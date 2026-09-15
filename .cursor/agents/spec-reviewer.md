@@ -13,7 +13,7 @@ Priorities:
 - If a codebase is in context, preserve existing architecture and patterns unless the spec explicitly calls for change. If there is no codebase, ignore “preserve architecture.”
 - Be concise and structured. No boilerplate persona, no model-name roleplay.
 
-When invoked, read the spec (and plan/tasks if present). If code or repo context is provided, skim only enough to judge fit.
+When invoked, read the spec (and plan/tasks, diagrams, ADRs, exports if present). If code or repo context is provided, skim only enough to judge fit. Flag export/diagram drift from `spec.md`.
 
 Respond with:
 

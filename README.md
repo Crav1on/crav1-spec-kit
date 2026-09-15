@@ -99,9 +99,36 @@ Runnable pieces in this repo:
 | --- | --- | --- |
 | Skill `/spark-to-spec` | You have 1–2 sentences | Slash command; can pin as Custom Mode |
 | Skill `/tighten-spec` | Spec exists, still mushy | Slash command |
-| Subagent `spec-reviewer` | Independent critique | Agent delegates, or ask “review this spec” |
+| Skill `/ideas-to-spec` | Pile of ideas + technical hunches | Slash command; pick an export format |
+| Skill `/export-spec` | Spec exists, want another format | Slash command |
+| Subagent `spec-reviewer` | Independent product/spec critique | Agent delegates, or ask “review this spec” |
+| Subagent `architecture-reviewer` | Diagrams, ADRs, hunches vs decisions | Agent delegates |
 
-## 3. The working loop (once a spec exists)
+## 3. From a pile of ideas (not a spark, not a spec)
+
+When you already have several ideas and maybe stack opinions, use **`/ideas-to-spec`**, not `/spark-to-spec`. Full walkthrough: [From a pile of ideas to a spec](docs/from-ideas.md).
+
+**First prompt:**
+
+```text
+/ideas-to-spec
+
+Format: EARS
+# BDD | OpenSpec | YAML | JSON | BMAD  (comma-separate for more than one)
+
+Bundle:
+- <ideas>
+- Technical thoughts: <hunches, constraints, preferred shape>
+
+Treat hunches as proposed, not decided.
+Do not write code. Capture first, then architecture questions.
+```
+
+Flow: cluster intent vs hunches → product questions if needed → **architecture interview** (≤7 questions, 2–3 options) → write `spec.md` + `diagrams.md` + ADRs + `export/<format>` → optional `architecture-reviewer` → Plan Mode.
+
+Canonical spec stays Markdown. EARS / BDD / OpenSpec / YAML / JSON / BMAD are exports. Mermaid for context and sequences; ASCII for trees and CLIs. ADRs only when there were real alternatives (MADR-shaped template).
+
+## 4. The working loop (once a spec exists)
 
 Use this on any non-trivial change.
 
@@ -146,7 +173,7 @@ Use `/review`, Bugbot, or a dedicated review subagent. Diff against the spec, no
 
 ---
 
-## 4. How to set it up
+## 5. How to set it up
 
 You can stay native to Cursor, or layer Spec Kit / OpenSpec on top. Native Cursor is enough for most teams; the toolkits add templates and slash-command discipline.
 
@@ -191,8 +218,11 @@ Create skills with `/create-skill`. Keep `SKILL.md` short; put long templates in
 This repo already ships:
 
 - `/spark-to-spec` — one-liner → questions → `spec.md`
+- `/ideas-to-spec` — idea pile + technical hunches → spec, diagrams, ADRs, chosen export
 - `/tighten-spec` — iterate the spec in place
-- subagent `spec-reviewer` — independent critique (your architect prompt, split out)
+- `/export-spec` — re-project `spec.md` into EARS, BDD, OpenSpec, YAML, JSON, or BMAD
+- subagent `spec-reviewer` — independent product/spec critique
+- subagent `architecture-reviewer` — hunches vs decisions, diagrams, ADRs
 
 Add more later if you keep repeating a prompt:
 
@@ -235,7 +265,7 @@ You do not need both. Pick one template family and stay consistent.
 
 ---
 
-## 5. Best practices (Cursor + Spec Kit + OpenSpec)
+## 6. Best practices (Cursor + Spec Kit + OpenSpec)
 
 **Make intent unambiguous.** Models complete patterns; they do not read your mind. “Add photo sharing” hides thousands of decisions. Specs surface them before code exists.
 
@@ -263,7 +293,7 @@ You do not need both. Pick one template family and stay consistent.
 
 ---
 
-## 6. Minimal templates
+## 7. Minimal templates
 
 Copy these into `docs/specs/<change>/`.
 

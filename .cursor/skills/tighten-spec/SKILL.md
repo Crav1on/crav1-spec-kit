@@ -27,6 +27,7 @@ Use the spec the user @-mentions. Otherwise the most recently edited file under 
 - If they introduce architecture or stack, put it in a `## Constraints` section — do not let it replace user journeys.
 - Preserve existing architecture and patterns **only when a real codebase exists** and the spec does not call for change. On a greenfield spark, there is nothing to preserve.
 - Never “fix” the idea by expanding v0.
+- If `diagrams.md`, `adr/`, or `export/` exist, either update them to match the spec or tell the user to run `/export-spec` and `architecture-reviewer`. Do not leave exports contradicting `spec.md`.
 - Do not start Plan Mode or write code unless they explicitly ask.
 
 ## When the spec is tight enough
