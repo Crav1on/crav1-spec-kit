@@ -77,7 +77,31 @@ Quick, well-understood edits (rename, copy tweak, one-file bug with a clear stac
 
 ---
 
-## 2. The working loop
+## 2. From one sentence to a spec
+
+If you have no spec, no stack, and only a spark, do **not** start in Plan Mode and do not paste a “senior architect” persona. Interview first, write `spec.md`, tighten it, *then* plan. Full walkthrough: [From one sentence to a spec](docs/from-nothing.md).
+
+**First prompt** (Agent chat, strong reasoning model):
+
+```text
+/spark-to-spec
+
+Spark: <one or two sentences>
+
+Treat this as greenfield. Do not write code. Ask questions first.
+```
+
+Then: answer ≤7 questions → agent writes `docs/specs/<slug>/spec.md` → `/tighten-spec` until v0 is demoable → optional `spec-reviewer` subagent → **new chat**, Plan Mode, `@` the spec.
+
+Runnable pieces in this repo:
+
+| Piece | When | How |
+| --- | --- | --- |
+| Skill `/spark-to-spec` | You have 1–2 sentences | Slash command; can pin as Custom Mode |
+| Skill `/tighten-spec` | Spec exists, still mushy | Slash command |
+| Subagent `spec-reviewer` | Independent critique | Agent delegates, or ask “review this spec” |
+
+## 3. The working loop (once a spec exists)
 
 Use this on any non-trivial change.
 
@@ -122,7 +146,7 @@ Use `/review`, Bugbot, or a dedicated review subagent. Diff against the spec, no
 
 ---
 
-## 3. How to set it up
+## 4. How to set it up
 
 You can stay native to Cursor, or layer Spec Kit / OpenSpec on top. Native Cursor is enough for most teams; the toolkits add templates and slash-command discipline.
 
@@ -206,7 +230,7 @@ You do not need both. Pick one template family and stay consistent.
 
 ---
 
-## 4. Best practices (Cursor + Spec Kit + OpenSpec)
+## 5. Best practices (Cursor + Spec Kit + OpenSpec)
 
 **Make intent unambiguous.** Models complete patterns; they do not read your mind. “Add photo sharing” hides thousands of decisions. Specs surface them before code exists.
 
@@ -234,7 +258,7 @@ You do not need both. Pick one template family and stay consistent.
 
 ---
 
-## 5. Minimal templates
+## 6. Minimal templates
 
 Copy these into `docs/specs/<change>/`.
 
