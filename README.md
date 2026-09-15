@@ -366,3 +366,5 @@ Stack, compatibility, performance, security.
 - [Subagents](https://cursor.com/docs/subagents)
 - [GitHub Spec Kit](https://github.com/github/spec-kit/) · [GitHub Blog on SDD](https://github.blog/ai-and-ml/generative-ai/spec-driven-development-with-ai-get-started-with-a-new-open-source-toolkit/)
 - [OpenSpec](https://github.com/Fission-AI/OpenSpec)
+- [MADR (Markdown Architectural Decision Records)](https://adr.github.io/madr/)
+- [EARS (Easy Approach to Requirements Syntax)](https://alistairmavin.com/ears/)
