@@ -188,10 +188,15 @@ Save Plan Mode output into `docs/specs/<change>/plan.md` so Cloud Agents and tea
 
 Create skills with `/create-skill`. Keep `SKILL.md` short; put long templates in `references/`.
 
-Useful SDD skills:
+This repo already ships:
 
-- **specify** — interview for users, edge cases, non-goals; write `spec.md`
-- **plan-from-spec** — produce file-level plan and tasks; refuse to code
+- `/spark-to-spec` — one-liner → questions → `spec.md`
+- `/tighten-spec` — iterate the spec in place
+- subagent `spec-reviewer` — independent critique (your architect prompt, split out)
+
+Add more later if you keep repeating a prompt:
+
+- **plan-from-spec** — file-level plan and tasks; refuse to code
 - **implement-task** — one task from `tasks.md`, then tests
 - **verify-spec** — map acceptance criteria to tests/UI checks
 
