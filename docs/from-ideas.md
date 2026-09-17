@@ -37,6 +37,7 @@ That slash command *is* the prompt. Pin `/ideas-to-spec` as a Custom Mode if you
 | B Architecture | Answer / “use assumptions”             | ≤7 technical questions + 2–3 options at one abstraction level                             |
 | C Write        | Pick options, correct A-numbers        | `spec.md`, `diagrams.md`, ADRs, `export/<format>`                                         |
 | D Critique     | Optional                               | `/architecture-reviewer` then `/tighten-spec` (one issue at a time)                        |
+| D2 Questions   | Leftover Open questions                | `/resolve-questions` — keep open or answer, one `Q#` at a time                             |
 | E Export again | “also want JSON”                       | `/export-spec` — does not change behavior                                                 |
 | Stop           | v0 is demoable and ADRs match diagrams | New chat, Plan Mode, `@spec.md` `@diagrams.md` `@adr/`                                    |
 
