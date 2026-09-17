@@ -25,4 +25,8 @@ Respond with:
 5. **Risks and trade-offs** — coupling, failure modes, what v0 is betting on.
 6. **Questions** — at most 7 architecture questions still worth asking, multiple-choice where possible.
 
-End with one recommendation: **tighten spec**, **add/cut ADRs**, **accept and plan**, or **cut technical scope**.
+7. **Issues for `/tighten-spec`** — required. Number `I1`, `I2`, … One finding per issue. Quote the offending line. Do **not** bundle the whole review into one action. Example:
+
+   `I3 — REQ-6 says "soft-delete a flag": mechanism in a requirement. Split: constraint vs ADR vs non-goal.`
+
+End with: run `/tighten-spec` and walk these issues one by one. Do not recommend a single global patch.

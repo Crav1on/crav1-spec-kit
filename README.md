@@ -91,14 +91,14 @@ Spark: <one or two sentences>
 Treat this as greenfield. Do not write code. Ask questions first.
 ```
 
-Then: answer ≤7 questions → agent writes `docs/specs/<slug>/spec.md` → `/tighten-spec` (pick an option, then it patches) until v0 is demoable → optional `spec-reviewer` subagent → **new chat**, Plan Mode, `@` the spec.
+Then: answer ≤7 questions → agent writes `docs/specs/<slug>/spec.md` → `/tighten-spec` walks **each** finding with choices (impact included) → optional `spec-reviewer` → **new chat**, Plan Mode, `@` the spec.
 
 Runnable pieces in this repo:
 
 | Piece | When | How |
 | --- | --- | --- |
 | Skill `/spark-to-spec` | You have 1–2 sentences | Slash command; can pin as Custom Mode |
-| Skill `/tighten-spec` | Spec exists, still mushy | Slash command; chooses before it edits |
+| Skill `/tighten-spec` | Spec exists, still mushy | Slash command; one issue at a time, then edit |
 | Skill `/ideas-to-spec` | Pile of ideas + technical hunches | Slash command; pick an export format |
 | Skill `/export-spec` | Spec exists, want another format | Slash command |
 | Subagent `spec-reviewer` | Independent product/spec critique | Agent delegates, or ask “review this spec” |
@@ -219,7 +219,7 @@ This repo already ships:
 
 - `/spark-to-spec` — one-liner → questions → `spec.md`
 - `/ideas-to-spec` — idea pile + technical hunches → spec, diagrams, ADRs, chosen export
-- `/tighten-spec` — offer explained next-step options, then patch only after you choose
+- `/tighten-spec` — one issue at a time, with explained resolutions and impact; patch only that issue after you choose
 - `/export-spec` — re-project `spec.md` into EARS, BDD, OpenSpec, YAML, JSON, or BMAD
 - subagent `spec-reviewer` — independent product/spec critique
 - subagent `architecture-reviewer` — hunches vs decisions, diagrams, ADRs

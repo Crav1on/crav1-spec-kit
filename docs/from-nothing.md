@@ -42,7 +42,7 @@ Use a strong reasoning model for this phase.
 | --- | --- | --- |
 | 1 | Spark + `/spark-to-spec` | Restate, propose v0, ≤7 questions, numbered assumptions |
 | 2 | Answer in bullets. Skip with “use assumptions” | Write `docs/specs/<slug>/spec.md` |
-| 3 | “v0 is too big” / “offline matters” / “not for teams” | `/tighten-spec` offers options (cut, apply, make testable, …) then patches after you pick |
+| 3 | “v0 is too big” / “offline matters” / “not for teams” | `/tighten-spec` turns each gap into an issue with choices (impact included), one by one |
 | 4 | Optional: “review this spec” | Parent agent delegates to **spec-reviewer** |
 | Stop | You can demo v0 from the acceptance list | Spec is done. New chat → Plan Mode → `@spec.md` |
 

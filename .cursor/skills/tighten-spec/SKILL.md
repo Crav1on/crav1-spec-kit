@@ -1,6 +1,6 @@
 ---
 name: tighten-spec
-description: Iterate an existing spec from critique, answers, or new constraints. Offer explained options first; do not patch until the user chooses. Use when a spec.md already exists and the user wants it sharper, smaller, or more testable. Do not write application code.
+description: Walk an existing spec issue-by-issue. For every finding (including architecture-reviewer notes), offer explained resolution choices and wait; patch only that issue after a pick. Use when spec.md exists and needs tightening. Do not write application code.
 disable-model-invocation: true
 icon: book-open
 color: cyan
@@ -8,69 +8,106 @@ color: cyan
 
 # Tighten spec
 
-You refine a spec in place. The spec is the source of truth; chat is commentary.
+You refine a spec **one issue at a time**. The spec is the source of truth; chat is commentary.
 
-**Do not patch files on the first response of a turn.** Find the spec, summarize, then offer options. Wait for a choice. Only then edit.
+Do **not** offer a single menu of workflow modes (“apply the whole review”, “make everything testable”, “full pass”). That hides per-finding decisions.
+
+**Do not patch until the user picks a resolution for the current issue** (or sends a batch of `I#: letter` answers).
 
 ## Find the spec
 
 Use the spec the user @-mentions. Otherwise the most recently edited file under `docs/specs/` excluding `_template/`. If several, ask which slug.
 
-Read `spec.md` and note whether `diagrams.md`, `adr/`, `tasks.md`, or `export/` exist.
+Read `spec.md` and note `diagrams.md`, `adr/`, `tasks.md`, `export/`.
 
-## Each turn
+Also read the latest **architecture-reviewer** / **spec-reviewer** output in this chat if present. Those findings become issues. Do not collapse them into one “apply reviewer notes” action.
 
-### 1. Brief (no edits)
+## Build the issue list (no edits)
 
-- 2–4 bullets: what their latest message is asking for
-- 2–4 bullets: what is weak in the spec *right now* (untestable acceptance, bloated v0, hunches in journeys, export/diagram drift)
-- If the spec already meets the “tight enough” checklist, say so up front
+Number issues `I1`, `I2`, … Each issue is **one** defect, ambiguity, or decision smuggled into the wrong layer.
 
-### 2. Options (always, before any patch)
+Sources, in order:
 
-Present **only the options that apply this turn** (usually 3–6). Use the questions tool when available (multiple-choice). Every option needs: **name**, **what it does**, **what it will change on disk**, **when to pick it**.
+1. Numbered issues already listed by a reviewer in this chat (preserve their meaning; split if they bundled two problems)
+2. Fresh read of `spec.md` / diagrams / ADRs (add only issues the reviewer missed)
 
-Base the menu on this list. Drop options that do not apply (e.g. skip “sync artifacts” if there are no diagrams/ADRs/exports). Never invent extra product features as an option.
+Typical issue shapes (from this skill’s job):
 
-| Id | Name | What it does | Disk | Pick when |
-| --- | --- | --- | --- | --- |
-| `cut-scope` | Cut v0 | Move tempting extras to non-goals / later. Prefer this over adding. | Edits `spec.md` only (goals, non-goals, journeys, acceptance). | v0 cannot be demoed in one sitting, or they said “too big.” |
-| `make-testable` | Make acceptance falsifiable | Rewrite mushy checks into yes/no lines a stranger could run. Does not add features. | Edits acceptance (and journeys if they are too vague to test). | Criteria read like “fast,” “intuitive,” or “handle errors.” |
-| `apply-notes` | Apply this message | Fold their new answers, constraints, or corrections into the spec. | Edits `spec.md`. Architecture/stack goes under `## Constraints`, not journeys. | They gave concrete corrections (A3 is wrong, offline matters, not for teams). |
-| `ask-first` | Ask, don’t patch | Ask at most 5 clarifying questions and list assumptions. No file edits. | None. | Their message is ambiguous, or patching would guess. |
-| `sync-artifacts` | Sync diagrams / ADRs / exports | After spec intent is clear, update related files so they do not contradict `spec.md`. Or tell them to `/export-spec` if a full re-projection is cleaner. | May edit `diagrams.md`, `adr/`, `export/`. Never changes product intent. | Those files exist and drift, or they just accepted a spec patch. |
-| `review-product` | Critique via spec-reviewer | Delegate to `spec-reviewer`. Independent read of testability and gaps. | None from this skill. | They want a second opinion before more edits. |
-| `review-architecture` | Critique via architecture-reviewer | Delegate to `architecture-reviewer`. Hunches vs decisions, ADR/diagram gaps. | None from this skill. | Technical thoughts are smuggled into requirements, or ADRs look weak. |
-| `accept-plan` | Accept and plan | Stop tightening. Spec is tight enough. | None. Tell them: new chat, Plan Mode (`Shift+Tab`), `@` the spec. | Checklist below is true, or they explicitly want to plan. |
+- Acceptance / SHALL that is not yes/no
+- Missing happy, fail, or **empty** path
+- Mechanism in a requirement (flag, relational DB, library) that should be constraint, ADR, or non-goal
+- Open question that could be cut to a non-goal now
+- Missing home for a tech gap (no ADR, no open question, no constraint)
+- Diagram or ADR that contradicts `spec.md`
 
-You may combine **one** edit option with `sync-artifacts` as a single choice (“cut v0, then sync diagrams”) if drift would otherwise be guaranteed. Do not combine cut + apply + make-testable in one shot unless they asked for a full pass — that hides the decision.
+Skip nitpicks. Merge duplicates. Prefer fewer sharp issues over a laundry list.
 
-If they already named an option (`cut-scope`, “just apply”, “don’t edit, ask”), skip the menu and do that.
+If **no issues** and the tight-enough checklist passes, say so and offer only: stop and Plan Mode, or run `spec-reviewer`.
 
-### 3. After they choose (edits only now)
+## Walk one issue at a time
 
-Execute the chosen option.
+### Index (every turn, short)
 
-For edit options (`cut-scope`, `make-testable`, `apply-notes`, `sync-artifacts`):
+List remaining issues as one line each: `I2` … `In` titles only. Mark the current one.
 
-1. Patch only what that option allows.
-2. Recap **Added / Removed / Still open**.
-3. Point at any acceptance line that is still not falsifiable. Do **not** silently rewrite those unless they chose `make-testable` or a full pass.
-4. Re-offer a **short** next-step menu (2–4 options) if work remains. Stop if they chose `accept-plan` or a reviewer.
+### Current issue (full)
+
+For **only** the current `I#`:
+
+1. **Finding** — one or two sentences. Quote the spec/ADR/diagram line.
+2. **Why it matters** — testability, v0 size, or requirement-vs-decision blur.
+3. **Options** — 2–4 mutually exclusive resolutions. Use the questions tool when available.
+
+Every option: **letter**, **name**, **what changes**, **impact** (who/v0/tests, and which files). Use the resolution catalog below. Drop resolutions that do not fit this issue. Never add a product feature as a “fix.”
+
+4. How to answer: `A` / `B` / … for this issue, or a batch: `I1 A, I3 C, I4 D`. Unmentioned issues stay for later.
+
+Stop. Do not edit. Do not preview a full patched spec.
+
+If they already answered this `I#` in the same message, skip the menu and execute.
+
+### After a choice
+
+1. Patch **only** what that resolution allows for **that issue**.
+2. Recap: **Added / Removed / Still open** for this issue.
+3. If acceptance is still mushy on *this* issue and they did not choose `make-testable`, say so — do not silently rewrite.
+4. Advance to the next unanswered issue (same format). If none remain, run the tight-enough checklist.
+
+Do not start the next issue’s patch in the same turn unless they batched answers.
+
+## Resolution catalog (per issue, not per turn)
+
+Pick the ones that fit; rewrite names to the actual REQ/ADR.
+
+| Id | Name | What it does | Typical impact |
+| --- | --- | --- | --- |
+| `make-testable` | Make this falsifiable | Rewrite this SHALL/acceptance into a yes/no check. No extra features. | `spec.md` that requirement/journey. Tests can assert one outcome. |
+| `cut-from-v0` | Cut from v0 | Move this capability to non-goals / later. | Smaller demo; journeys/acceptance that depended on it go away or shrink. |
+| `to-constraint` | Treat as constraint | Remove mechanism from requirements; record accepted tech under `## Constraints`. | Product spec stays behavioral; stack is binding without pretending it is a user journey. |
+| `to-adr` | Make / reframe an ADR | This is a real choice with alternatives. Write or fix `adr/NNNN`. Status `proposed` unless they already decided. | Requirements lose “how”; decision is reviewable. May need a later `sync` of diagrams. |
+| `to-open-question` | Leave as open question | Do not guess. Add or keep a numbered open question. | v0 stays blocked on this until they answer; no silent product decision. |
+| `add-missing-path` | Add the missing path | Write the empty, fail, or happy path (and a matching acceptance line) that is absent. | Demo script and tests cover that state. Disk: journeys + acceptance only. |
+| `keep` | Keep as written | Explicitly accept the current text. Say the cost (usually untestable or blurred layers). | No disk change. Use rarely; call out the cost. |
+| `ask` | Ask, don’t patch | Ask at most 3 questions **about this issue**. No file edits. | Next turn retries this `I#` with answers. |
+| `sync-here` | Sync this artifact | Update the diagram/ADR/export that this issue names so it matches `spec.md`. Does not change product intent. | Only the named files. |
+
+Do **not** offer a turn-level `apply-notes` that applies the whole architecture review. Each reviewer bullet is its own `I#`.
+
+You may add `sync-here` as a **second letter on the same issue** only when the chosen resolution would immediately make a named diagram/ADR wrong (“B, then sync the sequence diagram”). Still one issue.
 
 ## Hard rules
 
 - Prefer **cutting scope** over adding features.
-- If they introduce architecture or stack, put it in a `## Constraints` section — do not let it replace user journeys.
-- Preserve existing architecture and patterns **only when a real codebase exists** and the spec does not call for change. On a greenfield spark, there is nothing to preserve.
+- Architecture/stack in the user’s answers goes to `## Constraints` or an ADR, not journeys.
+- Preserve existing architecture and patterns **only when a real codebase exists** and the spec does not call for change.
 - Never “fix” the idea by expanding v0.
-- If `diagrams.md`, `adr/`, or `export/` exist, do not leave them contradicting `spec.md`. Offer `sync-artifacts` or `/export-spec` instead of silently ignoring drift.
-- Do not start Plan Mode or write code unless they explicitly ask or choose `accept-plan`.
+- Do not leave `diagrams.md` / `adr/` / `export/` contradicting `spec.md` after a patch that affects them — either the chosen resolution includes `sync-here`, or the next issue is that drift.
+- Do not start Plan Mode or write application code unless they explicitly ask after issues are done.
 - Do not patch “to be helpful” when they have not chosen.
 
 ## When the spec is tight enough
 
-Say so when all of these are true:
+All remaining issues resolved **and**:
 
 - One primary user
 - v0 vs later is explicit
@@ -79,4 +116,4 @@ Say so when all of these are true:
 - Every acceptance line is a yes/no check
 - Open questions are listed, not buried
 
-Then the default option to highlight is `accept-plan`. Optionally include `review-product`.
+Then stop the issue walk. Tell them: new chat, Plan Mode (`Shift+Tab`), `@` the spec. Optional: `spec-reviewer` once, not as a substitute for unfinished `I#`s.
