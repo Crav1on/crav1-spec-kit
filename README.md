@@ -91,7 +91,7 @@ Spark: <one or two sentences>
 Treat this as greenfield. Do not write code. Ask questions first.
 ```
 
-Then: answer ≤7 questions → agent writes `docs/specs/<slug>/spec.md` → `/tighten-spec` walks **each** finding with choices (impact included) → optional `spec-reviewer` → **new chat**, Plan Mode, `@` the spec.
+Then: answer ≤7 questions → agent writes `docs/specs/<slug>/spec.md` → `/tighten-spec` walks **each** finding → `/resolve-questions` walks leftover Open questions (keep open or answer) → optional `spec-reviewer` → **new chat**, Plan Mode, `@` the spec.
 
 Runnable pieces in this repo:
 
@@ -100,6 +100,7 @@ Runnable pieces in this repo:
 | Skill `/spark-to-spec` | You have 1–2 sentences | Slash command; can pin as Custom Mode |
 | Skill `/architecture-reviewer` | Spec + diagrams/ADRs exist | Slash command; runs the reviewer subagent |
 | Skill `/tighten-spec` | Spec exists, still mushy | Slash command; one issue at a time, then edit |
+| Skill `/resolve-questions` | Open questions remain after tightening | Slash command; keep-open or answer, one `Q#` at a time |
 | Skill `/ideas-to-spec` | Pile of ideas + technical hunches | Slash command; pick an export format |
 | Skill `/export-spec` | Spec exists, want another format | Slash command |
 | Subagent `spec-reviewer` | Independent product/spec critique | Agent delegates, or ask “review this spec” |
@@ -222,6 +223,7 @@ This repo already ships:
 - `/ideas-to-spec` — idea pile + technical hunches → spec, diagrams, ADRs, chosen export
 - `/architecture-reviewer` — run the architecture-reviewer subagent; numbered issues at the end
 - `/tighten-spec` — one issue at a time, with explained resolutions and impact; patch only that issue after you choose
+- `/resolve-questions` — one Open question at a time; keep it open or answer with impact; patch only that `Q#`
 - `/export-spec` — re-project `spec.md` into EARS, BDD, OpenSpec, YAML, JSON, or BMAD
 - subagent `spec-reviewer` — independent product/spec critique
 - subagent `architecture-reviewer` — hunches vs decisions, diagrams, ADRs

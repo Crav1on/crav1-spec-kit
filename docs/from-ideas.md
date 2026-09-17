@@ -92,7 +92,7 @@ Diagrams: context + v0 sequence are required. State/ER only if the idea needs th
 Do not edit files.
 ```
 
-Then `/tighten-spec` to walk the numbered issues.
+Then `/tighten-spec` to walk the numbered issues. Then `/resolve-questions` for leftover Open questions.
 
 ## After accept
 

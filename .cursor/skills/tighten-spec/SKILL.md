@@ -116,4 +116,8 @@ All remaining issues resolved **and**:
 - Every acceptance line is a yes/no check
 - Open questions are listed, not buried
 
-Then stop the issue walk. Tell them: new chat, Plan Mode (`Shift+Tab`), `@` the spec. Optional: `spec-reviewer` once, not as a substitute for unfinished `I#`s.
+Then stop the issue walk.
+
+If **Open questions** (or unresolved assumptions) remain, the next command is `/resolve-questions` — not Plan Mode. That skill walks each question with keep-open vs answer.
+
+If the open-question list is empty, tell them: new chat, Plan Mode (`Shift+Tab`), `@` the spec. Optional: `spec-reviewer` once, not as a substitute for unfinished `I#`s or `Q#`s.
