@@ -24,4 +24,4 @@ Respond with:
 5. **Test strategy** — how a stranger would prove v0 (commands, UI path, failure case).
 6. **Risks and trade-offs** — including the cost of the current v0 slice vs a smaller one.
 
-End with a single recommendation: **tighten spec**, **accept and plan**, or **cut scope before planning**.
+End with a numbered **Issues for `/tighten-spec`** list (`I1`, `I2`, …), one finding each, plus a single recommendation: **tighten spec**, **accept and plan**, or **cut scope before planning**. Do not bundle all gaps into one patch instruction.
