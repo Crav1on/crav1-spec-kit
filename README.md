@@ -98,6 +98,7 @@ Runnable pieces in this repo:
 | Piece | When | How |
 | --- | --- | --- |
 | Skill `/spark-to-spec` | You have 1–2 sentences | Slash command; can pin as Custom Mode |
+| Skill `/architecture-reviewer` | Spec + diagrams/ADRs exist | Slash command; runs the reviewer subagent |
 | Skill `/tighten-spec` | Spec exists, still mushy | Slash command; one issue at a time, then edit |
 | Skill `/ideas-to-spec` | Pile of ideas + technical hunches | Slash command; pick an export format |
 | Skill `/export-spec` | Spec exists, want another format | Slash command |
@@ -219,6 +220,7 @@ This repo already ships:
 
 - `/spark-to-spec` — one-liner → questions → `spec.md`
 - `/ideas-to-spec` — idea pile + technical hunches → spec, diagrams, ADRs, chosen export
+- `/architecture-reviewer` — run the architecture-reviewer subagent; numbered issues at the end
 - `/tighten-spec` — one issue at a time, with explained resolutions and impact; patch only that issue after you choose
 - `/export-spec` — re-project `spec.md` into EARS, BDD, OpenSpec, YAML, JSON, or BMAD
 - subagent `spec-reviewer` — independent product/spec critique

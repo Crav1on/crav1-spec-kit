@@ -36,7 +36,7 @@ That slash command *is* the prompt. Pin `/ideas-to-spec` as a Custom Mode if you
 | A Capture      | Paste the pile                         | Clusters intent vs hunches vs undecided, v0 vs later, ≤5 product questions, format choice |
 | B Architecture | Answer / “use assumptions”             | ≤7 technical questions + 2–3 options at one abstraction level                             |
 | C Write        | Pick options, correct A-numbers        | `spec.md`, `diagrams.md`, ADRs, `export/<format>`                                         |
-| D Critique     | Optional                               | `architecture-reviewer` emits numbered issues; `/tighten-spec` walks them one by one      |
+| D Critique     | Optional                               | `/architecture-reviewer` then `/tighten-spec` (one issue at a time)                        |
 | E Export again | “also want JSON”                       | `/export-spec` — does not change behavior                                                 |
 | Stop           | v0 is demoable and ADRs match diagrams | New chat, Plan Mode, `@spec.md` `@diagrams.md` `@adr/`                                    |
 
@@ -83,6 +83,16 @@ Diagrams: context + v0 sequence are required. State/ER only if the idea needs th
 
 
 `spec.md` is always written. Choosing EARS does not delete the narrative spec.
+
+## Critique command
+
+```text
+/architecture-reviewer
+@docs/specs/<slug>/
+Do not edit files.
+```
+
+Then `/tighten-spec` to walk the numbered issues.
 
 ## After accept
 
