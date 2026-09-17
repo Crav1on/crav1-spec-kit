@@ -30,14 +30,16 @@ That slash command *is* the prompt. Pin `/ideas-to-spec` as a Custom Mode if you
 
 ## The extra steps (vs spark)
 
-| Phase | You | Agent |
-| --- | --- | --- |
-| A Capture | Paste the pile | Clusters intent vs hunches vs undecided, v0 vs later, ≤5 product questions, format choice |
-| B Architecture | Answer / “use assumptions” | ≤7 technical questions + 2–3 options at one abstraction level |
-| C Write | Pick options, correct A-numbers | `spec.md`, `diagrams.md`, ADRs, `export/<format>` |
-| D Critique | Optional | `architecture-reviewer` then `/tighten-spec` |
-| E Export again | “also want JSON” | `/export-spec` — does not change behavior |
-| Stop | v0 is demoable and ADRs match diagrams | New chat, Plan Mode, `@spec.md` `@diagrams.md` `@adr/` |
+
+| Phase          | You                                    | Agent                                                                                     |
+| -------------- | -------------------------------------- | ----------------------------------------------------------------------------------------- |
+| A Capture      | Paste the pile                         | Clusters intent vs hunches vs undecided, v0 vs later, ≤5 product questions, format choice |
+| B Architecture | Answer / “use assumptions”             | ≤7 technical questions + 2–3 options at one abstraction level                             |
+| C Write        | Pick options, correct A-numbers        | `spec.md`, `diagrams.md`, ADRs, `export/<format>`                                         |
+| D Critique     | Optional                               | `architecture-reviewer` then `/tighten-spec`                                              |
+| E Export again | “also want JSON”                       | `/export-spec` — does not change behavior                                                 |
+| Stop           | v0 is demoable and ADRs match diagrams | New chat, Plan Mode, `@spec.md` `@diagrams.md` `@adr/`                                    |
+
 
 Good replies in B:
 
@@ -49,6 +51,8 @@ Bad replies:
 
 - “All options, we’ll see in the code.”
 - “Add a platform layer in case we need it.”
+
+
 
 ## What gets written
 
@@ -67,14 +71,16 @@ Diagrams: context + v0 sequence are required. State/ER only if the idea needs th
 
 ## Formats (what you are choosing)
 
-| Id | You get | Use when |
-| --- | --- | --- |
-| **EARS** | WHEN/IF/WHERE/WHILE … SHALL | Testable requirements without a full Gherkin suite |
-| **BDD** | Feature / Given-When-Then | You want scenarios as the acceptance list |
-| **OpenSpec** | proposal, delta specs, design, tasks | Change-shaped work, especially brownfield later |
-| **YAML** | `export/spec.yaml` | Tools or agents that prefer structured files |
-| **JSON** | `export/spec.json` | Same as YAML, machine-first |
-| **BMAD** | Behavior, Model, API, Data | You want domain + interface + data in one readable doc |
+
+| Id           | You get                              | Use when                                               |
+| ------------ | ------------------------------------ | ------------------------------------------------------ |
+| **EARS**     | WHEN/IF/WHERE/WHILE … SHALL          | Testable requirements without a full Gherkin suite     |
+| **BDD**      | Feature / Given-When-Then            | You want scenarios as the acceptance list              |
+| **OpenSpec** | proposal, delta specs, design, tasks | Change-shaped work, especially brownfield later        |
+| **YAML**     | `export/spec.yaml`                   | Tools or agents that prefer structured files           |
+| **JSON**     | `export/spec.json`                   | Same as YAML, machine-first                            |
+| **BMAD**     | Behavior, Model, API, Data           | You want domain + interface + data in one readable doc |
+
 
 `spec.md` is always written. Choosing EARS does not delete the narrative spec.
 
@@ -89,3 +95,4 @@ Plan Mode.
 Stay inside v0. Do not reopen rejected options unless an ADR is still proposed.
 Do not code yet.
 ```
+
