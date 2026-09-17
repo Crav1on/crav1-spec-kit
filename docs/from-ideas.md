@@ -98,12 +98,14 @@ Then `/tighten-spec` to walk the numbered issues. Then `/resolve-questions` for 
 ## After accept
 
 ```text
-Plan Mode.
+/plan-from-spec
 @docs/specs/<slug>/spec.md
 @docs/specs/<slug>/diagrams.md
 @docs/specs/<slug>/adr
 
 Stay inside v0. Do not reopen rejected options unless an ADR is still proposed.
-Do not code yet.
+Do not code.
 ```
+
+Or Cursor Plan Mode with the same `@` files. The skill writes `plan.md` and `tasks.md` in the spec folder so the plan lives in git, not only in the Plan Mode UI.
 

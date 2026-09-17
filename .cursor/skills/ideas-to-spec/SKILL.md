@@ -80,7 +80,7 @@ Then output only:
 - Paths written
 - Decisions captured as ADRs vs still open
 - 3–5 remaining arguments
-- Next: `/tighten-spec`, `architecture-reviewer`, `/export-spec` (other format), or accept and Plan Mode
+- Next: `/tighten-spec`, `/architecture-reviewer`, `/export-spec`, `/plan-from-spec`, or accept and Plan Mode
 
 Still no application code. Still no `plan.md` unless they asked.
 

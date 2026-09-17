@@ -1,4 +1,4 @@
 # Tasks
 
-- [ ] T1: … (verify: …)
-- [ ] T2: … (verify: …)
+- [ ] T1: … (verify: …) (spec: …)
+- [ ] T2: … (verify: …) (spec: …)

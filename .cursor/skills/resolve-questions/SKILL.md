@@ -92,5 +92,5 @@ Do **not** offer a turn-level “answer all with assumptions.” Guessing is `as
 ## When the list is done
 
 - Remaining items are only those they **kept open**, or the list is empty.
-- Tell them: kept-open items stay as the spec’s honest unknowns; empty list → new chat, Plan Mode, `@` the spec.
+- Tell them: kept-open items stay as the spec’s honest unknowns; empty list → `/plan-from-spec` or new chat, Plan Mode, `@` the spec.
 - Optional next: `/export-spec` if exports exist, or `/architecture-reviewer` if answers changed the shape.
