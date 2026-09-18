@@ -205,10 +205,12 @@ docs/specs/
     spec.md          # what / why / acceptance
     plan.md          # how / constraints / files
     tasks.md         # ordered, testable slices
+    verify.md        # acceptance matrix after implementation
   <change-id>/
     spec.md
     plan.md
     tasks.md
+    verify.md
 AGENTS.md
 .cursor/rules/
 .cursor/skills/      # or .agents/skills/
@@ -230,7 +232,7 @@ This repo already ships:
 - `/export-spec` — re-project `spec.md` into EARS, BDD, OpenSpec, YAML, JSON, or BMAD
 - `/plan-from-spec` — file-level `plan.md` and testable `tasks.md`; refuses to code
 - `/implement-task` — one `tasks.md` row, then run its verify step
-- `/verify-spec` — map every v0 acceptance line to evidence; write `verify.md`
+- `/verify-spec` — TL;DR of implemented vs not, then acceptance details in `verify.md`
 - subagent `spec-reviewer` — independent product/spec critique
 - subagent `architecture-reviewer` — hunches vs decisions, diagrams, ADRs
 
