@@ -220,7 +220,9 @@ Save Plan Mode output into `docs/specs/<change>/plan.md` so Cloud Agents and tea
 
 ### Step 3 — Skills and Custom Modes
 
-Create skills with `/create-skill`. Keep `SKILL.md` short; put long templates in `references/`.
+Create skills with `/create-skill`. Keep `SKILL.md` short; put long templates in that skill’s `assets/` (and `references/` for recipes). Copying `.cursor/skills/` and `.cursor/agent-assets/` into another repo is enough for the commands to keep their file shapes — also copy `docs/specs/_template/` if you want the human starter folder.
+
+When you change a template, update `docs/specs/_template/` **and** every `assets/` / `agent-assets/` copy. Rule: `.cursor/rules/self-contained-skills.mdc`.
 
 This repo already ships:
 
