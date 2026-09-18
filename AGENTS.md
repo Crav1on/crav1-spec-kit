@@ -10,4 +10,5 @@ This repository is a **process guide** for spec-driven development in Cursor, no
 - Critique with `/architecture-reviewer`, then `/tighten-spec` one issue at a time.
 - After tightening, `/resolve-questions` to keep or answer each remaining Open question.
 - When the spec is accepted, `/plan-from-spec` writes `plan.md` and `tasks.md`. Do not code in that step.
+- Build with `/implement-task` (one `T#` per turn). Prove the slice with `/verify-spec`.
 - Prefer editing the spec or plan over long patch-prompt threads when implementation drifts.

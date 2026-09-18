@@ -91,7 +91,7 @@ Spark: <one or two sentences>
 Treat this as greenfield. Do not write code. Ask questions first.
 ```
 
-Then: answer ≤7 questions → agent writes `docs/specs/<slug>/spec.md` → `/tighten-spec` walks **each** finding → `/resolve-questions` walks leftover Open questions (keep open or answer) → optional `spec-reviewer` → **`/plan-from-spec`** (or new chat, Plan Mode) `@` the spec.
+Then: answer ≤7 questions → agent writes `docs/specs/<slug>/spec.md` → `/tighten-spec` walks **each** finding → `/resolve-questions` walks leftover Open questions (keep open or answer) → optional `spec-reviewer` → **`/plan-from-spec`** → `/implement-task` per `T#` → `/verify-spec`.
 
 Runnable pieces in this repo:
 
@@ -102,6 +102,8 @@ Runnable pieces in this repo:
 | Skill `/tighten-spec` | Spec exists, still mushy | Slash command; one issue at a time, then edit |
 | Skill `/resolve-questions` | Open questions remain after tightening | Slash command; keep-open or answer, one `Q#` at a time |
 | Skill `/plan-from-spec` | Spec is accepted; want plan + tasks, no code | Slash command; writes `plan.md` and `tasks.md` |
+| Skill `/implement-task` | `tasks.md` exists; build one slice | Slash command; one `T#`, then its verify |
+| Skill `/verify-spec` | Want proof against acceptance | Slash command; writes `verify.md` matrix |
 | Skill `/ideas-to-spec` | Pile of ideas + technical hunches | Slash command; pick an export format |
 | Skill `/export-spec` | Spec exists, want another format | Slash command |
 | Subagent `spec-reviewer` | Independent product/spec critique | Agent delegates, or ask “review this spec” |
@@ -227,15 +229,12 @@ This repo already ships:
 - `/resolve-questions` — one Open question at a time; keep it open or answer with impact; patch only that `Q#`
 - `/export-spec` — re-project `spec.md` into EARS, BDD, OpenSpec, YAML, JSON, or BMAD
 - `/plan-from-spec` — file-level `plan.md` and testable `tasks.md`; refuses to code
+- `/implement-task` — one `tasks.md` row, then run its verify step
+- `/verify-spec` — map every v0 acceptance line to evidence; write `verify.md`
 - subagent `spec-reviewer` — independent product/spec critique
 - subagent `architecture-reviewer` — hunches vs decisions, diagrams, ADRs
 
-Add more later if you keep repeating a prompt:
-
-- **implement-task** — one task from `tasks.md`, then tests
-- **verify-spec** — map acceptance criteria to tests/UI checks
-
-Invoke with `/skill-name`, or pin a skill as a **Custom Mode** (`Option+Enter` / `Alt+Enter`) so it stays on for the session (for example a TDD or “plan only” mode).
+Invoke with `/skill-name`, or pin a skill as a **Custom Mode** (`Option+Enter` / `Alt+Enter`) so it stays on for the session (for example `/implement-task` while you burn down `T#`s).
 
 ### Step 4 — Verification as part of the environment
 

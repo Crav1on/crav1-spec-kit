@@ -109,3 +109,17 @@ Do not code.
 
 Or Cursor Plan Mode with the same `@` files. The skill writes `plan.md` and `tasks.md` in the spec folder so the plan lives in git, not only in the Plan Mode UI.
 
+Then, in a **new** chat (or pin `/implement-task` as a Custom Mode):
+
+```text
+/implement-task
+@docs/specs/<slug>/tasks.md
+```
+
+When you want the full acceptance matrix:
+
+```text
+/verify-spec
+@docs/specs/<slug>/spec.md
+```
+

@@ -45,7 +45,7 @@ Use a strong reasoning model for this phase.
 | 3 | “v0 is too big” / “offline matters” / “not for teams” | `/tighten-spec` turns each gap into an issue with choices (impact included), one by one |
 | 4 | Optional: “review this spec” | Parent agent delegates to **spec-reviewer** |
 | 5 | Leftover Open questions | `/resolve-questions` — keep open or answer, one `Q#` at a time |
-| Stop | You can demo v0 from the acceptance list; leftover Qs are explicit | Spec is done enough. `/plan-from-spec` or new chat → Plan Mode → `@spec.md` |
+| Stop | You can demo v0 from the acceptance list; leftover Qs are explicit | Spec is done enough. `/plan-from-spec` then `/implement-task` / `/verify-spec` |
 
 Good iteration messages (short):
 

@@ -81,7 +81,7 @@ Output only:
 - Paths written
 - Task count and any acceptance line with no task (must be none, or you failed)
 - Kept-open questions parked as risks
-- Next: they review `plan.md` / `tasks.md`; **new chat**, Agent or Cursor Plan Mode Build, `@plan.md` `@tasks.md` `@spec.md`. Do not start coding in this chat.
+- Next: they review `plan.md` / `tasks.md`; **new chat**, `/implement-task` (or Cursor Plan Mode Build) with `@plan.md` `@tasks.md` `@spec.md`. Do not start coding in this chat.
 
 ## Hard rules
 
