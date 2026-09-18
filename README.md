@@ -103,7 +103,7 @@ Runnable pieces in this repo:
 | Skill `/resolve-questions` | Open questions remain after tightening | Slash command; keep-open or answer, one `Q#` at a time |
 | Skill `/plan-from-spec` | Spec is accepted; want plan + tasks, no code | Slash command; writes `plan.md` and `tasks.md` |
 | Skill `/implement-task` | `tasks.md` exists; build one slice | Slash command; one `T#`, then its verify |
-| Skill `/verify-spec` | Want proof against acceptance | Slash command; writes `verify.md` matrix |
+| Skill `/verify-spec` | Want proof against acceptance | Slash command; TL;DR then `verify.md` details |
 | Skill `/ideas-to-spec` | Pile of ideas + technical hunches | Slash command; pick an export format |
 | Skill `/export-spec` | Spec exists, want another format | Slash command |
 | Subagent `spec-reviewer` | Independent product/spec critique | Agent delegates, or ask “review this spec” |
