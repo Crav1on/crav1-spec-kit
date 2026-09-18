@@ -66,7 +66,7 @@ docs/specs/<slug>/
   export/openspec/        # if you chose OpenSpec
 ```
 
-ADRs use the MADR-shaped template in `_template/adr.md`. Status starts as `proposed`. Hunches with no alternative belong under Constraints, not as ADRs.
+ADRs use the MADR-shaped template in `.cursor/skills/ideas-to-spec/assets/adr.md` (same as `docs/specs/_template/adr.md`). Status starts as `proposed`. Hunches with no alternative belong under Constraints, not as ADRs.
 
 Diagrams: context + v0 sequence are required. State/ER only if the idea needs them. Mermaid for graphs and sequences; ascii for trees, CLIs, and simple pipelines.
 

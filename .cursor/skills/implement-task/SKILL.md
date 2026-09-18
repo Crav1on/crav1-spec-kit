@@ -14,7 +14,7 @@ You implement **one** row from `tasks.md`. Then you run that row’s **verify** 
 
 Spec folder: user @-mention, else the most recently edited tree under `docs/specs/` excluding `_template/`.
 
-Read `tasks.md`, `plan.md`, `spec.md`. Use diagrams/ADRs as constraints. Spec wins if they disagree.
+Read `tasks.md`, `plan.md`, `spec.md`. Task row shape is this skill’s `assets/tasks.md`. Use diagrams/ADRs as constraints. Spec wins if they disagree.
 
 **Which task:** the `T#` they named, else the first unchecked `- [ ]`. If all checked, say so and tell them to run `/verify-spec`.
 

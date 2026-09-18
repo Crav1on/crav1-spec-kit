@@ -14,7 +14,7 @@ This skill is the **command**. You are the parent agent. Immediately delegate to
 
 Use the spec folder the user @-mentions. Otherwise the most recently edited tree under `docs/specs/` excluding `_template/`. If several, ask which slug, then delegate.
 
-Pass the subagent these paths (read-only): `spec.md`, `diagrams.md`, `adr/`, and `export/` if present.
+Pass the subagent these paths (read-only): the user’s `spec.md`, `diagrams.md`, `adr/`, and `export/` if present. Also point it at this skill’s `assets/` (and `.cursor/agent-assets/architecture-reviewer/`) for **expected artifact shape**, not as the spec under review.
 
 ## What to tell the subagent
 

@@ -30,7 +30,7 @@ Stop and wait. Do not write `spec.md` until they answer or say “use your assum
 
 ## After they answer
 
-Write `docs/specs/<slug>/spec.md` from `_template/spec.md`. Slug: short kebab-case from the idea.
+Write `docs/specs/<slug>/spec.md` from this skill’s `assets/spec.md` (same file as `docs/specs/_template/spec.md`). Slug: short kebab-case from the idea.
 
 Fill every section. Rules:
 

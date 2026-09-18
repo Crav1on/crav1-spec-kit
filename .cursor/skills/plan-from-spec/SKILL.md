@@ -10,7 +10,7 @@ color: green
 
 You turn a spec into a **reviewable implementation plan and task list**. You do not implement. You do not expand v0. You do not reopen rejected ADRs or non-goals.
 
-Read `_template/plan.md` and `_template/tasks.md` for shape. If a real codebase exists, search it before naming files.
+Read this skill’s `assets/plan.md` and `assets/tasks.md` for shape (same files as `docs/specs/_template/`). If a real codebase exists, search it before naming files.
 
 ## Find the spec
 
@@ -46,7 +46,7 @@ If `export/openspec/design.md` or `export/openspec/tasks.md` already exist, upda
 
 ### plan.md
 
-Use the template. Fill:
+Use the template in this skill’s `assets/plan.md`. Fill:
 
 - **Constraints** — from spec constraints + accepted ADRs only
 - **Approach** — ordered steps for v0; reference diagrams

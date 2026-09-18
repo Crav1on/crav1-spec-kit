@@ -48,7 +48,7 @@ Then:
 
 ## Write `docs/specs/<slug>/verify.md`
 
-Follow `_template/verify.md` **section order**. Do not put the long acceptance table first.
+Follow this skill’s `assets/verify.md` **section order**. Do not put the long acceptance table first.
 
 1. **TL;DR** — counts + four id lists (implemented/verified, not implemented, verify failed, claimed/unverified). One line each. Then one line: next command (`/implement-task T#` or ship).
 2. **Tasks — overview** — one short table: `T#` | title | status | verify result. Group or sort: verified first, then failed, then not implemented.

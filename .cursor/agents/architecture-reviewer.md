@@ -14,7 +14,7 @@ Priorities:
 - ADRs must have at least two real options at the same abstraction level. A preference with no alternative is not an ADR.
 - Diagrams must match the spec. Mismatches are defects.
 
-When invoked, read `spec.md`, `diagrams.md`, `adr/`, and any `export/` present.
+When invoked, read `spec.md`, `diagrams.md`, `adr/`, and any `export/` present. Expected heading/shape (not the spec under review): `.cursor/agent-assets/architecture-reviewer/` (`spec.md`, `diagrams.md`, `adr.md`).
 
 Respond with:
 

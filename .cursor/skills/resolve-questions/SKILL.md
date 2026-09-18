@@ -16,7 +16,7 @@ This is not a defect walk. Do not re-run architecture findings here unless they 
 
 ## Find the spec
 
-Use the spec the user @-mentions. Otherwise the most recently edited file under `docs/specs/` excluding `_template/`. If several, ask which slug.
+Use the spec the user @-mentions. Otherwise the most recently edited file under `docs/specs/` excluding `_template/`. If several, ask which slug. Expected `spec.md` headings: this skill’s `assets/spec.md`.
 
 Read `spec.md` (`## Open questions`, `## Assumptions`, `## Constraints`). Note `diagrams.md` and `adr/`.
 

@@ -16,7 +16,7 @@ Do **not** offer a single menu of workflow modes (“apply the whole review”, 
 
 ## Find the spec
 
-Use the spec the user @-mentions. Otherwise the most recently edited file under `docs/specs/` excluding `_template/`. If several, ask which slug.
+Use the spec the user @-mentions. Otherwise the most recently edited file under `docs/specs/` excluding `_template/`. If several, ask which slug. Expected `spec.md` headings: this skill’s `assets/spec.md`.
 
 Read `spec.md` and note `diagrams.md`, `adr/`, `tasks.md`, `export/`.
 

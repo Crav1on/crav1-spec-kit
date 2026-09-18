@@ -4,7 +4,8 @@ This repository is a **process guide** for spec-driven development in Cursor, no
 
 - Do not scaffold an app unless the user explicitly asks for one.
 - Keep the README accurate against current Cursor docs when you update it.
-- Put per-change work under `docs/specs/<change-id>/` using `_template/`.
+- Put per-change work under `docs/specs/<change-id>/` using `_template/` (human starter). Skills also carry copies in their `assets/`; keep both in sync.
+- When adding or updating a skill/agent that uses spec templates, copy those templates into that skill’s `assets/` (agents: `.cursor/agent-assets/<name>/`). See `.cursor/rules/self-contained-skills.mdc`.
 - From a one-sentence spark, use `/spark-to-spec` then `/tighten-spec`. Do not code first.
 - From a pile of ideas plus technical hunches, use `/ideas-to-spec` (diagrams + ADRs + chosen export). Do not code first.
 - Critique with `/architecture-reviewer`, then `/tighten-spec` one issue at a time.
