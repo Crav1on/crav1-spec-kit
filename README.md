@@ -91,7 +91,7 @@ Spark: <one or two sentences>
 Treat this as greenfield. Do not write code. Ask questions first.
 ```
 
-Then: answer ≤7 questions → agent writes `docs/specs/<slug>/spec.md` → `/tighten-spec` walks **each** finding → `/resolve-questions` walks leftover Open questions (keep open or answer) → optional `spec-reviewer` → **`/plan-from-spec`** → `/implement-task` per `T#` → `/verify-spec` → `/fix-from-verify` for any gap the matrix still lists.
+Then: answer ≤7 questions → agent writes `docs/specs/<slug>/spec.md` → `/tighten-spec` walks **each** finding → `/resolve-questions` walks leftover Open questions (keep open or answer) → optional `spec-reviewer` → **`/plan-from-spec`** → `/implement-task` per `T#` → `/verify-spec` → `/fix-from-verify` (omit Gap) for inner-loop remaining: failed → unverified → `G#`.
 
 Runnable pieces in this repo:
 
