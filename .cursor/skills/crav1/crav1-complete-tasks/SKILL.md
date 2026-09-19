@@ -2,9 +2,9 @@
 name: crav1-complete-tasks
 description: >-
   Orchestrate isolated /crav1-complete-task workers for a T# range or all
-  unchecked tasks. Persist commit style as a rule first. Launch one worker
-  chat per T#; relay fix/ready gates; stop the batch when a worker needs the
-  user or fails. Use to take several tasks implement-to-done, or
+  unchecked tasks. Persist commit style as a rule first. Ask once whether
+  they auto-run tools or will click Allow. Launch one worker per T#; relay
+  fix/ready gates only. Use for several tasks implement-to-done, or
   /crav1-complete-tasks.
 disable-model-invocation: true
 icon: list
@@ -36,6 +36,12 @@ Skip `[x]` unless they named a checked id (then say it is already done). Unknown
 Before the first worker, follow **style-persist.md**. If you must ask, this turn is style only.
 
 Do not ask again per `T#`. Workers must not ask style.
+
+## Tool approvals (once for the batch)
+
+Those **Allow / Stop** buttons on each worker (shell, env, Browser) are Cursor, not kit `fix`/`stop`. Follow [tool-approvals.md](../crav1-complete-task/references/tool-approvals.md) **before the first worker**. If you must ask `auto` / `click`, that turn is approvals only.
+
+After `auto`, do not treat IDE Allow/Stop as a reason to halt the board or re-prompt. After `click`, still do not re-ask per `T#`.
 
 ## Batch loop (you stay in this chat)
 

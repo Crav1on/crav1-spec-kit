@@ -47,7 +47,7 @@ Work in your **product** repo, not only the kit clone.
 4. `/crav1-architecture-reviewer` if there are real design hunches, then `/crav1-tighten-spec` **one issue at a time**.
 5. `/crav1-resolve-questions` for leftover `Q#`s you still care about.
 6. **New chat.** `/crav1-plan-from-spec`. You accept `plan.md` / `tasks.md`. Still no product code in that step.
-7. `/crav1-implement-task` for **one** `T#`, or `/crav1-complete-task` for an isolated worker that takes that row through commit and verify (optional fix). Several rows: `/crav1-complete-tasks T1-T3` (orchestrator; one worker per task) or omit the range for all unchecked.
+7. `/crav1-implement-task` for **one** `T#`, or `/crav1-complete-task` for an isolated worker that takes that row through commit and verify (optional fix). Several rows: `/crav1-complete-tasks T1-T3` (orchestrator; one worker per task) or omit the range for all unchecked. Before a long batch, set **Approvals & Execution** to **Run Everything** (or Auto-review + Browser Protection off) and answer `auto` once so you are not clicking Allow on every podman/browser call.
 8. If you implemented by hand: `/crav1-verify-spec`. If something in the inner loop is wrong, `/crav1-fix-from-verify` (omit Gap to take the next). Unimplemented tasks go back to step 7, not the fix skill.
 9. When you want a commit message: `/crav1-draft-commit-message` (paste into GitKraken) or `/crav1-finalize-commit` (edit, then copy or commit).
 

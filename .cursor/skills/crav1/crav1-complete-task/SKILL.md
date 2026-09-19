@@ -23,6 +23,8 @@ Several tasks: tell them `/crav1-complete-tasks` instead of launching many worke
 
 Follow this skill’s [references/style-persist.md](references/style-persist.md). If you must ask, this turn is **style only** — no worker yet.
 
+Then follow [references/tool-approvals.md](references/tool-approvals.md) (`auto` vs `click`). If you must ask, that turn is **approvals only** — no worker yet. After `auto`, do not treat IDE Allow/Stop as a kit gate.
+
 ## Find the work
 
 Spec folder: user @-mention, else most recently edited `docs/specs/` excluding `_template/`. Need `tasks.md` or stop (`/crav1-plan-from-spec`).
