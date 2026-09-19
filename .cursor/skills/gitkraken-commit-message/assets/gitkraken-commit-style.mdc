@@ -1,0 +1,16 @@
+---
+description: GitKraken and agent commits follow gitkraken-commit-message/references/style.md
+alwaysApply: true
+---
+
+# GitKraken commit style (persistent)
+
+This file was written by `/gitkraken-commit-message` when you chose **this commit and onward**.
+
+When drafting or creating commits in this repo:
+
+- Follow `.cursor/skills/gitkraken-commit-message/references/style.md`.
+- Do not use Conventional Commits prefixes (`feat:`, `fix:`, `chore:`).
+- Do not ask whether to use that style. It stays on until this rule is removed.
+
+**To stop and get the once/onward prompt again:** delete this file (`.cursor/rules/gitkraken-commit-style.mdc`). Nothing else to undo.

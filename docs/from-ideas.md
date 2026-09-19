@@ -141,7 +141,14 @@ When you are ready to commit in GitKraken (after a `T#` or a live fix):
 /gitkraken-commit-message
 ```
 
-Paste the **Summary** and **Description** blocks. The skill does not run `git commit` unless you also ask it to. Style lives in `.cursor/skills/gitkraken-commit-message/references/style.md`; it follows this repo’s `git log` when that disagrees with the examples.
+Paste the **Summary** and **Description** blocks. The skill does not run `git commit` unless you also ask it to.
+
+First time (no rule yet) it asks:
+
+- **This commit only** — use `references/style.md` now; ask again next time.
+- **This commit and onward** — same, and write `.cursor/rules/gitkraken-commit-style.mdc` so later chats skip the question.
+
+To go back to asking: delete `.cursor/rules/gitkraken-commit-style.mdc`.
 
 Inner-loop example (same skill; `/fix-live` also works):
 
