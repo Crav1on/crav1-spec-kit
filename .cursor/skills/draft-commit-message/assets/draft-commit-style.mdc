@@ -1,0 +1,18 @@
+---
+description: Commits follow draft-commit-message/references/style.md
+alwaysApply: true
+---
+
+# Draft-commit style.md (persistent)
+
+This file was written by `/draft-commit-message` when you chose **style.md, this commit and onward**.
+
+When drafting or creating commits in this repo:
+
+- Follow `.cursor/skills/draft-commit-message/references/style.md`.
+- Do not use Conventional Commits prefixes (`feat:`, `fix:`, `chore:`).
+- Do not ask whether to use that style. It stays on until this rule is removed.
+
+**To stop and get the once/onward prompt again:** delete this file (`.cursor/rules/draft-commit-style.mdc`). Nothing else to undo.
+
+Only one draft-commit persist rule should exist. If `.cursor/rules/draft-commit-gitlog.mdc` (or a legacy `gitkraken-commit-*.mdc`) is also present, delete one of them.

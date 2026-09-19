@@ -1,18 +1,20 @@
 ---
-name: gitkraken-commit-message
+name: draft-commit-message
 description: >-
-  Draft a GitKraken-ready commit summary and description. Ask whether to use
-  references/style.md or this repo’s git log, for this commit only or onward
-  as a deletable Cursor rule. Use when the user asks for a commit message or
-  GitKraken summary/description.
+  Draft a paste-ready GitKraken commit summary and description. Ask whether to
+  use references/style.md or this repo’s git log, for this commit only or onward
+  as a deletable Cursor rule. Use when the user asks for a commit message,
+  GitKraken summary/description, or /draft-commit-message.
 disable-model-invocation: true
 icon: git-commit
 color: purple
 ---
 
-# GitKraken commit message
+# Draft commit message
 
-You draft paste-ready **Summary** and **Description** for GitKraken. You do **not** create the commit unless the user also asked you to commit.
+You draft paste-ready **Summary** and **Description** (GitKraken fields). You do **not** create the commit unless the user also asked you to commit.
+
+Command: `/draft-commit-message`.
 
 Bundled style: [references/style.md](references/style.md).  
 Git-log style: this repo’s recent `git log` (subject + body).
@@ -21,22 +23,27 @@ Persistent rules (at most one should exist):
 
 | File | Meaning | Template |
 | --- | --- | --- |
-| `.cursor/rules/gitkraken-commit-style.mdc` | Always `style.md` | `assets/gitkraken-commit-style.mdc` |
-| `.cursor/rules/gitkraken-commit-gitlog.mdc` | Always live `git log` | `assets/gitkraken-commit-gitlog.mdc` |
+| `.cursor/rules/draft-commit-style.mdc` | Always `style.md` | `assets/draft-commit-style.mdc` |
+| `.cursor/rules/draft-commit-gitlog.mdc` | Always live `git log` | `assets/draft-commit-gitlog.mdc` |
+
+Also treat these **legacy** names as the same persist (if you find them, use them; new writes use the names above):
+
+- `.cursor/rules/gitkraken-commit-style.mdc` → style.md onward
+- `.cursor/rules/gitkraken-commit-gitlog.mdc` → git log onward
 
 ## Before drafting
 
 1. Inspect what would be committed (staged first; if empty, unstaged). On Windows, `git` may not be on `PATH` — try `git`, then `C:\Program Files\Git\cmd\git.exe`.
 2. Read `git log` (about 8–15 commits: subject + body) when git works.
-3. Check which persist rule exists.
+3. Check which persist rule exists (new names first, then legacy).
 
-### If `gitkraken-commit-style.mdc` exists
+### If a **style.md onward** rule exists
 
 Do **not** ask. Draft using `references/style.md` (`style.md` wins over the log). After the blocks: delete that rule file to stop; mention the git-log rule if both files exist (ask which to keep).
 
-### If `gitkraken-commit-gitlog.mdc` exists (and the style.md rule does not)
+### If a **git-log onward** rule exists (and no style.md rule)
 
-Do **not** ask. Draft matching **live `git log`**. If the log is empty, say so and fall back to asking the menu. After the blocks: delete `.cursor/rules/gitkraken-commit-gitlog.mdc` to stop.
+Do **not** ask. Draft matching **live `git log`**. If the log is empty, say so and fall back to asking the menu. After the blocks: delete the git-log rule file to stop.
 
 ### If neither rule exists
 
@@ -45,15 +52,15 @@ Do **not** ask. Draft matching **live `git log`**. If the log is empty, say so a
 | Id | Choice | What it does | Disk |
 | --- | --- | --- | --- |
 | `once` | `style.md`, this commit only | Use bundled `references/style.md` for **this** message. Ask again next time. | None |
-| `onward` | `style.md`, this commit and onward | Same, **and** write `gitkraken-commit-style.mdc`. Remove `gitkraken-commit-gitlog.mdc` if it exists. | Rule from `assets/gitkraken-commit-style.mdc` |
+| `onward` | `style.md`, this commit and onward | Same, **and** write `draft-commit-style.mdc`. Remove any git-log persist rule. | Rule from `assets/draft-commit-style.mdc` |
 | `log-once` | Git log, this commit only | Match **this repo’s** recent messages for **this** message. Ask again next time. | None |
-| `log-onward` | Git log, this commit and onward | Same, **and** write `gitkraken-commit-gitlog.mdc`. Remove `gitkraken-commit-style.mdc` if it exists. | Rule from `assets/gitkraken-commit-gitlog.mdc` |
+| `log-onward` | Git log, this commit and onward | Same, **and** write `draft-commit-gitlog.mdc`. Remove any style.md persist rule. | Rule from `assets/draft-commit-gitlog.mdc` |
 
 If `git log` is empty or unavailable, say that `log-once` / `log-onward` have no pattern to copy; they can still pick `style.md`.
 
 If they already named an id (`once`, `onward`, `log-once`, `log-onward`), skip the menu.
 
-After `onward` or `log-onward`: write the matching rule **before** showing the message, and delete the other persist file so only one remains. Tell them they undo by **deleting that rule file**.
+After `onward` or `log-onward`: write the matching **new** rule name **before** showing the message, and delete the other persist files (including legacy names) so only one remains. Tell them they undo by **deleting that rule file**.
 
 ## Draft
 

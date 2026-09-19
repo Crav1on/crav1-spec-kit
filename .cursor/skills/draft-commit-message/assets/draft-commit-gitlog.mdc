@@ -1,0 +1,18 @@
+---
+description: Commits follow this repo’s existing git log style
+alwaysApply: true
+---
+
+# Draft-commit git-log style (persistent)
+
+This file was written by `/draft-commit-message` when you chose **existing git log style, this commit and onward**.
+
+When drafting or creating commits in this repo:
+
+- Match **this repository’s** recent `git log` (subjects and bodies), not `.cursor/skills/draft-commit-message/references/style.md`.
+- Do not switch to Conventional Commits unless the live log already uses that shape.
+- Do not ask whether to use git-log style. It stays on until this rule is removed.
+
+**To stop and get the style prompt again:** delete this file (`.cursor/rules/draft-commit-gitlog.mdc`). Nothing else to undo.
+
+Only one draft-commit persist rule should exist. If `.cursor/rules/draft-commit-style.mdc` (or a legacy `gitkraken-commit-*.mdc`) is also present, delete one of them.

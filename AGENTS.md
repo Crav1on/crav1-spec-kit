@@ -14,4 +14,4 @@ This repository is a **process guide** for spec-driven development in Cursor, no
 - Build with `/implement-task` (one `T#` per turn). Prove the slice with `/verify-spec`.
 - After `/verify-spec`, `/fix-from-verify` with **no Gap** walks the inner-loop queue: verify failed → claimed/unverified → `G#`. Not unimplemented tasks. Do not edit `spec.md`. `/fix-live` is the same queue with a live-path hint.
 - Prefer editing the spec or plan over long patch-prompt threads when implementation drifts.
-- For a GitKraken paste-ready Summary/Description, `/gitkraken-commit-message`. It asks `style.md` vs live git log, this commit only vs onward (writes `gitkraken-commit-style.mdc` or `gitkraken-commit-gitlog.mdc`; delete that file to undo). Do not commit unless they asked.
+- For a paste-ready GitKraken Summary/Description, `/draft-commit-message`. It asks `style.md` vs live git log, this commit only vs onward (writes `draft-commit-style.mdc` or `draft-commit-gitlog.mdc`; delete that file to undo). Do not commit unless they asked.

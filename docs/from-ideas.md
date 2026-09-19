@@ -138,7 +138,7 @@ Omit `Gap` to take the next inner-loop item (order: verify failed → claimed do
 When you are ready to commit in GitKraken (after a `T#` or a live fix):
 
 ```text
-/gitkraken-commit-message
+/draft-commit-message
 ```
 
 Paste the **Summary** and **Description** blocks. The skill does not run `git commit` unless you also ask it to.
@@ -146,9 +146,9 @@ Paste the **Summary** and **Description** blocks. The skill does not run `git co
 First time (no persist rule yet) it asks:
 
 - **`style.md`, this commit only**
-- **`style.md`, this commit and onward** — writes `.cursor/rules/gitkraken-commit-style.mdc`
+- **`style.md`, this commit and onward** — writes `.cursor/rules/draft-commit-style.mdc`
 - **Git log, this commit only** — match this repo’s recent messages
-- **Git log, this commit and onward** — writes `.cursor/rules/gitkraken-commit-gitlog.mdc`
+- **Git log, this commit and onward** — writes `.cursor/rules/draft-commit-gitlog.mdc`
 
 Onward choices are mutually exclusive (writing one removes the other). To get the prompt again: delete that rule file.
 
