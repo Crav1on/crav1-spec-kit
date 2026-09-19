@@ -66,7 +66,7 @@ Same order as the file. Do **not** open with the full acceptance matrix.
 2. **TL;DR** (copy the id lists; they should be scannable in a few seconds)
 3. Point at the Tasks overview in the file
 4. Next:
-   - **Not implemented** or **verify failed** on a known `T#` → `/implement-task T#`
+   - **Not implemented**, **verify failed**, or **claimed done, unverified** → `/fix-from-verify` (after this report). `/implement-task T#` is also fine for a greenfield unchecked task.
    - acceptance with no task → `/plan-from-spec` or `/tighten-spec` if the line should die
    - all **Implemented, verified** and no missing acceptance → spec is demoable; they can ship / PR
 

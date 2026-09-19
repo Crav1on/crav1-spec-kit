@@ -123,15 +123,23 @@ When you want the full acceptance matrix:
 @docs/specs/<slug>/spec.md
 ```
 
-If that matrix looks fine (or unit tests pass) but a **running** call still fails (ports, proxy, SQL, compose):
+If the TL;DR still lists a gap (failed, unverified, not implemented, or a live path that could not run):
 
 ```text
-/fix-live
+/fix-from-verify
+@docs/specs/<slug>/verify.md
 @docs/specs/<slug>/spec.md
 
-Symptom: <what fails live>
-Live command: <exact curl / URL / payload>
-Spec bind: <REQ or T# or journey>
+Gap: <T# or A# or G# from the TL;DR>
+Do not change spec.md.
+```
+
+Inner-loop example (same skill; `/fix-live` also works):
+
+```text
+/fix-from-verify
+Gap: T# claimed done, unverified — POST /register never reached SQL
+Live command: POST <url>/register
 Do not change spec.md.
 ```
 
