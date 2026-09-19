@@ -3,8 +3,8 @@ name: crav1-complete-task
 description: >-
   Start one T# implement-to-done in an isolated worker chat (subagent). Persist
   commit style as a Cursor rule (same as finalize-commit onward). Auto-commit
-  after each phase. Use for a single task end-to-end, or /crav1-complete-task.
-  Several T#s: /crav1-complete-tasks (orchestrates these workers).
+  after each phase. Standalone: pause once for Approvals & Execution, then
+  undo at the end. Skip that pause when launched by /crav1-complete-tasks.
 disable-model-invocation: true
 icon: play
 color: green
@@ -23,7 +23,7 @@ Several tasks: tell them `/crav1-complete-tasks` instead of launching many worke
 
 Follow this skill’s [references/style-persist.md](references/style-persist.md). If you must ask, this turn is **style only** — no worker yet.
 
-Then follow [references/tool-approvals.md](references/tool-approvals.md) (`auto` vs `click`). If you must ask, that turn is **approvals only** — no worker yet. After `auto`, do not treat IDE Allow/Stop as a kit gate.
+Then, **only if this chat is a standalone `/crav1-complete-task`** (the user invoked this skill, not `/crav1-complete-tasks`): follow [references/tool-approvals.md](references/tool-approvals.md) — pause with directions, wait for `continue` / `click` / `stop`. If `/crav1-complete-tasks` launched you or passed `approvals: already-done`, **skip** that pause.
 
 ## Find the work
 
@@ -36,6 +36,7 @@ Spec folder: user @-mention, else most recently edited `docs/specs/` excluding `
 - Spec folder paths (`spec.md`, `tasks.md`, `plan.md`, `verify.md` if any)
 - `T#`
 - `resume: start` (or `fix` / `ready` / `stop` if this is a follow-up after a gate)
+- `approvals: already-done` after the standalone pause (or when the orchestrator passed that)
 - Point it at [references/run.md](references/run.md)
 
 Instruct it to follow `run.md` and end with the STATUS block. Do not do the implement/verify work in your own voice.
@@ -50,5 +51,7 @@ Show the worker’s recap and STATUS.
 | `needs_fix` | Ask `fix` / `stop`. `fix` → launch the **same** worker again with `resume: fix`. `stop` → end. |
 | `needs_ready` | Ask them to refresh the live host, then `ready` / `stop`. `ready` → worker with `resume: ready`. |
 | `blocked` / `failed` | Show DETAIL. Do not start another `T#`. |
+
+After this standalone run ends (any STATUS, or they `stop`), follow **tool-approvals.md → Undo**. Do not undo if this invocation skipped the pause (`approvals: already-done` from complete-tasks).
 
 Do not start `/crav1-complete-tasks` unless they asked.

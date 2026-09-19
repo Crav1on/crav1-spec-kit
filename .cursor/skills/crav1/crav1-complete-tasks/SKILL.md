@@ -3,9 +3,8 @@ name: crav1-complete-tasks
 description: >-
   Orchestrate isolated /crav1-complete-task workers for a T# range or all
   unchecked tasks. Persist commit style as a rule first. Ask once whether
-  they auto-run tools or will click Allow. Launch one worker per T#; relay
-  fix/ready gates only. Use for several tasks implement-to-done, or
-  /crav1-complete-tasks.
+  they pause for Approvals & Execution (then restore at the end). Launch one
+  worker per T# without another pause. Relay fix/ready gates only.
 disable-model-invocation: true
 icon: list
 color: green
@@ -17,7 +16,7 @@ You **manage** the batch. You do **not** implement, verify, or `git commit` in t
 
 Command: `/crav1-complete-tasks`. One task: `/crav1-complete-task`.
 
-Worker: `.cursor/agents/crav1-complete-task.md` (plugin: `agents/crav1-complete-task.md`). Protocol: `crav1-complete-task` [references/run.md](../crav1-complete-task/references/run.md). Style: [style-persist.md](../crav1-complete-task/references/style-persist.md).
+Worker: `.cursor/agents/crav1-complete-task.md` (plugin: `agents/crav1-complete-task.md`). Protocol: `crav1-complete-task` [references/run.md](../crav1-complete-task/references/run.md). Style: [style-persist.md](../crav1-complete-task/references/style-persist.md). Approvals: [tool-approvals.md](../crav1-complete-task/references/tool-approvals.md).
 
 ## Which tasks
 
@@ -39,9 +38,11 @@ Do not ask again per `T#`. Workers must not ask style.
 
 ## Tool approvals (once for the batch)
 
-Those **Allow / Stop** buttons on each worker (shell, env, Browser) are Cursor, not kit `fix`/`stop`. Follow [tool-approvals.md](../crav1-complete-task/references/tool-approvals.md) **before the first worker**. If you must ask `auto` / `click`, that turn is approvals only.
+Those **Allow / Stop** buttons on each worker are Cursor, not kit `fix`/`stop`. Follow [tool-approvals.md](../crav1-complete-task/references/tool-approvals.md) **once before the first worker** (pause, directions, wait for `continue` / `click` / `stop`).
 
-After `auto`, do not treat IDE Allow/Stop as a reason to halt the board or re-prompt. After `click`, still do not re-ask per `T#`.
+When you launch a worker, pass **`approvals: already-done`**. Workers and `/crav1-complete-task` must **not** pause again.
+
+After `continue`, do not treat IDE Allow/Stop as a reason to halt the board. After `click`, still do not re-ask per `T#`.
 
 ## Batch loop (you stay in this chat)
 
@@ -49,7 +50,7 @@ Keep a short board: queued / running / done / blocked.
 
 For each `T#` **one at a time**:
 
-1. Launch **crav1-complete-task** with spec folder, this `T#`, `resume: start`, and “style persist is already set.”
+1. Launch **crav1-complete-task** with spec folder, this `T#`, `resume: start`, `approvals: already-done`, and “style persist is already set.”
 2. Wait until that worker returns a STATUS block. Do not implement in parallel. Do not start `T+1` while this worker is open.
 3. Handle STATUS:
 
@@ -70,6 +71,8 @@ You may summarize each worker briefly on the board. Do not redo their implement/
 TL;DR: finished `T#`s, blocked `T#` + why, not started, commits the workers reported.
 
 If every selected task is `done`: one sentence that the requested slice is demoable (other unchecked `T#`s may remain if they passed a range).
+
+Then follow **tool-approvals.md → Undo** once (restore the mode they wrote at the pause). Do not undo after each `T#`.
 
 ## Hard rules
 

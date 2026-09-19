@@ -6,7 +6,7 @@ Follow these skills in order (drop-in `.cursor/skills/crav1/<name>/SKILL.md` or 
 
 `crav1-implement-task` → loop-commit → `crav1-verify-spec` → loop-commit → (optional) fix loop → `crav1-verify-spec` again.
 
-Commit **style** is already persisted (or the parent just wrote the rule). Use that persist. Do **not** ask style. Do **not** ask about Cursor Allow/Stop; the parent already chose `auto` or `click`.
+Commit **style** is already persisted (or the parent just wrote the rule). Use that persist. Do **not** ask style. Do **not** pause for Cursor Allow/Stop or Settings directions (`approvals: already-done`).
 
 Phase names in STATUS (never A/B/C/D): **`implement`**, **`verify`**, **`fix`**, **`done`**.
 
