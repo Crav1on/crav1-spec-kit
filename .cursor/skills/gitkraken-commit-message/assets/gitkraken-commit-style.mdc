@@ -14,3 +14,5 @@ When drafting or creating commits in this repo:
 - Do not ask whether to use that style. It stays on until this rule is removed.
 
 **To stop and get the once/onward prompt again:** delete this file (`.cursor/rules/gitkraken-commit-style.mdc`). Nothing else to undo.
+
+Only one GitKraken persist rule should exist. If `.cursor/rules/gitkraken-commit-gitlog.mdc` is also present, delete one of them.

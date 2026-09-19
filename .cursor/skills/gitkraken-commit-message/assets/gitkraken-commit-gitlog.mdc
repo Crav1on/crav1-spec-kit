@@ -1,0 +1,18 @@
+---
+description: GitKraken and agent commits follow this repo’s existing git log style
+alwaysApply: true
+---
+
+# GitKraken git-log commit style (persistent)
+
+This file was written by `/gitkraken-commit-message` when you chose **existing git log style, this commit and onward**.
+
+When drafting or creating commits in this repo:
+
+- Match **this repository’s** recent `git log` (subjects and bodies), not `.cursor/skills/gitkraken-commit-message/references/style.md`.
+- Do not switch to Conventional Commits unless the live log already uses that shape.
+- Do not ask whether to use git-log style. It stays on until this rule is removed.
+
+**To stop and get the style prompt again:** delete this file (`.cursor/rules/gitkraken-commit-gitlog.mdc`). Nothing else to undo.
+
+Only one GitKraken persist rule should exist. If `.cursor/rules/gitkraken-commit-style.mdc` is also present, delete one of them.

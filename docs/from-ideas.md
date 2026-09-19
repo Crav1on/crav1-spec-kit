@@ -143,12 +143,14 @@ When you are ready to commit in GitKraken (after a `T#` or a live fix):
 
 Paste the **Summary** and **Description** blocks. The skill does not run `git commit` unless you also ask it to.
 
-First time (no rule yet) it asks:
+First time (no persist rule yet) it asks:
 
-- **This commit only** — use `references/style.md` now; ask again next time.
-- **This commit and onward** — same, and write `.cursor/rules/gitkraken-commit-style.mdc` so later chats skip the question.
+- **`style.md`, this commit only**
+- **`style.md`, this commit and onward** — writes `.cursor/rules/gitkraken-commit-style.mdc`
+- **Git log, this commit only** — match this repo’s recent messages
+- **Git log, this commit and onward** — writes `.cursor/rules/gitkraken-commit-gitlog.mdc`
 
-To go back to asking: delete `.cursor/rules/gitkraken-commit-style.mdc`.
+Onward choices are mutually exclusive (writing one removes the other). To get the prompt again: delete that rule file.
 
 Inner-loop example (same skill; `/fix-live` also works):
 
