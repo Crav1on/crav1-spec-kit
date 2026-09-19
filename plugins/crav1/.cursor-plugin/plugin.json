@@ -1,0 +1,11 @@
+{
+  "name": "crav1",
+  "version": "1.0.0",
+  "description": "Spec-driven Cursor skills and agents: spark or ideas to spec, plan, implement, verify, and draft commit messages.",
+  "author": {
+    "name": "Thomas Cronholm",
+    "email": "thomas_cronholm@hotmail.com"
+  },
+  "keywords": ["crav1", "spec", "sdd", "skills", "agents"],
+  "license": "UNLICENSED"
+}

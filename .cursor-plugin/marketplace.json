@@ -1,0 +1,18 @@
+{
+  "name": "crav1-kit",
+  "owner": {
+    "name": "Thomas Cronholm",
+    "email": "thomas_cronholm@hotmail.com"
+  },
+  "metadata": {
+    "description": "crav1 spec-driven development kit for Cursor: skills, agents, and rules.",
+    "pluginRoot": "plugins"
+  },
+  "plugins": [
+    {
+      "name": "crav1",
+      "source": "crav1",
+      "description": "Spark-to-verify skills, spec/architecture reviewers, and a short usage rule. Type /crav1 after install."
+    }
+  ]
+}

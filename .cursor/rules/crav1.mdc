@@ -1,0 +1,14 @@
+---
+description: How this repo uses the crav1 spec-driven kit
+alwaysApply: true
+---
+
+# crav1 kit
+
+Specs, not chat history, are the source of truth. Put change work under `docs/specs/<change-id>/`.
+
+Type `/crav1` to list kit skills. Typical order: spark or ideas → architecture review → tighten → resolve questions → plan → implement one task → verify → fix-from-verify (do not edit `spec.md` in the fix loop).
+
+Do not scaffold an application unless the user asked for one. Prefer editing the spec or plan when implementation drifts.
+
+Full install paths: `docs/install.md` in the kit repo. After a plugin install, start with the plugin README.

@@ -2,7 +2,9 @@
 
 A concise playbook for using Cursor as an agentic coding environment where **specs, not chat history, are the source of truth**.
 
-This is a process guide, not an application. Use it as a checklist when you start a repo, then copy the folder patterns into that project.
+This is a process guide, not an application. Use it as a checklist when you start a repo, then install the kit into that project.
+
+**Before you install:** [docs/install.md](docs/install.md) (drop-in copy, Cursor plugin, or local plugin). **After a plugin install:** [plugins/crav1/README.md](plugins/crav1/README.md).
 
 Primary sources: [Cursor docs](https://cursor.com/docs/), [Plan Mode](https://cursor.com/docs/agent/plan-mode), [Agent](https://cursor.com/docs/agent/overview), [Rules](https://cursor.com/docs/context/rules), [Skills](https://cursor.com/docs/context/skills), [Cloud Agents](https://cursor.com/docs/cloud-agent), [GitHub Spec Kit](https://github.com/github/spec-kit/), and [OpenSpec](https://github.com/Fission-AI/OpenSpec).
 
@@ -228,9 +230,9 @@ Save Plan Mode output into `docs/specs/<change>/plan.md` so Cloud Agents and tea
 
 Create skills with `/create-skill`. New **crav1** skills go under `.cursor/skills/crav1/crav1-<name>/` with `name: crav1-<name>` so `/crav1` lists your library separately from Cursor built-ins. Keep `SKILL.md` short; put templates in that skill’s `assets/` (and `references/` for recipes).
 
-Drop-in for another repo: copy `.cursor/skills/crav1/`, `.cursor/agents/crav1-*.md`, `.cursor/agent-assets/crav1-*`, and `.cursor/rules/crav1-*.mdc`. Also copy `docs/specs/_template/` if you want the human starter folder.
+Install into another repo: [docs/install.md](docs/install.md). Drop-in copy is `.cursor/skills/crav1/`, `.cursor/agents/crav1-*.md`, `.cursor/agent-assets/crav1-*`, and `.cursor/rules/crav1.mdc`. Plugin install uses `plugins/crav1/` plus `.cursor-plugin/marketplace.json`. Also copy `docs/specs/_template/` if you want the human starter folder.
 
-When you change a template, update `docs/specs/_template/` **and** every `assets/` / `agent-assets/` copy. Rule: `.cursor/rules/crav1-self-contained-skills.mdc`.
+When you change a template, update `docs/specs/_template/` **and** every `assets/` / `agent-assets/` copy on **both** the drop-in tree and `plugins/crav1/` (`scripts/sync-crav1-plugin.sh`). Rule: `.cursor/rules/crav1-self-contained-skills.mdc`.
 
 This repo already ships:
 
@@ -375,7 +377,9 @@ Stack, compatibility, performance, security.
 
 ## Further reading
 
+- [Installing and using the kit](docs/install.md) · [Plugin quick start](plugins/crav1/README.md)
 - [Cursor documentation hub](https://cursor.com/docs/)
+- [Plugins](https://cursor.com/docs/plugins) · [Plugins reference](https://cursor.com/docs/reference/plugins)
 - [Plan Mode](https://cursor.com/docs/agent/plan-mode) · [Introducing Plan Mode](https://cursor.com/blog/plan-mode)
 - [Agent overview](https://cursor.com/docs/agent/overview)
 - [Rules and AGENTS.md](https://cursor.com/docs/context/rules)

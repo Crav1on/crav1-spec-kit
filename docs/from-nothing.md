@@ -1,5 +1,7 @@
 # From one sentence to a spec
 
+Kit not in this project yet? [Install first](install.md). After a plugin install, the short command loop is [plugins/crav1/README.md](../plugins/crav1/README.md).
+
 You do not start in Plan Mode. You do not start by picking Next.js. You start by making the idea small enough to accept or reject.
 
 ## Why your old prompt was the wrong *first* prompt

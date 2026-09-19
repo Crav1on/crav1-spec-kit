@@ -1,5 +1,7 @@
 # From a pile of ideas to a spec
 
+Kit not in this project yet? [Install first](install.md). After a plugin install, the short command loop is [plugins/crav1/README.md](../plugins/crav1/README.md).
+
 Use this when you have **more than a spark**: several ideas, maybe UX notes, maybe “I think we should use X”, but it is not a spec you would hand to an agent to build.
 
 You still do **not** start by coding. You add an architecture interview and you write diagrams + ADRs. The canonical file remains `spec.md`. Formats are exports.
@@ -66,7 +68,7 @@ docs/specs/<slug>/
   export/openspec/        # if you chose OpenSpec
 ```
 
-ADRs use the MADR-shaped template in `.cursor/skills/crav1/crav1-ideas-to-spec/assets/adr.md` (same as `docs/specs/_template/adr.md`). Status starts as `proposed`. Hunches with no alternative belong under Constraints, not as ADRs.
+ADRs use the MADR-shaped template in skill `crav1-ideas-to-spec` `assets/adr.md` (drop-in: `.cursor/skills/crav1/crav1-ideas-to-spec/assets/adr.md`; same as `docs/specs/_template/adr.md`). Status starts as `proposed`. Hunches with no alternative belong under Constraints, not as ADRs.
 
 Diagrams: context + v0 sequence are required. State/ER only if the idea needs them. Mermaid for graphs and sequences; ascii for trees, CLIs, and simple pipelines.
 
