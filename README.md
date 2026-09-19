@@ -106,6 +106,7 @@ Runnable pieces in this repo:
 | Skill `/verify-spec` | Want proof against acceptance | Slash command; TL;DR then `verify.md` details |
 | Skill `/fix-from-verify` | After verify-spec, inner-loop gaps | Slash command; omit Gap to walk failed → unverified → G# |
 | Skill `/fix-live` | Live/inner-loop gap | Alias of `/fix-from-verify` |
+| Skill `/gitkraken-commit-message` | About to commit in GitKraken | Slash command; paste-ready Summary + Description |
 | Skill `/ideas-to-spec` | Pile of ideas + technical hunches | Slash command; pick an export format |
 | Skill `/export-spec` | Spec exists, want another format | Slash command |
 | Subagent `spec-reviewer` | Independent product/spec critique | Agent delegates, or ask “review this spec” |
@@ -242,6 +243,7 @@ This repo already ships:
 - `/verify-spec` — TL;DR of implemented vs not, then acceptance details in `verify.md`
 - `/fix-from-verify` — after verify-spec, walk inner-loop gaps (failed → unverified → `G#`); omit Gap for the next; writes `fix-log.md`
 - `/fix-live` — alias when that gap is a live/inner-loop path
+- `/gitkraken-commit-message` — GitKraken Summary/Description from the diff; style in `references/style.md`
 - subagent `spec-reviewer` — independent product/spec critique
 - subagent `architecture-reviewer` — hunches vs decisions, diagrams, ADRs
 

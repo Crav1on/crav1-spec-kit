@@ -46,7 +46,7 @@ Output only:
 - `T#` done or blocked
 - Files changed
 - Verify command and result
-- Next: `/implement-task` (next unchecked), or `/verify-spec` when they want the full acceptance matrix
+- Next: `/implement-task` (next unchecked), `/gitkraken-commit-message` if they are about to commit, or `/verify-spec` when they want the full acceptance matrix
 
 Do not keep going through the list unless they wrote `T2 and T3` or “continue until blocked.”
 

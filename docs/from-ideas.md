@@ -135,6 +135,14 @@ Do not change spec.md.
 
 Omit `Gap` to take the next inner-loop item (order: verify failed → claimed done/unverified → `G#`). Repeat until that queue is empty. Unimplemented `T#`s stay on `/implement-task`.
 
+When you are ready to commit in GitKraken (after a `T#` or a live fix):
+
+```text
+/gitkraken-commit-message
+```
+
+Paste the **Summary** and **Description** blocks. The skill does not run `git commit` unless you also ask it to. Style lives in `.cursor/skills/gitkraken-commit-message/references/style.md`; it follows this repo’s `git log` when that disagrees with the examples.
+
 Inner-loop example (same skill; `/fix-live` also works):
 
 ```text
