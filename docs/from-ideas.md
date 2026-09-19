@@ -137,7 +137,19 @@ Do not change spec.md.
 
 Omit `Gap` to take the next inner-loop item (order: verify failed → claimed done/unverified → `G#`). Repeat until that queue is empty. Unimplemented `T#`s stay on `/crav1-implement-task`.
 
-When you are ready to commit (after a `T#` or a live fix):
+To take **one** `T#` from implement through commit, verify, and an optional fix loop (style once, auto-commit):
+
+```text
+/crav1-complete-task T2
+```
+
+Several (or all remaining `- [ ]`):
+
+```text
+/crav1-complete-tasks T1-T3
+```
+
+When you are ready to commit by itself (after a `T#` or a live fix):
 
 ```text
 /crav1-draft-commit-message

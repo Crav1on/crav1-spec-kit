@@ -105,6 +105,7 @@ If they say they **want** the Cursor trailer, leave it.
 
 - Never offer copy/edit/commit before Summary/Description exist. After they exist, show the blocks, then the choices (question prompt includes that wording).
 - No commit until `commit` (or an unambiguous “commit this message now”) **after** they have seen the current blocks.
+- `copy` never runs `git commit`.
 - After `commit`, if Cursor appended `Co-authored-by` / `Made-with` that was not in the draft, strip it once with amend when HEAD is ours and unpushed; do not fight a second inject—tell them to turn Attribution off.
 - Do not change product files except the persist rules the draft skill already writes (`draft-commit-style.mdc` / `draft-commit-gitlog.mdc`).
 - Do not open a PR.

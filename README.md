@@ -93,7 +93,7 @@ Spark: <one or two sentences>
 Treat this as greenfield. Do not write code. Ask questions first.
 ```
 
-Then: answer ≤7 questions → agent writes `docs/specs/<slug>/spec.md` → `/crav1-tighten-spec` walks **each** finding → `/crav1-resolve-questions` walks leftover Open questions (keep open or answer) → optional `crav1-spec-reviewer` → **`/crav1-plan-from-spec`** → `/crav1-implement-task` per `T#` → `/crav1-verify-spec` → `/crav1-fix-from-verify` (omit Gap) for inner-loop remaining: failed → unverified → `G#`.
+Then: answer ≤7 questions → agent writes `docs/specs/<slug>/spec.md` → `/crav1-tighten-spec` walks **each** finding → `/crav1-resolve-questions` walks leftover Open questions (keep open or answer) → optional `crav1-spec-reviewer` → **`/crav1-plan-from-spec`** → `/crav1-implement-task` per `T#` or `/crav1-complete-task` / `/crav1-complete-tasks` → `/crav1-verify-spec` → `/crav1-fix-from-verify` (omit Gap) for inner-loop remaining: failed → unverified → `G#`.
 
 Runnable pieces in this repo:
 
@@ -105,6 +105,8 @@ Runnable pieces in this repo:
 | Skill `/crav1-resolve-questions` | Open questions remain after tightening | Slash command; keep-open or answer, one `Q#` at a time |
 | Skill `/crav1-plan-from-spec` | Spec is accepted; want plan + tasks, no code | Slash command; writes `plan.md` and `tasks.md` |
 | Skill `/crav1-implement-task` | `tasks.md` exists; build one slice | Slash command; one `T#`, then its verify |
+| Skill `/crav1-complete-task` | One `T#` implement → commit → verify → optional fix loop | Style once; auto-commit; asks only if inner-loop or a gate |
+| Skill `/crav1-complete-tasks` | Several `T#`s to done | `T1-T3` or all unchecked; each via complete-task |
 | Skill `/crav1-verify-spec` | Want proof against acceptance | Slash command; TL;DR then `verify.md` details |
 | Skill `/crav1-fix-from-verify` | After verify-spec, inner-loop gaps | Slash command; omit Gap to walk failed → unverified → G# |
 | Skill `/crav1-fix-live` | Live/inner-loop gap | Alias of `/crav1-fix-from-verify` |
@@ -245,6 +247,8 @@ This repo already ships:
 - `/crav1-export-spec` — re-project `spec.md` into EARS, BDD, OpenSpec, YAML, JSON, or BMAD
 - `/crav1-plan-from-spec` — file-level `plan.md` and testable `tasks.md`; refuses to code
 - `/crav1-implement-task` — one `tasks.md` row, then run its verify step
+- `/crav1-complete-task` — one `T#`: implement → commit → verify-spec → commit → optional fix-from-verify loop; style once; auto-commit
+- `/crav1-complete-tasks` — `T1-T3` or all unchecked, each via complete-task; stop the batch when a task needs you
 - `/crav1-verify-spec` — TL;DR of implemented vs not, then acceptance details in `verify.md`
 - `/crav1-fix-from-verify` — after verify-spec, walk inner-loop gaps (failed → unverified → `G#`); omit Gap for the next; writes `fix-log.md`
 - `/crav1-fix-live` — alias when that gap is a live/inner-loop path

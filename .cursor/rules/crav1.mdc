@@ -7,7 +7,7 @@ alwaysApply: true
 
 Specs, not chat history, are the source of truth. Put change work under `docs/specs/<change-id>/`.
 
-Type `/crav1` to list kit skills. Typical order: spark or ideas → architecture review → tighten → resolve questions → plan → implement one task → verify → fix-from-verify (do not edit `spec.md` in the fix loop).
+Type `/crav1` to list kit skills. Typical order: spark or ideas → architecture review → tighten → resolve questions → plan → implement (or `/crav1-complete-task` / `/crav1-complete-tasks`) → verify → fix-from-verify (do not edit `spec.md` in the fix loop).
 
 Do not scaffold an application unless the user asked for one. Prefer editing the spec or plan when implementation drifts.
 

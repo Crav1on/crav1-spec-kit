@@ -46,7 +46,7 @@ Output only:
 - `T#` done or blocked
 - Files changed
 - Verify command and result
-- Next: `/crav1-implement-task` (next unchecked), `/crav1-draft-commit-message` (GitKraken paste only) or `/crav1-finalize-commit` (edit then copy or commit), or `/crav1-verify-spec` when they want the full acceptance matrix
+- Next: `/crav1-complete-task` (this `T#` through verify/fix/commits), `/crav1-complete-tasks` (a range or all unchecked), `/crav1-implement-task` (next unchecked only), `/crav1-draft-commit-message` / `/crav1-finalize-commit`, or `/crav1-verify-spec`
 
 Do not keep going through the list unless they wrote `T2 and T3` or “continue until blocked.”
 

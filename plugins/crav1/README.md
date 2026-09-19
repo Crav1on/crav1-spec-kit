@@ -19,6 +19,8 @@ Type `/crav1` in Agent chat to list commands.
 
 - `/crav1-plan-from-spec` — `plan.md` + `tasks.md` (no code)
 - `/crav1-implement-task` — one `T#`, then its verify step
+- `/crav1-complete-task` — one `T#` implement → commit → verify → optional fix loop (style once, auto-commit)
+- `/crav1-complete-tasks` — `T1-T3` or all unchecked; each via complete-task
 - `/crav1-verify-spec` — TL;DR of implemented vs not, then `verify.md`
 - `/crav1-fix-from-verify` — inner-loop gaps only (failed → unverified → `G#`); does not edit `spec.md`
 - `/crav1-fix-live` — same queue, live-path hint (ports, proxy, SQL)
@@ -45,8 +47,8 @@ Work in your **product** repo, not only the kit clone.
 4. `/crav1-architecture-reviewer` if there are real design hunches, then `/crav1-tighten-spec` **one issue at a time**.
 5. `/crav1-resolve-questions` for leftover `Q#`s you still care about.
 6. **New chat.** `/crav1-plan-from-spec`. You accept `plan.md` / `tasks.md`. Still no product code in that step.
-7. `/crav1-implement-task` for **one** `T#`. Repeat.
-8. `/crav1-verify-spec`. If something in the inner loop is wrong, `/crav1-fix-from-verify` (omit Gap to take the next). Unimplemented tasks go back to step 7, not the fix skill.
+7. `/crav1-implement-task` for **one** `T#`, or `/crav1-complete-task` to take that row through commit and verify (optional fix loop). Several rows: `/crav1-complete-tasks T1-T3` or omit the range for all unchecked.
+8. If you implemented by hand: `/crav1-verify-spec`. If something in the inner loop is wrong, `/crav1-fix-from-verify` (omit Gap to take the next). Unimplemented tasks go back to step 7, not the fix skill.
 9. When you want a commit message: `/crav1-draft-commit-message` (paste into GitKraken) or `/crav1-finalize-commit` (edit, then copy or commit).
 
 Do not start with “pick a stack and generate the app” unless the spec already says to. Quick typos and one-file bugs can skip this loop and use Agent mode directly.
