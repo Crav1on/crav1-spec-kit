@@ -44,7 +44,7 @@ Show the worker’s recap and STATUS.
 
 | STATUS | You do |
 | --- | --- |
-| `done` | Show Phase D TL;DR. Stop. |
+| `done` | Show the **done** TL;DR. Stop. |
 | `needs_fix` | Ask `fix` / `stop`. `fix` → launch the **same** worker again with `resume: fix`. `stop` → end. |
 | `needs_ready` | Ask them to refresh the live host, then `ready` / `stop`. `ready` → worker with `resume: ready`. |
 | `blocked` / `failed` | Show DETAIL. Do not start another `T#`. |

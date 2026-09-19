@@ -8,6 +8,8 @@ Follow these skills in order (drop-in `.cursor/skills/crav1/<name>/SKILL.md` or 
 
 Commit **style** is already persisted (or the parent just wrote the rule). Use that persist. Do **not** ask style.
 
+Phase names in STATUS (never A/B/C/D): **`implement`**, **`verify`**, **`fix`**, **`done`**.
+
 ## Loop-commit
 
 After a step that may have changed files:
@@ -29,19 +31,19 @@ Stop and return a **status block** (below) if:
 - `crav1-fix-from-verify` would stop (spec frozen, non-goal)
 - Commit / attribution needs them
 - Live host refresh needs them (`crav1-verify-spec` `references/live-host.md`) → `STATUS: needs_ready`
-- Inner-loop queue non-empty after verify-spec → `STATUS: needs_fix` (do not enter Phase C until parent says `resume: fix`)
+- Inner-loop queue non-empty after verify-spec → `STATUS: needs_fix` (do not enter **fix** until parent says `resume: fix`)
 - They / parent said `stop`
 
 ## Resume
 
 | Parent said | You do |
 | --- | --- |
-| (start / omitted) | Phase A |
-| `resume: ready` | Finish live-host wait; continue the phase that was waiting (usually B or C evidence) |
-| `resume: fix` | Phase C |
+| (start / omitted) | **implement** |
+| `resume: ready` | Finish live-host wait; continue the phase that was waiting (usually **verify** or **fix** evidence) |
+| `resume: fix` | **fix** |
 | `resume: stop` | `STATUS: blocked` — do not edit |
 
-## Phase A — implement
+## implement
 
 Follow **`crav1-implement-task`** for this `T#` only.
 
@@ -49,29 +51,29 @@ Then loop-commit.
 
 If the row did not go `[x]`, `STATUS: blocked`. Do not verify-spec as if the task shipped.
 
-## Phase B — verify-spec
+## verify
 
-If Phase A changed a hosted API/UI, follow `live-host.md` first. Then **`crav1-verify-spec`**.
+If **implement** changed a hosted API/UI, follow `live-host.md` first. Then **`crav1-verify-spec`**.
 
 Loop-commit if verify files changed.
 
 Inner-loop = verify failed → claimed/unverified → wiring `G#`. Other unimplemented `T#`s are not inner-loop.
 
-- Empty → Phase D
+- Empty → **done**
 - Non-empty → `STATUS: needs_fix` (parent asks the user)
 
-## Phase C — fix loop
+## fix
 
 Only after `resume: fix`:
 
 1. **`crav1-fix-from-verify`** with no Gap.
 2. Loop-commit.
-3. If inner-loop empty → verify-spec again, loop-commit if needed; still dirty → `STATUS: needs_fix`; clean → Phase D.
+3. If inner-loop empty → verify-spec again, loop-commit if needed; still dirty → `STATUS: needs_fix`; clean → **done**.
 4. If queue remains after the fix, continue (1) until empty or a gate.
 
 Do not implement a new `T#`.
 
-## Phase D
+## done
 
 ```text
 STATUS: done
@@ -87,10 +89,12 @@ Left unchecked: <other T#s or none>
 ```text
 STATUS: done | blocked | needs_fix | needs_ready | failed
 T#: Tn
-PHASE: A|B|C|D
+PHASE: implement | verify | fix | done
 COMMITS: <hashes>
 DETAIL: <one short paragraph>
 ```
+
+`PHASE` is the step you were in (or just finished). Do not write A, B, C, or D.
 
 ## Hard rules
 
