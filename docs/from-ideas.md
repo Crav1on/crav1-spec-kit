@@ -137,13 +137,21 @@ Do not change spec.md.
 
 Omit `Gap` to take the next inner-loop item (order: verify failed → claimed done/unverified → `G#`). Repeat until that queue is empty. Unimplemented `T#`s stay on `/crav1-implement-task`.
 
-When you are ready to commit in GitKraken (after a `T#` or a live fix):
+When you are ready to commit (after a `T#` or a live fix):
 
 ```text
 /crav1-draft-commit-message
 ```
 
-Paste the **Summary** and **Description** blocks. The skill does not run `git commit` unless you also ask it to.
+Paste the **Summary** and **Description** blocks into GitKraken. The skill does not run `git commit` unless you also ask it to.
+
+To change the wording first, then copy **or** create the git commit:
+
+```text
+/crav1-review-commit
+```
+
+That command drafts the same way, then asks `copy` / `edit` / `rewrite` / `commit`. It does not push.
 
 First time (no persist rule yet) it asks:
 

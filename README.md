@@ -108,7 +108,8 @@ Runnable pieces in this repo:
 | Skill `/crav1-verify-spec` | Want proof against acceptance | Slash command; TL;DR then `verify.md` details |
 | Skill `/crav1-fix-from-verify` | After verify-spec, inner-loop gaps | Slash command; omit Gap to walk failed → unverified → G# |
 | Skill `/crav1-fix-live` | Live/inner-loop gap | Alias of `/crav1-fix-from-verify` |
-| Skill `/crav1-draft-commit-message` | About to commit (GitKraken paste fields) | Slash command; style.md or git log, once or onward |
+| Skill `/crav1-draft-commit-message` | About to commit (GitKraken paste fields) | Slash command; style.md or git log, once or onward; no commit unless they ask |
+| Skill `/crav1-review-commit` | Want to edit the message, then copy or commit | Wraps draft-commit-message; menu: copy / edit / rewrite / commit; no push |
 | Skill `/crav1-ideas-to-spec` | Pile of ideas + technical hunches | Slash command; pick an export format |
 | Skill `/crav1-export-spec` | Spec exists, want another format | Slash command |
 | Subagent `crav1-spec-reviewer` | Independent product/spec critique | Agent delegates, or ask “review this spec” |
@@ -247,7 +248,8 @@ This repo already ships:
 - `/crav1-verify-spec` — TL;DR of implemented vs not, then acceptance details in `verify.md`
 - `/crav1-fix-from-verify` — after verify-spec, walk inner-loop gaps (failed → unverified → `G#`); omit Gap for the next; writes `fix-log.md`
 - `/crav1-fix-live` — alias when that gap is a live/inner-loop path
-- `/crav1-draft-commit-message` — paste-ready GitKraken Summary/Description; `style.md` or live git log, once or onward (deletable rule)
+- `/crav1-draft-commit-message` — paste-ready GitKraken Summary/Description; `style.md` or live git log, once or onward (deletable rule); does not commit unless they ask
+- `/crav1-review-commit` — same draft, then copy for GitKraken, edit/rewrite the text, or `git commit` when they accept it (no push)
 - subagent `crav1-spec-reviewer` — independent product/spec critique
 - subagent `crav1-architecture-reviewer` — hunches vs decisions, diagrams, ADRs
 
