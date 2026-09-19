@@ -58,6 +58,7 @@ Stop the run (do not start the next phase or the next `T#`) if:
 - Spec disagrees with the code → `/crav1-tighten-spec`, do not edit `spec.md`
 - `crav1-fix-from-verify` would stop (spec frozen, empty inner-loop you already handled, non-goal)
 - Commit / attribution needs them
+- Live host must be refreshed and they have to do it (see `crav1-verify-spec` `references/live-host.md`) — wait for `ready` or `stop`
 - They said `stop`
 
 ## Phase A — implement
@@ -70,7 +71,7 @@ If the row did not go `[x]`, **stop**. Recap. Do not verify-spec as if the task 
 
 ## Phase B — verify-spec
 
-Follow **`crav1-verify-spec`** in full (`verify.md` + chat TL;DR).
+If Phase A changed a **hosted** API/UI, follow `crav1-verify-spec` `references/live-host.md` first (restart/wait, or gate on `ready`). Then follow **`crav1-verify-spec`** in full (`verify.md` + chat TL;DR).
 
 Then loop-commit if `verify.md` or related files changed.
 

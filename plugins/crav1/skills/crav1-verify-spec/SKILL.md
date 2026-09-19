@@ -42,9 +42,10 @@ Acceptance lines with **no** `T#` stay in the detail matrix as **missing** cover
 
 Then:
 
-1. Run the documented test/lint commands from `AGENTS.md` or the repo README when they exist. Record the command and outcome.
-2. For UI acceptance, use the browser if available; otherwise mark **untested** and say why.
-3. Map `tasks.md` rows: checked but failing verify → **Implemented, verify failed**; unchecked → **Not implemented**.
+1. If any acceptance or task verify is **live** (running Aspire/compose/dev host, published URL, browser against localhost), follow this skill’s [references/live-host.md](references/live-host.md) **before** that evidence. Record refresh/health in **Commands run**.
+2. Run the documented test/lint commands from `AGENTS.md` or the repo README when they exist. Record the command and outcome.
+3. For UI acceptance, use the browser if available; otherwise mark **untested** and say why.
+4. Map `tasks.md` rows: checked but failing verify → **Implemented, verify failed**; unchecked → **Not implemented**.
 
 ## Write `docs/specs/<slug>/verify.md`
 

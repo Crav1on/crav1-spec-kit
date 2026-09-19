@@ -30,6 +30,7 @@ Sorted: verified, then verify failed, then not implemented, then unverified.
 
 ## Commands run
 
+- Live host: (refresh/health, or “in-process tests only”)
 - 
 
 ## Gaps

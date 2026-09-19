@@ -76,6 +76,8 @@ Do **not**:
 
 ## Verify the fix (required, same turn)
 
+If this gap’s evidence is **live**, follow `crav1-verify-spec` `references/live-host.md` (drop-in: `.cursor/skills/crav1/crav1-verify-spec/references/live-host.md`; plugin: sibling `skills/crav1-verify-spec/references/live-host.md`) **before** re-running it (especially after you changed API/service code).
+
 1. Re-run **the same evidence** for this gap (test name, UI path, or live HTTP/DB command from verify.md / the user). Fail → pass, or report still failing.
 2. If you changed app or config, re-run the repo test command. Must still pass.
 3. Extra probes (SQL ready, etc.) are optional **add-ons**. They do not replace the verify row.
