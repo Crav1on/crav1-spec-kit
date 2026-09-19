@@ -109,7 +109,7 @@ Runnable pieces in this repo:
 | Skill `/crav1-fix-from-verify` | After verify-spec, inner-loop gaps | Slash command; omit Gap to walk failed → unverified → G# |
 | Skill `/crav1-fix-live` | Live/inner-loop gap | Alias of `/crav1-fix-from-verify` |
 | Skill `/crav1-draft-commit-message` | About to commit (GitKraken paste fields) | Slash command; style.md or git log, once or onward; no commit unless they ask |
-| Skill `/crav1-finalize-commit` | Finish a message: edit, GitKraken copy, or git commit | Same draft; wording first, then next message copy / edit / rewrite / commit; no push |
+| Skill `/crav1-finalize-commit` | Finish a message: edit, GitKraken copy, or git commit | Style first if needed, then draft, then copy / edit / rewrite / commit; no push |
 | Skill `/crav1-ideas-to-spec` | Pile of ideas + technical hunches | Slash command; pick an export format |
 | Skill `/crav1-export-spec` | Spec exists, want another format | Slash command |
 | Subagent `crav1-spec-reviewer` | Independent product/spec critique | Agent delegates, or ask “review this spec” |

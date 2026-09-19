@@ -1,13 +1,11 @@
 ---
 name: crav1-finalize-commit
 description: >-
-  Finalize a commit: draft GitKraken Summary and Description the same way as
-  crav1-draft-commit-message, then copy for GitKraken, edit or rewrite the
-  wording, or git commit when they accept it. Shows the drafted text first and
-  waits for the next message before asking copy/edit/commit. Use when they want
-  to change the message or actually create the commit, or /crav1-finalize-commit.
-  Does not push. Does not commit until they pick commit. Paste-only with no
-  follow-up: use /crav1-draft-commit-message.
+  Finalize a commit: style.md vs git log first if needed, then draft GitKraken
+  Summary and Description, then offer copy / edit / rewrite / git commit.
+  Wording is shown before those choices. Use when they want to change the
+  message or actually create the commit, or /crav1-finalize-commit. Does not
+  push. Does not commit until they pick commit. Paste-only: /crav1-draft-commit-message.
 disable-model-invocation: true
 icon: git-branch
 color: green
@@ -19,9 +17,9 @@ You wrap **`crav1-draft-commit-message`**. First produce the same Summary and De
 
 Command: `/crav1-finalize-commit`.
 
-Show the drafted **Summary** and **Description** before they choose copy, edit, or commit. Do not open a questions UI on the same turn as that wording.
+Order: (1) style menu if no persist rule, (2) generate and show Summary/Description, (3) then the copy/edit/rewrite/commit/stop choices. Never put those choices before the wording exists.
 
-Paste-only (no edit/commit menu): tell them `/crav1-draft-commit-message` instead, or they can pick `copy` here.
+Paste-only (no copy/edit/commit choices): tell them `/crav1-draft-commit-message` instead, or they can pick `copy` here.
 
 ## Draft (same as the other skill)
 
@@ -37,27 +35,35 @@ Remember the intended file set (the paths the message describes). Warn if `agent
 
 ## After every new wording (first draft, edit, or rewrite)
 
-**They must see Summary and Description in the chat before choosing.** A blocking questions UI on the same turn hides that text.
+They choose **after** the message exists, not before.
 
-On any turn that **outputs or changes** the paste blocks:
+**Do not** open copy/edit/commit choices in the same turn as the style.md vs git-log menu. If style is needed, that turn is style only: no draft, no finalize choices.
 
-1. Put **Summary** and **Description** first (same fenced blocks as the draft skill).
-2. Then one short plain-text line, **below** the blocks, not a modal. Example: `When you have read that, reply copy, edit, rewrite, commit, or stop.`
-3. **End the turn.** Do not call the questions tool, AskQuestion, or any other blocking choice UI. Do not `git commit`. Do not regenerate again in this turn.
+On the turn that produces wording:
 
-Wait for their **next message**. Only then treat `copy` / `edit` / `rewrite` / `commit` / `stop` (or equivalent wording). If that next message is vague, list the five ids as a markdown table in chat and wait again — still no questions tool.
+1. Finish the draft (git inspect, style already chosen).
+2. Write the **Summary** and **Description** paste blocks into the user-visible reply. This is required. Do not skip it.
+3. **Then** offer the choices (questions tool when available). Put the **actual Summary and Description** in the question prompt so the choice UI still shows the generated text, for example:
 
-Do not ask copy/edit/commit in the same turn as the style.md vs git-log menu. Style (if needed) is a **previous** turn with no draft yet; the draft turn is wording only.
+   `Summary: <one line>`
+
+   `Description:` (the bullets)
+
+   `What next?`
+
+   Options: `copy` / `edit` / `rewrite` / `commit` / `stop`.
+
+Never call the questions tool (or any blocking choice UI) **before** step 2. Never call it as the first action of a draft turn. Draft first, choices last. Do not `git commit` until they pick `commit`.
 
 | Id | Choice | What it does |
 | --- | --- | --- |
 | `copy` | Copy for GitKraken | Done. Same outcome as `/crav1-draft-commit-message`. They paste Summary/Description. No `git commit`. |
-| `edit` | Change the text | They say what to change (summary, description, or both). Apply **only** those edits. Keep the same style source. Show blocks again, then **end the turn** (wording first, wait). |
-| `rewrite` | New draft from the diff | Run the draft skill’s draft step again on the **same** file set and style source. Discard the previous wording. Show blocks, then **end the turn**. |
+| `edit` | Change the text | They say what to change (summary, description, or both). Apply **only** those edits. Keep the same style source. Show the new blocks, **then** the same choices again. |
+| `rewrite` | New draft from the diff | Run the draft skill’s draft step again on the **same** file set and style source. Discard the previous wording. Show the new blocks, **then** the same choices again. |
 | `commit` | Create the git commit | Use the **current** Summary + Description. See below. |
 | `stop` | Abort | No commit. They can still copy the last blocks. |
 
-If they already named an id **after** seeing the current blocks, skip waiting. If they named an id **before** any wording exists, ignore it, draft first, end the turn.
+If they named `copy`/`edit`/`commit` **before** any wording exists, ignore it, draft, show blocks, then offer choices.
 
 Do not invent extra options (push, amend, commit subsets they did not name). If they ask to push after a successful commit, that is a **new** request — only then `git push`.
 
@@ -66,7 +72,7 @@ Do not invent extra options (push, amend, commit subsets they did not name). If 
 - If they paste a full new Summary and/or Description, use that text (cleanup only: no Conventional Commits unless the style source is git log that already uses them).
 - If they give notes (“shorter summary”, “mention verify.md”), rewrite just those parts.
 - Ask which field if it is unclear.
-- Then paste blocks and **end the turn** (they read, then choose). Never commit in the same turn as `edit` unless they also said `commit` **after** seeing the new blocks.
+- Then show the new paste blocks and **then** the same choices again. Never commit in the same turn as `edit` unless they also said `commit` **after** seeing the new blocks.
 
 ## When they pick `commit`
 
@@ -75,13 +81,13 @@ Do not invent extra options (push, amend, commit subsets they did not name). If 
 3. **Message:** `git commit` with Summary as the subject (`-m`) and Description as the body (second `-m`, or a HEREDOC). Do not add `Co-authored-by` or extra trailer lines.
 4. Do **not** push.
 5. Show the new hash, subject, and `git status` short result.
-6. If commit fails (hooks, empty index, identity), show the error. Keep the paste blocks. Wait for their next message. No questions tool.
+6. If commit fails (hooks, empty index, identity), show the error. Keep the paste blocks, **then** offer the choices again.
 
 Do not `git commit --amend` unless they explicitly asked to amend.
 
 ## Hard rules
 
-- No questions tool / blocking choice UI on a turn that shows Summary/Description.
+- Never offer copy/edit/commit before Summary/Description exist. After they exist, show the blocks, then the choices (question prompt includes that wording).
 - No commit until `commit` (or an unambiguous “commit this message now”) **after** they have seen the current blocks.
 - `copy` never runs `git commit`.
 - Do not change product files except the persist rules the draft skill already writes (`draft-commit-style.mdc` / `draft-commit-gitlog.mdc`).
