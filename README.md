@@ -213,6 +213,7 @@ docs/specs/
     plan.md
     tasks.md
     verify.md
+    live-fix.md
 AGENTS.md
 .cursor/rules/
 .cursor/skills/      # or .agents/skills/
