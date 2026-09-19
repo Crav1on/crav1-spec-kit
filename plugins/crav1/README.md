@@ -26,7 +26,7 @@ Type `/crav1` in Agent chat to list commands.
 **Also**
 
 - `/crav1-draft-commit-message` — GitKraken Summary/Description paste; does not commit unless you ask
-- `/crav1-finalize-commit` — same draft, then copy, edit, rewrite, or `git commit` (no push)
+- `/crav1-finalize-commit` — same draft (read it first), then reply copy, edit, rewrite, or `git commit` (no push)
 - Subagent `crav1-spec-reviewer` — product/spec critique (invoke by asking to review the spec)
 - Subagent `crav1-architecture-reviewer` — used by the slash command above
 - Rule: specs live under `docs/specs/`

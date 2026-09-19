@@ -151,7 +151,7 @@ To change the wording first, then copy **or** create the git commit:
 /crav1-finalize-commit
 ```
 
-That command drafts the same way, then asks `copy` / `edit` / `rewrite` / `commit`. It does not push.
+That command drafts the same way and shows Summary/Description first. On the **next** message you reply `copy` / `edit` / `rewrite` / `commit`. It does not push.
 
 First time (no persist rule yet) it asks:
 
