@@ -240,7 +240,8 @@ This repo already ships:
 - `/plan-from-spec` — file-level `plan.md` and testable `tasks.md`; refuses to code
 - `/implement-task` — one `tasks.md` row, then run its verify step
 - `/verify-spec` — TL;DR of implemented vs not, then acceptance details in `verify.md`
-- `/fix-live` — tests green, live path red: fix wiring in-spec, re-hit the same live command; writes `live-fix.md`
+- `/fix-from-verify` — after verify-spec, fix one listed gap in-spec and re-run that evidence; writes `fix-log.md`
+- `/fix-live` — alias when that gap is a live/inner-loop path
 - subagent `spec-reviewer` — independent product/spec critique
 - subagent `architecture-reviewer` — hunches vs decisions, diagrams, ADRs
 
