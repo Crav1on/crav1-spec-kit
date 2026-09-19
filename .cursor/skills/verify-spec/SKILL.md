@@ -50,7 +50,7 @@ Then:
 
 Follow this skill’s `assets/verify.md` **section order**. Do not put the long acceptance table first.
 
-1. **TL;DR** — counts + four id lists (implemented/verified, not implemented, verify failed, claimed/unverified). One line each. Then one line: next command (`/implement-task T#` or ship).
+1. **TL;DR** — counts + id lists. Then one line: next command (`/fix-from-verify` if failed/unverified/`G#` remain, else `/implement-task` or ship).
 2. **Tasks — overview** — one short table: `T#` | title | status | verify result. Group or sort: verified first, then failed, then not implemented.
 3. **Acceptance — details** — the full A# matrix (quote, evidence, result).
 4. **Commands run**
@@ -66,7 +66,8 @@ Same order as the file. Do **not** open with the full acceptance matrix.
 2. **TL;DR** (copy the id lists; they should be scannable in a few seconds)
 3. Point at the Tasks overview in the file
 4. Next:
-   - **Not implemented**, **verify failed**, or **claimed done, unverified** → `/fix-from-verify` (after this report). `/implement-task T#` is also fine for a greenfield unchecked task.
+   - Inner-loop (**verify failed**, **claimed done, unverified**, wiring **`G#`**) → `/fix-from-verify` (omit Gap to walk them in order)
+   - **Not implemented** → `/implement-task T#`
    - acceptance with no task → `/plan-from-spec` or `/tighten-spec` if the line should die
    - all **Implemented, verified** and no missing acceptance → spec is demoable; they can ship / PR
 

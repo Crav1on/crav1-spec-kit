@@ -12,5 +12,5 @@ This repository is a **process guide** for spec-driven development in Cursor, no
 - After tightening, `/resolve-questions` to keep or answer each remaining Open question.
 - When the spec is accepted, `/plan-from-spec` writes `plan.md` and `tasks.md`. Do not code in that step.
 - Build with `/implement-task` (one `T#` per turn). Prove the slice with `/verify-spec`.
-- After `/verify-spec` lists gaps, `/fix-from-verify` (one id). Do not edit `spec.md`. `/fix-live` is the same skill when the gap is a live/inner-loop path.
+- After `/verify-spec`, `/fix-from-verify` with **no Gap** walks the inner-loop queue: verify failed → claimed/unverified → `G#`. Not unimplemented tasks. Do not edit `spec.md`. `/fix-live` is the same queue with a live-path hint.
 - Prefer editing the spec or plan over long patch-prompt threads when implementation drifts.

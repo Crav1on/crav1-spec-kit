@@ -123,16 +123,17 @@ When you want the full acceptance matrix:
 @docs/specs/<slug>/spec.md
 ```
 
-If the TL;DR still lists a gap (failed, unverified, not implemented, or a live path that could not run):
+If the TL;DR still lists failed, unverified, or wiring `G#` rows (not “not implemented”):
 
 ```text
 /fix-from-verify
 @docs/specs/<slug>/verify.md
 @docs/specs/<slug>/spec.md
 
-Gap: <T# or A# or G# from the TL;DR>
 Do not change spec.md.
 ```
+
+Omit `Gap` to take the next inner-loop item (order: verify failed → claimed done/unverified → `G#`). Repeat until that queue is empty. Unimplemented `T#`s stay on `/implement-task`.
 
 Inner-loop example (same skill; `/fix-live` also works):
 

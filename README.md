@@ -104,7 +104,7 @@ Runnable pieces in this repo:
 | Skill `/plan-from-spec` | Spec is accepted; want plan + tasks, no code | Slash command; writes `plan.md` and `tasks.md` |
 | Skill `/implement-task` | `tasks.md` exists; build one slice | Slash command; one `T#`, then its verify |
 | Skill `/verify-spec` | Want proof against acceptance | Slash command; TL;DR then `verify.md` details |
-| Skill `/fix-from-verify` | After verify-spec, something is still wrong | Slash command; one gap, in-spec fix, re-run that evidence |
+| Skill `/fix-from-verify` | After verify-spec, inner-loop gaps | Slash command; omit Gap to walk failed → unverified → G# |
 | Skill `/fix-live` | Live/inner-loop gap | Alias of `/fix-from-verify` |
 | Skill `/ideas-to-spec` | Pile of ideas + technical hunches | Slash command; pick an export format |
 | Skill `/export-spec` | Spec exists, want another format | Slash command |
@@ -240,7 +240,7 @@ This repo already ships:
 - `/plan-from-spec` — file-level `plan.md` and testable `tasks.md`; refuses to code
 - `/implement-task` — one `tasks.md` row, then run its verify step
 - `/verify-spec` — TL;DR of implemented vs not, then acceptance details in `verify.md`
-- `/fix-from-verify` — after verify-spec, fix one listed gap in-spec and re-run that evidence; writes `fix-log.md`
+- `/fix-from-verify` — after verify-spec, walk inner-loop gaps (failed → unverified → `G#`); omit Gap for the next; writes `fix-log.md`
 - `/fix-live` — alias when that gap is a live/inner-loop path
 - subagent `spec-reviewer` — independent product/spec critique
 - subagent `architecture-reviewer` — hunches vs decisions, diagrams, ADRs

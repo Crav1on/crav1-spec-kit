@@ -1,6 +1,6 @@
 ---
 name: fix-from-verify
-description: Fix one gap reported by /verify-spec (failed, missing, unverified, or not implemented), stay inside the spec, then re-run that row’s evidence. Use after verify-spec. Do not edit spec.md.
+description: After /verify-spec, walk inner-loop gaps one by one (verify failed, then unverified, then G#). Fix in-spec and re-run that evidence. Omit Gap to take the next. Do not edit spec.md. Do not auto-pick unimplemented tasks.
 disable-model-invocation: true
 icon: bug
 color: red
@@ -8,7 +8,7 @@ color: red
 
 # Fix from verify
 
-You run this **after `/verify-spec`**. The problem is whatever `verify.md` (or the last verify TL;DR) already listed. You fix **one** gap, in spec, then re-prove **that** row. Inner-loop/live failures (ports, proxies, SQL) are one kind of gap — not the only kind.
+You run this **after `/verify-spec`**. Walk the **inner-loop queue** one item at a time: failed evidence, then unverified/could-not-run, then leftover `G#` wiring gaps. Omit `Gap` to take the next. Unimplemented tasks are **not** this skill (`/implement-task`).
 
 Do not change `spec.md`. Do not invent product behavior to get a green matrix.
 
@@ -26,32 +26,44 @@ If `verify.md` is missing and they did not paste a verify TL;DR, **stop**. Next:
 
 ## Pick one gap (no edits yet)
 
-Gaps come from the verify TL;DR buckets:
+This skill is the **inner-loop queue**: something is *supposed* to already work (or already be checked off) but verify could not prove it. It is not a backlog burn-down.
 
-| Verify says | What you may do |
+**In the queue** (walk in this order; skip empty buckets):
+
+1. **Implemented, verify failed** — evidence ran and contradicted (`T#` then `A#` as listed in `verify.md`)
+2. **Claimed done, unverified** — `[x]` but evidence could not run (no host, port, browser, SQL)
+3. **`G#` in verify.md Gaps** — only if it is the same kind of problem (fail, untested, live/wiring) **and** it is not a duplicate of a `T#`/`A#` already in (1) or (2)
+
+**Not in this queue** (do not auto-pick; say so and point elsewhere):
+
+| Verify says | Use instead |
 | --- | --- |
-| **Implemented, verify failed** | Fix implementation or wiring so the **existing** evidence can pass |
-| **Claimed done, unverified** | Run the evidence. If it fails, treat as verify-failed. If it cannot run (no host, unpublished port), that **is** the gap — fix inner-loop so the evidence can run, then run it |
-| **Not implemented** | Implement that `T#` the same way `/implement-task` would (one task, its verify line) |
-| **Acceptance with no task** | **Do not** add requirements. Stop: `/plan-from-spec` to add a task, or `/tighten-spec` if the line should leave the spec. This skill does not grow the spec |
+| **Not implemented** | `/implement-task T#` |
+| **Acceptance with no task** | `/plan-from-spec` or `/tighten-spec` — this skill does not grow the spec |
 
-If they named `T#`, `A#`, or `G#`, that is the gap. Else take the first in this order: verify failed → claimed/unverified → not implemented. List the rest as remaining.
+If they named `T#` / `A#` / `G#`:
 
-If several failed rows share one cause (e.g. SQL proxy down), say so, still **record** them as one incident, and re-run **each** named evidence after the fix.
+- Inner-loop (failed, unverified, or a wiring `G#`) → that is the current item
+- Not implemented / no-task → **stop**, send them to the table above. Do not implement a new `T#` here just because they typed the id
+
+If they **omitted Gap**: take the **first remaining** item in the queue above. List the rest as `F2`, `F3`, … so the next `/fix-from-verify` with no Gap continues the walk.
+
+Build the queue fresh from `verify.md` each turn (minus what `fix-log.md` already marked fixed **and** whose evidence you re-ran green). Deduplicate: one live SQL proxy failure that explains three unverified rows is still **one** current item — after the fix, re-run **each** of those rows’ evidence.
 
 **Stop** (no fix) if:
 
 - Closing the gap needs behavior **not** in the spec
 - It would implement a **non-goal** or reopen a rejected ADR
 - Playbook-only workspace and they did not ask to change an app here
+- The inner-loop queue is **empty** (only unimplemented / no-task left, or everything verified) — tell them `/implement-task` or `/verify-spec` / ship
 
-Confirm the before-state: re-run that row’s evidence (or the live command they / verify.md named) once. Quote the failure. Do not skip.
+Confirm the before-state: re-run that row’s evidence once. Quote the failure. Do not skip.
 
 ## Fix (in spec)
 
 Smallest change that makes **this** verify row pass:
 
-- Product code for a failed/not-implemented `T#` already in `tasks.md`
+- Product code only if this row is **verify failed** (already implemented, evidence red) — not to start an unimplemented `T#`
 - Tests or UI checks that **cover existing** acceptance (new test OK; new acceptance not OK)
 - Inner-loop wiring when evidence could not run or failed for connectivity: publish/ports, Aspire/SQL proxy, env, compose waits, operator health probes — not a new public API unless the spec already has it
 
@@ -90,11 +102,11 @@ TL;DR first:
 - Before → after (the **same** evidence)
 - Tests still pass? (if you ran them)
 - Files changed
-- Remaining ids from verify TL;DR
-- Next: `/fix-from-verify` for the next id, or `/verify-spec` to refresh the matrix
+- Remaining **inner-loop** ids (`F2`…) — not unimplemented tasks
+- Next: `/fix-from-verify` with **no Gap** to continue the walk, or `/verify-spec` when the inner-loop queue is empty
 
 ## Hard rules
 
 - **Spec is frozen.** Disagreement with the spec → stop, do not patch the spec.
-- One gap per turn unless they named a shared cause and listed the ids.
+- One inner-loop item per turn unless they named a shared cause and listed the ids. Omit Gap = next in queue.
 - Do not mark success without re-running that gap’s evidence.

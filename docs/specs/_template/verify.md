@@ -12,7 +12,7 @@ Date:
 | Claimed done, unverified | 0 | |
 | Acceptance with no task | 0 | |
 
-Next: `/implement-task T#` or ship if everything in the first row.
+Next: `/fix-from-verify` (omit Gap) for failed/unverified/`G#`; `/implement-task T#` if only unimplemented remains; or ship.
 
 ## Tasks — overview
 

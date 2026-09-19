@@ -11,7 +11,7 @@
 | Before | fail / untested (quote) |
 | After | pass / fail (quote) |
 | Tests | still pass / now fail / not re-run |
-| Remaining gaps | |
+| Remaining gaps | inner-loop queue only (failed → unverified → G#) |
 | Next | `/fix-from-verify` id or `/verify-spec` |
 
 ## Entry
