@@ -15,7 +15,7 @@ cp -a "$ROOT/.cursor/skills/crav1/." "$PLUGIN/skills/"
 find "$PLUGIN/agents" -maxdepth 1 -type f -name 'crav1-*.md' -delete
 cp -a "$ROOT/.cursor/agents/"crav1-*.md "$PLUGIN/agents/"
 
-# consumer usage rule only (not maintainer crav1-self-contained-skills.mdc)
+# consumer usage rule only (not kit-maintainer.mdc)
 rm -f "$PLUGIN/rules/crav1.mdc"
 cp -a "$ROOT/.cursor/rules/crav1.mdc" "$PLUGIN/rules/crav1.mdc"
 

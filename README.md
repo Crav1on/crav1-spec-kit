@@ -235,7 +235,7 @@ Create skills with `/create-skill`. New **crav1** skills go under `.cursor/skill
 
 Install into another repo: [docs/install.md](docs/install.md). Drop-in copy is `.cursor/skills/crav1/`, `.cursor/agents/crav1-*.md`, `.cursor/agent-assets/crav1-*`, and `.cursor/rules/crav1.mdc`. Plugin install uses `plugins/crav1/` plus `.cursor-plugin/marketplace.json`. Also copy `docs/specs/_template/` if you want the human starter folder.
 
-When you change a template, update `docs/specs/_template/` **and** every `assets/` / `agent-assets/` copy on **both** the drop-in tree and `plugins/crav1/` (`scripts/sync-crav1-plugin.sh`). Rule: `.cursor/rules/crav1-self-contained-skills.mdc`.
+When you change a template, update `docs/specs/_template/` **and** every `assets/` / `agent-assets/` copy on **both** the drop-in tree and `plugins/crav1/` (`scripts/sync-crav1-plugin.sh`). Rule: `.cursor/rules/kit-maintainer.mdc` (kit repo only; do not dump with `crav1-*`).
 
 This repo already ships:
 

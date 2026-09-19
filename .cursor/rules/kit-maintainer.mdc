@@ -1,9 +1,11 @@
 ---
-description: crav1 library stays prefixed, nested, self-contained, and mirrored to the plugin
+description: Kit-repo only — keep crav1 skills prefixed, nested, self-contained, and mirrored to the plugin. Do not copy this file into a product dump.
 alwaysApply: true
 ---
 
-# crav1 skills and agents
+# Kit maintainer (this repo only)
+
+This file is **not** `crav1-*` so a folder dump of the library can omit it. Product repos get `.cursor/rules/crav1.mdc` only.
 
 This repo’s custom library uses the **`crav1`** prefix so it is distinct from Cursor built-ins.
 

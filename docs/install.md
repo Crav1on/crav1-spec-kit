@@ -49,7 +49,7 @@ From a clone of this kit:
 3. Commit those files in the product repo.
 4. Reload Cursor if `/crav1` does not show up (`Developer: Reload Window`).
 
-Do **not** copy `.cursor/rules/crav1-self-contained-skills.mdc` unless you are forking the kit itself. That rule is for maintainers of this repository.
+Do **not** copy `.cursor/rules/kit-maintainer.mdc` unless you are forking the kit itself. That rule is for maintainers of this repository (no `crav1-` prefix on purpose, so a `crav1*` dump skips it).
 
 ### B. Cursor plugin (install from this repo)
 
@@ -105,7 +105,7 @@ If this window is the **kit repo**, drop-in skills are already under `.cursor/` 
 | Team marketplace | Auto Refresh or Dashboard **Refresh**, then update/reinstall the plugin if Cursor asks |
 | Local plugin | `scripts/sync-crav1-plugin.sh` in the kit, copy `plugins/crav1` to `~/.cursor/plugins/local/crav1`, reload |
 
-Kit maintainers: edit `.cursor/` first, run `scripts/sync-crav1-plugin.sh`, keep this file and `plugins/crav1/README.md` accurate. Rule: `.cursor/rules/crav1-self-contained-skills.mdc`.
+Kit maintainers: edit `.cursor/` first, run `scripts/sync-crav1-plugin.sh`, keep this file and `plugins/crav1/README.md` accurate. Rule: `.cursor/rules/kit-maintainer.mdc`.
 
 ## Using the kit without “installing”
 
