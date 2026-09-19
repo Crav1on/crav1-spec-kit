@@ -91,7 +91,7 @@ Spark: <one or two sentences>
 Treat this as greenfield. Do not write code. Ask questions first.
 ```
 
-Then: answer ≤7 questions → agent writes `docs/specs/<slug>/spec.md` → `/tighten-spec` walks **each** finding → `/resolve-questions` walks leftover Open questions (keep open or answer) → optional `spec-reviewer` → **`/plan-from-spec`** → `/implement-task` per `T#` → `/verify-spec`.
+Then: answer ≤7 questions → agent writes `docs/specs/<slug>/spec.md` → `/tighten-spec` walks **each** finding → `/resolve-questions` walks leftover Open questions (keep open or answer) → optional `spec-reviewer` → **`/plan-from-spec`** → `/implement-task` per `T#` → `/verify-spec`. If tests are green but the live path fails, `/fix-live` then re-hit that path.
 
 Runnable pieces in this repo:
 
@@ -104,6 +104,7 @@ Runnable pieces in this repo:
 | Skill `/plan-from-spec` | Spec is accepted; want plan + tasks, no code | Slash command; writes `plan.md` and `tasks.md` |
 | Skill `/implement-task` | `tasks.md` exists; build one slice | Slash command; one `T#`, then its verify |
 | Skill `/verify-spec` | Want proof against acceptance | Slash command; TL;DR then `verify.md` details |
+| Skill `/fix-live` | Tests pass, live/inner-loop path fails | Slash command; in-spec wiring fix + live re-hit |
 | Skill `/ideas-to-spec` | Pile of ideas + technical hunches | Slash command; pick an export format |
 | Skill `/export-spec` | Spec exists, want another format | Slash command |
 | Subagent `spec-reviewer` | Independent product/spec critique | Agent delegates, or ask “review this spec” |
@@ -206,6 +207,7 @@ docs/specs/
     plan.md          # how / constraints / files
     tasks.md         # ordered, testable slices
     verify.md        # acceptance matrix after implementation
+    live-fix.md      # inner-loop / live-path incident (tests green, live red)
   <change-id>/
     spec.md
     plan.md
@@ -235,6 +237,7 @@ This repo already ships:
 - `/plan-from-spec` — file-level `plan.md` and testable `tasks.md`; refuses to code
 - `/implement-task` — one `tasks.md` row, then run its verify step
 - `/verify-spec` — TL;DR of implemented vs not, then acceptance details in `verify.md`
+- `/fix-live` — tests green, live path red: fix wiring in-spec, re-hit the same live command; writes `live-fix.md`
 - subagent `spec-reviewer` — independent product/spec critique
 - subagent `architecture-reviewer` — hunches vs decisions, diagrams, ADRs
 

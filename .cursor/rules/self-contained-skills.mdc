@@ -5,7 +5,7 @@ alwaysApply: true
 
 # Self-contained skills and agents
 
-When you **create or update** a Cursor skill or subagent that reads or writes spec artifacts (`spec.md`, `plan.md`, `tasks.md`, `adr.md`, `diagrams.md`, `verify.md`):
+When you **create or update** a Cursor skill or subagent that reads or writes spec artifacts (`spec.md`, `plan.md`, `tasks.md`, `adr.md`, `diagrams.md`, `verify.md`, `live-fix.md`):
 
 1. Put a copy of each template that skill/agent uses in **that skill’s** `assets/` (or `.cursor/agent-assets/<agent-name>/` for subagents).
 2. Point the `SKILL.md` / agent prompt at **those** copies, not only `docs/specs/_template/`.

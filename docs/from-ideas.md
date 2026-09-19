@@ -123,3 +123,15 @@ When you want the full acceptance matrix:
 @docs/specs/<slug>/spec.md
 ```
 
+If that matrix looks fine (or unit tests pass) but a **running** call still fails (ports, proxy, SQL, compose):
+
+```text
+/fix-live
+@docs/specs/<slug>/spec.md
+
+Symptom: <what fails live>
+Live command: <exact curl / URL / payload>
+Spec bind: <REQ or T# or journey>
+Do not change spec.md.
+```
+
