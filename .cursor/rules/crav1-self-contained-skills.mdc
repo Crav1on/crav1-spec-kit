@@ -1,0 +1,28 @@
+---
+description: crav1 library skills/agents stay prefixed, nested, and self-contained
+alwaysApply: true
+---
+
+# crav1 skills and agents
+
+This repo’s custom library uses the **`crav1`** prefix so it is distinct from Cursor built-ins.
+
+## Layout
+
+- Skills: `.cursor/skills/crav1/crav1-<short-name>/` with frontmatter `name: crav1-<short-name>` (must match the folder that contains `SKILL.md`). Slash command: `/crav1-<short-name>`. Type `/crav1` to list them.
+- Agents: `.cursor/agents/crav1-<name>.md` with `name: crav1-<name>`.
+- Agent templates: `.cursor/agent-assets/crav1-<name>/` (not under `.cursor/agents/`).
+
+Do not add unprefixed copies at `.cursor/skills/<short-name>/` (name collision).
+
+## Self-contained templates
+
+When you **create or update** a crav1 skill or subagent that reads or writes spec artifacts (`spec.md`, `plan.md`, `tasks.md`, `adr.md`, `diagrams.md`, `verify.md`, `fix-log.md`):
+
+1. Put a copy of each template in **that skill’s** `assets/` (or `.cursor/agent-assets/crav1-<agent-name>/`).
+2. Point the `SKILL.md` / agent prompt at **those** copies, not only `docs/specs/_template/`.
+3. Keep `docs/specs/_template/` in sync. If you change a template, update **every** copy.
+4. Do **not** put template markdown under `.cursor/agents/` except the agent prompt file.
+5. Format recipes live in the skill’s `references/` (see `crav1-export-spec` / `crav1-ideas-to-spec`).
+
+Skills that do not use those files do not need empty `assets/` folders.

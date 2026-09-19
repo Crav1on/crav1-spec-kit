@@ -84,42 +84,42 @@ If you have no spec, no stack, and only a spark, do **not** start in Plan Mode a
 **First prompt** (Agent chat, strong reasoning model):
 
 ```text
-/spark-to-spec
+/crav1-spark-to-spec
 
 Spark: <one or two sentences>
 
 Treat this as greenfield. Do not write code. Ask questions first.
 ```
 
-Then: answer ≤7 questions → agent writes `docs/specs/<slug>/spec.md` → `/tighten-spec` walks **each** finding → `/resolve-questions` walks leftover Open questions (keep open or answer) → optional `spec-reviewer` → **`/plan-from-spec`** → `/implement-task` per `T#` → `/verify-spec` → `/fix-from-verify` (omit Gap) for inner-loop remaining: failed → unverified → `G#`.
+Then: answer ≤7 questions → agent writes `docs/specs/<slug>/spec.md` → `/crav1-tighten-spec` walks **each** finding → `/crav1-resolve-questions` walks leftover Open questions (keep open or answer) → optional `crav1-spec-reviewer` → **`/crav1-plan-from-spec`** → `/crav1-implement-task` per `T#` → `/crav1-verify-spec` → `/crav1-fix-from-verify` (omit Gap) for inner-loop remaining: failed → unverified → `G#`.
 
 Runnable pieces in this repo:
 
 | Piece | When | How |
 | --- | --- | --- |
-| Skill `/spark-to-spec` | You have 1–2 sentences | Slash command; can pin as Custom Mode |
-| Skill `/architecture-reviewer` | Spec + diagrams/ADRs exist | Slash command; runs the reviewer subagent |
-| Skill `/tighten-spec` | Spec exists, still mushy | Slash command; one issue at a time, then edit |
-| Skill `/resolve-questions` | Open questions remain after tightening | Slash command; keep-open or answer, one `Q#` at a time |
-| Skill `/plan-from-spec` | Spec is accepted; want plan + tasks, no code | Slash command; writes `plan.md` and `tasks.md` |
-| Skill `/implement-task` | `tasks.md` exists; build one slice | Slash command; one `T#`, then its verify |
-| Skill `/verify-spec` | Want proof against acceptance | Slash command; TL;DR then `verify.md` details |
-| Skill `/fix-from-verify` | After verify-spec, inner-loop gaps | Slash command; omit Gap to walk failed → unverified → G# |
-| Skill `/fix-live` | Live/inner-loop gap | Alias of `/fix-from-verify` |
-| Skill `/draft-commit-message` | About to commit (GitKraken paste fields) | Slash command; style.md or git log, once or onward |
-| Skill `/ideas-to-spec` | Pile of ideas + technical hunches | Slash command; pick an export format |
-| Skill `/export-spec` | Spec exists, want another format | Slash command |
-| Subagent `spec-reviewer` | Independent product/spec critique | Agent delegates, or ask “review this spec” |
-| Subagent `architecture-reviewer` | Diagrams, ADRs, hunches vs decisions | Agent delegates |
+| Skill `/crav1-spark-to-spec` | You have 1–2 sentences | Slash command; can pin as Custom Mode |
+| Skill `/crav1-architecture-reviewer` | Spec + diagrams/ADRs exist | Slash command; runs the reviewer subagent |
+| Skill `/crav1-tighten-spec` | Spec exists, still mushy | Slash command; one issue at a time, then edit |
+| Skill `/crav1-resolve-questions` | Open questions remain after tightening | Slash command; keep-open or answer, one `Q#` at a time |
+| Skill `/crav1-plan-from-spec` | Spec is accepted; want plan + tasks, no code | Slash command; writes `plan.md` and `tasks.md` |
+| Skill `/crav1-implement-task` | `tasks.md` exists; build one slice | Slash command; one `T#`, then its verify |
+| Skill `/crav1-verify-spec` | Want proof against acceptance | Slash command; TL;DR then `verify.md` details |
+| Skill `/crav1-fix-from-verify` | After verify-spec, inner-loop gaps | Slash command; omit Gap to walk failed → unverified → G# |
+| Skill `/crav1-fix-live` | Live/inner-loop gap | Alias of `/crav1-fix-from-verify` |
+| Skill `/crav1-draft-commit-message` | About to commit (GitKraken paste fields) | Slash command; style.md or git log, once or onward |
+| Skill `/crav1-ideas-to-spec` | Pile of ideas + technical hunches | Slash command; pick an export format |
+| Skill `/crav1-export-spec` | Spec exists, want another format | Slash command |
+| Subagent `crav1-spec-reviewer` | Independent product/spec critique | Agent delegates, or ask “review this spec” |
+| Subagent `crav1-architecture-reviewer` | Diagrams, ADRs, hunches vs decisions | Agent delegates |
 
 ## 3. From a pile of ideas (not a spark, not a spec)
 
-When you already have several ideas and maybe stack opinions, use **`/ideas-to-spec`**, not `/spark-to-spec`. Full walkthrough: [From a pile of ideas to a spec](docs/from-ideas.md).
+When you already have several ideas and maybe stack opinions, use **`/crav1-ideas-to-spec`**, not `/crav1-spark-to-spec`. Full walkthrough: [From a pile of ideas to a spec](docs/from-ideas.md).
 
 **First prompt:**
 
 ```text
-/ideas-to-spec
+/crav1-ideas-to-spec
 
 Format: EARS
 # BDD | OpenSpec | YAML | JSON | BMAD  (comma-separate for more than one)
@@ -132,7 +132,7 @@ Treat hunches as proposed, not decided.
 Do not write code. Capture first, then architecture questions.
 ```
 
-Flow: cluster intent vs hunches → product questions if needed → **architecture interview** (≤7 questions, 2–3 options) → write `spec.md` + `diagrams.md` + ADRs + `export/<format>` → optional `architecture-reviewer` → Plan Mode.
+Flow: cluster intent vs hunches → product questions if needed → **architecture interview** (≤7 questions, 2–3 options) → write `spec.md` + `diagrams.md` + ADRs + `export/<format>` → optional `crav1-architecture-reviewer` → Plan Mode.
 
 Canonical spec stays Markdown. EARS / BDD / OpenSpec / YAML / JSON / BMAD are exports. Mermaid for context and sequences; ASCII for trees and CLIs. ADRs only when there were real alternatives (MADR-shaped template).
 
@@ -226,28 +226,30 @@ Save Plan Mode output into `docs/specs/<change>/plan.md` so Cloud Agents and tea
 
 ### Step 3 — Skills and Custom Modes
 
-Create skills with `/create-skill`. Keep `SKILL.md` short; put long templates in that skill’s `assets/` (and `references/` for recipes). Copying `.cursor/skills/` and `.cursor/agent-assets/` into another repo is enough for the commands to keep their file shapes — also copy `docs/specs/_template/` if you want the human starter folder.
+Create skills with `/create-skill`. New **crav1** skills go under `.cursor/skills/crav1/crav1-<name>/` with `name: crav1-<name>` so `/crav1` lists your library separately from Cursor built-ins. Keep `SKILL.md` short; put templates in that skill’s `assets/` (and `references/` for recipes).
 
-When you change a template, update `docs/specs/_template/` **and** every `assets/` / `agent-assets/` copy. Rule: `.cursor/rules/self-contained-skills.mdc`.
+Drop-in for another repo: copy `.cursor/skills/crav1/`, `.cursor/agents/crav1-*.md`, `.cursor/agent-assets/crav1-*`, and `.cursor/rules/crav1-*.mdc`. Also copy `docs/specs/_template/` if you want the human starter folder.
+
+When you change a template, update `docs/specs/_template/` **and** every `assets/` / `agent-assets/` copy. Rule: `.cursor/rules/crav1-self-contained-skills.mdc`.
 
 This repo already ships:
 
-- `/spark-to-spec` — one-liner → questions → `spec.md`
-- `/ideas-to-spec` — idea pile + technical hunches → spec, diagrams, ADRs, chosen export
-- `/architecture-reviewer` — run the architecture-reviewer subagent; numbered issues at the end
-- `/tighten-spec` — one issue at a time, with explained resolutions and impact; patch only that issue after you choose
-- `/resolve-questions` — one Open question at a time; keep it open or answer with impact; patch only that `Q#`
-- `/export-spec` — re-project `spec.md` into EARS, BDD, OpenSpec, YAML, JSON, or BMAD
-- `/plan-from-spec` — file-level `plan.md` and testable `tasks.md`; refuses to code
-- `/implement-task` — one `tasks.md` row, then run its verify step
-- `/verify-spec` — TL;DR of implemented vs not, then acceptance details in `verify.md`
-- `/fix-from-verify` — after verify-spec, walk inner-loop gaps (failed → unverified → `G#`); omit Gap for the next; writes `fix-log.md`
-- `/fix-live` — alias when that gap is a live/inner-loop path
-- `/draft-commit-message` — paste-ready GitKraken Summary/Description; `style.md` or live git log, once or onward (deletable rule)
-- subagent `spec-reviewer` — independent product/spec critique
-- subagent `architecture-reviewer` — hunches vs decisions, diagrams, ADRs
+- `/crav1-spark-to-spec` — one-liner → questions → `spec.md`
+- `/crav1-ideas-to-spec` — idea pile + technical hunches → spec, diagrams, ADRs, chosen export
+- `/crav1-architecture-reviewer` — run the crav1-architecture-reviewer subagent; numbered issues at the end
+- `/crav1-tighten-spec` — one issue at a time, with explained resolutions and impact; patch only that issue after you choose
+- `/crav1-resolve-questions` — one Open question at a time; keep it open or answer with impact; patch only that `Q#`
+- `/crav1-export-spec` — re-project `spec.md` into EARS, BDD, OpenSpec, YAML, JSON, or BMAD
+- `/crav1-plan-from-spec` — file-level `plan.md` and testable `tasks.md`; refuses to code
+- `/crav1-implement-task` — one `tasks.md` row, then run its verify step
+- `/crav1-verify-spec` — TL;DR of implemented vs not, then acceptance details in `verify.md`
+- `/crav1-fix-from-verify` — after verify-spec, walk inner-loop gaps (failed → unverified → `G#`); omit Gap for the next; writes `fix-log.md`
+- `/crav1-fix-live` — alias when that gap is a live/inner-loop path
+- `/crav1-draft-commit-message` — paste-ready GitKraken Summary/Description; `style.md` or live git log, once or onward (deletable rule)
+- subagent `crav1-spec-reviewer` — independent product/spec critique
+- subagent `crav1-architecture-reviewer` — hunches vs decisions, diagrams, ADRs
 
-Invoke with `/skill-name`, or pin a skill as a **Custom Mode** (`Option+Enter` / `Alt+Enter`) so it stays on for the session (for example `/implement-task` while you burn down `T#`s).
+Invoke with `/skill-name`, or pin a skill as a **Custom Mode** (`Option+Enter` / `Alt+Enter`) so it stays on for the session (for example `/crav1-implement-task` while you burn down `T#`s).
 
 ### Step 4 — Verification as part of the environment
 

@@ -4,14 +4,14 @@ Use this when you have **more than a spark**: several ideas, maybe UX notes, may
 
 You still do **not** start by coding. You add an architecture interview and you write diagrams + ADRs. The canonical file remains `spec.md`. Formats are exports.
 
-Spark-only? Use [from-nothing](from-nothing.md) and `/spark-to-spec` instead.
+Spark-only? Use [from-nothing](from-nothing.md) and `/crav1-spark-to-spec` instead.
 
 ## First prompt
 
 New Agent chat. Strong reasoning model. Not Plan Mode yet.
 
 ```text
-/ideas-to-spec
+/crav1-ideas-to-spec
 
 Format: EARS
 # or: BDD | OpenSpec | YAML | JSON | BMAD
@@ -26,7 +26,7 @@ Treat hunches as proposed, not decided.
 Do not write code. Capture first, then architecture questions.
 ```
 
-That slash command *is* the prompt. Pin `/ideas-to-spec` as a Custom Mode if you want it on for the session.
+That slash command *is* the prompt. Pin `/crav1-ideas-to-spec` as a Custom Mode if you want it on for the session.
 
 ## The extra steps (vs spark)
 
@@ -36,9 +36,9 @@ That slash command *is* the prompt. Pin `/ideas-to-spec` as a Custom Mode if you
 | A Capture      | Paste the pile                         | Clusters intent vs hunches vs undecided, v0 vs later, ≤5 product questions, format choice |
 | B Architecture | Answer / “use assumptions”             | ≤7 technical questions + 2–3 options at one abstraction level                             |
 | C Write        | Pick options, correct A-numbers        | `spec.md`, `diagrams.md`, ADRs, `export/<format>`                                         |
-| D Critique     | Optional                               | `/architecture-reviewer` then `/tighten-spec` (one issue at a time)                        |
-| D2 Questions   | Leftover Open questions                | `/resolve-questions` — keep open or answer, one `Q#` at a time                             |
-| E Export again | “also want JSON”                       | `/export-spec` — does not change behavior                                                 |
+| D Critique     | Optional                               | `/crav1-architecture-reviewer` then `/crav1-tighten-spec` (one issue at a time)                        |
+| D2 Questions   | Leftover Open questions                | `/crav1-resolve-questions` — keep open or answer, one `Q#` at a time                             |
+| E Export again | “also want JSON”                       | `/crav1-export-spec` — does not change behavior                                                 |
 | Stop           | v0 is demoable and ADRs match diagrams | New chat, Plan Mode, `@spec.md` `@diagrams.md` `@adr/`                                    |
 
 
@@ -66,7 +66,7 @@ docs/specs/<slug>/
   export/openspec/        # if you chose OpenSpec
 ```
 
-ADRs use the MADR-shaped template in `.cursor/skills/ideas-to-spec/assets/adr.md` (same as `docs/specs/_template/adr.md`). Status starts as `proposed`. Hunches with no alternative belong under Constraints, not as ADRs.
+ADRs use the MADR-shaped template in `.cursor/skills/crav1/crav1-ideas-to-spec/assets/adr.md` (same as `docs/specs/_template/adr.md`). Status starts as `proposed`. Hunches with no alternative belong under Constraints, not as ADRs.
 
 Diagrams: context + v0 sequence are required. State/ER only if the idea needs them. Mermaid for graphs and sequences; ascii for trees, CLIs, and simple pipelines.
 
@@ -88,17 +88,17 @@ Diagrams: context + v0 sequence are required. State/ER only if the idea needs th
 ## Critique command
 
 ```text
-/architecture-reviewer
+/crav1-architecture-reviewer
 @docs/specs/<slug>/
 Do not edit files.
 ```
 
-Then `/tighten-spec` to walk the numbered issues. Then `/resolve-questions` for leftover Open questions.
+Then `/crav1-tighten-spec` to walk the numbered issues. Then `/crav1-resolve-questions` for leftover Open questions.
 
 ## After accept
 
 ```text
-/plan-from-spec
+/crav1-plan-from-spec
 @docs/specs/<slug>/spec.md
 @docs/specs/<slug>/diagrams.md
 @docs/specs/<slug>/adr
@@ -109,36 +109,36 @@ Do not code.
 
 Or Cursor Plan Mode with the same `@` files. The skill writes `plan.md` and `tasks.md` in the spec folder so the plan lives in git, not only in the Plan Mode UI.
 
-Then, in a **new** chat (or pin `/implement-task` as a Custom Mode):
+Then, in a **new** chat (or pin `/crav1-implement-task` as a Custom Mode):
 
 ```text
-/implement-task
+/crav1-implement-task
 @docs/specs/<slug>/tasks.md
 ```
 
 When you want the full acceptance matrix:
 
 ```text
-/verify-spec
+/crav1-verify-spec
 @docs/specs/<slug>/spec.md
 ```
 
 If the TL;DR still lists failed, unverified, or wiring `G#` rows (not “not implemented”):
 
 ```text
-/fix-from-verify
+/crav1-fix-from-verify
 @docs/specs/<slug>/verify.md
 @docs/specs/<slug>/spec.md
 
 Do not change spec.md.
 ```
 
-Omit `Gap` to take the next inner-loop item (order: verify failed → claimed done/unverified → `G#`). Repeat until that queue is empty. Unimplemented `T#`s stay on `/implement-task`.
+Omit `Gap` to take the next inner-loop item (order: verify failed → claimed done/unverified → `G#`). Repeat until that queue is empty. Unimplemented `T#`s stay on `/crav1-implement-task`.
 
 When you are ready to commit in GitKraken (after a `T#` or a live fix):
 
 ```text
-/draft-commit-message
+/crav1-draft-commit-message
 ```
 
 Paste the **Summary** and **Description** blocks. The skill does not run `git commit` unless you also ask it to.
@@ -152,10 +152,10 @@ First time (no persist rule yet) it asks:
 
 Onward choices are mutually exclusive (writing one removes the other). To get the prompt again: delete that rule file.
 
-Inner-loop example (same skill; `/fix-live` also works):
+Inner-loop example (same skill; `/crav1-fix-live` also works):
 
 ```text
-/fix-from-verify
+/crav1-fix-from-verify
 Gap: T# claimed done, unverified — POST /register never reached SQL
 Live command: POST <url>/register
 Do not change spec.md.
