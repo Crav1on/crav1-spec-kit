@@ -105,8 +105,8 @@ Runnable pieces in this repo:
 | Skill `/crav1-resolve-questions` | Open questions remain after tightening | Slash command; keep-open or answer, one `Q#` at a time |
 | Skill `/crav1-plan-from-spec` | Spec is accepted; want plan + tasks, no code | Slash command; writes `plan.md` and `tasks.md` |
 | Skill `/crav1-implement-task` | `tasks.md` exists; build one slice | Slash command; one `T#`, then its verify |
-| Skill `/crav1-complete-task` | One `T#` implement → commit → verify → optional fix loop | Style once; auto-commit; asks only if inner-loop or a gate |
-| Skill `/crav1-complete-tasks` | Several `T#`s to done | `T1-T3` or all unchecked; each via complete-task |
+| Skill `/crav1-complete-task` | One `T#` implement → done in an isolated worker | Persist commit style as a rule; auto-commit; parent relays fix/ready |
+| Skill `/crav1-complete-tasks` | Several `T#`s to done | Orchestrates one complete-task worker per id; `T1-T3` or all unchecked |
 | Skill `/crav1-verify-spec` | Want proof against acceptance | Slash command; TL;DR then `verify.md` details |
 | Skill `/crav1-fix-from-verify` | After verify-spec, inner-loop gaps | Slash command; omit Gap to walk failed → unverified → G# |
 | Skill `/crav1-fix-live` | Live/inner-loop gap | Alias of `/crav1-fix-from-verify` |
@@ -247,8 +247,8 @@ This repo already ships:
 - `/crav1-export-spec` — re-project `spec.md` into EARS, BDD, OpenSpec, YAML, JSON, or BMAD
 - `/crav1-plan-from-spec` — file-level `plan.md` and testable `tasks.md`; refuses to code
 - `/crav1-implement-task` — one `tasks.md` row, then run its verify step
-- `/crav1-complete-task` — one `T#`: implement → commit → verify-spec → commit → optional fix-from-verify loop; style once; auto-commit
-- `/crav1-complete-tasks` — `T1-T3` or all unchecked, each via complete-task; stop the batch when a task needs you
+- `/crav1-complete-task` — isolated worker for one `T#`: implement → commit → verify → optional fix; persist commit style as a rule
+- `/crav1-complete-tasks` — orchestrates one worker per `T#` (`T1-T3` or all unchecked); stops the batch when a worker needs you
 - `/crav1-verify-spec` — TL;DR of implemented vs not, then acceptance details in `verify.md`
 - `/crav1-fix-from-verify` — after verify-spec, walk inner-loop gaps (failed → unverified → `G#`); omit Gap for the next; writes `fix-log.md`
 - `/crav1-fix-live` — alias when that gap is a live/inner-loop path
@@ -256,6 +256,7 @@ This repo already ships:
 - `/crav1-finalize-commit` — same draft, then copy for GitKraken, edit/rewrite the text, or `git commit` when they accept it (no push)
 - subagent `crav1-spec-reviewer` — independent product/spec critique
 - subagent `crav1-architecture-reviewer` — hunches vs decisions, diagrams, ADRs
+- subagent `crav1-complete-task` — worker for `/crav1-complete-task` / `/crav1-complete-tasks` (one `T#`)
 
 Invoke with `/skill-name`, or pin a skill as a **Custom Mode** (`Option+Enter` / `Alt+Enter`) so it stays on for the session (for example `/crav1-implement-task` while you burn down `T#`s).
 

@@ -137,13 +137,13 @@ Do not change spec.md.
 
 Omit `Gap` to take the next inner-loop item (order: verify failed → claimed done/unverified → `G#`). Repeat until that queue is empty. Unimplemented `T#`s stay on `/crav1-implement-task`.
 
-To take **one** `T#` from implement through commit, verify, and an optional fix loop (style once, auto-commit):
+To take **one** `T#` implement-to-done in an **isolated worker chat** (style persisted as a rule):
 
 ```text
 /crav1-complete-task T2
 ```
 
-Several (or all remaining `- [ ]`):
+Several (orchestrator stays here; one worker per `T#`):
 
 ```text
 /crav1-complete-tasks T1-T3
