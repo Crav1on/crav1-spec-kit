@@ -78,17 +78,33 @@ Do not invent extra options (push, amend, commit subsets they did not name). If 
 
 1. Confirm git works (same PATH fallback as the draft skill).
 2. **Files:** commit **staged** files if the index is non-empty. If the index is empty, ask whether to `git add` the intended file set from the draft. Do not add `agent-tools/`, `artifacts/`, `bin/`, `obj/`, or other build output.
-3. **Message:** `git commit` with Summary as the subject (`-m`) and Description as the body (second `-m`, or a HEREDOC). Do not add `Co-authored-by` or extra trailer lines.
+3. **Message:** `git commit` with Summary as the subject (`-m`) and Description as the body (second `-m`, or a HEREDOC). Do not add `Co-authored-by`, `Made-with: Cursor`, or other trailers yourself.
 4. Do **not** push.
-5. Show the new hash, subject, and `git status` short result.
-6. If commit fails (hooks, empty index, identity), show the error. Keep the paste blocks, **then** offer the choices again.
+5. Read `git log -1 --format=%B`. Compare to the drafted Summary + Description.
+6. Show the new hash, subject, and `git status` short result.
+7. If the body has extra **Cursor attribution** (`Co-authored-by: Cursor`, `cursoragent@cursor.com`, `Made-with: Cursor`) that was **not** in the draft: this is Cursor’s commit-attribution setting (or a cloud agent), **not** this skill and usually **not** a repo hook. Follow **Cursor attribution** below.
+8. If commit fails (hooks, empty index, identity), show the error. Keep the paste blocks, **then** offer the choices again.
 
-Do not `git commit --amend` unless they explicitly asked to amend.
+Do not `git commit --amend` for wording tweaks unless they asked. Amending **only** to restore the drafted message (strip attribution) is allowed as below.
+
+## Cursor attribution
+
+After a successful commit, if HEAD’s message is the draft **plus** a Cursor co-author/trailer:
+
+1. Tell them in one short sentence: Cursor appended it; it was not part of the message they accepted.
+2. **Strip it once** when all of these are true: this process created HEAD, HEAD is not pushed, they have not asked to keep the trailer.
+   - `git commit --amend --no-verify` with **exactly** the drafted Summary + Description (same `-m` / HEREDOC as the original commit). No extra trailers.
+   - Read `git log -1 --format=%B` again. If the trailer is gone, show the clean hash/message and stop.
+   - If the trailer **came back**, Cursor wrapped `git commit` again. Do not loop amend. Offer `strip` (they should turn attribution off first) or `keep`.
+3. How to stop it on **future local** commits: Cursor Settings → **Git & PRs → Attribution** (older: **Agent → Attribution**) → turn commit attribution off. CLI: `attribution.attributeCommitsToAgent` false in `~/.cursor/cli-config.json`. Enterprise admins can disable it org-wide. **Cloud / background agents** may still add co-author; the IDE toggle does not always apply there.
+4. Do not install a `prepare-commit-msg` hook unless they ask.
+
+If they say they **want** the Cursor trailer, leave it.
 
 ## Hard rules
 
 - Never offer copy/edit/commit before Summary/Description exist. After they exist, show the blocks, then the choices (question prompt includes that wording).
 - No commit until `commit` (or an unambiguous “commit this message now”) **after** they have seen the current blocks.
-- `copy` never runs `git commit`.
+- After `commit`, if Cursor appended `Co-authored-by` / `Made-with` that was not in the draft, strip it once with amend when HEAD is ours and unpushed; do not fight a second inject—tell them to turn Attribution off.
 - Do not change product files except the persist rules the draft skill already writes (`draft-commit-style.mdc` / `draft-commit-gitlog.mdc`).
 - Do not open a PR.
