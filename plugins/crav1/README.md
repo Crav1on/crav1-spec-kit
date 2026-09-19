@@ -26,7 +26,7 @@ Type `/crav1` in Agent chat to list commands.
 **Also**
 
 - `/crav1-draft-commit-message` — GitKraken Summary/Description paste; does not commit unless you ask
-- `/crav1-review-commit` — same draft, then copy, edit, rewrite, or `git commit` (no push)
+- `/crav1-finalize-commit` — same draft, then copy, edit, rewrite, or `git commit` (no push)
 - Subagent `crav1-spec-reviewer` — product/spec critique (invoke by asking to review the spec)
 - Subagent `crav1-architecture-reviewer` — used by the slash command above
 - Rule: specs live under `docs/specs/`
@@ -47,7 +47,7 @@ Work in your **product** repo, not only the kit clone.
 6. **New chat.** `/crav1-plan-from-spec`. You accept `plan.md` / `tasks.md`. Still no product code in that step.
 7. `/crav1-implement-task` for **one** `T#`. Repeat.
 8. `/crav1-verify-spec`. If something in the inner loop is wrong, `/crav1-fix-from-verify` (omit Gap to take the next). Unimplemented tasks go back to step 7, not the fix skill.
-9. When you want a commit message: `/crav1-draft-commit-message` (paste into GitKraken) or `/crav1-review-commit` (edit, then copy or commit).
+9. When you want a commit message: `/crav1-draft-commit-message` (paste into GitKraken) or `/crav1-finalize-commit` (edit, then copy or commit).
 
 Do not start with “pick a stack and generate the app” unless the spec already says to. Quick typos and one-file bugs can skip this loop and use Agent mode directly.
 

@@ -148,7 +148,7 @@ Paste the **Summary** and **Description** blocks into GitKraken. The skill does 
 To change the wording first, then copy **or** create the git commit:
 
 ```text
-/crav1-review-commit
+/crav1-finalize-commit
 ```
 
 That command drafts the same way, then asks `copy` / `edit` / `rewrite` / `commit`. It does not push.

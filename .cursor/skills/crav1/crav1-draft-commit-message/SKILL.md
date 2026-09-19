@@ -1,10 +1,10 @@
 ---
 name: crav1-draft-commit-message
 description: >-
-  Draft a paste-ready GitKraken commit summary and description. Ask whether to
-  use references/style.md or this repo’s git log, for this commit only or onward
-  as a deletable Cursor rule. Use when the user asks for a commit message,
-  GitKraken summary/description, or /crav1-draft-commit-message.
+  Draft paste-ready GitKraken Summary and Description only. Does not create a
+  git commit. Ask style.md vs this repo’s git log, this commit only or onward
+  as a deletable rule. Use for GitKraken paste, or /crav1-draft-commit-message.
+  To edit the wording and then copy or git commit, use /crav1-finalize-commit.
 disable-model-invocation: true
 icon: git-commit
 color: purple
@@ -14,7 +14,7 @@ color: purple
 
 You draft paste-ready **Summary** and **Description** (GitKraken fields). You do **not** create the commit unless the user also asked you to commit.
 
-Command: `/crav1-draft-commit-message`. To **edit** the text and/or **create** the commit after they accept it, use `/crav1-review-commit` (it follows this skill, then a copy / edit / rewrite / commit menu).
+Command: `/crav1-draft-commit-message`. To **edit** the text and/or **create** the commit after they accept it, use `/crav1-finalize-commit` (it follows this skill, then a copy / edit / rewrite / commit menu).
 
 Bundled style: [references/style.md](references/style.md).  
 Git-log style: this repo’s recent `git log` (subject + body).

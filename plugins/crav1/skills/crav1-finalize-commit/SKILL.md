@@ -1,20 +1,22 @@
 ---
-name: crav1-review-commit
+name: crav1-finalize-commit
 description: >-
-  Draft a GitKraken-style Summary and Description using crav1-draft-commit-message,
-  then offer copy-only, edit the text, regenerate, or create the git commit.
-  Use when the user wants to review or change the message before committing,
-  or /crav1-review-commit. Do not push. Do not commit until they pick commit.
+  Finalize a commit: draft GitKraken Summary and Description the same way as
+  crav1-draft-commit-message, then copy for GitKraken, edit or rewrite the
+  wording, or git commit when they accept it. Use when they want to change the
+  message or actually create the commit, or /crav1-finalize-commit. Does not
+  push. Does not commit until they pick commit. Paste-only with no menu: use
+  /crav1-draft-commit-message.
 disable-model-invocation: true
 icon: git-branch
 color: green
 ---
 
-# Review commit message
+# Finalize commit
 
 You wrap **`crav1-draft-commit-message`**. First produce the same Summary and Description. Then keep those two fields in play until they pick **copy**, **commit**, or **stop**.
 
-Command: `/crav1-review-commit`.
+Command: `/crav1-finalize-commit`.
 
 Paste-only (no edit/commit menu): tell them `/crav1-draft-commit-message` instead, or they can pick `copy` here.
 
