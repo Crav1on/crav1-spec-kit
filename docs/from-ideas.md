@@ -40,7 +40,7 @@ Structured labels still work if you like them; they are not required.
 | Critique           | Optional                               | `/crav1-architecture-reviewer` then `/crav1-tighten-spec` (one issue at a time)            |
 | Questions          | Leftover Open questions                | `/crav1-resolve-questions` — keep open or answer, one `Q#` at a time                      |
 | Export again       | “also want JSON”                       | `/crav1-export-spec` — does not change behavior                                           |
-| Stop               | v0 is demoable and ADRs match diagrams | New chat, Plan Mode, `@spec.md` `@diagrams.md` `@adr/`                                    |
+| Stop               | v0 is demoable and ADRs match diagrams | New chat, Plan Mode, with `spec.md`, `diagrams.md`, and `adr/` attached |
 
 
 Good replies during Architecture:

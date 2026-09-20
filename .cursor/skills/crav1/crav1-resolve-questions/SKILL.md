@@ -29,7 +29,7 @@ Include:
 1. Every bullet (or numbered item) under **Open questions**
 2. Assumptions still marked unresolved (A1, A2, …) if they are not already duplicated as an open question
 
-Skip empty placeholders. Do not invent new questions. If the list is empty, say so and point to Plan Mode (`Shift+Tab`) `@` the spec — not to this skill.
+Skip empty placeholders. Do not invent new questions. If the list is empty, say so and point to Plan Mode (`Shift+Tab`) with `spec.md` attached — not to this skill.
 
 ## Walk one question at a time
 
@@ -92,5 +92,5 @@ Do **not** offer a turn-level “answer all with assumptions.” Guessing is `as
 ## When the list is done
 
 - Remaining items are only those they **kept open**, or the list is empty.
-- Tell them: kept-open items stay as the spec’s honest unknowns; empty list → `/crav1-plan-from-spec` or new chat, Plan Mode, `@` the spec.
+- Tell them: kept-open items stay as the spec’s honest unknowns; empty list → `/crav1-plan-from-spec` or a new chat in Plan Mode with `spec.md` attached.
 - Optional next: `/crav1-export-spec` if exports exist, or `/crav1-architecture-reviewer` if answers changed the shape.
