@@ -32,18 +32,18 @@ Structured labels still work if you like them; they are not required.
 ## The extra steps (vs spark)
 
 
-| Phase          | You                                    | Agent                                                                                     |
-| -------------- | -------------------------------------- | ----------------------------------------------------------------------------------------- |
-| A Capture      | Paste one unstructured blob            | Clusters intent vs hunches vs undecided, v0 vs later, ≤5 product questions, format choice |
-| B Architecture | Answer / “use assumptions”             | ≤7 technical questions + 2–3 options at one abstraction level                             |
-| C Write        | Pick options, correct A-numbers        | `spec.md`, `diagrams.md`, ADRs, `export/<format>`                                         |
-| D Critique     | Optional                               | `/crav1-architecture-reviewer` then `/crav1-tighten-spec` (one issue at a time)                        |
-| D2 Questions   | Leftover Open questions                | `/crav1-resolve-questions` — keep open or answer, one `Q#` at a time                             |
-| E Export again | “also want JSON”                       | `/crav1-export-spec` — does not change behavior                                                 |
-| Stop           | v0 is demoable and ADRs match diagrams | New chat, Plan Mode, `@spec.md` `@diagrams.md` `@adr/`                                    |
+| Phase              | You                                    | Agent                                                                                     |
+| ------------------ | -------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Capture            | Paste one unstructured blob            | Clusters intent vs hunches vs undecided, v0 vs later, ≤5 product questions, format choice |
+| Architecture       | Answer / “use assumptions”             | ≤7 technical questions + 2–3 options at one abstraction level                             |
+| Write              | Pick options, correct A-numbers        | `spec.md`, `diagrams.md`, ADRs, `export/<format>`                                         |
+| Critique           | Optional                               | `/crav1-architecture-reviewer` then `/crav1-tighten-spec` (one issue at a time)            |
+| Questions          | Leftover Open questions                | `/crav1-resolve-questions` — keep open or answer, one `Q#` at a time                      |
+| Export again       | “also want JSON”                       | `/crav1-export-spec` — does not change behavior                                           |
+| Stop               | v0 is demoable and ADRs match diagrams | New chat, Plan Mode, `@spec.md` `@diagrams.md` `@adr/`                                    |
 
 
-Good replies in B:
+Good replies during Architecture:
 
 - “Source of truth is local files. Sync is later.”
 - “Option 2, because I am solo and must ship a demo.”

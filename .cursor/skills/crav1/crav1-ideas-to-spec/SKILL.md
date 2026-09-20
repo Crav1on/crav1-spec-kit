@@ -33,7 +33,7 @@ Always write `spec.md` first. Exports are projections. If they conflict, `spec.m
 
 If they omit a format, ask once (multiple-choice). If they name a format anywhere in the blob (“EARS”, “export JSON”, …), treat it as chosen. If they say “use your default”, export **EARS** plus diagrams plus ADRs. Do not emit every format.
 
-## Phase A — Capture (first response, no files yet)
+## Capture (first response, no files yet)
 
 Treat the **whole message** as raw material. You structure it; they do not.
 
@@ -49,9 +49,9 @@ Treat the **whole message** as raw material. You structure it; they do not.
 
 Stop. Do not write files. Do not run the architecture interview until they answer or say “use assumptions and continue.”
 
-If the blob is already a clear v0 (user, done-state, non-goals), skip extra product questions and go to Phase B in the **next** turn after they confirm the restatement.
+If the blob is already a clear v0 (user, done-state, non-goals), skip extra product questions and go to **Architecture interview** in the **next** turn after they confirm the restatement.
 
-## Phase B — Architecture interview (still no spec files)
+## Architecture interview (still no spec files)
 
 Ask **at most 7** technical questions. Prefer options, not essays. Cover only what the bundle actually implies:
 
@@ -69,7 +69,7 @@ Do **not** pick a winner unless they already did. List which hunches would becom
 
 Stop again.
 
-## Phase C — Write artifacts
+## Write artifacts
 
 After they pick or confirm options:
 
