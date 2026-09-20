@@ -94,7 +94,7 @@ Diagrams: context + v0 sequence are required. State/ER only if the idea needs th
 Do not edit files.
 ```
 
-Then `/crav1-tighten-spec` to walk the numbered issues. Then `/crav1-resolve-questions` for leftover Open questions.
+Then `/crav1-tighten-spec` to walk the numbered issues (each issue has resolutions plus **get a suggestion**). Then `/crav1-resolve-questions` for leftover Open questions.
 
 ## After accept
 

@@ -112,7 +112,7 @@ Runnable pieces in this repo:
 | --- | --- | --- |
 | Skill `/crav1-spark-to-spec` | You have 1–2 sentences (empty repo or a feature on an existing app) | Slash command; greenfield vs brownfield from context |
 | Skill `/crav1-architecture-reviewer` | Spec + diagrams/ADRs exist | Slash command; runs the reviewer subagent |
-| Skill `/crav1-tighten-spec` | Spec exists, still mushy | Slash command; one issue at a time, then edit |
+| Skill `/crav1-tighten-spec` | Spec exists, still mushy | Slash command; one issue at a time (option to get a suggestion); then edit |
 | Skill `/crav1-resolve-questions` | Open questions remain after tightening | Slash command; keep-open or answer, one `Q#` at a time |
 | Skill `/crav1-plan-from-spec` | Spec is accepted; want plan + tasks, no code | Slash command; writes `plan.md` and `tasks.md` |
 | Skill `/crav1-implement-task` | `tasks.md` exists; build one slice | Slash command; one `T#`, then its verify |
@@ -122,7 +122,7 @@ Runnable pieces in this repo:
 | Skill `/crav1-fix-from-verify` | After verify-spec, inner-loop gaps | Slash command; omit Gap to walk failed → unverified → G# |
 | Skill `/crav1-fix-live` | Live/inner-loop gap | Alias of `/crav1-fix-from-verify` |
 | Skill `/crav1-draft-commit-message` | About to commit (GitKraken paste fields) | Slash command; style.md or git log, once or onward; no commit unless they ask |
-| Skill `/crav1-finalize-commit` | Finish a message: edit, GitKraken copy, or git commit | Style first if needed, then draft, then copy / edit / rewrite / commit; no push |
+| Skill `/crav1-finalize-commit` | Finish a message: git commit, GitKraken copy, or edit | Style first if needed, then draft, then **commit first**, then copy / edit / rewrite / stop; no push |
 | Skill `/crav1-ideas-to-spec` | Pile of ideas + technical hunches | Slash command; pick an export format |
 | Skill `/crav1-intake-to-specs` | 1–N files; maybe several features/repos | Slash command; landscape + one spec per v0 slug |
 | Skill `/crav1-export-spec` | Spec exists, want another format | Slash command |
@@ -275,7 +275,7 @@ This repo already ships:
 - `/crav1-ideas-to-spec` — idea pile + technical hunches → spec, diagrams, ADRs, chosen export
 - `/crav1-intake-to-specs` — mixed intake → `docs/system/` + one spec per v0 feature (isolated slice workers)
 - `/crav1-architecture-reviewer` — run the crav1-architecture-reviewer subagent; numbered issues at the end
-- `/crav1-tighten-spec` — one issue at a time, with explained resolutions and impact; patch only that issue after you choose
+- `/crav1-tighten-spec` — one issue at a time, with explained resolutions (plus get a suggestion) and impact; patch only that issue after you choose
 - `/crav1-resolve-questions` — one Open question at a time; keep it open or answer with impact; patch only that `Q#`
 - `/crav1-export-spec` — re-project `spec.md` into EARS, BDD, OpenSpec, YAML, JSON, or BMAD
 - `/crav1-plan-from-spec` — file-level `plan.md` and testable `tasks.md`; refuses to code
@@ -286,7 +286,7 @@ This repo already ships:
 - `/crav1-fix-from-verify` — after verify-spec, walk inner-loop gaps (failed → unverified → `G#`); omit Gap for the next; writes `fix-log.md`
 - `/crav1-fix-live` — alias when that gap is a live/inner-loop path
 - `/crav1-draft-commit-message` — paste-ready GitKraken Summary/Description; `style.md` or live git log, once or onward (deletable rule); does not commit unless they ask
-- `/crav1-finalize-commit` — same draft, then copy for GitKraken, edit/rewrite the text, or `git commit` when they accept it (no push)
+- `/crav1-finalize-commit` — same draft, then **commit first**, then copy for GitKraken, edit/rewrite, or stop (no push)
 - subagent `crav1-spec-reviewer` — independent product/spec critique
 - subagent `crav1-architecture-reviewer` — hunches vs decisions, diagrams, ADRs
 - subagent `crav1-complete-task` — worker for `/crav1-complete-task` / `/crav1-complete-tasks` (one `T#`)

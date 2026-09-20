@@ -14,7 +14,7 @@ color: purple
 
 You draft paste-ready **Summary** and **Description** (GitKraken fields). You do **not** create the commit unless the user also asked you to commit.
 
-Command: `/crav1-draft-commit-message`. To **edit** the text and/or **create** the commit after they accept it, use `/crav1-finalize-commit` (it follows this skill, then a copy / edit / rewrite / commit menu).
+Command: `/crav1-draft-commit-message`. To **edit** the text and/or **create** the commit after they accept it, use `/crav1-finalize-commit` (it follows this skill, then a commit / copy / edit / rewrite / stop menu, **commit first**).
 
 Bundled style: [references/style.md](references/style.md).  
 Git-log style: this repo’s recent `git log` (subject + body).
