@@ -77,7 +77,7 @@ Use a strong reasoning model for this phase.
 | 3 | “v0 is too big” / “offline matters” / “not for teams” | `/crav1-tighten-spec` turns each gap into an issue with choices (impact included; you can ask for a suggestion), one by one |
 | 4 | Optional: “review this spec” | Parent agent delegates to **crav1-spec-reviewer** |
 | 5 | Leftover Open questions | `/crav1-resolve-questions` — keep open or answer, one `Q#` at a time |
-| Stop | You can demo this slice from the acceptance list; leftover Qs are explicit | Spec is done enough. `/crav1-plan-from-spec` then `/crav1-complete-task` / `/crav1-implement-task` / `/crav1-verify-spec` |
+| Stop | You can demo this slice from the acceptance list; leftover Qs are explicit | Spec is done enough. `/crav1-plan-from-spec`, optional `/crav1-review-plan` / `/crav1-tighten-plan`, then complete-task / implement / verify |
 
 Good iteration messages (short):
 
@@ -102,6 +102,6 @@ New chat so exploration does not pollute implementation.
 @docs/specs/<slug>/spec.md
 ```
 
-Or Plan Mode with the same spec attached. Then you review `plan.md` / `tasks.md`, and only then `/crav1-complete-task` or `/crav1-implement-task`.
+Or Plan Mode with the same spec attached. Then optional `/crav1-review-plan` and `/crav1-tighten-plan` (plan/tasks only). Then `/crav1-complete-task` or `/crav1-implement-task`.
 
 If a repo already exists, `@` the relevant folders so plan and spec-reviewer apply “preserve existing patterns.”

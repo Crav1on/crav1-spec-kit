@@ -81,7 +81,7 @@ Output only:
 - Paths written
 - Task count and any acceptance line with no task (must be none, or you failed)
 - Kept-open questions parked as risks
-- Next: they review `plan.md` / `tasks.md`; **new chat**, `/crav1-implement-task` (or Cursor Plan Mode Build) with `@plan.md` `@tasks.md` `@spec.md`. Do not start coding in this chat.
+- Next: `/crav1-review-plan` (optional but useful), then `/crav1-tighten-plan` for plan `P#`s; **new chat**, `/crav1-implement-task` (or `/crav1-complete-task`) with `plan.md`, `tasks.md`, and `spec.md` attached. Do not start coding in this chat.
 
 ## Hard rules
 

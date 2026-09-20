@@ -108,7 +108,16 @@ Stay inside v0. Do not reopen rejected options unless an ADR is still proposed.
 Do not code.
 ```
 
-Or Cursor Plan Mode with the same `@` files. The skill writes `plan.md` and `tasks.md` in the spec folder so the plan lives in git, not only in the Plan Mode UI.
+Or Cursor Plan Mode with the same files attached. The skill writes `plan.md` and `tasks.md` in the spec folder so the plan lives in git, not only in the Plan Mode UI.
+
+Optional critique of the plan (does not change `spec.md`):
+
+```text
+/crav1-review-plan
+@docs/specs/<slug>/
+```
+
+Then `/crav1-tighten-plan` walks **plan** `P#`s one by one. Findings tagged **spec** go to `/crav1-tighten-spec` or `/crav1-resolve-questions`.
 
 Then, in a **new** chat (or pin `/crav1-implement-task` as a Custom Mode):
 

@@ -91,4 +91,4 @@ That puts `docs/system/` and the new spec slugs in git. No push. Intake does not
 
 ## Critique and build (per slug)
 
-Same as [from-ideas](from-ideas.md): `/crav1-architecture-reviewer` `@docs/specs/<slug>/`, then tighten, resolve questions, `/crav1-plan-from-spec`, implement or complete-task, verify, fix-from-verify.
+Same as [from-ideas](from-ideas.md): `/crav1-architecture-reviewer` with the spec folder attached, then tighten, resolve questions, `/crav1-plan-from-spec`, optional `/crav1-review-plan` then `/crav1-tighten-plan`, implement or complete-task, verify, fix-from-verify.

@@ -17,8 +17,8 @@ This kit repository is the source. Your product repository is where work happens
 
 | Piece | Role |
 | --- | --- |
-| Skills (`/crav1-…`) | Playbooks: spark/ideas/intake → spec → plan → implement → verify → fix → draft commit |
-| Agents | `crav1-spec-reviewer`, `crav1-architecture-reviewer` (readonly critics); `crav1-complete-task` and `crav1-intake-slice` (writers) |
+| Skills (`/crav1-…`) | Playbooks: spark/ideas/intake → spec → plan → review-plan → implement → verify → fix → draft commit |
+| Agents | `crav1-spec-reviewer`, `crav1-architecture-reviewer`, `crav1-plan-reviewer` (readonly critics); `crav1-complete-task` and `crav1-intake-slice` (writers) |
 | Rule `crav1.mdc` | Short always-on reminder: specs under `docs/specs/`, kit command order |
 | Templates | Inside each skill’s `assets/` (and agent-assets). Optional human copies: `docs/specs/_template/`, `docs/system/_template/` |
 

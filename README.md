@@ -104,7 +104,7 @@ Spark: <one or two sentences for this feature>
 Feature on this app. Preserve existing architecture. Do not write code.
 ```
 
-Then: answer ≤7 questions → agent writes `docs/specs/<slug>/spec.md` → `/crav1-tighten-spec` walks **each** finding → `/crav1-resolve-questions` walks leftover Open questions (keep open or answer) → optional `crav1-spec-reviewer` → **`/crav1-plan-from-spec`** → `/crav1-implement-task` per `T#` or `/crav1-complete-task` / `/crav1-complete-tasks` → `/crav1-verify-spec` → `/crav1-fix-from-verify` (omit Gap) for inner-loop remaining: failed → unverified → `G#`.
+Then: answer ≤7 questions → agent writes `docs/specs/<slug>/spec.md` → `/crav1-tighten-spec` walks **each** finding → `/crav1-resolve-questions` walks leftover Open questions (keep open or answer) → optional `crav1-spec-reviewer` → **`/crav1-plan-from-spec`** → `/crav1-review-plan` then `/crav1-tighten-plan` for plan `P#`s → `/crav1-implement-task` per `T#` or `/crav1-complete-task` / `/crav1-complete-tasks` → `/crav1-verify-spec` → `/crav1-fix-from-verify` (omit Gap) for inner-loop remaining: failed → unverified → `G#`.
 
 Runnable pieces in this repo:
 
@@ -115,6 +115,8 @@ Runnable pieces in this repo:
 | Skill `/crav1-tighten-spec` | Spec exists, still mushy | Slash command; one issue at a time (option to get a suggestion); then edit |
 | Skill `/crav1-resolve-questions` | Open questions remain after tightening | Slash command; keep-open or answer, one `Q#` at a time |
 | Skill `/crav1-plan-from-spec` | Spec is accepted; want plan + tasks, no code | Slash command; writes `plan.md` and `tasks.md` |
+| Skill `/crav1-review-plan` | Plan exists; want a critique | Slash command; numbered `P#`s for tighten-plan |
+| Skill `/crav1-tighten-plan` | After review-plan, or mushy tasks | Slash command; one `P#` at a time; patches plan/tasks only |
 | Skill `/crav1-implement-task` | `tasks.md` exists; build one slice | Slash command; one `T#`, then its verify |
 | Skill `/crav1-complete-task` | One `T#` implement → done in an isolated worker | Persist commit style as a rule; auto-commit; parent relays fix/ready |
 | Skill `/crav1-complete-tasks` | Several `T#`s to done | Orchestrates one complete-task worker per id; `T1-T3` or all unchecked |
@@ -128,6 +130,7 @@ Runnable pieces in this repo:
 | Skill `/crav1-export-spec` | Spec exists, want another format | Slash command |
 | Subagent `crav1-spec-reviewer` | Independent product/spec critique | Agent delegates, or ask “review this spec” |
 | Subagent `crav1-architecture-reviewer` | Diagrams, ADRs, hunches vs decisions | Agent delegates |
+| Subagent `crav1-plan-reviewer` | Plan/tasks vs spec | Agent delegates; `/crav1-review-plan` |
 
 ## 3. From a pile of ideas (not a spark, not a spec)
 
@@ -279,6 +282,8 @@ This repo already ships:
 - `/crav1-resolve-questions` — one Open question at a time; keep it open or answer with impact; patch only that `Q#`
 - `/crav1-export-spec` — re-project `spec.md` into EARS, BDD, OpenSpec, YAML, JSON, or BMAD
 - `/crav1-plan-from-spec` — file-level `plan.md` and testable `tasks.md`; refuses to code
+- `/crav1-review-plan` — critique `plan.md` / `tasks.md` against the spec; numbered `P#`s
+- `/crav1-tighten-plan` — one plan issue at a time; patches plan/tasks only (spec findings go to tighten-spec)
 - `/crav1-implement-task` — one `tasks.md` row, then run its verify step
 - `/crav1-complete-task` — isolated worker for one `T#`: implement → commit → verify → optional fix; persist commit style as a rule
 - `/crav1-complete-tasks` — orchestrates one worker per `T#` (`T1-T3` or all unchecked); stops the batch when a worker needs you
@@ -289,6 +294,7 @@ This repo already ships:
 - `/crav1-finalize-commit` — same draft, then **commit first**, then copy for GitKraken, edit/rewrite, or stop (no push)
 - subagent `crav1-spec-reviewer` — independent product/spec critique
 - subagent `crav1-architecture-reviewer` — hunches vs decisions, diagrams, ADRs
+- subagent `crav1-plan-reviewer` — worker for `/crav1-review-plan` (`plan.md` / `tasks.md` vs spec)
 - subagent `crav1-complete-task` — worker for `/crav1-complete-task` / `/crav1-complete-tasks` (one `T#`)
 - subagent `crav1-intake-slice` — worker for `/crav1-intake-to-specs` (one feature slug)
 
