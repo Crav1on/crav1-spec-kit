@@ -7,7 +7,7 @@ This repository is a **process guide** for spec-driven development in Cursor, no
 - Put per-change work under `docs/specs/<change-id>/` using `_template/` (human starter). Skills also carry copies in their `assets/`; keep both in sync.
 - Keep [docs/install.md](docs/install.md) and [plugins/crav1/README.md](plugins/crav1/README.md) current when install or first-run steps change.
 - When adding or updating a crav1 skill/agent, edit `.cursor/skills/crav1/crav1-<name>/` (agents: `.cursor/agents/crav1-<name>.md`, templates: that skill’s `assets/` and `.cursor/agent-assets/crav1-<name>/`), then run `scripts/sync-crav1-plugin.sh` so `plugins/crav1/` matches. See `.cursor/rules/kit-maintainer.mdc`.
-- From a one-sentence spark, use `/crav1-spark-to-spec` then `/crav1-tighten-spec`. Do not code first.
+- From a one-sentence spark, use `/crav1-spark-to-spec` then `/crav1-tighten-spec`. Works greenfield or as a feature on an existing repo (new spec slug unless they said extend). Do not code first.
 - From a pile of ideas plus technical hunches, use `/crav1-ideas-to-spec` (diagrams + ADRs + chosen export). Do not code first.
 - Critique with `/crav1-architecture-reviewer`, then `/crav1-tighten-spec` one issue at a time.
 - After tightening, `/crav1-resolve-questions` to keep or answer each remaining Open question.

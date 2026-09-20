@@ -81,9 +81,9 @@ Quick, well-understood edits (rename, copy tweak, one-file bug with a clear stac
 
 ## 2. From one sentence to a spec
 
-If you have no spec, no stack, and only a spark, do **not** start in Plan Mode and do not paste a “senior architect” persona. Interview first, write `spec.md`, tighten it, *then* plan. Full walkthrough: [From one sentence to a spec](docs/from-nothing.md).
+If you have only a spark (one or two sentences), do **not** start in Plan Mode and do not paste a “senior architect” persona. Interview first, write `spec.md`, tighten it, *then* plan — **greenfield or a feature on an existing app**. Full walkthrough: [From one sentence to a spec](docs/from-nothing.md).
 
-**First prompt** (Agent chat, strong reasoning model):
+**First prompt** (Agent chat, strong reasoning model). Greenfield:
 
 ```text
 /crav1-spark-to-spec
@@ -93,13 +93,24 @@ Spark: <one or two sentences>
 Treat this as greenfield. Do not write code. Ask questions first.
 ```
 
+Brownfield feature (existing app): `@` the code; the skill writes a **new** spec slug unless you say extend.
+
+```text
+/crav1-spark-to-spec
+@src
+
+Spark: <one or two sentences for this feature>
+
+Feature on this app. Preserve existing architecture. Do not write code.
+```
+
 Then: answer ≤7 questions → agent writes `docs/specs/<slug>/spec.md` → `/crav1-tighten-spec` walks **each** finding → `/crav1-resolve-questions` walks leftover Open questions (keep open or answer) → optional `crav1-spec-reviewer` → **`/crav1-plan-from-spec`** → `/crav1-implement-task` per `T#` or `/crav1-complete-task` / `/crav1-complete-tasks` → `/crav1-verify-spec` → `/crav1-fix-from-verify` (omit Gap) for inner-loop remaining: failed → unverified → `G#`.
 
 Runnable pieces in this repo:
 
 | Piece | When | How |
 | --- | --- | --- |
-| Skill `/crav1-spark-to-spec` | You have 1–2 sentences | Slash command; can pin as Custom Mode |
+| Skill `/crav1-spark-to-spec` | You have 1–2 sentences (empty repo or a feature on an existing app) | Slash command; greenfield vs brownfield from context |
 | Skill `/crav1-architecture-reviewer` | Spec + diagrams/ADRs exist | Slash command; runs the reviewer subagent |
 | Skill `/crav1-tighten-spec` | Spec exists, still mushy | Slash command; one issue at a time, then edit |
 | Skill `/crav1-resolve-questions` | Open questions remain after tightening | Slash command; keep-open or answer, one `Q#` at a time |
@@ -239,7 +250,7 @@ When you change a template, update `docs/specs/_template/` **and** every `assets
 
 This repo already ships:
 
-- `/crav1-spark-to-spec` — one-liner → questions → `spec.md`
+- `/crav1-spark-to-spec` — one-liner → questions → `spec.md` (greenfield or brownfield feature; new slug unless they extend an existing spec)
 - `/crav1-ideas-to-spec` — idea pile + technical hunches → spec, diagrams, ADRs, chosen export
 - `/crav1-architecture-reviewer` — run the crav1-architecture-reviewer subagent; numbered issues at the end
 - `/crav1-tighten-spec` — one issue at a time, with explained resolutions and impact; patch only that issue after you choose

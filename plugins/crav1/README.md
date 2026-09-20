@@ -8,7 +8,7 @@ Type `/crav1` in Agent chat to list commands.
 
 **Specify**
 
-- `/crav1-spark-to-spec` — one or two sentences → questions → `docs/specs/<slug>/spec.md`
+- `/crav1-spark-to-spec` — one or two sentences → questions → `docs/specs/<slug>/spec.md` (greenfield or a feature on an existing app)
 - `/crav1-ideas-to-spec` — idea pile + technical hunches → spec, diagrams, ADRs, export format
 - `/crav1-architecture-reviewer` — runs the architecture critic; numbered issues (`I#`)
 - `/crav1-tighten-spec` — one issue at a time; you pick; it patches only that issue

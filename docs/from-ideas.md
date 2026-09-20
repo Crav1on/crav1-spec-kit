@@ -6,7 +6,7 @@ Use this when you have **more than a spark**: several ideas, maybe UX notes, may
 
 You still do **not** start by coding. You add an architecture interview and you write diagrams + ADRs. The canonical file remains `spec.md`. Formats are exports.
 
-Spark-only? Use [from-nothing](from-nothing.md) and `/crav1-spark-to-spec` instead.
+Spark-only (greenfield or one feature on an existing app)? Use [from-nothing](from-nothing.md) and `/crav1-spark-to-spec` instead.
 
 ## First prompt
 
