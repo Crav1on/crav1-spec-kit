@@ -6,7 +6,7 @@ Use this when you have **more than a spark**: several ideas, maybe UX notes, may
 
 You still do **not** start by coding. You add an architecture interview and you write diagrams + ADRs. The canonical file remains `spec.md`. Formats are exports.
 
-Spark-only (greenfield or one feature on an existing app)? Use [from-nothing](from-nothing.md) and `/crav1-spark-to-spec` instead.
+Spark-only (greenfield or one feature on an existing app)? Use [from-nothing](from-nothing.md) and `/crav1-spark-to-spec` instead. Mixed files or several features/repos? Use [from-intake](from-intake.md) and `/crav1-intake-to-specs`. If this pile is clearly more than one v0 slice or more than one repo, `/crav1-ideas-to-spec` will stop and send you there.
 
 ## First prompt
 

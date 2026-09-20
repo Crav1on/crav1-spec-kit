@@ -4,7 +4,7 @@ Kit not in this project yet? [Install first](install.md). After a plugin install
 
 You do not start in Plan Mode. You do not start by picking Next.js. You start by making the idea small enough to accept or reject.
 
-`/crav1-spark-to-spec` is that first command whether the repo is **empty** or you are adding a **feature** to an app that already exists. The skill picks **greenfield** vs **brownfield** from context (and from what you @). A pile of ideas plus stack hunches is still [from-ideas](from-ideas.md) (`/crav1-ideas-to-spec`). An existing spec that is only mushy is `/crav1-tighten-spec`, not a second spark.
+`/crav1-spark-to-spec` is that first command whether the repo is **empty** or you are adding a **feature** to an app that already exists. The skill picks **greenfield** vs **brownfield** from context (and from what you @). A pile of ideas plus stack hunches is still [from-ideas](from-ideas.md) (`/crav1-ideas-to-spec`). Several files, or several features/repos, is [from-intake](from-intake.md) (`/crav1-intake-to-specs`). An existing spec that is only mushy is `/crav1-tighten-spec`, not a second spark. After `docs/system/` exists, a new feature is still this command with `@docs/system/` (new slug).
 
 ## Why your old prompt was the wrong *first* prompt
 
@@ -51,6 +51,18 @@ This is a feature on the current app. New spec slug. Preserve existing architect
 ```
 
 If you `@` an existing spec **without** saying extend, the skill starts a **new** slug for the feature. To change that spec in place, say **extend** or use `/crav1-tighten-spec`.
+
+**Later feature** (after `/crav1-intake-to-specs` wrote `docs/system/`):
+
+```text
+/crav1-spark-to-spec
+@docs/system/
+@docs/specs/<related>/
+
+Spark: <one or two sentences for this feature>
+
+New spec slug. Preserve landscape ADRs and repo boundaries. Do not write code. Ask questions first.
+```
 
 That slash command *is* the first prompt. The skill contains the rest so you do not re-paste a persona every time.
 

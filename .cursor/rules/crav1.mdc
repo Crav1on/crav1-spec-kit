@@ -5,9 +5,9 @@ alwaysApply: true
 
 # crav1 kit
 
-Specs, not chat history, are the source of truth. Put change work under `docs/specs/<change-id>/`.
+Specs, not chat history, are the source of truth. Put change work under `docs/specs/<change-id>/`. Multi-feature intake landscape lives under `docs/system/`.
 
-Type `/crav1` to list kit skills. Typical order: spark or ideas → architecture review → tighten → resolve questions → plan → implement (or `/crav1-complete-task` / `/crav1-complete-tasks`) → verify → fix-from-verify (do not edit `spec.md` in the fix loop). `/crav1-spark-to-spec` is greenfield or a brownfield feature (new slug unless they extend).
+Type `/crav1` to list kit skills. Typical order: spark, ideas, or intake → architecture review → tighten → resolve questions → plan → implement (or `/crav1-complete-task` / `/crav1-complete-tasks`) → verify → fix-from-verify (do not edit `spec.md` in the fix loop). `/crav1-spark-to-spec` is greenfield, a brownfield feature, or a later feature on `docs/system/` (new slug unless they extend). `/crav1-intake-to-specs` writes the landscape plus one spec per v0 feature.
 
 Do not scaffold an application unless the user asked for one. Prefer editing the spec or plan when implementation drifts.
 

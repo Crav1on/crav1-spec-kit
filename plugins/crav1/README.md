@@ -8,8 +8,9 @@ Type `/crav1` in Agent chat to list commands.
 
 **Specify**
 
-- `/crav1-spark-to-spec` — one or two sentences → questions → `docs/specs/<slug>/spec.md` (greenfield or a feature on an existing app)
+- `/crav1-spark-to-spec` — one or two sentences → questions → `docs/specs/<slug>/spec.md` (greenfield, a feature on an existing app, or a later feature on `docs/system/`)
 - `/crav1-ideas-to-spec` — idea pile + technical hunches → spec, diagrams, ADRs, export format
+- `/crav1-intake-to-specs` — mixed intake → `docs/system/` + one spec per v0 feature
 - `/crav1-architecture-reviewer` — runs the architecture critic; numbered issues (`I#`)
 - `/crav1-tighten-spec` — one issue at a time; you pick; it patches only that issue
 - `/crav1-resolve-questions` — one Open question (`Q#`); keep or answer
@@ -31,9 +32,10 @@ Type `/crav1` in Agent chat to list commands.
 - `/crav1-finalize-commit` — style if needed, then the draft, then copy / edit / rewrite / `git commit` (no push). If Cursor appends `Co-authored-by`, the skill strips it once from that unpushed commit.
 - Subagent `crav1-spec-reviewer` — product/spec critique (invoke by asking to review the spec)
 - Subagent `crav1-architecture-reviewer` — used by the slash command above
-- Rule: specs live under `docs/specs/`
+- Subagent `crav1-intake-slice` — used by `/crav1-intake-to-specs` (one slug)
+- Rule: specs live under `docs/specs/`; system landscape under `docs/system/`
 
-Templates ship inside each skill’s `assets/`. Copy `docs/specs/_template/` from the kit repo if you want a visible starter folder.
+Templates ship inside each skill’s `assets/`. Copy `docs/specs/_template/` and `docs/system/_template/` from the kit repo if you want visible starter folders.
 
 ## How to use (first change)
 
@@ -42,7 +44,8 @@ Work in your **product** repo, not only the kit clone.
 1. **New Agent chat.** Strong reasoning model for specify/plan.
 2. **Specify.** Either:
    - `/crav1-spark-to-spec` plus a one- or two-sentence spark, or
-   - `/crav1-ideas-to-spec` plus one blob of ideas and tech hunches (no required structure).
+   - `/crav1-ideas-to-spec` plus one blob of ideas and tech hunches (no required structure), or
+   - `/crav1-intake-to-specs` plus `@` files (notes, diagrams, optional code as context).
 3. Answer questions. Stop when v0 is demoable from the acceptance list.
 4. `/crav1-architecture-reviewer` if there are real design hunches, then `/crav1-tighten-spec` **one issue at a time**.
 5. `/crav1-resolve-questions` for leftover `Q#`s you still care about.

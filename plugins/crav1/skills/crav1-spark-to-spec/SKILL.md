@@ -1,10 +1,10 @@
 ---
 name: crav1-spark-to-spec
 description: >-
-  Turn a one- or two-sentence spark into spec.md. Use for greenfield (empty or
-  no app) or a new feature on an existing repo. If they @ an existing spec,
-  start a new slug unless they said to extend that file. Do not write
-  application code.
+  Turn a one- or two-sentence spark into spec.md. Use for greenfield, a new
+  feature on an existing repo, or a later feature when docs/system/ exists.
+  If they @ an existing spec, start a new slug unless they said to extend
+  that file. Do not write application code.
 disable-model-invocation: true
 icon: book-open
 color: blue
@@ -24,13 +24,16 @@ Look at the workspace and what they @-mentioned.
 | --- | --- |
 | No application to change (empty repo, kit-only, or they said greenfield) | **Greenfield** |
 | A real codebase is in context (they @ folders, or this repo is clearly an app) | **Brownfield** — this spark is a **feature**, not a new product |
-| They @ an existing `docs/specs/<old>/spec.md` | Still a spark. **New slug** for a new feature unless they said **extend** that spec (then edit that folder; prefer new slug when in doubt) |
+| They `@` an existing `docs/specs/<old>/spec.md` | Still a spark. **New slug** for a new feature unless they said **extend** that spec (then edit that folder; prefer new slug when in doubt) |
+| `docs/system/` exists (they `@` it or it is in the repo) | Later feature on the landscape. **New slug**. Do not rewrite `docs/system/` except an index row (and repo/ADR only if they need a new repo) |
 
-If both a codebase and an old spec are present, brownfield + new slug is the default.
+If both a codebase and an old spec are present, brownfield + new slug is the default. If `docs/system/` exists as well, treat that as **later feature on the landscape** (still new slug; constraints from landscape then from the app).
+
+If they pasted a dump, many files, or several features/repos, stop and tell them `/crav1-intake-to-specs` (or `/crav1-ideas-to-spec` for one pile → one spec). Do not stretch this skill.
 
 ## First response (before any file)
 
-1. Restate the spark in one sentence they can correct. Name the mode (greenfield vs brownfield feature).
+1. Restate the spark in one sentence they can correct. Name the mode (greenfield vs brownfield feature vs later feature on `docs/system/`).
 2. Propose the **smallest useful slice** (what this spec ships vs later). In brownfield, v0 is **this feature**, not a rewrite of the app.
 3. Ask **at most 7** clarifying questions, using the questions tool when available. Prefer multiple-choice plus an “other” option. Cover:
    - Who is this for? (one primary user)
@@ -57,15 +60,16 @@ Fill every section. Rules:
 - Open questions stay open. Do not silently resolve them in the spec body.
 - Mark remaining assumptions in a short `## Assumptions` section.
 - **Brownfield:** do not respec the entire existing product. Do not invent a new architecture. If you skimmed the repo, note only constraints that affect this slice.
+- **Landscape:** if `docs/system/landscape.md` exists, preserve its ADRs and repo boundaries. After writing this spec, **add one index row**. If they need a new repo, write a landscape ADR + `repos.md` row first. Do not re-run `/crav1-intake-to-specs`. Do not rewrite the landscape except those rows.
 
 Then output only:
 
 - Path to the spec
-- Mode (greenfield or brownfield feature)
+- Mode (greenfield, brownfield feature, or later feature on landscape)
 - 3–5 decisions still worth arguing
 - What to do next: answer those, or run `/crav1-tighten-spec`, or accept and `/crav1-plan-from-spec`
 
-Still no code. Still no `plan.md` unless they asked for a plan. Pile of ideas plus hunches: tell them `/crav1-ideas-to-spec` instead of stretching this skill.
+Still no code. Still no `plan.md` unless they asked for a plan. Pile of ideas plus hunches for **one** feature: tell them `/crav1-ideas-to-spec`. Mixed files / several features or repos: `/crav1-intake-to-specs`.
 
 ## Style
 

@@ -3,7 +3,7 @@
 Read this **before** you put the kit in a project. It covers what you get, which install path to pick, and where to go next. It is not the full playbook.
 
 - After a **plugin** install, open the plugin README (in Cursor: the `crav1` plugin, or [plugins/crav1/README.md](../plugins/crav1/README.md) in this repo).
-- For the **process** (why specs, Plan Mode, templates), use [README.md](../README.md), [from-nothing.md](from-nothing.md), and [from-ideas.md](from-ideas.md).
+- For the **process** (why specs, Plan Mode, templates), use [README.md](../README.md), [from-nothing.md](from-nothing.md), [from-ideas.md](from-ideas.md), and [from-intake.md](from-intake.md).
 
 ## What this kit is
 
@@ -17,12 +17,12 @@ This kit repository is the source. Your product repository is where work happens
 
 | Piece | Role |
 | --- | --- |
-| Skills (`/crav1-…`) | Playbooks: spark/ideas → spec → plan → implement → verify → fix → draft commit |
-| Agents | `crav1-spec-reviewer`, `crav1-architecture-reviewer` (readonly critics) |
+| Skills (`/crav1-…`) | Playbooks: spark/ideas/intake → spec → plan → implement → verify → fix → draft commit |
+| Agents | `crav1-spec-reviewer`, `crav1-architecture-reviewer` (readonly critics); `crav1-complete-task` and `crav1-intake-slice` (writers) |
 | Rule `crav1.mdc` | Short always-on reminder: specs under `docs/specs/`, kit command order |
-| Templates | Inside each skill’s `assets/` (and agent-assets). Optional human copies: `docs/specs/_template/` |
+| Templates | Inside each skill’s `assets/` (and agent-assets). Optional human copies: `docs/specs/_template/`, `docs/system/_template/` |
 
-Not installed by the plugin: this repo’s long README, `AGENTS.md`, or `docs/specs/_template/`. Copy `_template/` yourself if you want a starter folder in git.
+Not installed by the plugin: this repo’s long README, `AGENTS.md`, `docs/specs/_template/`, or `docs/system/_template/`. Copy those starter folders yourself if you want them in git.
 
 ## Prerequisites
 
@@ -45,7 +45,7 @@ From a clone of this kit:
    - `.cursor/agents/crav1-*.md`
    - `.cursor/agent-assets/crav1-*`
    - `.cursor/rules/crav1.mdc`
-2. Optionally copy `docs/specs/_template/` and add a line to the product `AGENTS.md` pointing at `docs/specs/`.
+2. Optionally copy `docs/specs/_template/`, `docs/system/_template/`, and add a line to the product `AGENTS.md` pointing at `docs/specs/` and `docs/system/`.
 3. Commit those files in the product repo.
 4. Reload Cursor if `/crav1` does not show up (`Developer: Reload Window`).
 
@@ -92,7 +92,7 @@ After you change the kit, re-copy or re-run the sync script, then reload.
 ## After install
 
 1. Open Agent chat in the **product** repo.
-2. Type `/crav1` and run `/crav1-spark-to-spec` or `/crav1-ideas-to-spec`.
+2. Type `/crav1` and run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, or `/crav1-intake-to-specs`.
 3. Follow the plugin README’s short loop. Do not start in Plan Mode or by picking a stack.
 
 `/crav1-complete-tasks` (and standalone `/crav1-complete-task`) **pauses once** with Settings directions (Run Everything vs Auto-review), waits for `continue` / `click`, then reminds you how to restore the previous mode when the run ends. Workers launched by complete-tasks do not pause again. The skill cannot change Settings for you.
@@ -128,5 +128,6 @@ If the kit is a private Origin repo (`thomas-cronholm/agent-spec-kit`):
 | Plugin just installed, want the command order | [plugins/crav1/README.md](../plugins/crav1/README.md) |
 | One-sentence idea | [docs/from-nothing.md](from-nothing.md) |
 | Pile of ideas + tech hunches | [docs/from-ideas.md](from-ideas.md) |
+| Mixed files / several features or repos | [docs/from-intake.md](from-intake.md) |
 | How Cursor + SDD fit together | [README.md](../README.md) |
 | Cursor plugin format | [Plugins](https://cursor.com/docs/plugins) · [Plugins reference](https://cursor.com/docs/reference/plugins) |

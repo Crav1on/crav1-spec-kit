@@ -35,11 +35,11 @@ After editing drop-in files, run `scripts/sync-crav1-plugin.sh` so the plugin tr
 
 ## Self-contained templates
 
-When you **create or update** a crav1 skill or subagent that reads or writes spec artifacts (`spec.md`, `plan.md`, `tasks.md`, `adr.md`, `diagrams.md`, `verify.md`, `fix-log.md`):
+When you **create or update** a crav1 skill or subagent that reads or writes spec artifacts (`spec.md`, `plan.md`, `tasks.md`, `adr.md`, `diagrams.md`, `verify.md`, `fix-log.md`) or landscape artifacts (`docs/system/`):
 
 1. Put a copy of each template in **that skill’s** `assets/` (and the matching `agent-assets/crav1-<agent-name>/` on both trees).
 2. Point the `SKILL.md` / agent prompt at **those** copies, not only `docs/specs/_template/`. Mention drop-in `.cursor/…` **and** plugin sibling paths when a file lives outside this skill.
-3. Keep `docs/specs/_template/` in sync. If you change a template, update **every** copy.
+3. Keep `docs/specs/_template/` and `docs/system/_template/` in sync with the matching `assets/` copies. If you change a template, update **every** copy.
 4. Do **not** put template markdown under `.cursor/agents/` or `plugins/crav1/agents/` except the agent prompt file.
 5. Format recipes live in the skill’s `references/` (see `crav1-export-spec` / `crav1-ideas-to-spec`).
 
@@ -47,4 +47,4 @@ Skills that do not use those files do not need empty `assets/` folders.
 
 ## Install docs
 
-Pre-install: `docs/install.md`. Post-plugin-install: `plugins/crav1/README.md`. Kit playbook: `README.md`, `docs/from-nothing.md`, `docs/from-ideas.md`.
+Pre-install: `docs/install.md`. Post-plugin-install: `plugins/crav1/README.md`. Kit playbook: `README.md`, `docs/from-nothing.md`, `docs/from-ideas.md`, `docs/from-intake.md`.

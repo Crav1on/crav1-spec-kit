@@ -12,7 +12,7 @@
     {
       "name": "crav1",
       "source": "crav1",
-      "description": "Spark-to-verify skills, spec/architecture reviewers, and a short usage rule. Type /crav1 after install."
+      "description": "Spark/ideas/intake-to-verify skills, spec/architecture reviewers, and a short usage rule. Type /crav1 after install."
     }
   ]
 }

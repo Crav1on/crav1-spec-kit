@@ -124,6 +124,7 @@ Runnable pieces in this repo:
 | Skill `/crav1-draft-commit-message` | About to commit (GitKraken paste fields) | Slash command; style.md or git log, once or onward; no commit unless they ask |
 | Skill `/crav1-finalize-commit` | Finish a message: edit, GitKraken copy, or git commit | Style first if needed, then draft, then copy / edit / rewrite / commit; no push |
 | Skill `/crav1-ideas-to-spec` | Pile of ideas + technical hunches | Slash command; pick an export format |
+| Skill `/crav1-intake-to-specs` | 1–N files; maybe several features/repos | Slash command; landscape + one spec per v0 slug |
 | Skill `/crav1-export-spec` | Spec exists, want another format | Slash command |
 | Subagent `crav1-spec-reviewer` | Independent product/spec critique | Agent delegates, or ask “review this spec” |
 | Subagent `crav1-architecture-reviewer` | Diagrams, ADRs, hunches vs decisions | Agent delegates |
@@ -146,9 +147,27 @@ Do not write code. Capture first, then architecture questions.
 
 Flow: cluster intent vs hunches → product questions if needed → **architecture interview** (≤7 questions, 2–3 options) → write `spec.md` + `diagrams.md` + ADRs + `export/<format>` → optional `crav1-architecture-reviewer` → Plan Mode.
 
-Canonical spec stays Markdown. EARS / BDD / OpenSpec / YAML / JSON / BMAD are exports. Mermaid for context and sequences; ASCII for trees and CLIs. ADRs only when there were real alternatives (MADR-shaped template).
+Canonical spec stays Markdown. EARS / BDD / OpenSpec / YAML / JSON / BMAD are exports. Mermaid for context and sequences; ASCII for trees and CLIs. ADRs only when there were real alternatives (MADR-shaped template). If the pile is several v0 features or several repos, `/crav1-ideas-to-spec` stops and you run `/crav1-intake-to-specs` instead.
 
-## 4. The working loop (once a spec exists)
+## 4. From intake files (several features or repos)
+
+When you have **1–N files** (notes, diagrams, screenshots, optional code as context) that may be a whole system, use **`/crav1-intake-to-specs`**. Full walkthrough: [From intake files to specs](docs/from-intake.md).
+
+**First prompt:**
+
+```text
+/crav1-intake-to-specs
+@notes/overview.md
+@sketches/flow.png
+@legacy-api/
+
+Treat hunches as proposed, not decided.
+Do not write code. Map first.
+```
+
+Default if you only `@` a codebase: new system, that code is **context** (not extract-as-is). The parent confirms a map (slugs, repos, bulk assumptions, mushy vs ready), writes `docs/system/`, then one isolated worker per v0 slug. Later features use spark/ideas with `@docs/system/` — new slug, do not re-run intake.
+
+## 5. The working loop (once a spec exists)
 
 Use this on any non-trivial change.
 
@@ -193,7 +212,7 @@ Use `/review`, Bugbot, or a dedicated review subagent. Diff against the spec, no
 
 ---
 
-## 5. How to set it up
+## 6. How to set it up
 
 You can stay native to Cursor, or layer Spec Kit / OpenSpec on top. Native Cursor is enough for most teams; the toolkits add templates and slash-command discipline.
 
@@ -215,6 +234,12 @@ Cursor’s rule hygiene: keep each rule under ~500 lines, split by concern, **po
 A layout that works without extra CLIs:
 
 ```text
+docs/system/
+  _template/
+  landscape.md       # v0 vs later, bulk A#s, feature index
+  repos.md           # named repos (proposed until a URL exists)
+  diagrams.md
+  adr/
 docs/specs/
   _template/
     spec.md          # what / why / acceptance
@@ -240,14 +265,15 @@ Save Plan Mode output into `docs/specs/<change>/plan.md` so Cloud Agents and tea
 
 Create skills with `/create-skill`. New **crav1** skills go under `.cursor/skills/crav1/crav1-<name>/` with `name: crav1-<name>` so `/crav1` lists your library separately from Cursor built-ins. Keep `SKILL.md` short; put templates in that skill’s `assets/` (and `references/` for recipes).
 
-Install into another repo: [docs/install.md](docs/install.md). Drop-in copy is `.cursor/skills/crav1/`, `.cursor/agents/crav1-*.md`, `.cursor/agent-assets/crav1-*`, and `.cursor/rules/crav1.mdc`. Plugin install uses `plugins/crav1/` plus `.cursor-plugin/marketplace.json`. Also copy `docs/specs/_template/` if you want the human starter folder.
+Install into another repo: [docs/install.md](docs/install.md). Drop-in copy is `.cursor/skills/crav1/`, `.cursor/agents/crav1-*.md`, `.cursor/agent-assets/crav1-*`, and `.cursor/rules/crav1.mdc`. Plugin install uses `plugins/crav1/` plus `.cursor-plugin/marketplace.json`. Also copy `docs/specs/_template/` and `docs/system/_template/` if you want visible starter folders.
 
 When you change a template, update `docs/specs/_template/` **and** every `assets/` / `agent-assets/` copy on **both** the drop-in tree and `plugins/crav1/` (`scripts/sync-crav1-plugin.sh`). Rule: `.cursor/rules/kit-maintainer.mdc` (kit repo only; do not dump with `crav1-*`).
 
 This repo already ships:
 
-- `/crav1-spark-to-spec` — one-liner → questions → `spec.md` (greenfield or brownfield feature; new slug unless they extend an existing spec)
+- `/crav1-spark-to-spec` — one-liner → questions → `spec.md` (greenfield, brownfield feature, or later feature on `docs/system/`; new slug unless they extend)
 - `/crav1-ideas-to-spec` — idea pile + technical hunches → spec, diagrams, ADRs, chosen export
+- `/crav1-intake-to-specs` — mixed intake → `docs/system/` + one spec per v0 feature (isolated slice workers)
 - `/crav1-architecture-reviewer` — run the crav1-architecture-reviewer subagent; numbered issues at the end
 - `/crav1-tighten-spec` — one issue at a time, with explained resolutions and impact; patch only that issue after you choose
 - `/crav1-resolve-questions` — one Open question at a time; keep it open or answer with impact; patch only that `Q#`
@@ -264,6 +290,7 @@ This repo already ships:
 - subagent `crav1-spec-reviewer` — independent product/spec critique
 - subagent `crav1-architecture-reviewer` — hunches vs decisions, diagrams, ADRs
 - subagent `crav1-complete-task` — worker for `/crav1-complete-task` / `/crav1-complete-tasks` (one `T#`)
+- subagent `crav1-intake-slice` — worker for `/crav1-intake-to-specs` (one feature slug)
 
 Invoke with `/skill-name`, or pin a skill as a **Custom Mode** (`Option+Enter` / `Alt+Enter`) so it stays on for the session (for example `/crav1-implement-task` while you burn down `T#`s).
 
@@ -300,7 +327,7 @@ You do not need both. Pick one template family and stay consistent.
 
 ---
 
-## 6. Best practices (Cursor + Spec Kit + OpenSpec)
+## 7. Best practices (Cursor + Spec Kit + OpenSpec)
 
 **Make intent unambiguous.** Models complete patterns; they do not read your mind. “Add photo sharing” hides thousands of decisions. Specs surface them before code exists.
 
@@ -328,7 +355,7 @@ You do not need both. Pick one template family and stay consistent.
 
 ---
 
-## 7. Minimal templates
+## 8. Minimal templates
 
 Copy these into `docs/specs/<change>/`.
 
