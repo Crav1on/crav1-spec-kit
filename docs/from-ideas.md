@@ -12,17 +12,14 @@ Spark-only (greenfield or one feature on an existing app)? Use [from-nothing](fr
 
 New Agent chat. Strong reasoning model. Not Plan Mode yet.
 
+Paste **one blob**. No required headings, bullets, or `Format:` / `Bundle:` labels. Include the same kinds of information you used to put in sections: who it is for, the ideas, any UX notes, stack or shape hunches, constraints. The skill clusters intent vs hunches for you.
+
 ```text
 /crav1-ideas-to-spec
 
-Format: EARS
-# or: BDD | OpenSpec | YAML | JSON | BMAD
-# multiple allowed, e.g. Format: EARS, BMAD
-
-Bundle:
-- <idea 1>
-- <idea 2>
-- Technical thoughts: <stack, shape, constraints, “I would like to…”>
+<paste the pile in your own words. Mix product ideas and technical thoughts.
+You can mention an export format in the same text (EARS, BDD, OpenSpec, YAML,
+JSON, BMAD) or skip it and the skill will ask.>
 
 Treat hunches as proposed, not decided.
 Do not write code. Capture first, then architecture questions.
@@ -30,12 +27,14 @@ Do not write code. Capture first, then architecture questions.
 
 That slash command *is* the prompt. Pin `/crav1-ideas-to-spec` as a Custom Mode if you want it on for the session.
 
+Structured labels still work if you like them; they are not required.
+
 ## The extra steps (vs spark)
 
 
 | Phase          | You                                    | Agent                                                                                     |
 | -------------- | -------------------------------------- | ----------------------------------------------------------------------------------------- |
-| A Capture      | Paste the pile                         | Clusters intent vs hunches vs undecided, v0 vs later, ≤5 product questions, format choice |
+| A Capture      | Paste one unstructured blob            | Clusters intent vs hunches vs undecided, v0 vs later, ≤5 product questions, format choice |
 | B Architecture | Answer / “use assumptions”             | ≤7 technical questions + 2–3 options at one abstraction level                             |
 | C Write        | Pick options, correct A-numbers        | `spec.md`, `diagrams.md`, ADRs, `export/<format>`                                         |
 | D Critique     | Optional                               | `/crav1-architecture-reviewer` then `/crav1-tighten-spec` (one issue at a time)                        |

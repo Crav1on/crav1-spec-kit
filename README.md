@@ -137,12 +137,8 @@ When you already have several ideas and maybe stack opinions, use **`/crav1-idea
 ```text
 /crav1-ideas-to-spec
 
-Format: EARS
-# BDD | OpenSpec | YAML | JSON | BMAD  (comma-separate for more than one)
-
-Bundle:
-- <ideas>
-- Technical thoughts: <hunches, constraints, preferred shape>
+<one blob: ideas, UX notes, stack hunches, constraints. No required structure.
+Name an export format in the same text if you already know it, or wait for the ask.>
 
 Treat hunches as proposed, not decided.
 Do not write code. Capture first, then architecture questions.

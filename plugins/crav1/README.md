@@ -42,7 +42,7 @@ Work in your **product** repo, not only the kit clone.
 1. **New Agent chat.** Strong reasoning model for specify/plan.
 2. **Specify.** Either:
    - `/crav1-spark-to-spec` plus a one- or two-sentence spark, or
-   - `/crav1-ideas-to-spec` plus bullets of ideas and tech hunches.
+   - `/crav1-ideas-to-spec` plus one blob of ideas and tech hunches (no required structure).
 3. Answer questions. Stop when v0 is demoable from the acceptance list.
 4. `/crav1-architecture-reviewer` if there are real design hunches, then `/crav1-tighten-spec` **one issue at a time**.
 5. `/crav1-resolve-questions` for leftover `Q#`s you still care about.
