@@ -40,6 +40,7 @@ That slash command *is* the prompt. Pin `/crav1-intake-to-specs` as a Custom Mod
 | Landscape        | Accept the map                           | `docs/system/` (`landscape.md`, `repos.md`, diagrams, cross-cutting ADRs) |
 | Slice specs      | Wait                                     | One isolated worker per v0 slug (`docs/specs/<slug>/`)                |
 | Index            | —                                        | Feature table on `landscape.md`                                       |
+| Commit (optional)| Glance at files, then `/crav1-finalize-commit` | Prompted next step only; intake does not commit                       |
 | Stop             | v0 slugs are demoable from their specs   | Per slug: reviewer → tighten → plan. Not one plan for the universe    |
 
 
@@ -77,6 +78,16 @@ Spark: <the new feature>
 ```
 
 Or `/crav1-ideas-to-spec` if the new thing is already a pile. **New slug.** If you need a new repo: landscape ADR + `repos.md` row, then the spec, then an index row.
+
+## After Index
+
+If you are done with this dump (not about to rewrite Map output in the same chat):
+
+```text
+/crav1-finalize-commit
+```
+
+That puts `docs/system/` and the new spec slugs in git. No push. Intake does not commit for you.
 
 ## Critique and build (per slug)
 

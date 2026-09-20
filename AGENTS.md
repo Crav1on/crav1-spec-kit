@@ -9,7 +9,7 @@ This repository is a **process guide** for spec-driven development in Cursor, no
 - When adding or updating a crav1 skill/agent, edit `.cursor/skills/crav1/crav1-<name>/` (agents: `.cursor/agents/crav1-<name>.md`, templates: that skill’s `assets/` and `.cursor/agent-assets/crav1-<name>/`), then run `scripts/sync-crav1-plugin.sh` so `plugins/crav1/` matches. See `.cursor/rules/kit-maintainer.mdc`.
 - From a one-sentence spark, use `/crav1-spark-to-spec` then `/crav1-tighten-spec`. Works greenfield or as a feature on an existing repo (new spec slug unless they said extend). Do not code first.
 - From a pile of ideas plus technical hunches, use `/crav1-ideas-to-spec` (paste one unstructured blob; diagrams + ADRs + chosen export). Do not code first. Several v0 features or several repos: `/crav1-intake-to-specs` instead.
-- From mixed files (notes, diagrams, screenshots, optional code as context), use `/crav1-intake-to-specs`. Writes `docs/system/` plus one spec per v0 feature. Later features: spark or ideas with `@docs/system/`, new slug. Do not code first.
+- From mixed files (notes, diagrams, screenshots, optional code as context), use `/crav1-intake-to-specs`. Writes `docs/system/` plus one spec per v0 feature. After Index, it prompts `/crav1-finalize-commit` (does not commit itself). Later features: spark or ideas with `@docs/system/`, new slug. Do not code first.
 - Critique with `/crav1-architecture-reviewer`, then `/crav1-tighten-spec` one issue at a time.
 - After tightening, `/crav1-resolve-questions` to keep or answer each remaining Open question.
 - When the spec is accepted, `/crav1-plan-from-spec` writes `plan.md` and `tasks.md`. Do not code in that step.

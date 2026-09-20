@@ -46,7 +46,7 @@ Work in your **product** repo, not only the kit clone.
    - `/crav1-spark-to-spec` plus a one- or two-sentence spark, or
    - `/crav1-ideas-to-spec` plus one blob of ideas and tech hunches (no required structure), or
    - `/crav1-intake-to-specs` plus `@` files (notes, diagrams, optional code as context).
-3. Answer questions. Stop when v0 is demoable from the acceptance list.
+3. Answer questions. Stop when v0 is demoable from the acceptance list. After `/crav1-intake-to-specs` Index, run `/crav1-finalize-commit` if you want landscape + specs in git before review (intake only prompts; it does not commit).
 4. `/crav1-architecture-reviewer` if there are real design hunches, then `/crav1-tighten-spec` **one issue at a time**.
 5. `/crav1-resolve-questions` for leftover `Q#`s you still care about.
 6. **New chat.** `/crav1-plan-from-spec`. You accept `plan.md` / `tasks.md`. Still no product code in that step.

@@ -165,7 +165,7 @@ Treat hunches as proposed, not decided.
 Do not write code. Map first.
 ```
 
-Default if you only `@` a codebase: new system, that code is **context** (not extract-as-is). The parent confirms a map (slugs, repos, bulk assumptions, mushy vs ready), writes `docs/system/`, then one isolated worker per v0 slug. Later features use spark/ideas with `@docs/system/` — new slug, do not re-run intake.
+Default if you only `@` a codebase: new system, that code is **context** (not extract-as-is). The parent confirms a map (slugs, repos, bulk assumptions, mushy vs ready), writes `docs/system/`, then one isolated worker per v0 slug. Then it **prompts** `/crav1-finalize-commit` (does not commit itself). Later features use spark/ideas with `@docs/system/` — new slug, do not re-run intake.
 
 ## 5. The working loop (once a spec exists)
 

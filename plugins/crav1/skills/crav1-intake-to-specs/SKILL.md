@@ -87,7 +87,11 @@ Then output only:
 - Ready vs interviewed slugs
 - ADRs (landscape vs slice) vs still open
 - 3–5 remaining arguments
-- Next: **per slug** `/crav1-architecture-reviewer`, `/crav1-tighten-spec`, `/crav1-plan-from-spec` — not one plan for the universe
+- Next:
+  - `/crav1-finalize-commit` — put landscape + specs in git (no push). Skip if they will rewrite this dump in the same chat.
+  - then **per slug** `/crav1-architecture-reviewer`, `/crav1-tighten-spec`, `/crav1-plan-from-spec` — not one plan for the universe
+
+Do **not** run `/crav1-finalize-commit` yourself. Prompt it. Workers must not commit.
 
 Still no application code. Still no `plan.md` unless they asked.
 
