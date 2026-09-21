@@ -44,12 +44,15 @@ If they pasted a dump, many files, or several features/repos, stop and tell them
    - Constraints they already know (platform, language, offline, deadline, solo vs team). **Greenfield:** do not pick a stack if they did not name one. **Brownfield:** do not propose a new stack or host; constraints come from the existing app unless they explicitly change them.
    - What would make this a failure even if the code runs?
 4. List **assumptions** you will use if they skip a question. Number them (A1, A2, …). Brownfield: assume preserve existing architecture and patterns unless they said otherwise.
+5. **Brownfield / later feature (git repo with commits):** propose a kebab **slug** and include the `/crav1-feature-branch` **Specify** options (`feat/<slug>` first). Empty greenfield repo: skip.
 
-Stop and wait. Do not write `spec.md` until they answer or say “use your assumptions.”
+Stop and wait. Do not write `spec.md` until they answer or say “use your assumptions.” Do not write until the branch choice is done or skipped.
 
 ## After they answer
 
-Write `docs/specs/<slug>/spec.md` from this skill’s `assets/spec.md` (same shape as `docs/specs/_template/spec.md`). Slug: short kebab-case from **this** idea (not the whole product name, in brownfield).
+**Branch first** when this is a git repo with commits (brownfield, later feature, or they have a default branch). Follow `/crav1-feature-branch` (drop-in: `.cursor/skills/crav1/crav1-feature-branch/SKILL.md`; plugin: sibling `skills/crav1-feature-branch/SKILL.md`). Propose slug, then the branch prompt. If that prompt is needed, **this turn is branch only** after they already answered product questions — or include the branch question in the same wait as “use assumptions” if you already know the slug. Do not write `spec.md` until the branch choice is done (or skipped). Greenfield empty repo: skip.
+
+Then write `docs/specs/<slug>/spec.md` from this skill’s `assets/spec.md` (same shape as `docs/specs/_template/spec.md`). Slug: short kebab-case from **this** idea (not the whole product name, in brownfield).
 
 Fill every section. Rules:
 
@@ -67,7 +70,7 @@ Then output only:
 - Path to the spec
 - Mode (greenfield, brownfield feature, or later feature on landscape)
 - 3–5 decisions still worth arguing
-- What to do next: answer those, or run `/crav1-tighten-spec`, or accept and `/crav1-plan-from-spec`
+- What to do next: answer those, or run `/crav1-tighten-spec`, or accept and `/crav1-plan-from-spec`. If they chose `spec/<slug>`, remind them: no implement on that branch; PR/merge when they want, then `feat/<slug>` for build.
 
 Still no code. Still no `plan.md` unless they asked for a plan. Pile of ideas plus hunches for **one** feature: tell them `/crav1-ideas-to-spec`. Mixed files / several features or repos: `/crav1-intake-to-specs`.
 

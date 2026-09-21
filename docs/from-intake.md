@@ -36,6 +36,7 @@ That slash command *is* the prompt. Pin `/crav1-intake-to-specs` as a Custom Mod
 | Phase            | You                                      | Agent                                                                 |
 | ---------------- | ---------------------------------------- | --------------------------------------------------------------------- |
 | Map              | `@` intake; confirm or split slugs/repos | Intent vs context, v0 vs later, bulk `A1…`, ready vs mushy per slug   |
+| Branch           | Pick `feat/…` or `spec/…` (or stay)    | `/crav1-feature-branch` before `docs/system/` (no push, no PR)        |
 | Mushy interview  | Answer only flagged slugs, or “use assumptions” | ≤5 questions per mushy slug, in **this** chat. Workers never interview |
 | Landscape        | Accept the map                           | `docs/system/` (`landscape.md`, `repos.md`, diagrams, cross-cutting ADRs) |
 | Slice specs      | Wait                                     | One isolated worker per v0 slug (`docs/specs/<slug>/`)                |

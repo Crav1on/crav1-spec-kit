@@ -27,6 +27,8 @@ Do not write code. Capture first, then architecture questions.
 
 That slash command *is* the prompt. Pin `/crav1-ideas-to-spec` as a Custom Mode if you want it on for the session.
 
+On a git repo with commits, the skill **prompts** for `feat/<slug>` (spec+build) or `spec/<slug>` (specify-only) before it writes files. `/crav1-feature-branch` is the same prompt on its own. No push, no PR.
+
 Structured labels still work if you like them; they are not required.
 
 ## The extra steps (vs spark)
@@ -118,6 +120,8 @@ Optional critique of the plan (does not change `spec.md`):
 ```
 
 Then `/crav1-tighten-plan` walks **plan** `P#`s one by one. Findings tagged **spec** go to `/crav1-tighten-spec` or `/crav1-resolve-questions`.
+
+If this work is on **`spec/<slug>`**, stop after plan: `/crav1-finalize-commit`, open a PR when you want the spec on the default branch. After it is merged, `/crav1-feature-branch` → `feat/<slug>`, then implement. Do not implement on `spec/<slug>`.
 
 Then, in a **new** chat (or pin `/crav1-implement-task` as a Custom Mode):
 

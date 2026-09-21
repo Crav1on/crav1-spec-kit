@@ -9,6 +9,7 @@ Type `/crav1` in Agent chat to list commands.
 **Specify**
 
 - `/crav1-spark-to-spec` — one or two sentences → questions → `docs/specs/<slug>/spec.md` (greenfield, a feature on an existing app, or a later feature on `docs/system/`)
+- `/crav1-feature-branch` — `feat/<slug>` (spec+build) or `spec/<slug>` then later `feat/<slug>` (specify while another feature builds); no push, no PR
 - `/crav1-ideas-to-spec` — idea pile + technical hunches → spec, diagrams, ADRs, export format
 - `/crav1-intake-to-specs` — mixed intake → `docs/system/` + one spec per v0 feature
 - `/crav1-architecture-reviewer` — runs the architecture critic; numbered issues (`I#`)
@@ -49,10 +50,10 @@ Work in your **product** repo, not only the kit clone.
    - `/crav1-spark-to-spec` plus a one- or two-sentence spark, or
    - `/crav1-ideas-to-spec` plus one blob of ideas and tech hunches (no required structure), or
    - `/crav1-intake-to-specs` plus `@` files (notes, diagrams, optional code as context).
-3. Answer questions. Stop when v0 is demoable from the acceptance list. After `/crav1-intake-to-specs` Index, run `/crav1-finalize-commit` if you want landscape + specs in git before review (intake only prompts; it does not commit).
+3. Answer questions (including branch: `feat/<slug>` or specify-only `spec/<slug>` on a brownfield repo). Stop when v0 is demoable from the acceptance list. After `/crav1-intake-to-specs` Index, run `/crav1-finalize-commit` if you want landscape + specs in git before review (intake only prompts; it does not commit).
 4. `/crav1-architecture-reviewer` if there are real design hunches, then `/crav1-tighten-spec` **one issue at a time**.
 5. `/crav1-resolve-questions` for leftover `Q#`s you still care about.
-6. **New chat.** `/crav1-plan-from-spec`. You accept `plan.md` / `tasks.md`. Still no product code in that step. Optional: `/crav1-review-plan` then `/crav1-tighten-plan`.
+6. **New chat.** `/crav1-plan-from-spec`. You accept `plan.md` / `tasks.md`. Still no product code in that step. Optional: `/crav1-review-plan` then `/crav1-tighten-plan`. On `spec/<slug>`, do not implement; merge that branch first, then `/crav1-feature-branch` → `feat/<slug>`.
 7. `/crav1-implement-task` for **one** `T#`, or `/crav1-complete-task` for an isolated worker that takes that row through commit and verify (optional fix). Several rows: `/crav1-complete-tasks T1-T3` (orchestrator; one worker per task) or omit the range for all unchecked. Those two commands **pause once** with Settings directions (`continue` / `click`); complete-tasks does not pause again per `T#`. When the run ends they remind you how to restore the previous mode.
 8. If you implemented by hand: `/crav1-verify-spec`. If something in the inner loop is wrong, `/crav1-fix-from-verify` (omit Gap to take the next). Unimplemented tasks go back to step 7, not the fix skill.
 9. When you want a commit message: `/crav1-draft-commit-message` (paste into GitKraken) or `/crav1-finalize-commit` (draft, then **commit** first, or copy / edit).

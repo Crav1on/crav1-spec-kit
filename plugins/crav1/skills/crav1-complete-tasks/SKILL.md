@@ -36,6 +36,8 @@ Before the first worker, follow **style-persist.md**. If you must ask, this turn
 
 Do not ask again per `T#`. Workers must not ask style.
 
+**Branch:** before tool approvals and the first worker, follow `/crav1-feature-branch` (drop-in: `.cursor/skills/crav1/crav1-feature-branch/SKILL.md`; plugin: sibling `skills/crav1-feature-branch/SKILL.md`) **Build** prompt. If needed, that turn is branch only. If on `spec/<slug>`, stop (no workers) and follow **Build on a spec-only branch**. Pass `branch: already-done` on every worker. Workers must not create branches.
+
 ## Tool approvals (once for the batch)
 
 Those **Allow / Stop** buttons on each worker are Cursor, not kit `fix`/`stop`. Follow [tool-approvals.md](../crav1-complete-task/references/tool-approvals.md) **once before the first worker** (pause, directions, wait for `continue` / `click` / `stop`).
@@ -50,7 +52,7 @@ Keep a short board: queued / running / done / blocked.
 
 For each `T#` **one at a time**:
 
-1. Launch **crav1-complete-task** with spec folder, this `T#`, `resume: start`, `approvals: already-done`, and “style persist is already set.”
+1. Launch **crav1-complete-task** with spec folder, this `T#`, `resume: start`, `approvals: already-done`, `branch: already-done`, and “style persist is already set.”
 2. Wait until that worker returns a STATUS block. Do not implement in parallel. Do not start `T+1` while this worker is open.
 3. Handle STATUS:
 

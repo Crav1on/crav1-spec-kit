@@ -92,7 +92,7 @@ After you change the kit, re-copy or re-run the sync script, then reload.
 ## After install
 
 1. Open Agent chat in the **product** repo.
-2. Type `/crav1` and run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, or `/crav1-intake-to-specs`.
+2. Type `/crav1` and run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, or `/crav1-intake-to-specs`. Brownfield: expect a branch prompt (`feat/<slug>` or `spec/<slug>`).
 3. Follow the plugin README’s short loop. Do not start in Plan Mode or by picking a stack.
 
 `/crav1-complete-tasks` (and standalone `/crav1-complete-task`) **pauses once** with Settings directions (Run Everything vs Auto-review), waits for `continue` / `click`, then reminds you how to restore the previous mode when the run ends. Workers launched by complete-tasks do not pause again. The skill cannot change Settings for you.

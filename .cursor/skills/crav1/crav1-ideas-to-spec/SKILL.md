@@ -75,6 +75,8 @@ Stop again.
 
 After they pick or confirm options:
 
+**Branch first** if a git repo with commits exists. Follow `/crav1-feature-branch` (drop-in: `.cursor/skills/crav1/crav1-feature-branch/SKILL.md`; plugin: sibling `skills/crav1-feature-branch/SKILL.md`). Do not write spec files until the branch choice is done or skipped.
+
 1. `spec.md` from this skill’s `assets/spec.md` plus:
    - `## Constraints` (only accepted technical constraints)
    - `## Assumptions`
@@ -89,7 +91,7 @@ Then output only:
 - Paths written
 - Decisions captured as ADRs vs still open
 - 3–5 remaining arguments
-- Next: `/crav1-tighten-spec`, `/crav1-architecture-reviewer`, `/crav1-export-spec`, `/crav1-plan-from-spec`, or accept and Plan Mode
+- Next: `/crav1-tighten-spec`, `/crav1-architecture-reviewer`, `/crav1-export-spec`, `/crav1-plan-from-spec`, or accept and Plan Mode. If they chose `spec/<slug>`: no implement on that branch.
 
 Still no application code. Still no `plan.md` unless they asked.
 

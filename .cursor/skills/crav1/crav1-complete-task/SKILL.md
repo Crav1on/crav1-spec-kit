@@ -25,6 +25,8 @@ Follow this skill’s [references/style-persist.md](references/style-persist.md)
 
 Then, **only if this chat is a standalone `/crav1-complete-task`** (the user invoked this skill, not `/crav1-complete-tasks`): follow [references/tool-approvals.md](references/tool-approvals.md) — pause with directions, wait for `continue` / `click` / `stop`. If `/crav1-complete-tasks` launched you or passed `approvals: already-done`, **skip** that pause.
 
+**Branch:** before the worker, follow `/crav1-feature-branch` (drop-in: `.cursor/skills/crav1/crav1-feature-branch/SKILL.md`; plugin: sibling `skills/crav1-feature-branch/SKILL.md`) **Build** prompt. If that prompt is needed, this turn is branch only (after style). If you are on `spec/<slug>`, stop (no worker) and follow **Build on a spec-only branch**. Pass `branch: already-done` to the worker. Workers must not create branches.
+
 ## Find the work
 
 Spec folder: user @-mention, else most recently edited `docs/specs/` excluding `_template/`. Need `tasks.md` or stop (`/crav1-plan-from-spec`).
@@ -37,6 +39,7 @@ Spec folder: user @-mention, else most recently edited `docs/specs/` excluding `
 - `T#`
 - `resume: start` (or `fix` / `ready` / `stop` if this is a follow-up after a gate)
 - `approvals: already-done` after the standalone pause (or when the orchestrator passed that)
+- `branch: already-done` (parent already ran `/crav1-feature-branch`)
 - Point it at [references/run.md](references/run.md)
 
 Instruct it to follow `run.md` and end with the STATUS block. Do not do the implement/verify work in your own voice.

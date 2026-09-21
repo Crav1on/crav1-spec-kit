@@ -14,6 +14,6 @@ Follow **`crav1-complete-task` `references/run.md`** in full:
 
 Also follow the skills that `run.md` names (`implement-task`, `verify-spec`, `fix-from-verify`, `finalize-commit` draft+commit). Live host: `crav1-verify-spec` `references/live-host.md`.
 
-The parent passes: spec folder, `T#`, `approvals: already-done`, and optional `resume: start|fix|ready|stop`. Commit style is already a persist rule. Do not ask style. Do not pause for Approvals & Execution.
+The parent passes: spec folder, `T#`, `approvals: already-done`, `branch: already-done`, and optional `resume: start|fix|ready|stop`. Commit style is already a persist rule. Do not ask style. Do not pause for Approvals & Execution. Do not create or switch git branches.
 
 End with the **STATUS** block from `run.md`. Do not push. Do not edit `spec.md`. Do not implement a different `T#`.

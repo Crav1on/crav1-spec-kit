@@ -81,7 +81,11 @@ Output only:
 - Paths written
 - Task count and any acceptance line with no task (must be none, or you failed)
 - Kept-open questions parked as risks
-- Next: `/crav1-review-plan` (optional but useful), then `/crav1-tighten-plan` for plan `P#`s; **new chat**, `/crav1-implement-task` (or `/crav1-complete-task`) with `plan.md`, `tasks.md`, and `spec.md` attached. Do not start coding in this chat.
+- Next: `/crav1-review-plan` (optional but useful), then `/crav1-tighten-plan` for plan `P#`s.
+- If this branch is `spec/<slug>` (specify-only): `/crav1-finalize-commit` (no push), then **they** open a PR when they want this spec on the default branch. Do **not** implement here. After it is on default: `/crav1-feature-branch` → `feat/<slug>`, then a **new chat** for `/crav1-implement-task` or `/crav1-complete-task`.
+- If this branch is `feat/<slug>` (or they stayed on one branch): **new chat**, `/crav1-implement-task` (or `/crav1-complete-task`) with `plan.md`, `tasks.md`, and `spec.md` attached.
+
+Do not start coding in this chat.
 
 ## Hard rules
 

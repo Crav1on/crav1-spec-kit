@@ -20,6 +20,8 @@ Read `tasks.md`, `plan.md`, `spec.md`. Task row shape is this skill’s `assets/
 
 If `tasks.md` is missing, stop. Next: `/crav1-plan-from-spec`.
 
+**Branch:** before any code, follow `/crav1-feature-branch` (drop-in: `.cursor/skills/crav1/crav1-feature-branch/SKILL.md`; plugin: sibling `skills/crav1-feature-branch/SKILL.md`) **Build** prompt. If you are on `spec/<slug>`, stop (no code) and follow that skill’s **Build on a spec-only branch**.
+
 ## Gate
 
 Stop (no code) if:

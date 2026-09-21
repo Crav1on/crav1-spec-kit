@@ -52,6 +52,14 @@ This is a feature on the current app. New spec slug. Preserve existing architect
 
 If you `@` an existing spec **without** saying extend, the skill starts a **new** slug for the feature. To change that spec in place, say **extend** or use `/crav1-tighten-spec`.
 
+On a brownfield git repo the skill **prompts** for a branch before it writes files (never a silent checkout, never a PR):
+
+- **`feat/<slug>`** (default) — spec and later build on one branch
+- **`spec/<slug>`** — specify-only; you merge that when you want the spec on the default branch, then `/crav1-feature-branch` → `feat/<slug>` to build (so you can specify another feature while this one is implemented)
+- **Stay** / **other name**
+
+You can run `/crav1-feature-branch` by itself. The kit does not push or open the pull request; use GitKraken/Origin for that.
+
 **Later feature** (after `/crav1-intake-to-specs` wrote `docs/system/`):
 
 ```text

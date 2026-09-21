@@ -93,7 +93,7 @@ Spark: <one or two sentences>
 Treat this as greenfield. Do not write code. Ask questions first.
 ```
 
-Brownfield feature (existing app): `@` the code; the skill writes a **new** spec slug unless you say extend.
+Brownfield feature (existing app): `@` the code; the skill writes a **new** spec slug unless you say extend. It **prompts** for `feat/<slug>` (spec+build) or `spec/<slug>` (specify-only; build later on `feat/<slug>` after that spec is on the default branch). No silent checkout, no PR.
 
 ```text
 /crav1-spark-to-spec
@@ -111,6 +111,7 @@ Runnable pieces in this repo:
 | Piece | When | How |
 | --- | --- | --- |
 | Skill `/crav1-spark-to-spec` | You have 1–2 sentences (empty repo or a feature on an existing app) | Slash command; greenfield vs brownfield from context |
+| Skill `/crav1-feature-branch` | Brownfield: get off the default branch | Prompt: `feat/<slug>` (spec+build) or `spec/<slug>` then `feat/<slug>` for build; no push, no PR |
 | Skill `/crav1-architecture-reviewer` | Spec + diagrams/ADRs exist | Slash command; runs the reviewer subagent |
 | Skill `/crav1-tighten-spec` | Spec exists, still mushy | Slash command; one issue at a time (option to get a suggestion); then edit |
 | Skill `/crav1-resolve-questions` | Open questions remain after tightening | Slash command; keep-open or answer, one `Q#` at a time |
@@ -275,6 +276,7 @@ When you change a template, update `docs/specs/_template/` **and** every `assets
 This repo already ships:
 
 - `/crav1-spark-to-spec` — one-liner → questions → `spec.md` (greenfield, brownfield feature, or later feature on `docs/system/`; new slug unless they extend)
+- `/crav1-feature-branch` — prompt for `feat/<slug>` or specify-only `spec/<slug>`; no silent checkout, no push, no PR
 - `/crav1-ideas-to-spec` — idea pile + technical hunches → spec, diagrams, ADRs, chosen export
 - `/crav1-intake-to-specs` — mixed intake → `docs/system/` + one spec per v0 feature (isolated slice workers)
 - `/crav1-architecture-reviewer` — run the crav1-architecture-reviewer subagent; numbered issues at the end

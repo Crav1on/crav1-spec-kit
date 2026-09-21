@@ -56,6 +56,8 @@ Stop until answers exist (or bulk-assume) for every mushy v0 slug you will write
 
 ## Landscape
 
+**Branch first** if a git repo with commits exists. Follow `/crav1-feature-branch` (drop-in: `.cursor/skills/crav1/crav1-feature-branch/SKILL.md`; plugin: sibling `skills/crav1-feature-branch/SKILL.md`). Intake uses one branch for the dump (landscape kebab or `system`). Do not write `docs/system/` until the branch choice is done or skipped.
+
 Write `docs/system/` from this skill’s `assets/` (same shape as `docs/system/_template/`):
 
 | File | What |
@@ -89,6 +91,7 @@ Then output only:
 - 3–5 remaining arguments
 - Next:
   - `/crav1-finalize-commit` — put landscape + specs in git (no push). Skip if they will rewrite this dump in the same chat.
+  - If they chose `spec/<dump>`: no implement on that branch; PR/merge when they want, then `feat/<slug>` per feature to build
   - then **per slug** `/crav1-architecture-reviewer`, `/crav1-tighten-spec`, `/crav1-plan-from-spec` — not one plan for the universe
 
 Do **not** run `/crav1-finalize-commit` yourself. Prompt it. Workers must not commit.
