@@ -95,7 +95,7 @@ After you change the kit, re-copy or re-run the sync script, then reload.
 2. Type `/crav1` and run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, or `/crav1-intake-to-specs`. Brownfield: expect a branch prompt (`feat/<slug>` or `spec/<slug>`).
 3. Follow the plugin README’s short loop. Do not start in Plan Mode or by picking a stack.
 
-`/crav1-complete-tasks` (and standalone `/crav1-complete-task`) **pauses once** with Settings directions (Run Everything vs Auto-review), waits for `continue` / `click`, then reminds you how to restore the previous mode when the run ends. Workers launched by complete-tasks do not pause again. The skill cannot change Settings for you.
+`/crav1-complete-tasks`, standalone `/crav1-complete-task`, and `/crav1-complete-features` **pause once** with Settings directions (Run Everything vs Auto-review), wait for `continue` / `click`, then remind you how to restore the previous mode when the run ends. Workers launched by those orchestrators do not pause again. The skill cannot change Settings for you.
 
 If this window is the **kit repo**, drop-in skills are already under `.cursor/` — no extra install.
 

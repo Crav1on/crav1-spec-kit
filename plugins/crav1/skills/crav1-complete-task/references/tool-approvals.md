@@ -7,9 +7,10 @@ Cursor **Allow / Stop** on a worker (podman, `dotnet`, env secrets, Browser) is 
 | Who is running | Pause with directions? |
 | --- | --- |
 | `/crav1-complete-tasks` (orchestrator) | **Yes**, once, before the first worker |
+| `/crav1-complete-features` (orchestrator) | **Yes**, once, before the first worker (same as complete-tasks) |
 | `/crav1-complete-task` **standalone** (user typed that command) | **Yes**, once, before launching the worker |
 | `crav1-complete-task` **worker** (subagent) | **Never** |
-| Worker launched by complete-tasks | **Never** — parent already paused. Pass `approvals: already-done` |
+| Worker launched by complete-tasks or complete-features | **Never** — parent already paused. Pass `approvals: already-done` |
 
 If the parent said `approvals: already-done`, skip this file’s wait entirely.
 

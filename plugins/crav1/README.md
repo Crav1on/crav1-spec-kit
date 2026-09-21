@@ -25,6 +25,7 @@ Type `/crav1` in Agent chat to list commands.
 - `/crav1-implement-task` — one `T#`, then its verify step
 - `/crav1-complete-task` — isolated worker: one `T#` implement → commit → verify → optional fix (persist commit style)
 - `/crav1-complete-tasks` — orchestrates one worker per `T#` (`T1-T3` or all unchecked)
+- `/crav1-complete-features` — several ready specs, **serial** (one `feat/<slug>` from default, then its T#s); one spec still `/crav1-complete-tasks`
 - `/crav1-verify-spec` — TL;DR of implemented vs not, then `verify.md`
 - `/crav1-fix-from-verify` — inner-loop gaps only (failed → unverified → `G#`); does not edit `spec.md`
 - `/crav1-fix-live` — same queue, live-path hint (ports, proxy, SQL)
@@ -54,7 +55,7 @@ Work in your **product** repo, not only the kit clone.
 4. `/crav1-architecture-reviewer` if there are real design hunches, then `/crav1-tighten-spec` **one issue at a time**.
 5. `/crav1-resolve-questions` for leftover `Q#`s you still care about.
 6. **New chat.** `/crav1-plan-from-spec`. You accept `plan.md` / `tasks.md`. Still no product code in that step. Optional: `/crav1-review-plan` then `/crav1-tighten-plan`. On `spec/<slug>`, do not implement; merge that branch first, then `/crav1-feature-branch` → `feat/<slug>`.
-7. `/crav1-implement-task` for **one** `T#`, or `/crav1-complete-task` for an isolated worker that takes that row through commit and verify (optional fix). Several rows: `/crav1-complete-tasks T1-T3` (orchestrator; one worker per task) or omit the range for all unchecked. Those two commands **pause once** with Settings directions (`continue` / `click`); complete-tasks does not pause again per `T#`. When the run ends they remind you how to restore the previous mode.
+7. `/crav1-implement-task` for **one** `T#`, or `/crav1-complete-task` for an isolated worker. Several `T#`s on one spec: `/crav1-complete-tasks T1-T3`. Several specs, one after another: `/crav1-complete-features auth-login billing` (or omit names for all ready). complete-task / complete-tasks / complete-features **pause once** with Settings directions (`continue` / `click`); they do not pause again per `T#` or per slug. When the run ends they remind you how to restore the previous mode.
 8. If you implemented by hand: `/crav1-verify-spec`. If something in the inner loop is wrong, `/crav1-fix-from-verify` (omit Gap to take the next). Unimplemented tasks go back to step 7, not the fix skill.
 9. When you want a commit message: `/crav1-draft-commit-message` (paste into GitKraken) or `/crav1-finalize-commit` (draft, then **commit** first, or copy / edit).
 

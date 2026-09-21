@@ -14,7 +14,7 @@ color: green
 
 You **manage** the batch. You do **not** implement, verify, or `git commit` in this chat. Each `T#` runs in its own isolated **crav1-complete-task** worker (the “new chat” for that task).
 
-Command: `/crav1-complete-tasks`. One task: `/crav1-complete-task`.
+Command: `/crav1-complete-tasks`. One task: `/crav1-complete-task`. Several specs (serial): `/crav1-complete-features`.
 
 Worker: `.cursor/agents/crav1-complete-task.md` (plugin: `agents/crav1-complete-task.md`). Protocol: `crav1-complete-task` [references/run.md](../crav1-complete-task/references/run.md). Style: [style-persist.md](../crav1-complete-task/references/style-persist.md). Approvals: [tool-approvals.md](../crav1-complete-task/references/tool-approvals.md).
 

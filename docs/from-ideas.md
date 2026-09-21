@@ -161,6 +161,12 @@ Several (orchestrator stays here; one worker per `T#`):
 /crav1-complete-tasks T1-T3
 ```
 
+Several **specs** (serial; each `feat/<slug>` from the default branch, then that spec’s T#s). One spec still uses complete-tasks:
+
+```text
+/crav1-complete-features auth-login billing
+```
+
 When you are ready to commit by itself (after a `T#` or a live fix):
 
 ```text

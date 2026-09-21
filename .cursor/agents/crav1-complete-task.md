@@ -1,6 +1,6 @@
 ---
 name: crav1-complete-task
-description: Independent worker that takes one T# from implement through verify and optional fix-from-verify, auto-committing with the persisted draft-commit style. Use when launched from /crav1-complete-task or /crav1-complete-tasks. Do not start other T#s.
+description: Independent worker that takes one T# from implement through verify and optional fix-from-verify, auto-committing with the persisted draft-commit style. Use when launched from /crav1-complete-task, /crav1-complete-tasks, or /crav1-complete-features. Do not start other T#s.
 model: inherit
 readonly: false
 ---
