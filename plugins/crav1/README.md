@@ -1,6 +1,6 @@
 # crav1
 
-You installed the **crav1** Cursor plugin. This is the short start **after** install. For how to install (copy vs plugin vs local), see [docs/install.md](https://github.com/Crav1on/crav1-spec-kit/blob/main/docs/install.md). In the kit repo, the same file is [docs/install.md](../../docs/install.md). For the full playbook, see that repo’s README.
+You installed the **crav1** plugin from **CRAV1 Spec Kit**. This is the short start **after** install. For how to install (copy vs plugin vs local), see [docs/install.md](https://github.com/Crav1on/crav1-spec-kit/blob/main/docs/install.md). In the kit repo, the same file is [docs/install.md](../../docs/install.md). A thin path from install through one task is [docs/first-run.md](https://github.com/Crav1on/crav1-spec-kit/blob/main/docs/first-run.md) ([docs/first-run.md](../../docs/first-run.md) in the kit repo). For the full playbook, see that repo’s README.
 
 Type `/crav1` in Agent chat to list commands.
 

@@ -1,6 +1,6 @@
-# Installing and using the crav1 kit
+# Installing and using CRAV1 Spec Kit (crav1)
 
-Read this **before** you put the kit in a project. It covers what you get, which install path to pick, and where to go next. It is not the full playbook.
+Read this **before** you put **CRAV1 Spec Kit** in a project. It covers what you get, which install path to pick, and where to go next. It is not the full playbook. The thin path after you pick an install is [first-run.md](first-run.md).
 
 Kit home: [https://github.com/Crav1on/crav1-spec-kit](https://github.com/Crav1on/crav1-spec-kit). License: [MIT](../LICENSE).
 
@@ -9,7 +9,7 @@ Kit home: [https://github.com/Crav1on/crav1-spec-kit](https://github.com/Crav1on
 
 ## What this kit is
 
-**crav1** is a Cursor skill/agent library for spec-driven development. Slash commands are prefixed `crav1-` so they group under `/crav1` and stay separate from Cursor built-ins.
+**CRAV1 Spec Kit** (`crav1`) is a Cursor skill and agent library for spec-driven development. Slash commands are prefixed `crav1-` so they group under `/crav1` and stay separate from Cursor built-ins.
 
 It does **not** create an app for you. It writes and walks specs, plans, tasks, and verify/fix loops **in the repo you already have** (or that you ask the agent to scaffold).
 
@@ -96,6 +96,8 @@ After you change the kit, re-copy or re-run the sync script, then reload.
 
 ## After install
 
+New to the loop? [First 15 minutes](first-run.md): open the product repo → `/crav1` → `/crav1-spark-to-spec` → tighten → plan → one task.
+
 1. Open Agent chat in the **product** repo.
 2. Type `/crav1` and run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, or `/crav1-intake-to-specs`. Brownfield: expect a branch prompt (`feat/<slug>` or `spec/<slug>`).
 3. Follow the plugin README’s short loop. Do not start in Plan Mode or by picking a stack.
@@ -130,6 +132,7 @@ The kit is at [https://github.com/Crav1on/crav1-spec-kit](https://github.com/Cra
 
 | Situation | Doc |
 | --- | --- |
+| Just installed; want install through one task | [first-run.md](first-run.md) |
 | Plugin just installed, want the command order | [plugins/crav1/README.md](../plugins/crav1/README.md) |
 | One-sentence idea | [docs/from-nothing.md](from-nothing.md) |
 | Pile of ideas + tech hunches | [docs/from-ideas.md](from-ideas.md) |

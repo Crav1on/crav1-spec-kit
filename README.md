@@ -1,10 +1,16 @@
-# Spec-driven agentic development with Cursor
+# CRAV1 Spec Kit (crav1)
 
-A concise playbook for using Cursor as an agentic coding environment where **specs, not chat history, are the source of truth**.
+**CRAV1 Spec Kit** (`crav1`) is a Cursor kit for spec-driven development: skills and agents that take a spark, a pile of ideas, or intake files through spec, plan, implement, verify, and a draft commit message. Specs, not chat history, are the source of truth. The plugin also ships a short usage rule.
+
+Repo: [crav1-spec-kit](https://github.com/Crav1on/crav1-spec-kit). Plugin id: `crav1`. After install, type `/crav1`.
 
 This is a process guide, not an application. Use it as a checklist when you start a repo, then install the kit into that project.
 
-**Before you install:** [docs/install.md](docs/install.md) (drop-in copy, Cursor plugin, or local plugin). **After a plugin install:** [plugins/crav1/README.md](plugins/crav1/README.md). Kit home: [https://github.com/Crav1on/crav1-spec-kit](https://github.com/Crav1on/crav1-spec-kit). License: [MIT](LICENSE).
+**First 15 minutes:** [docs/first-run.md](docs/first-run.md). **Before you install:** [docs/install.md](docs/install.md) (drop-in copy, Cursor plugin, or local plugin). **After a plugin install:** [plugins/crav1/README.md](plugins/crav1/README.md). License: [MIT](LICENSE).
+
+## First 15 minutes
+
+Pick an install path, open the product repo, then `/crav1` → `/crav1-spark-to-spec` → tighten → plan → one task. The short path is [docs/first-run.md](docs/first-run.md). The sections below are the full playbook.
 
 Primary sources: [Cursor docs](https://cursor.com/docs/), [Plan Mode](https://cursor.com/docs/agent/plan-mode), [Agent](https://cursor.com/docs/agent/overview), [Rules](https://cursor.com/docs/rules), [Skills](https://cursor.com/docs/skills), [Cloud Agents](https://cursor.com/docs/cloud-agent), [GitHub Spec Kit](https://github.com/github/spec-kit/), and [OpenSpec](https://github.com/Fission-AI/OpenSpec).
 
@@ -431,9 +437,15 @@ Stack, compatibility, performance, security.
 
 ---
 
+## Support
+
+Broken skill or install: open a [GitHub Issue](https://github.com/Crav1on/crav1-spec-kit/issues). Include your Cursor version, install path (drop-in, team marketplace, or local plugin), the command you ran, and what you expected versus what happened. Details: [SUPPORT.md](SUPPORT.md).
+
+---
+
 ## Further reading
 
-- [Kit repository](https://github.com/Crav1on/crav1-spec-kit) · [Installing and using the kit](docs/install.md) · [Plugin quick start](plugins/crav1/README.md) · [MIT License](LICENSE)
+- [Kit repository](https://github.com/Crav1on/crav1-spec-kit) · [First 15 minutes](docs/first-run.md) · [Installing and using the kit](docs/install.md) · [Plugin quick start](plugins/crav1/README.md) · [Changelog](CHANGELOG.md) · [Contributing](CONTRIBUTING.md) · [Support](SUPPORT.md) · [MIT License](LICENSE)
 - [Cursor documentation hub](https://cursor.com/docs/)
 - [Plugins](https://cursor.com/docs/plugins) · [Plugins reference](https://cursor.com/docs/reference/plugins)
 - [Plan Mode](https://cursor.com/docs/agent/plan-mode) · [Introducing Plan Mode](https://cursor.com/blog/plan-mode)
