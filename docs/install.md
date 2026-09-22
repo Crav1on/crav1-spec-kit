@@ -138,4 +138,5 @@ The kit is at [https://github.com/Crav1on/crav1-spec-kit](https://github.com/Cra
 | Pile of ideas + tech hunches | [docs/from-ideas.md](from-ideas.md) |
 | Mixed files / several features or repos | [docs/from-intake.md](from-intake.md) |
 | How Cursor + SDD fit together | [README.md](../README.md) |
+| Which lane owns a `/crav1-…` skill or `*-agent` | [guild-routing.md](guild-routing.md) |
 | Cursor plugin format | [Plugins](https://cursor.com/docs/plugins) · [Plugins reference](https://cursor.com/docs/reference/plugins) |
