@@ -2,6 +2,8 @@
 
 Read this **before** you put the kit in a project. It covers what you get, which install path to pick, and where to go next. It is not the full playbook.
 
+Kit home: [https://github.com/Crav1on/crav1-spec-kit](https://github.com/Crav1on/crav1-spec-kit). License: [MIT](../LICENSE).
+
 - After a **plugin** install, open the plugin README (in Cursor: the `crav1` plugin, or [plugins/crav1/README.md](../plugins/crav1/README.md) in this repo).
 - For the **process** (why specs, Plan Mode, templates), use [README.md](../README.md), [from-nothing.md](from-nothing.md), [from-ideas.md](from-ideas.md), and [from-intake.md](from-intake.md).
 
@@ -12,6 +14,10 @@ Read this **before** you put the kit in a project. It covers what you get, which
 It does **not** create an app for you. It writes and walks specs, plans, tasks, and verify/fix loops **in the repo you already have** (or that you ask the agent to scaffold).
 
 This kit repository is the source. Your product repository is where work happens.
+
+## License
+
+[MIT](../LICENSE). Copyright (c) 2026 Thomas Cronholm.
 
 ## What gets installed
 
@@ -30,7 +36,7 @@ Not installed by the plugin: this repo’s long README, `AGENTS.md`, `docs/specs
 - A **product git repo** (or this kit repo, which already has the drop-in `.cursor/` tree).
 - Optional: Teams or Enterprise, if you want a **team marketplace** (import this repo, then Install). Free/Pro can still **copy files** or load a **local plugin**.
 
-Cursor’s “Import from Repo” marketplaces accept **GitHub, GitLab, Bitbucket, and Azure DevOps**. If the kit only lives on Origin (or another host), use **drop-in copy** or **local plugin** from a clone.
+**Import from Repo** for this kit uses [https://github.com/Crav1on/crav1-spec-kit](https://github.com/Crav1on/crav1-spec-kit).
 
 ## Pick an install path
 
@@ -57,14 +63,13 @@ The plugin lives at [`plugins/crav1/`](../plugins/crav1/) with manifest [`plugin
 
 **Team marketplace (Teams / Enterprise)**
 
-1. Push this kit to GitHub, GitLab, Bitbucket, or Azure DevOps (or import that URL if it already is).
-2. Cursor Dashboard → **Plugins & MCPs** → **Team Marketplaces** → **Add Marketplace** → **Import from Repo**.
-3. Confirm plugin `crav1`. Set access and Default Off / Default On / Required. Save. Enable Auto Refresh on GitHub if you want pushes to re-index.
-4. In the IDE: **Customize** → find **crav1** → **Install** → project or user scope.
+1. Cursor Dashboard → **Plugins & MCPs** → **Team Marketplaces** → **Add Marketplace** → **Import from Repo**, and use [https://github.com/Crav1on/crav1-spec-kit](https://github.com/Crav1on/crav1-spec-kit).
+2. Confirm plugin `crav1`. Set access and Default Off / Default On / Required. Save. Enable Auto Refresh on GitHub if you want pushes to re-index.
+3. In the IDE: **Customize** → find **crav1** → **Install** → project or user scope.
 
 **Public Cursor Marketplace**
 
-Submit the repo at [cursor.com/marketplace/publish](https://cursor.com/marketplace/publish) (review, typically public source). Not required for private use.
+Optional: submit this repo at [cursor.com/marketplace/publish](https://cursor.com/marketplace/publish). Team marketplace, drop-in copy, and local plugin do not require that.
 
 **CLI**
 
@@ -113,13 +118,13 @@ Kit maintainers: edit `.cursor/` first, run `scripts/sync-crav1-plugin.sh`, keep
 
 Clone this repository and work here. Commands work because `.cursor/skills/crav1/` is already present. Use that to learn; copy or plugin-install when a **product** repo should get the same commands.
 
-## Private clone (Origin)
+## Clone
 
-If the kit is a private Origin repo (`thomas-cronholm/agent-spec-kit`):
+```bash
+git clone https://github.com/Crav1on/crav1-spec-kit.git
+```
 
-- Browse: `https://cursor.com/codebase/thomas-cronholm/agent-spec-kit`
-- Clone with the Origin CLI from **WSL or Linux/macOS**, not Windows PowerShell. Add `origin` to `PATH`, then clone `thomas-cronholm/agent-spec-kit`.
-- After clone, use **drop-in copy** or **local plugin**. Dashboard “Import from Repo” needs a GitHub/GitLab/Bitbucket/Azure URL.
+The kit is at [https://github.com/Crav1on/crav1-spec-kit](https://github.com/Crav1on/crav1-spec-kit). After clone, use **drop-in copy** or **local plugin**.
 
 ## What to read next
 

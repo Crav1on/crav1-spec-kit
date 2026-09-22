@@ -1,0 +1,49 @@
+name: Drop-in and plugin sync
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fail if drop-in and plugin drift
+        run: |
+          set -euo pipefail
+          fail=0
+
+          echo "== skills: .cursor/skills/crav1/ ↔ plugins/crav1/skills/ =="
+          if ! diff -ru .cursor/skills/crav1 plugins/crav1/skills; then
+            fail=1
+          fi
+
+          echo "== agents: crav1-*.md =="
+          agent_drop="$(mktemp -d)"
+          agent_plug="$(mktemp -d)"
+          find .cursor/agents -maxdepth 1 -type f -name 'crav1-*.md' -exec cp -a {} "$agent_drop/" \;
+          find plugins/crav1/agents -maxdepth 1 -type f -name 'crav1-*.md' -exec cp -a {} "$agent_plug/" \;
+          if ! diff -ru "$agent_drop" "$agent_plug"; then
+            fail=1
+          fi
+          rm -rf "$agent_drop" "$agent_plug"
+
+          echo "== rules: crav1.mdc =="
+          if ! diff -u .cursor/rules/crav1.mdc plugins/crav1/rules/crav1.mdc; then
+            fail=1
+          fi
+
+          echo "== agent-assets =="
+          if ! diff -ru .cursor/agent-assets plugins/crav1/agent-assets; then
+            fail=1
+          fi
+
+          echo "== kit-maintainer.mdc must not be under plugins/crav1/ =="
+          if find plugins/crav1 -name 'kit-maintainer.mdc' -print | grep -q .; then
+            echo "found kit-maintainer.mdc under plugins/crav1/"
+            find plugins/crav1 -name 'kit-maintainer.mdc' -print
+            fail=1
+          fi
+
+          exit "$fail"
