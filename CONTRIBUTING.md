@@ -16,6 +16,7 @@ This repo is the kit source. Product work happens in the repo where the kit is i
 2. Run `scripts/sync-crav1-plugin.sh` so `plugins/crav1/` matches. Hand-edits under `plugins/crav1/skills/`, `agents/`, `rules/crav1.mdc`, and `agent-assets/` are overwritten on the next sync.
 3. Plugin-only files stay hand-edited: `plugins/crav1/.cursor-plugin/plugin.json` and `plugins/crav1/README.md`. The catalog is `.cursor-plugin/marketplace.json`.
 4. When install or first-run steps change, update [docs/install.md](docs/install.md) and [plugins/crav1/README.md](plugins/crav1/README.md).
+5. When you add, rename, or remove a skill or agent, update [docs/guild-routing.md](docs/guild-routing.md) in the same pull request.
 
 Do not put `kit-maintainer.mdc` under `plugins/crav1/`. CI rejects that, and it rejects drift between the drop-in tree and the plugin mirror.
 

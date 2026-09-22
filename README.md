@@ -445,7 +445,7 @@ Broken skill or install: open a [GitHub Issue](https://github.com/Crav1on/crav1-
 
 ## Further reading
 
-- [Kit repository](https://github.com/Crav1on/crav1-spec-kit) · [First 15 minutes](docs/first-run.md) · [Installing and using the kit](docs/install.md) · [Plugin quick start](plugins/crav1/README.md) · [Changelog](CHANGELOG.md) · [Contributing](CONTRIBUTING.md) · [Support](SUPPORT.md) · [MIT License](LICENSE)
+- [Kit repository](https://github.com/Crav1on/crav1-spec-kit) · [First 15 minutes](docs/first-run.md) · [Installing and using the kit](docs/install.md) · [Guild routing](docs/guild-routing.md) · [Plugin quick start](plugins/crav1/README.md) · [Changelog](CHANGELOG.md) · [Contributing](CONTRIBUTING.md) · [Support](SUPPORT.md) · [MIT License](LICENSE)
 - [Cursor documentation hub](https://cursor.com/docs/)
 - [Plugins](https://cursor.com/docs/plugins) · [Plugins reference](https://cursor.com/docs/reference/plugins)
 - [Plan Mode](https://cursor.com/docs/agent/plan-mode) · [Introducing Plan Mode](https://cursor.com/blog/plan-mode)
