@@ -66,7 +66,7 @@ Never call the questions tool (or any blocking choice UI) **before** step 2. Nev
 
 If they named `copy`/`edit`/`commit` **before** any wording exists, ignore it, draft, show blocks, then offer choices.
 
-Do not invent extra options (push, amend, commit subsets they did not name). If they ask to push after a successful commit, that is a **new** request — only then `git push`.
+Do not invent extra options (push, amend, commit subsets they did not name). If they ask to push after a successful commit, that is a **new** request — only then `git push`. If they want a pull request, that is `/crav1-open-pr` in a later turn. Do not open it here.
 
 ## When they pick `edit`
 
@@ -84,7 +84,8 @@ Do not invent extra options (push, amend, commit subsets they did not name). If 
 5. Read `git log -1 --format=%B`. Compare to the drafted Summary + Description.
 6. Show the new hash, subject, and `git status` short result.
 7. If the body has extra **Cursor attribution** (`Co-authored-by: Cursor`, `cursoragent@cursor.com`, `Made-with: Cursor`) that was **not** in the draft: this is Cursor’s commit-attribution setting (or a cloud agent), **not** this skill and usually **not** a repo hook. Follow **Cursor attribution** below.
-8. If commit fails (hooks, empty index, identity), show the error. Keep the paste blocks, **then** offer the choices again (`commit` still first).
+8. After the commit message is settled (including a one-time attribution strip), one optional line and nothing more: Next (optional): `/crav1-open-pr` when you want to push and open the PR. Do not run that skill in this turn.
+9. If commit fails (hooks, empty index, identity), show the error. Keep the paste blocks, **then** offer the choices again (`commit` still first). Do not name `/crav1-open-pr` on a failed commit.
 
 Do not `git commit --amend` for wording tweaks unless they asked. Amending **only** to restore the drafted message (strip attribution) is allowed as below.
 
@@ -95,7 +96,7 @@ After a successful commit, if HEAD’s message is the draft **plus** a Cursor co
 1. Tell them in one short sentence: Cursor appended it; it was not part of the message they accepted.
 2. **Strip it once** when all of these are true: this process created HEAD, HEAD is not pushed, they have not asked to keep the trailer.
    - `git commit --amend --no-verify` with **exactly** the drafted Summary + Description (same `-m` / HEREDOC as the original commit). No extra trailers.
-   - Read `git log -1 --format=%B` again. If the trailer is gone, show the clean hash/message and stop.
+   - Read `git log -1 --format=%B` again. If the trailer is gone, show the clean hash/message, then the optional `/crav1-open-pr` line from the commit steps. Do not amend again.
    - If the trailer **came back**, Cursor wrapped `git commit` again. Do not loop amend. Offer `strip` (they should turn attribution off first) or `keep`.
 3. How to stop it on **future local** commits: Cursor Settings → **Git & PRs → Attribution** (older: **Agent → Attribution**) → turn commit attribution off. CLI: `attribution.attributeCommitsToAgent` false in `~/.cursor/cli-config.json`. Enterprise admins can disable it org-wide. **Cloud / background agents** may still add co-author; the IDE toggle does not always apply there.
 4. Do not install a `prepare-commit-msg` hook unless they ask.
@@ -109,4 +110,4 @@ If they say they **want** the Cursor trailer, leave it.
 - `copy` never runs `git commit`.
 - After `commit`, if Cursor appended `Co-authored-by` / `Made-with` that was not in the draft, strip it once with amend when HEAD is ours and unpushed; do not fight a second inject—tell them to turn Attribution off.
 - Do not change product files except the persist rules the draft skill already writes (`draft-commit-style.mdc` / `draft-commit-gitlog.mdc`).
-- Do not open a PR.
+- Do not open a PR. After a successful commit, one optional line may name `/crav1-open-pr`. Do not invoke it.

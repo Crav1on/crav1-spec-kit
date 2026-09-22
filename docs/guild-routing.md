@@ -50,6 +50,7 @@ Skill slash names are `/crav1-…`. Subagent names end in `-agent`.
 | Skill | `/crav1-export-spec` |
 | Skill | `/crav1-draft-commit-message` |
 | Skill | `/crav1-finalize-commit` |
+| Skill | `/crav1-open-pr` |
 
 ## Maintainer note
 
@@ -94,5 +95,6 @@ cross_cutting:
     - crav1-export-spec
     - crav1-draft-commit-message
     - crav1-finalize-commit
+    - crav1-open-pr
   subagents: []
 ```
