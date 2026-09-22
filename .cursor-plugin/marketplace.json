@@ -5,14 +5,14 @@
     "email": "thomas_cronholm@hotmail.com"
   },
   "metadata": {
-    "description": "crav1 spec-driven development kit for Cursor: skills, agents, and rules.",
+    "description": "CRAV1 Spec Kit (crav1) — spec-driven development kit for Cursor: skills, agents, and rules.",
     "pluginRoot": "plugins"
   },
   "plugins": [
     {
       "name": "crav1",
       "source": "crav1",
-      "description": "Spark/ideas/intake-to-verify skills, spec/architecture reviewers, and a short usage rule. Type /crav1 after install."
+      "description": "CRAV1 Spec Kit: spark, ideas, or intake to spec, plan, implement, and verify. Spec and architecture reviewers, plus a short usage rule. Type /crav1 after install."
     }
   ]
 }
