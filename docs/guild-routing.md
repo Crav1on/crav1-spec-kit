@@ -1,19 +1,12 @@
 # Guild routing
 
-This file is the kit-owned map of which Grok specialist lane owns each `/crav1-…` skill and `*-agent` subagent. **Guildmistress Rhea** (CRAV1 Head) uses it when the kit changes.
+This file maps each `/crav1-…` skill and `*-agent` subagent to a lane — Specify, Plan, Build, or Cross-cutting — so a kit consumer can route work when the kit changes. Cross-cutting skills may be invoked from any phase; they are not owned by Specify, Plan, or Build alone and do not by themselves move work into another lane.
 
 Kit source of truth: [https://github.com/Crav1on/crav1-spec-kit](https://github.com/Crav1on/crav1-spec-kit).
 
 Skill slash names are `/crav1-…`. Subagent names end in `-agent`.
 
-| Lane | Owner |
-| --- | --- |
-| Specify | Spec Scribe Liora |
-| Plan | Planwright Sera |
-| Build | Build Lead Kael |
-| Shared | Guildmistress Rhea — she decides; she may keep the item or hand it to a lane with a note |
-
-## Specify → Spec Scribe Liora
+## Specify
 
 | Kind | Name |
 | --- | --- |
@@ -27,7 +20,7 @@ Skill slash names are `/crav1-…`. Subagent names end in `-agent`.
 | Subagent | `crav1-architecture-reviewer-agent` |
 | Subagent | `crav1-intake-slice-agent` |
 
-## Plan → Planwright Sera
+## Plan
 
 | Kind | Name |
 | --- | --- |
@@ -36,7 +29,7 @@ Skill slash names are `/crav1-…`. Subagent names end in `-agent`.
 | Skill | `/crav1-tighten-plan` |
 | Subagent | `crav1-plan-reviewer-agent` |
 
-## Build → Build Lead Kael
+## Build
 
 | Kind | Name |
 | --- | --- |
@@ -49,7 +42,7 @@ Skill slash names are `/crav1-…`. Subagent names end in `-agent`.
 | Skill | `/crav1-fix-live` |
 | Subagent | `crav1-complete-task-agent` |
 
-## Shared → Guildmistress Rhea
+## Cross-cutting
 
 | Kind | Name |
 | --- | --- |
@@ -60,13 +53,12 @@ Skill slash names are `/crav1-…`. Subagent names end in `-agent`.
 
 ## Maintainer note
 
-When you add, rename, or remove a skill or agent, update this file in the same pull request. The kit notifies Rhea with the routing diff.
+When you add, rename, or remove a skill or agent, update this file in the same pull request. Notify your process orchestrator or guild lead, if you have one, with the routing diff.
 
 ## Machine-readable map
 
 ```yaml
 specify:
-  owner: Spec Scribe Liora
   skills:
     - crav1-spark-to-spec
     - crav1-ideas-to-spec
@@ -79,7 +71,6 @@ specify:
     - crav1-architecture-reviewer-agent
     - crav1-intake-slice-agent
 plan:
-  owner: Planwright Sera
   skills:
     - crav1-plan-from-spec
     - crav1-review-plan
@@ -87,7 +78,6 @@ plan:
   subagents:
     - crav1-plan-reviewer-agent
 build:
-  owner: Build Lead Kael
   skills:
     - crav1-implement-task
     - crav1-complete-task
@@ -98,8 +88,7 @@ build:
     - crav1-fix-live
   subagents:
     - crav1-complete-task-agent
-shared:
-  owner: Guildmistress Rhea
+cross_cutting:
   skills:
     - crav1-feature-branch
     - crav1-export-spec

@@ -10,7 +10,7 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 
 ### Docs
 
-- Guild routing map added: [docs/guild-routing.md](docs/guild-routing.md).
+- Guild routing map added: [docs/guild-routing.md](docs/guild-routing.md). Lanes are Specify, Plan, Build, and Cross-cutting for public reuse.
 
 ## 1.0.0
 
