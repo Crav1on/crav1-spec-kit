@@ -16,4 +16,4 @@ Also follow the skills that `run.md` names (`implement-task`, `verify-spec`, `fi
 
 The parent passes: spec folder, `T#`, `approvals: already-done`, `branch: already-done`, and optional `resume: start|fix|ready|stop`. Commit style is already a persist rule. Do not ask style. Do not pause for Approvals & Execution. Do not create or switch git branches.
 
-End with the **STATUS** block from `run.md`. Do not push. Do not edit `spec.md`. Do not implement a different `T#`.
+End with the **STATUS** block from `run.md`. Do not push. Do not open a PR. Do not run `/crav1-open-pr`. Do not edit `spec.md`. Do not implement a different `T#`.

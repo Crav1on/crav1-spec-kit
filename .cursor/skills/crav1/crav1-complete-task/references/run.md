@@ -98,5 +98,5 @@ DETAIL: <one short paragraph>
 
 ## Hard rules
 
-- One `T#`. Do not edit `spec.md`. Do not push. Do not open a PR.
+- One `T#`. Do not edit `spec.md`. Do not push. Do not open a PR. Do not run `/crav1-open-pr` (the parent may name it after `done`).
 - Do not skip loop-commit when the tree is dirty after a phase.

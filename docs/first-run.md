@@ -53,4 +53,5 @@ Start a new chat. Run `/crav1-plan-from-spec`. Read `plan.md` and `tasks.md` and
 | Pile of ideas and tech hunches | [from-ideas.md](from-ideas.md) · `/crav1-ideas-to-spec` |
 | Several features or repos | [from-intake.md](from-intake.md) · `/crav1-intake-to-specs` |
 | Prove a slice | `/crav1-verify-spec` |
+| Push and open a pull request | `/crav1-open-pr` (after commits exist; does not merge) |
 | Broken install or skill | [SUPPORT.md](../SUPPORT.md) |

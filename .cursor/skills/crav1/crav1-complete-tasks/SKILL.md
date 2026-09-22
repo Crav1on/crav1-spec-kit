@@ -72,6 +72,8 @@ You may summarize each worker briefly on the board. Do not redo their implement/
 
 TL;DR: finished `T#`s, blocked `T#` + why, not started, commits the workers reported.
 
+Next (optional): `/crav1-open-pr` when you want to push and open the PR. Do not run it from this skill.
+
 If every selected task is `done`: one sentence that the requested slice is demoable (other unchecked `T#`s may remain if they passed a range).
 
 Then follow **tool-approvals.md → Undo** once (restore the mode they wrote at the pause). Do not undo after each `T#`.

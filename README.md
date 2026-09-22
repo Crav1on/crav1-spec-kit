@@ -133,6 +133,7 @@ Runnable pieces in this repo:
 | Skill `/crav1-fix-live` | Live/inner-loop gap | Alias of `/crav1-fix-from-verify` |
 | Skill `/crav1-draft-commit-message` | About to commit (GitKraken paste fields) | Slash command; style.md or git log, once or onward; no commit unless they ask |
 | Skill `/crav1-finalize-commit` | Finish a message: git commit, GitKraken copy, or edit | Style first if needed, then draft, then **commit first**, then copy / edit / rewrite / stop; no push |
+| Skill `/crav1-open-pr` | Commits exist on `feat/<slug>` or `spec/<slug>` and you want a pull request | Push only after an explicit yes; one PR against the default branch; no merge, no commit |
 | Skill `/crav1-ideas-to-spec` | Pile of ideas + technical hunches | Slash command; pick an export format |
 | Skill `/crav1-intake-to-specs` | 1–N files; maybe several features/repos | Slash command; landscape + one spec per v0 slug |
 | Skill `/crav1-export-spec` | Spec exists, want another format | Slash command |
@@ -302,6 +303,7 @@ This repo already ships:
 - `/crav1-fix-live` — alias when that gap is a live/inner-loop path
 - `/crav1-draft-commit-message` — paste-ready GitKraken Summary/Description; `style.md` or live git log, once or onward (deletable rule); does not commit unless they ask
 - `/crav1-finalize-commit` — same draft, then **commit first**, then copy for GitKraken, edit/rewrite, or stop (no push)
+- `/crav1-open-pr` — push the change branch only after an explicit yes, then open one pull request (no merge, no commit)
 - subagent `crav1-spec-reviewer-agent` — independent product/spec critique
 - subagent `crav1-architecture-reviewer-agent` — hunches vs decisions, diagrams, ADRs
 - subagent `crav1-plan-reviewer-agent` — worker for `/crav1-review-plan` (`plan.md` / `tasks.md` vs spec)

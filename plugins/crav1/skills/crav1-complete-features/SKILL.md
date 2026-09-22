@@ -112,7 +112,7 @@ Do not skip a blocked slug unless they `skip-slug`.
 
 TL;DR: slugs `done` / `blocked` + why / `skipped` / not started; which `feat/<slug>` tips you left on; commits workers reported.
 
-Remind: **no push, no PR** unless they ask. Each `feat/<slug>` is its own PR in GitKraken or your git host when they want.
+Remind: **no push, no PR** from this skill. Next (optional): `/crav1-open-pr` when you want to push and open the PR (one PR per `feat/<slug>`; do not run it here).
 
 Then **tool-approvals.md → Undo** once. Do not undo per slug or per `T#`.
 

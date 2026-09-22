@@ -17,7 +17,7 @@ This kit repository is the source. Your product repository is where work happens
 
 ## License
 
-[MIT](../LICENSE). Copyright (c) 2026 Thomas Cronholm.
+[MIT](../LICENSE). The copyright notice is in that file.
 
 ## What gets installed
 
