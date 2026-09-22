@@ -13,6 +13,7 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 
 - Guild routing map added: [docs/guild-routing.md](docs/guild-routing.md). Lanes are Specify, Plan, Build, and Cross-cutting for public reuse.
 - [docs/guild-routing.md](docs/guild-routing.md) lists `/crav1-open-pr` under Cross-cutting.
+- Plugin author and marketplace owner display name is **Crav1**. The contact email is unchanged. [LICENSE](LICENSE) is unchanged.
 
 ## 1.0.0
 
@@ -20,7 +21,7 @@ First release of the public-facing kit: the skills, dual install, and sync check
 
 ### Kit
 
-- MIT license. Copyright (c) 2026 Thomas Cronholm.
+- MIT license. The copyright notice is in [LICENSE](LICENSE).
 - Dual install, documented in [docs/install.md](docs/install.md):
   - Drop-in copy into a product repo: `.cursor/skills/crav1/`, `.cursor/agents/crav1-*.md`, `.cursor/agent-assets/crav1-*`, and `.cursor/rules/crav1.mdc`.
   - Cursor plugin at `plugins/crav1/` with catalog `.cursor-plugin/marketplace.json` (team marketplace or local plugin).

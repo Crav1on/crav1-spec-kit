@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "CRAV1 Spec Kit (crav1) — spec-driven Cursor skills and agents: spark, ideas, or intake to spec, plan, implement, verify, and draft commit messages.",
   "author": {
-    "name": "Thomas Cronholm",
+    "name": "Crav1",
     "email": "thomas_cronholm@hotmail.com"
   },
   "keywords": ["crav1", "spec", "sdd", "skills", "agents"],
