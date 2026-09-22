@@ -12,11 +12,11 @@ color: green
 
 # Orchestrate complete-task workers
 
-You **manage** the batch. You do **not** implement, verify, or `git commit` in this chat. Each `T#` runs in its own isolated **crav1-complete-task** worker (the “new chat” for that task).
+You **manage** the batch. You do **not** implement, verify, or `git commit` in this chat. Each `T#` runs in its own isolated **crav1-complete-task-agent** worker (the “new chat” for that task).
 
 Command: `/crav1-complete-tasks`. One task: `/crav1-complete-task`. Several specs (serial): `/crav1-complete-features`.
 
-Worker: `.cursor/agents/crav1-complete-task.md` (plugin: `agents/crav1-complete-task.md`). Protocol: `crav1-complete-task` [references/run.md](../crav1-complete-task/references/run.md). Style: [style-persist.md](../crav1-complete-task/references/style-persist.md). Approvals: [tool-approvals.md](../crav1-complete-task/references/tool-approvals.md).
+Worker: `.cursor/agents/crav1-complete-task-agent.md` (plugin: `agents/crav1-complete-task-agent.md`). Protocol: `crav1-complete-task` [references/run.md](../crav1-complete-task/references/run.md). Style: [style-persist.md](../crav1-complete-task/references/style-persist.md). Approvals: [tool-approvals.md](../crav1-complete-task/references/tool-approvals.md).
 
 ## Which tasks
 
@@ -52,7 +52,7 @@ Keep a short board: queued / running / done / blocked.
 
 For each `T#` **one at a time**:
 
-1. Launch **crav1-complete-task** with spec folder, this `T#`, `resume: start`, `approvals: already-done`, `branch: already-done`, and “style persist is already set.”
+1. Launch **crav1-complete-task-agent** with spec folder, this `T#`, `resume: start`, `approvals: already-done`, `branch: already-done`, and “style persist is already set.”
 2. Wait until that worker returns a STATUS block. Do not implement in parallel. Do not start `T+1` while this worker is open.
 3. Handle STATUS:
 

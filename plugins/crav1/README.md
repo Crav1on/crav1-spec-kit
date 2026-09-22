@@ -34,11 +34,11 @@ Type `/crav1` in Agent chat to list commands.
 
 - `/crav1-draft-commit-message` — GitKraken Summary/Description paste; does not commit unless you ask
 - `/crav1-finalize-commit` — style if needed, then the draft, then **commit** first, then copy / edit / rewrite / stop (no push). If Cursor appends `Co-authored-by`, the skill strips it once from that unpushed commit.
-- Subagent `crav1-spec-reviewer` — product/spec critique (invoke by asking to review the spec)
-- Subagent `crav1-architecture-reviewer` — used by `/crav1-architecture-reviewer`
-- Subagent `crav1-plan-reviewer` — used by `/crav1-review-plan`
-- Subagent `crav1-complete-task` — worker for `/crav1-complete-task`, `/crav1-complete-tasks`, and `/crav1-complete-features` (one `T#`)
-- Subagent `crav1-intake-slice` — used by `/crav1-intake-to-specs` (one slug)
+- Subagent `crav1-spec-reviewer-agent` — product/spec critique (invoke by asking to review the spec)
+- Subagent `crav1-architecture-reviewer-agent` — used by `/crav1-architecture-reviewer`
+- Subagent `crav1-plan-reviewer-agent` — used by `/crav1-review-plan`
+- Subagent `crav1-complete-task-agent` — worker for `/crav1-complete-task`, `/crav1-complete-tasks`, and `/crav1-complete-features` (one `T#`)
+- Subagent `crav1-intake-slice-agent` — used by `/crav1-intake-to-specs` (one slug)
 - Rule: specs live under `docs/specs/`; system landscape under `docs/system/`
 
 Templates ship inside each skill’s `assets/`. Copy `docs/specs/_template/` and `docs/system/_template/` from the kit repo if you want visible starter folders.

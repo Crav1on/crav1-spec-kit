@@ -14,7 +14,7 @@ There are **two install trees**. When you add or change a skill, agent, template
 ## Drop-in (project `.cursor/`)
 
 - Skills: `.cursor/skills/crav1/crav1-<short-name>/` with frontmatter `name: crav1-<short-name>` (must match the folder that contains `SKILL.md`). Slash command: `/crav1-<short-name>`. Type `/crav1` to list them.
-- Agents: `.cursor/agents/crav1-<name>.md` with `name: crav1-<name>`.
+- Agents: `.cursor/agents/crav1-<name>.md` with `name: crav1-<name>`. Subagent `name:` ends in `-agent` so the Cursor slash picker can tell them apart from skills that share the same stem (`/crav1-architecture-reviewer` stays the skill; `crav1-architecture-reviewer-agent` is the subagent).
 - Agent templates: `.cursor/agent-assets/crav1-<name>/` (not under `.cursor/agents/`).
 - Usage rule for consuming repos: `.cursor/rules/crav1.mdc`.
 
