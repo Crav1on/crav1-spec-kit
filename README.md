@@ -4,7 +4,7 @@ A concise playbook for using Cursor as an agentic coding environment where **spe
 
 This is a process guide, not an application. Use it as a checklist when you start a repo, then install the kit into that project.
 
-**Before you install:** [docs/install.md](docs/install.md) (drop-in copy, Cursor plugin, or local plugin). **After a plugin install:** [plugins/crav1/README.md](plugins/crav1/README.md). Kit home: [https://github.com/Crav1on/crav1-spec-kit](https://github.com/Crav1on/crav1-spec-kit).
+**Before you install:** [docs/install.md](docs/install.md) (drop-in copy, Cursor plugin, or local plugin). **After a plugin install:** [plugins/crav1/README.md](plugins/crav1/README.md). Kit home: [https://github.com/Crav1on/crav1-spec-kit](https://github.com/Crav1on/crav1-spec-kit). License: [MIT](LICENSE).
 
 Primary sources: [Cursor docs](https://cursor.com/docs/), [Plan Mode](https://cursor.com/docs/agent/plan-mode), [Agent](https://cursor.com/docs/agent/overview), [Rules](https://cursor.com/docs/rules), [Skills](https://cursor.com/docs/skills), [Cloud Agents](https://cursor.com/docs/cloud-agent), [GitHub Spec Kit](https://github.com/github/spec-kit/), and [OpenSpec](https://github.com/Fission-AI/OpenSpec).
 
@@ -433,7 +433,7 @@ Stack, compatibility, performance, security.
 
 ## Further reading
 
-- [Kit repository](https://github.com/Crav1on/crav1-spec-kit) · [Installing and using the kit](docs/install.md) · [Plugin quick start](plugins/crav1/README.md)
+- [Kit repository](https://github.com/Crav1on/crav1-spec-kit) · [Installing and using the kit](docs/install.md) · [Plugin quick start](plugins/crav1/README.md) · [MIT License](LICENSE)
 - [Cursor documentation hub](https://cursor.com/docs/)
 - [Plugins](https://cursor.com/docs/plugins) · [Plugins reference](https://cursor.com/docs/reference/plugins)
 - [Plan Mode](https://cursor.com/docs/agent/plan-mode) · [Introducing Plan Mode](https://cursor.com/blog/plan-mode)
