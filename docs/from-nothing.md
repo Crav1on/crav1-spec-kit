@@ -8,7 +8,7 @@ You do not start in Plan Mode. You do not start by picking Next.js. You start by
 
 ## Why your old prompt was the wrong *first* prompt
 
-This is a strong **later** reviewer, and it is now the `crav1-spec-reviewer` subagent:
+This is a strong **later** reviewer, and it is now the `crav1-spec-reviewer-agent` subagent:
 
 - Make requirements explicit and testable
 - Propose spec sections, tasks, test strategy, risks
@@ -83,7 +83,7 @@ Use a strong reasoning model for this phase.
 | 1 | Spark + `/crav1-spark-to-spec` | Restate, name greenfield vs brownfield, propose v0 for **this** slice, ≤7 questions, numbered assumptions |
 | 2 | Answer in bullets. Skip with “use assumptions” | Write `docs/specs/<slug>/spec.md` |
 | 3 | “v0 is too big” / “offline matters” / “not for teams” | `/crav1-tighten-spec` turns each gap into an issue with choices (impact included; you can ask for a suggestion), one by one |
-| 4 | Optional: “review this spec” | Parent agent delegates to **crav1-spec-reviewer** |
+| 4 | Optional: “review this spec” | Parent agent delegates to **crav1-spec-reviewer-agent** |
 | 5 | Leftover Open questions | `/crav1-resolve-questions` — keep open or answer, one `Q#` at a time |
 | Stop | You can demo this slice from the acceptance list; leftover Qs are explicit | Spec is done enough. `/crav1-plan-from-spec`, optional `/crav1-review-plan` / `/crav1-tighten-plan`, then complete-task / implement / verify |
 

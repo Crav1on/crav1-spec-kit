@@ -14,13 +14,13 @@ color: green
 
 You **manage** a queue of **slugs**. You do **not** implement, verify, or `git commit` in this chat.
 
-Each slug is one feature: `docs/specs/<slug>/` + branch `feat/<slug>` created from the **default** branch (not from the previous feature). Inside a slug, reuse the `/crav1-complete-tasks` loop: one **crav1-complete-task** worker per `T#`, one at a time.
+Each slug is one feature: `docs/specs/<slug>/` + branch `feat/<slug>` created from the **default** branch (not from the previous feature). Inside a slug, reuse the `/crav1-complete-tasks` loop: one **crav1-complete-task-agent** worker per `T#`, one at a time.
 
 This is **not** parallel. Two `feat/` branches cannot share this working tree. True parallel (handoff / worktrees / Cloud Agents) is **out of scope** for this skill.
 
 Command: `/crav1-complete-features`. One spec: `/crav1-complete-tasks`. One task: `/crav1-complete-task`.
 
-Worker: `.cursor/agents/crav1-complete-task.md` (plugin: `agents/crav1-complete-task.md`). Protocol: `crav1-complete-task` [references/run.md](../crav1-complete-task/references/run.md). Style: [style-persist.md](../crav1-complete-task/references/style-persist.md). Approvals: [tool-approvals.md](../crav1-complete-task/references/tool-approvals.md). Branch rules: `/crav1-feature-branch` (drop-in: `.cursor/skills/crav1/crav1-feature-branch/SKILL.md`; plugin: sibling `skills/crav1-feature-branch/SKILL.md`).
+Worker: `.cursor/agents/crav1-complete-task-agent.md` (plugin: `agents/crav1-complete-task-agent.md`). Protocol: `crav1-complete-task` [references/run.md](../crav1-complete-task/references/run.md). Style: [style-persist.md](../crav1-complete-task/references/style-persist.md). Approvals: [tool-approvals.md](../crav1-complete-task/references/tool-approvals.md). Branch rules: `/crav1-feature-branch` (drop-in: `.cursor/skills/crav1/crav1-feature-branch/SKILL.md`; plugin: sibling `skills/crav1-feature-branch/SKILL.md`).
 
 ## Which slugs
 
@@ -93,7 +93,7 @@ For each queued slug, after switch:
 
 Run the complete-tasks **T# loop** on **this** slug’s `tasks.md` (all remaining `- [ ]` unless they named a range **for that slug** — v1: all unchecked on that slug).
 
-1. Launch **crav1-complete-task** with this spec folder, this `T#`, `resume: start`, `approvals: already-done`, `branch: already-done`, style already set.
+1. Launch **crav1-complete-task-agent** with this spec folder, this `T#`, `resume: start`, `approvals: already-done`, `branch: already-done`, style already set.
 2. Wait for STATUS. Do not implement. Do not start `T+1` or the next slug while this worker is open.
 3. Handle STATUS:
 

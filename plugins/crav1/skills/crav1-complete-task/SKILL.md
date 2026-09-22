@@ -15,7 +15,7 @@ color: green
 This skill is the **command**. You are the parent. Do **not** implement the task in this chat.
 
 1. Persist commit style (below).
-2. Immediately delegate to the **crav1-complete-task** subagent (`.cursor/agents/crav1-complete-task.md` or this plugin’s `agents/crav1-complete-task.md`). That isolated run is the “new chat” for this `T#`. All phases (implement → commit → verify → optional fix) stay in **that** worker. Do not split phases into more chats.
+2. Immediately delegate to the **crav1-complete-task-agent** subagent (`.cursor/agents/crav1-complete-task-agent.md` or this plugin’s `agents/crav1-complete-task-agent.md`). That isolated run is the “new chat” for this `T#`. All phases (implement → commit → verify → optional fix) stay in **that** worker. Do not split phases into more chats.
 
 Several tasks on **one** spec: tell them `/crav1-complete-tasks` instead of launching many workers yourself. Several **specs**: `/crav1-complete-features` (serial slugs).
 

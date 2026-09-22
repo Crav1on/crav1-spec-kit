@@ -1,6 +1,6 @@
 # Intake slice worker
 
-The parent launches **crav1-intake-slice** for **one** slug. This file is the protocol. The worker is not a user-facing slash command.
+The parent launches **crav1-intake-slice-agent** for **one** slug. This file is the protocol. The worker is not a user-facing slash command.
 
 ## Parent passes (and the worker may use only)
 
@@ -10,7 +10,7 @@ The parent launches **crav1-intake-slice** for **one** slug. This file is the pr
 - Bulk `A1…` plus any mushy-interview answers for this slug
 - Chosen **export format(s)**
 - **Repos** this spec may touch
-- Template paths: this skill’s `assets/spec.md`, `assets/spec-diagrams.md` (write as `diagrams.md`), `assets/adr.md` (drop-in also `.cursor/agent-assets/crav1-intake-slice/`; plugin also `agent-assets/crav1-intake-slice/`)
+- Template paths: this skill’s `assets/spec.md`, `assets/spec-diagrams.md` (write as `diagrams.md`), `assets/adr.md` (drop-in also `.cursor/agent-assets/crav1-intake-slice-agent/`; plugin also `agent-assets/crav1-intake-slice-agent/`)
 - Format and diagram recipes: `crav1-ideas-to-spec` `references/formats.md` and `references/diagrams.md`
 
 ## Worker does

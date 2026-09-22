@@ -110,7 +110,7 @@ Spark: <one or two sentences for this feature>
 Feature on this app. Preserve existing architecture. Do not write code.
 ```
 
-Then: answer ≤7 questions (and the branch prompt) → agent writes `docs/specs/<slug>/spec.md` → `/crav1-tighten-spec` walks **each** finding → `/crav1-resolve-questions` walks leftover Open questions (keep open or answer) → optional `crav1-spec-reviewer` → **`/crav1-plan-from-spec`** → `/crav1-review-plan` then `/crav1-tighten-plan` for plan `P#`s → `/crav1-implement-task` per `T#` or `/crav1-complete-task` / `/crav1-complete-tasks` (one spec) or `/crav1-complete-features` (several specs, serial) → `/crav1-verify-spec` → `/crav1-fix-from-verify` (omit Gap) for inner-loop remaining: failed → unverified → `G#`.
+Then: answer ≤7 questions (and the branch prompt) → agent writes `docs/specs/<slug>/spec.md` → `/crav1-tighten-spec` walks **each** finding → `/crav1-resolve-questions` walks leftover Open questions (keep open or answer) → optional `crav1-spec-reviewer-agent` → **`/crav1-plan-from-spec`** → `/crav1-review-plan` then `/crav1-tighten-plan` for plan `P#`s → `/crav1-implement-task` per `T#` or `/crav1-complete-task` / `/crav1-complete-tasks` (one spec) or `/crav1-complete-features` (several specs, serial) → `/crav1-verify-spec` → `/crav1-fix-from-verify` (omit Gap) for inner-loop remaining: failed → unverified → `G#`.
 
 Runnable pieces in this repo:
 
@@ -136,9 +136,9 @@ Runnable pieces in this repo:
 | Skill `/crav1-ideas-to-spec` | Pile of ideas + technical hunches | Slash command; pick an export format |
 | Skill `/crav1-intake-to-specs` | 1–N files; maybe several features/repos | Slash command; landscape + one spec per v0 slug |
 | Skill `/crav1-export-spec` | Spec exists, want another format | Slash command |
-| Subagent `crav1-spec-reviewer` | Independent product/spec critique | Agent delegates, or ask “review this spec” |
-| Subagent `crav1-architecture-reviewer` | Diagrams, ADRs, hunches vs decisions | Agent delegates |
-| Subagent `crav1-plan-reviewer` | Plan/tasks vs spec | Agent delegates; `/crav1-review-plan` |
+| Subagent `crav1-spec-reviewer-agent` | Independent product/spec critique | Agent delegates, or ask “review this spec” |
+| Subagent `crav1-architecture-reviewer-agent` | Diagrams, ADRs, hunches vs decisions | Agent delegates |
+| Subagent `crav1-plan-reviewer-agent` | Plan/tasks vs spec | Agent delegates; `/crav1-review-plan` |
 
 ## 3. From a pile of ideas (not a spark, not a spec)
 
@@ -156,7 +156,7 @@ Treat hunches as proposed, not decided.
 Do not write code. Capture first, then architecture questions.
 ```
 
-Flow: cluster intent vs hunches → product questions if needed → **architecture interview** (≤7 questions, 2–3 options) → write `spec.md` + `diagrams.md` + ADRs + `export/<format>` → optional `crav1-architecture-reviewer` → Plan Mode.
+Flow: cluster intent vs hunches → product questions if needed → **architecture interview** (≤7 questions, 2–3 options) → write `spec.md` + `diagrams.md` + ADRs + `export/<format>` → optional `/crav1-architecture-reviewer` → Plan Mode.
 
 Canonical spec stays Markdown. EARS / BDD / OpenSpec / YAML / JSON / BMAD are exports. Mermaid for context and sequences; ASCII for trees and CLIs. ADRs only when there were real alternatives (MADR-shaped template). If the pile is several v0 features or several repos, `/crav1-ideas-to-spec` stops and you run `/crav1-intake-to-specs` instead.
 
@@ -286,7 +286,7 @@ This repo already ships:
 - `/crav1-feature-branch` — prompt for `feat/<slug>` or specify-only `spec/<slug>`; no silent checkout, no push, no PR
 - `/crav1-ideas-to-spec` — idea pile + technical hunches → spec, diagrams, ADRs, chosen export
 - `/crav1-intake-to-specs` — mixed intake → `docs/system/` + one spec per v0 feature (isolated slice workers)
-- `/crav1-architecture-reviewer` — run the crav1-architecture-reviewer subagent; numbered issues at the end
+- `/crav1-architecture-reviewer` — run the crav1-architecture-reviewer-agent subagent; numbered issues at the end
 - `/crav1-tighten-spec` — one issue at a time, with explained resolutions (plus get a suggestion) and impact; patch only that issue after you choose
 - `/crav1-resolve-questions` — one Open question at a time; keep it open or answer with impact; patch only that `Q#`
 - `/crav1-export-spec` — re-project `spec.md` into EARS, BDD, OpenSpec, YAML, JSON, or BMAD
@@ -302,11 +302,11 @@ This repo already ships:
 - `/crav1-fix-live` — alias when that gap is a live/inner-loop path
 - `/crav1-draft-commit-message` — paste-ready GitKraken Summary/Description; `style.md` or live git log, once or onward (deletable rule); does not commit unless they ask
 - `/crav1-finalize-commit` — same draft, then **commit first**, then copy for GitKraken, edit/rewrite, or stop (no push)
-- subagent `crav1-spec-reviewer` — independent product/spec critique
-- subagent `crav1-architecture-reviewer` — hunches vs decisions, diagrams, ADRs
-- subagent `crav1-plan-reviewer` — worker for `/crav1-review-plan` (`plan.md` / `tasks.md` vs spec)
-- subagent `crav1-complete-task` — worker for `/crav1-complete-task` / `/crav1-complete-tasks` / `/crav1-complete-features` (one `T#`)
-- subagent `crav1-intake-slice` — worker for `/crav1-intake-to-specs` (one feature slug)
+- subagent `crav1-spec-reviewer-agent` — independent product/spec critique
+- subagent `crav1-architecture-reviewer-agent` — hunches vs decisions, diagrams, ADRs
+- subagent `crav1-plan-reviewer-agent` — worker for `/crav1-review-plan` (`plan.md` / `tasks.md` vs spec)
+- subagent `crav1-complete-task-agent` — worker for `/crav1-complete-task` / `/crav1-complete-tasks` / `/crav1-complete-features` (one `T#`)
+- subagent `crav1-intake-slice-agent` — worker for `/crav1-intake-to-specs` (one feature slug)
 
 Invoke with `/skill-name`, or pin a skill as a **Custom Mode** (`Option+Enter` / `Alt+Enter`) so it stays on for the session (for example `/crav1-implement-task` while you burn down `T#`s).
 

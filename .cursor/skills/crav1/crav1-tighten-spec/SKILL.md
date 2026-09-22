@@ -20,7 +20,7 @@ Use the spec the user @-mentions. Otherwise the most recently edited file under 
 
 Read `spec.md` and note `diagrams.md`, `adr/`, `tasks.md`, `export/`.
 
-Also read the latest **architecture-reviewer** / **crav1-spec-reviewer** output in this chat if present. Those findings become issues. Do not collapse them into one “apply reviewer notes” action.
+Also read the latest **crav1-architecture-reviewer-agent** / **crav1-spec-reviewer-agent** output in this chat if present. Those findings become issues. Do not collapse them into one “apply reviewer notes” action.
 
 ## Build the issue list (no edits)
 
@@ -42,7 +42,7 @@ Typical issue shapes (from this skill’s job):
 
 Skip nitpicks. Merge duplicates. Prefer fewer sharp issues over a laundry list.
 
-If **no issues** and the tight-enough checklist passes, say so and offer only: stop and Plan Mode, or run `crav1-spec-reviewer`.
+If **no issues** and the tight-enough checklist passes, say so and offer only: stop and Plan Mode, or run `crav1-spec-reviewer-agent`.
 
 ## Walk one issue at a time
 
@@ -133,4 +133,4 @@ Then stop the issue walk.
 
 If **Open questions** (or unresolved assumptions) remain, the next command is `/crav1-resolve-questions` — not Plan Mode. That skill walks each question with keep-open vs answer.
 
-If the open-question list is empty, tell them: `/crav1-plan-from-spec`, or a new chat in Plan Mode (`Shift+Tab`) with `spec.md` attached. Optional: `crav1-spec-reviewer` once, not as a substitute for unfinished `I#`s or `Q#`s.
+If the open-question list is empty, tell them: `/crav1-plan-from-spec`, or a new chat in Plan Mode (`Shift+Tab`) with `spec.md` attached. Optional: `crav1-spec-reviewer-agent` once, not as a substitute for unfinished `I#`s or `Q#`s.

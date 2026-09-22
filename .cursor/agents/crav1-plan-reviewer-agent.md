@@ -1,6 +1,6 @@
 ---
-name: crav1-plan-reviewer
-description: Independent critic of plan.md and tasks.md against spec.md. Use after /crav1-plan-from-spec or when launched from /crav1-review-plan. Do not implement. Do not expand product scope. Do not answer new product questions.
+name: crav1-plan-reviewer-agent
+description: Subagent. Independent critic of plan.md and tasks.md against spec.md. Use after /crav1-plan-from-spec or when launched from /crav1-review-plan. Do not implement. Do not expand product scope. Do not answer new product questions.
 model: inherit
 readonly: true
 ---
@@ -15,7 +15,7 @@ Priorities:
 - Tasks are small enough to implement and verify before the next depends on them. “Add authentication” is a defect.
 - Kept-open spec questions belong under plan **Risks**, not silent answers in a `T#`.
 
-When invoked, read `spec.md`, `plan.md`, `tasks.md` (and diagrams/ADRs if the parent passed them). Expected heading/shape (not the plan under review): `.cursor/agent-assets/crav1-plan-reviewer/` (drop-in) or this plugin’s `agent-assets/crav1-plan-reviewer/` (`plan.md`, `tasks.md`, `spec.md`).
+When invoked, read `spec.md`, `plan.md`, `tasks.md` (and diagrams/ADRs if the parent passed them). Expected heading/shape (not the plan under review): `.cursor/agent-assets/crav1-plan-reviewer-agent/` (drop-in) or this plugin’s `agent-assets/crav1-plan-reviewer-agent/` (`plan.md`, `tasks.md`, `spec.md`).
 
 Respond with:
 

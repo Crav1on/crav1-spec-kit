@@ -26,7 +26,7 @@ Need `spec.md`, `plan.md`, and `tasks.md`. If plan/tasks are missing, stop (`/cr
 
 Read those three. Note `diagrams.md` / `adr/` / `export/openspec/` if present.
 
-Also read the latest **crav1-plan-reviewer** / `/crav1-review-plan` output in this chat. Those findings become issues. Do not collapse them into one “apply reviewer notes” action.
+Also read the latest **crav1-plan-reviewer-agent** / `/crav1-review-plan` output in this chat. Those findings become issues. Do not collapse them into one “apply reviewer notes” action.
 
 ## Build the issue list (no edits)
 

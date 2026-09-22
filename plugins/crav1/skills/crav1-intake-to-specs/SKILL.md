@@ -15,7 +15,7 @@ You are the **parent**. Partition intake, confirm the map, interview only mushy 
 
 One feature and one repo after Map: you may write that slug yourself (ideas-to-spec Write artifacts) **and** still write a thin `docs/system/`. Do not skip the landscape.
 
-Worker: `.cursor/agents/crav1-intake-slice.md` (plugin: `agents/crav1-intake-slice.md`). Protocol: this skill’s [references/worker.md](references/worker.md).
+Worker: `.cursor/agents/crav1-intake-slice-agent.md` (plugin: `agents/crav1-intake-slice-agent.md`). Protocol: this skill’s [references/worker.md](references/worker.md).
 
 Read `references/diagrams.md` before writing landscape diagrams. Read `crav1-ideas-to-spec` `references/formats.md` only when exporting (drop-in: `.cursor/skills/crav1/crav1-ideas-to-spec/references/formats.md`; plugin: sibling `skills/crav1-ideas-to-spec/references/formats.md`).
 
@@ -71,7 +71,7 @@ No `tasks.md` here. No `git init`, remotes, or application code unless they **ex
 
 ## Slice specs
 
-Launch **crav1-intake-slice** once per accepted **v0** slug. Later items stay on the landscape as later — do not spec them now.
+Launch **crav1-intake-slice-agent** once per accepted **v0** slug. Later items stay on the landscape as later — do not spec them now.
 
 Pass exactly what [references/worker.md](references/worker.md) lists. Point the worker at this skill’s `assets/spec.md`, `assets/spec-diagrams.md`, and `assets/adr.md`, at `docs/system/` as written, and at ideas-to-spec `references/formats.md` + `references/diagrams.md` (sibling paths above).
 
