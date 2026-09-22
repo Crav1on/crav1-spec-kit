@@ -1,6 +1,6 @@
 # crav1
 
-You installed the **crav1** Cursor plugin. This is the short start **after** install. For how to install (copy vs plugin vs local), see [docs/install.md](../../docs/install.md) in the kit repo. For the full playbook, see that repo’s README.
+You installed the **crav1** Cursor plugin. This is the short start **after** install. For how to install (copy vs plugin vs local), see [docs/install.md](https://github.com/Crav1on/crav1-spec-kit/blob/main/docs/install.md). In the kit repo, the same file is [docs/install.md](../../docs/install.md). For the full playbook, see that repo’s README.
 
 Type `/crav1` in Agent chat to list commands.
 
@@ -37,6 +37,7 @@ Type `/crav1` in Agent chat to list commands.
 - Subagent `crav1-spec-reviewer` — product/spec critique (invoke by asking to review the spec)
 - Subagent `crav1-architecture-reviewer` — used by `/crav1-architecture-reviewer`
 - Subagent `crav1-plan-reviewer` — used by `/crav1-review-plan`
+- Subagent `crav1-complete-task` — worker for `/crav1-complete-task`, `/crav1-complete-tasks`, and `/crav1-complete-features` (one `T#`)
 - Subagent `crav1-intake-slice` — used by `/crav1-intake-to-specs` (one slug)
 - Rule: specs live under `docs/specs/`; system landscape under `docs/system/`
 

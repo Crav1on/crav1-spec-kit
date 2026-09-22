@@ -38,7 +38,7 @@ Run git (PATH fallback if needed). If not a repo, skip.
 **Specify** (spark / ideas / intake, before writing spec files):
 
 1. **`feat/<slug>`** — one branch for this spec **and** later build (default, **first/top**)
-2. **`spec/<slug>`** — specify-only. Merge this to the default branch (PR in GitKraken/Origin when they want). Build later on `feat/<slug>` from that default so another feature can be specified while this one is built
+2. **`spec/<slug>`** — specify-only. Merge this to the default branch (PR in GitKraken or your git host when they want). Build later on `feat/<slug>` from that default so another feature can be specified while this one is built
 3. **Stay** on the current branch
 4. **Other** — they name the branch
 

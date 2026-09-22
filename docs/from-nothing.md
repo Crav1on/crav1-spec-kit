@@ -58,7 +58,7 @@ On a brownfield git repo the skill **prompts** for a branch before it writes fil
 - **`spec/<slug>`** — specify-only; you merge that when you want the spec on the default branch, then `/crav1-feature-branch` → `feat/<slug>` to build (so you can specify another feature while this one is implemented)
 - **Stay** / **other name**
 
-You can run `/crav1-feature-branch` by itself. The kit does not push or open the pull request; use GitKraken/Origin for that.
+You can run `/crav1-feature-branch` by itself. The kit does not push or open the pull request; use GitKraken or your git host for that.
 
 **Later feature** (after `/crav1-intake-to-specs` wrote `docs/system/`):
 

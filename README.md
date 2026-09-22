@@ -4,9 +4,9 @@ A concise playbook for using Cursor as an agentic coding environment where **spe
 
 This is a process guide, not an application. Use it as a checklist when you start a repo, then install the kit into that project.
 
-**Before you install:** [docs/install.md](docs/install.md) (drop-in copy, Cursor plugin, or local plugin). **After a plugin install:** [plugins/crav1/README.md](plugins/crav1/README.md).
+**Before you install:** [docs/install.md](docs/install.md) (drop-in copy, Cursor plugin, or local plugin). **After a plugin install:** [plugins/crav1/README.md](plugins/crav1/README.md). Kit home: [https://github.com/Crav1on/crav1-spec-kit](https://github.com/Crav1on/crav1-spec-kit).
 
-Primary sources: [Cursor docs](https://cursor.com/docs/), [Plan Mode](https://cursor.com/docs/agent/plan-mode), [Agent](https://cursor.com/docs/agent/overview), [Rules](https://cursor.com/docs/context/rules), [Skills](https://cursor.com/docs/context/skills), [Cloud Agents](https://cursor.com/docs/cloud-agent), [GitHub Spec Kit](https://github.com/github/spec-kit/), and [OpenSpec](https://github.com/Fission-AI/OpenSpec).
+Primary sources: [Cursor docs](https://cursor.com/docs/), [Plan Mode](https://cursor.com/docs/agent/plan-mode), [Agent](https://cursor.com/docs/agent/overview), [Rules](https://cursor.com/docs/rules), [Skills](https://cursor.com/docs/skills), [Cloud Agents](https://cursor.com/docs/cloud-agent), [GitHub Spec Kit](https://github.com/github/spec-kit/), and [OpenSpec](https://github.com/Fission-AI/OpenSpec).
 
 ---
 
@@ -367,7 +367,7 @@ You do not need both. Pick one template family and stay consistent.
 
 ## 8. Minimal templates
 
-Copy these into `docs/specs/<change>/`.
+Copy these into `docs/specs/<change>/`. They match [`docs/specs/_template/`](docs/specs/_template/) (`## Trace` on the plan; each task row has `(verify: …) (spec: …)`).
 
 ### spec.md
 
@@ -411,6 +411,11 @@ Stack, compatibility, performance, security.
 ## Risks
 - …
 
+## Trace
+| Acceptance / REQ | Tasks |
+| --- | --- |
+| | T1 |
+
 ## Out of scope
 - …
 ```
@@ -420,21 +425,21 @@ Stack, compatibility, performance, security.
 ```markdown
 # Tasks
 
-- [ ] T1: … (verify: …)
-- [ ] T2: … (verify: …)
+- [ ] T1: … (verify: …) (spec: …)
+- [ ] T2: … (verify: …) (spec: …)
 ```
 
 ---
 
 ## Further reading
 
-- [Installing and using the kit](docs/install.md) · [Plugin quick start](plugins/crav1/README.md)
+- [Kit repository](https://github.com/Crav1on/crav1-spec-kit) · [Installing and using the kit](docs/install.md) · [Plugin quick start](plugins/crav1/README.md)
 - [Cursor documentation hub](https://cursor.com/docs/)
 - [Plugins](https://cursor.com/docs/plugins) · [Plugins reference](https://cursor.com/docs/reference/plugins)
 - [Plan Mode](https://cursor.com/docs/agent/plan-mode) · [Introducing Plan Mode](https://cursor.com/blog/plan-mode)
 - [Agent overview](https://cursor.com/docs/agent/overview)
-- [Rules and AGENTS.md](https://cursor.com/docs/context/rules)
-- [Agent Skills](https://cursor.com/docs/context/skills)
+- [Rules and AGENTS.md](https://cursor.com/docs/rules)
+- [Agent Skills](https://cursor.com/docs/skills)
 - [Cloud Agents](https://cursor.com/docs/cloud-agent)
 - [Hooks](https://cursor.com/docs/hooks)
 - [Subagents](https://cursor.com/docs/subagents)
