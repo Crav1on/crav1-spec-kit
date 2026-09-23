@@ -7,6 +7,7 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 ### Kit
 
 - Cross-cutting skill `/crav1-open-pr` pushes the change branch only after an explicit yes, then opens one pull request against the default branch. It does not commit, merge, force-push, or delete the branch. `/crav1-finalize-commit`, `/crav1-complete-task`, `/crav1-complete-tasks`, and `/crav1-complete-features` may name it as an optional next step; they do not run it. Workers stay no push / no PR.
+- `/crav1-open-pr` creates an Azure DevOps pull request with `az repos pr create` when the remote is `dev.azure.com` or `*.visualstudio.com` and the Azure CLI is available. GitHub still uses `gh`. If `az` is missing, not logged in, or create fails, the skill prints commands and GitKraken GUI paste fields and does not claim a pull request was opened.
 - Subagent files and `name:` values now end in `-agent` (`crav1-architecture-reviewer-agent`, `crav1-complete-task-agent`, `crav1-intake-slice-agent`, `crav1-plan-reviewer-agent`, `crav1-spec-reviewer-agent`) so the Cursor slash picker can tell them apart from skills. Skill commands stay `/crav1-architecture-reviewer` and `/crav1-complete-task`. Descriptions start with `Subagent.`
 
 ### Docs

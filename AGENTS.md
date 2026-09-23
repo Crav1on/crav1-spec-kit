@@ -18,4 +18,4 @@ This repository is a **process guide** for spec-driven development in Cursor, no
 - Prefer editing the spec or plan over long patch-prompt threads when implementation drifts.
 - For a paste-ready GitKraken Summary/Description, `/crav1-draft-commit-message`. It asks `style.md` vs live git log, this commit only vs onward (writes `draft-commit-style.mdc` or `draft-commit-gitlog.mdc`; delete that file to undo). Do not commit unless they asked.
 - To change the wording and then `git commit` (no push) or copy for GitKraken, `/crav1-finalize-commit` (`commit` is the first/top choice).
-- To push the change branch and open one pull request (no merge, no commit), `/crav1-open-pr`. Push only after an explicit yes. Workers stay no push / no PR.
+- To push the change branch and open one pull request (no merge, no commit), `/crav1-open-pr`. Push only after an explicit yes. GitHub uses `gh`; Azure DevOps uses `az repos pr create` when the CLI is available; otherwise it prints commands and GitKraken GUI paste fields. Workers stay no push / no PR.
