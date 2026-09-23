@@ -2,8 +2,9 @@
 name: crav1-open-pr
 description: >-
   Open a pull request for the current change branch (push with explicit yes).
-  Use after commits exist on feat/<slug> or spec/<slug>, or when the user asks
-  for a PR. Cross-cutting. Do not merge. Do not commit.
+  GitHub uses gh; Azure DevOps uses az when the CLI is available. Use after
+  commits exist on feat/<slug> or spec/<slug>, or when the user asks for a PR.
+  Cross-cutting. Do not merge. Do not commit.
 disable-model-invocation: true
 icon: git-pull-request
 color: green
@@ -12,6 +13,8 @@ color: green
 # Open a pull request
 
 Push the change branch **only after an explicit yes**, open **one** pull request against the default branch, then stop. Do not merge. Do not commit.
+
+Create with GitHub `gh` when that host's checks pass. On Azure DevOps, create with `az repos pr` when the Azure CLI can run it. Otherwise print filled commands and GitKraken GUI paste fields. Do not claim a pull request was opened unless the host returned a URL.
 
 Command: `/crav1-open-pr`.
 
@@ -117,22 +120,79 @@ If they edit the title, body, base, or head: apply only that edit, re-run the ch
 
 ## Host
 
-Use the GitHub CLI only when **both** are true: `gh auth status` succeeds, and the remote URL is GitHub (`github.com`, or `gh repo view` succeeds for that repo).
+Resolve **one** create path, in this order: GitHub `gh`, then Azure DevOps `az`, then printed commands and GitKraken GUI paste. Do not claim a pull request was opened unless that path returned a URL.
 
-Otherwise do **not** claim a pull request was opened. After a successful `git push` (push path only), or instead of create (open-only path), print:
+### GitHub (`gh`)
 
-- base ← head
-- the title and body they accepted
-- the exact commands, with their title and body filled in:
+Use `gh` only when **both** are true: `gh auth status` succeeds, and the remote URL is GitHub (`github.com`, or `gh repo view` succeeds for that repo).
+
+**Create** then uses the GitHub steps. If the remote is GitHub and `gh auth status` does not succeed, print the GitHub-shaped fallback below. Do not use `az`.
+
+### Azure DevOps (`az`)
+
+Treat the remote as Azure DevOps when the URL matches `dev.azure.com` or `*.visualstudio.com` (HTTPS or SSH). Read org, project, and repository from that URL when you can:
+
+| Shape | Org / project / repo |
+| --- | --- |
+| `https://dev.azure.com/<org>/<project>/_git/<repo>` | path segments |
+| `https://<org>@dev.azure.com/<org>/<project>/_git/<repo>` | path segments (ignore the userinfo) |
+| `https://<org>.visualstudio.com/<project>/_git/<repo>` | host label is the org |
+| `git@ssh.dev.azure.com:v3/<org>/<project>/<repo>` | path after `v3/` |
+| `git@vs-ssh.visualstudio.com:v3/<org>/<project>/<repo>` | path after `v3/` |
+| `<org>@vs-ssh.visualstudio.com:v3/<org>/<project>/<repo>` | path after `v3/` |
+
+`ssh://` URLs use the same path segments. Strip a trailing `.git`. Percent-decode project and repository when the URL encoded them. A collection segment such as `DefaultCollection` stays in the web URL; it is not the `--project` value.
+
+Use `az repos pr` only when **all** of these are true:
+
+1. `az` is on `PATH` (on Windows, `az.cmd` counts).
+2. The azure-devops extension works or can be used. `az repos pr list -h` exits 0, or the first `az repos pr` call succeeds. Microsoft documents that this extension installs automatically the first time an `az repos pr` command runs (Azure CLI 2.30.0 or higher). If that first call still cannot run `az repos pr`, the extension is not usable.
+3. The CLI is already authenticated for a non-interactive call. A list call for this remote that returns without an auth error counts. `az account show` exiting 0, or `AZURE_DEVOPS_EXT_PAT` already set, is a hint, not proof. A dialog box or a browser Microsoft sign-in is not a create path. Do not run `az login`, a device-code flow, or a web login. Do not create a token.
+
+Prefer org, project, and repository parsed from the remote. Pass them on the command and pass `--detect false`:
+
+- `--org` is the organization URL, for example `https://dev.azure.com/<org>` or `https://<org>.visualstudio.com`
+- `--project` is the team project
+- `--repository` is the repo name or id
+
+`--detect` is documented as "Automatically detect organization" (`true` or `false`; default `true`). From a local Azure Repos checkout it reads **that** git remote and overrides `az devops configure` defaults. Command flags win over detection. Use `--detect true`, and omit only the flags you could not parse, **only** when the URL did not yield org, project, and repository **and** this command runs in a local checkout of that same remote. Otherwise do not use `--detect true`.
+
+**Create** then uses the Azure DevOps steps. If `az` is missing, the extension is not usable, the CLI is not already authenticated, or list/create fails, print the Azure DevOps fallback below. Do not invent a URL.
+
+### Other remotes
+
+When the remote is neither GitHub nor Azure DevOps, print the GitHub-shaped fallback below. Do not claim a pull request was opened.
+
+### Fallback (no URL)
+
+After a successful `git push` (push path only), or instead of create (open-only path), print base ← head, the title and body they accepted, and the filled commands. On the open-only path, omit the `git push` line and say the remote branch must already exist.
+
+GitHub, or a remote that is not Azure DevOps:
 
 ```text
 git push -u <remote> <head>
 gh pr create --base <base> --head <head> --title "<title>" --body "<body>"
 ```
 
-GitKraken: open a pull request from `<head>` into `<base>`. Paste the title and body. Do not merge.
+Azure DevOps. Fill org, project, and repository from the remote when you have them. Name any you could not parse. Do not invent them. For `*.visualstudio.com`, `--org` is `https://<org>.visualstudio.com`.
 
-On the open-only path, omit the `git push` line and say the remote branch must already exist.
+```text
+git push -u <remote> <head>
+az repos pr list --org https://dev.azure.com/<org> --project <project> --repository <repo> --source-branch <head> --target-branch <base> --status active --include-links --detect false
+az repos pr create --org https://dev.azure.com/<org> --project <project> --repository <repo> --source-branch <head> --target-branch <base> --title "<title>" --description "<body>" --detect false
+```
+
+When org, project, and repository are known, also print the create-PR page they can open. This is not an opened pull request. URL-encode `<head>` and `<base>` (`/` as `%2F`):
+
+```text
+https://dev.azure.com/<org>/<project>/_git/<repo>/pullrequestcreate?sourceRef=<head>&targetRef=<base>
+```
+
+Use `https://<org>.visualstudio.com/...` when that is the host. Keep a collection segment from the remote when the web repo URL has one.
+
+GitKraken stays **GUI paste only**: open a pull request from `<head>` into `<base>`. Paste the title and body. Do not merge.
+
+Do not run `gk ai pr create` or any other interactive `gk` pull-request create. Those commands wait for a confirmation prompt and fail in a non-interactive shell.
 
 ## Push and open
 
@@ -152,6 +212,8 @@ Only after they pick `open` on the current draft.
 
 ## Create
 
+### GitHub
+
 When **Host** says to use `gh`:
 
 ```text
@@ -170,7 +232,43 @@ Pass the body with a HEREDOC or `--body-file` so quotes survive. Do not pass `--
 
 If create fails because a pull request already exists, print that URL. Do not open a second.
 
-When **Host** says not to use `gh`, print the commands and GitKraken fields from that section. Do not claim a pull request was opened. Tell them that if one already exists for this head → base, they should use that URL and not open a second.
+On success, follow **After it exists**.
+
+### Azure DevOps
+
+When **Host** says to use `az`, list open pull requests for this source → target **before** create. `--status active` is the open set, including drafts. Source is `<head>`. Target is `<base>`. Pass branch names (`dev`), not `refs/heads/...`.
+
+Parsed org, project, and repository:
+
+```text
+az repos pr list --org <org-url> --project <project> --repository <repo> --source-branch <head> --target-branch <base> --status active --include-links --detect false --output json
+```
+
+Use the `--detect true` form from **Host** only in the case Host allows, and only for the flags you could not parse.
+
+If the list is non-empty, print the web URL and stop. Do not run `az repos pr create`. Prefer `_links.web.href`. When the JSON has `pullRequestId` and no web link, print `https://dev.azure.com/<org>/<project>/_git/<repo>/pullrequest/<pullRequestId>` (or `https://<org>.visualstudio.com/...` when that is the organization host). That id came from the host.
+
+If the list call fails, do not create. Print the Azure DevOps fallback from **Host**. Do not invent a URL. Do not start a sign-in.
+
+If the list is empty:
+
+```text
+az repos pr create --org <org-url> --project <project> --repository <repo> --source-branch <head> --target-branch <base> --title <title> --description <body> --detect false --output json
+```
+
+Pass `--description` with a HEREDOC so quotes and Markdown survive. Microsoft documents each `--description` value as one new line; pass the accepted body as a single value.
+
+Do not pass `--open`, `--auto-complete`, `--draft`, `--delete-source-branch`, `--reviewers`, `--optional-reviewers`, `--required-reviewers`, `--work-items`, `--transition-work-items`, `--squash`, `--merge-commit-message`, `--labels`, or `--bypass-policy` unless they asked for that in this chat. Do not set auto-complete, merge, draft, reviewers, work items, or delete-source-branch unless they asked.
+
+On success, print the web URL the same way (`_links.web.href`, otherwise `/pullrequest/<pullRequestId>` from the id the command returned) and follow **After it exists**. A `url` field on that JSON counts as the host returning a URL; still print the web form when you can build it from that id.
+
+If create fails because a pull request already exists, print that URL. Do not open a second.
+
+If create fails for any other reason, print the Azure DevOps fallback from **Host**. Do not invent a URL. Do not start a sign-in.
+
+### No host create
+
+When **Host** says not to call `gh` or `az`, print the fallback from that section. Do not claim a pull request was opened. Tell them that if one already exists for this head → base, they should use that URL and not open a second.
 
 ## After it exists
 
@@ -184,8 +282,10 @@ When you only printed commands, stop after those commands. Do not invent a URL.
 
 - No `git commit`, no `git commit --amend`, no stash, no `git checkout`, no new branch.
 - No force-push.
-- No merge (`gh pr merge` or a local merge).
+- No merge (`gh pr merge`, completing an Azure DevOps pull request, or a local merge).
 - No second pull request for the same head → base.
 - No repository setting changes.
+- No `gk ai pr create` and no other interactive `gk` pull-request create. GitKraken stays GUI paste only.
+- No dialog-box or browser Microsoft sign-in (`az login`, device code, or a web login).
 - Do not claim a pull request was opened unless the host returned a URL.
 - Workers stay no push and no pull request. Do not run this skill from `crav1-complete-task-agent`.
