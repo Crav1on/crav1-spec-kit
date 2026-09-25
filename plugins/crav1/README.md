@@ -32,9 +32,9 @@ Type `/crav1` in Agent chat to list commands.
 
 **Also**
 
-- `/crav1-draft-commit-message` — GitKraken Summary/Description paste; does not commit unless you ask
-- `/crav1-finalize-commit` — style if needed, then the draft, then **commit** first, then copy / edit / rewrite / stop (no push). If Cursor appends `Co-authored-by`, the skill strips it once from that unpushed commit.
-- `/crav1-open-pr` — push the change branch only after an explicit yes, then open one pull request against the default branch (no merge, no commit)
+- `/crav1-draft-commit-message` — GitKraken Summary/Description paste; does not commit unless you ask. An optional `docs/specs/<slug>/work-item.md` line is appended as the last description line
+- `/crav1-finalize-commit` — style if needed, then the draft, then **commit** first, then copy / edit / rewrite / stop (no push). If Cursor appends `Co-authored-by`, the skill strips it once from that unpushed commit and keeps the work-item line.
+- `/crav1-open-pr` — push the change branch only after an explicit yes, then open one pull request against the default branch (no merge, no commit). The body includes a Work item section when `work-item.md` exists
 - Subagent `crav1-spec-reviewer-agent` — product/spec critique (invoke by asking to review the spec)
 - Subagent `crav1-architecture-reviewer-agent` — used by `/crav1-architecture-reviewer`
 - Subagent `crav1-plan-reviewer-agent` — used by `/crav1-review-plan`
@@ -61,6 +61,8 @@ Work in your **product** repo, not only the kit clone.
 8. If you implemented by hand: `/crav1-verify-spec`. If something in the inner loop is wrong, `/crav1-fix-from-verify` (omit Gap to take the next). Unimplemented tasks go back to step 7, not the fix skill.
 9. When you want a commit message: `/crav1-draft-commit-message` (paste into GitKraken) or `/crav1-finalize-commit` (draft, then **commit** first, or copy / edit).
 10. When you want a pull request: `/crav1-open-pr` (push only if you say yes). It does not merge.
+
+Optional Azure Boards link: add `docs/specs/<slug>/work-item.md` with `Work item: <id>`. Commit skills append `#<id>` on Azure Repos or `AB#<id>` on GitHub as the last description line. `/crav1-open-pr` adds a Work item section. No file means those steps continue, with one hint on Azure Repos only. See [docs/from-ideas.md](../../docs/from-ideas.md).
 
 Do not start with “pick a stack and generate the app” unless the spec already says to. Quick typos and one-file bugs can skip this loop and use Agent mode directly.
 
