@@ -51,7 +51,10 @@ Skill slash names are `/crav1-…`. Subagent names end in `-agent`.
 | Skill | `/crav1-draft-commit-message` |
 | Skill | `/crav1-finalize-commit` |
 | Skill | `/crav1-open-pr` |
+| Skill | `/crav1-merge-pr` |
 | Helper | Research |
+
+`/crav1-merge-pr` may run from any lane, and only when the user explicitly asks in that turn to merge a named pull request. It does not move work into Specify, Plan, or Build.
 
 Research is a cross-cutting helper with no slash command. Flag it when a run hits a technical question that needs research before Specify or Plan can proceed: choosing a technology or service, changing the architecture, scaling or modernizing, or judging an idea nobody has built yet.
 
@@ -107,6 +110,7 @@ cross_cutting:
     - crav1-draft-commit-message
     - crav1-finalize-commit
     - crav1-open-pr
+    - crav1-merge-pr
   subagents: []
   helpers:
     - research

@@ -34,7 +34,8 @@ Type `/crav1` in Agent chat to list commands.
 
 - `/crav1-draft-commit-message` — GitKraken Summary/Description paste; does not commit unless you ask. An optional `docs/specs/<slug>/work-item.md` line is appended as the last description line
 - `/crav1-finalize-commit` — style if needed, then the draft, then **commit** first, then copy / edit / rewrite / stop (no push). If Cursor appends `Co-authored-by`, the skill strips it once from that unpushed commit and keeps the work-item line.
-- `/crav1-open-pr` — push the change branch only after an explicit yes, then open one pull request against the default branch (no merge, no commit). The body includes a Work item section when `work-item.md` exists
+- `/crav1-open-pr` — push the change branch only after an explicit yes, then open one pull request against the default branch (no merge, no commit). The body includes a Work item section when `work-item.md` exists. A later merge is `/crav1-merge-pr`
+- `/crav1-merge-pr` — merge one named pull request only when you explicitly ask in that turn; merge commit only (no squash, no rebase, no policy bypass)
 - Subagent `crav1-spec-reviewer-agent` — product/spec critique (invoke by asking to review the spec)
 - Subagent `crav1-architecture-reviewer-agent` — used by `/crav1-architecture-reviewer`
 - Subagent `crav1-plan-reviewer-agent` — used by `/crav1-review-plan`
@@ -60,7 +61,7 @@ Work in your **product** repo, not only the kit clone.
 7. `/crav1-implement-task` for **one** `T#`, or `/crav1-complete-task` for an isolated worker. Several `T#`s on one spec: `/crav1-complete-tasks T1-T3`. Several specs, one after another: `/crav1-complete-features auth-login billing` (or omit names for all ready). complete-task / complete-tasks / complete-features **pause once** with Settings directions (`continue` / `click`); they do not pause again per `T#` or per slug. When the run ends they remind you how to restore the previous mode.
 8. If you implemented by hand: `/crav1-verify-spec`. If something in the inner loop is wrong, `/crav1-fix-from-verify` (omit Gap to take the next). Unimplemented tasks go back to step 7, not the fix skill.
 9. When you want a commit message: `/crav1-draft-commit-message` (paste into GitKraken) or `/crav1-finalize-commit` (draft, then **commit** first, or copy / edit).
-10. When you want a pull request: `/crav1-open-pr` (push only if you say yes). It does not merge.
+10. When you want a pull request: `/crav1-open-pr` (push only if you say yes). It does not merge. Next (optional, later turn): `/crav1-merge-pr` when you explicitly ask to merge that named pull request. Merge commit only.
 
 Optional Azure Boards link: add `docs/specs/<slug>/work-item.md` with `Work item: <id>`. Commit skills append `#<id>` on Azure Repos or `AB#<id>` on GitHub as the last description line. `/crav1-open-pr` adds a Work item section. No file means those steps continue, with one hint on Azure Repos only. See [docs/from-ideas.md](../../docs/from-ideas.md).
 
