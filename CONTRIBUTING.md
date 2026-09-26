@@ -28,4 +28,4 @@ The longer maintainer rule is `.cursor/rules/kit-maintainer.mdc`.
 - Say which skill, doc, or install path changed, and how you checked it (sync script, the workflow diff, or the command you ran).
 - Keep the visible author name in `plugins/crav1/.cursor-plugin/plugin.json` and the owner name in `.cursor-plugin/marketplace.json` as `Crav1`. Leave the author email as `thomas_cronholm@hotmail.com` unless the owner asks for a change.
 - Leave [LICENSE](LICENSE) as MIT unless the owner asks for a change.
-- Open a pull request for review. Merging, and any git tag, stays with the owner.
+- Open a pull request for review with `/crav1-open-pr` (it does not merge). Merge a named pull request only with `/crav1-merge-pr`, and only when that turn explicitly asks. Merging this kit, and any git tag, stays with the owner.

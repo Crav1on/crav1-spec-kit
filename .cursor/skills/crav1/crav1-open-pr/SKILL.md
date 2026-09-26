@@ -4,8 +4,9 @@ description: >-
   Open a pull request for the current change branch (push with explicit yes).
   GitHub uses gh; Azure DevOps uses az when the CLI is available. Use after
   commits exist on feat/<slug> or spec/<slug>, or when the user asks for a PR.
-  Cross-cutting. Do not merge. Do not commit. When that slug has
-  work-item.md, add a Work item section to the body.
+  Cross-cutting. Does not merge; that is /crav1-merge-pr on a later
+  explicit ask. Do not commit. When that slug has work-item.md, add a
+  Work item section to the body.
 disable-model-invocation: true
 icon: git-pull-request
 color: green
@@ -13,7 +14,7 @@ color: green
 
 # Open a pull request
 
-Push the change branch **only after an explicit yes**, open **one** pull request against the default branch, then stop. Do not merge. Do not commit.
+Push the change branch **only after an explicit yes**, open **one** pull request against the default branch, then stop. Do not merge in this skill. Merging is `/crav1-merge-pr`, a separate step, and only when they explicitly ask in that turn to merge a named pull request. Do not commit.
 
 Create with GitHub `gh` when that host's checks pass. On Azure DevOps, create with `az repos pr` when the Azure CLI can run it. Otherwise print filled commands and GitKraken GUI paste fields. Do not claim a pull request was opened unless the host returned a URL.
 
@@ -205,7 +206,7 @@ https://dev.azure.com/<org>/<project>/_git/<repo>/pullrequestcreate?sourceRef=<h
 
 Use `https://<org>.visualstudio.com/...` when that is the host. Keep a collection segment from the remote when the web repo URL has one.
 
-GitKraken stays **GUI paste only**: open a pull request from `<head>` into `<base>`. Paste the title and body. Do not merge.
+GitKraken stays **GUI paste only**: open a pull request from `<head>` into `<base>`. Paste the title and body. Do not merge. A later explicit ask to merge that named pull request is `/crav1-merge-pr`.
 
 Do not run `gk ai pr create` or any other interactive `gk` pull-request create. Those commands wait for a confirmation prompt and fail in a non-interactive shell.
 
@@ -289,7 +290,7 @@ When **Host** says not to call `gh` or `az`, print the fallback from that sectio
 
 When the host returned a pull request URL, print that URL and `base` ← `head`.
 
-One sentence: they can review and merge when they want. This skill does not merge, and it does not delete the branch.
+One sentence: they can review when they want. Next (optional): `/crav1-merge-pr` when they explicitly ask, in a later turn, to merge this named pull request. This skill does not merge, and it does not delete the branch. Do not run `/crav1-merge-pr` from this step.
 
 When you only printed commands, stop after those commands. Do not invent a URL.
 
@@ -297,7 +298,7 @@ When you only printed commands, stop after those commands. Do not invent a URL.
 
 - No `git commit`, no `git commit --amend`, no stash, no `git checkout`, no new branch.
 - No force-push.
-- No merge (`gh pr merge`, completing an Azure DevOps pull request, or a local merge).
+- No merge (`gh pr merge`, completing an Azure DevOps pull request, or a local merge). Merging is `/crav1-merge-pr` on a later explicit ask for a named pull request. Do not run it from this skill.
 - No second pull request for the same head → base.
 - No repository setting changes.
 - No `gk ai pr create` and no other interactive `gk` pull-request create. GitKraken stays GUI paste only.
