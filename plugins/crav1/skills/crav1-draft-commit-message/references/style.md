@@ -44,3 +44,4 @@ Adds a compiler warning suppression so local builds stay quiet.
 - Marketing or “ship” phrasing.
 - Dumping the entire conversation into the message.
 - Including `artifacts/`, `bin/`, or `obj/` unless the user explicitly asked to commit them.
+- Putting a work-item mention (`#<id>` or `AB#<id>`) in the Summary or in the Description body. The skill appends that line when `docs/specs/<slug>/work-item.md` says to.

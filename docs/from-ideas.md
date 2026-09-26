@@ -201,3 +201,11 @@ Live command: POST <url>/register
 Do not change spec.md.
 ```
 
+## Optional Azure Boards mention
+
+To link commits and the pull request to an Azure Boards work item, add `docs/specs/<slug>/work-item.md` with one line, `Work item: 52` (your id). The file is optional. The commented starter is [docs/specs/_template/work-item.md](specs/_template/work-item.md). Leave the id out of `tasks.md`.
+
+`/crav1-draft-commit-message` keeps the subject and description as drafted, then adds a blank line and the mention as the last line of the Description, so a GitKraken paste includes it. `/crav1-finalize-commit` commits that same text and keeps the line when it checks HEAD and when it strips a Cursor attribution trailer. `/crav1-open-pr` adds a `## Work item` section when the file has an id. The pull request title stays `<slug>: short summary`. The body stays What / why, Spec (links to that slug’s `spec.md`, `plan.md`, and `tasks.md`), Verify, then the work-item section.
+
+The mention is `#52` on Azure Repos (`dev.azure.com` or `*.visualstudio.com`) and `AB#52` on GitHub. Any other host adds no mention. `Work item: AB#52` or `Work item: #52` is used as written. With no file, the skills continue. On Azure Repos only, they print one hint. They do not block, they do not create the work item, and `/crav1-open-pr` still does not pass `--work-items`.
+

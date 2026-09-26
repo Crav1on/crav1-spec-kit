@@ -4,7 +4,8 @@ description: >-
   Open a pull request for the current change branch (push with explicit yes).
   GitHub uses gh; Azure DevOps uses az when the CLI is available. Use after
   commits exist on feat/<slug> or spec/<slug>, or when the user asks for a PR.
-  Cross-cutting. Do not merge. Do not commit.
+  Cross-cutting. Do not merge. Do not commit. When that slug has
+  work-item.md, add a Work item section to the body.
 disable-model-invocation: true
 icon: git-pull-request
 color: green
@@ -82,14 +83,28 @@ When base, head, and the checks are settled, write the draft into the user-visib
 
 ## Spec
 
-- docs/specs/<slug>/
+- [spec.md](docs/specs/<slug>/spec.md)
+- [plan.md](docs/specs/<slug>/plan.md)
+- [tasks.md](docs/specs/<slug>/tasks.md)
 
 ## Verify
 
 <One line from verify.md when that file exists (pass, fail, or missing). Otherwise: No verify.md on this branch.>
 ```
 
-Omit **Spec** when `docs/specs/<slug>/` is not on the head. Slug comes from `feat/<slug>` or `spec/<slug>`. If the head name has no slug and exactly one `docs/specs/<slug>/` folder changed vs base (not `_template/`), use that slug. If several changed, leave the slug out of the title and omit **Spec** rather than picking one.
+When a work-item mention is resolved, add this section after Verify. The body of the section is the mention line only:
+
+```markdown
+## Work item
+
+AB#52
+```
+
+**Spec** lists only files that exist on the head. Omit **Spec** when none of `spec.md`, `plan.md`, and `tasks.md` exist under `docs/specs/<slug>/`. Slug comes from `feat/<slug>` or `spec/<slug>`. If the head name has no slug and exactly one `docs/specs/<slug>/` folder changed vs base (not `_template/`), use that slug. If several changed, leave the slug out of the title and omit **Spec** rather than picking one.
+
+**Work item** is included only when [references/work-item-mention.md](../crav1-draft-commit-message/references/work-item-mention.md) resolves a mention for that slug (plugin: sibling `skills/crav1-draft-commit-message/references/work-item-mention.md`). The section body is that one mention line (`#<id>` on Azure Repos, `AB#<id>` on GitHub, or the file’s full token). Omit the section when there is no mention. The hint from that reference, when it has one, is a single sentence after the draft, not inside the body.
+
+The section is Markdown in the description. Do not pass `--work-items` or `--transition-work-items` because of it. The ban in **Create** stays as written. Host order and fallbacks stay as written.
 
 Show base, head, remote, title, and body. Say they can edit any of those before you act.
 
@@ -287,5 +302,7 @@ When you only printed commands, stop after those commands. Do not invent a URL.
 - No repository setting changes.
 - No `gk ai pr create` and no other interactive `gk` pull-request create. GitKraken stays GUI paste only.
 - No dialog-box or browser Microsoft sign-in (`az login`, device code, or a web login).
+- No `--work-items` and no `--transition-work-items` unless they asked for that in this chat. A **Work item** section in the body is not that flag.
+- Do not block the pull request when `work-item.md` is missing. Do not create a work item and do not look one up.
 - Do not claim a pull request was opened unless the host returned a URL.
 - Workers stay no push and no pull request. Do not run this skill from `crav1-complete-task-agent`.

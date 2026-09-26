@@ -16,7 +16,7 @@ After a step that may have changed files:
 
 1. If the tree is clean, skip. Say skipped.
 2. Follow `crav1-finalize-commit` **draft** (persist rule) and its **commit** + **Cursor attribution** sections.
-3. Show Summary/Description, then **`commit` immediately**. No copy / edit / rewrite / stop menu.
+3. Show Summary/Description, then **`commit` immediately**. No copy / edit / rewrite / stop menu. When the Description ends with a blank line and a work-item mention (`#<id>` or `AB#<id>`), that line is part of the message. Commit it. Keep it when you compare HEAD and when you amend away Cursor attribution. A missing `work-item.md` does not fail this worker.
 4. Do not push.
 
 If commit fails or attribution comes back after one strip: stop with `STATUS: failed`.

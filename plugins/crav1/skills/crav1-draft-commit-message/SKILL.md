@@ -5,6 +5,8 @@ description: >-
   git commit. Ask style.md vs this repo’s git log, this commit only or onward
   as a deletable rule. Use for GitKraken paste, or /crav1-draft-commit-message.
   To edit the wording and then copy or git commit, use /crav1-finalize-commit.
+  When docs/specs/<slug>/work-item.md exists, append that work-item mention
+  as the last description line.
 disable-model-invocation: true
 icon: git-commit
 color: purple
@@ -65,8 +67,9 @@ After `onward` or `log-onward`: write the matching **new** rule name **before** 
 ## Draft
 
 4. Apply the chosen source (`style.md` **or** live log — not a blend that reintroduces Conventional Commits unless the log already uses it).
-5. Draft **one** message for the intended set of files. Warn if `artifacts/`, `bin/`, `obj/`, or other build output is staged.
-6. Output only paste blocks (see below). Do not run `git commit` unless they asked.
+5. Draft **one** message for the intended set of files. Warn if `artifacts/`, `bin/`, `obj/`, or other build output is staged. Leave any work-item mention out of this draft.
+6. Resolve an optional Azure Boards mention in [references/work-item-mention.md](references/work-item-mention.md). Subject and the drafted description stay as written. When a mention is resolved, append one blank line and that mention as the **last line** of the Description. When it is not, the Description ends where the draft ended.
+7. Output only paste blocks (see below). A hint from the work-item reference, when it has one, is a single sentence **after** the blocks. Do not run `git commit` unless they asked.
 
 ## When the source is `style.md`
 
@@ -78,6 +81,7 @@ After `onward` or `log-onward`: write the matching **new** rule name **before** 
 - Copy the **shape** of recent subjects and bodies (length, prefixes or lack of them, bullets vs paragraph).
 - Do not force `style.md` rules if the log does something else (including Conventional Commits).
 - Still scope the message to the files they will actually commit.
+- Do not copy a trailing `#<id>` or `AB#<id>` line from older commits into the description. Step 6 appends the current slug’s mention once.
 
 ## Output
 
@@ -94,4 +98,15 @@ After `onward` or `log-onward`: write the matching **new** rule name **before** 
 ```
 ```
 
-If they should exclude paths, add one short sentence after the blocks.
+When a work-item mention was resolved, the Description fence includes it as the last line, after a blank line:
+
+```
+- bullet
+- bullet
+
+AB#52
+```
+
+That line is `#<id>` or `AB#<id>` per the work-item reference (or the file’s full token). It is part of the Description they paste into GitKraken. Omit it when no mention was resolved.
+
+If they should exclude paths, add one short sentence after the blocks. The work-item hint, if any, is another short sentence after the blocks, not inside them.

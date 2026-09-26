@@ -46,6 +46,8 @@ When you **create or update** a crav1 skill or subagent that reads or writes spe
 
 Skills that do not use those files do not need empty `assets/` folders.
 
+Optional Azure Boards id file: `docs/specs/_template/work-item.md` only. Commit and pull-request skills read `docs/specs/<slug>/work-item.md` when someone adds it. Do not copy that template into skill `assets/`, and do not scaffold it into a slug.
+
 ## Install docs
 
 Pre-install: `docs/install.md`. Post-plugin-install: `plugins/crav1/README.md`. Kit playbook: `README.md`, `docs/from-nothing.md`, `docs/from-ideas.md`, `docs/from-intake.md`.
