@@ -15,6 +15,7 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 - Guild routing map added: [docs/guild-routing.md](docs/guild-routing.md). Lanes are Specify, Plan, Build, and Cross-cutting for public reuse.
 - [docs/guild-routing.md](docs/guild-routing.md) lists `/crav1-open-pr` under Cross-cutting.
 - Plugin author and marketplace owner display name is **Crav1**. The contact email is unchanged. [LICENSE](LICENSE) is unchanged.
+- [docs/guild-routing.md](docs/guild-routing.md) adds Research as a cross-cutting helper (no slash command). A lane that must answer a technical question before Specify or Plan flags the process orchestrator or guild lead, who pauses that lane. The researcher writes `docs/specs/<slug>/research.md` (recommendation, trade-offs, confidence, link to the full study) and does not edit specs, plans, or code, or change the lane.
 
 ## 1.0.0
 

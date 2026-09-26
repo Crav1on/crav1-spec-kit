@@ -1,6 +1,6 @@
 # Guild routing
 
-This file maps each `/crav1-…` skill and `*-agent` subagent to a lane — Specify, Plan, Build, or Cross-cutting — so a kit consumer can route work when the kit changes. Cross-cutting skills may be invoked from any phase; they are not owned by Specify, Plan, or Build alone and do not by themselves move work into another lane.
+This file maps each `/crav1-…` skill and `*-agent` subagent to a lane — Specify, Plan, Build, or Cross-cutting — and records cross-cutting helpers, so a kit consumer can route work when the kit changes. Cross-cutting skills may be invoked from any phase, and cross-cutting helpers may be flagged from any phase. Neither is owned by Specify, Plan, or Build alone, and neither by itself moves work into another lane.
 
 Kit source of truth: [https://github.com/Crav1on/crav1-spec-kit](https://github.com/Crav1on/crav1-spec-kit).
 
@@ -51,10 +51,21 @@ Skill slash names are `/crav1-…`. Subagent names end in `-agent`.
 | Skill | `/crav1-draft-commit-message` |
 | Skill | `/crav1-finalize-commit` |
 | Skill | `/crav1-open-pr` |
+| Helper | Research |
+
+Research is a cross-cutting helper with no slash command. Flag it when a run hits a technical question that needs research before Specify or Plan can proceed: choosing a technology or service, changing the architecture, scaling or modernizing, or judging an idea nobody has built yet.
+
+Any lane that hits this flags it to the process orchestrator or guild lead, who pauses that lane and sends the researcher the question, the product or feature slug, and any constraints.
+
+The researcher treats the project's existing specs, plans, and code as the current state. For parts those do not cover, the researcher may use an architecture-extraction skill if one is available.
+
+The full study lives wherever the team keeps its research. The researcher writes a short `docs/specs/<slug>/research.md` with the recommendation, trade-offs, confidence, and a link to the full study, and returns the recommendation to the process orchestrator or guild lead with a suggested lane. That role routes it.
+
+Aside from that `research.md`, the researcher does not edit specs, plans, or code, and does not change the lane.
 
 ## Maintainer note
 
-When you add, rename, or remove a skill or agent, update this file in the same pull request. Notify your process orchestrator or guild lead, if you have one, with the routing diff.
+When you add, rename, or remove a skill, agent, or cross-cutting helper, update this file in the same pull request. Notify your process orchestrator or guild lead, if you have one, with the routing diff.
 
 ## Machine-readable map
 
@@ -97,4 +108,6 @@ cross_cutting:
     - crav1-finalize-commit
     - crav1-open-pr
   subagents: []
+  helpers:
+    - research
 ```
