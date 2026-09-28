@@ -2,11 +2,13 @@
 
 Optional Azure Boards link for one spec slug. Read this from `/crav1-draft-commit-message`, `/crav1-finalize-commit`, and `/crav1-open-pr`.
 
-The id lives only in `docs/specs/<slug>/work-item.md`. Do not store it in `tasks.md` (workers parse `T#` rows and skills rewrite that file). Do not create a work item, do not call an Azure DevOps API, do not ask for an id, and do not add a git hook.
+The id lives only in `docs/specs/<slug>/work-item.md`. Do not store it in `tasks.md` (workers parse `T#` rows and skills rewrite that file). Do not create a work item, do not call an Azure DevOps API, and do not add a git hook.
+
+`/crav1-draft-commit-message`, `/crav1-finalize-commit`, and `/crav1-open-pr` do not ask for an id. They only read the file. `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, and `/crav1-intake-to-specs` may write the one-line file when they create a new spec folder on Azure Repos and the user replies with an id. That offer is [work-item-offer.md](work-item-offer.md). Creating the work item in Azure Boards stays out of scope.
 
 A missing file never blocks a commit, a pull request, or a worker. Do not fail a worker status for this.
 
-Starter comment (humans copy from here; skills do not scaffold this file): `docs/specs/_template/work-item.md`.
+Starter comment (humans may copy from here): `docs/specs/_template/work-item.md`. Spec skills do not copy that comment into a slug. When the user answers the offer, they write one line, `Work item: <id>`, and nothing else.
 
 ## Slug
 

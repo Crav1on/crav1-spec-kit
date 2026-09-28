@@ -8,10 +8,10 @@ Type `/crav1` in Agent chat to list commands.
 
 **Specify**
 
-- `/crav1-spark-to-spec` — one or two sentences → questions → `docs/specs/<slug>/spec.md` (greenfield, a feature on an existing app, or a later feature on `docs/system/`)
+- `/crav1-spark-to-spec` — one or two sentences → questions → `docs/specs/<slug>/spec.md` (greenfield, a feature on an existing app, or a later feature on `docs/system/`). On Azure Repos, one optional work-item id after a new spec folder
 - `/crav1-feature-branch` — `feat/<slug>` (spec+build) or `spec/<slug>` then later `feat/<slug>` (specify while another feature builds); no push, no PR
-- `/crav1-ideas-to-spec` — idea pile + technical hunches → spec, diagrams, ADRs, export format
-- `/crav1-intake-to-specs` — mixed intake → `docs/system/` + one spec per v0 feature
+- `/crav1-ideas-to-spec` — idea pile + technical hunches → spec, diagrams, ADRs, export format. On Azure Repos, one optional work-item id after a new spec folder
+- `/crav1-intake-to-specs` — mixed intake → `docs/system/` + one spec per v0 feature. On Azure Repos, one optional work-item question listing the new slugs
 - `/crav1-architecture-reviewer` — runs the architecture critic; numbered issues (`I#`)
 - `/crav1-tighten-spec` — one issue at a time; you pick (or ask for a suggestion); it patches only that issue
 - `/crav1-resolve-questions` — one Open question (`Q#`); keep or answer
@@ -34,8 +34,8 @@ Type `/crav1` in Agent chat to list commands.
 
 - `/crav1-draft-commit-message` — GitKraken Summary/Description paste; does not commit unless you ask. An optional `docs/specs/<slug>/work-item.md` line is appended as the last description line
 - `/crav1-finalize-commit` — style if needed, then the draft, then **commit** first, then copy / edit / rewrite / stop (no push). If Cursor appends `Co-authored-by`, the skill strips it once from that unpushed commit and keeps the work-item line.
-- `/crav1-open-pr` — push the change branch only after an explicit yes, then open one pull request against the default branch (no merge, no commit). The body includes a Work item section when `work-item.md` exists. A later merge is `/crav1-merge-pr`
-- `/crav1-merge-pr` — merge one named pull request only when you explicitly ask in that turn; merge commit only (no squash, no rebase, no policy bypass)
+- `/crav1-open-pr` — push the change branch only after an explicit yes, then open one pull request against the default branch (no merge, no commit). The body includes a Work item section when `work-item.md` exists. On Windows, a multi-line Azure DevOps description is `--description "@<file>"` (UTF-8 without BOM). A later merge is `/crav1-merge-pr`
+- `/crav1-merge-pr` — merge one named pull request only when you explicitly ask in that turn; merge commit only (no squash, no rebase, no policy bypass). Two parents are confirmed with `git rev-list` after the completed re-read
 - Subagent `crav1-spec-reviewer-agent` — product/spec critique (invoke by asking to review the spec)
 - Subagent `crav1-architecture-reviewer-agent` — used by `/crav1-architecture-reviewer`
 - Subagent `crav1-plan-reviewer-agent` — used by `/crav1-review-plan`
@@ -63,7 +63,7 @@ Work in your **product** repo, not only the kit clone.
 9. When you want a commit message: `/crav1-draft-commit-message` (paste into GitKraken) or `/crav1-finalize-commit` (draft, then **commit** first, or copy / edit).
 10. When you want a pull request: `/crav1-open-pr` (push only if you say yes). It does not merge. Next (optional, later turn): `/crav1-merge-pr` when you explicitly ask to merge that named pull request. Merge commit only.
 
-Optional Azure Boards link: add `docs/specs/<slug>/work-item.md` with `Work item: <id>`. Commit skills append `#<id>` on Azure Repos or `AB#<id>` on GitHub as the last description line. `/crav1-open-pr` adds a Work item section. No file means those steps continue, with one hint on Azure Repos only. See [docs/from-ideas.md](../../docs/from-ideas.md).
+Optional Azure Boards link: `docs/specs/<slug>/work-item.md` with `Work item: <id>`. On Azure Repos, spark, ideas, and intake ask once after a new spec folder and write that line only if the user gives an id. The user can also add the file by hand. Commit skills append `#<id>` on Azure Repos or `AB#<id>` on GitHub as the last description line. `/crav1-open-pr` adds a Work item section. No file means those steps continue, with one hint on Azure Repos only. Creating the work item in Azure Boards is out of scope. See [docs/from-ideas.md](../../docs/from-ideas.md).
 
 Do not start with “pick a stack and generate the app” unless the spec already says to. Quick typos and one-file bugs can skip this loop and use Agent mode directly.
 

@@ -16,6 +16,6 @@ Templates: this agent’s `agent-assets/crav1-intake-slice-agent/` (drop-in: `.c
 
 The parent passes: slug, cluster, `docs/system/` paths, intent vs context refs, bulk `A#`s, mushy answers if any, export format(s), allowed repos.
 
-Landscape ADRs win. Do not edit `docs/system/`. Do not interview. Do not write code. Do not start another slug.
+Landscape ADRs win. Do not edit `docs/system/`. Do not interview. Do not write code. Do not write `work-item.md`. Do not start another slug.
 
 End with the **STATUS** block from `worker.md`.

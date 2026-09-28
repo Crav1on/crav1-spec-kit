@@ -203,7 +203,11 @@ Do not change spec.md.
 
 ## Optional Azure Boards mention
 
-To link commits and the pull request to an Azure Boards work item, add `docs/specs/<slug>/work-item.md` with one line, `Work item: 52` (your id). The file is optional. The commented starter is [docs/specs/_template/work-item.md](specs/_template/work-item.md). Leave the id out of `tasks.md`.
+To link commits and the pull request to an Azure Boards work item, `docs/specs/<slug>/work-item.md` holds one line, `Work item: 52`. The file is optional. The commented starter is [docs/specs/_template/work-item.md](specs/_template/work-item.md). Leave the id out of `tasks.md`.
+
+On an Azure Repos remote (`dev.azure.com` or `*.visualstudio.com`), `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, and `/crav1-intake-to-specs` ask once after they create a new spec folder. The question is optional: reply with the id, or skip. Intake lists every new slug in that one question so the user can give an id per slug. A reply writes `Work item: <id>` and nothing else. Skip writes nothing and does not ask again in that run. GitHub and other hosts are not asked. Those skills do not create the work item in Azure Boards, do not look it up, and do not call Azure DevOps.
+
+The file can still be added by hand.
 
 `/crav1-draft-commit-message` keeps the subject and description as drafted, then adds a blank line and the mention as the last line of the Description, so a GitKraken paste includes it. `/crav1-finalize-commit` commits that same text and keeps the line when it checks HEAD and when it strips a Cursor attribution trailer. `/crav1-open-pr` adds a `## Work item` section when the file has an id. The pull request title stays `<slug>: short summary`. The body stays What / why, Spec (links to that slug’s `spec.md`, `plan.md`, and `tasks.md`), Verify, then the work-item section.
 

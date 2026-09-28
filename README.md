@@ -116,7 +116,7 @@ Runnable pieces in this repo:
 
 | Piece | When | How |
 | --- | --- | --- |
-| Skill `/crav1-spark-to-spec` | You have 1–2 sentences (empty repo or a feature on an existing app) | Slash command; greenfield vs brownfield from context |
+| Skill `/crav1-spark-to-spec` | You have 1–2 sentences (empty repo or a feature on an existing app) | Slash command; greenfield vs brownfield from context. On Azure Repos, one optional work-item id after a new spec folder |
 | Skill `/crav1-feature-branch` | Brownfield: get off the default branch | Prompt: `feat/<slug>` (spec+build) or `spec/<slug>` then `feat/<slug>` for build; no push, no PR |
 | Skill `/crav1-architecture-reviewer` | Spec + diagrams/ADRs exist | Slash command; runs the reviewer subagent |
 | Skill `/crav1-tighten-spec` | Spec exists, still mushy | Slash command; one issue at a time (option to get a suggestion); then edit |
@@ -133,10 +133,10 @@ Runnable pieces in this repo:
 | Skill `/crav1-fix-live` | Live/inner-loop gap | Alias of `/crav1-fix-from-verify` |
 | Skill `/crav1-draft-commit-message` | About to commit (GitKraken paste fields) | Slash command; style.md or git log, once or onward; no commit unless they ask. Optional `work-item.md` mention is the last description line |
 | Skill `/crav1-finalize-commit` | Finish a message: git commit, GitKraken copy, or edit | Style first if needed, then draft, then **commit first**, then copy / edit / rewrite / stop; no push. Keeps a trailing work-item mention |
-| Skill `/crav1-open-pr` | Commits exist on `feat/<slug>` or `spec/<slug>` and you want a pull request | Push only after an explicit yes; one PR against the default branch; no merge, no commit. Adds a Work item section when `work-item.md` exists. Later merge is `/crav1-merge-pr` |
-| Skill `/crav1-merge-pr` | This turn explicitly asks to merge a named pull request | Merge commit only (`gh pr merge --merge` or Azure `noFastForward`). No squash, rebase, or policy bypass |
-| Skill `/crav1-ideas-to-spec` | Pile of ideas + technical hunches | Slash command; pick an export format |
-| Skill `/crav1-intake-to-specs` | 1–N files; maybe several features/repos | Slash command; landscape + one spec per v0 slug |
+| Skill `/crav1-open-pr` | Commits exist on `feat/<slug>` or `spec/<slug>` and you want a pull request | Push only after an explicit yes; one PR against the default branch; no merge, no commit. Adds a Work item section when `work-item.md` exists. On Windows, Azure DevOps description is `--description "@<file>"` (UTF-8, no BOM). Later merge is `/crav1-merge-pr` |
+| Skill `/crav1-merge-pr` | This turn explicitly asks to merge a named pull request | Merge commit only (`gh pr merge --merge` or Azure `noFastForward`). Parents counted with `git rev-list` after the completed re-read. No squash, rebase, or policy bypass |
+| Skill `/crav1-ideas-to-spec` | Pile of ideas + technical hunches | Slash command; pick an export format. On Azure Repos, one optional work-item id after a new spec folder |
+| Skill `/crav1-intake-to-specs` | 1–N files; maybe several features/repos | Slash command; landscape + one spec per v0 slug. On Azure Repos, one optional work-item question listing the new slugs |
 | Skill `/crav1-export-spec` | Spec exists, want another format | Slash command |
 | Subagent `crav1-spec-reviewer-agent` | Independent product/spec critique | Agent delegates, or ask “review this spec” |
 | Subagent `crav1-architecture-reviewer-agent` | Diagrams, ADRs, hunches vs decisions | Agent delegates |
@@ -284,10 +284,10 @@ When you change a template, update `docs/specs/_template/` **and** every `assets
 
 This repo already ships:
 
-- `/crav1-spark-to-spec` — one-liner → questions → `spec.md` (greenfield, brownfield feature, or later feature on `docs/system/`; new slug unless they extend)
+- `/crav1-spark-to-spec` — one-liner → questions → `spec.md` (greenfield, brownfield feature, or later feature on `docs/system/`; new slug unless they extend). On Azure Repos, offers once to write `work-item.md`
 - `/crav1-feature-branch` — prompt for `feat/<slug>` or specify-only `spec/<slug>`; no silent checkout, no push, no PR
-- `/crav1-ideas-to-spec` — idea pile + technical hunches → spec, diagrams, ADRs, chosen export
-- `/crav1-intake-to-specs` — mixed intake → `docs/system/` + one spec per v0 feature (isolated slice workers)
+- `/crav1-ideas-to-spec` — idea pile + technical hunches → spec, diagrams, ADRs, chosen export. On Azure Repos, offers once to write `work-item.md`
+- `/crav1-intake-to-specs` — mixed intake → `docs/system/` + one spec per v0 feature (isolated slice workers). On Azure Repos, one optional work-item question for the new slugs
 - `/crav1-architecture-reviewer` — run the crav1-architecture-reviewer-agent subagent; numbered issues at the end
 - `/crav1-tighten-spec` — one issue at a time, with explained resolutions (plus get a suggestion) and impact; patch only that issue after you choose
 - `/crav1-resolve-questions` — one Open question at a time; keep it open or answer with impact; patch only that `Q#`
@@ -304,8 +304,8 @@ This repo already ships:
 - `/crav1-fix-live` — alias when that gap is a live/inner-loop path
 - `/crav1-draft-commit-message` — paste-ready GitKraken Summary/Description; `style.md` or live git log, once or onward (deletable rule); does not commit unless they ask. Optional Azure Boards mention from `docs/specs/<slug>/work-item.md` is the last description line
 - `/crav1-finalize-commit` — same draft, then **commit first**, then copy for GitKraken, edit/rewrite, or stop (no push). Keeps that mention through the HEAD check and the attribution strip
-- `/crav1-open-pr` — push the change branch only after an explicit yes, then open one pull request (no merge, no commit). Body is What / why, Spec links, Verify, and a Work item section when `work-item.md` exists. Next explicit ask to merge is `/crav1-merge-pr`
-- `/crav1-merge-pr` — merge one named pull request only when that turn asks; always a merge commit; no squash, rebase, or policy bypass
+- `/crav1-open-pr` — push the change branch only after an explicit yes, then open one pull request (no merge, no commit). Body is What / why, Spec links, Verify, and a Work item section when `work-item.md` exists. On Windows, a multi-line Azure DevOps description is passed as `--description "@<file>"` (UTF-8 without BOM). Next explicit ask to merge is `/crav1-merge-pr`
+- `/crav1-merge-pr` — merge one named pull request only when that turn asks; always a merge commit; no squash, rebase, or policy bypass. After the completed re-read, two parents are confirmed with `git rev-list` (commits API if git cannot see the commit)
 - subagent `crav1-spec-reviewer-agent` — independent product/spec critique
 - subagent `crav1-architecture-reviewer-agent` — hunches vs decisions, diagrams, ADRs
 - subagent `crav1-plan-reviewer-agent` — worker for `/crav1-review-plan` (`plan.md` / `tasks.md` vs spec)

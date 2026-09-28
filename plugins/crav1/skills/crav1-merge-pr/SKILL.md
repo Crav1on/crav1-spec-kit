@@ -19,7 +19,7 @@ Command: `/crav1-merge-pr`.
 
 Run it only when **this turn** explicitly asks to merge a specific pull request, named by number or URL. `/crav1-open-pr`, a complete-task loop, a review, or an earlier turn naming a URL is not that ask. Do not run this skill from those steps. If this turn does not name a pull request, ask which one. That turn is the question only. No merge.
 
-On Windows, `git` may not be on `PATH`. Try `git`, then `C:\Program Files\Git\cmd\git.exe`.
+On Windows, `git` may not be on `PATH`. Try `git`, then `C:\Program Files\Git\cmd\git.exe`. `az` may be `az.cmd`. Quote any `--query` value that contains parentheses; `cmd.exe` treats an unquoted `(` as syntax. This skill does not pass a multi-line body to `az`. A multi-line `--description` on Windows uses the `@file` steps in `/crav1-open-pr`.
 
 ## Which pull request
 
@@ -37,7 +37,7 @@ Remote: the single `git remote`. If several remotes exist, ask which one. A full
 
 ## Host
 
-Resolve **one** merge path, in this order: GitHub `gh`, then Azure DevOps `az`, then printed commands and web UI steps. Do not claim the pull request was merged unless that path returned a merge commit hash. On Azure DevOps, that commit must also have two parents.
+Resolve **one** merge path, in this order: GitHub `gh`, then Azure DevOps `az`, then printed commands and web UI steps. Do not claim the pull request was merged unless that path returned a merge commit hash. On Azure DevOps, that commit must also have two parents, counted with `git rev-list` after the completed re-read (commits API only when git cannot see the commit).
 
 ### GitHub (`gh`)
 
@@ -205,29 +205,36 @@ az repos pr update --org <org-url> --id <n> --status completed --squash false --
 
 If this command fails, stop. Do not retry. Do not try `--squash true`, `--status completed` alone, `--merge-strategy`, or any other strategy. A status-only complete copies completion options already on the pull request, and those can be squash. Print the Azure DevOps fallback. Do not claim the pull request was merged. Do not run `az rest`. Do not start a sign-in.
 
-On success, fetch the pull request again and confirm it. Do not treat the update body as the last word.
+On success, fetch the pull request again and confirm it. Do not treat the update body as the last word. The update response can still say `status` `active` after a successful complete. Only the re-read counts.
 
 ```text
 az repos pr show --org <org-url> --id <n> --detect false --output json
 ```
 
-`status` must be `completed`. `lastMergeCommit.commitId` is the merge commit. Report that hash. Do not invent one. If `status` is not `completed`, stop and say the state. If `lastMergeCommit` is empty, say the merge commit is not in the response yet. Do not guess. Do not continue.
+`status` must be `completed`. `lastMergeCommit.commitId` is the merge commit. Keep that hash. Do not invent one. If `status` is not `completed`, stop and say the state. If `lastMergeCommit.commitId` is empty, say the merge commit is not in the response yet. Do not guess. Do not continue.
 
-Then confirm that commit has two parents.
+Do not read `lastMergeCommit.parents` on the pull request. That array is null on a real Azure DevOps response even when the commit has parents, so a parent check cannot use it.
 
-- When `lastMergeCommit.parents` is present, it must list two commit ids.
-- When `parents` is absent, fetch the commit and count parents. Use the `git` from the top of this skill, the remote from **Which pull request**, and the target branch name without `refs/heads/`:
+Count parents with git. Use the `git` from the top of this skill, the remote from **Which pull request**, and the target branch name without `refs/heads/`. `<commitId>` is `lastMergeCommit.commitId` from the re-read.
 
 ```text
 git fetch <remote> <target>
 git rev-list --parents -n 1 <commitId>
 ```
 
-The line is `<commitId> <parent1> <parent2>` for a merge commit. One parent is not a merge commit.
+The line is `<commitId> <parent1> <parent2>` for a merge commit. Two ids after the commit id means a merge commit. One parent is not a merge commit.
+
+If `git rev-list` exits non-zero, or does not print that commit id, git cannot see the commit. Fall back to the Azure DevOps commits API. This GET only counts parents. Do not use it to complete, update, or bypass the pull request. Do not run it when git already returned a parent count. Do not add an Authorization header. Do not print a token. Do not start a sign-in.
+
+```text
+az rest --method get --uri "https://dev.azure.com/<org>/<project>/_apis/git/repositories/<repo>/commits/<commitId>?api-version=7.1"
+```
+
+Use `https://<org>.visualstudio.com/...` when that is the host. Repository id from `repository.id` on the show payload when it is present; otherwise the repository name. Count the `parents` array. Two entries is a merge commit. One entry is not.
+
+If that GET fails, or `parents` is missing, stop and say the merge type could not be verified. Name the commit id. Do not claim a no-fast-forward merge. Do not fast-forward local `main`. Do not treat the update body, or a null `lastMergeCommit.parents`, as proof.
 
 If the commit does not have two parents, stop and report plainly: the pull request is completed, the hash, and the parent count. A branch policy may have forced squash or rebase. Do not fast-forward local `main`. Do not retry. Do not claim a no-fast-forward merge.
-
-If the parent count cannot be read, stop and say it was not confirmed. Do not treat the update as proof of a two-parent merge commit.
 
 ## Fallback (no merge)
 
@@ -284,7 +291,7 @@ When you only printed commands, stop after those commands. Do not invent a hash.
 
 ## Local main
 
-Run this only after a confirmed merge commit. On Azure DevOps that includes a completed pull request whose `lastMergeCommit` has two parents. If that check stopped the skill, do not fast-forward.
+Run this only after a confirmed merge commit. On Azure DevOps that includes a completed pull request whose merge commit has two parents, counted with `git rev-list` or, when git cannot see the commit, the commits API. If that check stopped the skill, do not fast-forward.
 
 When the working tree is clean, fast-forward local `main`:
 
@@ -327,7 +334,7 @@ An `AZURE_DEVOPS_EXT_PAT` the user has already set is a credential for the `az r
 - No branch delete unless the user asked in this turn.
 - No dialog-box or browser Microsoft sign-in (`az login`, `az devops login`, device code, or a web login).
 - No token printed, echoed, or created. An `AZURE_DEVOPS_EXT_PAT` the user already set is the PAT route in **Auth notes**.
-- Do not run `az rest`.
+- Do not run `az rest` to complete, update, or bypass a pull request. The parent-count fallback in **Merge** may GET one commit when git cannot see it.
 - Do not claim a merge commit hash the host did not return.
-- Do not claim a no-fast-forward merge when `lastMergeCommit` does not have two parents.
+- Do not claim a no-fast-forward merge unless the parent count was verified as two. A null `lastMergeCommit.parents` is not that count.
 - Do not run this skill from `/crav1-open-pr`, `crav1-complete-task-agent`, or a review.
