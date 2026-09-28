@@ -31,7 +31,8 @@ The parent launches **crav1-intake-slice-agent** for **one** slug. This file is 
 - Write or edit another slug
 - Rewrite `docs/system/` (no landscape, repos table, or system ADRs)
 - Invent a second system shape (landscape wins)
-- Write application code, `plan.md`, `tasks.md`, or create git remotes
+- Write application code, `plan.md`, `tasks.md`, `work-item.md`, or create git remotes
+- Ask for a work item (the parent offers once after Index)
 - Silently resolve ungrounded requirements — leave Open questions
 
 If a requirement cannot be grounded in intake, bulk `A#`s, or mushy answers, it is an Open question, not a fake SHALL.

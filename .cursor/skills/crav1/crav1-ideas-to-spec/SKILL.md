@@ -93,6 +93,8 @@ Then output only:
 - 3–5 remaining arguments
 - Next: `/crav1-tighten-spec`, `/crav1-architecture-reviewer`, `/crav1-export-spec`, `/crav1-plan-from-spec`, or accept and Plan Mode. If they chose `spec/<slug>`: no implement on that branch.
 
+Then, when this turn created a new `docs/specs/<slug>/` folder, follow [work-item-offer.md](../crav1-draft-commit-message/references/work-item-offer.md) (plugin: sibling `skills/crav1-draft-commit-message/references/work-item-offer.md`). One optional question on Azure Repos only. Do not ask on GitHub or any other host. Do not ask again in this run if the user skips or does not answer.
+
 Still no application code. Still no `plan.md` unless they asked.
 
 ## Style

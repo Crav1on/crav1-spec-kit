@@ -72,6 +72,8 @@ Then output only:
 - 3–5 decisions still worth arguing
 - What to do next: answer those, or run `/crav1-tighten-spec`, or accept and `/crav1-plan-from-spec`. If they chose `spec/<slug>`, remind them: no implement on that branch; PR/merge when they want, then `feat/<slug>` for build.
 
+Then, when this turn created a new `docs/specs/<slug>/` folder, follow [work-item-offer.md](../crav1-draft-commit-message/references/work-item-offer.md) (plugin: sibling `skills/crav1-draft-commit-message/references/work-item-offer.md`). One optional question on Azure Repos only. Do not ask on GitHub or any other host. Do not ask again in this run if the user skips or does not answer.
+
 Still no code. Still no `plan.md` unless they asked for a plan. Pile of ideas plus hunches for **one** feature: tell them `/crav1-ideas-to-spec`. Mixed files / several features or repos: `/crav1-intake-to-specs`.
 
 ## Style

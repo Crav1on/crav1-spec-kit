@@ -47,7 +47,7 @@ When you **create or update** a crav1 skill or subagent that reads or writes spe
 
 Skills that do not use those files do not need empty `assets/` folders.
 
-Optional Azure Boards id file: `docs/specs/_template/work-item.md` only. Commit and pull-request skills read `docs/specs/<slug>/work-item.md` when someone adds it. Do not copy that template into skill `assets/`, and do not scaffold it into a slug.
+Optional Azure Boards id file: `docs/specs/_template/work-item.md` is the HTML-comment starter only. Do not copy that template into skill `assets/`, and do not copy the comment into a slug. Commit and pull-request skills read `docs/specs/<slug>/work-item.md` when it exists. `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, and `/crav1-intake-to-specs` may write the one-line file when the user opts in on Azure Repos (`crav1-draft-commit-message` `references/work-item-offer.md`). They do not write the file when the user skips.
 
 ## Install docs
 

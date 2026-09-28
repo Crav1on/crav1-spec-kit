@@ -34,7 +34,7 @@ Resolve these before you push or create anything. Prompt when a value is missing
 | Body | Template below. |
 | Push | Ask once, **after** the title and body are visible. Options in order: **push and open PR** (first/top), **open PR only** (remote already has the branch), **stop**. |
 
-On Windows, `git` may not be on `PATH`. Try `git`, then `C:\Program Files\Git\cmd\git.exe`.
+On Windows, `git` may not be on `PATH`. Try `git`, then `C:\Program Files\Git\cmd\git.exe`. `az` may be `az.cmd`. When PowerShell calls `az.cmd`, `cmd.exe` cuts a multi-line argument at the first newline, and an unquoted `--query` value that contains parentheses is a syntax error. Quote every `--query` value (`--query "value[].pullRequestId"`). A multi-line pull-request description uses the `@file` steps in **Create**.
 
 ## Base branch
 
@@ -198,6 +198,8 @@ az repos pr list --org https://dev.azure.com/<org> --project <project> --reposit
 az repos pr create --org https://dev.azure.com/<org> --project <project> --repository <repo> --source-branch <head> --target-branch <base> --title "<title>" --description "<body>" --detect false
 ```
 
+On Windows, do not put a multi-line `<body>` on that create command. `cmd.exe` keeps only the first line. Write the accepted body to a temp file as UTF-8 without a BOM and pass `--description "@<file>"`, then delete the file. See **Create**. Quote any `--query` value that contains parentheses.
+
 When org, project, and repository are known, also print the create-PR page they can open. This is not an opened pull request. URL-encode `<head>` and `<base>` (`/` as `%2F`):
 
 ```text
@@ -266,13 +268,33 @@ If the list is non-empty, print the web URL and stop. Do not run `az repos pr cr
 
 If the list call fails, do not create. Print the Azure DevOps fallback from **Host**. Do not invent a URL. Do not start a sign-in.
 
-If the list is empty:
+If the list is empty, create one pull request.
+
+Non-Windows: pass `--description` as one value (a HEREDOC is fine) so quotes and Markdown survive. Microsoft documents each `--description` value as one new line.
 
 ```text
 az repos pr create --org <org-url> --project <project> --repository <repo> --source-branch <head> --target-branch <base> --title <title> --description <body> --detect false --output json
 ```
 
-Pass `--description` with a HEREDOC so quotes and Markdown survive. Microsoft documents each `--description` value as one new line; pass the accepted body as a single value.
+Windows (PowerShell calling `az.cmd`): do not pass the body on the command line. `cmd.exe` keeps only the text before the first newline.
+
+1. Write the accepted body to a new temp file as UTF-8 without a BOM. A BOM shows up as a character at the start of the description. Non-ASCII (an en dash, for example) must survive. Windows PowerShell `Set-Content -Encoding utf8` writes a BOM. Do not use it.
+
+```powershell
+$path = Join-Path ([System.IO.Path]::GetTempPath()) ("az-pr-body-" + [guid]::NewGuid().ToString() + ".md")
+$utf8NoBom = New-Object System.Text.UTF8Encoding $false
+[System.IO.File]::WriteAllText($path, $body, $utf8NoBom)
+```
+
+2. Pass `--description "@<path>"` with the `@` file token quoted, so PowerShell does not treat `@` as a splat. Azure CLI loads that file and keeps every line.
+
+```text
+az repos pr create --org <org-url> --project <project> --repository <repo> --source-branch <head> --target-branch <base> --title <title> --description "@<path>" --detect false --output json
+```
+
+3. Delete the temp file after the create call returns, whether it succeeded or failed. Do not commit it. Do not leave it in the repo.
+
+Quote any `--query` value that contains parentheses. `cmd.exe` treats an unquoted `(` as syntax.
 
 Do not pass `--open`, `--auto-complete`, `--draft`, `--delete-source-branch`, `--reviewers`, `--optional-reviewers`, `--required-reviewers`, `--work-items`, `--transition-work-items`, `--squash`, `--merge-commit-message`, `--labels`, or `--bypass-policy` unless they asked for that in this chat. Do not set auto-complete, merge, draft, reviewers, work items, or delete-source-branch unless they asked.
 

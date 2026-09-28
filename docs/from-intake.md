@@ -82,6 +82,8 @@ Or `/crav1-ideas-to-spec` if the new thing is already a pile. **New slug.** If y
 
 ## After Index
 
+On an Azure Repos remote, intake then asks once for an optional work-item id. One question lists the new slugs. Skip leaves no `work-item.md`. GitHub and other hosts are not asked. See [from-ideas](from-ideas.md).
+
 If you are done with this dump (not about to rewrite Map output in the same chat):
 
 ```text

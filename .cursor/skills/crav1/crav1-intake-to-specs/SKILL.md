@@ -96,6 +96,8 @@ Then output only:
 
 Do **not** run `/crav1-finalize-commit` yourself. Prompt it. Workers must not commit.
 
+Then follow [work-item-offer.md](../crav1-draft-commit-message/references/work-item-offer.md) (plugin: sibling `skills/crav1-draft-commit-message/references/work-item-offer.md`) once, for every new spec folder this run created that still has no `work-item.md`. One question lists those slugs. Azure Repos only. Do not ask on GitHub or any other host. Do not ask again in this run if the user skips or does not answer. Slice workers do not ask and do not write `work-item.md`.
+
 Still no application code. Still no `plan.md` unless they asked.
 
 ## Later features (tell them; do not do it in this command)

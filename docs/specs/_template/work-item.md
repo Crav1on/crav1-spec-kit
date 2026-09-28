@@ -9,4 +9,6 @@ Digits only. Commit and pull-request skills turn that id into a mention from the
 A full token is used as written: Work item: AB#52 or Work item: #52.
 
 Leave the id out of tasks.md. These skills do not create the work item, do not look it up, and do not block when this file is missing.
+
+On an Azure Repos remote, /crav1-spark-to-spec, /crav1-ideas-to-spec, and /crav1-intake-to-specs offer once to write this file when they create a new spec folder. They write the one line only if the user replies with an id. They do not copy this comment into the slug. On GitHub and other hosts they do not ask. Creating the work item in Azure Boards is out of scope.
 -->
