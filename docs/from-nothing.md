@@ -2,7 +2,7 @@
 
 Kit not in this project yet? [Install first](install.md). After a plugin install, the short command loop is [plugins/crav1/README.md](../plugins/crav1/README.md).
 
-You do not start in Plan Mode. You do not start by picking Next.js. You start by making the idea small enough to accept or reject.
+You do not start in the host plan UI. You do not start by picking Next.js. You start by making the idea small enough to accept or reject.
 
 `/crav1-spark-to-spec` is that first command whether the repo is **empty** or you are adding a **feature** to an app that already exists. The skill picks **greenfield** vs **brownfield** from context (and from what you @). A pile of ideas plus stack hunches is still [from-ideas](from-ideas.md) (`/crav1-ideas-to-spec`). Several files, or several features/repos, is [from-intake](from-intake.md) (`/crav1-intake-to-specs`). An existing spec that is only mushy is `/crav1-tighten-spec`, not a second spark. After `docs/system/` exists, a new feature is still this command with `@docs/system/` (new slug).
 
@@ -17,7 +17,7 @@ This is a strong **later** reviewer, and it is now the `crav1-spec-reviewer-agen
 
 What did not belong on turn one:
 
-- “You are Claude Sonnet/Opus…” — pick the model in Cursor; do not bake it into the prompt
+- “You are Claude Sonnet/Opus…” — pick the model in the host; do not bake it into the prompt
 - Architect + implementer + reviewer in one blob — that jumps to *how* before *what*
 - **Greenfield only:** “Preserve existing architecture” / “when I share code…” — there is none yet
 - **Brownfield:** skipping the spec and coding the feature into the current tree
@@ -25,7 +25,7 @@ What did not belong on turn one:
 ## What to run
 
 1. New Agent chat.
-2. Type `/crav1-spark-to-spec` (or pin it as a Custom Mode with Option/Alt+Enter).
+2. Type `/crav1-spark-to-spec`.
 3. Paste the spark. `@` the app (and an old spec only if this feature extends it).
 
 **Greenfield** (no app, or you want a new product slice with no existing architecture):
@@ -110,6 +110,6 @@ New chat so exploration does not pollute implementation.
 @docs/specs/<slug>/spec.md
 ```
 
-Or Plan Mode with the same spec attached. Then optional `/crav1-review-plan` and `/crav1-tighten-plan` (plan/tasks only). Then `/crav1-complete-task` or `/crav1-implement-task`.
+`/crav1-plan-from-spec` writes `plan.md` and `tasks.md`. The host plan UI is not those files ([install.md](install.md)). Then optional `/crav1-review-plan` and `/crav1-tighten-plan` (plan/tasks only). Then `/crav1-complete-task` or `/crav1-implement-task`.
 
 If a repo already exists, `@` the relevant folders so plan and spec-reviewer apply “preserve existing patterns.”

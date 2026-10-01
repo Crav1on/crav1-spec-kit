@@ -21,17 +21,25 @@ Command: `/crav1-draft-commit-message`. To **edit** the text and/or **create** t
 Bundled style: [references/style.md](references/style.md).  
 Git-log style: this repo’s recent `git log` (subject + body).
 
-Persistent rules (at most one should exist):
+Persistent rules (at most one should exist). Cursor and Claude Code both count. If the file for the host you are running exists, do not ask.
 
 | File | Meaning | Template |
 | --- | --- | --- |
-| `.cursor/rules/draft-commit-style.mdc` | Always `style.md` | `assets/draft-commit-style.mdc` |
-| `.cursor/rules/draft-commit-gitlog.mdc` | Always live `git log` | `assets/draft-commit-gitlog.mdc` |
+| `.cursor/rules/draft-commit-style.mdc` | Always `style.md` (Cursor) | `assets/draft-commit-style.mdc` |
+| `.cursor/rules/draft-commit-gitlog.mdc` | Always live `git log` (Cursor) | `assets/draft-commit-gitlog.mdc` |
+| `.claude/rules/draft-commit-style.md` | Always `style.md` (Claude Code project) | `assets/draft-commit-style.mdc` |
+| `.claude/rules/draft-commit-gitlog.md` | Always live `git log` (Claude Code project) | `assets/draft-commit-gitlog.mdc` |
+| `~/.claude/rules/draft-commit-style.md` | Always `style.md` (Claude Code user) | `assets/draft-commit-style.mdc` |
+| `~/.claude/rules/draft-commit-gitlog.md` | Always live `git log` (Claude Code user) | `assets/draft-commit-gitlog.mdc` |
+
+On Claude Code, write the **project** path when this repo contains the kit (`.claude/` or `.cursor/` in git). Write the **user** path when the kit lives in `~/.claude/` and this repo did not ask for the kit in git, so the rule is not committed into a client repo.
 
 Also treat these **legacy** names as the same persist (if you find them, use them; new writes use the names above):
 
 - `.cursor/rules/gitkraken-commit-style.mdc` → style.md onward
 - `.cursor/rules/gitkraken-commit-gitlog.mdc` → git log onward
+- `.claude/rules/gitkraken-commit-style.md` or `~/.claude/rules/gitkraken-commit-style.md` → style.md onward
+- `.claude/rules/gitkraken-commit-gitlog.md` or `~/.claude/rules/gitkraken-commit-gitlog.md` → git log onward
 
 ## Before drafting
 
@@ -54,9 +62,9 @@ Do **not** ask. Draft matching **live `git log`**. If the log is empty, say so a
 | Id | Choice | What it does | Disk |
 | --- | --- | --- | --- |
 | `once` | `style.md`, this commit only | Use bundled `references/style.md` for **this** message. Ask again next time. | None |
-| `onward` | `style.md`, this commit and onward | Same, **and** write `draft-commit-style.mdc`. Remove any git-log persist rule. | Rule from `assets/draft-commit-style.mdc` |
+| `onward` | `style.md`, this commit and onward | Same, **and** write the style persist rule. Remove any git-log persist rule. | Cursor: `.cursor/rules/draft-commit-style.mdc`. Claude Code project: `.claude/rules/draft-commit-style.md`. Claude Code user (kit not in this repo’s git): `~/.claude/rules/draft-commit-style.md`. Content from `assets/draft-commit-style.mdc`. |
 | `log-once` | Git log, this commit only | Match **this repo’s** recent messages for **this** message. Ask again next time. | None |
-| `log-onward` | Git log, this commit and onward | Same, **and** write `draft-commit-gitlog.mdc`. Remove any style.md persist rule. | Rule from `assets/draft-commit-gitlog.mdc` |
+| `log-onward` | Git log, this commit and onward | Same, **and** write the git-log persist rule. Remove any style.md persist rule. | Cursor: `.cursor/rules/draft-commit-gitlog.mdc`. Claude Code project: `.claude/rules/draft-commit-gitlog.md`. Claude Code user (kit not in this repo’s git): `~/.claude/rules/draft-commit-gitlog.md`. Content from `assets/draft-commit-gitlog.mdc`. |
 
 If `git log` is empty or unavailable, say that `log-once` / `log-onward` have no pattern to copy; they can still pick `style.md`.
 

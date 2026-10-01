@@ -4,13 +4,14 @@ A thin path for someone new to **CRAV1 Spec Kit** (`crav1`). Full playbook: [REA
 
 ## 1. Pick an install path
 
-Install into the **product repo** where the feature should land. Steps and trade-offs: [install.md](install.md).
+Install where the feature should land. Steps, host paths, and project versus user scope: [install.md](install.md).
 
-- **Drop-in copy** — copy `.cursor/skills/crav1/`, `.cursor/agents/crav1-*.md`, `.cursor/agent-assets/crav1-*`, and `.cursor/rules/crav1.mdc` into that repo. Leave `.cursor/rules/kit-maintainer.mdc` in the kit repo.
-- **Cursor plugin** — import [crav1-spec-kit](https://github.com/Crav1on/crav1-spec-kit) and install plugin `crav1` (team marketplace or a local copy of `plugins/crav1`).
-- **Learning in this kit repo** — `.cursor/` is already present. Skip the copy and continue below.
+- **Project drop-in** — commit the host tree (`.cursor/` or `.claude/`) in a repository you own.
+- **User scope** — Cursor user plugin, or Claude Code `~/.claude/`. On a client project, use this unless that project asked for the kit in git.
+- **Cursor plugin** — import [crav1-spec-kit](https://github.com/Crav1on/crav1-spec-kit) and install plugin `crav1`. There is no Claude Code marketplace in this kit.
+- **Learning in this kit repo** — the host trees are already present. Skip the copy and continue below.
 
-Reload the window if `/crav1` does not appear (`Developer: Reload Window`).
+If `/crav1` does not appear, reload or restart the host (see [install.md](install.md)).
 
 ## 2. Open the product repo
 

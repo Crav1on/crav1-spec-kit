@@ -10,7 +10,7 @@ Spark-only (greenfield or one feature on an existing app)? Use [from-nothing](fr
 
 ## First prompt
 
-New Agent chat. Strong reasoning model. Not Plan Mode yet.
+New chat. Strong reasoning model. Not the host plan UI yet.
 
 Paste **one blob**. No required headings, bullets, or `Format:` / `Bundle:` labels. Include the same kinds of information you used to put in sections: who it is for, the ideas, any UX notes, stack or shape hunches, constraints. The skill clusters intent vs hunches for you.
 
@@ -25,7 +25,7 @@ Treat hunches as proposed, not decided.
 Do not write code. Capture first, then architecture questions.
 ```
 
-That slash command *is* the prompt. Pin `/crav1-ideas-to-spec` as a Custom Mode if you want it on for the session.
+That slash command *is* the prompt.
 
 On a git repo with commits, the skill **prompts** for `feat/<slug>` (spec+build) or `spec/<slug>` (specify-only) before it writes files. `/crav1-feature-branch` is the same prompt on its own. No push, no PR.
 
@@ -42,7 +42,7 @@ Structured labels still work if you like them; they are not required.
 | Critique           | Optional                               | `/crav1-architecture-reviewer` then `/crav1-tighten-spec` (one issue at a time)            |
 | Questions          | Leftover Open questions                | `/crav1-resolve-questions` — keep open or answer, one `Q#` at a time                      |
 | Export again       | “also want JSON”                       | `/crav1-export-spec` — does not change behavior                                           |
-| Stop               | v0 is demoable and ADRs match diagrams | New chat, Plan Mode, with `spec.md`, `diagrams.md`, and `adr/` attached |
+| Stop               | v0 is demoable and ADRs match diagrams | New chat, `/crav1-plan-from-spec`, with `spec.md`, `diagrams.md`, and `adr/` attached |
 
 
 Good replies during Architecture:
@@ -110,7 +110,7 @@ Stay inside v0. Do not reopen rejected options unless an ADR is still proposed.
 Do not code.
 ```
 
-Or Cursor Plan Mode with the same files attached. The skill writes `plan.md` and `tasks.md` in the spec folder so the plan lives in git, not only in the Plan Mode UI.
+`/crav1-plan-from-spec` writes `plan.md` and `tasks.md` in the spec folder. The host plan UI is not those files ([install.md](install.md)).
 
 Optional critique of the plan (does not change `spec.md`):
 
@@ -123,7 +123,7 @@ Then `/crav1-tighten-plan` walks **plan** `P#`s one by one. Findings tagged **sp
 
 If this work is on **`spec/<slug>`**, stop after plan: `/crav1-finalize-commit`, open a PR when you want the spec on the default branch. After it is merged, `/crav1-feature-branch` → `feat/<slug>`, then implement. Do not implement on `spec/<slug>`.
 
-Then, in a **new** chat (or pin `/crav1-implement-task` as a Custom Mode):
+Then, in a **new** chat:
 
 ```text
 /crav1-implement-task
@@ -186,11 +186,11 @@ That command drafts the same way: style first if needed, then Summary/Descriptio
 First time (no persist rule yet) it asks:
 
 - **`style.md`, this commit only**
-- **`style.md`, this commit and onward** — writes `.cursor/rules/draft-commit-style.mdc`
+- **`style.md`, this commit and onward** — writes a host persist rule
 - **Git log, this commit only** — match this repo’s recent messages
-- **Git log, this commit and onward** — writes `.cursor/rules/draft-commit-gitlog.mdc`
+- **Git log, this commit and onward** — writes the other host persist rule
 
-Onward choices are mutually exclusive (writing one removes the other). To get the prompt again: delete that rule file.
+Onward choices are mutually exclusive (writing one removes the other). To get the prompt again: delete that rule file. Which file that is depends on the host ([install.md](install.md)).
 
 Inner-loop example (same skill; `/crav1-fix-live` also works):
 

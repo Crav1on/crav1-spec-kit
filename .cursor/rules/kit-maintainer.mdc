@@ -5,11 +5,13 @@ alwaysApply: true
 
 # Kit maintainer (this repo only)
 
-This file is **not** `crav1-*` so a folder dump of the library can omit it. Product repos get `.cursor/rules/crav1.mdc` only.
+This file is **not** `crav1-*` so a folder dump of the library can omit it. Product repos get `.cursor/rules/crav1.mdc` (Cursor) or `.claude/CLAUDE.md` (Claude Code), not this file.
 
-This repo’s custom library uses the **`crav1`** prefix so it is distinct from Cursor built-ins.
+This repo’s custom library uses the **`crav1`** prefix so it is distinct from Cursor built-ins. Skill and agent names stay the same on Claude Code.
 
-There are **two install trees**. When you add or change a skill, agent, template, or kit rule, update **both** (or run `scripts/sync-crav1-plugin.sh` after editing `.cursor/`). Also update `docs/install.md` and `plugins/crav1/README.md` when how people install or start using the kit changes.
+There are **three install trees**. Cursor drop-in `.cursor/` is the source of the playbooks. `plugins/crav1/` is the Cursor plugin mirror. `.claude/` is the generated Claude Code drop-in. When you add or change a skill, agent, template, or kit rule, edit `.cursor/` and run `scripts/sync-crav1-plugin.sh`. That refreshes the plugin mirror and regenerates `.claude/`. Do not hand-edit mirrored files under `plugins/crav1/` or anything under `.claude/`. Also update `docs/install.md` and `plugins/crav1/README.md` when how people install or start using the kit changes.
+
+CI (`.github/workflows/drop-in-plugin-sync.yml`) fails the check when the plugin mirror drifts, and when `scripts/sync-crav1-claude.sh --check` exits non-zero because the committed `.claude/` tree does not match a fresh generate. A comment in this rule is not the check.
 
 ## Drop-in (project `.cursor/`)
 
@@ -33,14 +35,28 @@ Cursor plugin layout (install-from-repo / local plugin):
 - Agent templates: `plugins/crav1/agent-assets/crav1-<name>/`
 - Rules: `plugins/crav1/rules/` (includes `crav1.mdc`; do not put this maintainer file in the plugin)
 
-After editing drop-in files, run `scripts/sync-crav1-plugin.sh` so the plugin tree matches. Do not hand-edit mirrored files only under `plugins/crav1/` — they will be overwritten. Plugin-only files: `plugins/crav1/.cursor-plugin/plugin.json`, `plugins/crav1/README.md`.
+After editing drop-in files, run `scripts/sync-crav1-plugin.sh` so the plugin tree and `.claude/` match. Do not hand-edit mirrored files only under `plugins/crav1/` or `.claude/` — they will be overwritten. Plugin-only files: `plugins/crav1/.cursor-plugin/plugin.json`, `plugins/crav1/README.md`. There is no Claude Code plugin marketplace in this kit.
+
+## Claude Code drop-in (generated `.claude/`)
+
+`scripts/sync-crav1-plugin.sh` calls `scripts/sync-crav1-claude.sh`, which writes `.claude/` from `.cursor/`. `scripts/sync-crav1-claude.sh --check` diffs a fresh generate against the committed tree and exits non-zero on drift. The same check runs in CI.
+
+Path rewrite only: `.cursor/skills/crav1/<name>/` → `.claude/skills/<name>/`, `.cursor/agents/` → `.claude/agents/`, `.cursor/agent-assets/` → `.claude/agent-assets/`. Commit-style rules rewrite `.cursor/rules/draft-commit-*.mdc` to `.claude/rules/draft-commit-*.md`. The source skill text names Cursor and Claude Code; the generator rewrites the Cursor paths in the Claude copy.
+
+Hand-written host differences inside that generator, not a second copy of every `SKILL.md`:
+
+- Agent frontmatter. `model: inherit` is omitted (Claude Code’s default). `readonly: true` becomes `tools: Read, Grep, Glob`. Writers omit `tools` so they can edit.
+- `.cursor/rules/crav1.mdc` becomes `.claude/CLAUDE.md` (the short project instruction, not the README).
+- Commit-style assets drop Cursor `alwaysApply` frontmatter so `.claude/rules/*.md` loads at session start.
+
+`.claude/agent-assets/` is not a directory Claude Code loads on its own. Prompts read those files. Do not put them under `.claude/agents/` (that tree is scanned as subagents). Do not copy this maintainer file into `.claude/`.
 
 ## Self-contained templates
 
 When you **create or update** a crav1 skill or subagent that reads or writes spec artifacts (`spec.md`, `plan.md`, `tasks.md`, `adr.md`, `diagrams.md`, `verify.md`, `fix-log.md`) or landscape artifacts (`docs/system/`):
 
 1. Put a copy of each template in **that skill’s** `assets/` (and the matching `agent-assets/crav1-<agent-name>/` on both trees).
-2. Point the `SKILL.md` / agent prompt at **those** copies, not only `docs/specs/_template/`. Mention drop-in `.cursor/…` **and** plugin sibling paths when a file lives outside this skill.
+2. Point the `SKILL.md` / agent prompt at **those** copies, not only `docs/specs/_template/`. Mention drop-in `.cursor/…` **and** plugin sibling paths when a file lives outside this skill. The Claude generator rewrites the `.cursor/` paths.
 3. Keep `docs/specs/_template/` and `docs/system/_template/` in sync with the matching `assets/` copies. If you change a template, update **every** copy.
 4. Do **not** put template markdown under `.cursor/agents/` or `plugins/crav1/agents/` except the agent prompt file.
 5. Format recipes live in the skill’s `references/` (see `crav1-export-spec` / `crav1-ideas-to-spec`).

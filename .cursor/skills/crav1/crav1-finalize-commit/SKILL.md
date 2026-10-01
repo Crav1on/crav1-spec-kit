@@ -112,5 +112,5 @@ If they say they **want** the Cursor trailer, leave it.
 - `copy` never runs `git commit`.
 - After `commit`, if Cursor appended `Co-authored-by` / `Made-with` that was not in the draft, strip it once with amend when HEAD is ours and unpushed; do not fight a second inject—tell them to turn Attribution off. The amend keeps the drafted Description, including a trailing work-item mention.
 - Do not install a hook to enforce the work-item line. Do not block the commit when `work-item.md` is missing.
-- Do not change product files except the persist rules the draft skill already writes (`draft-commit-style.mdc` / `draft-commit-gitlog.mdc`).
+- Do not change product files except the persist rules the draft skill already writes. Cursor: `.cursor/rules/draft-commit-style.mdc` or `.cursor/rules/draft-commit-gitlog.mdc`. Claude Code project: `.claude/rules/draft-commit-style.md` or `.claude/rules/draft-commit-gitlog.md`. Claude Code user: `~/.claude/rules/draft-commit-style.md` or `~/.claude/rules/draft-commit-gitlog.md`.
 - Do not open a PR. After a successful commit, one optional line may name `/crav1-open-pr`. Do not invoke it.

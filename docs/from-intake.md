@@ -10,7 +10,7 @@ One-liner? [from-nothing](from-nothing.md) (`/crav1-spark-to-spec`). One unstruc
 
 ## First prompt
 
-New Agent chat. Strong reasoning model. Not Plan Mode yet.
+New chat. Strong reasoning model. Not the host plan UI yet.
 
 `@` any mix of intent (what to build) and context (existing code or “like this”). No required structure in those files.
 
@@ -28,7 +28,7 @@ Do not write code. Map first, then landscape, then one spec per v0 slug.
 
 Default if you only `@` a codebase and do not say extract-as-is: **new system, this code is context.**
 
-That slash command *is* the prompt. Pin `/crav1-intake-to-specs` as a Custom Mode if you want it on for the session.
+That slash command *is* the prompt.
 
 ## The extra steps (vs ideas)
 

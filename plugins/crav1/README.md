@@ -1,6 +1,8 @@
 # crav1
 
-You installed the **crav1** plugin from **CRAV1 Spec Kit**. This is the short start **after** install. For how to install (copy vs plugin vs local), see [docs/install.md](https://github.com/Crav1on/crav1-spec-kit/blob/main/docs/install.md). In the kit repo, the same file is [docs/install.md](../../docs/install.md). A thin path from install through one task is [docs/first-run.md](https://github.com/Crav1on/crav1-spec-kit/blob/main/docs/first-run.md) ([docs/first-run.md](../../docs/first-run.md) in the kit repo). For the full playbook, see that repo’s README.
+You installed the **crav1** Cursor plugin from **CRAV1 Spec Kit**. This is the short start **after** that plugin install. For how to install (Cursor copy vs plugin vs local, or the Claude Code `.claude/` drop-in), see [docs/install.md](https://github.com/Crav1on/crav1-spec-kit/blob/main/docs/install.md). In the kit repo, the same file is [docs/install.md](../../docs/install.md). A thin path from install through one task is [docs/first-run.md](https://github.com/Crav1on/crav1-spec-kit/blob/main/docs/first-run.md) ([docs/first-run.md](../../docs/first-run.md) in the kit repo). For the full playbook, see that repo’s README.
+
+This plugin and its marketplace are Cursor-only. Claude Code has no plugin in this kit. Its drop-in is the generated `.claude/` tree in the install doc. The host plan UI is not `plan.md`; `/crav1-plan-from-spec` writes `plan.md` and `tasks.md`.
 
 Type `/crav1` in Agent chat to list commands.
 

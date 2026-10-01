@@ -1,24 +1,24 @@
 # CRAV1 Spec Kit (crav1)
 
-**CRAV1 Spec Kit** (`crav1`) is a Cursor kit for spec-driven development: skills and agents that take a spark, a pile of ideas, or intake files through spec, plan, implement, verify, and a draft commit message. Specs, not chat history, are the source of truth. The plugin also ships a short usage rule.
+**CRAV1 Spec Kit** (`crav1`) is a kit for spec-driven development: skills and agents that take a spark, a pile of ideas, or intake files through spec, plan, implement, verify, and a draft commit message. Specs, not chat history, are the source of truth. A short project instruction ships with the install.
 
-Repo: [crav1-spec-kit](https://github.com/Crav1on/crav1-spec-kit). Plugin id: `crav1`. After install, type `/crav1`.
+Repo: [crav1-spec-kit](https://github.com/Crav1on/crav1-spec-kit). Cursor plugin id: `crav1`. After install, type `/crav1`.
 
 This is a process guide, not an application. Use it as a checklist when you start a repo, then install the kit into that project.
 
-**First 15 minutes:** [docs/first-run.md](docs/first-run.md). **Before you install:** [docs/install.md](docs/install.md) (drop-in copy, Cursor plugin, or local plugin). **After a plugin install:** [plugins/crav1/README.md](plugins/crav1/README.md). License: [MIT](LICENSE).
+**First 15 minutes:** [docs/first-run.md](docs/first-run.md). **Before you install:** [docs/install.md](docs/install.md) (where files go on Cursor and Claude Code, project drop-in versus user scope). **After a Cursor plugin install:** [plugins/crav1/README.md](plugins/crav1/README.md). License: [MIT](LICENSE).
 
 ## First 15 minutes
 
 Pick an install path, open the product repo, then `/crav1` → `/crav1-spark-to-spec` → tighten → plan → one task. The short path is [docs/first-run.md](docs/first-run.md). The sections below are the full playbook.
 
-Primary sources: [Cursor docs](https://cursor.com/docs/), [Plan Mode](https://cursor.com/docs/agent/plan-mode), [Agent](https://cursor.com/docs/agent/overview), [Rules](https://cursor.com/docs/rules), [Skills](https://cursor.com/docs/skills), [Cloud Agents](https://cursor.com/docs/cloud-agent), [GitHub Spec Kit](https://github.com/github/spec-kit/), and [OpenSpec](https://github.com/Fission-AI/OpenSpec).
+Primary sources for the method: [GitHub Spec Kit](https://github.com/github/spec-kit/) and [OpenSpec](https://github.com/Fission-AI/OpenSpec). Host file locations and plan-UI notes are in [docs/install.md](docs/install.md).
 
 ---
 
 ## 1. How the pieces fit together
 
-Cursor’s agent is three things working at once: **instructions**, **tools**, and a **model**. Spec-driven development (SDD) is how you keep those three pointed at the same outcome when the work is larger than one prompt.
+An agent is three things working at once: **instructions**, **tools**, and a **model**. Spec-driven development (SDD) is how you keep those three pointed at the same outcome when the work is larger than one prompt.
 
 ### The agent stack
 
@@ -26,12 +26,11 @@ Cursor’s agent is three things working at once: **instructions**, **tools**, a
 | --- | --- | --- |
 | **Model** | The LLM you pick for the turn | Stronger reasoning models for specify/plan; faster models for isolated tasks |
 | **Tools** | Search, read, edit, terminal, browser, web, questions | The agent can research, implement, and **verify** instead of only generating text |
-| **Instructions** | System prompt + your rules, skills, and the spec in context | Persistent “how we work here”; specs are the current “what to build” |
-| **Modes** | Ask, Plan, Agent (and Custom Modes) | Separate thinking from doing |
-| **Checkpoints + Git** | Local undo vs permanent history | Roll back bad agent turns; keep specs and code versioned together |
-| **Cloud Agents** | Same agent, isolated VM | Parallel, long-running, testable runs once the environment can build and test |
+| **Instructions** | Project instructions, skills, and the spec in context | Persistent “how we work here”; specs are the current “what to build” |
+| **Plan files** | `plan.md` and `tasks.md` in the spec folder | Reviewable how, in git, one task at a time |
+| **Git** | Permanent history | Keep specs and code versioned together |
 
-Cursor’s own team now starts most new features by having Agent write a plan first. Plan Mode exists because frontier models do better on long-horizon work when they have a reviewable spec with file paths, constraints, and to-dos.
+Frontier models do better on long-horizon work when they have a reviewable spec with file paths, constraints, and tasks. That plan lives in git as `plan.md` and `tasks.md`. Each host also has a plan UI. That UI is not those files. See [docs/install.md](docs/install.md).
 
 ### Spec-driven development in one sentence
 
@@ -46,37 +45,36 @@ GitHub’s Spec Kit frames this as four gated phases:
 
 OpenSpec’s OPSX flow is the same idea without rigid waterfall gates: **explore → propose → apply → verify → sync/archive**, and you may update any artifact as understanding changes. That is a better fit for brownfield work.
 
-### Map that onto Cursor
+### How a change moves
 
 ```
 You (intent)
     │
-    ├─ AGENTS.md / .cursor/rules     → standing project law
-    ├─ Skills / Custom Modes         → playbooks (specify, implement, review)
-    └─ Specs in the repo             → this change’s contract
+    ├─ Project instructions     → standing project law (host file: install doc)
+    ├─ Skills                   → playbooks (specify, implement, review)
+    └─ Specs in the repo        → this change’s contract
             │
             ▼
-     Plan Mode  ──►  reviewable Markdown plan + to-dos
+     /crav1-plan-from-spec  ──►  docs/specs/<slug>/plan.md + tasks.md
             │
-            ▼  you click Build / switch to Agent
-     Agent Mode ──►  edits, tests, browser checks
+            ▼
+     One task               ──►  edits, tests, checks
             │
-            ├─ Checkpoints  → undo this session
-            ├─ Git          → keep spec + code together
-            └─ Cloud Agent  → same loop off your laptop
+            ├─ Git             → keep spec + code together
+            └─ Verify          → prove the slice against the spec
 ```
 
-**Rules vs skills vs specs** (do not collapse these):
+**Instructions vs skills vs specs** (do not collapse these):
 
-- **Rules / `AGENTS.md`**: always-on or file-scoped constraints (stack, style, “never touch generated files”). Short, stable, rarely change.
+- **Project instructions**: always-on constraints (stack, style, “never touch generated files”). Short, stable, rarely change. Where that file lives is in [docs/install.md](docs/install.md).
 - **Skills**: on-demand playbooks (“how we specify a feature”, “how we review a PR”). Load when relevant.
 - **Specs / plans**: per-change artifacts. They expire or get archived when the change ships.
 
-If you dump a whole product spec into always-on rules, you waste context and the agent treats yesterday’s feature as today’s law.
+If you dump a whole product spec into always-on instructions, you waste context and the agent treats yesterday’s feature as today’s law.
 
 ### What you should *not* spec-drive
 
-Quick, well-understood edits (rename, copy tweak, one-file bug with a clear stack trace) belong in **Agent mode** immediately. Plan Mode and SDD pay off when:
+Quick, well-understood edits (rename, copy tweak, one-file bug with a clear stack trace) belong in a normal agent turn. The spec loop pays off when:
 
 - There are multiple valid designs
 - Many files or systems are involved
@@ -87,7 +85,7 @@ Quick, well-understood edits (rename, copy tweak, one-file bug with a clear stac
 
 ## 2. From one sentence to a spec
 
-If you have only a spark (one or two sentences), do **not** start in Plan Mode and do not paste a “senior architect” persona. Interview first, write `spec.md`, tighten it, *then* plan — **greenfield or a feature on an existing app**. Full walkthrough: [From one sentence to a spec](docs/from-nothing.md).
+If you have only a spark (one or two sentences), do **not** start in the host plan UI and do not paste a “senior architect” persona. Interview first, write `spec.md`, tighten it, *then* plan — **greenfield or a feature on an existing app**. Full walkthrough: [From one sentence to a spec](docs/from-nothing.md).
 
 **First prompt** (Agent chat, strong reasoning model). Greenfield:
 
@@ -158,7 +156,7 @@ Treat hunches as proposed, not decided.
 Do not write code. Capture first, then architecture questions.
 ```
 
-Flow: cluster intent vs hunches → product questions if needed → **architecture interview** (≤7 questions, 2–3 options) → write `spec.md` + `diagrams.md` + ADRs + `export/<format>` → optional `/crav1-architecture-reviewer` → Plan Mode.
+Flow: cluster intent vs hunches → product questions if needed → **architecture interview** (≤7 questions, 2–3 options) → write `spec.md` + `diagrams.md` + ADRs + `export/<format>` → optional `/crav1-architecture-reviewer` → `/crav1-plan-from-spec`.
 
 Canonical spec stays Markdown. EARS / BDD / OpenSpec / YAML / JSON / BMAD are exports. Mermaid for context and sequences; ASCII for trees and CLIs. ADRs only when there were real alternatives (MADR-shaped template). If the pile is several v0 features or several repos, `/crav1-ideas-to-spec` stops and you run `/crav1-intake-to-specs` instead.
 
@@ -184,7 +182,7 @@ Default if you only `@` a codebase: new system, that code is **context** (not ex
 
 Use this on any non-trivial change.
 
-### A. Specify (Ask or Plan Mode, read-heavy)
+### A. Specify (read-heavy)
 
 Describe the user problem, not the stack. Force:
 
@@ -193,54 +191,47 @@ Describe the user problem, not the stack. Force:
 - Explicit **non-goals**
 - Acceptance checks a stranger could run
 
-Have the agent research the repo (search, read, existing tests). Answer clarifying questions. Do not skip them; Cursor documents that answer quality here dominates output quality later.
+Have the agent research the repo (search, read, existing tests). Answer clarifying questions. Do not skip them; answer quality here dominates output quality later.
 
 Write or update `docs/specs/<change>/spec.md` (or Spec Kit / OpenSpec’s layout). **You** accept this artifact before planning.
 
-### B. Plan (Plan Mode)
+### B. Plan (`plan.md` and `tasks.md`)
 
-`Shift+Tab` rotates into Plan Mode, or pick it from the mode dropdown. Cursor also suggests it when the prompt looks complex.
+Run `/crav1-plan-from-spec`. The skill writes `docs/specs/<change>/plan.md` and `tasks.md` with file paths, constraints, and testable tasks. Edit those files. They are the plan that teammates and later chats see.
 
-The agent researches, asks more questions, and writes a Markdown plan with file paths, code references, and to-dos. Edit the plan in the UI or on disk. Save it into the workspace so it is shared, not only in your home directory.
+The host plan UI is not a substitute. See [docs/install.md](docs/install.md).
 
 Treat the plan as a design review: wrong files, missing constraints, and oversized tasks are cheaper to fix here than after a 40-file diff.
 
 ### C. Task-slice
 
-Every to-do should be implementable **and testable** in isolation. “Add authentication” is not a task. “POST `/register` rejects invalid email and has a test” is.
+Every task should be implementable **and testable** in isolation. “Add authentication” is not a task. “POST `/register` rejects invalid email and has a test” is.
 
-If a task cannot be verified, it is still part of the spec, not ready for Agent.
+If a task cannot be verified, it is still part of the spec, not ready to implement.
 
-### D. Implement (Agent Mode)
+### D. Implement
 
-Build from the plan. Prefer a **fresh chat** (or a `/goal` for a long-lived objective) so implementation context is not polluted by all the exploration.
+Build from `plan.md` and `tasks.md`. Prefer a **fresh chat** so implementation context is not polluted by all the exploration. `/crav1-implement-task` is one `T#`. `/crav1-complete-task` is that `T#` in an isolated worker.
 
-Steer with queued follow-ups rather than interrupting mid-tool-call unless you need to redirect now. Use checkpoints if the agent diverges; Cursor’s docs recommend **reverting, tightening the plan, and rebuilding** instead of endless patch prompts.
+If the agent diverges, revert, tighten the plan, and rebuild instead of endless patch prompts.
 
 Verify the same way a human would: tests, linters, and for UI work, the browser tools.
 
 ### E. Review and close the loop
 
-Use `/review`, Bugbot, or a dedicated review subagent. Diff against the spec, not against “does it look plausible.” If behavior drifted, update the spec first, then the code. Archive or mark the change done so the next agent does not treat an in-flight proposal as current law.
+Use a review pass or the kit’s review subagent. Diff against the spec, not against “does it look plausible.” If behavior drifted, update the spec first, then the code. Archive or mark the change done so the next agent does not treat an in-flight proposal as current law.
 
 ---
 
 ## 6. How to set it up
 
-You can stay native to Cursor, or layer Spec Kit / OpenSpec on top. Native Cursor is enough for most teams; the toolkits add templates and slash-command discipline.
+The loop above is the method. Optional template families are in step 5. Where the kit files go on each host is [docs/install.md](docs/install.md).
 
 ### Step 1 — Standing instructions
 
-At the repo root, add `AGENTS.md` with only what is true for every session: language, test command, architecture boundaries, “do not” list.
+Keep project instructions short: language, test command, architecture boundaries, “do not” list. Where that file lives on Cursor or Claude Code is [docs/install.md](docs/install.md).
 
-Add `.cursor/rules/*.mdc` when guidance is **scoped**:
-
-- `alwaysApply: true` — rare, tiny, global (copyright header, never edit `dist/`)
-- `globs` — frontend vs backend conventions
-- `description` + intelligent apply — domain workflows
-- Manual `@rule` — occasional playbooks you have not turned into skills yet
-
-Cursor’s rule hygiene: keep each rule under ~500 lines, split by concern, **point at example files** instead of pasting style guides, and add a rule only after the agent repeats a mistake. Team Rules (Team/Enterprise) override project and user rules when they conflict.
+Keep each instruction under a few hundred lines, split by concern, **point at example files** instead of pasting style guides, and add one only after the agent repeats a mistake.
 
 ### Step 2 — Spec layout in git
 
@@ -267,20 +258,17 @@ docs/specs/
     tasks.md
     verify.md
     fix-log.md
-AGENTS.md
-.cursor/rules/
-.cursor/skills/      # or .agents/skills/
 ```
 
-Save Plan Mode output into `docs/specs/<change>/plan.md` so Cloud Agents and teammates see it.
+`/crav1-plan-from-spec` writes `plan.md` and `tasks.md` into that folder so teammates see them.
 
-### Step 3 — Skills and Custom Modes
+### Step 3 — Skills
 
-Create skills with `/create-skill`. New **crav1** skills go under `.cursor/skills/crav1/crav1-<name>/` with `name: crav1-<name>` so `/crav1` lists your library separately from Cursor built-ins. Keep `SKILL.md` short; put templates in that skill’s `assets/` (and `references/` for recipes).
+Kit skills are the playbooks. Type `/crav1`. Where the files go, and how a slash command shows up on each host, is [docs/install.md](docs/install.md). Keep `SKILL.md` short; put templates in that skill’s `assets/` (and `references/` for recipes).
 
-Install into another repo: [docs/install.md](docs/install.md). Drop-in copy is `.cursor/skills/crav1/`, `.cursor/agents/crav1-*.md`, `.cursor/agent-assets/crav1-*`, and `.cursor/rules/crav1.mdc`. Plugin install uses `plugins/crav1/` plus `.cursor-plugin/marketplace.json`. Also copy `docs/specs/_template/` and `docs/system/_template/` if you want visible starter folders.
+Also copy `docs/specs/_template/` and `docs/system/_template/` if you want visible starter folders.
 
-When you change a template, update `docs/specs/_template/` **and** every `assets/` / `agent-assets/` copy on **both** the drop-in tree and `plugins/crav1/` (`scripts/sync-crav1-plugin.sh`). Rule: `.cursor/rules/kit-maintainer.mdc` (kit repo only; do not dump with `crav1-*`).
+When you change a template in this kit repo, update `docs/specs/_template/` **and** every `assets/` / `agent-assets/` copy, then run `scripts/sync-crav1-plugin.sh` so the Cursor plugin mirror and the generated `.claude/` tree match. The maintainer rule stays in this kit repo (do not dump it with `crav1-*`). See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 This repo already ships:
 
@@ -312,42 +300,28 @@ This repo already ships:
 - subagent `crav1-complete-task-agent` — worker for `/crav1-complete-task` / `/crav1-complete-tasks` / `/crav1-complete-features` (one `T#`)
 - subagent `crav1-intake-slice-agent` — worker for `/crav1-intake-to-specs` (one feature slug)
 
-Invoke with `/skill-name`, or pin a skill as a **Custom Mode** (`Option+Enter` / `Alt+Enter`) so it stays on for the session (for example `/crav1-implement-task` while you burn down `T#`s).
+Invoke with `/skill-name` (for example `/crav1-implement-task` while you burn down `T#`s).
 
 ### Step 4 — Verification as part of the environment
 
-An agent that cannot run tests will guess. Locally: document the exact test/lint/dev commands in `AGENTS.md`. For Cloud Agents, this is the highest-leverage setup: a real environment (deps, secrets, startup, network policy) so the agent can build, test, and use the browser. Cursor’s docs compare skipping this to “not giving engineers a computer.”
+An agent that cannot run tests will guess. Document the exact test, lint, and dev commands in the project instructions. A real environment (deps, secrets, startup) is what lets the agent build, test, and check the UI.
 
-Optional: `.cursor/hooks.json` to format, block forbidden paths, or run checks after edits. Cloud Agents pick up **project** hooks, not your `~/.cursor/hooks.json`.
+### Step 5 — Optional template families
 
-### Step 5 — Optional toolkits
+**GitHub Spec Kit** is a heavier, gated specify → plan → tasks → implement loop. **OpenSpec** is lighter and iterative: propose → apply → verify → archive. You do not need either one to use this kit. This kit’s plan is `plan.md` and `tasks.md` from `/crav1-plan-from-spec`.
 
-**Spec Kit** (heavier, gated phases, great for greenfield and org-wide process):
+### Step 6 — Day-to-day
 
-```bash
-uv tool install specify-cli --from git+https://github.com/github/spec-kit.git
-specify init . --ai cursor
-```
-
-Then use its constitution → specify → plan → tasks → implement skills/commands. There is a Cursor integration; if a named integration is missing, the generic agent path still works.
-
-**OpenSpec** (lighter, iterative, better for existing codebases): keep delta specs per change; propose → apply → verify → archive without requiring a full waterfall.
-
-You do not need both. Pick one template family and stay consistent.
-
-### Step 6 — Day-to-day in the product
-
-1. Open Agent (`Cmd/Ctrl+I`).
-2. For a sizable change: Plan Mode (`Shift+Tab`).
-3. Answer questions; edit the plan; **Save to workspace**.
-4. Build. Watch diffs. Run tests.
-5. If wrong: restore checkpoint, edit the plan, rebuild.
-6. For long objectives: `/goal …` (optionally with a Custom Mode and `/loop`).
-7. For parallel or unattended work: kick a **Cloud Agent** from desktop, [cursor.com/agents](https://cursor.com/agents), Slack, or `@cursor` on an issue/PR — after source control is connected.
+1. Open an agent chat in the product repo.
+2. For a spark, ideas, or intake: the matching `/crav1-…` command. Do not start in the host plan UI.
+3. Accept `spec.md`. Then `/crav1-plan-from-spec` and accept `plan.md` / `tasks.md`.
+4. `/crav1-implement-task` or `/crav1-complete-task` for one `T#`. Watch diffs. Run the task’s verify step.
+5. If wrong: fix the spec or the plan, then rebuild.
+6. `/crav1-verify-spec` when you want the acceptance matrix. Inner-loop gaps go to `/crav1-fix-from-verify`.
 
 ---
 
-## 7. Best practices (Cursor + Spec Kit + OpenSpec)
+## 7. Best practices
 
 **Make intent unambiguous.** Models complete patterns; they do not read your mind. “Add photo sharing” hides thousands of decisions. Specs surface them before code exists.
 
@@ -363,13 +337,13 @@ You do not need both. Pick one template family and stay consistent.
 
 **Use the right model for the phase.** Planning and specification benefit from stronger reasoning. Mechanical, well-specified tasks can use a faster/cheaper model.
 
-**Verify against the spec, not the story.** Tests, browser flows, and `/review` should trace back to acceptance criteria. “Looks good” is not a gate.
+**Verify against the spec, not the story.** Tests and browser flows should trace back to acceptance criteria. “Looks good” is not a gate.
 
-**When implementation diverges, repair the spec.** Cursor: revert, refine the plan, rebuild. Spec Kit: the spec remains the living artifact. OpenSpec: update any artifact; then apply again.
+**When implementation diverges, repair the spec.** Revert, refine the plan, rebuild. The spec remains the living artifact.
 
 **Start simple, then encode mistakes.** Do not pre-write 40 rules. Add a rule or skill when you see a repeated failure. Check them into git.
 
-**Cloud agents need the same contract.** Project skills, `AGENTS.md`, workspace plans, and hooks travel with the repo. Personal `~/.cursor` skills and hooks do not, unless you sync skills for Cloud Agents.
+**A project install travels with the repo.** Project skills, project instructions, and `plan.md` are in git. A user-scope install does not land in the repo. See [docs/install.md](docs/install.md).
 
 **Do not confuse checkpoints with Git.** Checkpoints undo agent file changes in a session. Specs, plans, and finished work belong in version control.
 
@@ -443,22 +417,13 @@ Stack, compatibility, performance, security.
 
 ## Support
 
-Broken skill or install: open a [GitHub Issue](https://github.com/Crav1on/crav1-spec-kit/issues). Include your Cursor version, install path (drop-in, team marketplace, or local plugin), the command you ran, and what you expected versus what happened. Details: [SUPPORT.md](SUPPORT.md).
+Broken skill or install: open a [GitHub Issue](https://github.com/Crav1on/crav1-spec-kit/issues). Include the host and version, the install path, the command you ran, and what you expected versus what happened. Details: [SUPPORT.md](SUPPORT.md).
 
 ---
 
 ## Further reading
 
-- [Kit repository](https://github.com/Crav1on/crav1-spec-kit) · [First 15 minutes](docs/first-run.md) · [Installing and using the kit](docs/install.md) · [Guild routing](docs/guild-routing.md) · [Plugin quick start](plugins/crav1/README.md) · [Changelog](CHANGELOG.md) · [Contributing](CONTRIBUTING.md) · [Support](SUPPORT.md) · [MIT License](LICENSE)
-- [Cursor documentation hub](https://cursor.com/docs/)
-- [Plugins](https://cursor.com/docs/plugins) · [Plugins reference](https://cursor.com/docs/reference/plugins)
-- [Plan Mode](https://cursor.com/docs/agent/plan-mode) · [Introducing Plan Mode](https://cursor.com/blog/plan-mode)
-- [Agent overview](https://cursor.com/docs/agent/overview)
-- [Rules and AGENTS.md](https://cursor.com/docs/rules)
-- [Agent Skills](https://cursor.com/docs/skills)
-- [Cloud Agents](https://cursor.com/docs/cloud-agent)
-- [Hooks](https://cursor.com/docs/hooks)
-- [Subagents](https://cursor.com/docs/subagents)
+- [Kit repository](https://github.com/Crav1on/crav1-spec-kit) · [First 15 minutes](docs/first-run.md) · [Installing and using the kit](docs/install.md) · [Guild routing](docs/guild-routing.md) · [Cursor plugin quick start](plugins/crav1/README.md) · [Changelog](CHANGELOG.md) · [Contributing](CONTRIBUTING.md) · [Support](SUPPORT.md) · [MIT License](LICENSE)
 - [GitHub Spec Kit](https://github.com/github/spec-kit/) · [GitHub Blog on SDD](https://github.blog/ai-and-ml/generative-ai/spec-driven-development-with-ai-get-started-with-a-new-open-source-toolkit/)
 - [OpenSpec](https://github.com/Fission-AI/OpenSpec)
 - [MADR (Markdown Architectural Decision Records)](https://adr.github.io/madr/)

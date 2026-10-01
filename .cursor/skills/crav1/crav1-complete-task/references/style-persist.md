@@ -2,15 +2,19 @@
 
 Same files as `/crav1-finalize-commit` / `/crav1-draft-commit-message`. After this, **every** later draft in this repo uses that style until they delete the rule file.
 
-If a persist rule already exists (`.cursor/rules/draft-commit-style.mdc` or `draft-commit-gitlog.mdc`, or legacy `gitkraken-commit-*.mdc`): **do not ask**. Use it.
+If a persist rule already exists, **do not ask**. Use it. Cursor and Claude Code both count.
+
+- Cursor: `.cursor/rules/draft-commit-style.mdc` or `.cursor/rules/draft-commit-gitlog.mdc` (legacy `.cursor/rules/gitkraken-commit-style.mdc` or `.cursor/rules/gitkraken-commit-gitlog.mdc`)
+- Claude Code project: `.claude/rules/draft-commit-style.md` or `.claude/rules/draft-commit-gitlog.md` (legacy `.claude/rules/gitkraken-commit-style.md` or `.claude/rules/gitkraken-commit-gitlog.md`)
+- Claude Code user: `~/.claude/rules/draft-commit-style.md` or `~/.claude/rules/draft-commit-gitlog.md` (legacy `~/.claude/rules/gitkraken-commit-style.md` or `~/.claude/rules/gitkraken-commit-gitlog.md`)
 
 If none exists: **do not start implement**. Ask (questions tool OK). Only these two (both write a rule — there is no “this run only”):
 
 | Id | Choice | Disk |
 | --- | --- | --- |
-| `onward` | `style.md`, this commit and onward | Write `draft-commit-style.mdc` from `crav1-draft-commit-message` `assets/draft-commit-style.mdc`. Delete any git-log persist (including legacy). |
-| `log-onward` | Git log, this commit and onward | Write `draft-commit-gitlog.mdc` from that skill’s `assets/`. Delete any style.md persist (including legacy). |
+| `onward` | `style.md`, this commit and onward | Write the style rule from `crav1-draft-commit-message` `assets/draft-commit-style.mdc`. Cursor: `.cursor/rules/draft-commit-style.mdc`. Claude Code project: `.claude/rules/draft-commit-style.md`. Claude Code user, when the kit is not in this repo’s git: `~/.claude/rules/draft-commit-style.md`. Delete any git-log persist (including legacy). |
+| `log-onward` | Git log, this commit and onward | Write the git-log rule from that skill’s `assets/draft-commit-gitlog.mdc`. Cursor: `.cursor/rules/draft-commit-gitlog.mdc`. Claude Code project: `.claude/rules/draft-commit-gitlog.md`. Claude Code user, when the kit is not in this repo’s git: `~/.claude/rules/draft-commit-gitlog.md`. Delete any style.md persist (including legacy). |
 
-Templates: drop-in `.cursor/skills/crav1/crav1-draft-commit-message/assets/` or plugin sibling `skills/crav1-draft-commit-message/assets/`.
+Templates: drop-in `.cursor/skills/crav1/crav1-draft-commit-message/assets/` or plugin sibling `skills/crav1-draft-commit-message/assets/`. Claude Code reads the same assets from `.claude/skills/crav1-draft-commit-message/assets/` or `~/.claude/skills/crav1-draft-commit-message/assets/`.
 
 Tell them they undo by deleting that rule file.

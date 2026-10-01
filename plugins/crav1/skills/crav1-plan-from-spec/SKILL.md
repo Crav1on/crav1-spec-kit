@@ -92,4 +92,4 @@ Do not start coding in this chat.
 - **Refuse application code** — no feature files, no refactors, no “quick scaffold.” If they ask to build, tell them to start a new chat with the plan attached.
 - Prefer existing repo patterns when a codebase exists.
 - Do not invent endpoints, entities, or screens that the spec does not require.
-- Do not treat Cursor Plan Mode as a substitute for writing `plan.md` unless they said they only want the UI plan and not files.
+- Do not treat the host plan UI (Cursor Plan Mode or Claude Code plan mode) as a substitute for writing `plan.md` and `tasks.md` unless they said they only want the UI plan and not files. The skill still writes both files.
