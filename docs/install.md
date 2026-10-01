@@ -168,9 +168,9 @@ Onward commit style on a client repo writes `~/.claude/rules/draft-commit-style.
 
 Cursor `model: inherit` is omitted. Claude Code’s default is the parent model ([subagents](https://code.claude.com/docs/en/sub-agents)). The three reviewers (`crav1-spec-reviewer-agent`, `crav1-architecture-reviewer-agent`, `crav1-plan-reviewer-agent`) set `tools: Read, Grep, Glob` instead of Cursor `readonly: true`. The two writers omit `tools`, so they can edit.
 
-### Not a supported trial yet
+### Tried on Claude Code
 
-The files and the sync are in the kit. Claude Code is not called supported until someone runs `/crav1-spark-to-spec` through one task on Claude Code.
+On Claude Code 2.1.286, in a private throwaway git repo, the generated `.claude/` drop-in ran `/crav1-spark-to-spec`, `/crav1-plan-from-spec`, one implement task, and `/crav1-verify-spec`. The trial feature was a root `hello.txt` of exactly the five bytes `68 65 6c 6c 6f`. Verify passed. Nothing from that repo was pushed. Two frictions: a PowerShell byte-dump that uses a script block was blocked by Claude Code’s permission check, and the same bytes were checked another way; the feature-branch skill wants a clean tree, and the branch was created with the kit files still untracked.
 
 ## After install
 
