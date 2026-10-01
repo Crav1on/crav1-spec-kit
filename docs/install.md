@@ -2,7 +2,7 @@
 
 Read this **before** you put **CRAV1 Spec Kit** in a project. It covers what you get, which host and scope to pick, and where files go. It is not the full playbook. The thin path after you pick an install is [first-run.md](first-run.md).
 
-The method (specs, `plan.md`, `tasks.md`, verify) is [README.md](../README.md), [from-nothing.md](from-nothing.md), [from-ideas.md](from-ideas.md), and [from-intake.md](from-intake.md). This file is the host detail those pages leave out.
+The method (specs, `plan.md`, `tasks.md`, verify) is [README.md](../README.md), [from-nothing.md](from-nothing.md), [from-ideas.md](from-ideas.md), [from-intake.md](from-intake.md), and [from-match.md](from-match.md). This file is the host detail those pages leave out.
 
 Kit home: [https://github.com/Crav1on/crav1-spec-kit](https://github.com/Crav1on/crav1-spec-kit). License: [MIT](../LICENSE).
 
@@ -177,7 +177,7 @@ The files and the sync are in the kit. Claude Code is not called supported until
 New to the loop? [First 15 minutes](first-run.md): open the product repo → `/crav1` → `/crav1-spark-to-spec` → tighten → plan → one task.
 
 1. Open an agent chat in the **product** repo.
-2. Type `/crav1` and run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, or `/crav1-intake-to-specs`. Brownfield: expect a branch prompt (`feat/<slug>` or `spec/<slug>`).
+2. Type `/crav1` and run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, or `/crav1-match-to-specs`. Brownfield: expect a branch prompt (`feat/<slug>` or `spec/<slug>`).
 3. Follow the command loop. Do not start in the host plan UI or by picking a stack. `/crav1-plan-from-spec` writes `plan.md` and `tasks.md`.
 
 `/crav1-complete-tasks`, standalone `/crav1-complete-task`, and `/crav1-complete-features` **pause once** before the first worker, wait for `continue` / `click`, then remind you how to restore the previous gate when the run ends. On Cursor that gate is Approvals & Execution. On Claude Code it is the permission prompt (`/permissions`); the skill does not set a permission mode. Workers launched by those orchestrators do not pause again. The skill cannot change host settings for you.
@@ -216,5 +216,6 @@ The kit is at [https://github.com/Crav1on/crav1-spec-kit](https://github.com/Cra
 | One-sentence spark | [docs/from-nothing.md](from-nothing.md) |
 | Pile of ideas + tech hunches | [docs/from-ideas.md](from-ideas.md) |
 | Mixed files / several features or repos | [docs/from-intake.md](from-intake.md) |
+| Existing repos plus a dump to match | [docs/from-match.md](from-match.md) |
 | The method (specs, plan files, tasks, verify) | [README.md](../README.md) |
 | Which lane owns a `/crav1-…` skill or `*-agent` | [guild-routing.md](guild-routing.md) |

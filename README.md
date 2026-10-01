@@ -1,6 +1,6 @@
 # CRAV1 Spec Kit (crav1)
 
-**CRAV1 Spec Kit** (`crav1`) is a kit for spec-driven development: skills and agents that take a spark, a pile of ideas, or intake files through spec, plan, implement, verify, and a draft commit message. Specs, not chat history, are the source of truth. A short project instruction ships with the install.
+**CRAV1 Spec Kit** (`crav1`) is a kit for spec-driven development: skills and agents that take a spark, a pile of ideas, intake files, or a match of existing repos to a dump through spec, plan, implement, verify, and a draft commit message. Specs, not chat history, are the source of truth. A short project instruction ships with the install.
 
 Repo: [crav1-spec-kit](https://github.com/Crav1on/crav1-spec-kit). Cursor plugin id: `crav1`. After install, type `/crav1`.
 
@@ -135,6 +135,7 @@ Runnable pieces in this repo:
 | Skill `/crav1-merge-pr` | This turn explicitly asks to merge a named pull request | Merge commit only (`gh pr merge --merge` or Azure `noFastForward`). Parents counted with `git rev-list` after the completed re-read. No squash, rebase, or policy bypass |
 | Skill `/crav1-ideas-to-spec` | Pile of ideas + technical hunches | Slash command; pick an export format. Seeds a thin `docs/system/` when missing, then the spec, then one index row. On Azure Repos, one optional work-item id after a new spec folder |
 | Skill `/crav1-intake-to-specs` | 1–N files; maybe several features/repos | Slash command; landscape + one spec per v0 slug. On Azure Repos, one optional work-item question listing the new slugs |
+| Skill `/crav1-match-to-specs` | Existing repos plus a dump to match | Slash command; where the specs go, then one spec per slice (done, partial, or not in the code). Does not plan or commit |
 | Skill `/crav1-export-spec` | Spec exists, want another format | Slash command |
 | Subagent `crav1-spec-reviewer-agent` | Independent product/spec critique | Agent delegates, or ask “review this spec” |
 | Subagent `crav1-architecture-reviewer-agent` | Diagrams, ADRs, hunches vs decisions | Agent delegates |
@@ -178,7 +179,26 @@ Do not write code. Map first.
 
 Default if you only `@` a codebase: new system, that code is **context** (not extract-as-is). The parent confirms a map (slugs, repos, bulk assumptions, mushy vs ready), writes `docs/system/`, then one isolated worker per v0 slug. Then it **prompts** `/crav1-finalize-commit` (does not commit itself). Later features use spark or ideas. When `docs/system/` already exists, `@` it, use a new slug, and add an index row. When it is missing, those commands seed a thin landscape. Do not re-run intake.
 
-## 5. The working loop (once a spec exists)
+## 5. From existing repos and a dump
+
+When one or more repos already make up a system, and a dump (notes, tickets, old docs, diagrams, screenshots) is what to match against that code, use **`/crav1-match-to-specs`**. The repos are evidence of what exists. The dump is not a brief for a new product. Full walkthrough: [From existing repos and a dump to specs](docs/from-match.md).
+
+This does not replace `/crav1-intake-to-specs`, `/crav1-spark-to-spec`, or `/crav1-ideas-to-spec`.
+
+**First prompt:**
+
+```text
+/crav1-match-to-specs
+@repo-a/
+@repo-b/
+@notes/old-spec.md
+
+The repos are what exists. The dump is what to match. Do not write code.
+```
+
+The command asks where the spec files go (one repo already in front of it, or a new clean repo), then stops on a map: slice, repo, and done / partial / not in the code. After that map is confirmed, one branch carries the dump, then `docs/system/` and one spec per slice. It prompts `/crav1-finalize-commit` and does not plan a slice that is not in the code.
+
+## 6. The working loop (once a spec exists)
 
 Use this on any non-trivial change.
 
@@ -223,7 +243,7 @@ Use a review pass or the kit’s review subagent. Diff against the spec, not aga
 
 ---
 
-## 6. How to set it up
+## 7. How to set it up
 
 The loop above is the method. Optional template families are in step 5. Where the kit files go on each host is [docs/install.md](docs/install.md).
 
@@ -235,7 +255,7 @@ Keep each instruction under a few hundred lines, split by concern, **point at ex
 
 ### Step 2 — Spec layout in git
 
-The layout always includes `docs/system/`. Spark and ideas seed a thin landscape when that folder is missing (greenfield or an existing app) and leave an existing landscape in place, adding one index row. Intake writes `docs/system/` and does not skip it.
+The layout always includes `docs/system/`. Spark and ideas seed a thin landscape when that folder is missing (greenfield or an existing app) and leave an existing landscape in place, adding one index row. Intake writes `docs/system/` and does not skip it. Match writes `docs/system/` from the repos and the confirmed match when that folder is missing, and only fills gaps the match needs when it already exists.
 
 A layout that works without extra CLIs:
 
@@ -278,6 +298,7 @@ This repo already ships:
 - `/crav1-feature-branch` — prompt for `feat/<slug>` or specify-only `spec/<slug>`; no silent checkout, no push, no PR
 - `/crav1-ideas-to-spec` — idea pile + technical hunches → thin `docs/system/` when missing, then spec, diagrams, ADRs, chosen export, then one index row. An existing landscape is left in place. On Azure Repos, offers once to write `work-item.md`
 - `/crav1-intake-to-specs` — mixed intake → `docs/system/` + one spec per v0 feature (isolated slice workers). On Azure Repos, one optional work-item question for the new slugs
+- `/crav1-match-to-specs` — existing repos plus a dump → where the spec files go, then `docs/system/` and one spec per confirmed slice (done, partial, or not in the code). Not intake, spark, or ideas. Does not plan, implement, or commit
 - `/crav1-architecture-reviewer` — run the crav1-architecture-reviewer-agent subagent; numbered issues at the end
 - `/crav1-tighten-spec` — one issue at a time, with explained resolutions (plus get a suggestion) and impact; patch only that issue after you choose
 - `/crav1-resolve-questions` — one Open question at a time; keep it open or answer with impact; patch only that `Q#`
@@ -315,7 +336,7 @@ An agent that cannot run tests will guess. Document the exact test, lint, and de
 ### Step 6 — Day-to-day
 
 1. Open an agent chat in the product repo.
-2. For a spark, ideas, or intake: the matching `/crav1-…` command. Do not start in the host plan UI.
+2. For a spark, ideas, intake, or match: the matching `/crav1-…` command. Do not start in the host plan UI.
 3. Accept `spec.md`. Then `/crav1-plan-from-spec` and accept `plan.md` / `tasks.md`.
 4. `/crav1-implement-task` or `/crav1-complete-task` for one `T#`. Watch diffs. Run the task’s verify step.
 5. If wrong: fix the spec or the plan, then rebuild.
@@ -323,7 +344,7 @@ An agent that cannot run tests will guess. Document the exact test, lint, and de
 
 ---
 
-## 7. Best practices
+## 8. Best practices
 
 **Make intent unambiguous.** Models complete patterns; they do not read your mind. “Add photo sharing” hides thousands of decisions. Specs surface them before code exists.
 
@@ -351,7 +372,7 @@ An agent that cannot run tests will guess. Document the exact test, lint, and de
 
 ---
 
-## 8. Minimal templates
+## 9. Minimal templates
 
 Copy these into `docs/specs/<change>/`. They match [`docs/specs/_template/`](docs/specs/_template/) (`## Trace` on the plan; each task row has `(verify: …) (spec: …)`).
 
