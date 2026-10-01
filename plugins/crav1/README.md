@@ -10,9 +10,9 @@ Type `/crav1` in Agent chat to list commands.
 
 **Specify**
 
-- `/crav1-spark-to-spec` — one or two sentences → questions → `docs/specs/<slug>/spec.md` (greenfield, a feature on an existing app, or a later feature on `docs/system/`). On Azure Repos, one optional work-item id after a new spec folder
+- `/crav1-spark-to-spec` — one or two sentences → questions → thin `docs/system/` when missing, then `docs/specs/<slug>/spec.md`, then one index row (greenfield, a feature on an existing app, or a later feature on an existing landscape). An existing landscape is left in place. On Azure Repos, one optional work-item id after a new spec folder
 - `/crav1-feature-branch` — `feat/<slug>` (spec+build) or `spec/<slug>` then later `feat/<slug>` (specify while another feature builds); no push, no PR
-- `/crav1-ideas-to-spec` — idea pile + technical hunches → spec, diagrams, ADRs, export format. On Azure Repos, one optional work-item id after a new spec folder
+- `/crav1-ideas-to-spec` — idea pile + technical hunches → thin `docs/system/` when missing, then spec, diagrams, ADRs, export format, then one index row. An existing landscape is left in place. On Azure Repos, one optional work-item id after a new spec folder
 - `/crav1-intake-to-specs` — mixed intake → `docs/system/` + one spec per v0 feature. On Azure Repos, one optional work-item question listing the new slugs
 - `/crav1-architecture-reviewer` — runs the architecture critic; numbered issues (`I#`)
 - `/crav1-tighten-spec` — one issue at a time; you pick (or ask for a suggestion); it patches only that issue

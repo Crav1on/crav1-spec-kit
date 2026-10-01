@@ -64,7 +64,7 @@ docs/specs/<slug>/
   export/
 ```
 
-Human starter copies: `docs/system/_template/` (same files as skill `crav1-intake-to-specs` `assets/` for landscape). Feature spec shape matches ideas-to-spec plus **Repos**, **Constraints**, **Assumptions**, **Trace**.
+Human starter copies: `docs/system/_template/` (same files as skill `crav1-intake-to-specs` `assets/` for landscape, and as `assets/system/` on `crav1-spark-to-spec` and `crav1-ideas-to-spec`). Feature spec shape matches ideas-to-spec plus **Repos**, **Constraints**, **Assumptions**, **Trace**.
 
 ## Later features
 
@@ -78,7 +78,7 @@ Do not run `/crav1-intake-to-specs` again.
 Spark: <the new feature>
 ```
 
-Or `/crav1-ideas-to-spec` if the new thing is already a pile. **New slug.** If you need a new repo: landscape ADR + `repos.md` row, then the spec, then an index row.
+Or `/crav1-ideas-to-spec` if the new thing is already a pile. **New slug.** If `docs/system/` is missing, spark and ideas seed a thin landscape from the repo, then the spec, then one index row. They do not rewrite a landscape this command already wrote, and they do not re-run intake. If you need a new repo: landscape ADR + `repos.md` row, then the spec, then an index row.
 
 ## After Index
 
