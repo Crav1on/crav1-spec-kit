@@ -4,8 +4,8 @@ Use [GitHub Issues](https://github.com/Crav1on/crav1-spec-kit/issues) on [crav1-
 
 Include:
 
-- **Cursor version** (Help → About, or the version string you have).
-- **Install path:** drop-in copy, team marketplace, or local plugin (`~/.cursor/plugins/local/crav1`).
+- **Host and version** (Cursor: Help → About. Claude Code: the version the host prints).
+- **Install path:** Cursor drop-in, team marketplace, or local plugin (`~/.cursor/plugins/local/crav1`); or Claude Code project `.claude/` or user `~/.claude/`.
 - **Command:** the slash command and the spark or task id you passed (for example `/crav1-spark-to-spec`, `/crav1-implement-task` T1).
 - **Expected** versus **what happened** (missing `/crav1`, wrong files written, error text).
 

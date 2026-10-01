@@ -1,4 +1,4 @@
-name: Drop-in and plugin sync
+name: Drop-in, plugin, and Claude sync
 
 on:
   pull_request:
@@ -43,6 +43,18 @@ jobs:
           if find plugins/crav1 -name 'kit-maintainer.mdc' -print | grep -q .; then
             echo "found kit-maintainer.mdc under plugins/crav1/"
             find plugins/crav1 -name 'kit-maintainer.mdc' -print
+            fail=1
+          fi
+
+          echo "== claude drop-in: committed .claude/ must match a fresh generate =="
+          if ! scripts/sync-crav1-claude.sh --check; then
+            fail=1
+          fi
+
+          echo "== kit-maintainer.mdc must not be under .claude/ =="
+          if find .claude -name 'kit-maintainer.mdc' -print | grep -q .; then
+            echo "found kit-maintainer.mdc under .claude/"
+            find .claude -name 'kit-maintainer.mdc' -print
             fail=1
           fi
 

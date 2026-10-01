@@ -1,0 +1,3 @@
+Templates for **crav1** subagents (`crav1-spec-reviewer-agent`, `crav1-architecture-reviewer-agent`, `crav1-plan-reviewer-agent`, `crav1-intake-slice-agent`). Do not put these files under `.claude/agents/` or `plugins/crav1/agents/` — those directories are only for agent prompts (YAML frontmatter + name). The generated Claude tree keeps them out of `.claude/agents/` for the same reason.
+
+This folder is mirrored to `plugins/crav1/agent-assets/` and generated into `.claude/agent-assets/` by `scripts/sync-crav1-plugin.sh`. When you change a template, update `docs/specs/_template/` and `docs/system/_template/`, every skill `assets/` copy, and run that sync. Do not hand-edit the plugin or `.claude/` copies.

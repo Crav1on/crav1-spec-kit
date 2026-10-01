@@ -25,3 +25,6 @@ mkdir -p "$PLUGIN/agent-assets"
 cp -a "$ROOT/.cursor/agent-assets/." "$PLUGIN/agent-assets/"
 
 echo "Synced .cursor/ → plugins/crav1/ (skills, agents, crav1.mdc, agent-assets)"
+
+# Claude Code drop-in is generated. A stale .claude/ fails CI via --check.
+"$ROOT/scripts/sync-crav1-claude.sh"

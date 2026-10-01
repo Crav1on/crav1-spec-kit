@@ -13,6 +13,6 @@ When drafting or creating commits in this repo:
 - Do not use Conventional Commits prefixes (`feat:`, `fix:`, `chore:`).
 - Do not ask whether to use that style. It stays on until this rule is removed.
 
-**To stop and get the once/onward prompt again:** delete this file (`.cursor/rules/draft-commit-style.mdc`). Nothing else to undo.
+**To stop and get the once/onward prompt again:** delete this file. Cursor: `.cursor/rules/draft-commit-style.mdc`. Claude Code project: `.claude/rules/draft-commit-style.md`. Claude Code user: `~/.claude/rules/draft-commit-style.md`. Nothing else to undo.
 
-Only one draft-commit persist rule should exist. If `.cursor/rules/draft-commit-gitlog.mdc` (or a legacy `gitkraken-commit-*.mdc`) is also present, delete one of them.
+Only one draft-commit persist rule should exist. If another one is also present, delete one of them. Cursor git-log file: `.cursor/rules/draft-commit-gitlog.mdc` (legacy `.cursor/rules/gitkraken-commit-gitlog.mdc`). Claude Code project: `.claude/rules/draft-commit-gitlog.md` (legacy `.claude/rules/gitkraken-commit-gitlog.md`). Claude Code user: `~/.claude/rules/draft-commit-gitlog.md` (legacy `~/.claude/rules/gitkraken-commit-gitlog.md`).

@@ -2,6 +2,16 @@
 
 Cursor **Allow / Stop** on a worker (podman, `dotnet`, env secrets, Browser) is the IDE’s **Approvals & Execution** gate. It is **not** kit `fix` / `stop` / `ready`. This skill cannot change Settings or click Allow.
 
+## Claude Code
+
+On Claude Code the host gate is a permission prompt, not Cursor Approvals & Execution. It is still not kit `fix` / `stop` / `ready`. Read-only tools in the working directory do not ask. Bash and file edits ask unless the user already allowed them. The user manages rules with `/permissions`. This skill cannot change those rules and does not set a permission mode. Do not invent one.
+
+Use the same pause as below: once, before the first worker, unless the parent said `approvals: already-done`. `continue` means the user changed what Claude Code may run and will put that back at the end. `click` means they will answer the prompts. `stop` aborts. Skip the Cursor Settings steps. Do not write a kit permissions file.
+
+Undo when the run ends: if they changed permissions, tell them to restore what they had. This skill cannot restore it.
+
+Documented behavior: [Claude Code permissions](https://code.claude.com/docs/en/permissions).
+
 ## Who pauses
 
 | Who is running | Pause with directions? |
@@ -46,7 +56,9 @@ Use when you want fewer prompts but not “run anything.” Safer default if the
 
 Empty Allowlist = ask almost every time (the Allow/Stop spam).
 
-## How to set (local desktop)
+## How to set (Cursor desktop)
+
+Cursor only. On Claude Code, follow **Claude Code** above and skip this section.
 
 **Settings → Agents → Approvals & Execution** (sometimes labeled Run Mode).
 

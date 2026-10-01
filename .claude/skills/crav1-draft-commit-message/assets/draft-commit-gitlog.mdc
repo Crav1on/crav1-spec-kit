@@ -1,0 +1,13 @@
+# Draft-commit git-log style (persistent)
+
+This file was written by `/crav1-draft-commit-message` when you chose **existing git log style, this commit and onward**.
+
+When drafting or creating commits in this repo:
+
+- Match **this repository’s** recent `git log` (subjects and bodies), not `crav1-draft-commit-message/references/style.md`.
+- Do not switch to Conventional Commits unless the live log already uses that shape.
+- Do not ask whether to use git-log style. It stays on until this rule is removed.
+
+**To stop and get the style prompt again:** delete this file. Claude Code project: `.claude/rules/draft-commit-gitlog.md`. Claude Code user: `~/.claude/rules/draft-commit-gitlog.md`. Nothing else to undo.
+
+Only one draft-commit persist rule should exist. If another one is also present, delete one of them. Claude Code project: `.claude/rules/draft-commit-style.md` (legacy `.claude/rules/gitkraken-commit-style.md`). Claude Code user: `~/.claude/rules/draft-commit-style.md` (legacy `~/.claude/rules/gitkraken-commit-style.md`).
