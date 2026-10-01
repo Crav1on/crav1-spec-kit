@@ -21,6 +21,7 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 
 ### Docs
 
+- Plugin author name and marketplace owner name stay **Crav1**. There is no author email. Questions, bugs, and requests go to GitHub Issues on this repo ([SUPPORT.md](SUPPORT.md)). [LICENSE](LICENSE) is unchanged.
 - [README.md](README.md), [docs/from-nothing.md](docs/from-nothing.md), [docs/from-ideas.md](docs/from-ideas.md), [docs/from-intake.md](docs/from-intake.md), and [docs/first-run.md](docs/first-run.md) describe the method (specs, `plan.md`, `tasks.md`, verify). Host file locations, slash-command install, and the note that each host’s plan UI is not `plan.md` are in [docs/install.md](docs/install.md). Guild routing is unchanged.
 - [docs/from-ideas.md](docs/from-ideas.md), [docs/from-nothing.md](docs/from-nothing.md), and [docs/from-intake.md](docs/from-intake.md) describe the optional Azure Repos work-item offer when a spec folder is created. [AGENTS.md](AGENTS.md) and the README describe that offer, the merge-pr parent count, and the Windows `@file` description. Guild routing is unchanged.
 - [docs/from-ideas.md](docs/from-ideas.md) documents the optional `docs/specs/<slug>/work-item.md` mention. Starter: [docs/specs/_template/work-item.md](docs/specs/_template/work-item.md).
