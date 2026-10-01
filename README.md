@@ -136,6 +136,7 @@ Runnable pieces in this repo:
 | Skill `/crav1-ideas-to-spec` | Pile of ideas + technical hunches | Slash command; pick an export format. Seeds a thin `docs/system/` when missing, then the spec, then one index row. On Azure Repos, one optional work-item id after a new spec folder |
 | Skill `/crav1-intake-to-specs` | 1–N files; maybe several features/repos | Slash command; landscape + one spec per v0 slug. On Azure Repos, one optional work-item question listing the new slugs |
 | Skill `/crav1-match-to-specs` | Existing repos plus a dump to match | Slash command; where the specs go, then one spec per slice (done, partial, or not in the code). Does not plan or commit |
+| Skill `/crav1-add-to-spec` | New information for one existing spec | Slash command; adds it to that spec, then reports impact on the landscape or other specs before editing them. Does not plan or commit |
 | Skill `/crav1-export-spec` | Spec exists, want another format | Slash command |
 | Subagent `crav1-spec-reviewer-agent` | Independent product/spec critique | Agent delegates, or ask “review this spec” |
 | Subagent `crav1-architecture-reviewer-agent` | Diagrams, ADRs, hunches vs decisions | Agent delegates |
@@ -201,6 +202,8 @@ The command asks where the spec files go (one repo already in front of it, or a 
 ## 6. The working loop (once a spec exists)
 
 Use this on any non-trivial change.
+
+New information aimed at one spec that already exists is **`/crav1-add-to-spec`**. Full walkthrough: [From new information to an existing spec](docs/from-add.md). `/crav1-tighten-spec` stays for mushy wording. Match, intake, spark, and ideas create the folders. This command does not plan.
 
 ### A. Specify (read-heavy)
 
@@ -299,6 +302,7 @@ This repo already ships:
 - `/crav1-ideas-to-spec` — idea pile + technical hunches → thin `docs/system/` when missing, then spec, diagrams, ADRs, chosen export, then one index row. An existing landscape is left in place. On Azure Repos, offers once to write `work-item.md`
 - `/crav1-intake-to-specs` — mixed intake → `docs/system/` + one spec per v0 feature (isolated slice workers). On Azure Repos, one optional work-item question for the new slugs
 - `/crav1-match-to-specs` — existing repos plus a dump → where the spec files go, then `docs/system/` and one spec per confirmed slice (done, partial, or not in the code). Not intake, spark, or ideas. Does not plan, implement, or commit
+- `/crav1-add-to-spec` — new information for one existing spec → quote it into that `spec.md`, then report whether the landscape or another spec has to change. Does not rewrite those other files unless asked. Does not plan, implement, or commit
 - `/crav1-architecture-reviewer` — run the crav1-architecture-reviewer-agent subagent; numbered issues at the end
 - `/crav1-tighten-spec` — one issue at a time, with explained resolutions (plus get a suggestion) and impact; patch only that issue after you choose
 - `/crav1-resolve-questions` — one Open question at a time; keep it open or answer with impact; patch only that `Q#`
@@ -336,7 +340,7 @@ An agent that cannot run tests will guess. Document the exact test, lint, and de
 ### Step 6 — Day-to-day
 
 1. Open an agent chat in the product repo.
-2. For a spark, ideas, intake, or match: the matching `/crav1-…` command. Do not start in the host plan UI.
+2. For a spark, ideas, intake, match, or new information on an existing spec: the matching `/crav1-…` command. Do not start in the host plan UI.
 3. Accept `spec.md`. Then `/crav1-plan-from-spec` and accept `plan.md` / `tasks.md`.
 4. `/crav1-implement-task` or `/crav1-complete-task` for one `T#`. Watch diffs. Run the task’s verify step.
 5. If wrong: fix the spec or the plan, then rebuild.

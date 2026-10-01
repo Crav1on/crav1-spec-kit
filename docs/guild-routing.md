@@ -14,6 +14,7 @@ Skill slash names are `/crav1-…`. Subagent names end in `-agent`.
 | Skill | `/crav1-ideas-to-spec` |
 | Skill | `/crav1-intake-to-specs` |
 | Skill | `/crav1-match-to-specs` |
+| Skill | `/crav1-add-to-spec` |
 | Skill | `/crav1-architecture-reviewer` |
 | Skill | `/crav1-tighten-spec` |
 | Skill | `/crav1-resolve-questions` |
@@ -80,6 +81,7 @@ specify:
     - crav1-ideas-to-spec
     - crav1-intake-to-specs
     - crav1-match-to-specs
+    - crav1-add-to-spec
     - crav1-architecture-reviewer
     - crav1-tighten-spec
     - crav1-resolve-questions
