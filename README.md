@@ -85,7 +85,7 @@ Quick, well-understood edits (rename, copy tweak, one-file bug with a clear stac
 
 ## 2. From one sentence to a spec
 
-If you have only a spark (one or two sentences), do **not** start in the host plan UI and do not paste a “senior architect” persona. Interview first, write `spec.md`, tighten it, *then* plan — **greenfield or a feature on an existing app**. Full walkthrough: [From one sentence to a spec](docs/from-nothing.md).
+If you have only a spark (one or two sentences), do **not** start in the host plan UI and do not paste a “senior architect” persona. Interview first, write `spec.md`, tighten it, *then* plan — **greenfield or a feature on an existing app**. The layout always includes `docs/system/`. This command seeds a thin landscape when that folder is missing, then the spec, then one index row. An existing landscape is left in place. Full walkthrough: [From one sentence to a spec](docs/from-nothing.md).
 
 **First prompt** (Agent chat, strong reasoning model). Greenfield:
 
@@ -108,13 +108,13 @@ Spark: <one or two sentences for this feature>
 Feature on this app. Preserve existing architecture. Do not write code.
 ```
 
-Then: answer ≤7 questions (and the branch prompt) → agent writes `docs/specs/<slug>/spec.md` → `/crav1-tighten-spec` walks **each** finding → `/crav1-resolve-questions` walks leftover Open questions (keep open or answer) → optional `crav1-spec-reviewer-agent` → **`/crav1-plan-from-spec`** → `/crav1-review-plan` then `/crav1-tighten-plan` for plan `P#`s → `/crav1-implement-task` per `T#` or `/crav1-complete-task` / `/crav1-complete-tasks` (one spec) or `/crav1-complete-features` (several specs, serial) → `/crav1-verify-spec` → `/crav1-fix-from-verify` (omit Gap) for inner-loop remaining: failed → unverified → `G#`.
+Then: answer ≤7 questions (and the branch prompt) → agent seeds a thin `docs/system/` when that folder is missing, writes `docs/specs/<slug>/spec.md`, then adds one landscape index row → `/crav1-tighten-spec` walks **each** finding → `/crav1-resolve-questions` walks leftover Open questions (keep open or answer) → optional `crav1-spec-reviewer-agent` → **`/crav1-plan-from-spec`** → `/crav1-review-plan` then `/crav1-tighten-plan` for plan `P#`s → `/crav1-implement-task` per `T#` or `/crav1-complete-task` / `/crav1-complete-tasks` (one spec) or `/crav1-complete-features` (several specs, serial) → `/crav1-verify-spec` → `/crav1-fix-from-verify` (omit Gap) for inner-loop remaining: failed → unverified → `G#`.
 
 Runnable pieces in this repo:
 
 | Piece | When | How |
 | --- | --- | --- |
-| Skill `/crav1-spark-to-spec` | You have 1–2 sentences (empty repo or a feature on an existing app) | Slash command; greenfield vs brownfield from context. On Azure Repos, one optional work-item id after a new spec folder |
+| Skill `/crav1-spark-to-spec` | You have 1–2 sentences (empty repo or a feature on an existing app) | Slash command; greenfield vs brownfield from context. Seeds a thin `docs/system/` when missing, then the spec, then one index row. On Azure Repos, one optional work-item id after a new spec folder |
 | Skill `/crav1-feature-branch` | Brownfield: get off the default branch | Prompt: `feat/<slug>` (spec+build) or `spec/<slug>` then `feat/<slug>` for build; no push, no PR |
 | Skill `/crav1-architecture-reviewer` | Spec + diagrams/ADRs exist | Slash command; runs the reviewer subagent |
 | Skill `/crav1-tighten-spec` | Spec exists, still mushy | Slash command; one issue at a time (option to get a suggestion); then edit |
@@ -133,7 +133,7 @@ Runnable pieces in this repo:
 | Skill `/crav1-finalize-commit` | Finish a message: git commit, GitKraken copy, or edit | Style first if needed, then draft, then **commit first**, then copy / edit / rewrite / stop; no push. Keeps a trailing work-item mention |
 | Skill `/crav1-open-pr` | Commits exist on `feat/<slug>` or `spec/<slug>` and you want a pull request | Push only after an explicit yes; one PR against the default branch; no merge, no commit. Adds a Work item section when `work-item.md` exists. On Windows, Azure DevOps description is `--description "@<file>"` (UTF-8, no BOM). Later merge is `/crav1-merge-pr` |
 | Skill `/crav1-merge-pr` | This turn explicitly asks to merge a named pull request | Merge commit only (`gh pr merge --merge` or Azure `noFastForward`). Parents counted with `git rev-list` after the completed re-read. No squash, rebase, or policy bypass |
-| Skill `/crav1-ideas-to-spec` | Pile of ideas + technical hunches | Slash command; pick an export format. On Azure Repos, one optional work-item id after a new spec folder |
+| Skill `/crav1-ideas-to-spec` | Pile of ideas + technical hunches | Slash command; pick an export format. Seeds a thin `docs/system/` when missing, then the spec, then one index row. On Azure Repos, one optional work-item id after a new spec folder |
 | Skill `/crav1-intake-to-specs` | 1–N files; maybe several features/repos | Slash command; landscape + one spec per v0 slug. On Azure Repos, one optional work-item question listing the new slugs |
 | Skill `/crav1-export-spec` | Spec exists, want another format | Slash command |
 | Subagent `crav1-spec-reviewer-agent` | Independent product/spec critique | Agent delegates, or ask “review this spec” |
@@ -142,7 +142,7 @@ Runnable pieces in this repo:
 
 ## 3. From a pile of ideas (not a spark, not a spec)
 
-When you already have several ideas and maybe stack opinions, use **`/crav1-ideas-to-spec`**, not `/crav1-spark-to-spec`. Full walkthrough: [From a pile of ideas to a spec](docs/from-ideas.md).
+When you already have several ideas and maybe stack opinions, use **`/crav1-ideas-to-spec`**, not `/crav1-spark-to-spec`. The layout always includes `docs/system/`. This command seeds a thin landscape when that folder is missing, then the spec artifacts, then one index row. An existing landscape is left in place. Full walkthrough: [From a pile of ideas to a spec](docs/from-ideas.md).
 
 **First prompt:**
 
@@ -156,7 +156,7 @@ Treat hunches as proposed, not decided.
 Do not write code. Capture first, then architecture questions.
 ```
 
-Flow: cluster intent vs hunches → product questions if needed → **architecture interview** (≤7 questions, 2–3 options) → write `spec.md` + `diagrams.md` + ADRs + `export/<format>` → optional `/crav1-architecture-reviewer` → `/crav1-plan-from-spec`.
+Flow: cluster intent vs hunches → product questions if needed → **architecture interview** (≤7 questions, 2–3 options) → thin `docs/system/` when that folder is missing, then `spec.md` + `diagrams.md` + ADRs + `export/<format>`, then one landscape index row → optional `/crav1-architecture-reviewer` → `/crav1-plan-from-spec`.
 
 Canonical spec stays Markdown. EARS / BDD / OpenSpec / YAML / JSON / BMAD are exports. Mermaid for context and sequences; ASCII for trees and CLIs. ADRs only when there were real alternatives (MADR-shaped template). If the pile is several v0 features or several repos, `/crav1-ideas-to-spec` stops and you run `/crav1-intake-to-specs` instead.
 
@@ -176,7 +176,7 @@ Treat hunches as proposed, not decided.
 Do not write code. Map first.
 ```
 
-Default if you only `@` a codebase: new system, that code is **context** (not extract-as-is). The parent confirms a map (slugs, repos, bulk assumptions, mushy vs ready), writes `docs/system/`, then one isolated worker per v0 slug. Then it **prompts** `/crav1-finalize-commit` (does not commit itself). Later features use spark/ideas with `@docs/system/` — new slug, do not re-run intake.
+Default if you only `@` a codebase: new system, that code is **context** (not extract-as-is). The parent confirms a map (slugs, repos, bulk assumptions, mushy vs ready), writes `docs/system/`, then one isolated worker per v0 slug. Then it **prompts** `/crav1-finalize-commit` (does not commit itself). Later features use spark or ideas. When `docs/system/` already exists, `@` it, use a new slug, and add an index row. When it is missing, those commands seed a thin landscape. Do not re-run intake.
 
 ## 5. The working loop (once a spec exists)
 
@@ -235,6 +235,8 @@ Keep each instruction under a few hundred lines, split by concern, **point at ex
 
 ### Step 2 — Spec layout in git
 
+The layout always includes `docs/system/`. Spark and ideas seed a thin landscape when that folder is missing (greenfield or an existing app) and leave an existing landscape in place, adding one index row. Intake writes `docs/system/` and does not skip it.
+
 A layout that works without extra CLIs:
 
 ```text
@@ -272,9 +274,9 @@ When you change a template in this kit repo, update `docs/specs/_template/` **an
 
 This repo already ships:
 
-- `/crav1-spark-to-spec` — one-liner → questions → `spec.md` (greenfield, brownfield feature, or later feature on `docs/system/`; new slug unless they extend). On Azure Repos, offers once to write `work-item.md`
+- `/crav1-spark-to-spec` — one-liner → questions → thin `docs/system/` when missing, then `spec.md`, then one index row (greenfield, brownfield feature, or later feature on an existing landscape; new slug unless they extend). An existing landscape is left in place. On Azure Repos, offers once to write `work-item.md`
 - `/crav1-feature-branch` — prompt for `feat/<slug>` or specify-only `spec/<slug>`; no silent checkout, no push, no PR
-- `/crav1-ideas-to-spec` — idea pile + technical hunches → spec, diagrams, ADRs, chosen export. On Azure Repos, offers once to write `work-item.md`
+- `/crav1-ideas-to-spec` — idea pile + technical hunches → thin `docs/system/` when missing, then spec, diagrams, ADRs, chosen export, then one index row. An existing landscape is left in place. On Azure Repos, offers once to write `work-item.md`
 - `/crav1-intake-to-specs` — mixed intake → `docs/system/` + one spec per v0 feature (isolated slice workers). On Azure Repos, one optional work-item question for the new slugs
 - `/crav1-architecture-reviewer` — run the crav1-architecture-reviewer-agent subagent; numbered issues at the end
 - `/crav1-tighten-spec` — one issue at a time, with explained resolutions (plus get a suggestion) and impact; patch only that issue after you choose

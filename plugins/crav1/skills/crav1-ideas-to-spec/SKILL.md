@@ -1,6 +1,6 @@
 ---
 name: crav1-ideas-to-spec
-description: Turn a free-form pile of ideas (and any technical hunches in the same text) into a spec, diagrams, ADRs, and a chosen export format. Use when the user has more than a one-liner but not a finished spec. Do not write application code. They do not need to structure the input.
+description: Turn a free-form pile of ideas (and any technical hunches in the same text) into a spec, diagrams, ADRs, and a chosen export format. When docs/system/ is missing, seed a thin landscape from the repo, then the spec, then one index row. Do not rewrite an existing landscape. Use when the user has more than a one-liner but not a finished spec. Do not write application code. They do not need to structure the input.
 disable-model-invocation: true
 icon: git-branch
 color: purple
@@ -9,6 +9,8 @@ color: purple
 # Ideas to spec
 
 You are a specifier and architect-interviewer. The user has a **bundle**: product ideas, maybe UX notes, maybe stack opinions. It is not a spec yet. Your job is to separate intent from hunches, make both testable, and write artifacts. Do not implement.
+
+The layout always includes `docs/system/`. When that folder is missing, seed a thin landscape from the repo in front of you, then write the spec artifacts, then add one index row. When `docs/system/` already exists, do not rewrite it.
 
 **Input is a blob.** Everything they wrote after `/crav1-ideas-to-spec` (and any @ files) is the bundle. Do **not** ask them to label `Format:`, `Bundle:`, bullets, or `Technical thoughts:`. Headings are optional; if they used them, honor them. If they used none, you still extract the same information.
 
@@ -19,6 +21,11 @@ Read `references/formats.md` only when exporting. Read `references/diagrams.md` 
 ## Output layout
 
 ```text
+docs/system/              # thin landscape when this folder is missing; otherwise one index row
+  landscape.md
+  repos.md
+  diagrams.md
+  adr/                    # only a cross-cutting choice that already had alternatives
 docs/specs/<slug>/
   notes.md              # clustered raw input (optional, keep short)
   spec.md               # CANONICAL narrative spec (always)
@@ -27,7 +34,7 @@ docs/specs/<slug>/
   export/               # chosen format(s) only
 ```
 
-Always write `spec.md` first. Exports are projections. If they conflict, `spec.md` wins and you fix the export.
+When `docs/system/` is missing, seed it, then write `spec.md`, then add one index row. Exports are projections. If they conflict, `spec.md` wins and you fix the export. An existing `docs/system/` is not rewritten.
 
 ## Formats (user may pick one or more)
 
@@ -75,7 +82,22 @@ Stop again.
 
 After they pick or confirm options:
 
-**Branch first** if a git repo with commits exists. Follow `/crav1-feature-branch` (drop-in: `.cursor/skills/crav1/crav1-feature-branch/SKILL.md`; plugin: sibling `skills/crav1-feature-branch/SKILL.md`). Do not write spec files until the branch choice is done or skipped.
+**Branch first** if a git repo with commits exists. Follow `/crav1-feature-branch` (drop-in: `.cursor/skills/crav1/crav1-feature-branch/SKILL.md`; plugin: sibling `skills/crav1-feature-branch/SKILL.md`). Do not write spec files or `docs/system/` until the branch choice is done or skipped.
+
+**Thin landscape, then spec, then index.**
+
+When `docs/system/` does not exist (greenfield or brownfield, including an existing app), create it before the spec from this skill’s `assets/system/` (same files as `docs/system/_template/` and as intake `assets/` `landscape.md`, `repos.md`, `diagrams.md`, `adr.md`):
+
+| File | Fill |
+| --- | --- |
+| `landscape.md` | One short paragraph of what is in front of you (the app when it exists; otherwise the bundle). **v0** is this slice. **Later** stays short. Bulk `A#`s are the assumptions already listed. Constraints are only ones the repo or the bundle already shows. Leave the feature index empty until the spec exists. |
+| `repos.md` | The repo in front of you. Status `exists` when this checkout is a real repo; `proposed` until a URL exists. One boundaries line only when the repo already shows one. |
+| `diagrams.md` | One system-context diagram of what is actually there. One heading, one sentence, one fence. Do not invent services. Slice sequences stay in `docs/specs/<slug>/diagrams.md`. |
+| `adr/` | From `assets/system/adr.md` only when a cross-cutting choice already had real alternatives. Otherwise write no ADR. Slice ADRs stay under `docs/specs/<slug>/adr/`. |
+
+Fill those files from the repo in front of you and from answers already given. Do not ask a landscape interview. Do not run `/crav1-intake-to-specs`. Do not respec the whole product. If this slice needs a repo that is not the checkout in front of you, add that `repos.md` row and a landscape ADR in this seed, before the spec.
+
+When `docs/system/` already exists, do not rewrite `landscape.md`, `repos.md`, `diagrams.md`, or existing ADRs. If they need a new repo, write a landscape ADR from `assets/system/adr.md` and a `repos.md` row before the spec. That is the only edit before the index row.
 
 1. `spec.md` from this skill’s `assets/spec.md` plus:
    - `## Constraints` (only accepted technical constraints)
@@ -85,10 +107,11 @@ After they pick or confirm options:
 3. `adr/NNNN-*.md` from this skill’s `assets/adr.md` — **only** for choices that had real alternatives. Hunches with no alternative are constraints in `spec.md`, not ADRs. Default status: `proposed` until they say accepted.
 4. `export/` for each chosen format — follow `references/formats.md`.
 5. Optional short `notes.md` if the raw pile would otherwise be lost.
+6. One feature-index row on `docs/system/landscape.md` when this turn created a new spec folder: slug, `docs/specs/<slug>/`, repo name, `v0`. Do not add a second row for a slug that already has one.
 
 Then output only:
 
-- Paths written
+- Paths written (`docs/system/` when this turn seeded it, or the index row when the landscape already existed)
 - Decisions captured as ADRs vs still open
 - 3–5 remaining arguments
 - Next: `/crav1-tighten-spec`, `/crav1-architecture-reviewer`, `/crav1-export-spec`, `/crav1-plan-from-spec`, or accept and Plan Mode. If they chose `spec/<slug>`: no implement on that branch.

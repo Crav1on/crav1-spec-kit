@@ -4,7 +4,7 @@ Kit not in this project yet? [Install first](install.md). After a plugin install
 
 You do not start in the host plan UI. You do not start by picking Next.js. You start by making the idea small enough to accept or reject.
 
-`/crav1-spark-to-spec` is that first command whether the repo is **empty** or you are adding a **feature** to an app that already exists. The skill picks **greenfield** vs **brownfield** from context (and from what you @). A pile of ideas plus stack hunches is still [from-ideas](from-ideas.md) (`/crav1-ideas-to-spec`). Several files, or several features/repos, is [from-intake](from-intake.md) (`/crav1-intake-to-specs`). An existing spec that is only mushy is `/crav1-tighten-spec`, not a second spark. After `docs/system/` exists, a new feature is still this command with `@docs/system/` (new slug).
+`/crav1-spark-to-spec` is that first command whether the repo is **empty** or you are adding a **feature** to an app that already exists. The skill picks **greenfield** vs **brownfield** from context (and from what you @). The layout always includes `docs/system/`. When that folder is missing, this command seeds a thin landscape from the repo (empty or an existing app), then writes the spec, then adds one index row. It fills that landscape from the repo already in front of the agent. It does not open a second interview, and it does not respec the whole product. When `docs/system/` already exists, the landscape stays as it is and this command adds one index row (and a repo or ADR row only when the feature needs a new repo). A pile of ideas plus stack hunches is still [from-ideas](from-ideas.md) (`/crav1-ideas-to-spec`). Several files, or several features/repos, is [from-intake](from-intake.md) (`/crav1-intake-to-specs`). An existing spec that is only mushy is `/crav1-tighten-spec`, not a second spark. A later feature on an existing landscape is still this command with `@docs/system/` (new slug).
 
 ## Why your old prompt was the wrong *first* prompt
 
@@ -60,7 +60,7 @@ On a brownfield git repo the skill **prompts** for a branch before it writes fil
 
 You can run `/crav1-feature-branch` by itself. The kit does not push or open the pull request; use GitKraken or your git host for that.
 
-**Later feature** (after `/crav1-intake-to-specs` wrote `docs/system/`):
+**Later feature** (`docs/system/` already exists, from intake or from an earlier spark or ideas run):
 
 ```text
 /crav1-spark-to-spec
@@ -81,7 +81,7 @@ Use a strong reasoning model for this phase.
 | Turn | You do | Agent does |
 | --- | --- | --- |
 | 1 | Spark + `/crav1-spark-to-spec` | Restate, name greenfield vs brownfield, propose v0 for **this** slice, ≤7 questions, numbered assumptions |
-| 2 | Answer in bullets. Skip with “use assumptions” | Write `docs/specs/<slug>/spec.md`. On Azure Repos, one optional work-item id question (skip leaves no file) |
+| 2 | Answer in bullets. Skip with “use assumptions” | When `docs/system/` is missing, seed a thin landscape, write `docs/specs/<slug>/spec.md`, then one index row. When the landscape already exists, add the index row only. On Azure Repos, one optional work-item id question (skip leaves no file) |
 | 3 | “v0 is too big” / “offline matters” / “not for teams” | `/crav1-tighten-spec` turns each gap into an issue with choices (impact included; you can ask for a suggestion), one by one |
 | 4 | Optional: “review this spec” | Parent agent delegates to **crav1-spec-reviewer-agent** |
 | 5 | Leftover Open questions | `/crav1-resolve-questions` — keep open or answer, one `Q#` at a time |
