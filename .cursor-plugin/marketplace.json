@@ -1,8 +1,7 @@
 {
   "name": "crav1-kit",
   "owner": {
-    "name": "Crav1",
-    "email": "thomas_cronholm@hotmail.com"
+    "name": "Crav1"
   },
   "metadata": {
     "description": "CRAV1 Spec Kit (crav1) — spec-driven development kit for Cursor: skills, agents, and rules.",
