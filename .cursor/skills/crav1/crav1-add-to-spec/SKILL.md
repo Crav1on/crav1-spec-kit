@@ -3,8 +3,9 @@ name: crav1-add-to-spec
 description: >-
   Add new information to one existing spec, then report whether docs/system/
   or another spec has to change. Does not silently rewrite those files.
-  Does not create a glossary. A missing row on an existing glossary, when
-  the new information defines it, can be one listed edit.
+  Does not create a glossary. A missing row on an existing glossary can be
+  one listed edit. It is not written unless apply is chosen. A meaning the
+  new information does not state is `to be researched`.
   Does not write application code. Does not plan, implement, or commit.
 disable-model-invocation: true
 icon: file-plus
@@ -71,7 +72,7 @@ Section names for that read, not a file to paste over what exists: this skill’
 
 Do not edit anything outside the target spec in this step. Do not seed `docs/system/` when it is missing. Say it is missing and that this command does not create it. Do not create `glossary.md`.
 
-When `glossary.md` exists, a missing row that the new information defines can be one of the listed edits to `docs/system/`. Defined means the new information already uses that word or abbreviation and already states the expansion or meaning. If it does not state a meaning, do not add the row. Do not invent the term or the meaning. Do not rewrite an existing row. Do not write the new row unless they pick apply. A missing `glossary.md` is not a listed edit.
+When `glossary.md` exists, a missing row that the new information uses can be one of the listed edits to `docs/system/`. When the new information already states the expansion or meaning, that text is Meaning. When it does not, Meaning is `to be researched`. Do not invent the term or the meaning. Do not write TBD or to be decided. Do not rewrite, reorder, or edit an existing row. Do not change a Meaning cell that already has text. Do not write the new row unless they pick apply. A missing `glossary.md` is not a listed edit.
 
 Do not edit `plan.md` or `tasks.md` when they exist, and do not list them as proposed edits. One line in the report when they exist: they were left alone. Adding information does not start planning.
 

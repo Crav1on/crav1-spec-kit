@@ -4,7 +4,7 @@ Kit not in this project yet? [Install first](install.md). After a plugin install
 
 Use this when you have **more than a spark**: several ideas, maybe UX notes, maybe “I think we should use X”, but it is not a spec you would hand to an agent to build.
 
-You still do **not** start by coding. You add an architecture interview and you write diagrams + ADRs. The canonical file remains `spec.md`. Formats are exports. The layout always includes `docs/system/`. This command seeds a thin landscape when that folder is missing (greenfield or an existing app), then writes the spec artifacts, then adds one index row. It fills that landscape from the repo already in front of the agent. An existing landscape stays as it is; this command adds one index row (a repo or ADR row only when the feature needs a new repo, and `glossary.md` only when that file is missing). An existing glossary is left alone.
+You still do **not** start by coding. You add an architecture interview and you write diagrams + ADRs. The canonical file remains `spec.md`. Formats are exports. The layout always includes `docs/system/`. This command seeds a thin landscape when that folder is missing (greenfield or an existing app), then writes the spec artifacts, then adds one index row. It fills that landscape from the repo already in front of the agent. An existing landscape stays as it is; this command adds one index row (a repo or ADR row only when the feature needs a new repo). A missing `glossary.md` is written. An existing glossary gets only new rows for words that are not already listed. Existing rows are not rewritten. A meaning the source does not state is `to be researched`.
 
 Spark-only (greenfield or one feature on an existing app)? Use [from-nothing](from-nothing.md) and `/crav1-spark-to-spec` instead. Mixed files or several features/repos? Use [from-intake](from-intake.md) and `/crav1-intake-to-specs`. If this pile is clearly more than one v0 slice or more than one repo, `/crav1-ideas-to-spec` will stop and send you there.
 
@@ -38,7 +38,7 @@ Structured labels still work if you like them; they are not required.
 | ------------------ | -------------------------------------- | ----------------------------------------------------------------------------------------- |
 | Capture            | Paste one unstructured blob            | Clusters intent vs hunches vs undecided, v0 vs later, ≤5 product questions, format choice |
 | Architecture       | Answer / “use assumptions”             | ≤7 technical questions + 2–3 options at one abstraction level                             |
-| Write              | Pick options, correct A-numbers        | Thin `docs/system/` when missing, including `glossary.md`, then `spec.md`, `diagrams.md`, ADRs, `export/<format>`, then one landscape index row. A missing `glossary.md` is filled when the folder already exists |
+| Write              | Pick options, correct A-numbers        | Thin `docs/system/` when missing, including `glossary.md`, then `spec.md`, `diagrams.md`, ADRs, `export/<format>`, then one landscape index row. A missing `glossary.md` is written when the folder already exists. New rows are appended. Existing rows are not rewritten |
 | Critique           | Optional                               | `/crav1-architecture-reviewer` then `/crav1-tighten-spec` (one issue at a time)            |
 | Questions          | Leftover Open questions                | `/crav1-resolve-questions` — keep open or answer, one `Q#` at a time                      |
 | Export again       | “also want JSON”                       | `/crav1-export-spec` — does not change behavior                                           |
@@ -65,7 +65,7 @@ docs/system/              # always; seeded when the folder is missing
   landscape.md            # one index row points at the new spec
   repos.md
   diagrams.md
-  glossary.md             # words the source already uses; an existing file is left alone
+  glossary.md             # append words the source already uses; do not edit existing rows
   adr/                    # only a cross-cutting choice that already had alternatives
 docs/specs/<slug>/
   spec.md                 # source of truth
@@ -75,7 +75,7 @@ docs/specs/<slug>/
   export/openspec/        # if you chose OpenSpec
 ```
 
-`docs/system/` uses the same landscape, repos, diagram, glossary, and ADR templates intake writes. When that folder already exists, this command does not rewrite it. A missing `glossary.md` is the gap that file fills.
+`docs/system/` uses the same landscape, repos, diagram, glossary, and ADR templates intake writes. When that folder already exists, this command does not rewrite it. A missing `glossary.md` is written. New rows are appended. A meaning the source does not state is `to be researched`.
 
 ADRs use the MADR-shaped template in skill `crav1-ideas-to-spec` `assets/adr.md` (drop-in: `.cursor/skills/crav1/crav1-ideas-to-spec/assets/adr.md`; same as `docs/specs/_template/adr.md`). Status starts as `proposed`. Hunches with no alternative belong under Constraints, not as ADRs.
 

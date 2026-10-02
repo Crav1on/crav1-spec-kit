@@ -4,9 +4,11 @@ description: >-
   Match one or more repos that already make up a system, plus a dump of
   notes, tickets, old docs, diagrams, or screenshots, to docs/system/
   (including glossary.md) and one spec per confirmed slice. When that folder
-  exists and glossary.md is missing, write only that file. Do not rewrite an
-  existing glossary. Repos are evidence of what exists. The dump is what to
-  match, not a brief for a new product. Do not write application code.
+  exists, write glossary.md if it is missing, or append only words that are
+  not already rows. Do not rewrite existing glossary rows. A meaning the
+  source does not state is `to be researched`. Repos are evidence of what
+  exists. The dump is what to match, not a brief for a new product. Do not
+  write application code.
 disable-model-invocation: true
 icon: search
 color: yellow
@@ -92,9 +94,9 @@ When `docs/system/` is missing, seed it from the repos and the confirmed match, 
 | `glossary.md` | From `assets/glossary.md`, in this same pass. See the glossary rules below. |
 | `adr/` | Only where there was a real choice, with real alternatives, already visible in the repos or accepted on the map. Otherwise write no ADR. Hunches are not ADRs. |
 
-**Glossary.** `glossary.md` is part of the landscape, not a feature spec. Source is the repos plus the confirmed dump. Do not invent terms, expansions, or definitions. A row is only a word or abbreviation that source already uses, plus the expansion or meaning when that same source already says it. If the source never says what it means, list the word and leave Meaning blank. Skip ordinary English. A code identifier is not a row unless the source already treats that word as a term. Write the file even when it has no rows. Do not run an extra interview.
+**Glossary.** `glossary.md` is part of the landscape, not a feature spec. Source is the repos plus the confirmed dump. Do not invent terms, expansions, or definitions. Do not write TBD or to be decided. A row is only a word or abbreviation that source already uses. When that same source already says the expansion or meaning, put that text in Meaning. When the source never says what it means, set Meaning to `to be researched`. Skip ordinary English. A code identifier is not a row unless the source already treats that word as a term. Write the file even when it has no rows. When `glossary.md` already exists, append only words or abbreviations that are not already rows. Do not rewrite, reorder, or edit existing rows. Do not change a Meaning cell that already has text. Do not run an extra interview.
 
-When `docs/system/` already exists, do not rewrite `landscape.md`, `repos.md`, `diagrams.md`, existing ADRs, or an existing `glossary.md`. Only fill gaps the match needs, the same rule as spark and ideas: a `repos.md` row for a repo that is not listed, a landscape ADR only for a real choice that is not already recorded, a context diagram only when `diagrams.md` has none of these repos, `## Code with no slice` when that note is missing and the map has uncovered code, and `glossary.md` when that file is missing. Append to `## Code with no slice` if it is already there. Do not rewrite the paragraphs around it. Write a missing `glossary.md` from the same sources and the same glossary rules, and do not rewrite an existing glossary. The feature index is filled in Index, not here.
+When `docs/system/` already exists, do not rewrite `landscape.md`, `repos.md`, `diagrams.md`, or existing ADRs. Only fill gaps the match needs, the same rule as spark and ideas: a `repos.md` row for a repo that is not listed, a landscape ADR only for a real choice that is not already recorded, a context diagram only when `diagrams.md` has none of these repos, `## Code with no slice` when that note is missing and the map has uncovered code, `glossary.md` when that file is missing, and new glossary rows when the file exists. Append to `## Code with no slice` if it is already there. Do not rewrite the paragraphs around it. Write a missing `glossary.md`, or append new rows, from the same sources and the same glossary rules. Do not rewrite existing glossary rows. The feature index is filled in Index, not here.
 
 No `tasks.md`. No application code. No `git init` except the new clean repo they picked. No remotes.
 

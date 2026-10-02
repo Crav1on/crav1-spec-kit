@@ -79,7 +79,7 @@ Do not run `/crav1-intake-to-specs` again.
 Spark: <the new feature>
 ```
 
-Or `/crav1-ideas-to-spec` if the new thing is already a pile. **New slug.** If `docs/system/` is missing, spark and ideas seed a thin landscape from the repo, including `glossary.md`, then the spec, then one index row. They do not rewrite a landscape this command already wrote. A missing `glossary.md` is filled. An existing glossary is left alone. They do not re-run intake. If you need a new repo: landscape ADR + `repos.md` row, then the spec, then an index row.
+Or `/crav1-ideas-to-spec` if the new thing is already a pile. **New slug.** If `docs/system/` is missing, spark and ideas seed a thin landscape from the repo, including `glossary.md`, then the spec, then one index row. They do not rewrite a landscape this command already wrote. A missing `glossary.md` is written. New glossary rows are appended. Existing rows are not rewritten. A meaning the source does not state is `to be researched`. They do not re-run intake. If you need a new repo: landscape ADR + `repos.md` row, then the spec, then an index row.
 
 ## After Index
 

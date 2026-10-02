@@ -7,8 +7,10 @@ description: >-
   spec.md files, then report whether docs/system/ or another spec has
   to change. Does not create a slug. Does not watch the repo.
   Does not seed docs/system/. When that folder exists and glossary.md is
-  missing, fills only that file from the landed change. Does not rewrite an
-  existing glossary. Does not write application code. Does not plan, implement, or commit.
+  missing, fills only that file from the landed change. When the file exists,
+  appends only words that are not already rows. Does not rewrite existing
+  glossary rows. A meaning the change does not state is `to be researched`.
+  Does not write application code. Does not plan, implement, or commit.
 disable-model-invocation: true
 icon: file-diff
 color: teal
@@ -121,7 +123,7 @@ Section names for that read, not a file to paste over what exists: this skill’
 
 Do not edit anything outside the confirmed belongs writes in this step, except the glossary gap below. Do not seed `docs/system/` when it is missing. Say it is missing and that this command does not create it. Do not invent a landscape from the diff alone. When that folder is missing, do nothing about a glossary.
 
-**Glossary gap.** When `docs/system/` exists and `glossary.md` is missing, write only that file from `assets/system/glossary.md`. Source is the landed change. Do not invent terms, expansions, or definitions. A row is only a word or abbreviation that change already uses, plus the expansion or meaning when that same change already says it. If the change never says what it means, list the word and leave Meaning blank. Skip ordinary English. A code identifier is not a row unless the change already treats that word as a term. Write the file even when it has no rows. This fill is not an apply option, and it does not rewrite any other landscape file. When `glossary.md` already exists, leave it alone. Do not list a rewrite of it.
+**Glossary.** When `docs/system/` is missing, do nothing about a glossary. When it exists and `glossary.md` is missing, write only that file from `assets/system/glossary.md`. When `glossary.md` already exists, append only words or abbreviations the change uses that are not already rows. Do not rewrite, reorder, or edit existing rows. Do not change a Meaning cell that already has text. Source is the landed change. Do not invent terms, expansions, or definitions. Do not write TBD or to be decided. A row is only a word or abbreviation that change already uses. When that same change already says the expansion or meaning, put that text in Meaning. When the change never says what it means, set Meaning to `to be researched`. Skip ordinary English. A code identifier is not a row unless the change already treats that word as a term. Write the file even when it has no rows. This write is not an apply option, and it does not rewrite any other landscape file. Do not list a rewrite of existing rows.
 
 Do not edit `plan.md` or `tasks.md` when they exist, and do not list them as proposed edits. One line in the report when they exist: they were left alone. Adding what the change does does not start planning.
 
@@ -133,7 +135,7 @@ Report:
   2. **Leave the other files alone**
 - List each proposed edit in one line: the file, and what would change. One line per file change. No surrounding rewrite.
 
-Do not silently rewrite `docs/system/` or specs the sort did not already write. The missing-`glossary.md` fill above is the exception. Apply the other edits only if they pick apply, and only the lines you listed. If they pick leave, do not edit those files. An existing `glossary.md` stays as it is either way.
+Do not silently rewrite `docs/system/` or specs the sort did not already write. The glossary write above is the exception: a missing file, or new rows appended to an existing file. Apply the other edits only if they pick apply, and only the lines you listed. If they pick leave, do not edit those files. Do not rewrite existing glossary rows either way.
 
 ## Stop
 
@@ -145,10 +147,10 @@ Output only:
 - Each `docs/specs/<slug>/spec.md` that gained a new quote
 - What was added (what the change does, labeled new) and what was already described there
 - The fits-none list, left alone. If they asked for a new spec, which existing skill you pointed at
-- `glossary.md` when this turn filled that gap. If `docs/system/` was missing, say no glossary was written. If `glossary.md` already existed, say it was left alone
+- `glossary.md` when this turn created it or appended rows. If `docs/system/` was missing, say no glossary was written. If no new rows were appended, say so
 - Impact: nothing else, or the one-line edit list and which option they picked
 - Next: `/crav1-finalize-commit` only if any file changed and they want those spec edits committed (no push). `/crav1-plan-from-spec` only for a slice they choose. Do not run either.
 
 ## Style
 
-Be concise. Quote what the change does. Prefer the smaller edit. Do not invent content to fill gaps. A missing `glossary.md` is the one landscape file this command writes, and only when `docs/system/` already exists.
+Be concise. Quote what the change does. Prefer the smaller edit. Do not invent content to fill gaps. A missing `glossary.md` is written only when `docs/system/` already exists. New rows are appended to an existing glossary. Existing rows are not rewritten.
