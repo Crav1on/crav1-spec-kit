@@ -54,6 +54,7 @@ Start a new chat. Run `/crav1-plan-from-spec`. Read `plan.md` and `tasks.md` and
 | Pile of ideas and tech hunches | [from-ideas.md](from-ideas.md) · `/crav1-ideas-to-spec` |
 | Several features or repos | [from-intake.md](from-intake.md) · `/crav1-intake-to-specs` |
 | Existing repos plus a dump to match | [from-match.md](from-match.md) · `/crav1-match-to-specs` |
+| A later dump onto specs that already exist | [from-match-dump.md](from-match-dump.md) · `/crav1-match-dump-to-specs` |
 | New information for one existing spec | [from-add.md](from-add.md) · `/crav1-add-to-spec` |
 | Prove a slice | `/crav1-verify-spec` |
 | Push and open a pull request | `/crav1-open-pr` (after commits exist; does not merge) |
