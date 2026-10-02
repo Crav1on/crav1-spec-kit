@@ -44,7 +44,7 @@ The target `docs/specs/<slug>/spec.md`, unless the new words were already there.
 
 `docs/system/` and other specs change only when apply is picked. Each of those edits was listed in one line (file and what would change). Leaving them alone writes nothing outside the target spec.
 
-No `plan.md`. No `tasks.md`. No application code. A missing `docs/system/` is not seeded here.
+No `plan.md`. No `tasks.md`. No application code. A missing `docs/system/` is not seeded here. This command does not create `glossary.md`. When that file already exists, a new row from the new information can be one of the listed edits. It is not written unless apply is chosen. A meaning the new information does not state is `to be researched`. Existing rows are not rewritten.
 
 ## After
 

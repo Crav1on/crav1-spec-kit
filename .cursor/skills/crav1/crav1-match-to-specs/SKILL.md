@@ -2,10 +2,13 @@
 name: crav1-match-to-specs
 description: >-
   Match one or more repos that already make up a system, plus a dump of
-  notes, tickets, old docs, diagrams, or screenshots, to docs/system/ and
-  one spec per confirmed slice. Repos are evidence of what exists. The dump
-  is what to match, not a brief for a new product. Do not write application
-  code.
+  notes, tickets, old docs, diagrams, or screenshots, to docs/system/
+  (including glossary.md) and one spec per confirmed slice. When that folder
+  exists, write glossary.md if it is missing, or append only words that are
+  not already rows. Do not rewrite existing glossary rows. A meaning the
+  source does not state is `to be researched`. Repos are evidence of what
+  exists. The dump is what to match, not a brief for a new product. Do not
+  write application code.
 disable-model-invocation: true
 icon: search
 color: yellow
@@ -79,18 +82,21 @@ Slug for that prompt: a short landscape kebab, or `system` if unnamed. Specify o
 
 ## Landscape
 
-Write `docs/system/` in the destination from this skill’s `assets/` (same files as `docs/system/_template/`): `landscape.md`, `repos.md`, `diagrams.md`. An ADR file comes from `assets/adr.md` only when the table below says to write one.
+Write `docs/system/` in the destination from this skill’s `assets/` (same files as `docs/system/_template/`): `landscape.md`, `repos.md`, `diagrams.md`, `glossary.md`. An ADR file comes from `assets/adr.md` only when the table below says to write one.
 
-When `docs/system/` is missing, seed it from the repos and the confirmed match. Do not run an intake interview. Do not respec a new product.
+When `docs/system/` is missing, seed it from the repos and the confirmed match, including `glossary.md` in that same pass. Do not run an intake interview. Do not respec a new product.
 
 | File | Fill |
 | --- | --- |
 | `landscape.md` | What the repos are, in one short paragraph. Constraints only when a repo or the confirmed dump already shows them. Bulk assumptions are confirmed map facts only. Leave the feature index empty until the specs exist. Add `## Code with no slice` when the map listed uncovered code (repo, path, one line). That note is not a spec. |
 | `repos.md` | Every repo in front of you, plus the destination when it is the new clean repo. Status `exists` when the checkout is a real repo; put the URL when you have one. The new clean repo stays without a remote. Boundaries only when the repos already show one. |
 | `diagrams.md` | Follow [references/diagrams.md](references/diagrams.md). One context diagram of the repos as they are. Replace the sample. Do not invent services. |
+| `glossary.md` | From `assets/glossary.md`, in this same pass. See the glossary rules below. |
 | `adr/` | Only where there was a real choice, with real alternatives, already visible in the repos or accepted on the map. Otherwise write no ADR. Hunches are not ADRs. |
 
-When `docs/system/` already exists, do not rewrite `landscape.md`, `repos.md`, `diagrams.md`, or existing ADRs. Only fill gaps the match needs, the same rule as spark and ideas: a `repos.md` row for a repo that is not listed, a landscape ADR only for a real choice that is not already recorded, a context diagram only when `diagrams.md` has none of these repos, and `## Code with no slice` when that note is missing and the map has uncovered code. Append to that section if it is already there. Do not rewrite the paragraphs around it. The feature index is filled in Index, not here.
+**Glossary.** `glossary.md` is part of the landscape, not a feature spec. Source is the repos plus the confirmed dump. Do not invent terms, expansions, or definitions. Do not write TBD or to be decided. A row is only a word or abbreviation that source already uses. When that same source already says the expansion or meaning, put that text in Meaning. When the source never says what it means, set Meaning to `to be researched`. Skip ordinary English. A code identifier is not a row unless the source already treats that word as a term. Write the file even when it has no rows. When `glossary.md` already exists, append only words or abbreviations that are not already rows. Do not rewrite, reorder, or edit existing rows. Do not change a Meaning cell that already has text. Do not run an extra interview.
+
+When `docs/system/` already exists, do not rewrite `landscape.md`, `repos.md`, `diagrams.md`, or existing ADRs. Only fill gaps the match needs, the same rule as spark and ideas: a `repos.md` row for a repo that is not listed, a landscape ADR only for a real choice that is not already recorded, a context diagram only when `diagrams.md` has none of these repos, `## Code with no slice` when that note is missing and the map has uncovered code, `glossary.md` when that file is missing, and new glossary rows when the file exists. Append to `## Code with no slice` if it is already there. Do not rewrite the paragraphs around it. Write a missing `glossary.md`, or append new rows, from the same sources and the same glossary rules. Do not rewrite existing glossary rows. The feature index is filled in Index, not here.
 
 No `tasks.md`. No application code. No `git init` except the new clean repo they picked. No remotes.
 

@@ -34,7 +34,7 @@ That slash command *is* the prompt.
 | Where specs go | Pick one repo already in front of the command, or a new clean repo | Options only. Does not ask for a typed path. No files yet |
 | Map | Confirm or edit slices, which repo each belongs to, and done / partial / not in the code | Reads the repos and the dump. Lists code no slice covers, on the side. Stops |
 | Branch | Pick `feat/…` or `spec/…` (or stay) | `/crav1-feature-branch`, one branch for the dump (no push, no PR) |
-| Landscape | — | `docs/system/` from the repos and the confirmed match. An existing landscape is not rewritten; only gaps the match needs |
+| Landscape | — | `docs/system/` from the repos and the confirmed match, including `glossary.md`. An existing landscape is not rewritten; only gaps the match needs, including a missing glossary and new glossary rows. Existing glossary rows are not rewritten. A meaning the source does not state is `to be researched` |
 | Slice specs | Wait | One `docs/specs/<slug>/` per confirmed slice, including not in the code |
 | Index | — | One landscape row per slice, with match status |
 | Stop | Glance, then `/crav1-finalize-commit` if this dump should be in git | Does not plan, implement, or commit |
@@ -51,12 +51,13 @@ docs/system/
   landscape.md
   repos.md
   diagrams.md
+  glossary.md
   adr/
 docs/specs/<slug>/
   spec.md
 ```
 
-Human starter copies for the landscape are `docs/system/_template/` (same files as this skill’s `assets/` for landscape, repos, diagrams, and ADRs). The slice file starts from the skill’s `assets/spec.md`.
+Human starter copies for the landscape are `docs/system/_template/` (same files as this skill’s `assets/` for landscape, repos, diagrams, glossary, and ADRs). The slice file starts from the skill’s `assets/spec.md`.
 
 **Done** and **partial** specs record the match status, what the dump says, the repo paths that support the slice, what was read from the code versus what was only in the dump, and open questions. Normal spec sections appear only where the dump or the code supports them. The command does not invent acceptance criteria to make a slice look buildable.
 
