@@ -1,6 +1,6 @@
 # From existing repos and a dump to specs
 
-Kit not in this project yet? [Install first](install.md). After a plugin install, the short command loop is [plugins/crav1/README.md](../plugins/crav1/README.md).
+Kit not in this project yet? [Install first](install.md) (Cursor and Claude Code; the slash commands match, the files do not). After a Cursor plugin install, the short command loop is [plugins/crav1/README.md](../plugins/crav1/README.md). Claude Code has no plugin.
 
 Use this when **one or more repos already make up a system**, and you have a **dump** (notes, tickets, old docs, diagrams, screenshots) to match against that code.
 

@@ -1,6 +1,6 @@
 # From one sentence to a spec
 
-Kit not in this project yet? [Install first](install.md). After a plugin install, the short command loop is [plugins/crav1/README.md](../plugins/crav1/README.md).
+Kit not in this project yet? [Install first](install.md) (Cursor and Claude Code; the slash commands match, the files do not). After a Cursor plugin install, the short command loop is [plugins/crav1/README.md](../plugins/crav1/README.md). Claude Code has no plugin.
 
 You do not start in the host plan UI. You do not start by picking Next.js. You start by making the idea small enough to accept or reject.
 
@@ -24,7 +24,7 @@ What did not belong on turn one:
 
 ## What to run
 
-1. New Agent chat.
+1. New chat. On Cursor that is Agent chat. On Claude Code, open a session in the product repo. The slash command is the same.
 2. Type `/crav1-spark-to-spec`.
 3. Paste the spark. `@` the app (and an old spec only if this feature extends it).
 

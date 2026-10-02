@@ -6,8 +6,8 @@ The method (specs, `plan.md`, `tasks.md`, verify) is [README.md](../README.md), 
 
 Kit home: [https://github.com/Crav1on/crav1-spec-kit](https://github.com/Crav1on/crav1-spec-kit). License: [MIT](../LICENSE).
 
-- After a **Cursor plugin** install, open the plugin README (in Cursor: the `crav1` plugin, or [plugins/crav1/README.md](../plugins/crav1/README.md) in this repo).
-- Claude Code has **no plugin marketplace** in this kit. Use the generated `.claude/` drop-in below.
+- After a **Cursor plugin** install, open the plugin README (in Cursor: the `crav1` plugin, or [plugins/crav1/README.md](../plugins/crav1/README.md) in this repo). Plugin id: `crav1`. There is no public Cursor Marketplace listing. Install that plugin from this GitHub repo (team marketplace import or a local plugin), or copy the `.cursor/` drop-in below.
+- **Claude Code** has no plugin and no marketplace. The slash commands are the same. Copy the generated `.claude/` drop-in below into a repository you own, or into `~/.claude` for a client project. Cloning this kit does not install it into another product.
 
 ## What this kit is
 
@@ -82,7 +82,7 @@ Cursor rules: [Rules](https://cursor.com/docs/rules). Cursor skills: [Skills](ht
 
 ### B. Cursor plugin (install from this repo)
 
-The plugin lives at [`plugins/crav1/`](../plugins/crav1/) with manifest [`plugin.json`](../plugins/crav1/.cursor-plugin/plugin.json). The catalog is [`.cursor-plugin/marketplace.json`](../.cursor-plugin/marketplace.json). This marketplace is **Cursor-only**.
+The plugin lives at [`plugins/crav1/`](../plugins/crav1/) with manifest [`plugin.json`](../plugins/crav1/.cursor-plugin/plugin.json). Plugin id: `crav1`. The catalog is [`.cursor-plugin/marketplace.json`](../.cursor-plugin/marketplace.json). That catalog is **Cursor-only**. There is no public Cursor Marketplace listing.
 
 **Team marketplace (Teams / Enterprise)**
 
@@ -90,13 +90,13 @@ The plugin lives at [`plugins/crav1/`](../plugins/crav1/) with manifest [`plugin
 2. Confirm plugin `crav1`. Set access and Default Off / Default On / Required. Save. Enable Auto Refresh on GitHub if you want pushes to re-index.
 3. In the IDE: **Customize** → find **crav1** → **Install** → project or user scope.
 
-**Public Cursor Marketplace**
+**No public listing**
 
-Optional: submit this repo at [cursor.com/marketplace/publish](https://cursor.com/marketplace/publish). Team marketplace, drop-in copy, and local plugin do not require that.
+There is no public Cursor Marketplace listing for plugin `crav1`. Install it from this GitHub repo: team marketplace import (above) or a local plugin (below). A drop-in copy of `.cursor/` is the other Cursor path (section A).
 
 **CLI**
 
-`cursor-agent plugin marketplace add <repository-url>` adds a marketplace. Installing a plugin is still interactive (Customize or `/plugin`). There is no reliable non-interactive `plugin install` for CI yet.
+`cursor-agent plugin marketplace add <repository-url>` adds this repo as a Cursor marketplace. It does not publish a public listing. Installing a plugin is still interactive (Customize or `/plugin`). There is no reliable non-interactive `plugin install` for CI yet.
 
 **Scope**
 
@@ -121,6 +121,8 @@ Cursor plugin format: [Plugins](https://cursor.com/docs/plugins) · [Plugins ref
 
 ## Claude Code
 
+Claude Code has no plugin and no marketplace. The same slash commands as on Cursor live in the generated `.claude/` tree. Copy that tree into a repository you own, or into `~/.claude` for a client project. Cloning this kit does not install it into another product.
+
 Checked against current Claude Code docs (not a guessed layout):
 
 | What | Project (repo you own) | User (`~/.claude/`) | Doc |
@@ -133,8 +135,6 @@ Checked against current Claude Code docs (not a guessed layout):
 Docs also allow a project instruction at `./CLAUDE.md`. This kit uses `.claude/CLAUDE.md` so the drop-in is one directory and does not replace a product’s root `CLAUDE.md`. Both paths are loaded ([directory overview](https://code.claude.com/docs/en/claude-directory)).
 
 `.claude/agent-assets/` is **not** a directory Claude Code loads by itself. The subagent prompts tell the model to read those template files. They are not under `.claude/agents/` because Claude Code scans that tree recursively and would treat extra markdown as subagents.
-
-There is no Claude Code plugin, marketplace, or public listing in this change.
 
 ### Project drop-in
 
@@ -176,7 +176,7 @@ On Claude Code 2.1.286, in a private throwaway git repo, the generated `.claude/
 
 New to the loop? [First 15 minutes](first-run.md): open the product repo → `/crav1` → `/crav1-spark-to-spec` → tighten → plan → one task.
 
-1. Open an agent chat in the **product** repo.
+1. Open a chat in the **product** repo. On Cursor that is Agent chat. On Claude Code, open a session in that repo.
 2. Type `/crav1` and run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, or `/crav1-match-to-specs`. Brownfield: expect a branch prompt (`feat/<slug>` or `spec/<slug>`).
 3. Follow the command loop. Do not start in the host plan UI or by picking a stack. `/crav1-plan-from-spec` writes `plan.md` and `tasks.md`.
 
@@ -190,14 +190,14 @@ If this window is the **kit repo**, drop-in skills are already under `.cursor/` 
 | --- | --- |
 | Cursor drop-in copy | Copy the same `.cursor/` folders again from a newer kit; commit in the product repo |
 | Claude Code drop-in | Copy the same `.claude/` tree again (project) or into `~/.claude/` (user) |
-| Team marketplace | Auto Refresh or Dashboard **Refresh**, then update/reinstall the plugin if Cursor asks |
-| Local plugin | `scripts/sync-crav1-plugin.sh` in the kit, copy `plugins/crav1` to `~/.cursor/plugins/local/crav1`, reload |
+| Cursor team marketplace | Auto Refresh or Dashboard **Refresh**, then update/reinstall the plugin if Cursor asks |
+| Cursor local plugin | `scripts/sync-crav1-plugin.sh` in the kit, copy `plugins/crav1` to `~/.cursor/plugins/local/crav1`, reload |
 
 Kit maintainers: edit `.cursor/` first, run `scripts/sync-crav1-plugin.sh` (plugin mirror and `.claude/`). `scripts/sync-crav1-claude.sh --check` fails if `.claude/` is stale. Keep this file and `plugins/crav1/README.md` accurate. Rule: `.cursor/rules/kit-maintainer.mdc`.
 
 ## Using the kit without “installing”
 
-Clone this repository and work here. Commands work because `.cursor/skills/crav1/` and `.claude/skills/` are already present. Use that to learn; copy or plugin-install when a **product** repo should get the same commands.
+Clone this repository and work in it. Commands work here because `.cursor/skills/crav1/` and `.claude/skills/` are already present. That is not an install into another product. Copy the host drop-in, or on Cursor install plugin `crav1`, when a product repo should get the same commands.
 
 ## Clone
 
@@ -205,7 +205,7 @@ Clone this repository and work here. Commands work because `.cursor/skills/crav1
 git clone https://github.com/Crav1on/crav1-spec-kit.git
 ```
 
-The kit is at [https://github.com/Crav1on/crav1-spec-kit](https://github.com/Crav1on/crav1-spec-kit). After clone, use a **drop-in copy** or the **Cursor local plugin**.
+The kit is at [https://github.com/Crav1on/crav1-spec-kit](https://github.com/Crav1on/crav1-spec-kit). Cloning this repository does not install the kit into another product. To use the commands there, copy the drop-in for that host (Cursor `.cursor/` or Claude Code `.claude/`) or, on Cursor, install plugin `crav1` from this repo (team marketplace import or a local plugin). See the sections above.
 
 ## What to read next
 

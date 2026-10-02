@@ -1,10 +1,12 @@
-# crav1
+# crav1 (Cursor plugin)
 
-You installed the **crav1** Cursor plugin from **CRAV1 Spec Kit**. This is the short start **after** that plugin install. For how to install (Cursor copy vs plugin vs local, or the Claude Code `.claude/` drop-in), see [docs/install.md](https://github.com/Crav1on/crav1-spec-kit/blob/main/docs/install.md). In the kit repo, the same file is [docs/install.md](../../docs/install.md). A thin path from install through one task is [docs/first-run.md](https://github.com/Crav1on/crav1-spec-kit/blob/main/docs/first-run.md) ([docs/first-run.md](../../docs/first-run.md) in the kit repo). For the full playbook, see that repo’s README.
+You installed the **crav1** Cursor plugin from **CRAV1 Spec Kit**. Plugin id: `crav1`. This page is the short start **after** that Cursor plugin install. There is no public Cursor Marketplace listing. Cursor installs this plugin from this GitHub repo (team marketplace import or a local plugin).
 
-This plugin and its marketplace are Cursor-only. Claude Code has no plugin in this kit. Its drop-in is the generated `.claude/` tree in the install doc. The host plan UI is not `plan.md`; `/crav1-plan-from-spec` writes `plan.md` and `tasks.md`.
+Claude Code has no plugin and no marketplace. The slash commands are the same. Copy `.claude/` into a repository you own, or into `~/.claude` for a client project. Cloning the kit does not install it into another product. Where files go: [docs/install.md](https://github.com/Crav1on/crav1-spec-kit/blob/main/docs/install.md) ([docs/install.md](../../docs/install.md) in the kit repo). A thin path from install through one task is [docs/first-run.md](https://github.com/Crav1on/crav1-spec-kit/blob/main/docs/first-run.md) ([docs/first-run.md](../../docs/first-run.md) in the kit repo). For the full playbook, see that repo’s README.
 
-Type `/crav1` in Agent chat to list commands.
+Cursor Plan Mode is not `plan.md`. Claude Code plan mode is not those files either (same install doc). `/crav1-plan-from-spec` writes `plan.md` and `tasks.md`.
+
+Type `/crav1` in Cursor Agent chat to list commands. On Claude Code, type the same `/crav1` in the session.
 
 ## What is in this plugin
 
@@ -55,7 +57,7 @@ Templates ship inside each skill’s `assets/`. Copy `docs/specs/_template/` and
 
 Work in your **product** repo, not only the kit clone.
 
-1. **New Agent chat.** Strong reasoning model for specify/plan.
+1. **New chat.** On Cursor that is Agent chat. On Claude Code, open a session in the product repo. Strong reasoning model for specify/plan. The slash commands below are the same on either host.
 2. **Specify.** Either:
    - `/crav1-spark-to-spec` plus a one- or two-sentence spark, or
    - `/crav1-ideas-to-spec` plus one blob of ideas and tech hunches (no required structure), or
@@ -68,15 +70,17 @@ Work in your **product** repo, not only the kit clone.
 4. `/crav1-architecture-reviewer` if there are real design hunches, then `/crav1-tighten-spec` **one issue at a time**.
 5. `/crav1-resolve-questions` for leftover `Q#`s you still care about.
 6. **New chat.** `/crav1-plan-from-spec`. You accept `plan.md` / `tasks.md`. Still no product code in that step. Optional: `/crav1-review-plan` then `/crav1-tighten-plan`. On `spec/<slug>`, do not implement; merge that branch first, then `/crav1-feature-branch` → `feat/<slug>`.
-7. `/crav1-implement-task` for **one** `T#`, or `/crav1-complete-task` for an isolated worker. Several `T#`s on one spec: `/crav1-complete-tasks T1-T3`. Several specs, one after another: `/crav1-complete-features auth-login billing` (or omit names for all ready). complete-task / complete-tasks / complete-features **pause once** with Settings directions (`continue` / `click`); they do not pause again per `T#` or per slug. When the run ends they remind you how to restore the previous mode.
+7. `/crav1-implement-task` for **one** `T#`, or `/crav1-complete-task` for an isolated worker. Several `T#`s on one spec: `/crav1-complete-tasks T1-T3`. Several specs, one after another: `/crav1-complete-features auth-login billing` (or omit names for all ready). complete-task / complete-tasks / complete-features **pause once** (`continue` / `click`). On Cursor that pause points at Settings. On Claude Code it is the permission prompt ([docs/install.md](../../docs/install.md)). They do not pause again per `T#` or per slug. When the run ends they remind you how to restore the previous mode.
 8. If you implemented by hand: `/crav1-verify-spec`. If something in the inner loop is wrong, `/crav1-fix-from-verify` (omit Gap to take the next). Unimplemented tasks go back to step 7, not the fix skill.
 9. When you want a commit message: `/crav1-draft-commit-message` (paste into GitKraken) or `/crav1-finalize-commit` (draft, then **commit** first, or copy / edit).
 10. When you want a pull request: `/crav1-open-pr` (push only if you say yes). It does not merge. Next (optional, later turn): `/crav1-merge-pr` when you explicitly ask to merge that named pull request. Merge commit only.
 
 Optional Azure Boards link: `docs/specs/<slug>/work-item.md` with `Work item: <id>`. On Azure Repos, spark, ideas, and intake ask once after a new spec folder and write that line only if the user gives an id. The user can also add the file by hand. Commit skills append `#<id>` on Azure Repos or `AB#<id>` on GitHub as the last description line. `/crav1-open-pr` adds a Work item section. No file means those steps continue, with one hint on Azure Repos only. Creating the work item in Azure Boards is out of scope. See [docs/from-ideas.md](../../docs/from-ideas.md).
 
-Do not start with “pick a stack and generate the app” unless the spec already says to. Quick typos and one-file bugs can skip this loop and use Agent mode directly.
+Do not start with “pick a stack and generate the app” unless the spec already says to. Quick typos and one-file bugs can skip this loop. On Cursor, use Agent mode directly. On Claude Code, use a normal session in that repo.
 
 ## If `/crav1` is missing
 
-Reload the window. Confirm **crav1** is installed in **Customize** (project or user). Drop-in installs need `.cursor/skills/crav1/` committed in this workspace.
+On Cursor: reload the window. Confirm **crav1** is installed in **Customize** (project or user). Drop-in installs need `.cursor/skills/crav1/` committed in this workspace.
+
+On Claude Code there is no plugin. If the command is missing, see [docs/install.md](../../docs/install.md) (restart after a new skills directory). Project skills live under `.claude/skills/`.
