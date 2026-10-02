@@ -2,7 +2,7 @@
 
 Read this **before** you put **CRAV1 Spec Kit** in a project. It covers what you get, which host and scope to pick, and where files go. It is not the full playbook. The thin path after you pick an install is [first-run.md](first-run.md).
 
-The method (specs, `plan.md`, `tasks.md`, verify) is [README.md](../README.md), [from-nothing.md](from-nothing.md), [from-ideas.md](from-ideas.md), [from-intake.md](from-intake.md), [from-match.md](from-match.md), [from-match-dump.md](from-match-dump.md), and [from-add.md](from-add.md). This file is the host detail those pages leave out.
+The method (specs, `plan.md`, `tasks.md`, verify) is [README.md](../README.md), [from-nothing.md](from-nothing.md), [from-ideas.md](from-ideas.md), [from-intake.md](from-intake.md), [from-match.md](from-match.md), [from-match-dump.md](from-match-dump.md), [from-code.md](from-code.md), and [from-add.md](from-add.md). This file is the host detail those pages leave out.
 
 Kit home: [https://github.com/Crav1on/crav1-spec-kit](https://github.com/Crav1on/crav1-spec-kit). License: [MIT](../LICENSE).
 
@@ -218,6 +218,7 @@ The kit is at [https://github.com/Crav1on/crav1-spec-kit](https://github.com/Cra
 | Mixed files / several features or repos | [docs/from-intake.md](from-intake.md) |
 | Existing repos plus a dump to match | [docs/from-match.md](from-match.md) |
 | A later dump onto specs that already exist | [docs/from-match-dump.md](from-match-dump.md) |
+| A code change that already landed, specs already exist | [docs/from-code.md](from-code.md) |
 | New information for one existing spec | [docs/from-add.md](from-add.md) |
 | The method (specs, plan files, tasks, verify) | [README.md](../README.md) |
 | Which lane owns a `/crav1-…` skill or `*-agent` | [guild-routing.md](guild-routing.md) |
