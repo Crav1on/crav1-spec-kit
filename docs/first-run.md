@@ -31,7 +31,7 @@ Spark: <one or two sentences>
 Treat this as greenfield. Ask questions first.
 ```
 
-On an existing app, `@` the code and say it is a feature on this app. Answer the questions (about seven). The layout always includes `docs/system/`. The skill seeds a thin landscape when that folder is missing, writes `docs/specs/<slug>/spec.md`, then adds one index row. An existing landscape stays in place. On a brownfield repo it also asks for `feat/<slug>` (spec and build) or `spec/<slug>` (specify only).
+On an existing app, `@` the code and say it is a feature on this app. Answer the questions (about seven). The layout always includes `docs/system/`. The skill seeds a thin landscape when that folder is missing, including `glossary.md`, writes `docs/specs/<slug>/spec.md`, then adds one index row. An existing landscape stays in place. A missing `glossary.md` is filled. An existing glossary is left alone. On a brownfield repo it also asks for `feat/<slug>` (spec and build) or `spec/<slug>` (specify only).
 
 ## 5. Tighten
 

@@ -85,7 +85,7 @@ Quick, well-understood edits (rename, copy tweak, one-file bug with a clear stac
 
 ## 2. From one sentence to a spec
 
-If you have only a spark (one or two sentences), do **not** start in the host plan UI and do not paste a “senior architect” persona. Interview first, write `spec.md`, tighten it, *then* plan — **greenfield or a feature on an existing app**. The layout always includes `docs/system/`. This command seeds a thin landscape when that folder is missing, then the spec, then one index row. An existing landscape is left in place. Full walkthrough: [From one sentence to a spec](docs/from-nothing.md).
+If you have only a spark (one or two sentences), do **not** start in the host plan UI and do not paste a “senior architect” persona. Interview first, write `spec.md`, tighten it, *then* plan — **greenfield or a feature on an existing app**. The layout always includes `docs/system/`. This command seeds a thin landscape when that folder is missing, including `glossary.md`, then the spec, then one index row. An existing landscape is left in place. A missing `glossary.md` is filled. An existing glossary is left alone. Full walkthrough: [From one sentence to a spec](docs/from-nothing.md).
 
 **First prompt** (Agent chat, strong reasoning model). Greenfield:
 
@@ -146,7 +146,7 @@ Runnable pieces in this repo:
 
 ## 3. From a pile of ideas (not a spark, not a spec)
 
-When you already have several ideas and maybe stack opinions, use **`/crav1-ideas-to-spec`**, not `/crav1-spark-to-spec`. The layout always includes `docs/system/`. This command seeds a thin landscape when that folder is missing, then the spec artifacts, then one index row. An existing landscape is left in place. Full walkthrough: [From a pile of ideas to a spec](docs/from-ideas.md).
+When you already have several ideas and maybe stack opinions, use **`/crav1-ideas-to-spec`**, not `/crav1-spark-to-spec`. The layout always includes `docs/system/`. This command seeds a thin landscape when that folder is missing, including `glossary.md`, then the spec artifacts, then one index row. An existing landscape is left in place. A missing `glossary.md` is filled. An existing glossary is left alone. Full walkthrough: [From a pile of ideas to a spec](docs/from-ideas.md).
 
 **First prompt:**
 
@@ -180,7 +180,7 @@ Treat hunches as proposed, not decided.
 Do not write code. Map first.
 ```
 
-Default if you only `@` a codebase: new system, that code is **context** (not extract-as-is). The parent confirms a map (slugs, repos, bulk assumptions, mushy vs ready), writes `docs/system/`, then one isolated worker per v0 slug. Then it **prompts** `/crav1-finalize-commit` (does not commit itself). Later features use spark or ideas. When `docs/system/` already exists, `@` it, use a new slug, and add an index row. When it is missing, those commands seed a thin landscape. Do not re-run intake.
+Default if you only `@` a codebase: new system, that code is **context** (not extract-as-is). The parent confirms a map (slugs, repos, bulk assumptions, mushy vs ready), writes `docs/system/`, then one isolated worker per v0 slug. Then it **prompts** `/crav1-finalize-commit` (does not commit itself). Later features use spark or ideas. When `docs/system/` already exists, `@` it, use a new slug, and add an index row. A missing `glossary.md` is filled. An existing glossary is left alone. When the folder is missing, those commands seed a thin landscape, including `glossary.md`. Do not re-run intake.
 
 ## 5. From existing repos and a dump
 
@@ -296,7 +296,7 @@ Keep each instruction under a few hundred lines, split by concern, **point at ex
 
 ### Step 2 — Spec layout in git
 
-The layout always includes `docs/system/`. Spark and ideas seed a thin landscape when that folder is missing (greenfield or an existing app) and leave an existing landscape in place, adding one index row. Intake writes `docs/system/` and does not skip it. Match writes `docs/system/` from the repos and the confirmed match when that folder is missing, and only fills gaps the match needs when it already exists.
+The layout always includes `docs/system/`. Spark and ideas seed a thin landscape when that folder is missing (greenfield or an existing app), including `glossary.md`, and leave an existing landscape in place, adding one index row and a missing `glossary.md`. Intake writes `docs/system/` and does not skip it, including `glossary.md` in that same pass. Match writes `docs/system/` from the repos and the confirmed match when that folder is missing, and only fills gaps the match needs when it already exists, including a missing `glossary.md`. An existing glossary is left alone.
 
 A layout that works without extra CLIs:
 
@@ -306,6 +306,7 @@ docs/system/
   landscape.md       # v0 vs later, bulk A#s, feature index
   repos.md           # named repos (proposed until a URL exists)
   diagrams.md
+  glossary.md        # words the source already uses; not a feature spec
   adr/
 docs/specs/
   _template/
@@ -335,14 +336,14 @@ When you change a template in this kit repo, update `docs/specs/_template/` **an
 
 This repo already ships:
 
-- `/crav1-spark-to-spec` — one-liner → questions → thin `docs/system/` when missing, then `spec.md`, then one index row (greenfield, brownfield feature, or later feature on an existing landscape; new slug unless they extend). An existing landscape is left in place. On Azure Repos, offers once to write `work-item.md`
+- `/crav1-spark-to-spec` — one-liner → questions → thin `docs/system/` when missing, including `glossary.md`, then `spec.md`, then one index row (greenfield, brownfield feature, or later feature on an existing landscape; new slug unless they extend). An existing landscape is left in place. A missing `glossary.md` is filled. An existing glossary is left alone. On Azure Repos, offers once to write `work-item.md`
 - `/crav1-feature-branch` — prompt for `feat/<slug>` or specify-only `spec/<slug>`; no silent checkout, no push, no PR
-- `/crav1-ideas-to-spec` — idea pile + technical hunches → thin `docs/system/` when missing, then spec, diagrams, ADRs, chosen export, then one index row. An existing landscape is left in place. On Azure Repos, offers once to write `work-item.md`
-- `/crav1-intake-to-specs` — mixed intake → `docs/system/` + one spec per v0 feature (isolated slice workers). On Azure Repos, one optional work-item question for the new slugs
-- `/crav1-match-to-specs` — existing repos plus a dump → where the spec files go, then `docs/system/` and one spec per confirmed slice (done, partial, or not in the code). Not intake, spark, or ideas. Does not plan, implement, or commit
-- `/crav1-match-dump-to-specs` — a later dump, specs already exist → sort onto those specs (belongs, already there, or does not fit), then quote the new bits. Does not ask for a slug first. Does not create a slug. Does not plan, implement, or commit
-- `/crav1-code-into-specs` — a code change that already landed, specs already exist → sort onto those specs (belongs, already described there, or fits none), then quote what the change does. No dump. Does not ask for a slug first. Does not create a slug. Does not watch the repo. Does not plan, implement, or commit
-- `/crav1-add-to-spec` — new information for one existing spec → quote it into that `spec.md`, then report whether the landscape or another spec has to change. Does not rewrite those other files unless asked. Does not plan, implement, or commit
+- `/crav1-ideas-to-spec` — idea pile + technical hunches → thin `docs/system/` when missing, including `glossary.md`, then spec, diagrams, ADRs, chosen export, then one index row. An existing landscape is left in place. A missing `glossary.md` is filled. An existing glossary is left alone. On Azure Repos, offers once to write `work-item.md`
+- `/crav1-intake-to-specs` — mixed intake → `docs/system/` (including `glossary.md`) + one spec per v0 feature (isolated slice workers). A missing `glossary.md` is filled when the folder already exists. An existing glossary is left alone. On Azure Repos, one optional work-item question for the new slugs
+- `/crav1-match-to-specs` — existing repos plus a dump → where the spec files go, then `docs/system/` (including `glossary.md`) and one spec per confirmed slice (done, partial, or not in the code). Fills a missing `glossary.md` when the folder already exists. An existing glossary is left alone. Not intake, spark, or ideas. Does not plan, implement, or commit
+- `/crav1-match-dump-to-specs` — a later dump, specs already exist → sort onto those specs (belongs, already there, or does not fit), then quote the new bits. Does not ask for a slug first. Does not create a slug. Does not seed `docs/system/`. Fills a missing `glossary.md` only when that folder already exists. An existing glossary is left alone. Does not plan, implement, or commit
+- `/crav1-code-into-specs` — a code change that already landed, specs already exist → sort onto those specs (belongs, already described there, or fits none), then quote what the change does. No dump. Does not ask for a slug first. Does not create a slug. Does not watch the repo. Does not seed `docs/system/`. Fills a missing `glossary.md` only when that folder already exists. An existing glossary is left alone. Does not plan, implement, or commit
+- `/crav1-add-to-spec` — new information for one existing spec → quote it into that `spec.md`, then report whether the landscape or another spec has to change. Does not rewrite those other files unless asked. Does not create a glossary. A missing glossary row that the new information defines can be one listed edit. Does not plan, implement, or commit
 - `/crav1-architecture-reviewer` — run the crav1-architecture-reviewer-agent subagent; numbered issues at the end
 - `/crav1-tighten-spec` — one issue at a time, with explained resolutions (plus get a suggestion) and impact; patch only that issue after you choose
 - `/crav1-resolve-questions` — one Open question at a time; keep it open or answer with impact; patch only that `Q#`

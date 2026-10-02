@@ -2,8 +2,10 @@
 name: crav1-intake-to-specs
 description: >-
   Turn mixed intake (notes, diagrams, screenshots, optional code as context)
-  into docs/system/ plus one spec slug per v0 feature. Use when 1–N files or
-  a dump may imply several features or repos. Do not write application code.
+  into docs/system/ (including glossary.md) plus one spec slug per v0 feature.
+  When that folder exists and glossary.md is missing, write only that file.
+  Do not rewrite an existing glossary. Use when 1–N files or a dump may imply
+  several features or repos. Do not write application code.
 disable-model-invocation: true
 icon: layers
 color: purple
@@ -65,7 +67,10 @@ Write `docs/system/` from this skill’s `assets/` (same shape as `docs/system/_
 | `landscape.md` | What this is, v0 vs later, bulk `A#`s, feature index (fill paths after workers) |
 | `repos.md` | 1–N repos: purpose, proposed vs exists, URL when they have one |
 | `diagrams.md` | System context across repos (follow `references/diagrams.md`) |
+| `glossary.md` | From `assets/glossary.md`, in this same pass. See the glossary rules below. |
 | `adr/` | Cross-cutting choices only (`assets/adr.md`). Hunches with no alternative → constraints on `landscape.md`, not ADRs. Status `proposed` until they accept |
+
+**Glossary.** `glossary.md` is part of the landscape, not a feature spec. When `docs/system/` is missing, write it with the other landscape files. When `docs/system/` already exists, do not rewrite `landscape.md`, `repos.md`, `diagrams.md`, existing ADRs, or an existing `glossary.md`. If `glossary.md` is missing, write only that file. The feature index is filled in Index, not in that gap fill. Source is the intake already in hand. Do not run an extra interview. Do not invent terms, expansions, or definitions. A row is only a word or abbreviation that intake already uses, plus the expansion or meaning when that same intake already says it. If it never says what the word means, list the word and leave Meaning blank. Skip ordinary English. A code identifier is not a row unless the intake already treats that word as a term. Write the file even when it has no rows.
 
 No `tasks.md` here. No `git init`, remotes, or application code unless they **explicitly** asked in this chat to create repos.
 

@@ -38,7 +38,7 @@ That slash command *is* the prompt.
 | Map              | `@` intake; confirm or split slugs/repos | Intent vs context, v0 vs later, bulk `A1…`, ready vs mushy per slug   |
 | Branch           | Pick `feat/…` or `spec/…` (or stay)    | `/crav1-feature-branch` before `docs/system/` (no push, no PR)        |
 | Mushy interview  | Answer only flagged slugs, or “use assumptions” | ≤5 questions per mushy slug, in **this** chat. Workers never interview |
-| Landscape        | Accept the map                           | `docs/system/` (`landscape.md`, `repos.md`, diagrams, cross-cutting ADRs) |
+| Landscape        | Accept the map                           | `docs/system/` (`landscape.md`, `repos.md`, diagrams, `glossary.md`, cross-cutting ADRs) |
 | Slice specs      | Wait                                     | One isolated worker per v0 slug (`docs/specs/<slug>/`)                |
 | Index            | —                                        | Feature table on `landscape.md`                                       |
 | Commit (optional)| Glance at files, then `/crav1-finalize-commit` | Prompted next step only; intake does not commit                       |
@@ -56,6 +56,7 @@ docs/system/
   landscape.md
   repos.md
   diagrams.md
+  glossary.md
   adr/
 docs/specs/<slug>/
   spec.md
@@ -64,7 +65,7 @@ docs/specs/<slug>/
   export/
 ```
 
-Human starter copies: `docs/system/_template/` (same files as skill `crav1-intake-to-specs` `assets/` for landscape, and as `assets/system/` on `crav1-spark-to-spec` and `crav1-ideas-to-spec`). Feature spec shape matches ideas-to-spec plus **Repos**, **Constraints**, **Assumptions**, **Trace**.
+Human starter copies: `docs/system/_template/` (same files as skill `crav1-intake-to-specs` `assets/` for landscape, including `glossary.md`, and as `assets/system/` on `crav1-spark-to-spec` and `crav1-ideas-to-spec`). Feature spec shape matches ideas-to-spec plus **Repos**, **Constraints**, **Assumptions**, **Trace**.
 
 ## Later features
 
@@ -78,7 +79,7 @@ Do not run `/crav1-intake-to-specs` again.
 Spark: <the new feature>
 ```
 
-Or `/crav1-ideas-to-spec` if the new thing is already a pile. **New slug.** If `docs/system/` is missing, spark and ideas seed a thin landscape from the repo, then the spec, then one index row. They do not rewrite a landscape this command already wrote, and they do not re-run intake. If you need a new repo: landscape ADR + `repos.md` row, then the spec, then an index row.
+Or `/crav1-ideas-to-spec` if the new thing is already a pile. **New slug.** If `docs/system/` is missing, spark and ideas seed a thin landscape from the repo, including `glossary.md`, then the spec, then one index row. They do not rewrite a landscape this command already wrote. A missing `glossary.md` is filled. An existing glossary is left alone. They do not re-run intake. If you need a new repo: landscape ADR + `repos.md` row, then the spec, then an index row.
 
 ## After Index
 
