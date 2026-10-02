@@ -52,7 +52,7 @@ Anything that fits none of the existing specs is listed and left alone. The comm
 
 The matching `docs/specs/<slug>/spec.md` files, for bits that were new.
 
-`docs/system/` and other specs change only when apply is picked. Each of those edits was listed in one line (file and what would change). Leaving them alone writes nothing outside the specs that received new quotes.
+Other `docs/system/` files and other specs change only when apply is picked. Each of those edits was listed in one line (file and what would change). Leaving them alone writes nothing outside the specs that received new quotes, except the glossary gap below.
 
 No `plan.md`. No `tasks.md`. No application code. A missing `docs/system/` is not seeded here. A missing `glossary.md` is a gap fill only when `docs/system/` already exists. The does-not-fit pile is not a new spec folder.
 
