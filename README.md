@@ -1,6 +1,6 @@
 # CRAV1 Spec Kit (crav1)
 
-**CRAV1 Spec Kit** (`crav1`) is a kit for spec-driven development: skills and agents that take a spark, a pile of ideas, intake files, or a match of existing repos to a dump through spec, plan, implement, verify, and a draft commit message. Specs, not chat history, are the source of truth. A short project instruction ships with the install.
+**CRAV1 Spec Kit** (`crav1`) is a kit for spec-driven development: skills and agents that take a spark, a pile of ideas, intake files, a match of existing repos to a dump, or a later dump onto specs that already exist, through spec, plan, implement, verify, and a draft commit message. Specs, not chat history, are the source of truth. A short project instruction ships with the install.
 
 Repo: [crav1-spec-kit](https://github.com/Crav1on/crav1-spec-kit). Cursor plugin id: `crav1`. After install, type `/crav1`.
 
@@ -136,6 +136,7 @@ Runnable pieces in this repo:
 | Skill `/crav1-ideas-to-spec` | Pile of ideas + technical hunches | Slash command; pick an export format. Seeds a thin `docs/system/` when missing, then the spec, then one index row. On Azure Repos, one optional work-item id after a new spec folder |
 | Skill `/crav1-intake-to-specs` | 1–N files; maybe several features/repos | Slash command; landscape + one spec per v0 slug. On Azure Repos, one optional work-item question listing the new slugs |
 | Skill `/crav1-match-to-specs` | Existing repos plus a dump to match | Slash command; where the specs go, then one spec per slice (done, partial, or not in the code). Does not plan or commit |
+| Skill `/crav1-match-dump-to-specs` | A later dump, specs already exist | Slash command; sorts the dump onto those specs (belongs, already there, or does not fit), then quotes the new bits. Does not create a slug. Does not plan or commit |
 | Skill `/crav1-add-to-spec` | New information for one existing spec | Slash command; adds it to that spec, then reports impact on the landscape or other specs before editing them. Does not plan or commit |
 | Skill `/crav1-export-spec` | Spec exists, want another format | Slash command |
 | Subagent `crav1-spec-reviewer-agent` | Independent product/spec critique | Agent delegates, or ask “review this spec” |
@@ -199,7 +200,25 @@ The repos are what exists. The dump is what to match. Do not write code.
 
 The command asks where the spec files go (one repo already in front of it, or a new clean repo), then stops on a map: slice, repo, and done / partial / not in the code. After that map is confirmed, one branch carries the dump, then `docs/system/` and one spec per slice. It prompts `/crav1-finalize-commit` and does not plan a slice that is not in the code.
 
-## 6. The working loop (once a spec exists)
+## 6. From a later dump onto existing specs
+
+When specs already exist under `docs/specs/` and a new dump (notes, tickets, old docs, diagrams, screenshots) has to be sorted onto them, use **`/crav1-match-dump-to-specs`**. Full walkthrough: [From a later dump onto existing specs](docs/from-match-dump.md).
+
+Match creates the folders from repos plus a dump. Add takes information already aimed at one named spec. This command does not ask for a slug first. It reads the existing spec folders. One dump may be a lot about one slug, or it may cover many. Size is not a limit. It does not plan.
+
+**First prompt:**
+
+```text
+/crav1-match-dump-to-specs
+@notes/later-dump.md
+@tickets/
+
+The specs already exist. Sort this dump onto them. Do not write code. Do not plan.
+```
+
+The command shows three piles (belongs to this spec, already in that spec, does not fit) and waits. After that sort is confirmed, it quotes the new bits into the matching specs. Anything that fits none of them stays listed. It does not create a slug. It points at `/crav1-finalize-commit` when those edits should be in git, and at `/crav1-plan-from-spec` only for a slice you choose.
+
+## 7. The working loop (once a spec exists)
 
 Use this on any non-trivial change.
 
@@ -246,7 +265,7 @@ Use a review pass or the kit’s review subagent. Diff against the spec, not aga
 
 ---
 
-## 7. How to set it up
+## 8. How to set it up
 
 The loop above is the method. Optional template families are in step 5. Where the kit files go on each host is [docs/install.md](docs/install.md).
 
@@ -302,6 +321,7 @@ This repo already ships:
 - `/crav1-ideas-to-spec` — idea pile + technical hunches → thin `docs/system/` when missing, then spec, diagrams, ADRs, chosen export, then one index row. An existing landscape is left in place. On Azure Repos, offers once to write `work-item.md`
 - `/crav1-intake-to-specs` — mixed intake → `docs/system/` + one spec per v0 feature (isolated slice workers). On Azure Repos, one optional work-item question for the new slugs
 - `/crav1-match-to-specs` — existing repos plus a dump → where the spec files go, then `docs/system/` and one spec per confirmed slice (done, partial, or not in the code). Not intake, spark, or ideas. Does not plan, implement, or commit
+- `/crav1-match-dump-to-specs` — a later dump, specs already exist → sort onto those specs (belongs, already there, or does not fit), then quote the new bits. Does not ask for a slug first. Does not create a slug. Does not plan, implement, or commit
 - `/crav1-add-to-spec` — new information for one existing spec → quote it into that `spec.md`, then report whether the landscape or another spec has to change. Does not rewrite those other files unless asked. Does not plan, implement, or commit
 - `/crav1-architecture-reviewer` — run the crav1-architecture-reviewer-agent subagent; numbered issues at the end
 - `/crav1-tighten-spec` — one issue at a time, with explained resolutions (plus get a suggestion) and impact; patch only that issue after you choose
@@ -340,7 +360,7 @@ An agent that cannot run tests will guess. Document the exact test, lint, and de
 ### Step 6 — Day-to-day
 
 1. Open an agent chat in the product repo.
-2. For a spark, ideas, intake, match, or new information on an existing spec: the matching `/crav1-…` command. Do not start in the host plan UI.
+2. For a spark, ideas, intake, match, a later dump onto existing specs, or new information on one existing spec: the matching `/crav1-…` command. Do not start in the host plan UI.
 3. Accept `spec.md`. Then `/crav1-plan-from-spec` and accept `plan.md` / `tasks.md`.
 4. `/crav1-implement-task` or `/crav1-complete-task` for one `T#`. Watch diffs. Run the task’s verify step.
 5. If wrong: fix the spec or the plan, then rebuild.
@@ -348,7 +368,7 @@ An agent that cannot run tests will guess. Document the exact test, lint, and de
 
 ---
 
-## 8. Best practices
+## 9. Best practices
 
 **Make intent unambiguous.** Models complete patterns; they do not read your mind. “Add photo sharing” hides thousands of decisions. Specs surface them before code exists.
 
@@ -376,7 +396,7 @@ An agent that cannot run tests will guess. Document the exact test, lint, and de
 
 ---
 
-## 9. Minimal templates
+## 10. Minimal templates
 
 Copy these into `docs/specs/<change>/`. They match [`docs/specs/_template/`](docs/specs/_template/) (`## Trace` on the plan; each task row has `(verify: …) (spec: …)`).
 
