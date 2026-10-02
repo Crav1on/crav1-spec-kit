@@ -1,6 +1,6 @@
 # From intake files to specs
 
-Kit not in this project yet? [Install first](install.md). After a plugin install, the short command loop is [plugins/crav1/README.md](../plugins/crav1/README.md).
+Kit not in this project yet? [Install first](install.md) (Cursor and Claude Code; the slash commands match, the files do not). After a Cursor plugin install, the short command loop is [plugins/crav1/README.md](../plugins/crav1/README.md). Claude Code has no plugin.
 
 Use this when you have **1–N files** (notes, markdown, screenshots, diagrams, optional source code as background) that may describe a small app **or** a system with several features and several git repos.
 

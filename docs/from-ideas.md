@@ -1,6 +1,6 @@
 # From a pile of ideas to a spec
 
-Kit not in this project yet? [Install first](install.md). After a plugin install, the short command loop is [plugins/crav1/README.md](../plugins/crav1/README.md).
+Kit not in this project yet? [Install first](install.md) (Cursor and Claude Code; the slash commands match, the files do not). After a Cursor plugin install, the short command loop is [plugins/crav1/README.md](../plugins/crav1/README.md). Claude Code has no plugin.
 
 Use this when you have **more than a spark**: several ideas, maybe UX notes, maybe “I think we should use X”, but it is not a spec you would hand to an agent to build.
 
@@ -77,7 +77,7 @@ docs/specs/<slug>/
 
 `docs/system/` uses the same landscape, repos, diagram, glossary, and ADR templates intake writes. When that folder already exists, this command does not rewrite it. A missing `glossary.md` is written. New rows are appended. A meaning the source does not state is `to be researched`.
 
-ADRs use the MADR-shaped template in skill `crav1-ideas-to-spec` `assets/adr.md` (drop-in: `.cursor/skills/crav1/crav1-ideas-to-spec/assets/adr.md`; same as `docs/specs/_template/adr.md`). Status starts as `proposed`. Hunches with no alternative belong under Constraints, not as ADRs.
+ADRs use the MADR-shaped template in skill `crav1-ideas-to-spec` `assets/adr.md` (Cursor drop-in: `.cursor/skills/crav1/crav1-ideas-to-spec/assets/adr.md`; Claude Code drop-in: `.claude/skills/crav1-ideas-to-spec/assets/adr.md`; same as `docs/specs/_template/adr.md`). Status starts as `proposed`. Hunches with no alternative belong under Constraints, not as ADRs.
 
 Diagrams: context + v0 sequence are required. State/ER only if the idea needs them. Mermaid for graphs and sequences; ascii for trees, CLIs, and simple pipelines.
 

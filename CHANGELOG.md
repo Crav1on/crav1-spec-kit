@@ -25,6 +25,7 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 
 ### Docs
 
+- User-facing pages name Cursor and Claude Code on the first screen. The slash commands are the same. The install is not. Cursor installs plugin `crav1` from this GitHub repo (team marketplace import or a local plugin). There is no public Cursor Marketplace listing. Claude Code has no plugin and no marketplace; copy `.claude/` into a repository you own, or into `~/.claude` for a client project. Cloning the kit does not install it into another product. [docs/install.md](docs/install.md) stays the file-location guide. Skill behavior is unchanged. No version bump.
 - Walkthroughs that list system files now include `glossary.md`: [docs/from-nothing.md](docs/from-nothing.md), [docs/from-ideas.md](docs/from-ideas.md), [docs/from-intake.md](docs/from-intake.md), and [docs/from-match.md](docs/from-match.md). [docs/from-match-dump.md](docs/from-match-dump.md) and [docs/from-code.md](docs/from-code.md) say a missing glossary is a gap fill only when `docs/system/` already exists. The starter is [docs/system/_template/glossary.md](docs/system/_template/glossary.md).
 - [docs/install.md](docs/install.md) no longer says Claude Code is waiting on a trial.
 - Plugin author name and marketplace owner name stay **Crav1**. There is no author email. Questions, bugs, and requests go to GitHub Issues on this repo ([SUPPORT.md](SUPPORT.md)). [LICENSE](LICENSE) is unchanged.

@@ -1,6 +1,6 @@
 # Support
 
-Use [GitHub Issues](https://github.com/Crav1on/crav1-spec-kit/issues) on [crav1-spec-kit](https://github.com/Crav1on/crav1-spec-kit) for a broken skill, a failed install, or a command that does not do what the docs say.
+Use [GitHub Issues](https://github.com/Crav1on/crav1-spec-kit/issues) on [crav1-spec-kit](https://github.com/Crav1on/crav1-spec-kit) for a broken skill, a failed install, or a command that does not do what the docs say. The same slash commands exist on Cursor and Claude Code. The install is not the same ([docs/install.md](docs/install.md)). Contact name for this kit is Crav1. There is no author email.
 
 Include:
 

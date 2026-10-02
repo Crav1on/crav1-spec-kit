@@ -1,6 +1,6 @@
 # First 15 minutes
 
-A thin path for someone new to **CRAV1 Spec Kit** (`crav1`). Full playbook: [README](../README.md). Install detail: [install.md](install.md). After a plugin install: [plugins/crav1/README.md](../plugins/crav1/README.md).
+A thin path for someone new to **CRAV1 Spec Kit** (`crav1`) on Cursor or Claude Code. The slash commands are the same. The install is not. Full playbook: [README](../README.md). Where files go: [install.md](install.md). After a Cursor plugin install: [plugins/crav1/README.md](../plugins/crav1/README.md). Claude Code has no plugin.
 
 ## 1. Pick an install path
 
@@ -8,14 +8,14 @@ Install where the feature should land. Steps, host paths, and project versus use
 
 - **Project drop-in** — commit the host tree (`.cursor/` or `.claude/`) in a repository you own.
 - **User scope** — Cursor user plugin, or Claude Code `~/.claude/`. On a client project, use this unless that project asked for the kit in git.
-- **Cursor plugin** — import [crav1-spec-kit](https://github.com/Crav1on/crav1-spec-kit) and install plugin `crav1`. There is no Claude Code marketplace in this kit.
+- **Cursor plugin** — import [crav1-spec-kit](https://github.com/Crav1on/crav1-spec-kit) and install plugin `crav1` (team marketplace or local plugin). There is no public Cursor Marketplace listing. Claude Code has no plugin and no marketplace.
 - **Learning in this kit repo** — the host trees are already present. Skip the copy and continue below.
 
 If `/crav1` does not appear, reload or restart the host (see [install.md](install.md)).
 
 ## 2. Open the product repo
 
-Open Agent chat in that repo. Use a strong reasoning model for specify and plan.
+Open a chat in that repo. On Cursor that is Agent chat. On Claude Code, open a session in that repo. Use a strong reasoning model for specify and plan. The slash commands below are the same on either host.
 
 ## 3. List commands
 

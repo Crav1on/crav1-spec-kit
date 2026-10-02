@@ -1,12 +1,16 @@
 # CRAV1 Spec Kit (crav1)
 
-**CRAV1 Spec Kit** (`crav1`) is a kit for spec-driven development: skills and agents that take a spark, a pile of ideas, intake files, a match of existing repos to a dump, a later dump onto specs that already exist, or a code change that already landed onto those specs, through spec, plan, implement, verify, and a draft commit message. Specs, not chat history, are the source of truth. A short project instruction ships with the install.
+**CRAV1 Spec Kit** (`crav1`) runs on **Cursor** and **Claude Code**. The slash commands are the same (`/crav1`, then `/crav1-…`). The install is not. Where the files go is [docs/install.md](docs/install.md).
 
-Repo: [crav1-spec-kit](https://github.com/Crav1on/crav1-spec-kit). Cursor plugin id: `crav1`. After install, type `/crav1`.
+It is a kit for spec-driven development: skills and agents that take a spark, a pile of ideas, intake files, a match of existing repos to a dump, a later dump onto specs that already exist, or a code change that already landed onto those specs, through spec, plan, implement, verify, and a draft commit message. Specs, not chat history, are the source of truth. A short project instruction ships with the install.
+
+On Cursor, install plugin `crav1` from this GitHub repo (team marketplace import or a local plugin). There is no public Cursor Marketplace listing. On Claude Code, there is no plugin and no marketplace: copy `.claude/` into a repository you own, or into `~/.claude` for a client project. Cloning this kit does not install it into another product.
+
+Repo: [crav1-spec-kit](https://github.com/Crav1on/crav1-spec-kit). After install on either host, type `/crav1`.
 
 This is a process guide, not an application. Use it as a checklist when you start a repo, then install the kit into that project.
 
-**First 15 minutes:** [docs/first-run.md](docs/first-run.md). **Before you install:** [docs/install.md](docs/install.md) (where files go on Cursor and Claude Code, project drop-in versus user scope). **After a Cursor plugin install:** [plugins/crav1/README.md](plugins/crav1/README.md). License: [MIT](LICENSE).
+**First 15 minutes:** [docs/first-run.md](docs/first-run.md). **Install:** [docs/install.md](docs/install.md). **After a Cursor plugin install:** [plugins/crav1/README.md](plugins/crav1/README.md). License: [MIT](LICENSE).
 
 ## First 15 minutes
 
@@ -87,7 +91,7 @@ Quick, well-understood edits (rename, copy tweak, one-file bug with a clear stac
 
 If you have only a spark (one or two sentences), do **not** start in the host plan UI and do not paste a “senior architect” persona. Interview first, write `spec.md`, tighten it, *then* plan — **greenfield or a feature on an existing app**. The layout always includes `docs/system/`. This command seeds a thin landscape when that folder is missing, including `glossary.md`, then the spec, then one index row. An existing landscape is left in place. A missing `glossary.md` is filled. New glossary rows are appended. Existing rows are not rewritten. A meaning the source does not state is `to be researched`. Full walkthrough: [From one sentence to a spec](docs/from-nothing.md).
 
-**First prompt** (Agent chat, strong reasoning model). Greenfield:
+**First prompt** (Cursor: Agent chat. Claude Code: a session in the product repo. Strong reasoning model). Greenfield:
 
 ```text
 /crav1-spark-to-spec
@@ -380,7 +384,7 @@ An agent that cannot run tests will guess. Document the exact test, lint, and de
 
 ### Step 6 — Day-to-day
 
-1. Open an agent chat in the product repo.
+1. Open a chat in the product repo. On Cursor that is Agent chat. On Claude Code, open a session in that repo.
 2. For a spark, ideas, intake, match, a later dump onto existing specs, or new information on one existing spec: the matching `/crav1-…` command. Do not start in the host plan UI.
 3. Accept `spec.md`. Then `/crav1-plan-from-spec` and accept `plan.md` / `tasks.md`.
 4. `/crav1-implement-task` or `/crav1-complete-task` for one `T#`. Watch diffs. Run the task’s verify step.
@@ -413,7 +417,7 @@ An agent that cannot run tests will guess. Document the exact test, lint, and de
 
 **A project install travels with the repo.** Project skills, project instructions, and `plan.md` are in git. A user-scope install does not land in the repo. See [docs/install.md](docs/install.md).
 
-**Do not confuse checkpoints with Git.** Checkpoints undo agent file changes in a session. Specs, plans, and finished work belong in version control.
+**Do not confuse Cursor checkpoints with Git.** Cursor checkpoints undo agent file changes in a session. Specs, plans, and finished work belong in version control.
 
 ---
 
