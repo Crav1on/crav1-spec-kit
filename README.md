@@ -78,7 +78,7 @@ If you dump a whole product spec into always-on instructions, you waste context 
 
 ### What you should *not* spec-drive
 
-Quick, well-understood edits (rename, copy tweak, one-file bug with a clear stack trace) belong in a normal agent turn. The spec loop pays off when:
+Quick, well-understood edits (rename, copy tweak, one-file bug with a clear stack trace) belong in a normal agent turn. A bug that is already shipping, or that comes in from outside, is `/crav1-fix-bug`. That command names the lane and does not start it. The spec loop pays off when:
 
 - There are multiple valid designs
 - Many files or systems are involved
@@ -138,6 +138,7 @@ Runnable pieces in this repo:
 | Skill `/crav1-finalize-commit` | Finish a message: git commit, GitKraken copy, or edit | Style first if needed, then draft, then **commit first**, then copy / edit / rewrite / stop; no push. Keeps a trailing work-item mention |
 | Skill `/crav1-open-pr` | Commits exist on `feat/<slug>` or `spec/<slug>` and you want a pull request | Push only after an explicit yes; one PR against the default branch; no merge, no commit. Adds a Work item section when `work-item.md` exists. On Windows, Azure DevOps description is `--description "@<file>"` (UTF-8, no BOM). May name `/crav1-review-pr` and does not run it. Later merge is `/crav1-merge-pr` |
 | Skill `/crav1-review-pr` | This turn names an open pull request and you want to know if it can ship | Slash command; reads the diff. Spec, plan, `verify.md`, the body, and a required green linter. Does not edit, test, vote, comment, or merge |
+| Skill `/crav1-fix-bug` | This turn names a real bug (verify failure on work already shipping, or a defect from outside) | Slash command; says where it was seen, names the bug, what it breaks, and the lane. Does not start that lane, edit, or open a pull request. One of the startup options. Not a new-repo start |
 | Skill `/crav1-merge-pr` | This turn explicitly asks to merge a named pull request | Merge commit only (`gh pr merge --merge` or Azure `noFastForward`). Parents counted with `git rev-list` after the completed re-read. No squash, rebase, or policy bypass. Does not run `/crav1-review-pr`. Stops when a required host check is red |
 | Skill `/crav1-ideas-to-spec` | Pile of ideas + technical hunches | Slash command; pick an export format. Seeds a thin `docs/system/` when missing, then the spec, then one index row. On Azure Repos, one optional work-item id after a new spec folder |
 | Skill `/crav1-intake-to-specs` | 1–N files; maybe several features/repos | Slash command; landscape + one spec per v0 slug. On Azure Repos, one optional work-item question listing the new slugs |
@@ -252,6 +253,8 @@ New information aimed at one spec that already exists is **`/crav1-add-to-spec`*
 When architecture already exists, **`/crav1-security-review`** asks whether the thing in front of it is secure. Full walkthrough: [From a security review](docs/from-security.md). The same command covers the whole system, one existing spec, or the change in front of you. It is not a mode of `/crav1-architecture-reviewer`. Architecture review critiques design hunches. This command writes kept findings and stops. Spark, plan, and verify do not run it.
 
 When an open pull request is named, **`/crav1-review-pr`** reads the diff and says whether it can ship. Full walkthrough: [From a pull request review](docs/from-review-pr.md). It is cross-cutting. It is not a lane and not a bot. It does not edit, run the tests, vote, comment, or merge. `/crav1-open-pr` may name it and does not run it. `/crav1-merge-pr` does not run it. Spark, specify, and verify do not run it.
+
+When a real bug is named, **`/crav1-fix-bug`** says where it was seen, names the bug, points at the spec or the shipped behavior it breaks, and names the lane. Full walkthrough: [From a bug that already exists](docs/from-fix-bug.md). A real bug is a verify failure on work that is already shipping, or a defect that comes in from outside. It is cross-cutting. It is not a lane and not a stretch of verify. It does not start that lane, edit code, open a pull request, or create an Azure Boards work item. If no bug is named, it stops. It does not go hunting. When you ask for startup options, it is one of the options in that list. It is an intake for a bug that already exists. It is not a skill that runs because a repo is new, and it is not started automatically. Spark, specify, plan, and verify do not run it.
 
 ### A. Specify (read-heavy)
 
@@ -374,6 +377,7 @@ This repo already ships:
 - `/crav1-finalize-commit` — same draft, then **commit first**, then copy for GitKraken, edit/rewrite, or stop (no push). Keeps that mention through the HEAD check and the attribution strip
 - `/crav1-open-pr` — push the change branch only after an explicit yes, then open one pull request (no merge, no commit). Body is What / why, Spec links, Verify, and a Work item section when `work-item.md` exists. On Windows, a multi-line Azure DevOps description is passed as `--description "@<file>"` (UTF-8 without BOM). May name `/crav1-review-pr` and does not run it. Next explicit ask to merge is `/crav1-merge-pr`
 - `/crav1-review-pr` — cross-cutting. Reads one named open pull request. Spec, plan, `verify.md`, the body, and a required green linter must hold before it says ship. Names the lane for a finding and does not start it. Does not edit, test, vote, comment, install a linter, or merge. Spark, specify, and verify do not run it
+- `/crav1-fix-bug` — cross-cutting. Names one real bug the user already named (a verify failure on work that is already shipping, or a defect from outside). Says where it was seen, what it breaks, and the lane. Does not start that lane, edit code, open a pull request, or create an Azure Boards work item. Stops when no bug is named. Not a lane and not a stretch of verify. One of the startup options. Not a new-repo start. Not started automatically. Spark, specify, plan, and verify do not run it
 - `/crav1-merge-pr` — merge one named pull request only when that turn asks; always a merge commit; no squash, rebase, or policy bypass. After the completed re-read, two parents are confirmed with `git rev-list` (commits API if git cannot see the commit). Does not run `/crav1-review-pr`. Stops when a required host check is red
 - subagent `crav1-spec-reviewer-agent` — independent product/spec critique
 - subagent `crav1-architecture-reviewer-agent` — hunches vs decisions, diagrams, ADRs
@@ -394,7 +398,7 @@ An agent that cannot run tests will guess. Document the exact test, lint, and de
 ### Step 6 — Day-to-day
 
 1. Open a chat in the product repo. On Cursor that is Agent chat. On Claude Code, open a session in that repo.
-2. For a spark, ideas, intake, match, a later dump onto existing specs, or new information on one existing spec: the matching `/crav1-…` command. Do not start in the host plan UI.
+2. For a spark, ideas, intake, match, a later dump onto existing specs, new information on one existing spec, or a bug that already exists: the matching `/crav1-…` command. A bug that already exists is `/crav1-fix-bug`, one of the startup options. It is not a skill that runs because a repo is new. Do not start in the host plan UI.
 3. Accept `spec.md`. Then `/crav1-plan-from-spec` and accept `plan.md` / `tasks.md`.
 4. `/crav1-implement-task` or `/crav1-complete-task` for one `T#`. Watch diffs. Run the task’s verify step.
 5. If wrong: fix the spec or the plan, then rebuild.
