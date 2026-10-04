@@ -103,6 +103,7 @@ Do not start coding in this chat.
 - Do not invent endpoints, entities, screens, or a performance goal the spec does not require.
 - Do not write test code. Smoke after deploy, chaos, and fuzzing for its own sake stay out.
 - Do not run `/crav1-security-review`. Map kept checks that are already written.
+- A kept suggestion from `/crav1-suggest-tests-for-code` that is already an acceptance line maps to a task. A line under `## Dismissed test suggestions` is not a task. Do not run `/crav1-suggest-tests-for-code`.
 - Do not run `/crav1-review-pr`. Specify does not name the linter. Do not install a linter.
 - Do not name Build when `## Linter` says this repo has no linter or checker for the code these tasks will touch, until the user chooses to go on without one.
 - Do not treat the host plan UI (Cursor Plan Mode or Claude Code plan mode) as a substitute for writing `plan.md` and `tasks.md` unless they said they only want the UI plan and not files. The skill still writes both files.
