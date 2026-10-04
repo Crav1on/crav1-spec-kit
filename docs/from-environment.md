@@ -2,7 +2,7 @@
 
 Kit not in this project yet? [Install first](install.md) (Cursor and Claude Code; the slash commands match, the files do not). After a Cursor plugin install, the short command loop is [plugins/crav1/README.md](../plugins/crav1/README.md). Claude Code has no plugin.
 
-Use this when the user names a **host and an environment** and wants that environment read. Examples: Azure dev, Google Cloud test, AWS dev.
+Use this when the user names a **host and an environment** and wants that environment read. Examples: Azure dev, Google Cloud test, AWS dev. This command is a starter option. Asking for startup options names it and does not run it. It still runs only when the user names the host and a dev or test environment.
 
 This is cross-cutting. It is not a lane. It does not guess the host. It never reads production. Each host has its own reader. The reader lists only what that named environment actually has. A host with no reader stops and says so. It does not pretend to read it. This build has readers for Azure, AWS, and Google Cloud. Any other named host stops with no reader. Azure DevOps, GitHub, and CI are not read.
 

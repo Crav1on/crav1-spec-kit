@@ -73,6 +73,8 @@ Pre-install: `docs/install.md`. Post-plugin-install: `plugins/crav1/README.md`. 
 
 This map covers main. Read it before answering how a skill behaves. Lane ownership stays in `docs/guild-routing.md`. One line per skill: what it reads, what it writes, what it leaves alone, who calls it, and which skill or agent it calls. A second line is a real exception. An agent is listed only when it runs a skill. Naming a next command is not a call.
 
+Starter options, when the user asks for startup options: `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-match-to-specs`, `/crav1-repos-to-spec`, `/crav1-environment-read`, and `/crav1-fix-bug`. That ask names the list. It does not run a skill and does not move work into a lane. Every other skill is a later skill. Each starter still follows the rules it already has.
+
 - `/crav1-spark-to-spec` — Reads the spark and the repo. Writes `docs/specs/<slug>/spec.md`, a thin `docs/system/` including `glossary.md` when that folder is missing, otherwise one index row plus a missing glossary or new glossary rows, and `work-item.md` when the user opts in on Azure Repos. Leaves application code and an existing landscape alone. Called by the user. Calls `/crav1-feature-branch` when the repo already has commits.
   Exception: extend edits that spec and adds no second index row.
 - `/crav1-ideas-to-spec` — Reads one unstructured pile and the repo. Writes `spec.md`, `diagrams.md`, slice ADRs, the chosen `export/`, optional `notes.md`, the same landscape or index-and-glossary result as spark, and `work-item.md` on an Azure Repos opt-in. Leaves application code and an existing landscape alone. Called by the user. Calls `/crav1-feature-branch` when the repo already has commits.

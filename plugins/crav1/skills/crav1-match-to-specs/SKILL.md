@@ -20,6 +20,8 @@ color: yellow
 
 You are the **parent**. Match existing repos to a dump. Do not implement. Do not plan. Do not commit.
 
+This command is a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-match-to-specs`, `/crav1-repos-to-spec`, `/crav1-environment-read`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane. Every other skill is a later skill.
+
 This is not a mode of `/crav1-intake-to-specs`, `/crav1-spark-to-spec`, or `/crav1-ideas-to-spec`. It is not a system-to-architecture pass. Named repos and no dump, when the job is one architecture spec the lanes can extend, is `/crav1-repos-to-spec`. Do not do that job here. Do not send this job to those commands, and do not absorb theirs.
 
 Slice protocol: [references/slice.md](references/slice.md). Landscape diagrams: [references/diagrams.md](references/diagrams.md).

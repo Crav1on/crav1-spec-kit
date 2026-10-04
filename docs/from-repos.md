@@ -2,7 +2,7 @@
 
 Kit not in this project yet? [Install first](install.md) (Cursor and Claude Code; the slash commands match, the files do not). After a Cursor plugin install, the short command loop is [plugins/crav1/README.md](../plugins/crav1/README.md). Claude Code has no plugin.
 
-Use this when the user names **one or more repos** and wants the architecture the code shows written down.
+Use this when the user names **one or more repos** and wants the architecture the code shows written down. This command is a starter option. Asking for startup options names it and does not run it. It still runs only when the user names repos.
 
 This is cross-cutting. It is not a lane. It is not a mode of Specify. It writes one architecture spec the lanes can extend (`docs/architecture/spec.md`) when that file is missing. It writes the system notes under `docs/system/` that [explain](from-explain.md) reads when those notes are missing. When a real system note is already there, it leaves those notes and writes the missing architecture spec and `docs/architecture/left-out.md`. When the architecture spec or those notes are already there, a later re-read adds only what is new and does not rewrite lines that are already there, and removes a left-out line when the code shows it. It does not design the next feature. It does not write application code. It does not start Specify, Plan, or Build.
 
