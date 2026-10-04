@@ -112,3 +112,4 @@ TL;DR first:
 - **Spec is frozen.** Disagreement with the spec → stop, do not patch the spec.
 - One inner-loop item per turn unless they named a shared cause and listed the ids. Omit Gap = next in queue.
 - Do not mark success without re-running that gap’s evidence.
+- Do not run `/crav1-fix-bug`. This queue is the inner loop. A verify failure on work that is already shipping, or a defect from outside, is that command. Do not start it here.

@@ -61,6 +61,7 @@ Start a new chat. Run `/crav1-plan-from-spec`. Read `plan.md` and `tasks.md` and
 | Read the system notes | [from-explain.md](from-explain.md) · `/crav1-explain` |
 | Update the picture after something was added | [from-keep-current.md](from-keep-current.md) · `/crav1-keep-current` |
 | Review a named open pull request | [from-review-pr.md](from-review-pr.md) · `/crav1-review-pr` |
+| A bug that already exists | [from-fix-bug.md](from-fix-bug.md) · `/crav1-fix-bug` |
 | Prove a slice | `/crav1-verify-spec` |
 | Push and open a pull request | `/crav1-open-pr` (after commits exist; does not merge; may name `/crav1-review-pr` and does not run it) |
 | Merge a named pull request | `/crav1-merge-pr` (only when that turn asks; merge commit only; does not run the review) |

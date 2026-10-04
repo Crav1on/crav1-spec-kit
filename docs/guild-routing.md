@@ -54,6 +54,7 @@ Skill slash names are `/crav1-…`. Subagent names end in `-agent`.
 | Skill | `/crav1-security-review` |
 | Skill | `/crav1-explain` |
 | Skill | `/crav1-keep-current` |
+| Skill | `/crav1-fix-bug` |
 | Skill | `/crav1-export-spec` |
 | Skill | `/crav1-draft-commit-message` |
 | Skill | `/crav1-finalize-commit` |
@@ -71,6 +72,8 @@ Skill slash names are `/crav1-…`. Subagent names end in `-agent`.
 `/crav1-explain` may run from any lane. It reads the system notes already in `docs/system/`. The first answer is a short TLDR. Longer goes one level deeper from the same notes. It does not move work into Specify, Plan, or Build. It does not write a file.
 
 `/crav1-keep-current` may run from any lane, on its own. The passes that already append a glossary row also run this picture update. It adds what is new to the short description, the diagram, and how the parts connect. It does not move work into Specify, Plan, or Build. It does not design the change and does not build it.
+
+`/crav1-fix-bug` may run from any lane, and only when the user names a real bug in that turn. A real bug is a verify failure on work that is already shipping, or a defect that comes in from outside. If they have not named one, it stops. It does not go hunting. It names the lane and does not move work into Specify, Plan, or Build. It does not start that lane. A spec miss goes to Specify. A plan miss goes to Plan. A verify miss or a broken implementation goes to Build. Spark, specify, plan, and verify do not run it. It is not a stretch of verify. When the user asks for startup options, this skill is one of the options in that list (the ways to start in [plugins/crav1/README.md](../plugins/crav1/README.md) and [docs/first-run.md](first-run.md)). It is an intake for a bug that already exists. It is not a skill that runs because a repo is new, and it is not started automatically.
 
 Research is a cross-cutting helper with no slash command. Flag it when a run hits a technical question that needs research before Specify or Plan can proceed: choosing a technology or service, changing the architecture, scaling or modernizing, or judging an idea nobody has built yet.
 
@@ -129,6 +132,7 @@ cross_cutting:
     - crav1-security-review
     - crav1-explain
     - crav1-keep-current
+    - crav1-fix-bug
     - crav1-export-spec
     - crav1-draft-commit-message
     - crav1-finalize-commit
