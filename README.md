@@ -124,7 +124,7 @@ Runnable pieces in this repo:
 | Skill `/crav1-security-review` | Architecture already exists (`docs/system/` or a spec that describes the design) | Slash command; same command for the whole system, one spec, or the change in front of you. Writes kept findings. Does not plan or commit |
 | Skill `/crav1-tighten-spec` | Spec exists, still mushy | Slash command; one issue at a time (option to get a suggestion); then edit |
 | Skill `/crav1-resolve-questions` | Open questions remain after tightening | Slash command; keep-open or answer, one `Q#` at a time |
-| Skill `/crav1-plan-from-spec` | Spec is accepted; want plan + tasks, no code | Slash command; writes `plan.md` and `tasks.md` |
+| Skill `/crav1-plan-from-spec` | Spec is accepted; want plan + tasks, no code | Slash command; writes `plan.md` and `tasks.md`; each verify note names the checks |
 | Skill `/crav1-review-plan` | Plan exists; want a critique | Slash command; numbered `P#`s for tighten-plan |
 | Skill `/crav1-tighten-plan` | After review-plan, or mushy tasks | Slash command; one `P#` at a time; patches plan/tasks only |
 | Skill `/crav1-implement-task` | `tasks.md` exists; build one slice | Slash command; one `T#`, then its verify |
@@ -257,7 +257,7 @@ Describe the user problem, not the stack. Force:
 - Who it is for
 - Happy path and failure path
 - Explicit **non-goals**
-- Acceptance checks a stranger could run
+- Acceptance checks a stranger could mark yes or no. Name unit, system, or browser only when that kind is already obvious. Otherwise the plan names the kind. Do not write the test list in the spec.
 
 Have the agent research the repo (search, read, existing tests). Answer clarifying questions. Do not skip them; answer quality here dominates output quality later.
 
@@ -265,7 +265,7 @@ Write or update `docs/specs/<change>/spec.md` (or Spec Kit / OpenSpec’s layout
 
 ### B. Plan (`plan.md` and `tasks.md`)
 
-Run `/crav1-plan-from-spec`. The skill writes `docs/specs/<change>/plan.md` and `tasks.md` with file paths, constraints, and testable tasks. Edit those files. They are the plan that teammates and later chats see.
+Run `/crav1-plan-from-spec`. The skill writes `docs/specs/<change>/plan.md` and `tasks.md` with file paths, constraints, and tasks. Each task verify note names the kind of check and the checks that must pass, before any code. Edit those files. They are the plan that teammates and later chats see. `/crav1-verify-spec` is the gate that says those named checks passed.
 
 The host plan UI is not a substitute. See [docs/install.md](docs/install.md).
 
@@ -273,7 +273,7 @@ Treat the plan as a design review: wrong files, missing constraints, and oversiz
 
 ### C. Task-slice
 
-Every task should be implementable **and testable** in isolation. “Add authentication” is not a task. “POST `/register` rejects invalid email and has a test” is.
+Every task should be implementable **and testable** in isolation. “Add authentication” is not a task. “POST `/register` rejects invalid email (verify: unit — empty email is rejected; unit — malformed email is rejected)” is.
 
 If a task cannot be verified, it is still part of the spec, not ready to implement.
 
@@ -357,7 +357,7 @@ This repo already ships:
 - `/crav1-tighten-spec` — one issue at a time, with explained resolutions (plus get a suggestion) and impact; patch only that issue after you choose
 - `/crav1-resolve-questions` — one Open question at a time; keep it open or answer with impact; patch only that `Q#`
 - `/crav1-export-spec` — re-project `spec.md` into EARS, BDD, OpenSpec, YAML, JSON, or BMAD
-- `/crav1-plan-from-spec` — file-level `plan.md` and testable `tasks.md`; refuses to code
+- `/crav1-plan-from-spec` — file-level `plan.md` and `tasks.md`; each verify note names the checks before code; refuses to code
 - `/crav1-review-plan` — critique `plan.md` / `tasks.md` against the spec; numbered `P#`s
 - `/crav1-tighten-plan` — one plan issue at a time; patches plan/tasks only (spec findings go to tighten-spec)
 - `/crav1-implement-task` — one `tasks.md` row, then run its verify step
@@ -428,7 +428,7 @@ An agent that cannot run tests will guess. Document the exact test, lint, and de
 
 ## 11. Minimal templates
 
-Copy these into `docs/specs/<change>/`. They match [`docs/specs/_template/`](docs/specs/_template/) (`## Trace` on the plan; each task row has `(verify: …) (spec: …)`).
+Copy these into `docs/specs/<change>/`. They match [`docs/specs/_template/`](docs/specs/_template/) (`## Trace` on the plan; each task row has `(verify: <kind> — <named check>) (spec: …)`).
 
 ### spec.md
 
@@ -486,8 +486,8 @@ Stack, compatibility, performance, security.
 ```markdown
 # Tasks
 
-- [ ] T1: … (verify: …) (spec: …)
-- [ ] T2: … (verify: …) (spec: …)
+- [ ] T1: … (verify: <kind> — <named check>) (spec: …)
+- [ ] T2: … (verify: <kind> — <named check>) (spec: …)
 ```
 
 ---

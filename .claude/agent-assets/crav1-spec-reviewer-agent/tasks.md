@@ -1,4 +1,4 @@
 # Tasks
 
-- [ ] T1: … (verify: …) (spec: …)
-- [ ] T2: … (verify: …) (spec: …)
+- [ ] T1: … (verify: <kind> — <named check>) (spec: …)
+- [ ] T2: … (verify: <kind> — <named check>) (spec: …)

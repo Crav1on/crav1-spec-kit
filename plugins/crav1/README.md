@@ -27,7 +27,7 @@ Type `/crav1` in Cursor Agent chat to list commands. On Claude Code, type the sa
 
 **Build**
 
-- `/crav1-plan-from-spec` — `plan.md` + `tasks.md` (no code)
+- `/crav1-plan-from-spec` — `plan.md` + `tasks.md`; each verify note names the checks before code (no code)
 - `/crav1-review-plan` — critique plan/tasks vs spec; numbered `P#`s
 - `/crav1-tighten-plan` — one plan `P#`; patches `plan.md` / `tasks.md` only
 - `/crav1-implement-task` — one `T#`, then its verify step

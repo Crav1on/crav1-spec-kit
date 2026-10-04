@@ -30,7 +30,7 @@ Write `docs/specs/<slug>/spec.md` from `assets/spec.md`.
 - **In the code** lists repo paths that support the slice and what those paths show. Partial: also say what is missing, using the dump’s words.
 - **Trace** keeps the three labels. Confirmed dump facts are accepted, not inferred. Anything not on the confirmed map stays inferred or is left out.
 - **Open questions** stay open. Do not answer them in the body.
-- Add a normal spec section only when the dump or the code supports it: Problem, Goals, Non-goals, Users and journeys, Acceptance criteria, Constraints, Assumptions. Omit the section when it does not. Do not invent acceptance criteria, journeys, or a done-state to make the file look buildable.
+- Add a normal spec section only when the dump or the code supports it: Problem, Goals, Non-goals, Users and journeys, Acceptance criteria, Constraints, Assumptions. Omit the section when it does not. Do not invent acceptance criteria, journeys, or a done-state to make the file look buildable. A checkbox the dump or the code already states is yes/no. Name unit, system, or browser only when that kind is already obvious there. Otherwise leave the kind for plan. Do not invent a test list.
 
 ## Not in the code
 

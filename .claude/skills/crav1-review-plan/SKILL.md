@@ -24,7 +24,7 @@ Pass the subagent these paths (read-only): `spec.md`, `plan.md`, `tasks.md`, plu
 
 ## What to tell the subagent
 
-Instruct it to follow its own prompt and to finish with numbered **Issues for `/crav1-tighten-plan`** (`P1`, `P2`, …), one finding each. Mark any finding that is really a spec defect as **spec** (do not pretend the plan can fix it). No single global patch recommendation.
+Instruct it to follow its own prompt and the check rules in `crav1-plan-from-spec` [references/checks.md](../crav1-plan-from-spec/references/checks.md) (drop-in: `.claude/skills/crav1-plan-from-spec/references/checks.md`; plugin: sibling `skills/crav1-plan-from-spec/references/checks.md`). Finish with numbered **Issues for `/crav1-tighten-plan`** (`P1`, `P2`, …), one finding each. Mark any finding that is really a spec defect as **spec** (do not pretend the plan can fix it). No single global patch recommendation.
 
 ## After it returns
 
