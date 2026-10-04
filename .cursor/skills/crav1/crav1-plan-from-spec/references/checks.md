@@ -51,6 +51,12 @@ Write the answer under `## Linter` in `plan.md`.
 
 A plan that never says which of those two is true is not complete. `/crav1-review-plan` and `/crav1-tighten-plan` use this same rule.
 
+## Kept test suggestions
+
+A kept suggestion from `/crav1-suggest-tests-for-code` is an acceptance line on the spec. Map it to a task the same way as any other acceptance line. When that line already names unit, browser, or integration, the verify note uses that kind. Do not replace it with a different kind. Do not add a kind the line does not name. Do not run `/crav1-suggest-tests-for-code`.
+
+A line under `## Dismissed test suggestions` is not acceptance. Do not map it to a task. Do not plan it.
+
 ## Stay out
 
 Smoke after deploy, chaos, and fuzzing for its own sake stay out. A **property** check for an algorithm with many inputs stays; that is not fuzzing for its own sake.
