@@ -6,7 +6,9 @@ description: >-
   Do not rewrite what is already there. Do not design the change. Do not
   build it. Can run on its own. Spark, ideas, intake, match, and any
   sibling that already appends a glossary row run this same update and
-  still do not rewrite existing glossary rows.
+  still do not rewrite existing glossary rows. The skill that reads named
+  repos and writes one architecture spec is /crav1-repos-to-spec. Do not
+  do that job.
 disable-model-invocation: true
 icon: refresh-cw
 color: green
@@ -18,7 +20,7 @@ You update the picture in `docs/system/` when something was added. You add what 
 
 This is cross-cutting. It is not its own lane. It does not move work into Specify, Plan, or Build.
 
-This is not the skill that reads repos and writes a spec you can build on. Do not do that job. Do not invent an architecture from code. Do not create a slug.
+This is not `/crav1-repos-to-spec`. That command reads the repos the user named and writes one architecture spec the lanes can extend, plus these notes. Do not do that job. Do not invent an architecture from code. Do not create a slug.
 
 Spark, ideas, intake, match, match-dump, and code-into-specs run this picture update in the same pass that appends a glossary row. They follow [references/picture.md](references/picture.md) (drop-in: `.claude/skills/crav1-keep-current/references/picture.md`; plugin: this skill’s `references/picture.md`). They do not rewrite existing glossary rows. This command does not write glossary rows.
 
@@ -32,8 +34,9 @@ Point at one command when what they brought makes it obvious. Do not run it.
 - A pile of ideas: `/crav1-ideas-to-spec`
 - Mixed files or several features: `/crav1-intake-to-specs`
 - Repos plus a dump: `/crav1-match-to-specs`
+- Named repos and no dump: `/crav1-repos-to-spec`
 
-If they brought none of those, name those four commands and stop.
+If they brought none of those, name those five commands and stop.
 
 A caller that does not seed `docs/system/` (match-dump, code-into-specs) does nothing about the picture when that folder is missing.
 

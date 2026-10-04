@@ -8,7 +8,7 @@ The picture is three places: the short description in `landscape.md`, the contex
 
 This is cross-cutting. It is not its own lane. It can run on its own. The same passes that already append a glossary row also run this update: spark, ideas, intake, match, and the siblings that already append (match-dump and code-into-specs). Those passes do not rewrite existing glossary rows. This command does not write glossary rows.
 
-This is not the skill that reads repos and writes a spec you can build on. Spark, ideas, intake, and match still create the notes. [Explain](from-explain.md) reads them and does not update them.
+This is not [from the repos](from-repos.md) (`/crav1-repos-to-spec`). That command reads the repos the user named and writes one architecture spec the lanes can extend, plus these notes. Spark, ideas, intake, and match still create notes for a feature or a dump. [Explain](from-explain.md) reads the notes and does not update them.
 
 ## First prompt
 
@@ -28,7 +28,7 @@ That slash command *is* the prompt.
 
 | Phase | You | Agent |
 | --- | --- | --- |
-| Notes | — | Stops when `docs/system/` is missing. Points at spark, ideas, intake, or match. Does not seed the folder |
+| Notes | — | Stops when `docs/system/` is missing. Points at spark, ideas, intake, match, or repos-to-spec when the user named repos and brought no dump. Does not seed the folder |
 | What is new | — | A part or a connection a spec already states and the picture does not. Skips a sentence marked inferred. Does not invent one from the repo |
 | Write | Glance | Appends a sentence, a diagram node or edge, or a connection line. Leaves existing lines as they are |
 | Stop | `/crav1-finalize-commit` if a file changed | Does not plan, implement, or commit. Names that command only when a file changed |

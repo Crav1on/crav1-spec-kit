@@ -117,6 +117,8 @@ This map covers main. Read it before answering how a skill behaves. Lane ownersh
   Exception: spark, plan, and verify do not run it. `/crav1-architecture-reviewer` may name it and does not run it.
 - `/crav1-fix-bug` — Reads only the bug the user named and a spec already in front of them. Writes nothing. Leaves code, specs, plans, `verify.md`, and `work-item.md` alone. Called by the user. Calls no skill.
   Exception: no bug named, or not a real bug, stops with no lane. Spark, specify, plan, and verify do not run it.
+- `/crav1-repos-to-spec` — Reads the repos the user named. Writes one architecture spec the lanes can extend and the `docs/system/` notes `/crav1-explain` reads. Leaves application code, the next feature, and a later re-read alone. Called by the user. Calls `/crav1-feature-branch` when the destination already has commits.
+  Exception: a guess stays out of the spec until the user confirms it, and a link is written only when the code shows it.
 - `/crav1-explain` — Reads the `docs/system/` notes spark, ideas, intake, or match already wrote. Writes a short TLDR in the chat, one level deeper only when asked, and one part when pointed at. Leaves specs, code, and the picture alone. Called by the user. Calls no skill.
   Exception: does not guess, invent a second document, teach, or start Specify, Plan, or Build. When the picture is older than the specs, it names `/crav1-keep-current` and does not run it.
 - `/crav1-keep-current` — Reads the picture and what a spec already states. Writes new lines on the short description, the context diagram, and how the parts connect. Leaves existing picture lines, glossary rows, design, and build alone. Called by the user. Calls no skill.

@@ -6,7 +6,7 @@ Use this when **one or more repos already make up a system**, and you have a **d
 
 The repos are evidence of what exists. The dump is what to match. It is not a brief for a new product. You still do **not** start by coding.
 
-This command is not [intake](from-intake.md), [a spark](from-nothing.md), or [a pile of ideas](from-ideas.md). It does not replace those commands. A new system, with code only as background, stays `/crav1-intake-to-specs`. One or two sentences stay `/crav1-spark-to-spec`. One unstructured pile for one feature stays `/crav1-ideas-to-spec`.
+This command is not [intake](from-intake.md), [a spark](from-nothing.md), or [a pile of ideas](from-ideas.md). It does not replace those commands. A new system, with code only as background, stays `/crav1-intake-to-specs`. One or two sentences stay `/crav1-spark-to-spec`. One unstructured pile for one feature stays `/crav1-ideas-to-spec`. Named repos and no dump, when the job is one architecture spec of what the code shows, is [from the repos](from-repos.md) (`/crav1-repos-to-spec`). This command still needs the dump.
 
 ## First prompt
 

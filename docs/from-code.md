@@ -6,7 +6,7 @@ Use this when **specs already exist** under `docs/specs/` and a **code change al
 
 The change is a commit, a commit range, or the diff of the current branch against the default branch. No dump is required.
 
-[Match](from-match.md) creates the folders from repos plus a dump. [Match-dump](from-match-dump.md) sorts a later dump onto specs that already exist. [Add](from-add.md) takes information already aimed at one named spec. This command starts from the change. It does not replace [intake](from-intake.md), [a spark](from-nothing.md), or [a pile of ideas](from-ideas.md). It does not write application code. It does not watch the repo. It runs only when someone points it at a change.
+[Match](from-match.md) creates the folders from repos plus a dump. [Match-dump](from-match-dump.md) sorts a later dump onto specs that already exist. [Add](from-add.md) takes information already aimed at one named spec. This command starts from the change. It does not replace [intake](from-intake.md), [a spark](from-nothing.md), or [a pile of ideas](from-ideas.md). It is not [from the repos](from-repos.md) (`/crav1-repos-to-spec`), which reads the repos the user named and writes one architecture spec. It does not write application code. It does not watch the repo. It runs only when someone points it at a change.
 
 A not-started spec (match status `not in the code`, or a thin spec) can keep taking information until planning. Adding what the change does does not start planning and does not write `plan.md` or `tasks.md`.
 

@@ -52,6 +52,7 @@ Skill slash names are `/crav1-…`. Subagent names end in `-agent`.
 | --- | --- |
 | Skill | `/crav1-feature-branch` |
 | Skill | `/crav1-security-review` |
+| Skill | `/crav1-repos-to-spec` |
 | Skill | `/crav1-explain` |
 | Skill | `/crav1-keep-current` |
 | Skill | `/crav1-fix-bug` |
@@ -69,6 +70,8 @@ Skill slash names are `/crav1-…`. Subagent names end in `-agent`.
 
 `/crav1-security-review` may run from any lane, and only after architecture already exists (`docs/system/` or a spec that already describes the design). The same command reviews the whole system, one existing spec, or the change in front of us. It does not move work into Specify, Plan, or Build. Spark, plan, and verify do not run it.
 
+`/crav1-repos-to-spec` may run from any lane. The user names one or more repos. It reads those repos and writes one architecture spec the lanes can extend, plus the system notes in `docs/system/` that `/crav1-explain` reads. A fact the code shows is confirmed. A guess stays out of the spec until the user confirms it. A link between repos is written only when the code shows it. If none is found, it says so. It does not invent links. It does not design the next feature, write application code, or start Specify, Plan, or Build. A later re-read that only adds what is new is not this command. It is not `/crav1-code-into-specs`. It does not move work into Specify, Plan, or Build.
+
 `/crav1-explain` may run from any lane. It reads the system notes already in `docs/system/`. The first answer is a short TLDR. Longer goes one level deeper from the same notes. It does not move work into Specify, Plan, or Build. It does not write a file.
 
 `/crav1-keep-current` may run from any lane, on its own. The passes that already append a glossary row also run this picture update. It adds what is new to the short description, the diagram, and how the parts connect. It does not move work into Specify, Plan, or Build. It does not design the change and does not build it.
@@ -79,7 +82,7 @@ Research is a cross-cutting helper with no slash command. Flag it when a run hit
 
 Any lane that hits this flags it to the process orchestrator or guild lead, who pauses that lane and sends the researcher the question, the product or feature slug, and any constraints.
 
-The researcher treats the project's existing specs, plans, and code as the current state. For parts those do not cover, the researcher may use an architecture-extraction skill if one is available.
+The researcher treats the project's existing specs, plans, and code as the current state. For parts those do not cover, the researcher may use `/crav1-repos-to-spec`. Running that command is the skill writing the architecture spec and the system notes. The researcher does not hand-edit those files.
 
 The full study lives wherever the team keeps its research. The researcher writes a short `docs/specs/<slug>/research.md` with the recommendation, trade-offs, confidence, and a link to the full study, and returns the recommendation to the process orchestrator or guild lead with a suggested lane. That role routes it.
 
@@ -130,6 +133,7 @@ cross_cutting:
   skills:
     - crav1-feature-branch
     - crav1-security-review
+    - crav1-repos-to-spec
     - crav1-explain
     - crav1-keep-current
     - crav1-fix-bug

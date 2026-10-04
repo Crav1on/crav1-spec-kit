@@ -2,7 +2,7 @@
 
 Kit not in this project yet? [Install first](install.md) (Cursor and Claude Code; the slash commands match, the files do not). After a Cursor plugin install, the short command loop is [plugins/crav1/README.md](../plugins/crav1/README.md). Claude Code has no plugin.
 
-Use this when **system notes already exist** under `docs/system/` and you want them read back. Spark, ideas, intake, and match write those notes. This command reads them.
+Use this when **system notes already exist** under `docs/system/` and you want them read back. Spark, ideas, intake, match, and repos-to-spec write those notes. This command reads them.
 
 This is cross-cutting. It is not its own lane. It does not start Specify, Plan, or Build. It does not guess. It does not write a second document. It does not teach.
 
@@ -42,13 +42,13 @@ That slash command *is* the prompt.
 
 | Phase | You | Agent |
 | --- | --- | --- |
-| Notes | — | Stops when `docs/system/` has no notes yet. Points at spark, ideas, intake, or match. Does not invent the notes |
+| Notes | — | Stops when `docs/system/` has no notes yet. Points at spark, ideas, intake, match, or repos-to-spec when the user named repos and brought no dump. Does not invent the notes |
 | Answer | Read the TLDR | A few sentences from the short description, or from the part you named |
 | Longer | Say longer | One level deeper from the same notes. The next longer opens one more heading. Stops when the notes have no further level |
 | Can it | Ask the question | Yes and where, no and where, or that is not written down |
 | Age | — | When the picture is older than the specs, says so and names `/crav1-keep-current`. Does not run it |
 
-No notes in front of the command: it stops and points at spark, ideas, intake, or match.
+No notes in front of the command: it stops and points at spark, ideas, intake, match, or repos-to-spec when the user named repos and brought no dump.
 
 ## What gets written
 
