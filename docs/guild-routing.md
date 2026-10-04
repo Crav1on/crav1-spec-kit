@@ -51,6 +51,7 @@ Skill slash names are `/crav1-…`. Subagent names end in `-agent`.
 | Kind | Name |
 | --- | --- |
 | Skill | `/crav1-feature-branch` |
+| Skill | `/crav1-security-review` |
 | Skill | `/crav1-export-spec` |
 | Skill | `/crav1-draft-commit-message` |
 | Skill | `/crav1-finalize-commit` |
@@ -59,6 +60,8 @@ Skill slash names are `/crav1-…`. Subagent names end in `-agent`.
 | Helper | Research |
 
 `/crav1-merge-pr` may run from any lane, and only when the user explicitly asks in that turn to merge a named pull request. It does not move work into Specify, Plan, or Build.
+
+`/crav1-security-review` may run from any lane, and only after architecture already exists (`docs/system/` or a spec that already describes the design). The same command reviews the whole system, one existing spec, or the change in front of us. It does not move work into Specify, Plan, or Build. Spark, plan, and verify do not run it.
 
 Research is a cross-cutting helper with no slash command. Flag it when a run hits a technical question that needs research before Specify or Plan can proceed: choosing a technology or service, changing the architecture, scaling or modernizing, or judging an idea nobody has built yet.
 
@@ -114,6 +117,7 @@ build:
 cross_cutting:
   skills:
     - crav1-feature-branch
+    - crav1-security-review
     - crav1-export-spec
     - crav1-draft-commit-message
     - crav1-finalize-commit

@@ -23,3 +23,5 @@ Instruct it to follow its own prompt and to finish with numbered **Issues for `/
 ## After it returns
 
 Show the subagent’s review to the user. Then tell them the next command is `/crav1-tighten-spec` to walk those issues one by one. Do not start tightening in this turn unless they already asked.
+
+Also name `/crav1-security-review` when they want a security pass on the design that now exists. That command is optional. Do not run it from this skill. Architecture review stays a critique of design hunches. It does not ask whether the thing is secure.

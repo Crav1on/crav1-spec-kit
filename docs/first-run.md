@@ -57,6 +57,7 @@ Start a new chat. Run `/crav1-plan-from-spec`. Read `plan.md` and `tasks.md` and
 | A later dump onto specs that already exist | [from-match-dump.md](from-match-dump.md) · `/crav1-match-dump-to-specs` |
 | A code change that already landed, specs already exist | [from-code.md](from-code.md) · `/crav1-code-into-specs` |
 | New information for one existing spec | [from-add.md](from-add.md) · `/crav1-add-to-spec` |
+| Security review after architecture exists | [from-security.md](from-security.md) · `/crav1-security-review` |
 | Prove a slice | `/crav1-verify-spec` |
 | Push and open a pull request | `/crav1-open-pr` (after commits exist; does not merge) |
 | Merge a named pull request | `/crav1-merge-pr` (only when that turn asks; merge commit only) |
