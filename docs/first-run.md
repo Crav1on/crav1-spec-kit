@@ -2,6 +2,22 @@
 
 A thin path for someone new to **CRAV1 Spec Kit** (`crav1`) on Cursor or Claude Code. The slash commands are the same. The install is not. Full playbook: [README](../README.md). Where files go: [install.md](install.md). After a Cursor plugin install: [plugins/crav1/README.md](../plugins/crav1/README.md). Claude Code has no plugin.
 
+## Starter options
+
+When you ask for startup options, these seven are the only ways in. That ask names the list. It does not run a skill. It does not move work into a lane. Each starter still follows the rules it already has. Every other skill is a later skill.
+
+| Starter | When |
+| --- | --- |
+| `/crav1-spark-to-spec` | One or two sentences |
+| `/crav1-ideas-to-spec` | A pile of ideas and technical hunches |
+| `/crav1-intake-to-specs` | Mixed files, or more than one v0 feature |
+| `/crav1-match-to-specs` | Existing repos plus a dump to match |
+| `/crav1-repos-to-spec` | You name the repos. It runs only then |
+| `/crav1-environment-read` | You name the host and a dev or test environment. It runs only then |
+| `/crav1-fix-bug` | You name a real bug that already exists. It runs only then |
+
+The steps below are one thin path: a spark through one task. Pick another row in the table when that is the work in front of you.
+
 ## 1. Pick an install path
 
 Install where the feature should land. Steps, host paths, and project versus user scope: [install.md](install.md).
@@ -46,6 +62,8 @@ Start a new chat. Run `/crav1-plan-from-spec`. Read `plan.md` and `tasks.md` and
 `/crav1-implement-task` for one `T#` in `tasks.md`, then that task’s verify step.
 
 ## Where to go next
+
+The starter options are the seven above. The table includes later skills. Asking for startup options names only the seven.
 
 | Next | Where |
 | --- | --- |

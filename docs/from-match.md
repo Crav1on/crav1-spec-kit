@@ -2,7 +2,7 @@
 
 Kit not in this project yet? [Install first](install.md) (Cursor and Claude Code; the slash commands match, the files do not). After a Cursor plugin install, the short command loop is [plugins/crav1/README.md](../plugins/crav1/README.md). Claude Code has no plugin.
 
-Use this when **one or more repos already make up a system**, and you have a **dump** (notes, tickets, old docs, diagrams, screenshots) to match against that code.
+Use this when **one or more repos already make up a system**, and you have a **dump** (notes, tickets, old docs, diagrams, screenshots) to match against that code. This command is a starter option. The seven are in [first-run.md](first-run.md). Asking for startup options names that list and does not run this command.
 
 The repos are evidence of what exists. The dump is what to match. It is not a brief for a new product. You still do **not** start by coding.
 

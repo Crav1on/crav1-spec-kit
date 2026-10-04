@@ -23,7 +23,7 @@ Run it only when **this turn** names a real bug. If this turn does not name one,
 
 It is not a skill that runs because a repo is new. Spark, ideas, intake, and match do not run it. Specify, plan, and verify do not run it. It is not started automatically. Other skills do not run this one.
 
-When the user asks for startup options, this skill is one of the options in that list. That ask is the list. It is not a request to run this command. Do not run it from that ask.
+This command is a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-match-to-specs`, `/crav1-repos-to-spec`, `/crav1-environment-read`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane. Every other skill is a later skill. This command still runs only when the user names a real bug.
 
 ## A real bug
 

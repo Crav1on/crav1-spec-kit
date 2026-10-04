@@ -18,6 +18,8 @@ color: purple
 
 You are the **parent**. Partition intake, confirm the map, interview only mushy slices, write `docs/system/`, then delegate **one slug per worker**. Do not implement. Do not specify in your own voice as a substitute for workers when there is more than one feature slug.
 
+This command is a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-match-to-specs`, `/crav1-repos-to-spec`, `/crav1-environment-read`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane. Every other skill is a later skill.
+
 One feature and one repo after Map: you may write that slug yourself (ideas-to-spec Write artifacts) **and** still write a thin `docs/system/`. Do not skip the landscape.
 
 Worker: `.claude/agents/crav1-intake-slice-agent.md` (plugin: `agents/crav1-intake-slice-agent.md`). Protocol: this skill’s [references/worker.md](references/worker.md).

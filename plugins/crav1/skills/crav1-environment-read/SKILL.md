@@ -22,6 +22,8 @@ The user names the host and the environment at the start. You read that environm
 
 Command: `/crav1-environment-read`.
 
+This command is a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-match-to-specs`, `/crav1-repos-to-spec`, `/crav1-environment-read`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane. Every other skill is a later skill. This command still runs only when the user names the host and a dev or test environment.
+
 This is cross-cutting. It is not a lane. It does not move work into Specify, Plan, or Build. It does not start those lanes.
 
 This skill only reads. It does not write `docs/system`, `docs/architecture/spec.md`, a feature spec, or `docs/architecture/left-out.md`. After the user confirms a section, the skill that already owns that file adds only what is new. A fact is marked seen in that environment. It is not marked as something the code shows. It does not become a link unless the environment actually shows the connection.

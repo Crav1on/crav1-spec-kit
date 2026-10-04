@@ -2,7 +2,7 @@
 
 Kit not in this project yet? [Install first](install.md) (Cursor and Claude Code; the slash commands match, the files do not). After a Cursor plugin install, the short command loop is [plugins/crav1/README.md](../plugins/crav1/README.md). Claude Code has no plugin.
 
-Use this when you have **more than a spark**: several ideas, maybe UX notes, maybe “I think we should use X”, but it is not a spec you would hand to an agent to build.
+Use this when you have **more than a spark**: several ideas, maybe UX notes, maybe “I think we should use X”, but it is not a spec you would hand to an agent to build. This command is a starter option. The seven are in [first-run.md](first-run.md). Asking for startup options names that list and does not run this command.
 
 You still do **not** start by coding. You add an architecture interview and you write diagrams + ADRs. The canonical file remains `spec.md`. Formats are exports. The layout always includes `docs/system/`. This command seeds a thin landscape when that folder is missing (greenfield or an existing app), then writes the spec artifacts, then adds one index row. It fills that landscape from the repo already in front of the agent. When the landscape already exists, this command adds one index row (a repo or ADR row only when the feature needs a new repo) and adds what is new to the picture. Lines already there stay as they are. A missing `glossary.md` is written. An existing glossary gets only new rows for words that are not already listed. Existing rows are not rewritten. A meaning the source does not state is `to be researched`. That same pass adds what is new to the short description, the diagram, and how the parts connect. It does not rewrite what is already there.
 
