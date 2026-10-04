@@ -20,7 +20,7 @@ color: yellow
 
 You are the **parent**. Match existing repos to a dump. Do not implement. Do not plan. Do not commit.
 
-This is not a mode of `/crav1-intake-to-specs`, `/crav1-spark-to-spec`, or `/crav1-ideas-to-spec`. It is not a system-to-architecture pass. Do not send this job to those commands, and do not absorb theirs.
+This is not a mode of `/crav1-intake-to-specs`, `/crav1-spark-to-spec`, or `/crav1-ideas-to-spec`. It is not a system-to-architecture pass. Named repos and no dump, when the job is one architecture spec the lanes can extend, is `/crav1-repos-to-spec`. Do not do that job here. Do not send this job to those commands, and do not absorb theirs.
 
 Slice protocol: [references/slice.md](references/slice.md). Landscape diagrams: [references/diagrams.md](references/diagrams.md).
 

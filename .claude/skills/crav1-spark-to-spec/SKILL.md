@@ -38,7 +38,7 @@ Look at the workspace and what they @-mentioned.
 
 If both a codebase and an old spec are present, brownfield + new slug is the default. If `docs/system/` exists as well, treat that as **later feature on the landscape** (still new slug; constraints from landscape then from the app).
 
-If they pasted a dump, many files, or several features/repos, stop and tell them `/crav1-intake-to-specs` (or `/crav1-ideas-to-spec` for one pile → one spec). Do not stretch this skill.
+If they pasted a dump, many files, or several features/repos, stop and tell them `/crav1-intake-to-specs` (or `/crav1-ideas-to-spec` for one pile → one spec). Named repos and no feature sentence, when the job is the architecture the code shows, is `/crav1-repos-to-spec`. Do not stretch this skill.
 
 ## First response (before any file)
 

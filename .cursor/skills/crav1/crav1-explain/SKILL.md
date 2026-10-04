@@ -1,13 +1,15 @@
 ---
 name: crav1-explain
 description: >-
-  Read the system notes spark, ideas, intake, or match already wrote
-  (docs/system/). First answer is a short TLDR. Longer goes one level
+  Read the system notes spark, ideas, intake, match, or repos-to-spec
+  already wrote (docs/system/). First answer is a short TLDR. Longer goes one level
   deeper from the same notes. The user can point at one part, or ask
   whether the system can do something. Yes points at the note. No says no.
   Never mentioned means that is not written down. Does not guess, write a
   second document, teach, or start Specify, Plan, or Build. When the
   picture is older than the specs, say so and name /crav1-keep-current.
+  When the notes are missing and the user named repos and brought no dump,
+  name /crav1-repos-to-spec and do not run it.
 disable-model-invocation: true
 icon: message-circle
 color: blue
@@ -31,8 +33,9 @@ Point at one command when what they brought makes it obvious. Do not run it.
 - A pile of ideas, no notes yet: `/crav1-ideas-to-spec`
 - Mixed files or several features, no notes yet: `/crav1-intake-to-specs`
 - Repos plus a dump, no notes yet: `/crav1-match-to-specs`
+- Named repos and no dump, no notes yet: `/crav1-repos-to-spec`
 
-If they brought none of those, name those four commands and stop.
+If they brought none of those, name those five commands and stop.
 
 The template sentence `What this product/system is, in one short paragraph.` is not a short description. The template diagram `user[User] --> app[App]` with no other node is not a diagram of this system.
 

@@ -14,7 +14,7 @@ The layout always includes `docs/system/`. When that folder is missing, seed a t
 
 **Input is a blob.** Everything they wrote after `/crav1-ideas-to-spec` (and any @ files) is the bundle. Do **not** ask them to label `Format:`, `Bundle:`, bullets, or `Technical thoughts:`. Headings are optional; if they used them, honor them. If they used none, you still extract the same information.
 
-If the pile clearly implies **two or more v0 feature slices** or **two or more git repos**, stop. Do not write files. Tell them to run `/crav1-intake-to-specs` with the same `@` refs (and chat text). Do not morph this skill into the orchestrator.
+If the pile clearly implies **two or more v0 feature slices** or **two or more git repos**, stop. Do not write files. Tell them to run `/crav1-intake-to-specs` with the same `@` refs (and chat text). Named repos and no idea pile, when the job is the architecture the code shows, is `/crav1-repos-to-spec`. Do not send that job to intake. Do not morph this skill into the orchestrator.
 
 Read `references/formats.md` only when exporting. Read `references/diagrams.md` before writing diagrams.
 

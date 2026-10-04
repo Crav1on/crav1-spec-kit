@@ -33,7 +33,7 @@ Everything after `/crav1-intake-to-specs` and every `@` is **intake**. Do not as
 | **Intent** | Notes, briefs, markdown, screenshots, whiteboard photos, diagrams, PDFs, chat blob | Extract slices from this |
 | **Context** | Existing app code, other repos, “something like this” | Constraints and patterns; not a second product spec |
 
-Default if they only `@` a codebase and did **not** say extract-as-is: **new system, this code is context.** Extract-as-is is an explicit override; still partition into landscape + feature slugs, never one mega-spec.
+Default if they only `@` a codebase and did **not** say extract-as-is: **new system, this code is context.** Extract-as-is is an explicit override; still partition into landscape + feature slugs, never one mega-spec. Named repos and no intake files, when the job is one architecture spec of what the code shows, is `/crav1-repos-to-spec`. Do not partition that job into feature slugs.
 
 A one-liner with no files: tell them `/crav1-spark-to-spec`. A single unstructured pile that is clearly **one** feature and **one** repo: `/crav1-ideas-to-spec` is enough; you may continue here anyway (thin landscape is still required).
 

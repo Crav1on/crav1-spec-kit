@@ -24,6 +24,8 @@ You sort a code change that already landed onto specs that already exist. Then y
 
 This is not a mode of `/crav1-match-to-specs`, `/crav1-match-dump-to-specs`, or `/crav1-add-to-spec`. Match creates spec folders from repos plus a dump. Match-dump sorts a later dump onto specs that already exist. Add takes information already aimed at one named spec. This skill starts from a code change that already landed without spec, plan, or build. No dump is required. Do not send this job to those commands, and do not absorb theirs.
 
+This is not `/crav1-repos-to-spec`. That command reads the repos the user named and writes one architecture spec plus the system notes. This command sorts a change that already landed onto specs that already exist.
+
 Do not copy the match worker that creates folders. Do not use `crav1-match-to-specs` `references/slice.md`. Do not launch a worker. There is no slice subagent.
 
 This skill does not watch the repo. It runs only when someone points it at a change. Do not schedule it, hook it, or run it again because new commits appeared.
