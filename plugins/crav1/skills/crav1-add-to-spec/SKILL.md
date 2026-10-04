@@ -22,6 +22,10 @@ This is not `/crav1-match-to-specs`, `/crav1-intake-to-specs`, `/crav1-spark-to-
 
 A not-started spec (match status `not in the code`, or a thin spec) can keep taking information until planning. Adding information does not start planning and does not write `plan.md` or `tasks.md`.
 
+## From /crav1-environment-read
+
+When `/crav1-environment-read` hands a confirmed fact for a slice Match already owns, run only this section, then stop. Add that quote to that spec only. The quote starts with `Seen in <host> <environment>.` Do not replace it with a paraphrase. Do not mark it as something the code shows. Do not change match status. Do not create a slug. Do not open the impact question. Do not edit `docs/system/` or another spec from this handoff. If no spec has `## Match` for that slice, write nothing. Do not start Specify, Plan, or Build.
+
 ## Input
 
 Everything after `/crav1-add-to-spec`, and every `@`, is input: the new information, and a target when they named one.
