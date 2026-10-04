@@ -20,4 +20,4 @@ Links the code shows, each with the path that shows the link. When only one repo
 
 ## Open questions
 
-What the code does not show. A guess the user did not confirm stays out of this file.
+What the code does not show. A guess the user did not confirm stays out of this file. It belongs in `docs/architecture/left-out.md`.
