@@ -52,6 +52,8 @@ Skill slash names are `/crav1-…`. Subagent names end in `-agent`.
 | --- | --- |
 | Skill | `/crav1-feature-branch` |
 | Skill | `/crav1-security-review` |
+| Skill | `/crav1-explain` |
+| Skill | `/crav1-keep-current` |
 | Skill | `/crav1-export-spec` |
 | Skill | `/crav1-draft-commit-message` |
 | Skill | `/crav1-finalize-commit` |
@@ -65,6 +67,10 @@ Skill slash names are `/crav1-…`. Subagent names end in `-agent`.
 `/crav1-review-pr` may run from any lane, and only when the user names an open pull request (number or URL) in that turn, or clearly asks to review that pull request. It does not move work into Specify, Plan, or Build. It only names the lane for a finding. Spark, specify, and verify do not run it.
 
 `/crav1-security-review` may run from any lane, and only after architecture already exists (`docs/system/` or a spec that already describes the design). The same command reviews the whole system, one existing spec, or the change in front of us. It does not move work into Specify, Plan, or Build. Spark, plan, and verify do not run it.
+
+`/crav1-explain` may run from any lane. It reads the system notes already in `docs/system/`. The first answer is a short TLDR. Longer goes one level deeper from the same notes. It does not move work into Specify, Plan, or Build. It does not write a file.
+
+`/crav1-keep-current` may run from any lane, on its own. The passes that already append a glossary row also run this picture update. It adds what is new to the short description, the diagram, and how the parts connect. It does not move work into Specify, Plan, or Build. It does not design the change and does not build it.
 
 Research is a cross-cutting helper with no slash command. Flag it when a run hits a technical question that needs research before Specify or Plan can proceed: choosing a technology or service, changing the architecture, scaling or modernizing, or judging an idea nobody has built yet.
 
@@ -121,6 +127,8 @@ cross_cutting:
   skills:
     - crav1-feature-branch
     - crav1-security-review
+    - crav1-explain
+    - crav1-keep-current
     - crav1-export-spec
     - crav1-draft-commit-message
     - crav1-finalize-commit

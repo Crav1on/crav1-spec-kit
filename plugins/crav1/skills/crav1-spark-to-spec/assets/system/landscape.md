@@ -2,6 +2,10 @@
 
 What this product/system is, in one short paragraph.
 
+## How the parts connect
+
+Connections the notes already state. One line each. Add a line. Do not rewrite a line that is already here.
+
 ## v0 vs later
 
 - **v0:**

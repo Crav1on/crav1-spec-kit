@@ -10,7 +10,9 @@ description: >-
   missing, fills only that file from the landed change. When the file exists,
   appends only words that are not already rows. Does not rewrite existing
   glossary rows. A meaning the change does not state is `to be researched`.
-  Does not write application code. Does not plan, implement, or commit.
+  That same pass adds what is new to the short description, the diagram, and
+  how the parts connect. Does not rewrite what is already there. Does not
+  write application code. Does not plan, implement, or commit.
 disable-model-invocation: true
 icon: file-diff
 color: teal
@@ -18,7 +20,7 @@ color: teal
 
 # Code into specs
 
-You sort a code change that already landed onto specs that already exist. Then you write what belongs into the matching `spec.md` files, the same way `/crav1-add-to-spec` writes a quote. Then you check whether `docs/system/` or another spec has to change, and you report that impact. You do not silently rewrite those other files. You do not write application code. You do not plan, implement, or commit.
+You sort a code change that already landed onto specs that already exist. Then you write what belongs into the matching `spec.md` files, the same way `/crav1-add-to-spec` writes a quote. Then you check whether `docs/system/` or another spec has to change, and you report that impact. You do not silently rewrite those other files. The glossary append and the picture update are the exceptions: new glossary rows, and new picture lines, when `docs/system/` already exists. You do not rewrite existing glossary rows or existing picture lines. You do not write application code. You do not plan, implement, or commit.
 
 This is not a mode of `/crav1-match-to-specs`, `/crav1-match-dump-to-specs`, or `/crav1-add-to-spec`. Match creates spec folders from repos plus a dump. Match-dump sorts a later dump onto specs that already exist. Add takes information already aimed at one named spec. This skill starts from a code change that already landed without spec, plan, or build. No dump is required. Do not send this job to those commands, and do not absorb theirs.
 
@@ -121,9 +123,11 @@ The new quotes are already in the matching specs. Read `docs/system/` when it ex
 
 Section names for that read, not a file to paste over what exists: this skill’s `assets/system/` (same files as `docs/system/_template/`, including `glossary.md`; drop-in: `.claude/skills/crav1-code-into-specs/assets/system/`; plugin: this skill’s `assets/system/`).
 
-Do not edit anything outside the confirmed belongs writes in this step, except the glossary gap below. Do not seed `docs/system/` when it is missing. Say it is missing and that this command does not create it. Do not invent a landscape from the diff alone. When that folder is missing, do nothing about a glossary.
+Do not edit anything outside the confirmed belongs writes in this step, except the glossary gap and the picture update below. Do not seed `docs/system/` when it is missing. Say it is missing and that this command does not create it. Do not invent a landscape from the diff alone. When that folder is missing, do nothing about a glossary and do nothing about the picture.
 
-**Glossary.** When `docs/system/` is missing, do nothing about a glossary. When it exists and `glossary.md` is missing, write only that file from `assets/system/glossary.md`. When `glossary.md` already exists, append only words or abbreviations the change uses that are not already rows. Do not rewrite, reorder, or edit existing rows. Do not change a Meaning cell that already has text. Source is the landed change. Do not invent terms, expansions, or definitions. Do not write TBD or to be decided. A row is only a word or abbreviation that change already uses. When that same change already says the expansion or meaning, put that text in Meaning. When the change never says what it means, set Meaning to `to be researched`. Skip ordinary English. A code identifier is not a row unless the change already treats that word as a term. Write the file even when it has no rows. This write is not an apply option, and it does not rewrite any other landscape file. Do not list a rewrite of existing rows.
+**Glossary.** When `docs/system/` is missing, do nothing about a glossary. When it exists and `glossary.md` is missing, write only that file from `assets/system/glossary.md`. When `glossary.md` already exists, append only words or abbreviations the change uses that are not already rows. Do not rewrite, reorder, or edit existing rows. Do not change a Meaning cell that already has text. Source is the landed change. Do not invent terms, expansions, or definitions. Do not write TBD or to be decided. A row is only a word or abbreviation that change already uses. When that same change already says the expansion or meaning, put that text in Meaning. When the change never says what it means, set Meaning to `to be researched`. Skip ordinary English. A code identifier is not a row unless the change already treats that word as a term. Write the file even when it has no rows. This write is not an apply option, and it does not rewrite any other landscape file except the picture update below. Do not list a rewrite of existing rows.
+
+**Picture.** When `docs/system/` is missing, do nothing about the picture. When it exists, follow [picture.md](../crav1-keep-current/references/picture.md) (drop-in: `.claude/skills/crav1-keep-current/references/picture.md`; plugin: sibling `skills/crav1-keep-current/references/picture.md`). Source is the confirmed new quotes, not a sentence marked inferred. Add what those quotes added to the short description, the diagram, and how the parts connect. Do not rewrite a sentence, a diagram node, a diagram edge, or a connection line that is already there. Do not run `/crav1-keep-current` as a second turn. This write is not an apply option. Do not invent a part from the diff. Do not rewrite existing glossary rows.
 
 Do not edit `plan.md` or `tasks.md` when they exist, and do not list them as proposed edits. One line in the report when they exist: they were left alone. Adding what the change does does not start planning.
 
@@ -135,7 +139,7 @@ Report:
   2. **Leave the other files alone**
 - List each proposed edit in one line: the file, and what would change. One line per file change. No surrounding rewrite.
 
-Do not silently rewrite `docs/system/` or specs the sort did not already write. The glossary write above is the exception: a missing file, or new rows appended to an existing file. Apply the other edits only if they pick apply, and only the lines you listed. If they pick leave, do not edit those files. Do not rewrite existing glossary rows either way.
+Do not silently rewrite `docs/system/` or specs the sort did not already write. The glossary write above is one exception: a missing file, or new rows appended to an existing file. The picture update is the other: new lines on the short description, the diagram, and how the parts connect. Apply the other edits only if they pick apply, and only the lines you listed. If they pick leave, do not edit those files. Do not rewrite existing glossary rows or existing picture lines either way. Do not list the picture lines again as an apply option.
 
 ## Stop
 
@@ -148,9 +152,10 @@ Output only:
 - What was added (what the change does, labeled new) and what was already described there
 - The fits-none list, left alone. If they asked for a new spec, which existing skill you pointed at
 - `glossary.md` when this turn created it or appended rows. If `docs/system/` was missing, say no glossary was written. If no new rows were appended, say so
+- Picture lines added, or that the picture is current. If `docs/system/` was missing, say no picture was written
 - Impact: nothing else, or the one-line edit list and which option they picked
 - Next: `/crav1-finalize-commit` only if any file changed and they want those spec edits committed (no push). `/crav1-plan-from-spec` only for a slice they choose. Do not run either.
 
 ## Style
 
-Be concise. Quote what the change does. Prefer the smaller edit. Do not invent content to fill gaps. A missing `glossary.md` is written only when `docs/system/` already exists. New rows are appended to an existing glossary. Existing rows are not rewritten.
+Be concise. Quote what the change does. Prefer the smaller edit. Do not invent content to fill gaps. A missing `glossary.md` is written only when `docs/system/` already exists. New rows are appended to an existing glossary. Existing rows are not rewritten. The picture update adds what is new and does not rewrite what is already there.

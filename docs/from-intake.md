@@ -40,7 +40,7 @@ That slash command *is* the prompt.
 | Mushy interview  | Answer only flagged slugs, or “use assumptions” | ≤5 questions per mushy slug, in **this** chat. Workers never interview |
 | Landscape        | Accept the map                           | `docs/system/` (`landscape.md`, `repos.md`, diagrams, `glossary.md`, cross-cutting ADRs) |
 | Slice specs      | Wait                                     | One isolated worker per v0 slug (`docs/specs/<slug>/`)                |
-| Index            | —                                        | Feature table on `landscape.md`                                       |
+| Index            | —                                        | Feature table on `landscape.md`, then the picture update (short description, diagram, how the parts connect) |
 | Commit (optional)| Glance at files, then `/crav1-finalize-commit` | Prompted next step only; intake does not commit                       |
 | Stop             | v0 slugs are demoable from their specs   | Per slug: reviewer → tighten → plan. Not one plan for the universe    |
 
@@ -79,7 +79,7 @@ Do not run `/crav1-intake-to-specs` again.
 Spark: <the new feature>
 ```
 
-Or `/crav1-ideas-to-spec` if the new thing is already a pile. **New slug.** If `docs/system/` is missing, spark and ideas seed a thin landscape from the repo, including `glossary.md`, then the spec, then one index row. They do not rewrite a landscape this command already wrote. A missing `glossary.md` is written. New glossary rows are appended. Existing rows are not rewritten. A meaning the source does not state is `to be researched`. They do not re-run intake. If you need a new repo: landscape ADR + `repos.md` row, then the spec, then an index row.
+Or `/crav1-ideas-to-spec` if the new thing is already a pile. **New slug.** If `docs/system/` is missing, spark and ideas seed a thin landscape from the repo, including `glossary.md`, then the spec, then one index row. They do not rewrite lines that landscape already has. A missing `glossary.md` is written. New glossary rows are appended. Existing rows are not rewritten. A meaning the source does not state is `to be researched`. That same pass adds what is new to the short description, the diagram, and how the parts connect. They do not re-run intake. If you need a new repo: landscape ADR + `repos.md` row, then the spec, then an index row.
 
 ## After Index
 

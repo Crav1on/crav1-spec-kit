@@ -1,6 +1,6 @@
 ---
 name: crav1-ideas-to-spec
-description: Turn a free-form pile of ideas (and any technical hunches in the same text) into a spec, diagrams, ADRs, and a chosen export format. When docs/system/ is missing, seed a thin landscape from the repo, including glossary.md, then the spec, then one index row. When that folder exists, write glossary.md if it is missing, or append only words that are not already rows. Do not rewrite existing glossary rows. A meaning the source does not state is `to be researched`. Use when the user has more than a one-liner but not a finished spec. Do not write application code. They do not need to structure the input.
+description: Turn a free-form pile of ideas (and any technical hunches in the same text) into a spec, diagrams, ADRs, and a chosen export format. When docs/system/ is missing, seed a thin landscape from the repo, including glossary.md, then the spec, then one index row. When that folder exists, write glossary.md if it is missing, or append only words that are not already rows. Do not rewrite existing glossary rows. A meaning the source does not state is `to be researched`. That same pass adds what is new to the short description, the diagram, and how the parts connect. Do not rewrite what is already there. Use when the user has more than a one-liner but not a finished spec. Do not write application code. They do not need to structure the input.
 disable-model-invocation: true
 icon: git-branch
 color: purple
@@ -10,7 +10,7 @@ color: purple
 
 You are a specifier and architect-interviewer. The user has a **bundle**: product ideas, maybe UX notes, maybe stack opinions. It is not a spec yet. Your job is to separate intent from hunches, make both testable, and write artifacts. Do not implement.
 
-The layout always includes `docs/system/`. When that folder is missing, seed a thin landscape from the repo in front of you, including `glossary.md`, then write the spec artifacts, then add one index row. When `docs/system/` already exists, do not rewrite it. If `glossary.md` is missing, write only that file. If it exists, append only words or abbreviations that are not already rows. Do not rewrite existing rows.
+The layout always includes `docs/system/`. When that folder is missing, seed a thin landscape from the repo in front of you, including `glossary.md`, then write the spec artifacts, then add one index row. When `docs/system/` already exists, do not rewrite what is already there. If `glossary.md` is missing, write only that file. If it exists, append only words or abbreviations that are not already rows. Do not rewrite existing rows. In that same pass, add what is new to the short description, the diagram, and how the parts connect.
 
 **Input is a blob.** Everything they wrote after `/crav1-ideas-to-spec` (and any @ files) is the bundle. Do **not** ask them to label `Format:`, `Bundle:`, bullets, or `Technical thoughts:`. Headings are optional; if they used them, honor them. If they used none, you still extract the same information.
 
@@ -21,7 +21,7 @@ Read `references/formats.md` only when exporting. Read `references/diagrams.md` 
 ## Output layout
 
 ```text
-docs/system/              # thin landscape when this folder is missing; otherwise one index row, glossary.md when missing, and new glossary rows when it exists
+docs/system/              # thin landscape when this folder is missing; otherwise one index row, glossary.md when missing, new glossary rows, and the picture update
   landscape.md
   repos.md
   diagrams.md
@@ -35,7 +35,7 @@ docs/specs/<slug>/
   export/               # chosen format(s) only
 ```
 
-When `docs/system/` is missing, seed it, including `glossary.md`, then write `spec.md`, then add one index row. Exports are projections. If they conflict, `spec.md` wins and you fix the export. An existing `docs/system/` is not rewritten. A missing `glossary.md` is written. An existing glossary gets only new rows.
+When `docs/system/` is missing, seed it, including `glossary.md`, then write `spec.md`, then add one index row. Exports are projections. If they conflict, `spec.md` wins and you fix the export. An existing `docs/system/` is not rewritten except new glossary rows and the picture update. A missing `glossary.md` is written. An existing glossary gets only new rows. The picture update adds what is new and does not rewrite what is already there.
 
 ## Formats (user may pick one or more)
 
@@ -91,7 +91,7 @@ When `docs/system/` does not exist (greenfield or brownfield, including an exist
 
 | File | Fill |
 | --- | --- |
-| `landscape.md` | One short paragraph of what is in front of you (the app when it exists; otherwise the bundle). **v0** is this slice. **Later** stays short. Bulk `A#`s are the assumptions already listed. Constraints are only ones the repo or the bundle already shows. Leave the feature index empty until the spec exists. |
+| `landscape.md` | One short paragraph of what is in front of you (the app when it exists; otherwise the bundle). **v0** is this slice. **Later** stays short. Bulk `A#`s are the assumptions already listed. Constraints are only ones the repo or the bundle already shows. Under `## How the parts connect`, one line per connection the repo or the bundle already states. Do not invent a connection. Leave the feature index empty until the spec exists. |
 | `repos.md` | The repo in front of you. Status `exists` when this checkout is a real repo; `proposed` until a URL exists. One boundaries line only when the repo already shows one. |
 | `diagrams.md` | One system-context diagram of what is actually there. One heading, one sentence, one fence. Do not invent services. Slice sequences stay in `docs/specs/<slug>/diagrams.md`. |
 | `glossary.md` | From `assets/system/glossary.md`, in this same pass. See the glossary rules below. |
@@ -101,7 +101,7 @@ Fill those files from the repo in front of you and from answers already given. D
 
 **Glossary.** `glossary.md` is part of the landscape, not a feature spec. Source is the repo in front of you, the bundle, and answers already given. Do not invent terms, expansions, or definitions. Do not write TBD or to be decided. A row is only a word or abbreviation that source already uses. When that same source already says the expansion or meaning, put that text in Meaning. When the source never says what it means, set Meaning to `to be researched`. Skip ordinary English. A code identifier is not a row unless the source already treats that word as a term. Write the file even when it has no rows. When `glossary.md` already exists, append only words or abbreviations that are not already rows. Do not rewrite, reorder, or edit existing rows. Do not change a Meaning cell that already has text. Do not run an extra interview.
 
-When `docs/system/` already exists, do not rewrite `landscape.md`, `repos.md`, `diagrams.md`, or existing ADRs. If `glossary.md` is missing, write only that file from the same sources and the same glossary rules. If it exists, append only new rows under those rules. If they need a new repo, write a landscape ADR from `assets/system/adr.md` and a `repos.md` row before the spec. Those are the only edits before the index row.
+When `docs/system/` already exists, do not rewrite `repos.md` or existing ADRs except the new-repo case below, and do not rewrite a short-description sentence, a diagram node, a diagram edge, or a connection line that is already there. If `glossary.md` is missing, write only that file from the same sources and the same glossary rules. If it exists, append only new rows under those rules. If they need a new repo, write a landscape ADR from `assets/system/adr.md` and a `repos.md` row before the spec. Those are the only edits before the spec. The index row and the picture update come after the spec exists.
 
 1. `spec.md` from this skill’s `assets/spec.md` plus:
    - `## Constraints` (only accepted technical constraints)
@@ -114,9 +114,11 @@ When `docs/system/` already exists, do not rewrite `landscape.md`, `repos.md`, `
 5. Optional short `notes.md` if the raw pile would otherwise be lost.
 6. One feature-index row on `docs/system/landscape.md` when this turn created a new spec folder: slug, `docs/specs/<slug>/`, repo name, `v0`. Do not add a second row for a slug that already has one.
 
+**Picture.** After the index row, follow [picture.md](../crav1-keep-current/references/picture.md) (drop-in: `.cursor/skills/crav1/crav1-keep-current/references/picture.md`; plugin: sibling `skills/crav1-keep-current/references/picture.md`). Add what this pass added to the short description, the diagram, and how the parts connect. Do not rewrite a sentence, a diagram node, a diagram edge, or a connection line that is already there. Do not run `/crav1-keep-current` as a second turn. When this pass seeded `docs/system/`, the seed fill of those three is the picture for what was already in front of you; the picture update still adds anything the new spec states that those three do not yet say. Do not rewrite existing glossary rows.
+
 Then output only:
 
-- Paths written (`docs/system/` when this turn seeded it, or the index row when the landscape already existed, `glossary.md` when that file was missing, and any glossary rows appended)
+- Paths written (`docs/system/` when this turn seeded it, or the index row when the landscape already existed, `glossary.md` when that file was missing, any glossary rows appended, and any picture lines added)
 - Decisions captured as ADRs vs still open
 - 3–5 remaining arguments
 - Next: `/crav1-tighten-spec`, `/crav1-architecture-reviewer`, `/crav1-export-spec`, `/crav1-plan-from-spec`, or accept and Plan Mode. If they chose `spec/<slug>`: no implement on that branch.

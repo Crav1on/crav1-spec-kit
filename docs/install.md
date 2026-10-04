@@ -2,7 +2,7 @@
 
 Read this **before** you put **CRAV1 Spec Kit** in a project. It covers what you get, which host and scope to pick, and where files go. It is not the full playbook. The thin path after you pick an install is [first-run.md](first-run.md).
 
-The method (specs, `plan.md`, `tasks.md`, verify) is [README.md](../README.md), [from-nothing.md](from-nothing.md), [from-ideas.md](from-ideas.md), [from-intake.md](from-intake.md), [from-match.md](from-match.md), [from-match-dump.md](from-match-dump.md), [from-code.md](from-code.md), [from-add.md](from-add.md), [from-security.md](from-security.md), and [from-review-pr.md](from-review-pr.md). This file is the host detail those pages leave out.
+The method (specs, `plan.md`, `tasks.md`, verify) is [README.md](../README.md), [from-nothing.md](from-nothing.md), [from-ideas.md](from-ideas.md), [from-intake.md](from-intake.md), [from-match.md](from-match.md), [from-match-dump.md](from-match-dump.md), [from-code.md](from-code.md), [from-add.md](from-add.md), [from-security.md](from-security.md), [from-explain.md](from-explain.md), [from-keep-current.md](from-keep-current.md), and [from-review-pr.md](from-review-pr.md). This file is the host detail those pages leave out.
 
 Kit home: [https://github.com/Crav1on/crav1-spec-kit](https://github.com/Crav1on/crav1-spec-kit). License: [MIT](../LICENSE).
 
@@ -25,7 +25,7 @@ This kit repository is the source. Your product repository is where work happens
 
 | Piece | Role |
 | --- | --- |
-| Skills (`/crav1-…`) | Playbooks: spark/ideas/intake → spec → plan → review-plan → implement → verify → fix → draft commit → `/crav1-open-pr` → `/crav1-review-pr` (named pull request only) → `/crav1-merge-pr` (explicit ask, merge commit only). Plan names a linter when the repo has one and stops before Build when it does not. Cross-cutting `/crav1-security-review` after architecture exists (whole system, one spec, or the change in front of you). Spark, plan, and verify do not run the security review. Spark, specify, and verify do not run the pull request review |
+| Skills (`/crav1-…`) | Playbooks: spark/ideas/intake → spec → plan → review-plan → implement → verify → fix → draft commit → `/crav1-open-pr` → `/crav1-review-pr` (named pull request only) → `/crav1-merge-pr` (explicit ask, merge commit only). Plan names a linter when the repo has one and stops before Build when it does not. Cross-cutting `/crav1-security-review` after architecture exists (whole system, one spec, or the change in front of you). Cross-cutting `/crav1-explain` reads `docs/system/` (short TLDR; longer goes one level deeper). Cross-cutting `/crav1-keep-current` adds what is new to that picture. Spark, plan, and verify do not run the security review. Spark, specify, and verify do not run the pull request review. Explain and keep-current do not start Specify, Plan, or Build |
 | Agents | `crav1-spec-reviewer-agent`, `crav1-architecture-reviewer-agent`, `crav1-plan-reviewer-agent` (read-only critics); `crav1-complete-task-agent` and `crav1-intake-slice-agent` (writers) |
 | Project instruction | Cursor: rule `crav1.mdc`. Claude Code: `.claude/CLAUDE.md` (same short text, not the README) |
 | Templates | Inside each skill’s `assets/` (and agent-assets). Optional human copies: `docs/specs/_template/`, `docs/system/_template/` |
