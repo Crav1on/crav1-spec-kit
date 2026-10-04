@@ -57,7 +57,7 @@ Stop. Do not edit. Do not preview a full patched spec.
 
 1. Patch **only** this question.
    - **Keep open:** leave the bullet. You may sharpen the wording if they asked; do not resolve it.
-   - **Answer:** fold the decision into the right place (requirement/journey/acceptance, `## Constraints`, non-goals/later, or a new/updated ADR). **Remove** it from Open questions (or mark the assumption resolved).
+   - **Answer:** fold the decision into the right place (requirement/journey/acceptance, `## Constraints`, non-goals/later, or a new/updated ADR). **Remove** it from Open questions (or mark the assumption resolved). An acceptance line you add is yes/no. Name unit, system, or browser only when that kind is already obvious from the answer. Otherwise leave the kind for plan. Do not invent a test list.
    - **Cut from v0:** move to non-goals/later; remove from Open questions.
 2. Recap **Added / Removed / Still open** for this `Q#`.
 3. If the answer makes a named diagram/ADR wrong, either they also chose `sync-here`, or the **next** item is that drift (do not silently skip).

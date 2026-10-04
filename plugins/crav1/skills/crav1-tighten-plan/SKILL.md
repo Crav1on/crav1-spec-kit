@@ -24,7 +24,7 @@ Use the folder the user @-mentions. Otherwise the most recently edited tree unde
 
 Need `spec.md`, `plan.md`, and `tasks.md`. If plan/tasks are missing, stop (`/crav1-plan-from-spec`).
 
-Read those three. Note `diagrams.md` / `adr/` / `export/openspec/` if present.
+Read those three. Note `diagrams.md` / `adr/` / `export/openspec/` if present. Read `docs/system/security.md` and a Security section on the spec when those exist. Check rules: `crav1-plan-from-spec` [references/checks.md](../crav1-plan-from-spec/references/checks.md) (drop-in: `.cursor/skills/crav1/crav1-plan-from-spec/references/checks.md`; plugin: sibling `skills/crav1-plan-from-spec/references/checks.md`).
 
 Also read the latest **crav1-plan-reviewer-agent** / `/crav1-review-plan` output in this chat. Those findings become issues. Do not collapse them into one “apply reviewer notes” action.
 
@@ -40,7 +40,13 @@ Sources, in order:
 Typical **plan** shapes:
 
 - `T#` too big to verify alone (“add authentication”)
-- Missing `verify:` or `(spec: …)`
+- Missing `verify:` kind, missing named checks, or missing `(spec: …)`
+- An algorithm with one happy check and no corner cases
+- Behavior that already works, with no regression check
+- Two parts meet, with no integration test for that edge
+- A kept security check with no task and no “covered by T#”
+- Load or speed goal the spec did not state
+- Smoke after deploy, chaos, or fuzzing for its own sake, or test code in the plan
 - Task or approach step invents behavior the spec does not require
 - Acceptance / REQ with no task (or task with no spec line)
 - Files likely touched wrong, missing, or not `(proposed)` when there is no repo
@@ -94,7 +100,11 @@ Do not start the next issue’s patch in the same turn unless they batched.
 | Id | Name | What it does | Typical impact |
 | --- | --- | --- | --- |
 | `split-task` | Split this T# | Replace one oversized task with independently verifiable `T#`s. Renumber if needed; fix the trace table. | `tasks.md` (+ `plan.md` trace / approach if it named the old id). |
-| `add-verify` | Add verify | Add or fix `verify:` (command, test name, or UI check) and `(spec: …)` if missing. | That `T#` line only, unless trace also lacked the spec id. |
+| `add-verify` | Add verify | Name the kind and the checks on `verify:` (one or many; not one test per kind). Add `(spec: …)` if missing. | That `T#` line, unless trace also lacked the spec id. |
+| `add-cases` | Name the cases | When the spec describes an algorithm, name several checks, including corner cases of the behavior it already states. | That `T#` verify note. |
+| `add-regression` | Name the regression | Name checks that would fail if behavior that already works broke. | That `T#` verify note, or one new `T#` and the trace. |
+| `add-integration` | Name the boundary | When two parts meet, name an integration test for that edge. | That `T#` or one new `T#`. A system test of the whole path does not replace it. |
+| `cover-security` | Cover the security check | Map a kept check from `docs/system/security.md` or the spec Security section to a `T#`, or mark “covered by T#”. | Trace row; a new `T#` only when no task already proves that check. |
 | `drop-scope` | Drop extra scope | Remove the step/`T#` that is not in the spec (or move it to plan Out of scope). | Smaller task list; trace still covers remaining acceptance. |
 | `fix-trace` | Fix trace | Map acceptance/REQ ↔ `T#`. Add a covering task or mark “covered by T#”. | `plan.md` Trace table; maybe one new `T#`. |
 | `retarget-files` | Fix files likely touched | Correct paths; mark `(proposed)` if no repo. Do not invent a new architecture. | `plan.md` Files section. |

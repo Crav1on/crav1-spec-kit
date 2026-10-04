@@ -107,6 +107,7 @@ When `docs/system/` already exists, do not rewrite `landscape.md`, `repos.md`, `
    - `## Constraints` (only accepted technical constraints)
    - `## Assumptions`
    - `## Trace` (idea cluster → section, so they see what was dropped)
+   - Acceptance stays a yes/no checkbox. Name the kind of check (unit, system, or browser) only when that kind is already obvious from the source. Otherwise leave the kind for plan. Do not invent a test list.
 2. `diagrams.md` — follow `references/diagrams.md` and this skill’s `assets/diagrams.md`. At least: context (who talks to what) and the v0 happy-path sequence. Add state or data model only if the idea needs it.
 3. `adr/NNNN-*.md` from this skill’s `assets/adr.md` — **only** for choices that had real alternatives. Hunches with no alternative are constraints in `spec.md`, not ADRs. Default status: `proposed` until they say accepted.
 4. `export/` for each chosen format — follow `references/formats.md`.

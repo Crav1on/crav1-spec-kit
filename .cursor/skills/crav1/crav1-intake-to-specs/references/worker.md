@@ -16,7 +16,7 @@ The parent launches **crav1-intake-slice-agent** for **one** slug. This file is 
 ## Worker does
 
 1. Write `docs/specs/<slug>/` using ideas-to-spec Write artifacts:
-   - `spec.md` from `assets/spec.md` plus `## Repos`, `## Constraints` (accepted technical constraints only), `## Assumptions`, `## Trace` (cluster → section)
+   - `spec.md` from `assets/spec.md` plus `## Repos`, `## Constraints` (accepted technical constraints only), `## Assumptions`, `## Trace` (cluster → section). Acceptance stays a yes/no checkbox. Name the kind of check (unit, system, or browser) only when that kind is already obvious from the source. Otherwise leave the kind for plan. Do not invent a test list.
    - `diagrams.md` from `assets/spec-diagrams.md` — at least context + v0 sequence for **this** slice
    - `adr/NNNN-*.md` only for choices that had real alternatives **inside this slice**. Do not duplicate landscape ADRs. Default status `proposed`
    - `export/` for each chosen format

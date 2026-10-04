@@ -35,7 +35,7 @@ If two file layouts still fit, follow `plan.md` “files likely touched.” Do n
 ## Do the task
 
 1. Restate `T#` in one sentence (what / verify / spec id). Stop if they object.
-2. Prefer **test first** when the verify line is a test: write the failing check, then the minimum code to pass.
+2. Prefer **test first** when the verify line names a check: write those named checks, then the minimum code to pass. Do not add a different list.
 3. Change only files needed for this `T#`. Match existing patterns when a codebase exists.
 4. If that verify is **live** (HTTP/UI against a running host), follow `crav1-verify-spec` [references/live-host.md](../crav1-verify-spec/references/live-host.md) (drop-in: `.cursor/skills/crav1/crav1-verify-spec/references/live-host.md`; plugin: sibling `skills/crav1-verify-spec/references/live-host.md`) **before** the evidence. Then run the **verify** from the task line (command, test name, or a real UI path). If verify is a UI path and a browser is available, exercise it. If you cannot run it, say what you could not run — do not check the box.
 5. If verify **passes**, mark that row `[x]` in `tasks.md` (and OpenSpec `export/openspec/tasks.md` if it exists and lists the same id).

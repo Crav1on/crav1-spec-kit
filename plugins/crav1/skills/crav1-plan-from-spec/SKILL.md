@@ -59,18 +59,22 @@ Stay inside v0. File-level, not class-by-class essays. No new product behavior.
 
 ### tasks.md
 
-Independently testable slices. Bad: “add authentication.” Good: “POST `/register` rejects invalid email (verify: test X / click path Y).”
+Read this skill’s [references/checks.md](references/checks.md) before writing tasks (drop-in: `.cursor/skills/crav1/crav1-plan-from-spec/references/checks.md`; plugin: this skill’s `references/checks.md`). Name the checks there. Do not write test code.
+
+Independently testable slices. Bad: “add authentication.” Good: “POST `/register` rejects invalid email (verify: unit — empty email is rejected; unit — malformed email is rejected) (spec: invalid email).”
 
 ```markdown
 # Tasks
 
-- [ ] T1: <what> (verify: <command, test name, or UI check>) (spec: <REQ or acceptance>)
+- [ ] T1: <what> (verify: <kind> — <named check>) (spec: <REQ or acceptance>)
 ```
 
 Rules:
 
-- Each task maps to at least one spec acceptance line or REQ
+- Each task maps to at least one spec acceptance line, REQ, or kept security check
 - Every v0 acceptance line maps to at least one task (or an explicit “covered by T#”)
+- Every kept security check (`docs/system/security.md` or a Security section on the spec) maps to a task, or the trace says which task already covers it
+- Each verify note names the kind and the checks, per `references/checks.md`
 - Order so each task can be verified before the next depends on it
 - No task is “and also the rest of the app”
 
@@ -80,7 +84,9 @@ Output only:
 
 - Paths written
 - Task count and any acceptance line with no task (must be none, or you failed)
+- Any verify note with no kind, and any kept security check with no task (must be none, or you failed)
 - Kept-open questions parked as risks
+- These notes name the checks. `/crav1-verify-spec` is the gate that says they passed. Do not run it here.
 - Next: `/crav1-review-plan` (optional but useful), then `/crav1-tighten-plan` for plan `P#`s.
 - If this branch is `spec/<slug>` (specify-only): `/crav1-finalize-commit` (no push), then **they** open a PR when they want this spec on the default branch. Do **not** implement here. After it is on default: `/crav1-feature-branch` → `feat/<slug>`, then a **new chat** for `/crav1-implement-task` or `/crav1-complete-task`.
 - If this branch is `feat/<slug>` (or they stayed on one branch): **new chat**, `/crav1-implement-task` (or `/crav1-complete-task`) with `plan.md`, `tasks.md`, and `spec.md` attached.
@@ -91,5 +97,7 @@ Do not start coding in this chat.
 
 - **Refuse application code** — no feature files, no refactors, no “quick scaffold.” If they ask to build, tell them to start a new chat with the plan attached.
 - Prefer existing repo patterns when a codebase exists.
-- Do not invent endpoints, entities, or screens that the spec does not require.
+- Do not invent endpoints, entities, screens, or a performance goal the spec does not require.
+- Do not write test code. Smoke after deploy, chaos, and fuzzing for its own sake stay out.
+- Do not run `/crav1-security-review`. Map kept checks that are already written.
 - Do not treat the host plan UI (Cursor Plan Mode or Claude Code plan mode) as a substitute for writing `plan.md` and `tasks.md` unless they said they only want the UI plan and not files. The skill still writes both files.
