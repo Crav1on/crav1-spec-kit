@@ -1,12 +1,12 @@
-# Draft-commit style.md (persistent)
+# CRAV1 style (persistent)
 
-This file was written by `/crav1-draft-commit-message` when you chose **style.md, this commit and onward**.
+This file was written by `/crav1-draft-commit-message` when you chose **CRAV1 style, this commit and onward**.
 
 When drafting or creating commits in this repo:
 
-- Follow `references/style.md` from skill `crav1-draft-commit-message` (drop-in: `.claude/skills/crav1-draft-commit-message/references/style.md`; plugin: that skill’s `references/style.md`).
+- Follow CRAV1 style in `references/style.md` from skill `crav1-draft-commit-message` (drop-in: `.claude/skills/crav1-draft-commit-message/references/style.md`; plugin: that skill’s `references/style.md`).
 - Do not use Conventional Commits prefixes (`feat:`, `fix:`, `chore:`).
-- Do not ask whether to use that style. It stays on until this rule is removed.
+- Do not ask whether to use CRAV1 style. It stays on until this rule is removed.
 
 **To stop and get the once/onward prompt again:** delete this file. Claude Code project: `.claude/rules/draft-commit-style.md`. Claude Code user: `~/.claude/rules/draft-commit-style.md`. Nothing else to undo.
 

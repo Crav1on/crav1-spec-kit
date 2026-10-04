@@ -12,8 +12,8 @@ If none exists: **do not start implement**. Ask (questions tool OK). Only these 
 
 | Id | Choice | Disk |
 | --- | --- | --- |
-| `onward` | `style.md`, this commit and onward | Write the style rule from `crav1-draft-commit-message` `assets/draft-commit-style.mdc`. Cursor: `.cursor/rules/draft-commit-style.mdc`. Claude Code project: `.claude/rules/draft-commit-style.md`. Claude Code user, when the kit is not in this repo’s git: `~/.claude/rules/draft-commit-style.md`. Delete any git-log persist (including legacy). |
-| `log-onward` | Git log, this commit and onward | Write the git-log rule from that skill’s `assets/draft-commit-gitlog.mdc`. Cursor: `.cursor/rules/draft-commit-gitlog.mdc`. Claude Code project: `.claude/rules/draft-commit-gitlog.md`. Claude Code user, when the kit is not in this repo’s git: `~/.claude/rules/draft-commit-gitlog.md`. Delete any style.md persist (including legacy). |
+| `onward` | CRAV1 style, this commit and onward | Write the style rule from `crav1-draft-commit-message` `assets/draft-commit-style.mdc`. Cursor: `.cursor/rules/draft-commit-style.mdc`. Claude Code project: `.claude/rules/draft-commit-style.md`. Claude Code user, when the kit is not in this repo’s git: `~/.claude/rules/draft-commit-style.md`. Delete any git-log persist (including legacy). |
+| `log-onward` | Git log, this commit and onward | Write the git-log rule from that skill’s `assets/draft-commit-gitlog.mdc`. Cursor: `.cursor/rules/draft-commit-gitlog.mdc`. Claude Code project: `.claude/rules/draft-commit-gitlog.md`. Claude Code user, when the kit is not in this repo’s git: `~/.claude/rules/draft-commit-gitlog.md`. Delete any CRAV1 style persist (including legacy). |
 
 Templates: drop-in `.cursor/skills/crav1/crav1-draft-commit-message/assets/` or plugin sibling `skills/crav1-draft-commit-message/assets/`. Claude Code reads the same assets from `.claude/skills/crav1-draft-commit-message/assets/` or `~/.claude/skills/crav1-draft-commit-message/assets/`.
 

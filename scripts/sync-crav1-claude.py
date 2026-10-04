@@ -95,7 +95,7 @@ def clarify_rewritten_commit_rules(text: str) -> str:
         text,
     )
     text = re.sub(
-        r"- `\.claude/rules/gitkraken-commit-style\.md` → style\.md onward\n"
+        r"- `\.claude/rules/gitkraken-commit-style\.md` → CRAV1 style onward\n"
         r"- `\.claude/rules/gitkraken-commit-gitlog\.md` → git log onward\n",
         "",
         text,

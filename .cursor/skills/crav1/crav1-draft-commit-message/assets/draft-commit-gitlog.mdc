@@ -9,7 +9,7 @@ This file was written by `/crav1-draft-commit-message` when you chose **existing
 
 When drafting or creating commits in this repo:
 
-- Match **this repository’s** recent `git log` (subjects and bodies), not `crav1-draft-commit-message/references/style.md`.
+- Match **this repository’s** recent `git log` (subjects and bodies), not CRAV1 style (`crav1-draft-commit-message/references/style.md`).
 - Do not switch to Conventional Commits unless the live log already uses that shape.
 - Do not ask whether to use git-log style. It stays on until this rule is removed.
 

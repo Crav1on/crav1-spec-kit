@@ -2,7 +2,7 @@
 name: crav1-draft-commit-message
 description: >-
   Draft paste-ready GitKraken Summary and Description only. Does not create a
-  git commit. Ask style.md vs this repo’s git log, this commit only or onward
+  git commit. Ask CRAV1 style vs this repo’s git log, this commit only or onward
   as a deletable rule. Use for GitKraken paste, or /crav1-draft-commit-message.
   To edit the wording and then copy or git commit, use /crav1-finalize-commit.
   When docs/specs/<slug>/work-item.md exists, append that work-item mention
@@ -18,27 +18,27 @@ You draft paste-ready **Summary** and **Description** (GitKraken fields). You do
 
 Command: `/crav1-draft-commit-message`. To **edit** the text and/or **create** the commit after they accept it, use `/crav1-finalize-commit` (it follows this skill, then a commit / copy / edit / rewrite / stop menu, **commit first**).
 
-Bundled style: [references/style.md](references/style.md).  
+Bundled CRAV1 style: [references/style.md](references/style.md).  
 Git-log style: this repo’s recent `git log` (subject + body).
 
 Persistent rules (at most one should exist). Cursor and Claude Code both count. If the file for the host you are running exists, do not ask.
 
 | File | Meaning | Template |
 | --- | --- | --- |
-| `.cursor/rules/draft-commit-style.mdc` | Always `style.md` (Cursor) | `assets/draft-commit-style.mdc` |
+| `.cursor/rules/draft-commit-style.mdc` | Always CRAV1 style (Cursor) | `assets/draft-commit-style.mdc` |
 | `.cursor/rules/draft-commit-gitlog.mdc` | Always live `git log` (Cursor) | `assets/draft-commit-gitlog.mdc` |
-| `.claude/rules/draft-commit-style.md` | Always `style.md` (Claude Code project) | `assets/draft-commit-style.mdc` |
+| `.claude/rules/draft-commit-style.md` | Always CRAV1 style (Claude Code project) | `assets/draft-commit-style.mdc` |
 | `.claude/rules/draft-commit-gitlog.md` | Always live `git log` (Claude Code project) | `assets/draft-commit-gitlog.mdc` |
-| `~/.claude/rules/draft-commit-style.md` | Always `style.md` (Claude Code user) | `assets/draft-commit-style.mdc` |
+| `~/.claude/rules/draft-commit-style.md` | Always CRAV1 style (Claude Code user) | `assets/draft-commit-style.mdc` |
 | `~/.claude/rules/draft-commit-gitlog.md` | Always live `git log` (Claude Code user) | `assets/draft-commit-gitlog.mdc` |
 
 On Claude Code, write the **project** path when this repo contains the kit (`.claude/` or `.cursor/` in git). Write the **user** path when the kit lives in `~/.claude/` and this repo did not ask for the kit in git, so the rule is not committed into a client repo.
 
 Also treat these **legacy** names as the same persist (if you find them, use them; new writes use the names above):
 
-- `.cursor/rules/gitkraken-commit-style.mdc` → style.md onward
+- `.cursor/rules/gitkraken-commit-style.mdc` → CRAV1 style onward
 - `.cursor/rules/gitkraken-commit-gitlog.mdc` → git log onward
-- `.claude/rules/gitkraken-commit-style.md` or `~/.claude/rules/gitkraken-commit-style.md` → style.md onward
+- `.claude/rules/gitkraken-commit-style.md` or `~/.claude/rules/gitkraken-commit-style.md` → CRAV1 style onward
 - `.claude/rules/gitkraken-commit-gitlog.md` or `~/.claude/rules/gitkraken-commit-gitlog.md` → git log onward
 
 ## Before drafting
@@ -47,11 +47,11 @@ Also treat these **legacy** names as the same persist (if you find them, use the
 2. Read `git log` (about 8–15 commits: subject + body) when git works.
 3. Check which persist rule exists (new names first, then legacy).
 
-### If a **style.md onward** rule exists
+### If a **CRAV1 style onward** rule exists
 
-Do **not** ask. Draft using `references/style.md` (`style.md` wins over the log). After the blocks: delete that rule file to stop; mention the git-log rule if both files exist (ask which to keep).
+Do **not** ask. Draft using `references/style.md` (CRAV1 style wins over the log). After the blocks: delete that rule file to stop; mention the git-log rule if both files exist (ask which to keep).
 
-### If a **git-log onward** rule exists (and no style.md rule)
+### If a **git-log onward** rule exists (and no CRAV1 style rule)
 
 Do **not** ask. Draft matching **live `git log`**. If the log is empty, say so and fall back to asking the menu. After the blocks: delete the git-log rule file to stop.
 
@@ -61,12 +61,12 @@ Do **not** ask. Draft matching **live `git log`**. If the log is empty, say so a
 
 | Id | Choice | What it does | Disk |
 | --- | --- | --- | --- |
-| `once` | `style.md`, this commit only | Use bundled `references/style.md` for **this** message. Ask again next time. | None |
-| `onward` | `style.md`, this commit and onward | Same, **and** write the style persist rule. Remove any git-log persist rule. | Cursor: `.cursor/rules/draft-commit-style.mdc`. Claude Code project: `.claude/rules/draft-commit-style.md`. Claude Code user (kit not in this repo’s git): `~/.claude/rules/draft-commit-style.md`. Content from `assets/draft-commit-style.mdc`. |
+| `once` | CRAV1 style, this commit only | Use bundled CRAV1 style (`references/style.md`) for **this** message. Ask again next time. | None |
+| `onward` | CRAV1 style, this commit and onward | Same, **and** write the style persist rule. Remove any git-log persist rule. | Cursor: `.cursor/rules/draft-commit-style.mdc`. Claude Code project: `.claude/rules/draft-commit-style.md`. Claude Code user (kit not in this repo’s git): `~/.claude/rules/draft-commit-style.md`. Content from `assets/draft-commit-style.mdc`. |
 | `log-once` | Git log, this commit only | Match **this repo’s** recent messages for **this** message. Ask again next time. | None |
-| `log-onward` | Git log, this commit and onward | Same, **and** write the git-log persist rule. Remove any style.md persist rule. | Cursor: `.cursor/rules/draft-commit-gitlog.mdc`. Claude Code project: `.claude/rules/draft-commit-gitlog.md`. Claude Code user (kit not in this repo’s git): `~/.claude/rules/draft-commit-gitlog.md`. Content from `assets/draft-commit-gitlog.mdc`. |
+| `log-onward` | Git log, this commit and onward | Same, **and** write the git-log persist rule. Remove any CRAV1 style persist rule. | Cursor: `.cursor/rules/draft-commit-gitlog.mdc`. Claude Code project: `.claude/rules/draft-commit-gitlog.md`. Claude Code user (kit not in this repo’s git): `~/.claude/rules/draft-commit-gitlog.md`. Content from `assets/draft-commit-gitlog.mdc`. |
 
-If `git log` is empty or unavailable, say that `log-once` / `log-onward` have no pattern to copy; they can still pick `style.md`.
+If `git log` is empty or unavailable, say that `log-once` / `log-onward` have no pattern to copy; they can still pick CRAV1 style.
 
 If they already named an id (`once`, `onward`, `log-once`, `log-onward`), skip the menu.
 
@@ -74,20 +74,20 @@ After `onward` or `log-onward`: write the matching **new** rule name **before** 
 
 ## Draft
 
-4. Apply the chosen source (`style.md` **or** live log — not a blend that reintroduces Conventional Commits unless the log already uses it).
+4. Apply the chosen source (CRAV1 style **or** live log — not a blend that reintroduces Conventional Commits unless the log already uses it).
 5. Draft **one** message for the intended set of files. Warn if `artifacts/`, `bin/`, `obj/`, or other build output is staged. Leave any work-item mention out of this draft.
 6. Resolve an optional Azure Boards mention in [references/work-item-mention.md](references/work-item-mention.md). Subject and the drafted description stay as written. When a mention is resolved, append one blank line and that mention as the **last line** of the Description. When it is not, the Description ends where the draft ended.
 7. Output only paste blocks (see below). A hint from the work-item reference, when it has one, is a single sentence **after** the blocks. Do not run `git commit` unless they asked.
 
-## When the source is `style.md`
+## When the source is CRAV1 style
 
 - **Summary:** one line, sentence case, no trailing period. Imperative or “Adds/Implement …”. Include `(T#)` when the change completes a `tasks.md` row. Not marketing (“Ship…”) and not `type(scope):`.
-- **Description:** GitKraken Description field. `- ` bullets. Lead with why/what; name endpoints, tests, and spec task checkboxes when those are in the diff.
+- **Description:** CRAV1 style. `- ` bullets. Lead with why/what; name endpoints, tests, and spec task checkboxes when those are in the diff.
 
 ## When the source is git log
 
 - Copy the **shape** of recent subjects and bodies (length, prefixes or lack of them, bullets vs paragraph).
-- Do not force `style.md` rules if the log does something else (including Conventional Commits).
+- Do not force CRAV1 style rules if the log does something else (including Conventional Commits).
 - Still scope the message to the files they will actually commit.
 - Do not copy a trailing `#<id>` or `AB#<id>` line from older commits into the description. Step 6 appends the current slug’s mention once.
 

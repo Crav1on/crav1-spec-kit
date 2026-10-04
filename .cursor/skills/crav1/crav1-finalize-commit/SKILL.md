@@ -1,7 +1,7 @@
 ---
 name: crav1-finalize-commit
 description: >-
-  Finalize a commit: style.md vs git log first if needed, then draft GitKraken
+  Finalize a commit: CRAV1 style vs git log first if needed, then draft GitKraken
   Summary and Description, then offer git commit first, then copy / edit /
   rewrite / stop. Wording is shown before those choices. Use when they want
   to change the message or actually create the commit, or /crav1-finalize-commit.
@@ -40,7 +40,7 @@ Remember the intended file set (the paths the message describes). Warn if `agent
 
 They choose **after** the message exists, not before.
 
-**Do not** open copy/edit/commit choices in the same turn as the style.md vs git-log menu. If style is needed, that turn is style only: no draft, no finalize choices.
+**Do not** open copy/edit/commit choices in the same turn as the CRAV1 style vs git-log menu. If style is needed, that turn is style only: no draft, no finalize choices.
 
 On the turn that produces wording:
 

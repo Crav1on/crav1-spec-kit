@@ -1,4 +1,4 @@
-# Commit style
+# CRAV1 style
 
 Match this shape. Prefer live `git log` when it is available; use these rules when it is not.
 
@@ -18,7 +18,7 @@ Examples of the shape (not required wording):
 
 ## Description
 
-- GitKraken **Description** field: hyphen bullets when there is more than one change.
+- CRAV1 style **Description**: hyphen bullets when there is more than one change.
 - Each bullet starts with a verb (`Adds`, `Implements`, `Configures`, `Introduces`, `Marks`, …).
 - Say what changed and why it matters; mention endpoints, tests, or task-checkbox updates only if they are in the commit.
 - A short paragraph (no bullets) is fine for a single small change.

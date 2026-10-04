@@ -134,7 +134,7 @@ Runnable pieces in this repo:
 | Skill `/crav1-verify-spec` | Want proof against acceptance | Slash command; TL;DR then `verify.md` details |
 | Skill `/crav1-fix-from-verify` | After verify-spec, inner-loop gaps | Slash command; omit Gap to walk failed → unverified → G# |
 | Skill `/crav1-fix-live` | Live/inner-loop gap | Alias of `/crav1-fix-from-verify` |
-| Skill `/crav1-draft-commit-message` | About to commit (GitKraken paste fields) | Slash command; style.md or git log, once or onward; no commit unless they ask. Optional `work-item.md` mention is the last description line |
+| Skill `/crav1-draft-commit-message` | About to commit (GitKraken paste fields) | Slash command; CRAV1 style or git log, once or onward; no commit unless they ask. Optional `work-item.md` mention is the last description line |
 | Skill `/crav1-finalize-commit` | Finish a message: git commit, GitKraken copy, or edit | Style first if needed, then draft, then **commit first**, then copy / edit / rewrite / stop; no push. Keeps a trailing work-item mention |
 | Skill `/crav1-open-pr` | Commits exist on `feat/<slug>` or `spec/<slug>` and you want a pull request | Push only after an explicit yes; one PR against the default branch; no merge, no commit. Adds a Work item section when `work-item.md` exists. On Windows, Azure DevOps description is `--description "@<file>"` (UTF-8, no BOM). May name `/crav1-review-pr` and does not run it. Later merge is `/crav1-merge-pr` |
 | Skill `/crav1-review-pr` | This turn names an open pull request and you want to know if it can ship | Slash command; reads the diff. Spec, plan, `verify.md`, the body, and a required green linter. Does not edit, test, vote, comment, or merge |
@@ -370,7 +370,7 @@ This repo already ships:
 - `/crav1-verify-spec` — TL;DR of implemented vs not, then acceptance details in `verify.md`
 - `/crav1-fix-from-verify` — after verify-spec, walk inner-loop gaps (failed → unverified → `G#`); omit Gap for the next; writes `fix-log.md`
 - `/crav1-fix-live` — alias when that gap is a live/inner-loop path
-- `/crav1-draft-commit-message` — paste-ready GitKraken Summary/Description; `style.md` or live git log, once or onward (deletable rule); does not commit unless they ask. Optional Azure Boards mention from `docs/specs/<slug>/work-item.md` is the last description line
+- `/crav1-draft-commit-message` — paste-ready GitKraken Summary/Description; CRAV1 style or live git log, once or onward (deletable rule); does not commit unless they ask. Optional Azure Boards mention from `docs/specs/<slug>/work-item.md` is the last description line
 - `/crav1-finalize-commit` — same draft, then **commit first**, then copy for GitKraken, edit/rewrite, or stop (no push). Keeps that mention through the HEAD check and the attribution strip
 - `/crav1-open-pr` — push the change branch only after an explicit yes, then open one pull request (no merge, no commit). Body is What / why, Spec links, Verify, and a Work item section when `work-item.md` exists. On Windows, a multi-line Azure DevOps description is passed as `--description "@<file>"` (UTF-8 without BOM). May name `/crav1-review-pr` and does not run it. Next explicit ask to merge is `/crav1-merge-pr`
 - `/crav1-review-pr` — cross-cutting. Reads one named open pull request. Spec, plan, `verify.md`, the body, and a required green linter must hold before it says ship. Names the lane for a finding and does not start it. Does not edit, test, vote, comment, install a linter, or merge. Spark, specify, and verify do not run it
