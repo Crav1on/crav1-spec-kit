@@ -16,7 +16,7 @@ This repo is the kit source. Product work happens in the repo where the kit is i
 2. Run `scripts/sync-crav1-plugin.sh` so `plugins/crav1/` matches and `.claude/` is regenerated. Hand-edits under `plugins/crav1/skills/`, `agents/`, `rules/crav1.mdc`, and `agent-assets/`, and everything under `.claude/`, are overwritten on the next sync.
 3. Plugin-only files stay hand-edited: `plugins/crav1/.cursor-plugin/plugin.json` and `plugins/crav1/README.md`. The catalog is `.cursor-plugin/marketplace.json`. There is no Claude Code plugin and no marketplace in this kit. There is no public Cursor Marketplace listing.
 4. When install or first-run steps change, update [docs/install.md](docs/install.md) and [plugins/crav1/README.md](plugins/crav1/README.md).
-5. When you add, rename, or remove a skill, agent, or cross-cutting helper, update [docs/guild-routing.md](docs/guild-routing.md) in the same pull request. A Claude Code path change does not rename a skill or agent, so that file stays as it is.
+5. When you add, rename, or remove a skill, agent, or cross-cutting helper, update [docs/guild-routing.md](docs/guild-routing.md) in the same pull request. Update the behavior map in `.cursor/rules/kit-maintainer.mdc` in that same pull request. A Claude Code path change does not rename a skill or agent, so guild routing stays as it is. The behavior map still changes when what a skill reads, writes, or calls changes.
 
 Do not put `kit-maintainer.mdc` under `plugins/crav1/` or `.claude/`. CI rejects that. CI also rejects drift between the drop-in tree and the plugin mirror, and a stale `.claude/` tree (`scripts/sync-crav1-claude.sh --check`).
 

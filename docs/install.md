@@ -225,3 +225,4 @@ The kit is at [https://github.com/Crav1on/crav1-spec-kit](https://github.com/Cra
 | A bug that already exists | [docs/from-fix-bug.md](from-fix-bug.md) |
 | The method (specs, plan files, tasks, verify) | [README.md](../README.md) |
 | Which lane owns a `/crav1-…` skill or `*-agent` | [guild-routing.md](guild-routing.md) |
+| How a skill on main behaves | Behavior map in [`.cursor/rules/kit-maintainer.mdc`](../.cursor/rules/kit-maintainer.mdc) (this kit repo only) |

@@ -39,7 +39,9 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 
 ### Docs
 
-- [docs/from-explain.md](docs/from-explain.md) walks `/crav1-explain`. [docs/from-keep-current.md](docs/from-keep-current.md) walks `/crav1-keep-current`. [docs/guild-routing.md](docs/guild-routing.md) lists both under Cross-cutting. No new lane. [README.md](README.md), [docs/install.md](docs/install.md), [docs/first-run.md](docs/first-run.md), and [plugins/crav1/README.md](plugins/crav1/README.md) name the commands. The landscape starter gains `## How the parts connect`. No version bump.
+- [docs/from-explain.md](docs/from-explain.md) walks `/crav1-explain`. [docs/from-keep-current.md](docs/from-keep-current.md) walks `/crav1-keep-current`. [docs/guild-routing.md](docs/guild-routing.md) lists both under Cross-cutting. No new lane. [README.md](README.md), [docs/install.md](docs/install.md), [docs/first-run.md](docs/first-run.md), and [plugins/crav1/README.md](plugins/crav1/README.md) name the commands. The landscape starter gains `## How the parts connect`. The behavior map gains one line for each. No version bump.
+
+- The behavior map in [`.cursor/rules/kit-maintainer.mdc`](.cursor/rules/kit-maintainer.mdc) records one line per skill on main: what it reads, what it writes, what it leaves alone, who calls it, and which skill or agent it calls. An agent is listed only when it runs a skill. The map covers main. Guild routing is unchanged. No version bump.
 
 - [docs/from-fix-bug.md](docs/from-fix-bug.md) walks `/crav1-fix-bug` for Cursor and Claude Code. The slash command is the same. [docs/guild-routing.md](docs/guild-routing.md) lists the skill under Cross-cutting and adds it to the startup options. It may run from any lane, only when the user names a real bug, and it does not move work into Specify, Plan, or Build. [README.md](README.md), [docs/install.md](docs/install.md), [docs/first-run.md](docs/first-run.md), and [plugins/crav1/README.md](plugins/crav1/README.md) name the command. No new lane. No version bump.
 
