@@ -4,7 +4,7 @@ Kit not in this project yet? [Install first](install.md) (Cursor and Claude Code
 
 Use this when the user names **one or more repos** and wants the architecture the code shows written down.
 
-This is cross-cutting. It is not a lane. It is not a mode of Specify. It writes one architecture spec the lanes can extend, plus the system notes under `docs/system/` that [explain](from-explain.md) reads. It does not design the next feature. It does not write application code. It does not start Specify, Plan, or Build.
+This is cross-cutting. It is not a lane. It is not a mode of Specify. It writes one architecture spec the lanes can extend (`docs/architecture/spec.md`), plus the system notes under `docs/system/` that [explain](from-explain.md) reads. It does not design the next feature. It does not write application code. It does not start Specify, Plan, or Build.
 
 A fact the code shows is confirmed. A guess stays out of the spec until the user confirms it. A link between repos is written only when the code shows it. If none is found, the command says so. It does not invent links.
 
@@ -37,15 +37,17 @@ If the message names no repo, the command stops. It does not pick a checkout.
 | --- | --- | --- |
 | Repos | Named one or more checkouts | Stops when none was named. Does not clone. Does not pick a repo |
 | Where | One repo is the destination. Several repos: pick one of them, or a new clean repo | Options only. No typed path. No files yet |
-| Already there | — | Stops when `docs/specs/architecture/spec.md` or a real `docs/system/` note is already written. A later re-read is not this command. Points at `/crav1-explain`. Does not run it |
+| Already there | — | Stops when `docs/architecture/spec.md` or a real `docs/system/` note is already written. A later re-read is not this command. Points at `/crav1-explain`. Does not run it |
 | Read | Confirm or edit the lists | Confirmed facts cite a path. Guesses stay listed and out of the spec. A link only when the code shows it. If none is found, says so |
 | Branch | Pick `feat/architecture` or `spec/architecture` (or stay) | `/crav1-feature-branch` in the destination (no push, no pull request) |
-| Write | Glance | `docs/specs/architecture/spec.md` and `docs/system/` (`landscape.md`, `repos.md`, `diagrams.md`, `glossary.md`). An accepted guess is labeled accepted. A link the code does not show is not written |
+| Write | Glance | `docs/architecture/spec.md` and `docs/system/` (`landscape.md`, `repos.md`, `diagrams.md`, `glossary.md`). An accepted guess is labeled accepted. A link the code does not show is not written |
 | Stop | `/crav1-finalize-commit` if a file changed | Does not plan, implement, or commit. Does not start Specify, Plan, or Build |
 
 ## What gets written
 
-One spec: `docs/specs/architecture/spec.md`. Starter: the skill’s `assets/spec.md`.
+One spec: `docs/architecture/spec.md`. Starter: the skill’s `assets/spec.md`.
+
+The folder is `docs/architecture/`. The file is `spec.md`. Later architecture files can sit beside it. It stays out of `docs/system` and out of `docs/specs`. `docs/specs` stays one folder per feature slug. `docs/system` stays the short picture. This file stays the one the lanes can extend.
 
 System notes, the same files explain reads: `docs/system/landscape.md`, `repos.md`, `diagrams.md`, `glossary.md`, and an ADR only when the code shows a real choice. Starters: [docs/system/_template/](system/_template/).
 
@@ -65,4 +67,4 @@ If a file changed:
 
 That puts the spec and the notes in git. No push. This command does not commit for you.
 
-The lanes can extend `docs/specs/architecture/spec.md` in a later turn. This command does not start that turn.
+The lanes can extend `docs/architecture/spec.md` in a later turn. This command does not start that turn.
