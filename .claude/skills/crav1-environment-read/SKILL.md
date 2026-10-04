@@ -2,15 +2,15 @@
 name: crav1-environment-read
 description: >-
   Read the host and the environment the user named. Each host has its own
-  reader. This build has an Azure reader only. Another named host stops
-  with no reader. Never production. The reader lists only what that
-  environment actually has. A resource with no environment mark stops and
-  is not read. The skill only reads. It does not write docs/system,
-  docs/architecture/spec.md, feature specs, or docs/architecture/left-out.md.
-  After the user confirms a section, the skill that already owns the file
-  adds only what is new. A fact is seen in that environment, not something
-  the code shows. A link only when the environment shows the connection.
-  Does not start Specify, Plan, or Build.
+  reader. This build has readers for Azure, AWS, and Google Cloud. Another
+  named host stops with no reader. Never production. The reader lists only
+  what that environment actually has. A resource with no environment mark
+  stops and is not read. The skill only reads. It does not write
+  docs/system, docs/architecture/spec.md, feature specs, or
+  docs/architecture/left-out.md. After the user confirms a section, the
+  skill that already owns the file adds only what is new. A fact is seen
+  in that environment, not something the code shows. A link only when the
+  environment shows the connection. Does not start Specify, Plan, or Build.
 disable-model-invocation: true
 icon: cloud
 color: cyan
@@ -32,11 +32,11 @@ This is not `/crav1-repos-to-spec`. That command reads repos. This command reads
 
 Everything after `/crav1-environment-read`, and every `@`, is the pointer.
 
-The user names both the host and the environment in that message. Examples: Azure dev, Google Cloud test, AWS dev. The environment is dev or test. The user names the environment, not the subscription.
+The user names both the host and the environment in that message. Examples: Azure dev, Google Cloud test, AWS dev. The environment is dev or test. The user names the environment, not the subscription, the account, or the project.
 
-If they named no host, stop. Ask them to name the host and the environment. Do not guess. Do not pick Azure because it has a reader. Do not read.
+If they named no host, stop. Ask them to name the host and the environment. Do not guess. Do not pick a host because it has a reader. Do not read.
 
-If they named a host and no environment, stop. Ask them to name dev or test. Do not guess. Do not treat a subscription name as the environment. Do not read.
+If they named a host and no environment, stop. Ask them to name dev or test. Do not guess. Do not treat a subscription, an account, or a project name as the environment. Do not read.
 
 If they named production, prod, or live, stop. Say this skill never reads production. Do not list resources. Do not call a reader.
 
@@ -64,19 +64,27 @@ Do not offer production.
 
 Each host has its own reader. The reader lists only what that named environment actually has. A host with no reader stops. Say this host has no reader. Do not pretend to read it. Do not borrow another host’s reader.
 
-This build has an Azure reader only. It is [references/azure.md](references/azure.md) (drop-in: `.claude/skills/crav1-environment-read/references/azure.md`; plugin: this skill’s `references/azure.md`).
+This build has three readers.
+
+- **Azure** — [references/azure.md](references/azure.md) (drop-in: `.claude/skills/crav1-environment-read/references/azure.md`; plugin: this skill’s `references/azure.md`).
+- **AWS** — [references/aws.md](references/aws.md) (drop-in: `.claude/skills/crav1-environment-read/references/aws.md`; plugin: this skill’s `references/aws.md`). Amazon Web Services is AWS.
+- **Google Cloud** — [references/google-cloud.md](references/google-cloud.md) (drop-in: `.claude/skills/crav1-environment-read/references/google-cloud.md`; plugin: this skill’s `references/google-cloud.md`). GCP is Google Cloud.
 
 Check the host name before any read.
 
 - **GitHub, CI, Azure DevOps, or Azure Pipelines** — stop. This skill does not read them. Do not pretend to. Do not treat Azure DevOps as Azure.
-- **Azure** — follow that reader. The host name is Azure, not Azure DevOps.
-- **Google Cloud, AWS, or any other named host** — stop. This host has no reader.
+- **Azure** — follow the Azure reader. The host name is Azure, not Azure DevOps. The user names the environment, not the subscription.
+- **AWS** — follow the AWS reader. The user names the environment, not the account.
+- **Google Cloud** — follow the Google Cloud reader. The user names the environment, not the project.
+- **Any other named host** — stop. This host has no reader.
 
-If the Azure reader cannot read (`az` missing, or not logged in), stop. Say so. Do not invent a resource.
+If that reader cannot read (its CLI is missing, or the login is not present), stop. Say so. Do not invent a resource.
 
 ## Marks
 
-The reader takes only a resource whose name, group, or tag says the named environment (dev or test). Anything marked production is skipped and listed as skipped. It is not a fact. A resource with no environment mark stops the read. Ask. That resource is not read. Do not infer the mark from the subscription, the region, or a neighbor.
+The reader takes only a resource whose name, group, or tag says the named environment (dev or test). Anything marked production is skipped and listed as skipped. It is not a fact. A resource with no environment mark stops the read. Ask. That resource is not read. Do not infer the mark from the subscription, the account, the project, the region, or a neighbor.
+
+The reader file says what the name, the group, and the tag are on that host. Google Cloud has no resource group. That absence is not a mark.
 
 List every unmarked resource in the question. Do not drop one to keep the question short.
 
@@ -210,7 +218,7 @@ Do not plan. Do not implement. Do not commit. Do not start Specify, Plan, or Bui
 Output only:
 
 - Host and environment, or that the read stopped before a reader
-- The reader used, or that this host has no reader
+- The reader used (Azure, AWS, or Google Cloud), or that this host has no reader
 - Counts: seen, skipped, unmarked and not read, connections shown
 - Files the owners changed, or that nothing was written
 - Next: `/crav1-finalize-commit` when a file changed (no push). When nothing was written, name no command. Do not run it.
@@ -218,9 +226,9 @@ Output only:
 ## Hard rules
 
 - No host named: stop. Do not guess the host.
-- No environment named: stop. The user names the environment, not the subscription.
+- No environment named: stop. The user names the environment, not the subscription, the account, or the project.
 - Never production. A resource marked production is skipped and listed as skipped.
-- A host with no reader stops. This build reads Azure only. Do not pretend to read Google Cloud, AWS, or any other host.
+- A host with no reader stops. This build reads Azure, AWS, and Google Cloud. Do not pretend to read any other host.
 - Do not read Azure DevOps, GitHub, or CI.
 - A resource with no environment mark stops the read and is not read.
 - This skill does not write `docs/system`, `docs/architecture/spec.md`, a feature spec, or `docs/architecture/left-out.md`.
