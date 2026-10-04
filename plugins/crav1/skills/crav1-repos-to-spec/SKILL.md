@@ -2,7 +2,7 @@
 name: crav1-repos-to-spec
 description: >-
   Read one or more repos the user named. Write one architecture spec the
-  lanes can extend (docs/specs/architecture/spec.md) and the docs/system/
+  lanes can extend (docs/architecture/spec.md) and the docs/system/
   notes /crav1-explain reads. A fact the code shows is confirmed. A guess
   stays out of the spec until the user confirms it. A link between repos
   is written only when the code shows it. If none is found, say so. Do not
@@ -55,7 +55,7 @@ Check the destination before the read.
 
 Stop when either of these is already written:
 
-- `docs/specs/architecture/spec.md`
+- `docs/architecture/spec.md`
 - A real note in `docs/system/` (skip `_template`)
 
 A real note is a short description that is not the template sentence, a diagram that is not only the template sample, a connection line that is not the template intro, a repo row, a glossary row, an ADR, or a feature-index row with a slug. The template sentence `What this product/system is, in one short paragraph.` is not a short description. The template diagram `user[User] --> app[App]` with no other node is not a diagram of this system.
@@ -93,7 +93,7 @@ Follow `/crav1-feature-branch` (drop-in: `.cursor/skills/crav1/crav1-feature-bra
 
 ## Write
 
-One spec: `docs/specs/architecture/spec.md`, from this skill’s `assets/spec.md` (drop-in: `.cursor/skills/crav1/crav1-repos-to-spec/assets/spec.md`; plugin: this skill’s `assets/spec.md`).
+One spec: `docs/architecture/spec.md`, from this skill’s `assets/spec.md` (drop-in: `.cursor/skills/crav1/crav1-repos-to-spec/assets/spec.md`; plugin: this skill’s `assets/spec.md`). The folder is `docs/architecture/`. The file is `spec.md`. Later architecture files can sit beside it. This file stays out of `docs/system` and out of `docs/specs`. `docs/specs` stays one folder per feature slug. `docs/system` stays the short picture. This file stays the one the lanes can extend. Do not create `docs/specs/architecture/`.
 
 Write `docs/system/` from this skill’s `assets/system/` (same files as `docs/system/_template/`: `landscape.md`, `repos.md`, `diagrams.md`, `glossary.md`; an ADR file comes from `assets/system/adr.md` only when the table below says to write one). Drop-in: `.cursor/skills/crav1/crav1-repos-to-spec/assets/system/`. Plugin: this skill’s `assets/system/`.
 
@@ -102,7 +102,7 @@ Source for every fill is the confirmed list, plus a guess only when they accepte
 | File | Fill |
 | --- | --- |
 | `spec.md` | The sections in `assets/spec.md`. Confirmed facts under **Confirmed** and under the repo heading, each with a path. Accepted guesses only under **Accepted from a guess**, each saying the code does not show it. Leave that section empty when they accepted none. Under **How the repos connect**, one line per link the code shows, with the path. When only one repo was named, the only line is `Only one repo was named.` When more than one repo was named and the code shows no link, the only line is `No link between these repos is in the code.` **Open questions** name what the code does not show. A guess they did not accept stays out of the file. |
-| `landscape.md` | One short paragraph of what the code shows these repos are. Replace the template sentence. Under `## How the parts connect`, one line per link the code shows. When only one repo was named, one line: `Only one repo was named.` When more than one repo was named and the code shows no link, one line: `No link between these repos is in the code.` **v0** is the architecture the code already shows, in one line. Leave **Later** empty. Bulk assumptions are confirmed facts only. When the code states none, write `None the code states.` Constraints are only ones the code shows. When it shows none, write `None the code states.` Leave the feature index empty until the spec file exists, then one row: slug `architecture`, spec `docs/specs/architecture/`, Repos column lists the destination and the named repos, Notes `architecture`. |
+| `landscape.md` | One short paragraph of what the code shows these repos are. Replace the template sentence. Under `## How the parts connect`, one line per link the code shows. When only one repo was named, one line: `Only one repo was named.` When more than one repo was named and the code shows no link, one line: `No link between these repos is in the code.` **v0** is the architecture the code already shows, in one line. Leave **Later** empty. Bulk assumptions are confirmed facts only. When the code states none, write `None the code states.` Constraints are only ones the code shows. When it shows none, write `None the code states.` Leave the feature index empty until the spec file exists, then one row: slug `architecture`, spec `docs/architecture/spec.md`, Repos column lists the destination and the named repos, Notes `architecture`. |
 | `repos.md` | Every named repo, plus the destination when it is the new clean repo. Status `exists` when the checkout is a real repo. Put the URL when the checkout has one. The new clean repo stays without a remote. Boundaries only when the code shows one. |
 | `diagrams.md` | One context diagram. Replace the sample. One heading, one sentence, one fence. Nodes are the named repos. An edge only when the code shows that link. When only one repo was named, one node and no edge, and the sentence says only one repo was named. When more than one repo was named and the code shows no link, draw the nodes and no edge, and the sentence says no link was found. Do not invent a user, a service, or a queue. |
 | `glossary.md` | From `assets/system/glossary.md`. See the glossary rules below. |
@@ -120,10 +120,10 @@ Do not plan. Do not implement. Do not commit. Do not start Specify, Plan, or Bui
 
 Output only:
 
-- Paths written (`docs/specs/architecture/spec.md` and `docs/system/`)
+- Paths written (`docs/architecture/spec.md` and `docs/system/`)
 - Counts: confirmed facts written, guesses accepted, guesses left out
 - Whether the code shows a link, or that no link was found
-- Next: `/crav1-finalize-commit` when a file changed (no push). Do not run it. The lanes can extend `docs/specs/architecture/spec.md` in a later turn. Do not start that turn.
+- Next: `/crav1-finalize-commit` when a file changed (no push). Do not run it. The lanes can extend `docs/architecture/spec.md` in a later turn. Do not start that turn.
 
 If they chose `spec/architecture`, say that branch is specify-only: no implement there.
 
@@ -133,7 +133,7 @@ If they chose `spec/architecture`, say that branch is specify-only: no implement
 - A fact the code shows is confirmed and cites a path.
 - A guess stays out of the spec until the user confirms it. Then it is accepted from a guess, not a code fact.
 - A link is written only when the code shows it. If none is found, say so. Do not invent a link.
-- One architecture spec. Slug `architecture`. Do not create a second slug.
+- One architecture spec at `docs/architecture/spec.md`. Branch slug `architecture`. Do not create a second slug. Do not put this file under `docs/specs/` or `docs/system/`.
 - Do not design the next feature. Do not write application code. Do not start Specify, Plan, or Build.
 - A later re-read that only adds what is new is not this command.
 - This is not `/crav1-code-into-specs`.
