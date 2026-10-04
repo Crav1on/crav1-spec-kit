@@ -73,6 +73,7 @@ The same list is where a lone user sees the ways to start: [plugins/crav1/README
 | Skill | `/crav1-explain` |
 | Skill | `/crav1-keep-current` |
 | Skill | `/crav1-fix-bug` |
+| Skill | `/crav1-exploratory-test` |
 | Skill | `/crav1-export-spec` |
 | Skill | `/crav1-draft-commit-message` |
 | Skill | `/crav1-finalize-commit` |
@@ -96,6 +97,8 @@ The same list is where a lone user sees the ways to start: [plugins/crav1/README
 `/crav1-keep-current` may run from any lane, on its own. The passes that already append a glossary row also run this picture update. It adds what is new to the short description, the diagram, and how the parts connect. It does not move work into Specify, Plan, or Build. It does not design the change and does not build it.
 
 `/crav1-fix-bug` may run from any lane, and only when the user names a real bug in that turn. A real bug is a verify failure on work that is already shipping, or a defect that comes in from outside. If they have not named one, it stops. It does not go hunting. It names the lane and does not move work into Specify, Plan, or Build. It does not start that lane. A spec miss goes to Specify. A plan miss goes to Plan. A verify miss or a broken implementation goes to Build. Spark, specify, plan, and verify do not run it. It is not a stretch of verify. When the user asks for startup options, this skill is one of the seven starter options above. That ask names the list and does not run this skill. It is an intake for a bug that already exists. It still runs only when the user names a real bug. It is not a skill that runs because a repo is new, and it is not started automatically.
+
+`/crav1-exploratory-test` may run from any lane, after a build of a slice already exists. Pass one learns the slice by using it once. Pass two is no longer careful. It adds randomness and follows what the last action showed. It lasts about as long as the first pass, long enough to provoke bugs, then it stops. That stop is named `matched the first pass`. It stops sooner when the user says stop. That stop is named `the user said stop`. The user does not set a clock. It writes bugs to `docs/specs/<slug>/explore.md`. It does not write the checks the plan already named. It does not move work into Specify, Plan, or Build. It does not start those lanes. A bug it finds is not sent to `/crav1-fix-bug` unless the user says so in that turn. It is a later skill. It is not one of the seven starter options. When the user asks for startup options, that ask names the seven and does not run this skill. Spark, specify, plan, and verify do not run it.
 
 Research is a cross-cutting helper with no slash command. Flag it when a run hits a technical question that needs research before Specify or Plan can proceed: choosing a technology or service, changing the architecture, scaling or modernizing, or judging an idea nobody has built yet.
 
@@ -165,6 +168,7 @@ cross_cutting:
     - crav1-explain
     - crav1-keep-current
     - crav1-fix-bug
+    - crav1-exploratory-test
     - crav1-export-spec
     - crav1-draft-commit-message
     - crav1-finalize-commit

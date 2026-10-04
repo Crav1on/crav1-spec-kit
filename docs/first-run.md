@@ -82,6 +82,7 @@ The starter options are the seven above. The table includes later skills. Asking
 | Update the picture after something was added | [from-keep-current.md](from-keep-current.md) · `/crav1-keep-current` |
 | Review a named open pull request | [from-review-pr.md](from-review-pr.md) · `/crav1-review-pr` |
 | A bug that already exists | [from-fix-bug.md](from-fix-bug.md) · `/crav1-fix-bug` |
+| A built slice, exploratory test | [from-exploratory-test.md](from-exploratory-test.md) · `/crav1-exploratory-test` |
 | Prove a slice | `/crav1-verify-spec` |
 | Push and open a pull request | `/crav1-open-pr` (after commits exist; does not merge; may name `/crav1-review-pr` and does not run it) |
 | Merge a named pull request | `/crav1-merge-pr` (only when that turn asks; merge commit only; does not run the review) |
