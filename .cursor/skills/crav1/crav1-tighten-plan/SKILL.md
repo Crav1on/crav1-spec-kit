@@ -50,6 +50,7 @@ Typical **plan** shapes:
 - Task or approach step invents behavior the spec does not require
 - Acceptance / REQ with no task (or task with no spec line)
 - Files likely touched wrong, missing, or not `(proposed)` when there is no repo
+- `## Linter` missing, or it never says whether this repo has a linter or checker for the code the tasks will touch
 - Plan treats a kept-open spec question as decided
 
 **Spec** tag: the plan is fine or cannot be honest until `spec.md` changes. Do not “fix” that by writing product behavior into the plan.
@@ -57,6 +58,8 @@ Typical **plan** shapes:
 Skip nitpicks. Merge duplicates. Prefer fewer sharp issues.
 
 If **no plan issues** remain (spec-tagged ones only, or none): say so. Next: spec-tagged → `/crav1-tighten-spec` / `/crav1-resolve-questions`; else **new chat**, `/crav1-implement-task` or `/crav1-complete-task` with `plan.md`, `tasks.md`, and `spec.md` attached.
+
+When `## Linter` says this repo has no linter or checker for the code the tasks will touch, do not name those Build commands. Stop before Build. The user decides to add the linter or to go on without one. Do not install one. When they already chose to go on without one in this turn, the Build next step applies, and the plan still says none. A plan that already says none is not a `P#` by itself.
 
 ## Walk one issue at a time
 
@@ -108,6 +111,7 @@ Do not start the next issue’s patch in the same turn unless they batched.
 | `drop-scope` | Drop extra scope | Remove the step/`T#` that is not in the spec (or move it to plan Out of scope). | Smaller task list; trace still covers remaining acceptance. |
 | `fix-trace` | Fix trace | Map acceptance/REQ ↔ `T#`. Add a covering task or mark “covered by T#”. | `plan.md` Trace table; maybe one new `T#`. |
 | `retarget-files` | Fix files likely touched | Correct paths; mark `(proposed)` if no repo. Do not invent a new architecture. | `plan.md` Files section. |
+| `name-linter` | Name the linter | Search the repo. When it has a linter or checker for the code the tasks will touch, name the tool and the command under `## Linter`, and say Build leaves that check green. When it does not, write that. Do not install one. | `plan.md` Linter section. |
 | `park-risk` | Park as risk | Plan was treating a kept-open question as decided. Remove that decision from tasks; list it under Risks. | No silent product answer. |
 | `send-to-spec` | Send to spec | This is a spec defect or a new product question. Do not patch the plan. | No disk change here. Next: `/crav1-tighten-spec` or `/crav1-resolve-questions`. |
 | `keep` | Keep as written | Accept the cost (usually untestable or extra scope). | No disk change. Rare; say the cost. |
@@ -121,5 +125,6 @@ Do **not** offer `apply-notes` for the whole review.
 - Prefer **splitting or dropping** over adding product scope.
 - Never edit `spec.md`, diagrams, or ADRs. Never write application code.
 - Never resolve an Open question by encoding an answer in a `T#`.
-- Do not start implement/complete-task in this chat unless they explicitly asked after plan issues are done.
+- Do not start implement/complete-task in this chat unless they explicitly asked after plan issues are done. When `## Linter` says there is no linter, that ask is the choice to go on without one. Do not install a linter.
+- Do not run `/crav1-review-pr`. Specify does not name the linter.
 - Do not patch “to be helpful” when they have not chosen a **plan patch** (`suggest` and `send-to-spec` are not plan patches).

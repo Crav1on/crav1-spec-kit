@@ -56,10 +56,13 @@ Skill slash names are `/crav1-…`. Subagent names end in `-agent`.
 | Skill | `/crav1-draft-commit-message` |
 | Skill | `/crav1-finalize-commit` |
 | Skill | `/crav1-open-pr` |
+| Skill | `/crav1-review-pr` |
 | Skill | `/crav1-merge-pr` |
 | Helper | Research |
 
 `/crav1-merge-pr` may run from any lane, and only when the user explicitly asks in that turn to merge a named pull request. It does not move work into Specify, Plan, or Build.
+
+`/crav1-review-pr` may run from any lane, and only when the user names an open pull request (number or URL) in that turn, or clearly asks to review that pull request. It does not move work into Specify, Plan, or Build. It only names the lane for a finding. Spark, specify, and verify do not run it.
 
 `/crav1-security-review` may run from any lane, and only after architecture already exists (`docs/system/` or a spec that already describes the design). The same command reviews the whole system, one existing spec, or the change in front of us. It does not move work into Specify, Plan, or Build. Spark, plan, and verify do not run it.
 
@@ -122,6 +125,7 @@ cross_cutting:
     - crav1-draft-commit-message
     - crav1-finalize-commit
     - crav1-open-pr
+    - crav1-review-pr
     - crav1-merge-pr
   subagents: []
   helpers:

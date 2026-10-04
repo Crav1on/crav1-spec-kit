@@ -12,6 +12,10 @@ Stack, compatibility, performance, security.
 
 - `path` — why
 
+## Linter
+
+- 
+
 ## Risks
 
 - 

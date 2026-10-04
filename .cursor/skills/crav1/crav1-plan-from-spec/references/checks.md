@@ -38,6 +38,19 @@ Map that check to a `T#`, or write “covered by T#” on the Trace row. A task 
 
 If the kept decision conflicts with a spec non-goal, stop and send it to `/crav1-tighten-spec`. Do not encode the conflict as a task.
 
+## Linter, before Build
+
+Specify stays yes/no acceptance. It does not name the linter.
+
+Search the repo for a linter or checker that covers the code these tasks will touch. Do not install one.
+
+Write the answer under `## Linter` in `plan.md`.
+
+- When the repo has one, name the tool and the command. Say which paths it covers. Build is expected to leave that check green.
+- When it does not, write that this repo has no linter or checker for that code. Stop before Build. The user decides to add the linter or to go on without one. Do not install one. Do not name `/crav1-implement-task`, `/crav1-complete-task`, `/crav1-complete-tasks`, or `/crav1-complete-features` until they choose. When they choose to go on without one, the usual next step applies, and the plan still says none.
+
+A plan that never says which of those two is true is not complete. `/crav1-review-plan` and `/crav1-tighten-plan` use this same rule.
+
 ## Stay out
 
 Smoke after deploy, chaos, and fuzzing for its own sake stay out. A **property** check for an algorithm with many inputs stays; that is not fuzzing for its own sake.

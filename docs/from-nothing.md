@@ -85,7 +85,7 @@ Use a strong reasoning model for this phase.
 | 3 | “v0 is too big” / “offline matters” / “not for teams” | `/crav1-tighten-spec` turns each gap into an issue with choices (impact included; you can ask for a suggestion), one by one |
 | 4 | Optional: “review this spec” | Parent agent delegates to **crav1-spec-reviewer-agent** |
 | 5 | Leftover Open questions | `/crav1-resolve-questions` — keep open or answer, one `Q#` at a time |
-| Stop | You can demo this slice from the acceptance list; leftover Qs are explicit | Spec is done enough. `/crav1-plan-from-spec`, optional `/crav1-review-plan` / `/crav1-tighten-plan`, then complete-task / implement / verify |
+| Stop | You can demo this slice from the acceptance list; leftover Qs are explicit | Spec is done enough. `/crav1-plan-from-spec` names a linter or stops before Build when the repo has none. Optional `/crav1-review-plan` / `/crav1-tighten-plan`, then complete-task / implement / verify |
 
 Good iteration messages (short):
 
@@ -110,6 +110,6 @@ New chat so exploration does not pollute implementation.
 @docs/specs/<slug>/spec.md
 ```
 
-`/crav1-plan-from-spec` writes `plan.md` and `tasks.md`. The host plan UI is not those files ([install.md](install.md)). Then optional `/crav1-review-plan` and `/crav1-tighten-plan` (plan/tasks only). Then `/crav1-complete-task` or `/crav1-implement-task`.
+`/crav1-plan-from-spec` writes `plan.md` and `tasks.md`. The host plan UI is not those files ([install.md](install.md)). The plan names a linter or checker when the repo has one for the code those tasks will touch, and stops before Build when it does not. You decide to add the linter or to go on without one. The plan skill does not install one. Specify does not name the linter. Then optional `/crav1-review-plan` and `/crav1-tighten-plan` (plan/tasks only). Then `/crav1-complete-task` or `/crav1-implement-task` when the plan names a linter, or when you chose to go on without one.
 
 If a repo already exists, `@` the relevant folders so plan and spec-reviewer apply “preserve existing patterns.”

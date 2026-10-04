@@ -5,7 +5,8 @@ description: >-
   GitHub uses gh; Azure DevOps uses az when the CLI is available. Use after
   commits exist on feat/<slug> or spec/<slug>, or when the user asks for a PR.
   Cross-cutting. Does not merge; that is /crav1-merge-pr on a later
-  explicit ask. Do not commit. When that slug has work-item.md, add a
+  explicit ask. May name /crav1-review-pr as an optional next step
+  and does not run it. Do not commit. When that slug has work-item.md, add a
   Work item section to the body.
 disable-model-invocation: true
 icon: git-pull-request
@@ -312,7 +313,7 @@ When **Host** says not to call `gh` or `az`, print the fallback from that sectio
 
 When the host returned a pull request URL, print that URL and `base` ← `head`.
 
-One sentence: they can review when they want. Next (optional): `/crav1-merge-pr` when they explicitly ask, in a later turn, to merge this named pull request. This skill does not merge, and it does not delete the branch. Do not run `/crav1-merge-pr` from this step.
+One sentence: they can review when they want. Next (optional): `/crav1-review-pr` when they name this pull request in a later turn. This skill does not run that command. Merging stays `/crav1-merge-pr` when they explicitly ask, in a later turn, to merge this named pull request. A review is not that ask. This skill does not merge, and it does not delete the branch. Do not run `/crav1-review-pr` or `/crav1-merge-pr` from this step.
 
 When you only printed commands, stop after those commands. Do not invent a URL.
 
@@ -320,7 +321,7 @@ When you only printed commands, stop after those commands. Do not invent a URL.
 
 - No `git commit`, no `git commit --amend`, no stash, no `git checkout`, no new branch.
 - No force-push.
-- No merge (`gh pr merge`, completing an Azure DevOps pull request, or a local merge). Merging is `/crav1-merge-pr` on a later explicit ask for a named pull request. Do not run it from this skill.
+- No merge (`gh pr merge`, completing an Azure DevOps pull request, or a local merge). Merging is `/crav1-merge-pr` on a later explicit ask for a named pull request. Do not run it from this skill. Do not run `/crav1-review-pr`. A review is not a merge ask.
 - No second pull request for the same head → base.
 - No repository setting changes.
 - No `gk ai pr create` and no other interactive `gk` pull-request create. GitKraken stays GUI paste only.

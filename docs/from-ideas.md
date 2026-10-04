@@ -118,7 +118,7 @@ Stay inside v0. Do not reopen rejected options unless an ADR is still proposed.
 Do not code.
 ```
 
-`/crav1-plan-from-spec` writes `plan.md` and `tasks.md` in the spec folder. The host plan UI is not those files ([install.md](install.md)).
+`/crav1-plan-from-spec` writes `plan.md` and `tasks.md` in the spec folder. The host plan UI is not those files ([install.md](install.md)). The plan names a linter or checker when the repo has one, and stops before Build when it does not. You decide to add the linter or to go on without one. The plan skill does not install one. Specify does not name the linter.
 
 Optional critique of the plan (does not change `spec.md`):
 

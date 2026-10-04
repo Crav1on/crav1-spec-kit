@@ -14,7 +14,7 @@ Priorities:
 - Every v0 acceptance line traces to at least one `T#` (or an explicit “covered by T#”).
 - Tasks are small enough to implement and verify before the next depends on them. “Add authentication” is a defect.
 - Kept-open spec questions belong under plan **Risks**, not silent answers in a `T#`.
-- Check rules: `.cursor/skills/crav1/crav1-plan-from-spec/references/checks.md` (drop-in) or this plugin’s `skills/crav1-plan-from-spec/references/checks.md`. A missing kind, a missing corner case on an algorithm, a missing regression when old behavior is touched, a missing integration test when two parts meet, or a kept security check with no task is a defect. Smoke after deploy, chaos, fuzzing for its own sake, an invented speed goal, and test code in the plan are defects.
+- Check rules: `.cursor/skills/crav1/crav1-plan-from-spec/references/checks.md` (drop-in) or this plugin’s `skills/crav1-plan-from-spec/references/checks.md`. A missing kind, a missing corner case on an algorithm, a missing regression when old behavior is touched, a missing integration test when two parts meet, or a kept security check with no task is a defect. Smoke after deploy, chaos, fuzzing for its own sake, an invented speed goal, and test code in the plan are defects. A missing `## Linter`, or a Linter section that never says whether this repo has a linter or checker for the code the tasks will touch, is a defect. Specify does not name the linter. Do not install one. A plan that already says there is none is complete on that point.
 
 When invoked, read `spec.md`, `plan.md`, `tasks.md` (and diagrams/ADRs if the parent passed them), plus `docs/system/security.md` and a Security section on the spec when those exist. Expected heading/shape (not the plan under review): `.cursor/agent-assets/crav1-plan-reviewer-agent/` (drop-in) or this plugin’s `agent-assets/crav1-plan-reviewer-agent/` (`plan.md`, `tasks.md`, `spec.md`). Also read the check rules above.
 
@@ -22,7 +22,7 @@ Respond with:
 
 1. **See** — v0 slice, how many `T#`s, whether a codebase is in context.
 2. **Scope drift** — plan/tasks that invent behavior, or drop a required acceptance line. Quote the lines.
-3. **Task quality** — oversized `T#`s, a verify note with no kind, too few or too many checks for what must be proved, an algorithm with no corner cases, old behavior with no regression, an edge with no integration test, a kept security check with no task, missing `(spec: …)`, order that cannot be verified incrementally. Smoke, chaos, fuzz, an invented speed goal, or test code in the plan belongs here.
+3. **Task quality** — oversized `T#`s, a verify note with no kind, too few or too many checks for what must be proved, an algorithm with no corner cases, old behavior with no regression, an edge with no integration test, a kept security check with no task, missing `(spec: …)`, order that cannot be verified incrementally. Smoke, chaos, fuzz, an invented speed goal, or test code in the plan belongs here. A missing `## Linter`, or one that never says whether a linter or checker covers the code the tasks will touch, belongs here. Naming the linter inside acceptance criteria does too.
 4. **Trace** — acceptance / REQ with no task; tasks with no spec line.
 5. **Files** — `Files likely touched` that are wrong, missing, or too vague for the repo (if one exists).
 6. **Risks** — kept-open questions that the plan treats as decided; bets that will break the first demo.
@@ -34,5 +34,7 @@ Respond with:
    `P3 — plan — T2 verify is “run tests” and names no kind. The spec’s parser is an algorithm; name several unit checks, including the corner cases.`
 
    `P5 — spec — plan assumes OAuth; spec Open questions still list auth. Do not decide in the plan.`
+
+   `P6 — plan — ## Linter is missing. Say whether this repo has a linter or checker for the code the tasks will touch. Do not install one.`
 
 Do **not** bundle the whole review into one action. End with: run `/crav1-tighten-plan` for **plan** `P#`s; send **spec** `P#`s to tighten-spec / resolve-questions. Do not recommend a single global patch.
