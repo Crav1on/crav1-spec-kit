@@ -24,6 +24,10 @@ This is not `/crav1-repos-to-spec`. That command reads the repos the user named 
 
 Spark, ideas, intake, match, match-dump, and code-into-specs run this picture update in the same pass that appends a glossary row. They follow [references/picture.md](references/picture.md) (drop-in: `.cursor/skills/crav1/crav1-keep-current/references/picture.md`; plugin: this skill’s `references/picture.md`). They do not rewrite existing glossary rows. This command does not write glossary rows.
 
+## From /crav1-environment-read
+
+When `/crav1-environment-read` hands a confirmed system section, run only this section, then stop. That section is the source. Add only what is new to the picture, following [references/picture.md](references/picture.md). Each new sentence, node, edge, or connection line says `Seen in <host> <environment>.` It does not say the code shows it. A connection is added only when that section says the environment shows it. Do not rewrite a line that is already there. Do not run the alone-read of the specs. Do not open an interview. Do not start Specify, Plan, or Build. If `docs/system/` is missing, write nothing.
+
 ## When the folder is missing
 
 Run only when `docs/system/` already exists. If that folder is missing, stop. Point at the command that creates it. Do not seed the folder. Do not write the picture to fill the gap.
