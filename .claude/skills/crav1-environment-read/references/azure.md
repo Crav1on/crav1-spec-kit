@@ -1,8 +1,8 @@
 # Azure reader
 
-This is the only reader in this build. `/crav1-environment-read` follows it when the user named Azure and an environment of dev or test. It lists only what that named environment actually has.
+`/crav1-environment-read` follows this reader when the user named Azure and an environment of dev or test. It lists only what that named environment actually has.
 
-Google Cloud, AWS, and any other named host do not use this file. They stop with no reader.
+AWS follows [aws.md](aws.md). Google Cloud follows [google-cloud.md](google-cloud.md). Any other named host stops with no reader and does not use this file.
 
 ## Out of this reader
 
