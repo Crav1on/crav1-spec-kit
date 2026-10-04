@@ -2,7 +2,7 @@
 
 Read this **before** you put **CRAV1 Spec Kit** in a project. It covers what you get, which host and scope to pick, and where files go. It is not the full playbook. The thin path after you pick an install is [first-run.md](first-run.md).
 
-The method (specs, `plan.md`, `tasks.md`, verify) is [README.md](../README.md), [from-nothing.md](from-nothing.md), [from-ideas.md](from-ideas.md), [from-intake.md](from-intake.md), [from-match.md](from-match.md), [from-match-dump.md](from-match-dump.md), [from-code.md](from-code.md), [from-add.md](from-add.md), [from-security.md](from-security.md), and [from-review-pr.md](from-review-pr.md). This file is the host detail those pages leave out.
+The method (specs, `plan.md`, `tasks.md`, verify) is [README.md](../README.md), [from-nothing.md](from-nothing.md), [from-ideas.md](from-ideas.md), [from-intake.md](from-intake.md), [from-match.md](from-match.md), [from-match-dump.md](from-match-dump.md), [from-code.md](from-code.md), [from-add.md](from-add.md), [from-security.md](from-security.md), [from-review-pr.md](from-review-pr.md), and [from-fix-bug.md](from-fix-bug.md). This file is the host detail those pages leave out.
 
 Kit home: [https://github.com/Crav1on/crav1-spec-kit](https://github.com/Crav1on/crav1-spec-kit). License: [MIT](../LICENSE).
 
@@ -25,7 +25,7 @@ This kit repository is the source. Your product repository is where work happens
 
 | Piece | Role |
 | --- | --- |
-| Skills (`/crav1-…`) | Playbooks: spark/ideas/intake → spec → plan → review-plan → implement → verify → fix → draft commit → `/crav1-open-pr` → `/crav1-review-pr` (named pull request only) → `/crav1-merge-pr` (explicit ask, merge commit only). Plan names a linter when the repo has one and stops before Build when it does not. Cross-cutting `/crav1-security-review` after architecture exists (whole system, one spec, or the change in front of you). Spark, plan, and verify do not run the security review. Spark, specify, and verify do not run the pull request review |
+| Skills (`/crav1-…`) | Playbooks: spark/ideas/intake → spec → plan → review-plan → implement → verify → fix → draft commit → `/crav1-open-pr` → `/crav1-review-pr` (named pull request only) → `/crav1-merge-pr` (explicit ask, merge commit only). Plan names a linter when the repo has one and stops before Build when it does not. Cross-cutting `/crav1-security-review` after architecture exists (whole system, one spec, or the change in front of you). Cross-cutting `/crav1-fix-bug` when a real bug is already named (one of the startup options; not a new lane; not a stretch of verify). Spark, plan, and verify do not run the security review. Spark, specify, and verify do not run the pull request review. Spark, specify, plan, and verify do not run the bug intake |
 | Agents | `crav1-spec-reviewer-agent`, `crav1-architecture-reviewer-agent`, `crav1-plan-reviewer-agent` (read-only critics); `crav1-complete-task-agent` and `crav1-intake-slice-agent` (writers) |
 | Project instruction | Cursor: rule `crav1.mdc`. Claude Code: `.claude/CLAUDE.md` (same short text, not the README) |
 | Templates | Inside each skill’s `assets/` (and agent-assets). Optional human copies: `docs/specs/_template/`, `docs/system/_template/` |
@@ -177,7 +177,7 @@ On Claude Code 2.1.286, in a private throwaway git repo, the generated `.claude/
 New to the loop? [First 15 minutes](first-run.md): open the product repo → `/crav1` → `/crav1-spark-to-spec` → tighten → plan → one task.
 
 1. Open a chat in the **product** repo. On Cursor that is Agent chat. On Claude Code, open a session in that repo.
-2. Type `/crav1` and run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, or `/crav1-match-to-specs`. Brownfield: expect a branch prompt (`feat/<slug>` or `spec/<slug>`).
+2. Type `/crav1` and run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, or `/crav1-match-to-specs`. Brownfield: expect a branch prompt (`feat/<slug>` or `spec/<slug>`). A bug that already exists is `/crav1-fix-bug`, one of the startup options. It is not a skill that runs because a repo is new, and it is not started automatically.
 3. Follow the command loop. Do not start in the host plan UI or by picking a stack. `/crav1-plan-from-spec` writes `plan.md` and `tasks.md`.
 
 `/crav1-complete-tasks`, standalone `/crav1-complete-task`, and `/crav1-complete-features` **pause once** before the first worker, wait for `continue` / `click`, then remind you how to restore the previous gate when the run ends. On Cursor that gate is Approvals & Execution. On Claude Code it is the permission prompt (`/permissions`); the skill does not set a permission mode. Workers launched by those orchestrators do not pause again. The skill cannot change host settings for you.
@@ -222,5 +222,6 @@ The kit is at [https://github.com/Crav1on/crav1-spec-kit](https://github.com/Cra
 | New information for one existing spec | [docs/from-add.md](from-add.md) |
 | Security review after architecture exists | [docs/from-security.md](from-security.md) |
 | Review a named open pull request | [docs/from-review-pr.md](from-review-pr.md) |
+| A bug that already exists | [docs/from-fix-bug.md](from-fix-bug.md) |
 | The method (specs, plan files, tasks, verify) | [README.md](../README.md) |
 | Which lane owns a `/crav1-…` skill or `*-agent` | [guild-routing.md](guild-routing.md) |
