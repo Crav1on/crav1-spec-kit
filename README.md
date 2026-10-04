@@ -121,6 +121,7 @@ Runnable pieces in this repo:
 | Skill `/crav1-spark-to-spec` | You have 1–2 sentences (empty repo or a feature on an existing app) | Slash command; greenfield vs brownfield from context. Seeds a thin `docs/system/` when missing, then the spec, then one index row. On Azure Repos, one optional work-item id after a new spec folder |
 | Skill `/crav1-feature-branch` | Brownfield: get off the default branch | Prompt: `feat/<slug>` (spec+build) or `spec/<slug>` then `feat/<slug>` for build; no push, no PR |
 | Skill `/crav1-architecture-reviewer` | Spec + diagrams/ADRs exist | Slash command; runs the reviewer subagent |
+| Skill `/crav1-security-review` | Architecture already exists (`docs/system/` or a spec that describes the design) | Slash command; same command for the whole system, one spec, or the change in front of you. Writes kept findings. Does not plan or commit |
 | Skill `/crav1-tighten-spec` | Spec exists, still mushy | Slash command; one issue at a time (option to get a suggestion); then edit |
 | Skill `/crav1-resolve-questions` | Open questions remain after tightening | Slash command; keep-open or answer, one `Q#` at a time |
 | Skill `/crav1-plan-from-spec` | Spec is accepted; want plan + tasks, no code | Slash command; writes `plan.md` and `tasks.md` |
@@ -247,6 +248,8 @@ Use this on any non-trivial change.
 
 New information aimed at one spec that already exists is **`/crav1-add-to-spec`**. Full walkthrough: [From new information to an existing spec](docs/from-add.md). `/crav1-tighten-spec` stays for mushy wording. Match, intake, spark, and ideas create the folders. This command does not plan.
 
+When architecture already exists, **`/crav1-security-review`** asks whether the thing in front of it is secure. Full walkthrough: [From a security review](docs/from-security.md). The same command covers the whole system, one existing spec, or the change in front of you. It is not a mode of `/crav1-architecture-reviewer`. Architecture review critiques design hunches. This command writes kept findings and stops. Spark, plan, and verify do not run it.
+
 ### A. Specify (read-heavy)
 
 Describe the user problem, not the stack. Force:
@@ -311,6 +314,7 @@ docs/system/
   repos.md           # named repos (proposed until a URL exists)
   diagrams.md
   glossary.md        # words the source already uses; not a feature spec
+  security.md        # kept risks after /crav1-security-review (system pass); not seeded by spark
   adr/
 docs/specs/
   _template/
@@ -348,7 +352,8 @@ This repo already ships:
 - `/crav1-match-dump-to-specs` — a later dump, specs already exist → sort onto those specs (belongs, already there, or does not fit), then quote the new bits. Does not ask for a slug first. Does not create a slug. Does not seed `docs/system/`. Fills a missing `glossary.md` only when that folder already exists. New glossary rows are appended. Existing rows are not rewritten. A meaning the source does not state is `to be researched`. Does not plan, implement, or commit
 - `/crav1-code-into-specs` — a code change that already landed, specs already exist → sort onto those specs (belongs, already described there, or fits none), then quote what the change does. No dump. Does not ask for a slug first. Does not create a slug. Does not watch the repo. Does not seed `docs/system/`. Fills a missing `glossary.md` only when that folder already exists. New glossary rows are appended. Existing rows are not rewritten. A meaning the source does not state is `to be researched`. Does not plan, implement, or commit
 - `/crav1-add-to-spec` — new information for one existing spec → quote it into that `spec.md`, then report whether the landscape or another spec has to change. Does not rewrite those other files unless asked. Does not create a glossary. A new glossary row can be one listed edit and is not written unless apply is chosen. A meaning the new information does not state is `to be researched`. Existing rows are not rewritten. Does not plan, implement, or commit
-- `/crav1-architecture-reviewer` — run the crav1-architecture-reviewer-agent subagent; numbered issues at the end
+- `/crav1-architecture-reviewer` — run the crav1-architecture-reviewer-agent subagent; numbered issues at the end. Optional next, not run from this command: `/crav1-security-review`
+- `/crav1-security-review` — cross-cutting. After architecture exists, ask whether the thing in front of you is secure. Same command for the whole system (`docs/system/security.md`), one spec, or the change in front of you (a Security section on that spec). One confirm, then kept findings only. Does not invent an architecture. Does not plan, implement, or commit. Spark, plan, and verify do not run it
 - `/crav1-tighten-spec` — one issue at a time, with explained resolutions (plus get a suggestion) and impact; patch only that issue after you choose
 - `/crav1-resolve-questions` — one Open question at a time; keep it open or answer with impact; patch only that `Q#`
 - `/crav1-export-spec` — re-project `spec.md` into EARS, BDD, OpenSpec, YAML, JSON, or BMAD
