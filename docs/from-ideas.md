@@ -193,8 +193,8 @@ That command drafts the same way: style first if needed, then Summary/Descriptio
 
 First time (no persist rule yet) it asks:
 
-- **`style.md`, this commit only**
-- **`style.md`, this commit and onward** — writes a host persist rule
+- **CRAV1 style, this commit only**
+- **CRAV1 style, this commit and onward** — writes a host persist rule
 - **Git log, this commit only** — match this repo’s recent messages
 - **Git log, this commit and onward** — writes the other host persist rule
 
