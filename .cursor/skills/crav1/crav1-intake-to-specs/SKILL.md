@@ -5,7 +5,9 @@ description: >-
   into docs/system/ (including glossary.md) plus one spec slug per v0 feature.
   When that folder exists, write glossary.md if it is missing, or append only
   words that are not already rows. Do not rewrite existing glossary rows. A
-  meaning the source does not state is `to be researched`. Use when 1–N files
+  meaning the source does not state is `to be researched`. That same pass
+  adds what is new to the short description, the diagram, and how the parts
+  connect. Do not rewrite what is already there. Use when 1–N files
   or a dump may imply several features or repos. Do not write application code.
 disable-model-invocation: true
 icon: layers
@@ -65,13 +67,13 @@ Write `docs/system/` from this skill’s `assets/` (same shape as `docs/system/_
 
 | File | What |
 | --- | --- |
-| `landscape.md` | What this is, v0 vs later, bulk `A#`s, feature index (fill paths after workers) |
+| `landscape.md` | What this is, v0 vs later, bulk `A#`s, how the parts connect (one line per connection the intake already states), feature index (fill paths after workers) |
 | `repos.md` | 1–N repos: purpose, proposed vs exists, URL when they have one |
 | `diagrams.md` | System context across repos (follow `references/diagrams.md`) |
 | `glossary.md` | From `assets/glossary.md`, in this same pass. See the glossary rules below. |
 | `adr/` | Cross-cutting choices only (`assets/adr.md`). Hunches with no alternative → constraints on `landscape.md`, not ADRs. Status `proposed` until they accept |
 
-**Glossary.** `glossary.md` is part of the landscape, not a feature spec. When `docs/system/` is missing, write it with the other landscape files. When `docs/system/` already exists, do not rewrite `landscape.md`, `repos.md`, `diagrams.md`, or existing ADRs. If `glossary.md` is missing, write only that file. If it exists, append only new rows. The feature index is filled in Index, not in that gap fill. Source is the intake already in hand. Do not run an extra interview. Do not invent terms, expansions, or definitions. Do not write TBD or to be decided. A row is only a word or abbreviation that intake already uses. When that same intake already says the expansion or meaning, put that text in Meaning. When it never says what the word means, set Meaning to `to be researched`. Skip ordinary English. A code identifier is not a row unless the intake already treats that word as a term. Write the file even when it has no rows. Do not rewrite, reorder, or edit existing rows. Do not change a Meaning cell that already has text.
+**Glossary.** `glossary.md` is part of the landscape, not a feature spec. When `docs/system/` is missing, write it with the other landscape files. When `docs/system/` already exists, do not rewrite `repos.md` or existing ADRs, and do not rewrite a short-description sentence, a diagram node, a diagram edge, or a connection line that is already there. If `glossary.md` is missing, write only that file. If it exists, append only new rows. The feature index and the picture update are filled in Index, not in that gap fill. Source is the intake already in hand. Do not run an extra interview. Do not invent terms, expansions, or definitions. Do not write TBD or to be decided. A row is only a word or abbreviation that intake already uses. When that same intake already says the expansion or meaning, put that text in Meaning. When it never says what the word means, set Meaning to `to be researched`. Skip ordinary English. A code identifier is not a row unless the intake already treats that word as a term. Write the file even when it has no rows. Do not rewrite, reorder, or edit existing rows. Do not change a Meaning cell that already has text.
 
 No `tasks.md` here. No `git init`, remotes, or application code unless they **explicitly** asked in this chat to create repos.
 
@@ -89,9 +91,11 @@ If Map is one feature and one repo, write that slug here using ideas-to-spec Wri
 
 After workers return, update `docs/system/landscape.md` feature index: slug → spec path → repos. Do not rewrite slice specs.
 
+**Picture.** After the index, follow [picture.md](../crav1-keep-current/references/picture.md) (drop-in: `.cursor/skills/crav1/crav1-keep-current/references/picture.md`; plugin: sibling `skills/crav1-keep-current/references/picture.md`). Add what this pass added to the short description, the diagram, and how the parts connect. Do not rewrite a sentence, a diagram node, a diagram edge, or a connection line that is already there. Do not run `/crav1-keep-current` as a second turn. When this pass seeded `docs/system/`, the seed fill of those three is the picture for what the intake already stated; the picture update still adds anything the new specs state that those three do not yet say. Workers do not edit the picture. Do not rewrite existing glossary rows.
+
 Then output only:
 
-- Paths written (`docs/system/` and each `docs/specs/<slug>/`)
+- Paths written (`docs/system/` and each `docs/specs/<slug>/`, plus any picture lines added)
 - Ready vs interviewed slugs
 - ADRs (landscape vs slice) vs still open
 - 3–5 remaining arguments

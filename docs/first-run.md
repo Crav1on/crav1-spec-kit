@@ -58,6 +58,8 @@ Start a new chat. Run `/crav1-plan-from-spec`. Read `plan.md` and `tasks.md` and
 | A code change that already landed, specs already exist | [from-code.md](from-code.md) · `/crav1-code-into-specs` |
 | New information for one existing spec | [from-add.md](from-add.md) · `/crav1-add-to-spec` |
 | Security review after architecture exists | [from-security.md](from-security.md) · `/crav1-security-review` |
+| Read the system notes | [from-explain.md](from-explain.md) · `/crav1-explain` |
+| Update the picture after something was added | [from-keep-current.md](from-keep-current.md) · `/crav1-keep-current` |
 | Review a named open pull request | [from-review-pr.md](from-review-pr.md) · `/crav1-review-pr` |
 | A bug that already exists | [from-fix-bug.md](from-fix-bug.md) · `/crav1-fix-bug` |
 | Prove a slice | `/crav1-verify-spec` |

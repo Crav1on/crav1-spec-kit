@@ -1,0 +1,54 @@
+# Keep the picture current
+
+Kit not in this project yet? [Install first](install.md) (Cursor and Claude Code; the slash commands match, the files do not). After a Cursor plugin install, the short command loop is [plugins/crav1/README.md](../plugins/crav1/README.md). Claude Code has no plugin.
+
+Use this when **system notes already exist** under `docs/system/` and something was added that the picture does not show yet.
+
+The picture is three places: the short description in `landscape.md`, the context diagram in `diagrams.md`, and how the parts connect (`## How the parts connect` in `landscape.md`). This command adds what is new. It does not rewrite what is already there. It does not design the change. It does not build it.
+
+This is cross-cutting. It is not its own lane. It can run on its own. The same passes that already append a glossary row also run this update: spark, ideas, intake, match, and the siblings that already append (match-dump and code-into-specs). Those passes do not rewrite existing glossary rows. This command does not write glossary rows.
+
+This is not the skill that reads repos and writes a spec you can build on. Spark, ideas, intake, and match still create the notes. [Explain](from-explain.md) reads them and does not update them.
+
+## First prompt
+
+New chat. Not the host plan UI.
+
+```text
+/crav1-keep-current
+@docs/system/
+@docs/specs/
+
+Add what the specs already state to the picture. Do not rewrite what is already there. Do not write code.
+```
+
+That slash command *is* the prompt.
+
+## Steps
+
+| Phase | You | Agent |
+| --- | --- | --- |
+| Notes | — | Stops when `docs/system/` is missing. Points at spark, ideas, intake, or match. Does not seed the folder |
+| What is new | — | A part or a connection a spec already states and the picture does not. Skips a sentence marked inferred. Does not invent one from the repo |
+| Write | Glance | Appends a sentence, a diagram node or edge, or a connection line. Leaves existing lines as they are |
+| Stop | `/crav1-finalize-commit` if a file changed | Does not plan, implement, or commit. Names that command only when a file changed |
+
+Nothing new: it says the picture is current and writes nothing.
+
+## What gets written
+
+Only the three picture places. Starters: [docs/system/_template/landscape.md](system/_template/landscape.md) and [docs/system/_template/diagrams.md](system/_template/diagrams.md).
+
+An empty short description (the template sentence) is filled with one sentence the specs already support. An empty diagram (the template sample) is replaced with the parts the specs already name. After that, later runs only append.
+
+No feature-index row from this command. No glossary row. No `spec.md`. No `plan.md`. No `tasks.md`. No application code.
+
+## After
+
+If a file changed:
+
+```text
+/crav1-finalize-commit
+```
+
+That puts the picture update in git. No push. This command does not commit for you.
