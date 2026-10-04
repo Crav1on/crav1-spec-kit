@@ -124,7 +124,7 @@ Runnable pieces in this repo:
 | Skill `/crav1-security-review` | Architecture already exists (`docs/system/` or a spec that describes the design) | Slash command; same command for the whole system, one spec, or the change in front of you. Writes kept findings. Does not plan or commit |
 | Skill `/crav1-tighten-spec` | Spec exists, still mushy | Slash command; one issue at a time (option to get a suggestion); then edit |
 | Skill `/crav1-resolve-questions` | Open questions remain after tightening | Slash command; keep-open or answer, one `Q#` at a time |
-| Skill `/crav1-plan-from-spec` | Spec is accepted; want plan + tasks, no code | Slash command; writes `plan.md` and `tasks.md`; each verify note names the checks |
+| Skill `/crav1-plan-from-spec` | Spec is accepted; want plan + tasks, no code | Slash command; writes `plan.md` and `tasks.md`; each verify note names the checks. Names a linter when the repo has one, and stops before Build when it does not |
 | Skill `/crav1-review-plan` | Plan exists; want a critique | Slash command; numbered `P#`s for tighten-plan |
 | Skill `/crav1-tighten-plan` | After review-plan, or mushy tasks | Slash command; one `P#` at a time; patches plan/tasks only |
 | Skill `/crav1-implement-task` | `tasks.md` exists; build one slice | Slash command; one `T#`, then its verify |
@@ -136,8 +136,9 @@ Runnable pieces in this repo:
 | Skill `/crav1-fix-live` | Live/inner-loop gap | Alias of `/crav1-fix-from-verify` |
 | Skill `/crav1-draft-commit-message` | About to commit (GitKraken paste fields) | Slash command; style.md or git log, once or onward; no commit unless they ask. Optional `work-item.md` mention is the last description line |
 | Skill `/crav1-finalize-commit` | Finish a message: git commit, GitKraken copy, or edit | Style first if needed, then draft, then **commit first**, then copy / edit / rewrite / stop; no push. Keeps a trailing work-item mention |
-| Skill `/crav1-open-pr` | Commits exist on `feat/<slug>` or `spec/<slug>` and you want a pull request | Push only after an explicit yes; one PR against the default branch; no merge, no commit. Adds a Work item section when `work-item.md` exists. On Windows, Azure DevOps description is `--description "@<file>"` (UTF-8, no BOM). Later merge is `/crav1-merge-pr` |
-| Skill `/crav1-merge-pr` | This turn explicitly asks to merge a named pull request | Merge commit only (`gh pr merge --merge` or Azure `noFastForward`). Parents counted with `git rev-list` after the completed re-read. No squash, rebase, or policy bypass |
+| Skill `/crav1-open-pr` | Commits exist on `feat/<slug>` or `spec/<slug>` and you want a pull request | Push only after an explicit yes; one PR against the default branch; no merge, no commit. Adds a Work item section when `work-item.md` exists. On Windows, Azure DevOps description is `--description "@<file>"` (UTF-8, no BOM). May name `/crav1-review-pr` and does not run it. Later merge is `/crav1-merge-pr` |
+| Skill `/crav1-review-pr` | This turn names an open pull request and you want to know if it can ship | Slash command; reads the diff. Spec, plan, `verify.md`, the body, and a required green linter. Does not edit, test, vote, comment, or merge |
+| Skill `/crav1-merge-pr` | This turn explicitly asks to merge a named pull request | Merge commit only (`gh pr merge --merge` or Azure `noFastForward`). Parents counted with `git rev-list` after the completed re-read. No squash, rebase, or policy bypass. Does not run `/crav1-review-pr`. Stops when a required host check is red |
 | Skill `/crav1-ideas-to-spec` | Pile of ideas + technical hunches | Slash command; pick an export format. Seeds a thin `docs/system/` when missing, then the spec, then one index row. On Azure Repos, one optional work-item id after a new spec folder |
 | Skill `/crav1-intake-to-specs` | 1–N files; maybe several features/repos | Slash command; landscape + one spec per v0 slug. On Azure Repos, one optional work-item question listing the new slugs |
 | Skill `/crav1-match-to-specs` | Existing repos plus a dump to match | Slash command; where the specs go, then one spec per slice (done, partial, or not in the code). Does not plan or commit |
@@ -250,6 +251,8 @@ New information aimed at one spec that already exists is **`/crav1-add-to-spec`*
 
 When architecture already exists, **`/crav1-security-review`** asks whether the thing in front of it is secure. Full walkthrough: [From a security review](docs/from-security.md). The same command covers the whole system, one existing spec, or the change in front of you. It is not a mode of `/crav1-architecture-reviewer`. Architecture review critiques design hunches. This command writes kept findings and stops. Spark, plan, and verify do not run it.
 
+When an open pull request is named, **`/crav1-review-pr`** reads the diff and says whether it can ship. Full walkthrough: [From a pull request review](docs/from-review-pr.md). It is cross-cutting. It is not a lane and not a bot. It does not edit, run the tests, vote, comment, or merge. `/crav1-open-pr` may name it and does not run it. `/crav1-merge-pr` does not run it. Spark, specify, and verify do not run it.
+
 ### A. Specify (read-heavy)
 
 Describe the user problem, not the stack. Force:
@@ -265,7 +268,7 @@ Write or update `docs/specs/<change>/spec.md` (or Spec Kit / OpenSpec’s layout
 
 ### B. Plan (`plan.md` and `tasks.md`)
 
-Run `/crav1-plan-from-spec`. The skill writes `docs/specs/<change>/plan.md` and `tasks.md` with file paths, constraints, and tasks. Each task verify note names the kind of check and the checks that must pass, before any code. Edit those files. They are the plan that teammates and later chats see. `/crav1-verify-spec` is the gate that says those named checks passed.
+Run `/crav1-plan-from-spec`. The skill writes `docs/specs/<change>/plan.md` and `tasks.md` with file paths, constraints, and tasks. Each task verify note names the kind of check and the checks that must pass, before any code. The plan also says whether this repo has a linter or checker for the code those tasks will touch. When it has one, the plan names it and Build is expected to leave that check green. When it does not, the plan says so and stops before Build. You decide to add the linter or to go on without one. The plan skill does not install one. Specify stays a yes/no acceptance line and does not name the linter. Edit those files. They are the plan that teammates and later chats see. `/crav1-verify-spec` is the gate that says those named checks passed.
 
 The host plan UI is not a substitute. See [docs/install.md](docs/install.md).
 
@@ -357,7 +360,7 @@ This repo already ships:
 - `/crav1-tighten-spec` — one issue at a time, with explained resolutions (plus get a suggestion) and impact; patch only that issue after you choose
 - `/crav1-resolve-questions` — one Open question at a time; keep it open or answer with impact; patch only that `Q#`
 - `/crav1-export-spec` — re-project `spec.md` into EARS, BDD, OpenSpec, YAML, JSON, or BMAD
-- `/crav1-plan-from-spec` — file-level `plan.md` and `tasks.md`; each verify note names the checks before code; refuses to code
+- `/crav1-plan-from-spec` — file-level `plan.md` and `tasks.md`; each verify note names the checks before code; names a linter or checker when the repo has one, and stops before Build when it does not; refuses to code and does not install a linter
 - `/crav1-review-plan` — critique `plan.md` / `tasks.md` against the spec; numbered `P#`s
 - `/crav1-tighten-plan` — one plan issue at a time; patches plan/tasks only (spec findings go to tighten-spec)
 - `/crav1-implement-task` — one `tasks.md` row, then run its verify step
@@ -369,8 +372,9 @@ This repo already ships:
 - `/crav1-fix-live` — alias when that gap is a live/inner-loop path
 - `/crav1-draft-commit-message` — paste-ready GitKraken Summary/Description; `style.md` or live git log, once or onward (deletable rule); does not commit unless they ask. Optional Azure Boards mention from `docs/specs/<slug>/work-item.md` is the last description line
 - `/crav1-finalize-commit` — same draft, then **commit first**, then copy for GitKraken, edit/rewrite, or stop (no push). Keeps that mention through the HEAD check and the attribution strip
-- `/crav1-open-pr` — push the change branch only after an explicit yes, then open one pull request (no merge, no commit). Body is What / why, Spec links, Verify, and a Work item section when `work-item.md` exists. On Windows, a multi-line Azure DevOps description is passed as `--description "@<file>"` (UTF-8 without BOM). Next explicit ask to merge is `/crav1-merge-pr`
-- `/crav1-merge-pr` — merge one named pull request only when that turn asks; always a merge commit; no squash, rebase, or policy bypass. After the completed re-read, two parents are confirmed with `git rev-list` (commits API if git cannot see the commit)
+- `/crav1-open-pr` — push the change branch only after an explicit yes, then open one pull request (no merge, no commit). Body is What / why, Spec links, Verify, and a Work item section when `work-item.md` exists. On Windows, a multi-line Azure DevOps description is passed as `--description "@<file>"` (UTF-8 without BOM). May name `/crav1-review-pr` and does not run it. Next explicit ask to merge is `/crav1-merge-pr`
+- `/crav1-review-pr` — cross-cutting. Reads one named open pull request. Spec, plan, `verify.md`, the body, and a required green linter must hold before it says ship. Names the lane for a finding and does not start it. Does not edit, test, vote, comment, install a linter, or merge. Spark, specify, and verify do not run it
+- `/crav1-merge-pr` — merge one named pull request only when that turn asks; always a merge commit; no squash, rebase, or policy bypass. After the completed re-read, two parents are confirmed with `git rev-list` (commits API if git cannot see the commit). Does not run `/crav1-review-pr`. Stops when a required host check is red
 - subagent `crav1-spec-reviewer-agent` — independent product/spec critique
 - subagent `crav1-architecture-reviewer-agent` — hunches vs decisions, diagrams, ADRs
 - subagent `crav1-plan-reviewer-agent` — worker for `/crav1-review-plan` (`plan.md` / `tasks.md` vs spec)

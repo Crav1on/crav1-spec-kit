@@ -5,7 +5,7 @@ description: >-
   --merge. Azure Repos uses az repos pr update --status completed --squash
   false. Use only when this turn explicitly asks to merge a pull request by
   number or URL. Cross-cutting. Never squash, rebase, bypass policy, or
-  follow on from open-pr.
+  follow on from open-pr. Do not run /crav1-review-pr. A review is not this ask.
 disable-model-invocation: true
 icon: git-merge
 color: green
@@ -17,7 +17,7 @@ Merge **one** named pull request with a **merge commit**, then stop. Never squas
 
 Command: `/crav1-merge-pr`.
 
-Run it only when **this turn** explicitly asks to merge a specific pull request, named by number or URL. `/crav1-open-pr`, a complete-task loop, a review, or an earlier turn naming a URL is not that ask. Do not run this skill from those steps. If this turn does not name a pull request, ask which one. That turn is the question only. No merge.
+Run it only when **this turn** explicitly asks to merge a specific pull request, named by number or URL. `/crav1-open-pr`, a complete-task loop, `/crav1-review-pr`, or an earlier turn naming a URL is not that ask. Do not run this skill from those steps. Do not run `/crav1-review-pr` from this skill. A review is not a merge ask. If this turn does not name a pull request, ask which one. That turn is the question only. No merge.
 
 On Windows, `git` may not be on `PATH`. Try `git`, then `C:\Program Files\Git\cmd\git.exe`. `az` may be `az.cmd`. Quote any `--query` value that contains parentheses; `cmd.exe` treats an unquoted `(` as syntax. This skill does not pass a multi-line body to `az`. A multi-line `--description` on Windows uses the `@file` steps in `/crav1-open-pr`.
 
@@ -125,7 +125,7 @@ If `az` is missing and the pull request is a draft, print a first PATCH body `{"
 
 ## What must pass
 
-Required checks, branch policies, and reviews must pass. If anything blocks, stop and report what. Do not merge.
+Required checks, branch policies, and reviews must pass. If anything blocks, stop and report what. Do not merge. This skill still stops when a required host check is red. `/crav1-review-pr` does not replace that stop, and this skill does not run it.
 
 Never bypass. No `gh pr merge --admin`. No `--bypass-policy`. No `bypassPolicy: true`. No admin override in the web UI steps you print.
 
@@ -337,4 +337,5 @@ An `AZURE_DEVOPS_EXT_PAT` the user has already set is a credential for the `az r
 - Do not run `az rest` to complete, update, or bypass a pull request. The parent-count fallback in **Merge** may GET one commit when git cannot see it.
 - Do not claim a merge commit hash the host did not return.
 - Do not claim a no-fast-forward merge unless the parent count was verified as two. A null `lastMergeCommit.parents` is not that count.
-- Do not run this skill from `/crav1-open-pr`, `crav1-complete-task-agent`, or a review.
+- Do not run this skill from `/crav1-open-pr`, `crav1-complete-task-agent`, or `/crav1-review-pr`.
+- Do not run `/crav1-review-pr`. A review is not a merge ask. A required host check that is red still stops this skill.

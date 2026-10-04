@@ -81,3 +81,4 @@ Do not start implementing in this turn unless they already named a `T#` to fix.
 - If the code is right and the spec is wrong, say so and send `/crav1-tighten-spec` — do not silently edit the spec.
 - If this workspace has no application to run, report **untested** / **claimed done, unverified** with that reason; do not scaffold an app to get a green matrix.
 - Do not bury task implementation status inside the acceptance table. Overview is task-first; details are acceptance-first.
+- Do not run `/crav1-review-pr`.

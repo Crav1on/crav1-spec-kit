@@ -24,8 +24,12 @@ Pass the subagent these paths (read-only): `spec.md`, `plan.md`, `tasks.md`, plu
 
 ## What to tell the subagent
 
-Instruct it to follow its own prompt and the check rules in `crav1-plan-from-spec` [references/checks.md](../crav1-plan-from-spec/references/checks.md) (drop-in: `.claude/skills/crav1-plan-from-spec/references/checks.md`; plugin: sibling `skills/crav1-plan-from-spec/references/checks.md`). Finish with numbered **Issues for `/crav1-tighten-plan`** (`P1`, `P2`, …), one finding each. Mark any finding that is really a spec defect as **spec** (do not pretend the plan can fix it). No single global patch recommendation.
+Instruct it to follow its own prompt and the check rules in `crav1-plan-from-spec` [references/checks.md](../crav1-plan-from-spec/references/checks.md) (drop-in: `.claude/skills/crav1-plan-from-spec/references/checks.md`; plugin: sibling `skills/crav1-plan-from-spec/references/checks.md`), including **Linter, before Build**. A plan that never says whether this repo has a linter or checker for the code the tasks will touch is not complete. Finish with numbered **Issues for `/crav1-tighten-plan`** (`P1`, `P2`, …), one finding each. Mark any finding that is really a spec defect as **spec** (do not pretend the plan can fix it). No single global patch recommendation.
 
 ## After it returns
 
 Show the subagent’s review. Then tell them the next command is `/crav1-tighten-plan` to walk **plan** `P#`s one by one. Spec-tagged findings: `/crav1-tighten-spec` or `/crav1-resolve-questions` — do not start those in this turn unless they already asked.
+
+When `## Linter` says this repo has no linter or checker for the code the tasks will touch, do not name Build (`/crav1-implement-task`, `/crav1-complete-task`, `/crav1-complete-tasks`, `/crav1-complete-features`). Stop before Build. The user decides to add the linter or to go on without one. Do not install one. A plan that already says none is complete on that point. Do not file a `P#` only because the answer is none.
+
+Do not run `/crav1-review-pr`. Specify does not name the linter.

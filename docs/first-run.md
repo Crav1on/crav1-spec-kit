@@ -39,7 +39,7 @@ On an existing app, `@` the code and say it is a feature on this app. Answer the
 
 ## 6. Plan
 
-Start a new chat. Run `/crav1-plan-from-spec`. Read `plan.md` and `tasks.md` and accept them. That step writes the plan and tasks only.
+Start a new chat. Run `/crav1-plan-from-spec`. Read `plan.md` and `tasks.md` and accept them. That step writes the plan and tasks only. The plan names a linter or checker when the repo has one for the code those tasks will touch, and Build is expected to leave that check green. When the repo has none, the plan says so and stops before Build. You decide to add the linter or to go on without one. The plan skill does not install one.
 
 ## 7. One task
 
@@ -58,7 +58,8 @@ Start a new chat. Run `/crav1-plan-from-spec`. Read `plan.md` and `tasks.md` and
 | A code change that already landed, specs already exist | [from-code.md](from-code.md) · `/crav1-code-into-specs` |
 | New information for one existing spec | [from-add.md](from-add.md) · `/crav1-add-to-spec` |
 | Security review after architecture exists | [from-security.md](from-security.md) · `/crav1-security-review` |
+| Review a named open pull request | [from-review-pr.md](from-review-pr.md) · `/crav1-review-pr` |
 | Prove a slice | `/crav1-verify-spec` |
-| Push and open a pull request | `/crav1-open-pr` (after commits exist; does not merge) |
-| Merge a named pull request | `/crav1-merge-pr` (only when that turn asks; merge commit only) |
+| Push and open a pull request | `/crav1-open-pr` (after commits exist; does not merge; may name `/crav1-review-pr` and does not run it) |
+| Merge a named pull request | `/crav1-merge-pr` (only when that turn asks; merge commit only; does not run the review) |
 | Broken install or skill | [SUPPORT.md](../SUPPORT.md) |

@@ -58,3 +58,4 @@ Do not keep going through the list unless they wrote `T2 and T3` or “continue 
 - Do not expand v0 or “while we’re here” refactors.
 - Do not edit `spec.md` to match the code. If the spec is wrong, stop and tell them `/crav1-tighten-spec`.
 - Prefer fixing the task over adding features.
+- When `plan.md` names a linter or checker, leave that check green. Do not install a linter. When `## Linter` says this repo has none, and the user has not chosen to go on without one, stop. Do not write code.
