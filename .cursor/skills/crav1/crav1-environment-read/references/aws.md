@@ -10,7 +10,7 @@ Do not read Azure DevOps, GitHub, or CI. Do not call `gh`, a GitHub API, `az`, `
 
 The user names the host, not the account. Do not ask which account is dev or test. Do not treat an account id, alias, or name as an environment mark.
 
-Do not look inside databases or storage. SQL schema and blob structure are planned for a later change. Do not list tables, prefixes, or objects as facts.
+This reader lists a database and a bucket. It does not open them. Schema and storage structure are a later step, in [sql.md](sql.md) and [storage.md](storage.md), and only when the user says yes. Do not list tables, columns, prefixes, or objects in this pass.
 
 ## CLI
 

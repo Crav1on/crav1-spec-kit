@@ -10,7 +10,7 @@ Do not read Azure DevOps, GitHub, or CI. Do not call `az repos`, `az pipelines`,
 
 The user names the host, not the subscription. Do not ask which subscription is dev or test. Do not treat a subscription name as an environment mark.
 
-Do not look inside databases or storage. SQL schema and blob structure are planned for a later change. Do not list tables, containers, or blobs as facts.
+This reader lists a database and a storage account. It does not open them. Schema and storage structure are a later step, in [sql.md](sql.md) and [storage.md](storage.md), and only when the user says yes. Do not list tables, columns, containers, prefixes, or blobs in this pass.
 
 ## CLI
 
