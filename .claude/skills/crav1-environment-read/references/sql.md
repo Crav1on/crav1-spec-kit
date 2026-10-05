@@ -22,7 +22,7 @@ Skip system databases named `master`, `tempdb`, `model`, `msdb`, `postgres`, `te
 
 If the first read found no database in scope, do not ask. Say no database is opened. Go on to the storage reader, then the sections.
 
-If every database in scope is production only, do not ask. Say production is not opened. Go on to the storage reader, then the sections.
+If every database in scope is production only, including prod-only, do not ask. Say production is not opened. A yes to prod-only shape does not open it. Go on to the storage reader, then the sections.
 
 ## Clear environment
 
@@ -32,7 +32,7 @@ An unmarked server or database is not clear. One server or database used by seve
 
 When every database that can be opened is clear, do not ask question 1. Run the access check. Then ask question 2. List every database question 2 would open.
 
-A pre-prod or shared database is listed only when the user already said yes to shape and connections. A no on that earlier question leaves it unopened. A production database is never listed and never opened.
+A pre-prod or shared database is listed only when the user already said yes to shape and connections. A no on that earlier question leaves it unopened. A production database is never listed and never opened. A prod-only database is a production database. The shape yes does not list it and does not open it.
 
 ## No clear environment
 
@@ -236,6 +236,8 @@ After a no or a not sure, a name that matches no token is not a Seen line. Say t
 
 After the earlier yes, open for shape and connections only. Shape is schemas, table and view names, columns and types, and keys and relationships. Jobs and triggers are connections: source, target, and schedule. Say `Seen in <host> pre-prod.` or `Seen in <host> <environment>.` plus `shared with prod`. Say `Shape and connections only.` Never rows.
 
+Do not open a prod-only database in this section. That yes does not apply here. Prod-only shape stays on the host reader: names, types, setting keys, and secret names from the resource list and the settings. Never a schema from inside the database. Never a row.
+
 ## Where facts go
 
 Do not add a section. Each fact says `Seen in <host> <environment>.` Schema, table, view, column, key, procedure, and function facts join Seen, and then System, Architecture, Match, and Left out with the other facts. A job or a trigger joins Links.
@@ -284,7 +286,7 @@ Private IP only: say a VPN or a machine on that network is needed. Do not enable
 - A yes reads metadata only, and only with a query in this file.
 - Never read a row. Never `SELECT` from a user table. Never print a connection string, a password, a token, or a secret.
 - Never print procedure text, function text, a trigger body, or a job command.
-- Production is never opened. Pre-prod and shared stay shape and connections, and only after the earlier yes.
+- Production is never opened, including a prod-only database. A yes to prod-only shape does not open it. Pre-prod and shared stay shape and connections, and only after the earlier yes.
 - A schema or a name is evidence only when the whole-word token rule matches.
 - Do not install a tool. Do not log in. Do not create a login, a user, or a firewall rule.
 - Missing access stops this reader and names the gap. The sections of the first read still run.

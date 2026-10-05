@@ -32,11 +32,11 @@ One request per prefix. Ask for at most 100 prefixes. If the service says more e
 
 If the first read found no storage in scope, do not ask. Say no storage is opened. Go on to the sections.
 
-If every store in scope is production only, do not ask. Say production is not opened. Go on to the sections.
+If every store in scope is production only, including prod-only, do not ask. Say production is not opened. A yes to prod-only shape does not open it. Go on to the sections.
 
 An unmarked account or bucket stays unread. Do not open it. If nothing else is in scope, say there is no storage account with a clear environment. Do not ask.
 
-A pre-prod or shared store is opened only when the user already said yes to shape and connections. A no on that earlier question leaves it unopened.
+A pre-prod or shared store is opened only when the user already said yes to shape and connections. A no on that earlier question leaves it unopened. A prod-only store is production. The shape yes does not open it.
 
 ## Access check
 
@@ -151,6 +151,8 @@ A name that matches no token does not become an environment. The store keeps the
 
 After the earlier yes, the read is still structure only. Say `Seen in <host> pre-prod.` or `Seen in <host> <environment>.` plus `shared with prod`. Say `Shape and connections only.` Never a blob.
 
+Do not open a prod-only store in this section. That yes does not apply here. Prod-only shape stays on the host reader: names, types, setting keys, and secret names from the resource list and the settings. Never a prefix from inside the account. Never a blob.
+
 ## Where facts go
 
 Do not add a section. Each fact says `Seen in <host> <environment>.` Account, container, share, queue, table, prefix, access, lifecycle, versioning, and soft-delete facts join Seen, and then System, Architecture, Match, and Left out with the other facts. A trigger joins Links.
@@ -162,7 +164,7 @@ Do not add a section. Each fact says `Seen in <host> <environment>.` Account, co
 - A yes reads structure only. Prefix depth is 2. At most 100 prefixes per request.
 - Never read, download, or list every blob. Never report a file count or a size. List prefixes, not files.
 - Never print a key, a SAS token, or a connection string.
-- Production is never opened. Pre-prod and shared stay shape and connections, and only after the earlier yes.
+- Production is never opened, including a prod-only store. A yes to prod-only shape does not open it. Pre-prod and shared stay shape and connections, and only after the earlier yes.
 - A name or a prefix is evidence only when the whole-word token rule matches.
 - Do not install a tool. Do not log in. Do not create a role assignment, a SAS token, or a key.
 - Missing management-plane access stops this reader and names the gap. Missing data-plane access stops prefixes and is named. Management-plane facts that already succeeded stay.

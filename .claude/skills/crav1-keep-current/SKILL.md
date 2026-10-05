@@ -26,7 +26,7 @@ Spark, ideas, intake, match, match-dump, and code-into-specs run this picture up
 
 ## From /crav1-environment-read
 
-When `/crav1-environment-read` hands a confirmed system section, run only this section, then stop. That section is the source. Add only what is new to the picture, following [references/picture.md](references/picture.md). Each new sentence, node, edge, or connection line says `Seen in <host> <environment>.` When the line says `shared with prod`, or shape and connections only, keep that label. It does not say the code shows it. A connection is added only when that section says the environment shows it. Do not rewrite a line that is already there. Do not run the alone-read of the specs. Do not open an interview. Do not start Specify, Plan, or Build. If `docs/system/` is missing, write nothing.
+When `/crav1-environment-read` hands a confirmed system section, run only this section, then stop. That section is the source. Add only what is new to the picture, following [references/picture.md](references/picture.md). Each new sentence, node, edge, or connection line says `Seen in <host> <environment>.` When the line says `shared with prod`, `prod only`, or shape and connections only, keep that label. It does not say the code shows it. A connection is added only when that section says the environment shows it. Do not rewrite a line that is already there. Do not run the alone-read of the specs. Do not open an interview. Do not start Specify, Plan, or Build. If `docs/system/` is missing, write nothing.
 
 ## When the folder is missing
 
