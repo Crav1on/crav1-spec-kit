@@ -5,8 +5,11 @@ description: >-
   has readers for Azure, AWS, and Google Cloud. Another named host stops
   with no reader. Never production. One pass reads every non-prod
   environment. Pre-prod and resources shared with prod are shape and
-  connections only, after one yes. Appends confirmed lines to
-  docs/environments/marks.md. Does not write docs/system,
+  connections only, after one yes. After that read, and before any
+  section, optional SQL metadata and storage structure, only when the
+  user says yes. Never rows. Never blobs. Never production. Appends
+  confirmed lines to docs/environments/marks.md. Does not write
+  docs/system,
   docs/architecture/spec.md, feature specs, or
   docs/architecture/left-out.md. After the user confirms a section, the
   skill that already owns the file adds only what is new. A fact is seen
@@ -31,7 +34,7 @@ Cloud commands stay read-only. This skill does not create, update, delete, deplo
 
 This is not `/crav1-repos-to-spec`. That command reads repos. This command reads a host. This is not `/crav1-match-to-specs`. Match needs a dump and writes one spec per slice. This command does not create a slug. This is not `/crav1-code-into-specs`. `/crav1-pipeline-environments` proposes pipeline lines for `docs/environments/marks.md`. This command does not run it and does not write those lines.
 
-This command does not look inside databases or storage. SQL schema and blob structure are planned for a later change. Do not list tables, containers, or blobs as facts.
+The host readers list a database and a storage account. They do not open them. After the first read, and before any section, this command can look inside. SQL metadata is [references/sql.md](references/sql.md). Storage structure is [references/storage.md](references/storage.md). Drop-in: `.claude/skills/crav1-environment-read/references/`. Plugin: this skill’s `references/`. Both run only when the user says yes. A no leaves them unopened. The first read does not list tables, columns, prefixes, or blobs as facts.
 
 ## Start
 
@@ -189,11 +192,11 @@ Options:
 2. **Stop the read.**
 3. **I'll mark these myself.**
 
-Continue leaves those resources unread and goes on to the pre-prod question, when that question is needed, and then the sections. Stop asks no further question and no section, and does not read further. Marks already confirmed stay appended. Do not append anything else. Pre-prod and shared resources that were not asked stay not read.
+Continue leaves those resources unread and goes on to the pre-prod question, when that question is needed, then look inside, then the sections. Stop asks no further question, does not look inside, and asks no section. It does not read further. Marks already confirmed stay appended. Do not append anything else. Pre-prod and shared resources that were not asked stay not read.
 
-**I'll mark these myself** waits for the reply, the same way an edited section waits. The reply names an environment for a resource or for a group. Do not invent an environment they did not name. The environment word has to be one this skill knows. Map it with the mark table. A group reply writes one line per still-unmarked resource in that group. The source is `marked by the user`. A resource that was not listed stays unmarked. Naming prod or live on one leftover does not stop the whole read. That resource is then production, and it is skipped unless another source disagrees. Then classify again and go on to the pre-prod question, when that question is needed, and then the sections.
+**I'll mark these myself** waits for the reply, the same way an edited section waits. The reply names an environment for a resource or for a group. Do not invent an environment they did not name. The environment word has to be one this skill knows. Map it with the mark table. A group reply writes one line per still-unmarked resource in that group. The source is `marked by the user`. A resource that was not listed stays unmarked. Naming prod or live on one leftover does not stop the whole read. That resource is then production, and it is skipped unless another source disagrees. Then classify again and go on to the pre-prod question, when that question is needed, then look inside, then the sections.
 
-When nothing is unmarked, do not ask. Go on to the pre-prod question, when that question is needed.
+When nothing is unmarked, do not ask. Go on to the pre-prod question, when that question is needed, then look inside.
 
 ## Pre-prod and shared
 
@@ -206,7 +209,28 @@ Use the questions tool when it is available. Options only.
 
 The prompt says: read pre-prod resources for shape and connections only? Say that shared resources are in the same question.
 
-A yes reads type, the settings that name another resource id or hostname, links, and triggers. Never data. Never secrets. A no lists them as not read. They are not seen.
+A yes reads type, the settings that name another resource id or hostname, links, and triggers. Never data. Never secrets. A no lists them as not read. They are not seen. Look inside does not open a pre-prod or shared database or store that this answer left unread.
+
+Then run Look inside. Then ask the sections.
+
+## Look inside
+
+Run this after the pre-prod question, when that question is needed, and before any section. If leftovers stopped the read, skip it. Do not ask a section in the same step.
+
+Two readers, in this order. One question at a time. Do not ask the next question in the same questions call.
+
+- **SQL** — [references/sql.md](references/sql.md) (drop-in: `.claude/skills/crav1-environment-read/references/sql.md`; plugin: this skill’s `references/sql.md`). Metadata only. Never a row.
+- **Storage** — [references/storage.md](references/storage.md) (drop-in: `.claude/skills/crav1-environment-read/references/storage.md`; plugin: this skill’s `references/storage.md`). Structure only. Prefix depth is 2. Never a blob, a file count, or a size.
+
+When the databases this pass found have no clear environment, say `There are no clear database environments.` Then ask that reader’s questions. Options only.
+
+Before the question that opens a database or a store, say how to reach it and how much setup is needed. This skill does not install a tool. It does not create a login, a user, a firewall rule, a role, a SAS token, or a key. If access is missing, stop that reader and name what is missing. Do not open it. The other reader still runs. The sections still run.
+
+A schema, a table, a container, or a prefix is evidence only when the whole-word token rule matches. Cite it on the Seen line. A similar name is not evidence. Do not write that cite into `docs/environments/marks.md`.
+
+Production is never opened. Pre-prod and shared follow the yes already given, and stay shape and connections only.
+
+What a yes finds joins the sections below. Do not add a section. Each fact says `Seen in <host> <environment>.`
 
 ## Sections
 
@@ -218,9 +242,9 @@ Use only these sections, in this order. Do not invent another section. Resources
 
 **Skipped.** Every resource whose only mark is production. Each line is the resource name, the group, and the mark that said production. The line says skipped. It is not a fact and not a link. When none are marked production, the section says nothing was skipped.
 
-**Seen.** Every resource this pass took. A full non-prod resource is in this list. A pre-prod or shared resource is in this list only after the user said yes. Each line cites the resource id, the name, the group, and every source. Each line says `Seen in <host> <environment>.` Use the environment column in the mark table. A shared line also says `shared with prod` and shows both sources. A pre-prod or shared line also says `Shape and connections only.` It does not say the code shows it. When nothing was taken, the section says this host shows no non-prod resource. Do not invent one.
+**Seen.** Every resource this pass took, plus every SQL or storage fact a yes on look inside returned. A full non-prod resource is in this list. A pre-prod or shared resource is in this list only after the user said yes. Each line cites the resource id, the name, the group, and every source. A schema, table, column, container, or prefix line cites that name and the token when one matched. Each line says `Seen in <host> <environment>.` Use the environment column in the mark table. A shared line also says `shared with prod` and shows both sources. A pre-prod or shared line also says `Shape and connections only.` It does not say the code shows it. When nothing was taken, the section says this host shows no non-prod resource. Do not invent one.
 
-**Links.** A connection the environment shows on a seen resource: a field that names another resource id or hostname, and a trigger. Cite the resource id and the field. A trigger line shows the definition only: what starts the work, what it runs, and the schedule when it has one. Never a payload. Never a secret. The reader file lists the trigger kinds for that host. A similar name is not a connection. A seen resource does not become a link by itself. When no field and no trigger shows a connection, the section says no connection is shown. Do not offer a guessed link.
+**Links.** A connection the environment shows on a seen resource: a field that names another resource id or hostname, and a trigger. Cite the resource id and the field. A trigger line shows the definition only: what starts the work, what it runs, and the schedule when it has one. A SQL job or trigger, and a storage trigger, use that same line when look inside reached them. Never a payload. Never a secret. Never command text. The reader file lists the trigger kinds for that host. A similar name is not a connection. A seen resource does not become a link by itself. When no field and no trigger shows a connection, the section says no connection is shown. Do not offer a guessed link.
 
 **System.** Seen facts, and links the environment shows, that belong in `docs/system`. When `docs/system/` is missing, the section says so. This command does not create that folder. When every line is already in the picture, the section says the picture is current.
 
@@ -332,7 +356,7 @@ Output only:
 
 - Host, or that the read stopped before a reader
 - The reader used (Azure, AWS, or Google Cloud), or that this host has no reader, or the exact CLI or login that is missing
-- Counts: seen, shape only, skipped, not read, connections shown
+- Counts: seen, shape only, skipped, not read, connections shown, databases opened, storage accounts opened. A look-inside that did not open says not opened.
 - Files this skill appended (`docs/environments/marks.md`) and files the owners changed, or that nothing was written
 - Next: `/crav1-finalize-commit` when a file changed (no push). When nothing was written, name no command. Do not run it.
 
@@ -353,7 +377,12 @@ Output only:
 - This skill does not write `docs/system`, `docs/architecture/spec.md`, a feature spec, or `docs/architecture/left-out.md`.
 - A fact is seen in that environment. It is not something the code shows.
 - A link, including a trigger definition, is added only when the environment shows the connection. Do not invent a link. Do not show a payload or a secret.
-- Do not look inside databases or storage.
+- After the first read, and before any section, SQL and storage look-inside run only when the user says yes. SQL is metadata only. Storage is structure only, prefix depth 2. Never a row. Never a blob, a file count, or a size. Never a connection string, a key, or a secret.
+- No clear database environment: say `There are no clear database environments.` Then ask. Options only. One question at a time.
+- Production databases and production storage are never opened. Pre-prod and shared follow the earlier yes and stay shape and connections only.
+- A schema, a name, or a prefix is evidence only when the whole-word token rule matches. A similar name is not evidence.
+- Do not install a tool. Do not create a login, a user, a firewall rule, a role, a SAS token, or a key. Missing access stops that look-inside and names the gap. The sections of the first read still run.
+- Look-inside facts use the sections that already exist. They say `Seen in <host> <environment>.`
 - One question at a time. Every item stays listed.
 - The owner adds only what is new. Do not rewrite a line that is already there.
 - A slice Match does not already own is not a new slug.
