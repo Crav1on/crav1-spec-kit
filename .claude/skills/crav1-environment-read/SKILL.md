@@ -29,7 +29,7 @@ This is cross-cutting. It is not a lane. It does not move work into Specify, Pla
 
 Cloud commands stay read-only. This skill does not create, update, delete, deploy, start, stop, or set a cloud resource. It does not install a CLI. It does not log in. The only file this skill writes is `docs/environments/marks.md`, and only by appending a line the user confirmed. It does not write `docs/system`, `docs/architecture/spec.md`, a feature spec, or `docs/architecture/left-out.md`. After the user confirms a section, the skill that already owns that file adds only what is new. A fact is marked seen in that environment. It is not marked as something the code shows. It does not become a link unless the environment actually shows the connection.
 
-This is not `/crav1-repos-to-spec`. That command reads repos. This command reads a host. This is not `/crav1-match-to-specs`. Match needs a dump and writes one spec per slice. This command does not create a slug. This is not `/crav1-code-into-specs`. A later skill, `/crav1-pipeline-environments`, will propose pipeline lines for `docs/environments/marks.md`. This command does not run it and does not write those lines.
+This is not `/crav1-repos-to-spec`. That command reads repos. This command reads a host. This is not `/crav1-match-to-specs`. Match needs a dump and writes one spec per slice. This command does not create a slug. This is not `/crav1-code-into-specs`. `/crav1-pipeline-environments` proposes pipeline lines for `docs/environments/marks.md`. This command does not run it and does not write those lines.
 
 This command does not look inside databases or storage. SQL schema and blob structure are planned for a later change. Do not list tables, containers, or blobs as facts.
 

@@ -14,7 +14,7 @@ This command does not look inside databases or storage. SQL schema and blob stru
 
 Confirmation is one section at a time. Each section has its own question and its own answer. Nothing is dropped to keep a section short. After the user confirms a section, the skill that already owns the file adds only what is new. System facts go to `docs/system` through `/crav1-keep-current`. Architecture facts go to `docs/architecture/spec.md` through `/crav1-repos-to-spec`. A slice Match already owns goes on that feature spec through `/crav1-add-to-spec`. A left-out line the environment now shows comes off `docs/architecture/left-out.md`. Lines that are already there are not rewritten. This command does not start Specify, Plan, or Build.
 
-A later skill, `/crav1-pipeline-environments`, will propose pipeline lines for the marks file. This command does not run it.
+`/crav1-pipeline-environments` reads Azure DevOps pipeline definitions and appends confirmed lines to the same marks file. Walkthrough: [from-pipeline-environments.md](from-pipeline-environments.md). This command does not run it.
 
 This is not [named repos](from-repos.md) (`/crav1-repos-to-spec`). That command reads code. This command reads a host.
 

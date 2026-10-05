@@ -78,6 +78,7 @@ The starter options are the seven above. The table includes later skills. Asking
 | Security review after architecture exists | [from-security.md](from-security.md) · `/crav1-security-review` |
 | Named repos into one architecture spec | [from-repos.md](from-repos.md) · `/crav1-repos-to-spec` |
 | A named host (Azure, AWS, Google Cloud) | [from-environment.md](from-environment.md) · `/crav1-environment-read` |
+| Azure DevOps pipelines into environment marks | [from-pipeline-environments.md](from-pipeline-environments.md) · `/crav1-pipeline-environments` |
 | Read the system notes | [from-explain.md](from-explain.md) · `/crav1-explain` |
 | Update the picture after something was added | [from-keep-current.md](from-keep-current.md) · `/crav1-keep-current` |
 | Review a named open pull request | [from-review-pr.md](from-review-pr.md) · `/crav1-review-pr` |
