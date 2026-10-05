@@ -3,18 +3,19 @@ name: crav1-environment-read
 description: >-
   Read the host the user named. Each host has its own reader. This build
   has readers for Azure, AWS, and Google Cloud. Another named host stops
-  with no reader. Never production. One pass reads every non-prod
-  environment. Pre-prod and resources shared with prod are shape and
-  connections only, after one yes. After that read, and before any
+  with no reader. Naming production, prod, or live stops. One pass
+  reads every non-prod environment. Pre-prod, resources shared with
+  prod, and prod-only resources are shape and connections only, after
+  one yes. Never production data. After that read, and before any
   section, optional SQL metadata and storage structure, only when the
-  user says yes. Never rows. Never blobs. Never production. Appends
-  confirmed lines to docs/environments/marks.md. Does not write
-  docs/system,
-  docs/architecture/spec.md, feature specs, or
+  user says yes. Never rows. Never blobs. Never open production.
+  Appends confirmed lines to docs/environments/marks.md. Does not write
+  docs/system, docs/architecture/spec.md, feature specs, or
   docs/architecture/left-out.md. After the user confirms a section, the
   skill that already owns the file adds only what is new. A fact is seen
-  in that environment. A link only when the environment shows the
-  connection. Does not start Specify, Plan, or Build.
+  in that environment. A prod-only line says prod only. A link only when
+  the environment shows the connection. Does not start Specify, Plan, or
+  Build.
 disable-model-invocation: true
 icon: cloud
 color: cyan
@@ -22,7 +23,7 @@ color: cyan
 
 # Environment read
 
-The user names the host at the start. You read every non-prod environment on that host in one pass. You do not guess the host. You never read production.
+The user names the host at the start. You read every non-prod environment on that host in one pass. You do not guess the host. You never read production data. A prod-only resource is shape and connections only, after one yes.
 
 Command: `/crav1-environment-read`.
 
@@ -63,7 +64,7 @@ Stop until they pick. A pick of Azure, Google Cloud, or AWS is the host. Do not 
 
 ## Reader
 
-Each host has its own reader. The reader lists what that host actually has, then the marks decide what is taken, skipped, or not read. A host with no reader stops. Say this host has no reader. Do not pretend to read it. Do not borrow another host’s reader.
+Each host has its own reader. The reader lists what that host actually has, then the marks decide what is taken, skipped, shared, pre-prod, prod-only, or not read. A host with no reader stops. Say this host has no reader. Do not pretend to read it. Do not borrow another host’s reader.
 
 This build has three readers.
 
@@ -106,7 +107,7 @@ Split name, group, tag key, tag value, and the environment field of a marks line
 | `uat` | non-prod | uat |
 | `qa` | non-prod | qa |
 | `preprod`, or the neighboring tokens `pre` then `prod` | pre-prod | pre-prod |
-| `prod`, `production`, `live` | production | none (skipped, unless another source disagrees) |
+| `prod`, `production`, `live` | production | prod, when the resource is prod-only and the user said yes |
 
 A token is the whole word.
 
@@ -125,8 +126,8 @@ Inside one source, a production token wins over a non-prod token. That source sa
 
 Across sources:
 
-- **Skipped.** The only environment class is production. List it as skipped: name, group, and the mark. Do not show the rest of the resource. A resource whose own name, group, or tag says prod, with no other source, stays skipped.
-- **Shared.** One source says production and another source says non-prod or pre-prod. Treat it like pre-prod. Label it `shared with prod`. The line shows both sources, like `tag says dev; marks.md (pipeline X, stage Prod) says prod`.
+- **Prod-only.** The only environment class is production. No source says non-prod or pre-prod. That resource has no non-prod twin. A non-prod twin is another source on this same resource that says non-prod or pre-prod. That case is shared. A different resource with a similar name is not a twin. Do not read it for shape until the one yes. A no lists it as not read and it stays in Skipped. Cite the mark. A resource whose own name, group, or tag says prod, with no other source, is prod-only.
+- **Shared.** One source says production and another source says non-prod or pre-prod. Treat it like pre-prod. Label it `shared with prod`. The line shows both sources, like `tag says dev; marks.md (pipeline X, stage Prod) says prod`. It is not prod-only.
 - **Pre-prod.** A source says pre-prod, and no source says production. A non-prod token on another source does not make it a full read. The stricter class wins. Cite both sources.
 - **Taken.** One or more non-prod environments, and no production or pre-prod class. The resource is read in full for those environments. Cite every source. One line can carry more than one `Seen in <host> <environment>.` when sources name different non-prod environments.
 - **No mark.** No source has a token in the table. Do not read that resource yet. Evidence below may still mark it.
@@ -160,7 +161,7 @@ Confirmed group suggestions use `marked by the user, suggested by group`. Marks 
 
 Before the leftovers question, the reader may mark a resource that is still unmarked. Use shown evidence only. Try the three kinds strongest first. The first kind that marks the resource wins. A weaker kind does not replace that environment. If a weaker kind says production, the resource is shared instead of a full read. Cite both. A similar name is not evidence. Cite the evidence on the line.
 
-1. **A connection from a marked resource.** A setting on a taken non-prod resource that names this resource’s id or hostname, or the same private endpoint, VNet, or subnet. The environment is that marked resource’s environment. To test the network, the reader may read only the private endpoint, VNet, or subnet id on the unmarked resource. For a skipped production resource, the reader may read only those connection fields, to see if production also connects. Do not show the rest of that production resource. If a non-prod resource connects and a production resource also connects, the unmarked resource is shared. If only production connects, the mark is production and the resource is skipped. Do not use a pre-prod or shared resource as the source of this evidence.
+1. **A connection from a marked resource.** A setting on a taken non-prod resource that names this resource’s id or hostname, or the same private endpoint, VNet, or subnet. The environment is that marked resource’s environment. To test the network, the reader may read only the private endpoint, VNet, or subnet id on the unmarked resource. For a prod-only resource that is not yet read for shape, the reader may read only those connection fields, to see if production also connects. Do not show the rest of that resource. That peek is not the shape read. If a non-prod resource connects and a production resource also connects, the unmarked resource is shared. If only production connects, the mark is production and the resource is prod-only. Do not use a pre-prod or shared resource as the source of this evidence.
 2. **Deployment history, when the deployment that created it is named for an environment.** Azure: `az deployment group list` for a resource group the list already showed, then `az deployment operation group list` for the target resource id only. Do not print the request, the response, or outputs. AWS: CloudFormation stack name, from `aws cloudformation list-stacks` and `aws cloudformation list-stack-resources`, for a stack that still exists. Google Cloud: Deployment Manager deployment name, from `gcloud deployment-manager deployments list` and `gcloud deployment-manager resources list`. If that command fails or the API is disabled, this evidence is absent. Do not enable an API. Tokenize the deployment or stack name with the mark table. A name with no environment token is not evidence.
 3. **Infrastructure code in the project’s repos** that creates this resource per environment. Bicep, ARM, and Terraform. The file has to create this resource, and the environment has to be a parameter, a directory, a workspace, or a name token in that file. Cite the repo-relative path. Read a checkout that is already here. Do not clone. A repo named in `docs/system/repos.md` that is not checked out is not evidence. A comment, a README, or a similar name is not evidence. Code that creates it for both a non-prod environment and production makes it shared.
 
@@ -170,7 +171,7 @@ Map the class the same way as any other source. Cite it like `connection from <r
 
 After evidence, whatever is still unmarked in a group where other resources have a mark is one question. List every such resource. Each line says `probably <env>, same group as <marked resource or pipeline>`. Cite the pipeline when that sibling’s mark is a pipeline line. Otherwise cite the marked resource. When the sibling’s mark is a deployment, cite that marked resource, not the deployment name.
 
-Suggest an environment only when every marked resource in that group agrees on one class. A shared resource does not agree with the others. When they do not agree, do not suggest. Those resources stay unmarked. Google Cloud has no resource group. Do not invent one from the project. A suggestion there does not apply. AWS uses an AWS resource group. The account and the region are not a group.
+Suggest an environment only when every marked resource in that group agrees on one class. A shared resource does not agree with the others. A prod-only resource agrees only with other production marks. When they do not agree, do not suggest. Those resources stay unmarked. Google Cloud has no resource group. Do not invent one from the project. A suggestion there does not apply. AWS uses an AWS resource group. The account and the region are not a group.
 
 Options:
 
@@ -192,30 +193,30 @@ Options:
 2. **Stop the read.**
 3. **I'll mark these myself.**
 
-Continue leaves those resources unread and goes on to the pre-prod question, when that question is needed, then look inside, then the sections. Stop asks no further question, does not look inside, and asks no section. It does not read further. Marks already confirmed stay appended. Do not append anything else. Pre-prod and shared resources that were not asked stay not read.
+Continue leaves those resources unread and goes on to the shape question, when that question is needed, then look inside, then the sections. Stop asks no further question, does not look inside, and asks no section. It does not read further. Marks already confirmed stay appended. Do not append anything else. Pre-prod, shared, and prod-only resources that were not asked stay not read. Those prod-only resources stay skipped.
 
-**I'll mark these myself** waits for the reply, the same way an edited section waits. The reply names an environment for a resource or for a group. Do not invent an environment they did not name. The environment word has to be one this skill knows. Map it with the mark table. A group reply writes one line per still-unmarked resource in that group. The source is `marked by the user`. A resource that was not listed stays unmarked. Naming prod or live on one leftover does not stop the whole read. That resource is then production, and it is skipped unless another source disagrees. Then classify again and go on to the pre-prod question, when that question is needed, then look inside, then the sections.
+**I'll mark these myself** waits for the reply, the same way an edited section waits. The reply names an environment for a resource or for a group. Do not invent an environment they did not name. The environment word has to be one this skill knows. Map it with the mark table. A group reply writes one line per still-unmarked resource in that group. The source is `marked by the user`. A resource that was not listed stays unmarked. Naming prod or live on one leftover does not stop the whole read. That resource is then prod-only, unless another source says non-prod or pre-prod. That disagreement makes it shared. Then classify again and go on to the shape question, when that question is needed, then look inside, then the sections.
 
-When nothing is unmarked, do not ask. Go on to the pre-prod question, when that question is needed, then look inside.
+When nothing is unmarked, do not ask. Go on to the shape question, when that question is needed, then look inside.
 
-## Pre-prod and shared
+## Pre-prod, shared, and prod-only
 
-Before any pre-prod or shared resource is read for shape, ask one yes/no question. Ask it after evidence, the group suggestion, and the leftovers question, so a mark the user just confirmed is included. If leftovers stopped the read, do not ask. List every pre-prod resource and every shared resource. Do not drop one to keep the question short. Do not read their properties before the answer. A connection-field look at a skipped production resource, for evidence, is not this read.
+Before any pre-prod, shared, or prod-only resource is read for shape, ask one yes/no question. Ask it after evidence, the group suggestion, and the leftovers question, so a mark the user just confirmed is included. If leftovers stopped the read, do not ask. If none of those three classes has a resource, do not ask. List every pre-prod resource, every shared resource, and every prod-only resource. When a class has none, say that class has none. Do not drop one to keep the question short. Do not read their properties before the answer. A connection-field look at a prod-only resource, for evidence, is not this read.
 
 Use the questions tool when it is available. Options only.
 
 1. **Yes. Read these for shape and connections only.**
 2. **No. List them as not read.**
 
-The prompt says: read pre-prod resources for shape and connections only? Say that shared resources are in the same question.
+The prompt says: read pre-prod, shared-with-prod, and prod-only resources for shape and connections only?
 
-A yes reads type, the settings that name another resource id or hostname, links, and triggers. Never data. Never secrets. A no lists them as not read. They are not seen. Look inside does not open a pre-prod or shared database or store that this answer left unread.
+One answer covers all three classes. A yes reads each listed resource for shape and connections only. Shape and connections means names, types, setting keys, routes the settings already show, timers, links, and secret names. A setting value is shown only when it is a resource id or a hostname. Never data. Never secret values. Never row or blob contents. Do not read request logs or traffic. A no lists them as not read. They are not seen. A prod-only resource from that no stays in Skipped. Look inside does not open a database or store that this answer left unread. Look inside never opens a production database or production storage, including a prod-only one the user said yes to. Prod-only shape on a database or a store is only what the resource list and the settings already show.
 
 Then run Look inside. Then ask the sections.
 
 ## Look inside
 
-Run this after the pre-prod question, when that question is needed, and before any section. If leftovers stopped the read, skip it. Do not ask a section in the same step.
+Run this after the shape question, when that question is needed, and before any section. If leftovers stopped the read, skip it. Do not ask a section in the same step.
 
 Two readers, in this order. One question at a time. Do not ask the next question in the same questions call.
 
@@ -228,7 +229,7 @@ Before the question that opens a database or a store, say how to reach it and ho
 
 A schema, a table, a container, or a prefix is evidence only when the whole-word token rule matches. Cite it on the Seen line. A similar name is not evidence. Do not write that cite into `docs/environments/marks.md`.
 
-Production is never opened. Pre-prod and shared follow the yes already given, and stay shape and connections only.
+Production databases and production storage are never opened. A yes on prod-only does not open them. Prod-only shape is only what the resource list and the settings already show. Pre-prod and shared follow the yes already given, and stay shape and connections only.
 
 What a yes finds joins the sections below. Do not add a section. Each fact says `Seen in <host> <environment>.`
 
@@ -238,19 +239,19 @@ Show one section at a time. Each section has its own question and its own answer
 
 A fact already written in the destination file stays in its section and is marked already written. The owner does not add it again.
 
-Use only these sections, in this order. Do not invent another section. Resources the user left unread, and pre-prod or shared resources they declined, stay out of these sections. The counts at the end name them.
+Use only these sections, in this order. Do not invent another section. Resources the user left unread, and pre-prod, shared, or prod-only resources they declined, stay out of Seen, Links, System, Architecture, and Match. A declined prod-only resource stays in Skipped. The counts at the end name them.
 
-**Skipped.** Every resource whose only mark is production. Each line is the resource name, the group, and the mark that said production. The line says skipped. It is not a fact and not a link. When none are marked production, the section says nothing was skipped.
+**Skipped.** Every production resource this pass did not read for shape. That is a prod-only resource the user declined, or a prod-only resource that was not asked because the read stopped. Each line is the resource name, the group, and the mark that said production. The line says skipped. It is not a fact and not a link. When every prod-only resource was read for shape, the section says nothing was skipped.
 
-**Seen.** Every resource this pass took, plus every SQL or storage fact a yes on look inside returned. A full non-prod resource is in this list. A pre-prod or shared resource is in this list only after the user said yes. Each line cites the resource id, the name, the group, and every source. A schema, table, column, container, or prefix line cites that name and the token when one matched. Each line says `Seen in <host> <environment>.` Use the environment column in the mark table. A shared line also says `shared with prod` and shows both sources. A pre-prod or shared line also says `Shape and connections only.` It does not say the code shows it. When nothing was taken, the section says this host shows no non-prod resource. Do not invent one.
+**Seen.** Every resource this pass took, plus every SQL or storage fact a yes on look inside returned. A full non-prod resource is in this list. A pre-prod, shared, or prod-only resource is in this list only after the user said yes. Each line cites the resource id, the name, the group, and every source. A schema, table, column, container, or prefix line cites that name and the token when one matched. Each line says `Seen in <host> <environment>.` Use the environment column in the mark table. A shared line also says `shared with prod` and shows both sources. A pre-prod or shared line also says `Shape and connections only.` A prod-only line says `Seen in <host> prod.` It also says `prod only` and `Shape and connections only.` The environment is prod. That sentence is the shape read. It is not a full production data read. It does not say the code shows it. When no resource was taken and no shape resource was read, the section says this host shows no non-prod resource. Do not invent one. A host that shows only prod-only shape lines lists those lines.
 
-**Links.** A connection the environment shows on a seen resource: a field that names another resource id or hostname, and a trigger. Cite the resource id and the field. A trigger line shows the definition only: what starts the work, what it runs, and the schedule when it has one. A SQL job or trigger, and a storage trigger, use that same line when look inside reached them. Never a payload. Never a secret. Never command text. The reader file lists the trigger kinds for that host. A similar name is not a connection. A seen resource does not become a link by itself. When no field and no trigger shows a connection, the section says no connection is shown. Do not offer a guessed link.
+**Links.** A connection the environment shows on a seen resource: a field that names another resource id or hostname, and a trigger. Cite the resource id and the field. A trigger line shows the definition only: what starts the work, what it runs, and the schedule when it has one. A SQL job or trigger, and a storage trigger, use that same line when look inside reached them. Never a payload. Never a secret value. Never command text. A secret name may be cited. The secret value is not. The reader file lists the trigger kinds for that host. A similar name is not a connection. A seen resource does not become a link by itself. A link from a prod-only resource also says `prod only` and `Shape and connections only.` When no field and no trigger shows a connection, the section says no connection is shown. Do not offer a guessed link.
 
-**System.** Seen facts, and links the environment shows, that belong in `docs/system`. When `docs/system/` is missing, the section says so. This command does not create that folder. When every line is already in the picture, the section says the picture is current.
+**System.** Seen facts, and links the environment shows, that belong in `docs/system`. A line from a prod-only resource also says `prod only` and `Shape and connections only.` When `docs/system/` is missing, the section says so. This command does not create that folder. When every line is already in the picture, the section says the picture is current.
 
-**Architecture.** Seen facts, and links the environment shows, that belong in `docs/architecture/spec.md`. When that file is missing, the section says so. This command does not create it. When every line is already there, the section says the architecture spec is current.
+**Architecture.** Seen facts, and links the environment shows, that belong in `docs/architecture/spec.md`. A line from a prod-only resource also says `prod only` and `Shape and connections only.` When that file is missing, the section says so. This command does not create it. When every line is already there, the section says the architecture spec is current.
 
-**Match.** A seen fact that belongs on a slice Match already owns. That slice is a `docs/specs/<slug>/spec.md` (skip `_template`) that already has `## Match` for this fact. When no such spec exists, the section says no slice Match owns this. Do not create a slug. When more than one Match spec could take the fact, list each slug in the section. Do not drop one.
+**Match.** A seen fact that belongs on a slice Match already owns. That slice is a `docs/specs/<slug>/spec.md` (skip `_template`) that already has `## Match` for this fact. A line from a prod-only resource also says `prod only` and `Shape and connections only.` When no such spec exists, the section says no slice Match owns this. Do not create a slug. When more than one Match spec could take the fact, list each slug in the section. Do not drop one.
 
 **Left out.** Every line under `## Left out` in `docs/architecture/left-out.md` that this environment now shows. A similar name is not enough. The environment has to show that fact. When the file is missing, or no line is shown, the section says no line comes off. A `## Dismissed` line stays dismissed. Do not offer it.
 
@@ -263,7 +264,7 @@ Use the questions tool when it is available. Options only. Put that section’s 
 1. **Keep every resource in this section skipped.**
 2. **I will edit this section.**
 
-Do not offer an option that reads a production resource.
+Do not offer an option that reads a production resource. The shape question already decided that.
 
 **Skipped, when nothing was skipped.** Options:
 
@@ -338,7 +339,7 @@ A skipped confirm writes no file. The skipped lines stay skipped.
 
 You do not write those files. The skill that already owns the file adds only what is new, after that section’s answer. The handoff is the confirmed lines. It is not that skill’s interview, branch prompt, or first write. Do not start Specify, Plan, or Build.
 
-Mark every added line `Seen in <host> <environment>.` Keep `shared with prod` when the confirmed line says it. Keep `Shape and connections only.` when the confirmed line says it. Do not mark it as something the code shows. Do not rewrite a line that is already there. A connection is added only when the links section says the environment shows it.
+Mark every added line `Seen in <host> <environment>.` Keep `shared with prod` when the confirmed line says it. Keep `prod only` when the confirmed line says it. Keep `Shape and connections only.` when the confirmed line says it. A prod-only line keeps `Seen in <host> prod.` Do not mark it as something the code shows. Do not rewrite a line that is already there. A connection is added only when the links section says the environment shows it.
 
 **System.** `/crav1-keep-current` owns the picture in `docs/system` (drop-in: `.cursor/skills/crav1/crav1-keep-current/SKILL.md`; plugin: sibling `skills/crav1-keep-current/SKILL.md`). It adds only a new sentence, node, edge, or connection line. If `docs/system/` is missing, it writes nothing.
 
@@ -356,7 +357,7 @@ Output only:
 
 - Host, or that the read stopped before a reader
 - The reader used (Azure, AWS, or Google Cloud), or that this host has no reader, or the exact CLI or login that is missing
-- Counts: seen, shape only, skipped, not read, connections shown, databases opened, storage accounts opened. A look-inside that did not open says not opened.
+- Counts: seen, shape only, skipped, not read, connections shown, databases opened, storage accounts opened. Shape only counts pre-prod, shared, and prod-only resources that were read. A prod-only resource the user declined is counted in skipped and in not read. A look-inside that did not open says not opened. A production database or store that stayed closed says not opened.
 - Files this skill appended (`docs/environments/marks.md`) and files the owners changed, or that nothing was written
 - Next: `/crav1-finalize-commit` when a file changed (no push). When nothing was written, name no command. Do not run it.
 
@@ -365,21 +366,22 @@ Output only:
 - No host named: stop. Do not guess the host.
 - The user names the host, not the subscription, the account, or the project. They do not pick dev or test. One pass reads every non-prod environment.
 - Naming production, prod, or live stops the read. Do not list resources.
-- Never read production data. A resource whose only mark is production is skipped and listed as skipped.
+- Never read production data. Never a secret value. Never a row or a blob from production.
+- A resource whose only mark is production is prod-only. It has no non-prod twin. A similar name on another resource is not a twin. Prod-only is shape and connections only, and only after the one yes with pre-prod and shared. A no lists it as not read and it stays in Skipped.
 - `live` is production when it is a whole word.
 - A host with no reader stops. This build reads Azure, AWS, and Google Cloud. Do not pretend to read any other host.
 - Do not read Azure DevOps, GitHub, or CI.
 - Name the missing CLI or the missing login. Do not install a CLI. Do not log in.
-- Pre-prod, and a resource shared with prod, are shape and connections only, and only after the one yes. A no lists them as not read.
+- Pre-prod, a resource shared with prod, and a prod-only resource are shape and connections only, and only after the one yes. The prompt asks for all three together. A no lists them as not read. Shape is names, types, setting keys, routes the settings already show, timers, links, and secret names. Never data. Never secret values. Never row or blob contents.
 - Sources that disagree between non-prod and production make the resource shared. Cite both sources.
 - Evidence is the three kinds above, strongest first. A similar name is not evidence.
 - This skill’s only write is an append to `docs/environments/marks.md` of a line the user confirmed. Create that file only after at least one confirmed mark. Never rewrite an existing line.
 - This skill does not write `docs/system`, `docs/architecture/spec.md`, a feature spec, or `docs/architecture/left-out.md`.
 - A fact is seen in that environment. It is not something the code shows.
-- A link, including a trigger definition, is added only when the environment shows the connection. Do not invent a link. Do not show a payload or a secret.
+- A link, including a trigger definition, is added only when the environment shows the connection. Do not invent a link. Do not show a payload or a secret value. A prod-only link says `prod only`.
 - After the first read, and before any section, SQL and storage look-inside run only when the user says yes. SQL is metadata only. Storage is structure only, prefix depth 2. Never a row. Never a blob, a file count, or a size. Never a connection string, a key, or a secret.
 - No clear database environment: say `There are no clear database environments.` Then ask. Options only. One question at a time.
-- Production databases and production storage are never opened. Pre-prod and shared follow the earlier yes and stay shape and connections only.
+- Production databases and production storage are never opened. A yes on prod-only does not open them. Pre-prod and shared follow the earlier yes and stay shape and connections only.
 - A schema, a name, or a prefix is evidence only when the whole-word token rule matches. A similar name is not evidence.
 - Do not install a tool. Do not create a login, a user, a firewall rule, a role, a SAS token, or a key. Missing access stops that look-inside and names the gap. The sections of the first read still run.
 - Look-inside facts use the sections that already exist. They say `Seen in <host> <environment>.`

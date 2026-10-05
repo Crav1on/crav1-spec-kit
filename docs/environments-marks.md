@@ -34,7 +34,7 @@ arn:aws:lambda:eu-west-1:123456789012:function:orders | app-group | stage | pipe
 
 The read matches an id, or a name plus group. A similar name does not match. Compare without regard to case. If a name and group match more than one resource, that line is not used.
 
-`development` is dev, `testing` is test, and `staging` is stage. `pre-prod` and `preprod` are pre-prod. `production` and `live` are production. A line that says production, and another source that says a non-prod environment, makes the resource shared with prod.
+`development` is dev, `testing` is test, and `staging` is stage. `pre-prod` and `preprod` are pre-prod. `production` and `live` are production. A line that says production, and another source that says a non-prod environment, makes the resource shared with prod. A production line with no non-prod or pre-prod source makes the resource prod-only. `/crav1-environment-read` can read that resource for shape and connections only, after one yes. A no leaves it skipped.
 
 ## Who writes a line
 

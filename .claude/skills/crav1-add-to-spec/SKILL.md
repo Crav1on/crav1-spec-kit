@@ -24,7 +24,7 @@ A not-started spec (match status `not in the code`, or a thin spec) can keep tak
 
 ## From /crav1-environment-read
 
-When `/crav1-environment-read` hands a confirmed fact for a slice Match already owns, run only this section, then stop. Add that quote to that spec only. The quote starts with `Seen in <host> <environment>.` When the quote says `shared with prod`, or shape and connections only, keep that label. Do not replace it with a paraphrase. Do not mark it as something the code shows. Do not change match status. Do not create a slug. Do not open the impact question. Do not edit `docs/system/` or another spec from this handoff. If no spec has `## Match` for that slice, write nothing. Do not start Specify, Plan, or Build.
+When `/crav1-environment-read` hands a confirmed fact for a slice Match already owns, run only this section, then stop. Add that quote to that spec only. The quote starts with `Seen in <host> <environment>.` When the quote says `shared with prod`, `prod only`, or shape and connections only, keep that label. Do not replace it with a paraphrase. Do not mark it as something the code shows. Do not change match status. Do not create a slug. Do not open the impact question. Do not edit `docs/system/` or another spec from this handoff. If no spec has `## Match` for that slice, write nothing. Do not start Specify, Plan, or Build.
 
 ## From /crav1-suggest-tests-for-code
 

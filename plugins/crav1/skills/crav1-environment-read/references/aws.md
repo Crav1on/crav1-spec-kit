@@ -1,6 +1,6 @@
 # AWS reader
 
-`/crav1-environment-read` follows this reader when the user named AWS. Amazon Web Services is AWS. It lists what that account actually has. The skill’s Marks, marks.md, Evidence, Pre-prod and shared, Group suggestion, and Leftovers sections decide what is taken, skipped, shared, pre-prod, or not read. One pass reads every non-prod environment. Production is never read.
+`/crav1-environment-read` follows this reader when the user named AWS. Amazon Web Services is AWS. It lists what that account actually has. The skill’s Marks, marks.md, Evidence, Pre-prod, shared, and prod-only, Group suggestion, and Leftovers sections decide what is taken, skipped, shared, pre-prod, prod-only, or not read. One pass reads every non-prod environment. Production data is never read. A prod-only resource is shape and connections only after the one yes.
 
 Azure follows [azure.md](azure.md). Google Cloud follows [google-cloud.md](google-cloud.md). Any other named host stops with no reader and does not use this file.
 
@@ -26,7 +26,7 @@ Use `aws` only to list and show. The account is the one `aws sts get-caller-iden
 
 Do not create, update, delete, deploy, start, stop, or set a resource. Do not create an index or a view. Do not print a secret, a key, a password, or a payload. A hostname in a setting can be a connection. The secret value is not a fact.
 
-A region with no index is not a failure. Search the aggregator view with query `*`. If the CLI rejects that, use an empty query string. Do not put an environment word in the query. Paginate until the next token is absent. The marks in the skill decide what is taken, skipped, or unread.
+A region with no index is not a failure. Search the aggregator view with query `*`. If the CLI rejects that, use an empty query string. Do not put an environment word in the query. Paginate until the next token is absent. The marks in the skill decide what is taken, read for shape, skipped, or unread.
 
 If no aggregator view is already there, stop. Say the AWS reader cannot read the whole account. Do not treat one region as the whole account. Do not invent a resource.
 
@@ -59,11 +59,11 @@ Look at the resource name, the group, and the tags. That look is the filter, tog
 | `uat` | non-prod | uat |
 | `qa` | non-prod | qa |
 | `preprod`, or the neighboring tokens `pre` then `prod` | pre-prod | pre-prod |
-| `prod`, `production`, `live` | production | none (skipped, unless another source disagrees) |
+| `prod`, `production`, `live` | production | prod, when the resource is prod-only and the user said yes |
 
 A token is the whole word. `device` is not `dev`. `protest`, `latest`, and `contest` are not `test`. `backstage` and `staged` are not `stage`. `equation` and `equator` are not `uat`. `qatar` and `equal` are not `qa`. `product` and `reproduce` are not `prod`. `preprod` is pre-prod. `pre-prod` and `pre_prod` are the neighboring tokens `pre` then `prod`, and that pair is pre-prod. The `prod` in the pair is not production. `pre-production` is production, because the whole word is `production`. `live` is production. `alive`, `lives`, `liveness`, `deliver`, `livestock`, and `livestream` are not `live`.
 
-Classification, disagreement, pre-prod, shared, evidence, the group suggestion, and leftovers are in the skill. Follow those. Do not apply an older rule that a production token always wins across sources.
+Classification, disagreement, pre-prod, shared, prod-only, evidence, the group suggestion, and leftovers are in the skill. Follow those. Do not apply an older rule that a production token always wins across sources. A resource whose only mark is production is prod-only. It is not skipped until the user says no, or the read stops before the shape question.
 
 If search omits tags, `aws resourcegroupstaggingapi get-resources` may be used to read the tags only. If those tags still have no mark, the resource is unmarked until evidence or the user marks it. Do not read further properties on that resource, except the private endpoint, VPC, or subnet id when testing connection evidence. On AWS the VNet is a VPC.
 
@@ -71,11 +71,11 @@ If search omits tags, `aws resourcegroupstaggingapi get-resources` may be used t
 
 For a taken non-prod resource, the fact is the resource id (the ARN), the type, the name, and the group, plus every mark source. Say `Seen in AWS dev.` or the environment the mark table names (`test`, `stage`, `uat`, `qa`). One resource can carry more than one of those sentences. Do not say the code shows it.
 
-A pre-prod or shared resource is shown only after the user said yes. The fact is the type, the settings that name another resource id or hostname, the links, and the triggers. Say `Seen in AWS pre-prod.` or `Seen in AWS <environment>.` plus `shared with prod`. Say `Shape and connections only.` Never data. Never secrets.
+A pre-prod, shared, or prod-only resource is shown only after the user said yes. The fact is the name, the type, setting keys, routes the settings already show, timers, links, and secret names. A setting value is shown only when it is a resource id or a hostname. Say `Seen in AWS pre-prod.` or `Seen in AWS <environment>.` plus `shared with prod`. A prod-only line says `Seen in AWS prod.` plus `prod only`. Say `Shape and connections only.` Never data. Never secret values. Never row or blob contents. Do not open a database or a bucket for a prod-only resource. The list and the settings already shown are the shape.
 
-A connection is a field on that resource that names another resource id or a hostname. Cite the resource id and the field. A similar name is not a connection. Do not invent one. Do not read a skipped resource for a connection, except the connection fields the skill allows when testing whether production also connects to an unmarked resource.
+A connection is a field on that resource that names another resource id or a hostname. Cite the resource id and the field. A similar name is not a connection. Do not invent one. Do not read a prod-only resource for a connection before the yes, except the connection fields the skill allows when testing whether production also connects to an unmarked resource.
 
-A setting that holds a secret is not copied. Say the setting exists only when the connection is a hostname or a resource id, and cite that, not the secret.
+A setting that holds a secret is not copied. Cite the secret name. Do not cite the secret value. A hostname or a resource id in a setting is a connection. Cite that, not the secret.
 
 ## Triggers
 
