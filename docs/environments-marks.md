@@ -2,7 +2,7 @@
 
 `/crav1-environment-read` reads `docs/environments/marks.md` in the project repo after the resource name, the group, and the tags. It creates that folder and file only when the user has confirmed at least one mark. It appends those lines. It never rewrites an existing line.
 
-A later skill, `/crav1-pipeline-environments`, will propose the pipeline lines. That skill is not in this kit yet.
+`/crav1-pipeline-environments` appends a confirmed pipeline line to that same file. The walkthrough is [from-pipeline-environments.md](from-pipeline-environments.md). `/crav1-environment-read` does not run that command. It uses a pipeline line that is already there.
 
 ## Line
 
@@ -19,6 +19,8 @@ Four fields, separated by ` | ` (space, pipe, space). The source is everything a
   - `pipeline <name>, stage <stage>`
   - `marked by the user`
   - `marked by the user, suggested by group`
+
+There is no `shared` word. A resource that a non-prod stage and a production stage both deploy is two lines, one per stage. `/crav1-environment-read` treats those two lines as shared with prod. A pipeline line names the resource the step names. The group on that line is context. The line does not mark every resource in the group.
 
 A blank line is ignored. A line that starts with `#` is ignored.
 
@@ -40,6 +42,6 @@ This file is the only file `/crav1-environment-read` writes.
 
 - The user accepts a group suggestion: `marked by the user, suggested by group`.
 - The user marks a leftover, per resource or per group: `marked by the user`.
-- A pipeline line is for `/crav1-pipeline-environments`. This read does not write one. It uses one that is already there.
+- `/crav1-pipeline-environments` after the user confirms a stage: `pipeline <name>, stage <stage>`. One line per stage. This read does not write that line. It uses one that is already there.
 
 A mark from a connection, a deployment name, or infrastructure code is cited on the Seen line. It is not copied into this file.
