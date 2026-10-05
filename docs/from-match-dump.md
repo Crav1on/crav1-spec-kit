@@ -6,7 +6,7 @@ Use this when **specs already exist** under `docs/specs/` and there is a **new d
 
 Size is not a limit. One dump may be a lot about one slug, or it may cover many slugs.
 
-[Match](from-match.md) creates the folders from repos plus a dump. [Add](from-add.md) takes information already aimed at one named spec. This command is the later dump. It does not replace [intake](from-intake.md), [a spark](from-nothing.md), or [a pile of ideas](from-ideas.md). It does not write application code.
+[Match](from-match.md) creates the folders from repos plus a dump. [Add](from-add.md) takes information already aimed at one named spec. Minutes or a transcript are [from-meeting](from-meeting.md). That command extracts items and hands a kept addition to add-to-spec. This command is the later dump. It does not replace [intake](from-intake.md), [a spark](from-nothing.md), or [a pile of ideas](from-ideas.md). It does not write application code.
 
 A not-started spec (match status `not in the code`, or a thin spec) can keep taking information until planning. Adding information does not start planning and does not write `plan.md` or `tasks.md`.
 

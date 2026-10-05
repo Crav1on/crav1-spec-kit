@@ -76,6 +76,7 @@ The same list is where a lone user sees the ways to start: [plugins/crav1/README
 | Skill | `/crav1-fix-bug` |
 | Skill | `/crav1-exploratory-test` |
 | Skill | `/crav1-suggest-tests-for-code` |
+| Skill | `/crav1-meeting-to-specs` |
 | Skill | `/crav1-export-spec` |
 | Skill | `/crav1-draft-commit-message` |
 | Skill | `/crav1-finalize-commit` |
@@ -105,6 +106,8 @@ The same list is where a lone user sees the ways to start: [plugins/crav1/README
 `/crav1-exploratory-test` may run from any lane, after a build of a slice already exists. Pass one learns the slice by using it once. Pass two is no longer careful. It adds randomness and follows what the last action showed. It lasts about as long as the first pass, long enough to provoke bugs, then it stops. That stop is named `matched the first pass`. It stops sooner when the user says stop. That stop is named `the user said stop`. The user does not set a clock. It writes bugs to `docs/specs/<slug>/explore.md`. It does not write the checks the plan already named. It does not move work into Specify, Plan, or Build. It does not start those lanes. A bug it finds is not sent to `/crav1-fix-bug` unless the user says so in that turn. It is a later skill. It is not one of the seven starter options. When the user asks for startup options, that ask names the seven and does not run this skill. Spark, specify, plan, and verify do not run it.
 
 `/crav1-suggest-tests-for-code` may run from any lane. The user points at code that already exists, one repo or one area, not the whole system. It reads that code and suggests tests for what that code can actually break. A function gets a few checks. A page gets a browser check. A boundary gets an integration check. It does not dump every test type. Every suggestion stays listed. Nothing is dropped to keep the list short. The user takes them one at a time: keep, leave, or dismiss. Dismiss means it is not offered again. A kept suggestion goes onto the existing spec through `/crav1-add-to-spec`. Plan turns it into a task. It does not write the tests, change the code, or start Specify, Plan, or Build. It does not move work into a lane. It is a later skill. It is not one of the seven starter options. When the user asks for startup options, that ask names the seven and does not run this skill. The seven starter options stay unchanged. Spark, specify, plan, and verify do not run it.
+
+`/crav1-meeting-to-specs` may run from any lane. Everything after the command, and every `@`, is the minutes or transcript. If there is no pointer, it stops and asks. Options only. It does not guess. It extracts requirements, decisions, changes, open questions, and bugs as quotes, with speaker and time when the transcript shows them, and drops small talk. It matches each item to existing `docs/specs/<slug>/` folders, skipping `_template`. Cases are an addition, a possible new feature, a bug, or unclear. When more than one existing spec could fit, every candidate stays listed. Nothing is dropped to keep the list short. The user takes items one at a time: keep, leave, or dismiss. Dismiss is for this run only. The next run starts fresh. It does not write a dismissals file. A kept addition is handed to `/crav1-add-to-spec` for that slug. The impact check still runs there. A kept new feature names `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, or `/crav1-intake-to-specs` and does not run it. A kept bug names `/crav1-fix-bug` and does not run it. It writes nothing itself. It does not copy the transcript into the repo. It does not move work into Specify, Plan, or Build. It does not start those lanes. It is a later skill. It is not one of the seven starter options. When the user asks for startup options, that ask names the seven and does not run this skill. The seven starter options stay unchanged. Spark, specify, plan, and verify do not run it.
 
 Research is a cross-cutting helper with no slash command. Flag it when a run hits a technical question that needs research before Specify or Plan can proceed: choosing a technology or service, changing the architecture, scaling or modernizing, or judging an idea nobody has built yet.
 
@@ -177,6 +180,7 @@ cross_cutting:
     - crav1-fix-bug
     - crav1-exploratory-test
     - crav1-suggest-tests-for-code
+    - crav1-meeting-to-specs
     - crav1-export-spec
     - crav1-draft-commit-message
     - crav1-finalize-commit

@@ -2,7 +2,7 @@
 
 Kit not in this project yet? [Install first](install.md) (Cursor and Claude Code; the slash commands match, the files do not). After a Cursor plugin install, the short command loop is [plugins/crav1/README.md](../plugins/crav1/README.md). Claude Code has no plugin.
 
-Use this when **one spec already exists** and there is **new information** for that spec.
+Use this when **one spec already exists** and there is **new information** for that spec. Minutes or a transcript with many items is [from-meeting](from-meeting.md). A kept addition is handed here. The impact check still runs.
 
 `/crav1-tighten-spec` stays for mushy wording. This command is for new information. [Match](from-match.md) creates the folders. This command updates one that already exists. It does not replace [intake](from-intake.md), [a spark](from-nothing.md), or [a pile of ideas](from-ideas.md). It does not write application code.
 
