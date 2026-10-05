@@ -34,6 +34,14 @@ When `/crav1-suggest-tests-for-code` hands one suggestion for an existing spec, 
 
 **Dismiss.** Quote the suggestion under `## Dismissed test suggestions`. The line starts with `Dismissed test suggestion.` Do not reword the check. Create that heading only when it is missing. Do not add an acceptance checkbox. Do not turn it into a goal. Plan does not turn this line into a task. The next run of `/crav1-suggest-tests-for-code` does not offer it.
 
+## From /crav1-meeting-to-specs
+
+When `/crav1-meeting-to-specs` hands one kept addition for an existing spec, the spec is the one that skill already named. Do not ask for a slug. Do not create a slug. Do not create a folder.
+
+Quote the item. Do not replace it with a paraphrase. The quote starts with `From meeting <date>.` when the date is known, otherwise `From meeting.` Keep the speaker and the time in the quote when the transcript showed them. Label it `**New:**` in the section the words belong to, the same way any other new quote is labeled.
+
+Then run **Add to that spec.md** and **Impact** in this skill. The impact check still runs. Do not skip it. Do not write `plan.md` or `tasks.md`. Do not change application code. Do not start Specify, Plan, or Build.
+
 ## Input
 
 Everything after `/crav1-add-to-spec`, and every `@`, is input: the new information, and a target when they named one.
