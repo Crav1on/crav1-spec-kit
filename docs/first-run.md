@@ -13,7 +13,7 @@ When you ask for startup options, these seven are the only ways in. That ask nam
 | `/crav1-intake-to-specs` | Mixed files, or more than one v0 feature |
 | `/crav1-match-to-specs` | Existing repos plus a dump to match |
 | `/crav1-repos-to-spec` | You name the repos. It runs only then |
-| `/crav1-environment-read` | You name the host and a dev or test environment. It runs only then |
+| `/crav1-environment-read` | You name the host. It runs only then |
 | `/crav1-fix-bug` | You name a real bug that already exists. It runs only then |
 
 The steps below are one thin path: a spark through one task. Pick another row in the table when that is the work in front of you.
@@ -77,7 +77,7 @@ The starter options are the seven above. The table includes later skills. Asking
 | New information for one existing spec | [from-add.md](from-add.md) · `/crav1-add-to-spec` |
 | Security review after architecture exists | [from-security.md](from-security.md) · `/crav1-security-review` |
 | Named repos into one architecture spec | [from-repos.md](from-repos.md) · `/crav1-repos-to-spec` |
-| A named environment (Azure dev, Google Cloud test, AWS dev) | [from-environment.md](from-environment.md) · `/crav1-environment-read` |
+| A named host (Azure, AWS, Google Cloud) | [from-environment.md](from-environment.md) · `/crav1-environment-read` |
 | Read the system notes | [from-explain.md](from-explain.md) · `/crav1-explain` |
 | Update the picture after something was added | [from-keep-current.md](from-keep-current.md) · `/crav1-keep-current` |
 | Review a named open pull request | [from-review-pr.md](from-review-pr.md) · `/crav1-review-pr` |

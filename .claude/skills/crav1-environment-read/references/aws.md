@@ -1,6 +1,6 @@
 # AWS reader
 
-`/crav1-environment-read` follows this reader when the user named AWS and an environment of dev or test. Amazon Web Services is AWS. It lists only what that named environment actually has.
+`/crav1-environment-read` follows this reader when the user named AWS. Amazon Web Services is AWS. It lists what that account actually has. The skill’s Marks, marks.md, Evidence, Pre-prod and shared, Group suggestion, and Leftovers sections decide what is taken, skipped, shared, pre-prod, or not read. One pass reads every non-prod environment. Production is never read.
 
 Azure follows [azure.md](azure.md). Google Cloud follows [google-cloud.md](google-cloud.md). Any other named host stops with no reader and does not use this file.
 
@@ -8,13 +8,27 @@ Azure follows [azure.md](azure.md). Google Cloud follows [google-cloud.md](googl
 
 Do not read Azure DevOps, GitHub, or CI. Do not call `gh`, a GitHub API, `az`, `az repos`, `az pipelines`, `az boards`, or a pipeline API. A repo, a pipeline, or a board is not a resource this reader lists. Leave those out of the list. They do not stop the read.
 
-The user names the environment, not the account. Do not ask which account is dev or test. Do not treat an account id, alias, or name as an environment mark.
+The user names the host, not the account. Do not ask which account is dev or test. Do not treat an account id, alias, or name as an environment mark.
+
+Do not look inside databases or storage. SQL schema and blob structure are planned for a later change. Do not list tables, prefixes, or objects as facts.
+
+## CLI
+
+If `aws` is not on the path, stop. Say `aws` is not installed. Point at `https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html`. Do not install it.
+
+If `aws` runs and `aws sts get-caller-identity` fails because there is no login, stop. Say `aws` has no login. The login command is `aws sso login` or `aws configure`. Do not log in.
+
+Do not invent a resource. Do not pretend the host is empty.
 
 ## Read-only
 
-Use `aws` only to list and show. If `aws` is missing, or the login is not present, stop. Say the AWS reader cannot read. Do not invent a resource. Do not pretend the environment is empty.
+Use `aws` only to list and show. The account is the one `aws sts get-caller-identity` already returns. Do not assume a role. Do not switch profile. Do not call `aws organizations` to open another account.
 
-The account is the one `aws sts get-caller-identity` already returns. Do not assume a role. Do not switch profile. Do not call `aws organizations` to open another account.
+Do not create, update, delete, deploy, start, stop, or set a resource. Do not create an index or a view. Do not print a secret, a key, a password, or a payload. A hostname in a setting can be a connection. The secret value is not a fact.
+
+A region with no index is not a failure. Search the aggregator view with query `*`. If the CLI rejects that, use an empty query string. Do not put an environment word in the query. Paginate until the next token is absent. The marks in the skill decide what is taken, skipped, or unread.
+
+If no aggregator view is already there, stop. Say the AWS reader cannot read the whole account. Do not treat one region as the whole account. Do not invent a resource.
 
 Allowed:
 
@@ -23,38 +37,52 @@ Allowed:
 - `aws resource-explorer-2 list-views` and `aws resource-explorer-2 search` on that aggregator view
 - `aws resource-groups list-groups` and `aws resource-groups list-group-resources`
 - `aws resourcegroupstaggingapi get-resources` for tags, when search omits them
-- `aws cloudcontrol get-resource` for a field on a resource this reader already took
+- `aws cloudcontrol get-resource` for a connection field, or a private endpoint, VPC, or subnet id used as evidence, on a resource the skill allows
+- `aws events list-rules` and `aws events list-targets-by-rule` for an EventBridge rule this reader is allowed to read. Use the region on that rule. Show the pattern or schedule and the target. Do not show an input transformer secret
+- `aws s3api get-bucket-notification-configuration` for a bucket this reader is allowed to read. Show the event type and the topic, queue, or function. Do not show a secret
+- `aws lambda list-event-source-mappings` for a function this reader is allowed to read. Show the source, the function, and the state. Do not show a payload
+- `aws cloudformation list-stacks` and `aws cloudformation list-stack-resources` for evidence. Use a stack that still exists. Do not describe parameters
 
-Do not create, update, delete, deploy, start, stop, or set a resource. Do not create an index or a view. Do not print a secret, a key, or a password. A hostname in a setting can be a connection. The secret value is not a fact.
-
-A region with no index is not a failure. Search the aggregator view with query `*`. If the CLI rejects that, use an empty query string. Do not put dev, test, or production in the query. Paginate until the next token is absent. The marks below decide what is taken, skipped, or unread.
-
-If no aggregator view is already there, stop. Say the AWS reader cannot read the whole account. Do not treat one region as the whole account. Do not invent a resource.
-
-## Mark
-
-Look at the resource name, the group, and the tags. That look is the filter. The name is the last segment of the ARN. The group is an AWS resource group the resource belongs to. The tags are the resource tags. Split name, group, tag key, and tag value on every character that is not a letter. Those words are the tokens.
-
-| Named environment | Tokens that say it |
-| --- | --- |
-| dev | `dev`, `development` |
-| test | `test`, `testing` |
-| production | `prod`, `production` |
-
-A token is the whole word. `device` is not `dev`. `protest`, `latest`, and `contest` are not `test`. `product` and `reproduce` are not `prod`.
-
-- **Skipped.** Any production token on the name, the group, or a tag. List it as skipped: name, group, and the mark. Do not show the rest of the resource. Production wins when a dev or test token is also present.
-- **Taken.** Not production, and a token says the named environment. The reader lists it. Cite the resource id (the ARN).
-- **No mark.** No dev, test, or production token on the name, the group, and the tags. Stop and ask, in the skill. Do not read that resource. Do not list it as seen. The account is not a mark. The region is not a mark.
-
-If search omits tags, `aws resourcegroupstaggingapi get-resources` may be used to read the tags only. If those tags still have no mark, stop. Do not read further properties on that resource.
+If the resource search fails, stop. Say the AWS reader cannot list resources. If a CloudFormation command fails, that evidence is absent. Do not stop the read for that.
 
 An empty group list means no resource has a group mark. If the resource groups list cannot be read, stop. Say the AWS reader cannot read. Do not assume the group is empty.
 
+## Mark
+
+Look at the resource name, the group, and the tags. That look is the filter, together with `docs/environments/marks.md` and the evidence in the skill. The name is the last segment of the ARN. The group is an AWS resource group the resource belongs to. The account and the region are not a group. The tags are the resource tags. Split name, group, tag key, and tag value on every character that is not a letter. Compare tokens without regard to case. Those words are the tokens.
+
+| Tokens | Class | Environment on the Seen line |
+| --- | --- | --- |
+| `dev`, `development` | non-prod | dev |
+| `test`, `testing` | non-prod | test |
+| `stage`, `staging` | non-prod | stage |
+| `uat` | non-prod | uat |
+| `qa` | non-prod | qa |
+| `preprod`, or the neighboring tokens `pre` then `prod` | pre-prod | pre-prod |
+| `prod`, `production`, `live` | production | none (skipped, unless another source disagrees) |
+
+A token is the whole word. `device` is not `dev`. `protest`, `latest`, and `contest` are not `test`. `backstage` and `staged` are not `stage`. `equation` and `equator` are not `uat`. `qatar` and `equal` are not `qa`. `product` and `reproduce` are not `prod`. `preprod` is pre-prod. `pre-prod` and `pre_prod` are the neighboring tokens `pre` then `prod`, and that pair is pre-prod. The `prod` in the pair is not production. `pre-production` is production, because the whole word is `production`. `live` is production. `alive`, `lives`, `liveness`, `deliver`, `livestock`, and `livestream` are not `live`.
+
+Classification, disagreement, pre-prod, shared, evidence, the group suggestion, and leftovers are in the skill. Follow those. Do not apply an older rule that a production token always wins across sources.
+
+If search omits tags, `aws resourcegroupstaggingapi get-resources` may be used to read the tags only. If those tags still have no mark, the resource is unmarked until evidence or the user marks it. Do not read further properties on that resource, except the private endpoint, VPC, or subnet id when testing connection evidence. On AWS the VNet is a VPC.
+
 ## What a taken resource shows
 
-For a taken resource, the fact is the resource id, the type, the name, and the group, plus the mark (name, group, or tag). Say `Seen in AWS dev.` or `Seen in AWS test.` Do not say the code shows it.
+For a taken non-prod resource, the fact is the resource id (the ARN), the type, the name, and the group, plus every mark source. Say `Seen in AWS dev.` or the environment the mark table names (`test`, `stage`, `uat`, `qa`). One resource can carry more than one of those sentences. Do not say the code shows it.
 
-A connection is a field on that resource that names another resource id or a hostname. Cite the resource id and the field. A similar name is not a connection. Do not invent one. Do not read a skipped resource or an unmarked resource to look for a connection.
+A pre-prod or shared resource is shown only after the user said yes. The fact is the type, the settings that name another resource id or hostname, the links, and the triggers. Say `Seen in AWS pre-prod.` or `Seen in AWS <environment>.` plus `shared with prod`. Say `Shape and connections only.` Never data. Never secrets.
+
+A connection is a field on that resource that names another resource id or a hostname. Cite the resource id and the field. A similar name is not a connection. Do not invent one. Do not read a skipped resource for a connection, except the connection fields the skill allows when testing whether production also connects to an unmarked resource.
 
 A setting that holds a secret is not copied. Say the setting exists only when the connection is a hostname or a resource id, and cite that, not the secret.
+
+## Triggers
+
+Triggers are connections. They appear in the Links section. Show the definition only: what starts the work, what it runs, and the schedule when it has one. Never a payload. Never a secret. List these when the resource is one this reader is allowed to read:
+
+- EventBridge rules. The event pattern or the schedule expression, and each target.
+- S3 notifications. The event type, and the topic, queue, or function.
+- Lambda event source mappings. The source, the function, and the state.
+
+An EventBridge schedule expression is the schedule. Do not call a second scheduler API.

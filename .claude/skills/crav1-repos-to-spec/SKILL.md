@@ -44,7 +44,7 @@ A later re-read is this command. It adds only what is new to the architecture sp
 
 When `/crav1-environment-read` hands a confirmed architecture section or a left-out line, run only this section, then stop. Do not run the repo read, the section interview, or the branch prompt. Do not start Specify, Plan, or Build.
 
-An architecture section adds only what is new to `docs/architecture/spec.md` when that file is already there. Mark each new line `Seen in <host> <environment>.` Do not mark it as a fact the code shows. A link is added only when that section says the environment shows the connection. Do not rewrite a line that is already there. If `docs/architecture/spec.md` is missing, write nothing. Do not create it from the environment.
+An architecture section adds only what is new to `docs/architecture/spec.md` when that file is already there. Mark each new line `Seen in <host> <environment>.` When the line says `shared with prod`, or shape and connections only, keep that label. Do not mark it as a fact the code shows. A link is added only when that section says the environment shows the connection. Do not rewrite a line that is already there. If `docs/architecture/spec.md` is missing, write nothing. Do not create it from the environment.
 
 A left-out line the environment now shows comes off `docs/architecture/left-out.md`. Do not rewrite a line that stays. Do not write the line back as a guess.
 
