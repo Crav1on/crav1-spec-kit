@@ -6,7 +6,7 @@ Use this when you have **1–N files** (notes, markdown, screenshots, diagrams, 
 
 You still do **not** start by coding. The command writes a **landscape** under `docs/system/`, then one `docs/specs/<slug>/` per accepted v0 feature. Later features do **not** re-run this command.
 
-One-liner? [from-nothing](from-nothing.md) (`/crav1-spark-to-spec`). One unstructured pile that is clearly one feature and one repo? [from-ideas](from-ideas.md) (`/crav1-ideas-to-spec`). Minutes or a transcript to match against specs that already exist? [from-meeting](from-meeting.md) (`/crav1-meeting-to-specs`). That command writes nothing itself.
+One-liner? [from-nothing](from-nothing.md) (`/crav1-spark-to-spec`). One unstructured pile that is clearly one feature and one repo? [from-ideas](from-ideas.md) (`/crav1-ideas-to-spec`). Minutes, a transcript, an email, or a chat thread to match against specs that already exist? [from-meeting](from-meeting.md) (`/crav1-meeting-to-specs`). That command writes nothing itself.
 
 ## First prompt
 

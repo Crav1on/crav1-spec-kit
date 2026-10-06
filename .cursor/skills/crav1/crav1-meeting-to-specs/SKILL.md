@@ -2,12 +2,13 @@
 name: crav1-meeting-to-specs
 description: >-
   Extract requirements, decisions, changes, open questions, and bugs from
-  minutes or a transcript. Match each quote to existing specs. The user
-  takes them one at a time: keep, leave, or dismiss. Dismiss is for this
-  run only. A kept addition goes to that spec through /crav1-add-to-spec.
-  A kept new feature or bug only names the next command. Writes nothing
-  itself. Does not start Specify, Plan, or Build. Cross-cutting. Not a
-  starter option.
+  minutes, a transcript, an email, or a chat thread. Match each quote to
+  existing specs. The user takes them one at a time: keep, leave, or
+  dismiss. Dismiss is for this run only. A kept addition goes to that spec
+  through /crav1-add-to-spec. The quote label follows the kind and the
+  date. A kept new feature or bug only names the next command. Writes
+  nothing itself. Does not start Specify, Plan, or Build. Cross-cutting.
+  Not a starter option.
 disable-model-invocation: true
 icon: messages-square
 color: purple
@@ -15,7 +16,7 @@ color: purple
 
 # Meeting to specs
 
-Minutes and transcripts hold requirements that have not reached a spec yet. You extract the items that matter, match them to specs that already exist, and ask the user about one item at a time.
+Minutes, a transcript, an email, or a chat thread can hold requirements that have not reached a spec yet. You extract the items that matter, match them to specs that already exist, and ask the user about one item at a time.
 
 Command: `/crav1-meeting-to-specs`.
 
@@ -27,24 +28,49 @@ Other skills do not run this one. Spark, specify, plan, and verify do not run it
 
 This is not `/crav1-intake-to-specs`. Intake starts a landscape and new feature slugs from a dump. It does not match items against specs that already exist. This command does not create a slug and does not seed `docs/system/`.
 
-This is not `/crav1-add-to-spec` used on the whole meeting. Add-to-spec takes one piece of new information for one existing spec. This command extracts many items, matches them, and hands one kept addition to that skill.
+This is not `/crav1-add-to-spec` used on the whole input. Add-to-spec takes one piece of new information for one existing spec. This command extracts many items, matches them, and hands one kept addition to that skill.
 
-This is not `/crav1-whats-known-about`. A question about the status of one feature, slice, or resource, with no minutes, is that command. This command takes minutes or a transcript.
+This is not `/crav1-whats-known-about`. A question about the status of one feature, slice, or resource, with no minutes, email, or chat, is that command. This command takes minutes, a transcript, an email, or a chat thread.
 
 ## Input
 
-Everything after `/crav1-meeting-to-specs`, and every `@`, is the minutes or the transcript. A file, a paste, or a Teams or Zoom export is the same input. There is no required shape.
+Everything after `/crav1-meeting-to-specs`, and every `@`, is the input. Minutes, a transcript, a Teams or Zoom export, an email, or a pasted Slack or Teams chat thread are the same input. An email or a chat thread is accepted as well as minutes or a transcript. There is no required shape.
 
-If the message has no minutes and no `@`, stop. Ask with options only. Use the questions tool when it is available. The options are only:
+If the message has no input and no `@`, stop. Ask with options only. Use the questions tool when it is available. The options are only:
 
-1. **Paste the minutes or transcript in the next message**
-2. **@ a file** (minutes, a transcript, or a Teams or Zoom export)
+1. **Paste the minutes, transcript, email, or chat in the next message**
+2. **@ a file** (minutes, a transcript, a Teams or Zoom export, an email, or a chat thread)
 
-Stop until the user picks and the minutes are in the chat. Do not scan the repo for a transcript. Do not guess a file. Do not ask for a typed path.
+Stop until the user picks and the input is in the chat. Do not scan the repo for a file. Do not guess a file. Do not ask for a typed path.
+
+## Kind and date
+
+The kind comes from what the input shows. Do not guess.
+
+- `meeting` — minutes, a transcript, or a Teams or Zoom export
+- `email` — email headers such as From, To, Subject, or Sent
+- `chat` — a pasted Slack or Teams chat thread, with chat-style handles and timestamps
+
+If the kind is not clear, ask once per run. Options only. Use the questions tool when it is available. The options are only:
+
+1. **Meeting**
+2. **Email**
+3. **Chat**
+
+Stop until the user picks. Do not extract until the kind is known. One kind for the run. It applies to every item.
+
+The date comes from the input. The meeting date, an email's sent date, or one date the chat thread shows for the whole thread is the date. Do not invent a date. Do not pick one message time and call it the date.
+
+When the input shows no date, ask once per run whether to add one. Options only. Use the questions tool when it is available. The options are only:
+
+1. **Give a date**
+2. **Skip**
+
+Stop until the user picks. A date the user gives is used. If they pick give a date and the reply has no date, stop until they give one. Skip means no date. Do not ask again after skip. One date for the run, or none. It applies to every item.
 
 ## Extract
 
-Read the minutes. Extract only what matters for features:
+Read the input. Extract only what matters for features:
 
 - a requirement
 - a decision
@@ -52,7 +78,7 @@ Read the minutes. Extract only what matters for features:
 - an open question
 - a bug
 
-Each item is a quote. Use their words. Do not replace a quote with a paraphrase. When the transcript shows a speaker, include the speaker. When it shows a time, include the time. Do not invent a speaker, a time, or a date.
+Each item is a quote. Use their words. Do not replace a quote with a paraphrase. When the input shows a speaker, include the speaker. When it shows a time, include the time. Do not invent a speaker, a time, or a date.
 
 Drop small talk and status chatter. A greeting, scheduling, a status round, and "we will take that offline" with no decision are not items. A dropped line is not numbered and is not counted as extracted.
 
@@ -82,12 +108,12 @@ M1 — addition
 Quote: "<their words>"
 Speaker: <name, or omitted>
 Time: <time, or omitted>
-Source: meeting <date>, or meeting
+Source: <kind> <date>, or <kind>
 Fits: docs/specs/<slug>/ — <title line when spec.md has one>
 Also fits: docs/specs/<slug>/ — <title line>
 ```
 
-Omit `Speaker` and `Time` when the transcript does not show them. Omit `Also fits` when only one spec fits. A new feature, a bug, or an unclear item uses `Fits: none` when no spec fits.
+The kind is `meeting`, `email`, or `chat`. When the run has a date, `Source` is `<kind> <date>` (for example `email 2026-10-06`). When it does not, `Source` is `<kind>` (for example `meeting`). Omit `Speaker` and `Time` when the input does not show them. Omit `Also fits` when only one spec fits. A new feature, a bug, or an unclear item uses `Fits: none` when no spec fits.
 
 On every later turn, list every item again. Mark the ones already answered `kept`, `left`, or `dismissed`. The ones not answered stay on the list. Do not remove a line to keep the list short.
 
@@ -107,7 +133,7 @@ A batch (`M1 keep, M2 leave`) applies only the items named in that batch, in ord
 
 Follow the case already on that item.
 
-**Addition.** When one spec fits, hand the quote to `/crav1-add-to-spec` for that slug. Follow only the handoff **From /crav1-meeting-to-specs** in that skill (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/SKILL.md`; plugin: sibling `skills/crav1-add-to-spec/SKILL.md`). One item. Then stop that handoff. The impact check still runs there. Do not write the spec in this skill. Do not create a slug.
+**Addition.** When one spec fits, hand the quote to `/crav1-add-to-spec` for that slug. Pass the kind and the date for this run. When there is no date, pass the kind only. Follow only the handoff **From /crav1-meeting-to-specs** in that skill (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/SKILL.md`; plugin: sibling `skills/crav1-add-to-spec/SKILL.md`). One item. Then stop that handoff. The impact check still runs there. Do not write the spec in this skill. Do not create a slug.
 
 When more than one spec fits, ask which one before the handoff. Options only. One option per candidate, plus **Treat as a new feature**. Do not ask the user to type a slug. Stop until the user picks. A picked spec gets the addition handoff. Treat as a new feature follows the new-feature rule below.
 
@@ -156,22 +182,25 @@ When `/crav1-add-to-spec` changed a file, name `/crav1-finalize-commit`. Do not 
 
 ## Stop
 
-Do not write a file. Do not copy the transcript into the repo. Do not write `docs/system/`, a spec, `plan.md`, `tasks.md`, `verify.md`, `explore.md`, `docs/environments/marks.md`, or a dismissals file. Do not commit. Do not push. Do not open a pull request.
+Do not write a file. Do not copy the input into the repo. Do not write `docs/system/`, a spec, `plan.md`, `tasks.md`, `verify.md`, `explore.md`, `docs/environments/marks.md`, or a dismissals file. Do not commit. Do not push. Do not open a pull request.
 
 Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-match-to-specs`, `/crav1-plan-from-spec`, `/crav1-implement-task`, `/crav1-complete-task`, `/crav1-verify-spec`, `/crav1-fix-bug`, `/crav1-fix-from-verify`, or `/crav1-finalize-commit`.
 
 ## Hard rules
 
-- No minutes and no `@`: stop. Options only. Do not guess a file.
-- Extract requirements, decisions, changes, open questions, and bugs. Each item is a quote. Include speaker and time when the transcript shows them.
+- No input and no `@`: stop. Options only. Do not guess a file. An email or a chat thread is accepted as well as minutes or a transcript.
+- The kind comes from what the input shows: `meeting`, `email`, or `chat`. Do not guess. If it is not clear, ask once: meeting, email, or chat.
+- The date comes from the input. Do not invent one. If the input shows no date, ask once: give a date, or skip. Skip means no date.
+- One kind and one date for the run. They apply to every item. `Source` is `<kind> <date>`, or `<kind>`.
+- Extract requirements, decisions, changes, open questions, and bugs. Each item is a quote. Include speaker and time when the input shows them.
 - Drop small talk and status chatter. A dropped line is not an item.
 - Match every item. Cases: addition, new feature, bug, or unclear. When more than one existing spec could fit, list every candidate.
 - Every item stays listed. Nothing is dropped to keep the list short.
 - One item at a time: keep, leave, or dismiss.
 - Dismiss is for this run only. Start fresh on every run. Do not write a dismissals file. Do not remember a dismiss across runs.
-- A kept addition goes to that spec through `/crav1-add-to-spec`. The impact check still runs there.
+- A kept addition goes to that spec through `/crav1-add-to-spec`. Pass the kind and the date. The quote starts with `From <kind> <date>.` when there is a date, otherwise `From <kind>.` The impact check still runs there.
 - A kept new feature names `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, or `/crav1-intake-to-specs`. Do not run it. Do not create a slug.
 - A kept bug names `/crav1-fix-bug`. Do not run it.
-- This command writes no files. The transcript is not copied into the repo. Only a quote the user keeps as an addition reaches a spec, through `/crav1-add-to-spec`.
+- This command writes no files. The input is not copied into the repo. Only a quote the user keeps as an addition reaches a spec, through `/crav1-add-to-spec`.
 - Do not start Specify, Plan, or Build. Do not plan, implement, or commit.
 - Later skill. Not a starter option. Asking for startup options names only the seven and does not run this command.

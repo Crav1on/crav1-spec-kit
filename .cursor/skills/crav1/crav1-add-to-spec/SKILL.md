@@ -38,7 +38,7 @@ When `/crav1-suggest-tests-for-code` hands one suggestion for an existing spec, 
 
 When `/crav1-meeting-to-specs` hands one kept addition for an existing spec, the spec is the one that skill already named. Do not ask for a slug. Do not create a slug. Do not create a folder.
 
-Quote the item. Do not replace it with a paraphrase. The quote starts with `From meeting <date>.` when the date is known, otherwise `From meeting.` Keep the speaker and the time in the quote when the transcript showed them. Label it `**New:**` in the section the words belong to, the same way any other new quote is labeled.
+The handoff passes the kind and the date. The kind is `meeting`, `email`, or `chat`. Quote the item. Do not replace it with a paraphrase. The quote starts with `From <kind> <date>.` when the handoff includes a date, otherwise `From <kind>.` Examples: `From email 2026-10-06.`, `From meeting.` Do not invent a kind or a date. Keep the speaker and the time in the quote when the input showed them. Label it `**New:**` in the section the words belong to, the same way any other new quote is labeled.
 
 Then run **Add to that spec.md** and **Impact** in this skill. The impact check still runs. Do not skip it. Do not write `plan.md` or `tasks.md`. Do not change application code. Do not start Specify, Plan, or Build.
 

@@ -86,7 +86,7 @@ The starter options are the seven above. The table includes later skills. Asking
 | A bug that already exists | [from-fix-bug.md](from-fix-bug.md) · `/crav1-fix-bug` |
 | A built slice, exploratory test | [from-exploratory-test.md](from-exploratory-test.md) · `/crav1-exploratory-test` |
 | Tests for code that already exists, one repo or one area | [from-suggest-tests.md](from-suggest-tests.md) · `/crav1-suggest-tests-for-code` |
-| Minutes or a transcript matched to existing specs | [from-meeting.md](from-meeting.md) · `/crav1-meeting-to-specs` |
+| Minutes, a transcript, an email, or a chat matched to existing specs | [from-meeting.md](from-meeting.md) · `/crav1-meeting-to-specs` |
 | Prove a slice | `/crav1-verify-spec` |
 | Push and open a pull request | `/crav1-open-pr` (after commits exist; does not merge; may name `/crav1-review-pr` and does not run it) |
 | Merge a named pull request | `/crav1-merge-pr` (only when that turn asks; merge commit only; does not run the review) |
