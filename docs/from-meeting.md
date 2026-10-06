@@ -35,9 +35,27 @@ If the message has no input and no `@`, the command stops. Options only. It does
 | Kind and date | Glance | Kind from what the input shows: meeting, email, or chat. Date from the input. Asks once when the kind is not clear. Asks once when there is no date: give a date, or skip |
 | Extract | Read the list | Requirements, decisions, changes, open questions, and bugs. Each item is a quote. Speaker and time when the input shows them. Small talk is dropped |
 | Match | Read every item | Addition, new feature, bug, or unclear. Every candidate spec stays listed. Skip `_template` |
-| One at a time | Keep, leave, or dismiss | One item. Dismiss is for this run only. The next run starts fresh |
+| Build state | Read the line | One `State:` line on each item that matches a spec, in the list and in the question. `Fits: none` has no state line |
+| One at a time | Keep, leave, or dismiss | One item. The state line is on that question. The options stay keep, leave, or dismiss. Dismiss is for this run only. The next run starts fresh |
 | Keep | Glance | Addition goes through `/crav1-add-to-spec`. New feature or bug only names the next command |
 | Stop | Counts | Writes nothing itself. Does not start Specify, Plan, or Build |
+
+## Build state
+
+An item that matches an existing spec shows one line, `State: <state>.`, and a short reason that names the evidence. The same line is in the item block and in the keep, leave, or dismiss question.
+
+| State | Meaning |
+| --- | --- |
+| built | The spec already says the item is present, or a checked task covers it |
+| partly built | Part of it is covered. The reason names which part |
+| planned | It is in `plan.md` or an open task, and it is not done |
+| not built | The matched spec, plan, and tasks do not cover it |
+
+An item with `Fits: none` has no state line.
+
+The read is that slice’s `spec.md` (including `## Match`), then `plan.md`, then `tasks.md` checkboxes, then `verify.md` when that file is present. When those do not settle it, one read-only look at the code that spec or plan points to. No search of the codebase. A state from that code, or a state that is still uncertain, ends with `(inference, not in the docs)`.
+
+The line does not change the options. It is not written. It is not part of the quote handed to `/crav1-add-to-spec`.
 
 ## What gets written
 
@@ -45,7 +63,7 @@ This command writes no files. No `docs/system/`. No new spec folder. No marks. N
 
 A kept addition is a quote on the existing `spec.md`, written by `/crav1-add-to-spec`. The handoff passes the kind and the date. The quote starts with `From <kind> <date>.` when there is a date, otherwise `From <kind>.` Examples: `From email 2026-10-06.`, `From meeting.` One kind and one date apply to every item. The impact check still runs there. Other files change only when apply is picked.
 
-A left item is not written. A dismissed item is not written. The next run can offer either again.
+A left item is not written. A dismissed item is not written. The state line is not written. The next run can offer a left or dismissed item again.
 
 ## After
 

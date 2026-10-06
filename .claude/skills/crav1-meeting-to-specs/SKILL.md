@@ -3,8 +3,10 @@ name: crav1-meeting-to-specs
 description: >-
   Extract requirements, decisions, changes, open questions, and bugs from
   minutes, a transcript, an email, or a chat thread. Match each quote to
-  existing specs. The user takes them one at a time: keep, leave, or
-  dismiss. Dismiss is for this run only. A kept addition goes to that spec
+  existing specs. Each item that matches a spec shows a build-state
+  line. The line is not written. The user takes them one at a time:
+  keep, leave, or dismiss. Dismiss is for this run only. A kept addition
+  goes to that spec
   through /crav1-add-to-spec. The quote label follows the kind and the
   date. A kept new feature or bug only names the next command. Writes
   nothing itself. Does not start Specify, Plan, or Build. Cross-cutting.
@@ -99,6 +101,42 @@ When more than one existing spec could fit, list every candidate on that item. D
 
 When no spec folder exists, an item that would have been an addition is a new feature. Do not create a slug. Do not seed `docs/system/`.
 
+## Build state
+
+An item that matches an existing spec gets one line. An item with `Fits: none` gets no state line.
+
+Read the spec on `Fits:`. When `Also fits` is present, read each of those specs too. For each one, read in this order. Skip a file that is not there. A missing file is not a search.
+
+1. `docs/specs/<slug>/spec.md`, including `## Match` when that heading is there
+2. `plan.md` in that folder
+3. `tasks.md` in that folder, the checkboxes
+4. `verify.md` in that folder, when the file is present
+
+Judge in this order. Stop at the first that fits.
+
+1. **built** — `spec.md` already states the whole item as present, including a `## Match` line that covers it as done, or a checked task (`[x]`) covers the whole item, and no `verify.md` row for that coverage fails.
+2. **partly built** — part of the item is covered that way and part is not. A `verify.md` fail on one part is this state. The reason names which part.
+3. **planned** — `plan.md` describes the item, or an open task (`[ ]`) covers it, and it is not done.
+4. **not built** — that `spec.md`, `plan.md`, and `tasks.md` do not cover the item. A failed `verify.md` row that is the only coverage is this state. Name that row.
+
+A goal, a requirement, or an unchecked acceptance line that only says the item should exist is not built by itself.
+
+When those files do not settle the state, one quick read-only look at the code that spec or plan names. A path in `spec.md`, including `## Match`, or in `plan.md`, is the code to open. Do not open a file they do not name. Do not search the codebase. When they name no path, do not look. A clear state from the files above is settled. Do not open code to overturn it.
+
+A state that rests on that code, or a state that is still uncertain after the read, ends the reason with `(inference, not in the docs)`. A state the spec, plan, tasks, or verify file shows does not get that label. Never invent a file, a task number, a checkbox, or a quote.
+
+One line:
+
+```text
+State: <state>. <short reason that names the evidence>.
+```
+
+Example: `State: partly built. Dev container done (task 4 checked); prod not in tasks.md.`
+
+When more than one spec fits, the state word is the state of the spec on `Fits:`. The reason names each other spec when its state differs, with that spec’s path.
+
+The line is informational. It does not change keep, leave, or dismiss. It is not written. It is not part of the quote handed to `/crav1-add-to-spec`.
+
 ## The list
 
 Show every item before the first question. Number `M1`, `M2`, … On a new run, start at `M1`. Nothing is dropped to keep the list short.
@@ -111,19 +149,27 @@ Time: <time, or omitted>
 Source: <kind> <date>, or <kind>
 Fits: docs/specs/<slug>/ — <title line when spec.md has one>
 Also fits: docs/specs/<slug>/ — <title line>
+State: <state>. <short reason that names the evidence>.
 ```
 
-The kind is `meeting`, `email`, or `chat`. When the run has a date, `Source` is `<kind> <date>` (for example `email 2026-10-06`). When it does not, `Source` is `<kind>` (for example `meeting`). Omit `Speaker` and `Time` when the input does not show them. Omit `Also fits` when only one spec fits. A new feature, a bug, or an unclear item uses `Fits: none` when no spec fits.
+The kind is `meeting`, `email`, or `chat`. When the run has a date, `Source` is `<kind> <date>` (for example `email 2026-10-06`). When it does not, `Source` is `<kind>` (for example `meeting`). Omit `Speaker` and `Time` when the input does not show them. Omit `Also fits` when only one spec fits. Omit `State` when `Fits` is `none`. A new feature, a bug, or an unclear item uses `Fits: none` when no spec fits.
 
 On every later turn, list every item again. Mark the ones already answered `kept`, `left`, or `dismissed`. The ones not answered stay on the list. Do not remove a line to keep the list short.
 
 ## One at a time
 
-Ask about one item. Use the questions tool when it is available. The options are only:
+Ask about one item. Use the questions tool when it is available. The question text names the item and the spec when one fits, then the same `State` line that is on the item. The options are only:
 
 1. **Keep**
 2. **Leave**
 3. **Dismiss**
+
+```text
+M1: dev and prod containers. Add this to <slug>?
+State: partly built. Dev container done (task 4 checked); prod not in tasks.md.
+```
+
+When `Fits` is `none`, the question has no `State` line. The options stay Keep, Leave, and Dismiss.
 
 Stop until the user picks. Do not write before that reply. Do not apply the next item in the same turn.
 
@@ -133,7 +179,7 @@ A batch (`M1 keep, M2 leave`) applies only the items named in that batch, in ord
 
 Follow the case already on that item.
 
-**Addition.** When one spec fits, hand the quote to `/crav1-add-to-spec` for that slug. Pass the kind and the date for this run. When there is no date, pass the kind only. Follow only the handoff **From /crav1-meeting-to-specs** in that skill (drop-in: `.claude/skills/crav1-add-to-spec/SKILL.md`; plugin: sibling `skills/crav1-add-to-spec/SKILL.md`). One item. Then stop that handoff. The impact check still runs there. Do not write the spec in this skill. Do not create a slug.
+**Addition.** When one spec fits, hand the quote to `/crav1-add-to-spec` for that slug. Pass the kind and the date for this run. When there is no date, pass the kind only. Do not pass the `State` line. It is not quote text. Follow only the handoff **From /crav1-meeting-to-specs** in that skill (drop-in: `.claude/skills/crav1-add-to-spec/SKILL.md`; plugin: sibling `skills/crav1-add-to-spec/SKILL.md`). One item. Then stop that handoff. The impact check still runs there. Do not write the spec in this skill. Do not create a slug.
 
 When more than one spec fits, ask which one before the handoff. Options only. One option per candidate, plus **Treat as a new feature**. Do not ask the user to type a slug. Stop until the user picks. A picked spec gets the addition handoff. Treat as a new feature follows the new-feature rule below.
 
@@ -195,6 +241,7 @@ Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-spe
 - Extract requirements, decisions, changes, open questions, and bugs. Each item is a quote. Include speaker and time when the input shows them.
 - Drop small talk and status chatter. A dropped line is not an item.
 - Match every item. Cases: addition, new feature, bug, or unclear. When more than one existing spec could fit, list every candidate.
+- An item that matches a spec gets one `State:` line in the item block and in the question. `Fits: none` gets no state line. The line is informational. It is not written and it is not quote text.
 - Every item stays listed. Nothing is dropped to keep the list short.
 - One item at a time: keep, leave, or dismiss.
 - Dismiss is for this run only. Start fresh on every run. Do not write a dismissals file. Do not remember a dismiss across runs.
