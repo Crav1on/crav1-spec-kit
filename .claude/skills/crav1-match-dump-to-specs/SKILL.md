@@ -29,6 +29,8 @@ This is not `/crav1-tighten-spec`. Tighten is for mushy wording. This skill is f
 
 This is not `/crav1-intake-to-specs`, `/crav1-spark-to-spec`, or `/crav1-ideas-to-spec`. Those create the folders. Do not create a slug here.
 
+This is not `/crav1-whats-known-about`. That command answers a question about the status of one feature, slice, or resource and writes nothing. This command sorts a dump. A status question with no dump is that other command.
+
 A not-started spec (match status `not in the code`, or a thin spec) can keep taking information until planning. Adding information does not start planning and does not write `plan.md` or `tasks.md`.
 
 ## Input

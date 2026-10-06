@@ -29,6 +29,8 @@ This is not `/crav1-intake-to-specs`. Intake starts a landscape and new feature 
 
 This is not `/crav1-add-to-spec` used on the whole meeting. Add-to-spec takes one piece of new information for one existing spec. This command extracts many items, matches them, and hands one kept addition to that skill.
 
+This is not `/crav1-whats-known-about`. A question about the status of one feature, slice, or resource, with no minutes, is that command. This command takes minutes or a transcript.
+
 ## Input
 
 Everything after `/crav1-meeting-to-specs`, and every `@`, is the minutes or the transcript. A file, a paste, or a Teams or Zoom export is the same input. There is no required shape.
