@@ -72,6 +72,7 @@ The same list is where a lone user sees the ways to start: [plugins/crav1/README
 | Skill | `/crav1-environment-read` |
 | Skill | `/crav1-pipeline-environments` |
 | Skill | `/crav1-explain` |
+| Skill | `/crav1-whats-known-about` |
 | Skill | `/crav1-keep-current` |
 | Skill | `/crav1-fix-bug` |
 | Skill | `/crav1-exploratory-test` |
@@ -98,6 +99,8 @@ The same list is where a lone user sees the ways to start: [plugins/crav1/README
 `/crav1-pipeline-environments` may run from any lane. The user names Azure DevOps, the org, and the project. A pipeline name is optional. If any of those three is missing, it stops and asks. Options only. It does not guess. It reads pipeline definitions with `az pipelines` and `az devops` and does not run a pipeline. The stage name gives the environment, with the same whole-word rule as `/crav1-environment-read`. It appends only confirmed lines to `docs/environments/marks.md`. It does not write `docs/system`, `docs/architecture/spec.md`, a feature spec, or `docs/architecture/left-out.md`. It does not move work into Specify, Plan, or Build. It does not start those lanes. It names `/crav1-environment-read` and does not run it. It is a later skill. It is not one of the seven starter options. When the user asks for startup options, that ask names the seven and does not run this skill. The seven starter options stay unchanged. Spark, specify, plan, and verify do not run it.
 
 `/crav1-explain` may run from any lane. It reads the system notes already in `docs/system/`. The first answer is a short TLDR. Longer goes one level deeper from the same notes. It does not move work into Specify, Plan, or Build. It does not write a file.
+
+`/crav1-whats-known-about` may run from any lane. The user asks about one feature, slice, resource, or not-yet-feature. The answer comes from the specs first. It reads only. It writes nothing. One pass matches an exact name first, then key words, with spec titles and Match quotes weighted highest. One winning slice is the answer, and the path is named. Two or more close hits are listed and it asks which. It does not guess. No slice: it says so and presents a candidate slice. It names `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, or `/crav1-intake-to-specs` and does not run them. Pasted minutes or a long dump names `/crav1-meeting-to-specs` or `/crav1-match-dump-to-specs` and stops. After the repo part it runs read-only Azure and Azure DevOps checks. Production is shape and connections only, after the same yes or no as `/crav1-environment-read`. It never reads data. A failed live read offers Retry or Skip. It may name one skill. It does not run another skill. It does not move work into Specify, Plan, or Build. It does not start those lanes. It is a later skill. It is not one of the seven starter options. When the user asks for startup options, that ask names the seven and does not run this skill. The seven starter options stay unchanged. It is not `/crav1-explain`. Spark, specify, plan, and verify do not run it.
 
 `/crav1-keep-current` may run from any lane, on its own. The passes that already append a glossary row also run this picture update. It adds what is new to the short description, the diagram, and how the parts connect. It does not move work into Specify, Plan, or Build. It does not design the change and does not build it.
 
@@ -176,6 +179,7 @@ cross_cutting:
     - crav1-environment-read
     - crav1-pipeline-environments
     - crav1-explain
+    - crav1-whats-known-about
     - crav1-keep-current
     - crav1-fix-bug
     - crav1-exploratory-test

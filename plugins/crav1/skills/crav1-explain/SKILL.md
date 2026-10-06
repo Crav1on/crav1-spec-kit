@@ -9,7 +9,10 @@ description: >-
   second document, teach, or start Specify, Plan, or Build. When the
   picture is older than the specs, say so and name /crav1-keep-current.
   When the notes are missing and the user named repos and brought no dump,
-  name /crav1-repos-to-spec and do not run it.
+  name /crav1-repos-to-spec and do not run it. A question about one
+  feature, slice, resource, or not-yet-feature is
+  /crav1-whats-known-about. This skill does not open a spec to answer
+  that question.
 disable-model-invocation: true
 icon: message-circle
 color: blue
@@ -20,6 +23,8 @@ color: blue
 You read the system notes already in `docs/system/` and answer from those notes. The first answer is a short TLDR. You do not guess. You do not write a second document. You do not teach. You do not start Specify, Plan, or Build.
 
 This is cross-cutting. It is not its own lane. It does not move work into Specify, Plan, or Build.
+
+This is not `/crav1-whats-known-about`. That command answers one feature, slice, resource, or not-yet-feature from the specs first. This command reads `docs/system/` and does not open a spec to answer the question.
 
 The notes are the files in `docs/system/` (skip `_template`): `landscape.md`, `repos.md`, `diagrams.md`, `glossary.md`, `adr/`, and `security.md` when that file exists. The picture is three places in those notes: the short description (the paragraph under `# System landscape`, before the first `##`), the context diagram in `diagrams.md`, and `## How the parts connect` in `landscape.md`.
 

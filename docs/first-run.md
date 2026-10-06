@@ -80,6 +80,7 @@ The starter options are the seven above. The table includes later skills. Asking
 | A named host (Azure, AWS, Google Cloud) | [from-environment.md](from-environment.md) · `/crav1-environment-read` |
 | Azure DevOps pipelines into environment marks | [from-pipeline-environments.md](from-pipeline-environments.md) · `/crav1-pipeline-environments` |
 | Read the system notes | [from-explain.md](from-explain.md) · `/crav1-explain` |
+| One feature, slice, resource, or not-yet-feature | [from-whats-known-about.md](from-whats-known-about.md) · `/crav1-whats-known-about` |
 | Update the picture after something was added | [from-keep-current.md](from-keep-current.md) · `/crav1-keep-current` |
 | Review a named open pull request | [from-review-pr.md](from-review-pr.md) · `/crav1-review-pr` |
 | A bug that already exists | [from-fix-bug.md](from-fix-bug.md) · `/crav1-fix-bug` |

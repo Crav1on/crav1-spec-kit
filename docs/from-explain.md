@@ -4,6 +4,8 @@ Kit not in this project yet? [Install first](install.md) (Cursor and Claude Code
 
 Use this when **system notes already exist** under `docs/system/` and you want them read back. Spark, ideas, intake, match, and repos-to-spec write those notes. This command reads them.
 
+A question about one feature, slice, resource, or not-yet-feature is [what's known about](from-whats-known-about.md) (`/crav1-whats-known-about`). That command reads the specs first. This command reads `docs/system/` and does not open a spec to answer the question.
+
 This is cross-cutting. It is not its own lane. It does not start Specify, Plan, or Build. It does not guess. It does not write a second document. It does not teach.
 
 The first answer is a short TLDR. Say longer and it goes one level deeper from the same notes. Point it at one part and the answer stays on that part. Ask whether the system can do something: yes points at the note that says yes, no points at the note that says no, and a thing the notes never mention is not written down.
