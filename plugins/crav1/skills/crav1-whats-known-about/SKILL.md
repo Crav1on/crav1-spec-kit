@@ -4,6 +4,9 @@ description: >-
   Answer one question about a feature, slice, resource, or not-yet-feature
   from the specs first. Read only. Write nothing. One match pass. Then
   read-only Azure and Azure DevOps checks, each tagged as a live read.
+  When the git remote is not Azure Repos and marks do not name the org
+  and project, derive them from Azure DevOps URLs in docs/system/repos.md.
+  Check default az install paths before reporting az as not installed.
   Production stays shape and connections only, after the same yes or no
   as /crav1-environment-read. Never read data. Does not start Specify,
   Plan, or Build. Does not run another skill. Later skill. Not a starter
@@ -112,6 +115,20 @@ Build the repo answer first. Then run the live reads. The chat answer waits unti
 
 Two live reads. Both are read-only. Tag each fact `Live read.`
 
+### Finding `az`
+
+Try `az` on `PATH` first. On Windows, `az.cmd` on `PATH` counts.
+
+Before reporting `az` as not installed, check the default install paths for the operating system where this command is running. Use the first path that exists.
+
+- Windows: `C:\Program Files\Microsoft SDKs\Azure\CLI2\wbin\az.cmd`, then `C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\wbin\az.cmd`
+- macOS: `/opt/homebrew/bin/az`, then `/usr/local/bin/az`
+- Linux: `/usr/bin/az`, then `/usr/local/bin/az`
+
+When one of those paths exists, use that path for every `az` call in this command. Do not install `az`.
+
+When `az` is not on `PATH` and none of those paths exists, `az` is not installed.
+
 ### Azure resource settings and recent changes
 
 Use `az` to list and show. Do not create, update, delete, deploy, start, stop, or set a resource. Do not switch subscription. One pass on the current account.
@@ -150,23 +167,39 @@ A non-prod resource (dev, test, stage, uat, qa) is settings and recent changes, 
 
 ### Azure DevOps
 
-Work items, open pull requests, and branches that touch the thing.
+Work items, open pull requests, and branches that touch the thing. Every fact from this read is tagged `Live read.`
 
-This read applies when the git remote is Azure Repos (`dev.azure.com` or `*.visualstudio.com`), or when `docs/environments/marks.md` already names the Azure DevOps org and project. Use that org and project. Do not ask for a typed path. Do not guess an org.
+The org and project come from the first source that names both:
 
-Use `az boards` and `az repos` to list and show. Do not edit a work item, a pull request, or a branch. Do not pass `--work-items`. Do not create a work item.
+1. The git remote, when it is Azure Repos (`dev.azure.com` or `*.visualstudio.com`).
+2. `docs/environments/marks.md`, when that file already names the Azure DevOps org and project.
+3. Azure DevOps URLs in `docs/system/repos.md`, when the git remote is not Azure Repos and `docs/environments/marks.md` does not name the org and project.
+
+Do not ask for a typed path. Do not guess an org.
+
+For source 3, read `docs/system/repos.md` when that file exists. An Azure DevOps URL matches `dev.azure.com` or `*.visualstudio.com` (HTTPS or SSH). Read the org and the project from the URL:
+
+- `https://dev.azure.com/<org>/<project>/_git/<repo>` — path segments. Ignore userinfo such as `https://<org>@dev.azure.com/...`.
+- `https://<org>.visualstudio.com/<project>/_git/<repo>` — the host label is the org.
+- `git@ssh.dev.azure.com:v3/<org>/<project>/<repo>` — the path after `v3/`.
+- `git@vs-ssh.visualstudio.com:v3/<org>/<project>/<repo>` and `<org>@vs-ssh.visualstudio.com:v3/<org>/<project>/<repo>` — the path after `v3/`.
+- `ssh://` URLs use the same path segments.
+
+Strip a trailing `.git`. A collection segment such as `DefaultCollection` is not the project.
+
+When those URLs name one org and one project, use them. When `docs/system/repos.md` is missing, it has no Azure DevOps URL, or the URLs do not name one org and one project, this read does not apply. Say so under **Tracked elsewhere**. That is not a failure.
+
+Use `az boards` and `az repos` to list and show, the same way for every source above. Pass that org and that project on the calls. The org is `https://dev.azure.com/<org>` or `https://<org>.visualstudio.com`, matching the URL. Do not substitute an org from `az devops configure`. Do not edit a work item, a pull request, or a branch. Do not pass `--work-items`. Do not create a work item.
 
 - work items whose title contains the name
 - open pull requests whose title or source branch touches the thing
 - branches whose name touches the thing
 
-When the remote is not Azure Repos and the marks file does not name an org and project, this read does not apply. Say so under **Tracked elsewhere**. That is not a failure.
-
 ### When a live read fails
 
-The repo part is already done. A failure is `az` missing, `az` not signed in, the `azure-devops` extension missing, or no access to the DevOps project. A read that does not apply is not a failure.
+The repo part is already done. A failure is `az` not installed after the default-path check, `az` not signed in, the `azure-devops` extension missing, or no access to the DevOps project. A read that does not apply is not a failure.
 
-Show one prompt. State each failure. Suggest a fix when there is one. `az login`, then retry, when the login is missing. Name a missing `az` or a missing `azure-devops` extension. Do not install. Do not log in. Do not run `az login`.
+Show one prompt. State each failure. Suggest a fix when there is one. `az login`, then retry, when the login is missing. Name a missing `az` only after the default install paths have been checked. Name a missing `azure-devops` extension. Do not install. Do not log in. Do not run `az login`.
 
 Use the questions tool when it is available. The options are only:
 
@@ -201,7 +234,7 @@ The chat answer follows this skill’s `assets/answer.md` (drop-in: `.cursor/ski
 5. **Do not touch** — guardrails the docs already state. Each one has the date that note or ADR gives. When the note has no date, say the date is not written. Do not invent a date.
 6. **Seen only live** — a setting or a change that no doc mentions. Each line says `Live read.` A fact the docs already state stays out of this section.
 7. **Stale notes** — an older note that disagrees with a later note, or with a live read. Say which note is wrong and what to trust instead. A short note is not stale.
-8. **Tracked elsewhere** — work items, open pull requests, and branches. When the live read ran, this section stays, and `none` is a real line. When the user picked Skip, leave this section out.
+8. **Tracked elsewhere** — work items, open pull requests, and branches. When the live read ran, this section stays, and `none` is a real line. Each line says `Live read.` When the user picked Skip, leave this section out.
 9. **Source** — existing slice, found slice, or no slice (candidate). Then the files and the reads used.
 
 **Unexplained** is for a code-only hit with no spec and no architecture note. What the code shows goes there. What the code does not say stays unexplained. Leave that heading out on every other case.
@@ -227,6 +260,8 @@ Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-spe
 - No slice: say so, show what is known, present a candidate, and name spark, ideas, or intake. Do not run it.
 - Minutes or a long dump: name `/crav1-meeting-to-specs` or `/crav1-match-dump-to-specs` and stop.
 - Live reads come after the repo part. Tag each live fact `Live read.`
+- When the git remote is not Azure Repos and `docs/environments/marks.md` does not name the Azure DevOps org and project, derive them from Azure DevOps URLs in `docs/system/repos.md`. Then read work items, open pull requests, and branches the same way. Tag each fact `Live read.`
+- Before reporting `az` as not installed, check the default install paths on Windows, macOS, and Linux. Use that path when it is there.
 - Production is shape and connections only, after the same yes or no as `/crav1-environment-read`. Never data. Never a secret value. Never a row or a blob.
 - A failed live read is one prompt: the issue, a fix when there is one, Retry or Skip. Skip is the repo-only answer, with why the live checks did not run.
 - A focus still runs the full read. The answer shows only those sections.

@@ -46,9 +46,9 @@ Against: <one line>
 
 ## Tracked elsewhere
 
-- Work items: <id and title, or none>
-- Open pull requests: <id and title, or none>
-- Branches: <name, or none>
+- Work items: <id and title, or none> — Live read.
+- Open pull requests: <id and title, or none> — Live read.
+- Branches: <name, or none> — Live read.
 
 ## Source
 
