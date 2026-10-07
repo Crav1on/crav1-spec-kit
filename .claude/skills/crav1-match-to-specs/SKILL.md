@@ -104,6 +104,10 @@ When `docs/system/` already exists, do not rewrite a short-description sentence,
 
 No `tasks.md`. No application code. No `git init` except the new clean repo they picked. No remotes.
 
+## Imported sources
+
+When a dump file is a mail, a transcript, minutes, a chat, a screenshot, a diagram, or another original that will be quoted into a spec, follow the imported-sources convention before the slice specs are written (drop-in: `.claude/skills/crav1-add-to-spec/references/sources.md`; plugin: sibling `skills/crav1-add-to-spec/references/sources.md`). Write each source folder once. Pass each folder path with the slice that quotes it. The slice write adds the `Source:` and `Trace:` lines and does not import the file again. Do not commit. A file that is not an imported source does not get a folder.
+
 ## Slice specs
 
 One `docs/specs/<slug>/` per confirmed slice, including `not in the code`.
@@ -124,7 +128,7 @@ Do not plan. Do not implement. Do not commit. Do not run `/crav1-finalize-commit
 
 Output only:
 
-- Paths written (`docs/system/` and each `docs/specs/<slug>/spec.md`, plus any picture lines added)
+- Paths written (`docs/system/`, each `docs/specs/<slug>/spec.md`, any source folder `docs/sources/YYYY-MM-DD-<slug>/`, plus any picture lines added)
 - Counts: done, partial, not in the code
 - Where the uncovered-code note is, or that the map had none
 - Next:

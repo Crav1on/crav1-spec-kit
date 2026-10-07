@@ -11,6 +11,7 @@ The parent launches **crav1-intake-slice-agent** for **one** slug. This file is 
 - Chosen **export format(s)**
 - **Repos** this spec may touch
 - **Synced at** for this slice, only when the parent read only this slice: repo, branch, seven-character short sha, and the date of that read (`YYYY-MM-DD`). Omit this when the parent read the repo as a whole, or did not read the code.
+- **Source folders** the parent already wrote for an imported source this slice quotes: `docs/sources/YYYY-MM-DD-<slug>/`. Omit this when the parent wrote none.
 - Template paths: this skill’s `assets/spec.md`, `assets/spec-diagrams.md` (write as `diagrams.md`), `assets/adr.md` (drop-in also `.cursor/agent-assets/crav1-intake-slice-agent/`; plugin also `agent-assets/crav1-intake-slice-agent/`)
 - Format and diagram recipes: `crav1-ideas-to-spec` `references/formats.md` and `references/diagrams.md`
 
@@ -25,7 +26,8 @@ The parent launches **crav1-intake-slice-agent** for **one** slug. This file is 
 2. Copy applicable bulk `A#`s into `## Assumptions`. Add **slice-local** `A#`s only if intake forces a guess the parent never made.
 3. List allowed repos on `## Repos`.
 4. When the parent passed **Synced at**, write or update one line in `spec.md`, after the title and before the first heading: `Synced at: <repo> <branch>@<short sha>, <date>`. One line per repo the parent passed. Update the line for that repo. Leave other `Synced at` lines. Do not invent a line the parent did not pass. Do not edit `repos.md`.
-5. Return: paths written, ADRs vs open, 3–5 remaining arguments.
+5. When the parent passed a source folder, add the `Source:` and `Trace:` lines from the imported-sources convention (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/references/sources.md`; plugin: sibling `skills/crav1-add-to-spec/references/sources.md`). Do not import the file again. Do not ask the mail, binary, or personal-data questions again. Do not commit.
+6. Return: paths written, ADRs vs open, 3–5 remaining arguments.
 
 ## Worker must not
 
@@ -33,7 +35,7 @@ The parent launches **crav1-intake-slice-agent** for **one** slug. This file is 
 - Write or edit another slug
 - Rewrite `docs/system/` (no landscape, repos table, `Synced at` cell, or system ADRs)
 - Invent a second system shape (landscape wins)
-- Write application code, `plan.md`, `tasks.md`, `work-item.md`, or create git remotes
+- Write application code, `plan.md`, `tasks.md`, `work-item.md`, `docs/sources/`, or create git remotes
 - Ask for a work item (the parent offers once after Index)
 - Silently resolve ungrounded requirements — leave Open questions
 

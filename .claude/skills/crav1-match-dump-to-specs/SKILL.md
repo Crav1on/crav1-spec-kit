@@ -65,7 +65,9 @@ Stop. They confirm or edit the sort. Do not write files. That confirmation is th
 
 ## Write the new bits
 
-Edit only `docs/specs/<slug>/spec.md` for slugs in the confirmed **belongs** pile. Write them in this chat. Do not launch a worker.
+When a confirmed quote comes from a mail, a transcript, minutes, a chat, a screenshot, a diagram, or another original file, follow the imported-sources convention before that quote (drop-in: `.claude/skills/crav1-add-to-spec/references/sources.md`; plugin: sibling `skills/crav1-add-to-spec/references/sources.md`). Write `docs/sources/YYYY-MM-DD-<slug>/` once per source. Add the `Source:` and `Trace:` lines from that file. Do not commit. A quote that is not from an imported source does not get a source folder.
+
+Edit `docs/specs/<slug>/spec.md` for slugs in the confirmed **belongs** pile. An imported source also writes its source folder, as that convention says. Write them in this chat. Do not launch a worker.
 
 For each of those files:
 
@@ -83,7 +85,7 @@ Labels, in the section the words belong to:
 - `**Already there:**` — do not paste a second copy. Leave the existing sentence. The **already** pile is the report, not a second paste.
 - `**Inferred:**` — a connection you drew. Not an accepted fact.
 
-When the file already has `## Trace`, append one line: what this pass marked new, already there, and inferred. Do not create `## Trace` only for that line.
+When the file already has `## Trace`, append one line: what this pass marked new, already there, and inferred. Do not create `## Trace` only for that line. An imported source is the exception: the `Source:` and `Trace:` lines in the imported-sources convention are required, and `## Trace` is created when it is missing.
 
 A thin spec (match status `not in the code`, or only Match / What the dump says / In the code / Trace / Open questions) stays thin. Put the quote under the heading it belongs to. Add a heading only when their words are that content. Do not add Problem, Goals, Users and journeys, or Acceptance criteria to fill the file out. Do not add `## In the code` unless their words name code that is there.
 
@@ -104,7 +106,7 @@ The new quotes are already in the matching specs. Read `docs/system/` when it ex
 
 Section names for that read, not a file to paste over what exists: this skill’s `assets/system/` (same files as `docs/system/_template/`, including `glossary.md`; drop-in: `.claude/skills/crav1-match-dump-to-specs/assets/system/`; plugin: this skill’s `assets/system/`).
 
-Do not edit anything outside the confirmed belongs writes in this step, except the glossary gap and the picture update below. Do not seed `docs/system/` when it is missing. Say it is missing and that this command does not create it. When that folder is missing, do nothing about a glossary and do nothing about the picture.
+Do not edit anything outside the confirmed belongs writes in this step, except the glossary gap and the picture update below. A source folder already written under **Write the new bits** stays. Do not edit it in this step. Do not seed `docs/system/` when it is missing. Say it is missing and that this command does not create it. When that folder is missing, do nothing about a glossary and do nothing about the picture.
 
 **Glossary.** When `docs/system/` is missing, do nothing about a glossary. When it exists and `glossary.md` is missing, write only that file from `assets/system/glossary.md`. When `glossary.md` already exists, append only words or abbreviations the dump uses that are not already rows. Do not rewrite, reorder, or edit existing rows. Do not change a Meaning cell that already has text. Source is the dump. Do not invent terms, expansions, or definitions. Do not write TBD or to be decided. A row is only a word or abbreviation the dump already uses. When that same dump already says the expansion or meaning, put that text in Meaning. When the dump never says what it means, set Meaning to `to be researched`. Skip ordinary English. A code identifier is not a row unless the dump already treats that word as a term. Write the file even when it has no rows. This write is not an apply option, and it does not rewrite any other landscape file except the picture update below. Do not list a rewrite of existing rows.
 
@@ -129,6 +131,7 @@ Do not plan. Do not implement. Do not commit. Do not run `/crav1-finalize-commit
 Output only:
 
 - Each `docs/specs/<slug>/spec.md` that gained a new quote
+- Each source folder `docs/sources/YYYY-MM-DD-<slug>/` this pass wrote, or that none was written
 - What was added (their quotes, labeled new) and what was already there
 - The does-not-fit list, left alone. If they asked for a new spec, which existing skill you pointed at
 - `glossary.md` when this turn created it or appended rows. If `docs/system/` was missing, say no glossary was written. If no new rows were appended, say so

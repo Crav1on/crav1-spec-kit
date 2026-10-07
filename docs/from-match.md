@@ -59,6 +59,8 @@ docs/specs/<slug>/
 
 Human starter copies for the landscape are `docs/system/_template/` (same files as this skill’s `assets/` for landscape, repos, diagrams, glossary, and ADRs). The slice file starts from the skill’s `assets/spec.md`.
 
+A mail, a transcript, a chat, a screenshot, or another original that a quote comes from is written under `docs/sources/YYYY-MM-DD-<slug>/`. The spec `Source:` and `Trace:` lines link to that folder. This command does not commit.
+
 **Done** and **partial** specs record the match status, what the dump says, the repo paths that support the slice, what was read from the code versus what was only in the dump, and open questions. Normal spec sections appear only where the dump or the code supports them. The command does not invent acceptance criteria to make a slice look buildable.
 
 **Not in the code** stays thin: what the dump says, that the code does not have it, open questions, and an empty trace. More information can be added later, until planning. This command does not add it.

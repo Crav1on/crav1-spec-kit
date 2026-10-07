@@ -6,7 +6,10 @@ description: >-
   Does not create a glossary. A missing row on an existing glossary can be
   one listed edit. It is not written unless apply is chosen. A meaning the
   new information does not state is `to be researched`.
-  Does not write application code. Does not plan, implement, or commit.
+  An imported mail, transcript, chat, screenshot, or other original
+  follows references/sources.md and is written under docs/sources/
+  before the quote. Does not write application code. Does not plan,
+  implement, or commit.
 disable-model-invocation: true
 icon: file-plus
 color: blue
@@ -36,9 +39,11 @@ When `/crav1-suggest-tests-for-code` hands one suggestion for an existing spec, 
 
 ## From /crav1-meeting-to-specs
 
-When `/crav1-meeting-to-specs` hands one kept addition for an existing spec, the spec is the one that skill already named. Do not ask for a slug. Do not create a slug. Do not create a folder.
+When `/crav1-meeting-to-specs` hands one kept addition for an existing spec, the spec is the one that skill already named. Do not ask for a slug. Do not create a slug. Do not create a spec folder. A source folder that handoff already wrote stays. When it wrote none and the quote is an imported source, **Imported sources** writes that folder.
 
-The handoff passes the kind and the date. The kind is `meeting`, `email`, or `chat`. Quote the item. Do not replace it with a paraphrase. A `State:` line is not part of the quote. Do not write it. The quote starts with `From <kind> <date>.` when the handoff includes a date, otherwise `From <kind>.` Examples: `From email 2026-10-06.`, `From meeting.` Do not invent a kind or a date. Keep the speaker and the time in the quote when the input showed them. Label it `**New:**` in the section the words belong to, the same way any other new quote is labeled.
+The handoff passes the kind and the date, and the source folder when that skill already wrote one. The kind is `meeting`, `email`, or `chat`. Quote the item. Do not replace it with a paraphrase. A `State:` line is not part of the quote. Do not write it. The quote starts with `From <kind> <date>.` when the handoff includes a date, otherwise `From <kind>.` Examples: `From email 2026-10-06.`, `From meeting.` Do not invent a kind or a date. Keep the speaker and the time in the quote when the input showed them. Label it `**New:**` in the section the words belong to, the same way any other new quote is labeled.
+
+When the handoff includes a source folder, add the `Source:` and `Trace:` lines from [references/sources.md](references/sources.md). Do not ask the mail, binary, or personal-data questions again. Do not write a second copy of that folder. When the handoff has no folder and the quote is an imported source, follow **Imported sources** before the quote.
 
 Then run **Add to that spec.md** and **Impact** in this skill. The impact check still runs. Do not skip it. Do not write `plan.md` or `tasks.md`. Do not change application code. Do not start Specify, Plan, or Build. Do not ask the picture offer. That offer is only the environment-read and suggest-tests handoffs.
 
@@ -68,9 +73,17 @@ If they did not name one, they named a folder that is not there, they named more
 
 Stop until they pick, when a pick is required.
 
+## Imported sources
+
+When the new information is a mail, a transcript, minutes, a chat, a screenshot, a diagram, or another original file that will be quoted, or a paste of a mail, transcript, minutes, or chat, follow [references/sources.md](references/sources.md) (drop-in: `.claude/skills/crav1-add-to-spec/references/sources.md`; plugin: this skill’s `references/sources.md`).
+
+Write `docs/sources/YYYY-MM-DD-<slug>/` once for that source, before the quote, when this run has not already written that folder. Then add the `Source:` and `Trace:` lines on the quote. Do not commit.
+
+A short fact the user typed, an environment-read fact, and a test suggestion are not imported sources. Do not write `docs/sources/` for those.
+
 ## Add to that spec.md
 
-Edit only `docs/specs/<slug>/spec.md` in this step.
+Edit `docs/specs/<slug>/spec.md` in this step. An imported source also writes `docs/sources/YYYY-MM-DD-<slug>/` and, after a yes, one `.gitattributes` line, as [references/sources.md](references/sources.md) says. Do not write any other file in this step.
 
 - Quote their words. The quote is the record. Do not replace it with a paraphrase.
 - Label what is new versus what was already there.
@@ -86,7 +99,7 @@ Labels, in the section the words belong to:
 - `**Already there:**` — do not paste a second copy. Leave the existing sentence. Say in the report which heading already had it.
 - `**Inferred:**` — a connection you drew. Not an accepted fact.
 
-When the file already has `## Trace`, append one line: what this pass marked new, already there, and inferred. Do not create `## Trace` only for that line.
+When the file already has `## Trace`, append one line: what this pass marked new, already there, and inferred. Do not create `## Trace` only for that line. An imported source is the exception: the `Source:` and `Trace:` lines in [references/sources.md](references/sources.md) are required, and `## Trace` is created when it is missing so that line has a heading.
 
 A thin spec (match status `not in the code`, or only Match / What the dump says / In the code / Trace / Open questions) stays thin. Put the quote under the heading it belongs to. Add a heading only when their words are that content. Do not add Problem, Goals, Users and journeys, or Acceptance criteria to fill the file out. Do not add `## In the code` unless their words name code that is there.
 
@@ -100,7 +113,7 @@ Read `docs/system/` when it exists (`landscape.md`, `repos.md`, `diagrams.md`, `
 
 Section names for that read, not a file to paste over what exists: this skill’s `assets/system/` (same files as `docs/system/_template/`, including `glossary.md`; drop-in: `.claude/skills/crav1-add-to-spec/assets/system/`; plugin: this skill’s `assets/system/`).
 
-Do not edit anything outside the target spec in this step. Do not seed `docs/system/` when it is missing. Say it is missing and that this command does not create it. Do not create `glossary.md`.
+Do not edit anything outside the target spec in this step. A source folder already written under **Imported sources** stays. It is not an impact edit. Do not seed `docs/system/` when it is missing. Say it is missing and that this command does not create it. Do not create `glossary.md`.
 
 When `glossary.md` exists, a missing row that the new information uses can be one of the listed edits to `docs/system/`. When the new information already states the expansion or meaning, that text is Meaning. When it does not, Meaning is `to be researched`. Do not invent the term or the meaning. Do not write TBD or to be decided. Do not rewrite, reorder, or edit an existing row. Do not change a Meaning cell that already has text. Do not write the new row unless they pick apply. A missing `glossary.md` is not a listed edit.
 
@@ -123,6 +136,7 @@ Do not plan. Do not implement. Do not commit. Do not run `/crav1-finalize-commit
 Output only:
 
 - Target `docs/specs/<slug>/spec.md`
+- Source folder `docs/sources/YYYY-MM-DD-<slug>/` when this pass wrote one, or that none was written
 - What was added (their quotes, labeled new) and what was already there
 - Impact: nothing else, or the one-line edit list and which option they picked
 - Next: `/crav1-finalize-commit` if any file changed (no push). `/crav1-plan-from-spec` only if they say they want to start planning this slug. Do not run either.

@@ -6,7 +6,7 @@ Use this when you have **1–N files** (notes, markdown, screenshots, diagrams, 
 
 You still do **not** start by coding. The command writes a **landscape** under `docs/system/`, then one `docs/specs/<slug>/` per accepted v0 feature. Later features do **not** re-run this command.
 
-One-liner? [from-nothing](from-nothing.md) (`/crav1-spark-to-spec`). One unstructured pile that is clearly one feature and one repo? [from-ideas](from-ideas.md) (`/crav1-ideas-to-spec`). Minutes, a transcript, an email, or a chat thread to match against specs that already exist? [from-meeting](from-meeting.md) (`/crav1-meeting-to-specs`). That command writes nothing itself.
+One-liner? [from-nothing](from-nothing.md) (`/crav1-spark-to-spec`). One unstructured pile that is clearly one feature and one repo? [from-ideas](from-ideas.md) (`/crav1-ideas-to-spec`). Minutes, a transcript, an email, or a chat thread to match against specs that already exist? [from-meeting](from-meeting.md) (`/crav1-meeting-to-specs`). When a kept addition imports a source, that command writes `docs/sources/YYYY-MM-DD-<slug>/` and does not write the spec. It does not commit.
 
 ## First prompt
 
@@ -64,6 +64,8 @@ docs/specs/<slug>/
   adr/
   export/
 ```
+
+A mail, a transcript, a chat, a screenshot, or another original that a quote comes from is written under `docs/sources/YYYY-MM-DD-<slug>/` before the slice specs. The spec `Source:` and `Trace:` lines link to that folder. This command does not commit.
 
 Human starter copies: `docs/system/_template/` (same files as skill `crav1-intake-to-specs` `assets/` for landscape, including `glossary.md`, and as `assets/system/` on `crav1-spark-to-spec` and `crav1-ideas-to-spec`). `repos.md` includes a `Synced at` column. Where this run reads a whole repo, it sets that repo's cell and touches only those repos. Where this run reads only one slice, it does not touch the column. It writes or updates `Synced at: <repo> <branch>@<short sha>, <date>` in that slice's `spec.md`. Notes alone are not a repo read. Feature spec shape matches ideas-to-spec plus **Repos**, **Constraints**, **Assumptions**, **Trace**.
 
