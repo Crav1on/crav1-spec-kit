@@ -88,7 +88,7 @@ The same list is where a lone user sees the ways to start: [plugins/crav1/README
 
 `/crav1-merge-pr` may run from any lane, and only when the user explicitly asks in that turn to merge a named pull request. It does not move work into Specify, Plan, or Build.
 
-`/crav1-review-pr` may run from any lane, and only when the user names an open pull request (number or URL) in that turn, or clearly asks to review that pull request. It does not move work into Specify, Plan, or Build. It only names the lane for a finding. Spark, specify, and verify do not run it.
+`/crav1-review-pr` may run from any lane, and only when the user names an open pull request (number or URL) in that turn, or clearly asks to review that pull request. It does not move work into Specify, Plan, or Build. It only names the lane for a finding. A pull request with no `plan.md` or `tasks.md` for its slug was built outside the kit. That is an info note, not a fix finding. It does not report a missing `verify.md`. It reads the test results that pull request's own pipeline already recorded and does not run tests. It names `/crav1-keep-current` after that pull request merges and does not run it. A pull request that has a plan keeps the plan and `verify.md` checks. Spark, specify, and verify do not run it.
 
 `/crav1-security-review` may run from any lane, and only after architecture already exists (`docs/system/` or a spec that already describes the design). The same command reviews the whole system, one existing spec, or the change in front of us. It does not move work into Specify, Plan, or Build. Spark, plan, and verify do not run it.
 

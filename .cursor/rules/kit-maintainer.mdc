@@ -145,7 +145,7 @@ Starter options, when the user asks for startup options: `/crav1-spark-to-spec`,
   Exception: the worker commits immediately and skips the menu.
 - `/crav1-open-pr` — Reads the change branch, the spec folder, `verify.md`, and `work-item.md` when it exists. Writes one pull request after an explicit yes to push. Leaves new commits and the merge alone. Called by the user. Calls no skill.
   Exception: names `/crav1-review-pr` and `/crav1-merge-pr` and does not run them.
-- `/crav1-review-pr` — Reads one named open pull request, its diff, the spec, the plan, `verify.md`, the body, and the required linter. Writes nothing. Leaves code, the spec, the plan, comments, and the merge alone. Called by the user. Calls no skill.
-  Exception: spark, specify, verify, `/crav1-open-pr`, and `/crav1-merge-pr` do not run it.
+- `/crav1-review-pr` — Reads one named open pull request, its diff, the spec, the body, and the required linter. When the slug has `plan.md`, also reads the plan and `verify.md`. When the slug has no `plan.md` or `tasks.md`, reads the pipeline's recorded test results instead and does not treat a missing `verify.md` as a finding. Writes nothing. Leaves code, the spec, the plan, comments, and the merge alone. Called by the user. Calls no skill.
+  Exception: spark, specify, verify, `/crav1-open-pr`, and `/crav1-merge-pr` do not run it. An outside pull request names `/crav1-keep-current` after merge and does not run it.
 - `/crav1-merge-pr` — Reads one named pull request. Writes a merge commit on the host, and fast-forwards local default when the tree is clean after a confirmed two-parent merge. Leaves squash, rebase, branch deletion, and work-item links alone. Called by the user. Calls no skill.
   Exception: a required red host check stops it. It does not run `/crav1-review-pr`.
