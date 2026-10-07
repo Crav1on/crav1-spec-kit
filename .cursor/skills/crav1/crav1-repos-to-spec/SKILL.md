@@ -5,10 +5,12 @@ description: >-
   lanes can extend (docs/architecture/spec.md) when that file is missing,
   docs/architecture/left-out.md beside it for guesses that stay left
   out, and the docs/system/ notes /crav1-explain reads when those notes
-  are missing. When a real system note is already there, leave it and
+  are missing.   When a real system note is already there, leave it except the
+  Synced at cell of a repo this run read, and
   write only the missing architecture spec and the left-out file. When
   the architecture spec or those notes are already there, a later
-  re-read adds only what is new and does not rewrite those lines. A
+  re-read adds only what is new and does not rewrite those lines,
+  except that Synced at cell. A
   re-read also reads left-out.md and removes a line when the code shows
   it. A fact the code shows is confirmed. Before any file is written,
   confirm in sections: one per named repo, one for inferred guesses, one
@@ -187,7 +189,7 @@ A fact, link, guess, row, node, or edge that is already written is not new. Do n
 | --- | --- |
 | `spec.md` | The sections in `assets/spec.md`. Confirmed facts under **Confirmed** and under the repo heading, each with a path. Accepted guesses only under **Accepted from a guess**, each saying the code does not show it. Leave that section empty when they accepted none. Under **How the repos connect**, one line per link the code shows, with the path. When only one repo was named, the only line is `Only one repo was named.` When more than one repo was named and the code shows no link, the only line is `No link between these repos is in the code.` **Open questions** name what the code does not show. A guess they did not accept stays out of this file. Do not add a Left out heading. |
 | `landscape.md` | One short paragraph of what the code shows these repos are. Replace the template sentence. Under `## How the parts connect`, one line per link the code shows. When only one repo was named, one line: `Only one repo was named.` When more than one repo was named and the code shows no link, one line: `No link between these repos is in the code.` **v0** is the architecture the code already shows, in one line. Leave **Later** empty. Bulk assumptions are confirmed facts only. When the code states none, write `None the code states.` Constraints are only ones the code shows. When it shows none, write `None the code states.` Leave the feature index empty until the spec file exists, then one row: slug `architecture`, spec `docs/architecture/spec.md`, Repos column lists the destination and the named repos, Notes `architecture`. |
-| `repos.md` | Every named repo, plus the destination when it is the new clean repo. Status `exists` when the checkout is a real repo. Put the URL when the checkout has one. The new clean repo stays without a remote. Boundaries only when the code shows one. |
+| `repos.md` | Every named repo, plus the destination when it is the new clean repo. Status `exists` when the checkout is a real repo. Put the URL when the checkout has one. The new clean repo stays without a remote. Boundaries only when the code shows one. Include the `Synced at` column. For each repo this run read, set that cell as under **Synced at** below. A new clean repo with no commit stays empty. |
 | `diagrams.md` | One context diagram. Replace the sample. One heading, one sentence, one fence. Nodes are the named repos. An edge only when the code shows that link. When only one repo was named, one node and no edge, and the sentence says only one repo was named. When more than one repo was named and the code shows no link, draw the nodes and no edge, and the sentence says no link was found. Do not invent a user, a service, or a queue. |
 | `glossary.md` | From `assets/system/glossary.md`. See the glossary rules below. |
 | `adr/` | Only where the code shows a real choice, with real alternatives. Otherwise write no ADR. A guess is not an ADR. |
@@ -210,7 +212,7 @@ When the code still does not show a left-out line, the line stays under `## Left
 
 ### Missing architecture spec
 
-A real note is already in `docs/system/`, and `docs/architecture/spec.md` is missing. Write that spec, using the `spec.md` row above, and write the left-out file. Leave every file under `docs/system/` as it is. Do not add a line. Do not rewrite a line. Do not fill a gap in those notes on this pass. Do not run `/crav1-keep-current`.
+A real note is already in `docs/system/`, and `docs/architecture/spec.md` is missing. Write that spec, using the `spec.md` row above, and write the left-out file. Leave every file under `docs/system/` as it is. The one exception is the `Synced at` cell under **Synced at** below, and only when `repos.md` already exists. Do not add any other line. Do not rewrite any other line. Do not create `repos.md` on this pass. Do not fill a gap in those notes on this pass. Do not run `/crav1-keep-current`.
 
 ### Later re-read
 
@@ -225,7 +227,7 @@ A real note is already in `docs/system/`, and `docs/architecture/spec.md` is mis
 - Short description: keep every sentence. When a confirmed fact is not already named there, add one sentence at the end. Do not rephrase a sentence that is already there.
 - `## How the parts connect`: append one line per new link the code shows that is not already a line. Do not edit a line that is already there.
 - Diagram: keep every existing node and edge. Append a node or an edge the code shows that the fence does not already show. Do not rename a node. Do not redraw the fence. Do not invent a user, a service, or a queue. When the fence is still the template sample, replace that sample. It is not a real diagram.
-- `repos.md`: append a row for a named repo that is not already listed. Do not rewrite an existing row.
+- `repos.md`: append a row for a named repo that is not already listed. Include `Synced at` on that row, set as under **Synced at** below. Do not rewrite an existing row except that cell for a repo this run read.
 - `glossary.md`: append a new row only for a word the code already uses that is not already a row. Do not rewrite an existing row. The glossary rules above still apply. An accepted guess does not add a row.
 - Feature index: when `docs/architecture/spec.md` exists and the architecture row is missing, append that one row. Do not rewrite other rows.
 - `adr/`: do not rewrite an existing ADR. Write a new ADR only when the code shows a real choice, with real alternatives, that is not already an ADR. A guess is not an ADR.
@@ -237,6 +239,16 @@ Do not run `/crav1-keep-current`. This pass is the add.
 
 Do not write `plan.md`, `tasks.md`, `diagrams.md` inside the spec folder, `adr/` inside the spec folder, `export/`, `verify.md`, `fix-log.md`, `security.md`, or `work-item.md`. `docs/architecture/left-out.md` is the file for guesses that stay left out. Do not read `work-item-offer.md`. Do not write application code. Do not design the next feature. No goals for a feature, no acceptance list for work to build, no “should”.
 
+## Synced at
+
+This command reads each named repo as a whole. Record the commit actually read. `Synced at` is `<branch>@<short sha>, <date>`. A repo may list several branches, separated by `; `. Example: `main@abc1234, 2026-10-07; develop@def5678, 2026-10-06`. The branch is the branch that was read. The short sha is seven characters. The date is the date of that read, `YYYY-MM-DD`.
+
+Set that repo's `Synced at` cell to the branch and commit actually read. When that branch is already listed, replace that branch's entry. Leave every other branch in the cell. Touch only the repos this run read. Do not change Purpose, Status, URL, or Boundaries. When the column is missing and `repos.md` exists, add the column. Other repos' new cells stay empty. A checkout with no commit stays empty. Do not write a slice `Synced at` line. This command does not write `docs/specs/<slug>/spec.md`.
+
+On the missing-architecture pass, update that cell only when `repos.md` already exists. Do not create the file on that pass.
+
+Do not stamp a repo this run did not read. An empty cell stays empty. A consumer measuring drift uses the older of the repo column and the slice line, and an empty value means unknown, so fall back to spec file commit dates.
+
 ## Stop
 
 Do not plan. Do not implement. Do not commit. Do not start Specify, Plan, or Build. Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-match-to-specs`, `/crav1-code-into-specs`, `/crav1-plan-from-spec`, `/crav1-implement-task`, `/crav1-explain`, `/crav1-keep-current`, or `/crav1-finalize-commit`.
@@ -244,7 +256,7 @@ Do not plan. Do not implement. Do not commit. Do not start Specify, Plan, or Bui
 Output only:
 
 - Which pass: first write, missing architecture spec, or later re-read
-- Paths written. On a missing architecture spec, say the system notes were left as they are. On a later re-read, name each file that got a new line or lost a left-out line, or say that file is current
+- Paths written. On a missing architecture spec, say the system notes were left as they are, and name a `Synced at` cell when that was the exception. On a later re-read, name each file that got a new line or lost a left-out line, or say that file is current. Name each `Synced at` cell this run set.
 - Counts: confirmed facts written, guesses accepted, guesses left out, guesses dismissed
 - Whether the code shows a link, or that no link was found
 - Next: `/crav1-finalize-commit` when a file changed (no push). When nothing was written, name no command. Do not run it. The lanes can extend `docs/architecture/spec.md` in a later turn. Do not start that turn.

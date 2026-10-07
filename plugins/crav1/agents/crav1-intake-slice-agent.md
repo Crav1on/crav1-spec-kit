@@ -14,7 +14,7 @@ Follow **`crav1-intake-to-specs` `references/worker.md`** in full:
 
 Templates: this agent’s `agent-assets/crav1-intake-slice-agent/` (drop-in: `.cursor/agent-assets/crav1-intake-slice-agent/`; plugin: `agent-assets/crav1-intake-slice-agent/`) and the parent skill’s `assets/`. Export recipes: `crav1-ideas-to-spec` `references/formats.md`. Slice diagram recipe: `crav1-ideas-to-spec` `references/diagrams.md`.
 
-The parent passes: slug, cluster, `docs/system/` paths, intent vs context refs, bulk `A#`s, mushy answers if any, export format(s), allowed repos.
+The parent passes: slug, cluster, `docs/system/` paths, intent vs context refs, bulk `A#`s, mushy answers if any, export format(s), allowed repos, and `Synced at` only when the parent read only this slice.
 
 Landscape ADRs win. Do not edit `docs/system/`. Do not interview. Do not write code. Do not write `work-item.md`. Do not start another slug.
 

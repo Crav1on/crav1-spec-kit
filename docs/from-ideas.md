@@ -75,7 +75,7 @@ docs/specs/<slug>/
   export/openspec/        # if you chose OpenSpec
 ```
 
-`docs/system/` uses the same landscape, repos, diagram, glossary, and ADR templates intake writes. When that folder already exists, this command does not rewrite lines that are already there. A missing `glossary.md` is written. New rows are appended. A meaning the source does not state is `to be researched`. The picture update adds what is new to the short description, the diagram, and how the parts connect.
+`docs/system/` uses the same landscape, repos, diagram, glossary, and ADR templates intake writes. `repos.md` includes a `Synced at` column. When this run reads a whole repo, it sets that repo's cell and touches only those repos. When this run reads only one slice, it does not touch the column. It writes or updates `Synced at: <repo> <branch>@<short sha>, <date>` in that slice's `spec.md`. When that folder already exists, this command does not rewrite lines that are already there, except that cell on a whole-repo read. A missing `glossary.md` is written. New rows are appended. A meaning the source does not state is `to be researched`. The picture update adds what is new to the short description, the diagram, and how the parts connect.
 
 ADRs use the MADR-shaped template in skill `crav1-ideas-to-spec` `assets/adr.md` (Cursor drop-in: `.cursor/skills/crav1/crav1-ideas-to-spec/assets/adr.md`; Claude Code drop-in: `.claude/skills/crav1-ideas-to-spec/assets/adr.md`; same as `docs/specs/_template/adr.md`). Status starts as `proposed`. Hunches with no alternative belong under Constraints, not as ADRs.
 

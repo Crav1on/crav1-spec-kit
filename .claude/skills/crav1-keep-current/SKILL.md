@@ -3,7 +3,10 @@ name: crav1-keep-current
 description: >-
   Update the picture in docs/system/ when something was added. Add what is
   new to the short description, the diagram, and how the parts connect.
-  Do not rewrite what is already there. Do not design the change. Do not
+  Do not rewrite what is already there. When this run reads a whole repo,
+  set that repo's Synced at cell and touch only those repos. When it
+  reads only one slice, write the slice Synced at line and do not touch
+  the column. Do not design the change. Do not
   build it. Can run on its own. Spark, ideas, intake, match, and any
   sibling that already appends a glossary row run this same update and
   still do not rewrite existing glossary rows. The skill that reads named
@@ -52,6 +55,16 @@ From a caller: what is new is only what that pass added. Do not open a second in
 
 A part or a connection the source does not state is not new.
 
+## Synced at
+
+Reading spec files is not reading a repo. The alone path does not set `Synced at` from those files, and it does not stamp the docs repo because the picture was updated.
+
+When this run reads a whole repo, set that repo's `Synced at` cell in `docs/system/repos.md`. That cell is the only edit to `repos.md`. `Synced at` is `<branch>@<short sha>, <date>`. A repo may list several branches, separated by `; `. Example: `main@abc1234, 2026-10-07; develop@def5678, 2026-10-06`. The branch is the branch that was read. The short sha is seven characters. The date is the date of that read, `YYYY-MM-DD`. When that branch is already listed, replace that branch's entry. Leave every other branch in the cell. Touch only the repos this run read. Do not change Purpose, Status, URL, or Boundaries. When the column is missing, add it. Other repos' new cells stay empty. When that repo has no row, do not add one. Do not create `repos.md` when it is missing. Do not write a slice `Synced at` line for a repo this run read as a whole.
+
+When this run reads only one slice, do not touch the repo column. Write or update a line in that slice's `spec.md`, after the title and before the first heading: `Synced at: <repo> <branch>@<short sha>, <date>`. That line is the only edit to `spec.md`. One line per repo. Update the line for that repo. Leave other `Synced at` lines.
+
+Do not stamp a repo or a slice this run did not read. An empty cell stays empty. A consumer measuring drift uses the older of the repo column and the slice line, and an empty value means unknown, so fall back to spec file commit dates.
+
 ## Write
 
 Follow [references/picture.md](references/picture.md). Three places only:
@@ -69,6 +82,7 @@ Do not plan. Do not implement. Do not commit. Do not run `/crav1-explain`, `/cra
 Output only:
 
 - What was added to the picture (file, and the sentence, node, edge, or connection line), or that the picture is current
+- `Synced at` cell or slice line written, or that none was written
 - Next: `/crav1-finalize-commit` when a file changed (no push). When nothing was written, name no command. Do not run it.
 
 ## Style

@@ -8,7 +8,7 @@ The picture is three places in `docs/system/`:
 
 File shape: this skill’s `assets/landscape.md` and `assets/diagrams.md` (same files as `docs/system/_template/landscape.md` and `docs/system/_template/diagrams.md`; drop-in: `.cursor/skills/crav1/crav1-keep-current/assets/`; plugin: this skill’s `assets/`).
 
-Add what is new. Do not rewrite what is already there. Do not design a change. Do not build it. Do not write `glossary.md`. Do not edit `spec.md`, `plan.md`, `tasks.md`, `repos.md`, `adr/`, `security.md`, or application code.
+Add what is new. Do not rewrite what is already there. Do not design a change. Do not build it. Do not write `glossary.md`. Do not edit `spec.md`, `plan.md`, `tasks.md`, `repos.md`, `adr/`, `security.md`, or application code. A `Synced at` cell or a slice `Synced at` line is not a picture edit. The skill that read the code writes it. This picture update does not.
 
 ## What counts as new
 

@@ -43,7 +43,7 @@ Only the three picture places. Starters: [docs/system/_template/landscape.md](sy
 
 An empty short description (the template sentence) is filled with one sentence the specs already support. An empty diagram (the template sample) is replaced with the parts the specs already name. After that, later runs only append.
 
-No feature-index row from this command. No glossary row. No `spec.md`. No `plan.md`. No `tasks.md`. No application code.
+No feature-index row from this command. No glossary row. No `plan.md`. No `tasks.md`. No application code. Reading specs does not set `Synced at`. When this run reads a whole repo, it sets that repo's `Synced at` cell in `repos.md` and touches only those repos. When this run reads only one slice, it does not touch the column. It writes or updates `Synced at: <repo> <branch>@<short sha>, <date>` in that slice's `spec.md`. A consumer measuring drift uses the older of the repo column and the slice line, and an empty value means unknown, so fall back to spec file commit dates.
 
 ## After
 

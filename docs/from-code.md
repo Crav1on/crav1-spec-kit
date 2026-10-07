@@ -52,7 +52,7 @@ The matching `docs/specs/<slug>/spec.md` files, for what the change does that wa
 
 Other `docs/system/` files and other specs change only when apply is picked. Each of those edits was listed in one line (file and what would change). Leaving them alone writes nothing outside the specs that received new quotes, except the glossary gap below.
 
-No `plan.md`. No `tasks.md`. No application code. A missing `docs/system/` is not seeded here. A missing `glossary.md` is a gap fill only when `docs/system/` already exists. When that file exists, only new rows are appended. Existing rows are not rewritten. A meaning the change does not state is `to be researched`. When `docs/system/` already exists, that same pass adds what is new to the short description, the diagram, and how the parts connect. It does not rewrite what is already there. The pile that fits none of the specs is not a new spec folder.
+No `plan.md`. No `tasks.md`. No application code. A missing `docs/system/` is not seeded here. A missing `glossary.md` is a gap fill only when `docs/system/` already exists. When that file exists, only new rows are appended. Existing rows are not rewritten. A meaning the change does not state is `to be researched`. When `docs/system/` already exists, that same pass adds what is new to the short description, the diagram, and how the parts connect. It does not rewrite what is already there. A whole-repo read sets that repo's `Synced at` cell. A one-slice read writes `Synced at: <repo> <branch>@<short sha>, <date>` on that slice's `spec.md` and does not touch the column. That stamp is not an apply option. The pile that fits none of the specs is not a new spec folder.
 
 ## After
 
