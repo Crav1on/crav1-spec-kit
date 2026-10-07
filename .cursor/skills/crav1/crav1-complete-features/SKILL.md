@@ -116,6 +116,18 @@ Remind: **no push, no PR** from this skill. Next (optional): `/crav1-open-pr` wh
 
 Then **tool-approvals.md → Undo** once. Do not undo per slug or per `T#`.
 
+## Picture offer
+
+When this run marks a slug `done` on the board, or a slice on this board is marked `retired`, ask once at the end, after the board TL;DR. A slice is marked `retired` when the user says it is retired in this run, or that slug’s feature-index Notes or `## Match` status says `retired`. Do not write `retired` into a file. Do not edit `spec.md`.
+
+Ask once for the board, not once per slug. The question is exactly:
+
+The system picture may now be out of date. Run `/crav1-keep-current`?
+
+Options are yes and no. Use the questions tool when it is available. Do not run `/crav1-keep-current`. A yes waits for a later turn. A no ends without that command.
+
+Do not ask when no slug was marked done and none was marked retired. Do not add this question to `/crav1-implement-task` or `/crav1-complete-task`.
+
 ## Hard rules
 
 - Orchestration only: no product edits, no `git commit`, no push, no PR, no `spec.md` edits.
