@@ -10,7 +10,7 @@ It is a later skill. It is not a starter option. When the user asks for startup 
 
 [Intake](from-intake.md) starts a landscape and new feature slugs from a dump. It does not match items against specs that already exist. [Add](from-add.md) takes one piece of new information for one existing spec. This command extracts many items, matches them, and hands one kept addition to add-to-spec.
 
-The command writes nothing itself. The input is not copied into the repo. Only a quote the user keeps as an addition reaches a spec, through `/crav1-add-to-spec`.
+When a kept addition quotes a mail, a transcript, a chat, a screenshot, or another original, the command writes that source under `docs/sources/YYYY-MM-DD-<slug>/`, with the original files and a `README.md`, following the imported-sources convention. It does not write the spec. It does not commit. The quote reaches the spec through `/crav1-add-to-spec`, and that spec's `Source:` and `Trace:` lines link to the folder. A leave, a dismiss, a kept new feature, and a kept bug do not write the folder.
 
 ## First prompt
 
@@ -20,7 +20,7 @@ New chat. Paste the minutes, transcript, email, or chat, or `@` the file.
 /crav1-meeting-to-specs
 @<minutes, transcript, Teams or Zoom export, email, or chat thread>
 
-Extract what matters for features. Match it to the specs we already have. Do not write a file.
+Extract what matters for features. Match it to the specs we already have. Do not write a spec. Do not commit.
 ```
 
 That slash command *is* the prompt.
@@ -38,7 +38,7 @@ If the message has no input and no `@`, the command stops. Options only. It does
 | Build state | Read the line | One `State:` line on each item that matches a spec, in the list and in the question. `Fits: none` has no state line |
 | One at a time | Keep, leave, or dismiss | One item. The state line is on that question. The options stay keep, leave, or dismiss. Dismiss is for this run only. The next run starts fresh |
 | Keep | Glance | Addition goes through `/crav1-add-to-spec`. New feature or bug only names the next command |
-| Stop | Counts | Writes nothing itself. Does not start Specify, Plan, or Build |
+| Stop | Counts | Writes the source folder when a kept addition imports a source. Does not write a spec. Does not commit. Does not start Specify, Plan, or Build |
 
 ## Build state
 
@@ -59,9 +59,11 @@ The line does not change the options. It is not written. It is not part of the q
 
 ## What gets written
 
-This command writes no files. No `docs/system/`. No new spec folder. No marks. No dismissals file. The input stays out of the repo.
+For a kept addition that imports a source, `docs/sources/YYYY-MM-DD-<slug>/`: the original files, unchanged except where the convention says otherwise, and a `README.md`. The README says what it is, the sender or the participants, the date and the time, and how it was converted. A mail is a `.eml` file with CRLF line endings kept. A binary file is one of four choices, asked one file at a time. Personal details are flagged before the files are written. The command does not commit.
 
-A kept addition is a quote on the existing `spec.md`, written by `/crav1-add-to-spec`. The handoff passes the kind and the date. The quote starts with `From <kind> <date>.` when there is a date, otherwise `From <kind>.` Examples: `From email 2026-10-06.`, `From meeting.` One kind and one date apply to every item. The impact check still runs there. Other files change only when apply is picked.
+No `docs/system/`. No new spec folder. No marks. No dismissals file.
+
+A kept addition is a quote on the existing `spec.md`, written by `/crav1-add-to-spec`. The handoff passes the kind, the date, and the source folder when one was written. The quote starts with `From <kind> <date>.` when there is a date, otherwise `From <kind>.` Examples: `From email 2026-10-06.`, `From meeting.` The spec `Source:` and `Trace:` lines link to the source folder. One kind and one date apply to every item. The impact check still runs there. Other files change only when apply is picked.
 
 A left item is not written. A dismissed item is not written. The state line is not written. The next run can offer a left or dismissed item again.
 
@@ -81,4 +83,4 @@ When a file changed and the user wants it in git:
 /crav1-finalize-commit
 ```
 
-That puts the spec lines in git. No push. This command does not commit.
+That puts the spec lines, and any source folder this command wrote, in git. No push. This command does not commit.

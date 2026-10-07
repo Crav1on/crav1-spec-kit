@@ -87,6 +87,10 @@ When this run reads only one slice, do not touch the repo column. Write or updat
 
 Do not stamp a repo or a slice this run did not read. An empty cell stays empty. A consumer measuring drift uses the older of the repo column and the slice line, and an empty value means unknown, so fall back to spec file commit dates.
 
+## Imported sources
+
+When an intake file is a mail, a transcript, minutes, a chat, a screenshot, a diagram, or another original that will be quoted into a spec, follow the imported-sources convention before the slice specs are written (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/references/sources.md`; plugin: sibling `skills/crav1-add-to-spec/references/sources.md`). Write each source folder once. Pass each folder path to the worker that quotes it. The worker writes the `Source:` and `Trace:` lines and does not import the file again. Do not commit. A file that is not an imported source does not get a folder.
+
 ## Slice specs
 
 Launch **crav1-intake-slice-agent** once per accepted **v0** slug. Later items stay on the landscape as later — do not spec them now.
@@ -105,7 +109,7 @@ After workers return, update `docs/system/landscape.md` feature index: slug → 
 
 Then output only:
 
-- Paths written (`docs/system/` and each `docs/specs/<slug>/`, plus any picture lines added)
+- Paths written (`docs/system/`, each `docs/specs/<slug>/`, any source folder `docs/sources/YYYY-MM-DD-<slug>/`, plus any picture lines added)
 - Ready vs interviewed slugs
 - ADRs (landscape vs slice) vs still open
 - 3–5 remaining arguments

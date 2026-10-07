@@ -8,9 +8,10 @@ description: >-
   keep, leave, or dismiss. Dismiss is for this run only. A kept addition
   goes to that spec
   through /crav1-add-to-spec. The quote label follows the kind and the
-  date. A kept new feature or bug only names the next command. Writes
-  nothing itself. Does not start Specify, Plan, or Build. Cross-cutting.
-  Not a starter option.
+  date. When a kept addition imports a source, writes
+  docs/sources/YYYY-MM-DD-<slug>/ and does not write the spec. Does not
+  commit. A kept new feature or bug only names the next command. Does
+  not start Specify, Plan, or Build. Cross-cutting. Not a starter option.
 disable-model-invocation: true
 icon: messages-square
 color: purple
@@ -179,11 +180,13 @@ A batch (`M1 keep, M2 leave`) applies only the items named in that batch, in ord
 
 Follow the case already on that item.
 
-**Addition.** When one spec fits, hand the quote to `/crav1-add-to-spec` for that slug. Pass the kind and the date for this run. When there is no date, pass the kind only. Do not pass the `State` line. It is not quote text. Follow only the handoff **From /crav1-meeting-to-specs** in that skill (drop-in: `.claude/skills/crav1-add-to-spec/SKILL.md`; plugin: sibling `skills/crav1-add-to-spec/SKILL.md`). One item. Then stop that handoff. The impact check still runs there. Do not write the spec in this skill. Do not create a slug.
+**Addition.** When one spec fits, and this source is not yet imported, follow the imported-sources convention before the handoff (drop-in: `.claude/skills/crav1-add-to-spec/references/sources.md`; plugin: sibling `skills/crav1-add-to-spec/references/sources.md`). Write `docs/sources/YYYY-MM-DD-<slug>/` once for that source. Do not commit. A later kept addition from the same source reuses that folder. Do not ask those questions again.
+
+Then hand the quote to `/crav1-add-to-spec` for that slug. Pass the quote after any redaction that convention made. Pass the kind and the date for this run, and the source folder. When there is no date, pass the kind and the folder. Do not pass the `State` line. It is not quote text. Follow only the handoff **From /crav1-meeting-to-specs** in that skill (drop-in: `.claude/skills/crav1-add-to-spec/SKILL.md`; plugin: sibling `skills/crav1-add-to-spec/SKILL.md`). One item. Then stop that handoff. The impact check still runs there. Do not write the spec in this skill. Do not create a slug.
 
 When more than one spec fits, ask which one before the handoff. Options only. One option per candidate, plus **Treat as a new feature**. Do not ask the user to type a slug. Stop until the user picks. A picked spec gets the addition handoff. Treat as a new feature follows the new-feature rule below.
 
-**New feature.** Name the next command. Do not run it. Do not create a slug. Do not seed `docs/system/`. Do not write a file.
+**New feature.** Name the next command. Do not run it. Do not create a slug. Do not seed `docs/system/`. Do not write the source folder here.
 
 - One kept new feature that is one or two sentences: `/crav1-spark-to-spec`
 - One kept new feature that is a pile of ideas and technical hunches: `/crav1-ideas-to-spec`
@@ -224,11 +227,11 @@ Handoffs: docs/specs/<slug>/, or none
 Named, not run: <commands>, or none
 ```
 
-When `/crav1-add-to-spec` changed a file, name `/crav1-finalize-commit`. Do not run it.
+When `/crav1-add-to-spec` changed a file, or this command wrote a source folder, name `/crav1-finalize-commit`. Do not run it.
 
 ## Stop
 
-Do not write a file. Do not copy the input into the repo. Do not write `docs/system/`, a spec, `plan.md`, `tasks.md`, `verify.md`, `explore.md`, `docs/environments/marks.md`, or a dismissals file. Do not commit. Do not push. Do not open a pull request.
+The only files this command writes are `docs/sources/YYYY-MM-DD-<slug>/` for a source a kept addition quotes, and a `.gitattributes` line after a yes, as the imported-sources convention says. Do not write that folder for a leave, a dismiss, a kept new feature, or a kept bug. Do not write `docs/system/`, a spec, `plan.md`, `tasks.md`, `verify.md`, `explore.md`, `docs/environments/marks.md`, or a dismissals file. Do not commit. Do not push. Do not open a pull request.
 
 Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-match-to-specs`, `/crav1-plan-from-spec`, `/crav1-implement-task`, `/crav1-complete-task`, `/crav1-verify-spec`, `/crav1-fix-bug`, `/crav1-fix-from-verify`, or `/crav1-finalize-commit`.
 
@@ -237,7 +240,7 @@ Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-spe
 - No input and no `@`: stop. Options only. Do not guess a file. An email or a chat thread is accepted as well as minutes or a transcript.
 - The kind comes from what the input shows: `meeting`, `email`, or `chat`. Do not guess. If it is not clear, ask once: meeting, email, or chat.
 - The date comes from the input. Do not invent one. If the input shows no date, ask once: give a date, or skip. Skip means no date.
-- One kind and one date for the run. They apply to every item. `Source` is `<kind> <date>`, or `<kind>`.
+- One kind and one date for the run. They apply to every item. The chat `Source` line is `<kind> <date>`, or `<kind>`. The spec `Source:` line is the source folder, written by `/crav1-add-to-spec` after the folder exists.
 - Extract requirements, decisions, changes, open questions, and bugs. Each item is a quote. Include speaker and time when the input shows them.
 - Drop small talk and status chatter. A dropped line is not an item.
 - Match every item. Cases: addition, new feature, bug, or unclear. When more than one existing spec could fit, list every candidate.
@@ -245,9 +248,9 @@ Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-spe
 - Every item stays listed. Nothing is dropped to keep the list short.
 - One item at a time: keep, leave, or dismiss.
 - Dismiss is for this run only. Start fresh on every run. Do not write a dismissals file. Do not remember a dismiss across runs.
-- A kept addition goes to that spec through `/crav1-add-to-spec`. Pass the kind and the date. The quote starts with `From <kind> <date>.` when there is a date, otherwise `From <kind>.` The impact check still runs there.
-- A kept new feature names `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, or `/crav1-intake-to-specs`. Do not run it. Do not create a slug.
+- A kept addition goes to that spec through `/crav1-add-to-spec`. Before that handoff, when the source is not yet imported, follow `.claude/skills/crav1-add-to-spec/references/sources.md` (plugin: sibling `skills/crav1-add-to-spec/references/sources.md`). Write the source folder once. Pass the kind, the date, and that folder. The quote starts with `From <kind> <date>.` when there is a date, otherwise `From <kind>.` The impact check still runs there. Do not commit.
+- A kept new feature names `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, or `/crav1-intake-to-specs`. Do not run it. Do not create a slug. Do not write the source folder here. That next command follows the imported-sources convention when it quotes the source.
 - A kept bug names `/crav1-fix-bug`. Do not run it.
-- This command writes no files. The input is not copied into the repo. Only a quote the user keeps as an addition reaches a spec, through `/crav1-add-to-spec`.
+- This command does not write a spec. The only files it writes are the source folder for a kept addition, and a `.gitattributes` line after a yes. It does not commit.
 - Do not start Specify, Plan, or Build. Do not plan, implement, or commit.
 - Later skill. Not a starter option. Asking for startup options names only the seven and does not run this command.
