@@ -11,7 +11,9 @@ description: >-
   appends only words that are not already rows. Does not rewrite existing
   glossary rows. A meaning the change does not state is `to be researched`.
   That same pass adds what is new to the short description, the diagram, and
-  how the parts connect. Does not rewrite what is already there. Does not
+  how the parts connect. Does not rewrite what is already there. A
+  whole-repo read sets that repo's Synced at cell. A one-slice read
+  writes the slice Synced at line and does not touch the column. Does not
   write application code. Does not plan, implement, or commit.
 disable-model-invocation: true
 icon: file-diff
@@ -119,15 +121,27 @@ The **fits none of them** pile is listed and left alone. Do not create a spec fo
 - several new features, or several repos: `/crav1-intake-to-specs`
 - repos that already make up the system, and this leftover is a slice to match: `/crav1-match-to-specs`
 
+## Synced at
+
+Record the code commit this run actually read. This write is not an apply option. It happens with the confirmed writes. Do not stamp before that confirmation.
+
+`Synced at` in `docs/system/repos.md` is `<branch>@<short sha>, <date>`. A repo may list several branches, separated by `; `. Example: `main@abc1234, 2026-10-07; develop@def5678, 2026-10-06`. The branch is the branch that was read. The short sha is seven characters, the commit the read ended at: that commit, the end of a range, or the tip of a branch diff. The date is the date of that read, `YYYY-MM-DD`.
+
+A whole-repo read is a read that is not limited to one slice: more than one slice, a path that fits none, or a branch diff or checkout that is not confined to one slice. Set that repo's `Synced at` cell to the branch and commit actually read. When that branch is already listed, replace that branch's entry. Leave every other branch in the cell. Touch only the repos this run read. Do not change Purpose, Status, URL, or Boundaries. When the column is missing and `repos.md` exists, add the column. Other repos' new cells stay empty. When that repo has no row, do not add one. Say the cell was not written. Do not write a slice `Synced at` line for that whole-repo read. When `repos.md` is missing, do not create it. Say the column was not written.
+
+A one-slice read is a change whose paths all belong to one slice. Do not touch the repo column. Write or update a line in that slice's `spec.md`, after the title and before the first heading: `Synced at: <repo> <branch>@<short sha>, <date>`. One line per repo. Update the line for that repo. Leave other `Synced at` lines.
+
+Do not stamp a repo or a slice this run did not read. An empty cell stays empty. A consumer measuring drift uses the older of the repo column and the slice line, and an empty value means unknown, so fall back to spec file commit dates.
+
 ## Impact (before any other edit)
 
 The new quotes are already in the matching specs. Read `docs/system/` when it exists (`landscape.md`, `repos.md`, `diagrams.md`, `glossary.md`, `adr/`) and every other `docs/specs/<slug>/spec.md` (skip `_template`). Other means a spec that did not just receive a new quote, plus any heading on a spec you did edit that the confirmed sort did not already cover. Check whether what the change does contradicts or extends the landscape, a repo row, a diagram, an ADR, or another spec.
 
 Section names for that read, not a file to paste over what exists: this skill’s `assets/system/` (same files as `docs/system/_template/`, including `glossary.md`; drop-in: `.cursor/skills/crav1/crav1-code-into-specs/assets/system/`; plugin: this skill’s `assets/system/`).
 
-Do not edit anything outside the confirmed belongs writes in this step, except the glossary gap and the picture update below. Do not seed `docs/system/` when it is missing. Say it is missing and that this command does not create it. Do not invent a landscape from the diff alone. When that folder is missing, do nothing about a glossary and do nothing about the picture.
+Do not edit anything outside the confirmed belongs writes in this step, except the `Synced at` stamp above, the glossary gap, and the picture update below. Do not seed `docs/system/` when it is missing. Say it is missing and that this command does not create it. Do not invent a landscape from the diff alone. When that folder is missing, do nothing about a glossary and do nothing about the picture.
 
-**Glossary.** When `docs/system/` is missing, do nothing about a glossary. When it exists and `glossary.md` is missing, write only that file from `assets/system/glossary.md`. When `glossary.md` already exists, append only words or abbreviations the change uses that are not already rows. Do not rewrite, reorder, or edit existing rows. Do not change a Meaning cell that already has text. Source is the landed change. Do not invent terms, expansions, or definitions. Do not write TBD or to be decided. A row is only a word or abbreviation that change already uses. When that same change already says the expansion or meaning, put that text in Meaning. When the change never says what it means, set Meaning to `to be researched`. Skip ordinary English. A code identifier is not a row unless the change already treats that word as a term. Write the file even when it has no rows. This write is not an apply option, and it does not rewrite any other landscape file except the picture update below. Do not list a rewrite of existing rows.
+**Glossary.** When `docs/system/` is missing, do nothing about a glossary. When it exists and `glossary.md` is missing, write only that file from `assets/system/glossary.md`. When `glossary.md` already exists, append only words or abbreviations the change uses that are not already rows. Do not rewrite, reorder, or edit existing rows. Do not change a Meaning cell that already has text. Source is the landed change. Do not invent terms, expansions, or definitions. Do not write TBD or to be decided. A row is only a word or abbreviation that change already uses. When that same change already says the expansion or meaning, put that text in Meaning. When the change never says what it means, set Meaning to `to be researched`. Skip ordinary English. A code identifier is not a row unless the change already treats that word as a term. Write the file even when it has no rows. This write is not an apply option, and it does not rewrite any other landscape file except the `Synced at` stamp above and the picture update below. Do not list a rewrite of existing rows.
 
 **Picture.** When `docs/system/` is missing, do nothing about the picture. When it exists, follow [picture.md](../crav1-keep-current/references/picture.md) (drop-in: `.cursor/skills/crav1/crav1-keep-current/references/picture.md`; plugin: sibling `skills/crav1-keep-current/references/picture.md`). Source is the confirmed new quotes, not a sentence marked inferred. Add what those quotes added to the short description, the diagram, and how the parts connect. Do not rewrite a sentence, a diagram node, a diagram edge, or a connection line that is already there. Do not run `/crav1-keep-current` as a second turn. This write is not an apply option. Do not invent a part from the diff. Do not rewrite existing glossary rows.
 
@@ -141,7 +155,7 @@ Report:
   2. **Leave the other files alone**
 - List each proposed edit in one line: the file, and what would change. One line per file change. No surrounding rewrite.
 
-Do not silently rewrite `docs/system/` or specs the sort did not already write. The glossary write above is one exception: a missing file, or new rows appended to an existing file. The picture update is the other: new lines on the short description, the diagram, and how the parts connect. Apply the other edits only if they pick apply, and only the lines you listed. If they pick leave, do not edit those files. Do not rewrite existing glossary rows or existing picture lines either way. Do not list the picture lines again as an apply option.
+Do not silently rewrite `docs/system/` or specs the sort did not already write. The glossary write above is one exception: a missing file, or new rows appended to an existing file. The picture update is the other: new lines on the short description, the diagram, and how the parts connect. The `Synced at` stamp above is the third: the repo cell on a whole-repo read, or the slice line on a one-slice read. Apply the other edits only if they pick apply, and only the lines you listed. If they pick leave, do not edit those files. Do not rewrite existing glossary rows or existing picture lines either way. Do not list the picture lines again as an apply option.
 
 ## Stop
 
@@ -155,6 +169,7 @@ Output only:
 - The fits-none list, left alone. If they asked for a new spec, which existing skill you pointed at
 - `glossary.md` when this turn created it or appended rows. If `docs/system/` was missing, say no glossary was written. If no new rows were appended, say so
 - Picture lines added, or that the picture is current. If `docs/system/` was missing, say no picture was written
+- `Synced at` cell or slice line written, or that none was written
 - Impact: nothing else, or the one-line edit list and which option they picked
 - Next: `/crav1-finalize-commit` only if any file changed and they want those spec edits committed (no push). `/crav1-plan-from-spec` only for a slice they choose. Do not run either.
 

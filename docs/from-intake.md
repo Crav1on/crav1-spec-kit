@@ -65,7 +65,7 @@ docs/specs/<slug>/
   export/
 ```
 
-Human starter copies: `docs/system/_template/` (same files as skill `crav1-intake-to-specs` `assets/` for landscape, including `glossary.md`, and as `assets/system/` on `crav1-spark-to-spec` and `crav1-ideas-to-spec`). Feature spec shape matches ideas-to-spec plus **Repos**, **Constraints**, **Assumptions**, **Trace**.
+Human starter copies: `docs/system/_template/` (same files as skill `crav1-intake-to-specs` `assets/` for landscape, including `glossary.md`, and as `assets/system/` on `crav1-spark-to-spec` and `crav1-ideas-to-spec`). `repos.md` includes a `Synced at` column. Where this run reads a whole repo, it sets that repo's cell and touches only those repos. Where this run reads only one slice, it does not touch the column. It writes or updates `Synced at: <repo> <branch>@<short sha>, <date>` in that slice's `spec.md`. Notes alone are not a repo read. Feature spec shape matches ideas-to-spec plus **Repos**, **Constraints**, **Assumptions**, **Trace**.
 
 ## Later features
 
