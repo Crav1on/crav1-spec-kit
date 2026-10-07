@@ -360,6 +360,19 @@ Output only:
 - Counts: seen, shape only, skipped, not read, connections shown, databases opened, storage accounts opened. Shape only counts pre-prod, shared, and prod-only resources that were read. A prod-only resource the user declined is counted in skipped and in not read. A look-inside that did not open says not opened. A production database or store that stayed closed says not opened.
 - Files this skill appended (`docs/environments/marks.md`) and files the owners changed, or that nothing was written
 - Next: `/crav1-finalize-commit` when a file changed (no push). When nothing was written, name no command. Do not run it.
+- Picture offer, when this run appended one or more lines to `docs/environments/marks.md`
+
+## Picture offer
+
+When this run appended one or more lines to `docs/environments/marks.md`, ask once at the end. Do not ask when no marks line was added. Do not ask once per line.
+
+The question is exactly:
+
+The system picture may now be out of date. Run `/crav1-keep-current`?
+
+Options are yes and no. Use the questions tool when it is available. Do not run `/crav1-keep-current` from this question. A yes waits for a later turn. A no ends without that command.
+
+The confirmed system section is unchanged. After that section’s answer, `/crav1-keep-current` still adds only those confirmed lines. This question is not that handoff.
 
 ## Hard rules
 
@@ -387,6 +400,7 @@ Output only:
 - Look-inside facts use the sections that already exist. They say `Seen in <host> <environment>.`
 - One question at a time. Every item stays listed.
 - The owner adds only what is new. Do not rewrite a line that is already there.
+- After one or more `docs/environments/marks.md` lines are added, ask the picture question once. Do not run `/crav1-keep-current` from that question.
 - A slice Match does not already own is not a new slug.
 - Do not start Specify, Plan, or Build.
 

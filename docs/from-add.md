@@ -57,3 +57,5 @@ If a file changed:
 That puts the spec (and any applied edits) in git. No push. This command does not commit for you.
 
 `/crav1-plan-from-spec` is only when you say you want to start planning this slug. This command does not run it.
+
+A handoff from `/crav1-environment-read` or `/crav1-suggest-tests-for-code` asks once at the end of that run, not once per item: The system picture may now be out of date. Run `/crav1-keep-current`? It does not run that command. A meeting handoff does not ask.

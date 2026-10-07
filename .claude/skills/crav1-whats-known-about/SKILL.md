@@ -25,7 +25,7 @@ This command is a later skill. It is not a starter option. When the user asks fo
 
 Other skills do not run this one. Spark, specify, plan, and verify do not run it. It is not started automatically.
 
-This is not `/crav1-explain`. Explain reads `docs/system/` and does not open a spec to answer the question. This command reads the specs first.
+This is not `/crav1-explain`. Explain reads `docs/system/` first. When the picture has nothing on the question, it quotes the first paragraph of a matching spec, labelled as coming from the spec, and names this command. It does not run this command. This command reads the specs first.
 
 This command does not run another skill. It may name one.
 

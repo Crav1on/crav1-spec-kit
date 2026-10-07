@@ -49,6 +49,7 @@ If the message names no host, the command stops. It does not pick Azure. If the 
 | Sections | Answer one section, then the next | Skipped, seen, links (including triggers), system, architecture, Match, left out. Look-inside facts join those sections. Every item stays listed |
 | Owner | Glance | The skill that owns the other file adds only what is new. This command appends confirmed marks and does not write those other files |
 | Stop | `/crav1-finalize-commit` if a file changed | Does not plan, implement, or commit. Does not start Specify, Plan, or Build |
+| Picture | Yes or no, after a marks line is added | Asks once: The system picture may now be out of date. Run `/crav1-keep-current`? Does not run that refresh from the question |
 
 ## What can change
 

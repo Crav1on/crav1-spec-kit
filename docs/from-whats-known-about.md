@@ -8,7 +8,7 @@ This is cross-cutting. It is not its own lane. It may run from any lane. It does
 
 It is a later skill. It is not a starter option. When the user asks for startup options, that ask names only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-match-to-specs`, `/crav1-repos-to-spec`, `/crav1-environment-read`, and `/crav1-fix-bug`. It does not run this command. The seven starter options stay unchanged.
 
-[Explain](from-explain.md) (`/crav1-explain`) reads `docs/system/` and does not open a spec to answer the question. This command is the one feature. It reads the specs first.
+[Explain](from-explain.md) (`/crav1-explain`) reads `docs/system/` first. When the picture has nothing on the question, it quotes the first paragraph of a matching spec, labelled as coming from the spec, and names this command. It does not run this command. This command is the one feature. It reads the specs first.
 
 The command writes nothing. It does not run another skill. It may name one.
 
