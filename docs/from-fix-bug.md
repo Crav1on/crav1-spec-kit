@@ -36,6 +36,7 @@ If the message does not name a bug, the command stops. It does not go hunting. I
 | Where | Said verify, a report, or production, or pick from those three | Options only when the bug was named and the place was not. Does not guess |
 | Lane | Read the four lines | Says where it was seen, names the bug, points at the spec or the shipped behavior it breaks, and names the lane. A spec miss goes to Specify. A plan miss goes to Plan. A verify miss or a broken implementation goes to Build |
 | Stop | Glance | Does not start that lane. Does not edit code, open a pull request, or create an Azure Boards work item |
+| Picture | Yes or no, only when the bug changes how the parts connect | Asks once: The system picture may now be out of date. Run `/crav1-keep-current`? Does not run it |
 
 ## What does not get written
 

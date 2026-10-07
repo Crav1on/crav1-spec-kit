@@ -2,17 +2,17 @@
 name: crav1-explain
 description: >-
   Read the system notes spark, ideas, intake, match, or repos-to-spec
-  already wrote (docs/system/). First answer is a short TLDR. Longer goes one level
-  deeper from the same notes. The user can point at one part, or ask
-  whether the system can do something. Yes points at the note. No says no.
-  Never mentioned means that is not written down. Does not guess, write a
-  second document, teach, or start Specify, Plan, or Build. When the
-  picture is older than the specs, say so and name /crav1-keep-current.
-  When the notes are missing and the user named repos and brought no dump,
-  name /crav1-repos-to-spec and do not run it. A question about one
-  feature, slice, resource, or not-yet-feature is
-  /crav1-whats-known-about. This skill does not open a spec to answer
-  that question.
+  already wrote (docs/system/). First answer is a short TLDR. Longer goes
+  one level deeper from the same notes. The user can point at one part, or
+  ask whether the system can do something. Yes points at the note. No says
+  no. When the picture has nothing on the question, quote the first
+  paragraph of the matching slice's spec, labelled as coming from the spec,
+  and name /crav1-whats-known-about. When no spec matches either, say so
+  and name that skill. Does not guess, write a second document, teach, or
+  start Specify, Plan, or Build. On every run, compare the feature index
+  with each slice's diagram node and its connection line. List each slice
+  that is missing entirely or partly, including done and retired, and name
+  /crav1-keep-current. Do not run it. Read-only.
 disable-model-invocation: true
 icon: message-circle
 color: blue
@@ -20,11 +20,11 @@ color: blue
 
 # Explain
 
-You read the system notes already in `docs/system/` and answer from those notes. The first answer is a short TLDR. You do not guess. You do not write a second document. You do not teach. You do not start Specify, Plan, or Build.
+You read the system notes already in `docs/system/` and answer from those notes. The first answer is a short TLDR. You do not guess. You do not write a second document. You do not teach. You do not start Specify, Plan, or Build. You stay read-only. You do not write a file.
 
 This is cross-cutting. It is not its own lane. It does not move work into Specify, Plan, or Build.
 
-This is not `/crav1-whats-known-about`. That command answers one feature, slice, resource, or not-yet-feature from the specs first. This command reads `docs/system/` and does not open a spec to answer the question.
+This is not `/crav1-whats-known-about`. That command answers one feature, slice, resource, or not-yet-feature from the specs first. This command reads `docs/system/`. When the picture has nothing on the question, it quotes the first paragraph of the matching slice's spec, labelled as coming from the spec, and names `/crav1-whats-known-about`. It does not run that command. It does not answer the question from the spec.
 
 The notes are the files in `docs/system/` (skip `_template`): `landscape.md`, `repos.md`, `diagrams.md`, `glossary.md`, `adr/`, and `security.md` when that file exists. The picture is three places in those notes: the short description (the paragraph under `# System landscape`, before the first `##`), the context diagram in `diagrams.md`, and `## How the parts connect` in `landscape.md`.
 
@@ -44,6 +44,8 @@ If they brought none of those, name those five commands and stop.
 
 The template sentence `What this product/system is, in one short paragraph.` is not a short description. The template diagram `user[User] --> app[App]` with no other node is not a diagram of this system.
 
+Then run **Feature index and the picture** before you finish, whenever `docs/system/landscape.md` can be read.
+
 ## What they asked
 
 Everything after `/crav1-explain`, and every `@`, is the pointer.
@@ -54,16 +56,16 @@ Three asks:
 2. **One part** — they named a heading, a file under `docs/system/`, a repo row, a feature-index slug, or a diagram node. TLDR of that part only.
 3. **Can it** — they asked whether the system can do something. Yes, no, or not written down.
 
-A can-it question uses the notes. A pointer on that same message limits the search to that part. If the part never mentions it, say that is not written down. Do not search the rest of the notes unless they also asked about the whole system.
+A can-it question uses the notes. A pointer on that same message limits the search to that part. If the part never mentions it, say that is not written down. Do not search the rest of the notes unless they also asked about the whole system. Then follow **When the picture has nothing on the question**.
 
-If the pointer names something the notes do not contain, say that part is not written down. Do not search the repo to find it.
+If the pointer names something the notes do not contain, say that part is not written down. Do not search the repo to find it. Then follow **When the picture has nothing on the question**.
 
 ## First answer
 
 A few sentences. Quote the notes. Do not open the next heading.
 
-- **Whole system:** the short description only. When that paragraph is still the template sentence, say the short description is not written down.
-- **One part:** that part only. When the part is a heading with no lines under it, say that part is not written down.
+- **Whole system:** the short description only. When that paragraph is still the template sentence, say the short description is not written down. Then follow **When the picture has nothing on the question**.
+- **One part:** that part only. When the part is a heading with no lines under it, say that part is not written down. Then follow **When the picture has nothing on the question**.
 - **Can it:** do not add a TLDR. Answer in the next section.
 
 ## Longer
@@ -85,29 +87,63 @@ When the notes have no further level, say that is as deep as the notes go.
 
 A can-it question is not a level. A later “longer” after a can-it answer starts at level 0 for the whole system, or for the part they pointed at.
 
+The feature-index check still runs at the end of a longer answer.
+
 ## Can it
 
 Search the notes for that thing. A glossary row is a word, not a yes. A neighbor feature is not a yes. Code is not a note.
 
 - **Yes** — a note states the system does it. Say yes. Point at the file and the heading, the diagram node, the connection line, or the index row. The pointer is the line that says it. Do not retell a spec.
 - **No** — a note states the system does not (later, out of scope, a non-goal, or an explicit no). Say no. Point at that line.
-- **Not written down** — the notes never mention it. Say that is not written down. Do not infer a yes.
+- **Not written down** — the notes never mention it. Say that is not written down. Do not infer a yes. Then follow **When the picture has nothing on the question**.
 
-## Older than the specs
+## When the picture has nothing on the question
 
-On every answer, compare the picture to the specs. Read each `docs/specs/<slug>/spec.md` (skip `_template`): the title and the first paragraph under the first content heading. Skip `plan.md` and `tasks.md`.
+The picture has nothing on the question when the notes never mention what they asked. That is a can-it answer that is not written down, a named part the notes do not contain, or a whole-system answer whose short description is still the template sentence.
 
-The picture is older when that short read names a part or a connection the short description, the diagram, and `## How the parts connect` do not name. A part the picture already names, with extra acceptance detail, does not make the picture older.
+Match a slice by whole name only. The names that count are the slug, the spec title, and the main resource name, the same three as **Feature index and the picture**. The question matches a slice only when it uses one of those whole names. A shorter piece, a longer name that only contains it, a synonym, or a similar spelling is not a match.
 
-When the picture is older, add one sentence: the picture is older than the specs, so run `/crav1-keep-current`. Do not run it. Do not update the picture. Do not answer can-it from the spec. When the spec has it and the notes do not, the answer stays that it is not written down, plus that sentence.
+When one slice matches, quote the first paragraph of that `docs/specs/<slug>/spec.md`. The first paragraph is the first block of prose after the title line. Skip a heading. Do not quote a table. Label it `From the spec (docs/specs/<slug>/spec.md):` and then the paragraph. Name `/crav1-whats-known-about`. Do not run it. The quote is labelled as coming from the spec. It is not the picture's answer.
 
-When no spec folder exists, or the picture already names those parts and connections, do not mention keep-current.
+When more than one slice matches that whole name, do not pick one. Name each slug. Name `/crav1-whats-known-about`. Do not run it. Do not quote.
+
+When no spec matches either, say the picture has nothing on the question and no spec matches. Name `/crav1-whats-known-about`. Do not run it. Do not guess a slice.
+
+When the spec has no prose paragraph, say the spec has no first paragraph, and still name `/crav1-whats-known-about`. Do not run it.
+
+## Feature index and the picture
+
+On every run, at the end of the answer, compare `## Feature index` in `docs/system/landscape.md` with the picture. Run this check on a longer answer too. When the notes are missing and `docs/system/landscape.md` can still be read, run it before you finish. When that file cannot be read, there is no list. Do not invent slices. Do not name `/crav1-keep-current` for this check.
+
+The picture for this check is two places only: the slice's node in `docs/system/diagrams.md`, and its line under `## How the parts connect` in `landscape.md`. The short description is not this check.
+
+Read every index row that has a slug. Skip a row whose slug cell is empty. Include a row whose Notes say `done` or `retired`. Include a spec whose `## Match` status says `done` or `retired`. Do not skip those slices.
+
+Names that count, and only these:
+
+- the slug
+- the spec title, the `#` line of `docs/specs/<slug>/spec.md`
+- the main resource name: the Repos cell on that index row, and the `Repo:` line under `## Match` when that line is there
+
+A diagram node matches when its id or its label is that slug, that spec title, or that main resource name, as that whole name. A connection line matches when that line names the same whole name as its own token. A shorter piece, a longer name that only contains it, a synonym, or a similar spelling is not a match. Do not fuzzy-match.
+
+A slice is missing entirely when neither the node nor the line matches. It is missing partly when one matches and the other does not. A slice with both a matching node and a matching line is not listed.
+
+This check may read the title line, the feature-index row, and the Match `Status:` and `Repo:` lines. It does not answer the question from the rest of the spec.
+
+At the end of the answer, list each missing slice, one line per slice. Show the status on the line. Copy the Notes cell. When `## Match` has a `Status:` line, show that word too if the Notes cell does not already say it. `done` and `retired` stay visible. When the Notes cell is empty and there is no Match status, the status is `no status`.
+
+- `<slug> — <status> — missing the diagram node and the connection line`
+- `<slug> — <status> — missing the connection line`
+- `<slug> — <status> — missing the diagram node`
+
+When the list has one or more slices, name `/crav1-keep-current`. Do not run it. Do not update the picture. When the list is empty, do not name keep-current for this check.
 
 ## Stop
 
-Do not write a file. Do not invent a second document. Do not teach how to build it. Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-match-to-specs`, `/crav1-plan-from-spec`, `/crav1-implement-task`, `/crav1-keep-current`, or `/crav1-finalize-commit`.
+Do not write a file. Do not invent a second document. Do not teach how to build it. Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-match-to-specs`, `/crav1-plan-from-spec`, `/crav1-implement-task`, `/crav1-keep-current`, `/crav1-whats-known-about`, or `/crav1-finalize-commit`.
 
-Output only the answer, and the one age sentence when the picture is older.
+Output only the answer, the spec quote when the picture has nothing on the question, and the feature-index list when a slice is missing from the picture.
 
 ## Style
 

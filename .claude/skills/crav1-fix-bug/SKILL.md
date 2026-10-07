@@ -77,11 +77,21 @@ If the bug is a defect from outside and no spec says what shipping must do, the 
 
 If they did not point at a spec and none is already in front of you, `Breaks` is the shipped behavior in their words. Do not write `spec.md`.
 
+## Picture offer
+
+When the bug they named changes how the parts connect, ask once at the end. A connection change is which part talks to which: talks to, calls, sends, or reads from, including a line stated as does not. A bug that leaves those connections as they are does not get this question.
+
+The question is exactly:
+
+The system picture may now be out of date. Run `/crav1-keep-current`?
+
+Options are yes and no. Use the questions tool when it is available. Do not run `/crav1-keep-current`. Do not start the lane. Do not edit the picture.
+
 ## Stop
 
 Do not edit code. Do not edit `spec.md`, `plan.md`, `tasks.md`, or `verify.md`. Do not open a pull request. Do not create an Azure Boards work item. Do not write `work-item.md`. Do not call Azure DevOps. Do not pass `--work-items`. Do not commit. Do not push.
 
-Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-tighten-spec`, `/crav1-plan-from-spec`, `/crav1-implement-task`, `/crav1-fix-from-verify`, `/crav1-fix-live`, `/crav1-verify-spec`, `/crav1-open-pr`, or `/crav1-finalize-commit`.
+Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-tighten-spec`, `/crav1-plan-from-spec`, `/crav1-implement-task`, `/crav1-fix-from-verify`, `/crav1-fix-live`, `/crav1-verify-spec`, `/crav1-open-pr`, `/crav1-keep-current`, or `/crav1-finalize-commit`.
 
 ## Hard rules
 
@@ -90,3 +100,4 @@ Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-spe
 - Name the lane for a real bug. Do not start that lane.
 - No code edits. No spec edits. No pull request. No Azure Boards work item.
 - Not a stretch of verify. It is not a skill that runs because a repo is new. It is not started automatically.
+- When the bug changes how the parts connect, ask the picture question once. Do not run `/crav1-keep-current`.
