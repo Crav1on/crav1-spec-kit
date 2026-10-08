@@ -57,6 +57,17 @@ A kept suggestion from `/crav1-suggest-tests-for-code` is an acceptance line on 
 
 A line under `## Dismissed test suggestions` is not acceptance. Do not map it to a task. Do not plan it.
 
+## Built pieces
+
+When the spec is partial, or `## In the code` names paths, the plan lists each built piece before tasks exist. See **Built pieces** in this skill’s `SKILL.md`.
+
+- A piece that already matches v0 is `already there` on the trace. It is not a choice. It has no rebuild task.
+- Finish the gap writes a task for the gap only.
+- Add a verify test writes a task for a test of what is already there. The feature does not change.
+- Leave it writes no task. `plan.md` has one line, `Left as committed: <piece>.`, under `## Left as committed`. A later run does not turn that piece into work unless the user says so.
+
+An acceptance line traced to `already there` or `left as committed` is not a missing task. Do not file a review finding to rebuild it or to turn a left piece into work. A disagreement between the spec and the code is its own line, with the same three choices, before any task exists.
+
 ## Stay out
 
 Smoke after deploy, chaos, and fuzzing for its own sake stay out. A **property** check for an algorithm with many inputs stays; that is not fuzzing for its own sake.

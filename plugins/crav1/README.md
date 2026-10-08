@@ -35,13 +35,13 @@ When you ask for startup options, these seven are the only ways in. That ask nam
 - `/crav1-code-into-specs` — a code change that already landed, specs already exist → sort onto those specs (belongs, already described there, or fits none), then quote what the change does. No dump. Does not ask for a slug first. Does not create a slug. Does not watch the repo. Does not seed `docs/system/`. Fills a missing `glossary.md` only when that folder already exists. New glossary rows are appended. Existing rows are not rewritten. A meaning the source does not state is `to be researched`. That same pass adds what is new to the short description, the diagram, and how the parts connect. It does not rewrite what is already there. Does not plan, implement, or commit
 - `/crav1-add-to-spec` — new information for one existing spec → add it to that spec, then report whether the landscape or another spec has to change. Does not rewrite those files unless asked. Does not create a glossary. A new glossary row can be one listed edit and is not written unless apply is chosen. A meaning the new information does not state is `to be researched`. Existing rows are not rewritten. Does not plan, implement, or commit
 - `/crav1-architecture-reviewer` — runs the architecture critic; numbered issues (`I#`). Optional next, not run from this command: `/crav1-security-review`
-- `/crav1-tighten-spec` — one issue at a time; you pick (or ask for a suggestion); it patches only that issue
+- `/crav1-tighten-spec` — one issue at a time; the user picks (or asks for a suggestion); it patches only that issue. When the slice is partial or `## In the code` names paths, it reads the committed code on the repo and branch the spec names before wording issues. A spec with no code behind it skips that read. Finish, add a test, and leave are not choices here
 - `/crav1-resolve-questions` — one Open question (`Q#`); keep or answer
 - `/crav1-export-spec` — re-project `spec.md` (EARS, BDD, OpenSpec, YAML, JSON, BMAD)
 
 **Build**
 
-- `/crav1-plan-from-spec` — `plan.md` + `tasks.md`; each verify note names the checks before code (no code). Names a linter when the repo has one, and stops before Build when it does not. Does not install a linter
+- `/crav1-plan-from-spec` — `plan.md` + `tasks.md`; each verify note names the checks before code (no code). Names a linter when the repo has one, and stops before Build when it does not. Does not install a linter. When the spec is partial or `## In the code` names paths, it reads that repo and branch and chooses finish the gap, add a verify test, or leave it before any task. A piece that already matches v0 is not a choice
 - `/crav1-review-plan` — critique plan/tasks vs spec; numbered `P#`s
 - `/crav1-tighten-plan` — one plan `P#`; patches `plan.md` / `tasks.md` only
 - `/crav1-implement-task` — one `T#`, then its verify step

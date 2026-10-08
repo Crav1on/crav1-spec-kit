@@ -4,6 +4,18 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 
 ## Unreleased
 
+## 1.32.0 (2026-10-08)
+
+### Kit
+
+- `/crav1-tighten-spec`, when the slice is partial or `## In the code` names paths, reads the committed code on the repo and branch the spec names before wording issues, and treats that code as the current fact. It reads only that repo and branch. A different open checkout stops the run and names the right ones. A stub, for example a `.gitkeep` on `main`, is not the code. If the spec names no branch, it stops and asks which branch has the code. It does not assume `main` or the open checkout. After the user answers, that branch is the read. Writing the branch onto the spec is a yes or no, not a silent edit. A spec that is too thin for that read stops. Too thin means partial, status `done`, or `## In the code` without a repo or without paths, or neither marker on a spec that is not already a full spec with no code behind it. It names `/crav1-code-into-specs` when a change already landed on an existing spec, or `/crav1-match-to-specs` when the slice was never matched. It does not guess and it does not tighten. A disagreement between the tightened wording and the code is called out. The spec is not silently rewritten to match the code. A spec with no code behind it (match status `not in the code`, or a full spec that never claims existing code) skips the read and tightens as before. Finish the gap, add a verify test, and leave it are not choices here. Those belong to `/crav1-plan-from-spec`. No new skill. No version bump.
+
+- `/crav1-plan-from-spec`, before any task is written, when the spec is partial or `## In the code` names paths, reads that same repo and branch and lists each built piece. Each choice says what it means and what it will do. Finish the gap: the code is partly there and v0 wants the rest; the task is that gap only; what already matches is not rebuilt. Add a verify test: the code stays as it is; the task checks what is already there; the feature does not change. Leave it: no task; the plan gets one line saying this piece was left as committed; a later run does not turn it into work unless the user says so. A piece that already matches v0 is not a choice. It is marked already there and gets no rebuild task. A disagreement, such as the spec says one environment and the code enables another, is its own line before any task exists, with the same three choices. The plan check and the plan reviewer treat `already there` and `left as committed` as not a missing task. No new skill. No version bump.
+
+### Docs
+
+- [docs/guild-routing.md](docs/guild-routing.md) and the behavior map in [`.cursor/rules/kit-maintainer.mdc`](.cursor/rules/kit-maintainer.mdc) record one line per skill: what it reads, what it writes, and what it leaves alone, plus one short exception line. [README.md](README.md), [plugins/crav1/README.md](plugins/crav1/README.md), [docs/first-run.md](docs/first-run.md), [docs/from-nothing.md](docs/from-nothing.md), and [docs/from-ideas.md](docs/from-ideas.md) name the same read. [AGENTS.md](AGENTS.md) and [`.cursor/rules/crav1.mdc`](.cursor/rules/crav1.mdc) name it too. The words stay host-generic. No new skill. No version bump.
+
 ## 1.31.0 (2026-10-08)
 
 ### Kit

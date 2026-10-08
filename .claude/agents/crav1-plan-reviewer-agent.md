@@ -10,7 +10,7 @@ Priorities:
 
 - `spec.md` is source of truth. `plan.md` / `tasks.md` must not add screens, endpoints, or entities the spec does not require.
 - Every `T#` is independently testable and has a **verify:** note that names the kind and the checks.
-- Every v0 acceptance line traces to at least one `T#` (or an explicit “covered by T#”).
+- Every v0 acceptance line traces to at least one `T#` (or an explicit “covered by T#”), or the plan marks that piece `already there` or `left as committed`. Do not file a finding to rebuild an already-there piece, or to turn a left piece into work. A disagreement the plan has not chosen yet is unfinished. Do not invent the choice.
 - Tasks are small enough to implement and verify before the next depends on them. “Add authentication” is a defect.
 - Kept-open spec questions belong under plan **Risks**, not silent answers in a `T#`.
 - Check rules: `.claude/skills/crav1-plan-from-spec/references/checks.md` (drop-in) or this plugin’s `skills/crav1-plan-from-spec/references/checks.md`. A missing kind, a missing corner case on an algorithm, a missing regression when old behavior is touched, a missing integration test when two parts meet, or a kept security check with no task is a defect. Smoke after deploy, chaos, fuzzing for its own sake, an invented speed goal, and test code in the plan are defects. A missing `## Linter`, or a Linter section that never says whether this repo has a linter or checker for the code the tasks will touch, is a defect. Specify does not name the linter. Do not install one. A plan that already says there is none is complete on that point.
@@ -22,7 +22,7 @@ Respond with:
 1. **See** — v0 slice, how many `T#`s, whether a codebase is in context.
 2. **Scope drift** — plan/tasks that invent behavior, or drop a required acceptance line. Quote the lines.
 3. **Task quality** — oversized `T#`s, a verify note with no kind, too few or too many checks for what must be proved, an algorithm with no corner cases, old behavior with no regression, an edge with no integration test, a kept security check with no task, missing `(spec: …)`, order that cannot be verified incrementally. Smoke, chaos, fuzz, an invented speed goal, or test code in the plan belongs here. A missing `## Linter`, or one that never says whether a linter or checker covers the code the tasks will touch, belongs here. Naming the linter inside acceptance criteria does too.
-4. **Trace** — acceptance / REQ with no task; tasks with no spec line.
+4. **Trace** — acceptance / REQ with no task, unless the plan marks that piece `already there` or `left as committed`; tasks with no spec line. A rebuild task for a piece that already matches v0, or a task for a piece left as committed, belongs here.
 5. **Files** — `Files likely touched` that are wrong, missing, or too vague for the repo (if one exists).
 6. **Risks** — kept-open questions that the plan treats as decided; bets that will break the first demo.
 
