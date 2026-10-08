@@ -51,11 +51,11 @@ On an existing app, `@` the code and say it is a feature on this app. Answer the
 
 ## 5. Tighten
 
-`/crav1-tighten-spec` walks one issue at a time. Then `/crav1-resolve-questions` for leftover Open questions you still care about.
+`/crav1-tighten-spec` walks one issue at a time. When the slice is partial or `## In the code` names paths, it reads the committed code on the repo and branch the spec names before wording issues. A spec with no code behind it skips that read. Then `/crav1-resolve-questions` for leftover Open questions the user still cares about.
 
 ## 6. Plan
 
-Start a new chat. Run `/crav1-plan-from-spec`. Read `plan.md` and `tasks.md` and accept them. That step writes the plan and tasks only. The plan names a linter or checker when the repo has one for the code those tasks will touch, and Build is expected to leave that check green. When the repo has none, the plan says so and stops before Build. You decide to add the linter or to go on without one. The plan skill does not install one.
+Start a new chat. Run `/crav1-plan-from-spec`. Read `plan.md` and `tasks.md` and accept them. That step writes the plan and tasks only. When the spec is partial or `## In the code` names paths, it reads that repo and branch and lists each built piece before any task. Finish the gap, add a verify test, or leave it are the choices. A piece that already matches v0 is marked already there. The plan names a linter or checker when the repo has one for the code those tasks will touch, and Build is expected to leave that check green. When the repo has none, the plan says so and stops before Build. You decide to add the linter or to go on without one. The plan skill does not install one.
 
 ## 7. One task
 

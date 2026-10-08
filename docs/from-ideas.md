@@ -104,7 +104,7 @@ Diagrams: context + v0 sequence are required. State/ER only if the idea needs th
 Do not edit files.
 ```
 
-Then `/crav1-tighten-spec` to walk the numbered issues (each issue has resolutions plus **get a suggestion**). Then `/crav1-resolve-questions` for leftover Open questions.
+Then `/crav1-tighten-spec` to walk the numbered issues (each issue has resolutions plus **get a suggestion**). When the slice is partial or `## In the code` names paths, it reads the committed code on the repo and branch the spec names before wording issues. A spec with no code behind it skips that read. Then `/crav1-resolve-questions` for leftover Open questions.
 
 ## After accept
 
@@ -118,7 +118,7 @@ Stay inside v0. Do not reopen rejected options unless an ADR is still proposed.
 Do not code.
 ```
 
-`/crav1-plan-from-spec` writes `plan.md` and `tasks.md` in the spec folder. The host plan UI is not those files ([install.md](install.md)). The plan names a linter or checker when the repo has one, and stops before Build when it does not. You decide to add the linter or to go on without one. The plan skill does not install one. Specify does not name the linter.
+`/crav1-plan-from-spec` writes `plan.md` and `tasks.md` in the spec folder. When the spec is partial or `## In the code` names paths, it reads that repo and branch and lists each built piece before any task. Finish the gap, add a verify test, or leave it are the choices. A piece that already matches v0 is marked already there. The host plan UI is not those files ([install.md](install.md)). The plan names a linter or checker when the repo has one, and stops before Build when it does not. You decide to add the linter or to go on without one. The plan skill does not install one. Specify does not name the linter.
 
 Optional critique of the plan (does not change `spec.md`):
 

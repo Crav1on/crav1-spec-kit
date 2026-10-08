@@ -40,6 +40,10 @@ The same list is where a lone user sees the ways to start: [plugins/crav1/README
 | Subagent | `crav1-architecture-reviewer-agent` |
 | Subagent | `crav1-intake-slice-agent` |
 
+`/crav1-tighten-spec` reads `spec.md`, diagrams, ADRs, reviewer findings already in the chat, and, when the slice is partial or `## In the code` names paths, the committed code on the repo and branch that spec names. It writes only the picked issue in `spec.md` and, when that pick says so, the named diagram, ADR, or export. It writes a branch onto the spec only after a yes. It leaves application code and unpicked issues alone. A spec with no code behind it skips that read. The user calls it. It calls no skill.
+
+Exception: a different open repo or branch, a missing branch, a stub, or a spec too thin for that read stops and does not tighten. `suggest` does not patch. A disagreement with the code is called out and the spec is not rewritten to match the code. Finish, add a test, and leave are not choices here.
+
 ## Plan
 
 | Kind | Name |
@@ -48,6 +52,14 @@ The same list is where a lone user sees the ways to start: [plugins/crav1/README
 | Skill | `/crav1-review-plan` |
 | Skill | `/crav1-tighten-plan` |
 | Subagent | `crav1-plan-reviewer-agent` |
+
+`/crav1-plan-from-spec` reads the accepted spec, diagrams, ADRs, exports, kept security findings already written, and, when the spec is partial or `## In the code` names paths, that same committed repo and branch before any task is written. It writes `plan.md` and `tasks.md`, and matching OpenSpec export files when those already exist. A built piece that already matches v0 is marked already there and gets no rebuild task. A piece the user leaves gets one line in the plan and no task. It leaves `spec.md`, application code, and any linter install alone. The user calls it. It calls no skill.
+
+Exception: when `## Linter` says this repo has no linter for the code the tasks will touch, it stops before Build until the user chooses. A line under `## Dismissed test suggestions` is not a task. A kept test suggestion that is already an acceptance line maps to a task. A gap or a disagreement is finish, add a verify test, or leave before any task exists. A later run does not turn a left piece into work unless the user says so.
+
+`/crav1-review-plan` reads `spec.md`, `plan.md`, and `tasks.md`. It writes nothing. It leaves the plan and code alone. The user calls it. It calls no skill.
+
+Exception: the parent delegates the critique and does not review in its own voice. It names `/crav1-tighten-plan` and does not run it. A piece marked already there or left as committed is not a missing task.
 
 ## Build
 

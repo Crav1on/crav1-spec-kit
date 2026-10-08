@@ -1,6 +1,6 @@
 ---
 name: crav1-tighten-spec
-description: Walk an existing spec issue-by-issue. For every finding (including architecture-reviewer notes), offer explained resolution choices (including get a suggestion) and wait; patch only that issue after a pick. Use when spec.md exists and needs tightening. Do not write application code.
+description: Walk an existing spec issue-by-issue. When the slice is partial or In the code names paths, read that repo and branch first and treat the committed code as fact. For every finding (including architecture-reviewer notes), offer explained resolution choices (including get a suggestion) and wait; patch only that issue after a pick. Use when spec.md exists and needs tightening. Do not write application code. Do not offer finish, add a test, or leave.
 disable-model-invocation: true
 icon: book-open
 color: cyan
@@ -22,6 +22,28 @@ Read `spec.md` and note `diagrams.md`, `adr/`, `tasks.md`, `export/`.
 
 Also read the latest **crav1-architecture-reviewer-agent** / **crav1-spec-reviewer-agent** output in this chat if present. Those findings become issues. Do not collapse them into one “apply reviewer notes” action.
 
+## Read committed code first
+
+Decide in this order. Stop at the first match.
+
+1. **No code behind it.** Match status is `not in the code`, or the spec never claims existing code (no partial status, no status `done`, no `## In the code`, and it already has Problem, Goals, or Acceptance criteria). Skip the read. Tighten as this skill does today.
+2. **Too thin.** The slice is partial, status is `done`, or `## In the code` is present, and the spec does not name a repo or does not name paths that can be read. Also too thin: there is no partial status and no `## In the code`, and step 1 did not match. Stop. Name `/crav1-code-into-specs` when a change already landed on an existing spec. Name `/crav1-match-to-specs` when the slice was never matched. Do not guess. Do not tighten. Do not invent the repo or the paths.
+3. **Read.** The slice is partial, or `## In the code` names paths. Read the committed code on the repo and branch the spec names. That code is the current fact. Wording issues come after that read.
+
+The rest of this section applies only when step 3 matched.
+
+The repo is the Match repo line, a `Synced at` line, or another line in `spec.md` that names it. The branch is the branch on that line. Do not take the repo or the branch from the open checkout. Do not take a branch from `docs/system/repos.md` when the spec does not name it.
+
+Read only that repo and that branch. If the open checkout is a different repo or a different branch, stop and name the right ones. Do not read the open tree.
+
+Do not treat a stub as the code. A stub is a placeholder, for example a `.gitkeep` on `main`. If the paths on the named branch are only a stub, stop and say so. Do not tighten against that stub.
+
+If the spec names no branch, stop and ask which branch has the code. Do not assume `main`. Do not assume the open checkout. When that repo lists branches, the options are those branches. Do not pick one. After the user answers, that branch is the read. Then ask whether to write the branch onto the spec. That question is yes or no. It is not an `I#` patch. On yes, add `Branch: <name>` beside the repo the spec already names (under `## Match` when that section exists, otherwise one line after the title and before the first heading). On no, leave the spec unchanged. This read still uses that branch. Do not set `Synced at`. Do not write the branch as a silent edit. If the spec already names the branch, do not ask.
+
+Read the committed files on that branch. An uncommitted edit is not the fact.
+
+A disagreement between the spec and that code is called out. Quote what the spec says and what the code does. Do not silently rewrite the spec to match the code. The same call-out applies when tightened wording would disagree with the code. Do not offer finish the gap, add a verify test, or leave it. Those choices belong to `/crav1-plan-from-spec`.
+
 ## Build the issue list (no edits)
 
 Number issues `I1`, `I2`, … Each issue is **one** defect, ambiguity, or decision smuggled into the wrong layer.
@@ -29,7 +51,8 @@ Number issues `I1`, `I2`, … Each issue is **one** defect, ambiguity, or decisi
 Sources, in order:
 
 1. Numbered issues already listed by a reviewer in this chat (preserve their meaning; split if they bundled two problems)
-2. Fresh read of `spec.md` / diagrams / ADRs (add only issues the reviewer missed)
+2. When the committed-code read happened, one issue per disagreement with that code. Quote both sides. Do not rewrite the spec to match the code.
+3. Fresh read of `spec.md` / diagrams / ADRs (add only issues the reviewer missed). Wording issues come after the code read.
 
 Typical issue shapes (from this skill’s job):
 
@@ -107,6 +130,8 @@ Pick the ones that fit; rewrite names to the actual REQ/ADR.
 
 Do **not** offer a turn-level `apply-notes` that applies the whole architecture review. Each reviewer bullet is its own `I#`.
 
+Do **not** offer finish the gap, add a verify test, or leave it. Those choices belong to `/crav1-plan-from-spec`.
+
 You may add `sync-here` as a **second letter on the same issue** only when the chosen resolution would immediately make a named diagram/ADR wrong (“B, then sync the sequence diagram”). Still one issue.
 
 ## Hard rules
@@ -118,6 +143,8 @@ You may add `sync-here` as a **second letter on the same issue** only when the c
 - Do not leave `diagrams.md` / `adr/` / `export/` contradicting `spec.md` after a patch that affects them — either the chosen resolution includes `sync-here`, or the next issue is that drift.
 - Do not start Plan Mode or write application code unless they explicitly ask after issues are done.
 - Do not patch “to be helpful” when they have not chosen a **patch** resolution (`suggest` is not a patch).
+- Do not silently rewrite the spec to match the code. Call the disagreement out.
+- Do not add finish the gap, add a verify test, or leave it. Those choices belong to `/crav1-plan-from-spec`.
 
 ## When the spec is tight enough
 
