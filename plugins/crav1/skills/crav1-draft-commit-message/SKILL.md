@@ -6,7 +6,9 @@ description: >-
   as a deletable rule. Use for GitKraken paste, or /crav1-draft-commit-message.
   To edit the wording and then copy or git commit, use /crav1-finalize-commit.
   When docs/specs/<slug>/work-item.md exists, append that work-item mention
-  as the last description line.
+  as the last description line. Several ids: pick the line whose milestone
+  or slice label matches the slice being worked, and ask if that is unclear.
+  A single unlabeled line is still read.
 disable-model-invocation: true
 icon: git-commit
 color: purple

@@ -4,11 +4,11 @@ Optional Azure Boards link for one spec slug. Read this from `/crav1-draft-commi
 
 The id lives only in `docs/specs/<slug>/work-item.md`. Do not store it in `tasks.md` (workers parse `T#` rows and skills rewrite that file). Do not create a work item, do not call an Azure DevOps API, and do not add a git hook.
 
-`/crav1-draft-commit-message`, `/crav1-finalize-commit`, and `/crav1-open-pr` do not ask for an id. They only read the file. `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, and `/crav1-intake-to-specs` may write the one-line file when they create a new spec folder on Azure Repos and the user replies with an id. That offer is [work-item-offer.md](work-item-offer.md). Creating the work item in Azure Boards stays out of scope.
+`/crav1-draft-commit-message`, `/crav1-finalize-commit`, and `/crav1-open-pr` do not ask for a new id. They only read the file. When several lines are recorded and the slice is unclear, they ask which recorded line to mention. `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, and `/crav1-intake-to-specs` may write a line when they create a new spec folder on Azure Repos and the user replies with an id. That offer is [work-item-offer.md](work-item-offer.md). Creating a Feature is `/crav1-specs-to-ado`. These skills do not create one. `/crav1-specs-to-ado` writes a line after the user says yes.
 
 A missing file never blocks a commit, a pull request, or a worker. Do not fail a worker status for this.
 
-Starter comment (humans may copy from here): `docs/specs/_template/work-item.md`. Spec skills do not copy that comment into a slug. When the user answers the offer, they write one line, `Work item: <id>`, and nothing else.
+Starter comment (humans may copy from here): `docs/specs/_template/work-item.md`. Spec skills do not copy that comment into a slug. When the user answers the offer, they write one line per id, `Work item: <id>`, or `Work item: <id> — <label>` when they named a milestone or slice, and nothing else.
 
 ## Slug
 
@@ -20,18 +20,40 @@ Starter comment (humans may copy from here): `docs/specs/_template/work-item.md`
 
 Path: `docs/specs/<slug>/work-item.md`.
 
-Ignore HTML comments, including the sample `Work item: 52` inside `docs/specs/_template/work-item.md`. Read the first non-empty line outside comments.
+Ignore HTML comments, including the sample lines inside `docs/specs/_template/work-item.md`. Read every non-empty line outside comments. A file with one unlabeled line is the old format. Keep reading it.
 
 | Line | Result |
 | --- | --- |
-| `Work item: 52` | Numeric id `52`. Prefix comes from the remote. |
-| `Work item: AB#52` or `Work item: #52` | That token, verbatim. |
-| A line that is only `AB#52` or `#52` | That token, verbatim. |
-| Anything else, or no such line | No mention. |
+| `Work item: 52` | Numeric id `52`. No milestone or slice label. Prefix comes from the remote. |
+| `Work item: 52 — October billing` | Numeric id `52`. Label `October billing`. |
+| `Work item: AB#52` or `Work item: #52` | That token, verbatim. No label. |
+| `Work item: AB#52 — catalog` or `Work item: #52 — catalog` | That token, verbatim. Label `catalog`. |
+| A line that is only `AB#52` or `#52` | That token, verbatim. No label. |
+| Anything else | That line is not a mention. Other lines are still read. |
 
 The label `Work item:` is case-insensitive. Surrounding whitespace does not matter. Digits are the id. `AB#` plus digits, or `#` plus digits, is a full token.
 
+The milestone or slice label is the text after the first ` — ` (space, em dash, space) or ` - ` (space, hyphen, space) that follows the id token. The writer uses the em dash. The reader accepts both. A line with no separator has no label.
+
 A full token is an override: use it on every host, including a host that would otherwise get no mention.
+
+## Which line
+
+**One usable line.** Use it. A missing label does not ask. This is the old single-line format.
+
+**Several usable lines.** The mention is the line whose label matches the slice being worked.
+
+The slice being worked is the first of these that this turn already shows:
+
+1. The user named a milestone or slice in this turn.
+2. The intended commit (draft) or the pull-request diff (open PR) touches one milestone or slice heading in that spec, or one `tasks.md` row whose text is that label.
+3. The slug was resolved from the branch, and the branch name has text after that slug (`feat/<slug>-<rest>` or `spec/<slug>-<rest>`) that matches one label. When the branch name is exactly `feat/<slug>` or `spec/<slug>`, this step does not apply.
+
+A match is the whole label and that name, compared without regard to case. A partial overlap is not a match. One match uses that id.
+
+**Unclear.** Zero matches, or more than one, asks. Options only. Use the questions tool when it is available. One option per usable line, showing the id and the label, or `no label` when the line has none. Last option: **No mention.** Stop until the user picks. Do not guess. Do not put a mention in the draft until they pick. **No mention** means this commit or this pull request has no mention. Do not write `work-item.md` from that answer.
+
+A file whose every line fails the table uses the “no usable line” hint below. A file that parses some lines ignores the rest.
 
 ## Remote prefix
 

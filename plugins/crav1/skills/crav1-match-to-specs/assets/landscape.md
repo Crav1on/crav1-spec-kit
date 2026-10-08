@@ -29,3 +29,11 @@ Shared technical constraints (not slice requirements).
 ## Open questions
 
 Cross-cutting only. Slice questions live on that spec.
+
+## No spec yet in ADO
+
+Features in Azure Boards that have no spec yet. One row each. When a spec is made later, the id moves into that spec's `work-item.md` and the row comes off this table.
+
+| Id | Title | Date |
+| --- | --- | --- |
+| | | |
