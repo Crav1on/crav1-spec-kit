@@ -2,7 +2,7 @@
 
 Optional, once, when a spec skill creates a new spec folder. Read this from `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, and `/crav1-intake-to-specs` at the end of the turn that created the folder. Commit and pull-request skills do not read this file. They only read an existing `work-item.md` via [work-item-mention.md](work-item-mention.md).
 
-Creating the work item in Azure Boards is out of scope. Do not create a work item. Do not look one up. Do not call an Azure DevOps API. Do not run `az`. Do not pass `--work-items` or `--transition-work-items`.
+Creating a Feature is `/crav1-specs-to-ado`. This offer does not run that command. Do not create a work item. Do not look one up. Do not call an Azure DevOps API. Do not run `az`. Do not pass `--work-items` or `--transition-work-items`.
 
 ## When to ask
 
@@ -22,7 +22,7 @@ On GitHub or any other host that is not Azure Repos, never ask.
 
 ## Question
 
-One question. Optional. Non-blocking. The spec files are already written. In the same turn, state that creating the work item in Azure Boards is out of scope and that this only records an id the user already has.
+One question. Optional. Non-blocking. The spec files are already written. In the same turn, state that creating a Feature is `/crav1-specs-to-ado` and that this only records an id the user already has. Do not run `/crav1-specs-to-ado`.
 
 The question must accept a free-text id. If a questions tool cannot take that id, ask in the reply. Skip is a valid answer.
 
@@ -50,10 +50,11 @@ The turn that created the folders asks, then waits. The next message in this com
 | `#` plus digits (`#52`) | `Work item: #52` |
 | `AB#` plus digits (`AB#52`; any letter case on `AB`) | `Work item: AB#52` |
 | The same forms after a `Work item:` label | That id, in the form above |
+| Any of those plus a milestone or slice label (`52 — October billing`) | `Work item: 52 — October billing` (the id form above, then ` — ` and the label) |
 
 Surrounding whitespace does not matter. Write `AB#` in uppercase so [work-item-mention.md](work-item-mention.md) can parse the line.
 
-A single slug may be a bare id, or the slug plus the id (`<slug>: 52`). A different slug name writes nothing.
+A single slug may be a bare id, the id plus a milestone or slice label (`52 — October billing`), or the slug plus the id (`<slug>: 52`). A label on a slug line (`<slug>: 52 — October billing`) is kept. A different slug name writes nothing.
 
 For several slugs, each id must name its slug (`billing: 52`, `catalog #18`). A slug with no id in the reply is a skip for that slug. One bare id with several slugs does not apply to all of them. Do not guess. Do not ask again.
 
@@ -63,7 +64,7 @@ Anything else (including "skip", "no", or a sentence that is not an id) writes n
 
 Path: `docs/specs/<slug>/work-item.md`.
 
-The file is that single line and a trailing newline. Do not copy `docs/specs/_template/work-item.md`. Do not add the HTML comment. Do not put the id in `tasks.md`.
+The file is one line per id, and a trailing newline. A reply that names a milestone or slice uses `Work item: <id> — <label>`. A reply with no label uses `Work item: <id>`. Several ids are several lines. Do not copy `docs/specs/_template/work-item.md`. Do not add the HTML comment. Do not put the id in `tasks.md`. The line format matches [work-item-mention.md](work-item-mention.md).
 
 After writing, stop. These skills do not commit.
 

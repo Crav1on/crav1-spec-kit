@@ -37,6 +37,18 @@ When `/crav1-suggest-tests-for-code` hands one suggestion for an existing spec, 
 
 **Dismiss.** Quote the suggestion under `## Dismissed test suggestions`. The line starts with `Dismissed test suggestion.` Do not reword the check. Create that heading only when it is missing. Do not add an acceptance checkbox. Do not turn it into a goal. Plan does not turn this line into a task. The next run of `/crav1-suggest-tests-for-code` does not offer it.
 
+## From /crav1-specs-to-ado
+
+When `/crav1-specs-to-ado` hands a change that belongs in the spec before a Feature preview is rebuilt, the spec is the one that skill already named. Do not ask for a slug. Do not create a slug. Quote the change. Do not replace it with a paraphrase. Label it `**New:**`. Then run **Add to that spec.md** and **Impact**. Do not write `work-item.md` from this handoff. That skill writes the id after Azure Boards accepts the Feature. Do not start Specify, Plan, or Build.
+
+## From /crav1-ado-to-specs
+
+When `/crav1-ado-to-specs` hands one kept change or one answer for an existing spec, the spec is the one that skill already named. Do not ask for a slug. Do not create a slug. Do not create a spec folder.
+
+Quote the item. Do not replace it with a paraphrase. A kept Azure Boards change starts with `From ADO <date>. <who>.` when the handoff includes a date and a person. When the handoff has a date and no person, it starts with `From ADO <date>.` An answer the user gave starts with `From the user <date>. Answer to the ADO question.` Do not invent a date or a person. Label it `**New:**` in the section the words belong to. An open question from a Feature discussion goes under `## Open questions`.
+
+Then run **Add to that spec.md** and **Impact**. The impact check still runs. Do not write `plan.md`, `tasks.md`, or `work-item.md`. Do not change application code. Do not start Specify, Plan, or Build. Do not ask the picture offer.
+
 ## From /crav1-meeting-to-specs
 
 When `/crav1-meeting-to-specs` hands one kept addition for an existing spec, the spec is the one that skill already named. Do not ask for a slug. Do not create a slug. Do not create a spec folder. A source folder that handoff already wrote stays. When it wrote none and the quote is an imported source, **Imported sources** writes that folder.
@@ -49,7 +61,7 @@ Then run **Add to that spec.md** and **Impact** in this skill. The impact check 
 
 ## Picture offer
 
-The handoff sections **From /crav1-environment-read** and **From /crav1-suggest-tests-for-code** ask once at the end of the run, after every item this run wrote. Not after each item. The meeting handoff does not ask. The main path does not ask. A run that wrote nothing from these handoffs does not ask.
+The handoff sections **From /crav1-environment-read** and **From /crav1-suggest-tests-for-code** ask once at the end of the run, after every item this run wrote. Not after each item. The meeting handoff, the specs-to-ado handoff, and the ado-to-specs handoff do not ask. The main path does not ask. A run that wrote nothing from these handoffs does not ask.
 
 The question is exactly:
 

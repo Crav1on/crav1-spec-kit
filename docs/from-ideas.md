@@ -211,13 +211,15 @@ Do not change spec.md.
 
 ## Optional Azure Boards mention
 
-To link commits and the pull request to an Azure Boards work item, `docs/specs/<slug>/work-item.md` holds one line, `Work item: 52`. The file is optional. The commented starter is [docs/specs/_template/work-item.md](specs/_template/work-item.md). Leave the id out of `tasks.md`.
+To link commits and the pull request to an Azure Boards work item, `docs/specs/<slug>/work-item.md` holds one id per line. A line may name the milestone or slice: `Work item: 52` or `Work item: 81 — October billing`. A file with one unlabeled line is the old format and is still read. The commented starter is [docs/specs/_template/work-item.md](specs/_template/work-item.md). Leave the ids out of `tasks.md`.
 
-On an Azure Repos remote (`dev.azure.com` or `*.visualstudio.com`), `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, and `/crav1-intake-to-specs` ask once after they create a new spec folder. The question is optional: reply with the id, or skip. Intake lists every new slug in that one question so the user can give an id per slug. A reply writes `Work item: <id>` and nothing else. Skip writes nothing and does not ask again in that run. GitHub and other hosts are not asked. Those skills do not create the work item in Azure Boards, do not look it up, and do not call Azure DevOps.
+On an Azure Repos remote (`dev.azure.com` or `*.visualstudio.com`), `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, and `/crav1-intake-to-specs` ask once after they create a new spec folder. The question is optional: reply with the id, or skip. Intake lists every new slug in that one question so the user can give an id per slug. A reply writes one line per id. Skip writes nothing and does not ask again in that run. GitHub and other hosts are not asked. Those skills do not create the Feature. Creating a Feature is [`/crav1-specs-to-ado`](from-specs-to-ado.md).
+
+The commit mention picks the line whose label matches the slice being worked. If that match is unclear, the commit skills ask. They do not guess.
 
 The file can still be added by hand.
 
 `/crav1-draft-commit-message` keeps the subject and description as drafted, then adds a blank line and the mention as the last line of the Description, so a GitKraken paste includes it. `/crav1-finalize-commit` commits that same text and keeps the line when it checks HEAD and when it strips a Cursor attribution trailer. `/crav1-open-pr` adds a `## Work item` section when the file has an id. The pull request title stays `<slug>: short summary`. The body stays What / why, Spec (links to that slug’s `spec.md`, `plan.md`, and `tasks.md`), Verify, then the work-item section.
 
-The mention is `#52` on Azure Repos (`dev.azure.com` or `*.visualstudio.com`) and `AB#52` on GitHub. Any other host adds no mention. `Work item: AB#52` or `Work item: #52` is used as written. With no file, the skills continue. On Azure Repos only, they print one hint. They do not block, they do not create the work item, and `/crav1-open-pr` still does not pass `--work-items`.
+The mention is `#52` on Azure Repos (`dev.azure.com` or `*.visualstudio.com`) and `AB#52` on GitHub. Any other host adds no mention. `Work item: AB#52` or `Work item: #52` is used as written. With no file, the skills continue. On Azure Repos only, they print one hint. They do not block, and `/crav1-open-pr` still does not pass `--work-items`. Creating a Feature stays `/crav1-specs-to-ado`.
 
