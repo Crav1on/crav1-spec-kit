@@ -1,9 +1,10 @@
 ---
 name: crav1-draft-commit-message
 description: >-
-  Draft paste-ready GitKraken Summary and Description only. Does not create a
+  Draft a paste-ready commit Summary and Description only. Does not create a
   git commit. Ask CRAV1 style vs this repo’s git log, this commit only or onward
-  as a deletable rule. Use for GitKraken paste, or /crav1-draft-commit-message.
+  as a deletable rule. Use when you paste the message into your git client, or
+  /crav1-draft-commit-message.
   To edit the wording and then copy or git commit, use /crav1-finalize-commit.
   When docs/specs/<slug>/work-item.md exists, append that work-item mention
   as the last description line. Several ids: pick the line whose milestone

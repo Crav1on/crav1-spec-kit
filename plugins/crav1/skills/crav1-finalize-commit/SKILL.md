@@ -1,7 +1,7 @@
 ---
 name: crav1-finalize-commit
 description: >-
-  Finalize a commit: CRAV1 style vs git log first if needed, then draft GitKraken
+  Finalize a commit: CRAV1 style vs git log first if needed, then draft the
   Summary and Description, then offer git commit first, then copy / edit /
   rewrite / stop. Wording is shown before those choices. Use when they want
   to change the message or actually create the commit, or /crav1-finalize-commit.
