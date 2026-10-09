@@ -29,7 +29,7 @@ That slash command *is* the prompt.
 
 ## What it reads
 
-Ids come from every `docs/specs/<slug>/work-item.md` and from `## No spec yet in ADO` in `docs/system/landscape.md`, unless the user named ids. For each id it reads State, Priority, Target Date, Iteration, and Assigned To, plus discussion comments and history.
+Ids come from every `docs/specs/<slug>/work-item.md` and from `## No spec yet in ADO` in `docs/system/landscape.md`, unless the user named ids. For each id it reads State, Priority, Target Date, Iteration, and Assigned To, plus discussion comments and history. It reads the checks from Acceptance Criteria when the Feature type has that field, and from the Acceptance checks list in the Description when it does not. A list that matches the spec is not a change. Discussion comments use an api version current `az` can parse.
 
 `az` is checked the same way as `/crav1-specs-to-ado`. A failure states the issue, suggests a fix such as `az login`, and offers a skip.
 

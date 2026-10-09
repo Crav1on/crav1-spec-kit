@@ -43,7 +43,9 @@ Skip a file that has no usable line. Do not drop an id to keep the list short. W
 
 Check `az`, the org, and the project the same way `/crav1-specs-to-ado` does. On a failure, state the issue, suggest a fix such as `az login`, and offer Retry or Skip. Skip stops this command. Say the Azure Boards calls did not run, and why.
 
-For each id, read State, Priority, Target Date, Iteration, and Assigned To with `az boards work-item show`. Read discussion comments and history with `az devops invoke --area wit --resource comments` and `--resource updates`. Follow the reference.
+For each id, read State, Priority, Target Date, Iteration, and Assigned To with `az boards work-item show`. Read discussion comments and history with `az devops invoke --area wit --resource comments` and `--resource updates`. Follow the reference. Comments use api version `7.1-preview`. Do not use `7.1-preview.4`.
+
+Before comparing, read the project’s Feature fields once, the same way `/crav1-specs-to-ado` does. A failed field read is the same failure as the other `az` checks. State the issue, suggest a fix, and offer Retry or Skip. Do not guess where the checks live.
 
 A deleted or missing id is reported as missing. Do not guess another work item. Do not match on the title.
 
@@ -51,7 +53,9 @@ A deleted or missing id is reported as missing. Do not guess another work item. 
 
 One block per Feature. The block holds only what differs from the spec or is new.
 
-Compare State, Priority, Target Date, Iteration, Assigned To, title, description, acceptance criteria, tags, comments, and history with the spec that records the id (the `work-item.md` label picks the milestone or slice). A field the spec does not mention is new. A field that matches is left out. A comment that the spec already quotes is left out.
+Compare State, Priority, Target Date, Iteration, Assigned To, title, description, the checks, tags, comments, and history with the spec that records the id (the `work-item.md` label picks the milestone or slice). A field the spec does not mention is new. A field that matches is left out. A comment that the spec already quotes is left out.
+
+When the Feature type has Acceptance Criteria, the checks are that field. When it does not, the checks are the numbered list under the heading `Acceptance checks` in the Description. The paragraphs above that heading are the description. Strip HTML tags before comparing. When the list matches the spec’s checks, do not report the checks as a change, and do not report that list as a description change. When the type has the field, do not read the checks from the Description. When it does not, do not read `Microsoft.VSTS.Common.AcceptanceCriteria`, even if the work item returns a value there. A round trip that matches stays a match.
 
 Each difference names the date and who changed it when the history or the comment shows them. When the history shows no person, say the name is not in the history. Do not invent a person or a date.
 

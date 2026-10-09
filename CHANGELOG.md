@@ -4,6 +4,20 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 
 ## Unreleased
 
+## 1.33.0 (2026-10-09)
+
+### Kit
+
+- `/crav1-specs-to-ado`, before the preview, reads the project's Feature fields. When the type has Acceptance Criteria (`Microsoft.VSTS.Common.AcceptanceCriteria`), the spec's checks go there. When it does not, as on Agile and Basic, the checks go in the Description as an Acceptance checks numbered list, that field is not sent, and the preview says so in one line. The same rule applies on Update, so a re-run moves checks that were stored off the form into the Description. A failed field read states the issue, suggests a fix, and offers a skip. It does not guess.
+
+- After a Create, writing the new id into `docs/specs/<slug>/work-item.md` (with the milestone or slice label), or a row on the landscape “No spec yet in ADO” table when the item has no spec, is a required final step. The closing output names the file, says it is not committed yet, and names `/crav1-finalize-commit`. Without that file a later run offers Create again and would make a duplicate. If the write fails, the run says so and prints the line to add.
+
+- `/crav1-ado-to-specs` reads the checks from Acceptance Criteria when the Feature type has that field, and from the Acceptance checks list in the Description when it does not, so a round trip that matches is not reported as a change. Discussion comments use api version `7.1-preview`. Current `az devops invoke` deletes `-preview` and parses the rest as a float, so `7.1-preview.4` fails. `7.1-preview` parses. No new skill.
+
+### Docs
+
+- The behavior map in [`.cursor/rules/kit-maintainer.mdc`](.cursor/rules/kit-maintainer.mdc) and [docs/guild-routing.md](docs/guild-routing.md) record the same three rules. [docs/from-specs-to-ado.md](docs/from-specs-to-ado.md) and [docs/from-ado-to-specs.md](docs/from-ado-to-specs.md) name them too. No new skill.
+
 ## 1.32.0 (2026-10-08)
 
 ### Kit
