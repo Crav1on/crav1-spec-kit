@@ -71,6 +71,22 @@ az boards work-item type list --organization <org-url> --project <project> --det
 
 The project has the type when a returned name is `Feature`. If it does not, say the project has no Feature work item type, and stop. That stop is not the skip prompt. Do not create a type. Do not create a work item of another type.
 
+## Feature fields
+
+Before the preview, read the fields on the project’s Feature type. Use the same `az` path as the rest of this file. Read once for the project.
+
+```text
+az devops invoke --area wit --resource workitemtypesfield --route-parameters project=<project> type=Feature --organization <org-url> --detect false --api-version 7.1 -o json
+```
+
+That call is `GET _apis/wit/workitemtypes/Feature/fields`.
+
+The type has Acceptance Criteria when a returned field has reference name `Microsoft.VSTS.Common.AcceptanceCriteria`, or the field name `Acceptance Criteria`. The list may be a bare array or a `value` array.
+
+When the type has that field, send the spec’s checks as `Microsoft.VSTS.Common.AcceptanceCriteria`. When it does not, do not send that field. Put the checks in the Description, under the summary paragraphs, as a numbered list headed `Acceptance checks`.
+
+A failed field read is a failure in the Failure section above. State the issue, suggest a fix, and offer Retry or Skip. Do not guess whether the field is there. Do not preview until the read succeeds.
+
 ## Create and update
 
 Create:
@@ -79,7 +95,18 @@ Create:
 az boards work-item create --type Feature --title "<title>" --organization <org-url> --project <project> --detect false --fields "System.State=New" "Microsoft.VSTS.Common.ValueArea=Business" "System.Description=<html>" "Microsoft.VSTS.Common.AcceptanceCriteria=<html>" "System.Tags=<tags>" "Microsoft.VSTS.Scheduling.TargetDate=<YYYY-MM-DD>"
 ```
 
-Omit `Microsoft.VSTS.Scheduling.TargetDate` when the spec states no target date. Omit `Microsoft.VSTS.Common.AcceptanceCriteria` when the spec has no checks. Omit `System.AreaPath`, `System.IterationPath`, and `Microsoft.VSTS.Common.Priority`. Area stays the project default. Iteration and Priority stay blank so the user’s team can set them.
+Omit `Microsoft.VSTS.Scheduling.TargetDate` when the spec states no target date. Omit `Microsoft.VSTS.Common.AcceptanceCriteria` when the spec has no checks, and omit it when the Feature type does not have that field. Omit `System.AreaPath`, `System.IterationPath`, and `Microsoft.VSTS.Common.Priority`. Area stays the project default. Iteration and Priority stay blank so the user’s team can set them.
+
+When the type has no Acceptance Criteria field, the Description is the summary paragraphs, then a paragraph `Acceptance checks`, then an ordered list. One check is one list item, in the spec’s order. When the spec has no checks, the Description is the summary paragraphs only. Do not add an empty `Acceptance checks` heading.
+
+```html
+<p>summary</p>
+<p>Acceptance checks</p>
+<ol>
+<li>check one</li>
+<li>check two</li>
+</ol>
+```
 
 Update:
 
@@ -89,7 +116,9 @@ az boards work-item update --id <id> --organization <org-url> --project <project
 
 Do not send State, Area, Iteration, Priority, or Assigned To on an update unless the accepted diff includes that field. Do not clear a target date the spec does not state. Tags on an update add the slice name and the code repos that are missing. Do not remove a tag the form does not list.
 
-Description and Acceptance Criteria are HTML. Turn the plain paragraphs into `<p>` paragraphs. Escape `<`, `>`, and `&`. No links. No paths. No kit names. No skill names.
+The same field rule applies on an update. When the type has Acceptance Criteria, send changed checks on that field. When it does not, do not send `Microsoft.VSTS.Common.AcceptanceCriteria`, even if the work item returns a stored value. Put the checks in the Description. A re-run on a Feature that stored the checks off the form moves them into the Description.
+
+Description and Acceptance Criteria are HTML. Turn the plain paragraphs into `<p>` paragraphs. Escape `<`, `>`, and `&` in the summary and in each check. No links. No paths. No kit names. No skill names.
 
 Tags are semicolon-separated. The slice name, then each code repo the slice involves. Never the repo that holds the specs.
 
@@ -101,13 +130,17 @@ Show:
 az boards work-item show --id <id> --organization <org-url> --project <project> --detect false -o json
 ```
 
-Read `System.State`, `Microsoft.VSTS.Common.Priority`, `Microsoft.VSTS.Scheduling.TargetDate`, `System.IterationPath`, `System.AssignedTo`, plus title, description, acceptance criteria, and tags when comparing.
+Read `System.State`, `Microsoft.VSTS.Common.Priority`, `Microsoft.VSTS.Scheduling.TargetDate`, `System.IterationPath`, `System.AssignedTo`, plus title, description, tags, and the checks.
+
+When the Feature type has Acceptance Criteria, the checks are `Microsoft.VSTS.Common.AcceptanceCriteria`. When it does not, the checks are the numbered list under the heading `Acceptance checks` in `System.Description`. The paragraphs above that heading are the description. Strip HTML tags before comparing. When that list matches the spec’s checks, the checks are not a change, and the list is not a description change. When the type has the field, do not read the checks from the Description. When it does not, do not read the checks from `Microsoft.VSTS.Common.AcceptanceCriteria`, even if the work item returns a value there.
 
 Comments:
 
 ```text
-az devops invoke --area wit --resource comments --route-parameters project=<project> workItemId=<id> --organization <org-url> --detect false --api-version 7.1-preview.4 -o json
+az devops invoke --area wit --resource comments --route-parameters project=<project> workItemId=<id> --organization <org-url> --detect false --api-version 7.1-preview -o json
 ```
+
+`az devops invoke` deletes `-preview` and then parses the rest as a float. `7.1-preview.4` becomes `7.1.4` and fails. `7.1-preview` becomes `7.1` and parses. The call still sends `7.1-preview`. Do not use `7.1-preview.4`.
 
 History:
 
@@ -120,7 +153,7 @@ A not-found id is missing. Do not search by title.
 Post a comment only after the user says yes:
 
 ```text
-az devops invoke --area wit --resource comments --route-parameters project=<project> workItemId=<id> --organization <org-url> --detect false --http-method POST --api-version 7.1-preview.4 --in-file <body.json> -o json
+az devops invoke --area wit --resource comments --route-parameters project=<project> workItemId=<id> --organization <org-url> --detect false --http-method POST --api-version 7.1-preview --in-file <body.json> -o json
 ```
 
 The body is `{"text":"<p>...</p>"}`. The text is the accepted reply. No docs-repo path, link, kit name, or skill name. Delete the body file after the call. Do not print the body file path in the chat.

@@ -46,6 +46,8 @@ Stop until they pick. Do not preview a row they did not pick.
 
 ## Preview
 
+After the user picks, and before any form, read the project’s Feature fields once. Follow [references/azure-boards.md](references/azure-boards.md). When the type has Acceptance Criteria (`Microsoft.VSTS.Common.AcceptanceCriteria`), the checks go there. When it does not, the checks go in the Description. A failed field read is the same failure as the other `az` checks. State the issue, suggest a fix, and offer Retry or Skip. Do not guess. Do not preview until the read succeeds.
+
 For each pick, show the Azure Boards form in plain words. The label on the form is **Create** when no id is recorded, or **Update #<id>** when `work-item.md` or the landscape table already records one.
 
 | Form field | What to show |
@@ -58,14 +60,18 @@ For each pick, show the Azure Boards form in plain words. The label on the form 
 | Priority | blank. The user’s team sets it |
 | Target Date | The date the spec states, or blank |
 | Tags | The slice name, then the code repos that slice involves |
-| Description | Goals, status, and open questions, in two to four sentences that stand alone |
-| Acceptance Criteria | The spec’s checks, or blank |
+| Description | Goals, status, and open questions, in two to four sentences that stand alone. When the type has no Acceptance Criteria field and the spec has checks, the Acceptance checks list follows those sentences |
+| Acceptance Criteria | The spec’s checks when the type has that field, or blank. When the type does not have the field, this row is not on the form |
 
 Tags come from `docs/system/repos.md`: the repos that slice involves (the feature-index Repos cell, or a repo the spec or the plan names). Never tag the repo that holds the specs. A docs repo and a spec repo stay off the tag list.
 
-Acceptance Criteria are the acceptance checks in that `spec.md` and nothing else. Do not invent a check. Do not copy a task. When the spec has no checks, the field is blank. A questions-only candidate has blank acceptance and its questions in the description.
+The checks are the acceptance checks in that `spec.md` and nothing else. Do not invent a check. Do not copy a task. When the spec has no checks, Acceptance Criteria is blank when the type has that field, and the Description has no Acceptance checks list when it does not. A questions-only candidate has blank acceptance and its questions in the description.
+
+When the type has no Acceptance Criteria field and the spec has checks, the preview adds one plain line: this project’s Feature has no Acceptance Criteria field, so the checks are in the Description.
 
 An **Update** also shows what would change. Compare the form with the work item `az boards work-item show` returns. Show only fields that differ. Do not reset State, Area, Iteration, Priority, or Assigned To when the spec does not state that field. Do not clear a target date the spec does not state. Tags to add are the slice name and the code repos that are missing. Do not remove a tag the form does not list.
+
+The same field rule applies on an update. When the type has no Acceptance Criteria field, do not send that field. Put the checks in the Description. A re-run moves checks that were stored off the form into the Description. When the Description list already matches the spec’s checks, that is not a change.
 
 ### Nothing from the specs repo
 
@@ -95,7 +101,7 @@ A skip sends nothing for that row. The spec stays as it is.
 
 ## Record
 
-After a create, write the new id.
+After a create, write the new id. This write is a required final step of the run. It is not optional.
 
 **A spec.** Append one line to `docs/specs/<slug>/work-item.md`:
 
@@ -111,8 +117,14 @@ When a spec later covers a row in that table, move the id. An exact title match 
 
 An update does not mint a new id. It keeps the recorded line.
 
+If the write fails, say so. Print the exact line to add. For a spec, that line is `Work item: <id> — <label>`. For no spec yet, print the table row: id, title, and date.
+
 ## Report
 
-Say what was created and what was updated. One line each: the id, the title, and the spec slug or `no spec yet`. Say what was skipped. Name `/crav1-finalize-commit` when a file changed. Do not run it. Name `/crav1-ado-to-specs` as the later read-back. Do not run it.
+Say what was created and what was updated. One line each: the id, the title, and the spec slug or `no spec yet`. Say what was skipped.
+
+When a create wrote a file, name that file. Say it is not committed yet and must be committed. Name `/crav1-finalize-commit`. Do not run it. Say that without that file a later run offers Create again and would make a duplicate.
+
+Name `/crav1-ado-to-specs` as the later read-back. Do not run it.
 
 Do not plan. Do not implement. Do not commit.

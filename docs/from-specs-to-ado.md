@@ -26,7 +26,9 @@ The org and the project come from `docs/environments/marks.md`, or from the Azur
 
 ## Pick, preview, then send
 
-The user sees the candidate list and picks one or more by number, or all. Each pick is shown as the Feature form: title, State New, Area default, Value area Business, Iteration and Priority blank, Target Date only when the spec states it, tags for the slice name and the code repos it touches, a description that stands alone, and acceptance criteria only from the spec’s checks. Acceptance stays blank when the spec has none.
+The user sees the candidate list and picks one or more by number, or all. Before the form, the command reads the project's Feature fields. When that type has Acceptance Criteria, the spec's checks go there. When it does not, the checks go in the Description as an Acceptance checks numbered list, and the preview says so in one line. A failed field read states the issue, suggests a fix, and offers a skip. It does not guess.
+
+Each pick is shown as the Feature form: title, State New, Area default, Value area Business, Iteration and Priority blank, Target Date only when the spec states it, tags for the slice name and the code repos it touches, and a description that stands alone. The checks are the spec's checks and nothing else. Acceptance stays blank when the spec has none. The same field rule applies on an update, so a re-run moves checks that were stored off the form into the Description.
 
 Nothing sent to Azure Boards mentions the repo that holds the specs. No spec path, no link to that repo, no kit name, and no skill name. An `AB#` mention that already exists in a code repo stays as it is.
 
@@ -36,4 +38,4 @@ The form is labelled **Create** or **Update #<id>**. An update shows what would 
 
 ## What it writes
 
-A new id is one line in that spec’s `work-item.md`, with the milestone or slice label. An item with no spec gets a row on `## No spec yet in ADO` in `docs/system/landscape.md`: id, title, and date. When a spec is made later, the id moves into that spec’s `work-item.md`. The command reports what was created and what was updated. It does not commit.
+After a Create, writing the new id is required. A spec gets one line in that spec’s `work-item.md`, with the milestone or slice label. An item with no spec gets a row on `## No spec yet in ADO` in `docs/system/landscape.md`: id, title, and date. When a spec is made later, the id moves into that spec’s `work-item.md`. The command names the file it wrote. That file is not committed yet and must be committed. Without it a later run offers Create again and would make a duplicate. If the write fails, the command says so and prints the line to add. The command reports what was created and what was updated. It does not commit. It names `/crav1-finalize-commit` and does not run it.
