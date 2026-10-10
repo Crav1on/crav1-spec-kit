@@ -29,7 +29,7 @@ Write `docs/specs/<slug>/spec.md` from `assets/spec.md`.
 - **Status** is the confirmed match status. Do not upgrade it.
 - **What the dump says** is the dump, not a new product brief.
 - **In the code** lists repo paths that support the slice and what those paths show. Partial: also say what is missing, using the dump’s words.
-- **Trace** keeps the three labels. Confirmed dump facts are accepted, not inferred. Anything not on the confirmed map stays inferred or is left out. When the parent passed a source folder, add the `Source:` and `Trace:` lines from the imported-sources convention. Do not import the file again. Do not commit.
+- **Trace** keeps the three labels. Confirmed dump facts are accepted, not inferred. Anything not on the confirmed map stays inferred or is left out. When the parent passed a source folder, add the `Source:` and `Trace:` lines from the imported-sources convention. Do not import the file again. Do not ask the personal-data questions again. Do not write the transfer data policy. The parent runs that check. Do not commit.
 - **Open questions** stay open. Do not answer them in the body.
 - Add a normal spec section only when the dump or the code supports it: Problem, Goals, Non-goals, Users and journeys, Acceptance criteria, Constraints, Assumptions. Omit the section when it does not. Do not invent acceptance criteria, journeys, or a done-state to make the file look buildable. A checkbox the dump or the code already states is yes/no. Name unit, system, or browser only when that kind is already obvious there. Otherwise leave the kind for plan. Do not invent a test list.
 

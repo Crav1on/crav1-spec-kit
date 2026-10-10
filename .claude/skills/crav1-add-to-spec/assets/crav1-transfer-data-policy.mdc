@@ -1,0 +1,23 @@
+# Transfer data policy
+
+This file was written by the imported-sources check when the user chose to save it. The check is `references/sources.md` in skill `crav1-add-to-spec` (drop-in: `.claude/skills/crav1-add-to-spec/references/sources.md`; plugin: that skill's `references/sources.md`).
+
+## Types
+
+One type per line. A later type can be added as its own line. Secrets are not a type in this file. Secrets are always redacted. This file never stores a secrets choice.
+
+- <type>
+
+## Recommendations
+
+<auto-accept or review>
+
+`auto-accept` applies the keep and redact recommendations on each run. `review` asks on each run.
+
+## Hosted
+
+<where this repo is hosted>
+
+The note on each check uses this line.
+
+**To change this:** edit this file. **To get the questions again:** delete this file. Claude Code project: `.claude/rules/crav1-transfer-data-policy.md`. Nothing else to undo.

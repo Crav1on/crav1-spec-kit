@@ -65,7 +65,7 @@ Stop. They confirm or edit the sort. Do not write files. That confirmation is th
 
 ## Write the new bits
 
-When a confirmed quote comes from a mail, a transcript, minutes, a chat, a screenshot, a diagram, or another original file, follow the imported-sources convention before that quote (drop-in: `.claude/skills/crav1-add-to-spec/references/sources.md`; plugin: sibling `skills/crav1-add-to-spec/references/sources.md`). Write `docs/sources/YYYY-MM-DD-<slug>/` once per source. Add the `Source:` and `Trace:` lines from that file. Do not commit. A quote that is not from an imported source does not get a source folder.
+When a confirmed quote comes from a mail, a transcript, minutes, a chat, a screenshot, a diagram, or another original file, follow the imported-sources convention before that quote (drop-in: `.claude/skills/crav1-add-to-spec/references/sources.md`; plugin: sibling `skills/crav1-add-to-spec/references/sources.md`). That check flags personal data with a keep or redact recommendation. An item it cannot place has no recommendation and is asked one at a time. Secrets are redacted, by kind only, and are never a choice. When no transfer data policy exists, it asks once, then may write the rule after a yes. Claude Code project: `.claude/rules/crav1-transfer-data-policy.md`. It never writes a secrets choice into that file. Write `docs/sources/YYYY-MM-DD-<slug>/` once per source. Add the `Source:` and `Trace:` lines from that file. Do not commit. A quote that is not from an imported source does not get a source folder.
 
 Edit `docs/specs/<slug>/spec.md` for slugs in the confirmed **belongs** pile. An imported source also writes its source folder, as that convention says. Write them in this chat. Do not launch a worker.
 
@@ -132,6 +132,7 @@ Output only:
 
 - Each `docs/specs/<slug>/spec.md` that gained a new quote
 - Each source folder `docs/sources/YYYY-MM-DD-<slug>/` this pass wrote, or that none was written
+- The transfer data policy when this pass wrote it, or that none was written
 - What was added (their quotes, labeled new) and what was already there
 - The does-not-fit list, left alone. If they asked for a new spec, which existing skill you pointed at
 - `glossary.md` when this turn created it or appended rows. If `docs/system/` was missing, say no glossary was written. If no new rows were appended, say so
