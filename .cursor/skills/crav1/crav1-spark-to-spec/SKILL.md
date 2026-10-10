@@ -109,6 +109,10 @@ Then, when this turn created a new `docs/specs/<slug>/` folder, follow [work-ite
 
 Still no code. Still no `plan.md` unless they asked for a plan. Pile of ideas plus hunches for **one** feature: tell them `/crav1-ideas-to-spec`. Mixed files / several features or repos: `/crav1-intake-to-specs`.
 
+## A quoted note
+
+When this run quotes a note from `docs/notes/`, add a line `Used by <slug>` under `## Used by` on that note and update that row on `docs/notes/index.md`. Status stays open. Many specs can be listed. A note is not owned by one spec. Add `Absorbed by <slug>` only when this spec clearly takes the whole note, and only after the user says yes. Then the index status is absorbed. Partial use never closes the note. Do not commit. The same write is in `/crav1-add-to-spec`.
+
 ## Style
 
 Be concise. No lorem. No “Welcome to your app.” No persona theater. Structure with headings and bullets.

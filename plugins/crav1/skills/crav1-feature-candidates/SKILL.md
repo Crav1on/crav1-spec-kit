@@ -1,8 +1,10 @@
 ---
 name: crav1-feature-candidates
 description: >-
-  List Feature candidates from the landscape, the specs, research, and
-  sources. One dated milestone or slice is one candidate. Read only.
+  List Feature candidates from the landscape, the specs, research,
+  sources, and open notes in docs/notes/. A note is labelled as a note.
+  It is not a candidate by itself. One dated milestone or slice is one
+  candidate. Read only.
   Write nothing unless the user asks for a file. A target date only when
   the docs state it. Later skill. Not a starter option. Also called by
   /crav1-specs-to-ado.
@@ -34,9 +36,10 @@ Read all of these when they exist. Skip `docs/specs/_template/`.
 - Every `docs/specs/<slug>/spec.md` — milestones, slices, open questions, and actions.
 - `plan.md`, `tasks.md`, and `verify.md` in that folder when they exist.
 - `docs/research/` and `docs/sources/`.
+- `docs/notes/`, except `_template`. Read a note whose index status is `open`. An absorbed note is not input. When `docs/notes/index.md` is missing, read the note files that are there and treat a note with no `Absorbed by` line as open.
 - Each spec’s `docs/specs/<slug>/work-item.md`.
 
-A fact from `docs/research/` or `docs/sources/` carries the folder or file it came from, in the chat block. A glossary row is a word. It is not a candidate. A constraint is not a candidate. `## Way of working` is a candidate only when it names a piece of work that has no spec. A practice with no piece of work stays out of the list.
+A fact from `docs/research/` or `docs/sources/` carries the folder or file it came from, in the chat block. A fact from a note carries that note path and is labelled as a note. A note informs a candidate. It is not a candidate by itself. Do not add a table row for a note. A glossary row is a word. It is not a candidate. A constraint is not a candidate. `## Way of working` is a candidate only when it names a piece of work that has no spec. A practice with no piece of work stays out of the list.
 
 Do not invent a fact the files do not state. A meaning the glossary marks `to be researched` stays that way. Do not expand it.
 
@@ -50,7 +53,7 @@ One row is one candidate. A spec folder is not one row when it holds several dat
 - **No spec yet.** An item with no spec, from `docs/sources/`, from the landscape (Ideas, a piece of work under Way of working, or code with no slice), or from `docs/research/` when that note names work no spec covers, is one candidate. The Spec cell is `no spec yet`.
 - **Skip.** Skip a spec that is done or retired and has nothing open. Done or retired comes from the feature-index Notes, or from the spec when it says done or retired. Nothing open means no open question, no unchecked acceptance line, no open action, and no unchecked task. A done or retired spec that still has something open stays on the list.
 
-A source folder or research note that a spec already cites belongs to that spec’s candidate. It is not a second `no spec yet` row. Say where the fact came from in the block.
+A source folder, a research note, or a note in `docs/notes/` that a spec already cites belongs to that spec’s candidate. It is not a second `no spec yet` row. Say where the fact came from in the block. A note that no spec cites still does not become a candidate.
 
 Do not drop a candidate to keep the list short.
 
@@ -91,13 +94,15 @@ Already in ADO is the recorded id, or empty.
 
 Under the table, one block per row:
 
-- **Description.** Two to four sentences that stand alone. Cover the goal, the status, and what is open, using only words the docs state. When the source is thinner than two sentences, use only what it states. Do not add filler. A fact from research or sources names that folder in this block.
+- **Description.** Two to four sentences that stand alone. Cover the goal, the status, and what is open, using only words the docs state. When the source is thinner than two sentences, use only what it states. Do not add filler. A fact from research or sources names that folder in this block. A fact from a note names that note path and says it is a note.
 - **Open blockers and questions.** The open questions, actions, and unchecked work the docs state. Questions-only rows list the questions here and in the description. When none are written, say none are written down.
 - **Order.** `dated, <date>` or `undated. The user’s team prioritizes this.`
 
 No invented facts. Do not turn a guess into a row.
 
 When the list is empty, say so. Do not invent a candidate.
+
+After the table, list each open note that did not inform a candidate. One line: the title and the path. Say these are notes, not candidates. An open note that did inform a candidate stays in that block and is not listed again here.
 
 ## File
 

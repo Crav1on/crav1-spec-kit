@@ -8,6 +8,8 @@ Use this when **one spec already exists** and there is **new information** for t
 
 A not-started spec (match status `not in the code`, or a thin spec) can keep taking information until planning. Adding information does not start planning and does not write `plan.md` or `tasks.md`.
 
+When the quote comes from a note in `docs/notes/`, the note gets a line `Used by <slug>` and the index updates. Status stays open. `Absorbed by <slug>` only when this spec clearly takes the whole note, and only after the user says yes. Then status is absorbed. Partial use never closes the note. The command does not commit that line.
+
 ## First prompt
 
 New chat. Strong reasoning model. Not the host plan UI yet.

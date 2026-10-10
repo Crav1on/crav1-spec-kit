@@ -128,6 +128,10 @@ Still no application code. Still no `plan.md` unless they asked.
 
 New work is `/crav1-spark-to-spec` or `/crav1-ideas-to-spec` with `@docs/system/` (and related specs). **New slug.** Do not re-run intake. New repo = landscape ADR + `repos.md` row, then the spec, then an index row.
 
+## A quoted note
+
+When this run quotes a note from `docs/notes/`, add a line `Used by <slug>` under `## Used by` on that note and update that row on `docs/notes/index.md`. Status stays open. Many specs can be listed. A note is not owned by one spec. Add `Absorbed by <slug>` only when this spec clearly takes the whole note, and only after the user says yes. Then the index status is absorbed. Partial use never closes the note. Do not commit. The same write is in `/crav1-add-to-spec`.
+
 ## Style
 
 Be concise. Quote their words when clustering. Prefer cutting scope to adding architecture or repos.

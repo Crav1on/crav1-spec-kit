@@ -134,6 +134,10 @@ Do **not** offer finish the gap, add a verify test, or leave it. Those choices b
 
 You may add `sync-here` as a **second letter on the same issue** only when the chosen resolution would immediately make a named diagram/ADR wrong (“B, then sync the sequence diagram”). Still one issue.
 
+## A quoted note
+
+When a patch quotes a note from `docs/notes/`, add a line `Used by <slug>` under `## Used by` on that note and update that row on `docs/notes/index.md`. Status stays open. Many specs can be listed. A note is not owned by one spec. Add `Absorbed by <slug>` only when this spec clearly takes the whole note, and only after the user says yes. Then the index status is absorbed. Partial use never closes the note. Do not commit. The same write is in `/crav1-add-to-spec`.
+
 ## Hard rules
 
 - Prefer **cutting scope** over adding features.

@@ -3,7 +3,9 @@ name: crav1-match-dump-to-specs
 description: >-
   Sort a later dump of notes, tickets, old docs, diagrams, or screenshots
   onto specs that already exist. One dump may cover one slug or many.
-  Quote the new bits into the matching spec.md files, then report whether
+  Quote the new bits into the matching spec.md files. A fact worth
+  keeping that is not for an existing spec can be Note, which writes
+  docs/notes/ without tying it to a spec yet. Then report whether
   docs/system/ or another spec has to change. Does not create a slug.
   Does not seed docs/system/. When that folder exists and glossary.md is
   missing, fills only that file from the dump. When the file exists, appends
@@ -47,13 +49,22 @@ Read those folders before you sort. Do not ask which slug.
 
 If there are no spec folders, stop. Point at `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, or `/crav1-match-to-specs`. Do not create a slug. Do not seed `docs/system/`.
 
+## Already noted
+
+Read `docs/notes/` before the sort, when that folder exists. Skip `_template`. Compare each fact's words to the quote in each note. The same words are the same item. The `From` label is not part of that compare.
+
+When the quote is already in a note, the line shows `Already noted: docs/notes/<file>.md`. Do not put it on the Note pile as a new note. Do not write a second file.
+
 ## Sort (no writes yet)
 
-Read every existing `spec.md` (skip `_template`) and the dump. Then show three piles. Do not write files.
+Read every existing `spec.md` (skip `_template`) and the dump. Then show four piles. Do not write files.
 
-1. **Belongs to this spec** — new bits for an existing slug. Name `docs/specs/<slug>/` and the heading the words would go under. Quote the dump.
+1. **Belongs to this spec** — new bits that are a decision, a clarification, information, or an answer for an existing slug. Name `docs/specs/<slug>/` and the heading the words would go under. Quote the dump. The line says `Recommendation: Keep.`
 2. **Already in that spec** — the dump repeats what that `spec.md` already says. Name the slug and the heading. Do not plan a second copy.
-3. **Does not fit any of them** — the dump’s words that match no existing spec. Leave them on the list. Do not invent a slug.
+3. **Note** — worth keeping, and not a decision, a clarification, information, or an answer for an existing spec. Exploration with no feature yet, input that may feed several features, technical debt, and general information gathering go here. A mapping of tables and views when no spec covers it goes here. Quote the dump. The line says `Recommendation: Note — keep it in the repo without tying it to a spec yet.`
+4. **Does not fit any of them** — the dump’s words that match no existing spec and are not a note. Leave them on the list. Do not invent a slug.
+
+A greeting, scheduling, and thanks are noise. Drop them. They are not a note. Dismiss stays for that noise. A dropped line is not on a pile.
 
 A named slug in the dump is evidence. It does not skip the other piles. Something with no slug is sorted by what it says.
 
@@ -61,7 +72,37 @@ Split a passage that is partly new and partly already there. One fact is in one 
 
 Put every fact you will treat as accepted on the sort. A fact you leave off stays inferred.
 
-Stop. They confirm or edit the sort. Do not write files. That confirmation is the only stop before writes. Do not ask for a slug. Do not open a mushy interview, an architecture interview, or an export-format question. If they edit the sort, the edit is the confirmation. Do not ask again. Use their slugs and piles. A fact they struck, or that you never put on the sort, stays labeled inferred if it appears later. Confirming the sort confirms the facts they left on it.
+This skill does not ask keep, leave, dismiss, or note one fact at a time. It does not add an accept-all question. The recommendation is on the sort. The user confirms or edits the sort. That confirmation is the choice.
+
+On an edit, the user can mark a fact keep, leave, dismiss, or note. Keep moves it to belongs. Leave and dismiss write nothing. Note keeps it on the Note pile. Do not ask a second question after Note. Do not ask what kind of note it is.
+
+Stop. They confirm or edit the sort. Do not write files. That confirmation is the only stop before writes. Do not ask for a slug. Do not open a mushy interview, an architecture interview, or an export-format question. If they edit the sort, the edit is the confirmation. Do not ask again. Use their slugs and piles. A fact they struck, or that you never put on the sort, stays labeled inferred if it appears later. Confirming the sort confirms the facts they left on it, including the Note pile.
+
+## Write the notes
+
+When the confirmed sort leaves a fact on the Note pile, and it is not already noted, write one note. Do not ask what kind of note it is. Do not create a slug. Do not hand it to a starter.
+
+A note is not owned by one spec. The home is `docs/notes/` in the product repo.
+
+Create `docs/notes/` and `docs/notes/index.md` when they are missing. The shapes are this skill’s `assets/note.md` and `assets/index.md` (same files as `docs/notes/_template/note.md` and `docs/notes/_template/index.md`; drop-in: `.cursor/skills/crav1/crav1-match-dump-to-specs/assets/`; plugin: this skill’s `assets/`).
+
+One file per note: `docs/notes/YYYY-MM-DD-<slug>.md`. `YYYY-MM-DD` is the date the source shows. Do not invent a date. When the source shows no date, the file is `docs/notes/undated-<slug>.md`. `<slug>` is a short name from the subject or the quote. Lowercase. Hyphens. Do not put a person's name in the slug. A second note on the same day gets its own slug. When that file already exists and the quote is different, pick another slug. Do not overwrite a note.
+
+The note file has:
+
+- a title
+- the date, or `not shown` when the source shows no date
+- the quote, verbatim. When the dump is a mail, minutes, a transcript, or a chat, it starts with `From <kind> <date>.` when a date is shown, otherwise `From <kind>.` The kind is `email`, `meeting`, or `chat`, from what the input shows. Do not guess. When the dump is not one of those, it starts with `From the dump <date>.` when a date is shown, otherwise `From the dump.` Keep a speaker and a time in the quote when the input showed them. Do not paraphrase.
+- `Source: docs/sources/YYYY-MM-DD-<slug>/` when the input was imported. When it was not, omit that line.
+- `## Used by`, with nothing under it
+
+When the input was imported, follow the imported-sources convention before the note, in **Write the new bits**. One source folder for that source. The note's `Source:` line is that folder. Do not ask the imported-sources questions a second time for a folder this run already wrote.
+
+`docs/notes/index.md` gets one line for the new note: title, date, status `open`, and an empty used-by cell. The title links to the file. One line looks like `| [Source to target mapping](2026-10-06-source-to-target-mapping.md) | 2026-10-06 | open | |`. When the date is not shown, the date cell says `not shown`. Do not rewrite another row.
+
+Do not commit. A leave, a dismiss, and a does-not-fit fact do not get a note.
+
+When a belongs quote is the quote of a note already in `docs/notes/`, add `Used by <slug>` on that note and update the index, the same way `/crav1-add-to-spec` writes it. Status stays open. `Absorbed by <slug>` only when that spec clearly takes the whole note, and only after the user says yes. Partial use never closes the note.
 
 ## Write the new bits
 
@@ -93,7 +134,7 @@ A fuller spec keeps its headings. Place the quote in the section it extends. Add
 
 Expected headings when the file already uses the full spec shape: this skill’s `assets/spec.md` (same file as `docs/specs/_template/spec.md`; drop-in: `.cursor/skills/crav1/crav1-match-dump-to-specs/assets/spec.md`; plugin: this skill’s `assets/spec.md`). A match-shaped spec does not have to grow those headings.
 
-The **does not fit** pile is listed and left alone. Do not create a spec for it. If they say to create one, do not write a folder here. Point at the skill that creates a spec, and do not run it:
+The **Note** pile is written under **Write the notes**. It does not become a spec. The **does not fit** pile is listed and left alone. Do not create a spec for it. If they say to create one, do not write a folder here. Point at the skill that creates a spec, and do not run it:
 
 - one or two sentences for one feature: `/crav1-spark-to-spec`
 - one unstructured pile for one feature: `/crav1-ideas-to-spec`
@@ -106,7 +147,7 @@ The new quotes are already in the matching specs. Read `docs/system/` when it ex
 
 Section names for that read, not a file to paste over what exists: this skill’s `assets/system/` (same files as `docs/system/_template/`, including `glossary.md`; drop-in: `.cursor/skills/crav1/crav1-match-dump-to-specs/assets/system/`; plugin: this skill’s `assets/system/`).
 
-Do not edit anything outside the confirmed belongs writes in this step, except the glossary gap and the picture update below. A source folder already written under **Write the new bits** stays. Do not edit it in this step. Do not seed `docs/system/` when it is missing. Say it is missing and that this command does not create it. When that folder is missing, do nothing about a glossary and do nothing about the picture.
+Do not edit anything outside the confirmed belongs writes in this step, except the glossary gap and the picture update below. A note already written under **Write the notes** stays. A source folder already written under **Write the new bits** stays. Do not edit it in this step. Notes are not an impact edit. Do not list them as an apply option. Do not seed `docs/system/` when it is missing. Say it is missing and that this command does not create it. When that folder is missing, do nothing about a glossary and do nothing about the picture.
 
 **Glossary.** When `docs/system/` is missing, do nothing about a glossary. When it exists and `glossary.md` is missing, write only that file from `assets/system/glossary.md`. When `glossary.md` already exists, append only words or abbreviations the dump uses that are not already rows. Do not rewrite, reorder, or edit existing rows. Do not change a Meaning cell that already has text. Source is the dump. Do not invent terms, expansions, or definitions. Do not write TBD or to be decided. A row is only a word or abbreviation the dump already uses. When that same dump already says the expansion or meaning, put that text in Meaning. When the dump never says what it means, set Meaning to `to be researched`. Skip ordinary English. A code identifier is not a row unless the dump already treats that word as a term. Write the file even when it has no rows. This write is not an apply option, and it does not rewrite any other landscape file except the picture update below. Do not list a rewrite of existing rows.
 
@@ -131,10 +172,12 @@ Do not plan. Do not implement. Do not commit. Do not run `/crav1-finalize-commit
 Output only:
 
 - Each `docs/specs/<slug>/spec.md` that gained a new quote
+- Each note `docs/notes/YYYY-MM-DD-<slug>.md` this pass wrote, and the index line, or that none was written
 - Each source folder `docs/sources/YYYY-MM-DD-<slug>/` this pass wrote, or that none was written
 - The transfer data policy when this pass wrote it, or that none was written
 - What was added (their quotes, labeled new) and what was already there
 - The does-not-fit list, left alone. If they asked for a new spec, which existing skill you pointed at
+- An item already noted, with its path, and that no second file was written
 - `glossary.md` when this turn created it or appended rows. If `docs/system/` was missing, say no glossary was written. If no new rows were appended, say so
 - Picture lines added, or that the picture is current. If `docs/system/` was missing, say no picture was written
 - Impact: nothing else, or the one-line edit list and which option they picked
