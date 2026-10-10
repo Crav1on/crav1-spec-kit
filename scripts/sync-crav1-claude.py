@@ -2,8 +2,9 @@
 """Generate the Claude Code drop-in (.claude/) from the Cursor drop-in (.cursor/).
 
 Source of the playbooks is .cursor/ (and the plugin mirror of that tree).
-This script does not read plugins/crav1/. It rewrites paths and the three host
-differences: agent frontmatter, the project instruction, and commit-style rules.
+This script does not read plugins/crav1/. It rewrites paths and the host
+differences: agent frontmatter, the project instruction, commit-style rules,
+and the transfer data policy rule.
 
   scripts/sync-crav1-claude.py          write .claude/
   scripts/sync-crav1-claude.py --check  exit non-zero if .claude/ is stale
@@ -37,6 +38,7 @@ PATH_REWRITES = (
     (".cursor/skills/crav1/", ".claude/skills/"),
     (".cursor/agents/", ".claude/agents/"),
     (".cursor/agent-assets/", ".claude/agent-assets/"),
+    (".cursor/rules/crav1-transfer-data-policy.mdc", ".claude/rules/crav1-transfer-data-policy.md"),
     (".cursor/rules/draft-commit-style.mdc", ".claude/rules/draft-commit-style.md"),
     (".cursor/rules/draft-commit-gitlog.mdc", ".claude/rules/draft-commit-gitlog.md"),
     (".cursor/rules/gitkraken-commit-style.mdc", ".claude/rules/gitkraken-commit-style.md"),
@@ -47,6 +49,12 @@ PATH_REWRITES = (
 COMMIT_STYLE_ASSETS = {
     "draft-commit-style.mdc",
     "draft-commit-gitlog.mdc",
+}
+
+# Cursor .mdc rule templates. Claude copies drop alwaysApply so the body
+# loads at session start with no paths frontmatter.
+FRONTMATTER_RULE_ASSETS = COMMIT_STYLE_ASSETS | {
+    "crav1-transfer-data-policy.mdc",
 }
 
 TEXT_SUFFIXES = {".md", ".mdc", ".txt", ".json", ".yml", ".yaml"}
@@ -186,7 +194,7 @@ def rewrite_tree_files(root: Path) -> None:
         if not path.is_file() or not is_text(path):
             continue
         text = path.read_text(encoding="utf-8")
-        if path.name in COMMIT_STYLE_ASSETS:
+        if path.name in FRONTMATTER_RULE_ASSETS:
             updated = transform_commit_style_asset(text)
         else:
             updated = rewrite_paths(text)
@@ -251,7 +259,7 @@ def validate(dest: Path) -> None:
         if has_tools and any(token in fm for token in ("Write", "Edit", "Bash")):
             raise SystemExit(f"{agent.name} read-only tools include a write tool")
 
-    for asset_name in COMMIT_STYLE_ASSETS:
+    for asset_name in FRONTMATTER_RULE_ASSETS:
         matches = list((dest / "skills").rglob(asset_name))
         if len(matches) != 1:
             raise SystemExit(f"expected one {asset_name}, found {matches}")

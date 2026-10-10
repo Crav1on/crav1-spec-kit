@@ -8,8 +8,9 @@ description: >-
   new information does not state is `to be researched`.
   An imported mail, transcript, chat, screenshot, or other original
   follows references/sources.md and is written under docs/sources/
-  before the quote. Does not write application code. Does not plan,
-  implement, or commit.
+  before the quote. The personal-data check recommends keep or redact,
+  redacts secrets, and may write the transfer data policy after a yes.
+  Does not write application code. Does not plan, implement, or commit.
 disable-model-invocation: true
 icon: file-plus
 color: blue
@@ -89,6 +90,8 @@ Stop until they pick, when a pick is required.
 
 When the new information is a mail, a transcript, minutes, a chat, a screenshot, a diagram, or another original file that will be quoted, or a paste of a mail, transcript, minutes, or chat, follow [references/sources.md](references/sources.md) (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/references/sources.md`; plugin: this skill’s `references/sources.md`).
 
+That check flags personal data with a keep or redact recommendation. An item it cannot place has no recommendation and is asked one at a time. Secrets are redacted, by kind only, and are never a choice. When no transfer data policy exists, it asks once, then may write the rule after a yes. Cursor: `.cursor/rules/crav1-transfer-data-policy.mdc`. Claude Code project: `.claude/rules/crav1-transfer-data-policy.md`. It never writes a secrets choice into that file. The template is `assets/crav1-transfer-data-policy.mdc`.
+
 Write `docs/sources/YYYY-MM-DD-<slug>/` once for that source, before the quote, when this run has not already written that folder. Then add the `Source:` and `Trace:` lines on the quote. Do not commit.
 
 A short fact the user typed, an environment-read fact, and a test suggestion are not imported sources. Do not write `docs/sources/` for those.
@@ -149,6 +152,7 @@ Output only:
 
 - Target `docs/specs/<slug>/spec.md`
 - Source folder `docs/sources/YYYY-MM-DD-<slug>/` when this pass wrote one, or that none was written
+- The transfer data policy when this pass wrote it, or that none was written
 - What was added (their quotes, labeled new) and what was already there
 - Impact: nothing else, or the one-line edit list and which option they picked
 - Next: `/crav1-finalize-commit` if any file changed (no push). `/crav1-plan-from-spec` only if they say they want to start planning this slug. Do not run either.
