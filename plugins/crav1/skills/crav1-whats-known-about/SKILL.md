@@ -9,7 +9,8 @@ description: >-
   Check default az install paths before reporting az as not installed.
   Production stays shape and connections only, after the same yes or no
   as /crav1-environment-read. Never read data. Does not start Specify,
-  Plan, or Build. Does not run another skill. Later skill. Not a starter
+  Plan, or Build. Does not run another skill. A stale research note is
+  shown as stale. Later skill. Not a starter
   option. Not /crav1-explain.
 disable-model-invocation: true
 icon: file-search
@@ -107,7 +108,7 @@ An `@` of a spec folder or a code folder replaces that list. The search stays in
 
 **No slice.** Case 3.
 
-Reading the winning slice is the answer, not a second pass. Read that `spec.md`, `plan.md` and `tasks.md` when they exist, `## Match`, and `## Open questions`. Use the hits the same pass already found in `docs/system/`, `docs/architecture/spec.md`, and `docs/environments/marks.md`.
+Reading the winning slice is the answer, not a second pass. Read that `spec.md`, `plan.md` and `tasks.md` when they exist, `## Match`, `## Open questions`, and `## Research findings` when that heading is there. Read a `docs/research/` note those findings link to. A stale mark is shown as stale. Follow the readers section of `crav1-add-to-spec` `references/research-stale.md` (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/references/research-stale.md`; plugin: sibling `skills/crav1-add-to-spec/references/research-stale.md`). Quote the mark. Name the path. Do not treat that research as current. Do not clear the mark. Use the hits the same pass already found in `docs/system/`, `docs/architecture/spec.md`, and `docs/environments/marks.md`.
 
 ## Repo answer, then live reads
 
@@ -221,7 +222,7 @@ The full read still runs, including the live reads. The answer shows **Verdict**
 - Security bits: guardrails, constraints, non-goals, a Security section, `docs/system/security.md` lines that match, and a live setting that is a security setting.
 - What is pending: open questions, unchecked tasks, an open decision, **Either way**, and open work items and open pull requests.
 
-A section outside the focus is left out. An empty section is still left out. Do not pad the answer back out to the full template.
+A section outside the focus is left out. An empty section is still left out. Do not pad the answer back out to the full template. **Research marked stale** stays when a mark is there. A focus does not hide it.
 
 ## Answer
 
@@ -233,9 +234,10 @@ The chat answer follows this skill’s `assets/answer.md` (drop-in: `.cursor/ski
 4. **Either way** — tasks that apply whatever is decided. An `Ask <person>: …` line uses a person, or a role, the docs already name, plus the file and heading. Do not guess a person. Do not turn a role into a name. When a slice exists and this section is shown, the last task updates that slice’s `spec.md`. Those checkboxes stay in the chat. This command does not edit `tasks.md` or `spec.md`.
 5. **Do not touch** — guardrails the docs already state. Each one has the date that note or ADR gives. When the note has no date, say the date is not written. Do not invent a date.
 6. **Seen only live** — a setting or a change that no doc mentions. Each line says `Live read.` A fact the docs already state stays out of this section.
-7. **Stale notes** — an older note that disagrees with a later note, or with a live read. Say which note is wrong and what to trust instead. A short note is not stale.
-8. **Tracked elsewhere** — work items, open pull requests, and branches. When the live read ran, this section stays, and `none` is a real line. Each line says `Live read.` When the user picked Skip, leave this section out.
-9. **Source** — existing slice, found slice, or no slice (candidate). Then the files and the reads used.
+7. **Research marked stale** — a `Stale since` line under `## Research findings`, or a stale block on a note that section links to. Quote the mark. Name the path. This is not **Stale notes**. Do not clear the mark.
+8. **Stale notes** — an older note that disagrees with a later note, or with a live read. Say which note is wrong and what to trust instead. A short note is not stale. A research mark is not this section.
+9. **Tracked elsewhere** — work items, open pull requests, and branches. When the live read ran, this section stays, and `none` is a real line. Each line says `Live read.` When the user picked Skip, leave this section out.
+10. **Source** — existing slice, found slice, or no slice (candidate). Then the files and the reads used.
 
 **Unexplained** is for a code-only hit with no spec and no architecture note. What the code shows goes there. What the code does not say stays unexplained. Leave that heading out on every other case.
 

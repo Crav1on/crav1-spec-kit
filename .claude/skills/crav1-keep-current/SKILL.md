@@ -11,7 +11,8 @@ description: >-
   sibling that already appends a glossary row run this same update and
   still do not rewrite existing glossary rows. The skill that reads named
   repos and writes one architecture spec is /crav1-repos-to-spec. Do not
-  do that job.
+  do that job. When pointed at an updated note in docs/research/, asks
+  whether the update resolves a stale mark and clears it only on yes.
 disable-model-invocation: true
 icon: refresh-cw
 color: green
@@ -55,6 +56,10 @@ From a caller: what is new is only what that pass added. Do not open a second in
 
 A part or a connection the source does not state is not new.
 
+## Pointed at a research note
+
+When the user replaced a file under `docs/research/` and pointed this command at it, follow the clear section of `crav1-add-to-spec` `references/research-stale.md` (drop-in: `.claude/skills/crav1-add-to-spec/references/research-stale.md`; plugin: sibling `skills/crav1-add-to-spec/references/research-stale.md`). When the note or a spec that sees it still has a stale mark, ask whether the update resolves it. Clear the block and the spec line only after the user says yes. On yes, record `Cleared <date>: updated note <path or commit>.` under `## Research findings`. On no, the mark stays. Do not clear before that yes. Do not commit. Do not send anything. This check does not replace the picture update. The picture still follows **Write**. When the clear question is open, ask it. Do not ask another question in that same turn.
+
 ## Synced at
 
 Reading spec files is not reading a repo. The alone path does not set `Synced at` from those files, and it does not stamp the docs repo because the picture was updated.
@@ -77,12 +82,13 @@ Do not add a feature-index row. Callers that own the index still add that row th
 
 ## Stop
 
-Do not plan. Do not implement. Do not commit. Do not run `/crav1-explain`, `/crav1-plan-from-spec`, `/crav1-spark-to-spec`, or `/crav1-finalize-commit`.
+Do not plan. Do not implement. Do not commit. Do not run `/crav1-explain`, `/crav1-plan-from-spec`, `/crav1-spark-to-spec`, or `/crav1-finalize-commit`. Do not clear a stale research mark unless the user said the update resolves it.
 
 Output only:
 
 - What was added to the picture (file, and the sentence, node, edge, or connection line), or that the picture is current
 - `Synced at` cell or slice line written, or that none was written
+- Research: a stale mark cleared, or that the mark stayed, or that this run was not pointed at a research note
 - Next: `/crav1-finalize-commit` when a file changed (no push). When nothing was written, name no command. Do not run it.
 
 ## Style

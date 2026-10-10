@@ -40,6 +40,10 @@ Against: <one line>
 
 - <setting or change no doc mentions> — Live read.
 
+## Research marked stale
+
+- <path> — <the stale line, quoted>
+
 ## Stale notes
 
 - <older note> is wrong. Trust <the later note, or the live read> instead.

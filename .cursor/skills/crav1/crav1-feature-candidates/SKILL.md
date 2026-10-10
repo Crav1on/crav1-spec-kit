@@ -2,7 +2,8 @@
 name: crav1-feature-candidates
 description: >-
   List Feature candidates from the landscape, the specs, research,
-  sources, and open notes in docs/notes/. A note is labelled as a note.
+  sources, and open notes in docs/notes/. A stale research note is
+  shown as stale. A note is labelled as a note.
   It is not a candidate by itself. One dated milestone or slice is one
   candidate. Read only.
   Write nothing unless the user asks for a file. A target date only when
@@ -39,7 +40,7 @@ Read all of these when they exist. Skip `docs/specs/_template/`.
 - `docs/notes/`, except `_template`. Read a note whose index status is `open`. An absorbed note is not input. When `docs/notes/index.md` is missing, read the note files that are there and treat a note with no `Absorbed by` line as open.
 - Each spec’s `docs/specs/<slug>/work-item.md`.
 
-A fact from `docs/research/` or `docs/sources/` carries the folder or file it came from, in the chat block. A fact from a note carries that note path and is labelled as a note. A note informs a candidate. It is not a candidate by itself. Do not add a table row for a note. A glossary row is a word. It is not a candidate. A constraint is not a candidate. `## Way of working` is a candidate only when it names a piece of work that has no spec. A practice with no piece of work stays out of the list.
+A fact from `docs/research/` or `docs/sources/` carries the folder or file it came from, in the chat block. A research note with a stale block, or a `Stale since` line under `## Research findings`, is shown as stale. Quote the mark. Name the path. Follow the readers section of `crav1-add-to-spec` `references/research-stale.md` (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/references/research-stale.md`; plugin: sibling `skills/crav1-add-to-spec/references/research-stale.md`). Do not treat that research as current. Do not clear the mark. Do not drop it to keep the list short. A fact from a note carries that note path and is labelled as a note. A note informs a candidate. It is not a candidate by itself. Do not add a table row for a note. A glossary row is a word. It is not a candidate. A constraint is not a candidate. `## Way of working` is a candidate only when it names a piece of work that has no spec. A practice with no piece of work stays out of the list.
 
 Do not invent a fact the files do not state. A meaning the glossary marks `to be researched` stays that way. Do not expand it.
 
@@ -94,7 +95,7 @@ Already in ADO is the recorded id, or empty.
 
 Under the table, one block per row:
 
-- **Description.** Two to four sentences that stand alone. Cover the goal, the status, and what is open, using only words the docs state. When the source is thinner than two sentences, use only what it states. Do not add filler. A fact from research or sources names that folder in this block. A fact from a note names that note path and says it is a note.
+- **Description.** Two to four sentences that stand alone. Cover the goal, the status, and what is open, using only words the docs state. When the source is thinner than two sentences, use only what it states. Do not add filler. A fact from research or sources names that folder in this block. When that research is stale, say it is stale and quote the mark. A fact from a note names that note path and says it is a note.
 - **Open blockers and questions.** The open questions, actions, and unchecked work the docs state. Questions-only rows list the questions here and in the description. When none are written, say none are written down.
 - **Order.** `dated, <date>` or `undated. The user’s team prioritizes this.`
 
