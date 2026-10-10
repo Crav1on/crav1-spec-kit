@@ -4,7 +4,19 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 
 ## Unreleased
 
-## 1.35.0 (2026-10-10)
+## 1.36.0 (2026-10-11)
+
+### Kit
+
+- `/crav1-meeting-to-specs` and `/crav1-match-dump-to-specs` offer Note next to keep, leave, and dismiss. The choice is `Note — keep it in the repo without tying it to a spec yet.` Note is the recommended answer when the item is worth keeping and is not a decision, a clarification, information, or an answer for an existing spec. Exploration with no feature yet, input that may feed several features, technical debt, and general information gathering are that case. A mail that maps SQL tables and views when no spec covers it is that case. Dismiss stays for a greeting, scheduling, and thanks. There is no question after Note about what kind of note it is. Meeting still asks one item at a time and does not add an accept-all question. Match-dump still confirms the sort once. The recommendation is on that sort. Both read `docs/notes/` first. An item already noted is shown as already noted and is not written again.
+
+- A note lives in the product repo at `docs/notes/YYYY-MM-DD-<slug>.md`, with `docs/notes/index.md`. The file has a title, a date, the quote verbatim (`From <kind> <date>.` when there is a date), a `Source:` line to `docs/sources/YYYY-MM-DD-<slug>/` when the input was imported, and an empty `## Used by`. The index line is title, date, status (`open` or `absorbed`), and used by. The folder and the index are created when missing. The templates are [docs/notes/_template/note.md](docs/notes/_template/note.md) and [docs/notes/_template/index.md](docs/notes/_template/index.md), and the same files in the skill `assets/`. The skills do not commit.
+
+- A note is not owned by one spec. `/crav1-add-to-spec` writes `Used by <slug>` when a spec quotes a note, and updates the index. Status stays open. Many specs can be listed. `Absorbed by <slug>` only when one spec clearly takes the whole note, and only after the user says yes. Then status is absorbed. Partial use never closes the note. `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-match-to-specs`, and `/crav1-tighten-spec` do the same when they quote a note. `/crav1-feature-candidates` reads open notes as input, labelled as notes. A note is not a candidate by itself. No new skill.
+
+### Docs
+
+- The behavior map in [`.cursor/rules/kit-maintainer.mdc`](.cursor/rules/kit-maintainer.mdc) records the `docs/notes/` write, the Used by line, and the feature-candidates read. [docs/guild-routing.md](docs/guild-routing.md) notes the same. [README.md](README.md) names `docs/notes/` on the Writes cells that gained it. [docs/from-meeting.md](docs/from-meeting.md), [docs/from-match-dump.md](docs/from-match-dump.md), [docs/from-add.md](docs/from-add.md), and [docs/from-feature-candidates.md](docs/from-feature-candidates.md) name the same. No new skill.
 
 ### Kit
 

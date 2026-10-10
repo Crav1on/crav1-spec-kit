@@ -22,7 +22,7 @@ That slash command *is* the prompt.
 
 ## What it reads
 
-`docs/system/landscape.md` (the spec index and its statuses, Ideas, Way of working, and code with no slice), `docs/system/repos.md`, the glossary, every `docs/specs/<slug>/spec.md`, and `plan.md`, `tasks.md`, and `verify.md` where they exist. It also reads `docs/research/` and `docs/sources/`, and each fact from those folders is labelled by where it came from. It reads each spec’s `work-item.md` and the landscape table `## No spec yet in ADO`.
+`docs/system/landscape.md` (the spec index and its statuses, Ideas, Way of working, and code with no slice), `docs/system/repos.md`, the glossary, every `docs/specs/<slug>/spec.md`, and `plan.md`, `tasks.md`, and `verify.md` where they exist. It also reads `docs/research/` and `docs/sources/`, and each fact from those folders is labelled by where it came from. It reads open notes in `docs/notes/`. A fact from a note is labelled as a note. A note is not a candidate by itself. It reads each spec’s `work-item.md` and the landscape table `## No spec yet in ADO`.
 
 ## What one row is
 

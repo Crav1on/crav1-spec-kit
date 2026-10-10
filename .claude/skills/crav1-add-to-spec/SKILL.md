@@ -10,7 +10,10 @@ description: >-
   follows references/sources.md and is written under docs/sources/
   before the quote. The personal-data check recommends keep or redact,
   redacts secrets, and may write the transfer data policy after a yes.
-  Does not write application code. Does not plan, implement, or commit.
+  When the quote comes from a note in docs/notes/, writes
+  Used by on that note. Absorbed by only after a yes, when one spec
+  takes the whole note. Does not write application code. Does not plan,
+  implement, or commit.
 disable-model-invocation: true
 icon: file-plus
 color: blue
@@ -58,6 +61,8 @@ The handoff passes the kind and the date, and the source folder when that skill 
 
 When the handoff includes a source folder, add the `Source:` and `Trace:` lines from [references/sources.md](references/sources.md). Do not ask the mail, image, binary, or personal-data questions again. Do not write a second copy of that folder. When the handoff has no folder and the quote is an imported source, follow **Imported sources** before the quote.
 
+When the handoff includes a note path, that quote comes from that note. Run **Notes** after the spec quote. Do not ask what kind of note it is.
+
 Then run **Add to that spec.md** and **Impact** in this skill. The impact check still runs. Do not skip it. Do not write `plan.md` or `tasks.md`. Do not change application code. Do not start Specify, Plan, or Build. Do not ask the picture offer. That offer is only the environment-read and suggest-tests handoffs.
 
 ## Picture offer
@@ -98,7 +103,7 @@ A short fact the user typed, an environment-read fact, and a test suggestion are
 
 ## Add to that spec.md
 
-Edit `docs/specs/<slug>/spec.md` in this step. An imported source also writes `docs/sources/YYYY-MM-DD-<slug>/` and, after a yes, one `.gitattributes` line, as [references/sources.md](references/sources.md) says. When an image inside a mail is converted to text, that folder also holds `<name>.md`. Do not write any other file in this step.
+Edit `docs/specs/<slug>/spec.md` in this step. An imported source also writes `docs/sources/YYYY-MM-DD-<slug>/` and, after a yes, one `.gitattributes` line, as [references/sources.md](references/sources.md) says. When an image inside a mail is converted to text, that folder also holds `<name>.md`. Do not write any other file in this step. A note's `Used by` line is **Notes**, not this step.
 
 - Quote their words. The quote is the record. Do not replace it with a paraphrase.
 - Label what is new versus what was already there.
@@ -122,13 +127,48 @@ A fuller spec keeps its headings. Place the quote in the section it extends. Add
 
 Expected headings when the file already uses the full spec shape: this skill’s `assets/spec.md` (same file as `docs/specs/_template/spec.md`; drop-in: `.claude/skills/crav1-add-to-spec/assets/spec.md`; plugin: this skill’s `assets/spec.md`). A match-shaped spec does not have to grow those headings.
 
+## Notes
+
+A note is not owned by one spec. This section runs when the quote just written into the spec comes from a note in `docs/notes/`. That is when the user pointed at that file, the handoff passed that path, or the quote is the quote already in a note. Skip `_template`. When no note matches, write nothing here.
+
+The file shape is this skill’s `assets/note.md` and `assets/index.md` (same files as `docs/notes/_template/note.md` and `docs/notes/_template/index.md`; drop-in: `.claude/skills/crav1-add-to-spec/assets/`; plugin: this skill’s `assets/`). Do not create a note here. Meeting and match-dump create notes.
+
+Add one line under `## Used by` on that note:
+
+`Used by <slug>`
+
+`<slug>` is the spec this run quoted into. Do not add a line that is already there. Update that note's row on `docs/notes/index.md`. The used-by cell lists every slug on the note, separated by `; `. Do not rewrite the title or the date. Status stays `open`. Many specs can be listed.
+
+Partial use never closes the note. When the spec quote is only part of the note, do not ask. Do not write `Absorbed by`.
+
+When this spec clearly takes the whole note, ask once. The whole note means the spec quote is the note's quote, not a part of it. When that is unclear, it is partial. Do not guess.
+
+The question is: Absorb this note into <slug>?
+
+Options are only:
+
+1. **Yes**
+2. **No**
+
+Use the questions tool when it is available. Stop until the user picks.
+
+Yes adds this line under `## Used by`:
+
+`Absorbed by <slug>`
+
+Yes sets that index row's status to `absorbed`. No leaves the status `open`. The `Used by` line stays either way.
+
+When the note is already absorbed, do not ask again. Another spec can still add `Used by <slug>`. Status stays `absorbed`.
+
+Do not commit. This is not an impact question. Do not list the note as an apply option.
+
 ## Impact (before any other edit)
 
 Read `docs/system/` when it exists (`landscape.md`, `repos.md`, `diagrams.md`, `glossary.md`, `adr/`) and every other `docs/specs/<slug>/spec.md` (skip `_template`). Check whether the new information contradicts or extends the landscape, a repo row, a diagram, an ADR, or another spec.
 
 Section names for that read, not a file to paste over what exists: this skill’s `assets/system/` (same files as `docs/system/_template/`, including `glossary.md`; drop-in: `.claude/skills/crav1-add-to-spec/assets/system/`; plugin: this skill’s `assets/system/`).
 
-Do not edit anything outside the target spec in this step. A source folder already written under **Imported sources** stays. It is not an impact edit. Do not seed `docs/system/` when it is missing. Say it is missing and that this command does not create it. Do not create `glossary.md`.
+Do not edit anything outside the target spec in this step. A source folder already written under **Imported sources** stays. A note line already written under **Notes** stays. Neither is an impact edit. Do not seed `docs/system/` when it is missing. Say it is missing and that this command does not create it. Do not create `glossary.md`.
 
 When `glossary.md` exists, a missing row that the new information uses can be one of the listed edits to `docs/system/`. When the new information already states the expansion or meaning, that text is Meaning. When it does not, Meaning is `to be researched`. Do not invent the term or the meaning. Do not write TBD or to be decided. Do not rewrite, reorder, or edit an existing row. Do not change a Meaning cell that already has text. Do not write the new row unless they pick apply. A missing `glossary.md` is not a listed edit.
 
@@ -152,6 +192,7 @@ Output only:
 
 - Target `docs/specs/<slug>/spec.md`
 - Source folder `docs/sources/YYYY-MM-DD-<slug>/` when this pass wrote one, or that none was written
+- The note line when this pass wrote `Used by` or `Absorbed by`, or that none was written
 - The transfer data policy when this pass wrote it, or that none was written
 - What was added (their quotes, labeled new) and what was already there
 - Impact: nothing else, or the one-line edit list and which option they picked
