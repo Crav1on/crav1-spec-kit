@@ -59,7 +59,7 @@ The line does not change the options. It is not written. It is not part of the q
 
 ## What gets written
 
-For a kept addition that imports a source, `docs/sources/YYYY-MM-DD-<slug>/`: the original files, unchanged except where the convention says otherwise, and a `README.md`. The README says what it is, the sender or the participants, the date and the time, and how it was converted. A mail is a `.eml` file with CRLF line endings kept. A binary file is one of four choices, asked one file at a time. Personal details are flagged before the files are written. The command does not commit.
+For a kept addition that imports a source, `docs/sources/YYYY-MM-DD-<slug>/`: the original files, unchanged except where the convention says otherwise, and a `README.md`. The README says what it is, the sender or the participants, the date and the time, and how it was converted. A mail is a `.eml` file with CRLF line endings kept. Each image inside that mail, inline or attached, gets the same four choices, asked once for the list. A binary file handed over on its own is still one of four choices, asked one file at a time. Personal details in the mail, in an image, and in converted text are flagged before the files are written. The command does not commit.
 
 No `docs/system/`. No new spec folder. No marks. No dismissals file.
 
