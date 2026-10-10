@@ -12,7 +12,8 @@ description: >-
   start Specify, Plan, or Build. On every run, compare the feature index
   with each slice's diagram node and its connection line. List each slice
   that is missing entirely or partly, including done and retired, and name
-  /crav1-keep-current. Do not run it. Read-only.
+  /crav1-keep-current. Do not run it. A stale research note is shown
+  as stale. Read-only.
 disable-model-invocation: true
 icon: message-circle
 color: blue
@@ -139,11 +140,17 @@ At the end of the answer, list each missing slice, one line per slice. Show the 
 
 When the list has one or more slices, name `/crav1-keep-current`. Do not run it. Do not update the picture. When the list is empty, do not name keep-current for this check.
 
+## Research marked stale
+
+On every run, when this answer opens a spec, and when the feature-index check reads a spec for its title, also read `## Research findings` on that spec. Also read a `docs/research/` note that those findings link to, and any stale block on that note. Follow the readers section of `crav1-add-to-spec` `references/research-stale.md` (drop-in: `.claude/skills/crav1-add-to-spec/references/research-stale.md`; plugin: sibling `skills/crav1-add-to-spec/references/research-stale.md`).
+
+When a stale mark is there, say the research is stale. Quote the mark. Name the path. One line per mark. Do not treat that research as current. Do not clear the mark. Do not drop a mark to keep the list short. When no mark is there, do not invent one.
+
 ## Stop
 
 Do not write a file. Do not invent a second document. Do not teach how to build it. Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-match-to-specs`, `/crav1-plan-from-spec`, `/crav1-implement-task`, `/crav1-keep-current`, `/crav1-whats-known-about`, or `/crav1-finalize-commit`.
 
-Output only the answer, the spec quote when the picture has nothing on the question, and the feature-index list when a slice is missing from the picture.
+Output only the answer, the spec quote when the picture has nothing on the question, the feature-index list when a slice is missing from the picture, and each stale research mark this run found.
 
 ## Style
 

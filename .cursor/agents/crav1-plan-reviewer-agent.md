@@ -25,7 +25,7 @@ Respond with:
 3. **Task quality** — oversized `T#`s, a verify note with no kind, too few or too many checks for what must be proved, an algorithm with no corner cases, old behavior with no regression, an edge with no integration test, a kept security check with no task, missing `(spec: …)`, order that cannot be verified incrementally. Smoke, chaos, fuzz, an invented speed goal, or test code in the plan belongs here. A missing `## Linter`, or one that never says whether a linter or checker covers the code the tasks will touch, belongs here. Naming the linter inside acceptance criteria does too.
 4. **Trace** — acceptance / REQ with no task, unless the plan marks that piece `already there` or `left as committed`; tasks with no spec line. A rebuild task for a piece that already matches v0, or a task for a piece left as committed, belongs here.
 5. **Files** — `Files likely touched` that are wrong, missing, or too vague for the repo (if one exists).
-6. **Risks** — kept-open questions that the plan treats as decided; bets that will break the first demo.
+6. **Risks** — kept-open questions that the plan treats as decided; bets that will break the first demo. A `Stale since` line under the spec's `## Research findings` that is missing from Risks is a plan issue. Stale research does not block the plan. Do not treat the mark as a decision. Do not clear it.
 
 7. **Issues for `/crav1-tighten-plan`** — required. Number `P1`, `P2`, … One finding each. Quote the offending plan/task line. Tag **plan** (patch `plan.md` / `tasks.md`) or **spec** (do not patch the plan; they need `/crav1-tighten-spec` or `/crav1-resolve-questions`). Example:
 

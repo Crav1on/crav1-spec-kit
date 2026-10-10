@@ -5,7 +5,9 @@ description: >-
   The change is a commit, a commit range, or the current branch diff.
   No dump is required. Quote what the change does into the matching
   spec.md files, then report whether docs/system/ or another spec has
-  to change. Does not create a slug. Does not watch the repo.
+  to change. A kept quote is also compared with docs/research/ and
+  Research findings. Research is marked stale only after a yes.
+  Does not create a slug. Does not watch the repo.
   Does not seed docs/system/. When that folder exists and glossary.md is
   missing, fills only that file from the landed change. When the file exists,
   appends only words that are not already rows. Does not rewrite existing
@@ -137,9 +139,11 @@ Do not stamp a repo or a slice this run did not read. An empty cell stays empty.
 
 The new quotes are already in the matching specs. Read `docs/system/` when it exists (`landscape.md`, `repos.md`, `diagrams.md`, `glossary.md`, `adr/`) and every other `docs/specs/<slug>/spec.md` (skip `_template`). Other means a spec that did not just receive a new quote, plus any heading on a spec you did edit that the confirmed sort did not already cover. Check whether what the change does contradicts or extends the landscape, a repo row, a diagram, an ADR, or another spec.
 
+Also compare each kept quote with research. Follow `crav1-add-to-spec` `references/research-stale.md` (drop-in: `.claude/skills/crav1-add-to-spec/references/research-stale.md`; plugin: sibling `skills/crav1-add-to-spec/references/research-stale.md`). Read `docs/research/*.md` and `## Research findings` on the specs this quote touches, and the notes those findings link to. List a clear contradiction and an answered open question. An unclear case is not a hit. Ask before any mark. Write the stale block and the findings line only after the user says yes. Then offer the revisit draft. The kit drafts only. It does not send it. It does not contact the note's owner. This question is not an apply option. When it is open, ask it before the landscape question. Do not ask both in the same turn. Do not commit. Any kit skill that writes a file under `docs/research/` follows the clear section of that same reference.
+
 Section names for that read, not a file to paste over what exists: this skill’s `assets/system/` (same files as `docs/system/_template/`, including `glossary.md`; drop-in: `.claude/skills/crav1-code-into-specs/assets/system/`; plugin: this skill’s `assets/system/`).
 
-Do not edit anything outside the confirmed belongs writes in this step, except the `Synced at` stamp above, the glossary gap, and the picture update below. Do not seed `docs/system/` when it is missing. Say it is missing and that this command does not create it. Do not invent a landscape from the diff alone. When that folder is missing, do nothing about a glossary and do nothing about the picture.
+Do not edit anything outside the confirmed belongs writes in this step, except the `Synced at` stamp above, the glossary gap, the picture update below, and a research mark that `crav1-add-to-spec` `references/research-stale.md` already allowed after a yes. Do not seed `docs/system/` when it is missing. Say it is missing and that this command does not create it. Do not invent a landscape from the diff alone. When that folder is missing, do nothing about a glossary and do nothing about the picture. The research check still runs. The research mark is not a landscape edit.
 
 **Glossary.** When `docs/system/` is missing, do nothing about a glossary. When it exists and `glossary.md` is missing, write only that file from `assets/system/glossary.md`. When `glossary.md` already exists, append only words or abbreviations the change uses that are not already rows. Do not rewrite, reorder, or edit existing rows. Do not change a Meaning cell that already has text. Source is the landed change. Do not invent terms, expansions, or definitions. Do not write TBD or to be decided. A row is only a word or abbreviation that change already uses. When that same change already says the expansion or meaning, put that text in Meaning. When the change never says what it means, set Meaning to `to be researched`. Skip ordinary English. A code identifier is not a row unless the change already treats that word as a term. Write the file even when it has no rows. This write is not an apply option, and it does not rewrite any other landscape file except the `Synced at` stamp above and the picture update below. Do not list a rewrite of existing rows.
 
@@ -171,6 +175,7 @@ Output only:
 - Picture lines added, or that the picture is current. If `docs/system/` was missing, say no picture was written
 - `Synced at` cell or slice line written, or that none was written
 - Impact: nothing else, or the one-line edit list and which option they picked
+- Research: each hit, whether it was marked, the note path and the findings line, or that none was marked. The revisit draft when one was written in the chat, or that none was drafted
 - Next: `/crav1-finalize-commit` only if any file changed and they want those spec edits committed (no push). `/crav1-plan-from-spec` only for a slice they choose. Do not run either.
 
 ## Style

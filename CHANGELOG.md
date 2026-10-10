@@ -4,6 +4,24 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 
 ## Unreleased
 
+## 1.37.0 (2026-10-11)
+
+### Kit
+
+- After a quote is kept, the impact check also covers research. `/crav1-meeting-to-specs` does this through the `/crav1-add-to-spec` handoff and does not run the check a second time. `/crav1-add-to-spec`, `/crav1-match-dump-to-specs`, and `/crav1-code-into-specs` compare the quote with notes in `docs/research/` and with `## Research findings` on the specs it touches, including notes those findings link to. Two hits are listed. A clear contradiction of a research line. A quote that answers an open question in the note or the findings. The new quote is shown next to the research line or the question. An unclear case is not marked. It stays an open question on the spec, as today.
+
+- The research is marked only after the user says yes. The note gets a blockquote below the title and the owner line: `> Stale since <date>: <one line on what changed>. Source: docs/sources/YYYY-MM-DD-<slug>/`, or the input's source line when the quote was not imported. The note's own text is not changed. The spec's Research findings get `Stale since <date>: <one line>. See <note path>.` The skills do not commit.
+
+- After the mark, the kit offers to draft a short revisit request in the chat for the note's owner, taken from the note. The draft names the note path and the owner, what changed, what it contradicts, a question asking the owner to revisit and whether the recommendation still holds, and the status. The kit drafts only. It does not send the request or contact anyone. When the note names no owner, it says so and drafts without one.
+
+- When an updated note is written to `docs/research/`, or the user replaces the file and runs `/crav1-add-to-spec` or `/crav1-keep-current` pointed at it, the kit sees the stale block and asks whether the update resolves it. Yes removes the block and the spec's stale line, and records `Cleared <date>: updated note <path or commit>.` under Research findings. No leaves the mark. The skills do not commit.
+
+- `/crav1-explain`, `/crav1-whats-known-about`, and `/crav1-feature-candidates` show a stale note as stale. `/crav1-plan-from-spec` lists stale research findings under Risks and does not block. `/crav1-tighten-spec` may name the mark as an issue. The shared wording is [`.cursor/skills/crav1/crav1-add-to-spec/references/research-stale.md`](.cursor/skills/crav1/crav1-add-to-spec/references/research-stale.md). No new skill.
+
+### Docs
+
+- The behavior map in [`.cursor/rules/kit-maintainer.mdc`](.cursor/rules/kit-maintainer.mdc) records the research check, the mark, the revisit draft, and the clear. [docs/guild-routing.md](docs/guild-routing.md) notes the same. No new skill.
+
 ## 1.36.0 (2026-10-11)
 
 ### Kit

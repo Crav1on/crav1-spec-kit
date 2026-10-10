@@ -53,6 +53,7 @@ Sources, in order:
 1. Numbered issues already listed by a reviewer in this chat (preserve their meaning; split if they bundled two problems)
 2. When the committed-code read happened, one issue per disagreement with that code. Quote both sides. Do not rewrite the spec to match the code.
 3. Fresh read of `spec.md` / diagrams / ADRs (add only issues the reviewer missed). Wording issues come after the code read.
+4. A stale mark may be one issue. Read `## Research findings` and a note that section links to. Follow the readers section of `crav1-add-to-spec` `references/research-stale.md` (drop-in: `.claude/skills/crav1-add-to-spec/references/research-stale.md`; plugin: sibling `skills/crav1-add-to-spec/references/research-stale.md`). Quote the mark. Name the path. Do not clear the mark. Do not rewrite the research note. When no mark is there, do not invent this issue.
 
 Typical issue shapes (from this skill’s job):
 

@@ -31,6 +31,8 @@ Say which gate failed. Next command: `/crav1-tighten-spec` and/or `/crav1-resolv
 
 **Ready with leftovers:** kept-open questions that do not block a first demo become **Risks** / “do not implement until resolved” — not silent answers.
 
+Stale research does not fail this gate. A `Stale since` line under `## Research findings`, or a stale block on a note that section links to, is listed under Risks. Follow the readers section of `crav1-add-to-spec` `references/research-stale.md` (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/references/research-stale.md`; plugin: sibling `skills/crav1-add-to-spec/references/research-stale.md`). Do not block the plan. Do not clear the mark. Do not treat the stale research as current.
+
 If two architecture shapes still fit the spec (ADR still `proposed`, no constraint), ask **at most 3** multiple-choice questions, then wait. Do not pick a stack they never accepted.
 
 ## Built pieces (before any task)
@@ -87,7 +89,7 @@ Use the template in this skill’s `assets/plan.md`. Fill:
 - **Files likely touched** — real paths if a repo exists; otherwise proposed paths consistent with the spec, marked `(proposed)`
 - **Linter** — whether this repo has a linter or checker for the code those files will hold. See **Linter, before Build** in `references/checks.md`. Specify does not name the linter
 - **Requirements trace** — table: acceptance / REQ id → task ids
-- **Risks** — including kept-open questions
+- **Risks** — including kept-open questions, and each stale research finding. One line per mark: the stale line, and the note path when there is one. Stale research does not block the plan. Do not clear the mark.
 - **Out of scope** — spec non-goals; do not plan them
 - **Left as committed** — only when the user left a piece. One line per piece: `Left as committed: <piece>.` Omit the heading when nothing was left.
 
@@ -124,6 +126,7 @@ Output only:
 - The branch read, when **Built pieces** ran
 - Any verify note with no kind, and any kept security check with no task (must be none, or you failed)
 - Kept-open questions parked as risks
+- Each stale research finding listed under Risks, or that none was marked stale
 - These notes name the checks. `/crav1-verify-spec` is the gate that says they passed. Do not run it here.
 - The linter line: the tool and command, or that this repo has none for the code these tasks will touch.
 - Next, when the plan names a linter: `/crav1-review-plan` (optional but useful), then `/crav1-tighten-plan` for plan `P#`s. Build is expected to leave that named check green.
