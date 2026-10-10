@@ -18,6 +18,8 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 
 - The behavior map in [`.cursor/rules/kit-maintainer.mdc`](.cursor/rules/kit-maintainer.mdc) records the `docs/notes/` write, the Used by line, and the feature-candidates read. [docs/guild-routing.md](docs/guild-routing.md) notes the same. [README.md](README.md) names `docs/notes/` on the Writes cells that gained it. [docs/from-meeting.md](docs/from-meeting.md), [docs/from-match-dump.md](docs/from-match-dump.md), [docs/from-add.md](docs/from-add.md), and [docs/from-feature-candidates.md](docs/from-feature-candidates.md) name the same. No new skill.
 
+## 1.35.0 (2026-10-10)
+
 ### Kit
 
 - For a mail, each embedded image, inline or attached, is listed before the source folder is written. The same four options as a separate binary file apply to each image. The recommendation is convert to text when the image is a diagram, a table, or text that can be reproduced exactly, and compress otherwise. An image above about 10 MB still recommends leave it out. After the list, one question: accept all recommendations, go through them one by one with the recommendation shown, or change some by naming items. The transfer data policy `auto-accept` applies to these recommendations only when the rule text clearly covers them. The rule written today applies auto-accept to keep and redact. That line does not cover the four image options, so the question is still asked. Nothing is written to the source folder until every image has an answer. The skills do not commit. The shared reference is [`.cursor/skills/crav1/crav1-add-to-spec/references/sources.md`](.cursor/skills/crav1/crav1-add-to-spec/references/sources.md). No new skill.
