@@ -4,6 +4,22 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 
 ## Unreleased
 
+## 1.34.0 (2026-10-10)
+
+### Kit
+
+- Imported sources recommend keep or redact before the files are written. Keep a work email of a person on From, To, or Cc, other than the sender, an office phone, and an office address. Redact a personal mobile, a private street address, and a private email. The sender's own email stays unflagged. An item the kit cannot place, such as a mobile that may be work or private, has no recommendation and is asked one at a time. Secrets are always redacted and are never a choice: connection strings, SAS tokens, API keys, passwords, private keys, and VPN configs. The list shows a secret by kind only, never the value. The same README note names the kind and does not paste the value.
+
+- A note is shown once above the list. It is marked as not legal advice. Keeping a work mail as a project record fits, because a spec quote must trace to the source. Keep only what that trace needs. Where the repo is hosted matters. The client's or the employer's data and retention policy comes first. Removing something after it is pushed means rewriting git history.
+
+- After the list, one question has three answers: accept all recommendations, go through them one by one with the recommendation shown on each, or change some by naming items to flip. Unplaced items are still asked one at a time, whatever is picked. Nothing is written until every flagged item has an answer. A redaction is noted in the README by kind, never by value. No unredacted copy is written. The skills do not commit.
+
+- The first check with no rule asks once which types to check (personal data for now; the file allows more types later), whether to auto-accept the recommendations or review each run, and where the repo is hosted. It then offers to save that as the rule. Yes writes it. No uses the answers this run only. When the rule exists, the check applies it, shows one line naming the file and what it chose, shows the note once, and asks only about unplaced items, plus the accept question when the rule says review. The user changes it by editing or deleting the file. The skill never writes a secrets choice into it. Cursor: `.cursor/rules/crav1-transfer-data-policy.mdc`. Claude Code project: `.claude/rules/crav1-transfer-data-policy.md`. The template is [`.cursor/skills/crav1/crav1-add-to-spec/assets/crav1-transfer-data-policy.mdc`](.cursor/skills/crav1/crav1-add-to-spec/assets/crav1-transfer-data-policy.mdc). `/crav1-add-to-spec`, `/crav1-meeting-to-specs`, `/crav1-intake-to-specs`, `/crav1-match-to-specs`, and `/crav1-match-dump-to-specs` follow it. No new skill.
+
+### Docs
+
+- The behavior map in [`.cursor/rules/kit-maintainer.mdc`](.cursor/rules/kit-maintainer.mdc) records the rule write on those five skills. [docs/guild-routing.md](docs/guild-routing.md) notes the same check. [docs/install.md](docs/install.md) names the file a product repo may get, next to the commit-style rule. No new skill.
+
 ## 1.33.0 (2026-10-09)
 
 ### Kit

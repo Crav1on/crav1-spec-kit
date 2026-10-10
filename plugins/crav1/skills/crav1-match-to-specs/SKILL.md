@@ -106,7 +106,7 @@ No `tasks.md`. No application code. No `git init` except the new clean repo they
 
 ## Imported sources
 
-When a dump file is a mail, a transcript, minutes, a chat, a screenshot, a diagram, or another original that will be quoted into a spec, follow the imported-sources convention before the slice specs are written (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/references/sources.md`; plugin: sibling `skills/crav1-add-to-spec/references/sources.md`). Write each source folder once. Pass each folder path with the slice that quotes it. The slice write adds the `Source:` and `Trace:` lines and does not import the file again. Do not commit. A file that is not an imported source does not get a folder.
+When a dump file is a mail, a transcript, minutes, a chat, a screenshot, a diagram, or another original that will be quoted into a spec, follow the imported-sources convention before the slice specs are written (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/references/sources.md`; plugin: sibling `skills/crav1-add-to-spec/references/sources.md`). That check flags personal data with a keep or redact recommendation. An item it cannot place has no recommendation and is asked one at a time. Secrets are redacted, by kind only, and are never a choice. When no transfer data policy exists, it asks once, then may write the rule after a yes. Cursor: `.cursor/rules/crav1-transfer-data-policy.mdc`. Claude Code project: `.claude/rules/crav1-transfer-data-policy.md`. It never writes a secrets choice into that file. Write each source folder once. Pass each folder path with the slice that quotes it. The slice write adds the `Source:` and `Trace:` lines and does not import the file again. Do not commit. A file that is not an imported source does not get a folder.
 
 ## Slice specs
 
@@ -128,7 +128,7 @@ Do not plan. Do not implement. Do not commit. Do not run `/crav1-finalize-commit
 
 Output only:
 
-- Paths written (`docs/system/`, each `docs/specs/<slug>/spec.md`, any source folder `docs/sources/YYYY-MM-DD-<slug>/`, plus any picture lines added)
+- Paths written (`docs/system/`, each `docs/specs/<slug>/spec.md`, any source folder `docs/sources/YYYY-MM-DD-<slug>/`, the transfer data policy when this pass wrote it, plus any picture lines added)
 - Counts: done, partial, not in the code
 - Where the uncovered-code note is, or that the map had none
 - Next:

@@ -9,7 +9,9 @@ description: >-
   goes to that spec
   through /crav1-add-to-spec. The quote label follows the kind and the
   date. When a kept addition imports a source, writes
-  docs/sources/YYYY-MM-DD-<slug>/ and does not write the spec. Does not
+  docs/sources/YYYY-MM-DD-<slug>/ and does not write the spec. That
+  check may write the transfer data policy after a yes. It never writes
+  a secrets choice into that file. Does not
   commit. A kept new feature or bug only names the next command. Does
   not start Specify, Plan, or Build. Cross-cutting. Not a starter option.
 disable-model-invocation: true
@@ -180,7 +182,7 @@ A batch (`M1 keep, M2 leave`) applies only the items named in that batch, in ord
 
 Follow the case already on that item.
 
-**Addition.** When one spec fits, and this source is not yet imported, follow the imported-sources convention before the handoff (drop-in: `.claude/skills/crav1-add-to-spec/references/sources.md`; plugin: sibling `skills/crav1-add-to-spec/references/sources.md`). Write `docs/sources/YYYY-MM-DD-<slug>/` once for that source. Do not commit. A later kept addition from the same source reuses that folder. Do not ask those questions again.
+**Addition.** When one spec fits, and this source is not yet imported, follow the imported-sources convention before the handoff (drop-in: `.claude/skills/crav1-add-to-spec/references/sources.md`; plugin: sibling `skills/crav1-add-to-spec/references/sources.md`). That check flags personal data with a keep or redact recommendation. An item it cannot place has no recommendation and is asked one at a time. Secrets are redacted, by kind only, and are never a choice. When no transfer data policy exists, it asks once, then may write the rule after a yes. Claude Code project: `.claude/rules/crav1-transfer-data-policy.md`. It never writes a secrets choice into that file. Write `docs/sources/YYYY-MM-DD-<slug>/` once for that source. Do not commit. A later kept addition from the same source reuses that folder. Do not ask those questions again. The policy questions are once per repo, as that file says.
 
 Then hand the quote to `/crav1-add-to-spec` for that slug. Pass the quote after any redaction that convention made. Pass the kind and the date for this run, and the source folder. When there is no date, pass the kind and the folder. Do not pass the `State` line. It is not quote text. Follow only the handoff **From /crav1-meeting-to-specs** in that skill (drop-in: `.claude/skills/crav1-add-to-spec/SKILL.md`; plugin: sibling `skills/crav1-add-to-spec/SKILL.md`). One item. Then stop that handoff. The impact check still runs there. Do not write the spec in this skill. Do not create a slug.
 
@@ -231,7 +233,7 @@ When `/crav1-add-to-spec` changed a file, or this command wrote a source folder,
 
 ## Stop
 
-The only files this command writes are `docs/sources/YYYY-MM-DD-<slug>/` for a source a kept addition quotes, and a `.gitattributes` line after a yes, as the imported-sources convention says. Do not write that folder for a leave, a dismiss, a kept new feature, or a kept bug. Do not write `docs/system/`, a spec, `plan.md`, `tasks.md`, `verify.md`, `explore.md`, `docs/environments/marks.md`, or a dismissals file. Do not commit. Do not push. Do not open a pull request.
+The only files this command writes are `docs/sources/YYYY-MM-DD-<slug>/` for a source a kept addition quotes, a `.gitattributes` line after a yes, and the transfer data policy after a yes, as the imported-sources convention says. Do not write that folder for a leave, a dismiss, a kept new feature, or a kept bug. Do not write `docs/system/`, a spec, `plan.md`, `tasks.md`, `verify.md`, `explore.md`, `docs/environments/marks.md`, or a dismissals file. Do not commit. Do not push. Do not open a pull request.
 
 Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-match-to-specs`, `/crav1-plan-from-spec`, `/crav1-implement-task`, `/crav1-complete-task`, `/crav1-verify-spec`, `/crav1-fix-bug`, `/crav1-fix-from-verify`, or `/crav1-finalize-commit`.
 
@@ -248,9 +250,9 @@ Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-spe
 - Every item stays listed. Nothing is dropped to keep the list short.
 - One item at a time: keep, leave, or dismiss.
 - Dismiss is for this run only. Start fresh on every run. Do not write a dismissals file. Do not remember a dismiss across runs.
-- A kept addition goes to that spec through `/crav1-add-to-spec`. Before that handoff, when the source is not yet imported, follow `.claude/skills/crav1-add-to-spec/references/sources.md` (plugin: sibling `skills/crav1-add-to-spec/references/sources.md`). Write the source folder once. Pass the kind, the date, and that folder. The quote starts with `From <kind> <date>.` when there is a date, otherwise `From <kind>.` The impact check still runs there. Do not commit.
+- A kept addition goes to that spec through `/crav1-add-to-spec`. Before that handoff, when the source is not yet imported, follow `.claude/skills/crav1-add-to-spec/references/sources.md` (plugin: sibling `skills/crav1-add-to-spec/references/sources.md`). That check recommends keep or redact, redacts secrets, and may write the transfer data policy after a yes. Write the source folder once. Pass the kind, the date, and that folder. The quote starts with `From <kind> <date>.` when there is a date, otherwise `From <kind>.` The impact check still runs there. Do not commit.
 - A kept new feature names `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, or `/crav1-intake-to-specs`. Do not run it. Do not create a slug. Do not write the source folder here. That next command follows the imported-sources convention when it quotes the source.
 - A kept bug names `/crav1-fix-bug`. Do not run it.
-- This command does not write a spec. The only files it writes are the source folder for a kept addition, and a `.gitattributes` line after a yes. It does not commit.
+- This command does not write a spec. The only files it writes are the source folder for a kept addition, a `.gitattributes` line after a yes, and the transfer data policy after a yes. It does not commit. It never writes a secrets choice into that rule.
 - Do not start Specify, Plan, or Build. Do not plan, implement, or commit.
 - Later skill. Not a starter option. Asking for startup options names only the seven and does not run this command.

@@ -26,7 +26,7 @@ The parent launches **crav1-intake-slice-agent** for **one** slug. This file is 
 2. Copy applicable bulk `A#`s into `## Assumptions`. Add **slice-local** `A#`s only if intake forces a guess the parent never made.
 3. List allowed repos on `## Repos`.
 4. When the parent passed **Synced at**, write or update one line in `spec.md`, after the title and before the first heading: `Synced at: <repo> <branch>@<short sha>, <date>`. One line per repo the parent passed. Update the line for that repo. Leave other `Synced at` lines. Do not invent a line the parent did not pass. Do not edit `repos.md`.
-5. When the parent passed a source folder, add the `Source:` and `Trace:` lines from the imported-sources convention (drop-in: `.claude/skills/crav1-add-to-spec/references/sources.md`; plugin: sibling `skills/crav1-add-to-spec/references/sources.md`). Do not import the file again. Do not ask the mail, binary, or personal-data questions again. Do not commit.
+5. When the parent passed a source folder, add the `Source:` and `Trace:` lines from the imported-sources convention (drop-in: `.claude/skills/crav1-add-to-spec/references/sources.md`; plugin: sibling `skills/crav1-add-to-spec/references/sources.md`). Do not import the file again. Do not ask the mail, binary, or personal-data questions again. Do not write the transfer data policy. The parent runs that check. Do not commit.
 6. Return: paths written, ADRs vs open, 3–5 remaining arguments.
 
 ## Worker must not

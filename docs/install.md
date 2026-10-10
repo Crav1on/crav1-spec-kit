@@ -80,6 +80,8 @@ From a clone of this kit:
 
 Do **not** copy `.cursor/rules/kit-maintainer.mdc` unless you are forking the kit itself. That rule is for maintainers of this repository (no `crav1-` prefix on purpose, so a `crav1*` dump skips it).
 
+Do not copy a transfer data policy at install. The imported-sources check writes `.cursor/rules/crav1-transfer-data-policy.mdc` into the product repo after a yes. On Claude Code the same check writes `.claude/rules/crav1-transfer-data-policy.md`. Delete that file to get the questions again.
+
 Cursor rules: [Rules](https://cursor.com/docs/rules). Cursor skills: [Skills](https://cursor.com/docs/skills).
 
 ### B. Cursor plugin (install from this repo)
@@ -133,6 +135,7 @@ Checked against current Claude Code docs (not a guessed layout):
 | Subagents | `.claude/agents/*.md` | `~/.claude/agents/*.md` | [Subagents](https://code.claude.com/docs/en/sub-agents) |
 | Project instruction | `.claude/CLAUDE.md` | `~/.claude/CLAUDE.md` | [Memory](https://code.claude.com/docs/en/memory) |
 | Commit-style persist rule | `.claude/rules/*.md` | `~/.claude/rules/*.md` | [Memory](https://code.claude.com/docs/en/memory) |
+| Transfer data policy | `.claude/rules/crav1-transfer-data-policy.md` | Not written under `~/.claude/`. It stays in the repo. | [Memory](https://code.claude.com/docs/en/memory) |
 
 Docs also allow a project instruction at `./CLAUDE.md`. This kit uses `.claude/CLAUDE.md` so the drop-in is one directory and does not replace a product’s root `CLAUDE.md`. Both paths are loaded ([directory overview](https://code.claude.com/docs/en/claude-directory)).
 
@@ -165,6 +168,8 @@ Append `.claude/CLAUDE.md` to `~/.claude/CLAUDE.md` if you want the short kit in
 Playbooks name project paths (`.claude/skills/…`). If that file is not in the repo, read the same path under `~/.claude/`. The generated `CLAUDE.md` says this.
 
 Onward commit style on a client repo writes `~/.claude/rules/draft-commit-style.md` or `draft-commit-gitlog.md` (user rules, loaded for every project). A repo that committed the kit writes `.claude/rules/` instead, same idea as Cursor’s `.cursor/rules/draft-commit-*.mdc`.
+
+The imported-sources check can write a transfer data policy into the repo after a yes. Cursor: `.cursor/rules/crav1-transfer-data-policy.mdc`. Claude Code project: `.claude/rules/crav1-transfer-data-policy.md`. It is once per repo. It is not a user rule. Delete that file to get the questions again. The template is in the add-to-spec skill assets.
 
 ### Agents
 
