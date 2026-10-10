@@ -35,6 +35,7 @@ Write the folder once, before the first verbatim quote from that source is writt
 - The date and the time, as the source shows them.
 - How it was converted: as-is, compressed and the quality, converted to text, or left out.
 - Where the original lives, when the file was left out, or converted and the original stays outside the repo.
+- For a mail, each image that was converted, compressed, or left out. Name the image and the option. When any image changed, say the `.eml` is no longer the untouched original.
 - A redaction, when one was made, including a secret. Name the kind that was removed. Do not paste the removed value. Say the file is then no longer the untouched original.
 
 Do not invent a sender, a participant, a date, or a time. When the source does not show one, say it is not shown.
@@ -52,11 +53,13 @@ The question is: Add `*.eml -text` to `.gitattributes` so Git keeps the CRLF lin
 
 Do not add the line without that yes. When the line is already there, do not ask.
 
-A mail follows this section. The binary section does not replace it. An attachment the user also supplied as its own file follows the binary section and lives in the same folder when it belongs to that mail.
+A mail follows this section. Each image inside the mail, inline or attached, also follows Images inside a mail. The binary section does not replace the mail. An attachment the user also supplied as its own file follows the binary section and lives in the same folder when it belongs to that mail. A non-image part stays in the `.eml`.
 
 ## Binary files
 
-For every binary file, ask which of these four options to use. One question per file. Options only. Use the questions tool when it is available. Name one recommendation in the question. The user picks. Do not pick for them.
+For every binary file the user hands over as its own file, ask which of these four options to use. One question per file. Options only. Use the questions tool when it is available. Name one recommendation in the question. The user picks. Do not pick for them.
+
+An image inside a mail uses the list in Images inside a mail. Ask once for that list. The four options are the same.
 
 1. **Commit as-is.** The file goes in the folder unchanged.
 2. **Compress, then commit.** For a screenshot: crop off taskbars and app bars, no sharpening, WebP. Show samples at q70, q85, and lossless so the user picks the quality. Write only the picked file into the folder. This is the recommendation for a screenshot that is not above about 10 MB.
@@ -65,19 +68,58 @@ For every binary file, ask which of these four options to use. One question per 
 
 For any other binary under about 10 MB, the recommendation is commit as-is.
 
-When a file is above about 10 MB, recommend leave-it-out even when it is a screenshot or a document. Still offer all four options. The size is the file as offered, before a compress.
+For an image inside a mail that is not above about 10 MB, the recommendation is convert to text when the image is a diagram, a table, or text that can be reproduced exactly. Otherwise the recommendation is compress. An image that is a diagram and a table is convert to text. Text that can be reproduced exactly means the whole image can be written again as words, a markdown table, or a Mermaid diagram. A photo or a screen that would drop part of the picture is compress.
+
+When a file is above about 10 MB, recommend leave-it-out even when it is a screenshot, a document, or an image inside a mail. Still offer all four options. The size is the file as offered, or that image part, before a compress.
 
 Git LFS (Large File Storage) is a note only. It is not an option. It needs repo setup the kit does not do.
 
 The README records which option was used.
 
-Screenshot samples: crop first, then encode three WebP files, q70, q85, and lossless. Do not sharpen. Show the three to the user with the quality named on each. Stop until the user picks one. Write only the picked file into the folder. Remove the other two. Do not leave the samples in the source folder. If no encoder is available, say so and ask the user to pick another of the four options. Do not install an encoder.
+Screenshot samples: crop first, then encode three WebP files, q70, q85, and lossless. Do not sharpen. Show the three to the user with the quality named on each. Stop until the user picks one. Write only the picked file into the folder. Remove the other two. Do not leave the samples in the source folder. If no encoder is available, say so and ask the user to pick another of the four options. Do not install an encoder. An image inside a mail uses the same samples. The picked image replaces that part, as Images inside a mail says.
 
 A text file that is already text, such as `.txt`, `.md`, or `.vtt`, is not a binary file. Store it unchanged. A `.docx` or a PDF is a document and gets the four options.
 
+## Images inside a mail
+
+A mail can hold images inline, or as attached image parts. List every one before the folder is written. Nothing is dropped to keep the list short. Read each image before the question. When a secret is readable in an image, commit as-is is not an option for that image. Secrets says what is written instead. A mail with no image skips this section.
+
+Number each image. The line says inline or attached, the file name or content id when the mail has one, and a short line of what the image shows. The line ends with the recommendation from Binary files: `Recommendation: convert to text.`, `Recommendation: compress.`, or `Recommendation: leave it out.`
+
+### One question for the images
+
+After the list, one question when there is at least one image. Three answers. Use the questions tool when it is available. Stop until the user picks.
+
+1. **Accept all recommendations.**
+2. **Go through them one by one.** The recommendation is shown on each image. The four options are the answers.
+3. **Change some.** The user names images and the option, for example convert 2, compress 4.
+
+Accept all recommendations applies every listed recommendation.
+
+Go through them one by one asks the four options for each image. One image at a time. Options only. Use the questions tool when it is available. The question shows the recommendation. Stop until the user picks.
+
+Change some waits for the user to name the images and the option. The named option replaces the recommendation for that image. An image they do not name keeps its recommendation. When a number is not on the list, or the reply names an image and no option, ask again. Do not guess.
+
+The transfer data policy `auto-accept` applies to keep and redact recommendations. Apply it to these image recommendations only when the rule text clearly covers them. The template says auto-accept applies the keep and redact recommendations. That line does not cover the four image options. Ask this question. A rule the user edited covers the image recommendations only when its own text says so, for example that auto-accept applies to embedded-image options. A keep and redact line is not that cover. Do not add an image choice to the rule. Do not rewrite the rule for this.
+
+When the option is compress, the quality samples in Binary files still run. Accept all does not skip that pick. Stop until the user picks a quality. That pick is part of the answer.
+
+Do not write the source folder until every image has an answer. The transfer data policy file may still be written when the user says yes, as Personal data says.
+
+### What each option does to the part
+
+1. **Commit as-is.** That image part stays in the `.eml` unchanged.
+2. **Compress, then commit.** Replace that image part with the picked WebP. Same crop, no sharpening, and the same three samples as a screenshot. Keep the content id when the part had one. Set the type to `image/webp`. Keep the CRLF line endings. Do not write a second copy of the image next to the `.eml`. The README names the image and the quality. The `.eml` is then no longer the untouched original. The README says so.
+3. **Convert to text.** Remove that image part from the `.eml`. Leave a short placeholder where the image was shown, naming the new file: `[Image converted to text: <name>.md]`. When the image was only an attachment, add that line at the end of the text body. Write `<name>.md` in the same `docs/sources/YYYY-MM-DD-<slug>/` folder. The name comes from the image file name. Lowercase. Hyphens. Do not put a person's name in the name. When the mail shows no file name, use a short name from what the image shows. When that name is already used in the folder, add the list number. The file holds the image's text word for word. A diagram is a Mermaid redraw. A table is a markdown table. An image that has both holds both. Check that text word for word against the image before the file is written. Do not invent a label, a word, or a box the image does not show. The README notes the conversion and names the file. The README says the `.eml` is no longer the untouched original.
+4. **Leave it out.** Remove that image part from the `.eml`. Leave a short placeholder where the image was shown: `[Image left out: <name>]`. When the image was only an attachment, add that line at the end of the text body. Use the same name rules as convert to text. The folder does not contain that image. The README notes the leave-out and names the image. The README says the `.eml` is no longer the untouched original.
+
+Put the placeholder where that image was shown. A mail with a plain part and an HTML part gets the placeholder in both. Do not ask where an image that lived only in the mail now lives. The `<name>.md` from convert to text is the file the folder stores.
+
+Keep the CRLF line endings on the `.eml` after any of these edits. When every image is commit as-is, and no later section changes the file, the `.eml` stays the untouched original.
+
 ## Personal data
 
-Before the files are written, check the source, and check the quote that will be written into the spec. Flag every item below. Flag a detail that is readable in a screenshot, including when it sits in a mail signature. Nothing is dropped to keep the list short.
+Before the files are written, check the source, and check the quote that will be written into the spec. Flag every item below. Flag a detail that is readable in a screenshot, in an embedded image in a mail (inline or attached), and in text that a convert-to-text will write, including when it sits in a mail signature. Nothing is dropped to keep the list short.
 
 Flag these:
 
@@ -104,7 +146,7 @@ A similar detail follows the same three outcomes. Recommend keep when it is a wo
 
 ### Secrets
 
-Secrets are always redacted. They are never a choice. They are never stored in the rule. Check for them even when the rule does not list personal data.
+Secrets are always redacted. They are never a choice. They are never stored in the rule. Check for them even when the rule does not list personal data. Check what is readable in an embedded image and in text that a convert-to-text will write. A secret in an image is removed from the file that will be written. Commit as-is is not available for that image. Leave it out removes the part. Compress or convert to text writes the image or the text with the secret removed.
 
 The kinds are:
 
@@ -166,7 +208,7 @@ Go through them one by one asks keep or redact for each numbered item. One item 
 
 Change some waits for the user to name the items. The named choice replaces the recommendation for that item. An item they do not name keeps its recommendation. When a number is not on the list, or the reply does not name an item, ask again. Do not guess.
 
-When the rule or this run says auto-accept, do not ask that question. Apply each numbered recommendation.
+When the rule or this run says auto-accept, do not ask that question. Apply each numbered recommendation. That auto-accept covers these keep and redact lines. Images inside a mail says when it also covers an image recommendation.
 
 Unplaced items are still asked one at a time, whatever was picked, including auto-accept. Options are keep and redact. There is no recommendation. Use the questions tool when it is available. Stop until the user picks.
 
@@ -176,7 +218,9 @@ When there is no numbered item, do not ask the three-answer question. Ask the un
 
 **Redact.** Remove that item from the file that will be written, and from the quote. Note the redaction in the README, by kind, not by pasting the value. The file is then no longer the untouched original. The README says so.
 
-Do not write the source files until every flagged item has an answer. A secret is already answered by this section. The rule file may be written when the user says yes, before the source files. Do not write an unredacted copy into the repo. When a screenshot will be compressed, the samples are the redacted image. The user commits later. A redacted value is not in the file they will commit. Do not commit.
+A detail that is readable only in an image follows the same keep or redact. When that image will be compressed, the samples are the redacted image. When that image will be converted to text, the redact removes the item from `<name>.md` and from the quote. When the option for that image is commit as-is, a redact cannot leave the image unchanged. Say so and ask the user to pick compress, convert to text, or leave it out for that image. Do not edit an as-is image.
+
+Do not write the source files until every flagged item has an answer and every image inside a mail has an answer. A secret is already answered by this section. The rule file may be written when the user says yes, before the source files. Do not write an unredacted copy into the repo. When a screenshot or an embedded image will be compressed, the samples are the redacted image. The user commits later. A redacted value is not in the file they will commit. Do not commit.
 
 ## Spec lines
 
