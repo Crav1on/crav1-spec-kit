@@ -8,6 +8,8 @@
 
 Walk plan.md/tasks.md issues one by one (including [`/crav1-review-plan`](crav1-review-plan.md) P#s).
 
+One plan issue at a time; patches plan/tasks only (spec findings go to tighten-spec)
+
 ## Runs when
 
 Plan findings, or mushy tasks. Called by the user.

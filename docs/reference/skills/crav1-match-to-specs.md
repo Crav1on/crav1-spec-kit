@@ -8,6 +8,8 @@
 
 Match one or more repos that already make up a system, plus a dump of notes, tickets, old docs, diagrams, or screenshots, to docs/system/ (including glossary.md) and one spec per confirmed slice.
 
+Existing repos plus a dump → where the spec files go, then `docs/system/` (including `glossary.md`) and one spec per confirmed slice (done, partial, or not in the code). Fills a missing `glossary.md` when the folder already exists. New glossary rows are appended. Existing rows are not rewritten. A meaning the source does not state is `to be researched`. That same pass adds what is new to the short description, the diagram, and how the parts connect. It does not rewrite what is already there. Not intake, spark, or ideas. Does not plan, implement, or commit.
+
 ## Runs when
 
 Existing repos plus a dump. Called by the user.

@@ -8,6 +8,8 @@
 
 Sort a code change that already landed (a commit, a range, or the branch diff) onto specs that already exist.
 
+A code change that already landed, specs already exist → sort onto those specs (belongs, already described there, or fits none), then quote what the change does. No dump. Does not ask for a slug first. Does not create a slug. Does not watch the repo. Does not seed `docs/system/`. Fills a missing `glossary.md` only when that folder already exists. New glossary rows are appended. Existing rows are not rewritten. A meaning the source does not state is `to be researched`. That same pass adds what is new to the short description, the diagram, and how the parts connect. It does not rewrite what is already there. Does not plan, implement, or commit.
+
 ## Runs when
 
 A landed change; specs already exist. Called by the user.

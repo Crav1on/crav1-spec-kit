@@ -8,6 +8,8 @@
 
 Implement exactly one task from tasks.md, then run its verify step.
 
+One `tasks.md` row, then run its verify step.
+
 ## Runs when
 
 Build one task. Called by the user and by `crav1-complete-task-agent`.

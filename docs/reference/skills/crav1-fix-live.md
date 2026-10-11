@@ -8,6 +8,8 @@
 
 Shortcut to [`/crav1-fix-from-verify`](crav1-fix-from-verify.md) when the verify gap is a live/inner-loop path (ports, proxy, SQL, unpublished URL).
 
+Alias when that gap is a live/inner-loop path.
+
 ## Runs when
 
 A live or untested wiring gap. Called by the user.

@@ -4,6 +4,15 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 
 ## Unreleased
 
+### Docs
+
+- The [README](README.md) is now a short landing page: what the kit is, the seven starter options with links to their reference pages and walkthroughs, a lane diagram, and one pointer to the docs index.
+- New [docs index](docs/README.md), grouped by type (tutorial, how-to, reference, explanation) and by reader (spec writer, developer, guild bot, maintainer). It is the one map of every page. [docs/install.md](docs/install.md) and [docs/first-run.md](docs/first-run.md) point at it instead of keeping their own long lists.
+- New [docs/concepts/](docs/concepts/): [the method](docs/concepts/method.md) (how the pieces fit together, the starting points, the working loop, setup, best practices, and minimal templates, moved from the README), [data layout](docs/concepts/data-layout.md) (every folder and file, who writes it, notes, sources, research stale marks, open question marks, `work-item.md`, and the spec sections the kit looks for), a [glossary](docs/concepts/glossary.md), and the [data policy](docs/concepts/data-policy.md) for personal data and secrets in imported sources.
+- The README's per-skill paragraphs and its "already ships" list moved into a new `in_depth` field in [`docs/reference/skills.yaml`](docs/reference/skills.yaml), shown under Purpose on each skill page. The README's per-lane tables are gone; the [skills reference](docs/reference/skills.md) has them.
+- [plugins/crav1/README.md](plugins/crav1/README.md) uses full GitHub links and points at the skills reference instead of its own per-skill list.
+- The Skills row in [docs/install.md](docs/install.md) links to the skills reference instead of describing every command.
+
 ## 1.41.0 (2026-10-11)
 
 ### Kit

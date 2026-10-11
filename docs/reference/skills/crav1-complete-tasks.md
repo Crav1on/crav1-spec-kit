@@ -8,6 +8,8 @@
 
 Orchestrate isolated [`/crav1-complete-task`](crav1-complete-task.md) workers for a T# range or all unchecked tasks.
 
+Orchestrates one worker per `T#` (`T1-T3` or all unchecked); stops the batch when a worker needs you.
+
 ## Runs when
 
 Several tasks on one spec. Called by the user.

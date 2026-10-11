@@ -8,6 +8,10 @@
 
 Ask whether the thing in front of you is secure, after architecture already exists (docs/system/ or a spec that already describes the design).
 
+When architecture already exists, **[`/crav1-security-review`](crav1-security-review.md)** asks whether the thing in front of it is secure. The same command covers the whole system, one existing spec, or the change in front of you. It is not a mode of [`/crav1-architecture-reviewer`](crav1-architecture-reviewer.md). Architecture review critiques design hunches. This command writes kept findings and stops. Spark, plan, and verify do not run it.
+
+After architecture exists, ask whether the thing in front of you is secure. Same command for the whole system (`docs/system/security.md`), one spec, or the change in front of you (a Security section on that spec). One confirm, then kept findings only. Does not invent an architecture. Does not plan, implement, or commit. Spark, plan, and verify do not run it.
+
 ## Runs when
 
 Architecture already exists. Called by the user.

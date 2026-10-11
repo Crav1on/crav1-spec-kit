@@ -8,6 +8,8 @@
 
 Start the crav1-architecture-reviewer-agent subagent on the current spec.
 
+Run the crav1-architecture-reviewer-agent subagent; numbered issues at the end. Optional next, not run from this command: [`/crav1-security-review`](crav1-security-review.md).
+
 ## Runs when
 
 Spec, diagrams, or ADRs exist. Called by the user.

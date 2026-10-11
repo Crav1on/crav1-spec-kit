@@ -8,6 +8,10 @@
 
 Update the picture in docs/system/ when something was added: add what is new to the short description, the diagram, and how the parts connect, and do not rewrite what is there.
 
+When something was added, **[`/crav1-keep-current`](crav1-keep-current.md)** updates the short description, the diagram, and how the parts connect. It adds what is new and does not rewrite what is already there. It does not design the change and does not build it. It can run on its own. Spark, ideas, intake, match, and the siblings that already append a glossary row also run this update. They do not rewrite existing glossary rows. Some commands ask at the end of the run whether to run it, and do not run it: [`/crav1-complete-features`](crav1-complete-features.md) when a slice is marked done or retired, [`/crav1-fix-bug`](crav1-fix-bug.md) and [`/crav1-fix-live`](crav1-fix-live.md) when the fix changes how the parts connect, [`/crav1-environment-read`](crav1-environment-read.md) after marks lines are added, and [`/crav1-add-to-spec`](crav1-add-to-spec.md) once at the end of an environment-read or suggest-tests handoff. [`/crav1-implement-task`](crav1-implement-task.md) and [`/crav1-complete-task`](crav1-complete-task.md) do not ask.
+
+Adds what is new to the short description, the diagram, and how the parts connect. Does not rewrite what is already there. Does not design the change or build it. Can run on its own. Spark, ideas, intake, match, match-dump, and code-into-specs run this same update and still do not rewrite existing glossary rows.
+
 ## Runs when
 
 Something was added; catch the picture up. Called by the user and by [`/crav1-environment-read`](crav1-environment-read.md) for a confirmed system section.

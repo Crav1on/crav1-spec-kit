@@ -8,6 +8,8 @@
 
 After [`/crav1-verify-spec`](crav1-verify-spec.md), walk inner-loop gaps one by one (verify failed, then unverified, then G#).
 
+After verify-spec, walk inner-loop gaps (failed → unverified → `G#`); omit Gap for the next; writes `fix-log.md`.
+
 ## Runs when
 
 After verify, inner-loop gaps. Called by the user and by `crav1-complete-task-agent`.

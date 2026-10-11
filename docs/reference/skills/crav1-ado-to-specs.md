@@ -8,6 +8,8 @@
 
 Read Azure Boards Features that the specs already record.
 
+Reads Azure Boards Features back and shows what differs. A kept change goes through [`/crav1-add-to-spec`](crav1-add-to-spec.md). A reply comment is posted only after a yes.
+
 ## Runs when
 
 Read Azure Boards Features back. Called by the user.

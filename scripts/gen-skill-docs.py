@@ -112,6 +112,9 @@ def validate(data: dict) -> list[str]:
         for key in ("purpose", "use_when", "reads", "writes", "first_prompt", "since", "stage"):
             if not s.get(key):
                 errors.append(f"{n}: {key} is empty")
+        extra = s.get("in_depth", [])
+        if not isinstance(extra, list) or not all(isinstance(p, str) and p.strip() for p in extra):
+            errors.append(f"{n}: in_depth must be a list of paragraphs")
         for key in ("reads", "writes"):
             if not s.get("table", {}).get(key):
                 errors.append(f"{n}: table.{key} is empty")
@@ -218,6 +221,8 @@ def render_page(s: dict, data: dict) -> str:
     walk = walk_link(s, "../../")
     out.append(f"[All skills](../skills.md) · Walkthrough: {walk} · Playbook: [`SKILL.md`](../../../.cursor/skills/crav1/{n}/SKILL.md)")
     out += ["", "## Purpose", "", lk(s["purpose"])]
+    for para in s.get("in_depth") or []:
+        out += ["", lk(para)]
     runs = s["use_when"].rstrip(".") + "."
     out += ["", "## Runs when", "", lk(runs) + (" " + lk(s["called_by"]) if s.get("called_by") else "")]
     if s["starter"]:

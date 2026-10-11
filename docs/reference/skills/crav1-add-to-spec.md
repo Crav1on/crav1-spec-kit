@@ -8,6 +8,10 @@
 
 Add new information to one existing spec, then report whether docs/system/ or another spec has to change; edits there only on apply.
 
+New information aimed at one spec that already exists is **[`/crav1-add-to-spec`](crav1-add-to-spec.md)**. [`/crav1-tighten-spec`](crav1-tighten-spec.md) stays for mushy wording. Match, intake, spark, and ideas create the folders. This command does not plan.
+
+New information for one existing spec → quote it into that `spec.md`, then report whether the landscape or another spec has to change. Does not rewrite those other files unless asked. Does not create a glossary. A new glossary row can be one listed edit and is not written unless apply is chosen. A meaning the new information does not state is `to be researched`. Existing rows are not rewritten. Does not plan, implement, or commit.
+
 ## Runs when
 
 New information for one existing spec. Called by the user, by [`/crav1-environment-read`](crav1-environment-read.md) for a confirmed Match section, by [`/crav1-suggest-tests-for-code`](crav1-suggest-tests-for-code.md) for one kept or dismissed suggestion, by [`/crav1-meeting-to-specs`](crav1-meeting-to-specs.md) for one kept addition, by [`/crav1-specs-to-ado`](crav1-specs-to-ado.md) for a preview change, and by [`/crav1-ado-to-specs`](crav1-ado-to-specs.md) for one kept change or one answer.

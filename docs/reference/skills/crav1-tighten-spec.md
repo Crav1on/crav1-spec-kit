@@ -8,6 +8,8 @@
 
 Walk an existing spec issue-by-issue.
 
+One issue at a time, with explained resolutions (plus get a suggestion) and impact; patch only that issue after the user chooses. When the slice is partial or `## In the code` names paths, reads the committed code on the repo and branch the spec names before wording issues. A spec with no code behind it skips that read. Does not offer finish, add a test, or leave.
+
 ## Runs when
 
 The spec is still mushy. Called by the user.

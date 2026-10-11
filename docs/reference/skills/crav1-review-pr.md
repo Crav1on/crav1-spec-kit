@@ -8,6 +8,10 @@
 
 Read one named open pull request and report whether it can ship.
 
+When an open pull request is named, **[`/crav1-review-pr`](crav1-review-pr.md)** reads the diff and says whether it can ship. It is cross-cutting. It is not a lane and not a bot. A pull request with a plan keeps the plan and `verify.md` checks. A pull request with no `plan.md` or `tasks.md` for its slug was built outside the kit. That is an info note. It does not report a missing `verify.md`. It reads the test results that pull request's own pipeline already recorded. It does not run the tests, and it does not ask to. It ends by naming [`/crav1-keep-current`](crav1-keep-current.md) after the merge and does not run it. It does not edit, vote, comment, or merge. [`/crav1-open-pr`](crav1-open-pr.md) may name it and does not run it. [`/crav1-merge-pr`](crav1-merge-pr.md) does not run it. Spark, specify, and verify do not run it.
+
+Reads one named open pull request. When the slug has `plan.md`, spec, plan, `verify.md`, the body, and a required green linter must hold before it says ship. When the slug has no `plan.md` or `tasks.md`, that is an info note. It does not report a missing `verify.md`. It reviews spec fit, the body, the required green linter, and secrets, and it reads the pipeline's recorded tests. It does not run tests. It names [`/crav1-keep-current`](crav1-keep-current.md) after that pull request merges and does not run it. Names the lane for a finding and does not start it. Does not edit, vote, comment, install a linter, or merge. Spark, specify, and verify do not run it.
+
 ## Runs when
 
 This turn names an open pull request. Called by the user.

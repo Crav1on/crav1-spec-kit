@@ -8,6 +8,8 @@
 
 Serial board: build several ready specs one slug after another in this checkout.
 
+Serial board of ready slugs: `feat/<slug>` from default, then that spec’s complete-tasks loop; no parallel, no push, no PR.
+
 ## Runs when
 
 Several specs, one after another. Called by the user.

@@ -8,6 +8,8 @@
 
 Turn a one- or two-sentence spark into spec.md.
 
+One-liner → questions → thin `docs/system/` when missing, including `glossary.md`, then `spec.md`, then one index row (greenfield, brownfield feature, or later feature on an existing landscape; new slug unless they extend). An existing landscape is left in place. A missing `glossary.md` is filled. New glossary rows are appended. Existing rows are not rewritten. A meaning the source does not state is `to be researched`. That same pass adds what is new to the short description, the diagram, and how the parts connect. It does not rewrite what is already there. On Azure Repos, offers once to write `work-item.md`.
+
 ## Runs when
 
 You have 1–2 sentences. Called by the user.

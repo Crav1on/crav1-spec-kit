@@ -8,6 +8,8 @@
 
 Turn mixed intake (notes, diagrams, screenshots, optional code as context) into docs/system/ (including glossary.md) plus one spec slug per v0 feature.
 
+Mixed intake → `docs/system/` (including `glossary.md`) + one spec per v0 feature (isolated slice workers). A missing `glossary.md` is filled when the folder already exists. New glossary rows are appended. Existing rows are not rewritten. A meaning the source does not state is `to be researched`. That same pass adds what is new to the short description, the diagram, and how the parts connect. It does not rewrite what is already there. On Azure Repos, one optional work-item question for the new slugs.
+
 ## Runs when
 
 Mixed files, or several v0 features. Called by the user.

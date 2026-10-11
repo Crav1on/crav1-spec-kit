@@ -8,6 +8,8 @@
 
 Sort a later dump of notes, tickets, old docs, diagrams, or screenshots onto specs that already exist; one dump may cover one slug or many.
 
+A later dump, specs already exist → sort onto those specs (belongs, already there, note, or does not fit), then quote the new bits. A confirmed note is written under `docs/notes/`. Does not ask for a slug first. Does not create a slug. Does not seed `docs/system/`. Fills a missing `glossary.md` only when that folder already exists. New glossary rows are appended. Existing rows are not rewritten. A meaning the source does not state is `to be researched`. That same pass adds what is new to the short description, the diagram, and how the parts connect. It does not rewrite what is already there. Does not plan, implement, or commit.
+
 ## Runs when
 
 A later dump; specs already exist. Called by the user.

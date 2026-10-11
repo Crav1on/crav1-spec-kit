@@ -8,6 +8,8 @@
 
 Draft a paste-ready commit Summary and Description only.
 
+Paste-ready Summary/Description for any git client; CRAV1 style or live git log, once or onward (deletable rule); does not commit unless they ask. Optional Azure Boards mention from `docs/specs/<slug>/work-item.md` is the last description line.
+
 ## Runs when
 
 About to commit. Called by the user and by [`/crav1-finalize-commit`](crav1-finalize-commit.md).
