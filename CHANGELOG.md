@@ -4,6 +4,22 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 
 ## Unreleased
 
+## 1.39.0 (2026-10-11)
+
+### Kit
+
+- When an updated note comes back for a stale mark, the kit also reads that note's own open questions. That is the Open questions section, and any line the note marks as needing a source or a confirmation. A question whose answer lies outside the note's owner is written on each spec whose Research findings link to the note. The question names who has the fact when the note says so. A decision is marked as a decision. The same meaning already on the spec is not written again. A question the note's owner can still answer stays in the note. This runs whether or not the mark had open points, and also when the mark clears. The end-of-run summary lists every one of those questions. The kit does not ask the user. It does not send anything. It does not commit.
+
+- An older stale mark with no per-point lines is not one point. The kit splits it into the hits it was made from: the contradiction and answered-question lines named in the note's stale block, the spec's stale line, and the run that wrote them when that run is visible. It judges each hit. When those hits cannot be found, it judges the whole update against the original quote, and the summary says the older mark had no points. It does not rewrite that mark as a count of points.
+
+- An open question about a spec line names the real source of the suggested wording. When the wording is in the note's owner's revisit answer, the question says so and includes that answer's date. It uses the owner's name when the note or the answer names them. When the wording is in the note, the question names that section. It does not attribute to the note what is only in the answer. The spec line stays.
+
+- The check still does not ask the user. It still routes an open point the same four ways, and it still numbers a follow-up draft. Nothing is sent. Nothing is committed. The shared wording is [`.cursor/skills/crav1/crav1-add-to-spec/references/research-stale.md`](.cursor/skills/crav1/crav1-add-to-spec/references/research-stale.md). No new skill.
+
+### Docs
+
+- The behavior map in [`.cursor/rules/kit-maintainer.mdc`](.cursor/rules/kit-maintainer.mdc) records the note's own open questions and the split of an older mark. [docs/guild-routing.md](docs/guild-routing.md) notes the same. No new skill.
+
 ## 1.38.0 (2026-10-11)
 
 ### Kit
