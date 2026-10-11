@@ -257,4 +257,4 @@ The kit is at [https://github.com/Crav1on/crav1-spec-kit](https://github.com/Cra
 | Update the picture after something was added | [docs/from-keep-current.md](from-keep-current.md) |
 | The method (specs, plan files, tasks, verify) | [README.md](../README.md) |
 | Which lane owns a `/crav1-…` skill or `*-agent` | [guild-routing.md](guild-routing.md) |
-| How a skill on main behaves | Behavior map in [`.cursor/rules/kit-maintainer.mdc`](../.cursor/rules/kit-maintainer.mdc) (this kit repo only) |
+| Every command in one table, and how each skill behaves | [docs/reference/skills.md](reference/skills.md), with one page per skill |

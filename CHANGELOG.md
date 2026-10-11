@@ -4,6 +4,15 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 
 ## Unreleased
 
+## 1.41.0 (2026-10-11)
+
+### Kit
+
+- New data file [`docs/reference/skills.yaml`](docs/reference/skills.yaml) holds every skill and subagent: lane, group inside the lane, starter flag, use when, what it reads and writes, what it leaves alone, its exceptions, who calls it, what it calls, what you run next, its walkthrough, the release it first appeared in, and a first prompt. It was seeded from the behavior map and the README skills table and covers all 42 skills and 5 subagents.
+- New generator `scripts/gen-skill-docs.py` writes [`docs/reference/skills.md`](docs/reference/skills.md) (one table grouped by lane, Starters, Specify, Plan, Build, and Cross-cutting, with the README phases as groups inside the lanes, plus a table of all five subagents) and one page per skill under `docs/reference/skills/`. Columns: Command (linked to its page), Starter, Use when, Reads, Writes (every side effect), You run next, Runs by itself, and Walkthrough. Each page has Purpose, Runs when, Reads, Writes, Does not, You run next / Runs by itself, Lane and group, Stage and since, First prompt, and Walkthrough.
+- CI runs `scripts/gen-skill-docs.py --check` (generated pages match the YAML, every skill folder and subagent is in it, lanes match the guild-routing map) and the new `scripts/check-kit-docs.py` (every skill description in the three trees is within 1,024 characters, and `plugin.json` equals the newest CHANGELOG release heading). Both need PyYAML.
+- The behavior map moved out of `.cursor/rules/kit-maintainer.mdc` into the reference. The maintainer rule now points at `docs/reference/` and says a new or changed skill updates `skills.yaml` and regenerates. `plugin.json` is 1.41.0 and follows the release tag from now on.
+
 ### Docs
 
 - Stale claims fixed. `/crav1-meeting-to-specs` has four choices (keep, leave, dismiss, or note) and `/crav1-match-dump-to-specs` has four piles (belongs, already in, note, does not fit) in the README and [docs/install.md](docs/install.md). The README "already ships" list now has `/crav1-meeting-to-specs`, `/crav1-ask-open-questions`, `/crav1-feature-candidates`, `/crav1-specs-to-ado`, and `/crav1-ado-to-specs`. The README minimal plan template has `## Linter`, the same as `docs/specs/_template/plan.md`. The README layout block lists `docs/architecture/`, `docs/environments/`, `docs/notes/`, `docs/sources/`, `docs/research/`, and the extra files in a spec folder.
@@ -14,6 +23,7 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 - A specific git client is no longer named in the README, `AGENTS.md`, the plugin README, `from-ideas.md`, or `from-nothing.md`.
 - Skill descriptions: `/crav1-complete-task`, `/crav1-complete-tasks`, and `/crav1-finalize-commit` use host-neutral wording. The six descriptions over 1,024 characters (add-to-spec, code-into-specs, keep-current, match-dump-to-specs, meeting-to-specs, repos-to-spec) are shortened with the same meaning. The plugin mirror and `.claude/` copies are regenerated.
 - `plugins/crav1/.cursor-plugin/plugin.json` is at 1.40.0, so the line above about the version matching now holds. Its description and the catalog description cover the current kit.
+- [CONTRIBUTING.md](CONTRIBUTING.md), [docs/install.md](docs/install.md), [docs/guild-routing.md](docs/guild-routing.md), and the README point at the skills reference instead of the behavior map.
 
 ## 1.40.0 (2026-10-11)
 

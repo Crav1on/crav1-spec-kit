@@ -132,7 +132,7 @@ Then: answer ≤7 questions (and the branch prompt) → agent seeds a thin `docs
 
 - Start with one starter option, then go Specify → Plan → Build → Verify → Commit and pull request.
 - Every command says what it reads and what it writes. Anything not listed is left alone.
-- Lanes per command: [guild routing](docs/guild-routing.md). Full rules per command: that skill's own `SKILL.md`.
+- Lanes per command: [guild routing](docs/guild-routing.md). Full rules per command: the [skills reference](docs/reference/skills.md), one page per skill.
 
 ```mermaid
 flowchart LR
