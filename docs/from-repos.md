@@ -68,3 +68,5 @@ If a file changed:
 That puts the spec and the notes in git. No push. This command does not commit for you.
 
 The lanes can extend `docs/architecture/spec.md` in a later turn. This command does not start that turn.
+
+Reference page: [repos-to-spec](reference/skills/crav1-repos-to-spec.md)

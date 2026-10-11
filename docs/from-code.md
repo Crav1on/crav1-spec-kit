@@ -65,3 +65,5 @@ If a file changed and those edits should be in git:
 That puts the spec edits (and any applied edits) in git. No push. This command does not commit for you. It points at that command only when those spec edits should be committed.
 
 `/crav1-plan-from-spec` is only for a slice you choose to start. This command does not run it.
+
+Reference page: [code-into-specs](reference/skills/crav1-code-into-specs.md)

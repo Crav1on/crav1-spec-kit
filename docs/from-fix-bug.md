@@ -45,3 +45,5 @@ No code edit. No `spec.md` edit. No `plan.md` edit. No `verify.md` edit. No pull
 ## After
 
 Start the lane it named in a later turn. Do not treat this command as that lane.
+
+Reference page: [fix-bug](reference/skills/crav1-fix-bug.md)

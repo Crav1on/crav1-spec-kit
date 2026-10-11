@@ -80,3 +80,5 @@ If a file changed:
 ```
 
 That puts the security notes in git. No push. This command does not commit for you. It does not run plan, implement, or verify.
+
+Reference page: [security-review](reference/skills/crav1-security-review.md)

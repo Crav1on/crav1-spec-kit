@@ -68,6 +68,7 @@ The starter options are the seven above. Asking for startup options names only t
 | Next | Where |
 | --- | --- |
 | Why this loop | [The method](concepts/method.md) |
+| The loop step by step | [From a draft spec to an accepted spec](from-draft-spec.md) → [From a spec to a plan](from-spec-to-plan.md) → [Build tasks](from-plan-to-build.md) → [Verify and fix](from-verify.md) → [From commit to merge](from-commit.md) |
 | Prove a slice | `/crav1-verify-spec` |
 | Push and open a pull request | `/crav1-open-pr` (after commits exist; does not merge; may name `/crav1-review-pr` and does not run it) |
 | Merge a named pull request | `/crav1-merge-pr` (only when that turn asks; merge commit only; does not run the review) |

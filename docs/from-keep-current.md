@@ -54,3 +54,5 @@ If a file changed:
 ```
 
 That puts the picture update in git. No push. This command does not commit for you.
+
+Reference page: [keep-current](reference/skills/crav1-keep-current.md)

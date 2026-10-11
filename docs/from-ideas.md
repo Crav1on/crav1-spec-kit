@@ -223,3 +223,4 @@ The file can still be added by hand.
 
 The mention is `#52` on Azure Repos (`dev.azure.com` or `*.visualstudio.com`) and `AB#52` on GitHub. Any other host adds no mention. `Work item: AB#52` or `Work item: #52` is used as written. With no file, the skills continue. On Azure Repos only, they print one hint. They do not block, and `/crav1-open-pr` still does not pass `--work-items`. Creating a Feature stays `/crav1-specs-to-ado`.
 
+Reference page: [ideas-to-spec](reference/skills/crav1-ideas-to-spec.md)

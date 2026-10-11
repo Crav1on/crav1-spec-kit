@@ -2,7 +2,7 @@
 
 Kit not in this project yet? [Install first](install.md) (Cursor and Claude Code; the slash commands match, the files do not). After a Cursor plugin install, the short command loop is [plugins/crav1/README.md](../plugins/crav1/README.md). Claude Code has no plugin.
 
-Use this when the user has **minutes, a transcript, an email, or a chat thread** (a file, a paste, a Teams or Zoom export, or a pasted Slack or Teams chat) and wants the decisions matched to specs that already exist. An email or a chat thread is accepted as well as minutes or a transcript.
+Use this when the user has **minutes, a transcript, an email, or a chat thread** (a file, a paste, an export from a meeting tool, or a pasted team chat) and wants the decisions matched to specs that already exist. An email or a chat thread is accepted as well as minutes or a transcript.
 
 This is cross-cutting. It is not its own lane. It may run from any lane. It does not move work into Specify, Plan, or Build. It does not start those lanes.
 
@@ -20,7 +20,7 @@ New chat. Paste the minutes, transcript, email, or chat, or `@` the file.
 
 ```text
 /crav1-meeting-to-specs
-@<minutes, transcript, Teams or Zoom export, email, or chat thread>
+@<minutes, transcript, meeting tool export, email, or chat thread>
 
 Extract what matters for features. Match it to the specs we already have. Do not write a spec. Do not commit.
 ```
@@ -87,3 +87,5 @@ When a file changed and the user wants it in git:
 ```
 
 That puts the spec lines, and any source folder this command wrote, in git. No push. This command does not commit.
+
+Reference page: [meeting-to-specs](reference/skills/crav1-meeting-to-specs.md)

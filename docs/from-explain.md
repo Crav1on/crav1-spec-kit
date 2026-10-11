@@ -66,3 +66,5 @@ When the answer lists a slice missing from the picture:
 ```text
 /crav1-keep-current
 ```
+
+Reference page: [explain](reference/skills/crav1-explain.md)

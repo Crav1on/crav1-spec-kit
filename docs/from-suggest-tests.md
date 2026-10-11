@@ -65,3 +65,5 @@ When a file changed and the user wants it in git:
 ```
 
 That puts the spec lines in git. No push. This command does not commit.
+
+Reference page: [suggest-tests-for-code](reference/skills/crav1-suggest-tests-for-code.md)

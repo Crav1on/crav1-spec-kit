@@ -109,6 +109,8 @@ def validate(data: dict) -> list[str]:
         w = s.get("walkthrough")
         if w and not (ROOT / w).is_file():
             errors.append(f"{n}: walkthrough {w} does not exist")
+        elif w and not re.search(rf"\]\((?:\./)?reference/skills/{re.escape(n)}\.md[)#]", (ROOT / w).read_text(encoding="utf-8")):
+            errors.append(f"{n}: walkthrough {w} does not link back to reference/skills/{n}.md")
         for key in ("purpose", "use_when", "reads", "writes", "first_prompt", "since", "stage"):
             if not s.get(key):
                 errors.append(f"{n}: {key} is empty")

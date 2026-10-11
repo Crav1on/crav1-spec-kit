@@ -2,7 +2,7 @@
 
 # /crav1-merge-pr
 
-[All skills](../skills.md) · Walkthrough: reference only · Playbook: [`SKILL.md`](../../../.cursor/skills/crav1/crav1-merge-pr/SKILL.md)
+[All skills](../skills.md) · Walkthrough: [From commit to merge](../../from-commit.md) · Playbook: [`SKILL.md`](../../../.cursor/skills/crav1/crav1-merge-pr/SKILL.md)
 
 ## Purpose
 
@@ -55,4 +55,4 @@ Merge this pull request.
 
 ## Walkthrough
 
-Reference only. This command has no walkthrough page of its own.
+Step by step: [From commit to merge](../../from-commit.md).

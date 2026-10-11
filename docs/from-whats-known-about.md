@@ -72,3 +72,5 @@ When there is no slice, the answer names one next command. This command does not
 When nothing is written down, it names those three.
 
 Production follows `/crav1-environment-read`: shape and connections only, after the same yes or no. A no leaves that resource unread. This command does not run the environment read.
+
+Reference page: [whats-known-about](reference/skills/crav1-whats-known-about.md)

@@ -52,3 +52,5 @@ When the file changed and the user wants it in git:
 ```text
 /crav1-finalize-commit
 ```
+
+Reference page: [exploratory-test](reference/skills/crav1-exploratory-test.md)

@@ -2,7 +2,7 @@
 
 # /crav1-complete-tasks
 
-[All skills](../skills.md) · Walkthrough: reference only · Playbook: [`SKILL.md`](../../../.cursor/skills/crav1/crav1-complete-tasks/SKILL.md)
+[All skills](../skills.md) · Walkthrough: [Build tasks](../../from-plan-to-build.md) · Playbook: [`SKILL.md`](../../../.cursor/skills/crav1/crav1-complete-tasks/SKILL.md)
 
 ## Purpose
 
@@ -52,4 +52,4 @@ Stage: stable. Since: 1.0.0 ([changelog](../../../CHANGELOG.md)).
 
 ## Walkthrough
 
-Reference only. This command has no walkthrough page of its own.
+Step by step: [Build tasks](../../from-plan-to-build.md).

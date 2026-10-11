@@ -70,3 +70,5 @@ If a file changed:
 ```
 
 That puts the new lines in git. No push. This command does not commit for you. It does not start Specify, Plan, or Build.
+
+Reference page: [environment-read](reference/skills/crav1-environment-read.md)

@@ -9,6 +9,7 @@ This is the index of every page in the kit's docs. Pick by what you want to do, 
 | Install the kit | [Install](install.md) |
 | Get going in fifteen minutes | [First 15 minutes](first-run.md) |
 | Pick a way in | [The seven starter options](../README.md#the-seven-starter-options) |
+| Go from a draft spec to a merged change | [The core loop](#how-to-walkthroughs): accept the spec, plan, build, verify, commit and merge |
 | Do one thing step by step | [Walkthroughs](#how-to-walkthroughs) |
 | Look up one command | [Skills reference](reference/skills.md) |
 | Understand the method | [The method](concepts/method.md) |
@@ -37,12 +38,21 @@ Starters:
 - [From a named host](from-environment.md)
 - [From a bug that already exists](from-fix-bug.md)
 
+The core loop, after a starter:
+
+- [From a draft spec to an accepted spec](from-draft-spec.md)
+- [From a spec to a plan](from-spec-to-plan.md)
+- [Build tasks](from-plan-to-build.md)
+- [Verify and fix](from-verify.md)
+- [From commit to merge](from-commit.md)
+
 Once specs exist:
 
 - [From new information to an existing spec](from-add.md)
 - [From a later dump onto existing specs](from-match-dump.md)
 - [From a code change onto existing specs](from-code.md)
 - [From a meeting to specs](from-meeting.md)
+- [Ask open questions](from-ask-open-questions.md)
 
 Keep the picture current:
 
@@ -91,9 +101,10 @@ You turn ideas, meetings, and dumps into specs and keep them current.
 
 1. [First 15 minutes](first-run.md)
 2. A starter walkthrough: [one sentence](from-nothing.md), [a pile of ideas](from-ideas.md), or [intake files](from-intake.md)
-3. [From new information to an existing spec](from-add.md), [From a meeting to specs](from-meeting.md), [From a later dump onto existing specs](from-match-dump.md)
-4. [Data layout](concepts/data-layout.md) and [Data policy](concepts/data-policy.md)
-5. The Specify lane in the [skills reference](reference/skills.md#specify)
+3. [From a draft spec to an accepted spec](from-draft-spec.md) and [Ask open questions](from-ask-open-questions.md)
+4. [From new information to an existing spec](from-add.md), [From a meeting to specs](from-meeting.md), [From a later dump onto existing specs](from-match-dump.md)
+5. [Data layout](concepts/data-layout.md) and [Data policy](concepts/data-policy.md)
+6. The Specify lane in the [skills reference](reference/skills.md#specify)
 
 ### Developer
 
@@ -101,8 +112,9 @@ You plan, build, verify, and ship one spec at a time.
 
 1. [Install](install.md)
 2. The working loop in [The method](concepts/method.md#the-working-loop-once-a-spec-exists)
-3. The Plan and Build lanes in the [skills reference](reference/skills.md#plan)
-4. [From a pull request review](from-review-pr.md), [From a bug that already exists](from-fix-bug.md)
+3. [From a spec to a plan](from-spec-to-plan.md), [Build tasks](from-plan-to-build.md), [Verify and fix](from-verify.md), [From commit to merge](from-commit.md)
+4. The Plan and Build lanes in the [skills reference](reference/skills.md#plan)
+5. [From a pull request review](from-review-pr.md), [From a bug that already exists](from-fix-bug.md)
 
 ### Guild bot
 

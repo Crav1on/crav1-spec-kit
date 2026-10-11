@@ -61,3 +61,5 @@ When a file changed and the user wants it in git:
 ```
 
 That puts the marks lines in git. No push. This command does not commit.
+
+Reference page: [pipeline-environments](reference/skills/crav1-pipeline-environments.md)

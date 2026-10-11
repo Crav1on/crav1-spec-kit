@@ -12,6 +12,11 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 - The README's per-skill paragraphs and its "already ships" list moved into a new `in_depth` field in [`docs/reference/skills.yaml`](docs/reference/skills.yaml), shown under Purpose on each skill page. The README's per-lane tables are gone; the [skills reference](docs/reference/skills.md) has them.
 - [plugins/crav1/README.md](plugins/crav1/README.md) uses full GitHub links and points at the skills reference instead of its own per-skill list.
 - The Skills row in [docs/install.md](docs/install.md) links to the skills reference instead of describing every command.
+- Five walkthroughs for the core loop after a starter: [From a draft spec to an accepted spec](docs/from-draft-spec.md) (architecture-reviewer, tighten-spec, resolve-questions, feature-branch), [From a spec to a plan](docs/from-spec-to-plan.md) (plan-from-spec, review-plan, tighten-plan), [Build tasks](docs/from-plan-to-build.md) (implement-task, complete-task, complete-tasks, complete-features), [Verify and fix](docs/from-verify.md) (verify-spec, fix-from-verify, fix-live), and [From commit to merge](docs/from-commit.md) (draft-commit-message, finalize-commit, open-pr, merge-pr).
+- New walkthrough [Ask open questions](docs/from-ask-open-questions.md) for `/crav1-ask-open-questions`, including the `Pending:` and `Asked:` marks it writes. Every skill except `/crav1-export-spec` (reference only) now has a walkthrough.
+- [Feature candidates](docs/from-feature-candidates.md), [From specs to Azure Boards](docs/from-specs-to-ado.md), and [From Azure Boards to specs](docs/from-ado-to-specs.md) follow the same outline as the other walkthroughs: First prompt, Steps, What gets written, After.
+- Every walkthrough links to the reference page of each skill it covers, and each reference page links to its walkthrough through the `walkthrough` field in `skills.yaml`. `scripts/gen-skill-docs.py --check` fails when a walkthrough does not link back.
+- [From a meeting to specs](docs/from-meeting.md) no longer names specific meeting or chat tools.
 
 ## 1.41.0 (2026-10-11)
 

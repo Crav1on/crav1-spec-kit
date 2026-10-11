@@ -20,11 +20,13 @@ New chat.
 
 That slash command *is* the prompt.
 
-## Check first
+## Steps
+
+### Check first
 
 The org and the project come from `docs/environments/marks.md`, or from the Azure DevOps URLs in `docs/system/repos.md`. The command checks that `az` works, including the default install paths, and that the project has the Feature work item type. If the type is missing, it says so and stops. If `az` fails, it states the issue, suggests a fix such as `az login`, and offers a skip. It does not install `az` and it does not log in.
 
-## Pick, preview, then send
+### Pick, preview, then send
 
 The user sees the candidate list and picks one or more by number, or all. Before the form, the command reads the project's Feature fields. When that type has Acceptance Criteria, the spec's checks go there. When it does not, the checks go in the Description as an Acceptance checks numbered list, and the preview says so in one line. A failed field read states the issue, suggests a fix, and offers a skip. It does not guess.
 
@@ -36,6 +38,18 @@ The preview is not edited in place. A change goes into the spec first through `/
 
 The form is labelled **Create** or **Update #<id>**. An update shows what would change. The `az` command is not shown. Create or update runs only after the user says yes, one at a time or all of the reviewed picks together, because it goes out in the user’s name.
 
-## What it writes
+## What gets written
 
 After a Create, writing the new id is required. A spec gets one line in that spec’s `work-item.md`, with the milestone or slice label. An item with no spec gets a row on `## No spec yet in ADO` in `docs/system/landscape.md`: id, title, and date. When a spec is made later, the id moves into that spec’s `work-item.md`. The command names the file it wrote. That file is not committed yet and must be committed. Without it a later run offers Create again and would make a duplicate. If the write fails, the command says so and prints the line to add. The command reports what was created and what was updated. It does not commit. It names `/crav1-finalize-commit` and does not run it.
+
+## After
+
+Commit the file that holds the new id, so a later run does not offer Create again:
+
+```text
+/crav1-finalize-commit
+```
+
+Reading a Feature back onto the specs is [From Azure Boards to specs](from-ado-to-specs.md).
+
+Reference page: [specs-to-ado](reference/skills/crav1-specs-to-ado.md)
