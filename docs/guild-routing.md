@@ -1,6 +1,6 @@
 # Guild routing
 
-This file maps each `/crav1-…` skill and `*-agent` subagent to a lane — Specify, Plan, Build, or Cross-cutting — and records cross-cutting helpers, so a kit consumer can route work when the kit changes. Cross-cutting skills may be invoked from any phase, and cross-cutting helpers may be flagged from any phase. Neither is owned by Specify, Plan, or Build alone, and neither by itself moves work into another lane.
+For what each skill reads and writes, see the [skills reference](reference/skills.md). This file maps each `/crav1-…` skill and `*-agent` subagent to a lane — Specify, Plan, Build, or Cross-cutting — and records cross-cutting helpers, so a kit consumer can route work when the kit changes. Cross-cutting skills may be invoked from any phase, and cross-cutting helpers may be flagged from any phase. Neither is owned by Specify, Plan, or Build alone, and neither by itself moves work into another lane.
 
 Kit source of truth: [https://github.com/Crav1on/crav1-spec-kit](https://github.com/Crav1on/crav1-spec-kit).
 
@@ -154,7 +154,7 @@ When a note in `docs/research/` is updated, the skill that writes it follows the
 
 ## Maintainer note
 
-When you add, rename, or remove a skill, agent, or cross-cutting helper, update this file in the same pull request. Notify your process orchestrator or guild lead, if you have one, with the routing diff.
+When you add, rename, or remove a skill, agent, or cross-cutting helper, update this file in the same pull request, together with [`docs/reference/skills.yaml`](reference/skills.yaml) and the pages generated from it. CI checks that the lanes there match the map below. Notify your process orchestrator or guild lead, if you have one, with the routing diff.
 
 ## Machine-readable map
 
