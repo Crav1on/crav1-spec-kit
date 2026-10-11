@@ -1,6 +1,6 @@
 ---
 name: crav1-resolve-questions
-description: Walk Open questions in spec.md one by one. Each question gets keep-open or answer options with impact; patch only that question after a pick. Use after /crav1-tighten-spec when unanswered questions remain. Do not write application code.
+description: Walk Open questions in spec.md one by one. Each question gets keep-open or answer options with impact; patch only that question after a pick. When an answer settles a stale research point waiting on that question, re-check the point and clear the mark when no point is open. Do not ask the user. Use after /crav1-tighten-spec when unanswered questions remain. Do not write application code.
 disable-model-invocation: true
 icon: book-open
 color: yellow
@@ -18,7 +18,7 @@ This is not a defect walk. Do not re-run architecture findings here unless they 
 
 Use the spec the user @-mentions. Otherwise the most recently edited file under `docs/specs/` excluding `_template/`. If several, ask which slug. Expected `spec.md` headings: this skill’s `assets/spec.md`.
 
-Read `spec.md` (`## Open questions`, `## Assumptions`, `## Constraints`). Note `diagrams.md` and `adr/`.
+Read `spec.md` (`## Open questions`, `## Assumptions`, `## Constraints`, and `## Research findings` when that heading is there). Note `diagrams.md` and `adr/`.
 
 ## Build the question list (no edits)
 
@@ -61,7 +61,8 @@ Stop. Do not edit. Do not preview a full patched spec.
    - **Cut from v0:** move to non-goals/later; remove from Open questions.
 2. Recap **Added / Removed / Still open** for this `Q#`.
 3. If the answer makes a named diagram/ADR wrong, either they also chose `sync-here`, or the **next** item is that drift (do not silently skip).
-4. Advance to the next unanswered `Q#`. If none remain, say the open-question list is empty and they can Plan Mode or `/crav1-architecture-reviewer` / `/crav1-tighten-spec` if new gaps appeared.
+4. When this question was waiting on a stale research point, re-check that point. The question says so, or `## Research findings` names the point and this question. Follow the answered-later part of `crav1-add-to-spec` `references/research-stale.md` (drop-in: `.claude/skills/crav1-add-to-spec/references/research-stale.md`; plugin: sibling `skills/crav1-add-to-spec/references/research-stale.md`). Do not ask the user whether the point is settled. Keep open does not re-check. When the answer settles the point, record it and clear the mark when no point is open. When it does not, leave the mark and say why. Include that summary in the recap. Do not commit. Do not send anything.
+5. Advance to the next unanswered `Q#`. If none remain, say the open-question list is empty and they can Plan Mode or `/crav1-architecture-reviewer` / `/crav1-tighten-spec` if new gaps appeared.
 
 Do not start the next question’s patch in the same turn unless they batched.
 
