@@ -185,7 +185,7 @@ Output only:
 - `glossary.md` when this turn created it or appended rows. If `docs/system/` was missing, say no glossary was written. If no new rows were appended, say so
 - Picture lines added, or that the picture is current. If `docs/system/` was missing, say no picture was written
 - Impact: nothing else, or the one-line edit list and which option they picked
-- Research: each hit, whether it was marked, the note path and the findings line, or that none was marked. The revisit draft when one was written in the chat, or that none was drafted. The clear summary: what was cleared, narrowed, and routed where, or that this run did not check an updated note
+- Research: each hit, whether it was marked, the note path and the findings line, or that none was marked. The revisit draft when one was written in the chat, or that none was drafted. The clear summary: what was cleared, narrowed, and routed where, each open question from the updated note and where it went, and when an older mark had no points, or that this run did not check an updated note
 - Next: `/crav1-finalize-commit` if any file changed and they want those spec edits committed (no push). `/crav1-plan-from-spec` only for a slice they choose. Do not run either.
 
 ## Style

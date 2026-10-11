@@ -1,6 +1,6 @@
 # Research marked stale
 
-A kept quote can contradict a research note, or answer a question that note still leaves open. This file is how the kit marks that research stale, how it checks an updated note, how it clears or narrows the mark, how it routes a point that stays open, and how readers show it.
+A kept quote can contradict a research note, or answer a question that note still leaves open. This file is how the kit marks that research stale, how it checks an updated note, how it clears or narrows the mark, how it routes a point that stays open, how it routes an open question the updated note still has, and how readers show it.
 
 This file is the convention. Drop-in: `.cursor/skills/crav1/crav1-add-to-spec/references/research-stale.md`. Plugin, from this skill: `references/research-stale.md`. Plugin, from another skill: sibling `skills/crav1-add-to-spec/references/research-stale.md`.
 
@@ -136,15 +136,27 @@ A file under `docs/research/` that this command is pointed at, with no separate 
 
 When the note has no stale mark and no spec line sees it, there is nothing to check.
 
+When this check runs, also read the updated note's own open questions, under the heading `The note's own open questions`. That read does not wait on an open point. It still runs when the mark clears.
+
 ### Listed points
 
 The listed points are the `Point:` lines under the stale line, when those lines are still there.
 
 When a later check has already replaced those lines, the listed points are the points named on the narrowed stale line, plus each `Resolved` line for this mark. Do not treat the whole narrowed line as one point.
 
-When an older mark has no `Point:` lines and no narrowed line, the stale line is one point. Its label is that line.
-
 M is how many listed points the mark has. Do not add a point the mark did not list. Do not drop one.
+
+When an older mark has no `Point:` lines and no narrowed line, that mark is not one point. Do not give the stale line a label and count it as one.
+
+Split that mark into the hits it was made from. A hit is a contradiction, or an answered question. Read the contradiction lines and the answered-question lines named in the note's stale block. Read the same kinds of lines named in the spec's stale line. When this run can see the run that wrote those lines, read the hits that run listed. The example earlier in this file is a shape. It is not that hit list. Do not copy it onto a note.
+
+Each hit is one listed point. On each spec whose stale line sees the note, write it under that line as a `Point:` line, the same way a new mark writes one. Then judge it. M is how many hits this run found. Do not add a hit that was not named in the block, the spec line, or that run.
+
+When this run cannot find those hits, there are no listed points. Do not invent one. Do not set M to 1. Judge the whole update against the original quote. The original quote is the quote the stale line names. Use the same three words. Resolved means the update now agrees with that quote, or states the answer that quote gave. Partly means the update speaks to that quote and leaves part of it open. Not addressed means the update does not speak to that quote. Say in the summary that the older mark had no points.
+
+When that judgment is resolved, remove the blockquote from the note. Remove the `Stale since` line that sees that note. Under `## Research findings`, add `Cleared <date>: updated note <path or commit>.` Do not add a per-point line. The date and the path follow All resolved. Do this on every spec whose stale line sees that note.
+
+When that judgment is partly or not addressed, leave the older mark as written. Do not rewrite it as `N of M points`.
 
 ### Judge each point
 
@@ -160,7 +172,7 @@ Quote the update. Do not retell it.
 
 ### All resolved
 
-When every listed point is resolved:
+When the mark has listed points and every one of them is resolved:
 
 - Remove the blockquote from the note.
 - Remove the `Stale since` line that sees that note.
@@ -219,7 +231,9 @@ On the spec, each open point names where it waits, on its own line:
 3. **A decision.** The update says it needs a decision, such as cost or which option. Write an open question on the spec. Mark it as a decision. When the note names who decides, that is who. When it does not, who is `a decision`. Do not draft a revisit for that point.
 4. **No why.** The update does not say why the point is still open. Draft one request back to the note's owner, asking who can answer it. Once per point. When that point already says `Asked who can answer`, do not draft it again. The line stays `waiting for the note's owner`.
 
-`<slug>` is the spec that has the stale line. When more than one spec has it, write the question on each of those specs. The same words. Do not add a second question when that point already has one. When the update names a different who, add that name on the existing question.
+`<slug>` is the spec that has the stale line. When more than one spec has it, write the question on each of those specs. The same words. Do not add a second question when that point already has one. Same meaning is the same fact or the same decision. The words can differ. When the update names a different who, add that name on the existing question.
+
+This routing is for listed points that stayed open. The note's own open questions are a later section. They are not these points.
 
 ### Follow-up revisit request
 
@@ -259,13 +273,57 @@ A decision:
 
 ### A spec line to change
 
-When the update says a line in the spec should change, add an open question on that spec. When the update does not name the spec, use the spec that has the stale line. Quote the owner's suggested wording. Do not rewrite the spec line.
+When the update says a line in the spec should change, add an open question on that spec. When the update does not name the spec, use the spec that has the stale line. Do not rewrite the spec line.
+
+Name the source of the suggested wording. Do not attribute to the note a wording that is only in the note's owner's revisit answer. The revisit answer is that owner's reply to the revisit request. It may be in the chat, or pasted with the note. When the note's own text holds the wording, name that section, even if the answer repeats it. When the wording is only in the reply, name the reply.
+
+When the wording is in the revisit answer:
 
 ```text
-- The updated note <path> says to change "<the spec line>". Suggested wording: "<the owner's words>".
+- The note's owner, in their revisit answer (<date>), suggests changing "<old line>" to: "<wording>".
 ```
 
-When that question is already there, do not add another. This question is not a listed point. It does not clear the mark.
+When the note or the answer names the owner, use that name instead of `The note's owner`. Do not invent a name.
+
+The date is the date the revisit answer carries. When that answer has no date, write `no date`. Do not invent a date.
+
+When the wording is in the note, name the section:
+
+```text
+- The note <path>, in <section>, suggests changing "<old line>" to: "<wording>".
+```
+
+When an open question on that spec already has the same meaning, do not add another. Same meaning is the same change to the same line. The words can differ. This question is not a listed point. It does not clear the mark.
+
+### The note's own open questions
+
+Run this on every check in this Clearing section. Run it when the mark had open points. Run it when the mark had none. Run it when this run clears the mark. Run it when the older mark had no points.
+
+Before the clear, list each spec whose `## Research findings` name this note's path. A findings line that names the path is a link. A `See` line that names the path is a link. Keep that list. When the clear already ran in this check, use that list. When no list was made, a spec still counts if a findings line, a `See` line, or the `Cleared` line this run wrote names the path. When no spec names the path, say so. Do not invent a spec.
+
+Read the updated note's `## Open questions`. Also read a line the note marks as needing a source, or as needing confirmation. Skip a line that only records a fact. A question that appears twice in the note is one question. Same meaning is one question.
+
+A question stays in the note when the note's owner can still answer it. That is when the note does not say someone else has the fact, and it does not say the question needs a decision. Do not write it on a spec. When it is unclear who can answer, leave it in the note. Do not guess.
+
+A question whose answer lies outside the note's owner is written on each spec in that list. The same words on each spec.
+
+Someone else has the fact. The note says a partner, a customer, another team, or another person has the fact. Name who the note says has the fact. A person the note names only as a way to reach them is not who has the fact. Do not name a way to reach them. When the note does not name who, write `the note does not name who`. Do not invent a name.
+
+```text
+- <question>. Waiting for <who>. The note <path>, in <section>, says: "<quoted line>".
+```
+
+A decision. The note says the question needs a decision. Mark it as a decision. When the note names who decides, that is who. When it does not, who is `a decision`.
+
+```text
+- Decision. <question>. Waiting for <who>. The note <path>, in <section>, says: "<quoted line>".
+```
+
+Do not add a second question when that spec already has an open question with the same meaning. Same meaning is the same fact or the same decision. The words can differ. A different fact is a different question. Do not drop one because it shares a few words with another. When the note names a who that the existing question does not, add that name on the existing question.
+
+These questions are not listed points. They do not change N. They do not keep the mark open. They do not clear the mark. Do not remove them from the note.
+
+Create `## Open questions` on the spec only when it is missing and this bullet needs it. Do not rewrite another question.
 
 ### Answered later
 
@@ -302,13 +360,13 @@ Do this on every spec whose stale line sees that note.
 
 ### Summary
 
-End the run with one short summary. Name what was cleared, what was narrowed, and where each open point was routed. Name each draft as drafted and not sent. When a spec line was left as an open question, say so.
+End the run with one short summary. Name what was cleared, what was narrowed, and where each open point was routed. List every open question read from the updated note. For each, name the spec it was written on and who it waits for, or say it stayed in the note because the note's owner can still answer it. When the older mark had no points, say so. Name each draft as drafted and not sent. When a spec line was left as an open question, name where the suggested wording came from.
 
 Everything in this section is written in the files. Nothing is sent. Nothing is committed. Drafts stay in the chat.
 
 ## Readers
 
-`/crav1-explain`, `/crav1-whats-known-about`, and `/crav1-feature-candidates` show a stale note as stale. A narrowed line is still stale. Quote the mark. Name the path. Do not treat that research as current. Do not clear the mark. Do not route a point. Do not drop the note to keep a list short.
+`/crav1-explain`, `/crav1-whats-known-about`, and `/crav1-feature-candidates` show a stale note as stale. A narrowed line is still stale. Quote the mark. Name the path. Do not treat that research as current. Do not clear the mark. Do not route a point. Do not write the note's open questions onto a spec. Do not drop the note to keep a list short.
 
 `/crav1-plan-from-spec` lists stale research findings under Risks. A narrowed mark is still stale. The plan does not stop because research is stale. Do not clear the mark. Do not route a point.
 
@@ -316,4 +374,4 @@ Everything in this section is written in the files. Nothing is sent. Nothing is 
 
 ## Stop
 
-Do not commit. Do not push. Do not open a pull request. Do not send a revisit request. Do not contact the note's owner. Do not ask the user whether an updated note resolves the mark.
+Do not commit. Do not push. Do not open a pull request. Do not send a revisit request. Do not contact the note's owner. Do not ask the user whether an updated note resolves the mark. Do not count an older mark with no point lines as one point.

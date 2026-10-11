@@ -15,8 +15,11 @@ description: >-
   takes the whole note. After a kept quote, compares it with docs/research/ and with
   Research findings. Marks that research stale only after a yes.
   An unclear case is not marked. May draft a revisit request for
-  the note's owner. Does not send it. An updated note in
-  docs/research/ is checked per listed point. Does not ask the user
+  the note's owner. Does not send it.   An updated note in
+  docs/research/ is checked per listed point. An older mark with no
+  point lines is split into the hits it was made from. Open questions
+  in that note are routed when the answer lies outside the note's
+  owner, including when the mark clears. Does not ask the user
   whether the mark is clear. Does not write application
   code. Does not plan, implement, or commit.
 disable-model-invocation: true
@@ -173,7 +176,7 @@ Do not commit. This is not an impact question. Do not list the note as an apply 
 
 Read `docs/system/` when it exists (`landscape.md`, `repos.md`, `diagrams.md`, `glossary.md`, `adr/`) and every other `docs/specs/<slug>/spec.md` (skip `_template`). Check whether the new information contradicts or extends the landscape, a repo row, a diagram, an ADR, or another spec.
 
-Also compare the kept quote with research. Follow [references/research-stale.md](references/research-stale.md). Read `docs/research/*.md` and `## Research findings` on the specs this quote touches, and the notes those findings link to. List a clear contradiction and an answered open question. An unclear case is not a hit. Ask before any new mark. Write the stale block and the findings line only after the user says yes. Then offer the revisit draft. The kit drafts only. It does not send it. It does not contact the note's owner. When the user pointed this command at an updated note in `docs/research/`, or this run writes one, follow the clear section of that file. Judge each listed point. Do not ask the user whether the update resolves the mark. A kept quote that answers a point already waiting is re-checked there too. That re-check does not ask.
+Also compare the kept quote with research. Follow [references/research-stale.md](references/research-stale.md). Read `docs/research/*.md` and `## Research findings` on the specs this quote touches, and the notes those findings link to. List a clear contradiction and an answered open question. An unclear case is not a hit. Ask before any new mark. Write the stale block and the findings line only after the user says yes. Then offer the revisit draft. The kit drafts only. It does not send it. It does not contact the note's owner. When the user pointed this command at an updated note in `docs/research/`, or this run writes one, follow the clear section of that file. Judge each listed point. An older mark with no point lines is not one point. Split it as that file says. Also route the note's own open questions when the answer lies outside the note's owner. That still runs when the mark clears. Do not ask the user whether the update resolves the mark. A kept quote that answers a point already waiting is re-checked there too. That re-check does not ask.
 
 Section names for that read, not a file to paste over what exists: this skill’s `assets/system/` (same files as `docs/system/_template/`, including `glossary.md`; drop-in: `.cursor/skills/crav1/crav1-add-to-spec/assets/system/`; plugin: this skill’s `assets/system/`).
 
@@ -205,7 +208,7 @@ Output only:
 - The transfer data policy when this pass wrote it, or that none was written
 - What was added (their quotes, labeled new) and what was already there
 - Impact: nothing else, or the one-line edit list and which option they picked
-- Research: each hit, whether it was marked, the note path and the findings line, or that none was marked. The revisit draft when one was written in the chat, or that none was drafted. The clear summary: what was cleared, narrowed, and routed where, or that this run did not check an updated note
+- Research: each hit, whether it was marked, the note path and the findings line, or that none was marked. The revisit draft when one was written in the chat, or that none was drafted. The clear summary: what was cleared, narrowed, and routed where, each open question from the updated note and where it went, and when an older mark had no points, or that this run did not check an updated note
 - Next: `/crav1-finalize-commit` if any file changed (no push). `/crav1-plan-from-spec` only if they say they want to start planning this slug. Do not run either.
 
 ## Style
