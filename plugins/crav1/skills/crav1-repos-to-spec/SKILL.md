@@ -1,26 +1,19 @@
 ---
 name: crav1-repos-to-spec
 description: >-
-  Read one or more repos the user named. Write one architecture spec the
-  lanes can extend (docs/architecture/spec.md) when that file is missing,
-  docs/architecture/left-out.md beside it for guesses that stay left
-  out, and the docs/system/ notes /crav1-explain reads when those notes
-  are missing.   When a real system note is already there, leave it except the
-  Synced at cell of a repo this run read, and
-  write only the missing architecture spec and the left-out file. When
-  the architecture spec or those notes are already there, a later
-  re-read adds only what is new and does not rewrite those lines,
-  except that Synced at cell. A
-  re-read also reads left-out.md and removes a line when the code shows
-  it. A fact the code shows is confirmed. Before any file is written,
-  confirm in sections: one per named repo, one for inferred guesses, one
-  for links, and one for left-out. Each section
-  has its own question. Every item stays listed. A guess stays out until
-  that section’s answer accepts it. A link between repos is written only
-  when the code shows it. If none is found, that section says so and
-  does not offer a guessed link. Do not invent links. Do not design the
-  next feature, write application code, or start Specify, Plan, or
-  Build. This is not /crav1-code-into-specs.
+  Read one or more repos the user named. Write docs/architecture/spec.md
+  when missing, docs/architecture/left-out.md for guesses that stay left
+  out, and the docs/system/ notes /crav1-explain reads when missing. When
+  a system note exists, leave it except the Synced at cell of a repo this
+  run read, and write only the missing architecture spec and left-out
+  file. A later re-read adds only what is new, keeps existing lines except
+  that cell, and removes a left-out line when the code shows it. A fact
+  the code shows is confirmed. Before writing, confirm in sections: one
+  per named repo, guesses, links, and left-out, each with its own
+  question; every item stays listed. A guess stays out until its section
+  accepts it. A link is written only when the code shows it; none found is
+  said, never guessed. Do not design the next feature, write application
+  code, or start Specify, Plan, or Build. Not /crav1-code-into-specs.
 disable-model-invocation: true
 icon: boxes
 color: cyan

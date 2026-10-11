@@ -58,7 +58,7 @@ On a brownfield git repo the skill **prompts** for a branch before it writes fil
 - **`spec/<slug>`** — specify-only; you merge that when you want the spec on the default branch, then `/crav1-feature-branch` → `feat/<slug>` to build (so you can specify another feature while this one is implemented)
 - **Stay** / **other name**
 
-You can run `/crav1-feature-branch` by itself. The kit does not push or open the pull request; use GitKraken or your git host for that.
+You can run `/crav1-feature-branch` by itself. It does not push or open a pull request. `/crav1-open-pr` pushes after an explicit yes and opens one pull request, or use your git host.
 
 **Later feature** (`docs/system/` already exists, from intake or from an earlier spark or ideas run):
 

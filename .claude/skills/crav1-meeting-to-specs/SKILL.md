@@ -2,25 +2,19 @@
 name: crav1-meeting-to-specs
 description: >-
   Extract requirements, decisions, changes, open questions, and bugs from
-  minutes, a transcript, an email, or a chat thread. Match each quote to
-  existing specs. Each item that matches a spec shows a build-state
-  line. The line is not written.   The user takes them one at a time:
-  keep, leave, dismiss, or note. Note keeps the quote in docs/notes/
-  without tying it to a spec yet. There is no question after Note about
-  what kind of note it is. Dismiss is for this run only. A kept addition
-  goes to that spec
-  through /crav1-add-to-spec. That handoff compares the quote with
-  research and marks it stale only after a yes. The quote label follows the kind and the
-  date. When a kept addition or a note imports a source, writes
-  docs/sources/YYYY-MM-DD-<slug>/ and does not write the spec. That
-  check may write the transfer data policy after a yes. It never writes
-  a secrets choice into that file. Does not
-  commit. A clear answer to a spec open question is linked under that
-  question without a keep question. An unclear or partial answer is shown
-  as a possible answer and the question stays open. The asked-on date
-  comes from the input when it shows the question being asked. A kept new
-  feature or bug only names the next command. Does
-  not start Specify, Plan, or Build. Cross-cutting. Not a starter option.
+  minutes, a transcript, an email, or a chat thread, and match each quote
+  to existing specs. A matched item shows a build-state line that is not
+  written. One at a time: keep, leave, dismiss, or note. Note keeps the
+  quote in docs/notes/, not tied to a spec, with no kind question. Dismiss
+  is for this run only. A kept addition goes through /crav1-add-to-spec,
+  which runs the research check and marks stale only after a yes. The
+  quote label follows the kind and date. An imported source is written to
+  docs/sources/YYYY-MM-DD-<slug>/, not the spec; that check may write the
+  transfer data policy after a yes, never a secrets choice. A clear answer
+  to an open question is linked without a keep question; unclear stays
+  open. The asked-on date comes from the input. A new feature or bug only
+  names the next command. Does not commit or start Specify, Plan, or
+  Build. Cross-cutting. Not a starter option.
 disable-model-invocation: true
 icon: messages-square
 color: purple

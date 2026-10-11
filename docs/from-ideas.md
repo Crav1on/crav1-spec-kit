@@ -181,7 +181,7 @@ When you are ready to commit by itself (after a `T#` or a live fix):
 /crav1-draft-commit-message
 ```
 
-Paste the **Summary** and **Description** blocks into GitKraken. The skill does not run `git commit` unless you also ask it to.
+Paste the **Summary** and **Description** blocks into your git client. The skill does not run `git commit` unless you also ask it to.
 
 To change the wording first, then copy **or** create the git commit:
 
@@ -219,7 +219,7 @@ The commit mention picks the line whose label matches the slice being worked. If
 
 The file can still be added by hand.
 
-`/crav1-draft-commit-message` keeps the subject and description as drafted, then adds a blank line and the mention as the last line of the Description, so a GitKraken paste includes it. `/crav1-finalize-commit` commits that same text and keeps the line when it checks HEAD and when it strips a Cursor attribution trailer. `/crav1-open-pr` adds a `## Work item` section when the file has an id. The pull request title stays `<slug>: short summary`. The body stays What / why, Spec (links to that slug’s `spec.md`, `plan.md`, and `tasks.md`), Verify, then the work-item section.
+`/crav1-draft-commit-message` keeps the subject and description as drafted, then adds a blank line and the mention as the last line of the Description, so a paste into a git client includes it. `/crav1-finalize-commit` commits that same text and keeps the line when it checks HEAD and when it strips a host attribution trailer. `/crav1-open-pr` adds a `## Work item` section when the file has an id. The pull request title stays `<slug>: short summary`. The body stays What / why, Spec (links to that slug’s `spec.md`, `plan.md`, and `tasks.md`), Verify, then the work-item section.
 
 The mention is `#52` on Azure Repos (`dev.azure.com` or `*.visualstudio.com`) and `AB#52` on GitHub. Any other host adds no mention. `Work item: AB#52` or `Work item: #52` is used as written. With no file, the skills continue. On Azure Repos only, they print one hint. They do not block, and `/crav1-open-pr` still does not pass `--work-items`. Creating a Feature stays `/crav1-specs-to-ado`.
 

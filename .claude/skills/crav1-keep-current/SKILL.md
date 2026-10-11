@@ -1,23 +1,19 @@
 ---
 name: crav1-keep-current
 description: >-
-  Update the picture in docs/system/ when something was added. Add what is
-  new to the short description, the diagram, and how the parts connect.
-  Do not rewrite what is already there. When this run reads a whole repo,
-  set that repo's Synced at cell and touch only those repos. When it
-  reads only one slice, write the slice Synced at line and do not touch
-  the column. Do not design the change. Do not
-  build it. Can run on its own. Spark, ideas, intake, match, and any
-  sibling that already appends a glossary row run this same update and
-  still do not rewrite existing glossary rows. The skill that reads named
-  repos and writes one architecture spec is /crav1-repos-to-spec. Do not
-  do that job.   When pointed at an updated note in docs/research/,
-  checks each listed stale point. An older mark with no point lines
-  is split into the hits it was made from. Open questions in that
-  note are routed when the answer lies outside the note's owner,
-  including when the mark clears. It does not ask the user. It clears
-  the mark when every point is resolved, and otherwise narrows it and
-  routes each open point.
+  Update the picture in docs/system/ when something was added: add what is
+  new to the short description, the diagram, and how the parts connect,
+  and do not rewrite what is there. A whole-repo read sets that repo's
+  Synced at cell and touches only those repos; a one-slice read writes the
+  slice Synced at line and leaves the column. Does not design or build the
+  change. Can run on its own. Spark, ideas, intake, match, and siblings
+  that append a glossary row run this same update without rewriting rows.
+  Reading named repos into one architecture spec is /crav1-repos-to-spec,
+  not this. When pointed at an updated note in docs/research/, checks each
+  listed stale point, splits an older mark into its hits, and routes the
+  note's open questions whose answer lies outside its owner, without
+  asking. Clears the mark when every point is resolved; otherwise narrows
+  it and routes each open point.
 disable-model-invocation: true
 icon: refresh-cw
 color: green

@@ -11,7 +11,7 @@
     {
       "name": "crav1",
       "source": "crav1",
-      "description": "CRAV1 Spec Kit: spark, ideas, or intake to spec, plan, implement, and verify. Spec and architecture reviewers, plus a short usage rule. Type /crav1 after install."
+      "description": "CRAV1 Spec Kit: spec-driven skills and agents from a starter to spec, plan, build, verify, commit, and pull request, plus helpers for meetings, open questions, environments, and Azure Boards. Includes the always-on usage rule. Type /crav1 after install."
     }
   ]
 }

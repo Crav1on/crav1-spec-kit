@@ -46,7 +46,7 @@ Path rewrite only: `.cursor/skills/crav1/<name>/` → `.claude/skills/<name>/`, 
 Hand-written host differences inside that generator, not a second copy of every `SKILL.md`:
 
 - Agent frontmatter. `model: inherit` is omitted (Claude Code’s default). `readonly: true` becomes `tools: Read, Grep, Glob`. Writers omit `tools` so they can edit.
-- `.cursor/rules/crav1.mdc` becomes `.claude/CLAUDE.md` (the short project instruction, not the README).
+- `.cursor/rules/crav1.mdc` becomes `.claude/CLAUDE.md` (the always-on project instruction, not the README).
 - Commit-style assets drop Cursor `alwaysApply` frontmatter so `.claude/rules/*.md` loads at session start. The transfer data policy asset in `crav1-add-to-spec` gets the same drop.
 
 `.claude/agent-assets/` is not a directory Claude Code loads on its own. Prompts read those files. Do not put them under `.claude/agents/` (that tree is scanned as subagents). Do not copy this maintainer file into `.claude/`.

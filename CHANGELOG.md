@@ -4,6 +4,17 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 
 ## Unreleased
 
+### Docs
+
+- Stale claims fixed. `/crav1-meeting-to-specs` has four choices (keep, leave, dismiss, or note) and `/crav1-match-dump-to-specs` has four piles (belongs, already in, note, does not fit) in the README and [docs/install.md](docs/install.md). The README "already ships" list now has `/crav1-meeting-to-specs`, `/crav1-ask-open-questions`, `/crav1-feature-candidates`, `/crav1-specs-to-ado`, and `/crav1-ado-to-specs`. The README minimal plan template has `## Linter`, the same as `docs/specs/_template/plan.md`. The README layout block lists `docs/architecture/`, `docs/environments/`, `docs/notes/`, `docs/sources/`, `docs/research/`, and the extra files in a spec folder.
+- The project instruction is no longer called short in the README, [docs/install.md](docs/install.md), the maintainer rule, or the catalog description.
+- [docs/guild-routing.md](docs/guild-routing.md) sends the researcher's note to `docs/research/` with a line under `## Research findings`, the place every skill reads. The `docs/specs/<slug>/research.md` path is gone.
+- The README skills table lists every side effect in Writes: worker code and commits for `/crav1-complete-task`, `/crav1-complete-tasks`, and `/crav1-complete-features`, the reply comment after a yes for `/crav1-ado-to-specs`, sources, stale marks, and answer links for the import skills, and the code read for a partial slice in `/crav1-tighten-spec`. The subagent table lists all five subagents.
+- [plugins/crav1/README.md](plugins/crav1/README.md) lists the Plan skills under Plan, not Build, and names `/crav1-ask-open-questions` among the later skills. [docs/install.md](docs/install.md) and [docs/first-run.md](docs/first-run.md) link the walkthroughs they were missing.
+- A specific git client is no longer named in the README, `AGENTS.md`, the plugin README, `from-ideas.md`, or `from-nothing.md`.
+- Skill descriptions: `/crav1-complete-task`, `/crav1-complete-tasks`, and `/crav1-finalize-commit` use host-neutral wording. The six descriptions over 1,024 characters (add-to-spec, code-into-specs, keep-current, match-dump-to-specs, meeting-to-specs, repos-to-spec) are shortened with the same meaning. The plugin mirror and `.claude/` copies are regenerated.
+- `plugins/crav1/.cursor-plugin/plugin.json` is at 1.40.0, so the line above about the version matching now holds. Its description and the catalog description cover the current kit.
+
 ## 1.40.0 (2026-10-11)
 
 ### Kit

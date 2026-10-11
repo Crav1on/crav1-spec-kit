@@ -3,8 +3,9 @@ name: crav1-complete-tasks
 description: >-
   Orchestrate isolated /crav1-complete-task workers for a T# range or all
   unchecked tasks. Persist commit style as a rule first. Ask once whether
-  they pause for Approvals & Execution (then restore at the end). Launch one
-  worker per T# without another pause. Relay fix/ready gates only.
+  they pause for the host's approval setting (then restore at the end).
+  Launch one worker per T# without another pause. Relay fix/ready gates
+  only.
 disable-model-invocation: true
 icon: list
 color: green
