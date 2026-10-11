@@ -1,13 +1,14 @@
 ---
 name: crav1-finalize-commit
 description: >-
-  Finalize a commit: CRAV1 style vs git log first if needed, then draft the
-  Summary and Description, then offer git commit first, then copy / edit /
-  rewrite / stop. Wording is shown before those choices. Use when they want
-  to change the message or actually create the commit, or /crav1-finalize-commit.
-  Does not push. Does not commit until they pick commit. Paste-only:
-  /crav1-draft-commit-message. Keeps a trailing work-item mention through the
-  HEAD check and the Cursor attribution strip.
+  Finalize a commit: CRAV1 style vs git log first if needed, then draft
+  the Summary and Description, then offer git commit first, then copy /
+  edit / rewrite / stop. Wording is shown before those choices. Use when
+  they want to change the message or actually create the commit, or
+  /crav1-finalize-commit. Does not push. Does not commit until they pick
+  commit. Paste-only: /crav1-draft-commit-message. Keeps a trailing
+  work-item mention through the HEAD check and the strip of a host
+  attribution trailer.
 disable-model-invocation: true
 icon: git-branch
 color: green

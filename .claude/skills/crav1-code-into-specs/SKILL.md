@@ -1,22 +1,19 @@
 ---
 name: crav1-code-into-specs
 description: >-
-  Sort a code change that already landed onto specs that already exist.
-  The change is a commit, a commit range, or the current branch diff.
-  No dump is required. Quote what the change does into the matching
-  spec.md files, then report whether docs/system/ or another spec has
-  to change. A kept quote is also compared with docs/research/ and
-  Research findings. Research is marked stale only after a yes.
-  Does not create a slug. Does not watch the repo.
-  Does not seed docs/system/. When that folder exists and glossary.md is
-  missing, fills only that file from the landed change. When the file exists,
-  appends only words that are not already rows. Does not rewrite existing
-  glossary rows. A meaning the change does not state is `to be researched`.
-  That same pass adds what is new to the short description, the diagram, and
-  how the parts connect. Does not rewrite what is already there. A
-  whole-repo read sets that repo's Synced at cell. A one-slice read
-  writes the slice Synced at line and does not touch the column. Does not
-  write application code. Does not plan, implement, or commit.
+  Sort a code change that already landed (a commit, a range, or the branch
+  diff) onto specs that already exist. No dump needed. Quote what the
+  change does into the matching spec.md files, then report whether
+  docs/system/ or another spec has to change. A kept quote is compared
+  with docs/research/ and Research findings; research is marked stale only
+  after a yes. Does not create a slug, watch the repo, or seed
+  docs/system/. When that folder exists, fills a missing glossary.md or
+  appends new words only; existing rows stay. A meaning the change does
+  not state is `to be researched`. The same pass adds what is new to the
+  short description, the diagram, and how the parts connect. A whole-repo
+  read sets that repo's Synced at cell; a one-slice read writes the slice
+  Synced at line. Does not write application code, plan, implement, or
+  commit.
 disable-model-invocation: true
 icon: file-diff
 color: teal

@@ -2,24 +2,19 @@
 name: crav1-match-dump-to-specs
 description: >-
   Sort a later dump of notes, tickets, old docs, diagrams, or screenshots
-  onto specs that already exist. One dump may cover one slug or many.
-  Quote the new bits into the matching spec.md files. A fact worth
-  keeping that is not for an existing spec can be Note, which writes
-  docs/notes/ without tying it to a spec yet.   Then report whether
-  docs/system/ or another spec has to change. A kept quote is also
-  compared with docs/research/ and Research findings. Research is
-  marked stale only after a yes. Does not create a slug.
-  Does not seed docs/system/. When that folder exists and glossary.md is
-  missing, fills only that file from the dump. When the file exists, appends
-  only words that are not already rows. Does not rewrite existing glossary
-  rows. A meaning the dump does not state is `to be researched`. A clear
-  answer to a spec open question is linked under that question with the
-  confirmed sort. An unclear or partial answer is shown and the question
-  stays open. A mail, transcript, or chat that shows a question being
-  asked gives the asked-on date. That same
-  pass adds what is new to the short description, the diagram, and how the
-  parts connect. Does not rewrite what is already there. Does not
-  write application code. Does not plan, implement, or commit.
+  onto specs that already exist; one dump may cover one slug or many.
+  Quote the new bits into the matching spec.md files. A fact worth keeping
+  that is not for an existing spec can be Note, which writes docs/notes/.
+  Then report whether docs/system/ or another spec has to change. A kept
+  quote is compared with docs/research/ and Research findings; research is
+  marked stale only after a yes. Does not create a slug or seed
+  docs/system/. When that folder exists, fills a missing glossary.md or
+  appends new words only; a meaning not stated is `to be researched`. A
+  clear answer to a spec open question is linked under it with the
+  confirmed sort; unclear stays open. A source that shows a question being
+  asked gives the asked-on date. The same pass adds what is new to the
+  short description, the diagram, and how the parts connect. Does not
+  write code, plan, implement, or commit.
 disable-model-invocation: true
 icon: filter
 color: orange

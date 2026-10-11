@@ -1,30 +1,21 @@
 ---
 name: crav1-add-to-spec
 description: >-
-  Add new information to one existing spec, then report whether docs/system/
-  or another spec has to change. Does not silently rewrite those files.
-  Does not create a glossary. A missing row on an existing glossary can be
-  one listed edit. It is not written unless apply is chosen. A meaning the
-  new information does not state is `to be researched`.
-  An imported mail, transcript, chat, screenshot, or other original
-  follows references/sources.md and is written under docs/sources/
-  before the quote. The personal-data check recommends keep or redact,
-  redacts secrets, and may write the transfer data policy after a yes.
-  When the quote comes from a note in docs/notes/, writes
-  Used by on that note. Absorbed by only after a yes, when one spec
-  takes the whole note. After a kept quote, compares it with docs/research/ and with
-  Research findings. Marks that research stale only after a yes.
-  An unclear case is not marked. May draft a revisit request for
-  the note's owner. Does not send it.   An updated note in
-  docs/research/ is checked per listed point. An older mark with no
-  point lines is split into the hits it was made from. Open questions
-  in that note are routed when the answer lies outside the note's
-  owner, including when the mark clears. Does not ask the user
-  whether the mark is clear. A clear answer to an open question on the
-  spec is linked under that question, with the quote and the source,
-  following references/open-questions.md. An unclear or partial answer
-  is shown and the question stays open. Does not write application
-  code. Does not plan, implement, or commit.
+  Add new information to one existing spec, then report whether
+  docs/system/ or another spec has to change; edits there only on apply.
+  Does not create a glossary; a missing row is one listed edit. A meaning
+  not stated is `to be researched`. An imported original follows
+  references/sources.md and goes under docs/sources/ before the quote; the
+  personal-data check recommends keep or redact, redacts secrets, and may
+  write the transfer data policy after a yes. A quoted note in docs/notes/
+  gets Used by; Absorbed by only after a yes. A kept quote is compared
+  with docs/research/ and Research findings and marked stale only after a
+  yes; unclear is not marked. May draft a revisit request for the note's
+  owner; does not send it. An updated research note is checked per listed
+  point, an older mark is split into its hits, and its open questions are
+  routed, without asking. A clear answer to an open question is linked
+  under it (references/open-questions.md); unclear stays open. Does not
+  plan, implement, write code, or commit.
 disable-model-invocation: true
 icon: file-plus
 color: blue

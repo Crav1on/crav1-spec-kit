@@ -1,10 +1,11 @@
 ---
 name: crav1-complete-task
 description: >-
-  Start one T# implement-to-done in an isolated worker chat (subagent). Persist
-  commit style as a Cursor rule (same as finalize-commit onward). Auto-commit
-  after each phase. Standalone: pause once for Approvals & Execution, then
-  undo at the end. Skip that pause when launched by /crav1-complete-tasks.
+  Start one T# implement-to-done in an isolated worker chat (subagent).
+  Persist commit style as a rule (same as finalize-commit onward).
+  Auto-commit after each phase. Standalone: pause once for the host's
+  approval setting, then restore it at the end. Skip that pause when
+  launched by /crav1-complete-tasks.
 disable-model-invocation: true
 icon: play
 color: green
