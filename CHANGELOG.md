@@ -4,6 +4,15 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 
 ## Unreleased
 
+## 1.42.0 (2026-10-11)
+
+### Kit
+
+- The always-on project instruction (`.cursor/rules/crav1.mdc`, the plugin copy, and the generated `.claude/CLAUDE.md`) is cut from about 5,150 words to about 650: standing rules plus pointers: the layout and `Synced at` rules, the seven starter options, the typical order, six standing rules that hold for every skill, and links to the skills reference and the data layout. The per-skill text it repeated already lives in each skill's `SKILL.md` and on its reference page.
+- `/crav1-implement-task` and `/crav1-complete-task` now say in their own `SKILL.md` that they do not ask whether to run `/crav1-keep-current`. The project instruction said this before; the behavior is unchanged.
+- [CONTRIBUTING.md](CONTRIBUTING.md) and the maintainer rule: a new skill is done only when it is documented (its `skills.yaml` entry and reference page, a walkthrough that links back, a docs index line for a new page, and a CHANGELOG entry). The maintainer rule also says the project instruction stays standing rules plus pointers.
+- `plugins/crav1/.cursor-plugin/plugin.json` is 1.42.0.
+
 ### Docs
 
 - The [README](README.md) is now a short landing page: what the kit is, the seven starter options with links to their reference pages and walkthroughs, a lane diagram, and one pointer to the docs index.

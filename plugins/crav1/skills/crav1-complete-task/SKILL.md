@@ -58,4 +58,4 @@ Show the worker’s recap and STATUS.
 
 After this standalone run ends (any STATUS, or they `stop`), follow **tool-approvals.md → Undo**. Do not undo if this invocation skipped the pause (`approvals: already-done` from complete-tasks).
 
-Do not start `/crav1-complete-tasks` unless they asked.
+Do not start `/crav1-complete-tasks` unless they asked. Do not ask whether to run `/crav1-keep-current`.
