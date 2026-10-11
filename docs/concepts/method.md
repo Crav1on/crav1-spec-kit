@@ -195,7 +195,7 @@ The command shows three piles (belongs to this spec, already described there, fi
 
 Use this on any non-trivial change.
 
-The later skills that work on a spec that already exists (add, repos-to-spec, environment-read, pipeline-environments, explain, whats-known-about, keep-current, security-review, review-pr, suggest-tests-for-code, meeting-to-specs, exploratory-test, fix-bug) are described in full on their pages in the [skills reference](../reference/skills.md).
+The skills that work beside this loop (add, repos-to-spec, environment-read, pipeline-environments, explain, whats-known-about, keep-current, security-review, review-pr, suggest-tests-for-code, meeting-to-specs, exploratory-test, fix-bug) are described in full on their pages in the [skills reference](../reference/skills.md).
 
 ### A. Specify (read-heavy)
 
