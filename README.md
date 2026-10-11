@@ -163,6 +163,7 @@ Starter options run only when named. Asking for startup options lists them and d
 | `/crav1-architecture-reviewer` | Spec, diagrams, or ADRs exist | Spec, diagrams, ADRs, and export when present | Nothing (numbered `I#`s in chat) | `/crav1-tighten-spec` |
 | `/crav1-tighten-spec` | The spec is still mushy | Spec, diagrams, ADRs, and reviewer findings | The picked issue in `spec.md` | `/crav1-resolve-questions` |
 | `/crav1-resolve-questions` | Open questions remain | Open questions and assumptions in `spec.md` | The picked question in the spec | `/crav1-plan-from-spec` |
+| `/crav1-ask-open-questions` | Someone else has to answer open questions | Open questions on the specs for a person, a spec, or a topic | A draft in chat; asked or pending marks under those questions after you pick | `/crav1-meeting-to-specs` |
 | `/crav1-add-to-spec` | New information for one existing spec | That information and one `spec.md` | Quotes in that spec, and `Used by` on a note it quotes | `/crav1-finalize-commit` |
 | `/crav1-match-dump-to-specs` | A later dump; specs already exist | The dump and existing spec folders | Confirmed new quotes in matching specs, and `docs/notes/` for a note | `/crav1-finalize-commit` |
 | `/crav1-code-into-specs` | A landed change; specs already exist | A commit, range, or branch diff, plus specs | Quotes of what belongs in matching specs | `/crav1-finalize-commit` |

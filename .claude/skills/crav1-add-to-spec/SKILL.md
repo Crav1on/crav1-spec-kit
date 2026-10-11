@@ -20,7 +20,10 @@ description: >-
   point lines is split into the hits it was made from. Open questions
   in that note are routed when the answer lies outside the note's
   owner, including when the mark clears. Does not ask the user
-  whether the mark is clear. Does not write application
+  whether the mark is clear. A clear answer to an open question on the
+  spec is linked under that question, with the quote and the source,
+  following references/open-questions.md. An unclear or partial answer
+  is shown and the question stays open. Does not write application
   code. Does not plan, implement, or commit.
 disable-model-invocation: true
 icon: file-plus
@@ -72,6 +75,17 @@ When the handoff includes a source folder, add the `Source:` and `Trace:` lines 
 When the handoff includes a note path, that quote comes from that note. Run **Notes** after the spec quote. Do not ask what kind of note it is.
 
 Then run **Add to that spec.md** and **Impact** in this skill. The impact check still runs, including research. Follow [references/research-stale.md](references/research-stale.md). Do not skip it. Do not run that research check a second time. Do not write `plan.md` or `tasks.md`. Do not change application code. Do not start Specify, Plan, or Build. Do not ask the picture offer. That offer is only the environment-read and suggest-tests handoffs.
+
+## From an import: answer links and asked marks
+
+When `/crav1-meeting-to-specs` hands an answer link or an asked mark for an existing spec, the spec is the one that skill already named. Do not ask for a slug. Do not ask keep or apply. Follow [references/open-questions.md](references/open-questions.md).
+
+- An answer link writes one `Answered:` line under that open question: the date, who, the kind, the quote as handed (after any redaction), and the source folder. Do not paraphrase. Do not rewrite the question. Do not remove it from `## Open questions`. Do not change any other spec line. When the answer would change a spec line, name `/crav1-resolve-questions` for that slug. Do not run it.
+- An asked mark writes or replaces the `Asked:` line for that person under that question, with the date from the source. It replaces a `Pending:` line for the same person.
+
+When the handoff includes a source folder, add the `Source:` and `Trace:` lines from [references/sources.md](references/sources.md). Do not ask the imported-sources questions again.
+
+Then run **Impact** for the research part only. When the question is one a stale research point waits on, follow the answered-later part of [references/research-stale.md](references/research-stale.md). Do not ask the user whether the point is settled. Do not ask the landscape question for an answer link. Do not run the picture offer. Do not commit.
 
 ## Picture offer
 
@@ -128,6 +142,8 @@ Labels, in the section the words belong to:
 - `**New:** "…"` — their words, added this pass.
 - `**Already there:**` — do not paste a second copy. Leave the existing sentence. Say in the report which heading already had it.
 - `**Inferred:**` — a connection you drew. Not an accepted fact.
+
+Before the quote, read `## Open questions` on the target spec with the records under each question. When the new information clearly answers one, write an `Answered:` line under that question as [references/open-questions.md](references/open-questions.md) says, and say so in the report. An unclear or partial answer is shown in the report as a possible answer. The question stays open. When the new information is a mail, a transcript, or a chat that shows a question being asked, write the `Asked:` line with the date from the source. When the answer would change a spec line, name `/crav1-resolve-questions`. Do not run it. A clear answer to an open question on another spec is one listed impact edit.
 
 When the file already has `## Trace`, append one line: what this pass marked new, already there, and inferred. Do not create `## Trace` only for that line. An imported source is the exception: the `Source:` and `Trace:` lines in [references/sources.md](references/sources.md) are required, and `## Trace` is created when it is missing so that line has a heading.
 
@@ -207,6 +223,7 @@ Output only:
 - The note line when this pass wrote `Used by` or `Absorbed by`, or that none was written
 - The transfer data policy when this pass wrote it, or that none was written
 - What was added (their quotes, labeled new) and what was already there
+- Open questions: each answer linked, each possible answer left open, each asked mark written and where its date came from, or none
 - Impact: nothing else, or the one-line edit list and which option they picked
 - Research: each hit, whether it was marked, the note path and the findings line, or that none was marked. The revisit draft when one was written in the chat, or that none was drafted. The clear summary: what was cleared, narrowed, and routed where, each open question from the updated note and where it went, and when an older mark had no points, or that this run did not check an updated note
 - Next: `/crav1-finalize-commit` if any file changed (no push). `/crav1-plan-from-spec` only if they say they want to start planning this slug. Do not run either.

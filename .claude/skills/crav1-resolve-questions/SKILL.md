@@ -41,7 +41,7 @@ Remaining `Q#` titles only. Mark the current one.
 
 For **only** the current `Q#`:
 
-1. **Question** — quote the spec line. One sentence on what is undecided (product vs architecture).
+1. **Question** — quote the spec line. One sentence on what is undecided (product vs architecture). When the question has an `Answered:` line (see `crav1-add-to-spec` `references/open-questions.md`), quote that answer and its source, and offer the answer it states as the first answer option. Keep open is still offered. `Asked:` and `Pending:` lines are context only.
 2. **Why it is still open** — what v0, tests, or an ADR cannot finish without this.
 3. **Options** — usually 3–5 letters. Use the questions tool when available.
 
@@ -57,7 +57,7 @@ Stop. Do not edit. Do not preview a full patched spec.
 
 1. Patch **only** this question.
    - **Keep open:** leave the bullet. You may sharpen the wording if they asked; do not resolve it.
-   - **Answer:** fold the decision into the right place (requirement/journey/acceptance, `## Constraints`, non-goals/later, or a new/updated ADR). **Remove** it from Open questions (or mark the assumption resolved). An acceptance line you add is yes/no. Name unit, system, or browser only when that kind is already obvious from the answer. Otherwise leave the kind for plan. Do not invent a test list.
+   - **Answer:** fold the decision into the right place (requirement/journey/acceptance, `## Constraints`, non-goals/later, or a new/updated ADR). When the question had an `Answered:` line, keep that quote and its source with the decision. **Remove** it from Open questions, with its `Asked:`, `Pending:`, and `Answered:` lines (or mark the assumption resolved). An acceptance line you add is yes/no. Name unit, system, or browser only when that kind is already obvious from the answer. Otherwise leave the kind for plan. Do not invent a test list.
    - **Cut from v0:** move to non-goals/later; remove from Open questions.
 2. Recap **Added / Removed / Still open** for this `Q#`.
 3. If the answer makes a named diagram/ADR wrong, either they also chose `sync-here`, or the **next** item is that drift (do not silently skip).
