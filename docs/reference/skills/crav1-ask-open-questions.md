@@ -2,7 +2,7 @@
 
 # /crav1-ask-open-questions
 
-[All skills](../skills.md) · Walkthrough: reference only · Playbook: [`SKILL.md`](../../../.cursor/skills/crav1/crav1-ask-open-questions/SKILL.md)
+[All skills](../skills.md) · Walkthrough: [Ask open questions](../../from-ask-open-questions.md) · Playbook: [`SKILL.md`](../../../.cursor/skills/crav1/crav1-ask-open-questions/SKILL.md)
 
 ## Purpose
 
@@ -55,4 +55,4 @@ The open questions for <a person, one spec, or a topic>, as a mail.
 
 ## Walkthrough
 
-Reference only. This command has no walkthrough page of its own.
+Step by step: [Ask open questions](../../from-ask-open-questions.md).

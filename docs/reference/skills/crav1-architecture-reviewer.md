@@ -2,7 +2,7 @@
 
 # /crav1-architecture-reviewer
 
-[All skills](../skills.md) · Walkthrough: reference only · Playbook: [`SKILL.md`](../../../.cursor/skills/crav1/crav1-architecture-reviewer/SKILL.md)
+[All skills](../skills.md) · Walkthrough: [From a draft spec to an accepted spec](../../from-draft-spec.md) · Playbook: [`SKILL.md`](../../../.cursor/skills/crav1/crav1-architecture-reviewer/SKILL.md)
 
 ## Purpose
 
@@ -56,4 +56,4 @@ Critique the design. Number the issues. Do not edit the spec.
 
 ## Walkthrough
 
-Reference only. This command has no walkthrough page of its own.
+Step by step: [From a draft spec to an accepted spec](../../from-draft-spec.md).

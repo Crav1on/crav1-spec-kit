@@ -442,7 +442,7 @@ skills:
   starter: false
   since: 1.0.0
   stage: stable
-  walkthrough: null
+  walkthrough: docs/from-draft-spec.md
   purpose: Create or check out feat/<slug> (one branch for spec+build) or spec/<slug> (specify-only; build
     later on feat/<slug>).
   in_depth:
@@ -469,7 +469,7 @@ skills:
   starter: false
   since: 1.0.0
   stage: stable
-  walkthrough: null
+  walkthrough: docs/from-draft-spec.md
   purpose: Start the crav1-architecture-reviewer-agent subagent on the current spec.
   in_depth:
   - 'Run the crav1-architecture-reviewer-agent subagent; numbered issues at the end. Optional next, not
@@ -499,7 +499,7 @@ skills:
   starter: false
   since: 1.0.0
   stage: stable
-  walkthrough: null
+  walkthrough: docs/from-draft-spec.md
   purpose: Walk an existing spec issue-by-issue.
   in_depth:
   - One issue at a time, with explained resolutions (plus get a suggestion) and impact; patch only that
@@ -537,7 +537,7 @@ skills:
   starter: false
   since: 1.0.0
   stage: stable
-  walkthrough: null
+  walkthrough: docs/from-draft-spec.md
   purpose: Walk Open questions in spec.md one by one.
   in_depth:
   - One Open question at a time; keep it open or answer with impact; patch only that `Q#`.
@@ -566,7 +566,7 @@ skills:
   starter: false
   since: 1.40.0
   stage: stable
-  walkthrough: null
+  walkthrough: docs/from-ask-open-questions.md
   purpose: Gather the open questions in the specs for one person, one spec, or one topic, and draft them
     as a mail, a meeting agenda, a chat message, or meeting questions to ask out loud.
   in_depth:
@@ -870,7 +870,7 @@ skills:
   starter: false
   since: 1.0.0
   stage: stable
-  walkthrough: null
+  walkthrough: docs/from-spec-to-plan.md
   purpose: Turn an accepted spec into a file-level plan.md and independently testable tasks.md.
   in_depth:
   - File-level `plan.md` and `tasks.md`; each verify note names the checks before code; names a linter
@@ -911,7 +911,7 @@ skills:
   starter: false
   since: 1.0.0
   stage: stable
-  walkthrough: null
+  walkthrough: docs/from-spec-to-plan.md
   purpose: Start the crav1-plan-reviewer-agent subagent on plan.md and tasks.md against spec.md.
   in_depth:
   - Critique `plan.md` / `tasks.md` against the spec; numbered `P#`s.
@@ -937,7 +937,7 @@ skills:
   starter: false
   since: 1.0.0
   stage: stable
-  walkthrough: null
+  walkthrough: docs/from-spec-to-plan.md
   purpose: Walk plan.md/tasks.md issues one by one (including /crav1-review-plan P#s).
   in_depth:
   - One plan issue at a time; patches plan/tasks only (spec findings go to tighten-spec)
@@ -962,7 +962,7 @@ skills:
   starter: false
   since: 1.0.0
   stage: stable
-  walkthrough: null
+  walkthrough: docs/from-plan-to-build.md
   purpose: Implement exactly one task from tasks.md, then run its verify step.
   in_depth:
   - One `tasks.md` row, then run its verify step.
@@ -989,7 +989,7 @@ skills:
   starter: false
   since: 1.0.0
   stage: stable
-  walkthrough: null
+  walkthrough: docs/from-plan-to-build.md
   purpose: Start one T# implement-to-done in an isolated worker chat (subagent).
   in_depth:
   - 'Isolated worker for one `T#`: implement → commit → verify → optional fix; persist commit style as
@@ -1016,7 +1016,7 @@ skills:
   starter: false
   since: 1.0.0
   stage: stable
-  walkthrough: null
+  walkthrough: docs/from-plan-to-build.md
   purpose: Orchestrate isolated /crav1-complete-task workers for a T# range or all unchecked tasks.
   in_depth:
   - Orchestrates one worker per `T#` (`T1-T3` or all unchecked); stops the batch when a worker needs you.
@@ -1042,7 +1042,7 @@ skills:
   starter: false
   since: 1.0.0
   stage: stable
-  walkthrough: null
+  walkthrough: docs/from-plan-to-build.md
   purpose: 'Serial board: build several ready specs one slug after another in this checkout.'
   in_depth:
   - 'Serial board of ready slugs: `feat/<slug>` from default, then that spec’s complete-tasks loop; no
@@ -1070,7 +1070,7 @@ skills:
   starter: false
   since: 1.0.0
   stage: stable
-  walkthrough: null
+  walkthrough: docs/from-verify.md
   purpose: Map every v0 acceptance line to tests or UI checks and report pass, fail, or missing.
   in_depth:
   - TL;DR of implemented vs not, then acceptance details in `verify.md`.
@@ -1095,7 +1095,7 @@ skills:
   starter: false
   since: 1.0.0
   stage: stable
-  walkthrough: null
+  walkthrough: docs/from-verify.md
   purpose: After /crav1-verify-spec, walk inner-loop gaps one by one (verify failed, then unverified,
     then G#).
   in_depth:
@@ -1123,7 +1123,7 @@ skills:
   starter: false
   since: 1.0.0
   stage: stable
-  walkthrough: null
+  walkthrough: docs/from-verify.md
   purpose: Shortcut to /crav1-fix-from-verify when the verify gap is a live/inner-loop path (ports, proxy,
     SQL, unpublished URL).
   in_depth:
@@ -1150,7 +1150,7 @@ skills:
   starter: false
   since: 1.0.0
   stage: stable
-  walkthrough: null
+  walkthrough: docs/from-commit.md
   purpose: Draft a paste-ready commit Summary and Description only.
   in_depth:
   - Paste-ready Summary/Description for any git client; CRAV1 style or live git log, once or onward (deletable
@@ -1177,7 +1177,7 @@ skills:
   starter: false
   since: 1.0.0
   stage: stable
-  walkthrough: null
+  walkthrough: docs/from-commit.md
   purpose: 'Finalize a commit: CRAV1 style vs git log first if needed, then draft the Summary and Description,
     then offer git commit first, then copy / edit / rewrite / stop.'
   in_depth:
@@ -1202,7 +1202,7 @@ skills:
   starter: false
   since: 1.0.0
   stage: stable
-  walkthrough: null
+  walkthrough: docs/from-commit.md
   purpose: Open a pull request for the current change branch (push with explicit yes).
   in_depth:
   - Push the change branch only after an explicit yes, then open one pull request (no merge, no commit).
@@ -1276,7 +1276,7 @@ skills:
   starter: false
   since: 1.0.0
   stage: stable
-  walkthrough: null
+  walkthrough: docs/from-commit.md
   purpose: Merge one named pull request with a merge commit.
   in_depth:
   - Merge one named pull request only when that turn asks; always a merge commit; no squash, rebase, or

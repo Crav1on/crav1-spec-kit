@@ -2,7 +2,7 @@
 
 # /crav1-review-plan
 
-[All skills](../skills.md) · Walkthrough: reference only · Playbook: [`SKILL.md`](../../../.cursor/skills/crav1/crav1-review-plan/SKILL.md)
+[All skills](../skills.md) · Walkthrough: [From a spec to a plan](../../from-spec-to-plan.md) · Playbook: [`SKILL.md`](../../../.cursor/skills/crav1/crav1-review-plan/SKILL.md)
 
 ## Purpose
 
@@ -54,4 +54,4 @@ Stage: stable. Since: 1.0.0 ([changelog](../../../CHANGELOG.md)).
 
 ## Walkthrough
 
-Reference only. This command has no walkthrough page of its own.
+Step by step: [From a spec to a plan](../../from-spec-to-plan.md).

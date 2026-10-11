@@ -78,3 +78,5 @@ If you are done with this dump:
 That puts `docs/system/` and the new spec slugs in git. No push. This command does not commit for you.
 
 `/crav1-plan-from-spec` is only for a slice you choose to start. A slice that is not in the code is not planned by this command.
+
+Reference page: [match-to-specs](reference/skills/crav1-match-to-specs.md)

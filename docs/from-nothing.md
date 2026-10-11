@@ -113,3 +113,5 @@ New chat so exploration does not pollute implementation.
 `/crav1-plan-from-spec` writes `plan.md` and `tasks.md`. When the spec is partial or `## In the code` names paths, it reads that repo and branch and lists each built piece before any task. Finish the gap, add a verify test, or leave it are the choices. A piece that already matches v0 is marked already there. The host plan UI is not those files ([install.md](install.md)). The plan names a linter or checker when the repo has one for the code those tasks will touch, and stops before Build when it does not. You decide to add the linter or to go on without one. The plan skill does not install one. Specify does not name the linter. Then optional `/crav1-review-plan` and `/crav1-tighten-plan` (plan/tasks only). Then `/crav1-complete-task` or `/crav1-implement-task` when the plan names a linter, or when you chose to go on without one.
 
 If a repo already exists, `@` the relevant folders so plan and spec-reviewer apply “preserve existing patterns.”
+
+Reference page: [spark-to-spec](reference/skills/crav1-spark-to-spec.md)

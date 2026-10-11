@@ -71,3 +71,5 @@ If a file changed and those edits should be in git:
 That puts the spec edits (and any applied edits) in git. No push. This command does not commit for you.
 
 `/crav1-plan-from-spec` is only for a slice you choose to start. This command does not run it.
+
+Reference page: [match-dump-to-specs](reference/skills/crav1-match-dump-to-specs.md)

@@ -27,7 +27,9 @@ Named ids:
 
 That slash command *is* the prompt.
 
-## What it reads
+## Steps
+
+### What it reads
 
 Ids come from every `docs/specs/<slug>/work-item.md` and from `## No spec yet in ADO` in `docs/system/landscape.md`, unless the user named ids. For each id it reads State, Priority, Target Date, Iteration, and Assigned To, plus discussion comments and history. It reads the checks from Acceptance Criteria when the Feature type has that field, and from the Acceptance checks list in the Description when it does not. A list that matches the spec is not a change. Discussion comments use an api version current `az` can parse.
 
@@ -35,7 +37,7 @@ Ids come from every `docs/specs/<slug>/work-item.md` and from `## No spec yet in
 
 A deleted or missing id is reported as missing. The command does not guess another Feature.
 
-## What the user sees
+### What the user sees
 
 One block per Feature, and only what differs from the spec or is new. The user keeps or dismisses each change. Dismiss is for this run only. The next run starts fresh.
 
@@ -45,4 +47,18 @@ A Feature with no spec yet suggests making the spec first, for example `/crav1-s
 
 When the Feature discussion asks a question and the spec already answers it, the command drafts a reply with no reference to the specs repo. It shows `Post comment on Feature <id>: <text>`. The user can change it, post it, or skip it. It is posted only on yes. When the spec has no answer, no reply is drafted. The question is offered as an open question for the spec instead.
 
-The command does not create or update a Feature. It does not commit.
+## What gets written
+
+Nothing by this command itself. A kept change, and an answer the user gives during the run, go to the spec through `/crav1-add-to-spec`. A reply comment is posted on the Feature only after a yes. The command does not create or update a Feature. It does not commit.
+
+## After
+
+When a spec changed:
+
+```text
+/crav1-finalize-commit
+```
+
+A Feature with no spec yet: run the starter it suggested, for example [`/crav1-spark-to-spec`](from-nothing.md). Sending a change the other way is [From specs to Azure Boards](from-specs-to-ado.md).
+
+Reference page: [ado-to-specs](reference/skills/crav1-ado-to-specs.md)

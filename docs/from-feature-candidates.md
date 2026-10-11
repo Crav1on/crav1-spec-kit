@@ -20,18 +20,28 @@ New chat.
 
 That slash command *is* the prompt.
 
-## What it reads
+## Steps
+
+### What it reads
 
 `docs/system/landscape.md` (the spec index and its statuses, Ideas, Way of working, and code with no slice), `docs/system/repos.md`, the glossary, every `docs/specs/<slug>/spec.md`, and `plan.md`, `tasks.md`, and `verify.md` where they exist. It also reads `docs/research/` and `docs/sources/`, and each fact from those folders is labelled by where it came from. It reads open notes in `docs/notes/`. A fact from a note is labelled as a note. A note is not a candidate by itself. It reads each spec’s `work-item.md` and the landscape table `## No spec yet in ADO`.
 
-## What one row is
+### What one row is
 
 A dated milestone or slice is one candidate. An undated spec with open work is one candidate. A spec that holds only open questions is marked `questions only`, and the questions are in the description so they can be handled in the Feature discussion. An item with no spec, from sources, the landscape, or code with no slice, is marked `no spec yet`. A spec that is done or retired, with nothing open, is skipped.
 
 A target date appears only when the docs state it, and the list names the source. The command does not infer a date. A recorded id is shown. Dated rows are ordered by date. Undated rows are left for the user’s team to prioritize.
 
-## What the user sees
+### What the user sees
 
 A numbered table: title, target date and its source, spec (or `no spec yet` or `questions only`), and the id already recorded. Under it, a short block per row: a description that stands alone, the open blockers and questions, and the order. The description does not invent facts.
 
+## What gets written
+
+Nothing, unless the user asks for a file. The command does not call Azure Boards.
+
+## After
+
 Sending a row to Azure Boards is [From specs to Azure Boards](from-specs-to-ado.md).
+
+Reference page: [feature-candidates](reference/skills/crav1-feature-candidates.md)

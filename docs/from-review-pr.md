@@ -73,3 +73,5 @@ A clean review stops. On an outside pull request, the last line names `/crav1-ke
 That command still stops on its own when a required host check is red. This review does not merge, and it does not clear that stop.
 
 When a finding says fix or drop, start the lane it named in a later turn. Do not treat this review as that lane.
+
+Reference page: [review-pr](reference/skills/crav1-review-pr.md)

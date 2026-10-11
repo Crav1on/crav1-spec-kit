@@ -193,7 +193,7 @@ The command shows three piles (belongs to this spec, already described there, fi
 
 ## The working loop (once a spec exists)
 
-Use this on any non-trivial change.
+Use this on any non-trivial change. Step by step: [From a draft spec to an accepted spec](../from-draft-spec.md), [From a spec to a plan](../from-spec-to-plan.md), [Build tasks](../from-plan-to-build.md), [Verify and fix](../from-verify.md), and [From commit to merge](../from-commit.md).
 
 The skills that work beside this loop (add, repos-to-spec, environment-read, pipeline-environments, explain, whats-known-about, keep-current, security-review, review-pr, suggest-tests-for-code, meeting-to-specs, exploratory-test, fix-bug) are described in full on their pages in the [skills reference](../reference/skills.md).
 

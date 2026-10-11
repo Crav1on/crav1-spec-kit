@@ -2,7 +2,7 @@
 
 # /crav1-plan-from-spec
 
-[All skills](../skills.md) · Walkthrough: reference only · Playbook: [`SKILL.md`](../../../.cursor/skills/crav1/crav1-plan-from-spec/SKILL.md)
+[All skills](../skills.md) · Walkthrough: [From a spec to a plan](../../from-spec-to-plan.md) · Playbook: [`SKILL.md`](../../../.cursor/skills/crav1/crav1-plan-from-spec/SKILL.md)
 
 ## Purpose
 
@@ -56,4 +56,4 @@ The spec is accepted. Write plan.md and tasks.md. Do not write code.
 
 ## Walkthrough
 
-Reference only. This command has no walkthrough page of its own.
+Step by step: [From a spec to a plan](../../from-spec-to-plan.md).
