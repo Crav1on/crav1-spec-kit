@@ -20,7 +20,7 @@ CI (`.github/workflows/drop-in-plugin-sync.yml`) fails the check when the plugin
 - Agents: `.cursor/agents/crav1-<name>.md` with `name: crav1-<name>`. Subagent `name:` ends in `-agent` so the Cursor slash picker can tell them apart from skills that share the same stem (`/crav1-architecture-reviewer` stays the skill; `crav1-architecture-reviewer-agent` is the subagent).
 - Guild routing: when you add, rename, or remove a skill, agent, or cross-cutting helper, update `docs/guild-routing.md` in the same PR. Update `docs/reference/skills.yaml` in that same PR and run `scripts/gen-skill-docs.py` (see Skill reference below).
 - Agent templates: `.cursor/agent-assets/crav1-<name>/` (not under `.cursor/agents/`).
-- Usage rule for consuming repos: `.cursor/rules/crav1.mdc`.
+- Usage rule for consuming repos: `.cursor/rules/crav1.mdc`. Keep it to standing rules that hold for every skill, plus pointers to the skills reference. Per-skill behavior belongs in that skill's `SKILL.md` and its `skills.yaml` entry, not in this rule.
 
 Do not add unprefixed copies at `.cursor/skills/<short-name>/` (name collision).
 
@@ -78,5 +78,7 @@ Both are generated from one data file, `docs/reference/skills.yaml`. Do not hand
 - A new skill or subagent adds its entry to `skills.yaml` in the same pull request, then run `scripts/gen-skill-docs.py` and commit the regenerated pages.
 - A change to what a skill reads, writes, leaves alone, calls, or names as the next step updates its `skills.yaml` entry in that same pull request, then regenerate.
 - A rename or removal updates `skills.yaml`, `docs/guild-routing.md`, and the generated pages together.
+
+A new skill is done only when it is documented: its `skills.yaml` entry and generated reference page, a walkthrough (its own `docs/from-*.md` page, or a step in a goal walkthrough such as `docs/from-draft-spec.md`) that links back to the reference page and is set as the entry's `walkthrough`, a line in `docs/README.md` when the walkthrough is new, and a `CHANGELOG.md` entry. A single-shot command may stay reference only (`walkthrough: null`) when the pull request says why.
 
 CI fails when a generated page is stale, a skill folder or subagent is missing from `skills.yaml`, a lane in `skills.yaml` differs from the guild-routing map, a skill description is longer than 1,024 characters, or `plugins/crav1/.cursor-plugin/plugin.json` differs from the newest release heading in `CHANGELOG.md`.
