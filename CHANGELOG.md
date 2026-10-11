@@ -4,6 +4,24 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 
 ## Unreleased
 
+## 1.40.0 (2026-10-11)
+
+### Kit
+
+- New cross-cutting skill `/crav1-ask-open-questions`. The user names a person, one spec, or a topic. It gathers the open questions on the specs for that selection. For a person, that includes questions routed via that person, for example a partner's questions that go through one contact. It drafts a mail, a meeting agenda, a chat message, or meeting questions to ask out loud in a standup, a call, or a longer meeting. Meeting questions lists every selected question, not a short cut, and has no agenda layout. The questions are numbered and grouped by topic in plain words, each with enough context to be answered. The draft never names a spec slug, a path, or a question id. The kit keeps which question came from which spec on the spec itself. The draft is in English, or in the language the user names. The personal-data and secrets check runs on the draft, the same as for other outbound text. Nothing is sent. It is a later skill. It is not a starter option.
+
+- After the draft, the skill asks whether the questions were asked. Each option says what it does. Yes writes an `Asked:` line under each question, with the date, how, and who. No writes nothing. Pending writes a `Pending:` line with the date and who, for text copied now and sent later. On the next run, pending questions are shown first, for example `Drafted for Arvid on 2026-10-11 (mail), not marked as sent yet.` The user can mark them as sent, keep them pending, or drop the mark. They are not mixed silently into the new draft.
+
+- When `/crav1-meeting-to-specs`, `/crav1-match-dump-to-specs`, or `/crav1-add-to-spec` import a mail, a transcript, minutes, or a chat, a clear answer to a spec open question is linked under that question with the quote and the source, and the question is marked answered. Meeting does not ask keep for it. Match-dump links it with the confirmed sort. An unclear or partial answer is shown as a possible answer and the question stays open. An answer that would change a spec line names `/crav1-resolve-questions`. An answer that settles a stale research point runs the existing research re-check. Matching works whether the question is asked, pending, or not marked.
+
+- When the imported source shows a question being asked, the asked-on date is the mail's sent date, the meeting date, or the chat message's date. That replaces a pending mark, or a date from the user's yes. The user's yes date is used only when no source shows it. After a meeting, questions that got an answer are linked. The rest go back to open and keep their asked mark.
+
+- `/crav1-resolve-questions` shows a linked answer with its source and offers it first. When the user picks an answer, the quote and source stay with the decision. The shared wording is [`.cursor/skills/crav1/crav1-add-to-spec/references/open-questions.md`](.cursor/skills/crav1/crav1-add-to-spec/references/open-questions.md).
+
+### Docs
+
+- [docs/guild-routing.md](docs/guild-routing.md) lists `/crav1-ask-open-questions` under Cross-cutting. The behavior map in [`.cursor/rules/kit-maintainer.mdc`](.cursor/rules/kit-maintainer.mdc), [`.cursor/rules/crav1.mdc`](.cursor/rules/crav1.mdc), [AGENTS.md](AGENTS.md), the README Runnable pieces table, [docs/install.md](docs/install.md), and [plugins/crav1/README.md](plugins/crav1/README.md) name the skill and the answer links.
+
 ## 1.39.0 (2026-10-11)
 
 ### Kit
