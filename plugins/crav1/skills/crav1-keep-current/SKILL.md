@@ -11,8 +11,10 @@ description: >-
   sibling that already appends a glossary row run this same update and
   still do not rewrite existing glossary rows. The skill that reads named
   repos and writes one architecture spec is /crav1-repos-to-spec. Do not
-  do that job. When pointed at an updated note in docs/research/, asks
-  whether the update resolves a stale mark and clears it only on yes.
+  do that job. When pointed at an updated note in docs/research/,
+  checks each listed stale point. It does not ask the user. It clears
+  the mark when every point is resolved, and otherwise narrows it and
+  routes each open point.
 disable-model-invocation: true
 icon: refresh-cw
 color: green
@@ -58,7 +60,7 @@ A part or a connection the source does not state is not new.
 
 ## Pointed at a research note
 
-When the user replaced a file under `docs/research/` and pointed this command at it, follow the clear section of `crav1-add-to-spec` `references/research-stale.md` (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/references/research-stale.md`; plugin: sibling `skills/crav1-add-to-spec/references/research-stale.md`). When the note or a spec that sees it still has a stale mark, ask whether the update resolves it. Clear the block and the spec line only after the user says yes. On yes, record `Cleared <date>: updated note <path or commit>.` under `## Research findings`. On no, the mark stays. Do not clear before that yes. Do not commit. Do not send anything. This check does not replace the picture update. The picture still follows **Write**. When the clear question is open, ask it. Do not ask another question in that same turn.
+When the user replaced a file under `docs/research/` and pointed this command at it, follow the clear section of `crav1-add-to-spec` `references/research-stale.md` (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/references/research-stale.md`; plugin: sibling `skills/crav1-add-to-spec/references/research-stale.md`). Do not ask whether the update resolves the mark. Judge each listed point from the update's text. Clear the mark only when every point is resolved. Otherwise narrow the mark and route each open point. Record `Cleared <date>: updated note <path or commit>.` under `## Research findings` only when every point is resolved, with one short line per point. Do not commit. Do not send anything. Drafts stay in the chat. This check does not replace the picture update. The picture still follows **Write**. The clear's writes on the note and on `spec.md` are part of this check. A `Synced at` line is not the only edit when this check writes.
 
 ## Synced at
 
@@ -82,13 +84,13 @@ Do not add a feature-index row. Callers that own the index still add that row th
 
 ## Stop
 
-Do not plan. Do not implement. Do not commit. Do not run `/crav1-explain`, `/crav1-plan-from-spec`, `/crav1-spark-to-spec`, or `/crav1-finalize-commit`. Do not clear a stale research mark unless the user said the update resolves it.
+Do not plan. Do not implement. Do not commit. Do not run `/crav1-explain`, `/crav1-plan-from-spec`, `/crav1-spark-to-spec`, or `/crav1-finalize-commit`. Do not clear a stale research mark except as the clear section says. Do not ask the user whether the update resolves it.
 
 Output only:
 
 - What was added to the picture (file, and the sentence, node, edge, or connection line), or that the picture is current
 - `Synced at` cell or slice line written, or that none was written
-- Research: a stale mark cleared, or that the mark stayed, or that this run was not pointed at a research note
+- Research: the short summary of what was cleared, narrowed, and routed where, or that this run was not pointed at a research note
 - Next: `/crav1-finalize-commit` when a file changed (no push). When nothing was written, name no command. Do not run it.
 
 ## Style

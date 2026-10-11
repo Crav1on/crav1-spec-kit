@@ -15,7 +15,9 @@ description: >-
   takes the whole note. After a kept quote, compares it with docs/research/ and with
   Research findings. Marks that research stale only after a yes.
   An unclear case is not marked. May draft a revisit request for
-  the note's owner. Does not send it. Does not write application
+  the note's owner. Does not send it. An updated note in
+  docs/research/ is checked per listed point. Does not ask the user
+  whether the mark is clear. Does not write application
   code. Does not plan, implement, or commit.
 disable-model-invocation: true
 icon: file-plus
@@ -88,7 +90,7 @@ Spec folders are `docs/specs/<slug>/` with a `spec.md`. Skip `_template`.
 
 If there are no spec folders, stop. Point at `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, or `/crav1-match-to-specs`. Do not create a slug. Do not seed `docs/system/`.
 
-If the input is a file under `docs/research/` and there is no new quote for a spec, run the clear section of [references/research-stale.md](references/research-stale.md). Do not ask for a slug. Do not paste the note into a spec.
+If the input is a file under `docs/research/` and there is no new quote for a spec, run the clear section of [references/research-stale.md](references/research-stale.md). Do not ask the user whether the update resolves the mark. Do not ask for a slug. Do not paste the note into a spec.
 
 If they named one existing folder (a path in the message, or one `@` of that folder or its `spec.md`) and no other existing spec could fit the new information, that folder is the target. Do not ask.
 
@@ -171,11 +173,11 @@ Do not commit. This is not an impact question. Do not list the note as an apply 
 
 Read `docs/system/` when it exists (`landscape.md`, `repos.md`, `diagrams.md`, `glossary.md`, `adr/`) and every other `docs/specs/<slug>/spec.md` (skip `_template`). Check whether the new information contradicts or extends the landscape, a repo row, a diagram, an ADR, or another spec.
 
-Also compare the kept quote with research. Follow [references/research-stale.md](references/research-stale.md). Read `docs/research/*.md` and `## Research findings` on the specs this quote touches, and the notes those findings link to. List a clear contradiction and an answered open question. An unclear case is not a hit. Ask before any mark. Write the stale block and the findings line only after the user says yes. Then offer the revisit draft. The kit drafts only. It does not send it. It does not contact the note's owner. When the user pointed this command at an updated note in `docs/research/`, follow the clear section of that file. Clear only after the user says the update resolves the mark.
+Also compare the kept quote with research. Follow [references/research-stale.md](references/research-stale.md). Read `docs/research/*.md` and `## Research findings` on the specs this quote touches, and the notes those findings link to. List a clear contradiction and an answered open question. An unclear case is not a hit. Ask before any new mark. Write the stale block and the findings line only after the user says yes. Then offer the revisit draft. The kit drafts only. It does not send it. It does not contact the note's owner. When the user pointed this command at an updated note in `docs/research/`, or this run writes one, follow the clear section of that file. Judge each listed point. Do not ask the user whether the update resolves the mark. A kept quote that answers a point already waiting is re-checked there too. That re-check does not ask.
 
 Section names for that read, not a file to paste over what exists: this skill’s `assets/system/` (same files as `docs/system/_template/`, including `glossary.md`; drop-in: `.cursor/skills/crav1/crav1-add-to-spec/assets/system/`; plugin: this skill’s `assets/system/`).
 
-Do not edit anything outside the target spec in this step, except a research mark or a clear that [references/research-stale.md](references/research-stale.md) already allowed after a yes. A source folder already written under **Imported sources** stays. A note line already written under **Notes** stays. Neither is an impact edit. The research mark is not a landscape edit. Do not seed `docs/system/` when it is missing. Say it is missing and that this command does not create it. Do not create `glossary.md`. Do not commit.
+Do not edit anything outside the target spec in this step, except a research mark after a yes, or a clear, a narrowed mark, a resolved line, or an open question that [references/research-stale.md](references/research-stale.md) says to write. The clear does not wait for a yes. A source folder already written under **Imported sources** stays. A note line already written under **Notes** stays. Neither is an impact edit. The research mark is not a landscape edit. Do not seed `docs/system/` when it is missing. Say it is missing and that this command does not create it. Do not create `glossary.md`. Do not commit.
 
 When `glossary.md` exists, a missing row that the new information uses can be one of the listed edits to `docs/system/`. When the new information already states the expansion or meaning, that text is Meaning. When it does not, Meaning is `to be researched`. Do not invent the term or the meaning. Do not write TBD or to be decided. Do not rewrite, reorder, or edit an existing row. Do not change a Meaning cell that already has text. Do not write the new row unless they pick apply. A missing `glossary.md` is not a listed edit.
 
@@ -203,7 +205,7 @@ Output only:
 - The transfer data policy when this pass wrote it, or that none was written
 - What was added (their quotes, labeled new) and what was already there
 - Impact: nothing else, or the one-line edit list and which option they picked
-- Research: each hit, whether it was marked, the note path and the findings line, or that none was marked. The revisit draft when one was written in the chat, or that none was drafted. A clear, or that the mark stayed
+- Research: each hit, whether it was marked, the note path and the findings line, or that none was marked. The revisit draft when one was written in the chat, or that none was drafted. The clear summary: what was cleared, narrowed, and routed where, or that this run did not check an updated note
 - Next: `/crav1-finalize-commit` if any file changed (no push). `/crav1-plan-from-spec` only if they say they want to start planning this slug. Do not run either.
 
 ## Style

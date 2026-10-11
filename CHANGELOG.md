@@ -4,6 +4,22 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 
 ## Unreleased
 
+## 1.38.0 (2026-10-11)
+
+### Kit
+
+- The revisit request no longer says the mark is cleared when an updated note comes back. The question asks the note's owner to say, per point, resolved, partly, or not addressed, and why when it is still open. Examples are a partner who still has to confirm, a fact that is not in public sources, and a decision. The status line says the kit checks the updated note against each listed point when it comes back to `docs/research/`.
+
+- When an updated note is written to `docs/research/` for a note with a stale mark, or the user replaces the file and points `/crav1-add-to-spec` or `/crav1-keep-current` at it, the kit judges each listed point from the update's text. It does not ask the user. Copying the note in does not clear the mark. When every point is resolved, the kit removes the stale block and the spec's stale line, and records `Cleared <date>: updated note <path or commit>.` under Research findings, with one short line per point on how it was resolved. Otherwise the mark stays and is narrowed to `Stale since <date>, N of M points open: <points>.` Resolved points are recorded with the update that resolved them.
+
+- Each open point is routed from the owner's own reason. Research that missed it or got it wrong gets a follow-up revisit draft in the chat, for those points only, numbered `Follow-up N of this mark`. From follow-up 3 the draft says the point has been open a while and suggests a conversation instead of another note. The kit does not decide that. A fact someone else has (a partner, a customer, a document not yet read) becomes an open question on the spec, naming who can answer when the update or the note says so. It is not sent back to the owner. A decision (cost, which option) becomes an open question marked as a decision. When the update does not say why, the kit asks the owner once who can answer it. Each open point names where it waits: `waiting for the note's owner` or `open question on <slug>, waiting for <who>`. A spec line the update says to change becomes an open question with the owner's suggested wording quoted. The kit does not rewrite the spec.
+
+- When that open question is later answered, by `/crav1-resolve-questions` or by a new source through the impact check, the kit re-checks the point and clears it when settled. The mark clears when no point is open. Keep open leaves the point. The run ends with one short summary of what was cleared, narrowed, and routed where. Everything is written in the files. Drafts only. Nothing is sent. Nothing is committed. The shared wording is [`.cursor/skills/crav1/crav1-add-to-spec/references/research-stale.md`](.cursor/skills/crav1/crav1-add-to-spec/references/research-stale.md). No new skill.
+
+### Docs
+
+- The behavior map in [`.cursor/rules/kit-maintainer.mdc`](.cursor/rules/kit-maintainer.mdc) records that the clear does not ask the user, and that `/crav1-resolve-questions` may re-check a stale point. [docs/guild-routing.md](docs/guild-routing.md) notes the same. No new skill.
+
 ## 1.37.0 (2026-10-11)
 
 ### Kit
