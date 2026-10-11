@@ -8,6 +8,8 @@
 
 Re-project an existing canonical spec.md into EARS, BDD, OpenSpec, YAML, JSON, and/or BMAD.
 
+Re-project `spec.md` into EARS, BDD, OpenSpec, YAML, JSON, or BMAD.
+
 ## Runs when
 
 Spec exists; want another format. Called by the user.

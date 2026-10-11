@@ -8,6 +8,8 @@
 
 Gather the open questions in the specs for one person, one spec, or one topic, and draft them as a mail, a meeting agenda, a chat message, or meeting questions to ask out loud.
 
+Drafts the open questions for a person, a spec, or a topic as a mail, a meeting agenda, a chat message, or meeting questions. No spec names in the draft. Nothing is sent. Yes, no, or pending records whether they were asked.
+
 ## Runs when
 
 Someone else has to answer open questions. Called by the user.

@@ -8,6 +8,8 @@
 
 Turn a free-form pile of ideas (and any technical hunches in the same text) into a spec, diagrams, ADRs, and a chosen export format.
 
+Idea pile + technical hunches → thin `docs/system/` when missing, including `glossary.md`, then spec, diagrams, ADRs, chosen export, then one index row. An existing landscape is left in place. A missing `glossary.md` is filled. New glossary rows are appended. Existing rows are not rewritten. A meaning the source does not state is `to be researched`. That same pass adds what is new to the short description, the diagram, and how the parts connect. It does not rewrite what is already there. On Azure Repos, offers once to write `work-item.md`.
+
 ## Runs when
 
 A pile of ideas and hunches. Called by the user.

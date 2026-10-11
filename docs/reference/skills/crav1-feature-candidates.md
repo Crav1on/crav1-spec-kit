@@ -8,6 +8,8 @@
 
 List Feature candidates from the landscape, the specs, research, sources, and open notes in docs/notes/.
 
+Lists Feature candidates from the landscape, the specs, research, sources, and open notes. Writes nothing unless the user asks for a file.
+
 ## Runs when
 
 A list of Feature candidates. Called by the user and by [`/crav1-specs-to-ado`](crav1-specs-to-ado.md).

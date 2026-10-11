@@ -8,6 +8,8 @@
 
 Finalize a commit: CRAV1 style vs git log first if needed, then draft the Summary and Description, then offer git commit first, then copy / edit / rewrite / stop.
 
+Same draft, then **commit first**, then copy for your git client, edit/rewrite, or stop (no push). Keeps that mention through the HEAD check and the attribution strip.
+
 ## Runs when
 
 Wording, then commit or copy. Called by the user and by `crav1-complete-task-agent`.

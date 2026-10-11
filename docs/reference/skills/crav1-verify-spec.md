@@ -8,6 +8,8 @@
 
 Map every v0 acceptance line to tests or UI checks and report pass, fail, or missing.
 
+TL;DR of implemented vs not, then acceptance details in `verify.md`.
+
 ## Runs when
 
 Want proof against acceptance. Called by the user and by `crav1-complete-task-agent`.

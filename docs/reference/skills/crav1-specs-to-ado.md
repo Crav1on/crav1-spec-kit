@@ -8,6 +8,8 @@
 
 Turn picked feature candidates into Azure Boards Features.
 
+Sends picked candidates to Azure Boards as Features after a yes, then writes the id onto the spec.
+
 ## Runs when
 
 Send picked candidates to Azure Boards. Called by the user.

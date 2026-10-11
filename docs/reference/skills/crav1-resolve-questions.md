@@ -8,6 +8,8 @@
 
 Walk Open questions in spec.md one by one.
 
+One Open question at a time; keep it open or answer with impact; patch only that `Q#`.
+
 ## Runs when
 
 Open questions remain. Called by the user.

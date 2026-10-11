@@ -1,6 +1,6 @@
 # First 15 minutes
 
-A thin path for someone new to **CRAV1 Spec Kit** (`crav1`) on Cursor or Claude Code. The slash commands are the same. The install is not. Full playbook: [README](../README.md). Where files go: [install.md](install.md). After a Cursor plugin install: [plugins/crav1/README.md](../plugins/crav1/README.md). Claude Code has no plugin.
+A thin path for someone new to **CRAV1 Spec Kit** (`crav1`) on Cursor or Claude Code. The slash commands are the same. The install is not. Full playbook: [The method](concepts/method.md). Every page: [docs index](README.md). Where files go: [install.md](install.md). After a Cursor plugin install: [plugins/crav1/README.md](../plugins/crav1/README.md). Claude Code has no plugin.
 
 ## Starter options
 
@@ -63,35 +63,14 @@ Start a new chat. Run `/crav1-plan-from-spec`. Read `plan.md` and `tasks.md` and
 
 ## Where to go next
 
-The starter options are the seven above. The table includes later skills. Asking for startup options names only the seven.
+The starter options are the seven above. Asking for startup options names only the seven. Every other skill is a later skill.
 
 | Next | Where |
 | --- | --- |
-| Why this loop | [README](../README.md) |
-| One-sentence spark in more depth | [from-nothing.md](from-nothing.md) |
-| Pile of ideas and tech hunches | [from-ideas.md](from-ideas.md) · `/crav1-ideas-to-spec` |
-| Several features or repos | [from-intake.md](from-intake.md) · `/crav1-intake-to-specs` |
-| Existing repos plus a dump to match | [from-match.md](from-match.md) · `/crav1-match-to-specs` |
-| A later dump onto specs that already exist | [from-match-dump.md](from-match-dump.md) · `/crav1-match-dump-to-specs` |
-| A code change that already landed, specs already exist | [from-code.md](from-code.md) · `/crav1-code-into-specs` |
-| New information for one existing spec | [from-add.md](from-add.md) · `/crav1-add-to-spec` |
-| Security review after architecture exists | [from-security.md](from-security.md) · `/crav1-security-review` |
-| Named repos into one architecture spec | [from-repos.md](from-repos.md) · `/crav1-repos-to-spec` |
-| A named host (Azure, AWS, Google Cloud) | [from-environment.md](from-environment.md) · `/crav1-environment-read` |
-| Azure DevOps pipelines into environment marks | [from-pipeline-environments.md](from-pipeline-environments.md) · `/crav1-pipeline-environments` |
-| How environment marks are written | [environments-marks.md](environments-marks.md) |
-| Read the system notes | [from-explain.md](from-explain.md) · `/crav1-explain` |
-| One feature, slice, resource, or not-yet-feature | [from-whats-known-about.md](from-whats-known-about.md) · `/crav1-whats-known-about` |
-| Update the picture after something was added | [from-keep-current.md](from-keep-current.md) · `/crav1-keep-current` |
-| Review a named open pull request | [from-review-pr.md](from-review-pr.md) · `/crav1-review-pr` |
-| A bug that already exists | [from-fix-bug.md](from-fix-bug.md) · `/crav1-fix-bug` |
-| A built slice, exploratory test | [from-exploratory-test.md](from-exploratory-test.md) · `/crav1-exploratory-test` |
-| Tests for code that already exists, one repo or one area | [from-suggest-tests.md](from-suggest-tests.md) · `/crav1-suggest-tests-for-code` |
-| Minutes, a transcript, an email, or a chat matched to existing specs | [from-meeting.md](from-meeting.md) · `/crav1-meeting-to-specs` |
-| Feature candidates from the landscape and the specs | [from-feature-candidates.md](from-feature-candidates.md) · `/crav1-feature-candidates` |
-| Picked candidates as Azure Boards Features | [from-specs-to-ado.md](from-specs-to-ado.md) · `/crav1-specs-to-ado` |
-| Azure Boards Features read back onto the specs | [from-ado-to-specs.md](from-ado-to-specs.md) · `/crav1-ado-to-specs` |
+| Why this loop | [The method](concepts/method.md) |
 | Prove a slice | `/crav1-verify-spec` |
 | Push and open a pull request | `/crav1-open-pr` (after commits exist; does not merge; may name `/crav1-review-pr` and does not run it) |
 | Merge a named pull request | `/crav1-merge-pr` (only when that turn asks; merge commit only; does not run the review) |
+| Any other situation: a walkthrough for each starter and later skill | [Docs index](README.md#how-to-walkthroughs) |
+| One command in full | [Skills reference](reference/skills.md) |
 | Broken install or skill | [SUPPORT.md](../SUPPORT.md) |

@@ -67,7 +67,7 @@ Optional Azure Boards id file: `docs/specs/_template/work-item.md` is the HTML-c
 
 ## Install docs
 
-Pre-install: `docs/install.md`. Post-plugin-install: `plugins/crav1/README.md`. Kit playbook: `README.md`, `docs/from-nothing.md`, `docs/from-ideas.md`, `docs/from-intake.md`.
+Pre-install: `docs/install.md`. Post-plugin-install: `plugins/crav1/README.md`. Landing page: `README.md`. Docs index: `docs/README.md` (add every new page there). Method: `docs/concepts/method.md`. Data layout, glossary, and data policy: `docs/concepts/`. Walkthroughs: `docs/from-*.md`.
 
 ## Skill reference (behavior)
 

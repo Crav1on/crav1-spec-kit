@@ -8,6 +8,8 @@
 
 Start the crav1-plan-reviewer-agent subagent on plan.md and tasks.md against spec.md.
 
+Critique `plan.md` / `tasks.md` against the spec; numbered `P#`s.
+
 ## Runs when
 
 Plan exists; want a critique. Called by the user.
