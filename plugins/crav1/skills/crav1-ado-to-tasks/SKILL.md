@@ -41,9 +41,9 @@ Read the child type's fields once, as `/crav1-tasks-to-ado` does, to know where 
 
 For every recorded task id, read State, title, description, Acceptance Criteria (or the `Acceptance` paragraph in the Description when the type has no such field), Assigned To, discussion comments, and history. Strip HTML before comparing. Do not drop an id to keep the list short.
 
-Then read the children of the spec's Feature (the Feature line in `work-item.md`). A child whose id has no task line is **new**.
+Then read the children of the spec's Feature in each home (each Feature line in `work-item.md`). A child whose id has no task line is **new**.
 
-A deleted or missing id is reported as missing. Do not guess another work item. Do not match on the title.
+Read each id in its own home: the `(ADO: <org>/<project>)` tag on its line, or for an older line without one the marks.md org and project, as [work-item-homes.md](../crav1-specs-to-ado/references/work-item-homes.md) (drop-in: `.cursor/skills/crav1/crav1-specs-to-ado/references/work-item-homes.md`; plugin: sibling `skills/crav1-specs-to-ado/references/work-item-homes.md`) says. An id not found in its home is reported as **moved or missing**, with that home. Ask before searching the other projects `az` can read; never search on your own. A deleted id is reported as missing. Do not guess another work item. Do not match on the title.
 
 ## What to show
 
@@ -59,7 +59,7 @@ The user takes each difference one at a time: keep or dismiss. Use the questions
 
 A kept change goes to the spec and `tasks.md` through `/crav1-add-to-spec`. The quote starts with `From ADO <date>. <who>.` when the history shows them, else `From ADO <date>.` The impact check in that skill still runs.
 
-**State.** Compare the State with the `tasks.md` box, using the done state saved in `docs/environments/marks.md` (`Azure Boards task done state: <state>`; when the line is missing, Closed, Done, or Resolved count as done).
+**State.** Compare the State with the `tasks.md` box, using the done state saved for the task's home in `docs/environments/marks.md` (`Azure Boards task done state (<project>): <state>`, or the older line without a project; when the line is missing, Closed, Done, or Resolved count as done).
 
 - Done in Azure Boards and the box is open: show who closed it and when from the history, and ask once for that task: tick the box, or leave it. Tick only on yes, through `/crav1-add-to-spec`.
 - Reopened in Azure Boards (not done now, done before in the history) and the box is ticked: show both sides and ask: untick the box, or leave it. Untick only on yes, through `/crav1-add-to-spec`.
@@ -67,7 +67,7 @@ A kept change goes to the spec and `tasks.md` through `/crav1-add-to-spec`. The 
 
 Do not tick or untick a box on your own. Never write a State back to Azure Boards. That is `/crav1-tasks-to-ado`, and only on a yes.
 
-**New children.** For each new child, ask: add it as a task, or leave it. On yes, `/crav1-add-to-spec` adds the task to `tasks.md` with the next `T<n>`, in words from the work item, stripped as below. Then append its line to `work-item.md`: `Work item: <id> — task: T<n> <short title>`. Never write an id into `tasks.md`.
+**New children.** For each new child, ask: add it as a task, or leave it. On yes, `/crav1-add-to-spec` adds the task to `tasks.md` with the next `T<n>`, in words from the work item, stripped as below. Then append its line to `work-item.md`: `Work item: <id> — task: T<n> <short title> (ADO: <org>/<project>)`, with the home it was read from. Never write an id into `tasks.md`.
 
 ## Reply comment
 

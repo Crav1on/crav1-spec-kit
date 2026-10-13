@@ -70,7 +70,7 @@ Write `docs/system/` from this skill’s `assets/` (same shape as `docs/system/_
 | File | What |
 | --- | --- |
 | `landscape.md` | What this is, v0 vs later, bulk `A#`s, how the parts connect (one line per connection the intake already states), feature index (fill paths after workers) |
-| `repos.md` | 1–N repos: purpose, proposed vs exists, URL when they have one, and the `Synced at` column. Fill that cell only for a repo this run read as a whole, as under **Synced at** below. |
+| `repos.md` | 1–N repos: purpose, proposed vs exists, URL when they have one, and the `Synced at` column. Fill that cell only for a repo this run read as a whole, as under **Synced at** below. Add the `Work items go to` column when it is missing; leave its cells empty. Never fill a home here: the first Azure Boards skill that needs one asks ([work-item-homes.md](../crav1-specs-to-ado/references/work-item-homes.md)). |
 | `diagrams.md` | System context across repos (follow `references/diagrams.md`) |
 | `glossary.md` | From `assets/glossary.md`, in this same pass. See the glossary rules below. |
 | `adr/` | Cross-cutting choices only (`assets/adr.md`). Hunches with no alternative → constraints on `landscape.md`, not ADRs. Status `proposed` until they accept |

@@ -47,7 +47,7 @@ For each id, read State, Priority, Target Date, Iteration, and Assigned To with 
 
 Before comparing, read the project’s Feature fields once, the same way `/crav1-specs-to-ado` does. A failed field read is the same failure as the other `az` checks. State the issue, suggest a fix, and offer Retry or Skip. Do not guess where the checks live.
 
-A deleted or missing id is reported as missing. Do not guess another work item. Do not match on the title.
+Read each id in its own home: the `(ADO: <org>/<project>)` tag on its line, or for an older line without one the marks.md org and project, as [work-item-homes.md](../crav1-specs-to-ado/references/work-item-homes.md) (drop-in: `.cursor/skills/crav1/crav1-specs-to-ado/references/work-item-homes.md`; plugin: sibling `skills/crav1-specs-to-ado/references/work-item-homes.md`) says. An id not found in its home is reported as **moved or missing**, with that home. Ask before searching the other projects `az` can read; never search on your own. A deleted id is reported as missing. Do not guess another work item. Do not match on the title.
 
 ## What to show
 
