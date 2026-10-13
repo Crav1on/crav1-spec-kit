@@ -50,6 +50,8 @@ Commit the file that holds the new id, so a later run does not offer Create agai
 /crav1-finalize-commit
 ```
 
+Send that spec's tasks as child work items of the Feature with [From tasks to Azure Boards](from-tasks-to-ado.md).
+
 Reading a Feature back onto the specs is [From Azure Boards to specs](from-ado-to-specs.md).
 
 Reference page: [specs-to-ado](reference/skills/crav1-specs-to-ado.md)

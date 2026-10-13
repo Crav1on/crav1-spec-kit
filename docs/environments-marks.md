@@ -45,3 +45,13 @@ This file is the only file `/crav1-environment-read` writes.
 - `/crav1-pipeline-environments` after the user confirms a stage: `pipeline <name>, stage <stage>`. One line per stage. This read does not write that line. It uses one that is already there.
 
 A mark from a connection, a deployment name, or infrastructure code is cited on the Seen line. It is not copied into this file.
+
+## Azure Boards task type
+
+`/crav1-tasks-to-ado` appends one line, once, after the user picks which work item type a task becomes:
+
+```text
+Azure Boards task type: Task
+```
+
+It is not an environment mark. Later runs of that command read it and do not ask again. Edit the line to change the type. See [From tasks to Azure Boards](from-tasks-to-ado.md).
