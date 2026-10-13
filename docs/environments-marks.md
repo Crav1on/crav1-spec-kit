@@ -48,10 +48,11 @@ A mark from a connection, a deployment name, or infrastructure code is cited on 
 
 ## Azure Boards task type
 
-`/crav1-tasks-to-ado` appends one line, once, after the user picks which work item type a task becomes:
+`/crav1-tasks-to-ado` appends two lines, once, after the user picks which work item type a task becomes: the type, and that type's done state read from the project (Closed on Agile, Done on Scrum and Basic):
 
 ```text
 Azure Boards task type: User Story
+Azure Boards task done state: Closed
 ```
 
-It is not an environment mark. Later runs of that command read it and do not ask again. Edit the line to change the type. See [From tasks to Azure Boards](from-tasks-to-ado.md).
+They are not environment marks. Later runs of that command read them and do not ask again. When only the type line is there, the next run reads the done state and appends its line without asking. Edit a line to change it. `/crav1-ado-to-tasks` reads the done-state line too. See [From tasks to Azure Boards](from-tasks-to-ado.md).
