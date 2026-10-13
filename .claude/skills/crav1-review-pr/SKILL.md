@@ -289,7 +289,9 @@ Go through each earlier finding, one line each, before the new findings:
 
 A thread marked resolved whose problem is still there is flagged `resolved but still open`. Do not guess a status: when the diff does not settle it, say so.
 
-New findings go under their own heading, `New findings`, grouped by severity as below. The ship-or-not rule counts still-open, partly-fixed, and new first-section findings.
+Status lines and thread replies follow [Comment style](#comment-style): first person, friendly, varied, for example "Thanks, this looks sorted now in `abc1234`" or "I think there is still a little bit left here: …". A still-open finding is said softly, with the same information.
+
+New findings go under their own heading, `New findings`, in the same four sections as below. The ship-or-not rule counts still-open, partly-fixed, and new first-section findings.
 
 ## Paste-ready comment
 
@@ -324,7 +326,7 @@ After the paste-ready block, offer to post. One question. Use the questions tool
 On yes:
 
 1. Post each per-line remark, in the comment style, as an inline comment on its exact file and line in the diff (GitHub: a pending review with `gh api repos/<owner>/<repo>/pulls/<n>/reviews` and one comment per finding with `path`, `line`, `side`; Azure DevOps: one thread per finding with `threadContext` file path and line). A finding with no line in the diff goes in the summary only.
-2. On a re-review, reply in each earlier finding's existing thread with its status and the fixing commit. Add new inline comments only for new findings. Do not add a duplicate comment for an earlier finding.
+2. On a re-review, reply in each earlier finding's existing thread with its status and the fixing commit, in the comment style. Add new inline comments only for new findings. Do not add a duplicate comment for an earlier finding.
 3. Post the summary: the paste-ready block **without** the verdict line.
 4. Then ask which verdict to set, as options: **Approve**, **Comment**, or **Request changes** (Azure DevOps: approve, no vote, wait for author, reject). Name the one the review points to. Set only the one the user picks. On GitHub the inline comments and summary go in that same review submit.
 5. Never resolve a thread. On a re-review, after posting, offer to resolve the threads marked Fixed. Resolve only on that yes.
