@@ -10,6 +10,8 @@ Map every v0 acceptance line to tests or UI checks and report pass, fail, or mis
 
 TL;DR of implemented vs not, then acceptance details in `verify.md`.
 
+Before the tests, a local dependency preflight checks Azurite, database containers, and emulators the repo's tests name, and asks start, skip, or stop for one that is not running. A test skipped for a missing dependency blocks verified unless you chose skip; then `verify.md` lists it under Skipped tests. A missing dependency is a `BLOCKER:` line at the top of the summary, also in a headless run, which uses the two-pass questions file.
+
 ## Runs when
 
 Want proof against acceptance. Called by the user and by `crav1-complete-task-agent`.

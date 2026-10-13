@@ -10,6 +10,8 @@ Implement exactly one task from tasks.md, then run its verify step.
 
 One `tasks.md` row, then run its verify step.
 
+Before the tests, checks the local dependencies they need (Azurite, a database container, an emulator) and asks start, skip, or stop for one that is not running. Tests skipped for a missing dependency do not tick the row unless you chose skip.
+
 ## Runs when
 
 Build one task. Called by the user and by `crav1-complete-task-agent`.
