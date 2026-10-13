@@ -4,6 +4,19 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 
 ## Unreleased
 
+## 1.48.0 (2026-10-13)
+
+### Kit
+
+- `/crav1-tasks-to-ado` handles State. A ticked task is created in the done state, an open one as New. On an update, a box ticked since the item was sent offers moving it to the done state, and an unticked box on a closed item offers a reopen to New, each sent only on its own yes. A disagreement the `tasks.md` history does not explain shows both sides and asks each time. The kit never sets Active or Resolved and never sends Reason; Priority and Iteration stay unsent.
+- The done state is the project's own name (Closed on Agile, Done on Scrum and Basic), read with the work item types (new call in `references/child-items.md`) and saved as `Azure Boards task done state: <state>` in `docs/environments/marks.md`. A project with only the type line gets the done-state line on the next run without a question.
+- `/crav1-ado-to-tasks` uses that done state: done in Azure Boards ticks the box on a yes, reopened in Azure Boards unticks a ticked box on a yes, and an in-progress state is not shown as a difference. It still writes nothing back.
+- `plugins/crav1/.cursor-plugin/plugin.json` is 1.48.0.
+
+### Docs
+
+- [From tasks to Azure Boards](docs/from-tasks-to-ado.md), [From Azure Boards to tasks](docs/from-ado-to-tasks.md), [Environment marks](docs/environments-marks.md), and both reference pages describe the State handling.
+
 ## 1.47.0 (2026-10-13)
 
 ### Kit
