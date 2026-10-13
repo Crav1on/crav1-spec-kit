@@ -51,7 +51,7 @@ A mark from a connection, a deployment name, or infrastructure code is cited on 
 `/crav1-tasks-to-ado` appends one line, once, after the user picks which work item type a task becomes:
 
 ```text
-Azure Boards task type: Task
+Azure Boards task type: User Story
 ```
 
 It is not an environment mark. Later runs of that command read it and do not ask again. Edit the line to change the type. See [From tasks to Azure Boards](from-tasks-to-ado.md).

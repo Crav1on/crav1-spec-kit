@@ -1672,7 +1672,9 @@ skills:
   - >-
     Pick one spec that already has a Feature id in `work-item.md`. Every task in its `tasks.md` is listed,
     numbered, and you pick by number or all. The child work item type is asked once and saved as a line
-    in `docs/environments/marks.md`; edit that line to change it.
+    in `docs/environments/marks.md`; edit that line to change it. The question marks the type on the
+    requirement backlog level directly under Feature as recommended (User Story on Agile, Product Backlog
+    Item on Scrum, Issue on Basic, Requirement on CMMI), and gives none when the levels cannot be read.
   - >-
     Each task is previewed as a child of the Feature: a fuller title that says what the work is, State New,
     Iteration and Priority blank, tags for the slice and the code repos, the owner when the docs state one,

@@ -4,6 +4,17 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 
 ## Unreleased
 
+## 1.47.0 (2026-10-13)
+
+### Kit
+
+- `/crav1-tasks-to-ado`: the child type question now gives a recommendation. It reads the project's process and backlog levels (new calls in `references/child-items.md`) and puts the type on the requirement backlog level directly under Feature first, marked `(Recommended)` with one plain reason: User Story on Agile (a Task belongs under a User Story), Product Backlog Item on Scrum, Issue on Basic, Requirement on CMMI, or the inherited process's own requirement type. Bug is recommended only when the team tracks bugs as requirements. When the levels cannot be read, it says so and gives no recommendation. Before, it listed `Task` first with no mark.
+- `plugins/crav1/.cursor-plugin/plugin.json` is 1.47.0.
+
+### Docs
+
+- [From tasks to Azure Boards](docs/from-tasks-to-ado.md), [Environment marks](docs/environments-marks.md), and the reference page describe the recommendation.
+
 ## 1.46.0 (2026-10-13)
 
 ### Kit

@@ -10,6 +10,26 @@ az boards work-item type list --organization <org-url> --project <project> --det
 
 Offer the returned names. Do not create a type.
 
+## Recommendation
+
+Process name:
+
+```text
+az devops project show --project <project> --organization <org-url> --detect false -o json
+```
+
+`capabilities.processTemplate.templateName` is the process (Agile, Scrum, Basic, CMMI, or an inherited name).
+
+Backlog levels, for the project's default team:
+
+```text
+az devops invoke --area work --resource backlogconfiguration --route-parameters project=<project> team="<default team>" --organization <org-url> --detect false --api-version 7.1 -o json
+```
+
+`requirementBacklog.workItemTypes` is the requirement level directly under Feature. Its `defaultWorkItemType` is the recommendation. `bugsBehavior` is `asRequirements` when the team tracks bugs as requirements; only then may `Bug` be recommended. The default team is `defaultTeam.name` from the project show.
+
+When either call fails, there is no recommendation. Say the levels could not be read.
+
 ## Fields of the child type
 
 ```text
