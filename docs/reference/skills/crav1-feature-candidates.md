@@ -10,6 +10,8 @@ List Feature candidates from the landscape, the specs, research, sources, and op
 
 Lists Feature candidates from the landscape, the specs, research, sources, and open notes. Writes nothing unless the user asks for a file.
 
+Titles say what the work is, for example 'Email service: DA Nord Pool MCR via mailbox'. Each candidate has the same labelled lines (Target date (with its source), Spec, Description, Open blockers/questions as bullets with who and when where the docs say, and Order/priority). Descriptions are full paragraphs with context, who does what, related task-list items, and quotes with names and dates, and nothing the docs do not state.
+
 ## Runs when
 
 A list of Feature candidates. Called by the user and by [`/crav1-specs-to-ado`](crav1-specs-to-ado.md).

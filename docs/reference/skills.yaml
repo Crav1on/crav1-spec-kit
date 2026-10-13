@@ -1238,15 +1238,20 @@ skills:
     and `verify.md` checks. A pull request with no `plan.md` or `tasks.md` for its slug was built outside
     the kit. That is an info note. It does not report a missing `verify.md`. It reads the test results
     that pull request's own pipeline already recorded. It does not run the tests, and it does not ask
-    to. It ends by naming `/crav1-keep-current` after the merge and does not run it. It does not edit,
-    vote, comment, or merge. `/crav1-open-pr` may name it and does not run it. `/crav1-merge-pr` does
+    to. It ends by naming `/crav1-keep-current` after the merge and does not run it. It ends with a
+    paste-ready Markdown comment (verdict, findings by severity with file and line, no kit-internal
+    details). After your yes it posts each finding as an inline comment on its line and a summary without
+    the verdict, then asks which verdict to set. A re-review reads the earlier findings from the pull
+    request's own threads and marks each fixed (with the commit), partly fixed, still open, or no longer
+    relevant. It never resolves a thread without your yes. It does not edit or merge. `/crav1-open-pr` may name it and does not run it. `/crav1-merge-pr` does
     not run it. Spark, specify, and verify do not run it.
   - Reads one named open pull request. When the slug has `plan.md`, spec, plan, `verify.md`, the body,
     and a required green linter must hold before it says ship. When the slug has no `plan.md` or `tasks.md`,
     that is an info note. It does not report a missing `verify.md`. It reviews spec fit, the body, the
     required green linter, and secrets, and it reads the pipeline's recorded tests. It does not run tests.
     It names `/crav1-keep-current` after that pull request merges and does not run it. Names the lane
-    for a finding and does not start it. Does not edit, vote, comment, install a linter, or merge. Spark,
+    for a finding and does not start it. Posts comments and a verdict only after the user's yes. Does
+    not edit, install a linter, or merge. Spark,
     specify, and verify do not run it.
   use_when: This turn names an open pull request
   table:
@@ -1255,8 +1260,9 @@ skills:
   reads: Reads one named open pull request, its diff, the spec, the body, and the required linter. When
     the slug has `plan.md`, also reads the plan and `verify.md`. When the slug has no `plan.md` or `tasks.md`,
     reads the pipeline's recorded test results instead and does not treat a missing `verify.md` as a finding.
-  writes: Writes nothing.
-  leaves_alone: Leaves code, the spec, the plan, comments, and the merge alone.
+  writes: Writes no files. After the user's yes, posts inline comments, a summary, thread replies, and
+    the verdict the user picks.
+  leaves_alone: Leaves code, the spec, the plan, and the merge alone. Never resolves a thread without a yes.
   exceptions: spark, specify, verify, `/crav1-open-pr`, and `/crav1-merge-pr` do not run it. An outside
     pull request names `/crav1-keep-current` after merge and does not run it.
   called_by: Called by the user.
@@ -1584,6 +1590,12 @@ skills:
   in_depth:
   - Lists Feature candidates from the landscape, the specs, research, sources, and open notes. Writes
     nothing unless the user asks for a file.
+  - >-
+    Titles say what the work is, for example 'Email service: DA Nord Pool MCR via mailbox'. Each candidate
+    has the same labelled lines (Target date (with its source), Spec, Description, Open blockers/questions
+    as bullets with who and when where the docs say, and Order/priority). Descriptions are full paragraphs
+    with context, who does what, related task-list items, and quotes with names and dates, and nothing
+    the docs do not state.
   use_when: A list of Feature candidates
   table:
     reads: The landscape, the specs, research, and sources
@@ -1615,6 +1627,8 @@ skills:
   purpose: Turn picked feature candidates into Azure Boards Features.
   in_depth:
   - Sends picked candidates to Azure Boards as Features after a yes, then writes the id onto the spec.
+  - Before the preview it strips spec paths, `docs/sources/` folders, and spec references from the
+    candidate text, so nothing sent to Azure Boards points at the specs repo.
   use_when: Send picked candidates to Azure Boards
   table:
     reads: The org, the project, and the candidate list

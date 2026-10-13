@@ -10,6 +10,8 @@ Turn picked feature candidates into Azure Boards Features.
 
 Sends picked candidates to Azure Boards as Features after a yes, then writes the id onto the spec.
 
+Before the preview it strips spec paths, `docs/sources/` folders, and spec references from the candidate text, so nothing sent to Azure Boards points at the specs repo.
+
 ## Runs when
 
 Send picked candidates to Azure Boards. Called by the user.

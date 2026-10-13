@@ -16,7 +16,7 @@ Each imported source is one folder:
 
 `YYYY-MM-DD` is the date of the source. Use the date the skill already has. Do not invent a date. When the user skipped the date, the folder is `docs/sources/undated-<slug>/`.
 
-`<slug>` is a short name of that source, taken from the subject, the title, or the file name. Lowercase. Hyphens. Do not put a person's name in the slug. One source, one folder. A second source on the same day gets its own slug. Do not put two sources in one folder.
+`<slug>` is a short name of that source, taken from the subject, the title, or the file name. Lowercase. Hyphens. Do not put a person's name in the slug. One source, one folder. A second source on the same day gets its own slug. Do not put two sources in one folder. An intake of several documents writes one folder per document, `docs/sources/YYYY-MM-DD-<doc-slug>/`, each with its own README, its own Left out list, its own Superseded by line, and its own images.
 
 A mail and the files that belong to that same mail are one source. A meeting and a screenshot of that same meeting are one source when the user presented them together. When it is unclear whether two files are one source, ask once. Options only. Use the questions tool when it is available. The options are one folder, or one folder per file. Stop until the user picks.
 
@@ -36,9 +36,65 @@ Write the folder once, before the first verbatim quote from that source is writt
 - How it was converted: as-is, compressed and the quality, converted to text, or left out.
 - Where the original lives, when the file was left out, or converted and the original stays outside the repo.
 - For a mail, each image that was converted, compressed, or left out. Name the image and the option. When any image changed, say the `.eml` is no longer the untouched original.
+- **Left out**, when the import took only part of the document: one line per skipped section or page range, with a short reason. Then nobody mistakes the extract for the whole document.
+- **Superseded by**, when a newer version of this document was imported: a link to the newer folder. See Versions and conflicts.
+- For a `.docx`, the tracked changes and the comments. See Word files.
 - A redaction, when one was made, including a secret. Name the kind that was removed. Do not paste the removed value. Say the file is then no longer the untouched original.
 
 Do not invent a sender, a participant, a date, or a time. When the source does not show one, say it is not shown.
+
+## Reading the document
+
+### Temporary files
+
+Extract images and other temporary files into a new folder in the system temp folder (for example `mktemp -d`, or `%TEMP%` on Windows), never inside the repo. Delete that folder at the end of the run, also when the run fails or stops early. Write only the picked files into `docs/sources/`.
+
+### An image the kit cannot view
+
+When the kit cannot see an image (for example a headless `-p` run, where images cannot be read), say so. Never guess what it shows from its type, its order, or its size. Leave the image out with the placeholder `[Image left out: <name>, not viewed]`. The README and the run summary list it, and tell Rhea or the user to check it before deciding keep or leave.
+
+### Black-boxed text
+
+Text under a black box in a PDF is redacted, even when it can still be extracted. Never copy it into a file, a quote, or the chat. Mark the spot `[redacted in source]`.
+
+### Word files
+
+Read a `.docx` as if every tracked change were accepted, and flag each change in the README (what changed, who, and when, as the file shows). List each comment in the README with its author and date. A change or a comment that affects a spec becomes an open question in that spec.
+
+### Dates
+
+Never guess an ambiguous date such as `03/04`. Keep it as the source wrote it and add an open question that asks which date is meant. Fill it in only once answered. When the context settles it (the document's locale, a weekday next to it), apply it the normal way.
+
+### Duplicate images
+
+Detect exact duplicates (same bytes) across a document and across the documents of one intake. Store each image once. The README lists every place it appears. Ask the keep-or-leave question once per image.
+
+## Versions and conflicts
+
+### Superseded versions
+
+When an import brings a newer version of a document already imported, or an older one, mark the older folder's README `Superseded by: docs/sources/<newer>/`. Keep the old folder. Read only the newest version for specs.
+
+### Source precedence
+
+When sources disagree, the newest source that records a decision wins. When no source settles it, write an open question. After an intake of several files, run one conflict pass across them before the specs are final.
+
+### Plain facts
+
+A plain uncontested fact, such as a date or a name that no source contradicts, is applied without asking. List every one in the run summary. A fact that changes a decision, or that conflicts with text already in the spec, is still asked.
+
+### Glossary
+
+Add a new glossary term without asking. Before rewriting an existing row, show the old and the new definition side by side with the source, and wait for the user's yes.
+
+## Headless runs (two-pass)
+
+A run with no window (for example `-p`) cannot stop to ask. Run it in two passes:
+
+1. **Pass 1** does everything that needs no answer, writes every question to a file in the system temp folder, names that file, and stops. It writes nothing to `docs/sources/` or a spec that depends on an answer.
+2. **Pass 2** is pointed at that file with the answers filled in, applies them, and finishes.
+
+When the file is gone at pass 2 (temp was cleaned), ask the questions again with a new pass 1.
 
 ## Mails
 
@@ -161,7 +217,7 @@ Show each secret in the list by kind only. Do not show the value. Do not ask kee
 
 ### Transfer data policy
 
-The rule is once per repo. Read the file for the host that is running. Claude Code project: `.claude/rules/crav1-transfer-data-policy.md`. Do not read or write a user-level file. The user changes the rule by editing or deleting that file.
+The rule is once per repo and one shared policy for Cursor and Claude Code. It has two copies. Claude Code project: `.claude/rules/crav1-transfer-data-policy.md`. Read the copy for the host that is running. When only one copy exists, use it and write the other copy from it with the same words. When the kit writes the rule, it writes both copies together. When both exist and differ, say so and ask the user which one wins. Do not merge them. Then write the other copy from the one they picked. Do not read or write a user-level file. The user changes the rule by editing or deleting that file.
 
 The template is this skill's `assets/crav1-transfer-data-policy.mdc` (drop-in: `.claude/skills/crav1-add-to-spec/assets/crav1-transfer-data-policy.mdc`; plugin: this skill's `assets/crav1-transfer-data-policy.mdc`).
 
