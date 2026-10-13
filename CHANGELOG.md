@@ -4,6 +4,10 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 
 ## Unreleased
 
+### Docs
+
+- New walkthrough [From tasks to Azure Boards](docs/from-tasks-to-ado.md) for `/crav1-tasks-to-ado`, with a generic task example. Linked from the docs index, the skill's reference page, [From specs to Azure Boards](docs/from-specs-to-ado.md), the [data layout](docs/concepts/data-layout.md) (task lines in `work-item.md`), [Environment marks](docs/environments-marks.md) (the task type line), and the plugin README.
+
 ## 1.45.0 (2026-10-13)
 
 ### Kit
