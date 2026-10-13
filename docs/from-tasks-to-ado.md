@@ -34,10 +34,10 @@ Every task in that spec's `tasks.md` is listed, numbered `T1`, `T2`, …, with `
 
 ### Child type, once
 
-On the first run the command reads the project's work item types and asks once which type a task becomes, for example Task or Product Backlog Item. The answer is saved as one line in `docs/environments/marks.md`:
+On the first run the command reads the project's work item types and asks once which type a task becomes. It reads the project's process and backlog levels and marks the type directly under Feature as `(Recommended)` with one reason: User Story on Agile (a Task belongs under a User Story), Product Backlog Item on Scrum, Issue on Basic, Requirement on CMMI. Bug is recommended only when the team tracks bugs as requirements. When the levels cannot be read, it says so and gives no recommendation. The answer is saved as one line in `docs/environments/marks.md`:
 
 ```text
-Azure Boards task type: Task
+Azure Boards task type: User Story
 ```
 
 Later runs use that line without asking. To change it, edit the line.

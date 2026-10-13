@@ -8,7 +8,7 @@
 
 Send the tasks of one spec to Azure Boards as child work items of that spec's Feature.
 
-Pick one spec that already has a Feature id in `work-item.md`. Every task in its `tasks.md` is listed, numbered, and you pick by number or all. The child work item type is asked once and saved as a line in `docs/environments/marks.md`; edit that line to change it.
+Pick one spec that already has a Feature id in `work-item.md`. Every task in its `tasks.md` is listed, numbered, and you pick by number or all. The child work item type is asked once and saved as a line in `docs/environments/marks.md`; edit that line to change it. The question marks the type on the requirement backlog level directly under Feature as recommended (User Story on Agile, Product Backlog Item on Scrum, Issue on Basic, Requirement on CMMI), and gives none when the levels cannot be read.
 
 Each task is previewed as a child of the Feature: a fuller title that says what the work is, State New, Iteration and Priority blank, tags for the slice and the code repos, the owner when the docs state one, a fuller description (what, why, who, decisions with quotes, names, and dates, related items, open blockers or none recorded), and the task's verify line as acceptance. File paths, line numbers, spec references, and kit names are stripped; code repo names stay; the specs repo is never mentioned.
 
