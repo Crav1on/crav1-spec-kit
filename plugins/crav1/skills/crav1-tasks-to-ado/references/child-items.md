@@ -10,6 +10,14 @@ az boards work-item type list --organization <org-url> --project <project> --det
 
 Offer the returned names. Do not create a type.
 
+## Done state of the child type
+
+```text
+az devops invoke --area wit --resource workitemtypestates --route-parameters project=<project> type=<type> --organization <org-url> --detect false --api-version 7.1 -o json
+```
+
+The done state is the `name` whose `category` is `Completed`: `Closed` on Agile and CMMI, `Done` on Scrum and Basic, or the inherited process's own name. When the call fails or no state has that category, there is no done state. Say so. Never send Active, Resolved, or another `InProgress` or `Resolved` category state.
+
 ## Recommendation
 
 Process name:
@@ -41,16 +49,18 @@ Acceptance Criteria is present when a returned field has reference name `Microso
 ## Create with a parent
 
 ```text
-az boards work-item create --type "<type>" --title "<title>" --organization <org-url> --project <project> --detect false --fields "System.State=New" "System.Description=<html>" "Microsoft.VSTS.Common.AcceptanceCriteria=<html>" "System.Tags=<tags>" "System.AssignedTo=<owner>"
+az boards work-item create --type "<type>" --title "<title>" --organization <org-url> --project <project> --detect false --fields "System.State=<New, or the done state when the box is ticked>" "System.Description=<html>" "Microsoft.VSTS.Common.AcceptanceCriteria=<html>" "System.Tags=<tags>" "System.AssignedTo=<owner>"
 az boards work-item relation add --id <new-id> --relation-type parent --target-id <feature-id> --organization <org-url> --detect false
 ```
 
-Omit Acceptance Criteria when there is no verify line or the type lacks the field. Omit Assigned To when no owner is stated. Omit Area, Iteration, and Priority. When the relation add fails after the create, say the item was created without its parent, give the id, and offer Retry for the link only. Do not create it again.
+Omit Acceptance Criteria when there is no verify line or the type lacks the field. Omit Assigned To when no owner is stated. Omit Area, Iteration, Priority, and Reason. When the relation add fails after the create, say the item was created without its parent, give the id, and offer Retry for the link only. Do not create it again.
 
 ## Update
 
 ```text
 az boards work-item update --id <id> --organization <org-url> --project <project> --detect false --fields "<only fields the user accepted>"
 ```
+
+A state change the user accepted is `"System.State=<done state>"` or, to reopen, `"System.State=New"`. Never send `System.Reason`.
 
 Check the parent with `az boards work-item show --id <id> --expand relations`. The parent is the `System.LinkTypes.Hierarchy-Reverse` relation.
