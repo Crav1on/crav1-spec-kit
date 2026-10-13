@@ -68,7 +68,7 @@ Never infer a date. An undated candidate has an empty target-date cell.
 
 Show an id only when one is recorded.
 
-- A spec candidate uses the line in that spec’s `work-item.md` whose label matches the milestone or slice. The line format is [work-item-mention.md](../crav1-draft-commit-message/references/work-item-mention.md) (plugin: sibling `skills/crav1-draft-commit-message/references/work-item-mention.md`). A file with one unlabeled line is that spec’s id. Several lines and no matching label: the cell says the ids that are recorded, and the block says the label did not match. Do not pick one.
+- A spec candidate uses the line in that spec’s `work-item.md` whose label matches the milestone or slice. The line format is [work-item-mention.md](../crav1-draft-commit-message/references/work-item-mention.md) (plugin: sibling `skills/crav1-draft-commit-message/references/work-item-mention.md`). Task lines (`Work item: <id> — task: T<n> …`) are not Feature ids. Skip them here. A file with one unlabeled line is that spec’s id. Several lines and no matching label: the cell says the ids that are recorded, and the block says the label did not match. Do not pick one.
 - A `no spec yet` candidate uses the `## No spec yet in ADO` row when the title matches that row. A different title is not a match. Do not guess. A row whose cells are all empty is the template placeholder. It is not an id.
 
 This command does not look the id up in Azure Boards.

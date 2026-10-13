@@ -111,7 +111,7 @@ After a create, write the new id. This write is a required final step of the run
 Work item: 52 — <milestone or slice label>
 ```
 
-The label is the milestone or slice name. An undated spec uses the spec title. The line format is [work-item-mention.md](../crav1-draft-commit-message/references/work-item-mention.md). Create the file when it is missing. Do not copy `docs/specs/_template/work-item.md`. Do not add the HTML comment. Do not put the id in `tasks.md`. When that id and label are already on a line, leave the line.
+The label is the milestone or slice name. An undated spec uses the spec title. The line format is [work-item-mention.md](../crav1-draft-commit-message/references/work-item-mention.md). Create the file when it is missing. Do not copy `docs/specs/_template/work-item.md`. Do not add the HTML comment. Do not put the id in `tasks.md`. When that id and label are already on a line, leave the line. Task lines (`— task: T<n>`) belong to `/crav1-tasks-to-ado`. They are not a recorded Feature id for this command.
 
 **No spec yet.** Append a row to `## No spec yet in ADO` in `docs/system/landscape.md`. Columns: Id, Title, Date. Create the heading and the table when they are missing. Do not rewrite other landscape sections. Do not rewrite an existing row. A row whose cells are all empty is the template placeholder. Replace that placeholder with the first real row. Do not treat the placeholder as a Feature. The Date cell is the target date the docs stated. When they stated none, the date is the day the row is written, and the report says it is the day the row was written, not a target date.
 
