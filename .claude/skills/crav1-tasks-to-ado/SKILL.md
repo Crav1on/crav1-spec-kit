@@ -125,6 +125,6 @@ A re-run reads these lines and offers **Update #<id>** for that task. An update 
 
 Say what was created, what was updated, and what was skipped. One line each: the id, the title, and `T<n>`.
 
-When the run wrote `work-item.md` or `docs/environments/marks.md`, name each file. Say it is not committed yet and must be committed. Name `/crav1-finalize-commit`. Do not run it. Say that without `work-item.md` a later run offers Create again and would make a duplicate.
+When the run wrote `work-item.md` or `docs/environments/marks.md`, name each file. Say it is not committed yet and must be committed. Name `/crav1-finalize-commit`. Do not run it. Name `/crav1-ado-to-tasks` as the later read-back. Do not run it. Say that without `work-item.md` a later run offers Create again and would make a duplicate.
 
 Do not plan. Do not implement. Do not commit.

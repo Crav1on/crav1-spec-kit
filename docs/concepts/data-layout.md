@@ -77,7 +77,7 @@ docs/specs/
 | `docs/specs/<slug>/live-fix.md` | Legacy. New incidents go in `fix-log.md` | Nothing new | Read when present |
 | `docs/specs/<slug>/diagrams.md`, `adr/`, `export/`, `notes.md` | Slice diagrams, slice decisions, export copies, idea notes | `/crav1-ideas-to-spec`; `/crav1-tighten-spec` for a named diagram or ADR; `/crav1-export-spec` and plan for `export/` | Architecture review, plan |
 | `docs/specs/<slug>/explore.md` | Bugs found by exploratory testing | `/crav1-exploratory-test` | `/crav1-fix-bug` when you say so |
-| `docs/specs/<slug>/work-item.md` | Azure Boards ids, one per line | spark, ideas, and intake after an opt-in on Azure Repos; `/crav1-specs-to-ado` and `/crav1-tasks-to-ado` (task lines `Work item: <id> — task: T<n> <title>`) after a yes | Commit and pull request skills, `/crav1-ado-to-specs` |
+| `docs/specs/<slug>/work-item.md` | Azure Boards ids, one per line | spark, ideas, and intake after an opt-in on Azure Repos; `/crav1-specs-to-ado` and `/crav1-tasks-to-ado` (task lines `Work item: <id> — task: T<n> <title>`) after a yes, and `/crav1-ado-to-tasks` for an added task | Commit and pull request skills, `/crav1-ado-to-specs` |
 | Transfer data policy rule | The once-per-repo answers for the personal-data check | Any skill that imports a source, after a yes. See [Data policy](data-policy.md) | The same skills |
 | Commit-style rule | The commit style chosen for later commits | `/crav1-draft-commit-message`, `/crav1-finalize-commit`, and complete-task when onward is chosen | The commit skills |
 
@@ -146,7 +146,7 @@ Work item: 52
 Work item: 81 — October billing
 ```
 
-The commit and pull request skills turn the id into a mention from the git remote: `#52` on Azure Repos, `AB#52` on GitHub. Any other host adds no mention. Leave the ids out of `tasks.md`. Nothing blocks when the file is missing. The template comment is [`docs/specs/_template/work-item.md`](../specs/_template/work-item.md).
+The commit and pull request skills turn the id into a mention from the git remote: `#52` on Azure Repos, `AB#52` on GitHub. Any other host adds no mention. Leave the ids out of `tasks.md`. Task lines (`Work item: <id> — task: T<n> <title>`) record the child work items of the Feature. The mention keeps the Feature id; a commit that clearly implements one recorded task adds that task's id too, and the commit skills ask when it is unclear. A task id is never the only mention. Nothing blocks when the file is missing. The template comment is [`docs/specs/_template/work-item.md`](../specs/_template/work-item.md).
 
 ## Spec sections the kit looks for
 

@@ -73,6 +73,7 @@ Azure Boards:
 - [Feature candidates](from-feature-candidates.md)
 - [From specs to Azure Boards](from-specs-to-ado.md)
 - [From tasks to Azure Boards](from-tasks-to-ado.md)
+- [From Azure Boards to tasks](from-ado-to-tasks.md)
 - [From Azure Boards to specs](from-ado-to-specs.md)
 
 Install:
