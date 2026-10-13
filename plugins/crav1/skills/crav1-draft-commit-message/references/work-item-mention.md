@@ -29,15 +29,20 @@ Ignore HTML comments, including the sample lines inside `docs/specs/_template/wo
 | `Work item: AB#52` or `Work item: #52` | That token, verbatim. No label. |
 | `Work item: AB#52 — catalog` or `Work item: #52 — catalog` | That token, verbatim. Label `catalog`. |
 | A line that is only `AB#52` or `#52` | That token, verbatim. No label. |
+| `Work item: 1234 — task: T3 Short title` | A **task line**, written by `/crav1-tasks-to-ado`. Id `1234`, task `T3`. Not a Feature line. See Task lines. |
 | Anything else | That line is not a mention. Other lines are still read. |
 
 The label `Work item:` is case-insensitive. Surrounding whitespace does not matter. Digits are the id. `AB#` plus digits, or `#` plus digits, is a full token.
 
 The milestone or slice label is the text after the first ` — ` (space, em dash, space) or ` - ` (space, hyphen, space) that follows the id token. The writer uses the em dash. The reader accepts both. A line with no separator has no label.
 
+A label that starts with `task:` (case-insensitive), followed by `T` and digits, makes the line a task line. Every other usable line is a Feature line.
+
 A full token is an override: use it on every host, including a host that would otherwise get no mention.
 
 ## Which line
+
+Pick the Feature line first, with the rules below, counting **Feature lines only**. Task lines never count as usable lines here and are never an option in the unclear question. Then see Task lines.
 
 **One usable line.** Use it. A missing label does not ask. This is the old single-line format.
 
@@ -52,6 +57,18 @@ The slice being worked is the first of these that this turn already shows:
 A match is the whole label and that name, compared without regard to case. A partial overlap is not a match. One match uses that id.
 
 **Unclear.** Zero matches, or more than one, asks. Options only. Use the questions tool when it is available. One option per usable line, showing the id and the label, or `no label` when the line has none. Last option: **No mention.** Stop until the user picks. Do not guess. Do not put a mention in the draft until they pick. **No mention** means this commit or this pull request has no mention. Do not write `work-item.md` from that answer.
+
+## Task lines
+
+The mention always keeps the Feature id. A task id is never the only mention by accident.
+
+A task id is added only when the commit (draft) or the pull-request diff clearly implements one recorded task: it ticks or touches exactly one `tasks.md` row whose `T<n>` has a task line, or the user named that task in this turn. Then add the task's mention after the Feature's, on the same line, separated by a space (`#52 #1234`, or `AB#52 AB#1234`). It uses the same remote prefix.
+
+When the change could be more than one recorded task, or it is not clear, ask once. Options only. Use the questions tool when it is available. One option per candidate task (`T<n>` and its short title), then **Feature only**. Stop until the user picks. Do not guess.
+
+When the file has task lines and no Feature line, there is no mention. Say once: `docs/specs/<slug>/work-item.md has task lines but no Feature line, so no mention was added.` Do not mention a task id alone.
+
+Other readers of `work-item.md` (`/crav1-feature-candidates`, `/crav1-specs-to-ado`, `/crav1-ado-to-specs`) treat task lines as tasks, not as Feature ids. `/crav1-ado-to-tasks` reads them.
 
 A file whose every line fails the table uses the “no usable line” hint below. A file that parses some lines ignores the rest.
 
@@ -100,4 +117,4 @@ When a mention is resolved, append one blank line, then the mention as the **las
 #52
 ```
 
-The line is the resolved mention (`#<id>`, `AB#<id>`, or the verbatim token). Omit the section when there is no mention. Do not pass `--work-items` or `--transition-work-items`.
+The line is the resolved mention (`#<id>`, `AB#<id>`, or the verbatim token), plus a task mention when Task lines added one. Omit the section when there is no mention. Do not pass `--work-items` or `--transition-work-items`.

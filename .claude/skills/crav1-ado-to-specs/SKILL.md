@@ -34,7 +34,7 @@ When the user names ids, read those ids only.
 
 When they name none, collect every id recorded in:
 
-- each `docs/specs/<slug>/work-item.md` except `_template` (every line [work-item-mention.md](../crav1-draft-commit-message/references/work-item-mention.md) accepts)
+- each `docs/specs/<slug>/work-item.md` except `_template` (every Feature line [work-item-mention.md](../crav1-draft-commit-message/references/work-item-mention.md) accepts; task lines are read by `/crav1-ado-to-tasks`, not here)
 - the `## No spec yet in ADO` table in `docs/system/landscape.md`
 
 Skip a file that has no usable line. Do not drop an id to keep the list short. When the set is empty, say so and stop. Do not search Azure Boards for a title.

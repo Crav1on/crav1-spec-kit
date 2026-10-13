@@ -1701,7 +1701,46 @@ skills:
   runs_by_itself: Calls `/crav1-add-to-spec` when a preview change belongs in the spec.
   you_run_next:
   - /crav1-finalize-commit
+  - /crav1-ado-to-tasks
   first_prompt: /crav1-tasks-to-ado
+- name: crav1-ado-to-tasks
+  lane: cross-cutting
+  group: Azure Boards
+  starter: false
+  since: 1.46.0
+  stage: stable
+  walkthrough: docs/from-ado-to-tasks.md
+  purpose: Read back the Azure Boards task items a spec records and bring kept changes into the spec and tasks.md.
+  in_depth:
+  - >-
+    Pick a spec with task lines in `work-item.md`, or all. Every recorded task item is read back (State,
+    title, description, acceptance, Assigned To, comments, history) and only what differs from the spec
+    and `tasks.md` is shown, plus child items under the Feature that no task line records.
+  - >-
+    Each difference is kept or dismissed, fresh every run. Kept changes go in through `/crav1-add-to-spec`.
+    A task that is Done in Azure Boards ticks its box only on your yes. A new child is added as a task,
+    with its id recorded in `work-item.md`, only on your yes. It never writes a field back; a reply
+    comment is stripped and posted only on yes.
+  use_when: Bring changes on a spec's task items in Azure Boards back into the spec
+  table:
+    reads: The task items a spec records, and the Feature's children
+    writes: Kept changes through `/crav1-add-to-spec`; a comment in Azure Boards after a yes
+  reads: >-
+    Reads the org and project the same way as `/crav1-specs-to-ado`, the task lines and the Feature line
+    in `work-item.md`, every recorded task item with its comments and history, the child type's fields,
+    and the Feature's children.
+  writes: >-
+    Writes the spec and `tasks.md` only through `/crav1-add-to-spec` for kept changes, ticks a box or adds a
+    task only after a yes, appends a task line to `work-item.md` for an added task, and posts a reply
+    comment only after a yes.
+  leaves_alone: Leaves every Azure Boards field, `tasks.md` ids, and dismissed changes alone.
+  exceptions: a spec with no task lines names `/crav1-tasks-to-ado`. A missing id is reported as missing,
+    not guessed. Dismiss is for this run only. It does not commit. It is not a starter option.
+  called_by: Called by the user. `/crav1-tasks-to-ado` names it and does not run it.
+  runs_by_itself: Calls `/crav1-add-to-spec` for each kept change.
+  you_run_next:
+  - /crav1-finalize-commit
+  first_prompt: /crav1-ado-to-tasks
 - name: crav1-ado-to-specs
   lane: cross-cutting
   group: Azure Boards

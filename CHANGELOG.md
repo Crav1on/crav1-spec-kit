@@ -4,8 +4,18 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 
 ## Unreleased
 
+## 1.46.0 (2026-10-13)
+
+### Kit
+
+- New skill `/crav1-ado-to-tasks` (cross-cutting, later skill, not a starter). Pick a spec with task lines in `work-item.md`, or all. Every recorded task item is read back (State, title, description, acceptance, Assigned To, comments, history) and only what differs from the spec and `tasks.md` is shown, plus child items under the Feature that no task line records. Each difference is kept or dismissed, fresh every run; kept changes go in through `/crav1-add-to-spec`. A task Done in Azure Boards ticks its box only on a yes; a new child is added as a task and recorded in `work-item.md` only on a yes. It never writes a field back; reply comments are stripped and posted only on a yes.
+- Work-item mentions (`work-item-mention.md`, used by `/crav1-draft-commit-message`, `/crav1-finalize-commit`, and `/crav1-open-pr`): task lines `Work item: <id> — task: T<n> …` were read as ordinary labelled lines, so a file with a Feature line and task lines asked between all of them and could mention only a task id. Task lines are now their own kind. The mention keeps the Feature id; a task id is added after it only when the change clearly implements one recorded task, the skill asks when unclear, and a task id is never the only mention. `/crav1-feature-candidates`, `/crav1-specs-to-ado`, and `/crav1-ado-to-specs` no longer treat task lines as Feature ids.
+- `/crav1-tasks-to-ado` names `/crav1-ado-to-tasks` as the later read-back.
+- `plugins/crav1/.cursor-plugin/plugin.json` is 1.46.0.
+
 ### Docs
 
+- New walkthrough [From Azure Boards to tasks](docs/from-ado-to-tasks.md) and reference page, linked from the docs index, [From tasks to Azure Boards](docs/from-tasks-to-ado.md), the [data layout](docs/concepts/data-layout.md) (task lines and mentions), and guild routing.
 - New walkthrough [From tasks to Azure Boards](docs/from-tasks-to-ado.md) for `/crav1-tasks-to-ado`, with a generic task example. Linked from the docs index, the skill's reference page, [From specs to Azure Boards](docs/from-specs-to-ado.md), the [data layout](docs/concepts/data-layout.md) (task lines in `work-item.md`), [Environment marks](docs/environments-marks.md) (the task type line), and the plugin README.
 
 ## 1.45.0 (2026-10-13)

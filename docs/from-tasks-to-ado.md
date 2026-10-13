@@ -88,6 +88,8 @@ Commit the files that hold the new ids:
 /crav1-finalize-commit
 ```
 
+Reading the task items back onto the spec and `tasks.md` is [From Azure Boards to tasks](from-ado-to-tasks.md).
+
 Reading a Feature back onto the specs is [From Azure Boards to specs](from-ado-to-specs.md).
 
 Reference page: [tasks-to-ado](reference/skills/crav1-tasks-to-ado.md)
