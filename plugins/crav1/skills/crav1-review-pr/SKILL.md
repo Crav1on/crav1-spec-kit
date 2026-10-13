@@ -289,17 +289,33 @@ Go through each earlier finding, one line each, before the new findings:
 
 A thread marked resolved whose problem is still there is flagged `resolved but still open`. Do not guess a status: when the diff does not settle it, say so.
 
-New findings go under their own heading, `New findings`, grouped by severity as below. The ship-or-not rule counts still-open, partly-fixed, and new first-section findings.
+Status lines and thread replies follow [Comment style](#comment-style): first person, friendly, varied, for example "Thanks, this looks sorted now in `abc1234`" or "I think there is still a little bit left here: …". A still-open finding is said softly, with the same information.
+
+New findings go under their own heading, `New findings`, in the same four sections as below. The ship-or-not rule counts still-open, partly-fixed, and new first-section findings.
 
 ## Paste-ready comment
 
-End every review with one fenced Markdown block the user can paste into the pull request as one comment. Keep the tone the review already uses: short plain sentences, what is off, what could happen, no blame, no praise padding.
+End every review with one fenced Markdown block the user can paste into the pull request as one comment. It follows [Comment style](#comment-style).
 
-- First line: the verdict, one line: `Approve`, `Approve with comments`, or `Changes needed`, and why in a few words.
-- Then the findings grouped by severity: **Blocking** (first-section fix or drop), **Should fix**, **Nit** (suggestions). Each finding: `path:line`, what is wrong, the suggested fix.
-- On a re-review, the earlier findings and their status come first, then `New findings`.
+- First line: the verdict, one line: `Approve`, `Approve with comments`, or `Changes needed`, said in the same friendly voice.
+- Then a varied opening line (see Comment style).
+- Then the sections, in this order, leaving out a section with nothing in it: **Blocker**, **Bugs**, **Tests to add with this PR**, **Follow-ups (not for this PR)**. A first-section fix or drop is a Blocker. A defect that is not a blocker is a Bug. A missing test is under Tests to add. A suggestion, and a deliberate choice the description explains, is a Follow-up.
+- Each remark links its file in the host's pull request files view (GitHub `https://github.com/<owner>/<repo>/pull/<n>/files`; Azure DevOps `<org-url>/<project>/_git/<repo>/pullrequest/<n>?_a=files&path=/<path>`), then gives per-line remarks as `<path>`, line `<n>`: `<remark>`, so each one can become an inline comment as it stands.
+- On a re-review, the earlier findings and their status come first, then `New findings` in the same sections.
 - No kit-internal details: no spec paths, no `docs/sources/` folders, no vault, no kit or skill names, no `F1` numbering that only this chat explains. A plan or verify miss is said in plain words about the change.
 - English, unless the user names another language.
+
+## Comment style
+
+The default style for the paste-ready block, every posted comment, and every re-review reply (agreed by Thomas and Rhea, 2026-10-12):
+
+- Write in the user's own first-person voice. Friendly, so the author never feels criticised, harped on, or wrong. Do not say that outright.
+- Keep the source of the findings vague: "me and my checks". Never name a tool, a skill, a bot, or the kit. Never write that a tool found the author's mistakes.
+- Vary the opening every time, in the spirit of "So I have had a look, and run the PR through some of my checks". Never a fixed template.
+- Soft wording, same information: "I noticed…", "It looks like… maybe they could…?", "Would it be worth adding a test that…?". No flat statements of fault. Do not drop or water down a fact to sound soft.
+- Read the pull request description first. A choice the description says is deliberate is acknowledged ("I am ok with that") and goes under Follow-ups, framed as something they "might like" or that "may be a good idea", not as a fault.
+
+The chat review above the block (F, I, S lines) keeps its plain format for the user. The style applies to what the author will read.
 
 The block is text in the chat. Showing it posts nothing.
 
@@ -309,8 +325,8 @@ After the paste-ready block, offer to post. One question. Use the questions tool
 
 On yes:
 
-1. Post each finding as an inline comment on its exact file and line in the diff (GitHub: a pending review with `gh api repos/<owner>/<repo>/pulls/<n>/reviews` and one comment per finding with `path`, `line`, `side`; Azure DevOps: one thread per finding with `threadContext` file path and line). A finding with no line in the diff goes in the summary only.
-2. On a re-review, reply in each earlier finding's existing thread with its status and the fixing commit. Add new inline comments only for new findings. Do not add a duplicate comment for an earlier finding.
+1. Post each per-line remark, in the comment style, as an inline comment on its exact file and line in the diff (GitHub: a pending review with `gh api repos/<owner>/<repo>/pulls/<n>/reviews` and one comment per finding with `path`, `line`, `side`; Azure DevOps: one thread per finding with `threadContext` file path and line). A finding with no line in the diff goes in the summary only.
+2. On a re-review, reply in each earlier finding's existing thread with its status and the fixing commit, in the comment style. Add new inline comments only for new findings. Do not add a duplicate comment for an earlier finding.
 3. Post the summary: the paste-ready block **without** the verdict line.
 4. Then ask which verdict to set, as options: **Approve**, **Comment**, or **Request changes** (Azure DevOps: approve, no vote, wait for author, reject). Name the one the review points to. Set only the one the user picks. On GitHub the inline comments and summary go in that same review submit.
 5. Never resolve a thread. On a re-review, after posting, offer to resolve the threads marked Fixed. Resolve only on that yes.
