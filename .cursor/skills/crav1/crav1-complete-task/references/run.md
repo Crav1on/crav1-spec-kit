@@ -31,6 +31,7 @@ Stop and return a **status block** (below) if:
 - `crav1-fix-from-verify` would stop (spec frozen, non-goal)
 - Commit / attribution needs them
 - Live host refresh needs them (`crav1-verify-spec` `references/live-host.md`) → `STATUS: needs_ready`
+- A local test dependency is not running, or tests skipped for one (`crav1-verify-spec` `references/test-dependencies.md`) → `STATUS: needs_dependency`. DETAIL starts with `BLOCKER: <dependency> is not running. <n> tests need it. Not verified.` Do not mark the task verified
 - Inner-loop queue non-empty after verify-spec → `STATUS: needs_fix` (do not enter **fix** until parent says `resume: fix`)
 - They / parent said `stop`
 
@@ -41,6 +42,8 @@ Stop and return a **status block** (below) if:
 | (start / omitted) | **implement** |
 | `resume: ready` | Finish live-host wait; continue the phase that was waiting (usually **verify** or **fix** evidence) |
 | `resume: fix` | **fix** |
+| `resume: dependency-start` | Start the dependency as `test-dependencies.md` says, check it answers, re-run the waiting phase |
+| `resume: dependency-skip` | Run the tests without the ones that need it; record them in `verify.md` → **Skipped tests**; continue |
 | `resume: stop` | `STATUS: blocked` — do not edit |
 
 ## implement
@@ -87,7 +90,7 @@ Left unchecked: <other T#s or none>
 ## Status block (always end with this)
 
 ```text
-STATUS: done | blocked | needs_fix | needs_ready | failed
+STATUS: done | blocked | needs_fix | needs_ready | needs_dependency | failed
 T#: Tn
 PHASE: implement | verify | fix | done
 COMMITS: <hashes>
