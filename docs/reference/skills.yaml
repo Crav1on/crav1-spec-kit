@@ -1666,6 +1666,7 @@ skills:
   starter: false
   since: 1.45.0
   stage: stable
+  walkthrough: docs/from-tasks-to-ado.md
   purpose: Send the tasks of one spec to Azure Boards as child work items of that spec's Feature.
   in_depth:
   - >-

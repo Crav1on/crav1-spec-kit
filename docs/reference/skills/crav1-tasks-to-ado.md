@@ -2,7 +2,7 @@
 
 # /crav1-tasks-to-ado
 
-[All skills](../skills.md) · Walkthrough: reference only · Playbook: [`SKILL.md`](../../../.cursor/skills/crav1/crav1-tasks-to-ado/SKILL.md)
+[All skills](../skills.md) · Walkthrough: [From tasks to Azure Boards](../../from-tasks-to-ado.md) · Playbook: [`SKILL.md`](../../../.cursor/skills/crav1/crav1-tasks-to-ado/SKILL.md)
 
 ## Purpose
 
@@ -55,4 +55,4 @@ Stage: stable. Since: 1.45.0 ([changelog](../../../CHANGELOG.md)).
 
 ## Walkthrough
 
-Reference only. This command has no walkthrough page of its own.
+Step by step: [From tasks to Azure Boards](../../from-tasks-to-ado.md).
