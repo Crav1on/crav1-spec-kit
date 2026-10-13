@@ -2,6 +2,8 @@
 
 Date:
 
+<!-- When a local dependency is missing and the user has not chosen: BLOCKER: <dependency> is not running. <n> tests need it. Not verified. -->
+
 ## TL;DR
 
 | | Count | Ids |
@@ -32,6 +34,14 @@ Sorted: verified, then verify failed, then not implemented, then unverified.
 
 - Live host: (refresh/health, or “in-process tests only”)
 - 
+
+## Skipped tests
+
+Only tests skipped because a local dependency was not running, after the user chose skip.
+
+| Test | Dependency | Why |
+| --- | --- | --- |
+| | | skipped by user choice, <date> |
 
 ## Gaps
 

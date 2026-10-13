@@ -4,6 +4,20 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 
 ## Unreleased
 
+## 1.49.0 (2026-10-13)
+
+### Kit
+
+- Local test dependency preflight. New `crav1-verify-spec/references/test-dependencies.md`: before any test command, detect the local dependencies the repo's tests, config, compose files, and README name (Azurite, database containers, Cosmos DB and other emulators), check each is running, and ask start (the repo's documented command or a default such as `azurite` or `docker compose up -d <service>`), skip the tests that need it, or stop.
+- A test skipped for a missing dependency blocks verified. `/crav1-verify-spec` marks the task Claimed done, unverified and `/crav1-implement-task` leaves the box open, unless the user chose skip; then `verify.md` lists those tests under a new **Skipped tests** section with the dependency and why. Skips the preflight missed in the test output are treated the same way.
+- Headless runs use the two-pass questions file in the system temp folder, and the missing dependency is a `BLOCKER:` line at the top of the summary.
+- `/crav1-fix-from-verify` runs the preflight before re-proving a gap. The complete-task worker returns `STATUS: needs_dependency` with `resume: dependency-start` / `dependency-skip`; `/crav1-complete-task`, `/crav1-complete-tasks`, and `/crav1-complete-features` ask start, skip, or stop.
+- `plugins/crav1/.cursor-plugin/plugin.json` is 1.49.0.
+
+### Docs
+
+- [Verify and fix](docs/from-verify.md) has a Local test dependencies section; [Build tasks](docs/from-plan-to-build.md) and the reference pages describe the preflight.
+
 ## 1.48.0 (2026-10-13)
 
 ### Kit

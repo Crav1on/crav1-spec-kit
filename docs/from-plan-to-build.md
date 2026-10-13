@@ -30,6 +30,8 @@ Use this when `plan.md` and `tasks.md` are accepted. Build one task `T#` at a ti
 | Batch stop | Answer the worker | `/crav1-complete-tasks` stops the batch when a worker needs you. `/crav1-complete-features` runs specs one after another, never in parallel, and with one ready slug points at `/crav1-complete-tasks` |
 | Picture | Say yes or no | `/crav1-complete-features` asks once whether to run `/crav1-keep-current` when a slice is marked done or retired, and does not run it. The other build commands do not ask |
 
+Before the tests run, the kit checks their local dependencies (Azurite, a database container, an emulator) and asks start, skip, or stop for one that is down. A task whose tests skipped for a missing dependency is not ticked unless you chose skip. See [Local test dependencies](from-verify.md#local-test-dependencies).
+
 ## What gets written
 
 - The code and checks for each task, and `[x]` on that row in `tasks.md` after its verify passes.

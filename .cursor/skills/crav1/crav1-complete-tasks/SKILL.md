@@ -62,6 +62,7 @@ For each `T#` **one at a time**:
 | `done` | Mark done. Next queued `T#`. |
 | `needs_fix` | Ask the user `fix` / `stop` (this is their input). `fix` → **same T#** worker with `resume: fix` (still that task’s chat/worker, new launch is OK). Repeat until `done` or they `stop`. |
 | `needs_ready` | Ask them to refresh the host, then `ready` / `stop`. `ready` → worker `resume: ready`. |
+| `needs_dependency` | Show the BLOCKER line at the top. Ask start / skip / stop. `start` → worker `resume: dependency-start`; `skip` → `resume: dependency-skip`; `stop` → end. Headless: two-pass questions file. |
 | `blocked` / `failed` | **End the batch.** Do not launch the next `T#`. |
 | User `stop` | End the batch. |
 

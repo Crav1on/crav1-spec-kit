@@ -85,7 +85,7 @@ auth-login    feat/auth-login  T1–T4    running T2
 billing       feat/billing     T1–T6    queued
 ```
 
-Status: `queued` | `running` | `needs_fix` | `needs_ready` | `done` | `blocked` | `skipped`.
+Status: `queued` | `running` | `needs_fix` | `needs_ready` | `needs_dependency` | `done` | `blocked` | `skipped`.
 
 ## Per slug (you stay in this chat)
 
@@ -102,6 +102,7 @@ Run the complete-tasks **T# loop** on **this** slug’s `tasks.md` (all remainin
 | `done` | Next `T#` on **this** slug. If no unchecked left → slug `done`, switch to next slug. |
 | `needs_fix` | Ask `fix` / `skip-slug` / `stop`. `fix` → same `T#` worker `resume: fix`. |
 | `needs_ready` | Ask them to refresh the live host, then `ready` / `skip-slug` / `stop`. `ready` → `resume: ready`. |
+| `needs_dependency` | Show the BLOCKER line at the top. Ask start / skip / `skip-slug` / stop. `start` → `resume: dependency-start`; `skip` → `resume: dependency-skip`. Headless: two-pass questions file. |
 | `blocked` / `failed` | Slug `blocked`. **End the board.** Do not start the next slug. |
 | User `skip-slug` | Mark skipped. Switch to next slug (if any). |
 | User `stop` | End the board. |

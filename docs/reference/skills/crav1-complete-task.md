@@ -10,6 +10,8 @@ Start one T# implement-to-done in an isolated worker chat (subagent).
 
 Isolated worker for one `T#`: implement → commit → verify → optional fix; persist commit style as a rule.
 
+When a local test dependency is not running, the worker returns `needs_dependency` with a `BLOCKER:` line, and you answer start, skip, or stop.
+
 ## Runs when
 
 One task through commit in a worker. Called by the user.

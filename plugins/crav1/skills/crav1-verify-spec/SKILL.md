@@ -43,7 +43,7 @@ Acceptance lines with **no** `T#` stay in the detail matrix as **missing** cover
 Then:
 
 1. If any acceptance or task verify is **live** (running Aspire/compose/dev host, published URL, browser against localhost), follow this skill’s [references/live-host.md](references/live-host.md) **before** that evidence. Record refresh/health in **Commands run**.
-2. Run the documented test/lint commands from `AGENTS.md` or the repo README when they exist. Record the command and outcome.
+2. Before any test command, run the local dependency preflight in this skill's [references/test-dependencies.md](references/test-dependencies.md): detect what the tests need (Azurite, a database container, an emulator), check each is running, and ask start, skip, or stop for one that is not. Then run the documented test/lint commands from `AGENTS.md` or the repo README when they exist. Record the command and outcome. A test skipped for a missing dependency blocks **Implemented, verified** unless the user chose skip; that task is **Claimed done, unverified**, and the missing dependency goes at the top of the report as a blocker.
 3. For UI acceptance, use the browser if available; otherwise mark **untested** and say why.
 4. Map `tasks.md` rows: checked but failing verify → **Implemented, verify failed**; unchecked → **Not implemented**.
 
@@ -78,6 +78,7 @@ Do not start implementing in this turn unless they already named a `T#` to fix.
 
 - Do not invent new acceptance. Do not expand v0.
 - Do not mark pass without a command, test name, or exercised UI path.
+- Do not mark verified when tests skipped for a missing local dependency, unless the user chose skip. Then record those tests under **Skipped tests**.
 - If the code is right and the spec is wrong, say so and send `/crav1-tighten-spec` — do not silently edit the spec.
 - If this workspace has no application to run, report **untested** / **claimed done, unverified** with that reason; do not scaffold an app to get a green matrix.
 - Do not bury task implementation status inside the acceptance table. Overview is task-first; details are acceptance-first.

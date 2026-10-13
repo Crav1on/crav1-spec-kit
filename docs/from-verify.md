@@ -21,9 +21,19 @@ Use this after tasks are built. Verify maps every v0 acceptance line in `spec.md
 | Live wiring | `/crav1-fix-live` when the gap is a live path (ports, proxy, SQL, an unpublished URL) | Same queue and same writes as fix-from-verify, preferring live or untested wiring rows. When the fix changes how the parts connect, asks once whether to run `/crav1-keep-current` and does not run it |
 | Prove again | `/crav1-verify-spec` | Re-runs the matrix |
 
+## Local test dependencies
+
+Before any test runs, in build, verify, and fix, the kit checks the local dependencies the tests need: Azurite for Azure Storage, a database container, an emulator, whatever the repo's tests, config, compose files, or README name. For each one that is not running it asks:
+
+- **Start it.** The kit starts it with the repo's documented command, or a sensible default such as `azurite` or `docker compose up -d <service>`, and checks it answers.
+- **Skip the tests that need it.** The rest run. `verify.md` lists the skipped tests under **Skipped tests**, with the dependency and why.
+- **Stop.** No tests run.
+
+A test skipped for a missing dependency is not a pass. The task is not marked verified, and its box is not ticked, unless you chose skip. A run with no window writes the question to the two-pass questions file in the system temp folder and puts the missing dependency at the top of the summary as a `BLOCKER:` line, not a footnote. When tests skip anyway for a dependency the check missed, for example "5 skipped because Azurite wasn't running", the kit treats it the same way. A worker returns `STATUS: needs_dependency` and the orchestrator asks.
+
 ## What gets written
 
-- `docs/specs/<slug>/verify.md`: the acceptance matrix.
+- `docs/specs/<slug>/verify.md`: the acceptance matrix, plus **Skipped tests** when you chose skip for a missing dependency.
 - `docs/specs/<slug>/fix-log.md`: one entry per gap, with the fix and the re-proof.
 - The smallest code fix for that gap.
 
