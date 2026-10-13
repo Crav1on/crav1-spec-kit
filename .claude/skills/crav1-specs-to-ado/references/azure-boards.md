@@ -24,6 +24,8 @@ When `az` is not on `PATH` and none of those paths exists, `az` is not installed
 
 ## Org and project
 
+The project for a work item comes from its **work item home**: the `Work items go to` cell of the repo in `docs/system/repos.md`, or the `(ADO: <org>/<project>)` tag on a recorded `work-item.md` line. See [work-item-homes.md](work-item-homes.md). The sources below give the org, the suggestion when a home is asked, and the home of an older id line with no tag.
+
 Take the org and the project from the first source that names both:
 
 1. `docs/environments/marks.md`, when that file names the Azure DevOps org and project (an Azure DevOps URL, or both names written in the file).

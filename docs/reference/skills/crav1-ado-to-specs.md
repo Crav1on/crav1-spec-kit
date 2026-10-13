@@ -10,6 +10,8 @@ Read Azure Boards Features that the specs already record.
 
 Reads Azure Boards Features back and shows what differs. A kept change goes through [`/crav1-add-to-spec`](crav1-add-to-spec.md). A reply comment is posted only after a yes.
 
+Each id is read in its own work item home. An id not found there is reported as moved or missing, and it asks before searching other projects.
+
 ## Runs when
 
 Read Azure Boards Features back. Called by the user.

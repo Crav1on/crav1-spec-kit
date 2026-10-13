@@ -4,6 +4,24 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 
 ## Unreleased
 
+## 1.50.0 (2026-10-14)
+
+### Kit
+
+- Work item homes per repo. New `crav1-specs-to-ado/references/work-item-homes.md`. The specs repo stays the source of truth and is not tied to a tracker; each implementation repo has its own home in a new `Work items go to` column of `docs/system/repos.md` (`ADO: <org>/<project>`; `Jira: <project>` reserved, nothing built). One home holds 1–N repos. The specs repo never has one.
+- The home is asked the first time a skill needs it: the repo's own ADO project (suggested), every other project `az` can read, "same for all N new repos", or a typed answer. Headless runs use the two-pass questions file. Written only after the answer; changed only by editing the row. The repos and intake skills and every `repos.md` template add the column empty.
+- `/crav1-specs-to-ado`: a spec whose repos are in several homes gets one Feature per home, each with only its own repos, each previewed and sent on its own yes, linked as Related in the same org or mentioned in plain text across orgs. A No spec yet row is asked its home too and records it in the Id cell.
+- `/crav1-tasks-to-ado`: a task goes to its repo's home, parented to the Feature in that home. No clear repo asks once (suggesting the spec's main repo); repos in different homes ask split or pick. Child type and done state are saved per home: `Azure Boards task type (<project>): <type>`.
+- `work-item.md` id lines end with `(ADO: <org>/<project>)`. Older lines are read as the marks.md org and project and get the tag on the next write without asking.
+- `/crav1-ado-to-specs`, `/crav1-ado-to-tasks`, and `/crav1-whats-known-about` read each id in its own home; one not found is reported as moved or missing, and the kit asks before searching other projects.
+- `work-item-mention.md` (commit drafts, `/crav1-open-pr` on Azure DevOps) strips the home tag and mentions only lines in the home of the repo being committed to.
+- `docs/environments/marks.md` keeps the org; its project is only the fallback suggestion. Unchanged: nothing goes to ADO without a yes, Iteration and Priority blank, repo names kept and paths stripped, v1.48 State handling.
+- `plugins/crav1/.cursor-plugin/plugin.json` is 1.50.0.
+
+### Docs
+
+- [From specs to Azure Boards](docs/from-specs-to-ado.md) has a Work item homes section; [From tasks to Azure Boards](docs/from-tasks-to-ado.md), [From Azure Boards to tasks](docs/from-ado-to-tasks.md), [Environment marks](docs/environments-marks.md), [From named repos](docs/from-repos.md), the `repos.md` template, and the reference pages describe homes.
+
 ## 1.49.0 (2026-10-13)
 
 ### Kit

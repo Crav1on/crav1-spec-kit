@@ -36,6 +36,14 @@ On a failure, state the issue, suggest a fix such as `az login`, and offer Retry
 
 Do not ask for a typed path. Do not guess the org or the project.
 
+## Work item homes
+
+Each implementation repo has its own home, as [references/work-item-homes.md](references/work-item-homes.md) says. Before the previews, read the `Work items go to` cell of every code repo the picked specs touch. Ask for an empty cell, once per repo, and write it after the answer. Never for the specs repo.
+
+A spec whose repos are in several homes gets one Feature in each home. Each one names only its own repos in its tags and text, is its own preview with its own **Create** or **Update #<id>**, and is sent only on its own yes. After both exist, link them as that file says (Related in the same org, a plain-text mention across orgs). Check the Feature type in each home.
+
+A **No spec yet** row has no repo. Ask its home with the same options, and suggest the project line in `docs/environments/marks.md`.
+
 ## Candidates
 
 Run `/crav1-feature-candidates` and show that list. The rules in that skill are the rules for the rows (drop-in: `.cursor/skills/crav1/crav1-feature-candidates/SKILL.md`; plugin: sibling `skills/crav1-feature-candidates/SKILL.md`).
@@ -108,22 +116,22 @@ After a create, write the new id. This write is a required final step of the run
 **A spec.** Append one line to `docs/specs/<slug>/work-item.md`:
 
 ```text
-Work item: 52 — <milestone or slice label>
+Work item: 52 — <milestone or slice label> (ADO: <org>/<project>)
 ```
 
-The label is the milestone or slice name. An undated spec uses the spec title. The line format is [work-item-mention.md](../crav1-draft-commit-message/references/work-item-mention.md). Create the file when it is missing. Do not copy `docs/specs/_template/work-item.md`. Do not add the HTML comment. Do not put the id in `tasks.md`. When that id and label are already on a line, leave the line. Task lines (`— task: T<n>`) belong to `/crav1-tasks-to-ado`. They are not a recorded Feature id for this command.
+The line ends with its home. Add the tag to older lines in that file that have none, as [references/work-item-homes.md](references/work-item-homes.md) says, without asking. The label is the milestone or slice name. An undated spec uses the spec title. The line format is [work-item-mention.md](../crav1-draft-commit-message/references/work-item-mention.md). Create the file when it is missing. Do not copy `docs/specs/_template/work-item.md`. Do not add the HTML comment. Do not put the id in `tasks.md`. When that id and label are already on a line, leave the line. Task lines (`— task: T<n>`) belong to `/crav1-tasks-to-ado`. They are not a recorded Feature id for this command.
 
-**No spec yet.** Append a row to `## No spec yet in ADO` in `docs/system/landscape.md`. Columns: Id, Title, Date. Create the heading and the table when they are missing. Do not rewrite other landscape sections. Do not rewrite an existing row. A row whose cells are all empty is the template placeholder. Replace that placeholder with the first real row. Do not treat the placeholder as a Feature. The Date cell is the target date the docs stated. When they stated none, the date is the day the row is written, and the report says it is the day the row was written, not a target date.
+**No spec yet.** Append a row to `## No spec yet in ADO` in `docs/system/landscape.md`. Columns: Id, Title, Date. The Id cell carries the home: `52 (ADO: <org>/<project>)`. Create the heading and the table when they are missing. Do not rewrite other landscape sections. Do not rewrite an existing row. A row whose cells are all empty is the template placeholder. Replace that placeholder with the first real row. Do not treat the placeholder as a Feature. The Date cell is the target date the docs stated. When they stated none, the date is the day the row is written, and the report says it is the day the row was written, not a target date.
 
 When a spec later covers a row in that table, move the id. An exact title match moves it: append the `work-item.md` line on that spec, then remove the landscape row. Leave the heading. When more than one spec could fit, ask. Do not guess. When none fits, leave the row.
 
 An update does not mint a new id. It keeps the recorded line.
 
-If the write fails, say so. Print the exact line to add. For a spec, that line is `Work item: <id> — <label>`. For no spec yet, print the table row: id, title, and date.
+If the write fails, say so. Print the exact line to add. For a spec, that line is `Work item: <id> — <label> (ADO: <org>/<project>)`. For no spec yet, print the table row: id, title, and date.
 
 ## Report
 
-Say what was created and what was updated. One line each: the id, the title, and the spec slug or `no spec yet`. Say what was skipped.
+Say what was created and what was updated. One line each: the id, the home, the title, and the spec slug or `no spec yet`. Name every `repos.md` cell this run wrote. Say what was skipped.
 
 When a create wrote a file, name that file. Say it is not committed yet and must be committed. Name `/crav1-finalize-commit`. Do not run it. Say that without that file a later run offers Create again and would make a duplicate.
 

@@ -26,6 +26,14 @@ That slash command *is* the prompt.
 
 The org and the project come from `docs/environments/marks.md`, or from the Azure DevOps URLs in `docs/system/repos.md`. The command checks that `az` works, including the default install paths, and that the project has the Feature work item type. If the type is missing, it says so and stops. If `az` fails, it states the issue, suggests a fix such as `az login`, and offers a skip. It does not install `az` and it does not log in.
 
+### Work item homes
+
+The specs repo is the source of truth and is not tied to any tracker. Each implementation repo has its own work item home, written in the **Work items go to** column of `docs/system/repos.md` as `ADO: <org>/<project>` (`Jira: <project>` is reserved for later; nothing is built for Jira yet). One home can hold one or many repos. The specs repo never has one.
+
+The first time a command needs a repo's home, it asks: the ADO project the repo lives in (suggested), any other project `az` can read, **same for all N new repos**, or a typed answer. A run with no window uses the two-pass questions file. The cell is written only after that answer, never silently. Change it by editing the row.
+
+A spec whose repos are in several homes gets one Feature in each home, each holding only its own repos' tasks, each previewed and sent on its own yes. In one org they are linked to each other; across orgs each mentions the other in plain text.
+
 ### Pick, preview, then send
 
 The user sees the candidate list and picks one or more by number, or all. Before the form, the command reads the project's Feature fields. When that type has Acceptance Criteria, the spec's checks go there. When it does not, the checks go in the Description as an Acceptance checks numbered list, and the preview says so in one line. A failed field read states the issue, suggests a fix, and offers a skip. It does not guess.
@@ -40,7 +48,7 @@ The form is labelled **Create** or **Update #<id>**. An update shows what would 
 
 ## What gets written
 
-After a Create, writing the new id is required. A spec gets one line in that spec’s `work-item.md`, with the milestone or slice label. An item with no spec gets a row on `## No spec yet in ADO` in `docs/system/landscape.md`: id, title, and date. When a spec is made later, the id moves into that spec’s `work-item.md`. The command names the file it wrote. That file is not committed yet and must be committed. Without it a later run offers Create again and would make a duplicate. If the write fails, the command says so and prints the line to add. The command reports what was created and what was updated. It does not commit. It names `/crav1-finalize-commit` and does not run it.
+After a Create, writing the new id is required. A spec gets one line in that spec’s `work-item.md`, with the milestone or slice label and its home: `Work item: 52 — October billing (ADO: contoso/bc-operations)`. Older lines without the home are read as the org and project in `docs/environments/marks.md` and get the tag on the next write, without a question. An item with no spec gets a row on `## No spec yet in ADO` in `docs/system/landscape.md`: id, title, and date. When a spec is made later, the id moves into that spec’s `work-item.md`. The command names the file it wrote. That file is not committed yet and must be committed. Without it a later run offers Create again and would make a duplicate. If the write fails, the command says so and prints the line to add. The command reports what was created and what was updated. It does not commit. It names `/crav1-finalize-commit` and does not run it.
 
 ## After
 

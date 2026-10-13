@@ -178,6 +178,8 @@ The org and project come from the first source that names both:
 
 Do not ask for a typed path. Do not guess an org.
 
+A recorded id is read in its own home: the `(ADO: <org>/<project>)` tag on its `work-item.md` line, or the `Work items go to` cell of the repo in `docs/system/repos.md`, as [work-item-homes.md](../crav1-specs-to-ado/references/work-item-homes.md) (drop-in: `.claude/skills/crav1-specs-to-ado/references/work-item-homes.md`; plugin: sibling `skills/crav1-specs-to-ado/references/work-item-homes.md`) says. An older line without a tag uses the pair above. An id not found there is reported as moved or missing with that home; ask before searching other projects. This command only reads: it does not ask for or write a home.
+
 For source 3, read `docs/system/repos.md` when that file exists. An Azure DevOps URL matches `dev.azure.com` or `*.visualstudio.com` (HTTPS or SSH). Read the org and the project from the URL:
 
 - `https://dev.azure.com/<org>/<project>/_git/<repo>` — path segments. Ignore userinfo such as `https://<org>@dev.azure.com/...`.

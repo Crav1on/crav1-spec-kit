@@ -10,7 +10,7 @@ Read back the Azure Boards task items a spec records and bring kept changes into
 
 Pick a spec with task lines in `work-item.md`, or all. Every recorded task item is read back (State, title, description, acceptance, Assigned To, comments, history) and only what differs from the spec and `tasks.md` is shown, plus child items under the Feature that no task line records.
 
-Each difference is kept or dismissed, fresh every run. Kept changes go in through [`/crav1-add-to-spec`](crav1-add-to-spec.md). A task in the done state in Azure Boards ticks its box only on your yes; one reopened there unticks a ticked box only on your yes. A new child is added as a task, with its id recorded in `work-item.md`, only on your yes. It never writes a field back; a reply comment is stripped and posted only on yes.
+Each difference is kept or dismissed, fresh every run. Kept changes go in through [`/crav1-add-to-spec`](crav1-add-to-spec.md). A task in the done state in Azure Boards ticks its box only on your yes; one reopened there unticks a ticked box only on your yes. Each id is read in its own work item home; one not found is reported as moved or missing. A new child is added as a task, with its id recorded in `work-item.md`, only on your yes. It never writes a field back; a reply comment is stripped and posted only on yes.
 
 ## Runs when
 

@@ -14,6 +14,8 @@ Each task is previewed as a child of the Feature: a fuller title that says what 
 
 On an update, a box ticked since the item was sent offers moving it to the done state, and an unticked box on a closed item offers a reopen to New, each only on a yes. A disagreement the `tasks.md` history does not explain shows both sides and asks each time. The kit never sets Active or Resolved and never sends Reason.
 
+Each task goes to its repo's work item home and its parent is the Feature in that home. A task with no clear repo, or with repos in different homes, is asked about. The child type and done state are saved per home in `docs/environments/marks.md`.
+
 ## Runs when
 
 Send a spec's tasks to Azure Boards under its Feature. Called by the user. [`/crav1-specs-to-ado`](crav1-specs-to-ado.md) names it and does not run it.

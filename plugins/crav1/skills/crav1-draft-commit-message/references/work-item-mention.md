@@ -32,6 +32,10 @@ Ignore HTML comments, including the sample lines inside `docs/specs/_template/wo
 | `Work item: 1234 — task: T3 Short title` | A **task line**, written by `/crav1-tasks-to-ado`. Id `1234`, task `T3`. Not a Feature line. See Task lines. |
 | Anything else | That line is not a mention. Other lines are still read. |
 
+A line may end with its work item home, `(ADO: <org>/<project>)` ([work-item-homes.md](../../crav1-specs-to-ado/references/work-item-homes.md)). Strip it before reading the label. A line without it is in the marks.md org and project.
+
+**Home (Azure DevOps part of `/crav1-open-pr`, and commits).** When the lines carry homes, a mention counts only for lines whose home is the home of the code repo being committed or opened against (its `Work items go to` cell in `docs/system/repos.md`). Lines in other homes are not usable lines for this repo. When that cell is empty, all lines stay usable and the home is not asked here.
+
 The label `Work item:` is case-insensitive. Surrounding whitespace does not matter. Digits are the id. `AB#` plus digits, or `#` plus digits, is a full token.
 
 The milestone or slice label is the text after the first ` — ` (space, em dash, space) or ` - ` (space, hyphen, space) that follows the id token. The writer uses the em dash. The reader accepts both. A line with no separator has no label.

@@ -32,6 +32,12 @@ CLI checks and the `az` calls: the same file `/crav1-specs-to-ado` uses, [azure-
 
 On a failure, state the issue, suggest a fix such as `az login`, and offer Retry or Skip. Skip stops this command. Say the Azure Boards calls did not run, and why. Do not install. Do not log in. Do not run `az login`. Do not guess the org or the project.
 
+## Work item homes
+
+Each task goes to the home of its repo, as [work-item-homes.md](../crav1-specs-to-ado/references/work-item-homes.md) (drop-in: `.cursor/skills/crav1/crav1-specs-to-ado/references/work-item-homes.md`; plugin: sibling `skills/crav1-specs-to-ado/references/work-item-homes.md`) says: read the `Work items go to` cell in `docs/system/repos.md`, and ask for an empty one, once per repo. A task with no clear repo is asked once, suggesting the spec's main repo. A task whose repos are in different homes is asked: split it (through `/crav1-add-to-spec`) or pick one repo's home.
+
+Its parent is the spec's Feature **in that same home** (the Feature line whose `(ADO: …)` tag matches). When the spec has no Feature in that home, say so and name `/crav1-specs-to-ado`. Do not send that task. Do not parent it to a Feature in another home.
+
 ## Which spec
 
 The user picks one spec. List the specs whose `docs/specs/<slug>/work-item.md` records a Feature id (a `Work item: <id> — <label>` line that is not a task line). Skip `_template`. Use the questions tool when it is available and the list fits. Stop until they pick.
@@ -46,12 +52,14 @@ The user picks by number, or all. Stop until they pick. Do not preview a task th
 
 ## Child type
 
-Read the child work item type and its done state from the lines in `docs/environments/marks.md`:
+Read the child work item type and its done state for **that task's home** from the lines in `docs/environments/marks.md`:
 
 ```text
-Azure Boards task type: <type>
-Azure Boards task done state: <state>
+Azure Boards task type (<project>): <type>
+Azure Boards task done state (<project>): <state>
 ```
+
+A line without `(<project>)` is the line for the marks.md project. Each home asks its own type once.
 
 When the type line is there, use it. Do not ask. The user changes it by editing that line. When the type line is there and the done-state line is missing, read the type's states once as [references/child-items.md](references/child-items.md) says and append the done-state line. Do not ask.
 
@@ -80,7 +88,8 @@ For each pick, show the Azure Boards form in plain words. The label is **Create*
 
 | Form field | What to show |
 | --- | --- |
-| Type | The saved child type |
+| Home | `ADO: <org>/<project>`, the task's home |
+| Type | The saved child type for that home |
 | Parent | The Feature id |
 | Title | A fuller title that says what the work is: the area, then the task, for example `Email service: enable the day-ahead use case on dev` |
 | State | New when the `tasks.md` box is open. The saved done state (Closed or Done) when the box is ticked. See **State** below |
@@ -150,10 +159,10 @@ Stop until they pick. Create or update only on a yes, as [references/child-items
 After a create, append one line to `docs/specs/<slug>/work-item.md`. This is a required final step of the run.
 
 ```text
-Work item: <id> — task: T<n> <short title>
+Work item: <id> — task: T<n> <short title> (ADO: <org>/<project>)
 ```
 
-A re-run reads these lines and offers **Update #<id>** for that task. An update keeps the line. Never write an id into `tasks.md`. When the line is already there, leave it. If the write fails, say so and print the exact line to add.
+The line ends with its home. Add the tag to older lines in that file that have none, without asking. A re-run reads these lines and offers **Update #<id>** for that task. An update keeps the line. Never write an id into `tasks.md`. When the line is already there, leave it. If the write fails, say so and print the exact line to add.
 
 ## Report
 
