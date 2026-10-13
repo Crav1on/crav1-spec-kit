@@ -4,6 +4,17 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 
 ## Unreleased
 
+## 1.44.0 (2026-10-13)
+
+### Kit
+
+- `/crav1-review-pr` comment style (agreed by Thomas and Rhea, 2026-10-12) for the paste-ready block, posted comments, and re-review replies: the user's own friendly first-person voice, the source kept vague ("me and my checks", never a tool, skill, or bot), a varied opening every time, soft wording with the same information, and the description read first so deliberate choices are acknowledged and moved to Follow-ups. The sections are now Blocker, Bugs, Tests to add with this PR, and Follow-ups (not for this PR), replacing blocking / should fix / nit. Each file links to the pull request files view (GitHub or Azure DevOps) with per-line remarks usable as inline comments. Posting on yes, the summary without the verdict line, the verdict options, and the re-review statuses are unchanged.
+- `plugins/crav1/.cursor-plugin/plugin.json` is 1.44.0.
+
+### Docs
+
+- The review-pr reference page describes the comment style.
+
 ## 1.43.0 (2026-10-13)
 
 ### Kit
