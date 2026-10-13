@@ -52,6 +52,28 @@ A redact removes the item from the file and the quote and notes the redaction in
 
 Removing something after it is pushed means rewriting git history, so the check runs before anything is written. The skills do not commit. You do.
 
+## One policy for Cursor and Claude Code
+
+The transfer data policy is one shared policy with two copies: `.cursor/rules/crav1-transfer-data-policy.mdc` and `.claude/rules/crav1-transfer-data-policy.md`. The kit writes both copies together. When only one exists, it copies it across with the same words. When a repo has two copies that disagree, the kit says so and you pick which one wins; it does not merge them.
+
+## How imports handle hard cases
+
+- **Temporary files** go to a new folder in the system temp folder, outside the repo, and are deleted at the end even when the run fails.
+- **Images the kit cannot view** (for example in a headless `-p` run) are never guessed at. The kit says so, leaves the image out, and asks Rhea or you to check it before keep or leave.
+- **Headless two-pass mode.** Pass 1 writes its questions to a file in the system temp folder and stops. You answer them, and pass 2 reads the answers and finishes. If the file is gone, the questions are asked again.
+- **Partial extracts** get a "Left out" list in the source README: each skipped section or page with a reason.
+- **Black-boxed PDF text** is treated as redacted: never copied, marked `[redacted in source]`.
+- **Superseded versions** are kept, marked "Superseded by" with a link to the newer one; only the newest is read for specs.
+- **Source precedence:** the newest source that records a decision wins; otherwise it becomes an open question. A multi-file intake ends with one conflict pass.
+- **Plain uncontested facts** (a date, a name) are applied without asking and listed in the run summary. Decision changes and conflicts are still asked.
+- **One folder per document:** `docs/sources/YYYY-MM-DD-<doc-slug>/`, each with its own README.
+- **Ambiguous dates** such as `03/04` are kept as written and become an open question, unless the locale or a weekday settles them.
+- **Word files** are read with tracked changes accepted but flagged; comments are listed with author and date; spec-relevant ones become open questions.
+- **Duplicate images** are stored once, with every place they appear listed, and asked about once.
+- **Glossary:** new terms are added freely; rewriting an existing row shows old and new with the source and waits for your yes.
+
+The full rules are in [sources.md](../../.cursor/skills/crav1/crav1-add-to-spec/references/sources.md).
+
 ## Related
 
 - [Data layout](data-layout.md) for the source folder and its `README.md`.

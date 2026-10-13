@@ -75,6 +75,8 @@ The same field rule applies on an update. When the type has no Acceptance Criter
 
 ### Nothing from the specs repo
 
+Strip before the preview. The candidate list from `/crav1-feature-candidates` carries spec-internal material: spec paths, `docs/sources/` folders, `docs/research/` and `docs/notes/` paths, source headings, and spec references such as `(source: <slug>, Milestones)`. Remove all of it from the title, the description, the acceptance, and the tags before the form is shown. Keep the facts, the names, the dates, and the quotes. The preview is what will be sent, so it must already be stripped.
+
 Anything that would be sent — title, description, acceptance, tags, comment — must not mention the repo that holds the specs. No spec path, no link to that repo, no kit name, no skill name. Say the goal in the words the spec uses, without pointing at the file.
 
 A commit mention `AB#` that already exists in a code repo stays as it is. Do not rewrite those commits. Do not put that mention into the Feature description.

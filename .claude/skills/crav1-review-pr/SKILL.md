@@ -6,7 +6,9 @@ description: >-
   green linter. When it has no plan.md or tasks.md, an info note, spec
   and the body, the pipeline's recorded tests, and that linter.
   Cross-cutting. Not a lane and not a bot. Same family as /crav1-open-pr
-  and /crav1-merge-pr. Does not edit, test, vote, comment, or merge.
+  and /crav1-merge-pr. Ends with a paste-ready comment; posts it inline
+  and sets a verdict only after the user's yes. Re-review marks earlier
+  findings fixed or open. Does not edit, test, or merge.
 disable-model-invocation: true
 icon: git-pull-request
 color: orange
@@ -24,7 +26,7 @@ Run it only when **this turn** names an open pull request (number or URL), or cl
 
 `/crav1-open-pr` may name this command as an optional next step. It must not run it. `/crav1-merge-pr` must not run it. A review is not a merge ask. Spark, specify, and verify do not run this command. Do not run it from those skills. Do not run it from plan.
 
-You read the diff. You do not edit code, the spec, or the plan. You do not run the tests. You do not ask to run the tests. You do not vote, post a comment, install a linter, change branch protection, or merge. A comment or a vote is a later explicit ask, not this skill.
+You read the diff. You do not edit code, the spec, or the plan. You do not run the tests. You do not ask to run the tests. You do not install a linter, change branch protection, or merge. You post comments or set a verdict only as [Post it](#post-it) says, after the user's yes.
 
 On Windows, `git` may not be on `PATH`. Try `git`, then `C:\Program Files\Git\cmd\git.exe`. `az` may be `az.cmd`. Quote any `--query` value that contains parentheses.
 
@@ -268,11 +270,52 @@ On an outside pull request, the last line names `/crav1-keep-current` as the nex
 Next, after this pull request merges: /crav1-keep-current, to bring its changes into the spec and docs/system/.
 ```
 
-Then stop.
+Then the [paste-ready comment](#paste-ready-comment), then the [post offer](#post-it). Then stop.
 
 Do not merge. Merge stays a later explicit `/crav1-merge-pr` ask for this named pull request. Do not run it. A review is not that ask. `/crav1-merge-pr` still stops on its own when a required host check is red. This skill does not replace that stop, and it does not clear it.
 
-Do not post the review as a comment. Do not vote. Do not open a spec. Do not edit the pull request body.
+Do not post or vote except as [Post it](#post-it) says. Do not open a spec. Do not edit the pull request body.
+
+## Re-review
+
+When the pull request already has an earlier review, this run is a re-review. Read the earlier findings from the pull request's own review comments and threads (GitHub `gh api repos/<owner>/<repo>/pulls/<n>/comments` and `gh pr view <n> --json reviews,comments`; Azure DevOps `az repos pr thread list` or `az rest --method get` on the pull request threads). Comments from anyone count, including ones this skill posted. A paste-ready block still in this chat is the fallback only when the pull request has no earlier review comments. When neither exists, do a first review.
+
+Go through each earlier finding, one line each, before the new findings:
+
+- **Fixed:** the code changed and the problem is gone. Name the commit that fixed it (short SHA).
+- **Partly fixed:** some of it changed. Say what is left.
+- **Still open:** the problem is still there.
+- **No longer relevant:** the code was removed or rewritten so the finding no longer applies.
+
+A thread marked resolved whose problem is still there is flagged `resolved but still open`. Do not guess a status: when the diff does not settle it, say so.
+
+New findings go under their own heading, `New findings`, grouped by severity as below. The ship-or-not rule counts still-open, partly-fixed, and new first-section findings.
+
+## Paste-ready comment
+
+End every review with one fenced Markdown block the user can paste into the pull request as one comment. Keep the tone the review already uses: short plain sentences, what is off, what could happen, no blame, no praise padding.
+
+- First line: the verdict, one line: `Approve`, `Approve with comments`, or `Changes needed`, and why in a few words.
+- Then the findings grouped by severity: **Blocking** (first-section fix or drop), **Should fix**, **Nit** (suggestions). Each finding: `path:line`, what is wrong, the suggested fix.
+- On a re-review, the earlier findings and their status come first, then `New findings`.
+- No kit-internal details: no spec paths, no `docs/sources/` folders, no vault, no kit or skill names, no `F1` numbering that only this chat explains. A plan or verify miss is said in plain words about the change.
+- English, unless the user names another language.
+
+The block is text in the chat. Showing it posts nothing.
+
+## Post it
+
+After the paste-ready block, offer to post. One question. Use the questions tool when it is available. Say it posts under the user's own account. Options: post, or do not post. Nothing posts without that yes.
+
+On yes:
+
+1. Post each finding as an inline comment on its exact file and line in the diff (GitHub: a pending review with `gh api repos/<owner>/<repo>/pulls/<n>/reviews` and one comment per finding with `path`, `line`, `side`; Azure DevOps: one thread per finding with `threadContext` file path and line). A finding with no line in the diff goes in the summary only.
+2. On a re-review, reply in each earlier finding's existing thread with its status and the fixing commit. Add new inline comments only for new findings. Do not add a duplicate comment for an earlier finding.
+3. Post the summary: the paste-ready block **without** the verdict line.
+4. Then ask which verdict to set, as options: **Approve**, **Comment**, or **Request changes** (Azure DevOps: approve, no vote, wait for author, reject). Name the one the review points to. Set only the one the user picks. On GitHub the inline comments and summary go in that same review submit.
+5. Never resolve a thread. On a re-review, after posting, offer to resolve the threads marked Fixed. Resolve only on that yes.
+
+When a post fails, say what failed and what already posted. Do not retry by another route.
 
 ## Hard rules
 
@@ -281,7 +324,7 @@ Do not post the review as a comment. Do not vote. Do not open a spec. Do not edi
 - No edits to code, `spec.md`, `plan.md`, `tasks.md`, or `verify.md`.
 - No test run, and no ask to run tests. When the slug has `plan.md`, quote `verify.md` or say it is missing. When the pull request is outside the kit, do not say `verify.md` is missing. Read the pipeline's recorded test results.
 - No linter install. No branch-protection change. No required-check edit.
-- No comment, no vote, no label, no reviewer assignment.
+- No comment, no vote, and no thread resolve without the user's yes in [Post it](#post-it). No label, no reviewer assignment.
 - No merge. Do not run `/crav1-merge-pr`.
 - Do not run `/crav1-keep-current`. On an outside pull request, name it once, as the next step after the pull request merges.
 - Do not run this skill from `/crav1-open-pr`, `/crav1-merge-pr`, spark, specify, plan, or verify.

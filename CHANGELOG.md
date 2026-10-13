@@ -4,6 +4,20 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 
 ## Unreleased
 
+## 1.43.0 (2026-10-13)
+
+### Kit
+
+- Imported sources (`crav1-add-to-spec` `references/sources.md`, used by add-to-spec, intake, match, match-dump, and meeting): the transfer data policy is one shared policy for Cursor and Claude Code, written as both copies together and copied across when only one exists (conflicting copies: the user picks). Temporary files go to the system temp folder and are deleted even on failure. An image the kit cannot view is never guessed at: it is left out and flagged for Rhea or the user to check. New two-pass headless mode (questions to a temp file, answers on a second run). Partial extracts get a "Left out" list. Black-boxed PDF text is treated as redacted (`[redacted in source]`). Superseded versions are kept and marked "Superseded by"; only the newest is read. Source precedence: newest decided source wins, otherwise an open question, with a conflict pass after a multi-file intake. Plain uncontested facts are applied without asking and listed in the run summary. One folder per document. Ambiguous dates are never guessed. `.docx` tracked changes are accepted but flagged and comments listed with author and date. Exact duplicate images are stored once. New glossary terms are added freely; rewriting an existing row needs a yes.
+- `/crav1-review-pr` ends with a paste-ready Markdown comment (verdict, findings by severity with file and line, suggested fix, no kit-internal details, English by default). After the user's yes it posts each finding as an inline comment on its line and a summary without the verdict line, then offers the verdict options (approve, comment, request changes). A re-review reads earlier findings from the pull request's threads and marks each Fixed (with the commit), Partly fixed, Still open, or No longer relevant, flags resolved-but-still-open threads, replies in existing threads, and resolves threads only after a yes.
+- `/crav1-feature-candidates` uses the hand-made layout: titles that say what the work is, fixed labelled lines per candidate (Target date with source, Spec, Description, Open blockers/questions, Order/priority), and fuller descriptions with context, owners, related tasks, and dated quotes, with no invented facts.
+- `/crav1-specs-to-ado` strips spec paths, `docs/sources/` folders, and spec references from the candidate text before the preview.
+- `plugins/crav1/.cursor-plugin/plugin.json` is 1.43.0.
+
+### Docs
+
+- [Data policy](docs/concepts/data-policy.md): the shared policy and how imports handle the hard cases. Skill reference pages regenerated for review-pr, feature-candidates, and specs-to-ado.
+
 ## 1.42.0 (2026-10-11)
 
 ### Kit

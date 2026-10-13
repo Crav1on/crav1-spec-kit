@@ -87,17 +87,21 @@ The chat list, and the list handed to `/crav1-specs-to-ado`, is this table and t
 | --- | --- | --- | --- | --- |
 | 1 | Short title | 2026-11-01 (`docs/specs/<slug>/spec.md`, Milestones) | `<slug>` | 52 |
 
-Title is short, in the style of an Azure Boards title: the milestone, slice, or item name the docs use. Do not prefix it with “Feature”. Do not put a spec path in the title.
+Title says what the work is, in the style of an Azure Boards title: the area, then the milestone, slice, or item in the words the docs use, for example `Email service: DA Nord Pool MCR via mailbox`. Do not prefix it with “Feature”. Do not put a spec path in the title.
 
 Spec is the slug, `no spec yet`, or `questions only (<slug>)`.
 
 Already in ADO is the recorded id, or empty.
 
-Under the table, one block per row:
+Under the table, one block per row. The heading is `## <#>. <Title>`. Then these fixed labelled lines, always in this order, always present:
 
-- **Description.** Two to four sentences that stand alone. Cover the goal, the status, and what is open, using only words the docs state. When the source is thinner than two sentences, use only what it states. Do not add filler. A fact from research or sources names that folder in this block. When that research is stale, say it is stale and quote the mark. A fact from a note names that note path and says it is a note.
-- **Open blockers and questions.** The open questions, actions, and unchecked work the docs state. Questions-only rows list the questions here and in the description. When none are written, say none are written down.
-- **Order.** `dated, <date>` or `undated. The user’s team prioritizes this.`
+- **Target date:** the date and its source (file and heading), or `-` when the docs state none.
+- **Spec:** the slug folder, `no spec yet` (with the closest place the docs name, when they name one), or `questions only (<slug>)`.
+- **Description:** a full paragraph that stands alone: the goal and the context, the status, who does what, related task-list items, and short quotes with the speaker's name and the date when the docs record them. Use only what the docs state. When the source is thin, use only what it states. Do not add filler. A fact from research or sources names that folder. When that research is stale, say it is stale and quote the mark. A fact from a note names that note path and says it is a note.
+- **Open blockers/questions:** one bullet each for the open questions, actions, blockers, and unchecked work the docs state, with who and when where the docs say. Questions-only rows list the questions here and in the description. When none are written, one bullet says none are written down.
+- **Order/priority:** `<n> by date` for a dated row, or `undated. The user’s team prioritizes this.`
+
+This is the layout of the list in chat and of the file. Do not drop a line because it is empty. No invented facts: no name, quote, date, or owner the docs do not state.
 
 No invented facts. Do not turn a guess into a row.
 
