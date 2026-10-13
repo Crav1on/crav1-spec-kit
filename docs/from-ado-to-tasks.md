@@ -46,7 +46,9 @@ It then lists **New under the Feature**: child items in Azure Boards that no tas
 
 Each difference is kept or dismissed, one at a time. Dismiss is for this run only; the next run asks again. A kept change goes into the spec and `tasks.md` through `/crav1-add-to-spec`, quoted as `From ADO <date>. <who>.`
 
-- A task that is Done or Closed in Azure Boards ticks its `tasks.md` box only when the user says yes.
+- A task that is in the done state in Azure Boards (the `Azure Boards task done state` line in `docs/environments/marks.md`) ticks its `tasks.md` box only when the user says yes.
+- A task that was reopened in Azure Boards while its box is ticked unticks the box only when the user says yes.
+- Active or another in-progress state is not shown as a difference. People set it, and the kit leaves it alone.
 - A new child item is added as a task only on yes. It gets the next `T<n>` in `tasks.md` and a line `Work item: <id> — task: T<n> <short title>` in `work-item.md`. Ids never go into `tasks.md`.
 
 ### Reply comments

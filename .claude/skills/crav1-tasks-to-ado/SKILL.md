@@ -3,7 +3,7 @@ name: crav1-tasks-to-ado
 description: >-
   Send the tasks of one spec to Azure Boards as child work items of that
   spec's Feature. Check az first. The child type is asked once and saved
-  in docs/environments/marks.md. List every task, preview the form, then
+  in docs/environments/marks.md, with the done state. List every task, preview the form, then
   create or update only after the user says yes. Record the id in
   work-item.md. Later skill. Not a starter option.
 disable-model-invocation: true
@@ -46,13 +46,14 @@ The user picks by number, or all. Stop until they pick. Do not preview a task th
 
 ## Child type
 
-Read the child work item type from the line in `docs/environments/marks.md`:
+Read the child work item type and its done state from the lines in `docs/environments/marks.md`:
 
 ```text
 Azure Boards task type: <type>
+Azure Boards task done state: <state>
 ```
 
-When the line is there, use it. Do not ask. The user changes it by editing that line.
+When the type line is there, use it. Do not ask. The user changes it by editing that line. When the type line is there and the done-state line is missing, read the type's states once as [references/child-items.md](references/child-items.md) says and append the done-state line. Do not ask.
 
 When the line is missing, read the project's work item types as [references/child-items.md](references/child-items.md) says, and ask once which type a task becomes. Options only: the returned types.
 
@@ -69,7 +70,7 @@ An inherited or custom process uses its requirement backlog level, whatever its 
 
 When the process or the backlog levels cannot be read, say so in one line and give no recommendation. Do not guess from the type names.
 
-Use the questions tool when it is available. Stop until they pick. Then append that line to `docs/environments/marks.md`. Create the file when it is missing. Do not rewrite other lines.
+Use the questions tool when it is available. Stop until they pick. Then read that type's states, as [references/child-items.md](references/child-items.md) says: the done state is the state in the `Completed` category, for example `Closed` on Agile and `Done` on Scrum and Basic. Append the type line and the done-state line to `docs/environments/marks.md`. Create the file when it is missing. Do not rewrite other lines. When the states cannot be read, say so, append only the type line, and send no state other than New in this run.
 
 Then read that type's fields once, as `azure-boards.md` reads the Feature fields, to see whether it has Acceptance Criteria.
 
@@ -82,7 +83,7 @@ For each pick, show the Azure Boards form in plain words. The label is **Create*
 | Type | The saved child type |
 | Parent | The Feature id |
 | Title | A fuller title that says what the work is: the area, then the task, for example `Email service: enable the day-ahead use case on dev` |
-| State | New |
+| State | New when the `tasks.md` box is open. The saved done state (Closed or Done) when the box is ticked. See **State** below |
 | Iteration | blank. The user’s team sets it |
 | Priority | blank. The user’s team sets it |
 | Tags | The slice name, then the code repos this task touches |
@@ -110,7 +111,25 @@ Remove file paths, line numbers, spec references such as `(spec: v0; Open questi
 
 ### Update
 
-An **Update** shows only the fields that differ from what `az boards work-item show` returns. Do not reset State, Iteration, Priority, or Assigned To when the docs do not state that field. Tags add what is missing and remove nothing. Do not change the parent link when it already points at the Feature. When it points elsewhere, say so and ask. Do not guess.
+An **Update** shows only the fields that differ from what `az boards work-item show` returns. Do not reset Iteration, Priority, or Assigned To when the docs do not state that field. State changes only as **State** says. Tags add what is missing and remove nothing. Do not change the parent link when it already points at the Feature. When it points elsewhere, say so and ask. Do not guess.
+
+### State
+
+The kit sets only two states: New and the saved done state. It never sets Active, Resolved, or any other in-progress state. Those stay with people. It never sends Reason. Azure Boards fills its default.
+
+On a **Create**, an open box is created as New and a ticked box as the done state, so the Feature shows all its work.
+
+On an **Update**, compare the `tasks.md` box with the State that `az boards work-item show` returns. Use the `tasks.md` git history (`git log -p -- docs/specs/<slug>/tasks.md`) to tell whether the box changed locally since the item was created.
+
+| `tasks.md` box | State in Azure Boards | Preview |
+| --- | --- | --- |
+| Ticked | Done state | Nothing. They match |
+| Ticked, and the tick is newer than the create | Not done (New, Active, Resolved, …) | Offer **State: <current> → <done state>** |
+| Open, and the box was ticked before | Done state | Offer **Reopen: <done state> → New** |
+| Open | Not done | Nothing. Leave Active or any other state as it is |
+| Ticked, and the tick is not newer than the create; or open, and never ticked in the history | Done state differs from the box |  **Conflict.** Show both sides: the box and its last change in `tasks.md`, and the Azure Boards State with who changed it and when from the history. Ask each time: set Azure Boards to match `tasks.md`, or leave Azure Boards and bring it back with `/crav1-ado-to-tasks`, or leave both |
+
+When the history cannot tell, treat the row as a conflict and ask. Never pick a winner on your own. A state change is its own line in the preview and its own yes. Send it only on that yes. A skip leaves the State as it is.
 
 ### Edits
 
@@ -124,7 +143,7 @@ Ask after the previews. Use the questions tool when it is available.
 2. **All reviewed**
 3. **Skip this one**
 
-Stop until they pick. Create or update only on a yes, as [references/child-items.md](references/child-items.md) says, with the parent link to the Feature. Do not show the command. A skip sends nothing for that task.
+Stop until they pick. Create or update only on a yes, as [references/child-items.md](references/child-items.md) says, with the parent link to the Feature. Do not show the command. A skip sends nothing for that task. A state change the user did not say yes to is not sent, even when the other fields are.
 
 ## Record
 
@@ -138,7 +157,7 @@ A re-run reads these lines and offers **Update #<id>** for that task. An update 
 
 ## Report
 
-Say what was created, what was updated, and what was skipped. One line each: the id, the title, and `T<n>`.
+Say what was created, what was updated, and what was skipped. One line each: the id, the title, `T<n>`, and the State it was created with or moved to. Name any conflict that was left as it is.
 
 When the run wrote `work-item.md` or `docs/environments/marks.md`, name each file. Say it is not committed yet and must be committed. Name `/crav1-finalize-commit`. Do not run it. Name `/crav1-ado-to-tasks` as the later read-back. Do not run it. Say that without `work-item.md` a later run offers Create again and would make a duplicate.
 

@@ -34,13 +34,14 @@ Every task in that spec's `tasks.md` is listed, numbered `T1`, `T2`, …, with `
 
 ### Child type, once
 
-On the first run the command reads the project's work item types and asks once which type a task becomes. It reads the project's process and backlog levels and marks the type directly under Feature as `(Recommended)` with one reason: User Story on Agile (a Task belongs under a User Story), Product Backlog Item on Scrum, Issue on Basic, Requirement on CMMI. Bug is recommended only when the team tracks bugs as requirements. When the levels cannot be read, it says so and gives no recommendation. The answer is saved as one line in `docs/environments/marks.md`:
+On the first run the command reads the project's work item types and asks once which type a task becomes. It reads the project's process and backlog levels and marks the type directly under Feature as `(Recommended)` with one reason: User Story on Agile (a Task belongs under a User Story), Product Backlog Item on Scrum, Issue on Basic, Requirement on CMMI. Bug is recommended only when the team tracks bugs as requirements. When the levels cannot be read, it says so and gives no recommendation. It also reads that type's states and saves the done state, the one Azure Boards counts as completed (Closed on Agile, Done on Scrum and Basic). Both are saved as lines in `docs/environments/marks.md`:
 
 ```text
 Azure Boards task type: User Story
+Azure Boards task done state: Closed
 ```
 
-Later runs use that line without asking. To change it, edit the line.
+Later runs use those lines without asking. To change one, edit the line.
 
 ### Preview, then send
 
@@ -49,7 +50,7 @@ Each pick is shown as a form labelled **Create** or **Update #<id>**, as a child
 | Field | What goes in |
 | --- | --- |
 | Title | A fuller title that says what the work is |
-| State | New |
+| State | New for an open box, the done state for a ticked box |
 | Iteration, Priority | blank. The team sets them |
 | Tags | The slice name, then the code repos the task touches. Never the specs repo |
 | Assigned To | The task owner, when the docs state one |
@@ -67,6 +68,17 @@ Example, for T1 of an email service spec:
 - **Acceptance Criteria:** A unit test shows a day-ahead message is routed to the day-ahead use case when the environment is dev.
 
 The preview is not edited in place. A change goes into the spec or `tasks.md` first through `/crav1-add-to-spec`, and the preview is rebuilt.
+
+### State
+
+The kit sets only New and the done state. It never sets Active or Resolved; people do that in Azure Boards. It never sends Reason, so Azure Boards fills its default (Completed when an item closes on Agile).
+
+- **Create:** an open box goes in as New, a ticked box as the done state.
+- **Ticked since it was sent:** the preview offers moving the item to the done state.
+- **Unticked, and the item is closed:** the preview offers to reopen it to New.
+- **Disagreement the local history does not explain**, for example closed in Azure Boards while the box was never ticked: the preview shows both sides, with who changed what and when, and asks each time. Neither side wins on its own.
+
+Each state change is its own line and its own yes. Without that yes the State stays as it is.
 
 The user answers per task: **Create** or **Update #<id>**, **All reviewed**, or **Skip this one**. Nothing is sent without that yes, because it goes out in the user's name. The `az` command is not shown.
 

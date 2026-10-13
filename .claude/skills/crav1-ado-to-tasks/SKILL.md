@@ -59,7 +59,13 @@ The user takes each difference one at a time: keep or dismiss. Use the questions
 
 A kept change goes to the spec and `tasks.md` through `/crav1-add-to-spec`. The quote starts with `From ADO <date>. <who>.` when the history shows them, else `From ADO <date>.` The impact check in that skill still runs.
 
-**Done in Azure Boards.** When a task is Closed, Done, or Resolved in Azure Boards and its `tasks.md` box is not ticked, ask once for that task: tick the box, or leave it. Tick only on yes, through `/crav1-add-to-spec`. Do not tick a box on your own. Do not untick a box.
+**State.** Compare the State with the `tasks.md` box, using the done state saved in `docs/environments/marks.md` (`Azure Boards task done state: <state>`; when the line is missing, Closed, Done, or Resolved count as done).
+
+- Done in Azure Boards and the box is open: show who closed it and when from the history, and ask once for that task: tick the box, or leave it. Tick only on yes, through `/crav1-add-to-spec`.
+- Reopened in Azure Boards (not done now, done before in the history) and the box is ticked: show both sides and ask: untick the box, or leave it. Untick only on yes, through `/crav1-add-to-spec`.
+- Active, Resolved, or another in-progress state with an open box is not a difference. Leave it out.
+
+Do not tick or untick a box on your own. Never write a State back to Azure Boards. That is `/crav1-tasks-to-ado`, and only on a yes.
 
 **New children.** For each new child, ask: add it as a task, or leave it. On yes, `/crav1-add-to-spec` adds the task to `tasks.md` with the next `T<n>`, in words from the work item, stripped as below. Then append its line to `work-item.md`: `Work item: <id> — task: T<n> <short title>`. Never write an id into `tasks.md`.
 

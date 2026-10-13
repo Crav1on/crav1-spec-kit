@@ -8,9 +8,11 @@
 
 Send the tasks of one spec to Azure Boards as child work items of that spec's Feature.
 
-Pick one spec that already has a Feature id in `work-item.md`. Every task in its `tasks.md` is listed, numbered, and you pick by number or all. The child work item type is asked once and saved as a line in `docs/environments/marks.md`; edit that line to change it. The question marks the type on the requirement backlog level directly under Feature as recommended (User Story on Agile, Product Backlog Item on Scrum, Issue on Basic, Requirement on CMMI), and gives none when the levels cannot be read.
+Pick one spec that already has a Feature id in `work-item.md`. Every task in its `tasks.md` is listed, numbered, and you pick by number or all. The child work item type is asked once and saved as a line in `docs/environments/marks.md`, with the type's done state (Closed on Agile, Done on Scrum and Basic); edit a line to change it. The question marks the type on the requirement backlog level directly under Feature as recommended (User Story on Agile, Product Backlog Item on Scrum, Issue on Basic, Requirement on CMMI), and gives none when the levels cannot be read.
 
-Each task is previewed as a child of the Feature: a fuller title that says what the work is, State New, Iteration and Priority blank, tags for the slice and the code repos, the owner when the docs state one, a fuller description (what, why, who, decisions with quotes, names, and dates, related items, open blockers or none recorded), and the task's verify line as acceptance. File paths, line numbers, spec references, and kit names are stripped; code repo names stay; the specs repo is never mentioned.
+Each task is previewed as a child of the Feature: a fuller title that says what the work is, State New (or the done state when the box is ticked), Iteration and Priority blank, tags for the slice and the code repos, the owner when the docs state one, a fuller description (what, why, who, decisions with quotes, names, and dates, related items, open blockers or none recorded), and the task's verify line as acceptance. File paths, line numbers, spec references, and kit names are stripped; code repo names stay; the specs repo is never mentioned.
+
+On an update, a box ticked since the item was sent offers moving it to the done state, and an unticked box on a closed item offers a reopen to New, each only on a yes. A disagreement the `tasks.md` history does not explain shows both sides and asks each time. The kit never sets Active or Resolved and never sends Reason.
 
 ## Runs when
 
@@ -26,11 +28,11 @@ Reads the org and project from `docs/environments/marks.md` or Azure DevOps URLs
 
 In short: Child work items in Azure Boards after a yes, then task lines in that spec's `work-item.md`.
 
-Writes a child work item only after the user says yes, linked to the Feature as its parent. After a Create, appends `Work item: <id> — task: T<n> <short title>` to `work-item.md` (required). On the first run, appends the child type line to `docs/environments/marks.md`.
+Writes a child work item only after the user says yes, linked to the Feature as its parent. After a Create, appends `Work item: <id> — task: T<n> <short title>` to `work-item.md` (required). On the first run, appends the child type line and the done-state line to `docs/environments/marks.md`.
 
 ## Does not
 
-Leaves `tasks.md` without ids, the preview unedited, Iteration and Priority blank, and the specs repo out of anything sent.
+Leaves `tasks.md` without ids, the preview unedited, Iteration, Priority, and Reason unsent, Active to people, and the specs repo out of anything sent.
 
 Limits and exceptions: a spec with no Feature id is not offered and names [`/crav1-specs-to-ado`](crav1-specs-to-ado.md). A re-run offers Update for a recorded task and shows only changed fields. Edits go into the spec first through [`/crav1-add-to-spec`](crav1-add-to-spec.md). An `az` failure states the issue, suggests a fix, and offers a skip. It does not commit. It is not a starter option.
 
