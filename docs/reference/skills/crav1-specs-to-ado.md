@@ -12,6 +12,8 @@ Sends picked candidates to Azure Boards as Features after a yes, then writes the
 
 Before the preview it strips spec paths, `docs/sources/` folders, and spec references from the candidate text, so nothing sent to Azure Boards points at the specs repo.
 
+Each implementation repo has its own work item home, the `Work items go to` column in `docs/system/repos.md` (`ADO: <org>/<project>`), asked once per repo the first time and written only after the answer. A spec whose repos are in several homes gets one Feature in each, previewed and sent on its own yes, linked in the same org or mentioned in plain text across orgs. Id lines end with `(ADO: <org>/<project>)`.
+
 ## Runs when
 
 Send picked candidates to Azure Boards. Called by the user.

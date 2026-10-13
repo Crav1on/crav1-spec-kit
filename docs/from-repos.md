@@ -53,6 +53,8 @@ System notes, the same files explain reads: `docs/system/landscape.md`, `repos.m
 
 A meaning the code does not state is `to be researched` on a glossary row. A later re-read appends a new row and does not rewrite a row that is already there. The first write is the one that creates the file. When real notes are already there and the architecture spec is missing, this command does not edit those notes except the `Synced at` cell of a repo it read, and only when `repos.md` already exists. A whole-repo read sets that cell to `<branch>@<short sha>, <date>`. A repo may list several branches, separated by `; `. Example: `main@abc1234, 2026-10-07; develop@def5678, 2026-10-06`. It touches only the repos it read.
 
+`repos.md` also has a **Work items go to** column, each repo's work item home (`ADO: <org>/<project>`). This command adds the column when it is missing and leaves its cells empty. The first Azure Boards command that needs a repo's home asks for it. See [From specs to Azure Boards](from-specs-to-ado.md#work-item-homes).
+
 No `plan.md`. No `tasks.md`. No application code. No `security.md`. No `work-item.md`.
 
 The picture is the short description, the diagram, and how the parts connect. The first write fills those three from the confirmed facts. A later re-read adds only what is new and does not rewrite a line that is already there. When real notes are already there and the architecture spec is missing, the picture stays as it is. This command does not run `/crav1-keep-current`.

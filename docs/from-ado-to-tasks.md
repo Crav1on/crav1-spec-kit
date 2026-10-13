@@ -42,6 +42,8 @@ T1 (#1234): Enable the day-ahead use case on dev
 
 It then lists **New under the Feature**: child items in Azure Boards that no task line records.
 
+Each id is read in its own home, the `(ADO: <org>/<project>)` tag on its line. An id not found there is reported as moved or missing, and the command asks before searching other projects.
+
 ### Keep or dismiss
 
 Each difference is kept or dismissed, one at a time. Dismiss is for this run only; the next run asks again. A kept change goes into the spec and `tasks.md` through `/crav1-add-to-spec`, quoted as `From ADO <date>. <who>.`

@@ -26,6 +26,10 @@ That slash command *is* the prompt.
 
 The org and the project come from `docs/environments/marks.md`, or from the Azure DevOps URLs in `docs/system/repos.md`, the same way as `/crav1-specs-to-ado`. The command checks that `az` works, including the default install paths. If `az` fails, it states the issue, suggests a fix such as `az login`, and offers a skip. It does not install `az` and it does not log in.
 
+### Work item homes
+
+Each task goes to the home of its repo, from the **Work items go to** column in `docs/system/repos.md` (asked once per repo the first time, see [From specs to Azure Boards](from-specs-to-ado.md#work-item-homes)). A task with no clear repo is asked once, suggesting the spec's main repo. A task touching repos in different homes is asked: split it, or pick one. Its parent is the spec's Feature in that same home.
+
 ### Pick a spec, then tasks
 
 The user picks one spec. Only specs whose `work-item.md` already records a Feature id are offered. A spec without one points at `/crav1-specs-to-ado`.
@@ -37,9 +41,11 @@ Every task in that spec's `tasks.md` is listed, numbered `T1`, `T2`, …, with `
 On the first run the command reads the project's work item types and asks once which type a task becomes. It reads the project's process and backlog levels and marks the type directly under Feature as `(Recommended)` with one reason: User Story on Agile (a Task belongs under a User Story), Product Backlog Item on Scrum, Issue on Basic, Requirement on CMMI. Bug is recommended only when the team tracks bugs as requirements. When the levels cannot be read, it says so and gives no recommendation. It also reads that type's states and saves the done state, the one Azure Boards counts as completed (Closed on Agile, Done on Scrum and Basic). Both are saved as lines in `docs/environments/marks.md`:
 
 ```text
-Azure Boards task type: User Story
-Azure Boards task done state: Closed
+Azure Boards task type (bc-operations): User Story
+Azure Boards task done state (bc-operations): Closed
 ```
+
+The lines are kept per home. A line without `(<project>)` counts for the project in `docs/environments/marks.md`.
 
 Later runs use those lines without asking. To change one, edit the line.
 
@@ -87,7 +93,7 @@ The user answers per task: **Create** or **Update #<id>**, **All reviewed**, or 
 After a Create, one line per task is appended to that spec's `work-item.md`:
 
 ```text
-Work item: 1234 — task: T1 Enable the day-ahead use case on dev
+Work item: 1234 — task: T1 Enable the day-ahead use case on dev (ADO: contoso/bc-operations)
 ```
 
 A later run sees the line and offers **Update #1234**. Ids never go into `tasks.md`. On the first run the child type line is also appended to `docs/environments/marks.md`. The command reports what was created, updated, and skipped, names the files it wrote, and says they are not committed yet. Without `work-item.md` a later run offers Create again and would make a duplicate. It does not commit.

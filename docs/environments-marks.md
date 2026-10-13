@@ -51,8 +51,14 @@ A mark from a connection, a deployment name, or infrastructure code is cited on 
 `/crav1-tasks-to-ado` appends two lines, once, after the user picks which work item type a task becomes: the type, and that type's done state read from the project (Closed on Agile, Done on Scrum and Basic):
 
 ```text
-Azure Boards task type: User Story
-Azure Boards task done state: Closed
+Azure Boards task type (bc-operations): User Story
+Azure Boards task done state (bc-operations): Closed
 ```
+
+The lines are kept per work item home, one pair per project. A line without `(<project>)` is the pair for the project this file names.
+
+## Azure DevOps org and project
+
+This file keeps the Azure DevOps org. The project it names is only a fallback: the suggestion when a repo's work item home is asked, and the home of an older `work-item.md` line with no `(ADO: …)` tag. Each repo's own home is the **Work items go to** column in `docs/system/repos.md`. See [From specs to Azure Boards](from-specs-to-ado.md#work-item-homes).
 
 They are not environment marks. Later runs of that command read them and do not ask again. When only the type line is there, the next run reads the done state and appends its line without asking. Edit a line to change it. `/crav1-ado-to-tasks` reads the done-state line too. See [From tasks to Azure Boards](from-tasks-to-ado.md).
