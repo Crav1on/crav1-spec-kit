@@ -127,6 +127,6 @@ Say what was created and what was updated. One line each: the id, the title, and
 
 When a create wrote a file, name that file. Say it is not committed yet and must be committed. Name `/crav1-finalize-commit`. Do not run it. Say that without that file a later run offers Create again and would make a duplicate.
 
-Name `/crav1-ado-to-specs` as the later read-back. Do not run it.
+Name `/crav1-ado-to-specs` as the later read-back. Name `/crav1-tasks-to-ado` as the next step to send that spec's tasks as child work items of the Feature. Do not run either.
 
 Do not plan. Do not implement. Do not commit.

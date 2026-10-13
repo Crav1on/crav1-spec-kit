@@ -4,6 +4,18 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 
 ## Unreleased
 
+## 1.45.0 (2026-10-13)
+
+### Kit
+
+- New skill `/crav1-tasks-to-ado` (cross-cutting, later skill, not a starter). Pick one spec that already has a Feature id in `work-item.md`; every task in its `tasks.md` is listed and you pick by number or all. The child work item type is asked once and saved as `Azure Boards task type: <type>` in `docs/environments/marks.md`. Each task is previewed (Create or Update #id, only changed fields on an update) in the Feature layout: fuller title, State New, Iteration and Priority blank, slice and code repo tags, owner when stated, fuller description with decisions, quotes, names, and dates, open blockers or none recorded, and the verify line as acceptance. Paths, line numbers, spec references, and kit names are stripped; code repo names stay; the specs repo is never mentioned. Created only after a yes, as a child of the Feature, and recorded as `Work item: <id> — task: T<n> <short title>` in `work-item.md` (never in `tasks.md`). Uses the same `az` checks as `/crav1-specs-to-ado`, plus a new `references/child-items.md`.
+- `/crav1-specs-to-ado` names `/crav1-tasks-to-ado` as the next step in its report and does not run it.
+- `plugins/crav1/.cursor-plugin/plugin.json` is 1.45.0.
+
+### Docs
+
+- New reference page for `/crav1-tasks-to-ado`, the skills table, and guild routing updated.
+
 ## 1.44.0 (2026-10-13)
 
 ### Kit

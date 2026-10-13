@@ -1658,7 +1658,49 @@ skills:
     in the spec.
   you_run_next:
   - /crav1-finalize-commit
+  - /crav1-tasks-to-ado
   first_prompt: /crav1-specs-to-ado
+- name: crav1-tasks-to-ado
+  lane: cross-cutting
+  group: Azure Boards
+  starter: false
+  since: 1.45.0
+  stage: stable
+  purpose: Send the tasks of one spec to Azure Boards as child work items of that spec's Feature.
+  in_depth:
+  - >-
+    Pick one spec that already has a Feature id in `work-item.md`. Every task in its `tasks.md` is listed,
+    numbered, and you pick by number or all. The child work item type is asked once and saved as a line
+    in `docs/environments/marks.md`; edit that line to change it.
+  - >-
+    Each task is previewed as a child of the Feature: a fuller title that says what the work is, State New,
+    Iteration and Priority blank, tags for the slice and the code repos, the owner when the docs state one,
+    a fuller description (what, why, who, decisions with quotes, names, and dates, related items, open
+    blockers or none recorded), and the task's verify line as acceptance. File paths, line numbers, spec
+    references, and kit names are stripped; code repo names stay; the specs repo is never mentioned.
+  use_when: Send a spec's tasks to Azure Boards under its Feature
+  table:
+    reads: The org, the project, the spec's Feature id, and its `tasks.md`
+    writes: Child work items in Azure Boards after a yes, then task lines in that spec's `work-item.md`
+  reads: Reads the org and project from `docs/environments/marks.md` or Azure DevOps URLs in `docs/system/repos.md`,
+    checks `az` the same way as `/crav1-specs-to-ado`, reads the Feature id from `work-item.md`, every task
+    in `tasks.md`, the saved child type line, the project's work item types on the first run, and the
+    child type's fields.
+  writes: >-
+    Writes a child work item only after the user says yes, linked to the Feature as its parent. After
+    a Create, appends `Work item: <id> — task: T<n> <short title>` to `work-item.md` (required). On the first
+    run, appends the child type line to `docs/environments/marks.md`.
+  leaves_alone: Leaves `tasks.md` without ids, the preview unedited, Iteration and Priority blank, and the
+    specs repo out of anything sent.
+  exceptions: a spec with no Feature id is not offered and names `/crav1-specs-to-ado`. A re-run offers
+    Update for a recorded task and shows only changed fields. Edits go into the spec first through `/crav1-add-to-spec`.
+    An `az` failure states the issue, suggests a fix, and offers a skip. It does not commit. It is not a
+    starter option.
+  called_by: Called by the user. `/crav1-specs-to-ado` names it and does not run it.
+  runs_by_itself: Calls `/crav1-add-to-spec` when a preview change belongs in the spec.
+  you_run_next:
+  - /crav1-finalize-commit
+  first_prompt: /crav1-tasks-to-ado
 - name: crav1-ado-to-specs
   lane: cross-cutting
   group: Azure Boards
