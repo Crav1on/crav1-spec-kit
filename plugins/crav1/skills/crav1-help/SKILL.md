@@ -67,6 +67,7 @@ The message is a skill name, with or without `/` and `crav1-`. From its `skills.
 - What it reads and what it writes.
 - Before and after: the steps before it and after it in each route that has it (`workflow.yaml`), and its `you_run_next`.
 - Its walkthrough, when it has one.
+- For `/crav1-tasks-ready-to-build`, say that it can run any time, not only at its route step.
 
 A name that matches no skill: say so and list the closest names. Do not guess.
 
@@ -78,6 +79,7 @@ The message is `next`, or describes where the user is ("new information from a m
 2. Read file state for the slice the user named, or the one slice under `docs/specs/` when there is only one. Ask which slice when there are several. File state is: does `spec.md` have items under `## Open questions`; does `plan.md` exist; does `tasks.md` have ticked (`- [x]`) or unticked tasks; does `verify.md` exist and show a failure; does `work-item.md` have a Feature or task id line. Read only; never run a command that changes anything.
 3. Answer with the route's steps in order, numbered. Mark each step done, next, skipped, or to do from the file state, with one reason each (for example "skipped: no `work-item.md`"). Keep every step, including optional ones, and say why an optional one applies or not.
 4. Name the first step to run. Do not run it.
+5. When the route reaches building tasks, add one line: `/crav1-tasks-ready-to-build` can run any time to list which tasks are ready and why the others are blocked. For a question about which tasks are ready, name that command instead of judging the tasks yourself.
 
 ### 4. A free-form question
 

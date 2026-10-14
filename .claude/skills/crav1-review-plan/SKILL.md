@@ -3,8 +3,9 @@ name: crav1-review-plan
 description: >-
   Start the crav1-plan-reviewer-agent subagent on plan.md and tasks.md against
   spec.md. Use after /crav1-plan-from-spec. Numbered plan issues (P#) for
-  /crav1-tighten-plan. Do not write application code. Do not answer new
-  product questions.
+  /crav1-tighten-plan. Writes only one line in plan.md: Reviewed: <date>,
+  P# open: n. Do not write application code. Do not answer new product
+  questions.
 disable-model-invocation: true
 icon: search
 color: orange
@@ -12,7 +13,7 @@ color: orange
 
 # Start plan reviewer
 
-This skill is the **command**. You are the parent. Immediately delegate to the **crav1-plan-reviewer-agent** subagent. Load `.claude/agents/crav1-plan-reviewer-agent.md` (drop-in) or this plugin’s `agents/crav1-plan-reviewer-agent.md`. Do not review in your own voice as a substitute. Do not edit files. Do not write application code. Do not resolve product questions (those belong on the spec).
+This skill is the **command**. You are the parent. Immediately delegate to the **crav1-plan-reviewer-agent** subagent. Load `.claude/agents/crav1-plan-reviewer-agent.md` (drop-in) or this plugin’s `agents/crav1-plan-reviewer-agent.md`. Do not review in your own voice as a substitute. Do not edit files, except the one `Reviewed:` line in **Record the review** below. Do not write application code. Do not resolve product questions (those belong on the spec).
 
 ## Find the spec folder
 
@@ -25,6 +26,10 @@ Pass the subagent these paths (read-only): `spec.md`, `plan.md`, `tasks.md`, plu
 ## What to tell the subagent
 
 Instruct it to follow its own prompt and the check rules in `crav1-plan-from-spec` [references/checks.md](../crav1-plan-from-spec/references/checks.md) (drop-in: `.claude/skills/crav1-plan-from-spec/references/checks.md`; plugin: sibling `skills/crav1-plan-from-spec/references/checks.md`), including **Linter, before Build**. A stale research finding that the plan left out of Risks is a plan issue. Stale research does not block the plan. A plan that never says whether this repo has a linter or checker for the code the tasks will touch is not complete. Finish with numbered **Issues for `/crav1-tighten-plan`** (`P1`, `P2`, …), one finding each. Mark any finding that is really a spec defect as **spec** (do not pretend the plan can fix it). No single global patch recommendation.
+
+## Record the review
+
+After the subagent returns, write one line in `plan.md`, right under the `# Plan:` title: `Reviewed: <today's date>, P# open: <n>`, where `<n>` is the number of plan and spec `P#`s it listed (0 when it found none). Replace an earlier `Reviewed:` line, and the template's comment about it, instead of adding a second line. Change nothing else in `plan.md` or `tasks.md`. Say in the recap that the line was written. `/crav1-tasks-ready-to-build` reads it. This skill does not commit.
 
 ## After it returns
 

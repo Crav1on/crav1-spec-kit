@@ -13,11 +13,13 @@ An open question is a bullet, or a numbered item, under `## Open questions` in `
   - Pending: drafted <date> for <who>, <channel>. Not marked as sent yet. Question <n> of that draft.
   - Asked: <date>, <channel> to <who>. Question <n>. Date from <the user's yes | email <date> | meeting <date> | chat <date>>.
   - Answered: <date>, <who>, <kind>: "<quote>" Source: docs/sources/YYYY-MM-DD-<slug>/
+  - Blocks: T2, T4
 ```
 
 - `<who>` is the person or group the user named. `<channel>` is `mail`, `meeting agenda`, `chat`, or `meeting questions`.
 - `Question <n>` is the number the question had in that draft. It helps match "about question 3" in a reply. It is not shown as a spec id to anyone.
 - A question has at most one `Pending:` line and at most one `Asked:` line per person. A later mark for the same person replaces the earlier line. A question asked of two people keeps one line per person.
+- `Blocks:` names the tasks in `tasks.md` that wait on this question. `/crav1-resolve-questions` writes it after a keep-open pick, and `/crav1-plan-from-spec` writes it for a kept-open question it parks as a risk. At most one `Blocks:` line per question; a new one replaces it. No `Blocks:` line means the question blocks the whole slice for `/crav1-tasks-ready-to-build`. Remove the line when the question is answered.
 - `Answered:` keeps the source's words. Do not paraphrase. When there is no source folder, end with `Source: <kind> <date>` or `Source: <kind>`.
 
 ## Asked, no, or pending

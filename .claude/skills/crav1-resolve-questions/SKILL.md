@@ -56,7 +56,7 @@ Stop. Do not edit. Do not preview a full patched spec.
 ### After a choice
 
 1. Patch **only** this question.
-   - **Keep open:** leave the bullet. You may sharpen the wording if they asked; do not resolve it.
+   - **Keep open:** leave the bullet. You may sharpen the wording if they asked; do not resolve it. When the slice has `tasks.md`, ask once which tasks it blocks, as options: each unticked `T#` (multi-select), **The whole slice**, or **None**. A pick of tasks writes one indented line under the question, `- Blocks: T2, T4`, replacing an earlier `Blocks:` line (see `crav1-add-to-spec` `references/open-questions.md`). The whole slice or None writes nothing; a kept-open question with no `Blocks:` line blocks the whole slice for `/crav1-tasks-ready-to-build`.
    - **Answer:** fold the decision into the right place (requirement/journey/acceptance, `## Constraints`, non-goals/later, or a new/updated ADR). When the question had an `Answered:` line, keep that quote and its source with the decision. **Remove** it from Open questions, with its `Asked:`, `Pending:`, and `Answered:` lines (or mark the assumption resolved). An acceptance line you add is yes/no. Name unit, system, or browser only when that kind is already obvious from the answer. Otherwise leave the kind for plan. Do not invent a test list.
    - **Cut from v0:** move to non-goals/later; remove from Open questions.
 2. Recap **Added / Removed / Still open** for this `Q#`.

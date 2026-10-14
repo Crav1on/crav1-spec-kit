@@ -89,11 +89,15 @@ Use the template in this skill’s `assets/plan.md`. Fill:
 - **Files likely touched** — real paths if a repo exists; otherwise proposed paths consistent with the spec, marked `(proposed)`
 - **Linter** — whether this repo has a linter or checker for the code those files will hold. See **Linter, before Build** in `references/checks.md`. Specify does not name the linter
 - **Requirements trace** — table: acceptance / REQ id → task ids
-- **Risks** — including kept-open questions, and each stale research finding. One line per mark: the stale line, and the note path when there is one. Stale research does not block the plan. Do not clear the mark.
+- **Risks** — including kept-open questions (when a kept-open question blocks only some tasks, also write `Blocks: T#` under it on the spec, as **Blocks lines** below says), and each stale research finding. One line per mark: the stale line, and the note path when there is one. Stale research does not block the plan. Do not clear the mark.
 - **Out of scope** — spec non-goals; do not plan them
 - **Left as committed** — only when the user left a piece. One line per piece: `Left as committed: <piece>.` Omit the heading when nothing was left.
 
 Stay inside v0. File-level, not class-by-class essays. No new product behavior. A piece marked already there is named in the trace as `already there` and has no rebuild task. A left piece is the line above and has no task.
+
+### Blocks lines
+
+The one exception to leaving `spec.md` alone. For each kept-open question under `## Open questions` that blocks only some of the new tasks, write one indented line under that question: `- Blocks: T2, T4`. Follow `crav1-add-to-spec` `references/open-questions.md` (drop-in: `.claude/skills/crav1-add-to-spec/references/open-questions.md`; plugin: sibling `skills/crav1-add-to-spec/references/open-questions.md`). Do not change the question or its other lines. On a re-plan that renumbers tasks, replace the `Blocks:` lines this plan wrote. A kept-open question with no `Blocks:` line blocks the whole slice for `/crav1-tasks-ready-to-build` (inferred). List each `Blocks:` line in the recap.
 
 ### tasks.md
 
@@ -114,6 +118,7 @@ Rules:
 - Every kept security check (`docs/system/security.md` or a Security section on the spec) maps to a task, or the trace says which task already covers it
 - Each verify note names the kind and the checks, per `references/checks.md`
 - Order so each task can be verified before the next depends on it
+- When a task needs an earlier task to be done first, end its line with `(after: T1)` or `(after: T1, T3)`. Name only real needs. A task with no `(after: …)` has no recorded dependency, and `/crav1-tasks-ready-to-build` then treats every earlier unticked task as blocking it (inferred)
 - No task is “and also the rest of the app”
 
 ## After writing

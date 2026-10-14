@@ -912,6 +912,7 @@ skills:
   - /crav1-review-plan
   - /crav1-specs-to-ado
   - /crav1-tasks-to-ado
+  - /crav1-tasks-ready-to-build
   - /crav1-complete-tasks
   - /crav1-complete-task
   - /crav1-implement-task
@@ -969,6 +970,7 @@ skills:
   runs_by_itself: Calls no skill.
   you_run_next:
   - /crav1-tasks-to-ado
+  - /crav1-tasks-ready-to-build
   - /crav1-implement-task
   - /crav1-complete-task
   - /crav1-complete-tasks
@@ -1375,6 +1377,32 @@ skills:
   first_prompt: '/crav1-help
 
     I have new information from a meeting and tasks that are not built. What do I run, in order?'
+- name: crav1-tasks-ready-to-build
+  lane: cross-cutting
+  group: Start
+  starter: false
+  since: 1.54.0
+  stage: stable
+  walkthrough: docs/from-tasks-ready-to-build.md
+  purpose: 'List the tasks ready to build, for one spec or all, and why the others are blocked. Read-only.'
+  in_depth:
+  - '**`/crav1-tasks-ready-to-build`** reads `spec.md` open questions, `plan.md` (the `Reviewed:` line and `## Risks`), `tasks.md`, and `verify.md` for one slice or every slice. A ticked task is Done when `verify.md` lists it as verified, otherwise Needs verify. Then a task is blocked by a missing `plan.md`, by a kept-open question whose `Blocks:` line names it, by a kept-open question or plan Risk with no `Blocks:` line (the whole slice, inferred), or by an unticked task in its `(after: T#)` (recorded) or, with no `(after: …)`, any earlier unticked task (inferred). Otherwise it is Ready, with a warning when the plan review is unknown (inferred) or still has open `P#`s.'
+  - 'Shows summary counts per slice, then Ready, Blocked (one reason each, recorded or inferred), Needs verify, a Done count, `Next: /crav1-implement-task T#`, and a `Source:` line. Local only: it never reads Azure Boards and names `/crav1-ado-to-tasks` for task states there. It writes nothing and runs no other skill. It can run any time. It is cross-cutting. It is not a starter option.'
+  use_when: 'You want to know which tasks can be built now, and why the others cannot'
+  table:
+    reads: '`spec.md` open questions, `plan.md`, `tasks.md`, and `verify.md` per slice'
+    writes: Nothing (a list in chat with its source)
+  reads: 'Reads, for one slice or every slice under `docs/specs/`, the open questions in `spec.md` with their `Blocks:`, `Asked:`, `Pending:`, and `Answered:` lines, the `Reviewed:` line and `## Risks` in `plan.md`, the task lines in `tasks.md` with their ticks and `(after: T#)`, and `verify.md` when it exists.'
+  writes: 'Writes a list in the chat with summary counts, Ready, Blocked, Needs verify, a Done count, the next step, and its source.'
+  leaves_alone: 'Leaves every file alone, and never reads Azure Boards.'
+  exceptions: 'does not guess a dependency or a blocking link from task text. Where nothing is recorded it uses a fallback and marks the reason inferred. It writes no marks; review-plan, tighten-plan, plan-from-spec, and resolve-questions write them.'
+  called_by: Called by the user, any time.
+  runs_by_itself: Calls no skill.
+  you_run_next:
+  - /crav1-implement-task
+  first_prompt: '/crav1-tasks-ready-to-build
+
+    @docs/specs/<slug>/'
 - name: crav1-explain
   lane: cross-cutting
   group: Keep the picture current
@@ -1730,6 +1758,7 @@ skills:
   you_run_next:
   - /crav1-plan-from-spec
   - /crav1-tasks-to-ado
+  - /crav1-tasks-ready-to-build
   - /crav1-complete-tasks
   - /crav1-complete-task
   - /crav1-implement-task
@@ -1787,6 +1816,7 @@ skills:
   called_by: Called by the user. `/crav1-specs-to-ado` names it and does not run it.
   runs_by_itself: Calls `/crav1-add-to-spec` when a preview change belongs in the spec.
   you_run_next:
+  - /crav1-tasks-ready-to-build
   - /crav1-implement-task
   - /crav1-complete-task
   - /crav1-complete-tasks

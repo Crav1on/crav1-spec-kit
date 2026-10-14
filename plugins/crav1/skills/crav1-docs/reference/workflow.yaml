@@ -48,6 +48,9 @@ routes:
       - skills: [crav1-tasks-to-ado]
         optional: true
         when: When the Feature is in Azure Boards and the tasks should be too.
+      - skills: [crav1-tasks-ready-to-build]
+        optional: true
+        when: Any time, to see which tasks are ready, which are blocked and why. Read-only.
       - skills: [crav1-implement-task, crav1-complete-task, crav1-complete-tasks, crav1-complete-features]
         when: "One task in this chat (implement-task), or a worker per task (complete-task, complete-tasks, complete-features). The complete skills implement, commit, and verify each task inside their worker, so they go straight to the pull request."
         then:
@@ -90,6 +93,9 @@ routes:
       - skills: [crav1-tasks-to-ado]
         optional: true
         when: When the tasks are in Azure Boards.
+      - skills: [crav1-tasks-ready-to-build]
+        optional: true
+        when: Any time, to see which tasks are ready after the change, which are blocked and why. Read-only.
       - skills: [crav1-complete-tasks, crav1-complete-task, crav1-implement-task]
         when: To build the tasks that are not built yet. The complete skills verify each task inside their worker.
         then:
@@ -180,3 +186,4 @@ override:
   crav1-whats-known-about: ["The one skill it names, if any"]
   crav1-export-spec: []
   crav1-help: [The skill or route step it names]
+  crav1-tasks-ready-to-build: [/crav1-implement-task]
