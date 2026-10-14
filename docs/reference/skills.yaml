@@ -156,7 +156,7 @@ skills:
   starter: true
   since: 1.0.0
   stage: stable
-  walkthrough: docs/from-intake.md
+  walkthrough: docs/from-bundle-to-specs.md
   purpose: Turn mixed intake (notes, diagrams, screenshots, optional code as context) into docs/system/
     (including glossary.md) plus one spec slug per v0 feature.
   in_depth:
@@ -217,7 +217,7 @@ skills:
   starter: true
   since: 1.0.0
   stage: stable
-  walkthrough: docs/from-match.md
+  walkthrough: docs/from-existing-to-specs-with-bundle.md
   purpose: Turn a system that already exists into specs; asks repos only or repos plus a bundle, and one
     spec or system notes plus one spec per feature.
   in_depth:
@@ -315,7 +315,7 @@ skills:
   starter: true
   since: 1.13.0
   stage: stable
-  walkthrough: docs/from-environment.md
+  walkthrough: docs/from-read-environment.md
   purpose: Read the host the user named.
   in_depth:
   - 'When the user names a host, **`/crav1-read-environment`** reads every non-prod environment on that
@@ -553,7 +553,7 @@ skills:
   starter: false
   since: 1.40.0
   stage: stable
-  walkthrough: docs/from-ask-open-questions.md
+  walkthrough: docs/from-show-or-ask-open-questions.md
   purpose: Show the cross-spec overview of open questions (read-only), or draft them to ask; asks which.
   in_depth:
   - '**`/crav1-show-or-ask-open-questions`** opens with one question: show an overview of every open question
@@ -1240,7 +1240,7 @@ skills:
   starter: false
   since: 1.8.0
   stage: stable
-  walkthrough: docs/from-explain.md
+  walkthrough: docs/from-explain-existing-system.md
   purpose: Read the system notes spark, ideas, intake, match, or existing-to-specs already wrote (docs/system/).
   in_depth:
   - When system notes already exist, **`/crav1-explain-existing-system`** reads `docs/system/` and answers with a short
@@ -1288,7 +1288,7 @@ skills:
   starter: false
   since: 1.23.0
   stage: stable
-  walkthrough: docs/from-whats-known-about.md
+  walkthrough: docs/from-what-do-we-know-about-this.md
   purpose: Answer one question about a feature, slice, resource, or not-yet-feature from the specs first.
   in_depth:
   - 'When the user asks about one feature, slice, resource, or not-yet-feature, **`/crav1-what-do-we-know-about-this`**
@@ -1344,7 +1344,7 @@ skills:
   starter: false
   since: 1.8.0
   stage: stable
-  walkthrough: docs/from-keep-current.md
+  walkthrough: docs/from-refresh-system-notes.md
   purpose: 'Update the picture in docs/system/ when something was added: add what is new to the short
     description, the diagram, and how the parts connect, and do not rewrite what is there.'
   in_depth:
@@ -1401,7 +1401,7 @@ skills:
   starter: false
   since: 1.18.0
   stage: stable
-  walkthrough: docs/from-pipeline-environments.md
+  walkthrough: docs/from-map-pipeline-environments.md
   purpose: Read Azure DevOps pipeline definitions for the org and project the user named.
   in_depth:
   - When the user names Azure DevOps, the org, and the project, **`/crav1-map-pipeline-environments`** reads
@@ -1447,7 +1447,7 @@ skills:
   starter: false
   since: 1.4.0
   stage: stable
-  walkthrough: docs/from-security.md
+  walkthrough: docs/from-review-security.md
   purpose: Ask whether the thing in front of you is secure, after architecture already exists (docs/system/
     or a spec that already describes the design).
   in_depth:
@@ -1512,7 +1512,7 @@ skills:
   starter: false
   since: 1.31.0
   stage: stable
-  walkthrough: docs/from-feature-candidates.md
+  walkthrough: docs/from-ado-sync-suggest-features.md
   purpose: Keep specs and Azure Boards in step; asks suggest Features, push Features, push tasks, pull
     tasks, or pull spec changes.
   in_depth:
@@ -1657,7 +1657,7 @@ skills:
   starter: false
   since: 1.16.0
   stage: stable
-  walkthrough: docs/from-exploratory-test.md
+  walkthrough: docs/from-run-exploratory-test.md
   purpose: After a build of a slice already exists, use the slice in two passes and write down bugs.
   in_depth:
   - When a build of a slice already exists, **`/crav1-run-exploratory-test`** uses that slice in two passes

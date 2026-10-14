@@ -1,0 +1,64 @@
+# From Azure Boards to specs
+
+Kit not in this project yet? [Install first](install.md) (Cursor and Claude Code; the slash commands match, the files do not). After a Cursor plugin install, the short command loop is [plugins/crav1/README.md](../plugins/crav1/README.md). Claude Code has no plugin.
+
+Use this when the user wants Azure Boards Features read back onto the specs.
+
+This is cross-cutting. It is not its own lane. It may run from any lane. It does not move work into Specify, Plan, or Build. It does not start those lanes.
+
+It is a later skill. It is not a starter option. When the user asks for startup options, that ask names only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs`, `/crav1-read-environment`, and `/crav1-fix-bug`. It does not run this command. The six starter options stay unchanged.
+
+Sending a Feature is [From specs to Azure Boards](from-ado-sync-push-features.md).
+
+## First prompt
+
+New chat. Name ids, or leave them out to read every id the specs already record.
+
+```text
+/crav1-ado-sync
+```
+
+Named ids:
+
+```text
+/crav1-ado-sync
+52 81
+```
+
+That slash command *is* the prompt.
+
+## Steps
+
+### What it reads
+
+Ids come from every `docs/specs/<slug>/work-item.md` and from `## No spec yet in ADO` in `docs/system/landscape.md`, unless the user named ids. For each id it reads State, Priority, Target Date, Iteration, and Assigned To, plus discussion comments and history. It reads the checks from Acceptance Criteria when the Feature type has that field, and from the Acceptance checks list in the Description when it does not. A list that matches the spec is not a change. Discussion comments use an api version current `az` can parse.
+
+`az` is checked the same way as `/crav1-ado-sync`. A failure states the issue, suggests a fix such as `az login`, and offers a skip.
+
+A deleted or missing id is reported as missing. The command does not guess another Feature.
+
+### What the user sees
+
+One block per Feature, and only what differs from the spec or is new. The user keeps or dismisses each change. Dismiss is for this run only. The next run starts fresh.
+
+A kept change goes to the spec through `/crav1-add-to-spec`, labelled as coming from Azure Boards with the date and who changed it. An answer the user gives during the run goes into the spec first, labelled with the date as the user’s answer to the Azure Boards question.
+
+A Feature with no spec yet suggests making the spec first, for example `/crav1-spark-to-spec`, from what was written on the Feature. The command does not run that starter.
+
+When the Feature discussion asks a question and the spec already answers it, the command drafts a reply with no reference to the specs repo. It shows `Post comment on Feature <id>: <text>`. The user can change it, post it, or skip it. It is posted only on yes. When the spec has no answer, no reply is drafted. The question is offered as an open question for the spec instead.
+
+## What gets written
+
+Nothing by this command itself. A kept change, and an answer the user gives during the run, go to the spec through `/crav1-add-to-spec`. A reply comment is posted on the Feature only after a yes. The command does not create or update a Feature. It does not commit.
+
+## After
+
+When a spec changed:
+
+```text
+/crav1-finalize-commit
+```
+
+A Feature with no spec yet: run the starter it suggested, for example [`/crav1-spark-to-spec`](from-nothing.md). Sending a change the other way is [From specs to Azure Boards](from-ado-sync-push-features.md).
+
+Reference page: [ado-sync](reference/skills/crav1-ado-sync.md)

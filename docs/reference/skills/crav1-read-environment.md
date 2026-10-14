@@ -2,7 +2,7 @@
 
 # /crav1-read-environment
 
-[All skills](../skills.md) · Walkthrough: [From a named host](../../from-environment.md) · Playbook: [`SKILL.md`](../../../.cursor/skills/crav1/crav1-read-environment/SKILL.md)
+[All skills](../skills.md) · Walkthrough: [From a named host](../../from-read-environment.md) · Playbook: [`SKILL.md`](../../../.cursor/skills/crav1/crav1-read-environment/SKILL.md)
 
 ## Purpose
 
@@ -60,4 +60,4 @@ List every non-prod environment. A prod-only resource is shape and connections o
 
 ## Walkthrough
 
-Step by step: [From a named host](../../from-environment.md).
+Step by step: [From a named host](../../from-read-environment.md).
