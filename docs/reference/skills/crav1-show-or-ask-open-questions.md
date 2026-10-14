@@ -12,6 +12,15 @@ Show the cross-spec overview of open questions (read-only), or draft them to ask
 
 Drafts the open questions for a person, a spec, or a topic as a mail, a meeting agenda, a chat message, or meeting questions. No spec names in the draft. Nothing is sent. Yes, no, or pending records whether they were asked.
 
+## Choice words
+
+Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
+
+| Question | Word | Means |
+| --- | --- | --- |
+| Show or ask | `show` | show the overview (read-only) |
+| Show or ask | `ask` | draft the questions to ask |
+
 ## Runs when
 
 You want to see what is still open, or draft questions to ask. Called by the user.
