@@ -8,9 +8,9 @@ Do not copy the match worker that creates folders. Do not use `crav1-existing-to
 
 This is not `/crav1-tighten-spec`. Tighten is for mushy wording. This skill is for a dump. If the message is only “make this tighter” and brings no dump, tell them `/crav1-tighten-spec` and do not edit.
 
-This is not `/crav1-intake-to-specs`, `/crav1-spark-to-spec`, or `/crav1-ideas-to-spec`. Those create the folders. Do not create a slug here.
+This is not `/crav1-bundle-to-specs`, `/crav1-spark-to-spec`, or `/crav1-ideas-to-spec`. Those create the folders. Do not create a slug here.
 
-This is not `/crav1-whats-known-about`. That command answers a question about the status of one feature, slice, or resource and writes nothing. This command sorts a dump. A status question with no dump is that other command.
+This is not `/crav1-what-do-we-know-about-this`. That command answers a question about the status of one feature, slice, or resource and writes nothing. This command sorts a dump. A status question with no dump is that other command.
 
 A not-started spec (match status `not in the code`, or a thin spec) can keep taking information until planning. Adding information does not start planning and does not write `plan.md` or `tasks.md`.
 
@@ -26,7 +26,7 @@ Spec folders are `docs/specs/<slug>/` with a `spec.md`. Skip `_template`.
 
 Read those folders before you sort. Do not ask which slug.
 
-If there are no spec folders, stop. Point at `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, or `/crav1-existing-to-specs`. Do not create a slug. Do not seed `docs/system/`.
+If there are no spec folders, stop. Point at `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, or `/crav1-existing-to-specs`. Do not create a slug. Do not seed `docs/system/`.
 
 ## Already noted
 
@@ -43,7 +43,7 @@ Read every existing `spec.md` (skip `_template`) and the dump. Then show four pi
 3. **Note** — worth keeping, and not a decision, a clarification, information, or an answer for an existing spec. Exploration with no feature yet, input that may feed several features, technical debt, and general information gathering go here. A mapping of tables and views when no spec covers it goes here. Quote the dump. The line says `Recommendation: Note — keep it in the repo without tying it to a spec yet.`
 4. **Does not fit any of them** — the dump’s words that match no existing spec and are not a note. Leave them on the list. Do not invent a slug.
 
-Before the piles, read `## Open questions` on every spec with the records under each question. Follow `crav1-add-to-spec` `references/open-questions.md` (drop-in: `.claude/skills/crav1-add-to-spec/references/open-questions.md`; plugin: sibling `skills/crav1-add-to-spec/references/open-questions.md`). Match by meaning, whether the question is asked, pending, or not marked. A fact that clearly answers one goes on the **belongs** pile with `Answers: "<question>"` and `Linked with the sort.` There is no separate question for it. When it would change a spec line, the line also says `Then: /crav1-resolve-questions for <slug>.` A fact that only might answer, or answers part, keeps its pile and shows `Possible answer to: "<question>". The question stays open.` When the dump is a mail, a transcript, or a chat that shows a spec open question being asked, list it under `Asked in this dump` with the spec and the date the source shows. That is not a pile.
+Before the piles, read `## Open questions` on every spec with the records under each question. Follow `crav1-add-to-spec` `references/open-questions.md` (drop-in: `.claude/skills/crav1-add-to-spec/references/open-questions.md`; plugin: sibling `skills/crav1-add-to-spec/references/open-questions.md`). Match by meaning, whether the question is asked, pending, or not marked. A fact that clearly answers one goes on the **belongs** pile with `Answers: "<question>"` and `Linked with the sort.` There is no separate question for it. When it would change a spec line, the line also says `Then: /crav1-resolve-open-questions for <slug>.` A fact that only might answer, or answers part, keeps its pile and shows `Possible answer to: "<question>". The question stays open.` When the dump is a mail, a transcript, or a chat that shows a spec open question being asked, list it under `Asked in this dump` with the spec and the date the source shows. That is not a pile.
 
 A greeting, scheduling, and thanks are noise. Drop them. They are not a note. Dismiss stays for that noise. A dropped line is not on a pile.
 
@@ -115,13 +115,13 @@ A fuller spec keeps its headings. Place the quote in the section it extends. Add
 
 Expected headings when the file already uses the full spec shape: this skill’s `assets/spec.md` (same file as `docs/specs/_template/spec.md`; drop-in: `.claude/skills/crav1-add-to-spec/branches/dump/assets/spec.md`; plugin: this skill’s `assets/spec.md`). A match-shaped spec does not have to grow those headings.
 
-For a confirmed fact with `Answers:`, write the `Answered:` line under that open question, as `references/open-questions.md` says, after the imported-sources check for that source. Do not rewrite the question. Do not remove it from `## Open questions`. Do not change the spec line it would change. Name `/crav1-resolve-questions` for that slug. Do not run it. For each line under `Asked in this dump`, write or replace the `Asked:` line with the date from the source. That date replaces a `Pending:` line, and an `Asked:` line from the user's yes, for the same person. A possible answer writes no `Answered:` line. When the question is one a stale research point waits on, the research re-check below runs.
+For a confirmed fact with `Answers:`, write the `Answered:` line under that open question, as `references/open-questions.md` says, after the imported-sources check for that source. Do not rewrite the question. Do not remove it from `## Open questions`. Do not change the spec line it would change. Name `/crav1-resolve-open-questions` for that slug. Do not run it. For each line under `Asked in this dump`, write or replace the `Asked:` line with the date from the source. That date replaces a `Pending:` line, and an `Asked:` line from the user's yes, for the same person. A possible answer writes no `Answered:` line. When the question is one a stale research point waits on, the research re-check below runs.
 
 The **Note** pile is written under **Write the notes**. It does not become a spec. The **does not fit** pile is listed and left alone. Do not create a spec for it. If they say to create one, do not write a folder here. Point at the skill that creates a spec, and do not run it:
 
 - one or two sentences for one feature: `/crav1-spark-to-spec`
 - one unstructured pile for one feature: `/crav1-ideas-to-spec`
-- several new features, or several repos: `/crav1-intake-to-specs`
+- several new features, or several repos: `/crav1-bundle-to-specs`
 - repos that already make up the system, and this leftover is a slice to match: `/crav1-existing-to-specs`
 
 ## Impact (before any other edit)
@@ -136,7 +136,7 @@ Do not edit anything outside the confirmed belongs writes in this step, except t
 
 **Glossary.** When `docs/system/` is missing, do nothing about a glossary. When it exists and `glossary.md` is missing, write only that file from `assets/system/glossary.md`. When `glossary.md` already exists, append only words or abbreviations the dump uses that are not already rows. Do not rewrite, reorder, or edit existing rows. Do not change a Meaning cell that already has text. Source is the dump. Do not invent terms, expansions, or definitions. Do not write TBD or to be decided. A row is only a word or abbreviation the dump already uses. When that same dump already says the expansion or meaning, put that text in Meaning. When the dump never says what it means, set Meaning to `to be researched`. Skip ordinary English. A code identifier is not a row unless the dump already treats that word as a term. Write the file even when it has no rows. This write is not an apply option, and it does not rewrite any other landscape file except the picture update below. Do not list a rewrite of existing rows.
 
-**Picture.** When `docs/system/` is missing, do nothing about the picture. When it exists, follow [picture.md](../../../crav1-keep-current/references/picture.md) (drop-in: `.claude/skills/crav1-keep-current/references/picture.md`; plugin: sibling `skills/crav1-keep-current/references/picture.md`). Source is the confirmed new quotes, not a sentence marked inferred. Add what those quotes added to the short description, the diagram, and how the parts connect. Do not rewrite a sentence, a diagram node, a diagram edge, or a connection line that is already there. Do not run `/crav1-keep-current` as a second turn. This write is not an apply option. Do not rewrite existing glossary rows.
+**Picture.** When `docs/system/` is missing, do nothing about the picture. When it exists, follow [picture.md](../../../crav1-refresh-system-notes/references/picture.md) (drop-in: `.claude/skills/crav1-refresh-system-notes/references/picture.md`; plugin: sibling `skills/crav1-refresh-system-notes/references/picture.md`). Source is the confirmed new quotes, not a sentence marked inferred. Add what those quotes added to the short description, the diagram, and how the parts connect. Do not rewrite a sentence, a diagram node, a diagram edge, or a connection line that is already there. Do not run `/crav1-refresh-system-notes` as a second turn. This write is not an apply option. Do not rewrite existing glossary rows.
 
 Do not edit `plan.md` or `tasks.md` when they exist, and do not list them as proposed edits. One line in the report when they exist: they were left alone. Adding information does not start planning.
 
@@ -161,7 +161,7 @@ Output only:
 - Each source folder `docs/sources/YYYY-MM-DD-<slug>/` this pass wrote, or that none was written
 - The transfer data policy when this pass wrote it, or that none was written
 - What was added (their quotes, labeled new) and what was already there
-- Open questions: each answer linked, each possible answer left open, each asked mark written and where its date came from, and each `/crav1-resolve-questions` named, or none
+- Open questions: each answer linked, each possible answer left open, each asked mark written and where its date came from, and each `/crav1-resolve-open-questions` named, or none
 - The does-not-fit list, left alone. If they asked for a new spec, which existing skill you pointed at
 - An item already noted, with its path, and that no second file was written
 - `glossary.md` when this turn created it or appended rows. If `docs/system/` was missing, say no glossary was written. If no new rows were appended, say so

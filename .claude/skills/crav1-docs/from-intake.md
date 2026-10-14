@@ -15,7 +15,7 @@ New chat. Strong reasoning model. Not the host plan UI yet.
 `@` any mix of intent (what to build) and context (existing code or “like this”). No required structure in those files.
 
 ```text
-/crav1-intake-to-specs
+/crav1-bundle-to-specs
 @notes/overview.md
 @sketches/flow.png
 @legacy-api/
@@ -36,7 +36,7 @@ That slash command *is* the prompt.
 | Phase            | You                                      | Agent                                                                 |
 | ---------------- | ---------------------------------------- | --------------------------------------------------------------------- |
 | Map              | `@` intake; confirm or split slugs/repos | Intent vs context, v0 vs later, bulk `A1…`, ready vs mushy per slug   |
-| Branch           | Pick `feat/…` or `spec/…` (or stay)    | `/crav1-feature-branch` before `docs/system/` (no push, no PR)        |
+| Branch           | Pick `feat/…` or `spec/…` (or stay)    | `/crav1-create-feature-branch` before `docs/system/` (no push, no PR)        |
 | Mushy interview  | Answer only flagged slugs, or “use assumptions” | ≤5 questions per mushy slug, in **this** chat. Workers never interview |
 | Landscape        | Accept the map                           | `docs/system/` (`landscape.md`, `repos.md`, diagrams, `glossary.md`, cross-cutting ADRs) |
 | Slice specs      | Wait                                     | One isolated worker per v0 slug (`docs/specs/<slug>/`)                |
@@ -67,11 +67,11 @@ docs/specs/<slug>/
 
 A mail, a transcript, a chat, a screenshot, or another original that a quote comes from is written under `docs/sources/YYYY-MM-DD-<slug>/` before the slice specs. The spec `Source:` and `Trace:` lines link to that folder. This command does not commit.
 
-Human starter copies: `docs/system/_template/` (same files as skill `crav1-intake-to-specs` `assets/` for landscape, including `glossary.md`, and as `assets/system/` on `crav1-spark-to-spec` and `crav1-ideas-to-spec`). `repos.md` includes a `Synced at` column. Where this run reads a whole repo, it sets that repo's cell and touches only those repos. Where this run reads only one slice, it does not touch the column. It writes or updates `Synced at: <repo> <branch>@<short sha>, <date>` in that slice's `spec.md`. Notes alone are not a repo read. Feature spec shape matches ideas-to-spec plus **Repos**, **Constraints**, **Assumptions**, **Trace**.
+Human starter copies: `docs/system/_template/` (same files as skill `crav1-bundle-to-specs` `assets/` for landscape, including `glossary.md`, and as `assets/system/` on `crav1-spark-to-spec` and `crav1-ideas-to-spec`). `repos.md` includes a `Synced at` column. Where this run reads a whole repo, it sets that repo's cell and touches only those repos. Where this run reads only one slice, it does not touch the column. It writes or updates `Synced at: <repo> <branch>@<short sha>, <date>` in that slice's `spec.md`. Notes alone are not a repo read. Feature spec shape matches ideas-to-spec plus **Repos**, **Constraints**, **Assumptions**, **Trace**.
 
 ## Later features
 
-Do not run `/crav1-intake-to-specs` again.
+Do not run `/crav1-bundle-to-specs` again.
 
 ```text
 /crav1-spark-to-spec
@@ -97,6 +97,6 @@ That puts `docs/system/` and the new spec slugs in git. No push. Intake does not
 
 ## Critique and build (per slug)
 
-Same as [from-ideas](from-ideas.md): `/crav1-architecture-reviewer` with the spec folder attached, then tighten, resolve questions, `/crav1-plan-from-spec` (names a linter when the repo has one, and stops before Build when it does not), optional `/crav1-review-plan` then `/crav1-tighten-plan`, implement or build-tasks / complete-features, verify, fix-build-gaps.
+Same as [from-ideas](from-ideas.md): `/crav1-review-architecture` with the spec folder attached, then tighten, resolve questions, `/crav1-plan-from-spec` (names a linter when the repo has one, and stops before Build when it does not), optional `/crav1-review-plan` then `/crav1-tighten-plan`, implement or build-tasks / build-features, verify, fix-build-gaps.
 
-Reference page: [intake-to-specs](reference/skills/crav1-intake-to-specs.md)
+Reference page: [bundle-to-specs](reference/skills/crav1-bundle-to-specs.md)

@@ -6,7 +6,7 @@ Command: `/crav1-ado-sync`.
 
 This is cross-cutting. It is not a lane. It may run from any lane. It does not move work into Specify, Plan, or Build. It does not start those lanes.
 
-This command is a later skill. It is not a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-existing-to-specs`, `/crav1-environment-read`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane. The six starter options stay unchanged.
+This command is a later skill. It is not a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs`, `/crav1-read-environment`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane. The six starter options stay unchanged.
 
 Spark, specify, plan, and verify do not run it. It is not started automatically.
 
@@ -49,7 +49,7 @@ Each difference names the date and who changed it when the history or the commen
 
 When nothing differs, say that Feature matches the spec.
 
-A `no spec yet` id has no spec to compare. The block is what Azure Boards holds: title, State, Priority, Target Date, Iteration, Assigned To, and the discussion. Then suggest making the spec first, for example `/crav1-spark-to-spec`, from what was written on the Feature. Also name `/crav1-ideas-to-spec` or `/crav1-intake-to-specs` when the Feature text is a pile or several features. Do not run them. Do not create a slug.
+A `no spec yet` id has no spec to compare. The block is what Azure Boards holds: title, State, Priority, Target Date, Iteration, Assigned To, and the discussion. Then suggest making the spec first, for example `/crav1-spark-to-spec`, from what was written on the Feature. Also name `/crav1-ideas-to-spec` or `/crav1-bundle-to-specs` when the Feature text is a pile or several features. Do not run them. Do not create a slug.
 
 ## Keep or dismiss
 

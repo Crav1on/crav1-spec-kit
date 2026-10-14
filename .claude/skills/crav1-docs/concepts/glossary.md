@@ -26,7 +26,7 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 
 ## Words
 
-**Starter option.** One of the six ways in: spark-to-spec, ideas-to-spec, intake-to-specs, existing-to-specs, environment-read, fix-bug. Asking for startup options lists them and does not run one.
+**Starter option.** One of the six ways in: spark-to-spec, ideas-to-spec, bundle-to-specs, existing-to-specs, read-environment, fix-bug. Asking for startup options lists them and does not run one.
 
 **Later skill.** Any skill that is not a starter option. Most run once specs already exist.
 
@@ -78,7 +78,7 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 
 **Work item.** An Azure Boards id in `docs/specs/<slug>/work-item.md`. Commit and pull request skills turn it into a mention.
 
-**`T#`, `P#`, `I#`, `G#`, `Q#`, `A#`.** Numbered items: tasks in `tasks.md`, plan findings from review-plan, architecture issues from architecture-reviewer, gaps from verify, open questions in a spec, and bulk assumptions in the landscape.
+**`T#`, `P#`, `I#`, `G#`, `Q#`, `A#`.** Numbered items: tasks in `tasks.md`, plan findings from review-plan, architecture issues from review-architecture, gaps from verify, open questions in a spec, and bulk assumptions in the landscape.
 
 **Inner loop.** A gap that can be fixed and re-proved in the working tree. Fix-from-verify takes these one at a time.
 

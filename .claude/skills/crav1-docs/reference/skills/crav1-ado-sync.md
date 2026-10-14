@@ -60,7 +60,7 @@ Limits and exceptions: Suggest Features: a dated milestone or slice is one candi
 
 ## You run next / Runs by itself
 
-- You run next: [`/crav1-plan-from-spec`](crav1-plan-from-spec.md); [`/crav1-tasks-ready-to-build`](crav1-tasks-ready-to-build.md); [`/crav1-build-tasks`](crav1-build-tasks.md); [`/crav1-complete-features`](crav1-complete-features.md); [`/crav1-finalize-commit`](crav1-finalize-commit.md)
+- You run next: [`/crav1-plan-from-spec`](crav1-plan-from-spec.md); [`/crav1-tasks-ready-to-build`](crav1-tasks-ready-to-build.md); [`/crav1-build-tasks`](crav1-build-tasks.md); [`/crav1-build-features`](crav1-build-features.md); [`/crav1-finalize-commit`](crav1-finalize-commit.md)
 - Runs by itself: Suggest Features: Calls no skill. Push Features: Calls [`/crav1-ado-sync`](crav1-ado-sync.md), and [`/crav1-add-to-spec`](crav1-add-to-spec.md) when a preview change belongs in the spec. Push tasks: Calls [`/crav1-add-to-spec`](crav1-add-to-spec.md) when a preview change belongs in the spec. Pull tasks: Calls [`/crav1-add-to-spec`](crav1-add-to-spec.md) for each kept change. Pull spec changes: Calls [`/crav1-add-to-spec`](crav1-add-to-spec.md) for one kept change and for one answer.
 
 ## Lane and group

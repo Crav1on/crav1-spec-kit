@@ -1,6 +1,6 @@
 # Work item offer
 
-Optional, once, when a spec skill creates a new spec folder. Read this from `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, and `/crav1-intake-to-specs` at the end of the turn that created the folder. Commit and pull-request skills do not read this file. They only read an existing `work-item.md` via [work-item-mention.md](work-item-mention.md).
+Optional, once, when a spec skill creates a new spec folder. Read this from `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, and `/crav1-bundle-to-specs` at the end of the turn that created the folder. Commit and pull-request skills do not read this file. They only read an existing `work-item.md` via [work-item-mention.md](work-item-mention.md).
 
 Creating a Feature is `/crav1-ado-sync`. This offer does not run that command. Do not create a work item. Do not look one up. Do not call an Azure DevOps API. Do not run `az`. Do not pass `--work-items` or `--transition-work-items`.
 
@@ -70,4 +70,4 @@ After writing, stop. These skills do not commit.
 
 ## Who asks
 
-The parent asks. `/crav1-intake-to-specs` asks after Index, once, for every new slug folder that still has no `work-item.md`. Slice workers do not ask and do not write `work-item.md`.
+The parent asks. `/crav1-bundle-to-specs` asks after Index, once, for every new slug folder that still has no `work-item.md`. Slice workers do not ask and do not write `work-item.md`.

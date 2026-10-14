@@ -8,7 +8,7 @@ The picture is three places: the short description in `landscape.md`, the contex
 
 This is cross-cutting. It is not its own lane. It can run on its own. The same passes that already append a glossary row also run this update: spark, ideas, intake, match, and the siblings that already append (match-dump and add-to-spec). Repos-to-spec updates the picture in its own pass. Those passes do not rewrite existing glossary rows. This command does not write glossary rows.
 
-Some commands do not update the picture themselves. At the end of the run they ask, yes or no: The system picture may now be out of date. Run `/crav1-keep-current`? They do not run this command. `/crav1-complete-features` asks when a slice is marked done or retired. `/crav1-fix-bug` and `/crav1-fix-build-gaps` ask when the fix changes how the parts connect. `/crav1-environment-read` asks after lines are added to `docs/environments/marks.md`. `/crav1-add-to-spec` asks once at the end of a run that came from environment-read or suggest-tests-for-code, not once per item. `/crav1-build-tasks` do not ask.
+Some commands do not update the picture themselves. At the end of the run they ask, yes or no: The system picture may now be out of date. Run `/crav1-refresh-system-notes`? They do not run this command. `/crav1-build-features` asks when a slice is marked done or retired. `/crav1-fix-bug` and `/crav1-fix-build-gaps` ask when the fix changes how the parts connect. `/crav1-read-environment` asks after lines are added to `docs/environments/marks.md`. `/crav1-add-to-spec` asks once at the end of a run that came from read-environment or suggest-tests-for-code, not once per item. `/crav1-build-tasks` do not ask.
 
 This is not [from the repos](from-repos.md) (`/crav1-existing-to-specs`). That command reads the repos the user named and writes one architecture spec the lanes can extend, plus these notes. Spark, ideas, intake, and match still create notes for a feature or a dump. [Explain](from-explain.md) reads the notes and does not update them.
 
@@ -17,7 +17,7 @@ This is not [from the repos](from-repos.md) (`/crav1-existing-to-specs`). That c
 New chat. Not the host plan UI.
 
 ```text
-/crav1-keep-current
+/crav1-refresh-system-notes
 @docs/system/
 @docs/specs/
 
@@ -55,4 +55,4 @@ If a file changed:
 
 That puts the picture update in git. No push. This command does not commit for you.
 
-Reference page: [keep-current](reference/skills/crav1-keep-current.md)
+Reference page: [refresh-system-notes](reference/skills/crav1-refresh-system-notes.md)

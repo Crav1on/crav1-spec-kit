@@ -58,7 +58,7 @@ The more the kit records, the fewer reasons are inferred:
 
 - `/crav1-review-plan` writes `Reviewed: <date>, P# open: <n>` in `plan.md`, and `/crav1-tighten-plan` lowers the count.
 - `/crav1-plan-from-spec` ends a task line with `(after: T1)` when the task needs an earlier one.
-- `/crav1-resolve-questions` asks which tasks a kept-open question blocks and writes `Blocks: T#`. `/crav1-plan-from-spec` writes it for a question it parks as a risk.
+- `/crav1-resolve-open-questions` asks which tasks a kept-open question blocks and writes `Blocks: T#`. `/crav1-plan-from-spec` writes it for a question it parks as a risk.
 
 ## Azure Boards
 

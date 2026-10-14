@@ -40,6 +40,6 @@ Not written: branch deletion, work item links, squash or rebase merges.
 
 ## After
 
-After an outside pull request merges, `/crav1-review-pr` names `/crav1-keep-current` to catch the picture up: [Keep the picture current](from-keep-current.md).
+After an outside pull request merges, `/crav1-review-pr` names `/crav1-refresh-system-notes` to catch the picture up: [Keep the picture current](from-keep-current.md).
 
 Reference pages: [finalize-commit](reference/skills/crav1-finalize-commit.md) · [finalize-commit](reference/skills/crav1-finalize-commit.md) · [open-pr](reference/skills/crav1-open-pr.md) · [merge-pr](reference/skills/crav1-merge-pr.md)

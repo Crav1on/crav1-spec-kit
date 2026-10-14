@@ -2,9 +2,9 @@
 
 You are the **parent**. Match existing repos to a dump. Do not implement. Do not plan. Do not commit.
 
-This command is a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-existing-to-specs`, `/crav1-environment-read`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane. Every other skill is a later skill.
+This command is a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs`, `/crav1-read-environment`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane. Every other skill is a later skill.
 
-This is not a mode of `/crav1-intake-to-specs`, `/crav1-spark-to-spec`, or `/crav1-ideas-to-spec`. It is not a system-to-architecture pass. Named repos and no dump, when the job is one architecture spec the lanes can extend, is `/crav1-existing-to-specs`. Do not do that job here. Do not send this job to those commands, and do not absorb theirs.
+This is not a mode of `/crav1-bundle-to-specs`, `/crav1-spark-to-spec`, or `/crav1-ideas-to-spec`. It is not a system-to-architecture pass. Named repos and no dump, when the job is one architecture spec the lanes can extend, is `/crav1-existing-to-specs`. Do not do that job here. Do not send this job to those commands, and do not absorb theirs.
 
 Slice protocol: [references/slice.md](references/slice.md). Landscape diagrams: [references/diagrams.md](references/diagrams.md).
 
@@ -17,7 +17,7 @@ Everything after `/crav1-existing-to-specs`, and every `@`, is input.
 | **Repos** | Evidence of what exists. One or more repos that already make up the system |
 | **Dump** | Notes, tickets, old docs, diagrams, screenshots. What to match. Not a brief for a new product |
 
-A one-liner with no repos and no dump: tell them `/crav1-spark-to-spec`. A pile of ideas for a product that is not built yet: `/crav1-ideas-to-spec` or `/crav1-intake-to-specs`. Do not match a greenfield brief against empty code and call the slices done.
+A one-liner with no repos and no dump: tell them `/crav1-spark-to-spec`. A pile of ideas for a product that is not built yet: `/crav1-ideas-to-spec` or `/crav1-bundle-to-specs`. Do not match a greenfield brief against empty code and call the slices done.
 
 ## Where the specs go (first response, no map, no files)
 
@@ -62,9 +62,9 @@ Stop. They confirm or edit the map. Do not write files. That confirmation is the
 
 If they picked a new clean repo, create it now, before the branch prompt. No commit yet. A repo with no commits skips the prompt.
 
-Follow `/crav1-feature-branch` (drop-in: `.claude/skills/crav1-feature-branch/SKILL.md`; plugin: sibling `skills/crav1-feature-branch/SKILL.md`) in the **destination** repo. One branch for the whole dump. Not one branch per slice.
+Follow `/crav1-create-feature-branch` (drop-in: `.claude/skills/crav1-create-feature-branch/SKILL.md`; plugin: sibling `skills/crav1-create-feature-branch/SKILL.md`) in the **destination** repo. One branch for the whole dump. Not one branch per slice.
 
-Slug for that prompt: a short landscape kebab, or `system` if unnamed. Specify options: `feat/<that>` first, then `spec/<that>`, stay, or other. Do not write `docs/system/` or specs until that choice is done or skipped. A new clean repo with no commits skips the prompt (feature-branch skip). Do not push. Do not open a pull request.
+Slug for that prompt: a short landscape kebab, or `system` if unnamed. Specify options: `feat/<that>` first, then `spec/<that>`, stay, or other. Do not write `docs/system/` or specs until that choice is done or skipped. A new clean repo with no commits skips the prompt (create-feature-branch skip). Do not push. Do not open a pull request.
 
 ## Landscape
 
@@ -94,7 +94,7 @@ When a dump file is a mail, a transcript, minutes, a chat, a screenshot, a diagr
 
 One `docs/specs/<slug>/` per confirmed slice, including `not in the code`.
 
-One slice: write it in this chat. More than one: write them in this chat, or one worker per slug. Workers may run in parallel. There is no match-slice subagent. Do not launch `crav1-intake-slice-agent`. Do not reuse that prompt. A worker’s only instructions are [references/slice.md](references/slice.md), and the handoff must include the match status and the trace. A worker that is not given those does not write. Not-started (`not in the code`) stays the thin shape in that file. Workers do not edit `docs/system/`.
+One slice: write it in this chat. More than one: write them in this chat, or one worker per slug. Workers may run in parallel. There is no match-slice subagent. Do not launch `crav1-bundle-slice-agent`. Do not reuse that prompt. A worker’s only instructions are [references/slice.md](references/slice.md), and the handoff must include the match status and the trace. A worker that is not given those does not write. Not-started (`not in the code`) stays the thin shape in that file. Workers do not edit `docs/system/`.
 
 Do not thicken a not-started spec in this command. A later pass may add information before planning. This command does not.
 
@@ -102,7 +102,7 @@ Do not thicken a not-started spec in this command. A later pass may add informat
 
 After the specs exist, add one feature-index row per slice on `docs/system/landscape.md`: slug, `docs/specs/<slug>/`, the repo the slice belongs to, and the match status in Notes (`done`, `partial`, or `not in the code`). Do not rewrite other rows. Do not add a second row for a slug that already has one.
 
-**Picture.** After the index, follow [picture.md](../../../crav1-keep-current/references/picture.md) (drop-in: `.claude/skills/crav1-keep-current/references/picture.md`; plugin: sibling `skills/crav1-keep-current/references/picture.md`). Add what this pass added to the short description, the diagram, and how the parts connect. Do not rewrite a sentence, a diagram node, a diagram edge, or a connection line that is already there. Do not run `/crav1-keep-current` as a second turn. When this pass seeded `docs/system/`, the seed fill of those three is the picture for what the repos and the confirmed match already stated; the picture update still adds anything the new specs state that those three do not yet say. Do not rewrite existing glossary rows.
+**Picture.** After the index, follow [picture.md](../../../crav1-refresh-system-notes/references/picture.md) (drop-in: `.claude/skills/crav1-refresh-system-notes/references/picture.md`; plugin: sibling `skills/crav1-refresh-system-notes/references/picture.md`). Add what this pass added to the short description, the diagram, and how the parts connect. Do not rewrite a sentence, a diagram node, a diagram edge, or a connection line that is already there. Do not run `/crav1-refresh-system-notes` as a second turn. When this pass seeded `docs/system/`, the seed fill of those three is the picture for what the repos and the confirmed match already stated; the picture update still adds anything the new specs state that those three do not yet say. Do not rewrite existing glossary rows.
 
 ## Stop
 

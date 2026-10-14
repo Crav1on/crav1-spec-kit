@@ -12,7 +12,7 @@ This skill does not watch the repo. It runs only when someone points it at a cha
 
 This is not `/crav1-tighten-spec`. Tighten is for mushy wording. This skill is for a change that already landed. If the message is only “make this tighter” and brings no change, tell them `/crav1-tighten-spec` and do not edit.
 
-This is not `/crav1-intake-to-specs`, `/crav1-spark-to-spec`, or `/crav1-ideas-to-spec`. Those create the folders. Do not create a slug here. Do not invent a landscape from the diff alone.
+This is not `/crav1-bundle-to-specs`, `/crav1-spark-to-spec`, or `/crav1-ideas-to-spec`. Those create the folders. Do not create a slug here. Do not invent a landscape from the diff alone.
 
 A not-started spec (match status `not in the code`, or a thin spec) can keep taking information until planning. Adding what the change does does not start planning and does not write `plan.md` or `tasks.md`.
 
@@ -96,7 +96,7 @@ The **fits none of them** pile is listed and left alone. Do not create a spec fo
 
 - one or two sentences for one feature: `/crav1-spark-to-spec`
 - one unstructured pile for one feature: `/crav1-ideas-to-spec`
-- several new features, or several repos: `/crav1-intake-to-specs`
+- several new features, or several repos: `/crav1-bundle-to-specs`
 - repos that already make up the system, and this leftover is a slice to match: `/crav1-existing-to-specs`
 
 ## Synced at
@@ -123,7 +123,7 @@ Do not edit anything outside the confirmed belongs writes in this step, except t
 
 **Glossary.** When `docs/system/` is missing, do nothing about a glossary. When it exists and `glossary.md` is missing, write only that file from `assets/system/glossary.md`. When `glossary.md` already exists, append only words or abbreviations the change uses that are not already rows. Do not rewrite, reorder, or edit existing rows. Do not change a Meaning cell that already has text. Source is the landed change. Do not invent terms, expansions, or definitions. Do not write TBD or to be decided. A row is only a word or abbreviation that change already uses. When that same change already says the expansion or meaning, put that text in Meaning. When the change never says what it means, set Meaning to `to be researched`. Skip ordinary English. A code identifier is not a row unless the change already treats that word as a term. Write the file even when it has no rows. This write is not an apply option, and it does not rewrite any other landscape file except the `Synced at` stamp above and the picture update below. Do not list a rewrite of existing rows.
 
-**Picture.** When `docs/system/` is missing, do nothing about the picture. When it exists, follow [picture.md](../../../crav1-keep-current/references/picture.md) (drop-in: `.claude/skills/crav1-keep-current/references/picture.md`; plugin: sibling `skills/crav1-keep-current/references/picture.md`). Source is the confirmed new quotes, not a sentence marked inferred. Add what those quotes added to the short description, the diagram, and how the parts connect. Do not rewrite a sentence, a diagram node, a diagram edge, or a connection line that is already there. Do not run `/crav1-keep-current` as a second turn. This write is not an apply option. Do not invent a part from the diff. Do not rewrite existing glossary rows.
+**Picture.** When `docs/system/` is missing, do nothing about the picture. When it exists, follow [picture.md](../../../crav1-refresh-system-notes/references/picture.md) (drop-in: `.claude/skills/crav1-refresh-system-notes/references/picture.md`; plugin: sibling `skills/crav1-refresh-system-notes/references/picture.md`). Source is the confirmed new quotes, not a sentence marked inferred. Add what those quotes added to the short description, the diagram, and how the parts connect. Do not rewrite a sentence, a diagram node, a diagram edge, or a connection line that is already there. Do not run `/crav1-refresh-system-notes` as a second turn. This write is not an apply option. Do not invent a part from the diff. Do not rewrite existing glossary rows.
 
 Do not edit `plan.md` or `tasks.md` when they exist, and do not list them as proposed edits. One line in the report when they exist: they were left alone. Adding what the change does does not start planning.
 

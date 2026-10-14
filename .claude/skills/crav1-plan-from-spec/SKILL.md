@@ -27,7 +27,7 @@ Read `spec.md`, plus `diagrams.md`, `adr/`, `export/` if present. Treat `spec.md
 - Acceptance lines that are not yes/no
 - Open questions that **block the demo** (auth model, source of truth, “what is v0”) with no keep-open-and-plan-around path
 
-Say which gate failed. Next command: `/crav1-tighten-spec` and/or `/crav1-resolve-questions`. Do not draft a fake plan.
+Say which gate failed. Next command: `/crav1-tighten-spec` and/or `/crav1-resolve-open-questions`. Do not draft a fake plan.
 
 **Ready with leftovers:** kept-open questions that do not block a first demo become **Risks** / “do not implement until resolved” — not silent answers.
 
@@ -132,11 +132,11 @@ Output only:
 - Any verify note with no kind, and any kept security check with no task (must be none, or you failed)
 - Kept-open questions parked as risks
 - Each stale research finding listed under Risks, or that none was marked stale
-- These notes name the checks. `/crav1-verify-spec` is the gate that says they passed. Do not run it here.
+- These notes name the checks. `/crav1-verify-build-against-spec` is the gate that says they passed. Do not run it here.
 - The linter line: the tool and command, or that this repo has none for the code these tasks will touch.
 - Next, when the plan names a linter: `/crav1-review-plan` (optional but useful), then `/crav1-tighten-plan` for plan `P#`s. Build is expected to leave that named check green.
-- Next, when the plan says there is no linter: stop before Build. Say that. The user decides to add the linter or to go on without one. Do not install one. Do not name `/crav1-build-tasks`, or `/crav1-complete-features` until they choose. `/crav1-review-plan` and `/crav1-tighten-plan` stay available. They are not Build. When they choose to go on without one, the Build next step applies, and the plan still says none.
-- If this branch is `spec/<slug>` (specify-only): `/crav1-finalize-commit` (no push), then **they** open a PR when they want this spec on the default branch. Do **not** implement here. After it is on default: `/crav1-feature-branch` → `feat/<slug>`, then a **new chat** for `/crav1-build-tasks`. That implement chat waits until the plan names a linter, or they chose to go on without one.
+- Next, when the plan says there is no linter: stop before Build. Say that. The user decides to add the linter or to go on without one. Do not install one. Do not name `/crav1-build-tasks`, or `/crav1-build-features` until they choose. `/crav1-review-plan` and `/crav1-tighten-plan` stay available. They are not Build. When they choose to go on without one, the Build next step applies, and the plan still says none.
+- If this branch is `spec/<slug>` (specify-only): `/crav1-finalize-commit` (no push), then **they** open a PR when they want this spec on the default branch. Do **not** implement here. After it is on default: `/crav1-create-feature-branch` → `feat/<slug>`, then a **new chat** for `/crav1-build-tasks`. That implement chat waits until the plan names a linter, or they chose to go on without one.
 - If this branch is `feat/<slug>` (or they stayed on one branch), and the plan names a linter or they chose to go on without one: **new chat**, `/crav1-build-tasks` (or `/crav1-build-tasks`) with `plan.md`, `tasks.md`, and `spec.md` attached.
 
 Do not start coding in this chat.
@@ -147,7 +147,7 @@ Do not start coding in this chat.
 - Prefer existing repo patterns when a codebase exists.
 - Do not invent endpoints, entities, screens, or a performance goal the spec does not require.
 - Do not write test code. Smoke after deploy, chaos, and fuzzing for its own sake stay out.
-- Do not run `/crav1-security-review`. Map kept checks that are already written.
+- Do not run `/crav1-review-security`. Map kept checks that are already written.
 - A kept suggestion from `/crav1-suggest-tests-for-code` that is already an acceptance line maps to a task. A line under `## Dismissed test suggestions` is not a task. Do not run `/crav1-suggest-tests-for-code`.
 - Do not run `/crav1-review-pr`. Specify does not name the linter. Do not install a linter.
 - Do not name Build when `## Linter` says this repo has no linter or checker for the code these tasks will touch, until the user chooses to go on without one.

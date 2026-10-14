@@ -44,9 +44,9 @@ Command: `/crav1-show-or-ask-open-questions`.
 
 This is cross-cutting. It is not a lane. It may run from any lane. It does not move work into Specify, Plan, or Build.
 
-This command is a later skill. It is not a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-existing-to-specs`, `/crav1-environment-read`, and `/crav1-fix-bug`. That ask names the list. It does not run this command.
+This command is a later skill. It is not a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs`, `/crav1-read-environment`, and `/crav1-fix-bug`. That ask names the list. It does not run this command.
 
-This is not `/crav1-resolve-questions`. Resolve walks the questions with the user and writes the decisions into the spec. This command drafts the questions for someone else and writes only the asked and pending marks.
+This is not `/crav1-resolve-open-questions`. Resolve walks the questions with the user and writes the decisions into the spec. This command drafts the questions for someone else and writes only the asked and pending marks.
 
 The record format, pending, answer links, and the asked-on date are shared with the import skills. Follow `crav1-add-to-spec` `references/open-questions.md` (drop-in: `.claude/skills/crav1-add-to-spec/references/open-questions.md`; plugin: sibling `skills/crav1-add-to-spec/references/open-questions.md`).
 

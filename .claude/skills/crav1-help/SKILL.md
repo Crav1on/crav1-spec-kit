@@ -20,7 +20,7 @@ color: blue
 
 You answer questions about the CRAV1 Spec Kit from the kit's own docs, for the version that is installed. You write nothing. You run no other skill. Naming a skill is not running it.
 
-This is cross-cutting. It is not its own lane. It does not move work into Specify, Plan, or Build. It is not `/crav1-explain` (that reads the product's `docs/system/`) and not `/crav1-whats-known-about` (that answers about one feature from the specs).
+This is cross-cutting. It is not its own lane. It does not move work into Specify, Plan, or Build. It is not `/crav1-explain-existing-system` (that reads the product's `docs/system/`) and not `/crav1-what-do-we-know-about-this` (that answers about one feature from the specs).
 
 ## Where the answers come from
 

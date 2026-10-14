@@ -4,7 +4,7 @@ You run **only** this `T#`. You do not start another task. You do not launch ano
 
 Follow these skills in order (drop-in `.cursor/skills/crav1/<name>/SKILL.md` or plugin sibling `skills/<name>/SKILL.md`):
 
-`crav1-build-tasks` → loop-commit → `crav1-verify-spec` → loop-commit → (optional) fix loop → `crav1-verify-spec` again.
+`crav1-build-tasks` → loop-commit → `crav1-verify-build-against-spec` → loop-commit → (optional) fix loop → `crav1-verify-build-against-spec` again.
 
 Commit **style** is already persisted (or the parent just wrote the rule). Use that persist. Do **not** ask style. Do **not** pause for Cursor Allow/Stop or Settings directions (`approvals: already-done`).
 
@@ -30,9 +30,9 @@ Stop and return a **status block** (below) if:
 - Spec disagrees with the code → tell them `/crav1-tighten-spec`; do not edit `spec.md`
 - `crav1-fix-build-gaps` would stop (spec frozen, non-goal)
 - Commit / attribution needs them
-- Live host refresh needs them (`crav1-verify-spec` `references/live-host.md`) → `STATUS: needs_ready`
-- A local test dependency is not running, or tests skipped for one (`crav1-verify-spec` `references/test-dependencies.md`) → `STATUS: needs_dependency`. DETAIL starts with `BLOCKER: <dependency> is not running. <n> tests need it. Not verified.` Do not mark the task verified
-- Inner-loop queue non-empty after verify-spec → `STATUS: needs_fix` (do not enter **fix** until parent says `resume: fix`)
+- Live host refresh needs them (`crav1-verify-build-against-spec` `references/live-host.md`) → `STATUS: needs_ready`
+- A local test dependency is not running, or tests skipped for one (`crav1-verify-build-against-spec` `references/test-dependencies.md`) → `STATUS: needs_dependency`. DETAIL starts with `BLOCKER: <dependency> is not running. <n> tests need it. Not verified.` Do not mark the task verified
+- Inner-loop queue non-empty after verify-build-against-spec → `STATUS: needs_fix` (do not enter **fix** until parent says `resume: fix`)
 - They / parent said `stop`
 
 ## Resume
@@ -52,11 +52,11 @@ Follow **`crav1-build-tasks`** for this `T#` only.
 
 Then loop-commit.
 
-If the row did not go `[x]`, `STATUS: blocked`. Do not verify-spec as if the task shipped.
+If the row did not go `[x]`, `STATUS: blocked`. Do not verify-build-against-spec as if the task shipped.
 
 ## verify
 
-If **implement** changed a hosted API/UI, follow `live-host.md` first. Then **`crav1-verify-spec`**.
+If **implement** changed a hosted API/UI, follow `live-host.md` first. Then **`crav1-verify-build-against-spec`**.
 
 Loop-commit if verify files changed.
 
@@ -71,7 +71,7 @@ Only after `resume: fix`:
 
 1. **`crav1-fix-build-gaps`** with no Gap.
 2. Loop-commit.
-3. If inner-loop empty → verify-spec again, loop-commit if needed; still dirty → `STATUS: needs_fix`; clean → **done**.
+3. If inner-loop empty → verify-build-against-spec again, loop-commit if needed; still dirty → `STATUS: needs_fix`; clean → **done**.
 4. If queue remains after the fix, continue (1) until empty or a gate.
 
 Do not implement a new `T#`.

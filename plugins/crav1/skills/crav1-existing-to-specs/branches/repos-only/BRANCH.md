@@ -4,19 +4,19 @@ The user names one or more repos. You read those repos and write **one** archite
 
 Command: `/crav1-existing-to-specs`.
 
-This command is a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-existing-to-specs`, `/crav1-environment-read`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane. Every other skill is a later skill. This command still runs only when the user names repos.
+This command is a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs`, `/crav1-read-environment`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane. Every other skill is a later skill. This command still runs only when the user names repos.
 
 This is cross-cutting. It is not a lane. It is not a mode of Specify. It does not move work into Specify, Plan, or Build. It does not start those lanes.
 
 This is not `/crav1-add-to-spec`. That command sorts a code change that already landed onto specs that already exist. This command reads the repos the user named and writes one architecture spec. Do not send this job to that command, and do not absorb its job.
 
-This is not `/crav1-existing-to-specs`. Match needs a dump and writes one spec per slice. This command has no dump and writes one architecture spec. This is not `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, or `/crav1-intake-to-specs`. Those specify a feature. This command does not design the next feature.
+This is not `/crav1-existing-to-specs`. Match needs a dump and writes one spec per slice. This command has no dump and writes one architecture spec. This is not `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, or `/crav1-bundle-to-specs`. Those specify a feature. This command does not design the next feature.
 
 A later re-read is this command. It adds only what is new to the architecture spec and the system notes. It does not rewrite a line that is already there. It also reads `docs/architecture/left-out.md` and can remove a line from that file when the code shows it, or when that section dismisses it.
 
-## From /crav1-environment-read
+## From /crav1-read-environment
 
-When `/crav1-environment-read` hands a confirmed architecture section or a left-out line, run only this section, then stop. Do not run the repo read, the section interview, or the branch prompt. Do not start Specify, Plan, or Build.
+When `/crav1-read-environment` hands a confirmed architecture section or a left-out line, run only this section, then stop. Do not run the repo read, the section interview, or the branch prompt. Do not start Specify, Plan, or Build.
 
 An architecture section adds only what is new to `docs/architecture/spec.md` when that file is already there. Mark each new line `Seen in <host> <environment>.` When the line says `shared with prod`, `prod only`, or shape and connections only, keep that label. Do not mark it as a fact the code shows. A link is added only when that section says the environment shows the connection. Do not rewrite a line that is already there. If `docs/architecture/spec.md` is missing, write nothing. Do not create it from the environment.
 
@@ -57,7 +57,7 @@ Three passes:
 
 The architecture spec path is locked: `docs/architecture/spec.md`. The left-out path is locked beside it: `docs/architecture/left-out.md`. Both stay out of `docs/system` and out of `docs/specs`. Do not invent any other folder. Do not create `docs/specs/architecture/`. Do not put left-out guesses under a heading in `spec.md`.
 
-Do not point this pass at `/crav1-explain`. Do not run it.
+Do not point this pass at `/crav1-explain-existing-system`. Do not run it.
 
 ## Read (no files yet)
 
@@ -141,7 +141,7 @@ When the answer is **I will edit this section**, stop. Wait for the edited secti
 
 After every section has an answer, and after you create a new clean repo if they picked one. A repo with no commits skips the prompt. On a later re-read, when every confirmed fact and accepted guess is already a line in `docs/architecture/spec.md` and in the system notes this pass may edit, and `docs/architecture/left-out.md` would not gain, lose, or move a line, skip the branch. Write nothing. Say the files are current. A missing `docs/architecture/spec.md` is not current. Do not skip that write because the notes already state the facts.
 
-Follow `/crav1-feature-branch` (drop-in: `.cursor/skills/crav1/crav1-feature-branch/SKILL.md`; plugin: sibling `skills/crav1-feature-branch/SKILL.md`) in the **destination** repo. Slug: `architecture`. Specify options: `feat/architecture` first, then `spec/architecture`, stay, or other. Do not write files until that choice is done or skipped. Do not push. Do not open a pull request.
+Follow `/crav1-create-feature-branch` (drop-in: `.cursor/skills/crav1/crav1-create-feature-branch/SKILL.md`; plugin: sibling `skills/crav1-create-feature-branch/SKILL.md`) in the **destination** repo. Slug: `architecture`. Specify options: `feat/architecture` first, then `spec/architecture`, stay, or other. Do not write files until that choice is done or skipped. Do not push. Do not open a pull request.
 
 ## Write
 
@@ -168,7 +168,7 @@ A fact, link, guess, row, node, or edge that is already written is not new. Do n
 
 **Glossary.** `glossary.md` is part of the landscape, not a feature spec. Source is the code in the named repos. Do not invent terms, expansions, or definitions. Do not write TBD or to be decided. A row is only a word or abbreviation that code already uses. When that same code already says the expansion or meaning, put that text in Meaning. When the code never says what it means, set Meaning to `to be researched`. Skip ordinary English. A code identifier is not a row unless the code already treats that word as a term. Write the file even when it has no rows. An accepted guess does not add a row.
 
-The picture is the short description, the context diagram, and `## How the parts connect`. This write fills those three from the confirmed facts the repo sections’ answers kept. Do not run `/crav1-keep-current`.
+The picture is the short description, the context diagram, and `## How the parts connect`. This write fills those three from the confirmed facts the repo sections’ answers kept. Do not run `/crav1-refresh-system-notes`.
 
 ### Left-out file
 
@@ -184,7 +184,7 @@ When the code still does not show a left-out line, the line stays under `## Left
 
 ### Missing architecture spec
 
-A real note is already in `docs/system/`, and `docs/architecture/spec.md` is missing. Write that spec, using the `spec.md` row above, and write the left-out file. Leave every file under `docs/system/` as it is. The one exception is the `Synced at` cell under **Synced at** below, and only when `repos.md` already exists. Do not add any other line. Do not rewrite any other line. Do not create `repos.md` on this pass. Do not fill a gap in those notes on this pass. Do not run `/crav1-keep-current`.
+A real note is already in `docs/system/`, and `docs/architecture/spec.md` is missing. Write that spec, using the `spec.md` row above, and write the left-out file. Leave every file under `docs/system/` as it is. The one exception is the `Synced at` cell under **Synced at** below, and only when `repos.md` already exists. Do not add any other line. Do not rewrite any other line. Do not create `repos.md` on this pass. Do not fill a gap in those notes on this pass. Do not run `/crav1-refresh-system-notes`.
 
 ### Later re-read
 
@@ -207,7 +207,7 @@ A real note is already in `docs/system/`, and `docs/architecture/spec.md` is mis
 
 When `docs/system/` is missing or only the untouched template, those notes are not already there. Write them with the first-write table. Still add only what is new to the architecture spec.
 
-Do not run `/crav1-keep-current`. This pass is the add.
+Do not run `/crav1-refresh-system-notes`. This pass is the add.
 
 Do not write `plan.md`, `tasks.md`, `diagrams.md` inside the spec folder, `adr/` inside the spec folder, `export/`, `verify.md`, `fix-log.md`, `security.md`, or `work-item.md`. `docs/architecture/left-out.md` is the file for guesses that stay left out. Do not read `work-item-offer.md`. Do not write application code. Do not design the next feature. No goals for a feature, no acceptance list for work to build, no “should”.
 
@@ -223,7 +223,7 @@ Do not stamp a repo this run did not read. An empty cell stays empty. A consumer
 
 ## Stop
 
-Do not plan. Do not implement. Do not commit. Do not start Specify, Plan, or Build. Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-existing-to-specs`, `/crav1-add-to-spec`, `/crav1-plan-from-spec`, `/crav1-build-tasks`, `/crav1-explain`, `/crav1-keep-current`, or `/crav1-finalize-commit`.
+Do not plan. Do not implement. Do not commit. Do not start Specify, Plan, or Build. Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs`, `/crav1-add-to-spec`, `/crav1-plan-from-spec`, `/crav1-build-tasks`, `/crav1-explain-existing-system`, `/crav1-refresh-system-notes`, or `/crav1-finalize-commit`.
 
 Output only:
 

@@ -266,10 +266,10 @@ When the first section has no **fix** and no **drop**, the review says **ship**.
 
 When any first-section decision is **fix** or **drop**, the review does not say ship.
 
-On an outside pull request, the last line names `/crav1-keep-current` as the next step after the pull request merges, to bring its changes into the spec and `docs/system/`. This includes a mixed pull request, where any slug was built outside the kit. Do not run it. A pull request whose slugs all have `plan.md` does not get this line.
+On an outside pull request, the last line names `/crav1-refresh-system-notes` as the next step after the pull request merges, to bring its changes into the spec and `docs/system/`. This includes a mixed pull request, where any slug was built outside the kit. Do not run it. A pull request whose slugs all have `plan.md` does not get this line.
 
 ```text
-Next, after this pull request merges: /crav1-keep-current, to bring its changes into the spec and docs/system/.
+Next, after this pull request merges: /crav1-refresh-system-notes, to bring its changes into the spec and docs/system/.
 ```
 
 Then the [paste-ready comment](#paste-ready-comment), then the [post offer](#post-it). Then stop.
@@ -367,7 +367,7 @@ When a post fails, say what failed and what already posted. Do not retry by anot
 - No linter install. No branch-protection change. No required-check edit.
 - No comment, no vote, and no thread resolve without the user's yes in [Post it](#post-it). No label, no reviewer assignment.
 - No merge. Do not run `/crav1-merge-pr`.
-- Do not run `/crav1-keep-current`. On an outside pull request, name it once, as the next step after the pull request merges.
+- Do not run `/crav1-refresh-system-notes`. On an outside pull request, name it once, as the next step after the pull request merges.
 - Do not run this skill from `/crav1-open-pr`, `/crav1-merge-pr`, spark, specify, plan, or verify.
 - No `git checkout`, no `git commit`, no new branch, no push.
 - No dialog-box or browser Microsoft sign-in. No token printed or created.
