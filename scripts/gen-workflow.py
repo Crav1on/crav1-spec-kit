@@ -89,11 +89,18 @@ def step_names(st: dict) -> str:
     return " or ".join(f"`{slash(s)}`" for s in st["skills"])
 
 
+def kit_version() -> str:
+    import json
+    return json.loads((ROOT / "plugins/crav1/.cursor-plugin/plugin.json").read_text(encoding="utf-8"))["version"]
+
+
 def render_md(wf: dict) -> str:
     o = [
         "# Workflow routes",
         "",
         "<!-- Generated from docs/reference/workflow.yaml by scripts/gen-workflow.py. Do not edit by hand. -->",
+        "",
+        f"Kit version: {kit_version()}",
         "",
         "This page is the one written source for the order of kit commands. `/crav1-help` answers from it and names the route it used. The `crav1.mdc` order lines and every skill's next step in the [skills reference](skills.md) are generated from the same file, [workflow.yaml](workflow.yaml).",
         "",
