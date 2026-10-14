@@ -4,6 +4,19 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 
 ## Unreleased
 
+## 1.51.0 (2026-10-14)
+
+### Kit
+
+- `/crav1-review-pr`: follow-ups are no longer posted or pasted. The paste-ready block and the posted Azure DevOps or GitHub output (inline comments and summary) have only Blocker, Bugs, and Tests to add with this PR.
+- Follow-ups, including choices the description calls deliberate, are saved as `docs/notes/review-pr-<n>-follow-ups.md` in the existing notes format: the PR, the repo, the date, and each follow-up with its file and line (paths kept, since the note stays in the specs repo), plus an `open` row in `docs/notes/index.md`. They come back through the note flow: `/crav1-feature-candidates` reads open notes, and specs mark them Used by or Absorbed by.
+- The chat review still lists the follow-ups and says where the note was saved. A re-review updates the same note. No follow-ups, no note. When the specs repo is not in the workspace, the note is printed in the chat instead.
+- `plugins/crav1/.cursor-plugin/plugin.json` is 1.51.0.
+
+### Docs
+
+- [From a pull request review](docs/from-review-pr.md) has a Follow-ups section, and the reference page describes the note.
+
 ## 1.50.0 (2026-10-14)
 
 ### Kit

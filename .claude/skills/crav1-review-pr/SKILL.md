@@ -8,7 +8,9 @@ description: >-
   Cross-cutting. Not a lane and not a bot. Same family as /crav1-open-pr
   and /crav1-merge-pr. Ends with a paste-ready comment; posts it inline
   and sets a verdict only after the user's yes. Re-review marks earlier
-  findings fixed or open. Does not edit, test, or merge.
+  findings fixed or open. Follow-ups are kept out of the posted and
+  pasted comment and saved as a note in docs/notes/. Does not edit,
+  test, or merge.
 disable-model-invocation: true
 icon: git-pull-request
 color: orange
@@ -291,7 +293,7 @@ A thread marked resolved whose problem is still there is flagged `resolved but s
 
 Status lines and thread replies follow [Comment style](#comment-style): first person, friendly, varied, for example "Thanks, this looks sorted now in `abc1234`" or "I think there is still a little bit left here: …". A still-open finding is said softly, with the same information.
 
-New findings go under their own heading, `New findings`, in the same four sections as below. The ship-or-not rule counts still-open, partly-fixed, and new first-section findings.
+New findings go under their own heading, `New findings`, in the same sections as below. The ship-or-not rule counts still-open, partly-fixed, and new first-section findings.
 
 ## Paste-ready comment
 
@@ -299,7 +301,7 @@ End every review with one fenced Markdown block the user can paste into the pull
 
 - First line: the verdict, one line: `Approve`, `Approve with comments`, or `Changes needed`, said in the same friendly voice.
 - Then a varied opening line (see Comment style).
-- Then the sections, in this order, leaving out a section with nothing in it: **Blocker**, **Bugs**, **Tests to add with this PR**, **Follow-ups (not for this PR)**. A first-section fix or drop is a Blocker. A defect that is not a blocker is a Bug. A missing test is under Tests to add. A suggestion, and a deliberate choice the description explains, is a Follow-up.
+- Then the sections, in this order, leaving out a section with nothing in it: **Blocker**, **Bugs**, **Tests to add with this PR**. A first-section fix or drop is a Blocker. A defect that is not a blocker is a Bug. A missing test is under Tests to add. A suggestion, and a deliberate choice the description explains, is a follow-up: it is **not** in this block. It goes in the chat and in the follow-ups note (see [Follow-ups note](#follow-ups-note)).
 - Each remark links its file in the host's pull request files view (GitHub `https://github.com/<owner>/<repo>/pull/<n>/files`; Azure DevOps `<org-url>/<project>/_git/<repo>/pullrequest/<n>?_a=files&path=/<path>`), then gives per-line remarks as `<path>`, line `<n>`: `<remark>`, so each one can become an inline comment as it stands.
 - On a re-review, the earlier findings and their status come first, then `New findings` in the same sections.
 - No kit-internal details: no spec paths, no `docs/sources/` folders, no vault, no kit or skill names, no `F1` numbering that only this chat explains. A plan or verify miss is said in plain words about the change.
@@ -313,11 +315,34 @@ The default style for the paste-ready block, every posted comment, and every re-
 - Keep the source of the findings vague: "me and my checks". Never name a tool, a skill, a bot, or the kit. Never write that a tool found the author's mistakes.
 - Vary the opening every time, in the spirit of "So I have had a look, and run the PR through some of my checks". Never a fixed template.
 - Soft wording, same information: "I noticed…", "It looks like… maybe they could…?", "Would it be worth adding a test that…?". No flat statements of fault. Do not drop or water down a fact to sound soft.
-- Read the pull request description first. A choice the description says is deliberate is acknowledged ("I am ok with that") and goes under Follow-ups, framed as something they "might like" or that "may be a good idea", not as a fault.
+- Read the pull request description first. A choice the description says is deliberate is not raised as a fault. When it suggests something they "might like" or that "may be a good idea", it is a follow-up and goes to the note, not into the comment.
 
 The chat review above the block (F, I, S lines) keeps its plain format for the user. The style applies to what the author will read.
 
 The block is text in the chat. Showing it posts nothing.
+
+## Follow-ups note
+
+Follow-ups are not posted and not in the paste-ready block. The chat review still shows them, under **Follow-ups (not for this PR)**, then one line: `Follow-ups saved: docs/notes/<file>.md`.
+
+When the review has at least one follow-up, write a note in `docs/notes/` of the specs repo, in the existing notes format (`docs/notes/_template/note.md` and `index.md`; the same shapes `/crav1-meeting-to-specs` writes, drop-in: `.claude/skills/crav1-meeting-to-specs/assets/`; plugin: sibling `skills/crav1-meeting-to-specs/assets/`):
+
+- File: `docs/notes/review-pr-<n>-follow-ups.md`, where `<n>` is the pull request number. When two repos in this specs repo have the same pull request number, use `review-pr-<repo>-<n>-follow-ups.md`.
+- Title: `Follow-ups from PR <n> (<repo>)`.
+- `Date:` the review date.
+- `From review <date>. PR <n>, <repo>, <PR title>.` then one bullet per follow-up: `<path>`, line `<n>`: the follow-up in plain words. Paths and lines are kept, because the note stays in the specs repo. Use `no line` when the follow-up has no line.
+- No `Source:` line. `## Used by`, empty.
+- `docs/notes/index.md` gets one row for it, status `open`, empty used-by cell, as that format says. Create the folder and the index when they are missing. Do not rewrite another row.
+
+**Re-review.** When the note for that pull request exists, update it. Do not write a second note. Change the date to this review's date, add new follow-ups, and mark one the code now addresses as `(done in <short sha>)`. Do not remove a line. Leave `## Used by`, `Absorbed by`, and the index status as they are. When the review has no follow-ups and the note exists, leave the note.
+
+**No follow-ups.** Write no note.
+
+When the specs repo is not in this workspace, write nothing and print the note in the chat with the path it would have.
+
+The follow-ups come back through the existing note flow: `/crav1-feature-candidates` reads open notes, and a spec that takes one marks it Used by, or Absorbed by when it takes all of it. This skill does not do that marking.
+
+Writing the note is the only file this skill writes. It does not commit. Name `/crav1-finalize-commit` and do not run it.
 
 ## Post it
 
@@ -325,9 +350,9 @@ After the paste-ready block, offer to post. One question. Use the questions tool
 
 On yes:
 
-1. Post each per-line remark, in the comment style, as an inline comment on its exact file and line in the diff (GitHub: a pending review with `gh api repos/<owner>/<repo>/pulls/<n>/reviews` and one comment per finding with `path`, `line`, `side`; Azure DevOps: one thread per finding with `threadContext` file path and line). A finding with no line in the diff goes in the summary only.
+1. Post each per-line remark (Blocker, Bugs, Tests to add; never a follow-up), in the comment style, as an inline comment on its exact file and line in the diff (GitHub: a pending review with `gh api repos/<owner>/<repo>/pulls/<n>/reviews` and one comment per finding with `path`, `line`, `side`; Azure DevOps: one thread per finding with `threadContext` file path and line). A finding with no line in the diff goes in the summary only.
 2. On a re-review, reply in each earlier finding's existing thread with its status and the fixing commit, in the comment style. Add new inline comments only for new findings. Do not add a duplicate comment for an earlier finding.
-3. Post the summary: the paste-ready block **without** the verdict line.
+3. Post the summary: the paste-ready block **without** the verdict line. Follow-ups are never posted, not as inline comments and not in the summary.
 4. Then ask which verdict to set, as options: **Approve**, **Comment**, or **Request changes** (Azure DevOps: approve, no vote, wait for author, reject). Name the one the review points to. Set only the one the user picks. On GitHub the inline comments and summary go in that same review submit.
 5. Never resolve a thread. On a re-review, after posting, offer to resolve the threads marked Fixed. Resolve only on that yes.
 
@@ -337,7 +362,7 @@ When a post fails, say what failed and what already posted. Do not retry by anot
 
 - No review unless this turn names the pull request or clearly asks to review that one.
 - Do not pick the newest pull request.
-- No edits to code, `spec.md`, `plan.md`, `tasks.md`, or `verify.md`.
+- No edits to code, `spec.md`, `plan.md`, `tasks.md`, or `verify.md`. The only write is the follow-ups note in `docs/notes/` and its index row.
 - No test run, and no ask to run tests. When the slug has `plan.md`, quote `verify.md` or say it is missing. When the pull request is outside the kit, do not say `verify.md` is missing. Read the pipeline's recorded test results.
 - No linter install. No branch-protection change. No required-check edit.
 - No comment, no vote, and no thread resolve without the user's yes in [Post it](#post-it). No label, no reviewer assignment.
