@@ -39,9 +39,15 @@ jobs:
             fail=1
           fi
 
-          echo "== docs: docs/ ↔ plugins/crav1/docs/ (each release bundles its own docs) =="
-          if ! diff -ru docs plugins/crav1/docs; then
-            echo "plugins/crav1/docs/ differs from docs/; run scripts/sync-crav1-plugin.sh"
+          echo "== docs: docs/ ↔ bundled crav1-docs/ in every install (Cursor drop-in, plugin, Claude Code) =="
+          for d in .cursor/skills/crav1/crav1-docs plugins/crav1/skills/crav1-docs .claude/skills/crav1-docs; do
+            if ! diff -ru docs "$d"; then
+              echo "$d differs from docs/; run scripts/sync-crav1-plugin.sh"
+              fail=1
+            fi
+          done
+          if [ -e plugins/crav1/docs ]; then
+            echo "plugins/crav1/docs/ is gone since 1.53.0; the plugin bundles docs in skills/crav1-docs/"
             fail=1
           fi
 

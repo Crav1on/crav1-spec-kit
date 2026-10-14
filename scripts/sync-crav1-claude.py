@@ -31,6 +31,7 @@ import tempfile
 from pathlib import Path
 
 READONLY_TOOLS = "tools: Read, Grep, Glob"
+DOCS_DIR = "crav1-docs"  # bundled kit docs, not a skill
 
 # Longer prefixes first. Do not rewrite "~/.cursor/" (finalize-commit cites
 # ~/.cursor/cli-config.json, which is a Cursor setting, not a Claude path).
@@ -216,9 +217,12 @@ def generate(cursor: Path, dest: Path) -> None:
     (dest / "skills").mkdir(parents=True)
     (dest / "agents").mkdir(parents=True)
 
-    for skill_dir in sorted(p for p in skills_src.iterdir() if p.is_dir()):
+    for skill_dir in sorted(p for p in skills_src.iterdir() if p.is_dir() and p.name != DOCS_DIR):
         shutil.copytree(skill_dir, dest / "skills" / skill_dir.name)
     rewrite_tree_files(dest / "skills")
+    # The bundled kit docs are copied verbatim (no path rewrite), so they match docs/.
+    if (skills_src / DOCS_DIR).is_dir():
+        shutil.copytree(skills_src / DOCS_DIR, dest / "skills" / DOCS_DIR)
 
     agent_files = sorted(agents_src.glob("crav1-*.md"))
     if not agent_files:

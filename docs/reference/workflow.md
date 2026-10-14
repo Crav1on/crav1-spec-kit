@@ -2,6 +2,8 @@
 
 <!-- Generated from docs/reference/workflow.yaml by scripts/gen-workflow.py. Do not edit by hand. -->
 
+Kit version: 1.53.0
+
 This page is the one written source for the order of kit commands. `/crav1-help` answers from it and names the route it used. The `crav1.mdc` order lines and every skill's next step in the [skills reference](skills.md) are generated from the same file, [workflow.yaml](workflow.yaml).
 
 A route is an ordered list of steps for one situation. A step with more than one command means one of them. An optional step can be skipped when its condition does not hold.

@@ -9,7 +9,7 @@ description: >-
   When the docs do not cover a question, says "the kit doesn't say". On
   pushback, re-reads the file and keeps the answer unless the file says
   otherwise. Reads the kit repo's docs, or the docs bundled in the
-  installed plugin, never GitHub. When online, says once if a newer kit
+  installed kit (plugin or drop-in), never GitHub. When online, says once if a newer kit
   version is tagged. Writes nothing and runs no other skill.
 icon: life-buoy
 color: blue
@@ -28,12 +28,14 @@ Local files only. Never fetch an answer, a doc, or a skill from GitHub or the we
 Find the kit docs in this order and use the first that exists. Say which one you used once, at the top of the first answer.
 
 1. **The kit repo itself.** The workspace has `docs/reference/workflow.yaml`, `docs/reference/skills.yaml`, and `plugins/crav1/`. Use that `docs/`.
-2. **The installed plugin.** The `docs/` folder bundled in the plugin, next to its `skills/` folder (from this skill's folder: `../../docs/`). Each release bundles its own docs there, so the answer fits that exact version.
-3. **Neither.** A drop-in copy (`.cursor/` or `.claude/`) carries no docs. Answer only from the `SKILL.md` files next to this skill, say that the docs are not installed, and say that the plugin bundles them. Do not guess an order: for a route question, say "the kit doesn't say here" and name `docs/reference/workflow.md` in the kit repo.
+2. **The bundled docs next to the skills.** The `crav1-docs/` folder beside this skill's folder (from this skill's folder: `../crav1-docs/`). Every install carries it: the Cursor plugin (`skills/crav1-docs/`), the Cursor drop-in (`.cursor/skills/crav1/crav1-docs/`), and the Claude Code drop-in (`.claude/skills/crav1-docs/`, or `~/.claude/skills/crav1-docs/` in user scope). Each release bundles its own docs there, so the answer fits that exact version.
+3. **Neither.** Only the skill folders were copied. Answer only from the `SKILL.md` files next to this skill, say that `crav1-docs/` is missing, and that a full install copies it. Do not guess an order: for a route question, say "the kit doesn't say here" and name `docs/reference/workflow.md` in the kit repo.
 
 The product repo's own `docs/` (specs, `docs/system/`, notes) is not kit documentation. Read it only for file state (below).
 
 The files:
+
+Paths below are relative to that docs folder (`docs/` or `crav1-docs/`).
 
 - Routes: `docs/reference/workflow.yaml` and its page `docs/reference/workflow.md`.
 - Skills: `docs/reference/skills.yaml`, `docs/reference/skills.md`, and `docs/reference/skills/<name>.md`.
@@ -93,7 +95,7 @@ When the user questions an answer ("don't we need tighten-spec first?"), re-read
 
 At most once per chat, in the first answer:
 
-1. The installed version is `version` in the plugin's `.cursor-plugin/plugin.json` (kit repo: `plugins/crav1/.cursor-plugin/plugin.json`). A drop-in has none: skip the notice.
+1. The installed version is `version` in the plugin's `.cursor-plugin/plugin.json` (kit repo: `plugins/crav1/.cursor-plugin/plugin.json`). A drop-in has no `plugin.json`: use the `Kit version:` line at the top of `crav1-docs/reference/workflow.md`. When neither is readable, skip the notice.
 2. When the machine is online, read the tag names only, with a short timeout: `git ls-remote --tags --refs https://github.com/Crav1on/crav1-spec-kit` . Take the highest `vX.Y.Z`.
 3. When that is newer than the installed version, add one line: `A newer kit version is tagged: vX.Y.Z (installed X.Y.Z).` Nothing else.
 

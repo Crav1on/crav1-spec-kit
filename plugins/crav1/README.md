@@ -27,8 +27,8 @@ When you ask for startup options, these seven are the only ways in. That ask nam
 Every skill and subagent, grouped by lane (Specify, Plan, Build, Cross-cutting), with what it reads, writes, and leaves alone, is in the [skills reference](https://github.com/Crav1on/crav1-spec-kit/blob/main/docs/reference/skills.md). Each command has its own page there, for example [`/crav1-spark-to-spec`](https://github.com/Crav1on/crav1-spec-kit/blob/main/docs/reference/skills/crav1-spark-to-spec.md), linked to its walkthrough.
 
 - Skills: `/crav1-…`. Type `/crav1` to list them.
-- Help: `/crav1-help` answers what to run next, in what order, and what a command does, from the docs bundled in this plugin (`docs/`, next to `skills/`), for this exact version. Every answer names its source.
-- Docs: the kit's `docs/` for this release, including [Workflow routes](docs/reference/workflow.md).
+- Help: `/crav1-help` answers what to run next, in what order, and what a command does, from the docs bundled in this plugin (`skills/crav1-docs/`), for this exact version. Every answer names its source.
+- Docs: the kit's `docs/` for this release in `skills/crav1-docs/`, including [Workflow routes](skills/crav1-docs/reference/workflow.md).
 - Subagents: `crav1-spec-reviewer-agent`, `crav1-architecture-reviewer-agent`, `crav1-plan-reviewer-agent`, `crav1-complete-task-agent`, and `crav1-intake-slice-agent`. See [Subagents](https://github.com/Crav1on/crav1-spec-kit/blob/main/docs/reference/skills.md#subagents).
 - Rule: specs live under `docs/specs/`; system landscape under `docs/system/`. Every folder the kit writes: [Data layout](https://github.com/Crav1on/crav1-spec-kit/blob/main/docs/concepts/data-layout.md).
 

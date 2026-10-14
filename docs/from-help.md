@@ -51,8 +51,8 @@ Other agents follow the same rule. The always-on rule (`crav1.mdc` in Cursor, `C
 ## Where the answers come from
 
 - In the kit repo, its own `docs/`.
-- With the Cursor plugin, the `docs/` folder bundled in the plugin next to its skills. Each release bundles its own docs, so the answer fits the version you have.
-- A drop-in copy of `.cursor/` or `.claude/` has no docs. The command answers from the skill files only and says so.
+- In every install, the `crav1-docs/` folder next to the skills: `skills/crav1-docs/` in the Cursor plugin, `.cursor/skills/crav1/crav1-docs/` in the Cursor drop-in, and `.claude/skills/crav1-docs/` (or `~/.claude/skills/crav1-docs/`) in Claude Code. Each release bundles its own docs, so the answer fits the version you have.
+- When only the skill folders were copied and `crav1-docs/` is missing, the command answers from the skill files only and says so.
 
 It never fetches an answer from GitHub. When the machine is online, it reads the kit's tag names once and adds one line when a newer version is tagged.
 
