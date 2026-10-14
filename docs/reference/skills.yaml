@@ -1253,9 +1253,11 @@ skills:
     that pull request's own pipeline already recorded. It does not run the tests, and it does not ask
     to. It ends by naming `/crav1-keep-current` after the merge and does not run it. It ends with a
     paste-ready Markdown comment in your own friendly first-person voice, with a varied opening, the
-    sections Blocker, Bugs, Tests to add with this PR, and Follow-ups (not for this PR), a link to each
-    file in the pull request files view and per-line remarks, and no tool or kit names. Choices the
-    description calls deliberate are acknowledged and go under Follow-ups. Re-review replies use the
+    sections Blocker, Bugs, and Tests to add with this PR, a link to each file in the pull request files
+    view and per-line remarks, and no tool or kit names. Follow-ups, including choices the description
+    calls deliberate, are not posted and not in that comment; the chat lists them and they are saved as
+    `docs/notes/review-pr-<n>-follow-ups.md` (PR, repo, date, each with its file and line), which a
+    re-review updates and `/crav1-feature-candidates` reads as an open note. No follow-ups, no note. Re-review replies use the
     same voice. After your yes it posts each finding as an inline comment on its line and a summary without
     the verdict, then asks which verdict to set. A re-review reads the earlier findings from the pull
     request's own threads and marks each fixed (with the commit), partly fixed, still open, or no longer
@@ -1272,11 +1274,12 @@ skills:
   use_when: This turn names an open pull request
   table:
     reads: The pull request, its diff, and the spec
-    writes: Nothing
+    writes: A follow-ups note in `docs/notes/` when there are follow-ups
   reads: Reads one named open pull request, its diff, the spec, the body, and the required linter. When
     the slug has `plan.md`, also reads the plan and `verify.md`. When the slug has no `plan.md` or `tasks.md`,
     reads the pipeline's recorded test results instead and does not treat a missing `verify.md` as a finding.
-  writes: Writes no files. After the user's yes, posts inline comments, a summary, thread replies, and
+  writes: Writes `docs/notes/review-pr-<n>-follow-ups.md` and its `docs/notes/index.md` row when the review
+    has follow-ups, updating the same note on a re-review. After the user's yes, posts inline comments, a summary, thread replies, and
     the verdict the user picks.
   leaves_alone: Leaves code, the spec, the plan, and the merge alone. Never resolves a thread without a yes.
   exceptions: spark, specify, verify, `/crav1-open-pr`, and `/crav1-merge-pr` do not run it. An outside

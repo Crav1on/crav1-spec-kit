@@ -57,9 +57,17 @@ An outside pull request ends with one line. It names `/crav1-keep-current` as th
 
 A pull request that has a plan keeps the plan and `verify.md` checks in the section above. It does not get that line.
 
+## Follow-ups
+
+Follow-ups are suggestions, and choices the description calls deliberate. They are not for this pull request, so they are not posted to the pull request and are not in the paste-ready comment. The comment has only Blocker, Bugs, and Tests to add with this PR.
+
+The chat review still lists them, then says where they were saved. They go into one note in `docs/notes/` of the specs repo, in the usual notes format: `docs/notes/review-pr-<n>-follow-ups.md`, naming the pull request, the repo, the date, and each follow-up with its file and line. The paths stay, because the note stays in the specs repo. The note gets an `open` row in `docs/notes/index.md`.
+
+A re-review of the same pull request updates that note instead of writing a second one. A review with no follow-ups writes no note. The follow-ups come back through the existing note flow: [`/crav1-feature-candidates`](from-feature-candidates.md) reads open notes, and the spec that takes one marks it Used by, or Absorbed by. The note is not committed; `/crav1-finalize-commit` does that.
+
 ## What does not get written
 
-No code edit. No `spec.md` edit. No `plan.md` edit. No test run. No comment. No vote. No branch-protection change. No merge.
+No code edit. No `spec.md` edit. No `plan.md` edit. No test run. No comment or vote without your yes. The only file it writes is the follow-ups note. No branch-protection change. No merge.
 
 ## After
 
