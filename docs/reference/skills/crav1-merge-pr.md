@@ -34,7 +34,7 @@ Limits and exceptions: a required red host check stops it. It does not run [`/cr
 
 ## You run next / Runs by itself
 
-- You run next: Nothing in particular.
+- You run next: [`/crav1-keep-current`](crav1-keep-current.md) after an outside pull request merges
 - Runs by itself: Calls no skill.
 
 ## Lane and group

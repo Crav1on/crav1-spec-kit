@@ -191,6 +191,7 @@ def main() -> int:
                 errs.append(f"{key}: {s} is not a skill in skills.yaml")
     named = set(in_routes)
     named |= set((wf.get("also_next") or {}).keys())
+    named.add("crav1-help")  # any After section may point at help for the full order
     for vals in (wf.get("also_next") or {}).values():
         for v in vals:
             m = re.match(r"/(crav1-[a-z-]+)", v)

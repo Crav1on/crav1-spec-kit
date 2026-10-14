@@ -36,7 +36,7 @@ Limits and exceptions: creates no slug and no `docs/system/`. When the quote com
 
 ## You run next / Runs by itself
 
-- You run next: [`/crav1-finalize-commit`](crav1-finalize-commit.md)
+- You run next: [`/crav1-tighten-spec`](crav1-tighten-spec.md); [`/crav1-finalize-commit`](crav1-finalize-commit.md)
 - Runs by itself: Calls no skill.
 
 ## Lane and group

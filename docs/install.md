@@ -30,7 +30,7 @@ This kit repository is the source. Your product repository is where work happens
 | Project instruction | Cursor: rule `crav1.mdc`. Claude Code: `.claude/CLAUDE.md` (the same always-on text, not the README) |
 | Templates | Inside each skill’s `assets/` (and agent-assets). Optional human copies: `docs/specs/_template/`, `docs/system/_template/` |
 
-Not installed by the Cursor plugin: this repo’s README and `docs/`, `AGENTS.md`, `docs/specs/_template/`, or `docs/system/_template/`. Copy those starter folders yourself if you want them in git.
+The Cursor plugin bundles this repo's `docs/` (in the plugin's `docs/` folder, next to `skills/`), so `/crav1-help` answers for the installed version. A drop-in copy of `.cursor/` or `.claude/` does not include them. Not installed by the Cursor plugin: this repo’s README and `AGENTS.md`. The starter folders `docs/specs/_template/` and `docs/system/_template/` are in the bundled docs but are not copied into your repo. Copy them yourself if you want them in git.
 
 ## Project drop-in or user scope
 

@@ -36,7 +36,7 @@ Limits and exceptions: does not run [`/crav1-fix-bug`](crav1-fix-bug.md) or [`/c
 
 ## You run next / Runs by itself
 
-- You run next: [`/crav1-fix-from-verify`](crav1-fix-from-verify.md)
+- You run next: [`/crav1-fix-from-verify`](crav1-fix-from-verify.md); [`/crav1-fix-live`](crav1-fix-live.md); [`/crav1-draft-commit-message`](crav1-draft-commit-message.md); [`/crav1-finalize-commit`](crav1-finalize-commit.md)
 - Runs by itself: Calls no skill.
 
 ## Lane and group

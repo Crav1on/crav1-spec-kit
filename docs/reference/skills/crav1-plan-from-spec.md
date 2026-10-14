@@ -34,7 +34,7 @@ Limits and exceptions: when `## Linter` says this repo has no linter for the cod
 
 ## You run next / Runs by itself
 
-- You run next: [`/crav1-review-plan`](crav1-review-plan.md)
+- You run next: [`/crav1-review-plan`](crav1-review-plan.md); [`/crav1-specs-to-ado`](crav1-specs-to-ado.md); [`/crav1-tasks-to-ado`](crav1-tasks-to-ado.md); [`/crav1-complete-tasks`](crav1-complete-tasks.md); [`/crav1-complete-task`](crav1-complete-task.md); [`/crav1-implement-task`](crav1-implement-task.md)
 - Runs by itself: Calls no skill.
 
 ## Lane and group

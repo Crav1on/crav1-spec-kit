@@ -38,7 +38,7 @@ Limits and exceptions: a missing Feature type stops. An `az` failure, including 
 
 ## You run next / Runs by itself
 
-- You run next: [`/crav1-finalize-commit`](crav1-finalize-commit.md); [`/crav1-tasks-to-ado`](crav1-tasks-to-ado.md)
+- You run next: [`/crav1-plan-from-spec`](crav1-plan-from-spec.md); [`/crav1-tasks-to-ado`](crav1-tasks-to-ado.md); [`/crav1-complete-tasks`](crav1-complete-tasks.md); [`/crav1-complete-task`](crav1-complete-task.md); [`/crav1-implement-task`](crav1-implement-task.md); [`/crav1-finalize-commit`](crav1-finalize-commit.md)
 - Runs by itself: Calls [`/crav1-feature-candidates`](crav1-feature-candidates.md), and [`/crav1-add-to-spec`](crav1-add-to-spec.md) when a preview change belongs in the spec.
 
 ## Lane and group
