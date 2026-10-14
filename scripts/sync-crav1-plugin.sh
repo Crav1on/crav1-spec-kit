@@ -13,6 +13,8 @@ mkdir -p "$PLUGIN/skills" "$PLUGIN/agents" "$PLUGIN/rules" "$PLUGIN/agent-assets
 rm -rf "$ROOT/.cursor/skills/crav1/crav1-docs"
 mkdir -p "$ROOT/.cursor/skills/crav1/crav1-docs"
 cp -a "$ROOT/docs/." "$ROOT/.cursor/skills/crav1/crav1-docs/"
+# CHANGELOG travels with the docs so /crav1-help can answer "whats new" locally.
+cp -a "$ROOT/CHANGELOG.md" "$ROOT/.cursor/skills/crav1/crav1-docs/CHANGELOG.md"
 rm -rf "$PLUGIN/docs"
 
 # skills: replace tree
