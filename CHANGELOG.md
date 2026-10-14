@@ -4,6 +4,23 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 
 ## Unreleased
 
+## 1.53.0 (2026-10-14)
+
+### Kit
+
+- Every install now carries the kit docs next to the skills in a `crav1-docs/` folder: `.cursor/skills/crav1/crav1-docs/` (Cursor drop-in), `plugins/crav1/skills/crav1-docs/` (plugin), and `.claude/skills/crav1-docs/` (Claude Code drop-in, also `~/.claude/skills/crav1-docs/`). It is not a skill.
+- `/crav1-help` reads `../crav1-docs/` from its own folder in every install, after the kit repo's own `docs/`. Only when that folder is missing does it answer from the skill files alone. On a drop-in, the newer-version notice reads the `Kit version:` line in `reference/workflow.md`.
+- The plugin's `docs/` folder from 1.52.0 is replaced by `skills/crav1-docs/`.
+- `plugins/crav1/.cursor-plugin/plugin.json` is 1.53.0.
+
+### Docs
+
+- Install, [Ask the kit for help](docs/from-help.md), guild routing, the plugin README, CONTRIBUTING.md item 8, and the help reference name `crav1-docs/`. [Workflow routes](docs/reference/workflow.md) states the kit version.
+
+### CI
+
+- The sync job fails when any of the three `crav1-docs/` copies differs from `docs/`, or when `plugins/crav1/docs/` exists. `scripts/gen-workflow.py --check` fails when the kit version on the workflow page differs from `plugin.json`.
+
 ## 1.52.0 (2026-10-14)
 
 ### Kit
