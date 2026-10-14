@@ -6,7 +6,7 @@ Use this when the user asks about **one feature, slice, resource, or not-yet-fea
 
 This is cross-cutting. It is not its own lane. It may run from any lane. It does not move work into Specify, Plan, or Build. It does not start those lanes.
 
-It is a later skill. It is not a starter option. When the user asks for startup options, that ask names only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-match-to-specs`, `/crav1-repos-to-spec`, `/crav1-environment-read`, and `/crav1-fix-bug`. It does not run this command. The seven starter options stay unchanged.
+It is a later skill. It is not a starter option. When the user asks for startup options, that ask names only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-existing-to-specs`, `/crav1-environment-read`, and `/crav1-fix-bug`. It does not run this command. The six starter options stay unchanged.
 
 [Explain](from-explain.md) (`/crav1-explain`) reads `docs/system/` first. When the picture has nothing on the question, it quotes the first paragraph of a matching spec, labelled as coming from the spec, and names this command. It does not run this command. This command is the one feature. It reads the specs first.
 
@@ -35,7 +35,7 @@ A name matches first as written (`fn-market-data`, a slug, a title). A sentence 
 
 If the message has no name, no sentence, and no `@`, the command stops. Options only. It does not pick a thing.
 
-Pasted minutes go to `/crav1-meeting-to-specs`. A long dump goes to `/crav1-match-dump-to-specs`. This command stops and names that one. It does not run it.
+Pasted minutes go to `/crav1-add-to-spec`. A long dump goes to `/crav1-add-to-spec`. This command stops and names that one. It does not run it.
 
 ## Steps
 

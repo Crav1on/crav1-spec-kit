@@ -47,7 +47,7 @@ Search the repo for a linter or checker that covers the code these tasks will to
 Write the answer under `## Linter` in `plan.md`.
 
 - When the repo has one, name the tool and the command. Say which paths it covers. Build is expected to leave that check green.
-- When it does not, write that this repo has no linter or checker for that code. Stop before Build. The user decides to add the linter or to go on without one. Do not install one. Do not name `/crav1-implement-task`, `/crav1-complete-task`, `/crav1-complete-tasks`, or `/crav1-complete-features` until they choose. When they choose to go on without one, the usual next step applies, and the plan still says none.
+- When it does not, write that this repo has no linter or checker for that code. Stop before Build. The user decides to add the linter or to go on without one. Do not install one. Do not name `/crav1-build-tasks`, or `/crav1-complete-features` until they choose. When they choose to go on without one, the usual next step applies, and the plan still says none.
 
 A plan that never says which of those two is true is not complete. `/crav1-review-plan` and `/crav1-tighten-plan` use this same rule.
 

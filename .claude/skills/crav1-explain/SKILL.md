@@ -1,7 +1,7 @@
 ---
 name: crav1-explain
 description: >-
-  Read the system notes spark, ideas, intake, match, or repos-to-spec
+  Read the system notes spark, ideas, intake, match, or existing-to-specs
   already wrote (docs/system/). First answer is a short TLDR. Longer goes
   one level deeper from the same notes. The user can point at one part, or
   ask whether the system can do something. Yes points at the note. No says
@@ -38,8 +38,8 @@ Point at one command when what they brought makes it obvious. Do not run it.
 - One or two sentences, no notes yet: `/crav1-spark-to-spec`
 - A pile of ideas, no notes yet: `/crav1-ideas-to-spec`
 - Mixed files or several features, no notes yet: `/crav1-intake-to-specs`
-- Repos plus a dump, no notes yet: `/crav1-match-to-specs`
-- Named repos and no dump, no notes yet: `/crav1-repos-to-spec`
+- Repos plus a dump, no notes yet: `/crav1-existing-to-specs`
+- Named repos and no dump, no notes yet: `/crav1-existing-to-specs`
 
 If they brought none of those, name those five commands and stop.
 
@@ -148,7 +148,7 @@ When a stale mark is there, say the research is stale. Quote the mark. Name the 
 
 ## Stop
 
-Do not write a file. Do not invent a second document. Do not teach how to build it. Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-match-to-specs`, `/crav1-plan-from-spec`, `/crav1-implement-task`, `/crav1-keep-current`, `/crav1-whats-known-about`, or `/crav1-finalize-commit`.
+Do not write a file. Do not invent a second document. Do not teach how to build it. Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-existing-to-specs`, `/crav1-plan-from-spec`, `/crav1-build-tasks`, `/crav1-keep-current`, `/crav1-whats-known-about`, or `/crav1-finalize-commit`.
 
 Output only the answer, the spec quote when the picture has nothing on the question, the feature-index list when a slice is missing from the picture, and each stale research mark this run found.
 

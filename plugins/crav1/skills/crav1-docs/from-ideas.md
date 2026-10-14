@@ -2,7 +2,7 @@
 
 Kit not in this project yet? [Install first](install.md) (Cursor and Claude Code; the slash commands match, the files do not). After a Cursor plugin install, the short command loop is [plugins/crav1/README.md](../plugins/crav1/README.md). Claude Code has no plugin.
 
-Use this when you have **more than a spark**: several ideas, maybe UX notes, maybe “I think we should use X”, but it is not a spec you would hand to an agent to build. This command is a starter option. The seven are in [first-run.md](first-run.md). Asking for startup options names that list and does not run this command.
+Use this when you have **more than a spark**: several ideas, maybe UX notes, maybe “I think we should use X”, but it is not a spec you would hand to an agent to build. This command is a starter option. The six are in [first-run.md](first-run.md). Asking for startup options names that list and does not run this command.
 
 You still do **not** start by coding. You add an architecture interview and you write diagrams + ADRs. The canonical file remains `spec.md`. Formats are exports. The layout always includes `docs/system/`. This command seeds a thin landscape when that folder is missing (greenfield or an existing app), then writes the spec artifacts, then adds one index row. It fills that landscape from the repo already in front of the agent. When the landscape already exists, this command adds one index row (a repo or ADR row only when the feature needs a new repo) and adds what is new to the picture. Lines already there stay as they are. A missing `glossary.md` is written. An existing glossary gets only new rows for words that are not already listed. Existing rows are not rewritten. A meaning the source does not state is `to be researched`. That same pass adds what is new to the short description, the diagram, and how the parts connect. It does not rewrite what is already there.
 
@@ -134,7 +134,7 @@ If this work is on **`spec/<slug>`**, stop after plan: `/crav1-finalize-commit`,
 Then, in a **new** chat:
 
 ```text
-/crav1-implement-task
+/crav1-build-tasks
 @docs/specs/<slug>/tasks.md
 ```
 
@@ -148,28 +148,28 @@ When you want the full acceptance matrix:
 If the TL;DR still lists failed, unverified, or wiring `G#` rows (not “not implemented”):
 
 ```text
-/crav1-fix-from-verify
+/crav1-fix-build-gaps
 @docs/specs/<slug>/verify.md
 @docs/specs/<slug>/spec.md
 
 Do not change spec.md.
 ```
 
-Omit `Gap` to take the next inner-loop item (order: verify failed → claimed done/unverified → `G#`). Repeat until that queue is empty. Unimplemented `T#`s stay on `/crav1-implement-task`.
+Omit `Gap` to take the next inner-loop item (order: verify failed → claimed done/unverified → `G#`). Repeat until that queue is empty. Unimplemented `T#`s stay on `/crav1-build-tasks`.
 
 To take **one** `T#` implement-to-done in an **isolated worker chat** (style persisted as a rule):
 
 ```text
-/crav1-complete-task T2
+/crav1-build-tasks T2
 ```
 
 Several (orchestrator stays here; one worker per `T#`):
 
 ```text
-/crav1-complete-tasks T1-T3
+/crav1-build-tasks T1-T3
 ```
 
-Several **specs** (serial; each `feat/<slug>` from the default branch, then that spec’s T#s). One spec still uses complete-tasks:
+Several **specs** (serial; each `feat/<slug>` from the default branch, then that spec’s T#s). One spec still uses build-tasks:
 
 ```text
 /crav1-complete-features auth-login billing
@@ -178,7 +178,7 @@ Several **specs** (serial; each `feat/<slug>` from the default branch, then that
 When you are ready to commit by itself (after a `T#` or a live fix):
 
 ```text
-/crav1-draft-commit-message
+/crav1-finalize-commit
 ```
 
 Paste the **Summary** and **Description** blocks into your git client. The skill does not run `git commit` unless you also ask it to.
@@ -200,10 +200,10 @@ First time (no persist rule yet) it asks:
 
 Onward choices are mutually exclusive (writing one removes the other). To get the prompt again: delete that rule file. Which file that is depends on the host ([install.md](install.md)).
 
-Inner-loop example (same skill; `/crav1-fix-live` also works):
+Inner-loop example (same skill; `/crav1-fix-build-gaps` also works):
 
 ```text
-/crav1-fix-from-verify
+/crav1-fix-build-gaps
 Gap: T# claimed done, unverified — POST /register never reached SQL
 Live command: POST <url>/register
 Do not change spec.md.
@@ -213,14 +213,14 @@ Do not change spec.md.
 
 To link commits and the pull request to an Azure Boards work item, `docs/specs/<slug>/work-item.md` holds one id per line. A line may name the milestone or slice: `Work item: 52` or `Work item: 81 — October billing`. A file with one unlabeled line is the old format and is still read. The commented starter is [docs/specs/_template/work-item.md](specs/_template/work-item.md). Leave the ids out of `tasks.md`.
 
-On an Azure Repos remote (`dev.azure.com` or `*.visualstudio.com`), `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, and `/crav1-intake-to-specs` ask once after they create a new spec folder. The question is optional: reply with the id, or skip. Intake lists every new slug in that one question so the user can give an id per slug. A reply writes one line per id. Skip writes nothing and does not ask again in that run. GitHub and other hosts are not asked. Those skills do not create the Feature. Creating a Feature is [`/crav1-specs-to-ado`](from-specs-to-ado.md).
+On an Azure Repos remote (`dev.azure.com` or `*.visualstudio.com`), `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, and `/crav1-intake-to-specs` ask once after they create a new spec folder. The question is optional: reply with the id, or skip. Intake lists every new slug in that one question so the user can give an id per slug. A reply writes one line per id. Skip writes nothing and does not ask again in that run. GitHub and other hosts are not asked. Those skills do not create the Feature. Creating a Feature is [`/crav1-ado-sync`](from-specs-to-ado.md).
 
 The commit mention picks the line whose label matches the slice being worked. If that match is unclear, the commit skills ask. They do not guess.
 
 The file can still be added by hand.
 
-`/crav1-draft-commit-message` keeps the subject and description as drafted, then adds a blank line and the mention as the last line of the Description, so a paste into a git client includes it. `/crav1-finalize-commit` commits that same text and keeps the line when it checks HEAD and when it strips a host attribution trailer. `/crav1-open-pr` adds a `## Work item` section when the file has an id. The pull request title stays `<slug>: short summary`. The body stays What / why, Spec (links to that slug’s `spec.md`, `plan.md`, and `tasks.md`), Verify, then the work-item section.
+`/crav1-finalize-commit` keeps the subject and description as drafted, then adds a blank line and the mention as the last line of the Description, so a paste into a git client includes it. `/crav1-finalize-commit` commits that same text and keeps the line when it checks HEAD and when it strips a host attribution trailer. `/crav1-open-pr` adds a `## Work item` section when the file has an id. The pull request title stays `<slug>: short summary`. The body stays What / why, Spec (links to that slug’s `spec.md`, `plan.md`, and `tasks.md`), Verify, then the work-item section.
 
-The mention is `#52` on Azure Repos (`dev.azure.com` or `*.visualstudio.com`) and `AB#52` on GitHub. Any other host adds no mention. `Work item: AB#52` or `Work item: #52` is used as written. With no file, the skills continue. On Azure Repos only, they print one hint. They do not block, and `/crav1-open-pr` still does not pass `--work-items`. Creating a Feature stays `/crav1-specs-to-ado`.
+The mention is `#52` on Azure Repos (`dev.azure.com` or `*.visualstudio.com`) and `AB#52` on GitHub. Any other host adds no mention. `Work item: AB#52` or `Work item: #52` is used as written. With no file, the skills continue. On Azure Repos only, they print one hint. They do not block, and `/crav1-open-pr` still does not pass `--work-items`. Creating a Feature stays `/crav1-ado-sync`.
 
 Reference page: [ideas-to-spec](reference/skills/crav1-ideas-to-spec.md)

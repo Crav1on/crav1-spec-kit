@@ -8,7 +8,7 @@ description: >-
   slice Synced at line and leaves the column. Does not design or build the
   change. Can run on its own. Spark, ideas, intake, match, and siblings
   that append a glossary row run this same update without rewriting rows.
-  Reading named repos into one architecture spec is /crav1-repos-to-spec,
+  Reading named repos into one architecture spec is /crav1-existing-to-specs,
   not this. When pointed at an updated note in docs/research/, checks each
   listed stale point, splits an older mark into its hits, and routes the
   note's open questions whose answer lies outside its owner, without
@@ -25,9 +25,9 @@ You update the picture in `docs/system/` when something was added. You add what 
 
 This is cross-cutting. It is not its own lane. It does not move work into Specify, Plan, or Build.
 
-This is not `/crav1-repos-to-spec`. That command reads the repos the user named and writes one architecture spec the lanes can extend, plus these notes. Do not do that job. Do not invent an architecture from code. Do not create a slug.
+This is not `/crav1-existing-to-specs`. That command reads the repos the user named and writes one architecture spec the lanes can extend, plus these notes. Do not do that job. Do not invent an architecture from code. Do not create a slug.
 
-Spark, ideas, intake, match, match-dump, and code-into-specs run this picture update in the same pass that appends a glossary row. They follow [references/picture.md](references/picture.md) (drop-in: `.claude/skills/crav1-keep-current/references/picture.md`; plugin: this skill’s `references/picture.md`). They do not rewrite existing glossary rows. This command does not write glossary rows.
+Spark, ideas, intake, match, match-dump, and add-to-spec run this picture update in the same pass that appends a glossary row. They follow [references/picture.md](references/picture.md) (drop-in: `.claude/skills/crav1-keep-current/references/picture.md`; plugin: this skill’s `references/picture.md`). They do not rewrite existing glossary rows. This command does not write glossary rows.
 
 ## From /crav1-environment-read
 
@@ -42,12 +42,12 @@ Point at one command when what they brought makes it obvious. Do not run it.
 - One or two sentences: `/crav1-spark-to-spec`
 - A pile of ideas: `/crav1-ideas-to-spec`
 - Mixed files or several features: `/crav1-intake-to-specs`
-- Repos plus a dump: `/crav1-match-to-specs`
-- Named repos and no dump: `/crav1-repos-to-spec`
+- Repos plus a dump: `/crav1-existing-to-specs`
+- Named repos and no dump: `/crav1-existing-to-specs`
 
 If they brought none of those, name those five commands and stop.
 
-A caller that does not seed `docs/system/` (match-dump, code-into-specs) does nothing about the picture when that folder is missing.
+A caller that does not seed `docs/system/` (match-dump, add-to-spec) does nothing about the picture when that folder is missing.
 
 ## What was added
 

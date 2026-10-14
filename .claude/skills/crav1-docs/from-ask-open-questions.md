@@ -9,7 +9,7 @@ This is not `/crav1-resolve-questions`. Resolve walks the questions with you and
 ## First prompt
 
 ```text
-/crav1-ask-open-questions
+/crav1-show-or-ask-open-questions
 
 The open questions for <a person, one spec, or a topic>, as a mail.
 ```
@@ -49,6 +49,6 @@ When a mark was written:
 /crav1-finalize-commit
 ```
 
-When answers come back, bring the mail, minutes, transcript, or chat to [`/crav1-meeting-to-specs`](from-meeting.md), or a larger dump to [`/crav1-match-dump-to-specs`](from-match-dump.md). Those write an `Answered:` line with the quote and its source under the question. Then [`/crav1-resolve-questions`](from-draft-spec.md) offers that answer first. The marks are explained in [Data layout](concepts/data-layout.md#open-question-marks).
+When answers come back, bring the mail, minutes, transcript, or chat to [`/crav1-add-to-spec`](from-meeting.md), or a larger dump to [`/crav1-add-to-spec`](from-match-dump.md). Those write an `Answered:` line with the quote and its source under the question. Then [`/crav1-resolve-questions`](from-draft-spec.md) offers that answer first. The marks are explained in [Data layout](concepts/data-layout.md#open-question-marks).
 
-Reference page: [ask-open-questions](reference/skills/crav1-ask-open-questions.md)
+Reference page: [show-or-ask-open-questions](reference/skills/crav1-show-or-ask-open-questions.md)

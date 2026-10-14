@@ -6,7 +6,7 @@ Use this when the user wants Azure Boards Features read back onto the specs.
 
 This is cross-cutting. It is not its own lane. It may run from any lane. It does not move work into Specify, Plan, or Build. It does not start those lanes.
 
-It is a later skill. It is not a starter option. When the user asks for startup options, that ask names only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-match-to-specs`, `/crav1-repos-to-spec`, `/crav1-environment-read`, and `/crav1-fix-bug`. It does not run this command. The seven starter options stay unchanged.
+It is a later skill. It is not a starter option. When the user asks for startup options, that ask names only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-existing-to-specs`, `/crav1-environment-read`, and `/crav1-fix-bug`. It does not run this command. The six starter options stay unchanged.
 
 Sending a Feature is [From specs to Azure Boards](from-specs-to-ado.md).
 
@@ -15,13 +15,13 @@ Sending a Feature is [From specs to Azure Boards](from-specs-to-ado.md).
 New chat. Name ids, or leave them out to read every id the specs already record.
 
 ```text
-/crav1-ado-to-specs
+/crav1-ado-sync
 ```
 
 Named ids:
 
 ```text
-/crav1-ado-to-specs
+/crav1-ado-sync
 52 81
 ```
 
@@ -33,7 +33,7 @@ That slash command *is* the prompt.
 
 Ids come from every `docs/specs/<slug>/work-item.md` and from `## No spec yet in ADO` in `docs/system/landscape.md`, unless the user named ids. For each id it reads State, Priority, Target Date, Iteration, and Assigned To, plus discussion comments and history. It reads the checks from Acceptance Criteria when the Feature type has that field, and from the Acceptance checks list in the Description when it does not. A list that matches the spec is not a change. Discussion comments use an api version current `az` can parse.
 
-`az` is checked the same way as `/crav1-specs-to-ado`. A failure states the issue, suggests a fix such as `az login`, and offers a skip.
+`az` is checked the same way as `/crav1-ado-sync`. A failure states the issue, suggests a fix such as `az login`, and offers a skip.
 
 A deleted or missing id is reported as missing. The command does not guess another Feature.
 
@@ -61,4 +61,4 @@ When a spec changed:
 
 A Feature with no spec yet: run the starter it suggested, for example [`/crav1-spark-to-spec`](from-nothing.md). Sending a change the other way is [From specs to Azure Boards](from-specs-to-ado.md).
 
-Reference page: [ado-to-specs](reference/skills/crav1-ado-to-specs.md)
+Reference page: [ado-sync](reference/skills/crav1-ado-sync.md)

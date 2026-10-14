@@ -6,7 +6,7 @@
 
 ## Purpose
 
-Read the system notes spark, ideas, intake, match, or repos-to-spec already wrote (docs/system/).
+Read the system notes spark, ideas, intake, match, or existing-to-specs already wrote (docs/system/).
 
 When system notes already exist, **[`/crav1-explain`](crav1-explain.md)** reads `docs/system/` and answers with a short TLDR. Longer goes one level deeper from the same notes. On every run it compares the feature index with each slice's diagram node and its line under `## How the parts connect`. Names match only by slug, spec title, or main resource name. It lists each slice missing entirely or partly, including done and retired, with status, and names [`/crav1-keep-current`](crav1-keep-current.md). It does not run it. When the picture has nothing on the question, it quotes the first paragraph of the matching spec, labelled as coming from the spec, and names [`/crav1-whats-known-about`](crav1-whats-known-about.md). When no spec matches either, it says so and names that skill. It is cross-cutting. It is not its own lane. It does not guess, write a second document, teach, or start Specify, Plan, or Build. It stays read-only.
 

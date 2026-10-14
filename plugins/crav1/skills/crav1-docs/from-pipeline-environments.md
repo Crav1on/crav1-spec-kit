@@ -6,7 +6,7 @@ Use this when the user names **Azure DevOps**, the org, and the project, and wan
 
 This is cross-cutting. It is not its own lane. It may run from any lane. It does not move work into Specify, Plan, or Build. It does not start those lanes.
 
-It is a later skill. It is not a starter option. When the user asks for startup options, that ask names only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-match-to-specs`, `/crav1-repos-to-spec`, `/crav1-environment-read`, and `/crav1-fix-bug`. It does not run this command. The seven starter options stay unchanged.
+It is a later skill. It is not a starter option. When the user asks for startup options, that ask names only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-existing-to-specs`, `/crav1-environment-read`, and `/crav1-fix-bug`. It does not run this command. The six starter options stay unchanged.
 
 The command reads pipeline definitions. It lists and shows with `az pipelines` and `az devops`. It does not run a pipeline. It does not read builds, logs, test runs, or boards. The stage name gives the environment, with the same whole-word rule as `/crav1-environment-read`. A deploy step marks the resource it names. The resource group is context on that line. The rest of the group is not marked.
 

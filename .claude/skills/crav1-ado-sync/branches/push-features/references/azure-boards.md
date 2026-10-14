@@ -1,0 +1,161 @@
+# Azure Boards calls
+
+Shared by `/crav1-ado-sync`.
+
+Drop-in: `.claude/skills/crav1-ado-sync/branches/push-features/references/azure-boards.md`. Plugin: this skill’s `references/azure-boards.md`. From `/crav1-ado-sync`: sibling `skills/crav1-ado-sync/branches/push-features/references/azure-boards.md`.
+
+The chat does not show these commands. The user sees the form, the diff, or `Post comment on Feature <id>: <text>`.
+
+Pass `--detect false` on every `az` call. Do not run `az devops configure`. Do not substitute an org from `az devops configure`. Do not print a token, a secret, or a password.
+
+## Finding `az`
+
+Try `az` on `PATH` first. On Windows, `az.cmd` on `PATH` counts.
+
+Before reporting `az` as not installed, check the default install paths for the operating system where this command is running. Use the first path that exists.
+
+- Windows: `C:\Program Files\Microsoft SDKs\Azure\CLI2\wbin\az.cmd`, then `C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\wbin\az.cmd`
+- macOS: `/opt/homebrew/bin/az`, then `/usr/local/bin/az`
+- Linux: `/usr/bin/az`, then `/usr/local/bin/az`
+
+When one of those paths exists, use that path for every `az` call in the command. Do not install `az`.
+
+When `az` is not on `PATH` and none of those paths exists, `az` is not installed.
+
+## Org and project
+
+The project for a work item comes from its **work item home**: the `Work items go to` cell of the repo in `docs/system/repos.md`, or the `(ADO: <org>/<project>)` tag on a recorded `work-item.md` line. See [work-item-homes.md](work-item-homes.md). The sources below give the org, the suggestion when a home is asked, and the home of an older id line with no tag.
+
+Take the org and the project from the first source that names both:
+
+1. `docs/environments/marks.md`, when that file names the Azure DevOps org and project (an Azure DevOps URL, or both names written in the file).
+2. Azure DevOps URLs in `docs/system/repos.md`.
+
+An Azure DevOps URL matches `dev.azure.com` or `*.visualstudio.com` (HTTPS or SSH):
+
+- `https://dev.azure.com/<org>/<project>/_git/<repo>` — path segments. Ignore userinfo such as `https://<org>@dev.azure.com/...`.
+- `https://<org>.visualstudio.com/<project>/_git/<repo>` — the host label is the org.
+- `git@ssh.dev.azure.com:v3/<org>/<project>/<repo>` — the path after `v3/`.
+- `git@vs-ssh.visualstudio.com:v3/<org>/<project>/<repo>` and `<org>@vs-ssh.visualstudio.com:v3/<org>/<project>/<repo>` — the path after `v3/`.
+- `ssh://` URLs use the same path segments.
+
+Strip a trailing `.git`. A collection segment such as `DefaultCollection` is not the project.
+
+The org flag is `https://dev.azure.com/<org>` or `https://<org>.visualstudio.com`, matching the URL.
+
+Do not ask for a typed path. Do not guess an org. Do not read the org from the git remote of the docs repo. When the two sources name different pairs, ask which pair. Options only. One option per pair. Do not guess. When neither source names one org and one project, that is a failure. Offer skip.
+
+## Failure
+
+A failure is `az` not installed after the default-path check, `az` not signed in, the `azure-devops` extension missing, no access to the project, or no org and project in the two sources above.
+
+State the issue. Suggest a fix when there is one.
+
+- `az` not installed: point at `https://learn.microsoft.com/cli/azure/install-azure-cli`. Do not install it.
+- Extension missing: `az extension add --name azure-devops`. Point at `https://learn.microsoft.com/azure/devops/cli/`. Do not install it.
+- No login: `az login`. Do not run it. Do not log in.
+- No org and project: say `docs/environments/marks.md` and `docs/system/repos.md` do not name them.
+
+Offer skip. Use the questions tool when it is available. The options are only:
+
+1. **Retry**
+2. **Skip**
+
+Stop until the user picks. **Skip** stops the command. Say the Azure Boards calls did not run, and why. Do not create, update, or post.
+
+Check in this order: `az` installed, then `az extension show --name azure-devops`, then `az account show`. The Feature type check comes after those pass.
+
+## Feature type
+
+```text
+az boards work-item type list --organization <org-url> --project <project> --detect false -o json
+```
+
+The project has the type when a returned name is `Feature`. If it does not, say the project has no Feature work item type, and stop. That stop is not the skip prompt. Do not create a type. Do not create a work item of another type.
+
+## Feature fields
+
+Before the preview, read the fields on the project’s Feature type. Use the same `az` path as the rest of this file. Read once for the project.
+
+```text
+az devops invoke --area wit --resource workitemtypesfield --route-parameters project=<project> type=Feature --organization <org-url> --detect false --api-version 7.1 -o json
+```
+
+That call is `GET _apis/wit/workitemtypes/Feature/fields`.
+
+The type has Acceptance Criteria when a returned field has reference name `Microsoft.VSTS.Common.AcceptanceCriteria`, or the field name `Acceptance Criteria`. The list may be a bare array or a `value` array.
+
+When the type has that field, send the spec’s checks as `Microsoft.VSTS.Common.AcceptanceCriteria`. When it does not, do not send that field. Put the checks in the Description, under the summary paragraphs, as a numbered list headed `Acceptance checks`.
+
+A failed field read is a failure in the Failure section above. State the issue, suggest a fix, and offer Retry or Skip. Do not guess whether the field is there. Do not preview until the read succeeds.
+
+## Create and update
+
+Create:
+
+```text
+az boards work-item create --type Feature --title "<title>" --organization <org-url> --project <project> --detect false --fields "System.State=New" "Microsoft.VSTS.Common.ValueArea=Business" "System.Description=<html>" "Microsoft.VSTS.Common.AcceptanceCriteria=<html>" "System.Tags=<tags>" "Microsoft.VSTS.Scheduling.TargetDate=<YYYY-MM-DD>"
+```
+
+Omit `Microsoft.VSTS.Scheduling.TargetDate` when the spec states no target date. Omit `Microsoft.VSTS.Common.AcceptanceCriteria` when the spec has no checks, and omit it when the Feature type does not have that field. Omit `System.AreaPath`, `System.IterationPath`, and `Microsoft.VSTS.Common.Priority`. Area stays the project default. Iteration and Priority stay blank so the user’s team can set them.
+
+When the type has no Acceptance Criteria field, the Description is the summary paragraphs, then a paragraph `Acceptance checks`, then an ordered list. One check is one list item, in the spec’s order. When the spec has no checks, the Description is the summary paragraphs only. Do not add an empty `Acceptance checks` heading.
+
+```html
+<p>summary</p>
+<p>Acceptance checks</p>
+<ol>
+<li>check one</li>
+<li>check two</li>
+</ol>
+```
+
+Update:
+
+```text
+az boards work-item update --id <id> --organization <org-url> --project <project> --detect false --fields "<only fields the user accepted>"
+```
+
+Do not send State, Area, Iteration, Priority, or Assigned To on an update unless the accepted diff includes that field. Do not clear a target date the spec does not state. Tags on an update add the slice name and the code repos that are missing. Do not remove a tag the form does not list.
+
+The same field rule applies on an update. When the type has Acceptance Criteria, send changed checks on that field. When it does not, do not send `Microsoft.VSTS.Common.AcceptanceCriteria`, even if the work item returns a stored value. Put the checks in the Description. A re-run on a Feature that stored the checks off the form moves them into the Description.
+
+Description and Acceptance Criteria are HTML. Turn the plain paragraphs into `<p>` paragraphs. Escape `<`, `>`, and `&` in the summary and in each check. No links. No paths. No kit names. No skill names.
+
+Tags are semicolon-separated. The slice name, then each code repo the slice involves. Never the repo that holds the specs.
+
+## Show, comments, and history
+
+Show:
+
+```text
+az boards work-item show --id <id> --organization <org-url> --project <project> --detect false -o json
+```
+
+Read `System.State`, `Microsoft.VSTS.Common.Priority`, `Microsoft.VSTS.Scheduling.TargetDate`, `System.IterationPath`, `System.AssignedTo`, plus title, description, tags, and the checks.
+
+When the Feature type has Acceptance Criteria, the checks are `Microsoft.VSTS.Common.AcceptanceCriteria`. When it does not, the checks are the numbered list under the heading `Acceptance checks` in `System.Description`. The paragraphs above that heading are the description. Strip HTML tags before comparing. When that list matches the spec’s checks, the checks are not a change, and the list is not a description change. When the type has the field, do not read the checks from the Description. When it does not, do not read the checks from `Microsoft.VSTS.Common.AcceptanceCriteria`, even if the work item returns a value there.
+
+Comments:
+
+```text
+az devops invoke --area wit --resource comments --route-parameters project=<project> workItemId=<id> --organization <org-url> --detect false --api-version 7.1-preview -o json
+```
+
+`az devops invoke` deletes `-preview` and then parses the rest as a float. `7.1-preview.4` becomes `7.1.4` and fails. `7.1-preview` becomes `7.1` and parses. The call still sends `7.1-preview`. Do not use `7.1-preview.4`.
+
+History:
+
+```text
+az devops invoke --area wit --resource updates --route-parameters project=<project> id=<id> --organization <org-url> --detect false --api-version 7.1 -o json
+```
+
+A not-found id is missing. Do not search by title.
+
+Post a comment only after the user says yes:
+
+```text
+az devops invoke --area wit --resource comments --route-parameters project=<project> workItemId=<id> --organization <org-url> --detect false --http-method POST --api-version 7.1-preview --in-file <body.json> -o json
+```
+
+The body is `{"text":"<p>...</p>"}`. The text is the accepted reply. No docs-repo path, link, kit name, or skill name. Delete the body file after the call. Do not print the body file path in the chat.

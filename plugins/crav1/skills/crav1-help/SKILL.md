@@ -62,7 +62,7 @@ A short usage guide that lists every mode with one example each:
 | A concept | `/crav1-help work item homes`, `/crav1-help marks.md`, `/crav1-help stale marks` |
 | The skill list, or one lane | `/crav1-help list`, `/crav1-help list build` |
 | Where a slice is | `/crav1-help status cancel-booking`, `/crav1-help where am I` |
-| Two skills side by side | `/crav1-help compare complete-task complete-tasks` |
+| Two skills side by side | `/crav1-help compare build-tasks build-tasks` |
 | What changed | `/crav1-help whats new`, `/crav1-help whats new since 1.50` |
 | Anything else about the kit | `/crav1-help where do review follow-ups go?` |
 
@@ -98,7 +98,7 @@ The message names a kit word or file, such as `work item homes`, `marks.md`, `st
 
 ### 5. List, or one lane
 
-`list`: every skill grouped by lane (Specify, Plan, Build, Cross-cutting) and, inside each lane, by its group (phase), in the order of `docs/reference/skills.md`. One line each: the command and its `use_when`. Mark the seven starter options. `list <lane>` (`specify`, `plan`, `build`, `cross-cutting`): that lane only, with its subagents. The lanes come from `docs/reference/skills.yaml` and must match `docs/guild-routing.md`; when they differ, say so and cite both.
+`list`: every skill grouped by lane (Specify, Plan, Build, Cross-cutting) and, inside each lane, by its group (phase), in the order of `docs/reference/skills.md`. One line each: the command and its `use_when`. Mark the six starter options. `list <lane>` (`specify`, `plan`, `build`, `cross-cutting`): that lane only, with its subagents. The lanes come from `docs/reference/skills.yaml` and must match `docs/guild-routing.md`; when they differ, say so and cite both.
 
 ### 6. Status of a slice
 

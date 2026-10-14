@@ -2,7 +2,7 @@
 
 Kit not in this project yet? [Install first](install.md) (Cursor and Claude Code; the slash commands match, the files do not). After a Cursor plugin install, the short command loop is [plugins/crav1/README.md](../plugins/crav1/README.md). Claude Code has no plugin.
 
-Use this when **system notes already exist** under `docs/system/` and you want them read back. Spark, ideas, intake, match, and repos-to-spec write those notes. This command reads them.
+Use this when **system notes already exist** under `docs/system/` and you want them read back. Spark, ideas, intake, match, and existing-to-specs write those notes. This command reads them.
 
 A question about one feature, slice, resource, or not-yet-feature is [what's known about](from-whats-known-about.md) (`/crav1-whats-known-about`). That command reads the specs first. This command reads `docs/system/`. When the picture has nothing on the question, it quotes the first paragraph of the matching slice's spec, labelled as coming from the spec, and names `/crav1-whats-known-about`. When no spec matches either, it says so and names that skill. It does not run it.
 
@@ -44,14 +44,14 @@ That slash command *is* the prompt.
 
 | Phase | You | Agent |
 | --- | --- | --- |
-| Notes | — | Stops when `docs/system/` has no notes yet. Points at spark, ideas, intake, match, or repos-to-spec when the user named repos and brought no dump. Does not invent the notes |
+| Notes | — | Stops when `docs/system/` has no notes yet. Points at spark, ideas, intake, match, or existing-to-specs when the user named repos and brought no dump. Does not invent the notes |
 | Answer | Read the TLDR | A few sentences from the short description, or from the part you named |
 | Longer | Say longer | One level deeper from the same notes. The next longer opens one more heading. Stops when the notes have no further level |
 | Can it | Ask the question | Yes and where, no and where, or that is not written down |
 | Nothing in the picture | — | Quotes the first paragraph of the matching spec, labelled `From the spec`, and names `/crav1-whats-known-about`. When no spec matches, says so and names that skill. Does not run it |
 | Feature index | — | One line per slice missing a diagram node, a connection line, or both. Includes done and retired, with status. Names `/crav1-keep-current`. Does not run it |
 
-No notes in front of the command: it stops and points at spark, ideas, intake, match, or repos-to-spec when the user named repos and brought no dump.
+No notes in front of the command: it stops and points at spark, ideas, intake, match, or existing-to-specs when the user named repos and brought no dump.
 
 ## What gets written
 

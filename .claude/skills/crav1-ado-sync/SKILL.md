@@ -1,0 +1,39 @@
+---
+name: crav1-ado-sync
+description: >-
+  Keep specs and Azure Boards (ADO) in step. Opens with one question:
+  suggest Features (read only), push Features, push tasks, pull task
+  changes, or pull spec changes from Features. Skips the question when
+  the message already says which. Each choice keeps its own checks:
+  az first, previews, writes to Azure Boards only after a yes, ids
+  recorded in work-item.md, work-item homes per repo. Later skill. Not a
+  starter option. Replaces feature-candidates, specs-to-ado, tasks-to-ado,
+  ado-to-tasks, and ado-to-specs (their rules are kept as branches).
+disable-model-invocation: true
+icon: refresh-cw
+color: blue
+---
+
+# Azure Boards sync
+
+You move information between the specs and Azure Boards (ADO), one direction per run. You write to Azure Boards only after a yes, as each branch says.
+
+This replaces `/crav1-feature-candidates`, `/crav1-specs-to-ado`, `/crav1-tasks-to-ado`, `/crav1-ado-to-tasks`, and `/crav1-ado-to-specs` (1.56.0). Their rules are kept, unchanged, as the branches below. Follow the branch the answer picks, in full. Shared rules for every branch: [work item homes](branches/push-features/references/work-item-homes.md) and [Azure Boards](branches/push-features/references/azure-boards.md).
+
+## Opening question
+
+Ask one question, with the questions tool when it is available:
+
+1. **Suggest Features.** List Feature candidates from the landscape, specs, research, sources, and open notes. Read only. Follow [branches/suggest-features/BRANCH.md](branches/suggest-features/BRANCH.md).
+2. **Push Features.** Create or update Features from picked candidates or specs. Follow [branches/push-features/BRANCH.md](branches/push-features/BRANCH.md).
+3. **Push tasks.** Send one spec's tasks as child work items of its Feature. Follow [branches/push-tasks/BRANCH.md](branches/push-tasks/BRANCH.md).
+4. **Pull tasks.** Read back the task items a spec records and bring kept changes into the spec and `tasks.md`. Follow [branches/pull-tasks/BRANCH.md](branches/pull-tasks/BRANCH.md).
+5. **Pull spec changes.** Read back the Features the specs record and bring kept changes into the spec. Follow [branches/pull-spec-changes/BRANCH.md](branches/pull-spec-changes/BRANCH.md).
+
+Skip the question when the message already says which: "candidates" or "which Features" is 1; "create Features", "send the spec" is 2; "send the tasks" is 3; "read back the tasks", "task states" is 4; "read back the Features", "what changed in Boards" is 5. An alias (`/crav1-feature-candidates`, `/crav1-specs-to-ado`, `/crav1-tasks-to-ado`, `/crav1-ado-to-tasks`, `/crav1-ado-to-specs`) arrives with its choice already made.
+
+Where a branch says it calls or names another of these five, that is the matching choice of this skill. Run it only where that branch says so.
+
+## After
+
+Each branch ends with its own recap and next step.

@@ -27,13 +27,13 @@ The user names the host at the start. You read every non-prod environment on tha
 
 Command: `/crav1-environment-read`.
 
-This command is a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-match-to-specs`, `/crav1-repos-to-spec`, `/crav1-environment-read`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane. Every other skill is a later skill. This command still runs only when the user names the host. Naming production, prod, or live stops.
+This command is a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-existing-to-specs`, `/crav1-environment-read`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane. Every other skill is a later skill. This command still runs only when the user names the host. Naming production, prod, or live stops.
 
 This is cross-cutting. It is not a lane. It does not move work into Specify, Plan, or Build. It does not start those lanes.
 
 Cloud commands stay read-only. This skill does not create, update, delete, deploy, start, stop, or set a cloud resource. It does not install a CLI. It does not log in. The only file this skill writes is `docs/environments/marks.md`, and only by appending a line the user confirmed. It does not write `docs/system`, `docs/architecture/spec.md`, a feature spec, or `docs/architecture/left-out.md`. After the user confirms a section, the skill that already owns that file adds only what is new. A fact is marked seen in that environment. It is not marked as something the code shows. It does not become a link unless the environment actually shows the connection.
 
-This is not `/crav1-repos-to-spec`. That command reads repos. This command reads a host. This is not `/crav1-match-to-specs`. Match needs a dump and writes one spec per slice. This command does not create a slug. This is not `/crav1-code-into-specs`. `/crav1-pipeline-environments` proposes pipeline lines for `docs/environments/marks.md`. This command does not run it and does not write those lines.
+This is not `/crav1-existing-to-specs`. That command reads repos. This command reads a host. This is not `/crav1-existing-to-specs`. Match needs a dump and writes one spec per slice. This command does not create a slug. This is not `/crav1-add-to-spec`. `/crav1-pipeline-environments` proposes pipeline lines for `docs/environments/marks.md`. This command does not run it and does not write those lines.
 
 The host readers list a database and a storage account. They do not open them. After the first read, and before any section, this command can look inside. SQL metadata is [references/sql.md](references/sql.md). Storage structure is [references/storage.md](references/storage.md). Drop-in: `.cursor/skills/crav1/crav1-environment-read/references/`. Plugin: this skill’s `references/`. Both run only when the user says yes. A no leaves them unopened. The first read does not list tables, columns, prefixes, or blobs as facts.
 
@@ -343,15 +343,15 @@ Mark every added line `Seen in <host> <environment>.` Keep `shared with prod` wh
 
 **System.** `/crav1-keep-current` owns the picture in `docs/system` (drop-in: `.cursor/skills/crav1/crav1-keep-current/SKILL.md`; plugin: sibling `skills/crav1-keep-current/SKILL.md`). It adds only a new sentence, node, edge, or connection line. If `docs/system/` is missing, it writes nothing.
 
-**Architecture.** `/crav1-repos-to-spec` owns `docs/architecture/spec.md` (drop-in: `.cursor/skills/crav1/crav1-repos-to-spec/SKILL.md`; plugin: sibling `skills/crav1-repos-to-spec/SKILL.md`). It appends only a new line when that file is already there. If the file is missing, it writes nothing. It does not create the file from the environment.
+**Architecture.** `/crav1-existing-to-specs` owns `docs/architecture/spec.md` (drop-in: `.cursor/skills/crav1/crav1-existing-to-specs/branches/repos-only/BRANCH.md`; plugin: sibling `skills/crav1-existing-to-specs/branches/repos-only/BRANCH.md`). It appends only a new line when that file is already there. If the file is missing, it writes nothing. It does not create the file from the environment.
 
 **Match.** `/crav1-add-to-spec` owns the quote on a feature spec that already exists (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/SKILL.md`; plugin: sibling `skills/crav1-add-to-spec/SKILL.md`). It adds the quote only on a slice Match already owns. If none does, it writes nothing. It does not create a slug.
 
-**Left out.** `/crav1-repos-to-spec` owns `docs/architecture/left-out.md`. A line the environment now shows comes off that file. A line that stays is not rewritten. The line that comes off is not written back as a guess.
+**Left out.** `/crav1-existing-to-specs` owns `docs/architecture/left-out.md`. A line the environment now shows comes off that file. A line that stays is not rewritten. The line that comes off is not written back as a guess.
 
 ## Stop
 
-Do not plan. Do not implement. Do not commit. Do not start Specify, Plan, or Build. Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-match-to-specs`, `/crav1-plan-from-spec`, `/crav1-implement-task`, `/crav1-feature-branch`, `/crav1-finalize-commit`, or `/crav1-pipeline-environments`.
+Do not plan. Do not implement. Do not commit. Do not start Specify, Plan, or Build. Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-existing-to-specs`, `/crav1-plan-from-spec`, `/crav1-build-tasks`, `/crav1-feature-branch`, `/crav1-finalize-commit`, or `/crav1-pipeline-environments`.
 
 Output only:
 

@@ -47,7 +47,7 @@ If the open checkout is a different repo or a different branch, stop and name th
 
 If the spec names no branch, stop and ask which branch has the code. Do not assume `main`. Do not assume the open checkout. When that repo lists branches, the options are those branches. Do not pick one. After the user answers, that branch is the read. Do not write the branch onto the spec. That yes or no belongs to `/crav1-tighten-spec`. This skill leaves `spec.md` alone.
 
-If the spec is too thin for that read (partial, status `done`, or `## In the code` without a repo or without paths), stop. Name `/crav1-code-into-specs` when a change already landed on an existing spec. Name `/crav1-match-to-specs` when the slice was never matched. Do not guess. Do not write a task.
+If the spec is too thin for that read (partial, status `done`, or `## In the code` without a repo or without paths), stop. Name `/crav1-add-to-spec` when a change already landed on an existing spec. Name `/crav1-existing-to-specs` when the slice was never matched. Do not guess. Do not write a task.
 
 Read the committed files on that branch. An uncommitted edit is not the fact. List every built piece. Do not drop one to keep the list short.
 
@@ -135,9 +135,9 @@ Output only:
 - These notes name the checks. `/crav1-verify-spec` is the gate that says they passed. Do not run it here.
 - The linter line: the tool and command, or that this repo has none for the code these tasks will touch.
 - Next, when the plan names a linter: `/crav1-review-plan` (optional but useful), then `/crav1-tighten-plan` for plan `P#`s. Build is expected to leave that named check green.
-- Next, when the plan says there is no linter: stop before Build. Say that. The user decides to add the linter or to go on without one. Do not install one. Do not name `/crav1-implement-task`, `/crav1-complete-task`, `/crav1-complete-tasks`, or `/crav1-complete-features` until they choose. `/crav1-review-plan` and `/crav1-tighten-plan` stay available. They are not Build. When they choose to go on without one, the Build next step applies, and the plan still says none.
-- If this branch is `spec/<slug>` (specify-only): `/crav1-finalize-commit` (no push), then **they** open a PR when they want this spec on the default branch. Do **not** implement here. After it is on default: `/crav1-feature-branch` → `feat/<slug>`, then a **new chat** for `/crav1-implement-task` or `/crav1-complete-task`. That implement chat waits until the plan names a linter, or they chose to go on without one.
-- If this branch is `feat/<slug>` (or they stayed on one branch), and the plan names a linter or they chose to go on without one: **new chat**, `/crav1-implement-task` (or `/crav1-complete-task`) with `plan.md`, `tasks.md`, and `spec.md` attached.
+- Next, when the plan says there is no linter: stop before Build. Say that. The user decides to add the linter or to go on without one. Do not install one. Do not name `/crav1-build-tasks`, or `/crav1-complete-features` until they choose. `/crav1-review-plan` and `/crav1-tighten-plan` stay available. They are not Build. When they choose to go on without one, the Build next step applies, and the plan still says none.
+- If this branch is `spec/<slug>` (specify-only): `/crav1-finalize-commit` (no push), then **they** open a PR when they want this spec on the default branch. Do **not** implement here. After it is on default: `/crav1-feature-branch` → `feat/<slug>`, then a **new chat** for `/crav1-build-tasks`. That implement chat waits until the plan names a linter, or they chose to go on without one.
+- If this branch is `feat/<slug>` (or they stayed on one branch), and the plan names a linter or they chose to go on without one: **new chat**, `/crav1-build-tasks` (or `/crav1-build-tasks`) with `plan.md`, `tasks.md`, and `spec.md` attached.
 
 Do not start coding in this chat.
 

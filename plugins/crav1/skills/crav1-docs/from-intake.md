@@ -2,11 +2,11 @@
 
 Kit not in this project yet? [Install first](install.md) (Cursor and Claude Code; the slash commands match, the files do not). After a Cursor plugin install, the short command loop is [plugins/crav1/README.md](../plugins/crav1/README.md). Claude Code has no plugin.
 
-Use this when you have **1–N files** (notes, markdown, screenshots, diagrams, optional source code as background) that may describe a small app **or** a system with several features and several git repos. This command is a starter option. The seven are in [first-run.md](first-run.md). Asking for startup options names that list and does not run this command.
+Use this when you have **1–N files** (notes, markdown, screenshots, diagrams, optional source code as background) that may describe a small app **or** a system with several features and several git repos. This command is a starter option. The six are in [first-run.md](first-run.md). Asking for startup options names that list and does not run this command.
 
 You still do **not** start by coding. The command writes a **landscape** under `docs/system/`, then one `docs/specs/<slug>/` per accepted v0 feature. Later features do **not** re-run this command.
 
-One-liner? [from-nothing](from-nothing.md) (`/crav1-spark-to-spec`). One unstructured pile that is clearly one feature and one repo? [from-ideas](from-ideas.md) (`/crav1-ideas-to-spec`). Minutes, a transcript, an email, or a chat thread to match against specs that already exist? [from-meeting](from-meeting.md) (`/crav1-meeting-to-specs`). When a kept addition imports a source, that command writes `docs/sources/YYYY-MM-DD-<slug>/` and does not write the spec. It does not commit.
+One-liner? [from-nothing](from-nothing.md) (`/crav1-spark-to-spec`). One unstructured pile that is clearly one feature and one repo? [from-ideas](from-ideas.md) (`/crav1-ideas-to-spec`). Minutes, a transcript, an email, or a chat thread to match against specs that already exist? [from-meeting](from-meeting.md) (`/crav1-add-to-spec`). When a kept addition imports a source, that command writes `docs/sources/YYYY-MM-DD-<slug>/` and does not write the spec. It does not commit.
 
 ## First prompt
 
@@ -97,6 +97,6 @@ That puts `docs/system/` and the new spec slugs in git. No push. Intake does not
 
 ## Critique and build (per slug)
 
-Same as [from-ideas](from-ideas.md): `/crav1-architecture-reviewer` with the spec folder attached, then tighten, resolve questions, `/crav1-plan-from-spec` (names a linter when the repo has one, and stops before Build when it does not), optional `/crav1-review-plan` then `/crav1-tighten-plan`, implement or complete-task / complete-tasks / complete-features, verify, fix-from-verify.
+Same as [from-ideas](from-ideas.md): `/crav1-architecture-reviewer` with the spec folder attached, then tighten, resolve questions, `/crav1-plan-from-spec` (names a linter when the repo has one, and stops before Build when it does not), optional `/crav1-review-plan` then `/crav1-tighten-plan`, implement or build-tasks / complete-features, verify, fix-build-gaps.
 
 Reference page: [intake-to-specs](reference/skills/crav1-intake-to-specs.md)

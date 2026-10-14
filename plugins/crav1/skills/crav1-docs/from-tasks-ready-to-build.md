@@ -48,7 +48,7 @@ Needs verify
 
 Done: 3
 
-Next: /crav1-implement-task T5 (cancel-booking)
+Next: /crav1-build-tasks T5 (cancel-booking)
 Source: docs/specs/cancel-booking/spec.md, plan.md, tasks.md, verify.md
 ```
 
@@ -62,7 +62,7 @@ The more the kit records, the fewer reasons are inferred:
 
 ## Azure Boards
 
-It never reads Azure Boards (ADO). A task closed there but not ticked here still shows as not done. Run [`/crav1-ado-to-tasks`](from-ado-to-tasks.md) to bring task states back.
+It never reads Azure Boards (ADO). A task closed there but not ticked here still shows as not done. Run [`/crav1-ado-sync`](from-ado-to-tasks.md) to bring task states back.
 
 ## What does not get written
 
@@ -73,7 +73,7 @@ Nothing. No file, no commit, no command run.
 Build the task it named:
 
 ```text
-/crav1-implement-task T5
+/crav1-build-tasks T5
 @docs/specs/<slug>/
 ```
 

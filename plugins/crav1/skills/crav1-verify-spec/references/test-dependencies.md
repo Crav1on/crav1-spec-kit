@@ -46,7 +46,7 @@ Never as a footnote.
 ## Verified
 
 - A task is **Implemented, verified** only when its evidence ran and passed with no test skipped for a missing dependency, or when the user explicitly chose **skip** for that dependency.
-- Without that choice, the task is **Claimed done, unverified** and the box in `tasks.md` stays as `crav1-implement-task` says: not ticked on this evidence.
+- Without that choice, the task is **Claimed done, unverified** and the box in `tasks.md` stays as `crav1-build-tasks` says: not ticked on this evidence.
 - After a **skip**, `verify.md` → **Skipped tests** lists each skipped test, the dependency, and `skipped by user choice, <date>`.
 
 ## Missed by the preflight

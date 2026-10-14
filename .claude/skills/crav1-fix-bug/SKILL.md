@@ -17,13 +17,13 @@ Name **one** real bug they already named. Say where it was seen, what it breaks,
 
 Command: `/crav1-fix-bug`.
 
-This is cross-cutting. It is not a lane. It is not a stretch of verify. It is not `/crav1-fix-from-verify` and not `/crav1-fix-live`. Those walk the inner loop on work that is still in Build. This skill is an intake for a bug that already exists.
+This is cross-cutting. It is not a lane. It is not a stretch of verify. It is not `/crav1-fix-build-gaps` and not `/crav1-fix-build-gaps`. Those walk the inner loop on work that is still in Build. This skill is an intake for a bug that already exists.
 
 Run it only when **this turn** names a real bug. If this turn does not name one, stop. Do not go hunting. Do not scan the repo, `verify.md`, issues, tickets, or production. Do not pick a bug for them. Do not ask them to choose from bugs you found.
 
 It is not a skill that runs because a repo is new. Spark, ideas, intake, and match do not run it. Specify, plan, and verify do not run it. It is not started automatically. Other skills do not run this one.
 
-This command is a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-match-to-specs`, `/crav1-repos-to-spec`, `/crav1-environment-read`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane. Every other skill is a later skill. This command still runs only when the user names a real bug.
+This command is a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-existing-to-specs`, `/crav1-environment-read`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane. Every other skill is a later skill. This command still runs only when the user names a real bug.
 
 ## A real bug
 
@@ -39,7 +39,7 @@ These stay where they are. Say which row it is and stop. Do not name a lane for 
 | A design gap found before Build | The spec |
 | An unfinished task | That task |
 | A one-off flaky check | A note, unless it keeps blocking ship |
-| A verify failure on work that is not shipping yet | The inner loop. Point at `/crav1-fix-from-verify` (drop-in: `.claude/skills/crav1-fix-from-verify/SKILL.md`; plugin: sibling `skills/crav1-fix-from-verify/SKILL.md`). Do not run it |
+| A verify failure on work that is not shipping yet | The inner loop. Point at `/crav1-fix-build-gaps` (drop-in: `.claude/skills/crav1-fix-build-gaps/branches/verify-gaps/BRANCH.md`; plugin: sibling `skills/crav1-fix-build-gaps/branches/verify-gaps/BRANCH.md`). Do not run it |
 
 A one-off flaky check that **keeps blocking ship** is a real bug. They have to say it keeps blocking ship. Do not decide that by hunting.
 
@@ -91,7 +91,7 @@ Options are yes and no. Use the questions tool when it is available. Do not run 
 
 Do not edit code. Do not edit `spec.md`, `plan.md`, `tasks.md`, or `verify.md`. Do not open a pull request. Do not create an Azure Boards work item. Do not write `work-item.md`. Do not call Azure DevOps. Do not pass `--work-items`. Do not commit. Do not push.
 
-Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-tighten-spec`, `/crav1-plan-from-spec`, `/crav1-implement-task`, `/crav1-fix-from-verify`, `/crav1-fix-live`, `/crav1-verify-spec`, `/crav1-open-pr`, `/crav1-keep-current`, or `/crav1-finalize-commit`.
+Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-tighten-spec`, `/crav1-plan-from-spec`, `/crav1-build-tasks`, `/crav1-fix-build-gaps`, `/crav1-verify-spec`, `/crav1-open-pr`, `/crav1-keep-current`, or `/crav1-finalize-commit`.
 
 ## Hard rules
 
