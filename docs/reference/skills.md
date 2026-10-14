@@ -118,6 +118,43 @@ When the user asks for startup options, these six are the only ways in. That ask
 | [`/crav1-review-pr`](skills/crav1-review-pr.md) | — | This turn names an open pull request | The pull request, its diff, and the spec | A follow-ups note in `docs/notes/` when there are follow-ups | [`/crav1-merge-pr`](skills/crav1-merge-pr.md); [`/crav1-refresh-system-notes`](skills/crav1-refresh-system-notes.md) after an outside pull request merges | — | [From a pull request review](../from-review-pr.md) |
 | [`/crav1-merge-pr`](skills/crav1-merge-pr.md) | — | This turn asks to merge a named pull request | That named pull request | A merge commit on the host, and a fast-forward of the local default branch when the tree is clean | [`/crav1-refresh-system-notes`](skills/crav1-refresh-system-notes.md) after an outside pull request merges | — | [From commit to merge](../from-commit.md) |
 
+## Renamed skills
+
+These old names still work as deprecated aliases. Each one says it was renamed, hands off to the new skill, and pre-answers its opening question. They are removed in the release named below.
+
+| Old name | Now | Pre-answered choice | Removed in |
+| --- | --- | --- | --- |
+| `/crav1-implement-task` | [`/crav1-build-tasks`](skills/crav1-build-tasks.md) | one task (the worker follows the implement branch) | 1.58.0 |
+| `/crav1-complete-task` | [`/crav1-build-tasks`](skills/crav1-build-tasks.md) | one task | 1.58.0 |
+| `/crav1-complete-tasks` | [`/crav1-build-tasks`](skills/crav1-build-tasks.md) | a range or all | 1.58.0 |
+| `/crav1-complete-features` | [`/crav1-build-features`](skills/crav1-build-features.md) | — | 1.58.0 |
+| `/crav1-verify-spec` | [`/crav1-verify-build-against-spec`](skills/crav1-verify-build-against-spec.md) | — | 1.58.0 |
+| `/crav1-fix-from-verify` | [`/crav1-fix-build-gaps`](skills/crav1-fix-build-gaps.md) | verify report gaps | 1.58.0 |
+| `/crav1-fix-live` | [`/crav1-fix-build-gaps`](skills/crav1-fix-build-gaps.md) | live-site gaps | 1.58.0 |
+| `/crav1-match-dump-to-specs` | [`/crav1-add-to-spec`](skills/crav1-add-to-spec.md) | a dump | 1.58.0 |
+| `/crav1-code-into-specs` | [`/crav1-add-to-spec`](skills/crav1-add-to-spec.md) | a code change | 1.58.0 |
+| `/crav1-meeting-to-specs` | [`/crav1-add-to-spec`](skills/crav1-add-to-spec.md) | a meeting | 1.58.0 |
+| `/crav1-feature-candidates` | [`/crav1-ado-sync`](skills/crav1-ado-sync.md) | suggest Features | 1.58.0 |
+| `/crav1-specs-to-ado` | [`/crav1-ado-sync`](skills/crav1-ado-sync.md) | push Features | 1.58.0 |
+| `/crav1-tasks-to-ado` | [`/crav1-ado-sync`](skills/crav1-ado-sync.md) | push tasks | 1.58.0 |
+| `/crav1-ado-to-tasks` | [`/crav1-ado-sync`](skills/crav1-ado-sync.md) | pull tasks | 1.58.0 |
+| `/crav1-ado-to-specs` | [`/crav1-ado-sync`](skills/crav1-ado-sync.md) | pull spec changes | 1.58.0 |
+| `/crav1-match-to-specs` | [`/crav1-existing-to-specs`](skills/crav1-existing-to-specs.md) | repos plus a bundle (the second question is still asked) | 1.58.0 |
+| `/crav1-repos-to-spec` | [`/crav1-existing-to-specs`](skills/crav1-existing-to-specs.md) | repos only, one spec | 1.58.0 |
+| `/crav1-intake-to-specs` | [`/crav1-bundle-to-specs`](skills/crav1-bundle-to-specs.md) | — | 1.58.0 |
+| `/crav1-architecture-reviewer` | [`/crav1-review-architecture`](skills/crav1-review-architecture.md) | — | 1.58.0 |
+| `/crav1-resolve-questions` | [`/crav1-resolve-open-questions`](skills/crav1-resolve-open-questions.md) | — | 1.58.0 |
+| `/crav1-ask-open-questions` | [`/crav1-show-or-ask-open-questions`](skills/crav1-show-or-ask-open-questions.md) | ask | 1.58.0 |
+| `/crav1-draft-commit-message` | [`/crav1-finalize-commit`](skills/crav1-finalize-commit.md) | only write the message | 1.58.0 |
+| `/crav1-explain` | [`/crav1-explain-existing-system`](skills/crav1-explain-existing-system.md) | — | 1.58.0 |
+| `/crav1-whats-known-about` | [`/crav1-what-do-we-know-about-this`](skills/crav1-what-do-we-know-about-this.md) | — | 1.58.0 |
+| `/crav1-keep-current` | [`/crav1-refresh-system-notes`](skills/crav1-refresh-system-notes.md) | — | 1.58.0 |
+| `/crav1-pipeline-environments` | [`/crav1-map-pipeline-environments`](skills/crav1-map-pipeline-environments.md) | — | 1.58.0 |
+| `/crav1-security-review` | [`/crav1-review-security`](skills/crav1-review-security.md) | — | 1.58.0 |
+| `/crav1-environment-read` | [`/crav1-read-environment`](skills/crav1-read-environment.md) | — | 1.58.0 |
+| `/crav1-exploratory-test` | [`/crav1-run-exploratory-test`](skills/crav1-run-exploratory-test.md) | — | 1.58.0 |
+| `/crav1-feature-branch` | [`/crav1-create-feature-branch`](skills/crav1-create-feature-branch.md) | — | 1.58.0 |
+
 ## Subagents
 
 A subagent is an isolated worker that a skill or the user starts. Reviewers write nothing. Writers change only what is listed.

@@ -77,8 +77,27 @@ def validate(data: dict) -> list[str]:
     if len(names) != len(set(names)):
         errors.append("skills.yaml lists a skill twice")
     folders = sorted(p.name for p in SKILLS_DIR.iterdir() if (p / "SKILL.md").is_file())
+    aliases = {a["name"]: a for a in data.get("aliases") or []}
+    for a, e in aliases.items():
+        if a in names:
+            errors.append(f"{a} is both a skill and a deprecated alias")
+        if e.get("deprecated") is not True:
+            errors.append(f"alias {a}: needs deprecated: true")
+        if e.get("renamed_to") not in names:
+            errors.append(f"alias {a}: renamed_to {e.get('renamed_to')} is not a skill")
+        if not e.get("remove_in"):
+            errors.append(f"alias {a}: needs remove_in")
+        sk = SKILLS_DIR / a / "SKILL.md"
+        if not sk.is_file():
+            errors.append(f"alias {a}: .cursor/skills/crav1/{a}/SKILL.md is missing")
+        else:
+            t = sk.read_text(encoding="utf-8")
+            if "disable-model-invocation: true" not in t:
+                errors.append(f"alias {a}: SKILL.md needs disable-model-invocation: true")
+            if f"/{e.get('renamed_to')}" not in t:
+                errors.append(f"alias {a}: SKILL.md does not hand off to /{e.get('renamed_to')}")
     for f in folders:
-        if f not in names:
+        if f not in names and f not in aliases:
             errors.append(f"skill folder {f} is not in docs/reference/skills.yaml")
     for n in names:
         if n not in folders:
@@ -190,6 +209,18 @@ def render_table(data: dict) -> str:
                     )
                     + " |"
                 )
+    if data.get("aliases"):
+        out += [
+            "",
+            "## Renamed skills",
+            "",
+            "These old names still work as deprecated aliases. Each one says it was renamed, hands off to the new skill, and pre-answers its opening question. They are removed in the release named below.",
+            "",
+            "| Old name | Now | Pre-answered choice | Removed in |",
+            "| --- | --- | --- | --- |",
+        ]
+        for a in data["aliases"]:
+            out.append(f"| `/{a['name']}` | [`/{a['renamed_to']}`](skills/{a['renamed_to']}.md) | {a.get('choice') or '—'} | {a['remove_in']} |")
     out += [
         "",
         "## Subagents",
