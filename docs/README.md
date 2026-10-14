@@ -58,6 +58,7 @@ Find your way:
 
 - [Ask the kit for help](from-help.md): what to run next, in what order, and what a command does
 - [Workflow routes](reference/workflow.md)
+- [Tasks ready to build](from-tasks-ready-to-build.md): which tasks can be built now, and why the others cannot
 
 Keep the picture current:
 

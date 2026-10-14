@@ -38,7 +38,7 @@ For a route question, the command reads the slice's files and does not change th
 - A failure in `verify.md`.
 - Feature and task ids in `work-item.md`.
 
-It keeps every step of the route in the answer and gives a reason for each one it marks skipped. It names the first step to run and stops.
+It keeps every step of the route in the answer and gives a reason for each one it marks skipped. It names the first step to run and stops. When the route reaches building, it also says that [`/crav1-tasks-ready-to-build`](from-tasks-ready-to-build.md) can run any time to list which tasks are ready and why the others are blocked.
 
 Example: after a meeting changed a spec that has a plan and unbuilt tasks, the New information route gives tighten-spec, resolve-questions, plan-from-spec, specs-to-ado (only when the Feature itself changed), tasks-to-ado, complete-tasks, and verify-spec.
 
