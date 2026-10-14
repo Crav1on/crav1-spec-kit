@@ -193,6 +193,9 @@ skills:
   called_by: Called by the user.
   runs_by_itself: Calls `/crav1-feature-branch` when the repo already has commits.
   you_run_next:
+  - /crav1-feature-branch
+  - /crav1-architecture-reviewer
+  - /crav1-tighten-spec
   - /crav1-finalize-commit
   first_prompt: '/crav1-intake-to-specs
 
@@ -1116,6 +1119,8 @@ skills:
   runs_by_itself: Calls no skill.
   you_run_next:
   - /crav1-fix-from-verify
+  - /crav1-fix-live
+  - /crav1-draft-commit-message
   - /crav1-finalize-commit
   first_prompt: '/crav1-verify-spec
 

@@ -22,10 +22,10 @@
 routes:
   - id: new-slice
     title: New slice
-    when: You are starting a new feature from one or two sentences or a pile of ideas.
+    when: You are starting a new feature from one or two sentences, a pile of ideas, or several files.
     steps:
-      - skills: [crav1-spark-to-spec, crav1-ideas-to-spec]
-        when: One or two sentences (spark), or a pile of ideas and technical hunches (ideas).
+      - skills: [crav1-spark-to-spec, crav1-ideas-to-spec, crav1-intake-to-specs]
+        when: One or two sentences (spark), a pile of ideas and technical hunches (ideas), or mixed files or several v0 features (intake, then each slice follows this route).
       - skills: [crav1-feature-branch]
         optional: true
         when: Before the first commit for the slice, on `feat/<slug>` (or `spec/<slug>` for specify only).
@@ -56,10 +56,13 @@ routes:
           crav1-complete-features: [crav1-open-pr]
       - skills: [crav1-verify-spec]
         when: After implement-task, against the spec and the plan.
-      - skills: [crav1-fix-from-verify]
+      - skills: [crav1-fix-from-verify, crav1-fix-live]
         optional: true
         loop_to: crav1-verify-spec
-        when: When `verify.md` has a failure. Do not edit `spec.md` in this loop.
+        when: When `verify.md` has a failure (fix-from-verify), or to fix it against the running host (fix-live). Do not edit `spec.md` in this loop.
+      - skills: [crav1-draft-commit-message]
+        optional: true
+        when: When you want to see the commit message before the commit.
       - skills: [crav1-finalize-commit]
         when: When the slice verifies.
       - skills: [crav1-open-pr]
@@ -158,7 +161,6 @@ also_next:
   crav1-add-to-spec: [/crav1-finalize-commit]
   crav1-match-dump-to-specs: [/crav1-finalize-commit]
   crav1-code-into-specs: [/crav1-finalize-commit]
-  crav1-fix-live: [/crav1-verify-spec]
   crav1-draft-commit-message: [/crav1-finalize-commit]
   crav1-review-pr: [/crav1-keep-current after an outside pull request merges]
   crav1-explain: [/crav1-whats-known-about]

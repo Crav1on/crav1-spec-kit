@@ -8,7 +8,7 @@ A route is an ordered list of steps for one situation. A step with more than one
 
 | Route | When |
 | --- | --- |
-| [New slice](#new-slice) | You are starting a new feature from one or two sentences or a pile of ideas. |
+| [New slice](#new-slice) | You are starting a new feature from one or two sentences, a pile of ideas, or several files. |
 | [New information on an existing slice](#new-info) | Minutes, a mail, a chat, or a new fact changes a spec that already exists, built or not. |
 | [Bug](#bug) | Someone names a real bug. |
 | [Outside pull request](#outside-pr) | A pull request was built outside the kit (its slug has no `plan.md` or `tasks.md`). |
@@ -18,11 +18,11 @@ A route is an ordered list of steps for one situation. A step with more than one
 
 ## New slice
 
-You are starting a new feature from one or two sentences or a pile of ideas.
+You are starting a new feature from one or two sentences, a pile of ideas, or several files.
 
 | Step | Command | When |
 | --- | --- | --- |
-| 1 | `/crav1-spark-to-spec` or `/crav1-ideas-to-spec` | One or two sentences (spark), or a pile of ideas and technical hunches (ideas). |
+| 1 | `/crav1-spark-to-spec` or `/crav1-ideas-to-spec` or `/crav1-intake-to-specs` | One or two sentences (spark), a pile of ideas and technical hunches (ideas), or mixed files or several v0 features (intake, then each slice follows this route). |
 | 2 | `/crav1-feature-branch` | Optional. Before the first commit for the slice, on `feat/<slug>` (or `spec/<slug>` for specify only). |
 | 3 | `/crav1-architecture-reviewer` | Optional. When the spec touches structure, data, or integrations. |
 | 4 | `/crav1-tighten-spec` | Always, before questions and the plan. |
@@ -34,11 +34,12 @@ You are starting a new feature from one or two sentences or a pile of ideas.
 | 10 | `/crav1-tasks-to-ado` | Optional. When the Feature is in Azure Boards and the tasks should be too. |
 | 11 | `/crav1-implement-task` or `/crav1-complete-task` or `/crav1-complete-tasks` or `/crav1-complete-features` | One task in this chat (implement-task), or a worker per task (complete-task, complete-tasks, complete-features). The complete skills implement, commit, and verify each task inside their worker, so they go straight to the pull request. |
 | 12 | `/crav1-verify-spec` | After implement-task, against the spec and the plan. |
-| 13 | `/crav1-fix-from-verify` | Optional. When `verify.md` has a failure. Do not edit `spec.md` in this loop. Then back to `/crav1-verify-spec`. |
-| 14 | `/crav1-finalize-commit` | When the slice verifies. |
-| 15 | `/crav1-open-pr` | To push and open the pull request. |
-| 16 | `/crav1-review-pr` | Before the merge. |
-| 17 | `/crav1-merge-pr` | When the review says ship and the host checks are green. |
+| 13 | `/crav1-fix-from-verify` or `/crav1-fix-live` | Optional. When `verify.md` has a failure (fix-from-verify), or to fix it against the running host (fix-live). Do not edit `spec.md` in this loop. Then back to `/crav1-verify-spec`. |
+| 14 | `/crav1-draft-commit-message` | Optional. When you want to see the commit message before the commit. |
+| 15 | `/crav1-finalize-commit` | When the slice verifies. |
+| 16 | `/crav1-open-pr` | To push and open the pull request. |
+| 17 | `/crav1-review-pr` | Before the merge. |
+| 18 | `/crav1-merge-pr` | When the review says ship and the host checks are green. |
 
 <a id="new-info"></a>
 

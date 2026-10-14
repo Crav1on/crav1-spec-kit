@@ -10,7 +10,8 @@ and every `you_run_next` value in docs/reference/skills.yaml.
 --check also fails when a route names a skill that does not exist, when a
 skill in skills.yaml has no next steps from the routes, `also_next`, or
 `override`, when the help rule is missing from crav1.mdc or its copies, and
-when a walkthrough `## After` section names a skill that is not in a route.
+when a walkthrough `## After` section names a skill that workflow.yaml
+names in no route or `also_next` (an `override`-only skill, or no skill).
 After writing, run scripts/gen-skill-docs.py and scripts/sync-crav1-plugin.sh.
 """
 from __future__ import annotations
@@ -164,7 +165,7 @@ def after_check(route_skills: set[str]) -> list[str]:
             continue
         for n in sorted(set(re.findall(r"/(crav1-[a-z-]+)", m.group(0)))):
             if n not in route_skills:
-                errs.append(f"{f.relative_to(ROOT)}: ## After names /{n}, which is in no route or also_next of docs/reference/workflow.yaml")
+                errs.append(f"{f.relative_to(ROOT)}: ## After names /{n}, which docs/reference/workflow.yaml does not name in a route or also_next")
     return errs
 
 
@@ -189,6 +190,7 @@ def main() -> int:
             if s not in names:
                 errs.append(f"{key}: {s} is not a skill in skills.yaml")
     named = set(in_routes)
+    named |= set((wf.get("also_next") or {}).keys())
     for vals in (wf.get("also_next") or {}).values():
         for v in vals:
             m = re.match(r"/(crav1-[a-z-]+)", v)
