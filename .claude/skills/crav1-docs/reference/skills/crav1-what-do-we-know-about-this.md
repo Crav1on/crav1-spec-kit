@@ -2,7 +2,7 @@
 
 # /crav1-what-do-we-know-about-this
 
-[All skills](../skills.md) · Walkthrough: [What's known about one thing](../../from-whats-known-about.md) · Playbook: [`SKILL.md`](../../../.cursor/skills/crav1/crav1-what-do-we-know-about-this/SKILL.md)
+[All skills](../skills.md) · Walkthrough: [What's known about one thing](../../from-what-do-we-know-about-this.md) · Playbook: [`SKILL.md`](../../../.cursor/skills/crav1/crav1-what-do-we-know-about-this/SKILL.md)
 
 ## Purpose
 
@@ -57,4 +57,4 @@ What's the status of <the feature, slice, or resource>? What's pending?
 
 ## Walkthrough
 
-Step by step: [What's known about one thing](../../from-whats-known-about.md).
+Step by step: [What's known about one thing](../../from-what-do-we-know-about-this.md).

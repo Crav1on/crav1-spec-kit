@@ -120,7 +120,7 @@ Canonical spec stays Markdown. EARS / BDD / OpenSpec / YAML / JSON / BMAD are ex
 
 ### From intake files (several features or repos)
 
-When you have **1–N files** (notes, diagrams, screenshots, optional code as context) that may be a whole system, use **`/crav1-bundle-to-specs`**. Full walkthrough: [From intake files to specs](../from-intake.md).
+When you have **1–N files** (notes, diagrams, screenshots, optional code as context) that may be a whole system, use **`/crav1-bundle-to-specs`**. Full walkthrough: [From intake files to specs](../from-bundle-to-specs.md).
 
 **First prompt:**
 
@@ -138,7 +138,7 @@ Default if you only `@` a codebase: new system, that code is **context** (not ex
 
 ### From existing repos and a dump
 
-When one or more repos already make up a system, and a dump (notes, tickets, old docs, diagrams, screenshots) is what to match against that code, use **`/crav1-existing-to-specs`**. The repos are evidence of what exists. The dump is not a brief for a new product. Full walkthrough: [From existing repos and a dump to specs](../from-match.md).
+When one or more repos already make up a system, and a dump (notes, tickets, old docs, diagrams, screenshots) is what to match against that code, use **`/crav1-existing-to-specs`**. The repos are evidence of what exists. The dump is not a brief for a new product. Full walkthrough: [From existing repos and a dump to specs](../from-existing-to-specs-with-bundle.md).
 
 This does not replace `/crav1-bundle-to-specs`, `/crav1-spark-to-spec`, or `/crav1-ideas-to-spec`.
 
@@ -157,7 +157,7 @@ The command asks where the spec files go (one repo already in front of it, or a 
 
 ### From a later dump onto existing specs
 
-When specs already exist under `docs/specs/` and a new dump (notes, tickets, old docs, diagrams, screenshots) has to be sorted onto them, use **`/crav1-add-to-spec`**. Full walkthrough: [From a later dump onto existing specs](../from-match-dump.md).
+When specs already exist under `docs/specs/` and a new dump (notes, tickets, old docs, diagrams, screenshots) has to be sorted onto them, use **`/crav1-add-to-spec`**. Full walkthrough: [From a later dump onto existing specs](../from-add-to-spec-dump.md).
 
 Match creates the folders from repos plus a dump. Add takes information already aimed at one named spec. This command does not ask for a slug first. It reads the existing spec folders. One dump may be a lot about one slug, or it may cover many. Size is not a limit. It does not plan.
 
@@ -175,7 +175,7 @@ The command shows four piles (belongs to this spec, already in that spec, note, 
 
 ### From a code change that already landed
 
-When specs already exist under `docs/specs/` and a code change already landed without a spec, plan, or build, use **`/crav1-add-to-spec`**. Full walkthrough: [From a code change onto existing specs](../from-code.md).
+When specs already exist under `docs/specs/` and a code change already landed without a spec, plan, or build, use **`/crav1-add-to-spec`**. Full walkthrough: [From a code change onto existing specs](../from-add-to-spec-code-change.md).
 
 Match creates the folders from repos plus a dump. Match-dump sorts a later dump onto those specs. Add takes information already aimed at one named spec. This command starts from the change. No dump is required. It does not ask for a slug first. It reads the existing spec folders. It does not watch the repo. It runs only when someone points it at a change. It does not plan.
 

@@ -2,7 +2,7 @@
 
 # /crav1-ado-sync
 
-[All skills](../skills.md) · Walkthrough: [Feature candidates](../../from-feature-candidates.md) · Playbook: [`SKILL.md`](../../../.cursor/skills/crav1/crav1-ado-sync/SKILL.md)
+[All skills](../skills.md) · Walkthrough: [Feature candidates](../../from-ado-sync-suggest-features.md) · Playbook: [`SKILL.md`](../../../.cursor/skills/crav1/crav1-ado-sync/SKILL.md)
 
 ## Purpose
 
@@ -79,4 +79,4 @@ Stage: stable. Since: 1.31.0 ([changelog](../../../CHANGELOG.md)).
 
 ## Walkthrough
 
-Step by step: [Feature candidates](../../from-feature-candidates.md).
+Step by step: [Feature candidates](../../from-ado-sync-suggest-features.md).

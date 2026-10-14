@@ -2,7 +2,7 @@
 
 # /crav1-refresh-system-notes
 
-[All skills](../skills.md) · Walkthrough: [Keep the picture current](../../from-keep-current.md) · Playbook: [`SKILL.md`](../../../.cursor/skills/crav1/crav1-refresh-system-notes/SKILL.md)
+[All skills](../skills.md) · Walkthrough: [Keep the picture current](../../from-refresh-system-notes.md) · Playbook: [`SKILL.md`](../../../.cursor/skills/crav1/crav1-refresh-system-notes/SKILL.md)
 
 ## Purpose
 
@@ -59,4 +59,4 @@ Add what the specs already state to the picture. Do not rewrite what is already 
 
 ## Walkthrough
 
-Step by step: [Keep the picture current](../../from-keep-current.md).
+Step by step: [Keep the picture current](../../from-refresh-system-notes.md).

@@ -19,7 +19,7 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 | UI | User interface | |
 | LLM | Large language model | The model an agent runs on |
 | TL;DR | Too long; didn't read | The short answer first |
-| SQL | Structured Query Language | Environment-read looks at SQL metadata only, never rows |
+| SQL | Structured Query Language | Read-environment looks at SQL metadata only, never rows |
 | SAS | Shared access signature | A storage token. Always treated as a secret |
 | API | Application programming interface | |
 | VPN | Virtual private network | |
@@ -27,6 +27,12 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 ## Words
 
 **Starter option.** One of the six ways in: spark-to-spec, ideas-to-spec, bundle-to-specs, existing-to-specs, read-environment, fix-bug. Asking for startup options lists them and does not run one.
+
+**Alias (renamed skill).** An old skill name kept for two releases after a rename. It says it was renamed, hands off to the new skill, and pre-answers that skill's opening question. Listed under `aliases` in `skills.yaml` with `deprecated: true`. The 1.56.0 aliases are removed in 1.58.0.
+
+**Branch (of a skill).** One path inside a merged skill, kept in `branches/<id>/BRANCH.md` next to its `SKILL.md`. It holds the old skill's rules unchanged. The opening question picks the branch.
+
+**Opening question.** The question a merged skill asks first, with options, to pick a branch. Skipped when the message already answers it; an alias answers it ahead.
 
 **Later skill.** Any skill that is not a starter option. Most run once specs already exist.
 
@@ -50,7 +56,7 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 
 **v0.** The first version of a feature. Intake writes one spec per confirmed v0 feature.
 
-**Landscape, picture.** The system notes in `docs/system/`: the short description, the diagram, how the parts connect, and the feature index. Keep-current keeps the picture up to date.
+**Landscape, picture.** The system notes in `docs/system/`: the short description, the diagram, how the parts connect, and the feature index. Refresh-system-notes keeps the picture up to date.
 
 **Feature index.** The table in `docs/system/landscape.md` with one row per slice and its status.
 
@@ -80,7 +86,7 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 
 **`T#`, `P#`, `I#`, `G#`, `Q#`, `A#`.** Numbered items: tasks in `tasks.md`, plan findings from review-plan, architecture issues from review-architecture, gaps from verify, open questions in a spec, and bulk assumptions in the landscape.
 
-**Inner loop.** A gap that can be fixed and re-proved in the working tree. Fix-from-verify takes these one at a time.
+**Inner loop.** A gap that can be fixed and re-proved in the working tree. Fix-build-gaps takes these one at a time.
 
 **Worker, subagent.** An isolated helper a skill starts for one piece of work, such as one task or one intake slug. The five subagents are listed in the [skills reference](../reference/skills.md#subagents).
 

@@ -38,7 +38,7 @@ Otherwise start with tighten:
 | Open questions | `/crav1-resolve-open-questions`, then keep each open or answer it | One `Q#` at a time. An answer becomes spec text, a constraint, a non-goal, or an ADR, with its impact. A question with an `Answered:` line offers that answer first |
 | Accept | Read the spec. Say it is accepted | — |
 
-Questions only someone else can answer: draft them with [`/crav1-show-or-ask-open-questions`](from-ask-open-questions.md) and keep them open until the answer comes back.
+Questions only someone else can answer: draft them with [`/crav1-show-or-ask-open-questions`](from-show-or-ask-open-questions.md) and keep them open until the answer comes back.
 
 ## What gets written
 

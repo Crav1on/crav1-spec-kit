@@ -2,7 +2,7 @@
 
 # /crav1-review-security
 
-[All skills](../skills.md) · Walkthrough: [From a security review](../../from-security.md) · Playbook: [`SKILL.md`](../../../.cursor/skills/crav1/crav1-review-security/SKILL.md)
+[All skills](../skills.md) · Walkthrough: [From a security review](../../from-review-security.md) · Playbook: [`SKILL.md`](../../../.cursor/skills/crav1/crav1-review-security/SKILL.md)
 
 ## Purpose
 
@@ -58,4 +58,4 @@ Review the whole system. Do not write code. Do not plan.
 
 ## Walkthrough
 
-Step by step: [From a security review](../../from-security.md).
+Step by step: [From a security review](../../from-review-security.md).

@@ -32,10 +32,10 @@ Starters:
 
 - [From one sentence to a spec](from-nothing.md)
 - [From a pile of ideas to a spec](from-ideas.md)
-- [From intake files to specs](from-intake.md)
-- [From existing repos and a dump to specs](from-match.md)
-- [From named repos to an architecture spec](from-repos.md)
-- [From a named host](from-environment.md)
+- [From intake files to specs](from-bundle-to-specs.md)
+- [From existing repos and a dump to specs](from-existing-to-specs-with-bundle.md)
+- [From named repos to an architecture spec](from-existing-to-specs-repos-only.md)
+- [From a named host](from-read-environment.md)
 - [From a bug that already exists](from-fix-bug.md)
 
 The core loop, after a starter:
@@ -49,10 +49,10 @@ The core loop, after a starter:
 Once specs exist:
 
 - [From new information to an existing spec](from-add.md)
-- [From a later dump onto existing specs](from-match-dump.md)
-- [From a code change onto existing specs](from-code.md)
-- [From a meeting to specs](from-meeting.md)
-- [Ask open questions](from-ask-open-questions.md)
+- [From a later dump onto existing specs](from-add-to-spec-dump.md)
+- [From a code change onto existing specs](from-add-to-spec-code-change.md)
+- [From a meeting to specs](from-add-to-spec-meeting.md)
+- [Ask open questions](from-show-or-ask-open-questions.md)
 
 Find your way:
 
@@ -62,25 +62,25 @@ Find your way:
 
 Keep the picture current:
 
-- [From the system notes](from-explain.md)
-- [What's known about one thing](from-whats-known-about.md)
-- [Keep the picture current](from-keep-current.md)
-- [From Azure DevOps pipelines](from-pipeline-environments.md)
-- [From a security review](from-security.md)
+- [From the system notes](from-explain-existing-system.md)
+- [What's known about one thing](from-what-do-we-know-about-this.md)
+- [Keep the picture current](from-refresh-system-notes.md)
+- [From Azure DevOps pipelines](from-map-pipeline-environments.md)
+- [From a security review](from-review-security.md)
 
 Testing and review:
 
-- [From a built slice, exploratory test](from-exploratory-test.md)
+- [From a built slice, exploratory test](from-run-exploratory-test.md)
 - [From code that already exists, suggest tests](from-suggest-tests.md)
 - [From a pull request review](from-review-pr.md)
 
 Azure Boards:
 
-- [Feature candidates](from-feature-candidates.md)
-- [From specs to Azure Boards](from-specs-to-ado.md)
-- [From tasks to Azure Boards](from-tasks-to-ado.md)
-- [From Azure Boards to tasks](from-ado-to-tasks.md)
-- [From Azure Boards to specs](from-ado-to-specs.md)
+- [Feature candidates](from-ado-sync-suggest-features.md)
+- [From specs to Azure Boards](from-ado-sync-push-features.md)
+- [From tasks to Azure Boards](from-ado-sync-push-tasks.md)
+- [From Azure Boards to tasks](from-ado-sync-pull-tasks.md)
+- [From Azure Boards to specs](from-ado-sync-pull-spec-changes.md)
 
 Install:
 
@@ -108,9 +108,9 @@ Install:
 You turn ideas, meetings, and dumps into specs and keep them current.
 
 1. [First 15 minutes](first-run.md)
-2. A starter walkthrough: [one sentence](from-nothing.md), [a pile of ideas](from-ideas.md), or [intake files](from-intake.md)
-3. [From a draft spec to an accepted spec](from-draft-spec.md) and [Ask open questions](from-ask-open-questions.md)
-4. [From new information to an existing spec](from-add.md), [From a meeting to specs](from-meeting.md), [From a later dump onto existing specs](from-match-dump.md)
+2. A starter walkthrough: [one sentence](from-nothing.md), [a pile of ideas](from-ideas.md), or [intake files](from-bundle-to-specs.md)
+3. [From a draft spec to an accepted spec](from-draft-spec.md) and [Ask open questions](from-show-or-ask-open-questions.md)
+4. [From new information to an existing spec](from-add.md), [From a meeting to specs](from-add-to-spec-meeting.md), [From a later dump onto existing specs](from-add-to-spec-dump.md)
 5. [Data layout](concepts/data-layout.md) and [Data policy](concepts/data-policy.md)
 6. The Specify lane in the [skills reference](reference/skills.md#specify)
 

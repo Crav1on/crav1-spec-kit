@@ -2,9 +2,9 @@
 
 Kit not in this project yet? [Install first](install.md) (Cursor and Claude Code; the slash commands match, the files do not). After a Cursor plugin install, the short command loop is [plugins/crav1/README.md](../plugins/crav1/README.md). Claude Code has no plugin.
 
-Use this when **one spec already exists** and there is **new information** for that spec. Minutes, a transcript, an email, or a chat thread with many items is [from-meeting](from-meeting.md). A kept addition is handed here. The quote label follows the kind and the date. A `State:` line is not part of that quote. The impact check still runs.
+Use this when **one spec already exists** and there is **new information** for that spec. Minutes, a transcript, an email, or a chat thread with many items is [from-meeting](from-add-to-spec-meeting.md). A kept addition is handed here. The quote label follows the kind and the date. A `State:` line is not part of that quote. The impact check still runs.
 
-`/crav1-tighten-spec` stays for mushy wording. This command is for new information. [Match](from-match.md) creates the folders. This command updates one that already exists. It does not replace [intake](from-intake.md), [a spark](from-nothing.md), or [a pile of ideas](from-ideas.md). It does not write application code.
+`/crav1-tighten-spec` stays for mushy wording. This command is for new information. [Match](from-existing-to-specs-with-bundle.md) creates the folders. This command updates one that already exists. It does not replace [intake](from-bundle-to-specs.md), [a spark](from-nothing.md), or [a pile of ideas](from-ideas.md). It does not write application code.
 
 A not-started spec (match status `not in the code`, or a thin spec) can keep taking information until planning. Adding information does not start planning and does not write `plan.md` or `tasks.md`.
 
