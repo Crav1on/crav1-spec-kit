@@ -1378,9 +1378,9 @@ skills:
     the note''s owner, including when the mark clears. It does not ask the user.'
   leaves_alone: Leaves existing picture lines, glossary rows, design, and build alone.
   exceptions: spark, ideas, intake, match, match-dump, and add-to-spec run this picture update on
-    the pass that appends a glossary row. Repos-to-spec updates the picture in its own pass. Complete-features,
+    the pass that appends a glossary row. Existing-to-specs updates the picture in its own pass. Build-features,
     fix-bug, fix-build-gaps, read-environment, and the add-to-spec handoffs from read-environment and suggest-tests-for-code
-    may ask and do not run this command. Implement-task and build-tasks do not ask. It does not commit
+    may ask and do not run this command. Build-tasks and build-tasks do not ask. It does not commit
     a cleared research mark.
   called_by: Called by the user and by `/crav1-read-environment` for a confirmed system section.
   runs_by_itself: Calls no skill.

@@ -1,4 +1,4 @@
-# Complete-task worker (one T#, one isolated chat)
+# Build-tasks worker (one T#, one isolated chat)
 
 You run **only** this `T#`. You do not start another task. You do not launch another build-tasks agent.
 
