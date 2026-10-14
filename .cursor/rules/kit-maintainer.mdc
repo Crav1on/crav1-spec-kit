@@ -16,7 +16,7 @@ CI (`.github/workflows/drop-in-plugin-sync.yml`) fails the check when the plugin
 ## Drop-in (project `.cursor/`)
 
 - Skills: `.cursor/skills/crav1/crav1-<short-name>/` with frontmatter `name: crav1-<short-name>` (must match the folder that contains `SKILL.md`). Slash command: `/crav1-<short-name>`. Type `/crav1` to list them.
-- Cross-cutting pull-request skills: `/crav1-open-pr` opens one pull request and does not merge. `/crav1-merge-pr` merges one named pull request only when the user explicitly asks in that turn, and only with a merge commit. Do not fold merge into open-pr, complete-task, or review skills.
+- Cross-cutting pull-request skills: `/crav1-open-pr` opens one pull request and does not merge. `/crav1-merge-pr` merges one named pull request only when the user explicitly asks in that turn, and only with a merge commit. Do not fold merge into open-pr, build-tasks, or review skills.
 - Agents: `.cursor/agents/crav1-<name>.md` with `name: crav1-<name>`. Subagent `name:` ends in `-agent` so the Cursor slash picker can tell them apart from skills that share the same stem (`/crav1-architecture-reviewer` stays the skill; `crav1-architecture-reviewer-agent` is the subagent).
 - Guild routing: when you add, rename, or remove a skill, agent, or cross-cutting helper, update `docs/guild-routing.md` in the same PR. Update `docs/reference/skills.yaml` in that same PR and run `scripts/gen-skill-docs.py` (see Skill reference below).
 - Agent templates: `.cursor/agent-assets/crav1-<name>/` (not under `.cursor/agents/`).
@@ -57,13 +57,13 @@ When you **create or update** a crav1 skill or subagent that reads or writes spe
 
 1. Put a copy of each template in **that skill’s** `assets/` (and the matching `agent-assets/crav1-<agent-name>/` on both trees).
 2. Point the `SKILL.md` / agent prompt at **those** copies, not only `docs/specs/_template/`. Mention drop-in `.cursor/…` **and** plugin sibling paths when a file lives outside this skill. The Claude generator rewrites the `.cursor/` paths.
-3. Keep `docs/specs/_template/` and `docs/system/_template/` in sync with the matching `assets/` copies. If you change a template, update **every** copy. Note files use `docs/notes/_template/note.md` and `docs/notes/_template/index.md`. The same two files live in `crav1-meeting-to-specs`, `crav1-match-dump-to-specs`, and `crav1-add-to-spec` `assets/`.
+3. Keep `docs/specs/_template/` and `docs/system/_template/` in sync with the matching `assets/` copies. If you change a template, update **every** copy. Note files use `docs/notes/_template/note.md` and `docs/notes/_template/index.md`. The same two files live in `crav1-add-to-spec` `assets/`.
 4. Do **not** put template markdown under `.cursor/agents/` or `plugins/crav1/agents/` except the agent prompt file.
 5. Format recipes live in the skill’s `references/` (see `crav1-export-spec` / `crav1-ideas-to-spec`).
 
 Skills that do not use those files do not need empty `assets/` folders.
 
-Optional Azure Boards id file: `docs/specs/_template/work-item.md` is the HTML-comment starter only. Do not copy that template into skill `assets/`, and do not copy the comment into a slug. Commit and pull-request skills read `docs/specs/<slug>/work-item.md` when it exists. The file holds one id per line, with a milestone or slice label when one is recorded. A single unlabeled line is the old format and is still read. The mention picks the line whose label matches the slice being worked, and asks when that is unclear. `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, and `/crav1-intake-to-specs` may write a line when the user opts in on Azure Repos (`crav1-draft-commit-message` `references/work-item-offer.md`). They do not write the file when the user skips. Creating a Feature is `/crav1-specs-to-ado`.
+Optional Azure Boards id file: `docs/specs/_template/work-item.md` is the HTML-comment starter only. Do not copy that template into skill `assets/`, and do not copy the comment into a slug. Commit and pull-request skills read `docs/specs/<slug>/work-item.md` when it exists. The file holds one id per line, with a milestone or slice label when one is recorded. A single unlabeled line is the old format and is still read. The mention picks the line whose label matches the slice being worked, and asks when that is unclear. `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, and `/crav1-intake-to-specs` may write a line when the user opts in on Azure Repos (`crav1-finalize-commit` `references/work-item-offer.md`). They do not write the file when the user skips. Creating a Feature is `/crav1-ado-sync`.
 
 ## Install docs
 

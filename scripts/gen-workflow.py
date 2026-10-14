@@ -134,7 +134,7 @@ def order_block(wf: dict) -> str:
             parts.append(p)
         lines.append(f"- {r['title']}: " + " → ".join(parts) + ".")
     lines.append(
-        "- The complete skills (complete-task, complete-tasks, complete-features) verify each task inside their worker, then go to open-pr. `/crav1-tasks-ready-to-build` can run any time to list ready and blocked tasks. Full routes: `docs/reference/workflow.md` (kit repo, or `crav1-docs/` next to the skills)."
+        "- The build skills (build-tasks, complete-features) verify each task inside their worker, then go to open-pr. `/crav1-tasks-ready-to-build` can run any time to list ready and blocked tasks. Full routes: `docs/reference/workflow.md` (kit repo, or `crav1-docs/` next to the skills)."
     )
     lines.append(END)
     return "\n".join(lines)
