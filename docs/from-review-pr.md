@@ -32,7 +32,9 @@ If the message does not name a pull request, the command asks which one and stop
 | Must be true before ship | Read the findings | Each miss is its own finding. Three lines: what is off, what could happen, and the decision (ship, fix, or drop). Any fix or drop means the review does not say ship. An outside-the-kit note and a recorded-test note are info. They do not block ship |
 | Lane | — | Names the lane and does not start it. Spec miss → Specify. Plan miss → Plan, only when that slug has `plan.md`. Verify miss, a file the plan already named but the diff lacks, or a red or missing linter → Build. Body mismatch → rewrite the pull request body, not a new spec |
 | Suggestions | Read them | Style, patterns, and practices the repo already wrote down, plus dead code, or a name that hides what the code does. They do not block ship. A secret in the diff is a first-section fix |
-| Stop | Glance | A clean review says so and stops. It does not merge. It does not comment or vote |
+| Paste-ready comment | Copy it, or wait for the post question | Ends with one Markdown block you can paste into the pull request as one comment: a verdict line, then Blocker, Bugs, and Tests to add with this PR. Showing it posts nothing |
+| Post | Answer yes or no | Asks once whether to post under your own account. On yes, posts each remark inline on its file and line, posts the summary, then asks which verdict to set |
+| Stop | Glance | A clean review says so and stops. It does not merge. It never resolves a thread without your yes |
 
 ## What it checks
 
@@ -57,17 +59,56 @@ An outside pull request ends with one line. It names `/crav1-keep-current` as th
 
 A pull request that has a plan keeps the plan and `verify.md` checks in the section above. It does not get that line.
 
+## Paste-ready comment
+
+Every review ends with one fenced Markdown block you can paste into the pull request as one comment:
+
+- The first line is the verdict: `Approve`, `Approve with comments`, or `Changes needed`.
+- Then an opening line, then the sections **Blocker**, **Bugs**, and **Tests to add with this PR**. A section with nothing in it is left out.
+- Each remark links its file in the pull request files view, then gives `<path>`, line `<n>`: the remark, so each one can become an inline comment.
+- It has no kit details: no spec paths, no skill names, no numbering that only the chat explains.
+
+The chat review above the block keeps its plain format for you. The block is for the author.
+
+## Comment style
+
+The block, every posted comment, and every re-review reply use the style Thomas and Rhea agreed on 2026-10-12. It is the default:
+
+- Your own first-person voice, friendly, so the author never feels criticized.
+- A vague source, such as "me and my checks". It never names a tool, a bot, or the kit.
+- A different opening each time, for example "So I have had a look, and run the PR through some of my checks".
+- Soft wording with the same facts: "I noticed…", "Would it be worth adding a test that…?"
+- The pull request description is read first. A choice it calls deliberate is not raised as a fault. It becomes a follow-up.
+
+## Post it
+
+After the block, the review asks one question: post, or do not post. It posts under your own account, and nothing posts without your yes. On yes:
+
+1. Each remark is posted as an inline comment on its file and line. A remark with no line in the diff goes in the summary only.
+2. The summary is the block without the verdict line. Follow-ups are never posted.
+3. The review asks which verdict to set: **Approve**, **Comment**, or **Request changes** (on Azure DevOps (ADO): approve, no vote, wait for author, or reject). It names the one the review points to and sets only the one you pick.
+
+When a post fails, the review says what failed and what already posted, and does not retry another way.
+
+## Re-review
+
+When the pull request already has review comments, the next run is a re-review. It reads the earlier findings from the pull request's own comments and threads, from anyone. A block still in the chat is used only when the pull request has no comments.
+
+Each earlier finding gets one line first: **Fixed** (with the short commit SHA), **Partly fixed**, **Still open**, or **No longer relevant**. A resolved thread whose problem is still there is flagged `resolved but still open`. New findings follow under `New findings`.
+
+On post, the re-review replies in each earlier finding's own thread instead of adding a duplicate comment. Afterwards it offers to resolve the threads marked Fixed, and resolves them only on your yes.
+
 ## Follow-ups
 
 Follow-ups are suggestions, and choices the description calls deliberate. They are not for this pull request, so they are not posted to the pull request and are not in the paste-ready comment. The comment has only Blocker, Bugs, and Tests to add with this PR.
 
-The chat review still lists them, then says where they were saved. They go into one note in `docs/notes/` of the specs repo, in the usual notes format: `docs/notes/review-pr-<n>-follow-ups.md`, naming the pull request, the repo, the date, and each follow-up with its file and line. The paths stay, because the note stays in the specs repo. The note gets an `open` row in `docs/notes/index.md`.
+The chat review still lists them, then says where they were saved. They go into one note in `docs/notes/` of the specs repo, in the usual notes format: `docs/notes/review-pr-<n>-follow-ups.md`, or `docs/notes/review-pr-<repo>-<n>-follow-ups.md` when two repos in the specs repo have the same pull request number. The note names the pull request, the repo, the date, and each follow-up with its file and line. The paths stay, because the note stays in the specs repo. The note gets an `open` row in `docs/notes/index.md`.
 
-A re-review of the same pull request updates that note instead of writing a second one. A review with no follow-ups writes no note. The follow-ups come back through the existing note flow: [`/crav1-feature-candidates`](from-feature-candidates.md) reads open notes, and the spec that takes one marks it Used by, or Absorbed by. The note is not committed; `/crav1-finalize-commit` does that.
+A re-review of the same pull request updates that note instead of writing a second one: it changes the date, adds new follow-ups, and marks one the code now addresses `(done in <short sha>)`. It removes no line. A review with no follow-ups writes no note. The follow-ups come back through the existing note flow: [`/crav1-feature-candidates`](from-feature-candidates.md) reads open notes, and the spec that takes one marks it Used by, or Absorbed by. The note is not committed; `/crav1-finalize-commit` does that.
 
 ## What does not get written
 
-No code edit. No `spec.md` edit. No `plan.md` edit. No test run. No comment or vote without your yes. The only file it writes is the follow-ups note. No branch-protection change. No merge.
+No code edit. No `spec.md` edit. No `plan.md` edit. No test run. No comment, vote, or thread resolve without your yes. The only file it writes is the follow-ups note. No branch-protection change. No merge.
 
 ## After
 
