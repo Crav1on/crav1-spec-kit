@@ -12,5 +12,5 @@ When several lines are present, the mention is the line whose label matches the 
 
 Leave the ids out of tasks.md. These skills do not block when this file is missing.
 
-On an Azure Repos remote, /crav1-spark-to-spec, /crav1-ideas-to-spec, and /crav1-intake-to-specs offer once to write a line when they create a new spec folder. They write the line only if the user replies with an id. They do not copy this comment into the slug. On GitHub and other hosts they do not ask. Creating a Feature is /crav1-specs-to-ado. That command writes the id here after the user says yes.
+On an Azure Repos remote, /crav1-spark-to-spec, /crav1-ideas-to-spec, and /crav1-intake-to-specs offer once to write a line when they create a new spec folder. They write the line only if the user replies with an id. They do not copy this comment into the slug. On GitHub and other hosts they do not ask. Creating a Feature is /crav1-ado-sync. That command writes the id here after the user says yes.
 -->

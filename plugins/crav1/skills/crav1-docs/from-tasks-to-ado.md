@@ -6,7 +6,7 @@ Use this when a spec already has its Feature in Azure Boards and the user wants 
 
 This is cross-cutting. It is not its own lane. It may run from any lane. It does not move work into Specify, Plan, or Build. It does not start those lanes.
 
-It is a later skill. It is not a starter option. When the user asks for startup options, that ask names only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-match-to-specs`, `/crav1-repos-to-spec`, `/crav1-environment-read`, and `/crav1-fix-bug`. It does not run this command. The seven starter options stay unchanged.
+It is a later skill. It is not a starter option. When the user asks for startup options, that ask names only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-existing-to-specs`, `/crav1-environment-read`, and `/crav1-fix-bug`. It does not run this command. The six starter options stay unchanged.
 
 The Feature comes first, from [From specs to Azure Boards](from-specs-to-ado.md). The tasks come from the spec's `tasks.md`, written by [From a spec to a plan](from-spec-to-plan.md).
 
@@ -15,7 +15,7 @@ The Feature comes first, from [From specs to Azure Boards](from-specs-to-ado.md)
 New chat.
 
 ```text
-/crav1-tasks-to-ado
+/crav1-ado-sync
 ```
 
 That slash command *is* the prompt.
@@ -24,7 +24,7 @@ That slash command *is* the prompt.
 
 ### Check first
 
-The org and the project come from `docs/environments/marks.md`, or from the Azure DevOps URLs in `docs/system/repos.md`, the same way as `/crav1-specs-to-ado`. The command checks that `az` works, including the default install paths. If `az` fails, it states the issue, suggests a fix such as `az login`, and offers a skip. It does not install `az` and it does not log in.
+The org and the project come from `docs/environments/marks.md`, or from the Azure DevOps URLs in `docs/system/repos.md`, the same way as `/crav1-ado-sync`. The command checks that `az` works, including the default install paths. If `az` fails, it states the issue, suggests a fix such as `az login`, and offers a skip. It does not install `az` and it does not log in.
 
 ### Work item homes
 
@@ -32,7 +32,7 @@ Each task goes to the home of its repo, from the **Work items go to** column in 
 
 ### Pick a spec, then tasks
 
-The user picks one spec. Only specs whose `work-item.md` already records a Feature id are offered. A spec without one points at `/crav1-specs-to-ado`.
+The user picks one spec. Only specs whose `work-item.md` already records a Feature id are offered. A spec without one points at `/crav1-ado-sync`.
 
 Every task in that spec's `tasks.md` is listed, numbered `T1`, `T2`, …, with `Update #<id>` next to a task that was sent before. The user picks by number, or all.
 
@@ -110,4 +110,4 @@ Reading the task items back onto the spec and `tasks.md` is [From Azure Boards t
 
 Reading a Feature back onto the specs is [From Azure Boards to specs](from-ado-to-specs.md).
 
-Reference page: [tasks-to-ado](reference/skills/crav1-tasks-to-ado.md)
+Reference page: [ado-sync](reference/skills/crav1-ado-sync.md)

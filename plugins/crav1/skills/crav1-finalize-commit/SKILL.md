@@ -1,12 +1,15 @@
 ---
 name: crav1-finalize-commit
 description: >-
+  Opens with one question: commit, or only write the message (paste-ready
+  Summary and Description, no git commit). Skips it when the message says
+  which. Replaces draft-commit-message (its rules are kept as a branch).
   Finalize a commit: CRAV1 style vs git log first if needed, then draft
   the Summary and Description, then offer git commit first, then copy /
   edit / rewrite / stop. Wording is shown before those choices. Use when
   they want to change the message or actually create the commit, or
   /crav1-finalize-commit. Does not push. Does not commit until they pick
-  commit. Paste-only: /crav1-draft-commit-message. Keeps a trailing
+  commit. Paste-only: /crav1-finalize-commit. Keeps a trailing
   work-item mention through the HEAD check and the strip of a host
   attribution trailer.
 disable-model-invocation: true
@@ -16,22 +19,32 @@ color: green
 
 # Finalize commit
 
-You wrap **`crav1-draft-commit-message`**. First produce the same Summary and Description. Then keep those two fields in play until they pick **commit**, **copy**, or **stop**.
+## Opening question (1.56.0)
+
+This skill now also replaces `/crav1-draft-commit-message`. Its rules are kept, unchanged, as a branch. Ask one question, with the questions tool when it is available:
+
+1. **Commit.** Draft, show, then offer git commit. Follow the rest of this file.
+2. **Only write the message.** A paste-ready Summary and Description, no git commit. Follow [branches/message-only/BRANCH.md](branches/message-only/BRANCH.md).
+
+Skip the question when the message says which: "commit" or "finalize" is 1; "just the message", "draft", or "paste" is 2. The alias `/crav1-draft-commit-message` arrives with choice 2 already made. The style, work-item mention, and work-item offer rules in `branches/message-only/references/` apply to both choices, as they did before.
+
+
+You wrap **`crav1-finalize-commit`**. First produce the same Summary and Description. Then keep those two fields in play until they pick **commit**, **copy**, or **stop**.
 
 Command: `/crav1-finalize-commit`.
 
 Order: (1) style menu if no persist rule, (2) generate and show Summary/Description, (3) then the choices with **`commit` first** (top of the questions tool), then copy / edit / rewrite / stop. Never put those choices before the wording exists.
 
-Paste-only (no copy/edit/commit choices): tell them `/crav1-draft-commit-message` instead, or they can pick `copy` here.
+Paste-only (no copy/edit/commit choices): tell them `/crav1-finalize-commit` instead, or they can pick `copy` here.
 
 ## Draft (same as the other skill)
 
-Follow skill **`crav1-draft-commit-message`** in full for the first draft (drop-in: `.cursor/skills/crav1/crav1-draft-commit-message/SKILL.md`; plugin: sibling `skills/crav1-draft-commit-message/SKILL.md`):
+Follow skill **`crav1-finalize-commit`** in full for the first draft (drop-in: `.cursor/skills/crav1/crav1-finalize-commit/branches/message-only/BRANCH.md`; plugin: sibling `skills/crav1-finalize-commit/branches/message-only/BRANCH.md`):
 
 - Style menu or persist rule (`once` / `onward` / `log-once` / `log-onward`)
 - Inspect staged first, else unstaged
 - Output the **Summary** and **Description** paste blocks
-- Work-item mention, when [references/work-item-mention.md](../crav1-draft-commit-message/references/work-item-mention.md) resolves one (plugin: sibling `skills/crav1-draft-commit-message/references/work-item-mention.md`): one blank line, then that mention as the **last line** of the Description. Subject stays as drafted.
+- Work-item mention, when [references/work-item-mention.md](../crav1-finalize-commit/branches/message-only/references/work-item-mention.md) resolves one (plugin: sibling `skills/crav1-finalize-commit/branches/message-only/references/work-item-mention.md`): one blank line, then that mention as the **last line** of the Description. Subject stays as drafted.
 
 Do **not** run `git commit` in that step. Do **not** skip the paste blocks — they stay GitKraken-copyable on every turn. The mention is inside the Description fence, so a GitKraken paste includes it. A work-item hint stays after the fences.
 
@@ -62,7 +75,7 @@ Never call the questions tool (or any blocking choice UI) **before** step 2. Nev
 | Id | Choice | What it does |
 | --- | --- | --- |
 | `commit` | Create the git commit | Use the **current** Summary + Description. See below. **Always list this first.** |
-| `copy` | Copy for GitKraken | Done. Same outcome as `/crav1-draft-commit-message`. They paste Summary/Description. No `git commit`. |
+| `copy` | Copy for GitKraken | Done. Same outcome as `/crav1-finalize-commit`. They paste Summary/Description. No `git commit`. |
 | `edit` | Change the text | They say what to change (summary, description, or both). Apply **only** those edits. Keep the same style source. Show the new blocks, **then** the same choices again (`commit` still first). |
 | `rewrite` | New draft from the diff | Run the draft skill’s draft step again on the **same** file set and style source. Discard the previous wording. Show the new blocks, **then** the same choices again (`commit` still first). |
 | `stop` | Abort | No commit. They can still copy the last blocks. |

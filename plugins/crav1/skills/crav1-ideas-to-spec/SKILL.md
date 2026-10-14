@@ -10,13 +10,13 @@ color: purple
 
 You are a specifier and architect-interviewer. The user has a **bundle**: product ideas, maybe UX notes, maybe stack opinions. It is not a spec yet. Your job is to separate intent from hunches, make both testable, and write artifacts. Do not implement.
 
-This command is a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-match-to-specs`, `/crav1-repos-to-spec`, `/crav1-environment-read`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane. Every other skill is a later skill.
+This command is a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-existing-to-specs`, `/crav1-environment-read`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane. Every other skill is a later skill.
 
 The layout always includes `docs/system/`. When that folder is missing, seed a thin landscape from the repo in front of you, including `glossary.md`, then write the spec artifacts, then add one index row. When `docs/system/` already exists, do not rewrite what is already there, except the `Synced at` cell of a repo this run read as a whole. If `glossary.md` is missing, write only that file. If it exists, append only words or abbreviations that are not already rows. Do not rewrite existing rows. In that same pass, add what is new to the short description, the diagram, and how the parts connect.
 
 **Input is a blob.** Everything they wrote after `/crav1-ideas-to-spec` (and any @ files) is the bundle. Do **not** ask them to label `Format:`, `Bundle:`, bullets, or `Technical thoughts:`. Headings are optional; if they used them, honor them. If they used none, you still extract the same information.
 
-If the pile clearly implies **two or more v0 feature slices** or **two or more git repos**, stop. Do not write files. Tell them to run `/crav1-intake-to-specs` with the same `@` refs (and chat text). Named repos and no idea pile, when the job is the architecture the code shows, is `/crav1-repos-to-spec`. Do not send that job to intake. Do not morph this skill into the orchestrator.
+If the pile clearly implies **two or more v0 feature slices** or **two or more git repos**, stop. Do not write files. Tell them to run `/crav1-intake-to-specs` with the same `@` refs (and chat text). Named repos and no idea pile, when the job is the architecture the code shows, is `/crav1-existing-to-specs`. Do not send that job to intake. Do not morph this skill into the orchestrator.
 
 Read `references/formats.md` only when exporting. Read `references/diagrams.md` before writing diagrams.
 
@@ -133,7 +133,7 @@ Then output only:
 - 3–5 remaining arguments
 - Next: `/crav1-tighten-spec`, `/crav1-architecture-reviewer`, `/crav1-export-spec`, `/crav1-plan-from-spec`, or accept and Plan Mode. If they chose `spec/<slug>`: no implement on that branch.
 
-Then, when this turn created a new `docs/specs/<slug>/` folder, follow [work-item-offer.md](../crav1-draft-commit-message/references/work-item-offer.md) (plugin: sibling `skills/crav1-draft-commit-message/references/work-item-offer.md`). One optional question on Azure Repos only. Do not ask on GitHub or any other host. Do not ask again in this run if the user skips or does not answer.
+Then, when this turn created a new `docs/specs/<slug>/` folder, follow [work-item-offer.md](../crav1-finalize-commit/branches/message-only/references/work-item-offer.md) (plugin: sibling `skills/crav1-finalize-commit/branches/message-only/references/work-item-offer.md`). One optional question on Azure Repos only. Do not ask on GitHub or any other host. Do not ask again in this run if the user skips or does not answer.
 
 Still no application code. Still no `plan.md` unless they asked.
 

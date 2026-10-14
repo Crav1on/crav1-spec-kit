@@ -1,7 +1,7 @@
 {
   "name": "crav1",
   "version": "1.55.0",
-  "description": "CRAV1 Spec Kit (crav1) — spec-driven skills and agents: seven starters to spec, then plan, build, verify, commit, and pull request, with helpers for meetings, open questions, environments, and Azure Boards.",
+  "description": "CRAV1 Spec Kit (crav1) — spec-driven skills and agents: six starters to spec, then plan, build, verify, commit, and pull request, with helpers for meetings, open questions, environments, and Azure Boards.",
   "author": {
     "name": "Crav1"
   },

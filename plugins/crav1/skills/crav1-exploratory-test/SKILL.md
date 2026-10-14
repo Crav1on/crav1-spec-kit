@@ -23,7 +23,7 @@ Command: `/crav1-exploratory-test`.
 
 This is cross-cutting. It is not a lane. It may run from any lane. It does not move work into Specify, Plan, or Build. It does not start those lanes.
 
-This command is a later skill. It is not a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-match-to-specs`, `/crav1-repos-to-spec`, `/crav1-environment-read`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane.
+This command is a later skill. It is not a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-existing-to-specs`, `/crav1-environment-read`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane.
 
 Other skills do not run this one. Spark, specify, plan, and verify do not run it. It is not started automatically.
 
@@ -144,7 +144,7 @@ When the user says so in that turn, for a bug this skill found, follow `/crav1-f
 
 ## Stop
 
-Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-match-to-specs`, `/crav1-plan-from-spec`, `/crav1-implement-task`, `/crav1-complete-task`, `/crav1-verify-spec`, `/crav1-fix-from-verify`, `/crav1-fix-live`, or `/crav1-finalize-commit`.
+Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-existing-to-specs`, `/crav1-plan-from-spec`, `/crav1-build-tasks`, `/crav1-verify-spec`, `/crav1-fix-build-gaps`, or `/crav1-finalize-commit`.
 
 When `explore.md` changed, name `/crav1-finalize-commit`. Do not run it.
 
@@ -165,4 +165,4 @@ Output only:
 - Do not write the checks the plan already named.
 - Do not start Specify, Plan, or Build. Do not move work into a lane.
 - Do not send a bug to `/crav1-fix-bug` unless the user says so in that turn.
-- Later skill. Not a starter option. Asking for startup options names only the seven and does not run this command.
+- Later skill. Not a starter option. Asking for startup options names only the six and does not run this command.

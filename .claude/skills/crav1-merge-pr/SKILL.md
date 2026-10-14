@@ -17,7 +17,7 @@ Merge **one** named pull request with a **merge commit**, then stop. Never squas
 
 Command: `/crav1-merge-pr`.
 
-Run it only when **this turn** explicitly asks to merge a specific pull request, named by number or URL. `/crav1-open-pr`, a complete-task loop, `/crav1-review-pr`, or an earlier turn naming a URL is not that ask. Do not run this skill from those steps. Do not run `/crav1-review-pr` from this skill. A review is not a merge ask. If this turn does not name a pull request, ask which one. That turn is the question only. No merge.
+Run it only when **this turn** explicitly asks to merge a specific pull request, named by number or URL. `/crav1-open-pr`, a build-tasks loop, `/crav1-review-pr`, or an earlier turn naming a URL is not that ask. Do not run this skill from those steps. Do not run `/crav1-review-pr` from this skill. A review is not a merge ask. If this turn does not name a pull request, ask which one. That turn is the question only. No merge.
 
 On Windows, `git` may not be on `PATH`. Try `git`, then `C:\Program Files\Git\cmd\git.exe`. `az` may be `az.cmd`. Quote any `--query` value that contains parentheses; `cmd.exe` treats an unquoted `(` as syntax. This skill does not pass a multi-line body to `az`. A multi-line `--description` on Windows uses the `@file` steps in `/crav1-open-pr`.
 

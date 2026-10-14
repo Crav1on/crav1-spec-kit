@@ -18,7 +18,7 @@ The user names Azure DevOps, the org, and the project. You read pipeline definit
 
 Command: `/crav1-pipeline-environments`.
 
-This command is a later skill. It is not a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-match-to-specs`, `/crav1-repos-to-spec`, `/crav1-environment-read`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane. The seven starter options stay unchanged.
+This command is a later skill. It is not a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-existing-to-specs`, `/crav1-environment-read`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane. The six starter options stay unchanged.
 
 This is cross-cutting. It is not a lane. It does not move work into Specify, Plan, or Build. It does not start those lanes.
 
@@ -229,7 +229,7 @@ An unclear confirm writes no line. Do not write `marked by the user` from this c
 
 ## Stop
 
-Do not plan. Do not implement. Do not commit. Do not start Specify, Plan, or Build. Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-match-to-specs`, `/crav1-plan-from-spec`, `/crav1-implement-task`, `/crav1-feature-branch`, `/crav1-environment-read`, or `/crav1-finalize-commit`.
+Do not plan. Do not implement. Do not commit. Do not start Specify, Plan, or Build. Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-existing-to-specs`, `/crav1-plan-from-spec`, `/crav1-build-tasks`, `/crav1-feature-branch`, `/crav1-environment-read`, or `/crav1-finalize-commit`.
 
 Output only:
 

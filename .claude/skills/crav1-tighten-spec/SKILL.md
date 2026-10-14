@@ -27,7 +27,7 @@ Also read the latest **crav1-architecture-reviewer-agent** / **crav1-spec-review
 Decide in this order. Stop at the first match.
 
 1. **No code behind it.** Match status is `not in the code`, or the spec never claims existing code (no partial status, no status `done`, no `## In the code`, and it already has Problem, Goals, or Acceptance criteria). Skip the read. Tighten as this skill does today.
-2. **Too thin.** The slice is partial, status is `done`, or `## In the code` is present, and the spec does not name a repo or does not name paths that can be read. Also too thin: there is no partial status and no `## In the code`, and step 1 did not match. Stop. Name `/crav1-code-into-specs` when a change already landed on an existing spec. Name `/crav1-match-to-specs` when the slice was never matched. Do not guess. Do not tighten. Do not invent the repo or the paths.
+2. **Too thin.** The slice is partial, status is `done`, or `## In the code` is present, and the spec does not name a repo or does not name paths that can be read. Also too thin: there is no partial status and no `## In the code`, and step 1 did not match. Stop. Name `/crav1-add-to-spec` when a change already landed on an existing spec. Name `/crav1-existing-to-specs` when the slice was never matched. Do not guess. Do not tighten. Do not invent the repo or the paths.
 3. **Read.** The slice is partial, or `## In the code` names paths. Read the committed code on the repo and branch the spec names. That code is the current fact. Wording issues come after that read.
 
 The rest of this section applies only when step 3 matched.

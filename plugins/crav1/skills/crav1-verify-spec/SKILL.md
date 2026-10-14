@@ -51,7 +51,7 @@ Then:
 
 Follow this skill’s `assets/verify.md` **section order**. Do not put the long acceptance table first.
 
-1. **TL;DR** — counts + id lists. Then one line: next command (`/crav1-fix-from-verify` if failed/unverified/`G#` remain, else `/crav1-implement-task` or ship).
+1. **TL;DR** — counts + id lists. Then one line: next command (`/crav1-fix-build-gaps` if failed/unverified/`G#` remain, else `/crav1-build-tasks` or ship).
 2. **Tasks — overview** — one short table: `T#` | title | status | verify result. Group or sort: verified first, then failed, then not implemented.
 3. **Acceptance — details** — the full A# matrix (quote, evidence, result).
 4. **Commands run**
@@ -67,8 +67,8 @@ Same order as the file. Do **not** open with the full acceptance matrix.
 2. **TL;DR** (copy the id lists; they should be scannable in a few seconds)
 3. Point at the Tasks overview in the file
 4. Next:
-   - Inner-loop (**verify failed**, **claimed done, unverified**, wiring **`G#`**) → `/crav1-fix-from-verify` (omit Gap to walk them in order)
-   - **Not implemented** → `/crav1-implement-task T#`
+   - Inner-loop (**verify failed**, **claimed done, unverified**, wiring **`G#`**) → `/crav1-fix-build-gaps` (omit Gap to walk them in order)
+   - **Not implemented** → `/crav1-build-tasks T#`
    - acceptance with no task → `/crav1-plan-from-spec` or `/crav1-tighten-spec` if the line should die
    - all **Implemented, verified** and no missing acceptance → spec is demoable; they can ship / PR
 

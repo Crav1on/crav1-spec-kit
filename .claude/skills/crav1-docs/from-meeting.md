@@ -6,7 +6,7 @@ Use this when the user has **minutes, a transcript, an email, or a chat thread**
 
 This is cross-cutting. It is not its own lane. It may run from any lane. It does not move work into Specify, Plan, or Build. It does not start those lanes.
 
-It is a later skill. It is not a starter option. When the user asks for startup options, that ask names only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-match-to-specs`, `/crav1-repos-to-spec`, `/crav1-environment-read`, and `/crav1-fix-bug`. It does not run this command. The seven starter options stay unchanged.
+It is a later skill. It is not a starter option. When the user asks for startup options, that ask names only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-existing-to-specs`, `/crav1-environment-read`, and `/crav1-fix-bug`. It does not run this command. The six starter options stay unchanged.
 
 [Intake](from-intake.md) starts a landscape and new feature slugs from a dump. It does not match items against specs that already exist. [Add](from-add.md) takes one piece of new information for one existing spec. This command extracts many items, matches them, and hands one kept addition to add-to-spec.
 
@@ -19,7 +19,7 @@ Note is a fourth choice: `Note — keep it in the repo without tying it to a spe
 New chat. Paste the minutes, transcript, email, or chat, or `@` the file.
 
 ```text
-/crav1-meeting-to-specs
+/crav1-add-to-spec
 @<minutes, transcript, meeting tool export, email, or chat thread>
 
 Extract what matters for features. Match it to the specs we already have. Do not write a spec. Do not commit.
@@ -90,4 +90,4 @@ When a file changed and the user wants it in git:
 
 That puts the spec lines, and any source folder this command wrote, in git. No push. This command does not commit.
 
-Reference page: [meeting-to-specs](reference/skills/crav1-meeting-to-specs.md)
+Reference page: [add-to-spec](reference/skills/crav1-add-to-spec.md)

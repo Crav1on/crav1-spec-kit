@@ -6,7 +6,7 @@ Include:
 
 - **Host and version** (Cursor: Help → About. Claude Code: the version the host prints).
 - **Install path:** Cursor drop-in, team marketplace, or local plugin (`~/.cursor/plugins/local/crav1`); or Claude Code project `.claude/` or user `~/.claude/`.
-- **Command:** the slash command and the spark or task id you passed (for example `/crav1-spark-to-spec`, `/crav1-implement-task` T1).
+- **Command:** the slash command and the spark or task id you passed (for example `/crav1-spark-to-spec`, `/crav1-build-tasks` T1).
 - **Expected** versus **what happened** (missing `/crav1`, wrong files written, error text).
 
 Install steps: [docs/install.md](docs/install.md). First loop: [docs/first-run.md](docs/first-run.md).

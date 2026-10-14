@@ -8,7 +8,7 @@ This is the index of every page in the kit's docs. Pick by what you want to do, 
 | --- | --- |
 | Install the kit | [Install](install.md) |
 | Get going in fifteen minutes | [First 15 minutes](first-run.md) |
-| Pick a way in | [The seven starter options](../README.md#the-seven-starter-options) |
+| Pick a way in | [The six starter options](../README.md#the-six-starter-options) |
 | Go from a draft spec to a merged change | [The core loop](#how-to-walkthroughs): accept the spec, plan, build, verify, commit and merge |
 | Do one thing step by step | [Walkthroughs](#how-to-walkthroughs) |
 | Look up one command | [Skills reference](reference/skills.md) |

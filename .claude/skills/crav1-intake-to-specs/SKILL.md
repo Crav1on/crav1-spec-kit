@@ -18,7 +18,7 @@ color: purple
 
 You are the **parent**. Partition intake, confirm the map, interview only mushy slices, write `docs/system/`, then delegate **one slug per worker**. Do not implement. Do not specify in your own voice as a substitute for workers when there is more than one feature slug.
 
-This command is a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-match-to-specs`, `/crav1-repos-to-spec`, `/crav1-environment-read`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane. Every other skill is a later skill.
+This command is a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-existing-to-specs`, `/crav1-environment-read`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane. Every other skill is a later skill.
 
 One feature and one repo after Map: you may write that slug yourself (ideas-to-spec Write artifacts) **and** still write a thin `docs/system/`. Do not skip the landscape.
 
@@ -35,7 +35,7 @@ Everything after `/crav1-intake-to-specs` and every `@` is **intake**. Do not as
 | **Intent** | Notes, briefs, markdown, screenshots, whiteboard photos, diagrams, PDFs, chat blob | Extract slices from this |
 | **Context** | Existing app code, other repos, “something like this” | Constraints and patterns; not a second product spec |
 
-Default if they only `@` a codebase and did **not** say extract-as-is: **new system, this code is context.** Extract-as-is is an explicit override; still partition into landscape + feature slugs, never one mega-spec. Named repos and no intake files, when the job is one architecture spec of what the code shows, is `/crav1-repos-to-spec`. Do not partition that job into feature slugs.
+Default if they only `@` a codebase and did **not** say extract-as-is: **new system, this code is context.** Extract-as-is is an explicit override; still partition into landscape + feature slugs, never one mega-spec. Named repos and no intake files, when the job is one architecture spec of what the code shows, is `/crav1-existing-to-specs`. Do not partition that job into feature slugs.
 
 A one-liner with no files: tell them `/crav1-spark-to-spec`. A single unstructured pile that is clearly **one** feature and **one** repo: `/crav1-ideas-to-spec` is enough; you may continue here anyway (thin landscape is still required).
 
@@ -70,7 +70,7 @@ Write `docs/system/` from this skill’s `assets/` (same shape as `docs/system/_
 | File | What |
 | --- | --- |
 | `landscape.md` | What this is, v0 vs later, bulk `A#`s, how the parts connect (one line per connection the intake already states), feature index (fill paths after workers) |
-| `repos.md` | 1–N repos: purpose, proposed vs exists, URL when they have one, and the `Synced at` column. Fill that cell only for a repo this run read as a whole, as under **Synced at** below. Add the `Work items go to` column when it is missing; leave its cells empty. Never fill a home here: the first Azure Boards skill that needs one asks ([work-item-homes.md](../crav1-specs-to-ado/references/work-item-homes.md)). |
+| `repos.md` | 1–N repos: purpose, proposed vs exists, URL when they have one, and the `Synced at` column. Fill that cell only for a repo this run read as a whole, as under **Synced at** below. Add the `Work items go to` column when it is missing; leave its cells empty. Never fill a home here: the first Azure Boards skill that needs one asks ([work-item-homes.md](../crav1-ado-sync/branches/push-features/references/work-item-homes.md)). |
 | `diagrams.md` | System context across repos (follow `references/diagrams.md`) |
 | `glossary.md` | From `assets/glossary.md`, in this same pass. See the glossary rules below. |
 | `adr/` | Cross-cutting choices only (`assets/adr.md`). Hunches with no alternative → constraints on `landscape.md`, not ADRs. Status `proposed` until they accept |
@@ -120,7 +120,7 @@ Then output only:
 
 Do **not** run `/crav1-finalize-commit` yourself. Prompt it. Workers must not commit.
 
-Then follow [work-item-offer.md](../crav1-draft-commit-message/references/work-item-offer.md) (plugin: sibling `skills/crav1-draft-commit-message/references/work-item-offer.md`) once, for every new spec folder this run created that still has no `work-item.md`. One question lists those slugs. Azure Repos only. Do not ask on GitHub or any other host. Do not ask again in this run if the user skips or does not answer. Slice workers do not ask and do not write `work-item.md`.
+Then follow [work-item-offer.md](../crav1-finalize-commit/branches/message-only/references/work-item-offer.md) (plugin: sibling `skills/crav1-finalize-commit/branches/message-only/references/work-item-offer.md`) once, for every new spec folder this run created that still has no `work-item.md`. One question lists those slugs. Azure Repos only. Do not ask on GitHub or any other host. Do not ask again in this run if the user skips or does not answer. Slice workers do not ask and do not write `work-item.md`.
 
 Still no application code. Still no `plan.md` unless they asked.
 

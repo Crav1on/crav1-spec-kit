@@ -36,7 +36,7 @@ routes:
         when: Always, before questions and the plan.
       - skills: [crav1-resolve-questions]
         when: When `## Open questions` still has items.
-      - skills: [crav1-specs-to-ado]
+      - skills: [crav1-ado-sync]
         optional: true
         when: When the team tracks Features in Azure Boards.
       - skills: [crav1-plan-from-spec]
@@ -45,29 +45,25 @@ routes:
         when: Right after the plan is written.
       - skills: [crav1-tighten-plan]
         when: After the plan review.
-      - skills: [crav1-tasks-to-ado]
+      - skills: [crav1-ado-sync]
         optional: true
         when: When the Feature is in Azure Boards and the tasks should be too.
       - skills: [crav1-tasks-ready-to-build]
         optional: true
         when: Any time, to see which tasks are ready, which are blocked and why. Read-only.
-      - skills: [crav1-implement-task, crav1-complete-task, crav1-complete-tasks, crav1-complete-features]
-        when: "One task in this chat (implement-task), or a worker per task (complete-task, complete-tasks, complete-features). The complete skills implement, commit, and verify each task inside their worker, so they go straight to the pull request."
+      - skills: [crav1-build-tasks, crav1-complete-features]
+        when: "One task, a range, or all (build-tasks), or whole features (complete-features). Each task runs in its own worker that implements, commits, and verifies it, so they go straight to the pull request."
         then:
-          crav1-complete-task: [crav1-open-pr]
-          crav1-complete-tasks: [crav1-open-pr]
+          crav1-build-tasks: [crav1-open-pr]
           crav1-complete-features: [crav1-open-pr]
       - skills: [crav1-verify-spec]
-        when: After implement-task, against the spec and the plan.
-      - skills: [crav1-fix-from-verify, crav1-fix-live]
+        when: Against the spec and the plan, for the whole slice when you want one report.
+      - skills: [crav1-fix-build-gaps]
         optional: true
         loop_to: crav1-verify-spec
-        when: When `verify.md` has a failure (fix-from-verify), or to fix it against the running host (fix-live). Do not edit `spec.md` in this loop.
-      - skills: [crav1-draft-commit-message]
-        optional: true
-        when: When you want to see the commit message before the commit.
+        when: When `verify.md` has a failure, or to fix it against the running host (fix-build-gaps asks which). Do not edit `spec.md` in this loop.
       - skills: [crav1-finalize-commit]
-        when: When the slice verifies.
+        when: When the slice verifies (it asks commit, or only write the message first).
       - skills: [crav1-open-pr]
         when: To push and open the pull request.
       - skills: [crav1-review-pr]
@@ -79,30 +75,26 @@ routes:
     title: New information on an existing slice
     when: Minutes, a mail, a chat, or a new fact changes a spec that already exists, built or not.
     steps:
-      - skills: [crav1-meeting-to-specs, crav1-add-to-spec]
-        when: Minutes, a transcript, a mail, or a chat (meeting-to-specs), or one new fact (add-to-spec).
+      - skills: [crav1-add-to-spec]
+        when: Minutes, a transcript, a mail, a chat, a dump, a code change, or one new fact (add-to-spec asks which).
       - skills: [crav1-tighten-spec]
         when: Always, on each spec that changed. New text needs the same tightening as the first draft.
       - skills: [crav1-resolve-questions]
-        when: When the change added or answered open questions. Use `/crav1-ask-open-questions` for the ones someone else must answer.
+        when: When the change added or answered open questions. Use `/crav1-show-or-ask-open-questions` for the ones someone else must answer.
       - skills: [crav1-plan-from-spec]
         when: When the slice has `plan.md` or `tasks.md`, so the plan and the tasks follow the new spec.
-      - skills: [crav1-specs-to-ado]
+      - skills: [crav1-ado-sync]
         optional: true
-        when: Only when the Feature itself changed and it is in Azure Boards.
-      - skills: [crav1-tasks-to-ado]
-        optional: true
-        when: When the tasks are in Azure Boards.
+        when: When the Feature or its tasks are in Azure Boards (push Features only when the Feature itself changed; push tasks for the tasks).
       - skills: [crav1-tasks-ready-to-build]
         optional: true
         when: Any time, to see which tasks are ready after the change, which are blocked and why. Read-only.
-      - skills: [crav1-complete-tasks, crav1-complete-task, crav1-implement-task]
-        when: To build the tasks that are not built yet. The complete skills verify each task inside their worker.
+      - skills: [crav1-build-tasks]
+        when: To build the tasks that are not built yet. Each task is verified inside its worker.
         then:
-          crav1-complete-task: [crav1-open-pr]
-          crav1-complete-tasks: [crav1-open-pr]
+          crav1-build-tasks: [crav1-open-pr]
       - skills: [crav1-verify-spec]
-        when: After implement-task, or for the whole slice when you want one report.
+        when: For the whole slice when you want one report.
       - skills: [crav1-finalize-commit]
         when: When the slice verifies.
 
@@ -112,14 +104,14 @@ routes:
     steps:
       - skills: [crav1-fix-bug]
         when: The bug is named. It says which lane the fix belongs to.
-      - skills: [crav1-tighten-spec, crav1-plan-from-spec, crav1-implement-task]
-        when: The lane fix-bug named. Spec miss is Specify (tighten-spec), plan miss is Plan (plan-from-spec), code miss is Build (implement-task). Tighten-spec and plan-from-spec then follow the New slice route from that step.
+      - skills: [crav1-tighten-spec, crav1-plan-from-spec, crav1-build-tasks]
+        when: The lane fix-bug named. Spec miss is Specify (tighten-spec), plan miss is Plan (plan-from-spec), code miss is Build (build-tasks). Tighten-spec and plan-from-spec then follow the New slice route from that step.
         then:
           crav1-tighten-spec: []
           crav1-plan-from-spec: []
       - skills: [crav1-verify-spec]
         when: After the fix is built.
-      - skills: [crav1-fix-from-verify]
+      - skills: [crav1-fix-build-gaps]
         optional: true
         loop_to: crav1-verify-spec
         when: When `verify.md` has a failure.
@@ -146,37 +138,24 @@ routes:
     title: Azure Boards sync
     when: Specs and Azure Boards (ADO) should match.
     steps:
-      - skills: [crav1-feature-candidates]
-        when: To see which specs and notes could become Features.
-      - skills: [crav1-specs-to-ado]
-        when: To create or update the Features.
-      - skills: [crav1-tasks-to-ado]
-        when: When the slice has `tasks.md`.
-      - skills: [crav1-ado-to-tasks]
-        when: To read task states back from Azure Boards.
+      - skills: [crav1-ado-sync]
+        when: "It asks which: suggest Features, push Features, push tasks (when the slice has `tasks.md`), pull task states, or pull spec changes from Features."
+      - skills: [crav1-finalize-commit]
+        when: When the sync changed a file.
 
 # Extra next steps after the route steps (side steps such as a commit).
 also_next:
   crav1-intake-to-specs: [/crav1-finalize-commit]
-  crav1-match-to-specs: [/crav1-finalize-commit]
-  crav1-repos-to-spec: [/crav1-finalize-commit]
+  crav1-existing-to-specs: [/crav1-finalize-commit]
   crav1-environment-read: [/crav1-finalize-commit]
   crav1-feature-branch: [/crav1-finalize-commit]
-  crav1-ask-open-questions: [/crav1-meeting-to-specs, /crav1-match-dump-to-specs, /crav1-finalize-commit]
-  crav1-meeting-to-specs: [/crav1-finalize-commit]
+  crav1-show-or-ask-open-questions: [/crav1-add-to-spec, /crav1-finalize-commit]
   crav1-add-to-spec: [/crav1-finalize-commit]
-  crav1-match-dump-to-specs: [/crav1-finalize-commit]
-  crav1-code-into-specs: [/crav1-finalize-commit]
-  crav1-draft-commit-message: [/crav1-finalize-commit]
   crav1-review-pr: [/crav1-keep-current after an outside pull request merges]
   crav1-explain: [/crav1-whats-known-about]
   crav1-keep-current: [/crav1-finalize-commit]
   crav1-pipeline-environments: [/crav1-environment-read]
   crav1-security-review: [/crav1-finalize-commit]
-  crav1-specs-to-ado: [/crav1-finalize-commit]
-  crav1-tasks-to-ado: [/crav1-finalize-commit]
-  crav1-ado-to-tasks: [/crav1-finalize-commit]
-  crav1-ado-to-specs: [/crav1-finalize-commit]
   crav1-exploratory-test: [/crav1-finalize-commit]
   crav1-suggest-tests-for-code: [/crav1-plan-from-spec]
 
@@ -186,4 +165,4 @@ override:
   crav1-whats-known-about: ["The one skill it names, if any"]
   crav1-export-spec: []
   crav1-help: [The skill or route step it names]
-  crav1-tasks-ready-to-build: [/crav1-implement-task]
+  crav1-tasks-ready-to-build: [/crav1-build-tasks]

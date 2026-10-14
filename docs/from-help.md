@@ -25,7 +25,7 @@ I have new information from a meeting and tasks that are not built. What do I ru
 | `/crav1-help work item homes`, `marks.md`, `stale marks` | The concept, from the [glossary](concepts/glossary.md) and the concept pages |
 | `/crav1-help list`, `/crav1-help list build` | Every command grouped by lane and phase, or one lane, from the [skills reference](reference/skills.md) and [guild routing](guild-routing.md) |
 | `/crav1-help status <slug>`, `/crav1-help where am I` | Where one slice is: task counts (ready, blocked, needs verify, done) with the same rules as [`/crav1-tasks-ready-to-build`](from-tasks-ready-to-build.md), the route step it is on, and the next step |
-| `/crav1-help compare complete-task complete-tasks` | Two commands side by side: lane, purpose, reads, writes, next steps, and when to pick which |
+| `/crav1-help compare build-tasks build-tasks` | Two commands side by side: lane, purpose, reads, writes, next steps, and when to pick which |
 | `/crav1-help whats new`, `/crav1-help whats new since 1.50` | The changelog for your installed version, or every release since the one you name |
 | Any other question about the kit | The answer from the docs, or "the kit doesn't say" when they do not cover it |
 
@@ -45,7 +45,7 @@ For a route question, the command reads the slice's files and does not change th
 
 It keeps every step of the route in the answer and gives a reason for each one it marks skipped. It names the first step to run and stops. When the route reaches building, it also says that [`/crav1-tasks-ready-to-build`](from-tasks-ready-to-build.md) can run any time to list which tasks are ready and why the others are blocked.
 
-Example: after a meeting changed a spec that has a plan and unbuilt tasks, the New information route gives tighten-spec, resolve-questions, plan-from-spec, specs-to-ado (only when the Feature itself changed), tasks-to-ado, complete-tasks, and verify-spec.
+Example: after a meeting changed a spec that has a plan and unbuilt tasks, the New information route gives tighten-spec, resolve-questions, plan-from-spec, ado-sync (only when the Feature itself changed), ado-sync, build-tasks, and verify-spec.
 
 ## When you push back
 

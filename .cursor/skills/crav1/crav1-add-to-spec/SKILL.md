@@ -1,21 +1,19 @@
 ---
 name: crav1-add-to-spec
 description: >-
-  Add new information to one existing spec, then report whether
+  Bring new information into existing specs. Opens with one question: a
+  fact, a dump, a code change, or a meeting (minutes, transcript, mail,
+  chat); skipped when the message shows which. Replaces match-dump-to-
+  specs, code-into-specs, and meeting-to-specs, whose rules are kept as
+  branches. A fact: add it to one existing spec, then report whether
   docs/system/ or another spec has to change; edits there only on apply.
-  Does not create a glossary; a missing row is one listed edit. A meaning
-  not stated is `to be researched`. An imported original follows
-  references/sources.md and goes under docs/sources/ before the quote; the
-  personal-data check recommends keep or redact, redacts secrets, and may
-  write the transfer data policy after a yes. A quoted note in docs/notes/
-  gets Used by; Absorbed by only after a yes. A kept quote is compared
+  No new glossary; a meaning not stated is `to be researched`. Imported
+  originals go under docs/sources/ first; the personal-data check
+  recommends keep or redact and redacts secrets. A kept quote is compared
   with docs/research/ and Research findings and marked stale only after a
-  yes; unclear is not marked. May draft a revisit request for the note's
-  owner; does not send it. An updated research note is checked per listed
-  point, an older mark is split into its hits, and its open questions are
-  routed, without asking. A clear answer to an open question is linked
-  under it (references/open-questions.md); unclear stays open. Does not
-  plan, implement, write code, or commit.
+  yes. An updated research note is checked per listed point. A clear
+  answer to an open question is linked under it; unclear stays open. Does
+  not plan, implement, write code, or commit.
 disable-model-invocation: true
 icon: file-plus
 color: blue
@@ -23,11 +21,23 @@ color: blue
 
 # Add to spec
 
+## Opening question (1.56.0)
+
+This skill now also replaces `/crav1-match-dump-to-specs`, `/crav1-code-into-specs`, and `/crav1-meeting-to-specs`. Their rules are kept, unchanged, as branches. Ask one question, with the questions tool when it is available:
+
+1. **A fact.** One new piece of information for one spec. Follow the rest of this file.
+2. **A dump.** A later pile of notes, tickets, old docs, diagrams, or screenshots for one or many specs. Follow [branches/dump/BRANCH.md](branches/dump/BRANCH.md).
+3. **A code change.** A commit, a range, or the branch diff that already landed. Follow [branches/code-change/BRANCH.md](branches/code-change/BRANCH.md).
+4. **A meeting.** Minutes, a transcript, a mail, or a chat thread. Follow [branches/meeting/BRANCH.md](branches/meeting/BRANCH.md).
+
+Skip the question when the message shows which: a short new fact with an @-mentioned spec is 1; several files or a pasted pile is 2; a commit, a SHA, a range, or "the branch diff" is 3; minutes, a transcript, a `.eml`, or a chat export is 4. An alias (`/crav1-match-dump-to-specs`, `/crav1-code-into-specs`, `/crav1-meeting-to-specs`) arrives with its choice already made. Where a branch hands a kept quote to `/crav1-add-to-spec`, that is choice 1 of this skill, with the handoff that branch describes.
+
+
 You add new information to **one existing** spec. Then you check whether `docs/system/` or another spec has to change, and you report that impact. You do not silently rewrite those other files. You do not write application code. You do not plan, implement, or commit.
 
 This is not `/crav1-tighten-spec`. Tighten is for mushy wording. This skill is for new information. If the message is only “make this tighter” and brings no new fact, tell them `/crav1-tighten-spec` and do not edit.
 
-This is not `/crav1-match-to-specs`, `/crav1-intake-to-specs`, `/crav1-spark-to-spec`, or `/crav1-ideas-to-spec`. Those create the folders. This skill updates one spec that already exists. Do not send this job to those commands, and do not absorb theirs. Do not create a new slug here.
+This is not `/crav1-existing-to-specs`, `/crav1-intake-to-specs`, `/crav1-spark-to-spec`, or `/crav1-ideas-to-spec`. Those create the folders. This skill updates one spec that already exists. Do not send this job to those commands, and do not absorb theirs. Do not create a new slug here.
 
 A not-started spec (match status `not in the code`, or a thin spec) can keep taking information until planning. Adding information does not start planning and does not write `plan.md` or `tasks.md`.
 
@@ -43,21 +53,21 @@ When `/crav1-suggest-tests-for-code` hands one suggestion for an existing spec, 
 
 **Dismiss.** Quote the suggestion under `## Dismissed test suggestions`. The line starts with `Dismissed test suggestion.` Do not reword the check. Create that heading only when it is missing. Do not add an acceptance checkbox. Do not turn it into a goal. Plan does not turn this line into a task. The next run of `/crav1-suggest-tests-for-code` does not offer it.
 
-## From /crav1-specs-to-ado
+## From /crav1-ado-sync
 
-When `/crav1-specs-to-ado` hands a change that belongs in the spec before a Feature preview is rebuilt, the spec is the one that skill already named. Do not ask for a slug. Do not create a slug. Quote the change. Do not replace it with a paraphrase. Label it `**New:**`. Then run **Add to that spec.md** and **Impact**. Do not write `work-item.md` from this handoff. That skill writes the id after Azure Boards accepts the Feature. Do not start Specify, Plan, or Build.
+When `/crav1-ado-sync` hands a change that belongs in the spec before a Feature preview is rebuilt, the spec is the one that skill already named. Do not ask for a slug. Do not create a slug. Quote the change. Do not replace it with a paraphrase. Label it `**New:**`. Then run **Add to that spec.md** and **Impact**. Do not write `work-item.md` from this handoff. That skill writes the id after Azure Boards accepts the Feature. Do not start Specify, Plan, or Build.
 
-## From /crav1-ado-to-specs
+## From /crav1-ado-sync
 
-When `/crav1-ado-to-specs` hands one kept change or one answer for an existing spec, the spec is the one that skill already named. Do not ask for a slug. Do not create a slug. Do not create a spec folder.
+When `/crav1-ado-sync` hands one kept change or one answer for an existing spec, the spec is the one that skill already named. Do not ask for a slug. Do not create a slug. Do not create a spec folder.
 
 Quote the item. Do not replace it with a paraphrase. A kept Azure Boards change starts with `From ADO <date>. <who>.` when the handoff includes a date and a person. When the handoff has a date and no person, it starts with `From ADO <date>.` An answer the user gave starts with `From the user <date>. Answer to the ADO question.` Do not invent a date or a person. Label it `**New:**` in the section the words belong to. An open question from a Feature discussion goes under `## Open questions`.
 
 Then run **Add to that spec.md** and **Impact**. The impact check still runs. Do not write `plan.md`, `tasks.md`, or `work-item.md`. Do not change application code. Do not start Specify, Plan, or Build. Do not ask the picture offer.
 
-## From /crav1-meeting-to-specs
+## From /crav1-add-to-spec
 
-When `/crav1-meeting-to-specs` hands one kept addition for an existing spec, the spec is the one that skill already named. Do not ask for a slug. Do not create a slug. Do not create a spec folder. A source folder that handoff already wrote stays. When it wrote none and the quote is an imported source, **Imported sources** writes that folder.
+When `/crav1-add-to-spec` hands one kept addition for an existing spec, the spec is the one that skill already named. Do not ask for a slug. Do not create a slug. Do not create a spec folder. A source folder that handoff already wrote stays. When it wrote none and the quote is an imported source, **Imported sources** writes that folder.
 
 The handoff passes the kind and the date, and the source folder when that skill already wrote one. The kind is `meeting`, `email`, or `chat`. Quote the item. Do not replace it with a paraphrase. A `State:` line is not part of the quote. Do not write it. The quote starts with `From <kind> <date>.` when the handoff includes a date, otherwise `From <kind>.` Examples: `From email 2026-10-06.`, `From meeting.` Do not invent a kind or a date. Keep the speaker and the time in the quote when the input showed them. Label it `**New:**` in the section the words belong to, the same way any other new quote is labeled.
 
@@ -69,7 +79,7 @@ Then run **Add to that spec.md** and **Impact** in this skill. The impact check 
 
 ## From an import: answer links and asked marks
 
-When `/crav1-meeting-to-specs` hands an answer link or an asked mark for an existing spec, the spec is the one that skill already named. Do not ask for a slug. Do not ask keep or apply. Follow [references/open-questions.md](references/open-questions.md).
+When `/crav1-add-to-spec` hands an answer link or an asked mark for an existing spec, the spec is the one that skill already named. Do not ask for a slug. Do not ask keep or apply. Follow [references/open-questions.md](references/open-questions.md).
 
 - An answer link writes one `Answered:` line under that open question: the date, who, the kind, the quote as handed (after any redaction), and the source folder. Do not paraphrase. Do not rewrite the question. Do not remove it from `## Open questions`. Do not change any other spec line. When the answer would change a spec line, name `/crav1-resolve-questions` for that slug. Do not run it.
 - An asked mark writes or replaces the `Asked:` line for that person under that question, with the date from the source. It replaces a `Pending:` line for the same person.
@@ -80,7 +90,7 @@ Then run **Impact** for the research part only. When the question is one a stale
 
 ## Picture offer
 
-The handoff sections **From /crav1-environment-read** and **From /crav1-suggest-tests-for-code** ask once at the end of the run, after every item this run wrote. Not after each item. The meeting handoff, the specs-to-ado handoff, and the ado-to-specs handoff do not ask. The main path does not ask. A run that wrote nothing from these handoffs does not ask.
+The handoff sections **From /crav1-environment-read** and **From /crav1-suggest-tests-for-code** ask once at the end of the run, after every item this run wrote. Not after each item. The meeting handoff, the ado-sync handoff, and the ado-sync handoff do not ask. The main path does not ask. A run that wrote nothing from these handoffs does not ask.
 
 The question is exactly:
 
@@ -96,7 +106,7 @@ Everything after `/crav1-add-to-spec`, and every `@`, is input: the new informat
 
 Spec folders are `docs/specs/<slug>/` with a `spec.md`. Skip `_template`.
 
-If there are no spec folders, stop. Point at `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, or `/crav1-match-to-specs`. Do not create a slug. Do not seed `docs/system/`.
+If there are no spec folders, stop. Point at `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, or `/crav1-existing-to-specs`. Do not create a slug. Do not seed `docs/system/`.
 
 If the input is a file under `docs/research/` and there is no new quote for a spec, run the clear section of [references/research-stale.md](references/research-stale.md). Do not ask the user whether the update resolves the mark. Do not ask for a slug. Do not paste the note into a spec.
 

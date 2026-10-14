@@ -6,7 +6,7 @@ Use this when the user wants Azure Boards Features from the specs.
 
 This is cross-cutting. It is not its own lane. It may run from any lane. It does not move work into Specify, Plan, or Build. It does not start those lanes.
 
-It is a later skill. It is not a starter option. When the user asks for startup options, that ask names only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-match-to-specs`, `/crav1-repos-to-spec`, `/crav1-environment-read`, and `/crav1-fix-bug`. It does not run this command. The seven starter options stay unchanged.
+It is a later skill. It is not a starter option. When the user asks for startup options, that ask names only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-existing-to-specs`, `/crav1-environment-read`, and `/crav1-fix-bug`. It does not run this command. The six starter options stay unchanged.
 
 The list comes from [Feature candidates](from-feature-candidates.md). Reading a Feature back is [From Azure Boards to specs](from-ado-to-specs.md).
 
@@ -15,7 +15,7 @@ The list comes from [Feature candidates](from-feature-candidates.md). Reading a 
 New chat.
 
 ```text
-/crav1-specs-to-ado
+/crav1-ado-sync
 ```
 
 That slash command *is* the prompt.
@@ -62,4 +62,4 @@ Send that spec's tasks as child work items of the Feature with [From tasks to Az
 
 Reading a Feature back onto the specs is [From Azure Boards to specs](from-ado-to-specs.md).
 
-Reference page: [specs-to-ado](reference/skills/crav1-specs-to-ado.md)
+Reference page: [ado-sync](reference/skills/crav1-ado-sync.md)

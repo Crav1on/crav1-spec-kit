@@ -14,7 +14,7 @@ Idea pile + technical hunches → thin `docs/system/` when missing, including `g
 
 A pile of ideas and hunches. Called by the user.
 
-This is one of the seven starter options. Asking for startup options names it and does not run it.
+This is one of the six starter options. Asking for startup options names it and does not run it.
 
 ## Reads
 

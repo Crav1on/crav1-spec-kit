@@ -23,7 +23,7 @@ Command: `/crav1-suggest-tests-for-code`.
 
 This is cross-cutting. It is not a lane. It may run from any lane. It does not move work into Specify, Plan, or Build. It does not start those lanes.
 
-This command is a later skill. It is not a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-match-to-specs`, `/crav1-repos-to-spec`, `/crav1-environment-read`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane. The seven starter options stay unchanged.
+This command is a later skill. It is not a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-existing-to-specs`, `/crav1-environment-read`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane. The six starter options stay unchanged.
 
 Other skills do not run this one. Spark, specify, plan, and verify do not run it. It is not started automatically.
 
@@ -132,7 +132,7 @@ When every suggestion has an answer, stop. Repeat the full list with kept, left,
 
 Do not write the tests. Do not change the code. Do not edit `plan.md`, `tasks.md`, or `verify.md`. Do not commit. Do not push. Do not open a pull request.
 
-Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-match-to-specs`, `/crav1-plan-from-spec`, `/crav1-implement-task`, `/crav1-complete-task`, `/crav1-verify-spec`, `/crav1-fix-from-verify`, `/crav1-fix-live`, or `/crav1-finalize-commit`.
+Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-existing-to-specs`, `/crav1-plan-from-spec`, `/crav1-build-tasks`, `/crav1-verify-spec`, `/crav1-fix-build-gaps`, or `/crav1-finalize-commit`.
 
 When a file changed, name `/crav1-finalize-commit`. Do not run it.
 
@@ -148,4 +148,4 @@ Name `/crav1-plan-from-spec` only as the later step that turns a kept suggestion
 - Dismiss means it is not offered again.
 - A kept suggestion goes onto the existing spec through `/crav1-add-to-spec`. Plan turns it into a task. This command does not run Plan.
 - Do not write the tests. Do not change the code. Do not start Specify, Plan, or Build. Do not move work into a lane.
-- Later skill. Not a starter option. Asking for startup options names only the seven and does not run this command.
+- Later skill. Not a starter option. Asking for startup options names only the six and does not run this command.

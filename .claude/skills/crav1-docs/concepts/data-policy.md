@@ -2,7 +2,7 @@
 
 When a skill quotes an imported source into a spec (a mail, a transcript, minutes, a chat, a screenshot, a diagram, or another original file), it keeps the original in the product repo under `docs/sources/` so every quote can be checked. Before it writes those files, it checks them for personal data and secrets. This page explains that check in plain words. The full rules, which the skills follow, are in the add-to-spec reference [sources.md](../../.cursor/skills/crav1/crav1-add-to-spec/references/sources.md).
 
-The skills that import a source are `/crav1-add-to-spec`, `/crav1-meeting-to-specs`, `/crav1-match-dump-to-specs`, `/crav1-intake-to-specs`, and `/crav1-match-to-specs`. `/crav1-ask-open-questions` uses the same policy for its drafts.
+The skills that import a source are `/crav1-add-to-spec`, `/crav1-intake-to-specs`, and `/crav1-existing-to-specs`. `/crav1-show-or-ask-open-questions` uses the same policy for its drafts.
 
 This is not legal advice. The client's or the employer's data and retention policy comes first.
 

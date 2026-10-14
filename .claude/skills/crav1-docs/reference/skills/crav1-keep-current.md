@@ -8,9 +8,9 @@
 
 Update the picture in docs/system/ when something was added: add what is new to the short description, the diagram, and how the parts connect, and do not rewrite what is there.
 
-When something was added, **[`/crav1-keep-current`](crav1-keep-current.md)** updates the short description, the diagram, and how the parts connect. It adds what is new and does not rewrite what is already there. It does not design the change and does not build it. It can run on its own. Spark, ideas, intake, match, and the siblings that already append a glossary row also run this update. They do not rewrite existing glossary rows. Some commands ask at the end of the run whether to run it, and do not run it: [`/crav1-complete-features`](crav1-complete-features.md) when a slice is marked done or retired, [`/crav1-fix-bug`](crav1-fix-bug.md) and [`/crav1-fix-live`](crav1-fix-live.md) when the fix changes how the parts connect, [`/crav1-environment-read`](crav1-environment-read.md) after marks lines are added, and [`/crav1-add-to-spec`](crav1-add-to-spec.md) once at the end of an environment-read or suggest-tests handoff. [`/crav1-implement-task`](crav1-implement-task.md) and [`/crav1-complete-task`](crav1-complete-task.md) do not ask.
+When something was added, **[`/crav1-keep-current`](crav1-keep-current.md)** updates the short description, the diagram, and how the parts connect. It adds what is new and does not rewrite what is already there. It does not design the change and does not build it. It can run on its own. Spark, ideas, intake, match, and the siblings that already append a glossary row also run this update. They do not rewrite existing glossary rows. Some commands ask at the end of the run whether to run it, and do not run it: [`/crav1-complete-features`](crav1-complete-features.md) when a slice is marked done or retired, [`/crav1-fix-bug`](crav1-fix-bug.md) and [`/crav1-fix-build-gaps`](crav1-fix-build-gaps.md) when the fix changes how the parts connect, [`/crav1-environment-read`](crav1-environment-read.md) after marks lines are added, and [`/crav1-add-to-spec`](crav1-add-to-spec.md) once at the end of an environment-read or suggest-tests handoff. [`/crav1-build-tasks`](crav1-build-tasks.md) do not ask.
 
-Adds what is new to the short description, the diagram, and how the parts connect. Does not rewrite what is already there. Does not design the change or build it. Can run on its own. Spark, ideas, intake, match, match-dump, and code-into-specs run this same update and still do not rewrite existing glossary rows.
+Adds what is new to the short description, the diagram, and how the parts connect. Does not rewrite what is already there. Does not design the change or build it. Can run on its own. Spark, ideas, intake, match, match-dump, and add-to-spec run this same update and still do not rewrite existing glossary rows.
 
 ## Runs when
 
@@ -32,7 +32,7 @@ Writes new lines on the short description, the context diagram, and how the part
 
 Leaves existing picture lines, glossary rows, design, and build alone.
 
-Limits and exceptions: spark, ideas, intake, match, match-dump, and code-into-specs run this picture update on the pass that appends a glossary row. Repos-to-spec updates the picture in its own pass. Complete-features, fix-bug, fix-live, environment-read, and the add-to-spec handoffs from environment-read and suggest-tests-for-code may ask and do not run this command. Implement-task and complete-task do not ask. It does not commit a cleared research mark.
+Limits and exceptions: spark, ideas, intake, match, match-dump, and add-to-spec run this picture update on the pass that appends a glossary row. Repos-to-spec updates the picture in its own pass. Complete-features, fix-bug, fix-build-gaps, environment-read, and the add-to-spec handoffs from environment-read and suggest-tests-for-code may ask and do not run this command. Implement-task and build-tasks do not ask. It does not commit a cleared research mark.
 
 ## You run next / Runs by itself
 

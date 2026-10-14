@@ -8,7 +8,7 @@
 
 Serial board: build several ready specs one slug after another in this checkout.
 
-Serial board of ready slugs: `feat/<slug>` from default, then that spec’s complete-tasks loop; no parallel, no push, no PR.
+Serial board of ready slugs: `feat/<slug>` from default, then that spec’s build-tasks loop; no parallel, no push, no PR.
 
 ## Runs when
 
@@ -30,7 +30,7 @@ Writes the commit-style rule once when it is missing, and a `feat/<slug>` checko
 
 Leaves product code, commits, `spec.md`, push, and the pull request alone in this chat.
 
-Limits and exceptions: one ready slug stops and points at [`/crav1-complete-tasks`](crav1-complete-tasks.md) without running it. When a slice is marked done or retired, it asks once whether to run [`/crav1-keep-current`](crav1-keep-current.md) and does not run it.
+Limits and exceptions: one ready slug stops and points at [`/crav1-build-tasks`](crav1-build-tasks.md) without running it. When a slice is marked done or retired, it asks once whether to run [`/crav1-keep-current`](crav1-keep-current.md) and does not run it.
 
 ## You run next / Runs by itself
 

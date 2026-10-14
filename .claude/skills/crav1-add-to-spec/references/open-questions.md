@@ -2,7 +2,7 @@
 
 An open question on a spec can be asked of someone outside the kit, by mail, in a meeting, or in a chat. This file is how the kit records that a question was asked or is pending, how it links an answer that comes back in an import, and how it takes the asked-on date from the source.
 
-`/crav1-ask-open-questions` writes the asked and pending marks after the user picks. `/crav1-meeting-to-specs`, `/crav1-match-dump-to-specs`, and `/crav1-add-to-spec` follow this file when they import a mail, a transcript, minutes, or a chat. `/crav1-resolve-questions` reads the answer links. None of them sends anything. None of them commits.
+`/crav1-show-or-ask-open-questions` writes the asked and pending marks after the user picks. `/crav1-add-to-spec` follow this file when they import a mail, a transcript, minutes, or a chat. `/crav1-resolve-questions` reads the answer links. None of them sends anything. None of them commits.
 
 ## Where the records live
 
@@ -32,7 +32,7 @@ After a draft, the user picks one of three. The kit never sends anything.
 
 ## Pending comes back
 
-On the next `/crav1-ask-open-questions` run that touches a question with a `Pending:` line, show it first, before any new question. One line per draft:
+On the next `/crav1-show-or-ask-open-questions` run that touches a question with a `Pending:` line, show it first, before any new question. One line per draft:
 
 ```text
 Drafted for <who> on <date> (<channel>), not marked as sent yet. <n> questions.
@@ -50,7 +50,7 @@ Do not mix pending questions silently into the new draft. When the user wants th
 
 When a skill imports a mail, a transcript, minutes, or a chat, read every `## Open questions` on the specs it reads (skip `_template`), with their records. Compare each extracted item with each open question. Match by meaning. The words can differ. A reply that says "about question 3" matches the question whose `Asked:` or `Pending:` line says `Question 3` for that person. Matching works whether the question is asked, pending, or not marked.
 
-- **Clear answer.** The item states the fact or the decision the question asks for. Link it without a separate keep question. In `/crav1-meeting-to-specs` it is not asked. In `/crav1-match-dump-to-specs` it is linked with the confirmed sort. Write `Answered:` under the question, with the date, who, the kind, the quote, and the source. Follow the imported-sources check in [sources.md](sources.md) first, so the quote is the one after any redaction. The question stays under `## Open questions` with its answer linked. It is marked answered. It is not folded into requirements here.
+- **Clear answer.** The item states the fact or the decision the question asks for. Link it without a separate keep question. In `/crav1-add-to-spec` it is not asked. In `/crav1-add-to-spec` it is linked with the confirmed sort. Write `Answered:` under the question, with the date, who, the kind, the quote, and the source. Follow the imported-sources check in [sources.md](sources.md) first, so the quote is the one after any redaction. The question stays under `## Open questions` with its answer linked. It is marked answered. It is not folded into requirements here.
 - **Unclear or partial.** The item only might answer, answers part, or is hedged ("probably", "I think", "need to check"). Show it as a possible answer, quote and question together. Do not write `Answered:`. The question stays open. The item still goes through the import skill's own keep, leave, or note path.
 - **Changes a spec line.** When the linked answer would change a requirement, an acceptance line, a constraint, or another spec line, do not change that line here. Name `/crav1-resolve-questions` for that slug. Do not run it.
 - **Settles a stale research point.** When the question is one a stale research point waits on, the existing re-check in [research-stale.md](research-stale.md) runs. It does not ask the user.

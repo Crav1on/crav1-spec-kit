@@ -6,7 +6,7 @@ Use this when **specs already exist** under `docs/specs/` and a **code change al
 
 The change is a commit, a commit range, or the diff of the current branch against the default branch. No dump is required.
 
-[Match](from-match.md) creates the folders from repos plus a dump. [Match-dump](from-match-dump.md) sorts a later dump onto specs that already exist. [Add](from-add.md) takes information already aimed at one named spec. This command starts from the change. It does not replace [intake](from-intake.md), [a spark](from-nothing.md), or [a pile of ideas](from-ideas.md). It is not [from the repos](from-repos.md) (`/crav1-repos-to-spec`), which reads the repos the user named and writes one architecture spec. It does not write application code. It does not watch the repo. It runs only when someone points it at a change.
+[Match](from-match.md) creates the folders from repos plus a dump. [Match-dump](from-match-dump.md) sorts a later dump onto specs that already exist. [Add](from-add.md) takes information already aimed at one named spec. This command starts from the change. It does not replace [intake](from-intake.md), [a spark](from-nothing.md), or [a pile of ideas](from-ideas.md). It is not [from the repos](from-repos.md) (`/crav1-existing-to-specs`), which reads the repos the user named and writes one architecture spec. It does not write application code. It does not watch the repo. It runs only when someone points it at a change.
 
 A not-started spec (match status `not in the code`, or a thin spec) can keep taking information until planning. Adding what the change does does not start planning and does not write `plan.md` or `tasks.md`.
 
@@ -17,7 +17,7 @@ New chat. Strong reasoning model. Not the host plan UI yet.
 Name the change when one is already known. Do not name a slug first. Do not paste a dump.
 
 ```text
-/crav1-code-into-specs
+/crav1-add-to-spec
 
 The specs already exist. Sort this change onto them.
 Do not write code. Do not plan.
@@ -38,7 +38,7 @@ If the message names a commit, a commit range, or the branch diff, that is the c
 | Impact | If other files are affected, pick apply or leave them alone | Reads `docs/system/` and the other specs. Lists each proposed edit in one line. Does not edit those files until apply |
 | Stop | Glance, then `/crav1-finalize-commit` only if those spec edits should be committed | Does not plan, implement, or commit |
 
-No spec folders under `docs/specs/` (other than `_template`): the command stops and points at `/crav1-match-to-specs`. It does not invent a landscape from the diff. It does not create a slug.
+No spec folders under `docs/specs/` (other than `_template`): the command stops and points at `/crav1-existing-to-specs`. It does not invent a landscape from the diff. It does not create a slug.
 
 The sort confirmation is the only stop before writing. Confirming the sort accepts the facts left on it. Facts that were not confirmed stay labeled inferred.
 
@@ -66,4 +66,4 @@ That puts the spec edits (and any applied edits) in git. No push. This command d
 
 `/crav1-plan-from-spec` is only for a slice you choose to start. This command does not run it.
 
-Reference page: [code-into-specs](reference/skills/crav1-code-into-specs.md)
+Reference page: [add-to-spec](reference/skills/crav1-add-to-spec.md)

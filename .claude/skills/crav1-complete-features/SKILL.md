@@ -2,8 +2,8 @@
 name: crav1-complete-features
 description: >-
   Serial board: build several ready specs one slug after another in this
-  checkout. Each slug is feat/<slug> from default, then the complete-tasks
-  T# loop. Not parallel. One slug: use /crav1-complete-tasks. Do not push.
+  checkout. Each slug is feat/<slug> from default, then the build-tasks
+  T# loop. Not parallel. One slug: use /crav1-build-tasks. Do not push.
   Do not open a PR.
 disable-model-invocation: true
 icon: list
@@ -14,13 +14,13 @@ color: green
 
 You **manage** a queue of **slugs**. You do **not** implement, verify, or `git commit` in this chat.
 
-Each slug is one feature: `docs/specs/<slug>/` + branch `feat/<slug>` created from the **default** branch (not from the previous feature). Inside a slug, reuse the `/crav1-complete-tasks` loop: one **crav1-complete-task-agent** worker per `T#`, one at a time.
+Each slug is one feature: `docs/specs/<slug>/` + branch `feat/<slug>` created from the **default** branch (not from the previous feature). Inside a slug, reuse the `/crav1-build-tasks` loop: one **crav1-complete-task-agent** worker per `T#`, one at a time.
 
 This is **not** parallel. Two `feat/` branches cannot share this working tree. True parallel (handoff / worktrees / Cloud Agents) is **out of scope** for this skill.
 
-Command: `/crav1-complete-features`. One spec: `/crav1-complete-tasks`. One task: `/crav1-complete-task`.
+Command: `/crav1-complete-features`. One spec: `/crav1-build-tasks`. One task: `/crav1-build-tasks`.
 
-Worker: `.claude/agents/crav1-complete-task-agent.md` (plugin: `agents/crav1-complete-task-agent.md`). Protocol: `crav1-complete-task` [references/run.md](../crav1-complete-task/references/run.md). Style: [style-persist.md](../crav1-complete-task/references/style-persist.md). Approvals: [tool-approvals.md](../crav1-complete-task/references/tool-approvals.md). Branch rules: `/crav1-feature-branch` (drop-in: `.claude/skills/crav1-feature-branch/SKILL.md`; plugin: sibling `skills/crav1-feature-branch/SKILL.md`).
+Worker: `.claude/agents/crav1-complete-task-agent.md` (plugin: `agents/crav1-complete-task-agent.md`). Protocol: `crav1-build-tasks` [references/run.md](../crav1-build-tasks/branches/one-task/references/run.md). Style: [style-persist.md](../crav1-build-tasks/branches/one-task/references/style-persist.md). Approvals: [tool-approvals.md](../crav1-build-tasks/branches/one-task/references/tool-approvals.md). Branch rules: `/crav1-feature-branch` (drop-in: `.claude/skills/crav1-feature-branch/SKILL.md`; plugin: sibling `skills/crav1-feature-branch/SKILL.md`).
 
 ## Which slugs
 
@@ -36,7 +36,7 @@ Worker: `.claude/agents/crav1-complete-task-agent.md` (plugin: `agents/crav1-com
 - Those spec files exist **on the default branch** (`git show <default>:docs/specs/<slug>/spec.md` works). If they exist only on `spec/<slug>` or only in this dirty tree, **skip** with reason: merge specify-only first
 - Not a landscape-only path (`docs/system/` is not a slug)
 
-If the queue has **0** slugs: stop. If it has **exactly 1**: stop and tell them `/crav1-complete-tasks` with that spec attached.
+If the queue has **0** slugs: stop. If it has **exactly 1**: stop and tell them `/crav1-build-tasks` with that spec attached.
 
 Unknown names: list, continue with the rest. Empty after skips: stop.
 
@@ -60,9 +60,9 @@ If currently on `spec/<anything>`: stop. No workers. Follow feature-branch **Bui
 
 ## Tool approvals (once for the whole board)
 
-Follow [tool-approvals.md](../crav1-complete-task/references/tool-approvals.md) **once before the first worker** (you are an orchestrator, same as complete-tasks).
+Follow [tool-approvals.md](../crav1-build-tasks/branches/one-task/references/tool-approvals.md) **once before the first worker** (you are an orchestrator, same as build-tasks).
 
-Pass **`approvals: already-done`** and **`branch: already-done`** to every worker. Workers and nested `/crav1-complete-task` must **not** pause. Do not start a nested `/crav1-complete-tasks` skill (it would pause again); run its **T# loop yourself**.
+Pass **`approvals: already-done`** and **`branch: already-done`** to every worker. Workers and nested `/crav1-build-tasks` must **not** pause. Do not start a nested `/crav1-build-tasks` skill (it would pause again); run its **T# loop yourself**.
 
 Cloud Agents: skip the pause.
 
@@ -91,7 +91,7 @@ Status: `queued` | `running` | `needs_fix` | `needs_ready` | `needs_dependency` 
 
 For each queued slug, after switch:
 
-Run the complete-tasks **T# loop** on **this** slug’s `tasks.md` (all remaining `- [ ]` unless they named a range **for that slug** — v1: all unchecked on that slug).
+Run the build-tasks **T# loop** on **this** slug’s `tasks.md` (all remaining `- [ ]` unless they named a range **for that slug** — v1: all unchecked on that slug).
 
 1. Launch **crav1-complete-task-agent** with this spec folder, this `T#`, `resume: start`, `approvals: already-done`, `branch: already-done`, style already set.
 2. Wait for STATUS. Do not implement. Do not start `T+1` or the next slug while this worker is open.
@@ -127,7 +127,7 @@ The system picture may now be out of date. Run `/crav1-keep-current`?
 
 Options are yes and no. Use the questions tool when it is available. Do not run `/crav1-keep-current`. A yes waits for a later turn. A no ends without that command.
 
-Do not ask when no slug was marked done and none was marked retired. Do not add this question to `/crav1-implement-task` or `/crav1-complete-task`.
+Do not ask when no slug was marked done and none was marked retired. Do not add this question to `/crav1-build-tasks`.
 
 ## Hard rules
 

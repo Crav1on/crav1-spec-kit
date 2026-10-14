@@ -17,7 +17,7 @@ New chat. Strong reasoning model. Not the host plan UI yet.
 `@` the dump. Do not name a slug first. No required structure in the dump.
 
 ```text
-/crav1-match-dump-to-specs
+/crav1-add-to-spec
 @notes/later-dump.md
 @tickets/
 @sketches/flow.png
@@ -72,4 +72,4 @@ That puts the spec edits (and any applied edits) in git. No push. This command d
 
 `/crav1-plan-from-spec` is only for a slice you choose to start. This command does not run it.
 
-Reference page: [match-dump-to-specs](reference/skills/crav1-match-dump-to-specs.md)
+Reference page: [add-to-spec](reference/skills/crav1-add-to-spec.md)

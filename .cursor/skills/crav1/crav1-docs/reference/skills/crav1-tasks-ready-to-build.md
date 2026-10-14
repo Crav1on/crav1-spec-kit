@@ -10,7 +10,7 @@ List the tasks ready to build, for one spec or all, and why the others are block
 
 **[`/crav1-tasks-ready-to-build`](crav1-tasks-ready-to-build.md)** reads `spec.md` open questions, `plan.md` (the `Reviewed:` line and `## Risks`), `tasks.md`, and `verify.md` for one slice or every slice. A ticked task is Done when `verify.md` lists it as verified, otherwise Needs verify. Then a task is blocked by a missing `plan.md`, by a kept-open question whose `Blocks:` line names it, by a kept-open question or plan Risk with no `Blocks:` line (the whole slice, inferred), or by an unticked task in its `(after: T#)` (recorded) or, with no `(after: …)`, any earlier unticked task (inferred). Otherwise it is Ready, with a warning when the plan review is unknown (inferred) or still has open `P#`s.
 
-Shows summary counts per slice, then Ready, Blocked (one reason each, recorded or inferred), Needs verify, a Done count, `Next: [`/crav1-implement-task`](crav1-implement-task.md) T#`, and a `Source:` line. Local only: it never reads Azure Boards and names [`/crav1-ado-to-tasks`](crav1-ado-to-tasks.md) for task states there. It writes nothing and runs no other skill. It can run any time. It is cross-cutting. It is not a starter option.
+Shows summary counts per slice, then Ready, Blocked (one reason each, recorded or inferred), Needs verify, a Done count, `Next: [`/crav1-build-tasks`](crav1-build-tasks.md) T#`, and a `Source:` line. Local only: it never reads Azure Boards and names [`/crav1-ado-sync`](crav1-ado-sync.md) for task states there. It writes nothing and runs no other skill. It can run any time. It is cross-cutting. It is not a starter option.
 
 ## Runs when
 
@@ -36,7 +36,7 @@ Limits and exceptions: does not guess a dependency or a blocking link from task 
 
 ## You run next / Runs by itself
 
-- You run next: [`/crav1-implement-task`](crav1-implement-task.md)
+- You run next: [`/crav1-build-tasks`](crav1-build-tasks.md)
 - Runs by itself: Calls no skill.
 
 ## Lane and group

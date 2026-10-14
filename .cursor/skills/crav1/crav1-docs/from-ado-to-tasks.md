@@ -6,7 +6,7 @@ Use this when the tasks of a spec are already in Azure Boards, sent by [From tas
 
 This is cross-cutting. It is not its own lane. It may run from any lane. It does not move work into Specify, Plan, or Build. It does not start those lanes.
 
-It is a later skill. It is not a starter option. When the user asks for startup options, that ask names only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-match-to-specs`, `/crav1-repos-to-spec`, `/crav1-environment-read`, and `/crav1-fix-bug`. It does not run this command. The seven starter options stay unchanged.
+It is a later skill. It is not a starter option. When the user asks for startup options, that ask names only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-existing-to-specs`, `/crav1-environment-read`, and `/crav1-fix-bug`. It does not run this command. The six starter options stay unchanged.
 
 Reading the Feature itself back is [From Azure Boards to specs](from-ado-to-specs.md).
 
@@ -15,20 +15,20 @@ Reading the Feature itself back is [From Azure Boards to specs](from-ado-to-spec
 New chat.
 
 ```text
-/crav1-ado-to-tasks
+/crav1-ado-sync
 ```
 
-Or name a spec, for example `/crav1-ado-to-tasks email-service`, or `all`.
+Or name a spec, for example `/crav1-ado-sync email-service`, or `all`.
 
 ## Steps
 
 ### Check first
 
-The org and the project come from `docs/environments/marks.md`, or from the Azure DevOps URLs in `docs/system/repos.md`, the same way as `/crav1-specs-to-ado`. If `az` fails, the command states the issue, suggests a fix such as `az login`, and offers a skip. It does not install `az` and it does not log in.
+The org and the project come from `docs/environments/marks.md`, or from the Azure DevOps URLs in `docs/system/repos.md`, the same way as `/crav1-ado-sync`. If `az` fails, the command states the issue, suggests a fix such as `az login`, and offers a skip. It does not install `az` and it does not log in.
 
 ### Pick a spec
 
-The list shows the specs whose `work-item.md` has task lines, plus **All**. A spec without task lines points at `/crav1-tasks-to-ado`.
+The list shows the specs whose `work-item.md` has task lines, plus **All**. A spec without task lines points at `/crav1-ado-sync`.
 
 ### Read back and compare
 
@@ -69,4 +69,4 @@ Only the kept changes: the spec, `tasks.md`, and `work-item.md` lines for added 
 
 Commit mentions keep the Feature id. When a commit clearly implements one recorded task, its task id is added too; when it is unclear, the commit skills ask. See [Data layout](concepts/data-layout.md).
 
-Reference page: [ado-to-tasks](reference/skills/crav1-ado-to-tasks.md)
+Reference page: [ado-sync](reference/skills/crav1-ado-sync.md)

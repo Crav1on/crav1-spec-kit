@@ -14,7 +14,7 @@ One-liner → questions → thin `docs/system/` when missing, including `glossar
 
 You have 1–2 sentences. Called by the user.
 
-This is one of the seven starter options. Asking for startup options names it and does not run it.
+This is one of the six starter options. Asking for startup options names it and does not run it.
 
 ## Reads
 

@@ -1,6 +1,6 @@
 # The method
 
-This page is the method behind the kit: how the pieces fit together, the seven ways in, the working loop once a spec exists, how to set it up, and the best practices. The commands themselves, with what each reads and writes, are in the [skills reference](../reference/skills.md). Where the files go on each host is [install](../install.md). Every other page is listed in the [docs index](../README.md).
+This page is the method behind the kit: how the pieces fit together, the six ways in, the working loop once a spec exists, how to set it up, and the best practices. The commands themselves, with what each reads and writes, are in the [skills reference](../reference/skills.md). Where the files go on each host is [install](../install.md). Every other page is listed in the [docs index](../README.md).
 
 ## How the pieces fit together
 
@@ -69,7 +69,7 @@ Quick, well-understood edits (rename, copy tweak, one-file bug with a clear stac
 
 ## Starting points
 
-Each starting point below has its own walkthrough with the full steps. The table of all seven starter options is on the [README](../../README.md#the-seven-starter-options).
+Each starting point below has its own walkthrough with the full steps. The table of all six starter options is on the [README](../../README.md#the-six-starter-options).
 
 ### From one sentence to a spec
 
@@ -96,7 +96,7 @@ Spark: <one or two sentences for this feature>
 Feature on this app. Preserve existing architecture. Do not write code.
 ```
 
-Then: answer ≤7 questions (and the branch prompt) → agent seeds a thin `docs/system/` when that folder is missing, writes `docs/specs/<slug>/spec.md`, then adds one landscape index row → `/crav1-tighten-spec` walks **each** finding → `/crav1-resolve-questions` walks leftover Open questions (keep open or answer) → optional `crav1-spec-reviewer-agent` → **`/crav1-plan-from-spec`** → `/crav1-review-plan` then `/crav1-tighten-plan` for plan `P#`s → `/crav1-implement-task` per `T#` or `/crav1-complete-task` / `/crav1-complete-tasks` (one spec) or `/crav1-complete-features` (several specs, serial) → `/crav1-verify-spec` → `/crav1-fix-from-verify` (omit Gap) for inner-loop remaining: failed → unverified → `G#`.
+Then: answer ≤7 questions (and the branch prompt) → agent seeds a thin `docs/system/` when that folder is missing, writes `docs/specs/<slug>/spec.md`, then adds one landscape index row → `/crav1-tighten-spec` walks **each** finding → `/crav1-resolve-questions` walks leftover Open questions (keep open or answer) → optional `crav1-spec-reviewer-agent` → **`/crav1-plan-from-spec`** → `/crav1-review-plan` then `/crav1-tighten-plan` for plan `P#`s → `/crav1-build-tasks` per `T#` or `/crav1-build-tasks` (one spec) or `/crav1-complete-features` (several specs, serial) → `/crav1-verify-spec` → `/crav1-fix-build-gaps` (omit Gap) for inner-loop remaining: failed → unverified → `G#`.
 
 ### From a pile of ideas (not a spark, not a spec)
 
@@ -138,14 +138,14 @@ Default if you only `@` a codebase: new system, that code is **context** (not ex
 
 ### From existing repos and a dump
 
-When one or more repos already make up a system, and a dump (notes, tickets, old docs, diagrams, screenshots) is what to match against that code, use **`/crav1-match-to-specs`**. The repos are evidence of what exists. The dump is not a brief for a new product. Full walkthrough: [From existing repos and a dump to specs](../from-match.md).
+When one or more repos already make up a system, and a dump (notes, tickets, old docs, diagrams, screenshots) is what to match against that code, use **`/crav1-existing-to-specs`**. The repos are evidence of what exists. The dump is not a brief for a new product. Full walkthrough: [From existing repos and a dump to specs](../from-match.md).
 
 This does not replace `/crav1-intake-to-specs`, `/crav1-spark-to-spec`, or `/crav1-ideas-to-spec`.
 
 **First prompt:**
 
 ```text
-/crav1-match-to-specs
+/crav1-existing-to-specs
 @repo-a/
 @repo-b/
 @notes/old-spec.md
@@ -157,14 +157,14 @@ The command asks where the spec files go (one repo already in front of it, or a 
 
 ### From a later dump onto existing specs
 
-When specs already exist under `docs/specs/` and a new dump (notes, tickets, old docs, diagrams, screenshots) has to be sorted onto them, use **`/crav1-match-dump-to-specs`**. Full walkthrough: [From a later dump onto existing specs](../from-match-dump.md).
+When specs already exist under `docs/specs/` and a new dump (notes, tickets, old docs, diagrams, screenshots) has to be sorted onto them, use **`/crav1-add-to-spec`**. Full walkthrough: [From a later dump onto existing specs](../from-match-dump.md).
 
 Match creates the folders from repos plus a dump. Add takes information already aimed at one named spec. This command does not ask for a slug first. It reads the existing spec folders. One dump may be a lot about one slug, or it may cover many. Size is not a limit. It does not plan.
 
 **First prompt:**
 
 ```text
-/crav1-match-dump-to-specs
+/crav1-add-to-spec
 @notes/later-dump.md
 @tickets/
 
@@ -175,14 +175,14 @@ The command shows four piles (belongs to this spec, already in that spec, note, 
 
 ### From a code change that already landed
 
-When specs already exist under `docs/specs/` and a code change already landed without a spec, plan, or build, use **`/crav1-code-into-specs`**. Full walkthrough: [From a code change onto existing specs](../from-code.md).
+When specs already exist under `docs/specs/` and a code change already landed without a spec, plan, or build, use **`/crav1-add-to-spec`**. Full walkthrough: [From a code change onto existing specs](../from-code.md).
 
 Match creates the folders from repos plus a dump. Match-dump sorts a later dump onto those specs. Add takes information already aimed at one named spec. This command starts from the change. No dump is required. It does not ask for a slug first. It reads the existing spec folders. It does not watch the repo. It runs only when someone points it at a change. It does not plan.
 
 **First prompt:**
 
 ```text
-/crav1-code-into-specs
+/crav1-add-to-spec
 
 The specs already exist. Sort this change onto them. Do not write code. Do not plan.
 ```
@@ -195,7 +195,7 @@ The command shows three piles (belongs to this spec, already described there, fi
 
 Use this on any non-trivial change. Step by step: [From a draft spec to an accepted spec](../from-draft-spec.md), [From a spec to a plan](../from-spec-to-plan.md), [Build tasks](../from-plan-to-build.md), [Verify and fix](../from-verify.md), and [From commit to merge](../from-commit.md).
 
-The skills that work beside this loop (add, repos-to-spec, environment-read, pipeline-environments, explain, whats-known-about, keep-current, security-review, review-pr, suggest-tests-for-code, meeting-to-specs, exploratory-test, fix-bug) are described in full on their pages in the [skills reference](../reference/skills.md).
+The skills that work beside this loop (add, existing-to-specs, environment-read, pipeline-environments, explain, whats-known-about, keep-current, security-review, review-pr, suggest-tests-for-code, add-to-spec, exploratory-test, fix-bug) are described in full on their pages in the [skills reference](../reference/skills.md).
 
 ### A. Specify (read-heavy)
 
@@ -226,7 +226,7 @@ If a task cannot be verified, it is still part of the spec, not ready to impleme
 
 ### D. Implement
 
-Build from `plan.md` and `tasks.md`. Prefer a **fresh chat** so implementation context is not polluted by all the exploration. `/crav1-implement-task` is one `T#`. `/crav1-complete-task` is that `T#` in an isolated worker.
+Build from `plan.md` and `tasks.md`. Prefer a **fresh chat** so implementation context is not polluted by all the exploration. `/crav1-build-tasks` is one `T#`. `/crav1-build-tasks` is that `T#` in an isolated worker.
 
 If the agent diverges, revert, tighten the plan, and rebuild instead of endless patch prompts.
 
@@ -264,7 +264,7 @@ When you change a template in this kit repo, update `docs/specs/_template/` **an
 
 Every skill and subagent this kit ships, with what it reads, what it writes, and what it leaves alone, is in the [skills reference](../reference/skills.md).
 
-Invoke with `/skill-name` (for example `/crav1-implement-task` while you burn down `T#`s).
+Invoke with `/skill-name` (for example `/crav1-build-tasks` while you burn down `T#`s).
 
 ### Step 4 — Verification as part of the environment
 
@@ -277,11 +277,11 @@ An agent that cannot run tests will guess. Document the exact test, lint, and de
 ### Step 6 — Day-to-day
 
 1. Open a chat in the product repo. On Cursor that is Agent chat. On Claude Code, open a session in that repo.
-2. Pick one starter option from the [seven starter options](../../README.md#the-seven-starter-options). Asking for startup options names only those seven and does not run one. `/crav1-repos-to-spec` still runs only when the user names the repos. It does not start Specify, Plan, or Build. `/crav1-environment-read` still runs only when the user names the host, such as Azure. Naming production, prod, or live stops. It reads every non-prod environment in one pass. A prod-only resource is shape and connections only, after one yes. SQL metadata and storage structure are optional after that, and only when the user says yes. Look-inside never opens production. It does not start Specify, Plan, or Build. `/crav1-fix-bug` still runs only when the user names a real bug. It is not a skill that runs because a repo is new. Later skills, once specs already exist, include a later dump (`/crav1-match-dump-to-specs`), a landed code change (`/crav1-code-into-specs`), new information on one spec (`/crav1-add-to-spec`), tests for code that already exists (`/crav1-suggest-tests-for-code`, one repo or one area), and `/crav1-pipeline-environments` when the user names Azure DevOps, the org, and the project. Those are not starter options. Do not start in the host plan UI.
+2. Pick one starter option from the [six starter options](../../README.md#the-six-starter-options). Asking for startup options names only those six and does not run one. `/crav1-existing-to-specs` still runs only when the user names the repos. It does not start Specify, Plan, or Build. `/crav1-environment-read` still runs only when the user names the host, such as Azure. Naming production, prod, or live stops. It reads every non-prod environment in one pass. A prod-only resource is shape and connections only, after one yes. SQL metadata and storage structure are optional after that, and only when the user says yes. Look-inside never opens production. It does not start Specify, Plan, or Build. `/crav1-fix-bug` still runs only when the user names a real bug. It is not a skill that runs because a repo is new. Later skills, once specs already exist, include a later dump (`/crav1-add-to-spec`), a landed code change (`/crav1-add-to-spec`), new information on one spec (`/crav1-add-to-spec`), tests for code that already exists (`/crav1-suggest-tests-for-code`, one repo or one area), and `/crav1-pipeline-environments` when the user names Azure DevOps, the org, and the project. Those are not starter options. Do not start in the host plan UI.
 3. Accept `spec.md`. Then `/crav1-plan-from-spec` and accept `plan.md` / `tasks.md`.
-4. `/crav1-implement-task` or `/crav1-complete-task` for one `T#`. Watch diffs. Run the task’s verify step.
+4. `/crav1-build-tasks` for one `T#`. Watch diffs. Run the task’s verify step.
 5. If wrong: fix the spec or the plan, then rebuild.
-6. `/crav1-verify-spec` when you want the acceptance matrix. Inner-loop gaps go to `/crav1-fix-from-verify`.
+6. `/crav1-verify-spec` when you want the acceptance matrix. Inner-loop gaps go to `/crav1-fix-build-gaps`.
 
 ## Best practices
 

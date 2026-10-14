@@ -8,7 +8,7 @@ This is cross-cutting. It is not a lane. It is not a mode of Specify. It writes 
 
 A fact the code shows is confirmed. Before any file is written, the confirmation stays in sections: one per named repo for confirmed facts, one for inferred guesses, one for links, and one for left-out. Each section has its own question and its own answer. Every item stays listed. A guess stays out until that section’s answer accepts it. A guess that stays left out is written to `docs/architecture/left-out.md`, beside the architecture spec. A later re-read checks every line in that file against the code. When the code shows it, the line comes off that file. The left-out answer can accept a line, keep it left out, or dismiss it. Dismiss means it is not offered again. A link between repos is written only when the code shows it. If none is found, that section says so and does not offer a guessed link. It does not invent links. Confirming a guess does not turn it into a link.
 
-This is not [a code change onto existing specs](from-code.md) (`/crav1-code-into-specs`). That command sorts a change that already landed. This command reads the repos. Repos plus a dump stay [match](from-match.md). A feature sentence stays [a spark](from-nothing.md).
+This is not [a code change onto existing specs](from-code.md) (`/crav1-add-to-spec`). That command sorts a change that already landed. This command reads the repos. Repos plus a dump stay [match](from-match.md). A feature sentence stays [a spark](from-nothing.md).
 
 ## First prompt
 
@@ -17,7 +17,7 @@ New chat. Strong reasoning model. Not the host plan UI.
 Name the repos in this message.
 
 ```text
-/crav1-repos-to-spec
+/crav1-existing-to-specs
 @repo-a/
 @repo-b/
 
@@ -71,4 +71,4 @@ That puts the spec and the notes in git. No push. This command does not commit f
 
 The lanes can extend `docs/architecture/spec.md` in a later turn. This command does not start that turn.
 
-Reference page: [repos-to-spec](reference/skills/crav1-repos-to-spec.md)
+Reference page: [existing-to-specs](reference/skills/crav1-existing-to-specs.md)
