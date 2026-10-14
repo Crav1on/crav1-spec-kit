@@ -8,7 +8,7 @@
 
 Answer questions about the kit from its own local docs, with the source file and anchor for every answer.
 
-Called with nothing, **[`/crav1-help`](crav1-help.md)** shows a usage guide with example questions. With a skill name, it says what the skill does, when to use it, what it reads and writes, and its before and after steps. With `next` or a situation, it picks the route in `docs/reference/workflow.yaml` and lists the steps in order, marked done, next, skipped, or to do from the slice's file state (open questions, `plan.md`, ticked tasks, `verify.md`, `work-item.md`). A free-form question is answered from the docs, or with "the kit doesn't say". Every answer ends with `Source: <file>#<anchor>`. On pushback it re-reads the file and keeps the answer unless the file says otherwise.
+Called with nothing, **[`/crav1-help`](crav1-help.md)** shows a usage guide with example questions. With a skill name, it says what the skill does, when to use it, what it reads and writes, and its before and after steps. With `next` or a situation, it picks the route in `docs/reference/workflow.yaml` and lists the steps in order, marked done, next, skipped, or to do from the slice's file state (open questions, `plan.md`, ticked tasks, `verify.md`, `work-item.md`). It also explains a concept from the glossary and concept pages, lists skills by lane (`list`, `list <lane>`), gives the status of one slice (`status <slug>`, `where am I`) with the readiness rules of [`/crav1-tasks-ready-to-build`](crav1-tasks-ready-to-build.md) and the route step it is on, compares two skills (`compare A B`), and summarizes the changelog for the installed version (`whats new`, `whats new since x.y`). A free-form question is answered from the docs, or with "the kit doesn't say". Every answer ends with `Source: <file>#<anchor>`. On pushback it re-reads the file and keeps the answer unless the file says otherwise.
 
 It reads the kit repo's `docs/`, or the `crav1-docs/` folder bundled next to the skills (plugin, Cursor drop-in, Claude Code drop-in), never GitHub. When online, it reads the tag names once and says so when a newer version is tagged. It writes nothing and runs no other skill. It is cross-cutting. It is not a starter option.
 
@@ -20,7 +20,7 @@ You want to know what to run next, in what order, or what a skill does. Called b
 
 In short: The kit docs (kit repo, or the bundled `crav1-docs/` next to the skills), and the slice's file state.
 
-Reads `docs/reference/workflow.yaml`, `docs/reference/skills.yaml`, the reference pages, walkthroughs, and concept pages from the kit repo or the `crav1-docs/` folder bundled next to the skills in every install; for a route, the slice's `spec.md`, `plan.md`, `tasks.md`, `verify.md`, and `work-item.md`; when online, the kit's tag names only.
+Reads `docs/reference/workflow.yaml`, `docs/reference/skills.yaml`, the reference pages, walkthroughs, concept pages, guild routing, and `CHANGELOG.md` from the kit repo or the `crav1-docs/` folder bundled next to the skills in every install; for a route or a status, the slice's `spec.md`, `plan.md`, `tasks.md`, `verify.md`, and `work-item.md`; when online, the kit's tag names only.
 
 ## Writes
 

@@ -4,6 +4,28 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 
 ## Unreleased
 
+## 1.55.0 (2026-10-14)
+
+### Kit
+
+- `/crav1-help` has five more modes, all local, cited, and re-read on pushback:
+  - Concept: `help work item homes`, `marks.md`, `stale marks`, from the glossary and `docs/concepts/`.
+  - `list` shows every skill by lane and phase; `list <lane>` shows one lane, from `skills.yaml` and guild routing.
+  - `status <slug>` or `where am I`: task counts with the `/crav1-tasks-ready-to-build` rules, the route step the slice is on, and the next step from `workflow.yaml`. It points to tasks-ready-to-build for the per-task list.
+  - `compare A B` or `difference between A and B`, from `skills.yaml` and the reference pages.
+  - `whats new` for the installed version, or `whats new since x.y`, from the bundled `CHANGELOG.md`.
+- The usage guide (no input) lists every mode with an example.
+- `CHANGELOG.md` is now bundled in every `crav1-docs/` copy.
+- `plugins/crav1/.cursor-plugin/plugin.json` is 1.55.0.
+
+### Docs
+
+- [Ask the kit for help](docs/from-help.md) lists the new modes; the help reference, CONTRIBUTING.md item 8, and `kit-maintainer.mdc` are updated.
+
+### CI
+
+- The sync job fails when `crav1-docs/CHANGELOG.md` differs from `CHANGELOG.md` in any copy.
+
 ## 1.54.0 (2026-10-14)
 
 ### Kit

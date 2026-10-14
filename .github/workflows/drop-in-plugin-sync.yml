@@ -41,8 +41,8 @@ jobs:
 
           echo "== docs: docs/ ↔ bundled crav1-docs/ in every install (Cursor drop-in, plugin, Claude Code) =="
           for d in .cursor/skills/crav1/crav1-docs plugins/crav1/skills/crav1-docs .claude/skills/crav1-docs; do
-            if ! diff -ru docs "$d"; then
-              echo "$d differs from docs/; run scripts/sync-crav1-plugin.sh"
+            if ! diff -ru -x CHANGELOG.md docs "$d" || ! diff -u CHANGELOG.md "$d/CHANGELOG.md"; then
+              echo "$d differs from docs/ or CHANGELOG.md; run scripts/sync-crav1-plugin.sh"
               fail=1
             fi
           done

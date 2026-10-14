@@ -22,9 +22,14 @@ I have new information from a meeting and tasks that are not built. What do I ru
 | `/crav1-help` | A short usage guide, example questions, and the list of routes |
 | `/crav1-help tighten-spec` | What that command does, when to use it, what it reads and writes, and the steps before and after it |
 | `/crav1-help next`, or a situation | The route for that situation, in order, with each step marked done, next, skipped, or to do |
+| `/crav1-help work item homes`, `marks.md`, `stale marks` | The concept, from the [glossary](concepts/glossary.md) and the concept pages |
+| `/crav1-help list`, `/crav1-help list build` | Every command grouped by lane and phase, or one lane, from the [skills reference](reference/skills.md) and [guild routing](guild-routing.md) |
+| `/crav1-help status <slug>`, `/crav1-help where am I` | Where one slice is: task counts (ready, blocked, needs verify, done) with the same rules as [`/crav1-tasks-ready-to-build`](from-tasks-ready-to-build.md), the route step it is on, and the next step |
+| `/crav1-help compare complete-task complete-tasks` | Two commands side by side: lane, purpose, reads, writes, next steps, and when to pick which |
+| `/crav1-help whats new`, `/crav1-help whats new since 1.50` | The changelog for your installed version, or every release since the one you name |
 | Any other question about the kit | The answer from the docs, or "the kit doesn't say" when they do not cover it |
 
-Every answer ends with a line such as `Source: docs/reference/workflow.md#new-info`.
+Called with nothing, it shows this list with examples. Every answer ends with a line such as `Source: docs/reference/workflow.md#new-info`.
 
 ## Routes and file state
 
@@ -51,7 +56,7 @@ Other agents follow the same rule. The always-on rule (`crav1.mdc` in Cursor, `C
 ## Where the answers come from
 
 - In the kit repo, its own `docs/`.
-- In every install, the `crav1-docs/` folder next to the skills: `skills/crav1-docs/` in the Cursor plugin, `.cursor/skills/crav1/crav1-docs/` in the Cursor drop-in, and `.claude/skills/crav1-docs/` (or `~/.claude/skills/crav1-docs/`) in Claude Code. Each release bundles its own docs, so the answer fits the version you have.
+- In every install, the `crav1-docs/` folder next to the skills: `skills/crav1-docs/` in the Cursor plugin, `.cursor/skills/crav1/crav1-docs/` in the Cursor drop-in, and `.claude/skills/crav1-docs/` (or `~/.claude/skills/crav1-docs/`) in Claude Code. Each release bundles its own docs and `CHANGELOG.md`, so the answer fits the version you have.
 - When only the skill folders were copied and `crav1-docs/` is missing, the command answers from the skill files only and says so.
 
 It never fetches an answer from GitHub. When the machine is online, it reads the kit's tag names once and adds one line when a newer version is tagged.
