@@ -30,7 +30,7 @@ This kit repository is the source. Your product repository is where work happens
 | Project instruction | Cursor: rule `crav1.mdc`. Claude Code: `.claude/CLAUDE.md` (the same always-on text, not the README) |
 | Templates | Inside each skill’s `assets/` (and agent-assets). Optional human copies: `docs/specs/_template/`, `docs/system/_template/` |
 
-The Cursor plugin bundles this repo's `docs/` (in the plugin's `docs/` folder, next to `skills/`), so `/crav1-help` answers for the installed version. A drop-in copy of `.cursor/` or `.claude/` does not include them. Not installed by the Cursor plugin: this repo’s README and `AGENTS.md`. The starter folders `docs/specs/_template/` and `docs/system/_template/` are in the bundled docs but are not copied into your repo. Copy them yourself if you want them in git.
+Every install bundles this repo's `docs/` in a `crav1-docs/` folder next to the skills, so `/crav1-help` answers for the installed version: `skills/crav1-docs/` in the Cursor plugin, `.cursor/skills/crav1/crav1-docs/` in the Cursor drop-in, and `.claude/skills/crav1-docs/` in the Claude Code drop-in. It is not a skill. Copy it with the skills. Not installed by the Cursor plugin: this repo’s README and `AGENTS.md`. The starter folders `docs/specs/_template/` and `docs/system/_template/` are in the bundled docs but are not copied into your repo. Copy them yourself if you want them in git.
 
 ## Project drop-in or user scope
 
@@ -70,7 +70,7 @@ Works on any plan. Skills travel with clones, PRs, and Cloud Agents that use **p
 From a clone of this kit:
 
 1. Copy into the **product** repo:
-   - `.cursor/skills/crav1/`
+   - `.cursor/skills/crav1/` (includes `crav1-docs/`, the kit docs `/crav1-help` reads)
    - `.cursor/agents/crav1-*.md`
    - `.cursor/agent-assets/crav1-*`
    - `.cursor/rules/crav1.mdc`
