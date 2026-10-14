@@ -33,6 +33,18 @@ Skip the question when the message already answers it: one `T#` is option 1, a r
 
 A picked task that is blocked: say why (the tasks-ready-to-build reason) and ask whether to build it anyway or pick another. Do not skip that question.
 
+## Choice words
+
+Exact words for bots and scripted runs. There are no `--flags`.
+
+- Which tasks: `one task` / `range` / `all tasks`.
+
+When the invocation contains one of these words (for example `/crav1-build-tasks one task`), take that choice and do not ask. This holds for a person, a bot, or a headless run.
+
+When a choice is missing and the run is headless or started by a bot (no person in the chat to answer), do not guess. Stop and name the valid words, for example: `Missing choice. Use one of: one task, range, all tasks.`
+
+An alias passes its choice word.
+
 ## Inside the worker
 
 Each worker follows [branches/one-task/references/run.md](branches/one-task/references/run.md), which runs the implement rules in [branches/implement/BRANCH.md](branches/implement/BRANCH.md) (gate, branch check, one task, verify step, evidence), then the commit, `/crav1-verify-build-against-spec`, and the optional fix loop. The implement rules no longer run in this chat: where they say "this turn" or "this chat", read "this worker".

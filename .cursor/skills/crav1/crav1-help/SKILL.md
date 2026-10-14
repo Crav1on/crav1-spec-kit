@@ -79,11 +79,12 @@ The message is a skill name, with or without `/` and `crav1-`. From its `skills.
 - What it reads and what it writes.
 - Before and after: the steps before it and after it in each route that has it (`workflow.yaml`), and its `you_run_next`.
 - Its walkthrough, when it has one.
+- Its choice words, when its `skills.yaml` entry has `choice_words` (the merged skills): every question with its exact words and what each means, and an example such as `/crav1-ado-sync push tasks`. Say that a word in the invocation skips the question, and that a headless or bot run without a word stops and names the words.
 - For `/crav1-tasks-ready-to-build`, say that it can run any time, not only at its route step.
 
-An old name from before 1.56.0 (listed under `aliases` in `skills.yaml`, and in **Renamed skills** in `docs/reference/skills.md`): say first that it was renamed, name the new skill and the choice the alias pre-answers, and that the alias is removed in its `remove_in` release. Then answer for the new skill as above.
+An old name from before 1.56.0 (listed under `aliases` in `skills.yaml`, and in **Renamed skills** in `docs/reference/skills.md`): say first that it was renamed, name the new skill and the choice word the alias passes, and that the alias is removed in its `remove_in` release. Then answer for the new skill as above.
 
-"renamed", "renamed skills", or "what are the new names": list the whole **Renamed skills** table (old name, new name, pre-answered choice, removed in). Source: `docs/reference/skills.md#renamed-skills` and the 1.56.0 entry in `CHANGELOG.md`.
+"renamed", "renamed skills", or "what are the new names": list the whole **Renamed skills** table (old name, new name, choice word, removed in). Source: `docs/reference/skills.md#renamed-skills` and the 1.56.0 entry in `CHANGELOG.md`.
 
 A name that matches no skill and no alias: say so and list the closest names. Do not guess.
 
