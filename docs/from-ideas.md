@@ -6,7 +6,7 @@ Use this when you have **more than a spark**: several ideas, maybe UX notes, may
 
 You still do **not** start by coding. You add an architecture interview and you write diagrams + ADRs. The canonical file remains `spec.md`. Formats are exports. The layout always includes `docs/system/`. This command seeds a thin landscape when that folder is missing (greenfield or an existing app), then writes the spec artifacts, then adds one index row. It fills that landscape from the repo already in front of the agent. When the landscape already exists, this command adds one index row (a repo or ADR row only when the feature needs a new repo) and adds what is new to the picture. Lines already there stay as they are. A missing `glossary.md` is written. An existing glossary gets only new rows for words that are not already listed. Existing rows are not rewritten. A meaning the source does not state is `to be researched`. That same pass adds what is new to the short description, the diagram, and how the parts connect. It does not rewrite what is already there.
 
-Spark-only (greenfield or one feature on an existing app)? Use [from-nothing](from-nothing.md) and `/crav1-spark-to-spec` instead. Mixed files or several features/repos? Use [from-intake](from-intake.md) and `/crav1-intake-to-specs`. If this pile is clearly more than one v0 slice or more than one repo, `/crav1-ideas-to-spec` will stop and send you there.
+Spark-only (greenfield or one feature on an existing app)? Use [from-nothing](from-nothing.md) and `/crav1-spark-to-spec` instead. Mixed files or several features/repos? Use [from-intake](from-intake.md) and `/crav1-bundle-to-specs`. If this pile is clearly more than one v0 slice or more than one repo, `/crav1-ideas-to-spec` will stop and send you there.
 
 ## First prompt
 
@@ -27,7 +27,7 @@ Do not write code. Capture first, then architecture questions.
 
 That slash command *is* the prompt.
 
-On a git repo with commits, the skill **prompts** for `feat/<slug>` (spec+build) or `spec/<slug>` (specify-only) before it writes files. `/crav1-feature-branch` is the same prompt on its own. No push, no PR.
+On a git repo with commits, the skill **prompts** for `feat/<slug>` (spec+build) or `spec/<slug>` (specify-only) before it writes files. `/crav1-create-feature-branch` is the same prompt on its own. No push, no PR.
 
 Structured labels still work if you like them; they are not required.
 
@@ -39,8 +39,8 @@ Structured labels still work if you like them; they are not required.
 | Capture            | Paste one unstructured blob            | Clusters intent vs hunches vs undecided, v0 vs later, ≤5 product questions, format choice |
 | Architecture       | Answer / “use assumptions”             | ≤7 technical questions + 2–3 options at one abstraction level                             |
 | Write              | Pick options, correct A-numbers        | Thin `docs/system/` when missing, including `glossary.md`, then `spec.md`, `diagrams.md`, ADRs, `export/<format>`, then one landscape index row. A missing `glossary.md` is written when the folder already exists. New rows are appended. Existing rows are not rewritten. The picture update adds what is new to the short description, the diagram, and how the parts connect |
-| Critique           | Optional                               | `/crav1-architecture-reviewer` then `/crav1-tighten-spec` (one issue at a time)            |
-| Questions          | Leftover Open questions                | `/crav1-resolve-questions` — keep open or answer, one `Q#` at a time                      |
+| Critique           | Optional                               | `/crav1-review-architecture` then `/crav1-tighten-spec` (one issue at a time)            |
+| Questions          | Leftover Open questions                | `/crav1-resolve-open-questions` — keep open or answer, one `Q#` at a time                      |
 | Export again       | “also want JSON”                       | `/crav1-export-spec` — does not change behavior                                           |
 | Stop               | v0 is demoable and ADRs match diagrams | New chat, `/crav1-plan-from-spec`, with `spec.md`, `diagrams.md`, and `adr/` attached |
 
@@ -99,12 +99,12 @@ Diagrams: context + v0 sequence are required. State/ER only if the idea needs th
 ## Critique command
 
 ```text
-/crav1-architecture-reviewer
+/crav1-review-architecture
 @docs/specs/<slug>/
 Do not edit files.
 ```
 
-Then `/crav1-tighten-spec` to walk the numbered issues (each issue has resolutions plus **get a suggestion**). When the slice is partial or `## In the code` names paths, it reads the committed code on the repo and branch the spec names before wording issues. A spec with no code behind it skips that read. Then `/crav1-resolve-questions` for leftover Open questions.
+Then `/crav1-tighten-spec` to walk the numbered issues (each issue has resolutions plus **get a suggestion**). When the slice is partial or `## In the code` names paths, it reads the committed code on the repo and branch the spec names before wording issues. A spec with no code behind it skips that read. Then `/crav1-resolve-open-questions` for leftover Open questions.
 
 ## After accept
 
@@ -127,9 +127,9 @@ Optional critique of the plan (does not change `spec.md`):
 @docs/specs/<slug>/
 ```
 
-Then `/crav1-tighten-plan` walks **plan** `P#`s one by one. Findings tagged **spec** go to `/crav1-tighten-spec` or `/crav1-resolve-questions`.
+Then `/crav1-tighten-plan` walks **plan** `P#`s one by one. Findings tagged **spec** go to `/crav1-tighten-spec` or `/crav1-resolve-open-questions`.
 
-If this work is on **`spec/<slug>`**, stop after plan: `/crav1-finalize-commit`, open a PR when you want the spec on the default branch. After it is merged, `/crav1-feature-branch` → `feat/<slug>`, then implement. Do not implement on `spec/<slug>`.
+If this work is on **`spec/<slug>`**, stop after plan: `/crav1-finalize-commit`, open a PR when you want the spec on the default branch. After it is merged, `/crav1-create-feature-branch` → `feat/<slug>`, then implement. Do not implement on `spec/<slug>`.
 
 Then, in a **new** chat:
 
@@ -141,7 +141,7 @@ Then, in a **new** chat:
 When you want the full acceptance matrix:
 
 ```text
-/crav1-verify-spec
+/crav1-verify-build-against-spec
 @docs/specs/<slug>/spec.md
 ```
 
@@ -172,7 +172,7 @@ Several (orchestrator stays here; one worker per `T#`):
 Several **specs** (serial; each `feat/<slug>` from the default branch, then that spec’s T#s). One spec still uses build-tasks:
 
 ```text
-/crav1-complete-features auth-login billing
+/crav1-build-features auth-login billing
 ```
 
 When you are ready to commit by itself (after a `T#` or a live fix):
@@ -213,7 +213,7 @@ Do not change spec.md.
 
 To link commits and the pull request to an Azure Boards work item, `docs/specs/<slug>/work-item.md` holds one id per line. A line may name the milestone or slice: `Work item: 52` or `Work item: 81 — October billing`. A file with one unlabeled line is the old format and is still read. The commented starter is [docs/specs/_template/work-item.md](specs/_template/work-item.md). Leave the ids out of `tasks.md`.
 
-On an Azure Repos remote (`dev.azure.com` or `*.visualstudio.com`), `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, and `/crav1-intake-to-specs` ask once after they create a new spec folder. The question is optional: reply with the id, or skip. Intake lists every new slug in that one question so the user can give an id per slug. A reply writes one line per id. Skip writes nothing and does not ask again in that run. GitHub and other hosts are not asked. Those skills do not create the Feature. Creating a Feature is [`/crav1-ado-sync`](from-specs-to-ado.md).
+On an Azure Repos remote (`dev.azure.com` or `*.visualstudio.com`), `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, and `/crav1-bundle-to-specs` ask once after they create a new spec folder. The question is optional: reply with the id, or skip. Intake lists every new slug in that one question so the user can give an id per slug. A reply writes one line per id. Skip writes nothing and does not ask again in that run. GitHub and other hosts are not asked. Those skills do not create the Feature. Creating a Feature is [`/crav1-ado-sync`](from-specs-to-ado.md).
 
 The commit mention picks the line whose label matches the slice being worked. If that match is unclear, the commit skills ask. They do not guess.
 

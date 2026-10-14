@@ -12,9 +12,9 @@ Cloud commands stay read-only. The only file this command writes is `docs/enviro
 
 After that read, and before any section, the command can look inside a database or storage. It asks first. A no leaves them unopened. SQL is metadata only: schemas, names, columns, keys, procedure and function names, and jobs or triggers when they can be reached. Storage is structure only: containers or buckets, prefixes to depth 2, public or private access, lifecycle, versioning, soft delete, and what points at it. It never reads a row or a blob, and it never reports a file count or a size. It never prints a connection string, a key, or a secret. Production is never opened. A yes on prod-only shape does not open a production database or store. Pre-prod and shared follow the yes already given and stay shape and connections only. When the databases have no clear environment, it says there are no clear database environments, then asks whether the environments are in the same database, then whether to read the schema. Before that second question it says how to reach the database and how much setup is needed. The same kind of explanation comes before the storage question. `sqlcmd` is optional and is not installed by this command. The command does not create a login, a firewall rule, a role, or a key. If access is missing, it stops that look-inside and names the gap. A schema or a prefix is evidence only when the whole-word token rule matches. What it found joins the sections that already exist and says it was seen in that environment.
 
-Confirmation is one section at a time. Each section has its own question and its own answer. Nothing is dropped to keep a section short. After the user confirms a section, the skill that already owns the file adds only what is new. System facts go to `docs/system` through `/crav1-keep-current`. Architecture facts go to `docs/architecture/spec.md` through `/crav1-existing-to-specs`. A slice Match already owns goes on that feature spec through `/crav1-add-to-spec`. A left-out line the environment now shows comes off `docs/architecture/left-out.md`. Lines that are already there are not rewritten. This command does not start Specify, Plan, or Build.
+Confirmation is one section at a time. Each section has its own question and its own answer. Nothing is dropped to keep a section short. After the user confirms a section, the skill that already owns the file adds only what is new. System facts go to `docs/system` through `/crav1-refresh-system-notes`. Architecture facts go to `docs/architecture/spec.md` through `/crav1-existing-to-specs`. A slice Match already owns goes on that feature spec through `/crav1-add-to-spec`. A left-out line the environment now shows comes off `docs/architecture/left-out.md`. Lines that are already there are not rewritten. This command does not start Specify, Plan, or Build.
 
-`/crav1-pipeline-environments` reads Azure DevOps pipeline definitions and appends confirmed lines to the same marks file. Walkthrough: [from-pipeline-environments.md](from-pipeline-environments.md). This command does not run it.
+`/crav1-map-pipeline-environments` reads Azure DevOps pipeline definitions and appends confirmed lines to the same marks file. Walkthrough: [from-pipeline-environments.md](from-pipeline-environments.md). This command does not run it.
 
 This is not [named repos](from-repos.md) (`/crav1-existing-to-specs`). That command reads code. This command reads a host.
 
@@ -25,7 +25,7 @@ New chat. Not the host plan UI.
 Name the host in this message.
 
 ```text
-/crav1-environment-read
+/crav1-read-environment
 
 Azure.
 List every non-prod environment. A prod-only resource is shape and connections only, after one yes. Do not guess the host.
@@ -49,7 +49,7 @@ If the message names no host, the command stops. It does not pick Azure. If the 
 | Sections | Answer one section, then the next | Skipped, seen, links (including triggers), system, architecture, Match, left out. Look-inside facts join those sections. Every item stays listed |
 | Owner | Glance | The skill that owns the other file adds only what is new. This command appends confirmed marks and does not write those other files |
 | Stop | `/crav1-finalize-commit` if a file changed | Does not plan, implement, or commit. Does not start Specify, Plan, or Build |
-| Picture | Yes or no, after a marks line is added | Asks once: The system picture may now be out of date. Run `/crav1-keep-current`? Does not run that refresh from the question |
+| Picture | Yes or no, after a marks line is added | Asks once: The system picture may now be out of date. Run `/crav1-refresh-system-notes`? Does not run that refresh from the question |
 
 ## What can change
 
@@ -57,7 +57,7 @@ If the message names no host, the command stops. It does not pick Azure. If the 
 
 Nothing else changes until a section is confirmed and the owner adds a new line.
 
-`docs/system` changes only through `/crav1-keep-current`, and only when that folder is already there. `docs/architecture/spec.md` and `docs/architecture/left-out.md` change only through `/crav1-existing-to-specs`, and the spec is not created from the environment. A feature spec changes only through `/crav1-add-to-spec`, and only for a slice Match already owns.
+`docs/system` changes only through `/crav1-refresh-system-notes`, and only when that folder is already there. `docs/architecture/spec.md` and `docs/architecture/left-out.md` change only through `/crav1-existing-to-specs`, and the spec is not created from the environment. A feature spec changes only through `/crav1-add-to-spec`, and only for a slice Match already owns.
 
 A new line says it was seen in that environment. A shared line keeps `shared with prod`. A pre-prod line stays shape and connections only. A prod-only line says `Seen in <host> prod.`, `prod only`, and shape and connections only. A line that is already there stays as it is.
 
@@ -71,4 +71,4 @@ If a file changed:
 
 That puts the new lines in git. No push. This command does not commit for you. It does not start Specify, Plan, or Build.
 
-Reference page: [environment-read](reference/skills/crav1-environment-read.md)
+Reference page: [read-environment](reference/skills/crav1-read-environment.md)

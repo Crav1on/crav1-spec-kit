@@ -24,10 +24,10 @@ When you ask for startup options, these six are the only ways in. That ask names
 | --- | --- | --- |
 | [`/crav1-spark-to-spec`](docs/reference/skills/crav1-spark-to-spec.md) | One or two sentences | [From one sentence to a spec](docs/from-nothing.md) |
 | [`/crav1-ideas-to-spec`](docs/reference/skills/crav1-ideas-to-spec.md) | A pile of ideas and technical hunches | [From a pile of ideas to a spec](docs/from-ideas.md) |
-| [`/crav1-intake-to-specs`](docs/reference/skills/crav1-intake-to-specs.md) | Mixed files, or more than one v0 feature | [From intake files to specs](docs/from-intake.md) |
+| [`/crav1-bundle-to-specs`](docs/reference/skills/crav1-bundle-to-specs.md) | Mixed files, or more than one v0 feature | [From intake files to specs](docs/from-intake.md) |
 | [`/crav1-existing-to-specs`](docs/reference/skills/crav1-existing-to-specs.md) | Existing repos plus a dump to match | [From existing repos and a dump to specs](docs/from-match.md) |
 | [`/crav1-existing-to-specs`](docs/reference/skills/crav1-existing-to-specs.md) | You name the repos. It runs only then | [From named repos to an architecture spec](docs/from-repos.md) |
-| [`/crav1-environment-read`](docs/reference/skills/crav1-environment-read.md) | You name the host. It runs only then | [From a named host](docs/from-environment.md) |
+| [`/crav1-read-environment`](docs/reference/skills/crav1-read-environment.md) | You name the host. It runs only then | [From a named host](docs/from-environment.md) |
 | [`/crav1-fix-bug`](docs/reference/skills/crav1-fix-bug.md) | You name a real bug that already exists. It runs only then | [From a bug that already exists](docs/from-fix-bug.md) |
 
 Starter options run only when named. Asking for startup options lists them and does not run one. All walkthroughs are listed in the [docs index](docs/README.md#how-to-walkthroughs).

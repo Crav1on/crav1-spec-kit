@@ -32,7 +32,7 @@ Writes a list in the chat with summary counts, Ready, Blocked, Needs verify, a D
 
 Leaves every file alone, and never reads Azure Boards.
 
-Limits and exceptions: does not guess a dependency or a blocking link from task text. Where nothing is recorded it uses a fallback and marks the reason inferred. It writes no marks; review-plan, tighten-plan, plan-from-spec, and resolve-questions write them.
+Limits and exceptions: does not guess a dependency or a blocking link from task text. Where nothing is recorded it uses a fallback and marks the reason inferred. It writes no marks; review-plan, tighten-plan, plan-from-spec, and resolve-open-questions write them.
 
 ## You run next / Runs by itself
 

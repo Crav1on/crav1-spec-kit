@@ -4,7 +4,7 @@ Kit not in this project yet? [Install first](install.md) (Cursor and Claude Code
 
 Use this when you want to know what to run next, in what order, or what one command does. `/crav1-help` answers from the kit's own docs for the version you have installed, and every answer names the file it came from.
 
-This is cross-cutting. It is not its own lane. It writes nothing and runs no other command. It is not [`/crav1-explain`](from-explain.md), which reads your product's `docs/system/`.
+This is cross-cutting. It is not its own lane. It writes nothing and runs no other command. It is not [`/crav1-explain-existing-system`](from-explain.md), which reads your product's `docs/system/`.
 
 ## First prompt
 
@@ -45,7 +45,7 @@ For a route question, the command reads the slice's files and does not change th
 
 It keeps every step of the route in the answer and gives a reason for each one it marks skipped. It names the first step to run and stops. When the route reaches building, it also says that [`/crav1-tasks-ready-to-build`](from-tasks-ready-to-build.md) can run any time to list which tasks are ready and why the others are blocked.
 
-Example: after a meeting changed a spec that has a plan and unbuilt tasks, the New information route gives tighten-spec, resolve-questions, plan-from-spec, ado-sync (only when the Feature itself changed), ado-sync, build-tasks, and verify-spec.
+Example: after a meeting changed a spec that has a plan and unbuilt tasks, the New information route gives tighten-spec, resolve-open-questions, plan-from-spec, ado-sync (only when the Feature itself changed), ado-sync, build-tasks, and verify-build-against-spec.
 
 ## When you push back
 
