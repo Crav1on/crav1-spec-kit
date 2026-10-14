@@ -7,7 +7,7 @@ When the user asks for startup options, name only these seven: `/crav1-spark-to-
 Type `/crav1` to list kit skills. `/crav1-help` answers what to run next, in what order, and what a skill does, from the kit's own docs. Typical order, by route (generated from `docs/reference/workflow.yaml`):
 
 <!-- crav1-order:start -->
-- New slice: spark-to-spec or ideas-to-spec → feature-branch (optional) → architecture-reviewer (optional) → tighten-spec → resolve-questions → specs-to-ado (optional) → plan-from-spec → review-plan → tighten-plan → tasks-to-ado (optional) → implement-task or complete-task or complete-tasks or complete-features → verify-spec → fix-from-verify (optional) → finalize-commit → open-pr → review-pr → merge-pr.
+- New slice: spark-to-spec or ideas-to-spec or intake-to-specs → feature-branch (optional) → architecture-reviewer (optional) → tighten-spec → resolve-questions → specs-to-ado (optional) → plan-from-spec → review-plan → tighten-plan → tasks-to-ado (optional) → implement-task or complete-task or complete-tasks or complete-features → verify-spec → fix-from-verify or fix-live (optional) → draft-commit-message (optional) → finalize-commit → open-pr → review-pr → merge-pr.
 - New information on an existing slice: meeting-to-specs or add-to-spec → tighten-spec → resolve-questions → plan-from-spec → specs-to-ado (optional) → tasks-to-ado (optional) → complete-tasks or complete-task or implement-task → verify-spec → finalize-commit.
 - Bug: fix-bug → tighten-spec or plan-from-spec or implement-task → verify-spec → fix-from-verify (optional) → finalize-commit → open-pr.
 - Outside pull request: review-pr → merge-pr → keep-current → finalize-commit.
