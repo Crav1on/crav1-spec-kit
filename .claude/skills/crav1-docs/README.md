@@ -144,32 +144,32 @@ You change the kit itself.
 
 ## Renamed skills (1.56.0)
 
-The old names still work until 1.58.0. Each one says it was renamed and hands off to the new skill, with its opening question already answered.
+The old names still work until 1.58.0. Each one says it was renamed and hands off to the new skill with its choice word, so the opening question is not asked.
 
-| Old name | Now | Pre-answered choice |
+| Old name | Now | Choice word it passes |
 | --- | --- | --- |
-| `/crav1-implement-task` | [`/crav1-build-tasks`](reference/skills/crav1-build-tasks.md) | one task (the worker follows the implement branch) |
-| `/crav1-complete-task` | [`/crav1-build-tasks`](reference/skills/crav1-build-tasks.md) | one task |
-| `/crav1-complete-tasks` | [`/crav1-build-tasks`](reference/skills/crav1-build-tasks.md) | a range or all |
+| `/crav1-implement-task` | [`/crav1-build-tasks`](reference/skills/crav1-build-tasks.md) | `one task` |
+| `/crav1-complete-task` | [`/crav1-build-tasks`](reference/skills/crav1-build-tasks.md) | `one task` |
+| `/crav1-complete-tasks` | [`/crav1-build-tasks`](reference/skills/crav1-build-tasks.md) | `range or all tasks` |
 | `/crav1-complete-features` | [`/crav1-build-features`](reference/skills/crav1-build-features.md) | — |
 | `/crav1-verify-spec` | [`/crav1-verify-build-against-spec`](reference/skills/crav1-verify-build-against-spec.md) | — |
-| `/crav1-fix-from-verify` | [`/crav1-fix-build-gaps`](reference/skills/crav1-fix-build-gaps.md) | verify report gaps |
-| `/crav1-fix-live` | [`/crav1-fix-build-gaps`](reference/skills/crav1-fix-build-gaps.md) | live-site gaps |
-| `/crav1-match-dump-to-specs` | [`/crav1-add-to-spec`](reference/skills/crav1-add-to-spec.md) | a dump |
-| `/crav1-code-into-specs` | [`/crav1-add-to-spec`](reference/skills/crav1-add-to-spec.md) | a code change |
-| `/crav1-meeting-to-specs` | [`/crav1-add-to-spec`](reference/skills/crav1-add-to-spec.md) | a meeting |
-| `/crav1-feature-candidates` | [`/crav1-ado-sync`](reference/skills/crav1-ado-sync.md) | suggest Features |
-| `/crav1-specs-to-ado` | [`/crav1-ado-sync`](reference/skills/crav1-ado-sync.md) | push Features |
-| `/crav1-tasks-to-ado` | [`/crav1-ado-sync`](reference/skills/crav1-ado-sync.md) | push tasks |
-| `/crav1-ado-to-tasks` | [`/crav1-ado-sync`](reference/skills/crav1-ado-sync.md) | pull tasks |
-| `/crav1-ado-to-specs` | [`/crav1-ado-sync`](reference/skills/crav1-ado-sync.md) | pull spec changes |
-| `/crav1-match-to-specs` | [`/crav1-existing-to-specs`](reference/skills/crav1-existing-to-specs.md) | repos plus a bundle (the second question is still asked) |
-| `/crav1-repos-to-spec` | [`/crav1-existing-to-specs`](reference/skills/crav1-existing-to-specs.md) | repos only, one spec |
+| `/crav1-fix-from-verify` | [`/crav1-fix-build-gaps`](reference/skills/crav1-fix-build-gaps.md) | `verify gaps` |
+| `/crav1-fix-live` | [`/crav1-fix-build-gaps`](reference/skills/crav1-fix-build-gaps.md) | `live gaps` |
+| `/crav1-match-dump-to-specs` | [`/crav1-add-to-spec`](reference/skills/crav1-add-to-spec.md) | `dump` |
+| `/crav1-code-into-specs` | [`/crav1-add-to-spec`](reference/skills/crav1-add-to-spec.md) | `code change` |
+| `/crav1-meeting-to-specs` | [`/crav1-add-to-spec`](reference/skills/crav1-add-to-spec.md) | `meeting` |
+| `/crav1-feature-candidates` | [`/crav1-ado-sync`](reference/skills/crav1-ado-sync.md) | `suggest features` |
+| `/crav1-specs-to-ado` | [`/crav1-ado-sync`](reference/skills/crav1-ado-sync.md) | `push features` |
+| `/crav1-tasks-to-ado` | [`/crav1-ado-sync`](reference/skills/crav1-ado-sync.md) | `push tasks` |
+| `/crav1-ado-to-tasks` | [`/crav1-ado-sync`](reference/skills/crav1-ado-sync.md) | `pull tasks` |
+| `/crav1-ado-to-specs` | [`/crav1-ado-sync`](reference/skills/crav1-ado-sync.md) | `pull spec changes` |
+| `/crav1-match-to-specs` | [`/crav1-existing-to-specs`](reference/skills/crav1-existing-to-specs.md) | `repos and bundle` |
+| `/crav1-repos-to-spec` | [`/crav1-existing-to-specs`](reference/skills/crav1-existing-to-specs.md) | `repos only, one spec` |
 | `/crav1-intake-to-specs` | [`/crav1-bundle-to-specs`](reference/skills/crav1-bundle-to-specs.md) | — |
 | `/crav1-architecture-reviewer` | [`/crav1-review-architecture`](reference/skills/crav1-review-architecture.md) | — |
 | `/crav1-resolve-questions` | [`/crav1-resolve-open-questions`](reference/skills/crav1-resolve-open-questions.md) | — |
-| `/crav1-ask-open-questions` | [`/crav1-show-or-ask-open-questions`](reference/skills/crav1-show-or-ask-open-questions.md) | ask |
-| `/crav1-draft-commit-message` | [`/crav1-finalize-commit`](reference/skills/crav1-finalize-commit.md) | only write the message |
+| `/crav1-ask-open-questions` | [`/crav1-show-or-ask-open-questions`](reference/skills/crav1-show-or-ask-open-questions.md) | `ask` |
+| `/crav1-draft-commit-message` | [`/crav1-finalize-commit`](reference/skills/crav1-finalize-commit.md) | `message only` |
 | `/crav1-explain` | [`/crav1-explain-existing-system`](reference/skills/crav1-explain-existing-system.md) | — |
 | `/crav1-whats-known-about` | [`/crav1-what-do-we-know-about-this`](reference/skills/crav1-what-do-we-know-about-this.md) | — |
 | `/crav1-keep-current` | [`/crav1-refresh-system-notes`](reference/skills/crav1-refresh-system-notes.md) | — |

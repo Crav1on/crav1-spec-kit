@@ -43,6 +43,19 @@ Skip a question the message already answers: no attached files means repos only;
 
 When the user names no repos, stop and ask for them. Do not read the open checkout on your own.
 
+## Choice words
+
+Exact words for bots and scripted runs. There are no `--flags`.
+
+- What to read: `repos only` / `repos and bundle`.
+- What to write: `one spec` / `spec per feature`.
+
+When the invocation contains one of these words (for example `/crav1-existing-to-specs repos only`), take that choice and do not ask that question. This holds for a person, a bot, or a headless run.
+
+When a choice is missing and the run is headless or started by a bot (no person in the chat to answer), do not guess. Stop and name the valid words, for example: `Missing choice. Use one of: repos only, repos and bundle.` Each question with no word stops the same way.
+
+An alias passes its choice word.
+
 ## After
 
 Each branch ends with its own recap and next step.

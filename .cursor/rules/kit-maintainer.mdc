@@ -77,8 +77,8 @@ Both are generated from one data file, `docs/reference/skills.yaml`. Do not hand
 
 - A new skill or subagent adds its entry to `skills.yaml` in the same pull request, then run `scripts/gen-skill-docs.py` and commit the regenerated pages.
 - A change to what a skill reads, writes, leaves alone, calls, or names as the next step updates its `skills.yaml` entry in that same pull request, then regenerate.
-- A rename or removal updates `skills.yaml`, `docs/guild-routing.md`, and the generated pages together. A rename also leaves an alias: a stub `SKILL.md` under the old name (`disable-model-invocation: true`, hands off to the new skill, pre-answers its opening question), listed under `aliases` in `skills.yaml` with `deprecated: true` and `remove_in`. Aliases stay two releases and go in a breaking release; the 1.56.0 aliases go in 1.58.0.
-- A merged skill keeps each old skill's rules verbatim in `branches/<id>/BRANCH.md` and opens with a question with options. Do not drop a rule when merging.
+- A rename or removal updates `skills.yaml`, `docs/guild-routing.md`, and the generated pages together. A rename also leaves an alias: a stub `SKILL.md` under the old name (`disable-model-invocation: true`, hands off to the new skill, passes its choice word), listed under `aliases` in `skills.yaml` with `deprecated: true` and `remove_in`. Aliases stay two releases and go in a breaking release; the 1.56.0 aliases go in 1.58.0.
+- A merged skill keeps each old skill's rules verbatim in `branches/<id>/BRANCH.md` and opens with a question with options, with exact `choice_words` (no --flags). Do not drop a rule when merging.
 
 A skill change is done only when it is documented, for a new skill and for a change to an existing skill.
 

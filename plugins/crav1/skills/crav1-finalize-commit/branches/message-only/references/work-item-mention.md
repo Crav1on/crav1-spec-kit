@@ -1,10 +1,10 @@
 # Work item mention
 
-Optional Azure Boards link for one spec slug. Read this from `/crav1-finalize-commit`, and `/crav1-open-pr`.
+Optional Azure Boards link for one spec slug. Read this from the message only branch of `/crav1-finalize-commit`, the commit branch of `/crav1-finalize-commit`, and `/crav1-open-pr`.
 
 The id lives only in `docs/specs/<slug>/work-item.md`. Do not store it in `tasks.md` (workers parse `T#` rows and skills rewrite that file). Do not create a work item, do not call an Azure DevOps API, and do not add a git hook.
 
-`/crav1-finalize-commit`, and `/crav1-open-pr` do not ask for a new id. They only read the file. When several lines are recorded and the slice is unclear, they ask which recorded line to mention. `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, and `/crav1-bundle-to-specs` may write a line when they create a new spec folder on Azure Repos and the user replies with an id. That offer is [work-item-offer.md](work-item-offer.md). Creating a Feature is `/crav1-ado-sync`. These skills do not create one. `/crav1-ado-sync` writes a line after the user says yes.
+The message only branch of `/crav1-finalize-commit`, the commit branch of `/crav1-finalize-commit`, and `/crav1-open-pr` do not ask for a new id. They only read the file. When several lines are recorded and the slice is unclear, they ask which recorded line to mention. `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, and `/crav1-bundle-to-specs` may write a line when they create a new spec folder on Azure Repos and the user replies with an id. That offer is [work-item-offer.md](work-item-offer.md). Creating a Feature is the push features branch of `/crav1-ado-sync`. These skills do not create one. The push features branch of `/crav1-ado-sync` writes a line after the user says yes.
 
 A missing file never blocks a commit, a pull request, or a worker. Do not fail a worker status for this.
 
@@ -29,7 +29,7 @@ Ignore HTML comments, including the sample lines inside `docs/specs/_template/wo
 | `Work item: AB#52` or `Work item: #52` | That token, verbatim. No label. |
 | `Work item: AB#52 — catalog` or `Work item: #52 — catalog` | That token, verbatim. Label `catalog`. |
 | A line that is only `AB#52` or `#52` | That token, verbatim. No label. |
-| `Work item: 1234 — task: T3 Short title` | A **task line**, written by `/crav1-ado-sync`. Id `1234`, task `T3`. Not a Feature line. See Task lines. |
+| `Work item: 1234 — task: T3 Short title` | A **task line**, written by the push tasks branch of `/crav1-ado-sync`. Id `1234`, task `T3`. Not a Feature line. See Task lines. |
 | Anything else | That line is not a mention. Other lines are still read. |
 
 A line may end with its work item home, `(ADO: <org>/<project>)` ([work-item-homes.md](../../crav1-ado-sync/branches/push-features/references/work-item-homes.md)). Strip it before reading the label. A line without it is in the marks.md org and project.
@@ -72,7 +72,7 @@ When the change could be more than one recorded task, or it is not clear, ask on
 
 When the file has task lines and no Feature line, there is no mention. Say once: `docs/specs/<slug>/work-item.md has task lines but no Feature line, so no mention was added.` Do not mention a task id alone.
 
-Other readers of `work-item.md` (`/crav1-ado-sync`) treat task lines as tasks, not as Feature ids. `/crav1-ado-sync` reads them.
+Other readers of `work-item.md` (`/crav1-ado-sync`, the pull spec changes branch of `/crav1-ado-sync`) treat task lines as tasks, not as Feature ids. The pull tasks branch of `/crav1-ado-sync` reads them.
 
 A file whose every line fails the table uses the “no usable line” hint below. A file that parses some lines ignores the rest.
 
@@ -109,7 +109,7 @@ Subject and the drafted description stay as generated. Do not put the mention in
 
 When a mention is resolved, append one blank line, then the mention as the **last line** of the Description (the GitKraken description, and the `git commit` body). When the description already ends with that same line, do not append it again.
 
-`/crav1-finalize-commit` commits that Description as the body. The HEAD check expects the mention still last. The Cursor-attribution amend writes the same Summary and Description back, mention included. Do not treat `#<id>` or `AB#<id>` as a Cursor trailer.
+The commit branch of `/crav1-finalize-commit` commits that Description as the body. The HEAD check expects the mention still last. The Cursor-attribution amend writes the same Summary and Description back, mention included. Do not treat `#<id>` or `AB#<id>` as a Cursor trailer.
 
 ## Pull request body
 

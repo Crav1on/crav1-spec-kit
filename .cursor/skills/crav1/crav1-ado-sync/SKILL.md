@@ -34,6 +34,18 @@ Skip the question when the message already says which: "candidates" or "which Fe
 
 Where a branch says it calls or names another of these five, that is the matching choice of this skill. Run it only where that branch says so.
 
+## Choice words
+
+Exact words for bots and scripted runs. There are no `--flags`.
+
+- Which sync: `suggest features` / `push features` / `push tasks` / `pull tasks` / `pull spec changes`.
+
+When the invocation contains one of these words (for example `/crav1-ado-sync suggest features`), take that choice and do not ask. This holds for a person, a bot, or a headless run.
+
+When a choice is missing and the run is headless or started by a bot (no person in the chat to answer), do not guess. Stop and name the valid words, for example: `Missing choice. Use one of: suggest features, push features, push tasks, pull tasks, pull spec changes.`
+
+An alias passes its choice word.
+
 ## After
 
 Each branch ends with its own recap and next step.

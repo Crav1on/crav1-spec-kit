@@ -6,9 +6,9 @@ Command: `/crav1-ado-sync`.
 
 This is cross-cutting. It is not a lane. It may run from any lane. It does not move work into Specify, Plan, or Build. It does not start those lanes.
 
-This command is a later skill. It is not a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs`, `/crav1-read-environment`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane. The six starter options stay unchanged.
+This command is a later skill. It is not a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs`, `/crav1-read-environment`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane. The seven starter options stay unchanged.
 
-Spark, specify, plan, and verify do not run it. It is not started automatically. `/crav1-ado-sync` may name it and does not run it.
+Spark, specify, plan, and verify do not run it. It is not started automatically. The push tasks branch of `/crav1-ado-sync` may name it and does not run it.
 
 This command reads Azure Boards. It does not create or update a work item. It never writes a field back. The only write to Azure Boards is a discussion comment the user accepted.
 
@@ -18,13 +18,13 @@ CLI checks and the `az` calls: [../crav1-ado-sync/branches/push-features/referen
 
 Everything after the command is the pointer. A named slug reads that spec. **All** reads every spec. With no pointer, list the specs whose `docs/specs/<slug>/work-item.md` has task lines (`Work item: <id> — task: T<n> <short title>`, see [work-item-mention.md](../../../crav1-finalize-commit/branches/message-only/references/work-item-mention.md)), plus **All**. Use the questions tool when it is available. Stop until the user picks. Skip `_template`.
 
-A spec with no task lines has nothing to read back. Say so and name `/crav1-ado-sync`. Do not run it.
+A spec with no task lines has nothing to read back. Say so and name the push tasks branch of `/crav1-ado-sync`. Do not run it.
 
 ## Read
 
-Check `az`, the org, and the project the same way `/crav1-ado-sync` does. On a failure, state the issue, suggest a fix such as `az login`, and offer Retry or Skip. Skip stops this command. Say the Azure Boards calls did not run, and why.
+Check `az`, the org, and the project the same way the push features branch of `/crav1-ado-sync` does. On a failure, state the issue, suggest a fix such as `az login`, and offer Retry or Skip. Skip stops this command. Say the Azure Boards calls did not run, and why.
 
-Read the child type's fields once, as `/crav1-ado-sync` does, to know where acceptance lives.
+Read the child type's fields once, as the push tasks branch of `/crav1-ado-sync` does, to know where acceptance lives.
 
 For every recorded task id, read State, title, description, Acceptance Criteria (or the `Acceptance` paragraph in the Description when the type has no such field), Assigned To, discussion comments, and history. Strip HTML before comparing. Do not drop an id to keep the list short.
 
@@ -52,7 +52,7 @@ A kept change goes to the spec and `tasks.md` through `/crav1-add-to-spec`. The 
 - Reopened in Azure Boards (not done now, done before in the history) and the box is ticked: show both sides and ask: untick the box, or leave it. Untick only on yes, through `/crav1-add-to-spec`.
 - Active, Resolved, or another in-progress state with an open box is not a difference. Leave it out.
 
-Do not tick or untick a box on your own. Never write a State back to Azure Boards. That is `/crav1-ado-sync`, and only on a yes.
+Do not tick or untick a box on your own. Never write a State back to Azure Boards. That is the push tasks branch of `/crav1-ado-sync`, and only on a yes.
 
 **New children.** For each new child, ask: add it as a task, or leave it. On yes, `/crav1-add-to-spec` adds the task to `tasks.md` with the next `T<n>`, in words from the work item, stripped as below. Then append its line to `work-item.md`: `Work item: <id> — task: T<n> <short title> (ADO: <org>/<project>)`, with the home it was read from. Never write an id into `tasks.md`.
 
@@ -64,7 +64,7 @@ When a task's discussion asks a question and the spec already answers it, draft 
 Post comment on <id>: <text>
 ```
 
-Strip it the same way `/crav1-ado-sync` strips: no file paths, no line numbers, no spec references, no `docs/sources/` paths, no kit or skill names, never the specs repo. Code repo names stay. The user can change the text, post it, or skip it. A change that adds a fact goes into the spec first, through `/crav1-add-to-spec`. Post only on yes. When the spec has no answer, offer the question as an open question for the spec instead.
+Strip it the same way the push tasks branch of `/crav1-ado-sync` strips: no file paths, no line numbers, no spec references, no `docs/sources/` paths, no kit or skill names, never the specs repo. Code repo names stay. The user can change the text, post it, or skip it. A change that adds a fact goes into the spec first, through `/crav1-add-to-spec`. Post only on yes. When the spec has no answer, offer the question as an open question for the spec instead.
 
 ## Stop
 

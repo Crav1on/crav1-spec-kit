@@ -6,9 +6,9 @@ Command: `/crav1-ado-sync`.
 
 This is cross-cutting. It is not a lane. It may run from any lane. It does not move work into Specify, Plan, or Build. It does not start those lanes.
 
-This command is a later skill. It is not a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs`, `/crav1-read-environment`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane. The six starter options stay unchanged.
+This command is a later skill. It is not a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs`, `/crav1-read-environment`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane. The seven starter options stay unchanged.
 
-Other skills do not run this one, except `/crav1-ado-sync`, which runs this command and uses the list. Spark, specify, plan, and verify do not run it. It is not started automatically.
+Other skills do not run this one, except the push features branch of `/crav1-ado-sync`, which runs this command and uses the list. Spark, specify, plan, and verify do not run it. It is not started automatically.
 
 This command does not call Azure DevOps. It does not run `az`. It does not create a work item. It does not edit a spec, `docs/system/`, or `work-item.md`.
 
@@ -65,7 +65,7 @@ Undated candidates follow. Leave their order as the docs listed them. The block 
 
 ## Output
 
-The chat list, and the list handed to `/crav1-ado-sync`, is this table and then one block per row.
+The chat list, and the list handed to the push features branch of `/crav1-ado-sync`, is this table and then one block per row.
 
 | # | Title | Target date | Spec | Already in ADO |
 | --- | --- | --- | --- | --- |
@@ -99,4 +99,4 @@ Write a file only when the user asks for one. Write the list already shown. Use 
 
 ## Stop
 
-Do not plan. Do not implement. Do not commit. Do not run `/crav1-ado-sync`, `/crav1-add-to-spec`, or `/crav1-finalize-commit`. Naming `/crav1-ado-sync` as the command that sends a picked row to Azure Boards is allowed. Do not run it.
+Do not plan. Do not implement. Do not commit. Do not run `/crav1-ado-sync`, `/crav1-add-to-spec`, or `/crav1-finalize-commit`. Naming the push features branch of `/crav1-ado-sync` as the command that sends a picked row to Azure Boards is allowed. Do not run it.

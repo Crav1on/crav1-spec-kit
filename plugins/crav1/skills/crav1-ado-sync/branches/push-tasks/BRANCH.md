@@ -6,16 +6,16 @@ Command: `/crav1-ado-sync`.
 
 This is cross-cutting. It is not a lane. It may run from any lane. It does not move work into Specify, Plan, or Build. It does not start those lanes.
 
-This command is a later skill. It is not a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs`, `/crav1-read-environment`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane. The six starter options stay unchanged.
+This command is a later skill. It is not a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs`, `/crav1-read-environment`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane. The seven starter options stay unchanged.
 
-Spark, specify, plan, and verify do not run it. It is not started automatically. `/crav1-ado-sync` may name it and does not run it.
+Spark, specify, plan, and verify do not run it. It is not started automatically. The push features branch of `/crav1-ado-sync` may name it and does not run it.
 
-CLI checks and the `az` calls: the same file `/crav1-ado-sync` uses, [azure-boards.md](../../../crav1-ado-sync/branches/push-features/references/azure-boards.md) (drop-in: `.cursor/skills/crav1/crav1-ado-sync/branches/push-features/references/azure-boards.md`; plugin: sibling `skills/crav1-ado-sync/branches/push-features/references/azure-boards.md`), plus [references/child-items.md](references/child-items.md) for the child type and the parent link. Do not show those commands in the chat.
+CLI checks and the `az` calls: the same file the push features branch of `/crav1-ado-sync` uses, [azure-boards.md](../../../crav1-ado-sync/branches/push-features/references/azure-boards.md) (drop-in: `.cursor/skills/crav1/crav1-ado-sync/branches/push-features/references/azure-boards.md`; plugin: sibling `skills/crav1-ado-sync/branches/push-features/references/azure-boards.md`), plus [references/child-items.md](references/child-items.md) for the child type and the parent link. Do not show those commands in the chat.
 
 ## Check first
 
 1. Take the Azure DevOps org and project as `azure-boards.md` says. `docs/environments/marks.md` first, then Azure DevOps URLs in `docs/system/repos.md`.
-2. Check that `az` works, including the default install paths, the same way `/crav1-ado-sync` does.
+2. Check that `az` works, including the default install paths, the same way the push features branch of `/crav1-ado-sync` does.
 
 On a failure, state the issue, suggest a fix such as `az login`, and offer Retry or Skip. Skip stops this command. Say the Azure Boards calls did not run, and why. Do not install. Do not log in. Do not run `az login`. Do not guess the org or the project.
 
@@ -23,13 +23,13 @@ On a failure, state the issue, suggest a fix such as `az login`, and offer Retry
 
 Each task goes to the home of its repo, as [work-item-homes.md](../../../crav1-ado-sync/branches/push-features/references/work-item-homes.md) (drop-in: `.cursor/skills/crav1/crav1-ado-sync/branches/push-features/references/work-item-homes.md`; plugin: sibling `skills/crav1-ado-sync/branches/push-features/references/work-item-homes.md`) says: read the `Work items go to` cell in `docs/system/repos.md`, and ask for an empty one, once per repo. A task with no clear repo is asked once, suggesting the spec's main repo. A task whose repos are in different homes is asked: split it (through `/crav1-add-to-spec`) or pick one repo's home.
 
-Its parent is the spec's Feature **in that same home** (the Feature line whose `(ADO: …)` tag matches). When the spec has no Feature in that home, say so and name `/crav1-ado-sync`. Do not send that task. Do not parent it to a Feature in another home.
+Its parent is the spec's Feature **in that same home** (the Feature line whose `(ADO: …)` tag matches). When the spec has no Feature in that home, say so and name the push features branch of `/crav1-ado-sync`. Do not send that task. Do not parent it to a Feature in another home.
 
 ## Which spec
 
 The user picks one spec. List the specs whose `docs/specs/<slug>/work-item.md` records a Feature id (a `Work item: <id> — <label>` line that is not a task line). Skip `_template`. Use the questions tool when it is available and the list fits. Stop until they pick.
 
-A spec with no Feature id is not offered. When the user names one, say it has no Feature in Azure Boards yet and name `/crav1-ado-sync`. Do not run it. When the spec records several Feature ids, ask which Feature these tasks belong to. Do not guess.
+A spec with no Feature id is not offered. When the user names one, say it has no Feature in Azure Boards yet and name the push features branch of `/crav1-ado-sync`. Do not run it. When the spec records several Feature ids, ask which Feature these tasks belong to. Do not guess.
 
 ## Which tasks
 
@@ -71,7 +71,7 @@ Then read that type's fields once, as `azure-boards.md` reads the Feature fields
 
 ## Preview
 
-For each pick, show the Azure Boards form in plain words. The label is **Create** when no id is recorded for that task, or **Update #<id>** when `work-item.md` records one. The layout follows the Feature layout from `/crav1-ado-sync`.
+For each pick, show the Azure Boards form in plain words. The label is **Create** when no id is recorded for that task, or **Update #<id>** when `work-item.md` records one. The layout follows the Feature layout from the suggest features branch of `/crav1-ado-sync`.
 
 | Form field | What to show |
 | --- | --- |
@@ -123,7 +123,7 @@ On an **Update**, compare the `tasks.md` box with the State that `az boards work
 | Ticked, and the tick is newer than the create | Not done (New, Active, Resolved, …) | Offer **State: <current> → <done state>** |
 | Open, and the box was ticked before | Done state | Offer **Reopen: <done state> → New** |
 | Open | Not done | Nothing. Leave Active or any other state as it is |
-| Ticked, and the tick is not newer than the create; or open, and never ticked in the history | Done state differs from the box |  **Conflict.** Show both sides: the box and its last change in `tasks.md`, and the Azure Boards State with who changed it and when from the history. Ask each time: set Azure Boards to match `tasks.md`, or leave Azure Boards and bring it back with `/crav1-ado-sync`, or leave both |
+| Ticked, and the tick is not newer than the create; or open, and never ticked in the history | Done state differs from the box |  **Conflict.** Show both sides: the box and its last change in `tasks.md`, and the Azure Boards State with who changed it and when from the history. Ask each time: set Azure Boards to match `tasks.md`, or leave Azure Boards and bring it back with the pull tasks branch of `/crav1-ado-sync`, or leave both |
 
 When the history cannot tell, treat the row as a conflict and ask. Never pick a winner on your own. A state change is its own line in the preview and its own yes. Send it only on that yes. A skip leaves the State as it is.
 
@@ -155,6 +155,6 @@ The line ends with its home. Add the tag to older lines in that file that have n
 
 Say what was created, what was updated, and what was skipped. One line each: the id, the title, `T<n>`, and the State it was created with or moved to. Name any conflict that was left as it is.
 
-When the run wrote `work-item.md` or `docs/environments/marks.md`, name each file. Say it is not committed yet and must be committed. Name `/crav1-finalize-commit`. Do not run it. Name `/crav1-ado-sync` as the later read-back. Do not run it. Say that without `work-item.md` a later run offers Create again and would make a duplicate.
+When the run wrote `work-item.md` or `docs/environments/marks.md`, name each file. Say it is not committed yet and must be committed. Name `/crav1-finalize-commit`. Do not run it. Name the pull tasks branch of `/crav1-ado-sync` as the later read-back. Do not run it. Say that without `work-item.md` a later run offers Create again and would make a duplicate.
 
 Do not plan. Do not implement. Do not commit.

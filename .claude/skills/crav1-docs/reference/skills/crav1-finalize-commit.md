@@ -14,6 +14,15 @@ Only write the message (was `/crav1-draft-commit-message`): Paste-ready Summary/
 
 Commit (was [`/crav1-finalize-commit`](crav1-finalize-commit.md)): Same draft, then **commit first**, then copy for your git client, edit/rewrite, or stop (no push). Keeps that mention through the HEAD check and the attribution strip.
 
+## Choice words
+
+Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
+
+| Question | Word | Means |
+| --- | --- | --- |
+| Commit or message | `commit` | commit |
+| Commit or message | `message only` | only write the message |
+
 ## Runs when
 
 You want the commit message, or the commit itself. Called by the user and by [`/crav1-finalize-commit`](crav1-finalize-commit.md).

@@ -2,9 +2,9 @@
 
 You sort a later dump onto specs that already exist. Then you write the new bits into the matching `spec.md` files. Then you check whether `docs/system/` or another spec has to change, and you report that impact. You do not silently rewrite those other files. The glossary append and the picture update are the exceptions: new glossary rows, and new picture lines, when `docs/system/` already exists. You do not rewrite existing glossary rows or existing picture lines. You do not write application code. You do not plan, implement, or commit.
 
-This is not a mode of `/crav1-existing-to-specs` or `/crav1-add-to-spec`. Match creates spec folders from repos plus a dump. Add takes information already aimed at one named spec. This skill is the later dump: the folders are already there, and the dump has to be sorted onto them. Do not send this job to those commands, and do not absorb theirs.
+This is not a mode of the repos and bundle branch of `/crav1-existing-to-specs` or the fact branch of `/crav1-add-to-spec`. The repos and bundle branch creates spec folders from repos plus a dump. The fact branch takes information already aimed at one named spec. This skill is the later dump: the folders are already there, and the dump has to be sorted onto them. Do not send this job to those commands, and do not absorb theirs.
 
-Do not copy the match worker that creates folders. Do not use `crav1-existing-to-specs` `references/slice.md`. Do not launch a worker. There is no slice subagent.
+Do not copy the match worker that creates folders. Do not use `crav1-existing-to-specs` `branches/repos-and-bundle/references/slice.md`. Do not launch a worker. There is no slice subagent.
 
 This is not `/crav1-tighten-spec`. Tighten is for mushy wording. This skill is for a dump. If the message is only “make this tighter” and brings no dump, tell them `/crav1-tighten-spec` and do not edit.
 
@@ -16,7 +16,7 @@ A not-started spec (match status `not in the code`, or a thin spec) can keep tak
 
 ## Input
 
-Everything after `/crav1-add-to-spec`, and every `@`, is the dump: notes, tickets, old docs, diagrams, screenshots. Size is not a limit. Do not ask them to shrink it. Do not split one dump into several runs. One dump may be a lot about one slug, or it may cover many slugs. Both are this command.
+Everything after the fact branch of `/crav1-add-to-spec`, and every `@`, is the dump: notes, tickets, old docs, diagrams, screenshots. Size is not a limit. Do not ask them to shrink it. Do not split one dump into several runs. One dump may be a lot about one slug, or it may cover many slugs. Both are this command.
 
 Do not ask for a slug first. A hint in the dump about where something belongs is evidence for the sort, not a requirement. If it names a slug, use that. If it does not, match by what it says. An `@` of one spec folder is that kind of hint. It does not limit the sort to that folder.
 
@@ -26,7 +26,7 @@ Spec folders are `docs/specs/<slug>/` with a `spec.md`. Skip `_template`.
 
 Read those folders before you sort. Do not ask which slug.
 
-If there are no spec folders, stop. Point at `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, or `/crav1-existing-to-specs`. Do not create a slug. Do not seed `docs/system/`.
+If there are no spec folders, stop. Point at `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, or the repos and bundle branch of `/crav1-existing-to-specs`. Do not create a slug. Do not seed `docs/system/`.
 
 ## Already noted
 
@@ -83,7 +83,7 @@ When the input was imported, follow the imported-sources convention before the n
 
 Do not commit. A leave, a dismiss, and a does-not-fit fact do not get a note.
 
-When a belongs quote is the quote of a note already in `docs/notes/`, add `Used by <slug>` on that note and update the index, the same way `/crav1-add-to-spec` writes it. Status stays open. `Absorbed by <slug>` only when that spec clearly takes the whole note, and only after the user says yes. Partial use never closes the note.
+When a belongs quote is the quote of a note already in `docs/notes/`, add `Used by <slug>` on that note and update the index, the same way the fact branch of `/crav1-add-to-spec` writes it. Status stays open. `Absorbed by <slug>` only when that spec clearly takes the whole note, and only after the user says yes. Partial use never closes the note.
 
 ## Write the new bits
 
@@ -122,7 +122,7 @@ The **Note** pile is written under **Write the notes**. It does not become a spe
 - one or two sentences for one feature: `/crav1-spark-to-spec`
 - one unstructured pile for one feature: `/crav1-ideas-to-spec`
 - several new features, or several repos: `/crav1-bundle-to-specs`
-- repos that already make up the system, and this leftover is a slice to match: `/crav1-existing-to-specs`
+- repos that already make up the system, and this leftover is a slice to match: the repos and bundle branch of `/crav1-existing-to-specs`
 
 ## Impact (before any other edit)
 

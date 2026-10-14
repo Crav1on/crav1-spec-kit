@@ -1,10 +1,10 @@
 # CRAV1 style (persistent)
 
-This file was written by `/crav1-finalize-commit` when you chose **CRAV1 style, this commit and onward**.
+This file was written by the message only branch of `/crav1-finalize-commit` when you chose **CRAV1 style, this commit and onward**.
 
 When drafting or creating commits in this repo:
 
-- Follow CRAV1 style in `references/style.md` from skill `crav1-finalize-commit` (drop-in: `.claude/skills/crav1-finalize-commit/branches/message-only/references/style.md`; plugin: that skill’s `references/style.md`).
+- Follow CRAV1 style in `references/style.md` from the message only branch of `crav1-finalize-commit` (drop-in: `.claude/skills/crav1-finalize-commit/branches/message-only/references/style.md`; plugin: that skill’s `references/style.md`).
 - Do not use Conventional Commits prefixes (`feat:`, `fix:`, `chore:`).
 - Do not ask whether to use CRAV1 style. It stays on until this rule is removed.
 

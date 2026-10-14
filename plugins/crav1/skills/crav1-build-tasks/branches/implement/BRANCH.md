@@ -41,7 +41,7 @@ Output only:
 - `T#` done or blocked
 - Files changed
 - Verify command and result
-- Next: `/crav1-build-tasks` (this `T#` through verify/fix/commits), `/crav1-build-tasks` (a range or all unchecked), `/crav1-build-tasks` (next unchecked only), `/crav1-finalize-commit`, or `/crav1-verify-build-against-spec`
+- Next: the one task branch of `/crav1-build-tasks` (this `T#` through verify/fix/commits), the range or all branch of `/crav1-build-tasks` (a range or all unchecked), the implement step of `/crav1-build-tasks` (next unchecked only), the message only branch of `/crav1-finalize-commit` / `/crav1-finalize-commit`, or `/crav1-verify-build-against-spec`
 
 Do not keep going through the list unless they wrote `T2 and T3` or “continue until blocked.”
 

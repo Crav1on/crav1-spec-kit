@@ -85,6 +85,12 @@ def validate(data: dict) -> list[str]:
             errors.append(f"alias {a}: needs deprecated: true")
         if e.get("renamed_to") not in names:
             errors.append(f"alias {a}: renamed_to {e.get('renamed_to')} is not a skill")
+        if e.get("choice"):
+            tgt = next((x for x in skills if x["name"] == e.get("renamed_to")), {})
+            valid = {w["word"] for q in tgt.get("choice_words") or [] for w in q["words"]}
+            for part in re.split(r", | or ", e["choice"]):
+                if part not in valid:
+                    errors.append(f"alias {a}: choice {part!r} is not a choice word of {e.get('renamed_to')}")
         if not e.get("remove_in"):
             errors.append(f"alias {a}: needs remove_in")
         sk = SKILLS_DIR / a / "SKILL.md"
@@ -116,6 +122,11 @@ def validate(data: dict) -> list[str]:
         errors.append("starter_options differ from the starters in docs/guild-routing.md")
     for s in skills:
         n = s["name"]
+        for q in s.get("choice_words") or []:
+            body = (SKILLS_DIR / n / "SKILL.md").read_text(encoding="utf-8") if (SKILLS_DIR / n / "SKILL.md").is_file() else ""
+            for w in q.get("words") or []:
+                if f"`{w['word']}`" not in body:
+                    errors.append(f"{n}: choice word {w['word']!r} is not listed in its SKILL.md")
         if s["lane"] not in lanes:
             errors.append(f"{n}: unknown lane {s['lane']}")
             continue
@@ -214,9 +225,9 @@ def render_table(data: dict) -> str:
             "",
             "## Renamed skills",
             "",
-            "These old names still work as deprecated aliases. Each one says it was renamed, hands off to the new skill, and pre-answers its opening question. They are removed in the release named below.",
+            "These old names still work as deprecated aliases. Each one says it was renamed, hands off to the new skill, and passes its choice word. They are removed in the release named below.",
             "",
-            "| Old name | Now | Pre-answered choice | Removed in |",
+            "| Old name | Now | Choice word it passes | Removed in |",
             "| --- | --- | --- | --- |",
         ]
         for a in data["aliases"]:
@@ -257,6 +268,11 @@ def render_page(s: dict, data: dict) -> str:
     for para in s.get("in_depth") or []:
         out += ["", lk(para)]
     runs = s["use_when"].rstrip(".") + "."
+    if s.get("choice_words"):
+        out += ["", "## Choice words", "", "Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.", "", "| Question | Word | Means |", "| --- | --- | --- |"]
+        for q in s["choice_words"]:
+            for w in q["words"]:
+                out.append(f"| {q['question']} | `{w['word']}` | {w['means']} |")
     out += ["", "## Runs when", "", lk(runs) + (" " + lk(s["called_by"]) if s.get("called_by") else "")]
     if s["starter"]:
         out += ["", "This is one of the six starter options. Asking for startup options names it and does not run it."]

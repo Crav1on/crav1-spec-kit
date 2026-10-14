@@ -28,6 +28,18 @@ This skill was `/crav1-ask-open-questions`. Ask one question, with the questions
 
 Skip the question when the message says which: "show", "overview", "what is still open", or "who did we ask" is 1; a person, a channel, or "draft" is 2. The alias `/crav1-ask-open-questions` arrives with choice 2 already made.
 
+## Choice words
+
+Exact words for bots and scripted runs. There are no `--flags`.
+
+- Show or ask: `show` / `ask`.
+
+When the invocation contains one of these words (for example `/crav1-show-or-ask-open-questions show`), take that choice and do not ask. This holds for a person, a bot, or a headless run.
+
+When a choice is missing and the run is headless or started by a bot (no person in the chat to answer), do not guess. Stop and name the valid words, for example: `Missing choice. Use one of: show, ask.`
+
+An alias passes its choice word.
+
 ## Show
 
 Read `## Open questions` in every `docs/specs/<slug>/spec.md` (skip `_template`), with the lines under each question, as `crav1-add-to-spec` `references/open-questions.md` describes. Write nothing. Draft nothing. Send nothing.

@@ -28,6 +28,18 @@ Ask one question, with the questions tool when it is available:
 
 Skip the question when the message already says which: a `Gap` id, `T#`, or "from verify" is option 1; a URL, a port, "live", or "local host" is option 2. When `verify.md` is missing and the message names no live gap, stop and name `/crav1-verify-build-against-spec`. An alias (`/crav1-fix-from-verify`, `/crav1-fix-live`) arrives with its choice already made.
 
+## Choice words
+
+Exact words for bots and scripted runs. There are no `--flags`.
+
+- Which gaps: `verify gaps` / `live gaps`.
+
+When the invocation contains one of these words (for example `/crav1-fix-build-gaps verify gaps`), take that choice and do not ask. This holds for a person, a bot, or a headless run.
+
+When a choice is missing and the run is headless or started by a bot (no person in the chat to answer), do not guess. Stop and name the valid words, for example: `Missing choice. Use one of: verify gaps, live gaps.`
+
+An alias passes its choice word.
+
 ## After
 
 Each branch ends with its own recap and next step (`/crav1-verify-build-against-spec` to re-check). Do not run it.

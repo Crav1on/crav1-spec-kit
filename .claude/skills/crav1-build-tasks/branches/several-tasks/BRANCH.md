@@ -2,9 +2,9 @@
 
 You **manage** the batch. You do **not** implement, verify, or `git commit` in this chat. Each `T#` runs in its own isolated **crav1-build-task-agent** worker (the “new chat” for that task).
 
-Command: `/crav1-build-tasks`. One task: `/crav1-build-tasks`. Several specs (serial): `/crav1-build-features`.
+Command: `/crav1-build-tasks`. One task: the one task branch of `/crav1-build-tasks`. Several specs (serial): `/crav1-build-features`.
 
-Worker: `.claude/agents/crav1-build-task-agent.md` (plugin: `agents/crav1-build-task-agent.md`). Protocol: `crav1-build-tasks` [references/run.md](../../../crav1-build-tasks/branches/one-task/references/run.md). Style: [style-persist.md](../../../crav1-build-tasks/branches/one-task/references/style-persist.md). Approvals: [tool-approvals.md](../../../crav1-build-tasks/branches/one-task/references/tool-approvals.md).
+Worker: `.claude/agents/crav1-build-task-agent.md` (plugin: `agents/crav1-build-task-agent.md`). Protocol: the one task branch of `crav1-build-tasks` [references/run.md](../../../crav1-build-tasks/branches/one-task/references/run.md). Style: [style-persist.md](../../../crav1-build-tasks/branches/one-task/references/style-persist.md). Approvals: [tool-approvals.md](../../../crav1-build-tasks/branches/one-task/references/tool-approvals.md).
 
 ## Which tasks
 
@@ -30,7 +30,7 @@ Do not ask again per `T#`. Workers must not ask style.
 
 Those **Allow / Stop** buttons on each worker are Cursor, not kit `fix`/`stop`. Follow [tool-approvals.md](../../../crav1-build-tasks/branches/one-task/references/tool-approvals.md) **once before the first worker** (pause, directions, wait for `continue` / `click` / `stop`).
 
-When you launch a worker, pass **`approvals: already-done`**. Workers and `/crav1-build-tasks` must **not** pause again.
+When you launch a worker, pass **`approvals: already-done`**. Workers and the one task branch of `/crav1-build-tasks` must **not** pause again.
 
 After `continue`, do not treat IDE Allow/Stop as a reason to halt the board. After `click`, still do not re-ask per `T#`.
 

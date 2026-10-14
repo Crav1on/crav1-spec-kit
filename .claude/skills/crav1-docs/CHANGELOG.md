@@ -4,6 +4,33 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 
 ## Unreleased
 
+## 1.57.0 (2026-10-14)
+
+### Kit
+
+- Choice words for bots and scripted runs (no `--flags`). Every merged skill lists exact words for each option:
+  - `/crav1-build-tasks`: `one task` / `range` / `all tasks`
+  - `/crav1-fix-build-gaps`: `verify gaps` / `live gaps`
+  - `/crav1-add-to-spec`: `fact` / `dump` / `code change` / `meeting`
+  - `/crav1-ado-sync`: `suggest features` / `push features` / `push tasks` / `pull tasks` / `pull spec changes`
+  - `/crav1-existing-to-specs`: `repos only` / `repos and bundle`, then `one spec` / `spec per feature`
+  - `/crav1-finalize-commit`: `commit` / `message only`
+  - `/crav1-show-or-ask-open-questions`: `show` / `ask`
+- A word in the invocation takes that choice without asking, also for a bot or a headless run. A headless or bot run with no word stops and names the valid words instead of guessing.
+- Aliases pass their choice word (for example `/crav1-tasks-to-ado` runs `/crav1-ado-sync push tasks`).
+- Cleanups from 1.56.0: inside the merged skills' branches, references to sibling skills now name the branch in plain words (for example "the fact branch of `/crav1-add-to-spec`"), and the handoff headings in `/crav1-add-to-spec` name their branch. The build-task agent names the full `branches/one-task/references/run.md` path and the implement step.
+- The `/crav1-add-to-spec` description again mentions Used by / Absorbed by on notes and the revisit-request draft.
+- `/crav1-help <skill>` shows a merged skill's choice words.
+- `plugins/crav1/.cursor-plugin/plugin.json` is 1.57.0.
+
+### Docs
+
+- `choice_words` in `skills.yaml`, a Choice words section on each merged skill's reference page, a choice-words table in guild routing, the glossary (choice word), the help walkthrough, the renamed-skills table, CONTRIBUTING.md item 9, and `kit-maintainer.mdc`.
+
+### CI
+
+- `scripts/gen-skill-docs.py --check` fails when a choice word is missing from its `SKILL.md`, or when an alias passes a word the new skill does not list.
+
 ## 1.56.0 (2026-10-14)
 
 Skill names now say what each skill does, and related skills are merged. Old names keep working as aliases until 1.58.0.

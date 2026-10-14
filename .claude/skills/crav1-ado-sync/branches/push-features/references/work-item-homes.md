@@ -2,7 +2,7 @@
 
 The specs repo is the source of truth. It is not tied to any tracker. Each implementation repo has its own **work item home**, where the work items for that repo's work go. One home can hold one or many repos, in any combination.
 
-Read by `/crav1-ado-sync`, `/crav1-what-do-we-know-about-this`, `/crav1-open-pr` (Azure DevOps part, through `work-item-mention.md`), and the skills that write `docs/system/repos.md`.
+Read by `/crav1-ado-sync`, `/crav1-ado-sync`, `/crav1-what-do-we-know-about-this`, `/crav1-open-pr` (Azure DevOps part, through `work-item-mention.md`), and the skills that write `docs/system/repos.md`.
 
 ## Where the home is written
 
@@ -72,4 +72,4 @@ An older line without `(<project>)` is read as the line for the marks.md project
 
 ## Unchanged
 
-Nothing goes to Azure Boards without a yes. Iteration and Priority stay blank. Code repo names stay in the text, paths and line numbers are stripped, and the specs repo is never mentioned. The State handling of `/crav1-ado-sync` is unchanged.
+Nothing goes to Azure Boards without a yes. Iteration and Priority stay blank. Code repo names stay in the text, paths and line numbers are stripped, and the specs repo is never mentioned. The State handling of the push tasks branch of `/crav1-ado-sync` is unchanged.

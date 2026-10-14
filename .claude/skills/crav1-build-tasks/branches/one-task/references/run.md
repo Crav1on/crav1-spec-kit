@@ -1,10 +1,10 @@
-# Build-tasks worker (one T#, one isolated chat)
+# Build-task worker (one T#, one isolated chat)
 
 You run **only** this `T#`. You do not start another task. You do not launch another build-tasks agent.
 
 Follow these skills in order (drop-in `.claude/skills/<name>/SKILL.md` or plugin sibling `skills/<name>/SKILL.md`):
 
-`crav1-build-tasks` → loop-commit → `crav1-verify-build-against-spec` → loop-commit → (optional) fix loop → `crav1-verify-build-against-spec` again.
+The implement step of `crav1-build-tasks` → loop-commit → `crav1-verify-build-against-spec` → loop-commit → (optional) fix loop → `crav1-verify-build-against-spec` again.
 
 Commit **style** is already persisted (or the parent just wrote the rule). Use that persist. Do **not** ask style. Do **not** pause for Cursor Allow/Stop or Settings directions (`approvals: already-done`).
 
@@ -25,10 +25,10 @@ If commit fails or attribution comes back after one strip: stop with `STATUS: fa
 
 Stop and return a **status block** (below) if:
 
-- `crav1-build-tasks` would stop (parked Q, non-goal, playbook-only, missing `tasks.md`)
+- the implement step of `crav1-build-tasks` would stop (parked Q, non-goal, playbook-only, missing `tasks.md`)
 - That task’s row verify failed or you could not run it (`[ ]`)
 - Spec disagrees with the code → tell them `/crav1-tighten-spec`; do not edit `spec.md`
-- `crav1-fix-build-gaps` would stop (spec frozen, non-goal)
+- the verify gaps branch of `crav1-fix-build-gaps` would stop (spec frozen, non-goal)
 - Commit / attribution needs them
 - Live host refresh needs them (`crav1-verify-build-against-spec` `references/live-host.md`) → `STATUS: needs_ready`
 - A local test dependency is not running, or tests skipped for one (`crav1-verify-build-against-spec` `references/test-dependencies.md`) → `STATUS: needs_dependency`. DETAIL starts with `BLOCKER: <dependency> is not running. <n> tests need it. Not verified.` Do not mark the task verified
@@ -48,7 +48,7 @@ Stop and return a **status block** (below) if:
 
 ## implement
 
-Follow **`crav1-build-tasks`** for this `T#` only.
+Follow **the implement step of `crav1-build-tasks`** for this `T#` only.
 
 Then loop-commit.
 
@@ -69,7 +69,7 @@ Inner-loop = verify failed → claimed/unverified → wiring `G#`. Other unimple
 
 Only after `resume: fix`:
 
-1. **`crav1-fix-build-gaps`** with no Gap.
+1. **the verify gaps branch of `crav1-fix-build-gaps`** with no Gap.
 2. Loop-commit.
 3. If inner-loop empty → verify-build-against-spec again, loop-commit if needed; still dirty → `STATUS: needs_fix`; clean → **done**.
 4. If queue remains after the fix, continue (1) until empty or a gate.
