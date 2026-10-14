@@ -12,7 +12,7 @@ A layout that works without extra command-line tools:
 docs/system/
   _template/
   landscape.md       # short description, how the parts connect, v0 vs later, bulk A#s, feature index
-  repos.md           # named repos (proposed until a URL exists), Synced at per repo
+  repos.md           # named repos (proposed until a URL exists), Synced at and Work items go to per repo
   diagrams.md        # context diagram; /crav1-keep-current adds what is new
   glossary.md        # words the source already uses; not a feature spec
   security.md        # kept risks after /crav1-security-review (system pass); not seeded by spark
@@ -25,6 +25,7 @@ docs/environments/
 docs/notes/
   index.md           # open and absorbed notes
   YYYY-MM-DD-<slug>.md  # a fact kept as Note, not tied to a spec yet
+  review-pr-<n>-follow-ups.md  # follow-ups from /crav1-review-pr, one note per pull request
 docs/sources/
   YYYY-MM-DD-<slug>/ # an imported mail, transcript, chat, screenshot, or other original
 docs/research/
@@ -67,7 +68,7 @@ docs/specs/
 | `docs/architecture/spec.md` | One architecture spec from code | `/crav1-repos-to-spec`, when missing | The lanes that extend it |
 | `docs/architecture/left-out.md` | Guesses that stay left out, under `## Left out`, and `## Dismissed` lines | `/crav1-repos-to-spec` | `/crav1-repos-to-spec` on a re-read, `/crav1-environment-read` |
 | `docs/environments/marks.md` | One confirmed line per resource and environment | `/crav1-environment-read` and `/crav1-pipeline-environments`, appending only confirmed lines; `/crav1-tasks-to-ado` appends one `Azure Boards task type:` line | `/crav1-environment-read`, `/crav1-whats-known-about`. Line format: [Environment marks](../environments-marks.md) |
-| `docs/notes/` | A fact kept as Note, not tied to a spec yet, plus `index.md` | `/crav1-match-dump-to-specs` and `/crav1-meeting-to-specs` when the user picks Note; `Used by` and `Absorbed by` lines by any skill that quotes the note | `/crav1-feature-candidates`, the skills that quote a note |
+| `docs/notes/` | A fact kept as Note, not tied to a spec yet, plus `index.md` | `/crav1-match-dump-to-specs` and `/crav1-meeting-to-specs` when the user picks Note; `/crav1-review-pr` for its follow-ups note; `Used by` and `Absorbed by` lines by any skill that quotes the note | `/crav1-feature-candidates`, the skills that quote a note |
 | `docs/sources/YYYY-MM-DD-<slug>/` | The original of an imported mail, transcript, minutes, chat, screenshot, or diagram, plus a `README.md` | `/crav1-add-to-spec`, `/crav1-meeting-to-specs`, `/crav1-match-dump-to-specs`, `/crav1-intake-to-specs`, `/crav1-match-to-specs` | Anyone checking a quote. See [Data policy](data-policy.md) |
 | `docs/research/<topic>.md` | A short research note with the recommendation, trade-offs, confidence, and a link to the full study | The researcher (no slash command; see [guild routing](../guild-routing.md)). Skills only add or clear a stale mark | add, match-dump, code-into-specs, meeting, keep-current, explain, whats-known-about, feature-candidates |
 | `docs/specs/<slug>/spec.md` | What and why, acceptance, open questions | spark, ideas, intake (through `crav1-intake-slice-agent`), match; then tighten-spec, resolve-questions, add-to-spec, match-dump, code-into-specs, and security-review | Every later lane |
@@ -100,6 +101,10 @@ Source: docs/sources/YYYY-MM-DD-slug/
 ```
 
 `docs/notes/index.md` has one row per note: Title, Date, Status, Used by. When a skill quotes a note into a spec, it adds `Used by <slug>` under `## Used by` and updates that index row. Status stays open. Many specs can use one note. `Absorbed by <slug>` is added only when that spec clearly takes the whole note, and only after the user says yes.
+
+### Review follow-ups note
+
+`/crav1-review-pr` does not post follow-ups to the pull request or put them in the paste-ready comment. When a review has at least one, it writes `docs/notes/review-pr-<n>-follow-ups.md` in the same note format, where `<n>` is the pull request number. When two repos in the specs repo have the same pull request number, the file is `review-pr-<repo>-<n>-follow-ups.md`. The title is `Follow-ups from PR <n> (<repo>)`, there is no `Source:` line, and each follow-up keeps its file and line. The note gets an `open` row in `index.md`. A re-review updates the same note: it changes the date, adds new follow-ups, and marks addressed ones `(done in <short sha>)` without removing a line. A review with no follow-ups writes no note. See [From a pull request review](../from-review-pr.md#follow-ups).
 
 ## Sources
 
@@ -137,14 +142,29 @@ Under each item in a spec's `## Open questions`, the kit can add three kinds of 
 
 `/crav1-ask-open-questions` writes `Pending:` or `Asked:` after you say whether the draft was sent. `/crav1-add-to-spec`, `/crav1-match-dump-to-specs`, and `/crav1-meeting-to-specs` write `Answered:` when a kept quote clearly answers that question. `/crav1-resolve-questions` then walks the question with you. The full format is in [open-questions.md](../../.cursor/skills/crav1/crav1-add-to-spec/references/open-questions.md).
 
+## Work item homes
+
+Each implementation repo has its own work item home: the Azure DevOps (ADO) project its work items go to. The home is the `Work items go to` cell for that repo in `docs/system/repos.md`:
+
+```text
+ADO: <org>/<project>
+```
+
+- The specs repo itself never has a home. Its cell stays empty.
+- Skills that write `repos.md` add the column when it is missing and leave new cells empty. The first Azure Boards skill that needs a home asks once per repo, with the repo's own ADO project marked as the suggestion, and writes the cell after the answer. A later run reads the cell and does not ask again. To change a home, edit the row.
+- A task goes to the home of the repo it touches. A Feature goes to the homes of its spec's repos: one Feature per home, each holding only its own repos' tasks. Features in the same org are linked as related. Features in different orgs mention each other in the description.
+- `Jira: <project>` is reserved for later. Nothing reads or sends to Jira yet, so a repo with a `Jira:` cell is treated as having no home.
+
 ## Work item file
 
 `docs/specs/<slug>/work-item.md` is optional and only for Azure Boards linking. One id per line, optionally with the milestone or slice it belongs to:
 
 ```text
-Work item: 52
-Work item: 81 — October billing
+Work item: 52 (ADO: contoso/bc-operations)
+Work item: 81 — October billing (ADO: contoso/bc-operations)
 ```
+
+Each id line ends with its [work item home](#work-item-homes), `(ADO: <org>/<project>)`. An older line without the tag is read as the org and project in `docs/environments/marks.md`, and the next skill that writes the file adds the tag. One spec may record one Feature per home, and a Feature line and its task lines share a home.
 
 The commit and pull request skills turn the id into a mention from the git remote: `#52` on Azure Repos, `AB#52` on GitHub. Any other host adds no mention. Leave the ids out of `tasks.md`. Task lines (`Work item: <id> — task: T<n> <title>`) record the child work items of the Feature. The mention keeps the Feature id; a commit that clearly implements one recorded task adds that task's id too, and the commit skills ask when it is unclear. A task id is never the only mention. Nothing blocks when the file is missing. The template comment is [`docs/specs/_template/work-item.md`](../specs/_template/work-item.md).
 
