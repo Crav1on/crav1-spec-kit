@@ -60,7 +60,9 @@ If a file changed:
 
 That puts the spec (and any applied edits) in git. No push. This command does not commit for you.
 
-`/crav1-plan-from-spec` is only when you say you want to start planning this slug. This command does not run it.
+When this changed an existing spec, `/crav1-tighten-spec` for that slug comes next, then `/crav1-resolve-questions`, then `/crav1-plan-from-spec` when the slice has a plan, as the [New information on an existing slice](reference/workflow.md#new-info) route says. `/crav1-help next` gives the full order. This command does not run them.
+
+`/crav1-plan-from-spec` on a slice with no plan yet is only when you say you want to start planning this slug.
 
 A handoff from `/crav1-environment-read` or `/crav1-suggest-tests-for-code` asks once at the end of that run, not once per item: The system picture may now be out of date. Run `/crav1-keep-current`? It does not run that command. A meeting handoff does not ask.
 

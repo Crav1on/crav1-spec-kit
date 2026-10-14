@@ -122,7 +122,7 @@ When the quote is already in a note, the item shows `Already noted: docs/notes/<
 
 Read `## Open questions` on every spec folder (skip `_template`), with the records under each question. Follow `crav1-add-to-spec` `references/open-questions.md` (drop-in: `.claude/skills/crav1-add-to-spec/references/open-questions.md`; plugin: sibling `skills/crav1-add-to-spec/references/open-questions.md`). Match by meaning. Matching works whether the question is asked, pending, or not marked.
 
-- **Clear answer.** The item states the fact or the decision a spec open question asks for. The case is `answer`. The item shows `Answers: "<question>" on docs/specs/<slug>/` and `Linked without a question.` It is not asked keep, leave, dismiss, or note. Hand it to `/crav1-add-to-spec` as an answer link (see **Answer** under Keep). When it would change a spec line, also show `Then: /crav1-resolve-questions for <slug>.`
+- **Clear answer.** The item states the fact or the decision a spec open question asks for. The case is `answer`. The item shows `Answers: "<question>" on docs/specs/<slug>/` and `Linked without a question.` It is not asked keep, leave, dismiss, or note. Hand it to `/crav1-add-to-spec` as an answer link (see **Answer** under Keep). When it would change a spec line, also show `Then: /crav1-tighten-spec, then /crav1-resolve-questions for <slug>.`
 - **Unclear or partial.** The item keeps its own case. It also shows `Possible answer to: "<question>" on docs/specs/<slug>/. The question stays open.` It is asked one at a time like any other item. Nothing is linked.
 - **Asked in this input.** The input shows someone asking a spec open question. That is not an item. List it under `Asked in this <kind>` before the items, one line per question, with the spec. Its `Asked:` mark is written through the same handoff, with the date of this input. That date replaces a `Pending:` line, and an `Asked:` line from the user's yes, for the same person.
 
@@ -316,6 +316,8 @@ Named, not run: <commands>, or none
 ```
 
 Then the answer summary from the reference file: each answer linked, each possible answer left open, each asked mark and where its date came from, and each `/crav1-resolve-questions` named.
+
+When `/crav1-add-to-spec` changed an existing spec, name the next steps from the **New information on an existing slice** route (`docs/reference/workflow.md#new-info`) for that slug: `/crav1-tighten-spec` first, then `/crav1-resolve-questions`, then `/crav1-plan-from-spec` when the slice has `plan.md` or `tasks.md`. A named `/crav1-resolve-questions` comes after `/crav1-tighten-spec`, never before it. For the full order, name `/crav1-help next`. Do not run any of them.
 
 When `/crav1-add-to-spec` changed a file, or this command wrote a source folder or a note, name `/crav1-finalize-commit`. Do not run it. Do not commit the note.
 

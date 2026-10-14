@@ -36,7 +36,7 @@ Limits and exceptions: no input stops and asks. The kind and the date come from 
 
 ## You run next / Runs by itself
 
-- You run next: [`/crav1-resolve-questions`](crav1-resolve-questions.md); [`/crav1-finalize-commit`](crav1-finalize-commit.md)
+- You run next: [`/crav1-tighten-spec`](crav1-tighten-spec.md); [`/crav1-finalize-commit`](crav1-finalize-commit.md)
 - Runs by itself: Calls [`/crav1-add-to-spec`](crav1-add-to-spec.md) for one kept addition. That handoff runs the research check in `crav1-add-to-spec` `references/research-stale.md`. This skill does not run it a second time and does not write the stale block. A clear answer to a spec open question is handed to [`/crav1-add-to-spec`](crav1-add-to-spec.md) as an answer link without a keep question, with the asked marks the input shows, following `crav1-add-to-spec` `references/open-questions.md`. An unclear or partial answer is shown as a possible answer and the question stays open.
 
 ## Lane and group

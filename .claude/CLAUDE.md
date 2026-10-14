@@ -4,12 +4,22 @@ Specs, not chat history, are the source of truth. Put change work under `docs/sp
 
 When the user asks for startup options, name only these seven: `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-match-to-specs`, `/crav1-repos-to-spec`, `/crav1-environment-read`, and `/crav1-fix-bug`. Every other skill is a later skill. That ask names the list. It does not run a skill and does not move work into a lane. Each starter still follows the rules it already has. `/crav1-repos-to-spec` still runs only when the user names repos. `/crav1-environment-read` still runs only when the user names the host. Naming production, prod, or live stops. `/crav1-fix-bug` still runs only when the user names a real bug.
 
-Type `/crav1` to list kit skills. Typical order: spark, ideas, or intake → feature branch (`feat/<slug>` or specify-only `spec/<slug>`) → architecture review → tighten → resolve questions → plan → review-plan → tighten-plan → implement (or `/crav1-complete-task` / `/crav1-complete-tasks` / `/crav1-complete-features`) → verify → fix-from-verify (do not edit `spec.md` in the fix loop) → commit → pull request → merge.
+Type `/crav1` to list kit skills. `/crav1-help` answers what to run next, in what order, and what a skill does, from the kit's own docs. Typical order, by route (generated from `docs/reference/workflow.yaml`):
+
+<!-- crav1-order:start -->
+- New slice: spark-to-spec or ideas-to-spec or intake-to-specs → feature-branch (optional) → architecture-reviewer (optional) → tighten-spec → resolve-questions → specs-to-ado (optional) → plan-from-spec → review-plan → tighten-plan → tasks-to-ado (optional) → implement-task or complete-task or complete-tasks or complete-features → verify-spec → fix-from-verify or fix-live (optional) → draft-commit-message (optional) → finalize-commit → open-pr → review-pr → merge-pr.
+- New information on an existing slice: meeting-to-specs or add-to-spec → tighten-spec → resolve-questions → plan-from-spec → specs-to-ado (optional) → tasks-to-ado (optional) → complete-tasks or complete-task or implement-task → verify-spec → finalize-commit.
+- Bug: fix-bug → tighten-spec or plan-from-spec or implement-task → verify-spec → fix-from-verify (optional) → finalize-commit → open-pr.
+- Outside pull request: review-pr → merge-pr → keep-current → finalize-commit.
+- Azure Boards sync: feature-candidates → specs-to-ado → tasks-to-ado → ado-to-tasks.
+- The complete skills (complete-task, complete-tasks, complete-features) verify each task inside their worker, then go to open-pr. Full routes: `docs/reference/workflow.md` (kit repo or the plugin's `docs/`).
+<!-- crav1-order:end -->
 
 Standing rules for every kit skill:
 
 - The running skill's own `SKILL.md`, and the reference files it names, hold its rules. Follow them. This file does not repeat them.
 - A skill writes only what its rules say it writes. It commits, pushes, opens a pull request, or merges only where its own rules say so.
+- Before you suggest more than one next step, or when the user questions an order, call `/crav1-help` and quote its answer with its source. Never give an order from memory.
 - Naming a next command is not running it. A skill runs another skill only where its own rules say so.
 - A cross-cutting skill may run from any lane. It does not move work into a lane and does not start Specify, Plan, or Build. A later skill is not a starter option.
 - Production data is never read. Where a skill reads a cloud environment, pre-prod, shared-with-prod, and prod-only resources are shape and connections only, after one yes.

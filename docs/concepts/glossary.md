@@ -40,6 +40,8 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 
 **Intake.** One or more files that may describe a whole system with several v0 features.
 
+**Route.** An ordered list of commands for one situation, such as a new slice or new information on an existing slice. Each step says when it applies, and some are optional. The routes live in `docs/reference/workflow.yaml` and are shown in [Workflow routes](../reference/workflow.md). `/crav1-help` answers order questions from them.
+
 **Slice, slug.** A slice is one feature's spec folder. Its slug is the folder name under `docs/specs/`.
 
 **v0.** The first version of a feature. Intake writes one spec per confirmed v0 feature.

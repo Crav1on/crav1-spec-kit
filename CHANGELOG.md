@@ -4,13 +4,34 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 
 ## Unreleased
 
+## 1.52.0 (2026-10-14)
+
+### Kit
+
+- New `/crav1-help` (cross-cutting). Called with nothing, it shows a usage guide with example questions. With a skill name, it says what the skill does, when to use it, what it reads and writes, and its before and after steps. With `next` or a situation, it gives the route in order from `docs/reference/workflow.yaml`, marking each step from the slice's file state (open questions, `plan.md`, ticked tasks, `verify.md`, `work-item.md`). Other questions are answered from the docs, or with "the kit doesn't say". Every answer ends with `Source: <file>#<anchor>`. On pushback it re-reads the file and does not change the answer from memory.
+- Help is local only: the kit repo's `docs/`, else the `docs/` bundled in the installed plugin. It never fetches answers from GitHub. When online, it reads the tag names once and says when a newer version is tagged.
+- New `docs/reference/workflow.yaml` is the one written source for the order, with five routes: New slice, New information on an existing slice, Bug, Outside pull request, and Azure Boards sync. `scripts/gen-workflow.py` generates `docs/reference/workflow.md`, the order block in `crav1.mdc`, and every `you_run_next` in `skills.yaml`.
+- `crav1.mdc` (and the plugin and Claude Code copies) now says: before you suggest more than one next step, or when the user questions an order, call `/crav1-help` and quote its answer with its source. Never give an order from memory.
+- Order fixes: `/crav1-meeting-to-specs` and `/crav1-add-to-spec` name `/crav1-tighten-spec` before `/crav1-resolve-questions` after new information. Spark, ideas, and intake share the New slice route (optional feature branch and architecture review, then tighten). The complete skills verify inside their worker and go to `/crav1-open-pr`; implement-task goes to `/crav1-verify-spec`. The Azure Boards steps (specs-to-ado, tasks-to-ado) are in the order. `/crav1-merge-pr` names `/crav1-keep-current` after an outside pull request.
+- The plugin now bundles the kit's `docs/` as `plugins/crav1/docs/`, so each release carries its own docs.
+- `plugins/crav1/.cursor-plugin/plugin.json` is 1.52.0.
+
 ### Docs
+
+- New walkthrough [Ask the kit for help](docs/from-help.md), the generated [Workflow routes](docs/reference/workflow.md) page, a glossary entry for route, help in guild routing (Cross-cutting) and the docs index, and the tighten-spec step in the meeting and add walkthroughs. Install and the plugin README say the plugin bundles `docs/`.
+
+### CI
+
+- `scripts/gen-workflow.py --check`: route skills exist, `you_run_next` matches the routes, the `crav1.mdc` order block matches, the workflow page is current, the `/crav1-help` rule is in `crav1.mdc`, its plugin copy, and `CLAUDE.md`, and walkthrough `## After` sections name only skills that `workflow.yaml` names.
+- The sync job fails when `plugins/crav1/docs/` differs from `docs/`.
+
+### Docs (PR 80)
 
 - [From a pull request review](docs/from-review-pr.md) now covers the paste-ready comment, the comment style Thomas and Rhea agreed on (the default), posting after a yes, the verdict question, re-review, and the `review-pr-<repo>-<n>-follow-ups.md` name for the follow-ups note.
 - The [glossary](docs/concepts/glossary.md) and [data layout](docs/concepts/data-layout.md) explain work item homes: the `Work items go to` column in `docs/system/repos.md`, one Feature per home, `(ADO: <org>/<project>)` on `work-item.md` id lines, and `Jira:` reserved. The data layout also lists the review follow-ups note.
 - "Documented is part of done" now covers changes to existing skills too: update that skill's walkthrough and its glossary or data layout entries in the same pull request ([CONTRIBUTING.md](CONTRIBUTING.md) item 6, `kit-maintainer.mdc`).
 
-### CI
+### CI (PR 80)
 
 - New check `scripts/check-skill-docs-touched.py` (workflow `skill-docs-touched.yml`) fails a pull request that changes any copy of a `SKILL.md` without a docs change for that skill outside `docs/reference/`. Opt out with the `docs-not-needed` label or a `Docs-not-needed: <reason>` line in the pull request body.
 

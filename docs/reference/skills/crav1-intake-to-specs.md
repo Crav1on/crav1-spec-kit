@@ -36,7 +36,7 @@ Limits and exceptions: prompts [`/crav1-finalize-commit`](crav1-finalize-commit.
 
 ## You run next / Runs by itself
 
-- You run next: [`/crav1-finalize-commit`](crav1-finalize-commit.md)
+- You run next: [`/crav1-feature-branch`](crav1-feature-branch.md); [`/crav1-architecture-reviewer`](crav1-architecture-reviewer.md); [`/crav1-tighten-spec`](crav1-tighten-spec.md); [`/crav1-finalize-commit`](crav1-finalize-commit.md)
 - Runs by itself: Calls [`/crav1-feature-branch`](crav1-feature-branch.md) when the repo already has commits.
 
 ## Lane and group

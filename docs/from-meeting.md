@@ -72,6 +72,8 @@ A left item is not written. A dismissed item is not written. The state line is n
 
 ## After
 
+When a kept addition or an answer changed an existing spec, the next steps follow the [New information on an existing slice](reference/workflow.md#new-info) route for that slug: `/crav1-tighten-spec` first, then `/crav1-resolve-questions`, then `/crav1-plan-from-spec` when the slice has a plan. This command names them and does not run them. Ask `/crav1-help next` for the full order with your slice's state.
+
 A kept new feature names one next command. This command does not run it.
 
 - One kept new feature that is one or two sentences: `/crav1-spark-to-spec`

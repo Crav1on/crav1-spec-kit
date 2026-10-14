@@ -54,6 +54,11 @@ Once specs exist:
 - [From a meeting to specs](from-meeting.md)
 - [Ask open questions](from-ask-open-questions.md)
 
+Find your way:
+
+- [Ask the kit for help](from-help.md): what to run next, in what order, and what a command does
+- [Workflow routes](reference/workflow.md)
+
 Keep the picture current:
 
 - [From the system notes](from-explain.md)

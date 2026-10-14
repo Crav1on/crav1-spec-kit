@@ -90,6 +90,8 @@ skills:
   called_by: Called by the user.
   runs_by_itself: Calls `/crav1-feature-branch` when the repo already has commits.
   you_run_next:
+  - /crav1-feature-branch
+  - /crav1-architecture-reviewer
   - /crav1-tighten-spec
   first_prompt: '/crav1-spark-to-spec
 
@@ -133,6 +135,8 @@ skills:
   called_by: Called by the user.
   runs_by_itself: Calls `/crav1-feature-branch` when the repo already has commits.
   you_run_next:
+  - /crav1-feature-branch
+  - /crav1-architecture-reviewer
   - /crav1-tighten-spec
   first_prompt: '/crav1-ideas-to-spec
 
@@ -189,6 +193,9 @@ skills:
   called_by: Called by the user.
   runs_by_itself: Calls `/crav1-feature-branch` when the repo already has commits.
   you_run_next:
+  - /crav1-feature-branch
+  - /crav1-architecture-reviewer
+  - /crav1-tighten-spec
   - /crav1-finalize-commit
   first_prompt: '/crav1-intake-to-specs
 
@@ -461,6 +468,8 @@ skills:
     and `/crav1-complete-features`.
   runs_by_itself: Calls no skill.
   you_run_next:
+  - /crav1-architecture-reviewer
+  - /crav1-tighten-spec
   - /crav1-finalize-commit
   first_prompt: /crav1-feature-branch <slug>
 - name: crav1-architecture-reviewer
@@ -556,6 +565,7 @@ skills:
   called_by: Called by the user.
   runs_by_itself: Calls no skill.
   you_run_next:
+  - /crav1-specs-to-ado
   - /crav1-plan-from-spec
   first_prompt: '/crav1-resolve-questions
 
@@ -666,6 +676,7 @@ skills:
     for a preview change, and by `/crav1-ado-to-specs` for one kept change or one answer.
   runs_by_itself: Calls no skill.
   you_run_next:
+  - /crav1-tighten-spec
   - /crav1-finalize-commit
   first_prompt: '/crav1-add-to-spec
 
@@ -855,7 +866,7 @@ skills:
     `references/open-questions.md`. An unclear or partial answer is shown as a possible answer and the
     question stays open.
   you_run_next:
-  - /crav1-resolve-questions
+  - /crav1-tighten-spec
   - /crav1-finalize-commit
   first_prompt: '/crav1-meeting-to-specs
 
@@ -899,6 +910,11 @@ skills:
   runs_by_itself: Calls no skill.
   you_run_next:
   - /crav1-review-plan
+  - /crav1-specs-to-ado
+  - /crav1-tasks-to-ado
+  - /crav1-complete-tasks
+  - /crav1-complete-task
+  - /crav1-implement-task
   first_prompt: '/crav1-plan-from-spec
 
     @docs/specs/<slug>/
@@ -952,7 +968,11 @@ skills:
   called_by: Called by the user.
   runs_by_itself: Calls no skill.
   you_run_next:
+  - /crav1-tasks-to-ado
   - /crav1-implement-task
+  - /crav1-complete-task
+  - /crav1-complete-tasks
+  - /crav1-complete-features
   first_prompt: '/crav1-tighten-plan
 
     @docs/specs/<slug>/'
@@ -1099,6 +1119,9 @@ skills:
   runs_by_itself: Calls no skill.
   you_run_next:
   - /crav1-fix-from-verify
+  - /crav1-fix-live
+  - /crav1-draft-commit-message
+  - /crav1-finalize-commit
   first_prompt: '/crav1-verify-spec
 
     @docs/specs/<slug>/'
@@ -1320,11 +1343,38 @@ skills:
   exceptions: a required red host check stops it. It does not run `/crav1-review-pr`.
   called_by: Called by the user.
   runs_by_itself: Calls no skill.
-  you_run_next: []
+  you_run_next:
+  - /crav1-keep-current after an outside pull request merges
   first_prompt: '/crav1-merge-pr <pull request number or URL>
 
 
     Merge this pull request.'
+- name: crav1-help
+  lane: cross-cutting
+  group: Start
+  starter: false
+  since: 1.52.0
+  stage: stable
+  walkthrough: docs/from-help.md
+  purpose: Answer questions about the kit from its own local docs, with the source file and anchor for every answer.
+  in_depth:
+  - 'Called with nothing, **`/crav1-help`** shows a usage guide with example questions. With a skill name, it says what the skill does, when to use it, what it reads and writes, and its before and after steps. With `next` or a situation, it picks the route in `docs/reference/workflow.yaml` and lists the steps in order, marked done, next, skipped, or to do from the slice''s file state (open questions, `plan.md`, ticked tasks, `verify.md`, `work-item.md`). A free-form question is answered from the docs, or with "the kit doesn''t say". Every answer ends with `Source: <file>#<anchor>`. On pushback it re-reads the file and keeps the answer unless the file says otherwise.'
+  - It reads the kit repo's `docs/`, or the `docs/` bundled in the installed plugin, never GitHub. When online, it reads the tag names once and says so when a newer version is tagged. It writes nothing and runs no other skill. It is cross-cutting. It is not a starter option.
+  use_when: You want to know what to run next, in what order, or what a skill does
+  table:
+    reads: The kit docs (kit repo or the plugin's bundled `docs/`), and the slice's file state
+    writes: Nothing (an answer in chat with its source)
+  reads: Reads `docs/reference/workflow.yaml`, `docs/reference/skills.yaml`, the reference pages, walkthroughs, and concept pages from the kit repo or the plugin's bundled `docs/`; for a route, the slice's `spec.md`, `plan.md`, `tasks.md`, `verify.md`, and `work-item.md`; when online, the kit's tag names only.
+  writes: Writes an answer in the chat that ends with its source file and anchor, and at most one newer-version line per chat.
+  leaves_alone: Leaves every file alone.
+  exceptions: does not answer from memory, from general knowledge, or from GitHub. When the docs do not cover a question it says "the kit doesn't say". On pushback it re-reads the cited file and changes the answer only when the file says otherwise. A drop-in install has no bundled docs, so it answers from the skill files only and says so.
+  called_by: Called by the user, or by an agent before it suggests more than one next step or when an order is questioned (the `crav1.mdc` rule).
+  runs_by_itself: Calls no skill.
+  you_run_next:
+  - The skill or route step it names
+  first_prompt: '/crav1-help
+
+    I have new information from a meeting and tasks that are not built. What do I run, in order?'
 - name: crav1-explain
   lane: cross-cutting
   group: Keep the picture current
@@ -1678,8 +1728,12 @@ skills:
   runs_by_itself: Calls `/crav1-feature-candidates`, and `/crav1-add-to-spec` when a preview change belongs
     in the spec.
   you_run_next:
-  - /crav1-finalize-commit
+  - /crav1-plan-from-spec
   - /crav1-tasks-to-ado
+  - /crav1-complete-tasks
+  - /crav1-complete-task
+  - /crav1-implement-task
+  - /crav1-finalize-commit
   first_prompt: /crav1-specs-to-ado
 - name: crav1-tasks-to-ado
   lane: cross-cutting
@@ -1733,8 +1787,12 @@ skills:
   called_by: Called by the user. `/crav1-specs-to-ado` names it and does not run it.
   runs_by_itself: Calls `/crav1-add-to-spec` when a preview change belongs in the spec.
   you_run_next:
-  - /crav1-finalize-commit
+  - /crav1-implement-task
+  - /crav1-complete-task
+  - /crav1-complete-tasks
+  - /crav1-complete-features
   - /crav1-ado-to-tasks
+  - /crav1-finalize-commit
   first_prompt: /crav1-tasks-to-ado
 - name: crav1-ado-to-tasks
   lane: cross-cutting

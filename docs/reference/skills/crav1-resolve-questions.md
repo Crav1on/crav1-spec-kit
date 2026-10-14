@@ -32,7 +32,7 @@ Leaves application code and kept-open questions alone.
 
 ## You run next / Runs by itself
 
-- You run next: [`/crav1-plan-from-spec`](crav1-plan-from-spec.md)
+- You run next: [`/crav1-specs-to-ado`](crav1-specs-to-ado.md); [`/crav1-plan-from-spec`](crav1-plan-from-spec.md)
 - Runs by itself: Calls no skill.
 
 ## Lane and group

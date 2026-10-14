@@ -40,7 +40,7 @@ Limits and exceptions: a spec with no Feature id is not offered and names [`/cra
 
 ## You run next / Runs by itself
 
-- You run next: [`/crav1-finalize-commit`](crav1-finalize-commit.md); [`/crav1-ado-to-tasks`](crav1-ado-to-tasks.md)
+- You run next: [`/crav1-implement-task`](crav1-implement-task.md); [`/crav1-complete-task`](crav1-complete-task.md); [`/crav1-complete-tasks`](crav1-complete-tasks.md); [`/crav1-complete-features`](crav1-complete-features.md); [`/crav1-ado-to-tasks`](crav1-ado-to-tasks.md); [`/crav1-finalize-commit`](crav1-finalize-commit.md)
 - Runs by itself: Calls [`/crav1-add-to-spec`](crav1-add-to-spec.md) when a preview change belongs in the spec.
 
 ## Lane and group

@@ -24,7 +24,13 @@ rm -rf "$PLUGIN/agent-assets"
 mkdir -p "$PLUGIN/agent-assets"
 cp -a "$ROOT/.cursor/agent-assets/." "$PLUGIN/agent-assets/"
 
-echo "Synced .cursor/ → plugins/crav1/ (skills, agents, crav1.mdc, agent-assets)"
+# docs: each release bundles its own docs next to the skills, so /crav1-help
+# answers locally for that exact version. CI fails when they differ from docs/.
+rm -rf "$PLUGIN/docs"
+mkdir -p "$PLUGIN/docs"
+cp -a "$ROOT/docs/." "$PLUGIN/docs/"
+
+echo "Synced .cursor/ → plugins/crav1/ (skills, agents, crav1.mdc, agent-assets) and docs/ → plugins/crav1/docs/"
 
 # Claude Code drop-in is generated. A stale .claude/ fails CI via --check.
 "$ROOT/scripts/sync-crav1-claude.sh"

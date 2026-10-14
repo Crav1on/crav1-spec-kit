@@ -39,6 +39,12 @@ jobs:
             fail=1
           fi
 
+          echo "== docs: docs/ ↔ plugins/crav1/docs/ (each release bundles its own docs) =="
+          if ! diff -ru docs plugins/crav1/docs; then
+            echo "plugins/crav1/docs/ differs from docs/; run scripts/sync-crav1-plugin.sh"
+            fail=1
+          fi
+
           echo "== kit-maintainer.mdc must not be under plugins/crav1/ =="
           if find plugins/crav1 -name 'kit-maintainer.mdc' -print | grep -q .; then
             echo "found kit-maintainer.mdc under plugins/crav1/"
@@ -73,3 +79,5 @@ jobs:
         run: python scripts/gen-skill-docs.py --check
       - name: Description length and plugin.json version
         run: python scripts/check-kit-docs.py
+      - name: Workflow routes, you_run_next, crav1.mdc order, help rule, and After sections
+        run: python scripts/gen-workflow.py --check
