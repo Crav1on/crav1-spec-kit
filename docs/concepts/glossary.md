@@ -64,6 +64,8 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 
 **Production (prod).** The live environment. The kit never reads production data. Pre-prod, resources shared with prod, and prod-only resources are read for shape and connections only, after one yes.
 
+**Work item home.** Where the work items for one implementation repo go, written as `ADO: <org>/<project>` in the `Work items go to` column of `docs/system/repos.md`. The first Azure Boards skill that needs a repo's home asks for it once, suggesting the repo's own project, and never guesses it. A spec whose repos are in several homes gets one Feature in each home. `Jira: <project>` is reserved for later and is not read yet. See [Data layout](data-layout.md#work-item-homes).
+
 **Synced at.** The branch, short commit, and date a repo was last read, as `<branch>@<short sha>, <date>`, in `docs/system/repos.md`. A one-slice read writes a `Synced at` line on that slice instead.
 
 **Left out.** A guess from the code that stays out of the architecture spec, listed in `docs/architecture/left-out.md`.
