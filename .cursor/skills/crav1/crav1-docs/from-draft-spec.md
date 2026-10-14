@@ -45,6 +45,7 @@ Questions only someone else can answer: draft them with [`/crav1-ask-open-questi
 - `docs/specs/<slug>/spec.md`: only the issue or question you picked, each time.
 - The named diagram, ADR, or export, only when that pick says so.
 - A branch line on the spec, only after a yes.
+- `Blocks: T#` under a question you keep open, when the slice has `tasks.md` and you pick the tasks it blocks in `/crav1-resolve-questions`. Without it, the question blocks the whole slice in [Tasks ready to build](from-tasks-ready-to-build.md).
 - A cleared research stale mark, when a resolved question settles the last open point.
 - `Used by <slug>` on a note in `docs/notes/` that tighten quotes.
 

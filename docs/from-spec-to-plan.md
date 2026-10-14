@@ -32,14 +32,16 @@ On a `spec/<slug>` branch, do not build. Merge that branch first, then `/crav1-f
 
 ## What gets written
 
-- `docs/specs/<slug>/plan.md` and `tasks.md`.
+- `docs/specs/<slug>/plan.md` and `tasks.md`. `/crav1-plan-from-spec` ends a task line with `(after: T1)` when the task needs an earlier one done first.
+- On `spec.md`, only `Blocks: T#` lines under kept-open questions that block some of the new tasks, written by `/crav1-plan-from-spec`.
+- `/crav1-review-plan`: one `Reviewed: <date>, P# open: <n>` line under the plan title. `/crav1-tighten-plan` lowers `<n>` as `P#`s are fixed.
 - Matching OpenSpec export files, only when those already exist.
 - Tighten-plan: only the picked issue.
 
-Not written: `spec.md`, application code, any linter install.
+Not written: other `spec.md` lines, application code, any linter install. These marks feed [Tasks ready to build](from-tasks-ready-to-build.md); see [Readiness marks](concepts/data-layout.md#readiness-marks).
 
 ## After
 
-Build one task, or several: [Build tasks](from-plan-to-build.md).
+See which tasks are ready, any time: `/crav1-tasks-ready-to-build`. Then build one task, or several: [Build tasks](from-plan-to-build.md).
 
 Reference pages: [plan-from-spec](reference/skills/crav1-plan-from-spec.md) · [review-plan](reference/skills/crav1-review-plan.md) · [tighten-plan](reference/skills/crav1-tighten-plan.md)

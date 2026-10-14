@@ -4,6 +4,21 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 
 ## Unreleased
 
+## 1.54.0 (2026-10-14)
+
+### Kit
+
+- New `/crav1-tasks-ready-to-build` (cross-cutting, read-only), at Rhea's request. For one slice or all, it shows summary counts, then Ready, Blocked (one reason each, recorded or inferred), Needs verify, a Done count, `Next: /crav1-implement-task T#`, and a `Source:` line. It can run any time. It never reads Azure Boards and names `/crav1-ado-to-tasks` for task states there.
+- Rules: a ticked task is Done only when `verify.md` lists it as verified, otherwise Needs verify. A missing `plan.md` blocks. A kept-open question blocks the tasks its `Blocks:` line names, or the whole slice when it has none (inferred); a plan Risk that says do not implement until resolved blocks the whole slice (inferred). A task waits on its `(after: T#)` tasks, or on every earlier unticked task when none is recorded (inferred). An unknown plan review gives a warning to run `/crav1-review-plan`, not a block.
+- New marks: `/crav1-review-plan` writes `Reviewed: <date>, P# open: <n>` under the plan title, and `/crav1-tighten-plan` lowers the count. `/crav1-plan-from-spec` writes optional `(after: T#)` on task lines and `Blocks: T#` under kept-open questions it parks as risks (its one exception to leaving `spec.md` alone). `/crav1-resolve-questions` asks which tasks a kept-open question blocks and writes `Blocks: T#`.
+- `workflow.yaml`: tasks-ready-to-build is an optional step before build in the New slice and New information routes. `/crav1-help` says it can run any time, in its next answers and its skill answer.
+- Templates: `plan.md` has a comment for the `Reviewed:` line, `tasks.md` shows `(after: T1)`.
+- `plugins/crav1/.cursor-plugin/plugin.json` is 1.54.0.
+
+### Docs
+
+- New walkthrough [Tasks ready to build](docs/from-tasks-ready-to-build.md). [Data layout](docs/concepts/data-layout.md) has Readiness marks and `Blocks:` in open question marks; the [glossary](docs/concepts/glossary.md) has ready and blocking. The plan and draft walkthroughs, help, guild routing (Cross-cutting), and the docs index name the new marks and command. The `crav1-docs/` copies are updated.
+
 ## 1.53.0 (2026-10-14)
 
 ### Kit

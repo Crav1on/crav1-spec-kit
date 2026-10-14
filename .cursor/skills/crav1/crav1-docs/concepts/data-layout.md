@@ -68,6 +68,7 @@ docs/specs/
 | `docs/architecture/spec.md` | One architecture spec from code | `/crav1-repos-to-spec`, when missing | The lanes that extend it |
 | `docs/architecture/left-out.md` | Guesses that stay left out, under `## Left out`, and `## Dismissed` lines | `/crav1-repos-to-spec` | `/crav1-repos-to-spec` on a re-read, `/crav1-environment-read` |
 | `docs/environments/marks.md` | One confirmed line per resource and environment | `/crav1-environment-read` and `/crav1-pipeline-environments`, appending only confirmed lines; `/crav1-tasks-to-ado` appends one `Azure Boards task type:` line | `/crav1-environment-read`, `/crav1-whats-known-about`. Line format: [Environment marks](../environments-marks.md) |
+| `docs/specs/<slug>/plan.md`, `tasks.md` readiness marks | `Reviewed:` in `plan.md`, `(after: T#)` on task lines, `Blocks:` under spec open questions | `/crav1-review-plan`, `/crav1-tighten-plan`, `/crav1-plan-from-spec`, `/crav1-resolve-questions` | `/crav1-tasks-ready-to-build` |
 | `docs/notes/` | A fact kept as Note, not tied to a spec yet, plus `index.md` | `/crav1-match-dump-to-specs` and `/crav1-meeting-to-specs` when the user picks Note; `/crav1-review-pr` for its follow-ups note; `Used by` and `Absorbed by` lines by any skill that quotes the note | `/crav1-feature-candidates`, the skills that quote a note |
 | `docs/sources/YYYY-MM-DD-<slug>/` | The original of an imported mail, transcript, minutes, chat, screenshot, or diagram, plus a `README.md` | `/crav1-add-to-spec`, `/crav1-meeting-to-specs`, `/crav1-match-dump-to-specs`, `/crav1-intake-to-specs`, `/crav1-match-to-specs` | Anyone checking a quote. See [Data policy](data-policy.md) |
 | `docs/research/<topic>.md` | A short research note with the recommendation, trade-offs, confidence, and a link to the full study | The researcher (no slash command; see [guild routing](../guild-routing.md)). Skills only add or clear a stale mark | add, match-dump, code-into-specs, meeting, keep-current, explain, whats-known-about, feature-candidates |
@@ -131,16 +132,37 @@ There is one `Point:` line per hit. When the note is updated, `/crav1-keep-curre
 
 ## Open question marks
 
-Under each item in a spec's `## Open questions`, the kit can add three kinds of lines:
+Under each item in a spec's `## Open questions`, the kit can add four kinds of lines:
 
 ```text
 - <question>
   - Pending: drafted <date> for <who>, <channel>. Not marked as sent yet. Question <n> of that draft.
   - Asked: <date>, <channel> to <who>. Question <n>. Date from <the user's yes | email <date> | meeting <date> | chat <date>>.
   - Answered: <date>, <who>, <kind>: "<quote>" Source: docs/sources/YYYY-MM-DD-<slug>/
+  - Blocks: T2, T4
 ```
 
+`Blocks:` names the tasks that wait on a kept-open question. `/crav1-resolve-questions` writes it after a keep-open pick, and `/crav1-plan-from-spec` writes it for a kept-open question it parks as a risk. Without a `Blocks:` line, a kept-open question blocks the whole slice for [`/crav1-tasks-ready-to-build`](../from-tasks-ready-to-build.md). See [Readiness marks](#readiness-marks).
+
 `/crav1-ask-open-questions` writes `Pending:` or `Asked:` after you say whether the draft was sent. `/crav1-add-to-spec`, `/crav1-match-dump-to-specs`, and `/crav1-meeting-to-specs` write `Answered:` when a kept quote clearly answers that question. `/crav1-resolve-questions` then walks the question with you. The full format is in [open-questions.md](../../.cursor/skills/crav1/crav1-add-to-spec/references/open-questions.md).
+
+## Readiness marks
+
+[`/crav1-tasks-ready-to-build`](../from-tasks-ready-to-build.md) reads three optional marks. Each is written only by the skills named here; the reader writes nothing:
+
+| Mark | Where | Written by | Meaning |
+| --- | --- | --- | --- |
+| `Reviewed: <date>, P# open: <n>` | `plan.md`, under the `# Plan:` title | `/crav1-review-plan` writes it; `/crav1-tighten-plan` lowers `<n>` as `P#`s are fixed | The plan was reviewed, and how many reviewer findings are still open |
+| `(after: T1, T3)` | End of a task line in `tasks.md` | `/crav1-plan-from-spec` | The task needs those tasks done first |
+| `Blocks: T2, T4` | Under a kept-open question in `spec.md` | `/crav1-resolve-questions`, `/crav1-plan-from-spec` | The question blocks only those tasks |
+
+When a mark is missing, the reader falls back and labels the reason **inferred**:
+
+- No `Reviewed:` line: the task can still be ready, with a warning to run `/crav1-review-plan`.
+- No `(after: …)`: every earlier unticked task blocks it.
+- A kept-open question, or a plan Risk that says do not implement until resolved, with no `Blocks:` line: it blocks the whole slice.
+
+A ticked task is Done only when `verify.md` lists it as verified. Otherwise it shows as Needs verify.
 
 ## Work item homes
 
