@@ -2,7 +2,7 @@
 
 # /crav1-explain-existing-system
 
-[All skills](../skills.md) · Walkthrough: [From the system notes](../../from-explain.md) · Playbook: [`SKILL.md`](../../../.cursor/skills/crav1/crav1-explain-existing-system/SKILL.md)
+[All skills](../skills.md) · Walkthrough: [From the system notes](../../from-explain-existing-system.md) · Playbook: [`SKILL.md`](../../../.cursor/skills/crav1/crav1-explain-existing-system/SKILL.md)
 
 ## Purpose
 
@@ -56,4 +56,4 @@ Stage: stable. Since: 1.8.0 ([changelog](../../../CHANGELOG.md)).
 
 ## Walkthrough
 
-Step by step: [From the system notes](../../from-explain.md).
+Step by step: [From the system notes](../../from-explain-existing-system.md).

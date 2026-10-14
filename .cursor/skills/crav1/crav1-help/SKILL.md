@@ -62,8 +62,9 @@ A short usage guide that lists every mode with one example each:
 | A concept | `/crav1-help work item homes`, `/crav1-help marks.md`, `/crav1-help stale marks` |
 | The skill list, or one lane | `/crav1-help list`, `/crav1-help list build` |
 | Where a slice is | `/crav1-help status cancel-booking`, `/crav1-help where am I` |
-| Two skills side by side | `/crav1-help compare build-tasks build-tasks` |
+| Two skills side by side | `/crav1-help compare build-tasks build-features` |
 | What changed | `/crav1-help whats new`, `/crav1-help whats new since 1.50` |
+| Renamed skills | `/crav1-help renamed`, `/crav1-help complete-task` |
 | Anything else about the kit | `/crav1-help where do review follow-ups go?` |
 
 Then the route names from `workflow.yaml`, one line each.
@@ -80,7 +81,11 @@ The message is a skill name, with or without `/` and `crav1-`. From its `skills.
 - Its walkthrough, when it has one.
 - For `/crav1-tasks-ready-to-build`, say that it can run any time, not only at its route step.
 
-A name that matches no skill: say so and list the closest names. Do not guess.
+An old name from before 1.56.0 (listed under `aliases` in `skills.yaml`, and in **Renamed skills** in `docs/reference/skills.md`): say first that it was renamed, name the new skill and the choice the alias pre-answers, and that the alias is removed in its `remove_in` release. Then answer for the new skill as above.
+
+"renamed", "renamed skills", or "what are the new names": list the whole **Renamed skills** table (old name, new name, pre-answered choice, removed in). Source: `docs/reference/skills.md#renamed-skills` and the 1.56.0 entry in `CHANGELOG.md`.
+
+A name that matches no skill and no alias: say so and list the closest names. Do not guess.
 
 ### 3. "next" or a situation
 

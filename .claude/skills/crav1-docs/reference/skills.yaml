@@ -156,7 +156,7 @@ skills:
   starter: true
   since: 1.0.0
   stage: stable
-  walkthrough: docs/from-intake.md
+  walkthrough: docs/from-bundle-to-specs.md
   purpose: Turn mixed intake (notes, diagrams, screenshots, optional code as context) into docs/system/
     (including glossary.md) plus one spec slug per v0 feature.
   in_depth:
@@ -217,7 +217,7 @@ skills:
   starter: true
   since: 1.0.0
   stage: stable
-  walkthrough: docs/from-match.md
+  walkthrough: docs/from-existing-to-specs-with-bundle.md
   purpose: Turn a system that already exists into specs; asks repos only or repos plus a bundle, and one
     spec or system notes plus one spec per feature.
   in_depth:
@@ -315,7 +315,7 @@ skills:
   starter: true
   since: 1.13.0
   stage: stable
-  walkthrough: docs/from-environment.md
+  walkthrough: docs/from-read-environment.md
   purpose: Read the host the user named.
   in_depth:
   - 'When the user names a host, **`/crav1-read-environment`** reads every non-prod environment on that
@@ -553,7 +553,7 @@ skills:
   starter: false
   since: 1.40.0
   stage: stable
-  walkthrough: docs/from-ask-open-questions.md
+  walkthrough: docs/from-show-or-ask-open-questions.md
   purpose: Show the cross-spec overview of open questions (read-only), or draft them to ask; asks which.
   in_depth:
   - '**`/crav1-show-or-ask-open-questions`** opens with one question: show an overview of every open question
@@ -1240,7 +1240,7 @@ skills:
   starter: false
   since: 1.8.0
   stage: stable
-  walkthrough: docs/from-explain.md
+  walkthrough: docs/from-explain-existing-system.md
   purpose: Read the system notes spark, ideas, intake, match, or existing-to-specs already wrote (docs/system/).
   in_depth:
   - When system notes already exist, **`/crav1-explain-existing-system`** reads `docs/system/` and answers with a short
@@ -1288,7 +1288,7 @@ skills:
   starter: false
   since: 1.23.0
   stage: stable
-  walkthrough: docs/from-whats-known-about.md
+  walkthrough: docs/from-what-do-we-know-about-this.md
   purpose: Answer one question about a feature, slice, resource, or not-yet-feature from the specs first.
   in_depth:
   - 'When the user asks about one feature, slice, resource, or not-yet-feature, **`/crav1-what-do-we-know-about-this`**
@@ -1344,7 +1344,7 @@ skills:
   starter: false
   since: 1.8.0
   stage: stable
-  walkthrough: docs/from-keep-current.md
+  walkthrough: docs/from-refresh-system-notes.md
   purpose: 'Update the picture in docs/system/ when something was added: add what is new to the short
     description, the diagram, and how the parts connect, and do not rewrite what is there.'
   in_depth:
@@ -1378,9 +1378,9 @@ skills:
     the note''s owner, including when the mark clears. It does not ask the user.'
   leaves_alone: Leaves existing picture lines, glossary rows, design, and build alone.
   exceptions: spark, ideas, intake, match, match-dump, and add-to-spec run this picture update on
-    the pass that appends a glossary row. Repos-to-spec updates the picture in its own pass. Complete-features,
+    the pass that appends a glossary row. Existing-to-specs updates the picture in its own pass. Build-features,
     fix-bug, fix-build-gaps, read-environment, and the add-to-spec handoffs from read-environment and suggest-tests-for-code
-    may ask and do not run this command. Implement-task and build-tasks do not ask. It does not commit
+    may ask and do not run this command. Build-tasks and build-tasks do not ask. It does not commit
     a cleared research mark.
   called_by: Called by the user and by `/crav1-read-environment` for a confirmed system section.
   runs_by_itself: Calls no skill.
@@ -1401,7 +1401,7 @@ skills:
   starter: false
   since: 1.18.0
   stage: stable
-  walkthrough: docs/from-pipeline-environments.md
+  walkthrough: docs/from-map-pipeline-environments.md
   purpose: Read Azure DevOps pipeline definitions for the org and project the user named.
   in_depth:
   - When the user names Azure DevOps, the org, and the project, **`/crav1-map-pipeline-environments`** reads
@@ -1447,7 +1447,7 @@ skills:
   starter: false
   since: 1.4.0
   stage: stable
-  walkthrough: docs/from-security.md
+  walkthrough: docs/from-review-security.md
   purpose: Ask whether the thing in front of you is secure, after architecture already exists (docs/system/
     or a spec that already describes the design).
   in_depth:
@@ -1512,7 +1512,7 @@ skills:
   starter: false
   since: 1.31.0
   stage: stable
-  walkthrough: docs/from-feature-candidates.md
+  walkthrough: docs/from-ado-sync-suggest-features.md
   purpose: Keep specs and Azure Boards in step; asks suggest Features, push Features, push tasks, pull
     tasks, or pull spec changes.
   in_depth:
@@ -1657,7 +1657,7 @@ skills:
   starter: false
   since: 1.16.0
   stage: stable
-  walkthrough: docs/from-exploratory-test.md
+  walkthrough: docs/from-run-exploratory-test.md
   purpose: After a build of a slice already exists, use the slice in two passes and write down bugs.
   in_depth:
   - When a build of a slice already exists, **`/crav1-run-exploratory-test`** uses that slice in two passes
@@ -1746,6 +1746,178 @@ skills:
 
 
     Suggest tests for what this code can break. Do not write the tests. Do not change the code.'
+
+# Deprecated aliases (1.56.0). Each folder hands off to renamed_to and
+# pre-answers its opening question (choice). Removed in 1.58.0.
+aliases:
+- name: crav1-implement-task
+  renamed_to: crav1-build-tasks
+  deprecated: true
+  since: 1.56.0
+  remove_in: 1.58.0
+  choice: "one task (the worker follows the implement branch)"
+- name: crav1-complete-task
+  renamed_to: crav1-build-tasks
+  deprecated: true
+  since: 1.56.0
+  remove_in: 1.58.0
+  choice: "one task"
+- name: crav1-complete-tasks
+  renamed_to: crav1-build-tasks
+  deprecated: true
+  since: 1.56.0
+  remove_in: 1.58.0
+  choice: "a range or all"
+- name: crav1-complete-features
+  renamed_to: crav1-build-features
+  deprecated: true
+  since: 1.56.0
+  remove_in: 1.58.0
+- name: crav1-verify-spec
+  renamed_to: crav1-verify-build-against-spec
+  deprecated: true
+  since: 1.56.0
+  remove_in: 1.58.0
+- name: crav1-fix-from-verify
+  renamed_to: crav1-fix-build-gaps
+  deprecated: true
+  since: 1.56.0
+  remove_in: 1.58.0
+  choice: "verify report gaps"
+- name: crav1-fix-live
+  renamed_to: crav1-fix-build-gaps
+  deprecated: true
+  since: 1.56.0
+  remove_in: 1.58.0
+  choice: "live-site gaps"
+- name: crav1-match-dump-to-specs
+  renamed_to: crav1-add-to-spec
+  deprecated: true
+  since: 1.56.0
+  remove_in: 1.58.0
+  choice: "a dump"
+- name: crav1-code-into-specs
+  renamed_to: crav1-add-to-spec
+  deprecated: true
+  since: 1.56.0
+  remove_in: 1.58.0
+  choice: "a code change"
+- name: crav1-meeting-to-specs
+  renamed_to: crav1-add-to-spec
+  deprecated: true
+  since: 1.56.0
+  remove_in: 1.58.0
+  choice: "a meeting"
+- name: crav1-feature-candidates
+  renamed_to: crav1-ado-sync
+  deprecated: true
+  since: 1.56.0
+  remove_in: 1.58.0
+  choice: "suggest Features"
+- name: crav1-specs-to-ado
+  renamed_to: crav1-ado-sync
+  deprecated: true
+  since: 1.56.0
+  remove_in: 1.58.0
+  choice: "push Features"
+- name: crav1-tasks-to-ado
+  renamed_to: crav1-ado-sync
+  deprecated: true
+  since: 1.56.0
+  remove_in: 1.58.0
+  choice: "push tasks"
+- name: crav1-ado-to-tasks
+  renamed_to: crav1-ado-sync
+  deprecated: true
+  since: 1.56.0
+  remove_in: 1.58.0
+  choice: "pull tasks"
+- name: crav1-ado-to-specs
+  renamed_to: crav1-ado-sync
+  deprecated: true
+  since: 1.56.0
+  remove_in: 1.58.0
+  choice: "pull spec changes"
+- name: crav1-match-to-specs
+  renamed_to: crav1-existing-to-specs
+  deprecated: true
+  since: 1.56.0
+  remove_in: 1.58.0
+  choice: "repos plus a bundle (the second question is still asked)"
+- name: crav1-repos-to-spec
+  renamed_to: crav1-existing-to-specs
+  deprecated: true
+  since: 1.56.0
+  remove_in: 1.58.0
+  choice: "repos only, one spec"
+- name: crav1-intake-to-specs
+  renamed_to: crav1-bundle-to-specs
+  deprecated: true
+  since: 1.56.0
+  remove_in: 1.58.0
+- name: crav1-architecture-reviewer
+  renamed_to: crav1-review-architecture
+  deprecated: true
+  since: 1.56.0
+  remove_in: 1.58.0
+- name: crav1-resolve-questions
+  renamed_to: crav1-resolve-open-questions
+  deprecated: true
+  since: 1.56.0
+  remove_in: 1.58.0
+- name: crav1-ask-open-questions
+  renamed_to: crav1-show-or-ask-open-questions
+  deprecated: true
+  since: 1.56.0
+  remove_in: 1.58.0
+  choice: "ask"
+- name: crav1-draft-commit-message
+  renamed_to: crav1-finalize-commit
+  deprecated: true
+  since: 1.56.0
+  remove_in: 1.58.0
+  choice: "only write the message"
+- name: crav1-explain
+  renamed_to: crav1-explain-existing-system
+  deprecated: true
+  since: 1.56.0
+  remove_in: 1.58.0
+- name: crav1-whats-known-about
+  renamed_to: crav1-what-do-we-know-about-this
+  deprecated: true
+  since: 1.56.0
+  remove_in: 1.58.0
+- name: crav1-keep-current
+  renamed_to: crav1-refresh-system-notes
+  deprecated: true
+  since: 1.56.0
+  remove_in: 1.58.0
+- name: crav1-pipeline-environments
+  renamed_to: crav1-map-pipeline-environments
+  deprecated: true
+  since: 1.56.0
+  remove_in: 1.58.0
+- name: crav1-security-review
+  renamed_to: crav1-review-security
+  deprecated: true
+  since: 1.56.0
+  remove_in: 1.58.0
+- name: crav1-environment-read
+  renamed_to: crav1-read-environment
+  deprecated: true
+  since: 1.56.0
+  remove_in: 1.58.0
+- name: crav1-exploratory-test
+  renamed_to: crav1-run-exploratory-test
+  deprecated: true
+  since: 1.56.0
+  remove_in: 1.58.0
+- name: crav1-feature-branch
+  renamed_to: crav1-create-feature-branch
+  deprecated: true
+  since: 1.56.0
+  remove_in: 1.58.0
+
 subagents:
 - name: crav1-spec-reviewer-agent
   lane: specify

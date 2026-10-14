@@ -62,7 +62,7 @@ The more the kit records, the fewer reasons are inferred:
 
 ## Azure Boards
 
-It never reads Azure Boards (ADO). A task closed there but not ticked here still shows as not done. Run [`/crav1-ado-sync`](from-ado-to-tasks.md) to bring task states back.
+It never reads Azure Boards (ADO). A task closed there but not ticked here still shows as not done. Run [`/crav1-ado-sync`](from-ado-sync-pull-tasks.md) to bring task states back.
 
 ## What does not get written
 

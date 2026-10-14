@@ -32,10 +32,10 @@ Starters:
 
 - [From one sentence to a spec](from-nothing.md)
 - [From a pile of ideas to a spec](from-ideas.md)
-- [From intake files to specs](from-intake.md)
-- [From existing repos and a dump to specs](from-match.md)
-- [From named repos to an architecture spec](from-repos.md)
-- [From a named host](from-environment.md)
+- [From intake files to specs](from-bundle-to-specs.md)
+- [From existing repos and a dump to specs](from-existing-to-specs-with-bundle.md)
+- [From named repos to an architecture spec](from-existing-to-specs-repos-only.md)
+- [From a named host](from-read-environment.md)
 - [From a bug that already exists](from-fix-bug.md)
 
 The core loop, after a starter:
@@ -49,10 +49,10 @@ The core loop, after a starter:
 Once specs exist:
 
 - [From new information to an existing spec](from-add.md)
-- [From a later dump onto existing specs](from-match-dump.md)
-- [From a code change onto existing specs](from-code.md)
-- [From a meeting to specs](from-meeting.md)
-- [Ask open questions](from-ask-open-questions.md)
+- [From a later dump onto existing specs](from-add-to-spec-dump.md)
+- [From a code change onto existing specs](from-add-to-spec-code-change.md)
+- [From a meeting to specs](from-add-to-spec-meeting.md)
+- [Ask open questions](from-show-or-ask-open-questions.md)
 
 Find your way:
 
@@ -62,25 +62,25 @@ Find your way:
 
 Keep the picture current:
 
-- [From the system notes](from-explain.md)
-- [What's known about one thing](from-whats-known-about.md)
-- [Keep the picture current](from-keep-current.md)
-- [From Azure DevOps pipelines](from-pipeline-environments.md)
-- [From a security review](from-security.md)
+- [From the system notes](from-explain-existing-system.md)
+- [What's known about one thing](from-what-do-we-know-about-this.md)
+- [Keep the picture current](from-refresh-system-notes.md)
+- [From Azure DevOps pipelines](from-map-pipeline-environments.md)
+- [From a security review](from-review-security.md)
 
 Testing and review:
 
-- [From a built slice, exploratory test](from-exploratory-test.md)
+- [From a built slice, exploratory test](from-run-exploratory-test.md)
 - [From code that already exists, suggest tests](from-suggest-tests.md)
 - [From a pull request review](from-review-pr.md)
 
 Azure Boards:
 
-- [Feature candidates](from-feature-candidates.md)
-- [From specs to Azure Boards](from-specs-to-ado.md)
-- [From tasks to Azure Boards](from-tasks-to-ado.md)
-- [From Azure Boards to tasks](from-ado-to-tasks.md)
-- [From Azure Boards to specs](from-ado-to-specs.md)
+- [Feature candidates](from-ado-sync-suggest-features.md)
+- [From specs to Azure Boards](from-ado-sync-push-features.md)
+- [From tasks to Azure Boards](from-ado-sync-push-tasks.md)
+- [From Azure Boards to tasks](from-ado-sync-pull-tasks.md)
+- [From Azure Boards to specs](from-ado-sync-pull-spec-changes.md)
 
 Install:
 
@@ -108,9 +108,9 @@ Install:
 You turn ideas, meetings, and dumps into specs and keep them current.
 
 1. [First 15 minutes](first-run.md)
-2. A starter walkthrough: [one sentence](from-nothing.md), [a pile of ideas](from-ideas.md), or [intake files](from-intake.md)
-3. [From a draft spec to an accepted spec](from-draft-spec.md) and [Ask open questions](from-ask-open-questions.md)
-4. [From new information to an existing spec](from-add.md), [From a meeting to specs](from-meeting.md), [From a later dump onto existing specs](from-match-dump.md)
+2. A starter walkthrough: [one sentence](from-nothing.md), [a pile of ideas](from-ideas.md), or [intake files](from-bundle-to-specs.md)
+3. [From a draft spec to an accepted spec](from-draft-spec.md) and [Ask open questions](from-show-or-ask-open-questions.md)
+4. [From new information to an existing spec](from-add.md), [From a meeting to specs](from-add-to-spec-meeting.md), [From a later dump onto existing specs](from-add-to-spec-dump.md)
 5. [Data layout](concepts/data-layout.md) and [Data policy](concepts/data-policy.md)
 6. The Specify lane in the [skills reference](reference/skills.md#specify)
 
@@ -141,3 +141,40 @@ You change the kit itself.
 2. [Agent instructions for this repo](../AGENTS.md)
 3. [`skills.yaml`](reference/skills.yaml) and the generator `scripts/gen-skill-docs.py`
 4. [Changelog](../CHANGELOG.md)
+
+## Renamed skills (1.56.0)
+
+The old names still work until 1.58.0. Each one says it was renamed and hands off to the new skill, with its opening question already answered.
+
+| Old name | Now | Pre-answered choice |
+| --- | --- | --- |
+| `/crav1-implement-task` | [`/crav1-build-tasks`](reference/skills/crav1-build-tasks.md) | one task (the worker follows the implement branch) |
+| `/crav1-complete-task` | [`/crav1-build-tasks`](reference/skills/crav1-build-tasks.md) | one task |
+| `/crav1-complete-tasks` | [`/crav1-build-tasks`](reference/skills/crav1-build-tasks.md) | a range or all |
+| `/crav1-complete-features` | [`/crav1-build-features`](reference/skills/crav1-build-features.md) | — |
+| `/crav1-verify-spec` | [`/crav1-verify-build-against-spec`](reference/skills/crav1-verify-build-against-spec.md) | — |
+| `/crav1-fix-from-verify` | [`/crav1-fix-build-gaps`](reference/skills/crav1-fix-build-gaps.md) | verify report gaps |
+| `/crav1-fix-live` | [`/crav1-fix-build-gaps`](reference/skills/crav1-fix-build-gaps.md) | live-site gaps |
+| `/crav1-match-dump-to-specs` | [`/crav1-add-to-spec`](reference/skills/crav1-add-to-spec.md) | a dump |
+| `/crav1-code-into-specs` | [`/crav1-add-to-spec`](reference/skills/crav1-add-to-spec.md) | a code change |
+| `/crav1-meeting-to-specs` | [`/crav1-add-to-spec`](reference/skills/crav1-add-to-spec.md) | a meeting |
+| `/crav1-feature-candidates` | [`/crav1-ado-sync`](reference/skills/crav1-ado-sync.md) | suggest Features |
+| `/crav1-specs-to-ado` | [`/crav1-ado-sync`](reference/skills/crav1-ado-sync.md) | push Features |
+| `/crav1-tasks-to-ado` | [`/crav1-ado-sync`](reference/skills/crav1-ado-sync.md) | push tasks |
+| `/crav1-ado-to-tasks` | [`/crav1-ado-sync`](reference/skills/crav1-ado-sync.md) | pull tasks |
+| `/crav1-ado-to-specs` | [`/crav1-ado-sync`](reference/skills/crav1-ado-sync.md) | pull spec changes |
+| `/crav1-match-to-specs` | [`/crav1-existing-to-specs`](reference/skills/crav1-existing-to-specs.md) | repos plus a bundle (the second question is still asked) |
+| `/crav1-repos-to-spec` | [`/crav1-existing-to-specs`](reference/skills/crav1-existing-to-specs.md) | repos only, one spec |
+| `/crav1-intake-to-specs` | [`/crav1-bundle-to-specs`](reference/skills/crav1-bundle-to-specs.md) | — |
+| `/crav1-architecture-reviewer` | [`/crav1-review-architecture`](reference/skills/crav1-review-architecture.md) | — |
+| `/crav1-resolve-questions` | [`/crav1-resolve-open-questions`](reference/skills/crav1-resolve-open-questions.md) | — |
+| `/crav1-ask-open-questions` | [`/crav1-show-or-ask-open-questions`](reference/skills/crav1-show-or-ask-open-questions.md) | ask |
+| `/crav1-draft-commit-message` | [`/crav1-finalize-commit`](reference/skills/crav1-finalize-commit.md) | only write the message |
+| `/crav1-explain` | [`/crav1-explain-existing-system`](reference/skills/crav1-explain-existing-system.md) | — |
+| `/crav1-whats-known-about` | [`/crav1-what-do-we-know-about-this`](reference/skills/crav1-what-do-we-know-about-this.md) | — |
+| `/crav1-keep-current` | [`/crav1-refresh-system-notes`](reference/skills/crav1-refresh-system-notes.md) | — |
+| `/crav1-pipeline-environments` | [`/crav1-map-pipeline-environments`](reference/skills/crav1-map-pipeline-environments.md) | — |
+| `/crav1-security-review` | [`/crav1-review-security`](reference/skills/crav1-review-security.md) | — |
+| `/crav1-environment-read` | [`/crav1-read-environment`](reference/skills/crav1-read-environment.md) | — |
+| `/crav1-exploratory-test` | [`/crav1-run-exploratory-test`](reference/skills/crav1-run-exploratory-test.md) | — |
+| `/crav1-feature-branch` | [`/crav1-create-feature-branch`](reference/skills/crav1-create-feature-branch.md) | — |

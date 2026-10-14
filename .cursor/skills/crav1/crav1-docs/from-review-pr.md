@@ -104,7 +104,7 @@ Follow-ups are suggestions, and choices the description calls deliberate. They a
 
 The chat review still lists them, then says where they were saved. They go into one note in `docs/notes/` of the specs repo, in the usual notes format: `docs/notes/review-pr-<n>-follow-ups.md`, or `docs/notes/review-pr-<repo>-<n>-follow-ups.md` when two repos in the specs repo have the same pull request number. The note names the pull request, the repo, the date, and each follow-up with its file and line. The paths stay, because the note stays in the specs repo. The note gets an `open` row in `docs/notes/index.md`.
 
-A re-review of the same pull request updates that note instead of writing a second one: it changes the date, adds new follow-ups, and marks one the code now addresses `(done in <short sha>)`. It removes no line. A review with no follow-ups writes no note. The follow-ups come back through the existing note flow: [`/crav1-ado-sync`](from-feature-candidates.md) reads open notes, and the spec that takes one marks it Used by, or Absorbed by. The note is not committed; `/crav1-finalize-commit` does that.
+A re-review of the same pull request updates that note instead of writing a second one: it changes the date, adds new follow-ups, and marks one the code now addresses `(done in <short sha>)`. It removes no line. A review with no follow-ups writes no note. The follow-ups come back through the existing note flow: [`/crav1-ado-sync`](from-ado-sync-suggest-features.md) reads open notes, and the spec that takes one marks it Used by, or Absorbed by. The note is not committed; `/crav1-finalize-commit` does that.
 
 ## What does not get written
 

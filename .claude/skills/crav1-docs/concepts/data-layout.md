@@ -208,6 +208,10 @@ The kit finds these headings by name. Keep the names when you edit by hand.
 | `## Dismissed test suggestions` | `spec.md` | Suggestions dismissed in `/crav1-suggest-tests-for-code`. Not acceptance and not a task |
 | `## Linter` | `plan.md` | The linter or checker the build must leave green, or a line that there is none |
 | `## Left as committed` | `plan.md` | Built pieces you chose to leave. Not offered again unless you say so |
-| `## How the parts connect`, `## Feature index` | `docs/system/landscape.md` | The picture. Keep-current adds lines. Explain compares them |
-| `## Left out`, `## Dismissed` | `docs/architecture/left-out.md` | Repos-to-spec and read-environment |
+| `## How the parts connect`, `## Feature index` | `docs/system/landscape.md` | The picture. Refresh-system-notes adds lines. Explain-existing-system compares them |
+| `## Left out`, `## Dismissed` | `docs/architecture/left-out.md` | Existing-to-specs and read-environment |
 | `## Used by` | a note in `docs/notes/` | Which specs quote the note |
+
+## Renamed skills (1.56.0)
+
+The files above did not move. Only the skills that write them were renamed. The old names still run as aliases until 1.58.0; the [renamed skills](../reference/skills.md#renamed-skills) table maps each old name to the new one. A merged skill keeps each old skill's rules in `.cursor/skills/crav1/<skill>/branches/<id>/BRANCH.md`.

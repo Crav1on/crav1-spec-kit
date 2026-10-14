@@ -2,7 +2,7 @@
 
 `/crav1-read-environment` reads `docs/environments/marks.md` in the project repo after the resource name, the group, and the tags. It creates that folder and file only when the user has confirmed at least one mark. It appends those lines. It never rewrites an existing line.
 
-`/crav1-map-pipeline-environments` appends a confirmed pipeline line to that same file. The walkthrough is [from-pipeline-environments.md](from-pipeline-environments.md). `/crav1-read-environment` does not run that command. It uses a pipeline line that is already there.
+`/crav1-map-pipeline-environments` appends a confirmed pipeline line to that same file. The walkthrough is [from-map-pipeline-environments.md](from-map-pipeline-environments.md). `/crav1-read-environment` does not run that command. It uses a pipeline line that is already there.
 
 ## Line
 
@@ -59,6 +59,6 @@ The lines are kept per work item home, one pair per project. A line without `(<p
 
 ## Azure DevOps org and project
 
-This file keeps the Azure DevOps org. The project it names is only a fallback: the suggestion when a repo's work item home is asked, and the home of an older `work-item.md` line with no `(ADO: …)` tag. Each repo's own home is the **Work items go to** column in `docs/system/repos.md`. See [From specs to Azure Boards](from-specs-to-ado.md#work-item-homes).
+This file keeps the Azure DevOps org. The project it names is only a fallback: the suggestion when a repo's work item home is asked, and the home of an older `work-item.md` line with no `(ADO: …)` tag. Each repo's own home is the **Work items go to** column in `docs/system/repos.md`. See [From specs to Azure Boards](from-ado-sync-push-features.md#work-item-homes).
 
-They are not environment marks. Later runs of that command read them and do not ask again. When only the type line is there, the next run reads the done state and appends its line without asking. Edit a line to change it. `/crav1-ado-sync` reads the done-state line too. See [From tasks to Azure Boards](from-tasks-to-ado.md).
+They are not environment marks. Later runs of that command read them and do not ask again. When only the type line is there, the next run reads the done state and appends its line without asking. Edit a line to change it. `/crav1-ado-sync` reads the done-state line too. See [From tasks to Azure Boards](from-ado-sync-push-tasks.md).

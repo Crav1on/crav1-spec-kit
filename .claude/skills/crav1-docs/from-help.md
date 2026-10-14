@@ -4,7 +4,7 @@ Kit not in this project yet? [Install first](install.md) (Cursor and Claude Code
 
 Use this when you want to know what to run next, in what order, or what one command does. `/crav1-help` answers from the kit's own docs for the version you have installed, and every answer names the file it came from.
 
-This is cross-cutting. It is not its own lane. It writes nothing and runs no other command. It is not [`/crav1-explain-existing-system`](from-explain.md), which reads your product's `docs/system/`.
+This is cross-cutting. It is not its own lane. It writes nothing and runs no other command. It is not [`/crav1-explain-existing-system`](from-explain-existing-system.md), which reads your product's `docs/system/`.
 
 ## First prompt
 

@@ -6,7 +6,7 @@ Use this when you have **more than a spark**: several ideas, maybe UX notes, may
 
 You still do **not** start by coding. You add an architecture interview and you write diagrams + ADRs. The canonical file remains `spec.md`. Formats are exports. The layout always includes `docs/system/`. This command seeds a thin landscape when that folder is missing (greenfield or an existing app), then writes the spec artifacts, then adds one index row. It fills that landscape from the repo already in front of the agent. When the landscape already exists, this command adds one index row (a repo or ADR row only when the feature needs a new repo) and adds what is new to the picture. Lines already there stay as they are. A missing `glossary.md` is written. An existing glossary gets only new rows for words that are not already listed. Existing rows are not rewritten. A meaning the source does not state is `to be researched`. That same pass adds what is new to the short description, the diagram, and how the parts connect. It does not rewrite what is already there.
 
-Spark-only (greenfield or one feature on an existing app)? Use [from-nothing](from-nothing.md) and `/crav1-spark-to-spec` instead. Mixed files or several features/repos? Use [from-intake](from-intake.md) and `/crav1-bundle-to-specs`. If this pile is clearly more than one v0 slice or more than one repo, `/crav1-ideas-to-spec` will stop and send you there.
+Spark-only (greenfield or one feature on an existing app)? Use [from-nothing](from-nothing.md) and `/crav1-spark-to-spec` instead. Mixed files or several features/repos? Use [from-intake](from-bundle-to-specs.md) and `/crav1-bundle-to-specs`. If this pile is clearly more than one v0 slice or more than one repo, `/crav1-ideas-to-spec` will stop and send you there.
 
 ## First prompt
 
@@ -213,7 +213,7 @@ Do not change spec.md.
 
 To link commits and the pull request to an Azure Boards work item, `docs/specs/<slug>/work-item.md` holds one id per line. A line may name the milestone or slice: `Work item: 52` or `Work item: 81 — October billing`. A file with one unlabeled line is the old format and is still read. The commented starter is [docs/specs/_template/work-item.md](specs/_template/work-item.md). Leave the ids out of `tasks.md`.
 
-On an Azure Repos remote (`dev.azure.com` or `*.visualstudio.com`), `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, and `/crav1-bundle-to-specs` ask once after they create a new spec folder. The question is optional: reply with the id, or skip. Intake lists every new slug in that one question so the user can give an id per slug. A reply writes one line per id. Skip writes nothing and does not ask again in that run. GitHub and other hosts are not asked. Those skills do not create the Feature. Creating a Feature is [`/crav1-ado-sync`](from-specs-to-ado.md).
+On an Azure Repos remote (`dev.azure.com` or `*.visualstudio.com`), `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, and `/crav1-bundle-to-specs` ask once after they create a new spec folder. The question is optional: reply with the id, or skip. Intake lists every new slug in that one question so the user can give an id per slug. A reply writes one line per id. Skip writes nothing and does not ask again in that run. GitHub and other hosts are not asked. Those skills do not create the Feature. Creating a Feature is [`/crav1-ado-sync`](from-ado-sync-push-features.md).
 
 The commit mention picks the line whose label matches the slice being worked. If that match is unclear, the commit skills ask. They do not guess.
 

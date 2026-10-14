@@ -2,7 +2,7 @@
 
 # /crav1-map-pipeline-environments
 
-[All skills](../skills.md) · Walkthrough: [From Azure DevOps pipelines](../../from-pipeline-environments.md) · Playbook: [`SKILL.md`](../../../.cursor/skills/crav1/crav1-map-pipeline-environments/SKILL.md)
+[All skills](../skills.md) · Walkthrough: [From Azure DevOps pipelines](../../from-map-pipeline-environments.md) · Playbook: [`SKILL.md`](../../../.cursor/skills/crav1/crav1-map-pipeline-environments/SKILL.md)
 
 ## Purpose
 
@@ -58,4 +58,4 @@ Read the pipeline definitions. Do not run a pipeline. Do not guess the org.
 
 ## Walkthrough
 
-Step by step: [From Azure DevOps pipelines](../../from-pipeline-environments.md).
+Step by step: [From Azure DevOps pipelines](../../from-map-pipeline-environments.md).

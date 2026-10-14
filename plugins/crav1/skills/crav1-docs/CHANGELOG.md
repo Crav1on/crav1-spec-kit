@@ -4,6 +4,68 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 
 ## Unreleased
 
+## 1.56.0 (2026-10-14)
+
+Skill names now say what each skill does, and related skills are merged. Old names keep working as aliases until 1.58.0.
+
+### Kit
+
+- Merged skills open with a question with options, not flags. The question is skipped when the message already answers it, and an old alias jumps straight to its choice. Each old skill's rules are kept verbatim as `branches/<id>/BRANCH.md` inside the merged skill.
+- `/crav1-build-tasks` always runs each task in a worker. It asks one task, a range, or all, lists the ready ones, and ends at `/crav1-open-pr`.
+- `/crav1-show-or-ask-open-questions` has a new read-only Show: every open question across the specs, with Asked, Pending, and who.
+- `/crav1-finalize-commit` asks commit, or only write the message.
+- Starter options are now six: `/crav1-existing-to-specs` covers repos only and repos plus a bundle.
+- Subagents: `crav1-complete-task-agent` → `crav1-build-task-agent`, `crav1-architecture-reviewer-agent` → `crav1-review-architecture-agent`, `crav1-intake-slice-agent` → `crav1-bundle-slice-agent`.
+- `plugins/crav1/.cursor-plugin/plugin.json` is 1.56.0.
+
+| Old name | New name | Alias pre-answers |
+| --- | --- | --- |
+| `/crav1-implement-task` | `/crav1-build-tasks` | one task (the worker follows the implement branch) |
+| `/crav1-complete-task` | `/crav1-build-tasks` | one task |
+| `/crav1-complete-tasks` | `/crav1-build-tasks` | a range or all |
+| `/crav1-complete-features` | `/crav1-build-features` | — |
+| `/crav1-verify-spec` | `/crav1-verify-build-against-spec` | — |
+| `/crav1-fix-from-verify` | `/crav1-fix-build-gaps` | verify report gaps |
+| `/crav1-fix-live` | `/crav1-fix-build-gaps` | live-site gaps |
+| `/crav1-match-dump-to-specs` | `/crav1-add-to-spec` | a dump |
+| `/crav1-code-into-specs` | `/crav1-add-to-spec` | a code change |
+| `/crav1-meeting-to-specs` | `/crav1-add-to-spec` | a meeting |
+| `/crav1-feature-candidates` | `/crav1-ado-sync` | suggest Features |
+| `/crav1-specs-to-ado` | `/crav1-ado-sync` | push Features |
+| `/crav1-tasks-to-ado` | `/crav1-ado-sync` | push tasks |
+| `/crav1-ado-to-tasks` | `/crav1-ado-sync` | pull tasks |
+| `/crav1-ado-to-specs` | `/crav1-ado-sync` | pull spec changes |
+| `/crav1-match-to-specs` | `/crav1-existing-to-specs` | repos plus a bundle (the second question is still asked) |
+| `/crav1-repos-to-spec` | `/crav1-existing-to-specs` | repos only, one spec |
+| `/crav1-intake-to-specs` | `/crav1-bundle-to-specs` | — |
+| `/crav1-architecture-reviewer` | `/crav1-review-architecture` | — |
+| `/crav1-resolve-questions` | `/crav1-resolve-open-questions` | — |
+| `/crav1-ask-open-questions` | `/crav1-show-or-ask-open-questions` | ask |
+| `/crav1-draft-commit-message` | `/crav1-finalize-commit` | only write the message |
+| `/crav1-explain` | `/crav1-explain-existing-system` | — |
+| `/crav1-whats-known-about` | `/crav1-what-do-we-know-about-this` | — |
+| `/crav1-keep-current` | `/crav1-refresh-system-notes` | — |
+| `/crav1-pipeline-environments` | `/crav1-map-pipeline-environments` | — |
+| `/crav1-security-review` | `/crav1-review-security` | — |
+| `/crav1-environment-read` | `/crav1-read-environment` | — |
+| `/crav1-exploratory-test` | `/crav1-run-exploratory-test` | — |
+| `/crav1-feature-branch` | `/crav1-create-feature-branch` | — |
+
+Unchanged: spark-to-spec, ideas-to-spec, tighten-spec, plan-from-spec, review-plan, tighten-plan, fix-bug, help, tasks-ready-to-build, export-spec, suggest-tests-for-code, open-pr, review-pr, merge-pr. `/crav1-add-to-spec` keeps its name and is the fact choice.
+
+### Alias removal plan
+
+- 1.56.0 and 1.57.0: every old name is a deprecated alias (`aliases` in `skills.yaml`, `deprecated: true`). It says it was renamed and hands off.
+- 1.58.0 (breaking): the alias folders and the walkthrough redirect notes are removed. Update saved prompts, rules, and scripts to the new names before then.
+
+### Docs
+
+- Walkthroughs renamed to the new names, with a redirect note at each old path. Glossary (alias, branch, opening question), data layout, guild routing, the README skills table, CONTRIBUTING.md item 9, `kit-maintainer.mdc`, and `/crav1-help` (an old name, or `help renamed`) are updated. The skills reference has a Renamed skills table.
+
+### CI
+
+- `scripts/gen-skill-docs.py --check` validates every alias: `deprecated: true`, `remove_in`, a real `renamed_to`, `disable-model-invocation: true`, and a hand-off line.
+
 ## 1.55.0 (2026-10-14)
 
 ### Kit

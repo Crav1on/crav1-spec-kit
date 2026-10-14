@@ -2,7 +2,7 @@
 
 # /crav1-existing-to-specs
 
-[All skills](../skills.md) · Walkthrough: [From existing repos and a dump to specs](../../from-match.md) · Playbook: [`SKILL.md`](../../../.cursor/skills/crav1/crav1-existing-to-specs/SKILL.md)
+[All skills](../skills.md) · Walkthrough: [From existing repos and a dump to specs](../../from-existing-to-specs-with-bundle.md) · Playbook: [`SKILL.md`](../../../.cursor/skills/crav1/crav1-existing-to-specs/SKILL.md)
 
 ## Purpose
 
@@ -68,4 +68,4 @@ Do not write code. Ask where the specs go, then map, and stop.
 
 ## Walkthrough
 
-Step by step: [From existing repos and a dump to specs](../../from-match.md).
+Step by step: [From existing repos and a dump to specs](../../from-existing-to-specs-with-bundle.md).

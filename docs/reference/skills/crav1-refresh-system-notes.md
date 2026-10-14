@@ -2,7 +2,7 @@
 
 # /crav1-refresh-system-notes
 
-[All skills](../skills.md) · Walkthrough: [Keep the picture current](../../from-keep-current.md) · Playbook: [`SKILL.md`](../../../.cursor/skills/crav1/crav1-refresh-system-notes/SKILL.md)
+[All skills](../skills.md) · Walkthrough: [Keep the picture current](../../from-refresh-system-notes.md) · Playbook: [`SKILL.md`](../../../.cursor/skills/crav1/crav1-refresh-system-notes/SKILL.md)
 
 ## Purpose
 
@@ -32,7 +32,7 @@ Writes new lines on the short description, the context diagram, and how the part
 
 Leaves existing picture lines, glossary rows, design, and build alone.
 
-Limits and exceptions: spark, ideas, intake, match, match-dump, and add-to-spec run this picture update on the pass that appends a glossary row. Repos-to-spec updates the picture in its own pass. Complete-features, fix-bug, fix-build-gaps, read-environment, and the add-to-spec handoffs from read-environment and suggest-tests-for-code may ask and do not run this command. Implement-task and build-tasks do not ask. It does not commit a cleared research mark.
+Limits and exceptions: spark, ideas, intake, match, match-dump, and add-to-spec run this picture update on the pass that appends a glossary row. Existing-to-specs updates the picture in its own pass. Build-features, fix-bug, fix-build-gaps, read-environment, and the add-to-spec handoffs from read-environment and suggest-tests-for-code may ask and do not run this command. Build-tasks and build-tasks do not ask. It does not commit a cleared research mark.
 
 ## You run next / Runs by itself
 
@@ -59,4 +59,4 @@ Add what the specs already state to the picture. Do not rewrite what is already 
 
 ## Walkthrough
 
-Step by step: [Keep the picture current](../../from-keep-current.md).
+Step by step: [Keep the picture current](../../from-refresh-system-notes.md).

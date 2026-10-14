@@ -2,7 +2,7 @@
 
 # /crav1-show-or-ask-open-questions
 
-[All skills](../skills.md) · Walkthrough: [Ask open questions](../../from-ask-open-questions.md) · Playbook: [`SKILL.md`](../../../.cursor/skills/crav1/crav1-show-or-ask-open-questions/SKILL.md)
+[All skills](../skills.md) · Walkthrough: [Ask open questions](../../from-show-or-ask-open-questions.md) · Playbook: [`SKILL.md`](../../../.cursor/skills/crav1/crav1-show-or-ask-open-questions/SKILL.md)
 
 ## Purpose
 
@@ -57,4 +57,4 @@ The open questions for <a person, one spec, or a topic>, as a mail.
 
 ## Walkthrough
 
-Step by step: [Ask open questions](../../from-ask-open-questions.md).
+Step by step: [Ask open questions](../../from-show-or-ask-open-questions.md).

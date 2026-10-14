@@ -2,7 +2,7 @@
 
 # /crav1-run-exploratory-test
 
-[All skills](../skills.md) · Walkthrough: [From a built slice, exploratory test](../../from-exploratory-test.md) · Playbook: [`SKILL.md`](../../../.cursor/skills/crav1/crav1-run-exploratory-test/SKILL.md)
+[All skills](../skills.md) · Walkthrough: [From a built slice, exploratory test](../../from-run-exploratory-test.md) · Playbook: [`SKILL.md`](../../../.cursor/skills/crav1/crav1-run-exploratory-test/SKILL.md)
 
 ## Purpose
 
@@ -58,4 +58,4 @@ Use the slice once, then again with randomness. Write down bugs. Do not start Sp
 
 ## Walkthrough
 
-Step by step: [From a built slice, exploratory test](../../from-exploratory-test.md).
+Step by step: [From a built slice, exploratory test](../../from-run-exploratory-test.md).

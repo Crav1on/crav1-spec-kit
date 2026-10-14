@@ -2,7 +2,7 @@
 
 # /crav1-bundle-to-specs
 
-[All skills](../skills.md) · Walkthrough: [From intake files to specs](../../from-intake.md) · Playbook: [`SKILL.md`](../../../.cursor/skills/crav1/crav1-bundle-to-specs/SKILL.md)
+[All skills](../skills.md) · Walkthrough: [From intake files to specs](../../from-bundle-to-specs.md) · Playbook: [`SKILL.md`](../../../.cursor/skills/crav1/crav1-bundle-to-specs/SKILL.md)
 
 ## Purpose
 
@@ -63,4 +63,4 @@ Do not write code. Map first, then landscape, then one spec per v0 slug.
 
 ## Walkthrough
 
-Step by step: [From intake files to specs](../../from-intake.md).
+Step by step: [From intake files to specs](../../from-bundle-to-specs.md).
