@@ -10,10 +10,10 @@ When you ask for startup options, these six are the only ways in. That ask names
 | --- | --- |
 | `/crav1-spark-to-spec` | One or two sentences |
 | `/crav1-ideas-to-spec` | A pile of ideas and technical hunches |
-| `/crav1-intake-to-specs` | Mixed files, or more than one v0 feature |
+| `/crav1-bundle-to-specs` | Mixed files, or more than one v0 feature |
 | `/crav1-existing-to-specs` | Existing repos plus a dump to match |
 | `/crav1-existing-to-specs` | You name the repos. It runs only then |
-| `/crav1-environment-read` | You name the host. It runs only then |
+| `/crav1-read-environment` | You name the host. It runs only then |
 | `/crav1-fix-bug` | You name a real bug that already exists. It runs only then |
 
 The steps below are one thin path: a spark through one task. Pick another row in the table when that is the work in front of you.
@@ -51,7 +51,7 @@ On an existing app, `@` the code and say it is a feature on this app. Answer the
 
 ## 5. Tighten
 
-`/crav1-tighten-spec` walks one issue at a time. When the slice is partial or `## In the code` names paths, it reads the committed code on the repo and branch the spec names before wording issues. A spec with no code behind it skips that read. Then `/crav1-resolve-questions` for leftover Open questions the user still cares about.
+`/crav1-tighten-spec` walks one issue at a time. When the slice is partial or `## In the code` names paths, it reads the committed code on the repo and branch the spec names before wording issues. A spec with no code behind it skips that read. Then `/crav1-resolve-open-questions` for leftover Open questions the user still cares about.
 
 ## 6. Plan
 
@@ -69,7 +69,7 @@ The starter options are the six above. Asking for startup options names only the
 | --- | --- |
 | Why this loop | [The method](concepts/method.md) |
 | The loop step by step | [From a draft spec to an accepted spec](from-draft-spec.md) → [From a spec to a plan](from-spec-to-plan.md) → [Build tasks](from-plan-to-build.md) → [Verify and fix](from-verify.md) → [From commit to merge](from-commit.md) |
-| Prove a slice | `/crav1-verify-spec` |
+| Prove a slice | `/crav1-verify-build-against-spec` |
 | Push and open a pull request | `/crav1-open-pr` (after commits exist; does not merge; may name `/crav1-review-pr` and does not run it) |
 | Merge a named pull request | `/crav1-merge-pr` (only when that turn asks; merge commit only; does not run the review) |
 | Any other situation: a walkthrough for each starter and later skill | [Docs index](README.md#how-to-walkthroughs) |

@@ -6,9 +6,9 @@ Use this when the user asks about **one feature, slice, resource, or not-yet-fea
 
 This is cross-cutting. It is not its own lane. It may run from any lane. It does not move work into Specify, Plan, or Build. It does not start those lanes.
 
-It is a later skill. It is not a starter option. When the user asks for startup options, that ask names only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-existing-to-specs`, `/crav1-environment-read`, and `/crav1-fix-bug`. It does not run this command. The six starter options stay unchanged.
+It is a later skill. It is not a starter option. When the user asks for startup options, that ask names only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs`, `/crav1-read-environment`, and `/crav1-fix-bug`. It does not run this command. The six starter options stay unchanged.
 
-[Explain](from-explain.md) (`/crav1-explain`) reads `docs/system/` first. When the picture has nothing on the question, it quotes the first paragraph of a matching spec, labelled as coming from the spec, and names this command. It does not run this command. This command is the one feature. It reads the specs first.
+[Explain](from-explain.md) (`/crav1-explain-existing-system`) reads `docs/system/` first. When the picture has nothing on the question, it quotes the first paragraph of a matching spec, labelled as coming from the spec, and names this command. It does not run this command. This command is the one feature. It reads the specs first.
 
 The command writes nothing. It does not run another skill. It may name one.
 
@@ -17,7 +17,7 @@ The command writes nothing. It does not run another skill. It may name one.
 New chat. Name the thing, or `@` a spec folder or a code folder.
 
 ```text
-/crav1-whats-known-about
+/crav1-what-do-we-know-about-this
 
 What's the status of <the feature, slice, or resource>? What's pending?
 ```
@@ -25,7 +25,7 @@ What's the status of <the feature, slice, or resource>? What's pending?
 One folder:
 
 ```text
-/crav1-whats-known-about
+/crav1-what-do-we-know-about-this
 @docs/specs/<slug>/
 ```
 
@@ -67,10 +67,10 @@ When there is no slice, the answer names one next command. This command does not
 
 - One or two sentences: `/crav1-spark-to-spec`
 - A pile of ideas and technical hunches: `/crav1-ideas-to-spec`
-- Several features, or mixed files: `/crav1-intake-to-specs`
+- Several features, or mixed files: `/crav1-bundle-to-specs`
 
 When nothing is written down, it names those three.
 
-Production follows `/crav1-environment-read`: shape and connections only, after the same yes or no. A no leaves that resource unread. This command does not run the environment read.
+Production follows `/crav1-read-environment`: shape and connections only, after the same yes or no. A no leaves that resource unread. This command does not run the environment read.
 
-Reference page: [whats-known-about](reference/skills/crav1-whats-known-about.md)
+Reference page: [what-do-we-know-about-this](reference/skills/crav1-what-do-we-know-about-this.md)

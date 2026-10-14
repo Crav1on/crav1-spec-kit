@@ -1,6 +1,6 @@
 ---
 name: crav1-tighten-spec
-description: Walk an existing spec issue-by-issue. When the slice is partial or In the code names paths, read that repo and branch first and treat the committed code as fact. For every finding (including architecture-reviewer notes), offer explained resolution choices (including get a suggestion) and wait; patch only that issue after a pick. Use when spec.md exists and needs tightening. Do not write application code. Do not offer finish, add a test, or leave.
+description: Walk an existing spec issue-by-issue. When the slice is partial or In the code names paths, read that repo and branch first and treat the committed code as fact. For every finding (including review-architecture notes), offer explained resolution choices (including get a suggestion) and wait; patch only that issue after a pick. Use when spec.md exists and needs tightening. Do not write application code. Do not offer finish, add a test, or leave.
 disable-model-invocation: true
 icon: book-open
 color: cyan
@@ -20,7 +20,7 @@ Use the spec the user @-mentions. Otherwise the most recently edited file under 
 
 Read `spec.md` and note `diagrams.md`, `adr/`, `tasks.md`, `export/`.
 
-Also read the latest **crav1-architecture-reviewer-agent** / **crav1-spec-reviewer-agent** output in this chat if present. Those findings become issues. Do not collapse them into one “apply reviewer notes” action.
+Also read the latest **crav1-review-architecture-agent** / **crav1-spec-reviewer-agent** output in this chat if present. Those findings become issues. Do not collapse them into one “apply reviewer notes” action.
 
 ## Read committed code first
 
@@ -164,6 +164,6 @@ All remaining issues resolved **and**:
 
 Then stop the issue walk.
 
-If **Open questions** (or unresolved assumptions) remain, the next command is `/crav1-resolve-questions` — not Plan Mode. That skill walks each question with keep-open vs answer.
+If **Open questions** (or unresolved assumptions) remain, the next command is `/crav1-resolve-open-questions` — not Plan Mode. That skill walks each question with keep-open vs answer.
 
 If the open-question list is empty, tell them: `/crav1-plan-from-spec`, or a new chat in Plan Mode (`Shift+Tab`) with `spec.md` attached. Optional: `crav1-spec-reviewer-agent` once, not as a substitute for unfinished `I#`s or `Q#`s.

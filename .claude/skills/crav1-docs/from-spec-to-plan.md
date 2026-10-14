@@ -28,7 +28,7 @@ The spec is accepted. Write plan.md and tasks.md. Do not write code.
 
 Treat the plan as a design review. Wrong files, missing constraints, and oversized tasks are cheaper to fix here than after a large diff. A task that cannot be verified is not ready to build.
 
-On a `spec/<slug>` branch, do not build. Merge that branch first, then `/crav1-feature-branch` to `feat/<slug>`.
+On a `spec/<slug>` branch, do not build. Merge that branch first, then `/crav1-create-feature-branch` to `feat/<slug>`.
 
 ## What gets written
 

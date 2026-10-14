@@ -2,7 +2,7 @@
 
 An open question on a spec can be asked of someone outside the kit, by mail, in a meeting, or in a chat. This file is how the kit records that a question was asked or is pending, how it links an answer that comes back in an import, and how it takes the asked-on date from the source.
 
-`/crav1-show-or-ask-open-questions` writes the asked and pending marks after the user picks. `/crav1-add-to-spec` follow this file when they import a mail, a transcript, minutes, or a chat. `/crav1-resolve-questions` reads the answer links. None of them sends anything. None of them commits.
+`/crav1-show-or-ask-open-questions` writes the asked and pending marks after the user picks. `/crav1-add-to-spec` follow this file when they import a mail, a transcript, minutes, or a chat. `/crav1-resolve-open-questions` reads the answer links. None of them sends anything. None of them commits.
 
 ## Where the records live
 
@@ -19,7 +19,7 @@ An open question is a bullet, or a numbered item, under `## Open questions` in `
 - `<who>` is the person or group the user named. `<channel>` is `mail`, `meeting agenda`, `chat`, or `meeting questions`.
 - `Question <n>` is the number the question had in that draft. It helps match "about question 3" in a reply. It is not shown as a spec id to anyone.
 - A question has at most one `Pending:` line and at most one `Asked:` line per person. A later mark for the same person replaces the earlier line. A question asked of two people keeps one line per person.
-- `Blocks:` names the tasks in `tasks.md` that wait on this question. `/crav1-resolve-questions` writes it after a keep-open pick, and `/crav1-plan-from-spec` writes it for a kept-open question it parks as a risk. At most one `Blocks:` line per question; a new one replaces it. No `Blocks:` line means the question blocks the whole slice for `/crav1-tasks-ready-to-build`. Remove the line when the question is answered.
+- `Blocks:` names the tasks in `tasks.md` that wait on this question. `/crav1-resolve-open-questions` writes it after a keep-open pick, and `/crav1-plan-from-spec` writes it for a kept-open question it parks as a risk. At most one `Blocks:` line per question; a new one replaces it. No `Blocks:` line means the question blocks the whole slice for `/crav1-tasks-ready-to-build`. Remove the line when the question is answered.
 - `Answered:` keeps the source's words. Do not paraphrase. When there is no source folder, end with `Source: <kind> <date>` or `Source: <kind>`.
 
 ## Asked, no, or pending
@@ -52,7 +52,7 @@ When a skill imports a mail, a transcript, minutes, or a chat, read every `## Op
 
 - **Clear answer.** The item states the fact or the decision the question asks for. Link it without a separate keep question. In `/crav1-add-to-spec` it is not asked. In `/crav1-add-to-spec` it is linked with the confirmed sort. Write `Answered:` under the question, with the date, who, the kind, the quote, and the source. Follow the imported-sources check in [sources.md](sources.md) first, so the quote is the one after any redaction. The question stays under `## Open questions` with its answer linked. It is marked answered. It is not folded into requirements here.
 - **Unclear or partial.** The item only might answer, answers part, or is hedged ("probably", "I think", "need to check"). Show it as a possible answer, quote and question together. Do not write `Answered:`. The question stays open. The item still goes through the import skill's own keep, leave, or note path.
-- **Changes a spec line.** When the linked answer would change a requirement, an acceptance line, a constraint, or another spec line, do not change that line here. Name `/crav1-resolve-questions` for that slug. Do not run it.
+- **Changes a spec line.** When the linked answer would change a requirement, an acceptance line, a constraint, or another spec line, do not change that line here. Name `/crav1-resolve-open-questions` for that slug. Do not run it.
 - **Settles a stale research point.** When the question is one a stale research point waits on, the existing re-check in [research-stale.md](research-stale.md) runs. It does not ask the user.
 
 A link is one quote for one question. One item that clearly answers two questions links to both. Two items that answer one question are both linked, each on its own `Answered:` line.
@@ -74,12 +74,12 @@ The import skill's end-of-run summary lists:
 - each answer linked: the question, the spec, and the source
 - each possible answer shown and left open
 - each asked mark written or updated, with the date and where it came from
-- each `/crav1-resolve-questions` named, and for which slug
+- each `/crav1-resolve-open-questions` named, and for which slug
 
 ## Do not
 
 - Do not send, post, or reply to anything.
 - Do not rewrite the question text.
-- Do not remove an answered question from `## Open questions`. `/crav1-resolve-questions` does that when the user picks.
+- Do not remove an answered question from `## Open questions`. `/crav1-resolve-open-questions` does that when the user picks.
 - Do not show a spec slug, a spec path, or a `Q#` id in drafted text that goes to another person.
 - Do not commit.

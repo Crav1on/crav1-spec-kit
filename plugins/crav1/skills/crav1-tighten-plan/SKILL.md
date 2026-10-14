@@ -58,13 +58,13 @@ Typical **plan** shapes:
 
 Skip nitpicks. Merge duplicates. Prefer fewer sharp issues.
 
-If **no plan issues** remain (spec-tagged ones only, or none): say so. Next: spec-tagged → `/crav1-tighten-spec` / `/crav1-resolve-questions`; else **new chat**, `/crav1-build-tasks` with `plan.md`, `tasks.md`, and `spec.md` attached.
+If **no plan issues** remain (spec-tagged ones only, or none): say so. Next: spec-tagged → `/crav1-tighten-spec` / `/crav1-resolve-open-questions`; else **new chat**, `/crav1-build-tasks` with `plan.md`, `tasks.md`, and `spec.md` attached.
 
 When `## Linter` says this repo has no linter or checker for the code the tasks will touch, do not name those Build commands. Stop before Build. The user decides to add the linter or to go on without one. Do not install one. When they already chose to go on without one in this turn, the Build next step applies, and the plan still says none. A plan that already says none is not a `P#` by itself.
 
 ## Walk one issue at a time
 
-Walk **plan**-tagged `P#`s here. When the current item is **spec**-tagged: do not offer plan patches. Tell them `/crav1-tighten-spec` or `/crav1-resolve-questions` for that finding, mark it skipped-for-plan, advance.
+Walk **plan**-tagged `P#`s here. When the current item is **spec**-tagged: do not offer plan patches. Tell them `/crav1-tighten-spec` or `/crav1-resolve-open-questions` for that finding, mark it skipped-for-plan, advance.
 
 ### Index (every turn, short)
 
@@ -114,7 +114,7 @@ Do not start the next issue’s patch in the same turn unless they batched.
 | `retarget-files` | Fix files likely touched | Correct paths; mark `(proposed)` if no repo. Do not invent a new architecture. | `plan.md` Files section. |
 | `name-linter` | Name the linter | Search the repo. When it has a linter or checker for the code the tasks will touch, name the tool and the command under `## Linter`, and say Build leaves that check green. When it does not, write that. Do not install one. | `plan.md` Linter section. |
 | `park-risk` | Park as risk | Plan was treating a kept-open question as decided. Remove that decision from tasks; list it under Risks. | No silent product answer. |
-| `send-to-spec` | Send to spec | This is a spec defect or a new product question. Do not patch the plan. | No disk change here. Next: `/crav1-tighten-spec` or `/crav1-resolve-questions`. |
+| `send-to-spec` | Send to spec | This is a spec defect or a new product question. Do not patch the plan. | No disk change here. Next: `/crav1-tighten-spec` or `/crav1-resolve-open-questions`. |
 | `keep` | Keep as written | Accept the cost (usually untestable or extra scope). | No disk change. Rare; say the cost. |
 | `suggest` | Get a suggestion | Recommend one offered patch letter. No edits. | Stay on this `P#`. Always offer. |
 | `ask` | Ask, don’t patch | At most 3 questions about this issue. | Retry this `P#`. |

@@ -27,7 +27,7 @@ Respond with:
 5. **Files** — `Files likely touched` that are wrong, missing, or too vague for the repo (if one exists).
 6. **Risks** — kept-open questions that the plan treats as decided; bets that will break the first demo. A `Stale since` line under the spec's `## Research findings` that is missing from Risks is a plan issue. Stale research does not block the plan. Do not treat the mark as a decision. Do not clear it.
 
-7. **Issues for `/crav1-tighten-plan`** — required. Number `P1`, `P2`, … One finding each. Quote the offending plan/task line. Tag **plan** (patch `plan.md` / `tasks.md`) or **spec** (do not patch the plan; they need `/crav1-tighten-spec` or `/crav1-resolve-questions`). Example:
+7. **Issues for `/crav1-tighten-plan`** — required. Number `P1`, `P2`, … One finding each. Quote the offending plan/task line. Tag **plan** (patch `plan.md` / `tasks.md`) or **spec** (do not patch the plan; they need `/crav1-tighten-spec` or `/crav1-resolve-open-questions`). Example:
 
    `P2 — plan — T4 “add auth” has no verify and is not independently testable. Split.`
 
@@ -37,4 +37,4 @@ Respond with:
 
    `P6 — plan — ## Linter is missing. Say whether this repo has a linter or checker for the code the tasks will touch. Do not install one.`
 
-Do **not** bundle the whole review into one action. End with: run `/crav1-tighten-plan` for **plan** `P#`s; send **spec** `P#`s to tighten-spec / resolve-questions. Do not recommend a single global patch.
+Do **not** bundle the whole review into one action. End with: run `/crav1-tighten-plan` for **plan** `P#`s; send **spec** `P#`s to tighten-spec / resolve-open-questions. Do not recommend a single global patch.

@@ -15,7 +15,7 @@ color: orange
 
 # Build tasks
 
-You build tasks from `docs/specs/<slug>/tasks.md`. Every task runs in its own isolated worker, the **crav1-complete-task-agent** subagent. You never implement a task in this chat.
+You build tasks from `docs/specs/<slug>/tasks.md`. Every task runs in its own isolated worker, the **crav1-build-task-agent** subagent. You never implement a task in this chat.
 
 This replaces `/crav1-implement-task`, `/crav1-complete-task`, and `/crav1-complete-tasks` (1.56.0). Their rules are kept, unchanged, as the branches below. Follow the branch the answer picks, in full.
 
@@ -35,7 +35,7 @@ A picked task that is blocked: say why (the tasks-ready-to-build reason) and ask
 
 ## Inside the worker
 
-Each worker follows [branches/one-task/references/run.md](branches/one-task/references/run.md), which runs the implement rules in [branches/implement/BRANCH.md](branches/implement/BRANCH.md) (gate, branch check, one task, verify step, evidence), then the commit, `/crav1-verify-spec`, and the optional fix loop. The implement rules no longer run in this chat: where they say "this turn" or "this chat", read "this worker".
+Each worker follows [branches/one-task/references/run.md](branches/one-task/references/run.md), which runs the implement rules in [branches/implement/BRANCH.md](branches/implement/BRANCH.md) (gate, branch check, one task, verify step, evidence), then the commit, `/crav1-verify-build-against-spec`, and the optional fix loop. The implement rules no longer run in this chat: where they say "this turn" or "this chat", read "this worker".
 
 ## After
 

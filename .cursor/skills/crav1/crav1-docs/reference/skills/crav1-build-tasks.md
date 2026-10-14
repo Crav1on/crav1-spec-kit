@@ -22,7 +22,7 @@ A range or all (was `/crav1-complete-tasks`): Orchestrates one worker per `T#` (
 
 ## Runs when
 
-You want to build one task, a range, or all unticked tasks. Called by the user and by `crav1-complete-task-agent`.
+You want to build one task, a range, or all unticked tasks. Called by the user and by `crav1-build-task-agent`.
 
 ## Reads
 
@@ -40,12 +40,12 @@ Inside each worker: Writes the code and the checks that row names, and marks the
 
 Inside each worker: Leaves `spec.md` and other tasks alone. One task: Leaves product code, `spec.md`, push, and the pull request alone in this chat. A range or all: Leaves product code, commits, `spec.md`, push, and the pull request alone in this chat.
 
-Limits and exceptions: Inside each worker: stops with no code when `## Linter` says none and the user has not chosen to go on. It does not ask to run [`/crav1-keep-current`](crav1-keep-current.md). One task: it does not ask to run [`/crav1-keep-current`](crav1-keep-current.md).
+Limits and exceptions: Inside each worker: stops with no code when `## Linter` says none and the user has not chosen to go on. It does not ask to run [`/crav1-refresh-system-notes`](crav1-refresh-system-notes.md). One task: it does not ask to run [`/crav1-refresh-system-notes`](crav1-refresh-system-notes.md).
 
 ## You run next / Runs by itself
 
-- You run next: [`/crav1-open-pr`](crav1-open-pr.md); [`/crav1-verify-spec`](crav1-verify-spec.md)
-- Runs by itself: Inside each worker: Calls [`/crav1-feature-branch`](crav1-feature-branch.md) before code. One task: Calls [`/crav1-feature-branch`](crav1-feature-branch.md) and `crav1-complete-task-agent`. A range or all: Calls [`/crav1-feature-branch`](crav1-feature-branch.md) and `crav1-complete-task-agent` once per `T#`.
+- You run next: [`/crav1-open-pr`](crav1-open-pr.md); [`/crav1-verify-build-against-spec`](crav1-verify-build-against-spec.md)
+- Runs by itself: Inside each worker: Calls [`/crav1-create-feature-branch`](crav1-create-feature-branch.md) before code. One task: Calls [`/crav1-create-feature-branch`](crav1-create-feature-branch.md) and `crav1-build-task-agent`. A range or all: Calls [`/crav1-create-feature-branch`](crav1-create-feature-branch.md) and `crav1-build-task-agent` once per `T#`.
 
 ## Lane and group
 

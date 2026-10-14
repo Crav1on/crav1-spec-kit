@@ -21,7 +21,7 @@ Create with GitHub `gh` when that host's checks pass. On Azure DevOps, create wi
 
 Command: `/crav1-open-pr`.
 
-Other skills may **name** this command as an optional next step. Do not run it from those steps. Run it only when the user invoked `/crav1-open-pr` or clearly asked to open a pull request in this chat. `crav1-complete-task-agent` does not push and does not open a pull request.
+Other skills may **name** this command as an optional next step. Do not run it from those steps. Run it only when the user invoked `/crav1-open-pr` or clearly asked to open a pull request in this chat. `crav1-build-task-agent` does not push and does not open a pull request.
 
 ## Inputs
 
@@ -329,4 +329,4 @@ When you only printed commands, stop after those commands. Do not invent a URL.
 - No `--work-items` and no `--transition-work-items` unless they asked for that in this chat. A **Work item** section in the body is not that flag.
 - Do not block the pull request when `work-item.md` is missing. Do not create a work item and do not look one up.
 - Do not claim a pull request was opened unless the host returned a URL.
-- Workers stay no push and no pull request. Do not run this skill from `crav1-complete-task-agent`.
+- Workers stay no push and no pull request. Do not run this skill from `crav1-build-task-agent`.

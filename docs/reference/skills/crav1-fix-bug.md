@@ -34,7 +34,7 @@ Writes nothing.
 
 Leaves code, specs, plans, `verify.md`, and `work-item.md` alone.
 
-Limits and exceptions: no bug named, or not a real bug, stops with no lane. Spark, specify, plan, and verify do not run it. When the bug changes how the parts connect, it asks once whether to run [`/crav1-keep-current`](crav1-keep-current.md) and does not run it.
+Limits and exceptions: no bug named, or not a real bug, stops with no lane. Spark, specify, plan, and verify do not run it. When the bug changes how the parts connect, it asks once whether to run [`/crav1-refresh-system-notes`](crav1-refresh-system-notes.md) and does not run it.
 
 ## You run next / Runs by itself
 

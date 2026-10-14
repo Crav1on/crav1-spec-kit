@@ -8,8 +8,8 @@ After that skill’s end, when the fix this turn changes how the parts connect, 
 
 The question is exactly:
 
-The system picture may now be out of date. Run `/crav1-keep-current`?
+The system picture may now be out of date. Run `/crav1-refresh-system-notes`?
 
-Options are yes and no. Use the questions tool when it is available. Do not run `/crav1-keep-current`. Do not edit the picture in this turn.
+Options are yes and no. Use the questions tool when it is available. Do not run `/crav1-refresh-system-notes`. Do not edit the picture in this turn.
 
 Do not add this question to `/crav1-fix-build-gaps`, `/crav1-build-tasks`.

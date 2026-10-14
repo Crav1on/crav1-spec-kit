@@ -25,8 +25,8 @@ This kit repository is the source. Your product repository is where work happens
 
 | Piece | Role |
 | --- | --- |
-| Skills (`/crav1-…`) | Playbooks for every lane: the six starter options, Specify, Plan, Build, Verify and fix, Commit and pull request, and the cross-cutting helpers. What each command reads, writes, and leaves alone is in the [skills reference](reference/skills.md), one page per command. `/crav1-pipeline-environments`, `/crav1-ado-sync` use the `az` command-line tool with the `azure-devops` extension where their pages say so; the skills do not install it or log in |
-| Agents | `crav1-spec-reviewer-agent`, `crav1-architecture-reviewer-agent`, `crav1-plan-reviewer-agent` (read-only critics); `crav1-complete-task-agent` and `crav1-intake-slice-agent` (writers) |
+| Skills (`/crav1-…`) | Playbooks for every lane: the six starter options, Specify, Plan, Build, Verify and fix, Commit and pull request, and the cross-cutting helpers. What each command reads, writes, and leaves alone is in the [skills reference](reference/skills.md), one page per command. `/crav1-map-pipeline-environments`, `/crav1-ado-sync` use the `az` command-line tool with the `azure-devops` extension where their pages say so; the skills do not install it or log in |
+| Agents | `crav1-spec-reviewer-agent`, `crav1-review-architecture-agent`, `crav1-plan-reviewer-agent` (read-only critics); `crav1-build-task-agent` and `crav1-bundle-slice-agent` (writers) |
 | Project instruction | Cursor: rule `crav1.mdc`. Claude Code: `.claude/CLAUDE.md` (the same always-on text, not the README) |
 | Templates | Inside each skill’s `assets/` (and agent-assets). Optional human copies: `docs/specs/_template/`, `docs/system/_template/` |
 
@@ -58,8 +58,8 @@ After install, type `/crav1` to list the kit. Each skill folder’s `name:` is `
 - [Cursor](https://cursor.com/) with Agent chat (slash skills).
 - A **product git repo** (or this kit repo, which already has the drop-in `.cursor/` tree).
 - Optional: Teams or Enterprise, if you want a **team marketplace** (import this repo, then Install). Free/Pro can still **copy files** or load a **local plugin**.
-- Optional, for `/crav1-pipeline-environments` on the machine where the command runs (Cursor or Claude Code): [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli) and the `azure-devops` extension (`az extension add --name azure-devops`). The skill does not install them and does not log in. Login is `az login` and `az devops configure --defaults`.
-- Optional, for the SQL look-inside in `/crav1-environment-read` on the machine where the command runs (Cursor or Claude Code): [`sqlcmd`](https://learn.microsoft.com/sql/tools/sqlcmd/sqlcmd-utility). The skill does not install it and does not log in. PostgreSQL and MySQL use a client already on the machine. The skill does not install that client either. The host CLI (`az`, `aws`, or `gcloud`) is still required for the resource list.
+- Optional, for `/crav1-map-pipeline-environments` on the machine where the command runs (Cursor or Claude Code): [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli) and the `azure-devops` extension (`az extension add --name azure-devops`). The skill does not install them and does not log in. Login is `az login` and `az devops configure --defaults`.
+- Optional, for the SQL look-inside in `/crav1-read-environment` on the machine where the command runs (Cursor or Claude Code): [`sqlcmd`](https://learn.microsoft.com/sql/tools/sqlcmd/sqlcmd-utility). The skill does not install it and does not log in. PostgreSQL and MySQL use a client already on the machine. The skill does not install that client either. The host CLI (`az`, `aws`, or `gcloud`) is still required for the resource list.
 
 **Import from Repo** for this kit uses [https://github.com/Crav1on/crav1-spec-kit](https://github.com/Crav1on/crav1-spec-kit).
 
@@ -173,11 +173,11 @@ The imported-sources check can write a transfer data policy into the repo after 
 
 ### Agents
 
-The Cursor `model: inherit` line is left out of the Claude Code copy, because Claude Code’s default is already the parent model ([subagents](https://code.claude.com/docs/en/sub-agents)). The three reviewers (`crav1-spec-reviewer-agent`, `crav1-architecture-reviewer-agent`, `crav1-plan-reviewer-agent`) set `tools: Read, Grep, Glob` instead of Cursor `readonly: true`. The two writers omit `tools`, so they can edit.
+The Cursor `model: inherit` line is left out of the Claude Code copy, because Claude Code’s default is already the parent model ([subagents](https://code.claude.com/docs/en/sub-agents)). The three reviewers (`crav1-spec-reviewer-agent`, `crav1-review-architecture-agent`, `crav1-plan-reviewer-agent`) set `tools: Read, Grep, Glob` instead of Cursor `readonly: true`. The two writers omit `tools`, so they can edit.
 
 ### Tried on Claude Code
 
-On Claude Code 2.1.286, in a private throwaway git repo, the generated `.claude/` drop-in ran `/crav1-spark-to-spec`, `/crav1-plan-from-spec`, one implement task, and `/crav1-verify-spec`. The trial feature was a root `hello.txt` of exactly the five bytes `68 65 6c 6c 6f`. Verify passed. Nothing from that repo was pushed. Two frictions: a PowerShell byte-dump that uses a script block was blocked by Claude Code’s permission check, and the same bytes were checked another way; the feature-branch skill wants a clean tree, and the branch was created with the kit files still untracked.
+On Claude Code 2.1.286, in a private throwaway git repo, the generated `.claude/` drop-in ran `/crav1-spark-to-spec`, `/crav1-plan-from-spec`, one implement task, and `/crav1-verify-build-against-spec`. The trial feature was a root `hello.txt` of exactly the five bytes `68 65 6c 6c 6f`. Verify passed. Nothing from that repo was pushed. Two frictions: a PowerShell byte-dump that uses a script block was blocked by Claude Code’s permission check, and the same bytes were checked another way; the create-feature-branch skill wants a clean tree, and the branch was created with the kit files still untracked.
 
 ## After install
 
@@ -189,17 +189,17 @@ When you ask for startup options, these six are the only ways in. That ask names
 | --- | --- |
 | `/crav1-spark-to-spec` | One or two sentences |
 | `/crav1-ideas-to-spec` | A pile of ideas and technical hunches |
-| `/crav1-intake-to-specs` | Mixed files, or more than one v0 feature |
+| `/crav1-bundle-to-specs` | Mixed files, or more than one v0 feature |
 | `/crav1-existing-to-specs` | Existing repos plus a dump to match |
 | `/crav1-existing-to-specs` | You name the repos. It runs only then |
-| `/crav1-environment-read` | You name the host. It runs only then |
+| `/crav1-read-environment` | You name the host. It runs only then |
 | `/crav1-fix-bug` | You name a real bug that already exists. It runs only then |
 
 1. Open a chat in the **product** repo. On Cursor that is Agent chat. On Claude Code, open a session in that repo.
-2. Type `/crav1` and pick one starter from the table. Brownfield spark, ideas, intake, and match expect a branch prompt (`feat/<slug>` or `spec/<slug>`). `/crav1-existing-to-specs` still runs only when you name the repos, and it does not start Specify, Plan, or Build. `/crav1-environment-read` still runs only when you name the host. Naming production, prod, or live stops. It reads every non-prod environment in one pass. A prod-only resource is shape and connections only, after one yes. SQL metadata and storage structure are optional after that, and only when you say yes. Look-inside never opens production. It does not start Specify, Plan, or Build. `/crav1-fix-bug` still runs only when you name a real bug. It is not a skill that runs because a repo is new, and it is not started automatically.
-3. Follow the command loop. Do not start in the host plan UI or by picking a stack. `/crav1-plan-from-spec` writes `plan.md` and `tasks.md`. Later skills, once specs already exist, include `/crav1-add-to-spec`, `/crav1-suggest-tests-for-code` for tests on one repo or one area of code that already exists, `/crav1-add-to-spec` for minutes, a transcript, an email, or a chat matched to those specs, `/crav1-show-or-ask-open-questions` to draft the open questions for a person, a spec, or a topic as a mail, an agenda, a chat message, or meeting questions, `/crav1-whats-known-about` for one feature, slice, resource, or not-yet-feature, `/crav1-pipeline-environments` when the user names Azure DevOps, the org, and the project, `/crav1-ado-sync` for a Feature list from the landscape and the specs, `/crav1-ado-sync` to send picked candidates to Azure Boards, and `/crav1-ado-sync` to read those Features back onto the specs. Those are not starter options.
+2. Type `/crav1` and pick one starter from the table. Brownfield spark, ideas, intake, and match expect a branch prompt (`feat/<slug>` or `spec/<slug>`). `/crav1-existing-to-specs` still runs only when you name the repos, and it does not start Specify, Plan, or Build. `/crav1-read-environment` still runs only when you name the host. Naming production, prod, or live stops. It reads every non-prod environment in one pass. A prod-only resource is shape and connections only, after one yes. SQL metadata and storage structure are optional after that, and only when you say yes. Look-inside never opens production. It does not start Specify, Plan, or Build. `/crav1-fix-bug` still runs only when you name a real bug. It is not a skill that runs because a repo is new, and it is not started automatically.
+3. Follow the command loop. Do not start in the host plan UI or by picking a stack. `/crav1-plan-from-spec` writes `plan.md` and `tasks.md`. Later skills, once specs already exist, include `/crav1-add-to-spec`, `/crav1-suggest-tests-for-code` for tests on one repo or one area of code that already exists, `/crav1-add-to-spec` for minutes, a transcript, an email, or a chat matched to those specs, `/crav1-show-or-ask-open-questions` to draft the open questions for a person, a spec, or a topic as a mail, an agenda, a chat message, or meeting questions, `/crav1-what-do-we-know-about-this` for one feature, slice, resource, or not-yet-feature, `/crav1-map-pipeline-environments` when the user names Azure DevOps, the org, and the project, `/crav1-ado-sync` for a Feature list from the landscape and the specs, `/crav1-ado-sync` to send picked candidates to Azure Boards, and `/crav1-ado-sync` to read those Features back onto the specs. Those are not starter options.
 
-`/crav1-build-tasks`, standalone `/crav1-build-tasks`, and `/crav1-complete-features` **pause once** before the first worker, wait for `continue` / `click`, then remind you how to restore the previous gate when the run ends. On Cursor that gate is Approvals & Execution. On Claude Code it is the permission prompt (`/permissions`); the skill does not set a permission mode. Workers launched by those orchestrators do not pause again. The skill cannot change host settings for you.
+`/crav1-build-tasks`, standalone `/crav1-build-tasks`, and `/crav1-build-features` **pause once** before the first worker, wait for `continue` / `click`, then remind you how to restore the previous gate when the run ends. On Cursor that gate is Approvals & Execution. On Claude Code it is the permission prompt (`/permissions`); the skill does not set a permission mode. Workers launched by those orchestrators do not pause again. The skill cannot change host settings for you.
 
 If this window is the **kit repo**, drop-in skills are already under `.cursor/` and `.claude/` — no extra install.
 

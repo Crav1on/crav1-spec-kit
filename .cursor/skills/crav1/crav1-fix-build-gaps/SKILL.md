@@ -26,8 +26,8 @@ Ask one question, with the questions tool when it is available:
 1. **Gaps from the verify report.** `verify.md` lists verify failed, claimed done and unverified, or `G#` gaps. Follow [branches/verify-gaps/BRANCH.md](branches/verify-gaps/BRANCH.md).
 2. **A live-site gap.** The gap is on a running host or the inner loop: ports, a proxy, SQL, an unpublished URL. Follow [branches/live-gaps/BRANCH.md](branches/live-gaps/BRANCH.md).
 
-Skip the question when the message already says which: a `Gap` id, `T#`, or "from verify" is option 1; a URL, a port, "live", or "local host" is option 2. When `verify.md` is missing and the message names no live gap, stop and name `/crav1-verify-spec`. An alias (`/crav1-fix-from-verify`, `/crav1-fix-live`) arrives with its choice already made.
+Skip the question when the message already says which: a `Gap` id, `T#`, or "from verify" is option 1; a URL, a port, "live", or "local host" is option 2. When `verify.md` is missing and the message names no live gap, stop and name `/crav1-verify-build-against-spec`. An alias (`/crav1-fix-from-verify`, `/crav1-fix-live`) arrives with its choice already made.
 
 ## After
 
-Each branch ends with its own recap and next step (`/crav1-verify-spec` to re-check). Do not run it.
+Each branch ends with its own recap and next step (`/crav1-verify-build-against-spec` to re-check). Do not run it.

@@ -34,7 +34,7 @@ Limits and exceptions: a spec-tagged finding is not patched here.
 
 ## You run next / Runs by itself
 
-- You run next: [`/crav1-ado-sync`](crav1-ado-sync.md); [`/crav1-tasks-ready-to-build`](crav1-tasks-ready-to-build.md); [`/crav1-build-tasks`](crav1-build-tasks.md); [`/crav1-complete-features`](crav1-complete-features.md)
+- You run next: [`/crav1-ado-sync`](crav1-ado-sync.md); [`/crav1-tasks-ready-to-build`](crav1-tasks-ready-to-build.md); [`/crav1-build-tasks`](crav1-build-tasks.md); [`/crav1-build-features`](crav1-build-features.md)
 - Runs by itself: Calls no skill.
 
 ## Lane and group

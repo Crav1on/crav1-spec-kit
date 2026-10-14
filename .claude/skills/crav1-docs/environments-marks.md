@@ -1,8 +1,8 @@
 # Environment marks
 
-`/crav1-environment-read` reads `docs/environments/marks.md` in the project repo after the resource name, the group, and the tags. It creates that folder and file only when the user has confirmed at least one mark. It appends those lines. It never rewrites an existing line.
+`/crav1-read-environment` reads `docs/environments/marks.md` in the project repo after the resource name, the group, and the tags. It creates that folder and file only when the user has confirmed at least one mark. It appends those lines. It never rewrites an existing line.
 
-`/crav1-pipeline-environments` appends a confirmed pipeline line to that same file. The walkthrough is [from-pipeline-environments.md](from-pipeline-environments.md). `/crav1-environment-read` does not run that command. It uses a pipeline line that is already there.
+`/crav1-map-pipeline-environments` appends a confirmed pipeline line to that same file. The walkthrough is [from-pipeline-environments.md](from-pipeline-environments.md). `/crav1-read-environment` does not run that command. It uses a pipeline line that is already there.
 
 ## Line
 
@@ -20,7 +20,7 @@ Four fields, separated by ` | ` (space, pipe, space). The source is everything a
   - `marked by the user`
   - `marked by the user, suggested by group`
 
-There is no `shared` word. A resource that a non-prod stage and a production stage both deploy is two lines, one per stage. `/crav1-environment-read` treats those two lines as shared with prod. A pipeline line names the resource the step names. The group on that line is context. The line does not mark every resource in the group.
+There is no `shared` word. A resource that a non-prod stage and a production stage both deploy is two lines, one per stage. `/crav1-read-environment` treats those two lines as shared with prod. A pipeline line names the resource the step names. The group on that line is context. The line does not mark every resource in the group.
 
 A blank line is ignored. A line that starts with `#` is ignored.
 
@@ -34,15 +34,15 @@ arn:aws:lambda:eu-west-1:123456789012:function:orders | app-group | stage | pipe
 
 The read matches an id, or a name plus group. A similar name does not match. Compare without regard to case. If a name and group match more than one resource, that line is not used.
 
-`development` is dev, `testing` is test, and `staging` is stage. `pre-prod` and `preprod` are pre-prod. `production` and `live` are production. A line that says production, and another source that says a non-prod environment, makes the resource shared with prod. A production line with no non-prod or pre-prod source makes the resource prod-only. `/crav1-environment-read` can read that resource for shape and connections only, after one yes. A no leaves it skipped.
+`development` is dev, `testing` is test, and `staging` is stage. `pre-prod` and `preprod` are pre-prod. `production` and `live` are production. A line that says production, and another source that says a non-prod environment, makes the resource shared with prod. A production line with no non-prod or pre-prod source makes the resource prod-only. `/crav1-read-environment` can read that resource for shape and connections only, after one yes. A no leaves it skipped.
 
 ## Who writes a line
 
-This file is the only file `/crav1-environment-read` writes.
+This file is the only file `/crav1-read-environment` writes.
 
 - The user accepts a group suggestion: `marked by the user, suggested by group`.
 - The user marks a leftover, per resource or per group: `marked by the user`.
-- `/crav1-pipeline-environments` after the user confirms a stage: `pipeline <name>, stage <stage>`. One line per stage. This read does not write that line. It uses one that is already there.
+- `/crav1-map-pipeline-environments` after the user confirms a stage: `pipeline <name>, stage <stage>`. One line per stage. This read does not write that line. It uses one that is already there.
 
 A mark from a connection, a deployment name, or infrastructure code is cited on the Seen line. It is not copied into this file.
 

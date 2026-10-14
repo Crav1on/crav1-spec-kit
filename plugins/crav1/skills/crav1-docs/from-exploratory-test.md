@@ -6,7 +6,7 @@ Use this when a **build of a slice already exists** and the user wants that slic
 
 This is cross-cutting. It is not its own lane. It may run from any lane. It does not move work into Specify, Plan, or Build. It does not start those lanes.
 
-It is a later skill. It is not a starter option. When the user asks for startup options, that ask names only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-existing-to-specs`, `/crav1-environment-read`, and `/crav1-fix-bug`. It does not run this command.
+It is a later skill. It is not a starter option. When the user asks for startup options, that ask names only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs`, `/crav1-read-environment`, and `/crav1-fix-bug`. It does not run this command.
 
 Pass one learns the slice by using it once. Pass two is no longer careful. It adds randomness: sometimes a double-click, a hover back and forth, repeating an action, or using the same control more than once. It follows what the last action showed. It lasts about as long as the first pass, long enough to provoke bugs, then it stops. That stop is named `matched the first pass`. It stops sooner when the user says stop. That stop is named `the user said stop`. The user does not set a clock. The second pass does not run forever.
 
@@ -17,7 +17,7 @@ It does not write the checks the plan already named. A bug it finds is not sent 
 New chat. Point at the slice that already has a build.
 
 ```text
-/crav1-exploratory-test
+/crav1-run-exploratory-test
 @docs/specs/<slug>/
 
 Use the slice once, then again with randomness. Write down bugs. Do not start Specify, Plan, or Build.
@@ -53,4 +53,4 @@ When the file changed and the user wants it in git:
 /crav1-finalize-commit
 ```
 
-Reference page: [exploratory-test](reference/skills/crav1-exploratory-test.md)
+Reference page: [run-exploratory-test](reference/skills/crav1-run-exploratory-test.md)

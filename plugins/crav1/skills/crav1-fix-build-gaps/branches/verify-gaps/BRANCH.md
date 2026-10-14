@@ -1,6 +1,6 @@
 # Fix from verify
 
-You run this **after `/crav1-verify-spec`**. Walk the **inner-loop queue** one item at a time: failed evidence, then unverified/could-not-run, then leftover `G#` wiring gaps. Omit `Gap` to take the next. Unimplemented tasks are **not** this skill (`/crav1-build-tasks`).
+You run this **after `/crav1-verify-build-against-spec`**. Walk the **inner-loop queue** one item at a time: failed evidence, then unverified/could-not-run, then leftover `G#` wiring gaps. Omit `Gap` to take the next. Unimplemented tasks are **not** this skill (`/crav1-build-tasks`).
 
 Do not change `spec.md`. Do not invent product behavior to get a green matrix.
 
@@ -10,11 +10,11 @@ Spec folder: user @-mention, else most recently edited `docs/specs/` tree exclud
 
 Read, in order:
 
-1. `verify.md` (required if it exists). Chat TL;DR from the last `/crav1-verify-spec` in this thread counts as the same source.
+1. `verify.md` (required if it exists). Chat TL;DR from the last `/crav1-verify-build-against-spec` in this thread counts as the same source.
 2. `spec.md`, `tasks.md`, `plan.md` — spec wins.
 3. Report shape: this skill’s `assets/fix-log.md`.
 
-If `verify.md` is missing and they did not paste a verify TL;DR, **stop**. Next: `/crav1-verify-spec`. Do not guess gaps from vibes.
+If `verify.md` is missing and they did not paste a verify TL;DR, **stop**. Next: `/crav1-verify-build-against-spec`. Do not guess gaps from vibes.
 
 ## Pick one gap (no edits yet)
 
@@ -47,7 +47,7 @@ Build the queue fresh from `verify.md` each turn (minus what `fix-log.md` alread
 - Closing the gap needs behavior **not** in the spec
 - It would implement a **non-goal** or reopen a rejected ADR
 - Playbook-only workspace and they did not ask to change an app here
-- The inner-loop queue is **empty** (only unimplemented / no-task left, or everything verified) — tell them `/crav1-build-tasks` or `/crav1-verify-spec` / ship
+- The inner-loop queue is **empty** (only unimplemented / no-task left, or everything verified) — tell them `/crav1-build-tasks` or `/crav1-verify-build-against-spec` / ship
 
 Confirm the before-state: re-run that row’s evidence once. Quote the failure. Do not skip.
 
@@ -68,9 +68,9 @@ Do **not**:
 
 ## Verify the fix (required, same turn)
 
-If this gap’s evidence is **live**, follow `crav1-verify-spec` `references/live-host.md` (drop-in: `.cursor/skills/crav1/crav1-verify-spec/references/live-host.md`; plugin: sibling `skills/crav1-verify-spec/references/live-host.md`) **before** re-running it (especially after you changed API/service code).
+If this gap’s evidence is **live**, follow `crav1-verify-build-against-spec` `references/live-host.md` (drop-in: `.cursor/skills/crav1/crav1-verify-build-against-spec/references/live-host.md`; plugin: sibling `skills/crav1-verify-build-against-spec/references/live-host.md`) **before** re-running it (especially after you changed API/service code).
 
-1. Before any test command, run the local dependency preflight in `crav1-verify-spec` `references/test-dependencies.md` (drop-in: `.cursor/skills/crav1/crav1-verify-spec/references/test-dependencies.md`; plugin: sibling `skills/crav1-verify-spec/references/test-dependencies.md`). A test skipped for a missing dependency does not close the gap unless the user chose skip. Then re-run **the same evidence** for this gap (test name, UI path, or live HTTP/DB command from verify.md / the user). Fail → pass, or report still failing.
+1. Before any test command, run the local dependency preflight in `crav1-verify-build-against-spec` `references/test-dependencies.md` (drop-in: `.cursor/skills/crav1/crav1-verify-build-against-spec/references/test-dependencies.md`; plugin: sibling `skills/crav1-verify-build-against-spec/references/test-dependencies.md`). A test skipped for a missing dependency does not close the gap unless the user chose skip. Then re-run **the same evidence** for this gap (test name, UI path, or live HTTP/DB command from verify.md / the user). Fail → pass, or report still failing.
 2. If you changed app or config, re-run the repo test command. Must still pass.
 3. Extra probes (SQL ready, etc.) are optional **add-ons**. They do not replace the verify row.
 
@@ -82,7 +82,7 @@ Update `tasks.md` `[x]` only if that task’s stated verify now passes.
 
 Follow this skill’s `assets/fix-log.md` (TL;DR first). **Append** a dated entry if the file exists.
 
-Optionally patch **only this row** in `verify.md` if that file exists (status/evidence). Do not restage the whole matrix — tell them to run `/crav1-verify-spec` for a fresh full report.
+Optionally patch **only this row** in `verify.md` if that file exists (status/evidence). Do not restage the whole matrix — tell them to run `/crav1-verify-build-against-spec` for a fresh full report.
 
 Do not rewrite `spec.md`.
 
@@ -97,7 +97,7 @@ TL;DR first:
 - Tests still pass? (if you ran them)
 - Files changed
 - Remaining **inner-loop** ids (`F2`…) — not unimplemented tasks
-- Next: `/crav1-fix-build-gaps` with **no Gap** to continue the walk, or `/crav1-verify-spec` when the inner-loop queue is empty
+- Next: `/crav1-fix-build-gaps` with **no Gap** to continue the walk, or `/crav1-verify-build-against-spec` when the inner-loop queue is empty
 
 ## Hard rules
 

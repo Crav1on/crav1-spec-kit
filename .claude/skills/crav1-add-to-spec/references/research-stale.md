@@ -126,7 +126,7 @@ A stale mark is the blockquote on the note, or a `Stale since` line under `## Re
 Run this section when either is true:
 
 - This run writes a file under `docs/research/` for a note that has a stale mark.
-- The user replaced a file under `docs/research/` and pointed `/crav1-add-to-spec` or `/crav1-keep-current` at it, and the note or a spec that sees it has a stale mark.
+- The user replaced a file under `docs/research/` and pointed `/crav1-add-to-spec` or `/crav1-refresh-system-notes` at it, and the note or a spec that sees it has a stale mark.
 
 Do not ask the user whether the update resolves the mark. The user does not judge the research. Judge from the update's text.
 
@@ -329,7 +329,7 @@ Create `## Open questions` on the spec only when it is missing and this bullet n
 
 Run this when either is true:
 
-- `/crav1-resolve-questions` answers an open question that a stale point is waiting on. Keep open does not run this. The question stays. The point stays.
+- `/crav1-resolve-open-questions` answers an open question that a stale point is waiting on. Keep open does not run this. The question stays. The point stays.
 - A kept quote in the impact check answers that open question, or settles a listed point that is still open.
 
 Read the answer and the point. Do not ask the user.
@@ -366,7 +366,7 @@ Everything in this section is written in the files. Nothing is sent. Nothing is 
 
 ## Readers
 
-`/crav1-explain`, `/crav1-whats-known-about`, and `/crav1-ado-sync` show a stale note as stale. A narrowed line is still stale. Quote the mark. Name the path. Do not treat that research as current. Do not clear the mark. Do not route a point. Do not write the note's open questions onto a spec. Do not drop the note to keep a list short.
+`/crav1-explain-existing-system`, `/crav1-what-do-we-know-about-this`, and `/crav1-ado-sync` show a stale note as stale. A narrowed line is still stale. Quote the mark. Name the path. Do not treat that research as current. Do not clear the mark. Do not route a point. Do not write the note's open questions onto a spec. Do not drop the note to keep a list short.
 
 `/crav1-plan-from-spec` lists stale research findings under Risks. A narrowed mark is still stale. The plan does not stop because research is stale. Do not clear the mark. Do not route a point.
 

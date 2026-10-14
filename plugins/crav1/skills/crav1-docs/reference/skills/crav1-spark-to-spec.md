@@ -36,8 +36,8 @@ Limits and exceptions: extend edits that spec and adds no second index row. A qu
 
 ## You run next / Runs by itself
 
-- You run next: [`/crav1-feature-branch`](crav1-feature-branch.md); [`/crav1-architecture-reviewer`](crav1-architecture-reviewer.md); [`/crav1-tighten-spec`](crav1-tighten-spec.md)
-- Runs by itself: Calls [`/crav1-feature-branch`](crav1-feature-branch.md) when the repo already has commits.
+- You run next: [`/crav1-create-feature-branch`](crav1-create-feature-branch.md); [`/crav1-review-architecture`](crav1-review-architecture.md); [`/crav1-tighten-spec`](crav1-tighten-spec.md)
+- Runs by itself: Calls [`/crav1-create-feature-branch`](crav1-create-feature-branch.md) when the repo already has commits.
 
 ## Lane and group
 

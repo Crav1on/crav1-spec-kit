@@ -6,7 +6,7 @@ Use this when the user has **minutes, a transcript, an email, or a chat thread**
 
 This is cross-cutting. It is not its own lane. It may run from any lane. It does not move work into Specify, Plan, or Build. It does not start those lanes.
 
-It is a later skill. It is not a starter option. When the user asks for startup options, that ask names only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-existing-to-specs`, `/crav1-environment-read`, and `/crav1-fix-bug`. It does not run this command. The six starter options stay unchanged.
+It is a later skill. It is not a starter option. When the user asks for startup options, that ask names only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs`, `/crav1-read-environment`, and `/crav1-fix-bug`. It does not run this command. The six starter options stay unchanged.
 
 [Intake](from-intake.md) starts a landscape and new feature slugs from a dump. It does not match items against specs that already exist. [Add](from-add.md) takes one piece of new information for one existing spec. This command extracts many items, matches them, and hands one kept addition to add-to-spec.
 
@@ -72,13 +72,13 @@ A left item is not written. A dismissed item is not written. The state line is n
 
 ## After
 
-When a kept addition or an answer changed an existing spec, the next steps follow the [New information on an existing slice](reference/workflow.md#new-info) route for that slug: `/crav1-tighten-spec` first, then `/crav1-resolve-questions`, then `/crav1-plan-from-spec` when the slice has a plan. This command names them and does not run them. Ask `/crav1-help next` for the full order with your slice's state.
+When a kept addition or an answer changed an existing spec, the next steps follow the [New information on an existing slice](reference/workflow.md#new-info) route for that slug: `/crav1-tighten-spec` first, then `/crav1-resolve-open-questions`, then `/crav1-plan-from-spec` when the slice has a plan. This command names them and does not run them. Ask `/crav1-help next` for the full order with your slice's state.
 
 A kept new feature names one next command. This command does not run it.
 
 - One kept new feature that is one or two sentences: `/crav1-spark-to-spec`
 - One kept new feature that is a pile of ideas and technical hunches: `/crav1-ideas-to-spec`
-- Two or more kept new features: `/crav1-intake-to-specs`
+- Two or more kept new features: `/crav1-bundle-to-specs`
 
 A kept bug names `/crav1-fix-bug`. This command does not run it.
 

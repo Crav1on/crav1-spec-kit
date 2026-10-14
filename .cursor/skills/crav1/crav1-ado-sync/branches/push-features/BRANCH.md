@@ -6,7 +6,7 @@ Command: `/crav1-ado-sync`.
 
 This is cross-cutting. It is not a lane. It may run from any lane. It does not move work into Specify, Plan, or Build. It does not start those lanes.
 
-This command is a later skill. It is not a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-existing-to-specs`, `/crav1-environment-read`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane. The six starter options stay unchanged.
+This command is a later skill. It is not a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs`, `/crav1-read-environment`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane. The six starter options stay unchanged.
 
 Spark, specify, plan, and verify do not run it. It is not started automatically.
 
@@ -17,7 +17,7 @@ CLI checks and the `az` calls: [references/azure-boards.md](references/azure-boa
 Before the candidate list:
 
 1. Take the Azure DevOps org and project as [references/azure-boards.md](references/azure-boards.md) says. `docs/environments/marks.md` first, then Azure DevOps URLs in `docs/system/repos.md`.
-2. Check that `az` works, including the default install paths, the same way `/crav1-whats-known-about` does.
+2. Check that `az` works, including the default install paths, the same way `/crav1-what-do-we-know-about-this` does.
 3. Check that the project has the Feature work item type. If it does not, say so and stop. Do not create another type.
 
 On a failure, state the issue, suggest a fix such as `az login`, and offer Retry or Skip. Skip stops this command. Say the Azure Boards calls did not run, and why. Do not install. Do not log in. Do not run `az login`.
@@ -83,7 +83,7 @@ The target date on the form is the date alone. The chat can still say which head
 
 Edits never happen in the preview. The spec is the source. When the user wants different words, a different date, or a different check, that change goes into the spec first through `/crav1-add-to-spec`. Then rebuild the preview from the spec. Do not patch the form in the chat and send that patch.
 
-A `no spec yet` row has no spec to edit. Say so. Name `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, or `/crav1-intake-to-specs` and do not run it. Do not send a rewritten preview.
+A `no spec yet` row has no spec to edit. Say so. Name `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, or `/crav1-bundle-to-specs` and do not run it. Do not send a rewritten preview.
 
 ## Send
 

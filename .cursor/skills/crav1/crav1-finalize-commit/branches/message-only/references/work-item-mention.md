@@ -4,7 +4,7 @@ Optional Azure Boards link for one spec slug. Read this from `/crav1-finalize-co
 
 The id lives only in `docs/specs/<slug>/work-item.md`. Do not store it in `tasks.md` (workers parse `T#` rows and skills rewrite that file). Do not create a work item, do not call an Azure DevOps API, and do not add a git hook.
 
-`/crav1-finalize-commit`, and `/crav1-open-pr` do not ask for a new id. They only read the file. When several lines are recorded and the slice is unclear, they ask which recorded line to mention. `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, and `/crav1-intake-to-specs` may write a line when they create a new spec folder on Azure Repos and the user replies with an id. That offer is [work-item-offer.md](work-item-offer.md). Creating a Feature is `/crav1-ado-sync`. These skills do not create one. `/crav1-ado-sync` writes a line after the user says yes.
+`/crav1-finalize-commit`, and `/crav1-open-pr` do not ask for a new id. They only read the file. When several lines are recorded and the slice is unclear, they ask which recorded line to mention. `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, and `/crav1-bundle-to-specs` may write a line when they create a new spec folder on Azure Repos and the user replies with an id. That offer is [work-item-offer.md](work-item-offer.md). Creating a Feature is `/crav1-ado-sync`. These skills do not create one. `/crav1-ado-sync` writes a line after the user says yes.
 
 A missing file never blocks a commit, a pull request, or a worker. Do not fail a worker status for this.
 

@@ -2,7 +2,7 @@
 
 The parent writes **one** `docs/specs/<slug>/` in this chat, or hands this file to **one** worker for this slug. This file is the protocol. It is not a slash command.
 
-Do not use `crav1-intake-slice-agent` or that agent's prompt. Intake writes a buildable v0 spec. This protocol writes a match.
+Do not use `crav1-bundle-slice-agent` or that agent's prompt. Intake writes a buildable v0 spec. This protocol writes a match.
 
 ## Parent passes (and a worker may use only)
 

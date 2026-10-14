@@ -1,6 +1,6 @@
 # Checks named on a task
 
-Plan names the checks. It does not write test code. It does not invent product behavior. `/crav1-verify-spec` is the gate that says these named checks passed. Do not run that command from plan.
+Plan names the checks. It does not write test code. It does not invent product behavior. `/crav1-verify-build-against-spec` is the gate that says these named checks passed. Do not run that command from plan.
 
 Each verify note names the kind, then the check or checks:
 
@@ -34,7 +34,7 @@ Name these only when the thing being built needs them:
 
 Read `docs/system/security.md` when it exists, and a `## Security` section on the spec when it exists. Each kept finding has a Check line.
 
-Map that check to a `T#`, or write “covered by T#” on the Trace row. A task that already proves the check is enough. Do not copy the check into acceptance criteria. Do not invent a product behavior the finding does not state. Do not run `/crav1-security-review`.
+Map that check to a `T#`, or write “covered by T#” on the Trace row. A task that already proves the check is enough. Do not copy the check into acceptance criteria. Do not invent a product behavior the finding does not state. Do not run `/crav1-review-security`.
 
 If the kept decision conflicts with a spec non-goal, stop and send it to `/crav1-tighten-spec`. Do not encode the conflict as a task.
 
@@ -47,7 +47,7 @@ Search the repo for a linter or checker that covers the code these tasks will to
 Write the answer under `## Linter` in `plan.md`.
 
 - When the repo has one, name the tool and the command. Say which paths it covers. Build is expected to leave that check green.
-- When it does not, write that this repo has no linter or checker for that code. Stop before Build. The user decides to add the linter or to go on without one. Do not install one. Do not name `/crav1-build-tasks`, or `/crav1-complete-features` until they choose. When they choose to go on without one, the usual next step applies, and the plan still says none.
+- When it does not, write that this repo has no linter or checker for that code. Stop before Build. The user decides to add the linter or to go on without one. Do not install one. Do not name `/crav1-build-tasks`, or `/crav1-build-features` until they choose. When they choose to go on without one, the usual next step applies, and the plan still says none.
 
 A plan that never says which of those two is true is not complete. `/crav1-review-plan` and `/crav1-tighten-plan` use this same rule.
 

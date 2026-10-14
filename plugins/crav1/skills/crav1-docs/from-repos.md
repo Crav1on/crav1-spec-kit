@@ -37,7 +37,7 @@ If the message names no repo, the command stops. It does not pick a checkout.
 | Where | One repo is the destination. Several repos: pick one of them, or a new clean repo | Options only. No typed path. No files yet |
 | Already there | — | Does not stop because notes or the architecture spec are already written. Missing spec and real notes: write `docs/architecture/spec.md` and `docs/architecture/left-out.md`, and leave the notes. Spec already there: a later re-read adds only what is new and checks `left-out.md` |
 | Read | Answer one question per section | Sections stay separate: one per named repo, inferred guesses, links, and left-out. Every item stays listed. A fact cites a path. A guess stays out until that section accepts it. A link only when the code shows it. If none is found, that section says so and does not offer a guessed link. Left out can accept a line, keep it, or dismiss it. A fact already written is marked and is not added again |
-| Branch | Pick `feat/architecture` or `spec/architecture` (or stay) | `/crav1-feature-branch` in the destination (no push, no pull request). On a later re-read, skips the branch when the confirmed list adds no new line. A missing architecture spec is still written |
+| Branch | Pick `feat/architecture` or `spec/architecture` (or stay) | `/crav1-create-feature-branch` in the destination (no push, no pull request). On a later re-read, skips the branch when the confirmed list adds no new line. A missing architecture spec is still written |
 | Write | Glance | Missing `docs/architecture/spec.md` is written there. Guesses that stay left out go to `docs/architecture/left-out.md` beside it. System notes are written when they are missing. Existing notes stay when the spec is the missing file. A later re-read appends only new spec lines and removes a left-out line when the code shows it. An accepted guess is labeled accepted. A link the code does not show is not written |
 | Stop | `/crav1-finalize-commit` if a file changed | Does not plan, implement, or commit. Does not start Specify, Plan, or Build |
 
@@ -57,7 +57,7 @@ A meaning the code does not state is `to be researched` on a glossary row. A lat
 
 No `plan.md`. No `tasks.md`. No application code. No `security.md`. No `work-item.md`.
 
-The picture is the short description, the diagram, and how the parts connect. The first write fills those three from the confirmed facts. A later re-read adds only what is new and does not rewrite a line that is already there. When real notes are already there and the architecture spec is missing, the picture stays as it is. This command does not run `/crav1-keep-current`.
+The picture is the short description, the diagram, and how the parts connect. The first write fills those three from the confirmed facts. A later re-read adds only what is new and does not rewrite a line that is already there. When real notes are already there and the architecture spec is missing, the picture stays as it is. This command does not run `/crav1-refresh-system-notes`.
 
 ## After
 

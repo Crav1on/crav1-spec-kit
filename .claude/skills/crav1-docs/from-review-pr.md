@@ -55,7 +55,7 @@ It still checks spec fit, the pull request body against the diff, the required g
 
 Instead of `verify.md`, it reads the test results that pull request's own pipeline already recorded. The info note says which tests ran, whether they passed, and which changed files no test touches. The skill does not run tests and does not ask to. When the pipeline shows no test run, the note names the tests the pull request includes and tells the user they can run them manually and then rerun the review. A rerun only sees results the pipeline recorded, so a local run shows up only if the user pastes its output. The note states that these are the pull request's own tests, not a check against the spec.
 
-An outside pull request ends with one line. It names `/crav1-keep-current` as the next step after the pull request merges, to bring its changes into the spec and `docs/system/`. The review does not run that command.
+An outside pull request ends with one line. It names `/crav1-refresh-system-notes` as the next step after the pull request merges, to bring its changes into the spec and `docs/system/`. The review does not run that command.
 
 A pull request that has a plan keeps the plan and `verify.md` checks in the section above. It does not get that line.
 
@@ -112,7 +112,7 @@ No code edit. No `spec.md` edit. No `plan.md` edit. No test run. No comment, vot
 
 ## After
 
-A clean review stops. On an outside pull request, the last line names `/crav1-keep-current` and the review does not run it. Merge is a later turn, and only when that turn asks:
+A clean review stops. On an outside pull request, the last line names `/crav1-refresh-system-notes` and the review does not run it. Merge is a later turn, and only when that turn asks:
 
 ```text
 /crav1-merge-pr

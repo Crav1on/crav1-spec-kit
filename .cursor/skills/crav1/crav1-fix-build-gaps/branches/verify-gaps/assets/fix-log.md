@@ -5,14 +5,14 @@
 | | |
 | --- | --- |
 | Status | open / fixed / still failing |
-| Source | `/crav1-verify-spec` `verify.md` |
+| Source | `/crav1-verify-build-against-spec` `verify.md` |
 | Gap | T# / A# / G# + verify bucket |
 | Evidence re-run | command |
 | Before | fail / untested (quote) |
 | After | pass / fail (quote) |
 | Tests | still pass / now fail / not re-run |
 | Remaining gaps | inner-loop queue only (failed → unverified → G#) |
-| Next | `/crav1-fix-build-gaps` id or `/crav1-verify-spec` |
+| Next | `/crav1-fix-build-gaps` id or `/crav1-verify-build-against-spec` |
 
 ## Entry
 

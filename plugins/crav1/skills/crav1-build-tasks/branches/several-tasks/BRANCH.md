@@ -1,10 +1,10 @@
 # Orchestrate build-tasks workers
 
-You **manage** the batch. You do **not** implement, verify, or `git commit` in this chat. Each `T#` runs in its own isolated **crav1-complete-task-agent** worker (the “new chat” for that task).
+You **manage** the batch. You do **not** implement, verify, or `git commit` in this chat. Each `T#` runs in its own isolated **crav1-build-task-agent** worker (the “new chat” for that task).
 
-Command: `/crav1-build-tasks`. One task: `/crav1-build-tasks`. Several specs (serial): `/crav1-complete-features`.
+Command: `/crav1-build-tasks`. One task: `/crav1-build-tasks`. Several specs (serial): `/crav1-build-features`.
 
-Worker: `.cursor/agents/crav1-complete-task-agent.md` (plugin: `agents/crav1-complete-task-agent.md`). Protocol: `crav1-build-tasks` [references/run.md](../../../crav1-build-tasks/branches/one-task/references/run.md). Style: [style-persist.md](../../../crav1-build-tasks/branches/one-task/references/style-persist.md). Approvals: [tool-approvals.md](../../../crav1-build-tasks/branches/one-task/references/tool-approvals.md).
+Worker: `.cursor/agents/crav1-build-task-agent.md` (plugin: `agents/crav1-build-task-agent.md`). Protocol: `crav1-build-tasks` [references/run.md](../../../crav1-build-tasks/branches/one-task/references/run.md). Style: [style-persist.md](../../../crav1-build-tasks/branches/one-task/references/style-persist.md). Approvals: [tool-approvals.md](../../../crav1-build-tasks/branches/one-task/references/tool-approvals.md).
 
 ## Which tasks
 
@@ -24,7 +24,7 @@ Before the first worker, follow **style-persist.md**. If you must ask, this turn
 
 Do not ask again per `T#`. Workers must not ask style.
 
-**Branch:** before tool approvals and the first worker, follow `/crav1-feature-branch` (drop-in: `.cursor/skills/crav1/crav1-feature-branch/SKILL.md`; plugin: sibling `skills/crav1-feature-branch/SKILL.md`) **Build** prompt. If needed, that turn is branch only. If on `spec/<slug>`, stop (no workers) and follow **Build on a spec-only branch**. Pass `branch: already-done` on every worker. Workers must not create branches.
+**Branch:** before tool approvals and the first worker, follow `/crav1-create-feature-branch` (drop-in: `.cursor/skills/crav1/crav1-create-feature-branch/SKILL.md`; plugin: sibling `skills/crav1-create-feature-branch/SKILL.md`) **Build** prompt. If needed, that turn is branch only. If on `spec/<slug>`, stop (no workers) and follow **Build on a spec-only branch**. Pass `branch: already-done` on every worker. Workers must not create branches.
 
 ## Tool approvals (once for the batch)
 
@@ -40,7 +40,7 @@ Keep a short board: queued / running / done / blocked.
 
 For each `T#` **one at a time**:
 
-1. Launch **crav1-complete-task-agent** with spec folder, this `T#`, `resume: start`, `approvals: already-done`, `branch: already-done`, and “style persist is already set.”
+1. Launch **crav1-build-task-agent** with spec folder, this `T#`, `resume: start`, `approvals: already-done`, `branch: already-done`, and “style persist is already set.”
 2. Wait until that worker returns a STATUS block. Do not implement in parallel. Do not start `T+1` while this worker is open.
 3. Handle STATUS:
 
