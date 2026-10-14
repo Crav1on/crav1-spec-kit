@@ -2,8 +2,11 @@
 """Fail when a pull request changes a skill's SKILL.md without touching docs/ for it.
 
 A skill counts as documented in the pull request when at least one changed file
-under docs/ mentions the skill's name (for example `crav1-review-pr`): its
-walkthrough, a concept page, docs/reference/skills.yaml, or its generated page.
+under docs/, outside docs/reference/, is the skill's walkthrough (its
+`walkthrough` in docs/reference/skills.yaml), or has a changed line that names
+the skill (for example `crav1-review-pr` or `/crav1-review-pr`), such as a
+concept or data layout entry. The reference pages do not count, because they
+are generated from skills.yaml.
 
 Opt-out: the `docs-not-needed` label, or a line in the pull request body that
 starts with `Docs-not-needed:` followed by the reason.
@@ -42,6 +45,24 @@ def opted_out():
     return False
 
 
+def load_walkthroughs():
+    """Map skill name to walkthrough path from skills.yaml, without PyYAML."""
+    out, name = {}, None
+    try:
+        with open("docs/reference/skills.yaml", encoding="utf-8") as f:
+            for line in f:
+                m = re.match(r"^- name:\s*(\S+)", line)
+                if m:
+                    name = m.group(1)
+                    continue
+                m = re.match(r"^\s+walkthrough:\s*(\S+)", line)
+                if m and name and m.group(1) != "null":
+                    out[name] = m.group(1)
+    except FileNotFoundError:
+        pass
+    return out
+
+
 def main():
     if len(sys.argv) < 2:
         sys.exit(__doc__)
@@ -64,16 +85,28 @@ def main():
     if opted_out():
         return 0
 
-    docs = [p for p in changed if p.startswith("docs/") and os.path.isfile(p)]
-    texts = {p: open(p, encoding="utf-8", errors="replace").read() for p in docs}
+    docs = [p for p in changed if p.startswith("docs/") and not p.startswith("docs/reference/")]
+    walkthroughs = load_walkthroughs()
     missing = []
     for name in sorted(skills):
-        hits = [p for p, t in texts.items() if name in p or name in t]
+        hits = []
+        for p in docs:
+            if walkthroughs.get(name) == p:
+                hits.append(p)
+                continue
+            diff = subprocess.run(
+                ["git", "diff", "-U0", f"{base}...{head}", "--", p],
+                check=True, capture_output=True, text=True,
+            ).stdout
+            lines = [l for l in diff.splitlines()
+                     if l[:1] in "+-" and not l.startswith(("+++", "---"))]
+            if any(name in l for l in lines):
+                hits.append(p)
         if hits:
             print(f"ok   {name}: docs touched ({', '.join(hits)})")
         else:
             missing.append(name)
-            print(f"FAIL {name}: SKILL.md changed, but no changed file under docs/ mentions it")
+            print(f"FAIL {name}: SKILL.md changed, but no docs change outside docs/reference/ covers it")
     if missing:
         print(
             "\nUpdate the skill's walkthrough (docs/from-*.md) and its concept or data layout"
