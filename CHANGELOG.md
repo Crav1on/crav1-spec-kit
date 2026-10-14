@@ -4,6 +4,16 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 
 ## Unreleased
 
+### Docs
+
+- [From a pull request review](docs/from-review-pr.md) now covers the paste-ready comment, the comment style Thomas and Rhea agreed on (the default), posting after a yes, the verdict question, re-review, and the `review-pr-<repo>-<n>-follow-ups.md` name for the follow-ups note.
+- The [glossary](docs/concepts/glossary.md) and [data layout](docs/concepts/data-layout.md) explain work item homes: the `Work items go to` column in `docs/system/repos.md`, one Feature per home, `(ADO: <org>/<project>)` on `work-item.md` id lines, and `Jira:` reserved. The data layout also lists the review follow-ups note.
+- "Documented is part of done" now covers changes to existing skills too: update that skill's walkthrough and its glossary or data layout entries in the same pull request ([CONTRIBUTING.md](CONTRIBUTING.md) item 6, `kit-maintainer.mdc`).
+
+### CI
+
+- New check `scripts/check-skill-docs-touched.py` (workflow `skill-docs-touched.yml`) fails a pull request that changes any copy of a `SKILL.md` without a docs change for that skill outside `docs/reference/`. Opt out with the `docs-not-needed` label or a `Docs-not-needed: <reason>` line in the pull request body.
+
 ## 1.51.0 (2026-10-14)
 
 ### Kit
