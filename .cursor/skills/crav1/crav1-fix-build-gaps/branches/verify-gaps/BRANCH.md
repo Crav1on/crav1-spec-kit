@@ -1,6 +1,6 @@
 # Fix from verify
 
-You run this **after `/crav1-verify-build-against-spec`**. Walk the **inner-loop queue** one item at a time: failed evidence, then unverified/could-not-run, then leftover `G#` wiring gaps. Omit `Gap` to take the next. Unimplemented tasks are **not** this skill (`/crav1-build-tasks`).
+You run this **after `/crav1-verify-build-against-spec`**. Walk the **inner-loop queue** one item at a time: failed evidence, then unverified/could-not-run, then leftover `G#` wiring gaps. Omit `Gap` to take the next. Unimplemented tasks are **not** this skill (the implement step of `/crav1-build-tasks`).
 
 Do not change `spec.md`. Do not invent product behavior to get a green matrix.
 
@@ -38,7 +38,7 @@ If they named `T#` / `A#` / `G#`:
 - Inner-loop (failed, unverified, or a wiring `G#`) → that is the current item
 - Not implemented / no-task → **stop**, send them to the table above. Do not implement a new `T#` here just because they typed the id
 
-If they **omitted Gap**: take the **first remaining** item in the queue above. List the rest as `F2`, `F3`, … so the next `/crav1-fix-build-gaps` with no Gap continues the walk.
+If they **omitted Gap**: take the **first remaining** item in the queue above. List the rest as `F2`, `F3`, … so the next the verify gaps branch of `/crav1-fix-build-gaps` with no Gap continues the walk.
 
 Build the queue fresh from `verify.md` each turn (minus what `fix-log.md` already marked fixed **and** whose evidence you re-ran green). Deduplicate: one live SQL proxy failure that explains three unverified rows is still **one** current item — after the fix, re-run **each** of those rows’ evidence.
 
@@ -47,7 +47,7 @@ Build the queue fresh from `verify.md` each turn (minus what `fix-log.md` alread
 - Closing the gap needs behavior **not** in the spec
 - It would implement a **non-goal** or reopen a rejected ADR
 - Playbook-only workspace and they did not ask to change an app here
-- The inner-loop queue is **empty** (only unimplemented / no-task left, or everything verified) — tell them `/crav1-build-tasks` or `/crav1-verify-build-against-spec` / ship
+- The inner-loop queue is **empty** (only unimplemented / no-task left, or everything verified) — tell them the implement step of `/crav1-build-tasks` or `/crav1-verify-build-against-spec` / ship
 
 Confirm the before-state: re-run that row’s evidence once. Quote the failure. Do not skip.
 
@@ -97,7 +97,7 @@ TL;DR first:
 - Tests still pass? (if you ran them)
 - Files changed
 - Remaining **inner-loop** ids (`F2`…) — not unimplemented tasks
-- Next: `/crav1-fix-build-gaps` with **no Gap** to continue the walk, or `/crav1-verify-build-against-spec` when the inner-loop queue is empty
+- Next: the verify gaps branch of `/crav1-fix-build-gaps` with **no Gap** to continue the walk, or `/crav1-verify-build-against-spec` when the inner-loop queue is empty
 
 ## Hard rules
 

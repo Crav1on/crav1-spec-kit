@@ -1,4 +1,4 @@
-# Tool approvals (build-tasks)
+# Tool approvals (build-tasks / build-tasks)
 
 Cursor **Allow / Stop** on a worker (podman, `dotnet`, env secrets, Browser) is the IDE’s **Approvals & Execution** gate. It is **not** kit `fix` / `stop` / `ready`. This skill cannot change Settings or click Allow.
 
@@ -16,9 +16,9 @@ Documented behavior: [Claude Code permissions](https://code.claude.com/docs/en/p
 
 | Who is running | Pause with directions? |
 | --- | --- |
-| `/crav1-build-tasks` (orchestrator) | **Yes**, once, before the first worker |
+| The range or all branch of `/crav1-build-tasks` (orchestrator) | **Yes**, once, before the first worker |
 | `/crav1-build-features` (orchestrator) | **Yes**, once, before the first worker (same as build-tasks) |
-| `/crav1-build-tasks` **standalone** (user typed that command) | **Yes**, once, before launching the worker |
+| The one task branch of `/crav1-build-tasks` **standalone** (user typed that command) | **Yes**, once, before launching the worker |
 | `crav1-build-task-agent` **worker** (subagent) | **Never** |
 | Worker launched by build-tasks or build-features | **Never** — parent already paused. Pass `approvals: already-done` |
 
