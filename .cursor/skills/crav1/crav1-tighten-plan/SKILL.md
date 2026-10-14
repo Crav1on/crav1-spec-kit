@@ -18,6 +18,7 @@ Do **not** offer a single menu (“fix the whole review”). That hides per-find
 
 **Do not patch until the user picks a resolution for the current issue** (or a batch of `P#: letter` answers). `suggest` is not a patch. `send-to-spec` is not a plan patch.
 
+
 ## Find the spec folder
 
 Use the folder the user @-mentions. Otherwise the most recently edited tree under `docs/specs/` excluding `_template/`. If several, ask which slug. Expected headings: this skill’s `assets/plan.md` and `assets/tasks.md`.
@@ -119,6 +120,10 @@ Do not start the next issue’s patch in the same turn unless they batched.
 | `ask` | Ask, don’t patch | At most 3 questions about this issue. | Retry this `P#`. |
 
 Do **not** offer `apply-notes` for the whole review.
+
+## Reviewed line
+
+`plan.md` may have `Reviewed: <date>, P# open: <n>` under its title, written by `/crav1-review-plan`. After each patched `P#`, and when a `P#` is dropped as not an issue, lower `<n>` to the number of reviewer `P#`s still open. Keep the date. A `P#` the user leaves open stays counted. When there is no `Reviewed:` line, do not add one: only `/crav1-review-plan` records a review. This line is the only `plan.md` change this skill makes outside the picked patches.
 
 ## Hard rules
 
