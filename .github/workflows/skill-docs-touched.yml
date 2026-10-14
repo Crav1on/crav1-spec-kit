@@ -1,0 +1,15 @@
+name: Skill change touches docs
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited, labeled, unlabeled]
+
+jobs:
+  skill-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: A changed SKILL.md has docs in the same pull request
+        run: python3 scripts/check-skill-docs-touched.py "origin/${{ github.base_ref }}" HEAD
