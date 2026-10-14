@@ -217,7 +217,7 @@ Output only:
 - Open questions: each answer linked, each possible answer left open, each asked mark written and where its date came from, or none
 - Impact: nothing else, or the one-line edit list and which option they picked
 - Research: each hit, whether it was marked, the note path and the findings line, or that none was marked. The revisit draft when one was written in the chat, or that none was drafted. The clear summary: what was cleared, narrowed, and routed where, each open question from the updated note and where it went, and when an older mark had no points, or that this run did not check an updated note
-- Next: `/crav1-finalize-commit` if any file changed (no push). `/crav1-plan-from-spec` only if they say they want to start planning this slug. Do not run either.
+- Next: when this changed an existing spec, `/crav1-tighten-spec` for that slug first, as the **New information on an existing slice** route says (`docs/reference/workflow.md#new-info`): tighten, then resolve questions, then the plan when the slice has `plan.md` or `tasks.md`. `/crav1-finalize-commit` if any file changed (no push). For the full order, `/crav1-help next`. Do not run any of them.
 
 ## Style
 
