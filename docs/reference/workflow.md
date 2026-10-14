@@ -34,14 +34,15 @@ You are starting a new feature from one or two sentences, a pile of ideas, or se
 | 8 | `/crav1-review-plan` | Right after the plan is written. |
 | 9 | `/crav1-tighten-plan` | After the plan review. |
 | 10 | `/crav1-tasks-to-ado` | Optional. When the Feature is in Azure Boards and the tasks should be too. |
-| 11 | `/crav1-implement-task` or `/crav1-complete-task` or `/crav1-complete-tasks` or `/crav1-complete-features` | One task in this chat (implement-task), or a worker per task (complete-task, complete-tasks, complete-features). The complete skills implement, commit, and verify each task inside their worker, so they go straight to the pull request. |
-| 12 | `/crav1-verify-spec` | After implement-task, against the spec and the plan. |
-| 13 | `/crav1-fix-from-verify` or `/crav1-fix-live` | Optional. When `verify.md` has a failure (fix-from-verify), or to fix it against the running host (fix-live). Do not edit `spec.md` in this loop. Then back to `/crav1-verify-spec`. |
-| 14 | `/crav1-draft-commit-message` | Optional. When you want to see the commit message before the commit. |
-| 15 | `/crav1-finalize-commit` | When the slice verifies. |
-| 16 | `/crav1-open-pr` | To push and open the pull request. |
-| 17 | `/crav1-review-pr` | Before the merge. |
-| 18 | `/crav1-merge-pr` | When the review says ship and the host checks are green. |
+| 11 | `/crav1-tasks-ready-to-build` | Optional. Any time, to see which tasks are ready, which are blocked and why. Read-only. |
+| 12 | `/crav1-implement-task` or `/crav1-complete-task` or `/crav1-complete-tasks` or `/crav1-complete-features` | One task in this chat (implement-task), or a worker per task (complete-task, complete-tasks, complete-features). The complete skills implement, commit, and verify each task inside their worker, so they go straight to the pull request. |
+| 13 | `/crav1-verify-spec` | After implement-task, against the spec and the plan. |
+| 14 | `/crav1-fix-from-verify` or `/crav1-fix-live` | Optional. When `verify.md` has a failure (fix-from-verify), or to fix it against the running host (fix-live). Do not edit `spec.md` in this loop. Then back to `/crav1-verify-spec`. |
+| 15 | `/crav1-draft-commit-message` | Optional. When you want to see the commit message before the commit. |
+| 16 | `/crav1-finalize-commit` | When the slice verifies. |
+| 17 | `/crav1-open-pr` | To push and open the pull request. |
+| 18 | `/crav1-review-pr` | Before the merge. |
+| 19 | `/crav1-merge-pr` | When the review says ship and the host checks are green. |
 
 <a id="new-info"></a>
 
@@ -57,9 +58,10 @@ Minutes, a mail, a chat, or a new fact changes a spec that already exists, built
 | 4 | `/crav1-plan-from-spec` | When the slice has `plan.md` or `tasks.md`, so the plan and the tasks follow the new spec. |
 | 5 | `/crav1-specs-to-ado` | Optional. Only when the Feature itself changed and it is in Azure Boards. |
 | 6 | `/crav1-tasks-to-ado` | Optional. When the tasks are in Azure Boards. |
-| 7 | `/crav1-complete-tasks` or `/crav1-complete-task` or `/crav1-implement-task` | To build the tasks that are not built yet. The complete skills verify each task inside their worker. |
-| 8 | `/crav1-verify-spec` | After implement-task, or for the whole slice when you want one report. |
-| 9 | `/crav1-finalize-commit` | When the slice verifies. |
+| 7 | `/crav1-tasks-ready-to-build` | Optional. Any time, to see which tasks are ready after the change, which are blocked and why. Read-only. |
+| 8 | `/crav1-complete-tasks` or `/crav1-complete-task` or `/crav1-implement-task` | To build the tasks that are not built yet. The complete skills verify each task inside their worker. |
+| 9 | `/crav1-verify-spec` | After implement-task, or for the whole slice when you want one report. |
+| 10 | `/crav1-finalize-commit` | When the slice verifies. |
 
 <a id="bug"></a>
 
