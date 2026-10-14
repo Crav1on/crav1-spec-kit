@@ -10,9 +10,9 @@ A glossary row whose Meaning is `to be researched` is not a research note. Do no
 
 ## When to compare
 
-Compare after a quote is kept in a spec. The skills are `/crav1-meeting-to-specs`, `/crav1-add-to-spec`, `/crav1-match-dump-to-specs`, and `/crav1-code-into-specs`.
+Compare after a quote is kept in a spec. The skills are `/crav1-add-to-spec`.
 
-`/crav1-meeting-to-specs` hands a kept addition to `/crav1-add-to-spec`. That handoff runs this check. Meeting does not run it a second time.
+`/crav1-add-to-spec` hands a kept addition to `/crav1-add-to-spec`. That handoff runs this check. Meeting does not run it a second time.
 
 A kept new feature, a kept bug, a leave, a dismiss, and a note written to `docs/notes/` do not run this check.
 
@@ -366,7 +366,7 @@ Everything in this section is written in the files. Nothing is sent. Nothing is 
 
 ## Readers
 
-`/crav1-explain`, `/crav1-whats-known-about`, and `/crav1-feature-candidates` show a stale note as stale. A narrowed line is still stale. Quote the mark. Name the path. Do not treat that research as current. Do not clear the mark. Do not route a point. Do not write the note's open questions onto a spec. Do not drop the note to keep a list short.
+`/crav1-explain`, `/crav1-whats-known-about`, and `/crav1-ado-sync` show a stale note as stale. A narrowed line is still stale. Quote the mark. Name the path. Do not treat that research as current. Do not clear the mark. Do not route a point. Do not write the note's open questions onto a spec. Do not drop the note to keep a list short.
 
 `/crav1-plan-from-spec` lists stale research findings under Risks. A narrowed mark is still stale. The plan does not stop because research is stale. Do not clear the mark. Do not route a point.
 

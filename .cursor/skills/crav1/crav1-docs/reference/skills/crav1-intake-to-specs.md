@@ -14,7 +14,7 @@ Mixed intake → `docs/system/` (including `glossary.md`) + one spec per v0 feat
 
 Mixed files, or several v0 features. Called by the user.
 
-This is one of the seven starter options. Asking for startup options names it and does not run it.
+This is one of the six starter options. Asking for startup options names it and does not run it.
 
 ## Reads
 

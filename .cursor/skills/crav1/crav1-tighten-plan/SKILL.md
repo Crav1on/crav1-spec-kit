@@ -58,7 +58,7 @@ Typical **plan** shapes:
 
 Skip nitpicks. Merge duplicates. Prefer fewer sharp issues.
 
-If **no plan issues** remain (spec-tagged ones only, or none): say so. Next: spec-tagged → `/crav1-tighten-spec` / `/crav1-resolve-questions`; else **new chat**, `/crav1-implement-task` or `/crav1-complete-task` with `plan.md`, `tasks.md`, and `spec.md` attached.
+If **no plan issues** remain (spec-tagged ones only, or none): say so. Next: spec-tagged → `/crav1-tighten-spec` / `/crav1-resolve-questions`; else **new chat**, `/crav1-build-tasks` with `plan.md`, `tasks.md`, and `spec.md` attached.
 
 When `## Linter` says this repo has no linter or checker for the code the tasks will touch, do not name those Build commands. Stop before Build. The user decides to add the linter or to go on without one. Do not install one. When they already chose to go on without one in this turn, the Build next step applies, and the plan still says none. A plan that already says none is not a `P#` by itself.
 

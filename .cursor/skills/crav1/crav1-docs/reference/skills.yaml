@@ -5,7 +5,7 @@
 # After a change here, run: python3 scripts/gen-skill-docs.py
 # CI runs: python3 scripts/gen-skill-docs.py --check
 #
-# Lanes: starters is the list of the seven starter options. Every skill also
+# Lanes: starters is the list of the six starter options. Every skill also
 # has one lane (specify, plan, build, cross-cutting) and one group inside it.
 # Groups are reading aids. Lanes are the routing authority (docs/guild-routing.md).
 #
@@ -26,8 +26,7 @@ starter_options:
 - crav1-spark-to-spec
 - crav1-ideas-to-spec
 - crav1-intake-to-specs
-- crav1-match-to-specs
-- crav1-repos-to-spec
+- crav1-existing-to-specs
 - crav1-environment-read
 - crav1-fix-bug
 lanes:
@@ -212,50 +211,91 @@ skills:
     Treat hunches as proposed, not decided.
 
     Do not write code. Map first, then landscape, then one spec per v0 slug.'
-- name: crav1-match-to-specs
-  lane: specify
+- name: crav1-existing-to-specs
+  lane: cross-cutting
   group: Start
   starter: true
   since: 1.0.0
   stage: stable
   walkthrough: docs/from-match.md
-  purpose: Match one or more repos that already make up a system, plus a dump of notes, tickets, old docs,
-    diagrams, or screenshots, to docs/system/ (including glossary.md) and one spec per confirmed slice.
+  purpose: Turn a system that already exists into specs; asks repos only or repos plus a bundle, and one
+    spec or system notes plus one spec per feature.
   in_depth:
-  - Existing repos plus a dump → where the spec files go, then `docs/system/` (including `glossary.md`)
-    and one spec per confirmed slice (done, partial, or not in the code). Fills a missing `glossary.md`
-    when the folder already exists. New glossary rows are appended. Existing rows are not rewritten. A
-    meaning the source does not state is `to be researched`. That same pass adds what is new to the short
-    description, the diagram, and how the parts connect. It does not rewrite what is already there. Not
-    intake, spark, or ideas. Does not plan, implement, or commit.
-  use_when: Existing repos plus a dump
+  - '**`/crav1-existing-to-specs`** is a starter option. It opens with two questions: repos only, or repos
+    plus a bundle to match; and one spec (the architecture spec), or system notes plus one spec per feature.
+    It skips a question the message answers. It still runs only when the user names the repos. It replaces
+    repos-to-spec and match-to-specs; their rules are kept as branches.'
+  - 'Repos plus a bundle (was `/crav1-match-to-specs`): Existing repos plus a dump → where the spec files
+    go, then `docs/system/` (including `glossary.md`) and one spec per confirmed slice (done, partial,
+    or not in the code). Fills a missing `glossary.md` when the folder already exists. New glossary rows
+    are appended. Existing rows are not rewritten. A meaning the source does not state is `to be researched`.
+    That same pass adds what is new to the short description, the diagram, and how the parts connect.
+    It does not rewrite what is already there. Not intake, spark, or ideas. Does not plan, implement,
+    or commit.'
+  - 'Repos only (was `/crav1-repos-to-spec`): When the user names one or more repos and wants the architecture
+    the code shows, **`/crav1-existing-to-specs`** reads those repos and writes one architecture spec
+    the lanes can extend (`docs/architecture/spec.md`) when that file is missing. It writes the system
+    notes under `docs/system/` when those notes are missing. When a real system note is already there,
+    it leaves those notes except the `Synced at` cell of a repo it read, and writes the missing architecture
+    spec and `docs/architecture/left-out.md`. When the architecture spec or those notes are already there,
+    a later re-read adds only what is new and does not rewrite lines that are already there, except that
+    `Synced at` cell, and removes a left-out line when the code shows it. A fact the code shows is confirmed.
+    Before any file is written, the confirmation is one question per section. A guess stays out of the
+    spec until that section accepts it. A guess that stays left out is written to `docs/architecture/left-out.md`.
+    A link between repos is written only when the code shows it. If none is found, the command says so.
+    It does not invent links. It is cross-cutting. It is not a lane and not a mode of Specify. It does
+    not design the next feature, write application code, or start Specify, Plan, or Build. It is not `/crav1-add-to-spec`.'
+  - 'Repos only (was `/crav1-repos-to-spec`): The user names one or more repos. Reads those repos and
+    writes `docs/architecture/spec.md` when that file is missing, and the `docs/system/` notes `/crav1-explain`
+    reads when those notes are missing. When a real system note is already there, leaves those notes except
+    the `Synced at` cell of a repo it read, and writes the missing architecture spec and `docs/architecture/left-out.md`.
+    A later re-read adds only what is new and does not rewrite those lines, except that `Synced at` cell,
+    and removes a left-out line when the code shows it. Before any file is written, one question per section.
+    A fact the code shows is confirmed. A guess stays out until that section accepts it. A guess that
+    stays left out is written to `docs/architecture/left-out.md`. A link is written only when the code
+    shows it. If none is found, says so and does not invent a link. Does not design the next feature,
+    write application code, or start Specify, Plan, or Build. Not `/crav1-add-to-spec`.'
+  use_when: The user names existing repos, with or without a bundle to match
   table:
-    reads: The repos and the dump
-    writes: Landscape gaps (including a missing glossary and new rows), one spec per confirmed slice,
-      index rows, `docs/sources/` for an imported source, the transfer data policy after a yes, and `Used
-      by` on a quoted note
-  reads: Reads the repos and the dump.
-  writes: 'Writes `docs/system/` in the destination the user picks (gaps only when it exists, including
-    a missing glossary and new rows) and one `docs/specs/<slug>/spec.md` per confirmed slice, including
-    not in the code, then index rows. When a dump file it quotes is an imported source, also writes `docs/sources/YYYY-MM-DD-<slug>/`,
-    following `crav1-add-to-spec` `references/sources.md`. That check may write the transfer data policy
-    after a yes. Cursor: `.cursor/rules/crav1-transfer-data-policy.mdc`. Claude Code project: `.claude/rules/crav1-transfer-data-policy.md`.
-    It never writes a secrets choice into that file. For a mail, it lists each embedded image, inline
-    or attached. It recommends convert to text when the image is a diagram, a table, or text that can
-    be reproduced exactly, and compress otherwise. It asks once before the source folder is written. Auto-accept
-    applies to those recommendations only when the transfer data policy clearly covers them. A `repos.md`
-    it writes includes a `Synced at` column and leaves that cell empty. It does not set or clear an existing
-    cell.'
-  leaves_alone: Leaves application code, `plan.md`, `work-item.md`, and the rest of an existing landscape
-    alone. Does not commit.
-  exceptions: a slice that is not in the code stays thin and is not planned here. A quoted note in `docs/notes/`
-    gets `Used by <slug>`. `Absorbed by <slug>` only after the user says yes, when this spec takes the
-    whole note.
+    reads: 'Repos plus a bundle: The repos and the dump; Repos only: Those repos, and left-out when present'
+    writes: 'Repos plus a bundle: Landscape gaps (including a missing glossary and new rows), one spec
+      per confirmed slice, index rows, `docs/sources/` for an imported source, the transfer data policy
+      after a yes, and `Used by` on a quoted note; Repos only: `docs/architecture/spec.md` when missing,
+      `docs/architecture/left-out.md`, the system notes when missing, and `Synced at` on each repo it
+      read'
+  reads: 'Repos plus a bundle: Reads the repos and the dump. Repos only: Reads the repos the user named,
+    and `docs/architecture/left-out.md` when that file is there.'
+  writes: 'Repos plus a bundle: Writes `docs/system/` in the destination the user picks (gaps only when
+    it exists, including a missing glossary and new rows) and one `docs/specs/<slug>/spec.md` per confirmed
+    slice, including not in the code, then index rows. When a dump file it quotes is an imported source,
+    also writes `docs/sources/YYYY-MM-DD-<slug>/`, following `crav1-add-to-spec` `references/sources.md`.
+    That check may write the transfer data policy after a yes. Cursor: `.cursor/rules/crav1-transfer-data-policy.mdc`.
+    Claude Code project: `.claude/rules/crav1-transfer-data-policy.md`. It never writes a secrets choice
+    into that file. For a mail, it lists each embedded image, inline or attached. It recommends convert
+    to text when the image is a diagram, a table, or text that can be reproduced exactly, and compress
+    otherwise. It asks once before the source folder is written. Auto-accept applies to those recommendations
+    only when the transfer data policy clearly covers them. A `repos.md` it writes includes a `Synced
+    at` column and leaves that cell empty. It does not set or clear an existing cell. Repos only: Writes
+    `docs/architecture/spec.md` when that file is missing, `docs/architecture/left-out.md` for guesses
+    that stay left out, and the `docs/system/` notes `/crav1-explain` reads when those notes are missing.
+    Sets `Synced at` on each repo it read and touches only those repos.'
+  leaves_alone: 'Repos plus a bundle: Leaves application code, `plan.md`, `work-item.md`, and the rest
+    of an existing landscape alone. Does not commit. Repos only: Leaves application code and the next
+    feature alone. On the pass that creates the architecture spec while system notes are already there,
+    that cell is the only edit to those notes.'
+  exceptions: 'Repos plus a bundle: a slice that is not in the code stays thin and is not planned here.
+    A quoted note in `docs/notes/` gets `Used by <slug>`. `Absorbed by <slug>` only after the user says
+    yes, when this spec takes the whole note. Repos only: before writing, one question per section (each
+    named repo, inferred guesses, links, left-out) and every item stays listed. A later re-read adds only
+    what is new to the spec and notes, sets `Synced at` for repos it read without rewriting the rest of
+    that row, and removes a left-out line when the code shows it or that section dismisses it. A guess
+    stays out until that section accepts it. A link is written only when the code shows it.'
   called_by: Called by the user.
-  runs_by_itself: Calls `/crav1-feature-branch` in that destination when it already has commits.
+  runs_by_itself: 'Repos plus a bundle: Calls `/crav1-feature-branch` in that destination when it already
+    has commits. Repos only: Calls `/crav1-feature-branch` when the destination already has commits.'
   you_run_next:
   - /crav1-finalize-commit
-  first_prompt: '/crav1-match-to-specs
+  first_prompt: '/crav1-existing-to-specs
 
     @repo-a/
 
@@ -269,69 +309,6 @@ skills:
     The repos are what exists. The dump is what to match.
 
     Do not write code. Ask where the specs go, then map, and stop.'
-- name: crav1-repos-to-spec
-  lane: cross-cutting
-  group: Start
-  starter: true
-  since: 1.9.0
-  stage: stable
-  walkthrough: docs/from-repos.md
-  purpose: Read one or more repos the user named.
-  in_depth:
-  - When the user names one or more repos and wants the architecture the code shows, **`/crav1-repos-to-spec`**
-    reads those repos and writes one architecture spec the lanes can extend (`docs/architecture/spec.md`)
-    when that file is missing. It writes the system notes under `docs/system/` when those notes are missing.
-    When a real system note is already there, it leaves those notes except the `Synced at` cell of a repo
-    it read, and writes the missing architecture spec and `docs/architecture/left-out.md`. When the architecture
-    spec or those notes are already there, a later re-read adds only what is new and does not rewrite
-    lines that are already there, except that `Synced at` cell, and removes a left-out line when the code
-    shows it. A fact the code shows is confirmed. Before any file is written, the confirmation is one
-    question per section. A guess stays out of the spec until that section accepts it. A guess that stays
-    left out is written to `docs/architecture/left-out.md`. A link between repos is written only when
-    the code shows it. If none is found, the command says so. It does not invent links. It is cross-cutting.
-    It is not a lane and not a mode of Specify. It does not design the next feature, write application
-    code, or start Specify, Plan, or Build. It is not `/crav1-code-into-specs`.
-  - The user names one or more repos. Reads those repos and writes `docs/architecture/spec.md` when that
-    file is missing, and the `docs/system/` notes `/crav1-explain` reads when those notes are missing.
-    When a real system note is already there, leaves those notes except the `Synced at` cell of a repo
-    it read, and writes the missing architecture spec and `docs/architecture/left-out.md`. A later re-read
-    adds only what is new and does not rewrite those lines, except that `Synced at` cell, and removes
-    a left-out line when the code shows it. Before any file is written, one question per section. A fact
-    the code shows is confirmed. A guess stays out until that section accepts it. A guess that stays left
-    out is written to `docs/architecture/left-out.md`. A link is written only when the code shows it.
-    If none is found, says so and does not invent a link. Does not design the next feature, write application
-    code, or start Specify, Plan, or Build. Not `/crav1-code-into-specs`.
-  use_when: The user names the repos
-  table:
-    reads: Those repos, and left-out when present
-    writes: '`docs/architecture/spec.md` when missing, `docs/architecture/left-out.md`, the system notes
-      when missing, and `Synced at` on each repo it read'
-  reads: Reads the repos the user named, and `docs/architecture/left-out.md` when that file is there.
-  writes: Writes `docs/architecture/spec.md` when that file is missing, `docs/architecture/left-out.md`
-    for guesses that stay left out, and the `docs/system/` notes `/crav1-explain` reads when those notes
-    are missing. Sets `Synced at` on each repo it read and touches only those repos.
-  leaves_alone: Leaves application code and the next feature alone. On the pass that creates the architecture
-    spec while system notes are already there, that cell is the only edit to those notes.
-  exceptions: before writing, one question per section (each named repo, inferred guesses, links, left-out)
-    and every item stays listed. A later re-read adds only what is new to the spec and notes, sets `Synced
-    at` for repos it read without rewriting the rest of that row, and removes a left-out line when the
-    code shows it or that section dismisses it. A guess stays out until that section accepts it. A link
-    is written only when the code shows it.
-  called_by: Called by the user and by `/crav1-environment-read` for a confirmed architecture or left-out
-    section.
-  runs_by_itself: Calls `/crav1-feature-branch` when the destination already has commits.
-  you_run_next:
-  - /crav1-finalize-commit
-  first_prompt: '/crav1-repos-to-spec
-
-    @repo-a/
-
-    @repo-b/
-
-
-    Read these repos. Write one architecture spec and the system notes.
-
-    A guess stays out until I confirm it. Do not invent a link. Do not write code.'
 - name: crav1-environment-read
   lane: cross-cutting
   group: Start
@@ -368,7 +345,7 @@ skills:
   table:
     reads: Non-prod resources on that host
     writes: Confirmed lines appended to `docs/environments/marks.md`; confirmed sections go to their owners
-      through `/crav1-keep-current`, `/crav1-repos-to-spec`, or `/crav1-add-to-spec`
+      through `/crav1-keep-current`, `/crav1-existing-to-specs`, or `/crav1-add-to-spec`
   reads: Reads the host the user named, non-prod resources on that host, prod-only resources for shape
     and connections when the user says yes, and `docs/environments/marks.md` when it exists. After that
     read, optional SQL metadata and storage structure only when the user says yes.
@@ -385,7 +362,7 @@ skills:
     not run it. After `marks.md` lines are added, it asks once whether to run `/crav1-keep-current` and
     does not run that refresh from the question.
   called_by: Called by the user.
-  runs_by_itself: Calls `/crav1-keep-current`, `/crav1-repos-to-spec`, and `/crav1-add-to-spec` for the
+  runs_by_itself: Calls `/crav1-keep-current`, `/crav1-existing-to-specs`, and `/crav1-add-to-spec` for the
     append only after that section is confirmed.
   you_run_next:
   - /crav1-finalize-commit
@@ -410,7 +387,7 @@ skills:
     that is already shipping, or a defect that comes in from outside. It is cross-cutting. It is not a
     lane and not a stretch of verify. It does not start that lane, edit code, open a pull request, or
     create an Azure Boards work item. If no bug is named, it stops. It does not go hunting. When you ask
-    for startup options, it is one of the seven starter options. That ask names the list and does not
+    for startup options, it is one of the six starter options. That ask names the list and does not
     run it. It is an intake for a bug that already exists. It still runs only when you name a real bug.
     It is not a skill that runs because a repo is new, and it is not started automatically. Spark, specify,
     plan, and verify do not run it.
@@ -464,7 +441,7 @@ skills:
   exceptions: skips the prompt when there is no repo, no commits, or the branch is already right. A dirty
     tree does not checkout.
   called_by: Called by the user, `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`,
-    `/crav1-match-to-specs`, `/crav1-implement-task`, `/crav1-complete-task`, `/crav1-complete-tasks`,
+    `/crav1-existing-to-specs`, `/crav1-build-tasks`,
     and `/crav1-complete-features`.
   runs_by_itself: Calls no skill.
   you_run_next:
@@ -565,25 +542,28 @@ skills:
   called_by: Called by the user.
   runs_by_itself: Calls no skill.
   you_run_next:
-  - /crav1-specs-to-ado
+  - /crav1-ado-sync
   - /crav1-plan-from-spec
   first_prompt: '/crav1-resolve-questions
 
     @docs/specs/<slug>/spec.md'
-- name: crav1-ask-open-questions
+- name: crav1-show-or-ask-open-questions
   lane: cross-cutting
   group: Meetings and open questions
   starter: false
   since: 1.40.0
   stage: stable
   walkthrough: docs/from-ask-open-questions.md
-  purpose: Gather the open questions in the specs for one person, one spec, or one topic, and draft them
-    as a mail, a meeting agenda, a chat message, or meeting questions to ask out loud.
+  purpose: Show the cross-spec overview of open questions (read-only), or draft them to ask; asks which.
   in_depth:
+  - '**`/crav1-show-or-ask-open-questions`** opens with one question: show an overview of every open question
+    across the specs, with who was asked and when, pending drafts, and `Blocks:` lines (read-only), or
+    ask: draft them for one person, spec, or topic. It skips the question when the message says which.
+    It was ask-open-questions.'
   - Drafts the open questions for a person, a spec, or a topic as a mail, a meeting agenda, a chat message,
     or meeting questions. No spec names in the draft. Nothing is sent. Yes, no, or pending records whether
     they were asked.
-  use_when: Someone else has to answer open questions
+  use_when: You want to see what is still open, or draft questions to ask
   table:
     reads: Open questions on the specs for a person, a spec, or a topic
     writes: A draft in chat; `Asked:` or `Pending:` lines under those questions after yes or pending;
@@ -601,46 +581,103 @@ skills:
     alone. Sends nothing. Does not commit.
   exceptions: 'no person, spec, or topic stops and asks. Pending questions are shown first: mark as sent,
     keep pending, or drop the mark. No writes nothing. Meeting questions lists every selected question.
-    It names `/crav1-meeting-to-specs` or `/crav1-match-dump-to-specs` for the answers and `/crav1-finalize-commit`
-    when a mark was written, and does not run them. It is not a starter option.'
+    It names `/crav1-add-to-spec` for the answers and `/crav1-finalize-commit` when a mark was written,
+    and does not run them. It is not a starter option.'
   called_by: Called by the user.
   runs_by_itself: Calls no skill.
   you_run_next:
-  - /crav1-meeting-to-specs
-  - /crav1-match-dump-to-specs
+  - /crav1-add-to-spec
   - /crav1-finalize-commit
-  first_prompt: '/crav1-ask-open-questions
+  first_prompt: '/crav1-show-or-ask-open-questions
 
 
     The open questions for <a person, one spec, or a topic>, as a mail.'
 - name: crav1-add-to-spec
-  lane: specify
-  group: Specify
+  lane: cross-cutting
+  group: Keep the picture current
   starter: false
   since: 1.0.0
   stage: stable
   walkthrough: docs/from-add.md
-  purpose: Add new information to one existing spec, then report whether docs/system/ or another spec
-    has to change; edits there only on apply.
+  purpose: 'Bring new information into existing specs; asks what you have: a fact, a dump, a code change,
+    or a meeting.'
   in_depth:
-  - New information aimed at one spec that already exists is **`/crav1-add-to-spec`**. `/crav1-tighten-spec`
-    stays for mushy wording. Match, intake, spark, and ideas create the folders. This command does not
-    plan.
-  - New information for one existing spec → quote it into that `spec.md`, then report whether the landscape
-    or another spec has to change. Does not rewrite those other files unless asked. Does not create a
-    glossary. A new glossary row can be one listed edit and is not written unless apply is chosen. A meaning
-    the new information does not state is `to be researched`. Existing rows are not rewritten. Does not
-    plan, implement, or commit.
-  use_when: New information for one existing spec
+  - '**`/crav1-add-to-spec`** opens with one question: what you have, a fact, a dump, a code change, or
+    a meeting (minutes, a transcript, a mail, or a chat). It skips the question when the message shows
+    which. It replaces match-dump-to-specs, code-into-specs, and meeting-to-specs; their rules are kept
+    as branches, and a kept quote from any of them goes through the fact rules.'
+  - 'A fact (was `/crav1-add-to-spec`): New information aimed at one spec that already exists is **`/crav1-add-to-spec`**.
+    `/crav1-tighten-spec` stays for mushy wording. Match, intake, spark, and ideas create the folders.
+    This command does not plan.'
+  - 'A fact (was `/crav1-add-to-spec`): New information for one existing spec → quote it into that `spec.md`,
+    then report whether the landscape or another spec has to change. Does not rewrite those other files
+    unless asked. Does not create a glossary. A new glossary row can be one listed edit and is not written
+    unless apply is chosen. A meaning the new information does not state is `to be researched`. Existing
+    rows are not rewritten. Does not plan, implement, or commit.'
+  - 'A dump (was `/crav1-match-dump-to-specs`): A later dump, specs already exist → sort onto those specs
+    (belongs, already there, note, or does not fit), then quote the new bits. A confirmed note is written
+    under `docs/notes/`. Does not ask for a slug first. Does not create a slug. Does not seed `docs/system/`.
+    Fills a missing `glossary.md` only when that folder already exists. New glossary rows are appended.
+    Existing rows are not rewritten. A meaning the source does not state is `to be researched`. That same
+    pass adds what is new to the short description, the diagram, and how the parts connect. It does not
+    rewrite what is already there. Does not plan, implement, or commit.'
+  - 'A code change (was `/crav1-code-into-specs`): A code change that already landed, specs already exist
+    → sort onto those specs (belongs, already described there, or fits none), then quote what the change
+    does. No dump. Does not ask for a slug first. Does not create a slug. Does not watch the repo. Does
+    not seed `docs/system/`. Fills a missing `glossary.md` only when that folder already exists. New glossary
+    rows are appended. Existing rows are not rewritten. A meaning the source does not state is `to be
+    researched`. That same pass adds what is new to the short description, the diagram, and how the parts
+    connect. It does not rewrite what is already there. Does not plan, implement, or commit.'
+  - 'A meeting (was `/crav1-meeting-to-specs`): When the user brings minutes, a transcript, an email,
+    or a chat thread, **`/crav1-add-to-spec`** extracts the requirements, decisions, changes, open questions,
+    and bugs, and matches each quote to specs that already exist. An email or a chat thread is accepted
+    as well as minutes or a transcript. The kind is `meeting`, `email`, or `chat`, from what the input
+    shows. The date comes from the input. Each item is a quote, with speaker and time when the input shows
+    them. Small talk is dropped. When more than one existing spec could fit, every candidate stays listed.
+    Nothing is dropped to keep the list short. Each item that matches an existing spec shows one line,
+    `State: <state>.`, and a short reason that names the evidence, in the item block and in the question.
+    The states are built, partly built, planned, and not built. `Fits: none` has no state line. Evidence
+    is that slice’s `spec.md` (including `## Match`), `plan.md`, `tasks.md` checkboxes, and `verify.md`
+    when present. When those do not settle it, one read-only look at the code that spec or plan points
+    to. A code-based or uncertain state is labeled `(inference, not in the docs)`. The line does not change
+    keep, leave, dismiss, or note. It is not written and it is not passed to `/crav1-add-to-spec` as quote
+    text. The user takes them one at a time: keep, leave, dismiss, or note. Note keeps the quote in `docs/notes/`
+    without tying it to a spec yet. Dismiss is for this run only. The next run starts fresh. A kept addition
+    goes to that spec through `/crav1-add-to-spec`. The quote starts with `From <kind> <date>.` when there
+    is a date, otherwise `From <kind>.` The impact check still runs there. A kept new feature names `/crav1-spark-to-spec`,
+    `/crav1-ideas-to-spec`, or `/crav1-intake-to-specs`. A kept bug names `/crav1-fix-bug`. Those commands
+    are not run. When a kept addition imports a source, the skill writes `docs/sources/YYYY-MM-DD-<slug>/`
+    following the imported-sources convention and does not write the spec. It does not commit. It is cross-cutting.
+    It may run from any lane. It does not move work into a lane. It is a later skill. It is not a starter
+    option. Asking for startup options names only the six and does not run this command. The six starter
+    options stay unchanged.'
+  - 'A meeting (was `/crav1-meeting-to-specs`): Minutes, a transcript, an email, or a chat thread → quotes
+    matched to existing specs, keep, leave, dismiss, or note one at a time. A kept addition goes through
+    `/crav1-add-to-spec`. A clear answer to a spec open question is linked under it.'
+  use_when: New information for specs that already exist
   table:
-    reads: That information and one `spec.md`
-    writes: Quotes in that spec, `Used by` on a note it quotes, `docs/sources/` for an imported source,
-      the transfer data policy after a yes, research stale marks after a yes, and answer links under open
-      questions
-  reads: Reads the new information and one existing `spec.md`.
-  writes: 'Writes quotes into that file, and listed edits to `docs/system/` or another spec only when
-    the user picks apply, including a new row on an existing glossary. When that information is an imported
-    source, also writes `docs/sources/YYYY-MM-DD-<slug>/` following this skill’s `references/sources.md`,
+    reads: 'A fact: That information and one `spec.md`; A dump: The dump and existing spec folders; A
+      code change: A commit, range, or branch diff, plus specs; A meeting: That input and existing spec
+      folders'
+    writes: 'A fact: Quotes in that spec, `Used by` on a note it quotes, `docs/sources/` for an imported
+      source, the transfer data policy after a yes, research stale marks after a yes, and answer links
+      under open questions; A dump: Confirmed new quotes in matching specs, `docs/notes/` for a note,
+      `docs/sources/` for an imported source, the transfer data policy after a yes, research stale marks
+      after a yes, and answer links under open questions; A code change: Quotes of what belongs in matching
+      specs, a missing `glossary.md` or new glossary rows when `docs/system/` exists, the picture update,
+      `Synced at` (repo cell or slice line), and research stale marks after a yes; other listed edits
+      only on apply; A meeting: A source folder when a kept addition imports one, `docs/notes/` when the
+      user picks Note, the transfer data policy after a yes; answer links and asked marks through `/crav1-add-to-spec`'
+  reads: 'A fact: Reads the new information and one existing `spec.md`. A dump: Reads the dump, existing
+    spec folders, skipping `_template`, and `docs/notes/` so the same item is not noted twice. A code
+    change: Reads a named commit, range, or branch diff, and existing spec folders. A meeting: Reads the
+    minutes, transcript, email, or chat after the command, and existing `docs/specs/<slug>/` folders,
+    skipping `_template`. For an item that matches a slice, also reads that slice’s `spec.md` (including
+    `## Match`), `plan.md`, `tasks.md`, and `verify.md` when present, and the code that spec or plan points
+    to only when those files do not settle the build state.'
+  writes: 'A fact: Writes quotes into that file, and listed edits to `docs/system/` or another spec only
+    when the user picks apply, including a new row on an existing glossary. When that information is an
+    imported source, also writes `docs/sources/YYYY-MM-DD-<slug>/` following this skill’s `references/sources.md`,
     and `Source:` and `Trace:` lines that link to that folder. That check may write the transfer data
     policy after a yes. Cursor: `.cursor/rules/crav1-transfer-data-policy.mdc`. Claude Code project: `.claude/rules/crav1-transfer-data-policy.md`.
     It never writes a secrets choice into that file. For a mail, it lists each embedded image, inline
@@ -660,21 +697,74 @@ skills:
     including when the mark clears. It does not ask the user. A kept quote that answers a waiting point
     is re-checked the same way. It may draft a revisit request for the note''s owner. It does not send
     it. A clear answer to an open question on the target spec writes an `Answered:` line under it, and
-    an import from `/crav1-meeting-to-specs` can hand answer links and asked marks, following this skill''s
+    an import from `/crav1-add-to-spec` can hand answer links and asked marks, following this skill''s
     `references/open-questions.md`. Neither rewrites the question or a spec line. An answer that changes
-    a spec line names `/crav1-resolve-questions` and does not run it.'
-  leaves_alone: Leaves `plan.md`, `tasks.md`, and a missing `glossary.md` alone. Does not commit.
-  exceptions: creates no slug and no `docs/system/`. When the quote comes from a note, writes `Used by
-    <slug>` and updates `docs/notes/index.md`. Status stays open. `Absorbed by <slug>` only when one spec
-    takes the whole note, and only after the user says yes. Then status is absorbed. Partial use never
-    closes it. The research question is not the landscape apply question. The environment-read and suggest-tests-for-code
-    handoffs ask once at the end of the run, not per item, whether to run `/crav1-keep-current`, and do
-    not run it. The specs-to-ado and ado-to-specs handoffs do not ask. The meeting handoff runs this research
-    check. It does not run it a second time.
+    a spec line names `/crav1-resolve-questions` and does not run it. A dump: Writes confirmed new quotes
+    into the matching `spec.md` files, `docs/notes/YYYY-MM-DD-<slug>.md` and `docs/notes/index.md` when
+    the confirmed sort leaves a fact on the Note pile, and a missing `glossary.md` or new glossary rows
+    only when `docs/system/` already exists. When a confirmed quote comes from an imported source, also
+    writes `docs/sources/YYYY-MM-DD-<slug>/`, following `crav1-add-to-spec` `references/sources.md`. That
+    check may write the transfer data policy after a yes. Cursor: `.cursor/rules/crav1-transfer-data-policy.mdc`.
+    Claude Code project: `.claude/rules/crav1-transfer-data-policy.md`. It never writes a secrets choice
+    into that file. For a mail, it lists each embedded image, inline or attached. It recommends convert
+    to text when the image is a diagram, a table, or text that can be reproduced exactly, and compress
+    otherwise. It asks once before the source folder is written. Auto-accept applies to those recommendations
+    only when the transfer data policy clearly covers them. A listed `repos.md` edit keeps `Synced at`
+    and does not set it. After a kept quote, compares it with `docs/research/*.md` and `## Research findings`
+    on the specs it touches, including notes those findings link to, following `crav1-add-to-spec` `references/research-stale.md`.
+    A clear contradiction or an answered open question is marked stale only after the user says yes. An
+    unclear case is not marked. It may draft a revisit request for the note''s owner. It does not send
+    it. A clear answer to a spec open question is linked under that question with the confirmed sort,
+    and a source that shows a question being asked writes its `Asked:` date, following `crav1-add-to-spec`
+    `references/open-questions.md`. An unclear or partial answer is shown and the question stays open.
+    A code change: Writes quotes of what belongs into the matching `spec.md` files, and the same glossary
+    gap as match-dump. When the read is a whole repo, sets that repo''s `Synced at` cell and touches only
+    those repos. When the read is one slice, leaves that column alone and writes or updates `Synced at:
+    <repo> <branch>@<short sha>, <date>` on that slice''s `spec.md`. After a kept quote, compares it with
+    `docs/research/*.md` and `## Research findings` on the specs it touches, including notes those findings
+    link to, following `crav1-add-to-spec` `references/research-stale.md`. A clear contradiction or an
+    answered open question is marked stale only after the user says yes. An unclear case is not marked.
+    It may draft a revisit request for the note''s owner. It does not send it. A meeting: When a kept
+    addition imports a source, writes `docs/sources/YYYY-MM-DD-<slug>/` following `crav1-add-to-spec`
+    `references/sources.md`, and does not write the spec. When the user picks Note, writes `docs/notes/YYYY-MM-DD-<slug>.md`
+    and `docs/notes/index.md`. It reads `docs/notes/` first. An item already noted is not written again.
+    That check may write the transfer data policy after a yes. Cursor: `.cursor/rules/crav1-transfer-data-policy.mdc`.
+    Claude Code project: `.claude/rules/crav1-transfer-data-policy.md`. It never writes a secrets choice
+    into that file. For a mail, it lists each embedded image, inline or attached. It recommends convert
+    to text when the image is a diagram, a table, or text that can be reproduced exactly, and compress
+    otherwise. It asks once before the source folder is written. Auto-accept applies to those recommendations
+    only when the transfer data policy clearly covers them.'
+  leaves_alone: 'A fact: Leaves `plan.md`, `tasks.md`, and a missing `glossary.md` alone. Does not commit.
+    A dump: Leaves leftovers, `plan.md`, `tasks.md`, and other landscape files alone unless the user picks
+    apply. Does not commit. A code change: Leaves leftovers, application code, `plan.md`, `tasks.md`,
+    and other landscape files alone unless the user picks apply. Does not commit. A meeting: Leaves `docs/system/`,
+    specs, marks, and dismissals alone. Does not commit.'
+  exceptions: 'A fact: creates no slug and no `docs/system/`. When the quote comes from a note, writes
+    `Used by <slug>` and updates `docs/notes/index.md`. Status stays open. `Absorbed by <slug>` only when
+    one spec takes the whole note, and only after the user says yes. Then status is absorbed. Partial
+    use never closes it. The research question is not the landscape apply question. The environment-read
+    and suggest-tests-for-code handoffs ask once at the end of the run, not per item, whether to run `/crav1-keep-current`,
+    and do not run it. The ado-sync handoffs do not ask. The meeting handoff runs this research
+    check. It does not run it a second time. A dump: creates no slug and seeds no `docs/system/`. A confirmed
+    Note writes `docs/notes/` and does not ask what kind of note it is. An item already noted is not written
+    again. The research question is not the landscape apply question. A code change: creates no slug,
+    seeds no `docs/system/`, and does not watch the repo. The research question is not the landscape apply
+    question. A skill that writes `docs/research/` follows the clear section of that same file. That check
+    does not ask the user. A meeting: no input stops and asks. The kind and the date come from the input,
+    one of each for the run. An unclear kind, or no date, is one question. Note records the quote in `docs/notes/`
+    and does not ask what kind of note it is. Dismiss is this run only and is not stored. Dismiss stays
+    for a greeting, scheduling, and thanks. A kept new feature or bug only names the next command. A build-state
+    line on a matched item is informational. It is not quote text. It does not start Specify, Plan, or
+    Build. It is not a starter option.'
   called_by: Called by the user, by `/crav1-environment-read` for a confirmed Match section, by `/crav1-suggest-tests-for-code`
-    for one kept or dismissed suggestion, by `/crav1-meeting-to-specs` for one kept addition, by `/crav1-specs-to-ado`
-    for a preview change, and by `/crav1-ado-to-specs` for one kept change or one answer.
-  runs_by_itself: Calls no skill.
+    for one kept or dismissed suggestion, by `/crav1-add-to-spec` for one kept addition, by `/crav1-ado-sync`
+    for a preview change, and by `/crav1-ado-sync` for one kept change or one answer.
+  runs_by_itself: 'A fact: Calls no skill. A dump: Calls no skill. A code change: Calls no skill. A meeting:
+    Calls `/crav1-add-to-spec` for one kept addition. That handoff runs the research check in `crav1-add-to-spec`
+    `references/research-stale.md`. This skill does not run it a second time and does not write the stale
+    block. A clear answer to a spec open question is handed to `/crav1-add-to-spec` as an answer link
+    without a keep question, with the asked marks the input shows, following `crav1-add-to-spec` `references/open-questions.md`.
+    An unclear or partial answer is shown as a possible answer and the question stays open.'
   you_run_next:
   - /crav1-tighten-spec
   - /crav1-finalize-commit
@@ -687,194 +777,6 @@ skills:
 
 
     Add this to that spec. Do not write code. Do not plan.'
-- name: crav1-match-dump-to-specs
-  lane: specify
-  group: Specify
-  starter: false
-  since: 1.1.0
-  stage: stable
-  walkthrough: docs/from-match-dump.md
-  purpose: Sort a later dump of notes, tickets, old docs, diagrams, or screenshots onto specs that already
-    exist; one dump may cover one slug or many.
-  in_depth:
-  - A later dump, specs already exist → sort onto those specs (belongs, already there, note, or does not
-    fit), then quote the new bits. A confirmed note is written under `docs/notes/`. Does not ask for a
-    slug first. Does not create a slug. Does not seed `docs/system/`. Fills a missing `glossary.md` only
-    when that folder already exists. New glossary rows are appended. Existing rows are not rewritten.
-    A meaning the source does not state is `to be researched`. That same pass adds what is new to the
-    short description, the diagram, and how the parts connect. It does not rewrite what is already there.
-    Does not plan, implement, or commit.
-  use_when: A later dump; specs already exist
-  table:
-    reads: The dump and existing spec folders
-    writes: Confirmed new quotes in matching specs, `docs/notes/` for a note, `docs/sources/` for an imported
-      source, the transfer data policy after a yes, research stale marks after a yes, and answer links
-      under open questions
-  reads: Reads the dump, existing spec folders, skipping `_template`, and `docs/notes/` so the same item
-    is not noted twice.
-  writes: 'Writes confirmed new quotes into the matching `spec.md` files, `docs/notes/YYYY-MM-DD-<slug>.md`
-    and `docs/notes/index.md` when the confirmed sort leaves a fact on the Note pile, and a missing `glossary.md`
-    or new glossary rows only when `docs/system/` already exists. When a confirmed quote comes from an
-    imported source, also writes `docs/sources/YYYY-MM-DD-<slug>/`, following `crav1-add-to-spec` `references/sources.md`.
-    That check may write the transfer data policy after a yes. Cursor: `.cursor/rules/crav1-transfer-data-policy.mdc`.
-    Claude Code project: `.claude/rules/crav1-transfer-data-policy.md`. It never writes a secrets choice
-    into that file. For a mail, it lists each embedded image, inline or attached. It recommends convert
-    to text when the image is a diagram, a table, or text that can be reproduced exactly, and compress
-    otherwise. It asks once before the source folder is written. Auto-accept applies to those recommendations
-    only when the transfer data policy clearly covers them. A listed `repos.md` edit keeps `Synced at`
-    and does not set it. After a kept quote, compares it with `docs/research/*.md` and `## Research findings`
-    on the specs it touches, including notes those findings link to, following `crav1-add-to-spec` `references/research-stale.md`.
-    A clear contradiction or an answered open question is marked stale only after the user says yes. An
-    unclear case is not marked. It may draft a revisit request for the note''s owner. It does not send
-    it. A clear answer to a spec open question is linked under that question with the confirmed sort,
-    and a source that shows a question being asked writes its `Asked:` date, following `crav1-add-to-spec`
-    `references/open-questions.md`. An unclear or partial answer is shown and the question stays open.'
-  leaves_alone: Leaves leftovers, `plan.md`, `tasks.md`, and other landscape files alone unless the user
-    picks apply. Does not commit.
-  exceptions: creates no slug and seeds no `docs/system/`. A confirmed Note writes `docs/notes/` and does
-    not ask what kind of note it is. An item already noted is not written again. The research question
-    is not the landscape apply question.
-  called_by: Called by the user.
-  runs_by_itself: Calls no skill.
-  you_run_next:
-  - /crav1-finalize-commit
-  first_prompt: '/crav1-match-dump-to-specs
-
-    @notes/later-dump.md
-
-    @tickets/
-
-    @sketches/flow.png
-
-
-    The specs already exist. Sort this dump onto them.
-
-    Do not write code. Do not plan.'
-- name: crav1-code-into-specs
-  lane: specify
-  group: Specify
-  starter: false
-  since: 1.2.0
-  stage: stable
-  walkthrough: docs/from-code.md
-  purpose: Sort a code change that already landed (a commit, a range, or the branch diff) onto specs that
-    already exist.
-  in_depth:
-  - A code change that already landed, specs already exist → sort onto those specs (belongs, already described
-    there, or fits none), then quote what the change does. No dump. Does not ask for a slug first. Does
-    not create a slug. Does not watch the repo. Does not seed `docs/system/`. Fills a missing `glossary.md`
-    only when that folder already exists. New glossary rows are appended. Existing rows are not rewritten.
-    A meaning the source does not state is `to be researched`. That same pass adds what is new to the
-    short description, the diagram, and how the parts connect. It does not rewrite what is already there.
-    Does not plan, implement, or commit.
-  use_when: A landed change; specs already exist
-  table:
-    reads: A commit, range, or branch diff, plus specs
-    writes: Quotes of what belongs in matching specs, a missing `glossary.md` or new glossary rows when
-      `docs/system/` exists, the picture update, `Synced at` (repo cell or slice line), and research stale
-      marks after a yes; other listed edits only on apply
-  reads: Reads a named commit, range, or branch diff, and existing spec folders.
-  writes: 'Writes quotes of what belongs into the matching `spec.md` files, and the same glossary gap
-    as match-dump. When the read is a whole repo, sets that repo''s `Synced at` cell and touches only
-    those repos. When the read is one slice, leaves that column alone and writes or updates `Synced at:
-    <repo> <branch>@<short sha>, <date>` on that slice''s `spec.md`. After a kept quote, compares it with
-    `docs/research/*.md` and `## Research findings` on the specs it touches, including notes those findings
-    link to, following `crav1-add-to-spec` `references/research-stale.md`. A clear contradiction or an
-    answered open question is marked stale only after the user says yes. An unclear case is not marked.
-    It may draft a revisit request for the note''s owner. It does not send it.'
-  leaves_alone: Leaves leftovers, application code, `plan.md`, `tasks.md`, and other landscape files alone
-    unless the user picks apply. Does not commit.
-  exceptions: creates no slug, seeds no `docs/system/`, and does not watch the repo. The research question
-    is not the landscape apply question. A skill that writes `docs/research/` follows the clear section
-    of that same file. That check does not ask the user.
-  called_by: Called by the user.
-  runs_by_itself: Calls no skill.
-  you_run_next:
-  - /crav1-finalize-commit
-  first_prompt: '/crav1-code-into-specs
-
-
-    The specs already exist. Sort this change onto them.
-
-    Do not write code. Do not plan.'
-- name: crav1-meeting-to-specs
-  lane: cross-cutting
-  group: Meetings and open questions
-  starter: false
-  since: 1.21.0
-  stage: stable
-  walkthrough: docs/from-meeting.md
-  purpose: Extract requirements, decisions, changes, open questions, and bugs from minutes, a transcript,
-    an email, or a chat thread, and match each quote to existing specs.
-  in_depth:
-  - 'When the user brings minutes, a transcript, an email, or a chat thread, **`/crav1-meeting-to-specs`**
-    extracts the requirements, decisions, changes, open questions, and bugs, and matches each quote to
-    specs that already exist. An email or a chat thread is accepted as well as minutes or a transcript.
-    The kind is `meeting`, `email`, or `chat`, from what the input shows. The date comes from the input.
-    Each item is a quote, with speaker and time when the input shows them. Small talk is dropped. When
-    more than one existing spec could fit, every candidate stays listed. Nothing is dropped to keep the
-    list short. Each item that matches an existing spec shows one line, `State: <state>.`, and a short
-    reason that names the evidence, in the item block and in the question. The states are built, partly
-    built, planned, and not built. `Fits: none` has no state line. Evidence is that slice’s `spec.md`
-    (including `## Match`), `plan.md`, `tasks.md` checkboxes, and `verify.md` when present. When those
-    do not settle it, one read-only look at the code that spec or plan points to. A code-based or uncertain
-    state is labeled `(inference, not in the docs)`. The line does not change keep, leave, dismiss, or
-    note. It is not written and it is not passed to `/crav1-add-to-spec` as quote text. The user takes
-    them one at a time: keep, leave, dismiss, or note. Note keeps the quote in `docs/notes/` without tying
-    it to a spec yet. Dismiss is for this run only. The next run starts fresh. A kept addition goes to
-    that spec through `/crav1-add-to-spec`. The quote starts with `From <kind> <date>.` when there is
-    a date, otherwise `From <kind>.` The impact check still runs there. A kept new feature names `/crav1-spark-to-spec`,
-    `/crav1-ideas-to-spec`, or `/crav1-intake-to-specs`. A kept bug names `/crav1-fix-bug`. Those commands
-    are not run. When a kept addition imports a source, the skill writes `docs/sources/YYYY-MM-DD-<slug>/`
-    following the imported-sources convention and does not write the spec. It does not commit. It is cross-cutting.
-    It may run from any lane. It does not move work into a lane. It is a later skill. It is not a starter
-    option. Asking for startup options names only the seven and does not run this command. The seven starter
-    options stay unchanged.'
-  - Minutes, a transcript, an email, or a chat thread → quotes matched to existing specs, keep, leave,
-    dismiss, or note one at a time. A kept addition goes through `/crav1-add-to-spec`. A clear answer
-    to a spec open question is linked under it.
-  use_when: Minutes, an email, or a chat
-  table:
-    reads: That input and existing spec folders
-    writes: A source folder when a kept addition imports one, `docs/notes/` when the user picks Note,
-      the transfer data policy after a yes; answer links and asked marks through `/crav1-add-to-spec`
-  reads: Reads the minutes, transcript, email, or chat after the command, and existing `docs/specs/<slug>/`
-    folders, skipping `_template`. For an item that matches a slice, also reads that slice’s `spec.md`
-    (including `## Match`), `plan.md`, `tasks.md`, and `verify.md` when present, and the code that spec
-    or plan points to only when those files do not settle the build state.
-  writes: 'When a kept addition imports a source, writes `docs/sources/YYYY-MM-DD-<slug>/` following `crav1-add-to-spec`
-    `references/sources.md`, and does not write the spec. When the user picks Note, writes `docs/notes/YYYY-MM-DD-<slug>.md`
-    and `docs/notes/index.md`. It reads `docs/notes/` first. An item already noted is not written again.
-    That check may write the transfer data policy after a yes. Cursor: `.cursor/rules/crav1-transfer-data-policy.mdc`.
-    Claude Code project: `.claude/rules/crav1-transfer-data-policy.md`. It never writes a secrets choice
-    into that file. For a mail, it lists each embedded image, inline or attached. It recommends convert
-    to text when the image is a diagram, a table, or text that can be reproduced exactly, and compress
-    otherwise. It asks once before the source folder is written. Auto-accept applies to those recommendations
-    only when the transfer data policy clearly covers them.'
-  leaves_alone: Leaves `docs/system/`, specs, marks, and dismissals alone. Does not commit.
-  exceptions: no input stops and asks. The kind and the date come from the input, one of each for the
-    run. An unclear kind, or no date, is one question. Note records the quote in `docs/notes/` and does
-    not ask what kind of note it is. Dismiss is this run only and is not stored. Dismiss stays for a greeting,
-    scheduling, and thanks. A kept new feature or bug only names the next command. A build-state line
-    on a matched item is informational. It is not quote text. It does not start Specify, Plan, or Build.
-    It is not a starter option.
-  called_by: Called by the user.
-  runs_by_itself: Calls `/crav1-add-to-spec` for one kept addition. That handoff runs the research check
-    in `crav1-add-to-spec` `references/research-stale.md`. This skill does not run it a second time and
-    does not write the stale block. A clear answer to a spec open question is handed to `/crav1-add-to-spec`
-    as an answer link without a keep question, with the asked marks the input shows, following `crav1-add-to-spec`
-    `references/open-questions.md`. An unclear or partial answer is shown as a possible answer and the
-    question stays open.
-  you_run_next:
-  - /crav1-tighten-spec
-  - /crav1-finalize-commit
-  first_prompt: '/crav1-meeting-to-specs
-
-    @<minutes, transcript, meeting tool export, email, or chat thread>
-
-
-    Extract what matters for features. Match it to the specs we already have. Do not write a spec. Do
-    not commit.'
 - name: crav1-plan-from-spec
   lane: plan
   group: Plan
@@ -910,12 +812,9 @@ skills:
   runs_by_itself: Calls no skill.
   you_run_next:
   - /crav1-review-plan
-  - /crav1-specs-to-ado
-  - /crav1-tasks-to-ado
+  - /crav1-ado-sync
   - /crav1-tasks-ready-to-build
-  - /crav1-complete-tasks
-  - /crav1-complete-task
-  - /crav1-implement-task
+  - /crav1-build-tasks
   first_prompt: '/crav1-plan-from-spec
 
     @docs/specs/<slug>/
@@ -969,100 +868,66 @@ skills:
   called_by: Called by the user.
   runs_by_itself: Calls no skill.
   you_run_next:
-  - /crav1-tasks-to-ado
+  - /crav1-ado-sync
   - /crav1-tasks-ready-to-build
-  - /crav1-implement-task
-  - /crav1-complete-task
-  - /crav1-complete-tasks
+  - /crav1-build-tasks
   - /crav1-complete-features
   first_prompt: '/crav1-tighten-plan
 
     @docs/specs/<slug>/'
-- name: crav1-implement-task
+- name: crav1-build-tasks
   lane: build
   group: Build
   starter: false
   since: 1.0.0
   stage: stable
   walkthrough: docs/from-plan-to-build.md
-  purpose: Implement exactly one task from tasks.md, then run its verify step.
+  purpose: Build tasks from tasks.md, always in an isolated worker per task; asks which tasks (one, a
+    range, or all).
   in_depth:
-  - One `tasks.md` row, then run its verify step.
-  - >-
-    Before the tests, checks the local dependencies they need (Azurite, a database container, an emulator)
-    and asks start, skip, or stop for one that is not running. Tests skipped for a missing dependency do
-    not tick the row unless you chose skip.
-  use_when: Build one task
+  - '**`/crav1-build-tasks`** opens with one question: which tasks to build, one `T#`, a range, or all
+    unticked, listing the ready ones with the `/crav1-tasks-ready-to-build` rules. It skips the question
+    when the message names the tasks. Every task runs in its own worker (implement, commit, verify, optional
+    fix), and every path ends by naming `/crav1-open-pr`. It replaces implement-task, complete-task, and
+    complete-tasks; their rules are kept as branches.'
+  - 'Inside each worker (was `/crav1-implement-task`): One `tasks.md` row, then run its verify step.'
+  - 'Inside each worker (was `/crav1-implement-task`): Before the tests, checks the local dependencies
+    they need (Azurite, a database container, an emulator) and asks start, skip, or stop for one that
+    is not running. Tests skipped for a missing dependency do not tick the row unless you chose skip.'
+  - 'One task (was `/crav1-complete-task`): Isolated worker for one `T#`: implement → commit → verify
+    → optional fix; persist commit style as a rule.'
+  - 'One task (was `/crav1-complete-task`): When a local test dependency is not running, the worker returns
+    `needs_dependency` with a `BLOCKER:` line, and you answer start, skip, or stop.'
+  - 'A range or all (was `/crav1-complete-tasks`): Orchestrates one worker per `T#` (`T1-T3` or all unchecked);
+    stops the batch when a worker needs you.'
+  use_when: You want to build one task, a range, or all unticked tasks
   table:
-    reads: One `T#`, the plan, and the spec
-    writes: The code and checks that `T#` names, and `[x]` on that row when its verify passes
-  reads: Reads one `T#` in `tasks.md`, plus `plan.md` and `spec.md`.
-  writes: Writes the code and the checks that row names, and marks the row `[x]` only when that verify
-    passes.
-  leaves_alone: Leaves `spec.md` and other tasks alone.
-  exceptions: stops with no code when `## Linter` says none and the user has not chosen to go on. It does
-    not ask to run `/crav1-keep-current`.
+    reads: 'Inside each worker: One `T#`, the plan, and the spec; One task: One `T#` and the persist rule;
+      A range or all: The `T#` queue on one spec'
+    writes: 'Inside each worker: The code and checks that `T#` names, and `[x]` on that row when its verify
+      passes; One task: The commit-style rule when it is missing; its worker writes that task''s code,
+      `tasks.md`, `verify.md`, `fix-log.md` when a fix runs, and the commits; A range or all: The commit-style
+      rule once, when missing; one worker per `T#` writes that task''s code, `tasks.md`, `verify.md`,
+      `fix-log.md` when a fix runs, and the commits'
+  reads: 'Inside each worker: Reads one `T#` in `tasks.md`, plus `plan.md` and `spec.md`. One task: Reads
+    one `T#` and the persist rule. A range or all: Reads the `T#` queue on one spec.'
+  writes: 'Inside each worker: Writes the code and the checks that row names, and marks the row `[x]`
+    only when that verify passes. One task: Writes the commit-style rule when it is missing. A range or
+    all: Writes the commit-style rule once when it is missing.'
+  leaves_alone: 'Inside each worker: Leaves `spec.md` and other tasks alone. One task: Leaves product
+    code, `spec.md`, push, and the pull request alone in this chat. A range or all: Leaves product code,
+    commits, `spec.md`, push, and the pull request alone in this chat.'
+  exceptions: 'Inside each worker: stops with no code when `## Linter` says none and the user has not
+    chosen to go on. It does not ask to run `/crav1-keep-current`. One task: it does not ask to run `/crav1-keep-current`.'
   called_by: Called by the user and by `crav1-complete-task-agent`.
-  runs_by_itself: Calls `/crav1-feature-branch` before code.
+  runs_by_itself: 'Inside each worker: Calls `/crav1-feature-branch` before code. One task: Calls `/crav1-feature-branch`
+    and `crav1-complete-task-agent`. A range or all: Calls `/crav1-feature-branch` and `crav1-complete-task-agent`
+    once per `T#`.'
   you_run_next:
+  - /crav1-open-pr
   - /crav1-verify-spec
-  first_prompt: '/crav1-implement-task T1
+  first_prompt: '/crav1-build-tasks
 
-    @docs/specs/<slug>/'
-- name: crav1-complete-task
-  lane: build
-  group: Build
-  starter: false
-  since: 1.0.0
-  stage: stable
-  walkthrough: docs/from-plan-to-build.md
-  purpose: Start one T# implement-to-done in an isolated worker chat (subagent).
-  in_depth:
-  - 'Isolated worker for one `T#`: implement → commit → verify → optional fix; persist commit style as
-    a rule.'
-  - >-
-    When a local test dependency is not running, the worker returns `needs_dependency` with a `BLOCKER:`
-    line, and you answer start, skip, or stop.
-  use_when: One task through commit in a worker
-  table:
-    reads: One `T#` and the persist rule
-    writes: The commit-style rule when it is missing; its worker writes that task's code, `tasks.md`,
-      `verify.md`, `fix-log.md` when a fix runs, and the commits
-  reads: Reads one `T#` and the persist rule.
-  writes: Writes the commit-style rule when it is missing.
-  leaves_alone: Leaves product code, `spec.md`, push, and the pull request alone in this chat.
-  exceptions: it does not ask to run `/crav1-keep-current`.
-  called_by: Called by the user.
-  runs_by_itself: Calls `/crav1-feature-branch` and `crav1-complete-task-agent`.
-  you_run_next:
-  - /crav1-open-pr
-  first_prompt: '/crav1-complete-task T1
-
-    @docs/specs/<slug>/'
-- name: crav1-complete-tasks
-  lane: build
-  group: Build
-  starter: false
-  since: 1.0.0
-  stage: stable
-  walkthrough: docs/from-plan-to-build.md
-  purpose: Orchestrate isolated /crav1-complete-task workers for a T# range or all unchecked tasks.
-  in_depth:
-  - Orchestrates one worker per `T#` (`T1-T3` or all unchecked); stops the batch when a worker needs you.
-  use_when: Several tasks on one spec
-  table:
-    reads: The `T#` queue on one spec
-    writes: The commit-style rule once, when missing; one worker per `T#` writes that task's code, `tasks.md`,
-      `verify.md`, `fix-log.md` when a fix runs, and the commits
-  reads: Reads the `T#` queue on one spec.
-  writes: Writes the commit-style rule once when it is missing.
-  leaves_alone: Leaves product code, commits, `spec.md`, push, and the pull request alone in this chat.
-  exceptions: null
-  called_by: Called by the user.
-  runs_by_itself: Calls `/crav1-feature-branch` and `crav1-complete-task-agent` once per `T#`.
-  you_run_next:
-  - /crav1-open-pr
-  first_prompt: '/crav1-complete-tasks T1-T3
 
     @docs/specs/<slug>/'
 - name: crav1-complete-features
@@ -1074,7 +939,7 @@ skills:
   walkthrough: docs/from-plan-to-build.md
   purpose: 'Serial board: build several ready specs one slug after another in this checkout.'
   in_depth:
-  - 'Serial board of ready slugs: `feat/<slug>` from default, then that spec’s complete-tasks loop; no
+  - 'Serial board of ready slugs: `feat/<slug>` from default, then that spec’s build-tasks loop; no
     parallel, no push, no PR.'
   use_when: Several specs, one after another
   table:
@@ -1085,7 +950,7 @@ skills:
   writes: Writes the commit-style rule once when it is missing, and a `feat/<slug>` checkout from default
     per slug.
   leaves_alone: Leaves product code, commits, `spec.md`, push, and the pull request alone in this chat.
-  exceptions: one ready slug stops and points at `/crav1-complete-tasks` without running it. When a slice
+  exceptions: one ready slug stops and points at `/crav1-build-tasks` without running it. When a slice
     is marked done or retired, it asks once whether to run `/crav1-keep-current` and does not run it.
   called_by: Called by the user.
   runs_by_itself: Calls `/crav1-feature-branch` for that checkout, without re-prompting, and `crav1-complete-task-agent`
@@ -1120,95 +985,48 @@ skills:
   called_by: Called by the user and by `crav1-complete-task-agent`.
   runs_by_itself: Calls no skill.
   you_run_next:
-  - /crav1-fix-from-verify
-  - /crav1-fix-live
-  - /crav1-draft-commit-message
+  - /crav1-fix-build-gaps
   - /crav1-finalize-commit
   first_prompt: '/crav1-verify-spec
 
     @docs/specs/<slug>/'
-- name: crav1-fix-from-verify
+- name: crav1-fix-build-gaps
   lane: build
   group: Verify and fix
   starter: false
   since: 1.0.0
   stage: stable
   walkthrough: docs/from-verify.md
-  purpose: After /crav1-verify-spec, walk inner-loop gaps one by one (verify failed, then unverified,
-    then G#).
+  purpose: Fix gaps a build left, one at a time inside the spec; asks verify-report gaps or live-site
+    gaps.
   in_depth:
-  - After verify-spec, walk inner-loop gaps (failed → unverified → `G#`); omit Gap for the next; writes
-    `fix-log.md`.
-  use_when: After verify, inner-loop gaps
+  - '**`/crav1-fix-build-gaps`** opens with one question: gaps from the verify report, or a live-site
+    gap (ports, proxy, SQL, unpublished URL). It skips the question when the message says which. It replaces
+    fix-from-verify and fix-live; their rules are kept as branches.'
+  - 'Verify report gaps (was `/crav1-fix-from-verify`): After verify-spec, walk inner-loop gaps (failed
+    → unverified → `G#`); omit Gap for the next; writes `fix-log.md`.'
+  - 'Live-site gaps (was `/crav1-fix-live`): Alias when that gap is a live/inner-loop path.'
+  use_when: verify.md lists gaps, or a live host path fails
   table:
-    reads: '`verify.md` and the spec folder'
-    writes: The smallest in-spec fix, an appended `fix-log.md`, and that one `verify.md` row
-  reads: Reads `verify.md` and the spec folder.
-  writes: Writes the smallest in-spec fix, an appended `fix-log.md`, and that one `verify.md` row when
-    the file exists.
-  leaves_alone: Leaves `spec.md` and unimplemented tasks alone.
-  exceptions: does not run `/crav1-fix-bug`.
+    reads: 'Verify report gaps: `verify.md` and the spec folder; Live-site gaps: The same queue as fix-build-gaps'
+    writes: 'Verify report gaps: The smallest in-spec fix, an appended `fix-log.md`, and that one `verify.md`
+      row; Live-site gaps: What `/crav1-fix-build-gaps` writes'
+  reads: 'Verify report gaps: Reads `verify.md` and the spec folder. Live-site gaps: Reads the same queue
+    as `/crav1-fix-build-gaps`.'
+  writes: 'Verify report gaps: Writes the smallest in-spec fix, an appended `fix-log.md`, and that one
+    `verify.md` row when the file exists. Live-site gaps: Writes what that skill writes.'
+  leaves_alone: 'Verify report gaps: Leaves `spec.md` and unimplemented tasks alone. Live-site gaps: Leaves
+    `spec.md` alone.'
+  exceptions: 'Verify report gaps: does not run `/crav1-fix-bug`. Live-site gaps: prefers live or untested
+    wiring rows. When the fix changes how the parts connect, it asks once whether to run `/crav1-keep-current`
+    and does not run it.'
   called_by: Called by the user and by `crav1-complete-task-agent`.
-  runs_by_itself: Calls no skill.
+  runs_by_itself: 'Verify report gaps: Calls no skill. Live-site gaps: Calls `/crav1-fix-build-gaps`.'
   you_run_next:
   - /crav1-verify-spec
-  first_prompt: '/crav1-fix-from-verify
+  first_prompt: '/crav1-fix-build-gaps
 
     @docs/specs/<slug>/verify.md'
-- name: crav1-fix-live
-  lane: build
-  group: Verify and fix
-  starter: false
-  since: 1.0.0
-  stage: stable
-  walkthrough: docs/from-verify.md
-  purpose: Shortcut to /crav1-fix-from-verify when the verify gap is a live/inner-loop path (ports, proxy,
-    SQL, unpublished URL).
-  in_depth:
-  - Alias when that gap is a live/inner-loop path.
-  use_when: A live or untested wiring gap
-  table:
-    reads: The same queue as fix-from-verify
-    writes: What `/crav1-fix-from-verify` writes
-  reads: Reads the same queue as `/crav1-fix-from-verify`.
-  writes: Writes what that skill writes.
-  leaves_alone: Leaves `spec.md` alone.
-  exceptions: prefers live or untested wiring rows. When the fix changes how the parts connect, it asks
-    once whether to run `/crav1-keep-current` and does not run it.
-  called_by: Called by the user.
-  runs_by_itself: Calls `/crav1-fix-from-verify`.
-  you_run_next:
-  - /crav1-verify-spec
-  first_prompt: '/crav1-fix-live
-
-    @docs/specs/<slug>/verify.md'
-- name: crav1-draft-commit-message
-  lane: cross-cutting
-  group: Commit and pull request
-  starter: false
-  since: 1.0.0
-  stage: stable
-  walkthrough: docs/from-commit.md
-  purpose: Draft a paste-ready commit Summary and Description only.
-  in_depth:
-  - Paste-ready Summary/Description for any git client; CRAV1 style or live git log, once or onward (deletable
-    rule); does not commit unless they ask. Optional Azure Boards mention from `docs/specs/<slug>/work-item.md`
-    is the last description line.
-  use_when: About to commit
-  table:
-    reads: The diff, recent git log, and `work-item.md`
-    writes: A host persist rule when onward is chosen; a commit only when also asked in that turn
-  reads: Reads the staged or unstaged diff, recent `git log`, an existing persist rule, and `work-item.md`
-    when it exists. The mention picks the id whose milestone or slice label matches the slice being worked,
-    asks when that is unclear, and still reads a single unlabeled line.
-  writes: Writes a host persist rule only when the user chooses onward.
-  leaves_alone: Leaves the git commit alone.
-  exceptions: commits only when the user also asked to commit in that turn.
-  called_by: Called by the user and by `/crav1-finalize-commit`.
-  runs_by_itself: Calls no skill.
-  you_run_next:
-  - /crav1-finalize-commit
-  first_prompt: /crav1-draft-commit-message
 - name: crav1-finalize-commit
   lane: cross-cutting
   group: Commit and pull request
@@ -1216,21 +1034,34 @@ skills:
   since: 1.0.0
   stage: stable
   walkthrough: docs/from-commit.md
-  purpose: 'Finalize a commit: CRAV1 style vs git log first if needed, then draft the Summary and Description,
-    then offer git commit first, then copy / edit / rewrite / stop.'
+  purpose: Commit, or only write the commit message; asks which.
   in_depth:
-  - Same draft, then **commit first**, then copy for your git client, edit/rewrite, or stop (no push).
-    Keeps that mention through the HEAD check and the attribution strip.
-  use_when: Wording, then commit or copy
+  - '**`/crav1-finalize-commit`** opens with one question: commit, or only write the message (paste-ready,
+    no git commit). It skips the question when the message says which. It replaces draft-commit-message;
+    its rules are kept as a branch.'
+  - 'Only write the message (was `/crav1-draft-commit-message`): Paste-ready Summary/Description for any
+    git client; CRAV1 style or live git log, once or onward (deletable rule); does not commit unless they
+    ask. Optional Azure Boards mention from `docs/specs/<slug>/work-item.md` is the last description line.'
+  - 'Commit (was `/crav1-finalize-commit`): Same draft, then **commit first**, then copy for your git
+    client, edit/rewrite, or stop (no push). Keeps that mention through the HEAD check and the attribution
+    strip.'
+  use_when: You want the commit message, or the commit itself
   table:
-    reads: The same commit inputs as draft
-    writes: The persist rule when onward is chosen, and the git commit when picked
-  reads: Reads the same commit inputs through draft.
-  writes: Writes the persist rule when onward is chosen, and the git commit when the user picks commit.
-  leaves_alone: Leaves push alone.
-  exceptions: the worker commits immediately and skips the menu.
-  called_by: Called by the user and by `crav1-complete-task-agent`.
-  runs_by_itself: Calls `/crav1-draft-commit-message`.
+    reads: 'Only write the message: The diff, recent git log, and `work-item.md`; Commit: The same commit
+      inputs as draft'
+    writes: 'Only write the message: A host persist rule when onward is chosen; a commit only when also
+      asked in that turn; Commit: The persist rule when onward is chosen, and the git commit when picked'
+  reads: 'Only write the message: Reads the staged or unstaged diff, recent `git log`, an existing persist
+    rule, and `work-item.md` when it exists. The mention picks the id whose milestone or slice label matches
+    the slice being worked, asks when that is unclear, and still reads a single unlabeled line. Commit:
+    Reads the same commit inputs through draft.'
+  writes: 'Only write the message: Writes a host persist rule only when the user chooses onward. Commit:
+    Writes the persist rule when onward is chosen, and the git commit when the user picks commit.'
+  leaves_alone: 'Only write the message: Leaves the git commit alone. Commit: Leaves push alone.'
+  exceptions: 'Only write the message: commits only when the user also asked to commit in that turn. Commit:
+    the worker commits immediately and skips the menu.'
+  called_by: Called by the user and by `/crav1-finalize-commit`.
+  runs_by_itself: 'Only write the message: Calls no skill. Commit: Calls `/crav1-finalize-commit`.'
   you_run_next:
   - /crav1-open-pr
   first_prompt: /crav1-finalize-commit
@@ -1282,7 +1113,7 @@ skills:
     view and per-line remarks, and no tool or kit names. Follow-ups, including choices the description
     calls deliberate, are not posted and not in that comment; the chat lists them and they are saved as
     `docs/notes/review-pr-<n>-follow-ups.md` (PR, repo, date, each with its file and line), which a
-    re-review updates and `/crav1-feature-candidates` reads as an open note. No follow-ups, no note. Re-review replies use the
+    re-review updates and `/crav1-ado-sync` reads as an open note. No follow-ups, no note. Re-review replies use the
     same voice. After your yes it posts each finding as an inline comment on its line and a summary without
     the verdict, then asks which verdict to set. A re-review reads the earlier findings from the pull
     request's own threads and marks each fixed (with the commit), partly fixed, still open, or no longer
@@ -1387,7 +1218,7 @@ skills:
   purpose: 'List the tasks ready to build, for one spec or all, and why the others are blocked. Read-only.'
   in_depth:
   - '**`/crav1-tasks-ready-to-build`** reads `spec.md` open questions, `plan.md` (the `Reviewed:` line and `## Risks`), `tasks.md`, and `verify.md` for one slice or every slice. A ticked task is Done when `verify.md` lists it as verified, otherwise Needs verify. Then a task is blocked by a missing `plan.md`, by a kept-open question whose `Blocks:` line names it, by a kept-open question or plan Risk with no `Blocks:` line (the whole slice, inferred), or by an unticked task in its `(after: T#)` (recorded) or, with no `(after: …)`, any earlier unticked task (inferred). Otherwise it is Ready, with a warning when the plan review is unknown (inferred) or still has open `P#`s.'
-  - 'Shows summary counts per slice, then Ready, Blocked (one reason each, recorded or inferred), Needs verify, a Done count, `Next: /crav1-implement-task T#`, and a `Source:` line. Local only: it never reads Azure Boards and names `/crav1-ado-to-tasks` for task states there. It writes nothing and runs no other skill. It can run any time. It is cross-cutting. It is not a starter option.'
+  - 'Shows summary counts per slice, then Ready, Blocked (one reason each, recorded or inferred), Needs verify, a Done count, `Next: /crav1-build-tasks T#`, and a `Source:` line. Local only: it never reads Azure Boards and names `/crav1-ado-sync` for task states there. It writes nothing and runs no other skill. It can run any time. It is cross-cutting. It is not a starter option.'
   use_when: 'You want to know which tasks can be built now, and why the others cannot'
   table:
     reads: '`spec.md` open questions, `plan.md`, `tasks.md`, and `verify.md` per slice'
@@ -1399,7 +1230,7 @@ skills:
   called_by: Called by the user, any time.
   runs_by_itself: Calls no skill.
   you_run_next:
-  - /crav1-implement-task
+  - /crav1-build-tasks
   first_prompt: '/crav1-tasks-ready-to-build
 
     @docs/specs/<slug>/'
@@ -1410,7 +1241,7 @@ skills:
   since: 1.8.0
   stage: stable
   walkthrough: docs/from-explain.md
-  purpose: Read the system notes spark, ideas, intake, match, or repos-to-spec already wrote (docs/system/).
+  purpose: Read the system notes spark, ideas, intake, match, or existing-to-specs already wrote (docs/system/).
   in_depth:
   - When system notes already exist, **`/crav1-explain`** reads `docs/system/` and answers with a short
     TLDR. Longer goes one level deeper from the same notes. On every run it compares the feature index
@@ -1466,21 +1297,21 @@ skills:
     named. Two or more close hits are listed, one line each. It does not guess. No slice: it says so,
     shows what the repo, the code, and the environment notes know, and presents a candidate slice. It
     names `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, or `/crav1-intake-to-specs` and does not run
-    them. Pasted minutes or a long dump names `/crav1-meeting-to-specs` or `/crav1-match-dump-to-specs`
+    them. Pasted minutes or a long dump names `/crav1-add-to-spec`
     and stops. After the repo part it runs read-only live checks: Azure resource settings and recent changes,
     and Azure DevOps work items, open pull requests, and branches. Each live fact is a live read. Production
     is shape and connections only, after the same yes or no as `/crav1-environment-read`. It never reads
     data. A failed live read is one prompt, Retry or Skip. Skip is the repo-only answer. A focus still
     runs the full read and shows only those sections. It writes nothing. It may name one skill. It does
     not run another skill. It is cross-cutting. It may run from any lane. It does not move work into a
-    lane. It is a later skill. It is not a starter option. Asking for startup options names only the seven
-    and does not run this command. The seven starter options stay unchanged. It is not `/crav1-explain`.'
+    lane. It is a later skill. It is not a starter option. Asking for startup options names only the six
+    and does not run this command. The six starter options stay unchanged. It is not `/crav1-explain`.'
   - One feature, slice, resource, or not-yet-feature. Answers from the specs first. Exact name first,
     then key words. One pass. Writes nothing. Live Azure and Azure DevOps checks, tagged as a live read.
     Production is shape and connections only, after the same yes or no as `/crav1-environment-read`. Never
     data. A failed live read offers Retry or Skip. May name one skill and does not run it. Does not start
-    Specify, Plan, or Build. Not a starter option. Asking for startup options names only the seven and
-    does not run this command. The seven starter options stay unchanged. Not `/crav1-explain`.
+    Specify, Plan, or Build. Not a starter option. Asking for startup options names only the six and
+    does not run this command. The six starter options stay unchanged. Not `/crav1-explain`.
   use_when: One feature, slice, or resource
   table:
     reads: The matching spec, system notes, then live checks
@@ -1496,7 +1327,7 @@ skills:
     is there.
   writes: Writes nothing.
   leaves_alone: Leaves specs, code, marks, commits, and pull requests alone.
-  exceptions: pasted minutes or a long dump stops and names `/crav1-meeting-to-specs` or `/crav1-match-dump-to-specs`.
+  exceptions: pasted minutes or a long dump stops and names `/crav1-add-to-spec`.
     Two or more close hits ask which. A live-read failure offers Retry or Skip. It does not start Specify,
     Plan, or Build. It is not a starter option.
   called_by: Called by the user.
@@ -1522,13 +1353,13 @@ skills:
     design the change and does not build it. It can run on its own. Spark, ideas, intake, match, and the
     siblings that already append a glossary row also run this update. They do not rewrite existing glossary
     rows. Some commands ask at the end of the run whether to run it, and do not run it: `/crav1-complete-features`
-    when a slice is marked done or retired, `/crav1-fix-bug` and `/crav1-fix-live` when the fix changes
+    when a slice is marked done or retired, `/crav1-fix-bug` and `/crav1-fix-build-gaps` when the fix changes
     how the parts connect, `/crav1-environment-read` after marks lines are added, and `/crav1-add-to-spec`
-    once at the end of an environment-read or suggest-tests handoff. `/crav1-implement-task` and `/crav1-complete-task`
+    once at the end of an environment-read or suggest-tests handoff. `/crav1-build-tasks`
     do not ask.'
   - Adds what is new to the short description, the diagram, and how the parts connect. Does not rewrite
     what is already there. Does not design the change or build it. Can run on its own. Spark, ideas, intake,
-    match, match-dump, and code-into-specs run this same update and still do not rewrite existing glossary
+    match, match-dump, and add-to-spec run this same update and still do not rewrite existing glossary
     rows.
   use_when: Something was added; catch the picture up
   table:
@@ -1546,10 +1377,10 @@ skills:
     the hits it was made from. It also routes the note''s own open questions when the answer lies outside
     the note''s owner, including when the mark clears. It does not ask the user.'
   leaves_alone: Leaves existing picture lines, glossary rows, design, and build alone.
-  exceptions: spark, ideas, intake, match, match-dump, and code-into-specs run this picture update on
+  exceptions: spark, ideas, intake, match, match-dump, and add-to-spec run this picture update on
     the pass that appends a glossary row. Repos-to-spec updates the picture in its own pass. Complete-features,
-    fix-bug, fix-live, environment-read, and the add-to-spec handoffs from environment-read and suggest-tests-for-code
-    may ask and do not run this command. Implement-task and complete-task do not ask. It does not commit
+    fix-bug, fix-build-gaps, environment-read, and the add-to-spec handoffs from environment-read and suggest-tests-for-code
+    may ask and do not run this command. Implement-task and build-tasks do not ask. It does not commit
     a cleared research mark.
   called_by: Called by the user and by `/crav1-environment-read` for a confirmed system section.
   runs_by_itself: Calls no skill.
@@ -1579,14 +1410,14 @@ skills:
     with the same whole-word rule as `/crav1-environment-read`. A deploy step marks the resource it names.
     The group is context. It appends only confirmed lines to `docs/environments/marks.md`. It does not
     write the system, architecture, feature, or left-out files. It is cross-cutting. It is a later skill.
-    It is not a starter option. Asking for startup options names only the seven and does not run this
+    It is not a starter option. Asking for startup options names only the six and does not run this
     command. It names `/crav1-environment-read` and does not run it.
   - The user names Azure DevOps, the org, and the project. A pipeline name is optional. Reads pipeline
     definitions with `az pipelines` and `az devops` (list and show only). The stage name gives the environment,
     with the same whole-word rule as `/crav1-environment-read`. Appends confirmed lines to `docs/environments/marks.md`.
     Does not run a pipeline. Does not write `docs/system`, `docs/architecture/spec.md`, a feature spec,
     or `docs/architecture/left-out.md`. Names `/crav1-environment-read` and does not run it. Not a starter
-    option. Asking for startup options names only the seven and does not run this command. The seven starter
+    option. Asking for startup options names only the six and does not run this command. The six starter
     options stay unchanged.
   use_when: The user names Azure DevOps, the org, and the project
   table:
@@ -1675,230 +1506,151 @@ skills:
 
 
     Export as EARS.'
-- name: crav1-feature-candidates
+- name: crav1-ado-sync
   lane: cross-cutting
   group: Azure Boards
   starter: false
   since: 1.31.0
   stage: stable
   walkthrough: docs/from-feature-candidates.md
-  purpose: List Feature candidates from the landscape, the specs, research, sources, and open notes in
-    docs/notes/.
+  purpose: Keep specs and Azure Boards in step; asks suggest Features, push Features, push tasks, pull
+    tasks, or pull spec changes.
   in_depth:
-  - Lists Feature candidates from the landscape, the specs, research, sources, and open notes. Writes
-    nothing unless the user asks for a file.
-  - >-
-    Titles say what the work is, for example 'Email service: DA Nord Pool MCR via mailbox'. Each candidate
-    has the same labelled lines (Target date (with its source), Spec, Description, Open blockers/questions
-    as bullets with who and when where the docs say, and Order/priority). Descriptions are full paragraphs
-    with context, who does what, related task-list items, and quotes with names and dates, and nothing
-    the docs do not state.
-  use_when: A list of Feature candidates
+  - '**`/crav1-ado-sync`** opens with one question: suggest Features (read only), push Features, push
+    tasks, pull task changes, or pull spec changes from Features. It skips the question when the message
+    says which. Every write to Azure Boards still needs a yes. It replaces feature-candidates, specs-to-ado,
+    tasks-to-ado, ado-to-tasks, and ado-to-specs; their rules are kept as branches.'
+  - 'Suggest Features (was `/crav1-feature-candidates`): Lists Feature candidates from the landscape,
+    the specs, research, sources, and open notes. Writes nothing unless the user asks for a file.'
+  - 'Suggest Features (was `/crav1-feature-candidates`): Titles say what the work is, for example ''Email
+    service: DA Nord Pool MCR via mailbox''. Each candidate has the same labelled lines (Target date (with
+    its source), Spec, Description, Open blockers/questions as bullets with who and when where the docs
+    say, and Order/priority). Descriptions are full paragraphs with context, who does what, related task-list
+    items, and quotes with names and dates, and nothing the docs do not state.'
+  - 'Push Features (was `/crav1-specs-to-ado`): Sends picked candidates to Azure Boards as Features after
+    a yes, then writes the id onto the spec.'
+  - 'Push Features (was `/crav1-specs-to-ado`): Before the preview it strips spec paths, `docs/sources/`
+    folders, and spec references from the candidate text, so nothing sent to Azure Boards points at the
+    specs repo.'
+  - 'Push Features (was `/crav1-specs-to-ado`): Each implementation repo has its own work item home, the
+    `Work items go to` column in `docs/system/repos.md` (`ADO: <org>/<project>`), asked once per repo
+    the first time and written only after the answer. A spec whose repos are in several homes gets one
+    Feature in each, previewed and sent on its own yes, linked in the same org or mentioned in plain text
+    across orgs. Id lines end with `(ADO: <org>/<project>)`.'
+  - 'Push tasks (was `/crav1-tasks-to-ado`): Pick one spec that already has a Feature id in `work-item.md`.
+    Every task in its `tasks.md` is listed, numbered, and you pick by number or all. The child work item
+    type is asked once and saved as a line in `docs/environments/marks.md`, with the type''s done state
+    (Closed on Agile, Done on Scrum and Basic); edit a line to change it. The question marks the type
+    on the requirement backlog level directly under Feature as recommended (User Story on Agile, Product
+    Backlog Item on Scrum, Issue on Basic, Requirement on CMMI), and gives none when the levels cannot
+    be read.'
+  - 'Push tasks (was `/crav1-tasks-to-ado`): Each task is previewed as a child of the Feature: a fuller
+    title that says what the work is, State New (or the done state when the box is ticked), Iteration
+    and Priority blank, tags for the slice and the code repos, the owner when the docs state one, a fuller
+    description (what, why, who, decisions with quotes, names, and dates, related items, open blockers
+    or none recorded), and the task''s verify line as acceptance. File paths, line numbers, spec references,
+    and kit names are stripped; code repo names stay; the specs repo is never mentioned.'
+  - 'Push tasks (was `/crav1-tasks-to-ado`): On an update, a box ticked since the item was sent offers
+    moving it to the done state, and an unticked box on a closed item offers a reopen to New, each only
+    on a yes. A disagreement the `tasks.md` history does not explain shows both sides and asks each time.
+    The kit never sets Active or Resolved and never sends Reason.'
+  - 'Push tasks (was `/crav1-tasks-to-ado`): Each task goes to its repo''s work item home and its parent
+    is the Feature in that home. A task with no clear repo, or with repos in different homes, is asked
+    about. The child type and done state are saved per home in `docs/environments/marks.md`.'
+  - 'Pull tasks (was `/crav1-ado-to-tasks`): Pick a spec with task lines in `work-item.md`, or all. Every
+    recorded task item is read back (State, title, description, acceptance, Assigned To, comments, history)
+    and only what differs from the spec and `tasks.md` is shown, plus child items under the Feature that
+    no task line records.'
+  - 'Pull tasks (was `/crav1-ado-to-tasks`): Each difference is kept or dismissed, fresh every run. Kept
+    changes go in through `/crav1-add-to-spec`. A task in the done state in Azure Boards ticks its box
+    only on your yes; one reopened there unticks a ticked box only on your yes. Each id is read in its
+    own work item home; one not found is reported as moved or missing. A new child is added as a task,
+    with its id recorded in `work-item.md`, only on your yes. It never writes a field back; a reply comment
+    is stripped and posted only on yes.'
+  - 'Pull spec changes (was `/crav1-ado-to-specs`): Reads Azure Boards Features back and shows what differs.
+    A kept change goes through `/crav1-add-to-spec`. A reply comment is posted only after a yes.'
+  - 'Pull spec changes (was `/crav1-ado-to-specs`): Each id is read in its own work item home. An id not
+    found there is reported as moved or missing, and it asks before searching other projects.'
+  use_when: Specs and Azure Boards should match
   table:
-    reads: The landscape, the specs, research, and sources
-    writes: Nothing unless the user asks for a file
-  reads: Reads `docs/system/landscape.md` (the spec index, Ideas, Way of working, and code with no slice),
-    `docs/system/repos.md`, the glossary, every `docs/specs/*/spec.md` (milestones, slices, open questions,
-    and actions), `plan.md`, `tasks.md`, and `verify.md` where present, `docs/research/` and `docs/sources/`
-    with each fact labelled by its source, a stale research note shown as stale, open notes in `docs/notes/`
-    labelled as notes and not as candidates by themselves, each spec’s `work-item.md`, and the landscape
-    “No spec yet in ADO” table.
-  writes: Writes nothing unless the user asks for a file.
-  leaves_alone: Leaves specs, Azure Boards, and commits alone.
-  exceptions: a dated milestone or slice is one candidate. An undated spec with open work is one candidate.
-    A spec that holds only open questions is marked questions only. An item with no spec is marked no
-    spec yet. Done or retired with nothing open is skipped. A target date is given only when the docs
-    state it. It does not start Specify, Plan, or Build. It is not a starter option.
-  called_by: Called by the user and by `/crav1-specs-to-ado`.
-  runs_by_itself: Calls no skill.
-  you_run_next:
-  - /crav1-specs-to-ado
-  first_prompt: /crav1-feature-candidates
-- name: crav1-specs-to-ado
-  lane: cross-cutting
-  group: Azure Boards
-  starter: false
-  since: 1.31.0
-  stage: stable
-  walkthrough: docs/from-specs-to-ado.md
-  purpose: Turn picked feature candidates into Azure Boards Features.
-  in_depth:
-  - Sends picked candidates to Azure Boards as Features after a yes, then writes the id onto the spec.
-  - Before the preview it strips spec paths, `docs/sources/` folders, and spec references from the
-    candidate text, so nothing sent to Azure Boards points at the specs repo.
-  - >-
-    Each implementation repo has its own work item home, the `Work items go to` column in `docs/system/repos.md`
-    (`ADO: <org>/<project>`), asked once per repo the first time and written only after the answer. A spec
-    whose repos are in several homes gets one Feature in each, previewed and sent on its own yes, linked
-    in the same org or mentioned in plain text across orgs. Id lines end with `(ADO: <org>/<project>)`.
-  use_when: Send picked candidates to Azure Boards
-  table:
-    reads: The org, the project, and the candidate list
-    writes: A Feature in Azure Boards after a yes, then its id in that spec's `work-item.md` or a landscape
-      "No spec yet in ADO" row
-  reads: Reads the org and project from `docs/environments/marks.md` or Azure DevOps URLs in `docs/system/repos.md`,
-    checks `az` including the default install paths, checks that the project has the Feature work item
-    type, reads the Feature fields before the preview, and reads the candidate list. When the type has
-    Acceptance Criteria, the checks go there. When it does not, the checks go in the Description as an
-    Acceptance checks list and that field is not sent.
-  writes: Writes a Feature only after the user says yes. After a Create, writing the new id into that
-    spec’s `work-item.md` with its milestone or slice label, or a row on the landscape “No spec yet in
-    ADO” table when the item has no spec, is required.
-  leaves_alone: Leaves the preview unedited, Iteration and Priority blank, and the specs repo out of anything
-    sent.
-  exceptions: a missing Feature type stops. An `az` failure, including a failed field read, states the
-    issue, suggests a fix such as `az login`, and offers a skip. It does not guess. It does not show the
-    `az` command. It does not install or log in. The closing output names the file written, says it is
-    not committed yet, names `/crav1-finalize-commit`, and says a later run would offer Create again.
+    reads: 'Suggest Features: The landscape, the specs, research, and sources; Push Features: The org,
+      the project, and the candidate list; Push tasks: The org, the project, the spec''s Feature id, and
+      its `tasks.md`; Pull tasks: The task items a spec records, and the Feature''s children; Pull spec
+      changes: Recorded Feature ids, or the ids named'
+    writes: 'Suggest Features: Nothing unless the user asks for a file; Push Features: A Feature in Azure
+      Boards after a yes, then its id in that spec''s `work-item.md` or a landscape "No spec yet in ADO"
+      row; Push tasks: Child work items in Azure Boards after a yes, then task lines in that spec''s `work-item.md`;
+      Pull tasks: Kept changes through `/crav1-add-to-spec`; a comment in Azure Boards after a yes; Pull
+      spec changes: Nothing itself. A reply comment in Azure Boards only after a yes. Kept changes and
+      answers go to the spec through `/crav1-add-to-spec`'
+  reads: 'Suggest Features: Reads `docs/system/landscape.md` (the spec index, Ideas, Way of working, and
+    code with no slice), `docs/system/repos.md`, the glossary, every `docs/specs/*/spec.md` (milestones,
+    slices, open questions, and actions), `plan.md`, `tasks.md`, and `verify.md` where present, `docs/research/`
+    and `docs/sources/` with each fact labelled by its source, a stale research note shown as stale, open
+    notes in `docs/notes/` labelled as notes and not as candidates by themselves, each spec’s `work-item.md`,
+    and the landscape “No spec yet in ADO” table. Push Features: Reads the org and project from `docs/environments/marks.md`
+    or Azure DevOps URLs in `docs/system/repos.md`, checks `az` including the default install paths, checks
+    that the project has the Feature work item type, reads the Feature fields before the preview, and
+    reads the candidate list. When the type has Acceptance Criteria, the checks go there. When it does
+    not, the checks go in the Description as an Acceptance checks list and that field is not sent. Push
+    tasks: Reads the org and project from `docs/environments/marks.md` or Azure DevOps URLs in `docs/system/repos.md`,
+    checks `az` the same way as `/crav1-ado-sync`, reads the Feature id from `work-item.md`, every task
+    in `tasks.md`, the saved child type line, the project''s work item types on the first run, and the
+    child type''s fields. Pull tasks: Reads the org and project the same way as `/crav1-ado-sync`, the
+    task lines and the Feature line in `work-item.md`, every recorded task item with its comments and
+    history, the child type''s fields, and the Feature''s children. Pull spec changes: Reads the ids in
+    every `work-item.md` and the landscape “No spec yet in ADO” table, or only the ids the user names,
+    then State, Priority, Target Date, Iteration, Assigned To, discussion comments, and history. It reads
+    the checks from Acceptance Criteria when the Feature type has that field, and from the Acceptance
+    checks list in the Description when it does not, so a match is not a change. Comments use api version
+    `7.1-preview`, which `az devops invoke` can parse.'
+  writes: 'Suggest Features: Writes nothing unless the user asks for a file. Push Features: Writes a Feature
+    only after the user says yes. After a Create, writing the new id into that spec’s `work-item.md` with
+    its milestone or slice label, or a row on the landscape “No spec yet in ADO” table when the item has
+    no spec, is required. Push tasks: Writes a child work item only after the user says yes, linked to
+    the Feature as its parent. After a Create, appends `Work item: <id> — task: T<n> <short title>` to
+    `work-item.md` (required). On the first run, appends the child type line and the done-state line to
+    `docs/environments/marks.md`. Pull tasks: Writes the spec and `tasks.md` only through `/crav1-add-to-spec`
+    for kept changes, ticks a box or adds a task only after a yes, appends a task line to `work-item.md`
+    for an added task, and posts a reply comment only after a yes. Pull spec changes: Writes nothing itself.
+    A kept change and an answer the user gives go to the spec through `/crav1-add-to-spec`. A reply comment
+    is posted only after the user says yes.'
+  leaves_alone: 'Suggest Features: Leaves specs, Azure Boards, and commits alone. Push Features: Leaves
+    the preview unedited, Iteration and Priority blank, and the specs repo out of anything sent. Push
+    tasks: Leaves `tasks.md` without ids, the preview unedited, Iteration, Priority, and Reason unsent,
+    Active to people, and the specs repo out of anything sent. Pull tasks: Leaves every Azure Boards field,
+    `tasks.md` ids, and dismissed changes alone. Pull spec changes: Leaves a missing id unmatched.'
+  exceptions: 'Suggest Features: a dated milestone or slice is one candidate. An undated spec with open
+    work is one candidate. A spec that holds only open questions is marked questions only. An item with
+    no spec is marked no spec yet. Done or retired with nothing open is skipped. A target date is given
+    only when the docs state it. It does not start Specify, Plan, or Build. It is not a starter option.
+    Push Features: a missing Feature type stops. An `az` failure, including a failed field read, states
+    the issue, suggests a fix such as `az login`, and offers a skip. It does not guess. It does not show
+    the `az` command. It does not install or log in. The closing output names the file written, says it
+    is not committed yet, names `/crav1-finalize-commit`, and says a later run would offer Create again.
     If the write fails, it prints the line to add. It does not start Specify, Plan, or Build. It is not
-    a starter option.
-  called_by: Called by the user.
-  runs_by_itself: Calls `/crav1-feature-candidates`, and `/crav1-add-to-spec` when a preview change belongs
-    in the spec.
+    a starter option. Push tasks: a spec with no Feature id is not offered and names `/crav1-ado-sync`.
+    A re-run offers Update for a recorded task and shows only changed fields. Edits go into the spec first
+    through `/crav1-add-to-spec`. An `az` failure states the issue, suggests a fix, and offers a skip.
+    It does not commit. It is not a starter option. Pull tasks: a spec with no task lines names `/crav1-ado-sync`.
+    A missing id is reported as missing, not guessed. Dismiss is for this run only. It does not commit.
+    It is not a starter option. Pull spec changes: dismissals start fresh each run. A no-spec-yet Feature
+    names a starter such as `/crav1-spark-to-spec` and does not run it. When the spec has no answer, no
+    reply is drafted and the question is offered as an open question. An `az` failure, including a failed
+    field read, is handled the same way as `/crav1-ado-sync`. It does not start Specify, Plan, or Build.
+    It is not a starter option.'
+  called_by: Called by the user and by `/crav1-ado-sync`.
+  runs_by_itself: 'Suggest Features: Calls no skill. Push Features: Calls `/crav1-ado-sync`, and `/crav1-add-to-spec`
+    when a preview change belongs in the spec. Push tasks: Calls `/crav1-add-to-spec` when a preview change
+    belongs in the spec. Pull tasks: Calls `/crav1-add-to-spec` for each kept change. Pull spec changes:
+    Calls `/crav1-add-to-spec` for one kept change and for one answer.'
   you_run_next:
   - /crav1-plan-from-spec
-  - /crav1-tasks-to-ado
   - /crav1-tasks-ready-to-build
-  - /crav1-complete-tasks
-  - /crav1-complete-task
-  - /crav1-implement-task
-  - /crav1-finalize-commit
-  first_prompt: /crav1-specs-to-ado
-- name: crav1-tasks-to-ado
-  lane: cross-cutting
-  group: Azure Boards
-  starter: false
-  since: 1.45.0
-  stage: stable
-  walkthrough: docs/from-tasks-to-ado.md
-  purpose: Send the tasks of one spec to Azure Boards as child work items of that spec's Feature.
-  in_depth:
-  - >-
-    Pick one spec that already has a Feature id in `work-item.md`. Every task in its `tasks.md` is listed,
-    numbered, and you pick by number or all. The child work item type is asked once and saved as a line
-    in `docs/environments/marks.md`, with the type's done state (Closed on Agile, Done on Scrum and Basic); edit
-    a line to change it. The question marks the type on the
-    requirement backlog level directly under Feature as recommended (User Story on Agile, Product Backlog
-    Item on Scrum, Issue on Basic, Requirement on CMMI), and gives none when the levels cannot be read.
-  - >-
-    Each task is previewed as a child of the Feature: a fuller title that says what the work is, State New (or the done state when the box is ticked),
-    Iteration and Priority blank, tags for the slice and the code repos, the owner when the docs state one,
-    a fuller description (what, why, who, decisions with quotes, names, and dates, related items, open
-    blockers or none recorded), and the task's verify line as acceptance. File paths, line numbers, spec
-    references, and kit names are stripped; code repo names stay; the specs repo is never mentioned.
-  - >-
-    On an update, a box ticked since the item was sent offers moving it to the done state, and an unticked
-    box on a closed item offers a reopen to New, each only on a yes. A disagreement the `tasks.md` history
-    does not explain shows both sides and asks each time. The kit never sets Active or Resolved and never
-    sends Reason.
-  - >-
-    Each task goes to its repo's work item home and its parent is the Feature in that home. A task with
-    no clear repo, or with repos in different homes, is asked about. The child type and done state are
-    saved per home in `docs/environments/marks.md`.
-  use_when: Send a spec's tasks to Azure Boards under its Feature
-  table:
-    reads: The org, the project, the spec's Feature id, and its `tasks.md`
-    writes: Child work items in Azure Boards after a yes, then task lines in that spec's `work-item.md`
-  reads: Reads the org and project from `docs/environments/marks.md` or Azure DevOps URLs in `docs/system/repos.md`,
-    checks `az` the same way as `/crav1-specs-to-ado`, reads the Feature id from `work-item.md`, every task
-    in `tasks.md`, the saved child type line, the project's work item types on the first run, and the
-    child type's fields.
-  writes: >-
-    Writes a child work item only after the user says yes, linked to the Feature as its parent. After
-    a Create, appends `Work item: <id> — task: T<n> <short title>` to `work-item.md` (required). On the first
-    run, appends the child type line and the done-state line to `docs/environments/marks.md`.
-  leaves_alone: Leaves `tasks.md` without ids, the preview unedited, Iteration, Priority, and Reason unsent, Active to people, and the
-    specs repo out of anything sent.
-  exceptions: a spec with no Feature id is not offered and names `/crav1-specs-to-ado`. A re-run offers
-    Update for a recorded task and shows only changed fields. Edits go into the spec first through `/crav1-add-to-spec`.
-    An `az` failure states the issue, suggests a fix, and offers a skip. It does not commit. It is not a
-    starter option.
-  called_by: Called by the user. `/crav1-specs-to-ado` names it and does not run it.
-  runs_by_itself: Calls `/crav1-add-to-spec` when a preview change belongs in the spec.
-  you_run_next:
-  - /crav1-tasks-ready-to-build
-  - /crav1-implement-task
-  - /crav1-complete-task
-  - /crav1-complete-tasks
+  - /crav1-build-tasks
   - /crav1-complete-features
-  - /crav1-ado-to-tasks
   - /crav1-finalize-commit
-  first_prompt: /crav1-tasks-to-ado
-- name: crav1-ado-to-tasks
-  lane: cross-cutting
-  group: Azure Boards
-  starter: false
-  since: 1.46.0
-  stage: stable
-  walkthrough: docs/from-ado-to-tasks.md
-  purpose: Read back the Azure Boards task items a spec records and bring kept changes into the spec and tasks.md.
-  in_depth:
-  - >-
-    Pick a spec with task lines in `work-item.md`, or all. Every recorded task item is read back (State,
-    title, description, acceptance, Assigned To, comments, history) and only what differs from the spec
-    and `tasks.md` is shown, plus child items under the Feature that no task line records.
-  - >-
-    Each difference is kept or dismissed, fresh every run. Kept changes go in through `/crav1-add-to-spec`.
-    A task in the done state in Azure Boards ticks its box only on your yes; one reopened there unticks
-    a ticked box only on your yes.
-    Each id is read in its own work item home; one not found is reported as moved or missing. A new child is added as a task,
-    with its id recorded in `work-item.md`, only on your yes. It never writes a field back; a reply
-    comment is stripped and posted only on yes.
-  use_when: Bring changes on a spec's task items in Azure Boards back into the spec
-  table:
-    reads: The task items a spec records, and the Feature's children
-    writes: Kept changes through `/crav1-add-to-spec`; a comment in Azure Boards after a yes
-  reads: >-
-    Reads the org and project the same way as `/crav1-specs-to-ado`, the task lines and the Feature line
-    in `work-item.md`, every recorded task item with its comments and history, the child type's fields,
-    and the Feature's children.
-  writes: >-
-    Writes the spec and `tasks.md` only through `/crav1-add-to-spec` for kept changes, ticks a box or adds a
-    task only after a yes, appends a task line to `work-item.md` for an added task, and posts a reply
-    comment only after a yes.
-  leaves_alone: Leaves every Azure Boards field, `tasks.md` ids, and dismissed changes alone.
-  exceptions: a spec with no task lines names `/crav1-tasks-to-ado`. A missing id is reported as missing,
-    not guessed. Dismiss is for this run only. It does not commit. It is not a starter option.
-  called_by: Called by the user. `/crav1-tasks-to-ado` names it and does not run it.
-  runs_by_itself: Calls `/crav1-add-to-spec` for each kept change.
-  you_run_next:
-  - /crav1-finalize-commit
-  first_prompt: /crav1-ado-to-tasks
-- name: crav1-ado-to-specs
-  lane: cross-cutting
-  group: Azure Boards
-  starter: false
-  since: 1.31.0
-  stage: stable
-  walkthrough: docs/from-ado-to-specs.md
-  purpose: Read Azure Boards Features that the specs already record.
-  in_depth:
-  - Reads Azure Boards Features back and shows what differs. A kept change goes through `/crav1-add-to-spec`.
-    A reply comment is posted only after a yes.
-  - Each id is read in its own work item home. An id not found there is reported as moved or missing,
-    and it asks before searching other projects.
-  use_when: Read Azure Boards Features back
-  table:
-    reads: Recorded Feature ids, or the ids named
-    writes: Nothing itself. A reply comment in Azure Boards only after a yes. Kept changes and answers
-      go to the spec through `/crav1-add-to-spec`
-  reads: Reads the ids in every `work-item.md` and the landscape “No spec yet in ADO” table, or only the
-    ids the user names, then State, Priority, Target Date, Iteration, Assigned To, discussion comments,
-    and history. It reads the checks from Acceptance Criteria when the Feature type has that field, and
-    from the Acceptance checks list in the Description when it does not, so a match is not a change. Comments
-    use api version `7.1-preview`, which `az devops invoke` can parse.
-  writes: Writes nothing itself. A kept change and an answer the user gives go to the spec through `/crav1-add-to-spec`.
-    A reply comment is posted only after the user says yes.
-  leaves_alone: Leaves a missing id unmatched.
-  exceptions: dismissals start fresh each run. A no-spec-yet Feature names a starter such as `/crav1-spark-to-spec`
-    and does not run it. When the spec has no answer, no reply is drafted and the question is offered
-    as an open question. An `az` failure, including a failed field read, is handled the same way as `/crav1-specs-to-ado`.
-    It does not start Specify, Plan, or Build. It is not a starter option.
-  called_by: Called by the user.
-  runs_by_itself: Calls `/crav1-add-to-spec` for one kept change and for one answer.
-  you_run_next:
-  - /crav1-finalize-commit
-  first_prompt: /crav1-ado-to-specs
+  first_prompt: /crav1-ado-sync
 - name: crav1-exploratory-test
   lane: cross-cutting
   group: Testing helpers
@@ -1916,14 +1668,14 @@ skills:
     It writes `docs/specs/<slug>/explore.md`. It does not write the checks the plan already named. It
     is cross-cutting. It may run from any lane. It does not move work into Specify, Plan, or Build. A
     bug it finds is not sent to `/crav1-fix-bug` unless the user says so in that turn. It is a later skill.
-    It is not a starter option. Asking for startup options names only the seven and does not run this
+    It is not a starter option. Asking for startup options names only the six and does not run this
     command.
   - After a build of a slice already exists, uses the slice once, then again with randomness, and writes
     bugs to `docs/specs/<slug>/explore.md`. The second pass lasts about as long as the first, then stops
     (`matched the first pass`), or sooner when the user says stop (`the user said stop`). The user does
     not set a clock. Does not write the checks the plan already named. Does not start Specify, Plan, or
     Build. A bug is not sent to `/crav1-fix-bug` unless the user says so in that turn. Not a starter option.
-    Asking for startup options names only the seven and does not run this command.
+    Asking for startup options names only the six and does not run this command.
   use_when: A build of a slice already exists
   table:
     reads: A built slice, the spec, and the plan
@@ -1962,7 +1714,7 @@ skills:
     onto the existing spec through `/crav1-add-to-spec`. Plan turns it into a task. It does not write
     the tests, change the code, or start Specify, Plan, or Build. It is cross-cutting. It may run from
     any lane. It does not move work into a lane. It is a later skill. It is not a starter option. Asking
-    for startup options names only the seven and does not run this command. The seven starter options
+    for startup options names only the six and does not run this command. The six starter options
     stay unchanged.'
   - The user points at code that already exists, one repo or one area, not the whole system. Suggests
     tests for what that code can break. A function gets a few checks. A page gets a browser check. A boundary
@@ -1970,7 +1722,7 @@ skills:
     or dismiss, one at a time. Dismiss means it is not offered again. A kept suggestion goes onto the
     existing spec through `/crav1-add-to-spec`. Plan turns it into a task. Does not write the tests, change
     the code, or start Specify, Plan, or Build. Not a starter option. Asking for startup options names
-    only the seven and does not run this command. The seven starter options stay unchanged.
+    only the six and does not run this command. The six starter options stay unchanged.
   use_when: The user points at existing code
   table:
     reads: That code, its tests, and the spec
@@ -2023,11 +1775,11 @@ subagents:
   lane: build
   since: 1.0.0
   purpose: One `T#` from implement to commit, in isolation.
-  started_by: '`/crav1-complete-task`, `/crav1-complete-tasks`, `/crav1-complete-features`'
+  started_by: '`/crav1-build-tasks`, `/crav1-complete-features`'
   reads: One `T#` (`spec.md`, `plan.md`, `tasks.md`).
   writes: That task's code, `tasks.md`, `verify.md`, `fix-log.md` when a fix runs, and the commits
   leaves_alone: '`spec.md`, other `T#`s, push, and the pull request.'
-  calls: '`/crav1-implement-task`, `/crav1-verify-spec`, `/crav1-fix-from-verify`, and `/crav1-finalize-commit`.'
+  calls: '`/crav1-build-tasks`, `/crav1-verify-spec`, `/crav1-fix-build-gaps`, and `/crav1-finalize-commit`.'
 - name: crav1-intake-slice-agent
   lane: specify
   since: 1.0.0

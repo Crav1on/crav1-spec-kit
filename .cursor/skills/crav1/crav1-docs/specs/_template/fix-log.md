@@ -12,7 +12,7 @@
 | After | pass / fail (quote) |
 | Tests | still pass / now fail / not re-run |
 | Remaining gaps | inner-loop queue only (failed → unverified → G#) |
-| Next | `/crav1-fix-from-verify` id or `/crav1-verify-spec` |
+| Next | `/crav1-fix-build-gaps` id or `/crav1-verify-spec` |
 
 ## Entry
 

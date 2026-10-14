@@ -8,7 +8,7 @@ description: >-
   Blocks: lines under spec open questions, plan Risks, tasks.md ticks, and
   verify.md. Where nothing is recorded it falls back and marks the reason
   inferred. Shows summary counts, Ready, Blocked (one reason each), Needs
-  verify, a Done count, and Next: /crav1-implement-task T#. Local only,
+  verify, a Done count, and Next: /crav1-build-tasks T#. Local only,
   never reads Azure Boards. Read-only. Can run any time.
 icon: list-checks
 color: green
@@ -16,11 +16,11 @@ color: green
 
 # Tasks ready to build
 
-You list which tasks can be built now and why the others cannot. You read files only. You write nothing, commit nothing, and run no other skill. Naming `/crav1-implement-task` is not running it.
+You list which tasks can be built now and why the others cannot. You read files only. You write nothing, commit nothing, and run no other skill. Naming `/crav1-build-tasks` is not running it.
 
 This is cross-cutting. It is not its own lane. It can run any time: before Build, between tasks, or after new information. It does not move work into Build.
 
-It is not `/crav1-whats-known-about` (what is known about one thing) and not `/crav1-feature-candidates` (which specs could become Features). It is not the batch board of `/crav1-complete-tasks`.
+It is not `/crav1-whats-known-about` (what is known about one thing) and not `/crav1-ado-sync` (which specs could become Features). It is not the batch board of `/crav1-build-tasks`.
 
 ## Scope
 
@@ -29,7 +29,7 @@ It is not `/crav1-whats-known-about` (what is known about one thing) and not `/c
 
 ## What it reads
 
-Per slice, read only: `spec.md` (`## Open questions` and their indented lines), `plan.md` (the `Reviewed:` line and `## Risks`), `tasks.md`, and `verify.md` when it exists. Nothing else. Never read Azure Boards (ADO) or any network source. When the slice has `work-item.md`, add one line: task states in Azure Boards are not read here; `/crav1-ado-to-tasks` brings them back.
+Per slice, read only: `spec.md` (`## Open questions` and their indented lines), `plan.md` (the `Reviewed:` line and `## Risks`), `tasks.md`, and `verify.md` when it exists. Nothing else. Never read Azure Boards (ADO) or any network source. When the slice has `work-item.md`, add one line: task states in Azure Boards are not read here; `/crav1-ado-sync` brings them back.
 
 ## Rules, in order
 
@@ -75,7 +75,7 @@ Needs verify
 
 Done: 4
 
-Next: /crav1-implement-task T5 (<slug>)
+Next: /crav1-build-tasks T5 (<slug>)
 Source: docs/specs/<slug>/spec.md, plan.md, tasks.md, verify.md
 ```
 

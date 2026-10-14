@@ -25,7 +25,7 @@ Command: `/crav1-whats-known-about`.
 
 This is cross-cutting. It is not a lane. It may run from any lane. It does not move work into Specify, Plan, or Build. It does not start those lanes.
 
-This command is a later skill. It is not a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-match-to-specs`, `/crav1-repos-to-spec`, `/crav1-environment-read`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane. The seven starter options stay unchanged.
+This command is a later skill. It is not a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-existing-to-specs`, `/crav1-environment-read`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane. The six starter options stay unchanged.
 
 Other skills do not run this one. Spark, specify, plan, and verify do not run it. It is not started automatically.
 
@@ -57,8 +57,8 @@ Stop until the user picks. Do not scan the repo to pick a thing. Do not guess.
 
 Pasted minutes, a transcript, or a long dump are out of scope. Do not extract items. Do not answer from the paste.
 
-- Minutes or a transcript: name `/crav1-meeting-to-specs` and stop.
-- A dump of notes, tickets, old docs, diagrams, or screenshots: name `/crav1-match-dump-to-specs` and stop.
+- Minutes or a transcript: name `/crav1-add-to-spec` and stop.
+- A dump of notes, tickets, old docs, diagrams, or screenshots: name `/crav1-add-to-spec` and stop.
 
 A sentence or two is in scope. A long dump is not.
 
@@ -178,7 +178,7 @@ The org and project come from the first source that names both:
 
 Do not ask for a typed path. Do not guess an org.
 
-A recorded id is read in its own home: the `(ADO: <org>/<project>)` tag on its `work-item.md` line, or the `Work items go to` cell of the repo in `docs/system/repos.md`, as [work-item-homes.md](../crav1-specs-to-ado/references/work-item-homes.md) (drop-in: `.cursor/skills/crav1/crav1-specs-to-ado/references/work-item-homes.md`; plugin: sibling `skills/crav1-specs-to-ado/references/work-item-homes.md`) says. An older line without a tag uses the pair above. An id not found there is reported as moved or missing with that home; ask before searching other projects. This command only reads: it does not ask for or write a home.
+A recorded id is read in its own home: the `(ADO: <org>/<project>)` tag on its `work-item.md` line, or the `Work items go to` cell of the repo in `docs/system/repos.md`, as [work-item-homes.md](../crav1-ado-sync/branches/push-features/references/work-item-homes.md) (drop-in: `.cursor/skills/crav1/crav1-ado-sync/branches/push-features/references/work-item-homes.md`; plugin: sibling `skills/crav1-ado-sync/branches/push-features/references/work-item-homes.md`) says. An older line without a tag uses the pair above. An id not found there is reported as moved or missing with that home; ask before searching other projects. This command only reads: it does not ask for or write a home.
 
 For source 3, read `docs/system/repos.md` when that file exists. An Azure DevOps URL matches `dev.azure.com` or `*.visualstudio.com` (HTTPS or SSH). Read the org and the project from the URL:
 
@@ -253,7 +253,7 @@ When the user picked Skip, **Source** includes one line: the live checks did not
 
 Do not write a file. Do not edit a spec, a plan, `tasks.md`, `docs/system/`, `docs/architecture/spec.md`, `docs/environments/marks.md`, or code. Do not commit. Do not push. Do not open a pull request.
 
-Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-match-to-specs`, `/crav1-match-dump-to-specs`, `/crav1-meeting-to-specs`, `/crav1-explain`, `/crav1-environment-read`, `/crav1-pipeline-environments`, `/crav1-plan-from-spec`, `/crav1-implement-task`, `/crav1-add-to-spec`, or `/crav1-finalize-commit`.
+Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-existing-to-specs`, `/crav1-add-to-spec`, `/crav1-explain`, `/crav1-environment-read`, `/crav1-pipeline-environments`, `/crav1-plan-from-spec`, `/crav1-build-tasks`, or `/crav1-finalize-commit`.
 
 ## Hard rules
 
@@ -262,7 +262,7 @@ Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-spe
 - One pass. No hunt through the whole codebase. An `@` keeps the search inside that path.
 - One winning slice: answer and name the path. Two or more close hits: list every one and ask. Do not guess.
 - No slice: say so, show what is known, present a candidate, and name spark, ideas, or intake. Do not run it.
-- Minutes or a long dump: name `/crav1-meeting-to-specs` or `/crav1-match-dump-to-specs` and stop.
+- Minutes or a long dump: name `/crav1-add-to-spec` and stop.
 - Live reads come after the repo part. Tag each live fact `Live read.`
 - When the git remote is not Azure Repos and `docs/environments/marks.md` does not name the Azure DevOps org and project, derive them from Azure DevOps URLs in `docs/system/repos.md`. Then read work items, open pull requests, and branches the same way. Tag each fact `Live read.`
 - Before reporting `az` as not installed, check the default install paths on Windows, macOS, and Linux. Use that path when it is there.
@@ -272,4 +272,4 @@ Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-spe
 - People come from what is written. A guess is labeled `(inference, not in the docs)`.
 - Write nothing. Do not run another skill. Naming one is allowed.
 - Do not start Specify, Plan, or Build.
-- Later skill. Not a starter option. Asking for startup options names only the seven and does not run this command.
+- Later skill. Not a starter option. Asking for startup options names only the six and does not run this command.

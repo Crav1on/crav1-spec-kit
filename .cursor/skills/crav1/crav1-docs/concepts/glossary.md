@@ -26,7 +26,7 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 
 ## Words
 
-**Starter option.** One of the seven ways in: spark-to-spec, ideas-to-spec, intake-to-specs, match-to-specs, repos-to-spec, environment-read, fix-bug. Asking for startup options lists them and does not run one.
+**Starter option.** One of the six ways in: spark-to-spec, ideas-to-spec, intake-to-specs, existing-to-specs, environment-read, fix-bug. Asking for startup options lists them and does not run one.
 
 **Later skill.** Any skill that is not a starter option. Most run once specs already exist.
 

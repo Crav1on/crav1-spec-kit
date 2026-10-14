@@ -12,7 +12,7 @@ Prompt for `feat/<slug>` or specify-only `spec/<slug>`; no silent checkout, no p
 
 ## Runs when
 
-Brownfield: leave the default branch. Called by the user, [`/crav1-spark-to-spec`](crav1-spark-to-spec.md), [`/crav1-ideas-to-spec`](crav1-ideas-to-spec.md), [`/crav1-intake-to-specs`](crav1-intake-to-specs.md), [`/crav1-match-to-specs`](crav1-match-to-specs.md), [`/crav1-implement-task`](crav1-implement-task.md), [`/crav1-complete-task`](crav1-complete-task.md), [`/crav1-complete-tasks`](crav1-complete-tasks.md), and [`/crav1-complete-features`](crav1-complete-features.md).
+Brownfield: leave the default branch. Called by the user, [`/crav1-spark-to-spec`](crav1-spark-to-spec.md), [`/crav1-ideas-to-spec`](crav1-ideas-to-spec.md), [`/crav1-intake-to-specs`](crav1-intake-to-specs.md), [`/crav1-existing-to-specs`](crav1-existing-to-specs.md), [`/crav1-build-tasks`](crav1-build-tasks.md), and [`/crav1-complete-features`](crav1-complete-features.md).
 
 ## Reads
 

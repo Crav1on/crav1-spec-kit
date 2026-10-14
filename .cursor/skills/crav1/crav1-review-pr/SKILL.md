@@ -325,7 +325,7 @@ The block is text in the chat. Showing it posts nothing.
 
 Follow-ups are not posted and not in the paste-ready block. The chat review still shows them, under **Follow-ups (not for this PR)**, then one line: `Follow-ups saved: docs/notes/<file>.md`.
 
-When the review has at least one follow-up, write a note in `docs/notes/` of the specs repo, in the existing notes format (`docs/notes/_template/note.md` and `index.md`; the same shapes `/crav1-meeting-to-specs` writes, drop-in: `.cursor/skills/crav1/crav1-meeting-to-specs/assets/`; plugin: sibling `skills/crav1-meeting-to-specs/assets/`):
+When the review has at least one follow-up, write a note in `docs/notes/` of the specs repo, in the existing notes format (`docs/notes/_template/note.md` and `index.md`; the same shapes `/crav1-add-to-spec` writes, drop-in: `.cursor/skills/crav1/crav1-add-to-spec/branches/meeting/assets/`; plugin: sibling `skills/crav1-add-to-spec/branches/meeting/assets/`):
 
 - File: `docs/notes/review-pr-<n>-follow-ups.md`, where `<n>` is the pull request number. When two repos in this specs repo have the same pull request number, use `review-pr-<repo>-<n>-follow-ups.md`.
 - Title: `Follow-ups from PR <n> (<repo>)`.
@@ -340,7 +340,7 @@ When the review has at least one follow-up, write a note in `docs/notes/` of the
 
 When the specs repo is not in this workspace, write nothing and print the note in the chat with the path it would have.
 
-The follow-ups come back through the existing note flow: `/crav1-feature-candidates` reads open notes, and a spec that takes one marks it Used by, or Absorbed by when it takes all of it. This skill does not do that marking.
+The follow-ups come back through the existing note flow: `/crav1-ado-sync` reads open notes, and a spec that takes one marks it Used by, or Absorbed by when it takes all of it. This skill does not do that marking.
 
 Writing the note is the only file this skill writes. It does not commit. Name `/crav1-finalize-commit` and do not run it.
 

@@ -33,9 +33,9 @@ Point at one command when what they brought makes it obvious. Do not run it.
 - One or two sentences, no design yet: `/crav1-spark-to-spec`
 - A pile of ideas, no design yet: `/crav1-ideas-to-spec`
 - Mixed files or several features, no design yet: `/crav1-intake-to-specs`
-- Repos plus a dump, no design yet: `/crav1-match-to-specs`
+- Repos plus a dump, no design yet: `/crav1-existing-to-specs`
 - A spec folder exists and does not describe the design: `/crav1-add-to-spec` when they already have the information, otherwise spark or ideas for a new slug unless they said extend
-- They picked the change, specs exist, and no spec describes that change: `/crav1-code-into-specs`
+- They picked the change, specs exist, and no spec describes that change: `/crav1-add-to-spec`
 
 If they brought none of those, name the four commands that create the architecture (spark, ideas, intake, match) and stop.
 
@@ -67,7 +67,7 @@ Offer only targets that are real:
 
 Default branch: the branch `origin/HEAD` points at, or `main` when that is the default you can see. Do not ask them to type a hash or a path.
 
-When the target is the change and it belongs to one spec that describes the design, that spec is where the Security section goes. If it belongs to more than one such spec, ask with options only before findings. One option per spec the change actually touches. If it belongs to none, stop and point at `/crav1-code-into-specs` when spec folders exist, otherwise the command that creates the architecture. Do not invent a spec.
+When the target is the change and it belongs to one spec that describes the design, that spec is where the Security section goes. If it belongs to more than one such spec, ask with options only before findings. One option per spec the change actually touches. If it belongs to none, stop and point at `/crav1-add-to-spec` when spec folders exist, otherwise the command that creates the architecture. Do not invent a spec.
 
 ## Read
 

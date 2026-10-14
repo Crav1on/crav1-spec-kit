@@ -8,7 +8,7 @@ Examples: Aspire AppHost + an API resource, `docker compose`, a published URL, `
 
 Refresh **before** running that evidence if **any** of these are true:
 
-- Product code or config for that service changed since the host last started (typical after `/crav1-implement-task` or a fix)
+- Product code or config for that service changed since the host last started (typical after `/crav1-build-tasks` or a fix)
 - The last request still looks like the **old** API (stale route, old contract, old HTML)
 - Aspire / compose / the dashboard shows the resource as unhealthy, not started, or on an old revision
 
@@ -30,7 +30,7 @@ Aspire-specific: changing the API project does not always hot-reload the running
 
 Do **not** mark **pass**. Mark **untested** / **claimed done, unverified**. In chat, say exactly what they must do (example: “Restart `apiservice` in the Aspire dashboard, then reply `ready`”).
 
-In `/crav1-complete-task` / `/crav1-complete-tasks`, that is a **gate**: wait for `ready` or `stop`. Do not keep verifying against a stale host.
+In `/crav1-build-tasks`, that is a **gate**: wait for `ready` or `stop`. Do not keep verifying against a stale host.
 
 ## Record
 

@@ -6,36 +6,40 @@
 
 ## Purpose
 
-Finalize a commit: CRAV1 style vs git log first if needed, then draft the Summary and Description, then offer git commit first, then copy / edit / rewrite / stop.
+Commit, or only write the commit message; asks which.
 
-Same draft, then **commit first**, then copy for your git client, edit/rewrite, or stop (no push). Keeps that mention through the HEAD check and the attribution strip.
+**[`/crav1-finalize-commit`](crav1-finalize-commit.md)** opens with one question: commit, or only write the message (paste-ready, no git commit). It skips the question when the message says which. It replaces draft-commit-message; its rules are kept as a branch.
+
+Only write the message (was `/crav1-draft-commit-message`): Paste-ready Summary/Description for any git client; CRAV1 style or live git log, once or onward (deletable rule); does not commit unless they ask. Optional Azure Boards mention from `docs/specs/<slug>/work-item.md` is the last description line.
+
+Commit (was [`/crav1-finalize-commit`](crav1-finalize-commit.md)): Same draft, then **commit first**, then copy for your git client, edit/rewrite, or stop (no push). Keeps that mention through the HEAD check and the attribution strip.
 
 ## Runs when
 
-Wording, then commit or copy. Called by the user and by `crav1-complete-task-agent`.
+You want the commit message, or the commit itself. Called by the user and by [`/crav1-finalize-commit`](crav1-finalize-commit.md).
 
 ## Reads
 
-In short: The same commit inputs as draft.
+In short: Only write the message: The diff, recent git log, and `work-item.md`; Commit: The same commit inputs as draft.
 
-Reads the same commit inputs through draft.
+Only write the message: Reads the staged or unstaged diff, recent `git log`, an existing persist rule, and `work-item.md` when it exists. The mention picks the id whose milestone or slice label matches the slice being worked, asks when that is unclear, and still reads a single unlabeled line. Commit: Reads the same commit inputs through draft.
 
 ## Writes
 
-In short: The persist rule when onward is chosen, and the git commit when picked.
+In short: Only write the message: A host persist rule when onward is chosen; a commit only when also asked in that turn; Commit: The persist rule when onward is chosen, and the git commit when picked.
 
-Writes the persist rule when onward is chosen, and the git commit when the user picks commit.
+Only write the message: Writes a host persist rule only when the user chooses onward. Commit: Writes the persist rule when onward is chosen, and the git commit when the user picks commit.
 
 ## Does not
 
-Leaves push alone.
+Only write the message: Leaves the git commit alone. Commit: Leaves push alone.
 
-Limits and exceptions: the worker commits immediately and skips the menu.
+Limits and exceptions: Only write the message: commits only when the user also asked to commit in that turn. Commit: the worker commits immediately and skips the menu.
 
 ## You run next / Runs by itself
 
 - You run next: [`/crav1-open-pr`](crav1-open-pr.md)
-- Runs by itself: Calls [`/crav1-draft-commit-message`](crav1-draft-commit-message.md).
+- Runs by itself: Only write the message: Calls no skill. Commit: Calls [`/crav1-finalize-commit`](crav1-finalize-commit.md).
 
 ## Lane and group
 

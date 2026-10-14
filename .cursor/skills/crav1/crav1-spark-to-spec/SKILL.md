@@ -21,7 +21,7 @@ color: blue
 
 You are a product-minded specifier. The user has **one or two sentences**. Your job is a **living spec** for that slice, not an architecture lecture and not code.
 
-This command is a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-match-to-specs`, `/crav1-repos-to-spec`, `/crav1-environment-read`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane. Every other skill is a later skill.
+This command is a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-existing-to-specs`, `/crav1-environment-read`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane. Every other skill is a later skill.
 
 The layout always includes `docs/system/`. When that folder is missing, seed a thin landscape from the repo in front of you, including `glossary.md`, then write the spec, then add one index row. When `docs/system/` already exists, do not rewrite what is already there. If `glossary.md` is missing, write only that file. If it exists, append only words or abbreviations that are not already rows. Do not rewrite existing rows. In that same pass, add what is new to the short description, the diagram, and how the parts connect.
 
@@ -40,7 +40,7 @@ Look at the workspace and what they @-mentioned.
 
 If both a codebase and an old spec are present, brownfield + new slug is the default. If `docs/system/` exists as well, treat that as **later feature on the landscape** (still new slug; constraints from landscape then from the app).
 
-If they pasted a dump, many files, or several features/repos, stop and tell them `/crav1-intake-to-specs` (or `/crav1-ideas-to-spec` for one pile → one spec). Named repos and no feature sentence, when the job is the architecture the code shows, is `/crav1-repos-to-spec`. Do not stretch this skill.
+If they pasted a dump, many files, or several features/repos, stop and tell them `/crav1-intake-to-specs` (or `/crav1-ideas-to-spec` for one pile → one spec). Named repos and no feature sentence, when the job is the architecture the code shows, is `/crav1-existing-to-specs`. Do not stretch this skill.
 
 ## First response (before any file)
 
@@ -105,7 +105,7 @@ Then output only:
 - 3–5 decisions still worth arguing
 - What to do next: answer those, or run `/crav1-tighten-spec`, or accept and `/crav1-plan-from-spec`. If they chose `spec/<slug>`, remind them: no implement on that branch; PR/merge when they want, then `feat/<slug>` for build.
 
-Then, when this turn created a new `docs/specs/<slug>/` folder, follow [work-item-offer.md](../crav1-draft-commit-message/references/work-item-offer.md) (plugin: sibling `skills/crav1-draft-commit-message/references/work-item-offer.md`). One optional question on Azure Repos only. Do not ask on GitHub or any other host. Do not ask again in this run if the user skips or does not answer.
+Then, when this turn created a new `docs/specs/<slug>/` folder, follow [work-item-offer.md](../crav1-finalize-commit/branches/message-only/references/work-item-offer.md) (plugin: sibling `skills/crav1-finalize-commit/branches/message-only/references/work-item-offer.md`). One optional question on Azure Repos only. Do not ask on GitHub or any other host. Do not ask again in this run if the user skips or does not answer.
 
 Still no code. Still no `plan.md` unless they asked for a plan. Pile of ideas plus hunches for **one** feature: tell them `/crav1-ideas-to-spec`. Mixed files / several features or repos: `/crav1-intake-to-specs`.
 

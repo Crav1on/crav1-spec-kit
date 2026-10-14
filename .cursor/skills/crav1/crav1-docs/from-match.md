@@ -2,11 +2,11 @@
 
 Kit not in this project yet? [Install first](install.md) (Cursor and Claude Code; the slash commands match, the files do not). After a Cursor plugin install, the short command loop is [plugins/crav1/README.md](../plugins/crav1/README.md). Claude Code has no plugin.
 
-Use this when **one or more repos already make up a system**, and you have a **dump** (notes, tickets, old docs, diagrams, screenshots) to match against that code. This command is a starter option. The seven are in [first-run.md](first-run.md). Asking for startup options names that list and does not run this command.
+Use this when **one or more repos already make up a system**, and you have a **dump** (notes, tickets, old docs, diagrams, screenshots) to match against that code. This command is a starter option. The six are in [first-run.md](first-run.md). Asking for startup options names that list and does not run this command.
 
 The repos are evidence of what exists. The dump is what to match. It is not a brief for a new product. You still do **not** start by coding.
 
-This command is not [intake](from-intake.md), [a spark](from-nothing.md), or [a pile of ideas](from-ideas.md). It does not replace those commands. A new system, with code only as background, stays `/crav1-intake-to-specs`. One or two sentences stay `/crav1-spark-to-spec`. One unstructured pile for one feature stays `/crav1-ideas-to-spec`. Named repos and no dump, when the job is one architecture spec of what the code shows, is [from the repos](from-repos.md) (`/crav1-repos-to-spec`). This command still needs the dump.
+This command is not [intake](from-intake.md), [a spark](from-nothing.md), or [a pile of ideas](from-ideas.md). It does not replace those commands. A new system, with code only as background, stays `/crav1-intake-to-specs`. One or two sentences stay `/crav1-spark-to-spec`. One unstructured pile for one feature stays `/crav1-ideas-to-spec`. Named repos and no dump, when the job is one architecture spec of what the code shows, is [from the repos](from-repos.md) (`/crav1-existing-to-specs`). This command still needs the dump.
 
 ## First prompt
 
@@ -15,7 +15,7 @@ New chat. Strong reasoning model. Not the host plan UI yet.
 `@` the repos and the dump. No required structure in the dump.
 
 ```text
-/crav1-match-to-specs
+/crav1-existing-to-specs
 @repo-a/
 @repo-b/
 @notes/old-spec.md
@@ -79,4 +79,4 @@ That puts `docs/system/` and the new spec slugs in git. No push. This command do
 
 `/crav1-plan-from-spec` is only for a slice you choose to start. A slice that is not in the code is not planned by this command.
 
-Reference page: [match-to-specs](reference/skills/crav1-match-to-specs.md)
+Reference page: [existing-to-specs](reference/skills/crav1-existing-to-specs.md)

@@ -44,7 +44,7 @@ Run git (PATH fallback if needed). If not a repo, skip.
 
 Intake (several slugs): one branch for the dump. Slug = short landscape kebab, or `system` if unnamed. Options are `feat/<that>` vs `spec/<that>`.
 
-**Build** (implement / complete-task / complete-tasks, before the first code change or worker):
+**Build** (implement / build-tasks, before the first code change or worker):
 
 1. **`feat/<slug>`** — create/check out from the **current default** (default, **first/top**). Use this after a spec-only branch is on default, or when still on default
 2. **Stay**
@@ -70,7 +70,7 @@ Then continue the parent skill on the new branch (write spec, or start the worke
 
 ## Build on a spec-only branch
 
-If they start implement / complete-task / complete-tasks while **on `spec/<slug>`**:
+If they start implement / build-tasks while **on `spec/<slug>`**:
 
 Stop. Do not write application code on a specify-only branch.
 
@@ -85,8 +85,8 @@ Offer:
 When `/crav1-plan-from-spec` has written `plan.md` / `tasks.md` on `spec/<slug>` (or they chose specify-only earlier):
 
 - Next: `/crav1-finalize-commit` (no push), then **they** open a PR for this branch when they want the spec on default
-- Do **not** start `/crav1-implement-task` on `spec/<slug>`
-- After that PR is merged (they say so): `/crav1-feature-branch` with this slug → `feat/<slug>` from default, then implement / complete-task
+- Do **not** start `/crav1-build-tasks` on `spec/<slug>`
+- After that PR is merged (they say so): `/crav1-feature-branch` with this slug → `feat/<slug>` from default, then implement / build-tasks
 
 If they planned on `feat/<slug>` (one-branch default), skip spec-first. Implement on the same branch.
 
