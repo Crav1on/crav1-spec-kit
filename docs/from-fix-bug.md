@@ -6,9 +6,9 @@ Use this when a **real bug** is already named.
 
 A real bug is a verify failure on work that is already shipping, or a defect that comes in from outside.
 
-This is cross-cutting. It is not its own lane. It is not a stretch of verify. It is not `/crav1-fix-from-verify` and not `/crav1-fix-live`. Those walk the inner loop on work that is still in Build. This command is an intake for a bug that already exists. Spark, specify, plan, and verify do not run it. It is not a skill that runs because a repo is new, and it is not started automatically.
+This is cross-cutting. It is not its own lane. It is not a stretch of verify. It is not `/crav1-fix-build-gaps` and not `/crav1-fix-build-gaps`. Those walk the inner loop on work that is still in Build. This command is an intake for a bug that already exists. Spark, specify, plan, and verify do not run it. It is not a skill that runs because a repo is new, and it is not started automatically.
 
-When you ask for startup options, this command is one of the seven starter options in [first-run.md](first-run.md). That ask names the list and does not run this command. It still runs only when you name a real bug.
+When you ask for startup options, this command is one of the six starter options in [first-run.md](first-run.md). That ask names the list and does not run this command. It still runs only when you name a real bug.
 
 ## First prompt
 

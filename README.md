@@ -16,17 +16,17 @@ This is a process guide, not an application. Use it as a checklist when you star
 
 Pick an install path, open the product repo, then `/crav1` and one starter option. A spark continues tighten → plan → one task. The short path is [docs/first-run.md](docs/first-run.md). The method behind it is [docs/concepts/method.md](docs/concepts/method.md).
 
-## The seven starter options
+## The six starter options
 
-When you ask for startup options, these seven are the only ways in. That ask names the list. It does not run a skill. It does not move work into a lane. Each starter still follows the rules it already has. Every other skill is a later skill.
+When you ask for startup options, these six are the only ways in. That ask names the list. It does not run a skill. It does not move work into a lane. Each starter still follows the rules it already has. Every other skill is a later skill.
 
 | Starter | When | Walkthrough |
 | --- | --- | --- |
 | [`/crav1-spark-to-spec`](docs/reference/skills/crav1-spark-to-spec.md) | One or two sentences | [From one sentence to a spec](docs/from-nothing.md) |
 | [`/crav1-ideas-to-spec`](docs/reference/skills/crav1-ideas-to-spec.md) | A pile of ideas and technical hunches | [From a pile of ideas to a spec](docs/from-ideas.md) |
 | [`/crav1-intake-to-specs`](docs/reference/skills/crav1-intake-to-specs.md) | Mixed files, or more than one v0 feature | [From intake files to specs](docs/from-intake.md) |
-| [`/crav1-match-to-specs`](docs/reference/skills/crav1-match-to-specs.md) | Existing repos plus a dump to match | [From existing repos and a dump to specs](docs/from-match.md) |
-| [`/crav1-repos-to-spec`](docs/reference/skills/crav1-repos-to-spec.md) | You name the repos. It runs only then | [From named repos to an architecture spec](docs/from-repos.md) |
+| [`/crav1-existing-to-specs`](docs/reference/skills/crav1-existing-to-specs.md) | Existing repos plus a dump to match | [From existing repos and a dump to specs](docs/from-match.md) |
+| [`/crav1-existing-to-specs`](docs/reference/skills/crav1-existing-to-specs.md) | You name the repos. It runs only then | [From named repos to an architecture spec](docs/from-repos.md) |
 | [`/crav1-environment-read`](docs/reference/skills/crav1-environment-read.md) | You name the host. It runs only then | [From a named host](docs/from-environment.md) |
 | [`/crav1-fix-bug`](docs/reference/skills/crav1-fix-bug.md) | You name a real bug that already exists. It runs only then | [From a bug that already exists](docs/from-fix-bug.md) |
 
@@ -47,7 +47,7 @@ flowchart LR
 
 | Lane | Groups | Reference |
 | --- | --- | --- |
-| Starters | The seven ways in | [Starters](docs/reference/skills.md#starters) |
+| Starters | The six ways in | [Starters](docs/reference/skills.md#starters) |
 | Specify | Start, Specify | [Specify](docs/reference/skills.md#specify) |
 | Plan | Plan | [Plan](docs/reference/skills.md#plan) |
 | Build | Build, Verify and fix | [Build](docs/reference/skills.md#build) |

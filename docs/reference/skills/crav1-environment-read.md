@@ -16,7 +16,7 @@ The user names the host. One pass reads every non-prod environment. Azure, AWS, 
 
 The user names the host. Called by the user.
 
-This is one of the seven starter options. Asking for startup options names it and does not run it.
+This is one of the six starter options. Asking for startup options names it and does not run it.
 
 ## Reads
 
@@ -26,7 +26,7 @@ Reads the host the user named, non-prod resources on that host, prod-only resour
 
 ## Writes
 
-In short: Confirmed lines appended to `docs/environments/marks.md`; confirmed sections go to their owners through [`/crav1-keep-current`](crav1-keep-current.md), [`/crav1-repos-to-spec`](crav1-repos-to-spec.md), or [`/crav1-add-to-spec`](crav1-add-to-spec.md).
+In short: Confirmed lines appended to `docs/environments/marks.md`; confirmed sections go to their owners through [`/crav1-keep-current`](crav1-keep-current.md), [`/crav1-existing-to-specs`](crav1-existing-to-specs.md), or [`/crav1-add-to-spec`](crav1-add-to-spec.md).
 
 Writes only confirmed lines appended to `docs/environments/marks.md`.
 
@@ -39,7 +39,7 @@ Limits and exceptions: does not guess the host. Naming production, prod, or live
 ## You run next / Runs by itself
 
 - You run next: [`/crav1-finalize-commit`](crav1-finalize-commit.md)
-- Runs by itself: Calls [`/crav1-keep-current`](crav1-keep-current.md), [`/crav1-repos-to-spec`](crav1-repos-to-spec.md), and [`/crav1-add-to-spec`](crav1-add-to-spec.md) for the append only after that section is confirmed.
+- Runs by itself: Calls [`/crav1-keep-current`](crav1-keep-current.md), [`/crav1-existing-to-specs`](crav1-existing-to-specs.md), and [`/crav1-add-to-spec`](crav1-add-to-spec.md) for the append only after that section is confirmed.
 
 ## Lane and group
 

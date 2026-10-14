@@ -154,7 +154,7 @@ def render_table(data: dict) -> str:
         "",
         "## Starters",
         "",
-        "When the user asks for startup options, these seven are the only ways in. That ask names the list. It does not run a skill and does not move work into a lane. Each starter still follows its own rules. Every other skill is a later skill.",
+        "When the user asks for startup options, these six are the only ways in. That ask names the list. It does not run a skill and does not move work into a lane. Each starter still follows its own rules. Every other skill is a later skill.",
         "",
         "| Command | Lane | Use when |",
         "| --- | --- | --- |",
@@ -228,7 +228,7 @@ def render_page(s: dict, data: dict) -> str:
     runs = s["use_when"].rstrip(".") + "."
     out += ["", "## Runs when", "", lk(runs) + (" " + lk(s["called_by"]) if s.get("called_by") else "")]
     if s["starter"]:
-        out += ["", "This is one of the seven starter options. Asking for startup options names it and does not run it."]
+        out += ["", "This is one of the six starter options. Asking for startup options names it and does not run it."]
     out += ["", "## Reads", "", f"In short: {lk(s['table']['reads'])}.", "", lk(s["reads"])]
     out += ["", "## Writes", "", f"In short: {lk(s['table']['writes'])}.", "", lk(s["writes"])]
     out += ["", "## Does not", ""]

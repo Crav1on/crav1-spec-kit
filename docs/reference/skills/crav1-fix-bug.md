@@ -8,7 +8,7 @@
 
 Name one real bug the user already named.
 
-When a real bug is named, **[`/crav1-fix-bug`](crav1-fix-bug.md)** says where it was seen, names the bug, points at the spec or the shipped behavior it breaks, and names the lane. A real bug is a verify failure on work that is already shipping, or a defect that comes in from outside. It is cross-cutting. It is not a lane and not a stretch of verify. It does not start that lane, edit code, open a pull request, or create an Azure Boards work item. If no bug is named, it stops. It does not go hunting. When you ask for startup options, it is one of the seven starter options. That ask names the list and does not run it. It is an intake for a bug that already exists. It still runs only when you name a real bug. It is not a skill that runs because a repo is new, and it is not started automatically. Spark, specify, plan, and verify do not run it.
+When a real bug is named, **[`/crav1-fix-bug`](crav1-fix-bug.md)** says where it was seen, names the bug, points at the spec or the shipped behavior it breaks, and names the lane. A real bug is a verify failure on work that is already shipping, or a defect that comes in from outside. It is cross-cutting. It is not a lane and not a stretch of verify. It does not start that lane, edit code, open a pull request, or create an Azure Boards work item. If no bug is named, it stops. It does not go hunting. When you ask for startup options, it is one of the six starter options. That ask names the list and does not run it. It is an intake for a bug that already exists. It still runs only when you name a real bug. It is not a skill that runs because a repo is new, and it is not started automatically. Spark, specify, plan, and verify do not run it.
 
 Names one real bug the user already named (a verify failure on work that is already shipping, or a defect from outside). Says where it was seen, what it breaks, and the lane. Does not start that lane, edit code, open a pull request, or create an Azure Boards work item. Stops when no bug is named. Not a lane and not a stretch of verify. Starter option. Asking for startup options names it and does not run it. It still runs only when the user names a real bug. Not a new-repo start. Not started automatically. Spark, specify, plan, and verify do not run it.
 
@@ -16,7 +16,7 @@ Names one real bug the user already named (a verify failure on work that is alre
 
 The user names a real bug. Called by the user.
 
-This is one of the seven starter options. Asking for startup options names it and does not run it.
+This is one of the six starter options. Asking for startup options names it and does not run it.
 
 ## Reads
 
