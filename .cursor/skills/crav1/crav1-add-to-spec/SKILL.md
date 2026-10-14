@@ -37,13 +37,13 @@ You add new information to **one existing** spec. Then you check whether `docs/s
 
 This is not `/crav1-tighten-spec`. Tighten is for mushy wording. This skill is for new information. If the message is only “make this tighter” and brings no new fact, tell them `/crav1-tighten-spec` and do not edit.
 
-This is not `/crav1-existing-to-specs`, `/crav1-intake-to-specs`, `/crav1-spark-to-spec`, or `/crav1-ideas-to-spec`. Those create the folders. This skill updates one spec that already exists. Do not send this job to those commands, and do not absorb theirs. Do not create a new slug here.
+This is not `/crav1-existing-to-specs`, `/crav1-bundle-to-specs`, `/crav1-spark-to-spec`, or `/crav1-ideas-to-spec`. Those create the folders. This skill updates one spec that already exists. Do not send this job to those commands, and do not absorb theirs. Do not create a new slug here.
 
 A not-started spec (match status `not in the code`, or a thin spec) can keep taking information until planning. Adding information does not start planning and does not write `plan.md` or `tasks.md`.
 
-## From /crav1-environment-read
+## From /crav1-read-environment
 
-When `/crav1-environment-read` hands a confirmed fact for a slice Match already owns, run only this section. Add that quote to that spec only. The quote starts with `Seen in <host> <environment>.` When the quote says `shared with prod`, `prod only`, or shape and connections only, keep that label. Do not replace it with a paraphrase. Do not mark it as something the code shows. Do not change match status. Do not create a slug. Do not open the impact question. Do not edit `docs/system/` or another spec from this handoff. If no spec has `## Match` for that slice, write nothing. Do not start Specify, Plan, or Build. Do not continue into the main path. After the last environment-read item in this run, follow **Picture offer**, then stop.
+When `/crav1-read-environment` hands a confirmed fact for a slice Match already owns, run only this section. Add that quote to that spec only. The quote starts with `Seen in <host> <environment>.` When the quote says `shared with prod`, `prod only`, or shape and connections only, keep that label. Do not replace it with a paraphrase. Do not mark it as something the code shows. Do not change match status. Do not create a slug. Do not open the impact question. Do not edit `docs/system/` or another spec from this handoff. If no spec has `## Match` for that slice, write nothing. Do not start Specify, Plan, or Build. Do not continue into the main path. After the last read-environment item in this run, follow **Picture offer**, then stop.
 
 ## From /crav1-suggest-tests-for-code
 
@@ -75,13 +75,13 @@ When the handoff includes a source folder, add the `Source:` and `Trace:` lines 
 
 When the handoff includes a note path, that quote comes from that note. Run **Notes** after the spec quote. Do not ask what kind of note it is.
 
-Then run **Add to that spec.md** and **Impact** in this skill. The impact check still runs, including research. Follow [references/research-stale.md](references/research-stale.md). Do not skip it. Do not run that research check a second time. Do not write `plan.md` or `tasks.md`. Do not change application code. Do not start Specify, Plan, or Build. Do not ask the picture offer. That offer is only the environment-read and suggest-tests handoffs.
+Then run **Add to that spec.md** and **Impact** in this skill. The impact check still runs, including research. Follow [references/research-stale.md](references/research-stale.md). Do not skip it. Do not run that research check a second time. Do not write `plan.md` or `tasks.md`. Do not change application code. Do not start Specify, Plan, or Build. Do not ask the picture offer. That offer is only the read-environment and suggest-tests handoffs.
 
 ## From an import: answer links and asked marks
 
 When `/crav1-add-to-spec` hands an answer link or an asked mark for an existing spec, the spec is the one that skill already named. Do not ask for a slug. Do not ask keep or apply. Follow [references/open-questions.md](references/open-questions.md).
 
-- An answer link writes one `Answered:` line under that open question: the date, who, the kind, the quote as handed (after any redaction), and the source folder. Do not paraphrase. Do not rewrite the question. Do not remove it from `## Open questions`. Do not change any other spec line. When the answer would change a spec line, name `/crav1-resolve-questions` for that slug. Do not run it.
+- An answer link writes one `Answered:` line under that open question: the date, who, the kind, the quote as handed (after any redaction), and the source folder. Do not paraphrase. Do not rewrite the question. Do not remove it from `## Open questions`. Do not change any other spec line. When the answer would change a spec line, name `/crav1-resolve-open-questions` for that slug. Do not run it.
 - An asked mark writes or replaces the `Asked:` line for that person under that question, with the date from the source. It replaces a `Pending:` line for the same person.
 
 When the handoff includes a source folder, add the `Source:` and `Trace:` lines from [references/sources.md](references/sources.md). Do not ask the imported-sources questions again.
@@ -90,13 +90,13 @@ Then run **Impact** for the research part only. When the question is one a stale
 
 ## Picture offer
 
-The handoff sections **From /crav1-environment-read** and **From /crav1-suggest-tests-for-code** ask once at the end of the run, after every item this run wrote. Not after each item. The meeting handoff, the ado-sync handoff, and the ado-sync handoff do not ask. The main path does not ask. A run that wrote nothing from these handoffs does not ask.
+The handoff sections **From /crav1-read-environment** and **From /crav1-suggest-tests-for-code** ask once at the end of the run, after every item this run wrote. Not after each item. The meeting handoff, the ado-sync handoff, and the ado-sync handoff do not ask. The main path does not ask. A run that wrote nothing from these handoffs does not ask.
 
 The question is exactly:
 
-The system picture may now be out of date. Run `/crav1-keep-current`?
+The system picture may now be out of date. Run `/crav1-refresh-system-notes`?
 
-Options are yes and no. Use the questions tool when it is available. Do not run `/crav1-keep-current`. Do not open the impact question from this offer. Do not edit the picture in this turn.
+Options are yes and no. Use the questions tool when it is available. Do not run `/crav1-refresh-system-notes`. Do not open the impact question from this offer. Do not edit the picture in this turn.
 
 ## Input
 
@@ -106,7 +106,7 @@ Everything after `/crav1-add-to-spec`, and every `@`, is input: the new informat
 
 Spec folders are `docs/specs/<slug>/` with a `spec.md`. Skip `_template`.
 
-If there are no spec folders, stop. Point at `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, or `/crav1-existing-to-specs`. Do not create a slug. Do not seed `docs/system/`.
+If there are no spec folders, stop. Point at `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, or `/crav1-existing-to-specs`. Do not create a slug. Do not seed `docs/system/`.
 
 If the input is a file under `docs/research/` and there is no new quote for a spec, run the clear section of [references/research-stale.md](references/research-stale.md). Do not ask the user whether the update resolves the mark. Do not ask for a slug. Do not paste the note into a spec.
 
@@ -124,7 +124,7 @@ That check flags personal data with a keep or redact recommendation. An item it 
 
 Write `docs/sources/YYYY-MM-DD-<slug>/` once for that source, before the quote, when this run has not already written that folder. Then add the `Source:` and `Trace:` lines on the quote. Do not commit.
 
-A short fact the user typed, an environment-read fact, and a test suggestion are not imported sources. Do not write `docs/sources/` for those.
+A short fact the user typed, a read-environment fact, and a test suggestion are not imported sources. Do not write `docs/sources/` for those.
 
 ## Add to that spec.md
 
@@ -144,7 +144,7 @@ Labels, in the section the words belong to:
 - `**Already there:**` — do not paste a second copy. Leave the existing sentence. Say in the report which heading already had it.
 - `**Inferred:**` — a connection you drew. Not an accepted fact.
 
-Before the quote, read `## Open questions` on the target spec with the records under each question. When the new information clearly answers one, write an `Answered:` line under that question as [references/open-questions.md](references/open-questions.md) says, and say so in the report. An unclear or partial answer is shown in the report as a possible answer. The question stays open. When the new information is a mail, a transcript, or a chat that shows a question being asked, write the `Asked:` line with the date from the source. When the answer would change a spec line, name `/crav1-resolve-questions`. Do not run it. A clear answer to an open question on another spec is one listed impact edit.
+Before the quote, read `## Open questions` on the target spec with the records under each question. When the new information clearly answers one, write an `Answered:` line under that question as [references/open-questions.md](references/open-questions.md) says, and say so in the report. An unclear or partial answer is shown in the report as a possible answer. The question stays open. When the new information is a mail, a transcript, or a chat that shows a question being asked, write the `Asked:` line with the date from the source. When the answer would change a spec line, name `/crav1-resolve-open-questions`. Do not run it. A clear answer to an open question on another spec is one listed impact edit.
 
 When the file already has `## Trace`, append one line: what this pass marked new, already there, and inferred. Do not create `## Trace` only for that line. An imported source is the exception: the `Source:` and `Trace:` lines in [references/sources.md](references/sources.md) are required, and `## Trace` is created when it is missing so that line has a heading.
 

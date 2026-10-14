@@ -32,12 +32,12 @@ Writes `spec.md`, `diagrams.md`, slice ADRs, the chosen `export/`, optional `not
 
 Leaves application code and the rest of an existing landscape alone.
 
-Limits and exceptions: two or more v0 slices or repos writes nothing and points at [`/crav1-intake-to-specs`](crav1-intake-to-specs.md). A quoted note in `docs/notes/` gets `Used by <slug>`. `Absorbed by <slug>` only after the user says yes, when this spec takes the whole note.
+Limits and exceptions: two or more v0 slices or repos writes nothing and points at [`/crav1-bundle-to-specs`](crav1-bundle-to-specs.md). A quoted note in `docs/notes/` gets `Used by <slug>`. `Absorbed by <slug>` only after the user says yes, when this spec takes the whole note.
 
 ## You run next / Runs by itself
 
-- You run next: [`/crav1-feature-branch`](crav1-feature-branch.md); [`/crav1-architecture-reviewer`](crav1-architecture-reviewer.md); [`/crav1-tighten-spec`](crav1-tighten-spec.md)
-- Runs by itself: Calls [`/crav1-feature-branch`](crav1-feature-branch.md) when the repo already has commits.
+- You run next: [`/crav1-create-feature-branch`](crav1-create-feature-branch.md); [`/crav1-review-architecture`](crav1-review-architecture.md); [`/crav1-tighten-spec`](crav1-tighten-spec.md)
+- Runs by itself: Calls [`/crav1-create-feature-branch`](crav1-create-feature-branch.md) when the repo already has commits.
 
 ## Lane and group
 

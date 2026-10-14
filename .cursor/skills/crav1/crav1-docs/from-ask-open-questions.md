@@ -4,7 +4,7 @@ Kit not in this project yet? [Install first](install.md) (Cursor and Claude Code
 
 Use this when the specs hold open questions that only someone else can answer: a partner, a customer, or a colleague. The command gathers those questions for one person, one spec, or one topic, and drafts them for you to send or ask. It records whether you asked. Nothing is sent by the kit.
 
-This is not `/crav1-resolve-questions`. Resolve walks the questions with you and writes your decisions into the spec. This command drafts the questions for someone else and writes only the asked and pending marks.
+This is not `/crav1-resolve-open-questions`. Resolve walks the questions with you and writes your decisions into the spec. This command drafts the questions for someone else and writes only the asked and pending marks.
 
 ## First prompt
 
@@ -49,6 +49,6 @@ When a mark was written:
 /crav1-finalize-commit
 ```
 
-When answers come back, bring the mail, minutes, transcript, or chat to [`/crav1-add-to-spec`](from-meeting.md), or a larger dump to [`/crav1-add-to-spec`](from-match-dump.md). Those write an `Answered:` line with the quote and its source under the question. Then [`/crav1-resolve-questions`](from-draft-spec.md) offers that answer first. The marks are explained in [Data layout](concepts/data-layout.md#open-question-marks).
+When answers come back, bring the mail, minutes, transcript, or chat to [`/crav1-add-to-spec`](from-meeting.md), or a larger dump to [`/crav1-add-to-spec`](from-match-dump.md). Those write an `Answered:` line with the quote and its source under the question. Then [`/crav1-resolve-open-questions`](from-draft-spec.md) offers that answer first. The marks are explained in [Data layout](concepts/data-layout.md#open-question-marks).
 
 Reference page: [show-or-ask-open-questions](reference/skills/crav1-show-or-ask-open-questions.md)

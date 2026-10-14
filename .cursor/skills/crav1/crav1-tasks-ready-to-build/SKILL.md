@@ -20,7 +20,7 @@ You list which tasks can be built now and why the others cannot. You read files 
 
 This is cross-cutting. It is not its own lane. It can run any time: before Build, between tasks, or after new information. It does not move work into Build.
 
-It is not `/crav1-whats-known-about` (what is known about one thing) and not `/crav1-ado-sync` (which specs could become Features). It is not the batch board of `/crav1-build-tasks`.
+It is not `/crav1-what-do-we-know-about-this` (what is known about one thing) and not `/crav1-ado-sync` (which specs could become Features). It is not the batch board of `/crav1-build-tasks`.
 
 ## Scope
 
@@ -79,7 +79,7 @@ Next: /crav1-build-tasks T5 (<slug>)
 Source: docs/specs/<slug>/spec.md, plan.md, tasks.md, verify.md
 ```
 
-- **Next** names the first ready task, in `tasks.md` order, in the first slice that has one. When nothing is ready, say what would unblock the first blocked task instead (for example `Next: answer the open question with /crav1-resolve-questions`). When only Needs verify is left, `Next: /crav1-verify-spec`.
+- **Next** names the first ready task, in `tasks.md` order, in the first slice that has one. When nothing is ready, say what would unblock the first blocked task instead (for example `Next: answer the open question with /crav1-resolve-open-questions`). When only Needs verify is left, `Next: /crav1-verify-build-against-spec`.
 - **Source** names every file it read, per slice.
 - When the slice has `work-item.md`, add the Azure Boards line from **What it reads**.
 
@@ -87,4 +87,4 @@ Source: docs/specs/<slug>/spec.md, plan.md, tasks.md, verify.md
 
 - No file write, no commit, no network read, no Azure Boards read.
 - No skill run. It names the next step and stops.
-- No new marks. `Reviewed:`, `(after: …)`, and `Blocks:` are written by `/crav1-review-plan`, `/crav1-tighten-plan`, `/crav1-plan-from-spec`, and `/crav1-resolve-questions`.
+- No new marks. `Reviewed:`, `(after: …)`, and `Blocks:` are written by `/crav1-review-plan`, `/crav1-tighten-plan`, `/crav1-plan-from-spec`, and `/crav1-resolve-open-questions`.

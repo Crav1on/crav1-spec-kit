@@ -23,7 +23,7 @@ Run it only when **this turn** names a real bug. If this turn does not name one,
 
 It is not a skill that runs because a repo is new. Spark, ideas, intake, and match do not run it. Specify, plan, and verify do not run it. It is not started automatically. Other skills do not run this one.
 
-This command is a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-existing-to-specs`, `/crav1-environment-read`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane. Every other skill is a later skill. This command still runs only when the user names a real bug.
+This command is a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs`, `/crav1-read-environment`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane. Every other skill is a later skill. This command still runs only when the user names a real bug.
 
 ## A real bug
 
@@ -83,15 +83,15 @@ When the bug they named changes how the parts connect, ask once at the end. A co
 
 The question is exactly:
 
-The system picture may now be out of date. Run `/crav1-keep-current`?
+The system picture may now be out of date. Run `/crav1-refresh-system-notes`?
 
-Options are yes and no. Use the questions tool when it is available. Do not run `/crav1-keep-current`. Do not start the lane. Do not edit the picture.
+Options are yes and no. Use the questions tool when it is available. Do not run `/crav1-refresh-system-notes`. Do not start the lane. Do not edit the picture.
 
 ## Stop
 
 Do not edit code. Do not edit `spec.md`, `plan.md`, `tasks.md`, or `verify.md`. Do not open a pull request. Do not create an Azure Boards work item. Do not write `work-item.md`. Do not call Azure DevOps. Do not pass `--work-items`. Do not commit. Do not push.
 
-Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-specs`, `/crav1-tighten-spec`, `/crav1-plan-from-spec`, `/crav1-build-tasks`, `/crav1-fix-build-gaps`, `/crav1-verify-spec`, `/crav1-open-pr`, `/crav1-keep-current`, or `/crav1-finalize-commit`.
+Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, `/crav1-tighten-spec`, `/crav1-plan-from-spec`, `/crav1-build-tasks`, `/crav1-fix-build-gaps`, `/crav1-verify-build-against-spec`, `/crav1-open-pr`, `/crav1-refresh-system-notes`, or `/crav1-finalize-commit`.
 
 ## Hard rules
 
@@ -100,4 +100,4 @@ Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-intake-to-spe
 - Name the lane for a real bug. Do not start that lane.
 - No code edits. No spec edits. No pull request. No Azure Boards work item.
 - Not a stretch of verify. It is not a skill that runs because a repo is new. It is not started automatically.
-- When the bug changes how the parts connect, ask the picture question once. Do not run `/crav1-keep-current`.
+- When the bug changes how the parts connect, ask the picture question once. Do not run `/crav1-refresh-system-notes`.

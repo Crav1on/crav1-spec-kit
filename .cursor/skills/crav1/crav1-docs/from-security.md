@@ -6,7 +6,7 @@ Use this when **architecture already exists** and you want to know whether the t
 
 Architecture is `docs/system/` when that folder already describes the design, or a spec that already describes the design. This command does not invent an architecture. [Spark](from-nothing.md), [ideas](from-ideas.md), [intake](from-intake.md), and [match](from-match.md) create that design. This command does not replace them.
 
-This is not `/crav1-architecture-reviewer`. Architecture review critiques design hunches. This command asks whether the thing in front of it is secure. It is cross-cutting. It is not its own lane. Spark, plan, and verify do not run it.
+This is not `/crav1-review-architecture`. Architecture review critiques design hunches. This command asks whether the thing in front of it is secure. It is cross-cutting. It is not its own lane. Spark, plan, and verify do not run it.
 
 Same command, three targets: the whole system, one existing spec, or the change in front of you.
 
@@ -19,7 +19,7 @@ Name the target when one is already known.
 Whole system:
 
 ```text
-/crav1-security-review
+/crav1-review-security
 @docs/system/
 
 Review the whole system. Do not write code. Do not plan.
@@ -28,7 +28,7 @@ Review the whole system. Do not write code. Do not plan.
 One spec:
 
 ```text
-/crav1-security-review
+/crav1-review-security
 @docs/specs/<slug>/
 
 Review this spec. Do not write code. Do not plan.
@@ -37,7 +37,7 @@ Review this spec. Do not write code. Do not plan.
 The change in front of you:
 
 ```text
-/crav1-security-review
+/crav1-review-security
 
 Review the change on this branch. Do not write code. Do not plan.
 ```
@@ -81,4 +81,4 @@ If a file changed:
 
 That puts the security notes in git. No push. This command does not commit for you. It does not run plan, implement, or verify.
 
-Reference page: [security-review](reference/skills/crav1-security-review.md)
+Reference page: [review-security](reference/skills/crav1-review-security.md)

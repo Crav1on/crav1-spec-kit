@@ -337,5 +337,5 @@ An `AZURE_DEVOPS_EXT_PAT` the user has already set is a credential for the `az r
 - Do not run `az rest` to complete, update, or bypass a pull request. The parent-count fallback in **Merge** may GET one commit when git cannot see it.
 - Do not claim a merge commit hash the host did not return.
 - Do not claim a no-fast-forward merge unless the parent count was verified as two. A null `lastMergeCommit.parents` is not that count.
-- Do not run this skill from `/crav1-open-pr`, `crav1-complete-task-agent`, or `/crav1-review-pr`.
+- Do not run this skill from `/crav1-open-pr`, `crav1-build-task-agent`, or `/crav1-review-pr`.
 - Do not run `/crav1-review-pr`. A review is not a merge ask. A required host check that is red still stops this skill.

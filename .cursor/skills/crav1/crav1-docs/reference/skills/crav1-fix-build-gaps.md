@@ -10,13 +10,13 @@ Fix gaps a build left, one at a time inside the spec; asks verify-report gaps or
 
 **[`/crav1-fix-build-gaps`](crav1-fix-build-gaps.md)** opens with one question: gaps from the verify report, or a live-site gap (ports, proxy, SQL, unpublished URL). It skips the question when the message says which. It replaces fix-from-verify and fix-live; their rules are kept as branches.
 
-Verify report gaps (was `/crav1-fix-from-verify`): After verify-spec, walk inner-loop gaps (failed → unverified → `G#`); omit Gap for the next; writes `fix-log.md`.
+Verify report gaps (was `/crav1-fix-from-verify`): After verify-build-against-spec, walk inner-loop gaps (failed → unverified → `G#`); omit Gap for the next; writes `fix-log.md`.
 
 Live-site gaps (was `/crav1-fix-live`): Alias when that gap is a live/inner-loop path.
 
 ## Runs when
 
-verify.md lists gaps, or a live host path fails. Called by the user and by `crav1-complete-task-agent`.
+verify.md lists gaps, or a live host path fails. Called by the user and by `crav1-build-task-agent`.
 
 ## Reads
 
@@ -34,11 +34,11 @@ Verify report gaps: Writes the smallest in-spec fix, an appended `fix-log.md`, a
 
 Verify report gaps: Leaves `spec.md` and unimplemented tasks alone. Live-site gaps: Leaves `spec.md` alone.
 
-Limits and exceptions: Verify report gaps: does not run [`/crav1-fix-bug`](crav1-fix-bug.md). Live-site gaps: prefers live or untested wiring rows. When the fix changes how the parts connect, it asks once whether to run [`/crav1-keep-current`](crav1-keep-current.md) and does not run it.
+Limits and exceptions: Verify report gaps: does not run [`/crav1-fix-bug`](crav1-fix-bug.md). Live-site gaps: prefers live or untested wiring rows. When the fix changes how the parts connect, it asks once whether to run [`/crav1-refresh-system-notes`](crav1-refresh-system-notes.md) and does not run it.
 
 ## You run next / Runs by itself
 
-- You run next: [`/crav1-verify-spec`](crav1-verify-spec.md)
+- You run next: [`/crav1-verify-build-against-spec`](crav1-verify-build-against-spec.md)
 - Runs by itself: Verify report gaps: Calls no skill. Live-site gaps: Calls [`/crav1-fix-build-gaps`](crav1-fix-build-gaps.md).
 
 ## Lane and group
