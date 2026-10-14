@@ -25,7 +25,9 @@ I have new information from a meeting and tasks that are not built. What do I ru
 | `/crav1-help work item homes`, `marks.md`, `stale marks` | The concept, from the [glossary](concepts/glossary.md) and the concept pages |
 | `/crav1-help list`, `/crav1-help list build` | Every command grouped by lane and phase, or one lane, from the [skills reference](reference/skills.md) and [guild routing](guild-routing.md) |
 | `/crav1-help status <slug>`, `/crav1-help where am I` | Where one slice is: task counts (ready, blocked, needs verify, done) with the same rules as [`/crav1-tasks-ready-to-build`](from-tasks-ready-to-build.md), the route step it is on, and the next step |
-| `/crav1-help compare build-tasks build-tasks` | Two commands side by side: lane, purpose, reads, writes, next steps, and when to pick which |
+| `/crav1-help ado-sync` | For a merged skill, also its choice words, such as `suggest features` / `push features` / `push tasks` / `pull tasks` / `pull spec changes` ([choice words](guild-routing.md#choice-words-for-bots-and-scripted-runs)) |
+| `/crav1-help renamed`, or an old name | The old-to-new names and the choice word each alias passes |
+| `/crav1-help compare build-tasks build-features` | Two commands side by side: lane, purpose, reads, writes, next steps, and when to pick which |
 | `/crav1-help whats new`, `/crav1-help whats new since 1.50` | The changelog for your installed version, or every release since the one you name |
 | Any other question about the kit | The answer from the docs, or "the kit doesn't say" when they do not cover it |
 

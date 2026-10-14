@@ -8,9 +8,9 @@ This command is a starter option. When the user asks for startup options, name o
 
 This is cross-cutting. It is not a lane. It is not a mode of Specify. It does not move work into Specify, Plan, or Build. It does not start those lanes.
 
-This is not `/crav1-add-to-spec`. That command sorts a code change that already landed onto specs that already exist. This command reads the repos the user named and writes one architecture spec. Do not send this job to that command, and do not absorb its job.
+This is not the code change branch of `/crav1-add-to-spec`. That command sorts a code change that already landed onto specs that already exist. This command reads the repos the user named and writes one architecture spec. Do not send this job to that command, and do not absorb its job.
 
-This is not `/crav1-existing-to-specs`. Match needs a dump and writes one spec per slice. This command has no dump and writes one architecture spec. This is not `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, or `/crav1-bundle-to-specs`. Those specify a feature. This command does not design the next feature.
+This is not the repos and bundle branch of `/crav1-existing-to-specs`. That branch needs a dump and writes one spec per slice. This command has no dump and writes one architecture spec. This is not `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, or `/crav1-bundle-to-specs`. Those specify a feature. This command does not design the next feature.
 
 A later re-read is this command. It adds only what is new to the architecture spec and the system notes. It does not rewrite a line that is already there. It also reads `docs/architecture/left-out.md` and can remove a line from that file when the code shows it, or when that section dismisses it.
 
@@ -223,7 +223,7 @@ Do not stamp a repo this run did not read. An empty cell stays empty. A consumer
 
 ## Stop
 
-Do not plan. Do not implement. Do not commit. Do not start Specify, Plan, or Build. Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs`, `/crav1-add-to-spec`, `/crav1-plan-from-spec`, `/crav1-build-tasks`, `/crav1-explain-existing-system`, `/crav1-refresh-system-notes`, or `/crav1-finalize-commit`.
+Do not plan. Do not implement. Do not commit. Do not start Specify, Plan, or Build. Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, the repos and bundle branch of `/crav1-existing-to-specs`, the code change branch of `/crav1-add-to-spec`, `/crav1-plan-from-spec`, the implement step of `/crav1-build-tasks`, `/crav1-explain-existing-system`, `/crav1-refresh-system-notes`, or `/crav1-finalize-commit`.
 
 Output only:
 
@@ -248,7 +248,7 @@ If they chose `spec/architecture`, say that branch is specify-only: no implement
 - When `spec.md` is missing and a real `docs/system/` note is already there, write the architecture spec and the left-out file. Leave those notes as they are.
 - When `docs/architecture/spec.md` is already there, a later re-read adds only what is new to that file and to system notes that are already there. Do not rewrite a line that is already there. `left-out.md` still loses a line when the code shows it or that section dismisses it.
 - Do not design the next feature. Do not write application code. Do not start Specify, Plan, or Build.
-- This is not `/crav1-add-to-spec`.
+- This is not the code change branch of `/crav1-add-to-spec`.
 
 ## Style
 

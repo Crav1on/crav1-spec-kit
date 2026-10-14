@@ -37,6 +37,18 @@ Order: (1) style menu if no persist rule, (2) generate and show Summary/Descript
 
 Paste-only (no copy/edit/commit choices): tell them `/crav1-finalize-commit` instead, or they can pick `copy` here.
 
+## Choice words
+
+Exact words for bots and scripted runs. There are no `--flags`.
+
+- Commit or message: `commit` / `message only`.
+
+When the invocation contains one of these words (for example `/crav1-finalize-commit commit`), take that choice and do not ask. This holds for a person, a bot, or a headless run.
+
+When a choice is missing and the run is headless or started by a bot (no person in the chat to answer), do not guess. Stop and name the valid words, for example: `Missing choice. Use one of: commit, message only.`
+
+An alias passes its choice word.
+
 ## Draft (same as the other skill)
 
 Follow skill **`crav1-finalize-commit`** in full for the first draft (drop-in: `.claude/skills/crav1-finalize-commit/branches/message-only/BRANCH.md`; plugin: sibling `skills/crav1-finalize-commit/branches/message-only/BRANCH.md`):

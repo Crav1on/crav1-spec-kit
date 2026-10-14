@@ -6,7 +6,7 @@ Command: `/crav1-ado-sync`.
 
 This is cross-cutting. It is not a lane. It may run from any lane. It does not move work into Specify, Plan, or Build. It does not start those lanes.
 
-This command is a later skill. It is not a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs`, `/crav1-read-environment`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane. The six starter options stay unchanged.
+This command is a later skill. It is not a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs`, `/crav1-read-environment`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane. The seven starter options stay unchanged.
 
 Spark, specify, plan, and verify do not run it. It is not started automatically.
 
@@ -22,18 +22,18 @@ When the user names ids, read those ids only.
 
 When they name none, collect every id recorded in:
 
-- each `docs/specs/<slug>/work-item.md` except `_template` (every Feature line [work-item-mention.md](../../../crav1-finalize-commit/branches/message-only/references/work-item-mention.md) accepts; task lines are read by `/crav1-ado-sync`, not here)
+- each `docs/specs/<slug>/work-item.md` except `_template` (every Feature line [work-item-mention.md](../../../crav1-finalize-commit/branches/message-only/references/work-item-mention.md) accepts; task lines are read by the pull tasks branch of `/crav1-ado-sync`, not here)
 - the `## No spec yet in ADO` table in `docs/system/landscape.md`
 
 Skip a file that has no usable line. Do not drop an id to keep the list short. When the set is empty, say so and stop. Do not search Azure Boards for a title.
 
 ## Read
 
-Check `az`, the org, and the project the same way `/crav1-ado-sync` does. On a failure, state the issue, suggest a fix such as `az login`, and offer Retry or Skip. Skip stops this command. Say the Azure Boards calls did not run, and why.
+Check `az`, the org, and the project the same way the push features branch of `/crav1-ado-sync` does. On a failure, state the issue, suggest a fix such as `az login`, and offer Retry or Skip. Skip stops this command. Say the Azure Boards calls did not run, and why.
 
 For each id, read State, Priority, Target Date, Iteration, and Assigned To with `az boards work-item show`. Read discussion comments and history with `az devops invoke --area wit --resource comments` and `--resource updates`. Follow the reference. Comments use api version `7.1-preview`. Do not use `7.1-preview.4`.
 
-Before comparing, read the project’s Feature fields once, the same way `/crav1-ado-sync` does. A failed field read is the same failure as the other `az` checks. State the issue, suggest a fix, and offer Retry or Skip. Do not guess where the checks live.
+Before comparing, read the project’s Feature fields once, the same way the push features branch of `/crav1-ado-sync` does. A failed field read is the same failure as the other `az` checks. State the issue, suggest a fix, and offer Retry or Skip. Do not guess where the checks live.
 
 Read each id in its own home: the `(ADO: <org>/<project>)` tag on its line, or for an older line without one the marks.md org and project, as [work-item-homes.md](../../../crav1-ado-sync/branches/push-features/references/work-item-homes.md) (drop-in: `.claude/skills/crav1-ado-sync/branches/push-features/references/work-item-homes.md`; plugin: sibling `skills/crav1-ado-sync/branches/push-features/references/work-item-homes.md`) says. An id not found in its home is reported as **moved or missing**, with that home. Ask before searching the other projects `az` can read; never search on your own. A deleted id is reported as missing. Do not guess another work item. Do not match on the title.
 

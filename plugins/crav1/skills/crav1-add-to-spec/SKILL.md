@@ -1,19 +1,20 @@
 ---
 name: crav1-add-to-spec
 description: >-
-  Bring new information into existing specs. Opens with one question: a
-  fact, a dump, a code change, or a meeting (minutes, transcript, mail,
-  chat); skipped when the message shows which. Replaces match-dump-to-
-  specs, code-into-specs, and meeting-to-specs, whose rules are kept as
-  branches. A fact: add it to one existing spec, then report whether
-  docs/system/ or another spec has to change; edits there only on apply.
-  No new glossary; a meaning not stated is `to be researched`. Imported
-  originals go under docs/sources/ first; the personal-data check
-  recommends keep or redact and redacts secrets. A kept quote is compared
-  with docs/research/ and Research findings and marked stale only after a
-  yes. An updated research note is checked per listed point. A clear
-  answer to an open question is linked under it; unclear stays open. Does
-  not plan, implement, write code, or commit.
+  Bring new information into existing specs. Asks: fact, dump, code
+  change, or meeting (choice words); skipped when the message says which.
+  Replaces match-dump-to- specs, code-into-specs, and meeting-to-specs,
+  whose rules are kept as branches. A fact: add it to one existing spec,
+  then report whether docs/system/ or another spec has to change; edits
+  there only on apply. No new glossary; a meaning not stated is `to be
+  researched`. Imported originals go under docs/sources/ first; the
+  personal-data check recommends keep or redact and redacts secrets. A
+  quoted note in docs/notes/ gets Used by; Absorbed by only after a yes. A
+  kept quote is compared with docs/research/ and Research findings and
+  marked stale only after a yes; may draft a revisit request for the
+  note's owner, never sent. An updated research note is checked per listed
+  point. A clear answer to an open question is linked under it; unclear
+  stays open. Does not plan, implement, write code, or commit.
 disable-model-invocation: true
 icon: file-plus
 color: blue
@@ -41,6 +42,18 @@ This is not `/crav1-existing-to-specs`, `/crav1-bundle-to-specs`, `/crav1-spark-
 
 A not-started spec (match status `not in the code`, or a thin spec) can keep taking information until planning. Adding information does not start planning and does not write `plan.md` or `tasks.md`.
 
+## Choice words
+
+Exact words for bots and scripted runs. There are no `--flags`.
+
+- What you have: `fact` / `dump` / `code change` / `meeting`.
+
+When the invocation contains one of these words (for example `/crav1-add-to-spec fact`), take that choice and do not ask. This holds for a person, a bot, or a headless run.
+
+When a choice is missing and the run is headless or started by a bot (no person in the chat to answer), do not guess. Stop and name the valid words, for example: `Missing choice. Use one of: fact, dump, code change, meeting.`
+
+An alias passes its choice word.
+
 ## From /crav1-read-environment
 
 When `/crav1-read-environment` hands a confirmed fact for a slice Match already owns, run only this section. Add that quote to that spec only. The quote starts with `Seen in <host> <environment>.` When the quote says `shared with prod`, `prod only`, or shape and connections only, keep that label. Do not replace it with a paraphrase. Do not mark it as something the code shows. Do not change match status. Do not create a slug. Do not open the impact question. Do not edit `docs/system/` or another spec from this handoff. If no spec has `## Match` for that slice, write nothing. Do not start Specify, Plan, or Build. Do not continue into the main path. After the last read-environment item in this run, follow **Picture offer**, then stop.
@@ -53,11 +66,11 @@ When `/crav1-suggest-tests-for-code` hands one suggestion for an existing spec, 
 
 **Dismiss.** Quote the suggestion under `## Dismissed test suggestions`. The line starts with `Dismissed test suggestion.` Do not reword the check. Create that heading only when it is missing. Do not add an acceptance checkbox. Do not turn it into a goal. Plan does not turn this line into a task. The next run of `/crav1-suggest-tests-for-code` does not offer it.
 
-## From /crav1-ado-sync
+## From the push features branch of /crav1-ado-sync
 
 When `/crav1-ado-sync` hands a change that belongs in the spec before a Feature preview is rebuilt, the spec is the one that skill already named. Do not ask for a slug. Do not create a slug. Quote the change. Do not replace it with a paraphrase. Label it `**New:**`. Then run **Add to that spec.md** and **Impact**. Do not write `work-item.md` from this handoff. That skill writes the id after Azure Boards accepts the Feature. Do not start Specify, Plan, or Build.
 
-## From /crav1-ado-sync
+## From the pull spec changes branch of /crav1-ado-sync
 
 When `/crav1-ado-sync` hands one kept change or one answer for an existing spec, the spec is the one that skill already named. Do not ask for a slug. Do not create a slug. Do not create a spec folder.
 
@@ -65,7 +78,7 @@ Quote the item. Do not replace it with a paraphrase. A kept Azure Boards change 
 
 Then run **Add to that spec.md** and **Impact**. The impact check still runs. Do not write `plan.md`, `tasks.md`, or `work-item.md`. Do not change application code. Do not start Specify, Plan, or Build. Do not ask the picture offer.
 
-## From /crav1-add-to-spec
+## From the meeting branch of /crav1-add-to-spec
 
 When `/crav1-add-to-spec` hands one kept addition for an existing spec, the spec is the one that skill already named. Do not ask for a slug. Do not create a slug. Do not create a spec folder. A source folder that handoff already wrote stays. When it wrote none and the quote is an imported source, **Imported sources** writes that folder.
 

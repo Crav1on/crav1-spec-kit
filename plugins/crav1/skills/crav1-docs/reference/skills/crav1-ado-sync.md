@@ -36,6 +36,18 @@ Pull spec changes (was `/crav1-ado-to-specs`): Reads Azure Boards Features back 
 
 Pull spec changes (was `/crav1-ado-to-specs`): Each id is read in its own work item home. An id not found there is reported as moved or missing, and it asks before searching other projects.
 
+## Choice words
+
+Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
+
+| Question | Word | Means |
+| --- | --- | --- |
+| Which sync | `suggest features` | suggest Features |
+| Which sync | `push features` | push Features |
+| Which sync | `push tasks` | push tasks |
+| Which sync | `pull tasks` | pull tasks |
+| Which sync | `pull spec changes` | pull spec changes |
+
 ## Runs when
 
 Specs and Azure Boards should match. Called by the user and by [`/crav1-ado-sync`](crav1-ado-sync.md).

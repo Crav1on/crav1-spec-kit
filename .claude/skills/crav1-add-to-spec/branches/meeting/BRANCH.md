@@ -2,23 +2,23 @@
 
 Minutes, a transcript, an email, or a chat thread can hold requirements that have not reached a spec yet. You extract the items that matter, match them to specs that already exist, and ask the user about one item at a time.
 
-Command: `/crav1-add-to-spec`.
+Command: the fact branch of `/crav1-add-to-spec`.
 
 This is cross-cutting. It is not a lane. It may run from any lane. It does not move work into Specify, Plan, or Build. It does not start those lanes.
 
-This command is a later skill. It is not a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs`, `/crav1-read-environment`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane. The six starter options stay unchanged.
+This command is a later skill. It is not a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs`, `/crav1-read-environment`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane. The seven starter options stay unchanged.
 
 Other skills do not run this one. Spark, specify, plan, and verify do not run it. It is not started automatically.
 
 This is not `/crav1-bundle-to-specs`. Intake starts a landscape and new feature slugs from a dump. It does not match items against specs that already exist. This command does not create a slug and does not seed `docs/system/`.
 
-This is not `/crav1-add-to-spec` used on the whole input. Add-to-spec takes one piece of new information for one existing spec. This command extracts many items, matches them, and hands one kept addition to that skill.
+This is not the fact branch of `/crav1-add-to-spec` used on the whole input. Add-to-spec takes one piece of new information for one existing spec. This command extracts many items, matches them, and hands one kept addition to that skill.
 
 This is not `/crav1-what-do-we-know-about-this`. A question about the status of one feature, slice, or resource, with no minutes, email, or chat, is that command. This command takes minutes, a transcript, an email, or a chat thread.
 
 ## Input
 
-Everything after `/crav1-add-to-spec`, and every `@`, is the input. Minutes, a transcript, a Teams or Zoom export, an email, or a pasted Slack or Teams chat thread are the same input. An email or a chat thread is accepted as well as minutes or a transcript. There is no required shape.
+Everything after the fact branch of `/crav1-add-to-spec`, and every `@`, is the input. Minutes, a transcript, a Teams or Zoom export, an email, or a pasted Slack or Teams chat thread are the same input. An email or a chat thread is accepted as well as minutes or a transcript. There is no required shape.
 
 If the message has no input and no `@`, stop. Ask with options only. Use the questions tool when it is available. The options are only:
 
@@ -100,7 +100,7 @@ When the quote is already in a note, the item shows `Already noted: docs/notes/<
 
 Read `## Open questions` on every spec folder (skip `_template`), with the records under each question. Follow `crav1-add-to-spec` `references/open-questions.md` (drop-in: `.claude/skills/crav1-add-to-spec/references/open-questions.md`; plugin: sibling `skills/crav1-add-to-spec/references/open-questions.md`). Match by meaning. Matching works whether the question is asked, pending, or not marked.
 
-- **Clear answer.** The item states the fact or the decision a spec open question asks for. The case is `answer`. The item shows `Answers: "<question>" on docs/specs/<slug>/` and `Linked without a question.` It is not asked keep, leave, dismiss, or note. Hand it to `/crav1-add-to-spec` as an answer link (see **Answer** under Keep). When it would change a spec line, also show `Then: /crav1-tighten-spec, then /crav1-resolve-open-questions for <slug>.`
+- **Clear answer.** The item states the fact or the decision a spec open question asks for. The case is `answer`. The item shows `Answers: "<question>" on docs/specs/<slug>/` and `Linked without a question.` It is not asked keep, leave, dismiss, or note. Hand it to the fact branch of `/crav1-add-to-spec` as an answer link (see **Answer** under Keep). When it would change a spec line, also show `Then: /crav1-tighten-spec, then /crav1-resolve-open-questions for <slug>.`
 - **Unclear or partial.** The item keeps its own case. It also shows `Possible answer to: "<question>" on docs/specs/<slug>/. The question stays open.` It is asked one at a time like any other item. Nothing is linked.
 - **Asked in this input.** The input shows someone asking a spec open question. That is not an item. List it under `Asked in this <kind>` before the items, one line per question, with the spec. Its `Asked:` mark is written through the same handoff, with the date of this input. That date replaces a `Pending:` line, and an `Asked:` line from the user's yes, for the same person.
 
@@ -150,7 +150,7 @@ Example: `State: partly built. Dev container done (task 4 checked); prod not in 
 
 When more than one spec fits, the state word is the state of the spec on `Fits:`. The reason names each other spec when its state differs, with that spec’s path.
 
-The line is informational. It does not change keep, leave, dismiss, or note. It is not written. It is not part of the quote handed to `/crav1-add-to-spec`. It is not part of the quote written to a note.
+The line is informational. It does not change keep, leave, dismiss, or note. It is not written. It is not part of the quote handed to the fact branch of `/crav1-add-to-spec`. It is not part of the quote written to a note.
 
 ## The list
 
@@ -207,7 +207,7 @@ Follow the case already on that item.
 
 **Addition.** When one spec fits, and this source is not yet imported, follow the imported-sources convention before the handoff (drop-in: `.claude/skills/crav1-add-to-spec/references/sources.md`; plugin: sibling `skills/crav1-add-to-spec/references/sources.md`). That check flags personal data with a keep or redact recommendation. An item it cannot place has no recommendation and is asked one at a time. Secrets are redacted, by kind only, and are never a choice. When no transfer data policy exists, it asks once, then may write the rule after a yes. Claude Code project: `.claude/rules/crav1-transfer-data-policy.md`. It never writes a secrets choice into that file. For a mail, it lists each embedded image, inline or attached. It recommends convert to text when the image is a diagram, a table, or text that can be reproduced exactly, and compress otherwise. It asks once. Nothing is written to the source folder until every image has an answer. Auto-accept applies to those recommendations only when the transfer data policy clearly covers them. Write `docs/sources/YYYY-MM-DD-<slug>/` once for that source. Do not commit. A later kept addition from the same source reuses that folder. Do not ask those questions again. The policy questions are once per repo, as that file says.
 
-Then hand the quote to `/crav1-add-to-spec` for that slug. Pass the quote after any redaction that convention made. Pass the kind and the date for this run, and the source folder. When there is no date, pass the kind and the folder. When the item is already noted, pass that note path so the note gets `Used by <slug>`. Do not pass the `State` line. It is not quote text. Do not pass the recommendation. Follow only the handoff **From /crav1-add-to-spec** in that skill (drop-in: `.claude/skills/crav1-add-to-spec/SKILL.md`; plugin: sibling `skills/crav1-add-to-spec/SKILL.md`). One item. Then stop that handoff. The impact check still runs there, including research. That check follows `crav1-add-to-spec` `references/research-stale.md` (drop-in: `.claude/skills/crav1-add-to-spec/references/research-stale.md`; plugin: sibling `skills/crav1-add-to-spec/references/research-stale.md`). This skill does not run that check a second time. It does not write the stale block. Do not write the spec in this skill. Do not create a slug.
+Then hand the quote to the fact branch of `/crav1-add-to-spec` for that slug. Pass the quote after any redaction that convention made. Pass the kind and the date for this run, and the source folder. When there is no date, pass the kind and the folder. When the item is already noted, pass that note path so the note gets `Used by <slug>`. Do not pass the `State` line. It is not quote text. Do not pass the recommendation. Follow only the handoff **From the meeting branch of /crav1-add-to-spec** in that skill (drop-in: `.claude/skills/crav1-add-to-spec/SKILL.md`; plugin: sibling `skills/crav1-add-to-spec/SKILL.md`). One item. Then stop that handoff. The impact check still runs there, including research. That check follows `crav1-add-to-spec` `references/research-stale.md` (drop-in: `.claude/skills/crav1-add-to-spec/references/research-stale.md`; plugin: sibling `skills/crav1-add-to-spec/references/research-stale.md`). This skill does not run that check a second time. It does not write the stale block. Do not write the spec in this skill. Do not create a slug.
 
 When more than one spec fits, ask which one before the handoff. Options only. One option per candidate, plus **Treat as a new feature**. Do not ask the user to type a slug. Stop until the user picks. A picked spec gets the addition handoff. Treat as a new feature follows the new-feature rule below.
 
@@ -225,13 +225,13 @@ When a later keep brings the new-feature count to two or more, the next command 
 
 ### Answer
 
-An `answer` item is not asked. When this source is not yet imported, follow the imported-sources convention first, exactly as for a kept addition. Then hand it to `/crav1-add-to-spec` for that slug. Follow only the handoff **From an import: answer links and asked marks** in that skill. Pass the question, the quote after any redaction, who answered, the kind, the date, and the source folder. Pass the `Asked in this <kind>` lines for that spec in the same handoff. When a spec has only asked lines and no answer, hand those lines alone. They do not need a source folder. Do not write the spec in this skill. When the answer would change a spec line, name `/crav1-resolve-open-questions` for that slug. Do not run it.
+An `answer` item is not asked. When this source is not yet imported, follow the imported-sources convention first, exactly as for a kept addition. Then hand it to the fact branch of `/crav1-add-to-spec` for that slug. Follow only the handoff **From an import: answer links and asked marks** in that skill. Pass the question, the quote after any redaction, who answered, the kind, the date, and the source folder. Pass the `Asked in this <kind>` lines for that spec in the same handoff. When a spec has only asked lines and no answer, hand those lines alone. They do not need a source folder. Do not write the spec in this skill. When the answer would change a spec line, name `/crav1-resolve-open-questions` for that slug. Do not run it.
 
 When the imported-sources check asks a question, that question is this turn. Then continue with the next item.
 
 ### Note
 
-Write the note. Do not ask what kind of note it is. Do not hand the quote to `/crav1-add-to-spec`. Do not create a slug. Do not name a starter.
+Write the note. Do not ask what kind of note it is. Do not hand the quote to the fact branch of `/crav1-add-to-spec`. Do not create a slug. Do not name a starter.
 
 When the item is already noted, write nothing. Say the path. Do not write a second file.
 
@@ -295,24 +295,24 @@ Named, not run: <commands>, or none
 
 Then the answer summary from the reference file: each answer linked, each possible answer left open, each asked mark and where its date came from, and each `/crav1-resolve-open-questions` named.
 
-When `/crav1-add-to-spec` changed an existing spec, name the next steps from the **New information on an existing slice** route (`docs/reference/workflow.md#new-info`) for that slug: `/crav1-tighten-spec` first, then `/crav1-resolve-open-questions`, then `/crav1-plan-from-spec` when the slice has `plan.md` or `tasks.md`. A named `/crav1-resolve-open-questions` comes after `/crav1-tighten-spec`, never before it. For the full order, name `/crav1-help next`. Do not run any of them.
+When the fact branch of `/crav1-add-to-spec` changed an existing spec, name the next steps from the **New information on an existing slice** route (`docs/reference/workflow.md#new-info`) for that slug: `/crav1-tighten-spec` first, then `/crav1-resolve-open-questions`, then `/crav1-plan-from-spec` when the slice has `plan.md` or `tasks.md`. A named `/crav1-resolve-open-questions` comes after `/crav1-tighten-spec`, never before it. For the full order, name `/crav1-help next`. Do not run any of them.
 
-When `/crav1-add-to-spec` changed a file, or this command wrote a source folder or a note, name `/crav1-finalize-commit`. Do not run it. Do not commit the note.
+When the fact branch of `/crav1-add-to-spec` changed a file, or this command wrote a source folder or a note, name `/crav1-finalize-commit`. Do not run it. Do not commit the note.
 
 ## Stop
 
 The only files this command writes are `docs/sources/YYYY-MM-DD-<slug>/` for a source a kept addition or a note quotes, `docs/notes/YYYY-MM-DD-<slug>.md` and `docs/notes/index.md` when the user picks Note, a `.gitattributes` line after a yes, and the transfer data policy after a yes, as the imported-sources convention says. Do not write the source folder for a leave, a dismiss, a kept new feature, or a kept bug. Do not write a note for those. Do not write `docs/system/`, a spec, `plan.md`, `tasks.md`, `verify.md`, `explore.md`, `docs/environments/marks.md`, or a dismissals file. Do not commit. Do not push. Do not open a pull request.
 
-Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs`, `/crav1-plan-from-spec`, `/crav1-build-tasks`, `/crav1-verify-build-against-spec`, `/crav1-fix-bug`, `/crav1-fix-build-gaps`, or `/crav1-finalize-commit`.
+Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, the repos and bundle branch of `/crav1-existing-to-specs`, `/crav1-plan-from-spec`, `/crav1-build-tasks`, `/crav1-verify-build-against-spec`, `/crav1-fix-bug`, the verify gaps branch of `/crav1-fix-build-gaps`, or `/crav1-finalize-commit`.
 
 ## Hard rules
 
 - No input and no `@`: stop. Options only. Do not guess a file. An email or a chat thread is accepted as well as minutes or a transcript.
 - The kind comes from what the input shows: `meeting`, `email`, or `chat`. Do not guess. If it is not clear, ask once: meeting, email, or chat.
 - The date comes from the input. Do not invent one. If the input shows no date, ask once: give a date, or skip. Skip means no date.
-- One kind and one date for the run. They apply to every item. The chat `Source` line is `<kind> <date>`, or `<kind>`. The spec `Source:` line is the source folder, written by `/crav1-add-to-spec` after the folder exists.
+- One kind and one date for the run. They apply to every item. The chat `Source` line is `<kind> <date>`, or `<kind>`. The spec `Source:` line is the source folder, written by the fact branch of `/crav1-add-to-spec` after the folder exists.
 - Extract requirements, decisions, changes, open questions, and bugs. Each item is a quote. Include speaker and time when the input shows them.
-- Read spec open questions first. A clear answer is linked without a question through `/crav1-add-to-spec`. An unclear or partial answer is shown as a possible answer and the question stays open. A question the input shows being asked gets an `Asked:` mark with the input's date. Follow `crav1-add-to-spec` `references/open-questions.md`. Answers that change spec lines name `/crav1-resolve-open-questions`. Do not run it.
+- Read spec open questions first. A clear answer is linked without a question through the fact branch of `/crav1-add-to-spec`. An unclear or partial answer is shown as a possible answer and the question stays open. A question the input shows being asked gets an `Asked:` mark with the input's date. Follow `crav1-add-to-spec` `references/open-questions.md`. Answers that change spec lines name `/crav1-resolve-open-questions`. Do not run it.
 - Drop small talk and status chatter. A dropped line is not an item.
 - Match every item. Cases: addition, new feature, bug, or unclear. When more than one existing spec could fit, list every candidate.
 - An item that matches a spec gets one `State:` line in the item block and in the question. `Fits: none` gets no state line. The line is informational. It is not written and it is not quote text.
@@ -320,9 +320,9 @@ Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-spe
 - One item at a time: keep, leave, dismiss, or note. Show `Recommendation: Note.` when the item is worth keeping and is not a decision, a clarification, information, or an answer for an existing spec. Do not add an accept-all question. This skill does not have that pattern.
 - Note writes `docs/notes/YYYY-MM-DD-<slug>.md` and one index line. It does not ask what kind of note it is. Read `docs/notes/` first. An item already noted is shown as already noted and is not written again.
 - Dismiss is for this run only, and for noise. Start fresh on every run. Do not write a dismissals file. Do not remember a dismiss across runs.
-- A kept addition goes to that spec through `/crav1-add-to-spec`. Before that handoff, when the source is not yet imported, follow `.claude/skills/crav1-add-to-spec/references/sources.md` (plugin: sibling `skills/crav1-add-to-spec/references/sources.md`). That check recommends keep or redact, redacts secrets, and may write the transfer data policy after a yes. For a mail, it lists each embedded image, inline or attached, recommends convert to text or compress, and asks once. Nothing is written to the source folder until every image has an answer. Auto-accept applies to those recommendations only when the transfer data policy clearly covers them. Write the source folder once. Pass the kind, the date, and that folder. The quote starts with `From <kind> <date>.` when there is a date, otherwise `From <kind>.` The impact check still runs there, including research, following `.claude/skills/crav1-add-to-spec/references/research-stale.md` (plugin: sibling `skills/crav1-add-to-spec/references/research-stale.md`). This skill does not run that check a second time. It does not write the stale block. Do not commit.
+- A kept addition goes to that spec through the fact branch of `/crav1-add-to-spec`. Before that handoff, when the source is not yet imported, follow `.claude/skills/crav1-add-to-spec/references/sources.md` (plugin: sibling `skills/crav1-add-to-spec/references/sources.md`). That check recommends keep or redact, redacts secrets, and may write the transfer data policy after a yes. For a mail, it lists each embedded image, inline or attached, recommends convert to text or compress, and asks once. Nothing is written to the source folder until every image has an answer. Auto-accept applies to those recommendations only when the transfer data policy clearly covers them. Write the source folder once. Pass the kind, the date, and that folder. The quote starts with `From <kind> <date>.` when there is a date, otherwise `From <kind>.` The impact check still runs there, including research, following `.claude/skills/crav1-add-to-spec/references/research-stale.md` (plugin: sibling `skills/crav1-add-to-spec/references/research-stale.md`). This skill does not run that check a second time. It does not write the stale block. Do not commit.
 - A kept new feature names `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, or `/crav1-bundle-to-specs`. Do not run it. Do not create a slug. Do not write the source folder here. Do not write a note here. That next command follows the imported-sources convention when it quotes the source.
 - A kept bug names `/crav1-fix-bug`. Do not run it.
 - This command does not write a spec. The files it writes are the source folder for a kept addition or a note, the note file and `docs/notes/index.md` when the user picks Note, a `.gitattributes` line after a yes, and the transfer data policy after a yes. It does not commit. It never writes a secrets choice into that rule.
 - Do not start Specify, Plan, or Build. Do not plan, implement, or commit.
-- Later skill. Not a starter option. Asking for startup options names only the six and does not run this command.
+- Later skill. Not a starter option. Asking for startup options names only the seven and does not run this command.

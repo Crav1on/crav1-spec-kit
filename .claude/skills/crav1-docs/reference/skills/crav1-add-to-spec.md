@@ -22,6 +22,17 @@ A meeting (was `/crav1-meeting-to-specs`): When the user brings minutes, a trans
 
 A meeting (was `/crav1-meeting-to-specs`): Minutes, a transcript, an email, or a chat thread → quotes matched to existing specs, keep, leave, dismiss, or note one at a time. A kept addition goes through [`/crav1-add-to-spec`](crav1-add-to-spec.md). A clear answer to a spec open question is linked under it.
 
+## Choice words
+
+Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
+
+| Question | Word | Means |
+| --- | --- | --- |
+| What you have | `fact` | one fact |
+| What you have | `dump` | a dump |
+| What you have | `code change` | a code change |
+| What you have | `meeting` | a meeting (minutes, transcript, mail, or chat) |
+
 ## Runs when
 
 New information for specs that already exist. Called by the user, by [`/crav1-read-environment`](crav1-read-environment.md) for a confirmed Match section, by [`/crav1-suggest-tests-for-code`](crav1-suggest-tests-for-code.md) for one kept or dismissed suggestion, by [`/crav1-add-to-spec`](crav1-add-to-spec.md) for one kept addition, by [`/crav1-ado-sync`](crav1-ado-sync.md) for a preview change, and by [`/crav1-ado-sync`](crav1-ado-sync.md) for one kept change or one answer.

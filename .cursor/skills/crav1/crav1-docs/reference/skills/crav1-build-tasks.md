@@ -20,6 +20,16 @@ One task (was `/crav1-complete-task`): When a local test dependency is not runni
 
 A range or all (was `/crav1-complete-tasks`): Orchestrates one worker per `T#` (`T1-T3` or all unchecked); stops the batch when a worker needs you.
 
+## Choice words
+
+Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
+
+| Question | Word | Means |
+| --- | --- | --- |
+| Which tasks | `one task` | one task (add `T#`, or the first unticked) |
+| Which tasks | `range` | a range (add `T#-T#`) |
+| Which tasks | `all tasks` | all unticked tasks |
+
 ## Runs when
 
 You want to build one task, a range, or all unticked tasks. Called by the user and by `crav1-build-task-agent`.

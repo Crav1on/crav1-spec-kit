@@ -16,6 +16,17 @@ Repos only (was `/crav1-repos-to-spec`): When the user names one or more repos a
 
 Repos only (was `/crav1-repos-to-spec`): The user names one or more repos. Reads those repos and writes `docs/architecture/spec.md` when that file is missing, and the `docs/system/` notes [`/crav1-explain-existing-system`](crav1-explain-existing-system.md) reads when those notes are missing. When a real system note is already there, leaves those notes except the `Synced at` cell of a repo it read, and writes the missing architecture spec and `docs/architecture/left-out.md`. A later re-read adds only what is new and does not rewrite those lines, except that `Synced at` cell, and removes a left-out line when the code shows it. Before any file is written, one question per section. A fact the code shows is confirmed. A guess stays out until that section accepts it. A guess that stays left out is written to `docs/architecture/left-out.md`. A link is written only when the code shows it. If none is found, says so and does not invent a link. Does not design the next feature, write application code, or start Specify, Plan, or Build. Not [`/crav1-add-to-spec`](crav1-add-to-spec.md).
 
+## Choice words
+
+Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
+
+| Question | Word | Means |
+| --- | --- | --- |
+| What to read | `repos only` | repos only |
+| What to read | `repos and bundle` | repos plus a bundle |
+| What to write | `one spec` | one spec (the architecture spec) |
+| What to write | `spec per feature` | system notes plus one spec per feature |
+
 ## Runs when
 
 The user names existing repos, with or without a bundle to match. Called by the user.

@@ -14,6 +14,15 @@ Verify report gaps (was `/crav1-fix-from-verify`): After verify-build-against-sp
 
 Live-site gaps (was `/crav1-fix-live`): Alias when that gap is a live/inner-loop path.
 
+## Choice words
+
+Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
+
+| Question | Word | Means |
+| --- | --- | --- |
+| Which gaps | `verify gaps` | gaps from the verify report |
+| Which gaps | `live gaps` | live-site gaps |
+
 ## Runs when
 
 verify.md lists gaps, or a live host path fails. Called by the user and by `crav1-build-task-agent`.

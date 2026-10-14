@@ -1,12 +1,12 @@
 # Code into specs
 
-You sort a code change that already landed onto specs that already exist. Then you write what belongs into the matching `spec.md` files, the same way `/crav1-add-to-spec` writes a quote. Then you check whether `docs/system/` or another spec has to change, and you report that impact. You do not silently rewrite those other files. The glossary append and the picture update are the exceptions: new glossary rows, and new picture lines, when `docs/system/` already exists. You do not rewrite existing glossary rows or existing picture lines. You do not write application code. You do not plan, implement, or commit.
+You sort a code change that already landed onto specs that already exist. Then you write what belongs into the matching `spec.md` files, the same way the fact branch of `/crav1-add-to-spec` writes a quote. Then you check whether `docs/system/` or another spec has to change, and you report that impact. You do not silently rewrite those other files. The glossary append and the picture update are the exceptions: new glossary rows, and new picture lines, when `docs/system/` already exists. You do not rewrite existing glossary rows or existing picture lines. You do not write application code. You do not plan, implement, or commit.
 
-This is not a mode of `/crav1-existing-to-specs`, `/crav1-add-to-spec`. Match creates spec folders from repos plus a dump. Match-dump sorts a later dump onto specs that already exist. Add takes information already aimed at one named spec. This skill starts from a code change that already landed without spec, plan, or build. No dump is required. Do not send this job to those commands, and do not absorb theirs.
+This is not a mode of the repos and bundle branch of `/crav1-existing-to-specs`, the dump branch of `/crav1-add-to-spec`, or the fact branch of `/crav1-add-to-spec`. The repos and bundle branch creates spec folders from repos plus a dump. The dump branch sorts a later dump onto specs that already exist. The fact branch takes information already aimed at one named spec. This skill starts from a code change that already landed without spec, plan, or build. No dump is required. Do not send this job to those commands, and do not absorb theirs.
 
-This is not `/crav1-existing-to-specs`. That command reads the repos the user named and writes one architecture spec plus the system notes. This command sorts a change that already landed onto specs that already exist.
+This is not the repos only branch of `/crav1-existing-to-specs`. That command reads the repos the user named and writes one architecture spec plus the system notes. This command sorts a change that already landed onto specs that already exist.
 
-Do not copy the match worker that creates folders. Do not use `crav1-existing-to-specs` `references/slice.md`. Do not launch a worker. There is no slice subagent.
+Do not copy the match worker that creates folders. Do not use `crav1-existing-to-specs` `branches/repos-and-bundle/references/slice.md`. Do not launch a worker. There is no slice subagent.
 
 This skill does not watch the repo. It runs only when someone points it at a change. Do not schedule it, hook it, or run it again because new commits appeared.
 
@@ -18,7 +18,7 @@ A not-started spec (match status `not in the code`, or a thin spec) can keep tak
 
 ## Input
 
-Everything after `/crav1-add-to-spec`, and every `@`, is the pointer: a commit, a commit range, or the diff of the current branch against the default branch, when they named one. No dump is required. Do not ask for notes, tickets, or a dump.
+Everything after the fact branch of `/crav1-add-to-spec`, and every `@`, is the pointer: a commit, a commit range, or the diff of the current branch against the default branch, when they named one. No dump is required. Do not ask for notes, tickets, or a dump.
 
 Do not ask for a slug first. An `@` of one spec folder is a hint for the sort, not a requirement. It does not limit the sort to that folder, and it does not replace the change.
 
@@ -28,7 +28,7 @@ Spec folders are `docs/specs/<slug>/` with a `spec.md`. Skip `_template`.
 
 Read those folders before you sort. Do not ask which slug.
 
-If there are no spec folders, stop. Point at `/crav1-existing-to-specs`. Do not invent a landscape from the diff alone. Do not create a slug. Do not seed `docs/system/`.
+If there are no spec folders, stop. Point at the repos and bundle branch of `/crav1-existing-to-specs`. Do not invent a landscape from the diff alone. Do not create a slug. Do not seed `docs/system/`.
 
 ## Change (no sort yet)
 
@@ -68,7 +68,7 @@ Stop. They confirm or edit the sort. Do not write files. That confirmation is th
 
 Edit only `docs/specs/<slug>/spec.md` for slugs in the confirmed **belongs** pile. Write them in this chat. Do not launch a worker.
 
-For each of those files, write the same way `/crav1-add-to-spec` writes:
+For each of those files, write the same way the fact branch of `/crav1-add-to-spec` writes:
 
 - Quote what the change does. The quote is the record. Do not replace it with a paraphrase. A reading you add that the change does not show is inferred or it stays out.
 - Label what is new versus what was already there.
@@ -97,7 +97,7 @@ The **fits none of them** pile is listed and left alone. Do not create a spec fo
 - one or two sentences for one feature: `/crav1-spark-to-spec`
 - one unstructured pile for one feature: `/crav1-ideas-to-spec`
 - several new features, or several repos: `/crav1-bundle-to-specs`
-- repos that already make up the system, and this leftover is a slice to match: `/crav1-existing-to-specs`
+- repos that already make up the system, and this leftover is a slice to match: the repos and bundle branch of `/crav1-existing-to-specs`
 
 ## Synced at
 

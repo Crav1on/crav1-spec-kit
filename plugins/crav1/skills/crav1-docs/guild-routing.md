@@ -155,6 +155,23 @@ When a note in `docs/research/` is updated, the skill that writes it follows the
 
 When you add, rename, or remove a skill, agent, or cross-cutting helper, update this file in the same pull request, together with [`docs/reference/skills.yaml`](reference/skills.yaml) and the pages generated from it. CI checks that the lanes there match the map below. Notify your process orchestrator or guild lead, if you have one, with the routing diff.
 
+## Choice words for bots and scripted runs
+
+The merged skills take exact choice words instead of `--flags`. A word in the invocation takes that choice without asking, for a person, a bot, or a headless run. A headless or bot run with no word stops and names the valid words; it does not guess. Runners should always pass the word.
+
+| Skill | Question | Words |
+| --- | --- | --- |
+| `/crav1-existing-to-specs` | What to read | `repos only` · `repos and bundle` |
+| `/crav1-existing-to-specs` | What to write | `one spec` · `spec per feature` |
+| `/crav1-show-or-ask-open-questions` | Show or ask | `show` · `ask` |
+| `/crav1-add-to-spec` | What you have | `fact` · `dump` · `code change` · `meeting` |
+| `/crav1-build-tasks` | Which tasks | `one task` · `range` · `all tasks` |
+| `/crav1-fix-build-gaps` | Which gaps | `verify gaps` · `live gaps` |
+| `/crav1-finalize-commit` | Commit or message | `commit` · `message only` |
+| `/crav1-ado-sync` | Which sync | `suggest features` · `push features` · `push tasks` · `pull tasks` · `pull spec changes` |
+
+Example: `/crav1-ado-sync push tasks`, `/crav1-existing-to-specs repos and bundle spec per feature`.
+
 ## Machine-readable map
 
 ```yaml

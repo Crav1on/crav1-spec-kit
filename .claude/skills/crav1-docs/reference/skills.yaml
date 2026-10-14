@@ -212,6 +212,19 @@ skills:
 
     Do not write code. Map first, then landscape, then one spec per v0 slug.'
 - name: crav1-existing-to-specs
+  choice_words:
+  - question: What to read
+    words:
+    - word: "repos only"
+      means: "repos only"
+    - word: "repos and bundle"
+      means: "repos plus a bundle"
+  - question: What to write
+    words:
+    - word: "one spec"
+      means: "one spec (the architecture spec)"
+    - word: "spec per feature"
+      means: "system notes plus one spec per feature"
   lane: cross-cutting
   group: Start
   starter: true
@@ -548,6 +561,13 @@ skills:
 
     @docs/specs/<slug>/spec.md'
 - name: crav1-show-or-ask-open-questions
+  choice_words:
+  - question: Show or ask
+    words:
+    - word: "show"
+      means: "show the overview (read-only)"
+    - word: "ask"
+      means: "draft the questions to ask"
   lane: cross-cutting
   group: Meetings and open questions
   starter: false
@@ -593,6 +613,17 @@ skills:
 
     The open questions for <a person, one spec, or a topic>, as a mail.'
 - name: crav1-add-to-spec
+  choice_words:
+  - question: What you have
+    words:
+    - word: "fact"
+      means: "one fact"
+    - word: "dump"
+      means: "a dump"
+    - word: "code change"
+      means: "a code change"
+    - word: "meeting"
+      means: "a meeting (minutes, transcript, mail, or chat)"
   lane: cross-cutting
   group: Keep the picture current
   starter: false
@@ -876,6 +907,15 @@ skills:
 
     @docs/specs/<slug>/'
 - name: crav1-build-tasks
+  choice_words:
+  - question: Which tasks
+    words:
+    - word: "one task"
+      means: "one task (add `T#`, or the first unticked)"
+    - word: "range"
+      means: "a range (add `T#-T#`)"
+    - word: "all tasks"
+      means: "all unticked tasks"
   lane: build
   group: Build
   starter: false
@@ -991,6 +1031,13 @@ skills:
 
     @docs/specs/<slug>/'
 - name: crav1-fix-build-gaps
+  choice_words:
+  - question: Which gaps
+    words:
+    - word: "verify gaps"
+      means: "gaps from the verify report"
+    - word: "live gaps"
+      means: "live-site gaps"
   lane: build
   group: Verify and fix
   starter: false
@@ -1028,6 +1075,13 @@ skills:
 
     @docs/specs/<slug>/verify.md'
 - name: crav1-finalize-commit
+  choice_words:
+  - question: Commit or message
+    words:
+    - word: "commit"
+      means: "commit"
+    - word: "message only"
+      means: "only write the message"
   lane: cross-cutting
   group: Commit and pull request
   starter: false
@@ -1507,6 +1561,19 @@ skills:
 
     Export as EARS.'
 - name: crav1-ado-sync
+  choice_words:
+  - question: Which sync
+    words:
+    - word: "suggest features"
+      means: "suggest Features"
+    - word: "push features"
+      means: "push Features"
+    - word: "push tasks"
+      means: "push tasks"
+    - word: "pull tasks"
+      means: "pull tasks"
+    - word: "pull spec changes"
+      means: "pull spec changes"
   lane: cross-cutting
   group: Azure Boards
   starter: false
@@ -1748,14 +1815,14 @@ skills:
     Suggest tests for what this code can break. Do not write the tests. Do not change the code.'
 
 # Deprecated aliases (1.56.0). Each folder hands off to renamed_to and
-# pre-answers its opening question (choice). Removed in 1.58.0.
+# passes its choice word (choice, a word from choice_words). Removed in 1.58.0.
 aliases:
 - name: crav1-implement-task
   renamed_to: crav1-build-tasks
   deprecated: true
   since: 1.56.0
   remove_in: 1.58.0
-  choice: "one task (the worker follows the implement branch)"
+  choice: "one task"
 - name: crav1-complete-task
   renamed_to: crav1-build-tasks
   deprecated: true
@@ -1767,7 +1834,7 @@ aliases:
   deprecated: true
   since: 1.56.0
   remove_in: 1.58.0
-  choice: "a range or all"
+  choice: "range or all tasks"
 - name: crav1-complete-features
   renamed_to: crav1-build-features
   deprecated: true
@@ -1783,43 +1850,43 @@ aliases:
   deprecated: true
   since: 1.56.0
   remove_in: 1.58.0
-  choice: "verify report gaps"
+  choice: "verify gaps"
 - name: crav1-fix-live
   renamed_to: crav1-fix-build-gaps
   deprecated: true
   since: 1.56.0
   remove_in: 1.58.0
-  choice: "live-site gaps"
+  choice: "live gaps"
 - name: crav1-match-dump-to-specs
   renamed_to: crav1-add-to-spec
   deprecated: true
   since: 1.56.0
   remove_in: 1.58.0
-  choice: "a dump"
+  choice: "dump"
 - name: crav1-code-into-specs
   renamed_to: crav1-add-to-spec
   deprecated: true
   since: 1.56.0
   remove_in: 1.58.0
-  choice: "a code change"
+  choice: "code change"
 - name: crav1-meeting-to-specs
   renamed_to: crav1-add-to-spec
   deprecated: true
   since: 1.56.0
   remove_in: 1.58.0
-  choice: "a meeting"
+  choice: "meeting"
 - name: crav1-feature-candidates
   renamed_to: crav1-ado-sync
   deprecated: true
   since: 1.56.0
   remove_in: 1.58.0
-  choice: "suggest Features"
+  choice: "suggest features"
 - name: crav1-specs-to-ado
   renamed_to: crav1-ado-sync
   deprecated: true
   since: 1.56.0
   remove_in: 1.58.0
-  choice: "push Features"
+  choice: "push features"
 - name: crav1-tasks-to-ado
   renamed_to: crav1-ado-sync
   deprecated: true
@@ -1843,7 +1910,7 @@ aliases:
   deprecated: true
   since: 1.56.0
   remove_in: 1.58.0
-  choice: "repos plus a bundle (the second question is still asked)"
+  choice: "repos and bundle"
 - name: crav1-repos-to-spec
   renamed_to: crav1-existing-to-specs
   deprecated: true
@@ -1876,7 +1943,7 @@ aliases:
   deprecated: true
   since: 1.56.0
   remove_in: 1.58.0
-  choice: "only write the message"
+  choice: "message only"
 - name: crav1-explain
   renamed_to: crav1-explain-existing-system
   deprecated: true
@@ -1917,7 +1984,6 @@ aliases:
   deprecated: true
   since: 1.56.0
   remove_in: 1.58.0
-
 subagents:
 - name: crav1-spec-reviewer-agent
   lane: specify
