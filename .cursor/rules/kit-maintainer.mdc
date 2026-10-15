@@ -69,6 +69,10 @@ Optional Azure Boards id file: `docs/specs/_template/work-item.md` is the HTML-c
 
 Pre-install: `docs/install.md`. Post-plugin-install: `plugins/crav1/README.md`. Landing page: `README.md`. Docs index: `docs/README.md` (add every new page there). Method: `docs/concepts/method.md`. Data layout, glossary, and data policy: `docs/concepts/`. Walkthroughs: `docs/from-*.md`.
 
+## Releases
+
+A behavior release is a tag plus GitHub release from the CHANGELOG section. After the merge: put the lightweight `vX.Y.Z` tag on the merge commit (`plugin.json` and the newest `## X.Y.Z (date)` CHANGELOG heading already match), then create a GitHub release on that tag, titled `vX.Y.Z`, with that version's CHANGELOG section as the notes, marked latest (`gh release create vX.Y.Z --verify-tag --title vX.Y.Z --notes-file <section> --latest`). Never move or rewrite a published tag. Docs-only pull requests get no tag and no release.
+
 ## Skill reference (behavior)
 
 The behavior of every skill and subagent on main lives in the user-facing reference, not in this file: [`docs/reference/skills.md`](../../docs/reference/skills.md) (the table, grouped by lane) and `docs/reference/skills/crav1-<name>.md` (one page per skill: what it reads, writes, leaves alone, who calls it, and what it calls, plus its exceptions). Read that page before answering how a skill behaves. Lane ownership stays in `docs/guild-routing.md`.
