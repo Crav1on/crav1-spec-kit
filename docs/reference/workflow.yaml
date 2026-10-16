@@ -162,6 +162,7 @@ also_next:
 # Replaces the generated list. Free text is allowed here only.
 override:
   crav1-explain-this-code: []
+  crav1-retire-spec: []
   crav1-fix-bug: ["The lane it names (Specify, Plan, or Build)"]
   crav1-what-do-we-know-about-this: ["The one skill it names, if any"]
   crav1-export-spec: []
