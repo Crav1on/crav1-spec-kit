@@ -49,3 +49,8 @@ When a choice is missing and the run is headless or started by a bot (no person 
 ## After
 
 Each branch ends with its own recap and next step.
+
+## Parked and retired specs (1.60.0)
+
+Skip every spec under `docs/specs/retired/`, and every old-path `spec.md` that is only a `Moved:` pointer. A spec whose `spec.md` has a `Parked:` line is parked: the push branches (`suggest features`, `push features`, `push tasks`) do not push it. The pull branches still read it. Say `skipped: <slug> (parked)` and name `/crav1-retire-spec un-park docs/specs/<slug>/`. Do not remove the mark.
+A note under `docs/notes/` that says `Waiting for <slug> (parked)` is read like any other note.
