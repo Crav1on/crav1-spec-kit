@@ -32,7 +32,7 @@ Writes `spec.md`, `diagrams.md`, slice ADRs, the chosen `export/`, optional `not
 
 Leaves application code and the rest of an existing landscape alone.
 
-Limits and exceptions: two or more v0 slices or repos writes nothing and points at [`/crav1-bundle-to-specs`](crav1-bundle-to-specs.md). A quoted note in `docs/notes/` gets `Used by <slug>`. `Absorbed by <slug>` only after the user says yes, when this spec takes the whole note.
+Limits and exceptions: two or more v0 slices or repos writes nothing and points at [`/crav1-bundle-to-specs`](crav1-bundle-to-specs.md). A quoted note in `docs/notes/` gets its slug in `used_by` and a `Full source:` link; notes are never absorbed (1.61.0).
 
 ## You run next / Runs by itself
 

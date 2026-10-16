@@ -9,7 +9,7 @@ description: >-
   and /crav1-merge-pr. Ends with a paste-ready comment; posts it inline
   and sets a verdict only after the user's yes. Re-review marks earlier
   findings fixed or open. Follow-ups are kept out of the posted and
-  pasted comment and saved as a note in docs/notes/. Does not edit,
+  pasted comment and saved as a note in docs/notes/YYYY-MM/. Does not edit,
   test, or merge.
 disable-model-invocation: true
 icon: git-pull-request
@@ -323,24 +323,23 @@ The block is text in the chat. Showing it posts nothing.
 
 ## Follow-ups note
 
-Follow-ups are not posted and not in the paste-ready block. The chat review still shows them, under **Follow-ups (not for this PR)**, then one line: `Follow-ups saved: docs/notes/<file>.md`.
+Follow-ups are not posted and not in the paste-ready block. The chat review still shows them, under **Follow-ups (not for this PR)**, then one line: `Follow-ups saved: docs/notes/YYYY-MM/<file>.md`.
 
-When the review has at least one follow-up, write a note in `docs/notes/` of the specs repo, in the existing notes format (`docs/notes/_template/note.md` and `index.md`; the same shapes `/crav1-add-to-spec` writes, drop-in: `.claude/skills/crav1-add-to-spec/branches/meeting/assets/`; plugin: sibling `skills/crav1-add-to-spec/branches/meeting/assets/`):
+When the review has at least one follow-up, write a note in `docs/notes/` of the specs repo, in the notes format of `crav1-add-to-spec` `references/notes.md` (1.61.0; `docs/notes/_template/note.md`; the same shape `/crav1-add-to-spec` writes, drop-in: `.claude/skills/crav1-add-to-spec/branches/meeting/assets/`; plugin: sibling `skills/crav1-add-to-spec/branches/meeting/assets/`):
 
-- File: `docs/notes/review-pr-<n>-follow-ups.md`, where `<n>` is the pull request number. When two repos in this specs repo have the same pull request number, use `review-pr-<repo>-<n>-follow-ups.md`.
+- File: `docs/notes/YYYY-MM/review-pr-<n>-follow-ups.md`, in the month folder of the review date, where `<n>` is the pull request number. When two repos in this specs repo have the same pull request number, use `review-pr-<repo>-<n>-follow-ups.md`.
 - Title: `Follow-ups from PR <n> (<repo>)`.
-- `Date:` the review date.
+- Front matter: `kind: review-pr`, `source: PR <n> <repo>`, `source_date` and `imported` the review date, `used_by: []`.
 - `From review <date>. PR <n>, <repo>, <PR title>.` then one bullet per follow-up: `<path>`, line `<n>`: the follow-up in plain words. Paths and lines are kept, because the note stays in the specs repo. Use `no line` when the follow-up has no line.
-- No `Source:` line. `## Used by`, empty.
-- `docs/notes/index.md` gets one row for it, status `open`, empty used-by cell, as that format says. Create the folder and the index when they are missing. Do not rewrite another row.
+- Then run the notes index generator (`scripts/notes_index.py` in `crav1-add-to-spec`). Do not hand-edit an index.
 
-**Re-review.** When the note for that pull request exists, update it. Do not write a second note. Change the date to this review's date, add new follow-ups, and mark one the code now addresses as `(done in <short sha>)`. Do not remove a line. Leave `## Used by`, `Absorbed by`, and the index status as they are. When the review has no follow-ups and the note exists, leave the note.
+**Re-review.** When the note for that pull request exists (in any month folder, or flat in `docs/notes/` from before 1.61.0), update it where it is. Do not write a second note. Set `imported` to this review's date, add new follow-ups, and mark one the code now addresses as `(done in <short sha>)`. Do not remove a line. Leave `used_by` as it is, then rerun the generator. When the review has no follow-ups and the note exists, leave the note.
 
 **No follow-ups.** Write no note.
 
 When the specs repo is not in this workspace, write nothing and print the note in the chat with the path it would have.
 
-The follow-ups come back through the existing note flow: `/crav1-ado-sync` reads open notes, and a spec that takes one marks it Used by, or Absorbed by when it takes all of it. This skill does not do that marking.
+The follow-ups come back through the existing note flow: `/crav1-ado-sync` reads open notes, and a spec that takes one adds itself to the note's `used_by`. Notes are never absorbed. This skill does not do that marking.
 
 Writing the note is the only file this skill writes. It does not commit. Name `/crav1-finalize-commit` and do not run it.
 
@@ -362,7 +361,7 @@ When a post fails, say what failed and what already posted. Do not retry by anot
 
 - No review unless this turn names the pull request or clearly asks to review that one.
 - Do not pick the newest pull request.
-- No edits to code, `spec.md`, `plan.md`, `tasks.md`, or `verify.md`. The only write is the follow-ups note in `docs/notes/` and its index row.
+- No edits to code, `spec.md`, `plan.md`, `tasks.md`, or `verify.md`. The only write is the follow-ups note in `docs/notes/YYYY-MM/` and the generated indexes.
 - No test run, and no ask to run tests. When the slug has `plan.md`, quote `verify.md` or say it is missing. When the pull request is outside the kit, do not say `verify.md` is missing. Read the pipeline's recorded test results.
 - No linter install. No branch-protection change. No required-check edit.
 - No comment, no vote, and no thread resolve without the user's yes in [Post it](#post-it). No label, no reviewer assignment.

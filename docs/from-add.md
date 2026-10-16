@@ -8,7 +8,7 @@ Use this when **one spec already exists** and there is **new information** for t
 
 A not-started spec (match status `not in the code`, or a thin spec) can keep taking information until planning. Adding information does not start planning and does not write `plan.md` or `tasks.md`.
 
-When the quote comes from a note in `docs/notes/`, the note gets a line `Used by <slug>` and the index updates. Status stays open. `Absorbed by <slug>` only when this spec clearly takes the whole note, and only after the user says yes. Then status is absorbed. Partial use never closes the note. The command does not commit that line.
+Since 1.61.0 every input is saved once as one full note in `docs/notes/YYYY-MM/` (by source date, with the import date recorded); for a fact, the fact plus the passage around it. The spec gets only its own short point with `Full source: <note>`, and the note gets the slug in `used_by`. Notes are never absorbed. The same source again is not imported twice; a disagreement is flagged as a conflict, never overwritten. A parked spec gets nothing; the note waits for it.
 
 ## First prompt
 

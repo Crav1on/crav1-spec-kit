@@ -30,7 +30,7 @@ Writes only the picked issue in `spec.md` and, when that pick says so, the named
 
 Leaves application code and unpicked issues alone. A spec with no code behind it skips that read.
 
-Limits and exceptions: a different open repo or branch, a missing branch, a stub, or a spec too thin for that read stops and does not tighten. `suggest` does not patch. A disagreement with the code is called out and the spec is not rewritten to match the code. Finish, add a test, and leave are not choices here. A quoted note in `docs/notes/` gets `Used by <slug>`. `Absorbed by <slug>` only after the user says yes, when this spec takes the whole note.
+Limits and exceptions: a different open repo or branch, a missing branch, a stub, or a spec too thin for that read stops and does not tighten. `suggest` does not patch. A disagreement with the code is called out and the spec is not rewritten to match the code. Finish, add a test, and leave are not choices here. A quoted note in `docs/notes/` gets its slug in `used_by` and a `Full source:` link; notes are never absorbed (1.61.0).
 
 ## You run next / Runs by itself
 

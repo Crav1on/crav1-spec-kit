@@ -32,7 +32,7 @@ Writes `docs/system/` including `glossary.md` (a missing glossary and new rows w
 
 Leaves application code, `plan.md`, and later slices alone. Does not commit.
 
-Limits and exceptions: prompts [`/crav1-finalize-commit`](crav1-finalize-commit.md) and does not run it. A quoted note in `docs/notes/` gets `Used by <slug>`. `Absorbed by <slug>` only after the user says yes, when this spec takes the whole note.
+Limits and exceptions: prompts [`/crav1-finalize-commit`](crav1-finalize-commit.md) and does not run it. A quoted note in `docs/notes/` gets its slug in `used_by` and a `Full source:` link; notes are never absorbed (1.61.0).
 
 ## You run next / Runs by itself
 

@@ -11,7 +11,7 @@ description: >-
   takes a named target or suggests only real fits, each with a reason,
   and says "no good merge fit found" when none fits. Park adds a Parked
   mark in place; un-park re-reads the notes waiting for it. Convert to
-  note writes docs/notes/ with a Source line and a landscape line. Removes
+  note writes docs/notes/YYYY-MM/ with a Source line and a landscape line. Removes
   the feature-index row on retire, merge, and convert.
 disable-model-invocation: true
 icon: archive
@@ -118,18 +118,18 @@ While parked:
 
 ## Un-park
 
-1. Find every note in `docs/notes/` with a `Waiting for <slug> (parked)` line.
+1. Find every note in `docs/notes/` (month folders and their generated indexes) with the slug in `waiting_for`, or an old `Waiting for <slug> (parked)` line.
 2. Read each waiting note in full. Suggest what fits the spec now, including points that already went to other specs, when they matter to this one too. Match each point against every active spec as well, and say when another spec is now the better fit.
 3. Show the summary: the `Parked:` line removed, each point to add, and each note that gets `Used by <slug>`.
-4. On yes: remove the `Parked:` line, add the chosen points through the same rules as `/crav1-add-to-spec`, and on each waiting note replace `Waiting for <slug> (parked)` with `Used by <slug>` and update its notes index row.
+4. On yes: remove the `Parked:` line, add the chosen points through the same rules as `/crav1-add-to-spec`, and on each waiting note move the slug from `waiting_for` to `used_by` (an old line becomes `Used by <slug>`). Run the notes index generator; do not hand-edit an index.
 
 A waiting note is never marked absorbed. It stays open as the shared full source for any spec.
 
 ## Convert to note
 
-1. Write `docs/notes/<YYYY-MM-DD>-<slug>.md` in the note shape (`docs/notes/_template/note.md`). The title is the spec's title. Add `Source: docs/specs/<slug>/spec.md (converted <YYYY-MM-DD>)` and `Converted from spec, no research owner`. The body is the spec's content as it was.
-2. Add a row to `docs/notes/index.md`: title, date, status `open`, used by empty.
-3. Add one line under `## How the parts connect` in `docs/system/landscape.md`: `<title>: reference only, see docs/notes/<YYYY-MM-DD>-<slug>.md`. Append only. Do not rewrite a line that is there.
+1. Write `docs/notes/<YYYY-MM>/<YYYY-MM-DD>-<slug>.md` in the note shape (`docs/notes/_template/note.md`, see `crav1-add-to-spec` `references/notes.md`), dated by the spec's first commit date (the source date), with `imported` today. Front matter `kind: converted spec`, `source: docs/specs/<slug>/spec.md`. The title is the spec's title. Add `Source: docs/specs/<slug>/spec.md (converted <YYYY-MM-DD>)` and `Converted from spec, no research owner`. The body is the spec's content as it was.
+2. Run the notes index generator so the note gets its index row. Do not hand-edit an index.
+3. Add one line under `## How the parts connect` in `docs/system/landscape.md`: `<title>: reference only, see docs/notes/<YYYY-MM>/<YYYY-MM-DD>-<slug>.md`. Append only. Do not rewrite a line that is there.
 4. Remove that slug's feature-index row.
 5. Move the rest of the spec folder to `docs/specs/retired/<slug>/` and leave the pointer at the old path.
 

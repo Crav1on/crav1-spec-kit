@@ -148,7 +148,7 @@ When the user picks yes or pending, write the lines as the reference file says, 
 
 ## Parked and retired specs (1.60.0)
 
-Skip `docs/specs/retired/` and `Moved:` pointers. A parked spec (a `Parked:` line in `spec.md`) is still listed, its section heading marked `(parked)`; its questions can still be shown and asked. A note in `docs/notes/` that says `Waiting for <slug> (parked)` is not open work: list it as `waiting for parked <slug>` under that spec, not in the open counts.
+Skip `docs/specs/retired/` and `Moved:` pointers. A parked spec (a `Parked:` line in `spec.md`) is still listed, its section heading marked `(parked)`; its questions can still be shown and asked. A note in `docs/notes/` (month folders since 1.61.0) with the slug in `waiting_for`, or an old `Waiting for <slug> (parked)` line, is not open work: list it as `waiting for parked <slug>` under that spec, not in the open counts.
 
 ## Stop
 

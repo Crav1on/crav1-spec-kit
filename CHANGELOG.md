@@ -4,6 +4,27 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 
 ## Unreleased
 
+## 1.61.0 (2026-10-16)
+
+### Kit
+
+- `/crav1-add-to-spec`: every input (fact, dump, code change, meeting) becomes **one note** holding the full input and its source; a fact's note holds the fact plus the passage around it. Each matching spec gets only its own short points, each with `Full source: <note>`. Notes are never absorbed; `used_by` grows. The meeting branch's Note choice and the dump branch's Note pile are removed (a left item stays in the full note). The absorb question is gone; old `Absorbed by` lines are still read as used by. Rules in `crav1-add-to-spec` `references/notes.md`.
+- Notes live in month folders `docs/notes/YYYY-MM/`, named and filed by the **source date** (meeting date, mail sent date, commit date), with `imported` recorded; no source date files under the import date and says so.
+- Indexes are generated: `crav1-add-to-spec/scripts/notes_index.py` builds `docs/notes/index.md` (one row per month) and `docs/notes/YYYY-MM/index.md` from note front matter (`title`, `kind`, `source`, `source_date`, `imported`, `used_by`, `waiting_for`). `--check` fails on a stale index. Skills no longer hand-edit indexes.
+- Duplicate check: the same source again says `already imported on <date> as <note>` and offers reuse or skip, never a second copy. The same point from another source adds a second source on the spec line. A disagreement is written as a `**Conflict:**` line, never an overwrite.
+- Parked specs (1.60.0) fold into the general rule: nothing written, the slug goes in the note's `waiting_for`.
+- Migration: `notes_index.py migrate` moves existing flat notes into month folders by source date, adds front matter, and rebuilds the indexes. `/crav1-refresh-system-notes` names it when it finds flat notes. Old spec lines keep their source lines; no backfill.
+- Readers follow: `/crav1-ado-sync` (every note is input), `/crav1-review-pr` (follow-ups in `docs/notes/YYYY-MM/`), `/crav1-help` and `/crav1-show-or-ask-open-questions` (waiting counts from the indexes), `/crav1-retire-spec` (convert to note writes a month folder; un-park moves `waiting_for` to `used_by`), and the note write in `/crav1-bundle-to-specs`, `/crav1-ideas-to-spec`, `/crav1-spark-to-spec`, `/crav1-tighten-spec`, `/crav1-existing-to-specs`.
+- `plugins/crav1/.cursor-plugin/plugin.json` is 1.61.0.
+
+### Docs
+
+- Data layout notes section rewritten; note and index templates; add-to-spec, dump, and meeting walkthroughs; review-pr, retire-spec, draft-spec, method, guild routing, glossary (note, notes index, source date).
+
+### CI
+
+- The docs job runs `notes_index.py --selftest` (build, check, migrate).
+
 ## 1.60.0 (2026-10-16)
 
 ### Kit

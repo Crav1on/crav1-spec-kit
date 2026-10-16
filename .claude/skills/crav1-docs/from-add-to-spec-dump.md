@@ -33,8 +33,8 @@ That slash command *is* the prompt.
 | Phase | You | Agent |
 | --- | --- | --- |
 | Specs | — | Reads `docs/specs/<slug>/` (skips `_template`). Does not ask for a slug. A hint in the dump that names a slug is evidence for the sort |
-| Sort | Confirm or edit the piles | Belongs to this spec, already in that spec, note, or does not fit any of them. Note is recommended when a fact is worth keeping and is not for an existing spec. Stops |
-| Write | — | Quotes the new bits into the matching `spec.md` files. A confirmed note is written under `docs/notes/`. Labels what is new versus what was already there. Inferred stays inferred. Does not invent acceptance, architecture, or tasks. Does not commit |
+| Sort | Confirm or edit the piles | Belongs to this spec, already in that spec, or does not fit any of them. What fits nothing stays in the full note |
+| Write | — | Quotes the new bits into the matching `spec.md` files. The whole dump is written once as one full note in `docs/notes/YYYY-MM/`. Labels what is new versus what was already there. Inferred stays inferred. Does not invent acceptance, architecture, or tasks. Does not commit |
 | Impact | If other files are affected, pick apply or leave them alone | Reads `docs/system/` and the other specs. Lists each proposed edit in one line. Does not edit those files until apply |
 | Stop | Glance, then `/crav1-finalize-commit` if a changed file should be in git | Does not plan, implement, or commit |
 
@@ -52,7 +52,7 @@ Anything that fits none of the existing specs is listed and left alone. The comm
 
 The matching `docs/specs/<slug>/spec.md` files, for bits that were new.
 
-A confirmed note is `docs/notes/YYYY-MM-DD-<slug>.md`, plus one line on `docs/notes/index.md`. The quote stays verbatim. There is no question after Note about what kind of note it is. The command reads `docs/notes/` first. An item already noted is not written again. It does not commit the note.
+Since 1.61.0 the whole dump is one full note, `docs/notes/YYYY-MM/YYYY-MM-DD-<slug>.md`, filed by the date the dump shows (no date: the import date, and it says so). Each belongs quote links it as `Full source:`. There is no Note pile. The same file or mail again is not imported twice. Indexes are generated. It does not commit the note.
 
 A mail, a transcript, a chat, a screenshot, or another original that a confirmed quote comes from is also written under `docs/sources/YYYY-MM-DD-<slug>/`. The spec `Source:` and `Trace:` lines link to that folder. This command does not commit.
 

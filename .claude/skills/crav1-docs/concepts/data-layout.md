@@ -23,9 +23,11 @@ docs/architecture/
 docs/environments/
   marks.md           # confirmed environment lines from read-environment or map-pipeline-environments
 docs/notes/
-  index.md           # open and absorbed notes
-  YYYY-MM-DD-<slug>.md  # a fact kept as Note, not tied to a spec yet
-  review-pr-<n>-follow-ups.md  # follow-ups from /crav1-review-pr, one note per pull request
+  index.md           # generated: one row per month
+  YYYY-MM/           # month of the source date (1.61.0)
+    index.md         # generated: one row per note
+    YYYY-MM-DD-<slug>.md  # one full input (fact, dump, code change, meeting) and its source
+    review-pr-<n>-follow-ups.md  # follow-ups from /crav1-review-pr, one note per pull request
 docs/sources/
   YYYY-MM-DD-<slug>/ # an imported mail, transcript, chat, screenshot, or other original
 docs/research/
@@ -69,7 +71,7 @@ docs/specs/
 | `docs/architecture/left-out.md` | Guesses that stay left out, under `## Left out`, and `## Dismissed` lines | `/crav1-existing-to-specs` | `/crav1-existing-to-specs` on a re-read, `/crav1-read-environment` |
 | `docs/environments/marks.md` | One confirmed line per resource and environment | `/crav1-read-environment` and `/crav1-map-pipeline-environments`, appending only confirmed lines; `/crav1-ado-sync` appends one `Azure Boards task type:` line | `/crav1-read-environment`, `/crav1-what-do-we-know-about-this`. Line format: [Environment marks](../environments-marks.md) |
 | `docs/specs/<slug>/plan.md`, `tasks.md` readiness marks | `Reviewed:` in `plan.md`, `(after: T#)` on task lines, `Blocks:` under spec open questions | `/crav1-review-plan`, `/crav1-tighten-plan`, `/crav1-plan-from-spec`, `/crav1-resolve-open-questions` | `/crav1-tasks-ready-to-build` |
-| `docs/notes/` | A fact kept as Note, not tied to a spec yet, plus `index.md` | `/crav1-add-to-spec` when the user picks Note; `/crav1-review-pr` for its follow-ups note; `Used by` and `Absorbed by` lines by any skill that quotes the note | `/crav1-ado-sync`, the skills that quote a note |
+| `docs/notes/YYYY-MM/` | One note per input with the full input and its source, by source date; generated `index.md` per month and a top `index.md` | `/crav1-add-to-spec` for every input (1.61.0); `/crav1-review-pr` for its follow-ups note; `/crav1-retire-spec` convert to note. Indexes: `notes_index.py` only |
 | `docs/sources/YYYY-MM-DD-<slug>/` | The original of an imported mail, transcript, minutes, chat, screenshot, or diagram, plus a `README.md` | `/crav1-add-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs` | Anyone checking a quote. See [Data policy](data-policy.md) |
 | `docs/research/<topic>.md` | A short research note with the recommendation, trade-offs, confidence, and a link to the full study | The researcher (no slash command; see [guild routing](../guild-routing.md)). Skills only add or clear a stale mark | add, match-dump, add-to-spec, meeting, refresh-system-notes, explain-existing-system, what-do-we-know-about-this, ado-sync |
 | `docs/specs/<slug>/spec.md` | What and why, acceptance, open questions | spark, ideas, intake (through `crav1-bundle-slice-agent`), match; then tighten-spec, resolve-open-questions, add-to-spec, match-dump, add-to-spec, and review-security | Every later lane |
@@ -87,25 +89,39 @@ The host file names for the two rules are in [install](../install.md) and on the
 
 ## Notes
 
-A note is a fact kept for later that is not tied to a spec yet. Each note is `docs/notes/YYYY-MM-DD-<slug>.md`, from `docs/notes/_template/note.md`:
+Since 1.61.0 every `/crav1-add-to-spec` input (fact, dump, code change, meeting) becomes **one note** that holds the full input and its source. A fact's note holds the fact plus the passage around it. Each matching spec gets only its own short points, each followed by `Full source: docs/notes/YYYY-MM/<file>.md`. Notes are never absorbed; `used_by` grows as specs take points. There is no Note choice and no "never used" flag. The rule is `crav1-add-to-spec` `references/notes.md`.
+
+Each note is `docs/notes/YYYY-MM/YYYY-MM-DD-<slug>.md`. The date and the month folder are the **source date** (meeting date, mail sent date, commit date). The note also records `imported`. A source with no date is filed under the import date with `source_date: none`, and the run says so. The shape is `docs/notes/_template/note.md`:
 
 ```text
+---
+title: Title
+kind: fact | dump | code change | meeting | email | chat | review-pr | converted spec
+source: <mail subject, sender, sent date | meeting date and title | file path | commit sha>
+source_date: YYYY-MM-DD
+imported: YYYY-MM-DD
+source_folder: docs/sources/YYYY-MM-DD-slug/
+used_by: []
+waiting_for: []
+---
 # Title
 
-Date: YYYY-MM-DD
+Source date: YYYY-MM-DD. Imported: YYYY-MM-DD.
 
-From kind. "Quote."
-
-Source: docs/sources/YYYY-MM-DD-slug/
-
-## Used by
+<the full input, verbatim>
 ```
 
-`docs/notes/index.md` has one row per note: Title, Date, Status, Used by. When a skill quotes a note into a spec, it adds `Used by <slug>` under `## Used by` and updates that index row. Status stays open. Many specs can use one note. `Absorbed by <slug>` is added only when that spec clearly takes the whole note, and only after the user says yes.
+**Generated indexes.** `docs/notes/index.md` (one row per month) and `docs/notes/YYYY-MM/index.md` (title, date, kind, source, used by, waiting for) are built from the front matter by `notes_index.py` in the `crav1-add-to-spec` skill folder (`scripts/notes_index.py`). `--check` fails when an index is stale, so a product repo can run it in CI. No skill edits an index by hand. Lookups for a spec follow its `Full source:` links; matching new input and the duplicate check read the indexes.
+
+**Duplicate check.** The same source again (the same mail, meeting date and title, file, or commit) is not written twice: the run says `already imported on <date> as <note>` and offers reuse (for specs that took nothing yet) or skip. The same point from a different source adds the new note as a second source on the existing spec line. A disagreement is written as a `**Conflict:**` line for the user to decide, never an overwrite.
+
+**Parked specs.** A parked spec gets nothing written; its slug goes in the note's `waiting_for` until `/crav1-retire-spec` un-parks it.
+
+**Older notes.** Notes from before 1.61.0 (flat in `docs/notes/`, no front matter, maybe `Absorbed by`) are still read; `Absorbed by` counts as used by. `/crav1-refresh-system-notes` names the one-time move, `notes_index.py migrate`, which files them by source date and rebuilds the indexes. Old spec lines keep their source lines; nothing is backfilled. `/crav1-bundle-to-specs`, `/crav1-ideas-to-spec`, `/crav1-spark-to-spec`, `/crav1-tighten-spec`, and `/crav1-existing-to-specs` add their slug to `used_by` when they quote a note; `/crav1-ado-sync`, `/crav1-help`, and `/crav1-show-or-ask-open-questions` read the month folders and the generated indexes.
 
 ### Review follow-ups note
 
-`/crav1-review-pr` does not post follow-ups to the pull request or put them in the paste-ready comment. When a review has at least one, it writes `docs/notes/review-pr-<n>-follow-ups.md` in the same note format, where `<n>` is the pull request number. When two repos in the specs repo have the same pull request number, the file is `review-pr-<repo>-<n>-follow-ups.md`. The title is `Follow-ups from PR <n> (<repo>)`, there is no `Source:` line, and each follow-up keeps its file and line. The note gets an `open` row in `index.md`. A re-review updates the same note: it changes the date, adds new follow-ups, and marks addressed ones `(done in <short sha>)` without removing a line. A review with no follow-ups writes no note. See [From a pull request review](../from-review-pr.md#follow-ups).
+`/crav1-review-pr` does not post follow-ups to the pull request or put them in the paste-ready comment. When a review has at least one, it writes `docs/notes/YYYY-MM/review-pr-<n>-follow-ups.md` (month of the review date) in the same note format, where `<n>` is the pull request number. When two repos in the specs repo have the same pull request number, the file is `review-pr-<repo>-<n>-follow-ups.md`. The title is `Follow-ups from PR <n> (<repo>)`, front matter `kind: review-pr`, and each follow-up keeps its file and line. The indexes are regenerated. A re-review updates the same note where it is: it sets `imported` to the review date, adds new follow-ups, and marks addressed ones `(done in <short sha>)` without removing a line. A review with no follow-ups writes no note. See [From a pull request review](../from-review-pr.md#follow-ups).
 
 ## Sources
 
@@ -210,7 +226,7 @@ The kit finds these headings by name. Keep the names when you edit by hand.
 | `## Left as committed` | `plan.md` | Built pieces you chose to leave. Not offered again unless you say so |
 | `## How the parts connect`, `## Feature index` | `docs/system/landscape.md` | The picture. Refresh-system-notes adds lines. Explain-existing-system compares them |
 | `## Left out`, `## Dismissed` | `docs/architecture/left-out.md` | Existing-to-specs and read-environment |
-| `## Used by` | a note in `docs/notes/` | Which specs quote the note |
+| `used_by` | front matter of a note in `docs/notes/YYYY-MM/` | Which specs took points from the note (older notes: `## Used by`) |
 
 ## Renamed skills (1.56.0)
 

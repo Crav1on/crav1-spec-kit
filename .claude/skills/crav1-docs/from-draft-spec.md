@@ -47,7 +47,7 @@ Questions only someone else can answer: draft them with [`/crav1-show-or-ask-ope
 - A branch line on the spec, only after a yes.
 - `Blocks: T#` under a question you keep open, when the slice has `tasks.md` and you pick the tasks it blocks in `/crav1-resolve-open-questions`. Without it, the question blocks the whole slice in [Tasks ready to build](from-tasks-ready-to-build.md).
 - A cleared research stale mark, when a resolved question settles the last open point.
-- `Used by <slug>` on a note in `docs/notes/` that tighten quotes.
+- The slug in `used_by` on a note in `docs/notes/YYYY-MM/` that tighten quotes (generated index rebuilt).
 
 Not written: application code, `plan.md`, `tasks.md`. Nothing is committed.
 

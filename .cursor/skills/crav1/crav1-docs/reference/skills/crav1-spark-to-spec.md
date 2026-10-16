@@ -32,7 +32,7 @@ Writes `docs/specs/<slug>/spec.md`, a thin `docs/system/` including `glossary.md
 
 Leaves application code and an existing landscape alone.
 
-Limits and exceptions: extend edits that spec and adds no second index row. A quoted note in `docs/notes/` gets `Used by <slug>`. `Absorbed by <slug>` only after the user says yes, when this spec takes the whole note.
+Limits and exceptions: extend edits that spec and adds no second index row. A quoted note in `docs/notes/` gets its slug in `used_by` and a `Full source:` link; notes are never absorbed (1.61.0).
 
 ## You run next / Runs by itself
 

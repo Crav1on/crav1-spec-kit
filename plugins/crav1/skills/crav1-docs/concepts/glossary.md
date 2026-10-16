@@ -66,7 +66,11 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 
 **Match status.** Under a spec's `## Match`: done, partial, not in the code, or retired.
 
-**Note.** A fact kept for later in `docs/notes/`, not tied to a spec yet. `Used by` and `Absorbed by` record which specs took it.
+**Note.** One full input (fact plus passage, dump, code change, meeting) and its source in `docs/notes/YYYY-MM/`, filed by source date (1.61.0). Specs link it as `Full source:`; `used_by` records which specs took points. Never absorbed. Older notes may still say `Absorbed by`.
+
+**Notes index.** The generated `docs/notes/index.md` and `docs/notes/YYYY-MM/index.md`, built from note front matter by `notes_index.py`. Never hand-edited.
+
+**Source date.** The date of the original (meeting date, mail sent date, commit date). It names the note file and its month folder; the import date is recorded as `imported`.
 
 **Parked spec.** A spec with a `Parked: date, reason` line, set by `/crav1-retire-spec park`. Plan, build, and ado-sync push skip it. Add-to-spec writes nothing into it; matching input becomes a waiting note.
 
@@ -74,7 +78,7 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 
 **Pointer.** The one-line `Moved:` `spec.md` left at a spec's old path when it is retired, merged, or converted. Nothing is deleted.
 
-**Waiting note.** A note in `docs/notes/` that says `Waiting for <slug> (parked)`: the full input that matched a parked spec. Never absorbed; it stays the shared full source and `Used by` grows as specs use it.
+**Waiting note.** A note in `docs/notes/YYYY-MM/` with the slug in `waiting_for`: the full input that matched a parked spec. Never absorbed; it stays the shared full source and `Used by` grows as specs use it.
 
 **Saved explanation.** The optional `explain-this-code-<target>-<date>.md` that `/crav1-explain-this-code` writes when the user says yes to Save as .md: in the Downloads folder by default, or a path the user names, never into the repo by default. Its header names the paths covered and `<branch>@<short sha>`. Not a note: the kit never reads or indexes it.
 
