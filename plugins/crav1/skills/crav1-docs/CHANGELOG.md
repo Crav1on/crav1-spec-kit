@@ -4,6 +4,22 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 
 ## Unreleased
 
+## 1.60.0 (2026-10-16)
+
+### Kit
+
+- New skill `/crav1-retire-spec` (cross-cutting, Keep the picture current, standalone, any time). Takes one spec out of the work. Opening question with choice words `retire` (Recommended), `merge`, `park`, `convert to note`; skipped when the wording answers; a headless or bot run with no word stops and lists the words. Always shows a summary of every change and waits for a yes. Never deletes: a moved spec leaves a one-line `Moved:` pointer at its old path.
+- Retire: moves the spec to `docs/specs/retired/<slug>/` with `Retired: date, reason`, removes the feature-index row, and lists inbound links to fix. Every spec-scanning skill skips `docs/specs/retired/`.
+- Merge: a named target, or only real fits with a reason each (shared feature area, overlapping requirements, same system in landscape, links), best first marked (Recommended); none fits says `no good merge fit found` and offers park, retire, or convert to note. Content, open questions, and decisions move over marked `(from <slug>)`.
+- Park: a `Parked: date, reason` line in place. `/crav1-plan-from-spec`, `/crav1-build-tasks`, `/crav1-build-features`, and the push branches of `/crav1-ado-sync` skip it; `/crav1-help` and `/crav1-show-or-ask-open-questions` list it as parked with the count of waiting notes. Un-park (`/crav1-retire-spec un-park`) re-reads each waiting note in full, suggests what fits now, and adds the spec to `Used by`.
+- `/crav1-add-to-spec`: input that matches a parked spec is saved once in full as a note with `Waiting for <slug> (parked)`. Active matching specs get their points plus a `Full source:` link and join `Used by`. The parked spec gets nothing written. Such notes are never absorbed. Open questions shows them as `waiting for parked <slug>`, not open work.
+- Convert to note: writes `docs/notes/<date>-<slug>.md` with a `Source:` line and an index row, one line under `## How the parts connect` in landscape, and removes the feature-index row. A converted note has no research owner, so no revisit request.
+- `plugins/crav1/.cursor-plugin/plugin.json` is 1.60.0.
+
+### Docs
+
+- New walkthrough [Retire, merge, park, or convert a spec](docs/from-retire-spec.md); skills reference page; guild routing (cross-cutting); docs index; README; glossary (parked spec, retired spec, pointer, waiting note); `workflow.yaml` override (no next step).
+
 ## 1.59.0 (2026-10-16)
 
 ### Kit

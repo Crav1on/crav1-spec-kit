@@ -202,6 +202,20 @@ When the note is already absorbed, do not ask again. Another spec can still add 
 
 Do not commit. This is not an impact question. Do not list the note as an apply option.
 
+## Parked specs (1.60.0)
+
+Skip `docs/specs/retired/` and `Moved:` pointers as targets. A spec whose `spec.md` has a `Parked:` line is parked. Match the input against every spec as usual, parked ones included. When any part of it matches a parked spec:
+
+1. Save the **full input** once as one note, `docs/notes/<YYYY-MM-DD>-<slug-of-input>.md`, in the note shape, with one line per matched parked spec: `Waiting for <parked slug> (parked)`. Add its row to `docs/notes/index.md`, status `open`. Do not split the input.
+2. Write nothing into the parked spec.
+3. Each active spec that matches gets its points applied as usual, plus one line linking the full note: `Full source: docs/notes/<file>`. Add `Used by <slug>` to the note for each active spec, as **Notes** says.
+4. Never ask the absorb question for this note and never write `Absorbed by` on it. It stays the shared full source; `Used by` grows as specs use it.
+5. Tell the user: `saved as a note for <parked slug> (parked)`, with the note path.
+
+When the user un-parks the spec, `/crav1-retire-spec` re-reads each waiting note in full. Do not do that here.
+
+A note converted from a spec says `Converted from spec, no research owner`. When it is stale, show it as stale and do not offer a revisit request.
+
 ## Impact (before any other edit)
 
 Read `docs/system/` when it exists (`landscape.md`, `repos.md`, `diagrams.md`, `glossary.md`, `adr/`) and every other `docs/specs/<slug>/spec.md` (skip `_template`). Check whether the new information contradicts or extends the landscape, a repo row, a diagram, an ADR, or another spec.
