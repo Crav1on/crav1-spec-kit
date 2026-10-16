@@ -39,7 +39,7 @@ Which branch:
 - Repos only, system notes plus one spec per feature: [branches/repos-and-bundle/BRANCH.md](branches/repos-and-bundle/BRANCH.md) with no bundle; every slice comes from the code.
 - Repos plus a bundle, one spec: [branches/repos-only/BRANCH.md](branches/repos-only/BRANCH.md), using the bundle only as context for the confirmations; nothing from the bundle becomes a fact unless the code shows it.
 
-Skip a question the message already answers: no attached files means repos only; a dump or attachments means a bundle; "architecture spec" means one spec; "features" or "slices" means one spec per feature. An alias (`/crav1-repos-to-spec`, `/crav1-match-to-specs`) arrives with both answers already made (repos only and one spec; or repos plus a bundle and one spec per feature).
+Skip a question the message already answers: no attached files means repos only; a dump or attachments means a bundle; "architecture spec" means one spec; "features" or "slices" means one spec per feature.
 
 When the user names no repos, stop and ask for them. Do not read the open checkout on your own.
 
@@ -55,8 +55,6 @@ Exact words for bots and scripted runs. There are no `--flags`.
 When the invocation contains one of these words (for example `/crav1-existing-to-specs repos only`), take that choice and do not ask that question. This holds for a person, a bot, or a headless run.
 
 When a choice is missing and the run is headless or started by a bot (no person in the chat to answer), do not guess. Stop and name the valid words, for example: `Missing choice. Use one of: repos only, repos and bundle.` Each question with no word stops the same way.
-
-An alias passes its choice word.
 
 ## After
 

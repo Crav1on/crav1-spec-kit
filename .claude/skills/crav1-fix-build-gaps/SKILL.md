@@ -26,7 +26,7 @@ Ask one question, with the questions tool when it is available:
 1. **Gaps from the verify report.** `verify.md` lists verify failed, claimed done and unverified, or `G#` gaps. Follow [branches/verify-gaps/BRANCH.md](branches/verify-gaps/BRANCH.md).
 2. **A live-site gap.** The gap is on a running host or the inner loop: ports, a proxy, SQL, an unpublished URL. Follow [branches/live-gaps/BRANCH.md](branches/live-gaps/BRANCH.md).
 
-Skip the question when the message already says which: a `Gap` id, `T#`, or "from verify" is option 1; a URL, a port, "live", or "local host" is option 2. When `verify.md` is missing and the message names no live gap, stop and name `/crav1-verify-build-against-spec`. An alias (`/crav1-fix-from-verify`, `/crav1-fix-live`) arrives with its choice already made.
+Skip the question when the message already says which: a `Gap` id, `T#`, or "from verify" is option 1; a URL, a port, "live", or "local host" is option 2. When `verify.md` is missing and the message names no live gap, stop and name `/crav1-verify-build-against-spec`.
 
 When the message or the files make one option the better fit, list it first and end its label with ` (Recommended)`. Otherwise keep the order above with no label.
 
@@ -39,8 +39,6 @@ Exact words for bots and scripted runs. There are no `--flags`.
 When the invocation contains one of these words (for example `/crav1-fix-build-gaps verify gaps`), take that choice and do not ask. This holds for a person, a bot, or a headless run.
 
 When a choice is missing and the run is headless or started by a bot (no person in the chat to answer), do not guess. Stop and name the valid words, for example: `Missing choice. Use one of: verify gaps, live gaps.`
-
-An alias passes its choice word.
 
 ## After
 
