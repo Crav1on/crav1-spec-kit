@@ -56,6 +56,10 @@ Ask "don't we need tighten-spec first?" and the command re-reads the file it cit
 
 Other agents follow the same rule. The always-on rule (`crav1.mdc` in Cursor, `CLAUDE.md` in Claude Code) tells them to call `/crav1-help` before they suggest more than one next step, or when you question an order, and to quote its answer.
 
+## Parked and retired specs
+
+Help skips specs in `docs/specs/retired/` and `Moved:` pointers. Parked specs are listed under **Parked** with date, reason, and how many notes wait for each, for example `baltic-trades (parked 2026-10-16, waiting on partner), 2 notes waiting`. It names `/crav1-retire-spec un-park` to pick one up ([retire spec](from-retire-spec.md)).
+
 ## Where the answers come from
 
 - In the kit repo, its own `docs/`.

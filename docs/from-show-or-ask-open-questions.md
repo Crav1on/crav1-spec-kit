@@ -27,6 +27,10 @@ Name a person (`Alex`, or a group), a spec (`@docs/specs/<slug>/`), or a topic (
 | Draft | Copy it | Numbered, grouped by topic in plain words, with enough context for someone who has not read the spec. No spec name, path, file, or question id. English unless you named a language. The personal-data and secrets check runs on the draft. Ends with `Nothing was sent.` |
 | Asked? | Yes, no, or pending | Yes writes `Asked:` under each question. Pending writes `Pending:`, shown first next run. No writes nothing |
 
+## Parked and retired specs
+
+Specs in `docs/specs/retired/` are skipped. A parked spec is still listed, marked `(parked)`, and its questions can still be asked. A note waiting for a parked spec is shown as `waiting for parked <slug>`, not counted as open work ([retire spec](from-retire-spec.md)).
+
 ## What gets written
 
 Only lines under the drafted questions in `docs/specs/<slug>/spec.md`:
