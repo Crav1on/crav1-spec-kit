@@ -113,7 +113,7 @@ A mail follows this section. Each image inside the mail, inline or attached, als
 
 ## Binary files
 
-For every binary file the user hands over as its own file, ask which of these four options to use. One question per file. Options only. Use the questions tool when it is available. Name one recommendation in the question. The user picks. Do not pick for them.
+For every binary file the user hands over as its own file, ask which of these four options to use. One question per file. Options only. Use the questions tool when it is available. Mark the recommended option: list it first and end its label with ` (Recommended)`; the others keep the order below. Do not also write the recommendation in the question text. The user picks. Do not pick for them.
 
 An image inside a mail uses the list in Images inside a mail. Ask once for that list. The four options are the same.
 
@@ -147,12 +147,12 @@ Number each image. The line says inline or attached, the file name or content id
 After the list, one question when there is at least one image. Three answers. Use the questions tool when it is available. Stop until the user picks.
 
 1. **Accept all recommendations.**
-2. **Go through them one by one.** The recommendation is shown on each image. The four options are the answers.
+2. **Go through them one by one.** The recommendation is shown on each image. The four options are the answers; the recommended one comes first with ` (Recommended)`.
 3. **Change some.** The user names images and the option, for example convert 2, compress 4.
 
 Accept all recommendations applies every listed recommendation.
 
-Go through them one by one asks the four options for each image. One image at a time. Options only. Use the questions tool when it is available. The question shows the recommendation. Stop until the user picks.
+Go through them one by one asks the four options for each image. One image at a time. Options only. Use the questions tool when it is available. The recommended option comes first with ` (Recommended)` at the end of its label; the question text does not repeat it. Stop until the user picks.
 
 Change some waits for the user to name the images and the option. The named option replaces the recommendation for that image. An image they do not name keeps its recommendation. When a number is not on the list, or the reply names an image and no option, ask again. Do not guess.
 
@@ -244,7 +244,7 @@ This is not legal advice. Keeping a work mail as a project record fits, because 
 
 Then show the list.
 
-Number each item that has a recommendation. The line shows the text, the kind, and where it sits. The line ends with `Recommendation: keep.` or `Recommendation: redact.`
+Number each item that has a recommendation. The line shows the text, the kind, and where it sits. The line ends with `Recommended: keep.` or `Recommended: redact.`
 
 List each unplaced item after the numbers. The line shows the text, the kind, and where it sits. The line says there is no recommendation.
 
@@ -255,12 +255,12 @@ List secrets last. One line per kind. Do not number them. Do not show the value.
 Ask this question when there is at least one numbered item, and the rule or this run says review. One question. Three answers. Use the questions tool when it is available. Stop until the user picks.
 
 1. **Accept all recommendations.**
-2. **Go through them one by one.** The recommendation is shown on each item.
+2. **Go through them one by one.** The recommendation is shown on each item, and in its question as the first option with ` (Recommended)`.
 3. **Change some.** The user names items to flip, for example keep 3, redact 5.
 
 Accept all recommendations applies every numbered recommendation.
 
-Go through them one by one asks keep or redact for each numbered item. One item at a time. Options only. Use the questions tool when it is available. The question shows the recommendation. Stop until the user picks.
+Go through them one by one asks keep or redact for each numbered item. One item at a time. Options only. Use the questions tool when it is available. The recommended choice is the first option, labelled ` (Recommended)`, for example `Redact (Recommended)`, then the other. Stop until the user picks.
 
 Change some waits for the user to name the items. The named choice replaces the recommendation for that item. An item they do not name keeps its recommendation. When a number is not on the list, or the reply does not name an item, ask again. Do not guess.
 

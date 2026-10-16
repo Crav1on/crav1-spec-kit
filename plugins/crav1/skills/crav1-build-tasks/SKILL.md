@@ -33,6 +33,8 @@ Skip the question when the message already answers it: one `T#` is option 1, a r
 
 A picked task that is blocked: say why (the tasks-ready-to-build reason) and ask whether to build it anyway or pick another. Do not skip that question.
 
+When the message or the files make one option the better fit, list it first and end its label with ` (Recommended)`. Otherwise keep the order above with no label.
+
 ## Choice words
 
 Exact words for bots and scripted runs. There are no `--flags`.

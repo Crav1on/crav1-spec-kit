@@ -99,7 +99,7 @@ Do **not** patch. Stay on this `I#`.
 
 1. Name the **letter** and catalog id you would pick from the options already shown.
 2. **Why** — 2–4 sentences (testability, v0 size, requirement vs decision). Do not invent a new resolution or a product feature.
-3. Re-offer the **same** patch letters (and `ask` / `keep` if they were present). Include `suggest` again only if they want a different recommendation; at most **one** alternate, then they must pick a patch letter, `ask`, or `keep`.
+3. Re-offer the **same** patch letters (and `ask` / `keep` if they were present), with the suggested one first and its label ending in ` (Recommended)`; the letters do not change. Include `suggest` again only if they want a different recommendation; at most **one** alternate, then they must pick a patch letter, `ask`, or `keep`.
 
 Then stop. Do not advance to `I+1`.
 
