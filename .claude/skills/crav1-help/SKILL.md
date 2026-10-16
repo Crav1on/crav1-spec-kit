@@ -20,7 +20,7 @@ color: blue
 
 You answer questions about the CRAV1 Spec Kit from the kit's own docs, for the version that is installed. You write nothing. You run no other skill. Naming a skill is not running it.
 
-This is cross-cutting. It is not its own lane. It does not move work into Specify, Plan, or Build. It is not `/crav1-explain-existing-system` (that reads the product's `docs/system/`) and not `/crav1-what-do-we-know-about-this` (that answers about one feature from the specs).
+This is cross-cutting. It is not its own lane. It does not move work into Specify, Plan, or Build. It is not `/crav1-explain-existing-system` (that reads the product's `docs/system/`), not `/crav1-explain-this-code` (that explains one piece of the product's code) and not `/crav1-what-do-we-know-about-this` (that answers about one feature from the specs).
 
 ## Where the answers come from
 
@@ -100,7 +100,7 @@ The message is `next`, or describes where the user is ("new information from a m
 
 ### 4. A concept
 
-The message names a kit word or file, such as `work item homes`, `marks.md`, `stale marks`, `route`, `ready`, or `Synced at`. Answer from its entry in `docs/concepts/glossary.md`, then the section in `docs/concepts/` that explains it (data layout, method, data policy) or a page it links to, such as `docs/environments-marks.md`. Quote or closely paraphrase. Name the skills that write and read it when that page says so. A word with no entry: "the kit doesn't say", and the closest entries.
+The message names a kit word or file, such as `work item homes`, `choice words`, `Recommended option`, `marks.md`, `stale marks`, `route`, `ready`, or `Synced at`. Answer from its entry in `docs/concepts/glossary.md`, then the section in `docs/concepts/` that explains it (data layout, method, data policy) or a page it links to, such as `docs/environments-marks.md`. Quote or closely paraphrase. Name the skills that write and read it when that page says so. A word with no entry: "the kit doesn't say", and the closest entries.
 
 ### 5. List, or one lane
 
@@ -117,7 +117,7 @@ The message names a kit word or file, such as `work item homes`, `marks.md`, `st
 
 ### 7. Compare two skills
 
-`compare A B`, or `difference between A and B`. A side-by-side table from both `skills.yaml` entries and reference pages: lane and group, purpose, use when, reads, writes, leaves alone, runs by itself, you run next, and their route steps. Then one or two lines on when to pick which, only as the docs say it. A name that matches no skill: say so and list the closest names.
+`compare A B`, or `difference between A and B`. A side-by-side table from both `skills.yaml` entries and reference pages: lane and group, purpose, use when, reads, writes, leaves alone, runs by itself, you run next, and their route steps. Then one or two lines on when to pick which, only as the docs say it. For `/crav1-explain-this-code` and `/crav1-explain-existing-system`: explain-this-code reads code (a file, function, selection, or PR diff) and the code it calls; explain-existing-system reads the system notes in `docs/system/` about the whole system. Both are read-only and cross-cutting. A name that matches no skill: say so and list the closest names.
 
 ### 8. What's new
 
