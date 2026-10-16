@@ -175,23 +175,47 @@ def git_add_date(root, path):
 
 SOURCE_LINE = re.compile(r"^Source:\s*(.+?)\s*$", re.M)
 SOURCES_PATH = re.compile(r"(docs/sources/[\w./-]+?)/?(?=[\s`)\]]|$)")
-TOKEN = re.compile(r"(?<![\w./-])((?:\.{1,2}/)*[\w.-]+(?:/[\w.-]+)*\.md)(?![\w/-])")
+TOKEN = re.compile(r"(?<![\w./:-])((?:\.{1,2}/)+[\w.\-/]*|[\w.-]+(?:/[\w.-]+)*\.md(?![\w/-])|docs/[\w.\-/]+)")
+LINK_TARGET = re.compile(r"\]\(\s*<?([^)\s#>]+)")
 SKIP_DIRS = {".git", "node_modules"}
 
 
+def source_items(body):
+    """Every Source: line, split into items: comma/semicolon lists on the
+    line, and `- item` bullets right under an empty or list-style Source:."""
+    lines = body.splitlines()
+    items = []
+    for i, line in enumerate(lines):
+        m = re.match(r"^Source[s]?:\s*(.*?)\s*$", line)
+        if not m:
+            continue
+        val = m.group(1)
+        if val:
+            items.append(val)
+        j = i + 1
+        while j < len(lines) and re.match(r"^\s*[-*]\s+\S", lines[j]):
+            items.append(re.sub(r"^\s*[-*]\s+", "", lines[j]).strip())
+            j += 1
+    return items
+
+
 def source_fields(text):
-    """Mechanical: `source` is the Source: line verbatim, `source_folder` the
-    docs/sources/ path in it. No Source: line -> both empty. Never guessed."""
+    """Mechanical, never guessed. source_folder is the first docs/sources/ path
+    across all Source: lines and items; source is that line (or item) verbatim.
+    When none points into docs/sources/, source is the first Source: line and
+    source_folder is empty. No Source: line -> both empty."""
     body = text
     if text.startswith("---\n"):
         end = text.find("\n---", 4)
         body = text[end + 4:] if end != -1 else text
-    m = SOURCE_LINE.search(body)
-    if not m:
+    items = source_items(body)
+    if not items:
         return "", ""
-    src = m.group(1).strip()
-    f = SOURCES_PATH.search(src.replace("`", " "))
-    return src, (f.group(1) + "/") if f else ""
+    for it in items:
+        f = SOURCES_PATH.search(it.replace("`", " "))
+        if f:
+            return it, f.group(1) + "/"
+    return items[0], ""
 
 
 def set_front(text, fields):
@@ -276,41 +300,59 @@ def plan(root):
     for old, (dest, _) in moves.items():
         if dest != old:
             by_name.setdefault(old.name, []).append(dest)
+    root = root.resolve()
     old_to_new = {o.resolve(): d.resolve() for o, (d, _) in moves.items() if d != o}
 
     rewrites = {}
     for f in md_files(root):
-        f_old = f.resolve()
+        f_old = Path(os.path.normpath(f.resolve()))
         f_new = old_to_new.get(f_old, f_old)
         text = moves[f][1] if f in moves else f.read_text(encoding="utf-8")
         out, changes = [], []
         pos = 0
+        spans = {}
         for m in TOKEN.finditer(text):
-            tok = m.group(1)
-            if "://" in text[max(0, m.start() - 10):m.start()]:
+            spans[m.start(1)] = (m.end(1), m.group(1))
+        for m in LINK_TARGET.finditer(text):
+            spans.setdefault(m.start(1), (m.end(1), m.group(1)))
+        last_end = 0
+        for start in sorted(spans):
+            end, tok = spans[start]
+            if start < last_end or not tok or tok in ("./", "../"):
                 continue
-            repo_style = tok.startswith("docs/")
-            target = (root / tok if repo_style else f_old.parent / tok).resolve()
+            if "://" in tok or tok.startswith(("/", "mailto:", "#")) or "://" in text[max(0, start - 10):start]:
+                continue
+            slash = tok.endswith("/")
+            core = tok.rstrip("/")
+            repo_style = core.startswith("docs/")
+            explicit_rel = core.startswith(("./", "../")) or bool(LINK_TARGET.match(text, max(0, start - 2)) and text[start - 2:start] == "](")
+            target = Path(os.path.normpath(root / core if repo_style else f_old.parent / core))
             new_target = old_to_new.get(target)
             if new_target is None and not target.exists():
-                # stale flat path to a note that now lives in one month folder
                 if target.parent == (root / "docs" / "notes").resolve():
                     cands = [c for c in by_name.get(target.name, []) if c.resolve() != target]
                     if len(cands) == 1:
                         new_target = cands[0].resolve()
             if new_target is None:
-                if f_new == f_old or repo_style or not target.exists():
+                if f_new == f_old or repo_style:
+                    continue
+                if not (target.exists() or explicit_rel):
                     continue
                 new_target = target  # moved file: rebase its own relative link
             if repo_style:
-                rep = new_target.relative_to(root.resolve()).as_posix()
+                rep_ = new_target.relative_to(root.resolve()).as_posix()
             else:
-                rep = os.path.relpath(new_target, f_new.parent).replace(os.sep, "/")
-            if rep == tok:
+                rep_ = os.path.relpath(new_target, f_new.parent).replace(os.sep, "/")
+                if core.startswith("./") and not rep_.startswith("."):
+                    rep_ = "./" + rep_
+            if slash:
+                rep_ += "/"
+            last_end = end
+            if rep_ == tok:
                 continue
-            out.append(text[pos:m.start(1)] + rep)
-            pos = m.end(1)
-            changes.append((tok, rep))
+            out.append(text[pos:start] + rep_)
+            pos = end
+            changes.append((tok, rep_))
         if changes:
             out.append(text[pos:])
             rewrites[f] = ("".join(out), changes)
@@ -398,6 +440,30 @@ def selftest():
         assert migrate(root) == 0
         assert "docs/notes/2026-08/2026-08-01-hand.md" in (spec / "spec.md").read_text()
         assert 'source: meeting 2026-08-01 "Sync"' in (notes / "2026-08" / "2026-08-01-hand.md").read_text()
+        # round 2: rebase every relative link in a moved note; multi Source lines
+        (root / "docs" / "sources" / "x").mkdir(parents=True)
+        (root / "docs" / "sources" / "x" / "mail.txt").write_text("m")
+        (notes / "2026-07-02-multi.md").write_text(
+            "# Multi\n\nDate: 2026-07-02\n\nSource: meeting 2026-07-02 \"Kickoff\"\n"
+            "Source: docs/sources/x/\n\n"
+            "Folder [f](../sources/x/), file [t](../sources/x/mail.txt), bare ../sources/x/mail.txt, "
+            "anchor [a](2026-09-01-other.md#top), url [u](https://e.com/a.md), root docs/sources/x/, [h](#local)\n")
+        (notes / "2026-07-03-list.md").write_text(
+            "---\ntitle: List\nsource: mail \"Hi\"\nsource_date: 2026-07-03\nimported: 2026-10-16\n---\n# List\n\n"
+            "Sources:\n- mail \"Hi\"\n- docs/sources/x/mail.txt\n")
+        (spec / "spec.md").write_text((spec / "spec.md").read_text() + "[m](../../../notes/2026-07-02-multi.md#part)\n")
+        assert migrate(root) == 0
+        mm = (notes / "2026-07" / "2026-07-02-multi.md").read_text()
+        for want in ["(../../sources/x/)", "(../../sources/x/mail.txt)", "bare ../../sources/x/mail.txt",
+                     "(../2026-09/2026-09-01-other.md#top)", "(https://e.com/a.md)", "root docs/sources/x/", "(#local)",
+                     "source: docs/sources/x/", "source_folder: docs/sources/x/"]:
+            assert want in mm, want
+        lt = (notes / "2026-07" / "2026-07-03-list.md").read_text()
+        assert 'source: mail "Hi"' in lt and "source_folder: docs/sources/x/" in lt, lt
+        assert "(../../../notes/2026-07/2026-07-02-multi.md#part)" in (spec / "spec.md").read_text()
+        snap = {p: p.read_text() for p in root.rglob("*.md")}
+        assert migrate(root) == 0
+        assert snap == {p: p.read_text() for p in root.rglob("*.md")}, "round 2 not idempotent"
         (notes / "2026-09" / "2026-09-30-call.md").write_text(
             "---\ntitle: Call\nkind: meeting\nsource: meeting 2026-09-30 \"Call\"\nsource_date: 2026-09-30\n"
             "imported: 2026-10-16\nused_by: [billing]\nwaiting_for: [baltic]\n---\n# Call\n\nfull text\n")

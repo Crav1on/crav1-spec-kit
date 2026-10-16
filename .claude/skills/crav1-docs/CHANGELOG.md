@@ -4,6 +4,22 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 
 ## Unreleased
 
+## 1.63.0 (2026-10-16)
+
+### Kit
+
+- `notes_index.py migrate`: a moved note's own relative links are all rebased, not only `.md` targets: folders (`../sources/x/` becomes `../../sources/x/`), `.txt` and any other file, with or without a trailing slash, with anchors. Absolute URLs, root-style `docs/` paths, and anchor-only links stay as they are. Inbound links to a moved note keep their anchor (`note.md#part`).
+- Source fill reads every `Source:` line and multi-item source lists (comma or semicolon items, `- item` bullets under `Source:` or `Sources:`). `source_folder` is the first `docs/sources/` path; `source` is that line or item verbatim. When none points into `docs/sources/`, `source` is the first one and `source_folder` stays empty. An empty `source_folder` is filled even when `source` is already set; a non-empty value is never overwritten.
+- `plugins/crav1/.cursor-plugin/plugin.json` is 1.63.0.
+
+### Docs
+
+- Data layout and refresh-system-notes describe the full link rebase and the multi-line source fill.
+
+### CI
+
+- The `notes_index.py --selftest` step covers folder, `.txt`, bare, and anchored link rebases; URLs, root-style, and anchor-only links left alone; anchored inbound links; multiple `Source:` lines; a `Sources:` list filling `source_folder` when `source` is set; and idempotence.
+
 ## 1.62.0 (2026-10-16)
 
 ### Kit
