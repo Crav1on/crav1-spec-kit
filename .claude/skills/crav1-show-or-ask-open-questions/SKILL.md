@@ -28,6 +28,8 @@ This skill was `/crav1-ask-open-questions`. Ask one question, with the questions
 
 Skip the question when the message says which: "show", "overview", "what is still open", or "who did we ask" is 1; a person, a channel, or "draft" is 2. The alias `/crav1-ask-open-questions` arrives with choice 2 already made.
 
+When the message or the files make one option the better fit, list it first and end its label with ` (Recommended)`. Otherwise keep the order above with no label.
+
 ## Choice words
 
 Exact words for bots and scripted runs. There are no `--flags`.

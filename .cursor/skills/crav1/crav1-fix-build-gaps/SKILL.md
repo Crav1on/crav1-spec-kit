@@ -28,6 +28,8 @@ Ask one question, with the questions tool when it is available:
 
 Skip the question when the message already says which: a `Gap` id, `T#`, or "from verify" is option 1; a URL, a port, "live", or "local host" is option 2. When `verify.md` is missing and the message names no live gap, stop and name `/crav1-verify-build-against-spec`. An alias (`/crav1-fix-from-verify`, `/crav1-fix-live`) arrives with its choice already made.
 
+When the message or the files make one option the better fit, list it first and end its label with ` (Recommended)`. Otherwise keep the order above with no label.
+
 ## Choice words
 
 Exact words for bots and scripted runs. There are no `--flags`.

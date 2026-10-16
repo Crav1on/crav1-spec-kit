@@ -43,6 +43,8 @@ Skip a question the message already answers: no attached files means repos only;
 
 When the user names no repos, stop and ask for them. Do not read the open checkout on your own.
 
+When the message or the files make one option the better fit, list it first and end its label with ` (Recommended)`. Otherwise keep the order above with no label.
+
 ## Choice words
 
 Exact words for bots and scripted runs. There are no `--flags`.

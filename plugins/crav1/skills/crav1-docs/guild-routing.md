@@ -155,6 +155,10 @@ When a note in `docs/research/` is updated, the skill that writes it follows the
 
 When you add, rename, or remove a skill, agent, or cross-cutting helper, update this file in the same pull request, together with [`docs/reference/skills.yaml`](reference/skills.yaml) and the pages generated from it. CI checks that the lanes there match the map below. Notify your process orchestrator or guild lead, if you have one, with the routing diff.
 
+## Recommended option
+
+Every question with options that has a recommendation lists that option first and ends its label with ` (Recommended)`. The question text does not also say `Recommendation: X`. This covers the opening questions of `/crav1-build-tasks`, `/crav1-fix-build-gaps`, `/crav1-add-to-spec`, `/crav1-ado-sync`, `/crav1-existing-to-specs`, `/crav1-finalize-commit`, and `/crav1-show-or-ask-open-questions` (marked only when the message or files make one option the better fit), keep, leave, dismiss, or note in `/crav1-add-to-spec`, keep or redact and the image options in the imported-sources check, the suggested patch letter in `/crav1-tighten-spec` and `/crav1-tighten-plan`, the branch choice in `/crav1-create-feature-branch`, and the task type in `/crav1-ado-sync`. The shared rule is in `crav1.mdc` (and `CLAUDE.md`).
+
 ## Choice words for bots and scripted runs
 
 The merged skills take exact choice words instead of `--flags`. A word in the invocation takes that choice without asking, for a person, a bot, or a headless run. A headless or bot run with no word stops and names the valid words; it does not guess. Runners should always pass the word.

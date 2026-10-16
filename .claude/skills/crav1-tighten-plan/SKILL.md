@@ -88,7 +88,7 @@ If they already answered this `P#` with a **patch** letter in the same message, 
 
 ### When they pick `suggest`
 
-Do **not** patch. Stay on this `P#`. Name the letter you would pick and why (2–4 sentences). Re-offer the same patch letters. At most **one** alternate suggestion, then they must pick a patch letter, `ask`, `keep`, or `send-to-spec`.
+Do **not** patch. Stay on this `P#`. Name the letter you would pick and why (2–4 sentences). Re-offer the same patch letters, with the suggested one first and its label ending in ` (Recommended)` (letters do not change). At most **one** alternate suggestion, then they must pick a patch letter, `ask`, `keep`, or `send-to-spec`.
 
 ### After a choice
 

@@ -108,10 +108,10 @@ After a meeting, every question that was asked or pending for that meeting and g
 
 ## Recommendation
 
-Show one recommendation on the item and in the question. Do not pick for the user.
+Show one recommendation on the item and in the question. In the question, the recommended option comes first and its label ends with ` (Recommended)`; the question text does not repeat it. Do not pick for the user.
 
 - **Keep** — the quote is a decision, a clarification, information, or an answer for an existing spec.
-- **Note** — the quote is worth keeping, and it is not those. Exploration with no feature yet, input that may feed several features, technical debt, and general information gathering are this case. A mail that maps tables and views when no spec covers it is this case. The line is `Recommendation: Note.`
+- **Note** — the quote is worth keeping, and it is not those. Exploration with no feature yet, input that may feed several features, technical debt, and general information gathering are this case. A mail that maps tables and views when no spec covers it is this case. The item line is `Recommended: Note.`
 - **Dismiss** — the quote is only noise: a greeting, scheduling, or thanks.
 
 This skill asks one item at a time. It does not have an accept-all question. Do not add one. The recommendation is the suggested answer.
@@ -167,7 +167,7 @@ Also fits: docs/specs/<slug>/ — <title line>
 Answers: "<question>" on docs/specs/<slug>/
 Possible answer to: "<question>" on docs/specs/<slug>/. The question stays open.
 State: <state>. <short reason that names the evidence>.
-Recommendation: Note.
+Recommended: Note.
 Already noted: docs/notes/<file>.md
 ```
 
@@ -177,23 +177,25 @@ On every later turn, list every item again. Mark the ones already answered `kept
 
 ## One at a time
 
-Ask about one item. Use the questions tool when it is available. The question text names the item and the spec when one fits, then the recommendation, then the same `State` line that is on the item. The options are only:
+Ask about one item. Use the questions tool when it is available. The question text names the item and the spec when one fits, then the same `State` line that is on the item. It does not say `Recommendation:`. The options are only these four. The recommended one comes first with ` (Recommended)` at the end of its label; the others keep this order:
 
-1. **Keep**
-2. **Leave**
-3. **Dismiss**
-4. **Note — keep it in the repo without tying it to a spec yet.**
+- **Keep**
+- **Leave**
+- **Dismiss**
+- **Note — keep it in the repo without tying it to a spec yet.**
 
 ```text
 M1: dev and prod containers. Add this to <slug>?
-Recommendation: Keep.
 State: partly built. Dev container done (task 4 checked); prod not in tasks.md.
 ```
 
+Options: **Keep (Recommended)**, Leave, Dismiss, Note.
+
 ```text
 M1: source-to-target mapping of the SQL tables. Note this, without a spec?
-Recommendation: Note.
 ```
+
+Options: **Note — keep it in the repo without tying it to a spec yet. (Recommended)**, Keep, Leave, Dismiss.
 
 When `Fits` is `none`, the question has no `State` line. The options stay Keep, Leave, Dismiss, and Note.
 
@@ -317,7 +319,7 @@ Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-spe
 - Match every item. Cases: addition, new feature, bug, or unclear. When more than one existing spec could fit, list every candidate.
 - An item that matches a spec gets one `State:` line in the item block and in the question. `Fits: none` gets no state line. The line is informational. It is not written and it is not quote text.
 - Every item stays listed. Nothing is dropped to keep the list short.
-- One item at a time: keep, leave, dismiss, or note. Show `Recommendation: Note.` when the item is worth keeping and is not a decision, a clarification, information, or an answer for an existing spec. Do not add an accept-all question. This skill does not have that pattern.
+- One item at a time: keep, leave, dismiss, or note. Mark Note as `(Recommended)` and list it first when the item is worth keeping and is not a decision, a clarification, information, or an answer for an existing spec. Do not add an accept-all question. This skill does not have that pattern.
 - Note writes `docs/notes/YYYY-MM-DD-<slug>.md` and one index line. It does not ask what kind of note it is. Read `docs/notes/` first. An item already noted is shown as already noted and is not written again.
 - Dismiss is for this run only, and for noise. Start fresh on every run. Do not write a dismissals file. Do not remember a dismiss across runs.
 - A kept addition goes to that spec through the fact branch of `/crav1-add-to-spec`. Before that handoff, when the source is not yet imported, follow `.cursor/skills/crav1/crav1-add-to-spec/references/sources.md` (plugin: sibling `skills/crav1-add-to-spec/references/sources.md`). That check recommends keep or redact, redacts secrets, and may write the transfer data policy after a yes. For a mail, it lists each embedded image, inline or attached, recommends convert to text or compress, and asks once. Nothing is written to the source folder until every image has an answer. Auto-accept applies to those recommendations only when the transfer data policy clearly covers them. Write the source folder once. Pass the kind, the date, and that folder. The quote starts with `From <kind> <date>.` when there is a date, otherwise `From <kind>.` The impact check still runs there, including research, following `.cursor/skills/crav1/crav1-add-to-spec/references/research-stale.md` (plugin: sibling `skills/crav1-add-to-spec/references/research-stale.md`). This skill does not run that check a second time. It does not write the stale block. Do not commit.

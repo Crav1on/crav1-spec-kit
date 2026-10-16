@@ -34,6 +34,8 @@ Skip the question when the message already says which: "candidates" or "which Fe
 
 Where a branch says it calls or names another of these five, that is the matching choice of this skill. Run it only where that branch says so.
 
+When the message or the files make one option the better fit, list it first and end its label with ` (Recommended)`. Otherwise keep the order above with no label.
+
 ## Choice words
 
 Exact words for bots and scripted runs. There are no `--flags`.

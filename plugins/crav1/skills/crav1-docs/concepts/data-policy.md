@@ -46,7 +46,7 @@ To change the policy, edit that file. To get the questions again, delete it.
 
 When something is flagged, the skill shows a short note once, marked as not legal advice, naming where the repo is hosted. Then it lists the items: numbered items with a recommendation, then the items it cannot place, then secrets by kind.
 
-With `review`, it asks one question: accept all, go through them one by one, or change some. With `auto-accept`, it applies the keep and redact recommendations. Items with no recommendation are always asked one at a time.
+With `review`, it asks one question: accept all, go through them one by one, or change some. With `auto-accept`, it applies the keep and redact recommendations. Items with no recommendation are always asked one at a time. When an item is asked, its recommended choice is the first option, labelled `(Recommended)`.
 
 A redact removes the item from the file and the quote and notes the redaction in the `README.md` by kind. The file is then no longer the untouched original, and the README says so. No file is written until every flagged item has an answer, and no unredacted copy is written to the repo.
 

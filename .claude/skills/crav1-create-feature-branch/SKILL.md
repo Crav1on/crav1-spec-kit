@@ -76,7 +76,7 @@ Stop. Do not write application code on a specify-only branch.
 
 Offer:
 
-1. Wait until `spec/<slug>` is on the default branch, then `/crav1-create-feature-branch` → `feat/<slug>` (recommended)
+1. Wait until `spec/<slug>` is on the default branch, then `/crav1-create-feature-branch` → `feat/<slug>` (Recommended)
 2. Convert: rename/check out `feat/<slug>` from here and treat it as the one-branch flow (spec+build together)
 3. Stay and specify more (no code)
 

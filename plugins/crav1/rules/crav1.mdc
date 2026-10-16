@@ -27,6 +27,7 @@ Standing rules for every kit skill:
 - Before you suggest more than one next step, or when the user questions an order, call `/crav1-help` and quote its answer with its source. Never give an order from memory.
 - Naming a next command is not running it. A skill runs another skill only where its own rules say so.
 - A cross-cutting skill may run from any lane. It does not move work into a lane and does not start Specify, Plan, or Build. A later skill is not a starter option.
+- A question with options that has a recommendation lists the recommended option first and ends its label with ` (Recommended)`, for example `Note (Recommended)`. The question text does not also say `Recommendation: X`. This holds for every opening question, binary choice, review choice, and keep/leave/dismiss/note question. A question with no recommendation keeps its order and has no label.
 - Production data is never read. Where a skill reads a cloud environment, pre-prod, shared-with-prod, and prod-only resources are shape and connections only, after one yes.
 - Shared conventions live in `crav1-add-to-spec` `references/`: `sources.md` for imported sources under `docs/sources/`, the personal-data and secrets check, and the transfer data policy; `open-questions.md` for the `Pending:`, `Asked:`, and `Answered:` lines; and `research-stale.md` for stale marks on `docs/research/`. A quoted note in `docs/notes/` gets `Used by <slug>`. `Absorbed by <slug>` only after the user says yes.
 

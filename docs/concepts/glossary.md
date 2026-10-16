@@ -34,6 +34,8 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 
 **Opening question.** The question a merged skill asks first, with options, to pick a branch. Skipped when the message already answers it; an alias answers it ahead.
 
+**Recommended option.** In any question with options, the option the kit recommends is listed first and its label ends with ` (Recommended)`, such as `Keep (Recommended)`. The question text does not repeat it as `Recommendation: X`. A question with no recommendation has no label.
+
 **Choice word.** An exact word that answers a merged skill's opening question, such as `push tasks` for `/crav1-ado-sync`. A word in the invocation skips the question. A headless or bot run with no word stops and names the valid words. Listed under `choice_words` in `skills.yaml`. Not a `--flag`.
 
 **Later skill.** Any skill that is not a starter option. Most run once specs already exist.
