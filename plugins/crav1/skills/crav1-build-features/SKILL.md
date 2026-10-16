@@ -129,6 +129,10 @@ Options are yes and no. Use the questions tool when it is available. Do not run 
 
 Do not ask when no slug was marked done and none was marked retired. Do not add this question to `/crav1-build-tasks`.
 
+## Parked and retired specs (1.60.0)
+
+Skip every spec under `docs/specs/retired/`, and every old-path `spec.md` that is only a `Moved:` pointer. A spec whose `spec.md` has a `Parked:` line is parked: do not build it, and leave it off the board's to-build list. Say `skipped: <slug> (parked)` and name `/crav1-retire-spec un-park docs/specs/<slug>/`. Do not remove the mark.
+
 ## Hard rules
 
 - Orchestration only: no product edits, no `git commit`, no push, no PR, no `spec.md` edits.

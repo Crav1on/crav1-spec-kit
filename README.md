@@ -35,7 +35,7 @@ Starter options run only when named. Asking for startup options lists them and d
 
 - Start with one starter option, then go Specify → Plan → Build → Verify → Commit and pull request.
 - Every command says what it reads and what it writes. Anything not listed is left alone.
-- Lanes per command: [guild routing](docs/guild-routing.md). Full rules per command: the [skills reference](docs/reference/skills.md), one page per skill. To have one piece of code explained (a file, a function, a selection, or a PR diff), use [`/crav1-explain-this-code`](docs/reference/skills/crav1-explain-this-code.md) ([walkthrough](docs/from-explain-this-code.md)). Skills were renamed in 1.56.0 and the old names were removed in 1.58.0 ([renamed skills](docs/README.md#renamed-skills-1560)).
+- Lanes per command: [guild routing](docs/guild-routing.md). Full rules per command: the [skills reference](docs/reference/skills.md), one page per skill. To have one piece of code explained (a file, a function, a selection, or a PR diff), use [`/crav1-explain-this-code`](docs/reference/skills/crav1-explain-this-code.md) ([walkthrough](docs/from-explain-this-code.md)). To take a spec out of the work (retire, merge, park, or convert to note), use [`/crav1-retire-spec`](docs/reference/skills/crav1-retire-spec.md) ([walkthrough](docs/from-retire-spec.md)). Skills were renamed in 1.56.0 and the old names were removed in 1.58.0 ([renamed skills](docs/README.md#renamed-skills-1560)).
 
 ```mermaid
 flowchart LR

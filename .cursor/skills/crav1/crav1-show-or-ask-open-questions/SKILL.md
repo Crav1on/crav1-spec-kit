@@ -146,6 +146,10 @@ Ask once for the draft. Options only. Use the questions tool when it is availabl
 
 When the user picks yes or pending, write the lines as the reference file says, with `Question <n>` from the draft. A question asked of the same person again replaces the earlier line for that person. When an import later shows the question being asked, that date replaces this one. Do not edit the question text. Do not edit any other line.
 
+## Parked and retired specs (1.60.0)
+
+Skip `docs/specs/retired/` and `Moved:` pointers. A parked spec (a `Parked:` line in `spec.md`) is still listed, its section heading marked `(parked)`; its questions can still be shown and asked. A note in `docs/notes/` that says `Waiting for <slug> (parked)` is not open work: list it as `waiting for parked <slug>` under that spec, not in the open counts.
+
 ## Stop
 
 The only file this command writes is `docs/specs/<slug>/spec.md`, and in that file only the `Asked:` and `Pending:` lines under open questions, and the transfer data policy after a yes, as the personal-data check says. It does not write `docs/system/`, `plan.md`, `tasks.md`, `verify.md`, or a draft file. It does not send, post, or reply. It does not commit, push, or open a pull request.

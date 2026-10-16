@@ -1382,6 +1382,58 @@ skills:
   first_prompt: '/crav1-explain-this-code what it does
 
     @src/<file>'
+- name: crav1-retire-spec
+  choice_words:
+  - question: What to do
+    words:
+    - word: "retire"
+      means: "retire"
+    - word: "merge"
+      means: "merge"
+    - word: "park"
+      means: "park"
+    - word: "convert to note"
+      means: "convert to note"
+  lane: cross-cutting
+  group: Keep the picture current
+  starter: false
+  since: 1.60.0
+  stage: stable
+  walkthrough: docs/from-retire-spec.md
+  purpose: Take one spec out of the work (retire, merge, park, or convert to note), or un-park it.
+  in_depth:
+  - '**`/crav1-retire-spec`** takes one spec out of the work. It opens with one question: retire (Recommended),
+    merge, park, or convert to note, and skips it when the wording answers. A headless or bot run with
+    no choice word stops and lists the words. It always shows a summary of every change and waits for
+    a yes. It never deletes; a moved spec leaves a one-line `Moved:` pointer at its old path. Retire moves
+    the spec to `docs/specs/retired/` with a `Retired:` line, removes its feature-index row, and flags
+    links to it. Merge takes a named target or suggests only real fits with a reason each (shared feature
+    area, overlapping requirements, same system in landscape, links), best first, or says `no good merge
+    fit found`; content, open questions, and decisions move over credited `(from <slug>)`. Park adds a
+    `Parked:` line in place; plan, build, and ado-sync push skip it, and add-to-spec saves matching input
+    as one note waiting for it. Un-park re-reads each waiting note in full and adds the spec to `Used by`.
+    Convert to note writes `docs/notes/` with a `Source:` line, an index row, and a landscape line.'
+  use_when: A spec is done, dead, belongs in another spec, should wait, or is only reference knowledge
+  table:
+    reads: The named spec, the other specs, the feature index, landscape, and `docs/notes/`
+    writes: After a yes, the moved spec and its pointer, the feature index, and for merge or convert the target spec or note
+  reads: Reads the named `docs/specs/<slug>/`, the other specs (for merge fits and links), `docs/system/landscape.md`,
+    and `docs/notes/` (waiting notes on un-park).
+  writes: After a yes only. Retire and merge move the folder to `docs/specs/retired/<slug>/` and leave
+    a `Moved:` pointer; merge also writes the target `spec.md`. Park writes a `Parked:` line. Un-park removes
+    it, adds chosen points, and turns `Waiting for` into `Used by` on notes. Convert writes `docs/notes/<date>-<slug>.md`,
+    its index row, and one line under `## How the parts connect`. Retire, merge, and convert remove the
+    feature-index row.
+  leaves_alone: Never deletes a file. Leaves other specs alone (except the merge target) and does not rewrite
+    inbound links; it lists them.
+  exceptions: no target fits a merge says `no good merge fit found` and offers park, retire, or convert
+    to note. A converted note has no research owner, so no revisit request.
+  called_by: Called by the user.
+  runs_by_itself: Calls no skill.
+  you_run_next: []
+  first_prompt: '/crav1-retire-spec retire
+
+    docs/specs/<slug>/'
 - name: crav1-what-do-we-know-about-this
   lane: cross-cutting
   group: Keep the picture current

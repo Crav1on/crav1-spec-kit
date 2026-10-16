@@ -145,6 +145,10 @@ At most once per chat, in the first answer:
 
 Offline, a failed read, or no newer tag: say nothing. Never read a doc, a changelog, or a skill from GitHub, and never answer from a newer version.
 
+## Parked and retired specs (1.60.0)
+
+When the answer lists specs or the next step, skip `docs/specs/retired/` and `Moved:` pointers. List each spec with a `Parked:` line under **Parked**, with its date and reason and the count of notes in `docs/notes/` that say `Waiting for <slug> (parked)`, for example `baltic-trades (parked 2026-10-16, waiting on partner), 2 notes waiting`. Name `/crav1-retire-spec un-park docs/specs/<slug>/` to pick one up. Do not run it.
+
 ## What it does not do
 
 - No file write, no commit, no network read beyond the tag names above.

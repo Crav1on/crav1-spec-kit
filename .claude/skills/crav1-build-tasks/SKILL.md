@@ -52,3 +52,7 @@ Each worker follows [branches/one-task/references/run.md](branches/one-task/refe
 ## After
 
 Every path ends with the batch or single-task TL;DR from its branch, then names `/crav1-open-pr`. Do not run it. Do not push.
+
+## Parked and retired specs (1.60.0)
+
+Skip every spec under `docs/specs/retired/`, and every old-path `spec.md` that is only a `Moved:` pointer. A spec whose `spec.md` has a `Parked:` line is parked: do not build its tasks. Say `skipped: <slug> (parked)` and name `/crav1-retire-spec un-park docs/specs/<slug>/`. Do not remove the mark.
