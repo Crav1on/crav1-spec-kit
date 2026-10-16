@@ -4,6 +4,19 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 
 ## Unreleased
 
+## 1.59.0 (2026-10-16)
+
+### Kit
+
+- New skill `/crav1-explain-this-code` (cross-cutting, Keep the picture current, standalone, any time). Explains a file, a function, a selection, or a PR diff, and asks what to explain when none is named. Opening question with choice words `what it does` (Recommended), `what and why`, `teach the language`; skipped when the wording answers; a headless or bot run with no word stops and lists the words. Reads only the code and the code it calls and never guesses. What and why takes reasons only from the code, specs, plan decisions, system notes, and commits, else `no stated reason found`. Teach the language adds idiom notes, a one-line comparison to a language the user knows, and topics to look up next. Every answer has a small mermaid flowchart built from what was read. Read-only, in chat; nothing is written to `docs/` or the kit layout.
+- Save as .md: offered at the end. After showing the full path and asking, it writes `explain-this-code-<target>-<date>.md` to `~/Downloads` (`%USERPROFILE%\Downloads` on Windows) or a path the user names, never into the repo by default. The header names the paths covered and `<branch>@<short sha>`. The kit never reads or indexes it.
+- `/crav1-help` names it apart from `/crav1-explain-existing-system` and compares the two.
+- `plugins/crav1/.cursor-plugin/plugin.json` is 1.59.0.
+
+### Docs
+
+- New walkthrough [Explain this code](docs/from-explain-this-code.md); skills reference page; guild routing (cross-cutting); docs index; README; glossary (saved explanation); `workflow.yaml` override (no next step).
+
 ## 1.58.0 (2026-10-16)
 
 ### Breaking
