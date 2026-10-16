@@ -42,6 +42,8 @@ This is not `/crav1-existing-to-specs`, `/crav1-bundle-to-specs`, `/crav1-spark-
 
 A not-started spec (match status `not in the code`, or a thin spec) can keep taking information until planning. Adding information does not start planning and does not write `plan.md` or `tasks.md`.
 
+When the message or the files make one option the better fit, list it first and end its label with ` (Recommended)`. Otherwise keep the order above with no label.
+
 ## Choice words
 
 Exact words for bots and scripted runs. There are no `--flags`.

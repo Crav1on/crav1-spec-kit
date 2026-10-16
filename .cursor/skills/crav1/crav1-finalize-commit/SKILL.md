@@ -37,6 +37,8 @@ Order: (1) style menu if no persist rule, (2) generate and show Summary/Descript
 
 Paste-only (no copy/edit/commit choices): tell them `/crav1-finalize-commit` instead, or they can pick `copy` here.
 
+When the message or the files make one option the better fit, list it first and end its label with ` (Recommended)`. Otherwise keep the order above with no label.
+
 ## Choice words
 
 Exact words for bots and scripted runs. There are no `--flags`.
