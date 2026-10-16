@@ -4,6 +4,24 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 
 ## Unreleased
 
+## 1.62.0 (2026-10-16)
+
+### Kit
+
+- `notes_index.py migrate` rewrites references: every markdown link or path to a moved note anywhere in the repo (specs including parked and retired, `docs/system/`, `docs/sources/**/README.md`, other notes, `Full source:` and `Source:` lines) is updated to the month-folder path, keeping repo-root style or computing the correct relative path. A moved note's own relative links are rebased. Each changed file is listed.
+- `migrate` fills front matter `source` (the `Source:` line verbatim) and `source_folder` (the `docs/sources/` path in it) from each note's existing `Source:` line; with no `Source:` line both stay empty, never guessed. `/crav1-add-to-spec`'s already-imported check matches on these fields.
+- New mode `notes_index.py migrate-dry-run` prints the planned moves, source fills, and link rewrites and writes nothing. `/crav1-refresh-system-notes` recommends it before `migrate`.
+- `migrate` is idempotent: a second run changes nothing; after a manual move it fixes stale flat-path links and empty source fields only.
+- `plugins/crav1/.cursor-plugin/plugin.json` is 1.62.0.
+
+### Docs
+
+- Data layout: dry run, link rewrites, source fills.
+
+### CI
+
+- The `notes_index.py --selftest` step now covers link rewrites (including retired specs and source READMEs), source fill, an empty fill with no `Source:` line, dry run writing nothing, idempotence, and a manual move.
+
 ## 1.61.0 (2026-10-16)
 
 ### Kit

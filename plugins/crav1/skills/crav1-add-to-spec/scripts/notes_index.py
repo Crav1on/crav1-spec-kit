@@ -22,8 +22,15 @@ Indexes are generated, never hand-edited:
 Usage (from the product repo root, or pass --root):
     python3 notes_index.py            rebuild every index
     python3 notes_index.py --check    exit 1 when an index differs from a rebuild
+    python3 notes_index.py migrate-dry-run
+                                      print planned moves, source fills, and link
+                                      rewrites; write nothing (run this first)
     python3 notes_index.py migrate    one-time: move docs/notes/*.md into month
-                                      folders by source date, then rebuild
+                                      folders by source date, fill source and
+                                      source_folder from each Source: line, rewrite
+                                      every markdown link to a moved note, rebuild.
+                                      Safe to re-run (also fixes stale links and
+                                      empty source fields after a manual move)
     python3 notes_index.py --selftest
 
 Old notes without front matter are read gracefully: `Date:` line or filename
@@ -166,21 +173,76 @@ def git_add_date(root, path):
         return ""
 
 
-def migrate(root):
+SOURCE_LINE = re.compile(r"^Source:\s*(.+?)\s*$", re.M)
+SOURCES_PATH = re.compile(r"(docs/sources/[\w./-]+?)/?(?=[\s`)\]]|$)")
+TOKEN = re.compile(r"(?<![\w./-])((?:\.{1,2}/)*[\w.-]+(?:/[\w.-]+)*\.md)(?![\w/-])")
+SKIP_DIRS = {".git", "node_modules"}
+
+
+def source_fields(text):
+    """Mechanical: `source` is the Source: line verbatim, `source_folder` the
+    docs/sources/ path in it. No Source: line -> both empty. Never guessed."""
+    body = text
+    if text.startswith("---\n"):
+        end = text.find("\n---", 4)
+        body = text[end + 4:] if end != -1 else text
+    m = SOURCE_LINE.search(body)
+    if not m:
+        return "", ""
+    src = m.group(1).strip()
+    f = SOURCES_PATH.search(src.replace("`", " "))
+    return src, (f.group(1) + "/") if f else ""
+
+
+def set_front(text, fields):
+    """Fill empty or missing front-matter keys; never overwrite a value."""
+    end = text.find("\n---", 4)
+    lines = text[4:end].splitlines()
+    have = {}
+    for i, line in enumerate(lines):
+        if ":" in line:
+            have[line.split(":", 1)[0].strip()] = i
+    changed = []
+    for k, v in fields.items():
+        if not v:
+            continue
+        if k in have:
+            cur = lines[have[k]].split(":", 1)[1].strip()
+            if cur:
+                continue
+            lines[have[k]] = f"{k}: {v}"
+        else:
+            lines.append(f"{k}: {v}")
+        changed.append(k)
+    return "---\n" + "\n".join(lines) + text[end:], changed
+
+
+def md_files(root):
+    for dp, dns, fns in os.walk(root):
+        dns[:] = [d for d in dns if d not in SKIP_DIRS and not (d.startswith(".") and dp == str(root))]
+        for fn in fns:
+            if fn.endswith(".md"):
+                yield Path(dp) / fn
+
+
+def plan(root):
+    """Return moves, front-matter fills, and link rewrites. Writes nothing."""
     notes = root / "docs" / "notes"
+    moves, fills = {}, {}
     if not notes.is_dir():
-        print("no docs/notes/; nothing to migrate")
-        return 0
+        return moves, fills, {}
     for f in sorted(notes.glob("*.md")):
         if f.name in ("index.md", "README.md"):
             continue
         n = read_note(f)
-        date = n["date"]
         text = f.read_text(encoding="utf-8")
+        date = n["date"]
+        src, folder = source_fields(text)
         if not text.startswith("---\n"):
             imported = git_add_date(root, f)
             fm = ["---", f"title: {n['title']}", "kind: " + (n["kind"] or "note"),
-                  f"source_date: {date or 'none'}", f"imported: {imported or date or 'unknown'}"]
+                  f"source: {src}", f"source_date: {date or 'none'}",
+                  f"imported: {imported or date or 'unknown'}", f"source_folder: {folder}"]
             if n["used_by"]:
                 fm.append("used_by: [" + ", ".join(n["used_by"]) + "]")
             if n["waiting_for"]:
@@ -188,15 +250,107 @@ def migrate(root):
             text = "\n".join(fm) + "\n---\n" + text
             if not date and imported:
                 date = imported
-        month = date[:7] if date else "undated"
-        dest = notes / month / f.name
-        dest.parent.mkdir(parents=True, exist_ok=True)
+            fills[f] = [k for k, v in (("source", src), ("source_folder", folder)) if v]
+        else:
+            text, ch = set_front(text, {"source": src, "source_folder": folder})
+            if ch:
+                fills[f] = ch
+        dest = notes / (date[:7] if date else "undated") / f.name
         if dest.exists():
-            print(f"skip {f.name}: {dest.relative_to(root)} exists")
+            print(f"skip {f.relative_to(root)}: {dest.relative_to(root)} exists")
             continue
+        moves[f] = (dest, text)
+    # notes already in month folders (manual migration): fill only
+    for f in note_files(notes):
+        text = f.read_text(encoding="utf-8")
+        if text.startswith("---\n"):
+            src, folder = source_fields(text)
+            new, ch = set_front(text, {"source": src, "source_folder": folder})
+            if ch:
+                fills[f] = ch
+                moves.setdefault(f, (f, new))
+    # names of notes in month folders, for stale links after a manual move
+    by_name = {}
+    for f in note_files(notes):
+        by_name.setdefault(f.name, []).append(f)
+    for old, (dest, _) in moves.items():
+        if dest != old:
+            by_name.setdefault(old.name, []).append(dest)
+    old_to_new = {o.resolve(): d.resolve() for o, (d, _) in moves.items() if d != o}
+
+    rewrites = {}
+    for f in md_files(root):
+        f_old = f.resolve()
+        f_new = old_to_new.get(f_old, f_old)
+        text = moves[f][1] if f in moves else f.read_text(encoding="utf-8")
+        out, changes = [], []
+        pos = 0
+        for m in TOKEN.finditer(text):
+            tok = m.group(1)
+            if "://" in text[max(0, m.start() - 10):m.start()]:
+                continue
+            repo_style = tok.startswith("docs/")
+            target = (root / tok if repo_style else f_old.parent / tok).resolve()
+            new_target = old_to_new.get(target)
+            if new_target is None and not target.exists():
+                # stale flat path to a note that now lives in one month folder
+                if target.parent == (root / "docs" / "notes").resolve():
+                    cands = [c for c in by_name.get(target.name, []) if c.resolve() != target]
+                    if len(cands) == 1:
+                        new_target = cands[0].resolve()
+            if new_target is None:
+                if f_new == f_old or repo_style or not target.exists():
+                    continue
+                new_target = target  # moved file: rebase its own relative link
+            if repo_style:
+                rep = new_target.relative_to(root.resolve()).as_posix()
+            else:
+                rep = os.path.relpath(new_target, f_new.parent).replace(os.sep, "/")
+            if rep == tok:
+                continue
+            out.append(text[pos:m.start(1)] + rep)
+            pos = m.end(1)
+            changes.append((tok, rep))
+        if changes:
+            out.append(text[pos:])
+            rewrites[f] = ("".join(out), changes)
+    return moves, fills, rewrites
+
+
+def migrate(root, dry_run=False):
+    notes = root / "docs" / "notes"
+    if not notes.is_dir():
+        print("no docs/notes/; nothing to migrate")
+        return 0
+    moves, fills, rewrites = plan(root)
+    tag = "would " if dry_run else ""
+    rel = lambda p: p.relative_to(root).as_posix()
+    for old, (dest, _) in moves.items():
+        if dest != old:
+            print(f"{tag}move {rel(old)} -> {rel(dest)}")
+    for f, keys in fills.items():
+        print(f"{tag}fill {', '.join(keys)} in {rel(f)} (from its Source: line)")
+    for f, (_, ch) in rewrites.items():
+        for a, b in ch:
+            print(f"{tag}rewrite {rel(f)}: {a} -> {b}")
+    if not (moves or rewrites):
+        print("nothing to migrate")
+    if dry_run:
+        print("dry run: nothing written")
+        return 0
+    for f, (text, _) in rewrites.items():
+        if f in moves:
+            moves[f] = (moves[f][0], text)
+        else:
+            f.write_text(text, encoding="utf-8")
+    for old, (dest, text) in moves.items():
+        dest.parent.mkdir(parents=True, exist_ok=True)
         dest.write_text(text, encoding="utf-8")
-        f.unlink()
-        print(f"moved {f.relative_to(root)} -> {dest.relative_to(root)}")
+        if dest != old:
+            old.unlink()
+    changed = sorted({rel(f) for f in rewrites if f not in moves})
+    if changed:
+        print("files with rewritten links: " + ", ".join(changed))
     return build(root)
 
 
@@ -207,18 +361,50 @@ def selftest():
         notes.mkdir(parents=True)
         (notes / "index.md").write_text("| old | hand | index |\n")
         (notes / "2026-10-06-mapping.md").write_text(
-            "# Mapping\n\nDate: 2026-10-06\n\nFrom email. \"x\"\n\n## Used by\n\nUsed by orders\nAbsorbed by orders\n")
+            "# Mapping\n\nDate: 2026-10-06\n\nFrom email. \"x\"\n\nSource: docs/sources/2026-10-06-mail/\n\n"
+            "See [other](2026-09-01-other.md) and [src](../sources/2026-10-06-mail/README.md).\n\n"
+            "## Used by\n\nUsed by orders\nAbsorbed by orders\n")
+        (notes / "2026-09-01-other.md").write_text("# Other\n\nDate: 2026-09-01\n\n## Used by\n")
+        (root / "docs" / "sources" / "2026-10-06-mail").mkdir(parents=True)
+        (root / "docs" / "sources" / "2026-10-06-mail" / "README.md").write_text(
+            "Noted in [note](../../notes/2026-10-06-mapping.md).\n")
+        spec = root / "docs" / "specs" / "retired" / "orders"
+        spec.mkdir(parents=True)
+        (spec / "spec.md").write_text("Full source: docs/notes/2026-10-06-mapping.md\n"
+                                      "[n](../../../notes/2026-10-06-mapping.md)\n")
+        before = {p: p.read_text() for p in root.rglob("*.md")}
+        assert migrate(root, dry_run=True) == 0
+        assert before == {p: p.read_text() for p in root.rglob("*.md")}, "dry run wrote"
         assert migrate(root) == 0
         m = notes / "2026-10" / "2026-10-06-mapping.md"
-        assert m.exists() and m.read_text().startswith("---\n")
-        (notes / "2026-09").mkdir()
+        mt = m.read_text()
+        assert "source: docs/sources/2026-10-06-mail/" in mt and "source_folder: docs/sources/2026-10-06-mail/" in mt
+        assert "(../2026-09/2026-09-01-other.md)" in mt and "(../../sources/2026-10-06-mail/README.md)" in mt
+        st = (spec / "spec.md").read_text()
+        assert "Full source: docs/notes/2026-10/2026-10-06-mapping.md" in st
+        assert "(../../../notes/2026-10/2026-10-06-mapping.md)" in st
+        assert "(../../notes/2026-10/2026-10-06-mapping.md)" in (
+            root / "docs" / "sources" / "2026-10-06-mail" / "README.md").read_text()
+        o = (notes / "2026-09" / "2026-09-01-other.md").read_text()
+        assert "source: \n" in o and "source_folder: \n" in o, "no Source: line must stay empty"
+        snap = {p: p.read_text() for p in root.rglob("*.md")}
+        assert migrate(root) == 0
+        assert snap == {p: p.read_text() for p in root.rglob("*.md")}, "not idempotent"
+        # manual migration: file moved by hand, link left stale
+        (notes / "2026-08").mkdir()
+        (notes / "2026-08" / "2026-08-01-hand.md").write_text(
+            "---\ntitle: Hand\nsource_date: 2026-08-01\nimported: 2026-10-16\n---\n# Hand\n\nSource: meeting 2026-08-01 \"Sync\"\n")
+        (spec / "spec.md").write_text(st + "Full source: docs/notes/2026-08-01-hand.md\n")
+        assert migrate(root) == 0
+        assert "docs/notes/2026-08/2026-08-01-hand.md" in (spec / "spec.md").read_text()
+        assert 'source: meeting 2026-08-01 "Sync"' in (notes / "2026-08" / "2026-08-01-hand.md").read_text()
         (notes / "2026-09" / "2026-09-30-call.md").write_text(
             "---\ntitle: Call\nkind: meeting\nsource: meeting 2026-09-30 \"Call\"\nsource_date: 2026-09-30\n"
             "imported: 2026-10-16\nused_by: [billing]\nwaiting_for: [baltic]\n---\n# Call\n\nfull text\n")
         assert build(root, check=True) == 1
         assert build(root) == 0 and build(root, check=True) == 0
         top = (notes / "index.md").read_text()
-        assert "[2026-10](2026-10/index.md) | 1 | 0" in top and "[2026-09](2026-09/index.md) | 1 | 1" in top
+        assert "[2026-09](2026-09/index.md) | 2 | 1" in top
         assert "old: absorbed" in (notes / "2026-10" / "index.md").read_text()
     print("selftest ok")
     return 0
@@ -226,7 +412,7 @@ def selftest():
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("command", nargs="?", choices=["build", "migrate"], default="build")
+    ap.add_argument("command", nargs="?", choices=["build", "migrate", "migrate-dry-run"], default="build")
     ap.add_argument("--check", action="store_true")
     ap.add_argument("--root", default=".")
     ap.add_argument("--selftest", action="store_true")
@@ -234,7 +420,9 @@ def main():
     if a.selftest:
         return selftest()
     root = Path(a.root).resolve()
-    return migrate(root) if a.command == "migrate" else build(root, a.check)
+    if a.command in ("migrate", "migrate-dry-run"):
+        return migrate(root, dry_run=a.command == "migrate-dry-run")
+    return build(root, a.check)
 
 
 if __name__ == "__main__":
