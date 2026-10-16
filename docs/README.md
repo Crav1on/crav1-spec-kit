@@ -144,9 +144,9 @@ You change the kit itself.
 
 ## Renamed skills (1.56.0)
 
-The old names still work until 1.58.0. Each one says it was renamed and hands off to the new skill with its choice word, so the opening question is not asked.
+The old names were removed in 1.58.0 and no longer run. Use the new name, with the choice word where one is listed. `/crav1-help <old name>` answers with the new name.
 
-| Old name | Now | Choice word it passes |
+| Old name | Now | Choice word to use |
 | --- | --- | --- |
 | `/crav1-implement-task` | [`/crav1-build-tasks`](reference/skills/crav1-build-tasks.md) | `one task` |
 | `/crav1-complete-task` | [`/crav1-build-tasks`](reference/skills/crav1-build-tasks.md) | `one task` |
