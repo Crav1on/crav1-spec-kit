@@ -83,9 +83,7 @@ skills:
     that cell empty. When this run read only that slice''s code, writes or updates `Synced at: <repo>
     <branch>@<short sha>, <date>` on that slice''s `spec.md` and does not touch the repo column.'
   leaves_alone: Leaves application code and an existing landscape alone.
-  exceptions: extend edits that spec and adds no second index row. A quoted note in `docs/notes/` gets
-    `Used by <slug>`. `Absorbed by <slug>` only after the user says yes, when this spec takes the whole
-    note.
+  exceptions: extend edits that spec and adds no second index row. A quoted note in `docs/notes/` gets its slug in `used_by` and a `Full source:` link; notes are never absorbed (1.61.0).
   called_by: Called by the user.
   runs_by_itself: Calls `/crav1-create-feature-branch` when the repo already has commits.
   you_run_next:
@@ -128,9 +126,7 @@ skills:
     it reads only one slice, leaves that column alone and writes or updates `Synced at: <repo> <branch>@<short
     sha>, <date>` on that slice''s `spec.md`.'
   leaves_alone: Leaves application code and the rest of an existing landscape alone.
-  exceptions: two or more v0 slices or repos writes nothing and points at `/crav1-bundle-to-specs`. A
-    quoted note in `docs/notes/` gets `Used by <slug>`. `Absorbed by <slug>` only after the user says
-    yes, when this spec takes the whole note.
+  exceptions: two or more v0 slices or repos writes nothing and points at `/crav1-bundle-to-specs`. A quoted note in `docs/notes/` gets its slug in `used_by` and a `Full source:` link; notes are never absorbed (1.61.0).
   called_by: Called by the user.
   runs_by_itself: Calls `/crav1-create-feature-branch` when the repo already has commits.
   you_run_next:
@@ -186,9 +182,7 @@ skills:
     touches only those repos. Where it reads only one slice, leaves that column alone and writes or updates
     `Synced at: <repo> <branch>@<short sha>, <date>` on that slice''s `spec.md`.'
   leaves_alone: Leaves application code, `plan.md`, and later slices alone. Does not commit.
-  exceptions: prompts `/crav1-finalize-commit` and does not run it. A quoted note in `docs/notes/` gets
-    `Used by <slug>`. `Absorbed by <slug>` only after the user says yes, when this spec takes the whole
-    note.
+  exceptions: prompts `/crav1-finalize-commit` and does not run it. A quoted note in `docs/notes/` gets its slug in `used_by` and a `Full source:` link; notes are never absorbed (1.61.0).
   called_by: Called by the user.
   runs_by_itself: Calls `/crav1-create-feature-branch` when the repo already has commits.
   you_run_next:
@@ -297,8 +291,7 @@ skills:
     feature alone. On the pass that creates the architecture spec while system notes are already there,
     that cell is the only edit to those notes.'
   exceptions: 'Repos plus a bundle: a slice that is not in the code stays thin and is not planned here.
-    A quoted note in `docs/notes/` gets `Used by <slug>`. `Absorbed by <slug>` only after the user says
-    yes, when this spec takes the whole note. Repos only: before writing, one question per section (each
+    A quoted note in `docs/notes/` gets its slug in `used_by` and a `Full source:` link; notes are never absorbed (1.61.0). Repos only: before writing, one question per section (each
     named repo, inferred guesses, links, left-out) and every item stays listed. A later re-read adds only
     what is new to the spec and notes, sets `Synced at` for repos it read without rewriting the rest of
     that row, and removes a left-out line when the code shows it or that section dismisses it. A guess
@@ -520,9 +513,7 @@ skills:
     that read.
   exceptions: a different open repo or branch, a missing branch, a stub, or a spec too thin for that read
     stops and does not tighten. `suggest` does not patch. A disagreement with the code is called out and
-    the spec is not rewritten to match the code. Finish, add a test, and leave are not choices here. A
-    quoted note in `docs/notes/` gets `Used by <slug>`. `Absorbed by <slug>` only after the user says
-    yes, when this spec takes the whole note.
+    the spec is not rewritten to match the code. Finish, add a test, and leave are not choices here. A quoted note in `docs/notes/` gets its slug in `used_by` and a `Full source:` link; notes are never absorbed (1.61.0).
   called_by: Called by the user.
   runs_by_itself: Calls no skill.
   you_run_next:
@@ -646,8 +637,8 @@ skills:
     unless apply is chosen. A meaning the new information does not state is `to be researched`. Existing
     rows are not rewritten. Does not plan, implement, or commit.'
   - 'A dump (was `/crav1-match-dump-to-specs`): A later dump, specs already exist → sort onto those specs
-    (belongs, already there, note, or does not fit), then quote the new bits. A confirmed note is written
-    under `docs/notes/`. Does not ask for a slug first. Does not create a slug. Does not seed `docs/system/`.
+    (belongs, already there, or does not fit), then quote the new bits. The whole dump is written as
+    one full note in `docs/notes/YYYY-MM/` (1.61.0). Does not ask for a slug first. Does not create a slug. Does not seed `docs/system/`.
     Fills a missing `glossary.md` only when that folder already exists. New glossary rows are appended.
     Existing rows are not rewritten. A meaning the source does not state is `to be researched`. That same
     pass adds what is new to the short description, the diagram, and how the parts connect. It does not
@@ -671,9 +662,9 @@ skills:
     is that slice’s `spec.md` (including `## Match`), `plan.md`, `tasks.md` checkboxes, and `verify.md`
     when present. When those do not settle it, one read-only look at the code that spec or plan points
     to. A code-based or uncertain state is labeled `(inference, not in the docs)`. The line does not change
-    keep, leave, dismiss, or note. It is not written and it is not passed to `/crav1-add-to-spec` as quote
-    text. The user takes them one at a time: keep, leave, dismiss, or note. Note keeps the quote in `docs/notes/`
-    without tying it to a spec yet. Dismiss is for this run only. The next run starts fresh. A kept addition
+    keep, leave, or dismiss. It is not written and it is not passed to `/crav1-add-to-spec` as quote
+    text. The user takes them one at a time: keep, leave, or dismiss. The whole input is always written once
+    as one full note in `docs/notes/YYYY-MM/` by source date (1.61.0); a left item stays in that note. Dismiss is for this run only. The next run starts fresh. A kept addition
     goes to that spec through `/crav1-add-to-spec`. The quote starts with `From <kind> <date>.` when there
     is a date, otherwise `From <kind>.` The impact check still runs there. A kept new feature names `/crav1-spark-to-spec`,
     `/crav1-ideas-to-spec`, or `/crav1-bundle-to-specs`. A kept bug names `/crav1-fix-bug`. Those commands
@@ -683,24 +674,24 @@ skills:
     option. Asking for startup options names only the six and does not run this command. The six starter
     options stay unchanged.'
   - 'A meeting (was `/crav1-meeting-to-specs`): Minutes, a transcript, an email, or a chat thread → quotes
-    matched to existing specs, keep, leave, dismiss, or note one at a time. A kept addition goes through
+    matched to existing specs, keep, leave, or dismiss one at a time; the whole input is one full note. A kept addition goes through
     `/crav1-add-to-spec`. A clear answer to a spec open question is linked under it.'
   use_when: New information for specs that already exist
   table:
     reads: 'A fact: That information and one `spec.md`; A dump: The dump and existing spec folders; A
       code change: A commit, range, or branch diff, plus specs; A meeting: That input and existing spec
       folders'
-    writes: 'A fact: Quotes in that spec, `Used by` on a note it quotes, `docs/sources/` for an imported
+    writes: 'Every kind: one full note in `docs/notes/YYYY-MM/` by source date and the generated indexes;
+      A fact: Short quotes in that spec with a `Full source:` link, `docs/sources/` for an imported
       source, the transfer data policy after a yes, research stale marks after a yes, and answer links
-      under open questions; A dump: Confirmed new quotes in matching specs, `docs/notes/` for a note,
+      under open questions; A dump: Confirmed new quotes in matching specs,
       `docs/sources/` for an imported source, the transfer data policy after a yes, research stale marks
       after a yes, and answer links under open questions; A code change: Quotes of what belongs in matching
       specs, a missing `glossary.md` or new glossary rows when `docs/system/` exists, the picture update,
       `Synced at` (repo cell or slice line), and research stale marks after a yes; other listed edits
-      only on apply; A meeting: A source folder when a kept addition imports one, `docs/notes/` when the
-      user picks Note, the transfer data policy after a yes; answer links and asked marks through `/crav1-add-to-spec`'
+      only on apply; A meeting: A source folder when a kept addition imports one, the transfer data policy after a yes; answer links and asked marks through `/crav1-add-to-spec`'
   reads: 'A fact: Reads the new information and one existing `spec.md`. A dump: Reads the dump, existing
-    spec folders, skipping `_template`, and `docs/notes/` so the same item is not noted twice. A code
+    spec folders, skipping `_template`, and the generated notes indexes so the same source is not imported twice. A code
     change: Reads a named commit, range, or branch diff, and existing spec folders. A meeting: Reads the
     minutes, transcript, email, or chat after the command, and existing `docs/specs/<slug>/` folders,
     skipping `_template`. For an item that matches a slice, also reads that slice’s `spec.md` (including
@@ -715,9 +706,10 @@ skills:
     or attached. It recommends convert to text when the image is a diagram, a table, or text that can
     be reproduced exactly, and compress otherwise. It asks once before the source folder is written. Auto-accept
     applies to those recommendations only when the transfer data policy clearly covers them. A meeting
-    handoff that already wrote the folder only adds those lines. When the quote comes from a note in `docs/notes/`,
-    writes `Used by <slug>` on that note and updates the index. Status stays open. `Absorbed by <slug>`
-    only when one spec takes the whole note, and only after the user says yes. Then status is absorbed.
+    handoff that already wrote the folder only adds those lines. Every input becomes one full note in `docs/notes/YYYY-MM/` by source date
+    (1.61.0); each spec gets its short points with a `Full source:` link and its slug in `used_by`. Notes
+    are never absorbed. Indexes are generated by `scripts/notes_index.py`. The same source again is not
+    imported twice; a disagreement is flagged as a conflict.
     A listed `repos.md` edit keeps `Synced at` and does not set it. After a kept quote, compares it with
     `docs/research/*.md` and `## Research findings` on the specs it touches, including notes those findings
     link to, following this skill’s `references/research-stale.md`. A clear contradiction or an answered
@@ -731,8 +723,7 @@ skills:
     an import from `/crav1-add-to-spec` can hand answer links and asked marks, following this skill''s
     `references/open-questions.md`. Neither rewrites the question or a spec line. An answer that changes
     a spec line names `/crav1-resolve-open-questions` and does not run it. A dump: Writes confirmed new quotes
-    into the matching `spec.md` files, `docs/notes/YYYY-MM-DD-<slug>.md` and `docs/notes/index.md` when
-    the confirmed sort leaves a fact on the Note pile, and a missing `glossary.md` or new glossary rows
+    into the matching `spec.md` files, one full note `docs/notes/YYYY-MM/YYYY-MM-DD-<slug>.md` for the whole dump, and a missing `glossary.md` or new glossary rows
     only when `docs/system/` already exists. When a confirmed quote comes from an imported source, also
     writes `docs/sources/YYYY-MM-DD-<slug>/`, following `crav1-add-to-spec` `references/sources.md`. That
     check may write the transfer data policy after a yes. Cursor: `.cursor/rules/crav1-transfer-data-policy.mdc`.
@@ -757,8 +748,8 @@ skills:
     answered open question is marked stale only after the user says yes. An unclear case is not marked.
     It may draft a revisit request for the note''s owner. It does not send it. A meeting: When a kept
     addition imports a source, writes `docs/sources/YYYY-MM-DD-<slug>/` following `crav1-add-to-spec`
-    `references/sources.md`, and does not write the spec. When the user picks Note, writes `docs/notes/YYYY-MM-DD-<slug>.md`
-    and `docs/notes/index.md`. It reads `docs/notes/` first. An item already noted is not written again.
+    `references/sources.md`, and does not write the spec. Writes one full note `docs/notes/YYYY-MM/YYYY-MM-DD-<slug>.md` for the whole input.
+    The same mail or meeting again is not imported twice.
     That check may write the transfer data policy after a yes. Cursor: `.cursor/rules/crav1-transfer-data-policy.mdc`.
     Claude Code project: `.claude/rules/crav1-transfer-data-policy.md`. It never writes a secrets choice
     into that file. For a mail, it lists each embedded image, inline or attached. It recommends convert
@@ -770,20 +761,15 @@ skills:
     apply. Does not commit. A code change: Leaves leftovers, application code, `plan.md`, `tasks.md`,
     and other landscape files alone unless the user picks apply. Does not commit. A meeting: Leaves `docs/system/`,
     specs, marks, and dismissals alone. Does not commit.'
-  exceptions: 'A fact: creates no slug and no `docs/system/`. When the quote comes from a note, writes
-    `Used by <slug>` and updates `docs/notes/index.md`. Status stays open. `Absorbed by <slug>` only when
-    one spec takes the whole note, and only after the user says yes. Then status is absorbed. Partial
-    use never closes it. The research question is not the landscape apply question. The read-environment
+  exceptions: 'A fact: creates no slug and no `docs/system/`. Every input is one full note in `docs/notes/YYYY-MM/`
+    (source date, `Imported:` date); never absorbed, `used_by` grows; no Note choice; indexes generated. The research question is not the landscape apply question. The read-environment
     and suggest-tests-for-code handoffs ask once at the end of the run, not per item, whether to run `/crav1-refresh-system-notes`,
     and do not run it. The ado-sync handoffs do not ask. The meeting handoff runs this research
-    check. It does not run it a second time. A dump: creates no slug and seeds no `docs/system/`. A confirmed
-    Note writes `docs/notes/` and does not ask what kind of note it is. An item already noted is not written
-    again. The research question is not the landscape apply question. A code change: creates no slug,
+    check. It does not run it a second time. A dump: creates no slug and seeds no `docs/system/`. The whole dump is one full note. The research question is not the landscape apply question. A code change: creates no slug,
     seeds no `docs/system/`, and does not watch the repo. The research question is not the landscape apply
     question. A skill that writes `docs/research/` follows the clear section of that same file. That check
     does not ask the user. A meeting: no input stops and asks. The kind and the date come from the input,
-    one of each for the run. An unclear kind, or no date, is one question. Note records the quote in `docs/notes/`
-    and does not ask what kind of note it is. Dismiss is this run only and is not stored. Dismiss stays
+    one of each for the run. An unclear kind, or no date, is one question. The whole input is one full note; there is no Note choice. Dismiss is this run only and is not stored. Dismiss stays
     for a greeting, scheduling, and thanks. A kept new feature or bug only names the next command. A build-state
     line on a matched item is informational. It is not quote text. It does not start Specify, Plan, or
     Build. It is not a starter option.'
@@ -1166,7 +1152,7 @@ skills:
     sections Blocker, Bugs, and Tests to add with this PR, a link to each file in the pull request files
     view and per-line remarks, and no tool or kit names. Follow-ups, including choices the description
     calls deliberate, are not posted and not in that comment; the chat lists them and they are saved as
-    `docs/notes/review-pr-<n>-follow-ups.md` (PR, repo, date, each with its file and line), which a
+    `docs/notes/YYYY-MM/review-pr-<n>-follow-ups.md` (PR, repo, date, each with its file and line), which a
     re-review updates and `/crav1-ado-sync` reads as an open note. No follow-ups, no note. Re-review replies use the
     same voice. After your yes it posts each finding as an inline comment on its line and a summary without
     the verdict, then asks which verdict to set. A re-review reads the earlier findings from the pull
@@ -1188,7 +1174,7 @@ skills:
   reads: Reads one named open pull request, its diff, the spec, the body, and the required linter. When
     the slug has `plan.md`, also reads the plan and `verify.md`. When the slug has no `plan.md` or `tasks.md`,
     reads the pipeline's recorded test results instead and does not treat a missing `verify.md` as a finding.
-  writes: Writes `docs/notes/review-pr-<n>-follow-ups.md` and its `docs/notes/index.md` row when the review
+  writes: Writes `docs/notes/YYYY-MM/review-pr-<n>-follow-ups.md` and regenerates the notes indexes when the review
     has follow-ups, updating the same note on a re-review. After the user's yes, posts inline comments, a summary, thread replies, and
     the verdict the user picks.
   leaves_alone: Leaves code, the spec, the plan, and the merge alone. Never resolves a thread without a yes.
@@ -1412,7 +1398,7 @@ skills:
     fit found`; content, open questions, and decisions move over credited `(from <slug>)`. Park adds a
     `Parked:` line in place; plan, build, and ado-sync push skip it, and add-to-spec saves matching input
     as one note waiting for it. Un-park re-reads each waiting note in full and adds the spec to `Used by`.
-    Convert to note writes `docs/notes/` with a `Source:` line, an index row, and a landscape line.'
+    Convert to note writes `docs/notes/YYYY-MM/` with a `Source:` line and a landscape line, and regenerates the notes index.'
   use_when: A spec is done, dead, belongs in another spec, should wait, or is only reference knowledge
   table:
     reads: The named spec, the other specs, the feature index, landscape, and `docs/notes/`
@@ -1421,8 +1407,8 @@ skills:
     and `docs/notes/` (waiting notes on un-park).
   writes: After a yes only. Retire and merge move the folder to `docs/specs/retired/<slug>/` and leave
     a `Moved:` pointer; merge also writes the target `spec.md`. Park writes a `Parked:` line. Un-park removes
-    it, adds chosen points, and turns `Waiting for` into `Used by` on notes. Convert writes `docs/notes/<date>-<slug>.md`,
-    its index row, and one line under `## How the parts connect`. Retire, merge, and convert remove the
+    it, adds chosen points, and moves the slug from `waiting_for` to `used_by` on notes. Convert writes `docs/notes/YYYY-MM/<date>-<slug>.md`,
+    the generated index, and one line under `## How the parts connect`. Retire, merge, and convert remove the
     feature-index row.
   leaves_alone: Never deletes a file. Leaves other specs alone (except the merge target) and does not rewrite
     inbound links; it lists them.
