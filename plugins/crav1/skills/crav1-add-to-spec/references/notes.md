@@ -39,10 +39,10 @@ A **parked** spec (a `Parked:` line) gets nothing written. Add its slug to the n
 
 Lookups for a spec follow the `Full source:` links. Matching new input and the duplicate check read the generated indexes and the note front matter.
 
-- **Same source again** (the same mail, the same meeting date and title, the same file, the same commit): do not write a second note. Say `already imported on <imported date> as docs/notes/YYYY-MM/<file>.md`. Ask, options only: **Reuse the existing note (Recommended)** for specs that took nothing from it yet, or **Skip**. Reuse adds points and `used_by` only for those specs.
+- **Same source again** (the same mail, the same meeting date and title, the same file, the same commit), matched on each note's front matter `source` and `source_folder` (for a migrated note these come from its old `Source:` line; an empty field matches nothing): do not write a second note. Say `already imported on <imported date> as docs/notes/YYYY-MM/<file>.md`. Ask, options only: **Reuse the existing note (Recommended)** for specs that took nothing from it yet, or **Skip**. Reuse adds points and `used_by` only for those specs.
 - **Same point from a different source:** write the new note as usual. On the spec line that already says it, add the new note as a second source (`Full source: <first>; <second>`). Do not repeat the point.
 - **Disagreement:** when the new source says something different about a point already on a spec, do not overwrite. Write the new point under the old one as `**Conflict:** "<new words>" (Full source: <note>) vs the line above`, and list it in the report for the user to decide.
 
 ## Old notes
 
-Notes written before 1.61.0 (no front matter, flat in `docs/notes/`, maybe `Absorbed by`) are still read. `Absorbed by <slug>` counts as used by that slug; do not add new ones. Old spec lines keep their source lines; nothing is backfilled. The one-time move into month folders is `notes_index.py migrate` (named by `/crav1-refresh-system-notes`).
+Notes written before 1.61.0 (no front matter, flat in `docs/notes/`, maybe `Absorbed by`) are still read. `Absorbed by <slug>` counts as used by that slug; do not add new ones. Old spec lines keep their source lines; nothing is backfilled. The one-time move into month folders is `notes_index.py migrate`, after `notes_index.py migrate-dry-run` (named by `/crav1-refresh-system-notes`). It fills `source` and `source_folder` from the note's `Source:` line and rewrites links to moved notes across the repo.
