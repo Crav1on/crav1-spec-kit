@@ -171,7 +171,7 @@ Match creates the folders from repos plus a dump. Add takes information already 
 The specs already exist. Sort this dump onto them. Do not write code. Do not plan.
 ```
 
-The command shows four piles (belongs to this spec, already in that spec, note, does not fit) and waits. After that sort is confirmed, it quotes the new bits into the matching specs. A confirmed note is written under `docs/notes/` and is not tied to a spec yet. Anything that fits none of them stays listed. It does not create a slug. It points at `/crav1-finalize-commit` when those edits should be in git, and at `/crav1-plan-from-spec` only for a slice you choose.
+The command shows three piles (belongs to this spec, already in that spec, does not fit) and waits. After that sort is confirmed, it saves the whole dump as one full note in `docs/notes/YYYY-MM/` and quotes the new bits into the matching specs, each linking that note. Anything that fits none of them stays listed. It does not create a slug. It points at `/crav1-finalize-commit` when those edits should be in git, and at `/crav1-plan-from-spec` only for a slice you choose.
 
 ### From a code change that already landed
 
