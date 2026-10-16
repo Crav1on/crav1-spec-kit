@@ -35,7 +35,7 @@ Starter options run only when named. Asking for startup options lists them and d
 
 - Start with one starter option, then go Specify → Plan → Build → Verify → Commit and pull request.
 - Every command says what it reads and what it writes. Anything not listed is left alone.
-- Lanes per command: [guild routing](docs/guild-routing.md). Full rules per command: the [skills reference](docs/reference/skills.md), one page per skill. Skills were renamed in 1.56.0; the old names still work until 1.58.0 ([renamed skills](docs/reference/skills.md#renamed-skills)).
+- Lanes per command: [guild routing](docs/guild-routing.md). Full rules per command: the [skills reference](docs/reference/skills.md), one page per skill. Skills were renamed in 1.56.0 and the old names were removed in 1.58.0 ([renamed skills](docs/README.md#renamed-skills-1560)).
 
 ```mermaid
 flowchart LR

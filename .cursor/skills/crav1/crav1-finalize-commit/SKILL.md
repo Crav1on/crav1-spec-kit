@@ -26,7 +26,7 @@ This skill now also replaces `/crav1-draft-commit-message`. Its rules are kept, 
 1. **Commit.** Draft, show, then offer git commit. Follow the rest of this file.
 2. **Only write the message.** A paste-ready Summary and Description, no git commit. Follow [branches/message-only/BRANCH.md](branches/message-only/BRANCH.md).
 
-Skip the question when the message says which: "commit" or "finalize" is 1; "just the message", "draft", or "paste" is 2. The alias `/crav1-draft-commit-message` arrives with choice 2 already made. The style, work-item mention, and work-item offer rules in `branches/message-only/references/` apply to both choices, as they did before.
+Skip the question when the message says which: "commit" or "finalize" is 1; "just the message", "draft", or "paste" is 2. The style, work-item mention, and work-item offer rules in `branches/message-only/references/` apply to both choices, as they did before.
 
 
 You wrap **`crav1-finalize-commit`**. First produce the same Summary and Description. Then keep those two fields in play until they pick **commit**, **copy**, or **stop**.
@@ -48,8 +48,6 @@ Exact words for bots and scripted runs. There are no `--flags`.
 When the invocation contains one of these words (for example `/crav1-finalize-commit commit`), take that choice and do not ask. This holds for a person, a bot, or a headless run.
 
 When a choice is missing and the run is headless or started by a bot (no person in the chat to answer), do not guess. Stop and name the valid words, for example: `Missing choice. Use one of: commit, message only.`
-
-An alias passes its choice word.
 
 ## Draft (same as the other skill)
 

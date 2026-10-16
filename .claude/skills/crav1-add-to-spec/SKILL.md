@@ -31,7 +31,7 @@ This skill now also replaces `/crav1-match-dump-to-specs`, `/crav1-code-into-spe
 3. **A code change.** A commit, a range, or the branch diff that already landed. Follow [branches/code-change/BRANCH.md](branches/code-change/BRANCH.md).
 4. **A meeting.** Minutes, a transcript, a mail, or a chat thread. Follow [branches/meeting/BRANCH.md](branches/meeting/BRANCH.md).
 
-Skip the question when the message shows which: a short new fact with an @-mentioned spec is 1; several files or a pasted pile is 2; a commit, a SHA, a range, or "the branch diff" is 3; minutes, a transcript, a `.eml`, or a chat export is 4. An alias (`/crav1-match-dump-to-specs`, `/crav1-code-into-specs`, `/crav1-meeting-to-specs`) arrives with its choice already made. Where a branch hands a kept quote to `/crav1-add-to-spec`, that is choice 1 of this skill, with the handoff that branch describes.
+Skip the question when the message shows which: a short new fact with an @-mentioned spec is 1; several files or a pasted pile is 2; a commit, a SHA, a range, or "the branch diff" is 3; minutes, a transcript, a `.eml`, or a chat export is 4. Where a branch hands a kept quote to `/crav1-add-to-spec`, that is choice 1 of this skill, with the handoff that branch describes.
 
 
 You add new information to **one existing** spec. Then you check whether `docs/system/` or another spec has to change, and you report that impact. You do not silently rewrite those other files. You do not write application code. You do not plan, implement, or commit.
@@ -53,8 +53,6 @@ Exact words for bots and scripted runs. There are no `--flags`.
 When the invocation contains one of these words (for example `/crav1-add-to-spec fact`), take that choice and do not ask. This holds for a person, a bot, or a headless run.
 
 When a choice is missing and the run is headless or started by a bot (no person in the chat to answer), do not guess. Stop and name the valid words, for example: `Missing choice. Use one of: fact, dump, code change, meeting.`
-
-An alias passes its choice word.
 
 ## From /crav1-read-environment
 

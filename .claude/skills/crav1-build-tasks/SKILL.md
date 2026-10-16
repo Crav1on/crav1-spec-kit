@@ -29,7 +29,7 @@ Then ask one question, with the questions tool when it is available. List the ta
 2. **A range.** For example `T2-T5`. Follow [branches/several-tasks/BRANCH.md](branches/several-tasks/BRANCH.md) with that range.
 3. **All unticked tasks.** Follow [branches/several-tasks/BRANCH.md](branches/several-tasks/BRANCH.md) with all unchecked tasks.
 
-Skip the question when the message already answers it: one `T#` is option 1, a range or several `T#`s is option 2, `all` or "continue until blocked" is option 3. An alias (`/crav1-implement-task`, `/crav1-complete-task`, `/crav1-complete-tasks`) arrives with its choice already made.
+Skip the question when the message already answers it: one `T#` is option 1, a range or several `T#`s is option 2, `all` or "continue until blocked" is option 3.
 
 A picked task that is blocked: say why (the tasks-ready-to-build reason) and ask whether to build it anyway or pick another. Do not skip that question.
 
@@ -44,8 +44,6 @@ Exact words for bots and scripted runs. There are no `--flags`.
 When the invocation contains one of these words (for example `/crav1-build-tasks one task`), take that choice and do not ask. This holds for a person, a bot, or a headless run.
 
 When a choice is missing and the run is headless or started by a bot (no person in the chat to answer), do not guess. Stop and name the valid words, for example: `Missing choice. Use one of: one task, range, all tasks.`
-
-An alias passes its choice word.
 
 ## Inside the worker
 

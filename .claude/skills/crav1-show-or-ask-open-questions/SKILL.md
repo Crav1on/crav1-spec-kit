@@ -26,7 +26,7 @@ This skill was `/crav1-ask-open-questions`. Ask one question, with the questions
 1. **Show.** An overview of every open question across the specs. Read-only. See **Show** below.
 2. **Ask.** Draft questions for one person, one spec, or one topic. Follow the rest of this file from **Input** onward (the rules that were `/crav1-ask-open-questions`).
 
-Skip the question when the message says which: "show", "overview", "what is still open", or "who did we ask" is 1; a person, a channel, or "draft" is 2. The alias `/crav1-ask-open-questions` arrives with choice 2 already made.
+Skip the question when the message says which: "show", "overview", "what is still open", or "who did we ask" is 1; a person, a channel, or "draft" is 2.
 
 When the message or the files make one option the better fit, list it first and end its label with ` (Recommended)`. Otherwise keep the order above with no label.
 
@@ -39,8 +39,6 @@ Exact words for bots and scripted runs. There are no `--flags`.
 When the invocation contains one of these words (for example `/crav1-show-or-ask-open-questions show`), take that choice and do not ask. This holds for a person, a bot, or a headless run.
 
 When a choice is missing and the run is headless or started by a bot (no person in the chat to answer), do not guess. Stop and name the valid words, for example: `Missing choice. Use one of: show, ask.`
-
-An alias passes its choice word.
 
 ## Show
 
