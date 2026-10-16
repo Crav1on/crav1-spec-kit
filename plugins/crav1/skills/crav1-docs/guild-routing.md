@@ -82,6 +82,7 @@ Exception: the parent delegates the critique and does not review in its own voic
 | Skill | `/crav1-help` |
 | Skill | `/crav1-tasks-ready-to-build` |
 | Skill | `/crav1-explain-existing-system` |
+| Skill | `/crav1-explain-this-code` |
 | Skill | `/crav1-what-do-we-know-about-this` |
 | Skill | `/crav1-refresh-system-notes` |
 | Skill | `/crav1-fix-bug` |
@@ -114,6 +115,8 @@ Exception: the parent delegates the critique and does not review in its own voic
 `/crav1-tasks-ready-to-build` may run from any lane, any time. It lists which tasks are ready to build and why the others are blocked, from `spec.md`, `plan.md`, `tasks.md`, and `verify.md`. It never reads Azure Boards. It writes nothing and runs no skill. It names `/crav1-build-tasks` and does not run it. It does not move work into Build. It is not a starter option.
 
 `/crav1-explain-existing-system` may run from any lane. It reads the system notes already in `docs/system/`. The first answer is a short TLDR. Longer goes one level deeper from the same notes. It stays read-only. It shows a stale research note as stale. It does not clear the mark. On every run it compares the feature index with each slice's node in `docs/system/diagrams.md` and its line in `## How the parts connect`. Names match only by slug, spec title, or main resource name. It lists each slice missing entirely or partly, including done and retired, with status, and names `/crav1-refresh-system-notes`. It does not run it. When the picture has nothing on the question, it quotes the first paragraph of the matching spec, labelled as coming from the spec, and names `/crav1-what-do-we-know-about-this`. When no spec matches either, it says so and names that skill. It does not move work into Specify, Plan, or Build. It does not write a file.
+
+`/crav1-explain-this-code` may run from any lane, any time, on its own. The user names a file, a function, a selection, or a pull request diff; when none is named it asks what to explain. It opens with one question with choice words: `what it does` (Recommended), `what and why`, or `teach the language`, and skips it when the wording answers. A headless or bot run with no word stops and lists the words. It reads only the code and the code it calls and never guesses. Reasons come only from the code, specs, plan decisions, system notes, and commits, else `no stated reason found`. Every answer has a small mermaid flowchart built from what was read. It is read-only and explains in chat. It writes nothing to `docs/` or the kit layout. At the end it offers Save as .md: after showing the full path and asking, it writes to the user's Downloads folder or a path the user names, never into the repo by default. The kit never reads that file. It is not `/crav1-explain-existing-system`. It does not move work into Specify, Plan, or Build.
 
 `/crav1-what-do-we-know-about-this` may run from any lane. The user asks about one feature, slice, resource, or not-yet-feature. The answer comes from the specs first. It reads only. It writes nothing. It shows a stale research note as stale. It does not clear the mark. One pass matches an exact name first, then key words, with spec titles and Match quotes weighted highest. One winning slice is the answer, and the path is named. Two or more close hits are listed and it asks which. It does not guess. No slice: it says so and presents a candidate slice. It names `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, or `/crav1-bundle-to-specs` and does not run them. Pasted minutes or a long dump names `/crav1-add-to-spec` and stops. After the repo part it runs read-only Azure and Azure DevOps checks. Production is shape and connections only, after the same yes or no as `/crav1-read-environment`. It never reads data. A failed live read offers Retry or Skip. It may name one skill. It does not run another skill. It does not move work into Specify, Plan, or Build. It does not start those lanes. It is a later skill. It is not one of the six starter options. When the user asks for startup options, that ask names the six and does not run this skill. The six starter options stay unchanged. It is not `/crav1-explain-existing-system`. Spark, specify, plan, and verify do not run it.
 
@@ -223,6 +226,7 @@ cross_cutting:
     - crav1-help
     - crav1-tasks-ready-to-build
     - crav1-explain-existing-system
+    - crav1-explain-this-code
     - crav1-what-do-we-know-about-this
     - crav1-refresh-system-notes
     - crav1-fix-bug

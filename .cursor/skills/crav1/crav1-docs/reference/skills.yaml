@@ -1336,6 +1336,52 @@ skills:
   first_prompt: '/crav1-explain-existing-system
 
     @docs/system/'
+- name: crav1-explain-this-code
+  choice_words:
+  - question: How deep
+    words:
+    - word: "what it does"
+      means: "what it does"
+    - word: "what and why"
+      means: "what and why"
+    - word: "teach the language"
+      means: "teach the language"
+  lane: cross-cutting
+  group: Keep the picture current
+  starter: false
+  since: 1.59.0
+  stage: stable
+  walkthrough: docs/from-explain-this-code.md
+  purpose: Explain one piece of code (a file, a function, a selection, or a PR diff) from reading it.
+  in_depth:
+  - '**`/crav1-explain-this-code`** explains a file, a function, a selection, or a PR diff in the chat. It
+    asks what to explain when nothing is named. It opens with one question: what it does (Recommended),
+    what and why, or teach the language, and skips it when the wording answers. A headless or bot run with
+    no choice word stops and lists the words. It reads only the code and the code it calls and never guesses.
+    What and why takes reasons only from the code, specs, plan decisions, system notes, and commits, and
+    says `no stated reason found` otherwise. Teach the language adds idiom notes, a one-line comparison
+    to a language the user knows, and topics to look up next. Every answer has a small mermaid flowchart
+    built from what was read. At the end it offers Save as .md to the Downloads folder, after showing
+    the full path. It is not `/crav1-explain-existing-system`, which reads `docs/system/`.'
+  use_when: You want one piece of code explained
+  table:
+    reads: The named code, the code it calls, and for why also specs, plans, system notes, and commits
+    writes: Nothing (an explanation in chat); a .md in Downloads only when the user says yes
+  reads: Reads the named file, function, selection, or PR diff and the workspace code it calls. What and
+    why also reads `docs/specs/`, plan decisions, `docs/system/`, and `git log`/`git blame`.
+  writes: Writes the explanation and a mermaid flowchart in the chat. On Save as .md, after the user confirms
+    the full path, writes `explain-this-code-<target>-<date>.md` to `~/Downloads` (or `%USERPROFILE%\Downloads`)
+    or a path the user names, with a header naming the paths and `<branch>@<short sha>`.
+  leaves_alone: Leaves code, specs, `docs/`, and the rest of the kit layout alone. Never writes into the repo
+    by default.
+  exceptions: never guesses; says `not read` for code it could not read and `no stated reason found` for
+    a step with no stated reason. The kit never reads or indexes a saved file.
+  called_by: Called by the user.
+  runs_by_itself: Calls no skill.
+  you_run_next: []
+  first_prompt: '/crav1-explain-this-code what it does
+
+    @src/<file>'
 - name: crav1-what-do-we-know-about-this
   lane: cross-cutting
   group: Keep the picture current
