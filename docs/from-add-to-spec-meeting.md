@@ -38,7 +38,7 @@ If the message has no input and no `@`, the command stops. Options only. It does
 | Extract | Read the list | Requirements, decisions, changes, open questions, bugs, and information worth keeping that is not yet a spec. Each item is a quote. Speaker and time when the input shows them. Small talk is dropped |
 | Match | Read every item | Addition, new feature, bug, or unclear. Every candidate spec stays listed. Skip `_template`. `docs/notes/` is checked first |
 | Build state | Read the line | One `State:` line on each item that matches a spec, in the list and in the question. `Fits: none` has no state line |
-| One at a time | Keep, leave, dismiss, or note | One item. The recommendation is on that question. Note is recommended when it is worth keeping and not for an existing spec. Dismiss is for noise, and for this run only |
+| One at a time | Keep, leave, dismiss, or note | One item. The recommended answer is the first option, labelled `(Recommended)`, for example `Note (Recommended)`. Note is recommended when it is worth keeping and not for an existing spec. Dismiss is for noise, and for this run only |
 | Keep | Glance | Addition goes through `/crav1-add-to-spec`. New feature or bug only names the next command |
 | Note | Glance | Writes `docs/notes/` and does not ask what kind of note it is. Does not write a spec |
 | Stop | Counts | Writes the source folder when a kept addition or a note imports a source. Does not write a spec. Does not commit. Does not start Specify, Plan, or Build |
