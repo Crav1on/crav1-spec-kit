@@ -28,6 +28,7 @@ I have new information from a meeting and tasks that are not built. What do I ru
 | `/crav1-help ado-sync` | For a merged skill, also its choice words, such as `suggest features` / `push features` / `push tasks` / `pull tasks` / `pull spec changes` ([choice words](guild-routing.md#choice-words-for-bots-and-scripted-runs)) |
 | `/crav1-help renamed`, or an old name | The old-to-new names, the choice word to use, and that the old names were removed in 1.58.0 |
 | `/crav1-help compare build-tasks build-features` | Two commands side by side: lane, purpose, reads, writes, next steps, and when to pick which |
+| `/crav1-help compare explain-this-code explain-existing-system` | explain-this-code reads one piece of code (a file, function, selection, or PR diff); explain-existing-system reads the system notes in `docs/system/`. Both are read-only |
 | `/crav1-help whats new`, `/crav1-help whats new since 1.50` | The changelog for your installed version, or every release since the one you name |
 | Any other question about the kit | The answer from the docs, or "the kit doesn't say" when they do not cover it |
 
