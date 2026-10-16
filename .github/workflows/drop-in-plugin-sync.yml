@@ -87,3 +87,5 @@ jobs:
         run: python scripts/check-kit-docs.py
       - name: Workflow routes, you_run_next, crav1.mdc order, help rule, and After sections
         run: python scripts/gen-workflow.py --check
+      - name: Notes index generator builds, checks, and migrates (selftest)
+        run: python .cursor/skills/crav1/crav1-add-to-spec/scripts/notes_index.py --selftest
