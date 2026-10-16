@@ -4,6 +4,26 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 
 ## Unreleased
 
+## 1.58.0 (2026-10-16)
+
+### Breaking
+
+- The 30 deprecated alias folders from 1.56.0 are removed (for example `/crav1-complete-task`, `/crav1-tasks-to-ado`, `/crav1-verify-spec`). Old names no longer run. Use the new name with its choice word, for example `/crav1-ado-sync push tasks`. The old-to-new table stays in the [docs index](docs/README.md#renamed-skills-1560), and `/crav1-help <old name>` answers "renamed to X, removed in 1.58.0".
+- The walkthrough redirect notes at the old `docs/from-*.md` paths are removed.
+
+### Kit
+
+- Recommended option: any question with options that has a recommendation lists that option first and ends its label with ` (Recommended)`, for example `Note (Recommended)`. The question no longer also says `Recommendation: X`. The rule is in `crav1.mdc` and `CLAUDE.md`, and covers the merged skills' opening questions, keep/leave/dismiss/note, keep or redact and image options in the imported-sources check, suggested patch letters in tighten-spec and tighten-plan, and the create-feature-branch choice.
+- `plugins/crav1/.cursor-plugin/plugin.json` is 1.58.0.
+
+### Docs
+
+- Guild routing (Recommended option), glossary (recommended option; alias entry removed), data policy, data layout, help walkthrough, README, CONTRIBUTING.md item 9, and `kit-maintainer.mdc`.
+
+### CI
+
+- `aliases` is gone from `skills.yaml`; `scripts/gen-skill-docs.py` no longer validates aliases or generates a Renamed skills section in the reference.
+
 ## 1.57.0 (2026-10-14)
 
 ### Kit

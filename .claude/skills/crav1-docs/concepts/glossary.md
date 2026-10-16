@@ -28,11 +28,9 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 
 **Starter option.** One of the six ways in: spark-to-spec, ideas-to-spec, bundle-to-specs, existing-to-specs, read-environment, fix-bug. Asking for startup options lists them and does not run one.
 
-**Alias (renamed skill).** An old skill name kept for two releases after a rename. It says it was renamed, hands off to the new skill, and passes its choice word. Listed under `aliases` in `skills.yaml` with `deprecated: true`. The 1.56.0 aliases are removed in 1.58.0.
-
 **Branch (of a skill).** One path inside a merged skill, kept in `branches/<id>/BRANCH.md` next to its `SKILL.md`. It holds the old skill's rules unchanged. The opening question picks the branch.
 
-**Opening question.** The question a merged skill asks first, with options, to pick a branch. Skipped when the message already answers it; an alias answers it ahead.
+**Opening question.** The question a merged skill asks first, with options, to pick a branch. Skipped when the message already answers it or carries a choice word.
 
 **Recommended option.** In any question with options, the option the kit recommends is listed first and its label ends with ` (Recommended)`, such as `Keep (Recommended)`. The question text does not repeat it as `Recommendation: X`. A question with no recommendation has no label.
 

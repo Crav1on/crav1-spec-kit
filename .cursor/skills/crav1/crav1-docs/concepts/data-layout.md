@@ -214,4 +214,4 @@ The kit finds these headings by name. Keep the names when you edit by hand.
 
 ## Renamed skills (1.56.0)
 
-The files above did not move. Only the skills that write them were renamed. The old names still run as aliases until 1.58.0; the [renamed skills](../reference/skills.md#renamed-skills) table maps each old name to the new one. A merged skill keeps each old skill's rules in `.cursor/skills/crav1/<skill>/branches/<id>/BRANCH.md`.
+The files above did not move. Only the skills that write them were renamed. The old names were removed in 1.58.0; the [renamed skills](../README.md#renamed-skills-1560) table maps each old name to the new one. A merged skill keeps each old skill's rules in `.cursor/skills/crav1/<skill>/branches/<id>/BRANCH.md`.
