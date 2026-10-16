@@ -1,9 +1,15 @@
+---
+title: Title
+kind: fact | dump | code change | meeting | email | chat | review-pr | converted spec
+source: <what it is: mail "subject" from <sender> sent YYYY-MM-DD, meeting YYYY-MM-DD "title", file path, or commit sha>
+source_date: YYYY-MM-DD
+imported: YYYY-MM-DD
+source_folder: docs/sources/YYYY-MM-DD-slug/
+used_by: []
+waiting_for: []
+---
 # Title
 
-Date: YYYY-MM-DD
+Source date: YYYY-MM-DD. Imported: YYYY-MM-DD.
 
-From kind. "Quote."
-
-Source: docs/sources/YYYY-MM-DD-slug/
-
-## Used by
+<The full input, verbatim. For a fact: the fact plus the passage around it.>

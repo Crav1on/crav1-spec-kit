@@ -137,6 +137,10 @@ Report:
 
 Do not silently rewrite `docs/system/` or specs the sort did not already write. The glossary write above is one exception: a missing file, or new rows appended to an existing file. The picture update is the other: new lines on the short description, the diagram, and how the parts connect. The `Synced at` stamp above is the third: the repo cell on a whole-repo read, or the slice line on a one-slice read. Apply the other edits only if they pick apply, and only the lines you listed. If they pick leave, do not edit those files. Do not rewrite existing glossary rows or existing picture lines either way. Do not list the picture lines again as an apply option.
 
+## Full note (1.61.0)
+
+Every run writes **one note** for the change, as `crav1-add-to-spec` `references/notes.md` (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/references/notes.md`; plugin: sibling `skills/crav1-add-to-spec/references/notes.md`) says. It holds the full commit messages, the list of changed files, and the diff hunks the kept quotes come from. Path `docs/notes/YYYY-MM/YYYY-MM-DD-<slug>.md` by the **commit date** (the newest commit of a range). Front matter `kind: code change`, `source` the SHA or range. Each kept quote is followed by `Full source: docs/notes/YYYY-MM/<file>.md`, and the slug goes in `used_by`; a matching parked spec gets nothing and goes in `waiting_for`. The same commit or range again is `already imported on <date> as <note>`, reuse or skip; never a second copy. Run `scripts/notes_index.py` after the note changes. Do not hand-edit an index.
+
 ## Stop
 
 Do not plan. Do not implement. Do not commit. Do not run `/crav1-finalize-commit` or `/crav1-plan-from-spec`. Do not watch the repo.

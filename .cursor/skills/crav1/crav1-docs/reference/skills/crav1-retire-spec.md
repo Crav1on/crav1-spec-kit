@@ -8,7 +8,7 @@
 
 Take one spec out of the work (retire, merge, park, or convert to note), or un-park it.
 
-**[`/crav1-retire-spec`](crav1-retire-spec.md)** takes one spec out of the work. It opens with one question: retire (Recommended), merge, park, or convert to note, and skips it when the wording answers. A headless or bot run with no choice word stops and lists the words. It always shows a summary of every change and waits for a yes. It never deletes; a moved spec leaves a one-line `Moved:` pointer at its old path. Retire moves the spec to `docs/specs/retired/` with a `Retired:` line, removes its feature-index row, and flags links to it. Merge takes a named target or suggests only real fits with a reason each (shared feature area, overlapping requirements, same system in landscape, links), best first, or says `no good merge fit found`; content, open questions, and decisions move over credited `(from <slug>)`. Park adds a `Parked:` line in place; plan, build, and ado-sync push skip it, and add-to-spec saves matching input as one note waiting for it. Un-park re-reads each waiting note in full and adds the spec to `Used by`. Convert to note writes `docs/notes/` with a `Source:` line, an index row, and a landscape line.
+**[`/crav1-retire-spec`](crav1-retire-spec.md)** takes one spec out of the work. It opens with one question: retire (Recommended), merge, park, or convert to note, and skips it when the wording answers. A headless or bot run with no choice word stops and lists the words. It always shows a summary of every change and waits for a yes. It never deletes; a moved spec leaves a one-line `Moved:` pointer at its old path. Retire moves the spec to `docs/specs/retired/` with a `Retired:` line, removes its feature-index row, and flags links to it. Merge takes a named target or suggests only real fits with a reason each (shared feature area, overlapping requirements, same system in landscape, links), best first, or says `no good merge fit found`; content, open questions, and decisions move over credited `(from <slug>)`. Park adds a `Parked:` line in place; plan, build, and ado-sync push skip it, and add-to-spec saves matching input as one note waiting for it. Un-park re-reads each waiting note in full and adds the spec to `Used by`. Convert to note writes `docs/notes/YYYY-MM/` with a `Source:` line and a landscape line, and regenerates the notes index.
 
 ## Choice words
 
@@ -35,7 +35,7 @@ Reads the named `docs/specs/<slug>/`, the other specs (for merge fits and links)
 
 In short: After a yes, the moved spec and its pointer, the feature index, and for merge or convert the target spec or note.
 
-After a yes only. Retire and merge move the folder to `docs/specs/retired/<slug>/` and leave a `Moved:` pointer; merge also writes the target `spec.md`. Park writes a `Parked:` line. Un-park removes it, adds chosen points, and turns `Waiting for` into `Used by` on notes. Convert writes `docs/notes/<date>-<slug>.md`, its index row, and one line under `## How the parts connect`. Retire, merge, and convert remove the feature-index row.
+After a yes only. Retire and merge move the folder to `docs/specs/retired/<slug>/` and leave a `Moved:` pointer; merge also writes the target `spec.md`. Park writes a `Parked:` line. Un-park removes it, adds chosen points, and moves the slug from `waiting_for` to `used_by` on notes. Convert writes `docs/notes/YYYY-MM/<date>-<slug>.md`, the generated index, and one line under `## How the parts connect`. Retire, merge, and convert remove the feature-index row.
 
 ## Does not
 

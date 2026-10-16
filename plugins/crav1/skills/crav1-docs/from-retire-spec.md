@@ -24,13 +24,13 @@ It asks one question and a one-line reason. The recommended option is first. It 
 | Retire (Recommended) | `retire` | Moves to `docs/specs/retired/<slug>/` with `Retired: date, reason`. The feature-index row is removed. Links to it are listed for you to fix. Every skill skips `docs/specs/retired/`. |
 | Merge | `merge` | Moves content, open questions, and decisions into a target spec, marked `(from <slug>)`. Name the target, or it suggests only real fits, each with a reason (shared feature area, overlapping requirements, same system in landscape, links), best first. When nothing fits it says `no good merge fit found` and offers park, retire, or convert to note. The source moves to `docs/specs/retired/`. |
 | Park | `park` | Stays in place with `Parked: date, reason`. Plan, build, and ado-sync push skip it. Help and open questions list it as parked. |
-| Convert to note | `convert to note` | Becomes `docs/notes/<date>-<slug>.md` with a `Source:` line and an index row, plus one line under `## How the parts connect` in landscape. The feature-index row is removed. A converted note has no research owner, so no revisit request. |
+| Convert to note | `convert to note` | Becomes `docs/notes/YYYY-MM/<date>-<slug>.md` (by the spec's first commit date) with a `Source:` line and a generated index row, plus one line under `## How the parts connect` in landscape. The feature-index row is removed. A converted note has no research owner, so no revisit request. |
 
 A headless or bot run with no choice word stops and lists the four words.
 
 ## Parked specs and new input
 
-While a spec is parked, `/crav1-add-to-spec` writes nothing into it. When input matches it, the **full input** is saved once as a note that says `Waiting for <slug> (parked)`. Active specs that match still get their points, plus a link to that full note, and are added to its `Used by`. The note is never marked absorbed: it stays the shared full source. Help shows how many notes wait for each parked spec, and open questions shows them as `waiting for parked <slug>`, not as open work.
+While a spec is parked, `/crav1-add-to-spec` writes nothing into it. When input matches it, the **full input** is saved once as a note with the slug in `waiting_for`. Active specs that match still get their points, plus a link to that full note, and are added to its `Used by`. The note is never marked absorbed: it stays the shared full source. Help shows how many notes wait for each parked spec, and open questions shows them as `waiting for parked <slug>`, not as open work.
 
 ## Un-park
 
@@ -43,7 +43,7 @@ It re-reads each waiting note in full and suggests what fits the spec now, inclu
 ## What it reads and writes
 
 - Reads: the named spec, the other specs, `docs/system/landscape.md`, and `docs/notes/`.
-- Writes, after a yes: the moved spec and its pointer, the feature index, and for merge or convert the target spec or the note, its index row, and the landscape line.
+- Writes, after a yes: the moved spec and its pointer, the feature index, and for merge or convert the target spec or the note, the generated index, and the landscape line.
 - Leaves alone: every other spec, and inbound links (listed, not rewritten). Never deletes.
 
 Reference page: [retire spec](reference/skills/crav1-retire-spec.md)

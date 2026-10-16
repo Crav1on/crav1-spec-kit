@@ -90,11 +90,9 @@ When more than one existing spec could fit, list every candidate on that item. D
 
 When no spec folder exists, an item that would have been an addition is a new feature. Do not create a slug. Do not seed `docs/system/`.
 
-## Already noted
+## Duplicate check (1.61.0)
 
-Read `docs/notes/` before the list, when that folder exists. Skip `_template`. Compare each item's quote to the quote in each note. The same words are the same item. The `From` label is not part of that compare.
-
-When the quote is already in a note, the item shows `Already noted: docs/notes/<file>.md`. Do not offer it as a new note. Picking Note does not write a second file.
+Before the list, run the duplicate check in `crav1-add-to-spec` `references/notes.md` (drop-in: `.claude/skills/crav1-add-to-spec/references/notes.md`; plugin: sibling `skills/crav1-add-to-spec/references/notes.md`). The same source again (the same mail, or the same meeting date and title) is not imported twice: say `already imported on <date> as docs/notes/YYYY-MM/<file>.md`, and ask **Reuse the existing note (Recommended)** or **Skip**. Reuse runs the items only for specs that took nothing from that note yet. Skip stops.
 
 ## Answers to open questions
 
@@ -111,7 +109,7 @@ After a meeting, every question that was asked or pending for that meeting and g
 Show one recommendation on the item and in the question. In the question, the recommended option comes first and its label ends with ` (Recommended)`; the question text does not repeat it. Do not pick for the user.
 
 - **Keep** — the quote is a decision, a clarification, information, or an answer for an existing spec.
-- **Note** — the quote is worth keeping, and it is not those. Exploration with no feature yet, input that may feed several features, technical debt, and general information gathering are this case. A mail that maps tables and views when no spec covers it is this case. The item line is `Recommended: Note.`
+- **Leave** — the quote is worth keeping but fits no spec now. Exploration with no feature yet, technical debt, and general information gathering are this case. It stays in the full note (1.61.0); nothing else is written.
 - **Dismiss** — the quote is only noise: a greeting, scheduling, or thanks.
 
 This skill asks one item at a time. It does not have an accept-all question. Do not add one. The recommendation is the suggested answer.
@@ -167,41 +165,39 @@ Also fits: docs/specs/<slug>/ — <title line>
 Answers: "<question>" on docs/specs/<slug>/
 Possible answer to: "<question>" on docs/specs/<slug>/. The question stays open.
 State: <state>. <short reason that names the evidence>.
-Recommended: Note.
-Already noted: docs/notes/<file>.md
+Recommended: Keep.
 ```
 
-The kind is `meeting`, `email`, or `chat`. When the run has a date, `Source` is `<kind> <date>` (for example `email 2026-10-06`). When it does not, `Source` is `<kind>` (for example `meeting`). Omit `Speaker` and `Time` when the input does not show them. Omit `Also fits` when only one spec fits. Omit `State` when `Fits` is `none`. A new feature, a bug, or an unclear item uses `Fits: none` when no spec fits. Omit `Already noted` when the quote is not already in `docs/notes/`. Omit `Answers` and `Possible answer to` when the item answers no open question. An `answer` item shows `Linked without a question.` instead of a recommendation.
+The kind is `meeting`, `email`, or `chat`. When the run has a date, `Source` is `<kind> <date>` (for example `email 2026-10-06`). When it does not, `Source` is `<kind>` (for example `meeting`). Omit `Speaker` and `Time` when the input does not show them. Omit `Also fits` when only one spec fits. Omit `State` when `Fits` is `none`. A new feature, a bug, or an unclear item uses `Fits: none` when no spec fits. Omit `Answers` and `Possible answer to` when the item answers no open question. An `answer` item shows `Linked without a question.` instead of a recommendation.
 
-On every later turn, list every item again. Mark the ones already answered `kept`, `left`, `dismissed`, or `noted`. The ones not answered stay on the list. Do not remove a line to keep the list short.
+On every later turn, list every item again. Mark the ones already answered `kept`, `left`, or `dismissed`. The ones not answered stay on the list. Do not remove a line to keep the list short.
 
 ## One at a time
 
-Ask about one item. Use the questions tool when it is available. The question text names the item and the spec when one fits, then the same `State` line that is on the item. It does not say `Recommendation:`. The options are only these four. The recommended one comes first with ` (Recommended)` at the end of its label; the others keep this order:
+Ask about one item. Use the questions tool when it is available. The question text names the item and the spec when one fits, then the same `State` line that is on the item. It does not say `Recommendation:`. The options are only these three. The recommended one comes first with ` (Recommended)` at the end of its label; the others keep this order:
 
 - **Keep**
 - **Leave**
 - **Dismiss**
-- **Note — keep it in the repo without tying it to a spec yet.**
 
 ```text
 M1: dev and prod containers. Add this to <slug>?
 State: partly built. Dev container done (task 4 checked); prod not in tasks.md.
 ```
 
-Options: **Keep (Recommended)**, Leave, Dismiss, Note.
+Options: **Keep (Recommended)**, Leave, Dismiss.
 
 ```text
-M1: source-to-target mapping of the SQL tables. Note this, without a spec?
+M1: source-to-target mapping of the SQL tables. No spec fits.
 ```
 
-Options: **Note — keep it in the repo without tying it to a spec yet. (Recommended)**, Keep, Leave, Dismiss.
+Options: **Leave (Recommended)**, Keep, Dismiss. Left, it stays in the full note.
 
-When `Fits` is `none`, the question has no `State` line. The options stay Keep, Leave, Dismiss, and Note.
+When `Fits` is `none`, the question has no `State` line. The options stay Keep, Leave, and Dismiss.
 
 Stop until the user picks. Do not write before that reply. Do not apply the next item in the same turn.
 
-A batch (`M1 keep, M2 note`) applies only the items named in that batch, in order. An item with no mark stays unanswered. Do not treat silence as dismiss. When a keep needs a further question, ask that question and do not apply the rest of the batch in that turn. Note does not ask what kind of note it is. When Note must still run the imported-sources questions because the source folder is not written yet, ask those and do not apply the rest of the batch in that turn. When those questions are not needed, Note writes and the batch continues.
+A batch (`M1 keep, M2 leave`) applies only the items named in that batch, in order. An item with no mark stays unanswered. Do not treat silence as dismiss. When a keep needs a further question, ask that question and do not apply the rest of the batch in that turn.
 
 ### Keep
 
@@ -209,7 +205,7 @@ Follow the case already on that item.
 
 **Addition.** When one spec fits, and this source is not yet imported, follow the imported-sources convention before the handoff (drop-in: `.claude/skills/crav1-add-to-spec/references/sources.md`; plugin: sibling `skills/crav1-add-to-spec/references/sources.md`). That check flags personal data with a keep or redact recommendation. An item it cannot place has no recommendation and is asked one at a time. Secrets are redacted, by kind only, and are never a choice. When no transfer data policy exists, it asks once, then may write the rule after a yes. Claude Code project: `.claude/rules/crav1-transfer-data-policy.md`. It never writes a secrets choice into that file. For a mail, it lists each embedded image, inline or attached. It recommends convert to text when the image is a diagram, a table, or text that can be reproduced exactly, and compress otherwise. It asks once. Nothing is written to the source folder until every image has an answer. Auto-accept applies to those recommendations only when the transfer data policy clearly covers them. Write `docs/sources/YYYY-MM-DD-<slug>/` once for that source. Do not commit. A later kept addition from the same source reuses that folder. Do not ask those questions again. The policy questions are once per repo, as that file says.
 
-Then hand the quote to the fact branch of `/crav1-add-to-spec` for that slug. Pass the quote after any redaction that convention made. Pass the kind and the date for this run, and the source folder. When there is no date, pass the kind and the folder. When the item is already noted, pass that note path so the note gets `Used by <slug>`. Do not pass the `State` line. It is not quote text. Do not pass the recommendation. Follow only the handoff **From the meeting branch of /crav1-add-to-spec** in that skill (drop-in: `.claude/skills/crav1-add-to-spec/SKILL.md`; plugin: sibling `skills/crav1-add-to-spec/SKILL.md`). One item. Then stop that handoff. The impact check still runs there, including research. That check follows `crav1-add-to-spec` `references/research-stale.md` (drop-in: `.claude/skills/crav1-add-to-spec/references/research-stale.md`; plugin: sibling `skills/crav1-add-to-spec/references/research-stale.md`). This skill does not run that check a second time. It does not write the stale block. Do not write the spec in this skill. Do not create a slug.
+Then hand the quote to the fact branch of `/crav1-add-to-spec` for that slug. Pass the quote after any redaction that convention made. Pass the kind and the date for this run, and the source folder. When there is no date, pass the kind and the folder. Pass the path of the full note so the spec line links it and the note gets the slug in `used_by`. Do not pass the `State` line. It is not quote text. Do not pass the recommendation. Follow only the handoff **From the meeting branch of /crav1-add-to-spec** in that skill (drop-in: `.claude/skills/crav1-add-to-spec/SKILL.md`; plugin: sibling `skills/crav1-add-to-spec/SKILL.md`). One item. Then stop that handoff. The impact check still runs there, including research. That check follows `crav1-add-to-spec` `references/research-stale.md` (drop-in: `.claude/skills/crav1-add-to-spec/references/research-stale.md`; plugin: sibling `skills/crav1-add-to-spec/references/research-stale.md`). This skill does not run that check a second time. It does not write the stale block. Do not write the spec in this skill. Do not create a slug.
 
 When more than one spec fits, ask which one before the handoff. Options only. One option per candidate, plus **Treat as a new feature**. Do not ask the user to type a slug. Stop until the user picks. A picked spec gets the addition handoff. Treat as a new feature follows the new-feature rule below.
 
@@ -231,14 +227,6 @@ An `answer` item is not asked. When this source is not yet imported, follow the 
 
 When the imported-sources check asks a question, that question is this turn. Then continue with the next item.
 
-### Note
-
-Write the note. Do not ask what kind of note it is. Do not hand the quote to the fact branch of `/crav1-add-to-spec`. Do not create a slug. Do not name a starter.
-
-When the item is already noted, write nothing. Say the path. Do not write a second file.
-
-When the quote is not already noted, follow **Note file** below. Then stop that write. The next unanswered item is the next question.
-
 ### Leave
 
 Write nothing. The item stays listed as left for this run. The next run starts fresh and can offer it again.
@@ -247,31 +235,21 @@ Write nothing. The item stays listed as left for this run. The next run starts f
 
 Write nothing. Dismiss is for this run only. Do not write a dismissals file. Do not record the quote on a spec. The next run starts fresh and can offer the item again. Do not remember a dismiss across runs.
 
-## Note file
+## The full note (1.61.0)
 
-A note is not owned by one spec. The home is `docs/notes/` in the product repo.
+Every run writes **one note** holding the whole input, before the first item question, as `crav1-add-to-spec` `references/notes.md` (drop-in: `.claude/skills/crav1-add-to-spec/references/notes.md`; plugin: sibling `skills/crav1-add-to-spec/references/notes.md`) says. There is no Note option; nothing is asked about the note.
 
-Create `docs/notes/` and `docs/notes/index.md` when they are missing. The shapes are this skill’s `assets/note.md` and `assets/index.md` (same files as `docs/notes/_template/note.md` and `docs/notes/_template/index.md`; drop-in: `.claude/skills/crav1-add-to-spec/branches/meeting/assets/`; plugin: this skill’s `assets/`).
-
-One file per note: `docs/notes/YYYY-MM-DD-<slug>.md`. `YYYY-MM-DD` is the date this run already has. Do not invent a date. When the run has no date, the file is `docs/notes/undated-<slug>.md`. `<slug>` is a short name from the subject or the quote. Lowercase. Hyphens. Do not put a person's name in the slug. A second note on the same day gets its own slug. When that file already exists and the quote is different, pick another slug. Do not overwrite a note.
-
-The note file has:
-
-- a title
-- the date, or `not shown` when the run has no date
-- the quote, verbatim. It starts with `From <kind> <date>.` when there is a date, otherwise `From <kind>.` Keep the speaker and the time in the quote when the input showed them. Do not paraphrase.
-- `Source: docs/sources/YYYY-MM-DD-<slug>/` when the input was imported. When it was not, omit that line.
-- `## Used by`, with nothing under it
-
-When the input was imported and the source folder is not written yet, follow the imported-sources convention before the note (drop-in: `.claude/skills/crav1-add-to-spec/references/sources.md`; plugin: sibling `skills/crav1-add-to-spec/references/sources.md`). That check flags personal data with a keep or redact recommendation. An item it cannot place has no recommendation and is asked one at a time. Secrets are redacted, by kind only, and are never a choice. When no transfer data policy exists, it asks once, then may write the rule after a yes. For a mail, it lists each embedded image and asks once. Nothing is written until those answers are in. Write `docs/sources/YYYY-MM-DD-<slug>/` once. A later note from the same source reuses that folder. Do not ask those questions again. Those questions are the imported-sources convention. They are not a question about what kind of note this is.
-
-`docs/notes/index.md` gets one line for the new note: title, date, status `open`, and an empty used-by cell. The title links to the file. One line looks like `| [Source to target mapping](2026-10-06-source-to-target-mapping.md) | 2026-10-06 | open | |`. When the date is not shown, the date cell says `not shown`. Do not rewrite another row.
+- Run the imported-sources convention first when the input is imported and the source folder is not written yet (drop-in: `.claude/skills/crav1-add-to-spec/references/sources.md`; plugin: sibling `skills/crav1-add-to-spec/references/sources.md`). The note holds the text after its redaction.
+- Path: `docs/notes/YYYY-MM/YYYY-MM-DD-<slug>.md` by the **source date** (the meeting date or the mail's sent date). No date in the input: the import date, `source_date: none`, and say so.
+- Front matter `kind` is `meeting`, `email`, or `chat`; `source` names the mail (subject, sender, sent date) or the meeting (date and title); `imported` is today.
+- Each kept addition and each answer link names this note as `Full source:`. A matching parked spec gets nothing; its slug goes in `waiting_for`.
+- Run `scripts/notes_index.py` after the note changes. Do not hand-edit an index.
 
 Do not commit.
 
 ## After each answer
 
-Recap that one item: answer linked, kept as addition, kept as new feature, kept as bug, noted, left, or dismissed. Name the spec when a handoff ran. Name the note path when a note was written, or the path when it was already noted. Name the next command when one was named. Do not run that command.
+Recap that one item: answer linked, kept as addition, kept as new feature, kept as bug, left, or dismissed. Name the spec when a handoff ran. Name the full note path. Name the next command when one was named. Do not run that command.
 
 When the addition handoff asks apply or leave, or asks whether to mark research stale, or asks to draft a revisit request, that question is this turn. Do not ask the next meeting item in that same turn.
 
@@ -291,7 +269,7 @@ Noted: <n>
 Left: <n>
 Dismissed: <n>
 Handoffs: docs/specs/<slug>/, or none
-Notes: docs/notes/<file>.md, or none
+Note: docs/notes/YYYY-MM/<file>.md (source date, or no source date)
 Named, not run: <commands>, or none
 ```
 
@@ -303,7 +281,7 @@ When the fact branch of `/crav1-add-to-spec` changed a file, or this command wro
 
 ## Stop
 
-The only files this command writes are `docs/sources/YYYY-MM-DD-<slug>/` for a source a kept addition or a note quotes, `docs/notes/YYYY-MM-DD-<slug>.md` and `docs/notes/index.md` when the user picks Note, a `.gitattributes` line after a yes, and the transfer data policy after a yes, as the imported-sources convention says. Do not write the source folder for a leave, a dismiss, a kept new feature, or a kept bug. Do not write a note for those. Do not write `docs/system/`, a spec, `plan.md`, `tasks.md`, `verify.md`, `explore.md`, `docs/environments/marks.md`, or a dismissals file. Do not commit. Do not push. Do not open a pull request.
+The only files this command writes are `docs/sources/YYYY-MM-DD-<slug>/` for a source a kept addition or a note quotes, the full note `docs/notes/YYYY-MM/YYYY-MM-DD-<slug>.md` and the generated indexes, a `.gitattributes` line after a yes, and the transfer data policy after a yes, as the imported-sources convention says. Do not write the source folder for a leave, a dismiss, a kept new feature, or a kept bug. Do not write a note for those. Do not write `docs/system/`, a spec, `plan.md`, `tasks.md`, `verify.md`, `explore.md`, `docs/environments/marks.md`, or a dismissals file. Do not commit. Do not push. Do not open a pull request.
 
 Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, the repos and bundle branch of `/crav1-existing-to-specs`, `/crav1-plan-from-spec`, `/crav1-build-tasks`, `/crav1-verify-build-against-spec`, `/crav1-fix-bug`, the verify gaps branch of `/crav1-fix-build-gaps`, or `/crav1-finalize-commit`.
 
@@ -319,12 +297,12 @@ Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-spe
 - Match every item. Cases: addition, new feature, bug, or unclear. When more than one existing spec could fit, list every candidate.
 - An item that matches a spec gets one `State:` line in the item block and in the question. `Fits: none` gets no state line. The line is informational. It is not written and it is not quote text.
 - Every item stays listed. Nothing is dropped to keep the list short.
-- One item at a time: keep, leave, dismiss, or note. Mark Note as `(Recommended)` and list it first when the item is worth keeping and is not a decision, a clarification, information, or an answer for an existing spec. Do not add an accept-all question. This skill does not have that pattern.
-- Note writes `docs/notes/YYYY-MM-DD-<slug>.md` and one index line. It does not ask what kind of note it is. Read `docs/notes/` first. An item already noted is shown as already noted and is not written again.
+- One item at a time: keep, leave, or dismiss. Mark Leave as `(Recommended)` when the item fits no spec; it stays in the full note. Do not add an accept-all question. This skill does not have that pattern.
+- Every run writes one full note `docs/notes/YYYY-MM/YYYY-MM-DD-<slug>.md` by source date, and regenerates the indexes. The same source again is not written twice.
 - Dismiss is for this run only, and for noise. Start fresh on every run. Do not write a dismissals file. Do not remember a dismiss across runs.
 - A kept addition goes to that spec through the fact branch of `/crav1-add-to-spec`. Before that handoff, when the source is not yet imported, follow `.claude/skills/crav1-add-to-spec/references/sources.md` (plugin: sibling `skills/crav1-add-to-spec/references/sources.md`). That check recommends keep or redact, redacts secrets, and may write the transfer data policy after a yes. For a mail, it lists each embedded image, inline or attached, recommends convert to text or compress, and asks once. Nothing is written to the source folder until every image has an answer. Auto-accept applies to those recommendations only when the transfer data policy clearly covers them. Write the source folder once. Pass the kind, the date, and that folder. The quote starts with `From <kind> <date>.` when there is a date, otherwise `From <kind>.` The impact check still runs there, including research, following `.claude/skills/crav1-add-to-spec/references/research-stale.md` (plugin: sibling `skills/crav1-add-to-spec/references/research-stale.md`). This skill does not run that check a second time. It does not write the stale block. Do not commit.
 - A kept new feature names `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, or `/crav1-bundle-to-specs`. Do not run it. Do not create a slug. Do not write the source folder here. Do not write a note here. That next command follows the imported-sources convention when it quotes the source.
 - A kept bug names `/crav1-fix-bug`. Do not run it.
-- This command does not write a spec. The files it writes are the source folder for a kept addition or a note, the note file and `docs/notes/index.md` when the user picks Note, a `.gitattributes` line after a yes, and the transfer data policy after a yes. It does not commit. It never writes a secrets choice into that rule.
+- This command does not write a spec. The files it writes are the source folder for a kept addition or a note, the full note and the generated indexes, a `.gitattributes` line after a yes, and the transfer data policy after a yes. It does not commit. It never writes a secrets choice into that rule.
 - Do not start Specify, Plan, or Build. Do not plan, implement, or commit.
 - Later skill. Not a starter option. Asking for startup options names only the seven and does not run this command.

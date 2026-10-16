@@ -130,7 +130,7 @@ New work is `/crav1-spark-to-spec` or `/crav1-ideas-to-spec` with `@docs/system/
 
 ## A quoted note
 
-When this run quotes a note from `docs/notes/`, add a line `Used by <slug>` under `## Used by` on that note and update that row on `docs/notes/index.md`. Status stays open. Many specs can be listed. A note is not owned by one spec. Add `Absorbed by <slug>` only when this spec clearly takes the whole note, and only after the user says yes. Then the index status is absorbed. Partial use never closes the note. Do not commit. The same write is in `/crav1-add-to-spec`.
+When this run quotes a note from `docs/notes/` (month folders `docs/notes/YYYY-MM/` since 1.61.0; older flat notes are still read), add `<slug>` to that note's `used_by` front matter (an old note without front matter gets a `Used by <slug>` line under `## Used by`), and link the note from the spec line as `Full source: <note path>`. Then run the notes index generator as `crav1-add-to-spec` `references/notes.md` says; do not hand-edit an index. Many specs can be listed. A note is not owned by one spec and is never absorbed: do not write `Absorbed by`. Do not commit. The same write is in `/crav1-add-to-spec`.
 
 ## Style
 

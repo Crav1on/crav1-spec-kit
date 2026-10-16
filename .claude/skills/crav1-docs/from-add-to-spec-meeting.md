@@ -12,7 +12,7 @@ It is a later skill. It is not a starter option. When the user asks for startup 
 
 When a kept addition quotes a mail, a transcript, a chat, a screenshot, or another original, the command writes that source under `docs/sources/YYYY-MM-DD-<slug>/`, with the original files and a `README.md`, following the imported-sources convention. It does not write the spec. It does not commit. The quote reaches the spec through `/crav1-add-to-spec`, and that spec's `Source:` and `Trace:` lines link to the folder. A leave, a dismiss, a kept new feature, and a kept bug do not write the folder.
 
-Note is a fourth choice: `Note — keep it in the repo without tying it to a spec yet.` It writes `docs/notes/YYYY-MM-DD-<slug>.md` and one line on `docs/notes/index.md`. The quote stays verbatim. There is no question after Note about what kind of note it is. Note is the recommended answer when the item is worth keeping and is not a decision, a clarification, information, or an answer for an existing spec. Dismiss stays for a greeting, scheduling, and thanks. The command reads `docs/notes/` first. An item already noted is shown as already noted and is not written again. It does not commit the note. A note that quotes an imported source also writes that source folder.
+Since 1.61.0 the whole input is always saved once as one full note, `docs/notes/YYYY-MM/YYYY-MM-DD-<slug>.md`, filed by the meeting date or the mail's sent date (no date: the import date, and it says so). There is no Note choice. Each kept addition links that note as `Full source:`. A left item stays in the full note. The same mail or meeting again is not imported twice: it says `already imported on <date> as <note>` and offers reuse or skip. Indexes are generated, not hand-edited. Dismiss stays for a greeting, scheduling, and thanks.
 
 ## First prompt
 
@@ -36,16 +36,16 @@ If the message has no input and no `@`, the command stops. Options only. It does
 | Input | Pasted or `@` a file | Minutes, a transcript, an email, or a chat thread. Stops when nothing was pointed at. Does not scan the repo. Does not guess |
 | Kind and date | Glance | Kind from what the input shows: meeting, email, or chat. Date from the input. Asks once when the kind is not clear. Asks once when there is no date: give a date, or skip |
 | Extract | Read the list | Requirements, decisions, changes, open questions, bugs, and information worth keeping that is not yet a spec. Each item is a quote. Speaker and time when the input shows them. Small talk is dropped |
-| Match | Read every item | Addition, new feature, bug, or unclear. Every candidate spec stays listed. Skip `_template`. `docs/notes/` is checked first |
+| Match | Read every item | Addition, new feature, bug, or unclear. Every candidate spec stays listed. Skip `_template`. the notes indexes are checked first for the same source |
 | Build state | Read the line | One `State:` line on each item that matches a spec, in the list and in the question. `Fits: none` has no state line |
-| One at a time | Keep, leave, dismiss, or note | One item. The recommended answer is the first option, labelled `(Recommended)`, for example `Note (Recommended)`. Note is recommended when it is worth keeping and not for an existing spec. Dismiss is for noise, and for this run only |
+| One at a time | Keep, leave, or dismiss | One item. The recommended answer is the first option, labelled `(Recommended)`, for example `Keep (Recommended)`. Leave is recommended when no spec fits; the item stays in the full note |
 | Keep | Glance | Addition goes through `/crav1-add-to-spec`. New feature or bug only names the next command |
-| Note | Glance | Writes `docs/notes/` and does not ask what kind of note it is. Does not write a spec |
-| Stop | Counts | Writes the source folder when a kept addition or a note imports a source. Does not write a spec. Does not commit. Does not start Specify, Plan, or Build |
+| Full note | Glance | One note for the whole input, by source date. Not asked |
+| Stop | Counts | Writes the source folder when the input is an imported source. Does not write a spec. Does not commit. Does not start Specify, Plan, or Build |
 
 ## Build state
 
-An item that matches an existing spec shows one line, `State: <state>.`, and a short reason that names the evidence. The same line is in the item block and in the keep, leave, dismiss, or note question.
+An item that matches an existing spec shows one line, `State: <state>.`, and a short reason that names the evidence. The same line is in the item block and in the keep, leave, or dismiss question.
 
 | State | Meaning |
 | --- | --- |

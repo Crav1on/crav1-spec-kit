@@ -81,6 +81,10 @@ Follow [references/picture.md](references/picture.md). Three places only:
 
 Do not add a feature-index row. Callers that own the index still add that row themselves. Do not edit `glossary.md`. Do not commit.
 
+## Notes month folders (1.61.0)
+
+Since 1.61.0 notes live in `docs/notes/YYYY-MM/` by source date, with generated indexes. When this run finds notes flat in `docs/notes/` (any `*.md` there other than `index.md`), say so once and name the one-time move: `python3 <crav1-add-to-spec skill folder>/scripts/notes_index.py migrate` (drop-in: `.claude/skills/crav1-add-to-spec/scripts/notes_index.py`; Claude Code: `.claude/skills/crav1-add-to-spec/scripts/notes_index.py`). It moves each note into its month folder by source date (the note's date, else its filename date, else the date git first added it), adds front matter, and rebuilds the indexes. Old spec lines keep their source lines; nothing is backfilled. Run it only when the user says yes. It is not a picture write.
+
 ## Stop
 
 Do not plan. Do not implement. Do not commit. Do not run `/crav1-explain-existing-system`, `/crav1-plan-from-spec`, `/crav1-spark-to-spec`, or `/crav1-finalize-commit`. Do not clear a stale research mark except as the clear section says. Do not ask the user whether the update resolves it.
