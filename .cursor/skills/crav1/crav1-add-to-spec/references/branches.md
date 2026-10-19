@@ -35,7 +35,7 @@ For branch B in repo R, the candidates are:
 3. the default branch
 4. every other work branch of the same spec in R (stacked branches)
 
-For each candidate C, take `git merge-base B C` and count B's own commits since then (`git rev-list --count <merge-base>..B`). The candidate with the fewest own commits is the parent. On a tie, prefer the other spec branch (stacked), then the `Merges into` branch, then the default branch. The change is the commits from that split point to B's tip. Name it in the report: `Branch diff of feature/orders-openapi from develop (split at 00344be): 1 commit.`
+For each candidate C, take `git merge-base B C` and count B's own commits since then (`git rev-list --count <merge-base>..B`). The candidate with the fewest own commits is the parent. Another spec branch C counts only when B really sits on it: the merge-base of B and C is not already in B's base branch (`git merge-base --is-ancestor <merge-base> <base>` fails). Two branches cut from the same `develop` commit share that commit as their merge-base, and neither is the other's parent. On a tie, prefer a spec branch that counts (stacked), then the `Merges into` branch, then the default branch. The change is the commits from that split point to B's tip. Name it in the report: `Branch diff of feature/orders-openapi from develop (split at 00344be): 1 commit.`
 
 When no candidate shares history with B (a shallow clone, or the branch is missing), say so and fall back to the default branch. When even that fails, ask with options only: the repo's branches, plus **A commit range instead**. A headless run stops: `No fork point found for <branch>. Name a commit range.`
 
