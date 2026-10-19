@@ -8,9 +8,10 @@ description: >-
   Cross-cutting. Not a lane and not a bot. Same family as /crav1-open-pr
   and /crav1-merge-pr. Ends with a paste-ready comment; posts it inline
   and sets a verdict only after the user's yes. Re-review marks earlier
-  findings fixed or open. Follow-ups are kept out of the posted and
-  pasted comment and saved as a note in docs/notes/YYYY-MM/. Does not edit,
-  test, or merge.
+  findings fixed or open. Works across repos: from the specs repo for a
+  PR in a repo listed in repos.md, or with both open. Saves the PR
+  description as a PR note and follow-ups as a note in the specs repo's
+  docs/notes/YYYY-MM/. Does not edit, test, or merge.
 disable-model-invocation: true
 icon: git-pull-request
 color: orange
@@ -34,7 +35,7 @@ On Windows, `git` may not be on `PATH`. Try `git`, then `C:\Program Files\Git\cm
 
 ## Which pull request
 
-Accept a number (`123`) or a URL.
+Accept a number (`123`), a URL, or `<repo> <n>` (1.65.0), for example `orders-api 71`, where `<repo>` is a repo in `docs/system/repos.md` or a workspace folder.
 
 | URL | Id |
 | --- | --- |
@@ -42,9 +43,30 @@ Accept a number (`123`) or a URL.
 | `https://dev.azure.com/<org>/<project>/_git/<repo>/pullrequest/<n>` | `<n>` |
 | `https://<org>.visualstudio.com/<project>/_git/<repo>/pullrequest/<n>` | `<n>` |
 
-A branch name is not a pull request. Do not pick the newest pull request for the current branch. If the URL's repository is not this git remote, stop and name both. Do not review across that mismatch.
+A branch name is not a pull request. Do not pick the newest pull request for the current branch.
+
+A URL or `<repo> <n>` is accepted when its repository is one of these (1.65.0):
+
+1. this checkout's git remote
+2. the git remote of another folder in this workspace
+3. a row of `docs/system/repos.md` in the specs repo, matched on its `URL` cell: compare without a trailing `.git`, ignore case, and treat `dev.azure.com/<org>` and `<org>.visualstudio.com` as the same
+
+Otherwise stop and name what you looked at: `PR repository <url> is not this remote, a workspace folder, or a repos.md row.` Do not review across that mismatch.
 
 Remote: the single `git remote`. If several remotes exist, ask which one. A full URL still names the host. A bare number needs that remote, or a `gh` repo that matches it.
+
+## Specs repo and code repo (1.65.0)
+
+The **code repo** is the repo the pull request is in. The **specs repo** is the checkout that has `docs/specs/`. They may be the same repo.
+
+- **Same repo.** Everything below works as before: spec files come from the pull request head.
+- **Both open.** The specs repo is the workspace folder with `docs/specs/`. The code repo is the folder whose git remote matches the pull request. When several folders have `docs/specs/`, ask which one, options only. A headless run stops: `Several spec repos open: <a>, <b>. Name one.`
+- **Run from the specs repo.** A pull request from a repo in its `docs/system/repos.md`. The code repo's checkout is `../<repo>`, as `crav1-add-to-spec` `references/branches.md` says under **Sibling checkout** (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/references/branches.md`; plugin: sibling `skills/crav1-add-to-spec/references/branches.md`). Only an Azure DevOps diff needs that checkout.
+- **Run from the code repo, specs repo not open.** Look read-only for a sibling `../*/docs/system/repos.md` with a row for this repo. When one is found, that is the specs repo: read the spec there, and write the notes there without committing; name the full path in the report.
+
+When no specs repo is found, review against the pull request head and body as before, and print the notes in the chat with the path they would have.
+
+The review is read-only toward the code repo and its host. The only exception is the fetch in [Diff from a sibling checkout](#diff-from-a-sibling-checkout-azure-devops), after a pick.
 
 ## Host
 
@@ -52,13 +74,13 @@ Resolve **one** read path, in this order: GitHub `gh`, then Azure DevOps `az`, t
 
 ### GitHub (`gh`)
 
-Use `gh` only when **both** are true: `gh auth status` succeeds, and the pull request is on GitHub (`github.com` in the URL or the remote, or `gh repo view` succeeds for that repo).
+Use `gh` only when **both** are true: `gh auth status` succeeds, and the pull request is on GitHub (`github.com` in the URL, the remote, or the `repos.md` URL, or `gh repo view` succeeds for that repo).
 
 If the pull request is on GitHub and `gh auth status` does not succeed, stop. Say `gh` is not authenticated. Do not use `az`. Do not invent a review.
 
 ### Azure DevOps (`az`)
 
-Treat the remote or the pull request URL as Azure DevOps when it matches `dev.azure.com` or `*.visualstudio.com` (HTTPS or SSH). Read org, project, and repository from that URL the same way `/crav1-merge-pr` does.
+Treat the remote, the pull request URL, or the `repos.md` URL as Azure DevOps when it matches `dev.azure.com` or `*.visualstudio.com` (HTTPS or SSH). Read org, project, and repository from that URL the same way `/crav1-merge-pr` does.
 
 Use `az repos pr` only when `az` is on `PATH` (on Windows, `az.cmd` counts), the azure-devops extension can run, and the CLI is already authenticated for a non-interactive call. Do not run `az login`, a device-code flow, or a web login. Do not create a token. Do not print a token.
 
@@ -73,10 +95,12 @@ The pull request must be **open**. Anything else: stop and say the state. Do not
 ### GitHub
 
 ```text
-gh pr view <n-or-url> --json number,url,title,body,state,isDraft,baseRefName,headRefName,files,statusCheckRollup
+gh pr view <n-or-url> --json number,url,title,body,author,createdAt,state,isDraft,baseRefName,headRefName,files,statusCheckRollup
 gh pr diff <n-or-url>
 gh pr checks <n-or-url>
 ```
+
+For a pull request in another repo, pass its URL (or `--repo <owner>/<repo>` with the number). `gh pr diff` reads the diff from the host, so no local checkout is needed.
 
 `state` must be `OPEN`.
 
@@ -89,7 +113,7 @@ az repos pr policy list --org <org-url> --id <n> --detect false --output json
 
 `status` must be `active`.
 
-Read the diff without checking out a branch. Fetch if the commits are not local, then diff the target and the source. Do not `git checkout`. Do not commit. Do not push.
+Read the diff without checking out a branch. When the pull request is in this checkout, fetch if the commits are not local, then diff the target and the source. Do not `git checkout`. Do not commit. Do not push.
 
 ```text
 git fetch <remote> <source> <target>
@@ -98,11 +122,31 @@ git diff <target>...<source>
 
 Strip a `refs/heads/` prefix when you name the branches. `<source>` is `sourceRefName`. `<target>` is `targetRefName`.
 
+### Diff from a sibling checkout (Azure DevOps)
+
+When the pull request is in another repo, read the diff in that repo's checkout (a workspace folder, else `../<repo>`). When there is none, ask for the path with options only (the sibling folders that are git checkouts, plus Other). A headless run stops: `No checkout found for <repo>. Name its path.`
+
+First compare the copies on disk (`<remote>/<source>` and `<remote>/<target>`, else the local branches) with the pull request's `lastMergeSourceCommit.commitId` and `lastMergeTargetCommit.commitId`. A copy matches when it points at that commit or already contains it.
+
+- **Both match.** No question. `git diff <target>...<source>` on the copies on disk.
+- **A copy is missing or older.** Ask one question, options only:
+  1. **Fetch only the PR's two branches (Recommended).** `git fetch <remote> <source> <target>` in that checkout, then the diff. This moves remote-tracking refs only. Never check out, merge, commit, or push there. It is the one exception to the no-fetch rule for a sibling checkout in `references/branches.md`.
+  2. **Use what's on disk.** Diff the copies on disk. Say each copy's newest commit date and age, and `the copy on disk is older than the PR; newer commits may be missed`.
+  3. **Stop.** Say `Fetch <source> and <target> in <path> and rerun.` and stop.
+
+## Choice words (1.65.0)
+
+Exact words for bots and scripted runs. There are no `--flags`.
+
+- Branches on disk older than the pull request: `fetch pr branches` / `use disk` / `stop pr review`.
+
+When the invocation contains one of these words (for example `/crav1-review-pr orders-api 71 use disk`), take that choice when the question comes up and do not ask. When the question comes up in a headless run or a bot run with no word, stop: `PR branches on disk are missing or older than the PR. Use one of: fetch pr branches, use disk, stop pr review.` A word that is not needed (the copies match) is ignored.
+
 ## What to read besides the diff
 
-Read these from the pull request head. Do not edit them. `git show <source-sha>:<path>` is enough. Do not check out.
+Read these from the pull request head when the specs repo is the code repo. Do not edit them. `git show <source-sha>:<path>` is enough. Do not check out. When the pull request is in another repo (1.65.0), read `docs/specs/`, `docs/system/` and the spec files from the specs repo's working tree instead, read-only, and name it in the review: `specs from <specs repo> <branch> (working tree)`.
 
-- **Spec and plan.** When the head is `feat/<slug>` or `spec/<slug>`, or the body links `docs/specs/<slug>/`, or (1.64.0) a spec's `Synced at` entries, Match `Branch:` list or task `(branch: …)` parts name the head, the same lookup as `/crav1-open-pr`, read that folder's `spec.md`, `plan.md`, and `tasks.md` when they exist. When several spec folders changed against the target, read each. Skip `_template`. When none exist, say so.
+- **Spec and plan.** When the head is `feat/<slug>` or `spec/<slug>`, or the body links `docs/specs/<slug>/`, or (1.64.0) a spec's `Synced at` entries, Match `Branch:` list or task `(branch: …)` parts name the head (for a pull request in another repo, the entries, items and parts for that repo: its `Synced at` line, items with that repo prefix or without one when the spec has one repo, and `(branch: <repo> <head>)`), the same lookup as `/crav1-open-pr`, read that folder's `spec.md`, `plan.md`, and `tasks.md` when they exist. When several spec folders changed against the target, read each. Skip `_template`. When none exist, say so.
 - **Outside the kit.** The slug was built outside the kit when that folder has no `plan.md` on the head. `tasks.md` without `plan.md` is still outside the kit. When both files are absent, the info note says the slug has no `plan.md` or `tasks.md`. A pull request with no slug has no `plan.md` or `tasks.md` for a slug, so the whole pull request was built outside the kit. Do not invent a slug. Record that as an info note, not a fix finding. Do not report a missing `verify.md`. Review that pull request against `spec.md` when it is on the head, and against the pull request body. A slug that has `plan.md` keeps today's plan and `verify.md` checks. A missing `tasks.md` on that slug stays on those checks.
 - **Verify.** Only when the slug has `plan.md`. Quote `verify.md` when that file is already on the branch. Say so when it is missing. Do not run the tests. Do not write `verify.md`. When the slug has no `plan.md`, do not quote `verify.md` and do not say it is missing.
 - **Recorded tests.** Only when the pull request is outside the kit (any slug, or no slug). Read the test results that pull request's own pipeline already recorded. See [Recorded tests](#recorded-tests-outside-the-kit-only). Do not run the tests. Do not ask to run the tests.
@@ -206,13 +250,15 @@ When the slug has `plan.md`, and `verify.md` is missing, and the plan named no c
 
 When no spec exists and the diff adds no product behavior, say there is no spec for this diff. That is not a spec miss.
 
+A spec over several repos (1.65.0): an item or task that belongs to another repo is not a spec miss on this pull request. That is a task `(branch: <other repo> …)`, a Match `Branch:` item with another repo's prefix, or a requirement the spec ties to another repo. List those parts in the `I3` info note.
+
 When the slug has `plan.md` and the diff has no code the plan should have named, say so. That is not a plan miss. When the slug has `plan.md` and the diff has code and no plan task named the files or the checks, that is a plan miss. When the slug has no `plan.md`, that is the outside-the-kit info note, not a plan miss.
 
 A secret in the diff is a first-section finding. Decision: **fix**. Name Build. Do not print the secret. Name the path. A secret is not a suggestion. A secret is not an info note.
 
 ## Info
 
-Skip this section when every slug under review has `plan.md`.
+Skip this section when every slug under review has `plan.md` and the spec covers only this repo.
 
 Info notes do not block ship. They are not findings. They are not suggestions. A failed recorded test stays here.
 
@@ -241,6 +287,16 @@ The user can run them manually and then rerun this review.
 A rerun only sees results the pipeline recorded. A local run shows up only if the user pastes its output.
 These are the pull request's own tests, not a check against the spec.
 ```
+
+When the spec spans several repos (1.65.0), add:
+
+```text
+I3 — info — other repos
+Not in this PR: <repo>: <task, item, or requirement>, …
+Branches: 0 of 2 merged into develop. Not merged: feat/orders-retry (2 commits), …
+```
+
+The `Branches:` line is the one in `crav1-add-to-spec` `references/branches.md` **The Branches line**, one per repo, report only.
 
 ## Second section
 
@@ -271,6 +327,8 @@ On an outside pull request, the last line names `/crav1-refresh-system-notes` as
 ```text
 Next, after this pull request merges: /crav1-refresh-system-notes, to bring its changes into the spec and docs/system/.
 ```
+
+For a pull request in another repo (1.65.0), the same line also names `/crav1-add-to-spec code change <repo> <head branch>`, which brings the merged branch into the spec. Do not run either.
 
 Then the [paste-ready comment](#paste-ready-comment), then the [post offer](#post-it). Then stop.
 
@@ -327,9 +385,9 @@ Follow-ups are not posted and not in the paste-ready block. The chat review stil
 
 When the review has at least one follow-up, write a note in `docs/notes/` of the specs repo, in the notes format of `crav1-add-to-spec` `references/notes.md` (1.61.0; `docs/notes/_template/note.md`; the same shape `/crav1-add-to-spec` writes, drop-in: `.cursor/skills/crav1/crav1-add-to-spec/branches/meeting/assets/`; plugin: sibling `skills/crav1-add-to-spec/branches/meeting/assets/`):
 
-- File: `docs/notes/YYYY-MM/review-pr-<n>-follow-ups.md`, in the month folder of the review date, where `<n>` is the pull request number. When two repos in this specs repo have the same pull request number, use `review-pr-<repo>-<n>-follow-ups.md`.
+- File: `docs/notes/YYYY-MM/review-pr-<n>-follow-ups.md`, in the month folder of the review date, where `<n>` is the pull request number. When two repos in this specs repo have the same pull request number, use `review-pr-<repo>-<n>-follow-ups.md`. A pull request in a repo other than the specs repo always uses `review-pr-<repo>-<n>-follow-ups.md` (1.65.0).
 - Title: `Follow-ups from PR <n> (<repo>)`.
-- Front matter: `kind: review-pr`, `source: PR <n> <repo>`, `source_date` and `imported` the review date, `used_by: []`.
+- Front matter: `kind: review-pr`, `source: PR <n> <repo>`, `source_date` and `imported` the review date, `pr_note:` the PR note's path (1.65.0), `used_by: []`.
 - `From review <date>. PR <n>, <repo>, <PR title>.` then one bullet per follow-up: `<path>`, line `<n>`: the follow-up in plain words. Paths and lines are kept, because the note stays in the specs repo. Use `no line` when the follow-up has no line.
 - Then run the notes index generator (`scripts/notes_index.py` in `crav1-add-to-spec`). Do not hand-edit an index.
 
@@ -337,11 +395,15 @@ When the review has at least one follow-up, write a note in `docs/notes/` of the
 
 **No follow-ups.** Write no note.
 
-When the specs repo is not in this workspace, write nothing and print the note in the chat with the path it would have.
+When the specs repo is not in this workspace, write the note into the specs repo found as a sibling (see [Specs repo and code repo](#specs-repo-and-code-repo-1650)), never commit it, and name its full path. When no specs repo is found, write nothing and print the note in the chat with the path it would have.
+
+## PR note (1.65.0)
+
+Every review writes or reuses the **PR note**, whatever the follow-ups, as `crav1-add-to-spec` `references/notes.md` **PR note** says (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/references/notes.md`; plugin: sibling `skills/crav1-add-to-spec/references/notes.md`): one note per pull request, `kind: pull request`, `source: PR <n> <repo URL path>`, filed by the pull request's created date, a new `## Description as of <date>` section only when the description changed, the personal-data and secrets check, and the four image options. A pull request that `/crav1-open-pr` made gets one too. It goes in the same specs repo as the follow-ups note. Then one line: `PR note: <full path> (written | reused | updated: description changed)`.
 
 The follow-ups come back through the existing note flow: `/crav1-ado-sync` reads open notes, and a spec that takes one adds itself to the note's `used_by`. Notes are never absorbed. This skill does not do that marking.
 
-Writing the note is the only file this skill writes. It does not commit. Name `/crav1-finalize-commit` and do not run it.
+Writing the PR note and the follow-ups note are the only files this skill writes. It does not commit. Name `/crav1-finalize-commit` and do not run it.
 
 ## Post it
 
@@ -361,7 +423,8 @@ When a post fails, say what failed and what already posted. Do not retry by anot
 
 - No review unless this turn names the pull request or clearly asks to review that one.
 - Do not pick the newest pull request.
-- No edits to code, `spec.md`, `plan.md`, `tasks.md`, or `verify.md`. The only write is the follow-ups note in `docs/notes/YYYY-MM/` and the generated indexes.
+- No edits to code, `spec.md`, `plan.md`, `tasks.md`, or `verify.md`. The only writes are the PR note and the follow-ups note in the specs repo's `docs/notes/YYYY-MM/` and the generated indexes.
+- Read-only toward the code repo and its host. The only git write there is the fetch of the pull request's two branches after **Fetch only the PR's two branches** or `fetch pr branches`.
 - No test run, and no ask to run tests. When the slug has `plan.md`, quote `verify.md` or say it is missing. When the pull request is outside the kit, do not say `verify.md` is missing. Read the pipeline's recorded test results.
 - No linter install. No branch-protection change. No required-check edit.
 - No comment, no vote, and no thread resolve without the user's yes in [Post it](#post-it). No label, no reviewer assignment.
