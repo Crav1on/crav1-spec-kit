@@ -2,6 +2,22 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.66.0 (2026-10-19)
+
+A plainer, link-first pull request comment from `/crav1-review-pr`, posted as one comment, and merge-the-base-in advice everywhere instead of rebasing. Examples use made-up names: the code repo `orders-api` on Azure DevOps, pull request 42.
+
+### Kit
+
+- **Comment layout.** The paste-ready comment follows the new `crav1-review-pr` `references/comment-layout.md`. There's no verdict line in the block (the chat says `Verdict: …` above it), and the block opens with one short, plain line with no greeting or praise. The sections are **Blockers**, **Bugs**, **Tests to add with this PR**, and **A question** (or **Questions**); an empty section is left out. Each point starts with the host link to its file and line on the source branch (Azure DevOps `?path=…&version=GB<branch>&line=N&lineEnd=N&lineStartColumn=1&lineEndColumn=1`; GitHub `blob/<branch>/<path>?plain=1#LN`), then an indented paragraph. A point with no file line opens with the PR overview link, or a branch link for merge order. Each point has at most one fix and no tails. There are no follow-ups, no table, no closing line, and no HTML. It's in English unless you ask otherwise for that comment.
+- **Verdict and posting.** Any Blocker or Bug gives Changes needed, and only tests to add or a question gives Approve with comments. After your yes it posts **one comment** (the GitHub review body, or one Azure DevOps thread), with no inline threads, and sets the matching vote: Request changes / Comment / Approve on GitHub, Wait for author / Approve with suggestions / Approve on Azure DevOps. It never rejects.
+- **Chat lines.** `B` (bug), `T` (test to add) and `Q` (question) lines join F, I and S, so every point in the block has a chat line. A question is saved in the follow-ups note as `Asked on the PR: …`.
+- **Re-review.** Earlier points go under `### Since last time`, read also from an earlier one-comment review's links.
+- **Merge the base in, never rebase.** A merge-order point asks whether the other branch still goes first, then suggests merging the base into this branch. `/crav1-merge-pr` stops on a branch that is behind or has conflicts with `Merge <base> into <head> (resolve any conflicts there), push, then ask to merge again.` `/crav1-open-pr` answers a rejected push with `git pull --no-rebase`, never a force-push. Seeing that someone else rebased a branch is still reported.
+
+### Docs
+
+- From a pull request review: Paste-ready comment, Comment style, Post it and Re-review rewritten for the new layout. From commit to merge: "Behind, conflicts, or a rejected push". Glossary: Merge the base in. Data layout: questions in the follow-ups note.
+
 ## 1.65.0 (2026-10-19)
 
 Review a code pull request from the specs repo, and save every pull request's description as a note in the specs repo. Examples use made-up names: the specs repo `orders-specs`, the code repo `orders-api` on Azure DevOps.
