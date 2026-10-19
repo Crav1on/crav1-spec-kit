@@ -475,8 +475,19 @@ def selftest():
         (notes / "2026-09" / "2026-09-30-call.md").write_text(
             "---\ntitle: Call\nkind: meeting\nsource: meeting 2026-09-30 \"Call\"\nsource_date: 2026-09-30\n"
             "imported: 2026-10-16\nused_by: [billing]\nwaiting_for: [orders-export]\n---\n# Call\n\nfull text\n")
+        # 1.65.0: a PR note and a code-change note linking it with pr_note: index cleanly
+        (notes / "2026-10" / "2026-10-02-pr-orders-api-71.md").write_text(
+            "---\ntitle: PR 71 (orders-api): Retry on timeout\nkind: pull request\n"
+            "source: PR 71 dev.azure.com/contoso/orders/orders-api\nsource_date: 2026-10-02\nimported: 2026-10-19\n"
+            "used_by: [orders]\nwaiting_for: []\n---\n# PR 71 (orders-api): Retry on timeout\n\n"
+            "## Description as of 2026-10-19\n\nRetries an order call on timeout.\n")
+        (notes / "2026-10" / "2026-10-05-retry.md").write_text(
+            rt.replace("commits: [155b5c4, 2c0e1a9]\n", "commits: [155b5c4, 2c0e1a9]\npr_note: docs/notes/2026-10/2026-10-02-pr-orders-api-71.md\n"))
         assert build(root, check=True) == 1
         assert build(root) == 0 and build(root, check=True) == 0
+        oct_index = (notes / "2026-10" / "index.md").read_text()
+        assert "pull request" in oct_index and "PR 71 dev.azure.com/contoso/orders/orders-api" in oct_index, oct_index
+        assert "pr_note: docs/notes/2026-10/2026-10-02-pr-orders-api-71.md" in (notes / "2026-10" / "2026-10-05-retry.md").read_text()
         top = (notes / "index.md").read_text()
         assert "[2026-09](2026-09/index.md) | 2 | 1" in top
         assert "old: absorbed" in (notes / "2026-10" / "index.md").read_text()
