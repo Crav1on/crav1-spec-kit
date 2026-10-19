@@ -164,7 +164,7 @@ For bots: `comment posted` records only, `newest comment` takes the newest match
 
 ## Re-review
 
-When the pull request already has review comments, the next run is a re-review. It reads the earlier findings from the pull request's own comments and threads, from anyone, including the points of an earlier one-comment review. When the follow-ups note has the comment as posted, the earlier points are its points (1.67.0). When the pull request has no comments, the newest drafted comment is used, and the review says so.
+When the pull request already has review comments, the next run is a re-review. It reads the earlier findings from the pull request's own comments and threads, from anyone, including the points of an earlier one-comment review. When the follow-ups note has the comment as posted, the earlier points are its points (1.67.0). When nothing was posted, the new comment has no **Since last time**; the chat still says which points of the newest drafted comment are fixed or open.
 
 Each earlier finding gets one line first: **Fixed** (with the short commit SHA), **Partly fixed**, **Still open**, or **No longer relevant**. A resolved thread whose problem is still there is flagged `resolved but still open`. In the comment, earlier points go under **Since last time**, then new points under the normal sections. **Since last time** lists only points the reviewers saw. A finding you cut from the posted comment is shown in the chat with its mark and kept out of the new comment unless you say to include it.
 
