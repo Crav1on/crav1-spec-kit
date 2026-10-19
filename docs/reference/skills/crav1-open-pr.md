@@ -12,6 +12,8 @@ Push the change branch only after an explicit yes, then open one pull request (n
 
 1.64.0: the base is the head's `(into …)` branch, then the repo's `Merges into` branch (also from a sibling spec repo), then the default branch. The slug is also found from a spec that lists the head branch.
 
+1.66.0: a push rejected because the remote branch moved says to pull with `git pull --no-rebase`, resolve conflicts, and push again. Never a rebase or a force-push.
+
 ## Runs when
 
 Commits exist; want a pull request. Called by the user.
