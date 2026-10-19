@@ -38,6 +38,10 @@ A review is not a merge ask. Opening a pull request is not a merge ask either.
 
 Not written: branch deletion, work item links, squash or rebase merges.
 
+## PR note (1.65.0)
+
+`/crav1-open-pr` does not save the body it drafts: that is its own summary of the spec, plan and verify. After a confirmed merge, `/crav1-merge-pr` writes or updates the pull request's PR note in the specs repo (`docs/notes/YYYY-MM/YYYY-MM-DD-pr-<repo>-<n>.md`, its title and description, `kind: pull request`), with any edits made to the description since. It is not committed. A review with `/crav1-review-pr` writes the same note. From the specs repo, a pull request in another repo is reviewed with `/crav1-review-pr <repo> <n>`.
+
 ## After
 
 After an outside pull request merges, `/crav1-review-pr` names `/crav1-refresh-system-notes` to catch the picture up: [Keep the picture current](from-refresh-system-notes.md).
