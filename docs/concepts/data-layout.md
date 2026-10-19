@@ -28,6 +28,7 @@ docs/notes/
     index.md         # generated: one row per note
     YYYY-MM-DD-<slug>.md  # one full input (fact, dump, code change, meeting) and its source
     review-pr-<n>-follow-ups.md  # follow-ups from /crav1-review-pr, one note per pull request
+    YYYY-MM-DD-pr-<repo>-<n>.md  # PR note: one per pull request, its title and description (1.65.0)
 docs/sources/
   YYYY-MM-DD-<slug>/ # an imported mail, transcript, chat, screenshot, or other original
 docs/research/
@@ -71,7 +72,7 @@ docs/specs/
 | `docs/architecture/left-out.md` | Guesses that stay left out, under `## Left out`, and `## Dismissed` lines | `/crav1-existing-to-specs` | `/crav1-existing-to-specs` on a re-read, `/crav1-read-environment` |
 | `docs/environments/marks.md` | One confirmed line per resource and environment | `/crav1-read-environment` and `/crav1-map-pipeline-environments`, appending only confirmed lines; `/crav1-ado-sync` appends, once per work item home, an `Azure Boards task type (<project>): <type>` line and an `Azure Boards task done state (<project>): <state>` line | `/crav1-read-environment`, `/crav1-what-do-we-know-about-this`. Line format: [Environment marks](../environments-marks.md) |
 | `docs/specs/<slug>/plan.md`, `tasks.md` readiness marks | `Reviewed:` in `plan.md`, `(after: T#)` on task lines, `Blocks:` under spec open questions | `/crav1-review-plan`, `/crav1-tighten-plan`, `/crav1-plan-from-spec`, `/crav1-resolve-open-questions` | `/crav1-tasks-ready-to-build` |
-| `docs/notes/YYYY-MM/` | One note per input with the full input and its source, by source date; generated `index.md` per month and a top `index.md` | `/crav1-add-to-spec` for every input (1.61.0); `/crav1-review-pr` for its follow-ups note; `/crav1-retire-spec` convert to note. Indexes: `notes_index.py` only |
+| `docs/notes/YYYY-MM/` | One note per input with the full input and its source, by source date; generated `index.md` per month and a top `index.md` | `/crav1-add-to-spec` for every input (1.61.0); `/crav1-review-pr` for its follow-ups note and the PR note, `/crav1-merge-pr` for the PR note (1.65.0); `/crav1-retire-spec` convert to note. Indexes: `notes_index.py` only |
 | `docs/sources/YYYY-MM-DD-<slug>/` | The original of an imported mail, transcript, minutes, chat, screenshot, or diagram, plus a `README.md` | `/crav1-add-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs` | Anyone checking a quote. See [Data policy](data-policy.md) |
 | `docs/research/<topic>.md` | A short research note with the recommendation, trade-offs, confidence, and a link to the full study | The researcher (no slash command; see [guild routing](../guild-routing.md)). Skills only add or clear a stale mark | add, match-dump, add-to-spec, meeting, refresh-system-notes, explain-existing-system, what-do-we-know-about-this, ado-sync |
 | `docs/specs/<slug>/spec.md` | What and why, acceptance, open questions | spark, ideas, intake (through `crav1-bundle-slice-agent`), match; then tighten-spec, resolve-open-questions, add-to-spec, match-dump, add-to-spec, and review-security | Every later lane |
@@ -96,12 +97,13 @@ Each note is `docs/notes/YYYY-MM/YYYY-MM-DD-<slug>.md`. The date and the month f
 ```text
 ---
 title: Title
-kind: fact | dump | code change | meeting | email | chat | review-pr | converted spec
-source: <mail subject, sender, sent date | meeting date and title | file path | commit sha>
+kind: fact | dump | code change | meeting | email | chat | review-pr | pull request | converted spec
+source: <mail subject, sender, sent date | meeting date and title | file path | commit sha | PR <n> <repo URL path>>
 source_date: YYYY-MM-DD
 imported: YYYY-MM-DD
 source_folder: docs/sources/YYYY-MM-DD-slug/
 commits: []   # code change only (1.64.0)
+pr_note:      # code change or review-pr from a pull request (1.65.0)
 used_by: []
 waiting_for: []
 ---
@@ -120,9 +122,13 @@ Source date: YYYY-MM-DD. Imported: YYYY-MM-DD.
 
 **Older notes.** Notes from before 1.61.0 (flat in `docs/notes/`, no front matter, maybe `Absorbed by`) are still read; `Absorbed by` counts as used by. `/crav1-refresh-system-notes` recommends `notes_index.py migrate-dry-run` first (prints planned moves, source fills, and link rewrites; writes nothing), then the one-time move, `notes_index.py migrate` (1.62.0). It files notes by source date, fills `source` and `source_folder` from each note's `Source:` lines and list items (1.63.0: `source_folder` is the first `docs/sources/` path, `source` that line; empty when there is none, never guessed; `/crav1-add-to-spec` uses these for its already-imported check), rebases every relative link inside a moved note (folders, any file type, anchors) and rewrites every markdown link to a moved note anywhere in the repo, anchors kept, with correct relative paths and lists each changed file, and rebuilds the indexes. Re-running is safe. Old spec lines keep their source lines; nothing is backfilled. `/crav1-bundle-to-specs`, `/crav1-ideas-to-spec`, `/crav1-spark-to-spec`, `/crav1-tighten-spec`, and `/crav1-existing-to-specs` add their slug to `used_by` when they quote a note; `/crav1-ado-sync`, `/crav1-help`, and `/crav1-show-or-ask-open-questions` read the month folders and the generated indexes.
 
+### PR note (1.65.0)
+
+One note per pull request holds its title and description: `docs/notes/YYYY-MM/YYYY-MM-DD-pr-<repo>-<n>.md`, filed by the pull request's created date, `kind: pull request`, keyed by `source: PR <n> <repo URL path>` (host, repo and number), so it is never written twice. The body names the URL, the author, base ← head and the state, then `## Description as of <date>` and the description after the personal-data and secrets check; images get the four options. When a later read finds a changed description, a new dated section is appended; earlier text is never removed. `/crav1-review-pr` writes or reuses it on every review, `/crav1-merge-pr` after a merge, and `/crav1-add-to-spec` for a code change from a pull request (or a branch with exactly one pull request on a signed-in host). `/crav1-open-pr` does not. A code-change note and a follow-ups note from that pull request carry `pr_note:` with its path.
+
 ### Review follow-ups note
 
-`/crav1-review-pr` does not post follow-ups to the pull request or put them in the paste-ready comment. When a review has at least one, it writes `docs/notes/YYYY-MM/review-pr-<n>-follow-ups.md` (month of the review date) in the same note format, where `<n>` is the pull request number. When two repos in the specs repo have the same pull request number, the file is `review-pr-<repo>-<n>-follow-ups.md`. The title is `Follow-ups from PR <n> (<repo>)`, front matter `kind: review-pr`, and each follow-up keeps its file and line. The indexes are regenerated. A re-review updates the same note where it is: it sets `imported` to the review date, adds new follow-ups, and marks addressed ones `(done in <short sha>)` without removing a line. A review with no follow-ups writes no note. See [From a pull request review](../from-review-pr.md#follow-ups).
+`/crav1-review-pr` does not post follow-ups to the pull request or put them in the paste-ready comment. When a review has at least one, it writes `docs/notes/YYYY-MM/review-pr-<n>-follow-ups.md` (month of the review date) in the same note format, where `<n>` is the pull request number. When two repos in the specs repo have the same pull request number, and always for a pull request in another repo (1.65.0), the file is `review-pr-<repo>-<n>-follow-ups.md`. The title is `Follow-ups from PR <n> (<repo>)`, front matter `kind: review-pr`, and each follow-up keeps its file and line. The indexes are regenerated. A re-review updates the same note where it is: it sets `imported` to the review date, adds new follow-ups, and marks addressed ones `(done in <short sha>)` without removing a line. A review with no follow-ups writes no note. See [From a pull request review](../from-review-pr.md#follow-ups).
 
 ## Sources
 
