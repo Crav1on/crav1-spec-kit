@@ -57,7 +57,7 @@ Use the signed-in `gh` or `az` session only, read-only. Never log in.
   - Fields: `content`, `author.displayName`, `author.uniqueName`, `publishedDate`, `lastContentUpdatedDate`.
   - The signed-in user: `az account show --query user.name`, compared with `uniqueName`.
   - Edited means `lastContentUpdatedDate` is later than `publishedDate`.
-- **Another host, no `gh` or `az`, or not signed in:** ask the user to paste the comment.
+- **Another host, no `gh` or `az`, or not signed in:** ask the user to paste the comment, with the options **paste it** and **not posted yet**.
 
 ### Picking it
 
@@ -65,8 +65,9 @@ Use the signed-in `gh` or `az` session only, read-only. Never log in.
 2. A candidate matches when at least half of the drafted point links are in it, or its text similarity to the draft is 0.6 or more.
 3. **One match:** show its date, first line and URL, then ask `Is this the comment you posted? Options: save it / not this one / paste it`. A comment this skill posted is saved without asking.
 4. **Several:** list them (date, first line, points matched) as options, plus **paste it**. The user may pick more than one when they split the comment. Each pick gets its own section, in post order.
-5. **None by the user:** show candidates by other authors only if they match. Otherwise ask for a paste.
-6. **Pasted, and the host can be read too:** save the host text, and say so when the two differ.
+5. **None by the user:** show candidates by other authors only if they match.
+6. **Nothing matches on a host that could be read:** in the automatic step, say `No posted comment found on PR <n>; nothing recorded.` and go on with the review. The comment may simply not be posted yet, so do not ask every run. After `comment posted` or "posted", ask for a paste instead.
+7. **Pasted, and the host can be read too:** save the host text, and say so when the two differ.
 
 ## Comparing with the draft
 
@@ -113,7 +114,7 @@ The choice words are in [Choice words](../SKILL.md#choice-words-1650). With no w
 
 - **One match:** save it without asking.
 - **Several:** stop with `Several comments could be the posted one. Use one of: newest comment, skip comment record.`
-- **None, or the host can't be read:** stop with `No posted comment found on PR <n>. Paste it in chat, or use: skip comment record.`
+- **None, or the host can't be read,** after `comment posted`: stop with `No posted comment found on PR <n>. Paste it in chat, or use: skip comment record.` In the automatic step, print `No posted comment found on PR <n>; nothing recorded.` and go on; nothing to paste in a headless run.
 
 Posting stays interactive only. There is no choice word that posts.
 
