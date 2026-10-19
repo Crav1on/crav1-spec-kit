@@ -83,9 +83,9 @@ No `tasks.md` here. No `git init`, remotes, or application code unless they **ex
 
 When this run reads a whole repo, set that repo's `Synced at` cell to the branch and commit actually read. When that branch is already listed, replace that branch's entry. Leave every other branch in the cell. Touch only the repos this run read. Do not change Purpose, Status, URL, or Boundaries. When the column is missing, add it. Other repos' new cells stay empty. Do not write a slice `Synced at` line for a repo this run read as a whole. Workers do not edit `repos.md`. The parent writes that cell.
 
-When this run reads only one slice, do not touch the repo column. Write or update a line in that slice's `spec.md`, after the title and before the first heading: `Synced at: <repo> <branch>@<short sha>, <date>`. One line per repo. Update the line for that repo. Leave other `Synced at` lines. When a worker writes that spec, pass the repo, branch, short sha, and date. The worker writes the line and does not read git to invent one.
+When this run reads only one slice, do not touch the repo column. Write or update a line in that slice's `spec.md`, after the title and before the first heading: `Synced at: <repo> <branch>@<short sha>, <date>`. One line per repo. That line has one entry per branch read, separated by `; `, for example `Synced at: orders-api feat/orders-retry@155b5c4, 2026-10-19; develop@00344be, 2026-10-15`. When the branch read already has an entry, replace only that entry; a new branch adds an entry at the end. Leave the other entries, a `(dropped)` on them, and other repos' `Synced at` lines. When a worker writes that spec, pass the repo, branch, short sha, and date. The worker writes the line and does not read git to invent one.
 
-Do not stamp a repo or a slice this run did not read. An empty cell stays empty. A consumer measuring drift uses the older of the repo column and the slice line, and an empty value means unknown, so fall back to spec file commit dates.
+Do not stamp a repo or a slice this run did not read. An empty cell stays empty. A consumer measuring drift uses the older of the repo column and the slice line, for each branch its own entry, and an empty value means unknown, so fall back to spec file commit dates.
 
 ## Imported sources
 
