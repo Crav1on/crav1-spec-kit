@@ -68,7 +68,7 @@ Ready
 
 Blocked
 - <slug> T6: waits on T5 (recorded).
-- <slug> T7: open question "Which currency for refunds?" (recorded). Asked 2026-10-10, mail to Arvid.
+- <slug> T7: open question "Which currency for refunds?" (recorded). Asked 2026-10-10, mail to Dana.
 
 Needs verify
 - <slug> T3: no verify.md row.
