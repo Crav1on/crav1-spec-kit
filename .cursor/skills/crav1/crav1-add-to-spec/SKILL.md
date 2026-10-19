@@ -29,7 +29,7 @@ This skill now also replaces `/crav1-match-dump-to-specs`, `/crav1-code-into-spe
 
 1. **A fact.** One new piece of information for one spec. Follow the rest of this file.
 2. **A dump.** A later pile of notes, tickets, old docs, diagrams, or screenshots for one or many specs. Follow [branches/dump/BRANCH.md](branches/dump/BRANCH.md).
-3. **A code change.** A commit, a range, or the branch diff that already landed. Follow [branches/code-change/BRANCH.md](branches/code-change/BRANCH.md).
+3. **A code change.** A commit, a range, the branch diff, or a pull request (1.65.0) that already landed or is open. Follow [branches/code-change/BRANCH.md](branches/code-change/BRANCH.md).
 4. **A meeting.** Minutes, a transcript, a mail, or a chat thread. Follow [branches/meeting/BRANCH.md](branches/meeting/BRANCH.md).
 
 Skip the question when the message shows which: a short new fact with an @-mentioned spec is 1; several files or a pasted pile is 2; a commit, a SHA, a range, or "the branch diff" is 3; minutes, a transcript, a `.eml`, or a chat export is 4. Where a branch hands a kept quote to `/crav1-add-to-spec`, that is choice 1 of this skill, with the handoff that branch describes.
