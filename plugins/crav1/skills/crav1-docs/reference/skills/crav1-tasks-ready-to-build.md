@@ -12,6 +12,8 @@ List the tasks ready to build, for one spec or all, and why the others are block
 
 Shows summary counts per slice, then Ready, Blocked (one reason each, recorded or inferred), Needs verify, a Done count, `Next: [`/crav1-build-tasks`](crav1-build-tasks.md) T#`, and a `Source:` line. Local only: it never reads Azure Boards and names [`/crav1-ado-sync`](crav1-ado-sync.md) for task states there. It writes nothing and runs no other skill. It can run any time. It is cross-cutting. It is not a starter option.
 
+1.64.0: shows a task's `(branch: …)` and one Branches line from local git only.
+
 ## Runs when
 
 You want to know which tasks can be built now, and why the others cannot. Called by the user, any time.

@@ -26,6 +26,8 @@ Do not ask again per `T#`. Workers must not ask style.
 
 **Branch:** before tool approvals and the first worker, follow `/crav1-create-feature-branch` (drop-in: `.claude/skills/crav1-create-feature-branch/SKILL.md`; plugin: sibling `skills/crav1-create-feature-branch/SKILL.md`) **Build** prompt. If needed, that turn is branch only. If on `spec/<slug>`, stop (no workers) and follow **Build on a spec-only branch**. Pass `branch: already-done` on every worker. Workers must not create branches.
 
+**Task branches (1.64.0).** Work in `tasks.md` order. When the next task ends with `(branch: X)` and X is not the checkout, switch to X before its worker, only on a clean tree (workers commit, so it should be clean). Starting a range or all-tasks run is consent to use each task's named branch; do not ask per task. A task without a branch part uses the branch the run started on. When X exists only as `origin/X`, `git checkout X` makes the local branch. When X exists nowhere, the task is blocked with that reason; never create X. A dirty tree stops the run before the switch. A `(branch: <repo> X)` for another repo is blocked here with `belongs to <repo>`.
+
 ## Tool approvals (once for the batch)
 
 Those **Allow / Stop** buttons on each worker are Cursor, not kit `fix`/`stop`. Follow [tool-approvals.md](../../../crav1-build-tasks/branches/one-task/references/tool-approvals.md) **once before the first worker** (pause, directions, wait for `continue` / `click` / `stop`).
@@ -36,7 +38,7 @@ After `continue`, do not treat IDE Allow/Stop as a reason to halt the board. Aft
 
 ## Batch loop (you stay in this chat)
 
-Keep a short board: queued / running / done / blocked.
+Keep a short board: queued / running / done / blocked, with each task's branch when tasks name one.
 
 For each `T#` **one at a time**:
 

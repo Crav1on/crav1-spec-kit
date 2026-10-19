@@ -20,6 +20,8 @@ One task (was `/crav1-complete-task`): When a local test dependency is not runni
 
 A range or all (was `/crav1-complete-tasks`): Orchestrates one worker per `T#` (`T1-T3` or all unchecked); stops the batch when a worker needs you.
 
+1.64.0: a task's `(branch: …)` is offered first (Recommended) in the Build prompt; range and all-tasks runs switch to each task's branch on a clean tree, and a missing branch blocks that task.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.

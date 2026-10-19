@@ -437,6 +437,7 @@ skills:
     later on feat/<slug>).
   in_depth:
   - Prompt for `feat/<slug>` or specify-only `spec/<slug>`; no silent checkout, no push, no PR.
+  - '1.64.0: the Build prompt puts a task''s `(branch: …)` first, marked (Recommended), and never creates it from default without asking.'
   use_when: 'Brownfield: leave the default branch'
   table:
     reads: Current branch, default branch, dirty tree
@@ -498,6 +499,7 @@ skills:
     issue after the user chooses. When the slice is partial or `## In the code` names paths, reads the
     committed code on the repo and branch the spec names before wording issues. A spec with no code behind
     it skips that read. Does not offer finish, add a test, or leave.
+  - '1.64.0: reads every listed work branch without checkout; a yes on writing the branch adds to the `Branch:` list; a listed branch that is gone and not merged is offered `(dropped)` (`mark-dropped`); a deleted branch whose work is in the base shows `merged, branch deleted`.'
   use_when: The spec is still mushy
   table:
     reads: Spec, diagrams, ADRs, reviewer findings, and the committed code when the slice is partial or
@@ -676,6 +678,7 @@ skills:
   - 'A meeting (was `/crav1-meeting-to-specs`): Minutes, a transcript, an email, or a chat thread → quotes
     matched to existing specs, keep, leave, or dismiss one at a time; the whole input is one full note. A kept addition goes through
     `/crav1-add-to-spec`. A clear answer to a spec open question is linked under it.'
+  - '1.64.0: a code change can name a repo and branch (`code change orders-api feat/orders-retry`); the code is read read-only from `../<repo>`. The branch diff starts at the fork point (the repo''s `Merges into` branch, the default branch, or another spec branch), the slice `Synced at` line keeps one entry per branch, a yes records `Merges into` in `repos.md`, and the note''s `commits:` list plus `git patch-id` stop a commit being imported twice, also after a rebase.'
   use_when: New information for specs that already exist
   table:
     reads: 'A fact: That information and one `spec.md`; A dump: The dump and existing spec folders; A
@@ -808,6 +811,7 @@ skills:
     not install a linter. When the spec is partial or `## In the code` names paths, reads that repo and
     branch and chooses finish the gap, add a verify test, or leave it before any task. A piece that already
     matches v0 is not a choice.
+  - '1.64.0: Built pieces reads every work branch of the spec without checkout (and `../<repo>` for another repo), labels pieces `only on <branch>, not merged`, and ends a task with `(branch: …)` when its piece lives on one branch.'
   use_when: Spec is accepted
   table:
     reads: Spec, diagrams, ADRs; the named repo and branch when the slice is partial
@@ -926,6 +930,7 @@ skills:
     `needs_dependency` with a `BLOCKER:` line, and you answer start, skip, or stop.'
   - 'A range or all (was `/crav1-complete-tasks`): Orchestrates one worker per `T#` (`T1-T3` or all unchecked);
     stops the batch when a worker needs you.'
+  - '1.64.0: a task''s `(branch: …)` is offered first (Recommended) in the Build prompt; range and all-tasks runs switch to each task''s branch on a clean tree, and a missing branch blocks that task.'
   use_when: You want to build one task, a range, or all unticked tasks
   table:
     reads: 'Inside each worker: One `T#`, the plan, and the spec; One task: One `T#` and the persist rule;
@@ -967,6 +972,7 @@ skills:
   in_depth:
   - 'Serial board of ready slugs: `feat/<slug>` from default, then that spec’s build-tasks loop; no
     parallel, no push, no PR.'
+  - '1.64.0: tasks with `(branch: …)` are built on that branch; the board shows `done (n branches not merged)`.'
   use_when: Several specs, one after another
   table:
     reads: Ready spec folders on the default branch
@@ -1000,6 +1006,7 @@ skills:
     missing dependency blocks verified unless you chose skip; then `verify.md` lists it under Skipped
     tests. A missing dependency is a `BLOCKER:` line at the top of the summary, also in a headless run,
     which uses the two-pass questions file.
+  - '1.64.0: the TL;DR adds a Branches line (merged into the base, deleted-but-merged, rewritten, shared); demoable needs every work branch merged. Report only.'
   use_when: Want proof against acceptance
   table:
     reads: Spec, tasks, plan, and the running tree
@@ -1118,11 +1125,12 @@ skills:
     Body is What / why, Spec links, Verify, and a Work item section when `work-item.md` exists. On Windows,
     a multi-line Azure DevOps description is passed as `--description "@<file>"` (UTF-8 without BOM).
     May name `/crav1-review-pr` and does not run it. Next explicit ask to merge is `/crav1-merge-pr`.
+  - '1.64.0: the base is the head''s `(into …)` branch, then the repo''s `Merges into` branch (also from a sibling spec repo), then the default branch. The slug is also found from a spec that lists the head branch.'
   use_when: Commits exist; want a pull request
   table:
     reads: The change branch, the spec, and `verify.md`
     writes: A push of the change branch and one pull request, after an explicit yes
-  reads: Reads the change branch, the spec folder, `verify.md`, and `work-item.md` when it exists.
+  reads: 'Reads the change branch, the spec folder, `verify.md`, `work-item.md` when it exists, and the `Merges into` cell in `docs/system/repos.md` and the spec''s Branch list for the base.'
   writes: Writes one pull request after an explicit yes to push.
   leaves_alone: Leaves new commits and the merge alone.
   exceptions: names `/crav1-review-pr` and `/crav1-merge-pr` and does not run them.
@@ -1167,6 +1175,7 @@ skills:
     for a finding and does not start it. Posts comments and a verdict only after the user's yes. Does
     not edit, install a linter, or merge. Spark,
     specify, and verify do not run it.
+  - '1.64.0: finds the spec the same way as `/crav1-open-pr`, including a spec that lists the head branch.'
   use_when: This turn names an open pull request
   table:
     reads: The pull request, its diff, and the spec
@@ -1204,6 +1213,7 @@ skills:
     policy bypass. After the completed re-read, two parents are confirmed with `git rev-list` (commits
     API if git cannot see the commit). Does not run `/crav1-review-pr`. Stops when a required host check
     is red.
+  - '1.64.0: after a confirmed merge, says `<n> of <m> branches of <slug> now merged into <target>` per spec. No file edits.'
   use_when: This turn asks to merge a named pull request
   table:
     reads: That named pull request
@@ -1233,6 +1243,7 @@ skills:
   in_depth:
   - 'Called with nothing, **`/crav1-help`** shows a usage guide with example questions. With a skill name, it says what the skill does, when to use it, what it reads and writes, and its before and after steps. With `next` or a situation, it picks the route in `docs/reference/workflow.yaml` and lists the steps in order, marked done, next, skipped, or to do from the slice''s file state (open questions, `plan.md`, ticked tasks, `verify.md`, `work-item.md`). It also explains a concept from the glossary and concept pages, lists skills by lane (`list`, `list <lane>`), gives the status of one slice (`status <slug>`, `where am I`) with the readiness rules of `/crav1-tasks-ready-to-build` and the route step it is on, compares two skills (`compare A B`), and summarizes the changelog for the installed version (`whats new`, `whats new since x.y`). A free-form question is answered from the docs, or with "the kit doesn''t say". Every answer ends with `Source: <file>#<anchor>`. On pushback it re-reads the file and keeps the answer unless the file says otherwise.'
   - It reads the kit repo's `docs/`, or the `crav1-docs/` folder bundled next to the skills (plugin, Cursor drop-in, Claude Code drop-in), never GitHub. When online, it reads the tag names once and says so when a newer version is tagged. It writes nothing and runs no other skill. It is cross-cutting. It is not a starter option.
+  - '1.64.0: `status <slug>` and `where am I` add the Branches line and route unmerged work to `/crav1-open-pr` or `/crav1-merge-pr`.'
   use_when: You want to know what to run next, in what order, or what a skill does
   table:
     reads: The kit docs (kit repo, or the bundled `crav1-docs/` next to the skills), and the slice's file state
@@ -1259,6 +1270,7 @@ skills:
   in_depth:
   - '**`/crav1-tasks-ready-to-build`** reads `spec.md` open questions, `plan.md` (the `Reviewed:` line and `## Risks`), `tasks.md`, and `verify.md` for one slice or every slice. A ticked task is Done when `verify.md` lists it as verified, otherwise Needs verify. Then a task is blocked by a missing `plan.md`, by a kept-open question whose `Blocks:` line names it, by a kept-open question or plan Risk with no `Blocks:` line (the whole slice, inferred), or by an unticked task in its `(after: T#)` (recorded) or, with no `(after: …)`, any earlier unticked task (inferred). Otherwise it is Ready, with a warning when the plan review is unknown (inferred) or still has open `P#`s.'
   - 'Shows summary counts per slice, then Ready, Blocked (one reason each, recorded or inferred), Needs verify, a Done count, `Next: /crav1-build-tasks T#`, and a `Source:` line. Local only: it never reads Azure Boards and names `/crav1-ado-sync` for task states there. It writes nothing and runs no other skill. It can run any time. It is cross-cutting. It is not a starter option.'
+  - '1.64.0: shows a task''s `(branch: …)` and one Branches line from local git only.'
   use_when: 'You want to know which tasks can be built now, and why the others cannot'
   table:
     reads: '`spec.md` open questions, `plan.md`, `tasks.md`, and `verify.md` per slice'

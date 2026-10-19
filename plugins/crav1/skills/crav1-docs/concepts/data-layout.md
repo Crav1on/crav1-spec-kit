@@ -12,7 +12,7 @@ A layout that works without extra command-line tools:
 docs/system/
   _template/
   landscape.md       # short description, how the parts connect, v0 vs later, bulk A#s, feature index
-  repos.md           # named repos (proposed until a URL exists), Synced at and Work items go to per repo
+  repos.md           # named repos (proposed until a URL exists), Synced at, Merges into and Work items go to per repo
   diagrams.md        # context diagram; /crav1-refresh-system-notes adds what is new
   glossary.md        # words the source already uses; not a feature spec
   security.md        # kept risks after /crav1-review-security (system pass); not seeded by spark
@@ -101,6 +101,7 @@ source: <mail subject, sender, sent date | meeting date and title | file path | 
 source_date: YYYY-MM-DD
 imported: YYYY-MM-DD
 source_folder: docs/sources/YYYY-MM-DD-slug/
+commits: []   # code change only (1.64.0)
 used_by: []
 waiting_for: []
 ---
@@ -113,7 +114,7 @@ Source date: YYYY-MM-DD. Imported: YYYY-MM-DD.
 
 **Generated indexes.** `docs/notes/index.md` (one row per month) and `docs/notes/YYYY-MM/index.md` (title, date, kind, source, used by, waiting for) are built from the front matter by `notes_index.py` in the `crav1-add-to-spec` skill folder (`scripts/notes_index.py`). `--check` fails when an index is stale, so a product repo can run it in CI. No skill edits an index by hand. Lookups for a spec follow its `Full source:` links; matching new input and the duplicate check read the indexes.
 
-**Duplicate check.** The same source again (the same mail, meeting date and title, file, or commit) is not written twice: the run says `already imported on <date> as <note>` and offers reuse (for specs that took nothing yet) or skip. The same point from a different source adds the new note as a second source on the existing spec line. A disagreement is written as a `**Conflict:**` line for the user to decide, never an overwrite.
+**Duplicate check.** The same source again (the same mail, meeting date and title, file, or commit) is not written twice: the run says `already imported on <date> as <note>` and offers reuse (for specs that took nothing yet) or skip. The same point from a different source adds the new note as a second source on the existing spec line. A disagreement is written as a `**Conflict:**` line for the user to decide, never an overwrite. Since 1.64.0 a code change is also matched commit by commit: the note's `commits:` list (or its `source` expanded with git) and `git patch-id` for the same change under another SHA. Commits already imported are left out, and a fully imported change takes the reuse-or-skip path.
 
 **Parked specs.** A parked spec gets nothing written; its slug goes in the note's `waiting_for` until `/crav1-retire-spec` un-parks it.
 
@@ -184,6 +185,23 @@ When a mark is missing, the reader falls back and labels the reason **inferred**
 
 A ticked task is Done only when `verify.md` lists it as verified. Otherwise it shows as Needs verify.
 
+## One spec, several branches (1.64.0)
+
+A spec's work can sit on several branches, and in several repos. The rules are in `crav1-add-to-spec` `references/branches.md`; the marks are in the tables below.
+
+- **Where branches are named:** the `Synced at` slice line (one entry per branch, `; `-separated), the Match `Branch:` list, and a task's `(branch: …)` part. Together, minus base branches and `(dropped)` entries, these are the spec's **work branches**.
+- **Base branch:** the repo's `Merges into` cell in `docs/system/repos.md`, else the default branch. A branch diff starts at the **fork point** (where the branch split off), so a branch cut from `develop` in a repo whose default is `main` shows only its own commits.
+- **Done across branches:** every work branch merged into its base (contained, the same change, or a merged PR on GitHub or Azure DevOps). A deleted branch whose work is in the base counts as merged. Report only: no skill writes `Status:` because of it.
+- **Other repos:** code is read from the sibling checkout `../<repo>`, read-only. Refs on disk only; nothing fetches.
+
+```text
+docs/system/repos.md      | orders-api | … | develop@00344be, 2026-10-15 | develop | … |
+docs/specs/orders/spec.md   Synced at: orders-api feat/orders-retry@155b5c4, 2026-10-19; develop@00344be, 2026-10-15
+                            - Branch: feat/orders-retry; feature/orders-openapi
+docs/specs/orders/tasks.md  - [ ] T3: … (verify: unit — …) (spec: …) (after: T1) (branch: feat/orders-retry)
+docs/notes/2026-10/…md      commits: [155b5c4, 2c0e1a9]
+```
+
 ## Work item homes
 
 Each implementation repo has its own work item home: the Azure DevOps (ADO) project its work items go to. The home is the `Work items go to` cell for that repo in `docs/system/repos.md`:
@@ -225,9 +243,10 @@ Every mark and line format the kit writes inside product files, generated from [
 | Moved pointer | `Moved: <retired \| merged \| converted> <YYYY-MM-DD>, see <new path>. Reason: <reason>` | `docs/specs/<slug>/spec.md` (the old path, whole file) | `/crav1-retire-spec` | `/crav1-add-to-spec`, `/crav1-ado-sync`, `/crav1-build-features`, `/crav1-build-tasks`, `/crav1-help`, `/crav1-plan-from-spec`, `/crav1-show-or-ask-open-questions` | 1.60.0 |
 | Retired | `Retired: <YYYY-MM-DD>, <reason>` | `docs/specs/retired/<slug>/spec.md` (first line) | `/crav1-retire-spec` | — | 1.60.0 |
 | Merged | `Merged: <YYYY-MM-DD> into <target slug>, <reason>` | `docs/specs/retired/<slug>/spec.md` (first line) | `/crav1-retire-spec` | — | 1.60.0 |
-| Synced at (slice line) | `Synced at: <repo> <branch>@<short sha>, <date>` | `docs/specs/<slug>/spec.md` (after the title, before the first heading) | `/crav1-add-to-spec`, `/crav1-bundle-to-specs`, `crav1-bundle-slice-agent`, `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-refresh-system-notes` | `/crav1-plan-from-spec`, `/crav1-tighten-spec` | 1.29.0 |
+| Synced at (slice line) | `Synced at: <repo> <branch>@<short sha>, <date>[ (dropped)][; <branch>@<short sha>, <date>[ (dropped)]]` | `docs/specs/<slug>/spec.md` (after the title, before the first heading) | `/crav1-add-to-spec`, `/crav1-bundle-to-specs`, `crav1-bundle-slice-agent`, `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-refresh-system-notes` | `/crav1-plan-from-spec`, `/crav1-tighten-spec`, `/crav1-help`, `/crav1-verify-build-against-spec`, `/crav1-tasks-ready-to-build`, `/crav1-open-pr`, `/crav1-merge-pr`, `/crav1-review-pr` | 1.29.0 |
 | Match status | `- Status: <done \| partial \| not in the code>` | `docs/specs/<slug>/spec.md` (under ## Match) | `/crav1-existing-to-specs`, `/crav1-add-to-spec` | `/crav1-plan-from-spec`, `/crav1-tighten-spec`, `/crav1-explain-existing-system` | 1.0.0 |
-| Branch | `[- ]Branch: <name>` | `docs/specs/<slug>/spec.md` (under ## Match, or after the title) | `/crav1-tighten-spec` | `/crav1-tighten-spec` | 1.32.0 |
+| Branch | `[- ]Branch: [<repo> ]<branch>[ (into <branch>)][; [<repo> ]<branch>[ (into <branch>)]]` | `docs/specs/<slug>/spec.md` (under ## Match, or after the title) | `/crav1-tighten-spec` | `/crav1-tighten-spec`, `/crav1-plan-from-spec`, `/crav1-open-pr`, `/crav1-help`, `/crav1-verify-build-against-spec`, `/crav1-tasks-ready-to-build`, `/crav1-merge-pr`, `/crav1-review-pr` | 1.32.0 |
+| (dropped) | `<branch>@<short sha>, <date> (dropped)` | `docs/specs/<slug>/spec.md` (end of a Synced at entry) | `/crav1-tighten-spec` | `/crav1-help`, `/crav1-verify-build-against-spec`, `/crav1-tasks-ready-to-build`, `/crav1-plan-from-spec` | 1.64.0 |
 | New | `**New:** "<quote>"` | `docs/specs/<slug>/spec.md` | `/crav1-add-to-spec` | — | 1.0.0 |
 | Inferred | `**Inferred:** <connection the source does not state>` | `docs/specs/<slug>/spec.md` | `/crav1-add-to-spec` | — | 1.0.0 |
 | Full source | `Full source: docs/notes/YYYY-MM/<file>.md[; <second note>]` | `docs/specs/<slug>/spec.md` (after a point) | `/crav1-add-to-spec`, `/crav1-bundle-to-specs`, `/crav1-ideas-to-spec`, `/crav1-spark-to-spec`, `/crav1-tighten-spec`, `/crav1-existing-to-specs` | `/crav1-add-to-spec` | 1.60.0 |
@@ -266,12 +285,14 @@ Every mark and line format the kit writes inside product files, generated from [
 | (verify: …) | `(verify: <kind> — <named check>[; <kind> — <named check>])` | `docs/specs/<slug>/tasks.md` (on a task line) | `/crav1-plan-from-spec`, `/crav1-tighten-plan` | `/crav1-build-tasks`, `/crav1-review-plan` | 1.0.0 |
 | (spec: …) | `(spec: <REQ or acceptance>)` | `docs/specs/<slug>/tasks.md` (on a task line) | `/crav1-plan-from-spec`, `/crav1-tighten-plan` | `/crav1-review-plan`, `/crav1-ado-sync` | 1.0.0 |
 | (after: …) | `(after: T<n>[, T<n>])` | `docs/specs/<slug>/tasks.md` (end of a task line) | `/crav1-plan-from-spec` | `/crav1-tasks-ready-to-build`, `/crav1-help` | 1.54.0 |
+| (branch: …) | `(branch: [<repo> ]<branch>)` | `docs/specs/<slug>/tasks.md` (end of a task line, after (after: …)) | `/crav1-plan-from-spec` | `/crav1-build-tasks`, `/crav1-build-features`, `/crav1-create-feature-branch`, `/crav1-tasks-ready-to-build`, `/crav1-verify-build-against-spec`, `/crav1-help` | 1.64.0 |
 
 ### `docs/system/`
 
 | Mark | Format | Where | Written by | Read by | Since |
 | --- | --- | --- | --- | --- | --- |
 | Synced at (repo cell) | `<branch>@<short sha>, <date>[; <branch>@<short sha>, <date>]` | `docs/system/repos.md` (Synced at column) | `/crav1-add-to-spec`, `/crav1-bundle-to-specs`, `/crav1-ideas-to-spec`, `/crav1-refresh-system-notes`, `/crav1-existing-to-specs` | `/crav1-refresh-system-notes` | 1.29.0 |
+| Merges into | `<branch>` | `docs/system/repos.md` (Merges into column) | `/crav1-add-to-spec` | `/crav1-open-pr`, `/crav1-add-to-spec` | 1.64.0 |
 | Work items go to | `ADO: <org>/<project>` | `docs/system/repos.md` (Work items go to column) | `/crav1-ado-sync` | `/crav1-ado-sync`, `/crav1-finalize-commit`, `/crav1-open-pr`, `/crav1-what-do-we-know-about-this` | 1.50.0 |
 | Reference-only line | `<title>: reference only, see docs/notes/<YYYY-MM>/<YYYY-MM-DD>-<slug>.md` | `docs/system/landscape.md` (under ## How the parts connect) | `/crav1-retire-spec` | — | 1.60.0 |
 
@@ -295,6 +316,7 @@ Every mark and line format the kit writes inside product files, generated from [
 | Mark | Format | Where | Written by | Read by | Since |
 | --- | --- | --- | --- | --- | --- |
 | used_by | `used_by: [<slug>, <slug>]` | `docs/notes/YYYY-MM/<note>.md` (front matter) | `/crav1-add-to-spec`, `/crav1-bundle-to-specs`, `/crav1-ideas-to-spec`, `/crav1-spark-to-spec`, `/crav1-tighten-spec`, `/crav1-existing-to-specs`, `/crav1-retire-spec` | `/crav1-ado-sync` | 1.61.0 |
+| commits | `commits: [<short sha>[, <short sha>]]` | `docs/notes/YYYY-MM/<note>.md` (front matter, code change notes only) | `/crav1-add-to-spec` | `/crav1-add-to-spec`, `/crav1-tighten-spec` | 1.64.0 |
 | waiting_for | `waiting_for: [<parked slug>]` | `docs/notes/YYYY-MM/<note>.md` (front matter) | `/crav1-add-to-spec`, `/crav1-retire-spec` | `/crav1-help`, `/crav1-show-or-ask-open-questions`, `/crav1-ado-sync` | 1.61.0 |
 | Converted from spec | `Converted from spec, no research owner` | `docs/notes/YYYY-MM/<note>.md` (body, after the Source line) | `/crav1-retire-spec` | `/crav1-add-to-spec` | 1.60.0 |
 | Absorbed by / Used by (older notes) | `<Absorbed by \| Used by> <slug>` | `docs/notes/<note>.md` (before 1.61.0) | — | `/crav1-add-to-spec` | 1.36.0 |

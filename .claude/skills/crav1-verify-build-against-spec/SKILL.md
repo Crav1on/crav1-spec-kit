@@ -27,7 +27,11 @@ For every `T#` in `tasks.md`:
 | **Implemented, verified** | Row is `[x]` **and** its verify evidence ran and passed |
 | **Implemented, verify failed** | `[x]` or code exists for this `T#`, but verify ran and failed |
 | **Not implemented** | Still `- [ ]` (or no code for this `T#`) |
-| **Claimed done, unverified** | `[x]` but evidence could not be run (no command, no browser) |
+| **Claimed done, unverified** | `[x]` but evidence could not be run (no command, no browser). Also a ticked task whose `(branch: X)` is not the checkout: **Claimed done, unverified (on X, not checked out)** |
+
+## Branches (1.64.0)
+
+When the spec has work branches (its `Synced at` entries, Match `Branch:` list and task `(branch: …)` parts, minus base branches and `(dropped)` entries), work out the Branches line as `crav1-add-to-spec` `references/branches.md` (drop-in: `.claude/skills/crav1-add-to-spec/references/branches.md`; plugin: sibling `skills/crav1-add-to-spec/references/branches.md`) says: per repo, merged into its into branch or not, own commits since the fork point, `merged, branch deleted`, `branch rewritten since last read`, `unknown (branch gone)`, `(also in <slug>)` for a branch other specs list too, and the age of each remote copy. Use refs on disk; never fetch, never check out. Host checks only for GitHub (`gh`) and Azure DevOps (`az`) when already signed in. Report only: never change `Status:` or any spec line because of it.
 
 Acceptance lines with **no** `T#` stay in the detail matrix as **missing** coverage — also list their ids in the TL;DR.
 
@@ -51,7 +55,7 @@ Then:
 
 Follow this skill’s `assets/verify.md` **section order**. Do not put the long acceptance table first.
 
-1. **TL;DR** — counts + id lists. Then one line: next command (`/crav1-fix-build-gaps` if failed/unverified/`G#` remain, else `/crav1-build-tasks` or ship).
+1. **TL;DR** — counts + id lists, then the Branches line when the spec has work branches. Then one line: next command (`/crav1-fix-build-gaps` if failed/unverified/`G#` remain, else `/crav1-build-tasks` or ship).
 2. **Tasks — overview** — one short table: `T#` | title | status | verify result. Group or sort: verified first, then failed, then not implemented.
 3. **Acceptance — details** — the full A# matrix (quote, evidence, result).
 4. **Commands run**
@@ -64,13 +68,14 @@ Do not rewrite `spec.md`.
 Same order as the file. Do **not** open with the full acceptance matrix.
 
 1. Path to `verify.md`
-2. **TL;DR** (copy the id lists; they should be scannable in a few seconds)
+2. **TL;DR** (copy the id lists and the Branches line; they should be scannable in a few seconds)
 3. Point at the Tasks overview in the file
 4. Next:
    - Inner-loop (**verify failed**, **claimed done, unverified**, wiring **`G#`**) → `/crav1-fix-build-gaps` (omit Gap to walk them in order)
    - **Not implemented** → `/crav1-build-tasks T#`
    - acceptance with no task → `/crav1-plan-from-spec` or `/crav1-tighten-spec` if the line should die
-   - all **Implemented, verified** and no missing acceptance → spec is demoable; they can ship / PR
+   - all **Implemented, verified**, no missing acceptance, and every work branch merged → spec is demoable; they can ship / PR
+   - all verified but some work branches not merged → `built and verified, not merged yet: <branches>`, next `/crav1-open-pr` or `/crav1-merge-pr`
 
 Do not start implementing in this turn unless they already named a `T#` to fix.
 

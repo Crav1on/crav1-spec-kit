@@ -112,8 +112,9 @@ The message names a kit word or file, such as `work item homes`, `choice words`,
 
 1. Read the slice's files only: `spec.md` (open questions and their marks), `plan.md` (the `Reviewed:` line and `## Risks`), `tasks.md` (ticks and `(after: T#)`), `verify.md`, and `work-item.md`. Never read Azure Boards.
 2. Count tasks with the readiness rules of `/crav1-tasks-ready-to-build` (its `SKILL.md` next to this one): ready, blocked, needs verify, done. Do not repeat the per-task list; for that, name `/crav1-tasks-ready-to-build`.
-3. Name the route (`workflow.yaml`) the slice is on and the step it is at, marked from the files: for example no `plan.md` is before Plan; `plan.md` with no `Reviewed:` line is at review-plan; ready tasks are at build; all tasks ticked and verified is at finalize-commit.
-4. Give the next step from that route, and why. Do not run it.
+3. **Branches (1.64.0).** When the spec has work branches (its `Synced at` entries, Match `Branch:` list and task `(branch: …)` parts, minus base branches and `(dropped)` entries), give the Branches line from `crav1-add-to-spec` `references/branches.md` (drop-in: `.claude/skills/crav1-add-to-spec/references/branches.md`; plugin: sibling `skills/crav1-add-to-spec/references/branches.md`): per repo, how many are merged into the base, each unmerged branch's own commits since its fork point, `merged, branch deleted`, `branch rewritten since last read`, `unknown (branch gone)`, `(also in <slug>)`, and the age of each remote copy. This is read-only git on the refs on disk (and `../<repo>` for another repo); never fetch, never check out, never write. Host checks only for GitHub (`gh`) or Azure DevOps (`az`) when already signed in. For `where am I` across several slices, a shared branch is counted once.
+4. Name the route (`workflow.yaml`) the slice is on and the step it is at, marked from the files: for example no `plan.md` is before Plan; `plan.md` with no `Reviewed:` line is at review-plan; ready tasks are at build; all tasks ticked and verified is at finalize-commit, or at `/crav1-open-pr` / `/crav1-merge-pr` when some work branches are not merged yet.
+5. Give the next step from that route, and why. Do not run it.
 
 ### 7. Compare two skills
 

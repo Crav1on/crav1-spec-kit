@@ -15,7 +15,7 @@ color: green
 
 # Open a pull request
 
-Push the change branch **only after an explicit yes**, open **one** pull request against the default branch, then stop. Do not merge in this skill. Merging is `/crav1-merge-pr`, a separate step, and only when they explicitly ask in that turn to merge a named pull request. Do not commit.
+Push the change branch **only after an explicit yes**, open **one** pull request against the head's into branch (see **Base branch**; usually the default branch), then stop. Do not merge in this skill. Merging is `/crav1-merge-pr`, a separate step, and only when they explicitly ask in that turn to merge a named pull request. Do not commit.
 
 Create with GitHub `gh` when that host's checks pass. On Azure DevOps, create with `az repos pr` when the Azure CLI can run it. Otherwise print filled commands and GitKraken GUI paste fields. Do not claim a pull request was opened unless the host returned a URL.
 
@@ -29,7 +29,7 @@ Resolve these before you push or create anything. Prompt when a value is missing
 
 | Input | Default |
 | --- | --- |
-| Base | Repo default branch. See **Base branch**. Confirm when ambiguous. |
+| Base | The head's into branch, then the repo's `Merges into` branch, then the repo default branch. See **Base branch**. Confirm when ambiguous. |
 | Head | Current branch when it is not the base. Otherwise ask. Do not check out a different branch in this skill. |
 | Title | `<slug>: <short summary>` when the head is `feat/<slug>` or `spec/<slug>`. Summary is the `spec.md` H1 when `docs/specs/<slug>/spec.md` exists; otherwise the latest commit subject on the head. No slug: latest commit subject. |
 | Body | Template below. |
@@ -38,6 +38,16 @@ Resolve these before you push or create anything. Prompt when a value is missing
 On Windows, `git` may not be on `PATH`. Try `git`, then `C:\Program Files\Git\cmd\git.exe`. `az` may be `az.cmd`. When PowerShell calls `az.cmd`, `cmd.exe` cuts a multi-line argument at the first newline, and an unquoted `--query` value that contains parentheses is a syntax error. Quote every `--query` value (`--query "value[].pullRequestId"`). A multi-line pull-request description uses the `@file` steps in **Create**.
 
 ## Base branch
+
+**Into and Merges into (1.64.0).** Before the default-branch steps below, as `crav1-add-to-spec` `references/branches.md` (drop-in: `.claude/skills/crav1-add-to-spec/references/branches.md`; plugin: sibling `skills/crav1-add-to-spec/references/branches.md`) says:
+
+1. **Into.** When the head is listed in a spec's Match `Branch:` list with an `(into <branch>)` marker, that branch is the base. In 1.64.0 the kit only reads a marker that is already there; it never offers or writes one.
+2. **Merges into.** Else, when `docs/system/repos.md` has a `Merges into` cell for this repo, that branch is the base. When the open repo has no `docs/system/repos.md` row for itself (the specs live in another repo), look read-only in the sibling checkouts (`../*/docs/system/repos.md`) for one row naming this repo, and use its cell. Several rows that disagree: ask.
+3. Else the default branch, from the steps below.
+
+Name where the base came from in the draft (`Base: develop (Merges into in ../orders-specs/docs/system/repos.md)`).
+
+Default branch:
 
 1. `git symbolic-ref refs/remotes/<remote>/HEAD` (for example `origin/main` → `main`) when that ref exists.
 2. Else, when `gh auth status` succeeds and the remote is GitHub, `gh repo view --json defaultBranchRef --jq .defaultBranchRef.name`.
@@ -91,7 +101,7 @@ When base, head, and the checks are settled, write the draft into the user-visib
 
 ## Verify
 
-<One line from verify.md when that file exists (pass, fail, or missing). Otherwise: No verify.md on this branch.>
+<One line from verify.md when that file exists (pass, fail, or missing). Otherwise: No verify.md on this branch.> <When the spec has other unmerged work branches (1.64.0): This spec also has unmerged branches: <branch>, <branch>.>
 ```
 
 When a work-item mention is resolved, add this section after Verify. The body of the section is the mention line only:
@@ -102,7 +112,7 @@ When a work-item mention is resolved, add this section after Verify. The body of
 AB#52
 ```
 
-**Spec** lists only files that exist on the head. Omit **Spec** when none of `spec.md`, `plan.md`, and `tasks.md` exist under `docs/specs/<slug>/`. Slug comes from `feat/<slug>` or `spec/<slug>`. If the head name has no slug and exactly one `docs/specs/<slug>/` folder changed vs base (not `_template/`), use that slug. If several changed, leave the slug out of the title and omit **Spec** rather than picking one.
+**Spec** lists only files that exist on the head. Omit **Spec** when none of `spec.md`, `plan.md`, and `tasks.md` exist under `docs/specs/<slug>/`. Slug comes from `feat/<slug>` or `spec/<slug>`. Else (1.64.0) it is the spec whose `Synced at` entries, Match `Branch:` list or task `(branch: …)` parts name the head, in this repo or in the sibling spec repo found under **Base branch**; when several specs name it, list each under **Spec** and leave the slug out of the title. If the head name has no slug and exactly one `docs/specs/<slug>/` folder changed vs base (not `_template/`), use that slug. If several changed, leave the slug out of the title and omit **Spec** rather than picking one.
 
 **Work item** is included only when [references/work-item-mention.md](../crav1-finalize-commit/branches/message-only/references/work-item-mention.md) resolves a mention for that slug (plugin: sibling `skills/crav1-finalize-commit/branches/message-only/references/work-item-mention.md`). The section body is that one mention line (`#<id>` on Azure Repos, `AB#<id>` on GitHub, or the file’s full token). On Azure DevOps, only a line whose work item home matches this repo's `Work items go to` cell in `docs/system/repos.md` is mentioned, as that reference says. Omit the section when there is no mention. The hint from that reference, when it has one, is a single sentence after the draft, not inside the body.
 

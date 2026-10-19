@@ -12,7 +12,7 @@ Read `tasks.md`, `plan.md`, `spec.md`. Task row shape is this skill’s `assets/
 
 If `tasks.md` is missing, stop. Next: `/crav1-plan-from-spec`.
 
-**Branch:** before any code, follow `/crav1-create-feature-branch` (drop-in: `.claude/skills/crav1-create-feature-branch/SKILL.md`; plugin: sibling `skills/crav1-create-feature-branch/SKILL.md`) **Build** prompt. If you are on `spec/<slug>`, stop (no code) and follow that skill’s **Build on a spec-only branch**.
+**Branch:** before any code, follow `/crav1-create-feature-branch` (drop-in: `.claude/skills/crav1-create-feature-branch/SKILL.md`; plugin: sibling `skills/crav1-create-feature-branch/SKILL.md`) **Build** prompt. When the task ends with `(branch: X)`, that prompt offers **X (Recommended)** first (1.64.0); on X already, go ahead. A dirty tree still means no checkout. If you are on `spec/<slug>`, stop (no code) and follow that skill’s **Build on a spec-only branch**.
 
 ## Gate
 

@@ -14,7 +14,7 @@ This is not `/crav1-resolve-open-questions`. Resolve walks the questions with yo
 The open questions for <a person, one spec, or a topic>, as a mail.
 ```
 
-Name a person (`Alex`, or a group), a spec (`@docs/specs/<slug>/`), or a topic (`static IP`). You can also name the kind of draft and the language.
+Name a person (`Alex`, or a group), a spec (`@docs/specs/<slug>/`), or a topic (`static IP`). A question routed via a person ("Finance via Dana") belongs to that person: `/crav1-show-or-ask-open-questions` lists it for Dana. You can also name the kind of draft and the language.
 
 ## Steps
 

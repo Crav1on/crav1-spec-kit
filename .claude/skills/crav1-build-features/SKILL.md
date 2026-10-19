@@ -77,6 +77,8 @@ Default branch: same detect as create-feature-branch (`origin/HEAD`, else `main`
 
 After a slug’s last worker, the tree should be clean (workers commit). Then switch to the next slug with this same procedure.
 
+**Task branches (1.64.0).** Inside a slug, a task that ends with `(branch: X)` is built on X: switch to X before its worker, only on a clean tree (`git checkout X`, which also makes the local branch from `origin/X`). Tasks without a branch part use `feat/<slug>` from default, as above. Starting the board is consent to these switches. When X exists nowhere, that task is `blocked` with the reason `branch X not found`; never create X. A `(branch: <repo> X)` for another repo is `blocked` with `belongs to <repo>`.
+
 ## Board (keep this updated)
 
 ```text
@@ -86,6 +88,8 @@ billing       feat/billing     T1–T6    queued
 ```
 
 Status: `queued` | `running` | `needs_fix` | `needs_ready` | `needs_dependency` | `done` | `blocked` | `skipped`.
+
+The branch column shows each task's branch when tasks name one. A slug whose tasks are done but whose work branches are not all merged into their base shows `done (2 branches not merged)`, using the merged tests in `crav1-add-to-spec` `references/branches.md` (drop-in: `.claude/skills/crav1-add-to-spec/references/branches.md`; plugin: sibling `skills/crav1-add-to-spec/references/branches.md`). A branch shared by several slugs is counted once on the board. This is report only.
 
 ## Per slug (you stay in this chat)
 
@@ -111,7 +115,7 @@ Do not skip a blocked slug unless they `skip-slug`.
 
 ## After the board
 
-TL;DR: slugs `done` / `blocked` + why / `skipped` / not started; which `feat/<slug>` tips you left on; commits workers reported.
+TL;DR: slugs `done` (with `n branches not merged` when that applies) / `blocked` + why / `skipped` / not started; which `feat/<slug>` tips you left on; commits workers reported.
 
 Remind: **no push, no PR** from this skill. Next (optional): `/crav1-open-pr` when you want to push and open the PR (one PR per `feat/<slug>`; do not run it here).
 

@@ -10,6 +10,8 @@ Open a pull request for the current change branch (push with explicit yes).
 
 Push the change branch only after an explicit yes, then open one pull request (no merge, no commit). Body is What / why, Spec links, Verify, and a Work item section when `work-item.md` exists. On Windows, a multi-line Azure DevOps description is passed as `--description "@<file>"` (UTF-8 without BOM). May name [`/crav1-review-pr`](crav1-review-pr.md) and does not run it. Next explicit ask to merge is [`/crav1-merge-pr`](crav1-merge-pr.md).
 
+1.64.0: the base is the head's `(into …)` branch, then the repo's `Merges into` branch (also from a sibling spec repo), then the default branch. The slug is also found from a spec that lists the head branch.
+
 ## Runs when
 
 Commits exist; want a pull request. Called by the user.
@@ -18,7 +20,7 @@ Commits exist; want a pull request. Called by the user.
 
 In short: The change branch, the spec, and `verify.md`.
 
-Reads the change branch, the spec folder, `verify.md`, and `work-item.md` when it exists.
+Reads the change branch, the spec folder, `verify.md`, `work-item.md` when it exists, and the `Merges into` cell in `docs/system/repos.md` and the spec's Branch list for the base.
 
 ## Writes
 

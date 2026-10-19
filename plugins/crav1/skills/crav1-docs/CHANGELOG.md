@@ -2,16 +2,37 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
-## Unreleased
+## 1.64.0 (2026-10-19)
+
+One spec, many feature branches: setups 1 (main only), 2 (an integration branch such as `develop`), 3 (stacked branches) and 5 (one spec over several repos). Everything is report only and read-only git on the refs on disk; nothing fetches and nothing writes `Status:`. Examples use made-up names.
+
+### Kit
+
+- New `crav1-add-to-spec/references/branches.md`: the shared rules for work branches, base branch, fork point, merged, gone, rewritten and shared branches, the sibling checkout, and the Branches line.
+- **Synced at per branch.** A slice `Synced at` line keeps one entry per branch, `; `-separated (`Synced at: orders-api feat/orders-retry@155b5c4, 2026-10-19; develop@00344be, 2026-10-15`). A new read replaces only that branch's entry. Every writer follows it: add-to-spec code change, bundle-to-specs (and its worker and slice agent), spark-to-spec, ideas-to-spec and refresh-system-notes. Drift is measured per branch.
+- **Merges into.** `docs/system/repos.md` gets an optional `Merges into` column (empty means the default branch) in every template. The code-change branch of `/crav1-add-to-spec` offers to fill it after one yes when the fork point is not the default branch; a headless run writes nothing.
+- **Fork point.** A branch diff starts where the branch split off (its `(into …)` branch, the repo's `Merges into` branch, the default branch, or another spec branch, by fewest own commits), not at the default branch. The report names the parent, the split point and the age of each remote copy. No fork point: fall back, then ask with options only; headless stops with `No fork point found for <branch>. Name a commit range.`
+- **No double import.** Code-change notes get a `commits:` list. Before writing, the change's commits are compared with every code-change note, by SHA and by `git patch-id` (same change under another SHA). Imported commits are left out; a fully imported change takes the reuse-or-skip path. A squash merge counts as covered only through a merged PR on GitHub (`gh`) or Azure DevOps (`az`); otherwise it is listed as `may already be in <note>`.
+- **Gone, rewritten, shared.** A deleted branch counts as merged when its recorded SHA or its `commits:` are in the base, or the host shows a merged PR (`merged, branch deleted`). Only a gone and unmerged branch gets the new `mark-dropped` offer in `/crav1-tighten-spec`, which ends its `Synced at` entry with `(dropped)`. A rebased or force-pushed branch says `branch rewritten since last read`, is matched by patch-id, and never errors. A branch in several specs is reported under each with `(also in <slug>)` and counted once across specs; one note serves every spec.
+- **Branch list.** `/crav1-tighten-spec` and `/crav1-plan-from-spec` read every work branch without checkout; a yes on writing the branch adds to the Match `Branch:` list. Pieces only on an unmerged branch are labeled `only on <branch>, not merged`.
+- **Task branch.** `/crav1-plan-from-spec` ends a task with `(branch: …)` (with the repo when the spec spans repos) when its piece lives on one branch. `/crav1-create-feature-branch` offers it first, marked (Recommended), and never creates it from default without asking. `/crav1-build-tasks` range and all-tasks runs and `/crav1-build-features` switch to each task's branch on a clean tree; a missing branch blocks that task. `/crav1-tasks-ready-to-build` shows it.
+- **Other repos.** Code is read read-only from the sibling checkout `../<repo>`. When it is missing, the kit asks for the path with options only; headless stops with `No checkout found for <repo>. Name its path.`
+- **Done across branches.** `/crav1-verify-build-against-spec`, `/crav1-help status`, `/crav1-tasks-ready-to-build` and the `/crav1-build-features` board report `Branches: <n> of <m> merged into <base>`; demoable needs every branch merged. `/crav1-merge-pr` says `<n> of <m> branches of <slug> now merged`. `/crav1-ado-sync` suggest-features counts unmerged branches as open work.
+- **open-pr base.** `/crav1-open-pr` uses the head's `(into …)` marker (read only in 1.64.0), then the repo's `Merges into` branch (also from a sibling spec repo), then the default branch. It and `/crav1-review-pr` also find the spec from a spec that lists the head branch.
+- `plugins/crav1/.cursor-plugin/plugin.json` is 1.64.0.
 
 ### Docs
 
+- New `marks.yaml` entries: `(dropped)`, `(branch: …)`, `Merges into`, note `commits:`; the `Synced at` slice line and the Match `Branch:` list now allow several branches.
+- Glossary: work branch, base branch / Merges into, fork point, dropped, branch rewritten since last read. Data layout: a "One spec, several branches" section, the `Merges into` column and the note `commits:` field.
+- Walkthroughs: add-to-spec code change, spec to plan, plan to build and verify get a several-branches section.
 - New `docs/reference/marks.yaml`: the single source for every mark and line format the kit writes in a product repo (44 marks), each with its files, format, pattern, examples, writers, readers, and the version it arrived in. Data layout gets a generated **All marks** section, and its **Readiness marks** table is generated from the same file.
 - Data layout: the `docs/environments/marks.md` row now names both Azure Boards lines with their per-home form, `Azure Boards task type (<project>): <type>` and `Azure Boards task done state (<project>): <state>` (it said `Azure Boards task type:` only).
 - Examples in docs and skills use made-up names (`orders-api`, `contoso/orders`, `Dana`) instead of names taken from a real project.
 
 ### CI
 
+- `notes_index.py --selftest` checks that a code-change note keeps `commits:` through migrate.
 - `scripts/gen-marks.py --check`: the marks tables match `marks.yaml`, every example matches its pattern, and every skill or agent listed as writer or reader mentions the mark.
 
 ## 1.63.0 (2026-10-16)

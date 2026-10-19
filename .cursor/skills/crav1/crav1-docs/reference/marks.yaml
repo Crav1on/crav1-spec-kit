@@ -81,13 +81,14 @@ marks:
     name: "Synced at (slice line)"
     group: spec
     files: ["docs/specs/<slug>/spec.md (after the title, before the first heading)"]
-    format: "Synced at: <repo> <branch>@<short sha>, <date>"
-    pattern: '^Synced at: \S+ \S+@[0-9a-f]{7}, \d{4}-\d{2}-\d{2}$'
+    format: "Synced at: <repo> <branch>@<short sha>, <date>[ (dropped)][; <branch>@<short sha>, <date>[ (dropped)]]"
+    pattern: '^Synced at: \S+ \S+@[0-9a-f]{7}, \d{4}-\d{2}-\d{2}( \(dropped\))?(; \S+@[0-9a-f]{7}, \d{4}-\d{2}-\d{2}( \(dropped\))?)*$'
     examples:
       - "Synced at: orders-api main@abc1234, 2026-10-07"
-    meaning: "The code commit a one-slice read last read, one line per repo."
+      - "Synced at: orders-api feat/orders-retry@155b5c4, 2026-10-19; feature/orders-openapi@85d4561, 2026-10-19; develop@00344be, 2026-10-15"
+    meaning: "The code commit a one-slice read last read, one line per repo. Since 1.64.0 one entry per branch read; a new read replaces only that branch's entry."
     written_by: [crav1-add-to-spec, crav1-bundle-to-specs, crav1-bundle-slice-agent, crav1-spark-to-spec, crav1-ideas-to-spec, crav1-refresh-system-notes]
-    read_by: [crav1-plan-from-spec, crav1-tighten-spec]
+    read_by: [crav1-plan-from-spec, crav1-tighten-spec, crav1-help, crav1-verify-build-against-spec, crav1-tasks-ready-to-build, crav1-open-pr, crav1-merge-pr, crav1-review-pr]
     mention: 'Synced at'
     since: 1.29.0
 
@@ -109,15 +110,31 @@ marks:
     name: "Branch"
     group: spec
     files: ["docs/specs/<slug>/spec.md (under ## Match, or after the title)"]
-    format: "[- ]Branch: <name>"
-    pattern: '^(- )?Branch: \S+$'
+    format: "[- ]Branch: [<repo> ]<branch>[ (into <branch>)][; [<repo> ]<branch>[ (into <branch>)]]"
+    pattern: '^(- )?Branch: (\S+ )?\S+( \(into \S+\))?(; (\S+ )?\S+( \(into \S+\))?)*$'
     examples:
       - "- Branch: develop"
-    meaning: "The branch that holds the slice's code, written after a yes."
+      - "- Branch: feat/orders-retry; feature/orders-openapi"
+      - "- Branch: orders-api feat/orders-retry; orders-api feature/orders-export (into feat/orders-retry)"
+    meaning: "The branches that hold the slice's code, written after a yes. Since 1.64.0 a yes adds to the list. An (into …) marker is read by open-pr in 1.64.0 and written by hand only."
     written_by: [crav1-tighten-spec]
-    read_by: [crav1-tighten-spec]
-    mention: 'Branch: '
+    read_by: [crav1-tighten-spec, crav1-plan-from-spec, crav1-open-pr, crav1-help, crav1-verify-build-against-spec, crav1-tasks-ready-to-build, crav1-merge-pr, crav1-review-pr]
+    mention: 'Branch:'
     since: 1.32.0
+
+  - id: dropped
+    name: "(dropped)"
+    group: spec
+    files: ["docs/specs/<slug>/spec.md (end of a Synced at entry)"]
+    format: "<branch>@<short sha>, <date> (dropped)"
+    pattern: '^\S+@[0-9a-f]{7}, \d{4}-\d{2}-\d{2} \(dropped\)$'
+    examples:
+      - "feat/orders-old@abc1234, 2026-10-01 (dropped)"
+    meaning: "A branch that is gone and was never merged, given up after a yes. It stays a record of what was read and no longer counts toward done."
+    written_by: [crav1-tighten-spec]
+    read_by: [crav1-help, crav1-verify-build-against-spec, crav1-tasks-ready-to-build, crav1-plan-from-spec]
+    mention: '\(dropped\)'
+    since: 1.64.0
 
   # ---------- spec.md: lines in the body ----------
   - id: label-new
@@ -448,6 +465,21 @@ marks:
     mention: '\(after:'
     since: 1.54.0
 
+  - id: task-branch
+    name: "(branch: …)"
+    group: plan
+    files: ["docs/specs/<slug>/tasks.md (end of a task line, after (after: …))"]
+    format: "(branch: [<repo> ]<branch>)"
+    pattern: '^\(branch: (\S+ )?\S+\)$'
+    examples:
+      - "(branch: feat/orders-retry)"
+      - "(branch: orders-api feat/orders-retry)"
+    meaning: "The branch the task is built on. The repo is named when the spec spans repos. A task without one uses feat/<slug>."
+    written_by: [crav1-plan-from-spec]
+    read_by: [crav1-build-tasks, crav1-build-features, crav1-create-feature-branch, crav1-tasks-ready-to-build, crav1-verify-build-against-spec, crav1-help]
+    mention: '\(branch:'
+    since: 1.64.0
+
   # ---------- docs/system/repos.md ----------
   - id: synced-at-repo
     name: "Synced at (repo cell)"
@@ -463,6 +495,20 @@ marks:
     read_by: [crav1-refresh-system-notes]
     mention: 'Synced at'
     since: 1.29.0
+
+  - id: merges-into
+    name: "Merges into"
+    group: system
+    files: ["docs/system/repos.md (Merges into column)"]
+    format: "<branch>"
+    pattern: '^\S+$'
+    examples:
+      - "develop"
+    meaning: "The branch the repo's work merges into. Empty means the default branch. Fork point, done and the open-pr base use it."
+    written_by: [crav1-add-to-spec]
+    read_by: [crav1-open-pr, crav1-add-to-spec]
+    mention: 'Merges into'
+    since: 1.64.0
 
   - id: work-items-go-to
     name: "Work items go to"
@@ -580,6 +626,20 @@ marks:
     read_by: [crav1-ado-sync]
     mention: 'used_by'
     since: 1.61.0
+
+  - id: note-commits
+    name: "commits"
+    group: notes
+    files: ["docs/notes/YYYY-MM/<note>.md (front matter, code change notes only)"]
+    format: "commits: [<short sha>[, <short sha>]]"
+    pattern: '^commits: \[([0-9a-f]{7}(, [0-9a-f]{7})*)?\]$'
+    examples:
+      - "commits: [155b5c4, 2c0e1a9]"
+    meaning: "The commits a code-change note imported, oldest first, without merge commits. The overlap check matches on it."
+    written_by: [crav1-add-to-spec]
+    read_by: [crav1-add-to-spec, crav1-tighten-spec]
+    mention: 'commits:'
+    since: 1.64.0
 
   - id: note-waiting-for
     name: "waiting_for"

@@ -12,6 +12,8 @@ When an open pull request is named, **[`/crav1-review-pr`](crav1-review-pr.md)**
 
 Reads one named open pull request. When the slug has `plan.md`, spec, plan, `verify.md`, the body, and a required green linter must hold before it says ship. When the slug has no `plan.md` or `tasks.md`, that is an info note. It does not report a missing `verify.md`. It reviews spec fit, the body, the required green linter, and secrets, and it reads the pipeline's recorded tests. It does not run tests. It names [`/crav1-refresh-system-notes`](crav1-refresh-system-notes.md) after that pull request merges and does not run it. Names the lane for a finding and does not start it. Posts comments and a verdict only after the user's yes. Does not edit, install a linter, or merge. Spark, specify, and verify do not run it.
 
+1.64.0: finds the spec the same way as [`/crav1-open-pr`](crav1-open-pr.md), including a spec that lists the head branch.
+
 ## Runs when
 
 This turn names an open pull request. Called by the user.

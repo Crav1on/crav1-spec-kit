@@ -10,6 +10,8 @@ Walk an existing spec issue-by-issue.
 
 One issue at a time, with explained resolutions (plus get a suggestion) and impact; patch only that issue after the user chooses. When the slice is partial or `## In the code` names paths, reads the committed code on the repo and branch the spec names before wording issues. A spec with no code behind it skips that read. Does not offer finish, add a test, or leave.
 
+1.64.0: reads every listed work branch without checkout; a yes on writing the branch adds to the `Branch:` list; a listed branch that is gone and not merged is offered `(dropped)` (`mark-dropped`); a deleted branch whose work is in the base shows `merged, branch deleted`.
+
 ## Runs when
 
 The spec is still mushy. Called by the user.

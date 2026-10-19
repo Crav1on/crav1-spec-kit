@@ -219,7 +219,7 @@ Set that repo's `Synced at` cell to the branch and commit actually read. When th
 
 On the missing-architecture pass, update that cell only when `repos.md` already exists. Do not create the file on that pass.
 
-Do not stamp a repo this run did not read. An empty cell stays empty. A consumer measuring drift uses the older of the repo column and the slice line, and an empty value means unknown, so fall back to spec file commit dates.
+Do not stamp a repo this run did not read. An empty cell stays empty. A consumer measuring drift uses the older of the repo column and the slice line, for each branch its own entry, and an empty value means unknown, so fall back to spec file commit dates.
 
 ## Stop
 

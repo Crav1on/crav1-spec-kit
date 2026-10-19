@@ -66,7 +66,7 @@ The record format, pending, answer links, and the asked-on date are shared with 
 
 Everything after the command, and every `@`, is the input. The user names one of these:
 
-- **A person or a group.** For example `Dana`, or `Finance`. Questions waiting for that person, and questions routed via that person, are theirs. "NRCC via Dana" is a question for Dana.
+- **A person or a group.** For example `Dana`, or `Finance`. Questions waiting for that person, and questions routed via that person, are theirs. "Finance via Dana" is a question for Dana.
 - **A spec.** An `@` of a spec folder or its `spec.md`, or its title.
 - **A topic.** A few words, such as `static IP` or `mTLS`.
 

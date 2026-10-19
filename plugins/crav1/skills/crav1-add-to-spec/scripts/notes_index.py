@@ -464,6 +464,14 @@ def selftest():
         snap = {p: p.read_text() for p in root.rglob("*.md")}
         assert migrate(root) == 0
         assert snap == {p: p.read_text() for p in root.rglob("*.md")}, "round 2 not idempotent"
+        # 1.64.0: a code-change note keeps its commits: list through migrate
+        (notes / "2026-10-05-retry.md").write_text(
+            "---\ntitle: Retry\nkind: code change\nsource: feat/orders-retry 00344be..2c0e1a9\n"
+            "commits: [155b5c4, 2c0e1a9]\nsource_date: 2026-10-05\nimported: 2026-10-19\nused_by: [orders]\n"
+            "waiting_for: []\n---\n# Retry\n\nfull diff\n")
+        assert migrate(root) == 0
+        rt = (notes / "2026-10" / "2026-10-05-retry.md").read_text()
+        assert "commits: [155b5c4, 2c0e1a9]" in rt and "kind: code change" in rt, rt
         (notes / "2026-09" / "2026-09-30-call.md").write_text(
             "---\ntitle: Call\nkind: meeting\nsource: meeting 2026-09-30 \"Call\"\nsource_date: 2026-09-30\n"
             "imported: 2026-10-16\nused_by: [billing]\nwaiting_for: [orders-export]\n---\n# Call\n\nfull text\n")

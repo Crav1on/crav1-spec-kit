@@ -10,6 +10,8 @@ Merge one named pull request with a merge commit.
 
 Merge one named pull request only when that turn asks; always a merge commit; no squash, rebase, or policy bypass. After the completed re-read, two parents are confirmed with `git rev-list` (commits API if git cannot see the commit). Does not run [`/crav1-review-pr`](crav1-review-pr.md). Stops when a required host check is red.
 
+1.64.0: after a confirmed merge, says `<n> of <m> branches of <slug> now merged into <target>` per spec. No file edits.
+
 ## Runs when
 
 This turn asks to merge a named pull request. Called by the user.

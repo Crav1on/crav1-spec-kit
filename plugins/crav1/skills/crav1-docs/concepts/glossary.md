@@ -94,7 +94,17 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 
 **Work item home.** Where the work items for one implementation repo go, written as `ADO: <org>/<project>` in the `Work items go to` column of `docs/system/repos.md`. The first Azure Boards skill that needs a repo's home asks for it once, suggesting the repo's own project, and never guesses it. A spec whose repos are in several homes gets one Feature in each home. `Jira: <project>` is reserved for later and is not read yet. See [Data layout](data-layout.md#work-item-homes).
 
-**Synced at.** The branch, short commit, and date a repo was last read, as `<branch>@<short sha>, <date>`, in `docs/system/repos.md`. A one-slice read writes a `Synced at` line on that slice instead.
+**Synced at.** The branch, short commit, and date a repo was last read, as `<branch>@<short sha>, <date>`, in `docs/system/repos.md`. A one-slice read writes a `Synced at` line on that slice instead. Since 1.64.0 that line holds one entry per branch read, `; `-separated, and a new read replaces only that branch's entry: `Synced at: orders-api feat/orders-retry@155b5c4, 2026-10-19; develop@00344be, 2026-10-15`.
+
+**Work branch.** A branch that holds part of a spec's work and still has to merge: named in the spec's `Synced at` entries, its Match `Branch:` list, or a task's `(branch: …)`, minus base branches and `(dropped)` entries. A spec is done across branches when every work branch is merged into its base. A branch may serve several specs; it is reported under each and counted once.
+
+**Base branch / Merges into.** The branch a repo's work merges into: the `Merges into` cell in `docs/system/repos.md` (for example `develop`), else the default branch. A base branch is never counted as a work branch.
+
+**Fork point.** Where a branch split off: the closest of its repo's base branches and the spec's other branches, by fewest own commits. A branch diff starts there, not at the default branch.
+
+**Dropped.** A `(dropped)` at the end of a `Synced at` entry: the branch is gone, was never merged, and was given up after a yes in `/crav1-tighten-spec`. A gone branch whose work is in the base counts as merged and is never offered dropped.
+
+**Branch rewritten since last read.** What status says when a branch's recorded SHA no longer exists or is no longer in the branch (a rebase or force push). Commits are matched by content (`git patch-id`), so nothing is imported twice.
 
 **Left out.** A guess from the code that stays out of the architecture spec, listed in `docs/architecture/left-out.md`.
 
