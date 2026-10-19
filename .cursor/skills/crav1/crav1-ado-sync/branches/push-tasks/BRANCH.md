@@ -78,7 +78,7 @@ For each pick, show the Azure Boards form in plain words. The label is **Create*
 | Home | `ADO: <org>/<project>`, the task's home |
 | Type | The saved child type for that home |
 | Parent | The Feature id |
-| Title | A fuller title that says what the work is: the area, then the task, for example `Email service: enable the day-ahead use case on dev` |
+| Title | A fuller title that says what the work is: the area, then the task, for example `Orders API: enable retries on dev` |
 | State | New when the `tasks.md` box is open. The saved done state (Closed or Done) when the box is ticked. See **State** below |
 | Iteration | blank. The user’s team sets it |
 | Priority | blank. The user’s team sets it |
@@ -95,11 +95,11 @@ Use only what the docs state. Do not invent an owner, a quote, a date, a decisio
 
 Generic, for the shape only:
 
-- **Title:** `Email service: enable the day-ahead use case on dev`
-- **Tags:** `email-service; infra-email-service`
+- **Title:** `Orders API: enable retries on dev`
+- **Tags:** `orders-api; orders-infra`
 - **Assigned To:** `<task owner>`
-- **Description:** The day-ahead use case only runs on test and prod today. In email-service the code limits it to those two environments, and the dev settings in infra-email-service have no configuration for it. This task enables it on dev so v0 runs on both dev and test. Decision: "v0 stays dev and test" (<name>, <date>). Related: the dev and test mailboxes are set up and tested (<name>, <date>, ticket <number>). Open blockers/questions: none recorded.
-- **Acceptance Criteria:** A unit test shows a day-ahead message is routed to the day-ahead use case when the environment is dev.
+- **Description:** Retries only run on test and prod today. In orders-api the code limits them to those two environments, and the dev settings in orders-infra have no configuration for them. This task enables them on dev so v0 runs on both dev and test. Decision: "v0 stays dev and test" (<name>, <date>). Related: the dev and test queues are set up and tested (<name>, <date>, ticket <number>). Open blockers/questions: none recorded.
+- **Acceptance Criteria:** A unit test shows a failed order call is retried when the environment is dev.
 
 ### Strip before the preview
 

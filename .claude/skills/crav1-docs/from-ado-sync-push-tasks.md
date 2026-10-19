@@ -41,8 +41,8 @@ Every task in that spec's `tasks.md` is listed, numbered `T1`, `T2`, …, with `
 On the first run the command reads the project's work item types and asks once which type a task becomes. It reads the project's process and backlog levels and marks the type directly under Feature as `(Recommended)` with one reason: User Story on Agile (a Task belongs under a User Story), Product Backlog Item on Scrum, Issue on Basic, Requirement on CMMI. Bug is recommended only when the team tracks bugs as requirements. When the levels cannot be read, it says so and gives no recommendation. It also reads that type's states and saves the done state, the one Azure Boards counts as completed (Closed on Agile, Done on Scrum and Basic). Both are saved as lines in `docs/environments/marks.md`:
 
 ```text
-Azure Boards task type (bc-operations): User Story
-Azure Boards task done state (bc-operations): Closed
+Azure Boards task type (orders): User Story
+Azure Boards task done state (orders): Closed
 ```
 
 The lines are kept per home. A line without `(<project>)` counts for the project in `docs/environments/marks.md`.
@@ -65,13 +65,13 @@ Each pick is shown as a form labelled **Create** or **Update #<id>**, as a child
 
 Before the preview, file paths, line numbers, spec references such as `(spec: v0; Open questions 1)`, `docs/sources/` paths, and kit and skill names are stripped. Code repo names stay in the text. Nothing mentions the repo that holds the specs.
 
-Example, for T1 of an email service spec:
+Example, for T1 of an orders retry spec:
 
-- **Title:** Email service: enable the day-ahead use case on dev
-- **Tags:** email-service; infra-email-service
+- **Title:** Orders API: enable retries on dev
+- **Tags:** orders-api; orders-infra
 - **Assigned To:** the task owner
-- **Description:** The day-ahead use case only runs on test and prod today. In email-service the code limits it to those two environments, and the dev settings in infra-email-service have no configuration for it. This task enables it on dev so v0 runs on both dev and test. Decision: "v0 stays dev and test" (name, date). Related: the dev and test mailboxes are set up and tested (name, date, ticket number). Open blockers/questions: none recorded.
-- **Acceptance Criteria:** A unit test shows a day-ahead message is routed to the day-ahead use case when the environment is dev.
+- **Description:** Retries only run on test and prod today. In orders-api the code limits them to those two environments, and the dev settings in orders-infra have no configuration for them. This task enables them on dev so v0 runs on both dev and test. Decision: "v0 stays dev and test" (name, date). Related: the dev and test queues are set up and tested (name, date, ticket number). Open blockers/questions: none recorded.
+- **Acceptance Criteria:** A unit test shows a failed order call is retried when the environment is dev.
 
 The preview is not edited in place. A change goes into the spec or `tasks.md` first through `/crav1-add-to-spec`, and the preview is rebuilt.
 
@@ -93,7 +93,7 @@ The user answers per task: **Create** or **Update #<id>**, **All reviewed**, or 
 After a Create, one line per task is appended to that spec's `work-item.md`:
 
 ```text
-Work item: 1234 — task: T1 Enable the day-ahead use case on dev (ADO: contoso/bc-operations)
+Work item: 1234 — task: T1 Enable retries on dev (ADO: contoso/orders)
 ```
 
 A later run sees the line and offers **Update #1234**. Ids never go into `tasks.md`. On the first run the child type line is also appended to `docs/environments/marks.md`. The command reports what was created, updated, and skipped, names the files it wrote, and says they are not committed yet. Without `work-item.md` a later run offers Create again and would make a duplicate. It does not commit.

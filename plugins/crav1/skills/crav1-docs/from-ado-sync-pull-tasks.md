@@ -18,7 +18,7 @@ New chat.
 /crav1-ado-sync
 ```
 
-Or name a spec, for example `/crav1-ado-sync email-service`, or `all`.
+Or name a spec, for example `/crav1-ado-sync orders-retry`, or `all`.
 
 ## Steps
 
@@ -35,7 +35,7 @@ The list shows the specs whose `work-item.md` has task lines, plus **All**. A sp
 For every recorded task the command reads State, title, description, acceptance, Assigned To, the discussion, and the history. It shows only what differs from the spec and `tasks.md`, with who changed it and when when the history shows that. For example:
 
 ```text
-T1 (#1234): Enable the day-ahead use case on dev
+T1 (#1234): Enable retries on dev
 - State: Done (the task owner, date). tasks.md box is not ticked.
 - Comment (a reviewer, date): "Can we also run it on test before Friday?"
 ```

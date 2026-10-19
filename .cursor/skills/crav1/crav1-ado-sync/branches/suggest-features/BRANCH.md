@@ -71,7 +71,7 @@ The chat list, and the list handed to the push features branch of `/crav1-ado-sy
 | --- | --- | --- | --- | --- |
 | 1 | Short title | 2026-11-01 (`docs/specs/<slug>/spec.md`, Milestones) | `<slug>` | 52 |
 
-Title says what the work is, in the style of an Azure Boards title: the area, then the milestone, slice, or item in the words the docs use, for example `Email service: DA Nord Pool MCR via mailbox`. Do not prefix it with “Feature”. Do not put a spec path in the title.
+Title says what the work is, in the style of an Azure Boards title: the area, then the milestone, slice, or item in the words the docs use, for example `Orders API: retry on timeout`. Do not prefix it with “Feature”. Do not put a spec path in the title.
 
 Spec is the slug, `no spec yet`, or `questions only (<slug>)`.
 

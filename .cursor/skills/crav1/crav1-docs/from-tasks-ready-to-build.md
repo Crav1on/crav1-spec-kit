@@ -41,7 +41,7 @@ Ready
 
 Blocked
 - cancel-booking T6: waits on T5 (recorded).
-- cancel-booking T7: open question "Which currency for refunds?" (recorded). Asked 2026-10-10, mail to Arvid.
+- cancel-booking T7: open question "Which currency for refunds?" (recorded). Asked 2026-10-10, mail to Dana.
 
 Needs verify
 - cancel-booking T3: no verify.md row.

@@ -12,7 +12,7 @@ SOURCE date). Each note starts with front matter:
     imported: 2026-10-16
     source_folder: docs/sources/2026-10-06-data-sync/
     used_by: [orders, billing]
-    waiting_for: [baltic-trades]
+    waiting_for: [orders-export]
     ---
 
 Indexes are generated, never hand-edited:
@@ -466,7 +466,7 @@ def selftest():
         assert snap == {p: p.read_text() for p in root.rglob("*.md")}, "round 2 not idempotent"
         (notes / "2026-09" / "2026-09-30-call.md").write_text(
             "---\ntitle: Call\nkind: meeting\nsource: meeting 2026-09-30 \"Call\"\nsource_date: 2026-09-30\n"
-            "imported: 2026-10-16\nused_by: [billing]\nwaiting_for: [baltic]\n---\n# Call\n\nfull text\n")
+            "imported: 2026-10-16\nused_by: [billing]\nwaiting_for: [orders-export]\n---\n# Call\n\nfull text\n")
         assert build(root, check=True) == 1
         assert build(root) == 0 and build(root, check=True) == 0
         top = (notes / "index.md").read_text()

@@ -47,8 +47,8 @@ A run with no window uses the two-pass questions file from the imported-sources 
 Every `work-item.md` id line ends with its home:
 
 ```text
-Work item: 52 — October billing (ADO: contoso/bc-operations)
-Work item: 1234 — task: T3 Short title (ADO: contoso/bc-operations)
+Work item: 52 — October billing (ADO: contoso/orders)
+Work item: 1234 — task: T3 Short title (ADO: contoso/orders)
 ```
 
 - An older line without `(ADO: …)` is read as the org and project in `docs/environments/marks.md`, else the single pair the Azure DevOps URLs in `repos.md` name.

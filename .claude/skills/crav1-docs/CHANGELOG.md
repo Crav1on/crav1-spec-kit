@@ -4,6 +4,16 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 
 ## Unreleased
 
+### Docs
+
+- New `docs/reference/marks.yaml`: the single source for every mark and line format the kit writes in a product repo (44 marks), each with its files, format, pattern, examples, writers, readers, and the version it arrived in. Data layout gets a generated **All marks** section, and its **Readiness marks** table is generated from the same file.
+- Data layout: the `docs/environments/marks.md` row now names both Azure Boards lines with their per-home form, `Azure Boards task type (<project>): <type>` and `Azure Boards task done state (<project>): <state>` (it said `Azure Boards task type:` only).
+- Examples in docs and skills use made-up names (`orders-api`, `contoso/orders`, `Dana`) instead of names taken from a real project.
+
+### CI
+
+- `scripts/gen-marks.py --check`: the marks tables match `marks.yaml`, every example matches its pattern, and every skill or agent listed as writer or reader mentions the mark.
+
 ## 1.63.0 (2026-10-16)
 
 ### Kit

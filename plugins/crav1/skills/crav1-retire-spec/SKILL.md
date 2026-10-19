@@ -53,7 +53,7 @@ Exact words for bots and scripted runs. There are no `--flags`.
 
 - What to do: `retire` / `merge` / `park` / `convert to note`.
 
-When the invocation contains one of these words (for example `/crav1-retire-spec park docs/specs/baltic-trades/ waiting on partner`), take that choice and do not ask. This holds for a person, a bot, or a headless run.
+When the invocation contains one of these words (for example `/crav1-retire-spec park docs/specs/orders-export/ waiting on partner`), take that choice and do not ask. This holds for a person, a bot, or a headless run.
 
 When a choice is missing and the run is headless or started by a bot (no person in the chat to answer), do not guess. Stop and name the valid words: `Missing choice. Use one of: retire, merge, park, convert to note.`
 

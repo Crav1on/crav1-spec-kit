@@ -58,7 +58,7 @@ Other agents follow the same rule. The always-on rule (`crav1.mdc` in Cursor, `C
 
 ## Parked and retired specs
 
-Help skips specs in `docs/specs/retired/` and `Moved:` pointers. Parked specs are listed under **Parked** with date, reason, and how many notes wait for each, for example `baltic-trades (parked 2026-10-16, waiting on partner), 2 notes waiting`. It names `/crav1-retire-spec un-park` to pick one up ([retire spec](from-retire-spec.md)).
+Help skips specs in `docs/specs/retired/` and `Moved:` pointers. Parked specs are listed under **Parked** with date, reason, and how many notes wait for each, for example `orders-export (parked 2026-10-16, waiting on partner), 2 notes waiting`. It names `/crav1-retire-spec un-park` to pick one up ([retire spec](from-retire-spec.md)).
 
 ## Where the answers come from
 
