@@ -10,6 +10,8 @@ Turn an accepted spec into a file-level plan.md and independently testable tasks
 
 File-level `plan.md` and `tasks.md`; each verify note names the checks before code; names a linter or checker when the repo has one, and stops before Build when it does not; refuses to code and does not install a linter. When the spec is partial or `## In the code` names paths, reads that repo and branch and chooses finish the gap, add a verify test, or leave it before any task. A piece that already matches v0 is not a choice.
 
+1.64.0: Built pieces reads every work branch of the spec without checkout (and `../<repo>` for another repo), labels pieces `only on <branch>, not merged`, and ends a task with `(branch: …)` when its piece lives on one branch.
+
 ## Runs when
 
 Spec is accepted. Called by the user.

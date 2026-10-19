@@ -10,6 +10,8 @@ Serial board: build several ready specs one slug after another in this checkout.
 
 Serial board of ready slugs: `feat/<slug>` from default, then that spec’s build-tasks loop; no parallel, no push, no PR.
 
+1.64.0: tasks with `(branch: …)` are built on that branch; the board shows `done (n branches not merged)`.
+
 ## Runs when
 
 Several specs, one after another. Called by the user.

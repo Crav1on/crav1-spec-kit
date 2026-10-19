@@ -10,6 +10,8 @@ Create or check out feat/<slug> (one branch for spec+build) or spec/<slug> (spec
 
 Prompt for `feat/<slug>` or specify-only `spec/<slug>`; no silent checkout, no push, no PR.
 
+1.64.0: the Build prompt puts a task's `(branch: …)` first, marked (Recommended), and never creates it from default without asking.
+
 ## Runs when
 
 Brownfield: leave the default branch. Called by the user, [`/crav1-spark-to-spec`](crav1-spark-to-spec.md), [`/crav1-ideas-to-spec`](crav1-ideas-to-spec.md), [`/crav1-bundle-to-specs`](crav1-bundle-to-specs.md), [`/crav1-existing-to-specs`](crav1-existing-to-specs.md), [`/crav1-build-tasks`](crav1-build-tasks.md), and [`/crav1-build-features`](crav1-build-features.md).
