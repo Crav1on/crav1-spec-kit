@@ -713,6 +713,78 @@ marks:
     mention: 'Description as of'
     since: 1.65.0
 
+  - id: asked-on-the-pr
+    name: "Asked on the PR"
+    group: notes
+    files: ["docs/notes/YYYY-MM/review-pr-<n>-follow-ups.md (a bullet)"]
+    format: "- Asked on the PR: <question>"
+    pattern: '^- Asked on the PR: .+$'
+    examples:
+      - "- Asked on the PR: Should the retry log stay in the SQL table? (answered on the PR 2026-10-20)"
+    meaning: "A question asked in the review comment, kept in the follow-ups note; a re-review adds (answered on the PR <date>) when the thread has an answer."
+    written_by: [crav1-review-pr]
+    read_by: [crav1-review-pr]
+    mention: 'Asked on the PR:'
+    since: 1.66.0
+
+  - id: comment-as-drafted
+    name: "Comment as drafted"
+    group: notes
+    files: ["docs/notes/YYYY-MM/review-pr-<n>-follow-ups.md (body, after the bullets)"]
+    format: "## Comment as drafted, <YYYY-MM-DD>"
+    pattern: '^## Comment as drafted, \d{4}-\d{2}-\d{2}$'
+    examples:
+      - "## Comment as drafted, 2026-10-19"
+    meaning: "The paste-ready comment of one review, word for word in a code fence. Later runs compare the posted comment with it."
+    written_by: [crav1-review-pr]
+    read_by: [crav1-review-pr]
+    mention: 'Comment as drafted'
+    since: 1.67.0
+
+  - id: comment-as-posted
+    name: "Comment as posted"
+    group: notes
+    files: ["docs/notes/YYYY-MM/review-pr-<n>-follow-ups.md (body, after the bullets)"]
+    format: "## Comment as posted, <YYYY-MM-DD> (by <name>)[, edited]"
+    pattern: '^## Comment as posted, \d{4}-\d{2}-\d{2} \(by [^()\n]+\)(, edited)?$'
+    examples:
+      - "## Comment as posted, 2026-10-19 (by Alex Doe)"
+      - "## Comment as posted, 2026-10-21 (by Alex Doe), edited"
+    meaning: "The comment as the reviewers see it, word for word in a code fence. An edit on the host adds a new section; earlier ones are never removed."
+    written_by: [crav1-review-pr]
+    read_by: [crav1-review-pr]
+    mention: 'Comment as posted'
+    since: 1.67.0
+
+  - id: comment-posted-source
+    name: "Posted comment source"
+    group: notes
+    files: ["docs/notes/YYYY-MM/review-pr-<n>-follow-ups.md (first line under Comment as posted)"]
+    format: "<Read from the PR thread: <url>. | Pasted in chat. | Posted from this review on the user's yes: <url>.> Draft compared: <YYYY-MM-DD | none>. Description reviewed: as of <YYYY-MM-DD> (PR note).[ Verbatim except: <kind> removed.][ Edited on the host.]"
+    pattern: '^(Read from the PR thread: https://\S+\.|Pasted in chat\.|Posted from this review on the user''s yes: https://\S+\.) Draft compared: (\d{4}-\d{2}-\d{2}|none)\. Description reviewed: as of \d{4}-\d{2}-\d{2} \(PR note\)\.( Verbatim except: .+ removed\.)?( Edited on the host\.)?$'
+    examples:
+      - "Read from the PR thread: https://github.com/contoso/orders-api/pull/42#issuecomment-1001. Draft compared: 2026-10-19. Description reviewed: as of 2026-10-18 (PR note)."
+      - "Pasted in chat. Draft compared: 2026-10-19. Description reviewed: as of 2026-10-18 (PR note). Verbatim except: API key removed."
+    meaning: "Where the posted text came from, which draft it was compared with, and which description version the review read."
+    written_by: [crav1-review-pr]
+    read_by: [crav1-review-pr]
+    mention: 'Read from the PR thread'
+    since: 1.67.0
+
+  - id: not-in-posted-comment
+    name: "Not in the posted comment"
+    group: notes
+    files: ["docs/notes/YYYY-MM/review-pr-<n>-follow-ups.md (end of a bullet)"]
+    format: "<bullet> (Not in the posted comment, <YYYY-MM-DD>; still open.)"
+    pattern: '^- .+ \(Not in the posted comment, \d{4}-\d{2}-\d{2}; still open\.\)( \((done in [0-9a-f]{7,}|posted \d{4}-\d{2}-\d{2})\))?$'
+    examples:
+      - "- `src/orders/retry_store.py`, line 9: an idempotency test for the row key. (Not in the posted comment, 2026-10-19; still open.)"
+    meaning: "A drafted point the user left out of the posted comment. It stays open in the note; a re-review keeps it out of the comment unless the user includes it."
+    written_by: [crav1-review-pr]
+    read_by: [crav1-review-pr]
+    mention: 'Not in the posted comment'
+    since: 1.67.0
+
   - id: note-waiting-for
     name: "waiting_for"
     group: notes

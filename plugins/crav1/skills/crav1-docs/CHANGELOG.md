@@ -2,6 +2,24 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.67.0 (2026-10-19)
+
+`/crav1-review-pr` keeps the comment you actually posted, next to the one it drafted, so the specs repo matches what reviewers see. Examples use made-up names: the code repo `orders-api` on GitHub, pull request 42.
+
+### Kit
+
+- **Comment as drafted and as posted.** The follow-ups note now keeps every paste-ready comment as `## Comment as drafted, <date>`, and the posted text as `## Comment as posted, <date> (by <name>)`, each word for word in a code fence. A source line says where the posted text came from (read from the PR thread, pasted in chat, or posted from this review), which draft it was compared with, and which `Description as of` section of the PR note the review read. An edit on the host adds a new `, edited` section. Dated sections are never rewritten. Every review with a paste-ready comment writes the note. The rules are in the new `crav1-review-pr` `references/comment-as-posted.md`.
+- **Record step.** At the start of every run on a pull request with a drafted comment and nothing posted after it, the review looks read-only for the posted comment (GitHub reviews and conversation comments, Azure DevOps top-level threads or a reply in the earlier thread), by you and after the draft, that matches it. One match: it asks you to confirm. Several: you pick. None, or no `gh` or `az` session: you paste it. The text goes through the personal-data and secrets check first.
+- **Compare with the draft.** Points are paired by link and title and listed as drafted, changed, not in the posted comment, or added. A drafted point you left out stays in the note, ending `(Not in the posted comment, <date>; still open.)`. A cut question keeps its `Asked on the PR:` line with the mark added. An added question gets an `Asked on the PR:` line.
+- **Re-review against the posted comment.** `### Since last time` lists only points the reviewers saw. A finding you cut is shown in the chat with its mark and kept out of the new comment unless you include it.
+- **Post it.** A third option, **I'll post it myself**. After a post on your yes, the text the host returns is saved at once. On GitHub, your own pull request gets a comment, because the host allows no vote there.
+- **Choice words.** `comment posted` (only record the posted comment), `newest comment` and `skip comment record`. A headless run with several candidates or none stops and names them. No word posts.
+- **Marks.** `marks.yaml` adds Comment as drafted, Comment as posted, the posted comment's source line and Not in the posted comment (1.67.0), plus Asked on the PR (1.66.0). The data layout tables are regenerated (58 marks).
+
+### Docs
+
+- From a pull request review: a new "Comment as posted" section, with Steps, Post it, Re-review and Follow-ups updated. Data layout: the follow-ups note's dated sections. Glossary: Comment as posted. The skills reference lists review-pr's choice words.
+
 ## 1.66.0 (2026-10-19)
 
 A plainer, link-first pull request comment from `/crav1-review-pr`, posted as one comment, and merge-the-base-in advice everywhere instead of rebasing. Examples use made-up names: the code repo `orders-api` on Azure DevOps, pull request 42.

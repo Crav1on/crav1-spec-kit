@@ -40,6 +40,8 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 
 **Lane.** One of the groupings of skills: Starters, Specify, Plan, Build, and Cross-cutting. Inside each lane, skills sit in groups by phase. The [skills reference](../reference/skills.md) is organized this way, and [guild routing](../guild-routing.md) maps each skill to a lane.
 
+**Comment as posted.** The review comment as the reviewers see it, saved word for word in the review-pr follow-ups note next to the comment as drafted. `/crav1-review-pr` finds it on the pull request or takes a paste, compares it with the draft, and marks drafted points left out as `Not in the posted comment`, still open. A re-review compares against it (1.67.0).
+
 **Cross-cutting.** A skill that may run from any lane and does not move work into a lane.
 
 **Spark.** One or two sentences about what to build. Input to `/crav1-spark-to-spec`.

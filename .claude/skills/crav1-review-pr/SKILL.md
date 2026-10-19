@@ -11,7 +11,8 @@ description: >-
   findings fixed or open. Works across repos: from the specs repo for a
   PR in a repo listed in repos.md, or with both open. Saves the PR
   description as a PR note and follow-ups as a note in the specs repo's
-  docs/notes/YYYY-MM/. Does not edit, test, or merge.
+  docs/notes/YYYY-MM/, with the comment as drafted and as posted, and
+  marks drafted points left out. Does not edit, test, or merge.
 disable-model-invocation: true
 icon: git-pull-request
 color: orange
@@ -32,6 +33,10 @@ Run it only when **this turn** names an open pull request (number or URL), or cl
 You read the diff. You do not edit code, the spec, or the plan. You do not run the tests. You do not ask to run the tests. You do not install a linter, change branch protection, or merge. You post comments or set a verdict only as [Post it](#post-it) says, after the user's yes.
 
 On Windows, `git` may not be on `PATH`. Try `git`, then `C:\Program Files\Git\cmd\git.exe`. `az` may be `az.cmd`. Quote any `--query` value that contains parentheses.
+
+## Comment as posted first (1.67.0)
+
+When the follow-ups note for this pull request has a `## Comment as drafted` section with no `## Comment as posted` section after it, or the posted comment may have been edited on the host, run the **record step** before the review. Find the posted comment on the host (read-only) or ask for a paste. Save it word for word in a code fence under `## Comment as posted, <YYYY-MM-DD> (by <name>)`. Compare it with the draft, and mark drafted points left out with `(Not in the posted comment, <YYYY-MM-DD>; still open.)` without dropping them. How to find, pick, compare and mark: `references/comment-as-posted.md` (drop-in: `.claude/skills/crav1-review-pr/references/comment-as-posted.md`; plugin: `skills/crav1-review-pr/references/comment-as-posted.md`). The `comment posted` choice word runs only this step.
 
 ## Which pull request
 
@@ -139,8 +144,9 @@ First compare the copies on disk (`<remote>/<source>` and `<remote>/<target>`, e
 Exact words for bots and scripted runs. There are no `--flags`.
 
 - Branches on disk older than the pull request: `fetch pr branches` / `use disk` / `stop pr review`.
+- The comment as posted (1.67.0): `comment posted` (run only the record step, no review), `newest comment` (several candidates: take the newest match by the signed-in user), `skip comment record` (do not record; the review goes on).
 
-When the invocation contains one of these words (for example `/crav1-review-pr orders-api 71 use disk`), take that choice when the question comes up and do not ask. When the question comes up in a headless run or a bot run with no word, stop: `PR branches on disk are missing or older than the PR. Use one of: fetch pr branches, use disk, stop pr review.` A word that is not needed (the copies match) is ignored.
+When the invocation contains one of these words (for example `/crav1-review-pr orders-api 71 use disk`), take that choice when the question comes up and do not ask. When the question comes up in a headless run or a bot run with no word, stop: `PR branches on disk are missing or older than the PR. Use one of: fetch pr branches, use disk, stop pr review.` A word that is not needed (the copies match) is ignored. The record step's headless stops are in `references/comment-as-posted.md` **Headless and bot runs**: `Several comments could be the posted one. Use one of: newest comment, skip comment record.` and `No posted comment found on PR <n>. Paste it in chat, or use: skip comment record.`
 
 ## What to read besides the diff
 
@@ -350,7 +356,7 @@ Do not post or vote except as [Post it](#post-it) says. Do not open a spec. Do n
 
 ## Re-review
 
-When the pull request already has an earlier review, this run is a re-review. Read the earlier findings from the pull request's own review comments and threads, including the bullets of an earlier one-comment review (each link gives the path and lines) (GitHub `gh api repos/<owner>/<repo>/pulls/<n>/comments` and `gh pr view <n> --json reviews,comments`; Azure DevOps `az repos pr thread list` or `az rest --method get` on the pull request threads). Comments from anyone count, including ones this skill posted. A paste-ready block still in this chat is the fallback only when the pull request has no earlier review comments. When neither exists, do a first review.
+When the pull request already has an earlier review, this run is a re-review. Read the earlier findings from the pull request's own review comments and threads, including the bullets of an earlier one-comment review (each link gives the path and lines) (GitHub `gh api repos/<owner>/<repo>/pulls/<n>/comments` and `gh pr view <n> --json reviews,comments`; Azure DevOps `az repos pr thread list` or `az rest --method get` on the pull request threads). Comments from anyone count, including ones this skill posted. When the follow-ups note has a `## Comment as posted` section (1.67.0), the earlier points are the points of the newest one, after the record step. When the host has no earlier review comments, the newest `## Comment as drafted` section is the fallback: say `compared with the draft; nothing posted was found`. When neither exists, do a first review.
 
 Go through each earlier finding, one line each, before the new findings:
 
@@ -363,7 +369,7 @@ A thread marked resolved whose problem is still there is flagged `resolved but s
 
 Status lines and thread replies follow [Comment style](#comment-style): first person, friendly, varied, for example "Thanks, this looks sorted now in `abc1234`" or "I think there is still a little bit left here: …". A still-open finding is said softly, with the same information.
 
-In the comment, earlier points go under `### Since last time` and new points under the normal sections (`references/comment-layout.md` **Re-review**). The ship-or-not rule counts still-open, partly-fixed, and new first-section findings.
+In the comment, earlier points go under `### Since last time` and new points under the normal sections (`references/comment-layout.md` **Re-review**). `### Since last time` lists only points the reviewers saw. A new finding that matches a point marked `Not in the posted comment` is shown in the chat with its mark and kept out of the comment unless the user says to include it (1.67.0). The ship-or-not rule counts still-open, partly-fixed, and new first-section findings.
 
 ## Paste-ready comment
 
@@ -401,11 +407,12 @@ When the review has at least one follow-up or question, write a note in `docs/no
 - Title: `Follow-ups from PR <n> (<repo>)`.
 - Front matter: `kind: review-pr`, `source: PR <n> <repo>`, `source_date` and `imported` the review date, `pr_note:` the PR note's path (1.65.0), `used_by: []`.
 - `From review <date>. PR <n>, <repo>, <PR title>.` then one bullet per follow-up: `<path>`, line `<n>`: the follow-up in plain words. Paths and lines are kept, because the note stays in the specs repo. Use `no line` when the follow-up has no line. A question asked in the comment is a bullet too, starting `Asked on the PR:` (1.66.0); a re-review adds `(answered on the PR <date>)` when the thread has an answer.
+- After the bullets, the dated sections in time order (1.67.0): `## Comment as drafted, <YYYY-MM-DD>` with the paste-ready block, and `## Comment as posted, <YYYY-MM-DD> (by <name>)` with its source line and the posted text, each word for word in a code fence, after the personal-data and secrets check. A drafted point not in the posted comment gets a bullet ending `(Not in the posted comment, <YYYY-MM-DD>; still open.)`; a cut question keeps its `Asked on the PR:` line with the mark added. Never rewrite or remove a dated section. Details: `references/comment-as-posted.md`.
 - Then run the notes index generator (`scripts/notes_index.py` in `crav1-add-to-spec`). Do not hand-edit an index.
 
-**Re-review.** When the note for that pull request exists (in any month folder, or flat in `docs/notes/` from before 1.61.0), update it where it is. Do not write a second note. Set `imported` to this review's date, add new follow-ups, and mark one the code now addresses as `(done in <short sha>)`. Do not remove a line. Leave `used_by` as it is, then rerun the generator. When the review has no follow-ups and the note exists, leave the note.
+**Re-review.** When the note for that pull request exists (in any month folder, or flat in `docs/notes/` from before 1.61.0), update it where it is. Do not write a second note. Set `imported` to this review's date, add new follow-ups and a new `## Comment as drafted` section, and mark one the code now addresses as `(done in <short sha>)`. Do not remove a line. Leave `used_by` as it is, then rerun the generator. When the review has no follow-ups and the note exists, leave the note.
 
-**No follow-ups.** Write no note.
+**No follow-ups.** Still write the note when there is a paste-ready block (1.67.0): it holds the comment as drafted. A review with no block and no follow-ups writes no note.
 
 When the specs repo is not in this workspace, write the note into the specs repo found as a sibling (see [Specs repo and code repo](#specs-repo-and-code-repo-1650)), never commit it, and name its full path. When no specs repo is found, write nothing and print the note in the chat with the path it would have.
 
@@ -419,7 +426,7 @@ Writing the PR note and the follow-ups note are the only files this skill writes
 
 ## Post it
 
-After the paste-ready block, offer to post. One question. Use the questions tool when it is available. Say it posts under the user's own account as one comment, and name the vote it will set. Options: post, or do not post. Nothing posts without that yes.
+After the paste-ready block, offer to post. One question. Use the questions tool when it is available. Say it posts under the user's own account as one comment, and name the vote it will set. Options: **post**, **I'll post it myself**, or **do not post** (1.67.0). Nothing posts without that yes. **I'll post it myself** ends the run with `When it's posted, say "posted" here, or run /crav1-review-pr <repo> <n> comment posted.`
 
 On yes (1.66.0):
 
@@ -427,7 +434,9 @@ On yes (1.66.0):
 2. The vote follows the verdict: Changes needed is **Request changes** (GitHub) or **Wait for author** (Azure DevOps); Approve with comments is **Comment** or **Approve with suggestions**; Approve is **Approve**. Never Reject.
 3. On a re-review, post the new block as a reply in the earlier comment's thread (Azure DevOps) or as a new review (GitHub). Reply in an earlier inline thread only when one exists.
 4. Follow-ups are never posted.
-5. Never resolve a thread. On a re-review, after posting, offer to resolve existing threads whose points are now fixed. Resolve only on that yes.
+5. Save the posted text at once (1.67.0): the body the host returns, its URL and date, under `## Comment as posted, <YYYY-MM-DD> (by <name>)` with the source line `Posted from this review on the user's yes: <comment URL>. …` (`references/comment-as-posted.md`). A failed post saves nothing.
+6. On GitHub, when the signed-in user is the pull request's author, the host does not allow Approve or Request changes: post with event `COMMENT` and say `GitHub doesn't allow a vote on your own PR; posted as a comment.`
+7. Never resolve a thread. On a re-review, after posting, offer to resolve existing threads whose points are now fixed. Resolve only on that yes.
 
 When a post fails, say what failed and what already posted. Do not retry by another route.
 
@@ -439,6 +448,7 @@ When a post fails, say what failed and what already posted. Do not retry by anot
 - Read-only toward the code repo and its host. The only git write there is the fetch of the pull request's two branches after **Fetch only the PR's two branches** or `fetch pr branches`.
 - No test run, and no ask to run tests. When the slug has `plan.md`, quote `verify.md` or say it is missing. When the pull request is outside the kit, do not say `verify.md` is missing. Read the pipeline's recorded test results.
 - No linter install. No branch-protection change. No required-check edit.
+- The record step only reads the host (the signed-in `gh` or `az` session) or takes a paste. Never rewrite or remove a `## Comment as drafted` or `## Comment as posted` section; an edit on the host is a new `, edited` section.
 - No comment, no vote, and no thread resolve without the user's yes in [Post it](#post-it). One comment, no inline threads, never Reject. No label, no reviewer assignment.
 - Suggest merging `<base>` into the branch, never a rebase, `pull --rebase`, or a force-push.
 - No merge. Do not run `/crav1-merge-pr`.
