@@ -95,7 +95,7 @@ Compared with the draft of 2026-10-19: 5 points as drafted, 1 changed, 1 not in 
 ## Re-review
 
 - Earlier points come from the newest `Comment as posted` section, after the record step has caught any edit. Comments and answers by other people on the host still count.
-- No posted section: read the host's review comments as before. When the host has none, use the newest `Comment as drafted` section and say `compared with the draft; nothing posted was found`.
+- No posted section: read the host's review comments as before. When the host has none, nothing was posted, so the new comment is a first-review comment with no `### Since last time`. The chat still goes through the points of the newest `Comment as drafted` section (fixed, partly fixed, still open, no longer relevant) under `compared with the draft; nothing posted was found`.
 - `### Since last time` lists only points the reviewers saw.
 - A new finding that matches a point marked `Not in the posted comment` is shown in the chat with its mark and kept out of the new comment, unless the user says to include it.
 
