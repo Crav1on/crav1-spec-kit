@@ -679,6 +679,7 @@ skills:
     matched to existing specs, keep, leave, or dismiss one at a time; the whole input is one full note. A kept addition goes through
     `/crav1-add-to-spec`. A clear answer to a spec open question is linked under it.'
   - '1.64.0: a code change can name a repo and branch (`code change orders-api feat/orders-retry`); the code is read read-only from `../<repo>`. The branch diff starts at the fork point (the repo''s `Merges into` branch, the default branch, or another spec branch), the slice `Synced at` line keeps one entry per branch, a yes records `Merges into` in `repos.md`, and the note''s `commits:` list plus `git patch-id` stop a commit being imported twice, also after a rebase.'
+  - '1.65.0: a code change can be a pull request (`code change orders-api PR 71`, or its URL). It writes or reuses the PR note (the pull request''s title and description, `kind: pull request`) and links it from the code-change note with `pr_note:`. Given a branch, it writes the PR note when a signed-in `gh` or `az` host shows exactly one pull request for that branch; otherwise it says why it wrote none.'
   use_when: New information for specs that already exist
   table:
     reads: 'A fact: That information and one `spec.md`; A dump: The dump and existing spec folders; A
@@ -1194,6 +1195,7 @@ skills:
   you_run_next:
   - /crav1-merge-pr
   - /crav1-refresh-system-notes after an outside pull request merges
+  - /crav1-finalize-commit
   first_prompt: '/crav1-review-pr
 
     https://github.com/<owner>/<repo>/pull/<n>
@@ -1217,17 +1219,18 @@ skills:
   use_when: This turn asks to merge a named pull request
   table:
     reads: That named pull request
-    writes: A merge commit on the host, and a fast-forward of the local default branch when the tree is
-      clean
+    writes: A merge commit on the host, a fast-forward of the local default branch when the tree is
+      clean, and the PR note in the specs repo
   reads: Reads one named pull request.
   writes: Writes a merge commit on the host, and fast-forwards local default when the tree is clean after
-    a confirmed two-parent merge.
+    a confirmed two-parent merge. Then writes or reuses the PR note in the specs repo's `docs/notes/YYYY-MM/` (not committed).
   leaves_alone: Leaves squash, rebase, branch deletion, and work-item links alone.
   exceptions: a required red host check stops it. It does not run `/crav1-review-pr`.
   called_by: Called by the user.
   runs_by_itself: Calls no skill.
   you_run_next:
   - /crav1-refresh-system-notes after an outside pull request merges
+  - /crav1-finalize-commit
   first_prompt: '/crav1-merge-pr <pull request number or URL>
 
 

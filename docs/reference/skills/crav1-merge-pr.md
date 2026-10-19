@@ -24,9 +24,9 @@ Reads one named pull request.
 
 ## Writes
 
-In short: A merge commit on the host, and a fast-forward of the local default branch when the tree is clean.
+In short: A merge commit on the host, a fast-forward of the local default branch when the tree is clean, and the PR note in the specs repo.
 
-Writes a merge commit on the host, and fast-forwards local default when the tree is clean after a confirmed two-parent merge.
+Writes a merge commit on the host, and fast-forwards local default when the tree is clean after a confirmed two-parent merge. Then writes or reuses the PR note in the specs repo's `docs/notes/YYYY-MM/` (not committed).
 
 ## Does not
 
@@ -36,7 +36,7 @@ Limits and exceptions: a required red host check stops it. It does not run [`/cr
 
 ## You run next / Runs by itself
 
-- You run next: [`/crav1-refresh-system-notes`](crav1-refresh-system-notes.md) after an outside pull request merges
+- You run next: [`/crav1-refresh-system-notes`](crav1-refresh-system-notes.md) after an outside pull request merges; [`/crav1-finalize-commit`](crav1-finalize-commit.md)
 - Runs by itself: Calls no skill.
 
 ## Lane and group

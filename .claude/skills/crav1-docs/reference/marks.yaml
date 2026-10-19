@@ -476,7 +476,7 @@ marks:
       - "(branch: orders-api feat/orders-retry)"
     meaning: "The branch the task is built on. The repo is named when the spec spans repos. A task without one uses feat/<slug>."
     written_by: [crav1-plan-from-spec]
-    read_by: [crav1-build-tasks, crav1-build-features, crav1-create-feature-branch, crav1-tasks-ready-to-build, crav1-verify-build-against-spec, crav1-help]
+    read_by: [crav1-build-tasks, crav1-build-features, crav1-create-feature-branch, crav1-tasks-ready-to-build, crav1-verify-build-against-spec, crav1-help, crav1-review-pr]
     mention: '\(branch:'
     since: 1.64.0
 
@@ -506,7 +506,7 @@ marks:
       - "develop"
     meaning: "The branch the repo's work merges into. Empty means the default branch. Fork point, done and the open-pr base use it."
     written_by: [crav1-add-to-spec]
-    read_by: [crav1-open-pr, crav1-add-to-spec]
+    read_by: [crav1-open-pr, crav1-add-to-spec, crav1-review-pr]
     mention: 'Merges into'
     since: 1.64.0
 
@@ -654,6 +654,64 @@ marks:
     read_by: [crav1-add-to-spec]
     mention: 'author date'
     since: 1.64.1
+
+  - id: note-kind
+    name: "kind"
+    group: notes
+    files: ["docs/notes/YYYY-MM/<note>.md (front matter)", "docs/notes/_template/note.md"]
+    format: "kind: <fact | dump | code change | meeting | email | chat | review-pr | pull request | converted spec>"
+    pattern: '^kind: (fact|dump|code change|meeting|email|chat|review-pr|pull request|converted spec)$'
+    examples:
+      - "kind: code change"
+      - "kind: pull request"
+    meaning: "What the note holds. `pull request` (1.65.0) is the PR note: one per pull request, with its title and description."
+    written_by: [crav1-add-to-spec, crav1-review-pr, crav1-merge-pr, crav1-retire-spec]
+    read_by: [crav1-add-to-spec, crav1-review-pr]
+    mention: 'kind: '
+    since: 1.65.0
+
+  - id: note-pr-source
+    name: "PR note source"
+    group: notes
+    files: ["docs/notes/YYYY-MM/YYYY-MM-DD-pr-<repo>-<n>.md (front matter)"]
+    format: "source: PR <n> <repo URL path>"
+    pattern: '^source: PR \d+ \S+/\S+$'
+    examples:
+      - "source: PR 71 dev.azure.com/contoso/orders/orders-api"
+      - "source: PR 12 github.com/orders-org/orders-specs"
+    meaning: "The PR note's key: host, repo and pull request number. One note per pull request; a later read reuses it."
+    written_by: [crav1-add-to-spec, crav1-review-pr, crav1-merge-pr]
+    read_by: [crav1-add-to-spec, crav1-review-pr, crav1-merge-pr]
+    mention: 'source: PR '
+    since: 1.65.0
+
+  - id: note-pr-link
+    name: "pr_note"
+    group: notes
+    files: ["docs/notes/YYYY-MM/<note>.md (front matter of a code change or review-pr note from a pull request)"]
+    format: "pr_note: docs/notes/YYYY-MM/<file>.md"
+    pattern: '^pr_note: docs/notes/\d{4}-\d{2}/[a-z0-9.-]+\.md$'
+    examples:
+      - "pr_note: docs/notes/2026-10/2026-10-02-pr-orders-api-71.md"
+    meaning: "Links a code-change or follow-ups note to the PR note of the pull request it came from."
+    written_by: [crav1-add-to-spec, crav1-review-pr]
+    read_by: [crav1-add-to-spec, crav1-review-pr]
+    mention: 'pr_note:'
+    since: 1.65.0
+
+  - id: pr-description-as-of
+    name: "Description version (PR note)"
+    group: notes
+    files: ["docs/notes/YYYY-MM/YYYY-MM-DD-pr-<repo>-<n>.md (body)"]
+    format: "## Description as of <YYYY-MM-DD>"
+    pattern: '^## Description as of \d{4}-\d{2}-\d{2}$'
+    examples:
+      - "## Description as of 2026-10-19"
+    meaning: "One version of the pull request description. A changed description is appended as a new section; earlier ones are never removed."
+    written_by: [crav1-add-to-spec, crav1-review-pr, crav1-merge-pr]
+    read_by: [crav1-add-to-spec, crav1-review-pr, crav1-merge-pr]
+    mention: 'Description as of'
+    since: 1.65.0
 
   - id: note-waiting-for
     name: "waiting_for"

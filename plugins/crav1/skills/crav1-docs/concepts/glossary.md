@@ -68,6 +68,10 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 
 **Note.** One full input (fact plus passage, dump, code change, meeting) and its source in `docs/notes/YYYY-MM/`, filed by source date (1.61.0). Specs link it as `Full source:`; `used_by` records which specs took points. Never absorbed. Older notes may still say `Absorbed by`.
 
+**PR note.** One note per pull request in the specs repo's `docs/notes/YYYY-MM/`, filed by the pull request's created date, `kind: pull request`, holding its title and description (a changed description is appended as a dated section). Written by `/crav1-review-pr`, `/crav1-merge-pr`, and the code-change branch of `/crav1-add-to-spec` (1.65.0).
+
+**Specs repo, code repo.** The specs repo is the checkout with `docs/specs/`; a code repo is a repo in its `docs/system/repos.md`. `/crav1-review-pr` reviews a code repo's pull request from the specs repo, or with both open (1.65.0).
+
 **Notes index.** The generated `docs/notes/index.md` and `docs/notes/YYYY-MM/index.md`, built from note front matter by `notes_index.py`. Never hand-edited.
 
 **Source date.** The date of the original (meeting date, mail sent date, commit date). It names the note file and its month folder; the import date is recorded as `imported`.

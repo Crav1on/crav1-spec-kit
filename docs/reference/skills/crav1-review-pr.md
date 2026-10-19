@@ -38,7 +38,7 @@ Limits and exceptions: spark, specify, verify, [`/crav1-open-pr`](crav1-open-pr.
 
 ## You run next / Runs by itself
 
-- You run next: [`/crav1-merge-pr`](crav1-merge-pr.md); [`/crav1-refresh-system-notes`](crav1-refresh-system-notes.md) after an outside pull request merges
+- You run next: [`/crav1-merge-pr`](crav1-merge-pr.md); [`/crav1-refresh-system-notes`](crav1-refresh-system-notes.md) after an outside pull request merges; [`/crav1-finalize-commit`](crav1-finalize-commit.md)
 - Runs by itself: Calls no skill.
 
 ## Lane and group

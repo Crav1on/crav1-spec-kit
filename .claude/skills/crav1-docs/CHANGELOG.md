@@ -2,6 +2,25 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.65.0 (2026-10-19)
+
+Review a code pull request from the specs repo, and save every pull request's description as a note in the specs repo. Examples use made-up names: the specs repo `orders-specs`, the code repo `orders-api` on Azure DevOps.
+
+### Kit
+
+- **Cross-repo review.** `/crav1-review-pr` works from the specs repo for a pull request in a repo listed in `docs/system/repos.md` (`/crav1-review-pr orders-api 71`, or the URL; matched on the `URL` cell), or with both repos open in one workspace. It reads the pull request from `gh` or `az`, read-only, and the spec, plan and `verify.md` from the specs repo's working tree, found by the head branch in `Synced at`, Match `Branch:` or task `(branch: …)`. A code pull request whose spec has `plan.md` gets the full checks. Another repo's part of a spec is not a miss; a new `I3 — info — other repos` note lists it with the Branches line. A mismatched repository still stops, now naming the three places it looked.
+- **Azure DevOps diff from a sibling checkout.** When the code repo's copy of the pull request branches is missing or older than the pull request, one question: **Fetch only the PR's two branches (Recommended)**, **Use what's on disk** (with the copy's age and a warning), or **Stop**. Choice words for bots: `fetch pr branches`, `use disk`, `stop pr review`. No question when the copies match. This fetch is the one exception to the no-fetch rule for a sibling checkout in `references/branches.md`.
+- **Notes into a specs repo next door.** Run from the code repo, the review finds the specs repo as a sibling with a `repos.md` row for this repo, writes its notes there without committing, and names the full path. A code repo pull request's follow-ups note is always `review-pr-<repo>-<n>-follow-ups.md`.
+- **PR note.** One note per pull request, `kind: pull request`, keyed by `source: PR <n> <repo URL path>`, filed by the pull request's created date as `docs/notes/YYYY-MM/YYYY-MM-DD-pr-<repo>-<n>.md`. It holds the title, URL, author, base and head, state, and `## Description as of <date>` with the description after the personal-data and secrets check; images get the four options. A changed description is appended as a new dated section, never removed. `/crav1-review-pr` writes or reuses it on every review (also for pull requests `/crav1-open-pr` made), `/crav1-merge-pr` after a confirmed merge, and the code-change branch of `/crav1-add-to-spec` when given a pull request. `/crav1-open-pr` does not save one. Rules: `crav1-add-to-spec` `references/notes.md` **PR note**.
+- **Code change from a pull request.** `/crav1-add-to-spec code change orders-api PR 71` (or the URL) imports the pull request's commits and links the code-change note to the PR note with `pr_note:`. Given a branch, it writes the PR note when a signed-in `gh` or `az` host shows exactly one pull request for that branch; otherwise it writes none and says why.
+- Note template: `kind` gains `pull request`; new `pr_note:` field. `notes_index.py --selftest` covers a PR note and a linking code-change note.
+- `docs/reference/marks.yaml`: new marks `note-kind`, `note-pr-source`, `note-pr-link`, `pr-description-as-of` (53 marks); `/crav1-review-pr` now reads `task-branch` and `merges-into`.
+- `workflow.yaml`: `/crav1-review-pr` and `/crav1-merge-pr` may name `/crav1-finalize-commit` for the notes they wrote.
+
+### Docs
+
+- From a pull request review: "Specs in another repo" and "PR note". From a code change: "From a pull request". From commit to merge: "PR note". Glossary: PR note; specs repo, code repo. Data layout: the PR note, `pr_note`, and the generated marks tables.
+
 ## 1.64.1 (2026-10-19)
 
 Fixes to the 1.64.0 fork point and rebase matching, found by the proving-ground multi-branch scenarios. Examples use made-up names.

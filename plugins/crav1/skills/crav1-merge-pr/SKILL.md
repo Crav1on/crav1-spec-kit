@@ -6,6 +6,7 @@ description: >-
   false. Use only when this turn explicitly asks to merge a pull request by
   number or URL. Cross-cutting. Never squash, rebase, bypass policy, or
   follow on from open-pr. Do not run /crav1-review-pr. A review is not this ask.
+  After the merge, saves the PR description as a PR note in the specs repo.
 disable-model-invocation: true
 icon: git-merge
 color: green
@@ -86,7 +87,7 @@ The pull request must be **open**. Anything else: stop and say the state. Do not
 ### GitHub
 
 ```text
-gh pr view <n-or-url> --json number,url,title,state,isDraft,baseRefName,headRefName,mergeable,mergeStateStatus,reviewDecision,statusCheckRollup
+gh pr view <n-or-url> --json number,url,title,body,author,createdAt,state,isDraft,baseRefName,headRefName,mergeable,mergeStateStatus,reviewDecision,statusCheckRollup
 gh pr checks <n-or-url>
 ```
 
@@ -291,6 +292,8 @@ When you only printed commands, stop after those commands. Do not invent a hash.
 
 **Spec branches (1.64.0).** After a confirmed merge, when the source branch is a work branch of one or more specs (named in a spec's `Synced at` entries, Match `Branch:` list or task `(branch: …)` parts, in this repo or in the sibling spec repo `/crav1-open-pr` finds), say once per spec: `<n> of <m> branches of <slug> now merged into <target>`, counted with the merged tests in `crav1-add-to-spec` `references/branches.md` (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/references/branches.md`; plugin: sibling `skills/crav1-add-to-spec/references/branches.md`). When that was the last one: `<slug> is now merged across all its branches; run /crav1-verify-build-against-spec`. A branch several specs list is reported under each, and counted once per spec. Read-only: no file edits, no fetch, no status change.
 
+**PR note (1.65.0).** After a confirmed merge, write or reuse the pull request's **PR note** in the specs repo, as `crav1-add-to-spec` `references/notes.md` **PR note** says (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/references/notes.md`; plugin: sibling `skills/crav1-add-to-spec/references/notes.md`): one note per pull request, `kind: pull request`, `source: PR <n> <repo URL path>`, filed by its created date (`createdAt`, or `creationDate` from the re-read), the description from the read above, a new `## Description as of <date>` section only when the description changed, `State on <date>: merged`, the personal-data and secrets check, and the four image options. A pull request that `/crav1-open-pr` made gets one too. The specs repo is this checkout when it has `docs/specs/`, else the workspace folder with `docs/specs/`, else a sibling `../*/docs/system/repos.md` with a row for this repo; write the note there, never commit it, and name its full path: `PR note: <full path> (written | reused | updated)`. When no specs repo is found, print the note with the path it would have. Run the notes index generator after the note changes. Name `/crav1-finalize-commit` for that note; do not run it.
+
 ## Local main
 
 Run this only after a confirmed merge commit. On Azure DevOps that includes a completed pull request whose merge commit has two parents, counted with `git rev-list` or, when git cannot see the commit, the commits API. If that check stopped the skill, do not fast-forward.
@@ -333,6 +336,7 @@ An `AZURE_DEVOPS_EXT_PAT` the user has already set is a credential for the `az r
 - No `--admin`, no `--bypass-policy`, no `bypassPolicy`.
 - No second strategy attempt after a refusal or a failed `az repos pr update`.
 - No `git commit`, no stash, no new branch, no force-push.
+- The only file this skill writes is the PR note (and the generated notes indexes) in the specs repo, after a confirmed merge. Never committed.
 - No branch delete unless the user asked in this turn.
 - No dialog-box or browser Microsoft sign-in (`az login`, `az devops login`, device code, or a web login).
 - No token printed, echoed, or created. An `AZURE_DEVOPS_EXT_PAT` the user already set is the PAT route in **Auth notes**.

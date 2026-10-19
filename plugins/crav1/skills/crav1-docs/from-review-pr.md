@@ -98,17 +98,40 @@ Each earlier finding gets one line first: **Fixed** (with the short commit SHA),
 
 On post, the re-review replies in each earlier finding's own thread instead of adding a duplicate comment. Afterwards it offers to resolve the threads marked Fixed, and resolves them only on your yes.
 
+## Specs in another repo (1.65.0)
+
+The specs often live in their own repo (`orders-specs`) and the code pull requests in others (`orders-api` on Azure DevOps, merging into `develop`). The review works across that split in two ways:
+
+- **From the specs repo**, for a pull request in a repo listed in `docs/system/repos.md`: `/crav1-review-pr orders-api 71`, or the pull request URL. The repo is matched on its `URL` cell.
+- **With both repos open** in one workspace: the folder with `docs/specs/` is the specs repo, and the folder whose remote matches the pull request is the code repo.
+
+It reads the pull request from the host (`gh` or `az`, read-only), and the spec, plan and `verify.md` from the specs repo's working tree. The spec is found by the head branch in its `Synced at` entries, Match `Branch:` list or task `(branch: orders-api …)` parts. A code pull request whose spec has a `plan.md` gets the full checks, not the outside-the-kit note. When the spec spans several repos, another repo's part is not a miss; an `I3` info note lists it with the Branches line.
+
+A GitHub diff comes from `gh pr diff`. An Azure DevOps diff comes from the code repo's checkout (`../orders-api`). When that checkout's copy of the pull request branches is missing or older than the pull request, it asks once:
+
+1. **Fetch only the PR's two branches (Recommended)**: fetches just those two branches there; nothing is checked out or committed.
+2. **Use what's on disk**: diffs the copies there and says how old they are and that newer commits may be missed.
+3. **Stop**: you fetch and rerun.
+
+A bot passes `fetch pr branches`, `use disk` or `stop pr review`. When the copies already match, nothing is asked.
+
+Run from the code repo with the specs repo not open, it finds the specs repo next door (`../orders-specs`, by its `repos.md` row), writes the notes there, never commits them, and names the full path.
+
+## PR note (1.65.0)
+
+Every review saves the pull request's title and description as a **PR note** in the specs repo, so specs can link to it locally: `docs/notes/YYYY-MM/YYYY-MM-DD-pr-orders-api-71.md`, filed by the pull request's created date, `kind: pull request`, `source: PR 71 dev.azure.com/contoso/orders/orders-api`. A later review reuses it; when the description changed, it appends a `## Description as of <date>` section and never removes the earlier text. The description goes through the same personal-data and secrets check as an imported mail, and each image gets the four options. Pull requests made by `/crav1-open-pr` get one too. `/crav1-merge-pr` writes or updates it after a merge, and `/crav1-add-to-spec code change orders-api PR 71` uses it. The follow-ups note links it with `pr_note:`.
+
 ## Follow-ups
 
 Follow-ups are suggestions, and choices the description calls deliberate. They are not for this pull request, so they are not posted to the pull request and are not in the paste-ready comment. The comment has only Blocker, Bugs, and Tests to add with this PR.
 
-The chat review still lists them, then says where they were saved. They go into one note in `docs/notes/` of the specs repo, in the usual notes format: `docs/notes/YYYY-MM/review-pr-<n>-follow-ups.md`, or `docs/notes/YYYY-MM/review-pr-<repo>-<n>-follow-ups.md` (month of the review date) when two repos in the specs repo have the same pull request number. The note names the pull request, the repo, the date, and each follow-up with its file and line. The paths stay, because the note stays in the specs repo. The notes indexes are regenerated.
+The chat review still lists them, then says where they were saved. They go into one note in `docs/notes/` of the specs repo, in the usual notes format: `docs/notes/YYYY-MM/review-pr-<n>-follow-ups.md`, or `docs/notes/YYYY-MM/review-pr-<repo>-<n>-follow-ups.md` (month of the review date) when two repos in the specs repo have the same pull request number, and always for a pull request in another repo (1.65.0). The note names the pull request, the repo, the date, and each follow-up with its file and line. The paths stay, because the note stays in the specs repo. The notes indexes are regenerated.
 
 A re-review of the same pull request updates that note instead of writing a second one: it sets the imported date, adds new follow-ups, and marks one the code now addresses `(done in <short sha>)`. It removes no line. A review with no follow-ups writes no note. The follow-ups come back through the existing note flow: [`/crav1-ado-sync`](from-ado-sync-suggest-features.md) reads open notes, and the spec that takes one adds itself to the note's `used_by`. Notes are never absorbed. The note is not committed; `/crav1-finalize-commit` does that.
 
 ## What does not get written
 
-No code edit. No `spec.md` edit. No `plan.md` edit. No test run. No comment, vote, or thread resolve without your yes. The only file it writes is the follow-ups note. No branch-protection change. No merge.
+No code edit. No `spec.md` edit. No `plan.md` edit. No test run. No comment, vote, or thread resolve without your yes. The only files it writes are the PR note and the follow-ups note, in the specs repo. In the code repo it only fetches the pull request's two branches, and only after you pick that. No branch-protection change. No merge.
 
 ## After
 

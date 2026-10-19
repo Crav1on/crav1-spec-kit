@@ -71,6 +71,12 @@ The work for one spec often sits on several branches, and sometimes in another r
 
 `/crav1-tighten-spec`, `/crav1-plan-from-spec`, `/crav1-help status`, `/crav1-tasks-ready-to-build`, `/crav1-verify-build-against-spec`, `/crav1-open-pr` and `/crav1-merge-pr` then read all three branches. The other skills that write a slice `Synced at` line (`/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, `/crav1-refresh-system-notes`) keep the other branches' entries too, and `/crav1-existing-to-specs` templates carry the `Merges into` column.
 
+## From a pull request (1.65.0)
+
+A code change can be a pull request: `/crav1-add-to-spec code change orders-api PR 71`, or its URL. The change is its commits, read from the code repo's checkout. The pull request's title and description are saved as the PR note (`docs/notes/YYYY-MM/YYYY-MM-DD-pr-orders-api-71.md`, by its created date, `kind: pull request`), or reused when it exists, after the personal-data and secrets check. The code-change note links it with `pr_note:`, and a spec point taken from the description gets `Full source:` with the PR note's path.
+
+Given a branch instead, it also writes the PR note when a signed-in `gh` or `az` host shows exactly one pull request for that branch. Otherwise it writes none and says why in one line, for example `no PR note: 2 PRs for feat/orders-retry; name one as PR <n>`. It never asks, and never stops because of it.
+
 ## After
 
 If a file changed and those edits should be in git:

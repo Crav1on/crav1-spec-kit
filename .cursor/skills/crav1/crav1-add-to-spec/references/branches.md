@@ -24,7 +24,7 @@ Use the remote copy (`origin/<name>`) when it exists, and the local branch other
 
 ## Sibling checkout
 
-The code of a repo other than the open one is read from `../<repo>`, the folder with that repo's name next to the spec repo. When it isn't there, ask for the path with options only: the sibling folders that are git checkouts, plus Other. A headless run stops and names the repo: `No checkout found for <repo>. Name its path.` The sibling checkout is read-only: never check out, fetch, commit, or write there. Notes, spec points and `Synced at` go into the spec repo.
+The code of a repo other than the open one is read from `../<repo>`, the folder with that repo's name next to the spec repo. When it isn't there, ask for the path with options only: the sibling folders that are git checkouts, plus Other. A headless run stops and names the repo: `No checkout found for <repo>. Name its path.` The sibling checkout is read-only: never check out, fetch, commit, or write there. One exception (1.65.0): `/crav1-review-pr`, for an Azure DevOps pull request whose branches on disk are missing or older than the pull request, may fetch only that pull request's two branches there, after the user picks **Fetch only the PR's two branches** or a bot passes `fetch pr branches`. Notes, spec points and `Synced at` go into the spec repo.
 
 ## Fork point
 
