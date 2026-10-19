@@ -18,6 +18,19 @@ Reads one named open pull request. When the slug has `plan.md`, spec, plan, `ver
 
 1.67.0: the follow-ups note keeps the comment as drafted and the comment as posted, word for word in code fences. At the start of every run on the pull request it looks for the posted comment on the host (read-only) or takes a paste, compares it with the draft, and marks drafted points you left out as not in the posted comment and still open, without dropping them. A re-review compares against the posted comment and keeps points you cut out of the new comment unless you include them. Post it adds "I'll post it myself"; choice words `comment posted`, `newest comment` and `skip comment record`.
 
+## Choice words
+
+Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
+
+| Question | Word | Means |
+| --- | --- | --- |
+| PR branches on disk older than the pull request | `fetch pr branches` | fetch only the PR's two branches |
+| PR branches on disk older than the pull request | `use disk` | review the copies on disk |
+| PR branches on disk older than the pull request | `stop pr review` | stop |
+| The comment as posted | `comment posted` | only record the posted comment, no review |
+| The comment as posted | `newest comment` | several candidates: take the newest match by you |
+| The comment as posted | `skip comment record` | do not record; the review goes on |
+
 ## Runs when
 
 This turn names an open pull request. Called by the user.

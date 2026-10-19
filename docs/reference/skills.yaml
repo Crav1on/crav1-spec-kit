@@ -1144,6 +1144,23 @@ skills:
 
     @docs/specs/<slug>/'
 - name: crav1-review-pr
+  choice_words:
+  - question: PR branches on disk older than the pull request
+    words:
+    - word: "fetch pr branches"
+      means: "fetch only the PR's two branches"
+    - word: "use disk"
+      means: "review the copies on disk"
+    - word: "stop pr review"
+      means: "stop"
+  - question: The comment as posted
+    words:
+    - word: "comment posted"
+      means: "only record the posted comment, no review"
+    - word: "newest comment"
+      means: "several candidates: take the newest match by you"
+    - word: "skip comment record"
+      means: "do not record; the review goes on"
   lane: cross-cutting
   group: Commit and pull request
   starter: false
