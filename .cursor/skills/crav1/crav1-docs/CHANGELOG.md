@@ -2,6 +2,21 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.64.1 (2026-10-19)
+
+Fixes to the 1.64.0 fork point and rebase matching, found by the proving-ground multi-branch scenarios. Examples use made-up names.
+
+### Kit fixes
+
+- **Fork point before `Merges into` is filled.** While a repo's `Merges into` cell is empty, the integration branches on disk (`develop`, `development`, `dev`, `integration`) are fork-point candidates too. A branch cut from `develop` in a repo whose default is `main` now shows its own commits, not everything since `main`, and the code-change question to record `Merges into` is asked.
+- **Stacked branches.** A spec branch built on top of the branch being read (it already contains its tip) is no longer taken as its parent, and another spec branch counts only when the split point is in none of the base candidates.
+- **Rebase after a prune.** A code-change note's body now starts with one commit line per imported commit (`<short sha> <author date> <subject>`). When an imported commit is no longer on disk after a force push, a commit with the same author date and subject is reported as the same change and not imported again.
+- `docs/reference/marks.yaml`: new mark `note-commit-line` (49 marks).
+
+### Docs
+
+- Glossary (fork point) and data layout (fork point before `Merges into`, same change after a rebase).
+
 ## 1.64.0 (2026-10-19)
 
 One spec, many feature branches: setups 1 (main only), 2 (an integration branch such as `develop`), 3 (stacked branches) and 5 (one spec over several repos). Everything is report only and read-only git on the refs on disk; nothing fetches and nothing writes `Status:`. Examples use made-up names.

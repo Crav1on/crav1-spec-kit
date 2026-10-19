@@ -190,7 +190,8 @@ A ticked task is Done only when `verify.md` lists it as verified. Otherwise it s
 A spec's work can sit on several branches, and in several repos. The rules are in `crav1-add-to-spec` `references/branches.md`; the marks are in the tables below.
 
 - **Where branches are named:** the `Synced at` slice line (one entry per branch, `; `-separated), the Match `Branch:` list, and a task's `(branch: …)` part. Together, minus base branches and `(dropped)` entries, these are the spec's **work branches**.
-- **Base branch:** the repo's `Merges into` cell in `docs/system/repos.md`, else the default branch. A branch diff starts at the **fork point** (where the branch split off), so a branch cut from `develop` in a repo whose default is `main` shows only its own commits.
+- **Base branch:** the repo's `Merges into` cell in `docs/system/repos.md`, else the default branch. A branch diff starts at the **fork point** (where the branch split off), so a branch cut from `develop` in a repo whose default is `main` shows only its own commits, even before the `Merges into` cell is filled (1.64.1).
+- **Same change after a rebase:** commits are matched by `git patch-id`; when an imported commit is gone from disk after a force push, the note's commit line (`<short sha> <author date> <subject>`) is matched instead (1.64.1).
 - **Done across branches:** every work branch merged into its base (contained, the same change, or a merged PR on GitHub or Azure DevOps). A deleted branch whose work is in the base counts as merged. Report only: no skill writes `Status:` because of it.
 - **Other repos:** code is read from the sibling checkout `../<repo>`, read-only. Refs on disk only; nothing fetches.
 
@@ -317,6 +318,7 @@ Every mark and line format the kit writes inside product files, generated from [
 | --- | --- | --- | --- | --- | --- |
 | used_by | `used_by: [<slug>, <slug>]` | `docs/notes/YYYY-MM/<note>.md` (front matter) | `/crav1-add-to-spec`, `/crav1-bundle-to-specs`, `/crav1-ideas-to-spec`, `/crav1-spark-to-spec`, `/crav1-tighten-spec`, `/crav1-existing-to-specs`, `/crav1-retire-spec` | `/crav1-ado-sync` | 1.61.0 |
 | commits | `commits: [<short sha>[, <short sha>]]` | `docs/notes/YYYY-MM/<note>.md` (front matter, code change notes only) | `/crav1-add-to-spec` | `/crav1-add-to-spec`, `/crav1-tighten-spec` | 1.64.0 |
+| Commit line (code change note) | `<short sha> <author date> <subject>` | `docs/notes/YYYY-MM/<note>.md` (body of a code change note, one per imported commit) | `/crav1-add-to-spec` | `/crav1-add-to-spec` | 1.64.1 |
 | waiting_for | `waiting_for: [<parked slug>]` | `docs/notes/YYYY-MM/<note>.md` (front matter) | `/crav1-add-to-spec`, `/crav1-retire-spec` | `/crav1-help`, `/crav1-show-or-ask-open-questions`, `/crav1-ado-sync` | 1.61.0 |
 | Converted from spec | `Converted from spec, no research owner` | `docs/notes/YYYY-MM/<note>.md` (body, after the Source line) | `/crav1-retire-spec` | `/crav1-add-to-spec` | 1.60.0 |
 | Absorbed by / Used by (older notes) | `<Absorbed by \| Used by> <slug>` | `docs/notes/<note>.md` (before 1.61.0) | — | `/crav1-add-to-spec` | 1.36.0 |
