@@ -10,6 +10,10 @@ Commit **style** is already persisted (or the parent just wrote the rule). Use t
 
 Phase names in STATUS (never A/B/C/D): **`implement`**, **`verify`**, **`fix`**, **`done`**.
 
+## Branch (1.64.0)
+
+The parent already switched to the task's `(branch: …)` when it has one and passed `branch: already-done`. Commit on the branch you were given. Do not check out, create, or switch branches. When the checkout is not the task's named branch, return to the parent with that reason before any code.
+
 ## Loop-commit
 
 After a step that may have changed files:

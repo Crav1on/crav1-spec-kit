@@ -8,7 +8,8 @@ description: >-
   Blocks: lines under spec open questions, plan Risks, tasks.md ticks, and
   verify.md. Where nothing is recorded it falls back and marks the reason
   inferred. Shows summary counts, Ready, Blocked (one reason each), Needs
-  verify, a Done count, and Next: /crav1-build-tasks T#. Local only,
+  verify, a Done count, a Branches line, and Next: /crav1-build-tasks T#.
+  Shows a task's (branch: …) beside it. Local only,
   never reads Azure Boards. Read-only. Can run any time.
 icon: list-checks
 color: green
@@ -29,7 +30,9 @@ It is not `/crav1-what-do-we-know-about-this` (what is known about one thing) an
 
 ## What it reads
 
-Per slice, read only: `spec.md` (`## Open questions` and their indented lines), `plan.md` (the `Reviewed:` line and `## Risks`), `tasks.md`, and `verify.md` when it exists. Nothing else. Never read Azure Boards (ADO) or any network source. When the slice has `work-item.md`, add one line: task states in Azure Boards are not read here; `/crav1-ado-sync` brings them back.
+Per slice, read only: `spec.md` (`## Open questions` and their indented lines), `plan.md` (the `Reviewed:` line and `## Risks`), `tasks.md`, and `verify.md` when it exists. Nothing else, except read-only local git for the Branches line below. Never read Azure Boards (ADO) or any network source.
+
+**Branches (1.64.0).** When the slice has work branches (its `Synced at` entries, Match `Branch:` list and task `(branch: …)` parts, minus base branches and `(dropped)` entries), add one Branches line under the counts, from `crav1-add-to-spec` `references/branches.md` (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/references/branches.md`; plugin: sibling `skills/crav1-add-to-spec/references/branches.md`), using only the local git tests (contained, or the same change by `git cherry`) on the refs on disk. No host check here, so a squash merge can show as not merged; say `squash merges are checked by /crav1-help status` when a branch is not merged. A branch other slices also list gets `(also in <slug>)`. It doesn't change readiness or the Done count. When the slice has `work-item.md`, add one line: task states in Azure Boards are not read here; `/crav1-ado-sync` brings them back.
 
 ## Rules, in order
 
@@ -64,7 +67,7 @@ Tasks ready to build — <slug> | all specs (<n> slices)
 | <slug> | 2 | 3 | 1 | 4 |
 
 Ready
-- <slug> T5: <title>. Warning: plan review unknown (inferred), run /crav1-review-plan.
+- <slug> T5: <title> (branch: feat/orders-retry). Warning: plan review unknown (inferred), run /crav1-review-plan.
 
 Blocked
 - <slug> T6: waits on T5 (recorded).
@@ -74,17 +77,19 @@ Needs verify
 - <slug> T3: no verify.md row.
 
 Done: 4
+Branches: 1 of 3 merged into develop. Not merged: feat/orders-retry (2 commits), feature/orders-export (3 commits).
 
 Next: /crav1-build-tasks T5 (<slug>)
 Source: docs/specs/<slug>/spec.md, plan.md, tasks.md, verify.md
 ```
 
 - **Next** names the first ready task, in `tasks.md` order, in the first slice that has one. When nothing is ready, say what would unblock the first blocked task instead (for example `Next: answer the open question with /crav1-resolve-open-questions`). When only Needs verify is left, `Next: /crav1-verify-build-against-spec`.
+- A ready task with `(branch: …)` shows that branch beside it.
 - **Source** names every file it read, per slice.
 - When the slice has `work-item.md`, add the Azure Boards line from **What it reads**.
 
 ## What it does not do
 
-- No file write, no commit, no network read, no Azure Boards read.
+- No file write, no commit, no network read, no Azure Boards read, no fetch, no checkout.
 - No skill run. It names the next step and stops.
-- No new marks. `Reviewed:`, `(after: …)`, and `Blocks:` are written by `/crav1-review-plan`, `/crav1-tighten-plan`, `/crav1-plan-from-spec`, and `/crav1-resolve-open-questions`.
+- No new marks. `Reviewed:`, `(after: …)`, `(branch: …)`, and `Blocks:` are written by `/crav1-review-plan`, `/crav1-tighten-plan`, `/crav1-plan-from-spec`, and `/crav1-resolve-open-questions`.

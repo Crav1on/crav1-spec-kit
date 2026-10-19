@@ -15,9 +15,11 @@ Every `/crav1-add-to-spec` input (fact, dump, code change, meeting) becomes **on
 
 ## Shape
 
-The shape is this skill's `assets/note.md` (same file as `docs/notes/_template/note.md`): front matter `title`, `kind`, `source`, `source_date`, `imported`, `source_folder` (when imported), `used_by`, `waiting_for`; then the title, a `Source date: … Imported: …` line, and the full input verbatim.
+The shape is this skill's `assets/note.md` (same file as `docs/notes/_template/note.md`): front matter `title`, `kind`, `source`, `source_date`, `imported`, `source_folder` (when imported), `commits` (code changes only, 1.64.0), `used_by`, `waiting_for`; then the title, a `Source date: … Imported: …` line, and the full input verbatim.
 
 `source` names the input so it can be recognised again: the mail's subject, sender, and sent date; the meeting date and title; the file path; the commit SHA or range.
+
+`commits` (1.64.0) lists the short SHAs a code-change note imported, oldest first, without merge commits: `commits: [155b5c4, 2c0e1a9]`. Other kinds leave it out or empty. Notes written before 1.64.0 have none; that is fine.
 
 ## Indexes are generated
 
@@ -40,6 +42,7 @@ A **parked** spec (a `Parked:` line) gets nothing written. Add its slug to the n
 Lookups for a spec follow the `Full source:` links. Matching new input and the duplicate check read the generated indexes and the note front matter.
 
 - **Same source again** (the same mail, the same meeting date and title, the same file, the same commit), matched on each note's front matter `source` and `source_folder` (for a migrated note these come from its old `Source:` line; an empty field matches nothing): do not write a second note. Say `already imported on <imported date> as docs/notes/YYYY-MM/<file>.md`. Ask, options only: **Reuse the existing note (Recommended)** for specs that took nothing from it yet, or **Skip**. Reuse adds points and `used_by` only for those specs.
+- **Overlap and same change (code changes, 1.64.0):** before writing, list the new change's commits and compare them with every `kind: code change` note. Use the note's `commits:` when it has one; otherwise expand its `source` SHA or range with git when those commits can still be reached; otherwise don't match on that note. A commit with a different SHA but the same diff (rebased, cherry-picked, force-pushed) is the same change: compare `git patch-id` and say `same change as <sha> in <note>`. All commits already imported: the **same source again** path above. Some already imported: narrow the change to the new commits, say `<n> of <m> commits already in <note>; importing the other <k>` on the sort, and put only the new commits in `source` and `commits:`. No extra question; the sort confirmation covers it. A commit that may be a squash of imported commits counts as covered only when the host shows the matching PR merged as that commit (GitHub with `gh` or Azure DevOps with `az`, signed in, read-only); otherwise, and on any other host, list it as `may already be in <note>` for the user to keep or drop. One note serves every spec it feeds; never write a second note for the same commits. A missing or rewritten SHA never stops the run with an error.
 - **Same point from a different source:** write the new note as usual. On the spec line that already says it, add the new note as a second source (`Full source: <first>; <second>`). Do not repeat the point.
 - **Disagreement:** when the new source says something different about a point already on a spec, do not overwrite. Write the new point under the old one as `**Conflict:** "<new words>" (Full source: <note>) vs the line above`, and list it in the report for the user to decide.
 

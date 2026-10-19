@@ -52,6 +52,14 @@ Intake (several slugs): one branch for the dump. Slug = short landscape kebab, o
 
 Do not offer `spec/<slug>` on a build prompt.
 
+**Task branch (1.64.0).** When the task being built ends with `(branch: X)` (or `(branch: <repo> X)` for the open repo):
+
+- On X already: skip the prompt.
+- Otherwise the Build prompt is **X (Recommended)** first, then `feat/<slug>`, **Stay** and **Other**.
+- When X exists only as `origin/X`, `git checkout X` makes the local branch.
+- When X exists nowhere, say so and offer `feat/<slug>` or **Other**. Never create X from the default branch without asking.
+- A `(branch: <repo> X)` for another repo is not built here; say which checkout it belongs to.
+
 If the working tree is dirty (other than `agent-tools/`), **do not checkout**. Tell them `/crav1-finalize-commit` (or stash themselves). Re-ask branch after the tree is clean.
 
 ## Checkout
@@ -92,7 +100,7 @@ If they planned on `feat/<slug>` (one-branch default), skip spec-first. Implemen
 
 ## Hard rules
 
-- Prompt; never silent checkout.
+- Prompt; never silent checkout. A task's named branch comes first, marked (Recommended); it is never created from default without asking.
 - `feat/<slug>` is the default one-branch flow. `spec/<slug>` is the optional specify-then-build split.
 - No push, no PR, no `git commit` in this skill.
 - Do not throw away uncommitted work.

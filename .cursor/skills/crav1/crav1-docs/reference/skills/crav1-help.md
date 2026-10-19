@@ -12,6 +12,8 @@ Called with nothing, **[`/crav1-help`](crav1-help.md)** shows a usage guide with
 
 It reads the kit repo's `docs/`, or the `crav1-docs/` folder bundled next to the skills (plugin, Cursor drop-in, Claude Code drop-in), never GitHub. When online, it reads the tag names once and says so when a newer version is tagged. It writes nothing and runs no other skill. It is cross-cutting. It is not a starter option.
 
+1.64.0: `status <slug>` and `where am I` add the Branches line and route unmerged work to [`/crav1-open-pr`](crav1-open-pr.md) or [`/crav1-merge-pr`](crav1-merge-pr.md).
+
 ## Runs when
 
 You want to know what to run next, in what order, or what a skill does. Called by the user, or by an agent before it suggests more than one next step or when an order is questioned (the `crav1.mdc` rule).

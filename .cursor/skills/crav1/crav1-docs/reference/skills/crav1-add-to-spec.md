@@ -22,6 +22,8 @@ A meeting (was `/crav1-meeting-to-specs`): When the user brings minutes, a trans
 
 A meeting (was `/crav1-meeting-to-specs`): Minutes, a transcript, an email, or a chat thread → quotes matched to existing specs, keep, leave, or dismiss one at a time; the whole input is one full note. A kept addition goes through [`/crav1-add-to-spec`](crav1-add-to-spec.md). A clear answer to a spec open question is linked under it.
 
+1.64.0: a code change can name a repo and branch (`code change orders-api feat/orders-retry`); the code is read read-only from `../<repo>`. The branch diff starts at the fork point (the repo's `Merges into` branch, the default branch, or another spec branch), the slice `Synced at` line keeps one entry per branch, a yes records `Merges into` in `repos.md`, and the note's `commits:` list plus `git patch-id` stop a commit being imported twice, also after a rebase.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.

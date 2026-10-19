@@ -14,6 +14,8 @@ Date:
 | Claimed done, unverified | 0 | |
 | Acceptance with no task | 0 | |
 
+<!-- When the spec has work branches (1.64.0): Branches: <n> of <m> merged into <base>. Not merged: <branch> (<k> commits). -->
+
 Next: `/crav1-fix-build-gaps` (omit Gap) for failed/unverified/`G#`; `/crav1-build-tasks T#` if only unimplemented remains; or ship.
 
 ## Tasks — overview

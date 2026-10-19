@@ -35,7 +35,7 @@ Two kinds. List both. Do not drop one to keep the list short.
 
 An unclear case is not a hit. Do not mark it. It stays an open question on the spec, the same way that quote is written today. A line that only might disagree is unclear. Do not mark it.
 
-Example of both hits on one note. The quote is `A fixed, dedicated public IP address that we can allowlist in our proxy firewall`. That contradicts an inferred line `since NRCC calls us (we originate no NRCC traffic), mTLS itself doesn't need one`. It answers the open question `Does NRCC require a static IP from us?`. List both. The example is a shape. It is not a fact in this kit repo.
+Example of both hits on one note. The quote is `A fixed, dedicated public IP address that we can allowlist in our proxy firewall`. That contradicts an inferred line `since the partner calls us (we originate no partner traffic), mTLS itself doesn't need one`. It answers the open question `Does the partner require a static IP from us?`. List both. The example is a shape. It is not a fact in this kit repo.
 
 ## Ask before marking
 

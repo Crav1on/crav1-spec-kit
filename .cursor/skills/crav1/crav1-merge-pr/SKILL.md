@@ -289,6 +289,8 @@ Report the merge commit hash, the title, and `source` → `target`. Repeat the s
 
 When you only printed commands, stop after those commands. Do not invent a hash.
 
+**Spec branches (1.64.0).** After a confirmed merge, when the source branch is a work branch of one or more specs (named in a spec's `Synced at` entries, Match `Branch:` list or task `(branch: …)` parts, in this repo or in the sibling spec repo `/crav1-open-pr` finds), say once per spec: `<n> of <m> branches of <slug> now merged into <target>`, counted with the merged tests in `crav1-add-to-spec` `references/branches.md` (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/references/branches.md`; plugin: sibling `skills/crav1-add-to-spec/references/branches.md`). When that was the last one: `<slug> is now merged across all its branches; run /crav1-verify-build-against-spec`. A branch several specs list is reported under each, and counted once per spec. Read-only: no file edits, no fetch, no status change.
+
 ## Local main
 
 Run this only after a confirmed merge commit. On Azure DevOps that includes a completed pull request whose merge commit has two parents, counted with `git rev-list` or, when git cannot see the commit, the commits API. If that check stopped the skill, do not fast-forward.

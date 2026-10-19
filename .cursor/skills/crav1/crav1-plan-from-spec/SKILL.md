@@ -43,7 +43,9 @@ When the spec is partial, or `## In the code` names paths, do this before any ta
 
 Use the same repo and branch test as `/crav1-tighten-spec`. The repo is the Match repo line, a `Synced at` line, or another line in `spec.md` that names it. The branch is the branch on that line. Do not take them from the open checkout. Do not take a branch from `docs/system/repos.md` when the spec does not name it.
 
-If the open checkout is a different repo or a different branch, stop and name the right ones. Do not read the open tree. Do not treat a stub as the code. A stub is a placeholder, for example a `.gitkeep` on `main`. If the paths on the named branch are only a stub, stop and say so.
+**Several branches and other repos (1.64.0).** The spec's work branches are every branch in its `Synced at` entries, its Match `Branch:` list and its tasks' `(branch: …)` parts, minus the base branches and `(dropped)` entries, as `crav1-add-to-spec` `references/branches.md` (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/references/branches.md`; plugin: sibling `skills/crav1-add-to-spec/references/branches.md`) says. Read every work branch without checking it out (`git show <branch>:<path>`, `git diff`), from the refs on disk; never fetch. Each built piece says which branch it is on. A piece that only exists on an unmerged branch is labeled `only on <branch>, not merged`. When the named repo is not the open checkout, read it from `../<repo>` as the same file says under **Sibling checkout** (options-only ask when missing; headless stops with `No checkout found for <repo>. Name its path.`). Never write in that checkout.
+
+If the open checkout is a different repo, or a branch the spec does not list, stop and name the right ones. Do not read the open tree. Do not treat a stub as the code. A stub is a placeholder, for example a `.gitkeep` on `main`. If the paths on the named branch are only a stub, stop and say so.
 
 If the spec names no branch, stop and ask which branch has the code. Do not assume `main`. Do not assume the open checkout. When that repo lists branches, the options are those branches. Do not pick one. After the user answers, that branch is the read. Do not write the branch onto the spec. That yes or no belongs to `/crav1-tighten-spec`. This skill leaves `spec.md` alone.
 
@@ -119,6 +121,7 @@ Rules:
 - Each verify note names the kind and the checks, per `references/checks.md`
 - Order so each task can be verified before the next depends on it
 - When a task needs an earlier task to be done first, end its line with `(after: T1)` or `(after: T1, T3)`. Name only real needs. A task with no `(after: …)` has no recorded dependency, and `/crav1-tasks-ready-to-build` then treats every earlier unticked task as blocking it (inferred)
+- A task that finishes or tests a built piece found only on one work branch ends its line with `(branch: <name>)`, after `(verify:)`, `(spec:)` and `(after:)`. When the spec spans repos, name the repo too: `(branch: orders-api feat/orders-retry)`. New work with no home gets no branch part, and there is no new question. With one branch or none, write no branch part. A task without one uses `feat/<slug>` as today
 - No task is “and also the rest of the app”
 
 ## After writing

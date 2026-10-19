@@ -12,7 +12,7 @@ Follow **`crav1-bundle-to-specs` `references/worker.md`** in full:
 
 Templates: this agent’s `agent-assets/crav1-bundle-slice-agent/` (drop-in: `.claude/agent-assets/crav1-bundle-slice-agent/`; plugin: `agent-assets/crav1-bundle-slice-agent/`) and the parent skill’s `assets/`. Export recipes: `crav1-ideas-to-spec` `references/formats.md`. Slice diagram recipe: `crav1-ideas-to-spec` `references/diagrams.md`.
 
-The parent passes: slug, cluster, `docs/system/` paths, intent vs context refs, bulk `A#`s, mushy answers if any, export format(s), allowed repos, and `Synced at` only when the parent read only this slice.
+The parent passes: slug, cluster, `docs/system/` paths, intent vs context refs, bulk `A#`s, mushy answers if any, export format(s), allowed repos, and `Synced at` only when the parent read only this slice. That `Synced at` is one branch entry: write or update it on the repo's slice line as `references/worker.md` says (replace that branch's entry, keep the other entries).
 
 Landscape ADRs win. Do not edit `docs/system/`. Do not interview. Do not write code. Do not write `work-item.md`. Do not start another slug.
 

@@ -54,6 +54,23 @@ Other `docs/system/` files and other specs change only when apply is picked. Eac
 
 No `plan.md`. No `tasks.md`. No application code. A missing `docs/system/` is not seeded here. A missing `glossary.md` is a gap fill only when `docs/system/` already exists. When that file exists, only new rows are appended. Existing rows are not rewritten. A meaning the change does not state is `to be researched`. When `docs/system/` already exists, that same pass adds what is new to the short description, the diagram, and how the parts connect. It does not rewrite what is already there. A whole-repo read sets that repo's `Synced at` cell. A one-slice read writes `Synced at: <repo> <branch>@<short sha>, <date>` on that slice's `spec.md` and does not touch the column. That stamp is not an apply option. The pile that fits none of the specs is not a new spec folder.
 
+## One spec, several branches (1.64.0)
+
+The work for one spec often sits on several branches, and sometimes in another repo. In this example the specs live in `orders-specs`, the code in the sibling checkout `../orders-api`, whose default branch is `main` but whose work merges into `develop`. Three branches carry the `orders` spec: `feature/orders-openapi` (1 commit), `feat/orders-retry` (2) and `feature/orders-export` (3).
+
+```text
+/crav1-add-to-spec code change orders-api feature/orders-openapi
+```
+
+- **Which checkout.** `orders-api` is read from `../orders-api`, read-only. When it isn't there, the kit asks for the path (options only). A headless run stops with `No checkout found for orders-api. Name its path.`
+- **Fork point.** The branch diff starts where the branch split off, not at `main`: `Branch diff of feature/orders-openapi from develop (split at 00344be): 1 commit.` Measured from `main` it would be every commit on develop too. The report shows the age of each remote copy it read; nothing is fetched.
+- **Merges into.** Because the parent is `develop`, not the default branch, the kit asks once: `Work in orders-api merges into develop. Record that in repos.md?` A yes writes `develop` in the `Merges into` column. A headless run doesn't ask and writes nothing.
+- **Synced at.** The spec's line gains one entry per branch: `Synced at: orders-api feature/orders-openapi@85d4561, 2026-10-19; feat/orders-retry@155b5c4, 2026-10-19`. A new read of a branch replaces only that entry.
+- **No double import.** The note lists the commits it imported: `commits: [85d4561]`. Running the same branch again says `already imported`. A rebased or cherry-picked copy of an imported commit is `same change as <sha> in <note>` (matched by `git patch-id`). Only new commits are imported. When the branch was force-pushed since the last read, the run says `branch rewritten since last read` and carries on. A squash merge is recognised only through a merged PR on GitHub (`gh`) or Azure DevOps (`az`); anywhere else it is listed as `may already be in <note>` for you to keep or drop.
+- **One note, several specs.** When the change feeds two specs, one note serves both (`used_by` lists both).
+
+`/crav1-tighten-spec`, `/crav1-plan-from-spec`, `/crav1-help status`, `/crav1-tasks-ready-to-build`, `/crav1-verify-build-against-spec`, `/crav1-open-pr` and `/crav1-merge-pr` then read all three branches. The other skills that write a slice `Synced at` line (`/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, `/crav1-refresh-system-notes`) keep the other branches' entries too, and `/crav1-existing-to-specs` templates carry the `Merges into` column.
+
 ## After
 
 If a file changed and those edits should be in git:

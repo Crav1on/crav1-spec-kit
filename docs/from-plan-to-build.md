@@ -40,6 +40,15 @@ Before the tests run, the kit checks their local dependencies (Azurite, a databa
 
 Not written: `spec.md`, other tasks. No push, no pull request.
 
+## Tasks on several branches (1.64.0)
+
+A task line can name its branch: `- [ ] T3: … (after: T1) (branch: feat/orders-retry)`.
+
+- `/crav1-build-tasks` on one task offers **feat/orders-retry (Recommended)** first in the `/crav1-create-feature-branch` Build prompt, then `feat/<slug>`, Stay and Other. A branch that exists nowhere is never created from default without asking.
+- A range or all-tasks run switches to each task's branch on a clean tree; starting the run is the consent. A missing branch blocks that task.
+- `/crav1-build-features` does the same per slug. A slug whose tasks are done but whose branches aren't all merged shows `done (2 branches not merged)`.
+- `/crav1-tasks-ready-to-build` shows the branch beside each ready task, and one Branches line.
+
 ## After
 
 Prove the slice against the spec: [Verify and fix](from-verify.md). Then [From commit to merge](from-commit.md).

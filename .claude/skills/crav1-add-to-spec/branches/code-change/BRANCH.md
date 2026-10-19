@@ -18,7 +18,7 @@ A not-started spec (match status `not in the code`, or a thin spec) can keep tak
 
 ## Input
 
-Everything after the fact branch of `/crav1-add-to-spec`, and every `@`, is the pointer: a commit, a commit range, or the diff of the current branch against the default branch, when they named one. No dump is required. Do not ask for notes, tickets, or a dump.
+Everything after the fact branch of `/crav1-add-to-spec`, and every `@`, is the pointer: a commit, a commit range, a named branch, or the diff of the current branch, when they named one. The pointer may start with a repo from `docs/system/repos.md`, for example `orders-api feature/orders-openapi`; then the code is read from that repo's checkout (see **Which checkout**). No dump is required. Do not ask for notes, tickets, or a dump.
 
 Do not ask for a slug first. An `@` of one spec folder is a hint for the sort, not a requirement. It does not limit the sort to that folder, and it does not replace the change.
 
@@ -30,13 +30,17 @@ Read those folders before you sort. Do not ask which slug.
 
 If there are no spec folders, stop. Point at the repos and bundle branch of `/crav1-existing-to-specs`. Do not invent a landscape from the diff alone. Do not create a slug. Do not seed `docs/system/`.
 
+## Which checkout (1.64.0)
+
+When the pointer names a repo that is not the open checkout, read the code from `../<repo>`, as `crav1-add-to-spec` `references/branches.md` (drop-in: `.claude/skills/crav1-add-to-spec/references/branches.md`; plugin: sibling `skills/crav1-add-to-spec/references/branches.md`) says under **Sibling checkout**. Ask for the path with options only when it is missing. A headless run stops: `No checkout found for <repo>. Name its path.` Never check out, fetch, commit, or write in that checkout. The note, the spec points and `Synced at` go into the spec repo.
+
 ## Change (no sort yet)
 
 The change is one of these, when they named it:
 
 - a commit (a hash they already gave, `HEAD`, or a subject that matches one commit)
 - a commit range (`A..B`, `A...B`, or from one commit to another)
-- the diff of the current branch against the default branch (they said this branch, the branch, or the branch diff)
+- a branch diff: a branch they named, or the current branch when they said this branch, the branch, or the branch diff. A branch diff starts at the branch's **fork point**, not at the default branch (below)
 
 If they named one, that is the change. A named range is one change. Do not ask. Do not ask them to type a hash. Do not split one change into several runs.
 
@@ -44,9 +48,15 @@ If they did not name one, look at git, then ask with options only. Use the quest
 
 - Default branch: the branch `origin/HEAD` points at, or `main` when that is the default you can see.
 - Recent commits: a short list from `git log` on the current branch. Each option is that subject. A short hash may sit beside the subject so two subjects can be told apart. The choice is the option.
-- Branch diff: one option, the diff of the current branch against the default branch (commits on this branch that are not on the default branch, as one change). If that diff is empty, do not offer it. Say the branch diff is empty.
+- Branch diff: one option, the diff of the current branch from its fork point (commits on this branch since it split off, as one change). If that diff is empty, do not offer it. Say the branch diff is empty.
 
 Stop until they pick, when a pick is required. The pick is the change.
+
+**Fork point (1.64.0).** Work out where the branch split off as `crav1-add-to-spec` `references/branches.md` (drop-in: `.claude/skills/crav1-add-to-spec/references/branches.md`; plugin: sibling `skills/crav1-add-to-spec/references/branches.md`) says under **Fork point**: the candidates are its `(into …)` branch, the repo's `Merges into` branch, the default branch, and the spec's other work branches; the one with the fewest own commits is the parent (another spec branch only when the split point is not already in the base branch). The change is the commits from that split point to the branch tip, without merge commits (`git log --no-merges`). Use the refs on disk; never fetch. The report names the parent and split point used and the age of each remote copy it read. No fork point found: fall back to the default branch and say so; when that fails too, ask with options only (the repo's branches, plus **A commit range instead**). A headless run stops: `No fork point found for <branch>. Name a commit range.`
+
+**Merges into (1.64.0).** When the parent is not the default branch, is not a spec branch, and the repo's `Merges into` cell is empty, ask one yes/no question after the sort is confirmed: "Work in <repo> merges into <parent>. Record that in repos.md?" Yes writes `<parent>` in that repo's `Merges into` cell (add the column when `repos.md` exists and the column is missing; other rows stay empty). No writes nothing. Never create `repos.md` for this. A headless run doesn't ask, writes nothing, and says it used <parent>.
+
+**Overlap (1.64.0).** List the change's commits, then compare them with every `kind: code change` note before you sort, as `references/notes.md` says under **Overlap and same change**. When every commit is already imported, take the existing `already imported` path. When some are, narrow the change to the new commits and say `<n> of <m> commits already in <note>; importing the other <k>` on the sort. A commit that is the same change under another SHA (rebased, cherry-picked) is `same change as <sha> in <note>`. A commit that may be a squash of imported work, and that no merged PR on the host explains, is listed on the sort as `may already be in <note>` for them to keep or drop. When the branch's `Synced at` SHA is gone or no longer an ancestor of the tip, say `branch rewritten since last read (was <sha>)` and keep going; never stop with an error for it.
 
 ## Sort (no writes yet)
 
@@ -107,9 +117,9 @@ Record the code commit this run actually read. This write is not an apply option
 
 A whole-repo read is a read that is not limited to one slice: more than one slice, a path that fits none, or a branch diff or checkout that is not confined to one slice. Set that repo's `Synced at` cell to the branch and commit actually read. When that branch is already listed, replace that branch's entry. Leave every other branch in the cell. Touch only the repos this run read. Do not change Purpose, Status, URL, or Boundaries. When the column is missing and `repos.md` exists, add the column. Other repos' new cells stay empty. When that repo has no row, do not add one. Say the cell was not written. Do not write a slice `Synced at` line for that whole-repo read. When `repos.md` is missing, do not create it. Say the column was not written.
 
-A one-slice read is a change whose paths all belong to one slice. Do not touch the repo column. Write or update a line in that slice's `spec.md`, after the title and before the first heading: `Synced at: <repo> <branch>@<short sha>, <date>`. One line per repo. Update the line for that repo. Leave other `Synced at` lines.
+A one-slice read is a change whose paths all belong to one slice. Do not touch the repo column. Write or update a line in that slice's `spec.md`, after the title and before the first heading: `Synced at: <repo> <branch>@<short sha>, <date>`. One line per repo, with one entry per branch read, separated by `; `: `Synced at: orders-api feat/orders-retry@155b5c4, 2026-10-19; develop@00344be, 2026-10-15`. When that branch already has an entry, replace only that entry. A new branch adds an entry at the end. Leave the other entries, a `(dropped)` on them, and other repos' `Synced at` lines. A change from a branch diff also counts as a one-slice read of that branch when its paths fit one slice.
 
-Do not stamp a repo or a slice this run did not read. An empty cell stays empty. A consumer measuring drift uses the older of the repo column and the slice line, and an empty value means unknown, so fall back to spec file commit dates.
+Do not stamp a repo or a slice this run did not read. An empty cell stays empty. A consumer measuring drift uses the older of the repo column and the slice line, for each branch its own entry, and an empty value means unknown, so fall back to spec file commit dates.
 
 ## Impact (before any other edit)
 
@@ -139,7 +149,7 @@ Do not silently rewrite `docs/system/` or specs the sort did not already write. 
 
 ## Full note (1.61.0)
 
-Every run writes **one note** for the change, as `crav1-add-to-spec` `references/notes.md` (drop-in: `.claude/skills/crav1-add-to-spec/references/notes.md`; plugin: sibling `skills/crav1-add-to-spec/references/notes.md`) says. It holds the full commit messages, the list of changed files, and the diff hunks the kept quotes come from. Path `docs/notes/YYYY-MM/YYYY-MM-DD-<slug>.md` by the **commit date** (the newest commit of a range). Front matter `kind: code change`, `source` the SHA or range. Each kept quote is followed by `Full source: docs/notes/YYYY-MM/<file>.md`, and the slug goes in `used_by`; a matching parked spec gets nothing and goes in `waiting_for`. The same commit or range again is `already imported on <date> as <note>`, reuse or skip; never a second copy. Run `scripts/notes_index.py` after the note changes. Do not hand-edit an index.
+Every run writes **one note** for the change, as `crav1-add-to-spec` `references/notes.md` (drop-in: `.claude/skills/crav1-add-to-spec/references/notes.md`; plugin: sibling `skills/crav1-add-to-spec/references/notes.md`) says. It holds the full commit messages, the list of changed files, and the diff hunks the kept quotes come from. Path `docs/notes/YYYY-MM/YYYY-MM-DD-<slug>.md` by the **commit date** (the newest commit of a range). Front matter `kind: code change`, `source` the SHA or range, and `commits:` the short SHAs this note imported, oldest first, without merge commits (`commits: [155b5c4, 2c0e1a9]`). After a narrowed overlap, `source` and `commits:` hold only the new commits. Each kept quote is followed by `Full source: docs/notes/YYYY-MM/<file>.md`, and the slug goes in `used_by`; a matching parked spec gets nothing and goes in `waiting_for`. The same commit or range again, or a change whose commits are all already in notes (by SHA or the same change by `git patch-id`), is `already imported on <date> as <note>`, reuse or skip; never a second copy. One note may feed several specs: reuse adds the other spec to `used_by`. Run `scripts/notes_index.py` after the note changes. Do not hand-edit an index.
 
 ## Stop
 
@@ -147,7 +157,9 @@ Do not plan. Do not implement. Do not commit. Do not run `/crav1-finalize-commit
 
 Output only:
 
-- The change (which commit, range, or branch diff)
+- The change (which commit, range, or branch diff), and for a branch diff the parent, the split point, the commit count and the age of each remote copy read
+- Overlap: commits already imported and in which note, same changes by patch-id, `may already be in` lines, and `branch rewritten since last read` when it applied
+- `Merges into` written, declined, or not asked (headless)
 - Each `docs/specs/<slug>/spec.md` that gained a new quote
 - What was added (what the change does, labeled new) and what was already described there
 - The fits-none list, left alone. If they asked for a new spec, which existing skill you pointed at

@@ -5,6 +5,7 @@ source: <what it is: mail "subject" from <sender> sent YYYY-MM-DD, meeting YYYY-
 source_date: YYYY-MM-DD
 imported: YYYY-MM-DD
 source_folder: docs/sources/YYYY-MM-DD-slug/
+commits: [] # code change only: the short SHAs this note imported
 used_by: []
 waiting_for: []
 ---
