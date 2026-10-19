@@ -296,7 +296,7 @@ Not in this PR: <repo>: <task, item, or requirement>, …
 Branches: 0 of 2 merged into develop. Not merged: feat/orders-retry (2 commits), …
 ```
 
-The `Branches:` line is the one in `crav1-add-to-spec` `references/branches.md` **The Branches line**, one per repo, report only.
+The `Branches:` line is the one in `crav1-add-to-spec` `references/branches.md` **The Branches line**, one per repo, measured against each repo's into branch (its `Merges into` cell in `docs/system/repos.md`, else the default branch), report only.
 
 ## Second section
 
