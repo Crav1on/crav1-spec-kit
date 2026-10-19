@@ -66,7 +66,7 @@ The record format, pending, answer links, and the asked-on date are shared with 
 
 Everything after the command, and every `@`, is the input. The user names one of these:
 
-- **A person or a group.** For example `Arvid`, or `NRCC`. Questions waiting for that person, and questions routed via that person, are theirs. "NRCC via Arvid" is a question for Arvid.
+- **A person or a group.** For example `Dana`, or `Finance`. Questions waiting for that person, and questions routed via that person, are theirs. "NRCC via Dana" is a question for Dana.
 - **A spec.** An `@` of a spec folder or its `spec.md`, or its title.
 - **A topic.** A few words, such as `static IP` or `mTLS`.
 
@@ -85,7 +85,7 @@ Read `docs/specs/<slug>/spec.md` for every spec folder. Skip `_template`. Read `
 When a question in this selection has a `Pending:` line, show those first, before any new question. One line per draft, as the reference file says, for example:
 
 ```text
-Drafted for Arvid on 2026-10-11 (mail), not marked as sent yet. 5 questions.
+Drafted for Dana on 2026-10-11 (mail), not marked as sent yet. 5 questions.
 ```
 
 Ask for each draft. Options, each explained:

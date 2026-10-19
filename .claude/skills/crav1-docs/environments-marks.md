@@ -51,8 +51,8 @@ A mark from a connection, a deployment name, or infrastructure code is cited on 
 `/crav1-ado-sync` appends two lines, once, after the user picks which work item type a task becomes: the type, and that type's done state read from the project (Closed on Agile, Done on Scrum and Basic):
 
 ```text
-Azure Boards task type (bc-operations): User Story
-Azure Boards task done state (bc-operations): Closed
+Azure Boards task type (orders): User Story
+Azure Boards task done state (orders): Closed
 ```
 
 The lines are kept per work item home, one pair per project. A line without `(<project>)` is the pair for the project this file names.

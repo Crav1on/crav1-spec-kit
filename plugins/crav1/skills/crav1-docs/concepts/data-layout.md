@@ -69,7 +69,7 @@ docs/specs/
 | `docs/system/adr/` | Cross-cutting decisions | `/crav1-bundle-to-specs`, `/crav1-ideas-to-spec`, and `/crav1-existing-to-specs`, only for a choice that had real alternatives | Plan, explain-existing-system, security review |
 | `docs/architecture/spec.md` | One architecture spec from code | `/crav1-existing-to-specs`, when missing | The lanes that extend it |
 | `docs/architecture/left-out.md` | Guesses that stay left out, under `## Left out`, and `## Dismissed` lines | `/crav1-existing-to-specs` | `/crav1-existing-to-specs` on a re-read, `/crav1-read-environment` |
-| `docs/environments/marks.md` | One confirmed line per resource and environment | `/crav1-read-environment` and `/crav1-map-pipeline-environments`, appending only confirmed lines; `/crav1-ado-sync` appends one `Azure Boards task type:` line | `/crav1-read-environment`, `/crav1-what-do-we-know-about-this`. Line format: [Environment marks](../environments-marks.md) |
+| `docs/environments/marks.md` | One confirmed line per resource and environment | `/crav1-read-environment` and `/crav1-map-pipeline-environments`, appending only confirmed lines; `/crav1-ado-sync` appends, once per work item home, an `Azure Boards task type (<project>): <type>` line and an `Azure Boards task done state (<project>): <state>` line | `/crav1-read-environment`, `/crav1-what-do-we-know-about-this`. Line format: [Environment marks](../environments-marks.md) |
 | `docs/specs/<slug>/plan.md`, `tasks.md` readiness marks | `Reviewed:` in `plan.md`, `(after: T#)` on task lines, `Blocks:` under spec open questions | `/crav1-review-plan`, `/crav1-tighten-plan`, `/crav1-plan-from-spec`, `/crav1-resolve-open-questions` | `/crav1-tasks-ready-to-build` |
 | `docs/notes/YYYY-MM/` | One note per input with the full input and its source, by source date; generated `index.md` per month and a top `index.md` | `/crav1-add-to-spec` for every input (1.61.0); `/crav1-review-pr` for its follow-ups note; `/crav1-retire-spec` convert to note. Indexes: `notes_index.py` only |
 | `docs/sources/YYYY-MM-DD-<slug>/` | The original of an imported mail, transcript, minutes, chat, screenshot, or diagram, plus a `README.md` | `/crav1-add-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs` | Anyone checking a quote. See [Data policy](data-policy.md) |
@@ -166,11 +166,15 @@ Under each item in a spec's `## Open questions`, the kit can add four kinds of l
 
 [`/crav1-tasks-ready-to-build`](../from-tasks-ready-to-build.md) reads three optional marks. Each is written only by the skills named here; the reader writes nothing:
 
+<!-- crav1-readiness:start -->
+<!-- Generated from docs/reference/marks.yaml by scripts/gen-marks.py. Do not edit by hand. -->
+
 | Mark | Where | Written by | Meaning |
 | --- | --- | --- | --- |
-| `Reviewed: <date>, P# open: <n>` | `plan.md`, under the `# Plan:` title | `/crav1-review-plan` writes it; `/crav1-tighten-plan` lowers `<n>` as `P#`s are fixed | The plan was reviewed, and how many reviewer findings are still open |
-| `(after: T1, T3)` | End of a task line in `tasks.md` | `/crav1-plan-from-spec` | The task needs those tasks done first |
-| `Blocks: T2, T4` | Under a kept-open question in `spec.md` | `/crav1-resolve-open-questions`, `/crav1-plan-from-spec` | The question blocks only those tasks |
+| `Blocks: T<n>[, T<n>]` | `docs/specs/<slug>/spec.md` (indented under a kept-open question) | `/crav1-resolve-open-questions`, `/crav1-plan-from-spec` | The question blocks only those tasks. |
+| `Reviewed: <date>, P# open: <n>` | `docs/specs/<slug>/plan.md` (under the # Plan title) | `/crav1-review-plan`, `/crav1-tighten-plan` | The plan was reviewed, and how many reviewer findings are still open. |
+| `(after: T<n>[, T<n>])` | `docs/specs/<slug>/tasks.md` (end of a task line) | `/crav1-plan-from-spec` | The task needs those tasks done first. |
+<!-- crav1-readiness:end -->
 
 When a mark is missing, the reader falls back and labels the reason **inferred**:
 
@@ -198,13 +202,106 @@ ADO: <org>/<project>
 `docs/specs/<slug>/work-item.md` is optional and only for Azure Boards linking. One id per line, optionally with the milestone or slice it belongs to:
 
 ```text
-Work item: 52 (ADO: contoso/bc-operations)
-Work item: 81 — October billing (ADO: contoso/bc-operations)
+Work item: 52 (ADO: contoso/orders)
+Work item: 81 — October billing (ADO: contoso/orders)
 ```
 
 Each id line ends with its [work item home](#work-item-homes), `(ADO: <org>/<project>)`. An older line without the tag is read as the org and project in `docs/environments/marks.md`, and the next skill that writes the file adds the tag. One spec may record one Feature per home, and a Feature line and its task lines share a home.
 
 The commit and pull request skills turn the id into a mention from the git remote: `#52` on Azure Repos, `AB#52` on GitHub. Any other host adds no mention. Leave the ids out of `tasks.md`. Task lines (`Work item: <id> — task: T<n> <title>`) record the child work items of the Feature. The mention keeps the Feature id; a commit that clearly implements one recorded task adds that task's id too, and the commit skills ask when it is unclear. A task id is never the only mention. Nothing blocks when the file is missing. The template comment is [`docs/specs/_template/work-item.md`](../specs/_template/work-item.md).
+
+## All marks
+
+Every mark and line format the kit writes inside product files, generated from [marks.yaml](../reference/marks.yaml). The sections above explain the open question, research, and readiness marks in more detail.
+
+<!-- crav1-marks:start -->
+<!-- Generated from docs/reference/marks.yaml by scripts/gen-marks.py. Do not edit by hand. -->
+
+### `spec.md` lines
+
+| Mark | Format | Where | Written by | Read by | Since |
+| --- | --- | --- | --- | --- | --- |
+| Parked | `Parked: <YYYY-MM-DD>, <reason>` | `docs/specs/<slug>/spec.md` (first line) | `/crav1-retire-spec` | `/crav1-add-to-spec`, `/crav1-ado-sync`, `/crav1-build-features`, `/crav1-build-tasks`, `/crav1-help`, `/crav1-plan-from-spec`, `/crav1-show-or-ask-open-questions` | 1.60.0 |
+| Moved pointer | `Moved: <retired \| merged \| converted> <YYYY-MM-DD>, see <new path>. Reason: <reason>` | `docs/specs/<slug>/spec.md` (the old path, whole file) | `/crav1-retire-spec` | `/crav1-add-to-spec`, `/crav1-ado-sync`, `/crav1-build-features`, `/crav1-build-tasks`, `/crav1-help`, `/crav1-plan-from-spec`, `/crav1-show-or-ask-open-questions` | 1.60.0 |
+| Retired | `Retired: <YYYY-MM-DD>, <reason>` | `docs/specs/retired/<slug>/spec.md` (first line) | `/crav1-retire-spec` | — | 1.60.0 |
+| Merged | `Merged: <YYYY-MM-DD> into <target slug>, <reason>` | `docs/specs/retired/<slug>/spec.md` (first line) | `/crav1-retire-spec` | — | 1.60.0 |
+| Synced at (slice line) | `Synced at: <repo> <branch>@<short sha>, <date>` | `docs/specs/<slug>/spec.md` (after the title, before the first heading) | `/crav1-add-to-spec`, `/crav1-bundle-to-specs`, `crav1-bundle-slice-agent`, `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-refresh-system-notes` | `/crav1-plan-from-spec`, `/crav1-tighten-spec` | 1.29.0 |
+| Match status | `- Status: <done \| partial \| not in the code>` | `docs/specs/<slug>/spec.md` (under ## Match) | `/crav1-existing-to-specs`, `/crav1-add-to-spec` | `/crav1-plan-from-spec`, `/crav1-tighten-spec`, `/crav1-explain-existing-system` | 1.0.0 |
+| Branch | `[- ]Branch: <name>` | `docs/specs/<slug>/spec.md` (under ## Match, or after the title) | `/crav1-tighten-spec` | `/crav1-tighten-spec` | 1.32.0 |
+| New | `**New:** "<quote>"` | `docs/specs/<slug>/spec.md` | `/crav1-add-to-spec` | — | 1.0.0 |
+| Inferred | `**Inferred:** <connection the source does not state>` | `docs/specs/<slug>/spec.md` | `/crav1-add-to-spec` | — | 1.0.0 |
+| Full source | `Full source: docs/notes/YYYY-MM/<file>.md[; <second note>]` | `docs/specs/<slug>/spec.md` (after a point) | `/crav1-add-to-spec`, `/crav1-bundle-to-specs`, `/crav1-ideas-to-spec`, `/crav1-spark-to-spec`, `/crav1-tighten-spec`, `/crav1-existing-to-specs` | `/crav1-add-to-spec` | 1.60.0 |
+| Conflict | `**Conflict:** "<new words>" (Full source: <note>) vs the line above` | `docs/specs/<slug>/spec.md` (under the point it disagrees with) | `/crav1-add-to-spec` | — | 1.61.0 |
+| Source | `Source: docs/sources/YYYY-MM-DD-<slug>/` | `docs/specs/<slug>/spec.md` (after a quote) | `/crav1-add-to-spec` | — | 1.37.0 |
+| Trace | `[- ]Trace: <source> — <what this pass marked new, already there, and inferred>` | `docs/specs/<slug>/spec.md` (under ## Trace) | `/crav1-add-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs` | — | 1.30.0 |
+| Seen in | `Seen in <host> <environment>.` | `docs/specs/<slug>/spec.md`; `docs/architecture/spec.md`; `docs/system/*.md` | `/crav1-add-to-spec`, `/crav1-existing-to-specs`, `/crav1-refresh-system-notes` | `/crav1-read-environment` | 1.13.0 |
+
+### Open question marks
+
+| Mark | Format | Where | Written by | Read by | Since |
+| --- | --- | --- | --- | --- | --- |
+| Pending | `  - Pending: drafted <date> for <who>, <channel>. Not marked as sent yet. Question <n> of that draft.` | `docs/specs/<slug>/spec.md` (indented under an open question) | `/crav1-show-or-ask-open-questions` | `/crav1-resolve-open-questions`, `/crav1-show-or-ask-open-questions` | 1.40.0 |
+| Asked | `  - Asked: <date>, <channel> to <who>. Question <n>. Date from <the user's yes \| email <date> \| meeting <date> \| chat <date>>.` | `docs/specs/<slug>/spec.md` (indented under an open question) | `/crav1-show-or-ask-open-questions` | `/crav1-resolve-open-questions`, `/crav1-show-or-ask-open-questions` | 1.40.0 |
+| Answered | `  - Answered: <date>, <who>, <kind>: "<quote>" Source: docs/sources/YYYY-MM-DD-<slug>/` | `docs/specs/<slug>/spec.md` (indented under an open question) | `/crav1-add-to-spec` | `/crav1-resolve-open-questions`, `/crav1-show-or-ask-open-questions` | 1.40.0 |
+| Blocks | `  - Blocks: T<n>[, T<n>]` | `docs/specs/<slug>/spec.md` (indented under a kept-open question) | `/crav1-resolve-open-questions`, `/crav1-plan-from-spec` | `/crav1-tasks-ready-to-build` | 1.54.0 |
+
+### Research and stale marks
+
+| Mark | Format | Where | Written by | Read by | Since |
+| --- | --- | --- | --- | --- | --- |
+| Stale (note) | `> Stale since <date>: <one line on what changed>. Source: docs/sources/YYYY-MM-DD-<slug>/` | `docs/research/<topic>.md` (below the title and owner line) | `/crav1-add-to-spec` | `/crav1-what-do-we-know-about-this`, `/crav1-ado-sync`, `/crav1-plan-from-spec` | 1.37.0 |
+| Stale (spec finding) | `Stale since <date>: <one line>. See <note path>.` | `docs/specs/<slug>/spec.md` (under ## Research findings) | `/crav1-add-to-spec` | `/crav1-what-do-we-know-about-this`, `/crav1-plan-from-spec` | 1.37.0 |
+| Stale, narrowed | `[> ]Stale since <date>, N of M points open: <points>.[ See <note path>.]` | `docs/research/<topic>.md`; `docs/specs/<slug>/spec.md` (under ## Research findings) | `/crav1-add-to-spec`, `/crav1-refresh-system-notes` | `/crav1-what-do-we-know-about-this` | 1.38.0 |
+| Point | `Point: <short label>. <the research line or the question, quoted>.` | `docs/specs/<slug>/spec.md` (under a Stale since line) | `/crav1-add-to-spec` | `/crav1-refresh-system-notes` | 1.38.0 |
+| Cleared | `Cleared <date>: updated note <path or commit>.` | `docs/specs/<slug>/spec.md` (under ## Research findings) | `/crav1-add-to-spec`, `/crav1-refresh-system-notes` | — | 1.37.0 |
+| Resolved | `Resolved <date>: <point>. Updated note <path or commit>. <how>.` | `docs/specs/<slug>/spec.md` (under a narrowed Stale since line) | `/crav1-add-to-spec` | — | 1.38.0 |
+| Waiting point | `<point>: <waiting for the note's owner. Follow-up <N> of this mark. \| open question on <slug>, waiting for <who>.>` | `docs/specs/<slug>/spec.md` (under a narrowed Stale since line) | `/crav1-add-to-spec` | — | 1.38.0 |
+
+### `plan.md` and `tasks.md`
+
+| Mark | Format | Where | Written by | Read by | Since |
+| --- | --- | --- | --- | --- | --- |
+| Reviewed | `Reviewed: <date>, P# open: <n>` | `docs/specs/<slug>/plan.md` (under the # Plan title) | `/crav1-review-plan`, `/crav1-tighten-plan` | `/crav1-tasks-ready-to-build`, `/crav1-help` | 1.54.0 |
+| Task line | `- [ ] T<n>: <what> (verify: <kind> — <named check>) (spec: <REQ or acceptance>)` | `docs/specs/<slug>/tasks.md` | `/crav1-plan-from-spec`, `/crav1-tighten-plan`, `/crav1-build-tasks` | `/crav1-build-tasks`, `/crav1-review-plan`, `/crav1-tasks-ready-to-build`, `/crav1-verify-build-against-spec` | 1.0.0 |
+| (verify: …) | `(verify: <kind> — <named check>[; <kind> — <named check>])` | `docs/specs/<slug>/tasks.md` (on a task line) | `/crav1-plan-from-spec`, `/crav1-tighten-plan` | `/crav1-build-tasks`, `/crav1-review-plan` | 1.0.0 |
+| (spec: …) | `(spec: <REQ or acceptance>)` | `docs/specs/<slug>/tasks.md` (on a task line) | `/crav1-plan-from-spec`, `/crav1-tighten-plan` | `/crav1-review-plan`, `/crav1-ado-sync` | 1.0.0 |
+| (after: …) | `(after: T<n>[, T<n>])` | `docs/specs/<slug>/tasks.md` (end of a task line) | `/crav1-plan-from-spec` | `/crav1-tasks-ready-to-build`, `/crav1-help` | 1.54.0 |
+
+### `docs/system/`
+
+| Mark | Format | Where | Written by | Read by | Since |
+| --- | --- | --- | --- | --- | --- |
+| Synced at (repo cell) | `<branch>@<short sha>, <date>[; <branch>@<short sha>, <date>]` | `docs/system/repos.md` (Synced at column) | `/crav1-add-to-spec`, `/crav1-bundle-to-specs`, `/crav1-ideas-to-spec`, `/crav1-refresh-system-notes`, `/crav1-existing-to-specs` | `/crav1-refresh-system-notes` | 1.29.0 |
+| Work items go to | `ADO: <org>/<project>` | `docs/system/repos.md` (Work items go to column) | `/crav1-ado-sync` | `/crav1-ado-sync`, `/crav1-finalize-commit`, `/crav1-open-pr`, `/crav1-what-do-we-know-about-this` | 1.50.0 |
+| Reference-only line | `<title>: reference only, see docs/notes/<YYYY-MM>/<YYYY-MM-DD>-<slug>.md` | `docs/system/landscape.md` (under ## How the parts connect) | `/crav1-retire-spec` | — | 1.60.0 |
+
+### `docs/environments/marks.md`
+
+| Mark | Format | Where | Written by | Read by | Since |
+| --- | --- | --- | --- | --- | --- |
+| Environment mark | `<resource-id-or-name> \| <group> \| <environment> \| <source>` | `docs/environments/marks.md` | `/crav1-read-environment`, `/crav1-map-pipeline-environments` | `/crav1-read-environment`, `/crav1-what-do-we-know-about-this` | 1.18.0 |
+| Azure Boards task type | `Azure Boards task type[ (<project>)]: <type>` | `docs/environments/marks.md` | `/crav1-ado-sync` | `/crav1-ado-sync` | 1.45.0 |
+| Azure Boards task done state | `Azure Boards task done state[ (<project>)]: <state>` | `docs/environments/marks.md` | `/crav1-ado-sync` | `/crav1-ado-sync` | 1.48.0 |
+
+### `work-item.md`
+
+| Mark | Format | Where | Written by | Read by | Since |
+| --- | --- | --- | --- | --- | --- |
+| Work item | `Work item: <id>[ — <milestone or slice>] (ADO: <org>/<project>)` | `docs/specs/<slug>/work-item.md` | `/crav1-ado-sync` | `/crav1-finalize-commit`, `/crav1-ado-sync` | 1.0.0 |
+| Work item task | `Work item: <id> — task: T<n> <title> (ADO: <org>/<project>)` | `docs/specs/<slug>/work-item.md` | `/crav1-ado-sync` | `/crav1-finalize-commit`, `/crav1-ado-sync` | 1.45.0 |
+
+### Notes and sources
+
+| Mark | Format | Where | Written by | Read by | Since |
+| --- | --- | --- | --- | --- | --- |
+| used_by | `used_by: [<slug>, <slug>]` | `docs/notes/YYYY-MM/<note>.md` (front matter) | `/crav1-add-to-spec`, `/crav1-bundle-to-specs`, `/crav1-ideas-to-spec`, `/crav1-spark-to-spec`, `/crav1-tighten-spec`, `/crav1-existing-to-specs`, `/crav1-retire-spec` | `/crav1-ado-sync` | 1.61.0 |
+| waiting_for | `waiting_for: [<parked slug>]` | `docs/notes/YYYY-MM/<note>.md` (front matter) | `/crav1-add-to-spec`, `/crav1-retire-spec` | `/crav1-help`, `/crav1-show-or-ask-open-questions`, `/crav1-ado-sync` | 1.61.0 |
+| Converted from spec | `Converted from spec, no research owner` | `docs/notes/YYYY-MM/<note>.md` (body, after the Source line) | `/crav1-retire-spec` | `/crav1-add-to-spec` | 1.60.0 |
+| Absorbed by / Used by (older notes) | `<Absorbed by \| Used by> <slug>` | `docs/notes/<note>.md` (before 1.61.0) | — | `/crav1-add-to-spec` | 1.36.0 |
+| (done in …) | `(done in <short sha>)` | `docs/notes/YYYY-MM/review-pr-<n>-follow-ups.md` (end of a follow-up) | `/crav1-review-pr` | `/crav1-review-pr` | 1.51.0 |
+| Superseded by | `Superseded by: docs/sources/<newer>/` | `docs/sources/YYYY-MM-DD-<slug>/README.md` | `/crav1-add-to-spec` | `/crav1-add-to-spec` | 1.43.0 |
+
+<!-- crav1-marks:end -->
 
 ## Spec sections the kit looks for
 

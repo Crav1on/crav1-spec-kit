@@ -1,0 +1,652 @@
+# The single source for every mark and line format the kit writes in a product repo.
+# scripts/gen-marks.py generates the marks tables in docs/concepts/data-layout.md from this file,
+# and `--check` (CI) fails when:
+#   - the generated tables differ from this file,
+#   - an example does not match its `pattern`,
+#   - a skill or agent in written_by or read_by does not mention the mark (its `mention`
+#     regex, default: the literal text of `format` before the first `<`) in its folder's
+#     .md files (SKILL.md, branches, references, assets) or its agent file.
+#
+# Fields:
+#   id          unique, kebab-case
+#   name        short label for the tables
+#   group       which generated table it belongs to (see GROUPS in scripts/gen-marks.py)
+#   files       where the line lives in a product repo
+#   format      the line, with <placeholders>; [ ... ] is optional
+#   pattern     a Python regex every example must match in full
+#   examples    real-looking lines with made-up names
+#   meaning     one line, plain English
+#   written_by  skills (crav1-*) or agents that write it
+#   read_by     skills or agents that read it to decide something
+#   since       the kit version that introduced it
+#   mention     optional regex; see above
+#   readiness   true when /crav1-tasks-ready-to-build reads it (Readiness marks table)
+
+marks:
+  # ---------- spec.md: header lines ----------
+  - id: parked
+    name: "Parked"
+    group: spec
+    files: ["docs/specs/<slug>/spec.md (first line)"]
+    format: "Parked: <YYYY-MM-DD>, <reason>"
+    pattern: '^Parked: \d{4}-\d{2}-\d{2}, .+$'
+    examples:
+      - "Parked: 2026-10-16, waiting for the partner to confirm the export format."
+    meaning: "The spec is on hold. Plan, build, and push skip it; help lists it as parked."
+    written_by: [crav1-retire-spec]
+    read_by: [crav1-add-to-spec, crav1-ado-sync, crav1-build-features, crav1-build-tasks, crav1-help, crav1-plan-from-spec, crav1-show-or-ask-open-questions]
+    since: 1.60.0
+
+  - id: moved
+    name: "Moved pointer"
+    group: spec
+    files: ["docs/specs/<slug>/spec.md (the old path, whole file)"]
+    format: "Moved: <retired | merged | converted> <YYYY-MM-DD>, see <new path>. Reason: <reason>"
+    pattern: '^Moved: (retired|merged|converted) \d{4}-\d{2}-\d{2}, see \S+\. Reason: .+$'
+    examples:
+      - "Moved: retired 2026-10-16, see docs/specs/retired/orders-export/. Reason: replaced by the reporting API."
+      - "Moved: merged 2026-10-16, see docs/specs/orders-retry/. Reason: same feature."
+    meaning: "The spec was retired, merged, or converted to a note; skills skip the pointer."
+    written_by: [crav1-retire-spec]
+    read_by: [crav1-add-to-spec, crav1-ado-sync, crav1-build-features, crav1-build-tasks, crav1-help, crav1-plan-from-spec, crav1-show-or-ask-open-questions]
+    since: 1.60.0
+
+  - id: retired
+    name: "Retired"
+    group: spec
+    files: ["docs/specs/retired/<slug>/spec.md (first line)"]
+    format: "Retired: <YYYY-MM-DD>, <reason>"
+    pattern: '^Retired: \d{4}-\d{2}-\d{2}, .+$'
+    examples:
+      - "Retired: 2026-10-16, replaced by the reporting API."
+    meaning: "Why and when a spec under docs/specs/retired/ was retired."
+    written_by: [crav1-retire-spec]
+    read_by: []
+    since: 1.60.0
+
+  - id: merged
+    name: "Merged"
+    group: spec
+    files: ["docs/specs/retired/<slug>/spec.md (first line)"]
+    format: "Merged: <YYYY-MM-DD> into <target slug>, <reason>"
+    pattern: '^Merged: \d{4}-\d{2}-\d{2} into \S+, .+$'
+    examples:
+      - "Merged: 2026-10-16 into orders-retry, same feature."
+    meaning: "The spec was merged into another spec."
+    written_by: [crav1-retire-spec]
+    read_by: []
+    since: 1.60.0
+
+  - id: synced-at-slice
+    name: "Synced at (slice line)"
+    group: spec
+    files: ["docs/specs/<slug>/spec.md (after the title, before the first heading)"]
+    format: "Synced at: <repo> <branch>@<short sha>, <date>"
+    pattern: '^Synced at: \S+ \S+@[0-9a-f]{7}, \d{4}-\d{2}-\d{2}$'
+    examples:
+      - "Synced at: orders-api main@abc1234, 2026-10-07"
+    meaning: "The code commit a one-slice read last read, one line per repo."
+    written_by: [crav1-add-to-spec, crav1-bundle-to-specs, crav1-bundle-slice-agent, crav1-spark-to-spec, crav1-ideas-to-spec, crav1-refresh-system-notes]
+    read_by: [crav1-plan-from-spec, crav1-tighten-spec]
+    mention: 'Synced at'
+    since: 1.29.0
+
+  - id: match-status
+    name: "Match status"
+    group: spec
+    files: ["docs/specs/<slug>/spec.md (under ## Match)"]
+    format: "- Status: <done | partial | not in the code>"
+    pattern: '^- Status: (done|partial|not in the code)$'
+    examples:
+      - "- Status: partial"
+    meaning: "How much of the slice the code already has."
+    written_by: [crav1-existing-to-specs, crav1-add-to-spec]
+    read_by: [crav1-plan-from-spec, crav1-tighten-spec, crav1-explain-existing-system]
+    mention: '(?i)status'
+    since: 1.0.0
+
+  - id: match-branch
+    name: "Branch"
+    group: spec
+    files: ["docs/specs/<slug>/spec.md (under ## Match, or after the title)"]
+    format: "[- ]Branch: <name>"
+    pattern: '^(- )?Branch: \S+$'
+    examples:
+      - "- Branch: develop"
+    meaning: "The branch that holds the slice's code, written after a yes."
+    written_by: [crav1-tighten-spec]
+    read_by: [crav1-tighten-spec]
+    mention: 'Branch: '
+    since: 1.32.0
+
+  # ---------- spec.md: lines in the body ----------
+  - id: label-new
+    name: "New"
+    group: spec
+    files: ["docs/specs/<slug>/spec.md"]
+    format: '**New:** "<quote>"'
+    pattern: '^\*\*New:\*\* .+$'
+    examples:
+      - '**New:** From the code, `retry.py`: "max_attempts = 3"'
+    meaning: "A fact this pass added."
+    written_by: [crav1-add-to-spec]
+    read_by: []
+    mention: '\*\*New:\*\*'
+    since: 1.0.0
+
+  - id: label-inferred
+    name: "Inferred"
+    group: spec
+    files: ["docs/specs/<slug>/spec.md"]
+    format: "**Inferred:** <connection the source does not state>"
+    pattern: '^\*\*Inferred:\*\* .+$'
+    examples:
+      - "**Inferred:** the retry also covers the nightly export. Not an accepted fact."
+    meaning: "A connection the kit drew. Not an accepted fact."
+    written_by: [crav1-add-to-spec]
+    read_by: []
+    mention: '\*\*Inferred:\*\*'
+    since: 1.0.0
+
+  - id: full-source
+    name: "Full source"
+    group: spec
+    files: ["docs/specs/<slug>/spec.md (after a point)"]
+    format: "Full source: docs/notes/YYYY-MM/<file>.md[; <second note>]"
+    pattern: '^Full source: docs/notes/(\d{4}-\d{2}|undated)/\S+\.md(; docs/notes/(\d{4}-\d{2}|undated)/\S+\.md)*$'
+    examples:
+      - "Full source: docs/notes/2026-10/2026-10-07-retry-call.md"
+      - "Full source: docs/notes/2026-10/2026-10-07-retry-call.md; docs/notes/2026-10/2026-10-09-retry-mail.md"
+    meaning: "The note that holds the full input a point came from."
+    written_by: [crav1-add-to-spec, crav1-bundle-to-specs, crav1-ideas-to-spec, crav1-spark-to-spec, crav1-tighten-spec, crav1-existing-to-specs]
+    read_by: [crav1-add-to-spec]
+    mention: 'Full source'
+    since: 1.60.0
+
+  - id: conflict
+    name: "Conflict"
+    group: spec
+    files: ["docs/specs/<slug>/spec.md (under the point it disagrees with)"]
+    format: '**Conflict:** "<new words>" (Full source: <note>) vs the line above'
+    pattern: '^\*\*Conflict:\*\* ".+" \(Full source: \S+\) vs the line above$'
+    examples:
+      - '**Conflict:** "Retries stop after 5 attempts" (Full source: docs/notes/2026-10/2026-10-09-retry-mail.md) vs the line above'
+    meaning: "A new source disagrees with a point; the user decides."
+    written_by: [crav1-add-to-spec]
+    read_by: []
+    since: 1.61.0
+
+  - id: source-line
+    name: "Source"
+    group: spec
+    files: ["docs/specs/<slug>/spec.md (after a quote)"]
+    format: "Source: docs/sources/YYYY-MM-DD-<slug>/"
+    pattern: '^Source: \[?`?docs/sources/(\d{4}-\d{2}-\d{2}|undated)-[a-z0-9-]+/`?\]?.*$'
+    examples:
+      - "Source: docs/sources/2026-10-07-retry-call/"
+    meaning: "The imported original a quote comes from."
+    written_by: [crav1-add-to-spec]
+    read_by: []
+    mention: 'Source: docs/sources'
+    since: 1.37.0
+
+  - id: trace
+    name: "Trace"
+    group: spec
+    files: ["docs/specs/<slug>/spec.md (under ## Trace)"]
+    format: "[- ]Trace: <source> — <what this pass marked new, already there, and inferred>"
+    pattern: '^(- )?Trace: .+ [—-] .+$'
+    examples:
+      - "- Trace: docs/sources/2026-10-07-retry-call/ — This pass marked new: the 3-attempt limit. Already there: the backoff. Inferred: none written."
+    meaning: "One line per pass on what it added."
+    written_by: [crav1-add-to-spec, crav1-bundle-to-specs, crav1-existing-to-specs]
+    read_by: []
+    mention: 'Trace'
+    since: 1.30.0
+
+  - id: seen-in
+    name: "Seen in"
+    group: spec
+    files: ["docs/specs/<slug>/spec.md", "docs/architecture/spec.md", "docs/system/*.md"]
+    format: "Seen in <host> <environment>."
+    pattern: '^.*Seen in \S+ [a-z-]+\..*$'
+    examples:
+      - "Seen in Azure dev. orders-api-dev reads its database through a Key Vault reference."
+    meaning: "A fact read from a live environment, with where it was seen."
+    written_by: [crav1-add-to-spec, crav1-existing-to-specs, crav1-refresh-system-notes]
+    read_by: [crav1-read-environment]
+    since: 1.13.0
+
+  # ---------- spec.md: open question marks ----------
+  - id: oq-pending
+    name: "Pending"
+    group: open-questions
+    files: ["docs/specs/<slug>/spec.md (indented under an open question)"]
+    format: "  - Pending: drafted <date> for <who>, <channel>. Not marked as sent yet. Question <n> of that draft."
+    pattern: '^  - Pending: drafted \d{4}-\d{2}-\d{2} for .+, .+\. Not marked as sent yet\. Question \d+ of that draft\.$'
+    examples:
+      - "  - Pending: drafted 2026-10-12 for Dana, email. Not marked as sent yet. Question 2 of that draft."
+    meaning: "A drafted question that is not marked as sent yet."
+    written_by: [crav1-show-or-ask-open-questions]
+    read_by: [crav1-resolve-open-questions, crav1-show-or-ask-open-questions]
+    mention: 'Pending'
+    since: 1.40.0
+
+  - id: oq-asked
+    name: "Asked"
+    group: open-questions
+    files: ["docs/specs/<slug>/spec.md (indented under an open question)"]
+    format: "  - Asked: <date>, <channel> to <who>. Question <n>. Date from <the user's yes | email <date> | meeting <date> | chat <date>>."
+    pattern: '^  - Asked: \d{4}-\d{2}-\d{2}, .+ to .+\. Question \d+\. Date from .+\.$'
+    examples:
+      - "  - Asked: 2026-10-12, email to Dana. Question 2. Date from the user's yes."
+    meaning: "The question went out, when, and to whom."
+    written_by: [crav1-show-or-ask-open-questions]
+    read_by: [crav1-resolve-open-questions, crav1-show-or-ask-open-questions]
+    mention: 'Asked'
+    since: 1.40.0
+
+  - id: oq-answered
+    name: "Answered"
+    group: open-questions
+    files: ["docs/specs/<slug>/spec.md (indented under an open question)"]
+    format: '  - Answered: <date>, <who>, <kind>: "<quote>" Source: docs/sources/YYYY-MM-DD-<slug>/'
+    pattern: '^  - Answered: \d{4}-\d{2}-\d{2}, .+, .+: ".+" Source: docs/sources/\S+/$'
+    examples:
+      - '  - Answered: 2026-10-14, Dana, email: "Three attempts is right." Source: docs/sources/2026-10-14-dana-retry-answer/'
+    meaning: "A kept quote that answers the question."
+    written_by: [crav1-add-to-spec]
+    read_by: [crav1-resolve-open-questions, crav1-show-or-ask-open-questions]
+    mention: 'Answered'
+    since: 1.40.0
+
+  - id: oq-blocks
+    name: "Blocks"
+    group: open-questions
+    files: ["docs/specs/<slug>/spec.md (indented under a kept-open question)"]
+    format: "  - Blocks: T<n>[, T<n>]"
+    pattern: '^  - Blocks: T\d+(, T\d+)*$'
+    examples:
+      - "  - Blocks: T2, T4"
+    meaning: "The question blocks only those tasks."
+    written_by: [crav1-resolve-open-questions, crav1-plan-from-spec]
+    read_by: [crav1-tasks-ready-to-build]
+    readiness: true
+    mention: 'Blocks'
+    since: 1.54.0
+
+  # ---------- research stale marks ----------
+  - id: stale-note
+    name: "Stale (note)"
+    group: research
+    files: ["docs/research/<topic>.md (below the title and owner line)"]
+    format: "> Stale since <date>: <one line on what changed>. Source: docs/sources/YYYY-MM-DD-<slug>/"
+    pattern: '^> Stale since \d{4}-\d{2}-\d{2}: .+\. Source: docs/sources/\S+/$'
+    examples:
+      - "> Stale since 2026-10-14: the vendor now offers a fixed IP. Source: docs/sources/2026-10-14-vendor-mail/"
+    meaning: "A kept quote contradicts the research note; written after a yes."
+    written_by: [crav1-add-to-spec]
+    read_by: [crav1-what-do-we-know-about-this, crav1-ado-sync, crav1-plan-from-spec]
+    mention: 'Stale since'
+    since: 1.37.0
+
+  - id: stale-finding
+    name: "Stale (spec finding)"
+    group: research
+    files: ["docs/specs/<slug>/spec.md (under ## Research findings)"]
+    format: "Stale since <date>: <one line>. See <note path>."
+    pattern: '^Stale since \d{4}-\d{2}-\d{2}: .+\. See \S+\.$'
+    examples:
+      - "Stale since 2026-10-14: the vendor now offers a fixed IP. See docs/research/vendor-network.md."
+    meaning: "The spec relies on a research note marked stale."
+    written_by: [crav1-add-to-spec]
+    read_by: [crav1-what-do-we-know-about-this, crav1-plan-from-spec]
+    mention: 'Stale since'
+    since: 1.37.0
+
+  - id: stale-narrowed
+    name: "Stale, narrowed"
+    group: research
+    files: ["docs/research/<topic>.md", "docs/specs/<slug>/spec.md (under ## Research findings)"]
+    format: "[> ]Stale since <date>, N of M points open: <points>.[ See <note path>.]"
+    pattern: '^(> )?Stale since \d{4}-\d{2}-\d{2}, \d+ of \d+ points open: .+\.( See \S+\.)?$'
+    examples:
+      - "> Stale since 2026-10-14, 1 of 2 points open: allowlist."
+    meaning: "Some points of a stale mark are still open after an update."
+    written_by: [crav1-add-to-spec, crav1-refresh-system-notes]
+    read_by: [crav1-what-do-we-know-about-this]
+    mention: 'Stale since|narrowed'
+    since: 1.38.0
+
+  - id: stale-point
+    name: "Point"
+    group: research
+    files: ["docs/specs/<slug>/spec.md (under a Stale since line)"]
+    format: "Point: <short label>. <the research line or the question, quoted>."
+    pattern: '^Point: [^.]+\. .+[.!?]"?$'
+    examples:
+      - 'Point: fixed IP. "The vendor cannot offer a fixed address."'
+    meaning: "One hit of a stale mark, checked again when the note is updated."
+    written_by: [crav1-add-to-spec]
+    read_by: [crav1-refresh-system-notes]
+    mention: 'Point:|points'
+    since: 1.38.0
+
+  - id: stale-cleared
+    name: "Cleared"
+    group: research
+    files: ["docs/specs/<slug>/spec.md (under ## Research findings)"]
+    format: "Cleared <date>: updated note <path or commit>."
+    pattern: '^Cleared \d{4}-\d{2}-\d{2}: updated note \S+\.$'
+    examples:
+      - "Cleared 2026-10-20: updated note docs/research/vendor-network.md."
+    meaning: "Every point of the stale mark is resolved."
+    written_by: [crav1-add-to-spec, crav1-refresh-system-notes]
+    read_by: []
+    mention: '(?i)clear'
+    since: 1.37.0
+
+  - id: stale-resolved
+    name: "Resolved"
+    group: research
+    files: ["docs/specs/<slug>/spec.md (under a narrowed Stale since line)"]
+    format: "Resolved <date>: <point>. Updated note <path or commit>. <how>."
+    pattern: '^Resolved \d{4}-\d{2}-\d{2}: .+\. Updated note \S+\. .+\.$'
+    examples:
+      - "Resolved 2026-10-20: fixed IP. Updated note docs/research/vendor-network.md. The vendor confirmed a fixed address."
+    meaning: "One point of a still-open mark is resolved."
+    written_by: [crav1-add-to-spec]
+    read_by: []
+    mention: 'Resolved'
+    since: 1.38.0
+
+  - id: stale-waiting
+    name: "Waiting point"
+    group: research
+    files: ["docs/specs/<slug>/spec.md (under a narrowed Stale since line)"]
+    format: "<point>: <waiting for the note's owner. Follow-up <N> of this mark. | open question on <slug>, waiting for <who>.>"
+    pattern: "^.+: (waiting for the note's owner\\. Follow-up \\d+ of this mark\\.|open question on \\S+, waiting for .+\\.)$"
+    examples:
+      - "allowlist: waiting for the note's owner. Follow-up 1 of this mark."
+      - "allowlist: open question on orders-retry, waiting for the network team."
+    meaning: "Where an open point of a stale mark waits."
+    written_by: [crav1-add-to-spec]
+    read_by: []
+    mention: 'waiting for'
+    since: 1.38.0
+
+  # ---------- plan.md and tasks.md ----------
+  - id: reviewed
+    name: "Reviewed"
+    group: plan
+    files: ["docs/specs/<slug>/plan.md (under the # Plan title)"]
+    format: "Reviewed: <date>, P# open: <n>"
+    pattern: '^Reviewed: \d{4}-\d{2}-\d{2}, P# open: \d+$'
+    examples:
+      - "Reviewed: 2026-10-14, P# open: 0"
+    meaning: "The plan was reviewed, and how many reviewer findings are still open."
+    written_by: [crav1-review-plan, crav1-tighten-plan]
+    read_by: [crav1-tasks-ready-to-build, crav1-help]
+    readiness: true
+    since: 1.54.0
+
+  - id: task-line
+    name: "Task line"
+    group: plan
+    files: ["docs/specs/<slug>/tasks.md"]
+    format: "- [ ] T<n>: <what> (verify: <kind> — <named check>) (spec: <REQ or acceptance>)"
+    pattern: '^- \[[ x]\] T\d+: .+ \(verify: .+\) \(spec: .+\)( \(after: T\d+(, T\d+)*\))?$'
+    examples:
+      - "- [ ] T1: POST /retry rejects a missing order id (verify: unit — empty id is rejected) (spec: invalid input)"
+      - "- [x] T2: Retry stops after 3 attempts (verify: unit — the 4th call is not made) (spec: retry limit) (after: T1)"
+    meaning: "One ordered, testable task. `[x]` is set by the build worker."
+    written_by: [crav1-plan-from-spec, crav1-tighten-plan, crav1-build-tasks]
+    read_by: [crav1-build-tasks, crav1-review-plan, crav1-tasks-ready-to-build, crav1-verify-build-against-spec]
+    mention: 'T#|T1|tasks\.md'
+    since: 1.0.0
+
+  - id: task-verify
+    name: "(verify: …)"
+    group: plan
+    files: ["docs/specs/<slug>/tasks.md (on a task line)"]
+    format: "(verify: <kind> — <named check>[; <kind> — <named check>])"
+    pattern: '^\(verify: .+ [—-] .+\)$'
+    examples:
+      - "(verify: unit — empty id is rejected; unit — malformed id is rejected)"
+    meaning: "The kind of check and the named checks that prove the task."
+    written_by: [crav1-plan-from-spec, crav1-tighten-plan]
+    read_by: [crav1-build-tasks, crav1-review-plan]
+    mention: '\(verify:'
+    since: 1.0.0
+
+  - id: task-spec
+    name: "(spec: …)"
+    group: plan
+    files: ["docs/specs/<slug>/tasks.md (on a task line)"]
+    format: "(spec: <REQ or acceptance>)"
+    pattern: '^\(spec: .+\)$'
+    examples:
+      - "(spec: invalid input)"
+    meaning: "The acceptance line or requirement the task covers."
+    written_by: [crav1-plan-from-spec, crav1-tighten-plan]
+    read_by: [crav1-review-plan, crav1-ado-sync]
+    mention: '\(spec:'
+    since: 1.0.0
+
+  - id: task-after
+    name: "(after: …)"
+    group: plan
+    files: ["docs/specs/<slug>/tasks.md (end of a task line)"]
+    format: "(after: T<n>[, T<n>])"
+    pattern: '^\(after: T\d+(, T\d+)*\)$'
+    examples:
+      - "(after: T1, T3)"
+    meaning: "The task needs those tasks done first."
+    written_by: [crav1-plan-from-spec]
+    read_by: [crav1-tasks-ready-to-build, crav1-help]
+    readiness: true
+    mention: '\(after:'
+    since: 1.54.0
+
+  # ---------- docs/system/repos.md ----------
+  - id: synced-at-repo
+    name: "Synced at (repo cell)"
+    group: system
+    files: ["docs/system/repos.md (Synced at column)"]
+    format: "<branch>@<short sha>, <date>[; <branch>@<short sha>, <date>]"
+    pattern: '^\S+@[0-9a-f]{7}, \d{4}-\d{2}-\d{2}(; \S+@[0-9a-f]{7}, \d{4}-\d{2}-\d{2})*$'
+    examples:
+      - "main@abc1234, 2026-10-07"
+      - "main@abc1234, 2026-10-07; develop@def5678, 2026-10-06"
+    meaning: "The commit a whole-repo read last read, one entry per branch."
+    written_by: [crav1-add-to-spec, crav1-bundle-to-specs, crav1-ideas-to-spec, crav1-refresh-system-notes, crav1-existing-to-specs]
+    read_by: [crav1-refresh-system-notes]
+    mention: 'Synced at'
+    since: 1.29.0
+
+  - id: work-items-go-to
+    name: "Work items go to"
+    group: system
+    files: ["docs/system/repos.md (Work items go to column)"]
+    format: "ADO: <org>/<project>"
+    pattern: '^ADO: [^/\s]+/.+$'
+    examples:
+      - "ADO: contoso/orders"
+    meaning: "The work item home of that repo. `Jira:` is reserved and read as no home."
+    written_by: [crav1-ado-sync]
+    read_by: [crav1-ado-sync, crav1-finalize-commit, crav1-open-pr, crav1-what-do-we-know-about-this]
+    mention: 'Work items go to'
+    since: 1.50.0
+
+  - id: landscape-reference
+    name: "Reference-only line"
+    group: system
+    files: ["docs/system/landscape.md (under ## How the parts connect)"]
+    format: "<title>: reference only, see docs/notes/<YYYY-MM>/<YYYY-MM-DD>-<slug>.md"
+    pattern: '^.+: reference only, see docs/notes/\d{4}-\d{2}/\d{4}-\d{2}-\d{2}-[a-z0-9-]+\.md$'
+    examples:
+      - "Orders export: reference only, see docs/notes/2026-09/2026-09-02-orders-export.md"
+    meaning: "A spec converted to a note stays visible in the picture."
+    written_by: [crav1-retire-spec]
+    read_by: []
+    mention: 'reference only'
+    since: 1.60.0
+
+  # ---------- docs/environments/marks.md ----------
+  - id: environment-mark
+    name: "Environment mark"
+    group: environments
+    files: ["docs/environments/marks.md"]
+    format: "<resource-id-or-name> | <group> | <environment> | <source>"
+    pattern: '^\S+ \| \S+ \| (dev|development|test|testing|stage|staging|uat|qa|pre-prod|preprod|prod|production|live) \| (pipeline .+, stage .+|marked by the user|marked by the user, suggested by group)$'
+    examples:
+      - "orders-api | rg-orders | dev | pipeline orders-ci, stage Dev"
+      - "orders-db | rg-orders | test | marked by the user, suggested by group"
+    meaning: "One confirmed environment per resource. Full rules in environments-marks.md."
+    written_by: [crav1-read-environment, crav1-map-pipeline-environments]
+    read_by: [crav1-read-environment, crav1-what-do-we-know-about-this]
+    mention: 'marks\.md'
+    since: 1.18.0
+
+  - id: azure-boards-task-type
+    name: "Azure Boards task type"
+    group: environments
+    files: ["docs/environments/marks.md"]
+    format: "Azure Boards task type[ (<project>)]: <type>"
+    pattern: '^Azure Boards task type( \(\S+\))?: .+$'
+    examples:
+      - "Azure Boards task type (orders): User Story"
+    meaning: "The work item type a task becomes in that project."
+    written_by: [crav1-ado-sync]
+    read_by: [crav1-ado-sync]
+    mention: 'Azure Boards task type'
+    since: 1.45.0
+
+  - id: azure-boards-done-state
+    name: "Azure Boards task done state"
+    group: environments
+    files: ["docs/environments/marks.md"]
+    format: "Azure Boards task done state[ (<project>)]: <state>"
+    pattern: '^Azure Boards task done state( \(\S+\))?: .+$'
+    examples:
+      - "Azure Boards task done state (orders): Closed"
+    meaning: "The done state of that type in that project."
+    written_by: [crav1-ado-sync]
+    read_by: [crav1-ado-sync]
+    mention: 'Azure Boards task done state'
+    since: 1.48.0
+
+  # ---------- work-item.md ----------
+  - id: work-item-line
+    name: "Work item"
+    group: work-items
+    files: ["docs/specs/<slug>/work-item.md"]
+    format: "Work item: <id>[ — <milestone or slice>] (ADO: <org>/<project>)"
+    pattern: '^Work item: \d+( — .+)? \(ADO: [^/\s]+/\S+\)$'
+    examples:
+      - "Work item: 52 (ADO: contoso/orders)"
+      - "Work item: 81 — October billing (ADO: contoso/orders)"
+    meaning: "A Feature id and its home. An older line without the tag uses marks.md."
+    written_by: [crav1-ado-sync]
+    read_by: [crav1-finalize-commit, crav1-ado-sync]
+    mention: 'Work item'
+    since: 1.0.0
+
+  - id: work-item-task-line
+    name: "Work item task"
+    group: work-items
+    files: ["docs/specs/<slug>/work-item.md"]
+    format: "Work item: <id> — task: T<n> <title> (ADO: <org>/<project>)"
+    pattern: '^Work item: \d+ — task: T\d+ .+ \(ADO: [^/\s]+/\S+\)$'
+    examples:
+      - "Work item: 1234 — task: T1 Reject a missing order id (ADO: contoso/orders)"
+    meaning: "A child work item for one task."
+    written_by: [crav1-ado-sync]
+    read_by: [crav1-finalize-commit, crav1-ado-sync]
+    mention: 'task: T'
+    since: 1.45.0
+
+  # ---------- notes and sources ----------
+  - id: note-used-by
+    name: "used_by"
+    group: notes
+    files: ["docs/notes/YYYY-MM/<note>.md (front matter)"]
+    format: "used_by: [<slug>, <slug>]"
+    pattern: '^used_by: \[([a-z0-9-]+(, [a-z0-9-]+)*)?\]$'
+    examples:
+      - "used_by: [orders-retry, billing]"
+    meaning: "The specs that took points from the note."
+    written_by: [crav1-add-to-spec, crav1-bundle-to-specs, crav1-ideas-to-spec, crav1-spark-to-spec, crav1-tighten-spec, crav1-existing-to-specs, crav1-retire-spec]
+    read_by: [crav1-ado-sync]
+    mention: 'used_by'
+    since: 1.61.0
+
+  - id: note-waiting-for
+    name: "waiting_for"
+    group: notes
+    files: ["docs/notes/YYYY-MM/<note>.md (front matter)"]
+    format: "waiting_for: [<parked slug>]"
+    pattern: '^waiting_for: \[([a-z0-9-]+(, [a-z0-9-]+)*)?\]$'
+    examples:
+      - "waiting_for: [orders-export]"
+    meaning: "Parked specs the note waits for."
+    written_by: [crav1-add-to-spec, crav1-retire-spec]
+    read_by: [crav1-help, crav1-show-or-ask-open-questions, crav1-ado-sync]
+    mention: 'waiting_for'
+    since: 1.61.0
+
+  - id: note-converted
+    name: "Converted from spec"
+    group: notes
+    files: ["docs/notes/YYYY-MM/<note>.md (body, after the Source line)"]
+    format: "Converted from spec, no research owner"
+    pattern: '^Converted from spec, no research owner$'
+    examples:
+      - "Converted from spec, no research owner"
+    meaning: "A note made from a spec. Stale marks on it get no revisit request."
+    written_by: [crav1-retire-spec]
+    read_by: [crav1-add-to-spec]
+    since: 1.60.0
+
+  - id: note-legacy-used
+    name: "Absorbed by / Used by (older notes)"
+    group: notes
+    files: ["docs/notes/<note>.md (before 1.61.0)"]
+    format: "<Absorbed by | Used by> <slug>"
+    pattern: '^(Absorbed by|Used by) [a-z0-9-]+$'
+    examples:
+      - "Absorbed by orders-retry"
+    meaning: "Read only. Absorbed by counts as used by. No skill adds new ones."
+    written_by: []
+    read_by: [crav1-add-to-spec]
+    mention: 'Absorbed by'
+    since: 1.36.0
+
+  - id: follow-up-done
+    name: "(done in …)"
+    group: notes
+    files: ["docs/notes/YYYY-MM/review-pr-<n>-follow-ups.md (end of a follow-up)"]
+    format: "(done in <short sha>)"
+    pattern: '^\(done in [0-9a-f]{7}\)$'
+    examples:
+      - "(done in abc1234)"
+    meaning: "A review follow-up that a later commit addressed. The line stays."
+    written_by: [crav1-review-pr]
+    read_by: [crav1-review-pr]
+    mention: 'done in'
+    since: 1.51.0
+
+  - id: source-superseded
+    name: "Superseded by"
+    group: notes
+    files: ["docs/sources/YYYY-MM-DD-<slug>/README.md"]
+    format: "Superseded by: docs/sources/<newer>/"
+    pattern: '^Superseded by: docs/sources/\S+/$'
+    examples:
+      - "Superseded by: docs/sources/2026-10-14-orders-spec-v2/"
+    meaning: "A newer version of this source was imported; specs read only the newest."
+    written_by: [crav1-add-to-spec]
+    read_by: [crav1-add-to-spec]
+    mention: 'Superseded by'
+    since: 1.43.0
+
