@@ -8,13 +8,28 @@
 
 Read one named open pull request and report whether it can ship.
 
-When an open pull request is named, **[`/crav1-review-pr`](crav1-review-pr.md)** reads the diff and says whether it can ship. It is cross-cutting. It is not a lane and not a bot. A pull request with a plan keeps the plan and `verify.md` checks. A pull request with no `plan.md` or `tasks.md` for its slug was built outside the kit. That is an info note. It does not report a missing `verify.md`. It reads the test results that pull request's own pipeline already recorded. It does not run the tests, and it does not ask to. It ends by naming [`/crav1-refresh-system-notes`](crav1-refresh-system-notes.md) after the merge and does not run it. It ends with a paste-ready Markdown comment in your own friendly first-person voice, with a short plain opening, the sections Blockers, Bugs, Tests to add with this PR, and A question, each point starting with a link to its file and line on the source branch, and no tool or kit names. Follow-ups, including choices the description calls deliberate, are not posted and not in that comment; the chat lists them and they are saved as `docs/notes/YYYY-MM/review-pr-<n>-follow-ups.md` (PR, repo, date, each with its file and line), which a re-review updates and [`/crav1-ado-sync`](crav1-ado-sync.md) reads as an open note. No follow-ups, no note. Re-review replies use the same voice. After your yes it posts that block as one comment and sets the matching vote. A re-review reads the earlier findings from the pull request's own threads and marks each fixed (with the commit), partly fixed, still open, or no longer relevant. It never resolves a thread without your yes. It does not edit or merge. [`/crav1-open-pr`](crav1-open-pr.md) may name it and does not run it. [`/crav1-merge-pr`](crav1-merge-pr.md) does not run it. Spark, specify, and verify do not run it.
+When an open pull request is named, **[`/crav1-review-pr`](crav1-review-pr.md)** reads the diff and says whether it can ship. It is cross-cutting. It is not a lane and not a bot. A pull request with a plan keeps the plan and `verify.md` checks. A pull request with no `plan.md` or `tasks.md` for its slug was built outside the kit. That is an info note. It does not report a missing `verify.md`. It reads the test results that pull request's own pipeline already recorded. It does not run the tests, and it does not ask to. It ends by naming [`/crav1-refresh-system-notes`](crav1-refresh-system-notes.md) after the merge and does not run it. It ends with a paste-ready Markdown comment in your own friendly first-person voice, with a short plain opening, the sections Blockers, Bugs, Tests to add with this PR, and A question, each point starting with a link to its file and line on the source branch, and no tool or kit names. Follow-ups, including choices the description calls deliberate, are not posted and not in that comment; the chat lists them and they are saved as `docs/notes/YYYY-MM/review-pr-<n>-follow-ups.md` (PR, repo, date, each with its file and line), which a re-review updates and [`/crav1-ado-sync`](crav1-ado-sync.md) reads as an open note. The same note keeps the comment as drafted and, once you post it, the comment as posted, word for word. Re-review replies use the same voice. After your yes it posts that block as one comment and sets the matching vote. A re-review reads the earlier findings from the pull request's own threads and marks each fixed (with the commit), partly fixed, still open, or no longer relevant. It never resolves a thread without your yes. It does not edit or merge. [`/crav1-open-pr`](crav1-open-pr.md) may name it and does not run it. [`/crav1-merge-pr`](crav1-merge-pr.md) does not run it. Spark, specify, and verify do not run it.
 
 Reads one named open pull request. When the slug has `plan.md`, spec, plan, `verify.md`, the body, and a required green linter must hold before it says ship. When the slug has no `plan.md` or `tasks.md`, that is an info note. It does not report a missing `verify.md`. It reviews spec fit, the body, the required green linter, and secrets, and it reads the pipeline's recorded tests. It does not run tests. It names [`/crav1-refresh-system-notes`](crav1-refresh-system-notes.md) after that pull request merges and does not run it. Names the lane for a finding and does not start it. Posts comments and a verdict only after the user's yes. Does not edit, install a linter, or merge. Spark, specify, and verify do not run it.
 
 1.64.0: finds the spec the same way as [`/crav1-open-pr`](crav1-open-pr.md), including a spec that lists the head branch.
 
 1.66.0: the comment follows `references/comment-layout.md`: no verdict line, one short plain opening, Blockers, Bugs, Tests to add with this PR, and A question, each point starting with the host link to its file and line on the source branch and then an indented paragraph, at most one fix per point, no follow-ups, no table, no closing. Any Blocker or Bug means Changes needed; only tests or a question, Approve with comments. It posts one comment, no inline threads, and votes (never Reject) only after your yes. Advice about merge order says to merge the base into the branch, never to rebase.
+
+1.67.0: the follow-ups note keeps the comment as drafted and the comment as posted, word for word in code fences. At the start of every run on the pull request it looks for the posted comment on the host (read-only) or takes a paste, compares it with the draft, and marks drafted points you left out as not in the posted comment and still open, without dropping them. A re-review compares against the posted comment and keeps points you cut out of the new comment unless you include them. Post it adds "I'll post it myself"; choice words `comment posted`, `newest comment` and `skip comment record`.
+
+## Choice words
+
+Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
+
+| Question | Word | Means |
+| --- | --- | --- |
+| PR branches on disk older than the pull request | `fetch pr branches` | fetch only the PR's two branches |
+| PR branches on disk older than the pull request | `use disk` | review the copies on disk |
+| PR branches on disk older than the pull request | `stop pr review` | stop |
+| The comment as posted | `comment posted` | only record the posted comment, no review |
+| The comment as posted | `newest comment` | several candidates: take the newest match by you |
+| The comment as posted | `skip comment record` | do not record; the review goes on |
 
 ## Runs when
 
@@ -28,9 +43,9 @@ Reads one named open pull request, its diff, the spec, the body, and the require
 
 ## Writes
 
-In short: A follow-ups note in `docs/notes/` when there are follow-ups.
+In short: A follow-ups note in `docs/notes/` with the comment as drafted and as posted.
 
-Writes `docs/notes/YYYY-MM/review-pr-<n>-follow-ups.md` and regenerates the notes indexes when the review has follow-ups or questions, updating the same note on a re-review. After the user's yes, posts one comment and the matching vote.
+Writes `docs/notes/YYYY-MM/review-pr-<n>-follow-ups.md` and regenerates the notes indexes when the review has follow-ups, questions or a paste-ready comment, updating the same note on a re-review, with the comment as drafted and as posted. After the user's yes, posts one comment and the matching vote.
 
 ## Does not
 

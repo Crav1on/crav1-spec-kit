@@ -28,12 +28,13 @@ If the message does not name a pull request, the command asks which one and stop
 | Phase | You | Agent |
 | --- | --- | --- |
 | Which pull request | Named it by number or URL | Asks which one and stops when none was named. Does not pick the newest |
+| Comment as posted | Confirm the comment, or paste it | When the follow-ups note has a drafted comment with nothing posted after it, first finds the posted comment on the pull request (read-only) or asks you to paste it, saves it word for word, and compares it with the draft (1.67.0) |
 | Read | — | Reads the diff, the spec, and the pull request body, and whether a linter is required and green. When the slug has `plan.md`, also reads the plan and `verify.md`. When the slug has no `plan.md` or `tasks.md`, reads the test results that pull request's own pipeline already recorded. Does not edit. Does not run the tests |
 | Must be true before ship | Read the findings | Each miss is its own finding. Three lines: what is off, what could happen, and the decision (ship, fix, or drop). Any fix or drop means the review does not say ship. An outside-the-kit note and a recorded-test note are info. They do not block ship |
 | Lane | — | Names the lane and does not start it. Spec miss → Specify. Plan miss → Plan, only when that slug has `plan.md`. Verify miss, a file the plan already named but the diff lacks, or a red or missing linter → Build. Body mismatch → rewrite the pull request body, not a new spec |
 | Suggestions | Read them | Style, patterns, and practices the repo already wrote down, plus dead code, or a name that hides what the code does. They do not block ship. A secret in the diff is a first-section fix |
 | Paste-ready comment | Copy it, or wait for the post question | Says the verdict in the chat, then one Markdown block you can paste into the pull request as one comment: a short opening, then Blockers, Bugs, Tests to add with this PR, and A question, each point starting with a link to its file and line. Showing it posts nothing |
-| Post | Answer yes or no | Asks once whether to post under your own account, naming the vote. On yes, posts the block as one comment and sets that vote |
+| Post | Post, I'll post it myself, or do not post | Asks once whether to post under your own account, naming the vote. On yes, posts the block as one comment, sets that vote and saves the posted text |
 | Stop | Glance | A clean review says so and stops. It does not merge. It never resolves a thread without your yes |
 
 ## What it checks
@@ -110,7 +111,7 @@ The block, every posted comment, and every re-review reply use the style Thomas 
 
 ## Post it
 
-After the block, the review asks one question: post, or do not post. It posts under your own account, and nothing posts without your yes. On yes:
+After the block, the review asks one question: post, I'll post it myself, or do not post. It posts under your own account, and nothing posts without your yes. On yes:
 
 1. The block is posted as **one comment**, with no inline threads: on GitHub as the body of one review, on Azure DevOps as one thread.
 2. The vote follows the verdict:
@@ -125,11 +126,47 @@ After the block, the review asks one question: post, or do not post. It posts un
 
 When a post fails, the review says what failed and what already posted, and does not retry another way.
 
+On GitHub you can't approve or request changes on your own pull request, so there the review posts as a comment and says so.
+
+## Comment as posted (1.67.0)
+
+You often edit the comment before posting it. So the follow-ups note keeps both texts, each word for word in a code fence:
+
+- `## Comment as drafted, <date>`: the paste-ready block of each review.
+- `## Comment as posted, <date> (by <name>)`: what the reviewers see, with one line saying where it came from (read from the PR thread, pasted in chat, or posted from this review), which draft it was compared with, and which `Description as of` section of the PR note the review read. `by` is your name as the host shows it.
+
+**How it gets the posted text.** When the review posts on your yes, it saves the text the host returns at once. When you pick **I'll post it myself**, say "posted" when it's up, or run `/crav1-review-pr orders-api 42 comment posted`. Every later run on that pull request also checks first. It looks read-only for your review or comment on the pull request (GitHub reviews and conversation comments; Azure DevOps top-level threads, or your reply in the earlier thread), posted after the draft, that matches it. One match: it asks you to confirm. Several: it lists them, and you may pick more than one. None: it says so in one line and goes on, since you may not have posted it yet. No `gh` or `az` session, or nothing found after `comment posted`: it asks you to paste it. An edit on the host later adds a new section ending `, edited`; the earlier one stays.
+
+**Comparing.** Points are paired by their link and title. The chat lists them as drafted, changed, not in the posted comment, or added. A drafted point you left out stays in the note as a bullet ending `(Not in the posted comment, <date>; still open.)`. A cut question keeps its `Asked on the PR:` line, with the mark added. A question you added gets an `Asked on the PR:` line.
+
+Example, with made-up names:
+
+`````markdown
+- `src/orders/retry_store.py`, line 9: an idempotency test for the row key. (Not in the posted comment, 2026-10-19; still open.)
+
+## Comment as posted, 2026-10-19 (by Alex Doe)
+Read from the PR thread: https://github.com/contoso/orders-api/pull/42#issuecomment-1001. Draft compared: 2026-10-19. Description reviewed: as of 2026-10-18 (PR note).
+
+````markdown
+I've looked through the PR and run it through my checks. This is what I found:
+
+### Bugs
+
+- [src/orders/retry_store.py, line 9](https://github.com/contoso/orders-api/blob/feat/orders-retry/src/orders/retry_store.py?plain=1#L9)
+
+  The row key is random for every write. Maybe the key could be built from the file name and revision?
+````
+`````
+
+The pasted or fetched text goes through the personal-data and secrets check first, like the PR note. Secrets are removed and named by kind, and the source line says `Verbatim except: <kind> removed.`
+
+For bots: `comment posted` records only, `newest comment` takes the newest match, and `skip comment record` skips the step. A headless run with several candidates or none stops and names these words. No word posts.
+
 ## Re-review
 
-When the pull request already has review comments, the next run is a re-review. It reads the earlier findings from the pull request's own comments and threads, from anyone, including the points of an earlier one-comment review. A block still in the chat is used only when the pull request has no comments.
+When the pull request already has review comments, the next run is a re-review. It reads the earlier findings from the pull request's own comments and threads, from anyone, including the points of an earlier one-comment review. When the follow-ups note has the comment as posted, the earlier points are its points (1.67.0). When nothing was posted, the new comment has no **Since last time**; the chat still says which points of the newest drafted comment are fixed or open.
 
-Each earlier finding gets one line first: **Fixed** (with the short commit SHA), **Partly fixed**, **Still open**, or **No longer relevant**. A resolved thread whose problem is still there is flagged `resolved but still open`. In the comment, earlier points go under **Since last time**, then new points under the normal sections.
+Each earlier finding gets one line first: **Fixed** (with the short commit SHA), **Partly fixed**, **Still open**, or **No longer relevant**. A resolved thread whose problem is still there is flagged `resolved but still open`. In the comment, earlier points go under **Since last time**, then new points under the normal sections. **Since last time** lists only points the reviewers saw. A finding you cut from the posted comment is shown in the chat with its mark and kept out of the new comment unless you say to include it.
 
 On post, the re-review replies in the earlier comment's thread (Azure DevOps) or posts a new review (GitHub). Afterwards it offers to resolve existing threads whose points are fixed, and resolves them only on your yes.
 
@@ -162,7 +199,7 @@ Follow-ups are suggestions, and choices the description calls deliberate. They a
 
 The chat review still lists them, then says where they were saved. They go into one note in `docs/notes/` of the specs repo, in the usual notes format: `docs/notes/YYYY-MM/review-pr-<n>-follow-ups.md`, or `docs/notes/YYYY-MM/review-pr-<repo>-<n>-follow-ups.md` (month of the review date) when two repos in the specs repo have the same pull request number, and always for a pull request in another repo (1.65.0). The note names the pull request, the repo, the date, and each follow-up with its file and line. The paths stay, because the note stays in the specs repo. The notes indexes are regenerated.
 
-A re-review of the same pull request updates that note instead of writing a second one: it sets the imported date, adds new follow-ups, and marks one the code now addresses `(done in <short sha>)`. It removes no line. A question asked in the comment is saved there too, starting `Asked on the PR:` (1.66.0). A review with no follow-ups and no question writes no note. The follow-ups come back through the existing note flow: [`/crav1-ado-sync`](from-ado-sync-suggest-features.md) reads open notes, and the spec that takes one adds itself to the note's `used_by`. Notes are never absorbed. The note is not committed; `/crav1-finalize-commit` does that.
+A re-review of the same pull request updates that note instead of writing a second one: it sets the imported date, adds new follow-ups, and marks one the code now addresses `(done in <short sha>)`. It removes no line. A question asked in the comment is saved there too, starting `Asked on the PR:` (1.66.0). From 1.67.0 every review with a paste-ready comment writes the note, because it holds the comment as drafted. The follow-ups come back through the existing note flow: [`/crav1-ado-sync`](from-ado-sync-suggest-features.md) reads open notes, and the spec that takes one adds itself to the note's `used_by`. Notes are never absorbed. The note is not committed; `/crav1-finalize-commit` does that.
 
 ## What does not get written
 

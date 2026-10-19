@@ -1144,6 +1144,23 @@ skills:
 
     @docs/specs/<slug>/'
 - name: crav1-review-pr
+  choice_words:
+  - question: PR branches on disk older than the pull request
+    words:
+    - word: "fetch pr branches"
+      means: "fetch only the PR's two branches"
+    - word: "use disk"
+      means: "review the copies on disk"
+    - word: "stop pr review"
+      means: "stop"
+  - question: The comment as posted
+    words:
+    - word: "comment posted"
+      means: "only record the posted comment, no review"
+    - word: "newest comment"
+      means: "several candidates: take the newest match by you"
+    - word: "skip comment record"
+      means: "do not record; the review goes on"
   lane: cross-cutting
   group: Commit and pull request
   starter: false
@@ -1163,7 +1180,8 @@ skills:
     its file and line on the source branch, and no tool or kit names. Follow-ups, including choices the description
     calls deliberate, are not posted and not in that comment; the chat lists them and they are saved as
     `docs/notes/YYYY-MM/review-pr-<n>-follow-ups.md` (PR, repo, date, each with its file and line), which a
-    re-review updates and `/crav1-ado-sync` reads as an open note. No follow-ups, no note. Re-review replies use the
+    re-review updates and `/crav1-ado-sync` reads as an open note. The same note keeps the comment as drafted and,
+    once you post it, the comment as posted, word for word. Re-review replies use the
     same voice. After your yes it posts that block as one comment and sets the matching vote. A re-review reads the earlier findings from the pull
     request's own threads and marks each fixed (with the commit), partly fixed, still open, or no longer
     relevant. It never resolves a thread without your yes. It does not edit or merge. `/crav1-open-pr` may name it and does not run it. `/crav1-merge-pr` does
@@ -1183,16 +1201,22 @@ skills:
     no table, no closing. Any Blocker or Bug means Changes needed; only tests or a question, Approve with comments.
     It posts one comment, no inline threads, and votes (never Reject) only after your yes. Advice about merge
     order says to merge the base into the branch, never to rebase.'
+  - '1.67.0: the follow-ups note keeps the comment as drafted and the comment as posted, word for word in code
+    fences. At the start of every run on the pull request it looks for the posted comment on the host (read-only)
+    or takes a paste, compares it with the draft, and marks drafted points you left out as not in the posted
+    comment and still open, without dropping them. A re-review compares against the posted comment and keeps
+    points you cut out of the new comment unless you include them. Post it adds "I''ll post it myself"; choice
+    words `comment posted`, `newest comment` and `skip comment record`.'
   use_when: This turn names an open pull request
   table:
     reads: The pull request, its diff, and the spec
-    writes: A follow-ups note in `docs/notes/` when there are follow-ups
+    writes: A follow-ups note in `docs/notes/` with the comment as drafted and as posted
   reads: Reads one named open pull request, its diff, the spec, the body, and the required linter. When
     the slug has `plan.md`, also reads the plan and `verify.md`. When the slug has no `plan.md` or `tasks.md`,
     reads the pipeline's recorded test results instead and does not treat a missing `verify.md` as a finding.
   writes: Writes `docs/notes/YYYY-MM/review-pr-<n>-follow-ups.md` and regenerates the notes indexes when the review
-    has follow-ups or questions, updating the same note on a re-review. After the user's yes, posts one comment and
-    the matching vote.
+    has follow-ups, questions or a paste-ready comment, updating the same note on a re-review, with the comment as
+    drafted and as posted. After the user's yes, posts one comment and the matching vote.
   leaves_alone: Leaves code, the spec, the plan, and the merge alone. Never resolves a thread without a yes.
   exceptions: spark, specify, verify, `/crav1-open-pr`, and `/crav1-merge-pr` do not run it. An outside
     pull request names `/crav1-refresh-system-notes` after merge and does not run it.
