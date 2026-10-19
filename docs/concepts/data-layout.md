@@ -286,14 +286,14 @@ Every mark and line format the kit writes inside product files, generated from [
 | (verify: …) | `(verify: <kind> — <named check>[; <kind> — <named check>])` | `docs/specs/<slug>/tasks.md` (on a task line) | `/crav1-plan-from-spec`, `/crav1-tighten-plan` | `/crav1-build-tasks`, `/crav1-review-plan` | 1.0.0 |
 | (spec: …) | `(spec: <REQ or acceptance>)` | `docs/specs/<slug>/tasks.md` (on a task line) | `/crav1-plan-from-spec`, `/crav1-tighten-plan` | `/crav1-review-plan`, `/crav1-ado-sync` | 1.0.0 |
 | (after: …) | `(after: T<n>[, T<n>])` | `docs/specs/<slug>/tasks.md` (end of a task line) | `/crav1-plan-from-spec` | `/crav1-tasks-ready-to-build`, `/crav1-help` | 1.54.0 |
-| (branch: …) | `(branch: [<repo> ]<branch>)` | `docs/specs/<slug>/tasks.md` (end of a task line, after (after: …)) | `/crav1-plan-from-spec` | `/crav1-build-tasks`, `/crav1-build-features`, `/crav1-create-feature-branch`, `/crav1-tasks-ready-to-build`, `/crav1-verify-build-against-spec`, `/crav1-help` | 1.64.0 |
+| (branch: …) | `(branch: [<repo> ]<branch>)` | `docs/specs/<slug>/tasks.md` (end of a task line, after (after: …)) | `/crav1-plan-from-spec` | `/crav1-build-tasks`, `/crav1-build-features`, `/crav1-create-feature-branch`, `/crav1-tasks-ready-to-build`, `/crav1-verify-build-against-spec`, `/crav1-help`, `/crav1-review-pr` | 1.64.0 |
 
 ### `docs/system/`
 
 | Mark | Format | Where | Written by | Read by | Since |
 | --- | --- | --- | --- | --- | --- |
 | Synced at (repo cell) | `<branch>@<short sha>, <date>[; <branch>@<short sha>, <date>]` | `docs/system/repos.md` (Synced at column) | `/crav1-add-to-spec`, `/crav1-bundle-to-specs`, `/crav1-ideas-to-spec`, `/crav1-refresh-system-notes`, `/crav1-existing-to-specs` | `/crav1-refresh-system-notes` | 1.29.0 |
-| Merges into | `<branch>` | `docs/system/repos.md` (Merges into column) | `/crav1-add-to-spec` | `/crav1-open-pr`, `/crav1-add-to-spec` | 1.64.0 |
+| Merges into | `<branch>` | `docs/system/repos.md` (Merges into column) | `/crav1-add-to-spec` | `/crav1-open-pr`, `/crav1-add-to-spec`, `/crav1-review-pr` | 1.64.0 |
 | Work items go to | `ADO: <org>/<project>` | `docs/system/repos.md` (Work items go to column) | `/crav1-ado-sync` | `/crav1-ado-sync`, `/crav1-finalize-commit`, `/crav1-open-pr`, `/crav1-what-do-we-know-about-this` | 1.50.0 |
 | Reference-only line | `<title>: reference only, see docs/notes/<YYYY-MM>/<YYYY-MM-DD>-<slug>.md` | `docs/system/landscape.md` (under ## How the parts connect) | `/crav1-retire-spec` | — | 1.60.0 |
 
@@ -319,6 +319,10 @@ Every mark and line format the kit writes inside product files, generated from [
 | used_by | `used_by: [<slug>, <slug>]` | `docs/notes/YYYY-MM/<note>.md` (front matter) | `/crav1-add-to-spec`, `/crav1-bundle-to-specs`, `/crav1-ideas-to-spec`, `/crav1-spark-to-spec`, `/crav1-tighten-spec`, `/crav1-existing-to-specs`, `/crav1-retire-spec` | `/crav1-ado-sync` | 1.61.0 |
 | commits | `commits: [<short sha>[, <short sha>]]` | `docs/notes/YYYY-MM/<note>.md` (front matter, code change notes only) | `/crav1-add-to-spec` | `/crav1-add-to-spec`, `/crav1-tighten-spec` | 1.64.0 |
 | Commit line (code change note) | `<short sha> <author date> <subject>` | `docs/notes/YYYY-MM/<note>.md` (body of a code change note, one per imported commit) | `/crav1-add-to-spec` | `/crav1-add-to-spec` | 1.64.1 |
+| kind | `kind: <fact \| dump \| code change \| meeting \| email \| chat \| review-pr \| pull request \| converted spec>` | `docs/notes/YYYY-MM/<note>.md` (front matter); `docs/notes/_template/note.md` | `/crav1-add-to-spec`, `/crav1-review-pr`, `/crav1-merge-pr`, `/crav1-retire-spec` | `/crav1-add-to-spec`, `/crav1-review-pr` | 1.65.0 |
+| PR note source | `source: PR <n> <repo URL path>` | `docs/notes/YYYY-MM/YYYY-MM-DD-pr-<repo>-<n>.md` (front matter) | `/crav1-add-to-spec`, `/crav1-review-pr`, `/crav1-merge-pr` | `/crav1-add-to-spec`, `/crav1-review-pr`, `/crav1-merge-pr` | 1.65.0 |
+| pr_note | `pr_note: docs/notes/YYYY-MM/<file>.md` | `docs/notes/YYYY-MM/<note>.md` (front matter of a code change or review-pr note from a pull request) | `/crav1-add-to-spec`, `/crav1-review-pr` | `/crav1-add-to-spec`, `/crav1-review-pr` | 1.65.0 |
+| Description version (PR note) | `## Description as of <YYYY-MM-DD>` | `docs/notes/YYYY-MM/YYYY-MM-DD-pr-<repo>-<n>.md` (body) | `/crav1-add-to-spec`, `/crav1-review-pr`, `/crav1-merge-pr` | `/crav1-add-to-spec`, `/crav1-review-pr`, `/crav1-merge-pr` | 1.65.0 |
 | waiting_for | `waiting_for: [<parked slug>]` | `docs/notes/YYYY-MM/<note>.md` (front matter) | `/crav1-add-to-spec`, `/crav1-retire-spec` | `/crav1-help`, `/crav1-show-or-ask-open-questions`, `/crav1-ado-sync` | 1.61.0 |
 | Converted from spec | `Converted from spec, no research owner` | `docs/notes/YYYY-MM/<note>.md` (body, after the Source line) | `/crav1-retire-spec` | `/crav1-add-to-spec` | 1.60.0 |
 | Absorbed by / Used by (older notes) | `<Absorbed by \| Used by> <slug>` | `docs/notes/<note>.md` (before 1.61.0) | — | `/crav1-add-to-spec` | 1.36.0 |
