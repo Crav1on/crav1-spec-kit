@@ -100,7 +100,7 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 
 **Base branch / Merges into.** The branch a repo's work merges into: the `Merges into` cell in `docs/system/repos.md` (for example `develop`), else the default branch. A base branch is never counted as a work branch.
 
-**Fork point.** Where a branch split off: the closest of its repo's base branches and the spec's other branches, by fewest own commits. A branch diff starts there, not at the default branch.
+**Fork point.** Where a branch split off: the closest of its repo's base branches (while the `Merges into` cell is empty, also `develop`, `development`, `dev` or `integration` when they exist) and the spec's other branches, by fewest own commits. A branch diff starts there, not at the default branch.
 
 **Dropped.** A `(dropped)` at the end of a `Synced at` entry: the branch is gone, was never merged, and was given up after a yes in `/crav1-tighten-spec`. A gone branch whose work is in the base counts as merged and is never offered dropped.
 

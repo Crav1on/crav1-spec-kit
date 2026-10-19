@@ -641,6 +641,20 @@ marks:
     mention: 'commits:'
     since: 1.64.0
 
+  - id: note-commit-line
+    name: "Commit line (code change note)"
+    group: notes
+    files: ["docs/notes/YYYY-MM/<note>.md (body of a code change note, one per imported commit)"]
+    format: "<short sha> <author date> <subject>"
+    pattern: '^[0-9a-f]{7} \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2} .+$'
+    examples:
+      - "155b5c4 2026-10-01T08:00:12+02:00 Retry an order call on timeout"
+    meaning: "The imported commit with its author date and subject. When the commit is no longer on disk after a force push, the same author date and subject count as the same change."
+    written_by: [crav1-add-to-spec]
+    read_by: [crav1-add-to-spec]
+    mention: 'author date'
+    since: 1.64.1
+
   - id: note-waiting-for
     name: "waiting_for"
     group: notes
