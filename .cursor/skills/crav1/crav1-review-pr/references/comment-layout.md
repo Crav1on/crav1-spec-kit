@@ -111,7 +111,7 @@ Links point at the source branch, so they show the code the author is editing an
 
 ## Re-review
 
-The same layout. After the opening, a `### Since last time` section: one bullet per earlier point, link first, with its status in the explanation ("This looks sorted now in `abc1234`.", "I think there's still a little left here: …", "This one went away with the rewrite."). Then new points under the normal sections. Links point at the branch as it is now.
+The same layout. After the opening, a `### Since last time` section: one bullet per earlier point, link first, with its status in the explanation ("This looks sorted now in `abc1234`.", "I think there's still a little left here: …", "This one went away with the rewrite."). Then new points under the normal sections. Links point at the branch as it is now. Earlier points are the points of the comment as posted, not the draft (1.67.0, [comment-as-posted.md](comment-as-posted.md) **Re-review**).
 
 ## Nothing to say
 
