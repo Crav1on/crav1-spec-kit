@@ -1127,6 +1127,7 @@ skills:
     a multi-line Azure DevOps description is passed as `--description "@<file>"` (UTF-8 without BOM).
     May name `/crav1-review-pr` and does not run it. Next explicit ask to merge is `/crav1-merge-pr`.
   - '1.64.0: the base is the head''s `(into …)` branch, then the repo''s `Merges into` branch (also from a sibling spec repo), then the default branch. The slug is also found from a spec that lists the head branch.'
+  - '1.66.0: a push rejected because the remote branch moved says to pull with `git pull --no-rebase`, resolve conflicts, and push again. Never a rebase or a force-push.'
   use_when: Commits exist; want a pull request
   table:
     reads: The change branch, the spec, and `verify.md`
@@ -1157,14 +1158,13 @@ skills:
     the kit. That is an info note. It does not report a missing `verify.md`. It reads the test results
     that pull request's own pipeline already recorded. It does not run the tests, and it does not ask
     to. It ends by naming `/crav1-refresh-system-notes` after the merge and does not run it. It ends with a
-    paste-ready Markdown comment in your own friendly first-person voice, with a varied opening, the
-    sections Blocker, Bugs, and Tests to add with this PR, a link to each file in the pull request files
-    view and per-line remarks, and no tool or kit names. Follow-ups, including choices the description
+    paste-ready Markdown comment in your own friendly first-person voice, with a short plain opening, the
+    sections Blockers, Bugs, Tests to add with this PR, and A question, each point starting with a link to
+    its file and line on the source branch, and no tool or kit names. Follow-ups, including choices the description
     calls deliberate, are not posted and not in that comment; the chat lists them and they are saved as
     `docs/notes/YYYY-MM/review-pr-<n>-follow-ups.md` (PR, repo, date, each with its file and line), which a
     re-review updates and `/crav1-ado-sync` reads as an open note. No follow-ups, no note. Re-review replies use the
-    same voice. After your yes it posts each finding as an inline comment on its line and a summary without
-    the verdict, then asks which verdict to set. A re-review reads the earlier findings from the pull
+    same voice. After your yes it posts that block as one comment and sets the matching vote. A re-review reads the earlier findings from the pull
     request's own threads and marks each fixed (with the commit), partly fixed, still open, or no longer
     relevant. It never resolves a thread without your yes. It does not edit or merge. `/crav1-open-pr` may name it and does not run it. `/crav1-merge-pr` does
     not run it. Spark, specify, and verify do not run it.
@@ -1177,6 +1177,12 @@ skills:
     not edit, install a linter, or merge. Spark,
     specify, and verify do not run it.
   - '1.64.0: finds the spec the same way as `/crav1-open-pr`, including a spec that lists the head branch.'
+  - '1.66.0: the comment follows `references/comment-layout.md`: no verdict line, one short plain opening,
+    Blockers, Bugs, Tests to add with this PR, and A question, each point starting with the host link to its
+    file and line on the source branch and then an indented paragraph, at most one fix per point, no follow-ups,
+    no table, no closing. Any Blocker or Bug means Changes needed; only tests or a question, Approve with comments.
+    It posts one comment, no inline threads, and votes (never Reject) only after your yes. Advice about merge
+    order says to merge the base into the branch, never to rebase.'
   use_when: This turn names an open pull request
   table:
     reads: The pull request, its diff, and the spec
@@ -1185,8 +1191,8 @@ skills:
     the slug has `plan.md`, also reads the plan and `verify.md`. When the slug has no `plan.md` or `tasks.md`,
     reads the pipeline's recorded test results instead and does not treat a missing `verify.md` as a finding.
   writes: Writes `docs/notes/YYYY-MM/review-pr-<n>-follow-ups.md` and regenerates the notes indexes when the review
-    has follow-ups, updating the same note on a re-review. After the user's yes, posts inline comments, a summary, thread replies, and
-    the verdict the user picks.
+    has follow-ups or questions, updating the same note on a re-review. After the user's yes, posts one comment and
+    the matching vote.
   leaves_alone: Leaves code, the spec, the plan, and the merge alone. Never resolves a thread without a yes.
   exceptions: spark, specify, verify, `/crav1-open-pr`, and `/crav1-merge-pr` do not run it. An outside
     pull request names `/crav1-refresh-system-notes` after merge and does not run it.
@@ -1216,6 +1222,7 @@ skills:
     API if git cannot see the commit). Does not run `/crav1-review-pr`. Stops when a required host check
     is red.
   - '1.64.0: after a confirmed merge, says `<n> of <m> branches of <slug> now merged into <target>` per spec. No file edits.'
+  - '1.66.0: a branch that is behind the base or has conflicts gets one line: merge the base into the branch, push, then ask to merge again. Never a rebase.'
   use_when: This turn asks to merge a named pull request
   table:
     reads: That named pull request

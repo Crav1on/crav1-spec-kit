@@ -140,7 +140,7 @@ Stop unless all of these are true after the ready step:
 | `reviewDecision` | `APPROVED`, or empty when `mergeStateStatus` is `CLEAN` | `REVIEW_REQUIRED`, `CHANGES_REQUESTED` |
 | `gh pr checks` | every required check passed; exit 0 | failing or pending lines |
 
-`BEHIND` means the head is behind the base. Report that. Do not update the branch in this skill.
+`BEHIND` means the head is behind the base. `DIRTY` means the branch has conflicts with the base. Report that. Do not update the branch in this skill. Say how to fix it by merging the base in, never a rebase (1.66.0): `Merge <base> into <head> (resolve any conflicts there), push, then ask to merge again.` When they want the steps: `git switch <base>`, `git pull --ff-only`, `git switch <head>`, `git merge <base>`, `git push`. On GitHub, **Update branch** with **Update with merge commit** does the same for a branch that is only behind.
 
 `UNSTABLE` is not a pass. Report the check names. Do not merge.
 
@@ -153,6 +153,8 @@ Stop unless all of these are true after the ready step:
 | `mergeStatus` | `succeeded` | `conflicts`, `failure`, `rejectedByPolicy`, `queued`, or anything else |
 | Required reviewers | `isRequired` and vote `10` or `5` | vote `0`, `-5`, or `-10` on a required reviewer |
 | Blocking policies | enabled and `isBlocking`, status `approved` or `notApplicable` | `queued`, `rejected`, `broken`, `running`, or any other status |
+
+`conflicts` gets the same merge-the-base-in line as `DIRTY` above (1.66.0), never a rebase.
 
 Do not call `az repos pr set-vote`. Do not vote for the user.
 
@@ -332,7 +334,7 @@ An `AZURE_DEVOPS_EXT_PAT` the user has already set is a credential for the `az r
 
 - No merge unless this turn names the pull request and asks to merge it.
 - No squash (`--squash true`, squash merge, `mergeStrategy` `squash`). Azure DevOps complete uses `--squash false`, which is the no-fast-forward merge commit.
-- No rebase (`--rebase`, rebase and fast-forward, semi-linear / `rebaseMerge`).
+- No rebase (`--rebase`, rebase and fast-forward, semi-linear / `rebaseMerge`). Advice for a branch that is behind or has conflicts says to merge the base into it, never to rebase it.
 - No `--admin`, no `--bypass-policy`, no `bypassPolicy`.
 - No second strategy attempt after a refusal or a failed `az repos pr update`.
 - No `git commit`, no stash, no new branch, no force-push.

@@ -106,6 +106,8 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 
 **Fork point.** Where a branch split off: the closest of its repo's base branches (while the `Merges into` cell is empty, also `develop`, `development`, `dev` or `integration` when they exist) and the spec's other branches, by fewest own commits. A branch diff starts there, not at the default branch.
 
+**Merge the base in.** How the kit says to bring a branch up to date with its base (the pull request's target, else the repo's `Merges into` branch, else the default branch): merge the base into the branch and resolve conflicts there. The kit never suggests a rebase or a force-push. Seeing that someone else rebased a branch is still reported (see Branch rewritten since last read) (1.66.0).
+
 **Dropped.** A `(dropped)` at the end of a `Synced at` entry: the branch is gone, was never merged, and was given up after a yes in `/crav1-tighten-spec`. A gone branch whose work is in the base counts as merged and is never offered dropped.
 
 **Branch rewritten since last read.** What status says when a branch's recorded SHA no longer exists or is no longer in the branch (a rebase or force push). Commits are matched by content (`git patch-id`), so nothing is imported twice.
