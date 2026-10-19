@@ -38,6 +38,23 @@ A review is not a merge ask. Opening a pull request is not a merge ask either.
 
 Not written: branch deletion, work item links, squash or rebase merges.
 
+## Behind, conflicts, or a rejected push (1.66.0)
+
+The kit's advice is always to merge the base branch into your branch, never to rebase it:
+
+- `/crav1-merge-pr` stops when the branch is behind the base or has conflicts, and says: `Merge develop into feat/orders-retry (resolve any conflicts there), push, then ask to merge again.` On GitHub, **Update branch** with **Update with merge commit** does the same for a branch that is only behind.
+- `/crav1-open-pr` shows the error when a push is rejected because the remote branch moved, and says to pull with `git pull --no-rebase`, resolve any conflicts, and push again. It never force-pushes.
+
+The steps, when you want them:
+
+```text
+git switch develop
+git pull --ff-only
+git switch feat/orders-retry
+git merge develop
+git push
+```
+
 ## PR note (1.65.0)
 
 `/crav1-open-pr` does not save the body it drafts: that is its own summary of the spec, plan and verify. After a confirmed merge, `/crav1-merge-pr` writes or updates the pull request's PR note in the specs repo (`docs/notes/YYYY-MM/YYYY-MM-DD-pr-<repo>-<n>.md`, its title and description, `kind: pull request`), with any edits made to the description since. It is not committed. A review with `/crav1-review-pr` writes the same note. From the specs repo, a pull request in another repo is reviewed with `/crav1-review-pr <repo> <n>`.

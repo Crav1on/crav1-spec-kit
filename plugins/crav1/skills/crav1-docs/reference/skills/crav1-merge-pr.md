@@ -12,6 +12,8 @@ Merge one named pull request only when that turn asks; always a merge commit; no
 
 1.64.0: after a confirmed merge, says `<n> of <m> branches of <slug> now merged into <target>` per spec. No file edits.
 
+1.66.0: a branch that is behind the base or has conflicts gets one line: merge the base into the branch, push, then ask to merge again. Never a rebase.
+
 ## Runs when
 
 This turn asks to merge a named pull request. Called by the user.

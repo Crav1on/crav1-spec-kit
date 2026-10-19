@@ -228,7 +228,7 @@ Do not run `gk ai pr create` or any other interactive `gk` pull-request create. 
 Only after they pick `push` on the current draft.
 
 1. `git push -u <remote> <head>`. Never `--force`, `--force-with-lease`, `--force-if-includes`, or a refspec that starts with `+`.
-2. If the push fails, show the error. Do not open a pull request. Do not force-push.
+2. If the push fails, show the error. Do not open a pull request. Do not force-push. When it was rejected because the remote branch has commits this one lacks, say: `Pull <head> with git pull --no-rebase, resolve any conflicts, then push again.` Never suggest a rebase or a force-push (1.66.0).
 3. Open one pull request (below). If one already exists for this head → base, print that URL instead.
 
 ## Open only
@@ -330,7 +330,7 @@ When you only printed commands, stop after those commands. Do not invent a URL.
 ## Hard rules
 
 - No `git commit`, no `git commit --amend`, no stash, no `git checkout`, no new branch.
-- No force-push.
+- No force-push. No advice to rebase or force-push; a rejected push is fixed by pulling with a merge.
 - No merge (`gh pr merge`, completing an Azure DevOps pull request, or a local merge). Merging is `/crav1-merge-pr` on a later explicit ask for a named pull request. Do not run it from this skill. Do not run `/crav1-review-pr`. A review is not a merge ask.
 - No second pull request for the same head → base.
 - No repository setting changes.

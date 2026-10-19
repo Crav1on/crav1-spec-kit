@@ -6,8 +6,8 @@ description: >-
   green linter. When it has no plan.md or tasks.md, an info note, spec
   and the body, the pipeline's recorded tests, and that linter.
   Cross-cutting. Not a lane and not a bot. Same family as /crav1-open-pr
-  and /crav1-merge-pr. Ends with a paste-ready comment; posts it inline
-  and sets a verdict only after the user's yes. Re-review marks earlier
+  and /crav1-merge-pr. Ends with a paste-ready comment, link-first per
+  point; posts it as one comment and votes only after the user's yes. Re-review marks earlier
   findings fixed or open. Works across repos: from the specs repo for a
   PR in a repo listed in repos.md, or with both open. Saves the PR
   description as a PR note and follow-ups as a note in the specs repo's
@@ -95,7 +95,7 @@ The pull request must be **open**. Anything else: stop and say the state. Do not
 ### GitHub
 
 ```text
-gh pr view <n-or-url> --json number,url,title,body,author,createdAt,state,isDraft,baseRefName,headRefName,files,statusCheckRollup
+gh pr view <n-or-url> --json number,url,title,body,author,createdAt,state,isDraft,baseRefName,headRefName,headRefOid,headRepository,headRepositoryOwner,files,statusCheckRollup
 gh pr diff <n-or-url>
 gh pr checks <n-or-url>
 ```
@@ -314,9 +314,21 @@ Where: <path>
 
 No suggestions: say none.
 
+## Bugs, tests, questions (1.66.0)
+
+Each point that goes into the comment has a chat line, two lines each:
+
+```text
+B1 — bug
+What you noticed: <one line>
+Where: <path>, line <n> | no line
+```
+
+`T1 — test to add` is a concrete test for a changed behavior or a bug. `Q1 — question` is something the author or team must answer about the code repo. Same two lines. They do not change the ship line. A question is saved in the follow-ups note as a bullet that starts `Asked on the PR:`. Which section each one goes to: `references/comment-layout.md` **Which section** (drop-in: `.claude/skills/crav1-review-pr/references/comment-layout.md`; plugin: `skills/crav1-review-pr/references/comment-layout.md`).
+
 ## Ship or not
 
-Show findings, then info notes, then suggestions.
+Show findings, then info notes, then suggestions, then bugs, tests to add and questions.
 
 When the first section has no **fix** and no **drop**, the review says **ship**. Say it is clean. Info notes do not change that.
 
@@ -330,7 +342,7 @@ Next, after this pull request merges: /crav1-refresh-system-notes, to bring its 
 
 For a pull request in another repo (1.65.0), the same line also names `/crav1-add-to-spec code change <repo> <head branch>`, which brings the merged branch into the spec. Do not run either.
 
-Then the [paste-ready comment](#paste-ready-comment), then the [post offer](#post-it). Then stop.
+Then `Verdict: <Approve | Approve with comments | Changes needed>` (any Blocker or Bug: Changes needed; only tests to add or a question: Approve with comments; nothing: Approve), then the [paste-ready comment](#paste-ready-comment), then the [post offer](#post-it). Then stop.
 
 Do not merge. Merge stays a later explicit `/crav1-merge-pr` ask for this named pull request. Do not run it. A review is not that ask. `/crav1-merge-pr` still stops on its own when a required host check is red. This skill does not replace that stop, and it does not clear it.
 
@@ -338,7 +350,7 @@ Do not post or vote except as [Post it](#post-it) says. Do not open a spec. Do n
 
 ## Re-review
 
-When the pull request already has an earlier review, this run is a re-review. Read the earlier findings from the pull request's own review comments and threads (GitHub `gh api repos/<owner>/<repo>/pulls/<n>/comments` and `gh pr view <n> --json reviews,comments`; Azure DevOps `az repos pr thread list` or `az rest --method get` on the pull request threads). Comments from anyone count, including ones this skill posted. A paste-ready block still in this chat is the fallback only when the pull request has no earlier review comments. When neither exists, do a first review.
+When the pull request already has an earlier review, this run is a re-review. Read the earlier findings from the pull request's own review comments and threads, including the bullets of an earlier one-comment review (each link gives the path and lines) (GitHub `gh api repos/<owner>/<repo>/pulls/<n>/comments` and `gh pr view <n> --json reviews,comments`; Azure DevOps `az repos pr thread list` or `az rest --method get` on the pull request threads). Comments from anyone count, including ones this skill posted. A paste-ready block still in this chat is the fallback only when the pull request has no earlier review comments. When neither exists, do a first review.
 
 Go through each earlier finding, one line each, before the new findings:
 
@@ -351,19 +363,18 @@ A thread marked resolved whose problem is still there is flagged `resolved but s
 
 Status lines and thread replies follow [Comment style](#comment-style): first person, friendly, varied, for example "Thanks, this looks sorted now in `abc1234`" or "I think there is still a little bit left here: …". A still-open finding is said softly, with the same information.
 
-New findings go under their own heading, `New findings`, in the same sections as below. The ship-or-not rule counts still-open, partly-fixed, and new first-section findings.
+In the comment, earlier points go under `### Since last time` and new points under the normal sections (`references/comment-layout.md` **Re-review**). The ship-or-not rule counts still-open, partly-fixed, and new first-section findings.
 
 ## Paste-ready comment
 
-End every review with one fenced Markdown block the user can paste into the pull request as one comment. It follows [Comment style](#comment-style).
+End every review with one fenced Markdown block the user can paste into the pull request as one comment. Build it exactly as `references/comment-layout.md` says (1.66.0; drop-in: `.claude/skills/crav1-review-pr/references/comment-layout.md`; plugin: `skills/crav1-review-pr/references/comment-layout.md`). In short:
 
-- First line: the verdict, one line: `Approve`, `Approve with comments`, or `Changes needed`, said in the same friendly voice.
-- Then a varied opening line (see Comment style).
-- Then the sections, in this order, leaving out a section with nothing in it: **Blocker**, **Bugs**, **Tests to add with this PR**. A first-section fix or drop is a Blocker. A defect that is not a blocker is a Bug. A missing test is under Tests to add. A suggestion, and a deliberate choice the description explains, is a follow-up: it is **not** in this block. It goes in the chat and in the follow-ups note (see [Follow-ups note](#follow-ups-note)).
-- Each remark links its file in the host's pull request files view (GitHub `https://github.com/<owner>/<repo>/pull/<n>/files`; Azure DevOps `<org-url>/<project>/_git/<repo>/pullrequest/<n>?_a=files&path=/<path>`), then gives per-line remarks as `<path>`, line `<n>`: `<remark>`, so each one can become an inline comment as it stands.
-- On a re-review, the earlier findings and their status come first, then `New findings` in the same sections.
-- No kit-internal details: no spec paths, no `docs/sources/` folders, no vault, no kit or skill names, no `F1` numbering that only this chat explains. A plan or verify miss is said in plain words about the change.
-- English, unless the user names another language.
+- No verdict line in the block; the chat shows `Verdict: …` just above it.
+- One short, plain opening line, then `### Blockers`, `### Bugs`, `### Tests to add with this PR`, `### A question` (or `### Questions`), leaving out a section with nothing in it.
+- Each point starts with the host link to its file and line on the pull request's source branch (or the PR overview, or a branch link), then a blank line and the explanation as an indented paragraph. At most one fix per point, no tails.
+- No follow-ups, no table, no closing line, no files-view link, no HTML, no kit details.
+- Advice about a branch that is behind, has conflicts, or must take another branch first says to merge `<base>` into this branch. Never a rebase.
+- English, unless the user asks for another language for this comment in this turn.
 
 ## Comment style
 
@@ -371,11 +382,12 @@ The default style for the paste-ready block, every posted comment, and every re-
 
 - Write in the user's own first-person voice. Friendly, so the author never feels criticised, harped on, or wrong. Do not say that outright.
 - Keep the source of the findings vague: "me and my checks". Never name a tool, a skill, a bot, or the kit. Never write that a tool found the author's mistakes.
-- Vary the opening every time, in the spirit of "So I have had a look, and run the PR through some of my checks". Never a fixed template.
+- The opening is one short, plain line, in the spirit of "I've looked through the PR and run it through my checks. This is what I found:". It may vary slightly. Never praise, a greeting by name, or thanks (1.66.0).
+- One fix per point at most. No second option, and nothing after the fix or the question ("your call", "let me know") (1.66.0).
 - Soft wording, same information: "I noticed…", "It looks like… maybe they could…?", "Would it be worth adding a test that…?". No flat statements of fault. Do not drop or water down a fact to sound soft.
 - Read the pull request description first. A choice the description says is deliberate is not raised as a fault. When it suggests something they "might like" or that "may be a good idea", it is a follow-up and goes to the note, not into the comment.
 
-The chat review above the block (F, I, S lines) keeps its plain format for the user. The style applies to what the author will read.
+The chat review above the block (F, I, S, B, T, Q lines) keeps its plain format for the user. The style applies to what the author will read.
 
 The block is text in the chat. Showing it posts nothing.
 
@@ -383,12 +395,12 @@ The block is text in the chat. Showing it posts nothing.
 
 Follow-ups are not posted and not in the paste-ready block. The chat review still shows them, under **Follow-ups (not for this PR)**, then one line: `Follow-ups saved: docs/notes/YYYY-MM/<file>.md`.
 
-When the review has at least one follow-up, write a note in `docs/notes/` of the specs repo, in the notes format of `crav1-add-to-spec` `references/notes.md` (1.61.0; `docs/notes/_template/note.md`; the same shape `/crav1-add-to-spec` writes, drop-in: `.claude/skills/crav1-add-to-spec/branches/meeting/assets/`; plugin: sibling `skills/crav1-add-to-spec/branches/meeting/assets/`):
+When the review has at least one follow-up or question, write a note in `docs/notes/` of the specs repo, in the notes format of `crav1-add-to-spec` `references/notes.md` (1.61.0; `docs/notes/_template/note.md`; the same shape `/crav1-add-to-spec` writes, drop-in: `.claude/skills/crav1-add-to-spec/branches/meeting/assets/`; plugin: sibling `skills/crav1-add-to-spec/branches/meeting/assets/`):
 
 - File: `docs/notes/YYYY-MM/review-pr-<n>-follow-ups.md`, in the month folder of the review date, where `<n>` is the pull request number. When two repos in this specs repo have the same pull request number, use `review-pr-<repo>-<n>-follow-ups.md`. A pull request in a repo other than the specs repo always uses `review-pr-<repo>-<n>-follow-ups.md` (1.65.0).
 - Title: `Follow-ups from PR <n> (<repo>)`.
 - Front matter: `kind: review-pr`, `source: PR <n> <repo>`, `source_date` and `imported` the review date, `pr_note:` the PR note's path (1.65.0), `used_by: []`.
-- `From review <date>. PR <n>, <repo>, <PR title>.` then one bullet per follow-up: `<path>`, line `<n>`: the follow-up in plain words. Paths and lines are kept, because the note stays in the specs repo. Use `no line` when the follow-up has no line.
+- `From review <date>. PR <n>, <repo>, <PR title>.` then one bullet per follow-up: `<path>`, line `<n>`: the follow-up in plain words. Paths and lines are kept, because the note stays in the specs repo. Use `no line` when the follow-up has no line. A question asked in the comment is a bullet too, starting `Asked on the PR:` (1.66.0); a re-review adds `(answered on the PR <date>)` when the thread has an answer.
 - Then run the notes index generator (`scripts/notes_index.py` in `crav1-add-to-spec`). Do not hand-edit an index.
 
 **Re-review.** When the note for that pull request exists (in any month folder, or flat in `docs/notes/` from before 1.61.0), update it where it is. Do not write a second note. Set `imported` to this review's date, add new follow-ups, and mark one the code now addresses as `(done in <short sha>)`. Do not remove a line. Leave `used_by` as it is, then rerun the generator. When the review has no follow-ups and the note exists, leave the note.
@@ -407,15 +419,15 @@ Writing the PR note and the follow-ups note are the only files this skill writes
 
 ## Post it
 
-After the paste-ready block, offer to post. One question. Use the questions tool when it is available. Say it posts under the user's own account. Options: post, or do not post. Nothing posts without that yes.
+After the paste-ready block, offer to post. One question. Use the questions tool when it is available. Say it posts under the user's own account as one comment, and name the vote it will set. Options: post, or do not post. Nothing posts without that yes.
 
-On yes:
+On yes (1.66.0):
 
-1. Post each per-line remark (Blocker, Bugs, Tests to add; never a follow-up), in the comment style, as an inline comment on its exact file and line in the diff (GitHub: a pending review with `gh api repos/<owner>/<repo>/pulls/<n>/reviews` and one comment per finding with `path`, `line`, `side`; Azure DevOps: one thread per finding with `threadContext` file path and line). A finding with no line in the diff goes in the summary only.
-2. On a re-review, reply in each earlier finding's existing thread with its status and the fixing commit, in the comment style. Add new inline comments only for new findings. Do not add a duplicate comment for an earlier finding.
-3. Post the summary: the paste-ready block **without** the verdict line. Follow-ups are never posted, not as inline comments and not in the summary.
-4. Then ask which verdict to set, as options: **Approve**, **Comment**, or **Request changes** (Azure DevOps: approve, no vote, wait for author, reject). Name the one the review points to. Set only the one the user picks. On GitHub the inline comments and summary go in that same review submit.
-5. Never resolve a thread. On a re-review, after posting, offer to resolve the threads marked Fixed. Resolve only on that yes.
+1. Post the block as **one comment**. No inline threads. GitHub: one review whose body is the block, submitted with the vote (`gh api repos/<owner>/<repo>/pulls/<n>/reviews` with `body` and `event`). Azure DevOps: one pull request thread whose comment is the block, then the vote.
+2. The vote follows the verdict: Changes needed is **Request changes** (GitHub) or **Wait for author** (Azure DevOps); Approve with comments is **Comment** or **Approve with suggestions**; Approve is **Approve**. Never Reject.
+3. On a re-review, post the new block as a reply in the earlier comment's thread (Azure DevOps) or as a new review (GitHub). Reply in an earlier inline thread only when one exists.
+4. Follow-ups are never posted.
+5. Never resolve a thread. On a re-review, after posting, offer to resolve existing threads whose points are now fixed. Resolve only on that yes.
 
 When a post fails, say what failed and what already posted. Do not retry by another route.
 
@@ -427,7 +439,8 @@ When a post fails, say what failed and what already posted. Do not retry by anot
 - Read-only toward the code repo and its host. The only git write there is the fetch of the pull request's two branches after **Fetch only the PR's two branches** or `fetch pr branches`.
 - No test run, and no ask to run tests. When the slug has `plan.md`, quote `verify.md` or say it is missing. When the pull request is outside the kit, do not say `verify.md` is missing. Read the pipeline's recorded test results.
 - No linter install. No branch-protection change. No required-check edit.
-- No comment, no vote, and no thread resolve without the user's yes in [Post it](#post-it). No label, no reviewer assignment.
+- No comment, no vote, and no thread resolve without the user's yes in [Post it](#post-it). One comment, no inline threads, never Reject. No label, no reviewer assignment.
+- Suggest merging `<base>` into the branch, never a rebase, `pull --rebase`, or a force-push.
 - No merge. Do not run `/crav1-merge-pr`.
 - Do not run `/crav1-refresh-system-notes`. On an outside pull request, name it once, as the next step after the pull request merges.
 - Do not run this skill from `/crav1-open-pr`, `/crav1-merge-pr`, spark, specify, plan, or verify.
