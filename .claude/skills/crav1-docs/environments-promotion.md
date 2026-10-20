@@ -29,6 +29,7 @@ Per repo, environments are ordered dev < test < stage, uat, qa < pre-prod < prod
 
 `Promotion: on the branch that deploys to test (develop); not yet on the branch that deploys to prod (main).`
 
+- **What it names.** The furthest environment reached, then each later environment not yet reached, and the chain: `Promotion: on the branch that deploys to test (develop); not yet on the branch that deploys to prod (main). (chain: dev → test → prod)`.
 - **Branch reach, not deployment proof.** An environment is reached when the work is contained in a branch its line names (the same merged tests as done). The wording is never "deployed to".
 - **Release branches.** `on release/2026.11 (deploys to prod)` names the newest matching branch that contains the work. A fix made on a release branch, `(into release/2026.11)`, shows `not back on develop` until it reaches the base branch.
 - **Tags.** `in tag v2.3.0 (deploys to prod)` names the newest matching tag that contains the work; with none, `not yet tagged`.
