@@ -2,6 +2,17 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.71.1 (2026-10-20)
+
+Leaner `/crav1-add-to-spec` runs. Its three biggest reference files are split so a run reads only the part it needs. Text moved word for word; no rule, question or wording changed.
+
+### Kit
+
+- **Research check.** `references/research-stale.md` keeps the check every kept quote runs (when to compare, what to read, what is a hit) plus Readers and Stop. Marking and the revisit request moved to `research-stale-mark.md`, read only on a hit. Clearing, narrowing, routing and answered-later moved to `research-stale-clear.md`, read only when a mark is cleared, narrowed or re-checked. Other skills that point at the clear or answered-later part now point at `research-stale-clear.md`.
+- **Imported sources.** `references/sources.md` keeps the shared rules (folder, README, reading, versions, headless runs, personal data and secrets, spec lines). Mails and images inside a mail moved to `sources-mail.md`; binary files to `sources-binary.md`. A paste reads neither.
+- **Handoffs.** `references/handoffs.md` is now one file per section (`handoffs-read-environment.md`, `handoffs-suggest-tests.md`, `handoffs-ado-push.md`, `handoffs-ado-pull.md`, `handoffs-meeting.md`, `handoffs-import-answers.md`, `handoffs-picture.md`, `handoffs-imported-sources.md`), each behind its own pointer in `SKILL.md`.
+- **Words read.** A pasted dump reads about 3,000 words instead of 6,600. A mail import reads about 9,000 (9,650 with images) instead of about 14,300.
+
 ## 1.71.0 (2026-10-20)
 
 Slimmer skills. Each `SKILL.md` keeps the common path; rare cases moved word for word into the skill's `references/`, behind a one-line pointer that says when to read them. No rule changed.
