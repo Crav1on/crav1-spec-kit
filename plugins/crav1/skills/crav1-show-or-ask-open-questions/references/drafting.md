@@ -20,7 +20,7 @@ When the user did not name one, ask. Options only, each explained:
 - A question marked as a decision is phrased as a choice to make, with the options the spec names.
 - Do not add a question the specs do not have. Do not answer a question in the draft.
 
-Before showing the draft, run the personal-data and secrets check on the drafted text, the same way as for other outbound text. Follow `crav1-add-to-spec` `references/sources.md` (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/references/sources.md`; plugin: sibling `skills/crav1-add-to-spec/references/sources.md`), sections **Personal data**, **Secrets**, and **Transfer data policy**. A secret is always removed and is never a choice. Use the transfer data policy when it exists. When it does not, the check may ask once and may write it after a yes, as that file says. An item it cannot place is asked one at a time.
+Before showing the draft, run the personal-data and secrets check on the drafted text, the same way as for other outbound text. Follow `crav1-add-to-spec` `references/sources.md` (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/references/sources.md`; plugin: sibling `skills/crav1-add-to-spec/references/sources.md`), sections **Personal data** and **Secrets**, and `references/sources-flagged.md` in the same skill, section **Transfer data policy**. A secret is always removed and is never a choice. Use the transfer data policy when it exists. When it does not, the check may ask once and may write it after a yes, as that file says. An item it cannot place is asked one at a time.
 
 Show the draft in one block the user can copy. Under it, one line: `Nothing was sent.`
 

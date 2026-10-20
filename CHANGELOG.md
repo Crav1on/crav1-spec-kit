@@ -2,6 +2,17 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.71.2 (2026-10-20)
+
+Leaner imported-source runs in `/crav1-add-to-spec`. `references/sources.md` is split so a run reads only what its case needs. Text moved word for word; no rule, question or wording changed.
+
+### Kit
+
+- **Sources split.** `references/sources.md` keeps what every import needs: folder, README, the personal-data and secrets check, spec lines and do not commit, plus one routing line. The transfer data policy, the note and the list, and the one question for the recommendations moved to `sources-flagged.md`, read only when an item is flagged or a secret is found. Black-boxed text, Word files, dates, versions and conflicts, and headless runs moved to `sources-rare.md`. Temporary files, an image the kit cannot view, and duplicate images moved to `sources-binary.md`.
+- **Pointers instead of copies.** The dump and meeting branches, the imported-sources handoff, `/crav1-existing-to-specs` (repos and bundle) and `/crav1-bundle-to-specs` no longer restate the personal-data, secrets, policy and image rules; each has one line pointing at the sources files.
+- **Repointed.** `/crav1-show-or-ask-open-questions` and `/crav1-review-pr` read the transfer data policy from `sources-flagged.md`; `/crav1-verify-build-against-spec` and `/crav1-ado-sync` push features read headless runs from `sources-rare.md`.
+- **Words read** (dump path, including its branch file): pasted dump 6,466 to 6,367; pasted transcript with nothing flagged 11,273 to 9,385; mail with flagged items 12,432 to 11,802; mail with images 13,080 to 12,635; `.docx` transcript 11,921 to 10,654.
+
 ## 1.71.1 (2026-10-20)
 
 Leaner `/crav1-add-to-spec` runs. Its three biggest reference files are split so a run reads only the part it needs. Text moved word for word; no rule, question or wording changed.
