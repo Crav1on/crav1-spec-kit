@@ -46,6 +46,10 @@ If the message leaves out Azure DevOps, the org, or the project, the command sto
 
 Nothing else is written. No `docs/system`. No architecture spec. No feature spec. No left-out file.
 
+## Branches (1.69.0)
+
+After Unclear, a fourth section, **Branches**, proposes `docs/environments/promotion.md` lines from the same definitions: a YAML `trigger:` branch list, a stage `condition:` on `Build.SourceBranch`, a classic release's artifact branch filter, and `refs/tags/` triggers as tag lines. For example `orders-api | develop | test | pipeline orders-cd, stage DeployTest` and `orders-api | main | prod | pipeline orders-cd, stage DeployProd`. It still reads definitions only, never runs. Confirm the section like the others; only confirmed lines are appended. Status then shows a `Promotion:` line. The format: [environments-promotion.md](environments-promotion.md).
+
 ## After
 
 The next command is the host read. This command does not run it.

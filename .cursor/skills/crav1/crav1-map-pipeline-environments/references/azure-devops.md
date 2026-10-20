@@ -105,3 +105,15 @@ Use the input the task shows. The first marks field is the resource id when an i
 A Kubernetes or Helm task counts only when an input shows an Azure resource id or an app name. Do not invent a cluster id from the service connection name.
 
 A slot input is not a separate resource and not the environment. The stage name is the environment.
+
+## Branches (1.69.0)
+
+From the same definitions already read (no new command, no runs), take the branch facts for `promotion.md` lines:
+
+- a YAML pipeline's `trigger:` branch list (`branches: include:`, or a bare list): each branch or pattern deploys to the environments its deploy stages map to
+- a stage `condition:` that names `Build.SourceBranch` (`eq(variables['Build.SourceBranch'], 'refs/heads/main')`, `startsWith(…, 'refs/heads/release/')`): that stage's environment gets that branch or pattern (`release/*`)
+- a classic release definition's artifact branch filter (`sourceBranch`, `triggerConditions`): each environment of that release gets the filtered branch
+- a `trigger:` or condition that names `refs/tags/<pattern>`: a tag line, second field `tag <pattern>` (`tag v*`)
+
+The repo is the definition's repository name. The environment is the stage's environment word, by the same Stage name rules. A condition beats the trigger for its stage. A branch expression with an unresolved variable, or a stage whose word is unclear, is unclear: no line. Excluded branches (`exclude:`) never get a line.
+

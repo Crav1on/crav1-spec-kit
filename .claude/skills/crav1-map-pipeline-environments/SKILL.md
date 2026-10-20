@@ -5,7 +5,8 @@ description: >-
   named. Optional: one pipeline. List and show only. Propose marks for the
   resources each deploy step names, from the stage name, using the same
   whole-word rule as /crav1-read-environment. Append confirmed lines to
-  docs/environments/marks.md. Do not write docs/system, the architecture
+  docs/environments/marks.md, and branch-to-environment lines to
+  docs/environments/promotion.md. Do not write docs/system, the architecture
   spec, feature specs, or left-out. Do not start Specify, Plan, or Build.
 disable-model-invocation: true
 icon: workflow
@@ -181,6 +182,10 @@ When an existing line matches the resource and the environment class differs, sh
 
 A line the user did not confirm is not written. Unclear items write nothing.
 
+## promotion.md (1.69.0)
+
+Path: `docs/environments/promotion.md`, next to marks.md. Same four-field shape, the same environment words, and the same append rules: `<repo> | <branch, pattern or tag <pattern>> | <environment>[ (after <environment>)] | pipeline <name>, stage <stage>`. Example: `orders-api | develop | test | pipeline orders-cd, stage DeployTest`. The branch facts come from the definitions only, as `references/azure-devops.md` says under **Branches**. Create the file (and `docs/environments/`) only when at least one line is confirmed. Never rewrite a line; already there means the same repo, branch field and environment word. This command proposes known environment words only; an `(after …)` position is written by hand. The format is in `docs/environments-promotion.md`.
+
 ## Sections
 
 Show one section at a time. Each section has its own question and its own answer. Do not merge sections. List every item. Do not drop a resource, a stage, a group-context line, or an existing line to keep a section short.
@@ -192,6 +197,8 @@ Use only these sections, in this order. Do not invent another section.
 **Shared.** Every shared resource, both stages, and the proposed lines. Say there is no `shared` word. When none, the section says nothing is shared.
 
 **Unclear.** Every unclear resource and the reason. Say no mark is proposed. When none, the section says nothing is unclear.
+
+**Branches (1.69.0).** Every proposed `promotion.md` line (branch, pattern or tag line, environment, pipeline and stage), and every branch expression left unclear with its reason. When none, the section says no pipeline names a branch.
 
 Stop. Ask the section in front of you. Stop until that section has an answer. Append the confirmed lines from that section, then ask the next section. Do not ask the next section in the same questions call.
 
@@ -223,6 +230,17 @@ Use the questions tool when it is available. Options only. Put that section’s 
 1. **Nothing is unclear.**
 2. **I will edit this section.**
 
+**Branches, when it lists proposed lines.** Options:
+
+1. **Append every proposed line in this section** (to `docs/environments/promotion.md`).
+2. **Append none of this section.**
+3. **I will edit this section.**
+
+**Branches, when nothing is in it.** Options:
+
+1. **No pipeline names a branch.**
+2. **I will edit this section.**
+
 When the answer is **I will edit this section**, stop. Wait for the edited section. That edit is the answer. Do not ask that section again. Sections already answered stay answered. A line they struck is not appended. A resource they add that no pipeline step names stays out. Say the pipeline does not name it. Omitting a listed item does not drop it.
 
 An unclear confirm writes no line. Do not write `marked by the user` from this command.
@@ -235,7 +253,7 @@ Output only:
 
 - Org, project, and the pipelines read (name and kind), or that the read stopped before a pipeline list
 - Counts: one environment, shared, unclear
-- Whether `docs/environments/marks.md` changed
+- Whether `docs/environments/marks.md` changed, and whether `docs/environments/promotion.md` changed
 - Next: `/crav1-read-environment` (do not run it). When a file changed, also name `/crav1-finalize-commit` (do not run it). When nothing was written, still name `/crav1-read-environment`, and do not name finalize-commit
 
 ## Hard rules
@@ -250,7 +268,7 @@ Output only:
 - Mark only the resource the deploy step names. The group is context. Do not mark the whole group.
 - A secret is never printed. An unresolved variable is unclear. No mark is proposed for unclear.
 - The marks format has no `shared` word. Shared proposes one existing-format line per stage.
-- Append only a line the user confirmed. Create the file only then. Never rewrite an existing line. A disagreement is shown and the existing line stays.
+- Append only a line the user confirmed, to marks.md or promotion.md. Create the file only then. Never rewrite an existing line. A disagreement is shown and the existing line stays.
 - Do not write `docs/system`, `docs/architecture/spec.md`, a feature spec, or `docs/architecture/left-out.md`.
 - One section at a time. Every item stays listed.
 - Do not start Specify, Plan, or Build. Name `/crav1-read-environment` and do not run it.
