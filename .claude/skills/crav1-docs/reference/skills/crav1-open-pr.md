@@ -14,6 +14,8 @@ Push the change branch only after an explicit yes, then open one pull request (n
 
 1.66.0: a push rejected because the remote branch moved says to pull with `git pull --no-rebase`, resolve conflicts, and push again. Never a rebase or a force-push.
 
+1.68.0: the into step is offered and written: a head that split off another spec branch gets one yes/no question, and a sub-branch's PR goes into its spec branch.
+
 ## Runs when
 
 Commits exist; want a pull request. Called by the user.

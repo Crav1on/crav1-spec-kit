@@ -12,6 +12,8 @@ File-level `plan.md` and `tasks.md`; each verify note names the checks before co
 
 1.64.0: Built pieces reads every work branch of the spec without checkout (and `../<repo>` for another repo), labels pieces `only on <branch>, not merged`, and ends a task with `(branch: …)` when its piece lives on one branch.
 
+1.68.0: a task may name a sub-branch of the spec branch, `(branch: feat/orders-capacity-t3)`.
+
 ## Runs when
 
 Spec is accepted. Called by the user.

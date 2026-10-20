@@ -14,6 +14,8 @@ Shows summary counts per slice, then Ready, Blocked (one reason each, recorded o
 
 1.64.0: shows a task's `(branch: …)` and one Branches line from local git only.
 
+1.68.0: the `Sub-branches:` and `left behind:` lines and `merged, reverted on <base> (<sha>)`, report only.
+
 ## Runs when
 
 You want to know which tasks can be built now, and why the others cannot. Called by the user, any time.

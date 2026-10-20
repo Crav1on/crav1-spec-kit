@@ -438,6 +438,7 @@ skills:
   in_depth:
   - Prompt for `feat/<slug>` or specify-only `spec/<slug>`; no silent checkout, no push, no PR.
   - '1.64.0: the Build prompt puts a task''s `(branch: …)` first, marked (Recommended), and never creates it from default without asking.'
+  - '1.68.0: a missing task sub-branch is offered as **Create it from the spec branch (Recommended)**; the `(into …)` marker is written after the yes.'
   use_when: 'Brownfield: leave the default branch'
   table:
     reads: Current branch, default branch, dirty tree
@@ -500,6 +501,7 @@ skills:
     committed code on the repo and branch the spec names before wording issues. A spec with no code behind
     it skips that read. Does not offer finish, add a test, or leave.
   - '1.64.0: reads every listed work branch without checkout; a yes on writing the branch adds to the `Branch:` list; a listed branch that is gone and not merged is offered `(dropped)` (`mark-dropped`); a deleted branch whose work is in the base shows `merged, branch deleted`.'
+  - '1.68.0: reads and writes the `(spec branch)` and `(into …)` markers on the Match `Branch:` list after a yes.'
   use_when: The spec is still mushy
   table:
     reads: Spec, diagrams, ADRs, reviewer findings, and the committed code when the slice is partial or
@@ -681,6 +683,7 @@ skills:
   - '1.64.0: a code change can name a repo and branch (`code change orders-api feat/orders-retry`); the code is read read-only from `../<repo>`. The branch diff starts at the fork point (the repo''s `Merges into` branch, the default branch, or another spec branch), the slice `Synced at` line keeps one entry per branch, a yes records `Merges into` in `repos.md`, and the note''s `commits:` list plus `git patch-id` stop a commit being imported twice, also after a rebase.'
   - '1.65.0: a code change can be a pull request (`code change orders-api PR 71`, or its URL). It writes or reuses the PR note (the pull request''s title and description, `kind: pull request`) and links it from the code-change note with `pr_note:`. Given a branch, it writes the PR note when a signed-in `gh` or `az` host shows exactly one pull request for that branch; otherwise it says why it wrote none.'
   - '1.67.1: a one-slice read of a work branch also adds that branch to the spec''s Match `Branch:` list (never a base branch; existing entries and markers stay).'
+  - '1.68.0: a code change asks whether a branch that split off another spec branch merges into it; a yes writes `(into …)` and `(spec branch)` on the Match `Branch:` list, a headless run writes nothing and treats it as stacked. The commit list leaves out merge commits, and a spec-branch read imports only its own commits.'
   use_when: New information for specs that already exist
   table:
     reads: 'A fact: That information and one `spec.md`; A dump: The dump and existing spec folders; A
@@ -814,6 +817,7 @@ skills:
     branch and chooses finish the gap, add a verify test, or leave it before any task. A piece that already
     matches v0 is not a choice.
   - '1.64.0: Built pieces reads every work branch of the spec without checkout (and `../<repo>` for another repo), labels pieces `only on <branch>, not merged`, and ends a task with `(branch: …)` when its piece lives on one branch.'
+  - '1.68.0: a task may name a sub-branch of the spec branch, `(branch: feat/orders-capacity-t3)`.'
   use_when: Spec is accepted
   table:
     reads: Spec, diagrams, ADRs; the named repo and branch when the slice is partial
@@ -933,6 +937,7 @@ skills:
   - 'A range or all (was `/crav1-complete-tasks`): Orchestrates one worker per `T#` (`T1-T3` or all unchecked);
     stops the batch when a worker needs you.'
   - '1.64.0: a task''s `(branch: …)` is offered first (Recommended) in the Build prompt; range and all-tasks runs switch to each task''s branch on a clean tree, and a missing branch blocks that task.'
+  - '1.68.0: offers to create a missing task sub-branch from its spec branch and writes its `(into …)` marker after the yes.'
   use_when: You want to build one task, a range, or all unticked tasks
   table:
     reads: 'Inside each worker: One `T#`, the plan, and the spec; One task: One `T#` and the persist rule;
@@ -1009,6 +1014,7 @@ skills:
     tests. A missing dependency is a `BLOCKER:` line at the top of the summary, also in a headless run,
     which uses the two-pass questions file.
   - '1.64.0: the TL;DR adds a Branches line (merged into the base, deleted-but-merged, rewritten, shared); demoable needs every work branch merged. Report only.'
+  - '1.68.0: the `Sub-branches:` and `left behind:` lines, done when the top-level branches reached the base, and `merged, reverted on <base> (<sha>)`, report only.'
   use_when: Want proof against acceptance
   table:
     reads: Spec, tasks, plan, and the running tree
@@ -1129,6 +1135,7 @@ skills:
     May name `/crav1-review-pr` and does not run it. Next explicit ask to merge is `/crav1-merge-pr`.
   - '1.64.0: the base is the head''s `(into …)` branch, then the repo''s `Merges into` branch (also from a sibling spec repo), then the default branch. The slug is also found from a spec that lists the head branch.'
   - '1.66.0: a push rejected because the remote branch moved says to pull with `git pull --no-rebase`, resolve conflicts, and push again. Never a rebase or a force-push.'
+  - '1.68.0: the into step is offered and written: a head that split off another spec branch gets one yes/no question, and a sub-branch''s PR goes into its spec branch.'
   use_when: Commits exist; want a pull request
   table:
     reads: The change branch, the spec, and `verify.md`
@@ -1248,6 +1255,7 @@ skills:
     is red.
   - '1.64.0: after a confirmed merge, says `<n> of <m> branches of <slug> now merged into <target>` per spec. No file edits.'
   - '1.66.0: a branch that is behind the base or has conflicts gets one line: merge the base into the branch, push, then ask to merge again. Never a rebase.'
+  - '1.68.0: after a sub-branch merge, says `<n> of <m> sub-branches merged into <spec branch>` and any `left behind` branch; a reverted branch shows `merged, reverted on <base> (<sha>)`, report only.'
   use_when: This turn asks to merge a named pull request
   table:
     reads: That named pull request
@@ -1280,6 +1288,7 @@ skills:
   - It reads the kit repo's `docs/`, or the `crav1-docs/` folder bundled next to the skills (plugin, Cursor drop-in, Claude Code drop-in), never GitHub. When online, it reads the tag names once and says so when a newer version is tagged. It writes nothing and runs no other skill. It is cross-cutting. It is not a starter option.
   - '1.64.0: `status <slug>` and `where am I` add the Branches line and route unmerged work to `/crav1-open-pr` or `/crav1-merge-pr`.'
   - '1.67.1: remote copy ages count whole calendar days in local time; a commit made today is `today`, not `1 day old`.'
+  - '1.68.0: status adds the `Sub-branches:` and `left behind:` lines and `merged, reverted on <base> (<sha>)`, report only.'
   use_when: You want to know what to run next, in what order, or what a skill does
   table:
     reads: The kit docs (kit repo, or the bundled `crav1-docs/` next to the skills), and the slice's file state
@@ -1307,6 +1316,7 @@ skills:
   - '**`/crav1-tasks-ready-to-build`** reads `spec.md` open questions, `plan.md` (the `Reviewed:` line and `## Risks`), `tasks.md`, and `verify.md` for one slice or every slice. A ticked task is Done when `verify.md` lists it as verified, otherwise Needs verify. Then a task is blocked by a missing `plan.md`, by a kept-open question whose `Blocks:` line names it, by a kept-open question or plan Risk with no `Blocks:` line (the whole slice, inferred), or by an unticked task in its `(after: T#)` (recorded) or, with no `(after: …)`, any earlier unticked task (inferred). Otherwise it is Ready, with a warning when the plan review is unknown (inferred) or still has open `P#`s.'
   - 'Shows summary counts per slice, then Ready, Blocked (one reason each, recorded or inferred), Needs verify, a Done count, `Next: /crav1-build-tasks T#`, and a `Source:` line. Local only: it never reads Azure Boards and names `/crav1-ado-sync` for task states there. It writes nothing and runs no other skill. It can run any time. It is cross-cutting. It is not a starter option.'
   - '1.64.0: shows a task''s `(branch: …)` and one Branches line from local git only.'
+  - '1.68.0: the `Sub-branches:` and `left behind:` lines and `merged, reverted on <base> (<sha>)`, report only.'
   use_when: 'You want to know which tasks can be built now, and why the others cannot'
   table:
     reads: '`spec.md` open questions, `plan.md`, `tasks.md`, and `verify.md` per slice'

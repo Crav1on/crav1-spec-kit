@@ -49,6 +49,17 @@ A task line can name its branch: `- [ ] T3: … (after: T1) (branch: feat/orders
 - `/crav1-build-features` does the same per slug. A slug whose tasks are done but whose branches aren't all merged shows `done (2 branches not merged)`.
 - `/crav1-tasks-ready-to-build` shows the branch beside each ready task, and one Branches line.
 
+## A spec branch with task sub-branches (1.68.0)
+
+Some teams give a spec its own long-lived branch and each task a short sub-branch that merges into it. Made-up example: `feat/orders-capacity` is the spec branch; `feat/orders-capacity-t3` and `feat/orders-capacity-t4` are cut from it.
+
+- **Markers.** The Match line reads `- Branch: feat/orders-capacity (spec branch); feat/orders-capacity-t3 (into feat/orders-capacity)`. When a read finds a branch that split off another spec branch, `/crav1-add-to-spec` code change, `/crav1-tighten-spec` or `/crav1-open-pr` asks once: `feat/orders-capacity-t3 split off feat/orders-capacity. Does it merge into feat/orders-capacity?` A yes writes the markers. A no, or a headless run, writes nothing and treats it as stacked.
+- **Tasks.** `/crav1-plan-from-spec` may name a sub-branch: `(branch: feat/orders-capacity-t3)`. When it doesn't exist yet, the Build prompt offers **Create feat/orders-capacity-t3 from feat/orders-capacity (Recommended)** and writes the `(into …)` marker after the yes.
+- **No double import.** Reading the spec branch after its sub-branches imports only the commits made directly on it. A squash-merged sub-branch counts as covered through the host PR, or is listed as `may already be in <note>`.
+- **Pull requests.** A sub-branch's PR goes into the spec branch; the spec branch's PR goes into the repo's `Merges into` branch, else the default branch.
+- **Done.** Status shows `Sub-branches: 1 of 2 merged into feat/orders-capacity.` The spec is done when the spec branch has reached the base branch. A sub-branch that never merged is reported as `left behind: feat/orders-capacity-t4 (not in feat/orders-capacity)` and doesn't block done.
+- **Reverts.** A merged branch whose change was later reverted on the base shows `feat/orders-retry: merged, reverted on develop (<sha>)`. It is report only and doesn't change done.
+
 ## After
 
 Prove the slice against the spec: [Verify and fix](from-verify.md). Then [From commit to merge](from-commit.md).

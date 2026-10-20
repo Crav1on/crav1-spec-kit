@@ -22,6 +22,8 @@ A range or all (was `/crav1-complete-tasks`): Orchestrates one worker per `T#` (
 
 1.64.0: a task's `(branch: …)` is offered first (Recommended) in the Build prompt; range and all-tasks runs switch to each task's branch on a clean tree, and a missing branch blocks that task.
 
+1.68.0: offers to create a missing task sub-branch from its spec branch and writes its `(into …)` marker after the yes.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.

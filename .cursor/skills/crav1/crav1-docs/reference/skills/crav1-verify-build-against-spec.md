@@ -14,6 +14,8 @@ Before the tests, a local dependency preflight checks Azurite, database containe
 
 1.64.0: the TL;DR adds a Branches line (merged into the base, deleted-but-merged, rewritten, shared); demoable needs every work branch merged. Report only.
 
+1.68.0: the `Sub-branches:` and `left behind:` lines, done when the top-level branches reached the base, and `merged, reverted on <base> (<sha>)`, report only.
+
 ## Runs when
 
 Want proof against acceptance. Called by the user and by `crav1-build-task-agent`.

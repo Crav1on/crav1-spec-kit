@@ -14,6 +14,8 @@ Merge one named pull request only when that turn asks; always a merge commit; no
 
 1.66.0: a branch that is behind the base or has conflicts gets one line: merge the base into the branch, push, then ask to merge again. Never a rebase.
 
+1.68.0: after a sub-branch merge, says `<n> of <m> sub-branches merged into <spec branch>` and any `left behind` branch; a reverted branch shows `merged, reverted on <base> (<sha>)`, report only.
+
 ## Runs when
 
 This turn asks to merge a named pull request. Called by the user.
