@@ -49,7 +49,7 @@ Do not edit `docs/notes/index.md` or `docs/notes/YYYY-MM/index.md` by hand. Afte
 
 ## Writing the spec points
 
-Each matching spec gets only its own short points, quoted as **Add to that spec.md** in `SKILL.md` says, each followed by `Full source: docs/notes/YYYY-MM/<file>.md`. Then add the slug to the note's `used_by`.
+Each matching spec gets only its own short points, quoted as **Add to that spec.md** in `references/fact.md` says, each followed by `Full source: docs/notes/YYYY-MM/<file>.md`. Then add the slug to the note's `used_by`.
 
 A **parked** spec (a `Parked:` line) gets nothing written. Add its slug to the note's `waiting_for`. Say `saved as a note for <slug> (parked)`. Un-park is `/crav1-retire-spec`; it moves the slug from `waiting_for` to `used_by`.
 
