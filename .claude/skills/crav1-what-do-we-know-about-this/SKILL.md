@@ -55,12 +55,7 @@ Stop until the user picks. Do not scan the repo to pick a thing. Do not guess.
 
 ### Minutes and dumps
 
-Pasted minutes, a transcript, or a long dump are out of scope. Do not extract items. Do not answer from the paste.
-
-- Minutes or a transcript: name `/crav1-add-to-spec` and stop.
-- A dump of notes, tickets, old docs, diagrams, or screenshots: name `/crav1-add-to-spec` and stop.
-
-A sentence or two is in scope. A long dump is not.
+Read `references/inputs.md` ("Minutes and dumps") only when the input is minutes or a dump.
 
 ## Three cases
 
@@ -84,31 +79,7 @@ When nothing is written down, name those three and stop. Do not pick one.
 
 ## Match, one pass
 
-One pass. Do not hunt through the whole codebase. Do not open a second search after the first comes back.
-
-Places, in this order when the user did not `@` a path:
-
-- spec titles in `docs/specs/<slug>/spec.md` (skip `_template`)
-- `tasks.md` in those folders
-- Match quotes (`## Match` in those `spec.md` files)
-- `docs/system/`
-- `docs/architecture/spec.md`
-- `docs/environments/marks.md`
-- one exact-name code query, then, only when that exact name misses, one key-word code query
-
-An `@` of a spec folder or a code folder replaces that list. The search stays inside that path. Do not search specs outside a code folder they named. Say that the search stayed in the path.
-
-**Exact name first.** A slug, a spec title, a function name, or a resource name is a whole token. Case-sensitive first. A case-insensitive hit counts only when it is the only hit.
-
-**Key words when the exact name misses.** Match the key words against the same places. Spec titles and Match quotes weigh highest. A glossary row is a word, not a slice. A neighbor name is not a hit.
-
-**One slice clearly wins.** Answer from it (case 1 or case 2) and name the path `docs/specs/<slug>/`.
-
-**Two or more close hits.** List every one, one line each: the path and the title line. Ask which. Use the questions tool when it is available. One option per hit. Do not guess. Do not drop one to keep the list short. Stop until the user picks. Then answer from that slice.
-
-**No slice.** Case 3.
-
-Reading the winning slice is the answer, not a second pass. Read that `spec.md`, `plan.md` and `tasks.md` when they exist, `## Match`, `## Open questions`, and `## Research findings` when that heading is there. Read a `docs/research/` note those findings link to. A stale mark is shown as stale. Follow the readers section of `crav1-add-to-spec` `references/research-stale.md` (drop-in: `.claude/skills/crav1-add-to-spec/references/research-stale.md`; plugin: sibling `skills/crav1-add-to-spec/references/research-stale.md`). Quote the mark. Name the path. Do not treat that research as current. Do not clear the mark. Use the hits the same pass already found in `docs/system/`, `docs/architecture/spec.md`, and `docs/environments/marks.md`.
+Read `references/match.md` ("Match, one pass") only when you match the question against specs and notes.
 
 ## Repo answer, then live reads
 
@@ -118,104 +89,23 @@ Two live reads. Both are read-only. Tag each fact `Live read.`
 
 ### Finding `az`
 
-Try `az` on `PATH` first. On Windows, `az.cmd` on `PATH` counts.
-
-Before reporting `az` as not installed, check the default install paths for the operating system where this command is running. Use the first path that exists.
-
-- Windows: `C:\Program Files\Microsoft SDKs\Azure\CLI2\wbin\az.cmd`, then `C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\wbin\az.cmd`
-- macOS: `/opt/homebrew/bin/az`, then `/usr/local/bin/az`
-- Linux: `/usr/bin/az`, then `/usr/local/bin/az`
-
-When one of those paths exists, use that path for every `az` call in this command. Do not install `az`.
-
-When `az` is not on `PATH` and none of those paths exists, `az` is not installed.
+Read `references/live-reads.md` ("Finding `az`") only when a live read is needed.
 
 ### Azure resource settings and recent changes
 
-Use `az` to list and show. Do not create, update, delete, deploy, start, stop, or set a resource. Do not switch subscription. One pass on the current account.
-
-- `az account show` for the current account
-- `az resource list` for a resource whose name matches the thing
-- `az resource show` for that resource’s settings
-- `az monitor activity-log list` for recent changes on that resource id
-
-Recent changes are the operation name, the status, the time, and the caller when the log shows a name. No request body. No payload.
-
-Do not print a secret, a key, a password, a connection string, or a token. A secret name may be cited. The secret value is not. A setting value is shown only when it is a resource id or a hostname, or when the resource is non-prod and the value is not a secret.
-
-Do not read request logs, metrics, or traffic. Do not open a database. Do not open storage. Never a row. Never a blob.
-
-A resource name that is not in the question and not in the repo answer: this live read does not apply. Say so. That is not a failure.
+Read `references/live-reads.md` ("Azure resource settings and recent changes") only when the question needs live Azure resource settings or recent changes.
 
 ### Production
 
-Production follows `/crav1-read-environment` (drop-in: `.claude/skills/crav1-read-environment/SKILL.md`, the pre-prod, shared, and prod-only rule; plugin: sibling `skills/crav1-read-environment/SKILL.md`).
-
-Prod-only means the only mark is production. A similar name on another resource is not a twin. Pre-prod, shared-with-prod, and prod-only stay shape and connections only, after the same yes or no.
-
-When a matched resource is pre-prod, shared with prod, or prod-only, ask before it is read. Use the questions tool when it is available. The options are only:
-
-1. **Yes. Read these for shape and connections only.**
-2. **No. Leave them unread.**
-
-Stop until the user picks. One answer covers every such resource this pass listed.
-
-Shape and connections means names, types, setting keys, routes the settings already show, timers, links, and secret names. A setting value is shown only when it is a resource id or a hostname. Say `prod only` on a prod-only resource. Say `Shape and connections only.` Never data. Never secret values. Never a row or a blob. A yes does not open a production database or production storage.
-
-A no leaves those resources unread. The answer says they were not read.
-
-A non-prod resource (dev, test, stage, uat, qa) is settings and recent changes, as above. It does not need that yes. It is still never data and never a secret value.
+Read `references/live-reads.md` ("Production") only when the question touches production.
 
 ### Azure DevOps
 
-Work items, open pull requests, and branches that touch the thing. Every fact from this read is tagged `Live read.`
-
-The org and project come from the first source that names both:
-
-1. The git remote, when it is Azure Repos (`dev.azure.com` or `*.visualstudio.com`).
-2. `docs/environments/marks.md`, when that file already names the Azure DevOps org and project.
-3. Azure DevOps URLs in `docs/system/repos.md`, when the git remote is not Azure Repos and `docs/environments/marks.md` does not name the org and project.
-
-Do not ask for a typed path. Do not guess an org.
-
-A recorded id is read in its own home: the `(ADO: <org>/<project>)` tag on its `work-item.md` line, or the `Work items go to` cell of the repo in `docs/system/repos.md`, as [work-item-homes.md](../crav1-ado-sync/branches/push-features/references/work-item-homes.md) (drop-in: `.claude/skills/crav1-ado-sync/branches/push-features/references/work-item-homes.md`; plugin: sibling `skills/crav1-ado-sync/branches/push-features/references/work-item-homes.md`) says. An older line without a tag uses the pair above. An id not found there is reported as moved or missing with that home; ask before searching other projects. This command only reads: it does not ask for or write a home.
-
-For source 3, read `docs/system/repos.md` when that file exists. An Azure DevOps URL matches `dev.azure.com` or `*.visualstudio.com` (HTTPS or SSH). Read the org and the project from the URL:
-
-- `https://dev.azure.com/<org>/<project>/_git/<repo>` — path segments. Ignore userinfo such as `https://<org>@dev.azure.com/...`.
-- `https://<org>.visualstudio.com/<project>/_git/<repo>` — the host label is the org.
-- `git@ssh.dev.azure.com:v3/<org>/<project>/<repo>` — the path after `v3/`.
-- `git@vs-ssh.visualstudio.com:v3/<org>/<project>/<repo>` and `<org>@vs-ssh.visualstudio.com:v3/<org>/<project>/<repo>` — the path after `v3/`.
-- `ssh://` URLs use the same path segments.
-
-Strip a trailing `.git`. A collection segment such as `DefaultCollection` is not the project.
-
-When those URLs name one org and one project, use them. When `docs/system/repos.md` is missing, it has no Azure DevOps URL, or the URLs do not name one org and one project, this read does not apply. Say so under **Tracked elsewhere**. That is not a failure.
-
-Use `az boards` and `az repos` to list and show, the same way for every source above. Pass that org and that project on the calls. The org is `https://dev.azure.com/<org>` or `https://<org>.visualstudio.com`, matching the URL. Do not substitute an org from `az devops configure`. Do not edit a work item, a pull request, or a branch. Do not pass `--work-items`. Do not create a work item.
-
-- work items whose title contains the name
-- open pull requests whose title or source branch touches the thing
-- branches whose name touches the thing
+Read `references/live-reads.md` ("Azure DevOps") only when the question needs Azure DevOps (boards, pipelines, repos).
 
 ### When a live read fails
 
-The repo part is already done. A failure is `az` not installed after the default-path check, `az` not signed in, the `azure-devops` extension missing, or no access to the DevOps project. A read that does not apply is not a failure.
-
-Show one prompt. State each failure. Suggest a fix when there is one. `az login`, then retry, when the login is missing. Name a missing `az` only after the default install paths have been checked. Name a missing `azure-devops` extension. Do not install. Do not log in. Do not run `az login`.
-
-Use the questions tool when it is available. The options are only:
-
-1. **Retry**
-2. **Skip**
-
-Stop until the user picks.
-
-**Retry** runs the failed reads again. Keep a live fact that already succeeded. Do not ask another question in that turn. If the retry fails, show the same prompt again. Do not answer with a partial live read.
-
-**Skip** gives the repo-only answer. One line says the live checks did not run, and why. Do not mix a partial live read into that answer.
-
-Do not ask the production question in the same turn as the failure prompt. That question comes after the Azure list succeeds.
+Read `references/live-reads.md` ("When a live read fails") only when a live read fails.
 
 ## Focus
 

@@ -2,6 +2,15 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.71.0 (2026-10-20)
+
+Slimmer skills. Each `SKILL.md` keeps the common path; rare cases moved word for word into the skill's `references/`, behind a one-line pointer that says when to read them. No rule changed.
+
+### Kit
+
+- **Slimmed skills.** The 15 skills over about 2,000 words now load only what the usual run needs: `/crav1-review-pr` 6,728 to 1,999 words, `/crav1-read-environment` 6,234 to 1,666, `/crav1-merge-pr` 4,173 to 1,547, `/crav1-add-to-spec` 4,145 to 1,982, and the open-pr, map-pipeline-environments, what-do-we-know-about-this, tighten-spec, plan-from-spec, help, ideas-to-spec, spark-to-spec, bundle-to-specs, show-or-ask-open-questions and explain-existing-system skills. Moved: other hosts (Azure DevOps), fallbacks and sign-in notes, cross-repo and outside-the-kit cases, re-reviews, notes and posting, handoffs from other skills, the thin landscape and `Synced at` rules, and later phases. Each pointer reads `Read references/<file>.md ("<section>") only when <case>.`
+- **Size warning.** `scripts/check-kit-docs.py` warns in CI when a `SKILL.md` is over 2,000 words. CONTRIBUTING says how to keep under it.
+
 ## 1.70.0 (2026-10-20)
 
 Ask less. Skills stop asking what is already settled and ask the rest in one go. Examples use made-up names: the spec `orders-retry`, the code repo `orders-api`.

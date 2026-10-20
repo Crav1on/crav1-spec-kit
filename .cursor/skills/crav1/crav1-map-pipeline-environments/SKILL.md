@@ -68,18 +68,7 @@ Stop until they name it. Do not offer a typed path. Do not list orgs. Do not rea
 
 ## CLI
 
-Follow [references/azure-devops.md](references/azure-devops.md). Use `az pipelines` and `az devops` to list and show only. Pass `--detect false` on every call. The org is `https://dev.azure.com/<org>` unless they already gave the full URL.
-
-If the CLI cannot read, stop before any pipeline list. Name exactly what is missing. Do not invent a pipeline. Do not install. Do not log in. Do not run `az devops configure`.
-
-- **`az` is not installed.** Say `az` is not installed. Point at `https://learn.microsoft.com/cli/azure/install-azure-cli`. This skill does not install it. Do not also name the extension or the login.
-- **The `azure-devops` extension is not installed.** Say the `azure-devops` extension is not installed. The install command is `az extension add --name azure-devops`. Point at `https://learn.microsoft.com/azure/devops/cli/`. This skill does not install it. Do not also ask them to log in.
-- **`az` has no login.** Say `az` has no login. The login command is `az login`. Also name `az devops configure --defaults`. This skill does not log in and does not run configure.
-- **Azure DevOps rejects the login.** Say the Azure DevOps login is missing. The same two commands. Do not print a token. Do not ask for a PAT.
-
-The command is not installed when it is not on the path. The extension is missing when `az extension show --name azure-devops` fails. The login is missing when `az` is installed and `az account show` fails. Check in that order. A later Azure DevOps call that fails on login, after those checks passed, uses the Azure DevOps login stop.
-
-A failed pipeline list stops the read. Say the pipeline list failed. Do not invent a pipeline.
+Read `references/cli.md` ("CLI") only when the az CLI is missing, signed out, or behaves oddly.
 
 ## What is read
 
@@ -95,96 +84,23 @@ Do not read builds, runs, logs, test runs, boards, wikis, or artifacts. Do not q
 
 ## Stage name
 
-The stage name gives the environment. Tokenize that name with the Marks rule in `/crav1-read-environment`. The words below are that rule. Do not add a word. Do not drop a word. Do not keep a different list.
-
-Use the stage `displayName` when it is set. Otherwise use the stage identifier. A classic release environment name is the stage name.
-
-Split the stage name on every character that is not a letter. Those letter runs are the tokens. Compare tokens without regard to case. `Dev`, `DEV`, and `dev` are the same word. The whole-word rule still holds.
-
-| Tokens | Class | Environment on the marks line |
-| --- | --- | --- |
-| `dev`, `development` | non-prod | dev |
-| `test`, `testing` | non-prod | test |
-| `stage`, `staging` | non-prod | stage |
-| `uat` | non-prod | uat |
-| `qa` | non-prod | qa |
-| `preprod`, or the neighboring tokens `pre` then `prod` | pre-prod | pre-prod |
-| `prod`, `production`, `live` | production | prod |
-
-A token is the whole word.
-
-- `device` is not `dev`. `development` is dev.
-- `protest`, `latest`, and `contest` are not `test`. `testing` is test.
-- `backstage` and `staged` are not `stage`. `staging` is stage.
-- `equation` and `equator` are not `uat`.
-- `qatar` and `equal` are not `qa`.
-- `preprod` is one token, and it is pre-prod.
-- `pre-prod`, `pre_prod`, and `pre.prod` split into the neighboring tokens `pre` then `prod`. That pair is one pre-prod mark. The `prod` in that pair is not production. Order matters. `prod-pre` is production.
-- `pre-production` splits into `pre` and `production`. `production` is production. That spelling is not pre-prod.
-- `product` and `reproduce` are not `prod`.
-- `live` is safe as a whole word, and it is production. `alive`, `lives`, `liveness`, `deliver`, `livestock`, and `livestream` are not `live`. `go-live` and `live-api` split to a `live` token and are production.
-
-Inside one stage name, a production token wins over a non-prod token. That stage says prod. The pre-prod pair is the exception: that `prod` is not a production token.
-
-A job name is not the stage name. A deployment slot name is not the stage name. A slot named staging does not make the environment stage.
-
-Read the deployment job `environment:` name and show it on the item. It does not replace the stage name. When the stage name has a token and that `environment:` name has a different class, the resource is unclear. Say the two names disagree. Do not pick one. When the stage name has no token, the resource is unclear even if `environment:` has a token. Show that name in the reason.
+Read `references/naming.md` ("Stage name") only when a stage name does not map cleanly to an environment word.
 
 ## Targets
 
-For each stage, find the Azure targets each deploy step deploys to. The reference file lists the task inputs. A step that is not a deploy step contributes no target.
-
-Record, when the step shows them:
-
-- the resource id, or the app name when no id is shown
-- the resource group
-- the service connection’s subscription id and name, when the endpoint shows them
-
-The subscription is context on the item. It is not a fifth field on the marks line. Do not print a service principal secret, a password, a key, or a certificate. Do not print the endpoint JSON.
-
-**Marks only what the step names.** A step that deploys into a resource group marks the app or the resource id that step names. It does not mark the other resources in the group. The group is the second field on that resource’s line. That field is the context `/crav1-read-environment` can use later for a group suggestion. A step that names a group and no app and no resource id marks nothing. List the group as context under that stage. Do not write a line whose first field is the group.
-
-Prefer a resource id the step shows. Do not build an id from a subscription and a guessed provider. When the step shows an app name, the first field is that name.
-
-An id and a name are the same resource only when the id’s last segment equals the name and the group is the same. Compare without regard to case. A similar name is not the same resource. `app` does not match `app-api`. When you cannot tell, list them as separate resources. Say they were not merged.
-
-Follow a variable only when the value is plain. Plain means a value written in the pipeline YAML, a parameter default written there, or a variable group value whose `isSecret` is not true. A secret variable, a Key Vault link, a missing name, a cycle, or a runtime expression is unresolved. The target that depends on it is unclear. Do not print the secret. Do not print a plain value that is a connection string, a key, or a password. The resource name inside a plain value can still be the target.
-
-An inline script names a target only when the script text shows an app name or a resource id as a plain value. A script file path is not read. Do not open that file. A target that exists only in that file is unresolved.
-
-A Bicep file, an ARM template file, or a Terraform file is not the pipeline definition. Do not open it. Names that appear as task inputs still count.
+Read `references/targets.md` ("Targets") only when you map a stage to its deploy targets.
 
 ## Cases
 
-Group targets by resource across the pipelines you read. A resource is one of these cases.
-
-**One environment.** Every stage that deploys it has the same class, or every stage is non-prod and the words differ. Propose one marks line per stage. Each line uses that stage’s environment word. Several non-prod words are not shared. Shared is the next case. Say on the item when the non-prod words differ. A resource that is only pre-prod is this case. A resource that is only production is this case. The line uses `prod`. Say that the next environment read treats a resource whose only mark is production as prod-only. That read asks once, with pre-prod and shared, before it reads shape and connections. This skill still does not read that Azure resource.
-
-**Shared.** At least one stage is non-prod or pre-prod, and at least one stage is production. List the resource with both stages. The marks format has no `shared` word. Do not write one. Propose one line per stage, each with that stage’s own environment word, in the four-field format `docs/environments-marks.md` already defines. Say that `/crav1-read-environment` treats those lines as shared with prod. Pre-prod with production is this case, because that read already treats pre-prod and production as shared.
-
-**Unclear.** The stage name has no environment word, the stage name and `environment:` disagree, or the target is an unresolved variable. List the resource with the reason. Propose no mark.
-
-A group-only deploy stays with the case of its stage. It has no proposed line.
+Read `references/naming.md` ("Cases") only when a definition is classic, templated, or otherwise unusual.
 
 ## marks.md
 
-Path: `docs/environments/marks.md` in the project repo. The format is the four fields in `/crav1-read-environment` and in `docs/environments-marks.md`. Do not write the kit note into the project.
-
-```text
-<resource-id-or-name> | <group> | <environment> | pipeline <name>, stage <stage>
-```
-
-The second field is the group the step showed. Use `-` when the step shows no group. The source is `pipeline <name>, stage <stage>`. One line per stage. Do not put two stages in one source.
-
-Create `docs/environments/` and `marks.md` only when the user has confirmed at least one line. Append those lines. Never rewrite an existing line. Do not append a line that is already there. Already there means the same resource and the same environment word. `development` on an existing line is the same word as `dev`. Compare the resource the way `/crav1-read-environment` matches: the id, or the name plus the group, without regard to case. List that item as already written. A confirm does not append it again.
-
-When an existing line matches the resource and the environment class differs, show the existing line and the proposed line. Do not rewrite the existing line. A confirmed append leaves the existing line and adds the new one. Say that the next environment read treats that disagreement as shared.
-
-A line the user did not confirm is not written. Unclear items write nothing.
+Read `references/marks.md` ("marks.md") only when you append to docs/environments/marks.md.
 
 ## promotion.md (1.69.0)
 
-Path: `docs/environments/promotion.md`, next to marks.md. Same four-field shape, the same environment words, and the same append rules: `<repo> | <branch, pattern or tag <pattern>> | <environment>[ (after <environment>)] | pipeline <name>, stage <stage>`. Example: `orders-api | develop | test | pipeline orders-cd, stage DeployTest`. The branch facts come from the definitions only, as `references/azure-devops.md` says under **Branches**. Create the file (and `docs/environments/`) only when at least one line is confirmed. Never rewrite a line; already there means the same repo, branch field and environment word. This command proposes known environment words only; an `(after …)` position is written by hand. The format is in `docs/environments-promotion.md`.
+Read `references/branches.md` ("promotion.md (1.69.0)") only when you propose promotion.md lines (the Branches section).
 
 ## Sections
 
