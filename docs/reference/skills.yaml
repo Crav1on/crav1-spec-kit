@@ -1093,6 +1093,14 @@ skills:
       means: "commit"
     - word: "message only"
       means: "only write the message"
+    - word: "commit now"
+      means: "draft, show, then commit with no choice question (never pushes)"
+  - question: Style
+    words:
+    - word: "crav1"
+      means: "CRAV1 style, this commit only"
+    - word: "git log"
+      means: "match git log, this commit only"
   lane: cross-cutting
   group: Commit and pull request
   starter: false
