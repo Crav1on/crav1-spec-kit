@@ -174,7 +174,7 @@ The merged skills take exact choice words instead of `--flags`. A word in the in
 | `/crav1-existing-to-specs` | What to read | `repos only` · `repos and bundle` |
 | `/crav1-existing-to-specs` | What to write | `one spec` · `spec per feature` |
 | `/crav1-show-or-ask-open-questions` | Show or ask | `show` · `ask` |
-| `/crav1-add-to-spec` | What you have | `fact` · `dump` · `code change` · `meeting` |
+| `/crav1-add-to-spec` | What you have | `fact` · `dump` · `code change` · `meeting` · `mail` · `chat` |
 | `/crav1-build-tasks` | Which tasks | `one task` · `range` · `all tasks` |
 | `/crav1-fix-build-gaps` | Which gaps | `verify gaps` · `live gaps` |
 | `/crav1-finalize-commit` | Commit or message | `commit` · `message only` |

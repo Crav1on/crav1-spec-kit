@@ -40,6 +40,8 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 | What you have | `dump` | a dump |
 | What you have | `code change` | a code change |
 | What you have | `meeting` | a meeting (minutes, transcript, mail, or chat) |
+| What you have | `mail` | a mail, sorted as a dump |
+| What you have | `chat` | a chat, sorted as a dump |
 
 ## Runs when
 

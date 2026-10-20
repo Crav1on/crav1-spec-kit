@@ -619,6 +619,10 @@ skills:
       means: "a code change"
     - word: "meeting"
       means: "a meeting (minutes, transcript, mail, or chat)"
+    - word: "mail"
+      means: "a mail, sorted as a dump"
+    - word: "chat"
+      means: "a chat, sorted as a dump"
   lane: cross-cutting
   group: Keep the picture current
   starter: false
