@@ -8,7 +8,7 @@
 
 Bring new information into existing specs; asks what you have: a fact, a dump, a code change, or a meeting.
 
-**[`/crav1-add-to-spec`](crav1-add-to-spec.md)** opens with one question: what you have, a fact, a dump, a code change, or a meeting (minutes, a transcript, a mail, or a chat). It skips the question when the message shows which. It replaces match-dump-to-specs, code-into-specs, and meeting-to-specs; their rules are kept as branches, and a kept quote from any of them goes through the fact rules.
+**[`/crav1-add-to-spec`](crav1-add-to-spec.md)** opens with one question: what you have, a fact, a dump (a mail or a chat goes here), a code change, or a meeting (minutes or a transcript). It skips the question when the message shows which. It replaces match-dump-to-specs, code-into-specs, and meeting-to-specs; their rules are kept as branches, and a kept quote from any of them goes through the fact rules.
 
 A fact (was [`/crav1-add-to-spec`](crav1-add-to-spec.md)): New information aimed at one spec that already exists is **[`/crav1-add-to-spec`](crav1-add-to-spec.md)**. [`/crav1-tighten-spec`](crav1-tighten-spec.md) stays for mushy wording. Match, intake, spark, and ideas create the folders. This command does not plan.
 
@@ -39,7 +39,7 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 | What you have | `fact` | one fact |
 | What you have | `dump` | a dump |
 | What you have | `code change` | a code change |
-| What you have | `meeting` | a meeting (minutes, transcript, mail, or chat) |
+| What you have | `meeting` | a meeting (minutes or transcript) |
 | What you have | `mail` | a mail, sorted as a dump |
 | What you have | `chat` | a chat, sorted as a dump |
 

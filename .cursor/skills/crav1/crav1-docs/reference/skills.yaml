@@ -618,7 +618,7 @@ skills:
     - word: "code change"
       means: "a code change"
     - word: "meeting"
-      means: "a meeting (minutes, transcript, mail, or chat)"
+      means: "a meeting (minutes or transcript)"
     - word: "mail"
       means: "a mail, sorted as a dump"
     - word: "chat"
@@ -632,8 +632,8 @@ skills:
   purpose: 'Bring new information into existing specs; asks what you have: a fact, a dump, a code change,
     or a meeting.'
   in_depth:
-  - '**`/crav1-add-to-spec`** opens with one question: what you have, a fact, a dump, a code change, or
-    a meeting (minutes, a transcript, a mail, or a chat). It skips the question when the message shows
+  - '**`/crav1-add-to-spec`** opens with one question: what you have, a fact, a dump (a mail or a chat goes here), a code change, or
+    a meeting (minutes or a transcript). It skips the question when the message shows
     which. It replaces match-dump-to-specs, code-into-specs, and meeting-to-specs; their rules are kept
     as branches, and a kept quote from any of them goes through the fact rules.'
   - 'A fact (was `/crav1-add-to-spec`): New information aimed at one spec that already exists is **`/crav1-add-to-spec`**.

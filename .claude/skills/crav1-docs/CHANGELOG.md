@@ -2,6 +2,14 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.72.1 (2026-10-20)
+
+Fix: the `/crav1-add-to-spec` opening question no longer sends a mail or a chat to the meeting path.
+
+### Kit
+
+- **Opening question.** A mail or a chat thread is now listed under option 2, **A dump** (`mail`, `chat`), and option 4, **A meeting**, is minutes or a transcript. When the question is skipped, a `.eml` or a chat export now counts as 2. The question still has four options. The skills reference says the same. `/crav1-add-to-spec meeting` still takes a mail or a chat when you name it.
+
 ## 1.72.0 (2026-10-20)
 
 Two new choice words for `/crav1-add-to-spec`: `mail` and `chat`. No new questions.

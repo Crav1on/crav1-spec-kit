@@ -7,11 +7,11 @@ Read only when the pointer in `SKILL.md` sends you here. Moved word for word fro
 This skill now also replaces `/crav1-match-dump-to-specs`, `/crav1-code-into-specs`, and `/crav1-meeting-to-specs`. Their rules are kept, unchanged, as branches. Ask one question, with the questions tool when it is available:
 
 1. **A fact.** One new piece of information for one spec. Follow the rest of this file.
-2. **A dump.** A later pile of notes, tickets, old docs, diagrams, or screenshots for one or many specs. Follow [branches/dump/BRANCH.md](../branches/dump/BRANCH.md).
+2. **A dump.** A later pile of notes, tickets, old docs, diagrams, or screenshots for one or many specs, or a mail or a chat thread (`mail`, `chat`). Follow [branches/dump/BRANCH.md](../branches/dump/BRANCH.md).
 3. **A code change.** A commit, a range, the branch diff, or a pull request (1.65.0) that already landed or is open. Follow [branches/code-change/BRANCH.md](../branches/code-change/BRANCH.md).
-4. **A meeting.** Minutes, a transcript, a mail, or a chat thread. Follow [branches/meeting/BRANCH.md](../branches/meeting/BRANCH.md).
+4. **A meeting.** Minutes or a transcript. Follow [branches/meeting/BRANCH.md](../branches/meeting/BRANCH.md).
 
-Skip the question when the message shows which: a short new fact with an @-mentioned spec is 1; several files or a pasted pile is 2; a commit, a SHA, a range, or "the branch diff" is 3; minutes, a transcript, a `.eml`, or a chat export is 4. Where a branch hands a kept quote to `/crav1-add-to-spec`, that is choice 1 of this skill, with the handoff that branch describes.
+Skip the question when the message shows which: a short new fact with an @-mentioned spec is 1; several files, a pasted pile, a `.eml`, or a chat export is 2; a commit, a SHA, a range, or "the branch diff" is 3; minutes or a transcript is 4. Where a branch hands a kept quote to `/crav1-add-to-spec`, that is choice 1 of this skill, with the handoff that branch describes.
 
 
 You add new information to **one existing** spec. Then you check whether `docs/system/` or another spec has to change, and you report that impact. You do not silently rewrite those other files. You do not write application code. You do not plan, implement, or commit.
