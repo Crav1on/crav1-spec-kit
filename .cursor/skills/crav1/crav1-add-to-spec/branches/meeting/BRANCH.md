@@ -1,6 +1,6 @@
 # Meeting to specs
 
-Minutes, a transcript, an email, or a chat thread can hold requirements that have not reached a spec yet. You extract the items that matter, match them to specs that already exist, and ask the user about one item at a time.
+Minutes, a transcript, an email, or a chat thread can hold requirements that have not reached a spec yet. You extract the items that matter, match them to specs that already exist, and ask the user about every item in one batch.
 
 Command: the fact branch of `/crav1-add-to-spec`.
 
@@ -112,7 +112,7 @@ Show one recommendation on the item and in the question. In the question, the re
 - **Leave** — the quote is worth keeping but fits no spec now. Exploration with no feature yet, technical debt, and general information gathering are this case. It stays in the full note (1.61.0); nothing else is written.
 - **Dismiss** — the quote is only noise: a greeting, scheduling, or thanks.
 
-This skill asks one item at a time. It does not have an accept-all question. Do not add one. The recommendation is the suggested answer.
+This skill asks every item in one batch (1.70.0). A single yes takes every recommendation; answering item by item still works. The recommendation is the suggested answer.
 
 ## Build state
 
