@@ -80,21 +80,7 @@ When the input names none of person, spec, or topic, stop and ask. Options only.
 
 ## Pending first
 
-Read `docs/specs/<slug>/spec.md` for every spec folder. Skip `_template`. Read `## Open questions`, leftover unresolved assumptions, and the records under each question.
-
-When a question in this selection has a `Pending:` line, show those first, before any new question. One line per draft, as the reference file says, for example:
-
-```text
-Drafted for Dana on 2026-10-11 (mail), not marked as sent yet. 5 questions.
-```
-
-Ask for each draft. Options, each explained:
-
-1. **Mark as sent** — you sent it. The kit writes `Asked:` on those questions, with the date you give, or today when you give none.
-2. **Keep pending** — not sent yet. The mark stays and is shown again next run.
-3. **Drop the mark** — it will not be sent. The kit removes the pending mark. The questions are open as before.
-
-Stop until the user picks. Do not mix pending questions silently into the new draft. When the user wants them in the new draft too, they say so.
+Read `references/asked.md` ("Pending first") only when questions are already marked pending.
 
 ## Gather
 
@@ -112,43 +98,23 @@ Show the gathered list in the chat, numbered, each with its spec path. That list
 
 ## Output kind
 
-When the user did not name one, ask. Options only, each explained:
-
-1. **Mail** — a short greeting, one line on why, the questions numbered and grouped by topic, and a thank-you. The user copies it into their own mail.
-2. **Meeting agenda** — a title, the purpose, each topic as an agenda point with its questions under it, and the time to set aside when the user names it. For a booked meeting.
-3. **Chat message** — a short opener and the numbered questions. No headings. For a team chat.
-4. **Meeting questions** — every selected question as a numbered list to ask out loud, in a standup, a call, or a longer meeting. Grouped by topic. No agenda layout and no intro text. It lists all of them, not a short cut. Questions not answered in the meeting go back to open.
+Read `references/drafting.md` ("Output kind") only when you write the draft.
 
 ## Language
 
-English by default. When the user names a language, write the draft in that language. The gathered list in the chat stays in the language of this chat. Quoted technical names, product names, and values stay as they are.
+Read `references/drafting.md` ("Language") only when you write the draft.
 
 ## Write the draft
 
-- Number the questions 1, 2, 3, … across the whole draft.
-- Group them by topic. The topic heading is plain words, such as `Network access` or `Certificates`.
-- Each question carries enough context to be answered by someone who has not read the spec: what is being built in one clause when it helps, what is already known, and what exactly is needed. One question asks one thing.
-- Do not name a spec slug, a spec path, a file, or an id such as `Q3 in <spec>`. Do not name the kit. That can be misunderstood. The kit keeps which question belongs to which spec in the spec records.
-- A question marked as a decision is phrased as a choice to make, with the options the spec names.
-- Do not add a question the specs do not have. Do not answer a question in the draft.
-
-Before showing the draft, run the personal-data and secrets check on the drafted text, the same way as for other outbound text. Follow `crav1-add-to-spec` `references/sources.md` (drop-in: `.claude/skills/crav1-add-to-spec/references/sources.md`; plugin: sibling `skills/crav1-add-to-spec/references/sources.md`), sections **Personal data**, **Secrets**, and **Transfer data policy**. A secret is always removed and is never a choice. Use the transfer data policy when it exists. When it does not, the check may ask once and may write it after a yes, as that file says. An item it cannot place is asked one at a time.
-
-Show the draft in one block the user can copy. Under it, one line: `Nothing was sent.`
+Read `references/drafting.md` ("Write the draft") only when you write the draft.
 
 ## Asked?
 
-Ask once for the draft. Options only. Use the questions tool when it is available. Each option explained:
-
-1. **Yes, asked** — you have sent it or asked it. The kit writes `Asked:` under each question in the spec, with today's date, the kind, and who.
-2. **No** — not asking. The kit writes nothing.
-3. **Pending** — you copied it and will send it later. The kit writes `Pending:` under each question, with today's date, the kind, and who. Next run shows it first.
-
-When the user picks yes or pending, write the lines as the reference file says, with `Question <n>` from the draft. A question asked of the same person again replaces the earlier line for that person. When an import later shows the question being asked, that date replaces this one. Do not edit the question text. Do not edit any other line.
+Read `references/asked.md` ("Asked?") only when you ask whether the draft was sent.
 
 ## Parked and retired specs (1.60.0)
 
-Skip `docs/specs/retired/` and `Moved:` pointers. A parked spec (a `Parked:` line in `spec.md`) is still listed, its section heading marked `(parked)`; its questions can still be shown and asked. A note in `docs/notes/` (month folders since 1.61.0) with the slug in `waiting_for`, or an old `Waiting for <slug> (parked)` line, is not open work: list it as `waiting for parked <slug>` under that spec, not in the open counts.
+Read `references/asked.md` ("Parked and retired specs (1.60.0)") only when a spec is parked or retired.
 
 ## Stop
 

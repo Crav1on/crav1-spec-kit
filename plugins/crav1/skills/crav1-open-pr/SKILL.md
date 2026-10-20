@@ -78,72 +78,7 @@ If base or head is still ambiguous, that turn is the question only. No title, no
 
 ## Draft title and body
 
-When base, head, and the checks are settled, write the draft into the user-visible reply **before** any choice UI.
-
-**Title** (one line):
-
-```text
-<slug>: <short summary>
-```
-
-**Body:**
-
-```markdown
-## What / why
-
-<Two to four sentences from spec.md or the commits on base..head. Do not invent scope.>
-
-## Spec
-
-- [spec.md](docs/specs/<slug>/spec.md)
-- [plan.md](docs/specs/<slug>/plan.md)
-- [tasks.md](docs/specs/<slug>/tasks.md)
-
-## Verify
-
-<One line from verify.md when that file exists (pass, fail, or missing). Otherwise: No verify.md on this branch.> <When the spec has other unmerged work branches (1.64.0): This spec also has unmerged branches: <branch>, <branch>.>
-```
-
-When a work-item mention is resolved, add this section after Verify. The body of the section is the mention line only:
-
-```markdown
-## Work item
-
-AB#52
-```
-
-**Spec** lists only files that exist on the head. Omit **Spec** when none of `spec.md`, `plan.md`, and `tasks.md` exist under `docs/specs/<slug>/`. Slug comes from `feat/<slug>` or `spec/<slug>`. Else (1.64.0) it is the spec whose `Synced at` entries, Match `Branch:` list or task `(branch: …)` parts name the head, in this repo or in the sibling spec repo found under **Base branch**; when several specs name it, list each under **Spec** and leave the slug out of the title. If the head name has no slug and exactly one `docs/specs/<slug>/` folder changed vs base (not `_template/`), use that slug. If several changed, leave the slug out of the title and omit **Spec** rather than picking one.
-
-**Work item** is included only when [references/work-item-mention.md](../crav1-finalize-commit/branches/message-only/references/work-item-mention.md) resolves a mention for that slug (plugin: sibling `skills/crav1-finalize-commit/branches/message-only/references/work-item-mention.md`). The section body is that one mention line (`#<id>` on Azure Repos, `AB#<id>` on GitHub, or the file’s full token). On Azure DevOps, only a line whose work item home matches this repo's `Work items go to` cell in `docs/system/repos.md` is mentioned, as that reference says. Omit the section when there is no mention. The hint from that reference, when it has one, is a single sentence after the draft, not inside the body.
-
-The section is Markdown in the description. Do not pass `--work-items` or `--transition-work-items` because of it. The ban in **Create** stays as written. Host order and fallbacks stay as written.
-
-Show base, head, remote, title, and body. Say they can edit any of those before you act.
-
-**Then** offer the choices (questions tool when available). Put the actual title and body in the question prompt, for example:
-
-```text
-Base: <base>
-Head: <head>
-Title: <one line>
-
-Body:
-<the draft>
-
-What next?
-```
-
-Options, **in this order**:
-
-| Id | Choice | What it does |
-| --- | --- | --- |
-| `push` | Push and open PR | `git push -u <remote> <head>` (no force), then open one pull request. **Always list this first.** |
-| `open` | Open PR only | Remote already has this head. Do not push. Open one pull request for that remote head. |
-| `stop` | Stop | No push. No pull request. They can still copy the draft. |
-
-Never call the questions tool before the title and body are in the reply. If they named `push` or `open` before any draft existed, ignore it, draft, show the text, then offer the choices.
-
-If they edit the title, body, base, or head: apply only that edit, re-run the checks when base or head changed, show the new draft, **then** the same three choices (`push` still first). Do not push in the edit turn unless they pick `push` or `open` **after** seeing the new draft.
+Read `references/draft.md` ("Draft title and body") only when you draft the title and body.
 
 ## Host
 
@@ -157,34 +92,7 @@ Use `gh` only when **both** are true: `gh auth status` succeeds, and the remote 
 
 ### Azure DevOps (`az`)
 
-Treat the remote as Azure DevOps when the URL matches `dev.azure.com` or `*.visualstudio.com` (HTTPS or SSH). Read org, project, and repository from that URL when you can:
-
-| Shape | Org / project / repo |
-| --- | --- |
-| `https://dev.azure.com/<org>/<project>/_git/<repo>` | path segments |
-| `https://<org>@dev.azure.com/<org>/<project>/_git/<repo>` | path segments (ignore the userinfo) |
-| `https://<org>.visualstudio.com/<project>/_git/<repo>` | host label is the org |
-| `git@ssh.dev.azure.com:v3/<org>/<project>/<repo>` | path after `v3/` |
-| `git@vs-ssh.visualstudio.com:v3/<org>/<project>/<repo>` | path after `v3/` |
-| `<org>@vs-ssh.visualstudio.com:v3/<org>/<project>/<repo>` | path after `v3/` |
-
-`ssh://` URLs use the same path segments. Strip a trailing `.git`. Percent-decode project and repository when the URL encoded them. A collection segment such as `DefaultCollection` stays in the web URL; it is not the `--project` value.
-
-Use `az repos pr` only when **all** of these are true:
-
-1. `az` is on `PATH` (on Windows, `az.cmd` counts).
-2. The azure-devops extension works or can be used. `az repos pr list -h` exits 0, or the first `az repos pr` call succeeds. Microsoft documents that this extension installs automatically the first time an `az repos pr` command runs (Azure CLI 2.30.0 or higher). If that first call still cannot run `az repos pr`, the extension is not usable.
-3. The CLI is already authenticated for a non-interactive call. A list call for this remote that returns without an auth error counts. `az account show` exiting 0, or `AZURE_DEVOPS_EXT_PAT` already set, is a hint, not proof. A dialog box or a browser Microsoft sign-in is not a create path. Do not run `az login`, a device-code flow, or a web login. Do not create a token.
-
-Prefer org, project, and repository parsed from the remote. Pass them on the command and pass `--detect false`:
-
-- `--org` is the organization URL, for example `https://dev.azure.com/<org>` or `https://<org>.visualstudio.com`
-- `--project` is the team project
-- `--repository` is the repo name or id
-
-`--detect` is documented as "Automatically detect organization" (`true` or `false`; default `true`). From a local Azure Repos checkout it reads **that** git remote and overrides `az devops configure` defaults. Command flags win over detection. Use `--detect true`, and omit only the flags you could not parse, **only** when the URL did not yield org, project, and repository **and** this command runs in a local checkout of that same remote. Otherwise do not use `--detect true`.
-
-**Create** then uses the Azure DevOps steps. If `az` is missing, the extension is not usable, the CLI is not already authenticated, or list/create fails, print the Azure DevOps fallback below. Do not invent a URL.
+Read `references/azure-devops.md` ("Azure DevOps (`az`)") only when the remote is Azure DevOps.
 
 ### Other remotes
 
@@ -192,36 +100,7 @@ When the remote is neither GitHub nor Azure DevOps, print the GitHub-shaped fall
 
 ### Fallback (no URL)
 
-After a successful `git push` (push path only), or instead of create (open-only path), print base ← head, the title and body they accepted, and the filled commands. On the open-only path, omit the `git push` line and say the remote branch must already exist.
-
-GitHub, or a remote that is not Azure DevOps:
-
-```text
-git push -u <remote> <head>
-gh pr create --base <base> --head <head> --title "<title>" --body "<body>"
-```
-
-Azure DevOps. Fill org, project, and repository from the remote when you have them. Name any you could not parse. Do not invent them. For `*.visualstudio.com`, `--org` is `https://<org>.visualstudio.com`.
-
-```text
-git push -u <remote> <head>
-az repos pr list --org https://dev.azure.com/<org> --project <project> --repository <repo> --source-branch <head> --target-branch <base> --status active --include-links --detect false
-az repos pr create --org https://dev.azure.com/<org> --project <project> --repository <repo> --source-branch <head> --target-branch <base> --title "<title>" --description "<body>" --detect false
-```
-
-On Windows, do not put a multi-line `<body>` on that create command. `cmd.exe` keeps only the first line. Write the accepted body to a temp file as UTF-8 without a BOM and pass `--description "@<file>"`, then delete the file. See **Create**. Quote any `--query` value that contains parentheses.
-
-When org, project, and repository are known, also print the create-PR page they can open. This is not an opened pull request. URL-encode `<head>` and `<base>` (`/` as `%2F`):
-
-```text
-https://dev.azure.com/<org>/<project>/_git/<repo>/pullrequestcreate?sourceRef=<head>&targetRef=<base>
-```
-
-Use `https://<org>.visualstudio.com/...` when that is the host. Keep a collection segment from the remote when the web repo URL has one.
-
-GitKraken stays **GUI paste only**: open a pull request from `<head>` into `<base>`. Paste the title and body. Do not merge. A later explicit ask to merge that named pull request is `/crav1-merge-pr`.
-
-Do not run `gk ai pr create` or any other interactive `gk` pull-request create. Those commands wait for a confirmation prompt and fail in a non-interactive shell.
+Read `references/fallback.md` ("Fallback (no URL)") only when no host CLI can open the pull request.
 
 ## Push and open
 
@@ -265,67 +144,15 @@ On success, follow **After it exists**.
 
 ### Azure DevOps
 
-When **Host** says to use `az`, list open pull requests for this source → target **before** create. `--status active` is the open set, including drafts. Source is `<head>`. Target is `<base>`. Pass branch names (`dev`), not `refs/heads/...`.
-
-Parsed org, project, and repository:
-
-```text
-az repos pr list --org <org-url> --project <project> --repository <repo> --source-branch <head> --target-branch <base> --status active --include-links --detect false --output json
-```
-
-Use the `--detect true` form from **Host** only in the case Host allows, and only for the flags you could not parse.
-
-If the list is non-empty, print the web URL and stop. Do not run `az repos pr create`. Prefer `_links.web.href`. When the JSON has `pullRequestId` and no web link, print `https://dev.azure.com/<org>/<project>/_git/<repo>/pullrequest/<pullRequestId>` (or `https://<org>.visualstudio.com/...` when that is the organization host). That id came from the host.
-
-If the list call fails, do not create. Print the Azure DevOps fallback from **Host**. Do not invent a URL. Do not start a sign-in.
-
-If the list is empty, create one pull request.
-
-Non-Windows: pass `--description` as one value (a HEREDOC is fine) so quotes and Markdown survive. Microsoft documents each `--description` value as one new line.
-
-```text
-az repos pr create --org <org-url> --project <project> --repository <repo> --source-branch <head> --target-branch <base> --title <title> --description <body> --detect false --output json
-```
-
-Windows (PowerShell calling `az.cmd`): do not pass the body on the command line. `cmd.exe` keeps only the text before the first newline.
-
-1. Write the accepted body to a new temp file as UTF-8 without a BOM. A BOM shows up as a character at the start of the description. Non-ASCII (an en dash, for example) must survive. Windows PowerShell `Set-Content -Encoding utf8` writes a BOM. Do not use it.
-
-```powershell
-$path = Join-Path ([System.IO.Path]::GetTempPath()) ("az-pr-body-" + [guid]::NewGuid().ToString() + ".md")
-$utf8NoBom = New-Object System.Text.UTF8Encoding $false
-[System.IO.File]::WriteAllText($path, $body, $utf8NoBom)
-```
-
-2. Pass `--description "@<path>"` with the `@` file token quoted, so PowerShell does not treat `@` as a splat. Azure CLI loads that file and keeps every line.
-
-```text
-az repos pr create --org <org-url> --project <project> --repository <repo> --source-branch <head> --target-branch <base> --title <title> --description "@<path>" --detect false --output json
-```
-
-3. Delete the temp file after the create call returns, whether it succeeded or failed. Do not commit it. Do not leave it in the repo.
-
-Quote any `--query` value that contains parentheses. `cmd.exe` treats an unquoted `(` as syntax.
-
-Do not pass `--open`, `--auto-complete`, `--draft`, `--delete-source-branch`, `--reviewers`, `--optional-reviewers`, `--required-reviewers`, `--work-items`, `--transition-work-items`, `--squash`, `--merge-commit-message`, `--labels`, or `--bypass-policy` unless they asked for that in this chat. Do not set auto-complete, merge, draft, reviewers, work items, or delete-source-branch unless they asked.
-
-On success, print the web URL the same way (`_links.web.href`, otherwise `/pullrequest/<pullRequestId>` from the id the command returned) and follow **After it exists**. A `url` field on that JSON counts as the host returning a URL; still print the web form when you can build it from that id.
-
-If create fails because a pull request already exists, print that URL. Do not open a second.
-
-If create fails for any other reason, print the Azure DevOps fallback from **Host**. Do not invent a URL. Do not start a sign-in.
+Read `references/azure-devops.md` ("Azure DevOps (Create)") only when the remote is Azure DevOps.
 
 ### No host create
 
-When **Host** says not to call `gh` or `az`, print the fallback from that section. Do not claim a pull request was opened. Tell them that if one already exists for this head → base, they should use that URL and not open a second.
+Read `references/fallback.md` ("No host create") only when no host CLI can open the pull request.
 
 ## After it exists
 
-When the host returned a pull request URL, print that URL and `base` ← `head`.
-
-One sentence: they can review when they want. Next (optional): `/crav1-review-pr` when they name this pull request in a later turn (from the specs repo, a pull request in another repo is `/crav1-review-pr <repo> <n>`, 1.65.0). This skill does not save a PR note: the body is its own summary of the spec, plan and verify; `/crav1-review-pr` and `/crav1-merge-pr` save the description, with any later edits, as the PR note. This skill does not run that command. Merging stays `/crav1-merge-pr` when they explicitly ask, in a later turn, to merge this named pull request. A review is not that ask. This skill does not merge, and it does not delete the branch. Do not run `/crav1-review-pr` or `/crav1-merge-pr` from this step.
-
-When you only printed commands, stop after those commands. Do not invent a URL.
+Read `references/after.md` ("After it exists") only when the pull request exists.
 
 ## Hard rules
 

@@ -108,21 +108,15 @@ The message names a kit word or file, such as `work item homes`, `choice words`,
 
 ### 6. Status of a slice
 
-`status <slug>`, or `where am I`. For `where am I`, use the slice the user is working in, or the only one under `docs/specs/`; ask which when there are several.
-
-1. Read the slice's files only: `spec.md` (open questions and their marks), `plan.md` (the `Reviewed:` line and `## Risks`), `tasks.md` (ticks and `(after: T#)`), `verify.md`, and `work-item.md`. Never read Azure Boards.
-2. Count tasks with the readiness rules of `/crav1-tasks-ready-to-build` (its `SKILL.md` next to this one): ready, blocked, needs verify, done. Do not repeat the per-task list; for that, name `/crav1-tasks-ready-to-build`.
-3. **Branches (1.64.0).** When the spec has work branches (its `Synced at` entries, Match `Branch:` list and task `(branch: …)` parts, minus base branches and `(dropped)` entries), give the Branches line from `crav1-add-to-spec` `references/branches.md` (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/references/branches.md`; plugin: sibling `skills/crav1-add-to-spec/references/branches.md`): per repo, how many are merged into the base, each unmerged branch's own commits since its fork point, `merged, branch deleted`, `branch rewritten since last read`, `unknown (branch gone)`, `(also in <slug>)`, and the age of each remote copy in whole calendar days, counted as that file says under **Which refs** (1.67.1: a commit made today is `today`, not `1 day old`). This is read-only git on the refs on disk (and `../<repo>` for another repo); never fetch, never check out, never write. Host checks only for GitHub (`gh`) or Azure DevOps (`az`) when already signed in. For `where am I` across several slices, a shared branch is counted once. **Sub-branches and reverts (1.68.0).** As that file says under **Spec branch and sub-branches** and **Reverted**: sub-branches (entries with `(into <spec branch>)` under a `(spec branch)`) are left out of the Branches count and get `Sub-branches: <n> of <m> merged into <spec branch>.`, plus `left behind: <branch> (not in <spec branch>)` for one that never merged after the spec branch reached the base; done counts top-level branches only. A merged branch whose change was later undone on the base shows `<branch>: merged, reverted on <base> (<revert sha>)`. Both are report only and never block done. **Promotion (1.69.0).** When the spec repo has `docs/environments/promotion.md`, add the `Promotion:` line after the Branches line, as `crav1-add-to-spec` `references/branches.md` (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/references/branches.md`; plugin: sibling `skills/crav1-add-to-spec/references/branches.md`) says under **Promotion**: per repo, the furthest environment reached and each later one not yet reached, as `on the branch that deploys to <env> (<branch>)` or `not yet on the branch that deploys to <env> (<branch>)`, release patterns as `on release/<x> (deploys to <env>)`, tag lines as `in tag <tag> (deploys to <env>)` or `not yet tagged`, the chain at the end, `Unclear:` for an unknown word with no `(after …)`, and `<branch>: not back on <base>` for a release fix. Branch reach, never `deployed to`. When a pipeline-sourced line is behind it, end with **Also check the latest pipeline runs?** (**Check pipeline runs** / **No, keep the git answer**); the choice word `pipeline runs` runs the check without asking; headless without it gives the git answer plus `Pipeline runs not checked. Add the word: pipeline runs.` Azure DevOps only, read-only; `az has no login` keeps the git answer. Report only: done stays merged into the base.
-4. Name the route (`workflow.yaml`) the slice is on and the step it is at, marked from the files: for example no `plan.md` is before Plan; `plan.md` with no `Reviewed:` line is at review-plan; ready tasks are at build; all tasks ticked and verified is at finalize-commit, or at `/crav1-open-pr` / `/crav1-merge-pr` when some work branches are not merged yet.
-5. Give the next step from that route, and why. Do not run it.
+Read `references/status.md` ("6. Status of a slice") only when the user asks for the status of a slice.
 
 ### 7. Compare two skills
 
-`compare A B`, or `difference between A and B`. A side-by-side table from both `skills.yaml` entries and reference pages: lane and group, purpose, use when, reads, writes, leaves alone, runs by itself, you run next, and their route steps. Then one or two lines on when to pick which, only as the docs say it. For `/crav1-explain-this-code` and `/crav1-explain-existing-system`: explain-this-code reads code (a file, function, selection, or PR diff) and the code it calls; explain-existing-system reads the system notes in `docs/system/` about the whole system. Both are read-only and cross-cutting. A name that matches no skill: say so and list the closest names.
+Read `references/modes.md` ("7. Compare two skills") only when the user asks to compare two skills.
 
 ### 8. What's new
 
-`whats new`: the `CHANGELOG.md` section for the installed version (see **Newer-version notice** for how it is found). `whats new since x.y` or `since x.y.z`: every section after that version, newest first, up to the installed one. Summarize each release in a few bullets and cite its heading anchor, for example `Source: CHANGELOG.md#1540-2026-10-14`. Never read a newer version's notes from GitHub; when a newer tag exists, only the one notice line names it.
+Read `references/modes.md` ("8. What's new") only when the user asks what's new.
 
 ### 9. A free-form question
 
@@ -138,17 +132,11 @@ When the user questions an answer ("don't we need tighten-spec first?"), re-read
 
 ## Newer-version notice
 
-At most once per chat, in the first answer:
-
-1. The installed version is `version` in the plugin's `.cursor-plugin/plugin.json` (kit repo: `plugins/crav1/.cursor-plugin/plugin.json`). A drop-in has no `plugin.json`: use the `Kit version:` line at the top of `crav1-docs/reference/workflow.md`. When neither is readable, skip the notice.
-2. When the machine is online, read the tag names only, with a short timeout: `git ls-remote --tags --refs https://github.com/Crav1on/crav1-spec-kit` . Take the highest `vX.Y.Z`.
-3. When that is newer than the installed version, add one line: `A newer kit version is tagged: vX.Y.Z (installed X.Y.Z).` Nothing else.
-
-Offline, a failed read, or no newer tag: say nothing. Never read a doc, a changelog, or a skill from GitHub, and never answer from a newer version.
+Read `references/modes.md` ("Newer-version notice") only when a newer kit version may exist.
 
 ## Parked and retired specs (1.60.0)
 
-When the answer lists specs or the next step, skip `docs/specs/retired/` and `Moved:` pointers. List each spec with a `Parked:` line under **Parked**, with its date and reason and the count of notes with that slug in `waiting_for` (from the generated notes indexes in `docs/notes/YYYY-MM/`, or an old `Waiting for <slug> (parked)` line), for example `orders-export (parked 2026-10-16, waiting on partner), 2 notes waiting`. Name `/crav1-retire-spec un-park docs/specs/<slug>/` to pick one up. Do not run it.
+Read `references/modes.md` ("Parked and retired specs (1.60.0)") only when a slice is parked or retired.
 
 ## What it does not do
 
