@@ -8,7 +8,7 @@ This is cross-cutting. It is not its own lane. It may run from any lane. It does
 
 It is a later skill. It is not a starter option. When the user asks for startup options, that ask names only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs`, `/crav1-read-environment`, and `/crav1-fix-bug`. It does not run this command. The six starter options stay unchanged.
 
-A function gets a few checks. A page gets a browser check. A boundary gets an integration check. The command does not dump every test type. Every suggestion stays listed. Nothing is dropped to keep the list short. The user takes them one at a time: keep, leave, or dismiss. Dismiss means it is not offered again. A kept suggestion goes onto the existing spec through `/crav1-add-to-spec`. Plan turns it into a task. This command does not write the tests, change the code, or start Specify, Plan, or Build.
+A function gets a few checks. A page gets a browser check. A boundary gets an integration check. The command does not dump every test type. Every suggestion stays listed. Nothing is dropped to keep the list short. The user answers them in one batch: keep, leave, or dismiss (a single yes takes the recommendations). Dismiss means it is not offered again. A kept suggestion goes onto the existing spec through `/crav1-add-to-spec`. Plan turns it into a task. This command does not write the tests, change the code, or start Specify, Plan, or Build.
 
 ## First prompt
 

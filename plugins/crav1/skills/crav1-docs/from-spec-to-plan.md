@@ -23,7 +23,7 @@ The spec is accepted. Write plan.md and tasks.md. Do not write code.
 | Plan | — | Writes `plan.md` and `tasks.md`. Each task row names its check before any code: `(verify: <kind> — <named check>) (spec: …)`. Stale research findings are listed under Risks and do not block |
 | Linter | When the plan says there is no linter for the code the tasks touch: add one, or go on without | `## Linter` names the repo's linter or checker. When there is none, the plan stops before Build until you choose. It does not install one |
 | Review (optional) | `/crav1-review-plan` | Starts the `crav1-plan-reviewer-agent` subagent. Numbered findings `P#` in chat. Writes nothing |
-| Tighten (optional) | `/crav1-tighten-plan`, then pick one `P#` at a time | Patches only the picked issue in `plan.md` or `tasks.md`. A finding about the spec goes back to `/crav1-tighten-spec` |
+| Tighten (optional) | `/crav1-tighten-plan`, then answer every `P#` in one batch (`yes` takes the recommendations) | Patches only the picked issue in `plan.md` or `tasks.md`. A finding about the spec goes back to `/crav1-tighten-spec` |
 | Accept | Read `plan.md` and `tasks.md`. Edit them if needed. Say they are accepted | — |
 
 Treat the plan as a design review. Wrong files, missing constraints, and oversized tasks are cheaper to fix here than after a large diff. A task that cannot be verified is not ready to build.

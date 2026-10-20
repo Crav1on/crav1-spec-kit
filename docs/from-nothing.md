@@ -115,3 +115,7 @@ New chat so exploration does not pollute implementation.
 If a repo already exists, `@` the relevant folders so plan and spec-reviewer apply “preserve existing patterns.”
 
 Reference page: [spark-to-spec](reference/skills/crav1-spark-to-spec.md)
+
+## Last line
+
+`/crav1-spark-to-spec` ends with one plain line: what is left and the next skill. `Left: 2 gaps to tighten, 3 open questions. Next: /crav1-tighten-spec orders-retry.` or `Nothing left to tighten. Next: /crav1-plan-from-spec orders-retry.`
