@@ -20,7 +20,7 @@ A spec's **work branches**, per repo, are every branch named in those three plac
 
 ## Which refs
 
-Use the remote copy (`origin/<name>`) when it exists, and the local branch otherwise. Never fetch. Each report names the age of each remote copy it used, from the date of its newest commit, for example `origin/develop newest commit 2026-10-17 (2 days old)`, so stale refs are visible. Say `fetch to refresh` once when a copy is older than seven days. Do not run the fetch.
+Use the remote copy (`origin/<name>`) when it exists, and the local branch otherwise. Never fetch. Each report names the age of each remote copy it used, from the date of its newest commit, for example `origin/develop newest commit 2026-10-17 (2 days old)`, so stale refs are visible. Count the age in whole calendar days (1.67.1): today's local date minus the commit's committer date in local time (`git log -1 --format=%cd --date=short-local <ref>`), not counting the commit day itself and never rounding up. A commit made today is `today`, yesterday is `1 day old`. Say `fetch to refresh` once when a copy is older than seven days. Do not run the fetch.
 
 ## Sibling checkout
 

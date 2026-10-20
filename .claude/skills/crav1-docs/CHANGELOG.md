@@ -2,6 +2,15 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.67.1 (2026-10-20)
+
+Two bug fixes in the multi-branch work. Examples use made-up names: the code repo `orders-api`.
+
+### Kit
+
+- **Branch list filled in.** `/crav1-add-to-spec` code change wrote only the slice `Synced at` line, so the spec's Match `Branch:` list stayed empty. A one-slice read of a work branch now also adds that branch to the list, for example `- Branch: orders-api feat/orders-retry; orders-api feature/orders-openapi`. Base branches (the `Merges into` and default branch) are never added, an entry already there is left alone, and existing `(into …)` and `(spec branch)` markers stay. The report says whether the branch was added. `marks.yaml` lists add-to-spec as a writer of the Branch mark.
+- **Copy ages.** `/crav1-help` status (and every Branches report) showed remote copy ages one day too high. Ages now count whole calendar days in local time from the commit's committer date, without counting the commit day: a commit made today is `today`, yesterday is `1 day old`.
+
 ## 1.67.0 (2026-10-19)
 
 `/crav1-review-pr` keeps the comment you actually posted, next to the one it drafted, so the specs repo matches what reviewers see. Examples use made-up names: the code repo `orders-api` on GitHub, pull request 42.

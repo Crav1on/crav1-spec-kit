@@ -116,8 +116,8 @@ marks:
       - "- Branch: develop"
       - "- Branch: feat/orders-retry; feature/orders-openapi"
       - "- Branch: orders-api feat/orders-retry; orders-api feature/orders-export (into feat/orders-retry)"
-    meaning: "The branches that hold the slice's code, written after a yes. Since 1.64.0 a yes adds to the list. An (into …) marker is read by open-pr in 1.64.0 and written by hand only."
-    written_by: [crav1-tighten-spec]
+    meaning: "The branches that hold the slice's code, written after a yes. Since 1.64.0 a yes adds to the list. Since 1.67.1 an add-to-spec code-change read of a work branch adds that branch. An (into …) marker is read by open-pr in 1.64.0 and written by hand only."
+    written_by: [crav1-tighten-spec, crav1-add-to-spec]
     read_by: [crav1-tighten-spec, crav1-plan-from-spec, crav1-open-pr, crav1-help, crav1-verify-build-against-spec, crav1-tasks-ready-to-build, crav1-merge-pr, crav1-review-pr]
     mention: 'Branch:'
     since: 1.32.0
