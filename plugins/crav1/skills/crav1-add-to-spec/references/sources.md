@@ -10,6 +10,8 @@ These skills write the files. They do not commit. They do not push. They do not 
 
 Kind sections live in their own files. A mail follows [sources-mail.md](sources-mail.md) (**Mails**, **Images inside a mail**). A binary file handed over as its own file, and each image inside a mail, follows [sources-binary.md](sources-binary.md) (**Binary files**). A paste, or a text file that is already text, needs neither. Moved word for word from `sources.md` in 1.71.1; the rules are unchanged.
 
+Rare and flagged sections live in their own files. When the check below flags an item or finds a secret, follow [sources-flagged.md](sources-flagged.md) (**Transfer data policy**, **The note and the list**, **One question for the recommendations**). A PDF with black-boxed text, a `.docx`, an ambiguous date, a newer or older version, sources that disagree, and a run with no window follow [sources-rare.md](sources-rare.md) (**Reading the document**, **Versions and conflicts**, **Headless runs (two-pass)**). Temporary files, an image the kit cannot view, and duplicate images are in [sources-binary.md](sources-binary.md). Moved word for word from `sources.md` in 1.71.2; the rules are unchanged.
+
 ## Folder
 
 Each imported source is one folder:
@@ -44,59 +46,6 @@ Write the folder once, before the first verbatim quote from that source is writt
 - A redaction, when one was made, including a secret. Name the kind that was removed. Do not paste the removed value. Say the file is then no longer the untouched original.
 
 Do not invent a sender, a participant, a date, or a time. When the source does not show one, say it is not shown.
-
-## Reading the document
-
-### Temporary files
-
-Extract images and other temporary files into a new folder in the system temp folder (for example `mktemp -d`, or `%TEMP%` on Windows), never inside the repo. Delete that folder at the end of the run, also when the run fails or stops early. Write only the picked files into `docs/sources/`.
-
-### An image the kit cannot view
-
-When the kit cannot see an image (for example a headless `-p` run, where images cannot be read), say so. Never guess what it shows from its type, its order, or its size. Leave the image out with the placeholder `[Image left out: <name>, not viewed]`. The README and the run summary list it, and tell Rhea or the user to check it before deciding keep or leave.
-
-### Black-boxed text
-
-Text under a black box in a PDF is redacted, even when it can still be extracted. Never copy it into a file, a quote, or the chat. Mark the spot `[redacted in source]`.
-
-### Word files
-
-Read a `.docx` as if every tracked change were accepted, and flag each change in the README (what changed, who, and when, as the file shows). List each comment in the README with its author and date. A change or a comment that affects a spec becomes an open question in that spec.
-
-### Dates
-
-Never guess an ambiguous date such as `03/04`. Keep it as the source wrote it and add an open question that asks which date is meant. Fill it in only once answered. When the context settles it (the document's locale, a weekday next to it), apply it the normal way.
-
-### Duplicate images
-
-Detect exact duplicates (same bytes) across a document and across the documents of one intake. Store each image once. The README lists every place it appears. Ask the keep-or-leave question once per image.
-
-## Versions and conflicts
-
-### Superseded versions
-
-When an import brings a newer version of a document already imported, or an older one, mark the older folder's README `Superseded by: docs/sources/<newer>/`. Keep the old folder. Read only the newest version for specs.
-
-### Source precedence
-
-When sources disagree, the newest source that records a decision wins. When no source settles it, write an open question. After an intake of several files, run one conflict pass across them before the specs are final.
-
-### Plain facts
-
-A plain uncontested fact, such as a date or a name that no source contradicts, is applied without asking. List every one in the run summary. A fact that changes a decision, or that conflicts with text already in the spec, is still asked.
-
-### Glossary
-
-Add a new glossary term without asking. Before rewriting an existing row, show the old and the new definition side by side with the source, and wait for the user's yes.
-
-## Headless runs (two-pass)
-
-A run with no window (for example `-p`) cannot stop to ask. Run it in two passes:
-
-1. **Pass 1** does everything that needs no answer, writes every question to a file in the system temp folder, names that file, and stops. It writes nothing to `docs/sources/` or a spec that depends on an answer.
-2. **Pass 2** is pointed at that file with the answers filled in, applies them, and finishes.
-
-When the file is gone at pass 2 (temp was cleaned), ask the questions again with a new pass 1.
 
 ## Personal data
 
@@ -139,69 +88,6 @@ The kinds are:
 - VPN configs
 
 Show each secret in the list by kind only. Do not show the value. Do not ask keep or redact. Remove it from the file that will be written, and from the quote. Note it in the README by kind, not by value.
-
-### Transfer data policy
-
-The rule is once per repo and one shared policy for Cursor and Claude Code. It has two copies. Cursor: `.cursor/rules/crav1-transfer-data-policy.mdc`. Claude Code project: `.claude/rules/crav1-transfer-data-policy.md`. Read the copy for the host that is running. When only one copy exists, use it and write the other copy from it with the same words. When the kit writes the rule, it writes both copies together. When both exist and differ, say so and ask the user which one wins. Do not merge them. Then write the other copy from the one they picked. Do not read or write a user-level file. The user changes the rule by editing or deleting that file.
-
-The template is this skill's `assets/crav1-transfer-data-policy.mdc` (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/assets/crav1-transfer-data-policy.mdc`; plugin: this skill's `assets/crav1-transfer-data-policy.mdc`).
-
-The file lists types, one per line. This version checks personal data. A later type can be added as its own line. It lists `auto-accept` or `review`. It lists where the repo is hosted, in the user's words. It does not list a secrets choice.
-
-When the file exists and those three parts are present, apply it. Show one line that names the file and what it chose: the types, auto-accept or review, and where the repo is hosted. Do not ask the setup questions.
-
-When the file is missing a type, a recommendation, or the hosted line, or the recommendation is not `auto-accept` or `review`, say what is missing. Do not guess. Ask the setup questions for this run. Do not rewrite the file unless the user says yes to save.
-
-When no rule exists, and the check found a flagged item or a secret, ask the setup questions once for the run. A later source in that run uses the same answers. Do not ask them again in that run. Use the questions tool when it is available, except for the hosted question. Stop until the user answers.
-
-1. **Which types should this check cover?** The only option this version offers is personal data. The rule stores one type per line, so a later type can be added.
-2. **Apply the recommendations automatically, or review them on each run?** The options are auto-accept the recommendations, and review each run.
-3. **Where is this repo hosted?** Free text. Not options. Do not invent a place. The note uses this answer.
-4. **Save these answers as the transfer data policy for this repo?** Yes or no. Yes writes the file from the template. Replace `- <type>` with one line per chosen type. This version writes `- personal data` when the user picks that type. Replace `<auto-accept or review>` with `auto-accept` or `review`. Replace `<where this repo is hosted>` with the user's words. Do not leave the angle-bracket placeholders. Do not add a secret, a phone number, or an email address. No uses the answers this run only and does not write the file.
-
-When nothing is flagged and there is no secret, say so in one line and continue. Do not ask the setup questions. Do not show the note.
-
-### The note and the list
-
-When there is a flagged item or a secret, show this note once, above the list. Mark it as not legal advice. Replace `<hosted>` with the hosted words from the rule, or from the answer this run. Do not leave the placeholder.
-
-This is not legal advice. Keeping a work mail as a project record fits, because a spec quote must trace to the source. Keep only what that trace needs. Where the repo is hosted matters. This repo is hosted at <hosted>. The client's or the employer's data and retention policy comes first. Removing something after it is pushed means rewriting git history.
-
-Then show the list.
-
-Number each item that has a recommendation. The line shows the text, the kind, and where it sits. The line ends with `Recommended: keep.` or `Recommended: redact.`
-
-List each unplaced item after the numbers. The line shows the text, the kind, and where it sits. The line says there is no recommendation.
-
-List secrets last. One line per kind. Do not number them. Do not show the value. The line says redacted.
-
-### One question for the recommendations
-
-Ask this question when there is at least one numbered item, and the rule or this run says review. One question. Three answers. Use the questions tool when it is available. Stop until the user picks.
-
-1. **Accept all recommendations.**
-2. **Go through them one by one.** The recommendation is shown on each item, and in its question as the first option with ` (Recommended)`.
-3. **Change some.** The user names items to flip, for example keep 3, redact 5.
-
-Accept all recommendations applies every numbered recommendation.
-
-Go through them one by one asks keep or redact for each numbered item. One item at a time. Options only. Use the questions tool when it is available. The recommended choice is the first option, labelled ` (Recommended)`, for example `Redact (Recommended)`, then the other. Stop until the user picks.
-
-Change some waits for the user to name the items. The named choice replaces the recommendation for that item. An item they do not name keeps its recommendation. When a number is not on the list, or the reply does not name an item, ask again. Do not guess.
-
-When the rule or this run says auto-accept, do not ask that question. Apply each numbered recommendation. That auto-accept covers these keep and redact lines. Images inside a mail says when it also covers an image recommendation.
-
-Unplaced items are still asked, whatever was picked, including auto-accept, all in one questions call (1.70.0), one question per item. Options are keep and redact. There is no recommendation. Use the questions tool when it is available. Stop until the user picks.
-
-When there is no numbered item, do not ask the three-answer question. Ask the unplaced items. A secret is not a question.
-
-**Keep.** That text stays.
-
-**Redact.** Remove that item from the file that will be written, and from the quote. Note the redaction in the README, by kind, not by pasting the value. The file is then no longer the untouched original. The README says so.
-
-A detail that is readable only in an image follows the same keep or redact. When that image will be compressed, the samples are the redacted image. When that image will be converted to text, the redact removes the item from `<name>.md` and from the quote. When the option for that image is commit as-is, a redact cannot leave the image unchanged. Say so and ask the user to pick compress, convert to text, or leave it out for that image. Do not edit an as-is image.
-
-Do not write the source files until every flagged item has an answer and every image inside a mail has an answer. A secret is already answered by this section. The rule file may be written when the user says yes, before the source files. Do not write an unredacted copy into the repo. When a screenshot or an embedded image will be compressed, the samples are the redacted image. The user commits later. A redacted value is not in the file they will commit. Do not commit.
 
 ## Spec lines
 
