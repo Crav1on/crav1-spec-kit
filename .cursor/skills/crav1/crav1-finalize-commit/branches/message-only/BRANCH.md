@@ -54,7 +54,7 @@ Do **not** ask. Draft matching **live `git log`**. If the log is empty, say so a
 
 If `git log` is empty or unavailable, say that `log-once` / `log-onward` have no pattern to copy; they can still pick CRAV1 style.
 
-If they already named an id (`once`, `onward`, `log-once`, `log-onward`), skip the menu.
+If they already named an id (`once`, `onward`, `log-once`, `log-onward`), skip the menu. The choice word `crav1` is `once`; `git log` is `log-once`.
 
 After `onward` or `log-onward`: write the matching **new** rule name **before** showing the message, and delete the other persist files (including legacy names) so only one remains. Tell them they undo by **deleting that rule file**.
 
