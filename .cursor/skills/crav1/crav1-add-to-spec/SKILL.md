@@ -39,31 +39,31 @@ When a choice is missing and the run is headless or started by a bot (no person 
 
 ## From /crav1-read-environment
 
-Read `references/handoffs.md` ("From /crav1-read-environment") only when the call comes from /crav1-read-environment.
+Read `references/handoffs-read-environment.md` ("From /crav1-read-environment") only when the call comes from /crav1-read-environment.
 
 ## From /crav1-suggest-tests-for-code
 
-Read `references/handoffs.md` ("From /crav1-suggest-tests-for-code") only when the call comes from /crav1-suggest-tests-for-code.
+Read `references/handoffs-suggest-tests.md` ("From /crav1-suggest-tests-for-code") only when the call comes from /crav1-suggest-tests-for-code.
 
 ## From the push features branch of /crav1-ado-sync
 
-Read `references/handoffs.md` ("From the push features branch of /crav1-ado-sync") only when the call comes from the ado-sync push features branch.
+Read `references/handoffs-ado-push.md` ("From the push features branch of /crav1-ado-sync") only when the call comes from the ado-sync push features branch.
 
 ## From the pull spec changes branch of /crav1-ado-sync
 
-Read `references/handoffs.md` ("From the pull spec changes branch of /crav1-ado-sync") only when the call comes from the ado-sync pull spec changes branch.
+Read `references/handoffs-ado-pull.md` ("From the pull spec changes branch of /crav1-ado-sync") only when the call comes from the ado-sync pull spec changes branch.
 
 ## From the meeting branch of /crav1-add-to-spec
 
-Read `references/handoffs.md` ("From the meeting branch of /crav1-add-to-spec") only when the call comes from the meeting branch.
+Read `references/handoffs-meeting.md` ("From the meeting branch of /crav1-add-to-spec") only when the call comes from the meeting branch.
 
 ## From an import: answer links and asked marks
 
-Read `references/handoffs.md` ("From an import: answer links and asked marks") only when the input answers an open question or shows one being asked.
+Read `references/handoffs-import-answers.md` ("From an import: answer links and asked marks") only when the input answers an open question or shows one being asked.
 
 ## Picture offer
 
-Read `references/handoffs.md` ("Picture offer") only when the run ends and a picture could be offered.
+Read `references/handoffs-picture.md` ("Picture offer") only when the run ends and a picture could be offered.
 
 ## Input
 
@@ -75,7 +75,7 @@ Spec folders are `docs/specs/<slug>/` with a `spec.md`. Skip `_template`.
 
 If there are no spec folders, stop. Point at `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, or `/crav1-existing-to-specs`. Do not create a slug. Do not seed `docs/system/`.
 
-If the input is a file under `docs/research/` and there is no new quote for a spec, run the clear section of [references/research-stale.md](references/research-stale.md). Do not ask the user whether the update resolves the mark. Do not ask for a slug. Do not paste the note into a spec.
+If the input is a file under `docs/research/` and there is no new quote for a spec, run the clear section, [references/research-stale-clear.md](references/research-stale-clear.md). Do not ask the user whether the update resolves the mark. Do not ask for a slug. Do not paste the note into a spec.
 
 If they named one existing folder (a path in the message, or one `@` of that folder or its `spec.md`) and no other existing spec could fit the new information, that folder is the target. Do not ask.
 
@@ -85,11 +85,11 @@ Stop until they pick, when a pick is required.
 
 ## Imported sources
 
-Read `references/handoffs.md` ("Imported sources") only when the input is a mail, transcript, screenshot or other original.
+Read `references/handoffs-imported-sources.md` ("Imported sources") only when the input is a mail, transcript, screenshot or other original.
 
 ## Add to that spec.md
 
-Edit `docs/specs/<slug>/spec.md` in this step. An imported source also writes `docs/sources/YYYY-MM-DD-<slug>/` and, after a yes, one `.gitattributes` line, as [references/sources.md](references/sources.md) says. When an image inside a mail is converted to text, that folder also holds `<name>.md`. Do not write any other file in this step, except the note and its `used_by` under **Notes**.
+Edit `docs/specs/<slug>/spec.md` in this step. An imported source also writes `docs/sources/YYYY-MM-DD-<slug>/` and, after a yes, one `.gitattributes` line, as [references/sources.md](references/sources.md) says, with the kind file it names. When an image inside a mail is converted to text, that folder also holds `<name>.md`. Do not write any other file in this step, except the note and its `used_by` under **Notes**.
 
 - Quote their words. The quote is the record. Do not replace it with a paraphrase.
 - Label what is new versus what was already there.
@@ -123,7 +123,7 @@ Read `references/notes-1.61.md` ("Notes (1.61.0)") only when you save the input 
 
 Read `docs/system/` when it exists (`landscape.md`, `repos.md`, `diagrams.md`, `glossary.md`, `adr/`) and every other `docs/specs/<slug>/spec.md` (skip `_template`). Check whether the new information contradicts or extends the landscape, a repo row, a diagram, an ADR, or another spec.
 
-Also compare the kept quote with research. Follow [references/research-stale.md](references/research-stale.md). Read `docs/research/*.md` and `## Research findings` on the specs this quote touches, and the notes those findings link to. List a clear contradiction and an answered open question. An unclear case is not a hit. Ask before any new mark. Write the stale block and the findings line only after the user says yes. Then offer the revisit draft. The kit drafts only. It does not send it. It does not contact the note's owner. When the user pointed this command at an updated note in `docs/research/`, or this run writes one, follow the clear section of that file. Judge each listed point. An older mark with no point lines is not one point. Split it as that file says. Also route the note's own open questions when the answer lies outside the note's owner. That still runs when the mark clears. Do not ask the user whether the update resolves the mark. A kept quote that answers a point already waiting is re-checked there too. That re-check does not ask.
+Also compare the kept quote with research. Follow [references/research-stale.md](references/research-stale.md). Read [references/research-stale-mark.md](references/research-stale-mark.md) only on a hit. Read `docs/research/*.md` and `## Research findings` on the specs this quote touches, and the notes those findings link to. List a clear contradiction and an answered open question. An unclear case is not a hit. Ask before any new mark. Write the stale block and the findings line only after the user says yes. Then offer the revisit draft. The kit drafts only. It does not send it. It does not contact the note's owner. When the user pointed this command at an updated note in `docs/research/`, or this run writes one, follow the clear section, [references/research-stale-clear.md](references/research-stale-clear.md). Judge each listed point. An older mark with no point lines is not one point. Split it as that file says. Also route the note's own open questions when the answer lies outside the note's owner. That still runs when the mark clears. Do not ask the user whether the update resolves the mark. A kept quote that answers a point already waiting is re-checked there too. That re-check does not ask.
 
 Section names for that read, not a file to paste over what exists: this skill’s `assets/system/` (same files as `docs/system/_template/`, including `glossary.md`; drop-in: `.cursor/skills/crav1/crav1-add-to-spec/assets/system/`; plugin: this skill’s `assets/system/`).
 
