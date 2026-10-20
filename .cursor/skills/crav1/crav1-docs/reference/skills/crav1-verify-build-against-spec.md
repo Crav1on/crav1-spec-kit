@@ -16,6 +16,16 @@ Before the tests, a local dependency preflight checks Azurite, database containe
 
 1.68.0: the `Sub-branches:` and `left behind:` lines, done when the top-level branches reached the base, and `merged, reverted on <base> (<sha>)`, report only.
 
+1.69.0: the `Promotion:` line in the TL;DR and verify.md, with the optional `pipeline runs` check; done stays merged.
+
+## Choice words
+
+Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
+
+| Question | Word | Means |
+| --- | --- | --- |
+| Also check the latest pipeline runs? | `pipeline runs` | check the latest successful Azure DevOps runs behind the Promotion line (read-only) |
+
 ## Runs when
 
 Want proof against acceptance. Called by the user and by `crav1-build-task-agent`.

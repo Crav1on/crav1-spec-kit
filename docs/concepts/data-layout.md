@@ -310,6 +310,7 @@ Every mark and line format the kit writes inside product files, generated from [
 | Mark | Format | Where | Written by | Read by | Since |
 | --- | --- | --- | --- | --- | --- |
 | Environment mark | `<resource-id-or-name> \| <group> \| <environment> \| <source>` | `docs/environments/marks.md` | `/crav1-read-environment`, `/crav1-map-pipeline-environments` | `/crav1-read-environment`, `/crav1-what-do-we-know-about-this` | 1.18.0 |
+| Promotion line | `<repo> \| <branch, pattern or tag <pattern>> \| <environment>[ (after <environment>)] \| <source>` | `docs/environments/promotion.md` | `/crav1-map-pipeline-environments` | `/crav1-help`, `/crav1-verify-build-against-spec`, `/crav1-tasks-ready-to-build`, `/crav1-merge-pr` | 1.69.0 |
 | Azure Boards task type | `Azure Boards task type[ (<project>)]: <type>` | `docs/environments/marks.md` | `/crav1-ado-sync` | `/crav1-ado-sync` | 1.45.0 |
 | Azure Boards task done state | `Azure Boards task done state[ (<project>)]: <state>` | `docs/environments/marks.md` | `/crav1-ado-sync` | `/crav1-ado-sync` | 1.48.0 |
 

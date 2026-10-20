@@ -112,6 +112,10 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 
 **Reverted.** A merged branch whose change was later undone on the base branch (a `This reverts commit` message or the reverse patch). Shown as `merged, reverted on <base> (<sha>)`; report only, it never blocks done. Since 1.68.0.
 
+**Promotion.** How far merged work has got along a repo's environment chain (dev, test, prod), read from `docs/environments/promotion.md` and shown as the `Promotion:` status line. Report only; done stays merged into the base branch. Since 1.69.0. See [environments-promotion.md](../environments-promotion.md).
+
+**Branch reach.** The Promotion test: the work is contained in a branch (or a matching release branch or tag) that a promotion.md line says deploys to an environment. It is not deployment proof; the wording is "on the branch that deploys to prod", never "deployed to prod". The optional `pipeline runs` check reads the latest successful Azure DevOps runs. Since 1.69.0.
+
 **Base branch / Merges into.** The branch a repo's work merges into: the `Merges into` cell in `docs/system/repos.md` (for example `develop`), else the default branch. A base branch is never counted as a work branch.
 
 **Fork point.** Where a branch split off: the closest of its repo's base branches (while the `Merges into` cell is empty, also `develop`, `development`, `dev` or `integration` when they exist) and the spec's other branches, by fewest own commits. A branch diff starts there, not at the default branch.

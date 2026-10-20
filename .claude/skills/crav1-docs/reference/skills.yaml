@@ -355,7 +355,7 @@ skills:
   reads: Reads the host the user named, non-prod resources on that host, prod-only resources for shape
     and connections when the user says yes, and `docs/environments/marks.md` when it exists. After that
     read, optional SQL metadata and storage structure only when the user says yes.
-  writes: Writes only confirmed lines appended to `docs/environments/marks.md`.
+  writes: Writes only confirmed lines appended to `docs/environments/marks.md` and (1.69.0) `docs/environments/promotion.md`.
   leaves_alone: Leaves `docs/system`, `docs/architecture/spec.md`, feature specs, `docs/architecture/left-out.md`,
     and application code alone.
   exceptions: does not guess the host. Naming production, prod, or live stops. One pass covers every non-prod
@@ -1015,6 +1015,12 @@ skills:
     which uses the two-pass questions file.
   - '1.64.0: the TL;DR adds a Branches line (merged into the base, deleted-but-merged, rewritten, shared); demoable needs every work branch merged. Report only.'
   - '1.68.0: the `Sub-branches:` and `left behind:` lines, done when the top-level branches reached the base, and `merged, reverted on <base> (<sha>)`, report only.'
+  - '1.69.0: the `Promotion:` line in the TL;DR and verify.md, with the optional `pipeline runs` check; done stays merged.'
+  choice_words:
+  - question: Also check the latest pipeline runs?
+    words:
+    - word: "pipeline runs"
+      means: "check the latest successful Azure DevOps runs behind the Promotion line (read-only)"
   use_when: Want proof against acceptance
   table:
     reads: Spec, tasks, plan, and the running tree
@@ -1256,6 +1262,12 @@ skills:
   - '1.64.0: after a confirmed merge, says `<n> of <m> branches of <slug> now merged into <target>` per spec. No file edits.'
   - '1.66.0: a branch that is behind the base or has conflicts gets one line: merge the base into the branch, push, then ask to merge again. Never a rebase.'
   - '1.68.0: after a sub-branch merge, says `<n> of <m> sub-branches merged into <spec branch>` and any `left behind` branch; a reverted branch shows `merged, reverted on <base> (<sha>)`, report only.'
+  - '1.69.0: the `Promotion:` line after the after-merge line, with the optional `pipeline runs` check.'
+  choice_words:
+  - question: Also check the latest pipeline runs?
+    words:
+    - word: "pipeline runs"
+      means: "check the latest successful Azure DevOps runs behind the Promotion line (read-only)"
   use_when: This turn asks to merge a named pull request
   table:
     reads: That named pull request
@@ -1289,6 +1301,12 @@ skills:
   - '1.64.0: `status <slug>` and `where am I` add the Branches line and route unmerged work to `/crav1-open-pr` or `/crav1-merge-pr`.'
   - '1.67.1: remote copy ages count whole calendar days in local time; a commit made today is `today`, not `1 day old`.'
   - '1.68.0: status adds the `Sub-branches:` and `left behind:` lines and `merged, reverted on <base> (<sha>)`, report only.'
+  - '1.69.0: status adds the `Promotion:` line from `docs/environments/promotion.md` (branch reach, release and tag patterns, `not back on <base>`), with the optional `pipeline runs` check.'
+  choice_words:
+  - question: Also check the latest pipeline runs?
+    words:
+    - word: "pipeline runs"
+      means: "check the latest successful Azure DevOps runs behind the Promotion line (read-only)"
   use_when: You want to know what to run next, in what order, or what a skill does
   table:
     reads: The kit docs (kit repo, or the bundled `crav1-docs/` next to the skills), and the slice's file state
@@ -1317,6 +1335,12 @@ skills:
   - 'Shows summary counts per slice, then Ready, Blocked (one reason each, recorded or inferred), Needs verify, a Done count, `Next: /crav1-build-tasks T#`, and a `Source:` line. Local only: it never reads Azure Boards and names `/crav1-ado-sync` for task states there. It writes nothing and runs no other skill. It can run any time. It is cross-cutting. It is not a starter option.'
   - '1.64.0: shows a task''s `(branch: …)` and one Branches line from local git only.'
   - '1.68.0: the `Sub-branches:` and `left behind:` lines and `merged, reverted on <base> (<sha>)`, report only.'
+  - '1.69.0: the `Promotion:` line under the Branches line, with the optional `pipeline runs` check.'
+  choice_words:
+  - question: Also check the latest pipeline runs?
+    words:
+    - word: "pipeline runs"
+      means: "check the latest successful Azure DevOps runs behind the Promotion line (read-only)"
   use_when: 'You want to know which tasks can be built now, and why the others cannot'
   table:
     reads: '`spec.md` open questions, `plan.md`, `tasks.md`, and `verify.md` per slice'
@@ -1615,13 +1639,14 @@ skills:
     or `docs/architecture/left-out.md`. Names `/crav1-read-environment` and does not run it. Not a starter
     option. Asking for startup options names only the six and does not run this command. The six starter
     options stay unchanged.
+  - '1.69.0: a Branches section proposes `docs/environments/promotion.md` lines (branch, pattern or tag to environment) from `trigger:`, stage `condition:` and classic artifact filters; definitions only, confirmed and appended.'
   use_when: The user names Azure DevOps, the org, and the project
   table:
     reads: Those pipeline definitions and `marks.md`
-    writes: Confirmed lines on `docs/environments/marks.md`
+    writes: Confirmed lines on `docs/environments/marks.md` and `docs/environments/promotion.md`
   reads: Reads Azure DevOps pipeline definitions for the org and project the user named, and `docs/environments/marks.md`
     when it exists.
-  writes: Writes only confirmed lines appended to `docs/environments/marks.md`.
+  writes: Writes only confirmed lines appended to `docs/environments/marks.md` and (1.69.0) `docs/environments/promotion.md`.
   leaves_alone: Leaves `docs/system`, `docs/architecture/spec.md`, feature specs, `docs/architecture/left-out.md`,
     and application code alone.
   exceptions: Azure DevOps, the org, or the project missing stops the read. A missing CLI, extension,

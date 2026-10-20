@@ -18,6 +18,16 @@ It reads the kit repo's `docs/`, or the `crav1-docs/` folder bundled next to the
 
 1.68.0: status adds the `Sub-branches:` and `left behind:` lines and `merged, reverted on <base> (<sha>)`, report only.
 
+1.69.0: status adds the `Promotion:` line from `docs/environments/promotion.md` (branch reach, release and tag patterns, `not back on <base>`), with the optional `pipeline runs` check.
+
+## Choice words
+
+Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
+
+| Question | Word | Means |
+| --- | --- | --- |
+| Also check the latest pipeline runs? | `pipeline runs` | check the latest successful Azure DevOps runs behind the Promotion line (read-only) |
+
 ## Runs when
 
 You want to know what to run next, in what order, or what a skill does. Called by the user, or by an agent before it suggests more than one next step or when an order is questioned (the `crav1.mdc` rule).

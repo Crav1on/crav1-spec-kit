@@ -16,6 +16,16 @@ Merge one named pull request only when that turn asks; always a merge commit; no
 
 1.68.0: after a sub-branch merge, says `<n> of <m> sub-branches merged into <spec branch>` and any `left behind` branch; a reverted branch shows `merged, reverted on <base> (<sha>)`, report only.
 
+1.69.0: the `Promotion:` line after the after-merge line, with the optional `pipeline runs` check.
+
+## Choice words
+
+Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
+
+| Question | Word | Means |
+| --- | --- | --- |
+| Also check the latest pipeline runs? | `pipeline runs` | check the latest successful Azure DevOps runs behind the Promotion line (read-only) |
+
 ## Runs when
 
 This turn asks to merge a named pull request. Called by the user.

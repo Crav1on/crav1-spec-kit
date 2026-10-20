@@ -12,6 +12,8 @@ When the user names Azure DevOps, the org, and the project, **[`/crav1-map-pipel
 
 The user names Azure DevOps, the org, and the project. A pipeline name is optional. Reads pipeline definitions with `az pipelines` and `az devops` (list and show only). The stage name gives the environment, with the same whole-word rule as [`/crav1-read-environment`](crav1-read-environment.md). Appends confirmed lines to `docs/environments/marks.md`. Does not run a pipeline. Does not write `docs/system`, `docs/architecture/spec.md`, a feature spec, or `docs/architecture/left-out.md`. Names [`/crav1-read-environment`](crav1-read-environment.md) and does not run it. Not a starter option. Asking for startup options names only the six and does not run this command. The six starter options stay unchanged.
 
+1.69.0: a Branches section proposes `docs/environments/promotion.md` lines (branch, pattern or tag to environment) from `trigger:`, stage `condition:` and classic artifact filters; definitions only, confirmed and appended.
+
 ## Runs when
 
 The user names Azure DevOps, the org, and the project. Called by the user.
@@ -24,9 +26,9 @@ Reads Azure DevOps pipeline definitions for the org and project the user named, 
 
 ## Writes
 
-In short: Confirmed lines on `docs/environments/marks.md`.
+In short: Confirmed lines on `docs/environments/marks.md` and `docs/environments/promotion.md`.
 
-Writes only confirmed lines appended to `docs/environments/marks.md`.
+Writes only confirmed lines appended to `docs/environments/marks.md` and (1.69.0) `docs/environments/promotion.md`.
 
 ## Does not
 
