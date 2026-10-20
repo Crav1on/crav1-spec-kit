@@ -6,6 +6,9 @@
       .claude/skills/ is longer than 1,024 characters (Agent Skills limit), or
     - plugins/crav1/.cursor-plugin/plugin.json "version" differs from the
       newest release heading in CHANGELOG.md (## X.Y.Z ...).
+  It also warns, without failing, when a SKILL.md in .cursor/skills/crav1/ is
+  over 2,000 words (1.71.0): keep the common path there and move rare cases
+  into references/ with a one-line pointer.
 
 Needs PyYAML (pip install pyyaml).
 """
@@ -25,6 +28,7 @@ except ImportError:  # pragma: no cover
 ROOT = Path(__file__).resolve().parent.parent
 TREES = (".cursor/skills/crav1", "plugins/crav1/skills", ".claude/skills")
 LIMIT = 1024
+WORDS = 2000
 
 
 def descriptions() -> list[str]:
@@ -54,7 +58,19 @@ def version() -> list[str]:
     return []
 
 
+def word_warnings() -> list[str]:
+    out: list[str] = []
+    for path in sorted((ROOT / TREES[0]).glob("*/SKILL.md")):
+        n = len(path.read_text(encoding="utf-8").split())
+        if n > WORDS:
+            rel = path.relative_to(ROOT)
+            out.append(f"::warning file={rel}::{rel} is {n} words (over {WORDS:,}); move rare cases into references/")
+    return out
+
+
 def main() -> int:
+    for w in word_warnings():
+        print(w)
     errors = descriptions() + version()
     for e in errors:
         print(e)
