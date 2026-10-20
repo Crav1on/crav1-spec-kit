@@ -584,6 +584,23 @@ marks:
     mention: 'marks\.md'
     since: 1.18.0
 
+  - id: promotion-line
+    name: "Promotion line"
+    group: environments
+    files: ["docs/environments/promotion.md"]
+    format: "<repo> | <branch, pattern or tag <pattern>> | <environment>[ (after <environment>)] | <source>"
+    pattern: '^\S+ \| (tag )?\S+ \| ((dev|development|test|stage|uat|qa|pre-prod|prod)|\S+ \(after \S+\)) \| (pipeline .+, stage .+|marked by the user)$'
+    examples:
+      - "orders-api | develop | test | pipeline orders-cd, stage DeployTest"
+      - "orders-api | release/* | prod | marked by the user"
+      - "orders-api | tag v* | prod | marked by the user"
+      - "orders-api | hotfix | sandbox (after dev) | marked by the user"
+    meaning: "Which branch, branch pattern or tag pattern deploys to which environment. Read for the Promotion: report line (branch reach, not deployment proof); never changes done. An unknown environment word needs (after …), else the line is Unclear. Full rules in environments-promotion.md."
+    written_by: [crav1-map-pipeline-environments]
+    read_by: [crav1-help, crav1-verify-build-against-spec, crav1-tasks-ready-to-build, crav1-merge-pr]
+    mention: 'promotion\.md'
+    since: 1.69.0
+
   - id: azure-boards-task-type
     name: "Azure Boards task type"
     group: environments

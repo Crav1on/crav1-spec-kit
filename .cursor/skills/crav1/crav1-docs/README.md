@@ -94,6 +94,7 @@ Install:
 - [Skills reference](reference/skills.md). Every command and subagent, by lane, with one page each. Generated from [`skills.yaml`](reference/skills.yaml).
 - [Guild routing](guild-routing.md). Which lane each command belongs to.
 - [Environment marks](environments-marks.md). The line format of `docs/environments/marks.md`.
+- [Promotion lines](environments-promotion.md). The line format of `docs/environments/promotion.md` and the `Promotion:` status line (1.69.0).
 - [Changelog](../CHANGELOG.md).
 
 ### Explanation
