@@ -110,17 +110,47 @@ marks:
     name: "Branch"
     group: spec
     files: ["docs/specs/<slug>/spec.md (under ## Match, or after the title)"]
-    format: "[- ]Branch: [<repo> ]<branch>[ (into <branch>)][; [<repo> ]<branch>[ (into <branch>)]]"
-    pattern: '^(- )?Branch: (\S+ )?\S+( \(into \S+\))?(; (\S+ )?\S+( \(into \S+\))?)*$'
+    format: "[- ]Branch: [<repo> ]<branch>[ (into <branch>)| (spec branch)][; [<repo> ]<branch>[ (into <branch>)| (spec branch)]]"
+    pattern: '^(- )?Branch: (\S+ )?\S+( \(into \S+\)| \(spec branch\))?(; (\S+ )?\S+( \(into \S+\)| \(spec branch\))?)*$'
     examples:
       - "- Branch: develop"
       - "- Branch: feat/orders-retry; feature/orders-openapi"
       - "- Branch: orders-api feat/orders-retry; orders-api feature/orders-export (into feat/orders-retry)"
-    meaning: "The branches that hold the slice's code, written after a yes. Since 1.64.0 a yes adds to the list. Since 1.67.1 an add-to-spec code-change read of a work branch adds that branch. An (into …) marker is read by open-pr in 1.64.0 and written by hand only."
+      - "- Branch: orders-api feat/orders-capacity (spec branch); orders-api feat/orders-capacity-t3 (into feat/orders-capacity)"
+    meaning: "The branches that hold the slice's code, written after a yes. Since 1.64.0 a yes adds to the list. Since 1.67.1 an add-to-spec code-change read of a work branch adds that branch. Since 1.68.0 an entry may end in (into …) or (spec branch), written after a yes (see those marks)."
     written_by: [crav1-tighten-spec, crav1-add-to-spec]
     read_by: [crav1-tighten-spec, crav1-plan-from-spec, crav1-open-pr, crav1-help, crav1-verify-build-against-spec, crav1-tasks-ready-to-build, crav1-merge-pr, crav1-review-pr]
     mention: 'Branch:'
     since: 1.32.0
+
+  - id: spec-branch
+    name: "(spec branch)"
+    group: spec
+    files: ["docs/specs/<slug>/spec.md (end of a Match Branch: entry)"]
+    format: "[<repo> ]<branch> (spec branch)"
+    pattern: '^(\S+ )?\S+ \(spec branch\)$'
+    examples:
+      - "feat/orders-capacity (spec branch)"
+      - "orders-api feat/orders-capacity (spec branch)"
+    meaning: "The spec's long-lived branch that its task sub-branches merge into (setup 4). Written after a yes on the into question, on the parent's entry when it has no marker. Done means the top-level branches, not the sub-branches, reached the base."
+    written_by: [crav1-add-to-spec, crav1-tighten-spec, crav1-open-pr]
+    read_by: [crav1-create-feature-branch, crav1-plan-from-spec, crav1-help]
+    mention: '\(spec branch\)'
+    since: 1.68.0
+
+  - id: into-written
+    name: "(into …)"
+    group: spec
+    files: ["docs/specs/<slug>/spec.md (end of a Match Branch: entry)"]
+    format: "[<repo> ]<branch> (into <branch>)"
+    pattern: '^(\S+ )?\S+ \(into \S+\)$'
+    examples:
+      - "feat/orders-capacity-t3 (into feat/orders-capacity)"
+    meaning: "The branch merges into the named branch, not the base: its fork point and its PR base. Read since 1.64.0; offered with a yes/no question and written since 1.68.0. A headless run writes nothing and treats the branch as stacked. Sub-branches count toward the Sub-branches: line only."
+    written_by: [crav1-add-to-spec, crav1-tighten-spec, crav1-open-pr, crav1-create-feature-branch, crav1-build-tasks]
+    read_by: [crav1-open-pr, crav1-help, crav1-verify-build-against-spec, crav1-tasks-ready-to-build, crav1-merge-pr]
+    mention: '\(into'
+    since: 1.68.0
 
   - id: dropped
     name: "(dropped)"
