@@ -266,7 +266,7 @@ Change some waits for the user to name the items. The named choice replaces the 
 
 When the rule or this run says auto-accept, do not ask that question. Apply each numbered recommendation. That auto-accept covers these keep and redact lines. Images inside a mail says when it also covers an image recommendation.
 
-Unplaced items are still asked one at a time, whatever was picked, including auto-accept. Options are keep and redact. There is no recommendation. Use the questions tool when it is available. Stop until the user picks.
+Unplaced items are still asked, whatever was picked, including auto-accept, all in one questions call (1.70.0), one question per item. Options are keep and redact. There is no recommendation. Use the questions tool when it is available. Stop until the user picks.
 
 When there is no numbered item, do not ask the three-answer question. Ask the unplaced items. A secret is not a question.
 

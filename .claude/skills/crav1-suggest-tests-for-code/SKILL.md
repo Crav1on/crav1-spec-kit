@@ -5,7 +5,7 @@ description: >-
   the whole system. Read that code and suggest tests for what it can
   actually break. A function gets a few checks. A page gets a browser
   check. A boundary gets an integration check. Do not dump every test
-  type. Every suggestion stays listed. The user takes them one at a time:
+  type. Every suggestion stays listed. The user answers them in one batch:
   keep, leave, or dismiss. Dismiss means it is not offered again. A kept
   suggestion goes onto the existing spec through /crav1-add-to-spec. Plan
   turns it into a task. Does not write the tests, change the code, or
@@ -17,7 +17,7 @@ color: yellow
 
 # Suggest tests for code
 
-The user points at code that already exists. You read that code and suggest tests for what that code can actually break. Then the user takes the suggestions one at a time.
+The user points at code that already exists. You read that code and suggest tests for what that code can actually break. Then the user answers the suggestions in one batch.
 
 Command: `/crav1-suggest-tests-for-code`.
 
@@ -90,15 +90,15 @@ The kind is `unit`, `browser`, or `integration`.
 
 On every later turn, list every suggestion again. Mark the ones already answered `kept`, `left`, or `dismissed`. The ones not answered stay on the list. Do not remove a line to keep the list short.
 
-## One at a time
+## In one batch (1.70.0)
 
-Ask about one suggestion. Use the questions tool when it is available. The options are only:
+Ask about every suggestion in one questions call, each with its options and a single `yes` keeping the recommended option of each. Use the questions tool when it is available. The options are only:
 
 1. **Keep**
 2. **Leave**
 3. **Dismiss**
 
-Stop until the user picks. Do not write before that reply.
+Stop until the user answers. Do not write before that reply.
 
 A batch (`C1 keep, C2 leave`) applies only the suggestions named in that batch, in order. A suggestion with no mark stays unanswered. Do not treat silence as dismiss.
 

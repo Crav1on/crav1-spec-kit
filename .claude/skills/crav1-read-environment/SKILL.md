@@ -51,7 +51,7 @@ If they named the host and also a non-prod word, such as Azure dev, do not stop 
 
 If they named only an environment word and no host, stop. Ask them to name the host. Do not treat that word as the host. Do not read.
 
-Use the questions tool when it is available. Options only. Do not ask them to type a path. One question at a time. Do not ask the next question in the same questions call.
+Use the questions tool when it is available. Options only. Do not ask them to type a path. **Ask less (1.70.0).** Gather the questions that remain into one questions call (several questions in that call when the tool allows, else one message listing them). Skip any question the invocation, the files or an earlier answer already settles, and say what was used.
 
 **No host named.** Options:
 
@@ -218,7 +218,7 @@ Then run Look inside. Then ask the sections.
 
 Run this after the shape question, when that question is needed, and before any section. If leftovers stopped the read, skip it. Do not ask a section in the same step.
 
-Two readers, in this order. One question at a time. Do not ask the next question in the same questions call.
+Two readers, in this order. Ask both reader questions in one questions call (1.70.0).
 
 - **SQL** — [references/sql.md](references/sql.md) (drop-in: `.claude/skills/crav1-read-environment/references/sql.md`; plugin: this skill’s `references/sql.md`). Metadata only. Never a row.
 - **Storage** — [references/storage.md](references/storage.md) (drop-in: `.claude/skills/crav1-read-environment/references/storage.md`; plugin: this skill’s `references/storage.md`). Structure only. Prefix depth is 2. Never a blob, a file count, or a size.
@@ -255,7 +255,7 @@ Use only these sections, in this order. Do not invent another section. Resources
 
 **Left out.** Every line under `## Left out` in `docs/architecture/left-out.md` that this environment now shows. A similar name is not enough. The environment has to show that fact. When the file is missing, or no line is shown, the section says no line comes off. A `## Dismissed` line stays dismissed. Do not offer it.
 
-Stop. Do not write those files yourself. Ask the section in front of you. Stop until that section has an answer. Then the owner adds. Then ask the next section. Do not ask the next section in the same questions call.
+Stop. Do not write those files yourself. Show every section, then ask them in one questions call, one question per section (1.70.0). Stop until every section has an answer. Then the owner adds what was confirmed.
 
 Use the questions tool when it is available. Options only. Put that section’s items in the question prompt. Do not shorten the prompt by dropping an item.
 

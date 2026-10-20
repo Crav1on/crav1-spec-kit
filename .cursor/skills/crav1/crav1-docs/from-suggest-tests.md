@@ -8,7 +8,7 @@ This is cross-cutting. It is not its own lane. It may run from any lane. It does
 
 It is a later skill. It is not a starter option. When the user asks for startup options, that ask names only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs`, `/crav1-read-environment`, and `/crav1-fix-bug`. It does not run this command. The six starter options stay unchanged.
 
-A function gets a few checks. A page gets a browser check. A boundary gets an integration check. The command does not dump every test type. Every suggestion stays listed. Nothing is dropped to keep the list short. The user takes them one at a time: keep, leave, or dismiss. Dismiss means it is not offered again. A kept suggestion goes onto the existing spec through `/crav1-add-to-spec`. Plan turns it into a task. This command does not write the tests, change the code, or start Specify, Plan, or Build.
+A function gets a few checks. A page gets a browser check. A boundary gets an integration check. The command does not dump every test type. Every suggestion stays listed. Nothing is dropped to keep the list short. The user answers them in one batch: keep, leave, or dismiss (a single yes takes the recommendations). Dismiss means it is not offered again. A kept suggestion goes onto the existing spec through `/crav1-add-to-spec`. Plan turns it into a task. This command does not write the tests, change the code, or start Specify, Plan, or Build.
 
 ## First prompt
 
@@ -33,7 +33,7 @@ If the message points at the whole system, the command stops. If it points at no
 | Code | Pointed at one repo or one area | Stops when the pointer is the whole system, several repos, or no code. Does not scan the repo to pick an area |
 | Spec | Named one existing spec, or pick from the spec folders | Stops when no spec exists. Does not create a slug. Does not create a folder |
 | List | Read every suggestion | A function gets a few unit checks. A page gets a browser check. A boundary gets an integration check. Every suggestion stays listed |
-| One at a time | Keep, leave, or dismiss | One suggestion. Keep goes onto that spec through `/crav1-add-to-spec`. Leave is offered again. Dismiss is not offered again |
+| In one batch (1.70.0) | Keep, leave, or dismiss | Every suggestion in one batch; a single yes takes each recommendation. Keep goes onto that spec through `/crav1-add-to-spec`. Leave is offered again. Dismiss is not offered again |
 | Stop | Glance | Does not write the tests, change the code, or start Specify, Plan, or Build |
 
 No existing spec: the command stops and points at the starter that fits. It does not run that starter.

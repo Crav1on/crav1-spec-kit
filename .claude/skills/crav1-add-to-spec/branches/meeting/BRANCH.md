@@ -1,6 +1,6 @@
 # Meeting to specs
 
-Minutes, a transcript, an email, or a chat thread can hold requirements that have not reached a spec yet. You extract the items that matter, match them to specs that already exist, and ask the user about one item at a time.
+Minutes, a transcript, an email, or a chat thread can hold requirements that have not reached a spec yet. You extract the items that matter, match them to specs that already exist, and ask the user about every item in one batch.
 
 Command: the fact branch of `/crav1-add-to-spec`.
 
@@ -99,7 +99,7 @@ Before the list, run the duplicate check in `crav1-add-to-spec` `references/note
 Read `## Open questions` on every spec folder (skip `_template`), with the records under each question. Follow `crav1-add-to-spec` `references/open-questions.md` (drop-in: `.claude/skills/crav1-add-to-spec/references/open-questions.md`; plugin: sibling `skills/crav1-add-to-spec/references/open-questions.md`). Match by meaning. Matching works whether the question is asked, pending, or not marked.
 
 - **Clear answer.** The item states the fact or the decision a spec open question asks for. The case is `answer`. The item shows `Answers: "<question>" on docs/specs/<slug>/` and `Linked without a question.` It is not asked keep, leave, dismiss, or note. Hand it to the fact branch of `/crav1-add-to-spec` as an answer link (see **Answer** under Keep). When it would change a spec line, also show `Then: /crav1-tighten-spec, then /crav1-resolve-open-questions for <slug>.`
-- **Unclear or partial.** The item keeps its own case. It also shows `Possible answer to: "<question>" on docs/specs/<slug>/. The question stays open.` It is asked one at a time like any other item. Nothing is linked.
+- **Unclear or partial.** The item keeps its own case. It also shows `Possible answer to: "<question>" on docs/specs/<slug>/. The question stays open.` It is asked in the batch like any other item. Nothing is linked.
 - **Asked in this input.** The input shows someone asking a spec open question. That is not an item. List it under `Asked in this <kind>` before the items, one line per question, with the spec. Its `Asked:` mark is written through the same handoff, with the date of this input. That date replaces a `Pending:` line, and an `Asked:` line from the user's yes, for the same person.
 
 After a meeting, every question that was asked or pending for that meeting and got no clear answer goes back to open. Its asked mark stays, as the reference file says.
@@ -112,7 +112,7 @@ Show one recommendation on the item and in the question. In the question, the re
 - **Leave** — the quote is worth keeping but fits no spec now. Exploration with no feature yet, technical debt, and general information gathering are this case. It stays in the full note (1.61.0); nothing else is written.
 - **Dismiss** — the quote is only noise: a greeting, scheduling, or thanks.
 
-This skill asks one item at a time. It does not have an accept-all question. Do not add one. The recommendation is the suggested answer.
+This skill asks every item in one batch (1.70.0). A single yes takes every recommendation; answering item by item still works. The recommendation is the suggested answer.
 
 ## Build state
 
@@ -172,9 +172,9 @@ The kind is `meeting`, `email`, or `chat`. When the run has a date, `Source` is 
 
 On every later turn, list every item again. Mark the ones already answered `kept`, `left`, or `dismissed`. The ones not answered stay on the list. Do not remove a line to keep the list short.
 
-## One at a time
+## In one batch (1.70.0)
 
-Ask about one item. Use the questions tool when it is available. The question text names the item and the spec when one fits, then the same `State` line that is on the item. It does not say `Recommendation:`. The options are only these three. The recommended one comes first with ` (Recommended)` at the end of its label; the others keep this order:
+Ask about every item in one questions call, one question per item; a single `yes` takes the recommended option for every item. Use the questions tool when it is available. The question text names the item and the spec when one fits, then the same `State` line that is on the item. It does not say `Recommendation:`. The options are only these three. The recommended one comes first with ` (Recommended)` at the end of its label; the others keep this order:
 
 - **Keep**
 - **Leave**
@@ -195,7 +195,7 @@ Options: **Leave (Recommended)**, Keep, Dismiss. Left, it stays in the full note
 
 When `Fits` is `none`, the question has no `State` line. The options stay Keep, Leave, and Dismiss.
 
-Stop until the user picks. Do not write before that reply. Do not apply the next item in the same turn.
+Stop until the user answers. Do not write before that reply. Then apply the answered items in order.
 
 A batch (`M1 keep, M2 leave`) applies only the items named in that batch, in order. An item with no mark stays unanswered. Do not treat silence as dismiss. When a keep needs a further question, ask that question and do not apply the rest of the batch in that turn.
 

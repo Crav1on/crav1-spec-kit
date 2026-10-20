@@ -53,7 +53,7 @@ A `no spec yet` id has no spec to compare. The block is what Azure Boards holds:
 
 ## Keep or dismiss
 
-The user takes each difference one at a time: keep or dismiss. Use the questions tool when it is available. One question per difference. Do not drop one to keep the list short.
+The user answers every difference in one batch (1.70.0): keep or dismiss each, one question per difference in one questions call; a single `yes` keeps the recommended option of each. Do not drop one to keep the list short.
 
 Dismiss is for this run only. The next run starts fresh. Do not write a dismissals file.
 

@@ -37,7 +37,7 @@ If the message leaves out Azure DevOps, the org, or the project, the command sto
 | CLI | `az` and the `azure-devops` extension, already logged in | Names whichever is missing. Does not install or log in |
 | Definitions | — | YAML stages and classic release stages. List and show only. Secrets stay unprinted |
 | Cases | Read every item | One environment, shared, or unclear. A shared resource is two environments, one line each. Unclear proposes no mark |
-| Sections | Answer one section, then the next | Every item stays listed. Only a confirmed line is appended |
+| Sections | Answer every section in one batch | Every item stays listed. Only a confirmed line is appended |
 | Stop | `/crav1-read-environment` next | Does not run that command. Names `/crav1-finalize-commit` when a file changed. Does not commit |
 
 ## What gets written

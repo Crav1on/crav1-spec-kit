@@ -2,6 +2,17 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.70.0 (2026-10-20)
+
+Ask less. Skills stop asking what is already settled and ask the rest in one go. Examples use made-up names: the spec `orders-retry`, the code repo `orders-api`.
+
+### Kit
+
+- **Ask-less rule.** `crav1.mdc` gains one rule: never ask what the conversation, the files or an earlier answer already settles; pick an obvious default and say it in one line (`Using develop as the base (Merges into).`); gather the remaining questions into one batch; confirm all writes once at the end with a single yes. Choice words in the invocation still answer their question, and headless runs use the stated defaults. The landscape, glossary, picture and `Synced at` detail moved out of the rule file into the skills that write them; the rule file is now 762 words (was 867).
+- **Batched question flows.** `/crav1-tighten-spec`, `/crav1-tighten-plan` and `/crav1-resolve-open-questions` show every issue at once with the recommended option first: `yes` takes every recommendation, `I1 B, I3 keep` overrides some, and answering one at a time still works. `/crav1-read-environment` and `/crav1-map-pipeline-environments` show all sections together and ask once. `/crav1-suggest-tests-for-code`, the meeting and code-change branches of `/crav1-add-to-spec` (sort, Merges into and the into marker in one confirmation), unplaced source items, the `/crav1-ado-sync` pulls, the repos-only branch of `/crav1-existing-to-specs` and `/crav1-finalize-commit` (style with the copy/edit/commit choice) do the same.
+- **What's left line.** `/crav1-ideas-to-spec`, `/crav1-spark-to-spec` and `/crav1-bundle-to-specs` end with one plain line naming the next skill: `Left: 2 gaps to tighten, 3 open questions. Next: /crav1-tighten-spec orders-retry.`
+- **Docs.** The read-environment, add-to-spec meeting, ado-sync pull-tasks and suggest-tests pages and `skills.yaml` describe the batch.
+
 ## 1.69.1 (2026-10-20)
 
 Template copies that had drifted from the project templates.

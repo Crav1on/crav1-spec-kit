@@ -46,7 +46,7 @@ Each id is read in its own home, the `(ADO: <org>/<project>)` tag on its line. A
 
 ### Keep or dismiss
 
-Each difference is kept or dismissed, one at a time. Dismiss is for this run only; the next run asks again. A kept change goes into the spec and `tasks.md` through `/crav1-add-to-spec`, quoted as `From ADO <date>. <who>.`
+Each difference is kept or dismissed, all in one batch (1.70.0). Dismiss is for this run only; the next run asks again. A kept change goes into the spec and `tasks.md` through `/crav1-add-to-spec`, quoted as `From ADO <date>. <who>.`
 
 - A task that is in the done state in Azure Boards (the `Azure Boards task done state` line in `docs/environments/marks.md`) ticks its `tasks.md` box only when the user says yes.
 - A task that was reopened in Azure Boards while its box is ticked unticks the box only when the user says yes.

@@ -100,3 +100,7 @@ That puts `docs/system/` and the new spec slugs in git. No push. Intake does not
 Same as [from-ideas](from-ideas.md): `/crav1-review-architecture` with the spec folder attached, then tighten, resolve questions, `/crav1-plan-from-spec` (names a linter when the repo has one, and stops before Build when it does not), optional `/crav1-review-plan` then `/crav1-tighten-plan`, implement or build-tasks / build-features, verify, fix-build-gaps.
 
 Reference page: [bundle-to-specs](reference/skills/crav1-bundle-to-specs.md)
+
+## Last line
+
+`/crav1-bundle-to-specs` ends with one plain line: what is left and the next skill. `Left: 2 gaps to tighten, 3 open questions. Next: /crav1-tighten-spec orders-retry.` or `Nothing left to tighten. Next: /crav1-plan-from-spec orders-retry.`
