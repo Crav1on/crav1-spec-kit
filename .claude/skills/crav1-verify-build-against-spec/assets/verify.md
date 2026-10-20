@@ -15,6 +15,7 @@ Date:
 | Acceptance with no task | 0 | |
 
 <!-- When the spec has work branches (1.64.0): Branches: <n> of <m> merged into <base>. Not merged: <branch> (<k> commits). -->
+<!-- With a spec branch (1.68.0): Sub-branches: <n> of <m> merged into <spec branch>. left behind: <branch> (not in <spec branch>). A reverted branch: <branch>: merged, reverted on <base> (<sha>). Report only. -->
 
 Next: `/crav1-fix-build-gaps` (omit Gap) for failed/unverified/`G#`; `/crav1-build-tasks T#` if only unimplemented remains; or ship.
 
