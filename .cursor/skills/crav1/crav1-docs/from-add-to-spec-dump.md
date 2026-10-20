@@ -28,6 +28,8 @@ Do not write code. Do not plan.
 
 That slash command *is* the prompt.
 
+A mail or a chat goes the same way (1.72.0). Write `/crav1-add-to-spec mail` or `/crav1-add-to-spec chat`, or just say "add this mail to the spec": the word, or "this mail", "this email" or "this chat" in the message, skips the opening question. A mail is always an imported source and is stored under `docs/sources/` first. An exported chat file is too. Pasted chat text is sorted as a plain dump. A mail or chat that shows an open question being asked gives that question its `Asked:` date from the source.
+
 ## Steps
 
 | Phase | You | Agent |

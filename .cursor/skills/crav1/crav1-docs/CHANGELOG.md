@@ -2,6 +2,15 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.72.0 (2026-10-20)
+
+Two new choice words for `/crav1-add-to-spec`: `mail` and `chat`. No new questions.
+
+### Kit
+
+- **`mail` and `chat`.** Both run the dump branch. `/crav1-add-to-spec mail`, or a message that says "this mail", "this email" or "this chat", picks the word and skips the opening question. A mail is always an imported source: the run reads `references/sources.md` and `sources-mail.md` before the sort, and `Asked:` dates come from the mail. An exported chat file is an imported source too, with dates from the chat; pasted chat text is sorted as a plain dump. The headless `Missing choice` list, the skill description, the skills reference, guild routing and the dump walkthrough name the new words.
+- **Words read:** 25 more in `SKILL.md` on every run (2 of them in the description); 24 more in the dump branch on dump, mail and chat runs.
+
 ## 1.71.3 (2026-10-20)
 
 Leaner `/crav1-add-to-spec` dump runs, and a `SKILL.md` without the fact-only text. Text moved word for word; no rule or question changed.
