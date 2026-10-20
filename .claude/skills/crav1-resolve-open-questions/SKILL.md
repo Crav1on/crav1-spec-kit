@@ -8,7 +8,7 @@ color: yellow
 
 # Resolve questions
 
-You close **Open questions** (and leftover numbered **Assumptions**) one at a time. Same pacing as `/crav1-tighten-spec`: one `Q#`, options with impact, wait, then patch only that item.
+You close **Open questions** (and leftover numbered **Assumptions**) in one batch (1.70.0), as `/crav1-tighten-spec` does: every `Q#` with options and impact, one answer for the batch, then patch the answered items.
 
 This is not a defect walk. Do not re-run architecture findings here unless they are already written as open questions.
 
@@ -64,7 +64,7 @@ Stop. Do not edit. Do not preview a full patched spec.
 4. When this question was waiting on a stale research point, re-check that point. The question says so, or `## Research findings` names the point and this question. Follow the answered-later part of `crav1-add-to-spec` `references/research-stale.md` (drop-in: `.claude/skills/crav1-add-to-spec/references/research-stale.md`; plugin: sibling `skills/crav1-add-to-spec/references/research-stale.md`). Do not ask the user whether the point is settled. Keep open does not re-check. When the answer settles the point, record it and clear the mark when no point is open. When it does not, leave the mark and say why. Include that summary in the recap. Do not commit. Do not send anything.
 5. Advance to the next unanswered `Q#`. If none remain, say the open-question list is empty and they can Plan Mode or `/crav1-review-architecture` / `/crav1-tighten-spec` if new gaps appeared.
 
-Do not start the next question’s patch in the same turn unless they batched.
+**Batch (1.70.0).** Show every question at once, each with its options and the recommended one first, and ask once: a single `yes` applies every recommendation; a batch such as `Q1 A, Q3 keep` overrides those questions; answering one question at a time still works. Then patch, and give one recap for the run.
 
 ## Resolution catalog (per question)
 

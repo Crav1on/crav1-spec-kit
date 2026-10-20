@@ -97,7 +97,7 @@ Do **not** patch. Stay on this `P#`. Name the letter you would pick and why (2â€
 3. If `export/openspec/design.md` or `tasks.md` exist, update them to **match** (same tasks, no extra scope) when the resolution changed tasks.
 4. Advance to the next unanswered `P#`. If none remain, give the empty-queue next steps above.
 
-Do not start the next issueâ€™s patch in the same turn unless they batched.
+**Batch (1.70.0).** Show every issue at once, each with its options and the recommended one first, and ask once: a single `yes` applies every recommendation; a batch such as `I1 B, I3 keep` overrides those issues; answering one issue at a time still works. Then patch, and give one recap for the run.
 
 ## Resolution catalog (per plan issue)
 

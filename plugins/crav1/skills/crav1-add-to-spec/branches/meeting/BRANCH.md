@@ -172,9 +172,9 @@ The kind is `meeting`, `email`, or `chat`. When the run has a date, `Source` is 
 
 On every later turn, list every item again. Mark the ones already answered `kept`, `left`, or `dismissed`. The ones not answered stay on the list. Do not remove a line to keep the list short.
 
-## One at a time
+## In one batch (1.70.0)
 
-Ask about one item. Use the questions tool when it is available. The question text names the item and the spec when one fits, then the same `State` line that is on the item. It does not say `Recommendation:`. The options are only these three. The recommended one comes first with ` (Recommended)` at the end of its label; the others keep this order:
+Ask about every item in one questions call, one question per item; a single `yes` takes the recommended option for every item. Use the questions tool when it is available. The question text names the item and the spec when one fits, then the same `State` line that is on the item. It does not say `Recommendation:`. The options are only these three. The recommended one comes first with ` (Recommended)` at the end of its label; the others keep this order:
 
 - **Keep**
 - **Leave**
@@ -195,7 +195,7 @@ Options: **Leave (Recommended)**, Keep, Dismiss. Left, it stays in the full note
 
 When `Fits` is `none`, the question has no `State` line. The options stay Keep, Leave, and Dismiss.
 
-Stop until the user picks. Do not write before that reply. Do not apply the next item in the same turn.
+Stop until the user answers. Do not write before that reply. Then apply the answered items in order.
 
 A batch (`M1 keep, M2 leave`) applies only the items named in that batch, in order. An item with no mark stays unanswered. Do not treat silence as dismiss. When a keep needs a further question, ask that question and do not apply the rest of the batch in that turn.
 

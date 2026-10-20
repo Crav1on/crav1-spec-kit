@@ -42,7 +42,7 @@ Then one block **New under the Feature**: each new child with its id, type, titl
 
 ## Keep or dismiss
 
-The user takes each difference one at a time: keep or dismiss. Use the questions tool when it is available. One question per difference. Dismiss is for this run only. The next run starts fresh. Do not write a dismissals file.
+The user answers every difference in one batch (1.70.0): keep or dismiss each, one question per difference in one questions call; a single `yes` keeps the recommended option of each. Dismiss is for this run only. The next run starts fresh. Do not write a dismissals file.
 
 A kept change goes to the spec and `tasks.md` through `/crav1-add-to-spec`. The quote starts with `From ADO <date>. <who>.` when the history shows them, else `From ADO <date>.` The impact check in that skill still runs.
 

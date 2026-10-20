@@ -47,7 +47,7 @@ If they named Azure DevOps and no org, stop. Ask them to name the org. Do not gu
 
 If they named the org and no project, stop. Ask them to name the project. Do not guess. Do not read.
 
-Use the questions tool when it is available. Options only. Do not ask them to type a path. One question at a time. Do not ask the next question in the same questions call.
+Use the questions tool when it is available. Options only. Do not ask them to type a path. **Ask less (1.70.0).** Gather the questions that remain into one questions call (several questions in that call when the tool allows, else one message listing them). Skip any question the invocation, the files or an earlier answer already settles, and say what was used.
 
 **No host named.** Options:
 
@@ -188,7 +188,7 @@ Path: `docs/environments/promotion.md`, next to marks.md. Same four-field shape,
 
 ## Sections
 
-Show one section at a time. Each section has its own question and its own answer. Do not merge sections. List every item. Do not drop a resource, a stage, a group-context line, or an existing line to keep a section short.
+Show every section together (1.70.0). Each section has its own question and its own answer, asked in one questions call. Do not merge sections. List every item. Do not drop a resource, a stage, a group-context line, or an existing line to keep a section short.
 
 Use only these sections, in this order. Do not invent another section.
 
@@ -200,7 +200,7 @@ Use only these sections, in this order. Do not invent another section.
 
 **Branches (1.69.0).** Every proposed `promotion.md` line (branch, pattern or tag line, environment, pipeline and stage), and every branch expression left unclear with its reason. When none, the section says no pipeline names a branch.
 
-Stop. Ask the section in front of you. Stop until that section has an answer. Append the confirmed lines from that section, then ask the next section. Do not ask the next section in the same questions call.
+Stop. Show every section, then ask them in one questions call, one question per section (1.70.0). Stop until every section has an answer, then append the confirmed lines of each section once.
 
 Use the questions tool when it is available. Options only. Put that section’s items in the question prompt.
 
@@ -270,7 +270,7 @@ Output only:
 - The marks format has no `shared` word. Shared proposes one existing-format line per stage.
 - Append only a line the user confirmed, to marks.md or promotion.md. Create the file only then. Never rewrite an existing line. A disagreement is shown and the existing line stays.
 - Do not write `docs/system`, `docs/architecture/spec.md`, a feature spec, or `docs/architecture/left-out.md`.
-- One section at a time. Every item stays listed.
+- Every section in one questions call, each with its own answer. Every item stays listed.
 - Do not start Specify, Plan, or Build. Name `/crav1-read-environment` and do not run it.
 
 ## Style

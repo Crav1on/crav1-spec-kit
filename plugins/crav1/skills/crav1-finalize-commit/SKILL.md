@@ -66,7 +66,7 @@ Remember the intended file set (the paths the message describes). Warn if `agent
 
 They choose **after** the message exists, not before.
 
-**Do not** open copy/edit/commit choices in the same turn as the CRAV1 style vs git-log menu. If style is needed, that turn is style only: no draft, no finalize choices.
+When the style is not settled, ask the CRAV1 style vs git-log question in the same questions call as the copy/edit/commit choices (1.70.0), and draft in the recommended style; a different style answer redrafts before anything is committed.
 
 On the turn that produces wording:
 
