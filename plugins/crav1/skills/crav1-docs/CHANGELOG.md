@@ -2,6 +2,17 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.71.3 (2026-10-20)
+
+Leaner `/crav1-add-to-spec` dump runs, and a `SKILL.md` without the fact-only text. Text moved word for word; no rule or question changed.
+
+### Kit
+
+- **Fact text out of `SKILL.md`.** Input, Target, Imported sources, Add to that spec.md, Notes, Impact, Stop and Style moved to `references/fact.md`, read only for a fact or a handoff. `SKILL.md` keeps the opening, choice words, handoff pointers and two shared steps, **Thin spec** and **Research compare**, that the fact path and the dump branch both use. The handoff files, the meeting branch and `references/notes.md` now point at `fact.md`.
+- **Dump branch split.** The "This is not" scope lines moved to `references/dump-scope.md`; the glossary, picture and `assets/system` lines to `dump-landscape.md`, read only when `docs/system/` exists; the `Answered:` and `Asked:` write to `dump-answers.md`; the new-spec pointer list to `dump-new-spec.md`. The research and thin-spec copies are now pointers to the shared steps in `SKILL.md`.
+- **Fixed names.** The dump branch now names **Write the full note**, not the old **Write the notes** heading or a **Note** pile.
+- **Words read:** pasted dump 6,367 to 4,453 (4,933 with `docs/system/` and answers); flagged mail 11,802 to 10,043; pasted transcript 9,385 to 7,471; `.docx` transcript 10,654 to 8,740; meeting 7,370 to 6,172. A fact run goes from 3,040 to 3,170, and a meeting with a kept addition from 7,726 to 7,884, because they now read `fact.md` and its header.
+
 ## 1.71.2 (2026-10-20)
 
 Leaner imported-source runs in `/crav1-add-to-spec`. `references/sources.md` is split so a run reads only what its case needs. Text moved word for word; no rule, question or wording changed.
