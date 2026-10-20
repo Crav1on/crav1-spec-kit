@@ -14,6 +14,8 @@ It reads the kit repo's `docs/`, or the `crav1-docs/` folder bundled next to the
 
 1.64.0: `status <slug>` and `where am I` add the Branches line and route unmerged work to [`/crav1-open-pr`](crav1-open-pr.md) or [`/crav1-merge-pr`](crav1-merge-pr.md).
 
+1.67.1: remote copy ages count whole calendar days in local time; a commit made today is `today`, not `1 day old`.
+
 ## Runs when
 
 You want to know what to run next, in what order, or what a skill does. Called by the user, or by an agent before it suggests more than one next step or when an order is questioned (the `crav1.mdc` rule).
