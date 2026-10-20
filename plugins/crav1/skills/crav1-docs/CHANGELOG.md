@@ -2,6 +2,17 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.73.0 (2026-10-20)
+
+`/crav1-finalize-commit` can commit in one go.
+
+### Kit
+
+- **`commit now`.** Drafts, shows the Summary and Description paste blocks, then runs `git commit` with no choice question. It never pushes. When `agent-tools/` or build output is in the file set, it warns and offers the normal choices instead.
+- **Style words `crav1` and `git log`.** They answer the CRAV1-style vs git-log question for this commit, the same as `once` and `log-once`, so it is not asked. Saved style rules work as before.
+- `/crav1-finalize-commit commit now crav1` asks no questions when files are staged. The headless `Missing choice` list, the skill description, the skills reference, guild routing and the commit walkthrough name the new words.
+- **Words read:** 56 more in `SKILL.md` (12 of them in the description), 10 more in the message-only branch.
+
 ## 1.72.1 (2026-10-20)
 
 Fix: the `/crav1-add-to-spec` opening question no longer sends a mail or a chat to the meeting path.
