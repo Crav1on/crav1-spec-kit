@@ -22,6 +22,9 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 | --- | --- | --- |
 | Commit or message | `commit` | commit |
 | Commit or message | `message only` | only write the message |
+| Commit or message | `commit now` | draft, show, then commit with no choice question (never pushes) |
+| Style | `crav1` | CRAV1 style, this commit only |
+| Style | `git log` | match git log, this commit only |
 
 ## Runs when
 

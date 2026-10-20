@@ -4,7 +4,8 @@ description: >-
   Opens with one question: commit, or only write the message (paste-ready
   Summary and Description, no git commit). Skips it when the message says
   which. Replaces draft-commit-message (its rules are kept as a branch).
-  Finalize a commit: CRAV1 style vs git log first if needed, then draft
+  `commit now` commits without the choice; `crav1` or `git log` sets
+  the style. Finalize a commit: CRAV1 style vs git log first if needed, then draft
   the Summary and Description, then offer git commit first, then copy /
   edit / rewrite / stop. Wording is shown before those choices. Use when
   they want to change the message or actually create the commit, or
@@ -43,11 +44,14 @@ When the message or the files make one option the better fit, list it first and 
 
 Exact words for bots and scripted runs. There are no `--flags`.
 
-- Commit or message: `commit` / `message only`.
+- Commit or message: `commit` / `message only` / `commit now`.
+- Style: `crav1` / `git log`.
+
+`commit now`: draft, show the paste blocks, then commit with no choice question. Never push. When `agent-tools/` or build output is in the file set, warn and offer the normal choices instead.
 
 When the invocation contains one of these words (for example `/crav1-finalize-commit commit`), take that choice and do not ask. This holds for a person, a bot, or a headless run.
 
-When a choice is missing and the run is headless or started by a bot (no person in the chat to answer), do not guess. Stop and name the valid words, for example: `Missing choice. Use one of: commit, message only.`
+When a choice is missing and the run is headless or started by a bot (no person in the chat to answer), do not guess. Stop and name the valid words, for example: `Missing choice. Use one of: commit, message only, commit now.`
 
 ## Draft (same as the other skill)
 
