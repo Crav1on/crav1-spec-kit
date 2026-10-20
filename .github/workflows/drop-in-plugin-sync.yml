@@ -89,5 +89,7 @@ jobs:
         run: python scripts/gen-workflow.py --check
       - name: Marks tables match docs/reference/marks.yaml, examples match formats, writers and readers mention their marks
         run: python scripts/gen-marks.py --check
+      - name: Skill template copies match docs/*/_template/
+        run: python scripts/check-template-copies.py
       - name: Notes index generator builds, checks, and migrates (selftest)
         run: python .cursor/skills/crav1/crav1-add-to-spec/scripts/notes_index.py --selftest
