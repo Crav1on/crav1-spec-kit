@@ -117,6 +117,7 @@ Then output only:
   - `/crav1-finalize-commit` — put landscape + specs in git (no push). Skip if they will rewrite this dump in the same chat.
   - If they chose `spec/<dump>`: no implement on that branch; PR/merge when they want, then `feat/<slug>` per feature to build
   - then **per slug** `/crav1-review-architecture`, `/crav1-tighten-spec`, `/crav1-plan-from-spec` — not one plan for the universe
+- **Last line (1.70.0):** one plain line saying what is left and naming the next skill, counted per slug and summed (`Left: 2 gaps to tighten, 3 open questions across 3 specs. Next: /crav1-tighten-spec <first slug>.`), from the specs just written: gaps `/crav1-tighten-spec` would raise (acceptance lines that are not testable yet) and the `## Open questions` entries. Example: `Left: 2 gaps to tighten, 3 open questions. Next: /crav1-tighten-spec orders-retry.` When nothing is left: `Nothing left to tighten. Next: /crav1-plan-from-spec <slug>.`
 
 Do **not** run `/crav1-finalize-commit` yourself. Prompt it. Workers must not commit.
 
