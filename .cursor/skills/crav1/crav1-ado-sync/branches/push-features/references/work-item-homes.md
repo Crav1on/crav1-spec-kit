@@ -30,7 +30,7 @@ Ask once per repo with an empty cell, when a skill needs that repo's home. Use t
 
 Write the cell right after the answer. Do not rewrite other cells or rows.
 
-A run with no window uses the two-pass questions file from the imported-sources convention (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/references/sources.md` → **Headless runs (two-pass)**; plugin: sibling `skills/crav1-add-to-spec/references/sources.md`). Pass 1 writes the question and sends nothing for that repo.
+A run with no window uses the two-pass questions file from the imported-sources convention (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/references/sources-rare.md` → **Headless runs (two-pass)**; plugin: sibling `skills/crav1-add-to-spec/references/sources-rare.md`). Pass 1 writes the question and sends nothing for that repo.
 
 ## Which home a task or a Feature goes to
 

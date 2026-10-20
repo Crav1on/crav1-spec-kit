@@ -33,7 +33,7 @@ When the start fails, say why and ask again with skip or stop.
 
 ## Headless runs (two-pass)
 
-A run with no window cannot stop to ask. Use the two-pass questions file from the imported-sources convention (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/references/sources.md` → **Headless runs (two-pass)**; plugin: sibling `skills/crav1-add-to-spec/references/sources.md`): pass 1 writes the question to a file in the system temp folder, names it, and stops before marking anything verified. Pass 2 reads the answer.
+A run with no window cannot stop to ask. Use the two-pass questions file from the imported-sources convention (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/references/sources-rare.md` → **Headless runs (two-pass)**; plugin: sibling `skills/crav1-add-to-spec/references/sources-rare.md`): pass 1 writes the question to a file in the system temp folder, names it, and stops before marking anything verified. Pass 2 reads the answer.
 
 Put the missing dependency at the **top** of the summary, before the TL;DR, as a marked blocker:
 
