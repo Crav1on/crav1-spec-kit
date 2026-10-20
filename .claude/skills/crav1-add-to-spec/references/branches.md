@@ -34,7 +34,7 @@ For branch B in repo R, the candidates are:
 2. R's `Merges into` branch, else the default branch
 3. the default branch
 4. when R's `Merges into` cell is empty (1.64.1): the integration branches that exist on disk, by name: `develop`, `development`, `dev`, `integration`. This is how a repo whose work merges into `develop` is found before the cell is filled; the code-change question then offers to record it
-5. every other work branch of the same spec in R (stacked branches)
+5. every other work branch of the same spec in R (stacked branches); since 1.68.0 never a branch whose `(into …)` names B (B's own sub-branch), and none at all when B is marked `(spec branch)`: a spec branch's parent comes from the base candidates only
 
 Candidates 2 to 4 are the **base candidates**.
 
