@@ -33,7 +33,7 @@ If the message points at the whole system, the command stops. If it points at no
 | Code | Pointed at one repo or one area | Stops when the pointer is the whole system, several repos, or no code. Does not scan the repo to pick an area |
 | Spec | Named one existing spec, or pick from the spec folders | Stops when no spec exists. Does not create a slug. Does not create a folder |
 | List | Read every suggestion | A function gets a few unit checks. A page gets a browser check. A boundary gets an integration check. Every suggestion stays listed |
-| One at a time | Keep, leave, or dismiss | One suggestion. Keep goes onto that spec through `/crav1-add-to-spec`. Leave is offered again. Dismiss is not offered again |
+| In one batch (1.70.0) | Keep, leave, or dismiss | Every suggestion in one batch; a single yes takes each recommendation. Keep goes onto that spec through `/crav1-add-to-spec`. Leave is offered again. Dismiss is not offered again |
 | Stop | Glance | Does not write the tests, change the code, or start Specify, Plan, or Build |
 
 No existing spec: the command stops and points at the starter that fits. It does not run that starter.

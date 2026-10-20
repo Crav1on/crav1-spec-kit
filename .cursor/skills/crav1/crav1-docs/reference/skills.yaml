@@ -667,7 +667,7 @@ skills:
     when present. When those do not settle it, one read-only look at the code that spec or plan points
     to. A code-based or uncertain state is labeled `(inference, not in the docs)`. The line does not change
     keep, leave, or dismiss. It is not written and it is not passed to `/crav1-add-to-spec` as quote
-    text. The user takes them one at a time: keep, leave, or dismiss. The whole input is always written once
+    text. The user answers them in one batch: keep, leave, or dismiss. The whole input is always written once
     as one full note in `docs/notes/YYYY-MM/` by source date (1.61.0); a left item stays in that note. Dismiss is for this run only. The next run starts fresh. A kept addition
     goes to that spec through `/crav1-add-to-spec`. The quote starts with `From <kind> <date>.` when there
     is a date, otherwise `From <kind>.` The impact check still runs there. A kept new feature names `/crav1-spark-to-spec`,
@@ -678,7 +678,7 @@ skills:
     option. Asking for startup options names only the six and does not run this command. The six starter
     options stay unchanged.'
   - 'A meeting (was `/crav1-meeting-to-specs`): Minutes, a transcript, an email, or a chat thread → quotes
-    matched to existing specs, keep, leave, or dismiss one at a time; the whole input is one full note. A kept addition goes through
+    matched to existing specs, keep, leave, or dismiss in one batch; the whole input is one full note. A kept addition goes through
     `/crav1-add-to-spec`. A clear answer to a spec open question is linked under it.'
   - '1.64.0: a code change can name a repo and branch (`code change orders-api feat/orders-retry`); the code is read read-only from `../<repo>`. The branch diff starts at the fork point (the repo''s `Merges into` branch, the default branch, or another spec branch), the slice `Synced at` line keeps one entry per branch, a yes records `Merges into` in `repos.md`, and the note''s `commits:` list plus `git patch-id` stop a commit being imported twice, also after a rebase.'
   - '1.65.0: a code change can be a pull request (`code change orders-api PR 71`, or its URL). It writes or reuses the PR note (the pull request''s title and description, `kind: pull request`) and links it from the code-change note with `pr_note:`. Given a branch, it writes the PR note when a signed-in `gh` or `az` host shows exactly one pull request for that branch; otherwise it says why it wrote none.'
@@ -1952,7 +1952,7 @@ skills:
   - The user points at code that already exists, one repo or one area, not the whole system. Suggests
     tests for what that code can break. A function gets a few checks. A page gets a browser check. A boundary
     gets an integration check. Does not dump every test type. Every suggestion stays listed. Keep, leave,
-    or dismiss, one at a time. Dismiss means it is not offered again. A kept suggestion goes onto the
+    or dismiss, in one batch. Dismiss means it is not offered again. A kept suggestion goes onto the
     existing spec through `/crav1-add-to-spec`. Plan turns it into a task. Does not write the tests, change
     the code, or start Specify, Plan, or Build. Not a starter option. Asking for startup options names
     only the six and does not run this command. The six starter options stay unchanged.
