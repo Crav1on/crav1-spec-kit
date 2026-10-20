@@ -57,7 +57,8 @@ Do not offer `spec/<slug>` on a build prompt.
 - On X already: skip the prompt.
 - Otherwise the Build prompt is **X (Recommended)** first, then `feat/<slug>`, **Stay** and **Other**.
 - When X exists only as `origin/X`, `git checkout X` makes the local branch.
-- When X exists nowhere, say so and offer `feat/<slug>` or **Other**. Never create X from the default branch without asking.
+- When X exists nowhere and the spec's Match `Branch:` list has a `(spec branch)` S, or X has an `(into S)` entry (1.68.0, setup 4 in `crav1-add-to-spec` `references/branches.md` (drop-in: `.claude/skills/crav1-add-to-spec/references/branches.md`; plugin: sibling `skills/crav1-add-to-spec/references/branches.md`)): the prompt is **Create X from S (Recommended)**, then `feat/<slug>`, **Stay** and **Other**. After that yes, create X from S (local `S`, else `origin/S`; never fetch) and write `(into S)` on X's entry in the Match `Branch:` list (adding the entry). A headless run doesn't create X.
+- When X exists nowhere otherwise, say so and offer `feat/<slug>` or **Other**. Never create X from the default branch without asking.
 - A `(branch: <repo> X)` for another repo is not built here; say which checkout it belongs to.
 
 If the working tree is dirty (other than `agent-tools/`), **do not checkout**. Tell them `/crav1-finalize-commit` (or stash themselves). Re-ask branch after the tree is clean.

@@ -104,6 +104,14 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 
 **Work branch.** A branch that holds part of a spec's work and still has to merge: named in the spec's `Synced at` entries, its Match `Branch:` list, or a task's `(branch: …)`, minus base branches and `(dropped)` entries. A spec is done across branches when every work branch is merged into its base. A branch may serve several specs; it is reported under each and counted once.
 
+**Spec branch.** A spec's long-lived work branch, usually `feat/<slug>`, that its task sub-branches merge into before it merges into the base branch (setup 4). Marked `(spec branch)` on the Match `Branch:` list after a yes. Since 1.68.0.
+
+**Sub-branch.** A short branch for one task, for example `feat/orders-capacity-t3`, that merges into the spec branch, not the base. It counts toward the `Sub-branches:` progress line only, never toward done; one that never merged once the spec branch reached the base is reported as `left behind`. Since 1.68.0.
+
+**Into branch.** The branch a work branch merges into: its `(into <branch>)` marker on the Match `Branch:` list, else the repo's `Merges into` branch, else the default branch. It is the branch's fork point and its pull request base. The kit offers the marker with a yes/no question and writes it after a yes (1.68.0); a headless run writes nothing and treats the branch as stacked.
+
+**Reverted.** A merged branch whose change was later undone on the base branch (a `This reverts commit` message or the reverse patch). Shown as `merged, reverted on <base> (<sha>)`; report only, it never blocks done. Since 1.68.0.
+
 **Base branch / Merges into.** The branch a repo's work merges into: the `Merges into` cell in `docs/system/repos.md` (for example `develop`), else the default branch. A base branch is never counted as a work branch.
 
 **Fork point.** Where a branch split off: the closest of its repo's base branches (while the `Merges into` cell is empty, also `develop`, `development`, `dev` or `integration` when they exist) and the spec's other branches, by fewest own commits. A branch diff starts there, not at the default branch.

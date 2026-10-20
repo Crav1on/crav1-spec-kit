@@ -12,6 +12,8 @@ One issue at a time, with explained resolutions (plus get a suggestion) and impa
 
 1.64.0: reads every listed work branch without checkout; a yes on writing the branch adds to the `Branch:` list; a listed branch that is gone and not merged is offered `(dropped)` (`mark-dropped`); a deleted branch whose work is in the base shows `merged, branch deleted`.
 
+1.68.0: reads and writes the `(spec branch)` and `(into …)` markers on the Match `Branch:` list after a yes.
+
 ## Runs when
 
 The spec is still mushy. Called by the user.

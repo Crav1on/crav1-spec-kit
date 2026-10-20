@@ -7,7 +7,7 @@ Examples use made-up names: the spec repo `orders-specs`, the code repo `orders-
 ## Where each branch is named
 
 - **`Synced at` slice line** in `spec.md`, one line per repo, one entry per branch, separated by `; `: `Synced at: orders-api feat/orders-retry@155b5c4, 2026-10-19; develop@00344be, 2026-10-15`. An entry may end in `(dropped)`.
-- **Match `Branch:` list** under `## Match`: `- Branch: feat/orders-retry; feature/orders-openapi`. When the spec spans repos, an item may start with the repo: `- Branch: orders-api feat/orders-retry`. An item may end in `(into <branch>)`, written by hand in 1.64.0 (the kit reads it; it doesn't offer it yet).
+- **Match `Branch:` list** under `## Match`: `- Branch: feat/orders-retry; feature/orders-openapi`. When the spec spans repos, an item may start with the repo: `- Branch: orders-api feat/orders-retry`. An item may end in `(into <branch>)` (it merges into that branch, not the base; offered and written after a yes since 1.68.0) or `(spec branch)` (the spec's long-lived branch that its task sub-branches merge into, 1.68.0): `- Branch: orders-api feat/orders-capacity (spec branch); feat/orders-capacity-t3 (into feat/orders-capacity)`.
 - **Task branch** at the end of a task line in `tasks.md`: `(branch: feat/orders-retry)`, or `(branch: orders-api feat/orders-retry)` when the spec spans repos.
 
 A spec's **work branches**, per repo, are every branch named in those three places, minus the base branches and minus entries marked `(dropped)`.
@@ -34,7 +34,7 @@ For branch B in repo R, the candidates are:
 2. R's `Merges into` branch, else the default branch
 3. the default branch
 4. when R's `Merges into` cell is empty (1.64.1): the integration branches that exist on disk, by name: `develop`, `development`, `dev`, `integration`. This is how a repo whose work merges into `develop` is found before the cell is filled; the code-change question then offers to record it
-5. every other work branch of the same spec in R (stacked branches)
+5. every other work branch of the same spec in R (stacked branches); since 1.68.0 never a branch whose `(into …)` names B (B's own sub-branch), and none at all when B is marked `(spec branch)`: a spec branch's parent comes from the base candidates only
 
 Candidates 2 to 4 are the **base candidates**.
 
@@ -62,4 +62,23 @@ The same line everywhere, per repo, after the base branch is known:
 
 `Branches: 1 of 3 merged into develop. Not merged: feat/orders-retry (2 commits), feature/orders-export (3 commits). origin/develop newest commit 2026-10-17.`
 
-Commit counts are own commits since the fork point. Add `merged, branch deleted`, `branch rewritten since last read`, `unknown (branch gone)` and `(also in <slug>)` where they apply. A spec with no work branches has no Branches line. Done across branches means every work branch is merged into its into branch, and the tasks are done by today's rules. This is report only: no skill writes a Match `Status:` line, a mark, or any file because of it.
+Commit counts are own commits since the fork point. Add `merged, branch deleted`, `branch rewritten since last read`, `unknown (branch gone)` `(also in <slug>)` and (1.68.0) `merged, reverted on <base> (<sha>)` where they apply. Sub-branches (1.68.0) are left out of this count; they get their own `Sub-branches:` line, and done counts top-level branches only. A spec with no work branches has no Branches line. Done across branches means every work branch is merged into its into branch, and the tasks are done by today's rules. This is report only: no skill writes a Match `Status:` line, a mark, or any file because of it.
+
+## Spec branch and sub-branches (1.68.0)
+
+Setup 4: the spec has a long-lived **spec branch**, a normal work branch, usually `feat/<slug>` (never `spec/<slug>`, which means specify only). Each task gets a short **sub-branch**, for example `feat/orders-capacity-t3`, that merges into the spec branch; the spec branch later merges into the base branch.
+
+- **Markers.** A sub-branch carries `(into <spec branch>)` on the Match `Branch:` list. The spec branch may carry `(spec branch)` so the setup reads at a glance. Both are written only after a yes, by `/crav1-add-to-spec` code change, `/crav1-tighten-spec`, `/crav1-create-feature-branch` and `/crav1-build-tasks` (when they create a sub-branch), or by hand. A marker already there is never changed or removed by the kit.
+- **The into question.** When the fork-point search (no `(into …)` marker) finds that a branch's closest parent is another spec branch, ask one yes/no question: "feat/orders-capacity-t3 split off feat/orders-capacity. Does it merge into feat/orders-capacity?" A yes writes `(into feat/orders-capacity)` on that branch's entry (adding the entry when the branch isn't listed yet) and, when the parent carries no marker, `(spec branch)` on the parent's entry (adding it too). A no writes nothing, and the branch is treated as stacked (setup 3). A **headless run doesn't ask, writes nothing, and treats the branch as stacked**; it says so in the report.
+- **Fork point.** A branch with `(into X)` always has X as its parent (candidate 1 above).
+- **Commit list.** List commits with `git log --no-merges`. A merge commit that changes code beyond its two sides (for example a conflict fix) is listed in the sort for the user to keep or drop.
+- **Spec branch read after its sub-branches.** Its range runs from where it split off the base branch to its tip, so it holds the merged sub-branch commits. The overlap check drops every commit already in a sub-branch note (`commits:` and `git patch-id`); only commits made directly on the spec branch are imported. A sub-branch squash-merged into the spec branch is one new commit no patch-id matches: it counts as covered when the host (test 3 under **Merged**) shows that sub-branch's PR merged as that commit; otherwise list it on the sort as `may already be in <note>` for the user to keep or drop.
+- **Sub-branch read after the spec branch.** Its commits are already covered: `already imported`, the reuse-or-skip path.
+- **Top-level branches** are the work branches whose into branch is the base branch. **Done** across branches means every top-level branch is merged into the base branch (and the tasks are done by today's rules). A sub-branch never blocks done; it counts toward progress only.
+- **Sub-branches line**, per spec branch, after the Branches line: `Sub-branches: 1 of 2 merged into feat/orders-capacity.` A sub-branch is merged into its into branch by the same three tests under **Merged**.
+- **Left behind.** When the spec branch has reached the base branch but a sub-branch never merged into it, add `left behind: feat/orders-capacity-t4 (not in feat/orders-capacity)` to the Sub-branches line. Report only; it never blocks done. `(dropped)` is still offered only for a branch that is gone and unmerged.
+
+## Reverted (1.68.0)
+
+A merged work branch whose change was later undone on its base branch is reported as `<branch>: merged, reverted on <base> (<revert sha>)` on the Branches line. It is reverted when a commit on the base after the merge either says `This reverts commit <sha>` naming one of the branch's commits, or has a patch that is the reverse of the branch's change (`git show <commit> | git patch-id` equals the patch-id of `git diff <tip> <split point>`, the branch change reversed). Read-only local git on the refs on disk. Report only: the branch still counts as merged, done is unaffected, and no file changes.
+

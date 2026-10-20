@@ -2,6 +2,20 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.68.0 (2026-10-20)
+
+Setup 4: a spec with its own long-lived branch and a short sub-branch per task, plus revert reporting. Examples use made-up names: the code repo `orders-api`, the spec branch `feat/orders-capacity`.
+
+### Kit
+
+- **Spec branch and into markers.** The Match `Branch:` list can mark the spec branch, `feat/orders-capacity (spec branch)`, and a sub-branch, `feat/orders-capacity-t3 (into feat/orders-capacity)`. When a read finds a branch that split off another spec branch, `/crav1-add-to-spec` code change, `/crav1-tighten-spec` and `/crav1-open-pr` ask one yes/no question, `feat/orders-capacity-t3 split off feat/orders-capacity. Does it merge into feat/orders-capacity?` A yes writes both markers. A no writes nothing, and a headless run doesn't ask, writes nothing, and treats the branch as stacked.
+- **Sub-branches for tasks.** `/crav1-plan-from-spec` may name a sub-branch on a task. When it doesn't exist yet, `/crav1-create-feature-branch` and `/crav1-build-tasks` offer **Create it from the spec branch (Recommended)** and write the `(into …)` marker after the yes.
+- **No double import.** The fork point honours `(into …)`. The commit list leaves out merge commits (a merge commit that changes code beyond its two sides is offered on the sort). Reading the spec branch after its sub-branches imports only its own commits; a squash-merged sub-branch is covered through the host PR or listed as `may already be in <note>`.
+- **Open-pr base.** Into, then `Merges into`, then the default branch: a sub-branch's PR goes into its spec branch, the spec branch's into the base.
+- **Progress and done.** Status in `/crav1-help`, `/crav1-verify-build-against-spec`, `/crav1-tasks-ready-to-build` and `/crav1-merge-pr` shows `Sub-branches: 1 of 2 merged into feat/orders-capacity.` and `left behind: feat/orders-capacity-t4 (not in feat/orders-capacity)`. Done counts the top-level branches only; sub-branches never block it.
+- **Reverts.** A merged branch whose change was later undone on the base shows `feat/orders-retry: merged, reverted on develop (<sha>)`, found by a `This reverts commit` message or the reverse patch. Report only; done is unaffected.
+- **Marks and docs.** `marks.yaml` adds `(spec branch)` and the written `(into …)` (60 marks). The glossary gains spec branch, sub-branch, into branch and reverted; `from-plan-to-build.md` gains a setup 4 section.
+
 ## 1.67.1 (2026-10-20)
 
 Two bug fixes in the multi-branch work. Examples use made-up names: the code repo `orders-api`.

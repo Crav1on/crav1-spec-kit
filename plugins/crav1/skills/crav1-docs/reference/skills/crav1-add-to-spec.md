@@ -28,6 +28,8 @@ A meeting (was `/crav1-meeting-to-specs`): Minutes, a transcript, an email, or a
 
 1.67.1: a one-slice read of a work branch also adds that branch to the spec's Match `Branch:` list (never a base branch; existing entries and markers stay).
 
+1.68.0: a code change asks whether a branch that split off another spec branch merges into it; a yes writes `(into …)` and `(spec branch)` on the Match `Branch:` list, a headless run writes nothing and treats it as stacked. The commit list leaves out merge commits, and a spec-branch read imports only its own commits.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.

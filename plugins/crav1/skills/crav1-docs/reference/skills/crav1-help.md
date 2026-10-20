@@ -16,6 +16,8 @@ It reads the kit repo's `docs/`, or the `crav1-docs/` folder bundled next to the
 
 1.67.1: remote copy ages count whole calendar days in local time; a commit made today is `today`, not `1 day old`.
 
+1.68.0: status adds the `Sub-branches:` and `left behind:` lines and `merged, reverted on <base> (<sha>)`, report only.
+
 ## Runs when
 
 You want to know what to run next, in what order, or what a skill does. Called by the user, or by an agent before it suggests more than one next step or when an order is questioned (the `crav1.mdc` rule).
