@@ -28,7 +28,7 @@ Reads the host the user named, non-prod resources on that host, prod-only resour
 
 In short: Confirmed lines appended to `docs/environments/marks.md`; confirmed sections go to their owners through [`/crav1-refresh-system-notes`](crav1-refresh-system-notes.md), [`/crav1-existing-to-specs`](crav1-existing-to-specs.md), or [`/crav1-add-to-spec`](crav1-add-to-spec.md).
 
-Writes only confirmed lines appended to `docs/environments/marks.md`.
+Writes only confirmed lines appended to `docs/environments/marks.md` and (1.69.0) `docs/environments/promotion.md`.
 
 ## Does not
 

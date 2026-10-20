@@ -2,6 +2,18 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.69.0 (2026-10-20)
+
+Setup 6: environment and release branches. Done stays "merged into the base branch"; how far the work has got after that is shown on its own line. Examples use made-up names: the code repo `orders-api`, the pipeline `orders-cd`.
+
+### Kit
+
+- **promotion.md.** A new `docs/environments/promotion.md`, next to marks.md, in the same four-field shape: `orders-api | develop | test | pipeline orders-cd, stage DeployTest`. The second field may be a pattern (`release/*`) or a tag pattern (`tag v*`). An environment word outside the known list states its place, `sandbox (after dev)`; without it the line is Unclear. Lines are appended, never rewritten. Format: `docs/environments-promotion.md`.
+- **Branches section.** `/crav1-map-pipeline-environments` gains a fourth section after Unclear that proposes promotion.md lines from `trigger:` branch lists, stage `condition:` on `Build.SourceBranch`, classic artifact branch filters and `refs/tags/` triggers. Azure DevOps definitions only, no runs; confirmed section by section.
+- **Promotion line.** `/crav1-help` status, `/crav1-verify-build-against-spec`, `/crav1-tasks-ready-to-build` and `/crav1-merge-pr` show `Promotion: on the branch that deploys to test (develop); not yet on the branch that deploys to prod (main).` Release patterns name the newest matching branch (`on release/2026.11 (deploys to prod)`), tag lines the newest matching tag or `not yet tagged`, and a fix made on a release branch shows `not back on develop`. Branch reach only, never "deployed to". Report only; done is unaffected.
+- **Pipeline runs (optional).** When a pipeline-sourced line is behind the Promotion line, the report asks **Also check the latest pipeline runs?** The choice word `pipeline runs` skips the question. A headless run without it gives the git answer and `Pipeline runs not checked. Add the word: pipeline runs.` Azure DevOps only and read-only; with `az` signed out it says `az has no login` and keeps the git answer.
+- **Marks and docs.** `marks.yaml` adds the promotion line (61 marks). The glossary gains promotion and branch reach; `from-map-pipeline-environments.md` gains a Branches section.
+
 ## 1.68.0 (2026-10-20)
 
 Setup 4: a spec with its own long-lived branch and a short sub-branch per task, plus revert reporting. Examples use made-up names: the code repo `orders-api`, the spec branch `feat/orders-capacity`.
