@@ -124,6 +124,8 @@ A whole-repo read is a read that is not limited to one slice: more than one slic
 
 A one-slice read is a change whose paths all belong to one slice. Do not touch the repo column. Write or update a line in that slice's `spec.md`, after the title and before the first heading: `Synced at: <repo> <branch>@<short sha>, <date>`. One line per repo, with one entry per branch read, separated by `; `: `Synced at: orders-api feat/orders-retry@155b5c4, 2026-10-19; develop@00344be, 2026-10-15`. When that branch already has an entry, replace only that entry. A new branch adds an entry at the end. Leave the other entries, a `(dropped)` on them, and other repos' `Synced at` lines. A change from a branch diff also counts as a one-slice read of that branch when its paths fit one slice.
 
+**Branch list (1.67.1).** With the same confirmed writes, a one-slice read of a work branch also adds that branch to the slice's Match `Branch:` list, the `- Branch:` line under `## Match` in `spec.md`. A base branch (the repo's `Merges into` branch or default branch) is never added. When the line is missing, write it as the first line under `## Match`, and add `## Match` at the end of the spec when it is missing too. When the branch is already listed, leave it. Otherwise add it at the end, `; `-separated. Prefix the repo (`<repo> <branch>`) when the read named a repo or the list already uses repo prefixes. Keep every other entry and its markers (`(into …)`, `(spec branch)`) as they are, and never remove a branch: a branch given up gets `(dropped)` on its `Synced at` entry through `/crav1-tighten-spec`. Example: `- Branch: orders-api feat/orders-retry; orders-api feature/orders-openapi`. The report names the branch added, or says it was already listed. A whole-repo read does not touch any `Branch:` list.
+
 Do not stamp a repo or a slice this run did not read. An empty cell stays empty. A consumer measuring drift uses the older of the repo column and the slice line, for each branch its own entry, and an empty value means unknown, so fall back to spec file commit dates.
 
 ## Impact (before any other edit)
@@ -174,6 +176,7 @@ Output only:
 - `glossary.md` when this turn created it or appended rows. If `docs/system/` was missing, say no glossary was written. If no new rows were appended, say so
 - Picture lines added, or that the picture is current. If `docs/system/` was missing, say no picture was written
 - `Synced at` cell or slice line written, or that none was written
+- Match `Branch:` entry added, already listed, or not written (base branch or whole-repo read)
 - Impact: nothing else, or the one-line edit list and which option they picked
 - Research: each hit, whether it was marked, the note path and the findings line, or that none was marked. The revisit draft when one was written in the chat, or that none was drafted. The clear summary: what was cleared, narrowed, and routed where, each open question from the updated note and where it went, and when an older mark had no points, or that this run did not check an updated note
 - Next: `/crav1-finalize-commit` only if any file changed and they want those spec edits committed (no push). `/crav1-plan-from-spec` only for a slice they choose. Do not run either.
