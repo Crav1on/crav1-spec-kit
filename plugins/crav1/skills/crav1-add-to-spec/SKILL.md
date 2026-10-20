@@ -2,7 +2,7 @@
 name: crav1-add-to-spec
 description: >-
   Bring new information into existing specs. Asks: fact, dump, code
-  change, or meeting (choice words); skipped when the message says which.
+  change, meeting, mail, or chat (choice words); skipped when the message says which.
   Replaces match-dump-to- specs, code-into-specs, and meeting-to-specs,
   whose rules are kept as branches. A fact: add it to one existing spec,
   then report whether docs/system/ or another spec has to change; edits
@@ -31,11 +31,13 @@ Read `references/opening.md` ("Opening question (1.56.0)") only when no branch w
 
 Exact words for bots and scripted runs. There are no `--flags`.
 
-- What you have: `fact` / `dump` / `code change` / `meeting`.
+- What you have: `fact` / `dump` / `code change` / `meeting` / `mail` / `chat`.
+
+`mail` and `chat` run the dump branch. "This mail", "this email" or "this chat" picks that word.
 
 When the invocation contains one of these words (for example `/crav1-add-to-spec fact`), take that choice and do not ask. This holds for a person, a bot, or a headless run.
 
-When a choice is missing and the run is headless or started by a bot (no person in the chat to answer), do not guess. Stop and name the valid words, for example: `Missing choice. Use one of: fact, dump, code change, meeting.`
+When a choice is missing and the run is headless or started by a bot (no person in the chat to answer), do not guess. Stop and name the valid words, for example: `Missing choice. Use one of: fact, dump, code change, meeting, mail, chat.`
 
 ## From /crav1-read-environment
 
