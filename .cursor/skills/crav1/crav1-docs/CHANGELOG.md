@@ -2,6 +2,17 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.69.1 (2026-10-20)
+
+Template copies that had drifted from the project templates.
+
+### Kit
+
+- **Note template in dump and meeting.** `/crav1-add-to-spec`'s dump and meeting branches carried an old `note.md` whose `kind:` list lacked `pull request` (in the main template since 1.65.0) and that had no `commits:` or `pr_note:` fields. They now match `docs/notes/_template/note.md`.
+- **Notes index in dump and meeting.** Their `index.md` copies still had the pre-month layout; they now match `docs/notes/_template/index.md` (the generated top index with one row per month).
+- **verify.md and fix-log.md templates.** `docs/specs/_template/verify.md` now has the BLOCKER, Branches, Sub-branches, Promotion and Skipped tests lines the skill's copy already had, and `docs/specs/_template/fix-log.md` has the skill's Next wording.
+- **Drift check in CI.** `scripts/check-template-copies.py` fails when a skill's template copy differs from the template with the same name in `docs/*/_template/`; three copies that are deliberately a different template are listed with the reason.
+
 ## 1.69.0 (2026-10-20)
 
 Setup 6: environment and release branches. Done stays "merged into the base branch"; how far the work has got after that is shown on its own line. Examples use made-up names: the code repo `orders-api`, the pipeline `orders-cd`.
