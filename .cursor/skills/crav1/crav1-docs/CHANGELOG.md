@@ -2,6 +2,17 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.74.1 (2026-10-21)
+
+Fix: the `/crav1-finalize-commit` question no longer fails with `InputValidationError`.
+
+### Kit
+
+- **At most 4 options per question.** The questions tool rejects a fifth option. `/crav1-finalize-commit` now offers `commit` / `copy` / `change` / `stop`; `change` covers edit and rewrite (say what to change, or say rewrite). `/crav1-resolve-open-questions` offers 2–4 letters. A fifth choice goes under Other. The same in the Cursor, Claude Code and plugin copies.
+- **Message shown once.** The Summary and Description stay in the reply; the question prompt is just `Commit this message?`.
+- The commit walkthrough, the ideas walkthrough, the skills reference, the message-only branch and the build-tasks worker name the new options.
+- **Words read:** 47 fewer in finalize-commit `SKILL.md`, 10 more in resolve-open-questions `SKILL.md`.
+
 ## 1.74.0 (2026-10-21)
 
 `/crav1-resolve-open-questions` can show more context per question. No new questions.
