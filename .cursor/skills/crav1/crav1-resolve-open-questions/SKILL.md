@@ -1,6 +1,6 @@
 ---
 name: crav1-resolve-open-questions
-description: Walk Open questions in spec.md one by one. Each question gets keep-open or answer options with impact; patch only that question after a pick. When an answer settles a stale research point waiting on that question, re-check the point and clear the mark when no point is open. Do not ask the user. Use after /crav1-tighten-spec when unanswered questions remain. Do not write application code.
+description: Walk Open questions in spec.md one by one. Each question gets keep-open or answer options with impact; patch only that question after a pick. When an answer settles a stale research point waiting on that question, re-check the point and clear the mark when no point is open. Do not ask the user. Use after /crav1-tighten-spec when unanswered questions remain. Do not write application code. `detailed` shows more context per question.
 disable-model-invocation: true
 icon: book-open
 color: yellow
@@ -11,6 +11,10 @@ color: yellow
 You close **Open questions** (and leftover numbered **Assumptions**) in one batch (1.70.0), as `/crav1-tighten-spec` does: every `Q#` with options and impact, one answer for the batch, then patch the answered items.
 
 This is not a defect walk. Do not re-run architecture findings here unless they are already written as open questions.
+
+## Choice words
+
+Exact words, no `--flags`. `detailed`: each question shows the extended entry in [references/detailed.md](references/detailed.md); read that file only then. Without it, the list is short.
 
 **Do not patch until the user picks a letter for the current question** (or a batch of `Q#: letter` answers).
 
@@ -41,7 +45,7 @@ Remaining `Q#` titles only. Mark the current one.
 
 For **only** the current `Q#`:
 
-1. **Question** — quote the spec line. One sentence on what is undecided (product vs architecture). When the question has an `Answered:` line (see `crav1-add-to-spec` `references/open-questions.md`), quote that answer and its source, and offer the answer it states as the first answer option. Keep open is still offered. `Asked:` and `Pending:` lines are context only.
+1. **Question** — quote the spec line. One sentence on what is undecided (product vs architecture). When the question has an `Answered:` line (see `crav1-add-to-spec` `references/open-questions.md`), quote that answer and its source, and offer the answer it states as the first answer option. Keep open is still offered. `Asked:` and `Pending:` lines are shown in `detailed`.
 2. **Why it is still open** — what v0, tests, or an ADR cannot finish without this.
 3. **Options** — usually 3–5 letters. Use the questions tool when available.
 
