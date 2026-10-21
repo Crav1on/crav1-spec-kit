@@ -2,6 +2,16 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.74.0 (2026-10-21)
+
+`/crav1-resolve-open-questions` can show more context per question. No new questions.
+
+### Kit
+
+- **`detailed`.** `/crav1-resolve-open-questions detailed` shows an extended entry for each question, before its options: Blocks (the spec line or section, plus `Blocks:` tasks), Why it matters, Known so far, Who can answer, Asked (status, who, channel, date), Sources, and Suggested when there is one. Without the word the list stays short, as before, and nothing is asked.
+- The extended entry lives in the new `references/detailed.md`, read only on `detailed`. The skill description, the skills reference, guild routing and the draft-spec walkthrough name the word.
+- **Words read:** 34 more in `SKILL.md` (6 of them in the description); `references/detailed.md` is 180 words, read only on `detailed`.
+
 ## 1.73.0 (2026-10-20)
 
 `/crav1-finalize-commit` can commit in one go.

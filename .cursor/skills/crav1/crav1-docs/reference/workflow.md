@@ -2,7 +2,7 @@
 
 <!-- Generated from docs/reference/workflow.yaml by scripts/gen-workflow.py. Do not edit by hand. -->
 
-Kit version: 1.73.0
+Kit version: 1.74.0
 
 This page is the one written source for the order of kit commands. `/crav1-help` answers from it and names the route it used. The `crav1.mdc` order lines and every skill's next step in the [skills reference](skills.md) are generated from the same file, [workflow.yaml](workflow.yaml).
 
