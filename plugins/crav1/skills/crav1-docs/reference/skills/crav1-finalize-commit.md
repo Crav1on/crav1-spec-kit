@@ -12,7 +12,7 @@ Commit, or only write the commit message; asks which.
 
 Only write the message (was `/crav1-draft-commit-message`): Paste-ready Summary/Description for any git client; CRAV1 style or live git log, once or onward (deletable rule); does not commit unless they ask. Optional Azure Boards mention from `docs/specs/<slug>/work-item.md` is the last description line.
 
-Commit (was [`/crav1-finalize-commit`](crav1-finalize-commit.md)): Same draft, then **commit first**, then copy for your git client, edit/rewrite, or stop (no push). Keeps that mention through the HEAD check and the attribution strip.
+Commit (was [`/crav1-finalize-commit`](crav1-finalize-commit.md)): Same draft, then **commit first**, then copy for your git client, change (edit or rewrite), or stop (no push). Keeps that mention through the HEAD check and the attribution strip.
 
 ## Choice words
 
