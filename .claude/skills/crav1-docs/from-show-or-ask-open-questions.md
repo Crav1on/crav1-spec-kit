@@ -14,7 +14,7 @@ This is not `/crav1-resolve-open-questions`. Resolve walks the questions with yo
 The open questions for <a person, one spec, or a topic>, as a mail.
 ```
 
-Name a person (`Alex`, or a group), a spec (`@docs/specs/<slug>/`), or a topic (`static IP`). A question routed via a person ("Finance via Dana") belongs to that person: `/crav1-show-or-ask-open-questions` lists it for Dana. You can also name the kind of draft and the language.
+Name a person (`Alex`, or a group), a spec (`@docs/specs/<slug>/`), or a topic (`static IP`). A question routed via a person ("Finance via Dana") belongs to that person: `/crav1-show-or-ask-open-questions` lists it for Dana. A branch, or a pull request (`pr71`, `#71`, `pr orders-api 71`), also works (1.75.0): the pull request is found from its PR note or the local git log first, and online only after you pick to. You can also name the kind of draft and the language.
 
 ## Steps
 

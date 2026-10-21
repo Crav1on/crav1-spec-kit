@@ -8,6 +8,7 @@ Examples use made-up names: the spec repo `orders-specs`, the code repo `orders-
 
 - **`Synced at` slice line** in `spec.md`, one line per repo, one entry per branch, separated by `; `: `Synced at: orders-api feat/orders-retry@155b5c4, 2026-10-19; develop@00344be, 2026-10-15`. An entry may end in `(dropped)`.
 - **Match `Branch:` list** under `## Match`: `- Branch: feat/orders-retry; feature/orders-openapi`. When the spec spans repos, an item may start with the repo: `- Branch: orders-api feat/orders-retry`. An item may end in `(into <branch>)` (it merges into that branch, not the base; offered and written after a yes since 1.68.0) or `(spec branch)` (the spec's long-lived branch that its task sub-branches merge into, 1.68.0): `- Branch: orders-api feat/orders-capacity (spec branch); feat/orders-capacity-t3 (into feat/orders-capacity)`.
+- **PR marker (1.75.0).** A Match `Branch:` entry may end in `(PR <n>)`, written by `/crav1-open-pr`. It is the pull request number for `references/scope.md`. Ignore it for every branch rule here.
 - **Task branch** at the end of a task line in `tasks.md`: `(branch: feat/orders-retry)`, or `(branch: orders-api feat/orders-retry)` when the spec spans repos.
 
 A spec's **work branches**, per repo, are every branch named in those three places, minus the base branches and minus entries marked `(dropped)`.

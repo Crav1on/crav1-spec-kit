@@ -2,6 +2,18 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.75.0 (2026-10-21)
+
+`/crav1-help todo`: what to do next, ranked from the records. Scope by pull request, found offline first.
+
+### Kit
+
+- **`todo`, `todo next`, `todo top N`.** `/crav1-help` ranks every action the records imply, read-only, nothing stored: (1) a question that blocks otherwise ready tasks, (2) answered, not resolved, (3) a pending draft older than 3 days, (4) an ask older than 7 days, (5) a date in `## Constraints` within 14 days, (6) stale research with open points, (7) a decision for the team, (8) ready tasks, (9) a parked spec. Ties: more tasks unblocked, then older. Each line gives the spec, the reason with its age, and the next command. `todo next` is the top 5. A **Yours first** group comes from `git config user.name` or `todo for <name>`; no match, no group, no question. The rules are in `crav1-help/references/todo.md`, read only on `todo`.
+- **Shared scope.** New `crav1-add-to-spec/references/scope.md`: person, spec and topic (moved word for word from `/crav1-show-or-ask-open-questions`), a branch (via `branches.md`), and a pull request as `pr71`, `pr 71`, `#71` or `pr <repo> 71`. `/crav1-help todo`, `/crav1-show-or-ask-open-questions` and `/crav1-resolve-open-questions` use it.
+- **Pull request lookup, offline first.** (1) the PR note (`source: PR <n>` in the notes indexes, its `used_by` and head branch, or a `(PR <n>)` Branch entry), (2) the local git log (merge and squash subjects), (3) online only when gh or az is already signed in, or after one question with the sign-in status: A) I've signed in, look it up, B) Use a branch name instead, C) Stop. One re-check, no polling. A headless run reports and stops. The answer says which step found it.
+- **`/crav1-open-pr` records the number.** With the URL, it adds ` (PR <n>)` to the head's Match `Branch:` entry in the spec, or adds that entry for `feat/<slug>` or `spec/<slug>`. Uncommitted. `branches.md` ignores the marker for branch rules.
+- **Words read:** help `SKILL.md` 1,655 to 1,699 (+44, 5 in the description); `todo.md` 364 and `scope.md` 485, each read only when used; show-or-ask `SKILL.md` 1,394 to 1,312 (−82); resolve-open-questions 1,367 to 1,386 (+19); open-pr `after.md` +64; `branches.md` +31.
+
 ## 1.74.1 (2026-10-21)
 
 Fix: the `/crav1-finalize-commit` question no longer fails with `InputValidationError`.

@@ -1163,9 +1163,9 @@ skills:
   use_when: Commits exist; want a pull request
   table:
     reads: The change branch, the spec, and `verify.md`
-    writes: A push of the change branch and one pull request, after an explicit yes
+    writes: A push of the change branch and one pull request, after an explicit yes, and `(PR <n>)` on the spec's Match `Branch:` entry
   reads: 'Reads the change branch, the spec folder, `verify.md`, `work-item.md` when it exists, and the `Merges into` cell in `docs/system/repos.md` and the spec''s Branch list for the base.'
-  writes: Writes one pull request after an explicit yes to push.
+  writes: Writes one pull request after an explicit yes to push. With the URL, adds `(PR <n>)` to the head's Match `Branch:` entry in the spec (1.75.0), uncommitted.
   leaves_alone: Leaves new commits and the merge alone.
   exceptions: names `/crav1-review-pr` and `/crav1-merge-pr` and does not run them.
   called_by: Called by the user.
@@ -1320,16 +1320,25 @@ skills:
   - '1.67.1: remote copy ages count whole calendar days in local time; a commit made today is `today`, not `1 day old`.'
   - '1.68.0: status adds the `Sub-branches:` and `left behind:` lines and `merged, reverted on <base> (<sha>)`, report only.'
   - '1.69.0: status adds the `Promotion:` line from `docs/environments/promotion.md` (branch reach, release and tag patterns, `not back on <base>`), with the optional `pipeline runs` check.'
+  - '1.75.0: `todo`, `todo next` (top 5) and `todo top N`, with an optional scope (person, spec, topic, branch, or pull request), rank what to do next from the records. Read-only; nothing is stored. A **Yours first** group comes from `git config user.name` or `todo for <name>`.'
   choice_words:
   - question: Also check the latest pipeline runs?
     words:
     - word: "pipeline runs"
       means: "check the latest successful Azure DevOps runs behind the Promotion line (read-only)"
+  - question: What to do next (optional, never asked)
+    words:
+    - word: "todo"
+      means: "every action from the records, ranked (read-only)"
+    - word: "todo next"
+      means: "the top 5"
+    - word: "todo top N"
+      means: "the top N"
   use_when: You want to know what to run next, in what order, or what a skill does
   table:
     reads: The kit docs (kit repo, or the bundled `crav1-docs/` next to the skills), and the slice's file state
     writes: Nothing (an answer in chat with its source)
-  reads: Reads `docs/reference/workflow.yaml`, `docs/reference/skills.yaml`, the reference pages, walkthroughs, concept pages, guild routing, and `CHANGELOG.md` from the kit repo or the `crav1-docs/` folder bundled next to the skills in every install; for a route or a status, the slice's `spec.md`, `plan.md`, `tasks.md`, `verify.md`, and `work-item.md`; when online, the kit's tag names only.
+  reads: Reads `docs/reference/workflow.yaml`, `docs/reference/skills.yaml`, the reference pages, walkthroughs, concept pages, guild routing, and `CHANGELOG.md` from the kit repo or the `crav1-docs/` folder bundled next to the skills in every install; for a route or a status, the slice's `spec.md`, `plan.md`, `tasks.md`, `verify.md`, and `work-item.md`; when online, the kit's tag names only. For `todo`, every spec in scope, its `tasks.md`, and the notes indexes; a pull request online only after a yes.
   writes: Writes an answer in the chat that ends with its source file and anchor, and at most one newer-version line per chat.
   leaves_alone: Leaves every file alone.
   exceptions: does not answer from memory, from general knowledge, or from GitHub. When the docs do not cover a question it says "the kit doesn't say". On pushback it re-reads the cited file and changes the answer only when the file says otherwise. When `crav1-docs/` is missing (only skill folders were copied), it answers from the skill files only and says so.

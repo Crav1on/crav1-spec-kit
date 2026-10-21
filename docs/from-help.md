@@ -25,6 +25,7 @@ I have new information from a meeting and tasks that are not built. What do I ru
 | `/crav1-help work item homes`, `marks.md`, `stale marks` | The concept, from the [glossary](concepts/glossary.md) and the concept pages |
 | `/crav1-help list`, `/crav1-help list build` | Every command grouped by lane and phase, or one lane, from the [skills reference](reference/skills.md) and [guild routing](guild-routing.md) |
 | `/crav1-help status <slug>`, `/crav1-help where am I` | Where one slice is: task counts (ready, blocked, needs verify, done) with the same rules as [`/crav1-tasks-ready-to-build`](from-tasks-ready-to-build.md), the route step it is on, and the next step |
+| `/crav1-help todo`, `todo next`, `todo top 8`, then an optional scope such as `pr71`, `orders-retry`, `feat/orders-retry`, or `Dana` | What to do next, ranked from the records (1.75.0): questions that block ready tasks, answered questions not resolved, pending drafts older than 3 days, asks older than 7 days, dates in Constraints, stale research, decisions, ready tasks, parked specs. Each line gives the spec, the reason with its age, and the next command. A **Yours first** group comes from `git config user.name` or `todo for <name>`. A pull request is found offline from its PR note or the local git log; online only after you pick to |
 | `/crav1-help ado-sync` | For a merged skill, also its choice words, such as `suggest features` / `push features` / `push tasks` / `pull tasks` / `pull spec changes` ([choice words](guild-routing.md#choice-words-for-bots-and-scripted-runs)) |
 | `/crav1-help renamed`, or an old name | The old-to-new names, the choice word to use, and that the old names were removed in 1.58.0 |
 | `/crav1-help compare build-tasks build-features` | Two commands side by side: lane, purpose, reads, writes, next steps, and when to pick which |
@@ -70,7 +71,7 @@ It never fetches an answer from GitHub. When the machine is online, it reads the
 
 ## What does not get written
 
-Nothing. No file, no commit, no command run.
+Nothing. No file, no commit, no command run. `todo` stores nothing either.
 
 ## After
 

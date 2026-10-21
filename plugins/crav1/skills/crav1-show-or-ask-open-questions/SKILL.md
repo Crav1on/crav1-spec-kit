@@ -86,9 +86,7 @@ Read `references/asked.md` ("Pending first") only when questions are already mar
 
 Collect every open question that fits the selection.
 
-- **Person.** The question names that person as who can answer, says `waiting for <person>`, says `via <person>`, or has an `Asked:` or `Pending:` line for that person. A question whose who is a group the person speaks for (the user says so, or the question says `via <person>`) is included. Do not guess who can answer a question that names nobody. List those separately as `No one named`, and ask whether to include them.
-- **Spec.** Every open question on that spec.
-- **Topic.** Match by meaning across all specs. Spec titles and the question words weigh most.
+Person, spec, topic, branch, and pull request (`pr71`, `#71`) follow `crav1-add-to-spec` `references/scope.md` (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/references/scope.md`; plugin: sibling `skills/crav1-add-to-spec/references/scope.md`).
 
 Skip a question that already has a clear `Answered:` line. Say how many were skipped and why. Skip a question with an `Asked:` line for this person unless the user asks to ask again. Say how many were skipped and when they were asked.
 
