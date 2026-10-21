@@ -47,7 +47,7 @@ For **only** the current `Q#`:
 
 1. **Question** — quote the spec line. One sentence on what is undecided (product vs architecture). When the question has an `Answered:` line (see `crav1-add-to-spec` `references/open-questions.md`), quote that answer and its source, and offer the answer it states as the first answer option. Keep open is still offered. `Asked:` and `Pending:` lines are shown in `detailed`.
 2. **Why it is still open** — what v0, tests, or an ADR cannot finish without this.
-3. **Options** — usually 3–5 letters. Use the questions tool when available.
+3. **Options** — 2–4 letters. Use the questions tool when available. At most 4 options per question; a fifth goes under Other.
 
 **Always** include **Keep open**. Always include at least two **substantive** answers (not only keep vs cut) unless the only honest answers are keep vs cut-from-v0.
 

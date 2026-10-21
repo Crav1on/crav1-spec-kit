@@ -7,7 +7,7 @@ description: >-
   `commit now` commits without the choice; `crav1` or `git log` sets
   the style. Finalize a commit: CRAV1 style vs git log first if needed, then draft
   the Summary and Description, then offer git commit first, then copy /
-  edit / rewrite / stop. Wording is shown before those choices. Use when
+  change / stop. Wording is shown before those choices. Use when
   they want to change the message or actually create the commit, or
   /crav1-finalize-commit. Does not push. Does not commit until they pick
   commit. Paste-only: /crav1-finalize-commit. Keeps a trailing
@@ -34,9 +34,11 @@ You wrap **`crav1-finalize-commit`**. First produce the same Summary and Descrip
 
 Command: `/crav1-finalize-commit`.
 
-Order: (1) style menu if no persist rule, (2) generate and show Summary/Description, (3) then the choices with **`commit` first** (top of the questions tool), then copy / edit / rewrite / stop. Never put those choices before the wording exists.
+Order: (1) style menu if no persist rule, (2) generate and show Summary/Description, (3) then the choices with **`commit` first** (top of the questions tool), then copy / change / stop. Never put those choices before the wording exists.
 
-Paste-only (no copy/edit/commit choices): tell them `/crav1-finalize-commit` instead, or they can pick `copy` here.
+Paste-only (no commit/copy/change choices): tell them `/crav1-finalize-commit` instead, or they can pick `copy` here.
+
+At most 4 options per question; a fifth goes under Other.
 
 When the message or the files make one option the better fit, list it first and end its label with ` (Recommended)`. Otherwise keep the order above with no label.
 
@@ -66,25 +68,19 @@ Do **not** run `git commit` in that step. Do **not** skip the paste blocks — t
 
 Remember the intended file set (the paths the message describes). Warn if `agent-tools/` or build output is in that set.
 
-## After every new wording (first draft, edit, or rewrite)
+## After every new wording (first draft or change)
 
 They choose **after** the message exists, not before.
 
-When the style is not settled, ask the CRAV1 style vs git-log question in the same questions call as the copy/edit/commit choices (1.70.0), and draft in the recommended style; a different style answer redrafts before anything is committed.
+When the style is not settled, ask the CRAV1 style vs git-log question in the same questions call as the commit/copy/change choices (1.70.0), and draft in the recommended style; a different style answer redrafts before anything is committed.
 
 On the turn that produces wording:
 
 1. Finish the draft (git inspect, style already chosen).
 2. Write the **Summary** and **Description** paste blocks into the user-visible reply. This is required. Do not skip it.
-3. **Then** offer the choices (questions tool when available). Put the **actual Summary and Description** in the question prompt so the choice UI still shows the generated text, for example:
+3. **Then** offer the choices (questions tool when available). The prompt is `Commit this message?`. The blocks are already in the reply above; do not repeat them in the prompt.
 
-   `Summary: <one line>`
-
-   `Description:` (the body, including the trailing work-item line when the draft has one)
-
-   `What next?`
-
-   Options, **in this order**: `commit` / `copy` / `edit` / `rewrite` / `stop`. **`commit` is always the first/top option** in the questions tool and in any bullet list.
+   Options, **in this order**: `commit` / `copy` / `change` / `stop`. **`commit` is always the first/top option** in the questions tool and in any bullet list.
 
 Never call the questions tool (or any blocking choice UI) **before** step 2. Never call it as the first action of a draft turn. Draft first, choices last. Do not `git commit` until they pick `commit`.
 
@@ -92,20 +88,21 @@ Never call the questions tool (or any blocking choice UI) **before** step 2. Nev
 | --- | --- | --- |
 | `commit` | Create the git commit | Use the **current** Summary + Description. See below. **Always list this first.** |
 | `copy` | Copy for GitKraken | Done. Same outcome as `/crav1-finalize-commit`. They paste Summary/Description. No `git commit`. |
-| `edit` | Change the text | They say what to change (summary, description, or both). Apply **only** those edits. Keep the same style source. Show the new blocks, **then** the same choices again (`commit` still first). |
-| `rewrite` | New draft from the diff | Run the draft skill’s draft step again on the **same** file set and style source. Discard the previous wording. Show the new blocks, **then** the same choices again (`commit` still first). |
+| `change` | Edit or rewrite | They say what to change (summary, description, or both), or say rewrite for a new draft from the diff. See below. |
 | `stop` | Abort | No commit. They can still copy the last blocks. |
 
-If they named `copy`/`edit`/`commit` **before** any wording exists, ignore it, draft, show blocks, then offer choices.
+If they named `copy`/`change`/`commit` **before** any wording exists, ignore it, draft, show blocks, then offer choices.
 
 Do not invent extra options (push, amend, commit subsets they did not name). If they ask to push after a successful commit, that is a **new** request — only then `git push`. If they want a pull request, that is `/crav1-open-pr` in a later turn. Do not open it here.
 
-## When they pick `edit`
+## When they pick `change`
+
+- If they say rewrite, run the draft step again on the **same** file set and style source, and discard the previous wording.
 
 - If they paste a full new Summary and/or Description, use that text (cleanup only: no Conventional Commits unless the style source is git log that already uses them). Their pasted Description replaces the body, including its last line.
 - If they give notes (“shorter summary”, “mention verify.md”), rewrite just those parts. Keep the trailing work-item mention as the last line of the Description unless the note changes or removes it.
 - Ask which field if it is unclear.
-- Then show the new paste blocks and **then** the same choices again (`commit` still first). Never commit in the same turn as `edit` unless they also said `commit` **after** seeing the new blocks.
+- Then show the new paste blocks and **then** the same choices again (`commit` still first). Never commit in the same turn as `change` unless they also said `commit` **after** seeing the new blocks.
 
 ## When they pick `commit`
 
@@ -137,7 +134,7 @@ If they say they **want** the Cursor trailer, leave it.
 
 ## Hard rules
 
-- Never offer commit/copy/edit before Summary/Description exist. After they exist, show the blocks, then the choices with **`commit` first**. The question prompt includes that wording.
+- Never offer commit/copy/change before Summary/Description exist. After they exist, show the blocks, then the choices with **`commit` first**.
 - No commit until `commit` (or an unambiguous “commit this message now”) **after** they have seen the current blocks.
 - `copy` never runs `git commit`.
 - After `commit`, if Cursor appended `Co-authored-by` / `Made-with` that was not in the draft, strip it once with amend when HEAD is ours and unpushed; do not fight a second inject—tell them to turn Attribution off. The amend keeps the drafted Description, including a trailing work-item mention.
