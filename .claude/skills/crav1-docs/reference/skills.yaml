@@ -1031,14 +1031,6 @@ skills:
     words:
     - word: "pipeline runs"
       means: "check the latest successful Azure DevOps runs behind the Promotion line (read-only)"
-  - question: What to do next (optional, never asked)
-    words:
-    - word: "todo"
-      means: "every action from the records, ranked (read-only)"
-    - word: "todo next"
-      means: "the top 5"
-    - word: "todo top N"
-      means: "the top N"
   use_when: Want proof against acceptance
   table:
     reads: Spec, tasks, plan, and the running tree
@@ -1334,6 +1326,14 @@ skills:
     words:
     - word: "pipeline runs"
       means: "check the latest successful Azure DevOps runs behind the Promotion line (read-only)"
+  - question: What to do next (optional, never asked)
+    words:
+    - word: "todo"
+      means: "every action from the records, ranked (read-only)"
+    - word: "todo next"
+      means: "the top 5"
+    - word: "todo top N"
+      means: "the top N"
   use_when: You want to know what to run next, in what order, or what a skill does
   table:
     reads: The kit docs (kit repo, or the bundled `crav1-docs/` next to the skills), and the slice's file state

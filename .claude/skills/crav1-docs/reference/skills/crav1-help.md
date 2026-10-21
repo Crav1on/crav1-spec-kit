@@ -20,6 +20,8 @@ It reads the kit repo's `docs/`, or the `crav1-docs/` folder bundled next to the
 
 1.69.0: status adds the `Promotion:` line from `docs/environments/promotion.md` (branch reach, release and tag patterns, `not back on <base>`), with the optional `pipeline runs` check.
 
+1.75.0: `todo`, `todo next` (top 5) and `todo top N`, with an optional scope (person, spec, topic, branch, or pull request), rank what to do next from the records. Read-only; nothing is stored. A **Yours first** group comes from `git config user.name` or `todo for <name>`.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
@@ -27,6 +29,9 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 | Question | Word | Means |
 | --- | --- | --- |
 | Also check the latest pipeline runs? | `pipeline runs` | check the latest successful Azure DevOps runs behind the Promotion line (read-only) |
+| What to do next (optional, never asked) | `todo` | every action from the records, ranked (read-only) |
+| What to do next (optional, never asked) | `todo next` | the top 5 |
+| What to do next (optional, never asked) | `todo top N` | the top N |
 
 ## Runs when
 
@@ -36,7 +41,7 @@ You want to know what to run next, in what order, or what a skill does. Called b
 
 In short: The kit docs (kit repo, or the bundled `crav1-docs/` next to the skills), and the slice's file state.
 
-Reads `docs/reference/workflow.yaml`, `docs/reference/skills.yaml`, the reference pages, walkthroughs, concept pages, guild routing, and `CHANGELOG.md` from the kit repo or the `crav1-docs/` folder bundled next to the skills in every install; for a route or a status, the slice's `spec.md`, `plan.md`, `tasks.md`, `verify.md`, and `work-item.md`; when online, the kit's tag names only.
+Reads `docs/reference/workflow.yaml`, `docs/reference/skills.yaml`, the reference pages, walkthroughs, concept pages, guild routing, and `CHANGELOG.md` from the kit repo or the `crav1-docs/` folder bundled next to the skills in every install; for a route or a status, the slice's `spec.md`, `plan.md`, `tasks.md`, `verify.md`, and `work-item.md`; when online, the kit's tag names only. For `todo`, every spec in scope, its `tasks.md`, and the notes indexes; a pull request online only after a yes.
 
 ## Writes
 

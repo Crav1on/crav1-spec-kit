@@ -28,9 +28,9 @@ Reads the change branch, the spec folder, `verify.md`, `work-item.md` when it ex
 
 ## Writes
 
-In short: A push of the change branch and one pull request, after an explicit yes.
+In short: A push of the change branch and one pull request, after an explicit yes, and `(PR <n>)` on the spec's Match `Branch:` entry.
 
-Writes one pull request after an explicit yes to push.
+Writes one pull request after an explicit yes to push. With the URL, adds `(PR <n>)` to the head's Match `Branch:` entry in the spec (1.75.0), uncommitted.
 
 ## Does not
 
