@@ -20,7 +20,7 @@ Exact words, no `--flags`. `detailed`: each question shows the extended entry in
 
 ## Find the spec
 
-Use the spec the user @-mentions. Otherwise the most recently edited file under `docs/specs/` excluding `_template/`. If several, ask which slug. Expected `spec.md` headings: this skill’s `assets/spec.md`.
+Use the spec the user @-mentions. A branch or a pull request (`pr71`, `#71`) picks its spec as `crav1-add-to-spec` `references/scope.md` says; several specs: ask which. Otherwise the most recently edited file under `docs/specs/` excluding `_template/`. If several, ask which slug. Expected `spec.md` headings: this skill’s `assets/spec.md`.
 
 Read `spec.md` (`## Open questions`, `## Assumptions`, `## Constraints`, and `## Research findings` when that heading is there). Note `diagrams.md` and `adr/`.
 

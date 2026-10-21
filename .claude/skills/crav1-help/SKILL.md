@@ -11,7 +11,8 @@ description: >-
   pushback, re-reads the file and keeps the answer unless the file says
   otherwise. Reads the kit repo's docs, or the docs bundled in the
   installed kit (plugin or drop-in), never GitHub. When online, says once if a newer kit
-  version is tagged. Writes nothing and runs no other skill.
+  version is tagged. `todo` ranks what to do next.
+  Writes nothing and runs no other skill.
 icon: life-buoy
 color: blue
 ---
@@ -62,6 +63,7 @@ A short usage guide that lists every mode with one example each:
 | A concept | `/crav1-help work item homes`, `/crav1-help marks.md`, `/crav1-help stale marks` |
 | The skill list, or one lane | `/crav1-help list`, `/crav1-help list build` |
 | Where a slice is | `/crav1-help status cancel-booking`, `/crav1-help where am I` |
+| What to do now | `/crav1-help todo next pr71` |
 | Two skills side by side | `/crav1-help compare build-tasks build-features` |
 | What changed | `/crav1-help whats new`, `/crav1-help whats new since 1.50` |
 | Renamed skills | `/crav1-help renamed`, `/crav1-help complete-task` |
@@ -110,6 +112,8 @@ The message names a kit word or file, such as `work item homes`, `choice words`,
 
 Read `references/status.md` ("6. Status of a slice") only when the user asks for the status of a slice.
 
+Read `references/todo.md` only on `todo`.
+
 ### 7. Compare two skills
 
 Read `references/modes.md` ("7. Compare two skills") only when the user asks to compare two skills.
@@ -140,11 +144,12 @@ Read `references/modes.md` ("Parked and retired specs (1.60.0)") only when a sli
 
 ## What it does not do
 
-- No file write, no commit, no network read beyond the tag names above.
+- No file write, no commit, no network read beyond the tag names above, except a `todo` PR lookup after a yes.
 - No skill run. It names the next step and stops.
 - No order from memory, and no order that is not in `workflow.yaml`.
 
 
 ## Choice words (1.69.0)
 
+- Todo: `todo` / `todo next` / `todo top N`, then an optional scope.
 - Pipeline runs: `pipeline runs` (check the latest successful Azure DevOps runs behind the Promotion line without asking). There are no `--flags`.
