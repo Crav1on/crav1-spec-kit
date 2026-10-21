@@ -526,6 +526,11 @@ skills:
 
     @docs/specs/<slug>/spec.md'
 - name: crav1-resolve-open-questions
+  choice_words:
+  - question: List (optional, never asked)
+    words:
+    - word: "detailed"
+      means: "show blocks, why, known, who, asked, sources and suggested per question (no word: the short list, and a headless run does not stop)"
   lane: specify
   group: Specify
   starter: false
@@ -535,6 +540,7 @@ skills:
   purpose: Walk Open questions in spec.md one by one.
   in_depth:
   - One Open question at a time; keep it open or answer with impact; patch only that `Q#`.
+  - '`detailed` shows an extended entry per question: what it blocks, why it matters, what is known, who can answer, asked status and date, sources, and a suggested answer. No extra questions.'
   use_when: Open questions remain
   table:
     reads: Open questions and assumptions in `spec.md`

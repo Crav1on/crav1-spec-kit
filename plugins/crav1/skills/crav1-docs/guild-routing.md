@@ -179,6 +179,7 @@ The merged skills take exact choice words instead of `--flags`. A word in the in
 | `/crav1-fix-build-gaps` | Which gaps | `verify gaps` · `live gaps` |
 | `/crav1-finalize-commit` | Commit or message | `commit` · `message only` · `commit now` |
 | `/crav1-finalize-commit` | Style | `crav1` · `git log` |
+| `/crav1-resolve-open-questions` | List (optional) | `detailed` |
 | `/crav1-ado-sync` | Which sync | `suggest features` · `push features` · `push tasks` · `pull tasks` · `pull spec changes` |
 
 Example: `/crav1-ado-sync push tasks`, `/crav1-existing-to-specs repos and bundle spec per feature`.

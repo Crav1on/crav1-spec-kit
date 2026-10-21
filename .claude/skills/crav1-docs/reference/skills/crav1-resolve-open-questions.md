@@ -10,6 +10,16 @@ Walk Open questions in spec.md one by one.
 
 One Open question at a time; keep it open or answer with impact; patch only that `Q#`.
 
+`detailed` shows an extended entry per question: what it blocks, why it matters, what is known, who can answer, asked status and date, sources, and a suggested answer. No extra questions.
+
+## Choice words
+
+Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
+
+| Question | Word | Means |
+| --- | --- | --- |
+| List (optional, never asked) | `detailed` | show blocks, why, known, who, asked, sources and suggested per question (no word: the short list, and a headless run does not stop) |
+
 ## Runs when
 
 Open questions remain. Called by the user.
