@@ -12,7 +12,7 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 - **Shared scope.** New `crav1-add-to-spec/references/scope.md`: person, spec and topic (moved word for word from `/crav1-show-or-ask-open-questions`), a branch (via `branches.md`), and a pull request as `pr71`, `pr 71`, `#71` or `pr <repo> 71`. `/crav1-help todo`, `/crav1-show-or-ask-open-questions` and `/crav1-resolve-open-questions` use it.
 - **Pull request lookup, offline first.** (1) the PR note (`source: PR <n>` in the notes indexes, its `used_by` and head branch, or a `(PR <n>)` Branch entry), (2) the local git log (merge and squash subjects), (3) online only when gh or az is already signed in, or after one question with the sign-in status: A) I've signed in, look it up, B) Use a branch name instead, C) Stop. One re-check, no polling. A headless run reports and stops. The answer says which step found it.
 - **`/crav1-open-pr` records the number.** With the URL, it adds ` (PR <n>)` to the head's Match `Branch:` entry in the spec, or adds that entry for `feat/<slug>` or `spec/<slug>`. Uncommitted. `branches.md` ignores the marker for branch rules.
-- **Words read:** help `SKILL.md` 1,655 to 1,699 (+44, 5 in the description); `todo.md` 360 and `scope.md` 485, each read only when used; show-or-ask `SKILL.md` 1,394 to 1,312 (−82); resolve-open-questions 1,367 to 1,386 (+19); open-pr `after.md` +64; `branches.md` +31.
+- **Words read:** help `SKILL.md` 1,655 to 1,699 (+44, 5 in the description); `todo.md` 364 and `scope.md` 485, each read only when used; show-or-ask `SKILL.md` 1,394 to 1,312 (−82); resolve-open-questions 1,367 to 1,386 (+19); open-pr `after.md` +64; `branches.md` +31.
 
 ## 1.74.1 (2026-10-21)
 
