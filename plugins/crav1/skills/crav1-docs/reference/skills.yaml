@@ -1122,7 +1122,7 @@ skills:
     git client; CRAV1 style or live git log, once or onward (deletable rule); does not commit unless they
     ask. Optional Azure Boards mention from `docs/specs/<slug>/work-item.md` is the last description line.'
   - 'Commit (was `/crav1-finalize-commit`): Same draft, then **commit first**, then copy for your git
-    client, edit/rewrite, or stop (no push). Keeps that mention through the HEAD check and the attribution
+    client, change (edit or rewrite), or stop (no push). Keeps that mention through the HEAD check and the attribution
     strip.'
   use_when: You want the commit message, or the commit itself
   table:
