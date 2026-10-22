@@ -35,6 +35,7 @@ A pull request's title and description are saved as **one note per pull request*
 - **Read with.** GitHub: `gh pr view <n-or-url> --json number,url,title,body,author,createdAt,state,baseRefName,headRefName`. Azure DevOps: `az repos pr show --org <org-url> --id <n> --detect false --output json` (`title`, `description`, `creationDate`, `createdBy`, `status`, `sourceRefName`, `targetRefName`). Read-only. Never log in.
 - **Links.** A code-change note that came from a pull request, and a review-pr follow-ups note, carry `pr_note: docs/notes/YYYY-MM/<file>.md`. A spec point taken from the description is followed by `Full source:` with the PR note's path, and the slug goes in the PR note's `used_by`.
 - **Which specs repo.** The note goes into the specs repo (the checkout with `docs/specs/`): the open checkout, else the workspace folder with `docs/specs/`, else a sibling `../*/docs/system/repos.md` that has a row for the pull request's repo. Write it there without committing, and name the full path in the report. When no specs repo is found, write nothing and print the note with the path it would have.
+- **PR updates (1.76.0).** `pr<n> all` appends `## PR updates as of <date>` sections (description and comment threads), as [pr-comments.md](pr-comments.md) says. Other runs leave them as they are.
 - Run the notes index generator after the note changes.
 
 ## Indexes are generated

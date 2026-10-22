@@ -41,7 +41,7 @@ The change is one of these, when they named it:
 - a commit (a hash they already gave, `HEAD`, or a subject that matches one commit)
 - a commit range (`A..B`, `A...B`, or from one commit to another)
 - a branch diff: a branch they named, or the current branch when they said this branch, the branch, or the branch diff. A branch diff starts at the branch's **fork point**, not at the default branch (below)
-- a pull request (1.65.0): a URL, or `[<repo> ]PR <n>`, for example `orders-api PR 71`. Read it from the host, read-only, as **Pull request** below says. The change is its commits: the source branch diff from the pull request's target (the fork point search does not run; the target is the parent). A merged pull request whose source branch is gone uses its merge commit's second-parent range when git can reach it; otherwise say so and ask for a commit range, options only
+- a pull request (1.65.0): a URL, or `[<repo> ]PR <n>`, for example `orders-api PR 71`. A bare `pr71`, `pr 71`, `#71` or `pr <repo> 71` is this pointer too (1.76.0). Without `all`, comments are not read and the PR note's `## PR updates` sections are left as they are. Read it from the host, read-only, as **Pull request** below says. The change is its commits: the source branch diff from the pull request's target (the fork point search does not run; the target is the parent). A merged pull request whose source branch is gone uses its merge commit's second-parent range when git can reach it; otherwise say so and ask for a commit range, options only
 
 If they named one, that is the change. A named range is one change. Do not ask. Do not ask them to type a hash. Do not split one change into several runs.
 
