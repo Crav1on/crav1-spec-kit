@@ -86,13 +86,15 @@ Read `references/azure-devops.md` ("Diff from a sibling checkout (Azure DevOps)"
 
 ## Choice words (1.65.0)
 
-Exact words, no `--flags`.
+Exact words for bots and scripted runs. There are no `--flags`.
 
 - No pull request: `branch` (1.80.0), see `references/branch.md`.
 - Branches on disk older than the pull request: `fetch pr branches` / `use disk` / `stop pr review`.
 - The comment as posted (1.67.0): `comment posted` (run only the record step, no review), `newest comment` (several candidates: take the newest match by the signed-in user), `skip comment record` (do not record; the review goes on).
 
-When the invocation contains one of these words (for example `/crav1-review-pr orders-api 71 use disk`), take that choice when the question comes up and do not ask. When the question comes up in a headless run or a bot run with no word, stop: `PR branches on disk are missing or older than the PR. Use one of: fetch pr branches, use disk, stop pr review.` A word that is not needed (the copies match) is ignored. The record step's headless stops are in `references/comment-as-posted.md` **Headless and bot runs**: `Several comments could be the posted one. Use one of: newest comment, skip comment record.` and `No posted comment found on PR <n>. Paste it in chat, or use: skip comment record.`
+When the invocation contains one of these words (for example `/crav1-review-pr orders-api 71 use disk`), take that choice when the question comes up and do not ask. When the question comes up in a headless run or a bot run with no word, stop: `PR branches on disk are missing or older than the PR. Use one of: fetch pr branches, use disk, stop pr review.` A word that is not needed (the copies match) is ignored.
+
+Read `references/comment-as-posted.md` ("Headless and bot runs") only when the record step runs headless or by a bot with no word.
 
 ## What to read besides the diff
 
