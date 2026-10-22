@@ -2,6 +2,16 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.80.1 (2026-10-22)
+
+`/crav1-review-pr`: the choice-words intro is back to the shared wording.
+
+### Kit
+
+- **Intro restored.** The review-pr choice words open again with "Exact words for bots and scripted runs. There are no `--flags`.", as in the other skills (1.80.0 had shortened it).
+- **Pure move.** The record step's two headless stops (`Several comments could be the posted one. …` and `No posted comment found on PR <n>. …`) now live only in `references/comment-as-posted.md` **Headless and bot runs**, where they already stood word for word; `SKILL.md` keeps a read-only-when pointer. No rule changed.
+- **Words read:** review-pr `SKILL.md` 2,000 to 1,983 (−17).
+
 ## 1.80.0 (2026-10-22)
 
 `/crav1-review-pr branch`: review a branch before there is a pull request.
