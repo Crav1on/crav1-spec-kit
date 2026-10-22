@@ -2,6 +2,18 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.77.0 (2026-10-22)
+
+Open one question by its words or its `Q#`. `/crav1-show-or-ask-open-questions ask research` drafts a research request.
+
+### Kit
+
+- **One question.** In `/crav1-resolve-open-questions` and `/crav1-show-or-ask-open-questions`, topic words can narrow the list to one question: `/crav1-resolve-open-questions detailed static IP` opens only that one, with the detailed entry. `<spec> Q#` (`orders Q3`) works too. Several matches: one question listing up to 4, the rest under Other. The show overview prints each question's `Q#`, in the same document order resolve uses. No ids are written into specs. The rule is in `crav1-add-to-spec/references/scope.md`.
+- **`ask research`.** `/crav1-show-or-ask-open-questions ask research static IP Alex` drafts one self-contained request that works in any tool: the question, why it matters, what is known so far, sources, who decides, and what to bring back. The personal-data and secrets check runs on it; nothing is sent. It writes the existing `Pending:` mark with channel `research` (shown as `Pending since <date> for Alex (research)`). The researcher is the typed name, else `git config user.name`, else no name (`Pending since <date>, research`). No question when the words match one question.
+- **Back and todo.** The research note that comes back goes through `/crav1-add-to-spec` as before (answers linked, open points routed). `/crav1-help todo` ranks the mark as a pending draft under **Yours first**; an unnamed research mark counts as yours.
+- New `crav1-show-or-ask-open-questions/references/research.md`, read only on `ask research`. No new folder.
+- **Words read:** show-or-ask `SKILL.md` 1,312 to 1,324 (+12); resolve-open-questions 1,386 to 1,390 (+4); `scope.md` 485 to 507 (+22); `research.md` 243, read only on `ask research`; help `todo.md` +12.
+
 ## 1.76.1 (2026-10-22)
 
 Fix: `/crav1-finalize-commit commit` no longer asks "Commit this message?".
