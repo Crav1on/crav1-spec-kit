@@ -32,6 +32,7 @@ Read `references/opening.md` ("Opening question (1.56.0)") only when no branch w
 Exact words for bots and scripted runs. There are no `--flags`.
 
 - What you have: `fact` / `dump` / `code change` / `meeting` / `mail` / `chat`.
+- Code change, every open branch: `branches` (`branches all`, `branches skip stale`); read `references/branches-sweep.md`.
 - After a PR: `all`. A PR ref alone (`pr71`, `#71`, as `references/scope.md` parses) means `code change`; `pr71 all` adds description and comments per `references/pr-comments.md`.
 
 `mail` and `chat` run the dump branch. "This mail", "this email" or "this chat" picks that word.
