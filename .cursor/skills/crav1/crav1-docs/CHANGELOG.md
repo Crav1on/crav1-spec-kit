@@ -2,6 +2,16 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.78.0 (2026-10-22)
+
+`/crav1-what-do-we-know-about-this` points a gap at `ask research`.
+
+### Kit
+
+- **Research next step.** When the answer has a gap (something unknown, or a guess marked `(inference, not in the docs)`) and that gap matches an open question in a spec, the answer ends with one line: `Next: /crav1-show-or-ask-open-questions ask research <a few words from that question>`. It adds the spec (`orders static IP`) only when the words would match more than one spec. No match: no line. It does not run the command and asks no questions.
+- The skills reference and the what-do-we-know walkthrough say so.
+- **Words read:** what-do-we-know `SKILL.md` 1,877 to 1,895 (+18).
+
 ## 1.77.0 (2026-10-22)
 
 Open one question by its words or its `Q#`. `/crav1-show-or-ask-open-questions ask research` drafts a research request.
