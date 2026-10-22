@@ -1183,6 +1183,10 @@ skills:
     @docs/specs/<slug>/'
 - name: crav1-review-pr
   choice_words:
+  - question: Review a branch (optional, 1.80.0)
+    words:
+    - word: "branch"
+      means: "review a branch with no pull request: local diff from its base, same checks, PR-only parts skipped, verdict in chat"
   - question: PR branches on disk older than the pull request
     words:
     - word: "fetch pr branches"

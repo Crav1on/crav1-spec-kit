@@ -219,3 +219,11 @@ That command still stops on its own when a required host check is red. This revi
 When a finding says fix or drop, start the lane it named in a later turn. Do not treat this review as that lane.
 
 Reference page: [review-pr](reference/skills/crav1-review-pr.md)
+
+## A branch with no pull request (1.80.0)
+
+`/crav1-review-pr branch feature/orders-retry` reviews a branch before any pull request exists. `/crav1-review-pr branch` takes the current branch, and `/crav1-review-pr branch orders-api feature/orders-retry` a repo from `repos.md`. A branch named without the word is still not a pull request.
+
+It diffs from the base with local git only, never fetching. The base comes from the spec's Match `Branch:` entry and its `(into …)` or `(spec branch)` marker, then the repo's `Merges into`, then the default branch, and the review shows it: `Base: develop (Merges into). Merge-base: 1a2b3c4. Remote copy: 2 days.` With no base it asks once, with up to 4 likely bases and Other; a headless run stops and says to name one.
+
+The checks are those of a pull request review: spec, plan, `verify.md`, the secret rule, `F#` findings and suggestions. The body, the checks, the comment record and posting are skipped, and it says so once. The verdict stays in the chat. Nothing is checked out, committed, pushed or posted. When the base moved on, it suggests merging the base into the branch, never a rebase.
