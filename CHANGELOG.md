@@ -2,6 +2,16 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.76.1 (2026-10-22)
+
+Fix: `/crav1-finalize-commit commit` no longer asks "Commit this message?".
+
+### Kit
+
+- **Bare `commit`.** The word `commit` in the invocation, the same word as the question's option, now works exactly like `commit now`: draft, show the message once, commit with no question. The same refusal for `agent-tools/` or build output (warn and offer the normal choices), and it never pushes. Typing nothing still asks.
+- The skills reference, `/crav1-help` (from `skills.yaml`) and the commit walkthrough say so.
+- **Words read:** finalize-commit `SKILL.md` 1,808 to 1,815 (+7).
+
 ## 1.76.0 (2026-10-22)
 
 `/crav1-add-to-spec pr71 all`: new commits, the description and every comment thread of a pull request, in its PR note. `pr71` alone is enough for a code change.

@@ -20,7 +20,7 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 
 | Question | Word | Means |
 | --- | --- | --- |
-| Commit or message | `commit` | commit |
+| Commit or message | `commit` | the same as commit now (1.76.1) |
 | Commit or message | `message only` | only write the message |
 | Commit or message | `commit now` | draft, show, then commit with no choice question (never pushes) |
 | Style | `crav1` | CRAV1 style, this commit only |

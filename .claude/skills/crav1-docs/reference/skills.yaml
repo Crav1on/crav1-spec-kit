@@ -1097,7 +1097,7 @@ skills:
   - question: Commit or message
     words:
     - word: "commit"
-      means: "commit"
+      means: "the same as commit now (1.76.1)"
     - word: "message only"
       means: "only write the message"
     - word: "commit now"
