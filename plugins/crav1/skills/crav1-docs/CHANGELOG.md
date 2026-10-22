@@ -2,6 +2,18 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.76.0 (2026-10-22)
+
+`/crav1-add-to-spec pr71 all`: new commits, the description and every comment thread of a pull request, in its PR note. `pr71` alone is enough for a code change.
+
+### Kit
+
+- **PR ref alone.** `pr71`, `pr 71`, `#71` or `pr <repo> 71` (parsed as `references/scope.md` says) means `code change`, so the word is not needed. Offline first and no questions, as before. Comments are not read, and an existing `## PR updates` section is left as it is.
+- **`all` after a PR.** `/crav1-add-to-spec pr71 all` runs the code change (only new commits), then appends `## PR updates as of <date>` to the PR note: the description when it changed, then one heading per thread (`file:line` or Conversation, open or resolved) with each author as the host shows it, the date, the text verbatim and nested replies. Bot and system threads are skipped. The personal-data and secrets check runs on everything. A re-run appends only what is new or edited, plus one line per thread state change, and never rewrites an earlier section. A clear answer is linked as `Answered:`; a decision becomes a new open question; spec lines are never rewritten.
+- **Read with.** GitHub: `gh pr view`, `gh api` pull comments and GraphQL `reviewThreads`. Azure DevOps: `az devops invoke` `pullRequestThreads`. Signed out: one question with the sign-in status, A) I've signed in, look it up, B) Paste the comments instead, C) Stop. No polling; a headless run reports and stops.
+- **Not a seventh word.** The top-level words stay `fact` / `dump` / `code change` / `meeting` / `mail` / `chat`. `all` works only after a PR ref. The skills reference and `/crav1-help` show it as one line, `After a PR: all`.
+- **Words read:** add-to-spec `SKILL.md` 806 to 831 (+25); new `references/pr-comments.md` 389, read only on `all`; code-change `BRANCH.md` +34; `notes.md` +28; help `SKILL.md` 1,699 to 1,713 (+14).
+
 ## 1.75.0 (2026-10-21)
 
 `/crav1-help todo`: what to do next, ranked from the records. Scope by pull request, found offline first.
