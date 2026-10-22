@@ -41,3 +41,9 @@ git diff <target>...<source>
 ```
 
 Strip a `refs/heads/` prefix when you name the branches. `<source>` is `sourceRefName`. `<target>` is `targetRefName`.
+
+## Branches on disk: choice words
+
+Moved word for word from `SKILL.md` in 1.80.2.
+
+When the invocation contains one of these words (for example `/crav1-review-pr orders-api 71 use disk`), take that choice when the question comes up and do not ask. When the question comes up in a headless run or a bot run with no word, stop: `PR branches on disk are missing or older than the PR. Use one of: fetch pr branches, use disk, stop pr review.` A word that is not needed (the copies match) is ignored.

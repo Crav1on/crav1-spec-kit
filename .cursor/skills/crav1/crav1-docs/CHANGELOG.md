@@ -2,6 +2,16 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.80.2 (2026-10-22)
+
+`/crav1-review-pr`: a slimmer `SKILL.md`. Rare cases moved word for word into `references/`; no rule changed.
+
+### Kit
+
+- **Moved, each with a read-only-when pointer:** what other skills may do with this one (to `references/which-pr.md` **Other skills**); the stop when `gh` is not signed in (new `references/github.md` **GitHub not signed in**, in the existing folder); the branches-on-disk choice-word handling and its headless stop (to `references/azure-devops.md` **Branches on disk: choice words**); the record step's hard rule (to `references/comment-as-posted.md` **Record step rules**).
+- **Kept on purpose:** the gate (only a named pull request), the read-only and no-edit rules, the secret rule, the finding format, ship or not, the verdict, never a rebase, post only after yes, and the other hard rules every review needs. The choice words stay listed. The description is unchanged (it carries the routing words).
+- **Words read:** review-pr `SKILL.md` 1,983 to 1,836 (−147). The ~1,500 target would need moving common-path rules, so it stops here.
+
 ## 1.80.1 (2026-10-22)
 
 `/crav1-review-pr`: the choice-words intro is back to the shared wording.

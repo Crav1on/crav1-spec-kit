@@ -168,3 +168,9 @@ I've looked through the PR and run it through my checks. This is what I found:
   Should the retry count be configurable?
 ````
 `````
+
+## Record step rules
+
+Moved word for word from `SKILL.md` in 1.80.2.
+
+- The record step only reads the host (the signed-in `gh` or `az` session) or takes a paste. Never rewrite or remove a `## Comment as drafted` or `## Comment as posted` section; an edit on the host is a new `, edited` section.
