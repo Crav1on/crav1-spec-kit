@@ -12,7 +12,7 @@ Accept a number (`123`), a URL, or `<repo> <n>` (1.65.0), for example `orders-ap
 | `https://dev.azure.com/<org>/<project>/_git/<repo>/pullrequest/<n>` | `<n>` |
 | `https://<org>.visualstudio.com/<project>/_git/<repo>/pullrequest/<n>` | `<n>` |
 
-A branch name is not a pull request. Do not pick the newest pull request for the current branch.
+A branch name is not a pull request; only the `branch` word starts a branch review (1.80.0). Do not pick the newest pull request for the current branch.
 
 A URL or `<repo> <n>` is accepted when its repository is one of these (1.65.0):
 

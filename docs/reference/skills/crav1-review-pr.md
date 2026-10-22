@@ -24,6 +24,7 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 
 | Question | Word | Means |
 | --- | --- | --- |
+| Review a branch (optional, 1.80.0) | `branch` | review a branch with no pull request: local diff from its base, same checks, PR-only parts skipped, verdict in chat |
 | PR branches on disk older than the pull request | `fetch pr branches` | fetch only the PR's two branches |
 | PR branches on disk older than the pull request | `use disk` | review the copies on disk |
 | PR branches on disk older than the pull request | `stop pr review` | stop |

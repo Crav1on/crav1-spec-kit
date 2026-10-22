@@ -86,8 +86,9 @@ Read `references/azure-devops.md` ("Diff from a sibling checkout (Azure DevOps)"
 
 ## Choice words (1.65.0)
 
-Exact words for bots and scripted runs. There are no `--flags`.
+Exact words, no `--flags`.
 
+- No pull request: `branch` (1.80.0), see `references/branch.md`.
 - Branches on disk older than the pull request: `fetch pr branches` / `use disk` / `stop pr review`.
 - The comment as posted (1.67.0): `comment posted` (run only the record step, no review), `newest comment` (several candidates: take the newest match by the signed-in user), `skip comment record` (do not record; the review goes on).
 

@@ -2,6 +2,18 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.80.0 (2026-10-22)
+
+`/crav1-review-pr branch`: review a branch before there is a pull request.
+
+### Kit
+
+- **`branch`.** `/crav1-review-pr branch feature/orders-retry` reviews a branch; no name means the current branch; a repo from `repos.md` may come first. A branch named without the word is still not a pull request.
+- **Local diff.** No fetch. The base is the spec's Match `Branch:` entry and its `(into …)` / `(spec branch)` marker, then the repo's `Merges into`, then the default branch. One line shows the base, where it came from, the merge-base and the age of the remote copy. No base: one question with up to 4 likely bases and Other; a headless run stops and says how to name it.
+- **Same checks.** Spec, plan, `verify.md`, the first-section secret rule, `F#` findings and suggestions. The body, linter and required-check state, the comment record and posting are skipped, said once. Verdict in the chat. No checkout, commit, push or post. When the base moved on, it suggests merging the base in, never a rebase.
+- New `crav1-review-pr/references/branch.md`, read only on `branch`.
+- **Words read:** review-pr `SKILL.md` 1,999 to 2,000 (+1: the new line, with the choice-words intro shortened to stay at the 2,000-word limit); `branch.md` 234, read only on `branch`; `which-pr.md` +10.
+
 ## 1.79.0 (2026-10-22)
 
 `/crav1-add-to-spec branches`: import every open branch with something new, in one batch.
