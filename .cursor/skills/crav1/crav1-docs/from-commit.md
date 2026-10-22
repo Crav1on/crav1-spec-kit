@@ -22,7 +22,7 @@ Commit in one go, with no questions (1.73.0):
 /crav1-finalize-commit commit now crav1
 ```
 
-`commit now` drafts, shows the Summary and Description, then commits without the choice question. It never pushes. When `agent-tools/` or build output is in the file set, it warns and offers the normal choices instead. `crav1` (CRAV1 style) or `git log` (match the repo's log) answers the style question for this commit; a saved style rule still works as before.
+`commit now`, or just `commit` (1.76.1), drafts, shows the Summary and Description, then commits without the choice question. It never pushes. When `agent-tools/` or build output is in the file set, it warns and offers the normal choices instead. `crav1` (CRAV1 style) or `git log` (match the repo's log) answers the style question for this commit; a saved style rule still works as before.
 
 ## Steps
 
