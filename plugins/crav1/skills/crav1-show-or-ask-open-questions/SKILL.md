@@ -35,6 +35,7 @@ When the message or the files make one option the better fit, list it first and 
 Exact words for bots and scripted runs. There are no `--flags`.
 
 - Show or ask: `show` / `ask`.
+- After `ask`: `research` drafts a research request; read `references/research.md`.
 
 When the invocation contains one of these words (for example `/crav1-show-or-ask-open-questions show`), take that choice and do not ask. This holds for a person, a bot, or a headless run.
 
@@ -44,7 +45,7 @@ When a choice is missing and the run is headless or started by a bot (no person 
 
 Read `## Open questions` in every `docs/specs/<slug>/spec.md` (skip `_template`), with the lines under each question, as `crav1-add-to-spec` `references/open-questions.md` describes. Write nothing. Draft nothing. Send nothing.
 
-- One section per spec with open questions, then one line per question that has no `Answered:` line: the question in plain words, then its marks: `Asked <date>, <channel> to <who>`, `Pending since <date> for <who>`, `Blocks T2, T4`, or `not asked yet`.
+- One section per spec with open questions, then one line per question that has no `Answered:` line: its `Q#`, the question in plain words, then its marks: `Asked <date>, <channel> to <who>`, `Pending since <date> for <who>`, `Blocks T2, T4`, or `not asked yet`.
 - An answered question still waiting on `/crav1-resolve-open-questions` is listed under **Answered, not resolved**.
 - End with counts: open, asked, pending, not asked, answered not resolved; then by person: who has how many asked or pending.
 - Next: `/crav1-show-or-ask-open-questions` with **Ask** for the ones not asked yet, or `/crav1-resolve-open-questions` for the answered ones. Do not run them.
