@@ -65,6 +65,8 @@ The answer leaves out an empty section. It does not pad. A guess is labeled `(in
 
 When there is no slice, the answer names one next command. This command does not run it.
 
+When something in the answer is unknown or a guess, and an open question in a spec asks the same thing, the answer ends with one line such as `Next: /crav1-show-or-ask-open-questions ask research static IP` (1.78.0). It adds the spec, as in `orders static IP`, only when those words would match more than one spec. Nothing matches: no line. It does not run it and asks nothing.
+
 - One or two sentences: `/crav1-spark-to-spec`
 - A pile of ideas and technical hunches: `/crav1-ideas-to-spec`
 - Several features, or mixed files: `/crav1-bundle-to-specs`
