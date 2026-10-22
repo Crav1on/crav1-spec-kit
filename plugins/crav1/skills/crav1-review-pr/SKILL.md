@@ -88,6 +88,7 @@ Read `references/azure-devops.md` ("Diff from a sibling checkout (Azure DevOps)"
 
 Exact words for bots and scripted runs. There are no `--flags`.
 
+- Review a branch, no pull request (1.80.0): `branch` [`<repo>`] [`<branch>`]; read `references/branch.md`.
 - Branches on disk older than the pull request: `fetch pr branches` / `use disk` / `stop pr review`.
 - The comment as posted (1.67.0): `comment posted` (run only the record step, no review), `newest comment` (several candidates: take the newest match by the signed-in user), `skip comment record` (do not record; the review goes on).
 
