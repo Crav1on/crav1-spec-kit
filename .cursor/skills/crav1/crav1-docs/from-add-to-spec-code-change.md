@@ -78,6 +78,17 @@ A code change can be a pull request: `/crav1-add-to-spec code change orders-api 
 
 Given a branch instead, it also writes the PR note when a signed-in `gh` or `az` host shows exactly one pull request for that branch. Otherwise it writes none and says why in one line, for example `no PR note: 2 PRs for feat/orders-retry; name one as PR <n>`. It never asks, and never stops because of it.
 
+## Every open branch: `branches` (1.79.0)
+
+`/crav1-add-to-spec branches`, or `/crav1-add-to-spec orders-api branches` for a repo in `repos.md`, lists every branch that is not merged into its base and has commits not read yet, from the local branches and the remote-tracking copies already on disk. It never fetches. Each line shows the new commit count, the last commit date and the age of the remote copy, for example:
+
+```
+feat/orders-retry      3 new, last 2026-10-20, remote: 2 days
+feat/orders-export     1 new, last 2026-06-02, remote: 4 months, stale (no commits since 2026-06-02)
+```
+
+One question: A) Yes, all, B) Yes, skip the stale ones, C) Name the ones I want, D) Stop. `branches all` and `branches skip stale` answer it up front. Each chosen branch runs the usual branch import, a commit shared by two branches is imported once, and all sorts are confirmed in one batch. A stale branch left out is named once as worth deleting on the host. The kit never deletes, pushes or fetches.
+
 ## A PR ref alone, and `all` (1.76.0)
 
 `/crav1-add-to-spec pr71` (also `pr 71`, `#71`, or `pr orders-api 71`) is the same code change; the `code change` word is not needed. It does not read comments.

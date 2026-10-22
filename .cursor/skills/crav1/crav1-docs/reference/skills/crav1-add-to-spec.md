@@ -43,7 +43,7 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 | What you have | `mail` | a mail, sorted as a dump |
 | What you have | `chat` | a chat, sorted as a dump |
 
-After a PR: `all`. A PR ref alone (`pr71`, `pr 71`, `#71`, `pr <repo> 71`) means `code change`, offline. `pr71 all` also checks for new commits and appends the description and every comment thread to the PR note (1.76.0).
+After a PR: `all`. A PR ref alone (`pr71`, `pr 71`, `#71`, `pr <repo> 71`) means `code change`, offline. `pr71 all` also checks for new commits and appends the description and every comment thread to the PR note (1.76.0). Every open branch: `branches`, with `branches all` or `branches skip stale` to skip the question (1.79.0).
 
 ## Runs when
 

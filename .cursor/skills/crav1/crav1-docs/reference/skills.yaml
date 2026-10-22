@@ -634,7 +634,7 @@ skills:
       means: "a mail, sorted as a dump"
     - word: "chat"
       means: "a chat, sorted as a dump"
-    note: "After a PR: `all`. A PR ref alone (`pr71`, `pr 71`, `#71`, `pr <repo> 71`) means `code change`, offline. `pr71 all` also checks for new commits and appends the description and every comment thread to the PR note (1.76.0)."
+    note: "After a PR: `all`. A PR ref alone (`pr71`, `pr 71`, `#71`, `pr <repo> 71`) means `code change`, offline. `pr71 all` also checks for new commits and appends the description and every comment thread to the PR note (1.76.0). Every open branch: `branches`, with `branches all` or `branches skip stale` to skip the question (1.79.0)."
   lane: cross-cutting
   group: Keep the picture current
   starter: false

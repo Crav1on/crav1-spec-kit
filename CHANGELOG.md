@@ -2,6 +2,19 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.79.0 (2026-10-22)
+
+`/crav1-add-to-spec branches`: import every open branch with something new, in one batch.
+
+### Kit
+
+- **`branches`.** On the code-change path, `/crav1-add-to-spec branches` (or `orders-api branches` for a repo in `repos.md`) lists, read-only and with no fetch, every local or remote-tracking branch that is not merged into its base and has commits not read yet (`Synced at` and the overlap check). Merged branches, branches with nothing new and the base branches are left out. No date cutoff.
+- **Each line:** new commit count, last commit date, and the age of the remote copy. No commit in 3 months or more: `stale (no commits since <date>)`, as the Azure DevOps and GitHub Stale views say. Stale branches stay listed.
+- **One question:** A) Yes, all, B) Yes, skip the stale ones, C) Name the ones I want, D) Stop. `branches all` and `branches skip stale` answer it up front; a headless run with neither stops and names them.
+- **Import.** Each chosen branch runs the existing branch import (parent diff, overlap, PR note, `Synced at`, `Branch:` list). A shared commit is imported once. All sorts in one batch with one confirmation. A stale branch left out is named once as worth deleting on the host. Never deletes, pushes or fetches.
+- New `crav1-add-to-spec/references/branches-sweep.md`, read only on `branches`.
+- **Words read:** add-to-spec `SKILL.md` 831 to 845 (+14); `branches-sweep.md` 317, read only on `branches`.
+
 ## 1.78.0 (2026-10-22)
 
 `/crav1-what-do-we-know-about-this` points a gap at `ask research`.
