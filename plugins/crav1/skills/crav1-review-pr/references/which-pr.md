@@ -23,3 +23,9 @@ A URL or `<repo> <n>` is accepted when its repository is one of these (1.65.0):
 Otherwise stop and name what you looked at: `PR repository <url> is not this remote, a workspace folder, or a repos.md row.` Do not review across that mismatch.
 
 Remote: the single `git remote`. If several remotes exist, ask which one. A full URL still names the host. A bare number needs that remote, or a `gh` repo that matches it.
+
+## Other skills
+
+Moved word for word from `SKILL.md` in 1.80.2.
+
+`/crav1-open-pr` may name this command as an optional next step. It must not run it. `/crav1-merge-pr` must not run it. A review is not a merge ask. Spark, specify, and verify do not run this command. Do not run it from those skills. Do not run it from plan.

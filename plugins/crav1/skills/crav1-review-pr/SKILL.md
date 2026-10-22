@@ -28,7 +28,7 @@ This is cross-cutting. It is not a lane. It is not a bot. It is the same command
 
 Run it only when **this turn** names an open pull request (number or URL), or clearly asks to review that pull request. Any open pull request, not only a feature branch. If this turn does not name one, ask which one. That turn is the question only. Do not pick the newest. Do not review a pull request the user did not name.
 
-`/crav1-open-pr` may name this command as an optional next step. It must not run it. `/crav1-merge-pr` must not run it. A review is not a merge ask. Spark, specify, and verify do not run this command. Do not run it from those skills. Do not run it from plan.
+Read `references/which-pr.md` ("Other skills") only when another skill names or would run this one.
 
 You read the diff. You do not edit code, the spec, or the plan. You do not run the tests. You do not ask to run the tests. You do not install a linter, change branch protection, or merge. You post comments or set a verdict only as [Post it](#post-it) says, after the user's yes.
 
@@ -54,7 +54,7 @@ Resolve **one** read path, in this order: GitHub `gh`, then Azure DevOps `az`, t
 
 Use `gh` only when **both** are true: `gh auth status` succeeds, and the pull request is on GitHub (`github.com` in the URL, the remote, or the `repos.md` URL, or `gh repo view` succeeds for that repo).
 
-If the pull request is on GitHub and `gh auth status` does not succeed, stop. Say `gh` is not authenticated. Do not use `az`. Do not invent a review.
+Read `references/github.md` ("GitHub not signed in") only when `gh auth status` fails.
 
 ### Azure DevOps (`az`)
 
@@ -92,7 +92,7 @@ Exact words for bots and scripted runs. There are no `--flags`.
 - Branches on disk older than the pull request: `fetch pr branches` / `use disk` / `stop pr review`.
 - The comment as posted (1.67.0): `comment posted` (run only the record step, no review), `newest comment` (several candidates: take the newest match by the signed-in user), `skip comment record` (do not record; the review goes on).
 
-When the invocation contains one of these words (for example `/crav1-review-pr orders-api 71 use disk`), take that choice when the question comes up and do not ask. When the question comes up in a headless run or a bot run with no word, stop: `PR branches on disk are missing or older than the PR. Use one of: fetch pr branches, use disk, stop pr review.` A word that is not needed (the copies match) is ignored.
+Read `references/azure-devops.md` ("Branches on disk: choice words") only when the branches-on-disk question comes up.
 
 Read `references/comment-as-posted.md` ("Headless and bot runs") only when the record step runs headless or by a bot with no word.
 
@@ -209,7 +209,7 @@ Read `references/posting.md` ("Post it") only when the user answers the post que
 - Read-only toward the code repo and its host. The only git write there is the fetch of the pull request's two branches after **Fetch only the PR's two branches** or `fetch pr branches`.
 - No test run, and no ask to run tests. When the slug has `plan.md`, quote `verify.md` or say it is missing. When the pull request is outside the kit, do not say `verify.md` is missing. Read the pipeline's recorded test results.
 - No linter install. No branch-protection change. No required-check edit.
-- The record step only reads the host (the signed-in `gh` or `az` session) or takes a paste. Never rewrite or remove a `## Comment as drafted` or `## Comment as posted` section; an edit on the host is a new `, edited` section.
+- Read `references/comment-as-posted.md` ("Record step rules") only when the record step runs.
 - No comment, no vote, and no thread resolve without the user's yes in [Post it](#post-it). One comment, no inline threads, never Reject. No label, no reviewer assignment.
 - Suggest merging `<base>` into the branch, never a rebase, `pull --rebase`, or a force-push.
 - No merge. Do not run `/crav1-merge-pr`.
