@@ -78,6 +78,12 @@ A code change can be a pull request: `/crav1-add-to-spec code change orders-api 
 
 Given a branch instead, it also writes the PR note when a signed-in `gh` or `az` host shows exactly one pull request for that branch. Otherwise it writes none and says why in one line, for example `no PR note: 2 PRs for feat/orders-retry; name one as PR <n>`. It never asks, and never stops because of it.
 
+## A PR ref alone, and `all` (1.76.0)
+
+`/crav1-add-to-spec pr71` (also `pr 71`, `#71`, or `pr orders-api 71`) is the same code change; the `code change` word is not needed. It does not read comments.
+
+`/crav1-add-to-spec pr71 all` also checks for new commits and appends `## PR updates as of <date>` to the PR note: the description when it changed, then one heading per thread, such as `### src/Orders/Retry.cs:42 (resolved)` or `### Conversation (open)`, each comment with its author as the host shows it, the date and the text, replies nested. Bot and system threads are left out. A token in a comment is redacted. A later `all` adds only new or edited comments and one line per resolved or reopened thread. A comment that answers an open question is linked as `Answered:`; a decision becomes an open question. Signed out, it asks once: A) I've signed in, look it up, B) Paste the comments instead, C) Stop.
+
 ## After
 
 If a file changed and those edits should be in git:

@@ -236,6 +236,9 @@ def render_page(s: dict, data: dict) -> str:
         for q in s["choice_words"]:
             for w in q["words"]:
                 out.append(f"| {q['question']} | `{w['word']}` | {w['means']} |")
+        for q in s["choice_words"]:
+            if q.get("note"):
+                out += ["", lk(q["note"])]
     out += ["", "## Runs when", "", lk(runs) + (" " + lk(s["called_by"]) if s.get("called_by") else "")]
     if s["starter"]:
         out += ["", "This is one of the six starter options. Asking for startup options names it and does not run it."]

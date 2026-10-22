@@ -43,6 +43,8 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 | What you have | `mail` | a mail, sorted as a dump |
 | What you have | `chat` | a chat, sorted as a dump |
 
+After a PR: `all`. A PR ref alone (`pr71`, `pr 71`, `#71`, `pr <repo> 71`) means `code change`, offline. `pr71 all` also checks for new commits and appends the description and every comment thread to the PR note (1.76.0).
+
 ## Runs when
 
 New information for specs that already exist. Called by the user, by [`/crav1-read-environment`](crav1-read-environment.md) for a confirmed Match section, by [`/crav1-suggest-tests-for-code`](crav1-suggest-tests-for-code.md) for one kept or dismissed suggestion, by [`/crav1-add-to-spec`](crav1-add-to-spec.md) for one kept addition, by [`/crav1-ado-sync`](crav1-ado-sync.md) for a preview change, and by [`/crav1-ado-sync`](crav1-ado-sync.md) for one kept change or one answer.

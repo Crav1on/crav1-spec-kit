@@ -81,7 +81,7 @@ The message is a skill name, with or without `/` and `crav1-`. From its `skills.
 - What it reads and what it writes.
 - Before and after: the steps before it and after it in each route that has it (`workflow.yaml`), and its `you_run_next`.
 - Its walkthrough, when it has one.
-- Its choice words, when its `skills.yaml` entry has `choice_words` (the merged skills): every question with its exact words and what each means, and an example such as `/crav1-ado-sync push tasks`. Say that a word in the invocation skips the question, and that a headless or bot run without a word stops and names the words.
+- Its choice words, when its `skills.yaml` entry has `choice_words` (the merged skills): every question with its exact words and what each means, plus its `note` line when it has one (such as `After a PR: all`), and an example such as `/crav1-ado-sync push tasks`. Say that a word in the invocation skips the question, and that a headless or bot run without a word stops and names the words.
 - For `/crav1-tasks-ready-to-build`, say that it can run any time, not only at its route step.
 
 An old name from before 1.56.0 (in the **Renamed skills** table in `docs/README.md`): answer first, in one line, "`/crav1-<old>` was renamed to `/crav1-<new>`, removed in 1.58.0", with the choice word to use when the table names one (for example `/crav1-ado-sync push tasks`). The old name no longer runs. Then answer for the new skill as above.
