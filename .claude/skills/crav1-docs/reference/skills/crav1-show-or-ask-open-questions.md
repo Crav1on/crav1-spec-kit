@@ -20,6 +20,7 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 | --- | --- | --- |
 | Show or ask | `show` | show the overview (read-only) |
 | Show or ask | `ask` | draft the questions to ask |
+| Channel after ask (optional) | `research` | a self-contained research request, marked pending for the typed name or git user.name (1.77.0) |
 
 ## Runs when
 

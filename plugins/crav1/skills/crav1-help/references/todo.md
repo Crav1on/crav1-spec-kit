@@ -30,7 +30,7 @@ Ages are whole calendar days from the record's date to today.
 
 ## Yours first
 
-Match `git config user.name` (or its first word), or the `todo for <name>` name, against the `<who>` in `Pending:`, `Asked:`, `Waiting for`, and who can answer, and the research owner. Matches go first under **Yours first**, still in rank order. No match: leave the group out. Do not ask.
+Match `git config user.name` (or its first word), or the `todo for <name>` name, against the `<who>` in `Pending:`, `Asked:`, `Waiting for`, and who can answer, and the research owner. A `Pending:` research mark (1.77.0) with no name counts as a match. Matches go first under **Yours first**, still in rank order. No match: leave the group out. Do not ask.
 
 ## Each line
 

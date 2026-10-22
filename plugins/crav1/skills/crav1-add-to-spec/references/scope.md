@@ -9,6 +9,7 @@ Moved word for word from `/crav1-show-or-ask-open-questions` in 1.75.0.
 - **Person.** The question names that person as who can answer, says `waiting for <person>`, says `via <person>`, or has an `Asked:` or `Pending:` line for that person. A question whose who is a group the person speaks for (the user says so, or the question says `via <person>`) is included. Do not guess who can answer a question that names nobody. List those separately as `No one named`, and ask whether to include them.
 - **Spec.** Every open question on that spec.
 - **Topic.** Match by meaning across all specs. Spec titles and the question words weigh most.
+- **One question (1.77.0).** Words or `<spec> Q#` (document order, never written) pick one; several: ask, up to 4, rest under Other.
 
 ## Branch
 

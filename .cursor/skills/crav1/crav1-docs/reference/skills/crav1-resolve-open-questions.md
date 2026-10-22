@@ -20,6 +20,8 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 | --- | --- | --- |
 | List (optional, never asked) | `detailed` | show blocks, why, known, who, asked, sources and suggested per question (no word: the short list, and a headless run does not stop) |
 
+Topic words or `<spec> Q#` (for example `orders Q3`) open one question (1.77.0); several matches: one question listing up to 4.
+
 ## Runs when
 
 Open questions remain. Called by the user.
