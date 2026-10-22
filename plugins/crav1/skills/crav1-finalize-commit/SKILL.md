@@ -49,7 +49,7 @@ Exact words for bots and scripted runs. There are no `--flags`.
 - Commit or message: `commit` / `message only` / `commit now`.
 - Style: `crav1` / `git log`.
 
-`commit now`: draft, show the paste blocks, then commit with no choice question. Never push. When `agent-tools/` or build output is in the file set, warn and offer the normal choices instead.
+`commit now`, and `commit` typed in the invocation (1.76.1): draft, show the paste blocks, then commit with no choice question. Never push. When `agent-tools/` or build output is in the file set, warn and offer the normal choices instead.
 
 When the invocation contains one of these words (for example `/crav1-finalize-commit commit`), take that choice and do not ask. This holds for a person, a bot, or a headless run.
 
