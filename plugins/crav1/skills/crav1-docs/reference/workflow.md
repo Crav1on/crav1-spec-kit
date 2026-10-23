@@ -38,7 +38,7 @@ You are starting a new feature from one or two sentences, a pile of ideas, or se
 | 12 | `/crav1-build-tasks` or `/crav1-build-features` | One task, a range, or all (build-tasks), or whole features (build-features). Each task runs in its own worker that implements, commits, and verifies it, so they go straight to the pull request. |
 | 13 | `/crav1-verify-build-against-spec` | Against the spec and the plan, for the whole slice when you want one report. |
 | 14 | `/crav1-fix-build-gaps` | Optional. When `verify.md` has a failure, or to fix it against the running host (fix-build-gaps asks which). Do not edit `spec.md` in this loop. Then back to `/crav1-verify-build-against-spec`. |
-| 15 | `/crav1-finalize-commit` | When the slice verifies (it asks commit, or only write the message first). |
+| 15 | `/crav1-finalize-commit` | When the slice verifies (it drafts first, then offers commit, copy, change, or stop). |
 | 16 | `/crav1-open-pr` | To push and open the pull request. |
 | 17 | `/crav1-review-pr` | Before the merge. |
 | 18 | `/crav1-merge-pr` | When the review says ship and the host checks are green. |

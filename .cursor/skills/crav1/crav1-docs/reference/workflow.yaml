@@ -63,7 +63,7 @@ routes:
         loop_to: crav1-verify-build-against-spec
         when: When `verify.md` has a failure, or to fix it against the running host (fix-build-gaps asks which). Do not edit `spec.md` in this loop.
       - skills: [crav1-finalize-commit]
-        when: When the slice verifies (it asks commit, or only write the message first).
+        when: When the slice verifies (it drafts first, then offers commit, copy, change, or stop).
       - skills: [crav1-open-pr]
         when: To push and open the pull request.
       - skills: [crav1-review-pr]
