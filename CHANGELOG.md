@@ -2,6 +2,15 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.86.1 (2026-10-23)
+
+`/crav1-tighten-plan`: SKILL.md slimmed with a pure move. No rule changed.
+
+### Kit
+
+- **Moved:** `## Resolution catalog (per plan issue)` table to `references/catalog.md`, word for word. SKILL.md keeps a pointer naming every resolution id and the no-`apply-notes` rule.
+- **Words read:** tighten-plan `SKILL.md` 1,672 to 1,186; new `references/catalog.md` 525, read when building a `P#`'s options.
+
 ## 1.86.0 (2026-10-23)
 
 Match `Branch:` lists are merge-safe. **After updating, run `/crav1-add-to-spec migrate formats` once more in each product repo** (or `merge_safe_migrate.py --dry-run`, then without it).
