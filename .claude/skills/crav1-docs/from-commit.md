@@ -10,11 +10,15 @@ Use this when the change is built and verified and you want it committed, in a p
 /crav1-finalize-commit
 ```
 
+It drafts first, then offers commit, copy, change, or stop (1.83.0: there is no opening question).
+
 Only want the message to paste into your own git client:
 
 ```text
-/crav1-finalize-commit
+/crav1-finalize-commit message only
 ```
+
+`message only` drafts and shows the Summary and Description, then stops, the same as picking copy. A headless or bot run with no choice word ends the same way.
 
 Commit in one go, with no questions (1.73.0):
 

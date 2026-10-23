@@ -6,9 +6,9 @@
 
 ## Purpose
 
-Commit, or only write the commit message; asks which.
+Draft the commit message, then commit, copy, change, or stop.
 
-**[`/crav1-finalize-commit`](crav1-finalize-commit.md)** opens with one question: commit, or only write the message (paste-ready, no git commit). It skips the question when the message says which. It replaces draft-commit-message; its rules are kept as a branch.
+**[`/crav1-finalize-commit`](crav1-finalize-commit.md)** always drafts first, then offers commit, copy, change, or stop (1.83.0; there is no opening question). `message only` drafts with no commit, the same as copy, and a headless run with no choice word ends as copy. It replaces draft-commit-message; its rules are kept as a branch.
 
 Only write the message (was `/crav1-draft-commit-message`): Paste-ready Summary/Description for any git client; CRAV1 style or live git log, once or onward (deletable rule); does not commit unless they ask. Optional Azure Boards mention from `docs/specs/<slug>/work-item.md` is the last description line.
 
@@ -23,7 +23,7 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 | Question | Word | Means |
 | --- | --- | --- |
 | Commit or message | `commit` | the same as commit now (1.76.1) |
-| Commit or message | `message only` | only write the message |
+| Commit or message | `message only` | draft and show, no git commit; the same as copy (1.83.0) |
 | Commit or message | `commit now` | draft, show, then commit with no choice question (never pushes) |
 | Pull | `pull` | fetch, then the pull path or the nothing-lost check, with no commit first (1.81.0) |
 | Style | `crav1` | CRAV1 style, this commit only |
