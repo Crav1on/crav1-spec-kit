@@ -51,9 +51,9 @@ The folder is `docs/architecture/`. The spec file is `spec.md`. `left-out.md` si
 
 System notes, the same files explain reads: `docs/system/landscape.md`, `repos.md`, `diagrams.md`, `glossary.md`, and an ADR only when the code shows a real choice. Starters: [docs/system/_template/](system/_template/).
 
-A meaning the code does not state is `to be researched` on a glossary row. A later re-read appends a new row and does not rewrite a row that is already there. The first write is the one that creates the file. When real notes are already there and the architecture spec is missing, this command does not edit those notes except the `Synced at` cell of a repo it read, and only when `repos.md` already exists. A whole-repo read sets that cell to `<branch>@<short sha>, <date>`. A repo may list several branches, separated by `; `. Example: `main@abc1234, 2026-10-07; develop@def5678, 2026-10-06`. It touches only the repos it read.
+A meaning the code does not state is `to be researched` on a glossary row. A later re-read appends a new row and does not rewrite a row that is already there. The first write is the one that creates the file. When real notes are already there and the architecture spec is missing, this command does not edit those notes except the `Synced at` line in `repos.md` of a repo it read, and only when `repos.md` already exists. A whole-repo read sets that cell to `<branch>@<short sha>, <date>`. A repo may list several branches, separated by `; `. Example: `main@abc1234, 2026-10-07; develop@def5678, 2026-10-06`. It touches only the repos it read.
 
-`repos.md` also has a **Work items go to** column, each repo's work item home (`ADO: <org>/<project>`). This command adds the column when it is missing and leaves its cells empty. The first Azure Boards command that needs a repo's home asks for it. See [From specs to Azure Boards](from-ado-sync-push-features.md#work-item-homes).
+`repos.md` also has a **Work items go to** column, each repo's work item home (`ADO: <org>/<project>`). This command adds the `## Synced at` section when it is missing and writes no line in it. The first Azure Boards command that needs a repo's home asks for it. See [From specs to Azure Boards](from-ado-sync-push-features.md#work-item-homes).
 
 No `plan.md`. No `tasks.md`. No application code. No `security.md`. No `work-item.md`.
 

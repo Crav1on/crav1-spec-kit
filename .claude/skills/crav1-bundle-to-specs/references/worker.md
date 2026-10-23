@@ -25,7 +25,7 @@ The parent launches **crav1-bundle-slice-agent** for **one** slug. This file is 
    - Optional short `notes.md` if the cluster would otherwise be lost
 2. Copy applicable bulk `A#`s into `## Assumptions`. Add **slice-local** `A#`s only if intake forces a guess the parent never made.
 3. List allowed repos on `## Repos`.
-4. When the parent passed **Synced at**, write or update one line in `spec.md`, after the title and before the first heading: `Synced at: <repo> <branch>@<short sha>, <date>`. One line per repo the parent passed. That line has one entry per branch read, separated by `; `, for example `Synced at: orders-api feat/orders-retry@155b5c4, 2026-10-19; develop@00344be, 2026-10-15`. When the branch read already has an entry, replace only that entry; a new branch adds an entry at the end. Leave the other entries, a `(dropped)` on them, and other repos' `Synced at` lines. Do not invent a line the parent did not pass. Do not edit `repos.md`.
+4. When the parent passed **Synced at**, write or update one line in `spec.md`, after the title and before the first heading: `Synced at: <repo> <branch>@<short sha>, <date>`. One line per repo and branch read, for example `Synced at: orders-api develop@00344be, 2026-10-15` and, on the next line, `Synced at: orders-api feat/orders-retry@155b5c4, 2026-10-19` (1.84.0). When that repo and branch already have a line, replace only that line; a new one goes in sorted place (repo, then branch). Leave the other lines and a `(dropped)` on them. Do not invent a line the parent did not pass. Do not edit `repos.md`.
 5. When the parent passed a source folder, add the `Source:` and `Trace:` lines from the imported-sources convention (drop-in: `.claude/skills/crav1-add-to-spec/references/sources.md`; plugin: sibling `skills/crav1-add-to-spec/references/sources.md`). Do not import the file again. Do not ask the mail, binary, or personal-data questions again. Do not write the transfer data policy. The parent runs that check. Do not commit.
 6. Return: paths written, ADRs vs open, 3–5 remaining arguments.
 
@@ -33,7 +33,7 @@ The parent launches **crav1-bundle-slice-agent** for **one** slug. This file is 
 
 - Interview, ask format, or pause for Approvals & Execution
 - Write or edit another slug
-- Rewrite `docs/system/` (no landscape, repos table, `Synced at` cell, or system ADRs)
+- Rewrite `docs/system/` (no landscape, repos table, `Synced at` line in `repos.md`, or system ADRs)
 - Invent a second system shape (landscape wins)
 - Write application code, `plan.md`, `tasks.md`, `work-item.md`, `docs/sources/`, or create git remotes
 - Ask for a work item (the parent offers once after Index)

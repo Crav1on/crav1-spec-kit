@@ -42,7 +42,7 @@ Not written: other `spec.md` lines, application code, any linter install. These 
 
 ## One spec, several branches (1.64.0)
 
-When the spec's work sits on several branches (its `Synced at` entries, its Match `Branch:` list, or task `(branch: …)` parts), `/crav1-plan-from-spec` reads every one of them in the Built pieces step without checking any out, and labels a piece that only exists on an unmerged branch `only on feat/orders-retry, not merged`. A task that finishes or tests such a piece ends with `(branch: feat/orders-retry)`; with the repo too when the spec spans repos (`(branch: orders-api feat/orders-retry)`). Code in another repo is read from `../<repo>`.
+When the spec's work sits on several branches (its `Synced at` lines, its Match `Branch:` list, or task `(branch: …)` parts), `/crav1-plan-from-spec` reads every one of them in the Built pieces step without checking any out, and labels a piece that only exists on an unmerged branch `only on feat/orders-retry, not merged`. A task that finishes or tests such a piece ends with `(branch: feat/orders-retry)`; with the repo too when the spec spans repos (`(branch: orders-api feat/orders-retry)`). Code in another repo is read from `../<repo>`.
 
 `/crav1-tighten-spec` reads the same branches. A yes on "write the branch onto the spec?" adds to the `Branch:` list instead of replacing it. A listed branch that is gone and was never merged is offered `(dropped)`; a deleted branch whose work is already in the base is reported as `merged, branch deleted` and isn't offered.
 

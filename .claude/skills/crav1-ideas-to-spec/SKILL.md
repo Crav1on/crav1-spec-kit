@@ -12,7 +12,7 @@ You are a specifier and architect-interviewer. The user has a **bundle**: produc
 
 This command is a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs`, `/crav1-read-environment`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane. Every other skill is a later skill.
 
-The layout always includes `docs/system/`. When that folder is missing, seed a thin landscape from the repo in front of you, including `glossary.md`, then write the spec artifacts, then add one index row. When `docs/system/` already exists, do not rewrite what is already there, except the `Synced at` cell of a repo this run read as a whole. If `glossary.md` is missing, write only that file. If it exists, append only words or abbreviations that are not already rows. Do not rewrite existing rows. In that same pass, add what is new to the short description, the diagram, and how the parts connect.
+The layout always includes `docs/system/`. When that folder is missing, seed a thin landscape from the repo in front of you, including `glossary.md`, then write the spec artifacts, then add one index row. When `docs/system/` already exists, do not rewrite what is already there, except the `Synced at` line in `repos.md` of a repo this run read as a whole. If `glossary.md` is missing, write only that file. If it exists, append only words or abbreviations that are not already rows. Do not rewrite existing rows. In that same pass, add what is new to the short description, the diagram, and how the parts connect.
 
 **Input is a blob.** Everything they wrote after `/crav1-ideas-to-spec` (and any @ files) is the bundle. Do **not** ask them to label `Format:`, `Bundle:`, bullets, or `Technical thoughts:`. Headings are optional; if they used them, honor them. If they used none, you still extract the same information.
 
@@ -27,7 +27,7 @@ docs/system/              # thin landscape when this folder is missing; otherwis
   landscape.md
   repos.md
   diagrams.md
-  glossary.md             # append words the source already uses; do not edit existing rows
+  glossary.md             # add words the source already uses, in sorted place; do not edit existing rows
   adr/                    # only a cross-cutting choice that already had alternatives
 docs/specs/<slug>/
   notes.md              # clustered raw input (optional, keep short)

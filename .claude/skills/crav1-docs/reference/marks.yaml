@@ -81,12 +81,12 @@ marks:
     name: "Synced at (slice line)"
     group: spec
     files: ["docs/specs/<slug>/spec.md (after the title, before the first heading)"]
-    format: "Synced at: <repo> <branch>@<short sha>, <date>[ (dropped)][; <branch>@<short sha>, <date>[ (dropped)]]"
-    pattern: '^Synced at: \S+ \S+@[0-9a-f]{7}, \d{4}-\d{2}-\d{2}( \(dropped\))?(; \S+@[0-9a-f]{7}, \d{4}-\d{2}-\d{2}( \(dropped\))?)*$'
+    format: "Synced at: <repo> <branch>@<short sha>, <date>[ (dropped)]"
+    pattern: '^Synced at: \S+ \S+@[0-9a-f]{7}, \d{4}-\d{2}-\d{2}( \(dropped\))?$'
     examples:
-      - "Synced at: orders-api main@abc1234, 2026-10-07"
-      - "Synced at: orders-api feat/orders-retry@155b5c4, 2026-10-19; feature/orders-openapi@85d4561, 2026-10-19; develop@00344be, 2026-10-15"
-    meaning: "The code commit a one-slice read last read, one line per repo. Since 1.64.0 one entry per branch read; a new read replaces only that branch's entry."
+      - "Synced at: orders-api develop@00344be, 2026-10-15"
+      - "Synced at: orders-api feat/orders-retry@155b5c4, 2026-10-19"
+    meaning: "The code commit a one-slice read last read. Since 1.84.0 one line per repo and branch, sorted by repo, then branch; a new read replaces only its own line. Older `; `-joined lines are split by `/crav1-add-to-spec migrate formats`."
     written_by: [crav1-add-to-spec, crav1-bundle-to-specs, crav1-bundle-slice-agent, crav1-spark-to-spec, crav1-ideas-to-spec, crav1-refresh-system-notes]
     read_by: [crav1-plan-from-spec, crav1-tighten-spec, crav1-help, crav1-verify-build-against-spec, crav1-tasks-ready-to-build, crav1-open-pr, crav1-merge-pr, crav1-review-pr]
     mention: 'Synced at'
@@ -155,7 +155,7 @@ marks:
   - id: dropped
     name: "(dropped)"
     group: spec
-    files: ["docs/specs/<slug>/spec.md (end of a Synced at entry)"]
+    files: ["docs/specs/<slug>/spec.md (end of a Synced at line)"]
     format: "<branch>@<short sha>, <date> (dropped)"
     pattern: '^\S+@[0-9a-f]{7}, \d{4}-\d{2}-\d{2} \(dropped\)$'
     examples:
@@ -512,15 +512,15 @@ marks:
 
   # ---------- docs/system/repos.md ----------
   - id: synced-at-repo
-    name: "Synced at (repo cell)"
+    name: "Synced at (repo line)"
     group: system
-    files: ["docs/system/repos.md (Synced at column)"]
-    format: "<branch>@<short sha>, <date>[; <branch>@<short sha>, <date>]"
-    pattern: '^\S+@[0-9a-f]{7}, \d{4}-\d{2}-\d{2}(; \S+@[0-9a-f]{7}, \d{4}-\d{2}-\d{2})*$'
+    files: ["docs/system/repos.md (## Synced at section, after the table)"]
+    format: "- <repo> <branch>@<short sha>, <date>"
+    pattern: '^- \S+ \S+@[0-9a-f]{7}, \d{4}-\d{2}-\d{2}$'
     examples:
-      - "main@abc1234, 2026-10-07"
-      - "main@abc1234, 2026-10-07; develop@def5678, 2026-10-06"
-    meaning: "The commit a whole-repo read last read, one entry per branch."
+      - "- orders-api develop@def5678, 2026-10-06"
+      - "- orders-api main@abc1234, 2026-10-07"
+    meaning: "The commit a whole-repo read last read. Since 1.84.0 one line per repo and branch, sorted by repo, then branch; the table has no Synced at column."
     written_by: [crav1-add-to-spec, crav1-bundle-to-specs, crav1-ideas-to-spec, crav1-refresh-system-notes, crav1-existing-to-specs]
     read_by: [crav1-refresh-system-notes]
     mention: 'Synced at'

@@ -67,7 +67,7 @@ docs/specs/<slug>/
 
 A mail, a transcript, a chat, a screenshot, or another original that a quote comes from is written under `docs/sources/YYYY-MM-DD-<slug>/` before the slice specs. The spec `Source:` and `Trace:` lines link to that folder. This command does not commit.
 
-Human starter copies: `docs/system/_template/` (same files as skill `crav1-bundle-to-specs` `assets/` for landscape, including `glossary.md`, and as `assets/system/` on `crav1-spark-to-spec` and `crav1-ideas-to-spec`). `repos.md` includes a `Synced at` column. Where this run reads a whole repo, it sets that repo's cell and touches only those repos. Where this run reads only one slice, it does not touch the column. It writes or updates `Synced at: <repo> <branch>@<short sha>, <date>` in that slice's `spec.md`. Notes alone are not a repo read. Feature spec shape matches ideas-to-spec plus **Repos**, **Constraints**, **Assumptions**, **Trace**.
+Human starter copies: `docs/system/_template/` (same files as skill `crav1-bundle-to-specs` `assets/` for landscape, including `glossary.md`, and as `assets/system/` on `crav1-spark-to-spec` and `crav1-ideas-to-spec`). `repos.md` includes a `## Synced at` section, one line per repo and branch. Where this run reads a whole repo, it sets that repo and branch's line under `## Synced at` and touches only those repos. Where this run reads only one slice, it does not touch the `## Synced at` section. It writes or updates `Synced at: <repo> <branch>@<short sha>, <date>` in that slice's `spec.md`. Notes alone are not a repo read. Feature spec shape matches ideas-to-spec plus **Repos**, **Constraints**, **Assumptions**, **Trace**.
 
 ## Later features
 
@@ -81,7 +81,7 @@ Do not run `/crav1-bundle-to-specs` again.
 Spark: <the new feature>
 ```
 
-Or `/crav1-ideas-to-spec` if the new thing is already a pile. **New slug.** If `docs/system/` is missing, spark and ideas seed a thin landscape from the repo, including `glossary.md`, then the spec, then one index row. They do not rewrite lines that landscape already has. A missing `glossary.md` is written. New glossary rows are appended. Existing rows are not rewritten. A meaning the source does not state is `to be researched`. That same pass adds what is new to the short description, the diagram, and how the parts connect. They do not re-run intake. If you need a new repo: landscape ADR + `repos.md` row, then the spec, then an index row.
+Or `/crav1-ideas-to-spec` if the new thing is already a pile. **New slug.** If `docs/system/` is missing, spark and ideas seed a thin landscape from the repo, including `glossary.md`, then the spec, then one index row. They do not rewrite lines that landscape already has. A missing `glossary.md` is written. New glossary rows are added in sorted place by term. Existing rows are not rewritten. A meaning the source does not state is `to be researched`. That same pass adds what is new to the short description, the diagram, and how the parts connect. They do not re-run intake. If you need a new repo: landscape ADR + `repos.md` row, then the spec, then an index row.
 
 ## After Index
 

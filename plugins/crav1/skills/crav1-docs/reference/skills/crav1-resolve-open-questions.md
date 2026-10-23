@@ -8,7 +8,7 @@
 
 Walk Open questions in spec.md one by one.
 
-One Open question at a time; keep it open or answer with impact; patch only that `Q#`.
+One Open question at a time; keep it open or answer with impact; patch only that question, found by its words (`Q#` is display only).
 
 `detailed` shows an extended entry per question: what it blocks, why it matters, what is known, who can answer, asked status and date, sources, and a suggested answer. No extra questions.
 

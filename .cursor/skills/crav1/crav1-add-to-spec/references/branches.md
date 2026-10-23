@@ -6,7 +6,7 @@ Examples use made-up names: the spec repo `orders-specs`, the code repo `orders-
 
 ## Where each branch is named
 
-- **`Synced at` slice line** in `spec.md`, one line per repo, one entry per branch, separated by `; `: `Synced at: orders-api feat/orders-retry@155b5c4, 2026-10-19; develop@00344be, 2026-10-15`. An entry may end in `(dropped)`.
+- **`Synced at` slice line** in `spec.md`, one line per repo and branch (1.84.0, `references/merge-safe.md`): `Synced at: orders-api develop@00344be, 2026-10-15` and, on the next line, `Synced at: orders-api feat/orders-retry@155b5c4, 2026-10-19`. A line may end in `(dropped)`.
 - **Match `Branch:` list** under `## Match`: `- Branch: feat/orders-retry; feature/orders-openapi`. When the spec spans repos, an item may start with the repo: `- Branch: orders-api feat/orders-retry`. An item may end in `(into <branch>)` (it merges into that branch, not the base; offered and written after a yes since 1.68.0) or `(spec branch)` (the spec's long-lived branch that its task sub-branches merge into, 1.68.0): `- Branch: orders-api feat/orders-capacity (spec branch); feat/orders-capacity-t3 (into feat/orders-capacity)`.
 - **PR marker (1.75.0).** A Match `Branch:` entry may end in `(PR <n>)`, written by `/crav1-open-pr`. It is the pull request number for `references/scope.md`. Ignore it for every branch rule here.
 - **Task branch** at the end of a task line in `tasks.md`: `(branch: feat/orders-retry)`, or `(branch: orders-api feat/orders-retry)` when the spec spans repos.
@@ -16,7 +16,7 @@ A spec's **work branches**, per repo, are every branch named in those three plac
 ## Base branch and Merges into
 
 - `docs/system/repos.md` has an optional `Merges into` column. Its cell names the branch the repo's work merges into, for example `develop`. Empty, or no column, means the default branch: the branch `origin/HEAD` points at, else `main`, else `master`.
-- A repo's **base branches** are its `Merges into` branch and its default branch. A base branch is never a work branch that still has to merge. Its `Synced at` entry is only a read stamp.
+- A repo's **base branches** are its `Merges into` branch and its default branch. A base branch is never a work branch that still has to merge. Its `Synced at` line is only a read stamp.
 - A branch's **into branch** is its `(into …)` marker, else the repo's `Merges into` branch, else the default branch.
 
 ## Which refs
@@ -53,8 +53,8 @@ A work branch is **merged** into its into branch when any of these holds:
 
 ## Gone, rewritten, shared
 
-- **Gone** means neither the local branch nor `origin/<name>` exists. A gone branch is **merged** when the SHA in its `Synced at` entry is contained in the into branch, or the `commits:` of the notes that imported it are all in the into branch as the same change, or the host shows its PR merged (test 3). The report says `merged, branch deleted`. Only a branch that is gone and not merged by any of these is `unknown (branch gone)`: then the spec isn't done, and `/crav1-tighten-spec` offers `(dropped)` for it.
-- **Rewritten** means the SHA in a branch's `Synced at` entry no longer exists on disk, or is not an ancestor of the branch tip (a rebase or a force push). Say `<branch>: branch rewritten since last read (was <sha>)`. Measure that branch from its fork point, not from the old SHA. Match its commits by content (`git patch-id`) so nothing already imported is imported again. When an imported commit is no longer on disk (pruned after the force push), its commit line in the note (`<short sha> <author date> <subject>`, 1.64.1) is the key: a commit with the same author date and subject is the same change, and the report says so. Never stop with an error because a SHA is missing. The next read replaces the entry.
+- **Gone** means neither the local branch nor `origin/<name>` exists. A gone branch is **merged** when the SHA in its `Synced at` line is contained in the into branch, or the `commits:` of the notes that imported it are all in the into branch as the same change, or the host shows its PR merged (test 3). The report says `merged, branch deleted`. Only a branch that is gone and not merged by any of these is `unknown (branch gone)`: then the spec isn't done, and `/crav1-tighten-spec` offers `(dropped)` for it.
+- **Rewritten** means the SHA in a branch's `Synced at` line no longer exists on disk, or is not an ancestor of the branch tip (a rebase or a force push). Say `<branch>: branch rewritten since last read (was <sha>)`. Measure that branch from its fork point, not from the old SHA. Match its commits by content (`git patch-id`) so nothing already imported is imported again. When an imported commit is no longer on disk (pruned after the force push), its commit line in the note (`<short sha> <author date> <subject>`, 1.64.1) is the key: a commit with the same author date and subject is the same change, and the report says so. Never stop with an error because a SHA is missing. The next read replaces the entry.
 - **Shared** means one branch is listed in several specs. Report it under each spec that lists it, followed by `(also in <other slug>)`. A count across specs (the build-features board, help `where am I`) counts each branch once. One code-change note serves every spec it feeds (its `used_by` lists each one); never write a second note for the same commits.
 
 ## The Branches line

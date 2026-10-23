@@ -2,6 +2,20 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.84.0 (2026-10-23)
+
+Merge-safe formats, so two people's kit runs rarely conflict. **After updating, run `/crav1-add-to-spec migrate formats` once in each product repo** (or `python3 <skills>/crav1-add-to-spec/scripts/merge_safe_migrate.py --dry-run`, then without `--dry-run`). See [install.md](docs/install.md#keeping-the-kit-updated).
+
+### Kit
+
+- **Changed:** `Synced at` is one line per repo and branch. In `spec.md`: `Synced at: <repo> <branch>@<short sha>, <date>`, no more `; `-joined entries. In `docs/system/repos.md`: the table's `Synced at` column is gone; a `## Synced at` section after the table holds `- <repo> <branch>@<short sha>, <date>` lines. A read replaces only its own line. Every writer (spark, ideas, bundle and its slice agent, existing-to-specs, add-to-spec code change and `branches`, refresh-system-notes, tighten-spec `mark-dropped`) and reader uses the new form.
+- **Changed:** open questions are `- ` bullets found by their words. `Q#` is a display number only, never written; resolve-open-questions maps a `Q#: letter` answer to the question's words before it patches.
+- **Changed:** fixed insert order. A new `Synced at` line (repo, then branch), open question (its words), `**New:**` line (date, then text) or glossary row (term) goes before the first existing one that sorts after it, not at the end. Appending always hits the same spot, so two people's additions collide; sorted places almost never do. Existing lines are never reordered.
+- **Added:** `crav1-add-to-spec` `references/merge-safe.md` (the rules), `scripts/merge_safe_migrate.py` and the `migrate formats` choice word. The migration rewrites every spec and `repos.md` at once, keeps every line and entry, checks nothing was lost before writing (a file that would lose anything is left alone), keeps CRLF, and a second run changes nothing. `--selftest` runs in CI.
+- **Changed:** `/crav1-finalize-commit` pull path: newest `Synced at` per repo and branch; sorted-place lines are merged into their place; the same open question on both sides is one question with both sides' marks. An old `; `-joined line whose entries all survive as lines is not counted as lost.
+- **Docs:** repos template (all copies), data layout (new **Merge-safe formats** section), marks reference, skills reference, glossary, install, AGENTS.md and the walkthroughs.
+- **Proving ground:** checks for per-branch `Synced at`, word-matched questions and the migration (idempotent, nothing lost).
+
 ## 1.83.0 (2026-10-23)
 
 `/crav1-finalize-commit`: no opening question. It always drafts, then offers commit / copy / change / stop.
