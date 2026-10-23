@@ -8,7 +8,7 @@ In `plan.md`: **Left as committed** — only when the user left a piece. One lin
 
 ## Blocks lines
 
-The one exception to leaving `spec.md` alone. For each kept-open question under `## Open questions` that blocks only some of the new tasks, write one indented line under that question: `- Blocks: T2, T4`. Follow `crav1-add-to-spec` `references/open-questions.md` (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/references/open-questions.md`; plugin: sibling `skills/crav1-add-to-spec/references/open-questions.md`). Do not change the question or its other lines. On a re-plan that renumbers tasks, replace the `Blocks:` lines this plan wrote. A kept-open question with no `Blocks:` line blocks the whole slice for `/crav1-tasks-ready-to-build` (inferred). List each `Blocks:` line in the recap.
+The one exception to leaving `spec.md` alone. For each kept-open question under `## Open questions` that blocks only some of the new tasks, write one indented line under that question: `- Blocks: T2, T4`. Pick the tasks from the plan yourself; do not ask. Follow `crav1-add-to-spec` `references/open-questions.md` (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/references/open-questions.md`; plugin: sibling `skills/crav1-add-to-spec/references/open-questions.md`). Do not change the question or its other lines. On a re-plan that renumbers tasks, replace the `Blocks:` lines this plan wrote. A kept-open question with no `Blocks:` line blocks the whole slice for `/crav1-tasks-ready-to-build` (inferred). List each `Blocks:` line in the recap.
 
 ## tasks.md
 
