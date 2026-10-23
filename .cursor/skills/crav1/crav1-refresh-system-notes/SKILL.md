@@ -27,11 +27,11 @@ This is cross-cutting. It is not its own lane. It does not move work into Specif
 
 This is not `/crav1-existing-to-specs`. That command reads the repos the user named and writes one architecture spec the lanes can extend, plus these notes. Do not do that job. Do not invent an architecture from code. Do not create a slug.
 
-Spark, ideas, intake, match, match-dump, and add-to-spec run this picture update in the same pass that appends a glossary row. They follow [references/picture.md](references/picture.md) (drop-in: `.cursor/skills/crav1/crav1-refresh-system-notes/references/picture.md`; plugin: this skill’s `references/picture.md`). They do not rewrite existing glossary rows. This command does not write glossary rows.
+Spark, ideas, intake, match, match-dump, and add-to-spec run this picture update in the same pass that adds a glossary row. They follow [references/picture.md](references/picture.md) (drop-in: `.cursor/skills/crav1/crav1-refresh-system-notes/references/picture.md`; plugin: this skill’s `references/picture.md`). They do not rewrite existing glossary rows. This command does not write glossary rows.
 
 ## From /crav1-read-environment
 
-When `/crav1-read-environment` hands a confirmed system section, run only this section, then stop. That section is the source. Add only what is new to the picture, following [references/picture.md](references/picture.md). Each new sentence, node, edge, or connection line says `Seen in <host> <environment>.` When the line says `shared with prod`, `prod only`, or shape and connections only, keep that label. It does not say the code shows it. A connection is added only when that section says the environment shows it. Do not rewrite a line that is already there. Do not run the alone-read of the specs. Do not open an interview. Do not start Specify, Plan, or Build. If `docs/system/` is missing, write nothing.
+When `/crav1-read-environment` hands a confirmed system section, run only [references/handoff-read-environment.md](references/handoff-read-environment.md), then stop.
 
 ## When the folder is missing
 
@@ -59,15 +59,17 @@ A part or a connection the source does not state is not new.
 
 ## Pointed at a research note
 
-When the user replaced a file under `docs/research/` and pointed this command at it, follow the clear section of `crav1-add-to-spec` `references/research-stale-clear.md` (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/references/research-stale-clear.md`; plugin: sibling `skills/crav1-add-to-spec/references/research-stale-clear.md`). Do not ask whether the update resolves the mark. Judge each listed point from the update's text. An older mark with no point lines is not one point. Split it as that file says. Also route the note's own open questions when the answer lies outside the note's owner. That still runs when the mark clears. Clear the mark only when every listed point is resolved, or when an older mark had no points and the update resolves the original quote. Otherwise narrow the mark and route each open point. When the older mark had no points and stays open, leave it as written. Record `Cleared <date>: updated note <path or commit>.` under `## Research findings` only when the mark clears, with one short line per point when the mark had points. Do not commit. Do not send anything. Drafts stay in the chat. This check does not replace the picture update. The picture still follows **Write**. The clear's writes on the note and on `spec.md` are part of this check. A `Synced at` line is not the only edit when this check writes.
+When the user replaced a file under `docs/research/` and pointed this command at it, follow [references/research-note.md](references/research-note.md). It does not replace the picture update.
 
 ## Synced at
 
 Reading spec files is not reading a repo. The alone path does not set `Synced at` from those files, and it does not stamp the docs repo because the picture was updated.
 
-When this run reads a whole repo, set that repo's `Synced at` line in `docs/system/repos.md`. That line is the only edit to `repos.md`. `Synced at` is one line per repo and branch, `- <repo> <branch>@<short sha>, <date>`, in the `## Synced at` section of `repos.md`, for example `- orders-api main@abc1234, 2026-10-07` (1.84.0, `crav1-add-to-spec` `references/merge-safe.md`). The branch is the branch that was read. The short sha is seven characters. The date is the date of that read, `YYYY-MM-DD`. When that repo and branch already have a line, replace only that line; a new one goes in sorted place (repo, then branch). Leave every other line. Touch only the repos this run read. Do not change Purpose, Status, URL, or Boundaries. When the `## Synced at` section is missing, add it after the table. When that repo has no row, do not add one. Do not create `repos.md` when it is missing. Do not write a slice `Synced at` line for a repo this run read as a whole.
+Each `Synced at` line is one repo and branch: the branch that was read, the seven-character short sha, and the date of that read (`YYYY-MM-DD`). Format and sorted place (repo, then branch) follow `crav1-add-to-spec` `references/merge-safe.md`. When that repo and branch already have a line, replace only that line. Leave every other line, and a `(dropped)` on them.
 
-When this run reads only one slice, do not touch the `## Synced at` section of `repos.md`. Write or update a line in that slice's `spec.md`, after the title and before the first heading: `Synced at: <repo> <branch>@<short sha>, <date>`. That line is the only edit to `spec.md`. One line per repo and branch read, for example `Synced at: orders-api develop@00344be, 2026-10-15` and, on the next line, `Synced at: orders-api feat/orders-retry@155b5c4, 2026-10-19` (1.84.0). When that repo and branch already have a line, replace only that line; a new one goes in sorted place (repo, then branch). Leave the other lines and a `(dropped)` on them.
+When this run reads a whole repo, set its line in the `## Synced at` section of `docs/system/repos.md`, for example `- orders-api main@abc1234, 2026-10-07`. That line is the only edit to `repos.md`. Touch only the repos this run read. Do not change Purpose, Status, URL, or Boundaries. When the section is missing, add it after the table. When that repo has no row, do not add one. Do not create `repos.md` when it is missing. Do not write a slice line for a repo this run read as a whole.
+
+When this run reads only one slice, do not touch `repos.md`. Write or update that slice's `Synced at: <repo> <branch>@<short sha>, <date>` line in `spec.md`, after the title and before the first heading. That line is the only edit to `spec.md`.
 
 When a branch's recorded SHA no longer exists or is not an ancestor of the branch tip, say `<branch>: branch rewritten since last read (was <sha>)` and measure drift for that branch from its fork point, as `crav1-add-to-spec` `references/branches.md` says (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/references/branches.md`; plugin: sibling `skills/crav1-add-to-spec/references/branches.md`). Never stop with an error for it. A code repo other than the open checkout is read from `../<repo>` under the same file's **Sibling checkout**.
 
@@ -81,15 +83,11 @@ Follow [references/picture.md](references/picture.md). Three places only:
 - the context diagram in `docs/system/diagrams.md`
 - `## How the parts connect` in `docs/system/landscape.md`
 
-Do not add a feature-index row. Callers that own the index still add that row themselves. Do not edit `glossary.md`. Do not commit.
-
-## Notes month folders (1.61.0)
-
-Since 1.61.0 notes live in `docs/notes/YYYY-MM/` by source date, with generated indexes. When this run finds notes flat in `docs/notes/` (any `*.md` there other than `index.md`), say so once and recommend the dry run first: `python3 <crav1-add-to-spec skill folder>/scripts/notes_index.py migrate-dry-run`, which prints the planned moves, source fills, and link rewrites and writes nothing (1.62.0). Then name the one-time move: `python3 <crav1-add-to-spec skill folder>/scripts/notes_index.py migrate` (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/scripts/notes_index.py`; Claude Code: `.claude/skills/crav1-add-to-spec/scripts/notes_index.py`). It moves each note into its month folder by source date (the note's date, else its filename date, else the date git first added it), adds front matter, fills `source` and `source_folder` from each note's own `Source:` lines and list items (`source_folder` is the first `docs/sources/` path, `source` that line; empty when there is none, never guessed; an empty `source_folder` is filled even when `source` is set), rebases every relative link inside a moved note (folders, any file type, trailing slash, anchors; URLs and root-style paths stay), rewrites every markdown link to a moved note, anchors kept, anywhere in the repo (specs including parked and retired, `docs/system/`, `docs/sources/` READMEs, other notes, `Full source:` and `Source:` lines) with correct relative paths, lists each file it changed, and rebuilds the indexes. Re-running it is safe: it changes nothing that is already right, and after a manual move it fixes stale links and empty source fields. Old spec lines keep their source lines; nothing is backfilled. Run it only when the user says yes. It is not a picture write.
+Do not add a feature-index row. Callers that own the index still add that row themselves. Do not edit `glossary.md`.
 
 ## Stop
 
-Do not plan. Do not implement. Do not commit. Do not run `/crav1-explain-existing-system`, `/crav1-plan-from-spec`, `/crav1-spark-to-spec`, or `/crav1-finalize-commit`. Do not clear a stale research mark except as the clear section says. Do not ask the user whether the update resolves it.
+Do not plan. Do not implement. Do not commit. Do not run `/crav1-explain-existing-system`, `/crav1-plan-from-spec`, `/crav1-spark-to-spec`, or `/crav1-finalize-commit`. Do not clear a stale research mark except as `references/research-note.md` says. Do not ask the user whether the update resolves it.
 
 Output only:
 
