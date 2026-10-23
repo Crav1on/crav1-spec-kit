@@ -2,6 +2,17 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.82.0 (2026-10-23)
+
+`/crav1-finalize-commit`: the committed message is exactly what the skill drafted. Any trailer or line it did not write is stripped, not only Cursor's.
+
+### Kit
+
+- **Changed:** the Cursor attribution step is now **Added lines**. After the commit, any line the draft did not have is stripped once by amend when HEAD is ours and unpushed: Cursor's `Co-authored-by` / `Made-with`, Claude Code's `Generated with Claude Code` and `Co-Authored-By: Claude <noreply@anthropic.com>`, and any other `Co-authored-by`, `Signed-off-by` or tool line. The check compares against the draft, not a tool list. A trailer that comes back after one strip stops the run and names the tool's setting; there is no `keep` option any more. The work-item mention stays.
+- **Renamed:** `references/attribution.md` to `references/added-lines.md`; `crav1-build-tasks` one-task `run.md`, `work-item-mention.md`, the skills reference, `from-commit.md`, `from-ideas.md` and `AGENTS.md` use the new wording.
+- **Proving ground:** A13 gains a step where a Claude Code `Co-Authored-By` trailer is removed.
+- **Words read:** finalize-commit `SKILL.md` 1,485 to 1,499; `references/added-lines.md` 315 (was `attribution.md`, 250).
+
 ## 1.81.2 (2026-10-23)
 
 `/crav1-finalize-commit`: SKILL.md slimmed with moves and dedupes only. No rule changed.

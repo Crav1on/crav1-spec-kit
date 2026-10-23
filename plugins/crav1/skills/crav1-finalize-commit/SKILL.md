@@ -11,8 +11,8 @@ description: >-
   they want to change the message or actually create the commit, or
   /crav1-finalize-commit. Does not push. Does not commit until they pick
   commit. Paste-only: /crav1-finalize-commit. Keeps a trailing
-  work-item mention through the HEAD check and the strip of a host
-  attribution trailer. After the commit it fetches; when behind it pulls
+  work-item mention through the HEAD check and the strip of any trailer
+  it did not write. After the commit it fetches; when behind it pulls
   with a merge and fixes kit-file conflicts so no line is lost; `pull`
   does only that. Never pushes.
 disable-model-invocation: true
@@ -105,25 +105,25 @@ Read [references/change.md](references/change.md). Redraft or edit, show the new
 1. Confirm git works (same PATH fallback as the draft skill).
 2. **Files:** commit **staged** files if the index is non-empty. If the index is empty, ask whether to `git add` the intended file set from the draft. Do not add `agent-tools/`, `artifacts/`, `bin/`, `obj/`, or other build output.
 3. **Message:** `git commit` with Summary as the subject (`-m`) and Description as the body (second `-m`, or a HEREDOC). The body is the Description paste, including a trailing work-item mention when the draft has one. Do not add `Co-authored-by`, `Made-with: Cursor`, or other trailers yourself. Do not drop the mention line.
-4. Read `git log -1 --format=%B`. Compare to the drafted Summary + Description. The mention, when the draft has one, is the last line of that Description. A last line of `#<id>` or `AB#<id>` is the work-item mention, not Cursor attribution.
+4. Read `git log -1 --format=%B`. Compare to the drafted Summary + Description. The mention, when the draft has one, is the last line of that Description. A last line of `#<id>` or `AB#<id>` is the work-item mention, not an added line.
 5. Show the new hash, subject, and `git status` short result.
 5a. **Fetch and check (1.81.0).** Fetch. When behind the upstream, pull with a merge and resolve kit-file conflicts by the kit's rules; otherwise check any unpushed merge for lines either side added that the merge dropped. Read [references/pull.md](references/pull.md) for both. Never push; end with `Ready to push.`
-6. If the body has extra **Cursor attribution** (`Co-authored-by: Cursor`, `cursoragent@cursor.com`, `Made-with: Cursor`) that was **not** in the draft: this is Cursor’s commit-attribution setting (or a cloud agent), **not** this skill and usually **not** a repo hook. Read [references/attribution.md](references/attribution.md).
-7. After the commit message is settled (including a one-time attribution strip), one optional line and nothing more: Next (optional): `/crav1-open-pr` when you want to push and open the PR. Do not run that skill in this turn.
+6. If the message has any line that was **not** in the draft (a `Co-authored-by`, `Signed-off-by`, `Generated with` or other trailer from Cursor, Claude Code or another tool), read [references/added-lines.md](references/added-lines.md).
+7. After the commit message is settled (including a one-time strip of added lines), one optional line and nothing more: Next (optional): `/crav1-open-pr` when you want to push and open the PR. Do not run that skill in this turn.
 8. If commit fails (hooks, empty index, identity), show the error. Keep the paste blocks, **then** offer the choices again (`commit` still first). Do not name `/crav1-open-pr` on a failed commit.
 
-Do not `git commit --amend` for wording tweaks unless they asked. Amending **only** to restore the drafted message (strip attribution) is allowed as below.
+Do not `git commit --amend` for wording tweaks unless they asked. Amending **only** to restore the drafted message (strip added lines) is allowed as below.
 
-## Cursor attribution
+## Added lines
 
-A Cursor trailer the draft did not have: read [references/attribution.md](references/attribution.md). Strip it once by amend when HEAD is ours and unpushed; never loop.
+The final message is exactly what this skill drafted. Any other line: read [references/added-lines.md](references/added-lines.md). Strip once by amend when HEAD is ours and unpushed; never loop.
 
 ## Hard rules
 
 - Never offer commit/copy/change before Summary/Description exist. After they exist, show the blocks, then the choices with **`commit` first**.
 - No commit until `commit` (or an unambiguous “commit this message now”) **after** they have seen the current blocks.
 - `copy` never runs `git commit`.
-- After `commit`, if Cursor appended `Co-authored-by` / `Made-with` that was not in the draft, strip it once with amend when HEAD is ours and unpushed; do not fight a second inject—tell them to turn Attribution off. The amend keeps the drafted Description, including a trailing work-item mention.
+- The committed message is exactly the drafted Summary + Description. After `commit`, strip any trailer or line the draft did not have (Cursor, Claude Code, any `Co-authored-by` / `Signed-off-by`) once with amend when HEAD is ours and unpushed; do not fight a second inject—tell them to turn that attribution off. The amend keeps the drafted Description, including a trailing work-item mention.
 - Do not install a hook to enforce the work-item line. Do not block the commit when `work-item.md` is missing.
 - Do not change product files except the persist rules the draft skill already writes. Cursor: `.cursor/rules/draft-commit-style.mdc` or `.cursor/rules/draft-commit-gitlog.mdc`. Claude Code project: `.claude/rules/draft-commit-style.md` or `.claude/rules/draft-commit-gitlog.md`. Claude Code user: `~/.claude/rules/draft-commit-style.md` or `~/.claude/rules/draft-commit-gitlog.md`.
 - Never push and never rebase. Do not open a PR. After a successful commit, one optional line may name `/crav1-open-pr`. Do not invoke it.
