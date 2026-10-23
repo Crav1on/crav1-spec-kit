@@ -1,0 +1,37 @@
+# Pull path and nothing-lost check (1.81.0)
+
+Read after a commit, and on the `pull` word. Never push, never rebase, never suggest a rebase.
+
+## Kit files
+
+`docs/specs/**/spec.md`, `docs/architecture/spec.md`, `docs/system/*.md` and `docs/notes/**`. Every other file is a code file: its conflicts stay with the user, as before. Say which ones, stop, and do not commit the merge.
+
+## Fetch
+
+`git fetch`, then compare `HEAD` with its upstream (`git rev-list --left-right --count HEAD...@{u}`). No upstream: say so in one line and stop; nothing is checked. Fetch fails (offline, not signed in): show the error, then run the nothing-lost check on local merges only.
+
+- **Behind:** the pull path.
+- **Not behind:** the nothing-lost check on every merge commit in `@{u}..HEAD`. None: say `Up to date. Ready to push.`
+
+## Pull path
+
+`pull` with uncommitted changes: stop and name `commit` instead; never stash.
+
+1. `git pull --no-rebase`. Clean merge: run the check on the new merge commit.
+2. Conflicts in kit files, resolved by rule:
+   - Both sides added lines in the same spot: keep both, ours first, then theirs.
+   - `Synced at`: one entry per branch, the newer date (then the later commit) wins; entries only one side has are kept.
+   - `docs/notes/index.md` and the month indexes: take either side, then rebuild with `notes_index.py build` from crav1-add-to-spec's `scripts/`. Never merge them by hand.
+   - Both sides changed the same existing line in different ways (the same fact, said differently): ask the one question below.
+3. Run the check against the working tree before `git commit --no-edit`. Lines missing: do not commit; list them and restore them first.
+4. End: `Merged <upstream> into <branch>. Nothing lost. Ready to push.`
+
+The question, only for a real disagreement, one per fact, with the two lines shown: `keep both` (theirs becomes `**Conflict:** "<their words>" (Full source: <their note, or their short sha>) vs the line above` under ours) / `mine` / `theirs` / `stop` (leave the merge unfinished, `git merge --abort` undoes it). Headless or bot run: write the `**Conflict:**` line and say so.
+
+## Nothing-lost check
+
+For a merge `M` with parents `P1` and `P2` and base `B = git merge-base P1 P2`, for each kit file either side changed: every line `git diff -U0 --ignore-cr-at-eol B P1 -- <file>` or `B P2` adds (the `+` lines) must still be in `M` (or the working tree before the merge commit). Compare through git, ignoring CR at line ends, so CRLF copies under `core.autocrlf true` do not look different.
+
+Not counted as lost: a note index line when `notes_index.py --check` passes, and a `Synced at` entry replaced by a newer one for the same branch.
+
+Lines lost in a merge already committed: stop, list each line with its file and side (`ours <sha>` / `theirs <sha>`), and ask: `restore` (put them back after the kept lines, left uncommitted for this skill's commit step) / `show me` / `stop`. Never amend or rewrite the merge.

@@ -259,7 +259,7 @@ Every mark and line format the kit writes inside product files, generated from [
 | New | `**New:** "<quote>"` | `docs/specs/<slug>/spec.md` | `/crav1-add-to-spec` | — | 1.0.0 |
 | Inferred | `**Inferred:** <connection the source does not state>` | `docs/specs/<slug>/spec.md` | `/crav1-add-to-spec` | — | 1.0.0 |
 | Full source | `Full source: docs/notes/YYYY-MM/<file>.md[; <second note>]` | `docs/specs/<slug>/spec.md` (after a point) | `/crav1-add-to-spec`, `/crav1-bundle-to-specs`, `/crav1-ideas-to-spec`, `/crav1-spark-to-spec`, `/crav1-tighten-spec`, `/crav1-existing-to-specs` | `/crav1-add-to-spec` | 1.60.0 |
-| Conflict | `**Conflict:** "<new words>" (Full source: <note>) vs the line above` | `docs/specs/<slug>/spec.md` (under the point it disagrees with) | `/crav1-add-to-spec` | — | 1.61.0 |
+| Conflict | `**Conflict:** "<new words>" (Full source: <note>) vs the line above` | `docs/specs/<slug>/spec.md` (under the point it disagrees with) | `/crav1-add-to-spec`, `/crav1-finalize-commit` | — | 1.61.0 |
 | Source | `Source: docs/sources/YYYY-MM-DD-<slug>/` | `docs/specs/<slug>/spec.md` (after a quote) | `/crav1-add-to-spec` | — | 1.37.0 |
 | Trace | `[- ]Trace: <source> — <what this pass marked new, already there, and inferred>` | `docs/specs/<slug>/spec.md` (under ## Trace) | `/crav1-add-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs` | — | 1.30.0 |
 | Seen in | `Seen in <host> <environment>.` | `docs/specs/<slug>/spec.md`; `docs/architecture/spec.md`; `docs/system/*.md` | `/crav1-add-to-spec`, `/crav1-existing-to-specs`, `/crav1-refresh-system-notes` | `/crav1-read-environment` | 1.13.0 |

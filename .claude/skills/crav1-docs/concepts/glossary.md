@@ -122,6 +122,8 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 
 **Merge the base in.** How the kit says to bring a branch up to date with its base (the pull request's target, else the repo's `Merges into` branch, else the default branch): merge the base into the branch and resolve conflicts there. The kit never suggests a rebase or a force-push. Seeing that someone else rebased a branch is still reported (see Branch rewritten since last read) (1.66.0).
 
+**Nothing-lost check.** `/crav1-finalize-commit` (1.81.0) checks a merge against both of its parents: every line either side added to a spec, a system file or a note must still be there. Line endings are ignored. A rebuilt note index and a `Synced at` entry replaced by a newer one for the same branch do not count as lost. The pull path runs the check before it commits the merge; an unpushed merge made outside the kit is checked after a commit or on `pull`.
+
 **Dropped.** A `(dropped)` at the end of a `Synced at` entry: the branch is gone, was never merged, and was given up after a yes in `/crav1-tighten-spec`. A gone branch whose work is in the base counts as merged and is never offered dropped.
 
 **Branch rewritten since last read.** What status says when a branch's recorded SHA no longer exists or is no longer in the branch (a rebase or force push). Commits are matched by content (`git patch-id`), so nothing is imported twice.

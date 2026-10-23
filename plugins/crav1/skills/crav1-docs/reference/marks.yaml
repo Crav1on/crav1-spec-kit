@@ -218,8 +218,8 @@ marks:
     pattern: '^\*\*Conflict:\*\* ".+" \(Full source: \S+\) vs the line above$'
     examples:
       - '**Conflict:** "Retries stop after 5 attempts" (Full source: docs/notes/2026-10/2026-10-09-retry-mail.md) vs the line above'
-    meaning: "A new source disagrees with a point; the user decides."
-    written_by: [crav1-add-to-spec]
+    meaning: "A new source disagrees with a point, or two sides of a merge do (1.81.0); the user decides."
+    written_by: [crav1-add-to-spec, crav1-finalize-commit]
     read_by: []
     since: 1.61.0
 
