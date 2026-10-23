@@ -2,6 +2,16 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.86.4 (2026-10-23)
+
+`/crav1-plan-from-spec`: SKILL.md slimmed with a pure move and dedupes. No rule changed.
+
+### Kit
+
+- **Moved:** the `tasks.md` format and rules, **Blocks lines**, and the **Left as committed** line format to `references/write.md`, word for word. SKILL.md keeps pointers and the one-exception note for `Blocks:` lines.
+- **Deduped:** hard rules no longer repeat no-test-code, no linter install, no Build without a linter, and no rebuild or left-piece task (each stated in the body).
+- **Words read:** plan-from-spec `SKILL.md` 1,736 to 1,344; new `references/write.md` 453, read before writing tasks.
+
 ## 1.86.3 (2026-10-23)
 
 `/crav1-open-pr` and `/crav1-review-pr`: SKILL.md slimmed with pure moves and dedupes. No rule changed.
