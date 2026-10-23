@@ -79,9 +79,9 @@ skills:
   reads: Reads the spark and the repo.
   writes: 'Writes `docs/specs/<slug>/spec.md`, a thin `docs/system/` including `glossary.md` when that
     folder is missing, otherwise one index row plus a missing glossary or new glossary rows, and `work-item.md`
-    when the user opts in on Azure Repos. A `repos.md` it writes includes a `Synced at` column and leaves
-    that cell empty. When this run read only that slice''s code, writes or updates `Synced at: <repo>
-    <branch>@<short sha>, <date>` on that slice''s `spec.md` and does not touch the repo column.'
+    when the user opts in on Azure Repos. A `repos.md` it writes includes a `## Synced at` section and leaves
+    no Synced at line. When this run read only that slice''s code, writes or updates `Synced at: <repo>
+    <branch>@<short sha>, <date>` on that slice''s `spec.md` and does not touch the `## Synced at` section of `repos.md`.'
   leaves_alone: Leaves application code and an existing landscape alone.
   exceptions: extend edits that spec and adds no second index row. A quoted note in `docs/notes/` gets its slug in `used_by` and a `Full source:` link; notes are never absorbed (1.61.0).
   called_by: Called by the user.
@@ -122,8 +122,8 @@ skills:
   reads: Reads one unstructured pile and the repo.
   writes: 'Writes `spec.md`, `diagrams.md`, slice ADRs, the chosen `export/`, optional `notes.md`, the
     same landscape or index-and-glossary result as spark, and `work-item.md` on an Azure Repos opt-in.
-    Where it reads a whole repo, sets that repo''s `Synced at` cell and touches only those repos. Where
-    it reads only one slice, leaves that column alone and writes or updates `Synced at: <repo> <branch>@<short
+    Where it reads a whole repo, sets that repo''s `Synced at` line in `repos.md` and touches only those repos. Where
+    it reads only one slice, leaves the repos.md Synced at lines alone and writes or updates `Synced at: <repo> <branch>@<short
     sha>, <date>` on that slice''s `spec.md`.'
   leaves_alone: Leaves application code and the rest of an existing landscape alone.
   exceptions: two or more v0 slices or repos writes nothing and points at `/crav1-bundle-to-specs`. A quoted note in `docs/notes/` gets its slug in `used_by` and a `Full source:` link; notes are never absorbed (1.61.0).
@@ -178,8 +178,8 @@ skills:
     a mail, it lists each embedded image, inline or attached. It recommends convert to text when the image
     is a diagram, a table, or text that can be reproduced exactly, and compress otherwise. It asks once
     before the source folder is written. Auto-accept applies to those recommendations only when the transfer
-    data policy clearly covers them. Where it reads a whole repo, sets that repo''s `Synced at` cell and
-    touches only those repos. Where it reads only one slice, leaves that column alone and writes or updates
+    data policy clearly covers them. Where it reads a whole repo, sets that repo''s `Synced at` line in `repos.md` and
+    touches only those repos. Where it reads only one slice, leaves the repos.md Synced at lines alone and writes or updates
     `Synced at: <repo> <branch>@<short sha>, <date>` on that slice''s `spec.md`.'
   leaves_alone: Leaves application code, `plan.md`, and later slices alone. Does not commit.
   exceptions: prompts `/crav1-finalize-commit` and does not run it. A quoted note in `docs/notes/` gets its slug in `used_by` and a `Full source:` link; notes are never absorbed (1.61.0).
@@ -243,10 +243,10 @@ skills:
     the code shows, **`/crav1-existing-to-specs`** reads those repos and writes one architecture spec
     the lanes can extend (`docs/architecture/spec.md`) when that file is missing. It writes the system
     notes under `docs/system/` when those notes are missing. When a real system note is already there,
-    it leaves those notes except the `Synced at` cell of a repo it read, and writes the missing architecture
+    it leaves those notes except the `Synced at` line in `repos.md` of a repo it read, and writes the missing architecture
     spec and `docs/architecture/left-out.md`. When the architecture spec or those notes are already there,
     a later re-read adds only what is new and does not rewrite lines that are already there, except that
-    `Synced at` cell, and removes a left-out line when the code shows it. A fact the code shows is confirmed.
+    `Synced at` line in `repos.md`, and removes a left-out line when the code shows it. A fact the code shows is confirmed.
     Before any file is written, the confirmation is one question per section. A guess stays out of the
     spec until that section accepts it. A guess that stays left out is written to `docs/architecture/left-out.md`.
     A link between repos is written only when the code shows it. If none is found, the command says so.
@@ -255,8 +255,8 @@ skills:
   - 'Repos only (was `/crav1-repos-to-spec`): The user names one or more repos. Reads those repos and
     writes `docs/architecture/spec.md` when that file is missing, and the `docs/system/` notes `/crav1-explain-existing-system`
     reads when those notes are missing. When a real system note is already there, leaves those notes except
-    the `Synced at` cell of a repo it read, and writes the missing architecture spec and `docs/architecture/left-out.md`.
-    A later re-read adds only what is new and does not rewrite those lines, except that `Synced at` cell,
+    the `Synced at` line in `repos.md` of a repo it read, and writes the missing architecture spec and `docs/architecture/left-out.md`.
+    A later re-read adds only what is new and does not rewrite those lines, except that `Synced at` line in `repos.md`,
     and removes a left-out line when the code shows it. Before any file is written, one question per section.
     A fact the code shows is confirmed. A guess stays out until that section accepts it. A guess that
     stays left out is written to `docs/architecture/left-out.md`. A link is written only when the code
@@ -540,7 +540,7 @@ skills:
   walkthrough: docs/from-draft-spec.md
   purpose: Walk Open questions in spec.md one by one.
   in_depth:
-  - One Open question at a time; keep it open or answer with impact; patch only that `Q#`.
+  - One Open question at a time; keep it open or answer with impact; patch only that question, found by its words (`Q#` is display only).
   - '`detailed` shows an extended entry per question: what it blocks, why it matters, what is known, who can answer, asked status and date, sources, and a suggested answer. No extra questions.'
   use_when: Open questions remain
   table:
@@ -634,7 +634,7 @@ skills:
       means: "a mail, sorted as a dump"
     - word: "chat"
       means: "a chat, sorted as a dump"
-    note: "After a PR: `all`. A PR ref alone (`pr71`, `pr 71`, `#71`, `pr <repo> 71`) means `code change`, offline. `pr71 all` also checks for new commits and appends the description and every comment thread to the PR note (1.76.0). Every open branch: `branches`, with `branches all` or `branches skip stale` to skip the question (1.79.0)."
+    note: "After a PR: `all`. A PR ref alone (`pr71`, `pr 71`, `#71`, `pr <repo> 71`) means `code change`, offline. `pr71 all` also checks for new commits and appends the description and every comment thread to the PR note (1.76.0). Every open branch: `branches`, with `branches all` or `branches skip stale` to skip the question (1.79.0). Once after updating to 1.84.0: `migrate formats` rewrites every spec and `docs/system/repos.md` to the merge-safe formats (one `Synced at` line per repo and branch, plain-bullet open questions), after a dry run and one yes; idempotent, nothing lost, never commits."
   lane: cross-cutting
   group: Keep the picture current
   starter: false
@@ -712,7 +712,7 @@ skills:
       `docs/sources/` for an imported source, the transfer data policy after a yes, research stale marks
       after a yes, and answer links under open questions; A code change: Quotes of what belongs in matching
       specs, a missing `glossary.md` or new glossary rows when `docs/system/` exists, the picture update,
-      `Synced at` (repo cell or slice line), and research stale marks after a yes; other listed edits
+      `Synced at` (repo line or slice line), and research stale marks after a yes; other listed edits
       only on apply; A meeting: A source folder when a kept addition imports one, the transfer data policy after a yes; answer links and asked marks through `/crav1-add-to-spec`'
   reads: 'A fact: Reads the new information and one existing `spec.md`. A dump: Reads the dump, existing
     spec folders, skipping `_template`, and the generated notes indexes so the same source is not imported twice. A code
@@ -764,8 +764,8 @@ skills:
     and a source that shows a question being asked writes its `Asked:` date, following `crav1-add-to-spec`
     `references/open-questions.md`. An unclear or partial answer is shown and the question stays open.
     A code change: Writes quotes of what belongs into the matching `spec.md` files, and the same glossary
-    gap as match-dump. When the read is a whole repo, sets that repo''s `Synced at` cell and touches only
-    those repos. When the read is one slice, leaves that column alone and writes or updates `Synced at:
+    gap as match-dump. When the read is a whole repo, sets that repo''s `Synced at` line in `repos.md` and touches only
+    those repos. When the read is one slice, leaves the repos.md Synced at lines alone and writes or updates `Synced at:
     <repo> <branch>@<short sha>, <date>` on that slice''s `spec.md`. After a kept quote, compares it with
     `docs/research/*.md` and `## Research findings` on the specs it touches, including notes those findings
     link to, following `crav1-add-to-spec` `references/research-stale.md`. A clear contradiction or an
@@ -1635,14 +1635,14 @@ skills:
   use_when: Something was added; catch the picture up
   table:
     reads: The picture and what the spec states
-    writes: New lines on the description, diagram, and connections, `Synced at` (repo cell or slice line),
+    writes: New lines on the description, diagram, and connections, `Synced at` (repo line or slice line),
       and a cleared, narrowed, or routed research mark when pointed at an updated note
   reads: Reads the picture and what a spec already states.
   writes: 'Writes new lines on the short description, the context diagram, and how the parts connect.
-    When this run reads a whole repo, sets that repo''s `Synced at` cell and touches only those repos.
-    When this run reads only one slice, leaves that column alone and writes or updates `Synced at: <repo>
+    When this run reads a whole repo, sets that repo''s `Synced at` line in `repos.md` and touches only those repos.
+    When this run reads only one slice, leaves the repos.md Synced at lines alone and writes or updates `Synced at: <repo>
     <branch>@<short sha>, <date>` on that slice''s `spec.md`. Reading specs does not set it. A consumer
-    measuring drift uses the older of the repo column and the slice line, and an empty value means unknown,
+    measuring drift uses the older of the `## Synced at` section of `repos.md` and the slice line, and an empty value means unknown,
     so fall back to spec file commit dates. When pointed at an updated note in `docs/research/`, checks
     each listed point and clears, narrows, or routes it. An older mark with no point lines is split into
     the hits it was made from. It also routes the note''s own open questions when the answer lies outside

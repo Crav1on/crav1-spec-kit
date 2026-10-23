@@ -26,7 +26,7 @@ Reads one unstructured pile and the repo.
 
 In short: `spec.md`, `diagrams.md`, slice ADRs, the chosen `export/`, optional `notes.md`, the same landscape result as spark, `Synced at`, `work-item.md` on an Azure Repos opt-in, and `Used by` on a quoted note.
 
-Writes `spec.md`, `diagrams.md`, slice ADRs, the chosen `export/`, optional `notes.md`, the same landscape or index-and-glossary result as spark, and `work-item.md` on an Azure Repos opt-in. Where it reads a whole repo, sets that repo's `Synced at` cell and touches only those repos. Where it reads only one slice, leaves that column alone and writes or updates `Synced at: <repo> <branch>@<short sha>, <date>` on that slice's `spec.md`.
+Writes `spec.md`, `diagrams.md`, slice ADRs, the chosen `export/`, optional `notes.md`, the same landscape or index-and-glossary result as spark, and `work-item.md` on an Azure Repos opt-in. Where it reads a whole repo, sets that repo's `Synced at` line in `repos.md` and touches only those repos. Where it reads only one slice, leaves the repos.md Synced at lines alone and writes or updates `Synced at: <repo> <branch>@<short sha>, <date>` on that slice's `spec.md`.
 
 ## Does not
 

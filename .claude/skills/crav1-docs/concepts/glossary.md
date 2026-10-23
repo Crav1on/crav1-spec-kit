@@ -64,7 +64,7 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 
 **Feature index.** The table in `docs/system/landscape.md` with one row per slice and its status.
 
-**Glossary rows.** The words a source already uses, in `docs/system/glossary.md`. New rows are appended. Existing rows are not rewritten. A meaning the source does not state is `to be researched`.
+**Glossary rows.** The words a source already uses, in `docs/system/glossary.md`. New rows are added in sorted place by term. Existing rows are not rewritten. A meaning the source does not state is `to be researched`.
 
 **Match status.** Under a spec's `## Match`: done, partial, not in the code, or retired.
 
@@ -100,9 +100,9 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 
 **Work item home.** Where the work items for one implementation repo go, written as `ADO: <org>/<project>` in the `Work items go to` column of `docs/system/repos.md`. The first Azure Boards skill that needs a repo's home asks for it once, suggesting the repo's own project, and never guesses it. A spec whose repos are in several homes gets one Feature in each home. `Jira: <project>` is reserved for later and is not read yet. See [Data layout](data-layout.md#work-item-homes).
 
-**Synced at.** The branch, short commit, and date a repo was last read, as `<branch>@<short sha>, <date>`, in `docs/system/repos.md`. A one-slice read writes a `Synced at` line on that slice instead. Since 1.64.0 that line holds one entry per branch read, `; `-separated, and a new read replaces only that branch's entry: `Synced at: orders-api feat/orders-retry@155b5c4, 2026-10-19; develop@00344be, 2026-10-15`.
+**Synced at.** The branch, short commit, and date a repo was last read. In `docs/system/repos.md` it is one line per repo and branch under `## Synced at`, `- orders-api main@abc1234, 2026-10-07`. A one-slice read writes a line on that slice's `spec.md` instead, one per repo and branch: `Synced at: orders-api develop@00344be, 2026-10-15`, and `Synced at: orders-api feat/orders-retry@155b5c4, 2026-10-19` on the next line. A new read replaces only its own line (1.84.0).
 
-**Work branch.** A branch that holds part of a spec's work and still has to merge: named in the spec's `Synced at` entries, its Match `Branch:` list, or a task's `(branch: …)`, minus base branches and `(dropped)` entries. A spec is done across branches when every work branch is merged into its base. A branch may serve several specs; it is reported under each and counted once.
+**Work branch.** A branch that holds part of a spec's work and still has to merge: named in the spec's `Synced at` lines, its Match `Branch:` list, or a task's `(branch: …)`, minus base branches and `(dropped)` entries. A spec is done across branches when every work branch is merged into its base. A branch may serve several specs; it is reported under each and counted once.
 
 **Spec branch.** A spec's long-lived work branch, usually `feat/<slug>`, that its task sub-branches merge into before it merges into the base branch (setup 4). Marked `(spec branch)` on the Match `Branch:` list after a yes. Since 1.68.0.
 
@@ -122,9 +122,11 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 
 **Merge the base in.** How the kit says to bring a branch up to date with its base (the pull request's target, else the repo's `Merges into` branch, else the default branch): merge the base into the branch and resolve conflicts there. The kit never suggests a rebase or a force-push. Seeing that someone else rebased a branch is still reported (see Branch rewritten since last read) (1.66.0).
 
-**Nothing-lost check.** `/crav1-finalize-commit` (1.81.0) checks a merge against both of its parents: every line either side added to a spec, a system file or a note must still be there. Line endings are ignored. A rebuilt note index and a `Synced at` entry replaced by a newer one for the same branch do not count as lost. The pull path runs the check before it commits the merge; an unpushed merge made outside the kit is checked after a commit or on `pull`.
+**Nothing-lost check.** `/crav1-finalize-commit` (1.81.0) checks a merge against both of its parents: every line either side added to a spec, a system file or a note must still be there. Line endings are ignored. A rebuilt note index and a `Synced at` line replaced by a newer one for the same branch do not count as lost. The pull path runs the check before it commits the merge; an unpushed merge made outside the kit is checked after a commit or on `pull`.
 
-**Dropped.** A `(dropped)` at the end of a `Synced at` entry: the branch is gone, was never merged, and was given up after a yes in `/crav1-tighten-spec`. A gone branch whose work is in the base counts as merged and is never offered dropped.
+**Merge-safe formats.** The 1.84.0 rules that keep two people's kit runs from conflicting: one `Synced at` line per repo and branch, open questions found by their words, and new `**New:**` lines, open questions and glossary rows put in **sorted place** (before the first existing one that sorts after them) instead of at the end. Projects made before 1.84.0 run `/crav1-add-to-spec migrate formats` once. See [Data layout](data-layout.md#merge-safe-formats-1840).
+
+**Dropped.** A `(dropped)` at the end of a `Synced at` line: the branch is gone, was never merged, and was given up after a yes in `/crav1-tighten-spec`. A gone branch whose work is in the base counts as merged and is never offered dropped.
 
 **Branch rewritten since last read.** What status says when a branch's recorded SHA no longer exists or is no longer in the branch (a rebase or force push). Commits are matched by content (`git patch-id`), so nothing is imported twice.
 
@@ -132,7 +134,7 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 
 **Work item.** An Azure Boards id in `docs/specs/<slug>/work-item.md`. Commit and pull request skills turn it into a mention.
 
-**`T#`, `P#`, `I#`, `G#`, `Q#`, `A#`.** Numbered items: tasks in `tasks.md`, plan findings from review-plan, architecture issues from review-architecture, gaps from verify, open questions in a spec, and bulk assumptions in the landscape.
+**`T#`, `P#`, `I#`, `G#`, `Q#`, `A#`.** Numbered items: tasks in `tasks.md`, plan findings from review-plan, architecture issues from review-architecture, gaps from verify, open questions in a spec, and bulk assumptions in the landscape. `Q#` is a display number only, counted in document order and never written; the kit finds a question by its words (1.84.0).
 
 **Inner loop.** A gap that can be fixed and re-proved in the working tree. Fix-build-gaps takes these one at a time.
 

@@ -177,7 +177,7 @@ The specs often live in their own repo (`orders-specs`) and the code pull reques
 - **From the specs repo**, for a pull request in a repo listed in `docs/system/repos.md`: `/crav1-review-pr orders-api 71`, or the pull request URL. The repo is matched on its `URL` cell.
 - **With both repos open** in one workspace: the folder with `docs/specs/` is the specs repo, and the folder whose remote matches the pull request is the code repo.
 
-It reads the pull request from the host (`gh` or `az`, read-only), and the spec, plan and `verify.md` from the specs repo's working tree. The spec is found by the head branch in its `Synced at` entries, Match `Branch:` list or task `(branch: orders-api …)` parts. A code pull request whose spec has a `plan.md` gets the full checks, not the outside-the-kit note. When the spec spans several repos, another repo's part is not a miss; an `I3` info note lists it with the Branches line.
+It reads the pull request from the host (`gh` or `az`, read-only), and the spec, plan and `verify.md` from the specs repo's working tree. The spec is found by the head branch in its `Synced at` lines, Match `Branch:` list or task `(branch: orders-api …)` parts. A code pull request whose spec has a `plan.md` gets the full checks, not the outside-the-kit note. When the spec spans several repos, another repo's part is not a miss; an `I3` info note lists it with the Branches line.
 
 A GitHub diff comes from `gh pr diff`. An Azure DevOps diff comes from the code repo's checkout (`../orders-api`). When that checkout's copy of the pull request branches is missing or older than the pull request, it asks once:
 

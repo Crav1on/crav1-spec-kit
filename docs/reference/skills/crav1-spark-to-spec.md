@@ -26,7 +26,7 @@ Reads the spark and the repo.
 
 In short: `spec.md`, a thin `docs/system/` if missing (otherwise one index row and new glossary rows), the picture update, the slice `Synced at` line, `work-item.md` on an Azure Repos opt-in, and `Used by` on a quoted note.
 
-Writes `docs/specs/<slug>/spec.md`, a thin `docs/system/` including `glossary.md` when that folder is missing, otherwise one index row plus a missing glossary or new glossary rows, and `work-item.md` when the user opts in on Azure Repos. A `repos.md` it writes includes a `Synced at` column and leaves that cell empty. When this run read only that slice's code, writes or updates `Synced at: <repo> <branch>@<short sha>, <date>` on that slice's `spec.md` and does not touch the repo column.
+Writes `docs/specs/<slug>/spec.md`, a thin `docs/system/` including `glossary.md` when that folder is missing, otherwise one index row plus a missing glossary or new glossary rows, and `work-item.md` when the user opts in on Azure Repos. A `repos.md` it writes includes a `## Synced at` section and leaves no Synced at line. When this run read only that slice's code, writes or updates `Synced at: <repo> <branch>@<short sha>, <date>` on that slice's `spec.md` and does not touch the `## Synced at` section of `repos.md`.
 
 ## Does not
 

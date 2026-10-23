@@ -60,7 +60,7 @@ A mail, a transcript, a chat, a screenshot, or another original that a confirmed
 
 Other `docs/system/` files and other specs change only when apply is picked. Each of those edits was listed in one line (file and what would change). Leaving them alone writes nothing outside the specs that received new quotes, except the glossary gap below.
 
-No `plan.md`. No `tasks.md`. No application code. A missing `docs/system/` is not seeded here. A missing `glossary.md` is a gap fill only when `docs/system/` already exists. When that file exists, only new rows are appended. Existing rows are not rewritten. A meaning the dump does not state is `to be researched`. When `docs/system/` already exists, that same pass adds what is new to the short description, the diagram, and how the parts connect. It does not rewrite what is already there. The does-not-fit pile is not a new spec folder.
+No `plan.md`. No `tasks.md`. No application code. A missing `docs/system/` is not seeded here. A missing `glossary.md` is a gap fill only when `docs/system/` already exists. When that file exists, only new rows are added, in sorted place by term. Existing rows are not rewritten. A meaning the dump does not state is `to be researched`. When `docs/system/` already exists, that same pass adds what is new to the short description, the diagram, and how the parts connect. It does not rewrite what is already there. The does-not-fit pile is not a new spec folder.
 
 ## After
 

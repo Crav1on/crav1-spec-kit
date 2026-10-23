@@ -24,9 +24,9 @@ Reads the picture and what a spec already states.
 
 ## Writes
 
-In short: New lines on the description, diagram, and connections, `Synced at` (repo cell or slice line), and a cleared, narrowed, or routed research mark when pointed at an updated note.
+In short: New lines on the description, diagram, and connections, `Synced at` (repo line or slice line), and a cleared, narrowed, or routed research mark when pointed at an updated note.
 
-Writes new lines on the short description, the context diagram, and how the parts connect. When this run reads a whole repo, sets that repo's `Synced at` cell and touches only those repos. When this run reads only one slice, leaves that column alone and writes or updates `Synced at: <repo> <branch>@<short sha>, <date>` on that slice's `spec.md`. Reading specs does not set it. A consumer measuring drift uses the older of the repo column and the slice line, and an empty value means unknown, so fall back to spec file commit dates. When pointed at an updated note in `docs/research/`, checks each listed point and clears, narrows, or routes it. An older mark with no point lines is split into the hits it was made from. It also routes the note's own open questions when the answer lies outside the note's owner, including when the mark clears. It does not ask the user.
+Writes new lines on the short description, the context diagram, and how the parts connect. When this run reads a whole repo, sets that repo's `Synced at` line in `repos.md` and touches only those repos. When this run reads only one slice, leaves the repos.md Synced at lines alone and writes or updates `Synced at: <repo> <branch>@<short sha>, <date>` on that slice's `spec.md`. Reading specs does not set it. A consumer measuring drift uses the older of the `## Synced at` section of `repos.md` and the slice line, and an empty value means unknown, so fall back to spec file commit dates. When pointed at an updated note in `docs/research/`, checks each listed point and clears, narrows, or routes it. An older mark with no point lines is split into the hits it was made from. It also routes the note's own open questions when the answer lies outside the note's owner, including when the mark clears. It does not ask the user.
 
 ## Does not
 
