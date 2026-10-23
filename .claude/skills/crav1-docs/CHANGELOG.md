@@ -2,6 +2,15 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.86.2 (2026-10-23)
+
+`/crav1-help`: SKILL.md slimmed with a pure move. No rule changed.
+
+### Kit
+
+- **Moved:** modes 2 to 5 (a skill name, "next" or a situation, a concept, list or one lane) and the **Neither** sources case to `references/modes.md`, word for word. SKILL.md keeps each mode's trigger and a pointer.
+- **Words read:** help `SKILL.md` 1,713 to 1,096; `references/modes.md` 414 to 1,152, read only for those modes.
+
 ## 1.86.1 (2026-10-23)
 
 `/crav1-tighten-plan`: SKILL.md slimmed with a pure move. No rule changed.
