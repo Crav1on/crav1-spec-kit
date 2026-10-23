@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""One-go migration to the CRAV1 merge-safe formats (kit 1.84.0).
+"""One-go migration to the CRAV1 merge-safe formats (kit 1.84.0; Branch lines 1.86.0).
 
 Rewrites every docs/**/spec.md and docs/system/repos.md once:
   - `Synced at: <repo> a@1, d; b@2, d` becomes one `Synced at:` line per repo
@@ -8,6 +8,8 @@ Rewrites every docs/**/spec.md and docs/system/repos.md once:
     right after the table: `- <repo> <branch>@<short sha>, <date>`, one bullet
     per repo and branch, sorted.
   - numbered or `Q<n>`-prefixed open questions become plain `- ` bullets.
+  - (1.86.0) a `; `-joined Match `Branch:` list becomes one `Branch:` line
+    per branch, markers kept, sorted by repo, then branch.
 
 Every line and every entry is kept. Before anything is written, a
 nothing-lost check compares old and new; a file that would lose anything is
@@ -29,6 +31,7 @@ SYNC = re.compile(r"^Synced at: (\S+) (.+?)\s*$")
 ENTRY = re.compile(r"^(\S+)@([0-9a-f]{7,40}), (\d{4}-\d{2}-\d{2})( \(dropped\))?$")
 QNUM = re.compile(r"^(?:\d+[.)]\s+)?(?:\*\*)?Q\d+[.:)]?(?:\*\*)?\s+(.*)$")
 NUM = re.compile(r"^\d+[.)]\s+(.*)$")
+BRANCH = re.compile(r"^(- )?Branch: (.+?)\s*$")
 OLD_NOTE = '`Synced at` is `<branch>@<short sha>, <date>`. A repo may list several branches, separated by `; `. Example: `main@abc1234, 2026-10-07; develop@def5678, 2026-10-06`. A consumer measuring drift uses the older of the repo column and the slice line, for each branch its own entry, and an empty value means unknown, so fall back to spec file commit dates.'  # the 1.83 template paragraph, replaced only when unchanged
 NEW_NOTE = ("`## Synced at` below holds one line per repo and branch, `- <repo> <branch>@<short sha>, <date>`, "
             "sorted by repo, then branch (1.84.0). A new read replaces only that repo and branch's line. "
@@ -42,6 +45,13 @@ def entries(text):
 
 def key(repo, entry):
     return (repo.lower(), entry.split("@", 1)[0].lower(), entry)
+
+
+def branch_key(entry):
+    """(repo, branch) of a Branch entry; markers ignored. No repo sorts as ''."""
+    words = entry.split(" (", 1)[0].split()
+    repo, br = (words[0], words[1]) if len(words) >= 2 else ("", words[0] if words else "")
+    return (repo.lower(), br.lower(), entry)
 
 
 def cell_repo(c):
@@ -75,6 +85,15 @@ def migrate_spec(lines):
                 if (r, e) not in seen:
                     seen.append((r, e))
             out += ["Synced at: %s %s" % (r, e) for r, e in seen]
+            continue
+        b = BRANCH.match(ln)
+        if b and ";" in b.group(2):
+            seen = []
+            for e in sorted(entries(b.group(2)), key=branch_key):
+                if e not in seen:
+                    seen.append(e)
+            out += ["%sBranch: %s" % (b.group(1) or "", e) for e in seen]
+            i += 1
             continue
         if in_q and not ln.startswith((" ", "\t")):
             m = QNUM.match(ln[2:]) if ln.startswith("- ") else QNUM.match(ln)
@@ -189,6 +208,11 @@ def items(lines, repos):
                 continue
             if ln == OLD_NOTE or ln == NEW_NOTE or ln.strip() == "## Synced at":
                 continue
+        b = None if repos else BRANCH.match(ln)
+        if b:
+            for e in entries(b.group(2)):
+                c[("B", b.group(1) or "", e)] = 1
+            continue
         if not ln.strip():
             continue
         if in_q and not ln.startswith((" ", "\t")):
@@ -261,7 +285,9 @@ def selftest():
         spec = ("# Pantry orders\r\n\r\nSynced at: pantry-api feat/pantry-retry@155b5c4, 2026-10-19; develop@00344be, 2026-10-15\r\n"
                 "Synced at: pantry-web main@abc1234, 2026-10-07 (dropped)\r\n\r\n## What\r\n\r\nText.\r\n\r\n"
                 "## Open questions\r\n\r\n1. Who approves a refund?\r\n   - Asked: 2026-10-20, mail to Vega. Question 1.\r\n"
-                "- **Q2.** Is the cut-off local time?\r\n  - Blocks: T2\r\n- Plain one?\r\n")
+                "- **Q2.** Is the cut-off local time?\r\n  - Blocks: T2\r\n- Plain one?\r\n\r\n## Match\r\n\r\n"
+                "- Branch: pantry-api feat/pantry-retry-t2 (into feat/pantry-retry) (PR 12); pantry-api feat/pantry-retry (spec branch); feature/pantry-openapi\r\n"
+                "- Repo: pantry-api\r\n")
         (s / "spec.md").write_bytes(spec.encode())
         repos = ("# Repos\n\n| Repo | Purpose | Status | URL | Synced at | Merges into | Work items go to |\n"
                  "| --- | --- | --- | --- | --- | --- | --- |\n"
@@ -275,6 +301,8 @@ def selftest():
         a = (s / "spec.md").read_bytes().decode()
         assert "\r\n" in a and "; " not in a.split("## What")[0], a
         assert "Synced at: pantry-api develop@00344be, 2026-10-15\r\nSynced at: pantry-api feat/pantry-retry@155b5c4, 2026-10-19\r\nSynced at: pantry-web main@abc1234, 2026-10-07 (dropped)" in a, a
+        assert ("## Match\r\n\r\n- Branch: feature/pantry-openapi\r\n- Branch: pantry-api feat/pantry-retry (spec branch)\r\n"
+                "- Branch: pantry-api feat/pantry-retry-t2 (into feat/pantry-retry) (PR 12)\r\n- Repo: pantry-api") in a, a
         assert "- Who approves a refund?" in a and "- Is the cut-off local time?" in a and "  - Blocks: T2" in a, a
         r = (root / "docs" / "system" / "repos.md").read_text()
         assert "| Repo | Purpose | Status | URL | Merges into | Work items go to |" in r, r
@@ -286,6 +314,10 @@ def selftest():
         # a file that would lose a line is left alone
         _, _, lost = process(s / "spec.md", False)
         assert not lost
+        # a branch entry dropped by hand counts as lost
+        old = ["## Match", "- Branch: a x; a y"]
+        assert items(old, False) - items(["## Match", "- Branch: a x"], False)
+        assert not items(old, False) - items(migrate_spec(old), False)
     print("selftest ok")
     return 0
 

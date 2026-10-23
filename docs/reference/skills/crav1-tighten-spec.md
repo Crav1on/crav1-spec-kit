@@ -14,6 +14,8 @@ One issue at a time, with explained resolutions (plus get a suggestion) and impa
 
 1.68.0: reads and writes the `(spec branch)` and `(into …)` markers on the Match `Branch:` list after a yes.
 
+1.86.0: a yes on writing the branch adds one Match `Branch:` line in sorted place (repo, then branch); never `; `-joined.
+
 ## Runs when
 
 The spec is still mushy. Called by the user.

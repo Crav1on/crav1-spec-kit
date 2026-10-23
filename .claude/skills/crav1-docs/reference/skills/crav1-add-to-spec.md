@@ -30,6 +30,8 @@ A meeting (was `/crav1-meeting-to-specs`): Minutes, a transcript, an email, or a
 
 1.68.0: a code change asks whether a branch that split off another spec branch merges into it; a yes writes `(into …)` and `(spec branch)` on the Match `Branch:` list, a headless run writes nothing and treats it as stacked. The commit list leaves out merge commits, and a spec-branch read imports only its own commits.
 
+1.86.0: Match `Branch:` is one line per branch, a new one in sorted place (repo, then branch); `migrate formats` splits old `; `-joined lists, markers kept.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.

@@ -195,7 +195,7 @@ A ticked task is Done only when `verify.md` lists it as verified. Otherwise it s
 
 A spec's work can sit on several branches, and in several repos. The rules are in `crav1-add-to-spec` `references/branches.md`; the marks are in the tables below.
 
-- **Where branches are named:** the `Synced at` slice lines (one per repo and branch, 1.84.0), the Match `Branch:` list, and a task's `(branch: …)` part. Together, minus base branches and `(dropped)` entries, these are the spec's **work branches**.
+- **Where branches are named:** the `Synced at` slice lines (one per repo and branch, 1.84.0), the Match `Branch:` lines (one per branch, 1.86.0), and a task's `(branch: …)` part. Together, minus base branches and `(dropped)` entries, these are the spec's **work branches**.
 - **Base branch:** the repo's `Merges into` cell in `docs/system/repos.md`, else the default branch. A branch diff starts at the **fork point** (where the branch split off), so a branch cut from `develop` in a repo whose default is `main` shows only its own commits, even before the `Merges into` cell is filled (1.64.1).
 - **Same change after a rebase:** commits are matched by `git patch-id`; when an imported commit is gone from disk after a force push, the note's commit line (`<short sha> <author date> <subject>`) is matched instead (1.64.1).
 - **Done across branches:** every work branch merged into its base (contained, the same change, or a merged PR on GitHub or Azure DevOps). A deleted branch whose work is in the base counts as merged. Report only: no skill writes `Status:` because of it.
@@ -207,7 +207,8 @@ docs/system/repos.md      | orders-api | … | develop | … |
                           - orders-api develop@00344be, 2026-10-15
 docs/specs/orders/spec.md   Synced at: orders-api develop@00344be, 2026-10-15
                             Synced at: orders-api feat/orders-retry@155b5c4, 2026-10-19
-                            - Branch: feat/orders-retry; feature/orders-openapi
+                            - Branch: feat/orders-retry
+                            - Branch: feature/orders-openapi
 docs/specs/orders/tasks.md  - [ ] T3: … (verify: unit — …) (spec: …) (after: T1) (branch: feat/orders-retry)
 docs/notes/2026-10/…md      commits: [155b5c4, 2c0e1a9]
 ```
@@ -217,9 +218,10 @@ docs/notes/2026-10/…md      commits: [155b5c4, 2c0e1a9]
 Two people run the kit on their own machines and merge. These formats keep their additions on different lines, so git merges them cleanly most of the time; `/crav1-finalize-commit` resolves the rest by rule. The full rules are in `crav1-add-to-spec` `references/merge-safe.md`.
 
 - **`Synced at`:** one line per repo and branch. In `spec.md`: `Synced at: <repo> <branch>@<short sha>, <date>`. In `docs/system/repos.md`: a `## Synced at` section after the table, `- <repo> <branch>@<short sha>, <date>`; the table has no `Synced at` column. A read replaces only its own line.
+- **Match `Branch:` (1.86.0):** one line per branch, `- Branch: [<repo> ]<branch>` plus its markers; never `; `-joined.
 - **Open questions:** `- ` bullets found by their words. `Q#` is shown, never written.
-- **Sorted place:** a new `Synced at` line (by repo, then branch), open question (by its words), `**New:**` line (by date, then text) or glossary row (by term) goes before the first existing one that sorts after it. Existing lines are never reordered. Appending always hits the same spot, the end, so two people's additions collide there; sorted places almost never coincide.
-- **Migration:** a project made before 1.84.0 runs `/crav1-add-to-spec migrate formats` once after updating. It rewrites every `spec.md` and `repos.md` at once, keeps every line, checks nothing was lost before it writes, and a second run changes nothing.
+- **Sorted place:** a new `Synced at` or Match `Branch:` line (by repo, then branch), open question (by its words), `**New:**` line (by date, then text) or glossary row (by term) goes before the first existing one that sorts after it. Existing lines are never reordered. Appending always hits the same spot, the end, so two people's additions collide there; sorted places almost never coincide.
+- **Migration:** a project made before 1.84.0 runs `/crav1-add-to-spec migrate formats` once after updating, and again after 1.86.0 to split `; `-joined `Branch:` lists. It rewrites every `spec.md` and `repos.md` at once, keeps every line, checks nothing was lost before it writes, and a second run changes nothing.
 
 ## Work item homes
 
@@ -264,9 +266,9 @@ Every mark and line format the kit writes inside product files, generated from [
 | Merged | `Merged: <YYYY-MM-DD> into <target slug>, <reason>` | `docs/specs/retired/<slug>/spec.md` (first line) | `/crav1-retire-spec` | — | 1.60.0 |
 | Synced at (slice line) | `Synced at: <repo> <branch>@<short sha>, <date>[ (dropped)]` | `docs/specs/<slug>/spec.md` (after the title, before the first heading) | `/crav1-add-to-spec`, `/crav1-bundle-to-specs`, `crav1-bundle-slice-agent`, `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-refresh-system-notes` | `/crav1-plan-from-spec`, `/crav1-tighten-spec`, `/crav1-help`, `/crav1-verify-build-against-spec`, `/crav1-tasks-ready-to-build`, `/crav1-open-pr`, `/crav1-merge-pr`, `/crav1-review-pr` | 1.29.0 |
 | Match status | `- Status: <done \| partial \| not in the code>` | `docs/specs/<slug>/spec.md` (under ## Match) | `/crav1-existing-to-specs`, `/crav1-add-to-spec` | `/crav1-plan-from-spec`, `/crav1-tighten-spec`, `/crav1-explain-existing-system` | 1.0.0 |
-| Branch | `[- ]Branch: [<repo> ]<branch>[ (into <branch>)\| (spec branch)][; [<repo> ]<branch>[ (into <branch>)\| (spec branch)]]` | `docs/specs/<slug>/spec.md` (under ## Match, or after the title) | `/crav1-tighten-spec`, `/crav1-add-to-spec` | `/crav1-tighten-spec`, `/crav1-plan-from-spec`, `/crav1-open-pr`, `/crav1-help`, `/crav1-verify-build-against-spec`, `/crav1-tasks-ready-to-build`, `/crav1-merge-pr`, `/crav1-review-pr` | 1.32.0 |
-| (spec branch) | `[<repo> ]<branch> (spec branch)` | `docs/specs/<slug>/spec.md` (end of a Match Branch: entry) | `/crav1-add-to-spec`, `/crav1-tighten-spec`, `/crav1-open-pr` | `/crav1-create-feature-branch`, `/crav1-plan-from-spec`, `/crav1-help` | 1.68.0 |
-| (into …) | `[<repo> ]<branch> (into <branch>)` | `docs/specs/<slug>/spec.md` (end of a Match Branch: entry) | `/crav1-add-to-spec`, `/crav1-tighten-spec`, `/crav1-open-pr`, `/crav1-create-feature-branch`, `/crav1-build-tasks` | `/crav1-open-pr`, `/crav1-help`, `/crav1-verify-build-against-spec`, `/crav1-tasks-ready-to-build`, `/crav1-merge-pr` | 1.68.0 |
+| Branch | `[- ]Branch: [<repo> ]<branch>[ (into <branch>)\| (spec branch)][ (PR <n>)]` | `docs/specs/<slug>/spec.md` (under ## Match, or after the title) | `/crav1-tighten-spec`, `/crav1-add-to-spec` | `/crav1-tighten-spec`, `/crav1-plan-from-spec`, `/crav1-open-pr`, `/crav1-help`, `/crav1-verify-build-against-spec`, `/crav1-tasks-ready-to-build`, `/crav1-merge-pr`, `/crav1-review-pr` | 1.32.0 |
+| (spec branch) | `[<repo> ]<branch> (spec branch)` | `docs/specs/<slug>/spec.md` (end of a Match Branch: line) | `/crav1-add-to-spec`, `/crav1-tighten-spec`, `/crav1-open-pr` | `/crav1-create-feature-branch`, `/crav1-plan-from-spec`, `/crav1-help` | 1.68.0 |
+| (into …) | `[<repo> ]<branch> (into <branch>)` | `docs/specs/<slug>/spec.md` (end of a Match Branch: line) | `/crav1-add-to-spec`, `/crav1-tighten-spec`, `/crav1-open-pr`, `/crav1-create-feature-branch`, `/crav1-build-tasks` | `/crav1-open-pr`, `/crav1-help`, `/crav1-verify-build-against-spec`, `/crav1-tasks-ready-to-build`, `/crav1-merge-pr` | 1.68.0 |
 | (dropped) | `<branch>@<short sha>, <date> (dropped)` | `docs/specs/<slug>/spec.md` (end of a Synced at line) | `/crav1-tighten-spec` | `/crav1-help`, `/crav1-verify-build-against-spec`, `/crav1-tasks-ready-to-build`, `/crav1-plan-from-spec` | 1.64.0 |
 | New | `**New:** "<quote>"` | `docs/specs/<slug>/spec.md` | `/crav1-add-to-spec` | — | 1.0.0 |
 | Inferred | `**Inferred:** <connection the source does not state>` | `docs/specs/<slug>/spec.md` | `/crav1-add-to-spec` | — | 1.0.0 |
