@@ -1,16 +1,16 @@
 ---
 name: crav1-finalize-commit
 description: >-
-  Opens with one question: commit, or only write the message (paste-ready
-  Summary and Description, no git commit). Skips it when the message says
-  which. Replaces draft-commit-message (its rules are kept as a branch).
+  Always drafts first, then offers commit / copy / change / stop.
+  `message only` drafts with no commit (same as copy). Replaces
+  draft-commit-message (its rules are kept as a branch).
   `commit now` commits without the choice; `crav1` or `git log` sets
   the style. Finalize a commit: CRAV1 style vs git log first if needed, then draft
   the Summary and Description, then offer git commit first, then copy /
   change / stop. Wording is shown before those choices. Use when
   they want to change the message or actually create the commit, or
   /crav1-finalize-commit. Does not push. Does not commit until they pick
-  commit. Paste-only: /crav1-finalize-commit. Keeps a trailing
+  commit. Paste-only: `message only`. Keeps a trailing
   work-item mention through the HEAD check and the strip of any trailer
   it did not write. After the commit it fetches; when behind it pulls
   with a merge and fixes kit-file conflicts so no line is lost; `pull`
@@ -22,15 +22,9 @@ color: green
 
 # Finalize commit
 
-## Opening question (1.56.0)
+## No opening question (1.83.0)
 
-This skill now also replaces `/crav1-draft-commit-message`. Its rules are kept, unchanged, as a branch. Ask one question, with the questions tool when it is available:
-
-1. **Commit.** Draft, show, then offer git commit. Follow the rest of this file.
-2. **Only write the message.** A paste-ready Summary and Description, no git commit. Follow [branches/message-only/BRANCH.md](branches/message-only/BRANCH.md).
-
-Skip the question when the message says which: "commit" or "finalize" is 1; "just the message", "draft", or "paste" is 2. The style, work-item mention, and work-item offer rules in `branches/message-only/references/` apply to both choices, as they did before.
-
+Always draft first. There is no question before the wording. The draft rules are the message only branch, [branches/message-only/BRANCH.md](branches/message-only/BRANCH.md), whose style, work-item mention, and work-item offer rules apply to every run.
 
 First produce the Summary and Description. Then keep those two fields in play until they pick **commit**, **copy**, or **stop**.
 
@@ -46,7 +40,7 @@ When the message or the files make one option the better fit, list it first and 
 
 Exact words for bots and scripted runs. There are no `--flags`.
 
-- Commit or message: `commit` / `message only` / `commit now`.
+- Commit or message: `commit` / `commit now` / `message only` (draft, show, done: the same as `copy`, no git commit).
 - Style: `crav1` / `git log`.
 - Pull: `pull` (1.81.0) runs the pull path with no commit first.
 
@@ -54,7 +48,7 @@ Exact words for bots and scripted runs. There are no `--flags`.
 
 When the invocation contains one of these words (for example `/crav1-finalize-commit commit`), take that choice and do not ask. This holds for a person, a bot, or a headless run.
 
-When a choice is missing and the run is headless or started by a bot (no person in the chat to answer), do not guess. Stop and name the valid words, for example: `Missing choice. Use one of: commit, message only, commit now.`
+Headless or bot run with no choice word (no person in the chat to answer): draft, show the blocks, and end as `copy`. No git commit.
 
 ## Draft
 
