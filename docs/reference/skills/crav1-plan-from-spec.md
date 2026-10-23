@@ -14,6 +14,8 @@ File-level `plan.md` and `tasks.md`; each verify note names the checks before co
 
 1.68.0: a task may name a sub-branch of the spec branch, `(branch: feat/orders-capacity-t3)`.
 
+1.87.0: each kept-open question that does not block the demo becomes its own entry under `## Risks`, "do not implement until resolved", without asking. It picks any `Blocks: T#` itself.
+
 ## Runs when
 
 Spec is accepted. Called by the user.
@@ -28,7 +30,7 @@ Reads the accepted spec, diagrams, ADRs, exports, kept security findings already
 
 In short: `plan.md`, `tasks.md`, and matching OpenSpec export files when those already exist.
 
-Writes `plan.md` and `tasks.md`, and matching OpenSpec export files when those already exist. A built piece that already matches v0 is marked already there and gets no rebuild task. A piece the user leaves gets one line in the plan and no task. Lists stale research findings under Risks. That does not block the plan.
+Writes `plan.md` and `tasks.md`, and matching OpenSpec export files when those already exist. A built piece that already matches v0 is marked already there and gets no rebuild task. A piece the user leaves gets one line in the plan and no task. Lists each kept-open question under Risks without asking, and stale research findings under Risks. That does not block the plan.
 
 ## Does not
 
