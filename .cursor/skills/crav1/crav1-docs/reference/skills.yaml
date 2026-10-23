@@ -502,6 +502,7 @@ skills:
     it skips that read. Does not offer finish, add a test, or leave.
   - '1.64.0: reads every listed work branch without checkout; a yes on writing the branch adds to the `Branch:` list; a listed branch that is gone and not merged is offered `(dropped)` (`mark-dropped`); a deleted branch whose work is in the base shows `merged, branch deleted`.'
   - '1.68.0: reads and writes the `(spec branch)` and `(into …)` markers on the Match `Branch:` list after a yes.'
+  - '1.86.0: a yes on writing the branch adds one Match `Branch:` line in sorted place (repo, then branch); never `; `-joined.'
   use_when: The spec is still mushy
   table:
     reads: Spec, diagrams, ADRs, reviewer findings, and the committed code when the slice is partial or
@@ -700,6 +701,7 @@ skills:
   - '1.65.0: a code change can be a pull request (`code change orders-api PR 71`, or its URL). It writes or reuses the PR note (the pull request''s title and description, `kind: pull request`) and links it from the code-change note with `pr_note:`. Given a branch, it writes the PR note when a signed-in `gh` or `az` host shows exactly one pull request for that branch; otherwise it says why it wrote none.'
   - '1.67.1: a one-slice read of a work branch also adds that branch to the spec''s Match `Branch:` list (never a base branch; existing entries and markers stay).'
   - '1.68.0: a code change asks whether a branch that split off another spec branch merges into it; a yes writes `(into …)` and `(spec branch)` on the Match `Branch:` list, a headless run writes nothing and treats it as stacked. The commit list leaves out merge commits, and a spec-branch read imports only its own commits.'
+  - '1.86.0: Match `Branch:` is one line per branch, a new one in sorted place (repo, then branch); `migrate formats` splits old `; `-joined lists, markers kept.'
   use_when: New information for specs that already exist
   table:
     reads: 'A fact: That information and one `spec.md`; A dump: The dump and existing spec folders; A

@@ -124,7 +124,7 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 
 **Nothing-lost check.** `/crav1-finalize-commit` (1.81.0) checks a merge against both of its parents: every line either side added to a spec, a system file or a note must still be there. Line endings are ignored. A rebuilt note index and a `Synced at` line replaced by a newer one for the same branch do not count as lost. The pull path runs the check before it commits the merge; an unpushed merge made outside the kit is checked after a commit or on `pull`.
 
-**Merge-safe formats.** The 1.84.0 rules that keep two people's kit runs from conflicting: one `Synced at` line per repo and branch, open questions found by their words, and new `**New:**` lines, open questions and glossary rows put in **sorted place** (before the first existing one that sorts after them) instead of at the end. Projects made before 1.84.0 run `/crav1-add-to-spec migrate formats` once. See [Data layout](data-layout.md#merge-safe-formats-1840).
+**Merge-safe formats.** The 1.84.0 rules that keep two people's kit runs from conflicting: one `Synced at` line per repo and branch, one Match `Branch:` line per branch (1.86.0), open questions found by their words, and new `**New:**` lines, open questions and glossary rows put in **sorted place** (before the first existing one that sorts after them) instead of at the end. Projects made before 1.84.0 run `/crav1-add-to-spec migrate formats` once. See [Data layout](data-layout.md#merge-safe-formats-1840).
 
 **Dropped.** A `(dropped)` at the end of a `Synced at` line: the branch is gone, was never merged, and was given up after a yes in `/crav1-tighten-spec`. A gone branch whose work is in the base counts as merged and is never offered dropped.
 
