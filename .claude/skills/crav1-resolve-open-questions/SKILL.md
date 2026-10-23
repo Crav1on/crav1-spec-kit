@@ -26,11 +26,11 @@ Read `spec.md` (`## Open questions`, `## Assumptions`, `## Constraints`, and `##
 
 ## Build the question list (no edits)
 
-Number `Q1`, `Q2`, … in document order.
+Number `Q1`, `Q2`, … in document order, for display only (1.84.0): never write a `Q#` into a file. A `Q#: letter` answer maps to the question shown with that number, and the patch finds that question in `spec.md` by its words, as `crav1-add-to-spec` `references/merge-safe.md` says.
 
 Include:
 
-1. Every bullet (or numbered item) under **Open questions**
+1. Every bullet under **Open questions** (an older numbered item counts too)
 2. Assumptions still marked unresolved (A1, A2, …) if they are not already duplicated as an open question
 
 Skip empty placeholders. Do not invent new questions. If the list is empty, say so and point to Plan Mode (`Shift+Tab`) with `spec.md` attached — not to this skill.

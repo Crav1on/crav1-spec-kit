@@ -38,7 +38,7 @@ Edit `docs/specs/<slug>/spec.md` in this step. An imported source also writes `d
 
 Labels, in the section the words belong to:
 
-- `**New:** "…"` — their words, added this pass.
+- `**New:** "…"` — their words, added this pass, in sorted place among the `**New:**` lines there (1.84.0, `references/merge-safe.md`).
 - `**Already there:**` — do not paste a second copy. Leave the existing sentence. Say in the report which heading already had it.
 - `**Inferred:**` — a connection you drew. Not an accepted fact.
 
@@ -78,7 +78,7 @@ Report:
   2. **Leave the other files alone**
 - List each proposed edit in one line: the file, and what would change. One line per file change. No surrounding rewrite.
 
-Do not silently rewrite `docs/system/` or other specs. Apply those edits only if they pick apply, and only the lines you listed. If they pick leave, do not edit those files. A listed edit to a `repos.md` row keeps the `Synced at` cell. Do not set it and do not clear it. This command does not record the commit.
+Do not silently rewrite `docs/system/` or other specs. Apply those edits only if they pick apply, and only the lines you listed. If they pick leave, do not edit those files. A listed edit to a `repos.md` row keeps the `Synced at` line in `repos.md`. Do not set it and do not clear it. This command does not record the commit.
 
 ## Stop
 

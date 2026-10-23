@@ -6,7 +6,7 @@ An open question on a spec can be asked of someone outside the kit, by mail, in 
 
 ## Where the records live
 
-An open question is a bullet, or a numbered item, under `## Open questions` in `docs/specs/<slug>/spec.md`. Its records are indented lines under that bullet. The question text is not rewritten. The spec is where the kit keeps which question came from which spec. A drafted mail, agenda, or chat never shows that.
+An open question is a `- ` bullet under `## Open questions` in `docs/specs/<slug>/spec.md` (an older numbered item still counts until the migration makes it a bullet). The kit finds a question by its words; `Q#` is a display number only, never written. A new question goes in sorted place, not at the end, as [merge-safe.md](merge-safe.md) says (1.84.0). Its records are indented lines under that bullet. The question text is not rewritten. The spec is where the kit keeps which question came from which spec. A drafted mail, agenda, or chat never shows that.
 
 ```text
 - <the open question, as the spec already has it>

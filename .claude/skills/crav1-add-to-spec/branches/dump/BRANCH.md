@@ -79,7 +79,7 @@ For each of those files:
 
 Labels, in the section the words belong to:
 
-- `**New:** "…"` — their words, added this pass.
+- `**New:** "…"` — their words, added this pass, in sorted place among the `**New:**` lines there (1.84.0, `references/merge-safe.md`).
 - `**Already there:**` — do not paste a second copy. Leave the existing sentence. The **already** pile is the report, not a second paste.
 - `**Inferred:**` — a connection you drew. Not an accepted fact.
 
@@ -117,7 +117,7 @@ Report:
   2. **Leave the other files alone**
 - List each proposed edit in one line: the file, and what would change. One line per file change. No surrounding rewrite.
 
-Do not silently rewrite `docs/system/` or specs the sort did not already write. The glossary write above is one exception: a missing file, or new rows appended to an existing file. The picture update is the other: new lines on the short description, the diagram, and how the parts connect. Apply the other edits only if they pick apply, and only the lines you listed. If they pick leave, do not edit those files. Do not rewrite existing glossary rows or existing picture lines either way. Do not list the picture lines again as an apply option. A listed edit to a `repos.md` row keeps the `Synced at` cell. Do not set it and do not clear it. This command does not record the commit.
+Do not silently rewrite `docs/system/` or specs the sort did not already write. The glossary write above is one exception: a missing file, or new rows appended to an existing file. The picture update is the other: new lines on the short description, the diagram, and how the parts connect. Apply the other edits only if they pick apply, and only the lines you listed. If they pick leave, do not edit those files. Do not rewrite existing glossary rows or existing picture lines either way. Do not list the picture lines again as an apply option. A listed edit to a `repos.md` row keeps the `Synced at` line in `repos.md`. Do not set it and do not clear it. This command does not record the commit.
 
 ## Stop
 
