@@ -2,6 +2,18 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.85.0 (2026-10-23)
+
+`/crav1-refresh-system-notes`: slimmer, rare cases in `references/`, no flat-notes nag.
+
+### Kit
+
+- **Removed:** the **Notes month folders** section. The command no longer looks for notes flat in `docs/notes/` or names `notes_index.py migrate-dry-run` / `migrate`. Old flat notes are still read; the move stays available by hand (`notes_index.py` is unchanged, it also builds the indexes).
+- **Moved:** **Pointed at a research note** to `references/research-note.md` and **From /crav1-read-environment** to `references/handoff-read-environment.md`, with short pointers. Same rules.
+- **Changed:** `Synced at` is said once and points at `crav1-add-to-spec` `references/merge-safe.md` for format and sorted place; one example; `Do not commit` only in **Stop**.
+- **Docs:** walkthrough, skills reference, data layout and add-to-spec notes reference no longer say the refresh names the migration.
+- **Words read:** refresh-system-notes `SKILL.md` 1,749 to 1,120.
+
 ## 1.84.0 (2026-10-23)
 
 Merge-safe formats, so two people's kit runs rarely conflict. **After updating, run `/crav1-add-to-spec migrate formats` once in each product repo** (or `python3 <skills>/crav1-add-to-spec/scripts/merge_safe_migrate.py --dry-run`, then without `--dry-run`). See [install.md](docs/install.md#keeping-the-kit-updated).
