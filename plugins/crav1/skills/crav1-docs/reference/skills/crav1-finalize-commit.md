@@ -14,6 +14,8 @@ Only write the message (was `/crav1-draft-commit-message`): Paste-ready Summary/
 
 Commit (was [`/crav1-finalize-commit`](crav1-finalize-commit.md)): Same draft, then **commit first**, then copy for your git client, change (edit or rewrite), or stop (no push). Keeps that mention through the HEAD check and the attribution strip.
 
+Fetch, pull and check (1.81.0): after the commit it fetches. When the branch is behind its upstream it pulls with a merge (`git pull --no-rebase`, never a rebase) and resolves conflicts in specs, system files and notes by the kit's rules: both sides' added lines kept, ours first; the newest `Synced at` entry per branch; note indexes rebuilt with `notes_index.py`. Before the merge commit it checks that no line either side added is missing. One question only when the two sides say different things about the same fact: keep both (a `**Conflict:**` line), mine, theirs, or stop. Code file conflicts stay with you. When not behind, it checks any unpushed merge, including one made by hand, and offers to restore dropped lines. `pull` does this with no commit first. It never pushes; it ends with `Ready to push.`
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
@@ -23,6 +25,7 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 | Commit or message | `commit` | the same as commit now (1.76.1) |
 | Commit or message | `message only` | only write the message |
 | Commit or message | `commit now` | draft, show, then commit with no choice question (never pushes) |
+| Pull | `pull` | fetch, then the pull path or the nothing-lost check, with no commit first (1.81.0) |
 | Style | `crav1` | CRAV1 style, this commit only |
 | Style | `git log` | match git log, this commit only |
 
@@ -40,7 +43,7 @@ Only write the message: Reads the staged or unstaged diff, recent `git log`, an 
 
 In short: Only write the message: A host persist rule when onward is chosen; a commit only when also asked in that turn; Commit: The persist rule when onward is chosen, and the git commit when picked.
 
-Only write the message: Writes a host persist rule only when the user chooses onward. Commit: Writes the persist rule when onward is chosen, and the git commit when the user picks commit.
+Only write the message: Writes a host persist rule only when the user chooses onward. Commit: Writes the persist rule when onward is chosen, and the git commit when the user picks commit. When behind, a merge commit from the pull path, with kit-file conflicts resolved and note indexes rebuilt (1.81.0).
 
 ## Does not
 

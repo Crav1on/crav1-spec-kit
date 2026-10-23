@@ -24,6 +24,12 @@ Commit in one go, with no questions (1.73.0):
 
 `commit now`, or just `commit` (1.76.1), drafts, shows the Summary and Description, then commits without the choice question. It never pushes. When `agent-tools/` or build output is in the file set, it warns and offers the normal choices instead. `crav1` (CRAV1 style) or `git log` (match the repo's log) answers the style question for this commit; a saved style rule still works as before.
 
+Pull and check only, with no commit (1.81.0):
+
+```text
+/crav1-finalize-commit pull
+```
+
 ## Steps
 
 | Step | You | Agent |
@@ -62,6 +68,17 @@ git switch feat/orders-retry
 git merge develop
 git push
 ```
+
+## Someone else pushed first (1.81.0)
+
+After the commit, `/crav1-finalize-commit` fetches. It never pushes; it ends with `Ready to push.`
+
+- **Behind:** it runs `git pull --no-rebase`, never a rebase. Conflicts in specs, system files and notes are resolved by the kit's rules: both sides' new lines are kept (yours first), each branch keeps its newest `Synced at` entry, and the note indexes are rebuilt rather than merged. Before the merge commit, it checks that every line either side added is still there. If one is missing, it does not commit.
+- **A real disagreement:** when both sides changed the same line in different ways, you get one question: keep both (theirs becomes a `**Conflict:**` line under yours), mine, theirs, or stop.
+- **Code files:** conflicts there stay with you, as before.
+- **Not behind:** it checks any merge you have not pushed yet, including one you resolved by hand. A merge that kept your `**New:** Retries stop after 3 attempts` line but silently dropped the other side's `**New:** Retries back off for 30 seconds` line is listed, with restore / show me / stop.
+
+`/crav1-finalize-commit pull` does the same without committing first. With uncommitted changes it stops and names `commit` instead.
 
 ## PR note (1.65.0)
 

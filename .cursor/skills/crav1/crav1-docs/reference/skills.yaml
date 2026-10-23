@@ -1107,6 +1107,10 @@ skills:
       means: "only write the message"
     - word: "commit now"
       means: "draft, show, then commit with no choice question (never pushes)"
+  - question: Pull
+    words:
+    - word: "pull"
+      means: "fetch, then the pull path or the nothing-lost check, with no commit first (1.81.0)"
   - question: Style
     words:
     - word: "crav1"
@@ -1130,6 +1134,14 @@ skills:
   - 'Commit (was `/crav1-finalize-commit`): Same draft, then **commit first**, then copy for your git
     client, change (edit or rewrite), or stop (no push). Keeps that mention through the HEAD check and the attribution
     strip.'
+  - 'Fetch, pull and check (1.81.0): after the commit it fetches. When the branch is behind its upstream
+    it pulls with a merge (`git pull --no-rebase`, never a rebase) and resolves conflicts in specs, system
+    files and notes by the kit''s rules: both sides'' added lines kept, ours first; the newest `Synced at`
+    entry per branch; note indexes rebuilt with `notes_index.py`. Before the merge commit it checks that
+    no line either side added is missing. One question only when the two sides say different things about
+    the same fact: keep both (a `**Conflict:**` line), mine, theirs, or stop. Code file conflicts stay with
+    you. When not behind, it checks any unpushed merge, including one made by hand, and offers to restore
+    dropped lines. `pull` does this with no commit first. It never pushes; it ends with `Ready to push.`'
   use_when: You want the commit message, or the commit itself
   table:
     reads: 'Only write the message: The diff, recent git log, and `work-item.md`; Commit: The same commit
@@ -1141,7 +1153,8 @@ skills:
     the slice being worked, asks when that is unclear, and still reads a single unlabeled line. Commit:
     Reads the same commit inputs through draft.'
   writes: 'Only write the message: Writes a host persist rule only when the user chooses onward. Commit:
-    Writes the persist rule when onward is chosen, and the git commit when the user picks commit.'
+    Writes the persist rule when onward is chosen, and the git commit when the user picks commit. When behind,
+    a merge commit from the pull path, with kit-file conflicts resolved and note indexes rebuilt (1.81.0).'
   leaves_alone: 'Only write the message: Leaves the git commit alone. Commit: Leaves push alone.'
   exceptions: 'Only write the message: commits only when the user also asked to commit in that turn. Commit:
     the worker commits immediately and skips the menu.'
