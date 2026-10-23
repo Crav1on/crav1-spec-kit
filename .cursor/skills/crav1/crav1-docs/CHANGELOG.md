@@ -2,6 +2,15 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.87.0 (2026-10-23)
+
+`/crav1-plan-from-spec`: kept-open questions become Risk entries without asking.
+
+### Kit
+
+- **Changed (plan-from-spec):** each kept-open question that does not block a first demo becomes its own entry under `## Risks` in `plan.md`, with "do not implement until resolved". The skill does not ask whether to park, keep, or answer it, and does not answer it silently; answering stays with `/crav1-resolve-open-questions`. It picks any `Blocks: T#` lines itself. The recap lists each parked question.
+- **Docs:** skills reference and the spec-to-plan walkthrough say so.
+
 ## 1.86.5 (2026-10-23)
 
 `/crav1-what-do-we-know-about-this` and `/crav1-map-pipeline-environments`: SKILL.md slimmed with pure moves. No rule changed.
