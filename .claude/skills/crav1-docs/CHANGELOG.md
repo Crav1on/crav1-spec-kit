@@ -2,6 +2,16 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.86.5 (2026-10-23)
+
+`/crav1-what-do-we-know-about-this` and `/crav1-map-pipeline-environments`: SKILL.md slimmed with pure moves. No rule changed.
+
+### Kit
+
+- **Moved (what-do-we-know-about-this):** the answer sections (Verdict through Source, **Unexplained**, the guess label, the open-question `Next:` line, the Skip line) to `references/answer.md`, word for word; the five live-read pointers are one list.
+- **Moved (map-pipeline-environments):** the start questions to `references/start.md` and the per-section question options to `references/sections.md`, word for word.
+- **Words read:** what-do-we-know-about-this `SKILL.md` 1,895 to 1,426; map-pipeline-environments `SKILL.md` 1,851 to 1,452.
+
 ## 1.86.4 (2026-10-23)
 
 `/crav1-plan-from-spec`: SKILL.md slimmed with a pure move and dedupes. No rule changed.
