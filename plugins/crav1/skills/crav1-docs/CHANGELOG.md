@@ -2,6 +2,20 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.81.0 (2026-10-23)
+
+`/crav1-finalize-commit`: fetch after the commit, pull with a merge when behind, and never lose a line in a merge.
+
+### Kit
+
+- **Fetch after the commit.** When the branch is behind its upstream, the pull path runs `git pull --no-rebase` (never a rebase). Conflicts in specs, `docs/system/*.md` and notes are resolved by rule: both sides' added lines kept, ours first; one `Synced at` entry per branch, the newest; note indexes rebuilt with `notes_index.py`, never merged. Code file conflicts stay with the user.
+- **Nothing-lost check.** Before the merge commit, every line either side added (against the merge base, CR at line ends ignored) must still be there, or nothing is committed. When not behind, the same check runs on every unpushed merge, so a merge resolved by hand that dropped one side's lines is listed, with restore / show me / stop. Never amends or rewrites the merge.
+- **One question, only for a real disagreement:** keep both (a `**Conflict:**` line) / mine / theirs / stop. A headless run writes the `**Conflict:**` line.
+- **`pull`.** `/crav1-finalize-commit pull` runs the pull path with no commit first; with uncommitted changes it stops and names `commit`.
+- **Never pushes.** Ends with `Ready to push.`
+- New `crav1-finalize-commit/pull.md` at the skill root (no new folder), read after a commit and on `pull`.
+- **Words read:** finalize-commit `SKILL.md` 1,815 to 1,901 (+86); `pull.md` 489, read after a commit and on `pull`.
+
 ## 1.80.2 (2026-10-22)
 
 `/crav1-review-pr`: a slimmer `SKILL.md`. Rare cases moved word for word into `references/`; no rule changed.
