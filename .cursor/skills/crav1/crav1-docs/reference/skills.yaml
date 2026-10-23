@@ -836,6 +836,7 @@ skills:
     matches v0 is not a choice.
   - '1.64.0: Built pieces reads every work branch of the spec without checkout (and `../<repo>` for another repo), labels pieces `only on <branch>, not merged`, and ends a task with `(branch: …)` when its piece lives on one branch.'
   - '1.68.0: a task may name a sub-branch of the spec branch, `(branch: feat/orders-capacity-t3)`.'
+  - '1.87.0: each kept-open question that does not block the demo becomes its own entry under `## Risks`, "do not implement until resolved", without asking. It picks any `Blocks: T#` itself.'
   use_when: Spec is accepted
   table:
     reads: Spec, diagrams, ADRs; the named repo and branch when the slice is partial
@@ -845,8 +846,8 @@ skills:
     any task is written.
   writes: Writes `plan.md` and `tasks.md`, and matching OpenSpec export files when those already exist.
     A built piece that already matches v0 is marked already there and gets no rebuild task. A piece the
-    user leaves gets one line in the plan and no task. Lists stale research findings under Risks. That
-    does not block the plan.
+    user leaves gets one line in the plan and no task. Lists each kept-open question under Risks without
+    asking, and stale research findings under Risks. That does not block the plan.
   leaves_alone: Leaves `spec.md`, application code, and any linter install alone.
   exceptions: when `## Linter` says this repo has no linter for the code the tasks will touch, it stops
     before Build until the user chooses. A line under `## Dismissed test suggestions` is not a task. A
