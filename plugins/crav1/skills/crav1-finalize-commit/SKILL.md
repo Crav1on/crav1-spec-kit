@@ -32,13 +32,11 @@ This skill now also replaces `/crav1-draft-commit-message`. Its rules are kept, 
 Skip the question when the message says which: "commit" or "finalize" is 1; "just the message", "draft", or "paste" is 2. The style, work-item mention, and work-item offer rules in `branches/message-only/references/` apply to both choices, as they did before.
 
 
-You wrap **`crav1-finalize-commit`**. First produce the same Summary and Description. Then keep those two fields in play until they pick **commit**, **copy**, or **stop**.
+First produce the Summary and Description. Then keep those two fields in play until they pick **commit**, **copy**, or **stop**.
 
 Command: `/crav1-finalize-commit`.
 
 Order: (1) style menu if no persist rule, (2) generate and show Summary/Description, (3) then the choices with **`commit` first** (top of the questions tool), then copy / change / stop.
-
-Paste-only (no commit/copy/change choices): tell them `/crav1-finalize-commit` instead, or they can pick `copy` here.
 
 At most 4 options per question; a fifth goes under Other.
 
@@ -58,9 +56,9 @@ When the invocation contains one of these words (for example `/crav1-finalize-co
 
 When a choice is missing and the run is headless or started by a bot (no person in the chat to answer), do not guess. Stop and name the valid words, for example: `Missing choice. Use one of: commit, message only, commit now.`
 
-## Draft (same as the other skill)
+## Draft
 
-Follow skill **`crav1-finalize-commit`** in full for the first draft (drop-in: `.cursor/skills/crav1/crav1-finalize-commit/branches/message-only/BRANCH.md`; plugin: sibling `skills/crav1-finalize-commit/branches/message-only/BRANCH.md`):
+Follow [branches/message-only/BRANCH.md](branches/message-only/BRANCH.md) for the first draft:
 
 - Style menu or persist rule (`once` / `onward` / `log-once` / `log-onward`)
 - Inspect staged first, else unstaged
