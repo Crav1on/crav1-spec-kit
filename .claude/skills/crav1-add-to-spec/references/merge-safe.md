@@ -1,6 +1,6 @@
-# Merge-safe formats (1.84.0)
+# Merge-safe formats (1.84.0, Branch lines 1.86.0)
 
-Two people run the kit on their own machines and merge. These formats keep their additions on different lines, so git merges them without a conflict most of the time. Every skill that writes a `Synced at` stamp, an open question, a `**New:**` line or a glossary row follows this file. `/crav1-finalize-commit` `references/pull.md` resolves what still conflicts.
+Two people run the kit on their own machines and merge. These formats keep their additions on different lines, so git merges them without a conflict most of the time. Every skill that writes a `Synced at` stamp, a Match `Branch:` line, an open question, a `**New:**` line or a glossary row follows this file. `/crav1-finalize-commit` `references/pull.md` resolves what still conflicts.
 
 ## Synced at: one line per repo and branch
 
@@ -9,6 +9,12 @@ Two people run the kit on their own machines and merge. These formats keep their
 - A new read of a repo and branch replaces only that line. A new repo or branch adds a line in sorted place: by repo, then by branch (plain text order). Never touch another line.
 - The short sha is seven characters, the commit the read ended at. The date is the read date, `YYYY-MM-DD`.
 - A consumer measuring drift takes, for each repo and branch, the older of the repo line and the slice line. No line means unknown: fall back to spec file commit dates.
+
+## Match Branch: one line per branch (1.86.0)
+
+- Under `## Match`, one line per branch: `- Branch: [<repo> ]<branch>[ (into <branch>)| (spec branch)][ (PR <n>)]`. Example: `- Branch: orders-api feat/orders-capacity (spec branch)` on one line and `- Branch: orders-api feat/orders-capacity-t3 (into feat/orders-capacity)` on the next. Never `; `-joined. A spec with no `## Match` may hold the same lines without `- ` after the title.
+- A new branch adds a line in sorted place among the `Branch:` lines: by repo, then by branch (plain text order, case ignored; a line with no repo sorts as an empty repo). Markers are not part of the sort.
+- A marker for a listed branch (`(into …)`, `(spec branch)`, `(PR <n>)`) is written on that branch's own line only. Never touch another line.
 
 ## Open questions: matched by their words
 
@@ -24,8 +30,9 @@ Appending always lands at the same spot, the end, so two people's additions coll
 - **`**New:**` lines** in a section: before the first existing `**New:**` line in that run of lines that sorts after the new one, by its date (the first `YYYY-MM-DD` in the line; no date sorts last), then by text. Else after the last one. A `Full source:` line and other lines that belong to it move with it.
 - **Glossary rows**: before the first existing row whose term sorts after the new term (case ignored). Else at the end of the table.
 - **Synced at lines**: by repo, then branch, as above.
+- **Match `Branch:` lines**: by repo, then branch, as above.
 - **Open questions**: by their words, as above.
 
 ## Migration
 
-A project made before 1.84.0 runs `/crav1-add-to-spec migrate formats` once after updating. It runs `scripts/merge_safe_migrate.py`: the dry run first, one yes, then the write. It splits `; `-separated `Synced at` lines into one line each, moves the repos table's `Synced at` column into the `## Synced at` section, and turns numbered or `Q<n>`-prefixed open questions into plain bullets. It keeps every line and every entry, checks that nothing was lost before it writes, and a second run changes nothing. It does not commit.
+A project made before 1.84.0 runs `/crav1-add-to-spec migrate formats` once after updating. It runs `scripts/merge_safe_migrate.py`: the dry run first, one yes, then the write. It splits `; `-separated `Synced at` lines into one line each, moves the repos table's `Synced at` column into the `## Synced at` section, turns numbered or `Q<n>`-prefixed open questions into plain bullets, and (1.86.0) splits `; `-joined Match `Branch:` lists into one line per branch, markers kept. A project already on 1.84.0 runs it again after 1.86.0. It keeps every line and every entry, checks that nothing was lost before it writes, and a second run changes nothing. It does not commit.

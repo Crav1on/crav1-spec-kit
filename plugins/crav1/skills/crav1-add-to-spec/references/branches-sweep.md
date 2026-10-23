@@ -25,7 +25,7 @@ One question:
 
 ## Import
 
-For each chosen branch, run the branch import of `branches/code-change/BRANCH.md`: diff from its parent, overlap, PR note lookup, `Synced at`, the `Branch:` list. A commit shared by two branches is imported once, with the first branch; the other says `<n> commits already in <note>`. Show all sorts in one batch with one confirmation at the end, plus that batch's into and Merges into questions.
+For each chosen branch, run the branch import of `branches/code-change/BRANCH.md`: diff from its parent, overlap, PR note lookup, `Synced at`, the `Branch:` lines (one per branch, sorted place, 1.86.0). A commit shared by two branches is imported once, with the first branch; the other says `<n> commits already in <note>`. Show all sorts in one batch with one confirmation at the end, plus that batch's into and Merges into questions.
 
 ## Report
 

@@ -33,7 +33,7 @@ Exact words for bots and scripted runs. There are no `--flags`.
 
 - What you have: `fact` / `dump` / `code change` / `meeting` / `mail` / `chat`.
 - Code change, every open branch: `branches` (`branches all`, `branches skip stale`); read `references/branches-sweep.md`.
-- Once after updating to 1.84.0: `migrate formats`; see **Merge-safe formats** below.
+- Once after updating to 1.84.0 or 1.86.0: `migrate formats`; see **Merge-safe formats** below.
 - After a PR: `all`. A PR ref alone (`pr71`, `#71`, as `references/scope.md` parses) means `code change`; `pr71 all` adds description and comments per `references/pr-comments.md`.
 
 `mail` and `chat` run the dump branch. "This mail", "this email" or "this chat" picks that word.
