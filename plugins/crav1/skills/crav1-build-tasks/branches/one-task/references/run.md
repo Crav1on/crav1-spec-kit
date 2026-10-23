@@ -19,7 +19,7 @@ The parent already switched to the task's `(branch: …)` when it has one and pa
 After a step that may have changed files:
 
 1. If the tree is clean, skip. Say skipped.
-2. Follow `crav1-finalize-commit` **draft** (persist rule) and its **commit** + **Cursor attribution** sections.
+2. Follow `crav1-finalize-commit` **draft** (persist rule), its **commit** steps and its `references/attribution.md`.
 3. Show Summary/Description, then **`commit` immediately**. No copy / change / stop menu. When the Description ends with a blank line and a work-item mention (`#<id>` or `AB#<id>`), that line is part of the message. Commit it. Keep it when you compare HEAD and when you amend away Cursor attribution. A missing `work-item.md` does not fail this worker.
 4. Do not push.
 

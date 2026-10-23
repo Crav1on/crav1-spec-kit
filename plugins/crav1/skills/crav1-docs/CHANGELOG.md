@@ -2,6 +2,18 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.81.2 (2026-10-23)
+
+`/crav1-finalize-commit`: SKILL.md slimmed with moves and dedupes only. No rule changed.
+
+### Kit
+
+- **Moved:** `## Cursor attribution` to `references/attribution.md` and `## When they pick change` to `references/change.md`, word for word. SKILL.md keeps a short pointer for each and the attribution hard rule.
+- **Deduped:** never push now sits in step 5a and the hard rules only (the hard rules also name never rebase); the choices-after-wording rule is stated once plus the hard rules; the push/PR sentence that repeated step 7 is gone; the duplicate plugin-path parentheticals are gone. Commit steps renumbered (pull check is 5a, attribution is 6).
+- **Fixed:** leftover 1.56 wording (the self-wrapping line, the paste-only self-reference); the draft step links `branches/message-only/BRANCH.md` directly.
+- **Pointer:** `crav1-build-tasks` one-task `run.md` now names `references/attribution.md`.
+- **Words read:** finalize-commit `SKILL.md` 1,901 to 1,485; new `references/attribution.md` 250 and `references/change.md` 150, read only on that path.
+
 ## 1.81.1 (2026-10-23)
 
 `/crav1-finalize-commit`: `pull.md` moved into `references/`. Pure move; no rule changed.
