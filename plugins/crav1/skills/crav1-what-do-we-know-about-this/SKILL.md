@@ -87,25 +87,13 @@ Build the repo answer first. Then run the live reads. The chat answer waits unti
 
 Two live reads. Both are read-only. Tag each fact `Live read.`
 
-### Finding `az`
+Read `references/live-reads.md`, only the section you need:
 
-Read `references/live-reads.md` ("Finding `az`") only when a live read is needed.
-
-### Azure resource settings and recent changes
-
-Read `references/live-reads.md` ("Azure resource settings and recent changes") only when the question needs live Azure resource settings or recent changes.
-
-### Production
-
-Read `references/live-reads.md` ("Production") only when the question touches production.
-
-### Azure DevOps
-
-Read `references/live-reads.md` ("Azure DevOps") only when the question needs Azure DevOps (boards, pipelines, repos).
-
-### When a live read fails
-
-Read `references/live-reads.md` ("When a live read fails") only when a live read fails.
+- "Finding `az`": when a live read is needed.
+- "Azure resource settings and recent changes": when the question needs live Azure resource settings or recent changes.
+- "Production": when the question touches production.
+- "Azure DevOps": when the question needs Azure DevOps (boards, pipelines, repos).
+- "When a live read fails": when a live read fails.
 
 ## Focus
 
@@ -120,26 +108,7 @@ A section outside the focus is left out. An empty section is still left out. Do 
 
 The chat answer follows this skill’s `assets/answer.md` (drop-in: `.cursor/skills/crav1/crav1-what-do-we-know-about-this/assets/answer.md`; plugin: this skill’s `assets/answer.md`). Do not print a placeholder. Do not write the file into the project. Leave out a heading that has nothing under it. **Tracked elsewhere** stays when a live read ran, and `none` is a real line. A guess ends with `(inference, not in the docs)`.
 
-1. **Verdict** — one line. Example shape: finished code that is switched off, and the open item is a decision.
-2. **What it is** and **Why it's in this state** — two short paragraphs. Use the words the docs already use.
-3. **The decision** — when one is still open. Name where it is open (the file, the heading, or the question). Each option the docs already list gets one line for and one line against, then its own checkbox task list. Do not invent an option. When the options are not written, say that, and do not invent the lists.
-4. **Either way** — tasks that apply whatever is decided. An `Ask <person>: …` line uses a person, or a role, the docs already name, plus the file and heading. Do not guess a person. Do not turn a role into a name. When a slice exists and this section is shown, the last task updates that slice’s `spec.md`. Those checkboxes stay in the chat. This command does not edit `tasks.md` or `spec.md`.
-5. **Do not touch** — guardrails the docs already state. Each one has the date that note or ADR gives. When the note has no date, say the date is not written. Do not invent a date.
-6. **Seen only live** — a setting or a change that no doc mentions. Each line says `Live read.` A fact the docs already state stays out of this section.
-7. **Research marked stale** — a `Stale since` line under `## Research findings`, or a stale block on a note that section links to. Quote the mark. Name the path. This is not **Stale notes**. Do not clear the mark.
-8. **Stale notes** — an older note that disagrees with a later note, or with a live read. Say which note is wrong and what to trust instead. A short note is not stale. A research mark is not this section.
-9. **Tracked elsewhere** — work items, open pull requests, and branches. When the live read ran, this section stays, and `none` is a real line. Each line says `Live read.` When the user picked Skip, leave this section out.
-10. **Source** — existing slice, found slice, or no slice (candidate). Then the files and the reads used.
-
-**Unexplained** is for a code-only hit with no spec and no architecture note. What the code shows goes there. What the code does not say stays unexplained. Leave that heading out on every other case.
-
-A line that is a guess ends with `(inference, not in the docs)`. A fact the file or the live read shows does not get that label.
-
-Case 3 names the next command in **Source**. It does not run it.
-
-A gap matching an open question (1.78.0): end `Next: /crav1-show-or-ask-open-questions ask research <its words>`, plus spec if ambiguous.
-
-When the user picked Skip, **Source** includes one line: the live checks did not run, and why.
+Read `references/answer.md` ("Answer sections") when you write the answer: what each section holds (Verdict through Source, and **Unexplained**), the guess label, the open-question `Next:` line, and the Skip line in **Source**. Case 3 names the next command in **Source**. It does not run it.
 
 ## Stop
 
