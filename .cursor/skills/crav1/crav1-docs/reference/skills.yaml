@@ -1647,7 +1647,7 @@ skills:
     each listed point and clears, narrows, or routes it. An older mark with no point lines is split into
     the hits it was made from. It also routes the note''s own open questions when the answer lies outside
     the note''s owner, including when the mark clears. It does not ask the user.'
-  leaves_alone: Leaves existing picture lines, glossary rows, design, and build alone.
+  leaves_alone: Leaves existing picture lines, glossary rows, design, build, and the `docs/notes/` layout alone (1.85.0, no flat-notes migration prompt).
   exceptions: spark, ideas, intake, match, match-dump, and add-to-spec run this picture update on
     the pass that appends a glossary row. Existing-to-specs updates the picture in its own pass. Build-features,
     fix-bug, fix-build-gaps, read-environment, and the add-to-spec handoffs from read-environment and suggest-tests-for-code

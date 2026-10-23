@@ -30,7 +30,7 @@ Writes new lines on the short description, the context diagram, and how the part
 
 ## Does not
 
-Leaves existing picture lines, glossary rows, design, and build alone.
+Leaves existing picture lines, glossary rows, design, build, and the `docs/notes/` layout alone (1.85.0, no flat-notes migration prompt).
 
 Limits and exceptions: spark, ideas, intake, match, match-dump, and add-to-spec run this picture update on the pass that appends a glossary row. Existing-to-specs updates the picture in its own pass. Build-features, fix-bug, fix-build-gaps, read-environment, and the add-to-spec handoffs from read-environment and suggest-tests-for-code may ask and do not run this command. Build-tasks and build-tasks do not ask. It does not commit a cleared research mark.
 
