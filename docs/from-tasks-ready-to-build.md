@@ -2,7 +2,7 @@
 
 Kit not in this project yet? [Install first](install.md) (Cursor and Claude Code; the slash commands match, the files do not).
 
-Use this when you want to know which tasks can be built now, and why the others cannot. It reads your spec folders and writes nothing. Run it any time: before Build, between tasks, or after new information changed a spec.
+Use this when you want to know which tasks can be built now, and why the others cannot. It reads your spec folders and writes nothing. Run it any time: before Build, between tasks, or after new information changed a spec. It is command-only (1.88.0): type `/crav1-tasks-ready-to-build`. Asking "which tasks are ready?" in plain words does not start it.
 
 This is cross-cutting. It is not its own lane. It was added at Rhea's request so runners can pick the next task without guessing.
 
