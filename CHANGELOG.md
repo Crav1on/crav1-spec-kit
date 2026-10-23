@@ -2,6 +2,19 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.83.0 (2026-10-23)
+
+`/crav1-finalize-commit`: no opening question. It always drafts, then offers commit / copy / change / stop.
+
+### Kit
+
+- **Removed:** the commit-or-message opening question (1.56.0). Every run drafts the Summary and Description first; the first question is the commit / copy / change / stop choice (with the style question in the same call when style is not settled).
+- **Kept:** `message only` as a choice word, now meaning draft and show with no commit, the same as `copy`. `commit` and `commit now` work as before.
+- **Changed:** a headless or bot run with no choice word drafts and ends as `copy` instead of stopping with `Missing choice`.
+- **Docs:** skills reference, workflow route 15 and `from-commit.md` (the paste-only example is `/crav1-finalize-commit message only`).
+- **Proving ground:** A13 checks that the first question is the post-draft choice and that no opening question is asked.
+- **Words read:** finalize-commit `SKILL.md` 1,499 to 1,429.
+
 ## 1.82.0 (2026-10-23)
 
 `/crav1-finalize-commit`: the committed message is exactly what the skill drafted. Any trailer or line it did not write is stripped, not only Cursor's.
