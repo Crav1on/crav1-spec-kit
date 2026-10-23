@@ -12,7 +12,9 @@ description: >-
   /crav1-finalize-commit. Does not push. Does not commit until they pick
   commit. Paste-only: /crav1-finalize-commit. Keeps a trailing
   work-item mention through the HEAD check and the strip of a host
-  attribution trailer.
+  attribution trailer. After the commit it fetches; when behind it pulls
+  with a merge and fixes kit-file conflicts so no line is lost; `pull`
+  does only that. Never pushes.
 disable-model-invocation: true
 icon: git-branch
 color: green
@@ -48,6 +50,7 @@ Exact words for bots and scripted runs. There are no `--flags`.
 
 - Commit or message: `commit` / `message only` / `commit now`.
 - Style: `crav1` / `git log`.
+- Pull: `pull` (1.81.0) runs the pull path with no commit first.
 
 `commit now`, and `commit` typed in the invocation (1.76.1): draft, show the paste blocks, then commit with no choice question. Never push. When `agent-tools/` or build output is in the file set, warn and offer the normal choices instead.
 
@@ -112,6 +115,7 @@ Do not invent extra options (push, amend, commit subsets they did not name). If 
 4. Do **not** push.
 5. Read `git log -1 --format=%B`. Compare to the drafted Summary + Description. The mention, when the draft has one, is the last line of that Description. A last line of `#<id>` or `AB#<id>` is the work-item mention, not Cursor attribution.
 6. Show the new hash, subject, and `git status` short result.
+6a. **Fetch and check (1.81.0).** Fetch. When behind the upstream, pull with a merge and resolve kit-file conflicts by the kit's rules; otherwise check any unpushed merge for lines either side added that the merge dropped. Read [pull.md](pull.md) for both. Never push; end with `Ready to push.`
 7. If the body has extra **Cursor attribution** (`Co-authored-by: Cursor`, `cursoragent@cursor.com`, `Made-with: Cursor`) that was **not** in the draft: this is Cursor’s commit-attribution setting (or a cloud agent), **not** this skill and usually **not** a repo hook. Follow **Cursor attribution** below.
 8. After the commit message is settled (including a one-time attribution strip), one optional line and nothing more: Next (optional): `/crav1-open-pr` when you want to push and open the PR. Do not run that skill in this turn.
 9. If commit fails (hooks, empty index, identity), show the error. Keep the paste blocks, **then** offer the choices again (`commit` still first). Do not name `/crav1-open-pr` on a failed commit.
