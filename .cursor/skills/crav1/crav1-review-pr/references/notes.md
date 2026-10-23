@@ -21,7 +21,7 @@ When the review has at least one follow-up or question, write a note in `docs/no
 
 When the specs repo is not in this workspace, write the note into the specs repo found as a sibling (see [Specs repo and code repo](../SKILL.md#specs-repo-and-code-repo-1650)), never commit it, and name its full path. When no specs repo is found, write nothing and print the note in the chat with the path it would have.
 
-## PR note (1.65.0)
+## PR note
 
 Every review writes or reuses the **PR note**, whatever the follow-ups, as `crav1-add-to-spec` `references/notes.md` **PR note** says (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/references/notes.md`; plugin: sibling `skills/crav1-add-to-spec/references/notes.md`): one note per pull request, `kind: pull request`, `source: PR <n> <repo URL path>`, filed by the pull request's created date, a new `## Description as of <date>` section only when the description changed, the personal-data and secrets check, and the four image options. A pull request that `/crav1-open-pr` made gets one too. It goes in the same specs repo as the follow-ups note. Then one line: `PR note: <full path> (written | reused | updated: description changed)`.
 

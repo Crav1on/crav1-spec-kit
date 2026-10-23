@@ -2,7 +2,7 @@
 
 Read only when the pointer in `SKILL.md` sends you here. Moved word for word from `SKILL.md` in 1.71.0; the rules are unchanged.
 
-## Specs repo and code repo (1.65.0)
+## Specs repo and code repo
 
 The **code repo** is the repo the pull request is in. The **specs repo** is the checkout that has `docs/specs/`. They may be the same repo.
 
