@@ -39,20 +39,7 @@ On Windows, `git` may not be on `PATH`. Try `git`, then `C:\Program Files\Git\cm
 
 ## Base branch
 
-**Into and Merges into (1.64.0).** Before the default-branch steps below, as `crav1-add-to-spec` `references/branches.md` (drop-in: `.claude/skills/crav1-add-to-spec/references/branches.md`; plugin: sibling `skills/crav1-add-to-spec/references/branches.md`) says:
-
-1. **Into.** When the head is listed in a spec's Match `Branch:` list with an `(into <branch>)` marker, that branch is the base. When the head has no marker and its fork point (as `crav1-add-to-spec` `references/branches.md` (drop-in: `.claude/skills/crav1-add-to-spec/references/branches.md`; plugin: sibling `skills/crav1-add-to-spec/references/branches.md`) says) is another spec branch, ask once before the draft (1.68.0): "<head> split off <parent>. Does it merge into <parent>?" A yes writes `(into <parent>)` on the head's entry, and `(spec branch)` on the parent's entry when it has none, in the spec repo (not committed), and the base is <parent>. A no writes nothing and goes on to step 2. A headless run doesn't ask and writes nothing. A sub-branch's PR goes into its spec branch; the spec branch's PR goes into the Merges into branch.
-2. **Merges into.** Else, when `docs/system/repos.md` has a `Merges into` cell for this repo, that branch is the base. When the open repo has no `docs/system/repos.md` row for itself (the specs live in another repo), look read-only in the sibling checkouts (`../*/docs/system/repos.md`) for one row naming this repo, and use its cell. Several rows that disagree: ask.
-3. Else the default branch, from the steps below.
-
-Name where the base came from in the draft (`Base: develop (Merges into in ../orders-specs/docs/system/repos.md)`).
-
-Default branch:
-
-1. `git symbolic-ref refs/remotes/<remote>/HEAD` (for example `origin/main` → `main`) when that ref exists.
-2. Else, when `gh auth status` succeeds and the remote is GitHub, `gh repo view --json defaultBranchRef --jq .defaultBranchRef.name`.
-3. Else the local branch `main`, else `master`, else `develop`, when exactly one of those exists.
-4. If more than one candidate remains, or none does, **ask**. Do not guess.
+The base is the head's into branch, as `crav1-add-to-spec` `references/branches.md` ("Base branch and Merges into") says (drop-in: `.claude/skills/crav1-add-to-spec/references/branches.md`; plugin: sibling `skills/crav1-add-to-spec/references/branches.md`). Read `references/base.md` ("Base branch") to resolve it: the `(into …)` ask, the `Merges into` lookup (also in sibling checkouts), and the default-branch steps. Name where the base came from in the draft.
 
 Remote: the single `git remote`. If several remotes exist, ask which one. If none exist, draft the title and body if you can, then stop. Say no remote is configured. Do not claim a push or a pull request.
 
@@ -82,25 +69,7 @@ Read `references/draft.md` ("Draft title and body") only when you draft the titl
 
 ## Host
 
-Resolve **one** create path, in this order: GitHub `gh`, then Azure DevOps `az`, then printed commands and GitKraken GUI paste. Do not claim a pull request was opened unless that path returned a URL.
-
-### GitHub (`gh`)
-
-Use `gh` only when **both** are true: `gh auth status` succeeds, and the remote URL is GitHub (`github.com`, or `gh repo view` succeeds for that repo).
-
-**Create** then uses the GitHub steps. If the remote is GitHub and `gh auth status` does not succeed, print the GitHub-shaped fallback below. Do not use `az`.
-
-### Azure DevOps (`az`)
-
-Read `references/azure-devops.md` ("Azure DevOps (`az`)") only when the remote is Azure DevOps.
-
-### Other remotes
-
-When the remote is neither GitHub nor Azure DevOps, print the GitHub-shaped fallback below. Do not claim a pull request was opened.
-
-### Fallback (no URL)
-
-Read `references/fallback.md` ("Fallback (no URL)") only when no host CLI can open the pull request.
+Read `references/host.md` to pick **one** create path: GitHub `gh`, then Azure DevOps `az`, then printed commands and GitKraken GUI paste.
 
 ## Push and open
 
@@ -112,11 +81,7 @@ Only after they pick `push` on the current draft.
 
 ## Open only
 
-Only after they pick `open` on the current draft.
-
-1. `git ls-remote --heads <remote> <head>`. If it is missing, say the remote has no such branch. Do not create a pull request. They can pick **push and open PR**.
-2. If the local head has commits that are not on that remote head, say so and **do not push**. The pull request would miss them. They can pick **push and open PR**, or stop.
-3. Open one pull request (below). If one already exists for this head → base, print that URL instead.
+Read `references/open-only.md` ("Open only") only after they pick `open` on the current draft.
 
 ## Create
 

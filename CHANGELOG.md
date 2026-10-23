@@ -2,6 +2,18 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.86.3 (2026-10-23)
+
+`/crav1-open-pr` and `/crav1-review-pr`: SKILL.md slimmed with pure moves and dedupes. No rule changed.
+
+### Kit
+
+- **Added:** shared `crav1-open-pr` `references/host.md` (GitHub `gh` and Azure DevOps `az` order and the `gh` rule), read by both skills. Each skill keeps its own `references/azure-devops.md`.
+- **Moved (open-pr):** the base-branch steps to `references/base.md` (SKILL.md points at `crav1-add-to-spec` `references/branches.md` "Base branch and Merges into" for the into-branch order), **Open only** to `references/open-only.md`, the host section to the shared `references/host.md`; the duplicate branches.md path parenthetical is gone.
+- **Moved (review-pr):** the choice words to `references/choice-words.md`, the first-section finding format to `references/first-section.md` ("Finding format"), the host section to the shared host reference.
+- **Deduped (review-pr):** the hard rules no longer repeat "named PR only", "not the newest" and "no merge" (stated in the body); the secret rule is stated once. Version tags dropped from headings (and the matching reference headings).
+- **Words read:** open-pr `SKILL.md` 1,744 to 1,295; review-pr `SKILL.md` 1,836 to 1,520.
+
 ## 1.86.2 (2026-10-23)
 
 `/crav1-help`: SKILL.md slimmed with a pure move. No rule changed.

@@ -17,7 +17,7 @@ The chat review above the block (F, I, S, B, T, Q lines) keeps its plain format 
 
 The block is text in the chat. Showing it posts nothing.
 
-## Bugs, tests, questions (1.66.0)
+## Bugs, tests, questions
 
 Each point that goes into the comment has a chat line, two lines each:
 

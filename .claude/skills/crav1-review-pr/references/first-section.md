@@ -22,3 +22,24 @@ When the slug has `plan.md` and the diff has no code the plan should have named,
 | A file the plan already named is not in the diff (only when that slug has `plan.md`) | fix | Build. This is not a plan miss |
 | Body: the description is wider or narrower than the diff | fix | Rewrite the pull request body. Not a new spec. The mismatch stays on this pull request. Do not edit the body in this skill |
 | Linter: none covers the code in the diff, or one exists but is not required on this pull request, or it is required and red | fix | Build. Do not install a linter |
+
+## Finding format
+
+Moved word for word from `SKILL.md` in 1.86.3.
+
+Each miss is its own finding. Do not bundle two misses into one finding. Any finding whose decision is **fix** or **drop** means the review does not say ship.
+
+A check that holds has no finding.
+
+Each finding is three lines:
+
+```text
+F1 — <Spec | Plan | Verify | Body | Linter | Secret> — <lane or next step>
+What is off: <one line>
+What could happen: <one line>
+Decision: <ship | fix | drop>
+```
+
+Number `F1`, `F2`, …. A miss on these checks is **fix** or **drop**, not ship. **Drop** means the extra behavior should come out. **Fix** means the diff, the plan, the proof, the body, or the check should change so the review can ship later. **Ship** on a finding is only for a note that does not block. Do not use it to wave a miss through. An info note is not a finding. Do not give it an `F` number or a decision.
+
+Name the lane. Do not start it. Do not run the command you name.
