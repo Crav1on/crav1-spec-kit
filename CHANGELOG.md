@@ -2,6 +2,18 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.86.0 (2026-10-23)
+
+Match `Branch:` lists are merge-safe. **After updating, run `/crav1-add-to-spec migrate formats` once more in each product repo** (or `merge_safe_migrate.py --dry-run`, then without it).
+
+### Kit
+
+- **Changed:** a spec's Match `Branch:` list is one line per branch, `- Branch: [<repo> ]<branch>` plus its markers (`(into …)`, `(spec branch)`, `(PR <n>)`), never `; `-joined. A new branch goes in sorted place (repo, then branch; no repo sorts first), and a marker is written only on that branch's own line. Writers: add-to-spec code change and the branches sweep, tighten-spec, open-pr, create-feature-branch. Readers (review-pr base lookup and the rest) still read an old joined line as its entries.
+- **Changed:** `/crav1-finalize-commit` pull path: `Branch:` lines only one side has are kept in sorted place; the same branch on both sides is one line with both sides' markers; an old joined line whose entries all survive as lines is not lost.
+- **Added:** `merge_safe_migrate.py` (and `migrate formats`) splits `; `-joined `Branch:` lists into sorted lines, markers kept, nothing lost, idempotent; selftest extended.
+- **Docs:** `references/merge-safe.md`, `references/branches.md`, data layout, marks reference, skills reference, glossary, install and walkthroughs.
+- **Proving ground:** D-series and B09 checks for one `Branch:` line per branch and the split.
+
 ## 1.85.0 (2026-10-23)
 
 `/crav1-refresh-system-notes`: slimmer, rare cases in `references/`, no flat-notes nag.
