@@ -2,6 +2,16 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.88.0 (2026-10-23)
+
+`/crav1-tasks-ready-to-build` is command-only.
+
+### Kit
+
+- **Changed (tasks-ready-to-build):** `disable-model-invocation: true`. It runs only when you type `/crav1-tasks-ready-to-build`; the agent no longer starts it from a plain question, and its description no longer loads in every chat. `/crav1-help` stays model-invocable, so kit questions still route to it.
+- **Rules:** `crav1.mdc` (and the Claude Code copy) says the command is command-only and to name it for a plain question about ready tasks.
+- **Docs:** skills reference, the tasks-ready-to-build walkthrough and guild routing say so.
+
 ## 1.87.0 (2026-10-23)
 
 `/crav1-plan-from-spec`: kept-open questions become Risk entries without asking.

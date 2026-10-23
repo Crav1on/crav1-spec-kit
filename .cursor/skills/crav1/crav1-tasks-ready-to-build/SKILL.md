@@ -10,7 +10,8 @@ description: >-
   inferred. Shows summary counts, Ready, Blocked (one reason each), Needs
   verify, a Done count, a Branches line, and Next: /crav1-build-tasks T#.
   Shows a task's (branch: …) beside it. Local only,
-  never reads Azure Boards. Read-only. Can run any time.
+  never reads Azure Boards. Read-only. Can run any time by its slash command.
+disable-model-invocation: true
 icon: list-checks
 color: green
 ---

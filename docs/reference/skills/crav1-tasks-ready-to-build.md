@@ -18,6 +18,8 @@ Shows summary counts per slice, then Ready, Blocked (one reason each, recorded o
 
 1.69.0: the `Promotion:` line under the Branches line, with the optional `pipeline runs` check.
 
+1.88.0: command-only (`disable-model-invocation: true`). It runs only when you type [`/crav1-tasks-ready-to-build`](crav1-tasks-ready-to-build.md); the agent does not start it from a plain question, and its description no longer loads in every chat.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
@@ -28,7 +30,7 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 
 ## Runs when
 
-You want to know which tasks can be built now, and why the others cannot. Called by the user, any time.
+You want to know which tasks can be built now, and why the others cannot. Called by the user with its slash command, any time (command-only).
 
 ## Reads
 
