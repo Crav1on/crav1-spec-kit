@@ -19,11 +19,11 @@ The parent already switched to the task's `(branch: …)` when it has one and pa
 After a step that may have changed files:
 
 1. If the tree is clean, skip. Say skipped.
-2. Follow `crav1-finalize-commit` **draft** (persist rule), its **commit** steps and its `references/attribution.md`.
-3. Show Summary/Description, then **`commit` immediately**. No copy / change / stop menu. When the Description ends with a blank line and a work-item mention (`#<id>` or `AB#<id>`), that line is part of the message. Commit it. Keep it when you compare HEAD and when you amend away Cursor attribution. A missing `work-item.md` does not fail this worker.
+2. Follow `crav1-finalize-commit` **draft** (persist rule), its **commit** steps and its `references/added-lines.md`.
+3. Show Summary/Description, then **`commit` immediately**. No copy / change / stop menu. When the Description ends with a blank line and a work-item mention (`#<id>` or `AB#<id>`), that line is part of the message. Commit it. Keep it when you compare HEAD and when you amend away added lines. A missing `work-item.md` does not fail this worker.
 4. Do not push.
 
-If commit fails or attribution comes back after one strip: stop with `STATUS: failed`.
+If commit fails or added lines come back after one strip: stop with `STATUS: failed`.
 
 ## Gates (return to the parent; do not start the next T#)
 
@@ -33,7 +33,7 @@ Stop and return a **status block** (below) if:
 - That task’s row verify failed or you could not run it (`[ ]`)
 - Spec disagrees with the code → tell them `/crav1-tighten-spec`; do not edit `spec.md`
 - the verify gaps branch of `crav1-fix-build-gaps` would stop (spec frozen, non-goal)
-- Commit / attribution needs them
+- Commit / added lines need them
 - Live host refresh needs them (`crav1-verify-build-against-spec` `references/live-host.md`) → `STATUS: needs_ready`
 - A local test dependency is not running, or tests skipped for one (`crav1-verify-build-against-spec` `references/test-dependencies.md`) → `STATUS: needs_dependency`. DETAIL starts with `BLOCKER: <dependency> is not running. <n> tests need it. Not verified.` Do not mark the task verified
 - Inner-loop queue non-empty after verify-build-against-spec → `STATUS: needs_fix` (do not enter **fix** until parent says `resume: fix`)
