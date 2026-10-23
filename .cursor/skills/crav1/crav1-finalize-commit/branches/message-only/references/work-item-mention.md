@@ -109,7 +109,7 @@ Subject and the drafted description stay as generated. Do not put the mention in
 
 When a mention is resolved, append one blank line, then the mention as the **last line** of the Description (the GitKraken description, and the `git commit` body). When the description already ends with that same line, do not append it again.
 
-The commit branch of `/crav1-finalize-commit` commits that Description as the body. The HEAD check expects the mention still last. The Cursor-attribution amend writes the same Summary and Description back, mention included. Do not treat `#<id>` or `AB#<id>` as a Cursor trailer.
+The commit branch of `/crav1-finalize-commit` commits that Description as the body. The HEAD check expects the mention still last. The added-lines amend writes the same Summary and Description back, mention included. Do not treat `#<id>` or `AB#<id>` as an added trailer.
 
 ## Pull request body
 
