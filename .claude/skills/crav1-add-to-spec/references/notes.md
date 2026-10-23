@@ -65,4 +65,4 @@ Lookups for a spec follow the `Full source:` links. Matching new input and the d
 
 ## Old notes
 
-Notes written before 1.61.0 (no front matter, flat in `docs/notes/`, maybe `Absorbed by`) are still read. `Absorbed by <slug>` counts as used by that slug; do not add new ones. Old spec lines keep their source lines; nothing is backfilled. The one-time move into month folders is `notes_index.py migrate`, after `notes_index.py migrate-dry-run` (named by `/crav1-refresh-system-notes`). It fills `source` and `source_folder` from the note's `Source:` line and rewrites links to moved notes across the repo.
+Notes written before 1.61.0 (no front matter, flat in `docs/notes/`, maybe `Absorbed by`) are still read. `Absorbed by <slug>` counts as used by that slug; do not add new ones. Old spec lines keep their source lines; nothing is backfilled. The one-time move into month folders is `notes_index.py migrate`, after `notes_index.py migrate-dry-run`, run by hand (no command names it since 1.85.0). It fills `source` and `source_folder` from the note's `Source:` line and rewrites links to moved notes across the repo.

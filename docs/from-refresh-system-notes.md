@@ -45,6 +45,8 @@ An empty short description (the template sentence) is filled with one sentence t
 
 No feature-index row from this command. No glossary row. No `plan.md`. No `tasks.md`. No application code. Reading specs does not set `Synced at`. When this run reads a whole repo, it sets that repo's `Synced at` line in `repos.md` and touches only those repos. When this run reads only one slice, it does not touch the `## Synced at` section. It writes or updates `Synced at: <repo> <branch>@<short sha>, <date>` in that slice's `spec.md`. A consumer measuring drift uses, for each repo and branch, the older of the repo line and the slice line, and no line means unknown, so fall back to spec file commit dates.
 
+It does not look at how `docs/notes/` is laid out (1.85.0). Notes still flat in `docs/notes/` from before 1.61.0 are still read; to move them into month folders, run `notes_index.py migrate-dry-run`, then `notes_index.py migrate`, by hand (see [data layout](concepts/data-layout.md)).
+
 ## After
 
 If a file changed:
