@@ -2,6 +2,16 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.81.1 (2026-10-23)
+
+`/crav1-finalize-commit`: `pull.md` moved into `references/`. Pure move; no rule changed.
+
+### Kit
+
+- **Moved:** `crav1-finalize-commit/pull.md` to `crav1-finalize-commit/references/pull.md`, word for word; the SKILL.md pointer (step 6a) now names `references/pull.md`. A skill may now get a new `references/` folder when it follows the established pattern.
+- **Scanned:** every other skill root. No other reference-type file sat outside `references/`; `branches/`, `assets/`, `scripts/` and the `crav1-docs/` tree stay as they are.
+- **Words read:** unchanged (finalize-commit `SKILL.md` 1,901; `references/pull.md` 489).
+
 ## 1.81.0 (2026-10-23)
 
 `/crav1-finalize-commit`: fetch after the commit, pull with a merge when behind, and never lose a line in a merge.
