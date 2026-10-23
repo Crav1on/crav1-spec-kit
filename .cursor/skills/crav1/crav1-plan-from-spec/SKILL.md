@@ -63,36 +63,17 @@ Use the template in this skill’s `assets/plan.md`. Fill:
 - **Requirements trace** — table: acceptance / REQ id → task ids
 - **Risks** — including kept-open questions (when a kept-open question blocks only some tasks, also write `Blocks: T#` under it on the spec, as **Blocks lines** below says), and each stale research finding. One line per mark: the stale line, and the note path when there is one. Stale research does not block the plan. Do not clear the mark.
 - **Out of scope** — spec non-goals; do not plan them
-- **Left as committed** — only when the user left a piece. One line per piece: `Left as committed: <piece>.` Omit the heading when nothing was left.
+- **Left as committed** — only when the user left a piece; see `references/write.md` ("Left as committed").
 
-Stay inside v0. File-level, not class-by-class essays. No new product behavior. A piece marked already there is named in the trace as `already there` and has no rebuild task. A left piece is the line above and has no task.
+Stay inside v0. File-level, not class-by-class essays. No new product behavior. A piece marked already there is named in the trace as `already there` and has no rebuild task. A left piece has no task.
 
 ### Blocks lines
 
-The one exception to leaving `spec.md` alone. For each kept-open question under `## Open questions` that blocks only some of the new tasks, write one indented line under that question: `- Blocks: T2, T4`. Follow `crav1-add-to-spec` `references/open-questions.md` (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/references/open-questions.md`; plugin: sibling `skills/crav1-add-to-spec/references/open-questions.md`). Do not change the question or its other lines. On a re-plan that renumbers tasks, replace the `Blocks:` lines this plan wrote. A kept-open question with no `Blocks:` line blocks the whole slice for `/crav1-tasks-ready-to-build` (inferred). List each `Blocks:` line in the recap.
+The one exception to leaving `spec.md` alone: a `- Blocks: T#` line under a kept-open question that blocks only some new tasks. Read `references/write.md` ("Blocks lines") when any kept-open question blocks only some tasks. List each `Blocks:` line in the recap.
 
 ### tasks.md
 
-Read this skill’s [references/checks.md](references/checks.md) before writing tasks (drop-in: `.cursor/skills/crav1/crav1-plan-from-spec/references/checks.md`; plugin: this skill’s `references/checks.md`). Name the checks there. Do not write test code.
-
-Independently testable slices. Bad: “add authentication.” Good: “POST `/register` rejects invalid email (verify: unit — empty email is rejected; unit — malformed email is rejected) (spec: invalid email).”
-
-```markdown
-# Tasks
-
-- [ ] T1: <what> (verify: <kind> — <named check>) (spec: <REQ or acceptance>)
-```
-
-Rules:
-
-- Each task maps to at least one spec acceptance line, REQ, or kept security check
-- Every v0 acceptance line maps to at least one task (or an explicit “covered by T#”), or the trace says `already there` or `left as committed`
-- Every kept security check (`docs/system/security.md` or a Security section on the spec) maps to a task, or the trace says which task already covers it
-- Each verify note names the kind and the checks, per `references/checks.md`
-- Order so each task can be verified before the next depends on it
-- When a task needs an earlier task to be done first, end its line with `(after: T1)` or `(after: T1, T3)`. Name only real needs. A task with no `(after: …)` has no recorded dependency, and `/crav1-tasks-ready-to-build` then treats every earlier unticked task as blocking it (inferred)
-- A task that finishes or tests a built piece found only on one work branch ends its line with `(branch: <name>)`, after `(verify:)`, `(spec:)` and `(after:)`. When the spec spans repos, name the repo too: `(branch: orders-api feat/orders-retry)`. New work with no home gets no branch part, and there is no new question. With one branch or none, write no branch part. A task without one uses `feat/<slug>` as today
-- No task is “and also the rest of the app”
+Read `references/write.md` ("tasks.md") and [references/checks.md](references/checks.md) before writing tasks: the line format, `(after: …)`, `(branch: …)`, and the mapping rules. Do not write test code.
 
 ## After writing
 
@@ -123,11 +104,10 @@ Read `references/parked.md` ("Parked and retired specs (1.60.0)") only when the 
 - **Refuse application code** — no feature files, no refactors, no “quick scaffold.” If they ask to build, tell them to start a new chat with the plan attached.
 - Prefer existing repo patterns when a codebase exists.
 - Do not invent endpoints, entities, screens, or a performance goal the spec does not require.
-- Do not write test code. Smoke after deploy, chaos, and fuzzing for its own sake stay out.
+- Smoke after deploy, chaos, and fuzzing for its own sake stay out.
 - Do not run `/crav1-review-security`. Map kept checks that are already written.
 - A kept suggestion from `/crav1-suggest-tests-for-code` that is already an acceptance line maps to a task. A line under `## Dismissed test suggestions` is not a task. Do not run `/crav1-suggest-tests-for-code`.
-- Do not run `/crav1-review-pr`. Specify does not name the linter. Do not install a linter.
-- Do not name Build when `## Linter` says this repo has no linter or checker for the code these tasks will touch, until the user chooses to go on without one.
-- Do not write a rebuild task for a piece that already matches v0. Do not write a task for a piece the user left. A later run does not turn that piece into work unless the user says so.
+- Do not run `/crav1-review-pr`. Specify does not name the linter.
+- A later run does not turn an already-there or left piece into work unless the user says so.
 - Finish the gap, add a verify test, and leave it are choices in this skill, before any task exists. A disagreement is its own line with those same three choices.
 - Do not treat the host plan UI (Cursor Plan Mode or Claude Code plan mode) as a substitute for writing `plan.md` and `tasks.md` unless they said they only want the UI plan and not files. The skill still writes both files.
