@@ -2,7 +2,7 @@
 
 Read after a successful commit when HEAD's message has any line the draft did not have (commit step 6).
 
-Rule: the final commit message is exactly the drafted Summary + Description, nothing more. finalize-commit writes no trailers, so any trailer or extra line is someone else's: a host, an agent, a hook or a tool. Examples: `Co-authored-by: Cursor <cursoragent@cursor.com>`, `Made-with: Cursor`, `🤖 Generated with [Claude Code](https://claude.com/claude-code)`, `Co-Authored-By: Claude <noreply@anthropic.com>`, and any other `Co-authored-by:`, `Signed-off-by:` or `Generated with` line. The list is examples only; compare against the draft, not against names.
+Rule: the final commit message is exactly the drafted Summary + Description, nothing more. finalize-commit writes no trailers, so any trailer or extra line is someone else's: a host, an agent, a hook or a tool. Examples: `Co-authored-by: Cursor <cursoragent@cursor.com>`, `Made-with: Cursor`, `🤖 Generated with [Claude Code](https://claude.com/claude-code)`, `Co-Authored-By: Claude <noreply@anthropic.com>`, and any other `Co-authored-by:`, `Signed-off-by:` or `Generated with` line. The known tool trailers are listed once, in the trailer hook `branches/message-only/assets/commit-msg.sh`. The list is examples only; compare against the draft, not against names.
 
 A last line of `#<id>` or `AB#<id>` that the draft has is the work-item mention. Keep it.
 
@@ -13,4 +13,5 @@ A last line of `#<id>` or `AB#<id>` that the draft has is the work-item mention.
    - If lines **came back**, the tool wraps `git commit` itself. Do not loop amend. Stop, name the lines, and tell them to turn that tool's attribution off, then run the skill again.
 3. HEAD already pushed, or not made by this process: do not amend. Name the lines and stop.
 4. How to stop it on future commits: Cursor Settings → **Git & PRs → Attribution** (older: **Agent → Attribution**), or `attribution.attributeCommitsToAgent` false in `~/.cursor/cli-config.json`; cloud agents may still add it. Claude Code: `"includeCoAuthoredBy": false` in `settings.json`. Other tools: their own attribution or sign-off setting.
-5. Do not install a `prepare-commit-msg` hook unless they ask.
+   Or the trailer hook ([trailer-hook.md](trailer-hook.md)), which works for every tool.
+5. Install no other hook. The trailer hook is installed only after `strip trailers`.
