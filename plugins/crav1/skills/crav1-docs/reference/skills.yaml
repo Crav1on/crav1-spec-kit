@@ -1120,6 +1120,12 @@ skills:
       means: "CRAV1 style, this commit only"
     - word: "git log"
       means: "match git log, this commit only"
+  - question: Trailer hook
+    words:
+    - word: "strip trailers"
+      means: "add the shared .githooks/commit-msg hook that strips known tool trailers, and save yes (1.90.0)"
+    - word: "keep trailers"
+      means: "no hook; save no so it is not asked again (1.90.0)"
   lane: cross-cutting
   group: Commit and pull request
   starter: false
@@ -1138,6 +1144,12 @@ skills:
   - 'Commit (was `/crav1-finalize-commit`): Same draft, then **commit first**, then copy for your git
     client, change (edit or rewrite), or stop (no push). Keeps that mention through the HEAD check and the strip
     of any trailer it did not write (Cursor, Claude Code, any `Co-authored-by`).'
+  - 'Trailer hook (1.90.0): asked once per repo in the same prompt, "Strip tool trailers on every commit
+    for this repo?". `strip trailers` writes a committed `.githooks/commit-msg` (POSIX sh) that removes only
+    the known tool trailers from Cursor, Claude Code and Anthropic, runs `git config core.hooksPath .githooks`,
+    and saves the answer in a `trailer-hook` rule. Human `Co-authored-by` lines stay. A teammate whose
+    repo has the hook but not the config gets the config line on their first run, with no question.
+    `keep trailers` saves no and never asks again.'
   - 'Fetch, pull and check (1.81.0): after the commit it fetches. When the branch is behind its upstream
     it pulls with a merge (`git pull --no-rebase`, never a rebase) and resolves conflicts in specs, system
     files and notes by the kit''s rules: both sides'' added lines kept, ours first; the newest `Synced at`
