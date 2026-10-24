@@ -38,7 +38,7 @@ Pull and check only, with no commit (1.81.0):
 
 | Step | You | Agent |
 | --- | --- | --- |
-| Commit style (first time) | Pick CRAV1 style or the style of this repo's git log, once or onward | Asked in the same question as the commit choice, with the message drafted in the recommended style. Onward writes a commit-style rule so you are not asked again. Delete the rule to choose again |
+| Commit style (first time) | Pick CRAV1 style or the style of this repo's git log, once or onward | Asked in the same question as the commit choice, with the message drafted in the recommended style; never before the draft (1.89.0). Onward writes a commit-style rule so you are not asked again. Delete the rule to choose again |
 | Draft | — | Reads the diff, recent `git log`, the commit-style rule, and `docs/specs/<slug>/work-item.md` when it exists. Drafts a Summary and Description. A work item id becomes the last description line: `#<id>` on Azure Repos, `AB#<id>` on GitHub |
 | Commit | Pick commit, copy, change, or stop | `/crav1-finalize-commit` offers commit first. After the commit, it checks the message, and when a host or tool added any trailer or line to that unpushed commit (Cursor, Claude Code, any `Co-authored-by`), strips it once and keeps the work item line. `/crav1-finalize-commit` commits only when you also asked for that in the same turn |
 | Pull request | `/crav1-open-pr`, then pick push and open, open only, or stop | Shows the title and the body (what and why, spec links, verify, and a Work item section when `work-item.md` exists) before asking. Pushes only after an explicit yes. Opens one pull request against the default branch. Does not merge |

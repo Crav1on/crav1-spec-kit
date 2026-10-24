@@ -189,9 +189,9 @@ To change the wording first, then copy **or** create the git commit:
 /crav1-finalize-commit
 ```
 
-That command drafts the same way: style first if needed, then Summary/Description, **then** `commit` / `copy` / `change` / `stop`. It does not push.
+That command always drafts first: Summary/Description, **then** `commit` / `copy` / `change` / `stop`. It does not push.
 
-First time (no persist rule yet) it asks:
+First time (no persist rule yet) it drafts in the recommended style and asks the style in the same prompt as those choices (1.89.0); a different answer redrafts:
 
 - **CRAV1 style, this commit only**
 - **CRAV1 style, this commit and onward** — writes a host persist rule
