@@ -2,6 +2,15 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.89.0 (2026-10-25)
+
+`/crav1-finalize-commit` never asks before the draft.
+
+### Kit
+
+- **Changed (finalize-commit):** the order line no longer shows a style menu first. With no saved style rule it drafts in the recommended style, shows the Summary and Description, then asks one prompt: commit / copy / change / stop, plus CRAV1 style or git log. A different style answer redrafts before anything is committed. Fixes the contradiction with "no opening question" (1.83.0).
+- **Docs:** the finalize-commit skills reference says so.
+
 ## 1.88.0 (2026-10-23)
 
 `/crav1-tasks-ready-to-build` is command-only.

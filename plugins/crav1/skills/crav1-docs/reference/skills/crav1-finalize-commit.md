@@ -8,7 +8,7 @@
 
 Draft the commit message, then commit, copy, change, or stop.
 
-**[`/crav1-finalize-commit`](crav1-finalize-commit.md)** always drafts first, then offers commit, copy, change, or stop (1.83.0; there is no opening question). `message only` drafts with no commit, the same as copy, and a headless run with no choice word ends as copy. It replaces draft-commit-message; its rules are kept as a branch.
+**[`/crav1-finalize-commit`](crav1-finalize-commit.md)** always drafts first, then offers commit, copy, change, or stop (1.83.0; there is no opening question). When no style rule is saved, it drafts in the recommended style and asks CRAV1 style or git log in the same prompt as those choices (1.89.0). `message only` drafts with no commit, the same as copy, and a headless run with no choice word ends as copy. It replaces draft-commit-message; its rules are kept as a branch.
 
 Only write the message (was `/crav1-draft-commit-message`): Paste-ready Summary/Description for any git client; CRAV1 style or live git log, once or onward (deletable rule); does not commit unless they ask. Optional Azure Boards mention from `docs/specs/<slug>/work-item.md` is the last description line.
 
