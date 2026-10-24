@@ -44,12 +44,14 @@ PATH_REWRITES = (
     (".cursor/rules/draft-commit-gitlog.mdc", ".claude/rules/draft-commit-gitlog.md"),
     (".cursor/rules/gitkraken-commit-style.mdc", ".claude/rules/gitkraken-commit-style.md"),
     (".cursor/rules/gitkraken-commit-gitlog.mdc", ".claude/rules/gitkraken-commit-gitlog.md"),
+    (".cursor/rules/trailer-hook.mdc", ".claude/rules/trailer-hook.md"),
     (".cursor/rules/crav1.mdc", ".claude/CLAUDE.md"),
 )
 
 COMMIT_STYLE_ASSETS = {
     "draft-commit-style.mdc",
     "draft-commit-gitlog.mdc",
+    "trailer-hook.mdc",
 }
 
 # Cursor .mdc rule templates. Claude copies drop alwaysApply so the body
