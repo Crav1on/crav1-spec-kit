@@ -50,11 +50,16 @@ A review is not a merge ask. Opening a pull request is not a merge ask either.
 ## What gets written
 
 - The commit-style rule, when you pick onward.
+- `.githooks/commit-msg` and the trailer-hook answer, when you pick strip trailers (1.90.0).
 - The git commit, when you pick commit.
 - A push of the change branch and one pull request, after a yes.
 - A merge commit on the host, when you ask to merge.
 
 Not written: branch deletion, work item links, squash or rebase merges.
+
+## Trailer hook (1.90.0)
+
+The first time `/crav1-finalize-commit` runs in a repo without the hook, its one prompt also asks: Strip tool trailers on every commit for this repo? `strip trailers` adds `.githooks/commit-msg`, runs `git config core.hooksPath .githooks`, and saves the answer, so it never asks again. Commit the two new files so teammates get the hook. The hook removes only the known tool trailers from Cursor, Claude Code and Anthropic, even from tools that ignore their own attribution setting. A co-author line for a real person, such as `Co-authored-by: Ada Example <ada@example.com>`, stays. When a teammate's repo has the hook but not the config line, their first run sets it without asking. `keep trailers` saves no and adds nothing.
 
 ## Behind, conflicts, or a rejected push (1.66.0)
 

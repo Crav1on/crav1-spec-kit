@@ -2,6 +2,17 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.90.0 (2026-10-25)
+
+`/crav1-finalize-commit` offers a shared hook that strips tool trailers.
+
+### Kit
+
+- **Added (finalize-commit):** once per repo, the existing single prompt adds "Strip tool trailers on every commit for this repo?" (`strip trailers` / `keep trailers`). The answer is saved in a `trailer-hook` rule next to the style rule, so it is not asked again. `strip trailers` writes a committed `.githooks/commit-msg` (POSIX sh) and runs `git config core.hooksPath .githooks`. A teammate whose repo has the hook but not the config gets that line on their first run, with no question.
+- **Hook:** removes only the known tool trailers from Cursor, Claude Code and Anthropic. Human `Co-authored-by` lines and the work-item mention stay. The hook file is the single list of known trailers; `references/added-lines.md` points to it.
+- **Scripts:** the Claude Code generator maps the `trailer-hook` rule to `.claude/rules/trailer-hook.md`.
+- **Docs:** skills reference and the commit walkthrough say so.
+
 ## 1.89.0 (2026-10-25)
 
 `/crav1-finalize-commit` never asks before the draft.

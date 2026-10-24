@@ -14,6 +14,8 @@ Only write the message (was `/crav1-draft-commit-message`): Paste-ready Summary/
 
 Commit (was [`/crav1-finalize-commit`](crav1-finalize-commit.md)): Same draft, then **commit first**, then copy for your git client, change (edit or rewrite), or stop (no push). Keeps that mention through the HEAD check and the strip of any trailer it did not write (Cursor, Claude Code, any `Co-authored-by`).
 
+Trailer hook (1.90.0): asked once per repo in the same prompt, "Strip tool trailers on every commit for this repo?". `strip trailers` writes a committed `.githooks/commit-msg` (POSIX sh) that removes only the known tool trailers from Cursor, Claude Code and Anthropic, runs `git config core.hooksPath .githooks`, and saves the answer in a `trailer-hook` rule. Human `Co-authored-by` lines stay. A teammate whose repo has the hook but not the config gets the config line on their first run, with no question. `keep trailers` saves no and never asks again.
+
 Fetch, pull and check (1.81.0): after the commit it fetches. When the branch is behind its upstream it pulls with a merge (`git pull --no-rebase`, never a rebase) and resolves conflicts in specs, system files and notes by the kit's rules: both sides' added lines kept, ours first; the newest `Synced at` entry per branch; note indexes rebuilt with `notes_index.py`. Before the merge commit it checks that no line either side added is missing. One question only when the two sides say different things about the same fact: keep both (a `**Conflict:**` line), mine, theirs, or stop. Code file conflicts stay with you. When not behind, it checks any unpushed merge, including one made by hand, and offers to restore dropped lines. `pull` does this with no commit first. It never pushes; it ends with `Ready to push.`
 
 ## Choice words
@@ -28,6 +30,8 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 | Pull | `pull` | fetch, then the pull path or the nothing-lost check, with no commit first (1.81.0) |
 | Style | `crav1` | CRAV1 style, this commit only |
 | Style | `git log` | match git log, this commit only |
+| Trailer hook | `strip trailers` | add the shared .githooks/commit-msg hook that strips known tool trailers, and save yes (1.90.0) |
+| Trailer hook | `keep trailers` | no hook; save no so it is not asked again (1.90.0) |
 
 ## Runs when
 

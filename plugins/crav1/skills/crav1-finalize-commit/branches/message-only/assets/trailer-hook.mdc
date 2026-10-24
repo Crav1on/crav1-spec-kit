@@ -1,0 +1,15 @@
+---
+description: Answer to the finalize-commit trailer-hook question for this repo
+alwaysApply: false
+---
+
+# Trailer hook answer (persistent)
+
+This file was written by `/crav1-finalize-commit` when you answered **Strip tool trailers on every commit for this repo?**
+
+Answer: ANSWER
+
+- `yes`: `.githooks/commit-msg` strips the known tool trailers (Cursor, Claude Code, Anthropic) on every commit. Each person turns it on once with `git config core.hooksPath .githooks`; finalize-commit runs that line for anyone whose config is missing. Human `Co-authored-by` lines stay.
+- `no`: finalize-commit does not ask again.
+
+**To get the question again:** delete this file. Cursor: `.cursor/rules/trailer-hook.mdc`. Claude Code project: `.claude/rules/trailer-hook.md`. Claude Code user: `~/.claude/rules/trailer-hook.md`.

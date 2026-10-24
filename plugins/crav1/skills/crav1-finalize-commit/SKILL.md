@@ -12,7 +12,8 @@ description: >-
   /crav1-finalize-commit. Does not push. Does not commit until they pick
   commit. Paste-only: `message only`. Keeps a trailing
   work-item mention through the HEAD check and the strip of any trailer
-  it did not write. After the commit it fetches; when behind it pulls
+  it did not write. Offers once per repo a shared .githooks
+  commit-msg hook that strips known tool trailers. After the commit it fetches; when behind it pulls
   with a merge and fixes kit-file conflicts so no line is lost; `pull`
   does only that. Never pushes.
 disable-model-invocation: true
@@ -42,6 +43,7 @@ Exact words for bots and scripted runs. There are no `--flags`.
 
 - Commit or message: `commit` / `commit now` / `message only` (draft, show, done: the same as `copy`, no git commit).
 - Style: `crav1` / `git log`.
+- Trailer hook: `strip trailers` / `keep trailers`.
 - Pull: `pull` (1.81.0) runs the pull path with no commit first.
 
 `commit now`, and `commit` typed in the invocation (1.76.1): draft, show the paste blocks, then commit with no choice question. When `agent-tools/` or build output is in the file set, warn and offer the normal choices instead.
@@ -67,7 +69,7 @@ Remember the intended file set (the paths the message describes). Warn if `agent
 
 They choose **after** the message exists, not before.
 
-When the style is not settled, ask the CRAV1 style vs git-log question in the same questions call as the commit/copy/change choices (1.70.0), and draft in the recommended style; a different style answer redrafts before anything is committed.
+When the style is not settled, ask CRAV1 style vs git log in the same questions call (1.70.0); a different style answer redrafts before anything is committed.
 
 On the turn that produces wording:
 
@@ -78,6 +80,8 @@ On the turn that produces wording:
    Options, **in this order**: `commit` / `copy` / `change` / `stop`. **`commit` is always the first/top option** in the questions tool and in any bullet list.
 
 Never call the questions tool (or any blocking choice UI) before step 2.
+
+Trailer hook (1.90.0): when no answer is saved and `.githooks/commit-msg` is missing or not turned on, the same prompt adds `Strip tool trailers on every commit for this repo?` (`strip trailers` / `keep trailers`), asked once per repo. A teammate with the hook but no config gets the config line without a question. Read [references/trailer-hook.md](references/trailer-hook.md).
 
 | Id | Choice | What it does |
 | --- | --- | --- |
@@ -117,7 +121,7 @@ The final message is exactly what this skill drafted. Any other line: read [refe
 - Never offer commit/copy/change before Summary/Description exist. After they exist, show the blocks, then the choices with **`commit` first**.
 - No commit until `commit` (or an unambiguous “commit this message now”) **after** they have seen the current blocks.
 - `copy` never runs `git commit`.
-- The committed message is exactly the drafted Summary + Description. After `commit`, strip any trailer or line the draft did not have (Cursor, Claude Code, any `Co-authored-by` / `Signed-off-by`) once with amend when HEAD is ours and unpushed; do not fight a second inject—tell them to turn that attribution off. The amend keeps the drafted Description, including a trailing work-item mention.
-- Do not install a hook to enforce the work-item line. Do not block the commit when `work-item.md` is missing.
-- Do not change product files except the persist rules the draft skill already writes. Cursor: `.cursor/rules/draft-commit-style.mdc` or `.cursor/rules/draft-commit-gitlog.mdc`. Claude Code project: `.claude/rules/draft-commit-style.md` or `.claude/rules/draft-commit-gitlog.md`. Claude Code user: `~/.claude/rules/draft-commit-style.md` or `~/.claude/rules/draft-commit-gitlog.md`.
+- The committed message is exactly the drafted Summary + Description, including a trailing work-item mention. Added lines: [references/added-lines.md](references/added-lines.md).
+- Do not install a hook to enforce the work-item line. Do not block the commit when `work-item.md` is missing. The only hook is the trailer hook, after `strip trailers`.
+- Do not change product files except the persist rules the draft skill already writes, and the trailer hook and its saved answer (`.githooks/commit-msg`, `trailer-hook` rule). Cursor: `.cursor/rules/draft-commit-style.mdc` or `.cursor/rules/draft-commit-gitlog.mdc`. Claude Code project: `.claude/rules/draft-commit-style.md` or `.claude/rules/draft-commit-gitlog.md`. Claude Code user: `~/.claude/rules/draft-commit-style.md` or `~/.claude/rules/draft-commit-gitlog.md`.
 - Never push and never rebase. Do not open a PR. After a successful commit, one optional line may name `/crav1-open-pr`. Do not invoke it.
