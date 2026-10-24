@@ -5,9 +5,9 @@ description: >-
   `message only` drafts with no commit (same as copy). Replaces
   draft-commit-message (its rules are kept as a branch).
   `commit now` commits without the choice; `crav1` or `git log` sets
-  the style. Finalize a commit: CRAV1 style vs git log first if needed, then draft
-  the Summary and Description, then offer git commit first, then copy /
-  change / stop. Wording is shown before those choices. Use when
+  the style. Finalize a commit: draft the Summary and Description, then
+  offer git commit first, then copy / change / stop, with the CRAV1 style vs
+  git log question in the same prompt when no style rule is saved. Wording is shown before those choices. Use when
   they want to change the message or actually create the commit, or
   /crav1-finalize-commit. Does not push. Does not commit until they pick
   commit. Paste-only: `message only`. Keeps a trailing
@@ -30,7 +30,7 @@ First produce the Summary and Description. Then keep those two fields in play un
 
 Command: `/crav1-finalize-commit`.
 
-Order: (1) style menu if no persist rule, (2) generate and show Summary/Description, (3) then the choices with **`commit` first** (top of the questions tool), then copy / change / stop.
+Order (1.89.0): (1) generate and show Summary/Description, in the recommended style when no persist rule is saved, (2) then one prompt: the choices with **`commit` first** (top of the questions tool), then copy / change / stop, plus the style question when no persist rule is saved. There is no style menu before the draft.
 
 At most 4 options per question; a fifth goes under Other.
 
@@ -54,7 +54,7 @@ Headless or bot run with no choice word (no person in the chat to answer): draft
 
 Follow [branches/message-only/BRANCH.md](branches/message-only/BRANCH.md) for the first draft:
 
-- Style menu or persist rule (`once` / `onward` / `log-once` / `log-onward`)
+- Persist rule, else draft in the recommended style; the style question (`once` / `onward` / `log-once` / `log-onward`) waits for the choices
 - Inspect staged first, else unstaged
 - Output the **Summary** and **Description** paste blocks
 - Work-item mention, when [work-item-mention.md](branches/message-only/references/work-item-mention.md) resolves one: one blank line, then that mention as the **last line** of the Description. Subject stays as drafted.
@@ -71,7 +71,7 @@ When the style is not settled, ask the CRAV1 style vs git-log question in the sa
 
 On the turn that produces wording:
 
-1. Finish the draft (git inspect, style already chosen).
+1. Finish the draft (git inspect; style from the persist rule, else the recommended style).
 2. Write the **Summary** and **Description** paste blocks into the user-visible reply. This is required. Do not skip it.
 3. **Then** offer the choices (questions tool when available). The prompt is `Commit this message?`. The blocks are already in the reply above; do not repeat them in the prompt.
 

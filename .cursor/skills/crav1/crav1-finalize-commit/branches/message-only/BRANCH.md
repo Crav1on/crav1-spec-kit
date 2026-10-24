@@ -39,11 +39,11 @@ Do **not** ask. Draft using `references/style.md` (CRAV1 style wins over the log
 
 ### If a **git-log onward** rule exists (and no CRAV1 style rule)
 
-Do **not** ask. Draft matching **live `git log`**. If the log is empty, say so and fall back to asking the menu. After the blocks: delete the git-log rule file to stop.
+Do **not** ask. Draft matching **live `git log`**. If the log is empty, say so and follow the no-rule path below. After the blocks: delete the git-log rule file to stop.
 
 ### If neither rule exists
 
-**Do not draft yet.** Offer these options (questions tool when available). Explain impact:
+Do **not** ask before the draft (1.89.0). Draft in the recommended style (CRAV1 style, or the git log when it has a clear pattern of its own) and show the blocks. Then ask the style question in the same prompt as commit / copy / change / stop, recommended id first. A different answer redrafts before anything is committed. Options and impact:
 
 | Id | Choice | What it does | Disk |
 | --- | --- | --- | --- |
@@ -54,9 +54,9 @@ Do **not** ask. Draft matching **live `git log`**. If the log is empty, say so a
 
 If `git log` is empty or unavailable, say that `log-once` / `log-onward` have no pattern to copy; they can still pick CRAV1 style.
 
-If they already named an id (`once`, `onward`, `log-once`, `log-onward`), skip the menu. The choice word `crav1` is `once`; `git log` is `log-once`.
+If they already named an id (`once`, `onward`, `log-once`, `log-onward`), skip the style question. The choice word `crav1` is `once`; `git log` is `log-once`.
 
-After `onward` or `log-onward`: write the matching **new** rule name **before** showing the message, and delete the other persist files (including legacy names) so only one remains. Tell them they undo by **deleting that rule file**.
+After `onward` or `log-onward`: write the matching **new** rule name as soon as they answer (redraft first if the style changed), and delete the other persist files (including legacy names) so only one remains. Tell them they undo by **deleting that rule file**.
 
 ## Draft
 
