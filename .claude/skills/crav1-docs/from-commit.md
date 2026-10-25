@@ -61,6 +61,8 @@ Not written: branch deletion, work item links, squash or rebase merges.
 
 The first time `/crav1-finalize-commit` runs in a repo without the hook, its one prompt also asks: Strip tool trailers on every commit for this repo? `strip trailers` adds `.githooks/commit-msg`, runs `git config core.hooksPath .githooks`, and saves the answer, so it never asks again. Commit the two new files so teammates get the hook. The hook removes only the known tool trailers from Cursor, Claude Code and Anthropic, even from tools that ignore their own attribution setting. A co-author line for a real person, such as `Co-authored-by: Ada Example <ada@example.com>`, stays. When a teammate's repo has the hook but not the config line, their first run sets it without asking. `keep trailers` saves no and adds nothing.
 
+Where `/crav1-finalize-commit` has no questions tool, it asks in plain text: numbered lists, one per question, ending with `Reply with choice words in one line, e.g. commit once strip trailers.` (1.90.3).
+
 ## Behind, conflicts, or a rejected push (1.66.0)
 
 The kit's advice is always to merge the base branch into your branch, never to rebase it:
