@@ -2,6 +2,18 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.91.0 (2026-10-26)
+
+finalize-commit: restore commits in the same run, real co-authors stay, and the hook commit adds only its own files. A minor release because it changes behavior.
+
+### Kit
+
+- **Changed (finalize-commit):** after `restore` in the nothing-lost check, the restored lines go into this run's draft and commit with the one confirm at the end, as before 1.90.5. The 1.90.5 stop is removed.
+- **Fixed (finalize-commit):** the amend that strips added lines removes only the known tool trailers from the hook's list (Cursor, Claude Code, Anthropic). A real person's `Co-authored-by` line stays.
+- **Fixed (finalize-commit):** after `strip trailers`, only `.githooks/commit-msg` and the project `trailer-hook` rule are added by path to the commit, never other unstaged files.
+- **Docs:** `skills.yaml` now covers the 1.90.5 changes it missed: the style question at most once per run, spark-to-spec's grouped prompt and no auto-run on a bare `yes`, and resolve-open-questions ending with the still-open titles.
+- **Note:** 1.90.5 and 1.90.6 carried behavior changes and should have been minor releases.
+
 ## 1.90.7 (2026-10-25)
 
 finalize-commit never adds its own trailer.
