@@ -2,6 +2,16 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.90.5 (2026-10-25)
+
+Question budgets: fewer repeated and follow-on questions.
+
+### Kit
+
+- **Fixed (finalize-commit):** the commit style question is asked at most once per run, and after `restore` in the nothing-lost check the run stops instead of drafting a commit.
+- **Fixed (resolve-open-questions):** a run that names one question (`Q2`, `orders Q3`, or matching words) stops after that answer and does not ask the next one.
+- **Fixed (spark-to-spec):** the clarifying questions and the branch choice are one prompt, the branch is asked again alone only when the reply skipped it, and the closing decisions are a list, not a question.
+
 ## 1.90.4 (2026-10-25)
 
 `/crav1-what-do-we-know-about-this` gives one paste-ready `ask research` line per matching open question.
