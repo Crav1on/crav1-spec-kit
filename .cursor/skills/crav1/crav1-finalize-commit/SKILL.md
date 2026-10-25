@@ -79,6 +79,8 @@ On the turn that produces wording:
 
    Options, **in this order**: `commit` / `copy` / `change` / `stop`. **`commit` is always the first/top option** in the questions tool and in any bullet list.
 
+Without a questions tool, use numbered lists, one per question, then end with `Reply with choice words in one line, e.g. commit once strip trailers.`
+
 Never call the questions tool (or any blocking choice UI) before step 2.
 
 Trailer hook (1.90.0): when no answer is saved and `.githooks/commit-msg` is missing or not turned on, the same prompt adds `Strip tool trailers on every commit for this repo?` (`strip trailers` / `keep trailers`), asked once per repo. A teammate with the hook but no config gets the config line without a question. Read [references/trailer-hook.md](references/trailer-hook.md).
