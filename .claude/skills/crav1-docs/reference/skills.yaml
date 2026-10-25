@@ -63,6 +63,9 @@ skills:
   walkthrough: docs/from-nothing.md
   purpose: Turn a one- or two-sentence spark into spec.md.
   in_depth:
+  - 'Clarifying questions and the branch choice are one prompt; the branch is asked again alone only
+    when the reply skipped it. The closing decisions are a list, not a question, and a bare `yes` afterwards
+    does not run the next skill (1.90.5).'
   - One-liner → questions → thin `docs/system/` when missing, including `glossary.md`, then `spec.md`,
     then one index row (greenfield, brownfield feature, or later feature on an existing landscape; new
     slug unless they extend). An existing landscape is left in place. A missing `glossary.md` is filled.
@@ -532,7 +535,7 @@ skills:
     words:
     - word: "detailed"
       means: "show blocks, why, known, who, asked, sources and suggested per question (no word: the short list, and a headless run does not stop)"
-    note: "Topic words or `<spec> Q#` (for example `orders Q3`) open one question (1.77.0) and stop after it, with no next question (1.90.5); several matches: one question listing up to 4."
+    note: "Topic words or `<spec> Q#` (for example `orders Q3`) open one question (1.77.0) and stop after it, with no next question, ending with the still-open titles (1.90.5); several matches: one question listing up to 4."
   lane: specify
   group: Specify
   starter: false
@@ -1136,14 +1139,14 @@ skills:
   in_depth:
   - '**`/crav1-finalize-commit`** always drafts first, then offers commit, copy, change, or stop (1.83.0;
     there is no opening question). When no style rule is saved, it drafts in the recommended style and
-    asks CRAV1 style or git log in the same prompt as those choices (1.89.0). `message only` drafts with
+    asks CRAV1 style or git log in the same prompt as those choices (1.89.0), at most once per run (1.90.5). `message only` drafts with
     no commit, the same as copy, and a headless run with no choice word ends as copy. It replaces draft-commit-message; its rules are kept as a branch.'
   - 'Only write the message (was `/crav1-draft-commit-message`): Paste-ready Summary/Description for any
     git client; CRAV1 style or live git log, once or onward (deletable rule); does not commit unless they
     ask. Optional Azure Boards mention from `docs/specs/<slug>/work-item.md` is the last description line.'
   - 'Commit (was `/crav1-finalize-commit`): Same draft, then **commit first**, then copy for your git
     client, change (edit or rewrite), or stop (no push). Keeps that mention through the HEAD check and the strip
-    of any trailer it did not write (Cursor, Claude Code, any `Co-authored-by`).'
+    of the known tool trailers it did not write (Cursor, Claude Code); a real person''s `Co-authored-by` stays (1.91.0).'
   - 'Trailer hook (1.90.0): asked once per repo in the same prompt, "Strip tool trailers on every commit
     for this repo?". `strip trailers` writes a committed `.githooks/commit-msg` (POSIX sh) that removes only
     the known tool trailers from Cursor, Claude Code and Anthropic, runs `git config core.hooksPath .githooks`,
@@ -1157,7 +1160,7 @@ skills:
     no line either side added is missing. One question only when the two sides say different things about
     the same fact: keep both (a `**Conflict:**` line), mine, theirs, or stop. Code file conflicts stay with
     you. When not behind, it checks any unpushed merge, including one made by hand, and offers to restore
-    dropped lines. `pull` does this with no commit first. It never pushes; it ends with `Ready to push.`'
+    dropped lines; restored lines go into this run''s commit (1.91.0). `pull` does this with no commit first. It never pushes; it ends with `Ready to push.`'
   use_when: You want the commit message, or the commit itself
   table:
     reads: 'Only write the message: The diff, recent git log, and `work-item.md`; Commit: The same commit

@@ -25,7 +25,7 @@ Never a separate prompt and never before the paste blocks. A headless or bot run
 2. Run `git config core.hooksPath .githooks`. When `core.hooksPath` already points at another folder, do not change it: say so and leave the hook file for them to wire up.
 3. Write the saved answer from [../branches/message-only/assets/trailer-hook.mdc](../branches/message-only/assets/trailer-hook.mdc) with `Answer: yes`.
 4. Do this before the commit step, so this commit is already clean.
-5. Commit the hook with this commit (1.90.6), so teammates get it: on `commit`, stage `.githooks/commit-msg` and the saved answer when it is a project rule in the repo (`.cursor/rules/trailer-hook.mdc` or `.claude/rules/trailer-hook.md`, never `~/.claude/`) together with the commit's files, and name them in the result. The drafted message stays as it is. On `copy`, `stop`, or `message only`, nothing is committed: say the two files are ready to commit.
+5. Commit the hook with this commit (1.90.6), so teammates get it: on `commit`, stage `.githooks/commit-msg` and the saved answer when it is a project rule in the repo (`.cursor/rules/trailer-hook.mdc` or `.claude/rules/trailer-hook.md`, never `~/.claude/`) together with the commit's files, and name them in the result. Add them by path only (`git add -- .githooks/commit-msg <rule file>`), never `git add -A`, `-u` or `.`, so no other unstaged file joins the commit (1.91.0). The drafted message stays as it is. On `copy`, `stop`, or `message only`, nothing is committed: say the two files are ready to commit.
 
 ## On `keep trailers`
 

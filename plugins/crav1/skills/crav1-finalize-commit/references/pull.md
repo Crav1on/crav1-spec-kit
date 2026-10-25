@@ -36,4 +36,4 @@ For a merge `M` with parents `P1` and `P2` and base `B = git merge-base P1 P2`, 
 
 Not counted as lost: a note index line when `notes_index.py --check` passes, and a `Synced at` line replaced by a newer one for the same repo and branch, and an old `; `-joined `Synced at` or Match `Branch:` line whose entries are all kept as separate lines.
 
-Lines lost in a merge already committed: stop, list each line with its file and side (`ours <sha>` / `theirs <sha>`), and ask: `restore` (put them back after the kept lines, left uncommitted) / `show me` / `stop`. After `restore`, stop (1.90.5): no draft and no commit question in this run; name `/crav1-finalize-commit` to commit the restored lines. Never amend or rewrite the merge.
+Lines lost in a merge already committed: stop, list each line with its file and side (`ours <sha>` / `theirs <sha>`), and ask: `restore` (put them back after the kept lines, left uncommitted for this skill's commit step) / `show me` / `stop`. After `restore`, the restored lines go into this run's draft and commit, with the one confirm at the end (1.91.0). Never amend or rewrite the merge.
