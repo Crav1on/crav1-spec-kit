@@ -2,6 +2,14 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.90.2 (2026-10-25)
+
+`/crav1-finalize-commit` stops re-asking about a merge whose dropped lines were restored.
+
+### Kit
+
+- **Fixed (finalize-commit):** the nothing-lost check counts a line either side of an unpushed merge added as kept when it is in the merge, in `HEAD` or in the working tree. A line restored in a later commit, with the merge still unpushed, is no longer reported again on every run.
+
 ## 1.90.1 (2026-10-25)
 
 `/crav1-finalize-commit` lets hooks run when it strips added lines.
