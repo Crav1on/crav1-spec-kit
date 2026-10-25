@@ -2,6 +2,14 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.90.1 (2026-10-25)
+
+`/crav1-finalize-commit` lets hooks run when it strips added lines.
+
+### Kit
+
+- **Fixed (finalize-commit):** stripping added lines amends with `git commit --amend` without `--no-verify`, so the 1.90.0 trailer hook (`.githooks/commit-msg`) and other repo hooks run on the amend. If a hook fails the amend, the skill shows the error and stops; it never retries with `--no-verify`.
+
 ## 1.90.0 (2026-10-25)
 
 `/crav1-finalize-commit` offers a shared hook that strips tool trailers.
