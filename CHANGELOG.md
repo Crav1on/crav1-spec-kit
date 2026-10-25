@@ -2,6 +2,14 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.90.7 (2026-10-25)
+
+finalize-commit never adds its own trailer.
+
+### Kit
+
+- **Fixed (finalize-commit):** the skill never adds `--trailer` to a `git commit` command. The trailer hook stays as a backup.
+
 ## 1.90.6 (2026-10-25)
 
 The trailer hook reaches teammates.
