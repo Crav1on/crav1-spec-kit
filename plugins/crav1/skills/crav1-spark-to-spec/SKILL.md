@@ -57,6 +57,8 @@ If they pasted a dump, many files, or several features/repos, stop and tell them
 4. List **assumptions** you will use if they skip a question. Number them (A1, A2, …). Brownfield: assume preserve existing architecture and patterns unless they said otherwise.
 5. **Brownfield / later feature (git repo with commits):** propose a kebab **slug** and include the `/crav1-create-feature-branch` **Specify** options (`feat/<slug>` first). Empty greenfield repo: skip.
 
+Group steps 3–5 into one prompt answered in one reply (1.90.5). Before any file is written, ask at most twice: this prompt, and the branch prompt alone only when the reply skipped the branch.
+
 Stop and wait. Do not write `spec.md` or `docs/system/` until they answer or say “use your assumptions.” Do not write until the branch choice is done or skipped.
 
 ## After they answer
@@ -86,7 +88,7 @@ Then output only:
 
 - Path to the spec, and `docs/system/` when this turn seeded it (or the index row when the landscape already existed, `glossary.md` when that file was missing, any glossary rows appended, and any picture lines added)
 - Mode (greenfield, brownfield feature, or later feature on landscape)
-- 3–5 decisions still worth arguing
+- 3–5 decisions still worth arguing, as a list, not a question; a bare `yes` afterwards does not run the next skill
 - What to do next: answer those, or run `/crav1-tighten-spec`, or accept and `/crav1-plan-from-spec`. If they chose `spec/<slug>`, remind them: no implement on that branch; PR/merge when they want, then `feat/<slug>` for build.
 - **Last line (1.70.0):** one plain line saying what is left and naming the next skill, counted from the spec(s) just written: gaps `/crav1-tighten-spec` would raise (acceptance lines that are not testable yet) and the `## Open questions` entries. Example: `Left: 2 gaps to tighten, 3 open questions. Next: /crav1-tighten-spec orders-retry.` When nothing is left: `Nothing left to tighten. Next: /crav1-plan-from-spec <slug>.`
 
