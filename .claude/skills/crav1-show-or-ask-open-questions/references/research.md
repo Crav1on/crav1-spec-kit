@@ -21,7 +21,7 @@ Run the personal-data and secrets check on the draft. Nothing is sent.
 
 ## Mark
 
-Write the `Pending:` line of open-questions.md with channel `research`, with no question: `Pending: drafted <date> for <who>, research.` (shown as `Pending since <date> for <who> (research)`), or `Pending: drafted <date>, research.` with no name.
+Write the `Pending:` line of open-questions.md with channel `research` without asking (no confirm, no yes/no, no `Asked?` question): `Pending: drafted <date> for <who>, research.` (shown as `Pending since <date> for <who> (research)`), or `Pending: drafted <date>, research.` with no name.
 
 ## Back
 

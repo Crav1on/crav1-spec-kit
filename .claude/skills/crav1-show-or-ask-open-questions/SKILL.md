@@ -139,5 +139,5 @@ End with:
 - English by default, or the language named.
 - The personal-data and secrets check runs on the draft.
 - Nothing is sent.
-- Yes writes `Asked:`. No writes nothing. Pending writes `Pending:`. Only under the questions in the draft.
+- Yes writes `Asked:`. No writes nothing. Pending writes `Pending:` (ask research: no Asked? question). Only under the questions in the draft.
 - Do not plan, implement, or commit.
