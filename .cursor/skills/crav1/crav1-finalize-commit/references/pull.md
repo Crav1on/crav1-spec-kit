@@ -32,7 +32,7 @@ The question, only for a real disagreement, one per fact, with the two lines sho
 
 ## Nothing-lost check
 
-For a merge `M` with parents `P1` and `P2` and base `B = git merge-base P1 P2`, for each kit file either side changed: every line `git diff -U0 --ignore-cr-at-eol B P1 -- <file>` or `B P2` adds (the `+` lines) must still be in `M` (or the working tree before the merge commit). Compare through git, ignoring CR at line ends, so CRLF copies under `core.autocrlf true` do not look different.
+For a merge `M` with parents `P1` and `P2` and base `B = git merge-base P1 P2`, for each kit file either side changed: every line `git diff -U0 --ignore-cr-at-eol B P1 -- <file>` or `B P2` adds (the `+` lines) counts as kept when it is in `M`, in `HEAD` or in the working tree: check all three (`git show M:<file>`, `git show HEAD:<file>`, the file on disk), never only `M:<file>`. A line missing from `M` but restored in a later commit or in the working tree is kept, so a merge whose dropped lines were put back is not reported again. Before the merge commit, `M` is the working tree. Compare through git, ignoring CR at line ends, so CRLF copies under `core.autocrlf true` do not look different.
 
 Not counted as lost: a note index line when `notes_index.py --check` passes, and a `Synced at` line replaced by a newer one for the same repo and branch, and an old `; `-joined `Synced at` or Match `Branch:` line whose entries are all kept as separate lines.
 
