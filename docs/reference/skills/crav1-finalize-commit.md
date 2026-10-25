@@ -30,7 +30,7 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 | Pull | `pull` | fetch, then the pull path or the nothing-lost check, with no commit first (1.81.0) |
 | Style | `crav1` | CRAV1 style, this commit only |
 | Style | `git log` | match git log, this commit only |
-| Trailer hook | `strip trailers` | add the shared .githooks/commit-msg hook that strips known tool trailers, and save yes (1.90.0) |
+| Trailer hook | `strip trailers` | add the shared .githooks/commit-msg hook that strips known tool trailers, and save yes (1.90.0); on commit, the hook and its project rule go into that commit (1.90.6) |
 | Trailer hook | `keep trailers` | no hook; save no so it is not asked again (1.90.0) |
 
 ## Runs when

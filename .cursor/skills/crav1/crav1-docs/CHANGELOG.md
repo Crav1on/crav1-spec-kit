@@ -2,6 +2,14 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.90.6 (2026-10-25)
+
+The trailer hook reaches teammates.
+
+### Kit
+
+- **Fixed (finalize-commit):** after `strip trailers`, the commit it makes includes `.githooks/commit-msg` and the project `trailer-hook` rule, so teammates get the hook when they pull. With `copy` or `stop` the two files are left ready to commit.
+
 ## 1.90.5 (2026-10-25)
 
 Question budgets: fewer repeated and follow-on questions.

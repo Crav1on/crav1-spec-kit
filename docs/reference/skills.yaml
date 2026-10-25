@@ -1123,7 +1123,7 @@ skills:
   - question: Trailer hook
     words:
     - word: "strip trailers"
-      means: "add the shared .githooks/commit-msg hook that strips known tool trailers, and save yes (1.90.0)"
+      means: "add the shared .githooks/commit-msg hook that strips known tool trailers, and save yes (1.90.0); on commit, the hook and its project rule go into that commit (1.90.6)"
     - word: "keep trailers"
       means: "no hook; save no so it is not asked again (1.90.0)"
   lane: cross-cutting
