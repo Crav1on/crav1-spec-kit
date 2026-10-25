@@ -69,7 +69,7 @@ Remember the intended file set (the paths the message describes). Warn if `agent
 
 They choose **after** the message exists, not before.
 
-When the style is not settled, ask CRAV1 style vs git log in the same questions call (1.70.0); a different style answer redrafts before anything is committed.
+When the style is not settled, ask CRAV1 style vs git log in the same questions call (1.70.0); a different style answer redrafts before anything is committed. Ask the style question at most once per run (1.90.5): once answered, or given as a choice word, every later draft in this run uses that answer without asking again.
 
 On the turn that produces wording:
 
