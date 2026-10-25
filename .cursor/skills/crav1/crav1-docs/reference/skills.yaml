@@ -1578,7 +1578,7 @@ skills:
   walkthrough: docs/from-what-do-we-know-about-this.md
   purpose: Answer one question about a feature, slice, resource, or not-yet-feature from the specs first.
   in_depth:
-  - 'A gap in the answer (unknown or inferred) that matches an open question in a spec ends with one line naming `/crav1-show-or-ask-open-questions ask research <a few words from that question>`, with the spec only when the words match more than one spec (1.78.0). It does not run it and asks nothing.'
+  - 'A gap in the answer (unknown or inferred) that matches an open question in a spec ends with one line naming `/crav1-show-or-ask-open-questions ask research <a few words from that question>`, with the spec only when the words match more than one spec (1.78.0). Each matching question gets its own line, never one line for several (1.90.4). It does not run it and asks nothing.'
   - 'When the user asks about one feature, slice, resource, or not-yet-feature, **`/crav1-what-do-we-know-about-this`**
     answers from the specs first. A name matches first. A sentence or two matches on its key words. An
     `@` keeps the search inside that path. One pass. One winning slice is the answer, and the path is

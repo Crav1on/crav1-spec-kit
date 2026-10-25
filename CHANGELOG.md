@@ -2,6 +2,14 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.90.4 (2026-10-25)
+
+`/crav1-what-do-we-know-about-this` gives one paste-ready `ask research` line per matching open question.
+
+### Kit
+
+- **Fixed (what-do-we-know-about-this):** a gap matching several open questions ends with one `Next: /crav1-show-or-ask-open-questions ask research <the question's own words>` line per matching question, never one line for several.
+
 ## 1.90.3 (2026-10-25)
 
 Ask research and the finalize-commit plain-text prompt no longer trip agents up.
