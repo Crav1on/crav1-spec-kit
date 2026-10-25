@@ -2,6 +2,15 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.90.3 (2026-10-25)
+
+Ask research and the finalize-commit plain-text prompt no longer trip agents up.
+
+### Kit
+
+- **Fixed (show-or-ask-open-questions):** `ask research` writes the `Pending: drafted <date> for <who>, research.` mark without asking: no confirm, no yes/no, no `Asked?` question. The hard rules say so too.
+- **Fixed (finalize-commit):** without a questions tool, the choices are numbered lists, one per question, ending with `Reply with choice words in one line, e.g. commit once strip trailers.`
+
 ## 1.90.2 (2026-10-25)
 
 `/crav1-finalize-commit` stops re-asking about a merge whose dropped lines were restored.
