@@ -52,7 +52,7 @@ This is a feature on the current app. New spec slug. Preserve existing architect
 
 If you `@` an existing spec **without** saying extend, the skill starts a **new** slug for the feature. To change that spec in place, say **extend** or use `/crav1-tighten-spec`.
 
-On a brownfield git repo the skill **prompts** for a branch before it writes files (never a silent checkout, never a PR):
+On a brownfield git repo the skill **prompts** for a branch before it writes files (never a silent checkout, never a PR). The branch choice is in the same prompt as the clarifying questions, and it is asked again alone only when your reply skipped it (1.90.5). The decisions still worth arguing at the end are a list, not a question:
 
 - **`feat/<slug>`** (default) — spec and later build on one branch
 - **`spec/<slug>`** — specify-only; you merge that when you want the spec on the default branch, then `/crav1-create-feature-branch` → `feat/<slug>` to build (so you can specify another feature while this one is implemented)
