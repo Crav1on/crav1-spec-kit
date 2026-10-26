@@ -20,6 +20,10 @@ File-level `plan.md` and `tasks.md`; each verify note names the checks before co
 
 Spec is accepted. Called by the user.
 
+## Prompts
+
+Prompt budget: 1 (the most prompts in one run, the closing yes included). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
+
 ## Reads
 
 In short: Spec, diagrams, ADRs; the named repo and branch when the slice is partial.

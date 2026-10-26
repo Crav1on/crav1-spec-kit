@@ -26,6 +26,10 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 
 You want to see what is still open, or draft questions to ask. Called by the user.
 
+## Prompts
+
+Prompt budget: 2 (the most prompts in one run, the closing yes included). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
+
 ## Reads
 
 In short: Open questions on the specs for a person, a spec, or a topic.

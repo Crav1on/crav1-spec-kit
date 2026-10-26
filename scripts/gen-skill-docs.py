@@ -119,6 +119,9 @@ def validate(data: dict) -> list[str]:
         for key in ("purpose", "use_when", "reads", "writes", "first_prompt", "since", "stage"):
             if not s.get(key):
                 errors.append(f"{n}: {key} is empty")
+        pb = s.get("prompt_budget")
+        if not isinstance(pb, int) or isinstance(pb, bool) or pb < 0:
+            errors.append(f"{n}: prompt_budget must be a whole number, 0 or more")
         extra = s.get("in_depth", [])
         if not isinstance(extra, list) or not all(isinstance(p, str) and p.strip() for p in extra):
             errors.append(f"{n}: in_depth must be a list of paragraphs")
@@ -242,6 +245,8 @@ def render_page(s: dict, data: dict) -> str:
     out += ["", "## Runs when", "", lk(runs) + (" " + lk(s["called_by"]) if s.get("called_by") else "")]
     if s["starter"]:
         out += ["", "This is one of the six starter options. Asking for startup options names it and does not run it."]
+    pb = s["prompt_budget"]
+    out += ["", "## Prompts", "", f"Prompt budget: {pb} ({'asks nothing' if pb == 0 else 'the most prompts in one run, the closing yes included'}). A prompt may hold several questions. See the asking rule in `crav1.mdc`."]
     out += ["", "## Reads", "", f"In short: {lk(s['table']['reads'])}.", "", lk(s["reads"])]
     out += ["", "## Writes", "", f"In short: {lk(s['table']['writes'])}.", "", lk(s["writes"])]
     out += ["", "## Does not", ""]

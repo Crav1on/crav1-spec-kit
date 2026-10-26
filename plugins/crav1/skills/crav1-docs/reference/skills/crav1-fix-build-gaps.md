@@ -27,6 +27,10 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 
 verify.md lists gaps, or a live host path fails. Called by the user and by `crav1-build-task-agent`.
 
+## Prompts
+
+Prompt budget: 2 (the most prompts in one run, the closing yes included). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
+
 ## Reads
 
 In short: Verify report gaps: `verify.md` and the spec folder; Live-site gaps: The same queue as fix-build-gaps.

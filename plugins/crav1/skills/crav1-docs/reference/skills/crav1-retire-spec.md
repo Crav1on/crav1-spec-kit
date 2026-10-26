@@ -25,6 +25,10 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 
 A spec is done, dead, belongs in another spec, should wait, or is only reference knowledge. Called by the user.
 
+## Prompts
+
+Prompt budget: 2 (the most prompts in one run, the closing yes included). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
+
 ## Reads
 
 In short: The named spec, the other specs, the feature index, landscape, and `docs/notes/`.

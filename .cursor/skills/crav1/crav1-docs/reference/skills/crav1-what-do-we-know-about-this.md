@@ -18,6 +18,10 @@ One feature, slice, resource, or not-yet-feature. Answers from the specs first. 
 
 One feature, slice, or resource. Called by the user.
 
+## Prompts
+
+Prompt budget: 0 (asks nothing). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
+
 ## Reads
 
 In short: The matching spec, system notes, then live checks.

@@ -20,6 +20,10 @@ Push the change branch only after an explicit yes, then open one pull request (n
 
 Commits exist; want a pull request. Called by the user.
 
+## Prompts
+
+Prompt budget: 1 (the most prompts in one run, the closing yes included). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
+
 ## Reads
 
 In short: The change branch, the spec, and `verify.md`.

@@ -38,6 +38,10 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 
 You want to build one task, a range, or all unticked tasks. Called by the user and by `crav1-build-task-agent`.
 
+## Prompts
+
+Prompt budget: 1 (the most prompts in one run, the closing yes included). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
+
 ## Reads
 
 In short: Inside each worker: One `T#`, the plan, and the spec; One task: One `T#` and the persist rule; A range or all: The `T#` queue on one spec.

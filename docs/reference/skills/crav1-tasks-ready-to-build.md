@@ -32,6 +32,10 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 
 You want to know which tasks can be built now, and why the others cannot. Called by the user with its slash command, any time (command-only).
 
+## Prompts
+
+Prompt budget: 0 (asks nothing). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
+
 ## Reads
 
 In short: `spec.md` open questions, `plan.md`, `tasks.md`, and `verify.md` per slice.

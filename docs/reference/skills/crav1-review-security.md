@@ -16,6 +16,10 @@ After architecture exists, ask whether the thing in front of you is secure. Same
 
 Architecture already exists. Called by the user.
 
+## Prompts
+
+Prompt budget: 1 (the most prompts in one run, the closing yes included). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
+
 ## Reads
 
 In short: System notes or a spec that describes the design.

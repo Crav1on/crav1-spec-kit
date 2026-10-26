@@ -20,6 +20,10 @@ One issue at a time, with explained resolutions (plus get a suggestion) and impa
 
 The spec is still mushy. Called by the user.
 
+## Prompts
+
+Prompt budget: 1 (the most prompts in one run, the closing yes included). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
+
 ## Reads
 
 In short: Spec, diagrams, ADRs, reviewer findings, and the committed code when the slice is partial or `## In the code` names paths.

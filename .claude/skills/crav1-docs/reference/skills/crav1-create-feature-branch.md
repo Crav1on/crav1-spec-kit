@@ -18,6 +18,10 @@ Prompt for `feat/<slug>` or specify-only `spec/<slug>`; no silent checkout, no p
 
 Brownfield: leave the default branch. Called by the user, [`/crav1-spark-to-spec`](crav1-spark-to-spec.md), [`/crav1-ideas-to-spec`](crav1-ideas-to-spec.md), [`/crav1-bundle-to-specs`](crav1-bundle-to-specs.md), [`/crav1-existing-to-specs`](crav1-existing-to-specs.md), [`/crav1-build-tasks`](crav1-build-tasks.md), and [`/crav1-build-features`](crav1-build-features.md).
 
+## Prompts
+
+Prompt budget: 1 (the most prompts in one run, the closing yes included). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
+
 ## Reads
 
 In short: Current branch, default branch, dirty tree.

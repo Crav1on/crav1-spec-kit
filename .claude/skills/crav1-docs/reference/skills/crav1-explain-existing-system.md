@@ -16,6 +16,10 @@ Reads `docs/system/`. First answer is a short TLDR. Longer goes one level deeper
 
 System notes already exist. Called by the user.
 
+## Prompts
+
+Prompt budget: 0 (asks nothing). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
+
 ## Reads
 
 In short: `docs/system/` notes and the feature index.

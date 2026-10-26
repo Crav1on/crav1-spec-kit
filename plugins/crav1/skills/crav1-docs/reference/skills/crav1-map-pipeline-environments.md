@@ -18,6 +18,10 @@ The user names Azure DevOps, the org, and the project. A pipeline name is option
 
 The user names Azure DevOps, the org, and the project. Called by the user.
 
+## Prompts
+
+Prompt budget: 2 (the most prompts in one run, the closing yes included). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
+
 ## Reads
 
 In short: Those pipeline definitions and `marks.md`.

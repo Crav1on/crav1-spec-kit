@@ -30,6 +30,10 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 
 This turn asks to merge a named pull request. Called by the user.
 
+## Prompts
+
+Prompt budget: 0 (asks nothing). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
+
 ## Reads
 
 In short: That named pull request.
