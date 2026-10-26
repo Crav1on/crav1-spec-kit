@@ -2,6 +2,16 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.93.1 (2026-10-26)
+
+Three fixes. A patch release: no skill behavior changes.
+
+### Kit
+
+- **Fixed (help):** kit doc paths are written relative to the docs folder (`reference/workflow.yaml`, `concepts/…`, `README.md`), so an install no longer looks for `crav1-docs/docs/reference/…` first.
+- **Fixed (Claude Code copy):** finalize-commit's product-files line no longer shows a `Cursor:` clause with `.claude/rules/…` paths. `sync-crav1-claude.py` drops that duplicate for the two-file form too.
+- **CI:** `check-kit-docs.py` fails when any `workflow.md` `Kit version:` stamp differs from `plugin.json`. The stamp is now regenerated in the release commit.
+
 ## 1.93.0 (2026-10-26)
 
 One shared asking rule, and a prompt budget per skill. A minor release because it changes how every skill counts its questions.
