@@ -71,16 +71,7 @@ Read `references/landscape.md` ("Thin landscape") only when docs/system/ is miss
 
 Then write `docs/specs/<slug>/spec.md` from this skill’s `assets/spec.md` (same shape as `docs/specs/_template/spec.md`). Slug: short kebab-case from **this** idea (not the whole product name, in brownfield).
 
-Fill every section. Rules:
-
-- Goals are outcomes, not features (“a runner can log a 5k in under 30 seconds” not “add a form”).
-- Non-goals are as important as goals. If unsure, put the tempting extra in non-goals. Brownfield: “do not replace existing auth / do not add a second user table” belong here unless the spark is exactly that change.
-- Journeys: one happy path, one failure path, one empty/first-run path (first-run of **this** feature, not necessarily first-run of the whole app).
-- Acceptance criteria must be testable by a stranger with no chat history. Each item is a yes/no checkbox. Name the kind of check (unit, system, or browser) only when that kind is already obvious from the source. Otherwise leave the kind for plan. Do not invent a test list.
-- Open questions stay open. Do not silently resolve them in the spec body.
-- Mark remaining assumptions in a short `## Assumptions` section.
-- **Brownfield:** do not respec the entire existing product. Do not invent a new architecture. If you skimmed the repo, note only constraints that affect this slice.
-- **Landscape index:** after the spec exists, add one feature-index row on `docs/system/landscape.md` when this turn created a new spec folder: slug, `docs/specs/<slug>/`, repo name, `v0`. If they said **extend**, do not add a second row for that slug. Do not run `/crav1-bundle-to-specs`.
+Fill every section. Read `references/spec-rules.md` ("Fill every section") before you write the spec.
 
 **Picture.** After the index row, follow [picture.md](../crav1-refresh-system-notes/references/picture.md) (drop-in: `.cursor/skills/crav1/crav1-refresh-system-notes/references/picture.md`; plugin: sibling `skills/crav1-refresh-system-notes/references/picture.md`). Add what this pass added to the short description, the diagram, and how the parts connect. Do not rewrite a sentence, a diagram node, a diagram edge, or a connection line that is already there. Do not run `/crav1-refresh-system-notes` as a second turn. When this pass seeded `docs/system/`, the seed fill of those three is the picture for what was already in front of you; the picture update still adds anything the new spec states that those three do not yet say. Do not rewrite existing glossary rows.
 

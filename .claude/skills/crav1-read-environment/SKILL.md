@@ -129,11 +129,7 @@ Read `references/sections.md` ("Picture offer") only when the run ends and a pic
 - A fact is seen in that environment. It is not something the code shows.
 - A link, including a trigger definition, is added only when the environment shows the connection. Do not invent a link. Do not show a payload or a secret value. A prod-only link says `prod only`.
 - After the first read, and before any section, SQL and storage look-inside run only when the user says yes. SQL is metadata only. Storage is structure only, prefix depth 2. Never a row. Never a blob, a file count, or a size. Never a connection string, a key, or a secret.
-- No clear database environment: say `There are no clear database environments.` Then ask. Options only. One question at a time.
-- Production databases and production storage are never opened. A yes on prod-only does not open them. Pre-prod and shared follow the earlier yes and stay shape and connections only.
-- A schema, a name, or a prefix is evidence only when the whole-word token rule matches. A similar name is not evidence.
-- Do not install a tool. Do not create a login, a user, a firewall rule, a role, a SAS token, or a key. Missing access stops that look-inside and names the gap. The sections of the first read still run.
-- Look-inside facts use the sections that already exist. They say `Seen in <host> <environment>.`
+- Look-inside hard rules: read `references/look-inside.md` ("Look-inside hard rules") before any SQL or storage look-inside.
 - One question at a time. Every item stays listed.
 - The owner adds only what is new. Do not rewrite a line that is already there.
 - After one or more `docs/environments/marks.md` lines are added, ask the picture question once. Do not run `/crav1-refresh-system-notes` from that question.

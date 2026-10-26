@@ -56,15 +56,7 @@ The pull request must be **open**. Anything else: stop and say the state. Do not
 
 ### GitHub
 
-```text
-gh pr view <n-or-url> --json number,url,title,body,author,createdAt,state,isDraft,baseRefName,headRefName,headRefOid,headRepository,headRepositoryOwner,files,statusCheckRollup
-gh pr diff <n-or-url>
-gh pr checks <n-or-url>
-```
-
-Read `references/cross-repo.md` ("Other repo, in the review") only when the pull request is in another repo.
-
-`state` must be `OPEN`.
+Read `references/github.md` ("GitHub (Read it first)") only when the remote is GitHub.
 
 ### Azure DevOps
 
@@ -110,17 +102,7 @@ Read `references/outside-the-kit.md` ("Info") only when the slug has no plan.md 
 
 Style, patterns, and practices. Suggestions only.
 
-They do not block ship. They are not a fix. A secret is the exception (first section).
-
-Only flag a practice the repo already wrote down (for example `AGENTS.md` or its lint rules), plus dead code, or a name that hides what the code does. Do not invent a house style the repo never stated.
-
-```text
-S1 — suggestion
-What you noticed: <one line>
-Where: <path>
-```
-
-No suggestions: say none.
+Read `references/second-section.md` ("Second section") before you write any suggestion, or to say none.
 
 ## Bugs, tests, questions
 
