@@ -2,6 +2,17 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.93.0 (2026-10-26)
+
+One shared asking rule, and a prompt budget per skill. A minor release because it changes how every skill counts its questions.
+
+### Kit
+
+- **Added (crav1.mdc):** the asking rule. A prompt is one turn that waits for the user and may hold several questions. A question has at most 4 options; a fifth goes under Other. Use the questions tool when it is available. A skill's prompt budget, the most prompts in one run with the closing yes included, is its `prompt_budget` in `skills.yaml`. A prompt for a value the user left out, or at a stop its skill names, is outside the budget.
+- **Added (skills.yaml):** `prompt_budget` for every skill, taken from what each skill says today. Each skill page shows it under Prompts. `gen-skill-docs.py` fails when one is missing.
+- **Changed (spark-to-spec):** "at most 7 clarifying questions" and "ask at most twice" no longer clash. The 7 questions go in one prompt; the budget is 3 prompts (the grouped prompt, the branch prompt alone only when the reply skipped it, and the Azure Repos work-item offer).
+- **Removed (21 skills):** asking text the shared rule now covers: the per-skill `(Recommended)` paragraph, "use the questions tool when it is available", "at most 4 options per question", and the repeated Ask less sentence in read-environment and map-pipeline-environments. No other behavior changes.
+
 ## 1.92.0 (2026-10-26)
 
 finalize-commit drops the 1.90.7 no `--trailer` line. A minor release because it changes a skill rule.
