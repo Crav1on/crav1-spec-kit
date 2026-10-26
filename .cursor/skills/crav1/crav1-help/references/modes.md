@@ -17,9 +17,9 @@ The message is a skill name, with or without `/` and `crav1-`. From its `skills.
 - Its choice words, when its `skills.yaml` entry has `choice_words` (the merged skills): every question with its exact words and what each means, plus its `note` line when it has one (such as `After a PR: all`), and an example such as `/crav1-ado-sync push tasks`. Say that a word in the invocation skips the question, and that a headless or bot run without a word stops and names the words.
 - For `/crav1-tasks-ready-to-build`, say that it can run any time, not only at its route step.
 
-An old name from before 1.56.0 (in the **Renamed skills** table in `docs/README.md`): answer first, in one line, "`/crav1-<old>` was renamed to `/crav1-<new>`, removed in 1.58.0", with the choice word to use when the table names one (for example `/crav1-ado-sync push tasks`). The old name no longer runs. Then answer for the new skill as above.
+An old name from before 1.56.0 (in the **Renamed skills** table in `README.md`): answer first, in one line, "`/crav1-<old>` was renamed to `/crav1-<new>`, removed in 1.58.0", with the choice word to use when the table names one (for example `/crav1-ado-sync push tasks`). The old name no longer runs. Then answer for the new skill as above.
 
-"renamed", "renamed skills", or "what are the new names": list the whole **Renamed skills** table (old name, new name, choice word) and say the old names were removed in 1.58.0. Source: `docs/README.md#renamed-skills-1560` and the 1.56.0 and 1.58.0 entries in `CHANGELOG.md`.
+"renamed", "renamed skills", or "what are the new names": list the whole **Renamed skills** table (old name, new name, choice word) and say the old names were removed in 1.58.0. Source: `README.md#renamed-skills-1560` and the 1.56.0 and 1.58.0 entries in `CHANGELOG.md`.
 
 A name that matches no skill and no old name: say so and list the closest names. Do not guess.
 
@@ -35,11 +35,11 @@ The message is `next`, or describes where the user is ("new information from a m
 
 ### 4. A concept
 
-The message names a kit word or file, such as `work item homes`, `choice words`, `Recommended option`, `marks.md`, `stale marks`, `route`, `ready`, or `Synced at`. Answer from its entry in `docs/concepts/glossary.md`, then the section in `docs/concepts/` that explains it (data layout, method, data policy) or a page it links to, such as `docs/environments-marks.md`. Quote or closely paraphrase. Name the skills that write and read it when that page says so. A word with no entry: "the kit doesn't say", and the closest entries.
+The message names a kit word or file, such as `work item homes`, `choice words`, `Recommended option`, `marks.md`, `stale marks`, `route`, `ready`, or `Synced at`. Answer from its entry in `concepts/glossary.md`, then the section in `concepts/` that explains it (data layout, method, data policy) or a page it links to, such as `environments-marks.md`. Quote or closely paraphrase. Name the skills that write and read it when that page says so. A word with no entry: "the kit doesn't say", and the closest entries.
 
 ### 5. List, or one lane
 
-`list`: every skill grouped by lane (Specify, Plan, Build, Cross-cutting) and, inside each lane, by its group (phase), in the order of `docs/reference/skills.md`. One line each: the command and its `use_when`. Mark the six starter options. `list <lane>` (`specify`, `plan`, `build`, `cross-cutting`): that lane only, with its subagents. The lanes come from `docs/reference/skills.yaml` and must match `docs/guild-routing.md`; when they differ, say so and cite both.
+`list`: every skill grouped by lane (Specify, Plan, Build, Cross-cutting) and, inside each lane, by its group (phase), in the order of `reference/skills.md`. One line each: the command and its `use_when`. Mark the six starter options. `list <lane>` (`specify`, `plan`, `build`, `cross-cutting`): that lane only, with its subagents. The lanes come from `reference/skills.yaml` and must match `guild-routing.md`; when they differ, say so and cite both.
 
 ### 7. Compare two skills
 
