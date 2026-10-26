@@ -58,6 +58,20 @@ def version() -> list[str]:
     return []
 
 
+def workflow_stamp() -> list[str]:
+    """Every copy of workflow.md carries the plugin.json version (1.93.1)."""
+    want = json.loads((ROOT / "plugins/crav1/.cursor-plugin/plugin.json").read_text(encoding="utf-8"))["version"]
+    out = []
+    for path in sorted(ROOT.glob("**/reference/workflow.md")):
+        if ".git" in path.parts:
+            continue
+        m = re.search(r"^Kit version: (\S+)$", path.read_text(encoding="utf-8"), re.M)
+        got = m.group(1) if m else None
+        if got != want:
+            out.append(f"{path.relative_to(ROOT)} Kit version {got} differs from plugin.json {want}; run scripts/gen-workflow.py and sync")
+    return out
+
+
 def word_warnings() -> list[str]:
     out: list[str] = []
     for path in sorted((ROOT / TREES[0]).glob("*/SKILL.md")):
@@ -71,12 +85,12 @@ def word_warnings() -> list[str]:
 def main() -> int:
     for w in word_warnings():
         print(w)
-    errors = descriptions() + version()
+    errors = descriptions() + version() + workflow_stamp()
     for e in errors:
         print(e)
     if errors:
         return 1
-    print("Skill descriptions are within 1,024 characters; plugin.json matches the newest CHANGELOG release")
+    print("Skill descriptions are within 1,024 characters; plugin.json matches the newest CHANGELOG release and every workflow.md stamp")
     return 0
 
 

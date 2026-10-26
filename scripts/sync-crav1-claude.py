@@ -94,6 +94,13 @@ def clarify_rewritten_commit_rules(text: str) -> str:
         r"Claude Code project: `\1`. ",
         text,
     )
+    # Two-file form (C6): "Cursor: `a` or `b`. Claude Code project: `a` or `b`. "
+    text = re.sub(
+        r"Cursor: `(\.claude/rules/[^`]+)` or `(\.claude/rules/[^`]+)`\. "
+        r"Claude Code project: `\1` or `\2`\. ",
+        r"Claude Code project: `\1` or `\2`. ",
+        text,
+    )
     text = re.sub(
         r"- Cursor: `(\.claude/rules/[^`]+)` or `(\.claude/rules/[^`]+)` "
         r"\(legacy `(\.claude/rules/[^`]+)` or `(\.claude/rules/[^`]+)`\)\n",

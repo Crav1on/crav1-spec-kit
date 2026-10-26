@@ -4,7 +4,7 @@ description: >-
   Answer questions about the kit itself from the kit's own local docs: a
   usage guide when called with nothing, what one skill does and its before
   and after steps, the route in order for "next" or a situation (from
-  docs/reference/workflow.yaml, using the slice's file state), a concept,
+  reference/workflow.yaml, using the slice's file state), a concept,
   the skill list by lane, the status of one slice, a comparison of two
   skills, what is new in the CHANGELOG, or a free-form question. Every answer names the file and anchor it came from.
   When the docs do not cover a question, says "the kit doesn't say". On
@@ -39,14 +39,14 @@ The files:
 
 Paths below are relative to that docs folder (`docs/` or `crav1-docs/`).
 
-- Routes: `docs/reference/workflow.yaml` and its page `docs/reference/workflow.md`.
-- Skills: `docs/reference/skills.yaml`, `docs/reference/skills.md`, and `docs/reference/skills/<name>.md`.
-- Walkthroughs: `docs/from-*.md`. Concepts: `docs/concepts/` (glossary, data layout, method, data policy). Install: `docs/install.md`. Routing: `docs/guild-routing.md`.
+- Routes: `reference/workflow.yaml` and its page `reference/workflow.md`.
+- Skills: `reference/skills.yaml`, `reference/skills.md`, and `reference/skills/<name>.md`.
+- Walkthroughs: `from-*.md`. Concepts: `concepts/` (glossary, data layout, method, data policy). Install: `install.md`. Routing: `guild-routing.md`.
 - Changes: `CHANGELOG.md` (kit repo root; bundled as `crav1-docs/CHANGELOG.md`).
 
 ## Cite every answer
 
-Every mode, including the ones below, ends with one line: `Source: <file>#<anchor>`, for example `Source: docs/reference/workflow.md#new-info` or `Source: docs/reference/skills/crav1-tighten-spec.md#walkthrough`. More than one file: name each. The path is relative to the docs you used (kit repo or plugin). An answer with no source is not given.
+Every mode, including the ones below, ends with one line: `Source: <file>#<anchor>`, for example `Source: reference/workflow.md#new-info` or `Source: reference/skills/crav1-tighten-spec.md#walkthrough`. More than one file: name each. The path is relative to the docs you used (kit repo or plugin). An answer with no source is not given.
 
 ## Modes
 
@@ -71,7 +71,7 @@ A short usage guide that lists every mode with one example each:
 
 Then the route names from `workflow.yaml`, one line each.
 
-Source: `docs/reference/workflow.md` and `docs/reference/skills.md`.
+Source: `reference/workflow.md` and `reference/skills.md`.
 
 ### 2. A skill name
 
