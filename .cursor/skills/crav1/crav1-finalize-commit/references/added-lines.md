@@ -2,13 +2,13 @@
 
 Read after a successful commit when HEAD's message has any line the draft did not have (commit step 6).
 
-Rule: the final commit message is exactly the drafted Summary + Description, nothing more. finalize-commit writes no trailers, so any trailer or extra line is someone else's: a host, an agent, a hook or a tool. The known tool trailers are listed once, in the trailer hook `branches/message-only/assets/commit-msg.sh`: `Co-authored-by: Cursor <cursoragent@cursor.com>`, `Made-with: Cursor`, `🤖 Generated with [Claude Code](https://claude.com/claude-code)` and `Co-Authored-By: Claude <…@anthropic.com>`. Only those are stripped (1.91.0). A real person's `Co-authored-by:` line, or any other line not in that list, stays: name it and do not remove it.
+Rule: the final commit message is the drafted Summary + Description plus any added line that is not a known tool trailer. finalize-commit writes no trailers, so any extra line is someone else's: a host, an agent, a hook or a tool. The known tool trailers are listed in [tool-trailers.md](tool-trailers.md) and, as patterns, in the trailer hook `branches/message-only/assets/commit-msg.sh` (1.94.0). Only those are stripped. `Signed-off-by`, a real person's `Co-authored-by:` and any other line stay: name them and do not remove them.
 
 A last line of `#<id>` or `AB#<id>` that the draft has is the work-item mention. Keep it.
 
 1. Tell them in one short sentence which lines were added and that they were not part of the message they accepted.
 2. **Strip them once** when this process created HEAD and HEAD is not pushed.
-   - `git commit --amend` with the drafted Summary + Description (same `-m` / HEREDOC as the original commit) plus every added line that is not a known tool trailer, such as a real person's `Co-authored-by:`, in its original order. When the Description ends with the work-item mention, that line stays the last line.
+   - `git commit --amend` with the drafted Summary + Description (same `-m` / HEREDOC as the original commit) plus every added line that is not in [tool-trailers.md](tool-trailers.md), such as `Signed-off-by` or a real person's `Co-authored-by:`, in its original order. When the Description ends with the work-item mention, that line stays the last line.
    - Never add `--no-verify`: the repo's hooks, including the trailer hook `.githooks/commit-msg`, must run on the amend.
    - If a hook fails the amend, show the error and stop. Do not retry, and never retry with `--no-verify`.
    - Read `git log -1 --format=%B` again. If it matches the draft plus the kept lines, show the clean hash/message, then the optional `/crav1-open-pr` line from the commit steps. Do not amend again.
