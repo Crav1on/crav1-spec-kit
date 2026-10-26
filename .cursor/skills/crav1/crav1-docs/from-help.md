@@ -34,7 +34,9 @@ I have new information from a meeting and tasks that are not built. What do I ru
 | `/crav1-help whats new`, `/crav1-help whats new since 1.50` | The changelog for your installed version, or every release since the one you name |
 | Any other question about the kit | The answer from the docs, or "the kit doesn't say" when they do not cover it |
 
-Called with nothing, it shows this list with examples. Every answer ends with a line such as `Source: docs/reference/workflow.md#new-info`.
+Called with nothing, it shows this list with examples. Every answer ends with a line such as `Source: reference/workflow.md#new-info`.
+
+A skill, route, concept or free-form answer is at most 5 lines (1.95.0). Ask it to do something, such as "review my branch", and you get one line, for example `Run /crav1-review-pr branch: it diffs your branch against its base and checks it against the spec.` Help never runs the command for you.
 
 ## Routes and file state
 

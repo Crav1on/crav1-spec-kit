@@ -48,6 +48,10 @@ Paths below are relative to that docs folder (`docs/` or `crav1-docs/`).
 
 Every mode, including the ones below, ends with one line: `Source: <file>#<anchor>`, for example `Source: reference/workflow.md#new-info` or `Source: reference/skills/crav1-tighten-spec.md#walkthrough`. More than one file: name each. The path is relative to the docs you used (kit repo or plugin). An answer with no source is not given.
 
+## Keep it short (1.95.0)
+
+Modes 2, 3, 4 and 9 answer in at most 5 lines, plus the `Source:` line. An action question ("review my branch", "commit this") gets one line, `Run /crav1-<skill> <words>`, and the reason in the same line, never a quote of that skill's page. Help never does the action itself. Modes 1, 5, 6, 7 and 8 keep their own layout.
+
 ## Modes
 
 Pick the mode from the message.
