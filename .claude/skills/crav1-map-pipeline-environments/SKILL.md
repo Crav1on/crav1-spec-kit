@@ -47,7 +47,7 @@ If they named Azure DevOps and no org, stop. Ask them to name the org. Do not gu
 
 If they named the org and no project, stop. Ask them to name the project. Do not guess. Do not read.
 
-Use the questions tool when it is available. Options only. Do not ask them to type a path. **Ask less (1.70.0).** Gather the questions that remain into one questions call (several questions in that call when the tool allows, else one message listing them). Skip any question the invocation, the files or an earlier answer already settles, and say what was used.
+Options only. Do not ask them to type a path.
 
 Read `references/start.md` ("Start questions") when a question is needed: no host named, org missing, project missing (list every project), or a named pipeline matches nothing (list every pipeline; a similar name is not a match).
 

@@ -57,7 +57,7 @@ A named target is one of these:
 - One existing spec folder, or `@` of that folder or its `spec.md`, when that spec describes the design.
 - The change, when they named a commit, a range, this branch, this diff, or the uncommitted work.
 
-If the target is unclear, ask with options only. Use the questions tool when it is available. One option per real target already in front of you. No typed path. No typed slug. Stop until they pick.
+If the target is unclear, ask with options only. One option per real target already in front of you. No typed path. No typed slug. Stop until they pick.
 
 Offer only targets that are real:
 

@@ -28,8 +28,6 @@ This skill was `/crav1-ask-open-questions`. Ask one question, with the questions
 
 Skip the question when the message says which: "show", "overview", "what is still open", or "who did we ask" is 1; a person, a channel, or "draft" is 2.
 
-When the message or the files make one option the better fit, list it first and end its label with ` (Recommended)`. Otherwise keep the order above with no label.
-
 ## Choice words
 
 Exact words for bots and scripted runs. There are no `--flags`.
@@ -73,7 +71,7 @@ Everything after the command, and every `@`, is the input. The user names one of
 
 They may also name the output kind and the language.
 
-When the input names none of person, spec, or topic, stop and ask. Options only. Use the questions tool when it is available. The options are:
+When the input names none of person, spec, or topic, stop and ask. Options only. The options are:
 
 1. **A person** — gather the questions that person can answer. Reply with the name.
 2. **A spec** — gather every open question on one spec. Reply with an `@` of the spec, or pick it.

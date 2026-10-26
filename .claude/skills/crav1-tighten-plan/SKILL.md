@@ -76,7 +76,7 @@ For **only** the current plan `P#`:
 
 1. **Finding** — one or two sentences. Quote the plan/task line.
 2. **Why it matters** — verify-ability, extra scope, or silent spec decision.
-3. **Options** — 2–4 mutually exclusive **plan** resolutions, then **`suggest`**. Use the questions tool when available. Always keep `suggest`. Add `ask` / `keep` / `send-to-spec` when they fit.
+3. **Options** — 2–4 mutually exclusive **plan** resolutions, then **`suggest`**. Always keep `suggest`. Add `ask` / `keep` / `send-to-spec` when they fit.
 
 Every option: **letter**, **name**, **what changes**, **impact** (which `T#`s / files). Never add a product feature as a “fix.”
 

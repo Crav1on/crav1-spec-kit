@@ -49,7 +49,7 @@ Work is already shipping when they say it shipped, it is in production, or the f
 
 Say one of: **verify**, **a report**, or **production**.
 
-Use the place they already named. If they named the bug and not the place, ask with options only. Use the questions tool when it is available. The options are verify, a report, and production. Stop until they pick. Do not guess. Do not hunt for the place.
+Use the place they already named. If they named the bug and not the place, ask with options only. The options are verify, a report, and production. Stop until they pick. Do not guess. Do not hunt for the place.
 
 ## What to say
 
@@ -85,7 +85,7 @@ The question is exactly:
 
 The system picture may now be out of date. Run `/crav1-refresh-system-notes`?
 
-Options are yes and no. Use the questions tool when it is available. Do not run `/crav1-refresh-system-notes`. Do not start the lane. Do not edit the picture.
+Options are yes and no. Do not run `/crav1-refresh-system-notes`. Do not start the lane. Do not edit the picture.
 
 ## Stop
 

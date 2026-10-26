@@ -55,7 +55,7 @@ Treat the **whole message** as raw material. You structure it; they do not.
    - **undecided** — contradictions or things they hedged
 2. Cluster ideas. Quote their phrases so they can correct you. Mark duplicates and contradictions (two claims that cannot both be v0).
 3. Propose **v0 vs later**. Prefer cutting hunches that are not needed to demo v0.
-4. Ask **at most 5 product questions** if journeys, non-goals, or “done” are still mushy. Use the questions tool when available. Do not ask them to reformat the pile.
+4. Ask **at most 5 product questions** if journeys, non-goals, or “done” are still mushy. Do not ask them to reformat the pile.
 5. Ask **output format(s)** unless already named in the blob.
 6. Number assumptions **A1…**.
 

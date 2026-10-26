@@ -33,7 +33,7 @@ Everything after `/crav1-suggest-tests-for-code`, and every `@`, is the pointer.
 
 The pointer is **one repo** or **one area**. An area is one folder, one file, one module, or one page. It is not the whole system.
 
-If the user pointed at the whole system, at more than one repo, or at `docs/system/` as the code, stop. Say this command reads one repo or one area. Do not read the whole system. Do not invent an area. When the message already names more than one real area, ask with options only. Use the questions tool when it is available. One option per area the user already named. Do not offer the whole system. Stop until the user picks.
+If the user pointed at the whole system, at more than one repo, or at `docs/system/` as the code, stop. Say this command reads one repo or one area. Do not read the whole system. Do not invent an area. When the message already names more than one real area, ask with options only. One option per area the user already named. Do not offer the whole system. Stop until the user picks.
 
 If the user pointed at no code, stop. Ask the user to point at one repo or one area. Do not scan the repo to pick one. Do not suggest tests.
 
@@ -92,7 +92,7 @@ On every later turn, list every suggestion again. Mark the ones already answered
 
 ## In one batch (1.70.0)
 
-Ask about every suggestion in one questions call, each with its options and a single `yes` keeping the recommended option of each. Use the questions tool when it is available. The options are only:
+Ask about every suggestion in one questions call, each with its options and a single `yes` keeping the recommended option of each. The options are only:
 
 1. **Keep**
 2. **Leave**

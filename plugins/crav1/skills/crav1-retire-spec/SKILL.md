@@ -36,7 +36,7 @@ A spec that already has a `Parked:` line and the wording says un-park, unpark, r
 
 ## Opening question
 
-Ask one question, with the questions tool when it is available. The recommended option is first:
+Ask one question. The recommended option is first:
 
 1. **Retire (Recommended).** Done or dead. Moves to `docs/specs/retired/`.
 2. **Merge.** Its content belongs in another spec.

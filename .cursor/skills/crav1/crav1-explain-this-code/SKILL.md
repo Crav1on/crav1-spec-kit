@@ -41,7 +41,7 @@ A function name that matches more than one place: list the matches and ask which
 
 ## Opening question
 
-Ask one question, with the questions tool when it is available. The recommended option is first:
+Ask one question. The recommended option is first:
 
 1. **What it does (Recommended).** A walk-through based only on reading the code and the code it calls.
 2. **What and why.** Adds the reasons, from stated sources only.

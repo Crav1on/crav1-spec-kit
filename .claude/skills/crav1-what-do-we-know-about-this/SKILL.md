@@ -46,7 +46,7 @@ Four kinds of question:
 
 A name and a sentence can sit in the same message. A focus can sit with either. An `@` limits the search.
 
-If the message has no name, no sentence, and no `@`, stop. Ask with options only. Use the questions tool when it is available. The options are only:
+If the message has no name, no sentence, and no `@`, stop. Ask with options only. The options are only:
 
 1. **Name the feature, slice, or resource**
 2. **@ a spec folder or a code folder**
