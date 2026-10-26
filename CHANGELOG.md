@@ -2,6 +2,17 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.94.0 (2026-10-26)
+
+finalize-commit and the trailer hook strip a researched list of tool trailers, and keep everything else. A minor release because it changes which lines are stripped.
+
+### Kit
+
+- **Changed (finalize-commit, trailer hook):** the known tool trailers now cover Cursor, Claude Code / Anthropic (including `Claude-Session:`), GitHub Copilot, Aider, OpenAI Codex, Gemini, Jules, Devin, Windsurf / Codeium, Amazon Q, Cline, Sourcegraph Amp (including `Amp-Thread-ID:`) and JetBrains AI. Matching is on the tool's email or bot account, never on a first name, so a person called Claude stays.
+- **Kept:** `Signed-off-by`, a real person's `Co-authored-by`, the work-item mention and any other line not in the list. A missed tool is added later.
+- **Added (finalize-commit):** `references/tool-trailers.md`, the readable list; the hook holds the same list as patterns.
+- **Fixed (finalize-commit):** `added-lines.md` no longer says the message is "exactly the draft, nothing more" while also keeping added lines.
+
 ## 1.93.1 (2026-10-26)
 
 Three fixes. A patch release: no skill behavior changes.
