@@ -2,6 +2,15 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.92.0 (2026-10-26)
+
+finalize-commit drops the 1.90.7 no `--trailer` line. A minor release because it changes a skill rule.
+
+### Kit
+
+- **Removed (finalize-commit):** the 1.90.7 rule "Never add `--trailer` to a `git commit` command". Cursor's agent adds that option on its own whatever the skill says, and the commit-msg hook and the after-commit check already strip tool trailers, so the line changed nothing.
+- **Docs:** the commit page no longer mentions it.
+
 ## 1.91.0 (2026-10-26)
 
 finalize-commit: restore commits in the same run, real co-authors stay, and the hook commit adds only its own files. A minor release because it changes behavior.
