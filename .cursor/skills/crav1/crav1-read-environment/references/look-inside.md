@@ -20,3 +20,11 @@ A schema, a table, a container, or a prefix is evidence only when the whole-word
 Production databases and production storage are never opened. A yes on prod-only does not open them. Prod-only shape is only what the resource list and the settings already show. Pre-prod and shared follow the yes already given, and stay shape and connections only.
 
 What a yes finds joins the sections below. Do not add a section. Each fact says `Seen in <host> <environment>.`
+
+## Look-inside hard rules
+
+- No clear database environment: say `There are no clear database environments.` Then ask. Options only. One question at a time.
+- Production databases and production storage are never opened. A yes on prod-only does not open them. Pre-prod and shared follow the earlier yes and stay shape and connections only.
+- A schema, a name, or a prefix is evidence only when the whole-word token rule matches. A similar name is not evidence.
+- Do not install a tool. Do not create a login, a user, a firewall rule, a role, a SAS token, or a key. Missing access stops that look-inside and names the gap. The sections of the first read still run.
+- Look-inside facts use the sections that already exist. They say `Seen in <host> <environment>.`
