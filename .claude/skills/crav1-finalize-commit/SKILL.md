@@ -33,10 +33,6 @@ Command: `/crav1-finalize-commit`.
 
 Order (1.89.0): (1) generate and show Summary/Description, in the recommended style when no persist rule is saved, (2) then one prompt: the choices with **`commit` first** (top of the questions tool), then copy / change / stop, plus the style question when no persist rule is saved. There is no style menu before the draft.
 
-At most 4 options per question; a fifth goes under Other.
-
-When the message or the files make one option the better fit, list it first and end its label with ` (Recommended)`. Otherwise keep the order above with no label.
-
 ## Choice words
 
 Exact words for bots and scripted runs. There are no `--flags`.
@@ -75,7 +71,7 @@ On the turn that produces wording:
 
 1. Finish the draft (git inspect; style from the persist rule, else the recommended style).
 2. Write the **Summary** and **Description** paste blocks into the user-visible reply. This is required. Do not skip it.
-3. **Then** offer the choices (questions tool when available). The prompt is `Commit this message?`. The blocks are already in the reply above; do not repeat them in the prompt.
+3. **Then** offer the choices. The prompt is `Commit this message?`. The blocks are already in the reply above; do not repeat them in the prompt.
 
    Options, **in this order**: `commit` / `copy` / `change` / `stop`. **`commit` is always the first/top option** in the questions tool and in any bullet list.
 

@@ -51,6 +51,10 @@ After a PR: `all`. A PR ref alone (`pr71`, `pr 71`, `#71`, `pr <repo> 71`) means
 
 New information for specs that already exist. Called by the user, by [`/crav1-read-environment`](crav1-read-environment.md) for a confirmed Match section, by [`/crav1-suggest-tests-for-code`](crav1-suggest-tests-for-code.md) for one kept or dismissed suggestion, by [`/crav1-add-to-spec`](crav1-add-to-spec.md) for one kept addition, by [`/crav1-ado-sync`](crav1-ado-sync.md) for a preview change, and by [`/crav1-ado-sync`](crav1-ado-sync.md) for one kept change or one answer.
 
+## Prompts
+
+Prompt budget: 2 (the most prompts in one run, the closing yes included). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
+
 ## Reads
 
 In short: A fact: That information and one `spec.md`; A dump: The dump and existing spec folders; A code change: A commit, range, or branch diff, plus specs; A meeting: That input and existing spec folders.

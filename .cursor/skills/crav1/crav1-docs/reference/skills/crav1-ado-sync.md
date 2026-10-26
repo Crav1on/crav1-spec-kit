@@ -52,6 +52,10 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 
 Specs and Azure Boards should match. Called by the user and by [`/crav1-ado-sync`](crav1-ado-sync.md).
 
+## Prompts
+
+Prompt budget: 2 (the most prompts in one run, the closing yes included). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
+
 ## Reads
 
 In short: Suggest Features: The landscape, the specs, research, and sources; Push Features: The org, the project, and the candidate list; Push tasks: The org, the project, the spec's Feature id, and its `tasks.md`; Pull tasks: The task items a spec records, and the Feature's children; Pull spec changes: Recorded Feature ids, or the ids named.

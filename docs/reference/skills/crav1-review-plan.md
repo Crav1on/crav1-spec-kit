@@ -14,6 +14,10 @@ Critique `plan.md` / `tasks.md` against the spec; numbered `P#`s.
 
 Plan exists; want a critique. Called by the user.
 
+## Prompts
+
+Prompt budget: 0 (asks nothing). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
+
 ## Reads
 
 In short: Spec, plan, tasks.

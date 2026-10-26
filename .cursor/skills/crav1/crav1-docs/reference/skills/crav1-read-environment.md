@@ -18,6 +18,10 @@ The user names the host. Called by the user.
 
 This is one of the six starter options. Asking for startup options names it and does not run it.
 
+## Prompts
+
+Prompt budget: 3 (the most prompts in one run, the closing yes included). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
+
 ## Reads
 
 In short: Non-prod resources on that host.

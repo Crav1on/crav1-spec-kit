@@ -14,6 +14,10 @@ Run the crav1-review-architecture-agent subagent; numbered issues at the end. Op
 
 Spec, diagrams, or ADRs exist. Called by the user.
 
+## Prompts
+
+Prompt budget: 0 (asks nothing). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
+
 ## Reads
 
 In short: Spec, diagrams, ADRs, and export when present.

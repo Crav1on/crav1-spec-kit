@@ -14,6 +14,10 @@ Re-project `spec.md` into EARS, BDD, OpenSpec, YAML, JSON, or BMAD.
 
 Spec exists; want another format. Called by the user.
 
+## Prompts
+
+Prompt budget: 1 (the most prompts in one run, the closing yes included). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
+
 ## Reads
 
 In short: `spec.md` and the format recipes.

@@ -23,7 +23,7 @@ This replaces `/crav1-implement-task`, `/crav1-complete-task`, and `/crav1-compl
 
 Find the spec folder: the one the user @-mentioned, else the most recently edited tree under `docs/specs/` (not `_template`); ask which slug when several fit. When `tasks.md` is missing, stop and name `/crav1-plan-from-spec`.
 
-Then ask one question, with the questions tool when it is available. List the tasks that are ready, using the rules in `/crav1-tasks-ready-to-build` (its `SKILL.md` next to this one), with their titles, and say how many are blocked.
+Then ask one question. List the tasks that are ready, using the rules in `/crav1-tasks-ready-to-build` (its `SKILL.md` next to this one), with their titles, and say how many are blocked.
 
 1. **One task.** Pick one ready `T#`. Follow [branches/one-task/BRANCH.md](branches/one-task/BRANCH.md) (one worker, standalone).
 2. **A range.** For example `T2-T5`. Follow [branches/several-tasks/BRANCH.md](branches/several-tasks/BRANCH.md) with that range.
@@ -32,8 +32,6 @@ Then ask one question, with the questions tool when it is available. List the ta
 Skip the question when the message already answers it: one `T#` is option 1, a range or several `T#`s is option 2, `all` or "continue until blocked" is option 3.
 
 A picked task that is blocked: say why (the tasks-ready-to-build reason) and ask whether to build it anyway or pick another. Do not skip that question.
-
-When the message or the files make one option the better fit, list it first and end its label with ` (Recommended)`. Otherwise keep the order above with no label.
 
 ## Choice words
 

@@ -21,6 +21,8 @@
 #   walkthrough                 a docs/from-*.md page, or null for reference only
 #   since                       first release that names the skill
 #   stage                       stable unless marked otherwise
+#   prompt_budget               the most prompts in one run, the closing yes
+#                               included (the asking rule in crav1.mdc, 1.93.0)
 
 starter_options:
 - crav1-spark-to-spec
@@ -60,6 +62,7 @@ skills:
   starter: true
   since: 1.0.0
   stage: stable
+  prompt_budget: 3
   walkthrough: docs/from-nothing.md
   purpose: Turn a one- or two-sentence spark into spec.md.
   in_depth:
@@ -106,6 +109,7 @@ skills:
   starter: true
   since: 1.0.0
   stage: stable
+  prompt_budget: 2
   walkthrough: docs/from-ideas.md
   purpose: Turn a free-form pile of ideas (and any technical hunches in the same text) into a spec, diagrams,
     ADRs, and a chosen export format.
@@ -155,6 +159,7 @@ skills:
   starter: true
   since: 1.0.0
   stage: stable
+  prompt_budget: 2
   walkthrough: docs/from-bundle-to-specs.md
   purpose: Turn mixed intake (notes, diagrams, screenshots, optional code as context) into docs/system/
     (including glossary.md) plus one spec slug per v0 feature.
@@ -227,6 +232,7 @@ skills:
   starter: true
   since: 1.0.0
   stage: stable
+  prompt_budget: 3
   walkthrough: docs/from-existing-to-specs-with-bundle.md
   purpose: Turn a system that already exists into specs; asks repos only or repos plus a bundle, and one
     spec or system notes plus one spec per feature.
@@ -324,6 +330,7 @@ skills:
   starter: true
   since: 1.13.0
   stage: stable
+  prompt_budget: 3
   walkthrough: docs/from-read-environment.md
   purpose: Read the host the user named.
   in_depth:
@@ -388,6 +395,7 @@ skills:
   starter: true
   since: 1.7.0
   stage: stable
+  prompt_budget: 2
   walkthrough: docs/from-fix-bug.md
   purpose: Name one real bug the user already named.
   in_depth:
@@ -435,6 +443,7 @@ skills:
   starter: false
   since: 1.0.0
   stage: stable
+  prompt_budget: 1
   walkthrough: docs/from-draft-spec.md
   purpose: Create or check out feat/<slug> (one branch for spec+build) or spec/<slug> (specify-only; build
     later on feat/<slug>).
@@ -466,6 +475,7 @@ skills:
   starter: false
   since: 1.0.0
   stage: stable
+  prompt_budget: 0
   walkthrough: docs/from-draft-spec.md
   purpose: Start the crav1-review-architecture-agent subagent on the current spec.
   in_depth:
@@ -496,6 +506,7 @@ skills:
   starter: false
   since: 1.0.0
   stage: stable
+  prompt_budget: 1
   walkthrough: docs/from-draft-spec.md
   purpose: Walk an existing spec issue-by-issue.
   in_depth:
@@ -541,6 +552,7 @@ skills:
   starter: false
   since: 1.0.0
   stage: stable
+  prompt_budget: 2
   walkthrough: docs/from-draft-spec.md
   purpose: Walk Open questions in spec.md one by one.
   in_depth:
@@ -583,6 +595,7 @@ skills:
   starter: false
   since: 1.40.0
   stage: stable
+  prompt_budget: 2
   walkthrough: docs/from-show-or-ask-open-questions.md
   purpose: Show the cross-spec overview of open questions (read-only), or draft them to ask; asks which.
   in_depth:
@@ -644,6 +657,7 @@ skills:
   starter: false
   since: 1.0.0
   stage: stable
+  prompt_budget: 2
   walkthrough: docs/from-add.md
   purpose: 'Bring new information into existing specs; asks what you have: a fact, a dump, a code change,
     or a meeting.'
@@ -829,6 +843,7 @@ skills:
   starter: false
   since: 1.0.0
   stage: stable
+  prompt_budget: 1
   walkthrough: docs/from-spec-to-plan.md
   purpose: Turn an accepted spec into a file-level plan.md and independently testable tasks.md.
   in_depth:
@@ -876,6 +891,7 @@ skills:
   starter: false
   since: 1.0.0
   stage: stable
+  prompt_budget: 0
   walkthrough: docs/from-spec-to-plan.md
   purpose: Start the crav1-plan-reviewer-agent subagent on plan.md and tasks.md against spec.md.
   in_depth:
@@ -902,6 +918,7 @@ skills:
   starter: false
   since: 1.0.0
   stage: stable
+  prompt_budget: 1
   walkthrough: docs/from-spec-to-plan.md
   purpose: Walk plan.md/tasks.md issues one by one (including /crav1-review-plan P#s).
   in_depth:
@@ -939,6 +956,7 @@ skills:
   starter: false
   since: 1.0.0
   stage: stable
+  prompt_budget: 1
   walkthrough: docs/from-plan-to-build.md
   purpose: Build tasks from tasks.md, always in an isolated worker per task; asks which tasks (one, a
     range, or all).
@@ -996,6 +1014,7 @@ skills:
   starter: false
   since: 1.0.0
   stage: stable
+  prompt_budget: 2
   walkthrough: docs/from-plan-to-build.md
   purpose: 'Serial board: build several ready specs one slug after another in this checkout.'
   in_depth:
@@ -1025,6 +1044,7 @@ skills:
   starter: false
   since: 1.0.0
   stage: stable
+  prompt_budget: 0
   walkthrough: docs/from-verify.md
   purpose: Map every v0 acceptance line to tests or UI checks and report pass, fail, or missing.
   in_depth:
@@ -1072,6 +1092,7 @@ skills:
   starter: false
   since: 1.0.0
   stage: stable
+  prompt_budget: 2
   walkthrough: docs/from-verify.md
   purpose: Fix gaps a build left, one at a time inside the spec; asks verify-report gaps or live-site
     gaps.
@@ -1134,6 +1155,7 @@ skills:
   starter: false
   since: 1.0.0
   stage: stable
+  prompt_budget: 1
   walkthrough: docs/from-commit.md
   purpose: Draft the commit message, then commit, copy, change, or stop.
   in_depth:
@@ -1188,6 +1210,7 @@ skills:
   starter: false
   since: 1.0.0
   stage: stable
+  prompt_budget: 1
   walkthrough: docs/from-commit.md
   purpose: Open a pull request for the current change branch (push with explicit yes).
   in_depth:
@@ -1240,6 +1263,7 @@ skills:
   starter: false
   since: 1.6.0
   stage: stable
+  prompt_budget: 1
   walkthrough: docs/from-review-pr.md
   purpose: Read one named open pull request and report whether it can ship.
   in_depth:
@@ -1312,6 +1336,7 @@ skills:
   starter: false
   since: 1.0.0
   stage: stable
+  prompt_budget: 0
   walkthrough: docs/from-commit.md
   purpose: Merge one named pull request with a merge commit.
   in_depth:
@@ -1353,6 +1378,7 @@ skills:
   starter: false
   since: 1.52.0
   stage: stable
+  prompt_budget: 1
   walkthrough: docs/from-help.md
   purpose: Answer questions about the kit from its own local docs, with the source file and anchor for every answer.
   in_depth:
@@ -1397,6 +1423,7 @@ skills:
   starter: false
   since: 1.54.0
   stage: stable
+  prompt_budget: 0
   walkthrough: docs/from-tasks-ready-to-build.md
   purpose: 'List the tasks ready to build, for one spec or all, and why the others are blocked. Read-only.'
   in_depth:
@@ -1432,6 +1459,7 @@ skills:
   starter: false
   since: 1.8.0
   stage: stable
+  prompt_budget: 0
   walkthrough: docs/from-explain-existing-system.md
   purpose: Read the system notes spark, ideas, intake, match, or existing-to-specs already wrote (docs/system/).
   in_depth:
@@ -1489,6 +1517,7 @@ skills:
   starter: false
   since: 1.59.0
   stage: stable
+  prompt_budget: 3
   walkthrough: docs/from-explain-this-code.md
   purpose: Explain one piece of code (a file, a function, a selection, or a PR diff) from reading it.
   in_depth:
@@ -1537,6 +1566,7 @@ skills:
   starter: false
   since: 1.60.0
   stage: stable
+  prompt_budget: 2
   walkthrough: docs/from-retire-spec.md
   purpose: Take one spec out of the work (retire, merge, park, or convert to note), or un-park it.
   in_depth:
@@ -1578,6 +1608,7 @@ skills:
   starter: false
   since: 1.23.0
   stage: stable
+  prompt_budget: 0
   walkthrough: docs/from-what-do-we-know-about-this.md
   purpose: Answer one question about a feature, slice, resource, or not-yet-feature from the specs first.
   in_depth:
@@ -1635,6 +1666,7 @@ skills:
   starter: false
   since: 1.8.0
   stage: stable
+  prompt_budget: 0
   walkthrough: docs/from-refresh-system-notes.md
   purpose: 'Update the picture in docs/system/ when something was added: add what is new to the short
     description, the diagram, and how the parts connect, and do not rewrite what is there.'
@@ -1692,6 +1724,7 @@ skills:
   starter: false
   since: 1.18.0
   stage: stable
+  prompt_budget: 2
   walkthrough: docs/from-map-pipeline-environments.md
   purpose: Read Azure DevOps pipeline definitions for the org and project the user named.
   in_depth:
@@ -1739,6 +1772,7 @@ skills:
   starter: false
   since: 1.4.0
   stage: stable
+  prompt_budget: 1
   walkthrough: docs/from-review-security.md
   purpose: Ask whether the thing in front of you is secure, after architecture already exists (docs/system/
     or a spec that already describes the design).
@@ -1777,6 +1811,7 @@ skills:
   starter: false
   since: 1.0.0
   stage: stable
+  prompt_budget: 1
   walkthrough: null
   purpose: Re-project an existing canonical spec.md into EARS, BDD, OpenSpec, YAML, JSON, and/or BMAD.
   in_depth:
@@ -1817,6 +1852,7 @@ skills:
   starter: false
   since: 1.31.0
   stage: stable
+  prompt_budget: 2
   walkthrough: docs/from-ado-sync-suggest-features.md
   purpose: Keep specs and Azure Boards in step; asks suggest Features, push Features, push tasks, pull
     tasks, or pull spec changes.
@@ -1961,6 +1997,7 @@ skills:
   starter: false
   since: 1.16.0
   stage: stable
+  prompt_budget: 0
   walkthrough: docs/from-run-exploratory-test.md
   purpose: After a build of a slice already exists, use the slice in two passes and write down bugs.
   in_depth:
@@ -2007,6 +2044,7 @@ skills:
   starter: false
   since: 1.17.0
   stage: stable
+  prompt_budget: 1
   walkthrough: docs/from-suggest-tests.md
   purpose: The user points at code that already exists, one repo or one area, not the whole system.
   in_depth:

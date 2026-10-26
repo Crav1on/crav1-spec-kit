@@ -46,7 +46,7 @@ If they pasted a dump, many files, or several features/repos, stop and tell them
 
 1. Restate the spark in one sentence they can correct. Name the mode (greenfield vs brownfield feature vs later feature on `docs/system/`). If `docs/system/` is missing, say this turn will seed a thin landscape from the repo after they answer, including `glossary.md`. If it exists, say this turn will add an index row (a repo/ADR row only if they need a new repo, `glossary.md` when that file is missing, and new glossary rows when the file exists) and add what is new to the picture. Existing glossary rows and existing picture lines stay as they are.
 2. Propose the **smallest useful slice** (what this spec ships vs later). In brownfield, v0 is **this feature**, not a rewrite of the app.
-3. Ask **at most 7** clarifying questions, using the questions tool when available. Prefer multiple-choice plus an “other” option. Cover:
+3. Ask **at most 7** clarifying questions. Prefer multiple-choice plus an “other” option. Cover:
    - Who is this for? (one primary user)
    - What job are they trying to finish?
    - What is painfully true today without this?
@@ -57,7 +57,7 @@ If they pasted a dump, many files, or several features/repos, stop and tell them
 4. List **assumptions** you will use if they skip a question. Number them (A1, A2, …). Brownfield: assume preserve existing architecture and patterns unless they said otherwise.
 5. **Brownfield / later feature (git repo with commits):** propose a kebab **slug** and include the `/crav1-create-feature-branch` **Specify** options (`feat/<slug>` first). Empty greenfield repo: skip.
 
-Group steps 3–5 into one prompt answered in one reply (1.90.5). Before any file is written, ask at most twice: this prompt, and the branch prompt alone only when the reply skipped the branch.
+Group steps 3–5 into one prompt answered in one reply (1.90.5). The branch prompt is asked alone only when the reply skipped the branch.
 
 Stop and wait. Do not write `spec.md` or `docs/system/` until they answer or say “use your assumptions.” Do not write until the branch choice is done or skipped.
 

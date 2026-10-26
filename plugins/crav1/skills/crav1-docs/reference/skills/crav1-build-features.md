@@ -16,6 +16,10 @@ Serial board of ready slugs: `feat/<slug>` from default, then that spec’s buil
 
 Several specs, one after another. Called by the user.
 
+## Prompts
+
+Prompt budget: 2 (the most prompts in one run, the closing yes included). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
+
 ## Reads
 
 In short: Ready spec folders on the default branch.

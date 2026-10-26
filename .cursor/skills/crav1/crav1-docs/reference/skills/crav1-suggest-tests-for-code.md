@@ -16,6 +16,10 @@ The user points at code that already exists, one repo or one area, not the whole
 
 The user points at existing code. Called by the user.
 
+## Prompts
+
+Prompt budget: 1 (the most prompts in one run, the closing yes included). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
+
 ## Reads
 
 In short: That code, its tests, and the spec.

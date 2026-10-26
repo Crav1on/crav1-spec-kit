@@ -23,7 +23,7 @@ This replaces `/crav1-repos-to-spec` and `/crav1-match-to-specs` (1.56.0). Their
 
 ## Opening questions
 
-Ask one question at a time, with the questions tool when it is available.
+Ask one question at a time.
 
 1. **What do you have?**
    - **Repos only.** The named repos are the whole input.
@@ -42,8 +42,6 @@ Which branch:
 Skip a question the message already answers: no attached files means repos only; a dump or attachments means a bundle; "architecture spec" means one spec; "features" or "slices" means one spec per feature.
 
 When the user names no repos, stop and ask for them. Do not read the open checkout on your own.
-
-When the message or the files make one option the better fit, list it first and end its label with ` (Recommended)`. Otherwise keep the order above with no label.
 
 ## Choice words
 

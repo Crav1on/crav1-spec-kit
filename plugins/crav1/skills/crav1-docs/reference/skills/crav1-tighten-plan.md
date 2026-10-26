@@ -14,6 +14,10 @@ One plan issue at a time; patches plan/tasks only (spec findings go to tighten-s
 
 Plan findings, or mushy tasks. Called by the user.
 
+## Prompts
+
+Prompt budget: 1 (the most prompts in one run, the closing yes included). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
+
 ## Reads
 
 In short: Plan, tasks, spec, and those findings.

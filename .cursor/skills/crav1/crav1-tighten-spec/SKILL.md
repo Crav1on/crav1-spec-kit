@@ -64,7 +64,7 @@ For **only** the current `I#`:
 
 1. **Finding** — one or two sentences. Quote the spec/ADR/diagram line.
 2. **Why it matters** — testability, v0 size, or requirement-vs-decision blur.
-3. **Options** — 2–4 mutually exclusive resolutions. Use the questions tool when available.
+3. **Options** — 2–4 mutually exclusive resolutions.
 
 Every option: **letter**, **name**, **what changes**, **impact** (who/v0/tests, and which files). Use the resolution catalog below. Drop resolutions that do not fit this issue (always keep **`suggest`**). Never add a product feature as a “fix.”
 

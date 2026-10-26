@@ -43,7 +43,7 @@ If the user named one `docs/specs/<slug>/` (skip `_template`) and that slice has
 
 If the user named none and exactly one spec folder has a build, that is the slice.
 
-If more than one spec folder has a build and the user named none, ask with options only. Use the questions tool when it is available. One option per spec folder that has a build. Label each option with `docs/specs/<slug>/` and the title line of that `spec.md` when it has one. Do not ask the user to type a slug. Stop until the user picks.
+If more than one spec folder has a build and the user named none, ask with options only. One option per spec folder that has a build. Label each option with `docs/specs/<slug>/` and the title line of that `spec.md` when it has one. Do not ask the user to type a slug. Stop until the user picks.
 
 If no spec folder has a build, stop. Write nothing.
 

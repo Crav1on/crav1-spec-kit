@@ -24,6 +24,10 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 
 You want one piece of code explained. Called by the user.
 
+## Prompts
+
+Prompt budget: 3 (the most prompts in one run, the closing yes included). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
+
 ## Reads
 
 In short: The named code, the code it calls, and for why also specs, plans, system notes, and commits.

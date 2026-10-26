@@ -37,6 +37,10 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 
 You want the commit message, or the commit itself. Called by the user and by [`/crav1-finalize-commit`](crav1-finalize-commit.md).
 
+## Prompts
+
+Prompt budget: 1 (the most prompts in one run, the closing yes included). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
+
 ## Reads
 
 In short: Only write the message: The diff, recent git log, and `work-item.md`; Commit: The same commit inputs as draft.

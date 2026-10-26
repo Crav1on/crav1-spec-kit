@@ -129,7 +129,7 @@ Ask once for the board, not once per slug. The question is exactly:
 
 The system picture may now be out of date. Run `/crav1-refresh-system-notes`?
 
-Options are yes and no. Use the questions tool when it is available. Do not run `/crav1-refresh-system-notes`. A yes waits for a later turn. A no ends without that command.
+Options are yes and no. Do not run `/crav1-refresh-system-notes`. A yes waits for a later turn. A no ends without that command.
 
 Do not ask when no slug was marked done and none was marked retired. Do not add this question to `/crav1-build-tasks`.
 

@@ -30,6 +30,10 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 
 Want proof against acceptance. Called by the user and by `crav1-build-task-agent`.
 
+## Prompts
+
+Prompt budget: 0 (asks nothing). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
+
 ## Reads
 
 In short: Spec, tasks, plan, and the running tree.

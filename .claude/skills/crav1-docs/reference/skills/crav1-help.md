@@ -37,6 +37,10 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 
 You want to know what to run next, in what order, or what a skill does. Called by the user, or by an agent before it suggests more than one next step or when an order is questioned (the `crav1.mdc` rule).
 
+## Prompts
+
+Prompt budget: 1 (the most prompts in one run, the closing yes included). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
+
 ## Reads
 
 In short: The kit docs (kit repo, or the bundled `crav1-docs/` next to the skills), and the slice's file state.

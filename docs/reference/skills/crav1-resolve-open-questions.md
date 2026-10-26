@@ -26,6 +26,10 @@ Topic words or `<spec> Q#` (for example `orders Q3`) open one question (1.77.0) 
 
 Open questions remain. Called by the user.
 
+## Prompts
+
+Prompt budget: 2 (the most prompts in one run, the closing yes included). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
+
 ## Reads
 
 In short: Open questions and assumptions in `spec.md`.

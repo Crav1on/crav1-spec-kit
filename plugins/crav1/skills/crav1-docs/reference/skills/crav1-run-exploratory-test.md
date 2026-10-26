@@ -16,6 +16,10 @@ After a build of a slice already exists, uses the slice once, then again with ra
 
 A build of a slice already exists. Called by the user.
 
+## Prompts
+
+Prompt budget: 0 (asks nothing). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
+
 ## Reads
 
 In short: A built slice, the spec, and the plan.

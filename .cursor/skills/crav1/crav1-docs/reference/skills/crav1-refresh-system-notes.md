@@ -16,6 +16,10 @@ Adds what is new to the short description, the diagram, and how the parts connec
 
 Something was added; catch the picture up. Called by the user and by [`/crav1-read-environment`](crav1-read-environment.md) for a confirmed system section.
 
+## Prompts
+
+Prompt budget: 0 (asks nothing). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
+
 ## Reads
 
 In short: The picture and what the spec states.

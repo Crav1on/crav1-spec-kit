@@ -33,6 +33,10 @@ The user names existing repos, with or without a bundle to match. Called by the 
 
 This is one of the six starter options. Asking for startup options names it and does not run it.
 
+## Prompts
+
+Prompt budget: 3 (the most prompts in one run, the closing yes included). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
+
 ## Reads
 
 In short: Repos plus a bundle: The repos and the dump; Repos only: Those repos, and left-out when present.

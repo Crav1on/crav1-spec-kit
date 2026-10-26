@@ -51,7 +51,7 @@ If they named the host and also a non-prod word, such as Azure dev, do not stop 
 
 If they named only an environment word and no host, stop. Ask them to name the host. Do not treat that word as the host. Do not read.
 
-Use the questions tool when it is available. Options only. Do not ask them to type a path. **Ask less (1.70.0).** Gather the questions that remain into one questions call (several questions in that call when the tool allows, else one message listing them). Skip any question the invocation, the files or an earlier answer already settles, and say what was used.
+Options only. Do not ask them to type a path.
 
 **No host named.** Options:
 
