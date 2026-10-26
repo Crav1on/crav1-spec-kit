@@ -62,7 +62,7 @@ Limits and exceptions: Inside each worker: stops with no code when `## Linter` s
 
 ## You run next / Runs by itself
 
-- You run next: [`/crav1-open-pr`](crav1-open-pr.md); [`/crav1-verify-build-against-spec`](crav1-verify-build-against-spec.md)
+- You run next: [`/crav1-open-pr`](crav1-open-pr.md); [`/crav1-verify-build-against-spec`](crav1-verify-build-against-spec.md); [`/crav1-finalize-commit`](crav1-finalize-commit.md)
 - Runs by itself: Inside each worker: Calls [`/crav1-create-feature-branch`](crav1-create-feature-branch.md) before code. One task: Calls [`/crav1-create-feature-branch`](crav1-create-feature-branch.md) and `crav1-build-task-agent`. A range or all: Calls [`/crav1-create-feature-branch`](crav1-create-feature-branch.md) and `crav1-build-task-agent` once per `T#`.
 
 ## Lane and group

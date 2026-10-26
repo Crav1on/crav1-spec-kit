@@ -1004,6 +1004,7 @@ skills:
   you_run_next:
   - /crav1-open-pr
   - /crav1-verify-build-against-spec
+  - /crav1-finalize-commit
   first_prompt: '/crav1-build-tasks
 
 
@@ -1323,8 +1324,11 @@ skills:
   runs_by_itself: Calls no skill.
   you_run_next:
   - /crav1-merge-pr
-  - /crav1-refresh-system-notes after an outside pull request merges
+  - /crav1-tighten-spec
+  - /crav1-plan-from-spec
+  - /crav1-build-tasks
   - /crav1-finalize-commit
+  - /crav1-refresh-system-notes after an outside pull request merges
   first_prompt: '/crav1-review-pr
 
     https://github.com/<owner>/<repo>/pull/<n>

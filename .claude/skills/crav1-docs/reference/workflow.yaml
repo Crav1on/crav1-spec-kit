@@ -120,6 +120,24 @@ routes:
       - skills: [crav1-open-pr]
         when: To push and open the pull request.
 
+  - id: before-pr
+    title: Before a pull request
+    when: Your branch is ready and you want it reviewed and fixed before you open a pull request.
+    steps:
+      - skills: [crav1-review-pr]
+        as_next: /crav1-review-pr branch
+        when: "With the choice word `branch`: reviews the branch against its base, no pull request needed. Each finding names its lane."
+      - skills: [crav1-tighten-spec, crav1-plan-from-spec, crav1-build-tasks]
+        optional: true
+        when: When the review has findings, the lane each one names. Spec miss is Specify (tighten-spec), plan miss is Plan (plan-from-spec), code miss is Build (build-tasks).
+        then:
+          crav1-tighten-spec: []
+          crav1-plan-from-spec: []
+      - skills: [crav1-finalize-commit]
+        when: When the fixes are made.
+      - skills: [crav1-open-pr]
+        when: To push and open the pull request.
+
   - id: outside-pr
     title: Outside pull request
     when: A pull request was built outside the kit (its slug has no `plan.md` or `tasks.md`).

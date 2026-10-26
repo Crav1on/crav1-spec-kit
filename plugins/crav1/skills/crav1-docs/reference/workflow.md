@@ -13,6 +13,7 @@ A route is an ordered list of steps for one situation. A step with more than one
 | [New slice](#new-slice) | You are starting a new feature from one or two sentences, a pile of ideas, or several files. |
 | [New information on an existing slice](#new-info) | Minutes, a mail, a chat, or a new fact changes a spec that already exists, built or not. |
 | [Bug](#bug) | Someone names a real bug. |
+| [Before a pull request](#before-pr) | Your branch is ready and you want it reviewed and fixed before you open a pull request. |
 | [Outside pull request](#outside-pr) | A pull request was built outside the kit (its slug has no `plan.md` or `tasks.md`). |
 | [Azure Boards sync](#ado-sync) | Specs and Azure Boards (ADO) should match. |
 
@@ -75,6 +76,19 @@ Someone names a real bug.
 | 4 | `/crav1-fix-build-gaps` | Optional. When `verify.md` has a failure. Then back to `/crav1-verify-build-against-spec`. |
 | 5 | `/crav1-finalize-commit` | When it verifies. |
 | 6 | `/crav1-open-pr` | To push and open the pull request. |
+
+<a id="before-pr"></a>
+
+## Before a pull request
+
+Your branch is ready and you want it reviewed and fixed before you open a pull request.
+
+| Step | Command | When |
+| --- | --- | --- |
+| 1 | `/crav1-review-pr` | With the choice word `branch`: reviews the branch against its base, no pull request needed. Each finding names its lane. |
+| 2 | `/crav1-tighten-spec` or `/crav1-plan-from-spec` or `/crav1-build-tasks` | Optional. When the review has findings, the lane each one names. Spec miss is Specify (tighten-spec), plan miss is Plan (plan-from-spec), code miss is Build (build-tasks). |
+| 3 | `/crav1-finalize-commit` | When the fixes are made. |
+| 4 | `/crav1-open-pr` | To push and open the pull request. |
 
 <a id="outside-pr"></a>
 
