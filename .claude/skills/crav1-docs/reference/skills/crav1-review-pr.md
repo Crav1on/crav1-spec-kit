@@ -38,7 +38,7 @@ This turn names an open pull request. Called by the user.
 
 ## Prompts
 
-Prompt budget: 1 (the most prompts in one run, the closing yes included). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
+Prompt budget: 2 (the most prompts in one run, the closing yes included). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
 
 ## Reads
 
@@ -60,7 +60,7 @@ Limits and exceptions: spark, specify, verify, [`/crav1-open-pr`](crav1-open-pr.
 
 ## You run next / Runs by itself
 
-- You run next: [`/crav1-merge-pr`](crav1-merge-pr.md); [`/crav1-refresh-system-notes`](crav1-refresh-system-notes.md) after an outside pull request merges; [`/crav1-finalize-commit`](crav1-finalize-commit.md)
+- You run next: [`/crav1-merge-pr`](crav1-merge-pr.md); [`/crav1-tighten-spec`](crav1-tighten-spec.md); [`/crav1-plan-from-spec`](crav1-plan-from-spec.md); [`/crav1-build-tasks`](crav1-build-tasks.md); [`/crav1-finalize-commit`](crav1-finalize-commit.md); [`/crav1-refresh-system-notes`](crav1-refresh-system-notes.md) after an outside pull request merges
 - Runs by itself: Calls no skill.
 
 ## Lane and group

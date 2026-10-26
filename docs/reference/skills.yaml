@@ -956,7 +956,7 @@ skills:
   starter: false
   since: 1.0.0
   stage: stable
-  prompt_budget: 1
+  prompt_budget: 4
   walkthrough: docs/from-plan-to-build.md
   purpose: Build tasks from tasks.md, always in an isolated worker per task; asks which tasks (one, a
     range, or all).
@@ -1004,6 +1004,7 @@ skills:
   you_run_next:
   - /crav1-open-pr
   - /crav1-verify-build-against-spec
+  - /crav1-finalize-commit
   first_prompt: '/crav1-build-tasks
 
 
@@ -1014,7 +1015,7 @@ skills:
   starter: false
   since: 1.0.0
   stage: stable
-  prompt_budget: 2
+  prompt_budget: 3
   walkthrough: docs/from-plan-to-build.md
   purpose: 'Serial board: build several ready specs one slug after another in this checkout.'
   in_depth:
@@ -1044,7 +1045,7 @@ skills:
   starter: false
   since: 1.0.0
   stage: stable
-  prompt_budget: 0
+  prompt_budget: 3
   walkthrough: docs/from-verify.md
   purpose: Map every v0 acceptance line to tests or UI checks and report pass, fail, or missing.
   in_depth:
@@ -1155,7 +1156,7 @@ skills:
   starter: false
   since: 1.0.0
   stage: stable
-  prompt_budget: 1
+  prompt_budget: 3
   walkthrough: docs/from-commit.md
   purpose: Draft the commit message, then commit, copy, change, or stop.
   in_depth:
@@ -1264,7 +1265,7 @@ skills:
   starter: false
   since: 1.6.0
   stage: stable
-  prompt_budget: 1
+  prompt_budget: 2
   walkthrough: docs/from-review-pr.md
   purpose: Read one named open pull request and report whether it can ship.
   in_depth:
@@ -1323,8 +1324,11 @@ skills:
   runs_by_itself: Calls no skill.
   you_run_next:
   - /crav1-merge-pr
-  - /crav1-refresh-system-notes after an outside pull request merges
+  - /crav1-tighten-spec
+  - /crav1-plan-from-spec
+  - /crav1-build-tasks
   - /crav1-finalize-commit
+  - /crav1-refresh-system-notes after an outside pull request merges
   first_prompt: '/crav1-review-pr
 
     https://github.com/<owner>/<repo>/pull/<n>

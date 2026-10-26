@@ -2,6 +2,17 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.95.0 (2026-10-26)
+
+Prompts at named stops now count, help answers are short, review-pr runs a fixed check list, and a new route covers review, fix, then open a pull request. A minor release because it changes behavior.
+
+### Kit
+
+- **Changed (crav1.mdc):** only a prompt for a value the user left out is outside a skill's prompt budget. A prompt at a stop the skill names now counts. Budgets raised to the real worst case: finalize-commit 1 → 3, review-pr 1 → 2, build-tasks 1 → 4, build-features 2 → 3, verify-build-against-spec 0 → 3.
+- **Changed (help):** a skill, route, concept or free-form answer is at most 5 lines plus `Source:`. An action question gets one `Run /crav1-<skill> …` line with the reason, never a quote of the skill page.
+- **Added (review-pr):** `references/checklist.md`, 7 checks shown one line each on every run, even when clean: spec and plan match, tests, secrets, infrastructure access per environment, environment parity, spec wording a bug touches, merge order.
+- **Added (workflow):** the `before-pr` route: `/crav1-review-pr branch` → the lane each finding names (optional) → `/crav1-finalize-commit` → `/crav1-open-pr`.
+
 ## 1.94.0 (2026-10-26)
 
 finalize-commit and the trailer hook strip a researched list of tool trailers, and keep everything else. A minor release because it changes which lines are stripped.

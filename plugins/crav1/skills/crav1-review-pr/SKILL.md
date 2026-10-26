@@ -126,9 +126,13 @@ No suggestions: say none.
 
 Read `references/comment.md` ("Bugs, tests, questions") only when the review found bugs, missing tests or questions.
 
+## Fixed checks
+
+Every run, read `references/checklist.md` and show its 7 check lines, one line each even when clean: spec and plan match, tests, secrets, infrastructure access per environment, environment parity, spec wording a bug touches, merge order (1.95.0).
+
 ## Ship or not
 
-Show findings, then info notes, then suggestions, then bugs, tests to add and questions.
+Show the check lines, then findings, then info notes, then suggestions, then bugs, tests to add and questions.
 
 When the first section has no **fix** and no **drop**, the review says **ship**. Say it is clean. Info notes do not change that.
 

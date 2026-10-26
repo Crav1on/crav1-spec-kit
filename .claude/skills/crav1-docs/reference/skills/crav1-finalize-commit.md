@@ -39,7 +39,7 @@ You want the commit message, or the commit itself. Called by the user and by [`/
 
 ## Prompts
 
-Prompt budget: 1 (the most prompts in one run, the closing yes included). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
+Prompt budget: 3 (the most prompts in one run, the closing yes included). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
 
 ## Reads
 

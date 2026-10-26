@@ -18,7 +18,7 @@ Several specs, one after another. Called by the user.
 
 ## Prompts
 
-Prompt budget: 2 (the most prompts in one run, the closing yes included). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
+Prompt budget: 3 (the most prompts in one run, the closing yes included). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
 
 ## Reads
 
