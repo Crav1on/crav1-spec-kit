@@ -33,4 +33,4 @@ Write the saved answer with `Answer: no`. No hook, no config change.
 
 ## The list
 
-The hook file is the single list of known tool trailers: Cursor (`Co-authored-by: Cursor <cursoragent@cursor.com>`, `Made-with: Cursor`), Claude Code (`Generated with [Claude Code](...)`), and Anthropic (`Co-Authored-By: Claude <...@anthropic.com>`). [added-lines.md](added-lines.md) names these from the same file. Any other `Co-authored-by:` line, such as a real person, stays.
+The hook file is the single list of known tool trailers as patterns; [tool-trailers.md](tool-trailers.md) lists the same tools (Cursor, Claude Code, Copilot, Aider, Codex, Gemini, Jules, Devin, Windsurf, Amazon Q, Cline, Amp, JetBrains AI). `Signed-off-by`, a real person's `Co-authored-by:` and every other line stay (1.94.0).
