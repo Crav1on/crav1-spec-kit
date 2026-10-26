@@ -32,7 +32,7 @@ Want proof against acceptance. Called by the user and by `crav1-build-task-agent
 
 ## Prompts
 
-Prompt budget: 0 (asks nothing). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
+Prompt budget: 3 (the most prompts in one run, the closing yes included). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
 
 ## Reads
 

@@ -40,7 +40,7 @@ You want to build one task, a range, or all unticked tasks. Called by the user a
 
 ## Prompts
 
-Prompt budget: 1 (the most prompts in one run, the closing yes included). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
+Prompt budget: 4 (the most prompts in one run, the closing yes included). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
 
 ## Reads
 
