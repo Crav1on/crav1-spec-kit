@@ -2,6 +2,14 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.95.1 (2026-10-26)
+
+Seven skills move sections word for word into `references/` so each SKILL.md is under 1,500 words. A patch because no rule changes.
+
+### Kit
+
+- **Moved:** spark-to-spec "Fill every section" rules → `references/spec-rules.md` (1,700 → 1,485 words); review-security design checks → new `references/design-exists.md` (1,648 → 1,483); read-environment look-inside hard rules → `references/look-inside.md` (1,614 → 1,499); review-pr GitHub read and second-section detail → `references/github.md`, `references/second-section.md` (1,563 → 1,481); finalize-commit choice words → `references/choice-words.md` (1,554 → 1,442); merge-pr GitHub pass table → `references/github.md` (1,547 → 1,385); retire-spec convert to note → `references/convert-to-note.md` (1,506 → 1,366). Each SKILL.md keeps a one-line pointer.
+
 ## 1.95.0 (2026-10-26)
 
 Prompts at named stops now count, help answers are short, review-pr runs a fixed check list, and a new route covers review, fix, then open a pull request. A minor release because it changes behavior.
