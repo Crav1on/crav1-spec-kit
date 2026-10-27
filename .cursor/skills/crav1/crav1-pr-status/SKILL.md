@@ -87,8 +87,9 @@ Read `references/output.md` every run. Print, in this order:
 6. **Follow-ups** (drafts).
 7. **Order**: pull requests this one depends on or that depend on it, and the merge order.
 8. **Drafted replies (not posted)**: one per thread that waits on you.
-9. **Merge readiness**: `Ready: yes | no | merged`, with the reasons.
-10. `PR record: <repo>: <path>`, as a code span.
+9. **Next for you**: Now / After <name> answers / Later (1.100.0).
+10. **Merge readiness**: `Ready: yes | no | merged`, with the reasons.
+11. `PR record: <repo>: <path>`, as a code span.
 
 `since last` prints only changes; see **Since last**.
 
@@ -106,7 +107,7 @@ Writing the record needs no yes: it is a note in the specs repo, as `/crav1-revi
 
 Read `references/offers.md` only when there is something to offer.
 
-- **Spec or decision candidates.** A point that settles how the system works, accepts a limit for now, or drops a goal is a candidate. The record tags it `to spec` or `to decision`. On a yes, run `/crav1-add-to-spec` with the candidate text and the PR note as its source; that skill writes the spec lines, and the Point gets `in spec <slug>`.
+- **Spec or decision candidates.** A point that settles how the system works, accepts a limit for now, or drops a goal is a candidate. The record tags it `to spec` or `to decision`. Name the command to type, `/crav1-add-to-spec pr<n> candidates`; never run it or ask about it (1.100.0).
 - **Follow-up work items.** A point accepted for later becomes a drafted item for `/crav1-ado-sync` (title and description, in the format of that skill's push branch). The record marks its Point `follow-up` only on a yes. Never create a work item.
 - **Thread status changes.** One question per thread, each its own yes. Only a yes sets that one thread's status on the host, as `references/pr-threads.md` says. Never several threads on one yes.
 
@@ -117,5 +118,5 @@ Read `references/offers.md` only when there is something to offer.
 - No edits to code, `spec.md`, `plan.md`, `tasks.md` or `verify.md`. The only writes are the PR note with its record, and the generated notes indexes.
 - Read-only toward the code repo; the only git write is a fetch of the pull request's two branches, as `/crav1-review-pr` asks first.
 - Never log in. Never print, echo or store a token. Redact secrets and personal data the way `/crav1-review-pr` does.
-- Do not run `/crav1-review-pr`, `/crav1-merge-pr` or `/crav1-ado-sync`. Name them when they fit.
+- Do not run `/crav1-review-pr`, `/crav1-merge-pr`, `/crav1-add-to-spec` or `/crav1-ado-sync`. Name them when they fit.
 - No rebase advice; suggest merging the base into the branch.

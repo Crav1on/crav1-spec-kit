@@ -13,15 +13,15 @@ Order of questions:
    - `Thread 98 (tests/test_retry_store.py:45) is done in 3c9d2e1 and still active. Set it to fixed?` **Set to fixed (Recommended)** / **Leave it**
    - GitHub: **Resolve thread** / **Unresolve thread** in the same way.
    Recommend **Leave it** for any change that undoes someone else's resolve.
-2. **Spec and decision candidates**, one question: `Take these into a spec with /crav1-add-to-spec?` **Take all (Recommended)** / **Pick some** / **Not now**. **Pick some** lists them after the run, so it adds no prompt; the next turn names them.
-3. **Follow-ups**, one question: `Mark these as follow-ups for /crav1-ado-sync? (drafts; no work item is created)` **Mark them (Recommended)** / **Not now**.
+2. **Follow-ups**, one question: `Mark these as follow-ups for /crav1-ado-sync? (drafts; no work item is created)` **Mark them (Recommended)** / **Not now**.
 
 Signed out, headless, or a bot run: list the same questions as text under `Offers (not asked):`, say `Run /crav1-pr-status pr<n> again to answer them.`, and change nothing on the host.
 
 ## On a yes
 
 - **Thread status:** set only that thread's status, as `crav1-add-to-spec` `references/pr-threads.md` **Change a thread's status** (Azure DevOps) or **Resolve a thread** (GitHub) says, then read the thread again and show its new status. A failure is shown and not retried. Update the Point's `host <status>` tag.
-- **Spec and decision candidates:** run `/crav1-add-to-spec` with the candidate texts as a `fact` dump, the PR note as the source, and say so. That skill writes the spec lines, open questions or decision record and asks its own questions. When it names the slug, set the Point's tag to `in spec <slug>`.
 - **Follow-ups:** set each chosen Point to `follow-up`, keep its text, and print the draft item (title, description with the pull request link and the anchor) for `/crav1-ado-sync`. Do not run `/crav1-ado-sync`; name it. It reads `follow-up` Points as open items.
 
 A no changes nothing and is not asked again in the same run.
+
+Spec and decision candidates are never asked (1.100.0): the output names `/crav1-add-to-spec pr<n> candidates`, which only runs when you type it. Pick some by retagging a Point in the record, or with `pr<n> candidates 1,3`.
