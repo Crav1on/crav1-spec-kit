@@ -70,7 +70,7 @@ Without a questions tool, use numbered lists, one per question, then end with `R
 
 Never call the questions tool (or any blocking choice UI) before step 2.
 
-Trailer hook (1.90.0): when no answer is saved and `.githooks/commit-msg` is missing or not turned on, the same prompt adds `Strip tool trailers on every commit for this repo?` (`strip trailers` / `keep trailers`), asked once per repo. A teammate with the hook but no config gets the config line without a question. Read [references/trailer-hook.md](references/trailer-hook.md).
+Trailer hook (1.90.0): when no answer is saved and `.githooks/commit-msg` is missing or not turned on, the same prompt adds `Strip tool trailers on every commit for this repo?` (`strip trailers` / `keep trailers`), asked once per repo. A reply that names neither word (for example only `commit`) leaves it unanswered: install no hook, save no answer, and ask again next run; never apply the Recommended pick on its own. A teammate with the hook but no config gets the config line without a question. Read [references/trailer-hook.md](references/trailer-hook.md).
 
 | Id | Choice | What it does |
 | --- | --- | --- |
