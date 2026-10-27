@@ -2,6 +2,19 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.98.0 (2026-10-27)
+
+`/crav1-open-pr` writes pull request descriptions in sections, with each change linked to its file and lines, instead of one paragraph. `/crav1-pr-status` reads the new sections. A minor release because open-pr's output and pr-status's reading change.
+
+### Kit
+
+- **Changed (open-pr, format A):** the body is a 1–2 line summary, then `###` sections, each left out when empty: **Changes** (grouped by area when there are 2 or more, at most about 8 bullets; each starts with a link to the file and lines, then a bold short title and what changed and why in 1–3 sentences; the why comes only from the spec, a plan task, a commit message or a code comment, never invented), **Verified** (the check written out: what was run or compared, where, the result and the date), **Risks and rollback**, **Merge order** (replaces the 1.64.0 "also has unmerged branches" tail), **Not in this PR**, **Questions for reviewers** (never invented) and **Work item**, last. Plain Markdown, no tables.
+- **Changed (open-pr links):** file and line links are pinned to the head commit, so they keep working after the branch is deleted: Azure DevOps `version=GC<sha>`, GitHub `blob/<sha>/<path>?plain=1#L<a>-L<b>`. Same link forms and encoding as `/crav1-review-pr`, with the commit in place of the branch.
+- **Removed (open-pr):** the `## What / why`, `## Spec` and `## Verify` sections. The body has no Spec section and no link to `spec.md`, `plan.md`, `tasks.md`, `verify.md` or anything else under `docs/specs/`; the verify result is written out under Verified.
+- **Added (open-pr):** when an infra, pipeline or PROD change states no rollback, the chat says `No rollback stated; add one in your edit if you want it.` The body does not. No new question: `prompt_budget` stays 1.
+- **Changed (pr-status):** it also reads the description: `### Merge order` becomes `Order` lines, `### Questions for reviewers` becomes Points tagged `asked; from description <date>`, and `### Not in this PR` is offered as follow-ups (a `follow-up` Point only on a yes). open-pr still writes no PR note and no PR record. A body without those headings is read as before.
+- **Docs:** commit and ideas walkthroughs, the pr-status walkthrough, the PR record tags, and the open-pr and pr-status reference pages.
+
 ## 1.97.0 (2026-10-27)
 
 A new `/crav1-pr-status` skill shows where one pull request stands: what is done, what is left and why, and what you owe. Review-pr, add-to-spec, merge-pr and pr-status now share one PR record in the PR note, and `migrate formats` moves the old review follow-ups notes into it. A minor release because review-pr and merge-pr behave differently.
