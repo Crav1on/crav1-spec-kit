@@ -2,6 +2,17 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.96.0 (2026-10-27)
+
+One Asking bullet in crav1.mdc, two new pull request warnings in CI, and the attribution off switches each tool really documents. A minor release because the pull request rules change.
+
+### Kit
+
+- **Changed (crav1.mdc):** the three asking bullets are one **Asking** bullet, same rules, 241 → 236 words.
+- **Added (CI):** `scripts/check-patch-behavior.py` warns when a patch release adds a new sentence with never, always, stop or ask to a SKILL.md or a `references/` file: bump the minor version, or say in the pull request body why it is still a patch. A warning, never a failure.
+- **Changed (pull request rules):** no `Docs-not-needed:` line when the pull request regenerates docs or changes anything under `docs/` (the `Kit version:` stamp alone does not count). `scripts/check-docs-not-needed.py` warns when it does.
+- **Changed (finalize-commit):** `references/added-lines.md` lists the off switch for the seven tools that document one (Cursor, Claude Code, Copilot in VS Code, Aider, Amp, Jules, Devin), each with its source. The other six rely on `strip trailers` and the trailer hook.
+
 ## 1.95.1 (2026-10-26)
 
 Seven skills move sections word for word into `references/` so each SKILL.md is under 1,500 words. A patch because no rule changes.
