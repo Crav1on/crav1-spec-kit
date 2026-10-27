@@ -1,10 +1,10 @@
 # Comment as posted (1.67.0)
 
-The user often edits the paste-ready comment before posting it. So `/crav1-review-pr` keeps both texts in the follow-ups note: the comment as drafted and the comment as posted. It compares them, and it marks drafted points that were left out without dropping them. Re-review then compares against what the reviewers actually saw. Examples use made-up names: the code repo `orders-api` on GitHub (`github.com/contoso/orders-api`), the source branch `feat/orders-retry`, pull request 42, the user Alex Doe.
+The user often edits the paste-ready comment before posting it. So `/crav1-review-pr` keeps both texts in the PR note (1.97.0; before that, in a separate follow-ups note): the comment as drafted and the comment as posted. It compares them, and it marks drafted points that were left out without dropping them. Re-review then compares against what the reviewers actually saw. Examples use made-up names: the code repo `orders-api` on GitHub (`github.com/contoso/orders-api`), the source branch `feat/orders-retry`, pull request 42, the user Alex Doe.
 
-## What the follow-ups note holds
+## What the PR note holds
 
-The follow-ups note is `docs/notes/YYYY-MM/review-pr-[<repo>-]<n>-follow-ups.md` ([Follow-ups note](../SKILL.md#follow-ups-note)). After the bullets, it has dated sections in time order. Never rewrite or remove a dated section.
+The PR note is `docs/notes/YYYY-MM/YYYY-MM-DD-pr-<repo>-<n>.md` ([PR record](../SKILL.md#pr-record)). After its `## PR record` section come the dated history sections, in sorted place by date (`crav1-add-to-spec` `references/pr-record.md`). Never rewrite or remove a dated section.
 
 ### The comment as drafted
 
@@ -35,11 +35,11 @@ Then the posted text word for word, in a code fence the same way.
   - `Description reviewed` names the newest `## Description as of` section of the PR note at review time. That shows which description the comment answered.
 - **Edited later on the host:** add a new section `## Comment as posted, <edit date> (by <name>), edited`, with the edited text and ` Edited on the host.` in the source line. Keep the earlier section.
 
-The PR note is not changed. It keeps the author's description. The follow-ups note links to it through `pr_note:`.
+The `## Description as of` sections are not changed. They keep the author's description.
 
 ## The record step
 
-Run it at the start of **every** run on a pull request whose follow-ups note has a `Comment as drafted` section with no `Comment as posted` section after it, or has a posted section the host may have edited since. Run it before the review. The `comment posted` choice word runs only this step and no review. In the same chat, the user saying "posted" (or pasting the text) after **I'll post it myself** runs it too.
+Run it at the start of **every** run on a pull request whose PR note (or old follow-ups note) has a `Comment as drafted` section with no `Comment as posted` section after it, or has a posted section the host may have edited since. Run it before the review. The `comment posted` choice word runs only this step and no review. In the same chat, the user saying "posted" (or pasting the text) after **I'll post it myself** runs it too.
 
 ### Finding the comment on the host
 
@@ -52,7 +52,7 @@ Use the signed-in `gh` or `az` session only, read-only. Never log in.
   - The signed-in user: `gh api user -q .login`.
   - Edited means `updated_at` is later than `created_at`, or the body differs from the saved text.
 - **Azure DevOps:**
-  - Threads: `az rest --method get --resource 499b84ac-1321-427f-aa17-267ca6975798 --uri "<org-url>/<project>/_apis/git/repositories/<repo>/pullRequests/<n>/threads?api-version=7.1"`.
+  - Threads, as `crav1-add-to-spec` `references/pr-threads.md` says (1.97.0): `az rest --method get --resource 499b84ac-1321-427f-aa17-267ca6975798 --uri "<org-url>/<project>/_apis/git/repositories/<repo>/pullRequests/<n>/threads?api-version=7.1"`.
   - A candidate is a comment with `commentType` `text` (not `system`) on a thread without `threadContext` (not inline). It is either the first comment of a thread, or the user's reply in the thread of an earlier posted comment (a re-review).
   - Fields: `content`, `author.displayName`, `author.uniqueName`, `publishedDate`, `lastContentUpdatedDate`.
   - The signed-in user: `az account show --query user.name`, compared with `uniqueName`.
@@ -76,7 +76,7 @@ Use the signed-in `gh` or `az` session only, read-only. Never log in.
 - **Chat**, right after saving:
 
 ```text
-Comment as posted (2026-10-19, by Alex Doe): saved in docs/notes/2026-10/review-pr-orders-api-42-follow-ups.md
+Comment as posted (2026-10-19, by Alex Doe): saved in docs/notes/2026-10/2026-10-17-pr-orders-api-42.md
 Compared with the draft of 2026-10-19: 5 points as drafted, 1 changed, 1 not in the posted comment, 1 added; opening changed.
 - Changed: Bugs, src/orders/retry_store.py, lines 4–5
 - Not in the posted comment: Tests to add with this PR, src/orders/retry_store.py, line 9 (still open)
@@ -84,11 +84,11 @@ Compared with the draft of 2026-10-19: 5 points as drafted, 1 changed, 1 not in 
 ```
 
 - **In the note:**
-  - A drafted point that is not in the posted comment gets a bullet in the note's list, written like a follow-up, ending in the mark: ``- `src/orders/retry_store.py`, line 9: an idempotency test for the row key. (Not in the posted comment, 2026-10-19; still open.)``. It is never dropped.
-  - A cut question that already has an `Asked on the PR:` bullet keeps that line, with the mark added at its end. No rewrite.
-  - Changed points get no bullet; the saved text is the record.
-  - An added question gets an `Asked on the PR:` bullet. Other added points get none.
-  - Later, a point the code fixed gets `(done in <short sha>)` after the mark, and a point a later posted comment carries gets `(posted <YYYY-MM-DD>)`.
+  - A drafted point that is not in the posted comment keeps its record Point and gets the tag `not posted <date>` (1.97.0): ``- Point: src/orders/retry_store.py:9 | open | Alex Doe | from review-pr 2026-10-19; not posted 2026-10-19 | An idempotency test for the row key``. It is never dropped.
+  - A cut question keeps its Point (`waiting on <author>`, `asked`), with the tag added. No rewrite.
+  - Changed points keep their Point as it is; the saved text is the record.
+  - An added question gets a Point (`waiting on <author>`, `asked`). Other added points get an `open` Point.
+  - Later, a point the code fixed gets status `done <short sha>`, and a point a later posted comment carries loses `not posted` and gets `posted <YYYY-MM-DD>`.
 - **Posted text that doesn't split into points** (rewritten freely): save it word for word, mark nothing, and say `The posted comment doesn't follow the layout, so I can't match points; saved as is.`
 - Follow-ups are never in the comment, so they never get the mark.
 
@@ -97,7 +97,7 @@ Compared with the draft of 2026-10-19: 5 points as drafted, 1 changed, 1 not in 
 - Earlier points come from the newest `Comment as posted` section, after the record step has caught any edit. Comments and answers by other people on the host still count.
 - No posted section: read the host's review comments as before. When the host has none, nothing was posted, so the new comment is a first-review comment with no `### Since last time`. The chat still goes through the points of the newest `Comment as drafted` section (fixed, partly fixed, still open, no longer relevant) under `compared with the draft; nothing posted was found`.
 - `### Since last time` lists only points the reviewers saw.
-- A new finding that matches a point marked `Not in the posted comment` is shown in the chat with its mark and kept out of the new comment, unless the user says to include it.
+- A new finding that matches a Point tagged `not posted` is shown in the chat with its mark and kept out of the new comment, unless the user says to include it.
 
 ## Personal data and secrets
 
