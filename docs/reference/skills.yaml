@@ -450,6 +450,7 @@ skills:
   in_depth:
   - Prompt for `feat/<slug>` or specify-only `spec/<slug>`; no silent checkout, no push, no PR.
   - '1.64.0: the Build prompt puts a task''s `(branch: …)` first, marked (Recommended), and never creates it from default without asking.'
+  - '1.99.0: implementation code is never built on a base branch (main, master, develop, Merges into, `release/*`): no Stay there; Create `feat/<slug>` from the into branch (Recommended), Use an existing branch, Other name or Stop; `hotfix/` is a work prefix; specs, docs and the specs repo are exempt. Rules in `references/code-branch.md`.'
   - '1.68.0: a missing task sub-branch is offered as **Create it from the spec branch (Recommended)**; the `(into …)` marker is written after the yes.'
   use_when: 'Brownfield: leave the default branch'
   table:
@@ -952,6 +953,10 @@ skills:
       means: "a range (add `T#-T#`)"
     - word: "all tasks"
       means: "all unticked tasks"
+  - question: Branch
+    words:
+    - word: "new branch"
+      means: "on a base or other branch, create feat/<slug> from the into branch (1.99.0)"
   lane: build
   group: Build
   starter: false
@@ -962,6 +967,7 @@ skills:
   purpose: Build tasks from tasks.md, always in an isolated worker per task; asks which tasks (one, a
     range, or all).
   in_depth:
+  - '1.99.0: on a base branch the Build prompt has no Stay, a headless run stops unless `new branch`, a task naming a base branch is blocked, and the worker returns blocked on a base before any edit or commit.'
   - '**`/crav1-build-tasks`** opens with one question: which tasks to build, one `T#`, a range, or all
     unticked, listing the ready ones with the `/crav1-tasks-ready-to-build` rules. It skips the question
     when the message names the tasks. Every task runs in its own worker (implement, commit, verify, optional
@@ -1022,6 +1028,7 @@ skills:
   in_depth:
   - 'Serial board of ready slugs: `feat/<slug>` from default, then that spec’s build-tasks loop; no
     parallel, no push, no PR.'
+  - '1.99.0: `feat/<slug>` forks from the into branch (Merges into, else default), a task naming a base branch is blocked.'
   - '1.64.0: tasks with `(branch: …)` are built on that branch; the board shows `done (n branches not merged)`.'
   use_when: Several specs, one after another
   table:
@@ -1089,16 +1096,21 @@ skills:
       means: "gaps from the verify report"
     - word: "live gaps"
       means: "live-site gaps"
+  - question: Branch
+    words:
+    - word: "new branch"
+      means: "on a base or other branch, create fix/<slug> from the into branch (1.99.0)"
   lane: build
   group: Verify and fix
   starter: false
   since: 1.0.0
   stage: stable
-  prompt_budget: 2
+  prompt_budget: 3
   walkthrough: docs/from-verify.md
   purpose: Fix gaps a build left, one at a time inside the spec; asks verify-report gaps or live-site
     gaps.
   in_depth:
+  - '1.99.0: before the first code edit on a base branch, offers Create `fix/<slug>` from the into branch (Recommended), an existing branch, another name or stop; never edits code there; headless stops unless `new branch`.'
   - '**`/crav1-fix-build-gaps`** opens with one question: gaps from the verify report, or a live-site
     gap (ports, proxy, SQL, unpublished URL). It skips the question when the message says which. It replaces
     fix-from-verify and fix-live; their rules are kept as branches.'
@@ -1136,6 +1148,10 @@ skills:
       means: "draft and show, no git commit; the same as copy (1.83.0)"
     - word: "commit now"
       means: "draft, show, then commit with no choice question (never pushes)"
+  - question: Base branch
+    words:
+    - word: "new branch"
+      means: "code staged on a base branch: create feat/<slug> from the into branch and commit there (1.99.0)"
   - question: Pull
     words:
     - word: "pull"
@@ -1161,6 +1177,7 @@ skills:
   walkthrough: docs/from-commit.md
   purpose: Draft the commit message, then commit, copy, change, or stop.
   in_depth:
+  - '1.99.0: never commits implementation code on a base branch, even with `commit now`; the prompt becomes `Commit on a work branch?` (create `feat/<slug>` from the into branch and commit, an existing branch, another name, stop). Spec and doc commits on a base are unchanged.'
   - '**`/crav1-finalize-commit`** always drafts first, then offers commit, copy, change, or stop (1.83.0;
     there is no opening question). When no style rule is saved, it drafts in the recommended style and
     asks CRAV1 style or git log in the same prompt as those choices (1.89.0), at most once per run (1.90.5). `message only` drafts with
