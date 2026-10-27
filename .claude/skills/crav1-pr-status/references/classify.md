@@ -9,6 +9,16 @@ Read every run, from **Points and statuses** in `SKILL.md`. Record format: `crav
 - A point already in the record keeps its line: match by `thread <id>`, then by anchor and words. Never make a second Point for it.
 - A record Point with no thread (from `/crav1-review-pr`, or `migrated`) is matched to a thread the same way; no match keeps it as it is, with `no thread` shown in the chat.
 
+## The description (1.98.0)
+
+Read the pull request's description too. `/crav1-open-pr` writes these `###` sections (format A); read them when they are there, by heading, whoever wrote the body:
+
+- **Merge order:** each bullet names another pull request or branch and says before or after. One `Order` line each, as **Candidates** says, with `from the description` as its source.
+- **Questions for reviewers:** each bullet is a point the author asked. Anchor from its link (`path:line` or `path:start-end`; no link: `general`), owner the author, tags `asked; from description <date>`. Its status comes from the replies as for any point; no reply is `waiting on <reviewer>` when the pull request names one reviewer, else `open`. A thread that answers it is matched by words or anchor, as for a Point with no thread.
+- **Not in this PR:** each bullet is a **Follow-up** candidate, offered in the follow-ups question. It is written only on a yes, as a `follow-up` Point with the same tags rule (`from description <date>`).
+
+A point already in the record keeps its line. The other sections (Changes, Verified, Risks and rollback) are not record lines. A body without these headings is read as before: an order the description states in words is still an **Order** candidate.
+
 ## Read the replies
 
 For each point, read every reply in order. The **last** relevant message decides, unless a later push settles it.
