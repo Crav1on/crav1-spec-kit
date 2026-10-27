@@ -424,7 +424,8 @@ def migrate_pr(pr_lines, fu, fu_rel, today):
                     fm = ["%s: [%s]" % (key, ", ".join(merged)) if ln.startswith(key + ":") else ln for ln in fm]
     if moved:
         secs.append((today, moved))
-    out = list(fm) + pre + ["", "## PR record", ""] + rec + [""]
+    lead = [""] if fm and body and not body[0].strip() else []  # keep the blank line after the front matter
+    out = list(fm) + lead + pre + ["", "## PR record", ""] + rec + [""]
     if tail:
         out += tail + [""]
     for _, s in secs:
