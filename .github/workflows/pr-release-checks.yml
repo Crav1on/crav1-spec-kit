@@ -13,3 +13,12 @@ jobs:
           fetch-depth: 0
       - name: A patch release adds no new never/always/stop/ask sentence (warns only)
         run: python3 scripts/check-patch-behavior.py "origin/${{ github.base_ref }}" HEAD
+
+  docs-not-needed:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: No Docs-not-needed line when docs/ changed (warns only)
+        run: python3 scripts/check-docs-not-needed.py "origin/${{ github.base_ref }}" HEAD
