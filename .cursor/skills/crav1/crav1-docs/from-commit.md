@@ -57,6 +57,10 @@ A review is not a merge ask. Opening a pull request is not a merge ask either.
 
 Not written: branch deletion, work item links, squash or rebase merges.
 
+## On a base branch (1.99.0)
+
+When you are on `main`, `develop`, the `Merges into` branch or a `release/*` branch and anything staged is code (outside `docs/` and the root Markdown files), `/crav1-finalize-commit` never commits there, even with `commit now`. Its one prompt becomes `Commit on a work branch?`: **Create feat/<slug> from <into> and commit (Recommended)**, **Use an existing branch**, **Other name** or **stop**. Create moves your staged changes onto the new branch and commits there. `new branch` answers it in one line. Spec and doc commits on a base branch are unchanged, and so is the specs repo.
+
 ## Trailer hook (1.90.0)
 
 The first time `/crav1-finalize-commit` runs in a repo without the hook, its one prompt also asks: Strip tool trailers on every commit for this repo? `strip trailers` adds `.githooks/commit-msg`, runs `git config core.hooksPath .githooks`, and saves the answer, so it never asks again. When you pick commit, the hook and the saved answer go into that same commit, so teammates get the hook when they pull (1.90.6); with copy or stop they are left ready to commit. The hook removes only the known tool trailers (Cursor, Claude Code, GitHub Copilot, Aider, OpenAI Codex, Gemini, Jules, Devin, Windsurf, Amazon Q, Cline, Amp and JetBrains AI; 1.94.0), even from tools that ignore their own attribution setting. A co-author line for a real person, such as `Co-authored-by: Ada Example <ada@example.com>`, and any `Signed-off-by` line stay. When a teammate's repo has the hook but not the config line, their first run sets it without asking. `keep trailers` saves no and adds nothing.

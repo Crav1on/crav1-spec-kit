@@ -83,7 +83,7 @@ If they named `copy`/`change`/`commit` **before** any wording exists, ignore it,
 
 Do not invent extra options (push, amend, commit subsets they did not name). A push asked for after the commit is a **new** request.
 
-**Base branch (1.99.0).** Before offering the choices, when HEAD is a base branch and anything staged is implementation code, read [references/base-branch.md](references/base-branch.md): the prompt becomes `Commit on a work branch?`, and nothing is committed on the base, even with `commit now`.
+**Base branch (1.99.0).** Before offering the choices, when HEAD is a base branch and anything staged is implementation code, read [references/base-branch.md](references/base-branch.md): the prompt becomes `Commit on a work branch?`, and nothing is committed on the base, even with `commit now`; `new branch` answers it.
 
 ## When they pick `change`
 

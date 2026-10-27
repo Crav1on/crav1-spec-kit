@@ -21,6 +21,8 @@ Use this after tasks are built. Verify maps every v0 acceptance line in `spec.md
 | Live wiring | `/crav1-fix-build-gaps` when the gap is a live path (ports, proxy, SQL, an unpublished URL) | Same queue and same writes as fix-build-gaps, preferring live or untested wiring rows. When the fix changes how the parts connect, asks once whether to run `/crav1-refresh-system-notes` and does not run it |
 | Prove again | `/crav1-verify-build-against-spec` | Re-runs the matrix |
 
+On a base branch (`main`, `develop`, the `Merges into` branch, `release/*`) `/crav1-fix-build-gaps` edits no code: it first offers **Create fix/<slug> from <into> (Recommended)**, an existing branch, another name, or stop (1.99.0). A headless run stops unless it has `new branch`.
+
 ## Local test dependencies
 
 Before any test runs, in build, verify, and fix, the kit checks the local dependencies the tests need: Azurite for Azure Storage, a database container, an emulator, whatever the repo's tests, config, compose files, or README name. For each one that is not running it asks:

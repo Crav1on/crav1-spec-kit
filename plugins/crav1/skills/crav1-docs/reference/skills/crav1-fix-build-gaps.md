@@ -8,6 +8,8 @@
 
 Fix gaps a build left, one at a time inside the spec; asks verify-report gaps or live-site gaps.
 
+1.99.0: before the first code edit on a base branch, offers Create `fix/<slug>` from the into branch (Recommended), an existing branch, another name or stop; never edits code there; headless stops unless `new branch`.
+
 **[`/crav1-fix-build-gaps`](crav1-fix-build-gaps.md)** opens with one question: gaps from the verify report, or a live-site gap (ports, proxy, SQL, unpublished URL). It skips the question when the message says which. It replaces fix-from-verify and fix-live; their rules are kept as branches.
 
 Verify report gaps (was `/crav1-fix-from-verify`): After verify-build-against-spec, walk inner-loop gaps (failed → unverified → `G#`); omit Gap for the next; writes `fix-log.md`.
@@ -22,6 +24,7 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 | --- | --- | --- |
 | Which gaps | `verify gaps` | gaps from the verify report |
 | Which gaps | `live gaps` | live-site gaps |
+| Branch | `new branch` | on a base or other branch, create fix/<slug> from the into branch (1.99.0) |
 
 ## Runs when
 
@@ -29,7 +32,7 @@ verify.md lists gaps, or a live host path fails. Called by the user and by `crav
 
 ## Prompts
 
-Prompt budget: 2 (the most prompts in one run, the closing yes included). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
+Prompt budget: 3 (the most prompts in one run, the closing yes included). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
 
 ## Reads
 

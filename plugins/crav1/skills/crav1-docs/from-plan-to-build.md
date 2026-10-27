@@ -22,7 +22,7 @@ Use this when `plan.md` and `tasks.md` are accepted. Build one task `T#` at a ti
 
 | Step | You | Agent |
 | --- | --- | --- |
-| Branch | Pick the branch when asked | Each command calls `/crav1-create-feature-branch` before code. `/crav1-build-features` makes `feat/<slug>` from the default branch per slug without asking again |
+| Branch | Pick the branch when asked | Each command calls `/crav1-create-feature-branch` before code. On a base branch there is no Stay (see [Never on a base branch](#never-on-a-base-branch-1990)). `/crav1-build-features` makes `feat/<slug>` from the into branch per slug without asking again |
 | Linter gate | When `## Linter` says none and you have not chosen to go on, decide first | Stops with no code until you choose |
 | Approvals (worker commands) | Answer the one pause: `continue` or `click` | `/crav1-build-tasks`, and `/crav1-build-features` pause once for the host's tool-approval setting, not per task or per slug. When the run ends they say how to restore it |
 | Commit style (worker commands) | Pick a commit style once when asked | Writes the commit-style rule once when it is missing. Workers then commit without asking |
@@ -44,10 +44,20 @@ Not written: `spec.md`, other tasks. No push, no pull request.
 
 A task line can name its branch: `- [ ] T3: … (after: T1) (branch: feat/orders-retry)`.
 
-- `/crav1-build-tasks` on one task offers **feat/orders-retry (Recommended)** first in the `/crav1-create-feature-branch` Build prompt, then `feat/<slug>`, Stay and Other. A branch that exists nowhere is never created from default without asking.
+- `/crav1-build-tasks` on one task offers **feat/orders-retry (Recommended)** first in the `/crav1-create-feature-branch` Build prompt, then `feat/<slug>`, Other name and Stop (Stay only off a base branch). A task naming a base branch is blocked. A branch that exists nowhere is never created from default without asking.
 - A range or all-tasks run switches to each task's branch on a clean tree; starting the run is the consent. A missing branch blocks that task.
 - `/crav1-build-features` does the same per slug. A slug whose tasks are done but whose branches aren't all merged shows `done (2 branches not merged)`.
 - `/crav1-tasks-ready-to-build` shows the branch beside each ready task, and one Branches line.
+
+## Never on a base branch (1.99.0)
+
+Implementation code is never written or committed on a base branch: `main`, `master`, `develop`, the repo's `Merges into` branch, or any `release/*`. On a work branch (`feat/`, `feature/`, `bug/`, `bugfix/`, `fix/`, `hotfix/`, or one a spec names) the build goes ahead. On a base branch, `/crav1-build-tasks` and `/crav1-fix-build-gaps` ask once:
+
+- **Create feat/orders-retry from develop (Recommended)**: forks from the into branch, so a repo that merges into `develop` forks from `develop`, not `main`. Uncommitted changes come along when you are on that branch.
+- **Use an existing branch**: lists the repo's other branches, the spec's own first. A pick the spec doesn't list is added to its Match `Branch:` list with `(into develop)`.
+- **Other name** and **Stop**. There is no Stay.
+
+On a branch that is neither (`chore/x`, a detached checkout) the same prompt offers **Stay** instead of Other name. A release fix goes on `fix/<slug>` marked `(into release/x)`. A headless run stops with one line unless it has the choice word `new branch`. `/crav1-build-features` forks `feat/<slug>` from the into branch without asking. The worker returns `blocked` if it ever finds itself on a base branch. Spec and doc writes, and the specs repo itself, are exempt.
 
 ## A spec branch with task sub-branches (1.68.0)
 
