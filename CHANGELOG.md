@@ -2,6 +2,17 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.99.1 (2026-10-28)
+
+Kit skills change files with the host's edit tool, so you see a diff, and name local files as code spans with the repo first instead of links. A patch: the same records get written and the same answers come back, only how a file is edited and how its name is printed change.
+
+### Kit
+
+- **Added (crav1.mdc):** an **Editing files** rule: kit files (specs, notes, records) are changed with the host's file edit tool; run only the scripts a skill names, never an inline `python -`, `node -e` or heredoc script that edits files.
+- **Added (crav1.mdc):** a **Naming local files** rule: a local file is a code span, repo first when the run touched more than one repo, never a Markdown link, `file://`, `vscode://` or an absolute path. Web links only for things on the host.
+- **Changed (add-to-spec, `references/pr-record.md`):** a PR record line is changed with the edit tool, one edit per line, found by reading the note; when the words match two lines, ask instead of guessing.
+- **Changed (pr-status):** the closing line is `PR record: <repo>: <path>` as a code span, and `references/output.md` says local files are never links.
+
 ## 1.99.0 (2026-10-27)
 
 Implementation code is never written or committed on a base branch any more. Every skill that writes or commits code follows one shared guard, and on `main`, `develop`, the `Merges into` branch or a `release/*` branch it offers a work branch first instead of building there. A minor release because prompts change, Stay is gone on a base, and headless runs stop there.
