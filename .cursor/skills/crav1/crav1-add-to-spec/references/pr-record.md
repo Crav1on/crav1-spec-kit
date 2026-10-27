@@ -57,6 +57,7 @@ These follow [merge-safe.md](merge-safe.md) so two people's runs rarely conflict
 
 - Kinds in the order above. Within a kind, in sorted place by key, case ignored: Order by PR number, Point by anchor then text, Read by name.
 - A skill changes only its own line: it finds a Point by its thread id, else by anchor and text words (case, spacing and trailing punctuation ignored), and replaces that line where it is. A status or tag change does not move the line. Existing lines are never reordered.
+- Change a record line with the host's file edit tool, one edit per line, showing the old and new line. Find the line by reading the note, not with a script; when the words match two lines, ask instead of guessing. The only scripts a record write runs are the ones a skill names (`notes_index.py`) (1.99.1).
 - A new line goes in sorted place. `Ready` and `State` are replaced in place; `Read` is one line per person.
 - Never delete a Point. A point that no longer applies becomes `declined` or `done <sha>` with the reason in its text.
 
