@@ -43,8 +43,10 @@ Drafted replies (not posted)
 - To Robin K. (not sent): "Hi Robin, Sam and I need the merge order of feat/orders-queue (PR 40) and PR 42. Plan: PR 40 into develop first. OK with you?"
 
 Ready: no. 2 waiting on you; 1 needs Robin K.; 1 agreed, not done; after PR 40 (not merged).
-PR record: docs/notes/2026-10/2026-10-08-pr-orders-api-71.md
+PR record: `orders-api: docs/notes/2026-10/2026-10-08-pr-orders-api-71.md`
 ```
+
+Local files, the `PR record:` line included, are named as a code span with the repo first: `` `orders-api: docs/notes/…` ``. Never as a Markdown link, `file://`, `vscode://` or an absolute path, in the shape or in closing prose. Web links only for things on the host (the pull request, a thread, a commit) (1.99.1).
 
 Empty groups are left out, heading included. Within a group: oldest first, then by anchor.
 

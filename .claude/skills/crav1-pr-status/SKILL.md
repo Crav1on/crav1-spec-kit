@@ -88,7 +88,7 @@ Read `references/output.md` every run. Print, in this order:
 7. **Order**: pull requests this one depends on or that depend on it, and the merge order.
 8. **Drafted replies (not posted)**: one per thread that waits on you.
 9. **Merge readiness**: `Ready: yes | no | merged`, with the reasons.
-10. `PR record: <path>`.
+10. `PR record: <repo>: <path>`, as a code span.
 
 `since last` prints only changes; see **Since last**.
 
