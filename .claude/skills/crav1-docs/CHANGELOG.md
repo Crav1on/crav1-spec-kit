@@ -16,6 +16,7 @@ Implementation code is never written or committed on a base branch any more. Eve
 - **Added (fix-build-gaps):** a branch check before the first code edit, offering `fix/<slug>` from the into branch. `prompt_budget` 2 → 3; `new branch` choice word.
 - **Changed (finalize-commit):** with code staged on a base branch the prompt becomes `Commit on a work branch?` (create `feat/<slug>` from the into branch and commit, an existing branch, another name, stop), also for `commit now`; `new branch` answers it. Docs-only commits on a base are unchanged.
 - **Added (crav1.mdc):** a hard rule line for base branches.
+- **Fixed (finalize-commit):** a reply that names neither `strip trailers` nor `keep trailers` leaves the trailer-hook question unanswered: it installs no hook and saves nothing, instead of being read as the Recommended `strip trailers`.
 - **CI:** `scripts/check-code-branch.py` fails when a code-writing skill file doesn't point to the guard or the Build prompt offers Stay on a base.
 - **Docs:** build, verify and commit walkthroughs, glossary, skills reference.
 
