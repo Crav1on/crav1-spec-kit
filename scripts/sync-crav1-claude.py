@@ -67,6 +67,23 @@ On Claude Code this file is the project instruction (`.claude/CLAUDE.md`). A use
 """.strip()
 
 
+# /crav1-help names its docs folder per host (1.96.1). The Cursor source lists
+# the Cursor drop-in and plugin; the Claude copy lists the Claude Code folders
+# instead, so help never reads a folder the host does not have.
+HELP_DOCS_CURSOR = re.compile(r"^- Cursor drop-in: .*\n- Cursor plugin: .*\n", re.MULTILINE)
+HELP_DOCS_CLAUDE = (
+    "- Claude Code project drop-in: `.claude/skills/crav1-docs/`.\n"
+    "- Claude Code user scope: `~/.claude/skills/crav1-docs/`.\n"
+)
+
+
+def claude_help_docs_folder(text: str) -> str:
+    updated, n = HELP_DOCS_CURSOR.subn(lambda _m: HELP_DOCS_CLAUDE, text)
+    if n != 1:
+        raise SystemExit("crav1-help SKILL.md: expected one Cursor docs-folder pair, found %d" % n)
+    return updated
+
+
 def rewrite_paths(text: str) -> str:
     for old, new in PATH_REWRITES:
         text = text.replace(old, new)
@@ -206,6 +223,8 @@ def rewrite_tree_files(root: Path) -> None:
         text = path.read_text(encoding="utf-8")
         if path.name in FRONTMATTER_RULE_ASSETS:
             updated = transform_commit_style_asset(text)
+        elif path.name == "SKILL.md" and path.parent.name == "crav1-help":
+            updated = rewrite_paths(claude_help_docs_folder(text))
         else:
             updated = rewrite_paths(text)
         if updated != text:
@@ -271,6 +290,10 @@ def validate(dest: Path) -> None:
             raise SystemExit(f"{agent.name} tools are not the documented read-only set")
         if has_tools and any(token in fm for token in ("Write", "Edit", "Bash")):
             raise SystemExit(f"{agent.name} read-only tools include a write tool")
+
+    help_skill = (dest / "skills" / "crav1-help" / "SKILL.md").read_text(encoding="utf-8")
+    if HELP_DOCS_CLAUDE not in help_skill or "Cursor drop-in" in help_skill or "Cursor plugin:" in help_skill:
+        raise SystemExit("crav1-help SKILL.md does not name the Claude Code docs folders")
 
     for asset_name in FRONTMATTER_RULE_ASSETS:
         matches = list((dest / "skills").rglob(asset_name))

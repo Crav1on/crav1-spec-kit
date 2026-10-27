@@ -66,9 +66,14 @@ Help skips specs in `docs/specs/retired/` and `Moved:` pointers. Parked specs ar
 
 ## Where the answers come from
 
+The skill names its docs folder for each host and reads it directly (1.96.1). It never looks for `docs/reference/` at the root of your repo and never searches for the docs:
+
 - In the kit repo, its own `docs/`.
-- In every install, the `crav1-docs/` folder next to the skills: `skills/crav1-docs/` in the Cursor plugin, `.cursor/skills/crav1/crav1-docs/` in the Cursor drop-in, and `.claude/skills/crav1-docs/` (or `~/.claude/skills/crav1-docs/`) in Claude Code. Each release bundles its own docs and `CHANGELOG.md`, so the answer fits the version you have.
+- Cursor: `.cursor/skills/crav1/crav1-docs/` in the drop-in, `skills/crav1-docs/` in the plugin folder.
+- Claude Code: `.claude/skills/crav1-docs/`, or `~/.claude/skills/crav1-docs/` in user scope.
 - When only the skill folders were copied and `crav1-docs/` is missing, the command answers from the skill files only and says so.
+
+Each release bundles its own docs and `CHANGELOG.md`, so the answer fits the version you have. The answer starts with the answer, not with a line about which docs it used; the `Source:` line at the end says where it came from.
 
 It never fetches an answer from GitHub. When the machine is online, it reads the kit's tag names once and adds one line when a newer version is tagged.
 

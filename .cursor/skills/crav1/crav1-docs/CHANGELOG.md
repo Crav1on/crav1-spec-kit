@@ -2,6 +2,15 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.96.1 (2026-10-27)
+
+`/crav1-help` names its docs folder for each host and no longer opens with a line about which docs it used. A patch: help still reads the same docs and answers the same way.
+
+### Kit
+
+- **Changed (help):** the skill lists its docs folder per host: kit repo `docs/`; Cursor drop-in `.cursor/skills/crav1/crav1-docs/`; Cursor plugin `skills/crav1-docs/` in the plugin folder; Claude Code `.claude/skills/crav1-docs/` (user scope `~/.claude/skills/crav1-docs/`). It reads `<docs folder>/reference/…` directly, never `docs/reference/` at the root of a product repo, and never runs `ls`, `find` or a search for the docs. The Claude Code generator writes the Claude Code folders into the Claude copy (before, it listed the Cursor drop-in as `.claude/skills/crav1-docs/`).
+- **Changed (help):** no opening line about which docs were used; the first line is the answer, and short answers stay at 5 lines plus `Source:`.
+
 ## 1.96.0 (2026-10-27)
 
 One Asking bullet in crav1.mdc, two new pull request warnings in CI, and the attribution off switches each tool really documents. A minor release because the pull request rules change.
