@@ -4,7 +4,7 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 
 ## 1.98.0 (2026-10-27)
 
-`/crav1-open-pr` writes pull request descriptions in sections, with each change linked to its file and lines, instead of one paragraph. `/crav1-pr-status` reads the new sections. A minor release because open-pr's output and pr-status's reading change.
+`/crav1-open-pr` writes pull request descriptions in sections, with each change linked to its file and lines, instead of one paragraph. `/crav1-pr-status` reads the new sections, and `/crav1-review-pr` checks them point by point. A minor release because open-pr's output and pr-status's and review-pr's reading change.
 
 ### Kit
 
@@ -13,7 +13,8 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 - **Removed (open-pr):** the `## What / why`, `## Spec` and `## Verify` sections. The body has no Spec section and no link to `spec.md`, `plan.md`, `tasks.md`, `verify.md` or anything else under `docs/specs/`; the verify result is written out under Verified.
 - **Added (open-pr):** when an infra, pipeline or PROD change states no rollback, the chat says `No rollback stated; add one in your edit if you want it.` The body does not. No new question: `prompt_budget` stays 1.
 - **Changed (pr-status):** it also reads the description: `### Merge order` becomes `Order` lines, `### Questions for reviewers` becomes Points tagged `asked; from description <date>`, and `### Not in this PR` is offered as follow-ups (a `follow-up` Point only on a yes). open-pr still writes no PR note and no PR record. A body without those headings is read as before.
-- **Docs:** commit and ideas walkthroughs, the pr-status walkthrough, the PR record tags, and the open-pr and pr-status reference pages.
+- **Changed (review-pr):** a format A description is compared with the diff bullet by bullet: a Changes bullet whose linked lines are not in the diff or do not do what it says, or a change no bullet covers, is the Body fix finding, naming the bullet or file. A choice the bullet's why calls deliberate, at the lines it links, or that Not in this PR names as left out, is not raised as a fault, unless it contradicts something written in the repo.
+- **Docs:** commit, ideas and review-pr walkthroughs, the pr-status walkthrough, the PR record tags, and the open-pr and pr-status reference pages.
 
 ## 1.97.0 (2026-10-27)
 

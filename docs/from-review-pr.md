@@ -45,7 +45,7 @@ These have to be true before the review says ship:
 - **Spec.** The diff does not add product behavior the spec never asked for, and it does not leave out something the spec said must be true.
 - **Plan.** Only when the slug has `plan.md`. The files and the checks named on the plan tasks are in the diff. A task that never named a needed file or check is a plan miss.
 - **Verify.** Only when the slug has `plan.md`. It quotes `verify.md` when that file is already on the branch. It says so when the file is missing. It does not run the tests.
-- **Pull request body.** The description matches that same scope, not wider or narrower than the diff. A body mismatch stays on the pull request. This command does not open a new spec for it.
+- **Pull request body.** The description matches that same scope, not wider or narrower than the diff. A format A body from `/crav1-open-pr` (1.98.0) is checked bullet by bullet: each Changes bullet against the lines it links, and each change in the diff against a bullet. A body mismatch stays on the pull request. This command does not open a new spec for it.
 - **Linter.** A linter or checker covers the code in the diff, and that check is required and green. If none exists, or it exists but is not required, or it is required and red, the decision is fix. This command does not install a linter.
 - **Secrets.** A secret in the diff is a fix. The review names the path and does not print the secret.
 
@@ -108,7 +108,7 @@ The block, every posted comment, and every re-review reply use the style Thomas 
 - A vague source, such as "me and my checks". It never names a tool, a bot, or the kit.
 - A short, plain opening that may vary slightly. Never praise, a greeting by name, or thanks.
 - Soft wording with the same facts: "I noticed…", "Would it be worth adding a test that…?" One fix per point.
-- The pull request description is read first. A choice it calls deliberate is not raised as a fault, unless it contradicts something written in the repo. Otherwise it becomes a follow-up.
+- The pull request description is read first. A choice it calls deliberate is not raised as a fault, unless it contradicts something written in the repo. With a format A body (1.98.0) that is per point: the why on the Changes bullet that links those lines, and anything its Not in this PR section names as left out. Otherwise it becomes a follow-up.
 
 ## Post it
 

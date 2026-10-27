@@ -20,6 +20,8 @@ Reads one named open pull request. When the slug has `plan.md`, spec, plan, `ver
 
 1.97.0: no separate follow-ups note. Findings, follow-ups and questions go into the PR note's shared `## PR record` (`crav1-add-to-spec` `references/pr-record.md`) as Point lines, drafted points you cut get `not posted <date>`, and the comment as drafted and as posted go into the PR note's history. A re-review reads the record first. An old follow-ups note is still read; run [`/crav1-add-to-spec`](crav1-add-to-spec.md) migrate formats` to move it. Thread reads follow `references/pr-threads.md` (there is no `az repos pr thread list`). For where every thread stands, run [`/crav1-pr-status`](crav1-pr-status.md).
 
+1.98.0: a format A description from [`/crav1-open-pr`](crav1-open-pr.md) is compared with the diff bullet by bullet (each Changes bullet against the lines it links, each change against a bullet), and a choice a bullet's why calls deliberate, or that Not in this PR names as left out, is not raised as a fault unless the repo says otherwise.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
