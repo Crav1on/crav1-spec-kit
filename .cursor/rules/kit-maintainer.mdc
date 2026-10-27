@@ -71,7 +71,7 @@ Pre-install: `docs/install.md`. Post-plugin-install: `plugins/crav1/README.md`. 
 
 ## Releases
 
-A behavior release is a tag plus GitHub release from the CHANGELOG section. After the merge: put the lightweight `vX.Y.Z` tag on the merge commit (`plugin.json` and the newest `## X.Y.Z (date)` CHANGELOG heading already match), then create a GitHub release on that tag, titled `vX.Y.Z`, with that version's CHANGELOG section as the notes, marked latest (`gh release create vX.Y.Z --verify-tag --title vX.Y.Z --notes-file <section> --latest`). Never move or rewrite a published tag. Docs-only pull requests get no tag and no release.
+A behavior release is a tag plus GitHub release from the CHANGELOG section. After the merge: put the lightweight `vX.Y.Z` tag on the merge commit (`plugin.json` and the newest `## X.Y.Z (date)` CHANGELOG heading already match), then create a GitHub release on that tag, titled `vX.Y.Z`, with that version's CHANGELOG section as the notes, marked latest (`gh release create vX.Y.Z --verify-tag --title vX.Y.Z --notes-file <section> --latest`). Never move or rewrite a published tag. Docs-only pull requests get no tag and no release. A patch release is for moves and fixes; `scripts/check-patch-behavior.py` (workflow `pr-release-checks.yml`) warns when a patch adds a new never/always/stop/ask sentence to a `SKILL.md` or `references/` file. On that warning, bump the minor version or say in the pull request body why it is still a patch.
 
 ## Skill reference (behavior)
 
