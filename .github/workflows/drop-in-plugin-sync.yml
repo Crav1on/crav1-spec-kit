@@ -89,6 +89,8 @@ jobs:
         run: python scripts/gen-workflow.py --check
       - name: Marks tables match docs/reference/marks.yaml, examples match formats, writers and readers mention their marks
         run: python scripts/gen-marks.py --check
+      - name: Code-writing skills point to the base-branch guard, no Stay on a base
+        run: python scripts/check-code-branch.py
       - name: Skill template copies match docs/*/_template/
         run: python scripts/check-template-copies.py
       - name: Notes index generator builds, checks, and migrates (selftest)
