@@ -2,7 +2,7 @@
 name: crav1-build-features
 description: >-
   Serial board: build several ready specs one slug after another in this
-  checkout. Each slug is feat/<slug> from default, then the build-tasks
+  checkout. Each slug is feat/<slug> from its into branch, then the build-tasks
   T# loop. Not parallel. One slug: use /crav1-build-tasks. Do not push.
   Do not open a PR.
 disable-model-invocation: true
@@ -14,7 +14,7 @@ color: green
 
 You **manage** a queue of **slugs**. You do **not** implement, verify, or `git commit` in this chat.
 
-Each slug is one feature: `docs/specs/<slug>/` + branch `feat/<slug>` created from the **default** branch (not from the previous feature). Inside a slug, reuse the `/crav1-build-tasks` loop: one **crav1-build-task-agent** worker per `T#`, one at a time.
+Each slug is one feature: `docs/specs/<slug>/` + branch `feat/<slug>` created from the **into branch** (Merges into, else default; not from the previous feature). Inside a slug, reuse the `/crav1-build-tasks` loop: one **crav1-build-task-agent** worker per `T#`, one at a time.
 
 This is **not** parallel. Two `feat/` branches cannot share this working tree. True parallel (handoff / worktrees / Cloud Agents) is **out of scope** for this skill.
 
@@ -52,7 +52,7 @@ Do not ask again per slug or `T#`. Workers must not ask style.
 
 ## Consent to branches (once)
 
-Starting this command **is** consent to use `feat/<slug>` from **default** for each queued slug, in order. Do **not** re-run the create-feature-branch questions tool per slug.
+Starting this command **is** consent to use `feat/<slug>` from the **into branch** (Merges into, else default) for each queued slug, in order. Do **not** re-run the create-feature-branch questions tool per slug.
 
 One confirm if they are still on the default branch or on an unrelated branch: **continue** (first/top) = proceed with that checkout plan; **stop** = abort. If already on `feat/<first-slug>`, start there.
 
@@ -68,16 +68,16 @@ Cloud Agents: skip the pause.
 
 ## Switch to a slug (before that slug’s first T#)
 
-Default branch: same detect as create-feature-branch (`origin/HEAD`, else `main` / `master` / `develop`).
+Into branch and base branches (1.99.0): as `crav1-create-feature-branch` `references/code-branch.md` (drop-in: `.claude/skills/crav1-create-feature-branch/references/code-branch.md`; plugin: sibling `skills/crav1-create-feature-branch/references/code-branch.md`) says. The into branch is the repo's `Merges into` branch (also read from a sibling specs repo), else the default branch.
 
-1. Working tree dirty except `agent-tools/` → **do not checkout**. Tell them `/crav1-finalize-commit` (or they clean it). Wait. Never stash unless they ask.
-2. `git checkout <default>` then `git checkout feat/<slug>` if it exists, else `git checkout -b feat/<slug>` **from default**. Never create `feat/<slug>` from the previous feature branch.
+1. Working tree dirty except `agent-tools/` → **do not checkout**. On a base branch, offer to carry the changes onto `feat/<slug>` with `git switch -c` when HEAD is the into branch; never send them to `/crav1-finalize-commit` on a base. Otherwise they commit on their work branch or clean it. Wait. Never stash unless they ask.
+2. `git checkout feat/<slug>` if it exists, else `git switch -c feat/<slug> <into>` **from the into branch** (local, else `origin/<into>`), so a repo that merges into `develop` forks from `develop`, not `main`. Never create `feat/<slug>` from the previous feature branch.
 3. If checkout fails, **block** this slug; do not start the next unless they skip.
 4. Never `git push`. Never open a PR. Never `git commit` in this chat.
 
 After a slug’s last worker, the tree should be clean (workers commit). Then switch to the next slug with this same procedure.
 
-**Task branches (1.64.0).** Inside a slug, a task that ends with `(branch: X)` is built on X: switch to X before its worker, only on a clean tree (`git checkout X`, which also makes the local branch from `origin/X`). Tasks without a branch part use `feat/<slug>` from default, as above. Starting the board is consent to these switches. When X exists nowhere, that task is `blocked` with the reason `branch X not found`; never create X. A `(branch: <repo> X)` for another repo is `blocked` with `belongs to <repo>`.
+**Task branches (1.64.0).** Inside a slug, a task that ends with `(branch: X)` is built on X: switch to X before its worker, only on a clean tree (`git checkout X`, which also makes the local branch from `origin/X`). Tasks without a branch part use `feat/<slug>`, as above. A task whose X is a base branch is `blocked` with `branch X is a base branch`; never switch to it. Starting the board is consent to these switches. When X exists nowhere, that task is `blocked` with the reason `branch X not found`; never create X. A `(branch: <repo> X)` for another repo is `blocked` with `belongs to <repo>`.
 
 ## Board (keep this updated)
 
@@ -141,7 +141,7 @@ Skip every spec under `docs/specs/retired/`, and every old-path `spec.md` that i
 
 - Orchestration only: no product edits, no `git commit`, no push, no PR, no `spec.md` edits.
 - Serial slugs. Serial `T#`s inside a slug. Never two workers at once.
-- `feat/<slug>` always from **default**, never from the previous feature.
+- `feat/<slug>` always from the **into branch**, never from the previous feature. Never build on a base branch (1.99.0).
 - Do not implement on `spec/<slug>`.
 - Do not flatten the board into one implement pass.
 - Do not invent Mode B (handoff/worktrees/Cloud Agents) in this skill.
