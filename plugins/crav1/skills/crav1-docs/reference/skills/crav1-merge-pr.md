@@ -18,6 +18,8 @@ Merge one named pull request only when that turn asks; always a merge commit; no
 
 1.69.0: the `Promotion:` line after the after-merge line, with the optional `pipeline runs` check.
 
+1.97.0: before the merge it reads the merge-readiness line (`Ready:`) of the PR note's shared PR record. `Ready: no` stops the merge and lists the reasons, unless the turn says `anyway`; `anyway` never skips a required check, policy or review. No line: it goes on and names [`/crav1-pr-status`](crav1-pr-status.md). After the merge it sets `State: merged` and `Ready: merged` in the record instead of a `State on <date>` line.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
@@ -25,6 +27,7 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 | Question | Word | Means |
 | --- | --- | --- |
 | Also check the latest pipeline runs? | `pipeline runs` | check the latest successful Azure DevOps runs behind the Promotion line (read-only) |
+| The PR record says not ready (1.97.0) | `anyway` | merge although the record's `Ready:` line says no; host checks, policies and reviews still apply |
 
 ## Runs when
 
@@ -38,19 +41,19 @@ Prompt budget: 0 (asks nothing). A prompt may hold several questions. See the as
 
 In short: That named pull request.
 
-Reads one named pull request.
+Reads one named pull request, and the merge-readiness line of its PR record in the specs repo.
 
 ## Writes
 
-In short: A merge commit on the host, a fast-forward of the local default branch when the tree is clean, and the PR note in the specs repo.
+In short: A merge commit on the host, a fast-forward of the local default branch when the tree is clean, and the PR note with its PR record in the specs repo.
 
-Writes a merge commit on the host, and fast-forwards local default when the tree is clean after a confirmed two-parent merge. Then writes or reuses the PR note in the specs repo's `docs/notes/YYYY-MM/` (not committed).
+Writes a merge commit on the host, and fast-forwards local default when the tree is clean after a confirmed two-parent merge. Then writes or reuses the PR note in the specs repo's `docs/notes/YYYY-MM/`, with its PR record's `State` and `Ready` lines set to merged (not committed).
 
 ## Does not
 
 Leaves squash, rebase, branch deletion, and work-item links alone.
 
-Limits and exceptions: a required red host check stops it. It does not run [`/crav1-review-pr`](crav1-review-pr.md).
+Limits and exceptions: a required red host check stops it, and so does a PR record whose `Ready` line says no, unless the turn says `anyway`. It does not run [`/crav1-review-pr`](crav1-review-pr.md) or [`/crav1-pr-status`](crav1-pr-status.md).
 
 ## You run next / Runs by itself
 

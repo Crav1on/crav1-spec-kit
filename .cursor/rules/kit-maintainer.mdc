@@ -16,7 +16,7 @@ CI (`.github/workflows/drop-in-plugin-sync.yml`) fails the check when the plugin
 ## Drop-in (project `.cursor/`)
 
 - Skills: `.cursor/skills/crav1/crav1-<short-name>/` with frontmatter `name: crav1-<short-name>` (must match the folder that contains `SKILL.md`). Slash command: `/crav1-<short-name>`. Type `/crav1` to list them.
-- Cross-cutting pull-request skills: `/crav1-open-pr` opens one pull request and does not merge. `/crav1-merge-pr` merges one named pull request only when the user explicitly asks in that turn, and only with a merge commit. Do not fold merge into open-pr, build-tasks, or review skills.
+- Cross-cutting pull-request skills: `/crav1-open-pr` opens one pull request and does not merge. `/crav1-merge-pr` merges one named pull request only when the user explicitly asks in that turn, and only with a merge commit. Do not fold merge into open-pr, build-tasks, or review skills. `/crav1-pr-status` reads a pull request's threads and writes the shared PR record; it never posts, votes or merges.
 - Agents: `.cursor/agents/crav1-<name>.md` with `name: crav1-<name>`. Subagent `name:` ends in `-agent` so the Cursor slash picker can tell them apart from skills that share the same stem (`/crav1-review-architecture` stays the skill; `crav1-review-architecture-agent` is the subagent).
 - Guild routing: when you add, rename, or remove a skill, agent, or cross-cutting helper, update `docs/guild-routing.md` in the same PR. Update `docs/reference/skills.yaml` in that same PR and run `scripts/gen-skill-docs.py` (see Skill reference below).
 - Agent templates: `.cursor/agent-assets/crav1-<name>/` (not under `.cursor/agents/`).

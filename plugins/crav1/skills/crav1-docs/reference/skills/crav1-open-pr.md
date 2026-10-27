@@ -44,7 +44,7 @@ Limits and exceptions: names [`/crav1-review-pr`](crav1-review-pr.md) and [`/cra
 
 ## You run next / Runs by itself
 
-- You run next: [`/crav1-review-pr`](crav1-review-pr.md)
+- You run next: [`/crav1-review-pr`](crav1-review-pr.md); [`/crav1-pr-status`](crav1-pr-status.md)
 - Runs by itself: Calls no skill.
 
 ## Lane and group

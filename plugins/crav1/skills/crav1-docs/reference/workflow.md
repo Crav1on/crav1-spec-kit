@@ -89,6 +89,7 @@ Your branch is ready and you want it reviewed and fixed before you open a pull r
 | 2 | `/crav1-tighten-spec` or `/crav1-plan-from-spec` or `/crav1-build-tasks` | Optional. When the review has findings, the lane each one names. Spec miss is Specify (tighten-spec), plan miss is Plan (plan-from-spec), code miss is Build (build-tasks). |
 | 3 | `/crav1-finalize-commit` | When the fixes are made. |
 | 4 | `/crav1-open-pr` | To push and open the pull request. |
+| 5 | `/crav1-pr-status` | Optional. When the pull request has comments and replies, to see what is done, what is left and what you owe (1.97.0). |
 
 <a id="outside-pr"></a>
 
@@ -99,9 +100,10 @@ A pull request was built outside the kit (its slug has no `plan.md` or `tasks.md
 | Step | Command | When |
 | --- | --- | --- |
 | 1 | `/crav1-review-pr` | The pull request is open. |
-| 2 | `/crav1-merge-pr` | When the review says ship. |
-| 3 | `/crav1-refresh-system-notes` | After the merge, to bring its changes into the spec and `docs/system/`. |
-| 4 | `/crav1-finalize-commit` | When refresh-system-notes changed a file. |
+| 2 | `/crav1-pr-status` | Optional. When the review comments got replies or new pushes, to see where each point stands and whether it is ready to merge (1.97.0). |
+| 3 | `/crav1-merge-pr` | When the review says ship. |
+| 4 | `/crav1-refresh-system-notes` | After the merge, to bring its changes into the spec and `docs/system/`. |
+| 5 | `/crav1-finalize-commit` | When refresh-system-notes changed a file. |
 
 <a id="ado-sync"></a>
 

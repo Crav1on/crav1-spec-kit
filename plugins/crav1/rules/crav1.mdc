@@ -15,8 +15,8 @@ Type `/crav1` to list kit skills. `/crav1-help` answers what to run next, in wha
 - New slice: spark-to-spec or ideas-to-spec or bundle-to-specs → create-feature-branch (optional) → review-architecture (optional) → tighten-spec → resolve-open-questions → ado-sync (optional) → plan-from-spec → review-plan → tighten-plan → ado-sync (optional) → tasks-ready-to-build (optional) → build-tasks or build-features → verify-build-against-spec → fix-build-gaps (optional) → finalize-commit → open-pr → review-pr → merge-pr.
 - New information on an existing slice: add-to-spec → tighten-spec → resolve-open-questions → plan-from-spec → ado-sync (optional) → tasks-ready-to-build (optional) → build-tasks → verify-build-against-spec → finalize-commit.
 - Bug: fix-bug → tighten-spec or plan-from-spec or build-tasks → verify-build-against-spec → fix-build-gaps (optional) → finalize-commit → open-pr.
-- Before a pull request: review-pr → tighten-spec or plan-from-spec or build-tasks (optional) → finalize-commit → open-pr.
-- Outside pull request: review-pr → merge-pr → refresh-system-notes → finalize-commit.
+- Before a pull request: review-pr → tighten-spec or plan-from-spec or build-tasks (optional) → finalize-commit → open-pr → pr-status (optional).
+- Outside pull request: review-pr → pr-status (optional) → merge-pr → refresh-system-notes → finalize-commit.
 - Azure Boards sync: ado-sync → finalize-commit.
 - The build skills (build-tasks, build-features) verify each task inside their worker, then go to open-pr. `/crav1-tasks-ready-to-build` is command-only: it runs when typed, any time, to list ready and blocked tasks. For a plain question about which tasks are ready, name the command. Full routes: `docs/reference/workflow.md` (kit repo, or `crav1-docs/` next to the skills).
 <!-- crav1-order:end -->

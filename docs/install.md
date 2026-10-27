@@ -214,6 +214,16 @@ If this window is the **kit repo**, drop-in skills are already under `.cursor/` 
 
 **Updating to 1.84.0 or later from an older kit:** run `/crav1-add-to-spec migrate formats` once in each product repo that has specs. It rewrites every `spec.md` and `docs/system/repos.md` to the merge-safe formats (one `Synced at` line per repo and branch, plain-bullet open questions, and since 1.86.0 one Match `Branch:` line per branch; a repo already on 1.84.0 runs it again). It keeps every line, checks nothing was lost before it writes, and changes nothing on a second run. The same script runs without an agent: `python3 .cursor/skills/crav1/crav1-add-to-spec/scripts/merge_safe_migrate.py --dry-run`, then without `--dry-run` (Claude Code: `.claude/skills/crav1-add-to-spec/scripts/`). Commit the result yourself.
 
+**Updating to 1.97.0 or later:** run `/crav1-add-to-spec migrate formats` again in each specs repo that has PR notes or review-pr follow-ups notes. It gives every PR note its shared `## PR record` and moves each `review-pr-[<repo>-]<n>-follow-ups.md` into its PR note (one `Point` per bullet, text verbatim; the comment history by date; then the old file is deleted and links to it rewritten). The dry run prints a unified diff of every change and writes nothing; it writes only on your yes. It stops and leaves a note alone when anything would be lost (`LOST`, exit 2), and a second run changes nothing. Without an agent, from the specs repo root:
+
+```text
+python3 .cursor/skills/crav1/crav1-add-to-spec/scripts/merge_safe_migrate.py --dry-run
+python3 .cursor/skills/crav1/crav1-add-to-spec/scripts/merge_safe_migrate.py
+python3 .cursor/skills/crav1/crav1-add-to-spec/scripts/merge_safe_migrate.py --check
+```
+
+Commit the result yourself.
+
 Kit maintainers: edit `.cursor/` first, run `scripts/sync-crav1-plugin.sh` (plugin mirror and `.claude/`). `scripts/sync-crav1-claude.sh --check` fails if `.claude/` is stale. Keep this file and `plugins/crav1/README.md` accurate. Rule: `.cursor/rules/kit-maintainer.mdc`.
 
 ## Using the kit without “installing”

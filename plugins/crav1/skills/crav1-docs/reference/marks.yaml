@@ -741,11 +741,98 @@ marks:
     pattern: '^pr_note: docs/notes/\d{4}-\d{2}/[a-z0-9.-]+\.md$'
     examples:
       - "pr_note: docs/notes/2026-10/2026-10-02-pr-orders-api-71.md"
-    meaning: "Links a code-change or follow-ups note to the PR note of the pull request it came from."
-    written_by: [crav1-add-to-spec, crav1-review-pr]
-    read_by: [crav1-add-to-spec, crav1-review-pr]
+    meaning: "Links a code-change note (or a review follow-ups note from before 1.97.0) to the PR note of the pull request it came from."
+    written_by: [crav1-add-to-spec]
+    read_by: [crav1-add-to-spec]
     mention: 'pr_note:'
     since: 1.65.0
+
+  # ---------- PR note: the shared PR record (1.97.0) ----------
+  - id: pr-record
+    name: "PR record"
+    group: notes
+    files: ["docs/notes/YYYY-MM/YYYY-MM-DD-pr-<repo>-<n>.md (body, after the header lines)"]
+    format: "## PR record"
+    pattern: '^## PR record$'
+    examples:
+      - "## PR record"
+    meaning: "The one shared record of a pull request: one sorted line per item, read and written by pr-status, review-pr, add-to-spec and merge-pr. Format in crav1-add-to-spec references/pr-record.md."
+    written_by: [crav1-pr-status, crav1-review-pr, crav1-add-to-spec, crav1-merge-pr]
+    read_by: [crav1-pr-status, crav1-review-pr, crav1-add-to-spec, crav1-merge-pr, crav1-help, crav1-ado-sync]
+    mention: '## PR record'
+    since: 1.97.0
+
+  - id: pr-record-order
+    name: "Order (PR record)"
+    group: notes
+    files: ["docs/notes/YYYY-MM/YYYY-MM-DD-pr-<repo>-<n>.md (PR record)"]
+    format: "- Order: <after | before> PR <n> <repo> (<branch>) | <why> | <YYYY-MM-DD>"
+    pattern: '^- Order: (after|before) PR \d+ \S+ \(\S+\) \| .+ \| \d{4}-\d{2}-\d{2}$'
+    examples:
+      - "- Order: after PR 40 orders-api (feat/orders-queue) | merge order asked in thread 106, reply 2026-10-20 | 2026-10-27"
+    meaning: "A pull request this one depends on, or that depends on it, and why. The merge order comes from these lines."
+    written_by: [crav1-pr-status]
+    read_by: [crav1-pr-status, crav1-add-to-spec]
+    mention: 'Order:'
+    since: 1.97.0
+
+  - id: pr-record-point
+    name: "Point (PR record)"
+    group: notes
+    files: ["docs/notes/YYYY-MM/YYYY-MM-DD-pr-<repo>-<n>.md (PR record)"]
+    format: "- Point: <anchor> | <status> | <owner> | <tags or -> | <text>"
+    pattern: '^- Point: \S.* \| (done [0-9a-f]{7,}|agreed|declined|open|waiting on .+|needs .+|follow-up|migrated) \| .+ \| .+ \| .+$'
+    examples:
+      - "- Point: tests/test_retry_store.py:45 | done 3c9d2e1 | Sam Lee | thread 98; host fixed | Fixture could clean live tables"
+      - "- Point: general | waiting on Sam Lee | Sam Lee | asked; from review-pr 2026-10-19 | Is the cut-off local time?"
+    meaning: "One point of the pull request with its status: done <sha>, agreed, declined, open, waiting on <name>, needs <name>, follow-up or migrated. Never deleted; a change replaces the line where it is."
+    written_by: [crav1-pr-status, crav1-review-pr, crav1-add-to-spec]
+    read_by: [crav1-pr-status, crav1-review-pr, crav1-add-to-spec, crav1-merge-pr, crav1-help, crav1-ado-sync]
+    mention: '\bPoints?\b'
+    since: 1.97.0
+
+  - id: pr-record-read
+    name: "Read (PR record)"
+    group: notes
+    files: ["docs/notes/YYYY-MM/YYYY-MM-DD-pr-<repo>-<n>.md (PR record)"]
+    format: "- Read: <name> | <short sha>, push <n>, newest comment <timestamp> | <YYYY-MM-DD>"
+    pattern: '^- Read: .+ \| [0-9a-f]{7,}, push \d+, newest comment \S+ \| \d{4}-\d{2}-\d{2}$'
+    examples:
+      - "- Read: Alex Doe | 7b41a0c, push 6, newest comment 2026-10-26T15:03Z | 2026-10-27"
+    meaning: "What one person's last pr-status run saw. since last compares with it; each person has their own line."
+    written_by: [crav1-pr-status]
+    read_by: [crav1-pr-status]
+    mention: 'Read:'
+    since: 1.97.0
+
+  - id: pr-record-ready
+    name: "Ready (PR record)"
+    group: notes
+    files: ["docs/notes/YYYY-MM/YYYY-MM-DD-pr-<repo>-<n>.md (PR record)"]
+    format: "- Ready: <yes | no | merged> | <why> | <YYYY-MM-DD> by <skill>"
+    pattern: '^- Ready: (yes|no|merged) \| .+ \| \d{4}-\d{2}-\d{2} by [a-z-]+$'
+    examples:
+      - "- Ready: no | 1 needs Robin K.; after PR 40 (not merged) | 2026-10-27 by pr-status"
+    meaning: "Whether the pull request is ready to merge as far as its points go. merge-pr stops on no unless the turn says anyway."
+    written_by: [crav1-pr-status, crav1-merge-pr]
+    read_by: [crav1-merge-pr, crav1-pr-status]
+    mention: 'Ready:'
+    since: 1.97.0
+
+  - id: pr-record-state
+    name: "State (PR record)"
+    group: notes
+    files: ["docs/notes/YYYY-MM/YYYY-MM-DD-pr-<repo>-<n>.md (PR record, last line)"]
+    format: "- State: <active | draft | merged | abandoned | closed> | <YYYY-MM-DD>"
+    pattern: '^- State: (active|draft|merged|abandoned|closed) \| \d{4}-\d{2}-\d{2}$'
+    examples:
+      - "- State: active | 2026-10-27"
+      - "- State: merged | 2026-10-28"
+    meaning: "The pull request's state on the host as last read. One line; it replaces the older State on mentions."
+    written_by: [crav1-pr-status, crav1-review-pr, crav1-add-to-spec, crav1-merge-pr]
+    read_by: [crav1-pr-status, crav1-add-to-spec, crav1-merge-pr]
+    mention: 'State:'
+    since: 1.97.0
 
   - id: pr-description-as-of
     name: "Description version (PR note)"
@@ -764,21 +851,21 @@ marks:
   - id: asked-on-the-pr
     name: "Asked on the PR"
     group: notes
-    files: ["docs/notes/YYYY-MM/review-pr-<n>-follow-ups.md (a bullet)"]
+    files: ["docs/notes/YYYY-MM/review-pr-<n>-follow-ups.md (a bullet, before 1.97.0)"]
     format: "- Asked on the PR: <question>"
     pattern: '^- Asked on the PR: .+$'
     examples:
       - "- Asked on the PR: Should the retry log stay in the SQL table? (answered on the PR 2026-10-20)"
-    meaning: "A question asked in the review comment, kept in the follow-ups note; a re-review adds (answered on the PR <date>) when the thread has an answer."
-    written_by: [crav1-review-pr]
-    read_by: [crav1-review-pr]
+    meaning: "Before 1.97.0: a question asked in the review comment, kept in the follow-ups note. Read only; migrate formats turns it into a Point tagged asked, and from 1.97.0 a question is a waiting on Point in the PR record."
+    written_by: []
+    read_by: [crav1-add-to-spec]
     mention: 'Asked on the PR:'
     since: 1.66.0
 
   - id: comment-as-drafted
     name: "Comment as drafted"
     group: notes
-    files: ["docs/notes/YYYY-MM/review-pr-<n>-follow-ups.md (body, after the bullets)"]
+    files: ["docs/notes/YYYY-MM/YYYY-MM-DD-pr-<repo>-<n>.md (history, after the PR record; the follow-ups note before 1.97.0)"]
     format: "## Comment as drafted, <YYYY-MM-DD>"
     pattern: '^## Comment as drafted, \d{4}-\d{2}-\d{2}$'
     examples:
@@ -792,7 +879,7 @@ marks:
   - id: comment-as-posted
     name: "Comment as posted"
     group: notes
-    files: ["docs/notes/YYYY-MM/review-pr-<n>-follow-ups.md (body, after the bullets)"]
+    files: ["docs/notes/YYYY-MM/YYYY-MM-DD-pr-<repo>-<n>.md (history, after the PR record; the follow-ups note before 1.97.0)"]
     format: "## Comment as posted, <YYYY-MM-DD> (by <name>)[, edited]"
     pattern: '^## Comment as posted, \d{4}-\d{2}-\d{2} \(by [^()\n]+\)(, edited)?$'
     examples:
@@ -807,7 +894,7 @@ marks:
   - id: comment-posted-source
     name: "Posted comment source"
     group: notes
-    files: ["docs/notes/YYYY-MM/review-pr-<n>-follow-ups.md (first line under Comment as posted)"]
+    files: ["docs/notes/YYYY-MM/YYYY-MM-DD-pr-<repo>-<n>.md (first line under Comment as posted; the follow-ups note before 1.97.0)"]
     format: "<Read from the PR thread: <url>. | Pasted in chat. | Posted from this review on the user's yes: <url>.> Draft compared: <YYYY-MM-DD | none>. Description reviewed: as of <YYYY-MM-DD> (PR note).[ Verbatim except: <kind> removed.][ Edited on the host.]"
     pattern: '^(Read from the PR thread: https://\S+\.|Pasted in chat\.|Posted from this review on the user''s yes: https://\S+\.) Draft compared: (\d{4}-\d{2}-\d{2}|none)\. Description reviewed: as of \d{4}-\d{2}-\d{2} \(PR note\)\.( Verbatim except: .+ removed\.)?( Edited on the host\.)?$'
     examples:
@@ -822,13 +909,13 @@ marks:
   - id: not-in-posted-comment
     name: "Not in the posted comment"
     group: notes
-    files: ["docs/notes/YYYY-MM/review-pr-<n>-follow-ups.md (end of a bullet)"]
+    files: ["docs/notes/YYYY-MM/review-pr-<n>-follow-ups.md (end of a bullet, before 1.97.0)"]
     format: "<bullet> (Not in the posted comment, <YYYY-MM-DD>; still open.)"
     pattern: '^- .+ \(Not in the posted comment, \d{4}-\d{2}-\d{2}; still open\.\)( \((done in [0-9a-f]{7,}|posted \d{4}-\d{2}-\d{2})\))?$'
     examples:
       - "- `src/orders/retry_store.py`, line 9: an idempotency test for the row key. (Not in the posted comment, 2026-10-19; still open.)"
-    meaning: "A drafted point the user left out of the posted comment. It stays open in the note; a re-review keeps it out of the comment unless the user includes it."
-    written_by: [crav1-review-pr]
+    meaning: "Before 1.97.0: a drafted point the user left out of the posted comment. Read only; from 1.97.0 it is the not posted tag on the Point, and migrate formats converts it."
+    written_by: []
     read_by: [crav1-review-pr]
     mention: 'Not in the posted comment'
     since: 1.67.0
@@ -877,14 +964,14 @@ marks:
   - id: follow-up-done
     name: "(done in …)"
     group: notes
-    files: ["docs/notes/YYYY-MM/review-pr-<n>-follow-ups.md (end of a follow-up)"]
+    files: ["docs/notes/YYYY-MM/review-pr-<n>-follow-ups.md (end of a follow-up, before 1.97.0)"]
     format: "(done in <short sha>)"
     pattern: '^\(done in [0-9a-f]{7}\)$'
     examples:
       - "(done in abc1234)"
-    meaning: "A review follow-up that a later commit addressed. The line stays."
-    written_by: [crav1-review-pr]
-    read_by: [crav1-review-pr]
+    meaning: "Before 1.97.0: a review follow-up that a later commit addressed. Read only; migrate formats turns it into a done <sha> Point."
+    written_by: []
+    read_by: [crav1-add-to-spec]
     mention: 'done in'
     since: 1.51.0
 

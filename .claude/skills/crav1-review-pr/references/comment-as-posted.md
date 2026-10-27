@@ -84,7 +84,7 @@ Compared with the draft of 2026-10-19: 5 points as drafted, 1 changed, 1 not in 
 ```
 
 - **In the note:**
-  - A drafted point that is not in the posted comment keeps its record Point and gets the tag `not posted <date>` (1.97.0): ``- Point: src/orders/retry_store.py:9 | open | Alex Doe | from review-pr 2026-10-19; not posted 2026-10-19 | An idempotency test for the row key``. It is never dropped.
+  - A drafted point that is not in the posted comment keeps its record Point and gets the tag `not posted <date>` (1.97.0): ``- Point: src/orders/retry_store.py:9 | open | Sam Lee | from review-pr 2026-10-19; not posted 2026-10-19 | An idempotency test for the row key``. It is never dropped.
   - A cut question keeps its Point (`waiting on <author>`, `asked`), with the tag added. No rewrite.
   - Changed points keep their Point as it is; the saved text is the record.
   - An added question gets a Point (`waiting on <author>`, `asked`). Other added points get an `open` Point.
@@ -121,9 +121,13 @@ Posting stays interactive only. There is no choice word that posts.
 ## Example note (made-up names)
 
 `````markdown
-- Asked on the PR: The retry log goes to a SQL table here, but the folder README says Blob files only. Do we want an explicit exception, or to drop that goal? (Not in the posted comment, 2026-10-19; still open.)
-- `src/orders/retry_store.py`, line 9: an idempotency test for the row key. (Not in the posted comment, 2026-10-19; still open.)
-- Asked on the PR: Should the retry count be configurable?
+## PR record
+
+- Point: general | waiting on Sam Lee | Sam Lee | asked; from review-pr 2026-10-19 | Should the retry count be configurable?
+- Point: src/orders/retry notes.md:4 | waiting on Sam Lee | Sam Lee | asked; from review-pr 2026-10-19; not posted 2026-10-19 | The retry log goes to a SQL table here, but the folder README says Blob files only. An explicit exception, or drop that goal?
+- Point: src/orders/retry_store.py:9 | open | Sam Lee | from review-pr 2026-10-19; not posted 2026-10-19 | An idempotency test for the row key
+- Point: src/orders/retry_store.py:9 | open | Sam Lee | from review-pr 2026-10-19 | The row key is random for every write
+- State: active | 2026-10-19
 
 ## Comment as drafted, 2026-10-19
 

@@ -651,7 +651,7 @@ skills:
       means: "a mail, sorted as a dump"
     - word: "chat"
       means: "a chat, sorted as a dump"
-    note: "After a PR: `all`. A PR ref alone (`pr71`, `pr 71`, `#71`, `pr <repo> 71`) means `code change`, offline. `pr71 all` also checks for new commits and appends the description and every comment thread to the PR note (1.76.0). Every open branch: `branches`, with `branches all` or `branches skip stale` to skip the question (1.79.0). Once after updating to 1.84.0: `migrate formats` rewrites every spec and `docs/system/repos.md` to the merge-safe formats (one `Synced at` line per repo and branch, plain-bullet open questions), after a dry run and one yes; idempotent, nothing lost, never commits."
+    note: "After a PR: `all`. A PR ref alone (`pr71`, `pr 71`, `#71`, `pr <repo> 71`) means `code change`, offline. `pr71 all` also checks for new commits and adds the description and every comment thread to the PR note (1.76.0), and a PR record Point for each new thread (1.97.0). Every open branch: `branches`, with `branches all` or `branches skip stale` to skip the question (1.79.0). Once after updating to 1.84.0, 1.86.0 or 1.97.0: `migrate formats` rewrites every spec, `docs/system/repos.md` and every PR note to the merge-safe formats (one `Synced at` line per repo and branch, plain-bullet open questions, the shared PR record with old review follow-ups notes moved into it), after a dry run with a diff and one yes; idempotent, nothing lost, never commits."
   lane: cross-cutting
   group: Keep the picture current
   starter: false
@@ -719,6 +719,7 @@ skills:
   - '1.67.1: a one-slice read of a work branch also adds that branch to the spec''s Match `Branch:` list (never a base branch; existing entries and markers stay).'
   - '1.68.0: a code change asks whether a branch that split off another spec branch merges into it; a yes writes `(into …)` and `(spec branch)` on the Match `Branch:` list, a headless run writes nothing and treats it as stacked. The commit list leaves out merge commits, and a spec-branch read imports only its own commits.'
   - '1.86.0: Match `Branch:` is one line per branch, a new one in sorted place (repo, then branch); `migrate formats` splits old `; `-joined lists, markers kept.'
+  - '1.97.0: the PR note holds one shared `## PR record` (`references/pr-record.md`) that `/crav1-pr-status`, `/crav1-review-pr`, this skill and `/crav1-merge-pr` read and write, one sorted line per point, other pull request, reader, readiness and state. `pr<n> all` adds a Point per new thread and keeps the host status as a tag. The host reads for every skill are in `references/pr-threads.md`. `migrate formats` adds the record to every PR note and moves old review follow-ups notes into it, after a dry-run diff and one yes; idempotent, nothing lost.'
   use_when: New information for specs that already exist
   table:
     reads: 'A fact: That information and one `spec.md`; A dump: The dump and existing spec folders; A
@@ -1235,6 +1236,7 @@ skills:
   runs_by_itself: Calls no skill.
   you_run_next:
   - /crav1-review-pr
+  - /crav1-pr-status
   first_prompt: '/crav1-open-pr
 
     @docs/specs/<slug>/'
@@ -1278,9 +1280,9 @@ skills:
     paste-ready Markdown comment in your own friendly first-person voice, with a short plain opening, the
     sections Blockers, Bugs, Tests to add with this PR, and A question, each point starting with a link to
     its file and line on the source branch, and no tool or kit names. Follow-ups, including choices the description
-    calls deliberate, are not posted and not in that comment; the chat lists them and they are saved as
-    `docs/notes/YYYY-MM/review-pr-<n>-follow-ups.md` (PR, repo, date, each with its file and line), which a
-    re-review updates and `/crav1-ado-sync` reads as an open note. The same note keeps the comment as drafted and,
+    calls deliberate, are not posted and not in that comment; the chat lists them and they are saved in the
+    PR note's shared PR record (one `follow-up` Point each, with its file and line, 1.97.0), which a
+    re-review updates and `/crav1-ado-sync` reads as open items. The same PR note keeps the comment as drafted and,
     once you post it, the comment as posted, word for word. Re-review replies use the
     same voice. After your yes it posts that block as one comment and sets the matching vote. A re-review reads the earlier findings from the pull
     request's own threads and marks each fixed (with the commit), partly fixed, still open, or no longer
@@ -1307,16 +1309,17 @@ skills:
     comment and still open, without dropping them. A re-review compares against the posted comment and keeps
     points you cut out of the new comment unless you include them. Post it adds "I''ll post it myself"; choice
     words `comment posted`, `newest comment` and `skip comment record`.'
+  - '1.97.0: no separate follow-ups note. Findings, follow-ups and questions go into the PR note''s shared `## PR record` (`crav1-add-to-spec` `references/pr-record.md`) as Point lines, drafted points you cut get `not posted <date>`, and the comment as drafted and as posted go into the PR note''s history. A re-review reads the record first. An old follow-ups note is still read; run `/crav1-add-to-spec migrate formats` to move it. Thread reads follow `references/pr-threads.md` (there is no `az repos pr thread list`). For where every thread stands, run `/crav1-pr-status`.'
   use_when: This turn names an open pull request
   table:
     reads: The pull request, its diff, and the spec
-    writes: A follow-ups note in `docs/notes/` with the comment as drafted and as posted
+    writes: The PR note in `docs/notes/` with its PR record (findings, follow-ups, questions) and the comment as drafted and as posted
   reads: Reads one named open pull request, its diff, the spec, the body, and the required linter. When
     the slug has `plan.md`, also reads the plan and `verify.md`. When the slug has no `plan.md` or `tasks.md`,
     reads the pipeline's recorded test results instead and does not treat a missing `verify.md` as a finding.
-  writes: Writes `docs/notes/YYYY-MM/review-pr-<n>-follow-ups.md` and regenerates the notes indexes when the review
-    has follow-ups, questions or a paste-ready comment, updating the same note on a re-review, with the comment as
-    drafted and as posted. After the user's yes, posts one comment and the matching vote.
+  writes: Writes the PR note in `docs/notes/YYYY-MM/` with its `## PR record` (a Point per finding, follow-up and
+    question) and regenerates the notes indexes, updating the same note on a re-review, with the comment as
+    drafted and as posted in its history. After the user's yes, posts one comment and the matching vote.
   leaves_alone: Leaves code, the spec, the plan, and the merge alone. Never resolves a thread without a yes.
   exceptions: spark, specify, verify, `/crav1-open-pr`, and `/crav1-merge-pr` do not run it. An outside
     pull request names `/crav1-refresh-system-notes` after merge and does not run it.
@@ -1328,6 +1331,7 @@ skills:
   - /crav1-plan-from-spec
   - /crav1-build-tasks
   - /crav1-finalize-commit
+  - /crav1-pr-status
   - /crav1-refresh-system-notes after an outside pull request merges
   first_prompt: '/crav1-review-pr
 
@@ -1335,6 +1339,61 @@ skills:
 
 
     Read the diff. Do not edit. Do not run the tests. Do not merge.'
+- name: crav1-pr-status
+  choice_words:
+  - question: Which pull request
+    words:
+    - word: "pr<n>"
+      means: "that pull request (also `pr <n>`, `#<n>`, `pr <repo> <n>`, or its URL)"
+  - question: Your side (optional; picked from the PR author otherwise)
+    words:
+    - word: "as reviewer"
+      means: "reviewer mode: you are not the author"
+    - word: "as author"
+      means: "author mode: you opened the pull request"
+  - question: How much
+    words:
+    - word: "since last"
+      means: "only what changed since your last run"
+    - word: "no code"
+      means: "threads only; no diff or commit check, so nothing is marked done"
+  lane: cross-cutting
+  group: Commit and pull request
+  starter: false
+  since: 1.97.0
+  stage: stable
+  prompt_budget: 1
+  walkthrough: docs/from-pr-status.md
+  purpose: Show where one pull request stands, point by point, and who owes the next step.
+  in_depth:
+  - '**`/crav1-pr-status`** reads one named pull request''s threads, pushes and commits on Azure DevOps or GitHub (read-only, `references/pr-threads.md` in `crav1-add-to-spec`) and splits the threads into points. Each point gets one of six statuses: `done <sha>` (a commit after the request changed the lines), `agreed`, `declined` (with the reason), `open`, `waiting on <name>`, or `needs <name>` for a third person. It picks reviewer or author mode from who opened the pull request; `as reviewer` or `as author` overrides it, and an unclear sign-in is guessed without asking.'
+  - 'It prints a verdict line with the points waiting on you first, then the points by status, flags for threads resolved while the code is unchanged (and done points whose thread is still active), spec and decision candidates, follow-ups drafted for `/crav1-ado-sync`, the pull requests this one depends on and the merge order, drafted replies, and a merge-readiness line. `since last` shows only what changed since your last run.'
+  - 'It writes all of it to the PR note''s shared `## PR record`, the same record `/crav1-review-pr`, `/crav1-add-to-spec` and `/crav1-merge-pr` use; `/crav1-merge-pr` stops on `Ready: no`. Replies are drafts and are never posted. A thread status change on the host is offered one thread at a time and made only on that thread''s yes. Spec or decision candidates go to `/crav1-add-to-spec` on a yes. Follow-ups are drafts; no work item is created.'
+  use_when: You want to know what is done and what is left on a pull request, and what you owe
+  table:
+    reads: The pull request's threads, pushes and commits, its diff, and its PR record
+    writes: The PR record in the PR note in `docs/notes/`; one thread status on the host per yes
+  reads: Reads one named pull request's threads with every comment, its pushes with their commits and changed
+    files, the signed-in user, the diff of the source branch (unless `no code`), other pull requests named as
+    merge-order dependencies, and the PR note with its `## PR record` in the specs repo.
+  writes: Writes the PR note's `## PR record` (a Point per point, Order, your Read line, Ready, State) and a
+    `## Replies as drafted` history section, then regenerates the notes indexes; never committed. On a yes for
+    that one thread, sets one thread's status on the host (Azure DevOps) or resolves or reopens it (GitHub).
+  leaves_alone: Leaves code, specs, plans, tasks and work items alone. Never posts a reply, votes, approves,
+    merges, or changes a thread without its own yes.
+  exceptions: Signed out, the one prompt is the signed-out question and the offers are listed as text for the
+    next run. Headless and bot runs ask nothing and list the offers as text.
+  called_by: Called by the user.
+  runs_by_itself: Runs `/crav1-add-to-spec` with the spec and decision candidates only after a yes; calls no other skill.
+  you_run_next:
+  - /crav1-merge-pr
+  - /crav1-add-to-spec
+  - /crav1-ado-sync
+  - /crav1-review-pr
+  first_prompt: '/crav1-pr-status pr<n>
+
+
+    Where does this pull request stand, and what do I owe?'
 - name: crav1-merge-pr
   lane: cross-cutting
   group: Commit and pull request
@@ -1353,21 +1412,26 @@ skills:
   - '1.66.0: a branch that is behind the base or has conflicts gets one line: merge the base into the branch, push, then ask to merge again. Never a rebase.'
   - '1.68.0: after a sub-branch merge, says `<n> of <m> sub-branches merged into <spec branch>` and any `left behind` branch; a reverted branch shows `merged, reverted on <base> (<sha>)`, report only.'
   - '1.69.0: the `Promotion:` line after the after-merge line, with the optional `pipeline runs` check.'
+  - '1.97.0: before the merge it reads the merge-readiness line (`Ready:`) of the PR note''s shared PR record. `Ready: no` stops the merge and lists the reasons, unless the turn says `anyway`; `anyway` never skips a required check, policy or review. No line: it goes on and names `/crav1-pr-status`. After the merge it sets `State: merged` and `Ready: merged` in the record instead of a `State on <date>` line.'
   choice_words:
   - question: Also check the latest pipeline runs?
     words:
     - word: "pipeline runs"
       means: "check the latest successful Azure DevOps runs behind the Promotion line (read-only)"
+  - question: The PR record says not ready (1.97.0)
+    words:
+    - word: "anyway"
+      means: "merge although the record's `Ready:` line says no; host checks, policies and reviews still apply"
   use_when: This turn asks to merge a named pull request
   table:
     reads: That named pull request
     writes: A merge commit on the host, a fast-forward of the local default branch when the tree is
-      clean, and the PR note in the specs repo
-  reads: Reads one named pull request.
+      clean, and the PR note with its PR record in the specs repo
+  reads: Reads one named pull request, and the merge-readiness line of its PR record in the specs repo.
   writes: Writes a merge commit on the host, and fast-forwards local default when the tree is clean after
-    a confirmed two-parent merge. Then writes or reuses the PR note in the specs repo's `docs/notes/YYYY-MM/` (not committed).
+    a confirmed two-parent merge. Then writes or reuses the PR note in the specs repo's `docs/notes/YYYY-MM/`, with its PR record's `State` and `Ready` lines set to merged (not committed).
   leaves_alone: Leaves squash, rebase, branch deletion, and work-item links alone.
-  exceptions: a required red host check stops it. It does not run `/crav1-review-pr`.
+  exceptions: a required red host check stops it, and so does a PR record whose `Ready` line says no, unless the turn says `anyway`. It does not run `/crav1-review-pr` or `/crav1-pr-status`.
   called_by: Called by the user.
   runs_by_itself: Calls no skill.
   you_run_next:

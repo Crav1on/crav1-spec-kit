@@ -96,12 +96,15 @@ Exception: the parent delegates the critique and does not review in its own voic
 | Skill | `/crav1-finalize-commit` |
 | Skill | `/crav1-open-pr` |
 | Skill | `/crav1-review-pr` |
+| Skill | `/crav1-pr-status` |
 | Skill | `/crav1-merge-pr` |
 | Helper | Research |
 
 `/crav1-merge-pr` may run from any lane, and only when the user explicitly asks in that turn to merge a named pull request. It does not move work into Specify, Plan, or Build.
 
 `/crav1-review-pr` may run from any lane, and only when the user names an open pull request (number or URL) in that turn, or clearly asks to review that pull request. It does not move work into Specify, Plan, or Build. It only names the lane for a finding. A pull request with no `plan.md` or `tasks.md` for its slug was built outside the kit. That is an info note, not a fix finding. It does not report a missing `verify.md`. It reads the test results that pull request's own pipeline already recorded and does not run tests. It names `/crav1-refresh-system-notes` after that pull request merges and does not run it. A pull request that has a plan keeps the plan and `verify.md` checks. Spark, specify, and verify do not run it.
+
+`/crav1-pr-status` may run from any lane, and only when the user names a pull request (number or URL) in that turn, or the current branch has exactly one open pull request. It does not move work into Specify, Plan, or Build. It reads the threads read-only, writes the PR note's shared PR record, drafts replies and never posts them, and changes a thread's status on the host only on that thread's own yes (1.97.0). It hands spec or decision points to `/crav1-add-to-spec` on a yes and follow-ups to `/crav1-ado-sync` as drafts.
 
 `/crav1-review-security` may run from any lane, and only after architecture already exists (`docs/system/` or a spec that already describes the design). The same command reviews the whole system, one existing spec, or the change in front of us. It does not move work into Specify, Plan, or Build. Spark, plan, and verify do not run it.
 
@@ -246,6 +249,7 @@ cross_cutting:
     - crav1-finalize-commit
     - crav1-open-pr
     - crav1-review-pr
+    - crav1-pr-status
     - crav1-merge-pr
   subagents: []
   helpers:

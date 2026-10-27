@@ -75,6 +75,7 @@ Testing and review:
 - [From a built slice, exploratory test](from-run-exploratory-test.md)
 - [From code that already exists, suggest tests](from-suggest-tests.md)
 - [From a pull request review](from-review-pr.md)
+- [From a pull request's threads: where it stands](from-pr-status.md)
 
 Azure Boards:
 
@@ -125,7 +126,7 @@ You plan, build, verify, and ship one spec at a time.
 2. The working loop in [The method](concepts/method.md#the-working-loop-once-a-spec-exists)
 3. [From a spec to a plan](from-spec-to-plan.md), [Build tasks](from-plan-to-build.md), [Verify and fix](from-verify.md), [From commit to merge](from-commit.md)
 4. The Plan and Build lanes in the [skills reference](reference/skills.md#plan)
-5. [From a pull request review](from-review-pr.md), [From a bug that already exists](from-fix-bug.md)
+5. [From a pull request review](from-review-pr.md), [From a pull request's threads](from-pr-status.md), [From a bug that already exists](from-fix-bug.md)
 
 ### Guild bot
 
