@@ -14,6 +14,6 @@ Follow the one task branch of **`crav1-build-tasks`**, file `branches/one-task/r
 
 Also follow what `run.md` names: the implement step of `crav1-build-tasks` (`branches/implement/BRANCH.md`), `crav1-verify-build-against-spec`, the verify gaps branch of `crav1-fix-build-gaps`, and `crav1-finalize-commit` (message, then commit). Live host: `crav1-verify-build-against-spec` `references/live-host.md`.
 
-The parent passes: spec folder, `T#`, `approvals: already-done`, `branch: already-done`, and optional `resume: start|fix|ready|stop`. Commit style is already a persist rule. Do not ask style. Do not pause for Approvals & Execution. Do not create or switch git branches.
+The parent passes: spec folder, `T#`, `approvals: already-done`, `branch: already-done`, and optional `resume: start|fix|ready|stop`. Commit style is already a persist rule. Do not ask style. Do not pause for Approvals & Execution. Do not create or switch git branches. Never edit or commit code on a base branch (main, master, develop, Merges into, `release/*`): return `STATUS: blocked`, reason `on base branch <b>` (1.99.0).
 
 End with the **STATUS** block from `run.md`. Do not push. Do not open a PR. Do not run `/crav1-open-pr`. Do not edit `spec.md`. Do not implement a different `T#`.
