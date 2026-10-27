@@ -51,6 +51,10 @@ Build the queue fresh from `verify.md` each turn (minus what `fix-log.md` alread
 
 Confirm the before-state: re-run that row’s evidence once. Quote the failure. Do not skip.
 
+## Branch (1.99.0)
+
+Before the first code edit, check the checkout as `crav1-create-feature-branch` `references/code-branch.md` (drop-in: `.claude/skills/crav1-create-feature-branch/references/code-branch.md`; plugin: sibling `skills/crav1-create-feature-branch/references/code-branch.md`) says. On a work branch, go ahead. On a base branch (main, master, develop, the `Merges into` branch, `release/*`) never edit code there: ask once, **Create `fix/<slug>` from `<into>` (Recommended)**, **Use an existing branch**, **Other name**, **Stop**. On another branch, the same with **Stay on `<current>`** in place of Other name. Headless: stop with the reference's one line unless the invocation has `new branch`. Inside the build worker the branch is already checked; skip this.
+
 ## Fix (in spec)
 
 Smallest change that makes **this** verify row pass:

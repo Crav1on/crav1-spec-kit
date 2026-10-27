@@ -8,6 +8,8 @@
 
 Build tasks from tasks.md, always in an isolated worker per task; asks which tasks (one, a range, or all).
 
+1.99.0: on a base branch the Build prompt has no Stay, a headless run stops unless `new branch`, a task naming a base branch is blocked, and the worker returns blocked on a base before any edit or commit.
+
 **[`/crav1-build-tasks`](crav1-build-tasks.md)** opens with one question: which tasks to build, one `T#`, a range, or all unticked, listing the ready ones with the [`/crav1-tasks-ready-to-build`](crav1-tasks-ready-to-build.md) rules. It skips the question when the message names the tasks. Every task runs in its own worker (implement, commit, verify, optional fix), and every path ends by naming [`/crav1-open-pr`](crav1-open-pr.md). It replaces implement-task, complete-task, and complete-tasks; their rules are kept as branches.
 
 Inside each worker (was `/crav1-implement-task`): One `tasks.md` row, then run its verify step.
@@ -33,6 +35,7 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 | Which tasks | `one task` | one task (add `T#`, or the first unticked) |
 | Which tasks | `range` | a range (add `T#-T#`) |
 | Which tasks | `all tasks` | all unticked tasks |
+| Branch | `new branch` | on a base or other branch, create feat/<slug> from the into branch (1.99.0) |
 
 ## Runs when
 

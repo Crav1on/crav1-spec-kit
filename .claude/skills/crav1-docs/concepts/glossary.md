@@ -118,7 +118,7 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 
 **Branch reach.** The Promotion test: the work is contained in a branch (or a matching release branch or tag) that a promotion.md line says deploys to an environment. It is not deployment proof; the wording is "on the branch that deploys to prod", never "deployed to prod". The optional `pipeline runs` check reads the latest successful Azure DevOps runs. Since 1.69.0.
 
-**Base branch / Merges into.** The branch a repo's work merges into: the `Merges into` cell in `docs/system/repos.md` (for example `develop`), else the default branch. A base branch is never counted as a work branch.
+**Base branch / Merges into.** Implementation code is never built on one (1.99.0): `main`, `master`, `develop`, the `Merges into` branch and `release/*` all count. The branch a repo's work merges into: the `Merges into` cell in `docs/system/repos.md` (for example `develop`), else the default branch. A base branch is never counted as a work branch.
 
 **Fork point.** Where a branch split off: the closest of its repo's base branches (while the `Merges into` cell is empty, also `develop`, `development`, `dev` or `integration` when they exist) and the spec's other branches, by fewest own commits. A branch diff starts there, not at the default branch.
 

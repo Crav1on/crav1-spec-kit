@@ -33,6 +33,7 @@ Skip the question when the message already says which: a `Gap` id, `T#`, or "fro
 Exact words for bots and scripted runs. There are no `--flags`.
 
 - Which gaps: `verify gaps` / `live gaps`.
+- Branch (1.99.0, on a base or other branch): `new branch` (create `fix/<slug>` from the into branch).
 
 When the invocation contains one of these words (for example `/crav1-fix-build-gaps verify gaps`), take that choice and do not ask. This holds for a person, a bot, or a headless run.
 

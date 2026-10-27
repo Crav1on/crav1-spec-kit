@@ -14,6 +14,8 @@ Phase names in STATUS (never A/B/C/D): **`implement`**, **`verify`**, **`fix`**,
 
 The parent already switched to the task's `(branch: …)` when it has one and passed `branch: already-done`. Commit on the branch you were given. Do not check out, create, or switch branches. When the checkout is not the task's named branch, return to the parent with that reason before any code.
 
+**Base guard (1.99.0).** Before the first edit and before every loop-commit, check the checkout as `crav1-create-feature-branch` `references/code-branch.md` (drop-in: `.cursor/skills/crav1/crav1-create-feature-branch/references/code-branch.md`; plugin: sibling `skills/crav1-create-feature-branch/references/code-branch.md`) says. On a base branch (main, master, develop, the `Merges into` branch, `release/*`) return `STATUS: blocked` with the reason `on base branch <b>`, even when the parent passed `branch: already-done`. Never commit implementation code there.
+
 ## Loop-commit
 
 After a step that may have changed files:

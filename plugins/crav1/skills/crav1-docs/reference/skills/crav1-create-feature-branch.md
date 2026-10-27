@@ -12,6 +12,8 @@ Prompt for `feat/<slug>` or specify-only `spec/<slug>`; no silent checkout, no p
 
 1.64.0: the Build prompt puts a task's `(branch: …)` first, marked (Recommended), and never creates it from default without asking.
 
+1.99.0: implementation code is never built on a base branch (main, master, develop, Merges into, `release/*`): no Stay there; Create `feat/<slug>` from the into branch (Recommended), Use an existing branch, Other name or Stop; `hotfix/` is a work prefix; specs, docs and the specs repo are exempt. Rules in `references/code-branch.md`.
+
 1.68.0: a missing task sub-branch is offered as **Create it from the spec branch (Recommended)**; the `(into …)` marker is written after the yes.
 
 ## Runs when

@@ -2,6 +2,24 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.99.0 (2026-10-27)
+
+Implementation code is never written or committed on a base branch any more. Every skill that writes or commits code follows one shared guard, and on `main`, `develop`, the `Merges into` branch or a `release/*` branch it offers a work branch first instead of building there. A minor release because prompts change, Stay is gone on a base, and headless runs stop there.
+
+### Kit
+
+- **Added (create-feature-branch, `references/code-branch.md`):** one definition of base and work branches for every code-writing skill. Base branches: the `Merges into` branch, the default branch, any `main`, `master`, `develop`, `development`, `dev` or `integration` that exists, and every `release/*`. Work branches: `feat/`, `feature/`, `bug/`, `bugfix/`, `fix/`, `hotfix/`, or a branch a spec names. Spec and doc writes, and the specs (source-of-truth) repo, are exempt.
+- **Changed (create-feature-branch Build prompt):** on a base branch, at most 4 options and no Stay: **Create `feat/<slug>` from `<into>` (Recommended)**, **Use an existing branch** (the repo's non-base branches, the spec's own first; a pick the spec doesn't list is written to its Match `Branch:` list with `(into …)`), **Other name**, **Stop**. On a branch that is neither (`chore/x`, a detached checkout) Stay is offered in place of Other name. A release fix goes on `fix/<slug>` marked `(into release/x)`. A develop-flow repo now gets the prompt on `develop` even when `main` is the default.
+- **Changed (build-tasks):** every path follows the guard; a task whose `(branch: X)` is a base branch is blocked; a headless run on a base stops before any code unless it has the new `new branch` choice word.
+- **Added (worker):** `crav1-build-task-agent` checks before its first edit and before every commit, and returns `STATUS: blocked` with `on base branch <b>` even when the parent passed `branch: already-done`.
+- **Changed (build-features):** `feat/<slug>` forks from the into branch (Merges into, else default), not `main`; a base task branch is blocked; a dirty base tree is carried onto the new branch instead of being sent to finalize-commit.
+- **Added (fix-build-gaps):** a branch check before the first code edit, offering `fix/<slug>` from the into branch. `prompt_budget` 2 → 3; `new branch` choice word.
+- **Changed (finalize-commit):** with code staged on a base branch the prompt becomes `Commit on a work branch?` (create `feat/<slug>` from the into branch and commit, an existing branch, another name, stop), also for `commit now`; `new branch` answers it. Docs-only commits on a base are unchanged.
+- **Added (crav1.mdc):** a hard rule line for base branches.
+- **Fixed (finalize-commit):** a reply that names neither `strip trailers` nor `keep trailers` leaves the trailer-hook question unanswered: it installs no hook and saves nothing, instead of being read as the Recommended `strip trailers`.
+- **CI:** `scripts/check-code-branch.py` fails when a code-writing skill file doesn't point to the guard or the Build prompt offers Stay on a base.
+- **Docs:** build, verify and commit walkthroughs, glossary, skills reference.
+
 ## 1.98.0 (2026-10-27)
 
 `/crav1-open-pr` writes pull request descriptions in sections, with each change linked to its file and lines, instead of one paragraph. `/crav1-pr-status` reads the new sections, and `/crav1-review-pr` checks them point by point. A minor release because open-pr's output and pr-status's and review-pr's reading change.

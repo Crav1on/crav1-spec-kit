@@ -10,6 +10,8 @@ Serial board: build several ready specs one slug after another in this checkout.
 
 Serial board of ready slugs: `feat/<slug>` from default, then that spec’s build-tasks loop; no parallel, no push, no PR.
 
+1.99.0: `feat/<slug>` forks from the into branch (Merges into, else default), a task naming a base branch is blocked.
+
 1.64.0: tasks with `(branch: …)` are built on that branch; the board shows `done (n branches not merged)`.
 
 ## Runs when

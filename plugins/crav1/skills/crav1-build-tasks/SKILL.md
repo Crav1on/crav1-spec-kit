@@ -38,6 +38,7 @@ A picked task that is blocked: say why (the tasks-ready-to-build reason) and ask
 Exact words for bots and scripted runs. There are no `--flags`.
 
 - Which tasks: `one task` / `range` / `all tasks`.
+- Branch (1.99.0, on a base or other branch): `new branch` (create `feat/<slug>` from the into branch). Without it, a headless run on a base branch stops before any code.
 
 When the invocation contains one of these words (for example `/crav1-build-tasks one task`), take that choice and do not ask. This holds for a person, a bot, or a headless run.
 
