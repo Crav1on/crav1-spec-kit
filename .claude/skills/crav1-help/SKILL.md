@@ -35,7 +35,7 @@ The docs folder is fixed by where you run (1.96.1):
 
 In an install it is `../crav1-docs/` from this skill's folder. Read `<docs folder>/reference/…` and the other files below directly. Never read `docs/reference/` at the repo root outside the kit repo, and never run `ls`, `find`, or a search to locate the docs. When `<docs folder>/reference/workflow.yaml` is missing, only the skill folders were copied: read `references/modes.md` ("Neither: no kit docs").
 
-Say which docs folder you used once, at the top of the first answer.
+Never open an answer with a line about which docs you used. The first line is the answer; a short answer (below) stays at 5 lines plus `Source:`.
 
 The product repo's own `docs/` (specs, `docs/system/`, notes) is not kit documentation. Read it only for file state (below).
 

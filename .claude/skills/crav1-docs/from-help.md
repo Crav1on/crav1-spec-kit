@@ -73,7 +73,7 @@ The skill names its docs folder for each host and reads it directly (1.96.1). It
 - Claude Code: `.claude/skills/crav1-docs/`, or `~/.claude/skills/crav1-docs/` in user scope.
 - When only the skill folders were copied and `crav1-docs/` is missing, the command answers from the skill files only and says so.
 
-Each release bundles its own docs and `CHANGELOG.md`, so the answer fits the version you have.
+Each release bundles its own docs and `CHANGELOG.md`, so the answer fits the version you have. The answer starts with the answer, not with a line about which docs it used; the `Source:` line at the end says where it came from.
 
 It never fetches an answer from GitHub. When the machine is online, it reads the kit's tag names once and adds one line when a newer version is tagged.
 
