@@ -27,17 +27,21 @@ This is cross-cutting. It is not its own lane. It does not move work into Specif
 
 Local files only. Never fetch an answer, a doc, or a skill from GitHub or the web.
 
-Find the kit docs in this order and use the first that exists. Say which one you used once, at the top of the first answer.
+The docs folder is fixed by where you run (1.96.1):
 
-1. **The kit repo itself.** The workspace has `docs/reference/workflow.yaml`, `docs/reference/skills.yaml`, and `plugins/crav1/`. Use that `docs/`.
-2. **The bundled docs next to the skills.** The `crav1-docs/` folder beside this skill's folder (from this skill's folder: `../crav1-docs/`). Every install carries it: the Cursor plugin (`skills/crav1-docs/`), the Cursor drop-in (`.claude/skills/crav1-docs/`), and the Claude Code drop-in (`.claude/skills/crav1-docs/`, or `~/.claude/skills/crav1-docs/` in user scope). Each release bundles its own docs there, so the answer fits that exact version.
-3. **Neither.** Only the skill folders were copied. Read `references/modes.md` ("Neither: no kit docs").
+- Kit repo (`plugins/crav1/.cursor-plugin/plugin.json` exists): `docs/`.
+- Claude Code project drop-in: `.claude/skills/crav1-docs/`.
+- Claude Code user scope: `~/.claude/skills/crav1-docs/`.
+
+In an install it is `../crav1-docs/` from this skill's folder. Read `<docs folder>/reference/…` and the other files below directly. Never read `docs/reference/` at the repo root outside the kit repo, and never run `ls`, `find`, or a search to locate the docs. When `<docs folder>/reference/workflow.yaml` is missing, only the skill folders were copied: read `references/modes.md` ("Neither: no kit docs").
+
+Say which docs folder you used once, at the top of the first answer.
 
 The product repo's own `docs/` (specs, `docs/system/`, notes) is not kit documentation. Read it only for file state (below).
 
 The files:
 
-Paths below are relative to that docs folder (`docs/` or `crav1-docs/`).
+Paths below are relative to the docs folder.
 
 - Routes: `reference/workflow.yaml` and its page `reference/workflow.md`.
 - Skills: `reference/skills.yaml`, `reference/skills.md`, and `reference/skills/<name>.md`.
@@ -46,7 +50,7 @@ Paths below are relative to that docs folder (`docs/` or `crav1-docs/`).
 
 ## Cite every answer
 
-Every mode, including the ones below, ends with one line: `Source: <file>#<anchor>`, for example `Source: reference/workflow.md#new-info` or `Source: reference/skills/crav1-tighten-spec.md#walkthrough`. More than one file: name each. The path is relative to the docs you used (kit repo or plugin). An answer with no source is not given.
+Every mode, including the ones below, ends with one line: `Source: <file>#<anchor>`, for example `Source: reference/workflow.md#new-info` or `Source: reference/skills/crav1-tighten-spec.md#walkthrough`. More than one file: name each. The path is relative to the docs folder. An answer with no source is not given.
 
 ## Keep it short (1.95.0)
 
