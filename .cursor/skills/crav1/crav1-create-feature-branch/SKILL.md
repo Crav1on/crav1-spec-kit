@@ -3,8 +3,8 @@ name: crav1-create-feature-branch
 description: >-
   Create or check out feat/<slug> (one branch for spec+build) or spec/<slug>
   (specify-only; build later on feat/<slug>). Use on brownfield specify or
-  before implement if still on the default branch. Prompt; never silent
-  checkout. Do not push. Do not open a PR.
+  before implement on a base branch (main, develop, Merges into, release/*);
+  no Stay there. Prompt; never silent checkout. Do not push. Do not open a PR.
 disable-model-invocation: true
 icon: git-branch
 color: blue
@@ -21,7 +21,7 @@ Other skills follow this file (drop-in: `.cursor/skills/crav1/crav1-create-featu
 Run git (PATH fallback if needed). If not a repo, skip.
 
 - Current branch: `git branch --show-current`
-- Default branch: `git symbolic-ref refs/remotes/origin/HEAD` (e.g. `origin/main`) if that exists; else `main`, else `master`, else `develop`
+- Base branches, work branches and the into branch: as [references/code-branch.md](references/code-branch.md) (1.99.0) says. The default branch is `origin/HEAD`, else `gh`, else `main`, else `master`
 - Slug: from the spec folder they @, else the slug this specify pass is about to write, else ask
 - Dirty: `git status --porcelain` ignoring `agent-tools/`
 
@@ -29,7 +29,8 @@ Run git (PATH fallback if needed). If not a repo, skip.
 
 - No git repo, or no commits yet (empty greenfield)
 - Already on `feat/<slug>` or `spec/<slug>` for **this** slug
-- Already on a non-default branch they chose (leave it). Exception: they are on `spec/<slug>` and this is a **build** skill — see **Build on a spec-only branch**
+- Already on a **work branch** ([references/code-branch.md](references/code-branch.md)). Exception: they are on `spec/<slug>` and this is a **build** skill — see **Build on a spec-only branch**
+- **Specify** prompt only: already on a non-default branch they chose (leave it)
 - They already answered this prompt in this chat (`stay` / branch created)
 - Parent passed `branch: already-done`
 
@@ -44,24 +45,25 @@ Run git (PATH fallback if needed). If not a repo, skip.
 
 Intake (several slugs): one branch for the dump. Slug = short landscape kebab, or `system` if unnamed. Options are `feat/<that>` vs `spec/<that>`.
 
-**Build** (implement / build-tasks, before the first code change or worker):
+**Build** (implement / build-tasks / fix-build-gaps, before the first code change or worker): follow [references/code-branch.md](references/code-branch.md) (1.99.0).
 
-1. **`feat/<slug>`** — create/check out from the **current default** (default, **first/top**). Use this after a spec-only branch is on default, or when still on default
-2. **Stay**
-3. **Other**
+- On a **base branch** (main, master, develop, the `Merges into` branch, `release/*`): **Create `feat/<slug>` from `<into>` (Recommended)**, **Use an existing branch**, **Other name**, **Stop**. No Stay on a base.
+- On **another** branch (`chore/x`, detached HEAD): the same, with **Stay on `<current>`** in place of Other name.
+- Headless with no person: stop before any code, unless the invocation has the choice word `new branch`.
 
 Do not offer `spec/<slug>` on a build prompt.
 
 **Task branch (1.64.0).** When the task being built ends with `(branch: X)` (or `(branch: <repo> X)` for the open repo):
 
 - On X already: skip the prompt.
-- Otherwise the Build prompt is **X (Recommended)** first, then `feat/<slug>`, **Stay** and **Other**.
+- Otherwise the Build prompt is **X (Recommended)** first, then `feat/<slug>`, **Other name** and **Stop** (Stay only off a base).
+- When X is a base branch, the task is `blocked: branch X is a base branch`; never switch to it.
 - When X exists only as `origin/X`, `git checkout X` makes the local branch.
-- When X exists nowhere and the spec's Match `Branch:` list has a `(spec branch)` S, or X has an `(into S)` entry (1.68.0, setup 4 in `crav1-add-to-spec` `references/branches.md` (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/references/branches.md`; plugin: sibling `skills/crav1-add-to-spec/references/branches.md`)): the prompt is **Create X from S (Recommended)**, then `feat/<slug>`, **Stay** and **Other**. After that yes, create X from S (local `S`, else `origin/S`; never fetch) and write `(into S)` on X's Match `Branch:` line (adding the line in sorted place, 1.86.0). A headless run doesn't create X.
+- When X exists nowhere and the spec's Match `Branch:` list has a `(spec branch)` S, or X has an `(into S)` entry (1.68.0, setup 4 in `crav1-add-to-spec` `references/branches.md` (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/references/branches.md`; plugin: sibling `skills/crav1-add-to-spec/references/branches.md`)): the prompt is **Create X from S (Recommended)**, then `feat/<slug>`, **Other name** and **Stop**. After that yes, create X from S (local `S`, else `origin/S`; never fetch) and write `(into S)` on X's Match `Branch:` line (adding the line in sorted place, 1.86.0). A headless run doesn't create X.
 - When X exists nowhere otherwise, say so and offer `feat/<slug>` or **Other**. Never create X from the default branch without asking.
 - A `(branch: <repo> X)` for another repo is not built here; say which checkout it belongs to.
 
-If the working tree is dirty (other than `agent-tools/`), **do not checkout**. Tell them `/crav1-finalize-commit` (or stash themselves). Re-ask branch after the tree is clean.
+If the working tree is dirty (other than `agent-tools/`), **do not checkout** an existing branch. On a base branch, creating the new branch from HEAD with `git switch -c` carries the changes over (see the reference); never send a dirty base tree to `/crav1-finalize-commit`. Otherwise tell them to commit on their branch or stash themselves. Re-ask branch after the tree is clean.
 
 ## Checkout
 
@@ -70,6 +72,8 @@ Only after they pick a branch name that is not “stay”:
 ```text
 git checkout -b <name>
 ```
+
+On a base branch, create it as [references/code-branch.md](references/code-branch.md) **Creating** says (from the into branch, carrying uncommitted changes only when HEAD is that branch).
 
 If `<name>` already exists: `git checkout <name>` (do not `-B`, do not reset).
 
@@ -101,6 +105,7 @@ If they planned on `feat/<slug>` (one-branch default), skip spec-first. Implemen
 
 ## Hard rules
 
+- Implementation code is never built on a base branch (1.99.0, [references/code-branch.md](references/code-branch.md)); no Stay on a base.
 - Prompt; never silent checkout. A task's named branch comes first, marked (Recommended); it is never created from default without asking.
 - `feat/<slug>` is the default one-branch flow. `spec/<slug>` is the optional specify-then-build split.
 - No push, no PR, no `git commit` in this skill.
