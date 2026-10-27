@@ -32,7 +32,7 @@ Resolve these before you push or create anything. Prompt when a value is missing
 | Base | The head's into branch, then the repo's `Merges into` branch, then the repo default branch. See **Base branch**. Confirm when ambiguous. |
 | Head | Current branch when it is not the base. Otherwise ask. Do not check out a different branch in this skill. |
 | Title | `<slug>: <short summary>` when the head is `feat/<slug>` or `spec/<slug>`. Summary is the `spec.md` H1 when `docs/specs/<slug>/spec.md` exists; otherwise the latest commit subject on the head. No slug: latest commit subject. |
-| Body | Template below. |
+| Body | Format A in `references/draft.md`: a short summary, then headed sections with link-first bullets pinned to the head commit. No spec link. |
 | Push | Ask once, **after** the title and body are visible. Options in order: **push and open PR** (first/top), **open PR only** (remote already has the branch), **stop**. |
 
 On Windows, `git` may not be on `PATH`. Try `git`, then `C:\Program Files\Git\cmd\git.exe`. `az` may be `az.cmd`. When PowerShell calls `az.cmd`, `cmd.exe` cuts a multi-line argument at the first newline, and an unquoted `--query` value that contains parentheses is a syntax error. Quote every `--query` value (`--query "value[].pullRequestId"`). A multi-line pull-request description uses the `@file` steps in **Create**.
@@ -65,7 +65,7 @@ If base or head is still ambiguous, that turn is the question only. No title, no
 
 ## Draft title and body
 
-Read `references/draft.md` ("Draft title and body") only when you draft the title and body.
+Read `references/draft.md` ("Draft title and body") only when you draft the title and body. Since 1.98.0 the body is a 1–2 line summary, then Changes, Verified, Risks and rollback, Merge order, Not in this PR, Questions for reviewers and Work item, each left out when empty. Never link the spec; a missing rollback on an infra or PROD change is said in the chat only.
 
 ## Host
 
