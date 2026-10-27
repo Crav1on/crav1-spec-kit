@@ -23,7 +23,7 @@ Implementation code is never written or committed on a base branch. Every skill 
 - **On another branch:** offer a new branch but allow staying: `Create feat/<slug> from <into> (Recommended)`, `Use an existing branch`, `Stay on <current>`, `Stop`.
 - **On a base branch:** never write code there and never offer Stay. One prompt, at most 4 options:
   1. `Create feat/<slug> from <into> (Recommended)`. When `feat/<slug>` exists: `Check out feat/<slug> (Recommended)`. `/crav1-fix-build-gaps` offers `fix/<slug>`. On `release/<x>`: `Create fix/<slug> from release/<x> (Recommended)`, then write `(into release/<x>)` on its Match `Branch:` entry.
-  2. `Use an existing branch`: the repo's branches outside the base set (local and `origin`, no `spec/`), the spec's own branches first. Show up to 10 names in the prompt; with several, the pick is a follow-up list (at most 4 options, the last `Other name`), part of this prompt.
+  2. `Use an existing branch`: the repo's branches outside the base set (local and `origin`, no `spec/`), the spec's own branches first. Show up to 10 names in the prompt; with several, a follow-up list asks which (at most 4 options, the last `Other name`); that is a prompt for a value they left out, outside the prompt budget.
   3. `Other name`: they name the branch. A base name is refused; a missing branch is created from `<into>`.
   4. `Stop`: no code.
 
