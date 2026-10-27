@@ -113,10 +113,10 @@ The commit branch of `/crav1-finalize-commit` commits that Description as the bo
 
 ## Pull request body
 
-`/crav1-open-pr` adds this section only when a mention is resolved, after Verify:
+`/crav1-open-pr` adds this section only when a mention is resolved, last in the body (1.98.0):
 
 ```markdown
-## Work item
+### Work item
 
 #52
 ```

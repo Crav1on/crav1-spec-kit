@@ -14,6 +14,8 @@ It prints a verdict line with the points waiting on you first, then the points b
 
 It writes all of it to the PR note's shared `## PR record`, the same record [`/crav1-review-pr`](crav1-review-pr.md), [`/crav1-add-to-spec`](crav1-add-to-spec.md) and [`/crav1-merge-pr`](crav1-merge-pr.md) use; [`/crav1-merge-pr`](crav1-merge-pr.md) stops on `Ready: no`. Replies are drafts and are never posted. A thread status change on the host is offered one thread at a time and made only on that thread's yes. Spec or decision candidates go to [`/crav1-add-to-spec`](crav1-add-to-spec.md) on a yes. Follow-ups are drafts; no work item is created.
 
+1.98.0: also reads the pull request description: a `### Merge order` section becomes `Order` lines, `### Questions for reviewers` becomes Points tagged `asked; from description <date>`, and `### Not in this PR` is offered as follow-ups (a `follow-up` Point only on a yes). [`/crav1-open-pr`](crav1-open-pr.md) writes those sections.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.

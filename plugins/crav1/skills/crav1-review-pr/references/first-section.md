@@ -20,7 +20,7 @@ When the slug has `plan.md` and the diff has no code the plan should have named,
 | Verify: `verify.md` is on the branch and its quote shows a failure, or the quote does not cover a check the plan named for this diff (only when that slug has `plan.md`) | fix | Build |
 | Verify: `verify.md` is missing and the plan named checks for this diff (only when that slug has `plan.md`) | fix | Build. Say the file is missing. Do not run the tests |
 | A file the plan already named is not in the diff (only when that slug has `plan.md`) | fix | Build. This is not a plan miss |
-| Body: the description is wider or narrower than the diff | fix | Rewrite the pull request body. Not a new spec. The mismatch stays on this pull request. Do not edit the body in this skill |
+| Body: the description is wider or narrower than the diff. A format A body (1.98.0) is compared bullet by bullet: a Changes bullet whose linked lines are not in the diff or do not do what it says, or a change in the diff that no bullet covers (small changes may share a bullet) | fix | Rewrite the pull request body. Not a new spec. The mismatch stays on this pull request. Do not edit the body in this skill. Name the bullet or the uncovered file |
 | Linter: none covers the code in the diff, or one exists but is not required on this pull request, or it is required and red | fix | Build. Do not install a linter |
 
 ## Finding format

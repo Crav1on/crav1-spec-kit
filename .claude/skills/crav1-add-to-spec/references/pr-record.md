@@ -48,7 +48,7 @@ Examples:
   - `follow-up`: not for this pull request; it becomes later work. `/crav1-ado-sync` reads it like an open note item.
   - `migrated`: written by the migration from an older note; the next `/crav1-pr-status` run sorts it.
 - **Owner:** who acts next, as the host shows the name, or `-`.
-- **Tags**, `; `-separated, or `-`: `thread <id>`, `host <status>` (the host's thread status: `active`, `fixed`, `wontFix`, `closed`, `byDesign`, `pending`, or GitHub `resolved` / `outdated`), `resolved, code unchanged`, `to spec`, `to decision`, `in spec <slug>`, `asked`, `answered <date>`, `not posted <date>`, `from <skill> <date>`.
+- **Tags**, `; `-separated, or `-`: `thread <id>`, `host <status>` (the host's thread status: `active`, `fixed`, `wontFix`, `closed`, `byDesign`, `pending`, or GitHub `resolved` / `outdated`), `resolved, code unchanged`, `to spec`, `to decision`, `in spec <slug>`, `asked`, `answered <date>`, `not posted <date>`, `from <skill> <date>`, `from description <date>` (pr-status, from the description's Questions for reviewers or Not in this PR, 1.98.0).
 - **Text:** the point in plain words, with the reason when there is one. Last, so it may hold anything except a line break.
 
 ## Merge-safe rules
@@ -64,7 +64,7 @@ These follow [merge-safe.md](merge-safe.md) so two people's runs rarely conflict
 
 | Skill | Writes |
 | --- | --- |
-| `/crav1-pr-status` | Every kind: classifies each Point, adds Points for new threads, sets `Order`, its own `Read`, `Ready` and `State`, and adds `## Replies as drafted` history. |
+| `/crav1-pr-status` | Every kind: classifies each Point, adds Points for new threads and for the description's Questions for reviewers (and Not in this PR on a yes, 1.98.0), sets `Order`, its own `Read`, `Ready` and `State`, and adds `## Replies as drafted` history. |
 | `/crav1-review-pr` | One Point per finding, follow-up and question of its review (`open`, `follow-up`, `waiting on <author>` with `asked`), `not posted <date>` tags, `done <sha>` on a re-review, `State`, and the `## Comment as drafted` / `## Comment as posted` history. |
 | `/crav1-add-to-spec` | `pr<n> all`: a Point (`open`, `thread <id>`, `host <status>`) for each new thread and the `## PR updates as of` history; `in spec <slug>` when a point is taken into a spec; `answered <date>` when a comment answers a spec open question. |
 | `/crav1-merge-pr` | Reads `Ready` before the merge. After the merge: `State: merged` and `Ready: merged`. |

@@ -1218,12 +1218,13 @@ skills:
   purpose: Open a pull request for the current change branch (push with explicit yes).
   in_depth:
   - Push the change branch only after an explicit yes, then open one pull request (no merge, no commit).
-    Body is What / why, Spec links, Verify, and a Work item section when `work-item.md` exists. On Windows,
+    The body is a short summary and headed sections (see 1.98.0), with a Work item section when `work-item.md` exists. On Windows,
     a multi-line Azure DevOps description is passed as `--description "@<file>"` (UTF-8 without BOM).
     May name `/crav1-review-pr` and does not run it. Next explicit ask to merge is `/crav1-merge-pr`.
   - '1.64.0: the base is the head''s `(into …)` branch, then the repo''s `Merges into` branch (also from a sibling spec repo), then the default branch. The slug is also found from a spec that lists the head branch.'
   - '1.66.0: a push rejected because the remote branch moved says to pull with `git pull --no-rebase`, resolve conflicts, and push again. Never a rebase or a force-push.'
   - '1.68.0: the into step is offered and written: a head that split off another spec branch gets one yes/no question, and a sub-branch''s PR goes into its spec branch.'
+  - '1.98.0: the body is format A: a 1-2 line summary, then Changes (grouped by area, at most about 8 link-first bullets, each with a bold title and what and why; the why only from the spec, a plan task, a commit message or a code comment), Verified (the check written out, with dates), Risks and rollback, Merge order, Not in this PR, Questions for reviewers and Work item, each left out when empty. File and line links are pinned to the head commit (Azure DevOps `version=GC<sha>`, GitHub `blob/<sha>/…?plain=1#L<n>`). There is no Spec section and no link to the spec. A missing rollback on an infra, pipeline or PROD change is said in the chat only. `/crav1-pr-status` reads the Merge order, Questions for reviewers and Not in this PR sections on its next run.'
   use_when: Commits exist; want a pull request
   table:
     reads: The change branch, the spec, and `verify.md`
@@ -1310,6 +1311,7 @@ skills:
     points you cut out of the new comment unless you include them. Post it adds "I''ll post it myself"; choice
     words `comment posted`, `newest comment` and `skip comment record`.'
   - '1.97.0: no separate follow-ups note. Findings, follow-ups and questions go into the PR note''s shared `## PR record` (`crav1-add-to-spec` `references/pr-record.md`) as Point lines, drafted points you cut get `not posted <date>`, and the comment as drafted and as posted go into the PR note''s history. A re-review reads the record first. An old follow-ups note is still read; run `/crav1-add-to-spec migrate formats` to move it. Thread reads follow `references/pr-threads.md` (there is no `az repos pr thread list`). For where every thread stands, run `/crav1-pr-status`.'
+  - '1.98.0: a format A description from `/crav1-open-pr` is compared with the diff bullet by bullet (each Changes bullet against the lines it links, each change against a bullet), and a choice a bullet''s why calls deliberate, or that Not in this PR names as left out, is not raised as a fault unless the repo says otherwise.'
   use_when: This turn names an open pull request
   table:
     reads: The pull request, its diff, and the spec
@@ -1369,6 +1371,7 @@ skills:
   - '**`/crav1-pr-status`** reads one named pull request''s threads, pushes and commits on Azure DevOps or GitHub (read-only, `references/pr-threads.md` in `crav1-add-to-spec`) and splits the threads into points. Each point gets one of six statuses: `done <sha>` (a commit after the request changed the lines), `agreed`, `declined` (with the reason), `open`, `waiting on <name>`, or `needs <name>` for a third person. It picks reviewer or author mode from who opened the pull request; `as reviewer` or `as author` overrides it, and an unclear sign-in is guessed without asking.'
   - 'It prints a verdict line with the points waiting on you first, then the points by status, flags for threads resolved while the code is unchanged (and done points whose thread is still active), spec and decision candidates, follow-ups drafted for `/crav1-ado-sync`, the pull requests this one depends on and the merge order, drafted replies, and a merge-readiness line. `since last` shows only what changed since your last run.'
   - 'It writes all of it to the PR note''s shared `## PR record`, the same record `/crav1-review-pr`, `/crav1-add-to-spec` and `/crav1-merge-pr` use; `/crav1-merge-pr` stops on `Ready: no`. Replies are drafts and are never posted. A thread status change on the host is offered one thread at a time and made only on that thread''s yes. Spec or decision candidates go to `/crav1-add-to-spec` on a yes. Follow-ups are drafts; no work item is created.'
+  - '1.98.0: also reads the pull request description: a `### Merge order` section becomes `Order` lines, `### Questions for reviewers` becomes Points tagged `asked; from description <date>`, and `### Not in this PR` is offered as follow-ups (a `follow-up` Point only on a yes). `/crav1-open-pr` writes those sections.'
   use_when: You want to know what is done and what is left on a pull request, and what you owe
   table:
     reads: The pull request's threads, pushes and commits, its diff, and its PR record
