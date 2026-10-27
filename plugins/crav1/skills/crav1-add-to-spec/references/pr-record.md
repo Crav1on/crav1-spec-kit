@@ -25,12 +25,13 @@ One line per item, `- <Kind>: …`, fields split by ` | `. Kinds, in this order:
 Examples:
 
 ```text
-- Order: after PR 74 bc-operations (feat/fn-nrcc-fc1-prod) | merge order asked in thread 106, reply 2026-10-20 | 2026-10-27
-- Point: functions/fn-nrcc/nrcc/store.py:401 | declined | Arvid Cederberg | thread 106 | Random RowKey: one row per receive is intended, for traceability; a resend without a new revision is a bug on Volue's side
-- Point: functions/fn-nrcc/tests/test_store.py:45 | done f986696 | Arvid Cederberg | thread 106; host fixed | Fixture could clean live tables; Azurite is now forced
-- Point: general | needs David J. | Thomas Cronholm | thread 106 | Merge order of feat/fn-nrcc-fc1-prod: Arvid asks Thomas to check with David J.
-- Read: Thomas Cronholm | ad23f17, push 6, newest comment 2026-10-26T15:03Z | 2026-10-27
-- Ready: no | 1 waiting on Thomas Cronholm; 1 needs David J.; after PR 74 (not merged) | 2026-10-27 by pr-status
+- Order: after PR 40 orders-api (feat/orders-queue) | merge order asked in thread 106, reply 2026-10-20 | 2026-10-27
+- Point: general | needs Robin K. | Alex Doe | thread 106 | Merge order of feat/orders-queue: Sam asks Alex to check with Robin K.
+- Point: src/orders/audit.py | waiting on Alex Doe | Alex Doe | thread 104; to decision | 20 s timeouts accepted for the pilot; Sam asks what Alex thinks
+- Point: src/orders/retry_store.py:401 | declined | Sam Lee | thread 101 | Random row key: one row per attempt is intended, for traceability; a resend with the same id is a bug upstream
+- Point: tests/test_retry_store.py:45 | done 3c9d2e1 | Sam Lee | thread 98; host fixed | Fixture could clean live tables; the local emulator is now forced
+- Read: Alex Doe | 7b41a0c, push 6, newest comment 2026-10-26T15:03Z | 2026-10-27
+- Ready: no | 1 waiting on Alex Doe; 1 needs Robin K.; after PR 40 (not merged) | 2026-10-27 by pr-status
 - State: active | 2026-10-27
 ```
 
