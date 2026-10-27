@@ -83,6 +83,8 @@ If they named `copy`/`change`/`commit` **before** any wording exists, ignore it,
 
 Do not invent extra options (push, amend, commit subsets they did not name). A push asked for after the commit is a **new** request.
 
+**Base branch (1.99.0).** Before offering the choices, when HEAD is a base branch and anything staged is implementation code, read [references/base-branch.md](references/base-branch.md): the prompt becomes `Commit on a work branch?`, and nothing is committed on the base, even with `commit now`.
+
 ## When they pick `change`
 
 Read [references/change.md](references/change.md). Redraft or edit, show the new blocks, then the same choices; no commit in that turn.
@@ -113,4 +115,5 @@ The final message is exactly what this skill drafted. Any other line: read [refe
 - The committed message is exactly the drafted Summary + Description, including a trailing work-item mention. Added lines: [references/added-lines.md](references/added-lines.md).
 - Do not install a hook to enforce the work-item line. Do not block the commit when `work-item.md` is missing. The only hook is the trailer hook, after `strip trailers`.
 - Do not change product files except the persist rules the draft skill already writes, and the trailer hook and its saved answer (`.githooks/commit-msg`, `trailer-hook` rule). Cursor: `.cursor/rules/draft-commit-style.mdc` or `.cursor/rules/draft-commit-gitlog.mdc`. Claude Code project: `.claude/rules/draft-commit-style.md` or `.claude/rules/draft-commit-gitlog.md`. Claude Code user: `~/.claude/rules/draft-commit-style.md` or `~/.claude/rules/draft-commit-gitlog.md`.
+- Never commit implementation code on a base branch ([references/base-branch.md](references/base-branch.md)).
 - Never push and never rebase. Do not open a PR. After a successful commit, one optional line may name `/crav1-open-pr`. Do not invoke it.
