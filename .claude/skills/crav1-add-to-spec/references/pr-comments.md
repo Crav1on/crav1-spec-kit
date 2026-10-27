@@ -21,7 +21,7 @@ A comment that clearly answers an open question is linked under it as `Answered:
 
 ## Read with
 
-Read-only, never log in. GitHub: `gh pr view <n> --json body,comments`, `gh api repos/<owner>/<repo>/pulls/<n>/comments`, and `reviewThreads` (`isResolved`) through `gh api graphql`. Azure DevOps: `az devops invoke --area git --resource pullRequestThreads` with the project, repo and PR id; thread `status` gives open or resolved, comment type `system` marks system threads.
+Read-only, never log in, as [pr-threads.md](pr-threads.md) says (1.97.0): GitHub `gh pr view <n> --json body,comments`, `gh api repos/<owner>/<repo>/pulls/<n>/comments`, and `reviewThreads` (`isResolved`) through `gh api graphql`. Azure DevOps: `az devops invoke --area git --resource pullRequestThreads` with the project, repo and PR id; thread `status` gives open or resolved, comment type `system` marks system threads.
 
 ## Signed out
 
