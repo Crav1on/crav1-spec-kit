@@ -10,9 +10,10 @@ description: >-
   point; posts it as one comment and votes only after the user's yes. Re-review marks earlier
   findings fixed or open. Works across repos: from the specs repo for a
   PR in a repo listed in repos.md, or with both open. Saves the PR
-  description as a PR note and follow-ups as a note in the specs repo's
-  docs/notes/YYYY-MM/, with the comment as drafted and as posted, and
-  marks drafted points left out. Does not edit, test, or merge.
+  description, findings and follow-ups in the PR note's shared PR record
+  in the specs repo's docs/notes/YYYY-MM/, with the comment as drafted
+  and as posted, and marks drafted points left out. Does not edit, test,
+  or merge.
 disable-model-invocation: true
 icon: git-pull-request
 color: orange
@@ -132,7 +133,7 @@ Do not post or vote except as [Post it](#post-it) says. Do not open a spec. Do n
 
 ## Re-review
 
-Read `references/re-review.md` ("Re-review") only when this pull request was reviewed before (an earlier review comment or follow-ups note exists).
+Read `references/re-review.md` ("Re-review") only when this pull request was reviewed before (an earlier review comment, PR record Point, or old follow-ups note exists).
 
 ## Paste-ready comment
 
@@ -142,9 +143,9 @@ Read `references/comment.md` ("Paste-ready comment") only when you write the pas
 
 Read `references/comment.md` ("Comment style") only when you write the paste-ready comment (after the review is done).
 
-## Follow-ups note
+## PR record
 
-Read `references/notes.md` ("Follow-ups note") only when the review has follow-ups to save (after the comment).
+Read `references/notes.md` ("PR record") only when you save the review's points, follow-ups and comment (after the comment). 1.97.0: one shared record in the PR note, no follow-ups note.
 
 ## PR note
 
@@ -156,7 +157,7 @@ Read `references/posting.md` ("Post it") only when the user answers the post que
 
 ## Hard rules
 
-- No edits to code, `spec.md`, `plan.md`, `tasks.md`, or `verify.md`. The only writes are the PR note and the follow-ups note in the specs repo's `docs/notes/YYYY-MM/` and the generated indexes.
+- No edits to code, `spec.md`, `plan.md`, `tasks.md`, or `verify.md`. The only writes are the PR note (with its PR record) in the specs repo's `docs/notes/YYYY-MM/` and the generated indexes.
 - Read-only toward the code repo and its host. The only git write there is the fetch of the pull request's two branches after **Fetch only the PR's two branches** or `fetch pr branches`.
 - No test run, and no ask to run tests. When the slug has `plan.md`, quote `verify.md` or say it is missing. When the pull request is outside the kit, do not say `verify.md` is missing. Read the pipeline's recorded test results.
 - No linter install. No branch-protection change. No required-check edit.

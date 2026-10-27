@@ -11,7 +11,7 @@ The default style for the paste-ready block, every posted comment, and every re-
 - The opening is one short, plain line, in the spirit of "I've looked through the PR and run it through my checks. This is what I found:". It may vary slightly. Never praise, a greeting by name, or thanks (1.66.0).
 - One fix per point at most. No second option, and nothing after the fix or the question ("your call", "let me know") (1.66.0).
 - Soft wording, same information: "I noticed…", "It looks like… maybe they could…?", "Would it be worth adding a test that…?". No flat statements of fault. Do not drop or water down a fact to sound soft.
-- Read the pull request description first. A choice the description says is deliberate is not raised as a fault, unless it contradicts something written in the repo (a code comment, a README, a design rule); then it is a bug or a question with one fix (1.66.0). When it suggests something they "might like" or that "may be a good idea", it is a follow-up and goes to the note, not into the comment.
+- Read the pull request description first. A choice the description says is deliberate is not raised as a fault, unless it contradicts something written in the repo (a code comment, a README, a design rule); then it is a bug or a question with one fix (1.66.0). When it suggests something they "might like" or that "may be a good idea", it is a follow-up and goes to the PR record, not into the comment.
 
 The chat review above the block (F, I, S, B, T, Q lines) keeps its plain format for the user. The style applies to what the author will read.
 
@@ -27,7 +27,7 @@ What you noticed: <one line>
 Where: <path>, line <n> | no line
 ```
 
-`T1 — test to add` is a concrete test for a changed behavior or a bug. `Q1 — question` is something the author or team must answer about the code repo. Same two lines. They do not change the ship line. A question is saved in the follow-ups note as a bullet that starts `Asked on the PR:`. Which section each one goes to: `references/comment-layout.md` **Which section** (drop-in: `.cursor/skills/crav1/crav1-review-pr/references/comment-layout.md`; plugin: `skills/crav1-review-pr/references/comment-layout.md`).
+`T1 — test to add` is a concrete test for a changed behavior or a bug. `Q1 — question` is something the author or team must answer about the code repo. Same two lines. They do not change the ship line. A question is saved in the PR record as a Point, `waiting on <author>`, tagged `asked` (1.97.0). Which section each one goes to: `references/comment-layout.md` **Which section** (drop-in: `.cursor/skills/crav1/crav1-review-pr/references/comment-layout.md`; plugin: `skills/crav1-review-pr/references/comment-layout.md`).
 
 ## Paste-ready comment
 

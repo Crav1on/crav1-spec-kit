@@ -28,7 +28,7 @@ If the message does not name a pull request, the command asks which one and stop
 | Phase | You | Agent |
 | --- | --- | --- |
 | Which pull request | Named it by number or URL | Asks which one and stops when none was named. Does not pick the newest |
-| Comment as posted | Confirm the comment, or paste it | When the follow-ups note has a drafted comment with nothing posted after it, first finds the posted comment on the pull request (read-only) or asks you to paste it, saves it word for word, and compares it with the draft (1.67.0) |
+| Comment as posted | Confirm the comment, or paste it | When the PR note has a drafted comment with nothing posted after it, first finds the posted comment on the pull request (read-only) or asks you to paste it, saves it word for word, and compares it with the draft (1.67.0) |
 | Read | — | Reads the diff, the spec, and the pull request body, and whether a linter is required and green. When the slug has `plan.md`, also reads the plan and `verify.md`. When the slug has no `plan.md` or `tasks.md`, reads the test results that pull request's own pipeline already recorded. Does not edit. Does not run the tests |
 | Fixed checks | Read the 7 lines | The same 7 checks every run (1.95.0), one line each even when clean: spec and plan match, tests, secrets, infrastructure access per environment, environment parity, spec wording a bug touches, and merge order against the other open branches. Each line says `ok`, the finding ids, or `n/a` with a reason, so two runs on the same branch cover the same ground |
 | Must be true before ship | Read the findings | Each miss is its own finding. Three lines: what is off, what could happen, and the decision (ship, fix, or drop). Any fix or drop means the review does not say ship. An outside-the-kit note and a recorded-test note are info. They do not block ship |
@@ -131,7 +131,7 @@ On GitHub you can't approve or request changes on your own pull request, so ther
 
 ## Comment as posted (1.67.0)
 
-You often edit the comment before posting it. So the follow-ups note keeps both texts, each word for word in a code fence:
+You often edit the comment before posting it. So the PR note keeps both texts in its history, each word for word in a code fence (1.97.0; before that, a separate follow-ups note did):
 
 - `## Comment as drafted, <date>`: the paste-ready block of each review.
 - `## Comment as posted, <date> (by <name>)`: what the reviewers see, with one line saying where it came from (read from the PR thread, pasted in chat, or posted from this review), which draft it was compared with, and which `Description as of` section of the PR note the review read. `by` is your name as the host shows it.
@@ -165,7 +165,7 @@ For bots: `comment posted` records only, `newest comment` takes the newest match
 
 ## Re-review
 
-When the pull request already has review comments, the next run is a re-review. It reads the earlier findings from the pull request's own comments and threads, from anyone, including the points of an earlier one-comment review. When the follow-ups note has the comment as posted, the earlier points are its points (1.67.0). When nothing was posted, the new comment has no **Since last time**; the chat still says which points of the newest drafted comment are fixed or open.
+When the pull request already has review comments, the next run is a re-review. It reads the earlier findings from the pull request's own comments and threads, from anyone, including the points of an earlier one-comment review. When the PR note has the comment as posted, the earlier points are its points (1.67.0). When nothing was posted, the new comment has no **Since last time**; the chat still says which points of the newest drafted comment are fixed or open.
 
 Each earlier finding gets one line first: **Fixed** (with the short commit SHA), **Partly fixed**, **Still open**, or **No longer relevant**. A resolved thread whose problem is still there is flagged `resolved but still open`. In the comment, earlier points go under **Since last time**, then new points under the normal sections. **Since last time** lists only points the reviewers saw. A finding you cut from the posted comment is shown in the chat with its mark and kept out of the new comment unless you say to include it.
 
@@ -192,19 +192,27 @@ Run from the code repo with the specs repo not open, it finds the specs repo nex
 
 ## PR note (1.65.0)
 
-Every review saves the pull request's title and description as a **PR note** in the specs repo, so specs can link to it locally: `docs/notes/YYYY-MM/YYYY-MM-DD-pr-orders-api-71.md`, filed by the pull request's created date, `kind: pull request`, `source: PR 71 dev.azure.com/contoso/orders/orders-api`. A later review reuses it; when the description changed, it appends a `## Description as of <date>` section and never removes the earlier text. The description goes through the same personal-data and secrets check as an imported mail, and each image gets the four options. Pull requests made by `/crav1-open-pr` get one too. `/crav1-merge-pr` writes or updates it after a merge, and `/crav1-add-to-spec code change orders-api PR 71` uses it. The follow-ups note links it with `pr_note:`.
+Every review saves the pull request's title and description as a **PR note** in the specs repo, so specs can link to it locally: `docs/notes/YYYY-MM/YYYY-MM-DD-pr-orders-api-71.md`, filed by the pull request's created date, `kind: pull request`, `source: PR 71 dev.azure.com/contoso/orders/orders-api`. A later review reuses it; when the description changed, it appends a `## Description as of <date>` section and never removes the earlier text. The description goes through the same personal-data and secrets check as an imported mail, and each image gets the four options. Pull requests made by `/crav1-open-pr` get one too. `/crav1-merge-pr` writes or updates it after a merge, and `/crav1-add-to-spec code change orders-api PR 71` uses it. Code-change notes link it with `pr_note:`.
 
-## Follow-ups
+## Follow-ups and the PR record (1.97.0)
 
 Follow-ups are suggestions, and choices the description calls deliberate. They are not for this pull request, so they are not posted to the pull request and are not in the paste-ready comment. The comment has only Blockers, Bugs, Tests to add with this PR, and A question.
 
-The chat review still lists them, then says where they were saved. They go into one note in `docs/notes/` of the specs repo, in the usual notes format: `docs/notes/YYYY-MM/review-pr-<n>-follow-ups.md`, or `docs/notes/YYYY-MM/review-pr-<repo>-<n>-follow-ups.md` (month of the review date) when two repos in the specs repo have the same pull request number, and always for a pull request in another repo (1.65.0). The note names the pull request, the repo, the date, and each follow-up with its file and line. The paths stay, because the note stays in the specs repo. The notes indexes are regenerated.
+The chat review still lists them, then says `PR record: <path>`. Everything the review raises goes into the PR note's shared `## PR record`, one line per point, in the merge-safe format of `crav1-add-to-spec` `references/pr-record.md`:
 
-A re-review of the same pull request updates that note instead of writing a second one: it sets the imported date, adds new follow-ups, and marks one the code now addresses `(done in <short sha>)`. It removes no line. A question asked in the comment is saved there too, starting `Asked on the PR:` (1.66.0). From 1.67.0 every review with a paste-ready comment writes the note, because it holds the comment as drafted. The follow-ups come back through the existing note flow: [`/crav1-ado-sync`](from-ado-sync-suggest-features.md) reads open notes, and the spec that takes one adds itself to the note's `used_by`. Notes are never absorbed. The note is not committed; `/crav1-finalize-commit` does that.
+```text
+- Point: src/orders/retry_store.py:9 | open | Sam Lee | from review-pr 2026-10-19 | An idempotency test for the row key
+- Point: src/orders/retry.py | follow-up | - | from review-pr 2026-10-19 | Split the retry policy into its own module later
+- Point: general | waiting on Sam Lee | Sam Lee | asked; from review-pr 2026-10-19 | Is the cut-off local time?
+```
+
+A finding is `open`, a follow-up is `follow-up`, a question is `waiting on <author>` tagged `asked`, and a drafted point you cut from the posted comment gets `not posted <date>`. A re-review reads the record first, sets a point the code now addresses to `done <short sha>`, and never deletes a line. The same record is read and written by [`/crav1-pr-status`](from-pr-status.md) (where every thread stands), `/crav1-add-to-spec pr<n> all` and `/crav1-merge-pr` (which stops on `Ready: no`). The follow-ups come back through the existing note flow: [`/crav1-ado-sync`](from-ado-sync-suggest-features.md) reads `follow-up` Points as open items, and the spec that takes one adds itself to the note's `used_by`. Notes are never absorbed. The note is not committed; `/crav1-finalize-commit` does that.
+
+Before 1.97.0 the follow-ups lived in a separate `docs/notes/YYYY-MM/review-pr-[<repo>-]<n>-follow-ups.md`. A review still reads one and says to run `/crav1-add-to-spec migrate formats`, which moves it into the PR note ([install](install.md)).
 
 ## What does not get written
 
-No code edit. No `spec.md` edit. No `plan.md` edit. No test run. No comment, vote, or thread resolve without your yes. The only files it writes are the PR note and the follow-ups note, in the specs repo. In the code repo it only fetches the pull request's two branches, and only after you pick that. No branch-protection change. No merge.
+No code edit. No `spec.md` edit. No `plan.md` edit. No test run. No comment, vote, or thread resolve without your yes. The only file it writes is the PR note with its PR record, in the specs repo. In the code repo it only fetches the pull request's two branches, and only after you pick that. No branch-protection change. No merge.
 
 ## After
 

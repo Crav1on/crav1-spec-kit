@@ -33,8 +33,8 @@ Exact words for bots and scripted runs. There are no `--flags`.
 
 - What you have: `fact` / `dump` / `code change` / `meeting` / `mail` / `chat`.
 - Code change, every open branch: `branches` (`branches all`, `branches skip stale`); read `references/branches-sweep.md`.
-- Once after updating to 1.84.0 or 1.86.0: `migrate formats`; see **Merge-safe formats** below.
-- After a PR: `all`. A PR ref alone (`pr71`, `#71`, as `references/scope.md` parses) means `code change`; `pr71 all` adds description and comments per `references/pr-comments.md`.
+- Once after updating to 1.84.0, 1.86.0 or 1.97.0: `migrate formats`; see **Merge-safe formats** below.
+- After a PR: `all`. A PR ref alone (`pr71`, `#71`, as `references/scope.md` parses) means `code change`; `pr71 all` adds description and comments per `references/pr-comments.md`, and a record Point per new thread (`references/pr-record.md`, 1.97.0).
 
 `mail` and `chat` run the dump branch. "This mail", "this email" or "this chat" picks that word.
 
@@ -44,9 +44,9 @@ When a choice is missing and the run is headless or started by a bot (no person 
 
 ## Merge-safe formats (1.84.0)
 
-Every `Synced at` line, open question, `**New:**` line and glossary row this skill writes follows `references/merge-safe.md`: one `Synced at` line per repo and branch, questions found by their words (`Q#` is display only), and new lines in sorted place, not at the end.
+Every `Synced at` line, open question, `**New:**` line, glossary row and PR record line (1.97.0) this skill writes follows `references/merge-safe.md`: one `Synced at` line per repo and branch, questions found by their words (`Q#` is display only), and new lines in sorted place, not at the end.
 
-`migrate formats` rewrites every spec and `docs/system/repos.md` once. Run `python3 <this skill>/scripts/merge_safe_migrate.py --dry-run` from the repo root and show its list. After one yes (headless: the word is the yes), run it without `--dry-run`. It checks nothing was lost before it writes; a `LOST` line means that file was left alone, so show it and stop. A second run says `already merge-safe`. Do not commit.
+`migrate formats` rewrites every spec, `docs/system/repos.md` and (1.97.0) every PR note once, moving old review follow-ups notes into their PR notes' record. Run `python3 <this skill>/scripts/merge_safe_migrate.py --dry-run` from the repo root and show its list and diff. After one yes (headless: the word is the yes), run it without `--dry-run`. It checks nothing was lost before it writes; a `LOST` line means that file was left alone, so show it and stop. A second run says `already merge-safe`. Do not commit.
 
 ## From /crav1-read-environment
 

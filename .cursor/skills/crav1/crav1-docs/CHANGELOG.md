@@ -2,6 +2,31 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.97.0 (2026-10-27)
+
+A new `/crav1-pr-status` skill shows where one pull request stands: what is done, what is left and why, and what you owe. Review-pr, add-to-spec, merge-pr and pr-status now share one PR record in the PR note, and `migrate formats` moves the old review follow-ups notes into it. A minor release because review-pr and merge-pr behave differently.
+
+### Kit
+
+- **Added (pr-status):** `/crav1-pr-status pr<n>` (or a URL). It reads every thread, reply and push read-only and gives each point one status: done (only when a commit after the request changed its lines), agreed, declined, open, waiting on <name>, needs <name>. Reviewer mode, or author mode when you opened the pull request; `as reviewer` and `as author` switch. It prints a verdict line with the points waiting on you first, flags threads resolved while the code is unchanged, lists spec or decision candidates, follow-up drafts, dependent pull requests and merge order, drafted replies and a merge-readiness line. `since last` shows only what changed since your last run; `no code` skips the commit check. One prompt at most: a separate yes per thread status change, one for the spec candidates (handed to `/crav1-add-to-spec`), one for the follow-ups (drafts for `/crav1-ado-sync`, never created). Replies are never posted. Output goes to the chat and the PR note.
+- **Added (PR threads):** one shared host reference, `crav1-add-to-spec` `references/pr-threads.md`, for reading threads, comments, pushes and who is signed in on Azure DevOps (`az devops invoke` or `az rest`) and GitHub, and for changing one thread's status. **Fixed:** review-pr's re-review named `az repos pr thread list`, which does not exist.
+- **Changed (PR record, clean slate):** the PR note holds one shared `## PR record`: `Order`, `Point`, `Read`, `Ready` and `State` lines, one per item, in sorted place, merge-safe (`references/pr-record.md`). Review-pr writes its findings, follow-ups and questions there as Points (`not posted <date>` for a point cut from the posted comment, `done <sha>` on a re-review) and its comment history in the PR note; it no longer writes `review-pr-<n>-follow-ups.md`. Add-to-spec `pr<n> all` adds Points for new threads and `in spec <slug>` when a point is taken. Ado-sync suggest Features reads `follow-up` Points as open items. Help ranks PR points waiting on you.
+- **Changed (merge-pr):** it reads the PR record's `Ready` line and stops on `no` unless the turn says `anyway` (host checks still apply); no record means it goes on with a hint. After the merge it sets `State` and `Ready` to merged.
+- **Added (migration):** `/crav1-add-to-spec migrate formats` now gives every PR note its PR record (with a `State` line from the newest `State on` mention) and moves each review-pr follow-ups note into its PR note: one Point per bullet, text verbatim; the dated comment sections into the history by date; the intro and bullets under `## Review follow-ups, moved <date>`; front matter in one `Moved from` line; `used_by` and `waiting_for` merged. Then it deletes the old note, rewrites links to it and rebuilds the notes indexes. Idempotent; a nothing-lost check stops on any missing line (`LOST`, exit 2); the dry run prints a unified diff and writes nothing; it writes only on a yes.
+- **Docs:** new walkthrough `docs/from-pr-status.md`, reference page, guild routing, glossary, data layout (PR record section and six new marks), install, and optional pr-status steps on the before-pr and outside-pr routes.
+
+### Run the migration (each specs repo with PR notes)
+
+In the agent: `/crav1-add-to-spec migrate formats` (dry run first, then one yes). Without an agent, from the specs repo root:
+
+```text
+python3 .cursor/skills/crav1/crav1-add-to-spec/scripts/merge_safe_migrate.py --dry-run
+python3 .cursor/skills/crav1/crav1-add-to-spec/scripts/merge_safe_migrate.py
+python3 .cursor/skills/crav1/crav1-add-to-spec/scripts/merge_safe_migrate.py --check
+```
+
+Claude Code: `.claude/skills/crav1-add-to-spec/scripts/`. Commit the result yourself.
+
 ## 1.96.1 (2026-10-27)
 
 `/crav1-help` names its docs folder for each host and no longer opens with a line about which docs it used. A patch: help still reads the same docs and answers the same way.

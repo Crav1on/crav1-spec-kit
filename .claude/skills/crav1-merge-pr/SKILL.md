@@ -6,7 +6,9 @@ description: >-
   false. Use only when this turn explicitly asks to merge a pull request by
   number or URL. Cross-cutting. Never squash, rebase, bypass policy, or
   follow on from open-pr. Do not run /crav1-review-pr. A review is not this ask.
-  After the merge, saves the PR description as a PR note in the specs repo.
+  Stops when the PR record's merge-readiness line says no, unless the turn
+  says anyway. After the merge, saves the PR description and merged state
+  in the PR note in the specs repo.
 disable-model-invocation: true
 icon: git-merge
 color: green
@@ -103,6 +105,10 @@ Read `references/github.md` ("GitHub (What must pass)") only when the remote is 
 
 Read `references/azure-devops.md` ("Azure DevOps (What must pass)") only when the remote is Azure DevOps.
 
+## PR record gate (1.97.0)
+
+Read `references/pr-record-gate.md` ("The Ready line") before **Show, then merge**, every run. The PR note's merge-readiness line (`Ready:`) from `/crav1-pr-status` or `/crav1-review-pr` stops the merge when it says `no`, unless this turn says `anyway`. `anyway` never skips a required check, policy or review.
+
 ## Show, then merge
 
 Before the merge command, show:
@@ -173,7 +179,7 @@ Read `references/fallback.md` ("Auth notes") only when a CLI says it is not sign
 - No `--admin`, no `--bypass-policy`, no `bypassPolicy`.
 - No second strategy attempt after a refusal or a failed `az repos pr update`.
 - No `git commit`, no stash, no new branch, no force-push.
-- The only file this skill writes is the PR note (and the generated notes indexes) in the specs repo, after a confirmed merge. Never committed.
+- The only file this skill writes is the PR note with its PR record (and the generated notes indexes) in the specs repo, after a confirmed merge. Never committed.
 - No branch delete unless the user asked in this turn.
 - No dialog-box or browser Microsoft sign-in (`az login`, `az devops login`, device code, or a web login).
 - No token printed, echoed, or created. An `AZURE_DEVOPS_EXT_PAT` the user already set is the PAT route in **Auth notes**.
@@ -187,3 +193,4 @@ Read `references/fallback.md` ("Auth notes") only when a CLI says it is not sign
 ## Choice words (1.69.0)
 
 - Pipeline runs: `pipeline runs` (check the latest successful Azure DevOps runs behind the Promotion line without asking). There are no `--flags`.
+- Not ready: `anyway` (1.97.0; merge although the PR record says `Ready: no`; host checks still apply).

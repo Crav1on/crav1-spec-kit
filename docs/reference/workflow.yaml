@@ -137,6 +137,9 @@ routes:
         when: When the fixes are made.
       - skills: [crav1-open-pr]
         when: To push and open the pull request.
+      - skills: [crav1-pr-status]
+        optional: true
+        when: When the pull request has comments and replies, to see what is done, what is left and what you owe (1.97.0).
 
   - id: outside-pr
     title: Outside pull request
@@ -144,6 +147,9 @@ routes:
     steps:
       - skills: [crav1-review-pr]
         when: The pull request is open.
+      - skills: [crav1-pr-status]
+        optional: true
+        when: When the review comments got replies or new pushes, to see where each point stands and whether it is ready to merge (1.97.0).
       - skills: [crav1-merge-pr]
         when: When the review says ship.
       - skills: [crav1-refresh-system-notes]
@@ -171,6 +177,7 @@ also_next:
   crav1-add-to-spec: [/crav1-finalize-commit]
   crav1-review-pr: [/crav1-refresh-system-notes after an outside pull request merges, /crav1-finalize-commit]
   crav1-merge-pr: [/crav1-finalize-commit]
+  crav1-pr-status: [/crav1-add-to-spec, /crav1-ado-sync, /crav1-review-pr]
   crav1-explain-existing-system: [/crav1-what-do-we-know-about-this]
   crav1-refresh-system-notes: [/crav1-finalize-commit]
   crav1-map-pipeline-environments: [/crav1-read-environment]

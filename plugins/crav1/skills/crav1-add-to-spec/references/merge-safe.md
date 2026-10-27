@@ -1,4 +1,4 @@
-# Merge-safe formats (1.84.0, Branch lines 1.86.0)
+# Merge-safe formats (1.84.0, Branch lines 1.86.0, PR record 1.97.0)
 
 Two people run the kit on their own machines and merge. These formats keep their additions on different lines, so git merges them without a conflict most of the time. Every skill that writes a `Synced at` stamp, a Match `Branch:` line, an open question, a `**New:**` line or a glossary row follows this file. `/crav1-finalize-commit` `references/pull.md` resolves what still conflicts.
 
@@ -23,6 +23,10 @@ Two people run the kit on their own machines and merge. These formats keep their
 - A skill finds a question by its words: the question text, ignoring case, spacing and trailing punctuation. `Blocks:`, `Asked:`, `Pending:` and `Answered:` live under the question they belong to, so they move with it.
 - A new question goes in sorted place among the existing top-level bullets: before the first one whose words sort after it (case ignored). Existing questions are never reordered.
 
+## PR record: one line per item (1.97.0)
+
+The PR note's `## PR record` holds one line per point, other pull request, reader, readiness and state, in sorted place, as [pr-record.md](pr-record.md) says. A skill replaces only its own line, in place; a new line goes in sorted place; existing lines never move; a Point is never deleted. New history sections go in sorted place by date.
+
 ## Fixed insert order
 
 Appending always lands at the same spot, the end, so two people's additions collide. A sorted place spreads them out: two different lines almost never sort to the same spot, and git merges inserts at different spots cleanly. Existing lines are never reordered; only the new line's position is decided.
@@ -35,4 +39,12 @@ Appending always lands at the same spot, the end, so two people's additions coll
 
 ## Migration
 
-A project made before 1.84.0 runs `/crav1-add-to-spec migrate formats` once after updating. It runs `scripts/merge_safe_migrate.py`: the dry run first, one yes, then the write. It splits `; `-separated `Synced at` lines into one line each, moves the repos table's `Synced at` column into the `## Synced at` section, turns numbered or `Q<n>`-prefixed open questions into plain bullets, and (1.86.0) splits `; `-joined Match `Branch:` lists into one line per branch, markers kept. A project already on 1.84.0 runs it again after 1.86.0. It keeps every line and every entry, checks that nothing was lost before it writes, and a second run changes nothing. It does not commit.
+A project made before 1.84.0 runs `/crav1-add-to-spec migrate formats` once after updating. It runs `scripts/merge_safe_migrate.py`: the dry run first, one yes, then the write. It splits `; `-separated `Synced at` lines into one line each, moves the repos table's `Synced at` column into the `## Synced at` section, turns numbered or `Q<n>`-prefixed open questions into plain bullets, and (1.86.0) splits `; `-joined Match `Branch:` lists into one line per branch, markers kept. A project already on 1.84.0 runs it again after 1.86.0. A project made before 1.97.0 runs it again: (1.97.0) every PR note (`kind: pull request`) gets its `## PR record` with a `State` line from the newest `State on <date>` mention, and each review-pr follow-ups note (`review-pr-[<repo>-]<n>-follow-ups.md`, linked by `pr_note:` or by its pull request number and repo) moves into its PR note: one `Point` per bullet with the text verbatim (status `migrated`, or `done <sha>` for `(done in <sha>)`; tags `not posted` from `(Not in the posted comment, <date>; …)`, `asked` from `Asked on the PR:`, `answered` from `(answered on the PR <date>)`), its dated comment sections into the history by date, its intro and bullets into `## Review follow-ups, moved <date>`, its front matter into one `Moved from` line, `used_by` and `waiting_for` merged. Then the old file is deleted, repo-path mentions of it are rewritten, and the notes indexes are rebuilt. Thread sections are not turned into Points; the first `/crav1-pr-status` run does that. A follow-ups note with no PR note is left alone with a `NO PR NOTE` line. It keeps every line and every entry, checks that nothing was lost before it writes (a `LOST` line means that note was left alone and the run exits 2), and a second run changes nothing. `--dry-run` prints a unified diff of every change. It does not commit.
+
+Run from the product repo root (drop-in path shown; plugin: the same script under `skills/crav1-add-to-spec/scripts/`):
+
+```text
+python3 .cursor/skills/crav1/crav1-add-to-spec/scripts/merge_safe_migrate.py --dry-run
+python3 .cursor/skills/crav1/crav1-add-to-spec/scripts/merge_safe_migrate.py
+python3 .cursor/skills/crav1/crav1-add-to-spec/scripts/merge_safe_migrate.py --check
+```

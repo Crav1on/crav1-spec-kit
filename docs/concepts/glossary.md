@@ -40,7 +40,7 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 
 **Lane.** One of the groupings of skills: Starters, Specify, Plan, Build, and Cross-cutting. Inside each lane, skills sit in groups by phase. The [skills reference](../reference/skills.md) is organized this way, and [guild routing](../guild-routing.md) maps each skill to a lane.
 
-**Comment as posted.** The review comment as the reviewers see it, saved word for word in the review-pr follow-ups note next to the comment as drafted. `/crav1-review-pr` finds it on the pull request or takes a paste, compares it with the draft, and marks drafted points left out as `Not in the posted comment`, still open. A re-review compares against it (1.67.0).
+**Comment as posted.** The review comment as the reviewers see it, saved word for word in the PR note's history next to the comment as drafted (the review-pr follow-ups note before 1.97.0). `/crav1-review-pr` finds it on the pull request or takes a paste, compares it with the draft, and tags drafted points left out `not posted <date>` in the PR record, still open. A re-review compares against it (1.67.0).
 
 **Cross-cutting.** A skill that may run from any lane and does not move work into a lane.
 
@@ -70,7 +70,9 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 
 **Note.** One full input (fact plus passage, dump, code change, meeting) and its source in `docs/notes/YYYY-MM/`, filed by source date (1.61.0). Specs link it as `Full source:`; `used_by` records which specs took points. Never absorbed. Older notes may still say `Absorbed by`.
 
-**PR note.** One note per pull request in the specs repo's `docs/notes/YYYY-MM/`, filed by the pull request's created date, `kind: pull request`, holding its title and description (a changed description is appended as a dated section). Written by `/crav1-review-pr`, `/crav1-merge-pr`, and the code-change branch of `/crav1-add-to-spec` (1.65.0).
+**PR note.** One note per pull request in the specs repo's `docs/notes/YYYY-MM/`, filed by the pull request's created date, `kind: pull request`, holding its title and description (a changed description is appended as a dated section). Written by `/crav1-review-pr`, `/crav1-merge-pr`, and the code-change branch of `/crav1-add-to-spec` (1.65.0), and `/crav1-pr-status` (1.97.0). It holds the PR record.
+
+**PR record.** The PR note's `## PR record` section: one merge-safe line per point, dependent pull request, reader, readiness and state, shared by `/crav1-pr-status`, `/crav1-review-pr`, `/crav1-add-to-spec` and `/crav1-merge-pr`. `/crav1-merge-pr` stops on `Ready: no` unless you say `anyway` (1.97.0).
 
 **Specs repo, code repo.** The specs repo is the checkout with `docs/specs/`; a code repo is a repo in its `docs/system/repos.md`. `/crav1-review-pr` reviews a code repo's pull request from the specs repo, or with both open (1.65.0).
 

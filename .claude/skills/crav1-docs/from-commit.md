@@ -93,7 +93,7 @@ After the commit, `/crav1-finalize-commit` fetches. It never pushes; it ends wit
 
 ## PR note (1.65.0)
 
-`/crav1-open-pr` does not save the body it drafts: that is its own summary of the spec, plan and verify. After a confirmed merge, `/crav1-merge-pr` writes or updates the pull request's PR note in the specs repo (`docs/notes/YYYY-MM/YYYY-MM-DD-pr-<repo>-<n>.md`, its title and description, `kind: pull request`), with any edits made to the description since. It is not committed. A review with `/crav1-review-pr` writes the same note. From the specs repo, a pull request in another repo is reviewed with `/crav1-review-pr <repo> <n>`.
+`/crav1-open-pr` does not save the body it drafts: that is its own summary of the spec, plan and verify. After a confirmed merge, `/crav1-merge-pr` writes or updates the pull request's PR note in the specs repo (`docs/notes/YYYY-MM/YYYY-MM-DD-pr-<repo>-<n>.md`, its title and description, `kind: pull request`), with any edits made to the description since, and sets its PR record's `State` and `Ready` lines to merged (1.97.0). Before merging it reads the `Ready` line and stops on `no` unless you say `anyway`. It is not committed. A review with `/crav1-review-pr` writes the same note. From the specs repo, a pull request in another repo is reviewed with `/crav1-review-pr <repo> <n>`.
 
 ## After
 

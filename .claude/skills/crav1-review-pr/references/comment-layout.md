@@ -12,7 +12,7 @@ The paste-ready comment that `/crav1-review-pr` ends with, and the one comment i
    3. `### Tests to add with this PR`
    4. `### A question` (exactly one), or `### Questions` (two or more)
 
-   Leave out a section with nothing in it, heading included. **Follow-ups are never in the block.** The chat lists them under **Follow-ups (not for this PR)** and the follow-ups note keeps them.
+   Leave out a section with nothing in it, heading included. **Follow-ups are never in the block.** The chat lists them under **Follow-ups (not for this PR)** and the PR record keeps them as `follow-up` Points.
 4. **Bullets**, one per point, link first:
 
    ```text
@@ -29,7 +29,7 @@ The paste-ready comment that `/crav1-review-pr` ends with, and the one comment i
 5. **No table** of any kind.
 6. **No closing line and no files-view link.** The block ends with its last bullet.
 7. **Plain Markdown only:** headings, bullets, bold, inline code, links. No HTML tags, footnotes, task-list boxes, or diagrams. It renders the same in Azure DevOps and GitHub.
-8. **No kit details:** no spec paths or names, no `docs/sources/`, no vault, no `F1`. A plan or verify miss is said in plain words about the change. The follow-ups note is never mentioned.
+8. **No kit details:** no spec paths or names, no `docs/sources/`, no vault, no `F1`. A plan or verify miss is said in plain words about the change. The PR note and its record are never mentioned.
 9. **English**, unless the user asks for another language for this comment in this turn.
 
 ## Which section
@@ -42,9 +42,9 @@ The paste-ready comment that `/crav1-review-pr` ends with, and the one comment i
 | A choice the description calls deliberate that contradicts something written in the repo (a code comment, a README, a design rule) | **Bugs** (or a question): "I understand … was deliberate. If so, maybe … should be updated?" |
 | `T` test to add: a concrete test for a changed behavior or a bug | **Tests to add with this PR** |
 | `Q` question: something the author or team must answer about the code repo (two written goals disagree, an unclear intent) | **A question** / **Questions** |
-| `S` suggestion, and drift in the repo's own docs | Not in the block. Chat and follow-ups note |
-| A choice the description calls deliberate, with nothing in the repo against it | Not in the block. Chat and follow-ups note |
-| The description's own "might like" or "may be a good idea" items | Not in the block. Follow-ups note |
+| `S` suggestion, and drift in the repo's own docs | Not in the block. Chat and PR record |
+| A choice the description calls deliberate, with nothing in the repo against it | Not in the block. Chat and PR record |
+| The description's own "might like" or "may be a good idea" items | Not in the block. PR record |
 | `I1`, `I2`, `I3` info notes | Not in the block |
 
 A question in the block is about the code repo. The kit's open questions in a spec (`## Open questions`) are never copied into the block, and the block never names a spec. When a pull request question also touches a spec decision, the chat says so and names `/crav1-show-or-ask-open-questions` for that spec, and does not run it.
