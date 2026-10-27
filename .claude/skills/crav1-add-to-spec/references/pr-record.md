@@ -67,7 +67,7 @@ These follow [merge-safe.md](merge-safe.md) so two people's runs rarely conflict
 | --- | --- |
 | `/crav1-pr-status` | Every kind: classifies each Point, adds Points for new threads and for the description's Questions for reviewers (and Not in this PR on a yes, 1.98.0), sets `Order`, its own `Read`, `Ready` and `State`, and adds `## Replies as drafted` history. |
 | `/crav1-review-pr` | One Point per finding, follow-up and question of its review (`open`, `follow-up`, `waiting on <author>` with `asked`), `not posted <date>` tags, `done <sha>` on a re-review, `State`, and the `## Comment as drafted` / `## Comment as posted` history. |
-| `/crav1-add-to-spec` | `pr<n> all`: a Point (`open`, `thread <id>`, `host <status>`) for each new thread and the `## PR updates as of` history; `in spec <slug>` when a point is taken into a spec; `answered <date>` when a comment answers a spec open question. |
+| `/crav1-add-to-spec` | `pr<n> all`: a Point (`open`, `thread <id>`, `host <status>`) for each new thread and the `## PR updates as of` history; `in spec <slug>` when a point is taken into a spec (`pr<n> candidates` takes the `to spec` and `to decision` Points, 1.100.0); `answered <date>` when a comment answers a spec open question. |
 | `/crav1-merge-pr` | Reads `Ready` before the merge. After the merge: `State: merged` and `Ready: merged`. |
 
 ## Reading the record

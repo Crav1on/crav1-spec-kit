@@ -35,6 +35,7 @@ Exact words for bots and scripted runs. There are no `--flags`.
 - Code change, every open branch: `branches` (`branches all`, `branches skip stale`); read `references/branches-sweep.md`.
 - Once after updating to 1.84.0, 1.86.0 or 1.97.0: `migrate formats`; see **Merge-safe formats** below.
 - After a PR: `all`. A PR ref alone (`pr71`, `#71`, as `references/scope.md` parses) means `code change`; `pr71 all` adds description and comments per `references/pr-comments.md`, and a record Point per new thread (`references/pr-record.md`, 1.97.0).
+- After `/crav1-pr-status`: `pr<n> candidates` (or `pr<n> candidates 1,3`) takes only the record's `to spec` and `to decision` Points that are not yet `in spec`; read `references/pr-candidates.md` (1.100.0).
 
 `mail` and `chat` run the dump branch. "This mail", "this email" or "this chat" picks that word.
 
