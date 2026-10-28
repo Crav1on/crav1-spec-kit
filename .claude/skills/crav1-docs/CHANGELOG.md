@@ -2,6 +2,17 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.100.0 (2026-10-28)
+
+pr-status names a short `/crav1-add-to-spec pr<n> candidates` command instead of asking a question it can't carry out, and ends with a **Next for you** list that separates what you can do now from what waits on someone. A minor release because pr-status output and add-to-spec choice words change.
+
+### Kit
+
+- **Added (add-to-spec, `references/pr-candidates.md`):** the `pr<n> candidates` choice word reads only the PR record's `to spec` / `to decision` Points not yet `in spec`, takes them in as one fact with the PR note as source (an unmade decision becomes an open question with `Pending: <name>`), and sets `in spec <slug>` on each.
+- **Added (pr-status, `references/output.md`):** a **Next for you** section: Now / After <name> answers <point> / Later, built from record lines, with `If <option>:` lines only when the thread names the options.
+- **Changed (pr-status, `references/offers.md`):** the spec-candidates question is gone from the closing prompt; add-to-spec joins the do-not-run list in `SKILL.md`.
+- **Docs:** `skills.yaml`, regenerated skill pages and the pr-status walkthrough.
+
 ## 1.99.1 (2026-10-28)
 
 Kit skills change files with the host's edit tool, so you see a diff, and name local files as code spans with the repo first instead of links. A patch: the same records get written and the same answers come back, only how a file is edited and how its name is printed change.
