@@ -13,13 +13,15 @@ The word after the command picks the mode. There is no opening question.
 | You type | What happens |
 | --- | --- |
 | `/crav1-glossary` | The whole glossary in the chat, in the file's order (the `to be researched` rows stay last), a count line on top, and the path `docs/system/glossary.md` named at the end (as text, not a link, like every local file the kit names). Writes nothing, creates no file. |
-| `/crav1-glossary file` | The same list written to `.crav1/glossary-list.md` for you to open (1.102.0). The chat shows only the count line and the path. |
+| `/crav1-glossary as-file` | The same list written to `.crav1/glossary-list.md` for you to open (1.102.0). The chat shows only the count line and the path. |
 | `/crav1-glossary research` | Fills every `to be researched` row. `research <term>` fills only that one. |
 | `/crav1-glossary bcas` | Answers one term from its row. When the glossary does not define it, researches it, answers, then offers to add the row. |
 
 ## The list as a file
 
-`/crav1-glossary file` writes the list to `.crav1/glossary-list.md` at the repo root and overwrites an older copy. The first run also creates `.crav1/.gitignore` with the single line `*`, so git ignores the whole `.crav1/` folder: the file never shows up in `git status`, is never committed, and your own `.gitignore` is not touched. Delete the folder whenever you like.
+The mode word is `as-file`, not `file`, so a term literally named `file` still works with a bare lookup: `/crav1-glossary file` answers that term.
+
+`/crav1-glossary as-file` writes the list to `.crav1/glossary-list.md` at the repo root and overwrites an older copy. The first run also creates `.crav1/.gitignore` with the single line `*`, so git ignores the whole `.crav1/` folder: the file never shows up in `git status`, is never committed, and your own `.gitignore` is not touched. Delete the folder whenever you like.
 
 ## How a meaning is found
 
@@ -35,7 +37,7 @@ The word after the command picks the mode. There is no opening question.
 ```
 
 ```text
-/crav1-glossary file
+/crav1-glossary as-file
 ```
 
 ```text
@@ -48,6 +50,6 @@ The word after the command picks the mode. There is no opening question.
 
 ## What it writes
 
-Only rows in `docs/system/glossary.md`, the ignored `.crav1/glossary-list.md` in file mode, and on a not-found term the open question on the spec that uses it. A row that already has a meaning is never rewritten here; a different meaning from a new source goes through `/crav1-add-to-spec`, which shows old and new side by side. At most one question per run. Headless and bot runs ask nothing: they write the docs/ meanings and list web meanings as waiting for a yes.
+Only rows in `docs/system/glossary.md`, the ignored `.crav1/glossary-list.md` in as-file mode, and on a not-found term the open question on the spec that uses it. A row that already has a meaning is never rewritten here; a different meaning from a new source goes through `/crav1-add-to-spec`, which shows old and new side by side. At most one question per run. Headless and bot runs ask nothing: they write the docs/ meanings and list web meanings as waiting for a yes.
 
 Next: `/crav1-finalize-commit` when a row changed. See the [skill page](reference/skills/crav1-glossary.md).
