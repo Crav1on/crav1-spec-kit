@@ -64,7 +64,7 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 
 **Feature index.** The table in `docs/system/landscape.md` with one row per slice and its status.
 
-**Glossary rows.** The words a source already uses, in `docs/system/glossary.md`. New rows are added in sorted place by term. Existing rows are not rewritten. A meaning the source does not state is `to be researched`. `/crav1-glossary` shows the rows, answers one word, and fills `to be researched` rows: from `docs/` with a file and line link, or from the web for public terms after a yes (1.101.0).
+**Glossary rows.** The words a source already uses, in `docs/system/glossary.md`. New rows are added in sorted place by term. Existing rows are not rewritten. A meaning the source does not state is `to be researched`. `/crav1-glossary` shows the rows, answers one word, and fills `to be researched` rows: from `docs/` with a file and line link, or from the web for public terms after a yes (1.101.0). `/crav1-glossary file` writes the list to `.crav1/glossary-list.md`, ignored by git (1.102.0).
 
 **Match status.** Under a spec's `## Match`: done, partial, not in the code, or retired.
 
