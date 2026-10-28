@@ -32,7 +32,7 @@ A plain uncontested fact, such as a date or a name that no source contradicts, i
 
 ### Glossary
 
-Add a new glossary term without asking. Before rewriting an existing row, show the old and the new definition side by side with the source, and wait for the user's yes.
+Add a new glossary term without asking. Before rewriting an existing row, show the old and the new definition side by side with the source, and wait for the user's yes. A new term the source does not define is `to be researched`; `/crav1-glossary research` fills it later (1.101.0).
 
 ## Headless runs (two-pass)
 
