@@ -73,7 +73,7 @@ A short usage guide that lists every mode with one example each:
 | Where a slice is | `/crav1-help status cancel-booking`, `/crav1-help where am I` |
 | What to do now | `/crav1-help todo next pr71` |
 | A word in the project glossary (its own skill, 1.101.0) | `/crav1-glossary bcas` |
-| The whole glossary as a file you can open, kept out of git (1.102.0) | `/crav1-glossary file` |
+| The whole glossary as a file you can open, kept out of git (1.102.0) | `/crav1-glossary as-file` |
 | Where a pull request stands (its own skill, 1.97.0) | `/crav1-pr-status pr71` |
 | Two skills side by side | `/crav1-help compare build-tasks build-features` |
 | What changed | `/crav1-help whats new`, `/crav1-help whats new since 1.50` |
