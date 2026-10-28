@@ -1,0 +1,14 @@
+name: Kit lint
+
+on:
+  pull_request:
+  push:
+    branches: [main, develop]
+
+jobs:
+  kit-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Skill links, front matter, skills.yaml, skill copies
+        run: python3 scripts/kit-lint.py .
