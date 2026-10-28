@@ -72,6 +72,7 @@ A short usage guide that lists every mode with one example each:
 | The skill list, or one lane | `/crav1-help list`, `/crav1-help list build` |
 | Where a slice is | `/crav1-help status cancel-booking`, `/crav1-help where am I` |
 | What to do now | `/crav1-help todo next pr71` |
+| A word in the project glossary (its own skill, 1.101.0) | `/crav1-glossary bcas` |
 | Where a pull request stands (its own skill, 1.97.0) | `/crav1-pr-status pr71` |
 | Two skills side by side | `/crav1-help compare build-tasks build-features` |
 | What changed | `/crav1-help whats new`, `/crav1-help whats new since 1.50` |

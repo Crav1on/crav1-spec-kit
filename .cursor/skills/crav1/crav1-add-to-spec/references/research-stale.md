@@ -6,7 +6,7 @@ This file is the convention. Drop-in: `.cursor/skills/crav1/crav1-add-to-spec/re
 
 The skills that follow this file write the mark, the clear, the narrowed line, and any open question this file names. They do not commit. They do not push. They do not open a pull request. The user commits.
 
-A glossary row whose Meaning is `to be researched` is not a research note. Do not mark it from this file. A note in `docs/notes/` is not a research note. Do not mark it from this file.
+A glossary row whose Meaning is `to be researched` is not a research note. Do not mark it from this file. `/crav1-glossary research` fills those rows (1.101.0). A note in `docs/notes/` is not a research note. Do not mark it from this file.
 
 ## When to compare
 
