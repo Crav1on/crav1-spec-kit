@@ -2,6 +2,19 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.101.0 (2026-10-28)
+
+A new skill, `/crav1-glossary`, shows the project glossary, answers one word, and fills the rows still `to be researched`. A minor release because it adds a skill.
+
+### Kit
+
+- **Added (`/crav1-glossary`):** no word shows the whole `docs/system/glossary.md` in the chat in file order (the `to be researched` rows stay last), with a count line and a link to the file; nothing is written and no file is created.
+- **Added (`/crav1-glossary research`, `references/research.md`):** fills `to be researched` rows, docs/ first (written right away with a file and line link), then the web for public terms only, after the personal-data and secrets check; a web meaning is shown with its URL and written only after a yes; internal-only terms never go to the web. Found nowhere: an open question with `Pending:` on the spec that uses the word, or a drafted research request.
+- **Added (`/crav1-glossary <term>`):** answers one term from its row, or researches it the same way, answers, and offers to add the row (written only on the yes).
+- **Changed (crav1.mdc):** **Naming local files** allows the one glossary file link.
+- **Changed (add-to-spec `research-stale.md`, `sources-rare.md`, glossary templates, help):** point to `/crav1-glossary` for `to be researched` rows.
+- **Docs:** `skills.yaml`, regenerated skill pages, the glossary walkthrough, guild routing, first-run and AGENTS.
+
 ## 1.100.0 (2026-10-28)
 
 pr-status names a short `/crav1-add-to-spec pr<n> candidates` command instead of asking a question it can't carry out, and ends with a **Next for you** list that separates what you can do now from what waits on someone. A minor release because pr-status output and add-to-spec choice words change.
