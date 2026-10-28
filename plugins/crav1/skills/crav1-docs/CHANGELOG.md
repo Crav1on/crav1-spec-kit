@@ -4,12 +4,12 @@ Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/
 
 ## 1.102.0 (2026-10-28)
 
-`/crav1-glossary` names the glossary file as plain text again, and a new `file` word writes the list to a file you can open. A minor release because it adds a mode.
+`/crav1-glossary` names the glossary file as plain text again, and a new `as-file` word writes the list to a file you can open. A minor release because it adds a mode.
 
 ### Kit
 
-- **Added (`/crav1-glossary file`):** writes the whole list (file order, the `to be researched` rows last, the same count line) to `.crav1/glossary-list.md` at the repo root. The folder's own `.crav1/.gitignore` (`*`) keeps it out of git; it is never committed and the repo's `.gitignore` is not touched. The chat shows the count line and the path.
-- **Changed (`/crav1-glossary`):** the list ends with `docs/system/glossary.md` as a code span, not a link, and names `/crav1-glossary file`.
+- **Added (`/crav1-glossary as-file`):** writes the whole list (file order, the `to be researched` rows last, the same count line) to `.crav1/glossary-list.md` at the repo root. The folder's own `.crav1/.gitignore` (`*`) keeps it out of git; it is never committed and the repo's `.gitignore` is not touched. The chat shows the count line and the path. The word is `as-file`, so `/crav1-glossary file` still looks up a term named `file`.
+- **Changed (`/crav1-glossary`):** the list ends with `docs/system/glossary.md` as a code span, not a link, and names `/crav1-glossary as-file`.
 - **Changed (crav1.mdc, CLAUDE.md):** **Naming local files** drops the 1.101.0 glossary link exception.
 - **Docs:** help, the glossary walkthrough, `skills.yaml` and regenerated skill pages.
 
