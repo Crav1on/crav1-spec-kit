@@ -8,7 +8,9 @@
 
 Show the project glossary, answer one term, or fill the rows still `to be researched`.
 
-**[`/crav1-glossary`](crav1-glossary.md)** with no word shows the whole `docs/system/glossary.md` in the chat, in the file's order (so the `to be researched` rows stay last), with a count line, and ends with a link to the file. It writes nothing and creates no file.
+**[`/crav1-glossary`](crav1-glossary.md)** with no word shows the whole `docs/system/glossary.md` in the chat, in the file's order (so the `to be researched` rows stay last), with a count line, and ends by naming the file as text. It writes nothing and creates no file.
+
+`file` (1.102.0) writes the same list to `.crav1/glossary-list.md` and creates `.crav1/.gitignore` with `*`, so the folder stays out of git. It never commits, and the chat shows only the count line and the path.
 
 `research` fills the rows whose Meaning is `to be researched`: `docs/` first, where a line that states the meaning is written into the row right away with a file and line link; then the web, for public terms only, after the personal-data and secrets check on the search words. An internal-only term never goes to the web. A web meaning is shown with its URL and written only after a yes.
 
@@ -20,6 +22,7 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 
 | Question | Word | Means |
 | --- | --- | --- |
+| Which mode | `file` | write the whole list to `.crav1/glossary-list.md`, ignored by git (1.102.0) |
 | Which mode | `research` | fill the `to be researched` rows (`research <term>`: only that row) |
 | Which mode | `<term>` | answer that one term, as in `/crav1-glossary bcas` |
 
@@ -39,13 +42,13 @@ Reads `docs/system/glossary.md` and searches every file under `docs/` (not retir
 
 ## Writes
 
-In short: Rows in `docs/system/glossary.md`; an open question on a spec when nothing is found.
+In short: Rows in `docs/system/glossary.md`; an open question on a spec when nothing is found; `.crav1/glossary-list.md` (ignored) in file mode.
 
 Writes a docs/ meaning into its `to be researched` row with a file and line link, without asking. Writes a web meaning or a new row only after a yes. A term found nowhere gets an open question with a `Pending:` line on the spec that uses it; never committed.
 
 ## Does not
 
-Leaves rows that already have a meaning, research notes, code, plans and tasks alone. The list mode writes nothing. Never web-searches an internal-only term.
+Leaves rows that already have a meaning, research notes, code, plans and tasks alone. The list mode writes nothing; the file mode writes only its ignored `.crav1/` file. Never web-searches an internal-only term.
 
 Limits and exceptions: Headless and bot runs ask nothing; they write the docs/ meanings and list the web meanings as waiting for a yes.
 
