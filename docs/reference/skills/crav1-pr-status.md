@@ -10,11 +10,13 @@ Show where one pull request stands, point by point, and who owes the next step.
 
 **[`/crav1-pr-status`](crav1-pr-status.md)** reads one named pull request's threads, pushes and commits on Azure DevOps or GitHub (read-only, `references/pr-threads.md` in `crav1-add-to-spec`) and splits the threads into points. Each point gets one of six statuses: `done <sha>` (a commit after the request changed the lines), `agreed`, `declined` (with the reason), `open`, `waiting on <name>`, or `needs <name>` for a third person. It picks reviewer or author mode from who opened the pull request; `as reviewer` or `as author` overrides it, and an unclear sign-in is guessed without asking.
 
-It prints a verdict line with the points waiting on you first, then the points by status, flags for threads resolved while the code is unchanged (and done points whose thread is still active), spec and decision candidates, follow-ups drafted for [`/crav1-ado-sync`](crav1-ado-sync.md), the pull requests this one depends on and the merge order, drafted replies, and a merge-readiness line. `since last` shows only what changed since your last run.
+It prints a verdict line with the points waiting on you first, then the points by status, flags for threads resolved while the code is unchanged (and done points whose thread is still active), spec and decision candidates, follow-ups drafted for [`/crav1-ado-sync`](crav1-ado-sync.md), the pull requests this one depends on and the merge order, drafted replies, a `Next for you` list (Now, After <name> answers, Later), and a merge-readiness line. `since last` shows only what changed since your last run.
 
-It writes all of it to the PR note's shared `## PR record`, the same record [`/crav1-review-pr`](crav1-review-pr.md), [`/crav1-add-to-spec`](crav1-add-to-spec.md) and [`/crav1-merge-pr`](crav1-merge-pr.md) use; [`/crav1-merge-pr`](crav1-merge-pr.md) stops on `Ready: no`. Replies are drafts and are never posted. A thread status change on the host is offered one thread at a time and made only on that thread's yes. Spec or decision candidates go to [`/crav1-add-to-spec`](crav1-add-to-spec.md) on a yes. Follow-ups are drafts; no work item is created.
+It writes all of it to the PR note's shared `## PR record`, the same record [`/crav1-review-pr`](crav1-review-pr.md), [`/crav1-add-to-spec`](crav1-add-to-spec.md) and [`/crav1-merge-pr`](crav1-merge-pr.md) use; [`/crav1-merge-pr`](crav1-merge-pr.md) stops on `Ready: no`. Replies are drafts and are never posted. A thread status change on the host is offered one thread at a time and made only on that thread's yes. Spec or decision candidates are named with the command to type, [`/crav1-add-to-spec`](crav1-add-to-spec.md) pr<n> candidates`; pr-status never runs it. Follow-ups are drafts; no work item is created.
 
 1.98.0: also reads the pull request description: a `### Merge order` section becomes `Order` lines, `### Questions for reviewers` becomes Points tagged `asked; from description <date>`, and `### Not in this PR` is offered as follow-ups (a `follow-up` Point only on a yes). [`/crav1-open-pr`](crav1-open-pr.md) writes those sections.
+
+1.100.0: the output ends with `Next for you` before the `Ready` line: **Now** (steps nothing blocks, commands in route order), **After <name> answers <point>** (one group per person, with each path when the thread names the options), and **Later** (steps behind a merge, `Ready: yes` or a push). Commands are named, never run. The closing prompt no longer asks about spec candidates; it names [`/crav1-add-to-spec`](crav1-add-to-spec.md) pr<n> candidates` instead.
 
 ## Choice words
 
@@ -57,7 +59,7 @@ Limits and exceptions: Signed out, the one prompt is the signed-out question and
 ## You run next / Runs by itself
 
 - You run next: [`/crav1-merge-pr`](crav1-merge-pr.md); [`/crav1-add-to-spec`](crav1-add-to-spec.md); [`/crav1-ado-sync`](crav1-ado-sync.md); [`/crav1-review-pr`](crav1-review-pr.md)
-- Runs by itself: Runs [`/crav1-add-to-spec`](crav1-add-to-spec.md) with the spec and decision candidates only after a yes; calls no other skill.
+- Runs by itself: Calls no other skill. Names [`/crav1-add-to-spec`](crav1-add-to-spec.md) pr<n> candidates` for the spec and decision candidates; you type it.
 
 ## Lane and group
 

@@ -34,6 +34,8 @@ A meeting (was `/crav1-meeting-to-specs`): Minutes, a transcript, an email, or a
 
 1.97.0: the PR note holds one shared `## PR record` (`references/pr-record.md`) that [`/crav1-pr-status`](crav1-pr-status.md), [`/crav1-review-pr`](crav1-review-pr.md), this skill and [`/crav1-merge-pr`](crav1-merge-pr.md) read and write, one sorted line per point, other pull request, reader, readiness and state. `pr<n> all` adds a Point per new thread and keeps the host status as a tag. The host reads for every skill are in `references/pr-threads.md`. `migrate formats` adds the record to every PR note and moves old review follow-ups notes into it, after a dry-run diff and one yes; idempotent, nothing lost.
 
+1.100.0: `pr<n> candidates` reads only the PR record's `to spec` and `to decision` Points not yet `in spec` (`references/pr-candidates.md`), takes them into a spec as one fact with the PR note as the source, a decision not yet made as an open question with `Pending: <name>`, and sets `in spec <slug>` on each. [`/crav1-pr-status`](crav1-pr-status.md) names this command; you type it.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
@@ -47,7 +49,7 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 | What you have | `mail` | a mail, sorted as a dump |
 | What you have | `chat` | a chat, sorted as a dump |
 
-After a PR: `all`. A PR ref alone (`pr71`, `pr 71`, `#71`, `pr <repo> 71`) means `code change`, offline. `pr71 all` also checks for new commits and adds the description and every comment thread to the PR note (1.76.0), and a PR record Point for each new thread (1.97.0). Every open branch: `branches`, with `branches all` or `branches skip stale` to skip the question (1.79.0). Once after updating to 1.84.0, 1.86.0 or 1.97.0: `migrate formats` rewrites every spec, `docs/system/repos.md` and every PR note to the merge-safe formats (one `Synced at` line per repo and branch, plain-bullet open questions, the shared PR record with old review follow-ups notes moved into it), after a dry run with a diff and one yes; idempotent, nothing lost, never commits.
+After a PR: `all`. A PR ref alone (`pr71`, `pr 71`, `#71`, `pr <repo> 71`) means `code change`, offline. `pr71 all` also checks for new commits and adds the description and every comment thread to the PR note (1.76.0), and a PR record Point for each new thread (1.97.0). After [`/crav1-pr-status`](crav1-pr-status.md): `pr71 candidates` (or `pr71 candidates 1,3`) takes only the record's `to spec` and `to decision` Points into a spec as one fact, a pending decision as an open question, and marks each `in spec <slug>` (1.100.0). Every open branch: `branches`, with `branches all` or `branches skip stale` to skip the question (1.79.0). Once after updating to 1.84.0, 1.86.0 or 1.97.0: `migrate formats` rewrites every spec, `docs/system/repos.md` and every PR note to the merge-safe formats (one `Synced at` line per repo and branch, plain-bullet open questions, the shared PR record with old review follow-ups notes moved into it), after a dry run with a diff and one yes; idempotent, nothing lost, never commits.
 
 ## Runs when
 

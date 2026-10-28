@@ -33,8 +33,8 @@ A number, `#42`, `pr orders-api 42` or the URL. No pull request named and your b
 | Mode | — | You opened the pull request: author mode. Otherwise reviewer mode. Unclear sign-in: it guesses and tells you how to switch. It never asks |
 | Points | — | Reads the description too (1.98.0): its Merge order section becomes `Order` lines, Questions for reviewers become Points tagged `asked; from description <date>`, and Not in this PR is offered as follow-ups. Splits threads into points. Each gets one status: `done <sha>` (a commit after the request changed the lines), `agreed`, `declined` (with the reason), `open`, `waiting on <name>`, or `needs <name>` for someone outside the thread. No commit, no `done` |
 | Flags | Read them | A thread resolved while the code is unchanged, and a done point whose thread is still active |
-| Output | Read it | Verdict line with the points waiting on you first, then the points by status, flags, spec and decision candidates, follow-ups (drafts), merge order, drafted replies, the merge-readiness line and `PR record: <path>` |
-| Offers | One prompt | One question per thread status change (each its own yes), one for the spec candidates, one for the follow-ups. Signed out or headless: listed as text for the next run |
+| Output | Read it | Verdict line with the points waiting on you first, then the points by status, flags, spec and decision candidates, follow-ups (drafts), merge order, drafted replies, `Next for you` (Now, After <name> answers, Later; 1.100.0), the merge-readiness line and `PR record: <path>` |
+| Offers | One prompt | One question per thread status change (each its own yes) and one for the follow-ups. Spec candidates are not asked: the output names `/crav1-add-to-spec pr<n> candidates` for you to type (1.100.0). Signed out or headless: listed as text for the next run |
 | Record | — | Writes the PR note's `## PR record` in the specs repo; not committed |
 
 ## Example (made-up names)
