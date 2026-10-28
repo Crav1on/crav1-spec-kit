@@ -2,7 +2,8 @@
 name: crav1-glossary
 description: >-
   The project glossary in docs/system/glossary.md. No word: show the whole
-  glossary in the chat, in the file's order, and link the file. research:
+  glossary in the chat, in the file's order, and name the file. file: write
+  the same list to .crav1/glossary-list.md, kept out of git. research:
   fill the rows whose Meaning is to be researched, docs/ first (written
   with a file and line link), then the web for public terms only, after
   the personal-data check (a web meaning is written only after a yes).
@@ -29,8 +30,9 @@ Other skills do not run this one. It does not run another skill. It may name one
 Exact words for bots and scripted runs. There are no `--flags`. There is no opening question: the words pick the mode.
 
 - Nothing after the command: **List**.
+- `as-file`: **As file**, the same list written to a file instead of the chat.
 - `research`: **Research** every `to be researched` row. `research <term>`: only that row.
-- `<term>`, any other words: **Term**. The words are the term, as in `/crav1-glossary bcas`.
+- `<term>`, any other words: **Term**. The words are the term, as in `/crav1-glossary bcas`; `/crav1-glossary file` looks up the term `file`.
 
 ## Find the glossary
 
@@ -41,10 +43,17 @@ Read `docs/system/glossary.md`. Match a term case-insensitively, and match an ab
 Show the whole glossary in the chat. Write nothing. Create no file, not even a temporary one.
 
 - Every row, in the same order as the file. Do not sort, group, or move rows. The `to be researched` rows stay where the file has them (last, today).
-- Show it as one Markdown table with the file's columns, `| Term | Meaning |`, each Meaning as written, links kept.
+- One Markdown table, `| Term | Meaning |`, each Meaning as written, links kept.
 - Above the table, one count line: `<n> terms, <m> to be researched.`
-- End with the file as a link: `Glossary file: [docs/system/glossary.md](docs/system/glossary.md)`. It is the one exception to **Naming local files** in `crav1.mdc`; anywhere else in the chat a file is a code span.
+- End with the file as a code span, never a link, as **Naming local files** in `crav1.mdc` says: ``Glossary file: `docs/system/glossary.md` ``. To get the list as a file, name `/crav1-glossary as-file`.
 - When there are `to be researched` rows, the last line names `/crav1-glossary research`. Do not run it.
+
+## As file
+
+- The file is `.crav1/glossary-list.md` at the repo root. Create it with `.crav1/.gitignore` holding the one line `*`, so git ignores the folder. Do not touch the repo's `.gitignore`.
+- Content: `# Glossary`, the count line, the **List** table, and ``Source: `docs/system/glossary.md` ``. Overwrite an older copy.
+- In the chat: the count line and ``Glossary list file: `.crav1/glossary-list.md` (not in git) ``. Not the table.
+- Write nothing else; never stage or commit it. No glossary: stop as **Find the glossary** says.
 
 ## Research
 
@@ -87,12 +96,12 @@ The row stays `to be researched`. Route it the way the kit routes an open point 
 
 ## Prompt budget
 
-At most one prompt per run: the add question (Term) or the web-meaning question (Research). List asks nothing. A headless or bot run asks nothing; it writes the docs/ meanings and lists the rest.
+At most one prompt per run: the add question (Term) or the web-meaning question (Research). List and As file ask nothing. A headless or bot run asks nothing; it writes the docs/ meanings and lists the rest.
 
 ## Writes
 
-Only `docs/system/glossary.md` (rows filled or added as above) and, on **Not found**, the open question in one spec. Nothing else: no spec text, no research note, no notes index. Never commit, push, or open a pull request. The user commits.
+Only `docs/system/glossary.md` (rows filled or added as above), on **Not found** the open question in one spec, and in As file mode `.crav1/glossary-list.md` with its `.crav1/.gitignore`, both ignored by git. Nothing else: no spec text, no research note, no notes index. Never commit, push, or open a pull request. The user commits.
 
 ## Stop
 
-Do not invent a meaning. Do not take a meaning from a line that only uses the word. Do not rewrite a row that already has a meaning; a different meaning found later is shown side by side and left for `/crav1-add-to-spec`, as `references/sources-rare.md` says. Do not web-search an internal-only term. Do not write a web meaning without its yes. Do not mark research stale from a glossary row.
+Do not invent a meaning. Do not rewrite a row that already has a meaning; a different meaning found later is shown side by side and left for `/crav1-add-to-spec`, as `references/sources-rare.md` says. Do not web-search an internal-only term. Do not write a web meaning without its yes. Do not mark research stale from a glossary row.
