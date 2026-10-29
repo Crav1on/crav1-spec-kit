@@ -29,6 +29,6 @@ Rules:
 - Every kept security check (`docs/system/security.md` or a Security section on the spec) maps to a task, or the trace says which task already covers it
 - Each verify note names the kind and the checks, per `references/checks.md`
 - Order so each task can be verified before the next depends on it
-- When a task needs an earlier task to be done first, end its line with `(after: T1)` or `(after: T1, T3)`. Name only real needs. A task with no `(after: …)` has no recorded dependency, and `/crav1-tasks-ready-to-build` then treats every earlier unticked task as blocking it (inferred)
+- When a task needs an earlier task to be done first, end its line with `(after: T1)` or `(after: T1, T3)`. Name only real needs. A task with no `(after: …)` has no recorded dependency, and `/crav1-tasks-ready-to-build` then treats the task just before it as blocking it (inferred). Build, status and verify follow the `(after: …)` graph (dependency order, 1.103.0), not task number, so when the order is not simply T1, T2, T3…, give every task after T1 its `(after: …)`
 - A task that finishes or tests a built piece found only on one work branch ends its line with `(branch: <name>)`, after `(verify:)`, `(spec:)` and `(after:)`. When the spec spans repos, name the repo too: `(branch: orders-api feat/orders-retry)`. New work with no home gets no branch part, and there is no new question. With one branch or none, write no branch part. A task without one uses `feat/<slug>` as today
 - No task is “and also the rest of the app”

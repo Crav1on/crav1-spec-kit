@@ -95,7 +95,7 @@ The branch column shows each task's branch when tasks name one. A slug whose tas
 
 For each queued slug, after switch:
 
-Run the build-tasks **T# loop** on **this** slug’s `tasks.md` (all remaining `- [ ]` unless they named a range **for that slug** — v1: all unchecked on that slug).
+Run the build-tasks **T# loop** on **this** slug’s `tasks.md` (all remaining `- [ ]` unless they named a range **for that slug** — v1: all unchecked on that slug), in dependency order with its ready check before each `T#` (1.103.0, `/crav1-build-tasks` several-tasks branch).
 
 1. Launch **crav1-build-task-agent** with this spec folder, this `T#`, `resume: start`, `approvals: already-done`, `branch: already-done`, style already set.
 2. Wait for STATUS. Do not implement. Do not start `T+1` or the next slug while this worker is open.

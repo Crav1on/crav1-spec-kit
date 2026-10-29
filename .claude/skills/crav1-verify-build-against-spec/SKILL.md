@@ -20,7 +20,9 @@ Read `spec.md` acceptance (and EARS/BDD export if present — spec.md still wins
 
 ## Classify each task (before writing)
 
-For every `T#` in `tasks.md`:
+For every `T#` in `tasks.md`, in dependency order (`/crav1-tasks-ready-to-build` **Dependency order**, its `scripts/task_order.py` when Python runs), so a task is checked after the tasks it waits on. List tasks in that order in the Tasks overview and the TL;DR id lists, under the heading `Tasks — overview (dependency order)`.
+
+A task downstream of an **Implemented, verify failed** task (it waits on it, directly or through other tasks) keeps its own status, and its Verify cell starts with `depends on T7 (failed)`. When it failed too, its gap names T7 as the first thing to fix. `task_order.py <tasks.md> --failed T7` lists them.
 
 | Status | Meaning |
 | --- | --- |
@@ -60,7 +62,7 @@ Then:
 Follow this skill’s `assets/verify.md` **section order**. Do not put the long acceptance table first.
 
 1. **TL;DR** — counts + id lists, then the Branches line when the spec has work branches. Then one line: next command (`/crav1-fix-build-gaps` if failed/unverified/`G#` remain, else `/crav1-build-tasks` or ship).
-2. **Tasks — overview** — one short table: `T#` | title | status | verify result. Group or sort: verified first, then failed, then not implemented.
+2. **Tasks — overview** — one short table: `T#` | title | status | verify result, in dependency order (above).
 3. **Acceptance — details** — the full A# matrix (quote, evidence, result).
 4. **Commands run**
 5. **Gaps** (`G1`, `G2`, …)

@@ -9,6 +9,7 @@ description: >-
   verify.md. Where nothing is recorded it falls back and marks the reason
   inferred. Shows summary counts, Ready, Blocked (one reason each), Needs
   verify, a Done count, a Branches line, and Next: /crav1-build-tasks T#.
+  Lists are in dependency order (the (after: T#) graph), not task number.
   Shows a task's (branch: …) beside it. Local only,
   never reads Azure Boards. Read-only. Can run any time by its slash command.
 disable-model-invocation: true
@@ -48,13 +49,22 @@ Check each task in this order and stop at the first rule that decides it. Every 
    - A kept-open question with no `Blocks:` line, or a line under `## Risks` in `plan.md` that says do not implement until resolved: blocks every unticked task in the slice, `open question "<short question>" blocks the whole slice (inferred)` or `plan Risk "<short risk>" blocks the whole slice (inferred)`.
 4. **Dependencies.**
    - The task line has `(after: T1, T3)`: blocked while any of those is unticked, `waits on T1 (recorded)`. A named task that does not exist is `after: T9 names no task (recorded)`.
-   - No `(after: …)`: blocked while any earlier task in `tasks.md` is unticked, `waits on T2, earlier and unticked (inferred)`.
+   - No `(after: …)`: the task waits on the task just before it in `tasks.md` (the first task waits on nothing). Blocked while that one is unticked, `waits on T2 (inferred)`.
+   - Tasks that wait on each other in a loop are blocked, `cycle T3 → T7 → T3 (recorded)`. Fix the `(after: …)` marks with `/crav1-tighten-plan`.
 5. **Ready.** Otherwise the task is ready.
    - `plan.md` has `Reviewed: <date>, P# open: 0`: ready.
    - `Reviewed:` with `P# open:` above 0: ready, with the warning `plan review has <n> open P# (recorded), see /crav1-tighten-plan`.
    - No `Reviewed:` line: ready, with the warning `plan review unknown (inferred), run /crav1-review-plan`.
 
 Do not guess a dependency or a blocking link from the task text. Use only the marks above and the fallbacks.
+
+## Dependency order (1.103.0)
+
+Every task list is in **dependency order**, not task-number order. Each task gets a wave: 0 when it waits on nothing, otherwise one more than the latest wave of the tasks it waits on. List wave by wave, lowest number first inside a wave; tasks in one wave can be built in either order. Tasks on a cycle go last. For the slice in the example below (T7 after T2, T3 and T6 after T7, T4 after T3 and T7, T5 after T4) the order is T1 → T2 → T7 → T3 | T6 → T4 → T5.
+
+The sort ships next to this file as `scripts/task_order.py`. When Python runs, use it for each slice: `python3 <this skill folder>/scripts/task_order.py docs/specs/<slug>/tasks.md` prints Ready, Blocked, the Order line and Next, with the reasons for rule 4. Add the rule 1 to 3 results on top. Without Python, apply the same rule by hand.
+
+Other skills (`/crav1-build-tasks`, `/crav1-build-features`, `/crav1-verify-build-against-spec`) use this order and this Next rule.
 
 ## Output
 
@@ -67,10 +77,10 @@ Tasks ready to build — <slug> | all specs (<n> slices)
 | --- | --- | --- | --- | --- |
 | <slug> | 2 | 3 | 1 | 4 |
 
-Ready
+Ready (dependency order)
 - <slug> T5: <title> (branch: feat/orders-retry). Warning: plan review unknown (inferred), run /crav1-review-plan.
 
-Blocked
+Blocked (dependency order)
 - <slug> T6: waits on T5 (recorded).
 - <slug> T7: open question "Which currency for refunds?" (recorded). Asked 2026-10-10, mail to Dana.
 
@@ -78,13 +88,15 @@ Needs verify
 - <slug> T3: no verify.md row.
 
 Done: 4
+Order: T5 → T6 → T7
 Branches: 1 of 3 merged into develop. Not merged: feat/orders-retry (2 commits), feature/orders-export (3 commits).
 
 Next: /crav1-build-tasks T5 (<slug>)
 Source: docs/specs/<slug>/spec.md, plan.md, tasks.md, verify.md
 ```
 
-- **Next** names the first ready task, in `tasks.md` order, in the first slice that has one. When nothing is ready, say what would unblock the first blocked task instead (for example `Next: answer the open question with /crav1-resolve-open-questions`). When only Needs verify is left, `Next: /crav1-verify-build-against-spec`.
+- **Order** shows the slice's unticked tasks in dependency order, `|` between tasks of the same wave. One Order line per slice when listing all specs.
+- **Next** names the ready task that unblocks the most other unticked tasks (every task downstream of it), lowest number on a tie, in the first slice that has one. When nothing is ready, say what would unblock the first blocked task instead (for example `Next: answer the open question with /crav1-resolve-open-questions`). When only Needs verify is left, `Next: /crav1-verify-build-against-spec`.
 - A ready task with `(branch: …)` shows that branch beside it.
 - **Source** names every file it read, per slice.
 - When the slice has `work-item.md`, add the Azure Boards line from **What it reads**.

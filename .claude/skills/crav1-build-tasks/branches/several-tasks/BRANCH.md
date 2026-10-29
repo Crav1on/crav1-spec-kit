@@ -12,11 +12,13 @@ Spec folder: user @-mention, else most recently edited `docs/specs/` excluding `
 
 | They typed | Queue |
 | --- | --- |
-| `T1-T3` / `T1–T3` | Inclusive ids that exist in `tasks.md` |
-| `T1, T2, T5` | Those ids, tasks.md order |
-| No range / “all” / “rest” | Every remaining `- [ ]` |
+| `T1-T3` / `T1–T3` | Inclusive ids that exist in `tasks.md`, in dependency order |
+| `T1, T2, T5` | Those ids, in dependency order |
+| No range / “all” / “rest” | Every remaining `- [ ]`, in dependency order |
 
 Skip `[x]` unless they named a checked id (then say it is already done). Unknown ids: list, continue. Empty queue: stop.
+
+**Dependency order (1.103.0).** Order the queue with `/crav1-tasks-ready-to-build` **Dependency order** (its `scripts/task_order.py` when Python runs), not by task number. Before each worker, check the next queued task again with its rules: when it is still blocked (it waits on a task that is not ticked, an open question, or a cycle), end the batch there with that reason. Do not jump to a later queued task.
 
 ## Style once (rule from now on)
 
@@ -26,7 +28,7 @@ Do not ask again per `T#`. Workers must not ask style.
 
 **Branch:** before tool approvals and the first worker, follow `/crav1-create-feature-branch` (drop-in: `.claude/skills/crav1-create-feature-branch/SKILL.md`; plugin: sibling `skills/crav1-create-feature-branch/SKILL.md`) **Build** prompt. On a base branch it has no Stay and a headless run stops before any worker unless it has `new branch` (1.99.0, `crav1-create-feature-branch` `references/code-branch.md` (drop-in: `.claude/skills/crav1-create-feature-branch/references/code-branch.md`; plugin: sibling `skills/crav1-create-feature-branch/references/code-branch.md`)). If needed, that turn is branch only. If on `spec/<slug>`, stop (no workers) and follow **Build on a spec-only branch**. Pass `branch: already-done` on every worker. Workers must not create branches.
 
-**Task branches (1.64.0; sub-branches 1.68.0).** A missing task sub-branch is offered as **Create X from <spec branch> (Recommended)** and gets its `(into …)` marker after the yes, as `/crav1-create-feature-branch` says under **Task branch**. Work in `tasks.md` order. When the next task ends with `(branch: X)` and X is not the checkout, switch to X before its worker, only on a clean tree (workers commit, so it should be clean). Starting a range or all-tasks run is consent to use each task's named branch; do not ask per task. A task without a branch part uses the branch the run started on, never a base branch. A task whose `(branch: X)` is a base branch is `blocked: branch X is a base branch`; never switch to it. When X exists only as `origin/X`, `git checkout X` makes the local branch. When X exists nowhere, the task is blocked with that reason; never create X. A dirty tree stops the run before the switch. A `(branch: <repo> X)` for another repo is blocked here with `belongs to <repo>`.
+**Task branches (1.64.0; sub-branches 1.68.0).** A missing task sub-branch is offered as **Create X from <spec branch> (Recommended)** and gets its `(into …)` marker after the yes, as `/crav1-create-feature-branch` says under **Task branch**. Work in queue order (dependency order). When the next task ends with `(branch: X)` and X is not the checkout, switch to X before its worker, only on a clean tree (workers commit, so it should be clean). Starting a range or all-tasks run is consent to use each task's named branch; do not ask per task. A task without a branch part uses the branch the run started on, never a base branch. A task whose `(branch: X)` is a base branch is `blocked: branch X is a base branch`; never switch to it. When X exists only as `origin/X`, `git checkout X` makes the local branch. When X exists nowhere, the task is blocked with that reason; never create X. A dirty tree stops the run before the switch. A `(branch: <repo> X)` for another repo is blocked here with `belongs to <repo>`.
 
 ## Tool approvals (once for the batch)
 
@@ -48,7 +50,7 @@ For each `T#` **one at a time**:
 
 | STATUS | Orchestrator |
 | --- | --- |
-| `done` | Mark done. Next queued `T#`. |
+| `done` | Mark done. Check the next queued `T#` is ready (above), then start it. |
 | `needs_fix` | Ask the user `fix` / `stop` (this is their input). `fix` → **same T#** worker with `resume: fix` (still that task’s chat/worker, new launch is OK). Repeat until `done` or they `stop`. |
 | `needs_ready` | Ask them to refresh the host, then `ready` / `stop`. `ready` → worker `resume: ready`. |
 | `needs_dependency` | Show the BLOCKER line at the top. Ask start / skip / stop. `start` → worker `resume: dependency-start`; `skip` → `resume: dependency-skip`; `stop` → end. Headless: two-pass questions file. |
