@@ -1,0 +1,10 @@
+Ready (dependency order)
+- T2: Wire the xbid trigger
+Blocked (dependency order)
+- T7: waits on T2 (recorded)
+- T3: waits on T7 (recorded)
+- T6: waits on T7 (recorded)
+- T4: waits on T3, T7 (recorded)
+- T5: waits on T4 (recorded)
+Order: T2 → T7 → T3 → T6 → T4 → T5
+Next: T2

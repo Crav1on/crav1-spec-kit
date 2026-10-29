@@ -23,11 +23,11 @@ This replaces `/crav1-implement-task`, `/crav1-complete-task`, and `/crav1-compl
 
 Find the spec folder: the one the user @-mentioned, else the most recently edited tree under `docs/specs/` (not `_template`); ask which slug when several fit. When `tasks.md` is missing, stop and name `/crav1-plan-from-spec`.
 
-Then ask one question. List the tasks that are ready, using the rules in `/crav1-tasks-ready-to-build` (its `SKILL.md` next to this one), with their titles, and say how many are blocked.
+Then ask one question. List the tasks that are ready, using the rules in `/crav1-tasks-ready-to-build` (its `SKILL.md` next to this one), with their titles, in dependency order (its **Dependency order** section), and say how many are blocked and what comes after, for example `5 blocked; after T2 comes T7, then T3 and T6`. Put its **Next** task first as Recommended.
 
 1. **One task.** Pick one ready `T#`. Follow [branches/one-task/BRANCH.md](branches/one-task/BRANCH.md) (one worker, standalone).
 2. **A range.** For example `T2-T5`. Follow [branches/several-tasks/BRANCH.md](branches/several-tasks/BRANCH.md) with that range.
-3. **All unticked tasks.** Follow [branches/several-tasks/BRANCH.md](branches/several-tasks/BRANCH.md) with all unchecked tasks.
+3. **All unticked tasks.** Follow [branches/several-tasks/BRANCH.md](branches/several-tasks/BRANCH.md) with all unchecked tasks, in dependency order, until one is blocked.
 
 Skip the question when the message already answers it: one `T#` is option 1, a range or several `T#`s is option 2, `all` or "continue until blocked" is option 3.
 

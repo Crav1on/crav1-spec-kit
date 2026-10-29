@@ -2,6 +2,19 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.103.0 (2026-10-29)
+
+Tasks are listed, built and verified in dependency order (the `(after: T#)` graph), not task number. A minor release because it changes what the build skills offer and run.
+
+### Kit
+
+- **Changed (`/crav1-tasks-ready-to-build`):** Ready and Blocked are in **dependency order**: wave by wave through the `(after: …)` graph, lowest number first inside a wave, with an `Order:` line such as `T1 → T2 → T7 → T3 | T6 → T4 → T5`. **Next** is the ready task that unblocks the most other unticked tasks (lowest number on a tie). A task with no `(after: …)` now waits only on the task just before it (inferred), not on every earlier task. Tasks that wait on each other in a loop are blocked, `cycle T3 → T7 → T3 (recorded)`.
+- **Added (`scripts/task_order.py`, next to `/crav1-tasks-ready-to-build`):** the sort, standard library only. Prints Ready, Blocked, Order and Next for a `tasks.md`; `--failed T7` lists the tasks downstream of a failed one. The kit repo runs it as `scripts/task-order.py`, with unit and golden tests in CI.
+- **Changed (`/crav1-build-tasks`, `/crav1-build-features`):** the opening question lists ready tasks in dependency order with Next as Recommended and says what comes after. A range or all-tasks run queues in dependency order, checks the next task is still ready before each worker, and stops at the first blocked one.
+- **Changed (`/crav1-verify-build-against-spec`):** tasks are checked and listed in dependency order (`Tasks — overview (dependency order)`). A task downstream of a failed task keeps its status, and its Verify cell starts with `depends on T7 (failed)`.
+- **Changed (`/crav1-plan-from-spec`):** the plan guide asks for `(after: …)` on every task after T1 when the order is not simply T1, T2, T3….
+- **Docs:** the ready-to-build walkthrough, data layout, concept glossary (**Dependency order**), `skills.yaml`, regenerated skill pages, and the verify template heading.
+
 ## 1.102.0 (2026-10-28)
 
 `/crav1-glossary` names the glossary file as plain text again, and a new `as-file` word writes the list to a file you can open. A minor release because it adds a mode.
