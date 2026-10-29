@@ -37,6 +37,27 @@ If the message has no name, no sentence, and no `@`, the command stops. Options 
 
 Pasted minutes go to `/crav1-add-to-spec`. A long dump goes to `/crav1-add-to-spec`. This command stops and names that one. It does not run it.
 
+## Reports (1.104.0)
+
+Add one word to get a fixed report as a `.md` file instead of the free-form answer:
+
+```text
+/crav1-what-do-we-know-about-this report-feature-full xbid
+/crav1-what-do-we-know-about-this report-change-short pr74
+/crav1-what-do-we-know-about-this report-build-full @docs/specs/<slug>/
+```
+
+| Word | What you get |
+| --- | --- |
+| `report-feature-short` | Verdict, what it is, how it works, one flow diagram |
+| `report-feature-full` | Every section: flows, C4 levels 1–2 (3 when described), deployment, decisions, delivery, live state |
+| `report-change-short` | Verdict, 30-second version, what changes, one diagram |
+| `report-change-full` | Architecture, branches, pipelines, the change, the discussion, open decisions; C4 only when architecture or pipelines matter |
+| `report-build-short` | Status and the next tasks in dependency order |
+| `report-build-full` | Every gap, the unblock order wave by wave, the task graph |
+
+The command picks the template from the word, then reads only that template; the others stay closed. Diagrams are Mermaid wherever a picture helps. A live source that needs a sign-in or a permission is asked about first. The file goes to your Downloads folder when the agent can reach it, otherwise a temp folder, and the chat always links it. Nothing in the project changes.
+
 ## Steps
 
 | Phase | You | Agent |
@@ -55,7 +76,7 @@ A code-only hit, with no spec and no architecture note, says what the code shows
 
 ## What gets written
 
-Nothing. The answer stays in the chat.
+Nothing in the project. The answer stays in the chat. A `report-*` word writes one report file outside the project and links it.
 
 No spec edit. No `plan.md`. No `tasks.md`. No marks. No application code.
 

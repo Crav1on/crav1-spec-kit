@@ -1703,6 +1703,7 @@ skills:
   walkthrough: docs/from-what-do-we-know-about-this.md
   purpose: Answer one question about a feature, slice, resource, or not-yet-feature from the specs first.
   in_depth:
+  - 'A word `report-<type>-<depth>` picks a fixed Markdown report (1.104.0): `report-feature-short`, `report-feature-full`, `report-change-short`, `report-change-full`, `report-build-short`, `report-build-full`. It routes first and loads only `reports/common.md` and that one `reports/<type>-<depth>.md`; no report word stays the free-form answer and opens no report file. Mermaid wherever a picture helps, only the diagrams that file lists; C4 always in feature-full, in change-full only when the change alters architecture or pipelines. Build reports list tasks in dependency order. A live source that needs a sign-in, a permission, or a missing tool is asked about first (Allow or Skip); facts are tagged `Live read.`, guesses `(inference, not in the docs)`. The report is written outside the project, to Downloads when reachable, else a temp folder, and the chat always links or attaches it.'
   - 'A gap in the answer (unknown or inferred) that matches an open question in a spec ends with one line naming `/crav1-show-or-ask-open-questions ask research <a few words from that question>`, with the spec only when the words match more than one spec (1.78.0). Each matching question gets its own line, never one line for several (1.90.4). It does not run it and asks nothing.'
   - 'When the user asks about one feature, slice, resource, or not-yet-feature, **`/crav1-what-do-we-know-about-this`**
     answers from the specs first. A name matches first. A sentence or two matches on its key words. An
@@ -1738,7 +1739,7 @@ skills:
     pull requests, and branches the same way, each tagged as a live read. Before reporting `az` as not
     installed, checks the default install paths on Windows, macOS, and Linux and uses that path when it
     is there.
-  writes: Writes nothing.
+  writes: Writes nothing in the project. A `report-*` word writes one Markdown report outside it (Downloads, else a temp folder) and links it in chat.
   leaves_alone: Leaves specs, code, marks, commits, and pull requests alone.
   exceptions: pasted minutes or a long dump stops and names `/crav1-add-to-spec`.
     Two or more close hits ask which. A live-read failure offers Retry or Skip. It does not start Specify,
