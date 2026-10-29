@@ -1919,24 +1919,23 @@ skills:
   - '**`/crav1-glossary`** with no word shows the whole `docs/system/glossary.md` in the chat, in the file''s order (so the `to be researched` rows stay last), with a count line, and ends by naming the file as text. It writes nothing and creates no file.'
   - '`as-file` (1.102.0) writes the same list to `.crav1/glossary-list.md` and creates `.crav1/.gitignore` with `*`, so the folder stays out of git. It never commits, and the chat shows only the count line and the path. A bare `/crav1-glossary file` is a term lookup for `file`.'
   - '`research` fills the rows whose Meaning is `to be researched`: `docs/` first, where a line that states the meaning is written into the row right away with a file and line link; then the web, for public terms only, after the personal-data and secrets check on the search words. An internal-only term never goes to the web. A web meaning is shown with its URL and written only after a yes.'
-  - '`<term>`, as in `/crav1-glossary bcas`, answers from the row when it has a meaning. Otherwise it researches the term the same way, answers first, and then offers to add the row; it writes only on the yes. A term found nowhere stays `to be researched` and becomes an open question on the spec that uses it, naming who may know, or a drafted research request.'
+  - '`<term>`, as in `/crav1-glossary bcas`, answers from the row when it has a meaning. Otherwise it researches the term the same way, answers first, and then offers to add the row; it writes only on the yes. A term found nowhere gets a labelled guess with **Correct** (written as confirmed in chat) or **Needs research** (stays `to be researched`, with an optional research request drafted in the chat). It never writes an open question onto a spec, so a word never blocks a plan or a build (1.105.0).'
   use_when: You want the glossary, the meaning of one word, or the open glossary rows filled
   table:
     reads: '`docs/system/glossary.md`, every file under `docs/`, and the web for public terms'
-    writes: Rows in `docs/system/glossary.md`; an open question on a spec when nothing is found; `.crav1/glossary-list.md` (ignored) in as-file mode
+    writes: Rows in `docs/system/glossary.md`; `.crav1/glossary-list.md` (ignored) in as-file mode
   reads: Reads `docs/system/glossary.md` and searches every file under `docs/` (not retired specs) for the term.
     Searches the web only for a public term, after the personal-data and secrets check.
   writes: Writes a docs/ meaning into its `to be researched` row with a file and line link, without asking. Writes a
-    web meaning or a new row only after a yes. A term found nowhere gets an open question with a `Pending:` line on
-    the spec that uses it; never committed.
-  leaves_alone: Leaves rows that already have a meaning, research notes, code, plans and tasks alone. The list mode
+    web meaning or a new row only after a yes. A term found nowhere is written only on **Correct**; never an open question or any line in a spec;
+    never committed.
+  leaves_alone: Leaves specs (no open questions), rows that already have a meaning, research notes, code, plans and tasks alone. The list mode
     writes nothing; the as-file mode writes only its ignored `.crav1/` file. Never web-searches an internal-only term.
   exceptions: Headless and bot runs ask nothing; they write the docs/ meanings and list the web meanings as
-    waiting for a yes.
+    waiting for a yes, and not-found guesses under Guesses waiting.
   called_by: Called by the user.
-  runs_by_itself: Calls no skill. Names `/crav1-glossary research` and `/crav1-show-or-ask-open-questions ask`; you type them.
+  runs_by_itself: Calls no skill. Names `/crav1-glossary research`; you type it.
   you_run_next:
-  - /crav1-show-or-ask-open-questions
   - /crav1-finalize-commit
   first_prompt: '/crav1-glossary bcas'
 - name: crav1-export-spec
