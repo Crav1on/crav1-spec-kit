@@ -8,6 +8,8 @@
 
 Answer one question about a feature, slice, resource, or not-yet-feature from the specs first.
 
+A word `report-<type>-<depth>` picks a fixed Markdown report (1.104.0): `report-feature-short`, `report-feature-full`, `report-change-short`, `report-change-full`, `report-build-short`, `report-build-full`. It routes first and loads only `reports/common.md` and that one `reports/<type>-<depth>.md`; no report word stays the free-form answer and opens no report file. Mermaid wherever a picture helps, only the diagrams that file lists; C4 always in feature-full, in change-full only when the change alters architecture or pipelines. Build reports list tasks in dependency order. A live source that needs a sign-in, a permission, or a missing tool is asked about first (Allow or Skip); facts are tagged `Live read.`, guesses `(inference, not in the docs)`. The report is written outside the project, to Downloads when reachable, else a temp folder, and the chat always links or attaches it.
+
 A gap in the answer (unknown or inferred) that matches an open question in a spec ends with one line naming [`/crav1-show-or-ask-open-questions`](crav1-show-or-ask-open-questions.md) ask research <a few words from that question>`, with the spec only when the words match more than one spec (1.78.0). Each matching question gets its own line, never one line for several (1.90.4). It does not run it and asks nothing.
 
 When the user asks about one feature, slice, resource, or not-yet-feature, **[`/crav1-what-do-we-know-about-this`](crav1-what-do-we-know-about-this.md)** answers from the specs first. A name matches first. A sentence or two matches on its key words. An `@` keeps the search inside that path. One pass. One winning slice is the answer, and the path is named. Two or more close hits are listed, one line each. It does not guess. No slice: it says so, shows what the repo, the code, and the environment notes know, and presents a candidate slice. It names [`/crav1-spark-to-spec`](crav1-spark-to-spec.md), [`/crav1-ideas-to-spec`](crav1-ideas-to-spec.md), or [`/crav1-bundle-to-specs`](crav1-bundle-to-specs.md) and does not run them. Pasted minutes or a long dump names [`/crav1-add-to-spec`](crav1-add-to-spec.md) and stops. After the repo part it runs read-only live checks: Azure resource settings and recent changes, and Azure DevOps work items, open pull requests, and branches. Each live fact is a live read. Production is shape and connections only, after the same yes or no as [`/crav1-read-environment`](crav1-read-environment.md). It never reads data. A failed live read is one prompt, Retry or Skip. Skip is the repo-only answer. A focus still runs the full read and shows only those sections. It writes nothing. It may name one skill. It does not run another skill. It is cross-cutting. It may run from any lane. It does not move work into a lane. It is a later skill. It is not a starter option. Asking for startup options names only the six and does not run this command. The six starter options stay unchanged. It is not [`/crav1-explain-existing-system`](crav1-explain-existing-system.md).
@@ -32,7 +34,7 @@ Reads one name, a sentence or two, an `@` path, or a focus, then the matching sp
 
 In short: Nothing.
 
-Writes nothing.
+Writes nothing in the project. A `report-*` word writes one Markdown report outside it (Downloads, else a temp folder) and links it in chat.
 
 ## Does not
 

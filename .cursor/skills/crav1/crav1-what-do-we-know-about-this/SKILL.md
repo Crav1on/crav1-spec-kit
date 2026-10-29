@@ -2,7 +2,10 @@
 name: crav1-what-do-we-know-about-this
 description: >-
   Answer one question about a feature, slice, resource, or not-yet-feature
-  from the specs first. Read only. Write nothing. One match pass. Then
+  from the specs first. Read only. Writes nothing in the project. One match
+  pass. A report-<type>-<depth> word (feature, change, build; short, full)
+  writes one Markdown report outside the project, Downloads when reachable,
+  and always links it in chat. Then
   read-only Azure and Azure DevOps checks, each tagged as a live read.
   When the git remote is not Azure Repos and marks do not name the org
   and project, derive them from Azure DevOps URLs in docs/system/repos.md.
@@ -32,6 +35,15 @@ Other skills do not run this one. Spark, specify, plan, and verify do not run it
 This is not `/crav1-explain-existing-system`. Explain reads `docs/system/` first. When the picture has nothing on the question, it quotes the first paragraph of a matching spec, labelled as coming from the spec, and names this command. It does not run this command. This command reads the specs first.
 
 This command does not run another skill. It may name one.
+
+## Report words (1.104.0)
+
+Route first, load second. Check the message for one word `report-<type>-<depth>`:
+
+- **No report word:** the free-form answer below, unchanged. Do not open `reports/`.
+- **One report word:** type `feature` (what it does, flow, architecture), `change` (a pull request or branch, its pipelines, the discussion), or `build` (ready to build, what is missing, finish order); depth `short` or `full`. Read only `reports/common.md` and `reports/<type>-<depth>.md`. Never the other report files. The rest of the message is the question, matched as below.
+
+That one report file names its sections and the only diagrams to draw. The report is the one file this command writes, outside the project; the chat always links or attaches it.
 
 ## Input
 
@@ -97,12 +109,7 @@ Read `references/live-reads.md`, only the section you need:
 
 ## Focus
 
-The full read still runs, including the live reads. The answer shows **Verdict**, **Source**, and the sections the focus names.
-
-- Security bits: guardrails, constraints, non-goals, a Security section, `docs/system/security.md` lines that match, and a live setting that is a security setting.
-- What is pending: open questions, unchecked tasks, an open decision, **Either way**, and open work items and open pull requests.
-
-A section outside the focus is left out. An empty section is still left out. Do not pad the answer back out to the full template. **Research marked stale** stays when a mark is there. A focus does not hide it.
+A focus still runs the full read, including the live reads, and shows only **Verdict**, **Source**, and the focused sections. Read `references/focus.md` ("Focus") only when the question names a focus.
 
 ## Answer
 
@@ -112,7 +119,7 @@ Read `references/answer.md` ("Answer sections") when you write the answer: what 
 
 ## Stop
 
-Do not write a file. Do not edit a spec, a plan, `tasks.md`, `docs/system/`, `docs/architecture/spec.md`, `docs/environments/marks.md`, or code. Do not commit. Do not push. Do not open a pull request.
+Do not write a file, except the one report a `report-*` word asks for, outside the project. Do not edit a spec, a plan, `tasks.md`, `docs/system/`, `docs/architecture/spec.md`, `docs/environments/marks.md`, or code. Do not commit. Do not push. Do not open a pull request.
 
 Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs`, `/crav1-add-to-spec`, `/crav1-explain-existing-system`, `/crav1-read-environment`, `/crav1-map-pipeline-environments`, `/crav1-plan-from-spec`, `/crav1-build-tasks`, or `/crav1-finalize-commit`.
 
@@ -131,6 +138,6 @@ Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-spe
 - A failed live read is one prompt: the issue, a fix when there is one, Retry or Skip. Skip is the repo-only answer, with why the live checks did not run.
 - A focus still runs the full read. The answer shows only those sections.
 - People come from what is written. A guess is labeled `(inference, not in the docs)`.
-- Write nothing. Do not run another skill. Naming one is allowed.
+- Write nothing in the project. A `report-*` word writes one report outside it and links it in chat. Do not run another skill. Naming one is allowed.
 - Do not start Specify, Plan, or Build.
 - Later skill. Not a starter option. Asking for startup options names only the six and does not run this command.

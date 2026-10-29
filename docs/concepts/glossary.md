@@ -56,6 +56,10 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 
 **Dependency order.** The order tasks are listed, built and verified in since 1.103.0: the `(after: T#)` graph wave by wave (a task with no `(after: …)` waits on the task just before it), lowest number first inside a wave, not plain task number. **Next** is the ready task that unblocks the most others. Tasks that wait on each other in a loop are blocked as a cycle.
 
+**Load path.** The files a skill reads for one run, since 1.104.0: `SKILL.md` routes first, then only the chosen path's file (one report, one branch, one reference) is read. Other paths stay closed.
+
+**Report word.** `report-<type>-<depth>` on `/crav1-what-do-we-know-about-this` (1.104.0): type `feature`, `change`, or `build`; depth `short` or `full`. Picks one fixed report written outside the project.
+
 **Route.** An ordered list of commands for one situation, such as a new slice or new information on an existing slice. Each step says when it applies, and some are optional. The routes live in `docs/reference/workflow.yaml` and are shown in [Workflow routes](../reference/workflow.md). `/crav1-help` answers order questions from them.
 
 **Slice, slug.** A slice is one feature's spec folder. Its slug is the folder name under `docs/specs/`.

@@ -41,3 +41,15 @@ The longer maintainer rule is `.cursor/rules/kit-maintainer.mdc`.
 - Keep the visible author name in `plugins/crav1/.cursor-plugin/plugin.json` and the marketplace owner name in `.cursor-plugin/marketplace.json` as `Crav1`. There is no author email. Questions, bugs, and requests go to GitHub Issues on this repo ([SUPPORT.md](SUPPORT.md)).
 - Leave [LICENSE](LICENSE) as MIT unless the owner asks for a change.
 - Open a pull request for review with `/crav1-open-pr` (it does not merge). Review a named pull request with `/crav1-review-pr` (it does not edit, comment, or merge). See where its threads stand with `/crav1-pr-status` (it drafts replies and never posts). Merge a named pull request only with `/crav1-merge-pr`, and only when that turn explicitly asks. Merging this kit, and any git tag, stays with the owner.
+
+## Load paths (standing rule, 1.104.0)
+
+Every skill added or changed aims for the leanest load path:
+
+- `SKILL.md` routes. It says which word, case, or branch applies and which file to read next. It does not carry templates, long rule sets, or every branch inline.
+- Decide first, load second. Pick the path (a mode word, a branch, a case), then read only that path's file. Never read every template or reference up front. The default path (no mode word) opens none of them.
+- One file per path: `references/<topic>.md`, `branches/<name>/BRANCH.md`, `reports/<type>-<depth>.md`, `assets/<template>.md`. A path file may share one small `common.md`; it does not point at its siblings.
+- Diagrams and heavy output: only what that path or depth needs.
+- Keep `SKILL.md` near 1,500 words (CI fails at 2,000). Move a section out, with a one-line pointer, before it grows.
+- Add a unit test for the routing when a skill gains paths (see `scripts/tests/test_report_routing.py`).
+

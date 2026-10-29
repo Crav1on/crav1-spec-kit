@@ -2,6 +2,20 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.104.0 (2026-10-29)
+
+`/crav1-what-do-we-know-about-this` gains six report words that write a fixed Markdown report, and load paths become a standing kit rule. A minor release because it adds modes.
+
+### Kit
+
+- **Added (`/crav1-what-do-we-know-about-this report-<type>-<depth>`):** `report-feature-short`, `report-feature-full`, `report-change-short`, `report-change-full`, `report-build-short`, `report-build-full`. feature = what it does, flow, architecture; change = one pull request or branch, its pipelines and discussion; build = ready to build, gaps, and finish order in dependency order. short is one screen; full is every section.
+- **Added (load path):** the skill routes first and reads only `reports/common.md` plus the one `reports/<type>-<depth>.md`. No report word stays the free-form answer and opens no report file. Diagrams are Mermaid wherever a picture helps, only those that file lists; C4 always in feature-full, in change-full only when architecture or pipelines matter.
+- **Added (reports):** live reads as in the free-form answer, plus read-only sources the host already has; a source that needs a sign-in, a permission, or a missing tool is asked about first (Allow or Skip). `Live read.` and `(inference, not in the docs)` labels. The file goes outside the project, to Downloads when reachable, else a temp folder; the chat always links or attaches it.
+- **Changed (`/crav1-what-do-we-know-about-this`):** focus rules moved word for word to `references/focus.md`, read only when a focus is named.
+- **Added (maintainer):** **Load paths** is a standing rule in `kit-maintainer.mdc` and `CONTRIBUTING.md` for every skill added or changed.
+- **Tests:** routing and progressive-loading unit tests (`scripts/tests/test_report_routing.py`) in kit CI.
+- **Docs:** the walkthrough, `skills.yaml`, regenerated skill pages, glossary (**Load path**, **Report word**).
+
 ## 1.103.0 (2026-10-29)
 
 Tasks are listed, built and verified in dependency order (the `(after: T#)` graph), not task number. A minor release because it changes what the build skills offer and run.
