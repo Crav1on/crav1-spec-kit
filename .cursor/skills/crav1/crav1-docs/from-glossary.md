@@ -28,7 +28,7 @@ The mode word is `as-file`, not `file`, so a term literally named `file` still w
 1. **docs/ first.** Every file under `docs/` is searched (not retired specs). Only a line that states the meaning counts: a written-out abbreviation, `X is ...`, `X means ...`. A docs/ meaning is written into its `to be researched` row right away, with a file and line link, for example `Source: [docs/system/landscape.md:7](landscape.md#L7)`.
 2. **Public or internal.** Before any web search the term is checked: the personal-data and secrets check from the [Data policy](concepts/data-policy.md) runs on the search words, and a client, person, project, system or codename that only this project uses is internal-only. Internal-only terms never go to the web. When in doubt, a term is internal.
 3. **The web, public terms only.** A meaning found there is shown with its URL and written only after your yes.
-4. **Nowhere.** The row stays `to be researched`. When a spec uses the word, that spec gets the open question `What does <term> mean here?` with a `Pending:` line naming who may know; `/crav1-show-or-ask-open-questions ask` drafts it for them. When no spec uses it, you get a research request drafted in the chat. Nothing is sent.
+4. **Nowhere.** You get what the agent may know, labelled as a guess, with **Correct** or **Needs research**. **Correct** writes the row as confirmed in chat. **Needs research** keeps `to be researched`, and you may get a research request drafted in the chat for a person to pick up. No spec is touched: the glossary never adds open questions, so a word never blocks a plan or a build (1.105.0). Nothing is sent.
 
 ## First prompts
 
@@ -50,6 +50,6 @@ The mode word is `as-file`, not `file`, so a term literally named `file` still w
 
 ## What it writes
 
-Only rows in `docs/system/glossary.md`, the ignored `.crav1/glossary-list.md` in as-file mode, and on a not-found term the open question on the spec that uses it. A row that already has a meaning is never rewritten here; a different meaning from a new source goes through `/crav1-add-to-spec`, which shows old and new side by side. At most one question per run. Headless and bot runs ask nothing: they write the docs/ meanings and list web meanings as waiting for a yes.
+Only rows in `docs/system/glossary.md`, the ignored `.crav1/glossary-list.md` in as-file mode. No spec is ever touched. A row that already has a meaning is never rewritten here; a different meaning from a new source goes through `/crav1-add-to-spec`, which shows old and new side by side. At most one question per run. Headless and bot runs ask nothing: they write the docs/ meanings and list web meanings as waiting for a yes.
 
 Next: `/crav1-finalize-commit` when a row changed. See the [skill page](reference/skills/crav1-glossary.md).

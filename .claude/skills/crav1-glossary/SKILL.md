@@ -8,8 +8,9 @@ description: >-
   with a file and line link), then the web for public terms only, after
   the personal-data check (a web meaning is written only after a yes).
   <term>: answer one term from its row, or research it the same way and
-  offer to add the row. Not found anywhere: an open question or a
-  research request. Cross-cutting. Not a starter option. Does not commit.
+  offer to add the row. Not found anywhere: offer a guess with Correct or
+  Needs research; never an open question on a spec. Cross-cutting. Not a
+  starter option. Does not commit.
 disable-model-invocation: true
 icon: book-a
 color: teal
@@ -63,7 +64,7 @@ For each row, run **Research one term**. Then:
 
 - **Found in docs/.** Write the meaning into the row right away, no question. The Meaning is the source's words, shortened only, followed by the source as a link with the line: `Booking Cancellation Approval Service: approves a cancellation after the cut-off. Source: [docs/system/landscape.md:7](landscape.md#L7)`. The link is relative to `docs/system/`. Replace only `to be researched` in that one row; do not rewrite another row, do not move the row.
 - **Found on the web.** Show the meaning and its source URL, and ask `Add this meaning for <term>?` with `Add (Recommended)` and `Skip`. Write it only on that yes, as `<meaning> Source: <URL> (web, <date>)`. No yes, or a headless or bot run with no person to answer: write nothing for that row and list it under **Waiting for your yes** with the meaning and URL.
-- **Found nowhere.** The row stays `to be researched`. Route it as **Not found** says.
+- **Found nowhere.** The row stays `to be researched` unless the user picks **Correct** on a guess, as **Not found** says.
 
 Several web meanings in one run are asked in one question, one option per term plus `None`, so the run stays inside its prompt budget.
 
@@ -75,7 +76,7 @@ Answer one term.
 
 1. **In the glossary with a meaning.** Answer from the row: the term, its meaning, its source as the row gives it, and `From docs/system/glossary.md`. Write nothing. Ask nothing.
 2. **In the glossary as `to be researched`.** Say so, then run **Research** for that one row (`research <term>`).
-3. **Not in the glossary.** Run **Research one term**. Answer first: the meaning and its source (file and line, or URL), or that nothing was found. Then, when a meaning was found, offer to add the row: `Add <term> to the glossary?` with `Add (Recommended)` and `Skip`. On the yes, add `| <Term> | <meaning> Source: <link> |` in sorted place by term, before the first `to be researched` row when it sorts after them, as `crav1-add-to-spec` `references/merge-safe.md` says. No yes: write nothing. Nothing found: offer to add the row as `to be researched` on the same yes, and route it as **Not found** says.
+3. **Not in the glossary.** Run **Research one term**. Answer first: the meaning and its source (file and line, or URL), or that nothing was found. Then, when a meaning was found, offer to add the row: `Add <term> to the glossary?` with `Add (Recommended)` and `Skip`. On the yes, add `| <Term> | <meaning> Source: <link> |` in sorted place by term, before the first `to be researched` row when it sorts after them, as `crav1-add-to-spec` `references/merge-safe.md` says. No yes: write nothing. Nothing found: run **Not found** for that term (the row is added only on **Correct**, or as `to be researched` on **Needs research**).
 
 A term that is a kit word, not a project word, is answered from the kit's own glossary (`crav1-docs/concepts/glossary.md` next to the skills) and labelled `Kit glossary`; it is never added to the project glossary.
 
@@ -89,19 +90,16 @@ Read [references/research.md](references/research.md) and follow it. In short:
 
 ## Not found
 
-The row stays `to be researched`. Route it the way the kit routes an open point today:
-
-- **A spec uses the term.** Add an open question to that spec, `What does <term> mean here?`, in sorted place under `## Open questions` as `crav1-add-to-spec` `references/open-questions.md` says, with a `Pending:` line naming who may know: the author or sender of the first source that uses the word, else nobody. Name `/crav1-show-or-ask-open-questions ask` to ask them. Do not run it.
-- **No spec uses it.** Draft a research request in the chat in the shape of `crav1-show-or-ask-open-questions` `references/research.md` (Question, Why it matters, Known so far, Sources, Who decides, Bring back), with no slug or path. Nothing is sent.
+The glossary holds definitions only. A gap never becomes an open question on a spec, never gets a `Pending:` line, and is never handed to `/crav1-show-or-ask-open-questions` or `crav1-add-to-spec` `references/open-questions.md`, so it never blocks a plan or a build. Read [references/not-found.md](references/not-found.md) only when a term is found nowhere: offer what you may know with **Correct** or **Needs research**.
 
 ## Prompt budget
 
-At most one prompt per run: the add question (Term) or the web-meaning question (Research). List and As file ask nothing. A headless or bot run asks nothing; it writes the docs/ meanings and lists the rest.
+At most one prompt per run: the add question (Term), or one question with the web meanings and the **Not found** guesses (Research). List and As file ask nothing. A headless or bot run asks nothing; it writes the docs/ meanings and lists the rest.
 
 ## Writes
 
-Only `docs/system/glossary.md` (rows filled or added as above), on **Not found** the open question in one spec, and in As file mode `.crav1/glossary-list.md` with its `.crav1/.gitignore`, both ignored by git. Nothing else: no spec text, no research note, no notes index. Never commit, push, or open a pull request. The user commits.
+Only `docs/system/glossary.md` (rows filled or added as above) and in As file mode `.crav1/glossary-list.md` with its `.crav1/.gitignore`, both ignored by git. Nothing else: no spec text, no research note, no notes index. Never commit, push, or open a pull request. The user commits.
 
 ## Stop
 
-Do not invent a meaning. Do not rewrite a row that already has a meaning; a different meaning found later is shown side by side and left for `/crav1-add-to-spec`, as `references/sources-rare.md` says. Do not web-search an internal-only term. Do not write a web meaning without its yes. Do not mark research stale from a glossary row.
+Do not invent a meaning; a guess is labelled and written only on **Correct**. Do not rewrite a row that already has a meaning; a different meaning found later is shown side by side and left for `/crav1-add-to-spec`, as `references/sources-rare.md` says. Do not web-search an internal-only term. Do not write a web meaning without its yes. Do not mark research stale from a glossary row. Never write an open question, a `Pending:` line or any other line into a spec.
