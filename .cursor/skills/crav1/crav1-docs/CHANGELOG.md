@@ -2,6 +2,18 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.105.0 (2026-10-29)
+
+`/crav1-glossary` no longer adds open questions to specs. The glossary is definitions only, so a word can no longer block a plan or a build. A minor release because it changes what the skill writes and asks.
+
+### Kit
+
+- **Changed (`/crav1-glossary research`, `/crav1-glossary <term>`):** a term found nowhere no longer becomes `What does <term> mean here?` with a `Pending:` line on a spec, and the skill no longer names `/crav1-show-or-ask-open-questions`. It offers what it may know, labelled `(inference, not in the docs)`, with **Correct** (the row is written as `Source: confirmed in chat (<date>)`) or **Needs research** (the row stays `to be researched`, with an optional research request drafted in the chat, nothing written or sent). Headless and bot runs list the guesses under **Guesses waiting**.
+- **Changed (load path):** the not-found rules live in `references/not-found.md`, read only when a term is found nowhere.
+- **Unchanged:** docs/ meanings are written right away with a file and line link; web meanings only after a yes; internal-only terms never go to the web; one prompt per run.
+- **Tests:** glossary path unit tests (`scripts/tests/test_glossary_paths.py`) in kit CI; the proving-ground glossary replay seeds a spec that uses an unknown word and checks that the spec is untouched.
+- **Docs:** the glossary walkthrough, guild routing, `skills.yaml` and regenerated skill pages.
+
 ## 1.104.0 (2026-10-29)
 
 `/crav1-what-do-we-know-about-this` gains six report words that write a fixed Markdown report, and load paths become a standing kit rule. A minor release because it adds modes.
