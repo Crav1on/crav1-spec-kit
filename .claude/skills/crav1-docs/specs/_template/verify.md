@@ -20,7 +20,7 @@ Date:
 
 Next: `/crav1-fix-build-gaps` (omit Gap) for failed/unverified/`G#`; `/crav1-build-tasks T#` if only unimplemented remains; or ship.
 
-## Tasks — overview
+## Tasks — overview (dependency order)
 
 Sorted: verified, then verify failed, then not implemented, then unverified.
 

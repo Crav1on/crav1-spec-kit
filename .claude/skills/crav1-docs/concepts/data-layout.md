@@ -188,7 +188,7 @@ Under each item in a spec's `## Open questions`, the kit can add four kinds of l
 When a mark is missing, the reader falls back and labels the reason **inferred**:
 
 - No `Reviewed:` line: the task can still be ready, with a warning to run `/crav1-review-plan`.
-- No `(after: …)`: every earlier unticked task blocks it.
+- No `(after: …)`: the task just before it blocks it while unticked (1.103.0; before, every earlier unticked task did).
 - A kept-open question, or a plan Risk that says do not implement until resolved, with no `Blocks:` line: it blocks the whole slice.
 
 A ticked task is Done only when `verify.md` lists it as verified. Otherwise it shows as Needs verify.

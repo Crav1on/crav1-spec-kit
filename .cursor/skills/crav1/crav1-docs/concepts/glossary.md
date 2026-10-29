@@ -54,6 +54,8 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 
 **Blocking.** What keeps a task from being ready, with one reason: a kept-open question (its `Blocks:` line names the task, or it has none and blocks the whole slice), a plan Risk, or an earlier task that is not ticked (from `(after: T#)`, or task order when none is recorded). A reason from a written mark is **recorded**; a fallback is **inferred**.
 
+**Dependency order.** The order tasks are listed, built and verified in since 1.103.0: the `(after: T#)` graph wave by wave (a task with no `(after: …)` waits on the task just before it), lowest number first inside a wave, not plain task number. **Next** is the ready task that unblocks the most others. Tasks that wait on each other in a loop are blocked as a cycle.
+
 **Route.** An ordered list of commands for one situation, such as a new slice or new information on an existing slice. Each step says when it applies, and some are optional. The routes live in `docs/reference/workflow.yaml` and are shown in [Workflow routes](../reference/workflow.md). `/crav1-help` answers order questions from them.
 
 **Slice, slug.** A slice is one feature's spec folder. Its slug is the folder name under `docs/specs/`.
