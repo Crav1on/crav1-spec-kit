@@ -2,6 +2,16 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.105.1 (2026-10-30)
+
+Kit CI runs less. A patch release because no skill behavior changes.
+
+### Kit
+
+- **Changed (CI):** `Drop-in, plugin, Claude sync, and docs checks` runs on push only for `main` and `develop`, as `Kit lint` already did, so a pull request push no longer runs it twice.
+- **Changed (CI):** every kit workflow has a `concurrency` group per pull request or branch. A newer push to a pull request cancels the older run. Runs on `main` and `develop` are never cancelled.
+- **Unchanged:** no `paths-ignore`. Every workflow checks docs (bundled `crav1-docs`, `skills.yaml`, links, docs-touched), so no docs-only change is safe to skip.
+
 ## 1.105.0 (2026-10-29)
 
 `/crav1-glossary` no longer adds open questions to specs. The glossary is definitions only, so a word can no longer block a plan or a build. A minor release because it changes what the skill writes and asks.
