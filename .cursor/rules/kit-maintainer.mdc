@@ -56,8 +56,8 @@ Hand-written host differences inside that generator, not a second copy of every 
 When you **create or update** a crav1 skill or subagent that reads or writes spec artifacts (`spec.md`, `plan.md`, `tasks.md`, `adr.md`, `diagrams.md`, `verify.md`, `fix-log.md`) or landscape artifacts (`docs/system/`):
 
 1. Put a copy of each template in **that skill’s** `assets/` (and the matching `agent-assets/crav1-<agent-name>/` on both trees).
-2. Point the `SKILL.md` / agent prompt at **those** copies, not only `docs/specs/_template/`. Mention drop-in `.cursor/…` **and** plugin sibling paths when a file lives outside this skill. The Claude generator rewrites the `.cursor/` paths.
-3. Keep `docs/specs/_template/` and `docs/system/_template/` in sync with the matching `assets/` copies. If you change a template, update **every** copy. Note files use `docs/notes/_template/note.md` and `docs/notes/_template/index.md`. The same two files live in `crav1-add-to-spec` `assets/`.
+2. Point the `SKILL.md` / agent prompt at **those** copies, not only `docs/specs/_template/`. For a file in another skill write skill `crav1-other`, `references/x.md`, never a `.cursor/` path (1.107.0).
+3. Edit `docs/specs/_template/` or `docs/system/_template/`, then run `scripts/sync-crav1-plugin.sh`; it regenerates every `assets/` copy from `scripts/template-copies.tsv` (1.107.0). Note files use `docs/notes/_template/note.md` and `docs/notes/_template/index.md`. The same two files live in `crav1-add-to-spec` `assets/`.
 4. Do **not** put template markdown under `.cursor/agents/` or `plugins/crav1/agents/` except the agent prompt file.
 5. Format recipes live in the skill’s `references/` (see `crav1-export-spec` / `crav1-ideas-to-spec`).
 

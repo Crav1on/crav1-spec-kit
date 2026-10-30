@@ -4,6 +4,9 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 PLUGIN="$ROOT/plugins/crav1"
 
+# template copies: generated from docs/*/_template/ (1.107.0), before any mirror.
+python3 "$ROOT/scripts/gen-template-copies.py"
+
 mkdir -p "$PLUGIN/skills" "$PLUGIN/agents" "$PLUGIN/rules" "$PLUGIN/agent-assets"
 
 # docs: every install carries this release's docs next to the skills, so
