@@ -22,7 +22,7 @@ If there are no spec folders, stop. Point at `/crav1-spark-to-spec`, `/crav1-ide
 
 ## Duplicate check (1.61.0)
 
-Before the sort, run the duplicate check in this skill's `references/notes.md`. The same source again (the same file, mail, or meeting) is not imported twice: say `already imported on <date> as docs/notes/YYYY-MM/<file>.md`, and ask **Reuse the existing note (Recommended)** or **Skip**. Reuse sorts only for specs that took nothing from that note yet. Skip stops. A dump of several files checks each file.
+Read this skill's `branches/dump/references/duplicate-and-note.md` now, before you go on.
 
 ## Sort (no writes yet)
 
@@ -50,16 +50,7 @@ Stop. They confirm or edit the sort. Do not write files. That confirmation is th
 
 ## Write the full note (1.61.0)
 
-After the sort is confirmed, write **one note** holding the whole dump, as this skill's `references/notes.md` says. There is no Note pile and nothing is asked about the note. A dump of several separate sources (different mails, meetings, or files) writes one note per source; never split one source.
-
-- Run the imported-sources convention first, in **Write the new bits**. The note holds the text after its redaction and its `source_folder` is that folder.
-- Path: `docs/notes/YYYY-MM/YYYY-MM-DD-<slug>.md` by the **source date** the dump shows. No date: the import date, `source_date: none`, and say so.
-- Each belongs quote is followed by `Full source: docs/notes/YYYY-MM/<file>.md`, and the slug goes in the note's `used_by`. A matching parked spec gets nothing; its slug goes in `waiting_for`.
-- The same point already on a spec from another source adds this note as a second source on that line. A disagreement is a **Conflict:** line, never an overwrite.
-- Never ask an absorb question. Never write `Absorbed by`.
-- Run `scripts/notes_index.py` after the note changes. Do not hand-edit an index.
-
-Do not commit.
+This step is in the same file, this skill's `branches/dump/references/duplicate-and-note.md`.
 
 ## Write the new bits
 
@@ -99,25 +90,7 @@ Read this skill's `references/dump-new-spec.md` for which skill to point at.
 
 ## Impact (before any other edit)
 
-The new quotes are already in the matching specs. Read `docs/system/` when it exists (`landscape.md`, `repos.md`, `diagrams.md`, `glossary.md`, `adr/`) and every other `docs/specs/<slug>/spec.md` (skip `_template`). Other means a spec that did not just receive a new quote, plus any heading on a spec you did edit that the confirmed sort did not already cover. Check whether the new information contradicts or extends the landscape, a repo row, a diagram, an ADR, or another spec.
-
-Also compare each kept quote with research, as **Research compare** in `crav1-add-to-spec` `SKILL.md` says. This question is not an apply option. When it is open, ask it before the landscape question. Do not ask both in the same turn. Do not commit.
-
-When `docs/system/` exists, read this skill's `references/dump-landscape.md` for the glossary and the picture.
-
-Do not edit anything outside the confirmed belongs writes in this step, except the glossary gap, the picture update below, a research mark that `crav1-add-to-spec` `references/research-stale.md` already allowed after a yes, or a clear, a narrowed mark, a resolved line, or an open question that the same file says to write. The clear does not wait for a yes. A note already written under **Write the full note** stays. A source folder already written under **Write the new bits** stays. Do not edit it in this step. Notes are not an impact edit. Do not list them as an apply option. The research mark is not a landscape edit. Do not seed `docs/system/` when it is missing. Say it is missing and that this command does not create it. When that folder is missing, do nothing about a glossary and do nothing about the picture. The research check still runs.
-
-Do not edit `plan.md` or `tasks.md` when they exist, and do not list them as proposed edits. One line in the report when they exist: they were left alone. Adding information does not start planning.
-
-Report:
-
-- If nothing else is affected, say so. Do not ask. `docs/system/` and the specs outside those writes stay as they are.
-- If something else is affected, stop and ask. Options only. Use the questions tool when it is available.
-  1. **Apply the listed edits**
-  2. **Leave the other files alone**
-- List each proposed edit in one line: the file, and what would change. One line per file change. No surrounding rewrite.
-
-Do not silently rewrite `docs/system/` or specs the sort did not already write. The glossary write above is one exception: a missing file, or new rows appended to an existing file. The picture update is the other: new lines on the short description, the diagram, and how the parts connect. Apply the other edits only if they pick apply, and only the lines you listed. If they pick leave, do not edit those files. Do not rewrite existing glossary rows or existing picture lines either way. Do not list the picture lines again as an apply option. A listed edit to a `repos.md` row keeps the `Synced at` line in `repos.md`. Do not set it and do not clear it. This command does not record the commit.
+Read this skill's `branches/dump/references/impact.md` now, before you go on.
 
 ## Stop
 

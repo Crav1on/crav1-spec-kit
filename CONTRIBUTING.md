@@ -53,6 +53,6 @@ Every skill added or changed aims for the leanest load path:
 - One file per path: `references/<topic>.md`, `branches/<name>/BRANCH.md`, `reports/<type>-<depth>.md`, `assets/<template>.md`. A path file may share one small `common.md`; it does not point at its siblings.
 - Diagrams and heavy output: only what that path or depth needs.
 - The `description` is trigger text only, at most 60 words (1.106.0, `scripts/check-kit-docs.py`). Every description loads up front for skill matching, so rules belong in the body.
-- Keep `SKILL.md` near 1,500 words (CI fails at 2,000). Move a section out, with a one-line pointer, before it grows.
+- Keep `SKILL.md` near 1,500 words (CI fails at 2,000). Move a section out, with a one-line pointer, before it grows. A `BRANCH.md` fails CI over 2,000 words (1.107.0); move a later step into `branches/<name>/references/`.
 - Add a unit test for the routing when a skill gains paths (see `scripts/tests/test_report_routing.py`).
 

@@ -8,7 +8,8 @@
       newest release heading in CHANGELOG.md (## X.Y.Z ...).
   It also warns, without failing, when a SKILL.md in .cursor/skills/crav1/ is
   over 2,000 words (1.71.0): keep the common path there and move rare cases
-  into references/ with a one-line pointer.
+  into references/ with a one-line pointer. It fails when a BRANCH.md is over
+  2,000 words (1.107.0).
 
 Needs PyYAML (pip install pyyaml).
 """
@@ -85,15 +86,26 @@ def word_warnings() -> list[str]:
     return out
 
 
+def branch_words() -> list[str]:
+    """A BRANCH.md loads whole once its route is picked (1.107.0): over 2,000 words fails.
+    Move a later step into branches/<name>/references/ and leave a one-line pointer."""
+    out: list[str] = []
+    for path in sorted((ROOT / TREES[0]).glob("*/branches/*/BRANCH.md")):
+        n = len(path.read_text(encoding="utf-8").split())
+        if n > WORDS:
+            out.append(f"{path.relative_to(ROOT)} is {n} words (limit {WORDS:,}); move a later step into its references/")
+    return out
+
+
 def main() -> int:
     for w in word_warnings():
         print(w)
-    errors = descriptions() + version() + workflow_stamp()
+    errors = descriptions() + version() + workflow_stamp() + branch_words()
     for e in errors:
         print(e)
     if errors:
         return 1
-    print("Skill descriptions are within 60 words and 1,024 characters; plugin.json matches the newest CHANGELOG release and every workflow.md stamp")
+    print("Skill descriptions are within 60 words and 1,024 characters; every BRANCH.md is within 2,000 words; plugin.json matches the newest CHANGELOG release and every workflow.md stamp")
     return 0
 
 
