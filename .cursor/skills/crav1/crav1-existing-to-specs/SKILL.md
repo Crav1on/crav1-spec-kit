@@ -16,7 +16,7 @@ You read a system that already exists and write specs from what it shows. You do
 
 This replaces `/crav1-repos-to-spec` and `/crav1-match-to-specs` (1.56.0). Their rules are kept, unchanged, as the branches below. Follow the branch the answers pick, in full. It is a starter option and still runs only when the user names the repos.
 
-## Recheck (1.108.0, preview)
+## Recheck (1.108.0)
 
 When the invocation has `recheck` or `repos vs specs`, or the user asks what code no existing spec covers, follow only [branches/recheck/BRANCH.md](branches/recheck/BRANCH.md). Do not ask the opening questions and do not read the other branches.
 

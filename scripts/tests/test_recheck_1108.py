@@ -1,4 +1,4 @@
-"""1.108.0: /crav1-existing-to-specs recheck (repos vs specs, preview)."""
+"""1.108.0: /crav1-existing-to-specs recheck (repos vs specs)."""
 import pathlib, re, unittest
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]

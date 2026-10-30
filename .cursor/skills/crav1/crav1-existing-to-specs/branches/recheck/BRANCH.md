@@ -1,10 +1,8 @@
-# Repos vs specs (recheck, preview)
+# Repos vs specs (recheck)
 
 Specs already exist and the code kept moving. You read the named repos, compare them with the specs that are already there, and report two things: code that no spec covers, and spec claims the code no longer shows. You refresh one note in `docs/system/landscape.md`. You write nothing into any spec.
 
 Paths in backticks are relative to the skill folder unless they start with `docs/`.
-
-Preview (1.108.0). The rules can still change after use on a real repo.
 
 This is not the repos and bundle branch (that creates spec folders from repos plus a bundle) and not the code change branch of `/crav1-add-to-spec` (that sorts one pointed change onto specs). This branch runs only when the user calls it. Do not schedule it, hook it, or run it again because new commits appeared.
 
