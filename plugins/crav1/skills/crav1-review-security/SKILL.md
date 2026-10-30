@@ -101,9 +101,9 @@ A finding they struck is dropped. Do not write it. Wording they changed is the w
 
 Write in this chat. Do not launch a worker.
 
-**System pass:** `docs/system/security.md`. File shape: this skill’s `assets/security.md` (same file as `docs/system/_template/security.md`; drop-in: `.cursor/skills/crav1/crav1-review-security/assets/security.md`; plugin: this skill’s `assets/security.md`). When the file is missing, write that header, then the kept findings under `## Findings`. When the file exists, append kept findings that are not already there. Do not rewrite findings already in the file. Do not replace the file with the template.
+**System pass:** `docs/system/security.md`. File shape: this skill’s `assets/security.md` (same file as `docs/system/_template/security.md`; this skill's `assets/security.md`). When the file is missing, write that header, then the kept findings under `## Findings`. When the file exists, append kept findings that are not already there. Do not rewrite findings already in the file. Do not replace the file with the template.
 
-**Feature or change:** a Security section on that spec. Section shape: this skill’s `assets/security-section.md` (drop-in: `.cursor/skills/crav1/crav1-review-security/assets/security-section.md`; plugin: this skill’s `assets/security-section.md`). When `## Security` is missing, add that heading and its intro, then the kept findings. When it exists, append kept findings that are not already there. Do not rewrite other sections. Do not replace `spec.md` with the section file. Do not add Problem, Goals, Acceptance criteria, or tasks to fill the file out.
+**Feature or change:** a Security section on that spec. Section shape: this skill’s `assets/security-section.md` (this skill's `assets/security-section.md`). When `## Security` is missing, add that heading and its intro, then the kept findings. When it exists, append kept findings that are not already there. Do not rewrite other sections. Do not replace `spec.md` with the section file. Do not add Problem, Goals, Acceptance criteria, or tasks to fill the file out.
 
 Each kept finding is written in the same four lines you showed, under `### S# — confirmed` or `### S# — inferred`. Keep their numbers.
 

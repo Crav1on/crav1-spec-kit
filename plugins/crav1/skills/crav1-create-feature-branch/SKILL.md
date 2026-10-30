@@ -14,7 +14,7 @@ color: blue
 
 Get this change **off the default branch**. Prompt; do not silently `git checkout -b`. Do not push. Do not open a pull request unless they **explicitly** ask in this chat.
 
-Other skills follow this file (drop-in: `.cursor/skills/crav1/crav1-create-feature-branch/SKILL.md`; plugin: sibling `skills/crav1-create-feature-branch/SKILL.md`). Standalone command: `/crav1-create-feature-branch`.
+Other skills follow this file (this skill's `SKILL.md`). Standalone command: `/crav1-create-feature-branch`.
 
 ## Detect
 
@@ -59,7 +59,7 @@ Do not offer `spec/<slug>` on a build prompt.
 - Otherwise the Build prompt is **X (Recommended)** first, then `feat/<slug>`, **Other name** and **Stop** (Stay only off a base).
 - When X is a base branch, the task is `blocked: branch X is a base branch`; never switch to it.
 - When X exists only as `origin/X`, `git checkout X` makes the local branch.
-- When X exists nowhere and the spec's Match `Branch:` list has a `(spec branch)` S, or X has an `(into S)` entry (1.68.0, setup 4 in `crav1-add-to-spec` `references/branches.md` (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/references/branches.md`; plugin: sibling `skills/crav1-add-to-spec/references/branches.md`)): the prompt is **Create X from S (Recommended)**, then `feat/<slug>`, **Other name** and **Stop**. After that yes, create X from S (local `S`, else `origin/S`; never fetch) and write `(into S)` on X's Match `Branch:` line (adding the line in sorted place, 1.86.0). A headless run doesn't create X.
+- When X exists nowhere and the spec's Match `Branch:` list has a `(spec branch)` S, or X has an `(into S)` entry (1.68.0, setup 4 in skill `crav1-add-to-spec`, `references/branches.md`): the prompt is **Create X from S (Recommended)**, then `feat/<slug>`, **Other name** and **Stop**. After that yes, create X from S (local `S`, else `origin/S`; never fetch) and write `(into S)` on X's Match `Branch:` line (adding the line in sorted place, 1.86.0). A headless run doesn't create X.
 - When X exists nowhere otherwise, say so and offer `feat/<slug>` or **Other**. Never create X from the default branch without asking.
 - A `(branch: <repo> X)` for another repo is not built here; say which checkout it belongs to.
 

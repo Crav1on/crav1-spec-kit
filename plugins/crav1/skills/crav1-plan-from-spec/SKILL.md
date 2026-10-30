@@ -35,7 +35,7 @@ Say which gate failed. Next command: `/crav1-tighten-spec` and/or `/crav1-resolv
 
 **Ready with leftovers (1.87.0):** each kept-open question that does not block a first demo becomes its own entry under **Risks** in `plan.md`: the question’s words, then “do not implement until resolved”. Do this without asking. Do not ask whether to park it, keep it, or answer it, and do not answer it silently. Answering stays with `/crav1-resolve-open-questions`.
 
-Stale research does not fail this gate. A `Stale since` line under `## Research findings`, or a stale block on a note that section links to, is listed under Risks. Follow the readers section of `crav1-add-to-spec` `references/research-stale.md` (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/references/research-stale.md`; plugin: sibling `skills/crav1-add-to-spec/references/research-stale.md`). Do not block the plan. Do not clear the mark. Do not treat the stale research as current.
+Stale research does not fail this gate. A `Stale since` line under `## Research findings`, or a stale block on a note that section links to, is listed under Risks. Follow the readers section of skill `crav1-add-to-spec`, `references/research-stale.md`. Do not block the plan. Do not clear the mark. Do not treat the stale research as current.
 
 If two architecture shapes still fit the spec (ADR still `proposed`, no constraint), ask **at most 3** multiple-choice questions, then wait. Do not pick a stack they never accepted.
 

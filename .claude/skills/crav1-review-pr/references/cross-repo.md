@@ -8,7 +8,7 @@ The **code repo** is the repo the pull request is in. The **specs repo** is the 
 
 - **Same repo.** Everything below works as before: spec files come from the pull request head.
 - **Both open.** The specs repo is the workspace folder with `docs/specs/`. The code repo is the folder whose git remote matches the pull request. When several folders have `docs/specs/`, ask which one, options only. A headless run stops: `Several spec repos open: <a>, <b>. Name one.`
-- **Run from the specs repo.** A pull request from a repo in its `docs/system/repos.md`. The code repo's checkout is `../<repo>`, as `crav1-add-to-spec` `references/branches.md` says under **Sibling checkout** (drop-in: `.claude/skills/crav1-add-to-spec/references/branches.md`; plugin: sibling `skills/crav1-add-to-spec/references/branches.md`). Only an Azure DevOps diff needs that checkout.
+- **Run from the specs repo.** A pull request from a repo in its `docs/system/repos.md`. The code repo's checkout is `../<repo>`, as `crav1-add-to-spec` `references/branches.md` says under **Sibling checkout** (skill `crav1-add-to-spec`, `references/branches.md`). Only an Azure DevOps diff needs that checkout.
 - **Run from the code repo, specs repo not open.** Look read-only for a sibling `../*/docs/system/repos.md` with a row for this repo. When one is found, that is the specs repo: read the spec there, and write the notes there without committing; name the full path in the report.
 
 When no specs repo is found, review against the pull request head and body as before, and print the notes in the chat with the path they would have.

@@ -101,7 +101,7 @@ Compared with the draft of 2026-10-19: 5 points as drafted, 1 changed, 1 not in 
 
 ## Personal data and secrets
 
-Before anything is written, run the personal-data and secrets check of `crav1-add-to-spec` `references/sources.md`, with `references/sources-flagged.md` when an item is flagged, on the drafted block and on the posted text, fetched or pasted. Use the transfer data policy (auto-accept or review), the same as the PR note's description (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/references/sources.md`; plugin: sibling `skills/crav1-add-to-spec/references/sources.md`).
+Before anything is written, run the personal-data and secrets check of `crav1-add-to-spec` `references/sources.md`, with `references/sources-flagged.md` when an item is flagged, on the drafted block and on the posted text, fetched or pasted. Use the transfer data policy (auto-accept or review), the same as the PR note's description (skill `crav1-add-to-spec`, `references/sources.md`).
 
 - Secrets are always redacted by kind. The note names the kind, never the value.
 - Personal data follows the policy.

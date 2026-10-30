@@ -32,6 +32,8 @@ This kit repository is the source. Your product repository is where work happens
 
 Every install bundles this repo's `docs/` in a `crav1-docs/` folder next to the skills, so `/crav1-help` answers for the installed version: `skills/crav1-docs/` in the Cursor plugin, `.cursor/skills/crav1/crav1-docs/` in the Cursor drop-in, and `.claude/skills/crav1-docs/` in the Claude Code drop-in (`~/.claude/skills/crav1-docs/` in user scope). `/crav1-help` reads that folder directly and never searches for it. It is not a skill. Copy it with the skills. Not installed by the Cursor plugin: this repo’s README and `AGENTS.md`. The starter folders `docs/specs/_template/` and `docs/system/_template/` are in the bundled docs but are not copied into your repo. Copy them yourself if you want them in git.
 
+Skill files name a file in another skill host-neutral (1.107.0): skill `crav1-add-to-spec`, `references/branches.md`, not a `.cursor/` or plugin path. So `/crav1-plan-from-spec`, `/crav1-tighten-spec`, `/crav1-build-features` and `/crav1-what-do-we-know-about-this` find the `/crav1-add-to-spec` files, and `/crav1-review-plan` and `/crav1-tighten-plan` find the `/crav1-plan-from-spec` files, in the same folder layout on every host. Only files that name a host path (rules, agents, a command line) differ between the `.cursor/` and `.claude/` copies.
+
 ## Project drop-in or user scope
 
 **Project drop-in** — commit `.cursor/` or `.claude/` in a repository you own. Clones and teammates get the same kit.

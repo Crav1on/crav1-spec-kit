@@ -20,7 +20,7 @@ One feature and one repo after Map: you may write that slug yourself (ideas-to-s
 
 Worker: `.claude/agents/crav1-bundle-slice-agent.md` (plugin: `agents/crav1-bundle-slice-agent.md`). Protocol: this skill’s [references/worker.md](references/worker.md).
 
-Read `references/diagrams.md` before writing landscape diagrams. Read `crav1-ideas-to-spec` `references/formats.md` only when exporting (drop-in: `.claude/skills/crav1-ideas-to-spec/references/formats.md`; plugin: sibling `skills/crav1-ideas-to-spec/references/formats.md`).
+Read `references/diagrams.md` before writing landscape diagrams. Read `crav1-ideas-to-spec` `references/formats.md` only when exporting (skill `crav1-ideas-to-spec`, `references/formats.md`).
 
 ## Intake (no required structure)
 
@@ -73,7 +73,7 @@ If Map is one feature and one repo, write that slug here using ideas-to-spec Wri
 
 After workers return, update `docs/system/landscape.md` feature index: slug → spec path → repos. Do not rewrite slice specs.
 
-**Picture.** After the index, follow [picture.md](../crav1-refresh-system-notes/references/picture.md) (drop-in: `.claude/skills/crav1-refresh-system-notes/references/picture.md`; plugin: sibling `skills/crav1-refresh-system-notes/references/picture.md`). Add what this pass added to the short description, the diagram, and how the parts connect. Do not rewrite a sentence, a diagram node, a diagram edge, or a connection line that is already there. Do not run `/crav1-refresh-system-notes` as a second turn. When this pass seeded `docs/system/`, the seed fill of those three is the picture for what the intake already stated; the picture update still adds anything the new specs state that those three do not yet say. Workers do not edit the picture. Do not rewrite existing glossary rows.
+**Picture.** After the index, follow [picture.md](../crav1-refresh-system-notes/references/picture.md) (skill `crav1-refresh-system-notes`, `references/picture.md`). Add what this pass added to the short description, the diagram, and how the parts connect. Do not rewrite a sentence, a diagram node, a diagram edge, or a connection line that is already there. Do not run `/crav1-refresh-system-notes` as a second turn. When this pass seeded `docs/system/`, the seed fill of those three is the picture for what the intake already stated; the picture update still adds anything the new specs state that those three do not yet say. Workers do not edit the picture. Do not rewrite existing glossary rows.
 
 Then output only:
 

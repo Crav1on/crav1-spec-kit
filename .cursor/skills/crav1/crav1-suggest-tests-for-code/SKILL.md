@@ -99,7 +99,7 @@ A batch (`C1 keep, C2 leave`) applies only the suggestions named in that batch, 
 
 ### Keep
 
-A kept suggestion goes onto the existing spec through `/crav1-add-to-spec`. Follow only the handoff **From /crav1-suggest-tests-for-code** in that skill (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/SKILL.md`; plugin: sibling `skills/crav1-add-to-spec/SKILL.md`). One suggestion. Then stop that handoff.
+A kept suggestion goes onto the existing spec through `/crav1-add-to-spec`. Follow only the handoff **From /crav1-suggest-tests-for-code** in that skill (skill `crav1-add-to-spec`, `SKILL.md`). One suggestion. Then stop that handoff.
 
 Do not write the spec in this skill. Do not open the impact question. Do not start Specify. Do not run `/crav1-plan-from-spec`.
 

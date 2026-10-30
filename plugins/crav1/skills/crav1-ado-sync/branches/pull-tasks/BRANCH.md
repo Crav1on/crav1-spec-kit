@@ -12,7 +12,7 @@ Spark, specify, plan, and verify do not run it. It is not started automatically.
 
 This command reads Azure Boards. It does not create or update a work item. It never writes a field back. The only write to Azure Boards is a discussion comment the user accepted.
 
-CLI checks and the `az` calls: [../crav1-ado-sync/branches/push-features/references/azure-boards.md](../../../crav1-ado-sync/branches/push-features/references/azure-boards.md) (drop-in: `.cursor/skills/crav1/crav1-ado-sync/branches/push-features/references/azure-boards.md`; plugin: sibling `skills/crav1-ado-sync/branches/push-features/references/azure-boards.md`) and [../crav1-ado-sync/branches/push-tasks/references/child-items.md](../../../crav1-ado-sync/branches/push-tasks/references/child-items.md) for the children of a Feature. Do not show those commands in the chat.
+CLI checks and the `az` calls: [../crav1-ado-sync/branches/push-features/references/azure-boards.md](../../../crav1-ado-sync/branches/push-features/references/azure-boards.md) (this skill's `branches/push-features/references/azure-boards.md`) and [../crav1-ado-sync/branches/push-tasks/references/child-items.md](../../../crav1-ado-sync/branches/push-tasks/references/child-items.md) for the children of a Feature. Do not show those commands in the chat.
 
 ## Which spec
 
@@ -30,7 +30,7 @@ For every recorded task id, read State, title, description, Acceptance Criteria 
 
 Then read the children of the spec's Feature in each home (each Feature line in `work-item.md`). A child whose id has no task line is **new**.
 
-Read each id in its own home: the `(ADO: <org>/<project>)` tag on its line, or for an older line without one the marks.md org and project, as [work-item-homes.md](../../../crav1-ado-sync/branches/push-features/references/work-item-homes.md) (drop-in: `.cursor/skills/crav1/crav1-ado-sync/branches/push-features/references/work-item-homes.md`; plugin: sibling `skills/crav1-ado-sync/branches/push-features/references/work-item-homes.md`) says. An id not found in its home is reported as **moved or missing**, with that home. Ask before searching the other projects `az` can read; never search on your own. A deleted id is reported as missing. Do not guess another work item. Do not match on the title.
+Read each id in its own home: the `(ADO: <org>/<project>)` tag on its line, or for an older line without one the marks.md org and project, as [work-item-homes.md](../../../crav1-ado-sync/branches/push-features/references/work-item-homes.md) (this skill's `branches/push-features/references/work-item-homes.md`) says. An id not found in its home is reported as **moved or missing**, with that home. Ask before searching the other projects `az` can read; never search on your own. A deleted id is reported as missing. Do not guess another work item. Do not match on the title.
 
 ## What to show
 

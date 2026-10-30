@@ -4,7 +4,7 @@ Read only when the pointer in `SKILL.md` sends you here.
 
 ## Find the record
 
-Look for the pull request's PR note in the specs repo (found as **After it merged** says: this checkout with `docs/specs/`, else the workspace folder with `docs/specs/`, else a sibling `../*/docs/system/repos.md` with a row for this repo). Search the month `docs/notes/YYYY-MM/index.md` files, then the notes themselves, for `source: PR <n>` with this repo. Read its `## PR record` section, as `crav1-add-to-spec` `references/pr-record.md` says (drop-in: `.claude/skills/crav1-add-to-spec/references/pr-record.md`; plugin: sibling `skills/crav1-add-to-spec/references/pr-record.md`). Read-only.
+Look for the pull request's PR note in the specs repo (found as **After it merged** says: this checkout with `docs/specs/`, else the workspace folder with `docs/specs/`, else a sibling `../*/docs/system/repos.md` with a row for this repo). Search the month `docs/notes/YYYY-MM/index.md` files, then the notes themselves, for `source: PR <n>` with this repo. Read its `## PR record` section, as `crav1-add-to-spec` `references/pr-record.md` says (skill `crav1-add-to-spec`, `references/pr-record.md`). Read-only.
 
 ## The Ready line
 

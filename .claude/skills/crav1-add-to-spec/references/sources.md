@@ -2,7 +2,7 @@
 
 A mail, a transcript, minutes, a chat, a screenshot, a diagram, or another original file that a skill quotes into a spec is an imported source. The quote in the spec stays the words from that source. The original lives in the target project so every verbatim quote can be checked.
 
-This file is the convention. `/crav1-add-to-spec` follow it. A skill that quotes the same kinds of files into a spec follows it too. Drop-in: `.claude/skills/crav1-add-to-spec/references/sources.md`. Plugin, from this skill: `references/sources.md`. Plugin, from another skill: sibling `skills/crav1-add-to-spec/references/sources.md`.
+This file is the convention. `/crav1-add-to-spec` follow it. A skill that quotes the same kinds of files into a spec follows it too. Drop-in: this skill's `references/sources.md`. Plugin, from this skill: `references/sources.md`. Plugin, from another skill: sibling `skills/crav1-add-to-spec/references/sources.md`.
 
 Do not apply this file to a short fact the user typed for one spec, to a fact seen in an environment, to a test suggestion, or to a quote of repository code.
 

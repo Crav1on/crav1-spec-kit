@@ -8,11 +8,11 @@ You do not write those files. The skill that already owns the file adds only wha
 
 Mark every added line `Seen in <host> <environment>.` Keep `shared with prod` when the confirmed line says it. Keep `prod only` when the confirmed line says it. Keep `Shape and connections only.` when the confirmed line says it. A prod-only line keeps `Seen in <host> prod.` Do not mark it as something the code shows. Do not rewrite a line that is already there. A connection is added only when the links section says the environment shows it.
 
-**System.** `/crav1-refresh-system-notes` owns the picture in `docs/system` (drop-in: `.cursor/skills/crav1/crav1-refresh-system-notes/SKILL.md`; plugin: sibling `skills/crav1-refresh-system-notes/SKILL.md`). It adds only a new sentence, node, edge, or connection line. If `docs/system/` is missing, it writes nothing.
+**System.** `/crav1-refresh-system-notes` owns the picture in `docs/system` (skill `crav1-refresh-system-notes`, `SKILL.md`). It adds only a new sentence, node, edge, or connection line. If `docs/system/` is missing, it writes nothing.
 
-**Architecture.** `/crav1-existing-to-specs` owns `docs/architecture/spec.md` (drop-in: `.cursor/skills/crav1/crav1-existing-to-specs/branches/repos-only/BRANCH.md`; plugin: sibling `skills/crav1-existing-to-specs/branches/repos-only/BRANCH.md`). It appends only a new line when that file is already there. If the file is missing, it writes nothing. It does not create the file from the environment.
+**Architecture.** `/crav1-existing-to-specs` owns `docs/architecture/spec.md` (skill `crav1-existing-to-specs`, `branches/repos-only/BRANCH.md`). It appends only a new line when that file is already there. If the file is missing, it writes nothing. It does not create the file from the environment.
 
-**Match.** `/crav1-add-to-spec` owns the quote on a feature spec that already exists (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/SKILL.md`; plugin: sibling `skills/crav1-add-to-spec/SKILL.md`). It adds the quote only on a slice Match already owns. If none does, it writes nothing. It does not create a slug.
+**Match.** `/crav1-add-to-spec` owns the quote on a feature spec that already exists (skill `crav1-add-to-spec`, `SKILL.md`). It adds the quote only on a slice Match already owns. If none does, it writes nothing. It does not create a slug.
 
 **Left out.** `/crav1-existing-to-specs` owns `docs/architecture/left-out.md`. A line the environment now shows comes off that file. A line that stays is not rewritten. The line that comes off is not written back as a guess.
 

@@ -10,7 +10,7 @@ This command is a later skill. It is not a starter option. When the user asks fo
 
 Spark, specify, plan, and verify do not run it. It is not started automatically. The push features branch of `/crav1-ado-sync` may name it and does not run it.
 
-CLI checks and the `az` calls: the same file the push features branch of `/crav1-ado-sync` uses, [azure-boards.md](../../../crav1-ado-sync/branches/push-features/references/azure-boards.md) (drop-in: `.cursor/skills/crav1/crav1-ado-sync/branches/push-features/references/azure-boards.md`; plugin: sibling `skills/crav1-ado-sync/branches/push-features/references/azure-boards.md`), plus [references/child-items.md](references/child-items.md) for the child type and the parent link. Do not show those commands in the chat.
+CLI checks and the `az` calls: the same file the push features branch of `/crav1-ado-sync` uses, [azure-boards.md](../../../crav1-ado-sync/branches/push-features/references/azure-boards.md) (this skill's `branches/push-features/references/azure-boards.md`), plus [references/child-items.md](references/child-items.md) for the child type and the parent link. Do not show those commands in the chat.
 
 ## Check first
 
@@ -21,7 +21,7 @@ On a failure, state the issue, suggest a fix such as `az login`, and offer Retry
 
 ## Work item homes
 
-Each task goes to the home of its repo, as [work-item-homes.md](../../../crav1-ado-sync/branches/push-features/references/work-item-homes.md) (drop-in: `.cursor/skills/crav1/crav1-ado-sync/branches/push-features/references/work-item-homes.md`; plugin: sibling `skills/crav1-ado-sync/branches/push-features/references/work-item-homes.md`) says: read the `Work items go to` cell in `docs/system/repos.md`, and ask for an empty one, once per repo. A task with no clear repo is asked once, suggesting the spec's main repo. A task whose repos are in different homes is asked: split it (through `/crav1-add-to-spec`) or pick one repo's home.
+Each task goes to the home of its repo, as [work-item-homes.md](../../../crav1-ado-sync/branches/push-features/references/work-item-homes.md) (this skill's `branches/push-features/references/work-item-homes.md`) says: read the `Work items go to` cell in `docs/system/repos.md`, and ask for an empty one, once per repo. A task with no clear repo is asked once, suggesting the spec's main repo. A task whose repos are in different homes is asked: split it (through `/crav1-add-to-spec`) or pick one repo's home.
 
 Its parent is the spec's Feature **in that same home** (the Feature line whose `(ADO: …)` tag matches). When the spec has no Feature in that home, say so and name the push features branch of `/crav1-ado-sync`. Do not send that task. Do not parent it to a Feature in another home.
 
@@ -39,35 +39,7 @@ The user picks by number, or all. Stop until they pick. Do not preview a task th
 
 ## Child type
 
-Read the child work item type and its done state for **that task's home** from the lines in `docs/environments/marks.md`:
-
-```text
-Azure Boards task type (<project>): <type>
-Azure Boards task done state (<project>): <state>
-```
-
-A line without `(<project>)` is the line for the marks.md project. Each home asks its own type once.
-
-When the type line is there, use it. Do not ask. The user changes it by editing that line. When the type line is there and the done-state line is missing, read the type's states once as [references/child-items.md](references/child-items.md) says and append the done-state line. Do not ask.
-
-When the line is missing, read the project's work item types as [references/child-items.md](references/child-items.md) says, and ask once which type a task becomes. Options only: the returned types.
-
-Recommend one, as [references/child-items.md](references/child-items.md) says. Read the project's process and its backlog levels. The recommendation is the type on the requirement backlog level, the level directly under Feature. Put it first, marked `(Recommended)`, with one plain reason:
-
-| Process | Recommended | Reason |
-| --- | --- | --- |
-| Agile | User Story | A User Story sits directly under a Feature. A Task belongs under a User Story. |
-| Scrum | Product Backlog Item | A Product Backlog Item sits directly under a Feature. |
-| Basic | Issue | Issue is the requirement level in Basic. A Task belongs under an Issue. |
-| CMMI | Requirement | A Requirement sits directly under a Feature. |
-
-An inherited or custom process uses its requirement backlog level, whatever its name. Use the type that level returns, not the table, when they differ. Offer `Bug` as the recommendation only when the team tracks bugs as requirements. Otherwise `Bug` stays an option without a mark.
-
-When the process or the backlog levels cannot be read, say so in one line and give no recommendation. Do not guess from the type names.
-
-Use the questions tool when it is available. Stop until they pick. Then read that type's states, as [references/child-items.md](references/child-items.md) says: the done state is the state in the `Completed` category, for example `Closed` on Agile and `Done` on Scrum and Basic. Append the type line and the done-state line to `docs/environments/marks.md`. Create the file when it is missing. Do not rewrite other lines. When the states cannot be read, say so, append only the type line, and send no state other than New in this run.
-
-Then read that type's fields once, as `azure-boards.md` reads the Feature fields, to see whether it has Acceptance Criteria.
+Read this skill's `branches/push-tasks/references/child-type.md` now, before you go on.
 
 ## Preview
 
@@ -111,21 +83,7 @@ An **Update** shows only the fields that differ from what `az boards work-item s
 
 ### State
 
-The kit sets only two states: New and the saved done state. It never sets Active, Resolved, or any other in-progress state. Those stay with people. It never sends Reason. Azure Boards fills its default.
-
-On a **Create**, an open box is created as New and a ticked box as the done state, so the Feature shows all its work.
-
-On an **Update**, compare the `tasks.md` box with the State that `az boards work-item show` returns. Use the `tasks.md` git history (`git log -p -- docs/specs/<slug>/tasks.md`) to tell whether the box changed locally since the item was created.
-
-| `tasks.md` box | State in Azure Boards | Preview |
-| --- | --- | --- |
-| Ticked | Done state | Nothing. They match |
-| Ticked, and the tick is newer than the create | Not done (New, Active, Resolved, …) | Offer **State: <current> → <done state>** |
-| Open, and the box was ticked before | Done state | Offer **Reopen: <done state> → New** |
-| Open | Not done | Nothing. Leave Active or any other state as it is |
-| Ticked, and the tick is not newer than the create; or open, and never ticked in the history | Done state differs from the box |  **Conflict.** Show both sides: the box and its last change in `tasks.md`, and the Azure Boards State with who changed it and when from the history. Ask each time: set Azure Boards to match `tasks.md`, or leave Azure Boards and bring it back with the pull tasks branch of `/crav1-ado-sync`, or leave both |
-
-When the history cannot tell, treat the row as a conflict and ask. Never pick a winner on your own. A state change is its own line in the preview and its own yes. Send it only on that yes. A skip leaves the State as it is.
+Read this skill's `branches/push-tasks/references/state.md` now, before you go on.
 
 ### Edits
 

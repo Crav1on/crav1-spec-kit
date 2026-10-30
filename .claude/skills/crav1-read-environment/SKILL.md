@@ -24,7 +24,7 @@ Cloud commands stay read-only. This skill does not create, update, delete, deplo
 
 This is not `/crav1-existing-to-specs`. That command reads repos. This command reads a host. This is not `/crav1-existing-to-specs`. Match needs a dump and writes one spec per slice. This command does not create a slug. This is not `/crav1-add-to-spec`. `/crav1-map-pipeline-environments` proposes pipeline lines for `docs/environments/marks.md`. This command does not run it and does not write those lines.
 
-The host readers list a database and a storage account. They do not open them. After the first read, and before any section, this command can look inside. SQL metadata is [references/sql.md](references/sql.md). Storage structure is [references/storage.md](references/storage.md). Drop-in: `.claude/skills/crav1-read-environment/references/`. Plugin: this skill’s `references/`. Both run only when the user says yes. A no leaves them unopened. The first read does not list tables, columns, prefixes, or blobs as facts.
+The host readers list a database and a storage account. They do not open them. After the first read, and before any section, this command can look inside. SQL metadata is [references/sql.md](references/sql.md). Storage structure is [references/storage.md](references/storage.md). Drop-in: this skill's `references/`. Plugin: this skill’s `references/`. Both run only when the user says yes. A no leaves them unopened. The first read does not list tables, columns, prefixes, or blobs as facts.
 
 ## Start
 

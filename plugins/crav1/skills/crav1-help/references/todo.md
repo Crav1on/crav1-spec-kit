@@ -6,7 +6,7 @@ Read only on `todo`. What to do next, ranked from the records the kit already ke
 
 - `todo`: every item, grouped by rank.
 - `todo next`: the top 5. `todo top N`: the top N.
-- A scope may follow: a person, a spec, a topic, a branch, or a pull request (`pr71`, `pr 71`, `#71`, `pr <repo> 71`), as `crav1-add-to-spec` `references/scope.md` says (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/references/scope.md`; plugin: sibling `skills/crav1-add-to-spec/references/scope.md`). No scope: every spec. `todo for <name>` sets who "you" are.
+- A scope may follow: a person, a spec, a topic, a branch, or a pull request (`pr71`, `pr 71`, `#71`, `pr <repo> 71`), as `crav1-add-to-spec` `references/scope.md` says (skill `crav1-add-to-spec`, `references/scope.md`). No scope: every spec. `todo for <name>` sets who "you" are.
 
 ## What it reads
 

@@ -8,9 +8,9 @@ Each host has its own reader. The reader lists what that host actually has, then
 
 This build has three readers.
 
-- **Azure** — [references/azure.md](azure.md) (drop-in: `.claude/skills/crav1-read-environment/references/azure.md`; plugin: this skill’s `references/azure.md`).
-- **AWS** — [references/aws.md](aws.md) (drop-in: `.claude/skills/crav1-read-environment/references/aws.md`; plugin: this skill’s `references/aws.md`). Amazon Web Services is AWS.
-- **Google Cloud** — [references/google-cloud.md](google-cloud.md) (drop-in: `.claude/skills/crav1-read-environment/references/google-cloud.md`; plugin: this skill’s `references/google-cloud.md`). GCP is Google Cloud.
+- **Azure** — [references/azure.md](azure.md) (this skill's `references/azure.md`).
+- **AWS** — [references/aws.md](aws.md) (this skill's `references/aws.md`). Amazon Web Services is AWS.
+- **Google Cloud** — [references/google-cloud.md](google-cloud.md) (this skill's `references/google-cloud.md`). GCP is Google Cloud.
 
 Check the host name before any read.
 

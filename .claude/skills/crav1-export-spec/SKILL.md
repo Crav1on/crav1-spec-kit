@@ -13,7 +13,7 @@ color: orange
 
 Find `docs/specs/<slug>/spec.md` (user @-mention, else most recently edited spec excluding `_template`).
 
-Read `references/formats.md` from skill `crav1-ideas-to-spec` (drop-in: `.claude/skills/crav1-ideas-to-spec/references/formats.md`; plugin: sibling `skills/crav1-ideas-to-spec/references/formats.md`) and write only the requested format(s) under `docs/specs/<slug>/export/`.
+Read `references/formats.md` from skill `crav1-ideas-to-spec` (skill `crav1-ideas-to-spec`, `references/formats.md`) and write only the requested format(s) under `docs/specs/<slug>/export/`.
 
 Rules:
 

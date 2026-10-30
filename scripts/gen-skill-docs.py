@@ -6,7 +6,8 @@
   scripts/gen-skill-docs.py --check  exit non-zero when a page is stale, a page
                                      is extra, or the data file is out of line
                                      with the skill folders, the subagents, or
-                                     the lanes in docs/guild-routing.md
+                                     the routing block;
+                                     also writes docs/guild-routing.md (1.107.0)
 
 Needs PyYAML (pip install pyyaml).
 """
@@ -92,9 +93,14 @@ def validate(data: dict) -> list[str]:
         if a not in agents:
             errors.append(f"skills.yaml lists subagent {a}, but .cursor/agents/{a}.md is missing")
     starters = set(data["starter_options"])
-    routing = yaml.safe_load(ROUTING.read_text(encoding="utf-8").split("```yaml", 1)[1].split("```", 1)[0])
-    if set(routing["starters"]) != starters:
-        errors.append("starter_options differ from the starters in docs/guild-routing.md")
+    routing = data.get("routing") or {}
+    if set(routing.get("starters_runs_when", {})) != starters:
+        errors.append("routing.starters_runs_when must name exactly the starter_options")
+    lane_of = {x["name"]: x["lane"] for x in skills}
+    for lid, lane in (routing.get("lanes") or {}).items():
+        for n in lane.get("skills", {}):
+            if lane_of.get(n) != lid:
+                errors.append(f"routing.lanes.{lid} has text for {n}, whose lane is {lane_of.get(n)}")
     for s in skills:
         n = s["name"]
         for q in s.get("choice_words") or []:
@@ -109,8 +115,6 @@ def validate(data: dict) -> list[str]:
             errors.append(f"{n}: group {s['group']} is not a group of lane {s['lane']}")
         if bool(s["starter"]) != (n in starters):
             errors.append(f"{n}: starter flag differs from starter_options")
-        if n not in routing[LANE_KEYS[s["lane"]]]["skills"]:
-            errors.append(f"{n}: lane {s['lane']} differs from docs/guild-routing.md")
         w = s.get("walkthrough")
         if w and not (ROOT / w).is_file():
             errors.append(f"{n}: walkthrough {w} does not exist")
@@ -131,8 +135,6 @@ def validate(data: dict) -> list[str]:
     for a in data["subagents"]:
         if a["lane"] not in lanes:
             errors.append(f"{a['name']}: unknown lane {a['lane']}")
-        elif a["name"] not in routing[LANE_KEYS[a["lane"]]].get("subagents", []):
-            errors.append(f"{a['name']}: lane {a['lane']} differs from docs/guild-routing.md")
     return errors
 
 
@@ -282,8 +284,45 @@ def render_index(data: dict) -> str:
     return "\n".join(out)
 
 
+def render_routing(data: dict) -> str:
+    """docs/guild-routing.md (1.107.0): lanes from skills[].lane and subagents[].lane, prose from routing."""
+    r = data["routing"]
+    out = ["# Guild routing", "", GENERATED, ""]
+    out += [p + "\n" for p in r["intro"]]
+    out += ["## Starter options", "", r["starters_intro"], "", "| Starter | Runs when |", "| --- | --- |"]
+    out += [f"| `/{n}` | {r['starters_runs_when'][n]} |" for n in data["starter_options"]]
+    out += [""] + [p + "\n" for p in r["starters_outro"]]
+    for lane in data["lanes"]:
+        lid = lane["id"]
+        lr = r["lanes"].get(lid, {})
+        out += [f"## {lane['title']}", "", "| Kind | Name |", "| --- | --- |"]
+        out += [f"| Skill | `/{x['name']}` |" for x in data["skills"] if x["lane"] == lid]
+        out += [f"| Subagent | `{x['name']}` |" for x in data["subagents"] if x["lane"] == lid]
+        out.append("")
+        for x in data["skills"]:
+            out += [p + "\n" for p in lr.get("skills", {}).get(x["name"], [])]
+        out += [p + "\n" for p in lr.get("notes", [])]
+    out += ["## Maintainer note", ""] + [p + "\n" for p in r["maintainer_note"]]
+    out += ["## Recommended option", ""] + [p + "\n" for p in r["recommended_option"]]
+    out += ["## Choice words for bots and scripted runs", "", r["choice_words_intro"], "", "| Skill | Question | Words |", "| --- | --- | --- |"]
+    for x in data["skills"]:
+        for q in x.get("choice_words") or []:
+            out.append(f"| `/{x['name']}` | {q['question']} | " + " · ".join(f"`{w['word']}`" for w in q["words"]) + " |")
+    out += ["", r["choice_words_example"], "", "## Machine-readable map", "", "```yaml", "starters:"]
+    out += [f"  - {n}" for n in data["starter_options"]]
+    for lane in data["lanes"]:
+        lid = lane["id"]
+        out += [f"{LANE_KEYS[lid]}:", "  skills:"] + [f"    - {x['name']}" for x in data["skills"] if x["lane"] == lid]
+        subs = [x["name"] for x in data["subagents"] if x["lane"] == lid]
+        out += ["  subagents:" + ("" if subs else " []")] + [f"    - {n}" for n in subs]
+        if lid == "cross-cutting":
+            out += ["  helpers:"] + [f"    - {h}" for h in r["helpers"]]
+    out += ["```", ""]
+    return "\n".join(out)
+
+
 def expected(data: dict) -> dict[Path, str]:
-    files = {TABLE: render_table(data), TABLE.parent / "index.yaml": render_index(data)}
+    files = {TABLE: render_table(data), TABLE.parent / "index.yaml": render_index(data), ROUTING: render_routing(data)}
     for s in data["skills"]:
         files[PAGES / f"{s['name']}.md"] = render_page(s, data)
     return files

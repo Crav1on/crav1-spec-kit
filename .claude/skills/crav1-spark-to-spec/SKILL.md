@@ -56,7 +56,7 @@ Stop and wait. Do not write `spec.md` or `docs/system/` until they answer or say
 
 ## After they answer
 
-**Branch first** when this is a git repo with commits (brownfield, later feature, or they have a default branch). Follow `/crav1-create-feature-branch` (drop-in: `.claude/skills/crav1-create-feature-branch/SKILL.md`; plugin: sibling `skills/crav1-create-feature-branch/SKILL.md`). Propose slug, then the branch prompt. If that prompt is needed, **this turn is branch only** after they already answered product questions — or include the branch question in the same wait as “use assumptions” if you already know the slug. Do not write `spec.md` or `docs/system/` until the branch choice is done (or skipped). Greenfield empty repo: skip the branch prompt.
+**Branch first** when this is a git repo with commits (brownfield, later feature, or they have a default branch). Follow `/crav1-create-feature-branch` (skill `crav1-create-feature-branch`, `SKILL.md`). Propose slug, then the branch prompt. If that prompt is needed, **this turn is branch only** after they already answered product questions — or include the branch question in the same wait as “use assumptions” if you already know the slug. Do not write `spec.md` or `docs/system/` until the branch choice is done (or skipped). Greenfield empty repo: skip the branch prompt.
 
 **Thin landscape, then spec, then index.**
 
@@ -66,7 +66,7 @@ Then write `docs/specs/<slug>/spec.md` from this skill’s `assets/spec.md` (sam
 
 Fill every section. Read `references/spec-rules.md` ("Fill every section") before you write the spec.
 
-**Picture.** After the index row, follow [picture.md](../crav1-refresh-system-notes/references/picture.md) (drop-in: `.claude/skills/crav1-refresh-system-notes/references/picture.md`; plugin: sibling `skills/crav1-refresh-system-notes/references/picture.md`). Add what this pass added to the short description, the diagram, and how the parts connect. Do not rewrite a sentence, a diagram node, a diagram edge, or a connection line that is already there. Do not run `/crav1-refresh-system-notes` as a second turn. When this pass seeded `docs/system/`, the seed fill of those three is the picture for what was already in front of you; the picture update still adds anything the new spec states that those three do not yet say. Do not rewrite existing glossary rows.
+**Picture.** After the index row, follow [picture.md](../crav1-refresh-system-notes/references/picture.md) (skill `crav1-refresh-system-notes`, `references/picture.md`). Add what this pass added to the short description, the diagram, and how the parts connect. Do not rewrite a sentence, a diagram node, a diagram edge, or a connection line that is already there. Do not run `/crav1-refresh-system-notes` as a second turn. When this pass seeded `docs/system/`, the seed fill of those three is the picture for what was already in front of you; the picture update still adds anything the new spec states that those three do not yet say. Do not rewrite existing glossary rows.
 
 Then output only:
 

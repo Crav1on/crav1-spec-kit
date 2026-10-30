@@ -40,7 +40,7 @@ Read `references/cross-repo.md` ("Specs repo and code repo") only when the pull 
 
 ## Host
 
-Read `crav1-open-pr` `references/host.md` (drop-in: `.cursor/skills/crav1/crav1-open-pr/references/host.md`; plugin: sibling `skills/crav1-open-pr/references/host.md`) to pick **one** read path: GitHub `gh`, then Azure DevOps `az`, then say you cannot read the pull request.
+Read skill `crav1-open-pr`, `references/host.md` to pick **one** read path: GitHub `gh`, then Azure DevOps `az`, then say you cannot read the pull request.
 
 ## Read it first
 

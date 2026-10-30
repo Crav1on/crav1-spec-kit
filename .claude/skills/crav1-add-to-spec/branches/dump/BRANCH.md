@@ -2,7 +2,7 @@
 
 You sort a later dump onto specs that already exist. Then you write the new bits into the matching `spec.md` files. Then you check whether `docs/system/` or another spec has to change, and you report that impact. You do not silently rewrite those other files. The glossary append and the picture update are the exceptions: new glossary rows, and new picture lines, when `docs/system/` already exists. You do not rewrite existing glossary rows or existing picture lines. You do not write application code. You do not plan, implement, or commit.
 
-Read `crav1-add-to-spec` `references/dump-scope.md` (drop-in: `.claude/skills/crav1-add-to-spec/references/dump-scope.md`; plugin: sibling `skills/crav1-add-to-spec/references/dump-scope.md`) only when the request may not be a dump: a fact for one named spec, repos plus a dump, a tighten request, a request to create specs, or a status question.
+Read this skill's `references/dump-scope.md` only when the request may not be a dump: a fact for one named spec, repos plus a dump, a tighten request, a request to create specs, or a status question.
 
 A not-started spec (match status `not in the code`, or a thin spec) can keep taking information until planning. Adding information does not start planning and does not write `plan.md` or `tasks.md`.
 
@@ -22,7 +22,7 @@ If there are no spec folders, stop. Point at `/crav1-spark-to-spec`, `/crav1-ide
 
 ## Duplicate check (1.61.0)
 
-Before the sort, run the duplicate check in `crav1-add-to-spec` `references/notes.md` (drop-in: `.claude/skills/crav1-add-to-spec/references/notes.md`; plugin: sibling `skills/crav1-add-to-spec/references/notes.md`). The same source again (the same file, mail, or meeting) is not imported twice: say `already imported on <date> as docs/notes/YYYY-MM/<file>.md`, and ask **Reuse the existing note (Recommended)** or **Skip**. Reuse sorts only for specs that took nothing from that note yet. Skip stops. A dump of several files checks each file.
+Read this skill's `branches/dump/references/duplicate-and-note.md` now, before you go on.
 
 ## Sort (no writes yet)
 
@@ -32,7 +32,7 @@ Read every existing `spec.md` (skip `_template`) and the dump. Then show three p
 2. **Already in that spec** — the dump repeats what that `spec.md` already says. Name the slug and the heading. Do not plan a second copy.
 3. **Does not fit any of them** — the dump’s words that match no existing spec. Exploration with no feature yet, technical debt, and general information gathering land here. They stay in the full note (1.61.0). Leave them on the list. Do not invent a slug.
 
-Before the piles, read `## Open questions` on every spec with the records under each question. Follow `crav1-add-to-spec` `references/open-questions.md` (drop-in: `.claude/skills/crav1-add-to-spec/references/open-questions.md`; plugin: sibling `skills/crav1-add-to-spec/references/open-questions.md`). Match by meaning, whether the question is asked, pending, or not marked. A fact that clearly answers one goes on the **belongs** pile with `Answers: "<question>"` and `Linked with the sort.` There is no separate question for it. When it would change a spec line, the line also says `Then: /crav1-resolve-open-questions for <slug>.` A fact that only might answer, or answers part, keeps its pile and shows `Possible answer to: "<question>". The question stays open.` When the dump is a mail, a transcript, or a chat that shows a spec open question being asked, list it under `Asked in this dump` with the spec and the date the source shows. That is not a pile.
+Before the piles, read `## Open questions` on every spec with the records under each question. Follow this skill's `references/open-questions.md`. Match by meaning, whether the question is asked, pending, or not marked. A fact that clearly answers one goes on the **belongs** pile with `Answers: "<question>"` and `Linked with the sort.` There is no separate question for it. When it would change a spec line, the line also says `Then: /crav1-resolve-open-questions for <slug>.` A fact that only might answer, or answers part, keeps its pile and shows `Possible answer to: "<question>". The question stays open.` When the dump is a mail, a transcript, or a chat that shows a spec open question being asked, list it under `Asked in this dump` with the spec and the date the source shows. That is not a pile.
 
 A greeting, scheduling, and thanks are noise. Drop them. They are not a pile. Dismiss stays for that noise. A dropped line is not on a pile.
 
@@ -50,20 +50,11 @@ Stop. They confirm or edit the sort. Do not write files. That confirmation is th
 
 ## Write the full note (1.61.0)
 
-After the sort is confirmed, write **one note** holding the whole dump, as `crav1-add-to-spec` `references/notes.md` (drop-in: `.claude/skills/crav1-add-to-spec/references/notes.md`; plugin: sibling `skills/crav1-add-to-spec/references/notes.md`) says. There is no Note pile and nothing is asked about the note. A dump of several separate sources (different mails, meetings, or files) writes one note per source; never split one source.
-
-- Run the imported-sources convention first, in **Write the new bits**. The note holds the text after its redaction and its `source_folder` is that folder.
-- Path: `docs/notes/YYYY-MM/YYYY-MM-DD-<slug>.md` by the **source date** the dump shows. No date: the import date, `source_date: none`, and say so.
-- Each belongs quote is followed by `Full source: docs/notes/YYYY-MM/<file>.md`, and the slug goes in the note's `used_by`. A matching parked spec gets nothing; its slug goes in `waiting_for`.
-- The same point already on a spec from another source adds this note as a second source on that line. A disagreement is a **Conflict:** line, never an overwrite.
-- Never ask an absorb question. Never write `Absorbed by`.
-- Run `scripts/notes_index.py` after the note changes. Do not hand-edit an index.
-
-Do not commit.
+This step is in the same file, this skill's `branches/dump/references/duplicate-and-note.md`.
 
 ## Write the new bits
 
-When a confirmed quote comes from a mail, a transcript, minutes, a chat, a screenshot, a diagram, or another original file, follow the imported-sources convention before that quote (drop-in: `.claude/skills/crav1-add-to-spec/references/sources.md`; plugin: sibling `skills/crav1-add-to-spec/references/sources.md`). Its personal-data and secrets check is in that file; flagged items, the transfer data policy, and the one question are in `references/sources-flagged.md`, and a mail's images in `references/sources-mail.md` and `references/sources-binary.md`, all in `crav1-add-to-spec`. Write `docs/sources/YYYY-MM-DD-<slug>/` once per source. Add the `Source:` and `Trace:` lines from that file. Do not commit. A quote that is not from an imported source does not get a source folder. With `mail`, read `sources.md` and `sources-mail.md` before the sort. With `chat`, an exported chat file is an imported source; pasted chat text is not.
+When a confirmed quote comes from a mail, a transcript, minutes, a chat, a screenshot, a diagram, or another original file, follow the imported-sources convention before that quote (this skill's `references/sources.md`). Its personal-data and secrets check is in that file; flagged items, the transfer data policy, and the one question are in `references/sources-flagged.md`, and a mail's images in `references/sources-mail.md` and `references/sources-binary.md`, all in `crav1-add-to-spec`. Write `docs/sources/YYYY-MM-DD-<slug>/` once per source. Add the `Source:` and `Trace:` lines from that file. Do not commit. A quote that is not from an imported source does not get a source folder. With `mail`, read `sources.md` and `sources-mail.md` before the sort. With `chat`, an exported chat file is an imported source; pasted chat text is not.
 
 Edit `docs/specs/<slug>/spec.md` for slugs in the confirmed **belongs** pile. An imported source also writes its source folder, as that convention says. Write them in this chat. Do not launch a worker.
 
@@ -89,35 +80,17 @@ A thin spec stays thin, as **Thin spec** in `crav1-add-to-spec` `SKILL.md` says.
 
 A fuller spec keeps its headings. Place the quote in the section it extends. Add an acceptance checkbox only when they stated a check a stranger could run, and label that checkbox `**New:**`. That checkbox stays yes/no. Name unit, system, or browser only when that kind is already obvious from the source. Otherwise leave the kind for plan. Do not invent a test list. Do not turn a wish into a checkbox.
 
-Expected headings when the file already uses the full spec shape: this skill’s `assets/spec.md` (same file as `docs/specs/_template/spec.md`; drop-in: `.claude/skills/crav1-add-to-spec/branches/dump/assets/spec.md`; plugin: this skill’s `assets/spec.md`). A match-shaped spec does not have to grow those headings.
+Expected headings when the file already uses the full spec shape: this skill’s `assets/spec.md` (same file as `docs/specs/_template/spec.md`; this skill's `branches/dump/assets/spec.md`). A match-shaped spec does not have to grow those headings.
 
-Read `crav1-add-to-spec` `references/dump-answers.md` (drop-in: `.claude/skills/crav1-add-to-spec/references/dump-answers.md`; plugin: sibling `skills/crav1-add-to-spec/references/dump-answers.md`) only when the confirmed sort has a fact with `Answers:` or a line under `Asked in this dump`.
+Read this skill's `references/dump-answers.md` only when the confirmed sort has a fact with `Answers:` or a line under `Asked in this dump`.
 
 The full note is written under **Write the full note**. It does not become a spec. The **does not fit** pile is listed and left alone. Do not create a spec for it. If they say to create one, do not write a folder here. Point at the skill that creates a spec, and do not run it:
 
-Read `crav1-add-to-spec` `references/dump-new-spec.md` (drop-in: `.claude/skills/crav1-add-to-spec/references/dump-new-spec.md`; plugin: sibling `skills/crav1-add-to-spec/references/dump-new-spec.md`) for which skill to point at.
+Read this skill's `references/dump-new-spec.md` for which skill to point at.
 
 ## Impact (before any other edit)
 
-The new quotes are already in the matching specs. Read `docs/system/` when it exists (`landscape.md`, `repos.md`, `diagrams.md`, `glossary.md`, `adr/`) and every other `docs/specs/<slug>/spec.md` (skip `_template`). Other means a spec that did not just receive a new quote, plus any heading on a spec you did edit that the confirmed sort did not already cover. Check whether the new information contradicts or extends the landscape, a repo row, a diagram, an ADR, or another spec.
-
-Also compare each kept quote with research, as **Research compare** in `crav1-add-to-spec` `SKILL.md` says. This question is not an apply option. When it is open, ask it before the landscape question. Do not ask both in the same turn. Do not commit.
-
-When `docs/system/` exists, read `crav1-add-to-spec` `references/dump-landscape.md` (drop-in: `.claude/skills/crav1-add-to-spec/references/dump-landscape.md`; plugin: sibling `skills/crav1-add-to-spec/references/dump-landscape.md`) for the glossary and the picture.
-
-Do not edit anything outside the confirmed belongs writes in this step, except the glossary gap, the picture update below, a research mark that `crav1-add-to-spec` `references/research-stale.md` already allowed after a yes, or a clear, a narrowed mark, a resolved line, or an open question that the same file says to write. The clear does not wait for a yes. A note already written under **Write the full note** stays. A source folder already written under **Write the new bits** stays. Do not edit it in this step. Notes are not an impact edit. Do not list them as an apply option. The research mark is not a landscape edit. Do not seed `docs/system/` when it is missing. Say it is missing and that this command does not create it. When that folder is missing, do nothing about a glossary and do nothing about the picture. The research check still runs.
-
-Do not edit `plan.md` or `tasks.md` when they exist, and do not list them as proposed edits. One line in the report when they exist: they were left alone. Adding information does not start planning.
-
-Report:
-
-- If nothing else is affected, say so. Do not ask. `docs/system/` and the specs outside those writes stay as they are.
-- If something else is affected, stop and ask. Options only. Use the questions tool when it is available.
-  1. **Apply the listed edits**
-  2. **Leave the other files alone**
-- List each proposed edit in one line: the file, and what would change. One line per file change. No surrounding rewrite.
-
-Do not silently rewrite `docs/system/` or specs the sort did not already write. The glossary write above is one exception: a missing file, or new rows appended to an existing file. The picture update is the other: new lines on the short description, the diagram, and how the parts connect. Apply the other edits only if they pick apply, and only the lines you listed. If they pick leave, do not edit those files. Do not rewrite existing glossary rows or existing picture lines either way. Do not list the picture lines again as an apply option. A listed edit to a `repos.md` row keeps the `Synced at` line in `repos.md`. Do not set it and do not clear it. This command does not record the commit.
+Read this skill's `branches/dump/references/impact.md` now, before you go on.
 
 ## Stop
 

@@ -1,6 +1,6 @@
 # crav1-finalize-commit: base branch (1.99.0)
 
-Read only when the pointer in `SKILL.md` sends you here. Implementation code is never committed on a base branch. The guard is `crav1-create-feature-branch` `references/code-branch.md` (drop-in: `.claude/skills/crav1-create-feature-branch/references/code-branch.md`; plugin: sibling `skills/crav1-create-feature-branch/references/code-branch.md`).
+Read only when the pointer in `SKILL.md` sends you here. Implementation code is never committed on a base branch. The guard is skill `crav1-create-feature-branch`, `references/code-branch.md`.
 
 ## When it applies
 

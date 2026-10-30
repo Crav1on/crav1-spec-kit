@@ -2,7 +2,7 @@
 
 A kept quote can contradict a research note, or answer a question that note still leaves open. This file is how the kit marks that research stale, how it checks an updated note, how it clears or narrows the mark, how it routes a point that stays open, how it routes an open question the updated note still has, and how readers show it.
 
-This file is the convention. Drop-in: `.cursor/skills/crav1/crav1-add-to-spec/references/research-stale.md`. Plugin, from this skill: `references/research-stale.md`. Plugin, from another skill: sibling `skills/crav1-add-to-spec/references/research-stale.md`.
+This file is the convention. Drop-in: this skill's `references/research-stale.md`. Plugin, from this skill: `references/research-stale.md`. Plugin, from another skill: sibling `skills/crav1-add-to-spec/references/research-stale.md`.
 
 The skills that follow this file write the mark, the clear, the narrowed line, and any open question this file names. They do not commit. They do not push. They do not open a pull request. The user commits.
 

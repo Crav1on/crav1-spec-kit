@@ -45,109 +45,23 @@ Stop until they pick. Do not read for facts yet. Do not write files.
 
 ## What is already there
 
-Check the destination before the read. Do not stop because a note is already in `docs/system/`. Do not stop because `docs/architecture/spec.md` is already there. Name which pass this is, then read.
-
-A real note is a short description that is not the template sentence, a diagram that is not only the template sample, a connection line that is not the template intro, a repo row, a glossary row, an ADR, or a feature-index row with a slug. The template sentence `What this product/system is, in one short paragraph.` is not a short description. The template diagram `user[User] --> app[App]` with no other node is not a diagram of this system. A `docs/system/` that is missing, or that is only the untouched template, is not already written.
-
-Three passes:
-
-1. **First write.** `docs/architecture/spec.md` is missing, and `docs/system/` is missing or only the untouched template. Write the architecture spec, the left-out file, and the system notes.
-2. **Missing architecture spec.** `docs/architecture/spec.md` is missing, and a real note is already in `docs/system/`. Write `docs/architecture/spec.md` and `docs/architecture/left-out.md`. Leave every system note as it is. Do not add a line to those notes. Do not rewrite them.
-3. **Later re-read.** `docs/architecture/spec.md` is already there. Add only what is new to that file. Do not rewrite a line that is already there. The same rule for system notes that are already there. Update `docs/architecture/left-out.md` when a line is added, removed, or dismissed. When `docs/system/` is missing or only the untouched template, those notes are not already there, so this pass writes them and still only adds what is new to the architecture spec.
-
-The architecture spec path is locked: `docs/architecture/spec.md`. The left-out path is locked beside it: `docs/architecture/left-out.md`. Both stay out of `docs/system` and out of `docs/specs`. Do not invent any other folder. Do not create `docs/specs/architecture/`. Do not put left-out guesses under a heading in `spec.md`.
-
-Do not point this pass at `/crav1-explain-existing-system`. Do not run it.
+Read this skill's `branches/repos-only/references/already-there.md` now, before you go on.
 
 ## Read (no files yet)
 
-Read the named repos. On a later re-read, also read `docs/architecture/spec.md`, `docs/architecture/left-out.md` when that file exists, and the real notes in `docs/system/` so you know which lines are already there. Then show the confirmation in sections. Do not merge those sections into one list. Do not write files.
-
-On every re-read, check the code again for every line in `docs/architecture/left-out.md`, especially the lines under `## Left out`. A similar name, a README wish, or a matching identifier that the code does not actually call is not enough.
-
-- When the code now shows the fact, that line is a confirmed fact. Put it in that repo’s section and cite the path. It is not a guess. It does not stay in the left-out section.
-- When the code now shows a real link, that line is a link. Put it in the links section and cite the path. It does not stay in the left-out section. Confirming a guess does not turn it into a link. Only the code does.
-- When the code still does not show it, a `## Left out` line stays in the left-out section. A `## Dismissed` line stays dismissed. Do not offer a dismissed line.
-
-Use only these sections. One section per named repo, for that repo’s confirmed facts. One section for inferred guesses. One section for links. One section for left-out. Do not invent another section.
-
-List every item in its section. Do not drop a confirmed fact, a guess, a link, or a left-out line to keep a section short. On a later re-read, mark a fact or a link that is already a line as already written. Keep it in its section. The write does not add it again.
-
-**Named repo.** One section. The heading is that repo’s name. Confirmed facts for that repo only. A fact the code shows. A reader can point at a file, a type, a route, a config key, or a dependency. Cite the path on every line. A fact with no path is not confirmed. When this repo shows no confirmed fact, the section says so. Do not invent a fact.
-
-A smaller fact beats a story. A name a file shows stays confirmed. A purpose the code does not state is inferred.
-
-**Inferred.** One section. A guess. A purpose, a product story, or a “should” the code does not state. A guess stays out until this section’s answer accepts it, or the left-out section’s answer accepts it. Then it is accepted from a guess, not a fact the code shows. When the read has no new guess, the section says so. Do not invent a guess. Do not put a guessed link in this section as something to accept. Do not list a guess that is already under `## Left out` or `## Dismissed`.
-
-**Links.** One section. A link is code in one named repo that reaches another named repo: a call, an import, a URL, a client, a queue, or a config entry. Cite the path. A link is written only when the code shows it. A comment, a README wish, or a similar name is not a link. Confirming a guess does not turn it into a link. One named repo has no second repo to reach. The section says only one repo was named. Do not invent a link inside that repo and call it a link between repos. When more than one repo was named and the code shows no link, the section says no link between these repos is in the code. Do not offer a guessed link as something to accept.
-
-**Left out.** One section, asked in the same questions call as the others (1.70.0); it lists the inferred guesses with the note that a guess accepted under inferred drops out of it. List every line under `## Left out` that the code still does not show, and every guess the inferred answer did not accept. Each line is the guess, and it says the code does not show it. It is not a confirmed fact and it is not a link. When no such line remains, the section says no line is left out. Do not list a `## Dismissed` line. Do not drop a line to keep the section short.
-
-Stop. Do not write files. Each section gets its own question and its own answer. Do not collapse those questions into one write-or-not question. Stop until each section has an answer. Those answers are the only stop before writing. Do not open a feature interview, an architecture interview, or an export-format question.
-
-Use the questions tool when it is available. Options only. One question per section, in this order: each named repo, then inferred, then links, then left out, all in one questions call (1.70.0). Put that section’s items in the question prompt. Do not shorten the prompt by dropping an item. When the tool cannot take several questions in one call, list them in one message and take the answers together. Do not write between answers.
-
-**Named repo, when it lists facts.** Options:
-
-1. **Write every fact in this section.**
-2. **Write none of this section.**
-3. **I will edit this section.**
-
-**Named repo, when it has no confirmed fact.** The section already says so. Options:
-
-1. **Write none of this section.**
-2. **I will edit this section.**
-
-**Inferred, when it lists guesses.** Options:
-
-1. **Accept none.**
-2. **Accept every guess in this section.**
-3. **I will edit this section.**
-
-**Inferred, when it has no guess.** The section already says so. Options:
-
-1. **Accept none.**
-2. **I will edit this section.**
-
-**Links, when the code shows at least one.** Options:
-
-1. **Write every link in this section.**
-2. **I will edit this section.**
-
-**Links, when the code shows none.** The section already says only one repo was named, or that no link between these repos is in the code. Options:
-
-1. **Write that line.**
-2. **I will edit this section.**
-
-Do not add an option that accepts a guessed link.
-
-**Left out, when it lists lines.** Options:
-
-1. **Keep every line left out.**
-2. **Accept every line.**
-3. **Dismiss every line.**
-4. **I will edit this section.**
-
-**Left out, when no line is left out.** The section already says so. Options:
-
-1. **No line is left out.**
-2. **I will edit this section.**
-
-In a left-out edit, mark each line accept, keep left out, or dismiss. A line with no mark stays left out. Omitting a line does not dismiss it and does not drop it. Dismiss means that line is not offered again.
-
-When the answer is **I will edit this section**, stop. Wait for the edited section. That edit is the answer. Do not write yet. Do not ask that section again. Sections already answered stay answered. A confirmed fact they struck stays out. A fact they add that the code does not show stays out. A guess they do not accept stays out of the spec. A guess the inferred section or the left-out section accepts is written later as accepted from a guess, not as a fact the code shows. Confirming a guess does not turn it into a link. If they add a link the code does not show, do not write that link. Say the code does not show it. A link they struck stays out.
+Read this skill's `branches/repos-only/references/read.md` now, before you go on.
 
 ## Branch
 
 After every section has an answer, and after you create a new clean repo if they picked one. A repo with no commits skips the prompt. On a later re-read, when every confirmed fact and accepted guess is already a line in `docs/architecture/spec.md` and in the system notes this pass may edit, and `docs/architecture/left-out.md` would not gain, lose, or move a line, skip the branch. Write nothing. Say the files are current. A missing `docs/architecture/spec.md` is not current. Do not skip that write because the notes already state the facts.
 
-Follow `/crav1-create-feature-branch` (drop-in: `.cursor/skills/crav1/crav1-create-feature-branch/SKILL.md`; plugin: sibling `skills/crav1-create-feature-branch/SKILL.md`) in the **destination** repo. Slug: `architecture`. Specify options: `feat/architecture` first, then `spec/architecture`, stay, or other. Do not write files until that choice is done or skipped. Do not push. Do not open a pull request.
+Follow `/crav1-create-feature-branch` (skill `crav1-create-feature-branch`, `SKILL.md`) in the **destination** repo. Slug: `architecture`. Specify options: `feat/architecture` first, then `spec/architecture`, stay, or other. Do not write files until that choice is done or skipped. Do not push. Do not open a pull request.
 
 ## Write
 
-One spec: `docs/architecture/spec.md`, from this skill’s `assets/spec.md` (drop-in: `.cursor/skills/crav1/crav1-existing-to-specs/branches/repos-only/assets/spec.md`; plugin: this skill’s `assets/spec.md`). The folder is `docs/architecture/`. The file is `spec.md`. `docs/architecture/left-out.md` sits beside it, from this skill’s `assets/left-out.md` (same drop-in and plugin paths). Both stay out of `docs/system` and out of `docs/specs`. `docs/specs` stays one folder per feature slug. `docs/system` stays the short picture. `spec.md` stays the one the lanes can extend. Do not create `docs/specs/architecture/`. Do not invent any other folder. Do not put left-out guesses under a heading in `spec.md`.
+One spec: `docs/architecture/spec.md`, from this skill’s `assets/spec.md` (this skill's `branches/repos-only/assets/spec.md`). The folder is `docs/architecture/`. The file is `spec.md`. `docs/architecture/left-out.md` sits beside it, from this skill’s `assets/left-out.md` (same drop-in and plugin paths). Both stay out of `docs/system` and out of `docs/specs`. `docs/specs` stays one folder per feature slug. `docs/system` stays the short picture. `spec.md` stays the one the lanes can extend. Do not create `docs/specs/architecture/`. Do not invent any other folder. Do not put left-out guesses under a heading in `spec.md`.
 
-System notes, when this pass writes them, come from this skill’s `assets/system/` (same files as `docs/system/_template/`: `landscape.md`, `repos.md`, `diagrams.md`, `glossary.md`; an ADR file comes from `assets/system/adr.md` only when the table below says to write one). Drop-in: `.cursor/skills/crav1/crav1-existing-to-specs/branches/repos-only/assets/system/`. Plugin: this skill’s `assets/system/`.
+System notes, when this pass writes them, come from this skill’s `assets/system/` (same files as `docs/system/_template/`: `landscape.md`, `repos.md`, `diagrams.md`, `glossary.md`; an ADR file comes from `assets/system/adr.md` only when the table below says to write one). Drop-in: this skill's `branches/repos-only/assets/system/`. Plugin: this skill’s `assets/system/`.
 
 Source for every fill of `spec.md` is the confirmed facts the repo sections’ answers kept, plus a guess only when the inferred section or the left-out section accepts it. An accepted guess is labeled accepted. It is not labeled confirmed. A link comes only from the links section, and only when the code shows it. A guess that stays left out is written only to `docs/architecture/left-out.md`.
 
@@ -155,71 +69,15 @@ A fact, link, guess, row, node, or edge that is already written is not new. Do n
 
 ### First write
 
-`docs/architecture/spec.md` is missing, and the system notes are missing or only the untouched template. Write the architecture spec, the left-out file, and the system notes. Replace the template fills.
-
-| File | Fill |
-| --- | --- |
-| `spec.md` | The sections in `assets/spec.md`. Confirmed facts under **Confirmed** and under the repo heading, each with a path. Accepted guesses only under **Accepted from a guess**, each saying the code does not show it. Leave that section empty when they accepted none. Under **How the repos connect**, one line per link the code shows, with the path. When only one repo was named, the only line is `Only one repo was named.` When more than one repo was named and the code shows no link, the only line is `No link between these repos is in the code.` **Open questions** name what the code does not show. A guess they did not accept stays out of this file. Do not add a Left out heading. |
-| `landscape.md` | One short paragraph of what the code shows these repos are. Replace the template sentence. Under `## How the parts connect`, one line per link the code shows. When only one repo was named, one line: `Only one repo was named.` When more than one repo was named and the code shows no link, one line: `No link between these repos is in the code.` **v0** is the architecture the code already shows, in one line. Leave **Later** empty. Bulk assumptions are confirmed facts only. When the code states none, write `None the code states.` Constraints are only ones the code shows. When it shows none, write `None the code states.` Leave the feature index empty until the spec file exists, then one row: slug `architecture`, spec `docs/architecture/spec.md`, Repos column lists the destination and the named repos, Notes `architecture`. |
-| `repos.md` | Every named repo, plus the destination when it is the new clean repo. Status `exists` when the checkout is a real repo. Put the URL when the checkout has one. The new clean repo stays without a remote. Boundaries only when the code shows one. Include the `## Synced at` section. For each repo this run read, set its `Synced at` line as under **Synced at** below. A new clean repo with no commit stays empty. Add the `Work items go to` column when it is missing; leave its cells empty. Never fill a home here: the first Azure Boards skill that needs one asks ([work-item-homes.md](../../../crav1-ado-sync/branches/push-features/references/work-item-homes.md)). |
-| `diagrams.md` | One context diagram. Replace the sample. One heading, one sentence, one fence. Nodes are the named repos. An edge only when the code shows that link. When only one repo was named, one node and no edge, and the sentence says only one repo was named. When more than one repo was named and the code shows no link, draw the nodes and no edge, and the sentence says no link was found. Do not invent a user, a service, or a queue. |
-| `glossary.md` | From `assets/system/glossary.md`. See the glossary rules below. |
-| `adr/` | Only where the code shows a real choice, with real alternatives. Otherwise write no ADR. A guess is not an ADR. |
-
-**Glossary.** `glossary.md` is part of the landscape, not a feature spec. Source is the code in the named repos. Do not invent terms, expansions, or definitions. Do not write TBD or to be decided. A row is only a word or abbreviation that code already uses. When that same code already says the expansion or meaning, put that text in Meaning. When the code never says what it means, set Meaning to `to be researched`. Skip ordinary English. A code identifier is not a row unless the code already treats that word as a term. Write the file even when it has no rows. An accepted guess does not add a row.
-
-The picture is the short description, the context diagram, and `## How the parts connect`. This write fills those three from the confirmed facts the repo sections’ answers kept. Do not run `/crav1-refresh-system-notes`.
-
-### Left-out file
-
-Write `docs/architecture/left-out.md` from `assets/left-out.md` on the first write and on the missing-architecture-spec pass. On a later re-read, update that file. When it is missing, write it. Do not put this file under `docs/system/` or `docs/specs/`. Do not copy its lines into `spec.md`.
-
-Each line names the guess and then says `The code does not show it.` A line here is not a confirmed fact and not a link.
-
-- **Left out.** A guess the inferred answer did not accept. A line already under `## Left out` that this answer keeps. Keep every such line. Do not drop one to keep the file short. Do not reword a line that stays.
-- **Dismissed.** A line the left-out answer dismisses. Move it here. Do not reword the guess. Do not offer it again in the inferred section or the left-out section. Keep it in the file so the next read knows.
-- **Remove.** A line the read moved to a confirmed fact or a link. A line the left-out answer accepts. Take it off this file. An accepted line is written in `spec.md` under **Accepted from a guess** and still says the code does not show it. It is not a link. A line the read moved to a fact or a link is removed even when that section’s answer strikes it. Do not put a struck fact or a struck link back in this file. The code shows it, so it is not a guess. The next read can offer it again as a fact or a link.
-
-When the code still does not show a left-out line, the line stays under `## Left out` unless this answer accepts it or dismisses it.
-
-### Missing architecture spec
-
-A real note is already in `docs/system/`, and `docs/architecture/spec.md` is missing. Write that spec, using the `spec.md` row above, and write the left-out file. Leave every file under `docs/system/` as it is. The one exception is the `Synced at` line in `repos.md` under **Synced at** below, and only when `repos.md` already exists. Do not add any other line. Do not rewrite any other line. Do not create `repos.md` on this pass. Do not fill a gap in those notes on this pass. Do not run `/crav1-refresh-system-notes`.
+Read this skill's `branches/repos-only/references/first-write.md` now, before you go on.
 
 ### Later re-read
 
-`docs/architecture/spec.md` is already there. Add only what is new. Do not rewrite, reorder, or delete a line that is already there.
-
-**Architecture spec.** Append a confirmed fact under **Confirmed** and under the repo heading when that fact is not already a line. Cite the path. A repo the user named that has no heading yet gets a new heading. Do not rewrite the lines under a heading that is already there. Append an accepted guess under **Accepted from a guess** when it is not already a line, and say the code does not show it. Append a link under **How the repos connect** when the code shows it and that link is not already a line. Cite the path. Do not invent a link. Leave an existing `Only one repo was named.` or `No link between these repos is in the code.` line as it is. Append an open question when the code does not show it and that question is not already a line. A guess they did not accept stays out of this file. Do not add a Left out heading. When nothing new belongs in the file, write no line. Say the architecture spec is current.
-
-**Left-out file.** Follow **Left-out file** above. A line the code now shows is removed and written as a confirmed fact or a link, not as a guess. A line the code still does not show stays, unless this answer accepts it or dismisses it. Do not drop a line to keep the file short.
-
-**System notes that are already there.** Add only what is new. Do not rewrite a line that is already there.
-
-- Short description: keep every sentence. When a confirmed fact is not already named there, add one sentence at the end. Do not rephrase a sentence that is already there.
-- `## How the parts connect`: append one line per new link the code shows that is not already a line. Do not edit a line that is already there.
-- Diagram: keep every existing node and edge. Append a node or an edge the code shows that the fence does not already show. Do not rename a node. Do not redraw the fence. Do not invent a user, a service, or a queue. When the fence is still the template sample, replace that sample. It is not a real diagram.
-- `repos.md`: append a row for a named repo that is not already listed. Add its `Synced at` line under `## Synced at`, set as under **Synced at** below. Do not rewrite an existing row.
-- `glossary.md`: append a new row only for a word the code already uses that is not already a row. Do not rewrite an existing row. A new row goes in sorted place by term (1.84.0, `crav1-add-to-spec` `references/merge-safe.md`). The glossary rules above still apply. An accepted guess does not add a row.
-- Feature index: when `docs/architecture/spec.md` exists and the architecture row is missing, append that one row. Do not rewrite other rows.
-- `adr/`: do not rewrite an existing ADR. Write a new ADR only when the code shows a real choice, with real alternatives, that is not already an ADR. A guess is not an ADR.
-- v0, bulk assumptions, and constraints: append a confirmed fact that is not already a line. Do not rewrite a line that is already there. Leave `None the code states.` in place.
-
-When `docs/system/` is missing or only the untouched template, those notes are not already there. Write them with the first-write table. Still add only what is new to the architecture spec.
-
-Do not run `/crav1-refresh-system-notes`. This pass is the add.
-
-Do not write `plan.md`, `tasks.md`, `diagrams.md` inside the spec folder, `adr/` inside the spec folder, `export/`, `verify.md`, `fix-log.md`, `security.md`, or `work-item.md`. `docs/architecture/left-out.md` is the file for guesses that stay left out. Do not read `work-item-offer.md`. Do not write application code. Do not design the next feature. No goals for a feature, no acceptance list for work to build, no “should”.
+Read this skill's `branches/repos-only/references/later-re-read.md` now, before you go on.
 
 ## Synced at
 
-This command reads each named repo as a whole. Record the commit actually read. `Synced at` is one line per repo and branch, `- <repo> <branch>@<short sha>, <date>`, in the `## Synced at` section of `repos.md`, for example `- orders-api main@abc1234, 2026-10-07` (1.84.0, `crav1-add-to-spec` `references/merge-safe.md`). The branch is the branch that was read. The short sha is seven characters. The date is the date of that read, `YYYY-MM-DD`.
-
-Set that repo's `Synced at` line in `repos.md` to the branch and commit actually read. When that repo and branch already have a line, replace only that line; a new one goes in sorted place (repo, then branch). Leave every other line. Touch only the repos this run read. Do not change Purpose, Status, URL, or Boundaries. When the `## Synced at` section is missing and `repos.md` exists, add it after the table. A checkout with no commit stays empty. Do not write a slice `Synced at` line. This command does not write `docs/specs/<slug>/spec.md`.
-
-On the missing-architecture pass, update that cell only when `repos.md` already exists. Do not create the file on that pass.
-
-Do not stamp a repo this run did not read. A repo or branch with no line keeps no line. A consumer measuring drift uses, for each repo and branch, the older of the repo line and the slice line, and no line means unknown, so fall back to spec file commit dates.
+Read this skill's `branches/repos-only/references/synced-at.md` now, before you go on.
 
 ## Stop
 

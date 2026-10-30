@@ -8,7 +8,7 @@ Read only when the personal-data and secrets check in [sources.md](sources.md) f
 
 The rule is once per repo and one shared policy for Cursor and Claude Code. It has two copies. Cursor: `.cursor/rules/crav1-transfer-data-policy.mdc`. Claude Code project: `.claude/rules/crav1-transfer-data-policy.md`. Read the copy for the host that is running. When only one copy exists, use it and write the other copy from it with the same words. When the kit writes the rule, it writes both copies together. When both exist and differ, say so and ask the user which one wins. Do not merge them. Then write the other copy from the one they picked. Do not read or write a user-level file. The user changes the rule by editing or deleting that file.
 
-The template is this skill's `assets/crav1-transfer-data-policy.mdc` (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/assets/crav1-transfer-data-policy.mdc`; plugin: this skill's `assets/crav1-transfer-data-policy.mdc`).
+The template is this skill's `assets/crav1-transfer-data-policy.mdc` (this skill's `assets/crav1-transfer-data-policy.mdc`).
 
 The file lists types, one per line. This version checks personal data. A later type can be added as its own line. It lists `auto-accept` or `review`. It lists where the repo is hosted, in the user's words. It does not list a secrets choice.
 

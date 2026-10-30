@@ -26,7 +26,7 @@ The only file this skill writes is `docs/environments/marks.md`, and only by app
 
 This is not `/crav1-read-environment`. That command reads a host. It does not read Azure DevOps. This command does not run it. After marks are confirmed, name it. Do not run it.
 
-Commands and task inputs: [references/azure-devops.md](references/azure-devops.md) (drop-in: `.cursor/skills/crav1/crav1-map-pipeline-environments/references/azure-devops.md`; plugin: this skill’s `references/azure-devops.md`).
+Commands and task inputs: [references/azure-devops.md](references/azure-devops.md) (this skill's `references/azure-devops.md`).
 
 ## Start
 

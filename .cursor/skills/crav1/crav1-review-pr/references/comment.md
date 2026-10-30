@@ -27,11 +27,11 @@ What you noticed: <one line>
 Where: <path>, line <n> | no line
 ```
 
-`T1 — test to add` is a concrete test for a changed behavior or a bug. `Q1 — question` is something the author or team must answer about the code repo. Same two lines. They do not change the ship line. A question is saved in the PR record as a Point, `waiting on <author>`, tagged `asked` (1.97.0). Which section each one goes to: `references/comment-layout.md` **Which section** (drop-in: `.cursor/skills/crav1/crav1-review-pr/references/comment-layout.md`; plugin: `skills/crav1-review-pr/references/comment-layout.md`).
+`T1 — test to add` is a concrete test for a changed behavior or a bug. `Q1 — question` is something the author or team must answer about the code repo. Same two lines. They do not change the ship line. A question is saved in the PR record as a Point, `waiting on <author>`, tagged `asked` (1.97.0). Which section each one goes to: `references/comment-layout.md` **Which section** (this skill's `references/comment-layout.md`).
 
 ## Paste-ready comment
 
-End every review with one fenced Markdown block the user can paste into the pull request as one comment. Build it exactly as `references/comment-layout.md` says (1.66.0; drop-in: `.cursor/skills/crav1/crav1-review-pr/references/comment-layout.md`; plugin: `skills/crav1-review-pr/references/comment-layout.md`). In short:
+End every review with one fenced Markdown block the user can paste into the pull request as one comment. Build it exactly as `references/comment-layout.md` says (1.66.0; drop-in: this skill's `references/comment-layout.md`; plugin: `skills/crav1-review-pr/references/comment-layout.md`). In short:
 
 - No verdict line in the block; the chat shows `Verdict: …` just above it.
 - One short, plain opening line, then `### Blockers`, `### Bugs`, `### Tests to add with this PR`, `### A question` (or `### Questions`), leaving out a section with nothing in it.

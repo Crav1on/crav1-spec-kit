@@ -5,7 +5,7 @@ alwaysApply: true
 
 # Transfer data policy
 
-This file was written by the imported-sources check when the user chose to save it. The check is `references/sources.md` in skill `crav1-add-to-spec` (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/references/sources.md`; plugin: that skill's `references/sources.md`).
+This file was written by the imported-sources check when the user chose to save it. The check is `references/sources.md` in skill `crav1-add-to-spec` (this skill's `references/sources.md`).
 
 ## Types
 

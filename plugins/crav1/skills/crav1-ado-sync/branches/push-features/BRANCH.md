@@ -10,7 +10,7 @@ This command is a later skill. It is not a starter option. When the user asks fo
 
 Spark, specify, plan, and verify do not run it. It is not started automatically.
 
-CLI checks and the `az` calls: [references/azure-boards.md](references/azure-boards.md) (drop-in: `.cursor/skills/crav1/crav1-ado-sync/branches/push-features/references/azure-boards.md`; plugin: this skill’s `references/azure-boards.md`). Do not show those commands in the chat.
+CLI checks and the `az` calls: [references/azure-boards.md](references/azure-boards.md) (this skill's `branches/push-features/references/azure-boards.md`). Do not show those commands in the chat.
 
 ## Check first
 
@@ -34,7 +34,7 @@ A **No spec yet** row has no repo. Ask its home with the same options, and sugge
 
 ## Candidates
 
-Run the suggest features branch of `/crav1-ado-sync` and show that list. The rules in that skill are the rules for the rows (drop-in: `.cursor/skills/crav1/crav1-ado-sync/branches/suggest-features/BRANCH.md`; plugin: sibling `skills/crav1-ado-sync/branches/suggest-features/BRANCH.md`).
+Run the suggest features branch of `/crav1-ado-sync` and show that list. The rules in that skill are the rules for the rows (this skill's `branches/suggest-features/BRANCH.md`).
 
 The user picks one or more by number, or all. Every row stays listed. Do not drop one to keep the list short. Use the questions tool when it is available and the list fits. Otherwise the numbered table is the choice, and the reply is the numbers or all.
 

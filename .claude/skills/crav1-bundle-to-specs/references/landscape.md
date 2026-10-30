@@ -4,7 +4,7 @@ Read only when the pointer in `SKILL.md` sends you here. Moved word for word fro
 
 ## Landscape
 
-**Branch first** if a git repo with commits exists. Follow `/crav1-create-feature-branch` (drop-in: `.claude/skills/crav1-create-feature-branch/SKILL.md`; plugin: sibling `skills/crav1-create-feature-branch/SKILL.md`). Intake uses one branch for the dump (landscape kebab or `system`). Do not write `docs/system/` until the branch choice is done or skipped.
+**Branch first** if a git repo with commits exists. Follow `/crav1-create-feature-branch` (skill `crav1-create-feature-branch`, `SKILL.md`). Intake uses one branch for the dump (landscape kebab or `system`). Do not write `docs/system/` until the branch choice is done or skipped.
 
 Write `docs/system/` from this skill’s `assets/` (same shape as `docs/system/_template/`):
 

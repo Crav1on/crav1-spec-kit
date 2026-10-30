@@ -75,7 +75,7 @@ Read `references/interview.md` ("Architecture interview (still no spec files)") 
 
 After they pick or confirm options:
 
-**Branch first** if a git repo with commits exists. Follow `/crav1-create-feature-branch` (drop-in: `.cursor/skills/crav1/crav1-create-feature-branch/SKILL.md`; plugin: sibling `skills/crav1-create-feature-branch/SKILL.md`). Do not write spec files or `docs/system/` until the branch choice is done or skipped.
+**Branch first** if a git repo with commits exists. Follow `/crav1-create-feature-branch` (skill `crav1-create-feature-branch`, `SKILL.md`). Do not write spec files or `docs/system/` until the branch choice is done or skipped.
 
 **Thin landscape, then spec, then index.**
 
@@ -92,7 +92,7 @@ Read `references/landscape.md` ("Thin landscape") only when docs/system/ is miss
 5. Optional short `notes.md` if the raw pile would otherwise be lost.
 6. One feature-index row on `docs/system/landscape.md` when this turn created a new spec folder: slug, `docs/specs/<slug>/`, repo name, `v0`. Do not add a second row for a slug that already has one.
 
-**Picture.** After the index row, follow [picture.md](../crav1-refresh-system-notes/references/picture.md) (drop-in: `.cursor/skills/crav1/crav1-refresh-system-notes/references/picture.md`; plugin: sibling `skills/crav1-refresh-system-notes/references/picture.md`). Add what this pass added to the short description, the diagram, and how the parts connect. Do not rewrite a sentence, a diagram node, a diagram edge, or a connection line that is already there. Do not run `/crav1-refresh-system-notes` as a second turn. When this pass seeded `docs/system/`, the seed fill of those three is the picture for what was already in front of you; the picture update still adds anything the new spec states that those three do not yet say. Do not rewrite existing glossary rows.
+**Picture.** After the index row, follow [picture.md](../crav1-refresh-system-notes/references/picture.md) (skill `crav1-refresh-system-notes`, `references/picture.md`). Add what this pass added to the short description, the diagram, and how the parts connect. Do not rewrite a sentence, a diagram node, a diagram edge, or a connection line that is already there. Do not run `/crav1-refresh-system-notes` as a second turn. When this pass seeded `docs/system/`, the seed fill of those three is the picture for what was already in front of you; the picture update still adds anything the new spec states that those three do not yet say. Do not rewrite existing glossary rows.
 
 Then output only:
 

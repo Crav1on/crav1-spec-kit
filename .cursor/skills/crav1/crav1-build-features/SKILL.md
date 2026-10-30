@@ -19,7 +19,7 @@ This is **not** parallel. Two `feat/` branches cannot share this working tree. T
 
 Command: `/crav1-build-features`. One spec: `/crav1-build-tasks`. One task: `/crav1-build-tasks`.
 
-Worker: `.cursor/agents/crav1-build-task-agent.md` (plugin: `agents/crav1-build-task-agent.md`). Protocol: `crav1-build-tasks` [references/run.md](../crav1-build-tasks/branches/one-task/references/run.md). Style: [style-persist.md](../crav1-build-tasks/branches/one-task/references/style-persist.md). Approvals: [tool-approvals.md](../crav1-build-tasks/branches/one-task/references/tool-approvals.md). Branch rules: `/crav1-create-feature-branch` (drop-in: `.cursor/skills/crav1/crav1-create-feature-branch/SKILL.md`; plugin: sibling `skills/crav1-create-feature-branch/SKILL.md`).
+Worker: `.cursor/agents/crav1-build-task-agent.md` (plugin: `agents/crav1-build-task-agent.md`). Protocol: `crav1-build-tasks` [references/run.md](../crav1-build-tasks/branches/one-task/references/run.md). Style: [style-persist.md](../crav1-build-tasks/branches/one-task/references/style-persist.md). Approvals: [tool-approvals.md](../crav1-build-tasks/branches/one-task/references/tool-approvals.md). Branch rules: `/crav1-create-feature-branch` (skill `crav1-create-feature-branch`, `SKILL.md`).
 
 ## Which slugs
 
@@ -67,7 +67,7 @@ Cloud Agents: skip the pause.
 
 ## Switch to a slug (before that slug’s first T#)
 
-Into branch and base branches (1.99.0): as `crav1-create-feature-branch` `references/code-branch.md` (drop-in: `.cursor/skills/crav1/crav1-create-feature-branch/references/code-branch.md`; plugin: sibling `skills/crav1-create-feature-branch/references/code-branch.md`) says. The into branch is the repo's `Merges into` branch (also read from a sibling specs repo), else the default branch.
+Into branch and base branches (1.99.0): as skill `crav1-create-feature-branch`, `references/code-branch.md` says. The into branch is the repo's `Merges into` branch (also read from a sibling specs repo), else the default branch.
 
 1. Working tree dirty except `agent-tools/` → **do not checkout**. On a base branch, offer to carry the changes onto `feat/<slug>` with `git switch -c` when HEAD is the into branch; never send them to `/crav1-finalize-commit` on a base. Otherwise they commit on their work branch or clean it. Wait. Never stash unless they ask.
 2. `git checkout feat/<slug>` if it exists, else `git switch -c feat/<slug> <into>` **from the into branch** (local, else `origin/<into>`), so a repo that merges into `develop` forks from `develop`, not `main`. Never create `feat/<slug>` from the previous feature branch.
@@ -88,7 +88,7 @@ billing       feat/billing     T1–T6    queued
 
 Status: `queued` | `running` | `needs_fix` | `needs_ready` | `needs_dependency` | `done` | `blocked` | `skipped`.
 
-The branch column shows each task's branch when tasks name one. A slug whose tasks are done but whose work branches are not all merged into their base shows `done (2 branches not merged)`, using the merged tests in `crav1-add-to-spec` `references/branches.md` (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/references/branches.md`; plugin: sibling `skills/crav1-add-to-spec/references/branches.md`). A branch shared by several slugs is counted once on the board. This is report only.
+The branch column shows each task's branch when tasks name one. A slug whose tasks are done but whose work branches are not all merged into their base shows `done (2 branches not merged)`, using the merged tests in skill `crav1-add-to-spec`, `references/branches.md`. A branch shared by several slugs is counted once on the board. This is report only.
 
 ## Per slug (you stay in this chat)
 

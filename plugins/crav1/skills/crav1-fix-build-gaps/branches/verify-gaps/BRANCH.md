@@ -53,7 +53,7 @@ Confirm the before-state: re-run that row’s evidence once. Quote the failure. 
 
 ## Branch (1.99.0)
 
-Before the first code edit, check the checkout as `crav1-create-feature-branch` `references/code-branch.md` (drop-in: `.cursor/skills/crav1/crav1-create-feature-branch/references/code-branch.md`; plugin: sibling `skills/crav1-create-feature-branch/references/code-branch.md`) says. On a work branch, go ahead. On a base branch (main, master, develop, the `Merges into` branch, `release/*`) never edit code there: ask once, **Create `fix/<slug>` from `<into>` (Recommended)**, **Use an existing branch**, **Other name**, **Stop**. On another branch, the same with **Stay on `<current>`** in place of Other name. Headless: stop with the reference's one line unless the invocation has `new branch`. Inside the build worker the branch is already checked; skip this.
+Before the first code edit, check the checkout as skill `crav1-create-feature-branch`, `references/code-branch.md` says. On a work branch, go ahead. On a base branch (main, master, develop, the `Merges into` branch, `release/*`) never edit code there: ask once, **Create `fix/<slug>` from `<into>` (Recommended)**, **Use an existing branch**, **Other name**, **Stop**. On another branch, the same with **Stay on `<current>`** in place of Other name. Headless: stop with the reference's one line unless the invocation has `new branch`. Inside the build worker the branch is already checked; skip this.
 
 ## Fix (in spec)
 
@@ -72,9 +72,9 @@ Do **not**:
 
 ## Verify the fix (required, same turn)
 
-If this gap’s evidence is **live**, follow `crav1-verify-build-against-spec` `references/live-host.md` (drop-in: `.cursor/skills/crav1/crav1-verify-build-against-spec/references/live-host.md`; plugin: sibling `skills/crav1-verify-build-against-spec/references/live-host.md`) **before** re-running it (especially after you changed API/service code).
+If this gap’s evidence is **live**, follow skill `crav1-verify-build-against-spec`, `references/live-host.md` **before** re-running it (especially after you changed API/service code).
 
-1. Before any test command, run the local dependency preflight in `crav1-verify-build-against-spec` `references/test-dependencies.md` (drop-in: `.cursor/skills/crav1/crav1-verify-build-against-spec/references/test-dependencies.md`; plugin: sibling `skills/crav1-verify-build-against-spec/references/test-dependencies.md`). A test skipped for a missing dependency does not close the gap unless the user chose skip. Then re-run **the same evidence** for this gap (test name, UI path, or live HTTP/DB command from verify.md / the user). Fail → pass, or report still failing.
+1. Before any test command, run the local dependency preflight in skill `crav1-verify-build-against-spec`, `references/test-dependencies.md`. A test skipped for a missing dependency does not close the gap unless the user chose skip. Then re-run **the same evidence** for this gap (test name, UI path, or live HTTP/DB command from verify.md / the user). Fail → pass, or report still failing.
 2. If you changed app or config, re-run the repo test command. Must still pass.
 3. Extra probes (SQL ready, etc.) are optional **add-ons**. They do not replace the verify row.
 
