@@ -2,6 +2,18 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.106.0 (2026-10-30)
+
+Skills load less before and during a run. A minor release because the skills read different files.
+
+### Kit
+
+- **Changed (all 38 skills, load path):** each `description` is now trigger text only, at most 60 words. Down from 4,149 words to about 1,700 in total, and all of it loads up front for skill matching. The rules stay in each skill's body. `scripts/check-kit-docs.py` fails over 60 words.
+- **Changed (`/crav1-help`, load path):** help reads the new generated `reference/index.yaml` first (one entry per skill: lane, starter, page, purpose), then only the `reference/skills/<name>.md` pages the answer needs. It no longer reads `skills.yaml` or `skills.md` whole (`skills.md` only for `list`). It opens `CHANGELOG.md` only for what's new, a release, or a version question, and then only the sections asked for. `scripts/gen-skill-docs.py` writes and checks the index.
+- **Changed (routers):** `/crav1-retire-spec` (retire, merge, park and un-park, convert), `/crav1-show-or-ask-open-questions` (show, ask), `/crav1-explain-this-code` (what it does, what and why, teach the language) and `/crav1-glossary` (list, as-file, research, term) route first and read only one `branches/<mode>/BRANCH.md`. Mode sections moved word for word, so the rules are unchanged.
+- **Changed (maintainer):** `AGENTS.md` cut from 7,783 to about 560 words: starters, layout, the route in one line each, and edit-then-sync. Per-skill behavior lives in the skills and `skills.yaml`. The 60-word description rule is added to `CONTRIBUTING.md` and `kit-maintainer.mdc`.
+- **Tests:** `scripts/tests/test_help_index.py` (index, help load path, description cap) and `scripts/tests/test_routers_1106.py` (each router points at every branch, no mode section left inline).
+
 ## 1.105.1 (2026-10-30)
 
 Kit CI runs less. A patch release because no skill behavior changes.
