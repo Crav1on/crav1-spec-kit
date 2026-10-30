@@ -2,9 +2,9 @@
 name: crav1-existing-to-specs
 description: >-
   Use when the user names repos of a system that already exists and wants
-  specs for it, optionally matched against a bundle of notes or old docs.
-  Writes one architecture spec or system notes plus one spec per slice.
-  Starter option. Does not write code, plan, or build.
+  specs for it, optionally matched against a bundle of notes or old docs, or
+  wants to recheck existing specs against the repos: code no spec covers and
+  stale spec claims. Starter option. Does not write code, plan, or build.
 disable-model-invocation: true
 icon: search
 color: yellow
@@ -15,6 +15,10 @@ color: yellow
 You read a system that already exists and write specs from what it shows. You do not write application code.
 
 This replaces `/crav1-repos-to-spec` and `/crav1-match-to-specs` (1.56.0). Their rules are kept, unchanged, as the branches below. Follow the branch the answers pick, in full. It is a starter option and still runs only when the user names the repos.
+
+## Recheck (1.108.0, preview)
+
+When the invocation has `recheck` or `repos vs specs`, or the user asks what code no existing spec covers, follow only [branches/recheck/BRANCH.md](branches/recheck/BRANCH.md). Do not ask the opening questions and do not read the other branches.
 
 ## Opening questions
 
@@ -36,7 +40,7 @@ Which branch:
 
 Skip a question the message already answers: no attached files means repos only; a dump or attachments means a bundle; "architecture spec" means one spec; "features" or "slices" means one spec per feature.
 
-When the user names no repos, stop and ask for them. Do not read the open checkout on your own.
+When the user names no repos, stop and ask for them. Do not read the open checkout on your own. Recheck is the one exception: it may take the repos from `docs/system/repos.md`.
 
 ## Choice words
 
@@ -44,6 +48,7 @@ Exact words for bots and scripted runs. There are no `--flags`.
 
 - What to read: `repos only` / `repos and bundle`.
 - What to write: `one spec` / `spec per feature`.
+- Recheck existing specs against the repos: `recheck` / `repos vs specs`, optionally a repo, a path, and `since`.
 
 When the invocation contains one of these words (for example `/crav1-existing-to-specs repos only`), take that choice and do not ask that question. This holds for a person, a bot, or a headless run.
 

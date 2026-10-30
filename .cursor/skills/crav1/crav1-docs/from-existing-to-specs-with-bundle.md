@@ -67,6 +67,14 @@ A mail, a transcript, a chat, a screenshot, or another original that a quote com
 
 Code that no slice covers is a note on the landscape, not a guessed spec. ADRs are written only where there was a real choice.
 
+## Later: recheck the specs against the repos (1.108.0, preview)
+
+Once specs exist and the code has moved on, run `/crav1-existing-to-specs recheck` (or `repos vs specs`). Name a repo, or leave it out to use every repo in `docs/system/repos.md`. Add a path to narrow it, or `since` for only code changed after that repo's `Synced at`.
+
+It reports, per repo, the code no spec covers (with the nearest spec) and the stale claims: paths a spec cites under `## In the code` that are gone. It refreshes `## Code with no slice` in `docs/system/landscape.md`: lines still true stay, covered lines come off, new gaps are added, and `## Dismissed` lines are never offered again. It writes nothing into any spec and never adds an open question.
+
+For each gap you pick: add it to the nearest spec (handed to `/crav1-add-to-spec` after a yes), start a new spec (it names `/crav1-spark-to-spec` or `/crav1-ideas-to-spec` and does not run it), ignore it (dismissed), or leave it. A stale claim points at `/crav1-tighten-spec`.
+
 ## After Index
 
 If you are done with this dump:

@@ -27,6 +27,8 @@ Exact words for bots and scripted runs. There are no `--flags`.
 - After a PR: `all`. A PR ref alone (`pr71`, `#71`, as `references/scope.md` parses) means `code change`; `pr71 all` adds description and comments per `references/pr-comments.md`, and a record Point per new thread (`references/pr-record.md`, 1.97.0).
 - After `/crav1-pr-status`: `pr<n> candidates` (or `pr<n> candidates 1,3`) takes only the record's `to spec` and `to decision` Points that are not yet `in spec`; read `references/pr-candidates.md` (1.100.0).
 
+Not this skill: "what code is not in any spec" with no change named. Name `/crav1-existing-to-specs recheck` (1.108.0) and stop.
+
 `mail` and `chat` run the dump branch. "This mail", "this email" or "this chat" picks that word.
 
 When the invocation contains one of these words (for example `/crav1-add-to-spec fact`), take that choice and do not ask. This holds for a person, a bot, or a headless run.

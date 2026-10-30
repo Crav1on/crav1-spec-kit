@@ -227,6 +227,12 @@ skills:
       means: "one spec (the architecture spec)"
     - word: "spec per feature"
       means: "system notes plus one spec per feature"
+  - question: Recheck existing specs (preview, 1.108.0)
+    words:
+    - word: "recheck"
+      means: compare the repos with the specs that exist; report code with no spec and stale claims; refresh the landscape note
+    - word: "repos vs specs"
+      means: the same as recheck
   lane: cross-cutting
   group: Start
   starter: true
@@ -234,8 +240,8 @@ skills:
   stage: stable
   prompt_budget: 3
   walkthrough: docs/from-existing-to-specs-with-bundle.md
-  purpose: Turn a system that already exists into specs; asks repos only or repos plus a bundle, and one
-    spec or system notes plus one spec per feature.
+  purpose: Turn a system that already exists into specs; asks repos only or repos plus a bundle, and one spec or system
+    notes plus one spec per feature; or rechecks existing specs against the repos (preview).
   in_depth:
   - '**`/crav1-existing-to-specs`** is a starter option. It opens with two questions: repos only, or repos
     plus a bundle to match; and one spec (the architecture spec), or system notes plus one spec per feature.
@@ -273,32 +279,35 @@ skills:
     write application code, or start Specify, Plan, or Build. Not `/crav1-add-to-spec`.'
   use_when: The user names existing repos, with or without a bundle to match
   table:
-    reads: 'Repos plus a bundle: The repos and the dump; Repos only: Those repos, and left-out when present'
-    writes: 'Repos plus a bundle: Landscape gaps (including a missing glossary and new rows), one spec
-      per confirmed slice, index rows, `docs/sources/` for an imported source, the transfer data policy
-      after a yes, and `Used by` on a quoted note; Repos only: `docs/architecture/spec.md` when missing,
-      `docs/architecture/left-out.md`, the system notes when missing, and `Synced at` on each repo it
-      read'
+    reads: 'Repos plus a bundle: The repos and the dump; Repos only: Those repos, and left-out when present; Recheck:
+      the repos and every existing spec'
+    writes: 'Repos plus a bundle: Landscape gaps (including a missing glossary and new rows), one spec per confirmed
+      slice, index rows, `docs/sources/` for an imported source, the transfer data policy after a yes, and `Used by`
+      on a quoted note; Repos only: `docs/architecture/spec.md` when missing, `docs/architecture/left-out.md`, the
+      system notes when missing, and `Synced at` on each repo it read; Recheck: the landscape `## Code with no slice`
+      note only'
   reads: 'Repos plus a bundle: Reads the repos and the dump. Repos only: Reads the repos the user named,
     and `docs/architecture/left-out.md` when that file is there.'
-  writes: 'Repos plus a bundle: Writes `docs/system/` in the destination the user picks (gaps only when
-    it exists, including a missing glossary and new rows) and one `docs/specs/<slug>/spec.md` per confirmed
-    slice, including not in the code, then index rows. When a dump file it quotes is an imported source,
-    also writes `docs/sources/YYYY-MM-DD-<slug>/`, following `crav1-add-to-spec` `references/sources.md`.
-    That check may write the transfer data policy after a yes. Cursor: `.cursor/rules/crav1-transfer-data-policy.mdc`.
-    Claude Code project: `.claude/rules/crav1-transfer-data-policy.md`. It never writes a secrets choice
-    into that file. For a mail, it lists each embedded image, inline or attached. It recommends convert
-    to text when the image is a diagram, a table, or text that can be reproduced exactly, and compress
-    otherwise. It asks once before the source folder is written. Auto-accept applies to those recommendations
-    only when the transfer data policy clearly covers them. A `repos.md` it writes includes a `Synced
-    at` column and leaves that cell empty. It does not set or clear an existing cell. Repos only: Writes
-    `docs/architecture/spec.md` when that file is missing, `docs/architecture/left-out.md` for guesses
-    that stay left out, and the `docs/system/` notes `/crav1-explain-existing-system` reads when those notes are missing.
-    Sets `Synced at` on each repo it read and touches only those repos.'
-  leaves_alone: 'Repos plus a bundle: Leaves application code, `plan.md`, `work-item.md`, and the rest
-    of an existing landscape alone. Does not commit. Repos only: Leaves application code and the next
-    feature alone. On the pass that creates the architecture spec while system notes are already there,
-    that cell is the only edit to those notes.'
+  writes: 'Repos plus a bundle: Writes `docs/system/` in the destination the user picks (gaps only when it exists,
+    including a missing glossary and new rows) and one `docs/specs/<slug>/spec.md` per confirmed slice, including
+    not in the code, then index rows. When a dump file it quotes is an imported source, also writes `docs/sources/YYYY-MM-DD-<slug>/`,
+    following `crav1-add-to-spec` `references/sources.md`. That check may write the transfer data policy after a yes.
+    Cursor: `.cursor/rules/crav1-transfer-data-policy.mdc`. Claude Code project: `.claude/rules/crav1-transfer-data-policy.md`.
+    It never writes a secrets choice into that file. For a mail, it lists each embedded image, inline or attached.
+    It recommends convert to text when the image is a diagram, a table, or text that can be reproduced exactly, and
+    compress otherwise. It asks once before the source folder is written. Auto-accept applies to those recommendations
+    only when the transfer data policy clearly covers them. A `repos.md` it writes includes a `Synced at` column and
+    leaves that cell empty. It does not set or clear an existing cell. Repos only: Writes `docs/architecture/spec.md`
+    when that file is missing, `docs/architecture/left-out.md` for guesses that stay left out, and the `docs/system/`
+    notes `/crav1-explain-existing-system` reads when those notes are missing. Sets `Synced at` on each repo it read
+    and touches only those repos. Recheck (preview, 1.108.0): writes only `## Code with no slice` in `docs/system/landscape.md`
+    (lines still true stay, covered lines come off, new gaps added, `## Dismissed` kept) and `Synced at` in `repos.md`
+    for a repo read whole. Writes nothing into any spec, and never an open question.'
+  leaves_alone: 'Repos plus a bundle: Leaves application code, `plan.md`, `work-item.md`, and the rest of an existing
+    landscape alone. Does not commit. Repos only: Leaves application code and the next feature alone. On the pass
+    that creates the architecture spec while system notes are already there, that cell is the only edit to those notes.
+    Recheck: leaves every `spec.md`, Match status, plan, task, and application code alone; stale claims are reported,
+    not fixed.'
   exceptions: 'Repos plus a bundle: a slice that is not in the code stays thin and is not planned here.
     A quoted note in `docs/notes/` gets its slug in `used_by` and a `Full source:` link; notes are never absorbed (1.61.0). Repos only: before writing, one question per section (each
     named repo, inferred guesses, links, left-out) and every item stays listed. A later re-read adds only
@@ -309,6 +318,8 @@ skills:
   runs_by_itself: 'Repos plus a bundle: Calls `/crav1-create-feature-branch` in that destination when it already
     has commits. Repos only: Calls `/crav1-create-feature-branch` when the destination already has commits.'
   you_run_next:
+  - /crav1-add-to-spec
+  - /crav1-tighten-spec
   - /crav1-finalize-commit
   first_prompt: '/crav1-existing-to-specs
 
@@ -538,6 +549,7 @@ skills:
   runs_by_itself: Calls no skill.
   you_run_next:
   - /crav1-resolve-open-questions
+  - /crav1-finalize-commit
   first_prompt: '/crav1-tighten-spec
 
     @docs/specs/<slug>/spec.md'
@@ -2435,6 +2447,12 @@ routing:
           link. It does not invent links. It does not design the next feature, write application code,
           or start Specify, Plan, or Build. It is not `/crav1-add-to-spec`. It does not move work into
           Specify, Plan, or Build.'
+        - '`/crav1-existing-to-specs recheck` (also `repos vs specs`, preview since 1.108.0) may run from any lane
+          once specs exist. It compares the named repos, or every repo in `docs/system/repos.md`, with the existing
+          specs, optionally narrowed to a path or to code changed since the last read. It reports code no spec covers
+          and stale claims (cited paths that are gone), refreshes `## Code with no slice` in `docs/system/landscape.md`,
+          and writes nothing into any spec and never an open question. A gap goes to `/crav1-add-to-spec` only after
+          a yes; a new feature is named, not started.'
         crav1-read-environment:
         - '`/crav1-read-environment` is a starter option. Asking for startup options names it and does
           not run it. It may run from any lane. The user names the host at the start. It still runs only
