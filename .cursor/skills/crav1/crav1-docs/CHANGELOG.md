@@ -2,6 +2,14 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.108.1 (2026-10-30)
+
+A patch with no behavior change.
+
+### Kit
+
+- **Changed (`/crav1-existing-to-specs recheck`):** no longer labelled preview. It has been used on a real repo and is treated as stable. Only labels in the skill, branch, help, reference pages and walkthroughs changed; no steps changed.
+
 ## 1.108.0 (2026-10-30)
 
 A gap check of the repos against the specs that already exist. A minor release because it adds behavior.
