@@ -50,7 +50,7 @@ A thin spec stays thin, as **Thin spec** in `SKILL.md` says.
 
 A fuller spec keeps its headings. Place the quote in the section it extends. Add an acceptance checkbox only when they stated a check a stranger could run, and label that checkbox `**New:**`. That checkbox stays yes/no. Name unit, system, or browser only when that kind is already obvious from the source. Otherwise leave the kind for plan. Do not invent a test list. Do not turn a wish into a checkbox.
 
-Expected headings when the file already uses the full spec shape: this skill’s `assets/spec.md` (same file as `docs/specs/_template/spec.md`; drop-in: `.cursor/skills/crav1/crav1-add-to-spec/assets/spec.md`; plugin: this skill’s `assets/spec.md`). A match-shaped spec does not have to grow those headings.
+Expected headings when the file already uses the full spec shape: this skill’s `assets/spec.md` (same file as `docs/specs/_template/spec.md`; this skill's `assets/spec.md`). A match-shaped spec does not have to grow those headings.
 
 ## Notes (1.61.0)
 
@@ -62,7 +62,7 @@ Read `docs/system/` when it exists (`landscape.md`, `repos.md`, `diagrams.md`, `
 
 Also compare the kept quote with research, as **Research compare** in `SKILL.md` says.
 
-Section names for that read, not a file to paste over what exists: this skill’s `assets/system/` (same files as `docs/system/_template/`, including `glossary.md`; drop-in: `.cursor/skills/crav1/crav1-add-to-spec/assets/system/`; plugin: this skill’s `assets/system/`).
+Section names for that read, not a file to paste over what exists: this skill’s `assets/system/` (same files as `docs/system/_template/`, including `glossary.md`; this skill's `assets/system/`).
 
 Do not edit anything outside the target spec in this step, except a research mark after a yes, or a clear, a narrowed mark, a resolved line, or an open question that [references/research-stale.md](research-stale.md) says to write. The clear does not wait for a yes. A source folder already written under **Imported sources** stays. A note already written under **Notes** stays. Neither is an impact edit. The research mark is not a landscape edit. Do not seed `docs/system/` when it is missing. Say it is missing and that this command does not create it. Do not create `glossary.md`. Do not commit.
 

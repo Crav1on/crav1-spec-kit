@@ -2,7 +2,7 @@
 
 Shared by `/crav1-ado-sync`.
 
-Drop-in: `.cursor/skills/crav1/crav1-ado-sync/branches/push-features/references/azure-boards.md`. Plugin: this skill’s `references/azure-boards.md`. From the pull spec changes branch of `/crav1-ado-sync`: sibling `skills/crav1-ado-sync/branches/push-features/references/azure-boards.md`.
+Drop-in: this skill's `branches/push-features/references/azure-boards.md`. Plugin: this skill’s `references/azure-boards.md`. From the pull spec changes branch of `/crav1-ado-sync`: sibling `skills/crav1-ado-sync/branches/push-features/references/azure-boards.md`.
 
 The chat does not show these commands. The user sees the form, the diff, or `Post comment on Feature <id>: <text>`.
 

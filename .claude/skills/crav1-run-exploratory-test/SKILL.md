@@ -135,7 +135,7 @@ Do not edit `spec.md`, `plan.md`, `tasks.md`, `verify.md`, `fix-log.md`, or appl
 
 A bug this skill finds stays in `explore.md`. Do not send it to `/crav1-fix-bug`. Do not name that command.
 
-When the user says so in that turn, for a bug this skill found, follow `/crav1-fix-bug` (drop-in: `.claude/skills/crav1-fix-bug/SKILL.md`; plugin: sibling `skills/crav1-fix-bug/SKILL.md`) for that bug. Do not start the lane it names.
+When the user says so in that turn, for a bug this skill found, follow `/crav1-fix-bug` (skill `crav1-fix-bug`, `SKILL.md`) for that bug. Do not start the lane it names.
 
 ## Stop
 

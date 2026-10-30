@@ -18,7 +18,7 @@ This is cross-cutting. It is not its own lane. It does not move work into Specif
 
 This is not `/crav1-existing-to-specs`. That command reads the repos the user named and writes one architecture spec the lanes can extend, plus these notes. Do not do that job. Do not invent an architecture from code. Do not create a slug.
 
-Spark, ideas, intake, match, match-dump, and add-to-spec run this picture update in the same pass that adds a glossary row. They follow [references/picture.md](references/picture.md) (drop-in: `.claude/skills/crav1-refresh-system-notes/references/picture.md`; plugin: this skill’s `references/picture.md`). They do not rewrite existing glossary rows. This command does not write glossary rows.
+Spark, ideas, intake, match, match-dump, and add-to-spec run this picture update in the same pass that adds a glossary row. They follow [references/picture.md](references/picture.md) (this skill's `references/picture.md`). They do not rewrite existing glossary rows. This command does not write glossary rows.
 
 ## From /crav1-read-environment
 
@@ -62,7 +62,7 @@ When this run reads a whole repo, set its line in the `## Synced at` section of 
 
 When this run reads only one slice, do not touch `repos.md`. Write or update that slice's `Synced at: <repo> <branch>@<short sha>, <date>` line in `spec.md`, after the title and before the first heading. That line is the only edit to `spec.md`.
 
-When a branch's recorded SHA no longer exists or is not an ancestor of the branch tip, say `<branch>: branch rewritten since last read (was <sha>)` and measure drift for that branch from its fork point, as `crav1-add-to-spec` `references/branches.md` says (drop-in: `.claude/skills/crav1-add-to-spec/references/branches.md`; plugin: sibling `skills/crav1-add-to-spec/references/branches.md`). Never stop with an error for it. A code repo other than the open checkout is read from `../<repo>` under the same file's **Sibling checkout**.
+When a branch's recorded SHA no longer exists or is not an ancestor of the branch tip, say `<branch>: branch rewritten since last read (was <sha>)` and measure drift for that branch from its fork point, as `crav1-add-to-spec` `references/branches.md` says (skill `crav1-add-to-spec`, `references/branches.md`). Never stop with an error for it. A code repo other than the open checkout is read from `../<repo>` under the same file's **Sibling checkout**.
 
 Do not stamp a repo or a slice this run did not read. A repo or branch with no line keeps no line. A consumer measuring drift uses, for each repo and branch, the older of the repo line and the slice line, and no line means unknown, so fall back to spec file commit dates.
 

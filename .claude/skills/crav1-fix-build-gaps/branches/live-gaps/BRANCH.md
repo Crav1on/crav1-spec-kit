@@ -1,6 +1,6 @@
 # Fix live (alias)
 
-Follow skill **the verify gaps branch of `crav1-fix-build-gaps`** in full (drop-in: `.claude/skills/crav1-fix-build-gaps/branches/verify-gaps/BRANCH.md`; plugin: sibling `skills/crav1-fix-build-gaps/branches/verify-gaps/BRANCH.md`). Hint only: prefer live/untested wiring rows in the inner-loop queue (failed → unverified → `G#`). Omit Gap to take the next of those. Never auto-pick **not implemented**.
+Follow skill **the verify gaps branch of `crav1-fix-build-gaps`** in full (this skill's `branches/verify-gaps/BRANCH.md`). Hint only: prefer live/untested wiring rows in the inner-loop queue (failed → unverified → `G#`). Omit Gap to take the next of those. Never auto-pick **not implemented**.
 
 ## Picture offer
 

@@ -62,7 +62,7 @@ Stop. They confirm or edit the map. Do not write files. That confirmation is the
 
 If they picked a new clean repo, create it now, before the branch prompt. No commit yet. A repo with no commits skips the prompt.
 
-Follow `/crav1-create-feature-branch` (drop-in: `.claude/skills/crav1-create-feature-branch/SKILL.md`; plugin: sibling `skills/crav1-create-feature-branch/SKILL.md`) in the **destination** repo. One branch for the whole dump. Not one branch per slice.
+Follow `/crav1-create-feature-branch` (skill `crav1-create-feature-branch`, `SKILL.md`) in the **destination** repo. One branch for the whole dump. Not one branch per slice.
 
 Slug for that prompt: a short landscape kebab, or `system` if unnamed. Specify options: `feat/<that>` first, then `spec/<that>`, stay, or other. Do not write `docs/system/` or specs until that choice is done or skipped. A new clean repo with no commits skips the prompt (create-feature-branch skip). Do not push. Do not open a pull request.
 
@@ -88,7 +88,7 @@ No `tasks.md`. No application code. No `git init` except the new clean repo they
 
 ## Imported sources
 
-When a dump file is a mail, a transcript, minutes, a chat, a screenshot, a diagram, or another original that will be quoted into a spec, follow the imported-sources convention before the slice specs are written (drop-in: `.claude/skills/crav1-add-to-spec/references/sources.md`; plugin: sibling `skills/crav1-add-to-spec/references/sources.md`). Its personal-data and secrets check is in that file; flagged items, the transfer data policy, and the one question are in `references/sources-flagged.md`, and a mail's images in `references/sources-mail.md` and `references/sources-binary.md`, all in `crav1-add-to-spec`. Write each source folder once. Pass each folder path with the slice that quotes it. The slice write adds the `Source:` and `Trace:` lines and does not import the file again. Do not commit. A file that is not an imported source does not get a folder.
+When a dump file is a mail, a transcript, minutes, a chat, a screenshot, a diagram, or another original that will be quoted into a spec, follow the imported-sources convention before the slice specs are written (skill `crav1-add-to-spec`, `references/sources.md`). Its personal-data and secrets check is in that file; flagged items, the transfer data policy, and the one question are in `references/sources-flagged.md`, and a mail's images in `references/sources-mail.md` and `references/sources-binary.md`, all in `crav1-add-to-spec`. Write each source folder once. Pass each folder path with the slice that quotes it. The slice write adds the `Source:` and `Trace:` lines and does not import the file again. Do not commit. A file that is not an imported source does not get a folder.
 
 ## Slice specs
 
@@ -102,7 +102,7 @@ Do not thicken a not-started spec in this command. A later pass may add informat
 
 After the specs exist, add one feature-index row per slice on `docs/system/landscape.md`: slug, `docs/specs/<slug>/`, the repo the slice belongs to, and the match status in Notes (`done`, `partial`, or `not in the code`). Do not rewrite other rows. Do not add a second row for a slug that already has one.
 
-**Picture.** After the index, follow [picture.md](../../../crav1-refresh-system-notes/references/picture.md) (drop-in: `.claude/skills/crav1-refresh-system-notes/references/picture.md`; plugin: sibling `skills/crav1-refresh-system-notes/references/picture.md`). Add what this pass added to the short description, the diagram, and how the parts connect. Do not rewrite a sentence, a diagram node, a diagram edge, or a connection line that is already there. Do not run `/crav1-refresh-system-notes` as a second turn. When this pass seeded `docs/system/`, the seed fill of those three is the picture for what the repos and the confirmed match already stated; the picture update still adds anything the new specs state that those three do not yet say. Do not rewrite existing glossary rows.
+**Picture.** After the index, follow [picture.md](../../../crav1-refresh-system-notes/references/picture.md) (skill `crav1-refresh-system-notes`, `references/picture.md`). Add what this pass added to the short description, the diagram, and how the parts connect. Do not rewrite a sentence, a diagram node, a diagram edge, or a connection line that is already there. Do not run `/crav1-refresh-system-notes` as a second turn. When this pass seeded `docs/system/`, the seed fill of those three is the picture for what the repos and the confirmed match already stated; the picture update still adds anything the new specs state that those three do not yet say. Do not rewrite existing glossary rows.
 
 ## Stop
 

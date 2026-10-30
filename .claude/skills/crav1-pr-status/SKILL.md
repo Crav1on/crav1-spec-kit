@@ -41,9 +41,9 @@ At most **one** prompt per run, the closing one included, as `crav1.mdc` says. A
 
 ## Read
 
-Resolve the pull request, its host, the code repo and the specs repo as `/crav1-review-pr` does (**Specs repo and code repo**). Read everything as `crav1-add-to-spec` `references/pr-threads.md` says (drop-in: `.claude/skills/crav1-add-to-spec/references/pr-threads.md`; plugin: sibling `skills/crav1-add-to-spec/references/pr-threads.md`): the threads with every comment, the pushes with their commits, the files each push changed, and who is signed in. Never log in. Never print a token. Skip system and bot threads.
+Resolve the pull request, its host, the code repo and the specs repo as `/crav1-review-pr` does (**Specs repo and code repo**). Read everything as `crav1-add-to-spec` `references/pr-threads.md` says (skill `crav1-add-to-spec`, `references/pr-threads.md`): the threads with every comment, the pushes with their commits, the files each push changed, and who is signed in. Never log in. Never print a token. Skip system and bot threads.
 
-Then read the PR note and its `## PR record`, as `crav1-add-to-spec` `references/pr-record.md` says (drop-in: `.claude/skills/crav1-add-to-spec/references/pr-record.md`; plugin: sibling `skills/crav1-add-to-spec/references/pr-record.md`). No PR note yet: write it as `/crav1-review-pr` **PR note** does. An old follow-ups note is read as `migrated` Points; say once to run `/crav1-add-to-spec migrate formats`.
+Then read the PR note and its `## PR record`, as `crav1-add-to-spec` `references/pr-record.md` says (skill `crav1-add-to-spec`, `references/pr-record.md`). No PR note yet: write it as `/crav1-review-pr` **PR note** does. An old follow-ups note is read as `migrated` Points; say once to run `/crav1-add-to-spec migrate formats`.
 
 ## Mode
 

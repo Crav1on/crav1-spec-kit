@@ -16,8 +16,8 @@ Do not use `crav1-bundle-slice-agent` or that agent's prompt. Intake writes a bu
   - accepted from the dump because the map confirmation left it in
   - inferred (in the dump or in a reading, and not confirmed)
 - Open questions already on the confirmed map for this slice
-- **Source folders** the parent already wrote for an imported source this slice quotes: `docs/sources/YYYY-MM-DD-<slug>/`. Omit this when the parent wrote none. The lines to add are in the imported-sources convention (drop-in: `.claude/skills/crav1-add-to-spec/references/sources.md`; plugin: sibling `skills/crav1-add-to-spec/references/sources.md`)
-- Template: this skill’s `assets/spec.md` (drop-in: `.claude/skills/crav1-existing-to-specs/branches/repos-and-bundle/assets/spec.md`; plugin: this skill’s `assets/spec.md`)
+- **Source folders** the parent already wrote for an imported source this slice quotes: `docs/sources/YYYY-MM-DD-<slug>/`. Omit this when the parent wrote none. The lines to add are in the imported-sources convention (skill `crav1-add-to-spec`, `references/sources.md`)
+- Template: this skill’s `assets/spec.md` (this skill's `branches/repos-and-bundle/assets/spec.md`)
 - Path to `docs/system/` as already written (read it; do not edit it)
 
 A worker that does not receive the match status and the trace does not write.

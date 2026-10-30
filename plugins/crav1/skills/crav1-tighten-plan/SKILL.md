@@ -25,7 +25,7 @@ Use the folder the user @-mentions. Otherwise the most recently edited tree unde
 
 Need `spec.md`, `plan.md`, and `tasks.md`. If plan/tasks are missing, stop (`/crav1-plan-from-spec`).
 
-Read those three. Note `diagrams.md` / `adr/` / `export/openspec/` if present. Read `docs/system/security.md` and a Security section on the spec when those exist. Check rules: `crav1-plan-from-spec` [references/checks.md](../crav1-plan-from-spec/references/checks.md) (drop-in: `.cursor/skills/crav1/crav1-plan-from-spec/references/checks.md`; plugin: sibling `skills/crav1-plan-from-spec/references/checks.md`).
+Read those three. Note `diagrams.md` / `adr/` / `export/openspec/` if present. Read `docs/system/security.md` and a Security section on the spec when those exist. Check rules: `crav1-plan-from-spec` [references/checks.md](../crav1-plan-from-spec/references/checks.md) (skill `crav1-plan-from-spec`, `references/checks.md`).
 
 Also read the latest **crav1-plan-reviewer-agent** / `/crav1-review-plan` output in this chat. Those findings become issues. Do not collapse them into one “apply reviewer notes” action.
 

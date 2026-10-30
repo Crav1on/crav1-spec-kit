@@ -22,4 +22,4 @@ This command is a later skill. It is not a starter option. When the user asks fo
 
 This is not `/crav1-resolve-open-questions`. Resolve walks the questions with the user and writes the decisions into the spec. This command drafts the questions for someone else and writes only the asked and pending marks.
 
-The record format, pending, answer links, and the asked-on date are shared with the import skills. Follow `crav1-add-to-spec` `references/open-questions.md` (drop-in: `.claude/skills/crav1-add-to-spec/references/open-questions.md`; plugin: sibling `skills/crav1-add-to-spec/references/open-questions.md`).
+The record format, pending, answer links, and the asked-on date are shared with the import skills. Follow skill `crav1-add-to-spec`, `references/open-questions.md`.

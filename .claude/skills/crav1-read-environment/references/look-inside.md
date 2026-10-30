@@ -8,8 +8,8 @@ Run this after the shape question, when that question is needed, and before any 
 
 Two readers, in this order. Ask both reader questions in one questions call (1.70.0).
 
-- **SQL** — [references/sql.md](sql.md) (drop-in: `.claude/skills/crav1-read-environment/references/sql.md`; plugin: this skill’s `references/sql.md`). Metadata only. Never a row.
-- **Storage** — [references/storage.md](storage.md) (drop-in: `.claude/skills/crav1-read-environment/references/storage.md`; plugin: this skill’s `references/storage.md`). Structure only. Prefix depth is 2. Never a blob, a file count, or a size.
+- **SQL** — [references/sql.md](sql.md) (this skill's `references/sql.md`). Metadata only. Never a row.
+- **Storage** — [references/storage.md](storage.md) (this skill's `references/storage.md`). Structure only. Prefix depth is 2. Never a blob, a file count, or a size.
 
 When the databases this pass found have no clear environment, say `There are no clear database environments.` Then ask that reader’s questions. Options only.
 

@@ -36,6 +36,6 @@ When the spec has no prose paragraph, say the spec has no first paragraph, and s
 
 ## Research marked stale
 
-On every run, when this answer opens a spec, and when the feature-index check reads a spec for its title, also read `## Research findings` on that spec. Also read a `docs/research/` note that those findings link to, and any stale block on that note. Follow the readers section of `crav1-add-to-spec` `references/research-stale.md` (drop-in: `.claude/skills/crav1-add-to-spec/references/research-stale.md`; plugin: sibling `skills/crav1-add-to-spec/references/research-stale.md`).
+On every run, when this answer opens a spec, and when the feature-index check reads a spec for its title, also read `## Research findings` on that spec. Also read a `docs/research/` note that those findings link to, and any stale block on that note. Follow the readers section of skill `crav1-add-to-spec`, `references/research-stale.md`.
 
 When a stale mark is there, say the research is stale. Quote the mark. Name the path. One line per mark. Do not treat that research as current. Do not clear the mark. Do not drop a mark to keep the list short. When no mark is there, do not invent one.

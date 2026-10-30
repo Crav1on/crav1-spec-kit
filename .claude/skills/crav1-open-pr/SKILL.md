@@ -35,7 +35,7 @@ On Windows, `git` may not be on `PATH`. Try `git`, then `C:\Program Files\Git\cm
 
 ## Base branch
 
-The base is the head's into branch, as `crav1-add-to-spec` `references/branches.md` ("Base branch and Merges into") says (drop-in: `.claude/skills/crav1-add-to-spec/references/branches.md`; plugin: sibling `skills/crav1-add-to-spec/references/branches.md`). Read `references/base.md` ("Base branch") to resolve it: the `(into …)` ask, the `Merges into` lookup (also in sibling checkouts), and the default-branch steps. Name where the base came from in the draft.
+The base is the head's into branch, as `crav1-add-to-spec` `references/branches.md` ("Base branch and Merges into") says (skill `crav1-add-to-spec`, `references/branches.md`). Read `references/base.md` ("Base branch") to resolve it: the `(into …)` ask, the `Merges into` lookup (also in sibling checkouts), and the default-branch steps. Name where the base came from in the draft.
 
 Remote: the single `git remote`. If several remotes exist, ask which one. If none exist, draft the title and body if you can, then stop. Say no remote is configured. Do not claim a push or a pull request.
 

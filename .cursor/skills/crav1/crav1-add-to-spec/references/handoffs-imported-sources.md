@@ -4,7 +4,7 @@ Read only when the pointer in `SKILL.md` sends you here. Moved word for word fro
 
 ## Imported sources
 
-When the new information is a mail, a transcript, minutes, a chat, a screenshot, a diagram, or another original file that will be quoted, or a paste of a mail, transcript, minutes, or chat, follow [references/sources.md](sources.md) (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/references/sources.md`; plugin: this skill’s `references/sources.md`).
+When the new information is a mail, a transcript, minutes, a chat, a screenshot, a diagram, or another original file that will be quoted, or a paste of a mail, transcript, minutes, or chat, follow [references/sources.md](sources.md) (this skill's `references/sources.md`).
 
 Its personal-data and secrets check is in that file; flagged items, the transfer data policy, and the one question are in `references/sources-flagged.md`, and a mail's images in `references/sources-mail.md` and `references/sources-binary.md`, all in `crav1-add-to-spec`.
 

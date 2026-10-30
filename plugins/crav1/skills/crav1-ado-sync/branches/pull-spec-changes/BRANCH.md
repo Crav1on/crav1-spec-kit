@@ -12,7 +12,7 @@ Spark, specify, plan, and verify do not run it. It is not started automatically.
 
 This command reads Azure Boards. It does not create a Feature. It does not update a Feature field. The only write to Azure Boards is a discussion comment the user accepted.
 
-CLI checks and the `az` calls: [../crav1-ado-sync/branches/push-features/references/azure-boards.md](../../../crav1-ado-sync/branches/push-features/references/azure-boards.md) (drop-in: `.cursor/skills/crav1/crav1-ado-sync/branches/push-features/references/azure-boards.md`; plugin: sibling `skills/crav1-ado-sync/branches/push-features/references/azure-boards.md`). Do not show those commands in the chat.
+CLI checks and the `az` calls: [../crav1-ado-sync/branches/push-features/references/azure-boards.md](../../../crav1-ado-sync/branches/push-features/references/azure-boards.md) (this skill's `branches/push-features/references/azure-boards.md`). Do not show those commands in the chat.
 
 ## Which ids
 
@@ -35,7 +35,7 @@ For each id, read State, Priority, Target Date, Iteration, and Assigned To with 
 
 Before comparing, read the project’s Feature fields once, the same way the push features branch of `/crav1-ado-sync` does. A failed field read is the same failure as the other `az` checks. State the issue, suggest a fix, and offer Retry or Skip. Do not guess where the checks live.
 
-Read each id in its own home: the `(ADO: <org>/<project>)` tag on its line, or for an older line without one the marks.md org and project, as [work-item-homes.md](../../../crav1-ado-sync/branches/push-features/references/work-item-homes.md) (drop-in: `.cursor/skills/crav1/crav1-ado-sync/branches/push-features/references/work-item-homes.md`; plugin: sibling `skills/crav1-ado-sync/branches/push-features/references/work-item-homes.md`) says. An id not found in its home is reported as **moved or missing**, with that home. Ask before searching the other projects `az` can read; never search on your own. A deleted id is reported as missing. Do not guess another work item. Do not match on the title.
+Read each id in its own home: the `(ADO: <org>/<project>)` tag on its line, or for an older line without one the marks.md org and project, as [work-item-homes.md](../../../crav1-ado-sync/branches/push-features/references/work-item-homes.md) (this skill's `branches/push-features/references/work-item-homes.md`) says. An id not found in its home is reported as **moved or missing**, with that home. Ask before searching the other projects `az` can read; never search on your own. A deleted id is reported as missing. Do not guess another work item. Do not match on the title.
 
 ## What to show
 

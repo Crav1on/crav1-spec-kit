@@ -26,7 +26,7 @@ Read `references/asked.md` ("Pending first") only when questions are already mar
 
 Collect every open question that fits the selection.
 
-Person, spec, topic, branch, and pull request (`pr71`, `#71`) follow `crav1-add-to-spec` `references/scope.md` (drop-in: `.cursor/skills/crav1/crav1-add-to-spec/references/scope.md`; plugin: sibling `skills/crav1-add-to-spec/references/scope.md`).
+Person, spec, topic, branch, and pull request (`pr71`, `#71`) follow skill `crav1-add-to-spec`, `references/scope.md`.
 
 Skip a question that already has a clear `Answered:` line. Say how many were skipped and why. Skip a question with an `Asked:` line for this person unless the user asks to ask again. Say how many were skipped and when they were asked.
 

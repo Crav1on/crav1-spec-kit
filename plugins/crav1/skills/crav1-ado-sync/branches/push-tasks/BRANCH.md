@@ -10,7 +10,7 @@ This command is a later skill. It is not a starter option. When the user asks fo
 
 Spark, specify, plan, and verify do not run it. It is not started automatically. The push features branch of `/crav1-ado-sync` may name it and does not run it.
 
-CLI checks and the `az` calls: the same file the push features branch of `/crav1-ado-sync` uses, [azure-boards.md](../../../crav1-ado-sync/branches/push-features/references/azure-boards.md) (drop-in: `.cursor/skills/crav1/crav1-ado-sync/branches/push-features/references/azure-boards.md`; plugin: sibling `skills/crav1-ado-sync/branches/push-features/references/azure-boards.md`), plus [references/child-items.md](references/child-items.md) for the child type and the parent link. Do not show those commands in the chat.
+CLI checks and the `az` calls: the same file the push features branch of `/crav1-ado-sync` uses, [azure-boards.md](../../../crav1-ado-sync/branches/push-features/references/azure-boards.md) (this skill's `branches/push-features/references/azure-boards.md`), plus [references/child-items.md](references/child-items.md) for the child type and the parent link. Do not show those commands in the chat.
 
 ## Check first
 
@@ -21,7 +21,7 @@ On a failure, state the issue, suggest a fix such as `az login`, and offer Retry
 
 ## Work item homes
 
-Each task goes to the home of its repo, as [work-item-homes.md](../../../crav1-ado-sync/branches/push-features/references/work-item-homes.md) (drop-in: `.cursor/skills/crav1/crav1-ado-sync/branches/push-features/references/work-item-homes.md`; plugin: sibling `skills/crav1-ado-sync/branches/push-features/references/work-item-homes.md`) says: read the `Work items go to` cell in `docs/system/repos.md`, and ask for an empty one, once per repo. A task with no clear repo is asked once, suggesting the spec's main repo. A task whose repos are in different homes is asked: split it (through `/crav1-add-to-spec`) or pick one repo's home.
+Each task goes to the home of its repo, as [work-item-homes.md](../../../crav1-ado-sync/branches/push-features/references/work-item-homes.md) (this skill's `branches/push-features/references/work-item-homes.md`) says: read the `Work items go to` cell in `docs/system/repos.md`, and ask for an empty one, once per repo. A task with no clear repo is asked once, suggesting the spec's main repo. A task whose repos are in different homes is asked: split it (through `/crav1-add-to-spec`) or pick one repo's home.
 
 Its parent is the spec's Feature **in that same home** (the Feature line whose `(ADO: …)` tag matches). When the spec has no Feature in that home, say so and name the push features branch of `/crav1-ado-sync`. Do not send that task. Do not parent it to a Feature in another home.
 
