@@ -23,7 +23,7 @@ The spec is everything after `/crav1-retire-spec` that names a folder under `doc
 
 No spec named, or a name that matches more than one folder: ask with options only, one option per spec folder, labelled `docs/specs/<slug>/` and the spec's title line. A headless or bot run with no spec stops and says: `Missing spec. Name docs/specs/<slug>/.`
 
-A spec that already has a `Parked:` line and the wording says un-park, unpark, resume, or pick up again: run **Un-park**. Do not ask the opening question.
+A spec that already has a `Parked:` line and the wording says un-park, unpark, resume, or pick up again: run **Un-park** ([branches/park/BRANCH.md](branches/park/BRANCH.md)). Do not ask the opening question.
 
 ## Opening question
 
@@ -64,62 +64,14 @@ Moved: <retired | merged | converted> <YYYY-MM-DD>, see <new path>. Reason: <rea
 
 Other files in the old folder (`plan.md`, `tasks.md`, `verify.md`, and the rest) move with the spec. The old folder keeps only the pointer.
 
-## Retire
+## Route (1.106.0)
 
-1. Move `docs/specs/<slug>/` to `docs/specs/retired/<slug>/`. Create `docs/specs/retired/` when it is missing.
-2. Add as the first line of the moved `spec.md`: `Retired: <YYYY-MM-DD>, <reason>`.
-3. Leave the pointer at the old path.
-4. Remove that slug's row from `## Feature index` in `docs/system/landscape.md`.
-5. Search `docs/` (specs, plans, tasks, notes, system notes) for links to the old path or the slug. Do not rewrite them. List each one as `link to fix: <file>:<line>` in the closing message.
+Route first, load second. Pick the branch from the choice word or the answer to the opening question, then read only that branch file. Do not read the other branches.
 
-Every skill that scans specs skips `docs/specs/retired/`.
-
-## Merge
-
-**Target.** When the user named a target spec, use it. Do not suggest others.
-
-When no target is named, suggest only specs that are a real fit, which can be none, one, or several. Each suggestion has a reason taken from what was read:
-
-- a shared feature area (the same area or parent in the feature index, or the same title words)
-- overlapping requirements (the same requirement, resource, or acceptance line in both specs)
-- the same system in `docs/system/landscape.md` (both slices on the same line under `## How the parts connect`)
-- links between them (one spec links to the other)
-
-Best fit first, its label ending with ` (Recommended)`. Do not pad the list. A spec with no stated reason is not a fit. When none fits, say `no good merge fit found` and offer park, retire, or convert to note instead. A headless or bot run with no target stops and lists the fits with their reasons, or says `no good merge fit found`.
-
-**Move.** Into the target `spec.md`:
-
-- the content, under the target's matching headings, each block marked `(from <slug>)`
-- each open question with its lines, marked `(from <slug>)`
-- each decision, marked `(from <slug>)`
-
-Do not rewrite the target's own lines. A requirement that already says the same thing is not copied again; list it as `already in target` in the summary.
-
-Then move the source folder to `docs/specs/retired/<slug>/` with `Merged: <YYYY-MM-DD> into <target slug>, <reason>` as its first line, leave the pointer at the old path, and remove the source's feature-index row. Flag inbound links as in **Retire**.
-
-## Park
-
-Add as the first line of `spec.md`: `Parked: <YYYY-MM-DD>, <reason>`. Do not move the spec. Do not change the feature-index row.
-
-While parked:
-
-- `/crav1-plan-from-spec`, `/crav1-build-tasks`, `/crav1-build-features`, and the push branches of `/crav1-ado-sync` skip it and say `skipped: <slug> (parked)`.
-- `/crav1-help` and `/crav1-show-or-ask-open-questions` list it as parked, with the count of notes waiting for it.
-- `/crav1-add-to-spec` writes nothing into it. Input that matches it is saved as one note waiting for it (see that skill's **Parked specs**).
-
-## Un-park
-
-1. Find every note in `docs/notes/` (month folders and their generated indexes) with the slug in `waiting_for`, or an old `Waiting for <slug> (parked)` line.
-2. Read each waiting note in full. Suggest what fits the spec now, including points that already went to other specs, when they matter to this one too. Match each point against every active spec as well, and say when another spec is now the better fit.
-3. Show the summary: the `Parked:` line removed, each point to add, and each note that gets `Used by <slug>`.
-4. On yes: remove the `Parked:` line, add the chosen points through the same rules as `/crav1-add-to-spec`, and on each waiting note move the slug from `waiting_for` to `used_by` (an old line becomes `Used by <slug>`). Run the notes index generator; do not hand-edit an index.
-
-A waiting note is never marked absorbed. It stays open as the shared full source for any spec.
-
-## Convert to note
-
-Read `references/convert-to-note.md` ("Convert to note") only when the answer is convert to note.
-
+- **Retire** (`retire`): follow [branches/retire/BRANCH.md](branches/retire/BRANCH.md).
+- **Merge** (`merge`): follow [branches/merge/BRANCH.md](branches/merge/BRANCH.md).
+- **Park and un-park** (`park`, or un-park): follow [branches/park/BRANCH.md](branches/park/BRANCH.md).
+- **Convert to note** (`convert to note`): follow [branches/convert/BRANCH.md](branches/convert/BRANCH.md).
 
 ## Stop
 

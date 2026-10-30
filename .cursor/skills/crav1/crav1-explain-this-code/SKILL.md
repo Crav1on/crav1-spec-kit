@@ -57,31 +57,13 @@ Read the target. Follow each call it makes into the code it calls, when that cod
 
 Never guess. When something cannot be read, say so: `not read: <what> (<why>)`. Do not fill the gap.
 
-## What it does
+## Route (1.106.0)
 
-A walk-through in the order the code runs: inputs, the main steps, branches and loops, side effects (files, network, database, state), what it returns or raises. Name the file and line for each step. Plain words first, then the detail.
+Route first, load second. Pick the branch from the choice word or the answer to the opening question, then read only that branch file. Do not read the other branches.
 
-## What and why
-
-Everything in **What it does**, plus the reasons. A reason counts only when a source states it:
-
-- the code itself (a comment, a docstring, a name that says it, an assert, a test that pins it)
-- the specs (`docs/specs/<slug>/spec.md`)
-- plan decisions (`docs/specs/<slug>/plan.md`)
-- system notes (`docs/system/`, including `adr/`)
-- commits (`git log` and `git blame` on the lines)
-
-Quote or closely paraphrase, and name the source for each reason. When no source states a reason for a step, say `no stated reason found`. Never invent one, and do not offer a likely reason in its place.
-
-## Teach the language
-
-Everything in **What it does**, plus:
-
-- **Idiom notes as they come up.** Detect the language from the file (Python, C#, JavaScript or TypeScript, Go, Rust, and so on). At the line where an idiom appears, add a short note: what it is and why people write it that way, for example a Python decorator, C# async/await or LINQ, a JS closure or promise, a Go goroutine or errors-as-values, Rust ownership or `?`.
-- **One-line comparison.** One line comparing an idiom to a language the user knows. If the user has not said which, ask once. If they skip, or the run is headless, leave the comparison out.
-- **Topics to look up next.** At the end, a few topics to look up next, drawn from the idioms in this code.
-
-Do not hand off to another persona or skill for a lesson.
+- **What it does** (`what it does`): follow [branches/what/BRANCH.md](branches/what/BRANCH.md).
+- **What and why** (`what and why`): follow [branches/why/BRANCH.md](branches/why/BRANCH.md).
+- **Teach the language** (`teach the language`): follow [branches/teach/BRANCH.md](branches/teach/BRANCH.md).
 
 ## Flowchart
 
