@@ -1,19 +1,10 @@
 ---
 name: crav1-explain-existing-system
 description: >-
-  Read the system notes spark, ideas, intake, match, or existing-to-specs
-  already wrote (docs/system/). First answer is a short TLDR. Longer goes
-  one level deeper from the same notes. The user can point at one part, or
-  ask whether the system can do something. Yes points at the note. No says
-  no. When the picture has nothing on the question, quote the first
-  paragraph of the matching slice's spec, labelled as coming from the spec,
-  and name /crav1-what-do-we-know-about-this. When no spec matches either, say so
-  and name that skill. Does not guess, write a second document, teach, or
-  start Specify, Plan, or Build. On every run, compare the feature index
-  with each slice's diagram node and its connection line. List each slice
-  that is missing entirely or partly, including done and retired, and name
-  /crav1-refresh-system-notes. Do not run it. A stale research note is shown
-  as stale. Read-only.
+  Use when the user asks what the system is or whether it can do something.
+  Answers from docs/system/ notes with a short TLDR, deeper on request, and
+  lists slices missing from the picture. Read-only. Does not guess or start
+  Specify, Plan, or Build.
 disable-model-invocation: true
 icon: message-circle
 color: blue

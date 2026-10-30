@@ -1,19 +1,10 @@
 ---
 name: crav1-review-pr
 description: >-
-  Read one named open pull request and report whether it can ship. When
-  the slug has a plan, spec, plan, verify.md, the body, and a required
-  green linter. When it has no plan.md or tasks.md, an info note, spec
-  and the body, the pipeline's recorded tests, and that linter.
-  Cross-cutting. Not a lane and not a bot. Same family as /crav1-open-pr
-  and /crav1-merge-pr. Ends with a paste-ready comment, link-first per
-  point; posts it as one comment and votes only after the user's yes. Re-review marks earlier
-  findings fixed or open. Works across repos: from the specs repo for a
-  PR in a repo listed in repos.md, or with both open. Saves the PR
-  description, findings and follow-ups in the PR note's shared PR record
-  in the specs repo's docs/notes/YYYY-MM/, with the comment as drafted
-  and as posted, and marks drafted points left out. Does not edit, test,
-  or merge.
+  Use when the user asks whether one named open pull request can ship, or to
+  re-review it. Checks it against the spec, plan, verify and linter, drafts a
+  paste-ready comment, and posts or votes only after a yes. Works across
+  repos. Does not edit, test, or merge.
 disable-model-invocation: true
 icon: git-pull-request
 color: orange

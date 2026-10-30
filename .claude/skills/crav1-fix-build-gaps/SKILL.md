@@ -1,13 +1,9 @@
 ---
 name: crav1-fix-build-gaps
 description: >-
-  Fix gaps a build left, one at a time, inside the spec. Opens with one
-  question: gaps from the verify report (verify failed, then unverified,
-  then G#), or a live-site gap (ports, proxy, SQL, unpublished URL). Skips
-  the question when the message already says which. Re-runs the evidence
-  after each fix. Does not edit spec.md. Does not auto-pick unimplemented
-  tasks. Replaces fix-from-verify and fix-live (their rules are kept as
-  branches).
+  Use after a build or verify left gaps. Fixes one gap at a time inside the
+  spec, from the verify report or a live-site gap (ports, proxy, SQL, URL),
+  and re-runs the evidence. Does not edit spec.md or pick unimplemented tasks.
 disable-model-invocation: true
 icon: wrench
 color: orange

@@ -1,19 +1,10 @@
 ---
 name: crav1-refresh-system-notes
 description: >-
-  Update the picture in docs/system/ when something was added: add what is
-  new to the short description, the diagram, and how the parts connect,
-  and do not rewrite what is there. A whole-repo read sets that repo's
-  Synced at line in repos.md and touches only those repos; a one-slice read writes the
-  slice Synced at line and leaves repos.md. Does not design or build the
-  change. Can run on its own. Spark, ideas, intake, match, and siblings
-  that append a glossary row run this same update without rewriting rows.
-  Reading named repos into one architecture spec is /crav1-existing-to-specs,
-  not this. When pointed at an updated note in docs/research/, checks each
-  listed stale point, splits an older mark into its hits, and routes the
-  note's open questions whose answer lies outside its owner, without
-  asking. Clears the mark when every point is resolved; otherwise narrows
-  it and routes each open point.
+  Use when something was added and the docs/system/ picture (description,
+  diagram, connections) should catch up, or when a docs/research/ note was
+  updated and its stale points need checking. Adds only what is new. Does not
+  design or build.
 disable-model-invocation: true
 icon: refresh-cw
 color: green

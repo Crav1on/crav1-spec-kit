@@ -1,6 +1,9 @@
 ---
 name: crav1-export-spec
-description: Re-project an existing canonical spec.md into EARS, BDD, OpenSpec, YAML, JSON, and/or BMAD. Use when the spec already exists and the user wants another format. Do not change behavior. Do not write application code.
+description: >-
+  Use when a spec.md already exists and the user wants it in another format
+  (EARS, BDD, OpenSpec, YAML, JSON, or BMAD). Does not change behavior or
+  write application code.
 disable-model-invocation: true
 icon: book-open
 color: orange

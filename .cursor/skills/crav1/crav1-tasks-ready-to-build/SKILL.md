@@ -1,17 +1,9 @@
 ---
 name: crav1-tasks-ready-to-build
 description: >-
-  List the tasks that are ready to build, for one spec or all specs, and why
-  the others are blocked. Ready means plan.md exists (and was reviewed),
-  the task's dependencies are done, no open question blocks it, and it is
-  not ticked. Reads the Reviewed line in plan.md, (after: T#) on task lines,
-  Blocks: lines under spec open questions, plan Risks, tasks.md ticks, and
-  verify.md. Where nothing is recorded it falls back and marks the reason
-  inferred. Shows summary counts, Ready, Blocked (one reason each), Needs
-  verify, a Done count, a Branches line, and Next: /crav1-build-tasks T#.
-  Lists are in dependency order (the (after: T#) graph), not task number.
-  Shows a task's (branch: …) beside it. Local only,
-  never reads Azure Boards. Read-only. Can run any time by its slash command.
+  Use when the user asks which tasks are ready to build, for one spec or all,
+  and why others are blocked. Lists Ready, Blocked, Needs verify and Done in
+  dependency order and names the next task. Local and read-only.
 disable-model-invocation: true
 icon: list-checks
 color: green

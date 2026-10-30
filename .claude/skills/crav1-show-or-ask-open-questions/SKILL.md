@@ -1,17 +1,10 @@
 ---
 name: crav1-show-or-ask-open-questions
 description: >-
-  Opens with one question: show the cross-spec overview of open questions
-  (who was asked, when, pending drafts, Blocks lines; read-only), or ask;
-  skipped when the message says which. Ask: gather the open questions for
-  one person, spec, or topic and draft a mail, agenda, chat message, or
-  questions to ask out loud. Numbered, grouped by topic, plain words, with
-  context. The draft never names a slug, path, or question id. English by
-  default. Nothing is sent. Then asks whether they were asked: yes, no, or
-  pending; yes and pending mark each question in the spec, and pending
-  come back first next run. The personal-data check applies. Answers are
-  linked back by the import skills. Cross-cutting. Not a starter option.
-  Does not plan, implement, or commit.
+  Use when the user wants an overview of open questions across specs, or to
+  ask a person, spec, or topic about them. Drafts a mail, agenda, or chat
+  message (never sent), then records who was asked. Does not plan, implement,
+  or commit.
 disable-model-invocation: true
 icon: message-circle-question
 color: purple

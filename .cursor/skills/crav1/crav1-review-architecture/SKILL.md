@@ -1,6 +1,10 @@
 ---
 name: crav1-review-architecture
-description: Start the crav1-review-architecture-agent subagent on the current spec. Use when the user wants an architecture critique, hunches vs decisions, ADR/diagram gaps, and a numbered issue list for /crav1-tighten-spec. Do not write application code.
+description: >-
+  Use when the user wants an architecture critique of the current spec. Starts
+  the crav1-review-architecture-agent subagent for hunches vs decisions, ADR
+  and diagram gaps, and numbered issues for /crav1-tighten-spec. Does not
+  write application code.
 disable-model-invocation: true
 icon: shield
 color: purple

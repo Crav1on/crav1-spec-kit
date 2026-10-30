@@ -1,16 +1,10 @@
 ---
 name: crav1-glossary
 description: >-
-  The project glossary in docs/system/glossary.md. No word: show the whole
-  glossary in the chat, in the file's order, and name the file. file: write
-  the same list to .crav1/glossary-list.md, kept out of git. research:
-  fill the rows whose Meaning is to be researched, docs/ first (written
-  with a file and line link), then the web for public terms only, after
-  the personal-data check (a web meaning is written only after a yes).
-  <term>: answer one term from its row, or research it the same way and
-  offer to add the row. Not found anywhere: offer a guess with Correct or
-  Needs research; never an open question on a spec. Cross-cutting. Not a
-  starter option. Does not commit.
+  Use when the user asks about project terms in docs/system/glossary.md. Shows
+  the glossary, writes it to a file, researches rows marked to be researched,
+  or answers one term. Never adds open questions to a spec. Cross-cutting.
+  Does not commit.
 disable-model-invocation: true
 icon: book-a
 color: teal

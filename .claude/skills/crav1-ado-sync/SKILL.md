@@ -1,14 +1,10 @@
 ---
 name: crav1-ado-sync
 description: >-
-  Keep specs and Azure Boards (ADO) in step. Opens with one question:
-  suggest Features (read only), push Features, push tasks, pull task
-  changes, or pull spec changes from Features. Skips the question when
-  the message already says which. Each choice keeps its own checks:
-  az first, previews, writes to Azure Boards only after a yes, ids
-  recorded in work-item.md, work-item homes per repo. Later skill. Not a
-  starter option. Replaces feature-candidates, specs-to-ado, tasks-to-ado,
-  ado-to-tasks, and ado-to-specs (their rules are kept as branches).
+  Use to keep specs and Azure Boards in step. Suggest Features, push Features,
+  push tasks, pull task changes, or pull spec changes from Features. Previews
+  first and writes to Azure Boards only after a yes. Later skill, not a
+  starter option.
 disable-model-invocation: true
 icon: refresh-cw
 color: blue

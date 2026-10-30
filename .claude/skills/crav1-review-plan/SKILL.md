@@ -1,11 +1,9 @@
 ---
 name: crav1-review-plan
 description: >-
-  Start the crav1-plan-reviewer-agent subagent on plan.md and tasks.md against
-  spec.md. Use after /crav1-plan-from-spec. Numbered plan issues (P#) for
-  /crav1-tighten-plan. Writes only one line in plan.md: Reviewed: <date>,
-  P# open: n. Do not write application code. Do not answer new product
-  questions.
+  Use after /crav1-plan-from-spec. Starts the crav1-plan-reviewer-agent
+  subagent on plan.md and tasks.md against spec.md and returns P# issues for
+  /crav1-tighten-plan. Writes only the Reviewed line. Does not write code.
 disable-model-invocation: true
 icon: search
 color: orange

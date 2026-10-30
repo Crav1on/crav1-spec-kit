@@ -1,18 +1,10 @@
 ---
 name: crav1-help
 description: >-
-  Answer questions about the kit itself from the kit's own local docs: a
-  usage guide when called with nothing, what one skill does and its before
-  and after steps, the route in order for "next" or a situation (from
-  reference/workflow.yaml, using the slice's file state), a concept,
-  the skill list by lane, the status of one slice, a comparison of two
-  skills, what is new in the CHANGELOG, or a free-form question. Every answer names the file and anchor it came from.
-  When the docs do not cover a question, says "the kit doesn't say". On
-  pushback, re-reads the file and keeps the answer unless the file says
-  otherwise. Reads the kit repo's docs, or the docs bundled in the
-  installed kit (plugin or drop-in), never GitHub. When online, says once if a newer kit
-  version is tagged. `todo` ranks what to do next.
-  Writes nothing and runs no other skill.
+  Use when the user asks about the kit itself (what a skill does, what to run
+  next, a concept, lanes, a slice's status, what is new, or `todo`). Answers
+  from the kit's local docs and names the source. Writes nothing and runs no
+  other skill.
 icon: life-buoy
 color: blue
 ---

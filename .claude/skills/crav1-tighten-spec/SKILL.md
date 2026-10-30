@@ -1,6 +1,10 @@
 ---
 name: crav1-tighten-spec
-description: Walk an existing spec issue-by-issue. When the slice is partial or In the code names paths, read that repo and branch first and treat the committed code as fact. For every finding (including review-architecture notes), offer explained resolution choices (including get a suggestion) and wait; patch only that issue after a pick. Use when spec.md exists and needs tightening. Do not write application code. Do not offer finish, add a test, or leave.
+description: >-
+  Use when spec.md exists and needs tightening. Walks each issue (including
+  architecture review notes) with explained choices and patches only that
+  issue after a pick; reads the code first when the slice is partial. Does not
+  write application code.
 disable-model-invocation: true
 icon: book-open
 color: cyan

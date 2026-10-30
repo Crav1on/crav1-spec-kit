@@ -1,10 +1,10 @@
 ---
 name: crav1-create-feature-branch
 description: >-
-  Create or check out feat/<slug> (one branch for spec+build) or spec/<slug>
-  (specify-only; build later on feat/<slug>). Use on brownfield specify or
-  before implement on a base branch (main, develop, Merges into, release/*);
-  no Stay there. Prompt; never silent checkout. Do not push. Do not open a PR.
+  Use before specifying or building on a base branch (main, develop,
+  release/*). Prompts for feat/<slug> or specify-only spec/<slug>, then
+  creates or checks it out. Never checks out silently. Does not push or open a
+  pull request.
 disable-model-invocation: true
 icon: git-branch
 color: blue

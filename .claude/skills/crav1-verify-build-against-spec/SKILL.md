@@ -1,6 +1,9 @@
 ---
 name: crav1-verify-build-against-spec
-description: Map every v0 acceptance line to tests or UI checks and report pass, fail, or missing. Lead with a TL;DR of which tasks are implemented vs not. Use after implementation or when the user wants proof against spec.md. Do not add product features.
+description: >-
+  Use after implementation or when the user wants proof against spec.md. Maps
+  every v0 acceptance line to tests or UI checks and reports pass, fail, or
+  missing, with a TL;DR of implemented tasks. Does not add features.
 disable-model-invocation: true
 icon: beaker
 color: orange

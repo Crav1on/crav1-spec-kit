@@ -1,21 +1,10 @@
 ---
 name: crav1-finalize-commit
 description: >-
-  Always drafts first, then offers commit / copy / change / stop.
-  `message only` drafts with no commit (same as copy). Replaces
-  draft-commit-message (its rules are kept as a branch).
-  `commit now` commits without the choice; `crav1` or `git log` sets
-  the style. Finalize a commit: draft the Summary and Description, then
-  offer git commit first, then copy / change / stop, with the CRAV1 style vs
-  git log question in the same prompt when no style rule is saved. Wording is shown before those choices. Use when
-  they want to change the message or actually create the commit, or
-  /crav1-finalize-commit. Does not push. Does not commit until they pick
-  commit. Paste-only: `message only`. Keeps a trailing
-  work-item mention through the HEAD check and the strip of any trailer
-  it did not write. Offers once per repo a shared .githooks
-  commit-msg hook that strips known tool trailers. After the commit it fetches; when behind it pulls
-  with a merge and fixes kit-file conflicts so no line is lost; `pull`
-  does only that. Never pushes.
+  Use when the user wants a commit message drafted or a commit made. Drafts
+  Summary and Description first, then offers commit, copy, change, or stop.
+  Choice words: `message only`, `commit now`, `pull`; `crav1` or `git log`
+  sets the style. Never pushes.
 disable-model-invocation: true
 icon: git-branch
 color: green

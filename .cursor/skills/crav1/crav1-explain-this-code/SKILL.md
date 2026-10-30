@@ -1,18 +1,10 @@
 ---
 name: crav1-explain-this-code
 description: >-
-  Explain a piece of code: a file, a function, a selection, or a PR diff.
-  Asks what to explain when nothing is named. Opens with one question:
-  what it does (Recommended), what and why, or teach the language. Skips
-  it when the wording answers; a headless or bot run with no choice word
-  stops and lists the words. Answers only from the code it read and the
-  code that code calls. Never guesses. Why comes only from the code,
-  specs, plan decisions, system notes, and commits, else "no stated
-  reason found". Always includes a small mermaid flowchart built only
-  from what was read. Read-only, in chat. At the end offers Save as .md,
-  to the user's Downloads folder by default, only after asking and
-  showing the full path; never into the repo by default. Not
-  /crav1-explain-existing-system.
+  Use when the user wants a file, function, selection, or pull request diff
+  explained (what it does, why, or teach the language). Answers only from code
+  it read, with a small mermaid flowchart. Read-only, in chat; saves a .md
+  only after asking.
 disable-model-invocation: true
 icon: code
 color: blue

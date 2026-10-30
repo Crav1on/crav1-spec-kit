@@ -1,6 +1,10 @@
 ---
 name: crav1-ideas-to-spec
-description: Turn a free-form pile of ideas (and any technical hunches in the same text) into a spec, diagrams, ADRs, and a chosen export format. When docs/system/ is missing, seed a thin landscape from the repo, including glossary.md, then the spec, then one index row. When that folder exists, write glossary.md if it is missing, or append only words that are not already rows. Do not rewrite existing glossary rows. A meaning the source does not state is `to be researched`. That same pass adds what is new to the short description, the diagram, and how the parts connect. Do not rewrite what is already there. Use when the user has more than a one-liner but not a finished spec. Do not write application code. They do not need to structure the input.
+description: >-
+  Use when the user pastes a free-form pile of ideas and technical hunches for
+  one feature. Writes a spec, diagrams, ADRs and a chosen export, seeding a
+  thin docs/system/ when missing. Starter option. Several features or repos go
+  to /crav1-bundle-to-specs. Does not write code.
 disable-model-invocation: true
 icon: git-branch
 color: purple

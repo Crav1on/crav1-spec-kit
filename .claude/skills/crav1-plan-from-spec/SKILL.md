@@ -1,6 +1,10 @@
 ---
 name: crav1-plan-from-spec
-description: Turn an accepted spec into a file-level plan.md and independently testable tasks.md. When the spec is partial or In the code names paths, read that repo and branch and choose finish, add a verify test, or leave before any task is written. Use when spec.md exists and the user wants an implementation plan. Do not write application code.
+description: >-
+  Use when spec.md is accepted and the user wants an implementation plan.
+  Writes a file-level plan.md and independently testable tasks.md, reading the
+  code first when the slice is partial. Names the linter check. Does not write
+  application code.
 disable-model-invocation: true
 icon: git-branch
 color: green

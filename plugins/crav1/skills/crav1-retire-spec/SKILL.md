@@ -1,18 +1,9 @@
 ---
 name: crav1-retire-spec
 description: >-
-  Take one spec out of the work: retire it, merge it into another spec,
-  park it, or convert it to a note. Opens with one question: retire
-  (Recommended), merge, park, or convert to note; skips it when the
-  wording answers; a headless or bot run with no choice word stops and
-  lists the words. Always shows a summary of every change and waits for a
-  yes before writing. Never deletes; a moved spec leaves a one-line
-  pointer at its old path. Retire moves it to docs/specs/retired/. Merge
-  takes a named target or suggests only real fits, each with a reason,
-  and says "no good merge fit found" when none fits. Park adds a Parked
-  mark in place; un-park re-reads the notes waiting for it. Convert to
-  note writes docs/notes/YYYY-MM/ with a Source line and a landscape line. Removes
-  the feature-index row on retire, merge, and convert.
+  Use when one spec should leave the work. Retire, merge into another spec,
+  park, or convert to a note. Shows every change and waits for a yes. Never
+  deletes; a moved spec leaves a pointer.
 disable-model-invocation: true
 icon: archive
 color: gray

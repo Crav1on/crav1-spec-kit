@@ -1,15 +1,10 @@
 ---
 name: crav1-existing-to-specs
 description: >-
-  Turn a system that already exists into specs. Opens with two questions:
-  repos only, or repos plus a bundle of notes, tickets, old docs,
-  diagrams, or screenshots to match; and one spec (the architecture spec)
-  or system notes plus one spec per feature. Skips a question the message
-  already answers. Repos are evidence of what exists. A fact the code
-  shows is confirmed; a guess stays out until accepted. Does not write
-  application code or start Specify, Plan, or Build. Starter option.
-  Replaces repos-to-spec and match-to-specs (their rules are kept as
-  branches).
+  Use when the user names repos of a system that already exists and wants
+  specs for it, optionally matched against a bundle of notes or old docs.
+  Writes one architecture spec or system notes plus one spec per slice.
+  Starter option. Does not write code, plan, or build.
 disable-model-invocation: true
 icon: search
 color: yellow

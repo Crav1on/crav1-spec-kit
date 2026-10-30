@@ -1,11 +1,9 @@
 ---
 name: crav1-fix-bug
 description: >-
-  Name one real bug the user already named. Say where it was seen (verify,
-  a report, or production), point at the spec or the shipped behavior it
-  breaks, and name the lane. Cross-cutting. Not a lane and not a stretch of
-  verify. Does not hunt, start the lane, edit code, open a pull request, or
-  create an Azure Boards work item.
+  Use when the user names one real bug. Says where it was seen, which spec or
+  shipped behavior it breaks, and which lane fixes it. Cross-cutting. Does not
+  hunt, edit code, open a pull request, or create a work item.
 disable-model-invocation: true
 icon: alert-triangle
 color: orange

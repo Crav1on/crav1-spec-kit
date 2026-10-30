@@ -1,21 +1,10 @@
 ---
 name: crav1-read-environment
 description: >-
-  Read the host the user named. Each host has its own reader. This build
-  has readers for Azure, AWS, and Google Cloud. Another named host stops
-  with no reader. Naming production, prod, or live stops. One pass
-  reads every non-prod environment. Pre-prod, resources shared with
-  prod, and prod-only resources are shape and connections only, after
-  one yes. Never production data. After that read, and before any
-  section, optional SQL metadata and storage structure, only when the
-  user says yes. Never rows. Never blobs. Never open production.
-  Appends confirmed lines to docs/environments/marks.md. Does not write
-  docs/system, docs/architecture/spec.md, feature specs, or
-  docs/architecture/left-out.md. After the user confirms a section, the
-  skill that already owns the file adds only what is new. A fact is seen
-  in that environment. A prod-only line says prod only. A link only when
-  the environment shows the connection. Does not start Specify, Plan, or
-  Build.
+  Use when the user names a cloud host (Azure, AWS, or Google Cloud) and wants
+  its non-prod environments read. Production is shape and connections only
+  after one yes, never data. Appends confirmed lines to
+  docs/environments/marks.md. Naming production stops.
 disable-model-invocation: true
 icon: cloud
 color: cyan
