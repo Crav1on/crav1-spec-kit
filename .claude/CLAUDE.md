@@ -13,6 +13,7 @@ Type `/crav1` to list kit skills. `/crav1-help` answers what to run next, in wha
 - Before a pull request: review-pr → tighten-spec or plan-from-spec or build-tasks (optional) → finalize-commit → open-pr → pr-status (optional).
 - Outside pull request: review-pr → pr-status (optional) → merge-pr → refresh-system-notes → finalize-commit.
 - Azure Boards sync: ado-sync → finalize-commit.
+- Repos vs specs: existing-to-specs → add-to-spec (optional) → tighten-spec (optional) → finalize-commit.
 - The build skills (build-tasks, build-features) verify each task inside their worker, then go to open-pr. `/crav1-tasks-ready-to-build` is command-only: it runs when typed, any time, to list ready and blocked tasks. For a plain question about which tasks are ready, name the command. Full routes: `docs/reference/workflow.md` (kit repo, or `crav1-docs/` next to the skills).
 <!-- crav1-order:end -->
 

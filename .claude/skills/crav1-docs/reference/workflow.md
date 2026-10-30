@@ -16,6 +16,7 @@ A route is an ordered list of steps for one situation. A step with more than one
 | [Before a pull request](#before-pr) | Your branch is ready and you want it reviewed and fixed before you open a pull request. |
 | [Outside pull request](#outside-pr) | A pull request was built outside the kit (its slug has no `plan.md` or `tasks.md`). |
 | [Azure Boards sync](#ado-sync) | Specs and Azure Boards (ADO) should match. |
+| [Repos vs specs](#repo-gaps) | Specs already exist and you want to know what code no spec covers, or which spec claims the code no longer shows. |
 
 <a id="new-slice"></a>
 
@@ -115,3 +116,16 @@ Specs and Azure Boards (ADO) should match.
 | --- | --- | --- |
 | 1 | `/crav1-ado-sync` | It asks which: suggest Features, push Features, push tasks (when the slice has `tasks.md`), pull task states, or pull spec changes from Features. |
 | 2 | `/crav1-finalize-commit` | When the sync changed a file. |
+
+<a id="repo-gaps"></a>
+
+## Repos vs specs
+
+Specs already exist and you want to know what code no spec covers, or which spec claims the code no longer shows.
+
+| Step | Command | When |
+| --- | --- | --- |
+| 1 | `/crav1-existing-to-specs` | `/crav1-existing-to-specs recheck` (preview, 1.108.0): reports code with no spec and stale spec claims, and refreshes `## Code with no slice` in `docs/system/landscape.md`. It writes nothing into any spec. |
+| 2 | `/crav1-add-to-spec` | Optional. For a gap you want in an existing spec, after a yes. |
+| 3 | `/crav1-tighten-spec` | Optional. For a stale claim you want fixed in the spec. |
+| 4 | `/crav1-finalize-commit` | When the note changed. |

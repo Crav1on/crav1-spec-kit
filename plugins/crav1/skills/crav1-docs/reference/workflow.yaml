@@ -166,6 +166,21 @@ routes:
         when: "It asks which: suggest Features, push Features, push tasks (when the slice has `tasks.md`), pull task states, or pull spec changes from Features."
       - skills: [crav1-finalize-commit]
         when: When the sync changed a file.
+  - id: repo-gaps
+    title: Repos vs specs
+    when: Specs already exist and you want to know what code no spec covers, or which spec claims the code no longer shows.
+    steps:
+      - skills: [crav1-existing-to-specs]
+        when: "`/crav1-existing-to-specs recheck` (preview, 1.108.0): reports code with no spec and stale spec claims, and refreshes `## Code with no slice` in `docs/system/landscape.md`. It writes nothing into any spec."
+        as_next: /crav1-existing-to-specs recheck
+      - skills: [crav1-add-to-spec]
+        optional: true
+        when: For a gap you want in an existing spec, after a yes.
+      - skills: [crav1-tighten-spec]
+        optional: true
+        when: For a stale claim you want fixed in the spec.
+      - skills: [crav1-finalize-commit]
+        when: When the note changed.
 
 # Extra next steps after the route steps (side steps such as a commit).
 also_next:

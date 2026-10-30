@@ -44,7 +44,7 @@ Limits and exceptions: a different open repo or branch, a missing branch, a stub
 
 ## You run next / Runs by itself
 
-- You run next: [`/crav1-resolve-open-questions`](crav1-resolve-open-questions.md)
+- You run next: [`/crav1-resolve-open-questions`](crav1-resolve-open-questions.md); [`/crav1-finalize-commit`](crav1-finalize-commit.md)
 - Runs by itself: Calls no skill.
 
 ## Lane and group

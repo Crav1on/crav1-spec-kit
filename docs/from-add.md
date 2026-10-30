@@ -27,6 +27,9 @@ Add this to that spec. Do not write code. Do not plan.
 
 That slash command *is* the prompt.
 
+
+To find code that no spec covers yet, with no change to point at, `/crav1-add-to-spec` is not the skill: run `/crav1-existing-to-specs recheck` (1.108.0, preview), then bring a gap back here after a yes.
+
 ## Steps
 
 | Phase | You | Agent |
