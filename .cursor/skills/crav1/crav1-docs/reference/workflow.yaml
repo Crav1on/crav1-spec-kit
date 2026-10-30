@@ -171,7 +171,7 @@ routes:
     when: Specs already exist and you want to know what code no spec covers, or which spec claims the code no longer shows.
     steps:
       - skills: [crav1-existing-to-specs]
-        when: "`/crav1-existing-to-specs recheck` (preview, 1.108.0): reports code with no spec and stale spec claims, and refreshes `## Code with no slice` in `docs/system/landscape.md`. It writes nothing into any spec."
+        when: "`/crav1-existing-to-specs recheck` (1.108.0): reports code with no spec and stale spec claims, and refreshes `## Code with no slice` in `docs/system/landscape.md`. It writes nothing into any spec."
         as_next: /crav1-existing-to-specs recheck
       - skills: [crav1-add-to-spec]
         optional: true

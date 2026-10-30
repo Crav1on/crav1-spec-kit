@@ -227,7 +227,7 @@ skills:
       means: "one spec (the architecture spec)"
     - word: "spec per feature"
       means: "system notes plus one spec per feature"
-  - question: Recheck existing specs (preview, 1.108.0)
+  - question: Recheck existing specs (1.108.0)
     words:
     - word: "recheck"
       means: compare the repos with the specs that exist; report code with no spec and stale claims; refresh the landscape note
@@ -241,7 +241,7 @@ skills:
   prompt_budget: 3
   walkthrough: docs/from-existing-to-specs-with-bundle.md
   purpose: Turn a system that already exists into specs; asks repos only or repos plus a bundle, and one spec or system
-    notes plus one spec per feature; or rechecks existing specs against the repos (preview).
+    notes plus one spec per feature; or rechecks existing specs against the repos.
   in_depth:
   - '**`/crav1-existing-to-specs`** is a starter option. It opens with two questions: repos only, or repos
     plus a bundle to match; and one spec (the architecture spec), or system notes plus one spec per feature.
@@ -300,7 +300,7 @@ skills:
     leaves that cell empty. It does not set or clear an existing cell. Repos only: Writes `docs/architecture/spec.md`
     when that file is missing, `docs/architecture/left-out.md` for guesses that stay left out, and the `docs/system/`
     notes `/crav1-explain-existing-system` reads when those notes are missing. Sets `Synced at` on each repo it read
-    and touches only those repos. Recheck (preview, 1.108.0): writes only `## Code with no slice` in `docs/system/landscape.md`
+    and touches only those repos. Recheck (1.108.0): writes only `## Code with no slice` in `docs/system/landscape.md`
     (lines still true stay, covered lines come off, new gaps added, `## Dismissed` kept) and `Synced at` in `repos.md`
     for a repo read whole. Writes nothing into any spec, and never an open question.'
   leaves_alone: 'Repos plus a bundle: Leaves application code, `plan.md`, `work-item.md`, and the rest of an existing
@@ -2447,7 +2447,7 @@ routing:
           link. It does not invent links. It does not design the next feature, write application code,
           or start Specify, Plan, or Build. It is not `/crav1-add-to-spec`. It does not move work into
           Specify, Plan, or Build.'
-        - '`/crav1-existing-to-specs recheck` (also `repos vs specs`, preview since 1.108.0) may run from any lane
+        - '`/crav1-existing-to-specs recheck` (also `repos vs specs`, since 1.108.0) may run from any lane
           once specs exist. It compares the named repos, or every repo in `docs/system/repos.md`, with the existing
           specs, optionally narrowed to a path or to code changed since the last read. It reports code no spec covers
           and stale claims (cited paths that are gone), refreshes `## Code with no slice` in `docs/system/landscape.md`,

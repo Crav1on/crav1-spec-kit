@@ -2,13 +2,21 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.108.1 (2026-10-30)
+
+A patch with no behavior change.
+
+### Kit
+
+- **Changed (`/crav1-existing-to-specs recheck`):** no longer labelled preview. It has been used on a real repo and is treated as stable. Only labels in the skill, branch, help, reference pages and walkthroughs changed; no steps changed.
+
 ## 1.108.0 (2026-10-30)
 
 A gap check of the repos against the specs that already exist. A minor release because it adds behavior.
 
 ### Kit
 
-- **Added (`/crav1-existing-to-specs recheck`, preview):** choice words `recheck` / `repos vs specs`. It compares the named repos (or every repo in `docs/system/repos.md`) with the existing specs. You can narrow it to a path, or with `since` to code changed after that repo's `Synced at`. It reports code no spec covers (with the nearest spec) and stale claims (paths under `## In the code` that are gone). It refreshes `## Code with no slice` in `docs/system/landscape.md`: lines still true stay, covered lines come off, new gaps are added, `## Dismissed` is kept. It writes nothing into any spec and never adds an open question. For each gap you can hand it to `/crav1-add-to-spec` after a yes, have it name a skill for a new spec, dismiss it, or leave it. It loads only `branches/recheck/BRANCH.md` (about 1,000 words) and two step references.
+- **Added (`/crav1-existing-to-specs recheck`):** choice words `recheck` / `repos vs specs`. It compares the named repos (or every repo in `docs/system/repos.md`) with the existing specs. You can narrow it to a path, or with `since` to code changed after that repo's `Synced at`. It reports code no spec covers (with the nearest spec) and stale claims (paths under `## In the code` that are gone). It refreshes `## Code with no slice` in `docs/system/landscape.md`: lines still true stay, covered lines come off, new gaps are added, `## Dismissed` is kept. It writes nothing into any spec and never adds an open question. For each gap you can hand it to `/crav1-add-to-spec` after a yes, have it name a skill for a new spec, dismiss it, or leave it. It loads only `branches/recheck/BRANCH.md` (about 1,000 words) and two step references.
 - **Added (route):** "Repos vs specs" in `workflow.yaml`, so `/crav1-help next` names recheck. `/crav1-add-to-spec` names it when asked for code not in any spec with no change named.
 - **Tests:** `scripts/tests/test_recheck_1108.py`.
 

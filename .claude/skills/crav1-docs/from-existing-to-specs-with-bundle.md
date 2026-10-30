@@ -67,7 +67,7 @@ A mail, a transcript, a chat, a screenshot, or another original that a quote com
 
 Code that no slice covers is a note on the landscape, not a guessed spec. ADRs are written only where there was a real choice.
 
-## Later: recheck the specs against the repos (1.108.0, preview)
+## Later: recheck the specs against the repos (1.108.0)
 
 Once specs exist and the code has moved on, run `/crav1-existing-to-specs recheck` (or `repos vs specs`). Name a repo, or leave it out to use every repo in `docs/system/repos.md`. Add a path to narrow it, or `since` for only code changed after that repo's `Synced at`.
 
