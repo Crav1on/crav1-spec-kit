@@ -20,7 +20,7 @@ skills:
     lane: cross-cutting
     starter: true
     page: reference/skills/crav1-existing-to-specs.md
-    purpose: "Turn a system that already exists into specs; asks repos only or repos plus a bundle, and one spec or system notes plus one spec per feature; or rechecks existing specs against the repos (preview)."
+    purpose: "Turn a system that already exists into specs; asks repos only or repos plus a bundle, and one spec or system notes plus one spec per feature; or rechecks existing specs against the repos."
   crav1-read-environment:
     lane: cross-cutting
     starter: true

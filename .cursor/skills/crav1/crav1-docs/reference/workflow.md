@@ -125,7 +125,7 @@ Specs already exist and you want to know what code no spec covers, or which spec
 
 | Step | Command | When |
 | --- | --- | --- |
-| 1 | `/crav1-existing-to-specs` | `/crav1-existing-to-specs recheck` (preview, 1.108.0): reports code with no spec and stale spec claims, and refreshes `## Code with no slice` in `docs/system/landscape.md`. It writes nothing into any spec. |
+| 1 | `/crav1-existing-to-specs` | `/crav1-existing-to-specs recheck` (1.108.0): reports code with no spec and stale spec claims, and refreshes `## Code with no slice` in `docs/system/landscape.md`. It writes nothing into any spec. |
 | 2 | `/crav1-add-to-spec` | Optional. For a gap you want in an existing spec, after a yes. |
 | 3 | `/crav1-tighten-spec` | Optional. For a stale claim you want fixed in the spec. |
 | 4 | `/crav1-finalize-commit` | When the note changed. |

@@ -6,7 +6,7 @@
 
 ## Purpose
 
-Turn a system that already exists into specs; asks repos only or repos plus a bundle, and one spec or system notes plus one spec per feature; or rechecks existing specs against the repos (preview).
+Turn a system that already exists into specs; asks repos only or repos plus a bundle, and one spec or system notes plus one spec per feature; or rechecks existing specs against the repos.
 
 **[`/crav1-existing-to-specs`](crav1-existing-to-specs.md)** is a starter option. It opens with two questions: repos only, or repos plus a bundle to match; and one spec (the architecture spec), or system notes plus one spec per feature. It skips a question the message answers. It still runs only when the user names the repos. It replaces repos-to-spec and match-to-specs; their rules are kept as branches.
 
@@ -26,8 +26,8 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 | What to read | `repos and bundle` | repos plus a bundle |
 | What to write | `one spec` | one spec (the architecture spec) |
 | What to write | `spec per feature` | system notes plus one spec per feature |
-| Recheck existing specs (preview, 1.108.0) | `recheck` | compare the repos with the specs that exist; report code with no spec and stale claims; refresh the landscape note |
-| Recheck existing specs (preview, 1.108.0) | `repos vs specs` | the same as recheck |
+| Recheck existing specs (1.108.0) | `recheck` | compare the repos with the specs that exist; report code with no spec and stale claims; refresh the landscape note |
+| Recheck existing specs (1.108.0) | `repos vs specs` | the same as recheck |
 
 ## Runs when
 
@@ -49,7 +49,7 @@ Repos plus a bundle: Reads the repos and the dump. Repos only: Reads the repos t
 
 In short: Repos plus a bundle: Landscape gaps (including a missing glossary and new rows), one spec per confirmed slice, index rows, `docs/sources/` for an imported source, the transfer data policy after a yes, and `Used by` on a quoted note; Repos only: `docs/architecture/spec.md` when missing, `docs/architecture/left-out.md`, the system notes when missing, and `Synced at` on each repo it read; Recheck: the landscape `## Code with no slice` note only.
 
-Repos plus a bundle: Writes `docs/system/` in the destination the user picks (gaps only when it exists, including a missing glossary and new rows) and one `docs/specs/<slug>/spec.md` per confirmed slice, including not in the code, then index rows. When a dump file it quotes is an imported source, also writes `docs/sources/YYYY-MM-DD-<slug>/`, following `crav1-add-to-spec` `references/sources.md`. That check may write the transfer data policy after a yes. Cursor: `.cursor/rules/crav1-transfer-data-policy.mdc`. Claude Code project: `.claude/rules/crav1-transfer-data-policy.md`. It never writes a secrets choice into that file. For a mail, it lists each embedded image, inline or attached. It recommends convert to text when the image is a diagram, a table, or text that can be reproduced exactly, and compress otherwise. It asks once before the source folder is written. Auto-accept applies to those recommendations only when the transfer data policy clearly covers them. A `repos.md` it writes includes a `Synced at` column and leaves that cell empty. It does not set or clear an existing cell. Repos only: Writes `docs/architecture/spec.md` when that file is missing, `docs/architecture/left-out.md` for guesses that stay left out, and the `docs/system/` notes [`/crav1-explain-existing-system`](crav1-explain-existing-system.md) reads when those notes are missing. Sets `Synced at` on each repo it read and touches only those repos. Recheck (preview, 1.108.0): writes only `## Code with no slice` in `docs/system/landscape.md` (lines still true stay, covered lines come off, new gaps added, `## Dismissed` kept) and `Synced at` in `repos.md` for a repo read whole. Writes nothing into any spec, and never an open question.
+Repos plus a bundle: Writes `docs/system/` in the destination the user picks (gaps only when it exists, including a missing glossary and new rows) and one `docs/specs/<slug>/spec.md` per confirmed slice, including not in the code, then index rows. When a dump file it quotes is an imported source, also writes `docs/sources/YYYY-MM-DD-<slug>/`, following `crav1-add-to-spec` `references/sources.md`. That check may write the transfer data policy after a yes. Cursor: `.cursor/rules/crav1-transfer-data-policy.mdc`. Claude Code project: `.claude/rules/crav1-transfer-data-policy.md`. It never writes a secrets choice into that file. For a mail, it lists each embedded image, inline or attached. It recommends convert to text when the image is a diagram, a table, or text that can be reproduced exactly, and compress otherwise. It asks once before the source folder is written. Auto-accept applies to those recommendations only when the transfer data policy clearly covers them. A `repos.md` it writes includes a `Synced at` column and leaves that cell empty. It does not set or clear an existing cell. Repos only: Writes `docs/architecture/spec.md` when that file is missing, `docs/architecture/left-out.md` for guesses that stay left out, and the `docs/system/` notes [`/crav1-explain-existing-system`](crav1-explain-existing-system.md) reads when those notes are missing. Sets `Synced at` on each repo it read and touches only those repos. Recheck (1.108.0): writes only `## Code with no slice` in `docs/system/landscape.md` (lines still true stay, covered lines come off, new gaps added, `## Dismissed` kept) and `Synced at` in `repos.md` for a repo read whole. Writes nothing into any spec, and never an open question.
 
 ## Does not
 
