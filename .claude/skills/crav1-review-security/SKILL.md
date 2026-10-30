@@ -1,12 +1,10 @@
 ---
 name: crav1-review-security
 description: >-
-  Ask whether the thing in front of you is secure, after architecture
-  already exists (docs/system/ or a spec that already describes the design).
-  Same command for the whole system, one existing spec, or the change in
-  front of us. Findings are risks and what should change. One confirm, then
-  write only the kept findings. Does not invent an architecture. Does not
-  plan, implement, or commit. Not a mode of /crav1-review-architecture.
+  Use when the user asks whether the system, one spec, or the current change
+  is secure and the architecture already exists. Lists risks and what should
+  change; writes kept findings after one confirm. Does not invent
+  architecture, plan, implement, or commit.
 disable-model-invocation: true
 icon: lock
 color: red

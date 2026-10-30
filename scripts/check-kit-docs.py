@@ -28,6 +28,7 @@ except ImportError:  # pragma: no cover
 ROOT = Path(__file__).resolve().parent.parent
 TREES = (".cursor/skills/crav1", "plugins/crav1/skills", ".claude/skills")
 LIMIT = 1024
+DESC_WORDS = 60  # 1.106.0: descriptions load up front for skill matching; trigger text only
 WORDS = 2000
 
 
@@ -45,6 +46,8 @@ def descriptions() -> list[str]:
                 errors.append(f"{path.relative_to(ROOT)}: description is empty")
             elif len(desc) > LIMIT:
                 errors.append(f"{path.relative_to(ROOT)}: description is {len(desc)} characters (limit {LIMIT})")
+            elif len(desc.split()) > DESC_WORDS:
+                errors.append(f"{path.relative_to(ROOT)}: description is {len(desc.split())} words (limit {DESC_WORDS})")
     return errors
 
 
@@ -90,7 +93,7 @@ def main() -> int:
         print(e)
     if errors:
         return 1
-    print("Skill descriptions are within 1,024 characters; plugin.json matches the newest CHANGELOG release and every workflow.md stamp")
+    print("Skill descriptions are within 60 words and 1,024 characters; plugin.json matches the newest CHANGELOG release and every workflow.md stamp")
     return 0
 
 

@@ -1,14 +1,10 @@
 ---
 name: crav1-merge-pr
 description: >-
-  Merge one named pull request with a merge commit. GitHub uses gh pr merge
-  --merge. Azure Repos uses az repos pr update --status completed --squash
-  false. Use only when this turn explicitly asks to merge a pull request by
-  number or URL. Cross-cutting. Never squash, rebase, bypass policy, or
-  follow on from open-pr. Do not run /crav1-review-pr. A review is not this ask.
-  Stops when the PR record's merge-readiness line says no, unless the turn
-  says anyway. After the merge, saves the PR description and merged state
-  in the PR note in the specs repo.
+  Use only when this turn explicitly asks to merge a named pull request.
+  Merges with a merge commit on GitHub or Azure Repos, never squash or rebase,
+  and stops when the PR record says not ready unless told anyway. Saves the
+  merged state in the PR note.
 disable-model-invocation: true
 icon: git-merge
 color: green

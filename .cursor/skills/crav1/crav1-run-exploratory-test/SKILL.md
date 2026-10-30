@@ -1,15 +1,10 @@
 ---
 name: crav1-run-exploratory-test
 description: >-
-  After a build of a slice already exists, use the slice in two passes and
-  write down bugs. Pass one learns the slice by using it once. Pass two is
-  no longer careful. It adds randomness and follows what the last action
-  showed. It lasts about as long as the first pass, long enough to provoke
-  bugs, then it stops. It stops sooner when the user says stop. The user
-  does not set a clock. It does not write the checks the plan already named.
-  It does not start Specify, Plan, or Build. A bug is not sent to
-  /crav1-fix-bug unless the user says so in that turn. Cross-cutting. Not a
-  starter option.
+  Use after a slice is built and the user wants it explored for bugs. Two
+  passes, one careful and one random, then writes down the bugs. Does not
+  write the planned checks, send bugs to /crav1-fix-bug unasked, or start
+  Specify, Plan, or Build.
 disable-model-invocation: true
 icon: mouse-pointer
 color: purple

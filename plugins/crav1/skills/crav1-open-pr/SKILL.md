@@ -1,13 +1,9 @@
 ---
 name: crav1-open-pr
 description: >-
-  Open a pull request for the current change branch (push with explicit yes).
-  GitHub uses gh; Azure DevOps uses az when the CLI is available. Use after
-  commits exist on feat/<slug> or spec/<slug>, or when the user asks for a PR.
-  Cross-cutting. Does not merge; that is /crav1-merge-pr on a later
-  explicit ask. May name /crav1-review-pr as an optional next step
-  and does not run it. Do not commit. When that slug has work-item.md, add a
-  Work item section to the body.
+  Use when commits exist on feat/<slug> or spec/<slug> and the user wants a
+  pull request. Pushes only after a yes, then opens it with gh or az. Cross-
+  cutting. Does not commit or merge.
 disable-model-invocation: true
 icon: git-pull-request
 color: green

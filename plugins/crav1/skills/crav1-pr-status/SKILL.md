@@ -1,19 +1,10 @@
 ---
 name: crav1-pr-status
 description: >-
-  Show where one open pull request stands: every point raised in its
-  threads, what is done in the code, what is agreed, declined, still open,
-  waiting on someone or needing a third person, and who owes the next
-  step. Reviewer or author mode by who opened the PR. Starts with a
-  verdict line, the points waiting on you first. Flags threads resolved
-  while the code is unchanged. Shows PR dependencies and merge order, and
-  a merge-readiness line that /crav1-merge-pr reads. Later runs can show
-  only what changed (since last). Writes the shared PR record in the PR
-  note in the specs repo's docs/notes/YYYY-MM/. Drafts replies, never
-  posts. Offers thread status changes one thread at a time, spec or
-  decision points to /crav1-add-to-spec, and follow-up work items as
-  drafts for /crav1-ado-sync. Cross-cutting. Read-only toward the code
-  and the host except a thread status the user said yes to.
+  Use when the user asks where one open pull request stands. Lists every
+  thread point as done, agreed, declined, open, or waiting, who owes the next
+  step, dependencies, and a merge-readiness line. `since last` shows only
+  changes. Saves the PR record in the specs repo notes.
 disable-model-invocation: true
 icon: list-checks
 color: orange

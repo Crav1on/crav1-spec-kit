@@ -1,10 +1,10 @@
 ---
 name: crav1-tighten-plan
 description: >-
-  Walk plan.md/tasks.md issues one by one (including /crav1-review-plan P#s).
-  Offer resolutions (including get a suggestion); patch only plan and tasks
-  after a pick. Spec-tagged findings go to tighten-spec. Do not write
-  application code. Do not edit spec.md.
+  Use to walk plan.md and tasks.md issues one by one, including /crav1-review-
+  plan P#s. Offers resolutions and patches only plan and tasks after a pick.
+  Spec findings go to /crav1-tighten-spec. Does not edit spec.md or write
+  code.
 disable-model-invocation: true
 icon: list
 color: orange

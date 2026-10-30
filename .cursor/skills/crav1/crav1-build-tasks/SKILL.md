@@ -1,13 +1,10 @@
 ---
 name: crav1-build-tasks
 description: >-
-  Build tasks from tasks.md, always in an isolated worker per task
-  (implement, commit, verify, optional fix). Opens with one question:
-  which tasks, one, a range, or all unticked, listing the ready ones from
-  the /crav1-tasks-ready-to-build rules. Skips the question when the
-  message already names the tasks. Persists commit style first. Ends at
-  /crav1-open-pr. Does not push or open a PR. Replaces implement-task,
-  complete-task, and complete-tasks (their rules are kept as branches).
+  Use to build tasks from tasks.md, one isolated worker per task (implement,
+  commit, verify, optional fix). Asks which tasks (one, a range, or all ready)
+  unless the message names them. Ends by naming /crav1-open-pr. Does not push
+  or open a pull request.
 disable-model-invocation: true
 icon: hammer
 color: orange

@@ -56,7 +56,7 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 
 **Dependency order.** The order tasks are listed, built and verified in since 1.103.0: the `(after: T#)` graph wave by wave (a task with no `(after: …)` waits on the task just before it), lowest number first inside a wave, not plain task number. **Next** is the ready task that unblocks the most others. Tasks that wait on each other in a loop are blocked as a cycle.
 
-**Load path.** The files a skill reads for one run, since 1.104.0: `SKILL.md` routes first, then only the chosen path's file (one report, one branch, one reference) is read. Other paths stay closed.
+**Load path.** The files a skill reads for one run, since 1.104.0: `SKILL.md` routes first, then only the chosen path's file (one report, one branch, one reference) is read. Other paths stay closed. Since 1.106.0 `/crav1-retire-spec`, `/crav1-show-or-ask-open-questions`, `/crav1-explain-this-code` and `/crav1-glossary` route to one `branches/<mode>/BRANCH.md`, and `/crav1-help` reads `reference/index.yaml` and one `reference/skills/<name>.md` page, opening `CHANGELOG.md` only for a release question.
 
 **Report word.** `report-<type>-<depth>` on `/crav1-what-do-we-know-about-this` (1.104.0): type `feature`, `change`, or `build`; depth `short` or `full`. Picks one fixed report written outside the project.
 

@@ -1,6 +1,10 @@
 ---
 name: crav1-resolve-open-questions
-description: Walk Open questions in spec.md one by one. Each question gets keep-open or answer options with impact; patch only that question after a pick. When an answer settles a stale research point waiting on that question, re-check the point and clear the mark when no point is open. Do not ask the user. Use after /crav1-tighten-spec when unanswered questions remain. Do not write application code. `detailed` shows more context per question.
+description: >-
+  Use after /crav1-tighten-spec when open questions remain in spec.md. Walks
+  them one by one with keep-open or answer options and patches only that
+  question after a pick. `detailed` shows more context. Does not write
+  application code.
 disable-model-invocation: true
 icon: book-open
 color: yellow

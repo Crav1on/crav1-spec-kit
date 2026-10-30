@@ -8,13 +8,13 @@ Only the skill folders were copied. Answer only from the `SKILL.md` files next t
 
 ### 2. A skill name
 
-The message is a skill name, with or without `/` and `crav1-`. From its `skills.yaml` entry and reference page:
+The message is a skill name, with or without `/` and `crav1-`. From its `reference/index.yaml` entry and its page `reference/skills/<name>.md` (not the whole skills list):
 
 - What it does (purpose) and when to use it (`use_when`).
 - What it reads and what it writes.
 - Before and after: the steps before it and after it in each route that has it (`workflow.yaml`), and its `you_run_next`.
 - Its walkthrough, when it has one.
-- Its choice words, when its `skills.yaml` entry has `choice_words` (the merged skills): every question with its exact words and what each means, plus its `note` line when it has one (such as `After a PR: all`), and an example such as `/crav1-ado-sync push tasks`. Say that a word in the invocation skips the question, and that a headless or bot run without a word stops and names the words.
+- Its choice words, when its page has a Choice words section (the merged skills): every question with its exact words and what each means, plus its `note` line when it has one (such as `After a PR: all`), and an example such as `/crav1-ado-sync push tasks`. Say that a word in the invocation skips the question, and that a headless or bot run without a word stops and names the words.
 - For `/crav1-tasks-ready-to-build`, say that it can run any time, not only at its route step.
 
 An old name from before 1.56.0 (in the **Renamed skills** table in `README.md`): answer first, in one line, "`/crav1-<old>` was renamed to `/crav1-<new>`, removed in 1.58.0", with the choice word to use when the table names one (for example `/crav1-ado-sync push tasks`). The old name no longer runs. Then answer for the new skill as above.
@@ -39,11 +39,11 @@ The message names a kit word or file, such as `work item homes`, `choice words`,
 
 ### 5. List, or one lane
 
-`list`: every skill grouped by lane (Specify, Plan, Build, Cross-cutting) and, inside each lane, by its group (phase), in the order of `reference/skills.md`. One line each: the command and its `use_when`. Mark the six starter options. `list <lane>` (`specify`, `plan`, `build`, `cross-cutting`): that lane only, with its subagents. The lanes come from `reference/skills.yaml` and must match `guild-routing.md`; when they differ, say so and cite both.
+`list`: every skill grouped by lane (Specify, Plan, Build, Cross-cutting) and, inside each lane, by its group (phase), in the order of `reference/skills.md`. One line each: the command and its `use_when`. Mark the six starter options. `list <lane>` (`specify`, `plan`, `build`, `cross-cutting`): that lane only, with its subagents. The lanes come from `reference/index.yaml` and must match `guild-routing.md`; when they differ, say so and cite both.
 
 ### 7. Compare two skills
 
-`compare A B`, or `difference between A and B`. A side-by-side table from both `skills.yaml` entries and reference pages: lane and group, purpose, use when, reads, writes, leaves alone, runs by itself, you run next, and their route steps. Then one or two lines on when to pick which, only as the docs say it. For `/crav1-explain-this-code` and `/crav1-explain-existing-system`: explain-this-code reads code (a file, function, selection, or PR diff) and the code it calls; explain-existing-system reads the system notes in `docs/system/` about the whole system. Both are read-only and cross-cutting. A name that matches no skill: say so and list the closest names.
+`compare A B`, or `difference between A and B`. A side-by-side table from both `reference/skills/<name>.md` pages: lane and group, purpose, use when, reads, writes, leaves alone, runs by itself, you run next, and their route steps. Then one or two lines on when to pick which, only as the docs say it. For `/crav1-explain-this-code` and `/crav1-explain-existing-system`: explain-this-code reads code (a file, function, selection, or PR diff) and the code it calls; explain-existing-system reads the system notes in `docs/system/` about the whole system. Both are read-only and cross-cutting. A name that matches no skill: say so and list the closest names.
 
 ### 8. What's new
 

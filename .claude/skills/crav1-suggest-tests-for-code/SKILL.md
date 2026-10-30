@@ -1,15 +1,10 @@
 ---
 name: crav1-suggest-tests-for-code
 description: >-
-  The user points at code that already exists, one repo or one area, not
-  the whole system. Read that code and suggest tests for what it can
-  actually break. A function gets a few checks. A page gets a browser
-  check. A boundary gets an integration check. Do not dump every test
-  type. Every suggestion stays listed. The user answers them in one batch:
-  keep, leave, or dismiss. Dismiss means it is not offered again. A kept
-  suggestion goes onto the existing spec through /crav1-add-to-spec. Plan
-  turns it into a task. Does not write the tests, change the code, or
-  start Specify, Plan, or Build. Cross-cutting. Not a starter option.
+  Use when the user points at existing code (one repo or area) and wants test
+  suggestions for what it can break. The user keeps, leaves, or dismisses them
+  in one batch; kept ones go to the spec via /crav1-add-to-spec. Does not
+  write tests or change code.
 disable-model-invocation: true
 icon: list-checks
 color: yellow

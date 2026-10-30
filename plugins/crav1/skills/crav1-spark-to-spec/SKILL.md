@@ -1,17 +1,10 @@
 ---
 name: crav1-spark-to-spec
 description: >-
-  Turn a one- or two-sentence spark into spec.md. When docs/system/ is
-  missing, seed a thin landscape from the repo (greenfield or brownfield),
-  including glossary.md, then the spec, then one index row. When that
-  folder exists, write glossary.md if it is missing, or append only words
-  that are not already rows. Do not rewrite existing glossary rows. A
-  meaning the source does not state is `to be researched`. That same pass
-  adds what is new to the short description, the diagram, and how the parts
-  connect. Do not rewrite what is already there.
-  Use for greenfield, a new feature on an existing repo, or a later feature
-  when docs/system/ exists. If they @ an existing spec, start a new slug
-  unless they said to extend that file. Do not write application code.
+  Use when the user gives a one- or two-sentence idea for a new feature,
+  greenfield or on an existing repo. Writes spec.md, seeding a thin
+  docs/system/ when missing, and adds one index row. Starter option. Does not
+  write application code.
 disable-model-invocation: true
 icon: book-open
 color: blue

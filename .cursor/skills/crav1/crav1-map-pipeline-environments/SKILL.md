@@ -1,13 +1,10 @@
 ---
 name: crav1-map-pipeline-environments
 description: >-
-  Read Azure DevOps pipeline definitions for the org and project the user
-  named. Optional: one pipeline. List and show only. Propose marks for the
-  resources each deploy step names, from the stage name, using the same
-  whole-word rule as /crav1-read-environment. Append confirmed lines to
-  docs/environments/marks.md, and branch-to-environment lines to
-  docs/environments/promotion.md. Do not write docs/system, the architecture
-  spec, feature specs, or left-out. Do not start Specify, Plan, or Build.
+  Use when the user names an Azure DevOps org and project (optional pipeline)
+  and wants environments mapped from pipeline definitions. List and show only.
+  Appends confirmed lines to docs/environments/marks.md and promotion.md. Does
+  not run pipelines or start Specify, Plan, or Build.
 disable-model-invocation: true
 icon: workflow
 color: blue

@@ -1,21 +1,11 @@
 ---
 name: crav1-add-to-spec
 description: >-
-  Bring new information into existing specs. Asks: fact, dump, code
-  change, meeting, mail, or chat (choice words); skipped when the message says which.
-  Replaces match-dump-to- specs, code-into-specs, and meeting-to-specs,
-  whose rules are kept as branches. A fact: add it to one existing spec,
-  then report whether docs/system/ or another spec has to change; edits
-  there only on apply. No new glossary; a meaning not stated is `to be
-  researched`. Imported originals go under docs/sources/ first; the
-  personal-data check recommends keep or redact and redacts secrets. A
-  Every input becomes one full note in docs/notes/YYYY-MM/; specs get
-  short points with a link; never absorbed. A
-  kept quote is compared with docs/research/ and Research findings and
-  marked stale only after a yes; may draft a revisit request for the
-  note's owner, never sent. An updated research note is checked per listed
-  point. A clear answer to an open question is linked under it; unclear
-  stays open. Does not plan, implement, write code, or commit.
+  Use when new information should go into existing specs (a fact, a dump, a
+  landed code change, a meeting, a mail, or a chat). Sorts it into specs and
+  notes, writes only after a confirmed sort, and reports whether docs/system/
+  or another spec has to change. Does not create a slug, plan, implement, or
+  commit.
 disable-model-invocation: true
 icon: file-plus
 color: blue

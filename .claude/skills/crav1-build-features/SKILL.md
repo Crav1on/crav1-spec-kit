@@ -1,10 +1,9 @@
 ---
 name: crav1-build-features
 description: >-
-  Serial board: build several ready specs one slug after another in this
-  checkout. Each slug is feat/<slug> from its into branch, then the build-tasks
-  T# loop. Not parallel. One slug: use /crav1-build-tasks. Do not push.
-  Do not open a PR.
+  Use to build several ready specs one after another in this checkout, each on
+  feat/<slug> with the build-tasks loop. Serial, not parallel. For one slug
+  use /crav1-build-tasks. Does not push or open a pull request.
 disable-model-invocation: true
 icon: list
 color: green

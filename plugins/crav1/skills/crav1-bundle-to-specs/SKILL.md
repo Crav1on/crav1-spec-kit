@@ -1,14 +1,10 @@
 ---
 name: crav1-bundle-to-specs
 description: >-
-  Turn mixed intake (notes, diagrams, screenshots, optional code as context)
-  into docs/system/ (including glossary.md) plus one spec slug per v0 feature.
-  When that folder exists, write glossary.md if it is missing, or append only
-  words that are not already rows. Do not rewrite existing glossary rows. A
-  meaning the source does not state is `to be researched`. That same pass
-  adds what is new to the short description, the diagram, and how the parts
-  connect. Do not rewrite what is already there. Use when 1–N files
-  or a dump may imply several features or repos. Do not write application code.
+  Use when mixed intake (notes, diagrams, screenshots, optional code) may
+  imply several features or repos. Writes docs/system/, including glossary.md,
+  plus one spec per v0 feature, adding only what is new. Starter option. Does
+  not write application code or commit.
 disable-model-invocation: true
 icon: layers
 color: purple

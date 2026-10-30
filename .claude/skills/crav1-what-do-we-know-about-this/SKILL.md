@@ -1,20 +1,10 @@
 ---
 name: crav1-what-do-we-know-about-this
 description: >-
-  Answer one question about a feature, slice, resource, or not-yet-feature
-  from the specs first. Read only. Writes nothing in the project. One match
-  pass. A report-<type>-<depth> word (feature, change, build; short, full)
-  writes one Markdown report outside the project, Downloads when reachable,
-  and always links it in chat. Then
-  read-only Azure and Azure DevOps checks, each tagged as a live read.
-  When the git remote is not Azure Repos and marks do not name the org
-  and project, derive them from Azure DevOps URLs in docs/system/repos.md.
-  Check default az install paths before reporting az as not installed.
-  Production stays shape and connections only, after the same yes or no
-  as /crav1-read-environment. Never read data. Does not start Specify,
-  Plan, or Build. Does not run another skill. A stale research note is
-  shown as stale. Later skill. Not a starter
-  option. Not /crav1-explain-existing-system.
+  Use when the user asks what we know about a feature, slice, resource, or
+  idea. Answers from the specs first with read-only live checks; a
+  report-<type>-<depth> word writes one Markdown report outside the project.
+  Writes nothing in the project. Does not run another skill.
 disable-model-invocation: true
 icon: file-search
 color: cyan
