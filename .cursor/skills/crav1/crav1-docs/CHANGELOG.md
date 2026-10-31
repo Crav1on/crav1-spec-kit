@@ -2,6 +2,10 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.109.2 (2026-10-31)
+
+- Playbook reports (`report-playbook-short`, `report-playbook-full`, still preview): under **Kept** and **Needs your answer**, a short block says exactly what to write in chat (`change: K<n> <new decision>`; `yes N1–N<last>` or `N5: <your answer>`), that nothing needs to run first, and that the steps under Steps then write it, with an example. Kept items are numbered K1…, questions N1…. Compose keeps **From** and **To** to short names so the table stays readable. Each step is its own block (title, command in a code block, You should see, Done when); full keeps no cap on steps. Wording and layout only; no new behavior.
+
 ## 1.109.1 (2026-10-31)
 
 - Playbook reports (`report-playbook-short`, `report-playbook-full`, still preview) read plainer: the spec, the plan, the tasks instead of file names. Kept decisions can be challenged and changed. Live reads keep out-of-scope items in a last **Out of scope** block. The merge order is marked suggested and can change; rebase is never offered as the kit's way, only named when someone suggested it. Compose includes a separate deploy (such as DEV Bicep) only when the docs describe it. Each step says what to type, what you should see, and when it is done, after a first line asking you to confirm your answers. Wording only; no new behavior.

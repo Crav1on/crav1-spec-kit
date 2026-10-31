@@ -61,7 +61,7 @@ Add one word to get a fixed report as a `.md` file instead of the free-form answ
 
 The command picks the template from the word, then reads only that template; the others stay closed. Diagrams are Mermaid wherever a picture helps. A live source that needs a sign-in or a permission is asked about first. The file goes to your Downloads folder when the agent can reach it, otherwise a temp folder, and the chat always links it. Nothing in the project changes.
 
-A playbook keeps your answers in the report. Kept decisions can still be changed, the merge order is a suggestion, and every step says what to type, what you should see, and when it is done (1.109.1). Once you confirm them, run the skills its Steps name (for example `/crav1-resolve-open-questions`, then `/crav1-plan-from-spec`) to write them into the specs and plan.
+A playbook keeps your answers in the report. Kept decisions can still be changed, the merge order is a suggestion, and every step says what to type, what you should see, and when it is done (1.109.1). Under Kept and Needs your answer, a short block says exactly what to write in chat (`change: K2 …`, `yes N1–N12`, `N5: …`) and what to run next, with an example; each step is its own block (1.109.2). Once you confirm them, run the skills its Steps name (for example `/crav1-resolve-open-questions`, then `/crav1-plan-from-spec`) to write them into the specs and plan.
 
 ## Steps
 
