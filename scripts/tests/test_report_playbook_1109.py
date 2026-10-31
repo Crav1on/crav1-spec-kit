@@ -16,7 +16,7 @@ class Playbook(unittest.TestCase):
     def test_templates_exist_with_buckets(self):
         for d in DEPTHS:
             t = (SK / "reports" / f"playbook-{d}.md").read_text()
-            self.assertLess(len(t.split()), 900, d)
+            self.assertLess(len(t.split()), 1200, d)
             for h in ("## Kept", "## Needs your answer", "## Compose", "## Steps", "## Order"):
                 self.assertIn(h, t, f"{d}: {h}")
             self.assertIn("recommended answer and why", t)
@@ -56,6 +56,24 @@ class Polish1091(unittest.TestCase):
                 self.assertIn(s, t, f"{d}: {s}")
             self.assertIsNone(re.search(r"\b(spec|plan|tasks)\.md\b", t), d)
             self.assertNotIn("road" + "map", t.lower())
+
+
+class Polish1092(unittest.TestCase):
+    """1.109.2: clear change/answer blocks with examples, short From/To, one block per step, no cap in full."""
+
+    def test_answer_blocks(self):
+        for d in DEPTHS:
+            t = (SK / "reports" / f"playbook-{d}.md").read_text()
+            for s in ("**To change a decision under Kept**", "These are decisions already made. You can still change any of them",
+                      "`change: K<n> <new decision>`", "**To answer the questions under Needs your answer**",
+                      "`yes N1–N<last>`", "`N5: <your answer>`", "nothing needs to run first", "Example:",
+                      "never squeeze them into one line", "**From** and **To** hold a short name only",
+                      "### Step <n>: <short title>"):
+                self.assertIn(s, t, f"{d}: {s}")
+        full = (SK / "reports/playbook-full.md").read_text()
+        self.assertIn("No cap on steps: as many as the work needs.", full)
+        self.assertIn("| K | Decision |", full)
+        self.assertIn("| N | Question |", full)
 
 
 if __name__ == "__main__":
