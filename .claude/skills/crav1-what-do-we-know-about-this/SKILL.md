@@ -31,7 +31,7 @@ This command does not run another skill. It may name one.
 Route first, load second. Check the message for one word `report-<type>-<depth>`:
 
 - **No report word:** the free-form answer below, unchanged. Do not open `reports/`.
-- **One report word:** type `feature` (what it does, flow, architecture), `change` (a pull request or branch, its pipelines, the discussion), `build` (ready to build, what is missing, finish order), or `playbook` (1.109.0, preview: what is kept, what needs your answer, what to compose, and the kit skills in order to reach buildable work; answers stay in the report until the user confirms); depth `short` or `full`. Read only `reports/common.md` and `reports/<type>-<depth>.md`. Never the other report files. The rest of the message is the question, matched as below.
+- **One report word:** type `feature` (what it does, flow, architecture), `change` (a pull request or branch, its pipelines, the discussion), `build` (ready to build, what is missing, finish order), or `playbook` (1.109.0, preview: what is kept, what needs your answer, what to compose, and the kit skills in order to reach buildable work; answers stay in the report until the user confirms; Kept items can still be changed, and the merge order is a suggestion); depth `short` or `full`. Read only `reports/common.md` and `reports/<type>-<depth>.md`. Never the other report files. The rest of the message is the question, matched as below.
 
 That one report file names its sections and the only diagrams to draw. The report is the one file this command writes, outside the project; the chat always links or attaches it.
 

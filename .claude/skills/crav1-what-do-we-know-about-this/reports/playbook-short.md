@@ -4,6 +4,15 @@ One screen: how to get one goal (a milestone, a release, a set of agreed changes
 
 Preview (1.109.0).
 
+Plain-language rules (1.109.1):
+- Write for someone using the kit for the first time. Say the spec, the plan, the tasks; never a file name ending in `.md` in prose.
+- **Kept** is not frozen. Each Kept item may be challenged: say how to change it (answer `change: <new decision>` in chat; the skill named in Steps writes the change after you confirm).
+- Go-live or a due date is one fact among the others, not the whole story.
+- Merging: offer a **merge order** (merge commits), marked **suggested, can change**. Never offer rebase as the kit's way. If someone in the sources suggested a rebase, name it as their suggestion only.
+- Compose takes items from the docs only, never invented. When `docs/` describes a deploy kept apart from the others (for example a DEV Bicep deploy separate from TEST and PROD), it goes in Compose with the doc it came from.
+
+Live reads: keep everything you read. Items outside this goal stay in, under a last block headed **Out of scope**, at the end of the live-reads section; never drop them.
+
 Answers come first in the report. Write nothing in the project. After the user confirms the answers, the existing skills write them (named in Steps).
 
 Buckets:
@@ -11,7 +20,12 @@ Buckets:
 - **Needs your answer:** open points. For each, give a recommended answer and why. Its status is `undecided` or `decided by <person>` when the docs name one. Never write a hand-off such as "for <name> to decide".
 - **Compose:** work to put together from what exists: what splits out, or lifts from one branch or pull request into another, and why.
 
-Steps: at most 8 numbered kit commands, each with its input. Mark a step no skill covers as `manual:` in one line. If there are more steps, the last line says `More steps: report-playbook-full`.
+Steps, for a first-time user. Start the section with this line, in bold: **First confirm your answers under Needs your answer. Then run these steps in order, one at a time.** Each step has:
+- **Type:** the exact command, with its real input (a named spec, branch, pull request number or answer number). Never a vague pointer such as "the three under Kept" or "the tasks on feat/...": name the items and the work.
+- **You should see:** what the command shows or asks.
+- **Done when:** the check that tells you to move on.
+Mark a step no skill covers as `manual:`, with the same three lines.
+At most 8 steps. If there are more, the last line says `More steps: report-playbook-full`.
 
 Diagrams: one `flowchart` of the dependency order, only when 3 or more steps depend on each other. No C4.
 
@@ -31,13 +45,19 @@ Diagrams: one `flowchart` of the dependency order, only when 3 or more steps dep
 <numbered: question, recommended answer, why, status>
 
 ## Compose
-<bullets>
+<bullets, each with its source doc>
+
+## Merge order
+<suggested, can change: pull requests or branches in merge order, merge commits>
 
 ## Steps
-<numbered kit commands, at most 8>
+<bold confirm-first line, then numbered steps: Type / You should see / Done when; at most 8>
 
 ## Order
 <diagram, if any>
+
+## What we read
+<live reads; Out of scope block last>
 
 ## Source
 <specs, notes, pull requests, live reads>
