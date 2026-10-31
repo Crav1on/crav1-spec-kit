@@ -16,7 +16,7 @@ class Playbook(unittest.TestCase):
     def test_templates_exist_with_buckets(self):
         for d in DEPTHS:
             t = (SK / "reports" / f"playbook-{d}.md").read_text()
-            self.assertLess(len(t.split()), 600, d)
+            self.assertLess(len(t.split()), 900, d)
             for h in ("## Kept", "## Needs your answer", "## Compose", "## Steps", "## Order"):
                 self.assertIn(h, t, f"{d}: {h}")
             self.assertIn("recommended answer and why", t)
@@ -34,12 +34,28 @@ class Playbook(unittest.TestCase):
             self.assertNotIn("for Arvid", t)
 
     def test_short_caps_steps_full_does_not(self):
-        self.assertIn("at most 8 numbered kit commands", (SK / "reports/playbook-short.md").read_text())
-        self.assertIn("no cap", (SK / "reports/playbook-full.md").read_text())
+        self.assertIn("At most 8 steps.", (SK / "reports/playbook-short.md").read_text())
+        self.assertIn("No cap on steps", (SK / "reports/playbook-full.md").read_text())
 
     def test_diagram_order_not_c4_first(self):
         self.assertIn("No C4.", (SK / "reports/playbook-short.md").read_text())
         self.assertIn("never as the first diagram", (SK / "reports/playbook-full.md").read_text())
+
+
+class Polish1091(unittest.TestCase):
+    """1.109.1: plain wording, Kept can change, Out of scope last, merge order suggested, fool-proof steps."""
+
+    def test_polish_rules(self):
+        for d in DEPTHS:
+            t = (SK / "reports" / f"playbook-{d}.md").read_text()
+            for s in ("never a file name ending in `.md` in prose", "**Kept** is not frozen", "**Out of scope**",
+                      "suggested, can change", "Never offer rebase as the kit's way", "their suggestion only",
+                      "DEV Bicep", "**Type:**", "**You should see:**", "**Done when:**",
+                      "**First confirm your answers under Needs your answer. Then run these steps in order",
+                      "one fact among the others"):
+                self.assertIn(s, t, f"{d}: {s}")
+            self.assertIsNone(re.search(r"\b(spec|plan|tasks)\.md\b", t), d)
+            self.assertNotIn("road" + "map", t.lower())
 
 
 if __name__ == "__main__":
