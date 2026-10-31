@@ -1,11 +1,11 @@
-"""Routing and progressive-loading checks for /crav1-what-do-we-know-about-this report words (1.104.0)."""
+"""Routing and progressive-loading checks for /crav1-what-do-we-know-about-this report words (1.104.0; playbook 1.109.0)."""
 import pathlib
 import re
 import unittest
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 SKILL = ROOT / ".cursor/skills/crav1/crav1-what-do-we-know-about-this"
-WORDS = [f"{t}-{d}" for t in ("feature", "change", "build") for d in ("short", "full")]
+WORDS = [f"{t}-{d}" for t in ("feature", "change", "build", "playbook") for d in ("short", "full")]
 
 
 class ReportRouting(unittest.TestCase):
