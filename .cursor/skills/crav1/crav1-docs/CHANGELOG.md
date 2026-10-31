@@ -2,6 +2,10 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.109.0 (2026-10-31)
+
+- `/crav1-what-do-we-know-about-this` adds two report words, **preview**: `report-playbook-short` and `report-playbook-full`. A playbook sorts a goal's decisions into **Kept**, **Needs your answer** (a recommended answer and why; `undecided` or `decided by <person>`, never a hand-off) and **Compose**, then lists the kit skills in order with a dependency-order Mermaid diagram. Short has at most 8 steps; full has no cap and adds where it stands, gaps and a second diagram when needed. Answers stay in the report until you confirm; then the named skills write them. Loads only `reports/common.md` and the chosen template; no report word stays free-form. Delivery and live reads follow 1.104.0.
+
 ## 1.108.1 (2026-10-30)
 
 A patch with no behavior change.
