@@ -2,55 +2,57 @@
 
 Every section: how to get one goal from its decisions to work that can be built, using the kit's skills in order. Rules: `reports/common.md`.
 
-Preview (1.109.0).
+Preview (1.109.0). Answers through the normal skills, `apply` for a filled file (1.110.0).
 
 Plain-language rules (1.109.1):
 - Write for someone using the kit for the first time. Say the spec, the plan, the tasks; never a file name ending in `.md` in prose.
-- **Kept** is not frozen. Each Kept item may be challenged: number them K1, K2, … and print the change block below under Kept.
+- **Kept** is not frozen. Each Kept item may be challenged: number them K1, K2, … and print the change block above the Kept table.
 - Go-live or a due date is one fact among the others, not the whole story.
 - Merging: offer a **merge order** (merge commits), marked **suggested, can change**. Never offer rebase as the kit's way. If someone in the sources suggested a rebase, name it as their suggestion only.
 - Compose takes items from the docs only, never invented. When `docs/` describes a deploy kept apart from the others (for example a DEV Bicep deploy separate from TEST and PROD), it goes in Compose with the doc it came from.
 
 Live reads: keep everything you read. Items outside this goal stay in, under a last block headed **Out of scope**, at the end of the live-reads section; never drop them.
 
-Answers come first in the report. Write nothing in the project. After the user confirms the answers, the existing skills write them (named in each row and in Steps).
+Answers come first in the report. Write nothing in the project. The existing skills write the answers, each in the Step its row names.
 
 Buckets:
 - **Kept:** decisions already made. Do not ask them again. For each, say who decided and when, if the docs say so, with the spec line.
 - **Needs your answer:** open points. For each, give a recommended answer and why. Its status is `undecided` or `decided by <person>` when the docs name one. Never write a hand-off such as "for <name> to decide".
 - **Compose:** work to put together from what exists: what splits out, or lifts from one branch or pull request into another, from where to where, and why.
 
-Answer blocks (1.109.2). Print each block word for word under its heading, with the report's real numbers, the real skill and a real example drawn from this report. One instruction per line; never squeeze them into one line.
+Answer blocks (1.110.0). The report only lists; it never takes answers in chat. Answers go through the normal skills, whenever the user comes back, or the filled file is read back with `apply`. Print each block word for word ABOVE its table, with the report's real numbers, the real skill and a real example drawn from this report. One instruction per line; never squeeze them into one line. No "To change it" column: each row ends with `Recorded in Step <n>`.
 
-Under **Kept**, after the table:
+Above the **Kept** table:
 
 > **To change a decision under Kept** (skip if all stay as they are)
-> These are decisions already made. You can still change any of them:
+> These are decisions already made. You can still change any of them, now or later:
 > 1. Nothing needs to run first.
-> 2. Write in this chat, one line per change: `change: K<n> <new decision>`
-> 3. Then run the steps under Steps. The step that names K<n> runs the skill that writes the change (for example `/crav1-add-to-spec`); it shows the change and asks you to confirm.
+> 2. Either run the Step named in the row (it uses `/crav1-add-to-spec` and shows the change before writing), or write the new decision on the row's `Change:` line in this file.
+> 3. A filled file, also one others filled in, is read back with `/crav1-resolve-open-questions apply <this file>`.
 >
 > Example:
 > ```
-> change: K2 DEV deploy runs from the shared pipeline, not its own Bicep
+> K2 Change: DEV deploy runs from the shared pipeline, not its own Bicep
 > ```
 
-Under **Needs your answer**, after the table:
+Under the Kept table, one fill-in line per row, left empty: `K<n> Change:`
+
+Above the **Needs your answer** table:
 
 > **To answer the questions under Needs your answer**
-> 1. Before you answer: nothing needs to run first. <If a question needs a pull request or branch read first, name it here.>
-> 2. Write in this chat, in one message:
->    - to accept every recommended answer: `yes N1–N<last>`
->    - to accept some and give your own for others, one line each: `yes N1–N4, N6–N<last>`, then `N5: <your answer>`
-> 3. Then run the steps under Steps, from step 1. The step that writes each answer names its number.
+> 1. Nothing needs to run first. <If a question needs a pull request or branch read first, name it here.>
+> 2. Answer them in Step <n> (the answer step) with `/crav1-resolve-open-questions <spec>`, whenever you are ready; or write each answer on its `Answer:` line in this file (`yes` takes the recommended answer).
+> 3. A filled file, also one sent out and returned, is read back with `/crav1-resolve-open-questions apply <this file>`. It checks what changed in the specs since this report and asks about any clash before writing.
 >
 > Example:
 > ```
-> yes N1–N4, N6–N12
-> N5: keep TEST and PROD on the same release branch
+> N1 Answer: yes
+> N5 Answer: keep TEST and PROD on the same release branch
 > ```
 
-Compose table: keep columns balanced. **From** and **To** hold a short name only (a branch, `PR #<n>` or a folder; about 30 characters at most). Put the full path or long title under **Source doc** and the reasoning under **Why**.
+Under the Needs your answer table, one fill-in line per row, left empty: `N<n> Answer:`
+
+Compose: written-out bullets, never a table. One bullet per item, 1-2 sentences: what moves, from which pull request or branch to which (short names: a branch, `PR #<n>` or a folder), and why; end with `Source: <doc>`.
 
 Step layout: each step is its own small block, never one paragraph:
 
@@ -63,12 +65,14 @@ Step layout: each step is its own small block, never one paragraph:
 >
 > **Done when:** <one line>
 
-Steps, for a first-time user. Start the section with this line, in bold: **First confirm your answers under Needs your answer. Then run these steps in order, one at a time.** Each step has:
+Steps, for a first-time user. Start the section with this line, in bold: **Run these steps in order, one at a time. You can stop and come back later.** The answer step comes first or right after the Kept changes: it runs `/crav1-resolve-open-questions <spec>` for the Needs your answer questions (or `apply <this file>` when the file was filled in), and names every N it covers. Each step has:
 - **Type:** the exact command, with its real input (a named spec, branch, pull request number or answer number). Never a vague pointer such as "the three under Kept" or "the tasks on feat/...": name the items and the work.
 - **You should see:** what the command shows or asks.
 - **Done when:** the check that tells you to move on.
 Mark a step no skill covers as `manual:`, with the same three lines.
 No cap on steps: as many as the work needs. List kit gaps found on the way under Gaps; do not route around them silently.
+
+Diagram syntax (1.110.0), so every viewer renders it, also one that escapes quotes (mermaid 11.4.1 and later): node ids are plain ASCII letters and digits, never `end`, `graph` or a branch name; labels in square brackets, plain ASCII words only: letters, digits, spaces, `-`, `,`, `.`, `/` (no double quotes, parentheses, colons, `#`, `&`, backticks, `→` or `–`; write steps as `Steps 1-14`, a pull request as `PR 74`); edge labels as `-->|plain words|`; a blank line before and after each fence.
 
 Diagrams:
 - One `gitGraph` or `flowchart` of the dependency order of branches, pull requests and steps.
@@ -91,22 +95,24 @@ Diagrams:
 <open pull requests and branches, missing plan or tasks, blockers; live reads; Out of scope block last>
 
 ## Kept
-| K | Decision | Decided by, date | Spec line | To change it |
 <change block>
+| K | Decision | Decided by, date | Spec line | Recorded in |
+<K<n> Change: lines>
 
 ## Needs your answer
-| N | Question | Recommended | Why | Status | Written by, after your yes |
 <answer block>
+| N | Question | Recommended | Why | Status | Recorded in |
+<N<n> Answer: lines>
 
 ## Compose
-| # | Item | From (short) | To (short) | Why | Source doc |
+<one bullet per item: what moves, from → to, why; Source: doc>
 
 ## Merge order
 Suggested, can change.
 | # | Pull request or branch | Into | Waits for |
 
 ## Steps
-<bold confirm-first line, then one block per step (Step layout above)>
+<bold run-in-order line, then one block per step (Step layout above)>
 
 ## Order
 <diagram>
