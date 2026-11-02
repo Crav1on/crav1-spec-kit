@@ -559,6 +559,8 @@ skills:
     words:
     - word: "detailed"
       means: "show blocks, why, known, who, asked, sources and suggested per question (no word: the short list, and a headless run does not stop)"
+    - word: "apply"
+      means: "apply <file>: read back a filled-in playbook report, compare each answer with the specs now (new, already settled, conflicting), ask once per conflict, write after one confirm (1.110.0)"
     note: "Topic words or `<spec> Q#` (for example `orders Q3`) open one question (1.77.0) and stop after it, with no next question, ending with the still-open titles (1.90.5); several matches: one question listing up to 4."
   lane: specify
   group: Specify

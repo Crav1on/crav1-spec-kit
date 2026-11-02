@@ -183,7 +183,7 @@ The merged skills take exact choice words instead of `--flags`. A word in the in
 | `/crav1-existing-to-specs` | What to read | `repos only` · `repos and bundle` |
 | `/crav1-existing-to-specs` | What to write | `one spec` · `spec per feature` |
 | `/crav1-existing-to-specs` | Recheck existing specs (1.108.0) | `recheck` · `repos vs specs` |
-| `/crav1-resolve-open-questions` | List (optional, never asked) | `detailed` |
+| `/crav1-resolve-open-questions` | List (optional, never asked) | `detailed` · `apply` |
 | `/crav1-show-or-ask-open-questions` | Show or ask | `show` · `ask` |
 | `/crav1-show-or-ask-open-questions` | Channel after ask (optional) | `research` |
 | `/crav1-add-to-spec` | What you have | `fact` · `dump` · `code change` · `meeting` · `mail` · `chat` |
