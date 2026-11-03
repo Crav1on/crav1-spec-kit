@@ -2,6 +2,12 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.110.0 (2026-11-02)
+
+- Playbook reports (`report-playbook-short`, `report-playbook-full`, still preview) only list; they no longer take answers in chat. The how-to blocks for **Kept** and **Needs your answer** sit above their tables, the "To change it" column is gone, and every row says `Recorded in Step <n>`. An early answer step runs `/crav1-resolve-open-questions` for the questions. Each item has a plain `Answer:` or `Change:` line, so the file can be filled in later or by people who do not use the kit. Compose is written out as bullets. Order diagrams follow a safe syntax (plain ASCII labels, no quotes or parentheses) so every viewer renders them. Short no longer caps the steps.
+- `/crav1-resolve-open-questions apply <file>` reads back a filled-in playbook report. It names what changed in the specs since the report, sorts each answer as new, already settled the same way, or conflicting, asks one question per conflict (the file's answer next to the spec's, who decided each, a recommendation), and writes nothing until you confirm.
+- Kit CI parses every mermaid block in templates and test goldens with mermaid 11.4.1.
+
 ## 1.109.2 (2026-10-31)
 
 - Playbook reports (`report-playbook-short`, `report-playbook-full`, still preview): under **Kept** and **Needs your answer**, a short block says exactly what to write in chat (`change: K<n> <new decision>`; `yes N1–N<last>` or `N5: <your answer>`), that nothing needs to run first, and that the steps under Steps then write it, with an example. Kept items are numbered K1…, questions N1…. Compose keeps **From** and **To** to short names so the table stays readable. Each step is its own block (title, command in a code block, You should see, Done when); full keeps no cap on steps. Wording and layout only; no new behavior.

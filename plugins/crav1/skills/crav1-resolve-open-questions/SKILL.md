@@ -3,8 +3,9 @@ name: crav1-resolve-open-questions
 description: >-
   Use after /crav1-tighten-spec when open questions remain in spec.md. Walks
   them one by one with keep-open or answer options and patches only that
-  question after a pick. `detailed` shows more context. Does not write
-  application code.
+  question after a pick. `detailed` shows more context. `apply <file>`
+  reads back a filled-in playbook report and writes its answers after a
+  confirm. Does not write application code.
 disable-model-invocation: true
 icon: book-open
 color: yellow
@@ -19,6 +20,8 @@ This is not a defect walk. Do not re-run architecture findings here unless they 
 ## Choice words
 
 Exact words, no `--flags`. `detailed`: each question shows the extended entry in [references/detailed.md](references/detailed.md); read that file only then. Without it, the list is short.
+
+`apply` (1.110.0), as `apply <file>`: read back a playbook report whose `Answer:` and `Change:` lines were filled in, by the user or by others it was sent to. Follow [references/apply.md](references/apply.md); read that file only then.
 
 **Do not patch until the user picks a letter for the current question** (or a batch of `Q#: letter` answers).
 
