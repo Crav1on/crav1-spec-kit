@@ -293,7 +293,7 @@ skills:
     not in the code, then index rows. When a dump file it quotes is an imported source, also writes `docs/sources/YYYY-MM-DD-<slug>/`,
     following `crav1-add-to-spec` `references/sources.md`. That check may write the transfer data policy after a yes.
     Cursor: `.cursor/rules/crav1-transfer-data-policy.mdc`. Claude Code project: `.claude/rules/crav1-transfer-data-policy.md`.
-    It never writes a secrets choice into that file. For a mail, it lists each embedded image, inline or attached.
+    It never writes a secrets choice into that file. A mail is written as text, `mail.md`, and the original mail stays outside the repo (1.111.0). For a mail, it lists each embedded image, inline or attached.
     It recommends convert to text when the image is a diagram, a table, or text that can be reproduced exactly, and
     compress otherwise. It asks once before the source folder is written. Auto-accept applies to those recommendations
     only when the transfer data policy clearly covers them. A `repos.md` it writes includes a `Synced at` column and
@@ -561,7 +561,7 @@ skills:
       means: "show blocks, why, known, who, asked, sources and suggested per question (no word: the short list, and a headless run does not stop)"
     - word: "apply"
       means: "apply <file>: read back a filled-in playbook report, compare each answer with the specs now (new, already settled, conflicting), ask once per conflict, write after one confirm (1.110.0)"
-    note: "Topic words or `<spec> Q#` (for example `orders Q3`) open one question (1.77.0) and stop after it, with no next question, ending with the still-open titles (1.90.5); several matches: one question listing up to 4."
+    note: "Every **Conflict:** line in the spec is listed after the questions as C1, C2 (1.111.0, no word): one question per conflict, the decided line and the new quote side by side, a recommendation first, written after one confirm. Topic words or `<spec> Q#` (for example `orders Q3`) open one question (1.77.0) and stop after it, with no next question, ending with the still-open titles (1.90.5); several matches: one question listing up to 4."
   lane: specify
   group: Specify
   starter: false
@@ -569,16 +569,17 @@ skills:
   stage: stable
   prompt_budget: 2
   walkthrough: docs/from-draft-spec.md
-  purpose: Walk Open questions in spec.md one by one.
+  purpose: Walk Open questions and Conflict lines in spec.md one by one.
   in_depth:
   - One Open question at a time; keep it open or answer with impact; patch only that question, found by its words (`Q#` is display only).
+  - Conflict lines (1.111.0) are listed after the questions; settling one replaces or keeps the decided line, removes the Conflict line, and adds a trace to the note.
   - '`detailed` shows an extended entry per question: what it blocks, why it matters, what is known, who can answer, asked status and date, sources, and a suggested answer. No extra questions.'
   use_when: Open questions remain
   table:
-    reads: Open questions and assumptions in `spec.md`
+    reads: Open questions, assumptions and Conflict lines in `spec.md`
     writes: The picked question in the spec (with a linked answer's quote and source), and a cleared research
       mark when no point stays open
-  reads: Reads Open questions and unresolved assumptions in `spec.md`.
+  reads: Reads Open questions, unresolved assumptions and **Conflict:** lines in `spec.md`.
   writes: Writes only the picked question into the spec, a constraint, a non-goal, or an ADR. When that
     answer settles a stale research point waiting on the question, re-checks the point and clears the
     mark when no point is open. It does not ask the user. A question with an `Answered:` line shows that
@@ -2317,6 +2318,11 @@ routing:
           that read stops and does not tighten. `suggest` does not patch. A disagreement with the code
           is called out and the spec is not rewritten to match the code. Finish, add a test, and leave
           are not choices here. A stale research mark may be one issue. It does not clear the mark.'
+        crav1-resolve-open-questions:
+        - '`/crav1-resolve-open-questions` also settles **Conflict:** lines (1.111.0). They are listed after
+          the open questions, one question per conflict with a recommendation first, and nothing is written
+          until one confirm. `/crav1-add-to-spec` and `/crav1-finalize-commit` name it when they write a Conflict
+          line.'
       notes:
       - '`/crav1-add-to-spec`, `/crav1-bundle-to-specs`, and `/crav1-existing-to-specs` follow the imported-sources
         check when they quote an imported source. That check recommends keep or redact for personal data.

@@ -3,7 +3,7 @@ name: crav1-resolve-open-questions
 description: >-
   Use after /crav1-tighten-spec when open questions remain in spec.md. Walks
   them one by one with keep-open or answer options and patches only that
-  question after a pick. `detailed` shows more context. `apply <file>`
+  question after a pick. Also settles **Conflict:** lines. `detailed` shows more context. `apply <file>`
   reads back a filled-in playbook report and writes its answers after a
   confirm. Does not write application code.
 disable-model-invocation: true
@@ -39,6 +39,7 @@ Include:
 
 1. Every bullet under **Open questions** (an older numbered item counts too)
 2. Assumptions still marked unresolved (A1, A2, …) if they are not already duplicated as an open question
+3. Every `**Conflict:**` line in the spec, listed after the questions as `C1`, `C2`, … (1.111.0, no choice word). Follow [references/conflicts.md](references/conflicts.md); read that file only when there is one.
 
 Skip empty placeholders. Do not invent new questions. If the list is empty, say so and point to Plan Mode (`Shift+Tab`) with `spec.md` attached — not to this skill.
 
@@ -103,6 +104,6 @@ Do **not** offer a turn-level “answer all with assumptions.” Guessing is `as
 
 ## When the list is done
 
-- Remaining items are only those they **kept open**, or the list is empty.
+- Remaining items are only those they **kept open** (questions or Conflict lines), or the list is empty.
 - Tell them: kept-open items stay as the spec’s honest unknowns; empty list → `/crav1-plan-from-spec` or a new chat in Plan Mode with `spec.md` attached.
 - Optional next: `/crav1-export-spec` if exports exist, or `/crav1-review-architecture` if answers changed the shape.
