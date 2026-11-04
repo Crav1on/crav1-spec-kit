@@ -6,7 +6,7 @@
 
 ## Purpose
 
-Open a pull request for the current change branch (push with explicit yes).
+Open a pull request for the current change branch, or push to an existing one and update its description or comment (push with explicit yes).
 
 Push the change branch only after an explicit yes, then open one pull request (no merge, no commit). The body is a short summary and headed sections (see 1.98.0), with a Work item section when `work-item.md` exists. On Windows, a multi-line Azure DevOps description is passed as `--description "@<file>"` (UTF-8 without BOM). May name [`/crav1-review-pr`](crav1-review-pr.md) and does not run it. Next explicit ask to merge is [`/crav1-merge-pr`](crav1-merge-pr.md).
 
@@ -17,6 +17,8 @@ Push the change branch only after an explicit yes, then open one pull request (n
 1.68.0: the into step is offered and written: a head that split off another spec branch gets one yes/no question, and a sub-branch's PR goes into its spec branch.
 
 1.98.0: the body is format A: a 1-2 line summary, then Changes (grouped by area, at most about 8 link-first bullets, each with a bold title and what and why; the why only from the spec, a plan task, a commit message or a code comment), Verified (the check written out, with dates), Risks and rollback, Merge order, Not in this PR, Questions for reviewers and Work item, each left out when empty. File and line links are pinned to the head commit (Azure DevOps `version=GC<sha>`, GitHub `blob/<sha>/…?plain=1#L<n>`). There is no Spec section and no link to the spec. A missing rollback on an infra, pipeline or PROD change is said in the chat only. [`/crav1-pr-status`](crav1-pr-status.md) reads the Merge order, Questions for reviewers and Not in this PR sections on its next run.
+
+1.114.0: when a pull request is already open for the branch, it pushes (after your yes), shows the new commits since the description was written, and offers update description, add as comment, push only or stop. Add as comment comes first on someone else's pull request. The comment says what was pushed and why, written for reviewers. You see the exact text first: reply yes to post it as shown, or reply with edits to redraft. Nothing is posted until yes. Next-step lines elsewhere name the pull request, for example [`/crav1-open-pr`](crav1-open-pr.md) to push to PR 77 and update its description or comment.
 
 ## Runs when
 
@@ -36,7 +38,7 @@ Reads the change branch, the spec folder, `verify.md`, `work-item.md` when it ex
 
 In short: A push of the change branch and one pull request, after an explicit yes, and `(PR <n>)` on the spec's Match `Branch:` entry.
 
-Writes one pull request after an explicit yes to push. With the URL, adds `(PR <n>)` to the head's Match `Branch:` entry in the spec (1.75.0), uncommitted.
+Writes one pull request after an explicit yes to push, or on an existing pull request a description update or a comment after a yes to the shown text (1.114.0). With the URL, adds `(PR <n>)` to the head's Match `Branch:` entry in the spec (1.75.0), uncommitted.
 
 ## Does not
 

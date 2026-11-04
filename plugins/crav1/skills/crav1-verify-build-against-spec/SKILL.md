@@ -84,7 +84,7 @@ Same order as the file. Do **not** open with the full acceptance matrix.
    - **Not implemented** → `/crav1-build-tasks T#`
    - acceptance with no task → `/crav1-plan-from-spec` or `/crav1-tighten-spec` if the line should die
    - all **Implemented, verified**, no missing acceptance, and every work branch merged → spec is demoable; they can ship / PR
-   - all verified but some work branches not merged → `built and verified, not merged yet: <branches>`, next `/crav1-open-pr` or `/crav1-merge-pr`
+   - all verified but some work branches not merged → `built and verified, not merged yet: <branches>`, next `/crav1-open-pr` or `/crav1-merge-pr` (a branch with `(PR <n>)` names it: `/crav1-open-pr` to push to PR <n> and update its description or comment)
 
 Do not start implementing in this turn unless they already named a `T#` to fix.
 

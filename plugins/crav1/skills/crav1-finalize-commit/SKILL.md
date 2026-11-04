@@ -87,7 +87,7 @@ Read [references/change.md](references/change.md). Redraft or edit, show the new
 5. Show the new hash, subject, and `git status` short result.
 5a. **Fetch and check (1.81.0).** Fetch. When behind the upstream, pull with a merge and resolve kit-file conflicts by the kit's rules; otherwise check any unpushed merge for lines either side added that the merge dropped. Read [references/pull.md](references/pull.md) for both. Never push; end with `Ready to push.`
 6. If the message has any line that was **not** in the draft (a `Co-authored-by`, `Signed-off-by`, `Generated with` or other trailer from Cursor, Claude Code or another tool), read [references/added-lines.md](references/added-lines.md).
-7. After the commit message is settled (including a one-time strip of added lines), one optional line and nothing more: Next (optional): `/crav1-open-pr` when you want to push and open the PR. Do not run that skill in this turn.
+7. After the commit message is settled (including a one-time strip of added lines), one optional line and nothing more: Next (optional): `/crav1-open-pr` when you want to push and open the PR (when the head's Match `Branch:` line ends in `(PR <n>)` or a pull request is known to be open for it, name it instead: `/crav1-open-pr` to push to PR <n> and update its description or comment). Do not run that skill in this turn.
 8. If commit fails (hooks, empty index, identity), show the error. Keep the paste blocks, **then** offer the choices again (`commit` still first). Do not name `/crav1-open-pr` on a failed commit.
 
 Do not `git commit --amend` for wording tweaks unless they asked. Amending **only** to restore the drafted message (strip added lines) is allowed as below.
