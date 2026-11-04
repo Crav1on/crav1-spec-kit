@@ -175,6 +175,8 @@ When the pull request already has review comments, the next run is a re-review. 
 
 Each earlier finding gets one line first: **Fixed** (with the short commit SHA), **Partly fixed**, **Still open**, or **No longer relevant**. A resolved thread whose problem is still there is flagged `resolved but still open`. In the comment, earlier points go under **Since last time**, then new points under the normal sections. **Since last time** lists only points the reviewers saw. A finding you cut from the posted comment is shown in the chat with its mark and kept out of the new comment unless you say to include it.
 
+Since 1.114.1 a re-review fetches the pull request again and reads every file and line link from the head commit as it is now. After a new push or a force-push, a point whose code moved links its new lines, and a point whose code is gone is marked fixed or no longer relevant. Lines are never copied from the earlier review.
+
 On post, the re-review replies in the earlier comment's thread (Azure DevOps) or posts a new review (GitHub). Afterwards it offers to resolve existing threads whose points are fixed, and resolves them only on your yes.
 
 ## Specs in another repo (1.65.0)

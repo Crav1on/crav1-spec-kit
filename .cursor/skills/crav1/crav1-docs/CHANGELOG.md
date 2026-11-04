@@ -2,6 +2,10 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.114.1 (2026-11-04)
+
+- `/crav1-review-pr` re-review: after a new push or a force-push, every file and line link is read again from the current head commit. A point whose code moved links its new lines; a point whose code is gone is fixed or no longer relevant. Lines are never copied from the earlier review, record or draft. Fixes re-reviews that still linked the old lines.
+
 ## 1.114.0 (2026-11-04)
 
 - `/crav1-open-pr` on a branch that already has an open pull request: after the push (your yes, never a force-push) it shows the pull request, its author and the commits added since the description was written, then asks: **update description**, **add as comment**, **push only** or **stop**. On someone else's pull request, **add as comment** comes first. The comment says what was pushed and why and reads like a normal reviewer comment; an updated description keeps the same format and keeps lines a person wrote, listing what changes.
