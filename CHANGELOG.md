@@ -2,6 +2,12 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.114.0 (2026-11-04)
+
+- `/crav1-open-pr` on a branch that already has an open pull request: after the push (your yes, never a force-push) it shows the pull request, its author and the commits added since the description was written, then asks: **update description**, **add as comment**, **push only** or **stop**. On someone else's pull request, **add as comment** comes first. The comment says what was pushed and why and reads like a normal reviewer comment; an updated description keeps the same format and keeps lines a person wrote, listing what changes.
+- Before anything is posted you see the exact text: **Reply yes** (or "confirm") to post it as shown, or reply with your edits (for example "drop the second bullet") to get a redraft. Nothing is posted until you say yes.
+- Next-step lines in build-tasks, build-features, finalize-commit, verify-build-against-spec and help status name the pull request when the branch has one: `/crav1-open-pr` to push to PR 77 and update its description or comment. Otherwise they still say push and open the PR.
+
 ## 1.113.0 (2026-11-04)
 
 - `/crav1-review-pr` shows only the review you can post: the verdict, the paste-ready block, one `Kit record:` line naming the PR note, and the post question. The 7 check lines, findings with lanes, info notes, suggestions, follow-ups and the next step after merge are no longer in the chat; they are saved in the PR note as the kit record.
