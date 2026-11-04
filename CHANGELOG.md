@@ -2,6 +2,12 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.113.0 (2026-11-04)
+
+- `/crav1-review-pr` shows only the review you can post: the verdict, the paste-ready block, one `Kit record:` line naming the PR note, and the post question. The 7 check lines, findings with lanes, info notes, suggestions, follow-ups and the next step after merge are no longer in the chat; they are saved in the PR note as the kit record.
+- Context added in the same message (a mail, a meeting, a workshop plan) shapes the review (what comes first, what is left out, the questions it raises), but the review never mentions it, the kit or the specs. Below the review, after a line, a read-only section shows the kit record and what the context changed. It is also saved next to the PR note as `<date>-pr-<repo>-<n>-context`, linked from the PR note.
+- Posting, also to Azure DevOps, only ever takes the review.
+
 ## 1.112.0 (2026-11-04)
 
 - Playbook reports (`report-playbook-short`, `report-playbook-full`, still preview) list every **Conflict:** line in the covered specs under **Needs your answer** as C1, C2, …, after the questions: the decided line and the newer quote side by side, a recommended answer and why, a `C<n> Answer:` line, and the Step that records it. The answer step names every N and C it covers; `/crav1-resolve-open-questions <spec>` (or `apply <this file>`) settles the conflicts too.
