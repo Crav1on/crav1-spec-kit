@@ -2,6 +2,10 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.114.2 (2026-11-04)
+
+- `/crav1-review-pr`: recording the comment as posted (`comment posted`, `newest comment`, a paste) saves only the posted comment and never adds a `Comment as drafted` section. Drafted comments in the PR note are always in a four-backtick fence, never three.
+
 ## 1.114.1 (2026-11-04)
 
 - `/crav1-review-pr` re-review: after a new push or a force-push, every file and line link is read again from the current head commit. A point whose code moved links its new lines; a point whose code is gone is fixed or no longer relevant. Lines are never copied from the earlier review, record or draft. Fixes re-reviews that still linked the old lines.
