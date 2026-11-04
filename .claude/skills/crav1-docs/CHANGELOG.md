@@ -2,6 +2,10 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.111.2 (2026-11-04)
+
+- `/crav1-add-to-spec` code-change branch: the **Write what belongs** section moved word for word into its own references file, read at the same point. No behavior change.
+
 ## 1.111.1 (2026-11-04)
 
 - The sort in `/crav1-add-to-spec`, the map in `/crav1-existing-to-specs`, and the apply list and conflict batch in `/crav1-resolve-open-questions` now end with the same plain block: **Reply yes** (or "confirm") to write it as shown; to change something first, reply with your edits (for example "drop 13"); nothing gets committed either way. Wording only; no new behavior.
