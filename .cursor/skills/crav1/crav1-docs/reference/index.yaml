@@ -105,7 +105,7 @@ skills:
     lane: cross-cutting
     starter: false
     page: reference/skills/crav1-open-pr.md
-    purpose: "Open a pull request for the current change branch (push with explicit yes)."
+    purpose: "Open a pull request for the current change branch, or push to an existing one and update its description or comment (push with explicit yes)."
   crav1-review-pr:
     lane: cross-cutting
     starter: false

@@ -72,6 +72,7 @@ Where `/crav1-finalize-commit` has no questions tool, it asks in plain text: num
 The kit's advice is always to merge the base branch into your branch, never to rebase it:
 
 - `/crav1-merge-pr` stops when the branch is behind the base or has conflicts, and says: `Merge develop into feat/orders-retry (resolve any conflicts there), push, then ask to merge again.` On GitHub, **Update branch** with **Update with merge commit** does the same for a branch that is only behind.
+- When a pull request is already open for the branch (since 1.114.0), `/crav1-open-pr` pushes after your yes, then shows the commits added since the description was written and asks: **update description**, **add as comment**, **push only** or **stop**. On someone else's pull request, **add as comment** comes first. Either text is shown in full before anything is posted: reply **yes** (or "confirm") to post it as shown, or reply with edits such as "drop the second bullet" to get a redraft. Nothing is posted until you say yes. The comment reads as a normal reviewer comment: what was pushed and why.
 - `/crav1-open-pr` shows the error when a push is rejected because the remote branch moved, and says to pull with `git pull --no-rebase`, resolve any conflicts, and push again. It never force-pushes.
 
 The steps, when you want them:
