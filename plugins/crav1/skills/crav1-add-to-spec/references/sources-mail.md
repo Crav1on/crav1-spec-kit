@@ -1,21 +1,23 @@
 # Imported sources: mails
 
-Read only for a mail. [sources.md](sources.md) is the convention; its other sections still apply. Moved word for word from `sources.md` in 1.71.1; the rules are unchanged.
+Read only for a mail. [sources.md](sources.md) is the convention; its other sections still apply. Moved from `sources.md` in 1.71.1. Since 1.111.0 a mail is written as text.
 
 ## Mails
 
-A mail goes in as a `.eml` text file. Keep the CRLF line endings. Do not convert them to LF. A paste that used LF is written with CRLF. The README says the paste was written with CRLF.
+A mail is written as text, never as a mail file (1.111.0). Write `mail.md` in the source folder:
 
-Read the project's `.gitattributes`. If that file does not already contain the line `*.eml -text`, ask the user once, before adding it. Yes or no. Use the questions tool when it is available. One question for the run, not once per mail.
+- A header block, one line each: `From`, `To`, `Cc`, `Date`, `Subject`, and `Message-ID` when the mail has one. Copy them as the mail shows them. A header the mail does not show says `not shown`.
+- Then the text body word for word, the quoted thread kept. Use the plain text part. When the mail has only an HTML part, write its text without markup. Do not shorten, summarize, or reflow it.
 
-The question is: Add `*.eml -text` to `.gitattributes` so Git keeps the CRLF line endings on mail files?
+The original mail file stays outside the repo. Do not copy it into the folder. Do not edit it. Do not write a script to edit, split, or re-encode a mail. Read the mail; write the text. The README names the original file name, the `Date`, and the `Message-ID`, and says the original is kept outside the repo. Do not write a local disk path. Write a location only when the user gives a shared one.
 
-1. **Yes.** Add that line on its own line. Create `.gitattributes` only when the file is missing. Do not rewrite other lines.
-2. **No.** Do not add the line. The README says `.gitattributes` was left as it was, so a later commit may change the line endings.
+A pasted mail is also written as `mail.md`. The README says it was pasted and there was no original file.
 
-Do not add the line without that yes. When the line is already there, do not ask.
+The duplicate check matches a mail by its `Message-ID`. Without one, it matches `Date`, `Subject`, and `From`. An earlier import may be a `mail.md` or an older mail file; both count. Mail files already in a project stay as they are. Do not convert or remove them unless the user asks.
 
-A mail follows this section. Each image inside the mail, inline or attached, also follows Images inside a mail. The binary section does not replace the mail. An attachment the user also supplied as its own file follows the binary section and lives in the same folder when it belongs to that mail. A non-image part stays in the `.eml`.
+Personal data and Secrets apply to the text in `mail.md`: the headers, the body, the signature, and the quoted thread. A redaction edits `mail.md`.
+
+A mail follows this section. Each image inside the mail, inline or attached, also follows Images inside a mail. An attachment that is not an image follows Binary files as its own file in the same folder. An attachment the user also supplied as its own file is that same file.
 
 ## Images inside a mail
 
@@ -43,13 +45,13 @@ When the option is compress, the quality samples in Binary files still run. Acce
 
 Do not write the source folder until every image has an answer. The transfer data policy file may still be written when the user says yes, as Personal data says.
 
-### What each option does to the part
+### What each option does to the image
 
-1. **Commit as-is.** That image part stays in the `.eml` unchanged.
-2. **Compress, then commit.** Replace that image part with the picked WebP. Same crop, no sharpening, and the same three samples as a screenshot. Keep the content id when the part had one. Set the type to `image/webp`. Keep the CRLF line endings. Do not write a second copy of the image next to the `.eml`. The README names the image and the quality. The `.eml` is then no longer the untouched original. The README says so.
-3. **Convert to text.** Remove that image part from the `.eml`. Leave a short placeholder where the image was shown, naming the new file: `[Image converted to text: <name>.md]`. When the image was only an attachment, add that line at the end of the text body. Write `<name>.md` in the same `docs/sources/YYYY-MM-DD-<slug>/` folder. The name comes from the image file name. Lowercase. Hyphens. Do not put a person's name in the name. When the mail shows no file name, use a short name from what the image shows. When that name is already used in the folder, add the list number. The file holds the image's text word for word. A diagram is a Mermaid redraw. A table is a markdown table. An image that has both holds both. Check that text word for word against the image before the file is written. Do not invent a label, a word, or a box the image does not show. The README notes the conversion and names the file. The README says the `.eml` is no longer the untouched original.
-4. **Leave it out.** Remove that image part from the `.eml`. Leave a short placeholder where the image was shown: `[Image left out: <name>]`. When the image was only an attachment, add that line at the end of the text body. Use the same name rules as convert to text. The folder does not contain that image. The README notes the leave-out and names the image. The README says the `.eml` is no longer the untouched original.
+Each image becomes its own file next to `mail.md`, or no file. `mail.md` gets a short placeholder where the image was shown. When the image was only an attachment, the placeholder goes at the end of the text body.
 
-Put the placeholder where that image was shown. A mail with a plain part and an HTML part gets the placeholder in both. Do not ask where an image that lived only in the mail now lives. The `<name>.md` from convert to text is the file the folder stores.
+1. **Commit as-is.** Write the image file next to `mail.md`. Placeholder: `[Image: <file>]`.
+2. **Compress, then commit.** Write the picked WebP next to `mail.md`. Same crop, no sharpening, and the same three samples as a screenshot. Placeholder: `[Image: <file>]`. The README names the image and the quality.
+3. **Convert to text.** Write `<name>.md` next to `mail.md`. Placeholder: `[Image converted to text: <name>]`. The file holds the image's text word for word. A diagram is a Mermaid redraw. A table is a markdown table. An image that has both holds both. Check that text word for word against the image before the file is written. Do not invent a label, a word, or a box the image does not show.
+4. **Leave it out.** No file. Placeholder: `[Image left out: <name>]`.
 
-Keep the CRLF line endings on the `.eml` after any of these edits. When every image is commit as-is, and no later section changes the file, the `.eml` stays the untouched original.
+Names come from the image file name. Lowercase. Hyphens. Do not put a person's name in the name. When the mail shows no file name, use a short name from what the image shows. When that name is already used in the folder, add the list number. The README names each image and its option.

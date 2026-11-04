@@ -26,7 +26,7 @@ Read `references/handoffs-imported-sources.md` ("Imported sources") only when th
 
 ## Add to that spec.md
 
-Edit `docs/specs/<slug>/spec.md` in this step. An imported source also writes `docs/sources/YYYY-MM-DD-<slug>/` and, after a yes, one `.gitattributes` line, as [references/sources.md](sources.md) says, with the kind file it names. When an image inside a mail is converted to text, that folder also holds `<name>.md`. Do not write any other file in this step, except the note and its `used_by` under **Notes**.
+Edit `docs/specs/<slug>/spec.md` in this step. An imported source also writes `docs/sources/YYYY-MM-DD-<slug>/` as [references/sources.md](sources.md) says, with the kind file it names. When an image inside a mail is converted to text, that folder also holds `<name>.md`. Do not write any other file in this step, except the note and its `used_by` under **Notes**.
 
 - Quote their words. The quote is the record. Do not replace it with a paraphrase.
 - Label what is new versus what was already there.
