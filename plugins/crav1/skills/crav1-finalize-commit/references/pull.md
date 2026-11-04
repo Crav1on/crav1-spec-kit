@@ -28,7 +28,7 @@ Read after a commit, and on the `pull` word. Never push, never rebase, never sug
 3. Run the check against the working tree before `git commit --no-edit`. Lines missing: do not commit; list them and restore them first.
 4. End: `Merged <upstream> into <branch>. Nothing lost. Ready to push.`
 
-The question, only for a real disagreement, one per fact, with the two lines shown: `keep both` (theirs becomes `**Conflict:** "<their words>" (Full source: <their note, or their short sha>) vs the line above` under ours) / `mine` / `theirs` / `stop` (leave the merge unfinished, `git merge --abort` undoes it). Headless or bot run: write the `**Conflict:**` line and say so.
+The question, only for a real disagreement, one per fact, with the two lines shown: `keep both` (theirs becomes `**Conflict:** "<their words>" (Full source: <their note, or their short sha>) vs the line above` under ours) / `mine` / `theirs` / `stop` (leave the merge unfinished, `git merge --abort` undoes it). Headless or bot run: write the `**Conflict:**` line and say so. When a `**Conflict:**` line was written, the end names `/crav1-resolve-open-questions <slug>` to settle it (1.111.0).
 
 ## Nothing-lost check
 

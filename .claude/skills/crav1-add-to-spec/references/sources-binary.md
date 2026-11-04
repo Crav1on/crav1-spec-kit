@@ -23,7 +23,7 @@ Git LFS (Large File Storage) is a note only. It is not an option. It needs repo 
 
 The README records which option was used.
 
-Screenshot samples: crop first, then encode three WebP files, q70, q85, and lossless. Do not sharpen. Show the three to the user with the quality named on each. Stop until the user picks one. Write only the picked file into the folder. Remove the other two. Do not leave the samples in the source folder. If no encoder is available, say so and ask the user to pick another of the four options. Do not install an encoder. An image inside a mail uses the same samples. The picked image replaces that part, as Images inside a mail says.
+Screenshot samples: crop first, then encode three WebP files, q70, q85, and lossless. Do not sharpen. Show the three to the user with the quality named on each. Stop until the user picks one. Write only the picked file into the folder. Remove the other two. Do not leave the samples in the source folder. If no encoder is available, say so and ask the user to pick another of the four options. Do not install an encoder. An image inside a mail uses the same samples. The picked image is written next to the mail text, as Images inside a mail says.
 
 A text file that is already text, such as `.txt`, `.md`, or `.vtt`, is not a binary file. Store it unchanged. A `.docx` or a PDF is a document and gets the four options.
 

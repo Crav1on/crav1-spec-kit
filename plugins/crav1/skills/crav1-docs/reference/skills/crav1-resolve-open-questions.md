@@ -6,9 +6,11 @@
 
 ## Purpose
 
-Walk Open questions in spec.md one by one.
+Walk Open questions and Conflict lines in spec.md one by one.
 
 One Open question at a time; keep it open or answer with impact; patch only that question, found by its words (`Q#` is display only).
+
+Conflict lines (1.111.0) are listed after the questions; settling one replaces or keeps the decided line, removes the Conflict line, and adds a trace to the note.
 
 `detailed` shows an extended entry per question: what it blocks, why it matters, what is known, who can answer, asked status and date, sources, and a suggested answer. No extra questions.
 
@@ -21,7 +23,7 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 | List (optional, never asked) | `detailed` | show blocks, why, known, who, asked, sources and suggested per question (no word: the short list, and a headless run does not stop) |
 | List (optional, never asked) | `apply` | apply <file>: read back a filled-in playbook report, compare each answer with the specs now (new, already settled, conflicting), ask once per conflict, write after one confirm (1.110.0) |
 
-Topic words or `<spec> Q#` (for example `orders Q3`) open one question (1.77.0) and stop after it, with no next question, ending with the still-open titles (1.90.5); several matches: one question listing up to 4.
+Every **Conflict:** line in the spec is listed after the questions as C1, C2 (1.111.0, no word): one question per conflict, the decided line and the new quote side by side, a recommendation first, written after one confirm. Topic words or `<spec> Q#` (for example `orders Q3`) open one question (1.77.0) and stop after it, with no next question, ending with the still-open titles (1.90.5); several matches: one question listing up to 4.
 
 ## Runs when
 
@@ -33,9 +35,9 @@ Prompt budget: 2 (the most prompts in one run, the closing yes included). A prom
 
 ## Reads
 
-In short: Open questions and assumptions in `spec.md`.
+In short: Open questions, assumptions and Conflict lines in `spec.md`.
 
-Reads Open questions and unresolved assumptions in `spec.md`.
+Reads Open questions, unresolved assumptions and **Conflict:** lines in `spec.md`.
 
 ## Writes
 

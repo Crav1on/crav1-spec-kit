@@ -24,9 +24,9 @@ Each imported source is one folder:
 
 A mail and the files that belong to that same mail are one source. A meeting and a screenshot of that same meeting are one source when the user presented them together. When it is unclear whether two files are one source, ask once. Options only. Use the questions tool when it is available. The options are one folder, or one folder per file. Stop until the user picks.
 
-The folder holds the original files, unchanged, except where a later section of this file changes a file, plus `README.md`.
+The folder holds the original files, unchanged, except where a later section of this file changes a file, plus `README.md`. A mail is the exception: it is written as `mail.md` and its original stays outside the repo.
 
-A paste of a mail, a transcript, minutes, or a chat, with no file, is still a source. Write the pasted words as a text file in the folder. A pasted mail is a `.eml` file. The README says it was pasted and there was no original file.
+A paste of a mail, a transcript, minutes, or a chat, with no file, is still a source. Write the pasted words as a text file in the folder. A pasted mail is written as `mail.md`, as the mail file says. The README says it was pasted and there was no original file.
 
 Write the folder once, before the first verbatim quote from that source is written into a spec. Later quotes from the same source reuse the folder. Do not ask the questions below again for a folder this run already wrote. Do not write the folder when no quote from that source will be written.
 
@@ -39,7 +39,7 @@ Write the folder once, before the first verbatim quote from that source is writt
 - The date and the time, as the source shows them.
 - How it was converted: as-is, compressed and the quality, converted to text, or left out.
 - Where the original lives, when the file was left out, or converted and the original stays outside the repo.
-- For a mail, each image that was converted, compressed, or left out. Name the image and the option. When any image changed, say the `.eml` is no longer the untouched original.
+- For a mail, the original file name, the `Date`, the `Message-ID`, and that the original is kept outside the repo. Each image and its option.
 - **Left out**, when the import took only part of the document: one line per skipped section or page range, with a short reason. Then nobody mistakes the extract for the whole document.
 - **Superseded by**, when a newer version of this document was imported: a link to the newer folder. See Versions and conflicts.
 - For a `.docx`, the tracked changes and the comments. See Word files.
@@ -109,4 +109,4 @@ A `Source:` line in a chat list, before the folder exists, stays `<kind> <date>`
 
 ## Do not commit
 
-Write the folder, the README, a `.gitattributes` line only after a yes, the transfer data policy only after a yes, and the spec lines. Do not commit. Do not push. Do not open a pull request. Name `/crav1-finalize-commit` when a file changed. Do not run it.
+Write the folder, the README, the transfer data policy only after a yes, and the spec lines. Do not commit. Do not push. Do not open a pull request. Name `/crav1-finalize-commit` when a file changed. Do not run it.

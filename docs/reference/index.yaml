@@ -50,7 +50,7 @@ skills:
     lane: specify
     starter: false
     page: reference/skills/crav1-resolve-open-questions.md
-    purpose: "Walk Open questions in spec.md one by one."
+    purpose: "Walk Open questions and Conflict lines in spec.md one by one."
   crav1-show-or-ask-open-questions:
     lane: cross-cutting
     starter: false

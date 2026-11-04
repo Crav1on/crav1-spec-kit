@@ -2,6 +2,11 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.111.0 (2026-11-04)
+
+- `/crav1-add-to-spec` writes a mail as text: `mail.md` in the source folder holds `From`, `To`, `Cc`, `Date`, `Subject` (and `Message-ID`) and the body word for word, quoted thread kept. The original mail file stays outside the repo; the README names its file name, date and Message-ID. Images in the mail keep the same per-image choice but become their own files next to the mail text, with a placeholder where each was shown. No mail is edited, split or re-encoded, and the `.gitattributes` question is gone. A pasted mail is written the same way. Mail files already in a project stay as they are.
+- `/crav1-resolve-open-questions` also lists every **Conflict:** line after the open questions (no word needed), asks one question per conflict with the decided line and the new quote side by side and a recommendation first, and writes nothing until one confirm. Settling replaces or keeps the decided line, removes the Conflict line and adds a trace. `/crav1-add-to-spec` and the pull step of `/crav1-finalize-commit` name it when they write a Conflict line.
+
 ## 1.110.0 (2026-11-02)
 
 - Playbook reports (`report-playbook-short`, `report-playbook-full`, still preview) only list; they no longer take answers in chat. The how-to blocks for **Kept** and **Needs your answer** sit above their tables, the "To change it" column is gone, and every row says `Recorded in Step <n>`. An early answer step runs `/crav1-resolve-open-questions` for the questions. Each item has a plain `Answer:` or `Change:` line, so the file can be filled in later or by people who do not use the kit. Compose is written out as bullets. Order diagrams follow a safe syntax (plain ASCII labels, no quotes or parentheses) so every viewer renders them. Short no longer caps the steps.
