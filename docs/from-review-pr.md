@@ -30,10 +30,10 @@ If the message does not name a pull request, the command asks which one and stop
 | Which pull request | Named it by number or URL | Asks which one and stops when none was named. Does not pick the newest |
 | Comment as posted | Confirm the comment, or paste it | When the PR note has a drafted comment with nothing posted after it, first finds the posted comment on the pull request (read-only) or asks you to paste it, saves it word for word, and compares it with the draft (1.67.0) |
 | Read | — | Reads the diff, the spec, and the pull request body, and whether a linter is required and green. When the slug has `plan.md`, also reads the plan and `verify.md`. When the slug has no `plan.md` or `tasks.md`, reads the test results that pull request's own pipeline already recorded. Does not edit. Does not run the tests |
-| Fixed checks | Read the 7 lines | The same 7 checks every run (1.95.0), one line each even when clean: spec and plan match, tests, secrets, infrastructure access per environment, environment parity, spec wording a bug touches, and merge order against the other open branches. Each line says `ok`, the finding ids, or `n/a` with a reason, so two runs on the same branch cover the same ground |
-| Must be true before ship | Read the findings | Each miss is its own finding. Three lines: what is off, what could happen, and the decision (ship, fix, or drop). Any fix or drop means the review does not say ship. An outside-the-kit note and a recorded-test note are info. They do not block ship |
-| Lane | — | Names the lane and does not start it. Spec miss → Specify. Plan miss → Plan, only when that slug has `plan.md`. Verify miss, a file the plan already named but the diff lacks, or a red or missing linter → Build. Body mismatch → rewrite the pull request body, not a new spec |
-| Suggestions | Read them | Style, patterns, and practices the repo already wrote down, plus dead code, or a name that hides what the code does. They do not block ship. A secret in the diff is a first-section fix |
+| Fixed checks | Open the PR note when you want them | Written to the PR note's kit record, not the chat (1.113.0). The same 7 checks every run (1.95.0), one line each even when clean: spec and plan match, tests, secrets, infrastructure access per environment, environment parity, spec wording a bug touches, and merge order against the other open branches. Each line says `ok`, the finding ids, or `n/a` with a reason, so two runs on the same branch cover the same ground |
+| Must be true before ship | Open the PR note when you want them | In the kit record. Each miss is its own finding. Three lines: what is off, what could happen, and the decision (ship, fix, or drop). Any fix or drop means the review does not say ship. An outside-the-kit note and a recorded-test note are info. They do not block ship |
+| Lane | — | Names the lane in the kit record and does not start it. Spec miss → Specify. Plan miss → Plan, only when that slug has `plan.md`. Verify miss, a file the plan already named but the diff lacks, or a red or missing linter → Build. Body mismatch → rewrite the pull request body, not a new spec |
+| Suggestions | Open the PR note when you want them | In the kit record. Style, patterns, and practices the repo already wrote down, plus dead code, or a name that hides what the code does. They do not block ship. A secret in the diff is a first-section fix |
 | Paste-ready comment | Copy it, or wait for the post question | Says the verdict in the chat, then one Markdown block you can paste into the pull request as one comment: a short opening, then Blockers, Bugs, Tests to add with this PR, and A question, each point starting with a link to its file and line. Showing it posts nothing |
 | Post | Post, I'll post it myself, or do not post | Asks once whether to post under your own account, naming the vote. On yes, posts the block as one comment, sets that vote and saves the posted text |
 | Stop | Glance | A clean review says so and stops. It does not merge. It never resolves a thread without your yes |
@@ -98,7 +98,13 @@ I've looked through the PR and run it through my checks. This is what I found:
 
 On GitHub the same link is `https://github.com/contoso/orders-api/blob/feature/orders-retry-table/functions/orders-sync/store.py?plain=1#L401`. The full rules are in the skill's `references/comment-layout.md`.
 
-The chat review above the block keeps its plain format for you, including `B` (bug), `T` (test to add) and `Q` (question) lines for the points in the block. The block is for the author.
+## What the chat shows (1.113.0)
+
+A plain `/crav1-review-pr <pr>` shows only the review you can post: the verdict, the paste-ready block, one line `Kit record: <PR note path>`, and the post question. Nothing about specs, plans, lanes, kit steps, next steps or the tools used. That kit record (the 7 check lines, findings with lanes, info notes, suggestions, follow-ups, the next step after merge) is saved in the PR note.
+
+When you add context in the same message, such as a mail or a meeting, it shapes the review: what comes first, what is left out (for example points a workshop will settle) and the questions it raises. The review still reads as plain review comments and never mentions the mail, the kit or the specs. Below it, after a line, comes a read-only section with the kit record and what the context changed: comparisons, the items left for the workshop, questions kept for later. That section is also saved next to the PR note, with `-context` added to its name, and the PR note links it.
+
+Posting, here or to Azure DevOps, only ever takes the review.
 
 ## Comment style
 
@@ -198,7 +204,7 @@ Every review saves the pull request's title and description as a **PR note** in 
 
 Follow-ups are suggestions, and choices the description calls deliberate. They are not for this pull request, so they are not posted to the pull request and are not in the paste-ready comment. The comment has only Blockers, Bugs, Tests to add with this PR, and A question.
 
-The chat review still lists them, then says `PR record: <path>`. Everything the review raises goes into the PR note's shared `## PR record`, one line per point, in the merge-safe format of `crav1-add-to-spec` `references/pr-record.md`:
+The kit record in the PR note lists them; the chat only says `Kit record: <path>` (1.113.0). Everything the review raises goes into the PR note's shared `## PR record`, one line per point, in the merge-safe format of `crav1-add-to-spec` `references/pr-record.md`:
 
 ```text
 - Point: src/orders/retry_store.py:9 | open | Sam Lee | from review-pr 2026-10-19 | An idempotency test for the row key

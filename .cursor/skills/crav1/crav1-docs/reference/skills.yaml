@@ -1306,7 +1306,11 @@ skills:
   purpose: Read one named open pull request and report whether it can ship.
   in_depth:
   - When an open pull request is named, **`/crav1-review-pr`** reads the diff and says whether it can
-    ship. It is cross-cutting. It is not a lane and not a bot. A pull request with a plan keeps the plan
+    ship. It is cross-cutting. It is not a lane and not a bot. Since 1.113.0 the chat shows only the
+    postable review, its verdict, one line naming the PR note and the post question; the checks, findings,
+    lanes, follow-ups and next step are the kit record in the PR note. Added context (a mail, a meeting)
+    shapes the review without being named in it, and a separate read-only section, also saved next to the
+    PR note as its context file, shows the kit record and what the context changed. Posting takes only the review. A pull request with a plan keeps the plan
     and `verify.md` checks. A pull request with no `plan.md` or `tasks.md` for its slug was built outside
     the kit. That is an info note. It does not report a missing `verify.md`. It reads the test results
     that pull request's own pipeline already recorded. It does not run the tests, and it does not ask
@@ -1314,7 +1318,7 @@ skills:
     paste-ready Markdown comment in your own friendly first-person voice, with a short plain opening, the
     sections Blockers, Bugs, Tests to add with this PR, and A question, each point starting with a link to
     its file and line on the source branch, and no tool or kit names. Follow-ups, including choices the description
-    calls deliberate, are not posted and not in that comment; the chat lists them and they are saved in the
+    calls deliberate, are not posted and not in that comment; they are saved in the
     PR note's shared PR record (one `follow-up` Point each, with its file and line, 1.97.0), which a
     re-review updates and `/crav1-ado-sync` reads as open items. The same PR note keeps the comment as drafted and,
     once you post it, the comment as posted, word for word. Re-review replies use the
