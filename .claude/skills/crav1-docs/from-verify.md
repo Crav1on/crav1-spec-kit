@@ -48,7 +48,7 @@ When the spec's work sits on several branches, `/crav1-verify-build-against-spec
 - **Merged** means the branch is in its base, its commits are there as the same change, or a merged PR shows on GitHub or Azure DevOps (only when `gh` or `az` is already signed in). A deleted branch whose work is in the base is `merged, branch deleted`.
 - **Rewritten** branches say `branch rewritten since last read`; nothing errors.
 - A branch two specs share is listed under each with `(also in <slug>)`.
-- "Demoable" needs every branch merged. Otherwise: `built and verified, not merged yet`, next `/crav1-open-pr` or `/crav1-merge-pr`. `/crav1-open-pr` proposes the base `develop` here (into, then Merges into, then default), and `/crav1-review-pr` finds the spec the same way. After a merge, `/crav1-merge-pr` says `2 of 3 branches of orders now merged into develop`. `/crav1-help status orders` shows the same line, and `/crav1-ado-sync` suggest-features counts unmerged branches as open work.
+- "Demoable" needs every branch merged. Otherwise: `built and verified, not merged yet`, next `/crav1-open-pr` or `/crav1-merge-pr`; a branch that already has a pull request is named, for example `/crav1-open-pr` to push to PR 77 and update its description or comment (1.114.0). `/crav1-open-pr` proposes the base `develop` here (into, then Merges into, then default), and `/crav1-review-pr` finds the spec the same way. After a merge, `/crav1-merge-pr` says `2 of 3 branches of orders now merged into develop`. `/crav1-help status orders` shows the same line, and `/crav1-ado-sync` suggest-features counts unmerged branches as open work.
 - Nothing writes `Status:`. It is report only. Refs on disk; nothing fetches.
 
 ## After
