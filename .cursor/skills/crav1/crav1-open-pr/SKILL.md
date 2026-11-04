@@ -2,8 +2,9 @@
 name: crav1-open-pr
 description: >-
   Use when commits exist on feat/<slug> or spec/<slug> and the user wants a
-  pull request. Pushes only after a yes, then opens it with gh or az. Cross-
-  cutting. Does not commit or merge.
+  pull request, or to push to an existing one. Pushes only after a yes, opens
+  it with gh or az, or on an existing pull request offers to update its
+  description or add a comment, posted only on a yes. Does not commit or merge.
 disable-model-invocation: true
 icon: git-pull-request
 color: green
@@ -73,7 +74,7 @@ Only after they pick `push` on the current draft.
 
 1. `git push -u <remote> <head>`. Never `--force`, `--force-with-lease`, `--force-if-includes`, or a refspec that starts with `+`.
 2. If the push fails, show the error. Do not open a pull request. Do not force-push. When it was rejected because the remote branch has commits this one lacks, say: `Pull <head> with git pull --no-rebase, resolve any conflicts, then push again.` Never suggest a rebase or a force-push (1.66.0).
-3. Open one pull request (below). If one already exists for this head → base, print that URL instead.
+3. Open one pull request (below). If one already exists for this head → base, follow **Existing pull request** instead.
 
 ## Open only
 
@@ -89,7 +90,7 @@ When **Host** says to use `gh`:
 gh pr list --head <head> --base <base> --state open --json number,url
 ```
 
-If the list is non-empty, print the URL. Do not run `gh pr create`.
+If the list is non-empty, follow **Existing pull request**. Do not run `gh pr create`.
 
 Otherwise:
 
@@ -99,7 +100,7 @@ gh pr create --base <base> --head <head> --title <title> --body <body>
 
 Pass the body with a HEREDOC or `--body-file` so quotes survive. Do not pass `--draft`, `--reviewer`, `--label`, `--assignee`, or `--milestone` unless they asked for that in this chat.
 
-If create fails because a pull request already exists, print that URL. Do not open a second.
+If create fails because a pull request already exists, follow **Existing pull request**. Do not open a second.
 
 On success, follow **After it exists**.
 
@@ -111,6 +112,10 @@ Read `references/azure-devops.md` ("Azure DevOps (Create)") only when the remote
 
 Read `references/fallback.md` ("No host create") only when no host CLI can open the pull request.
 
+## Existing pull request
+
+Read `references/existing-pr.md` ("Existing pull request", 1.114.0) when a pull request is already open for this head → base. It reads the pull request's author, description and the commits since the description was written, then offers **update description**, **add as comment**, **push only** and **stop** (add as comment first when someone else opened it). Update or comment shows the exact text and posts only on a yes; edits redraft it.
+
 ## After it exists
 
 Read `references/after.md` ("After it exists") only when the pull request exists.
@@ -121,6 +126,7 @@ Read `references/after.md` ("After it exists") only when the pull request exists
 - No force-push. No advice to rebase or force-push; a rejected push is fixed by pulling with a merge.
 - No merge (`gh pr merge`, completing an Azure DevOps pull request, or a local merge). Merging is `/crav1-merge-pr` on a later explicit ask for a named pull request. Do not run it from this skill. Do not run `/crav1-review-pr`. A review is not a merge ask.
 - No second pull request for the same head → base.
+- On an existing pull request, post a description update or a comment only on a yes to the latest shown text. Never change its title, reviewers or state.
 - No repository setting changes.
 - No `gk ai pr create` and no other interactive `gk` pull-request create. GitKraken stays GUI paste only.
 - No dialog-box or browser Microsoft sign-in (`az login`, device code, or a web login).

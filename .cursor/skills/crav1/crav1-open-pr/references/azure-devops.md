@@ -45,7 +45,7 @@ az repos pr list --org <org-url> --project <project> --repository <repo> --sourc
 
 Use the `--detect true` form from **Host** only in the case Host allows, and only for the flags you could not parse.
 
-If the list is non-empty, print the web URL and stop. Do not run `az repos pr create`. Prefer `_links.web.href`. When the JSON has `pullRequestId` and no web link, print `https://dev.azure.com/<org>/<project>/_git/<repo>/pullrequest/<pullRequestId>` (or `https://<org>.visualstudio.com/...` when that is the organization host). That id came from the host.
+If the list is non-empty, print the web URL, then follow **Existing pull request** in `SKILL.md` (1.114.0). Do not run `az repos pr create`. Prefer `_links.web.href`. When the JSON has `pullRequestId` and no web link, print `https://dev.azure.com/<org>/<project>/_git/<repo>/pullrequest/<pullRequestId>` (or `https://<org>.visualstudio.com/...` when that is the organization host). That id came from the host.
 
 If the list call fails, do not create. Print the Azure DevOps fallback from **Host**. Do not invent a URL. Do not start a sign-in.
 
@@ -81,6 +81,6 @@ Do not pass `--open`, `--auto-complete`, `--draft`, `--delete-source-branch`, `-
 
 On success, print the web URL the same way (`_links.web.href`, otherwise `/pullrequest/<pullRequestId>` from the id the command returned) and follow **After it exists**. A `url` field on that JSON counts as the host returning a URL; still print the web form when you can build it from that id.
 
-If create fails because a pull request already exists, print that URL. Do not open a second.
+If create fails because a pull request already exists, or the list call finds one, follow **Existing pull request** in `SKILL.md` (1.114.0). Do not open a second.
 
 If create fails for any other reason, print the Azure DevOps fallback from **Host**. Do not invent a URL. Do not start a sign-in.
