@@ -2,6 +2,10 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.111.1 (2026-11-04)
+
+- The sort in `/crav1-add-to-spec`, the map in `/crav1-existing-to-specs`, and the apply list and conflict batch in `/crav1-resolve-open-questions` now end with the same plain block: **Reply yes** (or "confirm") to write it as shown; to change something first, reply with your edits (for example "drop 13"); nothing gets committed either way. Wording only; no new behavior.
+
 ## 1.111.0 (2026-11-04)
 
 - `/crav1-add-to-spec` writes a mail as text: `mail.md` in the source folder holds `From`, `To`, `Cc`, `Date`, `Subject` (and `Message-ID`) and the body word for word, quoted thread kept. The original mail file stays outside the repo; the README names its file name, date and Message-ID. Images in the mail keep the same per-image choice but become their own files next to the mail text, with a placeholder where each was shown. No mail is edited, split or re-encoded, and the `.gitattributes` question is gone. A pasted mail is written the same way. Mail files already in a project stay as they are.
