@@ -14,7 +14,7 @@ Every review that ends with a paste-ready block saves it in the note:
 ## Comment as drafted, <YYYY-MM-DD>
 ```
 
-Then the block word for word, inside a code fence one backtick longer than any fence in the block (four backticks when the block has none). It is saved after the personal-data and secrets check (below). A re-review that drafts again adds a new section, even on the same date.
+Then the block word for word, always inside a fence of four backticks tagged markdown, never three; only when the block itself has a four-backtick fence, use one backtick longer (1.114.2). It is saved after the personal-data and secrets check (below). A re-review that drafts again adds a new section, even on the same date.
 
 ### The comment as posted
 
@@ -177,4 +177,5 @@ I've looked through the PR and run it through my checks. This is what I found:
 
 Moved word for word from `SKILL.md` in 1.80.2.
 
+- A record-only run (`comment posted`, `newest comment`, a paste, or saving the posted comment found at the start of a run) writes `## Comment as posted` and Point tags only. It never writes a `## Comment as drafted` section; only a run that ends with a new paste-ready block drafts (1.114.2).
 - The record step only reads the host (the signed-in `gh` or `az` session) or takes a paste. Never rewrite or remove a `## Comment as drafted` or `## Comment as posted` section; an edit on the host is a new `, edited` section.
