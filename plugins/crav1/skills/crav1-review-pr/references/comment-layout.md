@@ -12,7 +12,7 @@ The paste-ready comment that `/crav1-review-pr` ends with, and the one comment i
    3. `### Tests to add with this PR`
    4. `### A question` (exactly one), or `### Questions` (two or more)
 
-   Leave out a section with nothing in it, heading included. **Follow-ups are never in the block.** The chat lists them under **Follow-ups (not for this PR)** and the PR record keeps them as `follow-up` Points.
+   Leave out a section with nothing in it, heading included. **Follow-ups are never in the block.** The kit record in the PR note lists them under **Follow-ups (not for this PR)** and the PR record keeps them as `follow-up` Points.
 4. **Bullets**, one per point, link first:
 
    ```text
@@ -34,7 +34,7 @@ The paste-ready comment that `/crav1-review-pr` ends with, and the one comment i
 
 ## Which section
 
-| In the chat | In the block |
+| In the kit record | In the block |
 | --- | --- |
 | `F` Spec, Plan, Verify, Body, Secret, Linter (fix or drop) | **Blockers**. A secret names the path and line, never the value. A linter miss with no file line opens with the PR overview link |
 | A merge-order problem the spec, the plan, or the user states (another branch must merge first and is not in the target) | **Blockers**, opening with that branch's link, phrased as a question (see [Merge order](#merge-order)) |
@@ -42,8 +42,8 @@ The paste-ready comment that `/crav1-review-pr` ends with, and the one comment i
 | A choice the description calls deliberate that contradicts something written in the repo (a code comment, a README, a design rule) | **Bugs** (or a question): "I understand … was deliberate. If so, maybe … should be updated?" |
 | `T` test to add: a concrete test for a changed behavior or a bug | **Tests to add with this PR** |
 | `Q` question: something the author or team must answer about the code repo (two written goals disagree, an unclear intent) | **A question** / **Questions** |
-| `S` suggestion, and drift in the repo's own docs | Not in the block. Chat and PR record |
-| A choice the description calls deliberate, with nothing in the repo against it | Not in the block. Chat and PR record |
+| `S` suggestion, and drift in the repo's own docs | Not in the block. Kit record and PR record |
+| A choice the description calls deliberate, with nothing in the repo against it | Not in the block. Kit record and PR record |
 | The description's own "might like" or "may be a good idea" items | Not in the block. PR record |
 | `I1`, `I2`, `I3` info notes | Not in the block |
 
@@ -57,7 +57,7 @@ A question in the block is about the code repo. The kit's open questions in a sp
 | Only tests to add or a question | `Approve with comments` | Approve with suggestions | Comment |
 | Nothing | `Approve` | Approve | Approve |
 
-Never Reject. The vote is set only after the yes in [Post it](../SKILL.md#post-it). The ship line in the chat still follows the first section.
+Never Reject. The vote is set only after the yes in [Post it](../SKILL.md#post-it). The ship line in the kit record still follows the first section.
 
 ## Merge order
 

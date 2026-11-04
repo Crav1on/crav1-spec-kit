@@ -26,6 +26,10 @@ You read the diff. You do not edit code, the spec, or the plan. You do not run t
 
 Read `references/windows.md` ("Windows") only when git or az is not found (Windows).
 
+## Output (1.113.0)
+
+Read `references/output.md` ("Output") every run, before you show anything. The chat shows only the postable review, its verdict, one line naming the PR note, and the post offer. Everything else in this skill (check lines, findings, lanes, info, suggestions, follow-ups, next steps) is the kit record and goes into the PR note. With outside context (a mail, a meeting), a separate read-only section follows the review and is saved next to the PR note.
+
 ## Comment as posted first
 
 Read `references/posted-comments.md` ("Comment as posted first") only when the user says they posted the comment themselves, or a review of this PR was posted before.
@@ -102,21 +106,19 @@ Read `references/comment.md` ("Bugs, tests, questions") only when the review fou
 
 ## Fixed checks
 
-Every run, read `references/checklist.md` and show its 7 check lines, one line each even when clean: spec and plan match, tests, secrets, infrastructure access per environment, environment parity, spec wording a bug touches, merge order (1.95.0).
+Every run, read `references/checklist.md` and write its 7 check lines into the kit record, one line each even when clean: spec and plan match, tests, secrets, infrastructure access per environment, environment parity, spec wording a bug touches, merge order (1.95.0).
 
 ## Ship or not
 
-Show the check lines, then findings, then info notes, then suggestions, then bugs, tests to add and questions.
+In the kit record, list the check lines, then findings, then info notes, then suggestions, then bugs, tests to add and questions.
 
 When the first section has no **fix** and no **drop**, the review says **ship**. Say it is clean. Info notes do not change that.
 
 When any first-section decision is **fix** or **drop**, the review does not say ship.
 
-```text
-Next, after this pull request merges: /crav1-refresh-system-notes, to bring its changes into the spec and docs/system/.
-```
+The kit record ends with `Next, after this pull request merges: /crav1-refresh-system-notes, to bring its changes into the spec and docs/system/.`
 
-Then `Verdict: <Approve | Approve with comments | Changes needed>` (any Blocker or Bug: Changes needed; only tests to add or a question: Approve with comments; nothing: Approve), then the [paste-ready comment](#paste-ready-comment), then the [post offer](#post-it). Then stop.
+The chat shows `Verdict: <Approve | Approve with comments | Changes needed>` (any Blocker or Bug: Changes needed; only tests to add or a question: Approve with comments; nothing: Approve), then the [paste-ready comment](#paste-ready-comment), the `Kit record:` line, then the [post offer](#post-it), as `references/output.md` says. Then stop.
 
 Do not merge. Merge stays a later explicit `/crav1-merge-pr` ask for this named pull request. Do not run it. A review is not that ask. `/crav1-merge-pr` still stops on its own when a required host check is red. This skill does not replace that stop, and it does not clear it.
 
@@ -148,14 +150,15 @@ Read `references/posting.md` ("Post it") only when the user answers the post que
 
 ## Hard rules
 
-- No edits to code, `spec.md`, `plan.md`, `tasks.md`, or `verify.md`. The only writes are the PR note (with its PR record) in the specs repo's `docs/notes/YYYY-MM/` and the generated indexes.
+- No edits to code, `spec.md`, `plan.md`, `tasks.md`, or `verify.md`. The only writes are the PR note (with its PR record), the context file when outside context was added, in the specs repo's `docs/notes/YYYY-MM/`, and the generated indexes.
 - Read-only toward the code repo and its host. The only git write there is the fetch of the pull request's two branches after **Fetch only the PR's two branches** or `fetch pr branches`.
 - No test run, and no ask to run tests. When the slug has `plan.md`, quote `verify.md` or say it is missing. When the pull request is outside the kit, do not say `verify.md` is missing. Read the pipeline's recorded test results.
 - No linter install. No branch-protection change. No required-check edit.
 - Read `references/comment-as-posted.md` ("Record step rules") only when the record step runs.
 - No comment, no vote, and no thread resolve without the user's yes in [Post it](#post-it). One comment, no inline threads, never Reject. No label, no reviewer assignment.
 - Suggest merging `<base>` into the branch, never a rebase, `pull --rebase`, or a force-push.
-- Do not run `/crav1-refresh-system-notes`. On an outside pull request, name it once, as the next step after the pull request merges.
+- Do not run `/crav1-refresh-system-notes`. Name it once, in the kit record, as the next step after the pull request merges.
+- Posting takes only the review block. Never the kit record or the context file.
 - Do not run this skill from `/crav1-open-pr`, `/crav1-merge-pr`, spark, specify, plan, or verify.
 - No `git checkout`, no `git commit`, no new branch, no push.
 - No dialog-box or browser Microsoft sign-in. No token printed or created.

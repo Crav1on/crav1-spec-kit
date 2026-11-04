@@ -13,7 +13,7 @@ The default style for the paste-ready block, every posted comment, and every re-
 - Soft wording, same information: "I noticed…", "It looks like… maybe they could…?", "Would it be worth adding a test that…?". No flat statements of fault. Do not drop or water down a fact to sound soft.
 - Read the pull request description first. A choice the description says is deliberate is not raised as a fault, unless it contradicts something written in the repo (a code comment, a README, a design rule); then it is a bug or a question with one fix (1.66.0). A format A body (`/crav1-open-pr`, 1.98.0) gives a why per Changes bullet: a choice that bullet's why calls deliberate, at the lines it links, is not raised, under the same exception. A choice its Not in this PR section names as left out is not raised as missing. When it suggests something they "might like" or that "may be a good idea", it is a follow-up and goes to the PR record, not into the comment.
 
-The chat review above the block (F, I, S, B, T, Q lines) keeps its plain format for the user. The style applies to what the author will read.
+The F, I, S, B, T, Q lines keep their plain format in the kit record (PR note), not in the chat (1.113.0, `references/output.md`). The style applies to what the author will read.
 
 The block is text in the chat. Showing it posts nothing.
 

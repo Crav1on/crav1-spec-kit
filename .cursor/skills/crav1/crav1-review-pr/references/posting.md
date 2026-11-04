@@ -11,7 +11,7 @@ On yes (1.66.0):
 1. Post the block as **one comment**. No inline threads. GitHub: one review whose body is the block, submitted with the vote (`gh api repos/<owner>/<repo>/pulls/<n>/reviews` with `body` and `event`). Azure DevOps: one pull request thread whose comment is the block, then the vote.
 2. The vote follows the verdict: Changes needed is **Request changes** (GitHub) or **Wait for author** (Azure DevOps); Approve with comments is **Comment** or **Approve with suggestions**; Approve is **Approve**. Never Reject.
 3. On a re-review, post the new block as a reply in the earlier comment's thread (Azure DevOps) or as a new review (GitHub). Reply in an earlier inline thread only when one exists.
-4. Follow-ups are never posted.
+4. Follow-ups are never posted. Only the review block is posted: never the kit record, the read-only context section or the context file (1.113.0).
 5. Save the posted text at once (1.67.0): the body the host returns, its URL and date, under `## Comment as posted, <YYYY-MM-DD> (by <name>)` with the source line `Posted from this review on the user's yes: <comment URL>. …` (`references/comment-as-posted.md`). A failed post saves nothing.
 6. On GitHub, when the signed-in user is the pull request's author, the host does not allow Approve or Request changes: post with event `COMMENT` and say `GitHub doesn't allow a vote on your own PR; posted as a comment.`
 7. Never resolve a thread. On a re-review, after posting, offer to resolve existing threads whose points are now fixed. Resolve only on that yes.
