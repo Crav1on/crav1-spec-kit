@@ -2,6 +2,10 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.112.0 (2026-11-04)
+
+- Playbook reports (`report-playbook-short`, `report-playbook-full`, still preview) list every **Conflict:** line in the covered specs under **Needs your answer** as C1, C2, …, after the questions: the decided line and the newer quote side by side, a recommended answer and why, a `C<n> Answer:` line, and the Step that records it. The answer step names every N and C it covers; `/crav1-resolve-open-questions <spec>` (or `apply <this file>`) settles the conflicts too.
+
 ## 1.111.2 (2026-11-04)
 
 - `/crav1-add-to-spec` code-change branch: the **Write what belongs** section moved word for word into its own references file, read at the same point. No behavior change.
