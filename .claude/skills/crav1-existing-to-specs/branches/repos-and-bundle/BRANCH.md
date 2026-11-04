@@ -56,6 +56,12 @@ On the side, list code no slice covers: repo, path, one line about what it is. M
 
 Put every fact you will treat as accepted on the map. A fact you leave off stays inferred.
 
+End the map with this block, word for word except the examples, as the last thing in the message:
+
+> **Reply yes** (or "confirm") to write it as shown.
+> To change something first, reply with your edits, for example "drop slice 3" or "move 5 to the orders repo".
+> Nothing gets committed either way.
+
 Stop. They confirm or edit the map. Do not write files. That confirmation is the only product stop before writing. Do not open a mushy interview, an architecture interview, or an export-format question. If they edit the map, the edit is the confirmation. Do not ask again. Use their slugs, repos, and match statuses. A fact they struck, or that you never put on the map, stays labeled inferred if it appears later. Confirming the map confirms the facts they left on it.
 
 ## Branch (one for the dump)

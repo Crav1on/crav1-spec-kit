@@ -22,7 +22,13 @@ Recommend one option and put it first, with ` (Recommended)` at the end of its l
 
 ## Write
 
-Nothing is written until the user confirms the whole batch with one `yes` (or picks items). Then, per settled conflict:
+Nothing is written until the user confirms the whole batch with one `yes` (or picks items). End the batch with this block, word for word except the examples:
+
+> **Reply yes** (or "confirm") to write it as shown.
+> To change something first, reply with your edits, for example "only C1" or "C2: keep it open".
+> Nothing gets committed either way.
+
+After the yes or the edits, then, per settled conflict:
 
 - Replace or keep the decided line as picked. Keep its existing source and add the new note as a second source when the new quote won. Keep the `Decided` date format the spec uses; the date is today.
 - Remove the `**Conflict:**` line.
