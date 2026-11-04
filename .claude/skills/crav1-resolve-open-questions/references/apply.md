@@ -27,7 +27,13 @@ One question per conflict, with the questions tool when available, at most 4 opt
 
 ## Write
 
-Nothing is written until the user confirms the whole list with one `yes` (or picks items). Then:
+Nothing is written until the user confirms the whole list with one `yes` (or picks items). End the list with this block, word for word except the examples:
+
+> **Reply yes** (or "confirm") to write it as shown.
+> To change something first, reply with your edits, for example "only 1 and 3" or "skip K2".
+> Nothing gets committed either way.
+
+After the yes or the edits, then:
 - N answers: patch the open question as this skill's answer path does (one batch).
 - K changes: write through `/crav1-add-to-spec`'s rules (show the change, then write).
 - Never edit the filled file itself.
