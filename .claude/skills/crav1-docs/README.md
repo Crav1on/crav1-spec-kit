@@ -53,6 +53,7 @@ Once specs exist:
 - [From a code change onto existing specs](from-add-to-spec-code-change.md)
 - [From a meeting to specs](from-add-to-spec-meeting.md)
 - [Ask open questions](from-show-or-ask-open-questions.md)
+- [Set up a host setting](from-host-setup.md): a branch policy, required build, reviewers or an approval, as a checked-in script
 
 Find your way:
 

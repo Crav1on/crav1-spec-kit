@@ -37,6 +37,7 @@ These stay where they are. Say which row it is and stop. Do not name a lane for 
 | A design gap found before Build | The spec |
 | An unfinished task | That task |
 | A one-off flaky check | A note, unless it keeps blocking ship |
+| A missing or wrong host setting (a branch policy, required build, reviewers, an approval, a variable group) | Host setup. Point at `/crav1-host-setup`. Do not run it |
 | A verify failure on work that is not shipping yet | The inner loop. Point at `/crav1-fix-build-gaps` (skill `crav1-fix-build-gaps`, `branches/verify-gaps/BRANCH.md`). Do not run it |
 
 A one-off flaky check that **keeps blocking ship** is a real bug. They have to say it keeps blocking ship. Do not decide that by hunting.

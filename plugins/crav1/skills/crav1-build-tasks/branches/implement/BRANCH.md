@@ -34,6 +34,10 @@ If two file layouts still fit, follow `plan.md` “files likely touched.” Do n
 6. If verify **passes**, mark that row `[x]` in `tasks.md` (and OpenSpec `export/openspec/tasks.md` if it exists and lists the same id).
 7. If verify **fails**, leave `[ ]`. Recap what failed. Do not silently start `T+1`.
 
+### Host setup tasks (1.115.0)
+
+A task marked `(host setup)` follows skill `crav1-host-setup`, `references/host-setup.md`: write the checked-in script and the manual steps from its comments, show the commands, their scope and the steps, and run `apply` only after the user's explicit yes, then `check`. A worker with no person to answer never applies: it writes the script, leaves the box `[ ]` and says `Host setup not applied. Run it after a yes.` Tick the box only when `check` prints `ok` for every setting.
+
 ## After one task
 
 Output only:

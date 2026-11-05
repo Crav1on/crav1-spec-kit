@@ -781,11 +781,12 @@ marks:
     group: notes
     files: ["docs/notes/YYYY-MM/YYYY-MM-DD-pr-<repo>-<n>.md (PR record)"]
     format: "- Point: <anchor> | <status> | <owner> | <tags or -> | <text>"
-    pattern: '^- Point: \S.* \| (done [0-9a-f]{7,}|agreed|declined|open|waiting on .+|needs .+|follow-up|migrated) \| .+ \| .+ \| .+$'
+    pattern: '^- Point: \S.* \| (done [0-9a-f]{7,}|done host|agreed|declined|open|waiting on .+|needs .+|follow-up|migrated) \| .+ \| .+ \| .+$'
     examples:
       - "- Point: tests/test_retry_store.py:45 | done 3c9d2e1 | Sam Lee | thread 98; host fixed | Fixture could clean live tables"
       - "- Point: general | waiting on Sam Lee | Sam Lee | asked; from review-pr 2026-10-19 | Is the cut-off local time?"
-    meaning: "One point of the pull request with its status: done <sha>, agreed, declined, open, waiting on <name>, needs <name>, follow-up or migrated. Never deleted; a change replaces the line where it is."
+      - "- Point: general | done host | Sam Lee | thread 101; required build on develop read back 2026-11-05 | Add a required build"
+    meaning: "One point of the pull request with its status: done <sha>, done host (a host setting read back live, 1.115.0), agreed, declined, open, waiting on <name>, needs <name>, follow-up or migrated. Never deleted; a change replaces the line where it is."
     written_by: [crav1-pr-status, crav1-review-pr, crav1-add-to-spec]
     read_by: [crav1-pr-status, crav1-review-pr, crav1-add-to-spec, crav1-merge-pr, crav1-help, crav1-ado-sync]
     mention: '\bPoints?\b'

@@ -23,6 +23,7 @@ CODE_WRITERS = [
     ".cursor/skills/crav1/crav1-finalize-commit/SKILL.md",
     ".cursor/skills/crav1/crav1-finalize-commit/references/base-branch.md",
     ".cursor/rules/crav1.mdc",
+    ".cursor/skills/crav1/crav1-host-setup/SKILL.md",
 ]
 # The worker agent names the rule inline (it has no room for the pointer); it must still block on a base.
 INLINE_OK = {".cursor/agents/crav1-build-task-agent.md": "on base branch"}

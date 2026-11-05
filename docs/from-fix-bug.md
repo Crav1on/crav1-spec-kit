@@ -10,6 +10,8 @@ This is cross-cutting. It is not its own lane. It is not a stretch of verify. It
 
 When you ask for startup options, this command is one of the six starter options in [first-run.md](first-run.md). That ask names the list and does not run this command. It still runs only when you name a real bug.
 
+A missing or wrong host setting (a branch policy, required build, reviewers, an approval) is not a bug for this command. It points at [`/crav1-host-setup`](from-host-setup.md) (1.115.0).
+
 ## First prompt
 
 New chat. Name the bug in this message. Say where you saw it.

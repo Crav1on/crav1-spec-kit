@@ -71,6 +71,10 @@ Some teams give a spec its own long-lived branch and each task a short sub-branc
 - **Done.** Status shows `Sub-branches: 1 of 2 merged into feat/orders-capacity.` The spec is done when the spec branch has reached the base branch. A sub-branch that never merged is reported as `left behind: feat/orders-capacity-t4 (not in feat/orders-capacity)` and doesn't block done.
 - **Reverts.** A merged branch whose change was later reverted on the base shows `feat/orders-retry: merged, reverted on develop (<sha>)`. It is report only and doesn't change done.
 
+## Host setup tasks (1.115.0)
+
+A task marked `(host setup)` is a host setting, not a file. The worker writes the checked-in script and its manual steps, shows them, and runs the script only after your yes; it ticks the task only when the script's `check` part reads the setting back `ok`. A worker with nobody to answer leaves it unticked. The rules are the same as [Set up a host setting](from-host-setup.md) (`/crav1-host-setup`).
+
 ## After
 
 Prove the slice against the spec: [Verify and fix](from-verify.md). Then [From commit to merge](from-commit.md).

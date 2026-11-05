@@ -70,6 +70,7 @@ The starter options are the six above. Asking for startup options names only the
 | Why this loop | [The method](concepts/method.md) |
 | The loop step by step | [From a draft spec to an accepted spec](from-draft-spec.md) → [From a spec to a plan](from-spec-to-plan.md) → [Build tasks](from-plan-to-build.md) → [Verify and fix](from-verify.md) → [From commit to merge](from-commit.md) |
 | Prove a slice | `/crav1-verify-build-against-spec` |
+| Set a branch policy, required build, reviewers or an approval on the host | `/crav1-host-setup` (a checked-in script, run only after your yes, read back live) |
 | Push and open a pull request | `/crav1-open-pr` (after commits exist; does not merge; may name `/crav1-review-pr` and does not run it) |
 | The glossary, one word, or the `to be researched` rows | `/crav1-glossary`, `/crav1-glossary bcas`, `/crav1-glossary research` |
 | Where a pull request's threads stand | `/crav1-pr-status` (what is done, what is left, what you owe; drafts replies, never posts) |

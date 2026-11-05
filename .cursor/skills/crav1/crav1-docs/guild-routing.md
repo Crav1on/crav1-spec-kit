@@ -86,6 +86,7 @@ Exception: the parent delegates the critique and does not review in its own voic
 | Skill | `/crav1-add-to-spec` |
 | Skill | `/crav1-finalize-commit` |
 | Skill | `/crav1-open-pr` |
+| Skill | `/crav1-host-setup` |
 | Skill | `/crav1-review-pr` |
 | Skill | `/crav1-pr-status` |
 | Skill | `/crav1-merge-pr` |
@@ -264,6 +265,7 @@ cross_cutting:
     - crav1-add-to-spec
     - crav1-finalize-commit
     - crav1-open-pr
+    - crav1-host-setup
     - crav1-review-pr
     - crav1-pr-status
     - crav1-merge-pr

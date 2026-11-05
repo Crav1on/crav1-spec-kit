@@ -74,6 +74,8 @@ One pull request, one PR note, one record. `/crav1-pr-status`, `/crav1-review-pr
 
 `/crav1-merge-pr` reads the `Ready` line and stops on `no` unless you add `anyway`; host checks still apply. A project from before 1.97.0 runs `/crav1-add-to-spec migrate formats` once ([install](install.md)).
 
+A point that asked for a host setting, such as a required build on `develop`, becomes `done host` when the setting reads back live in this run (1.115.0). No commit is needed, and the skill never applies anything; when it is not set yet it names `/crav1-host-setup`.
+
 ## What does not get written
 
 No code, spec, plan or task edit. No reply posted, no vote, no merge. Replies are drafts. A thread status changes only on that thread's yes. Follow-ups are drafts; no work item is created. The only file it writes is the PR note in the specs repo, not committed.
