@@ -5,9 +5,12 @@ Reads back a playbook report (`report-playbook-short` or `report-playbook-full` 
 ## Read the file
 
 - Its date and kit version come from the `Report:` line under the title. No date: say so and treat every item as possibly stale.
-- Every `N<n> Answer:` line under Needs your answer. `yes` (or `ok`, `accept`) means the row's recommended answer. Empty means not answered: leave that question open.
-- Every `K<n> Change:` line under Kept. Empty means the decision stays.
-- Each row's spec line and `Recorded in Step <n>`, to find the spec and the words to match.
+- Two layouts, both read the same way:
+  - **Item blocks (1.115.1):** each item is a bullet `**N<n>:**`, `**C<n>:**` or `**K<n>:**` with indented lines under it. Its fill-in line is the `Answer:` (N, C) or `Change:` (K) line under that bullet, up to the next item; the item number comes from the bullet. Under an N or C item, `Change:` is the report's proposed change, not an answer.
+  - **Older files (1.110.0 to 1.115.0):** a table, then separate `N<n> Answer:`, `C<n> Answer:` and `K<n> Change:` lines.
+- N and C answers: `yes` (or `ok`, `accept`) means the item's recommended answer. Empty means not answered: leave that question open.
+- K changes: empty means the decision stays.
+- Each item's spec line or Where line and `Recorded in Step <n>`, to find the spec and the words to match.
 
 ## Compare with the specs now (no edits)
 
@@ -35,6 +38,7 @@ Nothing is written until the user confirms the whole list with one `yes` (or pic
 
 After the yes or the edits, then:
 - N answers: patch the open question as this skill's answer path does (one batch).
+- C answers: settle the `**Conflict:**` line as this skill's conflict path does.
 - K changes: write through `/crav1-add-to-spec`'s rules (show the change, then write).
 - Never edit the filled file itself.
 
