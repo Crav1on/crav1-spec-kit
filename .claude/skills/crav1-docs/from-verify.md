@@ -51,6 +51,10 @@ When the spec's work sits on several branches, `/crav1-verify-build-against-spec
 - "Demoable" needs every branch merged. Otherwise: `built and verified, not merged yet`, next `/crav1-open-pr` or `/crav1-merge-pr`; a branch that already has a pull request is named, for example `/crav1-open-pr` to push to PR 77 and update its description or comment (1.114.0). `/crav1-open-pr` proposes the base `develop` here (into, then Merges into, then default), and `/crav1-review-pr` finds the spec the same way. After a merge, `/crav1-merge-pr` says `2 of 3 branches of orders now merged into develop`. `/crav1-help status orders` shows the same line, and `/crav1-ado-sync` suggest-features counts unmerged branches as open work.
 - Nothing writes `Status:`. It is report only. Refs on disk; nothing fetches.
 
+## Host setup tasks (1.115.0)
+
+A `(host setup)` task passes only when its script's `check` part, run now against the live host, prints `ok` for every setting. Verify never applies the script. See [Set up a host setting](from-host-setup.md).
+
 ## After
 
 When the matrix is green: [From commit to merge](from-commit.md). When the spec itself was wrong, fix the spec first ([From a draft spec to an accepted spec](from-draft-spec.md)), then the plan, then build again.

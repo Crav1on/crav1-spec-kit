@@ -46,6 +46,10 @@ When the spec's work sits on several branches (its `Synced at` lines, its Match 
 
 `/crav1-tighten-spec` reads the same branches. A yes on "write the branch onto the spec?" adds a `Branch:` line in sorted place (1.86.0) instead of replacing the list. A listed branch that is gone and was never merged is offered `(dropped)`; a deleted branch whose work is already in the base is reported as `merged, branch deleted` and isn't offered.
 
+## Host setup tasks (1.115.0)
+
+A requirement that is a host setting with no file in the repo (a branch policy, required build, reviewers, an approval, a variable group) becomes its own task marked `(host setup)`, verified by reading the live setting back. Pipeline YAML and infrastructure as code stay ordinary tasks. See [Set up a host setting](from-host-setup.md).
+
 ## After
 
 See which tasks are ready, any time: `/crav1-tasks-ready-to-build`. Then build one task, or several: [Build tasks](from-plan-to-build.md).

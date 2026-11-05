@@ -197,6 +197,7 @@ also_next:
   crav1-glossary: [/crav1-finalize-commit]
   crav1-refresh-system-notes: [/crav1-finalize-commit]
   crav1-map-pipeline-environments: [/crav1-read-environment]
+  crav1-host-setup: [/crav1-open-pr, /crav1-pr-status]
   crav1-review-security: [/crav1-finalize-commit]
   crav1-run-exploratory-test: [/crav1-finalize-commit]
   crav1-suggest-tests-for-code: [/crav1-plan-from-spec]

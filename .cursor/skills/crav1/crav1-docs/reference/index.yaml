@@ -106,6 +106,11 @@ skills:
     starter: false
     page: reference/skills/crav1-open-pr.md
     purpose: "Open a pull request for the current change branch, or push to an existing one and update its description or comment (push with explicit yes)."
+  crav1-host-setup:
+    lane: cross-cutting
+    starter: false
+    page: reference/skills/crav1-host-setup.md
+    purpose: "Change one Azure DevOps or GitHub setting that does not live in the repo, through a checked-in script applied after a yes and read back live."
   crav1-review-pr:
     lane: cross-cutting
     starter: false
