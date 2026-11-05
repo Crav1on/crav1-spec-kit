@@ -2,6 +2,10 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.114.3 (2026-11-05)
+
+- `/crav1-review-pr` re-review: the drafted comment heading in the PR note is always plain `## Comment as drafted, <date>`, with no `(re-review)` suffix. A re-review tag goes only on the `## Kit record` heading.
+
 ## 1.114.2 (2026-11-04)
 
 - `/crav1-review-pr`: recording the comment as posted (`comment posted`, `newest comment`, a paste) saves only the posted comment and never adds a `Comment as drafted` section. Drafted comments in the PR note are always in a four-backtick fence, never three.
