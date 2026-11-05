@@ -2,6 +2,15 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.116.0 (2026-11-05)
+
+A guided walk through a playbook report in chat. A minor release because `report-playbook-full` now asks to walk after writing and there is a new report word.
+
+- `report-playbook-full` writes the report as before, then asks *Walk through it now?*. The walk first offers to settle answers that block several steps (`skip` takes them in order), then goes in Steps order, one K, N or C item at a time, each with a short *Why this matters* and the recommendation. Reply `yes`, your own answer, `more` for the full background, or add what you know; jump with `go to N9`.
+- Free flow: ask back, push back or change direction mid-walk; only the affected Compose, Merge order and Steps are redrafted, shown and agreed before the walk carries on.
+- Each answer is saved into the report as it comes; nothing touches a spec during the walk. At the end, a summary and an offer to run `/crav1-resolve-open-questions apply` on your yes.
+- New `report-playbook-walk` resumes an existing playbook report at the first unanswered item. Headless runs never walk; they write the file and say how to resume.
+
 ## 1.115.1 (2026-11-05)
 
 - `report-playbook-short` and `report-playbook-full`: Kept, Needs your answer and conflict items are bullet blocks instead of tables, each with its `Change:` (K) or `Answer:` (N, C) line right under it, so there is no separate list of fill-in lines to match up. `/crav1-resolve-open-questions apply` reads the new layout and still reads files filled in with the older table layout.
