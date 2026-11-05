@@ -24,7 +24,7 @@ Other skills do not run this one. Spark, specify, plan, and verify do not run it
 
 This is not `/crav1-explain-existing-system`. Explain reads `docs/system/` first. When the picture has nothing on the question, it quotes the first paragraph of a matching spec, labelled as coming from the spec, and names this command. It does not run this command. This command reads the specs first.
 
-This command does not run another skill. It may name one.
+This command does not run another skill, except `apply` on yes at the end of a walk. It may name one.
 
 ## Report words (1.104.0)
 
@@ -32,6 +32,8 @@ Route first, load second. Check the message for one word `report-<type>-<depth>`
 
 - **No report word:** the free-form answer below, unchanged. Do not open `reports/`.
 - **One report word:** type `feature` (what it does, flow, architecture), `change` (a pull request or branch, its pipelines, the discussion), `build` (ready to build, what is missing, finish order), or `playbook` (1.109.0, preview: what is kept, what needs your answer, what to compose, and the kit skills in order to reach buildable work; answers stay in the report until the user confirms; Kept items can still be changed, and the merge order is a suggestion); depth `short` or `full`. Read only `reports/common.md` and `reports/<type>-<depth>.md`. Never the other report files. The rest of the message is the question, matched as below.
+
+**Walk (1.116.0):** after `report-playbook-full`, ask `Walk through it now?`. On yes, or for the word `report-playbook-walk` (resume at the first unanswered item of the existing report), read `references/walk.md` and walk in chat, saving each answer into the report. Headless: never walk; say how to resume.
 
 That one report file names its sections and the only diagrams to draw. The report is the one file this command writes, outside the project; the chat always links or attaches it.
 
@@ -128,6 +130,6 @@ Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-spe
 - A failed live read is one prompt: the issue, a fix when there is one, Retry or Skip. Skip is the repo-only answer, with why the live checks did not run.
 - A focus still runs the full read. The answer shows only those sections.
 - People come from what is written. A guess is labeled `(inference, not in the docs)`.
-- Write nothing in the project. A `report-*` word writes one report outside it and links it in chat. Do not run another skill. Naming one is allowed.
+- Write nothing in the project. A `report-*` word writes one report outside it and links it in chat. Do not run another skill, except `apply` on the user's yes at the end of a walk. Naming one is allowed.
 - Do not start Specify, Plan, or Build.
 - Later skill. Not a starter option. Asking for startup options names only the six and does not run this command.
