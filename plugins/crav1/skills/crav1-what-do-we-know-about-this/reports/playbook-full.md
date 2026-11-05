@@ -21,7 +21,7 @@ Buckets:
   Conflicts (1.112.0) also go here: every `**Conflict:**` line in a covered spec, numbered C1, C2, … after the N items. For each: the decided line and the newer quote (each with its source), the recommended answer and why, and `Recorded in Step <n>` (the answer step). None found: no C items.
 - **Compose:** work to put together from what exists: what splits out, or lifts from one branch or pull request into another, from where to where, and why.
 
-Answer blocks (1.110.0). The report only lists; it never takes answers in chat. Answers go through the normal skills, whenever the user comes back, or the filled file is read back with `apply`. Print each block word for word ABOVE its items, with the report's real numbers, the real skill and a real example drawn from this report. One instruction per line; never squeeze them into one line.
+Answer blocks (1.110.0). The report only lists. After writing it, ask `Walk through it now?` (1.116.0); the walk is in `references/walk.md`, read only on yes. Answers go through the normal skills, whenever the user comes back, or the filled file is read back with `apply`. Print each block word for word ABOVE its items, with the report's real numbers, the real skill and a real example drawn from this report. One instruction per line; never squeeze them into one line.
 
 Items (1.115.1): K, N and C items are bullet blocks, never tables, so each answer sits right under its item. Item layout, one block per item, the fill-in line last and left empty:
 
