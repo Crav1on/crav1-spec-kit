@@ -2,6 +2,10 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.115.1 (2026-11-05)
+
+- `report-playbook-short` and `report-playbook-full`: Kept, Needs your answer and conflict items are bullet blocks instead of tables, each with its `Change:` (K) or `Answer:` (N, C) line right under it, so there is no separate list of fill-in lines to match up. `/crav1-resolve-open-questions apply` reads the new layout and still reads files filled in with the older table layout.
+
 ## 1.115.0 (2026-11-05)
 
 Host settings are built like code. A minor release because plan, build, verify and pr-status gain host setup tasks and a new skill.
