@@ -34,6 +34,8 @@ A task downstream of an **Implemented, verify failed** task (it waits on it, dir
 | **Not implemented** | Still `- [ ]` (or no code for this `T#`) |
 | **Claimed done, unverified** | `[x]` but evidence could not be run (no command, no browser). Also a ticked task whose `(branch: X)` is not the checkout: **Claimed done, unverified (on X, not checked out)** |
 
+**Host setup tasks (1.115.0).** A task marked `(host setup)` is **Implemented, verified** only when its script's `check` part, run now against the live host, prints `ok` for every setting (skill `crav1-host-setup`, `references/host-setup.md`). A written script that was not applied, or a `missing` line, is **Implemented, verify failed**. Not signed in to the host: **Claimed done, unverified**. Verify never runs `apply`.
+
 ## Branches (1.64.0)
 
 When the spec has work branches (its `Synced at` lines, Match `Branch:` list and task `(branch: …)` parts, minus base branches and `(dropped)` entries), work out the Branches line as skill `crav1-add-to-spec`, `references/branches.md` says: per repo, merged into its into branch or not, own commits since the fork point, `merged, branch deleted`, `branch rewritten since last read`, `unknown (branch gone)`, `(also in <slug>)` for a branch other specs list too, and the age of each remote copy. Use refs on disk; never fetch, never check out. Host checks only for GitHub (`gh`) and Azure DevOps (`az`) when already signed in. Report only: never change `Status:` or any spec line because of it.

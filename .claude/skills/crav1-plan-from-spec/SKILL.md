@@ -71,6 +71,10 @@ Use the template in this skill’s `assets/plan.md`. Fill:
 
 Stay inside v0. File-level, not class-by-class essays. No new product behavior. A piece marked already there is named in the trace as `already there` and has no rebuild task. A left piece has no task.
 
+### Host setup tasks (1.115.0)
+
+A requirement that is a host setting with no file in the repo (a branch policy or required build, required reviewers, an environment approval, a variable group, a service connection) gets its own task marked `(host setup)`. Its verify is the script's `check` part reading the live setting, for example `infra/ado/develop-build-policy.sh check prints ok`. Pipeline YAML, templates and infrastructure as code stay ordinary code tasks. Read skill `crav1-host-setup`, `references/host-setup.md` for the split. A secret is a manual task: the plan names what to create and where, never a value.
+
 ### Blocks lines
 
 The one exception to leaving `spec.md` alone: a `- Blocks: T#` line under a kept-open question that blocks only some new tasks. Read `references/write.md` ("Blocks lines") when any kept-open question blocks only some tasks. List each `Blocks:` line in the recap.
