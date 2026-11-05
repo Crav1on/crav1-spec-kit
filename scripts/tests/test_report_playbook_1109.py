@@ -16,7 +16,7 @@ class Playbook(unittest.TestCase):
     def test_templates_exist_with_buckets(self):
         for d in DEPTHS:
             t = (SK / "reports" / f"playbook-{d}.md").read_text()
-            self.assertLess(len(t.split()), 1400, d)
+            self.assertLess(len(t.split()), 1500, d)
             for h in ("## Kept", "## Needs your answer", "## Compose", "## Steps", "## Order"):
                 self.assertIn(h, t, f"{d}: {h}")
             self.assertIn("recommended answer and why", t)
@@ -73,8 +73,8 @@ class Polish1092(unittest.TestCase):
                 self.assertIn(s, t, f"{d}: {s}")
         full = (SK / "reports/playbook-full.md").read_text()
         self.assertIn("No cap on steps: as many as the work needs.", full)
-        self.assertIn("| K | Decision |", full)
-        self.assertIn("| N | Question |", full)
+        self.assertNotIn("| K | Decision |", full)
+        self.assertNotIn("| N | Question |", full)
 
 
 class Apply1110(unittest.TestCase):
@@ -83,16 +83,14 @@ class Apply1110(unittest.TestCase):
     def test_templates(self):
         for d in DEPTHS:
             t = (SK / "reports" / f"playbook-{d}.md").read_text()
-            for s in ("Print each block word for word ABOVE its table", "Recorded in Step <n>", "`N<n> Answer:`",
-                      "`K<n> Change:`", "/crav1-resolve-open-questions apply <this file>", "written-out bullets, never a table",
+            for s in ("Print each block word for word ABOVE its items", "Recorded in Step <n>", "/crav1-resolve-open-questions apply <this file>", "written-out bullets, never a table",
                       "it never takes answers in chat", "Diagram syntax (1.110.0)", "no double quotes", "`-->|plain words|`"):
                 self.assertIn(s, t, f"{d}: {s}")
             self.assertNotIn("To change it |", t)
             self.assertNotIn("Written by, after your yes", t)
             self.assertNotIn("`change: K<n>", t)
             self.assertNotIn("| From (short) |", t)
-            self.assertLess(t.index("**To change a decision under Kept**"), t.index("Under the Kept table"))
-            self.assertLess(t.index("<change block>"), t.index("<K<n> Change: lines>"))
+            self.assertLess(t.index("<change block>"), t.index("<K1, K2, … as item blocks"))
             self.assertIn("The answer step comes first", t)
 
     def test_apply_on_resolve(self):

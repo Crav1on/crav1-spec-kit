@@ -6,7 +6,7 @@ Preview (1.109.0). Answers through the normal skills, `apply` for a filled file 
 
 Plain-language rules (1.109.1):
 - Write for someone using the kit for the first time. Say the spec, the plan, the tasks; never a file name ending in `.md` in prose.
-- **Kept** is not frozen. Each Kept item may be challenged: number them K1, K2, … and print the change block above the Kept table.
+- **Kept** is not frozen. Each Kept item may be challenged: number them K1, K2, … and print the change block above the Kept items.
 - Go-live or a due date is one fact among the others, not the whole story.
 - Merging: offer a **merge order** (merge commits), marked **suggested, can change**. Never offer rebase as the kit's way. If someone in the sources suggested a rebase, name it as their suggestion only.
 - Compose takes items from the docs only, never invented. When `docs/` describes a deploy kept apart from the others (for example a DEV Bicep deploy separate from TEST and PROD), it goes in Compose with the doc it came from.
@@ -18,41 +18,53 @@ Answers come first in the report. Write nothing in the project. The existing ski
 Buckets:
 - **Kept:** decisions already made. Do not ask them again. For each, say who decided and when, if the docs say so, with the spec line.
 - **Needs your answer:** open points. For each, give a recommended answer and why. Its status is `undecided` or `decided by <person>` when the docs name one. Never write a hand-off such as "for <name> to decide".
-  Conflicts (1.112.0) also go here: every `**Conflict:**` line in a covered spec, numbered C1, C2, … after the N items. For each: the decided line and the newer quote side by side (each with its source), the recommended answer and why, and `Recorded in Step <n>` (the answer step). None found: no C items.
+  Conflicts (1.112.0) also go here: every `**Conflict:**` line in a covered spec, numbered C1, C2, … after the N items. For each: the decided line and the newer quote (each with its source), the recommended answer and why, and `Recorded in Step <n>` (the answer step). None found: no C items.
 - **Compose:** work to put together from what exists: what splits out, or lifts from one branch or pull request into another, from where to where, and why.
 
-Answer blocks (1.110.0). The report only lists; it never takes answers in chat. Answers go through the normal skills, whenever the user comes back, or the filled file is read back with `apply`. Print each block word for word ABOVE its table, with the report's real numbers, the real skill and a real example drawn from this report. One instruction per line; never squeeze them into one line. No "To change it" column: each row ends with `Recorded in Step <n>`.
+Answer blocks (1.110.0). The report only lists; it never takes answers in chat. Answers go through the normal skills, whenever the user comes back, or the filled file is read back with `apply`. Print each block word for word ABOVE its items, with the report's real numbers, the real skill and a real example drawn from this report. One instruction per line; never squeeze them into one line.
 
-Above the **Kept** table:
+Items (1.115.1): K, N and C items are bullet blocks, never tables, so each answer sits right under its item. Item layout, one block per item, the fill-in line last and left empty:
+
+> - **N1:** <the question in one line>. Recommended: <answer>, because <why>.
+>   - From: <who raised it, date>; <status>
+>   - Where: <spec section>; Recorded in Step <n>
+>   - Change: <what the recommended answer changes in the spec; empty when nothing changes>
+>   - Answer:
+
+- **K items:** `**K<n>:** <the decision in one line>`, then From (who decided, date), Where, and the fill-in line `Change:` (no Answer line; an empty Change keeps the decision).
+- **C items:** `**C<n>:** <the clash in one line>. Recommended: <answer>, because <why>.`, then `Decided:` and `Newer:` (each quote with its source), Where, Change, and `Answer:`.
+- No separate list of fill-in lines at the end of a section.
+
+Above the **Kept** items:
 
 > **To change a decision under Kept** (skip if all stay as they are)
 > These are decisions already made. You can still change any of them, now or later:
 > 1. Nothing needs to run first.
-> 2. Either run the Step named in the row (it uses `/crav1-add-to-spec` and shows the change before writing), or write the new decision on the row's `Change:` line in this file.
+> 2. Either run the Step named in the item (it uses `/crav1-add-to-spec` and shows the change before writing), or write the new decision on the `Change:` line right under the item in this file.
 > 3. A filled file, also one others filled in, is read back with `/crav1-resolve-open-questions apply <this file>`.
 >
 > Example:
 > ```
-> K2 Change: DEV deploy runs from the shared pipeline, not its own Bicep
+> - **K2:** DEV deploy has its own Bicep
+>   - Change: DEV deploy runs from the shared pipeline, not its own Bicep
 > ```
 
-Under the Kept table, one fill-in line per row, left empty: `K<n> Change:`
-
-Above the **Needs your answer** table:
+Above the **Needs your answer** items:
 
 > **To answer the questions under Needs your answer**
 > 1. Nothing needs to run first. <If a question needs a pull request or branch read first, name it here.>
-> 2. Answer them in Step <n> (the answer step) with `/crav1-resolve-open-questions <spec>`, whenever you are ready; or write each answer on its `Answer:` line in this file (`yes` takes the recommended answer). Conflicts (C items) are settled the same way: the answer step runs `/crav1-resolve-open-questions <spec>`, which lists them, or the filled file is read back with `apply`.
+> 2. Answer them in Step <n> (the answer step) with `/crav1-resolve-open-questions <spec>`, whenever you are ready; or write each answer on the `Answer:` line right under its item in this file (`yes` takes the recommended answer). Conflicts (C items) are settled the same way: the answer step runs `/crav1-resolve-open-questions <spec>`, which lists them, or the filled file is read back with `apply`.
 > 3. A filled file, also one sent out and returned, is read back with `/crav1-resolve-open-questions apply <this file>`. It checks what changed in the specs since this report and asks about any clash before writing.
 >
 > Example:
 > ```
-> N1 Answer: yes
-> N5 Answer: keep TEST and PROD on the same release branch
-> C1 Answer: take the newer quote
+> - **N1:** …
+>   - Answer: yes
+> - **N5:** …
+>   - Answer: keep TEST and PROD on the same release branch
+> - **C1:** …
+>   - Answer: take the newer quote
 > ```
-
-Under the Needs your answer table, one fill-in line per row, left empty: `N<n> Answer:`, then `C<n> Answer:` for each conflict
 
 Compose: written-out bullets, never a table. One bullet per item, 1-2 sentences: what moves, from which pull request or branch to which (short names: a branch, `PR #<n>` or a folder), and why; end with `Source: <doc>`.
 
@@ -98,14 +110,11 @@ Diagrams:
 
 ## Kept
 <change block>
-| K | Decision | Decided by, date | Spec line | Recorded in |
-<K<n> Change: lines>
+<K1, K2, … as item blocks, each ending with an empty Change: line>
 
 ## Needs your answer
 <answer block>
-| N | Question | Recommended | Why | Status | Recorded in |
-<numbered C1, C2, … when any: decided line, newer quote, recommended answer, why, Recorded in Step <n>>
-<N<n> Answer: and C<n> Answer: lines>
+<N1, N2, …, then C1, C2, … when any, as item blocks, each ending with an empty Answer: line>
 
 ## Compose
 <one bullet per item: what moves, from → to, why; Source: doc>
