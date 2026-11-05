@@ -2,6 +2,14 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.115.0 (2026-11-05)
+
+Host settings are built like code. A minor release because plan, build, verify and pr-status gain host setup tasks and a new skill.
+
+- **Added:** `/crav1-host-setup`. Describe a host setting that does not live in the repo (a branch policy or required build, required reviewers, an environment approval, a variable group). It drafts a checked-in `az` or `gh` script under `infra/ado/` or `infra/github/`, with a what and why comment above every command, and generates the manual steps from those comments. You see the commands, their scope and the steps, reply with edits until it is right, then yes. It runs the script's `apply` part, reads the live setting back with its `check` part, and commits the script on a work branch. Headless runs never apply.
+- **Added (shared reference):** `crav1-host-setup` `references/host-setup.md`, used by both the ad hoc and the plan route so they write the same script. Pipeline YAML, templates and infrastructure as code stay ordinary code. Service connections and secret values are always manual: the script only checks they exist by name. Host-facing text is kit-neutral.
+- **Changed:** `/crav1-plan-from-spec` writes a host setting as its own task marked `(host setup)`. `/crav1-build-tasks` writes its script and runs it only after a yes. `/crav1-verify-build-against-spec` counts it verified only when `check` reads the setting back `ok` from the live host, and never applies. `/crav1-pr-status` marks a point that asked for a host setting `done host` when the setting reads back live. `/crav1-fix-bug` points a missing host setting at `/crav1-host-setup`.
+
 ## 1.114.3 (2026-11-05)
 
 - `/crav1-review-pr` re-review: the drafted comment heading in the PR note is always plain `## Comment as drafted, <date>`, with no `(re-review)` suffix. A re-review tag goes only on the `## Kit record` heading.
