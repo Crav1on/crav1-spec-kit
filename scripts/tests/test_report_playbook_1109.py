@@ -84,8 +84,10 @@ class Apply1110(unittest.TestCase):
         for d in DEPTHS:
             t = (SK / "reports" / f"playbook-{d}.md").read_text()
             for s in ("Print each block word for word ABOVE its items", "Recorded in Step <n>", "/crav1-resolve-open-questions apply <this file>", "written-out bullets, never a table",
-                      "it never takes answers in chat", "Diagram syntax (1.110.0)", "no double quotes", "`-->|plain words|`"):
+                      "Diagram syntax (1.110.0)", "no double quotes", "`-->|plain words|`"):
                 self.assertIn(s, t, f"{d}: {s}")
+            # 1.116.0: full offers a walk in chat after writing; short still only lists
+            self.assertIn("Walk through it now?" if d == "full" else "it never takes answers in chat", t, d)
             self.assertNotIn("To change it |", t)
             self.assertNotIn("Written by, after your yes", t)
             self.assertNotIn("`change: K<n>", t)
