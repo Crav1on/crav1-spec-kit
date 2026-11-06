@@ -58,7 +58,7 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 
 **Load path.** The files a skill reads for one run, since 1.104.0: `SKILL.md` routes first, then only the chosen path's file (one report, one branch, one reference) is read. Other paths stay closed. Since 1.106.0 `/crav1-retire-spec`, `/crav1-show-or-ask-open-questions`, `/crav1-explain-this-code` and `/crav1-glossary` route to one `branches/<mode>/BRANCH.md`, and `/crav1-help` reads `reference/index.yaml` and one `reference/skills/<name>.md` page, opening `CHANGELOG.md` only for a release question.
 
-**Report word.** `report-<type>-<depth>` on `/crav1-what-do-we-know-about-this` (1.104.0): type `feature`, `change`, or `build`; depth `short` or `full`. Picks one fixed report written outside the project.
+**Report word.** `report-<type>-<depth>` on `/crav1-what-do-we-know-about-this` (1.104.0): type `feature`, `change`, `build`, or `playbook`; depth `short` or `full`, plus `report-playbook-walk` (1.116.0). Picks one fixed report written outside the project. A full playbook can be walked in chat (1.117.0): the chat states each item in words and does not use the report's item ids, and `go to N9` still jumps. When the user's words and the record disagree, the walk works out the intended outcome with them before anything new is written.
 
 **Route.** An ordered list of commands for one situation, such as a new slice or new information on an existing slice. Each step says when it applies, and some are optional. The routes live in `docs/reference/workflow.yaml` and are shown in [Workflow routes](../reference/workflow.md). `/crav1-help` answers order questions from them.
 

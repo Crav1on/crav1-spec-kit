@@ -248,7 +248,11 @@ def render_page(s: dict, data: dict) -> str:
     if s["starter"]:
         out += ["", "This is one of the six starter options. Asking for startup options names it and does not run it."]
     pb = s["prompt_budget"]
-    out += ["", "## Prompts", "", f"Prompt budget: {pb} ({'asks nothing' if pb == 0 else 'the most prompts in one run, the closing yes included'}). A prompt may hold several questions. See the asking rule in `crav1.mdc`."]
+    if s.get("prompt_note"):
+        budget_line = s["prompt_note"].rstrip(".") + ". A prompt may hold several questions. See the asking rule in `crav1.mdc`."
+    else:
+        budget_line = f"Prompt budget: {pb} ({'asks nothing' if pb == 0 else 'the most prompts in one run, the closing yes included'}). A prompt may hold several questions. See the asking rule in `crav1.mdc`."
+    out += ["", "## Prompts", "", budget_line]
     out += ["", "## Reads", "", f"In short: {lk(s['table']['reads'])}.", "", lk(s["reads"])]
     out += ["", "## Writes", "", f"In short: {lk(s['table']['writes'])}.", "", lk(s["writes"])]
     out += ["", "## Does not", ""]
