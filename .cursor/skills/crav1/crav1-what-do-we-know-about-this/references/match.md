@@ -1,10 +1,10 @@
 # crav1-what-do-we-know-about-this: match
 
-Read only when the pointer in `SKILL.md` sends you here. Moved word for word from `SKILL.md` in 1.71.0; the rules are unchanged.
+Read only when the pointer in `SKILL.md` sends you here.
 
 ## Match, one pass
 
-One pass. Do not hunt through the whole codebase. Do not open a second search after the first comes back.
+One pass picks the slice. Do not hunt through the whole codebase to find it. Do not open a second search after the first comes back. Later reads of the winning slice, and reads while answering or walking, are not another pass.
 
 Places, in this order when the user did not `@` a path:
 

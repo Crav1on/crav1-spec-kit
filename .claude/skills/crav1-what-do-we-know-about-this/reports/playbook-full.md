@@ -84,7 +84,7 @@ Steps, for a first-time user. Start the section with this line, in bold: **Run t
 - **You should see:** what the command shows or asks.
 - **Done when:** the check that tells you to move on.
 Mark a step no skill covers as `manual:`, with the same three lines.
-No cap on steps: as many as the work needs. List kit gaps found on the way under Gaps; do not route around them silently.
+No cap on steps: as many as the work needs. List kit gaps found on the way under Gaps; do not route around them silently. No guessed range; an unnamed command goes under Gaps.
 
 Diagram syntax (1.110.0), so every viewer renders it, also one that escapes quotes (mermaid 11.4.1 and later): node ids are plain ASCII letters and digits, never `end`, `graph` or a branch name; labels in square brackets, plain ASCII words only: letters, digits, spaces, `-`, `,`, `.`, `/` (no double quotes, parentheses, colons, `#`, `&`, backticks, `→` or `–`; write steps as `Steps 1-14`, a pull request as `PR 74`); edge labels as `-->|plain words|`; a blank line before and after each fence.
 
