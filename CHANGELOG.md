@@ -2,6 +2,18 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.117.0 (2026-11-06)
+
+A playbook walk stays in words, and a disagreement is worked out before anything is written. A minor release because the walk now asks differently and no longer starts help.
+
+- The walk states each kept decision, open question and conflict in words. Item ids stay in the report. `go to N9` still jumps, and the reply does not repeat the id.
+- When the user's words and the record do not match, the walk works out the intended outcome from the known facts and their words, one follow-up at a time, then summarizes and waits for an explicit yes before it writes. The older record does not win by default. An uncertain recollection is not already decided. A missing note is not proof that no decision was made.
+- The walk stays on the current item. It does not stitch a route. `/crav1-what-do-we-know-about-this` does not start `/crav1-help`. The standing help rule yields while that skill is running.
+- Apply stays the only other skill, at the end on yes, and only for filled confirmed lines. It does not run plan, build, or merge.
+- One pass picks the slice. Later reads of that slice, including a read-only pull-request thread, are part of the skill. It does not run `/crav1-pr-status`. A labelled merge trial for an order the report already suggests stays outside the work tree. Quote only a finished run. Never checkout, commit, or push for a trial.
+- A step whose command cannot be named yet is incomplete, under Gaps on a full playbook. No guessed range.
+- The walk's own prompts, and follow-ups to understand what the user means, do not count against the prompt budget. Headless runs still never walk. A short playbook still does not walk.
+
 ## 1.116.0 (2026-11-05)
 
 A guided walk through a playbook report in chat. A minor release because `report-playbook-full` now asks to walk after writing and there is a new report word.

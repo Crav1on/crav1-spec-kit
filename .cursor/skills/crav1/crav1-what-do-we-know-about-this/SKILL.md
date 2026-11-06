@@ -4,7 +4,8 @@ description: >-
   Use when the user asks what we know about a feature, slice, resource, or
   idea. Answers from the specs first with read-only live checks; a
   report-<type>-<depth> word writes one Markdown report outside the project.
-  Writes nothing in the project. Does not run another skill.
+  Writes nothing in the project. Does not run another skill, except apply
+  at the end of a playbook walk on yes.
 disable-model-invocation: true
 icon: file-search
 color: cyan
@@ -24,7 +25,7 @@ Other skills do not run this one. Spark, specify, plan, and verify do not run it
 
 This is not `/crav1-explain-existing-system`. Explain reads `docs/system/` first. When the picture has nothing on the question, it quotes the first paragraph of a matching spec, labelled as coming from the spec, and names this command. It does not run this command. This command reads the specs first.
 
-This command does not run another skill, except `apply` on yes at the end of a walk. It may name one.
+This command does not run another skill, except `apply` on yes at the end of a walk for filled confirmed lines. It may name one. It does not start `/crav1-help` or `/crav1-pr-status`.
 
 ## Report words (1.104.0)
 
@@ -33,7 +34,7 @@ Route first, load second. Check the message for one word `report-<type>-<depth>`
 - **No report word:** the free-form answer below, unchanged. Do not open `reports/`.
 - **One report word:** type `feature` (what it does, flow, architecture), `change` (a pull request or branch, its pipelines, the discussion), `build` (ready to build, what is missing, finish order), or `playbook` (1.109.0, preview: what is kept, what needs your answer, what to compose, and the kit skills in order to reach buildable work; answers stay in the report until the user confirms; Kept items can still be changed, and the merge order is a suggestion); depth `short` or `full`. Read only `reports/common.md` and `reports/<type>-<depth>.md`. Never the other report files. The rest of the message is the question, matched as below.
 
-**Walk (1.116.0):** after `report-playbook-full`, ask `Walk through it now?`. On yes, or for the word `report-playbook-walk` (resume at the first unanswered item of the existing report), read `references/walk.md` and walk in chat, saving each answer into the report. Headless: never walk; say how to resume.
+**Walk (1.116.0, chat 1.117.0):** after `report-playbook-full`, ask `Walk through it now?`. On yes, or for `report-playbook-walk`, read `references/walk.md` and walk in chat. Chat does not use item ids; the report keeps them, and `go to N9` still jumps. Headless: never walk; say how to resume.
 
 That one report file names its sections and the only diagrams to draw. The report is the one file this command writes, outside the project; the chat always links or attaches it.
 
@@ -119,7 +120,7 @@ Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-spe
 
 - Specs first. One feature, slice, resource, or not-yet-feature.
 - Exact name first. Key words only when the exact name misses. Spec titles and Match quotes weigh highest.
-- One pass. No hunt through the whole codebase. An `@` keeps the search inside that path.
+- One pass picks the slice. No second search, and no hunt through the whole codebase. An `@` keeps that search inside that path. Later reads of that slice are not another pass. Do not run `/crav1-pr-status`.
 - One winning slice: answer and name the path. Two or more close hits: list every one and ask. Do not guess.
 - No slice: say so, show what is known, present a candidate, and name spark, ideas, or intake. Do not run it.
 - Minutes or a long dump: name `/crav1-add-to-spec` and stop.
@@ -130,6 +131,6 @@ Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-spe
 - A failed live read is one prompt: the issue, a fix when there is one, Retry or Skip. Skip is the repo-only answer, with why the live checks did not run.
 - A focus still runs the full read. The answer shows only those sections.
 - People come from what is written. A guess is labeled `(inference, not in the docs)`.
-- Write nothing in the project. A `report-*` word writes one report outside it and links it in chat. Do not run another skill, except `apply` on the user's yes at the end of a walk. Naming one is allowed.
+- Write nothing in the project. A `report-*` word writes one report outside it and links it in chat. During a walk that report is the only file written. Do not run another skill, except `apply` on yes at the end of a walk, for filled confirmed lines only. Do not start `/crav1-help`.
 - Do not start Specify, Plan, or Build.
 - Later skill. Not a starter option. Asking for startup options names only the six and does not run this command.

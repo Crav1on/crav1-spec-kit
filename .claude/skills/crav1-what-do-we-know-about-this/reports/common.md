@@ -6,7 +6,7 @@ Read with exactly one `reports/<type>-<depth>.md`, only when the message has a `
 
 1. Run the same match as the free-form answer. Two or more close hits: list them and ask. No hit: say so and stop; do not write a report about nothing.
 2. Live reads: the ones `references/live-reads.md` describes, plus any read-only source the host already has for the topic (for example the pull request on its forge). When a source needs a sign-in, a permission, or a tool that is not there, ask first, one prompt: what it is, why the report wants it, **Allow** or **Skip**. Never sign in, mint a token, or install a tool on your own. Production stays shape and connections only, after the same yes or no as `/crav1-read-environment`. Never data, never a secret value.
-3. Label every line that needs it: a fact from a live source ends `Live read.`; a guess ends `(inference, not in the docs)`. A fact from a file names the file.
+3. Label every line that needs it: a fact from a live source ends `Live read.`; a guess ends `(inference, not in the docs)`. A fact from a file names the file. A pull-request thread may be read read-only and tagged `Live read.`; that read does not write a PR record and does not run `/crav1-pr-status`. A merge trial is allowed only for an order the report already suggests, only outside the work tree, and labelled as a trial. Quote only a finished run. Never checkout, commit, or push for a trial.
 
 ## Diagrams
 
