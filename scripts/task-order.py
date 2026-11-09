@@ -5,9 +5,12 @@ The sort itself ships with the skills, at
 .cursor/skills/crav1/crav1-tasks-ready-to-build/scripts/task_order.py, so it reaches every install.
 This wrapper runs it from the kit repo: task-order.py <tasks.md> [--failed T7] [--json]
 """
+import sys
+
+sys.dont_write_bytecode = True  # before loading the skill script; no __pycache__ beside it (1.121.1)
+
 import importlib.util
 import pathlib
-import sys
 
 SRC = pathlib.Path(__file__).resolve().parent.parent / ".cursor/skills/crav1/crav1-tasks-ready-to-build/scripts/task_order.py"
 
