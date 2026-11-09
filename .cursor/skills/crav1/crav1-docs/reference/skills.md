@@ -124,6 +124,12 @@ When the user asks for startup options, these six are the only ways in. That ask
 | [`/crav1-pr-status`](skills/crav1-pr-status.md) | — | You want to know what is done and what is left on a pull request, and what you owe | The pull request's threads, pushes and commits, its diff, and its PR record | The PR record in the PR note in `docs/notes/`; one thread status on the host per yes | [`/crav1-merge-pr`](skills/crav1-merge-pr.md); [`/crav1-add-to-spec`](skills/crav1-add-to-spec.md); [`/crav1-ado-sync`](skills/crav1-ado-sync.md); [`/crav1-review-pr`](skills/crav1-review-pr.md) | `/crav1-add-to-spec` | [From a pull request's threads: where it stands](../from-pr-status.md) |
 | [`/crav1-merge-pr`](skills/crav1-merge-pr.md) | — | This turn asks to merge a named pull request | That named pull request | A merge commit on the host, a fast-forward of the local default branch when the tree is clean, and the PR note with its PR record in the specs repo | [`/crav1-refresh-system-notes`](skills/crav1-refresh-system-notes.md) after an outside pull request merges; [`/crav1-finalize-commit`](skills/crav1-finalize-commit.md) | — | [From commit to merge](../from-commit.md) |
 
+### Cross-cutting: Guided walks
+
+| Command | Starter | Use when | Reads | Writes | You run next | Runs by itself | Walkthrough |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| [`/crav1-tighten-and-plan-ready-to-build`](skills/crav1-tighten-and-plan-ready-to-build.md) | — | A spec should be tightened and planned until it is ready to build | The spec folder, an optional playbook, and the progress file when one exists | `docs/specs/<slug>/walk-progress.md` after a yes. Spec, plan, and tasks are written only by the skill that owns that write | [`/crav1-build-tasks`](skills/crav1-build-tasks.md) | `/crav1-resolve-open-questions` | [Tighten and plan until ready to build](../from-tighten-and-plan.md) |
+
 ## Subagents
 
 A subagent is an isolated worker that a skill or the user starts. Reviewers write nothing. Writers change only what is listed.

@@ -62,6 +62,7 @@ docs/specs/
     export/          # EARS, BDD, OpenSpec, YAML, JSON, or BMAD copies
     notes.md         # optional, from ideas-to-spec
     explore.md       # bugs from /crav1-run-exploratory-test
+    walk-progress.md # position of /crav1-tighten-and-plan-ready-to-build; not the source of truth
     work-item.md     # Azure Boards ids, one per line
 ```
 
@@ -93,6 +94,7 @@ docs/specs/
 | `docs/specs/<slug>/live-fix.md` | Legacy. New incidents go in `fix-log.md` | Nothing new | Read when present |
 | `docs/specs/<slug>/diagrams.md`, `adr/`, `export/`, `notes.md` | Slice diagrams, slice decisions, export copies, idea notes | `/crav1-ideas-to-spec`; `/crav1-tighten-spec` for a named diagram or ADR; `/crav1-export-spec` and plan for `export/` | Architecture review, plan |
 | `docs/specs/<slug>/explore.md` | Bugs found by exploratory testing | `/crav1-run-exploratory-test` | `/crav1-fix-bug` when you say so |
+| `docs/specs/<slug>/walk-progress.md` | Which steps of the tighten-and-plan walk are done, when, and the spec, plan, and tasks version each step covered. The ready check also records a `verify.md` version. The playbook step records only the playbook file. This file is position only | `/crav1-tighten-and-plan-ready-to-build`, after a yes | `/crav1-tighten-and-plan-ready-to-build` on resume |
 | `docs/specs/<slug>/work-item.md` | Azure Boards ids, one per line | spark, ideas, and intake after an opt-in on Azure Repos; `/crav1-ado-sync` (task lines `Work item: <id> — task: T<n> <title>`) after a yes, and `/crav1-ado-sync` for an added task | Commit and pull request skills, `/crav1-ado-sync` |
 | Transfer data policy rule | The once-per-repo answers for the personal-data check | Any skill that imports a source, after a yes. See [Data policy](data-policy.md) | The same skills |
 | Commit-style rule | The commit style chosen for later commits | `/crav1-finalize-commit`, and build-tasks when onward is chosen | The commit skills |
@@ -322,6 +324,21 @@ Every mark and line format the kit writes inside product files, generated from [
 | (spec: …) | `(spec: <REQ or acceptance>)` | `docs/specs/<slug>/tasks.md` (on a task line) | `/crav1-plan-from-spec`, `/crav1-tighten-plan` | `/crav1-review-plan`, `/crav1-ado-sync` | 1.0.0 |
 | (after: …) | `(after: T<n>[, T<n>])` | `docs/specs/<slug>/tasks.md` (end of a task line) | `/crav1-plan-from-spec` | `/crav1-tasks-ready-to-build`, `/crav1-help` | 1.54.0 |
 | (branch: …) | `(branch: [<repo> ]<branch>)` | `docs/specs/<slug>/tasks.md` (end of a task line, after (after: …)) | `/crav1-plan-from-spec` | `/crav1-build-tasks`, `/crav1-build-features`, `/crav1-create-feature-branch`, `/crav1-tasks-ready-to-build`, `/crav1-verify-build-against-spec`, `/crav1-help`, `/crav1-review-pr` | 1.64.0 |
+
+### Walk progress
+
+| Mark | Format | Where | Written by | Read by | Since |
+| --- | --- | --- | --- | --- | --- |
+| Walk | `Walk: tighten-and-plan-ready-to-build` | `docs/specs/<slug>/walk-progress.md` (near the title) | `/crav1-tighten-and-plan-ready-to-build` | `/crav1-tighten-and-plan-ready-to-build` | 1.119.0 |
+| Slice | `Slice: docs/specs/<slug>/` | `docs/specs/<slug>/walk-progress.md` (near the title) | `/crav1-tighten-and-plan-ready-to-build` | `/crav1-tighten-and-plan-ready-to-build` | 1.119.0 |
+| Step | `- Step: <playbook \| review-architecture \| tighten-spec \| resolve-open-questions \| plan-from-spec \| review-and-tighten-plan \| tasks-ready-to-build>` | `docs/specs/<slug>/walk-progress.md` | `/crav1-tighten-and-plan-ready-to-build` | `/crav1-tighten-and-plan-ready-to-build` | 1.119.0 |
+| Done | `  Done: <YYYY-MM-DDTHH:MM:SS+HH:MM>` | `docs/specs/<slug>/walk-progress.md` (under a step) | `/crav1-tighten-and-plan-ready-to-build` | `/crav1-tighten-and-plan-ready-to-build` | 1.119.0 |
+| Result | `  Result: <done \| nothing-to-do \| skipped \| applied \| reapplied>` | `docs/specs/<slug>/walk-progress.md` (under a step) | `/crav1-tighten-and-plan-ready-to-build` | `/crav1-tighten-and-plan-ready-to-build` | 1.119.0 |
+| Spec version | `  Spec version: <12 hex \| missing>` | `docs/specs/<slug>/walk-progress.md` (under a step that covers the spec) | `/crav1-tighten-and-plan-ready-to-build` | `/crav1-tighten-and-plan-ready-to-build` | 1.119.0 |
+| Plan version | `  Plan version: <12 hex \| missing>` | `docs/specs/<slug>/walk-progress.md` (under a step that covers the plan) | `/crav1-tighten-and-plan-ready-to-build` | `/crav1-tighten-and-plan-ready-to-build` | 1.119.0 |
+| Tasks version | `  Tasks version: <12 hex \| missing>` | `docs/specs/<slug>/walk-progress.md` (under a step that covers the tasks) | `/crav1-tighten-and-plan-ready-to-build` | `/crav1-tighten-and-plan-ready-to-build` | 1.119.0 |
+| Verify version | `  Verify version: <12 hex \| missing>` | `docs/specs/<slug>/walk-progress.md` (under the ready check) | `/crav1-tighten-and-plan-ready-to-build` | `/crav1-tighten-and-plan-ready-to-build` | 1.119.0 |
+| Playbook | `  Playbook: <path>@<12 hex>` | `docs/specs/<slug>/walk-progress.md` (under the playbook step) | `/crav1-tighten-and-plan-ready-to-build` | `/crav1-tighten-and-plan-ready-to-build` | 1.119.0 |
 
 ### `docs/system/`
 

@@ -68,6 +68,8 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 
 **Route.** An ordered list of commands for one situation, such as a new slice or new information on an existing slice. Each step says when it applies, and some are optional. The routes live in `docs/reference/workflow.yaml` and are shown in [Workflow routes](../reference/workflow.md). `/crav1-help` answers order questions from them.
 
+**Walk progress.** The file `docs/specs/<slug>/walk-progress.md` written by `/crav1-tighten-and-plan-ready-to-build` (1.119.0). It records which locked steps are done, when, and the version of the spec, plan, and tasks each step covered. The ready check also records a `verify.md` version. The playbook line is intake only. The spec, plan, and tasks stay the source of truth. On resume, a step is reopened only when a file it covered has changed.
+
 **Slice, slug.** A slice is one feature's spec folder. Its slug is the folder name under `docs/specs/`.
 
 **v0.** The first version of a feature. Intake writes one spec per confirmed v0 feature.
