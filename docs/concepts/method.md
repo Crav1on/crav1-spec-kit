@@ -195,6 +195,8 @@ The command shows three piles (belongs to this spec, already described there, fi
 
 Use this on any non-trivial change. Step by step: [From a draft spec to an accepted spec](../from-draft-spec.md), [From a spec to a plan](../from-spec-to-plan.md), [Build tasks](../from-plan-to-build.md), [Verify and fix](../from-verify.md), and [From commit to merge](../from-commit.md).
 
+To do the specify and plan part as one guided walk, with or without a playbook, run [`/crav1-tighten-and-plan-ready-to-build`](../from-tighten-and-plan.md). It runs those existing skills and stops before build. The route itself is unchanged. You can still run each skill on its own.
+
 The skills that work beside this loop (add, existing-to-specs, read-environment, map-pipeline-environments, explain-existing-system, what-do-we-know-about-this, model-data, refresh-system-notes, review-security, review-pr, suggest-tests-for-code, add-to-spec, run-exploratory-test, fix-bug) are described in full on their pages in the [skills reference](../reference/skills.md).
 
 ### A. Specify (read-heavy)

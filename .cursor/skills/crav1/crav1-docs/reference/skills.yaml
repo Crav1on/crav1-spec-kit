@@ -55,6 +55,7 @@ lanes:
   - Azure Boards
   - Testing helpers
   - Commit and pull request
+  - Guided walks
 skills:
 - name: crav1-spark-to-spec
   lane: specify
@@ -1852,6 +1853,38 @@ skills:
   first_prompt: '/crav1-model-data manual-flow
 
     <optional scope, or leave it out>'
+- name: crav1-tighten-and-plan-ready-to-build
+  lane: cross-cutting
+  group: Guided walks
+  starter: false
+  since: 1.119.0
+  stage: stable
+  prompt_budget: 4
+  prompt_note: 'The walk''s own prompts are the playbook skip or reapply question when a playbook is given, one batch of optional offers when the spec needs them, one jump-back question when the ready check is not clear, and the yes before the progress file is written when that yes is not already the step''s confirm. Questions inside a step belong to that step''s skill and its own budget. A value the user left out is outside the budget. A headless run stops before any of these.'
+  walkthrough: docs/from-tighten-and-plan.md
+  purpose: Walk a draft spec through architecture, tighten, questions, and the plan until the ready check is clear.
+  in_depth:
+  - '`/crav1-tighten-and-plan-ready-to-build` (1.119.0) is one guided walk with two starts. A playbook path is optional. Without one, step 1 is skipped. Both starts then use the same steps and the same ready check. The walk runs the existing skills. It does not replace them. There is no automatic mode.'
+  - 'Locked order: playbook when given; `/crav1-review-architecture` always; `/crav1-tighten-spec` one issue at a time; `/crav1-resolve-open-questions`; `/crav1-plan-from-spec`, which writes `plan.md` and `tasks.md`; `/crav1-review-plan` then `/crav1-tighten-plan`; `/crav1-tasks-ready-to-build`. A step with nothing to do says so and moves on. Research, `/crav1-review-security`, `/crav1-model-data`, `/crav1-show-or-ask-open-questions`, and `/crav1-suggest-tests-for-code` are offered only when the spec needs them.'
+  - 'The progress file is `docs/specs/<slug>/walk-progress.md`. It records the step, when, and the version of each file that step covered. On resume, only a step whose covered file changed is reopened. Spec, plan, and tasks stay the source of truth. The playbook is intake only. A Blocked or Needs verify row is named back to its step. Needs verify is outside the walk. The walk never reports ready with a blocker or an open assumption, and it never starts build.'
+  use_when: A spec should be tightened and planned until it is ready to build
+  table:
+    reads: The spec folder, an optional playbook, and the progress file when one exists
+    writes: '`docs/specs/<slug>/walk-progress.md` after a yes. Spec, plan, and tasks are written only by the skill that owns that write'
+  reads: Reads the spec folder, the optional playbook, and `walk-progress.md` when resuming. The ready check reads `spec.md`, `plan.md`, `tasks.md`, and `verify.md` through `/crav1-tasks-ready-to-build`. It does not read production data.
+  writes: 'Writes `docs/specs/<slug>/walk-progress.md` through `scripts/walk_progress.py`, and only after a yes. Spec, plan, and task edits happen inside the skill the walk runs, after that skill''s own yes. `/crav1-resolve-open-questions` with `apply <file>` writes playbook answers, including Kept items through the rules of `/crav1-add-to-spec`, and this walk does not call `/crav1-add-to-spec` a second time for those items.'
+  leaves_alone: Leaves `spec.md`, `plan.md`, and `tasks.md` to the skills that own them. Leaves the playbook file unedited. Does not start `/crav1-build-tasks`, `/crav1-build-features`, or `/crav1-verify-build-against-spec`. Does not commit.
+  exceptions: A headless run stops. No playbook skips step 1. Architecture review always runs inside the walk even though the new-slice route marks it optional. Needs verify is named and not started. An open plan-review warning is not ready. The progress script does not decide that a playbook was already applied unless this walk recorded that apply.
+  called_by: Called by the user.
+  runs_by_itself: Runs the locked skills inside the walk, each under its own rules, and `/crav1-resolve-open-questions` with `apply <file>` on yes when a playbook is applied. It does not run Build.
+  you_run_next:
+  - /crav1-build-tasks
+  first_prompt: '/crav1-tighten-and-plan-ready-to-build
+
+    @docs/specs/<slug>/
+
+
+    <optional playbook file, or leave it out>'
 - name: crav1-refresh-system-notes
   lane: cross-cutting
   group: Keep the picture current
@@ -2409,6 +2442,7 @@ routing:
           until one confirm. `/crav1-add-to-spec` and `/crav1-finalize-commit` name it when they write a Conflict
           line.'
       notes:
+      - 'A guided walk from a draft spec through the plan until ready to build is `/crav1-tighten-and-plan-ready-to-build` (1.119.0). It is cross-cutting, so neither Specify nor Plan owns it. It runs the Specify skills this lane already owns, inside the walk, and does not replace them. It does not start Build. The new-slice route is unchanged. Architecture review stays optional on that route. Inside the walk it always runs.'
       - '`/crav1-add-to-spec`, `/crav1-bundle-to-specs`, and `/crav1-existing-to-specs` follow the imported-sources
         check when they quote an imported source. That check recommends keep or redact for personal data.
         Items it cannot place are asked in one batch. Secrets are always redacted and are never a choice.
@@ -2486,7 +2520,8 @@ routing:
         - 'Exception: the parent delegates the critique and does not review in its own voice. It names
           `/crav1-tighten-plan` and does not run it. A piece marked already there or left as committed
           is not a missing task.'
-      notes: []
+      notes:
+      - 'The same walk, `/crav1-tighten-and-plan-ready-to-build`, runs `/crav1-plan-from-spec`, then `/crav1-review-plan` and `/crav1-tighten-plan`, then the ready check. It does not replace those skills. It stops when the check is clear and does not start `/crav1-build-tasks`.'
     build:
       skills: {}
       notes: []
@@ -2649,6 +2684,8 @@ routing:
           Specify, Plan, or Build.'
         crav1-model-data:
         - '`/crav1-model-data` may run from any lane. The user asks for a data model. `manual-flow` and `auto-flow` share one state machine. A scope value is optional. It does not move work into Specify, Plan, or Build. It does not edit spec requirements, generate schema, or start a watcher. It is a later skill. It is not a starter option. Asking for startup options names only the six and does not run this command.'
+        crav1-tighten-and-plan-ready-to-build:
+        - '`/crav1-tighten-and-plan-ready-to-build` may run from any lane when the user asks to tighten and plan a spec until it is ready to build. A playbook path is optional. It is a guided walk, not a new lane and not a starter option. Asking for startup options names only the six and does not run this command. It runs the existing Specify and Plan skills inside the walk and does not replace them. The user asked for that walk. It does not start Build, and it does not run `/crav1-build-tasks`. The spec, plan, and tasks stay the source of truth.'
         crav1-what-do-we-know-about-this:
         - '`/crav1-what-do-we-know-about-this` may run from any lane. The user asks about one feature,
           slice, resource, or not-yet-feature. The answer comes from the specs first. With no report

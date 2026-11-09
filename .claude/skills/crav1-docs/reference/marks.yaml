@@ -1017,3 +1017,143 @@ marks:
     read_by: [crav1-model-data, crav1-what-do-we-know-about-this]
     since: 1.118.0
 
+  - id: walk-name
+    name: "Walk"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md (near the title)"]
+    format: "Walk: tighten-and-plan-ready-to-build"
+    pattern: '^Walk: tighten-and-plan-ready-to-build$'
+    examples:
+      - "Walk: tighten-and-plan-ready-to-build"
+    meaning: "Which walk this progress file tracks. The file is position only."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    since: 1.119.0
+
+  - id: walk-slice
+    name: "Slice"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md (near the title)"]
+    format: "Slice: docs/specs/<slug>/"
+    pattern: '^Slice: docs/specs/[a-z0-9-]+/$'
+    examples:
+      - "Slice: docs/specs/orders-retry/"
+    meaning: "The spec folder this progress file sits beside."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    since: 1.119.0
+
+  - id: walk-step
+    name: "Step"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md"]
+    format: "- Step: <playbook | review-architecture | tighten-spec | resolve-open-questions | plan-from-spec | review-and-tighten-plan | tasks-ready-to-build>"
+    pattern: '^- Step: (playbook|review-architecture|tighten-spec|resolve-open-questions|plan-from-spec|review-and-tighten-plan|tasks-ready-to-build)$'
+    examples:
+      - "- Step: review-architecture"
+      - "- Step: tasks-ready-to-build"
+    meaning: "One locked step of the walk. A playbook step is intake only."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    mention: '(?m)^- Step: '
+    since: 1.119.0
+
+  - id: walk-done
+    name: "Done"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md (under a step)"]
+    format: "  Done: <YYYY-MM-DDTHH:MM:SS+HH:MM>"
+    pattern: '^  Done: \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}$'
+    examples:
+      - "  Done: 2026-11-09T10:19:09+01:00"
+    meaning: "When that step was recorded."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    mention: '(?m)^  Done: '
+    since: 1.119.0
+
+  - id: walk-result
+    name: "Result"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md (under a step)"]
+    format: "  Result: <done | nothing-to-do | skipped | applied | reapplied>"
+    pattern: '^  Result: (done|nothing-to-do|skipped|applied|reapplied)$'
+    examples:
+      - "  Result: done"
+      - "  Result: nothing-to-do"
+      - "  Result: applied"
+    meaning: "How the step ended. nothing-to-do still counts as covered for those versions."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    mention: '(?m)^  Result: '
+    since: 1.119.0
+
+  - id: walk-spec-version
+    name: "Spec version"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md (under a step that covers the spec)"]
+    format: "  Spec version: <12 hex | missing>"
+    pattern: '^  Spec version: ([0-9a-f]{12}|missing)$'
+    examples:
+      - "  Spec version: a1b2c3d4e5f6"
+      - "  Spec version: missing"
+    meaning: "The spec contents that step covered. A later change reopens that step."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    since: 1.119.0
+
+  - id: walk-plan-version
+    name: "Plan version"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md (under a step that covers the plan)"]
+    format: "  Plan version: <12 hex | missing>"
+    pattern: '^  Plan version: ([0-9a-f]{12}|missing)$'
+    examples:
+      - "  Plan version: a1b2c3d4e5f6"
+      - "  Plan version: missing"
+    meaning: "The plan contents that step covered. A playbook step does not record this."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    since: 1.119.0
+
+  - id: walk-tasks-version
+    name: "Tasks version"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md (under a step that covers the tasks)"]
+    format: "  Tasks version: <12 hex | missing>"
+    pattern: '^  Tasks version: ([0-9a-f]{12}|missing)$'
+    examples:
+      - "  Tasks version: a1b2c3d4e5f6"
+      - "  Tasks version: missing"
+    meaning: "The tasks contents that step covered."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    since: 1.119.0
+
+  - id: walk-verify-version
+    name: "Verify version"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md (under the ready check)"]
+    format: "  Verify version: <12 hex | missing>"
+    pattern: '^  Verify version: ([0-9a-f]{12}|missing)$'
+    examples:
+      - "  Verify version: a1b2c3d4e5f6"
+      - "  Verify version: missing"
+    meaning: "The verify.md contents the ready check covered. Only that check records it."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    since: 1.119.0
+
+  - id: walk-playbook
+    name: "Playbook"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md (under the playbook step)"]
+    format: "  Playbook: <path>@<12 hex>"
+    pattern: '^  Playbook: \S+@[0-9a-f]{12}$'
+    examples:
+      - "  Playbook: docs/notes/2026-11/orders-playbook.md@a1b2c3d4e5f6"
+    meaning: "The playbook file and contents this walk applied or skipped. Intake only."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    since: 1.119.0
+

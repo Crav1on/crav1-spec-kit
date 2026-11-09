@@ -161,6 +161,11 @@ skills:
     starter: false
     page: reference/skills/crav1-model-data.md
     purpose: "Build or revise one data model from the project's specs, with a manual flow or an auto flow."
+  crav1-tighten-and-plan-ready-to-build:
+    lane: cross-cutting
+    starter: false
+    page: reference/skills/crav1-tighten-and-plan-ready-to-build.md
+    purpose: "Walk a draft spec through architecture, tighten, questions, and the plan until the ready check is clear."
   crav1-refresh-system-notes:
     lane: cross-cutting
     starter: false

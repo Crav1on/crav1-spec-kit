@@ -2,6 +2,15 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.119.0 (2026-11-09)
+
+A guided walk from a draft spec through the plan until the tasks are honestly ready to build. A minor release because there is a new skill.
+
+- **Added:** `/crav1-tighten-and-plan-ready-to-build`. One walk, with or without a playbook. It runs the existing architecture review, tighten, open questions, plan, plan review, and ready check. It does not replace those skills. Guided only. It stops at ready and does not start build.
+- A playbook, when one is given, is step 1. If this walk already applied that same file, you choose skip or reapply. Otherwise it shows the changes and applies them only on yes, through `/crav1-resolve-open-questions apply`.
+- `docs/specs/<slug>/walk-progress.md` records which steps are done, when, and the spec, plan, and tasks version each step covered. On resume, only a step whose covered file changed is reopened. The spec, plan, and tasks stay the source of truth.
+- When the ready check is Blocked or Needs verify, the walk names the step for each row and can jump back. Needs verify stays outside the walk. An open plan-review warning is not treated as ready.
+
 ## 1.118.0 (2026-11-08)
 
 A data model from the specs, and a review of the saved model. A minor release because there is a new skill and a new report word.

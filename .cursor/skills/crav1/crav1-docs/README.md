@@ -41,6 +41,7 @@ Starters:
 The core loop, after a starter:
 
 - [From a draft spec to an accepted spec](from-draft-spec.md)
+- [Tighten and plan until ready to build](from-tighten-and-plan.md): one guided walk, with or without a playbook, stopping before build
 - [From a spec to a plan](from-spec-to-plan.md)
 - [Build tasks](from-plan-to-build.md)
 - [Verify and fix](from-verify.md)
