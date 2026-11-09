@@ -52,6 +52,20 @@ class ReportRouting(unittest.TestCase):
             self.assertIn(needle, c)
         self.assertIsNone(re.search(r"vault|bot", c, re.I))
 
+    def test_guild_routing_distinguishes_report_writes(self):
+        """Free-form is read-only. Other reports leave the project. The saved-model review is the in-project exception."""
+        yaml_text = (ROOT / "docs/reference/skills.yaml").read_text()
+        start = yaml_text.find("crav1-what-do-we-know-about-this:\n")
+        blurb = yaml_text[start : yaml_text.find("crav1-glossary:", start)]
+        guild = (ROOT / "docs/guild-routing.md").read_text()
+        page = (ROOT / "docs/reference/skills/crav1-what-do-we-know-about-this.md").read_text()
+        for text in (blurb, guild, page):
+            self.assertIn("writes nothing in the project", text)
+            self.assertIn("outside the project", text)
+            self.assertIn("docs/data-model/<model>/reviews/", text)
+            self.assertIn("does not edit the saved model", text)
+            self.assertNotIn("It reads only. It writes nothing.", text)
+
 
 if __name__ == "__main__":
     unittest.main()
