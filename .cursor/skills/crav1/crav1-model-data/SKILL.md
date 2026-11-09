@@ -33,7 +33,7 @@ Route first, load second. The word after the command is the flow. A scope may fo
 
 When you draw a diagram, read `references/diagrams.md`. Do not open it before that.
 
-Both flows use `scripts/model_run.py` in this skill. That script is the state machine. Do not keep a second copy of its gates in chat, and do not hand-edit `confirmed.md`.
+Both flows use `scripts/model_run.py` in this skill. That script is the state machine. Do not keep a second copy of its gates in chat, and do not hand-edit the model files. A change to a recorded decision, worked example, question, diagram, or the sources on a decision is `revise`. When you record, read `references/inputs.md`. Do not open it before that, and do not read the script to learn the fields.
 
 ## What the words change
 
@@ -60,5 +60,5 @@ Name `/crav1-finalize-commit` when a model file changed. Name `/crav1-what-do-we
 - Unknown feasibility is not disproof. Requirement evidence, candidate fit, and approval are different.
 - Business meaning comes before a confirmed physical design. Inferred entities stay labeled as inference until the user approves that stage and revision.
 - `Approved: <stage> r<n>, <date>` records that stage and revision only. A business-model approval does not approve physical design or a later revision.
-- The last confirmed text stays until an explicit approval appends a new snapshot. Review comments become proposed revisions. They are not approval.
+- The last confirmed text stays until an explicit approval appends a new snapshot. Review comments become proposed revisions. They are not approval. A hand edit of a model file is not a revision. `revise` keeps the previous text and sets that item back to proposed.
 - Schema, migration code, detailed migration planning, and spec edits are offered, not done.

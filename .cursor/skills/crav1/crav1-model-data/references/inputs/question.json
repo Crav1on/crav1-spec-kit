@@ -1,0 +1,7 @@
+{
+  "id": "history-window",
+  "affects": "docs/specs/orders/spec.md",
+  "provider": "dispatch lead",
+  "blocks": "order-line-grain",
+  "body": "Is a year of as-was history required?"
+}

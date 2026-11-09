@@ -17,7 +17,7 @@ The word picks the flow. A scope may follow it. The scope is a value, such as `o
 | `/crav1-model-data auto-flow` | You approve a budget, then the run continues. Unconfirmed results stay proposals |
 | `/crav1-model-data` | Asks which flow. A headless run with no word stops and names the two words |
 
-Both flows follow the same modeling rules and the same state machine, `scripts/model_run.py` in the skill.
+Both flows follow the same modeling rules and the same state machine, `scripts/model_run.py` in the skill. On Windows run it with `py -3`. Elsewhere run it with `python3`. If that command is missing, try the other. Content goes in a file (`--input` or `--text-file`). The fields are in the skill's `references/inputs.md`. Do not edit a model file by hand. `revise` records the new text, keeps the previous text, and sets that item back to proposed.
 
 ## What you should see
 
@@ -33,7 +33,7 @@ Physical design, once the business model is approved, says what to build and why
 
 Before each auto run you see the budget: **20 minutes** and **5 correction passes**, shared across the whole run. You can keep those numbers or change them. The run does not stop to ask you to confirm each stage. It also does not pretend you did. Conditional physical detail stays marked conditional and not implementable.
 
-Time is checked between passes, not in the middle of one. The run stops when the proposal is stable, when it stalls, when it cycles, or when the budget is used. It says what is unfinished. Nothing watches between runs. A later run is a new invocation and shows the budget again.
+The first proposal is a baseline. It does not use one of the five passes. A later change to a recorded decision or worked example is `revise`, and during the run that revise stays inside the current pass. The script reads its own clock. Time is checked between passes, not in the middle of one. The run stops when the proposal is stable, when it stalls, when it cycles, or when the budget is used. It says what is unfinished. Nothing watches between runs. A later run is a new invocation and shows the budget again.
 
 ## Where it is saved
 
@@ -43,7 +43,7 @@ Questions stay with the model and name the specs they affect. The command can ad
 
 ## Review
 
-`/crav1-what-do-we-know-about-this report-data-model-full <model>` reads the saved model and writes one Markdown review and a PDF with the diagrams drawn. It does not model again. The export is a snapshot. Comments brought back become a proposed revision. They do not approve the model and they do not change the export.
+`/crav1-what-do-we-know-about-this report-data-model-full <model>` reads the saved model and writes one Markdown review and a PDF. It does not model again. The review is built from the saved records: one title, each section once, a line when a section is empty, and a run-ending line near the top (flow, why it stopped, passes and minutes used, checkpoint). The PDF carries the same prose, and diagrams are titled by name, wrapped so the text stays readable, or split across a landscape page. The export is a snapshot. Comments brought back become a proposed revision. They do not approve the model and they do not change the export.
 
 ## After
 

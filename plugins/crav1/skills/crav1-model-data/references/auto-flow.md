@@ -15,7 +15,7 @@ The user may keep those numbers or give others. Pass the approved numbers. Do no
 
 A headless run that does not name the budget stops and shows 20 and 5. It does not start.
 
-`auto-begin --minutes <n> --passes <n> --now <ISO time>` opens the run. There is no watcher after it finishes.
+`auto-begin --minutes <n> --passes <n>` opens the run. The script reads its own clock. There is no watcher after it finishes.
 
 ## During the run
 
@@ -29,13 +29,15 @@ Do not set `user_chose`. A tie stays a tie.
 
 ## Passes
 
-A correction pass is one cycle: find the issue, revise the proposal, revalidate what that change affects. Record it with `auto-pass`.
+The first proposal is a baseline, not a correction pass. Record it with `auto-baseline`. If you call `auto-pass` before a baseline exists, that call is the baseline and does not use a pass. The approved pass budget stays available for corrections.
+
+A correction pass is one cycle: find the issue, revise the proposal, revalidate what that change affects. Change a recorded decision, worked example, question, diagram, or the sources on a decision with `revise`. Do not edit the model files by hand. During an open run, `revise` stays inside the current pass and does not use another pass. Record the pass with `auto-pass`.
 
 - `--fingerprint` is a stable id for the proposal text after the pass.
-- `--text` is that text, so a rewording of the same lines can be seen. The match is a heuristic. Say so. It is not proof two texts mean the same thing.
+- `--text-file` is that text, so a rewording of the same lines can be seen. `--text` is only for a short value. The match is a heuristic. Say so. It is not proof two texts mean the same thing.
 - `--unresolved` is the count of open decision-changing gaps.
 - `--progress yes` only when the pass closed a gap, changed a status on cited evidence, or removed an inconsistency. A rewording is `--progress no`.
-- `--now` is the time you start the pass. The script checks the limit then, not during the pass. It does not preempt mid-pass.
+- The script checks the time limit when the pass is recorded, not during the pass. It does not preempt mid-pass. Do not pass a clock time.
 - `--stage` is a label. It does not reset the pass count.
 
 Stop when the script returns one of these:

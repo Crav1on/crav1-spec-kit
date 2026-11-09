@@ -2,7 +2,13 @@
 
 Read this with the one flow file the command picked. The other flow file stays closed.
 
-The state machine is `scripts/model_run.py` in skill `crav1-model-data`. Run it with `python3` on that file. Pass paths the user can see. The script accepts or rejects the record. It does not score candidates and it does not use a research ledger.
+The state machine is `scripts/model_run.py` in skill `crav1-model-data`. Run it with `py -3` on Windows and `python3` elsewhere. If that command is missing, try the other before giving up. Check that `--version` is 3.10 or later. Pass paths the user can see.
+
+Content goes through files so the command line stays small. Use `--input <file.json>` (or `--json <file.json>`) and `--text-file <path>`. Inline `--text` and other short flags stay allowed for small values. Do not put a model, a proposal, or a long comment on the command line. Every command's fields and one example file are in `references/inputs.md`. Read that file when you record. Do not read the script to learn the fields.
+
+The script accepts or rejects the record. It does not score candidates and it does not use a research ledger. It reads its own UTC clock. Do not pass `--now`. That switch exists only for tests, with `--test-clock`.
+
+Never edit model files directly. The script stores a content hash on each write. If a file was changed outside the script, the next command refuses until you restore the last script write and record the change with `revise`. `revise --id <id> --reason "<why>" --input <file.json>` bumps the model revision, keeps the previous text in `history.md`, and sets the item back to proposed. A question stays open. During an open auto run, `revise` stays inside the current correction pass and does not use another pass.
 
 ## Discover
 
@@ -47,7 +53,7 @@ Record decisions with `decide --json`. Use a short slug. Fields the script store
 Check worked examples with `example` before physical approval:
 
 - `double-count` when two grains would be added together.
-- `history-window` when a short retained window is asked to cover a longer period. It cannot, unless another source is named.
+- `history-window` when a short retained window is asked to cover a longer period. It cannot, unless another source is named and its coverage is known (`other_source_days`). A named source whose coverage is unknown is an open question, not a reconstruction. A start date alone does not prove coverage.
 - `schema-not-disproof` when a schema has no history columns. That is unknown feasibility, not proof that history is impossible.
 - `correction` when a restatement or void is in the question. A missing correction meaning blocks physical approval.
 - `views` for the area and platform obligations.
@@ -64,7 +70,7 @@ A concise transition note (`transition --kind concise`) covers data, history, co
 
 Unanswered questions go to `questions.md` through `question`. Name the spec they affect and the provider when you know it. They are not copied into the spec.
 
-Pin each source you relied on with `pin` (path and content hash). `drift` compares those hashes and also looks for internal contradictions, including two grains for one measure. It reports what it checked. It never says that nothing drifted anywhere.
+Pin each source you relied on with `pin` (path and content hash). `drift` compares those hashes and also looks for internal contradictions, including two grains for one measure, and a recommendation whose best fit leans one way while a decision on that axis is a tie. Clear a real exclusion with the words `tie on axis <axis> excluded` in the reason or in `tie_excluded`. It reports what it checked. It never says that nothing drifted anywhere.
 
 `note-drift` marks the affected proposed decisions, and decisions that depend on them, for review. It does not change unaffected decision text. It does not change `confirmed.md`.
 

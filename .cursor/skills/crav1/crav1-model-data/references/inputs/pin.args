@@ -1,0 +1,1 @@
+pin --home docs/data-model/orders --root <repo> --source docs/specs/orders/spec.md --decisions order-line-grain

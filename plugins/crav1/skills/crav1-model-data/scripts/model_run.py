@@ -130,6 +130,124 @@ def _hash(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def _clock(now: str | None, test_clock: bool) -> datetime:
+    """Wall clock. Agent-supplied time is accepted only with the test switch."""
+    if now and not test_clock:
+        raise ModelError(
+            "The script reads its own UTC clock. Pass --now only with --test-clock, and only in tests.",
+            "clock",
+        )
+    if test_clock:
+        if not now:
+            raise ModelError("--test-clock needs --now.", "clock")
+        return _now(now)
+    return datetime.now(timezone.utc)
+
+
+# Files the script owns. A hash of each is stored on the last write.
+TRACKED = (
+    "proposed.md",
+    "confirmed.md",
+    "questions.md",
+    "comparisons.md",
+    "sources.md",
+    "history.md",
+    "run.md",
+    "checkpoint.md",
+)
+_INTEGRITY = "\n## Integrity\n"
+# Landscape content width at one PDF point per pixel, after margins.
+# A diagram wider than the portrait content width gets a landscape page.
+PORTRAIT_MAX_W = 500
+LANDSCAPE_MAX_W = 680
+DIAGRAM_MAX_H = 440
+LABEL_SCALE = 2  # 5x7 glyph → 10×14 px. Never draw labels smaller than this.
+
+
+def _strip_integrity(text: str) -> str:
+    at = text.find(_INTEGRITY)
+    if at < 0:
+        return text
+    return text[: at + 1]
+
+
+def _tracked_hash(home: Path, name: str) -> str:
+    path = home / name
+    if not path.is_file():
+        return "missing"
+    return _hash(path)
+
+
+def _integrity_map(home: Path) -> dict[str, str] | None:
+    text = (home / "index.md").read_text(encoding="utf-8") if (home / "index.md").is_file() else ""
+    if _INTEGRITY not in text:
+        return None
+    found: dict[str, str] = {}
+    grab = False
+    for line in text.splitlines():
+        if line.strip() == "## Integrity":
+            grab = True
+            continue
+        if grab:
+            if line.startswith("## "):
+                break
+            if line.startswith("- ") and ": " in line:
+                key, _, val = line[2:].partition(": ")
+                found[key] = val
+    return found
+
+
+def _guard(home: Path) -> None:
+    """Refuse to continue when a model file was changed outside the script.
+
+    A model written before integrity hashes existed has no section. That older
+    file stays readable. The next script write records the hashes.
+    """
+    recorded = _integrity_map(home)
+    if recorded is None:
+        return
+    bad = []
+    index_text = (home / "index.md").read_text(encoding="utf-8")
+    body = _strip_integrity(index_text)
+    if recorded.get("index") and recorded["index"] != hashlib.sha256(body.encode("utf-8")).hexdigest():
+        bad.append("index.md")
+    for name in TRACKED:
+        if recorded.get(name, "missing") != _tracked_hash(home, name):
+            bad.append(name)
+    if not bad:
+        return
+    names = ", ".join(bad)
+    raise ModelError(
+        f"{names} changed outside the script. The content hash from the last script write does not match. "
+        "Restore those files to the last script write, then record the change with "
+        '`revise --id <id> --reason "<why>" --input <file.json>` '
+        "(or `--text-file` when the new content is prose). "
+        "revise bumps the model revision, keeps the previous text in history.md, and sets the item back to proposed. "
+        "During an open auto run, revise stays inside the current correction pass and does not use another pass. "
+        "Do not edit model files directly.",
+        "hand-edit",
+    )
+
+
+def _seal(home: Path) -> None:
+    index_path = home / "index.md"
+    if not index_path.is_file():
+        return
+    text = index_path.read_text(encoding="utf-8")
+    body = _strip_integrity(text)
+    if not body.endswith("\n"):
+        body += "\n"
+    # Body ends with one newline. The integrity heading follows, so
+    # _strip_integrity (which keeps the newline before the heading) returns body.
+    lines = ["## Integrity", "", f"- index: {hashlib.sha256(body.encode('utf-8')).hexdigest()}"]
+    for name in TRACKED:
+        lines.append(f"- {name}: {_tracked_hash(home, name)}")
+    lines.append("")
+    new = body + "\n".join(lines)
+    if new != text:
+        index_path.write_text(new, encoding="utf-8")
+
+
 def _load_lines(path: Path) -> dict[str, str]:
     data: dict[str, str] = {}
     if not path.is_file():
@@ -226,6 +344,9 @@ def _write_run(home: Path, data: dict[str, str], fingerprints: list[str], norms:
         "Stop",
         "Last progress",
         "Last unresolved",
+        "Baseline",
+        "Last at",
+        "Revise in pass",
     ]
     lines = ["# Auto run", ""]
     for key in keys:
@@ -509,26 +630,71 @@ def check_recommendation(payload: dict, flow: str | None = None) -> dict:
     }
 
 
+def _history_question(retained: int, needed: int) -> dict:
+    return {
+        "ok": True,
+        "kind": "history-window",
+        "result": "question",
+        "gap": (
+            f"Need {needed} days. Retained window is {retained} days. "
+            "Another history source is named, but its coverage is unknown. This is an open question, not a reconstruction."
+        ),
+        "conditional": True,
+        "open_question": True,
+    }
+
+
 def check_example(kind: str, payload: dict) -> dict:
     if kind == "history-window":
         retained = int(payload.get("retained_days", -1))
         needed = int(payload.get("needed_days", -1))
         other = bool(payload.get("other_source"))
         claim = payload.get("claim")
-        if claim == "can-reconstruct" and not other and retained < needed:
+        other_days = payload.get("other_source_days")
+        other_from = payload.get("other_source_from")
+        if other_days is not None:
+            try:
+                other_days = int(other_days)
+            except (TypeError, ValueError) as exc:
+                raise ModelError("other_source_days must be a number of days.", "history-window") from exc
+        # A from-date without a length does not prove coverage.
+        coverage_known = other_days is not None
+        if claim == "can-reconstruct" and retained < needed and not other:
             raise ModelError(
                 f"{retained} retained days cannot reconstruct {needed} days without another source.",
                 "history-window",
             )
         if claim not in ("can-reconstruct", "conditional", "met"):
             raise ModelError("History claim must be can-reconstruct, conditional, or met.", "history-window")
+        if claim in ("can-reconstruct", "met") and other and retained < needed and not coverage_known:
+            return _history_question(retained, needed)
         if claim == "met" and not other and retained < needed:
             raise ModelError("The history window does not cover the question.", "history-window")
-        missing = None if claim == "met" or (claim == "can-reconstruct" and (other or retained >= needed)) else (
-            f"Need {needed} days. Retained window is {retained} days."
-            + ("" if other else " No other history source is recorded.")
-        )
-        return {"ok": True, "kind": kind, "result": "gap" if missing else "ok", "gap": missing, "conditional": bool(missing)}
+        covered = retained + (other_days or 0)
+        if claim == "can-reconstruct" and other and coverage_known and covered < needed:
+            missing = (
+                f"Need {needed} days. Retained window is {retained} days. "
+                f"The other source covers {other_days} days."
+            )
+            return {"ok": True, "kind": kind, "result": "gap", "gap": missing, "conditional": True, "open_question": False}
+        if claim == "can-reconstruct" and (retained >= needed or (other and coverage_known and covered >= needed)):
+            return {"ok": True, "kind": kind, "result": "ok", "gap": None, "conditional": False, "open_question": False}
+        missing = None
+        if claim != "met":
+            missing = (
+                f"Need {needed} days. Retained window is {retained} days."
+                + ("" if other else " No other history source is recorded.")
+            )
+            if other_from and not coverage_known:
+                missing += " The other source has a start date and no length, so coverage stays unknown."
+        return {
+            "ok": True,
+            "kind": kind,
+            "result": "gap" if missing else "ok",
+            "gap": missing,
+            "conditional": bool(missing),
+            "open_question": False,
+        }
     if kind == "schema-not-disproof":
         claim = payload.get("claim")
         if claim == "history-impossible":
@@ -749,16 +915,21 @@ def recommend(home: Path, payload: dict) -> dict:
         raise ModelError("Proposed model has no Recommendation section.", "layout")
     gaps = payload.get("decision_changing_gaps") or []
     alternatives = payload.get("alternatives") or []
+    excluded = payload.get("tie_excluded") or []
+    if isinstance(excluded, str):
+        excluded = [item.strip() for item in excluded.split(";") if item.strip()]
     block = "\n".join([
         "## Recommendation",
         "",
         f"- Choice: {payload['recommendation']}",
         f"- Best fit: {payload.get('best_fit') or ''}",
+        f"- Axis: {payload.get('axis') or ''}",
         "- Alternatives: " + "; ".join(alternatives),
         f"- Assumptions: {payload.get('assumptions') or ''}",
         "- Gaps: " + "; ".join(gaps),
         f"- Binding: {payload.get('binding') or ''}",
         f"- Revisit: {payload.get('revisit') or ''}",
+        "- Tie excluded: " + "; ".join(str(item) for item in excluded),
         f"- Provisional: {'yes' if result['provisional'] else 'no'}",
         f"- Reason: {payload.get('reason') or ''}",
         "",
@@ -820,7 +991,12 @@ def add_decision(home: Path, fields: dict) -> dict:
     section = text[_start:_end]
     existing = _blocks(section)
     if any(did == fields["id"] for did, _raw in existing):
-        raise ModelError(f"Decision {fields['id']} already exists. Record a revision instead of a second copy.", "decision")
+        raise ModelError(
+            f"Decision {fields['id']} already exists. Revise it with "
+            f'`revise --id {fields["id"]} --reason "<why>" --input <file.json>`. '
+            "Do not add a second copy and do not edit the file by hand.",
+            "decision",
+        )
     revision, text = _bump_proposed(home, text)
     fields = dict(fields)
     fields["Revision"] = revision
@@ -841,24 +1017,15 @@ def add_decision(home: Path, fields: dict) -> dict:
 
 
 def add_question(home: Path, fields: dict) -> dict:
-    _slug(fields["id"], "Question id")
     path = home / "questions.md"
     text = path.read_text(encoding="utf-8")
     if f"### {fields['id']}\n" in text:
-        raise ModelError(f"Question {fields['id']} already exists.", "question")
-    block = "\n".join([
-        f"### {fields['id']}",
-        f"- Affects: {fields.get('affects') or ''}",
-        f"- Provider: {fields.get('provider') or 'unknown'}",
-        f"- Blocks: {fields.get('blocks') or ''}",
-        "- Status: open",
-        "",
-        (fields.get("body") or "").strip(),
-        "",
-    ])
-    if not text.endswith("\n"):
-        text += "\n"
-    path.write_text(text + block, encoding="utf-8")
+        raise ModelError(
+            f"Question {fields['id']} already exists. Revise it with "
+            f'`revise --id {fields["id"]} --reason "<why>" --input <file.json>`.',
+            "question",
+        )
+    _append_question(home, fields)
     text_p = _proposed_text(home)
     revision = _save_proposed(home, text_p)
     return {"ok": True, "id": fields["id"], "revision": revision, "status": "open"}
@@ -872,22 +1039,60 @@ def add_example(home: Path, kind: str, payload: dict) -> dict:
     if at < 0:
         raise ModelError("Proposed model has no Diagrams section.", "layout")
     gap = result.get("gap") or ""
-    blocks_physical = "yes" if result.get("result") == "gap" or result.get("blocks_physical") else "no"
+    blocks_physical = "yes" if result.get("result") in ("gap", "question") or result.get("blocks_physical") else "no"
+    if payload.get("narrative"):
+        narrative = str(payload["narrative"]).strip()
+    elif kind == "views":
+        narrative = "Both views stay available. Neither is the default. Local obligations stay in the platform view."
+    else:
+        narrative = gap or "The example matches the recorded case."
     block = "\n".join([
         f"### {kind}",
         f"- Kind: {kind}",
         f"- Result: {result['result']}",
         f"- Gap: {gap}",
         f"- Blocks physical: {blocks_physical}",
+        "- Status: proposed",
         "",
-        (payload.get("narrative") or gap or "The example matches the recorded grains.").strip(),
+        narrative,
         "",
     ])
     # Insert before Diagrams, after existing examples.
     text = text[:at] + "\n" + block + text[at:]
+    if result.get("open_question"):
+        _append_question(home, {
+            "id": "history-window-coverage",
+            "affects": payload.get("affects") or "",
+            "provider": payload.get("provider") or "unknown",
+            "blocks": kind,
+            "body": result.get("gap") or "The other history source coverage is unknown.",
+        })
+        result["question_id"] = "history-window-coverage"
     revision = _save_proposed(home, text)
     result["revision"] = revision
     return result
+
+
+def _append_question(home: Path, fields: dict) -> None:
+    """Append one open question. Does not bump the revision; the caller does."""
+    _slug(fields["id"], "Question id")
+    path = home / "questions.md"
+    text = path.read_text(encoding="utf-8")
+    if f"### {fields['id']}\n" in text:
+        return
+    block = "\n".join([
+        f"### {fields['id']}",
+        f"- Affects: {fields.get('affects') or ''}",
+        f"- Provider: {fields.get('provider') or 'unknown'}",
+        f"- Blocks: {fields.get('blocks') or ''}",
+        "- Status: open",
+        "",
+        (fields.get("body") or "").strip(),
+        "",
+    ])
+    if not text.endswith("\n"):
+        text += "\n"
+    path.write_text(text + "\n" + block, encoding="utf-8")
 
 
 def add_diagram(home: Path, diagram_id: str, kind: str, caption: str, mermaid: str) -> dict:
@@ -1114,10 +1319,42 @@ def _pins(home: Path) -> list[dict]:
     return pins
 
 
+def _recommendation_fields(home: Path) -> dict[str, str]:
+    text = _proposed_text(home)
+    start = text.find("\n## Recommendation\n")
+    end = text.find("\n## Decisions\n")
+    if start < 0 or end < 0:
+        return {}
+    fields: dict[str, str] = {}
+    for line in text[start:end].splitlines():
+        if line.startswith("- ") and ": " in line:
+            key, _, val = line[2:].partition(": ")
+            fields[key] = val
+    return fields
+
+
+def _tie_excluded(fields: dict[str, str], axis: str) -> bool:
+    phrase = f"tie on axis {axis} excluded".lower()
+    blob = " ".join([
+        fields.get("Tie excluded", ""),
+        fields.get("Reason", ""),
+        fields.get("Revisit", ""),
+        fields.get("Best fit", ""),
+    ]).lower()
+    if phrase in blob:
+        return True
+    named = {item.strip().lower() for item in fields.get("Tie excluded", "").split(";") if item.strip()}
+    return axis.lower() in named
+
+
 def _internal_issues(home: Path) -> list[str]:
     issues = []
     seen: dict[tuple[str, str], tuple[str, str]] = {}
     approvals = current_approvals(home)
+    recommendation = _recommendation_fields(home)
+    best = recommendation.get("Best fit", "").strip()
+    choice = recommendation.get("Choice", "").strip()
+    leans = bool(best) and choice not in ("tie", "held", "")
     for did, raw in _decision_map(home):
         parsed = _parse_block(raw)
         key = (parsed.get("Scope", ""), parsed.get("Measure", ""))
@@ -1135,6 +1372,14 @@ def _internal_issues(home: Path) -> list[str]:
             issues.append(f"Internal inconsistency: {did} is conditional and also marked implementable.")
         if parsed.get("Stage") == "physical-design" and parsed.get("Implementable") == "yes" and "business-model" not in approvals:
             issues.append(f"Internal inconsistency: {did} is marked implementable while the business model is not approved.")
+        if leans and parsed.get("Outcome") == "tie":
+            axis = parsed.get("Axis") or "unspecified"
+            rec_axis = recommendation.get("Axis", "").strip()
+            same_axis = not rec_axis or rec_axis == axis
+            if same_axis and not _tie_excluded(recommendation, axis):
+                issues.append(
+                    f"Internal inconsistency: recommendation best fit leans one way while {did} on axis {axis} is a tie."
+                )
     return issues
 
 
@@ -1300,10 +1545,10 @@ def normalize_text(text: str) -> str:
     return "\n".join(sorted(lines))
 
 
-def auto_begin(home: Path, minutes: int, passes: int, now: str) -> dict:
+def auto_begin(home: Path, minutes: int, passes: int, now: str | None = None, test_clock: bool = False) -> dict:
     if minutes < 1 or passes < 1:
         raise ModelError("The budget needs a positive minute limit and a positive pass limit.", "budget")
-    moment = _now(now)
+    moment = _clock(now, test_clock)
     data = {
         "Minutes": str(minutes),
         "Passes": str(passes),
@@ -1313,6 +1558,9 @@ def auto_begin(home: Path, minutes: int, passes: int, now: str) -> dict:
         "Stop": "",
         "Last progress": "",
         "Last unresolved": "",
+        "Baseline": "no",
+        "Last at": moment.isoformat(),
+        "Revise in pass": "",
     }
     _write_run(home, data, [], [])
     if (home / "checkpoint.md").is_file():
@@ -1323,23 +1571,11 @@ def auto_begin(home: Path, minutes: int, passes: int, now: str) -> dict:
         "minutes": minutes,
         "passes": passes,
         "started": data["Started"],
-        "note": "Budget applies to this run only. Passes are shared across stages and are not reset. No watcher is started.",
+        "note": "Budget applies to this run only. Passes are shared across stages and are not reset. The first proposal is a baseline, not a correction pass. No watcher is started.",
     }
 
 
-def auto_pass(
-    home: Path,
-    fingerprint: str,
-    unresolved: int,
-    progress: str,
-    now: str,
-    text: str | None = None,
-    stage: str | None = None,
-) -> dict:
-    if progress not in ("yes", "no"):
-        raise ModelError("Progress is yes or no.", "progress")
-    if stage and stage not in STAGES:
-        raise ModelError("Stage must be business-model or physical-design.", "stage")
+def _open_run(home: Path) -> tuple[Path, str, dict[str, str]]:
     path = _run_path(home)
     if not path.is_file():
         raise ModelError("No auto run is open. Start one only after the budget is approved.", "resume")
@@ -1350,42 +1586,124 @@ def auto_pass(
             "This run already stopped. Resume needs a new auto-flow invocation and a new approved budget. Nothing is watching between runs.",
             "resume",
         )
-    moment = _now(now)
+    return path, raw, data
+
+
+def _record_baseline(home: Path, data: dict[str, str], raw: str, fingerprint: str, norm: str, moment: datetime, stage: str | None) -> dict:
+    if data.get("Baseline") == "yes":
+        raise ModelError("A baseline is already recorded. Further changes are correction passes (auto-pass).", "baseline")
+    data["Baseline"] = "yes"
+    data["Last at"] = moment.isoformat()
+    data["Revise in pass"] = ""
+    fps = _fingerprints(raw)
+    norms = _norms(raw)
+    fps.append(fingerprint)
+    norms.append(norm)
+    _write_run(home, data, fps, norms)
+    return {
+        "ok": True,
+        "applied": True,
+        "baseline": True,
+        "stop": "",
+        "passes_used": int(data.get("Passes used") or 0),
+        "stage": stage or "",
+        "counted_as_pass": False,
+        "note": "The first proposal is a baseline. It does not use a correction pass. The approved pass budget is still available for corrections.",
+    }
+
+
+def auto_baseline(
+    home: Path,
+    fingerprint: str,
+    unresolved: int,
+    now: str | None = None,
+    text: str | None = None,
+    stage: str | None = None,
+    test_clock: bool = False,
+) -> dict:
+    if stage and stage not in STAGES:
+        raise ModelError("Stage must be business-model or physical-design.", "stage")
+    _path, raw, data = _open_run(home)
+    moment = _clock(now, test_clock)
+    started = _now(data["Started"])
+    if (moment - started).total_seconds() >= int(data["Minutes"]) * 60:
+        data["Open"] = "no"
+        data["Stop"] = "time"
+        data["Last at"] = moment.isoformat()
+        _write_run(home, data, _fingerprints(raw), _norms(raw))
+        _checkpoint(home, "time", True, unresolved)
+        return {
+            "ok": True,
+            "applied": False,
+            "baseline": False,
+            "stop": "time",
+            "passes_used": int(data["Passes used"]),
+            "unfinished": True,
+            "note": "The time limit was reached before the baseline was recorded. The baseline did not start.",
+        }
+    norm = hashlib.sha256(normalize_text(text if text is not None else fingerprint).encode()).hexdigest()
+    return _record_baseline(home, data, raw, fingerprint, norm, moment, stage)
+
+
+def auto_pass(
+    home: Path,
+    fingerprint: str,
+    unresolved: int,
+    progress: str,
+    now: str | None = None,
+    text: str | None = None,
+    stage: str | None = None,
+    test_clock: bool = False,
+) -> dict:
+    if progress not in ("yes", "no"):
+        raise ModelError("Progress is yes or no.", "progress")
+    if stage and stage not in STAGES:
+        raise ModelError("Stage must be business-model or physical-design.", "stage")
+    _path, raw, data = _open_run(home)
+    moment = _clock(now, test_clock)
     started = _now(data["Started"])
     elapsed = (moment - started).total_seconds()
     limit = int(data["Minutes"]) * 60
     if elapsed >= limit:
         data["Open"] = "no"
         data["Stop"] = "time"
+        data["Last at"] = moment.isoformat()
         _write_run(home, data, _fingerprints(raw), _norms(raw))
         _checkpoint(home, "time", True, unresolved)
         return {
             "ok": True,
             "applied": False,
+            "baseline": False,
             "stop": "time",
             "passes_used": int(data["Passes used"]),
             "unfinished": True,
             "note": "The time limit was reached between passes. The pass did not start. Time is not preempted mid-pass.",
         }
+    norm = hashlib.sha256(normalize_text(text if text is not None else fingerprint).encode()).hexdigest()
+    if data.get("Baseline") != "yes":
+        return _record_baseline(home, data, raw, fingerprint, norm, moment, stage)
     used = int(data["Passes used"])
     if used >= int(data["Passes"]):
         data["Open"] = "no"
         data["Stop"] = "passes"
+        data["Last at"] = moment.isoformat()
         _write_run(home, data, _fingerprints(raw), _norms(raw))
         _checkpoint(home, "passes", True, unresolved)
         return {
             "ok": True,
             "applied": False,
+            "baseline": False,
             "stop": "passes",
             "passes_used": used,
             "unfinished": True,
-            "note": "The shared correction-pass budget is used up. It was not reset for a new stage.",
+            "note": "The shared correction-pass budget is used up. It was not reset for a new stage. The baseline was not a correction pass.",
         }
     fps = _fingerprints(raw)
     norms = _norms(raw)
-    norm = hashlib.sha256(normalize_text(text if text is not None else fingerprint).encode()).hexdigest()
     used += 1
     data["Passes used"] = str(used)
+    data["Last at"] = moment.isoformat()
+    data["Revise in pass"] = ""
     cycle = False
     if fps and fingerprint in fps and fingerprint != fps[-1]:
         cycle = True
@@ -1421,12 +1739,14 @@ def auto_pass(
     return {
         "ok": True,
         "applied": True,
+        "baseline": False,
         "stop": stop,
         "passes_used": used,
         "stage": stage or "",
         "stable": stable,
         "stall": stalled,
         "cycle": cycle,
+        "counted_as_pass": True,
         "unfinished": bool(stop) and not stable,
         "heuristic": "Normalized text is a cycle heuristic. It is not proof that two wordings mean the same thing.",
     }
@@ -1456,6 +1776,222 @@ def auto_finish(home: Path, root: Path) -> dict:
     report["unfinished"] = data.get("Stop") not in ("stable", "")
     report["note"] = report["statement"]
     return report
+
+
+def _section_bounds(text: str, heading: str) -> tuple[int, int]:
+    marker = f"\n## {heading}\n"
+    at = text.find(marker)
+    if at < 0:
+        raise ModelError(f"Proposed model has no {heading} section.", "layout")
+    start = at + 1
+    rest = text.find("\n## ", start + len(f"## {heading}"))
+    end = len(text) if rest < 0 else rest + 1
+    return start, end
+
+
+def _replace_section_block(text: str, heading: str, item_id: str, new_block: str) -> tuple[str, str]:
+    start, end = _section_bounds(text, heading)
+    section = text[start:end]
+    old = ""
+    blocks = []
+    found = False
+    for did, raw in _blocks(section):
+        if did == item_id and not found:
+            old = raw
+            found = True
+            blocks.append(new_block if new_block.endswith("\n") else new_block + "\n")
+        else:
+            blocks.append(raw)
+    if not found:
+        raise ModelError(f"{item_id} was not found under {heading}.", "revise")
+    rebuilt = f"## {heading}\n\n" + "".join(blocks)
+    if not rebuilt.endswith("\n"):
+        rebuilt += "\n"
+    return text[:start] + rebuilt + text[end:], old
+
+
+def _append_history(home: Path, revision: str, item_id: str, kind: str, reason: str, old_block: str) -> None:
+    path = home / "history.md"
+    name = _index(home)["Model"]
+    if path.is_file():
+        text = path.read_text(encoding="utf-8")
+    else:
+        text = f"# History for {name}\n\nPrevious text of revised items. The current text stays in the model files.\n"
+    entry = "\n".join([
+        f"## {revision} {item_id}",
+        "",
+        f"- Item: {item_id}",
+        f"- Kind: {kind}",
+        f"- Reason: {reason.strip()}",
+        "",
+        old_block.strip(),
+        "",
+    ])
+    if not text.endswith("\n"):
+        text += "\n"
+    path.write_text(text + "\n" + entry, encoding="utf-8")
+
+
+def _note_revise_in_pass(home: Path, item_id: str) -> dict:
+    path = _run_path(home)
+    if not path.is_file():
+        return {"counted_as_pass": False, "passes_used": 0, "pass_effect": "no-auto-run"}
+    raw = path.read_text(encoding="utf-8")
+    data = _load_lines(path)
+    used = int(data.get("Passes used") or 0)
+    if data.get("Open") == "yes":
+        data["Revise in pass"] = item_id
+        _write_run(home, data, _fingerprints(raw), _norms(raw))
+        return {"counted_as_pass": False, "passes_used": used, "pass_effect": "inside-current-pass"}
+    return {"counted_as_pass": False, "passes_used": used, "pass_effect": "run-closed"}
+
+
+def _example_block(kind: str, item_id: str, result: dict, payload: dict) -> str:
+    gap = result.get("gap") or ""
+    blocks_physical = "yes" if result.get("result") in ("gap", "question") or result.get("blocks_physical") else "no"
+    narrative = (payload.get("narrative") or gap or "The example matches the recorded case.").strip()
+    return "\n".join([
+        f"### {item_id}",
+        f"- Kind: {kind}",
+        f"- Result: {result['result']}",
+        f"- Gap: {gap}",
+        f"- Blocks physical: {blocks_physical}",
+        "- Status: proposed",
+        "",
+        narrative,
+        "",
+    ])
+
+
+def revise(home: Path, item_id: str, content: dict, reason: str) -> dict:
+    if not (reason or "").strip():
+        raise ModelError("revise needs a short reason.", "revise")
+    if not (item_id or "").strip():
+        raise ModelError("revise needs the item id.", "revise")
+    text = _proposed_text(home)
+    d_start, d_end = _decisions_span(text)
+    decision_ids = {did for did, _raw in _blocks(text[d_start:d_end])}
+    ex_start, ex_end = _section_bounds(text, "Worked examples")
+    example_ids = {did for did, _raw in _blocks(text[ex_start:ex_end])}
+    questions = (home / "questions.md").read_text(encoding="utf-8")
+    question_ids = {did for did, _raw in _blocks(questions)}
+    diag_start, diag_end = _section_bounds(text, "Diagrams")
+    diagram_ids = {did for did, _raw in _blocks(text[diag_start:diag_end])}
+    if item_id in decision_ids:
+        kind = "decision"
+    elif item_id in example_ids:
+        kind = "example"
+    elif item_id in question_ids:
+        kind = "question"
+    elif item_id in diagram_ids:
+        kind = "diagram"
+    else:
+        raise ModelError(
+            f"No decision, worked example, question, or diagram is named {item_id}. "
+            "revise records a new version of an item that is already there.",
+            "revise",
+        )
+    index_revision = _index(home)["Revision"]
+    if kind == "decision":
+        fields = _normalize_decision(content)
+        fields["id"] = item_id
+        fields["Status"] = "proposed"
+        _validate_decision(fields, _index(home)["Flow"], current_approvals(home))
+        text = _proposed_text(home)
+        _text, old = _replace_section_block(text, "Decisions", item_id, "### placeholder\n")
+        _append_history(home, index_revision, item_id, kind, reason, old)
+        revision, text = _bump_proposed(home, text)
+        fields["Revision"] = revision
+        text, _old = _replace_section_block(text, "Decisions", item_id, _serialize_block(fields))
+        (home / "proposed.md").write_text(text, encoding="utf-8")
+        status = "proposed"
+    elif kind == "example":
+        stored = _parse_block(dict(_blocks(text[ex_start:ex_end]))[item_id])
+        example_kind = str(content.get("kind") or stored.get("Kind") or item_id)
+        result = check_example(example_kind, content)
+        if result.get("open_question"):
+            _append_question(home, {
+                "id": "history-window-coverage",
+                "affects": content.get("affects") or "",
+                "provider": content.get("provider") or "unknown",
+                "blocks": item_id,
+                "body": result.get("gap") or "The other history source coverage is unknown.",
+            })
+            result["question_id"] = "history-window-coverage"
+        text = _proposed_text(home)
+        _text, old = _replace_section_block(text, "Worked examples", item_id, "### placeholder\n")
+        _append_history(home, index_revision, item_id, kind, reason, old)
+        revision, text = _bump_proposed(home, text)
+        block = _example_block(example_kind, item_id, result, content)
+        text, _old = _replace_section_block(text, "Worked examples", item_id, block)
+        (home / "proposed.md").write_text(text, encoding="utf-8")
+        status = "proposed"
+    elif kind == "question":
+        old = dict(_blocks(questions))[item_id]
+        _append_history(home, index_revision, item_id, kind, reason, old)
+        body = "\n".join([
+            f"### {item_id}",
+            f"- Affects: {content.get('affects') or ''}",
+            f"- Provider: {content.get('provider') or 'unknown'}",
+            f"- Blocks: {content.get('blocks') or ''}",
+            "- Status: open",
+            "",
+            (content.get("body") or "").strip(),
+            "",
+        ])
+        updated = questions
+        # Replace the one block. Questions file has no Decisions heading, so swap by id.
+        parts = []
+        for did, raw in _blocks(questions):
+            parts.append(body if did == item_id else raw)
+        # Keep the preamble before the first ###.
+        head = questions.split("### ", 1)[0]
+        updated = head + "".join(parts)
+        if not updated.endswith("\n"):
+            updated += "\n"
+        (home / "questions.md").write_text(updated, encoding="utf-8")
+        revision = _save_proposed(home, _proposed_text(home))
+        status = "open"
+    else:
+        diagram_kind = content.get("kind")
+        caption = content.get("caption")
+        mermaid = content.get("mermaid")
+        if diagram_kind not in ("er", "flow") or not caption or not mermaid:
+            raise ModelError("A diagram revise needs kind, caption, and mermaid.", "revise")
+        if diagram_kind == "er":
+            parse_er(str(mermaid))
+        else:
+            parse_flow(str(mermaid))
+        text = _proposed_text(home)
+        _text, old = _replace_section_block(text, "Diagrams", item_id, "### placeholder\n")
+        _append_history(home, index_revision, item_id, kind, reason, old)
+        revision, text = _bump_proposed(home, text)
+        block = "\n".join([
+            f"### {item_id}",
+            f"- Kind: {diagram_kind}",
+            f"- Caption: {caption}",
+            "- Status: proposed",
+            "",
+            "```mermaid",
+            str(mermaid).strip("\n"),
+            "```",
+            "",
+        ])
+        text, _old = _replace_section_block(text, "Diagrams", item_id, block)
+        (home / "proposed.md").write_text(text, encoding="utf-8")
+        status = "proposed"
+    pass_note = _note_revise_in_pass(home, item_id)
+    return {
+        "ok": True,
+        "id": item_id,
+        "kind": kind,
+        "revision": revision,
+        "status": status,
+        "reason": reason.strip(),
+        "previous_revision": index_revision,
+        "history": "history.md",
+        **pass_note,
+    }
 
 
 def feedback(home: Path, review: Path, comment: str, decision: str) -> dict:
@@ -1678,80 +2214,160 @@ ACCENT = (30, 70, 110)
 MUTED = (70, 80, 90)
 
 
-def draw_er(parsed: dict) -> Canvas:
-    names = list(parsed["entities"])
-    box_w, box_h = 220, 36 + 16 * max(1, max(len(v) for v in parsed["entities"].values()))
-    gap = 70
-    width = 40 + len(names) * (box_w + gap)
-    height = 80 + box_h + 80
-    canvas = Canvas(width, height)
-    canvas.text(16, 12, "ER structure. Legend: lines are relationships, not movement.", INK, 1)
-    centers = {}
-    for i, name in enumerate(names):
-        x = 20 + i * (box_w + gap)
-        y = 40
-        canvas.rect(x, y, box_w, box_h, ACCENT, fill=False)
-        canvas.rect(x, y, box_w, 22, ACCENT, fill=True)
-        canvas.text(x + 6, y + 4, _label(name, 18), (255, 255, 255), 1)
-        for j, attr in enumerate(parsed["entities"][name][:8]):
-            canvas.text(x + 6, y + 28 + j * 14, _label(attr, 24), INK, 1)
-        centers[name] = (x + box_w, y + box_h // 2, x, y + box_h // 2)
-    for rel in parsed["rels"]:
-        x1 = centers[rel["left"]][0]
-        y1 = centers[rel["left"]][1]
-        x2 = centers[rel["right"]][2]
-        y2 = centers[rel["right"]][3]
-        if x2 < x1:
-            x1, x2 = centers[rel["left"]][2], centers[rel["right"]][0]
-        canvas.line(x1, y1, x2, y2, ACCENT)
-        canvas.text((x1 + x2) // 2 - 20, y1 - 18, _label(rel["label"], 16), MUTED, 1)
-        canvas.text(x1 + 2, y1 + 4, rel["left_card"], MUTED, 1)
-        canvas.text(x2 - 24, y2 + 4, rel["right_card"], MUTED, 1)
-    canvas.text(16, height - 28, "Cardinality marks follow Mermaid crow-foot spelling. Not a formal UML claim.", MUTED, 1)
-    return canvas
+def _shown_lines(attrs: list[str], limit: int = 8) -> list[str]:
+    shown = [_label(item, 16) for item in attrs[:limit]]
+    extra = len(attrs) - limit
+    if extra > 0:
+        shown.append(f"+{extra} more")
+    return shown or [""]
 
 
-def draw_flow(parsed: dict) -> Canvas:
-    names = list(parsed["nodes"])
-    box_w, box_h = 160, 48
-    if parsed["direction"] == "TD":
-        width, height = 360, 40 + len(names) * 100
+def _grid_parts(count: int, box_w: int, box_h: int, gap_x: int, gap_y: int, top_down: bool = False) -> list[tuple[list[tuple[int, int]], int, int]]:
+    """Place nodes in rows, or top-down columns. Split when a page would shrink the text."""
+    stride_x = box_w + gap_x
+    stride_y = box_h + gap_y
+    margin_top, margin_bottom = 44, 32
+    rows_fit = max(1, (DIAGRAM_MAX_H - margin_top - margin_bottom) // max(stride_y, 1))
+    cols_fit = max(1, (LANDSCAPE_MAX_W - 40) // max(stride_x, 1))
+    if top_down:
+        per_row = 1 if count <= rows_fit else min(cols_fit, (count + rows_fit - 1) // rows_fit)
+        per_part = per_row * rows_fit
+    elif count * stride_x + 40 <= LANDSCAPE_MAX_W:
+        per_row = max(count, 1)
+        per_part = count
     else:
-        width, height = 40 + len(names) * 220, 220
-    canvas = Canvas(max(width, 320), max(height, 180))
-    canvas.text(12, 10, "Flow. Arrow means movement, a layer, or ownership, as labelled.", INK, 1)
-    pos = {}
-    for i, name in enumerate(names):
-        if parsed["direction"] == "TD":
-            x, y = 80, 40 + i * 90
-        else:
-            x, y = 20 + i * 210, 70
-        pos[name] = (x, y)
-        canvas.rect(x, y, box_w, box_h, ACCENT, fill=False)
-        canvas.text(x + 8, y + 16, _label(parsed["nodes"][name], 16), INK, 1)
-    for edge in parsed["edges"]:
-        x1, y1 = pos[edge["src"]]
-        x2, y2 = pos[edge["dst"]]
-        if parsed["direction"] == "TD":
-            canvas.line(x1 + box_w // 2, y1 + box_h, x2 + box_w // 2, y2, ACCENT)
-            canvas.text(x1 + box_w // 2 + 6, (y1 + y2) // 2, _label(edge["label"], 18), MUTED, 1)
-        else:
+        per_row = cols_fit
+        per_part = per_row * rows_fit
+    parts = []
+    for start in range(0, count, per_part):
+        n = min(per_part, count - start)
+        cols = 1 if top_down and n <= rows_fit else min(per_row, n)
+        if top_down and n > rows_fit:
+            cols = min(per_row, (n + rows_fit - 1) // rows_fit)
+        rows = (n + cols - 1) // cols
+        positions = []
+        for i in range(n):
+            if top_down:
+                col, row = divmod(i, rows_fit)
+                if col >= cols:
+                    row = i  # safety
+            else:
+                row, col = divmod(i, cols)
+            positions.append((20 + col * stride_x, margin_top + row * stride_y))
+        width = 20 + max(x for x, _y in positions) + box_w + 20
+        height = margin_top + rows * stride_y + margin_bottom
+        parts.append((positions, width, height))
+    return parts
+
+
+def _paint_boxes(names: list[str], labels: dict[str, list[str]], box_w: int, box_h: int, gap_x: int, gap_y: int, top_down: bool, title: str, footer: str) -> list[Canvas]:
+    parts = _grid_parts(len(names), box_w, box_h, gap_x, gap_y, top_down=top_down)
+    canvases = []
+    offset = 0
+    line_h = 8 * LABEL_SCALE
+    for positions, width, height in parts:
+        canvas = Canvas(max(width, 240), max(height, 120))
+        canvas.text(12, 8, _label(title, 42), INK, LABEL_SCALE)
+        chunk = names[offset : offset + len(positions)]
+        pos = {}
+        for (x, y), name in zip(positions, chunk):
+            pos[name] = (x, y)
+            canvas.rect(x, y, box_w, box_h, ACCENT, fill=False)
+            canvas.rect(x, y, box_w, 22, ACCENT, fill=True)
+            canvas.text(x + 6, y + 4, _label(labels[name][0], 16), (255, 255, 255), LABEL_SCALE)
+            for j, line in enumerate(labels[name][1:]):
+                canvas.text(x + 6, y + 26 + j * line_h, _label(line, 16), INK, LABEL_SCALE)
+        canvases.append((canvas, pos, chunk))
+        offset += len(positions)
+    # footer on each canvas
+    painted = []
+    for canvas, pos, chunk in canvases:
+        canvas.text(12, canvas.h - 22, _label(footer, 48), MUTED, LABEL_SCALE)
+        painted.append((canvas, pos))
+    return painted
+
+
+def draw_er(parsed: dict) -> list[Canvas]:
+    names = list(parsed["entities"])
+    box_w, gap_x, gap_y = 220, 48, 28
+    shown = {name: [name, *_shown_lines(parsed["entities"][name])] for name in names}
+    box_h = 26 + (8 * LABEL_SCALE) * max(1, max(len(lines) - 1 for lines in shown.values()))
+    painted = _paint_boxes(
+        names, shown, box_w, box_h, gap_x, gap_y, False,
+        "ER. Lines are relationships.",
+        "Crow-foot marks are Mermaid spelling, not a UML claim.",
+    )
+    canvases = []
+    for canvas, pos in painted:
+        for rel in parsed["rels"]:
+            if rel["left"] not in pos or rel["right"] not in pos:
+                continue
+            x1, y1 = pos[rel["left"]]
+            x2, y2 = pos[rel["right"]]
             canvas.line(x1 + box_w, y1 + box_h // 2, x2, y2 + box_h // 2, ACCENT)
-            canvas.text(x1 + box_w + 4, y1 + 4, _label(edge["label"], 16), MUTED, 1)
-    canvas.text(12, canvas.h - 24, "Legend is local communication, not an official method notation.", MUTED, 1)
-    return canvas
+            canvas.text(x1 + 4, y1 + box_h - 16, _label(rel["label"], 14), MUTED, LABEL_SCALE)
+        canvases.append(canvas)
+    return canvases
+
+
+def draw_flow(parsed: dict) -> list[Canvas]:
+    names = list(parsed["nodes"])
+    box_w, box_h, gap_x, gap_y = 180, 48, 40, 36
+    labels = {name: [parsed["nodes"][name]] for name in names}
+    top_down = parsed["direction"] == "TD"
+    painted = _paint_boxes(
+        names, labels, box_w, box_h, gap_x, gap_y, top_down,
+        "Flow. Arrow means movement or ownership.",
+        "The legend is local communication, not a method notation.",
+    )
+    canvases = []
+    for canvas, pos in painted:
+        for edge in parsed["edges"]:
+            if edge["src"] not in pos or edge["dst"] not in pos:
+                continue
+            x1, y1 = pos[edge["src"]]
+            x2, y2 = pos[edge["dst"]]
+            if top_down:
+                canvas.line(x1 + box_w // 2, y1 + box_h, x2 + box_w // 2, y2, ACCENT)
+            else:
+                canvas.line(x1 + box_w, y1 + box_h // 2, x2, y2 + box_h // 2, ACCENT)
+            if edge["label"]:
+                canvas.text(x1 + 8, y1 + 4, _label(edge["label"], 12), MUTED, LABEL_SCALE)
+        canvases.append(canvas)
+    return canvases
+
+
+def render_diagram_parts(name: str, source: str) -> list[tuple[str, Canvas, str]]:
+    first = next((ln.strip() for ln in source.splitlines() if ln.strip()), "")
+    if first.startswith("erDiagram"):
+        canvases = draw_er(parse_er(source))
+    elif first.startswith("flowchart"):
+        canvases = draw_flow(parse_flow(source))
+    else:
+        raise ModelError(
+            f"This exporter draws erDiagram and flowchart only. It will not hide an unsupported diagram ({first or 'empty'}).",
+            "diagram",
+        )
+    if not canvases:
+        raise ModelError("The diagram has nothing to draw.", "diagram")
+    total = len(canvases)
+    parts = []
+    for index, canvas in enumerate(canvases, start=1):
+        if canvas.dark_pixels() < 50:
+            raise ModelError("A diagram rendered as a blank image. The PDF is not written.", "diagram")
+        if total == 1:
+            caption = name
+            note = ""
+        else:
+            caption = f"{name} (part {index} of {total})"
+            note = "This diagram is split into numbered parts so the text stays readable."
+        parts.append((caption, canvas, note))
+    return parts
 
 
 def render_mermaid(source: str) -> Canvas:
-    first = next((ln.strip() for ln in source.splitlines() if ln.strip()), "")
-    if first.startswith("erDiagram"):
-        return draw_er(parse_er(source))
-    if first.startswith("flowchart"):
-        return draw_flow(parse_flow(source))
-    raise ModelError(
-        f"This exporter draws erDiagram and flowchart only. It will not hide an unsupported diagram ({first or 'empty'}).",
-        "diagram",
-    )
+    parts = render_diagram_parts("diagram", source)
+    return parts[0][1]
 
 
 def _png(canvas: Canvas) -> bytes:
@@ -1788,33 +2404,40 @@ def _wrap(text: str, width: int = 90) -> list[str]:
     return lines or [""]
 
 
-def build_pdf(title: str, sections: list[tuple[str, list[str]]], images: list[tuple[str, Canvas]]) -> bytes:
-    """One PDF. Images are Flate-compressed RGB XObjects, not Mermaid source."""
-    page_w, page_h = 612, 792
+def build_pdf(
+    title: str,
+    sections: list[tuple[str, list[str]]],
+    images: list[tuple[str, Canvas] | tuple[str, Canvas, str]],
+) -> bytes:
+    """One PDF. Each diagram is its own page. Images are RGB XObjects, not Mermaid source."""
+    portrait = (612, 792)
+    landscape = (792, 612)
     margin = 48
-    pages: list[tuple[str, list[int]]] = []
-    image_objs = []
-    # Build content streams referencing image indexes.
-    content_parts: list[list[str]] = [[]]
-    image_use: list[list[tuple[int, int]]] = [[]]  # (image index, y) per page — y tracked in stream directly
+    glyph_px = 7 * LABEL_SCALE
+    pages: list[dict] = []
 
-    def new_page():
-        content_parts.append([])
-        return len(content_parts) - 1
+    def start(width: int, height: int) -> dict:
+        page = {"w": width, "h": height, "ops": []}
+        pages.append(page)
+        return page
 
-    y = page_h - margin
+    page = start(*portrait)
+    y = portrait[1] - margin
 
-    def ensure(height: int):
-        nonlocal y
+    def ensure(height: int) -> None:
+        nonlocal page, y
         if y - height < margin:
-            new_page()
-            y = page_h - margin
+            page = start(page["w"], page["h"])
+            y = page["h"] - margin
 
-    def add_text(size: int, text: str):
+    def add_text(size: int, text: str) -> None:
         nonlocal y
-        for line in _wrap(text, 95 if size <= 11 else 80):
+        wrap = 100 if page["w"] > 700 else 90
+        for line in _wrap(text, wrap if size <= 11 else 78):
             ensure(size + 4)
-            content_parts[-1].append(f"BT /F1 {size} Tf {margin} {y - size} Td ({_pdf_escape(line)}) Tj ET")
+            page["ops"].append(
+                f"BT /F1 {size} Tf {margin} {y - size} Td ({_pdf_escape(line)}) Tj ET"
+            )
             y -= size + 4
 
     add_text(16, title)
@@ -1822,24 +2445,36 @@ def build_pdf(title: str, sections: list[tuple[str, list[str]]], images: list[tu
     for heading, paras in sections:
         add_text(13, heading)
         for para in paras:
-            add_text(10, para)
-        y -= 6
-    for index, (caption, canvas) in enumerate(images):
-        add_text(11, caption)
-        scale = min(1.0, (page_w - 2 * margin) / canvas.w, 360 / canvas.h)
+            for piece in str(para).splitlines() or [""]:
+                stripped = piece.strip()
+                if stripped.startswith("```") or stripped in ("erDiagram",) or stripped.startswith("flowchart"):
+                    continue
+                add_text(11 if piece.startswith("### ") else 10, piece)
+        y -= 4
+    image_objs: list[Canvas] = []
+    for index, item in enumerate(images):
+        caption, canvas = item[0], item[1]
+        note = item[2] if len(item) > 2 else ""
+        wide = canvas.w > PORTRAIT_MAX_W
+        pw, ph = landscape if wide else portrait
+        page = start(pw, ph)
+        y = ph - margin
+        add_text(12, caption)
+        if note:
+            add_text(10, note)
+        avail_w = pw - 2 * margin
+        avail_h = max(40, y - margin)
+        scale = min(1.0, avail_w / canvas.w, avail_h / canvas.h)
+        if scale * glyph_px < 8:
+            raise ModelError(
+                f"{caption} would shrink the text below a readable size. The PDF is not written.",
+                "diagram",
+            )
         dw, dh = canvas.w * scale, canvas.h * scale
-        ensure(int(dh) + 12)
-        y -= int(dh)
-        content_parts[-1].append(
-            f"q {dw:.2f} 0 0 {dh:.2f} {margin} {y} cm /Im{index + 1} Do Q"
-        )
-        y -= 16
+        y -= dh
+        page["ops"].append(f"q {dw:.2f} 0 0 {dh:.2f} {margin} {y:.2f} cm /Im{index + 1} Do Q")
         image_objs.append(canvas)
-    # Assemble objects.
-    streams = []
-    for part in content_parts:
-        data = ("\n".join(part) + "\n").encode("latin-1", errors="replace")
-        streams.append(data)
+    streams = [("\n".join(item["ops"]) + "\n").encode("latin-1", errors="replace") for item in pages]
     objects: list[bytes] = []
 
     def add_obj(body: bytes) -> int:
@@ -1847,9 +2482,7 @@ def build_pdf(title: str, sections: list[tuple[str, list[str]]], images: list[tu
         return len(objects)
 
     catalog_id = add_obj(b"<< /Type /Catalog /Pages 2 0 R >>")
-    # pages object filled later
-    pages_id = add_obj(b"")  # placeholder index 2
-    page_ids = []
+    pages_id = add_obj(b"")
     content_ids = []
     for data in streams:
         content_ids.append(add_obj(b"<< /Length %d >>\nstream\n" % len(data) + data + b"endstream"))
@@ -1862,17 +2495,17 @@ def build_pdf(title: str, sections: list[tuple[str, list[str]]], images: list[tu
         ).encode()
         image_ids.append(add_obj(header + raw + b"\nendstream"))
     font_id = add_obj(b"<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>")
-    for i, cid in enumerate(content_ids):
-        xobj = " ".join(f"/Im{n + 1} {image_ids[n]} 0 R" for n in range(len(image_ids)))
+    page_ids = []
+    xobj = " ".join(f"/Im{n + 1} {image_ids[n]} 0 R" for n in range(len(image_ids)))
+    for item, cid in zip(pages, content_ids):
         body = (
-            f"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 {page_w} {page_h}] "
+            f"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 {item['w']} {item['h']}] "
             f"/Contents {cid} 0 R /Resources << /Font << /F1 {font_id} 0 R >> "
             f"/XObject << {xobj} >> >> >>"
         ).encode()
         page_ids.append(add_obj(body))
     kids = " ".join(f"{pid} 0 R" for pid in page_ids)
     objects[pages_id - 1] = f"<< /Type /Pages /Count {len(page_ids)} /Kids [{kids}] >>".encode()
-    # Write file with xref.
     out = bytearray(b"%PDF-1.4\n")
     offsets = [0]
     for i, body in enumerate(objects, start=1):
@@ -1902,66 +2535,201 @@ def _short_sources(home: Path) -> list[str]:
     return rows
 
 
-def export_report(home: Path, now: str, kit_version: str) -> dict:
-    moment = _now(now)
+def _minutes_used(run: dict[str, str]) -> int:
+    started = run.get("Started") or ""
+    last = run.get("Last at") or started
+    if not started:
+        return 0
+    try:
+        delta = (_now(last) - _now(started)).total_seconds()
+    except ModelError:
+        return 0
+    return max(0, int(delta // 60))
+
+
+def _run_line(home: Path, index: dict[str, str]) -> str:
+    flow = index.get("Flow") or "manual"
+    checkpoint = "written" if (home / "checkpoint.md").is_file() else "not written"
+    run = _load_run(home)
+    if not run:
+        return f"Run: flow {flow}, no auto run, checkpoint {checkpoint}."
+    stop = run.get("Stop") or "in-progress"
+    used = run.get("Passes used") or "0"
+    limit = run.get("Passes") or "0"
+    budget = run.get("Minutes") or "0"
+    return (
+        f"Run: flow {flow}, stop {stop}, passes {used} of {limit}, "
+        f"minutes {_minutes_used(run)} of {budget}, checkpoint {checkpoint}."
+    )
+
+
+def _semi(value: str) -> list[str]:
+    return [item.strip() for item in (value or "").split(";") if item.strip()]
+
+
+def _section_items(text: str, heading: str) -> list[dict]:
+    try:
+        start, end = _section_bounds(text, heading)
+    except ModelError:
+        return []
+    return [_parse_block(raw) for _did, raw in _blocks(text[start:end])]
+
+
+def _field_block(parsed: dict, keys: list[str]) -> str:
+    lines = [f"### {parsed['id']}", ""]
+    for key in keys:
+        if parsed.get(key):
+            lines.append(f"- {key}: {parsed[key]}")
+    lines.append("")
+    body = (parsed.get("body") or "").strip()
+    if body:
+        lines.append(body)
+    return "\n".join(lines)
+
+
+_DECISION_KEYS = [
+    "Stage", "Revision", "Status", "Evidence", "Requirement", "Fit", "Outcome",
+    "Scope", "Axis", "Sources", "Depends", "Conditional", "Implementable",
+    "Grain", "Measure", "Short source", "Drift",
+]
+
+
+def _recommendation_body(home: Path) -> list[str]:
+    fields = _recommendation_fields(home)
+    if not fields:
+        return ["Not assessed yet."]
+    order = [
+        "Choice", "Best fit", "Axis", "Alternatives", "Assumptions", "Gaps",
+        "Binding", "Revisit", "Tie excluded", "Provisional", "Reason",
+    ]
+    lines = [f"- {key}: {fields[key]}" for key in order if fields.get(key, "").strip()]
+    return ["\n".join(lines)]
+
+
+def _comparison_body(home: Path) -> list[str]:
+    text = (home / "comparisons.md").read_text(encoding="utf-8")
+    area: list[str] = []
+    platform: list[str] = []
+    current = ""
+    for line in text.splitlines():
+        if line.strip() == "## Area":
+            current = "area"
+        elif line.strip() == "## Platform":
+            current = "platform"
+        elif line.startswith("- Obligations:"):
+            items = _semi(line.split(":", 1)[1])
+            if current == "area":
+                area = items
+            elif current == "platform":
+                platform = items
+    extra = [item for item in platform if item not in area]
+    area_text = "; ".join(area) if area else "none"
+    extra_text = "; ".join(extra) if extra else "none"
+    return [
+        "Both views stay available. Neither is the default.",
+        f"### Area\n\nObligations: {area_text}",
+        "### Platform\n\nLocal obligations are listed under Area and are kept in the platform view.\n"
+        f"Further obligations: {extra_text}",
+    ]
+
+
+def _confirmed_body(text: str, approvals: dict[str, str]) -> list[str]:
+    if not approvals:
+        return ["Nothing confirmed yet."]
+    kept = []
+    for line in text.splitlines():
+        if line.startswith("# "):
+            continue
+        if line.strip() == "## Approvals":
+            continue
+        if line.startswith("## "):
+            kept.append("### " + line[3:])
+        else:
+            kept.append(line)
+    body = "\n".join(kept).strip()
+    return [body or "Nothing confirmed yet."]
+
+
+def _transition_body(text: str) -> list[str]:
+    try:
+        start, end = _section_bounds(text, "Transition")
+    except ModelError:
+        return ["No structural transition is recorded yet."]
+    raw = "\n".join(text[start:end].splitlines()[1:]).strip()
+    return [raw or "No structural transition is recorded yet."]
+
+
+def export_report(home: Path, now: str | None = None, kit_version: str = "1.121.0", test_clock: bool = False) -> dict:
+    moment = _clock(now, test_clock)
     index = _index(home)
     proposed = _proposed_text(home)
     confirmed = _confirmed_text(home)
     before_proposed = proposed
     before_confirmed = confirmed
     approvals = current_approvals(home)
-    fences = _fences(proposed) + _fences(confirmed)
-    if not fences:
+    diagram_items = _section_items(proposed, "Diagrams")
+    if not diagram_items:
         raise ModelError("The saved model has no diagram to render. The PDF is not written.", "diagram")
-    images = []
-    for i, fence in enumerate(fences, start=1):
-        try:
-            images.append((f"Diagram {i}", render_mermaid(fence)))
-        except ModelError:
-            raise
-        if images[-1][1].dark_pixels() < 50:
-            raise ModelError("A diagram rendered as a blank image. The PDF is not written.", "diagram")
+    images: list[tuple[str, Canvas, str]] = []
+    diagram_paras = [
+        "The Markdown keeps the Mermaid source. The PDF draws that same revision as pictures.",
+        "A picture is not proof of a modeling method, an enforced key, or an empirical result.",
+    ]
+    for item in diagram_items:
+        fences = _fences(item.get("body") or "")
+        if not fences:
+            raise ModelError(f"Diagram {item['id']} has no Mermaid source. The PDF is not written.", "diagram")
+        parts = render_diagram_parts(item["id"], fences[0])
+        if len(parts) > 1:
+            diagram_paras.append(
+                f"{item['id']} is drawn in {len(parts)} numbered parts so the text stays readable."
+            )
+        diagram_paras.append(_field_block(item, ["Kind", "Caption", "Status"]))
+        images.extend(parts)
     revision = index["Revision"]
-    approval_lines = list(approvals.values()) or ["No stage is approved."]
-    questions = (home / "questions.md").read_text(encoding="utf-8")
-    comparisons = (home / "comparisons.md").read_text(encoding="utf-8")
-    sources = (home / "sources.md").read_text(encoding="utf-8")
+    approval_lines = list(approvals.values())
     version = f"{revision}-{_stamp(moment)}"
+    run_line = _run_line(home, index)
     summary = [
         f"Model {index['Model']} at revision {revision}. Flow recorded: {index['Flow']}.",
         "Approval applies only to the stage and revision named below. A business-model approval is not a physical-design approval.",
         "Proposed text that is not in the confirmed file is a proposal. Conditional text is not implementable.",
-        "This review reads the saved files. It does not model again.",
+        "This review reads the saved records. It does not model again.",
     ]
+    if approval_lines:
+        approval_status = "Approval: " + "; ".join(approval_lines)
+    else:
+        approval_status = "Approval: none"
     status = [
         f"Revision: {revision}",
         f"Scope confirmed: {index.get('Scope confirmed', 'no')}",
-        *[f"Current {line}" for line in approval_lines],
+        approval_status,
     ]
+    decisions = _section_items(proposed, "Decisions")
+    examples = _section_items(proposed, "Worked examples")
+    question_items = [_parse_block(raw) for _did, raw in _blocks((home / "questions.md").read_text(encoding="utf-8"))]
     sections_md = [
         ("## Summary", summary),
         ("## Status", status),
-        ("## Recommendation and decisions", [proposed.strip()]),
-        ("## Confirmed snapshot", [confirmed.strip()]),
-        ("## Comparisons", [comparisons.strip()]),
-        ("## Worked examples and questions", [questions.strip()]),
-        ("## Why, with short sources", _short_sources(home) or ["No decisions recorded."]),
-        ("## Diagrams", [
-            "The Markdown keeps the Mermaid source. The PDF draws that same revision as pictures.",
-            "A picture is not proof of a modeling method, an enforced key, or an empirical result.",
-            proposed[proposed.find("## Diagrams") :] if "## Diagrams" in proposed else "",
-        ]),
-        ("## Sources", [sources.strip()]),
+        ("## Recommendation", _recommendation_body(home)),
+        ("## Decisions", [_field_block(item, _DECISION_KEYS) for item in decisions] or ["None recorded yet."]),
+        ("## Worked examples", [_field_block(item, ["Kind", "Result", "Gap", "Blocks physical", "Status"]) for item in examples] or ["Nothing recorded yet."]),
+        ("## Confirmed", _confirmed_body(confirmed, approvals)),
+        ("## Approvals", approval_lines or ["None yet."]),
+        ("## Comparisons", _comparison_body(home)),
+        ("## Questions", [_field_block(item, ["Affects", "Provider", "Blocks", "Status"]) for item in question_items] or ["None yet."]),
+        ("## Diagrams", diagram_paras),
+        ("## Transition", _transition_body(proposed)),
+        ("## Sources", [pin["path"] + " @ " + pin["checked"] for pin in _pins(home)] or ["No sources pinned."]),
     ]
     md_lines = [
         f"# Data model review: {index['Model']}",
         "",
-        f"Report: report-data-model-full · {_stamp(moment)[:8]} · kit {kit_version}",
+        f"Report: report-data-model-full · {moment.astimezone(timezone.utc).strftime('%Y-%m-%d')} · kit {kit_version}",
         f"Review-Version: {version}",
         f"Model: {index['Home']}",
         f"Revision: {revision}",
-        "Approval:",
-        *[f"- {line}" for line in approval_lines],
+        run_line,
         "",
         "Confirmed, proposed, conditional, and implementable are different. This file is an immutable snapshot of the saved model at this revision.",
         "",
@@ -1970,24 +2738,20 @@ def export_report(home: Path, now: str, kit_version: str) -> dict:
         md_lines.append(heading)
         md_lines.append("")
         for para in paras:
-            md_lines.append(para)
+            md_lines.append(para.rstrip("\n"))
             md_lines.append("")
     md_lines.append("Comments on this review are brought back as proposed revisions. They are not approval.")
     md_lines.append("")
-    pdf_sections = [(h, [p for p in paras if not p.startswith("```")]) for h, paras in sections_md]
-    # Drop huge raw dumps from PDF body; keep summary, status, short sources, captions.
-    pdf_sections = [
-        ("Summary", summary),
-        ("Status", status),
-        ("Short sources beside decisions", _short_sources(home) or ["No decisions recorded."]),
-        ("Review questions", [ln[4:].strip() for ln in questions.splitlines() if ln.startswith("### ")] or ["No open questions stored."]),
-        ("Full source list", [pin["path"] + " @ " + pin["checked"][:12] for pin in _pins(home)] or ["No sources pinned."]),
-        ("Picture limit", ["Rendered diagrams illustrate the saved Mermaid. They do not certify a method or a physical constraint."]),
-    ]
+    def _strip_fences(para: str) -> str:
+        return re.sub(r"```mermaid\n.*?```", "", para, flags=re.S).strip()
+
+    pdf_sections = []
+    for heading, paras in [("Run", [run_line]), *sections_md]:
+        cleaned = [text for text in (_strip_fences(para) for para in paras) if text]
+        pdf_sections.append((heading.lstrip("#").strip(), cleaned))
     pdf = build_pdf(f"{index['Model']} {version}", pdf_sections, images)
     if b"/Subtype /Image" not in pdf:
         raise ModelError("The PDF has no rendered image.", "diagram")
-    # Text showing operators sit before the first image stream. Mermaid source must not be there.
     head = pdf.split(b"/Subtype /Image", 1)[0]
     if b"erDiagram" in head or b"flowchart" in head:
         raise ModelError("The PDF text contained Mermaid source instead of a drawing.", "diagram")
@@ -2014,7 +2778,9 @@ def export_report(home: Path, now: str, kit_version: str) -> dict:
         "version": version,
         "revision": revision,
         "approvals": approval_lines,
-        "diagrams": len(images),
+        "diagrams": len(diagram_items),
+        "diagram_parts": len(images),
+        "run": run_line,
         "model_unchanged": True,
     }
 
@@ -2032,8 +2798,59 @@ def _print(payload: dict, code: int = 0) -> int:
 
 def _read_json(path: str | None) -> dict:
     if not path:
-        raise ModelError("A JSON payload is required.", "json")
+        raise ModelError("A JSON payload is required. Pass --input <file.json> or --json <file.json>.", "json")
     return json.loads(Path(path).read_text(encoding="utf-8"))
+
+
+def _json_arg(args) -> dict:
+    inline = getattr(args, "payload", None)
+    infile = getattr(args, "input", None)
+    if inline and infile:
+        raise ModelError("Pass --json or --input, not both.", "input")
+    return _read_json(inline or (str(infile) if infile else None))
+
+
+def _text_arg(args, flag: str = "text", required: bool = False) -> str | None:
+    inline = getattr(args, flag, None)
+    file_attr = flag.replace("-", "_") + "_file"
+    infile = getattr(args, file_attr, None)
+    if inline is not None and infile is not None:
+        raise ModelError(f"Pass --{flag} or --{flag}-file, not both.", "input")
+    if infile is not None:
+        return Path(infile).read_text(encoding="utf-8")
+    if inline is not None:
+        return inline
+    if required:
+        raise ModelError(f"Pass --{flag} or --{flag}-file.", "input")
+    return None
+
+
+def _add_json(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument("--json", dest="payload", default=None)
+    parser.add_argument("--input", type=Path, default=None)
+
+
+WRITERS = {
+    "init",
+    "recommend",
+    "decide",
+    "question",
+    "diagram",
+    "transition",
+    "views",
+    "confirm-scope",
+    "propose-scope",
+    "pin",
+    "note-drift",
+    "approve",
+    "auto-begin",
+    "auto-baseline",
+    "auto-pass",
+    "auto-finish",
+    "feedback",
+    "revise",
+    "example",
+}
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -2052,36 +2869,38 @@ def main(argv: list[str] | None = None) -> int:
 
     p = sub.add_parser("recommend")
     p.add_argument("--home", type=Path, required=True)
-    p.add_argument("--json", dest="payload", required=True)
+    _add_json(p)
 
     p = sub.add_parser("example")
     p.add_argument("--home", type=Path)
     p.add_argument("--kind", required=True)
-    p.add_argument("--json", dest="payload", required=True)
+    _add_json(p)
 
     p = sub.add_parser("decide")
     p.add_argument("--home", type=Path, required=True)
-    p.add_argument("--json", dest="payload", required=True)
+    _add_json(p)
 
     p = sub.add_parser("question")
     p.add_argument("--home", type=Path, required=True)
-    p.add_argument("--json", dest="payload", required=True)
+    _add_json(p)
 
     p = sub.add_parser("diagram")
     p.add_argument("--home", type=Path, required=True)
     p.add_argument("--id", required=True)
     p.add_argument("--kind", required=True)
-    p.add_argument("--caption", required=True)
+    p.add_argument("--caption", default=None)
+    p.add_argument("--caption-file", type=Path, default=None)
     p.add_argument("--mermaid", type=Path, required=True)
 
     p = sub.add_parser("transition")
     p.add_argument("--home", type=Path, required=True)
     p.add_argument("--kind", default="concise")
-    p.add_argument("--text", required=True)
+    p.add_argument("--text", default=None)
+    p.add_argument("--text-file", type=Path, default=None)
 
     p = sub.add_parser("views")
     p.add_argument("--home", type=Path, required=True)
-    p.add_argument("--json", dest="payload", required=True)
+    _add_json(p)
 
     p = sub.add_parser("confirm-scope")
     p.add_argument("--home", type=Path, required=True)
@@ -2089,7 +2908,8 @@ def main(argv: list[str] | None = None) -> int:
 
     p = sub.add_parser("propose-scope")
     p.add_argument("--home", type=Path, required=True)
-    p.add_argument("--scope", required=True)
+    p.add_argument("--scope", default=None)
+    p.add_argument("--scope-file", type=Path, default=None)
 
     p = sub.add_parser("pin")
     p.add_argument("--home", type=Path, required=True)
@@ -2116,15 +2936,28 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--home", type=Path, required=True)
     p.add_argument("--minutes", type=int, required=True)
     p.add_argument("--passes", type=int, required=True)
-    p.add_argument("--now", required=True)
+    p.add_argument("--now", default=None)
+    p.add_argument("--test-clock", action="store_true")
+
+    p = sub.add_parser("auto-baseline")
+    p.add_argument("--home", type=Path, required=True)
+    p.add_argument("--fingerprint", required=True)
+    p.add_argument("--unresolved", type=int, default=0)
+    p.add_argument("--text", default=None)
+    p.add_argument("--text-file", type=Path, default=None)
+    p.add_argument("--stage", default=None)
+    p.add_argument("--now", default=None)
+    p.add_argument("--test-clock", action="store_true")
 
     p = sub.add_parser("auto-pass")
     p.add_argument("--home", type=Path, required=True)
     p.add_argument("--fingerprint", required=True)
     p.add_argument("--unresolved", type=int, required=True)
     p.add_argument("--progress", required=True)
-    p.add_argument("--now", required=True)
+    p.add_argument("--now", default=None)
+    p.add_argument("--test-clock", action="store_true")
     p.add_argument("--text", default=None)
+    p.add_argument("--text-file", type=Path, default=None)
     p.add_argument("--stage", default=None)
 
     p = sub.add_parser("auto-finish")
@@ -2134,42 +2967,58 @@ def main(argv: list[str] | None = None) -> int:
     p = sub.add_parser("feedback")
     p.add_argument("--home", type=Path, required=True)
     p.add_argument("--review", type=Path, required=True)
-    p.add_argument("--comment", required=True)
+    p.add_argument("--comment", default=None)
+    p.add_argument("--comment-file", type=Path, default=None)
     p.add_argument("--decision", required=True)
+
+    p = sub.add_parser("revise")
+    p.add_argument("--home", type=Path, required=True)
+    p.add_argument("--id", required=True)
+    p.add_argument("--reason", default=None)
+    p.add_argument("--reason-file", type=Path, default=None)
+    _add_json(p)
 
     p = sub.add_parser("report")
     p.add_argument("--home", type=Path, required=True)
-    p.add_argument("--now", required=True)
-    p.add_argument("--kit", default="1.118.0")
+    p.add_argument("--now", default=None)
+    p.add_argument("--test-clock", action="store_true")
+    p.add_argument("--kit", default="1.121.0")
 
     p = sub.add_parser("link-line")
     p.add_argument("--name", required=True)
 
     args = parser.parse_args(argv)
     try:
+        home = getattr(args, "home", None)
+        if args.cmd != "init" and home and (args.cmd != "example" or args.home):
+            _guard(Path(home))
         if args.cmd == "discover":
             payload = discover(args.root, args.scope or None)
         elif args.cmd == "init":
             payload = init_model(args.home, args.name, args.flow, args.scope or None)
         elif args.cmd == "recommend":
-            payload = recommend(args.home, _read_json(args.payload))
+            payload = recommend(args.home, _json_arg(args))
         elif args.cmd == "example":
-            body = _read_json(args.payload)
+            body = _json_arg(args)
             payload = add_example(args.home, args.kind, body) if args.home else check_example(args.kind, body)
         elif args.cmd == "decide":
-            payload = add_decision(args.home, _read_json(args.payload))
+            payload = add_decision(args.home, _json_arg(args))
         elif args.cmd == "question":
-            payload = add_question(args.home, _read_json(args.payload))
+            payload = add_question(args.home, _json_arg(args))
         elif args.cmd == "diagram":
-            payload = add_diagram(args.home, args.id, args.kind, args.caption, args.mermaid.read_text(encoding="utf-8"))
+            payload = add_diagram(
+                args.home, args.id, args.kind,
+                _text_arg(args, "caption", required=True),
+                args.mermaid.read_text(encoding="utf-8"),
+            )
         elif args.cmd == "transition":
-            payload = set_transition(args.home, args.text, args.kind)
+            payload = set_transition(args.home, _text_arg(args, "text", required=True), args.kind)
         elif args.cmd == "views":
-            payload = set_views(args.home, _read_json(args.payload))
+            payload = set_views(args.home, _json_arg(args))
         elif args.cmd == "confirm-scope":
             payload = confirm_scope(args.home, args.yes)
         elif args.cmd == "propose-scope":
-            payload = propose_scope(args.home, args.scope)
+            payload = propose_scope(args.home, _text_arg(args, "scope", required=True))
         elif args.cmd == "pin":
             payload = pin_source(args.home, args.root, args.source, [d for d in args.decisions.split(",") if d])
         elif args.cmd == "drift":
@@ -2179,19 +3028,31 @@ def main(argv: list[str] | None = None) -> int:
         elif args.cmd == "approve":
             payload = approve(args.home, args.stage, args.revision, args.date, args.yes)
         elif args.cmd == "auto-begin":
-            payload = auto_begin(args.home, args.minutes, args.passes, args.now)
+            payload = auto_begin(args.home, args.minutes, args.passes, args.now, args.test_clock)
+        elif args.cmd == "auto-baseline":
+            payload = auto_baseline(
+                args.home, args.fingerprint, args.unresolved, args.now,
+                _text_arg(args, "text"), args.stage, args.test_clock,
+            )
         elif args.cmd == "auto-pass":
-            payload = auto_pass(args.home, args.fingerprint, args.unresolved, args.progress, args.now, args.text, args.stage)
+            payload = auto_pass(
+                args.home, args.fingerprint, args.unresolved, args.progress, args.now,
+                _text_arg(args, "text"), args.stage, args.test_clock,
+            )
         elif args.cmd == "auto-finish":
             payload = auto_finish(args.home, args.root)
         elif args.cmd == "feedback":
-            payload = feedback(args.home, args.review, args.comment, args.decision)
+            payload = feedback(args.home, args.review, _text_arg(args, "comment", required=True), args.decision)
+        elif args.cmd == "revise":
+            payload = revise(args.home, args.id, _json_arg(args), _text_arg(args, "reason", required=True))
         elif args.cmd == "report":
-            payload = export_report(args.home, args.now, args.kit)
+            payload = export_report(args.home, args.now, args.kit, args.test_clock)
         elif args.cmd == "link-line":
             payload = {"ok": True, "line": link_line(args.name)}
         else:
             raise ModelError("Unknown command.", "cli")
+        if home and args.cmd in WRITERS and (args.cmd != "example" or args.home):
+            _seal(Path(home))
         return _print(payload, 0)
     except ModelError as exc:
         return _print({"ok": False, "error": str(exc), "code": exc.code}, 2)

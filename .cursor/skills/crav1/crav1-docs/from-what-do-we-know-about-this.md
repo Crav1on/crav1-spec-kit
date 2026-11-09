@@ -60,7 +60,7 @@ Add one word to get a fixed report as a `.md` file instead of the free-form answ
 | `report-playbook-short` | Preview (1.109.0). Kept, Needs your answer (questions and spec conflicts, recommended + why), Compose, every kit step in order, an order diagram |
 | `report-playbook-full` | Preview (1.109.0). Where it stands, the three buckets, every kit step, the order diagram, gaps no skill covers; then asks *Walk through it now?* (1.116.0) |
 | `report-playbook-walk` | 1.116.0. Resumes the walk in chat at the first unanswered item of an existing playbook report |
-| `report-data-model-full` | 1.118.0. One review of a saved data model. Markdown and a PDF with the diagrams drawn. It does not model again |
+| `report-data-model-full` | 1.118.0, export shape 1.121.0. One review of a saved data model, built from the saved records. Markdown and a PDF with the same prose and the diagrams drawn by name. It does not model again |
 
 The command picks the template from the word, then reads only that template; the others stay closed. Diagrams are Mermaid wherever a picture helps. A live source that needs a sign-in or a permission is asked about first. The file goes to your Downloads folder when the agent can reach it, otherwise a temp folder, and the chat always links it. Nothing in the project changes.
 

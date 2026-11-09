@@ -12,6 +12,8 @@ Build or revise one data model from the project's specs, with a manual flow or a
 
 Both flows call `scripts/model_run.py` in this skill. That script is the state machine for discovery gates, worked examples, approval, drift, the auto budget, and the PDF review. It does not score candidates.
 
+1.121.0: `revise` records a new version of a decision, worked example, question, or diagram, keeps the previous text in `history.md`, and sets the item back to proposed (a question stays open). A hand edit is refused until it is redone with `revise`. On Windows run `py -3`, elsewhere `python3`, and try the other if the first is missing. Content goes through `--input` or `--text-file`. The fields are in `references/inputs.md`. The script reads its own clock. The first auto proposal is a baseline and does not use a correction pass. A revise during an open auto run stays inside the current pass.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
@@ -41,13 +43,13 @@ Reads the specs and system notes the scope includes, the saved model when one ex
 
 In short: `docs/data-model/<model>/`, and a `Data model:` line on a spec after a yes.
 
-Writes `docs/data-model/<model>/` through `scripts/model_run.py`: confirmed snapshots, proposed revisions, questions, comparisons, sources, an auto checkpoint when a run stops, and nothing else. After a yes it may add only the line `Data model: docs/data-model/<model>/` on a relevant spec. `report-data-model-full` on [`/crav1-what-do-we-know-about-this`](crav1-what-do-we-know-about-this.md) writes the review snapshot.
+Writes `docs/data-model/<model>/` through `scripts/model_run.py`: confirmed snapshots, proposed revisions, questions, comparisons, sources, `history.md` when an item is revised (1.121.0), an auto checkpoint when a run stops, and nothing else. After a yes it may add only the line `Data model: docs/data-model/<model>/` on a relevant spec. `report-data-model-full` on [`/crav1-what-do-we-know-about-this`](crav1-what-do-we-know-about-this.md) writes the review snapshot.
 
 ## Does not
 
-Leaves spec requirements, schema, migration code, and the confirmed model alone until an explicit approval of that stage and revision.
+Leaves spec requirements, schema, migration code, and the confirmed model alone until an explicit approval of that stage and revision. Refuses a hand edit of a model file (1.121.0).
 
-Limits and exceptions: No flow word asks, and a headless run with no word stops. An open auto run cannot approve. A tie is not given a winner. Unknown feasibility is not an exclusion.
+Limits and exceptions: No flow word asks, and a headless run with no word stops. An open auto run cannot approve. A tie is not given a winner. Unknown feasibility is not an exclusion. A hand edit is not a revision.
 
 ## You run next / Runs by itself
 

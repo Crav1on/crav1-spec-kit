@@ -2,6 +2,16 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.121.0 (2026-11-09)
+
+Fixes from the first live `/crav1-model-data` auto run and its `report-data-model-full` export. A minor release because `revise`, the baseline, and the review export change behavior.
+
+- **Added:** `revise` records a new version of a decision, worked example, question, or diagram, including the sources on a decision. It bumps the model revision, keeps the previous text in `history.md`, and sets the item back to proposed (a question stays open). A hand edit of a model file is refused until that change is redone with `revise`. During an open auto run, `revise` stays inside the current correction pass.
+- **Changed:** Run the state script with `py -3` on Windows and `python3` elsewhere, and try the other if the first is missing. Content goes through `--input` or `--text-file`. `references/inputs.md` lists every command's fields and an example file. The script reads its own clock. The first auto proposal is a baseline and does not use a correction pass.
+- **Changed:** `report-data-model-full` is built from the saved records. One title, each section once, one line when a section is empty, a run-ending line near the top, worked examples in their own section, obligations once, and ISO dates. The PDF carries the same prose. Diagrams are titled by name, wrap so the text stays readable, and a wide diagram gets a landscape page or numbered parts.
+- **Fixed:** A history-window claim of can-reconstruct is an open question when the other source's coverage is unknown. Drift flags a recommendation that leans one way on an axis recorded as a tie.
+- Older saved models and reviews still read. A model written before the content hashes has no hash section; the next script write records one.
+
 ## 1.118.0 (2026-11-08)
 
 A data model from the specs, and a review of the saved model. A minor release because there is a new skill and a new report word.
