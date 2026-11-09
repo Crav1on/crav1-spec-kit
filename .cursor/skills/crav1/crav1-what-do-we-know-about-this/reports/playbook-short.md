@@ -13,7 +13,7 @@ Plain-language rules (1.109.1):
 
 Live reads: keep everything you read. Items outside this goal stay in, under a last block headed **Out of scope**, at the end of the live-reads section; never drop them.
 
-Answers come first in the report. Write nothing in the project. The existing skills write the answers, each in the Step its row names.
+Answers come first in the report. The first write stays outside the project; apply copies a filled file to docs/playbooks. The existing skills write the answers, each in the Step its row names.
 
 Buckets:
 - **Kept:** decisions already made. Do not ask them again. For each, say who decided and when, if the docs say so.

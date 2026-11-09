@@ -13,7 +13,7 @@ color: blue
 
 The user wants one guided walk from a draft spec through the plan until the tasks are honestly ready to build. A playbook file may be named. Without one, the walk starts at the architecture review. Both routes then use the same steps and the same ready check.
 
-Command: `/crav1-tighten-and-plan-ready-to-build`. The playbook path is an optional value after the command. Do not ask the user to type the characters `[playbook]`.
+Command: `/crav1-tighten-and-plan-ready-to-build`. The playbook path is an optional value after the command. A `docs/playbooks/<topic>.md` path is a playbook. Do not ask the user to type the characters `[playbook]`.
 
 This walk is cross-cutting. It is not a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs`, `/crav1-read-environment`, and `/crav1-fix-bug`. That ask names the list. It does not run this command. The six starter options stay unchanged.
 
@@ -48,4 +48,4 @@ A step with nothing to do says so, records that, and moves on. Optional offers a
 
 The spec, the plan, and the tasks stay the source of truth. `walk-progress.md` only records position. Do not edit `spec.md`, `plan.md`, or `tasks.md` from this skill. Those writes happen inside the skill that owns them, after that skill's own yes.
 
-Do not report ready while a blocker or an open assumption remains. Do not start Build. Do not commit.
+Do not report ready while a blocker or an open assumption remains. Do not start Build. Do not create a git commit. Apply writes the playbook copy under `docs/playbooks/`; that write is not a git commit.

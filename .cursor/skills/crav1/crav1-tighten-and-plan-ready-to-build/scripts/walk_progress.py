@@ -191,15 +191,28 @@ def render(slice_label: str, steps: dict) -> str:
     return "\n".join(lines).rstrip() + "\n"
 
 
+def playbook_mod():
+    import importlib.util
+
+    path = Path(__file__).resolve().parents[2] / "crav1-resolve-open-questions" / "scripts" / "playbook_store.py"
+    spec = importlib.util.spec_from_file_location("playbook_store", path)
+    if spec is None or spec.loader is None:
+        fail("playbook", f"cannot load {path}")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
 def current_tokens(root: Path, step: str, playbook: Path | None) -> dict:
-    got = versions(root, playbook)
+    got = versions(root)
     out = {}
     for token in COVERS[step]:
         if token == "playbook":
             if playbook is None:
                 fail("playbook", "the playbook step needs --playbook")
-            out["playbook"] = str(playbook)
-            out["playbook_version"] = got["playbook"]
+            recorded, hashed = playbook_mod().recorded_playbook(root, playbook)
+            out["playbook"] = recorded
+            out["playbook_version"] = version_of(hashed)
         else:
             out[token] = got[token]
     return out
@@ -254,7 +267,14 @@ def find_playbook(root: Path, recorded: str) -> Path | None:
         candidate = base / recorded
         if candidate.is_file():
             return candidate
-        if base.name == "docs" or str(base) == "/":
+        # A repo-relative docs/playbooks path is found from the repo, which is
+        # the parent of docs/, not from inside the spec folder (1.120.0).
+        if base.name == "docs":
+            repo_candidate = base.parent / recorded
+            if repo_candidate.is_file():
+                return repo_candidate
+            break
+        if str(base) == "/":
             break
     return None
 
@@ -301,9 +321,41 @@ def resume(args: argparse.Namespace) -> None:
     })
 
 
+def resolve_playbook(root: Path, given: str) -> Path:
+    path = Path(given)
+    if path.is_file():
+        return path
+    found = find_playbook(root, given)
+    return found if found is not None else path
+
+
+def same_playbook_path(root: Path, recorded: str, given: str, resolved: Path) -> bool:
+    if recorded == given:
+        return True
+    if resolved.is_file():
+        try:
+            recorded_rel, _hashed = playbook_mod().recorded_playbook(root, resolved)
+        except SystemExit:
+            raise
+        except Exception:
+            recorded_rel = ""
+        if recorded_rel == recorded:
+            return True
+        found = find_playbook(root, recorded)
+        try:
+            if found is not None and found.resolve() == resolved.resolve():
+                return True
+        except OSError:
+            return False
+    try:
+        return Path(recorded).resolve() == Path(given).resolve()
+    except OSError:
+        return False
+
+
 def playbook_status(args: argparse.Namespace) -> None:
     root = Path(args.root)
-    playbook = Path(args.playbook)
+    playbook = resolve_playbook(root, args.playbook)
     data = load(root) if root.is_dir() else {"steps": {}}
     body = data["steps"].get("playbook")
     now = version_of(playbook)
@@ -316,12 +368,7 @@ def playbook_status(args: argparse.Namespace) -> None:
             "note": "No progress line for this playbook. Use the apply compare. Do not treat it as already applied.",
         })
         return
-    same_path = body["playbook"] == args.playbook
-    if not same_path:
-        try:
-            same_path = Path(body["playbook"]).resolve() == playbook.resolve()
-        except OSError:
-            same_path = False
+    same_path = same_playbook_path(root, body["playbook"], args.playbook, playbook)
     same_hash = body.get("playbook_version") == now and now != "missing"
     if same_path and same_hash and body["result"] in APPLIED:
         emit({

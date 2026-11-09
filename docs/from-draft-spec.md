@@ -35,7 +35,7 @@ Otherwise start with tighten:
 | Independent spec review (optional) | Ask for a spec review | The `crav1-spec-reviewer-agent` subagent critiques product and spec. Writes nothing |
 | Tighten | `/crav1-tighten-spec`, then answer every issue in one batch: `yes` for all the recommendations, a batch such as `I1 A, I3 C`, or `suggest` | Lists issues `I1`, `I2`, … (reviewer findings in this chat first), each with the finding, why it matters, and two to four options with the recommended one first. Patches only what you picked. Answering one issue at a time still works. `suggest` recommends and does not patch |
 | Code first (partial slices) | Confirm the repo and branch when asked | When the slice is partial or `## In the code` names paths, reads that committed code before wording issues. A disagreement with the code is called out, not silently rewritten |
-| Open questions | `/crav1-resolve-open-questions`, then keep each open or answer it, in one batch | Every `Q#` shown together (`Q#` is a display number; the answer is matched to the question by its words, 1.84.0); `yes` takes the recommendations. An answer becomes spec text, a constraint, a non-goal, or an ADR, with its impact. A question with an `Answered:` line offers that answer first. Name a branch or `pr71` to pick the spec (1.75.0). Add `detailed` for what each question blocks, who can answer, when it was asked, and its sources. Words or `orders Q3` open one question (1.77.0), and the run stops after that answer without asking another (1.90.5) |
+| Open questions | `/crav1-resolve-open-questions`, then keep each open or answer it, in one batch | Every `Q#` shown together (`Q#` is a display number; the answer is matched to the question by its words, 1.84.0); `yes` takes the recommendations. An answer becomes spec text, a constraint, a non-goal, or an ADR, with its impact. A question with an `Answered:` line offers that answer first. Name a branch or `pr71` to pick the spec (1.75.0). Add `detailed` for what each question blocks, who can answer, when it was asked, and its sources. Words or `orders Q3` open one question (1.77.0), and the run stops after that answer without asking another (1.90.5). `apply <file>` reads a filled playbook and, on the same yes, copies it to `docs/playbooks/<topic>.md` (1.120.0) |
 | Accept | Read the spec. Say it is accepted | — |
 
 Questions only someone else can answer: draft them with [`/crav1-show-or-ask-open-questions`](from-show-or-ask-open-questions.md) and keep them open until the answer comes back.
@@ -48,8 +48,9 @@ Questions only someone else can answer: draft them with [`/crav1-show-or-ask-ope
 - `Blocks: T#` under a question you keep open, when the slice has `tasks.md` and you pick the tasks it blocks in `/crav1-resolve-open-questions`. Without it, the question blocks the whole slice in [Tasks ready to build](from-tasks-ready-to-build.md).
 - A cleared research stale mark, when a resolved question settles the last open point.
 - The slug in `used_by` on a note in `docs/notes/YYYY-MM/` that tighten quotes (generated index rebuilt).
+- On `apply <file>`, `docs/playbooks/<topic>.md` for a filled playbook, and a `Playbook:` line on each spec that apply changed. The name is shown once. A draft is not copied. A hand-edit of the committed file is shown before overwrite.
 
-Not written: application code, `plan.md`, `tasks.md`. Nothing is committed.
+Not written: application code, `plan.md`, `tasks.md`. Nothing is git-committed.
 
 ## After
 

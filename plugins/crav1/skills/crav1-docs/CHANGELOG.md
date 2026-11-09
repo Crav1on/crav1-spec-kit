@@ -2,6 +2,17 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.120.0 (2026-11-09)
+
+A filled playbook is copied into the repo when it is applied, so the team shares it from docs. A minor release because apply now writes a project file.
+
+- The first write of `report-playbook-short` or `report-playbook-full` stays outside the project, in Downloads or else a temp folder. A draft with no filled `Answer:` or `Change:` line is not copied.
+- On apply, `/crav1-resolve-open-questions apply <file>` copies a filled playbook to `docs/playbooks/<topic>.md`. The same copy runs at the end of a playbook walk and in step 1 of `/crav1-tighten-and-plan-ready-to-build`. Specs that apply changed link that file. `Answer:` and `Change:` lines still read back from the copy.
+- The file name comes from the report subject, lowercase kebab-case (`CC Process 1.0` becomes `cc-process-1-0.md`). The name is shown once before the first copy. After that it stays fixed.
+- The same playbook is the `Docs path:` line in the file, or else the one committed file whose title subject matches. Reapply overwrites that file. When the committed file was edited in the repo since `Applied as:`, the diff is shown and overwrite waits for a yes.
+- `walk-progress.md` records the `docs/playbooks/` path, not the outside path, so resume works on any machine. The walk also accepts a `docs/playbooks/` path as its playbook argument.
+- This write is not a git commit. `/crav1-finalize-commit` still does that.
+
 ## 1.119.0 (2026-11-09)
 
 A guided walk from a draft spec through the plan until the tasks are honestly ready to build. A minor release because there is a new skill.

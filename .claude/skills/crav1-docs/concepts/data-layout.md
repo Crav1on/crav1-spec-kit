@@ -32,6 +32,8 @@ docs/sources/
   YYYY-MM-DD-<slug>/ # an imported mail, transcript, chat, screenshot, or other original
 docs/research/
   <topic>.md         # research notes; a spec's ## Research findings links to them
+docs/playbooks/
+  <topic>.md         # a filled playbook copied on apply (1.120.0); the first write stays outside the project
 docs/data-model/
   <model>/
     index.md         # flow, scope, revision; scope confirmed only after a yes
@@ -86,6 +88,7 @@ docs/specs/
 | `docs/notes/YYYY-MM/` | One note per input with the full input and its source, by source date; generated `index.md` per month and a top `index.md` | `/crav1-add-to-spec` for every input (1.61.0); `/crav1-review-pr` for its follow-ups note and the PR note, `/crav1-merge-pr` for the PR note (1.65.0); `/crav1-retire-spec` convert to note. Indexes: `notes_index.py` only |
 | `docs/sources/YYYY-MM-DD-<slug>/` | The original of an imported transcript, minutes, chat, screenshot, or diagram, or a mail written as text (`mail.md`, 1.111.0; the original mail stays outside the repo), plus a `README.md` | `/crav1-add-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs` | Anyone checking a quote. See [Data policy](data-policy.md) |
 | `docs/research/<topic>.md` | A short research note with the recommendation, trade-offs, confidence, and a link to the full study | The researcher (no slash command; see [guild routing](../guild-routing.md)). Skills only add or clear a stale mark | add, match-dump, add-to-spec, meeting, refresh-system-notes, explain-existing-system, what-do-we-know-about-this, ado-sync |
+| `docs/playbooks/<topic>.md` | The shared copy of a filled playbook report. The file name comes from the subject, lowercase kebab-case. A `Docs path:` line fixes it. `Applied as:` detects a hand-edit since the last apply. The first write stays outside the project. A draft with no filled answer is not copied | `/crav1-resolve-open-questions` `apply <file>`, also at the end of a playbook walk and in step 1 of `/crav1-tighten-and-plan-ready-to-build` | `/crav1-resolve-open-questions`, `/crav1-what-do-we-know-about-this` `report-playbook-walk`, `/crav1-tighten-and-plan-ready-to-build` |
 | `docs/data-model/<model>/` | Confirmed and proposed data model, questions, both comparison views, pinned sources, and immutable review snapshots | `/crav1-model-data`; `reviews/` by `/crav1-what-do-we-know-about-this` `report-data-model-full` | `/crav1-model-data`, `/crav1-what-do-we-know-about-this` |
 | `docs/specs/<slug>/spec.md` | What and why, acceptance, open questions | spark, ideas, intake (through `crav1-bundle-slice-agent`), match; then tighten-spec, resolve-open-questions, add-to-spec, match-dump, add-to-spec, and review-security | Every later lane |
 | `docs/specs/<slug>/plan.md`, `tasks.md` | How, constraints, files, linter; ordered testable tasks | `/crav1-plan-from-spec`, `/crav1-tighten-plan`; `[x]` on a task row by implement and build-tasks | Build, verify, review |
@@ -94,7 +97,7 @@ docs/specs/
 | `docs/specs/<slug>/live-fix.md` | Legacy. New incidents go in `fix-log.md` | Nothing new | Read when present |
 | `docs/specs/<slug>/diagrams.md`, `adr/`, `export/`, `notes.md` | Slice diagrams, slice decisions, export copies, idea notes | `/crav1-ideas-to-spec`; `/crav1-tighten-spec` for a named diagram or ADR; `/crav1-export-spec` and plan for `export/` | Architecture review, plan |
 | `docs/specs/<slug>/explore.md` | Bugs found by exploratory testing | `/crav1-run-exploratory-test` | `/crav1-fix-bug` when you say so |
-| `docs/specs/<slug>/walk-progress.md` | Which steps of the tighten-and-plan walk are done, when, and the spec, plan, and tasks version each step covered. The ready check also records a `verify.md` version. The playbook step records only the playbook file. This file is position only | `/crav1-tighten-and-plan-ready-to-build`, after a yes | `/crav1-tighten-and-plan-ready-to-build` on resume |
+| `docs/specs/<slug>/walk-progress.md` | Which steps of the tighten-and-plan walk are done, when, and the spec, plan, and tasks version each step covered. The ready check also records a `verify.md` version. The playbook step records the `docs/playbooks/` path, not a file outside the repo. This file is position only | `/crav1-tighten-and-plan-ready-to-build`, after a yes | `/crav1-tighten-and-plan-ready-to-build` on resume |
 | `docs/specs/<slug>/work-item.md` | Azure Boards ids, one per line | spark, ideas, and intake after an opt-in on Azure Repos; `/crav1-ado-sync` (task lines `Work item: <id> — task: T<n> <title>`) after a yes, and `/crav1-ado-sync` for an added task | Commit and pull request skills, `/crav1-ado-sync` |
 | Transfer data policy rule | The once-per-repo answers for the personal-data check | Any skill that imports a source, after a yes. See [Data policy](data-policy.md) | The same skills |
 | Commit-style rule | The commit style chosen for later commits | `/crav1-finalize-commit`, and build-tasks when onward is chosen | The commit skills |
@@ -292,6 +295,7 @@ Every mark and line format the kit writes inside product files, generated from [
 | Source | `Source: docs/sources/YYYY-MM-DD-<slug>/` | `docs/specs/<slug>/spec.md` (after a quote) | `/crav1-add-to-spec` | — | 1.37.0 |
 | Trace | `[- ]Trace: <source> — <what this pass marked new, already there, and inferred>` | `docs/specs/<slug>/spec.md` (under ## Trace) | `/crav1-add-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs` | — | 1.30.0 |
 | Seen in | `Seen in <host> <environment>.` | `docs/specs/<slug>/spec.md`; `docs/architecture/spec.md`; `docs/system/*.md` | `/crav1-add-to-spec`, `/crav1-existing-to-specs`, `/crav1-refresh-system-notes` | `/crav1-read-environment` | 1.13.0 |
+| Playbook link | `Playbook: docs/playbooks/<topic>.md` | `docs/specs/<slug>/spec.md` (after the title) | `/crav1-resolve-open-questions` | `/crav1-resolve-open-questions`, `/crav1-what-do-we-know-about-this`, `/crav1-tighten-and-plan-ready-to-build` | 1.120.0 |
 
 ### Open question marks
 
@@ -339,6 +343,13 @@ Every mark and line format the kit writes inside product files, generated from [
 | Tasks version | `  Tasks version: <12 hex \| missing>` | `docs/specs/<slug>/walk-progress.md` (under a step that covers the tasks) | `/crav1-tighten-and-plan-ready-to-build` | `/crav1-tighten-and-plan-ready-to-build` | 1.119.0 |
 | Verify version | `  Verify version: <12 hex \| missing>` | `docs/specs/<slug>/walk-progress.md` (under the ready check) | `/crav1-tighten-and-plan-ready-to-build` | `/crav1-tighten-and-plan-ready-to-build` | 1.119.0 |
 | Playbook | `  Playbook: <path>@<12 hex>` | `docs/specs/<slug>/walk-progress.md` (under the playbook step) | `/crav1-tighten-and-plan-ready-to-build` | `/crav1-tighten-and-plan-ready-to-build` | 1.119.0 |
+
+### `docs/playbooks/`
+
+| Mark | Format | Where | Written by | Read by | Since |
+| --- | --- | --- | --- | --- | --- |
+| Docs path | `Docs path: docs/playbooks/<topic>.md` | `docs/playbooks/<topic>.md` (after the Report line) | `/crav1-resolve-open-questions` | `/crav1-resolve-open-questions`, `/crav1-what-do-we-know-about-this`, `/crav1-tighten-and-plan-ready-to-build` | 1.120.0 |
+| Applied as | `Applied as: <12 hex>` | `docs/playbooks/<topic>.md` (after Docs path) | `/crav1-resolve-open-questions` | `/crav1-resolve-open-questions`, `/crav1-tighten-and-plan-ready-to-build` | 1.120.0 |
 
 ### `docs/system/`
 
