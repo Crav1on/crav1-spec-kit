@@ -2,6 +2,10 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.121.1 (2026-11-09)
+
+- A kit Python script that imports a helper no longer writes a `__pycache__/` folder beside that helper. The folder was showing up as untracked in the project, for example next to `playbook_store.py` when `/crav1-tighten-and-plan-ready-to-build` runs.
+
 ## 1.121.0 (2026-11-09)
 
 Fixes from the first live `/crav1-model-data` auto run and its `report-data-model-full` export. A minor release because `revise`, the baseline, and the review export change behavior.

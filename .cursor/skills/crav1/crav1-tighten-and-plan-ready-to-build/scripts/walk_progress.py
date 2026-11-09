@@ -24,6 +24,9 @@ import argparse
 import hashlib
 import json
 import sys
+
+sys.dont_write_bytecode = True  # before any sibling import; no __pycache__ in the project (1.121.1)
+
 from pathlib import Path
 
 WALK = "tighten-and-plan-ready-to-build"
