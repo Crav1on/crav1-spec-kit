@@ -67,6 +67,7 @@ Keep the picture current:
 - [Explain this code](from-explain-this-code.md): one file, function, selection, or PR diff, from reading the code
 - [Retire, merge, park, or convert a spec](from-retire-spec.md): take one spec out of the work, or un-park it
 - [What's known about one thing](from-what-do-we-know-about-this.md)
+- [Model the data](from-model-data.md)
 - [The glossary](from-glossary.md): show it, look up one word, fill the `to be researched` rows
 - [Keep the picture current](from-refresh-system-notes.md)
 - [From Azure DevOps pipelines](from-map-pipeline-environments.md)

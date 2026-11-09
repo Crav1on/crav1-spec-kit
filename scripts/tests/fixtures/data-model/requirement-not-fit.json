@@ -1,0 +1,7 @@
+{
+  "recommendation": "held",
+  "requirement": "supported",
+  "fit": "unknown",
+  "outcome": "viable-on-evidence",
+  "reason": "The requirement is written down, so the candidate must fit."
+}

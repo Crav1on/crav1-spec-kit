@@ -1,0 +1,8 @@
+{
+  "operation": "sum",
+  "rows": [
+    {"grain": "one order", "amount": 100},
+    {"grain": "one order line", "amount": 100}
+  ],
+  "narrative": "Adding the order total to the line totals counts the same amount twice."
+}

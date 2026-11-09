@@ -1,0 +1,7 @@
+{
+  "retained_days": 7,
+  "needed_days": 365,
+  "other_source": false,
+  "claim": "conditional",
+  "narrative": "Seven retained days cannot rebuild a year. The choice stays conditional."
+}

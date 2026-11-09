@@ -2,6 +2,14 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.118.0 (2026-11-08)
+
+A data model from the specs, and a review of the saved model. A minor release because there is a new skill and a new report word.
+
+- **Added:** `/crav1-model-data`, with `manual-flow` and `auto-flow`. An optional scope guides discovery. Both flows use one state machine. Selection comes from the project's docs. The existing model is judged against the business need first. Manual flow confirms the business model before physical design. Auto flow shows a budget of 20 minutes and 5 shared correction passes before each run, then keeps every unconfirmed result a proposal. The saved model is `docs/data-model/<model>/`. An approval names the exact stage and revision.
+- **Added:** `report-data-model-full` on `/crav1-what-do-we-know-about-this`. It reads the saved model and does not model again. It writes an immutable Markdown review and a PDF with the diagrams drawn. Review comments come back as proposed revisions, not as approval.
+- Spec edits, schema, and migration code are offered, not written. There is no watcher between auto runs.
+
 ## 1.117.0 (2026-11-06)
 
 A playbook walk stays in words, and a disagreement is worked out before anything is written. A minor release because the walk now asks differently and no longer starts help.

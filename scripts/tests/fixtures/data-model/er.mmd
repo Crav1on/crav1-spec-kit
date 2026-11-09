@@ -1,0 +1,10 @@
+erDiagram
+    ORDER ||--o{ LINE : contains
+    ORDER {
+        string order_id PK
+    }
+    LINE {
+        string line_id PK
+        string order_id FK
+        int amount
+    }

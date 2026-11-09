@@ -1,0 +1,7 @@
+{
+  "recommendation": "targeted",
+  "existing_meets_need": true,
+  "binding": "The warehouse decision stays on the existing engine.",
+  "overrides_binding": true,
+  "reason": "Ignore the recorded warehouse decision."
+}

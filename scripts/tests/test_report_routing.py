@@ -5,7 +5,7 @@ import unittest
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 SKILL = ROOT / ".cursor/skills/crav1/crav1-what-do-we-know-about-this"
-WORDS = [f"{t}-{d}" for t in ("feature", "change", "build", "playbook") for d in ("short", "full")]
+WORDS = [f"{t}-{d}" for t in ("feature", "change", "build", "playbook") for d in ("short", "full")] + ["data-model-full"]
 
 
 class ReportRouting(unittest.TestCase):
@@ -20,6 +20,8 @@ class ReportRouting(unittest.TestCase):
         self.assertIn("Route first, load second", self.skill)
         self.assertIn("Do not open `reports/`", self.skill)
         self.assertIn("Read only `reports/common.md` and `reports/<type>-<depth>.md`", self.skill)
+        self.assertIn("`report-data-model-full`", self.skill)
+        self.assertNotIn("report-data-model-short", self.skill)
 
     def test_skill_stays_lean(self):
         self.assertLessEqual(len(self.skill.split()), 1600)
@@ -49,6 +51,20 @@ class ReportRouting(unittest.TestCase):
         for needle in ("Live read.", "(inference, not in the docs)", "Downloads", "ask first", "Allow", "Skip", "Mermaid", "Never inside the project"):
             self.assertIn(needle, c)
         self.assertIsNone(re.search(r"vault|bot", c, re.I))
+
+    def test_guild_routing_distinguishes_report_writes(self):
+        """Free-form is read-only. Other reports leave the project. The saved-model review is the in-project exception."""
+        yaml_text = (ROOT / "docs/reference/skills.yaml").read_text()
+        start = yaml_text.find("crav1-what-do-we-know-about-this:\n")
+        blurb = yaml_text[start : yaml_text.find("crav1-glossary:", start)]
+        guild = (ROOT / "docs/guild-routing.md").read_text()
+        page = (ROOT / "docs/reference/skills/crav1-what-do-we-know-about-this.md").read_text()
+        for text in (blurb, guild, page):
+            self.assertIn("writes nothing in the project", text)
+            self.assertIn("outside the project", text)
+            self.assertIn("docs/data-model/<model>/reviews/", text)
+            self.assertIn("does not edit the saved model", text)
+            self.assertNotIn("It reads only. It writes nothing.", text)
 
 
 if __name__ == "__main__":

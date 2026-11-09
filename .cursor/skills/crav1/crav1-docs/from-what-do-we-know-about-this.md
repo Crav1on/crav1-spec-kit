@@ -46,6 +46,7 @@ Add one word to get a fixed report as a `.md` file instead of the free-form answ
 /crav1-what-do-we-know-about-this report-change-short pr74
 /crav1-what-do-we-know-about-this report-build-full @docs/specs/<slug>/
 /crav1-what-do-we-know-about-this report-playbook-short CC Process 1.0
+/crav1-what-do-we-know-about-this report-data-model-full orders
 ```
 
 | Word | What you get |
@@ -59,6 +60,7 @@ Add one word to get a fixed report as a `.md` file instead of the free-form answ
 | `report-playbook-short` | Preview (1.109.0). Kept, Needs your answer (questions and spec conflicts, recommended + why), Compose, every kit step in order, an order diagram |
 | `report-playbook-full` | Preview (1.109.0). Where it stands, the three buckets, every kit step, the order diagram, gaps no skill covers; then asks *Walk through it now?* (1.116.0) |
 | `report-playbook-walk` | 1.116.0. Resumes the walk in chat at the first unanswered item of an existing playbook report |
+| `report-data-model-full` | 1.118.0. One review of a saved data model. Markdown and a PDF with the diagrams drawn. It does not model again |
 
 The command picks the template from the word, then reads only that template; the others stay closed. Diagrams are Mermaid wherever a picture helps. A live source that needs a sign-in or a permission is asked about first. The file goes to your Downloads folder when the agent can reach it, otherwise a temp folder, and the chat always links it. Nothing in the project changes.
 
@@ -84,7 +86,7 @@ A code-only hit, with no spec and no architecture note, says what the code shows
 
 ## What gets written
 
-Nothing in the project. The answer stays in the chat. A `report-*` word writes one report file outside the project and links it.
+Nothing in the project for the free-form answer and for feature, change, build, and playbook reports. Those reports are one file outside the project. `report-data-model-full` writes one new snapshot under the saved model, `report.md` and `report.pdf`, and does not edit the model.
 
 No spec edit. No `plan.md`. No `tasks.md`. No marks. No application code.
 
