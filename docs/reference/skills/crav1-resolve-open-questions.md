@@ -14,6 +14,8 @@ Conflict lines (1.111.0) are listed after the questions; settling one replaces o
 
 `detailed` shows an extended entry per question: what it blocks, why it matters, what is known, who can answer, asked status and date, sources, and a suggested answer. No extra questions.
 
+`apply <file>` (1.120.0) copies a filled playbook to `docs/playbooks/<topic>.md` after the same yes. The name comes from the subject, lowercase kebab-case, and is shown once. A `Docs path:` line, or the one committed file with the same subject, is the same playbook later. Reapply overwrites that file. An edit in the repo since `Applied as:` is shown and confirmed first. Each spec the apply changed gets `Playbook: docs/playbooks/<topic>.md`. A draft with no filled answer is not copied. This is not a git commit.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
@@ -21,7 +23,7 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 | Question | Word | Means |
 | --- | --- | --- |
 | List (optional, never asked) | `detailed` | show blocks, why, known, who, asked, sources and suggested per question (no word: the short list, and a headless run does not stop) |
-| List (optional, never asked) | `apply` | apply <file>: read back a filled-in playbook report, compare each answer with the specs now (new, already settled, conflicting), ask once per conflict, write after one confirm (1.110.0) |
+| List (optional, never asked) | `apply` | apply <file>: read back a filled-in playbook report, compare each answer with the specs now (new, already settled, conflicting), ask once per conflict, write after one confirm (1.110.0). On that yes, copy a filled playbook to docs/playbooks/<topic>.md (1.120.0). A draft with no filled answer is not copied. The name is shown once before the first copy. Reapply overwrites that file, and asks first when the committed file was edited in the repo. |
 
 Every **Conflict:** line in the spec is listed after the questions as C1, C2 (1.111.0, no word): one question per conflict, the decided line and the new quote side by side, a recommendation first, written after one confirm. Topic words or `<spec> Q#` (for example `orders Q3`) open one question (1.77.0) and stop after it, with no next question, ending with the still-open titles (1.90.5); several matches: one question listing up to 4.
 
@@ -31,23 +33,23 @@ Open questions remain. Called by the user.
 
 ## Prompts
 
-Prompt budget: 2 (the most prompts in one run, the closing yes included). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
+Prompt budget: 2 for the question walk. On apply, the one confirm includes the proposed docs/playbooks name the first time, and the diff when the committed file was edited in the repo. A conflict still asks once. A value the user left out is outside the budget. A prompt may hold several questions. See the asking rule in `crav1.mdc`.
 
 ## Reads
 
-In short: Open questions, assumptions and Conflict lines in `spec.md`.
+In short: Open questions, assumptions and Conflict lines in `spec.md`, and the playbook file on apply.
 
 Reads Open questions, unresolved assumptions and **Conflict:** lines in `spec.md`.
 
 ## Writes
 
-In short: The picked question in the spec (with a linked answer's quote and source), and a cleared research mark when no point stays open.
+In short: The picked question in the spec (with a linked answer's quote and source), a cleared research mark when no point stays open, and on apply the playbook copy plus a Playbook line on each spec it changed.
 
-Writes only the picked question into the spec, a constraint, a non-goal, or an ADR. When that answer settles a stale research point waiting on the question, re-checks the point and clears the mark when no point is open. It does not ask the user. A question with an `Answered:` line shows that answer and offers it first. An answer keeps that quote and source with the decision.
+Writes only the picked question into the spec, a constraint, a non-goal, or an ADR. When that answer settles a stale research point waiting on the question, re-checks the point and clears the mark when no point is open. It does not ask the user. A question with an `Answered:` line shows that answer and offers it first. An answer keeps that quote and source with the decision. `apply <file>` also copies a filled playbook to `docs/playbooks/<topic>.md` through `scripts/playbook_store.py` and writes a Playbook line for that path on each spec it changed.
 
 ## Does not
 
-Leaves application code and kept-open questions alone.
+Leaves application code and kept-open questions alone. Does not change `Answer:` or `Change:` lines in the playbook file. Does not copy a draft. Does not git-commit.
 
 ## You run next / Runs by itself
 

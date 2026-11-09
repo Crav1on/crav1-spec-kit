@@ -16,4 +16,4 @@ After a step finishes, run `resume` again. A write in an earlier step can reopen
 
 Spec, plan, and tasks remain the source of truth. The progress file does not.
 
-Do not run `/crav1-build-tasks`, `/crav1-build-features`, `/crav1-verify-build-against-spec`, or `/crav1-fix-build-gaps`. Do not commit.
+Do not run `/crav1-build-tasks`, `/crav1-build-features`, `/crav1-verify-build-against-spec`, or `/crav1-fix-build-gaps`. Do not create a git commit. The playbook copy under `docs/playbooks/` is a file write inside apply, not a git commit.

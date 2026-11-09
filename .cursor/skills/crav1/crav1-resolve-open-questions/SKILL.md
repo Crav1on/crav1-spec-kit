@@ -21,7 +21,7 @@ This is not a defect walk. Do not re-run architecture findings here unless they 
 
 Exact words, no `--flags`. `detailed`: each question shows the extended entry in [references/detailed.md](references/detailed.md); read that file only then. Without it, the list is short.
 
-`apply` (1.110.0), as `apply <file>`: read back a playbook report whose `Answer:` and `Change:` lines were filled in, by the user or by others it was sent to. Follow [references/apply.md](references/apply.md); read that file only then.
+`apply` (1.110.0), as `apply <file>`: read back a playbook report whose `Answer:` and `Change:` lines were filled in, by the user or by others it was sent to. On that yes, a filled playbook is copied to `docs/playbooks/<topic>.md` (1.120.0). Follow [references/apply.md](references/apply.md); read that file only then.
 
 **Do not patch until the user picks a letter for the current question** (or a batch of `Q#: letter` answers).
 
