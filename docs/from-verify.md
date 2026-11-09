@@ -60,3 +60,5 @@ A `(host setup)` task passes only when its script's `check` part, run now agains
 When the matrix is green: [From commit to merge](from-commit.md). When the spec itself was wrong, fix the spec first ([From a draft spec to an accepted spec](from-draft-spec.md)), then the plan, then build again.
 
 Reference pages: [verify-build-against-spec](reference/skills/crav1-verify-build-against-spec.md) · [fix-build-gaps](reference/skills/crav1-fix-build-gaps.md) · [fix-build-gaps](reference/skills/crav1-fix-build-gaps.md)
+
+The run ends as [How a run ends](reference/run-ending.md) says: one `Next:` line, `Waiting:` only when a step is blocked, and `Uncommitted:` when files changed and are not committed.

@@ -9,7 +9,10 @@ Read `## Open questions` in every `docs/specs/<slug>/spec.md` (skip `_template`)
 - One section per spec with open questions, then one line per question that has no `Answered:` line: its `Q#` (document order, display only, never written; 1.84.0), the question in plain words, then its marks: `Asked <date>, <channel> to <who>`, `Pending since <date> for <who>`, `Blocks T2, T4`, or `not asked yet`.
 - An answered question still waiting on `/crav1-resolve-open-questions` is listed under **Answered, not resolved**.
 - End with counts: open, asked, pending, not asked, answered not resolved; then by person: who has how many asked or pending.
-- Next: `/crav1-show-or-ask-open-questions` with **Ask** for the ones not asked yet, or `/crav1-resolve-open-questions` for the answered ones. Do not run them.
+- One `Next` line. Do not print both. Do not run it.
+- Any question is not asked yet: `Next: /crav1-show-or-ask-open-questions ask, because those questions are not asked yet.`
+- Every remaining question is answered: `Next: /crav1-resolve-open-questions, because the answers are not in the spec yet.`
+- Neither: `Next: nothing needed now.`
 
 
 The specs hold open questions that only someone outside the kit can answer, such as a partner, a customer, or a colleague. You gather those questions and draft them so the user can ask them by mail, in a meeting, or in a chat. You record whether they were asked. You never send anything.

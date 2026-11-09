@@ -86,3 +86,7 @@ Do not delete a file. Do not edit a spec other than the one named and, for merge
 ## Style
 
 Be concise. Plain words. Name every path.
+
+## Run ending (1.122.0)
+
+End as [run-ending.md](../crav1-docs/reference/run-ending.md) says.

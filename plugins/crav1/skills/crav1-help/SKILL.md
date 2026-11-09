@@ -37,7 +37,7 @@ Paths below are relative to the docs folder.
 
 - Index first (1.106.0): `reference/index.yaml`, one entry per skill with its lane, starter flag, page, and purpose. Read it before any other kit file.
 - Skills: then only `reference/skills/<name>.md` for each skill the answer needs. Do not read `reference/skills.yaml` or `reference/skills.md` whole; open `skills.md` only for `list`.
-- Routes: `reference/workflow.yaml` and its page `reference/workflow.md`.
+- Routes: `reference/workflow.yaml` and its page `reference/workflow.md`. How a run ends: `reference/run-ending.md`.
 - Walkthroughs: `from-*.md`. Concepts: `concepts/` (glossary, data layout, method, data policy). Install: `install.md`. Routing: `guild-routing.md`. Open one only when the answer needs it.
 - Changes: `CHANGELOG.md` (kit repo root; bundled as `crav1-docs/CHANGELOG.md`). Read it only for what's new, a release, or a version question, and then only the sections asked for.
 

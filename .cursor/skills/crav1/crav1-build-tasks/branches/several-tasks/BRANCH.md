@@ -65,7 +65,7 @@ You may summarize each worker briefly on the board. Do not redo their implement/
 
 TL;DR: finished `T#`s, blocked `T#` + why, not started, commits the workers reported.
 
-Next (optional): `/crav1-open-pr` when you want to push and open the PR (when the head's Match `Branch:` line ends in `(PR <n>)` or a pull request is known to be open for it, name it instead: `/crav1-open-pr` to push to PR <n> and update its description or comment). Do not run it from this skill.
+`Next: /crav1-open-pr, because the work is not on a pull request yet.` When the head's Match `Branch:` line ends in `(PR <n>)` or a pull request is known to be open for it, name it instead: `/crav1-open-pr` to push to PR <n> and update its description or comment. Do not run it from this skill.
 
 If every selected task is `done`: one sentence that the requested slice is demoable (other unchecked `T#`s may remain if they passed a range).
 

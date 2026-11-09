@@ -70,6 +70,8 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 
 **Route.** An ordered list of commands for one situation, such as a new slice or new information on an existing slice. Each step says when it applies, and some are optional. The routes live in `docs/reference/workflow.yaml` and are shown in [Workflow routes](../reference/workflow.md). `/crav1-help` answers order questions from them.
 
+**Run ending.** The last lines of a skill's chat, since 1.122.0. `Next:` is one line, the single step to run now and why. `Waiting:` is one line per step that is blocked, naming who or what it waits on. `Uncommitted:` is a trailing reminder when files changed and are not committed, not a step. A later step that depends on `Next` is not listed. Every skill follows [How a run ends](../reference/run-ending.md), including `/crav1-export-spec`.
+
 **Walk progress.** The file `docs/specs/<slug>/walk-progress.md` written by `/crav1-tighten-and-plan-ready-to-build` (1.119.0). It records which locked steps are done, when, and the version of the spec, plan, and tasks each step covered. The ready check also records a `verify.md` version. The playbook line is intake only. Since 1.120.0 that line is the `docs/playbooks/` path, not a file outside the repo, and the walk accepts a `docs/playbooks/` path as its playbook argument. The spec, plan, and tasks stay the source of truth. On resume, a step is reopened only when a file it covered has changed.
 
 **Slice, slug.** A slice is one feature's spec folder. Its slug is the folder name under `docs/specs/`.

@@ -93,6 +93,14 @@ Do not write a file. Do not invent a second document. Do not teach how to build 
 
 Output only the answer, the spec quote when the picture has nothing on the question, the feature-index list when a slice is missing from the picture, and each stale research mark this run found.
 
+- A slice is missing from the picture: `Next: /crav1-refresh-system-notes, because that slice is missing from the picture.`
+- Otherwise: `Next: nothing needed now.`
+- Do not run the next step.
+
 ## Style
 
 Be concise. Prefer the note’s words. Do not fill a gap with a guess.
+
+## Run ending (1.122.0)
+
+End as [run-ending.md](../crav1-docs/reference/run-ending.md) says.

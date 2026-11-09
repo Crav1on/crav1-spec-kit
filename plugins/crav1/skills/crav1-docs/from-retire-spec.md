@@ -47,3 +47,5 @@ It re-reads each waiting note in full and suggests what fits the spec now, inclu
 - Leaves alone: every other spec, and inbound links (listed, not rewritten). Never deletes.
 
 Reference page: [retire spec](reference/skills/crav1-retire-spec.md)
+
+The run ends as [How a run ends](reference/run-ending.md) says: one `Next:` line, `Waiting:` only when a step is blocked, and `Uncommitted:` when files changed and are not committed.

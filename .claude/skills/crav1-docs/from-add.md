@@ -55,17 +55,14 @@ No `plan.md`. No `tasks.md`. No application code. A missing `docs/system/` is no
 
 ## After
 
-If a file changed:
+When this changed an existing spec, the run ends as [How a run ends](reference/run-ending.md) says:
 
 ```text
-/crav1-finalize-commit
+Next: /crav1-tighten-spec <slug>, because the new information is not tightened yet.
+Uncommitted: 1 file; commit with /crav1-finalize-commit when ready.
 ```
 
-That puts the spec (and any applied edits) in git. No push. This command does not commit for you.
-
-When this changed an existing spec, `/crav1-tighten-spec` for that slug comes next, then `/crav1-resolve-open-questions`, then `/crav1-plan-from-spec` when the slice has a plan, as the [New information on an existing slice](reference/workflow.md#new-info) route says. `/crav1-help next` gives the full order. This command does not run them.
-
-`/crav1-plan-from-spec` on a slice with no plan yet is only when you say you want to start planning this slug.
+Resolve and the plan are not listed here. `/crav1-tighten-spec` names them when they apply, as the [New information on an existing slice](reference/workflow.md#new-info) route says. This command does not run the next step. `/crav1-help next` gives the full order.
 
 A handoff from `/crav1-read-environment` or `/crav1-suggest-tests-for-code` asks once at the end of that run, not once per item: The system picture may now be out of date. Run `/crav1-refresh-system-notes`? It does not run that command. A meeting handoff does not ask.
 

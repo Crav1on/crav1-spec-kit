@@ -14,6 +14,8 @@ The script maps:
 
 When the script says the check is not ready, name each row's step in the words the script returns. Offer to jump back. Options: jump back (Recommended) when at least one row can jump, or stop. On jump back, rerun the affected steps in walk order, then run this check again. A row that cannot jump back stays named. The check is still not ready.
 
-Ready is only when the script says `ready` and `start_build` is false, with no blockers, no Needs verify, and no assumptions. Then say the slice is ready to build. Name `/crav1-build-tasks` as the user's next command. Do not run it. Stop.
+Ready is only when the script says `ready` and `start_build` is false, with no blockers, no Needs verify, and no assumptions. Then say the slice is ready to build. One line: `Next: /crav1-build-tasks, because the slice is ready to build.` Do not run it. Add the Uncommitted line when `walk-progress.md` is not committed. Stop.
+
+When they pick stop and the check is not ready, `Next` is the first row's command, because that row blocks ready. Do not list the other rows in the ending. They were already named in the check. This walk still runs a step when they pick jump back.
 
 Record step `tasks-ready-to-build` with the versions the script stores, including `Verify version:`, after the user confirms the record. A later change to `verify.md` reopens only this check.

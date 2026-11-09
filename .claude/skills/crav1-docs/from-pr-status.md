@@ -82,9 +82,6 @@ No code, spec, plan or task edit. No reply posted, no vote, no merge. Replies ar
 
 ## After
 
-- Spec or decision candidates: `/crav1-add-to-spec`, on your yes in the run.
-- Follow-ups: `/crav1-ado-sync`.
-- Review the code again: `/crav1-review-pr`.
-- Merge when `Ready: yes`: `/crav1-merge-pr`.
+The run ends as [How a run ends](reference/run-ending.md) says. One `Next:` line for the first thing nothing blocks. A step that waits on a person or another pull request is a `Waiting:` line. Candidates stay in the report; `/crav1-pr-status` names `/crav1-add-to-spec` when you take them. Follow-ups stay drafts for `/crav1-ado-sync`. Merge is `/crav1-merge-pr` only after `Ready: yes`.
 
 Reference page: [pr-status](reference/skills/crav1-pr-status.md)

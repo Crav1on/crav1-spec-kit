@@ -78,7 +78,7 @@ Exact words for bots and scripted runs: `yes` / `manual` / `stop` for the confir
 - The script path and the manual steps
 - Applied or not, and each `check` line
 - The commit, or why there is none
-- Next: `/crav1-open-pr`, and `/crav1-pr-status` when a thread asked for it
+- `Next: /crav1-open-pr, because the script is on a work branch and not on a pull request yet.` When a thread asked for the setting, say that in the reason. Do not also name pr-status. Add the Uncommitted line when the script is not committed. Do not run the next step.
 
 ## Hard rules
 
@@ -88,3 +88,7 @@ Exact words for bots and scripted runs: `yes` / `manual` / `stop` for the confir
 - Host-facing text (script comments, output, commit message) is kit-neutral: no specs, tasks or kit commands.
 - No pipeline applies the script. The kit runs it.
 - Do not push, open a pull request or post on a thread.
+
+## Run ending (1.122.0)
+
+End as [run-ending.md](../crav1-docs/reference/run-ending.md) says.

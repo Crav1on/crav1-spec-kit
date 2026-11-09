@@ -35,3 +35,13 @@ PR <n>'s comments are on the host. To read them, sign in to GitHub (`gh auth log
 - C) Stop
 
 A runs one sign-in check; still signed out shows the question once more. Never poll. B takes the paste, with the same check. A headless or bot run prints the status line and `PR <n> comments not read.` and stops.
+
+## End
+
+End as `crav1-docs/reference/run-ending.md` says. Do not run the next step.
+
+- This run added a Point on one or more pull requests: `Next: /crav1-pr-status` for every pull request this run touched, in that one command, because those Points are not sorted yet.
+- No new Point: `Next: nothing needed now.`
+- A question that waits on a person is one `Waiting:` line: `/crav1-resolve-open-questions <slug>, after <who> answers <what>.`
+- Do not list `pr<n> candidates` here. pr-status names that when the record has candidates.
+- Add the Uncommitted line when a file changed and is not committed.

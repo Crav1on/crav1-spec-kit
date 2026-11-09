@@ -100,3 +100,15 @@ Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-spe
 - No code edits. No spec edits. No pull request. No Azure Boards work item.
 - Not a stretch of verify. It is not a skill that runs because a repo is new. It is not started automatically.
 - When the bug changes how the parts connect, ask the picture question once. Do not run `/crav1-refresh-system-notes`.
+
+One `Next` line for the lane this run picked. Do not list the other lanes. Do not run it.
+
+- Spec miss: `Next: /crav1-tighten-spec, because the bug is a spec miss.`
+- Plan miss: `Next: /crav1-plan-from-spec, because the bug is a plan miss.`
+- Code miss: `Next: /crav1-build-tasks, because the bug is a code miss.`
+- Host setting: `Next: /crav1-host-setup, because the bug is a host setting.`
+- Not a real bug: `Next: nothing needed now.`
+
+## Run ending (1.122.0)
+
+End as [run-ending.md](../crav1-docs/reference/run-ending.md) says.

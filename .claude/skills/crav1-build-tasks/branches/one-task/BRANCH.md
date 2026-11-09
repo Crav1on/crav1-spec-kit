@@ -38,7 +38,7 @@ Show the worker’s recap and STATUS.
 
 | STATUS | You do |
 | --- | --- |
-| `done` | Show the **done** TL;DR. Then one line: Next (optional): `/crav1-open-pr` when you want to push and open the PR (when the head's Match `Branch:` line ends in `(PR <n>)` or a pull request is known to be open for it, name it instead: `/crav1-open-pr` to push to PR <n> and update its description or comment). Do not run it. Stop. |
+| `done` | Show the **done** TL;DR. Then one line: `Next: /crav1-open-pr, because the work is not on a pull request yet.` When the head's Match `Branch:` line ends in `(PR <n>)` or a pull request is known to be open for it, name it instead: `/crav1-open-pr` to push to PR <n> and update its description or comment. Do not run it. Stop. |
 | `needs_fix` | Ask `fix` / `stop`. `fix` → launch the **same** worker again with `resume: fix`. `stop` → end. |
 | `needs_ready` | Ask them to refresh the live host, then `ready` / `stop`. `ready` → worker with `resume: ready`. |
 | `needs_dependency` | Show the BLOCKER line first. Ask start / skip / stop for that dependency. `start` → same worker with `resume: dependency-start`; `skip` → `resume: dependency-skip`; `stop` → end. Headless: use the two-pass questions file. |

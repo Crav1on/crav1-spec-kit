@@ -70,3 +70,5 @@ Only the kept changes: the spec, `tasks.md`, and `work-item.md` lines for added 
 Commit mentions keep the Feature id. When a commit clearly implements one recorded task, its task id is added too; when it is unclear, the commit skills ask. See [Data layout](concepts/data-layout.md).
 
 Reference page: [ado-sync](reference/skills/crav1-ado-sync.md)
+
+The run ends as [How a run ends](reference/run-ending.md) says: one `Next:` line, `Waiting:` only when a step is blocked, and `Uncommitted:` when files changed and are not committed.

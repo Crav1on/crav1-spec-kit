@@ -49,12 +49,6 @@ It does not look at how `docs/notes/` is laid out (1.85.0). Notes still flat in 
 
 ## After
 
-If a file changed:
-
-```text
-/crav1-finalize-commit
-```
-
-That puts the picture update in git. No push. This command does not commit for you.
+`Next: nothing needed now.` When a file changed: `Uncommitted: 1 file; commit with /crav1-finalize-commit when ready.` See [How a run ends](reference/run-ending.md). That puts the picture update in git when you commit. No push. This command does not commit for you.
 
 Reference page: [refresh-system-notes](reference/skills/crav1-refresh-system-notes.md)

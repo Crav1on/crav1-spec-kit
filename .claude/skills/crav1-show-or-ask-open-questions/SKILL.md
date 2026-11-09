@@ -53,8 +53,9 @@ End with:
 - how many questions, from which specs (paths, for the user only)
 - how many were skipped, and why
 - which marks were written, or that none were
-- when a mark was written, name `/crav1-finalize-commit`. Do not run it.
-- when answers come back, `/crav1-add-to-spec` for a mail, minutes, a transcript, or a chat, or `/crav1-add-to-spec` for a larger dump. Those link the answers. Do not run them.
+- `Next: nothing needed now.` The draft is the work of this run.
+- `Waiting: /crav1-add-to-spec, after the answers come back.` Leave that line out when nothing was drafted.
+- Add the Uncommitted line when a mark was written. Do not run the next step.
 
 ## Hard rules
 
@@ -69,3 +70,7 @@ End with:
 - Nothing is sent.
 - Yes writes `Asked:`. No writes nothing. Pending writes `Pending:` (ask research: no Asked? question). Only under the questions in the draft.
 - Do not plan, implement, or commit.
+
+## Run ending (1.122.0)
+
+End as [run-ending.md](../crav1-docs/reference/run-ending.md) says.

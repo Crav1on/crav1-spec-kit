@@ -48,3 +48,7 @@ Each branch ends with its own recap and next step.
 
 Skip every spec under `docs/specs/retired/`, and every old-path `spec.md` that is only a `Moved:` pointer. A spec whose `spec.md` has a `Parked:` line is parked: the push branches (`suggest features`, `push features`, `push tasks`) do not push it. The pull branches still read it. Say `skipped: <slug> (parked)` and name `/crav1-retire-spec un-park docs/specs/<slug>/`. Do not remove the mark.
 A note under `docs/notes/` (month folders since 1.61.0) with the slug in `waiting_for` (or an old `Waiting for <slug> (parked)` line) is read like any other note.
+
+## Run ending (1.122.0)
+
+End as [run-ending.md](../crav1-docs/reference/run-ending.md) says.

@@ -57,3 +57,7 @@ When a choice is missing and the run is headless or started by a bot (no person 
 ## After
 
 Each branch ends with its own recap and next step.
+
+## Run ending (1.122.0)
+
+End as [run-ending.md](../crav1-docs/reference/run-ending.md) says.

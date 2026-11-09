@@ -47,7 +47,11 @@ The saved model is `docs/data-model/<model>/`. The script creates it. Confirmed 
 
 Do not edit a spec's requirements. Do not generate or apply schema or migration code. Do not write a detailed migration plan. Do not send anything externally. Do not start a watcher between runs. Do not commit.
 
-Name `/crav1-finalize-commit` when a model file changed. Name `/crav1-what-do-we-know-about-this report-data-model-full <model>` when the user wants the review. Do not run either one.
+End as `crav1-docs/reference/run-ending.md` says. Do not run the next step. Add the Uncommitted line when a model file changed.
+
+- The user asked for the review in this run: `Next: /crav1-what-do-we-know-about-this report-data-model-full <model>, because they asked for the review.`
+- Otherwise: `Next: nothing needed now.`
+- Do not name add-to-spec in the ending.
 
 ## Hard rules
 

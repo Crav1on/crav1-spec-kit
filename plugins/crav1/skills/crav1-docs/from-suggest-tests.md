@@ -50,20 +50,6 @@ No test code. No application code. No `plan.md`. No `tasks.md`. No new folder.
 
 ## After
 
-Plan turns a kept suggestion into a task when the user runs plan:
-
-```text
-/crav1-plan-from-spec
-```
-
-This command does not run it.
-
-When a file changed and the user wants it in git:
-
-```text
-/crav1-finalize-commit
-```
-
-That puts the spec lines in git. No push. This command does not commit.
+When a kept suggestion is not in the spec yet: `Next: /crav1-add-to-spec, because that suggestion is not in the spec yet.` Plan is not listed here. When a file changed: `Uncommitted: 1 file; commit with /crav1-finalize-commit when ready.` See [How a run ends](reference/run-ending.md). This command does not run the next step. No push.
 
 Reference page: [suggest-tests-for-code](reference/skills/crav1-suggest-tests-for-code.md)

@@ -52,4 +52,4 @@ The mode word is `as-file`, not `file`, so a term literally named `file` still w
 
 Only rows in `docs/system/glossary.md`, the ignored `.crav1/glossary-list.md` in as-file mode. No spec is ever touched. A row that already has a meaning is never rewritten here; a different meaning from a new source goes through `/crav1-add-to-spec`, which shows old and new side by side. At most one question per run. Headless and bot runs ask nothing: they write the docs/ meanings and list web meanings as waiting for a yes.
 
-Next: `/crav1-finalize-commit` when a row changed. See the [skill page](reference/skills/crav1-glossary.md).
+`Next: nothing needed now.` When a row changed: `Uncommitted: 1 file; commit with /crav1-finalize-commit when ready.` See [How a run ends](reference/run-ending.md) and the [skill page](reference/skills/crav1-glossary.md).

@@ -6,6 +6,8 @@
 - the .cursor, .claude and plugin copies of each skill have the same files
 - a Python entry point that imports a local helper sets sys.dont_write_bytecode = True
   after import sys and before that import (1.121.1)
+- every SKILL.md points at crav1-docs/reference/run-ending.md, unless the skill is in RUN_ENDING_EXEMPT (1.122.0)
+- no skill file has a Next: instruction that names more than one step to run now (1.122.0)
 """
 import ast, os, re, sys, glob
 
@@ -125,6 +127,93 @@ def py_entry_points(kit):
     return found
 
 
+# Skills that do not point at the shared run-ending rule. Empty on purpose.
+# Add a folder name here only with the reason in the same comment.
+RUN_ENDING_EXEMPT = set()
+RUN_ENDING_REF = "run-ending.md"
+CMD = re.compile(r"/crav1-[a-z0-9-]+")
+
+
+def _indent(line):
+    return len(line) - len(line.lstrip(" "))
+
+
+def _next_spans(text):
+    """Each Next: instruction, plus lines indented under it.
+
+    A deeper bullet is part of that instruction (a Next: heading with several
+    steps). A sibling line is the next instruction or ordinary text.
+    """
+    lines = text.splitlines()
+    spans = []
+    i = 0
+    while i < len(lines):
+        if "Next:" in lines[i]:
+            base = _indent(lines[i])
+            start = lines[i].index("Next:")
+            block = [lines[i][start:]]
+            j = i + 1
+            while j < len(lines):
+                nxt = lines[j]
+                stripped = nxt.strip()
+                if stripped == "" or stripped.startswith("#"):
+                    break
+                if stripped.startswith(("Waiting:", "Uncommitted:", "Source:", "Ready:")):
+                    break
+                if _indent(nxt) <= base:
+                    break
+                block.append(nxt)
+                j += 1
+            spans.append((i + 1, "\n".join(block)))
+            i = j
+        else:
+            i += 1
+    return spans
+
+
+def next_step_problems(path, text):
+    """A Next: instruction that names more than one distinct kit command."""
+    out = []
+    for lineno, block in _next_spans(text):
+        cmds = list(dict.fromkeys(CMD.findall(block)))
+        if len(cmds) > 1:
+            out.append(
+                f"{path}:{lineno}: Next: names {len(cmds)} steps ({', '.join(cmds)}); "
+                "one Next line names one step"
+            )
+    return out
+
+
+def run_ending_problems(kit):
+    """Every SKILL.md cites the shared rule, and no skill file lists two steps as Next."""
+    root = os.path.join(kit, ".cursor", "skills", "crav1")
+    out = []
+    if not os.path.isdir(root):
+        return [f"{root}: missing"]
+    for name in sorted(os.listdir(root)):
+        skill = os.path.join(root, name)
+        skill_md = os.path.join(skill, "SKILL.md")
+        if not os.path.isfile(skill_md):
+            continue
+        if name in RUN_ENDING_EXEMPT:
+            continue
+        with open(skill_md, encoding="utf-8") as fh:
+            text = fh.read()
+        if RUN_ENDING_REF not in text:
+            out.append(f"{name}: SKILL.md does not reference {RUN_ENDING_REF} (or add it to RUN_ENDING_EXEMPT with a reason)")
+        for dirpath, dirnames, filenames in os.walk(skill):
+            dirnames[:] = [d for d in dirnames if d != "__pycache__"]
+            for fn in filenames:
+                if not fn.endswith(".md"):
+                    continue
+                path = os.path.join(dirpath, fn)
+                with open(path, encoding="utf-8") as fh:
+                    body = fh.read()
+                rel = os.path.relpath(path, kit)
+                out.extend(next_step_problems(rel, body))
+    return out
+
+
 def bytecode_problems(kit):
     out = []
     for path in sorted(py_entry_points(kit)):
@@ -179,6 +268,7 @@ def main(argv):
             a, b = set(files(os.path.join(SK, s))), set(files(os.path.join(other, s)))
             if a != b: errs.append(f"{os.path.relpath(other, kit)}/{s}: files differ ({', '.join(sorted(a ^ b)[:3])})")
     errs.extend(bytecode_problems(kit))
+    errs.extend(run_ending_problems(kit))
     for e in errs: print("FAIL  " + e)
     print(f"kit lint: {len(skills)} skills, {len(errs)} problem(s)")
     return 1 if errs else 0

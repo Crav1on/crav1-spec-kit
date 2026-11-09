@@ -80,3 +80,5 @@ A task marked `(host setup)` is a host setting, not a file. The worker writes th
 Prove the slice against the spec: [Verify and fix](from-verify.md). Then [From commit to merge](from-commit.md).
 
 Reference pages: [build-tasks](reference/skills/crav1-build-tasks.md) · [build-tasks](reference/skills/crav1-build-tasks.md) · [build-tasks](reference/skills/crav1-build-tasks.md) · [build-features](reference/skills/crav1-build-features.md) · [subagents](reference/skills.md#subagents)
+
+The run ends as [How a run ends](reference/run-ending.md) says: one `Next:` line, `Waiting:` only when a step is blocked, and `Uncommitted:` when files changed and are not committed.

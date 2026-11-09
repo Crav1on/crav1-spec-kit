@@ -26,6 +26,8 @@ Instruct it to follow its own prompt and to finish with numbered **Issues for `/
 
 ## After it returns
 
-Show the subagent’s review to the user. Then tell them the next command is `/crav1-tighten-spec` to walk those issues one by one. Do not start tightening in this turn unless they already asked.
+Show the subagent’s review to the user. Then one line: `Next: /crav1-tighten-spec, because the review's issues are not walked yet.` Do not start tightening in this turn unless they already asked. Do not name a security review in the ending. Architecture review stays a critique of design hunches. It does not ask whether the thing is secure.
 
-Also name `/crav1-review-security` when they want a security pass on the design that now exists. That command is optional. Do not run it from this skill. Architecture review stays a critique of design hunches. It does not ask whether the thing is secure.
+## Run ending (1.122.0)
+
+End as [run-ending.md](../crav1-docs/reference/run-ending.md) says.

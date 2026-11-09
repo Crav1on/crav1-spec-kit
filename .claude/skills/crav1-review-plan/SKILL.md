@@ -31,8 +31,12 @@ After the subagent returns, write one line in `plan.md`, right under the `# Plan
 
 ## After it returns
 
-Show the subagent’s review. Then tell them the next command is `/crav1-tighten-plan` to walk **plan** `P#`s one by one. Spec-tagged findings: `/crav1-tighten-spec` or `/crav1-resolve-open-questions` — do not start those in this turn unless they already asked.
+Show the subagent’s review. Then one line: `Next: /crav1-tighten-plan, because the plan findings are not walked yet.` Spec-tagged findings stay in the review. Do not name them as a second step. Do not start tighten in this turn unless they already asked.
 
 When `## Linter` says this repo has no linter or checker for the code the tasks will touch, do not name Build (`/crav1-build-tasks`, `/crav1-build-features`). Stop before Build. The user decides to add the linter or to go on without one. Do not install one. A plan that already says none is complete on that point. Do not file a `P#` only because the answer is none.
 
 Do not run `/crav1-review-pr`. Specify does not name the linter.
+
+## Run ending (1.122.0)
+
+End as [run-ending.md](../crav1-docs/reference/run-ending.md) says.

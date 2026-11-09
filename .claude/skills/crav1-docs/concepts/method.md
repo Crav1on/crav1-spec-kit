@@ -98,6 +98,8 @@ Feature on this app. Preserve existing architecture. Do not write code.
 
 Then: answer ≤7 questions (and the branch prompt) → agent seeds a thin `docs/system/` when that folder is missing, writes `docs/specs/<slug>/spec.md`, then adds one landscape index row → `/crav1-tighten-spec` walks **each** finding → `/crav1-resolve-open-questions` walks leftover Open questions (keep open or answer) → optional `crav1-spec-reviewer-agent` → **`/crav1-plan-from-spec`** → `/crav1-review-plan` then `/crav1-tighten-plan` for plan `P#`s → `/crav1-build-tasks` per `T#` or `/crav1-build-tasks` (one spec) or `/crav1-build-features` (several specs, serial) → `/crav1-verify-build-against-spec` → `/crav1-fix-build-gaps` (omit Gap) for inner-loop remaining: failed → unverified → `G#`.
 
+A single run names only the next step, as [How a run ends](../reference/run-ending.md) says. The chain above is the route, not a list the run prints.
+
 ### From a pile of ideas (not a spark, not a spec)
 
 When you already have several ideas and maybe stack opinions, use **`/crav1-ideas-to-spec`**, not `/crav1-spark-to-spec`. The layout always includes `docs/system/`. This command seeds a thin landscape when that folder is missing, including `glossary.md`, then the spec artifacts, then one index row. An existing landscape is left in place. A missing `glossary.md` is filled. New glossary rows are added in sorted place by term. Existing rows are not rewritten. A meaning the source does not state is `to be researched`. That same pass adds what is new to the short description, the diagram, and how the parts connect. It does not rewrite what is already there. Full walkthrough: [From a pile of ideas to a spec](../from-ideas.md).

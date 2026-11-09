@@ -57,3 +57,9 @@ Only `docs/system/glossary.md` (rows filled or added as above) and in As file mo
 ## Stop
 
 Do not invent a meaning; a guess is labelled and written only on **Correct**. Do not rewrite a row that already has a meaning; a different meaning found later is shown side by side and left for `/crav1-add-to-spec`, as `references/sources-rare.md` says. Do not web-search an internal-only term. Do not write a web meaning without its yes. Do not mark research stale from a glossary row. Never write an open question, a `Pending:` line or any other line into a spec.
+
+`Next: nothing needed now.` Add the Uncommitted line when a glossary row changed and is not committed. Do not put the commit command in `Next`.
+
+## Run ending (1.122.0)
+
+End as [run-ending.md](../crav1-docs/reference/run-ending.md) says.

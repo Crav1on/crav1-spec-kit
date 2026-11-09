@@ -12,5 +12,5 @@ Output only:
 - The reader used (Azure, AWS, or Google Cloud), or that this host has no reader, or the exact CLI or login that is missing
 - Counts: seen, shape only, skipped, not read, connections shown, databases opened, storage accounts opened. Shape only counts pre-prod, shared, and prod-only resources that were read. A prod-only resource the user declined is counted in skipped and in not read. A look-inside that did not open says not opened. A production database or store that stayed closed says not opened.
 - Files this skill appended (`docs/environments/marks.md`) and files the owners changed, or that nothing was written
-- Next: `/crav1-finalize-commit` when a file changed (no push). When nothing was written, name no command. Do not run it.
+- `Next: nothing needed now.` Add the Uncommitted line when a file changed and is not committed. Do not run a commit.
 - Picture offer, when this run appended one or more lines to `docs/environments/marks.md`

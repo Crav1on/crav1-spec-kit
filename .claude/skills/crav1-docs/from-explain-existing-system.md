@@ -68,3 +68,5 @@ When the answer lists a slice missing from the picture:
 ```
 
 Reference page: [explain](reference/skills/crav1-explain-existing-system.md)
+
+The run ends as [How a run ends](reference/run-ending.md) says: one `Next:` line, `Waiting:` only when a step is blocked, and `Uncommitted:` when files changed and are not committed.

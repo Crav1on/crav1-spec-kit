@@ -72,22 +72,14 @@ A left item is not written. A dismissed item is not written. The state line is n
 
 ## After
 
-When a kept addition or an answer changed an existing spec, the next steps follow the [New information on an existing slice](reference/workflow.md#new-info) route for that slug: `/crav1-tighten-spec` first, then `/crav1-resolve-open-questions`, then `/crav1-plan-from-spec` when the slice has a plan. This command names them and does not run them. Ask `/crav1-help next` for the full order with your slice's state.
+One `Next:` line, the first case that applies, as [How a run ends](reference/run-ending.md) says. This command does not run it. Ask `/crav1-help next` for the full order.
 
-A kept new feature names one next command. This command does not run it.
+- An existing spec changed: `/crav1-tighten-spec`, because the new information is not tightened yet. Resolve and `/crav1-plan-from-spec` are not listed. See [New information on an existing slice](reference/workflow.md#new-info).
+- The only handoff is one new feature of one or two sentences: `/crav1-spark-to-spec`.
+- The only handoff is a pile of ideas: `/crav1-ideas-to-spec`.
+- The only handoff is two or more new features: `/crav1-bundle-to-specs`.
+- The only handoff is a bug: `/crav1-fix-bug`.
 
-- One kept new feature that is one or two sentences: `/crav1-spark-to-spec`
-- One kept new feature that is a pile of ideas and technical hunches: `/crav1-ideas-to-spec`
-- Two or more kept new features: `/crav1-bundle-to-specs`
-
-A kept bug names `/crav1-fix-bug`. This command does not run it.
-
-When a file changed and the user wants it in git:
-
-```text
-/crav1-finalize-commit
-```
-
-That puts the spec lines, and any source folder this command wrote, in git. No push. This command does not commit.
+When a file changed: `Uncommitted: 1 file; commit with /crav1-finalize-commit when ready.` No push. This command does not commit.
 
 Reference page: [add-to-spec](reference/skills/crav1-add-to-spec.md)

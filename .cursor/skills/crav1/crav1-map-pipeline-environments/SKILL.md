@@ -111,7 +111,7 @@ Output only:
 - Org, project, and the pipelines read (name and kind), or that the read stopped before a pipeline list
 - Counts: one environment, shared, unclear
 - Whether `docs/environments/marks.md` changed, and whether `docs/environments/promotion.md` changed
-- Next: `/crav1-read-environment` (do not run it). When a file changed, also name `/crav1-finalize-commit` (do not run it). When nothing was written, still name `/crav1-read-environment`, and do not name finalize-commit
+- `Next: /crav1-read-environment, because the pipeline read is not a host read.` Do not run it. Add the Uncommitted line when a file changed and is not committed.
 
 ## Hard rules
 
@@ -133,3 +133,7 @@ Output only:
 ## Style
 
 Be concise. Cite the pipeline, the stage, and the resource. Prefer the smaller fact. Do not fill a gap with a resource the step did not name.
+
+## Run ending (1.122.0)
+
+End as [run-ending.md](../crav1-docs/reference/run-ending.md) says.

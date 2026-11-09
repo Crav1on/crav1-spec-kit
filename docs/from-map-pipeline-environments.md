@@ -52,18 +52,13 @@ After Unclear, a fourth section, **Branches**, proposes `docs/environments/promo
 
 ## After
 
-The next command is the host read. This command does not run it.
+The run ends as [How a run ends](reference/run-ending.md) says. This command does not run the next step.
 
 ```text
-/crav1-read-environment
+Next: /crav1-read-environment, because the pipeline read is not a host read.
+Uncommitted: 1 file; commit with /crav1-finalize-commit when ready.
 ```
 
-When a file changed and the user wants it in git:
-
-```text
-/crav1-finalize-commit
-```
-
-That puts the marks lines in git. No push. This command does not commit.
+Leave the Uncommitted line out when nothing was written. No push. This command does not commit.
 
 Reference page: [map-pipeline-environments](reference/skills/crav1-map-pipeline-environments.md)

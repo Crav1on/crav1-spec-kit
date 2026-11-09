@@ -129,9 +129,10 @@ Do not write the tests. Do not change the code. Do not edit `plan.md`, `tasks.md
 
 Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs`, `/crav1-plan-from-spec`, `/crav1-build-tasks`, `/crav1-verify-build-against-spec`, `/crav1-fix-build-gaps`, or `/crav1-finalize-commit`.
 
-When a file changed, name `/crav1-finalize-commit`. Do not run it.
+One `Next` line, as `crav1-docs/reference/run-ending.md` says. Do not run it. Add the Uncommitted line when a file changed. Do not name plan in the ending.
 
-Name `/crav1-plan-from-spec` only as the later step that turns a kept suggestion into a task. Do not run it.
+- A kept suggestion is not in the spec yet: `Next: /crav1-add-to-spec, because that suggestion is not in the spec yet.`
+- Nothing was kept: `Next: nothing needed now.`
 
 ## Hard rules
 

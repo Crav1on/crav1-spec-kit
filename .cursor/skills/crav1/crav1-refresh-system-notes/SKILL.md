@@ -85,8 +85,12 @@ Output only:
 - What was added to the picture (file, and the sentence, node, edge, or connection line), or that the picture is current
 - `Synced at` line in `repos.md` or slice line written, or that none was written
 - Research: the short summary of what was cleared, narrowed, and routed where, each open question from the updated note and where it went, and when an older mark had no points, or that this run was not pointed at a research note
-- Next: `/crav1-finalize-commit` when a file changed (no push). When nothing was written, name no command. Do not run it.
+- `Next: nothing needed now.` Add the Uncommitted line when a file changed and is not committed. Do not run a commit.
 
 ## Style
 
 Be concise. Add the smaller line. Do not fill gaps with an architecture you invented.
+
+## Run ending (1.122.0)
+
+End as [run-ending.md](../crav1-docs/reference/run-ending.md) says.

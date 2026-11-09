@@ -103,9 +103,9 @@ Output only:
 - Paths written (`docs/system/`, each `docs/specs/<slug>/spec.md`, any source folder `docs/sources/YYYY-MM-DD-<slug>/`, the transfer data policy when this pass wrote it, plus any picture lines added)
 - Counts: done, partial, not in the code
 - Where the uncovered-code note is, or that the map had none
-- Next:
-  - `/crav1-finalize-commit` for this dump (landscape and specs). No push
-  - `/crav1-plan-from-spec` only for a slice they choose to start. `not in the code` is not planned by this command
+- End as `crav1-docs/reference/run-ending.md` says. Do not run the next step. A slice that is not in the code is not planned here. Add the Uncommitted line when a file changed and is not committed.
+- Specs were written: `Next: /crav1-tighten-spec <first slug>, because those specs are not tightened yet.`
+- Nothing was written: `Next: nothing needed now.`
 
 If they chose `spec/<dump>`, say that branch is specify-only: no implement there.
 

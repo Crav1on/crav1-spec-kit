@@ -141,7 +141,7 @@ When the user says so in that turn, for a bug this skill found, follow `/crav1-f
 
 Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs`, `/crav1-plan-from-spec`, `/crav1-build-tasks`, `/crav1-verify-build-against-spec`, `/crav1-fix-build-gaps`, or `/crav1-finalize-commit`.
 
-When `explore.md` changed, name `/crav1-finalize-commit`. Do not run it.
+`Next: nothing needed now.` A bug stays in `explore.md` until a later turn where the user says to send it. Add the Uncommitted line when `explore.md` changed. Do not run a commit.
 
 Output only:
 
@@ -161,3 +161,7 @@ Output only:
 - Do not start Specify, Plan, or Build. Do not move work into a lane.
 - Do not send a bug to `/crav1-fix-bug` unless the user says so in that turn.
 - Later skill. Not a starter option. Asking for startup options names only the six and does not run this command.
+
+## Run ending (1.122.0)
+
+End as [run-ending.md](../crav1-docs/reference/run-ending.md) says.

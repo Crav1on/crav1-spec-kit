@@ -108,7 +108,7 @@ A focus still runs the full read, including the live reads, and shows only **Ver
 
 The chat answer follows this skill’s `assets/answer.md`. Do not print a placeholder. Do not write the file into the project. Leave out a heading that has nothing under it. **Tracked elsewhere** stays when a live read ran, and `none` is a real line. A guess ends with `(inference, not in the docs)`.
 
-Read `references/answer.md` ("Answer sections") when you write the answer: what each section holds (Verdict through Source, and **Unexplained**), the guess label, the open-question `Next:` line, and the Skip line in **Source**. Case 3 names the next command in **Source**. It does not run it.
+Read `references/answer.md` ("Answer sections") when you write the answer: what each section holds (Verdict through Source, and **Unexplained**), the guess label, the open-question `Next:` line, and the Skip line in **Source**. Case 3 names the next command in **Source** ([run-ending.md](../crav1-docs/reference/run-ending.md)). It does not run it.
 
 ## Stop
 

@@ -15,6 +15,6 @@ All remaining issues resolved **and**:
 
 Then stop the issue walk.
 
-If **Open questions** (or unresolved assumptions) remain, the next command is `/crav1-resolve-open-questions` — not Plan Mode. That skill walks each question with keep-open vs answer.
+If **Open questions** (or unresolved assumptions) remain: `Next: /crav1-resolve-open-questions, because open questions are still listed.` Not Plan Mode. That skill walks each question with keep-open vs answer.
 
-If the open-question list is empty, tell them: `/crav1-plan-from-spec`, or a new chat in Plan Mode (`Shift+Tab`) with `spec.md` attached. Optional: `crav1-spec-reviewer-agent` once, not as a substitute for unfinished `I#`s or `Q#`s.
+If the open-question list is empty: `Next: /crav1-plan-from-spec, because the spec is tight enough to plan.` A new chat in Plan Mode (`Shift+Tab`) with `spec.md` attached is the same step. Do not name the spec reviewer in the ending.

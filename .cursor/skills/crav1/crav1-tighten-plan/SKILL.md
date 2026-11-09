@@ -58,7 +58,12 @@ Typical **plan** shapes:
 
 Skip nitpicks. Merge duplicates. Prefer fewer sharp issues.
 
-If **no plan issues** remain (spec-tagged ones only, or none): say so. Next: spec-tagged → `/crav1-tighten-spec` / `/crav1-resolve-open-questions`; else **new chat**, `/crav1-build-tasks` with `plan.md`, `tasks.md`, and `spec.md` attached.
+If **no plan issues** remain, say so and print one `Next` line. Do not list the other cases.
+
+- A spec-tagged finding is a spec defect: `Next: /crav1-tighten-spec, because that finding is a spec defect.`
+- A spec-tagged finding is an open question: `Next: /crav1-resolve-open-questions, because that finding is an open question.`
+- None remain, and the plan names a linter or they chose to go on without one: `Next: /crav1-build-tasks, because the plan issues are done.` A new chat, with `plan.md`, `tasks.md`, and `spec.md` attached.
+- No linter, and they have not chosen to go on: `Next: nothing needed now.` Do not name build.
 
 When `## Linter` says this repo has no linter or checker for the code the tasks will touch, do not name those Build commands. Stop before Build. The user decides to add the linter or to go on without one. Do not install one. When they already chose to go on without one in this turn, the Build next step applies, and the plan still says none. A plan that already says none is not a `P#` by itself.
 
@@ -115,3 +120,7 @@ Build each `P#`'s options from [references/catalog.md](references/catalog.md) (`
 - Do not start implement/complete-task in this chat unless they explicitly asked after plan issues are done. When `## Linter` says there is no linter, that ask is the choice to go on without one. Do not install a linter.
 - Do not run `/crav1-review-pr`. Specify does not name the linter.
 - Do not patch “to be helpful” when they have not chosen a **plan patch** (`suggest` and `send-to-spec` are not plan patches).
+
+## Run ending (1.122.0)
+
+End as [run-ending.md](../crav1-docs/reference/run-ending.md) says.

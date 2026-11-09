@@ -105,3 +105,5 @@ After the commit, `/crav1-finalize-commit` fetches. It never pushes; it ends wit
 After an outside pull request merges, `/crav1-review-pr` names `/crav1-refresh-system-notes` to catch the picture up: [Keep the picture current](from-refresh-system-notes.md).
 
 Reference pages: [finalize-commit](reference/skills/crav1-finalize-commit.md) · [finalize-commit](reference/skills/crav1-finalize-commit.md) · [open-pr](reference/skills/crav1-open-pr.md) · [merge-pr](reference/skills/crav1-merge-pr.md)
+
+The run ends as [How a run ends](reference/run-ending.md) says: one `Next:` line, `Waiting:` only when a step is blocked, and `Uncommitted:` when files changed and are not committed.
