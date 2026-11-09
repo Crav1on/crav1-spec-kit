@@ -1,0 +1,9 @@
+{
+  "recommendation": "retain",
+  "existing_meets_need": true,
+  "documentation": "poor",
+  "decision_changing_gaps": [],
+  "best_fit": "current orders grain",
+  "alternatives": [],
+  "reason": "The weekly dispatch question is already answered. Thin documentation is not a reason to redesign."
+}

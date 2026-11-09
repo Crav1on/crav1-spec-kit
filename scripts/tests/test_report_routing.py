@@ -5,7 +5,7 @@ import unittest
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 SKILL = ROOT / ".cursor/skills/crav1/crav1-what-do-we-know-about-this"
-WORDS = [f"{t}-{d}" for t in ("feature", "change", "build", "playbook") for d in ("short", "full")]
+WORDS = [f"{t}-{d}" for t in ("feature", "change", "build", "playbook") for d in ("short", "full")] + ["data-model-full"]
 
 
 class ReportRouting(unittest.TestCase):
@@ -20,6 +20,8 @@ class ReportRouting(unittest.TestCase):
         self.assertIn("Route first, load second", self.skill)
         self.assertIn("Do not open `reports/`", self.skill)
         self.assertIn("Read only `reports/common.md` and `reports/<type>-<depth>.md`", self.skill)
+        self.assertIn("`report-data-model-full`", self.skill)
+        self.assertNotIn("report-data-model-short", self.skill)
 
     def test_skill_stays_lean(self):
         self.assertLessEqual(len(self.skill.split()), 1600)

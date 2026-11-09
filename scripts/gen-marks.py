@@ -38,6 +38,7 @@ GROUPS = {
     "research": "Research and stale marks",
     "plan": "`plan.md` and `tasks.md`",
     "system": "`docs/system/`",
+    "data-model": "`docs/data-model/`",
     "environments": "`docs/environments/marks.md`",
     "work-items": "`work-item.md`",
     "notes": "Notes and sources",

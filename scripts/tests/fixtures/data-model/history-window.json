@@ -1,0 +1,6 @@
+{
+  "retained_days": 7,
+  "needed_days": 365,
+  "other_source": false,
+  "claim": "can-reconstruct"
+}

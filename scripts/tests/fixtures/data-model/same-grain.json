@@ -1,0 +1,8 @@
+{
+  "operation": "sum",
+  "rows": [
+    {"grain": "one order line", "amount": 40},
+    {"grain": "one order line", "amount": 60}
+  ],
+  "narrative": "Both rows are one order line, so the sum is one grain."
+}

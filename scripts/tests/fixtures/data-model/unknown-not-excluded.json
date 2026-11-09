@@ -1,0 +1,6 @@
+{
+  "recommendation": "held",
+  "unknown_feasibility": true,
+  "outcome": "excluded",
+  "reason": "No one has shown the candidate can store history, so exclude it."
+}

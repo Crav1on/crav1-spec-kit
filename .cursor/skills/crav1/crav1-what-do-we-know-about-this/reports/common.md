@@ -2,6 +2,8 @@
 
 Read with exactly one `reports/<type>-<depth>.md`, only when the message has a `report-*` word (1.104.0).
 
+Exception (1.118.0): `report-data-model-full` does not match a slice and does not run the live Azure reads. It reads the saved model the question names. It writes one new immutable review snapshot under that model (`report.md` and `report.pdf`) and does not edit the model, a spec, or code. The Downloads rule below is for the other report words.
+
 ## Before writing
 
 1. Run the same match as the free-form answer. Two or more close hits: list them and ask. No hit: say so and stop; do not write a report about nothing.

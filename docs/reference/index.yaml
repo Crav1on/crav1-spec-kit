@@ -156,6 +156,11 @@ skills:
     starter: false
     page: reference/skills/crav1-what-do-we-know-about-this.md
     purpose: "Answer one question about a feature, slice, resource, or not-yet-feature from the specs first."
+  crav1-model-data:
+    lane: cross-cutting
+    starter: false
+    page: reference/skills/crav1-model-data.md
+    purpose: "Build or revise one data model from the project's specs, with a manual flow or an auto flow."
   crav1-refresh-system-notes:
     lane: cross-cutting
     starter: false

@@ -32,6 +32,16 @@ docs/sources/
   YYYY-MM-DD-<slug>/ # an imported mail, transcript, chat, screenshot, or other original
 docs/research/
   <topic>.md         # research notes; a spec's ## Research findings links to them
+docs/data-model/
+  <model>/
+    index.md         # flow, scope, revision; scope confirmed only after a yes
+    confirmed.md     # append-only Approved snapshots, one stage and revision each
+    proposed.md      # recommendation, decisions, examples, diagrams, transition
+    questions.md     # unanswered questions, with the specs they affect
+    comparisons.md   # area view and platform view, neither the default
+    sources.md       # pinned sources and the hash that was checked
+    checkpoint.md    # written when an auto run stops unfinished
+    reviews/         # immutable report.md and report.pdf snapshots
 docs/specs/
   _template/
     spec.md          # what / why / acceptance
@@ -75,6 +85,7 @@ docs/specs/
 | `docs/notes/YYYY-MM/` | One note per input with the full input and its source, by source date; generated `index.md` per month and a top `index.md` | `/crav1-add-to-spec` for every input (1.61.0); `/crav1-review-pr` for its follow-ups note and the PR note, `/crav1-merge-pr` for the PR note (1.65.0); `/crav1-retire-spec` convert to note. Indexes: `notes_index.py` only |
 | `docs/sources/YYYY-MM-DD-<slug>/` | The original of an imported transcript, minutes, chat, screenshot, or diagram, or a mail written as text (`mail.md`, 1.111.0; the original mail stays outside the repo), plus a `README.md` | `/crav1-add-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs` | Anyone checking a quote. See [Data policy](data-policy.md) |
 | `docs/research/<topic>.md` | A short research note with the recommendation, trade-offs, confidence, and a link to the full study | The researcher (no slash command; see [guild routing](../guild-routing.md)). Skills only add or clear a stale mark | add, match-dump, add-to-spec, meeting, refresh-system-notes, explain-existing-system, what-do-we-know-about-this, ado-sync |
+| `docs/data-model/<model>/` | Confirmed and proposed data model, questions, both comparison views, pinned sources, and immutable review snapshots | `/crav1-model-data`; `reviews/` by `/crav1-what-do-we-know-about-this` `report-data-model-full` | `/crav1-model-data`, `/crav1-what-do-we-know-about-this` |
 | `docs/specs/<slug>/spec.md` | What and why, acceptance, open questions | spark, ideas, intake (through `crav1-bundle-slice-agent`), match; then tighten-spec, resolve-open-questions, add-to-spec, match-dump, add-to-spec, and review-security | Every later lane |
 | `docs/specs/<slug>/plan.md`, `tasks.md` | How, constraints, files, linter; ordered testable tasks | `/crav1-plan-from-spec`, `/crav1-tighten-plan`; `[x]` on a task row by implement and build-tasks | Build, verify, review |
 | `docs/specs/<slug>/verify.md` | The acceptance matrix | `/crav1-verify-build-against-spec`; one row by `/crav1-fix-build-gaps` | `/crav1-open-pr`, `/crav1-review-pr` |
@@ -320,6 +331,13 @@ Every mark and line format the kit writes inside product files, generated from [
 | Merges into | `<branch>` | `docs/system/repos.md` (Merges into column) | `/crav1-add-to-spec` | `/crav1-open-pr`, `/crav1-add-to-spec`, `/crav1-review-pr` | 1.64.0 |
 | Work items go to | `ADO: <org>/<project>` | `docs/system/repos.md` (Work items go to column) | `/crav1-ado-sync` | `/crav1-ado-sync`, `/crav1-finalize-commit`, `/crav1-open-pr`, `/crav1-what-do-we-know-about-this` | 1.50.0 |
 | Reference-only line | `<title>: reference only, see docs/notes/<YYYY-MM>/<YYYY-MM-DD>-<slug>.md` | `docs/system/landscape.md` (under ## How the parts connect) | `/crav1-retire-spec` | — | 1.60.0 |
+
+### `docs/data-model/`
+
+| Mark | Format | Where | Written by | Read by | Since |
+| --- | --- | --- | --- | --- | --- |
+| Data model | `Data model: docs/data-model/<model>/` | `docs/specs/<slug>/spec.md` (after the title) | `/crav1-model-data` | `/crav1-model-data`, `/crav1-what-do-we-know-about-this` | 1.118.0 |
+| Approved stage | `Approved: <business-model \| physical-design> r<n>, <YYYY-MM-DD>` | `docs/data-model/<model>/confirmed.md` | `/crav1-model-data` | `/crav1-model-data`, `/crav1-what-do-we-know-about-this` | 1.118.0 |
 
 ### `docs/environments/marks.md`
 

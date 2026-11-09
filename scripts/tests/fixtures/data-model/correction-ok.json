@@ -1,0 +1,5 @@
+{
+  "question": "as-was after a restatement",
+  "correction_meaning": "A restatement keeps the prior amount on the previous row and writes the new amount on a new row.",
+  "narrative": "The correction keeps the prior amount instead of overwriting it."
+}

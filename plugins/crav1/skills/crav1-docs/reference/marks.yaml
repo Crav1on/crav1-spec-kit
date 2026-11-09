@@ -990,3 +990,30 @@ marks:
     mention: 'Superseded by'
     since: 1.43.0
 
+  - id: data-model-link
+    name: "Data model"
+    group: data-model
+    files: ["docs/specs/<slug>/spec.md (after the title)"]
+    format: "Data model: docs/data-model/<model>/"
+    pattern: '^Data model: docs/data-model/[a-z0-9-]+/$'
+    examples:
+      - "Data model: docs/data-model/orders/"
+    meaning: "The spec points at its saved data model. Written only after a yes. It is not a requirement edit."
+    written_by: [crav1-model-data]
+    read_by: [crav1-model-data, crav1-what-do-we-know-about-this]
+    since: 1.118.0
+
+  - id: data-model-approved
+    name: "Approved stage"
+    group: data-model
+    files: ["docs/data-model/<model>/confirmed.md"]
+    format: "Approved: <business-model | physical-design> r<n>, <YYYY-MM-DD>"
+    pattern: '^Approved: (business-model|physical-design) r[1-9][0-9]*, \d{4}-\d{2}-\d{2}$'
+    examples:
+      - "Approved: business-model r2, 2026-11-08"
+      - "Approved: physical-design r3, 2026-11-08"
+    meaning: "That stage and revision were explicitly approved. Another stage, or a later revision, stays unapproved."
+    written_by: [crav1-model-data]
+    read_by: [crav1-model-data, crav1-what-do-we-know-about-this]
+    since: 1.118.0
+
