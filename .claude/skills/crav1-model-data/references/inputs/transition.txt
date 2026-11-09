@@ -1,0 +1,1 @@
+Consumers keep reading the current grain while a history source is absent. Detailed migration planning is offered, not written.

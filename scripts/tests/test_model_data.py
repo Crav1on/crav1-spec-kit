@@ -8,6 +8,7 @@ A rendered diagram proves the exporter drew pixels, not that a notation is offic
 from __future__ import annotations
 
 import json
+import re
 import shutil
 import subprocess
 import sys
@@ -179,7 +180,7 @@ class Fixtures(unittest.TestCase):
             choice_path = home / "choice.json"
             choice_path.write_text(json.dumps(choice), encoding="utf-8")
             fails(["recommend", "--home", str(home), "--json", str(choice_path)], "auto-choice")
-            must(["auto-begin", "--home", str(home), "--minutes", "20", "--passes", "5", "--now", "2026-11-08T12:00:00+00:00"])
+            must(["auto-begin", "--home", str(home), "--minutes", "20", "--passes", "5", "--test-clock", "--now", "2026-11-08T12:00:00+00:00"])
             fails(
                 ["approve", "--home", str(home), "--stage", "business-model", "--revision", self._revision(home), "--date", "2026-11-08", "--yes"],
                 "auto-approve",
@@ -256,7 +257,7 @@ class Fixtures(unittest.TestCase):
             must(["approve", "--home", str(home), "--stage", "business-model", "--revision", rev, "--date", "2026-11-08", "--yes"])
             proposed_before = (home / "proposed.md").read_bytes()
             confirmed_before = (home / "confirmed.md").read_bytes()
-            exported = must(["report", "--home", str(home), "--now", "2026-11-08T12:00:00+00:00", "--kit", "1.118.0"])
+            exported = must(["report", "--home", str(home), "--test-clock", "--now", "2026-11-08T12:00:00+00:00", "--kit", "1.118.0"])
             self.assertEqual((home / "proposed.md").read_bytes(), proposed_before)
             self.assertEqual((home / "confirmed.md").read_bytes(), confirmed_before)
             review = Path(exported["review"])
@@ -279,7 +280,7 @@ class Fixtures(unittest.TestCase):
                 "body": "Is a year of as-was history required?",
             }), encoding="utf-8")
             must(["question", "--home", str(home), "--json", str(qpath)])
-            second = must(["report", "--home", str(home), "--now", "2026-11-08T13:00:00+00:00", "--kit", "1.118.0"])
+            second = must(["report", "--home", str(home), "--test-clock", "--now", "2026-11-08T13:00:00+00:00", "--kit", "1.118.0"])
             self.assertNotEqual(second["review"], exported["review"])
             self.assertEqual((review / "report.md").read_bytes(), md.encode("utf-8"))
             self.assertEqual((review / "report.pdf").read_bytes(), pdf)
@@ -295,44 +296,351 @@ class Fixtures(unittest.TestCase):
         finally:
             shutil.rmtree(home)
 
+    def test_revise_keeps_history_and_refuses_a_hand_edit(self):
+        home = self._init("auto")
+        try:
+            made = must(["decide", "--home", str(home), "--json", str(self._decision("order-line-grain", "business-model"))])
+            original = (home / "proposed.md").read_text(encoding="utf-8")
+            (home / "proposed.md").write_text(original.replace("one row", "HAND EDIT"), encoding="utf-8")
+            refused = fails(["drift", "--home", str(home), "--root", str(REPO)], "hand-edit")
+            self.assertIn("proposed.md", refused["error"])
+            self.assertIn("revise --id", refused["error"])
+            self.assertIn("history.md", refused["error"])
+            (home / "proposed.md").write_text(original, encoding="utf-8")
+            must(["drift", "--home", str(home), "--root", str(REPO)])
+            body = json.loads(self._decision("order-line-grain", "business-model").read_text(encoding="utf-8"))
+            body["status"] = "confirmed"
+            body["sources"] = "docs/specs/orders/spec.md, docs/specs/billing/spec.md"
+            body["body"] = "The grain stays one order line, and billing is now a source."
+            path = home / "revise-decision.json"
+            path.write_text(json.dumps(body), encoding="utf-8")
+            must(["auto-begin", "--home", str(home), "--minutes", "20", "--passes", "5", "--test-clock", "--now", "2026-11-09T12:00:00+00:00"])
+            base = must([
+                "auto-baseline", "--home", str(home), "--fingerprint", "base",
+                "--test-clock", "--now", "2026-11-09T12:01:00+00:00",
+            ])
+            self.assertEqual(base["passes_used"], 0)
+            revised = must([
+                "revise", "--home", str(home), "--id", "order-line-grain",
+                "--reason", "add the billing source", "--input", str(path),
+            ])
+            self.assertEqual(revised["status"], "proposed")
+            self.assertEqual(revised["kind"], "decision")
+            self.assertNotEqual(revised["revision"], made["revision"])
+            self.assertFalse(revised["counted_as_pass"])
+            self.assertEqual(revised["passes_used"], 0)
+            self.assertEqual(revised["pass_effect"], "inside-current-pass")
+            text = (home / "proposed.md").read_text(encoding="utf-8")
+            self.assertIn("billing is now a source", text)
+            self.assertIn("docs/specs/billing/spec.md", text)
+            self.assertNotIn("- Status: confirmed", text)
+            history = (home / "history.md").read_text(encoding="utf-8")
+            self.assertIn(made["revision"], history)
+            self.assertIn("add the billing source", history)
+            self.assertIn("one row at the stated grain", history)
+            step = must([
+                "auto-pass", "--home", str(home), "--fingerprint", "fixed", "--unresolved", "1",
+                "--progress", "yes", "--test-clock", "--now", "2026-11-09T12:02:00+00:00",
+            ])
+            self.assertEqual(step["passes_used"], 1)
+            again = dict(body)
+            again["body"] = "The grain stays one order line after the correction pass."
+            path.write_text(json.dumps(again), encoding="utf-8")
+            second = must([
+                "revise", "--home", str(home), "--id", "order-line-grain",
+                "--reason", "wording after the pass", "--input", str(path),
+            ])
+            self.assertEqual(second["passes_used"], 1)
+            self.assertFalse(second["counted_as_pass"])
+            must(["example", "--home", str(home), "--kind", "correction", "--json", str(FIX / "correction-ok.json")])
+            example = json.loads((FIX / "correction-ok.json").read_text(encoding="utf-8"))
+            example["kind"] = "correction"
+            example["narrative"] = "Corrected narrative for the restatement."
+            epath = home / "revise-example.json"
+            epath.write_text(json.dumps(example), encoding="utf-8")
+            ex = must([
+                "revise", "--home", str(home), "--id", "correction",
+                "--reason", "fix the worked example", "--input", str(epath),
+            ])
+            self.assertEqual(ex["kind"], "example")
+            self.assertEqual(ex["status"], "proposed")
+            self.assertIn("Corrected narrative", (home / "proposed.md").read_text(encoding="utf-8"))
+            self.assertIn("fix the worked example", (home / "history.md").read_text(encoding="utf-8"))
+        finally:
+            shutil.rmtree(home)
+
+    def test_content_goes_through_files_and_the_baseline_is_free(self):
+        home = self._init("auto")
+        try:
+            fails(
+                ["auto-begin", "--home", str(home), "--minutes", "20", "--passes", "2", "--now", "2026-11-09T12:00:00+00:00"],
+                "clock",
+            )
+            must(["auto-begin", "--home", str(home), "--minutes", "20", "--passes", "2", "--test-clock", "--now", "2026-11-09T12:00:00+00:00"])
+            big = home / "proposal.txt"
+            big.write_text("Grain is the order line.\n" * 2000, encoding="utf-8")
+            self.assertGreater(big.stat().st_size, 32767)
+            argv = [
+                "auto-pass", "--home", str(home), "--fingerprint", "base", "--unresolved", "1",
+                "--progress", "yes", "--text-file", str(big),
+                "--test-clock", "--now", "2026-11-09T12:01:00+00:00",
+            ]
+            joined = " ".join([sys.executable, str(SCRIPT), *argv])
+            self.assertLess(len(joined), 32767)
+            first = must(argv)
+            self.assertTrue(first["baseline"])
+            self.assertEqual(first["passes_used"], 0)
+            self.assertFalse(first["counted_as_pass"])
+            fails(
+                ["auto-baseline", "--home", str(home), "--fingerprint", "again", "--test-clock", "--now", "2026-11-09T12:01:30+00:00"],
+                "baseline",
+            )
+            must(["recommend", "--home", str(home), "--input", str(FIX / "retain-poor-docs.json")])
+            for n in (1, 2):
+                step = must([
+                    "auto-pass", "--home", str(home), "--fingerprint", f"c{n}", "--unresolved", "1",
+                    "--progress", "yes", "--test-clock", "--now", f"2026-11-09T12:0{n + 1}:00+00:00",
+                ])
+                self.assertEqual(step["passes_used"], n)
+                self.assertFalse(step["baseline"])
+            capped = must([
+                "auto-pass", "--home", str(home), "--fingerprint", "c3", "--unresolved", "1",
+                "--progress", "yes", "--test-clock", "--now", "2026-11-09T12:04:00+00:00",
+            ])
+            self.assertEqual(capped["stop"], "passes")
+            self.assertEqual(capped["passes_used"], 2)
+            self.assertFalse(capped["applied"])
+        finally:
+            shutil.rmtree(home)
+
+    def test_report_is_built_from_saved_records(self):
+        home = self._init("auto")
+        try:
+            must(["decide", "--home", str(home), "--json", str(self._decision("order-line-grain", "business-model"))])
+            must(["recommend", "--home", str(home), "--json", str(FIX / "retain-poor-docs.json")])
+            qpath = home / "q.json"
+            qpath.write_text(json.dumps({
+                "id": "history-window",
+                "affects": "docs/specs/orders/spec.md",
+                "provider": "dispatch lead",
+                "blocks": "order-line-grain",
+                "body": "Is a year of as-was history required?",
+            }), encoding="utf-8")
+            must(["question", "--home", str(home), "--json", str(qpath)])
+            views = {
+                "area_obligations": ["keep the local rule"],
+                "platform_obligations": ["keep the local rule", "platform only rule"],
+                "promoted_to_platform_rule": False,
+                "default_view": None,
+            }
+            vpath = home / "views.json"
+            vpath.write_text(json.dumps(views), encoding="utf-8")
+            must(["views", "--home", str(home), "--input", str(vpath)])
+            must(["diagram", "--home", str(home), "--id", "structure", "--kind", "er", "--caption", "Order and line", "--mermaid", str(FIX / "er.mmd")])
+            must(["diagram", "--home", str(home), "--id", "movement", "--kind", "flow", "--caption", "Landing window", "--mermaid", str(FIX / "flow.mmd")])
+            must(["auto-begin", "--home", str(home), "--minutes", "20", "--passes", "5", "--test-clock", "--now", "2026-11-09T10:25:00+00:00"])
+            must(["auto-pass", "--home", str(home), "--fingerprint", "base", "--unresolved", "1", "--progress", "yes", "--test-clock", "--now", "2026-11-09T10:26:00+00:00"])
+            stall = must(["auto-pass", "--home", str(home), "--fingerprint", "base", "--unresolved", "1", "--progress", "no", "--test-clock", "--now", "2026-11-09T10:31:00+00:00"])
+            self.assertEqual(stall["stop"], "stall")
+            exported = must(["report", "--home", str(home), "--test-clock", "--now", "2026-11-09T10:52:00+00:00", "--kit", "1.121.0"])
+            md = (Path(exported["review"]) / "report.md").read_text(encoding="utf-8")
+            pdf = (Path(exported["review"]) / "report.pdf").read_bytes()
+            h1 = [line for line in md.splitlines() if line.startswith("# ") and not line.startswith("##")]
+            self.assertEqual(h1, ["# Data model review: orders"])
+            self.assertEqual(sum(line.strip() == "## Diagrams" for line in md.splitlines()), 1)
+            self.assertEqual(sum(line.strip() == "## Transition" for line in md.splitlines()), 1)
+            self.assertFalse(any(line.startswith("# Proposed") or line.startswith("# Confirmed") or line.startswith("# Questions") or line.startswith("# Comparisons") for line in md.splitlines()))
+            self.assertNotIn("Current No stage is approved.", md)
+            self.assertIn("Nothing confirmed yet.", md)
+            self.assertIn("None yet.", md)
+            self.assertIn("Nothing recorded yet.", md)
+            self.assertRegex(md, r"Report: report-data-model-full · 2026-11-09 · kit 1.121.0")
+            self.assertLess(md.index("Run: flow auto, stop stall, passes 1 of 5, minutes 6 of 20, checkpoint written."), md.index("## Summary"))
+            self.assertLess(md.index("## Worked examples"), md.index("## Questions"))
+            self.assertEqual(md.count("keep the local rule"), 1)
+            self.assertEqual(md.count("platform only rule"), 1)
+            self.assertIn("Is a year of as-was history required?", md)
+            self.assertIn("current orders grain", md)
+            prose = self._pdf_text(pdf)
+            self.assertIn("Run: flow auto, stop stall", prose)
+            self.assertIn("current orders grain", prose)
+            self.assertIn("one row at the stated grain", prose)
+            self.assertIn("Is a year of as-was history required?", prose)
+            self.assertIn("structure", prose)
+            self.assertIn("movement", prose)
+            self.assertNotIn("Diagram 1", prose)
+            self.assertNotIn("Current No stage is approved.", prose)
+            # An older model with no integrity section is still readable.
+            index = (home / "index.md").read_text(encoding="utf-8")
+            (home / "index.md").write_text(index.split("\n## Integrity\n", 1)[0], encoding="utf-8")
+            must(["example", "--home", str(home), "--kind", "correction", "--json", str(FIX / "correction-ok.json")])
+            second = must(["report", "--home", str(home), "--test-clock", "--now", "2026-11-09T11:00:00+00:00", "--kit", "1.121.0"])
+            self.assertNotEqual(second["review"], exported["review"])
+            self.assertEqual((Path(exported["review"]) / "report.md").read_text(encoding="utf-8"), md)
+            later = (Path(second["review"]) / "report.md").read_text(encoding="utf-8")
+            self.assertIn("The correction keeps the prior amount", later)
+            self.assertIn("The correction keeps the prior amount", self._pdf_text((Path(second["review"]) / "report.pdf").read_bytes()))
+            self.assertNotIn("Nothing recorded yet.", later)
+        finally:
+            shutil.rmtree(home)
+
+    def test_pdf_diagrams_wrap_use_landscape_and_split(self):
+        home = self._init("manual")
+        try:
+            must(["decide", "--home", str(home), "--json", str(self._decision("order-line-grain", "business-model"))])
+            wide = home / "wide.mmd"
+            lines = ["erDiagram"]
+            for i in range(8):
+                lines.append(f"E{i} {{")
+                for attr in range(4):
+                    lines.append(f"string field{attr}")
+                lines.append("}")
+                if i:
+                    lines.append(f"E{i - 1} ||--o{{ E{i} : link")
+            wide.write_text("\n".join(lines) + "\n", encoding="utf-8")
+            flow = home / "flow.mmd"
+            nodes = ["flowchart LR"]
+            for i in range(9):
+                nodes.append(f"N{i}[Node {i}] --> N{i + 1}[Node {i + 1}]")
+            flow.write_text("\n".join(nodes) + "\n", encoding="utf-8")
+            must(["diagram", "--home", str(home), "--id", "platform-structure", "--kind", "er", "--caption", "Wide structure", "--mermaid", str(wide)])
+            must(["diagram", "--home", str(home), "--id", "platform-movement", "--kind", "flow", "--caption", "Wide movement", "--mermaid", str(flow)])
+            exported = must(["report", "--home", str(home), "--test-clock", "--now", "2026-11-09T12:00:00+00:00", "--kit", "1.121.0"])
+            pdf = (Path(exported["review"]) / "report.pdf").read_bytes()
+            prose = self._pdf_text(pdf)
+            self.assertIn("platform-structure (part 1 of 2)", prose)
+            self.assertIn("platform-structure (part 2 of 2)", prose)
+            self.assertIn("split into numbered parts", prose)
+            self.assertNotIn("Diagram 1", prose)
+            self.assertIn(b"/MediaBox [0 0 792 612]", pdf)
+            sizes = [(int(w), int(h)) for w, h in re.findall(rb"/Width (\d+) /Height (\d+)", pdf)]
+            draws = [(float(w), float(h)) for w, h in re.findall(rb"q ([0-9.]+) 0 0 ([0-9.]+) ", pdf)]
+            self.assertGreaterEqual(len(sizes), 2)
+            self.assertTrue(all(w <= 720 for w, _h in sizes))
+            self.assertLess(max(w for w, _h in sizes), 8 * 180)
+            self.assertGreater(max(h for _w, h in sizes), 150)
+            for (dw, dh), (w, h) in zip(draws, sizes):
+                self.assertGreaterEqual(dw / w, 0.57)
+                self.assertGreaterEqual((dh / h) * 14, 8)
+        finally:
+            shutil.rmtree(home)
+
+    def test_unknown_history_coverage_and_a_lean_on_a_tie(self):
+        unknown = {
+            "retained_days": 405,
+            "needed_days": 2230,
+            "other_source": True,
+            "claim": "can-reconstruct",
+        }
+        path = Path(tempfile.mkdtemp()) / "unknown.json"
+        path.write_text(json.dumps(unknown), encoding="utf-8")
+        result = must(["example", "--kind", "history-window", "--json", str(path)])
+        self.assertEqual(result["result"], "question")
+        self.assertTrue(result["open_question"])
+        dated = dict(unknown)
+        dated["other_source_from"] = "2020-10-01"
+        path.write_text(json.dumps(dated), encoding="utf-8")
+        dated_result = must(["example", "--kind", "history-window", "--json", str(path)])
+        self.assertEqual(dated_result["result"], "question")
+        covered = dict(unknown)
+        covered["other_source_days"] = 2000
+        path.write_text(json.dumps(covered), encoding="utf-8")
+        self.assertEqual(must(["example", "--kind", "history-window", "--json", str(path)])["result"], "ok")
+        short = dict(unknown)
+        short["other_source_days"] = 10
+        path.write_text(json.dumps(short), encoding="utf-8")
+        self.assertEqual(must(["example", "--kind", "history-window", "--json", str(path)])["result"], "gap")
+        home = self._init("manual")
+        root = Path(tempfile.mkdtemp())
+        try:
+            unknown_path = home / "unknown.json"
+            unknown_path.write_text(json.dumps(unknown), encoding="utf-8")
+            stored = must(["example", "--home", str(home), "--kind", "history-window", "--json", str(unknown_path)])
+            self.assertEqual(stored["result"], "question")
+            self.assertIn("history-window-coverage", (home / "questions.md").read_text(encoding="utf-8"))
+            body = json.loads(self._decision("storage-layout", "business-model").read_text(encoding="utf-8"))
+            body["outcome"] = "tie"
+            body["axis"] = "storage"
+            (home / "tie.json").write_text(json.dumps(body), encoding="utf-8")
+            must(["decide", "--home", str(home), "--json", str(home / "tie.json")])
+            rec = {
+                "recommendation": "targeted",
+                "existing_meets_need": True,
+                "documentation": "poor",
+                "provisional": True,
+                "decision_changing_gaps": ["storage"],
+                "best_fit": "shared database",
+                "axis": "storage",
+                "reason": "Keep the shared database for operational feeds.",
+            }
+            (home / "rec.json").write_text(json.dumps(rec), encoding="utf-8")
+            must(["recommend", "--home", str(home), "--input", str(home / "rec.json")])
+            shutil.copytree(REPO, root, dirs_exist_ok=True)
+            flagged = must(["drift", "--home", str(home), "--root", str(root)])
+            self.assertTrue(any("storage-layout" in item and "tie" in item for item in flagged["internal"]))
+            rec["reason"] = "tie on axis storage excluded from best fit"
+            (home / "rec.json").write_text(json.dumps(rec), encoding="utf-8")
+            must(["recommend", "--home", str(home), "--input", str(home / "rec.json")])
+            clear = must(["drift", "--home", str(home), "--root", str(root)])
+            self.assertFalse(any("storage-layout" in item for item in clear["internal"]))
+        finally:
+            shutil.rmtree(home)
+            shutil.rmtree(root, ignore_errors=True)
+
     def test_link_line_does_not_write_a_spec(self):
         payload = must(["link-line", "--name", "orders"])
         self.assertEqual(payload["line"], "Data model: docs/data-model/orders/")
         self.assertFalse((ROOT / "docs/data-model").exists())
 
+    def _pdf_text(self, pdf: bytes) -> str:
+        raw = pdf.split(b"/Subtype /Image", 1)[0]
+        parts = []
+        for match in re.findall(br"\((?:\\.|[^\\)])*\) Tj", raw):
+            inner = match[1:-4].replace(b"\\(", b"(").replace(b"\\)", b")").replace(b"\\\\", b"\\")
+            parts.append(inner.decode("latin-1"))
+        return "\n".join(parts)
+
     def _budget(self, home: Path):
         start = "2026-11-08T12:00:00+00:00"
         # Fresh run for the budget cases. The caller already began one; stop it via the time limit first.
-        timed = must(["auto-pass", "--home", str(home), "--fingerprint", "a", "--unresolved", "1", "--progress", "yes", "--now", "2026-11-08T12:20:00+00:00", "--stage", "business-model"])
+        timed = must(["auto-pass", "--home", str(home), "--fingerprint", "a", "--unresolved", "1", "--progress", "yes", "--test-clock", "--now", "2026-11-08T12:20:00+00:00", "--stage", "business-model"])
         self.assertEqual(timed["stop"], "time")
         self.assertFalse(timed["applied"])
         self.assertTrue((home / "checkpoint.md").is_file())
         self.assertIn("not a live preemption", (home / "checkpoint.md").read_text(encoding="utf-8"))
-        fails(["auto-pass", "--home", str(home), "--fingerprint", "a", "--unresolved", "1", "--progress", "yes", "--now", "2026-11-08T12:21:00+00:00"], "resume")
-        must(["auto-begin", "--home", str(home), "--minutes", "20", "--passes", "5", "--now", start])
-        first = must(["auto-pass", "--home", str(home), "--fingerprint", "a", "--unresolved", "0", "--progress", "yes", "--now", "2026-11-08T12:01:00+00:00", "--stage", "business-model"])
+        fails(["auto-pass", "--home", str(home), "--fingerprint", "a", "--unresolved", "1", "--progress", "yes", "--test-clock", "--now", "2026-11-08T12:21:00+00:00"], "resume")
+        must(["auto-begin", "--home", str(home), "--minutes", "20", "--passes", "5", "--test-clock", "--now", start])
+        first = must(["auto-pass", "--home", str(home), "--fingerprint", "a", "--unresolved", "0", "--progress", "yes", "--test-clock", "--now", "2026-11-08T12:01:00+00:00", "--stage", "business-model"])
         self.assertEqual(first["stop"], "")
-        stable = must(["auto-pass", "--home", str(home), "--fingerprint", "a", "--unresolved", "0", "--progress", "yes", "--now", "2026-11-08T12:02:00+00:00"])
+        stable = must(["auto-pass", "--home", str(home), "--fingerprint", "a", "--unresolved", "0", "--progress", "yes", "--test-clock", "--now", "2026-11-08T12:02:00+00:00"])
         self.assertEqual(stable["stop"], "stable")
-        must(["auto-begin", "--home", str(home), "--minutes", "20", "--passes", "5", "--now", start])
-        must(["auto-pass", "--home", str(home), "--fingerprint", "a", "--unresolved", "2", "--progress", "yes", "--now", "2026-11-08T12:01:00+00:00"])
-        stall = must(["auto-pass", "--home", str(home), "--fingerprint", "a", "--unresolved", "2", "--progress", "no", "--now", "2026-11-08T12:02:00+00:00"])
+        must(["auto-begin", "--home", str(home), "--minutes", "20", "--passes", "5", "--test-clock", "--now", start])
+        must(["auto-pass", "--home", str(home), "--fingerprint", "a", "--unresolved", "2", "--progress", "yes", "--test-clock", "--now", "2026-11-08T12:01:00+00:00"])
+        stall = must(["auto-pass", "--home", str(home), "--fingerprint", "a", "--unresolved", "2", "--progress", "no", "--test-clock", "--now", "2026-11-08T12:02:00+00:00"])
         self.assertEqual(stall["stop"], "stall")
         self.assertIn("Unfinished: yes", (home / "checkpoint.md").read_text(encoding="utf-8"))
-        must(["auto-begin", "--home", str(home), "--minutes", "20", "--passes", "5", "--now", start])
-        must(["auto-pass", "--home", str(home), "--fingerprint", "a", "--unresolved", "1", "--progress", "yes", "--now", "2026-11-08T12:01:00+00:00", "--text", "Grain is the order line."])
-        must(["auto-pass", "--home", str(home), "--fingerprint", "b", "--unresolved", "1", "--progress", "yes", "--now", "2026-11-08T12:02:00+00:00", "--text", "Use a shipment grain."])
-        cycle = must(["auto-pass", "--home", str(home), "--fingerprint", "a", "--unresolved", "1", "--progress", "yes", "--now", "2026-11-08T12:03:00+00:00", "--text", "Grain is the order line."])
+        must(["auto-begin", "--home", str(home), "--minutes", "20", "--passes", "5", "--test-clock", "--now", start])
+        must(["auto-pass", "--home", str(home), "--fingerprint", "a", "--unresolved", "1", "--progress", "yes", "--test-clock", "--now", "2026-11-08T12:01:00+00:00", "--text", "Grain is the order line."])
+        must(["auto-pass", "--home", str(home), "--fingerprint", "b", "--unresolved", "1", "--progress", "yes", "--test-clock", "--now", "2026-11-08T12:02:00+00:00", "--text", "Use a shipment grain."])
+        cycle = must(["auto-pass", "--home", str(home), "--fingerprint", "a", "--unresolved", "1", "--progress", "yes", "--test-clock", "--now", "2026-11-08T12:03:00+00:00", "--text", "Grain is the order line."])
         self.assertEqual(cycle["stop"], "cycle")
-        must(["auto-begin", "--home", str(home), "--minutes", "20", "--passes", "5", "--now", start])
+        must(["auto-begin", "--home", str(home), "--minutes", "20", "--passes", "5", "--test-clock", "--now", start])
+        baseline = must([
+            "auto-pass", "--home", str(home), "--fingerprint", "base", "--unresolved", "1",
+            "--progress", "yes", "--test-clock", "--now", "2026-11-08T12:00:30+00:00", "--stage", "business-model",
+        ])
+        self.assertTrue(baseline["baseline"])
+        self.assertEqual(baseline["passes_used"], 0)
+        self.assertFalse(baseline["counted_as_pass"])
         for n, stage in enumerate(["business-model", "business-model", "physical-design", "physical-design", "physical-design"], start=1):
             step = must([
                 "auto-pass", "--home", str(home), "--fingerprint", f"p{n}", "--unresolved", "1",
-                "--progress", "yes", "--now", f"2026-11-08T12:0{n}:00+00:00", "--stage", stage,
+                "--progress", "yes", "--test-clock", "--now", f"2026-11-08T12:0{n}:00+00:00", "--stage", stage,
             ])
+            self.assertFalse(step["baseline"])
             self.assertEqual(step["passes_used"], n)
             self.assertEqual(step["stop"], "")
-        capped = must(["auto-pass", "--home", str(home), "--fingerprint", "p6", "--unresolved", "1", "--progress", "yes", "--now", "2026-11-08T12:06:00+00:00", "--stage", "physical-design"])
+        capped = must(["auto-pass", "--home", str(home), "--fingerprint", "p6", "--unresolved", "1", "--progress", "yes", "--test-clock", "--now", "2026-11-08T12:06:00+00:00", "--stage", "physical-design"])
         self.assertEqual(capped["stop"], "passes")
         self.assertFalse(capped["applied"])
         self.assertEqual(capped["passes_used"], 5)

@@ -1,0 +1,7 @@
+{
+  "operation": "sum",
+  "rows": [
+    {"grain": "one order", "amount": 100},
+    {"grain": "one order line", "amount": 40}
+  ]
+}

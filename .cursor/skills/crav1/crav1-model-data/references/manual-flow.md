@@ -18,4 +18,4 @@ A tie stops for the user. Record their choice with `user_chose` only after they 
 
 ## What you do not do
 
-Do not call `auto-begin`. Do not draft conditional physical design ahead of the business approval. The script rejects that record.
+Do not call `auto-begin`. Do not draft conditional physical design ahead of the business approval. The script rejects that record. Do not edit model files by hand. Change a recorded item with `revise`.
