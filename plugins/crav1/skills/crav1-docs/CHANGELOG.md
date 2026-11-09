@@ -12,6 +12,7 @@ A filled playbook is copied into the repo when it is applied, so the team shares
 - The same playbook is the `Docs path:` line in the file, or else the one committed file whose title subject matches. Reapply overwrites that file. When the committed file was edited in the repo since `Applied as:`, the diff is shown and overwrite waits for a yes.
 - `walk-progress.md` records the `docs/playbooks/` path, not the outside path, so resume works on any machine. The walk also accepts a `docs/playbooks/` path as its playbook argument.
 - This write is not a git commit. `/crav1-finalize-commit` still does that.
+- Already applied a playbook, then new mail landed in the specs: do not re-walk the playbook. Run `/crav1-tighten-and-plan-ready-to-build` with that playbook. Step 1 is skip or reapply, and reapply writes the `docs/playbooks/` copy when it is missing. The new questions are `/crav1-resolve-open-questions`. A fresh `report-playbook-full` only when the playbook's own decisions change. A playbook applied before 1.120.0 is reapplied to create the copy; answers already in the specs stay as they are.
 
 ## 1.119.0 (2026-11-09)
 

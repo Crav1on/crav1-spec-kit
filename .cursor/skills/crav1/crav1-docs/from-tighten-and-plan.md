@@ -56,6 +56,27 @@ Needs verify belongs to `/crav1-verify-build-against-spec`. That command is outs
 
 Not written: application code. `Answer:` and `Change:` lines in the playbook are not edited. A draft with no filled answer is not copied. Nothing is git-committed.
 
+## Already applied, then new information
+
+You already applied a playbook. Then new information landed in the specs, for example from a mail import. Do not re-walk the playbook. Its answers are already in the specs. New facts from mail are open questions or conflicts in the specs. Settle those with `/crav1-resolve-open-questions`.
+
+Recommended path: run the walk again and name that playbook.
+
+```text
+/crav1-tighten-and-plan-ready-to-build
+@docs/specs/<slug>/
+
+<the playbook file>
+```
+
+Step 1 offers `skip` (Recommended) or `reapply`. `reapply` also writes the `docs/playbooks/` copy when that file is missing, for example a playbook applied before 1.120.0. The open-questions step picks up what the mail added. The walk continues to the ready check.
+
+Without the walk: run `/crav1-resolve-open-questions` for the new questions. Reapply the playbook only when you need the `docs/playbooks/` copy.
+
+Make a fresh `report-playbook-full` only when the new information changes the playbook's own decisions, for example the merge order or a reversed choice. That report reads the current specs.
+
+A playbook applied before 1.120.0: reapply the same file. That creates the `docs/playbooks/` copy. Spec answers already present stay as they are.
+
 ## After
 
 When the check is clear, the slice is ready to build. You run build yourself:
