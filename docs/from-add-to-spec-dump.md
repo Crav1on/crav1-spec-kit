@@ -64,14 +64,6 @@ No `plan.md`. No `tasks.md`. No application code. A missing `docs/system/` is no
 
 ## After
 
-If a file changed and those edits should be in git:
-
-```text
-/crav1-finalize-commit
-```
-
-That puts the spec edits (and any applied edits) in git. No push. This command does not commit for you.
-
-`/crav1-plan-from-spec` is only for a slice you choose to start. This command does not run it.
+When a Conflict line was written, `Next` is `/crav1-resolve-open-questions` for that slug, because the conflict is unsettled. Otherwise, when an existing spec changed, `Next` is `/crav1-tighten-spec`, because the new information is not tightened yet. When a file changed and is not committed, the run adds an Uncommitted line for `/crav1-finalize-commit`. The plan is not listed. See [How a run ends](reference/run-ending.md). This command does not run the next step. No push.
 
 Reference page: [add-to-spec](reference/skills/crav1-add-to-spec.md)

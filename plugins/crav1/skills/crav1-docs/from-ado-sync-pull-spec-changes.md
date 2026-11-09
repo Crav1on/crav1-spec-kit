@@ -62,3 +62,5 @@ When a spec changed:
 A Feature with no spec yet: run the starter it suggested, for example [`/crav1-spark-to-spec`](from-nothing.md). Sending a change the other way is [From specs to Azure Boards](from-ado-sync-push-features.md).
 
 Reference page: [ado-sync](reference/skills/crav1-ado-sync.md)
+
+The run ends as [How a run ends](reference/run-ending.md) says: one `Next:` line, `Waiting:` only when a step is blocked, and `Uncommitted:` when files changed and are not committed.

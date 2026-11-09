@@ -101,7 +101,9 @@ TL;DR first:
 - Tests still pass? (if you ran them)
 - Files changed
 - Remaining **inner-loop** ids (`F2`…) — not unimplemented tasks
-- Next: the verify gaps branch of `/crav1-fix-build-gaps` with **no Gap** to continue the walk, or `/crav1-verify-build-against-spec` when the inner-loop queue is empty
+- The queue still has an inner-loop id: `Next: /crav1-fix-build-gaps, because the inner-loop queue is not empty.` Omit Gap to continue the walk.
+- The queue is empty: `Next: /crav1-verify-build-against-spec, because the inner loop is clear.`
+- Add the Uncommitted line when files changed and are not committed. Do not run the next step.
 
 ## Hard rules
 

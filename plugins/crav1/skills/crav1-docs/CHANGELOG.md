@@ -2,6 +2,12 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.122.0 (2026-11-09)
+
+A run ends with one next step. A minor release because what a skill prints at the end of a run changes.
+
+Every skill ends with one `Next:` line: the step to run now, and a short reason. `Waiting:` is added only when a step is blocked, one short line each. A commit is not a step. When files changed and are not committed, the run adds `Uncommitted: 3 files; commit with /crav1-finalize-commit when ready.` A step that depends on the next step's result is not listed. Rules that already pick a first step, such as a Conflict line or new information on an existing slice, keep that choice and use this shape. Spark, ideas, and bundle keep their one `Left:` line. The rule is `docs/reference/run-ending.md`. A skill still only names the next step, unless it already runs that step.
+
 ## 1.121.1 (2026-11-09)
 
 - A kit Python script that imports a helper no longer writes a `__pycache__/` folder beside that helper. The folder was showing up as untracked in the project, for example next to `playbook_store.py` when `/crav1-tighten-and-plan-ready-to-build` runs.

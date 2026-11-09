@@ -45,7 +45,11 @@ Output only:
 - `T#` done or blocked
 - Files changed
 - Verify command and result
-- Next: the one task branch of `/crav1-build-tasks` (this `T#` through verify/fix/commits), the range or all branch of `/crav1-build-tasks` (a range or all unchecked), the implement step of `/crav1-build-tasks` (next unchecked only), the message only branch of `/crav1-finalize-commit` / `/crav1-finalize-commit`, or `/crav1-verify-build-against-spec`
+- One `Next` line, the first case that applies. Do not list the others. Add the Uncommitted line when files changed and are not committed.
+- `tasks.md` is missing: `Next: /crav1-plan-from-spec, because there is no task list.`
+- This task is not through verify: `Next: /crav1-build-tasks <T#>, because verify is still open.`
+- They named a range: `Next: /crav1-build-tasks` for that range, because that is the batch they named.
+- This turn's tasks are done: `Next: /crav1-verify-build-against-spec, because this turn's tasks are done.`
 
 Do not keep going through the list unless they wrote `T2 and T3` or “continue until blocked.”
 

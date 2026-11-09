@@ -52,6 +52,6 @@ Run `scripts/playbook_store.py` in this skill after the yes, when at least one f
 4. `ask-overwrite`: the committed file was edited in the repo after the last apply. `Applied as:` does not match the other lines. Show the diff. Pass `--overwrite` only after the user says yes to that overwrite.
 5. `write --yes` copies the file to `docs/playbooks/<topic>.md`, stamps `Docs path:` and `Applied as:`, and leaves `Answer:` and `Change:` lines as they were. Reapply overwrites that same file. Git history keeps the earlier copy once someone commits.
 6. For each spec this apply changed, pass `--spec`. The script writes one `Playbook: docs/playbooks/<topic>.md` line on that spec, after the title, replacing an older playbook line.
-7. Read-back of `Answer:` and `Change:` works on the committed copy the same way as on the outside file. Name `/crav1-finalize-commit` when the user wants the file in git. Do not commit from this skill.
+7. Read-back of `Answer:` and `Change:` works on the committed copy the same way as on the outside file. Add the Uncommitted line when the user wants the file in git. Do not commit from this skill.
 
 End with what changed, per spec, what was skipped and why, what is still open, and the `docs/playbooks/` path when a copy was written. Suggest rerunning the playbook report to refresh it.

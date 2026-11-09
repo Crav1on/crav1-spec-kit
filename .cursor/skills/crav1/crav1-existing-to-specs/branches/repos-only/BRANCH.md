@@ -89,7 +89,7 @@ Output only:
 - Paths written. On a missing architecture spec, say the system notes were left as they are, and name a `Synced at` line in `repos.md` when that was the exception. On a later re-read, name each file that got a new line or lost a left-out line, or say that file is current. Name each `Synced at` line in `repos.md` this run set.
 - Counts: confirmed facts written, guesses accepted, guesses left out, guesses dismissed
 - Whether the code shows a link, or that no link was found
-- Next: `/crav1-finalize-commit` when a file changed (no push). When nothing was written, name no command. Do not run it. The lanes can extend `docs/architecture/spec.md` in a later turn. Do not start that turn.
+- `Next: nothing needed now.` The lanes can extend the architecture spec in a later turn. Do not start that turn. Add the Uncommitted line when a file changed and is not committed. Do not run a commit.
 
 If they chose `spec/architecture`, say that branch is specify-only: no implement there.
 

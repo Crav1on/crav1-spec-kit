@@ -80,7 +80,7 @@ Read `references/output.md` every run. Print, in this order:
 6. **Follow-ups** (drafts).
 7. **Order**: pull requests this one depends on or that depend on it, and the merge order.
 8. **Drafted replies (not posted)**: one per thread that waits on you.
-9. **Next for you**: Now / After <name> answers / Later (1.100.0).
+9. **Run ending** (1.122.0): one `Next:` line, then `Waiting:` lines, then `Uncommitted:` when the note is not committed. See `references/output.md`.
 10. **Merge readiness**: `Ready: yes | no | merged`, with the reasons.
 11. `PR record: <repo>: <path>`, as a code span.
 
@@ -92,7 +92,7 @@ Read `references/since-last.md` only on `since last`, or when your `Read` line e
 
 ## Write the record
 
-Every run writes the PR note's `## PR record` as `references/pr-record.md` says, merge-safe, each line in sorted place: one Point per point, `Order` lines, your `Read` line, the `Ready` line and the `State` line. A Point keeps its line; a changed status replaces that line where it is. Never delete a Point. The drafted replies go in a `## Replies as drafted, <date> (not posted)` history section, after the personal-data and secrets check. Then run the notes index generator (`scripts/notes_index.py` in `crav1-add-to-spec`). Do not commit; name `/crav1-finalize-commit`.
+Every run writes the PR note's `## PR record` as `references/pr-record.md` says, merge-safe, each line in sorted place: one Point per point, `Order` lines, your `Read` line, the `Ready` line and the `State` line. A Point keeps its line; a changed status replaces that line where it is. Never delete a Point. The drafted replies go in a `## Replies as drafted, <date> (not posted)` history section, after the personal-data and secrets check. Then run the notes index generator (`scripts/notes_index.py` in `crav1-add-to-spec`). Do not commit. The run ending's Uncommitted line covers the note.
 
 Writing the record needs no yes: it is a note in the specs repo, as `/crav1-review-pr` writes its notes. When no specs repo is found, print the record with the path it would have.
 
@@ -113,3 +113,7 @@ Read `references/offers.md` only when there is something to offer.
 - Never log in. Never print, echo or store a token. Redact secrets and personal data the way `/crav1-review-pr` does.
 - Do not run `/crav1-review-pr`, `/crav1-merge-pr`, `/crav1-add-to-spec` or `/crav1-ado-sync`. Name them when they fit.
 - No rebase advice; suggest merging the base into the branch.
+
+## Run ending (1.122.0)
+
+End as [run-ending.md](../crav1-docs/reference/run-ending.md) says.

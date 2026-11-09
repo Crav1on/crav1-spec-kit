@@ -49,3 +49,5 @@ No code edit. No `spec.md` edit. No `plan.md` edit. No `verify.md` edit. No pull
 Start the lane it named in a later turn. Do not treat this command as that lane.
 
 Reference page: [fix-bug](reference/skills/crav1-fix-bug.md)
+
+The run ends as [How a run ends](reference/run-ending.md) says: one `Next:` line, `Waiting:` only when a step is blocked, and `Uncommitted:` when files changed and are not committed.

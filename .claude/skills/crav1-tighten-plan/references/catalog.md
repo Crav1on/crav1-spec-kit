@@ -16,7 +16,7 @@ Read by `/crav1-tighten-plan` when it builds the options for a plan `P#`.
 | `retarget-files` | Fix files likely touched | Correct paths; mark `(proposed)` if no repo. Do not invent a new architecture. | `plan.md` Files section. |
 | `name-linter` | Name the linter | Search the repo. When it has a linter or checker for the code the tasks will touch, name the tool and the command under `## Linter`, and say Build leaves that check green. When it does not, write that. Do not install one. | `plan.md` Linter section. |
 | `park-risk` | Park as risk | Plan was treating a kept-open question as decided. Remove that decision from tasks; list it under Risks. | No silent product answer. |
-| `send-to-spec` | Send to spec | This is a spec defect or a new product question. Do not patch the plan. | No disk change here. Next: `/crav1-tighten-spec` or `/crav1-resolve-open-questions`. |
+| `send-to-spec` | Send to spec | This is a spec defect or a new product question. Do not patch the plan. | No disk change here. One Next line: tighten-spec for a spec defect, resolve-open-questions for a new question. |
 | `keep` | Keep as written | Accept the cost (usually untestable or extra scope). | No disk change. Rare; say the cost. |
 | `suggest` | Get a suggestion | Recommend one offered patch letter. No edits. | Stay on this `P#`. Always offer. |
 | `ask` | Ask, don’t patch | At most 3 questions about this issue. | Retry this `P#`. |

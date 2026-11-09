@@ -49,3 +49,7 @@ A step with nothing to do says so, records that, and moves on. Optional offers a
 The spec, the plan, and the tasks stay the source of truth. `walk-progress.md` only records position. Do not edit `spec.md`, `plan.md`, or `tasks.md` from this skill. Those writes happen inside the skill that owns them, after that skill's own yes.
 
 Do not report ready while a blocker or an open assumption remains. Do not start Build. Do not create a git commit. Apply writes the playbook copy under `docs/playbooks/`; that write is not a git commit.
+
+## Run ending (1.122.0)
+
+End as [run-ending.md](../crav1-docs/reference/run-ending.md) says.

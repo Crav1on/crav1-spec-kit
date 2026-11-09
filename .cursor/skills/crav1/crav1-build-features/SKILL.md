@@ -116,7 +116,7 @@ Do not skip a blocked slug unless they `skip-slug`.
 
 TL;DR: slugs `done` (with `n branches not merged` when that applies) / `blocked` + why / `skipped` / not started; which `feat/<slug>` tips you left on; commits workers reported.
 
-Remind: **no push, no PR** from this skill. Next (optional): `/crav1-open-pr` when you want to push and open the PR (one PR per `feat/<slug>`; do not run it here) (when the head's Match `Branch:` line ends in `(PR <n>)` or a pull request is known to be open for it, name it instead: `/crav1-open-pr` to push to PR <n> and update its description or comment).
+Remind: **no push, no PR** from this skill. `Next: /crav1-open-pr, because the work is not on a pull request yet.` One pull request per `feat/<slug>`. Do not run it here. When the head's Match `Branch:` line ends in `(PR <n>)` or a pull request is known to be open for it, name it instead: `/crav1-open-pr` to push to PR <n> and update its description or comment.
 
 Then **tool-approvals.md → Undo** once. Do not undo per slug or per `T#`.
 
@@ -144,3 +144,7 @@ Skip every spec under `docs/specs/retired/`, and every old-path `spec.md` that i
 - Do not implement on `spec/<slug>`.
 - Do not flatten the board into one implement pass.
 - Do not invent Mode B (handoff/worktrees/Cloud Agents) in this skill.
+
+## Run ending (1.122.0)
+
+End as [run-ending.md](../crav1-docs/reference/run-ending.md) says.

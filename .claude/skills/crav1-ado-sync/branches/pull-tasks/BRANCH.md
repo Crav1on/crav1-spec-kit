@@ -68,4 +68,4 @@ Strip it the same way the push tasks branch of `/crav1-ado-sync` strips: no file
 
 ## Stop
 
-Report what was kept, ticked, added, posted, and dismissed. When a file changed, name it, say it is not committed yet, and name `/crav1-finalize-commit`. Do not run it. Do not plan. Do not implement. Do not commit. Do not create or update a work item.
+Report what was kept, ticked, added, posted, and dismissed. `Next: nothing needed now.` When a file changed, name it and add the Uncommitted line. Do not run a commit. Do not plan. Do not implement. Do not commit. Do not create or update a work item.

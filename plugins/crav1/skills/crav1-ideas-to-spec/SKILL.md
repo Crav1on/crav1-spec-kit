@@ -99,8 +99,10 @@ Then output only:
 - Paths written (`docs/system/` when this turn seeded it, or the index row when the landscape already existed, `glossary.md` when that file was missing, any glossary rows appended, and any picture lines added)
 - Decisions captured as ADRs vs still open
 - 3–5 remaining arguments
-- Next: `/crav1-tighten-spec`, `/crav1-review-architecture`, `/crav1-export-spec`, `/crav1-plan-from-spec`, or accept and Plan Mode. If they chose `spec/<slug>`: no implement on that branch.
-- **Last line (1.70.0):** one plain line saying what is left and naming the next skill, counted from the spec(s) just written: gaps `/crav1-tighten-spec` would raise (acceptance lines that are not testable yet) and the `## Open questions` entries. Example: `Left: 2 gaps to tighten, 3 open questions. Next: /crav1-tighten-spec orders-retry.` When nothing is left: `Nothing left to tighten. Next: /crav1-plan-from-spec <slug>.`
+- If they chose `spec/<slug>`: no implement on that branch. Do not list the later pull request.
+- **Last line (1.70.0, shape 1.122.0):** one plain line, counted from the specs just written. Gaps are acceptance lines that are not testable yet, plus `## Open questions`. Add the Uncommitted line when a file changed. Do not run the next step.
+- Gaps or open questions remain: `Left: 2 gaps to tighten, 3 open questions. Next: /crav1-tighten-spec orders-retry, because those gaps are still in the spec.`
+- Nothing left to tighten: `Nothing left to tighten. Next: /crav1-plan-from-spec <slug>, because the spec is tight enough to plan.`
 
 Then, when this turn created a new `docs/specs/<slug>/` folder, follow [work-item-offer.md](../crav1-finalize-commit/branches/message-only/references/work-item-offer.md) (plugin: sibling `skills/crav1-finalize-commit/branches/message-only/references/work-item-offer.md`). One optional question on Azure Repos only. Do not ask on GitHub or any other host. Do not ask again in this run if the user skips or does not answer.
 
@@ -113,3 +115,7 @@ Read `references/notes.md` ("A quoted note") only when a spec line quotes a note
 ## Style
 
 Be concise. No persona theater. Quote their words when clustering so they can correct you. Prefer cutting scope to adding architecture.
+
+## Run ending (1.122.0)
+
+End as [run-ending.md](../crav1-docs/reference/run-ending.md) says.

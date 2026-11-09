@@ -97,9 +97,8 @@ Offer:
 
 When `/crav1-plan-from-spec` has written `plan.md` / `tasks.md` on `spec/<slug>` (or they chose specify-only earlier):
 
-- Next: `/crav1-finalize-commit` (no push), then **they** open a PR for this branch when they want the spec on default
-- Do **not** start `/crav1-build-tasks` on `spec/<slug>`
-- After that PR is merged (they say so): `/crav1-create-feature-branch` with this slug → `feat/<slug>` from default, then implement / build-tasks
+- On `spec/<slug>`: `Next: /crav1-open-pr, because this specify-only branch is not on the default branch yet.` Add the Uncommitted line when spec files are not committed. Do not start build on that branch. Do not list the feat branch; it waits until this pull request has merged.
+- On `feat/<slug>`: skip this list. Implement on the same branch when they ask. Do not start it here.
 
 If they planned on `feat/<slug>` (one-branch default), skip spec-first. Implement on the same branch.
 
@@ -111,3 +110,7 @@ If they planned on `feat/<slug>` (one-branch default), skip spec-first. Implemen
 - No push, no PR, no `git commit` in this skill.
 - Do not throw away uncommitted work.
 - Do not create branches in an empty repo with no commits.
+
+## Run ending (1.122.0)
+
+End as [run-ending.md](../crav1-docs/reference/run-ending.md) says.

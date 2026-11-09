@@ -42,6 +42,9 @@ Named, not run: <commands>, or none
 
 Then the answer summary from the reference file: each answer linked, each possible answer left open, each asked mark and where its date came from, and each `/crav1-resolve-open-questions` named.
 
-When the fact branch of `/crav1-add-to-spec` changed an existing spec, name the next steps from the **New information on an existing slice** route (`docs/reference/workflow.md#new-info`) for that slug: `/crav1-tighten-spec` first, then `/crav1-resolve-open-questions`, then `/crav1-plan-from-spec` when the slice has `plan.md` or `tasks.md`. A named `/crav1-resolve-open-questions` comes after `/crav1-tighten-spec`, never before it. For the full order, name `/crav1-help next`. Do not run any of them.
+Then one ending, as `crav1-docs/reference/run-ending.md` says. The first matching case wins. Do not list resolve or the plan. Do not run the next step. Add the Uncommitted line when a file changed and is not committed. Do not commit the note.
 
-When the fact branch of `/crav1-add-to-spec` changed a file, or this command wrote a source folder or a note, name `/crav1-finalize-commit`. Do not run it. Do not commit the note.
+- The fact branch changed an existing spec: `Next: /crav1-tighten-spec <slug>, because the new information is not tightened yet.`
+- A kept new feature was the only handoff: `Next:` is the one starter that item named (spark, ideas, or bundle), because it fits no existing spec.
+- A kept bug was the only handoff: `Next: /crav1-fix-bug, because the item is a bug and no lane has started.`
+- None of those: `Next: nothing needed now.`

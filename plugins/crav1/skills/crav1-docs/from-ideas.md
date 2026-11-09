@@ -227,4 +227,4 @@ Reference page: [ideas-to-spec](reference/skills/crav1-ideas-to-spec.md)
 
 ## Last line
 
-`/crav1-ideas-to-spec` ends with one plain line: what is left and the next skill. `Left: 2 gaps to tighten, 3 open questions. Next: /crav1-tighten-spec orders-retry.` or `Nothing left to tighten. Next: /crav1-plan-from-spec orders-retry.`
+`/crav1-ideas-to-spec` ends with one plain line, as [How a run ends](reference/run-ending.md) says. `Left: 2 gaps to tighten, 3 open questions. Next: /crav1-tighten-spec orders-retry, because those gaps are still in the spec.` When nothing is left: `Nothing left to tighten. Next: /crav1-plan-from-spec orders-retry, because the spec is tight enough to plan.`

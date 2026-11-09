@@ -97,14 +97,13 @@ One question: A) Yes, all, B) Yes, skip the stale ones, C) Name the ones I want,
 
 ## After
 
-If a file changed and those edits should be in git:
+When an existing spec gained a quote, the run ends as [How a run ends](reference/run-ending.md) says:
 
 ```text
-/crav1-finalize-commit
+Next: /crav1-tighten-spec <slug>, because the new information is not tightened yet.
+Uncommitted: 1 file; commit with /crav1-finalize-commit when ready.
 ```
 
-That puts the spec edits (and any applied edits) in git. No push. This command does not commit for you. It points at that command only when those spec edits should be committed.
-
-`/crav1-plan-from-spec` is only for a slice you choose to start. This command does not run it.
+The plan is not listed. This command does not run the next step. No push.
 
 Reference page: [add-to-spec](reference/skills/crav1-add-to-spec.md)

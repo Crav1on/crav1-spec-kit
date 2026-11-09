@@ -85,4 +85,4 @@ When the spec has no answer, draft no reply. Offer the question as an open quest
 
 ## Stop
 
-Do not plan. Do not implement. Do not commit. Do not create or update a Feature. Name `/crav1-finalize-commit` when a spec file changed. Do not run it.
+Do not plan. Do not implement. Do not commit. Do not create or update a Feature. `Next: nothing needed now.` Add the Uncommitted line when a spec file changed. Do not run a commit.

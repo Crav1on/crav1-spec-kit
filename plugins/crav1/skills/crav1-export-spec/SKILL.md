@@ -23,3 +23,7 @@ Rules:
 - Keep IDs stable if `export/spec.yaml` or `export/spec.json` already exist.
 
 Ask which format if they did not name one.
+
+## Run ending (1.122.0)
+
+End as [run-ending.md](../crav1-docs/reference/run-ending.md) says.

@@ -47,6 +47,6 @@ Questions stay with the model and name the specs they affect. The command can ad
 
 ## After
 
-When a model file changed, `/crav1-finalize-commit`. When you want the review, `/crav1-what-do-we-know-about-this`. When a requirement should change, `/crav1-add-to-spec`. This command does not run them.
+When you asked for the review: `Next: /crav1-what-do-we-know-about-this report-data-model-full <model>, because you asked for the review.` Otherwise `Next: nothing needed now.` When a model file changed: `Uncommitted: 1 file; commit with /crav1-finalize-commit when ready.` A requirement change is later, through `/crav1-add-to-spec`, and is not listed here. This command does not run them. See [How a run ends](reference/run-ending.md).
 
 Reference page: [model data](reference/skills/crav1-model-data.md)

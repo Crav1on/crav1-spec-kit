@@ -12,7 +12,7 @@ Date:
 | Claimed done, unverified | 0 | |
 | Acceptance with no task | 0 | |
 
-Next: `/crav1-fix-build-gaps` (omit Gap) for failed/unverified/`G#`; `/crav1-build-tasks T#` if only unimplemented remains; or ship.
+Next: `/crav1-fix-build-gaps`, because a verify id is not proved yet.
 
 ## Tasks — overview
 

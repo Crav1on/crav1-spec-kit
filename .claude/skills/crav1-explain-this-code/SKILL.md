@@ -103,3 +103,7 @@ Do not change code. Do not write any other file. Do not run `/crav1-explain-exis
 ## Style
 
 Be concise. Plain words. Point at file and line. Say what is not known instead of guessing.
+
+## Run ending (1.122.0)
+
+End as [run-ending.md](../crav1-docs/reference/run-ending.md) says.

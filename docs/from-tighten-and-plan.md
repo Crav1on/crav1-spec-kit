@@ -86,6 +86,6 @@ When the check is clear, the slice is ready to build. You run build yourself:
 @docs/specs/<slug>/
 ```
 
-This walk does not run `/crav1-build-tasks`. When the progress file should be committed, `/crav1-finalize-commit`.
+This walk does not run `/crav1-build-tasks`. The ending is `Next: /crav1-build-tasks, because the slice is ready to build.` When the progress file is not committed: `Uncommitted: 1 file; commit with /crav1-finalize-commit when ready.` See [How a run ends](reference/run-ending.md).
 
 Reference page: [tighten and plan, ready to build](reference/skills/crav1-tighten-and-plan-ready-to-build.md)

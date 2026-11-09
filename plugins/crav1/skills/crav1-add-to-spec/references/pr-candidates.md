@@ -13,4 +13,4 @@ Read only on `pr<n> candidates`, from **Choice words** in `SKILL.md`.
 - Run the candidates as one `fact` dump, as `references/fact.md` says, with the PR note as the source (`From PR <n> record, <date>.`). The usual target-spec and impact questions apply.
 - A `to decision` Point whose text says the decision is not made yet (`<name> decides`, `waiting on <name>`, an open question) goes in as an open question with `Pending: <name>`, as `references/open-questions.md` says, not as a spec line.
 - After the spec is written, set `in spec <slug>` on each Point taken, with the host's edit tool, one edit per line, in place (`references/pr-record.md` **Merge-safe rules**). A Point the user leaves out keeps its tag.
-- Do not commit; name `/crav1-finalize-commit`.
+- Do not commit. The fact path's ending applies (`references/stop.md`). Add the Uncommitted line when a file changed.

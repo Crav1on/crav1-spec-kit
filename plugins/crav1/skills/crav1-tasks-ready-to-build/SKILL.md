@@ -83,12 +83,15 @@ Done: 4
 Order: T5 → T6 → T7
 Branches: 1 of 3 merged into develop. Not merged: feat/orders-retry (2 commits), feature/orders-export (3 commits).
 
-Next: /crav1-build-tasks T5 (<slug>)
+Next: /crav1-build-tasks T5 (orders-retry), because that task unblocks the most others.
 Source: docs/specs/<slug>/spec.md, plan.md, tasks.md, verify.md
 ```
 
 - **Order** shows the slice's unticked tasks in dependency order, `|` between tasks of the same wave. One Order line per slice when listing all specs.
-- **Next** names the ready task that unblocks the most other unticked tasks (every task downstream of it), lowest number on a tie, in the first slice that has one. When nothing is ready, say what would unblock the first blocked task instead (for example `Next: answer the open question with /crav1-resolve-open-questions`). When only Needs verify is left, `Next: /crav1-verify-build-against-spec`.
+- **Next** is one line, as `crav1-docs/reference/run-ending.md` says. It names the ready task that unblocks the most other unticked tasks (every task downstream of it), lowest number on a tie, in the first slice that has one.
+- Nothing is ready, and an open question blocks the first task: `Next: /crav1-resolve-open-questions <slug>, because that question blocks the first task.`
+- Only Needs verify is left: `Next: /crav1-verify-build-against-spec <slug>, because the built tasks are not verified yet.`
+- Nothing is left to build or verify: `Next: nothing needed now.`
 - A ready task with `(branch: …)` shows that branch beside it.
 - **Source** names every file it read, per slice.
 - When the slice has `work-item.md`, add the Azure Boards line from **What it reads**.

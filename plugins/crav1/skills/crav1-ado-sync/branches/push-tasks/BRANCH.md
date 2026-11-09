@@ -113,6 +113,6 @@ The line ends with its home. Add the tag to older lines in that file that have n
 
 Say what was created, what was updated, and what was skipped. One line each: the id, the title, `T<n>`, and the State it was created with or moved to. Name any conflict that was left as it is.
 
-When the run wrote `work-item.md` or `docs/environments/marks.md`, name each file. Say it is not committed yet and must be committed. Name `/crav1-finalize-commit`. Do not run it. Name the pull tasks branch of `/crav1-ado-sync` as the later read-back. Do not run it. Say that without `work-item.md` a later run offers Create again and would make a duplicate.
+When the run wrote `work-item.md` or `docs/environments/marks.md`, name each file. Say that without `work-item.md` a later run offers Create again and would make a duplicate. `Next: nothing needed now.` Add the Uncommitted line. Do not name the pull tasks branch in the ending. Do not run a commit.
 
 Do not plan. Do not implement. Do not commit.

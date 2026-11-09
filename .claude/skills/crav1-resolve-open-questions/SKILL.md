@@ -74,7 +74,12 @@ Stop. Do not edit. Do not preview a full patched spec.
 2. Recap **Added / Removed / Still open** for this `Q#`.
 3. If the answer makes a named diagram/ADR wrong, either they also chose `sync-here`, or the **next** item is that drift (do not silently skip).
 4. When this question was waiting on a stale research point, re-check that point. The question says so, or `## Research findings` names the point and this question. Follow the answered-later part of skill `crav1-add-to-spec`, `references/research-stale-clear.md`. Do not ask the user whether the point is settled. Keep open does not re-check. When the answer settles the point, record it and clear the mark when no point is open. When it does not, leave the mark and say why. Include that summary in the recap. Do not commit. Do not send anything.
-5. When the run named one question (`Q2`, `orders Q3`, or words matching one question), stop after it (1.90.5): do not show or ask another question; end with the still-open titles and `/crav1-resolve-open-questions <slug>` for the rest. Otherwise advance to the next unanswered `Q#`. If none remain, say the open-question list is empty and they can Plan Mode or `/crav1-review-architecture` / `/crav1-tighten-spec` if new gaps appeared.
+5. When the run named one question (`Q2`, `orders Q3`, or words matching one question), stop after it (1.90.5): do not show or ask another question. End with the still-open titles and one line: `Next: /crav1-resolve-open-questions <slug>, because other questions are still open.` Otherwise advance to the next unanswered `Q#`.
+
+If none remain, print one of these and not both.
+
+- New gaps appeared: `Next: /crav1-tighten-spec <slug>, because new gaps are not tightened yet.`
+- No new gaps: `Next: /crav1-plan-from-spec <slug>, because the open questions are settled or kept open.`
 
 **Batch (1.70.0).** Show every question at once, each with its options and the recommended one first, and ask once: a single `yes` applies every recommendation; a batch such as `Q1 A, Q3 keep` overrides those questions; answering one question at a time still works. Then patch, and give one recap for the run.
 
@@ -105,5 +110,8 @@ Do **not** offer a turn-level “answer all with assumptions.” Guessing is `as
 ## When the list is done
 
 - Remaining items are only those they **kept open** (questions or Conflict lines), or the list is empty.
-- Tell them: kept-open items stay as the spec’s honest unknowns; empty list → `/crav1-plan-from-spec` or a new chat in Plan Mode with `spec.md` attached.
-- Optional next: `/crav1-export-spec` if exports exist, or `/crav1-review-architecture` if answers changed the shape.
+- Kept-open items stay as the spec’s honest unknowns. `Next: nothing needed now.`
+- Empty list: `Next: /crav1-plan-from-spec <slug>, because the open questions are settled or kept open.`
+- Do not list export or an architecture review in the ending.
+
+End as [run-ending.md](../crav1-docs/reference/run-ending.md) says.

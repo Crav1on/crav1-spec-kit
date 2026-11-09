@@ -134,3 +134,7 @@ Read `references/after.md` ("After it exists") only when the pull request exists
 - Do not block the pull request when `work-item.md` is missing. Do not create a work item and do not look one up.
 - Do not claim a pull request was opened unless the host returned a URL.
 - Workers stay no push and no pull request. Do not run this skill from `crav1-build-task-agent`.
+
+## Run ending (1.122.0)
+
+End as [run-ending.md](../crav1-docs/reference/run-ending.md) says.

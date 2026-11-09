@@ -43,16 +43,10 @@ Drafted replies (not posted)
 - Thread 104 (src/orders/audit.py): "Agreed for the pilot. I'll add the restructure as a follow-up so it isn't lost."
 - To Robin K. (not sent): "Hi Robin, Sam and I need the merge order of feat/orders-queue (PR 40) and PR 42. Plan: PR 40 into develop first. OK with you?"
 
-Next for you
-Now
-- Post the drafted reply in thread 104 (in the note, under Replies as drafted, 2026-10-27).
-- `/crav1-add-to-spec pr42 candidates`: 1 candidate.
-- `/crav1-ado-sync`: the follow-up (restructure the audit write path).
-After Robin K. answers the merge order (PR 40)
-- If PR 40 first: wait for PR 40, then `/crav1-pr-status pr42 since last`.
-- If PR 42 first: drop the Order line in the next run, then `/crav1-pr-status pr42 since last`.
-Later
-- When PR 40 is merged and Ready is yes: `/crav1-merge-pr pr42`.
+Next: post the drafted reply in thread 104, because that thread is waiting on you.
+Waiting: /crav1-pr-status pr42 since last, after Robin K. answers the merge order.
+Waiting: /crav1-merge-pr pr42, after PR 40 is merged and Ready is yes.
+Uncommitted: 1 file; commit with /crav1-finalize-commit when ready.
 
 Ready: no. 2 waiting on you; 1 needs Robin K.; 1 agreed, not done; after PR 40 (not merged).
 PR record: `orders-api: docs/notes/2026-10/2026-10-08-pr-orders-api-71.md`
@@ -60,17 +54,17 @@ PR record: `orders-api: docs/notes/2026-10/2026-10-08-pr-orders-api-71.md`
 
 Local files, the `PR record:` line included, are named as a code span with the repo first: `` `orders-api: docs/notes/…` ``. Never as a Markdown link, `file://`, `vscode://` or an absolute path, in the shape or in closing prose. Web links only for things on the host (the pull request, a thread, a commit) (1.99.1).
 
-## Next for you (1.100.0)
+## Run ending (1.122.0)
 
-The last section before `Ready`, built from record lines, never from guesses:
+The last lines before `Ready`, as `crav1-docs/reference/run-ending.md` says. Build the old Now / After / Later groups in your head, from record lines, never from guesses, then print the shape and not the groups.
 
-- **Now**: steps nothing blocks, from `waiting on <you>` Points, drafted replies, open candidates and follow-ups. Commands follow the route order of `docs/reference/workflow.md`; that file is the source, so no `/crav1-help` call is needed.
-- **After `<name>` answers `<point>`**: steps behind a `waiting on <name>` or `needs <name>` Point, one group per person. When the thread names the options, one `If <option>:` line per option with what it leads to; otherwise one line, and nothing made up.
-- **Later**: steps behind an event: an `Order` pull request merged, `Ready: yes`, or a push.
+- **Now** (not printed as a heading): steps nothing blocks, from `waiting on <you>` Points, drafted replies, open candidates and follow-ups. Order them by `docs/reference/workflow.md`, then oldest, then anchor. That file is the source, so no help call is needed.
+- `Next:` is the first Now item, one line, with a short reason. Now empty: `Next: nothing needed now.`
+- A Now item that is not first stays in the report section that already lists it (candidates, follow-ups, drafted replies). It is not a second `Next` line and not a `Waiting` line.
+- **After `<name>` answers** and **Later** become `Waiting:` lines. One line per blocked step: the step, and who or what it waits on. When the thread names options, keep them in the Order section. One Waiting line for that person, not one line per option. Nothing made up.
+- `Uncommitted:` when the PR note changed and is not committed. Do not put the commit command in `Next`.
 
-Commands are named, never run. Empty groups are left out. `since last` shows steps that moved between groups.
-
-Empty groups are left out, heading included. Within a group: oldest first, then by anchor.
+Commands are named, never run. `since last` uses the same shape for steps that moved. Nothing new: `Next: nothing needed now.`
 
 ## Verdict line
 

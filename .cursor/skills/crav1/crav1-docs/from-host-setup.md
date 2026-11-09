@@ -35,7 +35,10 @@ A plan task marked `(host setup)` follows the same rules inside [Build tasks](fr
 
 ## After
 
-- `/crav1-open-pr` to push the script and open a pull request.
-- `/crav1-pr-status` when a pull request thread asked for this setting.
+```text
+Next: /crav1-open-pr, because the script is on a work branch and not on a pull request yet.
+```
+
+A thread that asked for the setting is named in that reason. `/crav1-pr-status` comes after the pull request exists. See [How a run ends](reference/run-ending.md).
 
 Reference page: [host-setup](reference/skills/crav1-host-setup.md)

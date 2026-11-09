@@ -43,14 +43,6 @@ No `spec.md` edit. No `plan.md` edit. No `tasks.md` edit. No `verify.md` edit. N
 
 ## After
 
-The run is done when the stop name is written. A bug stays in `explore.md`.
-
-Send a bug to `/crav1-fix-bug` only in a turn where the user says so. This command does not start Specify, Plan, or Build.
-
-When the file changed and the user wants it in git:
-
-```text
-/crav1-finalize-commit
-```
+The run is done when the stop name is written. `Next: nothing needed now.` A bug stays in `explore.md`. Send a bug to `/crav1-fix-bug` only in a turn where the user says so. This command does not start Specify, Plan, or Build. When the file changed: `Uncommitted: 1 file; commit with /crav1-finalize-commit when ready.` See [How a run ends](reference/run-ending.md).
 
 Reference page: [run-exploratory-test](reference/skills/crav1-run-exploratory-test.md)

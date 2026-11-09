@@ -28,7 +28,7 @@ Read `references/windows.md` ("Windows") only when git or az is not found (Windo
 
 ## Output (1.113.0)
 
-Read `references/output.md` ("Output") every run, before you show anything. The chat shows only the postable review, its verdict, one line naming the PR note, and the post offer. Everything else in this skill (check lines, findings, lanes, info, suggestions, follow-ups, next steps) is the kit record and goes into the PR note. With outside context (a mail, a meeting), a separate read-only section follows the review and is saved next to the PR note.
+Read `references/output.md` ("Output") every run, before you show anything. The chat shows only the postable review, its verdict, one line naming the PR note, and the post offer. Everything else in this skill (check lines, findings, lanes, info, suggestions, follow-ups, later steps) is the kit record and goes into the PR note. With outside context (a mail, a meeting), a separate read-only section follows the review and is saved next to the PR note. After the post offer: `Next: nothing needed now.` The Uncommitted line goes in the kit record when the note is not committed.
 
 ## Comment as posted first
 
@@ -162,3 +162,7 @@ Read `references/posting.md` ("Post it") only when the user answers the post que
 - Do not run this skill from `/crav1-open-pr`, `/crav1-merge-pr`, spark, specify, plan, or verify.
 - No `git checkout`, no `git commit`, no new branch, no push.
 - No dialog-box or browser Microsoft sign-in. No token printed or created.
+
+## Run ending (1.122.0)
+
+End as [run-ending.md](../crav1-docs/reference/run-ending.md) says.

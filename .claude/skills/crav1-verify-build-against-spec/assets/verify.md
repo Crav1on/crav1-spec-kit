@@ -18,7 +18,7 @@ Date:
 <!-- With a spec branch (1.68.0): Sub-branches: <n> of <m> merged into <spec branch>. left behind: <branch> (not in <spec branch>). A reverted branch: <branch>: merged, reverted on <base> (<sha>). Report only. -->
 <!-- With docs/environments/promotion.md (1.69.0): Promotion: on the branch that deploys to <env> (<branch>); not yet on the branch that deploys to <env> (<branch>). Branch reach, not deployment proof. -->
 
-Next: `/crav1-fix-build-gaps` (omit Gap) for failed/unverified/`G#`; `/crav1-build-tasks T#` if only unimplemented remains; or ship.
+Next: `/crav1-fix-build-gaps`, because a verify id is not proved yet.
 
 ## Tasks — overview (dependency order)
 

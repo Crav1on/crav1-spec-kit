@@ -77,14 +77,6 @@ For each gap you pick: add it to the nearest spec (handed to `/crav1-add-to-spec
 
 ## After Index
 
-If you are done with this dump:
-
-```text
-/crav1-finalize-commit
-```
-
-That puts `docs/system/` and the new spec slugs in git. No push. This command does not commit for you.
-
-`/crav1-plan-from-spec` is only for a slice you choose to start. A slice that is not in the code is not planned by this command.
+When specs were written: `Next: /crav1-tighten-spec <first slug>, because those specs are not tightened yet.` When a file changed: `Uncommitted: 1 file; commit with /crav1-finalize-commit when ready.` See [How a run ends](reference/run-ending.md). No push. This command does not commit for you. A slice that is not in the code is not planned by this command.
 
 Reference page: [existing-to-specs](reference/skills/crav1-existing-to-specs.md)

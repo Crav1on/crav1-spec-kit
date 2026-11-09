@@ -116,3 +116,7 @@ Read `references/notes.md` ("A quoted note") only when a fix quotes a note.
 ## When the spec is tight enough
 
 Read `references/done.md` ("When the spec is tight enough") only when no issues are left.
+
+## Run ending (1.122.0)
+
+End as [run-ending.md](../crav1-docs/reference/run-ending.md) says.

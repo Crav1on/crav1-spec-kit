@@ -81,12 +81,13 @@ Same order as the file. Do **not** open with the full acceptance matrix.
 1. Path to `verify.md`
 2. **TL;DR** (copy the id lists and the Branches line; they should be scannable in a few seconds)
 3. Point at the Tasks overview in the file
-4. Next:
-   - Inner-loop (**verify failed**, **claimed done, unverified**, wiring **`G#`**) → `/crav1-fix-build-gaps` (omit Gap to walk them in order)
-   - **Not implemented** → `/crav1-build-tasks T#`
-   - acceptance with no task → `/crav1-plan-from-spec` or `/crav1-tighten-spec` if the line should die
-   - all **Implemented, verified**, no missing acceptance, and every work branch merged → spec is demoable; they can ship / PR
-   - all verified but some work branches not merged → `built and verified, not merged yet: <branches>`, next `/crav1-open-pr` or `/crav1-merge-pr` (a branch with `(PR <n>)` names it: `/crav1-open-pr` to push to PR <n> and update its description or comment)
+4. One `Next` line, the first case that applies, as `crav1-docs/reference/run-ending.md` says. Do not list the other cases. Do not run it. Add the Uncommitted line when `verify.md` changed and is not committed.
+   - Inner-loop ids remain (verify failed, claimed done unverified, or a wiring `G#`): `Next: /crav1-fix-build-gaps, because verify could not prove those ids.` Omit Gap to walk them in order.
+   - Only not-implemented tasks remain: `Next: /crav1-build-tasks` for the first of those, because they are not built.
+   - An acceptance line has no task and should stay: `Next: /crav1-plan-from-spec, because that acceptance line has no task.`
+   - An acceptance line should die: `Next: /crav1-tighten-spec, because that acceptance line should not stay.`
+   - All verified, and a work branch is not merged: `Next: /crav1-open-pr, because a work branch is not merged yet.` Say `built and verified, not merged yet: <branches>`. A branch with `(PR <n>)` names it: `/crav1-open-pr` to push to PR <n> and update its description or comment.
+   - All verified and every work branch is merged: `Next: nothing needed now.` The spec is demoable.
 
 Do not start implementing in this turn unless they already named a `T#` to fix.
 

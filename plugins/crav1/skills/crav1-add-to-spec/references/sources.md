@@ -109,4 +109,4 @@ A `Source:` line in a chat list, before the folder exists, stays `<kind> <date>`
 
 ## Do not commit
 
-Write the folder, the README, the transfer data policy only after a yes, and the spec lines. Do not commit. Do not push. Do not open a pull request. Name `/crav1-finalize-commit` when a file changed. Do not run it.
+Write the folder, the README, the transfer data policy only after a yes, and the spec lines. Do not commit. Do not push. Do not open a pull request. Add the Uncommitted line from `crav1-docs/reference/run-ending.md` when a file changed. Do not run a commit.

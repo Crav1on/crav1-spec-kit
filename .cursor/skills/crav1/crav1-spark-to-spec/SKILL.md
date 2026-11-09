@@ -73,8 +73,10 @@ Then output only:
 - Path to the spec, and `docs/system/` when this turn seeded it (or the index row when the landscape already existed, `glossary.md` when that file was missing, any glossary rows appended, and any picture lines added)
 - Mode (greenfield, brownfield feature, or later feature on landscape)
 - 3–5 decisions still worth arguing, as a list, not a question; a bare `yes` afterwards does not run the next skill
-- What to do next: answer those, or run `/crav1-tighten-spec`, or accept and `/crav1-plan-from-spec`. If they chose `spec/<slug>`, remind them: no implement on that branch; PR/merge when they want, then `feat/<slug>` for build.
-- **Last line (1.70.0):** one plain line saying what is left and naming the next skill, counted from the spec(s) just written: gaps `/crav1-tighten-spec` would raise (acceptance lines that are not testable yet) and the `## Open questions` entries. Example: `Left: 2 gaps to tighten, 3 open questions. Next: /crav1-tighten-spec orders-retry.` When nothing is left: `Nothing left to tighten. Next: /crav1-plan-from-spec <slug>.`
+- If they chose `spec/<slug>`, say no implement on that branch. Do not list the later pull request or the feat branch.
+- **Last line (1.70.0, shape 1.122.0):** one plain line, counted from the spec just written. Gaps are acceptance lines that are not testable yet, plus `## Open questions`. Add the Uncommitted line when a file changed. Do not run the next step.
+- Gaps or open questions remain: `Left: 2 gaps to tighten, 3 open questions. Next: /crav1-tighten-spec orders-retry, because those gaps are still in the spec.`
+- Nothing left to tighten: `Nothing left to tighten. Next: /crav1-plan-from-spec <slug>, because the spec is tight enough to plan.`
 
 Then, when this turn created a new `docs/specs/<slug>/` folder, follow [work-item-offer.md](../crav1-finalize-commit/branches/message-only/references/work-item-offer.md) (plugin: sibling `skills/crav1-finalize-commit/branches/message-only/references/work-item-offer.md`). One optional question on Azure Repos only. Do not ask on GitHub or any other host. Do not ask again in this run if the user skips or does not answer.
 
@@ -87,3 +89,7 @@ Read `references/notes.md` ("A quoted note") only when a spec line quotes a note
 ## Style
 
 Be concise. No lorem. No “Welcome to your app.” No persona theater. Structure with headings and bullets.
+
+## Run ending (1.122.0)
+
+End as [run-ending.md](../crav1-docs/reference/run-ending.md) says.

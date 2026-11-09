@@ -111,3 +111,5 @@ Reading the task items back onto the spec and `tasks.md` is [From Azure Boards t
 Reading a Feature back onto the specs is [From Azure Boards to specs](from-ado-sync-pull-spec-changes.md).
 
 Reference page: [ado-sync](reference/skills/crav1-ado-sync.md)
+
+The run ends as [How a run ends](reference/run-ending.md) says: one `Next:` line, `Waiting:` only when a step is blocked, and `Uncommitted:` when files changed and are not committed.

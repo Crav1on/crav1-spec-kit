@@ -77,4 +77,9 @@ When nothing is found: `No gaps and no stale claims in <repos/scope>.` and the n
 
 ## Stop
 
-Stop after the report and the handoff choices. Do not start Specify, Plan, or Build. Next steps the user may run: `/crav1-add-to-spec` for a gap they want in a spec, `/crav1-tighten-spec` for a stale claim they want fixed in the spec, `/crav1-spark-to-spec` for a new feature.
+Stop after the report and the handoff choices. Do not start Specify, Plan, or Build. One `Next` line, the first gap in the report. Do not list the other kinds. Do not run it. Add the Uncommitted line when a file changed and is not committed.
+
+- A code gap with no spec: `Next: /crav1-add-to-spec, because that code is in no spec.`
+- A stale claim: `Next: /crav1-tighten-spec <slug>, because that claim no longer matches the code.`
+- A new feature: `Next: /crav1-spark-to-spec, because the report names a feature with no spec.`
+- No gap: `Next: nothing needed now.`

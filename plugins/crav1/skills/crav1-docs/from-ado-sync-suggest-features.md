@@ -45,3 +45,5 @@ Nothing, unless the user asks for a file. The command does not call Azure Boards
 Sending a row to Azure Boards is [From specs to Azure Boards](from-ado-sync-push-features.md).
 
 Reference page: [ado-sync](reference/skills/crav1-ado-sync.md)
+
+The run ends as [How a run ends](reference/run-ending.md) says: one `Next:` line, `Waiting:` only when a step is blocked, and `Uncommitted:` when files changed and are not committed.

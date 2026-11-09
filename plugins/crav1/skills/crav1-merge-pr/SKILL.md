@@ -190,3 +190,7 @@ Read `references/fallback.md` ("Auth notes") only when a CLI says it is not sign
 
 - Pipeline runs: `pipeline runs` (check the latest successful Azure DevOps runs behind the Promotion line without asking). There are no `--flags`.
 - Not ready: `anyway` (1.97.0; merge although the PR record says `Ready: no`; host checks still apply).
+
+## Run ending (1.122.0)
+
+End as [run-ending.md](../crav1-docs/reference/run-ending.md) says.

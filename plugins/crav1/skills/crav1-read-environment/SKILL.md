@@ -128,3 +128,7 @@ Read `references/sections.md` ("Picture offer") only when the run ends and a pic
 ## Style
 
 Be concise. Cite the resource id. Prefer the smaller fact. Do not fill a gap with an architecture you invented.
+
+## Run ending (1.122.0)
+
+End as [run-ending.md](../crav1-docs/reference/run-ending.md) says.

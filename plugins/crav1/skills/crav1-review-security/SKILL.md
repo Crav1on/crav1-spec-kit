@@ -122,8 +122,12 @@ Output only:
 - Target (system, `docs/specs/<slug>/`, or the change and the spec it wrote)
 - Kept findings, or that nothing was kept
 - File written, or that nothing was written
-- Next: `/crav1-finalize-commit` when a file changed (no push). When nothing was written, name no command. Do not run it.
+- `Next: nothing needed now.` Add the Uncommitted line when a file changed and is not committed. Do not run a commit.
 
 ## Style
 
 Be concise. Prefer the smaller finding. Mark inferred as inferred. Do not fill gaps with an architecture you invented.
+
+## Run ending (1.122.0)
+
+End as [run-ending.md](../crav1-docs/reference/run-ending.md) says.

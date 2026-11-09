@@ -73,12 +73,6 @@ No `plan.md`. No `tasks.md`. No acceptance criteria. No application code. A miss
 
 ## After
 
-If a file changed:
-
-```text
-/crav1-finalize-commit
-```
-
-That puts the security notes in git. No push. This command does not commit for you. It does not run plan, implement, or verify.
+`Next: nothing needed now.` When a file changed: `Uncommitted: 1 file; commit with /crav1-finalize-commit when ready.` See [How a run ends](reference/run-ending.md). No push. This command does not commit for you. It does not run plan, implement, or verify.
 
 Reference page: [review-security](reference/skills/crav1-review-security.md)

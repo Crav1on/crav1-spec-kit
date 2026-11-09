@@ -96,10 +96,9 @@ Output only:
 - Each stale research finding listed under Risks, or that none was marked stale
 - These notes name the checks. `/crav1-verify-build-against-spec` is the gate that says they passed. Do not run it here.
 - The linter line: the tool and command, or that this repo has none for the code these tasks will touch.
-- Next, when the plan names a linter: `/crav1-review-plan` (optional but useful), then `/crav1-tighten-plan` for plan `P#`s. Build is expected to leave that named check green.
-- Next, when the plan says there is no linter: stop before Build. Say that. The user decides to add the linter or to go on without one. Do not install one. Do not name `/crav1-build-tasks`, or `/crav1-build-features` until they choose. `/crav1-review-plan` and `/crav1-tighten-plan` stay available. They are not Build. When they choose to go on without one, the Build next step applies, and the plan still says none.
-- If this branch is `spec/<slug>` (specify-only): `/crav1-finalize-commit` (no push), then **they** open a PR when they want this spec on the default branch. Do **not** implement here. After it is on default: `/crav1-create-feature-branch` → `feat/<slug>`, then a **new chat** for `/crav1-build-tasks`. That implement chat waits until the plan names a linter, or they chose to go on without one.
-- If this branch is `feat/<slug>` (or they stayed on one branch), and the plan names a linter or they chose to go on without one: **new chat**, `/crav1-build-tasks` (or `/crav1-build-tasks`) with `plan.md`, `tasks.md`, and `spec.md` attached.
+- One `Next` line, as `crav1-docs/reference/run-ending.md` says. Do not run it. Add the Uncommitted line when a file changed and is not committed. Do not name tighten-plan or build in this ending.
+- This branch is `spec/<slug>`: `Next: /crav1-open-pr, because this specify-only branch is not on the default branch yet.` Do not implement here.
+- Any other branch: `Next: /crav1-review-plan, because the plan is written and not reviewed.` When the plan says there is no linter, say build is not named until they add one or choose to go on without one. Do not install one.
 
 Do not start coding in this chat.
 

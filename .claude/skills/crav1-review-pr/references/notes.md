@@ -27,4 +27,4 @@ Every review writes or reuses the **PR note** as `crav1-add-to-spec` `references
 
 The follow-ups come back through the existing note flow: `/crav1-ado-sync` reads `follow-up` Points as open items, and a spec that takes one adds itself to the note's `used_by`. Notes are never absorbed. This skill does not do that marking. For the status of every thread, name `/crav1-pr-status` in the kit record and do not run it.
 
-Writing the PR note (and the context file, `references/output.md`) is the only file this skill writes. It does not commit. Name `/crav1-finalize-commit` in the kit record and do not run it.
+Writing the PR note (and the context file, `references/output.md`) is the only file this skill writes. It does not commit. The kit record's Uncommitted line covers the note. Do not run a commit. The chat review does not list a next step; 1.113.0 keeps later steps in the kit record.

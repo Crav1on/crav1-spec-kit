@@ -50,7 +50,7 @@ Needs verify
 
 Done: 3
 
-Next: /crav1-build-tasks T5 (cancel-booking)
+Next: /crav1-build-tasks T5 (cancel-booking), because that task unblocks the most others.
 Source: docs/specs/cancel-booking/spec.md, plan.md, tasks.md, verify.md
 ```
 
@@ -80,3 +80,5 @@ Build the task it named:
 ```
 
 Reference page: [tasks-ready-to-build](reference/skills/crav1-tasks-ready-to-build.md) · Routes: [Workflow routes](reference/workflow.md)
+
+The run ends as [How a run ends](reference/run-ending.md) says: one `Next:` line, `Waiting:` only when a step is blocked, and `Uncommitted:` when files changed and are not committed.

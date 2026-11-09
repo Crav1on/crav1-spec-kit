@@ -121,8 +121,10 @@ If the write fails, say so. Print the exact line to add. For a spec, that line i
 
 Say what was created and what was updated. One line each: the id, the home, the title, and the spec slug or `no spec yet`. Name every `repos.md` cell this run wrote. Say what was skipped.
 
-When a create wrote a file, name that file. Say it is not committed yet and must be committed. Name `/crav1-finalize-commit`. Do not run it. Say that without that file a later run offers Create again and would make a duplicate.
+When a create wrote a file, name that file. Say that without that file a later run offers Create again and would make a duplicate. Add the Uncommitted line. Do not run a commit.
 
-Name the pull spec changes branch of `/crav1-ado-sync` as the later read-back. Name the push tasks branch of `/crav1-ado-sync` as the next step to send that spec's tasks as child work items of the Feature. Do not run either.
+- That spec has tasks: `Next: /crav1-ado-sync push tasks, because the Feature exists and its tasks are not on the board yet.`
+- Otherwise: `Next: nothing needed now.`
+- Do not name the pull spec changes branch in the ending. Do not run the next step.
 
 Do not plan. Do not implement. Do not commit.
