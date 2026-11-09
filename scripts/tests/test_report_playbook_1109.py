@@ -20,7 +20,8 @@ class Playbook(unittest.TestCase):
             for h in ("## Kept", "## Needs your answer", "## Compose", "## Steps", "## Order"):
                 self.assertIn(h, t, f"{d}: {h}")
             self.assertIn("recommended answer and why", t)
-            self.assertIn("Write nothing in the project", t)
+            self.assertIn("The first write stays outside the project; apply copies a filled file to docs/playbooks.", t)
+            self.assertNotIn("Write nothing in the project", t)
             self.assertIn("Preview (1.109.0)", t)
             self.assertNotIn("road" + "map", t.lower())
 

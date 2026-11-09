@@ -40,7 +40,7 @@ Starter options run only when named. Asking for startup options lists them and d
 ```mermaid
 flowchart LR
   S[Starters] --> Specify --> Plan --> Build --> V[Verify and fix] --> C[Commit and pull request]
-  X[Cross-cutting: meetings and open questions, keep the picture current, Azure Boards, testing helpers] -.-> Specify
+  X[Cross-cutting: meetings and open questions, keep the picture current, Azure Boards, testing helpers, guided walks] -.-> Specify
   X -.-> Build
 ```
 
@@ -50,7 +50,7 @@ flowchart LR
 | Specify | Start, Specify | [Specify](docs/reference/skills.md#specify) |
 | Plan | Plan | [Plan](docs/reference/skills.md#plan) |
 | Build | Build, Verify and fix | [Build](docs/reference/skills.md#build) |
-| Cross-cutting | Start, Meetings and open questions, Keep the picture current, Azure Boards, Testing helpers, Commit and pull request | [Cross-cutting](docs/reference/skills.md#cross-cutting) |
+| Cross-cutting | Start, Meetings and open questions, Keep the picture current, Azure Boards, Testing helpers, Commit and pull request, Guided walks | [Cross-cutting](docs/reference/skills.md#cross-cutting) |
 
 ## Where next
 

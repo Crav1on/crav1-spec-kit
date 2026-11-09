@@ -34,12 +34,24 @@ Nothing is written until the user confirms the whole list with one `yes` (or pic
 
 > **Reply yes** (or "confirm") to write it as shown.
 > To change something first, reply with your edits, for example "only 1 and 3" or "skip K2".
-> Nothing gets committed either way.
+> A filled playbook is written to `docs/playbooks/<topic>.md` on that yes. A git commit still waits for `/crav1-finalize-commit`.
 
 After the yes or the edits, then:
 - N answers: patch the open question as this skill's answer path does (one batch).
 - C answers: settle the `**Conflict:**` line as this skill's conflict path does.
 - K changes: write through `/crav1-add-to-spec`'s rules (show the change, then write).
-- Never edit the filled file itself.
+- Never edit the filled file itself. Do not change its `Answer:` or `Change:` lines. The copy under `docs/playbooks/` is a separate write.
 
-End with what changed, per spec, what was skipped and why, and what is still open. Suggest rerunning the playbook report to refresh it.
+## Copy into the repo (1.120.0)
+
+Run `scripts/playbook_store.py` in this skill after the yes, when at least one filled line is being written. The first report stays outside the project. This copy is not a git commit.
+
+1. Run `prepare`. `draft` means no filled `Answer:` or `Change:` line outside a code fence. Say so and do not copy. The outside file stays where it is.
+2. `propose-name`: the file name comes from the report subject, lowercase kebab-case (`CC Process 1.0` becomes `cc-process-1-0.md`). Show that name once, in the confirm, before the first copy. The user may reply with a different kebab-case name. Pass the confirmed name as `--name`. Later applies do not ask. The name stays fixed.
+3. Same playbook: a `Docs path: docs/playbooks/<topic>.md` line in the file wins. Otherwise the one file under `docs/playbooks/` whose title subject matches. Two subject matches: stop and list them. Do not guess. A later apply reuses that path and ignores a different `--name`.
+4. `ask-overwrite`: the committed file was edited in the repo after the last apply. `Applied as:` does not match the other lines. Show the diff. Pass `--overwrite` only after the user says yes to that overwrite.
+5. `write --yes` copies the file to `docs/playbooks/<topic>.md`, stamps `Docs path:` and `Applied as:`, and leaves `Answer:` and `Change:` lines as they were. Reapply overwrites that same file. Git history keeps the earlier copy once someone commits.
+6. For each spec this apply changed, pass `--spec`. The script writes one `Playbook: docs/playbooks/<topic>.md` line on that spec, after the title, replacing an older playbook line.
+7. Read-back of `Answer:` and `Change:` works on the committed copy the same way as on the outside file. Name `/crav1-finalize-commit` when the user wants the file in git. Do not commit from this skill.
+
+End with what changed, per spec, what was skipped and why, what is still open, and the `docs/playbooks/` path when a copy was written. Suggest rerunning the playbook report to refresh it.

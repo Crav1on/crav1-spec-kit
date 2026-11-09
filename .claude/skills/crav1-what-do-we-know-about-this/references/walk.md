@@ -5,7 +5,7 @@ A guided walk in chat through one playbook report: one item at a time, the answe
 ## Start
 
 - **After `report-playbook-full`:** the report file is written as usual and linked in chat. Then ask one question: `Walk through it now?` (yes, or later with `report-playbook-walk`). No answer or no: stop there.
-- **`report-playbook-walk`:** resume after a pause. Find the existing playbook report for the question (the newest `<topic-slug>-report-playbook-*` file in the folder the report rules name, or the file the user names or attaches). None found: say so, name `report-playbook-full`, and stop. Read it plainly, as `/crav1-resolve-open-questions apply` does (item blocks and the older table layout), and pick up at the first item whose `Answer:` (N, C) is empty or whose K item has not been walked. Say where you pick up in words, for example `Picking up at the deploy-order question (6 of 14 answered).` Do not speak the item id.
+- **`report-playbook-walk`:** resume after a pause. Find the existing playbook report for the question. Look in `docs/playbooks/` as well as the folder the report rules name. A path the user names under `docs/playbooks/` is the playbook. A `Docs path:` line names that committed copy. Otherwise the newest `<topic-slug>-report-playbook-*` file outside the project, or the file the user names or attaches. None found: say so, name `report-playbook-full`, and stop. Read it plainly, as `/crav1-resolve-open-questions apply` does (item blocks and the older table layout), and pick up at the first item whose `Answer:` (N, C) is empty or whose K item has not been walked. Say where you pick up in words, for example `Picking up at the deploy-order question (6 of 14 answered).` Do not speak the item id. The committed copy's `Answer:` and `Change:` lines read back the same way. That file carries `Docs path: docs/playbooks/<topic>.md`. Specs the apply touched get `Playbook: docs/playbooks/<topic>.md`.
 - **Headless or bot run** (no person in the chat): never walk. Write the file as usual and end with how to resume: `To walk it in chat later: /crav1-what-do-we-know-about-this report-playbook-walk <question>`.
 
 ## In chat
@@ -63,11 +63,11 @@ A merge trial is allowed only for an order this report already suggests, only ou
 
 When the last item is walked (or the user says `done`), show a short summary: the answers given, the kept-decision changes, the direction changes, and the items still open. Then offer apply, word for word except the examples:
 
-> **Reply yes** (or "confirm") to run `/crav1-resolve-open-questions apply <this file>` and write these answers into the specs; it shows each change before writing.
+> **Reply yes** (or "confirm") to run `/crav1-resolve-open-questions apply <this file>` and write these answers into the specs; it shows each change before writing. On that yes a filled playbook is also written to `docs/playbooks/<topic>.md`.
 > To change something first, reply with your edits, for example "keep the third question open" or "drop the separate branch".
-> Nothing gets committed either way.
+> A git commit still waits for `/crav1-finalize-commit`.
 
-On yes, hand over to `/crav1-resolve-open-questions apply <this file>`: the one skill this command may start, and only on that yes. Apply writes filled, confirmed lines only (kept-decision changes, open-question answers, and conflict answers). It does not run plan, build, or merge. Empty lines stay open. Stopping halfway is fine: the file keeps the answers, and `report-playbook-walk` picks up again.
+On yes, hand over to `/crav1-resolve-open-questions apply <this file>`: the one skill this command may start, and only on that yes. Apply writes filled, confirmed lines only (kept-decision changes, open-question answers, and conflict answers) and copies a filled playbook to `docs/playbooks/`. It does not run plan, build, or merge. It does not create a git commit. Empty lines stay open. A draft with no filled line is not copied. Stopping halfway is fine: the file keeps the answers, and `report-playbook-walk` picks up again, including from `docs/playbooks/`.
 
 ## Out of scope
 

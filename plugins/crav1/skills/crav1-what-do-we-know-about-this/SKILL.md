@@ -13,17 +13,17 @@ color: cyan
 
 # What's known about
 
-The user asks about one feature, slice, resource, or not-yet-feature. You answer from the specs first. You read. You write nothing in the project.
+The user asks about one feature, slice, resource, or not-yet-feature. You answer from the specs first. You read. You write nothing in the project until apply.
 
 Command: `/crav1-what-do-we-know-about-this`.
 
-This is cross-cutting. It is not a lane. It may run from any lane. It does not move work into Specify, Plan, or Build. It does not start those lanes.
+This is cross-cutting. It is not a lane. It may run from any lane. It does not move work into Specify, Plan, or Build.
 
-This command is a later skill. It is not a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs`, `/crav1-read-environment`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane. The six starter options stay unchanged.
+This command is a later skill. It is not a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs`, `/crav1-read-environment`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane.
 
 Other skills do not run this one. Spark, specify, plan, and verify do not run it. It is not started automatically.
 
-This is not `/crav1-explain-existing-system`. Explain reads `docs/system/` first. When the picture has nothing on the question, it quotes the first paragraph of a matching spec, labelled as coming from the spec, and names this command. It does not run this command. This command reads the specs first.
+This is not `/crav1-explain-existing-system`. Explain reads `docs/system/` first. When the picture has nothing on the question, it quotes the first paragraph of a matching spec, labelled as coming from the spec, and names this command. It does not run this command.
 
 This command does not run another skill, except `apply` on yes at the end of a walk for filled confirmed lines. It may name one. It does not start `/crav1-help` or `/crav1-pr-status`.
 
@@ -36,7 +36,7 @@ Route first, load second. Check the message for one word `report-<type>-<depth>`
 
 **Walk (1.116.0, chat 1.117.0):** after `report-playbook-full`, ask `Walk through it now?`. On yes, or for `report-playbook-walk`, read `references/walk.md` and walk in chat. Chat does not use item ids; the report keeps them, and `go to N9` still jumps. Headless: never walk; say how to resume.
 
-That one report file names its sections and the only diagrams to draw. Feature, change, build, and playbook reports go outside the project. `report-data-model-full` writes one new immutable snapshot under the saved model and does not edit the model. The chat always links or attaches the file.
+That one report file names its sections and the only diagrams to draw. Feature, change, and build reports go outside the project. A playbook's first write does too; apply copies a filled one to `docs/playbooks/`. `report-data-model-full` writes one new immutable snapshot under the saved model and does not edit the model. The chat always links or attaches the file.
 
 ## Input
 
@@ -106,7 +106,7 @@ A focus still runs the full read, including the live reads, and shows only **Ver
 
 ## Answer
 
-The chat answer follows this skill’s `assets/answer.md` (this skill's `assets/answer.md`). Do not print a placeholder. Do not write the file into the project. Leave out a heading that has nothing under it. **Tracked elsewhere** stays when a live read ran, and `none` is a real line. A guess ends with `(inference, not in the docs)`.
+The chat answer follows this skill’s `assets/answer.md`. Do not print a placeholder. Do not write the file into the project. Leave out a heading that has nothing under it. **Tracked elsewhere** stays when a live read ran, and `none` is a real line. A guess ends with `(inference, not in the docs)`.
 
 Read `references/answer.md` ("Answer sections") when you write the answer: what each section holds (Verdict through Source, and **Unexplained**), the guess label, the open-question `Next:` line, and the Skip line in **Source**. Case 3 names the next command in **Source**. It does not run it.
 
@@ -131,6 +131,6 @@ Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-spe
 - A failed live read is one prompt: the issue, a fix when there is one, Retry or Skip. Skip is the repo-only answer, with why the live checks did not run.
 - A focus still runs the full read. The answer shows only those sections.
 - People come from what is written. A guess is labeled `(inference, not in the docs)`.
-- Other reports write nothing in the project. `report-data-model-full` writes one new snapshot and does not edit the model. During a walk that report is the only file written. Do not run another skill, except `apply` on yes at the end of a walk, for filled confirmed lines only. Do not start `/crav1-help`.
+- Feature, change, and build reports write nothing in the project. Playbook apply copies a filled file to `docs/playbooks/` (1.120.0). `report-data-model-full` writes one new snapshot and does not edit the model. During a walk that report is the only file written. Do not run another skill, except `apply` on yes at the end of a walk, for filled confirmed lines only. Do not start `/crav1-help`.
 - Do not start Specify, Plan, or Build.
 - Later skill. Not a starter option. Asking for startup options names only the six and does not run this command.

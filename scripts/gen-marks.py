@@ -37,6 +37,8 @@ GROUPS = {
     "open-questions": "Open question marks",
     "research": "Research and stale marks",
     "plan": "`plan.md` and `tasks.md`",
+    "walk": "Walk progress",
+    "playbook": "`docs/playbooks/`",
     "system": "`docs/system/`",
     "data-model": "`docs/data-model/`",
     "environments": "`docs/environments/marks.md`",
