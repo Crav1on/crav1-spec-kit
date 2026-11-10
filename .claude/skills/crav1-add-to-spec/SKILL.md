@@ -39,7 +39,7 @@ When a choice is missing and the run is headless or started by a bot (no person 
 
 Every `Synced at` line, open question, `**New:**` line, glossary row and PR record line (1.97.0) this skill writes follows `references/merge-safe.md`: one `Synced at` line per repo and branch, questions found by their words (`Q#` is display only), and new lines in sorted place, not at the end.
 
-`migrate formats` rewrites every spec, `docs/system/repos.md` and (1.97.0) every PR note once, moving old review follow-ups notes into their PR notes' record. Run `python3 <this skill>/scripts/merge_safe_migrate.py --dry-run` from the repo root and show its list and diff. After one yes (headless: the word is the yes), run it without `--dry-run`. It checks nothing was lost before it writes; a `LOST` line means that file was left alone, so show it and stop. A second run says `already merge-safe`. Do not commit.
+`migrate formats` rewrites every spec, `docs/system/repos.md` and (1.97.0) every PR note once, moving old review follow-ups notes into their PR notes' record. Run `<interpreter> <this skill>/scripts/merge_safe_migrate.py --dry-run` from the repo root and show its list and diff. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. After one yes (headless: the word is the yes), run it without `--dry-run`. It checks nothing was lost before it writes; a `LOST` line means that file was left alone, so show it and stop. A second run says `already merge-safe`. Do not commit.
 
 ## From /crav1-read-environment
 

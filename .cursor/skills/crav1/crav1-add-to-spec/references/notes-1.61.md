@@ -11,7 +11,7 @@ For a fact: the note holds the fact plus the passage around it. Write the note b
 - Run the duplicate check first. The same source again is `already imported on <date> as <note>`, reuse or skip; never a second copy. The same point from another source adds a second source to the spec line. A disagreement is written as a **Conflict:** line, never an overwrite.
 - A parked spec (a `Parked:` line) gets nothing written; its slug goes in the note's `waiting_for`. Say `saved as a note for <slug> (parked)`. Skip `docs/specs/retired/` and `Moved:` pointers as targets.
 - Never ask an absorb question. Never write `Absorbed by`. An old note's `Absorbed by` is read as used by.
-- Do not edit `docs/notes/index.md` or a month index by hand. Run `scripts/notes_index.py` after the note write.
+- Do not edit `docs/notes/index.md` or a month index by hand. Run `scripts/notes_index.py` after the note write. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says.
 - A note converted from a spec says `Converted from spec, no research owner`. When it is stale, show it as stale and do not offer a revisit request.
 
 Do not commit. This is not an impact question. Do not list the note as an apply option.

@@ -2,7 +2,7 @@
 
 Kit not in this project yet? [Install first](install.md) (Cursor and Claude Code; the slash commands match, the files do not). After a Cursor plugin install, the short command loop is [plugins/crav1/README.md](../plugins/crav1/README.md). Claude Code has no plugin.
 
-Use this when a pull request has comments and replies, and you want to know what is done, what is left and why, and what you owe. New in 1.97.0.
+Use this when a pull request has comments and replies, and you want to know what is done, what is left and why, and what you owe. New in 1.97.0. A kit script this command runs uses the interpreter in [Running a kit script](reference/running-scripts.md).
 
 This is cross-cutting. It is not a lane and not a bot. It is the same command family as [`/crav1-review-pr`](from-review-pr.md) and `/crav1-merge-pr`. A review judges the code; `/crav1-pr-status` tracks the conversation about it. It never posts, votes or merges.
 

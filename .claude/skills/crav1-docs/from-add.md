@@ -6,7 +6,7 @@ Use this when **one spec already exists** and there is **new information** for t
 
 `/crav1-tighten-spec` stays for mushy wording. This command is for new information. [Match](from-existing-to-specs-with-bundle.md) creates the folders. This command updates one that already exists. It does not replace [intake](from-bundle-to-specs.md), [a spark](from-nothing.md), or [a pile of ideas](from-ideas.md). It does not write application code.
 
-A not-started spec (match status `not in the code`, or a thin spec) can keep taking information until planning. Adding information does not start planning and does not write `plan.md` or `tasks.md`.
+A not-started spec (match status `not in the code`, or a thin spec) can keep taking information until planning. Adding information does not start planning and does not write `plan.md` or `tasks.md`. A kit script this command runs uses the interpreter in [Running a kit script](reference/running-scripts.md).
 
 Since 1.61.0 every input is saved once as one full note in `docs/notes/YYYY-MM/` (by source date, with the import date recorded); for a fact, the fact plus the passage around it. The spec gets only its own short point with `Full source: <note>`, and the note gets the slug in `used_by`. Notes are never absorbed. The same source again is not imported twice; a disagreement is flagged as a conflict, never overwritten. A parked spec gets nothing; the note waits for it.
 

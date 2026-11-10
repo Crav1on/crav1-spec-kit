@@ -17,7 +17,7 @@ The word picks the flow. A scope may follow it. The scope is a value, such as `o
 | `/crav1-model-data auto-flow` | You approve a budget, then the run continues. Unconfirmed results stay proposals |
 | `/crav1-model-data` | Asks which flow. A headless run with no word stops and names the two words |
 
-Both flows follow the same modeling rules and the same state machine, `scripts/model_run.py` in the skill. On Windows run it with `py -3`. Elsewhere run it with `python3`. If that command is missing, try the other. Content goes in a file (`--input` or `--text-file`). The fields are in the skill's `references/inputs.md`. Do not edit a model file by hand. `revise` records the new text, keeps the previous text, and sets that item back to proposed.
+Both flows follow the same modeling rules and the same state machine, `scripts/model_run.py` in the skill. Pick the interpreter as [Running a kit script](reference/running-scripts.md) says. Content goes in a file (`--input` or `--text-file`). The fields are in the skill's `references/inputs.md`. Do not edit a model file by hand. `revise` records the new text, keeps the previous text, and sets that item back to proposed.
 
 ## What you should see
 

@@ -1,6 +1,6 @@
 # Sweep rules (1.124.0)
 
-Both flows use this file. The script `scripts/sweep_progress.py` in this skill owns `docs/system/sweep-progress.md`. Pass `--yes` only after this run is going ahead: after the manual fetch answer, or at the start of auto flow. A call without `--yes` writes nothing.
+Both flows use this file. The script `scripts/sweep_progress.py` in this skill owns `docs/system/sweep-progress.md`. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. Pass `--yes` only after this run is going ahead: after the manual fetch answer, or at the start of auto flow. A call without `--yes` writes nothing.
 
 ## Scope
 

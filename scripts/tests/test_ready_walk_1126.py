@@ -336,8 +336,9 @@ class JsonIds(unittest.TestCase):
         self.assertEqual(payload["order"], ["T1", "T2", "T3"])
         self.assertEqual(payload["ready"], ["T1"])
         self.assertEqual(payload["next"], "T1")
-        self.assertEqual(payload["blocked"][0]["id"], "T2")
-        self.assertTrue(payload["blocked"][0]["reason"].startswith("waits on T1"))
+        self.assertEqual(payload["blocked"], [])
+        self.assertEqual(payload["waits_in_order"][0]["id"], "T2")
+        self.assertTrue(payload["waits_in_order"][0]["reason"].startswith("waits on T1"))
 
 
 class WindowsEncoding(unittest.TestCase):

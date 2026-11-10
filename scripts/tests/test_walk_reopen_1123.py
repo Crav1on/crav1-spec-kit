@@ -178,7 +178,7 @@ class InsideWalk(unittest.TestCase):
         self.record("resolve-open-questions", "nothing-to-do")
         self.record("plan-from-spec")
         self.record("review-and-tighten-plan")
-        self.record("tasks-ready-to-build")
+        self.record("tasks-ready-to-build", "ready")
         (self.root / "tasks.md").write_text("tasks edited by hand\n", encoding="utf-8")
         payload = must(["resume", "--root", str(self.root), "--no-playbook"])
         by_id = {row["id"]: row for row in payload["steps"]}

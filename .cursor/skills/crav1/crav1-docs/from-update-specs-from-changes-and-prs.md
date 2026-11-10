@@ -18,7 +18,7 @@ The word picks the flow. A repo name from `docs/system/repos.md` may follow. A w
 | `/crav1-update-specs-from-changes-and-prs auto-flow 30` | The same, with a 30 minute budget |
 | `/crav1-update-specs-from-changes-and-prs` | Asks which flow. A headless run with no word stops and names the two words |
 
-Both flows follow the same inventory and the same state machine, `scripts/sweep_progress.py` in the skill. On Windows run it with `py -3`. Elsewhere run it with `python3`. If that command is missing, try the other. Do not edit `docs/system/sweep-progress.md` by hand.
+Both flows follow the same inventory and the same state machine, `scripts/sweep_progress.py` in the skill. Pick the interpreter as [Running a kit script](reference/running-scripts.md) says. Do not edit `docs/system/sweep-progress.md` by hand.
 
 ## What it looks at
 

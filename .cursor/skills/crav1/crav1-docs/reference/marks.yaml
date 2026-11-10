@@ -1163,17 +1163,30 @@ marks:
     name: "Result"
     group: walk
     files: ["docs/specs/<slug>/walk-progress.md (under a step)"]
-    format: "  Result: <done | nothing-to-do | skipped | applied | reapplied>"
-    pattern: '^  Result: (done|nothing-to-do|skipped|applied|reapplied)$'
+    format: "  Result: <done | nothing-to-do | skipped | applied | reapplied | ready | not-ready>"
+    pattern: '^  Result: (done|nothing-to-do|skipped|applied|reapplied|ready|not-ready)$'
     examples:
       - "  Result: done"
-      - "  Result: nothing-to-do"
-      - "  Result: applied"
-    meaning: "How the step ended. nothing-to-do still counts as covered for those versions."
+      - "  Result: ready"
+      - "  Result: not-ready"
+    meaning: "How the step ended. The ready check records ready or not-ready. An older done on that step still reads. nothing-to-do still counts as covered for those versions."
     written_by: [crav1-tighten-and-plan-ready-to-build]
     read_by: [crav1-tighten-and-plan-ready-to-build]
     mention: '(?m)^  Result: '
     since: 1.119.0
+
+  - id: walk-ack-stamp
+    name: "Acknowledged stamp"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md (before the steps)"]
+    format: "Acknowledged stamp: <YYYY-MM-DDTHH:MM:SS+HH:MM> (<step>, <step>)"
+    pattern: '^Acknowledged stamp: \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2} \([a-z0-9-]+(?:, [a-z0-9-]+)+\)$'
+    examples:
+      - "Acknowledged stamp: 2026-11-10T12:00:00+00:00 (tighten-spec, resolve-open-questions)"
+    meaning: "Those steps share a Done time. The warning stays quiet for this stamp. A later shared stamp warns again."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    since: 1.127.0
 
   - id: walk-spec-version
     name: "Spec version"

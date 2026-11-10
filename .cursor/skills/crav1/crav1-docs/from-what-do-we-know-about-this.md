@@ -2,7 +2,7 @@
 
 Kit not in this project yet? [Install first](install.md) (Cursor and Claude Code; the slash commands match, the files do not). After a Cursor plugin install, the short command loop is [plugins/crav1/README.md](../plugins/crav1/README.md). Claude Code has no plugin.
 
-Use this when the user asks about **one feature, slice, resource, or not-yet-feature**. Status and what is pending are this command. The answer comes from the specs first.
+Use this when the user asks about **one feature, slice, resource, or not-yet-feature**. Status and what is pending are this command. The answer comes from the specs first. A kit script this command runs uses the interpreter in [Running a kit script](reference/running-scripts.md).
 
 This is cross-cutting. It is not its own lane. It may run from any lane. It does not move work into Specify, Plan, or Build. It does not start those lanes.
 

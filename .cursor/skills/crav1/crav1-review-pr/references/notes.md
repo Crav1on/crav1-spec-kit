@@ -13,7 +13,7 @@ Write the record as `crav1-add-to-spec` `references/pr-record.md` says (skill `c
 - One Point per question asked in the comment: status `waiting on <author>`, tag `asked`. A re-review adds `answered <date>` when the thread has an answer, and leaves the status to `/crav1-pr-status`.
 - `State: <host state> | <date>`.
 - History, in sorted place by date (1.67.0): `## Comment as drafted, <YYYY-MM-DD>` with the paste-ready block, and `## Comment as posted, <YYYY-MM-DD> (by <name>)` with its source line and the posted text, each word for word in a code fence (four backticks for a draft, 1.114.2), after the personal-data and secrets check. A drafted point not in the posted comment gets the tag `not posted <YYYY-MM-DD>` on its Point and keeps its status. Never rewrite or remove a dated section. A record-only run never adds a drafted section (1.114.2). The drafted heading is always plain `## Comment as drafted, <YYYY-MM-DD>`, on a re-review too: never add a suffix such as `(re-review)`; a re-review tag goes on the `## Kit record` heading only (1.114.3). Details: `references/comment-as-posted.md`.
-- Then run the notes index generator (`scripts/notes_index.py` in `crav1-add-to-spec`). Do not hand-edit an index.
+- Then run the notes index generator (`scripts/notes_index.py` in `crav1-add-to-spec`). Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. Do not hand-edit an index.
 
 **Re-review.** Read the record first. Do not write a second note. Set `imported` to this review's date, add Points for new findings and follow-ups, a new `## Comment as drafted` section, and set a Point the code now addresses to `done <short sha>`. Never delete a Point. Leave `used_by` as it is, then rerun the generator.
 

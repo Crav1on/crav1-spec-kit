@@ -2,6 +2,18 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.127.0 (2026-11-10)
+
+Fixes from a live tighten-and-plan walk and a live ready check on Windows. A minor release because the ready-check rows, the progress result, and how a kit script is started change.
+
+- **Playbook first.** When a playbook is named, that question comes before any later step, including a read-only check such as readiness. Resume may report status. No step runs until the choice is answered.
+- **Waiting who.** Who comes from the question's own "Waiting for" phrase, then the latest Pending or Asked line. When neither names anyone, who is "not named yet", and that task still counts. Example: `Waiting: 8 tasks wait on open questions (the partner, a colleague; 1 not named yet).`
+- **Row buckets.** A task that only waits on an earlier real task is `waits-in-order`. A task held by an open question is `waiting`. Only a true blocker is `blocked`.
+- **Ready result.** The ready check records `Result: ready` or `Result: not-ready`. Resume treats both as recorded. An older `Result: done` still reads.
+- **Shared stamp.** `walk_progress.py ack-stamps --root <spec-folder> --yes` writes one `Acknowledged stamp:` line after a yes. The warning stays quiet for that stamp. A new shared stamp warns again. The warning names the command.
+- **Interpreter.** A kit script tries `python3`, then `python`, then `py -3`. The Store alias message `Python was not found` means that command was not found. The rule is [Running a kit script](docs/reference/running-scripts.md). `/crav1-tasks-ready-to-build`, `/crav1-add-to-spec`, `/crav1-update-specs-from-changes-and-prs`, `/crav1-pr-status`, and `/crav1-verify-build-against-spec` point at it.
+- **Ready list.** `/crav1-tasks-ready-to-build` and `task_order.py` split Ready, Waiting on a question, Waits in order, and Blocked. The text report and the JSON `waits_in_order` list use that split. A cycle, or an `(after:)` that names no task, stays Blocked.
+
 ## 1.126.0 (2026-11-10)
 
 The tighten-and-plan walk can call a slice ready when later tasks only wait their turn, and a kept-open question that already waits on someone else is not a jump back. A minor release because the ready check, the risk wording, and how the walk records a step change.

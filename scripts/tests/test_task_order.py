@@ -27,6 +27,19 @@ class TaskOrder(unittest.TestCase):
         self.assertEqual(res["ready"], [1])
         self.assertEqual(res["next"], 1)
 
+    def test_text_splits_order_waits_from_blockers(self):
+        rendered = to.render(run(
+            "- [ ] T1: a\n- [ ] T2: b\n- [ ] T3: c (after: T9)\n"
+        ))
+        waits = rendered.split("Waits in order (dependency order)", 1)[1].split(
+            "Blocked (dependency order)", 1
+        )[0]
+        blocked = rendered.split("Blocked (dependency order)", 1)[1].split("Order:", 1)[0]
+        self.assertIn("- T2: waits on T1 (inferred)", waits)
+        self.assertNotIn("T3:", waits)
+        self.assertIn("names no task", blocked)
+        self.assertNotIn("T2:", blocked)
+
     def test_linear_no_after_matches_file_order(self):
         res = run("- [ ] T1: a\n- [ ] T2: b\n- [ ] T3: c\n")
         self.assertEqual(res["order"], [1, 2, 3])

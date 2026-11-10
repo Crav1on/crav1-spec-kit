@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Progress file for /crav1-tighten-and-plan-ready-to-build (kit 1.123.0, ready rows 1.126.0).
+"""Progress file for /crav1-tighten-and-plan-ready-to-build (kit 1.127.0).
 
 The spec, plan, and tasks stay the source of truth. This script only tracks
 where the guided walk is, which version of each file a step covered, and which
@@ -23,6 +23,7 @@ Usage (JSON on stdout):
   walk_progress.py readiness --root <spec-folder>
   walk_progress.py readiness --json <file> [--root <spec-folder>]
   walk_progress.py unlinked --root <spec-folder>
+  walk_progress.py ack-stamps --root <spec-folder> --yes
 
 readiness --root builds the rows from task_order.py and question_blocks.py
 and adds the Reviewed warnings. Do not hand-build that JSON.
@@ -61,7 +62,10 @@ from pathlib import Path
 
 WALK = "tighten-and-plan-ready-to-build"
 PROGRESS_NAME = "walk-progress.md"
-RESULTS = ("done", "nothing-to-do", "skipped", "applied", "reapplied")
+RESULTS = ("done", "nothing-to-do", "skipped", "applied", "reapplied", "ready", "not-ready")
+# The ready check records ready or not-ready. An older Result: done still reads.
+READY_RESULTS = ("ready", "not-ready", "nothing-to-do")
+NOT_NAMED = "not named yet"
 APPLIED = {"applied", "reapplied"}
 
 # Locked step order. Playbook is intake only. Step 6 is one step that runs
@@ -181,9 +185,30 @@ def progress_path(root: Path) -> Path:
     return root / PROGRESS_NAME
 
 
+ACK_LINE = re.compile(
+    r"^Acknowledged stamp: (\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}) \(([^)]+)\)$"
+)
+
+
+def _parse_ack(line: str) -> dict:
+    match = ACK_LINE.fullmatch(line)
+    if not match:
+        fail("progress-file", f"ack line is not a shared stamp: {line}")
+    names = [part.strip() for part in match.group(2).split(",") if part.strip()]
+    known = set(ORDER) | set(EXTRAS)
+    if len(names) < 2 or any(name not in known for name in names):
+        fail("progress-file", f"ack line needs the steps that share the stamp: {line}")
+    return {"when": match.group(1), "steps": names}
+
+
+def _ack_line(when: str, names: list[str]) -> str:
+    return f"Acknowledged stamp: {when} ({', '.join(names)})"
+
+
 def parse_progress(text: str) -> dict:
     """Parse the progress file. A line the format does not allow is an error."""
     steps: dict[str, dict] = {}
+    acks: list[dict] = []
     current: dict | None = None
     slice_line = None
     for raw in text.splitlines():
@@ -194,6 +219,9 @@ def parse_progress(text: str) -> dict:
             continue
         if line.startswith("Slice: "):
             slice_line = line[len("Slice: "):]
+            continue
+        if line.startswith("Acknowledged stamp: "):
+            acks.append(_parse_ack(line))
             continue
         if line.startswith("- Step: "):
             step = line[len("- Step: "):]
@@ -241,18 +269,24 @@ def parse_progress(text: str) -> dict:
                     fail("progress-file", f"step {step} has no playbook line")
             elif token not in body:
                 fail("progress-file", f"step {step} has no {LABEL[token]}")
-    return {"slice": slice_line, "steps": steps}
+    return {"slice": slice_line, "steps": steps, "acks": acks}
 
 
 def load(root: Path) -> dict:
     path = progress_path(root)
     if not path.is_file():
-        return {"slice": None, "steps": {}}
-    return parse_progress(path.read_text(encoding="utf-8"))
+        return {"slice": None, "steps": {}, "acks": []}
+    data = parse_progress(path.read_text(encoding="utf-8"))
+    data.setdefault("acks", [])
+    return data
 
 
-def render(slice_label: str, steps: dict) -> str:
+def render(slice_label: str, steps: dict, acks: list | None = None) -> str:
     lines = ["# Walk progress", "", f"Walk: {WALK}", f"Slice: {slice_label}", ""]
+    for ack in acks or []:
+        lines.append(_ack_line(ack["when"], ack["steps"]))
+    if acks:
+        lines.append("")
     for step in ORDER:
         body = steps.get(step)
         if not body:
@@ -341,6 +375,14 @@ def record(args: argparse.Namespace) -> None:
         fail("step", f"unknown step {step}")
     if args.result not in RESULTS:
         fail("result", f"result must be one of {', '.join(RESULTS)}")
+    if step == "tasks-ready-to-build" and args.result not in READY_RESULTS:
+        fail(
+            "result",
+            "tasks-ready-to-build records Result: ready or Result: not-ready, "
+            "from the readiness output. An older Result: done still reads.",
+        )
+    if step != "tasks-ready-to-build" and args.result in ("ready", "not-ready"):
+        fail("result", "ready and not-ready are only for tasks-ready-to-build")
     if not args.yes:
         fail(
             "needs-yes",
@@ -380,7 +422,7 @@ def record(args: argparse.Namespace) -> None:
     label = args.slice or data["slice"] or f"docs/specs/{root.name}/"
     if not str(label).endswith("/"):
         label = f"{label}/"
-    text = render(label, data["steps"])
+    text = render(label, data["steps"], data.get("acks"))
     progress_path(root).write_text(text, encoding="utf-8")
     payload = {"ok": True, "wrote": PROGRESS_NAME, "step": step, "result": result, "when": body["when"]}
     if kept_done:
@@ -388,19 +430,40 @@ def record(args: argparse.Namespace) -> None:
     emit(payload)
 
 
-def done_stamp_warning(steps: dict) -> str | None:
-    """Set when two or more steps were stamped at the same second."""
+def _shared_groups(steps: dict) -> list[tuple[str, list[str]]]:
     grouped: dict[str, list[str]] = {}
     for step in list(ORDER) + list(EXTRAS):
         body = steps.get(step)
         if not body or "when" not in body:
             continue
         grouped.setdefault(body["when"], []).append(step)
-    dupes = [(when, names) for when, names in grouped.items() if len(names) >= 2]
-    if not dupes:
+    return [(when, names) for when, names in grouped.items() if len(names) >= 2]
+
+
+def _ack_covers(acks: list, when: str, names: list[str]) -> bool:
+    wanted = set(names)
+    for ack in acks:
+        if ack.get("when") == when and wanted <= set(ack.get("steps") or []):
+            return True
+    return False
+
+
+def done_stamp_warning(steps: dict, acks: list | None = None) -> str | None:
+    """Set when two or more steps share a Done stamp that is not acknowledged."""
+    pending = [
+        (when, names)
+        for when, names in _shared_groups(steps)
+        if not _ack_covers(acks or [], when, names)
+    ]
+    if not pending:
         return None
-    bits = [f"{', '.join(names)} share Done {when}" for when, names in dupes]
-    return "Record each step when it finishes, one record per call. " + "; ".join(bits) + "."
+    bits = [f"{', '.join(names)} share Done {when}" for when, names in pending]
+    return (
+        "Record each step when it finishes, one record per call. "
+        + "; ".join(bits)
+        + ". Acknowledge that shared stamp once with "
+        "walk_progress.py ack-stamps --root <spec-folder> --yes."
+    )
 
 
 def hash_drift(root: Path, step: str, body: dict) -> list[str]:
@@ -493,7 +556,7 @@ def write_progress(root: Path, data: dict, slice_label: str | None = None) -> No
     label = slice_label or data["slice"] or f"docs/specs/{root.name}/"
     if not str(label).endswith("/"):
         label = f"{label}/"
-    progress_path(root).write_text(render(label, data["steps"]), encoding="utf-8")
+    progress_path(root).write_text(render(label, data["steps"], data.get("acks")), encoding="utf-8")
 
 
 def find_playbook(root: Path, recorded: str) -> Path | None:
@@ -567,7 +630,7 @@ def resume(args: argparse.Namespace) -> None:
         "steps": rows,
         "continue_from": continue_from,
         "playbook": book.get("playbook") if book else None,
-        "done_stamp_warning": done_stamp_warning(data["steps"]),
+        "done_stamp_warning": done_stamp_warning(data["steps"], data.get("acks")),
     })
 
 
@@ -698,6 +761,8 @@ def classify(row: dict, resolve_kept: bool = False) -> dict | None:
         return _hit(task, "assumption", "review-plan", "The ready check assumed a plan review. Run /crav1-review-plan, then /crav1-tighten-plan.")
     if "p# open" in text or "open p#" in text:
         return _hit(task, "assumption", "tighten-plan", "The plan review still has open P# items. Run /crav1-tighten-plan.")
+    if bucket == "waits-in-order":
+        return None
     if bucket in ("ready", "done") and not warning:
         return None
     if bucket == "ready" and warning:
@@ -728,6 +793,8 @@ def _waiting(row: dict) -> dict:
         who = who.strip() or None
     else:
         who = None
+    if not who:
+        who = NOT_NAMED
     return {
         "task": row.get("task"),
         "bucket": "waiting",
@@ -994,7 +1061,14 @@ def build_rows(root: Path) -> list[dict]:
             continue
         dep = by_reason.get(task["id"])
         if dep and dep.get("reason"):
-            rows.append({"bucket": "blocked", "task": tid, "reason": dep["reason"]})
+            reason = dep["reason"]
+            # A wait on a real earlier task is the order. A cycle, or an
+            # after: that names no task, stays blocked.
+            if re.search(r"waits on\s+T\d+", reason) and "cycle" not in reason.lower() and "names no task" not in reason.lower():
+                bucket = "waits-in-order"
+            else:
+                bucket = "blocked"
+            rows.append({"bucket": bucket, "task": tid, "reason": reason})
             continue
         row = {"bucket": "ready", "task": tid}
         if warning:
@@ -1027,15 +1101,25 @@ def _waiting_lines(waiting: list[dict], slug: str) -> tuple[str | None, str | No
         return None, None
     tasks: list[str] = []
     whos: list[str] = []
+    unnamed = 0
     for hit in waiting:
         task = hit.get("task")
         if task and task not in tasks:
             tasks.append(task)
         who = hit.get("who")
-        if who and who not in whos:
+        if not who or who == NOT_NAMED:
+            unnamed += 1
+        elif who not in whos:
             whos.append(who)
     count = len(tasks) or len(waiting)
-    tail = f" ({', '.join(whos)})" if whos else ""
+    if whos and unnamed:
+        tail = f" ({', '.join(whos)}; {unnamed} not named yet)"
+    elif whos:
+        tail = f" ({', '.join(whos)})"
+    elif unnamed:
+        tail = f" ({unnamed} not named yet)"
+    else:
+        tail = ""
     line = f"Waiting: {count} tasks wait on open questions{tail}."
     if all(hit.get("asked") for hit in waiting):
         nxt = (
@@ -1077,6 +1161,8 @@ def readiness(args: argparse.Namespace) -> None:
         hit = classify(row, resolve_kept=resolve_kept)
         if hit:
             hits.append(hit)
+            if hit["kind"] == "waiting":
+                row["bucket"] = "waiting"
     reopened = reopened_hits(root) if root is not None else []
     hits.extend(reopened)
     blockers = [h for h in hits if h["kind"] == "blocker" and not h["outside_walk"]]
@@ -1106,8 +1192,49 @@ def readiness(args: argparse.Namespace) -> None:
     if built:
         out["rows"] = rows
     if root is not None and root.is_dir():
-        out["done_stamp_warning"] = done_stamp_warning(load(root)["steps"])
+        loaded = load(root)
+        out["done_stamp_warning"] = done_stamp_warning(loaded["steps"], loaded.get("acks"))
     emit(out)
+
+
+def ack_stamps(args: argparse.Namespace) -> None:
+    """Record that a shared Done stamp was seen, so the warning stops for it.
+
+    A later stamp that two steps still share warns again. Show the line and
+    pass --yes only after that yes. Without --yes this writes nothing.
+    """
+    root = Path(args.root)
+    if not root.is_dir():
+        fail("root", f"not a folder: {root}")
+    data = load(root)
+    if not data["steps"]:
+        fail("progress-file", "no walk progress to acknowledge")
+    pending = [
+        (when, names)
+        for when, names in _shared_groups(data["steps"])
+        if not _ack_covers(data.get("acks") or [], when, names)
+    ]
+    if not pending:
+        emit({"ok": True, "wrote": None, "lines": [], "message": "no shared stamp to acknowledge"})
+        return
+    lines = [_ack_line(when, names) for when, names in pending]
+    if not args.yes:
+        emit({
+            "ok": False,
+            "code": "needs-yes",
+            "message": (
+                "ack-stamps writes the progress file only with --yes, "
+                "after the line was shown and confirmed"
+            ),
+            "lines": lines,
+        })
+        raise SystemExit(2)
+    acks = list(data.get("acks") or [])
+    for when, names in pending:
+        acks.append({"when": when, "steps": list(names)})
+    data["acks"] = acks
+    write_progress(root, data)
+    emit({"ok": True, "wrote": PROGRESS_NAME, "lines": lines})
 
 
 def cmd_version(args: argparse.Namespace) -> None:
@@ -1164,6 +1291,11 @@ def main(argv: list[str] | None = None) -> None:
     u = sub.add_parser("unlinked")
     u.add_argument("--root", required=True)
     u.set_defaults(func=unlinked)
+
+    a = sub.add_parser("ack-stamps")
+    a.add_argument("--root", required=True)
+    a.add_argument("--yes", action="store_true")
+    a.set_defaults(func=ack_stamps)
 
     args = parser.parse_args(argv)
     args.func(args)

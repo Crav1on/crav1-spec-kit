@@ -12,9 +12,9 @@ Read the saved files only: `index.md`, `confirmed.md`, `proposed.md`, `questions
 
 ## Write the snapshot
 
-Run `scripts/model_run.py report` from skill `crav1-model-data`. On Windows use `py -3`. Elsewhere use `python3`. If that command is missing, try the other before giving up. Do not pass `--now`. The script reads its own clock.
+Run `scripts/model_run.py report` from skill `crav1-model-data`. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. Do not pass `--now`. The script reads its own clock.
 
-`py -3` or `python3` `<crav1-model-data>/scripts/model_run.py report --home docs/data-model/<model> --kit <version>`
+`<interpreter> <crav1-model-data>/scripts/model_run.py report --home docs/data-model/<model> --kit <version>`
 
 The script writes `reviews/<revision>-<time>/report.md` and `report.pdf` for that revision. It does not change `confirmed.md` or `proposed.md`. The snapshot stays immutable.
 

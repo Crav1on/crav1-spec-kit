@@ -32,6 +32,6 @@ After the yes or the edits, then, per settled conflict:
 
 - Replace or keep the decided line as picked. Keep its existing source and add the new note as a second source when the new quote won. Keep the `Decided` date format the spec uses; the date is today.
 - Remove the `**Conflict:**` line.
-- Add a trace to the note named in `Full source:` as `crav1-add-to-spec` `references/notes.md` says, and run `scripts/notes_index.py` from that skill when a note changed.
+- Add a trace to the note named in `Full source:` as `crav1-add-to-spec` `references/notes.md` says, and run `scripts/notes_index.py` from that skill when a note changed. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says.
 
 A headless or bot run lists the conflicts and settles none. Do not commit. End with what was settled, what stays open, and `/crav1-finalize-commit` when a file changed.

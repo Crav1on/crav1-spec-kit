@@ -23,7 +23,7 @@ Read `spec.md` acceptance (and EARS/BDD export if present — spec.md still wins
 
 ## Classify each task (before writing)
 
-For every `T#` in `tasks.md`, in dependency order (`/crav1-tasks-ready-to-build` **Dependency order**, its `scripts/task_order.py` when Python runs), so a task is checked after the tasks it waits on. List tasks in that order in the Tasks overview and the TL;DR id lists, under the heading `Tasks — overview (dependency order)`.
+For every `T#` in `tasks.md`, in dependency order (`/crav1-tasks-ready-to-build` **Dependency order**, its `scripts/task_order.py` when Python runs; pick the interpreter as `crav1-docs/reference/running-scripts.md` says), so a task is checked after the tasks it waits on. List tasks in that order in the Tasks overview and the TL;DR id lists, under the heading `Tasks — overview (dependency order)`.
 
 A task downstream of an **Implemented, verify failed** task (it waits on it, directly or through other tasks) keeps its own status, and its Verify cell starts with `depends on T7 (failed)`. When it failed too, its gap names T7 as the first thing to fix. `task_order.py <tasks.md> --failed T7` lists them.
 

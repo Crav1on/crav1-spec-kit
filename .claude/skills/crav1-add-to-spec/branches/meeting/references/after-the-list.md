@@ -10,7 +10,7 @@ Every run writes **one note** holding the whole input, before the first item que
 - Path: `docs/notes/YYYY-MM/YYYY-MM-DD-<slug>.md` by the **source date** (the meeting date or the mail's sent date). No date in the input: the import date, `source_date: none`, and say so.
 - Front matter `kind` is `meeting`, `email`, or `chat`; `source` names the mail (subject, sender, sent date) or the meeting (date and title); `imported` is today.
 - Each kept addition and each answer link names this note as `Full source:`. A matching parked spec gets nothing; its slug goes in `waiting_for`.
-- Run `scripts/notes_index.py` after the note changes. Do not hand-edit an index.
+- Run `scripts/notes_index.py` after the note changes. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. Do not hand-edit an index.
 
 Do not commit.
 

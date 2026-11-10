@@ -15,6 +15,6 @@ After the sort is confirmed, write **one note** holding the whole dump, as this 
 - Each belongs quote is followed by `Full source: docs/notes/YYYY-MM/<file>.md`, and the slug goes in the note's `used_by`. A matching parked spec gets nothing; its slug goes in `waiting_for`.
 - The same point already on a spec from another source adds this note as a second source on that line. A disagreement is a **Conflict:** line, never an overwrite.
 - Never ask an absorb question. Never write `Absorbed by`.
-- Run `scripts/notes_index.py` after the note changes. Do not hand-edit an index.
+- Run `scripts/notes_index.py` after the note changes. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. Do not hand-edit an index.
 
 Do not commit.
