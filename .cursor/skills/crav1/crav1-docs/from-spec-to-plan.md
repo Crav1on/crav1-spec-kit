@@ -20,7 +20,7 @@ The spec is accepted. Write plan.md and tasks.md. Do not write code.
 | Step | You | Agent |
 | --- | --- | --- |
 | Built pieces (partial slices) | For each built piece: finish the gap, add a verify test, or leave it | When the spec is partial or `## In the code` names paths, reads that repo and branch first. A piece that already matches v0 is marked already there and is not a choice. A piece you leave gets one line under `## Left as committed` and no task |
-| Plan | — | Writes `plan.md` and `tasks.md`. Each task row names its check before any code: `(verify: <kind> — <named check>) (spec: …)`. Each question you kept open becomes its own entry under Risks, "do not implement until resolved", without a question to you. Stale research findings are listed under Risks and do not block |
+| Plan | When a leftover might be current work or later, answer `current` or `later` in one batch | Writes `plan.md` and `tasks.md`. Each task row names its check before any code: `(verify: <kind> — <named check>) (spec: …)`. Each question you kept open becomes its own entry under Risks. One that blocks no current task gets `Blocks: none` and does not say "do not implement until resolved". Stale research findings are listed under Risks and do not block |
 | Linter | When the plan says there is no linter for the code the tasks touch: add one, or go on without | `## Linter` names the repo's linter or checker. When there is none, the plan stops before Build until you choose. It does not install one |
 | Review (optional) | `/crav1-review-plan` | Starts the `crav1-plan-reviewer-agent` subagent. Numbered findings `P#` in chat. Writes nothing |
 | Tighten (optional) | `/crav1-tighten-plan`, then answer every `P#` in one batch (`yes` takes the recommendations) | Patches only the picked issue in `plan.md` or `tasks.md`. A finding about the spec goes back to `/crav1-tighten-spec` |
@@ -33,7 +33,7 @@ On a `spec/<slug>` branch, do not build. Merge that branch first, then `/crav1-c
 ## What gets written
 
 - `docs/specs/<slug>/plan.md` and `tasks.md`. `/crav1-plan-from-spec` ends a task line with `(after: T1)` when the task needs an earlier one done first.
-- On `spec.md`, only `Blocks: T#` lines under kept-open questions that block some of the new tasks, written by `/crav1-plan-from-spec`.
+- On `spec.md`, `Blocks: T#` under a kept-open question that blocks some of the new tasks, and `Blocks: none` under one that blocks no current task, written by `/crav1-plan-from-spec`. No line still means the whole slice.
 - `/crav1-review-plan`: one `Reviewed: <date>, P# open: <n>` line under the plan title. `/crav1-tighten-plan` lowers `<n>` as `P#`s are fixed.
 - Matching OpenSpec export files, only when those already exist.
 - Tighten-plan: only the picked issue.

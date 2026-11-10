@@ -2,6 +2,16 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.125.0 (2026-11-10)
+
+A kept-open question can block no current task, and the tighten-and-plan walk asks the choices it was skipping. A minor release because the ready check, plan leftovers, and the walk's prompts change.
+
+- **`Blocks: none`.** A line under a spec open question, optionally `Blocks: none (later phase)`. It blocks no current task. No `Blocks:` line still means the whole slice, so older specs behave as before. The whole-slice choice stays as no line.
+- **Resolve.** When `tasks.md` exists, **None** writes `Blocks: none`. It no longer writes nothing. **The whole slice** still writes no line.
+- **Plan.** Once `tasks.md` exists, a leftover that blocks some current tasks gets `Blocks: T#`. A leftover that blocks no current task gets `Blocks: none`, and its Risk line does not say "do not implement until resolved". When current or later is unclear, one short batch asks, not one question at a time.
+- **Ready check.** `Blocks: none` blocks no task. Any `Blocks:` line wins over a Risk that says do not implement until resolved, so that wording does not infer a whole-slice block for that question.
+- **Walk.** After the plan, and before that step is recorded, list kept-open questions that still have no `Blocks:` line and offer to set them, one by one or as one batch. The progress record shows its line and gets a yes, unless the step's own confirm already covered it. An extra's yes stays that confirm. An already-applied playbook still asks skip (Recommended) or reapply. Optional extras are offered once, after open questions, when the kept-open questions are known, and the walk does not pass that point when an extra applies. Show-or-ask is offered when a question is for someone else.
+
 ## 1.124.0 (2026-11-10)
 
 One command to catch the specs up with changed branches and pull requests across the linked repos. A minor release because there is a new skill.

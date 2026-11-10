@@ -36,9 +36,11 @@ Check each task in this order and stop at the first rule that decides it. Every 
    - `verify.md` has it under **Implemented, verified**: **Done**.
    - `verify.md` is missing, or has no row for it, or lists it as failed or **Claimed done, unverified**: **Needs verify**, with what `verify.md` says or `no verify.md row`. Not counted as done.
 2. **No plan.** No `plan.md`: every task is blocked, `no plan.md (recorded)`.
-3. **Blocking questions.**
+3. **Blocking questions (1.125.0).**
    - A kept-open question under `## Open questions` (no `Answered:` line) with `Blocks: T#` that names this task: blocked, `open question "<short question>" (recorded)`, plus its latest `Asked:` or `Pending:` line when there is one.
-   - A kept-open question with no `Blocks:` line, or a line under `## Risks` in `plan.md` that says do not implement until resolved: blocks every unticked task in the slice, `open question "<short question>" blocks the whole slice (inferred)` or `plan Risk "<short risk>" blocks the whole slice (inferred)`.
+   - `Blocks: none`, optionally `Blocks: none (later phase)`: this question blocks no task (recorded).
+   - A kept-open question with no `Blocks:` line: blocks every unticked task in the slice, `open question "<short question>" blocks the whole slice (inferred)`. Older specs with no line behave as before.
+   - A line under `## Risks` in `plan.md` that says do not implement until resolved blocks every unticked task, `plan Risk "<short risk>" blocks the whole slice (inferred)`, only when that risk is not about a question that already has a `Blocks:` line. Any `Blocks:` line wins over that wording, including `Blocks: none`.
 4. **Dependencies.**
    - The task line has `(after: T1, T3)`: blocked while any of those is unticked, `waits on T1 (recorded)`. A named task that does not exist is `after: T9 names no task (recorded)`.
    - No `(after: …)`: the task waits on the task just before it in `tasks.md` (the first task waits on nothing). Blocked while that one is unticked, `waits on T2 (inferred)`.
@@ -49,6 +51,8 @@ Check each task in this order and stop at the first rule that decides it. Every 
    - No `Reviewed:` line: ready, with the warning `plan review unknown (inferred), run /crav1-review-plan`.
 
 Do not guess a dependency or a blocking link from the task text. Use only the marks above and the fallbacks.
+
+When Python runs, rule 3 may use `scripts/question_blocks.py` beside this skill: `python3 <this skill folder>/scripts/question_blocks.py docs/specs/<slug>/spec.md docs/specs/<slug>/plan.md`. Use its result. It does not write. A question it marks `none` blocks no task. A question it marks `missing` blocks the whole slice. A Risk it marks `blocks_slice: false` does not.
 
 ## Dependency order (1.103.0)
 

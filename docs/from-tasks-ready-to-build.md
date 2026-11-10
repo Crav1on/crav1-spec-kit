@@ -23,7 +23,7 @@ For each task, in this order:
 | --- | --- |
 | Ticked in `tasks.md` | **Done** when `verify.md` lists it as verified, otherwise **Needs verify** |
 | `plan.md` missing | Blocked |
-| A kept-open question in `spec.md` | Blocked when its `Blocks:` line names the task (recorded). With no `Blocks:` line, it blocks the whole slice (inferred). A plan Risk that says do not implement until resolved does the same |
+| A kept-open question in `spec.md` | Blocked when its `Blocks:` line names the task (recorded). `Blocks: none` blocks no task (recorded). With no `Blocks:` line, it blocks the whole slice (inferred). A plan Risk that says do not implement until resolved does the same only when that question has no `Blocks:` line. The line wins |
 | Tasks it waits on | Blocked while a task in its `(after: T#)` is unticked (recorded). With no `(after: …)`, the task just before it blocks it (inferred). Tasks that wait on each other in a loop are blocked as a cycle |
 | Otherwise | **Ready**. When `plan.md` has no `Reviewed:` line, it adds a warning to run `/crav1-review-plan` (inferred). When the review still has open `P#`s, it says so |
 
@@ -60,7 +60,7 @@ The more the kit records, the fewer reasons are inferred:
 
 - `/crav1-review-plan` writes `Reviewed: <date>, P# open: <n>` in `plan.md`, and `/crav1-tighten-plan` lowers the count.
 - `/crav1-plan-from-spec` ends a task line with `(after: T1)` when the task needs an earlier one.
-- `/crav1-resolve-open-questions` asks which tasks a kept-open question blocks and writes `Blocks: T#`. `/crav1-plan-from-spec` writes it for a question it parks as a risk.
+- `/crav1-resolve-open-questions` asks which tasks a kept-open question blocks and writes `Blocks: T#`. **None** writes `Blocks: none`. **The whole slice** leaves no line. `/crav1-plan-from-spec` writes `Blocks: T#` or `Blocks: none` for a question it parks as a risk.
 
 ## Azure Boards
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Progress file for /crav1-tighten-and-plan-ready-to-build (kit 1.123.0).
+"""Progress file for /crav1-tighten-and-plan-ready-to-build (kit 1.123.0, unlinked 1.125.0).
 
 The spec, plan, and tasks stay the source of truth. This script only tracks
 where the guided walk is, which version of each file a step covered, and which
@@ -21,6 +21,7 @@ Usage (JSON on stdout):
   walk_progress.py resume --root <spec-folder>
   walk_progress.py playbook-status --root <spec-folder> --playbook <file>
   walk_progress.py readiness --json <file> [--root <spec-folder>]
+  walk_progress.py unlinked --root <spec-folder>
 
 record, cover, and clear without --yes write nothing and exit 2.
 The script stamps Done itself. --when, when passed, must be a full timestamp.
@@ -306,7 +307,11 @@ def record(args: argparse.Namespace) -> None:
     if args.result not in RESULTS:
         fail("result", f"result must be one of {', '.join(RESULTS)}")
     if not args.yes:
-        fail("needs-yes", "record writes the progress file only with --yes", status=2)
+        fail(
+            "needs-yes",
+            "record writes the progress file only with --yes, after the line was shown and confirmed",
+            status=2,
+        )
     root = Path(args.root)
     if not root.is_dir():
         fail("root", f"not a folder: {root}")
@@ -552,6 +557,10 @@ def playbook_status(args: argparse.Namespace) -> None:
             "already_applied": True,
             "offer": "skip-or-reapply",
             "result": body["result"],
+            "note": (
+                "Ask once: skip (Recommended) or reapply, even when the file has not changed. "
+                "Do not move on without that question."
+            ),
         })
         return
     if same_path and same_hash and body["result"] == "skipped":
@@ -572,6 +581,29 @@ def playbook_status(args: argparse.Namespace) -> None:
     })
 
 
+def blocks_mod():
+    import importlib.util
+
+    path = Path(__file__).resolve().parents[2] / "crav1-tasks-ready-to-build" / "scripts" / "question_blocks.py"
+    spec = importlib.util.spec_from_file_location("question_blocks", path)
+    if spec is None or spec.loader is None:
+        fail("blocks", f"cannot load {path}")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def unlinked(args: argparse.Namespace) -> None:
+    """Kept-open questions that still have no Blocks line. Writes nothing."""
+    root = Path(args.root)
+    spec = root / "spec.md"
+    if not spec.is_file():
+        fail("spec", f"no spec.md in {root}")
+    questions = blocks_mod().kept_open(spec.read_text(encoding="utf-8"))
+    missing = [{"text": q["text"]} for q in questions if q["mark"] == "missing"]
+    emit({"ok": True, "count": len(missing), "questions": missing})
+
+
 def classify(row: dict) -> dict | None:
     bucket = str(row.get("bucket") or "")
     reason = str(row.get("reason") or "")
@@ -589,6 +621,9 @@ def classify(row: dict) -> dict | None:
             "kind": "blocker",
             "why": "Needs verify belongs to /crav1-verify-build-against-spec, which is outside this walk. Do not start it. Do not report ready.",
         }
+    # Blocks: none blocks no task, and that line wins over Risk wording (1.125.0).
+    if "blocks: none" in text or "blocks no task" in text or "blocks no current" in text:
+        return None
     if "plan review unknown" in text:
         return _hit(task, "assumption", "review-plan", "The ready check assumed a plan review. Run /crav1-review-plan, then /crav1-tighten-plan.")
     if "p# open" in text or "open p#" in text:
@@ -806,6 +841,10 @@ def main(argv: list[str] | None = None) -> None:
     d.add_argument("--json", required=True)
     d.add_argument("--root", help="Spec folder. Reopened walk steps block ready.")
     d.set_defaults(func=readiness)
+
+    u = sub.add_parser("unlinked")
+    u.add_argument("--root", required=True)
+    u.set_defaults(func=unlinked)
 
     args = parser.parse_args(argv)
     args.func(args)

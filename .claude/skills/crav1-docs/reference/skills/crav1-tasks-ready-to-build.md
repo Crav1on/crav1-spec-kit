@@ -8,7 +8,7 @@
 
 List the tasks ready to build, for one spec or all, and why the others are blocked. Read-only.
 
-**[`/crav1-tasks-ready-to-build`](crav1-tasks-ready-to-build.md)** reads `spec.md` open questions, `plan.md` (the `Reviewed:` line and `## Risks`), `tasks.md`, and `verify.md` for one slice or every slice. A ticked task is Done when `verify.md` lists it as verified, otherwise Needs verify. Then a task is blocked by a missing `plan.md`, by a kept-open question whose `Blocks:` line names it, by a kept-open question or plan Risk with no `Blocks:` line (the whole slice, inferred), or by an unticked task in its `(after: T#)` (recorded) or, with no `(after: …)`, the task just before it (inferred). Lists and Next follow dependency order (1.103.0): the `(after: …)` graph in waves, lowest number first in a wave; Next is the ready task that unblocks the most; a cycle blocks its tasks. It may run `scripts/task_order.py` next to the skill. Otherwise it is Ready, with a warning when the plan review is unknown (inferred) or still has open `P#`s.
+**[`/crav1-tasks-ready-to-build`](crav1-tasks-ready-to-build.md)** reads `spec.md` open questions, `plan.md` (the `Reviewed:` line and `## Risks`), `tasks.md`, and `verify.md` for one slice or every slice. A ticked task is Done when `verify.md` lists it as verified, otherwise Needs verify. Then a task is blocked by a missing `plan.md`, by a kept-open question whose `Blocks:` line names it, by a kept-open question with no `Blocks:` line (the whole slice, inferred), by a plan Risk that says do not implement until resolved only when that question has no `Blocks:` line, or by an unticked task in its `(after: T#)` (recorded) or, with no `(after: …)`, the task just before it (inferred). `Blocks: none` blocks no task. Any `Blocks:` line wins over that Risk wording. Lists and Next follow dependency order (1.103.0): the `(after: …)` graph in waves, lowest number first in a wave; Next is the ready task that unblocks the most; a cycle blocks its tasks. It may run `scripts/task_order.py` and `scripts/question_blocks.py` next to the skill. Otherwise it is Ready, with a warning when the plan review is unknown (inferred) or still has open `P#`s.
 
 Shows summary counts per slice, then Ready, Blocked (one reason each, recorded or inferred), Needs verify, a Done count, one `Next:` line (the ready task that unblocks the most others, with a short reason; the unblock step when nothing is ready; verify when only Needs verify is left), and a `Source:` line. Local only: it never reads Azure Boards and names [`/crav1-ado-sync`](crav1-ado-sync.md) for task states there. It writes nothing and runs no other skill. It can run any time. It is cross-cutting. It is not a starter option.
 
@@ -19,6 +19,8 @@ Shows summary counts per slice, then Ready, Blocked (one reason each, recorded o
 1.69.0: the `Promotion:` line under the Branches line, with the optional `pipeline runs` check.
 
 1.88.0: command-only (`disable-model-invocation: true`). It runs only when you type [`/crav1-tasks-ready-to-build`](crav1-tasks-ready-to-build.md); the agent does not start it from a plain question, and its description no longer loads in every chat.
+
+1.125.0: `Blocks: none` blocks no task. A `Blocks:` line wins over a Risk that says do not implement until resolved. No line still blocks the whole slice. Older specs with no line behave as before.
 
 ## Choice words
 

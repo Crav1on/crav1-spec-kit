@@ -52,7 +52,7 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 
 **Ready (task).** A task that can be built now: `plan.md` exists, no open question or plan Risk blocks it, the tasks it waits on are ticked, and it is not ticked itself. A ticked task that `verify.md` does not list as verified is **needs verify**, not done. `/crav1-tasks-ready-to-build` lists them. See [Readiness marks](data-layout.md#readiness-marks).
 
-**Blocking.** What keeps a task from being ready, with one reason: a kept-open question (its `Blocks:` line names the task, or it has none and blocks the whole slice), a plan Risk, or an earlier task that is not ticked (from `(after: T#)`, or task order when none is recorded). A reason from a written mark is **recorded**; a fallback is **inferred**.
+**Blocking.** What keeps a task from being ready, with one reason: a kept-open question (its `Blocks:` line names the task, `Blocks: none` blocks no task, or it has no line and blocks the whole slice), a plan Risk that says do not implement until resolved only when that question has no `Blocks:` line, or an earlier task that is not ticked (from `(after: T#)`, or task order when none is recorded). A reason from a written mark is **recorded**; a fallback is **inferred**. Since 1.125.0 any `Blocks:` line wins over that Risk wording.
 
 **Dependency order.** The order tasks are listed, built and verified in since 1.103.0: the `(after: T#)` graph wave by wave (a task with no `(after: …)` waits on the task just before it), lowest number first inside a wave, not plain task number. **Next** is the ready task that unblocks the most others. Tasks that wait on each other in a loop are blocked as a cycle.
 
@@ -112,7 +112,7 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 
 **Research note, stale mark, point.** A research note lives in `docs/research/`. When a later quote changes what it says, the note gets a `Stale since` mark after a yes, and each spec that relies on it gets one `Point:` line per hit.
 
-**Open question marks.** `Pending:`, `Asked:`, `Answered:`, and `Blocks:` lines under a spec's open question. See [Data layout](data-layout.md#open-question-marks).
+**Open question marks.** `Pending:`, `Asked:`, `Answered:`, and `Blocks:` lines under a spec's open question, including `Blocks: none` when the question blocks no current task (1.125.0). See [Data layout](data-layout.md#open-question-marks).
 
 **Environment marks.** Confirmed lines in `docs/environments/marks.md` saying which environment a cloud resource belongs to. See [Environment marks](../environments-marks.md).
 

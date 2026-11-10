@@ -4,7 +4,7 @@ Read this only when the command names a playbook file. The file is a `report-pla
 
 Run `playbook-status` from `scripts/walk_progress.py` on that file. A `docs/playbooks/` path is the same playbook this walk recorded when the path matches.
 
-- **already-applied** (this walk recorded `applied` or `reapplied` for the same file and the same contents): ask one question. Options: `skip` (Recommended), `reapply`. `skip` records `Result: skipped` only when the previous result was not already an apply; if it was applied, leave the applied line as it is and move on. `reapply` shows the changes and writes only on yes.
+- **already-applied** (this walk recorded `applied` or `reapplied` for the same file and the same contents): ask one question, even when the file has not changed. Do not move on without it. Options: `skip` (Recommended), `reapply`. `skip` records `Result: skipped` only when the previous result was not already an apply; if it was applied, leave the applied line as it is and move on. `reapply` shows the changes and writes only on yes.
 - **already-skipped** (same file and contents, result `skipped`): options `skip` (Recommended), `apply`. `apply` is the show-changes path below.
 - **not-recorded**, **changed**, or **different-file**: do not call it already applied. Show the changes, then apply only on yes.
 
