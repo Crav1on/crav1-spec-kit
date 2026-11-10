@@ -46,7 +46,7 @@ def parse(text):
         else:
             deps = [prev] if prev is not None else []
             recorded = False
-        title = re.sub(r"\s*\((verify|spec|after|branch):[^)]*\)", "", rest).strip()
+        title = re.sub(r"\s*\((verify|spec|after|branch|step|map):[^)]*\)", "", rest).strip()
         tasks.append({"id": num, "done": m.group(1) != " ", "title": title, "deps": deps, "recorded": recorded})
         prev = num
     return tasks

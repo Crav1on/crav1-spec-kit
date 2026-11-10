@@ -6,11 +6,11 @@
 
 ## Purpose
 
-List the tasks ready to build, for one spec or all, and why the others are blocked. Read-only.
+List the tasks ready to build, for one spec or all, and why the others are blocked. Rewrites each slice build map.
 
 **[`/crav1-tasks-ready-to-build`](crav1-tasks-ready-to-build.md)** reads `spec.md` open questions, `plan.md` (the `Reviewed:` line and `## Risks`), `tasks.md`, and `verify.md` for one slice or every slice. A ticked task is Done when `verify.md` lists it as verified, otherwise Needs verify. Then a task is blocked by a missing `plan.md`, by a kept-open question whose `Blocks:` line names it, by a kept-open question with no `Blocks:` line (the whole slice, inferred), by a plan Risk that says do not implement until resolved only when that question has no `Blocks:` line, or by an unticked task in its `(after: T#)` (recorded) or, with no `(after: …)`, the task just before it (inferred). `Blocks: none` blocks no task. Any `Blocks:` line wins over that Risk wording. Lists and Next follow dependency order (1.103.0): the `(after: …)` graph in waves, lowest number first in a wave; Next is the ready task that unblocks the most; a cycle blocks its tasks. It may run `scripts/task_order.py` and `scripts/question_blocks.py` next to the skill. Otherwise it is Ready, with a warning when the plan review is unknown (inferred) or still has open `P#`s.
 
-Shows summary counts per slice, then Ready, Waiting on a question, Waits in order, and Blocked (one reason each, recorded or inferred), Needs verify, a Done count, one `Next:` line (the ready task that unblocks the most others, with a short reason; the unblock step when nothing is ready; verify when only Needs verify is left), and a `Source:` line. A wait on a real earlier task is Waits in order. A cycle, or an after: that names no task, is Blocked. An open question is Waiting on a question. Local only: it never reads Azure Boards and names [`/crav1-ado-sync`](crav1-ado-sync.md) for task states there. It writes nothing and runs no other skill. It can run any time. It is cross-cutting. It is not a starter option.
+Shows summary counts per slice, then Ready, Waiting on a question, Waits in order, and Blocked (one reason each, recorded or inferred), Needs verify, a Done count, one `Next:` line (the ready task that unblocks the most others, with a short reason; the unblock step when nothing is ready; verify when only Needs verify is left), and a `Source:` line. A wait on a real earlier task is Waits in order. A cycle, or an after: that names no task, is Blocked. An open question is Waiting on a question. Local only: it never reads Azure Boards and names [`/crav1-ado-sync`](crav1-ado-sync.md) for task states there. It runs no other skill. It can run any time. It is cross-cutting. It is not a starter option.
 
 1.64.0: shows a task's `(branch: …)` and one Branches line from local git only.
 
@@ -26,17 +26,20 @@ Shows summary counts per slice, then Ready, Waiting on a question, Waits in orde
 
 1.127.0: the report splits Ready, Waiting on a question, Waits in order, and Blocked. `task_order.py` text uses the same Waits in order and Blocked headings. Who on a question comes from "Waiting for", then the latest Pending or Asked line, or not named yet. The interpreter is `docs/reference/running-scripts.md`.
 
+1.128.0: every run rewrites `docs/specs/<slug>/build-map.md` through `scripts/build_map.py`. The task list is unchanged apart from one line pointing at that file. The word `build-map` shows only the short summary: the path, how many branches in each wave can run in parallel, then the Overlap lines for that wave, one per pair. The ready-check list stays the one pointer line. One branch per numbered Approach step, unless a task has `(map:)`. `(step:)` links a task to a step. No steps, or steps that name no task, means one branch per task, and the file says so. Each wave is a subgraph so its branches sit side by side. A question hold is counted in the wave heading (`3 branches, 2 can start now`). An overlap note names two branches in one wave that share a `(spec:)` requirement or a backtick path. The note does not change readiness or waves. Six fields per branch, no task ids and no file list in a row. Who uses the 1.127.0 rule. A cycle or an unknown `(after:)` is under Blocked.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
 
 | Question | Word | Means |
 | --- | --- | --- |
+| Show the build map? | `build-map` | show only the build map for the same scope, such as cc 1.0; the task list stays off |
 | Also check the latest pipeline runs? | `pipeline runs` | check the latest successful Azure DevOps runs behind the Promotion line (read-only) |
 
 ## Runs when
 
-You want to know which tasks can be built now, and why the others cannot. Called by the user with its slash command, any time (command-only).
+You want to know which tasks can be built now, and why the others cannot, or you want the build map. Called by the user with its slash command, any time (command-only).
 
 ## Prompts
 
@@ -46,19 +49,19 @@ Prompt budget: 0 (asks nothing). A prompt may hold several questions. See the as
 
 In short: `spec.md` open questions, `plan.md`, `tasks.md`, and `verify.md` per slice.
 
-Reads, for one slice or every slice under `docs/specs/`, the open questions in `spec.md` with their `Blocks:`, `Asked:`, `Pending:`, and `Answered:` lines, the `Reviewed:` line and `## Risks` in `plan.md`, the task lines in `tasks.md` with their ticks and `(after: T#)`, and `verify.md` when it exists.
+Reads, for one slice or every slice under `docs/specs/`, the open questions in `spec.md` with their `Blocks:`, `Asked:`, `Pending:`, and `Answered:` lines, the `Reviewed:` line, `## Approach`, and `## Risks` in `plan.md`, the task lines in `tasks.md` with their ticks, `(after: T#)`, `(step:)`, and `(map:)`, and `verify.md` when it exists.
 
 ## Writes
 
-In short: Nothing (a list in chat with its source).
+In short: `docs/specs/<slug>/build-map.md` every run, and a list in chat.
 
-Writes a list in the chat with summary counts, Ready, Waiting on a question, Waits in order, Blocked, Needs verify, a Done count, the next step, and its source.
+Writes a list in the chat with summary counts, Ready, Waiting on a question, Waits in order, Blocked, Needs verify, a Done count, the next step, and its source, plus one line pointing at the build map. Every run rewrites `docs/specs/<slug>/build-map.md`. The word `build-map` prints only the short summary of that file.
 
 ## Does not
 
-Leaves every file alone, and never reads Azure Boards.
+Leaves every file other than `build-map.md` alone, and never reads Azure Boards. It does not commit the map.
 
-Limits and exceptions: does not guess a dependency or a blocking link from task text. Where nothing is recorded it uses a fallback and marks the reason inferred. It writes no marks; review-plan, tighten-plan, plan-from-spec, and resolve-open-questions write them.
+Limits and exceptions: does not guess a dependency or a blocking link from task text. Where nothing is recorded it uses a fallback and marks the reason inferred. It writes no readiness marks; review-plan, tighten-plan, plan-from-spec, and resolve-open-questions write them. The map is written only by `scripts/build_map.py`.
 
 ## You run next / Runs by itself
 

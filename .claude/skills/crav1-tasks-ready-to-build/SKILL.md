@@ -2,8 +2,8 @@
 name: crav1-tasks-ready-to-build
 description: >-
   Use when the user asks which tasks are ready to build, for one spec or all,
-  and why others are blocked. Lists Ready, Blocked, Needs verify and Done in
-  dependency order and names the next task. Local and read-only.
+  and why others are blocked, or asks for the build map. Lists ready and
+  blocked tasks in dependency order and refreshes each slice's build map.
 disable-model-invocation: true
 icon: list-checks
 color: green
@@ -11,15 +11,21 @@ color: green
 
 # Tasks ready to build
 
-You list which tasks can be built now and why the others cannot. You read files only. You write nothing, commit nothing, and run no other skill. Naming `/crav1-build-tasks` is not running it.
+You list which tasks can be built now and why the others cannot. The only file you write is `docs/specs/<slug>/build-map.md`, through the script. You commit nothing and run no other skill. Naming `/crav1-build-tasks` is not running it.
 
 This is cross-cutting. It is not its own lane. It can run any time: before Build, between tasks, or after new information. It does not move work into Build.
 
 It is not `/crav1-what-do-we-know-about-this` (what is known about one thing) and not `/crav1-ado-sync` (which specs could become Features). It is not the batch board of `/crav1-build-tasks`.
 
+## Build map (1.128.0)
+
+Route first. The word `build-map` shows only the map. The words after it are the scope, the same scope as this command with no word (a slug such as `cc 1.0`, an `@` folder, or every slice). No word keeps the task list.
+
+Every run, rebuild `docs/specs/<slug>/build-map.md` with `scripts/build_map.py`. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. Do not hand-edit it. The task list gains one line: `Build map: docs/specs/<slug>/build-map.md`. With the word, run `--chat` and print only that summary: each wave, then that wave's Overlap lines. Read `references/build-map.md` only when the script cannot run. Do not invent the map.
+
 ## Scope
 
-- A named slug (or an @-mentioned spec folder): that slice only.
+- A named slug (or an @-mentioned spec folder): that slice only. `cc 1.0` matches a folder `cc 1.0`, `cc-1.0`, or `cc-1-0`.
 - No slug: every folder under `docs/specs/` that has `tasks.md`, skipping `_template`. A folder with `spec.md` but no `tasks.md` is listed once as `no tasks yet (run /crav1-plan-from-spec)`.
 
 ## What it reads
@@ -94,6 +100,7 @@ Branches: 1 of 3 merged into develop. Not merged: feat/orders-retry (2 commits),
 
 Next: /crav1-build-tasks T5 (orders-retry), because that task unblocks the most others.
 Source: docs/specs/<slug>/spec.md, plan.md, tasks.md, verify.md
+Build map: docs/specs/<slug>/build-map.md
 ```
 
 - **Order** shows the slice's unticked tasks in dependency order, `|` between tasks of the same wave. One Order line per slice when listing all specs.
@@ -103,15 +110,17 @@ Source: docs/specs/<slug>/spec.md, plan.md, tasks.md, verify.md
 - Nothing is left to build or verify: `Next: nothing needed now.`
 - A ready task with `(branch: …)` shows that branch beside it.
 - **Source** names every file it read, per slice.
+- **Build map** is one line per slice, the path the script just wrote. The task list above it is unchanged.
 - When the slice has `work-item.md`, add the Azure Boards line from **What it reads**.
 
 ## What it does not do
 
-- No file write, no commit, no network read, no Azure Boards read, no fetch, no checkout.
+- No commit, no network read, no Azure Boards read, no fetch, no checkout. The only write is `build-map.md`, through the script.
 - No skill run. It names the next step and stops.
-- No new marks. `Reviewed:`, `(after: …)`, `(branch: …)`, and `Blocks:` are written by `/crav1-review-plan`, `/crav1-tighten-plan`, `/crav1-plan-from-spec`, and `/crav1-resolve-open-questions`.
+- No new readiness marks. `Reviewed:`, `(after: …)`, `(branch: …)`, and `Blocks:` are written by `/crav1-review-plan`, `/crav1-tighten-plan`, `/crav1-plan-from-spec`, and `/crav1-resolve-open-questions`. `(step:)` and `(map:)` are optional and written by `/crav1-plan-from-spec`. This skill only reads them.
 
 
 ## Choice words (1.69.0)
 
+- Build map: `build-map` (show only the build map; the words after it are the scope, same as this command with no word, such as `cc 1.0`). The task list stays off. There are no `--flags`.
 - Pipeline runs: `pipeline runs` (check the latest successful Azure DevOps runs behind the Promotion line without asking). There are no `--flags`.

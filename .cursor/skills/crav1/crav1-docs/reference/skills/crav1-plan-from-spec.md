@@ -20,6 +20,8 @@ File-level `plan.md` and `tasks.md`; each verify note names the checks before co
 
 1.126.0: a question with `Blocks: T2, T4` gets the risk line `kept open; blocks T2, T4 until resolved.` Only a question with no `Blocks:` line keeps do not implement until resolved. A risk matches on the question first sentence or a `(question: <first words>)` tag, not the whole line.
 
+1.128.0: optional `(step: 1)` links a task to a numbered Approach step, and optional `(map: feat/cancel-refund)` puts that task on another branch. Leave both off. The default build map is one branch per step.
+
 ## Runs when
 
 Spec is accepted. Called by the user.
