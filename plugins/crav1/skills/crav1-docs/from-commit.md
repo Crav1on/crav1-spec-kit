@@ -87,9 +87,11 @@ git push
 
 ## Someone else pushed first (1.81.0)
 
-After the commit, `/crav1-finalize-commit` fetches. It never pushes; it ends with `Ready to push.`
+After the commit, `/crav1-finalize-commit` fetches. It never pushes. It makes at most two commits: the one you just drafted, and one merge commit when the branch was behind.
 
-- **Behind:** it runs `git pull --no-rebase`, never a rebase. Conflicts in specs, system files and notes are resolved by the kit's rules: both sides' new lines are kept (yours first), each repo and branch keeps its newest `Synced at` line, and the note indexes are rebuilt rather than merged. Before the merge commit, it checks that every line either side added is still there. If one is missing, it does not commit.
+- **Behind:** it runs `git pull --no-rebase --no-commit`, never a rebase and never an automatic merge commit. Conflicts in specs, system files and notes are resolved by the kit's rules: both sides' new lines are kept (yours first), each repo and branch keeps its newest `Synced at` line, and the note indexes are rebuilt rather than merged. The rebuild is part of the merge commit, noted in that commit's message. It runs the nothing-lost check and says nothing was lost only when that check passes. If a line is missing, it does not commit. Then one merge commit. No third commit for the index.
+- **Unfinished walk:** the next line is `/crav1-tighten-and-plan-ready-to-build`, because the walk paused.
+- **Base branch:** it says to push `main` or `master`, because a pull request cannot open from that branch into itself. On a feature branch the next line names `/crav1-open-pr`.
 - **A real disagreement:** when both sides changed the same line in different ways, you get one question: keep both (theirs becomes a `**Conflict:**` line under yours), mine, theirs, or stop.
 - **Code files:** conflicts there stay with you, as before.
 - **Not behind:** it checks any merge you have not pushed yet, including one you resolved by hand. A merge that kept your `**New:** Retries stop after 3 attempts` line but silently dropped the other side's `**New:** Retries back off for 30 seconds` line is listed, with restore / show me / stop. After `restore` the restored lines go into this run's commit, with the one confirm at the end (1.91.0).

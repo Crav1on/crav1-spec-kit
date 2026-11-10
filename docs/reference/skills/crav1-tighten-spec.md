@@ -10,6 +10,8 @@ Walk an existing spec issue-by-issue.
 
 One issue at a time, with explained resolutions (plus get a suggestion) and impact; patch only that issue after the user chooses. When the slice is partial or `## In the code` names paths, reads the committed code on the repo and branch the spec names before wording issues. A spec with no code behind it skips that read. Does not offer finish, add a test, or leave.
 
+1.123.0: more than 8 issues starts with one line of counts (issues to fix, open questions, small wording) and does not print the full list. Each time, one issue or a small group; one by one is always offered. An issue whose only work is an Answered line, or that repeats an open question, is one line passed to [`/crav1-resolve-open-questions`](crav1-resolve-open-questions.md), with no menu.
+
 1.64.0: reads every listed work branch without checkout; a yes on writing the branch adds to the `Branch:` list; a listed branch that is gone and not merged is offered `(dropped)` (`mark-dropped`); a deleted branch whose work is in the base shows `merged, branch deleted`.
 
 1.68.0: reads and writes the `(spec branch)` and `(into …)` markers on the Match `Branch:` list after a yes.

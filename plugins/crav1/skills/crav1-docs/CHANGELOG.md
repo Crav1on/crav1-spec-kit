@@ -2,6 +2,18 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.123.0 (2026-11-10)
+
+The tighten-and-plan walk can finish, and a commit during that walk stays on the walk. A minor release because resume, the ready check, tighten-spec's batch, and the commit's next line change.
+
+- **Walk progress.** A later step inside the walk does not reopen earlier steps. Recording a step updates the versions those earlier steps covered. An optional extra the walk itself offers and runs (a security review, research, a data model, show-or-ask, suggest-tests, and the same kind of extra) is recorded with `- Extra:` when it finishes. That record is automatic. The user does not run `cover` first. The extra's spec or plan write does not reopen earlier steps. `cover` stays optional, for a write made outside this walk that you want counted as part of the walk, and it does not name an extra. A hand edit, or `/crav1-add-to-spec` between sessions, reopens only the steps that change affects. A spec change does not reopen the architecture review once a later spec step is recorded. A plan or tasks edit does not reopen the step that wrote the plan from the spec; it reopens the plan review and the ready check. Plan steps follow the same inside-walk rule.
+- **Ready check.** A reopened step blocks ready. The check names the step. Jump back and rerun it, or clear it with one line, `nothing new`.
+- **Done time.** The progress script stamps each step's `Done` time itself, as a full timestamp.
+- **Pause.** Stopping partway is one paused-at line, then Next (this walk, and the step it resumes at), Waiting only when that step is blocked, and Uncommitted. No long pause prose.
+- **Tighten a large batch.** More than 8 issues: one line of counts first (issues to fix, open questions, small wording). The full list is not printed up front. Each time, one issue or a small group. One by one is always offered. An issue that only settles an open question goes to `/crav1-resolve-open-questions` as one line, with no menu.
+- **Commit.** `/crav1-finalize-commit` makes at most two commits: the drafted commit, and one merge commit. The merge is `git pull --no-rebase --no-commit`, never a rebase and never an automatic merge commit. When the notes index check fails, the index is rebuilt into that merge commit and the message says so. `scripts/nothing_lost.py` is the nothing-lost check. Say nothing was lost only when it reports that.
+- **Next after a commit.** An unfinished `walk-progress.md` points Next back at `/crav1-tighten-and-plan-ready-to-build`. On `main` or `master` (any base branch), Next is a push, because `/crav1-open-pr` cannot open a pull request from that branch into itself. On a feature branch, Next is `/crav1-open-pr`. The rule is in `docs/reference/run-ending.md`.
+
 ## 1.122.0 (2026-11-09)
 
 A run ends with one next step. A minor release because what a skill prints at the end of a run changes.

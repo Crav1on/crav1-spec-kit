@@ -199,22 +199,27 @@ class Progress(unittest.TestCase):
         (self.root / "spec.md").write_text("spec v2\n", encoding="utf-8")
         spec = must(["resume", "--root", str(self.root)])
         by_id = {row["id"]: row for row in spec["steps"]}
+        # Architecture already has a later spec step, so a spec edit does not
+        # send the walk back there (1.123.0). The steps that edit or consume
+        # the spec do reopen.
         self.assertEqual(by_id["playbook"]["status"], "keep")
-        for step in ("review-architecture", "tighten-spec", "resolve-open-questions", "plan-from-spec", "review-and-tighten-plan", "tasks-ready-to-build"):
+        self.assertEqual(by_id["review-architecture"]["status"], "keep")
+        for step in ("tighten-spec", "resolve-open-questions", "plan-from-spec", "review-and-tighten-plan", "tasks-ready-to-build"):
             self.assertEqual(by_id[step]["status"], "reopen", step)
-            self.assertIn("spec", by_id[step]["changed"])
-        self.assertEqual(spec["continue_from"], "review-architecture")
+            self.assertEqual(by_id[step]["changed"], ["spec"])
+        self.assertEqual(spec["continue_from"], "tighten-spec")
 
         (self.root / "spec.md").write_text("spec v1\n", encoding="utf-8")
         (self.root / "plan.md").write_text("plan v2\n", encoding="utf-8")
         plan = must(["resume", "--root", str(self.root)])
         by_id = {row["id"]: row for row in plan["steps"]}
-        for step in ("playbook", "review-architecture", "tighten-spec", "resolve-open-questions"):
+        for step in ("playbook", "review-architecture", "tighten-spec", "resolve-open-questions", "plan-from-spec"):
             self.assertEqual(by_id[step]["status"], "keep", step)
-        for step in ("plan-from-spec", "review-and-tighten-plan", "tasks-ready-to-build"):
+        for step in ("review-and-tighten-plan", "tasks-ready-to-build"):
             self.assertEqual(by_id[step]["status"], "reopen", step)
             self.assertIn("plan", by_id[step]["changed"])
             self.assertNotIn("spec", by_id[step]["changed"])
+        self.assertEqual(plan["continue_from"], "review-and-tighten-plan")
 
         (self.root / "plan.md").write_text("plan v1\n", encoding="utf-8")
         (self.root / "verify.md").write_text("verify v1\n", encoding="utf-8")

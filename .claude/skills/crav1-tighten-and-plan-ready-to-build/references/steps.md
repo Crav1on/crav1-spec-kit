@@ -12,6 +12,8 @@ Always run `/crav1-review-architecture`. It writes nothing. Show its issues. Whe
 
 Run `/crav1-tighten-spec` as that skill walks: one issue at a time. A batch of `I#: letter` answers is that skill's own rule. Do not add a second way to patch. When it finds no issues, say so and move on.
 
+An issue whose only work is an `Answered:` line, or that only repeats a question already under `## Open questions`, goes to step 4 with no menu. One line: `Left for /crav1-resolve-open-questions: I3, I10, I11.` More than 8 issues: that skill shows a one-line count by kind first, then one issue or a small group. One by one is always offered. Do not print the full list first.
+
 ## 4. Open questions
 
 Run `/crav1-resolve-open-questions`. When `## Open questions` has nothing left to settle, say so and move on.
@@ -28,7 +30,9 @@ Run `/crav1-review-plan`, then `/crav1-tighten-plan`, in that order. Review writ
 
 ## Offered only when the spec needs them
 
-Not fixed steps. Security and tests stay optional. Offer the ones that apply in one batch, at most four options, a fifth under Other. List a recommended one first and end its label with ` (Recommended)`. Do not run any of them unless the user picks it. After one of them writes, run `resume` and reopen only the steps it affected.
+Not fixed steps. Security and tests stay optional. Offer the ones that apply in one batch, at most four options, a fifth under Other. List a recommended one first and end its label with ` (Recommended)`. Do not run any of them unless the user picks it. When one of them finishes inside this walk, record it before `resume`. The record is `- Extra: review-security`, `- Extra: research`, `- Extra: model-data`, `- Extra: show-or-ask-open-questions`, or `- Extra: suggest-tests-for-code`. Pass `--yes` because the user already picked the extra. Do not ask them to run `cover`. That record leaves earlier steps done.
+
+`cover --yes` is optional and is not how this walk records an extra it just ran. Use it only for a write made outside this walk, when you want the current spec, plan, and tasks counted as part of the walk without a named extra.
 
 - Research helper, no slash command. Offer it when the spec needs a technology, a service, or a scaling choice nobody has decided. Flag the question. Do not invent a command.
 - `/crav1-review-security`, when the spec touches trust, access, or personal data, or the user asks. Architecture review already names it. Still optional here.
