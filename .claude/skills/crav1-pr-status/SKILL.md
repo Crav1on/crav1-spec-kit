@@ -92,7 +92,7 @@ Read `references/since-last.md` only on `since last`, or when your `Read` line e
 
 ## Write the record
 
-Every run writes the PR note's `## PR record` as `references/pr-record.md` says, merge-safe, each line in sorted place: one Point per point, `Order` lines, your `Read` line, the `Ready` line and the `State` line. A Point keeps its line; a changed status replaces that line where it is. Never delete a Point. The drafted replies go in a `## Replies as drafted, <date> (not posted)` history section, after the personal-data and secrets check. Then run the notes index generator (`scripts/notes_index.py` in `crav1-add-to-spec`). Do not commit. The run ending's Uncommitted line covers the note.
+Every run writes the PR note's `## PR record` as `references/pr-record.md` says, merge-safe, each line in sorted place: one Point per point, `Order` lines, your `Read` line, the `Ready` line and the `State` line. A Point keeps its line; a changed status replaces that line where it is. Never delete a Point. The drafted replies go in a `## Replies as drafted, <date> (not posted)` history section, after the personal-data and secrets check. Then run the notes index generator (`scripts/notes_index.py` in `crav1-add-to-spec`). Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. Do not commit. The run ending's Uncommitted line covers the note.
 
 Writing the record needs no yes: it is a note in the specs repo, as `/crav1-review-pr` writes its notes. When no specs repo is found, print the record with the path it would have.
 

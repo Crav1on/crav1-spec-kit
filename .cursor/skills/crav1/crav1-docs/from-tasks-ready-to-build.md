@@ -19,12 +19,12 @@ Leave out the folder to check every slice under `docs/specs/`.
 
 For each task, in this order:
 
-| Check | Done, ready, or blocked |
+| Check | Where it lands |
 | --- | --- |
 | Ticked in `tasks.md` | **Done** when `verify.md` lists it as verified, otherwise **Needs verify** |
 | `plan.md` missing | Blocked |
-| A kept-open question in `spec.md` | Blocked when its `Blocks:` line names the task (recorded). `Blocks: none` blocks no task (recorded). With no `Blocks:` line, it blocks the whole slice (inferred). A plan Risk that says do not implement until resolved does the same when it matches no question, or matches a question with no `Blocks:` line. It matches on the question's first sentence, a `(question: <first words>)` tag, or the same Blocks tasks named in the risk. The line wins |
-| Tasks it waits on | Blocked while a task in its `(after: T#)` is unticked (recorded). With no `(after: …)`, the task just before it blocks it (inferred). Tasks that wait on each other in a loop are blocked as a cycle |
+| A kept-open question in `spec.md` | **Waiting on a question** when its `Blocks:` line names the task (recorded). `Blocks: none` blocks no task (recorded). With no `Blocks:` line, the question holds the whole slice (inferred). Who comes from "Waiting for", then the latest Pending or Asked line, or not named yet. A plan Risk that says do not implement until resolved is **Blocked** when it matches no question, or matches a question with no `Blocks:` line. It matches on the question's first sentence, a `(question: <first words>)` tag, or the same Blocks tasks named in the risk. The line wins |
+| Tasks it waits on | **Waits in order** while a real earlier task is unticked (recorded from `(after: T#)`, or inferred from the task just before it). A cycle, or an `(after:)` that names no task, is **Blocked** |
 | Otherwise | **Ready**. When `plan.md` has no `Reviewed:` line, it adds a warning to run `/crav1-review-plan` (inferred). When the review still has open `P#`s, it says so |
 
 Lists are in **dependency order** (1.103.0), not task number: tasks with nothing to wait on first, then the tasks they unblock, wave by wave, lowest number first inside a wave. For a slice where T7 waits on T2, T3 and T6 on T7, T4 on T3 and T7, and T5 on T4, the order is T1 → T2 → T7 → T3 | T6 → T4 → T5. **Next** is the ready task that unblocks the most other tasks. `/crav1-build-tasks`, `/crav1-build-features` and `/crav1-verify-build-against-spec` use the same order.
@@ -34,16 +34,18 @@ Every reason says **recorded** (from a mark in a file) or **inferred** (a fallba
 ## What you see
 
 ```text
-| Slice | Ready | Blocked | Needs verify | Done |
-| --- | --- | --- | --- | --- |
-| cancel-booking | 1 | 2 | 1 | 3 |
+| Slice | Ready | Waiting | Waits in order | Blocked | Needs verify | Done |
+| --- | --- | --- | --- | --- | --- | --- |
+| cancel-booking | 1 | 1 | 1 | 0 | 1 | 3 |
 
 Ready (dependency order)
 - cancel-booking T5: Refund to the original card. Warning: plan review unknown (inferred), run /crav1-review-plan.
 
-Blocked (dependency order)
+Waiting on a question
+- cancel-booking T7: open question "Which currency for refunds?" (recorded). Waiting for the partner.
+
+Waits in order (dependency order)
 - cancel-booking T6: waits on T5 (recorded).
-- cancel-booking T7: open question "Which currency for refunds?" (recorded). Asked 2026-10-10, mail to Dana.
 
 Needs verify
 - cancel-booking T3: no verify.md row.

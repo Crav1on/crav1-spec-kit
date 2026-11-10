@@ -28,7 +28,7 @@ This run makes at most two commits: the drafted commit, and one merge commit whe
    - `docs/notes/index.md` and the month indexes: take either side, then rebuild. Never merge them by hand.
    - Both sides changed the same existing line in different ways (the same fact, said differently): ask the one question below.
 3. Run `notes_index.py --check` from crav1-add-to-spec's `scripts/`. When it fails, on a conflict or on a clean merge, rebuild with `notes_index.py` (no extra arguments) and `git add` the indexes. Do not commit yet.
-4. Run `scripts/nothing_lost.py` in this skill, with `--root` set to the repo. Before the merge commit, the working tree is the merge. Do not say Nothing lost unless the script prints `"nothing_lost": true`. Lines lost: do not commit; list each line with its file and side, and restore them first.
+4. Run `scripts/nothing_lost.py` in this skill, with `--root` set to the repo. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. Before the merge commit, the working tree is the merge. Do not say Nothing lost unless the script prints `"nothing_lost": true`. Lines lost: do not commit; list each line with its file and side, and restore them first.
 5. One merge commit, and no other. Stage the rebuilt indexes with the merge. When the index was rebuilt, append `Rebuilt the notes index into this merge.` to the merge message, then commit that message once. Otherwise `git commit --no-edit`. Do not make a second commit for the index.
 6. End, only when the script said nothing was lost: `Merged <upstream> into <branch>. Nothing lost. Ready to push.` When the index was rebuilt, say it is in the merge commit.
 
@@ -38,7 +38,7 @@ The question, only for a real disagreement, one per fact, with the two lines sho
 
 ## Nothing-lost check
 
-Run `scripts/nothing_lost.py`. Do not reimplement it in the chat, and do not say Nothing lost without its `"nothing_lost": true`.
+Run `scripts/nothing_lost.py`. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. Do not reimplement it in the chat, and do not say Nothing lost without its `"nothing_lost": true`.
 
 The script checks a merge `M` with parents `P1` and `P2` and base `B = git merge-base P1 P2`. For each kit file either side changed, every line `git diff -U0 --ignore-cr-at-eol B P1 -- <file>` or `B P2` adds (the `+` lines) counts as kept when it is in `M`, in `HEAD` or in the working tree. A line missing from `M` but restored in a later commit or in the working tree is kept. Before the merge commit, `M` is the working tree. Pass `--merge <sha>` for a merge that is already committed. Compare through git, ignoring CR at line ends, so CRLF copies under `core.autocrlf true` do not look different.
 

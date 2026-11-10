@@ -23,10 +23,10 @@ It does not replace the skills it runs. It does not start Build. It never runs `
 
 Read [references/common.md](references/common.md) once. Then open only the file for the point you are at. Do not open the others yet.
 
-- A `walk-progress.md` already beside the spec: read [references/progress.md](references/progress.md) and resume before any step.
-- A playbook path was given: read [references/playbook.md](references/playbook.md) for step 1. No playbook: do not open that file. Say step 1 is skipped and go to step 2.
+- A `walk-progress.md` already beside the spec: read [references/progress.md](references/progress.md). Resume may report status. It does not start a step.
+- A playbook path was given: read [references/playbook.md](references/playbook.md) and ask the step 1 question before any later step, including a read-only check such as readiness. No step runs until that choice is answered. No playbook: do not open that file. Say step 1 is skipped and go to step 2.
 - Steps 2 through 6: read [references/steps.md](references/steps.md).
-- Step 7: read [references/readiness.md](references/readiness.md).
+- Step 7: read [references/readiness.md](references/readiness.md). Do not open it, and do not run readiness, until the playbook choice is answered when a playbook was named.
 
 A headless or bot run stops before any step. This walk is guided only. It does not guess a mode, and there is no automatic mode.
 

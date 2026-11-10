@@ -10,7 +10,7 @@ List the tasks ready to build, for one spec or all, and why the others are block
 
 **[`/crav1-tasks-ready-to-build`](crav1-tasks-ready-to-build.md)** reads `spec.md` open questions, `plan.md` (the `Reviewed:` line and `## Risks`), `tasks.md`, and `verify.md` for one slice or every slice. A ticked task is Done when `verify.md` lists it as verified, otherwise Needs verify. Then a task is blocked by a missing `plan.md`, by a kept-open question whose `Blocks:` line names it, by a kept-open question with no `Blocks:` line (the whole slice, inferred), by a plan Risk that says do not implement until resolved only when that question has no `Blocks:` line, or by an unticked task in its `(after: T#)` (recorded) or, with no `(after: …)`, the task just before it (inferred). `Blocks: none` blocks no task. Any `Blocks:` line wins over that Risk wording. Lists and Next follow dependency order (1.103.0): the `(after: …)` graph in waves, lowest number first in a wave; Next is the ready task that unblocks the most; a cycle blocks its tasks. It may run `scripts/task_order.py` and `scripts/question_blocks.py` next to the skill. Otherwise it is Ready, with a warning when the plan review is unknown (inferred) or still has open `P#`s.
 
-Shows summary counts per slice, then Ready, Blocked (one reason each, recorded or inferred), Needs verify, a Done count, one `Next:` line (the ready task that unblocks the most others, with a short reason; the unblock step when nothing is ready; verify when only Needs verify is left), and a `Source:` line. Local only: it never reads Azure Boards and names [`/crav1-ado-sync`](crav1-ado-sync.md) for task states there. It writes nothing and runs no other skill. It can run any time. It is cross-cutting. It is not a starter option.
+Shows summary counts per slice, then Ready, Waiting on a question, Waits in order, and Blocked (one reason each, recorded or inferred), Needs verify, a Done count, one `Next:` line (the ready task that unblocks the most others, with a short reason; the unblock step when nothing is ready; verify when only Needs verify is left), and a `Source:` line. A wait on a real earlier task is Waits in order. A cycle, or an after: that names no task, is Blocked. An open question is Waiting on a question. Local only: it never reads Azure Boards and names [`/crav1-ado-sync`](crav1-ado-sync.md) for task states there. It writes nothing and runs no other skill. It can run any time. It is cross-cutting. It is not a starter option.
 
 1.64.0: shows a task's `(branch: …)` and one Branches line from local git only.
 
@@ -23,6 +23,8 @@ Shows summary counts per slice, then Ready, Blocked (one reason each, recorded o
 1.125.0: `Blocks: none` blocks no task. A `Blocks:` line wins over a Risk that says do not implement until resolved. No line still blocks the whole slice. Older specs with no line behave as before.
 
 1.126.0: a Risk that says do not implement until resolved matches a question on the question first sentence, a `(question: <first words>)` tag, or the same Blocks tasks named in the Risk. A Risk that matches no question still blocks the slice. `scripts/task_order.py --json` uses T1 style ids.
+
+1.127.0: the report splits Ready, Waiting on a question, Waits in order, and Blocked. `task_order.py` text uses the same Waits in order and Blocked headings. Who on a question comes from "Waiting for", then the latest Pending or Asked line, or not named yet. The interpreter is `docs/reference/running-scripts.md`.
 
 ## Choice words
 
@@ -50,7 +52,7 @@ Reads, for one slice or every slice under `docs/specs/`, the open questions in `
 
 In short: Nothing (a list in chat with its source).
 
-Writes a list in the chat with summary counts, Ready, Blocked, Needs verify, a Done count, the next step, and its source.
+Writes a list in the chat with summary counts, Ready, Waiting on a question, Waits in order, Blocked, Needs verify, a Done count, the next step, and its source.
 
 ## Does not
 

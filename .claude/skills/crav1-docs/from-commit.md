@@ -2,7 +2,7 @@
 
 Kit not in this project yet? [Install first](install.md) (Cursor and Claude Code; the slash commands match, the files do not). After a Cursor plugin install, the short command loop is [plugins/crav1/README.md](../plugins/crav1/README.md). Claude Code has no plugin.
 
-Use this when the change is built and verified and you want it committed, in a pull request, and merged. Each step is its own command. None of them runs the next one. Push and merge happen only after you say so in that turn.
+Use this when the change is built and verified and you want it committed, in a pull request, and merged. Each step is its own command. A kit script this command runs uses the interpreter in [Running a kit script](reference/running-scripts.md). None of them runs the next one. Push and merge happen only after you say so in that turn.
 
 ## First prompt
 

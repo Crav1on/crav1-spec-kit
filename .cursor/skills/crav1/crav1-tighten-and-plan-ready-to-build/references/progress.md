@@ -26,14 +26,14 @@ Slice: docs/specs/orders-retry/
 
 - Step: tasks-ready-to-build
   Done: 2026-11-09T10:19:09+01:00
-  Result: nothing-to-do
+  Result: ready
   Spec version: a1b2c3d4e5f6
   Plan version: b2c3d4e5f6a1
   Tasks version: c3d4e5f6a1b2
   Verify version: missing
 ```
 
-A playbook step records `Playbook:` only. It does not record spec, plan, or tasks versions. Other result words are `skipped` and `reapplied`. The ready check is the only step that records `Verify version:`. An extra records spec, plan, and tasks versions:
+A playbook step records `Playbook:` only. It does not record spec, plan, or tasks versions. Other result words are `skipped` and `reapplied`. The ready check records `Result: ready` when the readiness output says ready, and `Result: not-ready` when it does not. Do not record `Result: done` for that step. An older `Result: done` on that step still reads as recorded. Resume treats `ready`, `not-ready`, and an older `done` as recorded. The ready check is the only step that records `Verify version:`. An extra records spec, plan, and tasks versions:
 
 ```text
 - Extra: review-security
@@ -44,7 +44,15 @@ A playbook step records `Playbook:` only. It does not record spec, plan, or task
   Tasks version: c3d4e5f6a1b2
 ```
 
-The script stamps `Done` itself, as `YYYY-MM-DDTHH:MM:SS+HH:MM`. Do not pass `--when`. A date alone is rejected. Record one step per call, right when that step finishes. Do not record several steps in one command. `resume` returns `done_stamp_warning` when two or more steps share a Done stamp. Say that warning. Those steps were recorded together. The times are not evidence each one finished then.
+The script stamps `Done` itself, as `YYYY-MM-DDTHH:MM:SS+HH:MM`. Do not pass `--when`. A date alone is rejected. Record one step per call, right when that step finishes. Do not record several steps in one command. `resume` and `readiness` return `done_stamp_warning` when two or more steps share a Done stamp that has not been acknowledged. Say that warning. Those steps were recorded together. The times are not evidence each one finished then.
+
+A shared stamp from before the one-step rule can be acknowledged once. Show the line, get a yes, then run `walk_progress.py ack-stamps --root <spec-folder> --yes`. It writes one line, before the steps:
+
+```text
+Acknowledged stamp: 2026-11-10T12:00:00+00:00 (tighten-spec, resolve-open-questions)
+```
+
+After that line, the warning stays quiet for those records. A new shared stamp warns again. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says.
 
 Recording a step updates the versions on earlier steps. Their `Done` and `Result` stay. A later step's write does not reopen them. That includes a plan step that edits the plan.
 
@@ -58,7 +66,7 @@ A change from outside the walk is one nobody recorded or covered. A hand edit, o
 - A plan or tasks change reopens the plan review and the ready check. It does not reopen plan-from-spec. A spec change does, because the plan was written from the spec.
 - A `verify.md` change reopens only the ready check. A playbook file change reopens only the playbook step.
 
-At the start of a run, resume before recording anything. Redo `continue_from`. Do not record a later step to clear an earlier reopen.
+At the start of a run, resume before recording anything. Resume may report status. When a playbook was named, it does not start a later step, and the playbook question is answered first, including before a read-only check. Redo `continue_from` only after that choice. Do not record a later step to clear an earlier reopen.
 
 On resume, run `resume`. With no playbook on this command, add `--no-playbook` so a playbook step that was never started stays skipped. The script returns `keep`, `reopen`, or `not-started`, and `continue_from`. A recorded extra is `keep` and does not change `continue_from`. Explain each reopen with its `impact` before redoing it. Leave `keep` steps as they are. After a step or an extra is recorded, run `resume` again.
 

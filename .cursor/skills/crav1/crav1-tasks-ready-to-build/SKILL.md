@@ -37,13 +37,13 @@ Check each task in this order and stop at the first rule that decides it. Every 
    - `verify.md` is missing, or has no row for it, or lists it as failed or **Claimed done, unverified**: **Needs verify**, with what `verify.md` says or `no verify.md row`. Not counted as done.
 2. **No plan.** No `plan.md`: every task is blocked, `no plan.md (recorded)`.
 3. **Blocking questions (1.125.0).**
-   - A kept-open question under `## Open questions` (no `Answered:` line) with `Blocks: T#` that names this task: blocked, `open question "<short question>" (recorded)`, plus its latest `Asked:` or `Pending:` line when there is one.
+   - A kept-open question under `## Open questions` (no `Answered:` line) with `Blocks: T#` that names this task: waiting on a question, `open question "<short question>" (recorded)`. Who comes first from the question's own "Waiting for <who>" phrase, then the latest `Pending:` or `Asked:` line. When neither names anyone, say not named yet.
    - `Blocks: none`, optionally `Blocks: none (later phase)`: this question blocks no task (recorded).
-   - A kept-open question with no `Blocks:` line: blocks every unticked task in the slice, `open question "<short question>" blocks the whole slice (inferred)`. Older specs with no line behave as before.
+   - A kept-open question with no `Blocks:` line: waiting on a question for every unticked task in the slice, `open question "<short question>" blocks the whole slice (inferred)`. Older specs with no line behave as before. This is waiting, not a task-order block.
    - A line under `## Risks` in `plan.md` that says do not implement until resolved blocks every unticked task, `plan Risk "<short risk>" blocks the whole slice (inferred)`, only when that risk is not about a question that already has a `Blocks:` line. Any `Blocks:` line wins over that wording, including `Blocks: none`. The risk matches its question on the question's first sentence, on `(question: <first words>)`, or when the risk names the same `Blocks` tasks. A risk that uses the phrase and matches no question still blocks the slice.
 4. **Dependencies.**
-   - The task line has `(after: T1, T3)`: blocked while any of those is unticked, `waits on T1 (recorded)`. A named task that does not exist is `after: T9 names no task (recorded)`.
-   - No `(after: …)`: the task waits on the task just before it in `tasks.md` (the first task waits on nothing). Blocked while that one is unticked, `waits on T2 (inferred)`.
+   - The task line has `(after: T1, T3)`: waits in order while any of those is unticked, `waits on T1 (recorded)`. A named task that does not exist is blocked, `after: T9 names no task (recorded)`.
+   - No `(after: …)`: the task waits in order on the task just before it in `tasks.md` (the first task waits on nothing). Waits in order while that one is unticked, `waits on T2 (inferred)`.
    - Tasks that wait on each other in a loop are blocked, `cycle T3 → T7 → T3 (recorded)`. Fix the `(after: …)` marks with `/crav1-tighten-plan`.
 5. **Ready.** Otherwise the task is ready.
    - `plan.md` has `Reviewed: <date>, P# open: 0`: ready.
@@ -52,13 +52,13 @@ Check each task in this order and stop at the first rule that decides it. Every 
 
 Do not guess a dependency or a blocking link from the task text. Use only the marks above and the fallbacks.
 
-When Python runs, rule 3 may use `scripts/question_blocks.py` beside this skill: `python3 <this skill folder>/scripts/question_blocks.py docs/specs/<slug>/spec.md docs/specs/<slug>/plan.md`. Use its result. It does not write. A question it marks `none` blocks no task. A question it marks `missing` blocks the whole slice. A Risk it marks `blocks_slice: false` does not.
+When Python runs, rule 3 may use `scripts/question_blocks.py` beside this skill: `<interpreter> <this skill folder>/scripts/question_blocks.py docs/specs/<slug>/spec.md docs/specs/<slug>/plan.md`. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. Use its result. It does not write. A question it marks `none` blocks no task. A question it marks `missing` blocks the whole slice. A Risk it marks `blocks_slice: false` does not.
 
 ## Dependency order (1.103.0)
 
 Every task list is in **dependency order**, not task-number order. Each task gets a wave: 0 when it waits on nothing, otherwise one more than the latest wave of the tasks it waits on. List wave by wave, lowest number first inside a wave; tasks in one wave can be built in either order. Tasks on a cycle go last. For the slice in the example below (T7 after T2, T3 and T6 after T7, T4 after T3 and T7, T5 after T4) the order is T1 → T2 → T7 → T3 | T6 → T4 → T5.
 
-The sort ships next to this file as `scripts/task_order.py`. When Python runs, use it for each slice: `python3 <this skill folder>/scripts/task_order.py docs/specs/<slug>/tasks.md` prints Ready, Blocked, the Order line and Next, with the reasons for rule 4. Add the rule 1 to 3 results on top. Without Python, apply the same rule by hand.
+The sort ships next to this file as `scripts/task_order.py`. When Python runs, use it for each slice: `<interpreter> <this skill folder>/scripts/task_order.py docs/specs/<slug>/tasks.md`. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. It prints Ready, Waits in order, Blocked, the Order line and Next. Waits in order is a real earlier task. Blocked is a cycle or an `(after:)` that names no task. Add the rule 1 to 3 results on top: a question is Waiting on a question, not Blocked. Without Python, apply the same rule by hand.
 
 Other skills (`/crav1-build-tasks`, `/crav1-build-features`, `/crav1-verify-build-against-spec`) use this order and this Next rule.
 
@@ -69,22 +69,27 @@ Lead with the summary, then the lists. One line per task. Leave out an empty lis
 ```text
 Tasks ready to build — <slug> | all specs (<n> slices)
 
-| Slice | Ready | Blocked | Needs verify | Done |
-| --- | --- | --- | --- | --- |
-| <slug> | 2 | 3 | 1 | 4 |
+| Slice | Ready | Waiting | Waits in order | Blocked | Needs verify | Done |
+| --- | --- | --- | --- | --- | --- | --- |
+| <slug> | 1 | 1 | 1 | 1 | 1 | 4 |
 
 Ready (dependency order)
 - <slug> T5: <title> (branch: feat/orders-retry). Warning: plan review unknown (inferred), run /crav1-review-plan.
 
-Blocked (dependency order)
+Waiting on a question
+- <slug> T7: open question "Which currency for refunds?" (recorded). Waiting for the partner.
+
+Waits in order (dependency order)
 - <slug> T6: waits on T5 (recorded).
-- <slug> T7: open question "Which currency for refunds?" (recorded). Asked 2026-10-10, mail to Dana.
+
+Blocked (dependency order)
+- <slug> T8: cycle T8 → T9 → T8 (recorded).
 
 Needs verify
 - <slug> T3: no verify.md row.
 
 Done: 4
-Order: T5 → T6 → T7
+Order: T5 → T6 → T7 → T8
 Branches: 1 of 3 merged into develop. Not merged: feat/orders-retry (2 commits), feature/orders-export (3 commits).
 
 Next: /crav1-build-tasks T5 (orders-retry), because that task unblocks the most others.

@@ -2,7 +2,7 @@
 
 Everything left before the slice is done, and the order to do it. Rules: `reports/common.md`.
 
-Read the slice's `spec.md`, `plan.md`, `tasks.md`, open questions and verify notes. Order tasks with `/crav1-tasks-ready-to-build` **Dependency order** (its `scripts/task_order.py` when Python runs). Do not run that skill.
+Read the slice's `spec.md`, `plan.md`, `tasks.md`, open questions and verify notes. Order tasks with `/crav1-tasks-ready-to-build` **Dependency order** (its `scripts/task_order.py` when Python runs; pick the interpreter as `crav1-docs/reference/running-scripts.md` says). Do not run that skill.
 
 Diagrams: a `flowchart` of the whole task graph (ticked tasks greyed, ready ones marked, blocked edges labelled with why); a short `flowchart` of the finish order, one box per wave. No C4.
 

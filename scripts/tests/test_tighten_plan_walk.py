@@ -191,7 +191,7 @@ class Progress(unittest.TestCase):
         self.record("resolve-open-questions")
         self.record("plan-from-spec")
         self.record("review-and-tighten-plan")
-        self.record("tasks-ready-to-build")
+        self.record("tasks-ready-to-build", "ready")
         same = must(["resume", "--root", str(self.root)])
         self.assertIsNone(same["continue_from"])
         self.assertTrue(all(row["status"] == "keep" for row in same["steps"]))

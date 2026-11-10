@@ -2,7 +2,7 @@
 
 Read this when you record. Do not read `scripts/model_run.py` to learn a field. The other flow file stays closed.
 
-Run `scripts/model_run.py` with `py -3` on Windows and `python3` elsewhere. If that command is missing, try the other before giving up. Content goes through a file. Inline flags are for short values only.
+Run `scripts/model_run.py`. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. Content goes through a file. Inline flags are for short values only.
 
 `--input <file.json>` and `--json <file.json>` are the same JSON file. Pass one of them. `--text-file` is the prose file. `--text` is the short inline form.
 

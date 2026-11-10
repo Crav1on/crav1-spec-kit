@@ -2,7 +2,7 @@
 
 Kit not in this project yet? [Install first](install.md) (Cursor and Claude Code; the slash commands match, the files do not). After a Cursor plugin install, the short command loop is [plugins/crav1/README.md](../plugins/crav1/README.md). Claude Code has no plugin.
 
-Use this when a starter has written `docs/specs/<slug>/spec.md` and it is not yet good enough to plan from. The goal is a spec you accept: acceptance lines a stranger could mark yes or no, non-goals, and only the open questions you choose to keep. Every step here edits the spec one issue at a time, after you pick. None of them writes code or a plan.
+Use this when a starter has written `docs/specs/<slug>/spec.md` and it is not yet good enough to plan from. A kit script this command runs uses the interpreter in [Running a kit script](reference/running-scripts.md). The goal is a spec you accept: acceptance lines a stranger could mark yes or no, non-goals, and only the open questions you choose to keep. Every step here edits the spec one issue at a time, after you pick. None of them writes code or a plan.
 
 On a brownfield repo, put the work on a branch first. `/crav1-create-feature-branch` offers `feat/<slug>` (spec and build on one branch) or `spec/<slug>` (specify only; build later on `feat/<slug>` after this spec is on the default branch). Starters already ask this; run it on its own when you skipped that prompt.
 

@@ -44,7 +44,7 @@ After the yes or the edits, then:
 
 ## Copy into the repo (1.120.0)
 
-Run `scripts/playbook_store.py` in this skill after the yes, when at least one filled line is being written. The first report stays outside the project. This copy is not a git commit.
+Run `scripts/playbook_store.py` in this skill after the yes, when at least one filled line is being written. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. The first report stays outside the project. This copy is not a git commit.
 
 1. Run `prepare`. `draft` means no filled `Answer:` or `Change:` line outside a code fence. Say so and do not copy. The outside file stays where it is.
 2. `propose-name`: the file name comes from the report subject, lowercase kebab-case (`CC Process 1.0` becomes `cc-process-1-0.md`). Show that name once, in the confirm, before the first copy. The user may reply with a different kebab-case name. Pass the confirmed name as `--name`. Later applies do not ask. The name stays fixed.

@@ -2,7 +2,7 @@
 
 Read this with the one flow file the command picked. The other flow file stays closed.
 
-The state machine is `scripts/model_run.py` in skill `crav1-model-data`. Run it with `py -3` on Windows and `python3` elsewhere. If that command is missing, try the other before giving up. Check that `--version` is 3.10 or later. Pass paths the user can see.
+The state machine is `scripts/model_run.py` in skill `crav1-model-data`. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. Check that `--version` is 3.10 or later. Pass paths the user can see.
 
 Content goes through files so the command line stays small. Use `--input <file.json>` (or `--json <file.json>`) and `--text-file <path>`. Inline `--text` and other short flags stay allowed for small values. Do not put a model, a proposal, or a long comment on the command line. Every command's fields and one example file are in `references/inputs.md`. Read that file when you record. Do not read the script to learn the fields.
 

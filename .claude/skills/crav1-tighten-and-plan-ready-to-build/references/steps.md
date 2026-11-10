@@ -1,6 +1,6 @@
 # Steps 2 to 6
 
-Run these in order. Each one is the existing skill, not a copy of it. A step with nothing to do says so in one line, records `Result: nothing-to-do` with the versions it covers, and moves on. Record that one step right then. One `record` call per step. Do not record several steps in one command. Do not pass `--when`. The script stamps Done. `record` refuses more than one step.
+Run these in order. When a playbook was named, the playbook question is answered before any later step, including a read-only check. Each one is the existing skill, not a copy of it. A step with nothing to do says so in one line, records `Result: nothing-to-do` with the versions it covers, and moves on. Record that one step right then. One `record` call per step. Do not record several steps in one command. Do not pass `--when`. The script stamps Done. `record` refuses more than one step.
 
 After a step, show the progress line and get a yes before `record --yes`. The answers inside the step do not cover that line. Skip this confirm only when the step's own confirm already included this record. An extra's yes is that case.
 
@@ -44,7 +44,7 @@ Run `/crav1-plan-from-spec`. That skill writes `plan.md` and `tasks.md`. When bo
 
 ## After the plan, questions with no Blocks line
 
-Before step 5 is recorded, run `scripts/walk_progress.py unlinked --root <spec-folder>`. It lists kept-open questions that still have no `Blocks:` line. It writes nothing.
+Before step 5 is recorded, run `scripts/walk_progress.py unlinked --root <spec-folder>`. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. It lists kept-open questions that still have no `Blocks:` line. It writes nothing.
 
 An empty list: say so, record the plan step, and move on.
 

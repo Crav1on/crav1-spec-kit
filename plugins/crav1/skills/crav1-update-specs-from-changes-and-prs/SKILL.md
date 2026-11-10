@@ -25,7 +25,7 @@ Route first, load second. The word after the command is the flow. A repo name fr
 - **`manual-flow`:** read [references/manual-flow.md](references/manual-flow.md), then [references/common.md](references/common.md). Do not open `references/auto-flow.md`.
 - **`auto-flow`:** read [references/auto-flow.md](references/auto-flow.md), then [references/common.md](references/common.md). Do not open `references/manual-flow.md`.
 
-Both flows use `scripts/sweep_progress.py` in this skill. That script is the state machine. Do not keep a second copy of its gates in chat, and do not hand-edit `docs/system/sweep-progress.md`. On Windows run it with `py -3`. Elsewhere run it with `python3`. If that command is missing, try the other.
+Both flows use `scripts/sweep_progress.py` in this skill. That script is the state machine. Do not keep a second copy of its gates in chat, and do not hand-edit `docs/system/sweep-progress.md`. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says.
 
 ## What the words change
 

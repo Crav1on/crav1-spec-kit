@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Which kept-open questions block which tasks (kit 1.126.0).
+"""Which kept-open questions block which tasks (kit 1.127.0).
 
 Reads `## Open questions` in spec.md and `## Risks` in plan.md. A question with
 an Answered line is not kept open. `Blocks: T2, T4` blocks those tasks.
@@ -38,6 +38,11 @@ QUESTION_TAG = re.compile(r"\(question:\s*([^)]+)\)", re.I)
 NAMED_BLOCKS = re.compile(r"\bblocks:?\s*((?:T\d+\s*(?:,\s*)?)+)", re.I)
 ASKED_WHO = re.compile(r"\bto\s+([^.,;]+)")
 PENDING_WHO = re.compile(r"\bfor\s+([^.,;]+)")
+# The question's own "Waiting for <who>" wins over the person named on Asked or Pending.
+WAITING_FOR = re.compile(
+    r"\bwaiting for\s+(.+?)(?=\s+(?:to|on|before|until|about)\b|[,.;?!]|$)",
+    re.I,
+)
 
 
 def _section(text, heading):
@@ -65,6 +70,15 @@ def _norm(text):
 def _first_sentence(text):
     parts = re.split(r"(?<=[.!?])\s+", text.strip(), maxsplit=1)
     return parts[0].strip()
+
+
+def _who_waiting(text):
+    """Who from the question's own "Waiting for <who>" phrase, if it has one."""
+    found = WAITING_FOR.search(text or "")
+    if not found:
+        return None
+    who = found.group(1).strip()
+    return who or None
 
 
 def _who_asked(marks):
@@ -159,7 +173,8 @@ def kept_open(text):
                 mark, tasks = "tasks", [part.strip() for part in line.split(",")]
             else:
                 mark, tasks = "unparsed", []
-        who, asked = _who_asked(q["marks"])
+        mark_who, asked = _who_asked(q["marks"])
+        who = _who_waiting(q["text"]) or mark_who
         out.append({
             "text": q["text"],
             "mark": mark,

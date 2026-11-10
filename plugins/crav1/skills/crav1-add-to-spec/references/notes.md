@@ -41,7 +41,7 @@ A pull request's title and description are saved as **one note per pull request*
 
 ## Indexes are generated
 
-Do not edit `docs/notes/index.md` or `docs/notes/YYYY-MM/index.md` by hand. After writing or changing notes, run the generator from the product repo root:
+Do not edit `docs/notes/index.md` or `docs/notes/YYYY-MM/index.md` by hand. After writing or changing notes, run the generator from the product repo root. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. The lines below are the first try:
 
 - Cursor drop-in: `python3 .cursor/skills/crav1/crav1-add-to-spec/scripts/notes_index.py`
 - Plugin: this skill's `scripts/notes_index.py`

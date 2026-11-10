@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Dependency order for a slice's tasks.md (kit 1.103.0, JSON ids 1.126.0).
+"""Dependency order for a slice's tasks.md (kit 1.103.0, text split 1.127.0).
 
 Reads `- [ ] T#: ...` / `- [x] T#: ...` lines. A task's dependencies are its `(after: T1, T3)` mark; a task
 with no `(after: ...)` waits on the task just before it in the file (the first task waits on nothing).
@@ -146,11 +146,28 @@ def analyse(tasks, failed=()):
             "rows": rows}
 
 
+def _order_wait(reason):
+    """A wait on a real earlier task. A cycle, or an after: that names no task, is a blocker."""
+    text = (reason or "").lower()
+    if "cycle" in text or "names no task" in text:
+        return False
+    return "waits on t" in text
+
+
+def _split_blocked(blocked):
+    waits = [item for item in blocked if _order_wait(item.get("reason"))]
+    blockers = [item for item in blocked if not _order_wait(item.get("reason"))]
+    return waits, blockers
+
+
 def render(res):
+    waits, blockers = _split_blocked(res["blocked"])
     out = ["Ready (dependency order)"]
     out += [f"- T{r['id']}: {r['title']}" for r in res["rows"] if r["ready"]] or ["- none"]
+    out.append("Waits in order (dependency order)")
+    out += [f"- T{r['id']}: {r['reason']}" for r in waits] or ["- none"]
     out.append("Blocked (dependency order)")
-    out += [f"- T{r['id']}: {r['reason']}" for r in res["blocked"]] or ["- none"]
+    out += [f"- T{r['id']}: {r['reason']}" for r in blockers] or ["- none"]
     out.append("Order: " + " → ".join(f"T{n}" for n in res["order"]))
     out.append(f"Next: T{res['next']}" if res["next"] else "Next: none ready")
     for k, v in res["depends_on_failed"].items():
@@ -169,10 +186,12 @@ def public(res):
     def row(item):
         return {**item, "id": _tid(item["id"])}
 
+    waits, blockers = _split_blocked(res["blocked"])
     return {
         "order": [_tid(n) for n in res["order"]],
         "ready": [_tid(n) for n in res["ready"]],
-        "blocked": [row(item) for item in res["blocked"]],
+        "waits_in_order": [row(item) for item in waits],
+        "blocked": [row(item) for item in blockers],
         "next": _tid(res["next"]),
         "depends_on_failed": res["depends_on_failed"],
         "rows": [row(item) for item in res["rows"]],
