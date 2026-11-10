@@ -1455,8 +1455,8 @@ skills:
   writes: Writes the PR note's `## PR record` (a Point per point, Order, your Read line, Ready, State) and a
     `## Replies as drafted` history section, then regenerates the notes indexes; never committed. On a yes for
     that one thread, sets one thread's status on the host (Azure DevOps) or resolves or reopens it (GitHub).
-  leaves_alone: Leaves code, specs, plans, tasks and work items alone. Never posts a reply, votes, approves,
-    merges, or changes a thread without its own yes.
+  leaves_alone: 'Leaves code, specs, plans, tasks and work items alone. Never posts a reply, votes, approves,
+    merges, or changes a thread without its own yes. Leaves a `Read: sweep` line alone (1.124.0).'
   exceptions: Signed out, the one prompt is the signed-out question and the offers are listed as text for the
     next run. Headless and bot runs ask nothing and list the offers as text.
   called_by: Called by the user.
@@ -1860,6 +1860,47 @@ skills:
   first_prompt: '/crav1-model-data manual-flow
 
     <optional scope, or leave it out>'
+- name: crav1-update-specs-from-changes-and-prs
+  choice_words:
+  - question: Which flow
+    words:
+    - word: "manual-flow"
+      means: "Ask once before fetching, confirm the inventory, then show each spec change before writing it. An optional repo may follow."
+    - word: "auto-flow"
+      means: "Fetch without asking. Write notes and Synced at only. Spec changes stay proposals. An optional repo may follow."
+    note: "The repo is an optional repos.md name, not the characters [repo]. A whole number of minutes may follow. The specs repo stays out unless it is named, or manual-flow is told to read its pull request comments. Its branches are never read."
+  lane: cross-cutting
+  group: Keep the picture current
+  starter: false
+  since: 1.124.0
+  stage: stable
+  prompt_budget: 4
+  prompt_note: 'The flow question only when the word is absent, the manual start batch (fetch and, when a specs-repo row exists, its pull request comments), the inventory confirm, and the current item or small group. Auto-flow asks nothing once the word is present. A number of minutes the user left out uses 20 and is outside the budget. Each later item is a later turn.'
+  walkthrough: docs/from-update-specs-from-changes-and-prs.md
+  purpose: Sweep linked repos for changed branches and open or recently closed pull requests, and feed them into the specs.
+  in_depth:
+  - '`/crav1-update-specs-from-changes-and-prs` (1.124.0) is one skill with `manual-flow` and `auto-flow`. It runs `/crav1-add-to-spec` for each changed branch and each open or recently closed pull request, including drafts and the host conversation and review threads. It is not a choice on add-to-spec. An optional repo name narrows the run to one `docs/system/repos.md` row.'
+  - 'Default scope is every row with a URL that is not `proposed`, except the specs repo. Manual flow asks once whether to read that repo''s pull request comments this time. Auto flow leaves it out unless the repo was named. Neither flow reads the specs repo''s branches. Base branches (`main`, `master`, `develop`, `release/*`, and `Merges into`) are not items. Slack, mail, issues, and a new `/crav1-review-pr` are out.'
+  - 'Manual flow asks once before a read-only fetch, then confirms the inventory (items can be dropped), then goes one by one. Small groups of at most four are offered when there are more than eight items. A spec change is shown before it is written. Auto flow fetches without asking and writes notes and `Synced at` only. Every spec change is a proposal.'
+  - 'State is `docs/system/sweep-progress.md`, written only by `scripts/sweep_progress.py`. A stopped run resumes the same queue and does not redo a finished item. A pull request whose threads were read gets one `Read: sweep` line on its PR note. The budget is 20 minutes unless a number is given, and the script will not go past 45. A failed fetch skips that repo, lists it under Waiting, and the run continues.'
+  - 'The run does not commit, push, post, vote, resolve a thread, or run `/crav1-review-pr`, `/crav1-pr-status`, `/crav1-resolve-open-questions`, or `/crav1-finalize-commit`. Proposals print first in auto flow. Next is this command when items or proposals remain, or `/crav1-resolve-open-questions` when a conflict or open question was written onto a spec. The commit stays on Uncommitted.'
+  use_when: Many repos or pull requests should be caught up into the specs
+  table:
+    reads: '`docs/system/repos.md`, `Synced at`, sibling checkouts, and open or recently closed pull requests on the host'
+    writes: '`docs/system/sweep-progress.md`, notes and `Synced at` through add-to-spec, a `Read: sweep` line, and spec lines only after a yes'
+  reads: Reads `docs/system/repos.md`, `Synced at` lines, the sweep progress file, sibling checkouts, and pull request threads through the same `gh` or `az` reads add-to-spec already uses. It does not read Slack, mail, issues, or production data. It does not log in.
+  writes: 'Writes `docs/system/sweep-progress.md` through `scripts/sweep_progress.py`. Runs `/crav1-add-to-spec` so that skill can write the PR note, its record, and `Synced at`. Writes one `Read: sweep` line on a PR note whose threads were read. Manual flow writes a spec line only after the change is shown and the user says yes. Auto flow does not write spec lines; it records proposals in the progress file.'
+  leaves_alone: Leaves base branches, the specs repo's branches, a person's `Read` line, and every thread on the host alone. Does not run `/crav1-review-pr` or `/crav1-pr-status`. Does not commit, push, or delete.
+  exceptions: No flow word asks, and a headless run with no word stops. Auto flow cannot record a spec write. A fetch failure skips that repo. The first sweep has no closed-since list. A budget stop finishes the current item and resumes later.
+  called_by: Called by the user.
+  runs_by_itself: Runs `/crav1-add-to-spec` for each inventory item, under that skill's note and `Synced at` rules. It does not run `/crav1-review-pr`, `/crav1-pr-status`, `/crav1-resolve-open-questions`, or `/crav1-finalize-commit`.
+  you_run_next:
+  - /crav1-resolve-open-questions
+  - /crav1-update-specs-from-changes-and-prs
+  - /crav1-finalize-commit
+  first_prompt: '/crav1-update-specs-from-changes-and-prs manual-flow
+
+    <optional repo, or leave it out>'
 - name: crav1-tighten-and-plan-ready-to-build
   lane: cross-cutting
   group: Guided walks
@@ -2691,6 +2732,8 @@ routing:
           Specify, Plan, or Build.'
         crav1-model-data:
         - '`/crav1-model-data` may run from any lane. The user asks for a data model. `manual-flow` and `auto-flow` share one state machine. A scope value is optional. It does not move work into Specify, Plan, or Build. It does not edit spec requirements, generate schema, or start a watcher. It is a later skill. It is not a starter option. Asking for startup options names only the six and does not run this command.'
+        crav1-update-specs-from-changes-and-prs:
+        - '`/crav1-update-specs-from-changes-and-prs` may run from any lane. The user wants changed branches and open or recently closed pull requests, including their conversation and review threads, brought into the specs across the repos in `docs/system/repos.md`. `manual-flow` and `auto-flow` share one state machine. It runs `/crav1-add-to-spec` for each item and does not replace it. It does not run `/crav1-review-pr` or `/crav1-pr-status`. It does not commit. It does not move work into Specify, Plan, or Build. It is a later skill. It is not a starter option. Asking for startup options names only the six and does not run this command.'
         crav1-tighten-and-plan-ready-to-build:
         - '`/crav1-tighten-and-plan-ready-to-build` may run from any lane when the user asks to tighten and plan a spec until it is ready to build. A playbook path is optional. It is a guided walk, not a new lane and not a starter option. Asking for startup options names only the six and does not run this command. It runs the existing Specify and Plan skills inside the walk and does not replace them. The user asked for that walk. It does not start Build, and it does not run `/crav1-build-tasks`. The spec, plan, and tasks stay the source of truth.'
         crav1-what-do-we-know-about-this:

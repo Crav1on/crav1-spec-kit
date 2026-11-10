@@ -2,6 +2,19 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.124.0 (2026-11-10)
+
+One command to catch the specs up with changed branches and pull requests across the linked repos. A minor release because there is a new skill.
+
+- **Added:** `/crav1-update-specs-from-changes-and-prs`, with `manual-flow` and `auto-flow`. An optional repo name narrows the run to one `docs/system/repos.md` row. It runs `/crav1-add-to-spec` for each item. It is not a new choice on add-to-spec.
+- **Scope.** Every row with a URL that is not `proposed`, except the specs repo. Manual flow asks once whether to read that repo's pull request comments this time. Auto flow leaves it out unless the repo is named. Neither flow reads the specs repo's branches.
+- **Inventory.** Unmerged branches with commits past `Synced at`, open pull requests including drafts, and pull requests closed since the last sweep, with their conversation and review threads. The first sweep has no earlier closed list. Base branches, Slack, mail, issues, and a new `/crav1-review-pr` are out.
+- **Fetch.** Manual flow asks once before a read-only fetch. Auto flow fetches without asking. A repo whose fetch fails is skipped and listed under Waiting. The run continues. Nothing is pushed or deleted.
+- **Pace.** Manual flow confirms the inventory, then goes one by one. Small groups are offered when there are more than eight items. A spec change is shown before it is written. Auto flow writes notes and `Synced at` only. Spec changes stay a proposal list.
+- **State.** `docs/system/sweep-progress.md` holds the queue, so a stopped run resumes and does not redo a finished item. A pull request whose threads were read gets a `Read: sweep` line. A person's own `Read` line is left alone.
+- **Budget.** 20 minutes unless you pass another number. The run will not go past 45. When the time is used it finishes the current item, saves its place, and the next line resumes the same command.
+- **Ending.** Proposals first when there are any, then the shared Next, Waiting, and Uncommitted lines. The command does not commit, review, or resolve a question.
+
 ## 1.123.0 (2026-11-10)
 
 The tighten-and-plan walk can finish, and a commit during that walk stays on the walk. A minor release because resume, the ready check, tighten-spec's batch, and the commit's next line change.

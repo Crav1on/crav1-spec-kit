@@ -101,6 +101,7 @@ The same walk, `/crav1-tighten-and-plan-ready-to-build`, runs `/crav1-plan-from-
 | Skill | `/crav1-retire-spec` |
 | Skill | `/crav1-what-do-we-know-about-this` |
 | Skill | `/crav1-model-data` |
+| Skill | `/crav1-update-specs-from-changes-and-prs` |
 | Skill | `/crav1-tighten-and-plan-ready-to-build` |
 | Skill | `/crav1-refresh-system-notes` |
 | Skill | `/crav1-map-pipeline-environments` |
@@ -142,6 +143,8 @@ The same walk, `/crav1-tighten-and-plan-ready-to-build`, runs `/crav1-plan-from-
 `/crav1-what-do-we-know-about-this` may run from any lane. The user asks about one feature, slice, resource, or not-yet-feature. The answer comes from the specs first. With no report word, the answer is read-only and writes nothing in the project. A `report-*` word other than `report-data-model-full` writes one Markdown report outside the project (Downloads, else a temp folder). The first playbook write stays outside. On apply, a filled playbook is copied to `docs/playbooks/`. A draft with no filled answer is not copied. `report-data-model-full` writes one new immutable `report.md` and `report.pdf` under `docs/data-model/<model>/reviews/` and does not edit the saved model. It shows a stale research note as stale. It does not clear the mark. One pass matches an exact name first, then key words, with spec titles and Match quotes weighted highest. One winning slice is the answer, and the path is named. Two or more close hits are listed and it asks which. It does not guess. No slice: it says so and presents a candidate slice. It names `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, or `/crav1-bundle-to-specs` and does not run them. Pasted minutes or a long dump names `/crav1-add-to-spec` and stops. After the repo part it runs read-only Azure and Azure DevOps checks. Production is shape and connections only, after the same yes or no as `/crav1-read-environment`. It never reads data. A failed live read offers Retry or Skip. It may name one skill. It does not run another skill. It does not move work into Specify, Plan, or Build. It does not start those lanes. It is a later skill. It is not one of the six starter options. When the user asks for startup options, that ask names the six and does not run this skill. The six starter options stay unchanged. It is not `/crav1-explain-existing-system`. Spark, specify, plan, and verify do not run it.
 
 `/crav1-model-data` may run from any lane. The user asks for a data model. `manual-flow` and `auto-flow` share one state machine. A scope value is optional. It does not move work into Specify, Plan, or Build. It does not edit spec requirements, generate schema, or start a watcher. It is a later skill. It is not a starter option. Asking for startup options names only the six and does not run this command.
+
+`/crav1-update-specs-from-changes-and-prs` may run from any lane. The user wants changed branches and open or recently closed pull requests, including their conversation and review threads, brought into the specs across the repos in `docs/system/repos.md`. `manual-flow` and `auto-flow` share one state machine. It runs `/crav1-add-to-spec` for each item and does not replace it. It does not run `/crav1-review-pr` or `/crav1-pr-status`. It does not commit. It does not move work into Specify, Plan, or Build. It is a later skill. It is not a starter option. Asking for startup options names only the six and does not run this command.
 
 `/crav1-tighten-and-plan-ready-to-build` may run from any lane when the user asks to tighten and plan a spec until it is ready to build. A playbook path is optional. It is a guided walk, not a new lane and not a starter option. Asking for startup options names only the six and does not run this command. It runs the existing Specify and Plan skills inside the walk and does not replace them. The user asked for that walk. It does not start Build, and it does not run `/crav1-build-tasks`. The spec, plan, and tasks stay the source of truth.
 
@@ -224,6 +227,7 @@ The merged skills take exact choice words instead of `--flags`. A word in the in
 | `/crav1-explain-this-code` | How deep | `what it does` · `what and why` · `teach the language` |
 | `/crav1-retire-spec` | What to do | `retire` · `merge` · `park` · `convert to note` |
 | `/crav1-model-data` | Which flow | `manual-flow` · `auto-flow` |
+| `/crav1-update-specs-from-changes-and-prs` | Which flow | `manual-flow` · `auto-flow` |
 | `/crav1-glossary` | Which mode | `as-file` · `research` · `<term>` |
 | `/crav1-ado-sync` | Which sync | `suggest features` · `push features` · `push tasks` · `pull tasks` · `pull spec changes` |
 
@@ -287,6 +291,7 @@ cross_cutting:
     - crav1-retire-spec
     - crav1-what-do-we-know-about-this
     - crav1-model-data
+    - crav1-update-specs-from-changes-and-prs
     - crav1-tighten-and-plan-ready-to-build
     - crav1-refresh-system-notes
     - crav1-map-pipeline-environments
