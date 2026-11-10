@@ -2,6 +2,8 @@
 
 Run these in order. Each one is the existing skill, not a copy of it. A step with nothing to do says so in one line, records `Result: nothing-to-do` with the versions it covers, and moves on.
 
+After a step, show the progress line and get a yes before `record --yes`. The answers inside the step do not cover that line. Skip this confirm only when the step's own confirm already included this record. An extra's yes is that case.
+
 The new-slice route in `docs/reference/workflow.yaml` marks `/crav1-review-architecture` optional, and it also has optional `/crav1-create-feature-branch` and `/crav1-ado-sync`. This walk does not change that route. Inside the walk, architecture review always runs. The walk does not run create-feature-branch or ado-sync. They are not locked steps.
 
 ## 2. Architecture review
@@ -18,19 +20,15 @@ An issue whose only work is an `Answered:` line, or that only repeats a question
 
 Run `/crav1-resolve-open-questions`. When `## Open questions` has nothing left to settle, say so and move on.
 
-When a kept-open question needs someone else to answer, offer `/crav1-show-or-ask-open-questions` in the optional batch below. Do not run it unless the user says yes.
+Then the extras batch below, once. Do not go on to the plan first.
 
-## 5. Plan
+## After step 4, one batch of extras
 
-Run `/crav1-plan-from-spec`. That skill writes `plan.md` and `tasks.md`. When both already match the spec and it has nothing to add, say so and move on. Do not write the plan from this walk.
+Once, after `/crav1-resolve-open-questions`, when the kept-open questions are known. Not at an earlier step, and not again later. Offer the ones that apply, in one batch, at most four options, a fifth under Other. List a recommended one first and end its label with ` (Recommended)`. When any extra applies, do not go on to the plan without that offer. When none apply, say so in one line and move on. Do not run any of them unless the user picks it.
 
-## 6. Review the plan, then tighten it
+Offer `/crav1-show-or-ask-open-questions` when any kept-open question is for someone else.
 
-Run `/crav1-review-plan`, then `/crav1-tighten-plan`, in that order. Review writes the `Reviewed:` line and does not edit the plan otherwise. Tighten walks plan issues and does not edit `spec.md`. When either has nothing to do, say so. Record one progress step, `review-and-tighten-plan`, only after both have finished or both had nothing to do.
-
-## Offered only when the spec needs them
-
-Not fixed steps. Security and tests stay optional. Offer the ones that apply in one batch, at most four options, a fifth under Other. List a recommended one first and end its label with ` (Recommended)`. Do not run any of them unless the user picks it. When one of them finishes inside this walk, record it before `resume`. The record is `- Extra: review-security`, `- Extra: research`, `- Extra: model-data`, `- Extra: show-or-ask-open-questions`, or `- Extra: suggest-tests-for-code`. Pass `--yes` because the user already picked the extra. Do not ask them to run `cover`. That record leaves earlier steps done.
+Not fixed steps. Security and tests stay optional. When one of them finishes inside this walk, record it before `resume`. The record is `- Extra: review-security`, `- Extra: research`, `- Extra: model-data`, `- Extra: show-or-ask-open-questions`, or `- Extra: suggest-tests-for-code`. Pass `--yes` because the user already picked the extra. Do not ask them to run `cover`. That record leaves earlier steps done. Auto-record stays this way.
 
 `cover --yes` is optional and is not how this walk records an extra it just ran. Use it only for a write made outside this walk, when you want the current spec, plan, and tasks counted as part of the walk without a named extra.
 
@@ -39,3 +37,19 @@ Not fixed steps. Security and tests stay optional. Offer the ones that apply in 
 - `/crav1-model-data`, when the spec is about stored data and no `Data model:` line names a saved model. It does not edit requirements.
 - `/crav1-show-or-ask-open-questions`, when a question is for someone else.
 - `/crav1-suggest-tests-for-code`, when the spec names existing code and the acceptance lines do not already name the checks. A kept suggestion goes through `/crav1-add-to-spec`, which that skill runs on yes. This walk does not write the tests.
+
+## 5. Plan
+
+Run `/crav1-plan-from-spec`. That skill writes `plan.md` and `tasks.md`. When both already match the spec and it has nothing to add, say so and move on. Do not write the plan from this walk.
+
+## After the plan, questions with no Blocks line
+
+Before step 5 is recorded, run `scripts/walk_progress.py unlinked --root <spec-folder>`. It lists kept-open questions that still have no `Blocks:` line. It writes nothing.
+
+An empty list: say so, record the plan step, and move on.
+
+A list: offer to set them before the plan review. Options: `one batch` (Recommended), `one by one`. For each question, the choices are the unticked tasks it blocks (`Blocks: T2, T4`), **None** (`Blocks: none`, and a short reason in parentheses when they give one, such as `later phase`), or **The whole slice** (no line). One yes writes only those lines. None also replaces "do not implement until resolved" on that question's Risk line with `kept open; does not block the current tasks.` The whole slice leaves no line and still blocks every current task. Do not start the plan review until this offer is answered. Then record the plan step, so the spec version includes these lines.
+
+## 6. Review the plan, then tighten it
+
+Run `/crav1-review-plan`, then `/crav1-tighten-plan`, in that order. Review writes the `Reviewed:` line and does not edit the plan otherwise. Tighten walks plan issues and does not edit `spec.md`. When either has nothing to do, say so. Record one progress step, `review-and-tighten-plan`, only after both have finished or both had nothing to do.

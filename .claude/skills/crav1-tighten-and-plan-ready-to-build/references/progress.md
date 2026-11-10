@@ -2,7 +2,7 @@
 
 Read this when `walk-progress.md` is already beside the spec, and again when you record a step. The file is `docs/specs/<slug>/walk-progress.md`. It records completed steps, when, and the version of each file that step covered. It is not the source of truth.
 
-The script `scripts/walk_progress.py` in this skill reads and writes it. Do not hand-edit it. `record` writes only with `--yes`, after you have shown the line and the user has confirmed.
+The script `scripts/walk_progress.py` in this skill reads and writes it. Do not hand-edit it. `record` writes only with `--yes`. Show the progress line and get a yes before `record --yes`. The answers inside tighten, open questions, or the plan do not cover that line. Skip this confirm only when the step's own confirm already included this record. An extra's yes is that case, and it stays one confirm.
 
 A version is the first 12 hex characters of the SHA-256 of the file's bytes. A missing file is `missing`. The playbook version is the same kind of hash, of the committed file when one exists. A spec change does not reopen the playbook step. The playbook is intake only. After apply, the `Playbook:` line is `docs/playbooks/<topic>.md@<12 hex>`, not the outside path, so resume works on any machine. The script stores that docs path when the file has a `Docs path: docs/playbooks/<topic>.md` line or the same subject as a file under `docs/playbooks/`. Specs apply touched use `Playbook: docs/playbooks/<topic>.md`.
 

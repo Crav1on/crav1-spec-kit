@@ -2,7 +2,7 @@
 
 Read only on `detailed`. Each `Q#` shows these lines, in order, before its options. Take each from the spec. Skip a line with nothing, except **Asked**. Do not invent a fact, a person, or a date.
 
-- **Blocks:** the requirement, acceptance line, or section it holds back, plus the `Blocks:` tasks. No `Blocks:` line means the whole slice.
+- **Blocks:** the requirement, acceptance line, or section it holds back, plus the `Blocks:` tasks. No `Blocks:` line means the whole slice. `Blocks: none` means it blocks no current task.
 - **Why it matters:** what v0, tests, or an ADR cannot finish without it.
 - **Known so far:** related `## Constraints`, the assumption it came from, a `## Research findings` point waiting on it (say when stale), and any partial answer.
 - **Who can answer:** the person or group the spec or a research note names, or nobody named.

@@ -33,7 +33,7 @@ Read `spec.md`, plus `diagrams.md`, `adr/`, `export/` if present. Treat `spec.md
 
 Say which gate failed. Next command: `/crav1-tighten-spec` and/or `/crav1-resolve-open-questions`. Do not draft a fake plan.
 
-**Ready with leftovers (1.87.0):** each kept-open question that does not block a first demo becomes its own entry under **Risks** in `plan.md`: the question’s words, then “do not implement until resolved”. Do this without asking. Do not ask whether to park it, keep it, or answer it, and do not answer it silently. Answering stays with `/crav1-resolve-open-questions`.
+**Ready with leftovers (1.87.0, 1.125.0):** each kept-open question that does not block a first demo becomes its own entry under **Risks** in `plan.md`. Do not ask whether to park it, keep it, or answer it, and do not answer it silently. Answering stays with `/crav1-resolve-open-questions`. The `Blocks:` line and the risk wording are in `references/write.md` ("Blocks lines"). When you cannot tell whether a leftover is current work or later, that section's one short batch is the ask.
 
 Stale research does not fail this gate. A `Stale since` line under `## Research findings`, or a stale block on a note that section links to, is listed under Risks. Follow the readers section of skill `crav1-add-to-spec`, `references/research-stale.md`. Do not block the plan. Do not clear the mark. Do not treat the stale research as current.
 
@@ -65,7 +65,7 @@ Use the template in this skill’s `assets/plan.md`. Fill:
 - **Files likely touched** — real paths if a repo exists; otherwise proposed paths consistent with the spec, marked `(proposed)`
 - **Linter** — whether this repo has a linter or checker for the code those files will hold. See **Linter, before Build** in `references/checks.md`. Specify does not name the linter
 - **Requirements trace** — table: acceptance / REQ id → task ids
-- **Risks** — one entry per kept-open question, written without asking (when a kept-open question blocks only some tasks, also write `Blocks: T#` under it on the spec, as **Blocks lines** below says), and each stale research finding. One line per mark: the stale line, and the note path when there is one. Stale research does not block the plan. Do not clear the mark.
+- **Risks** — one entry per kept-open question, as **Blocks lines** in `references/write.md` says, and each stale research finding. One line per mark: the stale line, and the note path when there is one. Stale research does not block the plan. Do not clear the mark.
 - **Out of scope** — spec non-goals; do not plan them
 - **Left as committed** — only when the user left a piece; see `references/write.md` ("Left as committed").
 
@@ -77,7 +77,7 @@ A requirement that is a host setting with no file in the repo (a branch policy o
 
 ### Blocks lines
 
-The one exception to leaving `spec.md` alone: a `- Blocks: T#` line under a kept-open question that blocks only some new tasks. Read `references/write.md` ("Blocks lines") when any kept-open question blocks only some tasks. List each `Blocks:` line in the recap.
+The one exception to leaving `spec.md` alone: a `Blocks:` line under a kept-open question, `Blocks: T#` or `Blocks: none`. Read `references/write.md` ("Blocks lines") when any question stays open. List each `Blocks:` line in the recap.
 
 ### tasks.md
 
@@ -92,7 +92,7 @@ Output only:
 - Each built piece: already there, finish the gap, add a verify test, or left as committed
 - The branch read, when **Built pieces** ran
 - Any verify note with no kind, and any kept security check with no task (must be none, or you failed)
-- Kept-open questions parked as risks, one line each (none were asked about)
+- Kept-open questions parked as risks, one line each. The current-or-later batch is the only ask, and only when a leftover is unclear.
 - Each stale research finding listed under Risks, or that none was marked stale
 - These notes name the checks. `/crav1-verify-build-against-spec` is the gate that says they passed. Do not run it here.
 - The linter line: the tool and command, or that this repo has none for the code these tasks will touch.

@@ -2,7 +2,7 @@
 
 Read only when **Research one term** found no meaning in `docs/` and none on the web (1.105.0).
 
-The glossary is definitions only. Nothing here writes to a spec: no open question, no `Pending:` line, no `Asked:` line, no task. Do not run or hand off to `/crav1-show-or-ask-open-questions`, and do not use `crav1-add-to-spec` `references/open-questions.md`. Open questions without `Blocks:` stop `/crav1-tasks-ready-to-build`, and a word's meaning must never stop a build.
+The glossary is definitions only. Nothing here writes to a spec: no open question, no `Pending:` line, no `Asked:` line, no task. Do not run or hand off to `/crav1-show-or-ask-open-questions`, and do not use `crav1-add-to-spec` `references/open-questions.md`. Open questions with no `Blocks:` line block tasks in `/crav1-tasks-ready-to-build`. `Blocks: none` blocks no task. A word's meaning must never stop a build.
 
 ## Offer what you may know
 

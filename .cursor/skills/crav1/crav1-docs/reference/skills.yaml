@@ -578,18 +578,14 @@ skills:
   - Conflict lines (1.111.0) are listed after the questions; settling one replaces or keeps the decided line, removes the Conflict line, and adds a trace to the note.
   - '`detailed` shows an extended entry per question: what it blocks, why it matters, what is known, who can answer, asked status and date, sources, and a suggested answer. No extra questions.'
   - '`apply <file>` (1.120.0) copies a filled playbook to `docs/playbooks/<topic>.md` after the same yes. The name comes from the subject, lowercase kebab-case, and is shown once. A `Docs path:` line, or the one committed file with the same subject, is the same playbook later. Reapply overwrites that file. An edit in the repo since `Applied as:` is shown and confirmed first. Each spec the apply changed gets `Playbook: docs/playbooks/<topic>.md`. A draft with no filled answer is not copied. This is not a git commit.'
+  - '1.125.0: when `tasks.md` exists, None writes `Blocks: none`. The whole slice still writes no line. No line still blocks the whole slice.'
   use_when: Open questions remain
   table:
     reads: Open questions, assumptions and Conflict lines in `spec.md`, and the playbook file on apply
     writes: The picked question in the spec (with a linked answer's quote and source), a cleared research
       mark when no point stays open, and on apply the playbook copy plus a Playbook line on each spec it changed
   reads: Reads Open questions, unresolved assumptions and **Conflict:** lines in `spec.md`.
-  writes: Writes only the picked question into the spec, a constraint, a non-goal, or an ADR. When that
-    answer settles a stale research point waiting on the question, re-checks the point and clears the
-    mark when no point is open. It does not ask the user. A question with an `Answered:` line shows that
-    answer and offers it first. An answer keeps that quote and source with the decision. `apply <file>`
-    also copies a filled playbook to `docs/playbooks/<topic>.md` through `scripts/playbook_store.py` and
-    writes a Playbook line for that path on each spec it changed.
+  writes: 'Writes only the picked question into the spec, a constraint, a non-goal, or an ADR. When that answer settles a stale research point waiting on the question, re-checks the point and clears the mark when no point is open. It does not ask the user. A question with an `Answered:` line shows that answer and offers it first. An answer keeps that quote and source with the decision. When `tasks.md` exists, None on a kept-open question writes `Blocks: none`. The whole slice writes no line. `apply <file>` also copies a filled playbook to `docs/playbooks/<topic>.md` through `scripts/playbook_store.py` and writes a Playbook line for that path on each spec it changed.'
   leaves_alone: Leaves application code and kept-open questions alone. Does not change `Answer:` or
     `Change:` lines in the playbook file. Does not copy a draft. Does not git-commit.
   exceptions: null
@@ -868,7 +864,8 @@ skills:
   starter: false
   since: 1.0.0
   stage: stable
-  prompt_budget: 1
+  prompt_budget: 3
+  prompt_note: 'The gate may ask one architecture batch. Leftovers that might be current work or later work are one short batch, current or later, not one question at a time. The closing yes is the third. Skip a batch that does not apply. A value the user left out is outside the budget.'
   walkthrough: docs/from-spec-to-plan.md
   purpose: Turn an accepted spec into a file-level plan.md and independently testable tasks.md.
   in_depth:
@@ -879,19 +876,17 @@ skills:
     matches v0 is not a choice.
   - '1.64.0: Built pieces reads every work branch of the spec without checkout (and `../<repo>` for another repo), labels pieces `only on <branch>, not merged`, and ends a task with `(branch: …)` when its piece lives on one branch.'
   - '1.68.0: a task may name a sub-branch of the spec branch, `(branch: feat/orders-capacity-t3)`.'
-  - '1.87.0: each kept-open question that does not block the demo becomes its own entry under `## Risks`, "do not implement until resolved", without asking. It picks any `Blocks: T#` itself.'
+  - '1.87.0: each kept-open question that does not block the demo becomes its own entry under `## Risks`, without asking whether to park or answer it.'
+  - '1.125.0: once `tasks.md` exists, a leftover that blocks some current tasks gets `Blocks: T#` and the risk line says do not implement until resolved. A leftover that blocks no current task gets `Blocks: none`, and that risk line does not say do not implement until resolved. When current or later is unclear, one short batch asks. No `Blocks:` line still means the whole slice.'
   use_when: Spec is accepted
   table:
     reads: Spec, diagrams, ADRs; the named repo and branch when the slice is partial
-    writes: '`plan.md`, `tasks.md`, and matching OpenSpec export files when those already exist'
+    writes: '`plan.md`, `tasks.md`, `Blocks:` or `Blocks: none` on kept-open questions, and matching OpenSpec export files when those already exist'
   reads: Reads the accepted spec, diagrams, ADRs, exports, kept security findings already written, and,
     when the spec is partial or `## In the code` names paths, that same committed repo and branch before
     any task is written.
-  writes: Writes `plan.md` and `tasks.md`, and matching OpenSpec export files when those already exist.
-    A built piece that already matches v0 is marked already there and gets no rebuild task. A piece the
-    user leaves gets one line in the plan and no task. Lists each kept-open question under Risks without
-    asking, and stale research findings under Risks. That does not block the plan.
-  leaves_alone: Leaves `spec.md`, application code, and any linter install alone.
+  writes: 'Writes `plan.md` and `tasks.md`, and matching OpenSpec export files when those already exist. A built piece that already matches v0 is marked already there and gets no rebuild task. A piece the user leaves gets one line in the plan and no task. Lists each kept-open question under Risks without asking whether to park it, and stale research findings under Risks. That does not block the plan. Writes `Blocks: T#` or `Blocks: none` under a kept-open question. A `Blocks: none` risk does not say do not implement until resolved.'
+  leaves_alone: Leaves `spec.md` alone except a `Blocks:` line under a kept-open question. Leaves application code and any linter install alone.
   exceptions: when `## Linter` says this repo has no linter for the code the tasks will touch, it stops
     before Build until the user chooses. A line under `## Dismissed test suggestions` is not a task. A
     kept test suggestion that is already an acceptance line maps to a task. A gap or a disagreement is
@@ -1572,12 +1567,13 @@ skills:
   walkthrough: docs/from-tasks-ready-to-build.md
   purpose: 'List the tasks ready to build, for one spec or all, and why the others are blocked. Read-only.'
   in_depth:
-  - '**`/crav1-tasks-ready-to-build`** reads `spec.md` open questions, `plan.md` (the `Reviewed:` line and `## Risks`), `tasks.md`, and `verify.md` for one slice or every slice. A ticked task is Done when `verify.md` lists it as verified, otherwise Needs verify. Then a task is blocked by a missing `plan.md`, by a kept-open question whose `Blocks:` line names it, by a kept-open question or plan Risk with no `Blocks:` line (the whole slice, inferred), or by an unticked task in its `(after: T#)` (recorded) or, with no `(after: …)`, the task just before it (inferred). Lists and Next follow dependency order (1.103.0): the `(after: …)` graph in waves, lowest number first in a wave; Next is the ready task that unblocks the most; a cycle blocks its tasks. It may run `scripts/task_order.py` next to the skill. Otherwise it is Ready, with a warning when the plan review is unknown (inferred) or still has open `P#`s.'
+  - '**`/crav1-tasks-ready-to-build`** reads `spec.md` open questions, `plan.md` (the `Reviewed:` line and `## Risks`), `tasks.md`, and `verify.md` for one slice or every slice. A ticked task is Done when `verify.md` lists it as verified, otherwise Needs verify. Then a task is blocked by a missing `plan.md`, by a kept-open question whose `Blocks:` line names it, by a kept-open question with no `Blocks:` line (the whole slice, inferred), by a plan Risk that says do not implement until resolved only when that question has no `Blocks:` line, or by an unticked task in its `(after: T#)` (recorded) or, with no `(after: …)`, the task just before it (inferred). `Blocks: none` blocks no task. Any `Blocks:` line wins over that Risk wording. Lists and Next follow dependency order (1.103.0): the `(after: …)` graph in waves, lowest number first in a wave; Next is the ready task that unblocks the most; a cycle blocks its tasks. It may run `scripts/task_order.py` and `scripts/question_blocks.py` next to the skill. Otherwise it is Ready, with a warning when the plan review is unknown (inferred) or still has open `P#`s.'
   - 'Shows summary counts per slice, then Ready, Blocked (one reason each, recorded or inferred), Needs verify, a Done count, one `Next:` line (the ready task that unblocks the most others, with a short reason; the unblock step when nothing is ready; verify when only Needs verify is left), and a `Source:` line. Local only: it never reads Azure Boards and names `/crav1-ado-sync` for task states there. It writes nothing and runs no other skill. It can run any time. It is cross-cutting. It is not a starter option.'
   - '1.64.0: shows a task''s `(branch: …)` and one Branches line from local git only.'
   - '1.68.0: the `Sub-branches:` and `left behind:` lines and `merged, reverted on <base> (<sha>)`, report only.'
   - '1.69.0: the `Promotion:` line under the Branches line, with the optional `pipeline runs` check.'
   - '1.88.0: command-only (`disable-model-invocation: true`). It runs only when you type `/crav1-tasks-ready-to-build`; the agent does not start it from a plain question, and its description no longer loads in every chat.'
+  - '1.125.0: `Blocks: none` blocks no task. A `Blocks:` line wins over a Risk that says do not implement until resolved. No line still blocks the whole slice. Older specs with no line behave as before.'
   choice_words:
   - question: Also check the latest pipeline runs?
     words:
@@ -1907,21 +1903,22 @@ skills:
   starter: false
   since: 1.119.0
   stage: stable
-  prompt_budget: 4
-  prompt_note: 'The walk''s own prompts are the playbook skip or reapply question when a playbook is given, one batch of optional offers when the spec needs them, one jump-back question when the ready check is not clear (jump back, or clear a reopened step with nothing new), and the yes before the progress file is written when that yes is not already the step''s confirm. Questions inside a step belong to that step''s skill and its own budget. A value the user left out is outside the budget. A headless run stops before any of these.'
+  prompt_budget: 5
+  prompt_note: 'The walk''s own prompts are the playbook skip or reapply question, asked even when that file is already applied, one batch of optional extras once after open questions when any extra applies, one batch for kept-open questions that still have no Blocks line after the plan, one jump-back question when the ready check is not clear (jump back, or clear a reopened step with nothing new), and the yes before the progress file is written. That yes shows the progress line, unless the step''s own confirm already included this record. An extra''s yes is that case. Questions inside a step belong to that step''s skill and its own budget. A value the user left out is outside the budget. A headless run stops before any of these.'
   walkthrough: docs/from-tighten-and-plan.md
   purpose: Walk a draft spec through architecture, tighten, questions, and the plan until the ready check is clear.
   in_depth:
   - '`/crav1-tighten-and-plan-ready-to-build` (1.119.0) is one guided walk with two starts. A playbook path is optional. Without one, step 1 is skipped. Both starts then use the same steps and the same ready check. The walk runs the existing skills. It does not replace them. There is no automatic mode.'
   - 'Locked order: playbook when given; `/crav1-review-architecture` always; `/crav1-tighten-spec` one issue at a time; `/crav1-resolve-open-questions`; `/crav1-plan-from-spec`, which writes `plan.md` and `tasks.md`; `/crav1-review-plan` then `/crav1-tighten-plan`; `/crav1-tasks-ready-to-build`. A step with nothing to do says so and moves on. Research, `/crav1-review-security`, `/crav1-model-data`, `/crav1-show-or-ask-open-questions`, and `/crav1-suggest-tests-for-code` are offered only when the spec needs them.'
   - 'The progress file is `docs/specs/<slug>/walk-progress.md`. It records the step, when, and the version of each file that step covered. Since 1.123.0 the script stamps Done. A later step inside the walk leaves earlier steps done. An optional extra the walk itself runs is recorded with `- Extra:` when it finishes, and that write does not reopen earlier steps. `cover` is optional and only counts a write made outside the walk. A hand edit or `/crav1-add-to-spec` between sessions reopens only the steps that change affects. A reopened step blocks the ready check until it is rerun or cleared with nothing new. Spec, plan, and tasks stay the source of truth. The playbook is intake only. After apply, the playbook line is the `docs/playbooks/<topic>.md` path, not the outside path, so resume works on any machine. The walk accepts a `docs/playbooks/` path as its playbook argument. A Blocked or Needs verify row is named back to its step. Needs verify is outside the walk. The walk never reports ready with a blocker, a reopened step, or an open assumption, and it never starts build. Stopping partway is one paused-at line, then Next, Waiting only if blocked, and Uncommitted.'
+  - '1.125.0: the progress confirm shows the line and gets a yes, unless the step''s own confirm already included that record. An extra''s yes stays that confirm. An already-applied playbook still asks skip (Recommended) or reapply. Optional extras are offered once, after open questions, when any apply, including show-or-ask when a question is for someone else. Before the plan step is recorded, kept-open questions with no `Blocks:` line are offered, one by one or as one batch.'
   use_when: A spec should be tightened and planned until it is ready to build
   table:
     reads: The spec folder, an optional playbook (outside the project or under `docs/playbooks/`), and the progress file when one exists
     writes: '`docs/specs/<slug>/walk-progress.md` after a yes, with the `docs/playbooks/` path when a playbook was applied. The playbook copy is written by apply'
   reads: Reads the spec folder, the optional playbook, and `walk-progress.md` when resuming. The ready check reads `spec.md`, `plan.md`, `tasks.md`, and `verify.md` through `/crav1-tasks-ready-to-build`. It does not read production data.
-  writes: 'Writes `docs/specs/<slug>/walk-progress.md` through `scripts/walk_progress.py`, and only after a yes. The playbook step records `docs/playbooks/<topic>.md`, not the outside path. Spec, plan, and task edits happen inside the skill the walk runs, after that skill''s own yes. `/crav1-resolve-open-questions` with `apply <file>` writes playbook answers and the `docs/playbooks/` copy, including Kept items through the rules of `/crav1-add-to-spec`, and this walk does not call `/crav1-add-to-spec` a second time for those items.'
-  leaves_alone: Leaves `spec.md`, `plan.md`, and `tasks.md` to the skills that own them. Does not change `Answer:` or `Change:` lines in the playbook. Does not start `/crav1-build-tasks`, `/crav1-build-features`, or `/crav1-verify-build-against-spec`. Does not git-commit.
+  writes: 'Writes `docs/specs/<slug>/walk-progress.md` through `scripts/walk_progress.py`, and only after a yes that was shown the progress line, unless that step''s confirm already included the record. The playbook step records `docs/playbooks/<topic>.md`, not the outside path. Spec, plan, and task edits happen inside the skill the walk runs, after that skill''s own yes, except a `Blocks:` line (and the matching Risk sentence when it is `Blocks: none`) for a kept-open question that still has no line after the plan. `/crav1-resolve-open-questions` with `apply <file>` writes playbook answers and the `docs/playbooks/` copy, including Kept items through the rules of `/crav1-add-to-spec`, and this walk does not call `/crav1-add-to-spec` a second time for those items.'
+  leaves_alone: Leaves `spec.md`, `plan.md`, and `tasks.md` to the skills that own them, except that one `Blocks:` pass. Does not change `Answer:` or `Change:` lines in the playbook. Does not start `/crav1-build-tasks`, `/crav1-build-features`, or `/crav1-verify-build-against-spec`. Does not git-commit.
   exceptions: A headless run stops. No playbook skips step 1. Architecture review always runs inside the walk even though the new-slice route marks it optional. Needs verify is named and not started. An open plan-review warning is not ready. The progress script does not decide that a playbook was already applied unless this walk recorded that apply.
   called_by: Called by the user.
   runs_by_itself: Runs the locked skills inside the walk, each under its own rules, and `/crav1-resolve-open-questions` with `apply <file>` on yes when a playbook is applied. It does not run Build.

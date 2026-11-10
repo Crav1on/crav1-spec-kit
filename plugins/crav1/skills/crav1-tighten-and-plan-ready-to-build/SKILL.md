@@ -42,11 +42,11 @@ The order matches the new-slice route from architecture review through the ready
 6. `/crav1-review-plan`, then `/crav1-tighten-plan`.
 7. `/crav1-tasks-ready-to-build`
 
-A step with nothing to do says so, records that, and moves on. Optional offers are not steps. They are named in [references/steps.md](references/steps.md) only when the spec needs them.
+A step with nothing to do says so, records that, and moves on. Optional offers are not steps. They are offered once, after open questions, when any apply. They are named in [references/steps.md](references/steps.md). After the plan, questions that still have no `Blocks:` line are offered there too, before that step is recorded.
 
 ## Stop
 
-The spec, the plan, and the tasks stay the source of truth. `walk-progress.md` only records position. Do not edit `spec.md`, `plan.md`, or `tasks.md` from this skill. Those writes happen inside the skill that owns them, after that skill's own yes.
+The spec, the plan, and the tasks stay the source of truth. `walk-progress.md` only records position. Do not edit `spec.md`, `plan.md`, or `tasks.md` from this skill, except a `Blocks:` line the pass after plan-from-spec writes after a yes, and the matching Risk sentence when that line is `Blocks: none`. Every other spec, plan, and task write happens inside the skill that owns it, after that skill's own yes.
 
 Do not report ready while a blocker, a reopened step, or an open assumption remains. Do not start Build. Do not create a git commit. Apply writes the playbook copy under `docs/playbooks/`; that write is not a git commit.
 

@@ -16,6 +16,8 @@ Conflict lines (1.111.0) are listed after the questions; settling one replaces o
 
 `apply <file>` (1.120.0) copies a filled playbook to `docs/playbooks/<topic>.md` after the same yes. The name comes from the subject, lowercase kebab-case, and is shown once. A `Docs path:` line, or the one committed file with the same subject, is the same playbook later. Reapply overwrites that file. An edit in the repo since `Applied as:` is shown and confirmed first. Each spec the apply changed gets `Playbook: docs/playbooks/<topic>.md`. A draft with no filled answer is not copied. This is not a git commit.
 
+1.125.0: when `tasks.md` exists, None writes `Blocks: none`. The whole slice still writes no line. No line still blocks the whole slice.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
@@ -45,7 +47,7 @@ Reads Open questions, unresolved assumptions and **Conflict:** lines in `spec.md
 
 In short: The picked question in the spec (with a linked answer's quote and source), a cleared research mark when no point stays open, and on apply the playbook copy plus a Playbook line on each spec it changed.
 
-Writes only the picked question into the spec, a constraint, a non-goal, or an ADR. When that answer settles a stale research point waiting on the question, re-checks the point and clears the mark when no point is open. It does not ask the user. A question with an `Answered:` line shows that answer and offers it first. An answer keeps that quote and source with the decision. `apply <file>` also copies a filled playbook to `docs/playbooks/<topic>.md` through `scripts/playbook_store.py` and writes a Playbook line for that path on each spec it changed.
+Writes only the picked question into the spec, a constraint, a non-goal, or an ADR. When that answer settles a stale research point waiting on the question, re-checks the point and clears the mark when no point is open. It does not ask the user. A question with an `Answered:` line shows that answer and offers it first. An answer keeps that quote and source with the decision. When `tasks.md` exists, None on a kept-open question writes `Blocks: none`. The whole slice writes no line. `apply <file>` also copies a filled playbook to `docs/playbooks/<topic>.md` through `scripts/playbook_store.py` and writes a Playbook line for that path on each spec it changed.
 
 ## Does not
 

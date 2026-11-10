@@ -8,9 +8,9 @@ Two routes, one walk. With a playbook, step 1 is that file. Without a playbook, 
 
 Run each locked skill by following that skill's own `SKILL.md`. Do not copy its rules into this walk. Do not replace it.
 
-This walk's own prompts are the playbook choice, one batch of optional offers when any apply, one jump-back question when the check is not clear, and the yes before `walk-progress.md` is written when that yes is not already the step's confirm. Questions inside a step belong to that step's skill.
+This walk's own prompts are the playbook choice, asked even when that file is already applied, one batch of optional extras once after open questions when any extra applies, one batch for kept-open questions that still have no `Blocks:` line after the plan, one jump-back question when the check is not clear, and the yes before `walk-progress.md` is written. That yes shows the progress line, unless the step's own confirm already included this record. An extra's yes is that case. Questions inside a step belong to that step's skill.
 
-The progress script is `scripts/walk_progress.py` in this skill. Use it for versions, resume, playbook status, and the ready-check map. Do not keep a second copy of those rules in chat. Pass `--yes` only after the user has confirmed that record.
+The progress script is `scripts/walk_progress.py` in this skill. Use it for versions, resume, playbook status, and the ready-check map. Do not keep a second copy of those rules in chat. Pass `--yes` only after you have shown the line and the user has confirmed that record.
 
 After a step finishes, record it, then run `resume`. Recording updates earlier steps, so this step's write does not reopen them. When an optional extra this walk offered and ran finishes, record that extra in the same way. The yes that ran the extra is the yes for that record. Do not ask the user to run `cover`. A write in an earlier step can still reopen a later one. A change from outside the walk reopens only the steps that change affects. Explain that impact in the script's words before redoing only those steps.
 

@@ -23,23 +23,23 @@ With a playbook, add the report path on the next line. You do not type brackets.
 
 | Step | What you see |
 | --- | --- |
-| 1. Playbook, only when you named one | The path may be outside the project or `docs/playbooks/<topic>.md`. If this walk already applied that same file, you choose `skip` (Recommended) or `reapply`. Otherwise you see the changes. Nothing is written until you say yes. Apply is `/crav1-resolve-open-questions apply`. On that yes a filled playbook is copied to `docs/playbooks/<topic>.md`. The name is shown once before the first copy. A hand-edit since the last apply is shown before overwrite. Kept items are written inside that apply. |
+| 1. Playbook, only when you named one | The path may be outside the project or `docs/playbooks/<topic>.md`. If this walk already applied that same file, you are still asked: `skip` (Recommended) or `reapply`, even when the file has not changed. Otherwise you see the changes. Nothing is written until you say yes. Apply is `/crav1-resolve-open-questions apply`. On that yes a filled playbook is copied to `docs/playbooks/<topic>.md`. The name is shown once before the first copy. A hand-edit since the last apply is shown before overwrite. Kept items are written inside that apply. |
 | 2. Architecture review | Always runs. It writes nothing. If there is nothing to critique, the walk says so. |
 | 3. Tighten the spec | One issue at a time, as `/crav1-tighten-spec` already walks. More than 8 issues: a one-line count first, then one issue or a small group. One by one is always offered. An open question that belongs to the next step is one line, with no menu. No issues: it says so. |
-| 4. Open questions | `/crav1-resolve-open-questions`. Nothing left to settle: it says so. |
-| 5. Plan | `/crav1-plan-from-spec` writes `plan.md` and `tasks.md`. |
+| 4. Open questions | `/crav1-resolve-open-questions`. Nothing left to settle: it says so. Then, once, the optional extras that apply. The walk does not go on to the plan without that offer when one applies. Show-or-ask is offered when a question is for someone else. |
+| 5. Plan | `/crav1-plan-from-spec` writes `plan.md` and `tasks.md`. Before that step is recorded, questions that still have no `Blocks:` line are offered, one by one or as one batch. |
 | 6. Plan review, then tighten | `/crav1-review-plan`, then `/crav1-tighten-plan`. |
 | 7. Ready check | `/crav1-tasks-ready-to-build`. The walk stops here. |
 
 A step with nothing to do says so and moves on.
 
-Offered only when the spec needs them, not as fixed steps: the research helper, `/crav1-review-security`, `/crav1-model-data`, `/crav1-show-or-ask-open-questions`, and `/crav1-suggest-tests-for-code`. Security and tests stay optional. The walk does not run them unless you pick them.
+Offered once, after open questions, when the spec needs them, not as fixed steps: the research helper, `/crav1-review-security`, `/crav1-model-data`, `/crav1-show-or-ask-open-questions`, and `/crav1-suggest-tests-for-code`. Security and tests stay optional. The walk does not run them unless you pick them. When one finishes, it is recorded without a second confirm.
 
 ## Progress
 
 Beside the spec, `docs/specs/<slug>/walk-progress.md` records which steps are done, when, and the version of the spec, plan, and tasks each step covered. The ready check also records a `verify.md` version. The playbook is intake only. After apply, the playbook line is the `docs/playbooks/` path, not the file outside the project, so you can resume on another machine.
 
-When you come back, the walk says what changed. A later step inside the walk leaves earlier steps done. An optional extra the walk itself runs, such as `/crav1-review-security`, is recorded when it finishes, and that write does not reopen earlier steps. A hand edit, or `/crav1-add-to-spec` between sessions, reopens only the steps that change affects. The spec, the plan, and the tasks stay the source of truth. The script stamps each step's done time.
+When you come back, the walk says what changed. A later step inside the walk leaves earlier steps done. An optional extra the walk itself runs, such as `/crav1-review-security`, is recorded when it finishes, and that write does not reopen earlier steps. A hand edit, or `/crav1-add-to-spec` between sessions, reopens only the steps that change affects. The spec, the plan, and the tasks stay the source of truth. The script stamps each step's done time. The progress line is shown, and you confirm it, before it is written. An extra's yes already covers its line.
 
 ## When the check is not ready
 

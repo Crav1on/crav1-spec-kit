@@ -8,7 +8,13 @@ In `plan.md`: **Left as committed** — only when the user left a piece. One lin
 
 ## Blocks lines
 
-The one exception to leaving `spec.md` alone. For each kept-open question under `## Open questions` that blocks only some of the new tasks, write one indented line under that question: `- Blocks: T2, T4`. Pick the tasks from the plan yourself; do not ask. Follow skill `crav1-add-to-spec`, `references/open-questions.md`. Do not change the question or its other lines. On a re-plan that renumbers tasks, replace the `Blocks:` lines this plan wrote. A kept-open question with no `Blocks:` line blocks the whole slice for `/crav1-tasks-ready-to-build` (inferred). List each `Blocks:` line in the recap.
+The one exception to leaving `spec.md` alone. Once `tasks.md` exists, every kept-open question gets one decision. Follow skill `crav1-add-to-spec`, `references/open-questions.md`. Do not change the question or its other lines. At most one `Blocks:` line; a new one replaces it. On a re-plan that renumbers tasks, replace the `Blocks:` lines this plan wrote.
+
+- It blocks some of the new tasks: write `- Blocks: T2, T4`. Pick the tasks from the plan. Do not ask. The risk entry is the question's words, then "do not implement until resolved".
+- It blocks no current task: write `- Blocks: none`, or `- Blocks: none (later phase)` when the reason is that short. Do not ask. The risk entry is the question's words, then `kept open; does not block the current tasks.` Do not write "do not implement until resolved" on that entry.
+- You cannot tell whether it is current work or later: ask once, in one short batch, for every such question together. Not one question at a time. Each option is `current` or `later`, with no recommendation. `later` writes `Blocks: none` and the risk wording above. `current` writes `Blocks: T#` when it blocks some tasks, or no line when it blocks the whole current slice, and the risk line keeps "do not implement until resolved".
+
+A kept-open question with no `Blocks:` line still blocks the whole slice for `/crav1-tasks-ready-to-build` (inferred). `Blocks: none` blocks no task. Any `Blocks:` line wins over Risk wording. List each `Blocks:` line in the recap.
 
 ## tasks.md
 

@@ -316,12 +316,28 @@ marks:
     pattern: '^  - Blocks: T\d+(, T\d+)*$'
     examples:
       - "  - Blocks: T2, T4"
-    meaning: "The question blocks only those tasks."
+    meaning: "The question blocks only those tasks. This line wins over a plan Risk that says do not implement until resolved."
     written_by: [crav1-resolve-open-questions, crav1-plan-from-spec]
     read_by: [crav1-tasks-ready-to-build]
     readiness: true
     mention: 'Blocks'
     since: 1.54.0
+
+  - id: oq-blocks-none
+    name: "Blocks none"
+    group: open-questions
+    files: ["docs/specs/<slug>/spec.md (indented under a kept-open question)"]
+    format: "  - Blocks: none [(<reason>)]"
+    pattern: '^  - Blocks: none( \([^)]+\))?$'
+    examples:
+      - "  - Blocks: none"
+      - "  - Blocks: none (later phase)"
+    meaning: "The question blocks no current task. A short reason in parentheses is optional. No Blocks line still means the whole slice."
+    written_by: [crav1-resolve-open-questions, crav1-plan-from-spec, crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tasks-ready-to-build]
+    readiness: true
+    mention: 'Blocks: none'
+    since: 1.125.0
 
   # ---------- research stale marks ----------
   - id: stale-note

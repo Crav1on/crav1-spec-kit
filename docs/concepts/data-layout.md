@@ -86,7 +86,7 @@ docs/specs/
 | `docs/architecture/spec.md` | One architecture spec from code | `/crav1-existing-to-specs`, when missing | The lanes that extend it |
 | `docs/architecture/left-out.md` | Guesses that stay left out, under `## Left out`, and `## Dismissed` lines | `/crav1-existing-to-specs` | `/crav1-existing-to-specs` on a re-read, `/crav1-read-environment` |
 | `docs/environments/marks.md` | One confirmed line per resource and environment | `/crav1-read-environment` and `/crav1-map-pipeline-environments`, appending only confirmed lines; `/crav1-ado-sync` appends, once per work item home, an `Azure Boards task type (<project>): <type>` line and an `Azure Boards task done state (<project>): <state>` line | `/crav1-read-environment`, `/crav1-what-do-we-know-about-this`. Line format: [Environment marks](../environments-marks.md) |
-| `docs/specs/<slug>/plan.md`, `tasks.md` readiness marks | `Reviewed:` in `plan.md`, `(after: T#)` on task lines, `Blocks:` under spec open questions | `/crav1-review-plan`, `/crav1-tighten-plan`, `/crav1-plan-from-spec`, `/crav1-resolve-open-questions` | `/crav1-tasks-ready-to-build` |
+| `docs/specs/<slug>/plan.md`, `tasks.md` readiness marks | `Reviewed:` in `plan.md`, `(after: T#)` on task lines, `Blocks:` and `Blocks: none` under spec open questions | `/crav1-review-plan`, `/crav1-tighten-plan`, `/crav1-plan-from-spec`, `/crav1-resolve-open-questions` | `/crav1-tasks-ready-to-build` |
 | `docs/notes/YYYY-MM/` | One note per input with the full input and its source, by source date; generated `index.md` per month and a top `index.md` | `/crav1-add-to-spec` for every input (1.61.0); `/crav1-review-pr` for its follow-ups note and the PR note, `/crav1-merge-pr` for the PR note (1.65.0); `/crav1-retire-spec` convert to note. Indexes: `notes_index.py` only |
 | `docs/sources/YYYY-MM-DD-<slug>/` | The original of an imported transcript, minutes, chat, screenshot, or diagram, or a mail written as text (`mail.md`, 1.111.0; the original mail stays outside the repo), plus a `README.md` | `/crav1-add-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs` | Anyone checking a quote. See [Data policy](data-policy.md) |
 | `docs/research/<topic>.md` | A short research note with the recommendation, trade-offs, confidence, and a link to the full study | The researcher (no slash command; see [guild routing](../guild-routing.md)). Skills only add or clear a stale mark | add, match-dump, add-to-spec, meeting, refresh-system-notes, explain-existing-system, what-do-we-know-about-this, ado-sync |
@@ -185,7 +185,7 @@ Under each item in a spec's `## Open questions`, the kit can add four kinds of l
   - Blocks: T2, T4
 ```
 
-`Blocks:` names the tasks that wait on a kept-open question. `/crav1-resolve-open-questions` writes it after a keep-open pick, and `/crav1-plan-from-spec` writes it for a kept-open question it parks as a risk. Without a `Blocks:` line, a kept-open question blocks the whole slice for [`/crav1-tasks-ready-to-build`](../from-tasks-ready-to-build.md). See [Readiness marks](#readiness-marks).
+`Blocks:` names the tasks that wait on a kept-open question, or `Blocks: none` when the question blocks no current task. A short reason may follow in parentheses: `Blocks: none (later phase)`. `/crav1-resolve-open-questions` writes a task list after a keep-open pick of tasks, and writes `Blocks: none` when the pick is None. The whole slice leaves no line. `/crav1-plan-from-spec` writes `Blocks: T#` for a question that blocks some current tasks, and `Blocks: none` for a leftover that blocks none. Without a `Blocks:` line, a kept-open question blocks the whole slice for [`/crav1-tasks-ready-to-build`](../from-tasks-ready-to-build.md). Any `Blocks:` line wins over a plan Risk that says do not implement until resolved. Older specs with no line behave as before. See [Readiness marks](#readiness-marks).
 
 `/crav1-show-or-ask-open-questions` writes `Pending:` or `Asked:` after you say whether the draft was sent. `/crav1-add-to-spec` write `Answered:` when a kept quote clearly answers that question. `/crav1-resolve-open-questions` then walks the question with you. The full format is in [open-questions.md](../../.cursor/skills/crav1/crav1-add-to-spec/references/open-questions.md).
 
@@ -198,7 +198,8 @@ Under each item in a spec's `## Open questions`, the kit can add four kinds of l
 
 | Mark | Where | Written by | Meaning |
 | --- | --- | --- | --- |
-| `Blocks: T<n>[, T<n>]` | `docs/specs/<slug>/spec.md` (indented under a kept-open question) | `/crav1-resolve-open-questions`, `/crav1-plan-from-spec` | The question blocks only those tasks. |
+| `Blocks: T<n>[, T<n>]` | `docs/specs/<slug>/spec.md` (indented under a kept-open question) | `/crav1-resolve-open-questions`, `/crav1-plan-from-spec` | The question blocks only those tasks. This line wins over a plan Risk that says do not implement until resolved. |
+| `Blocks: none [(<reason>)]` | `docs/specs/<slug>/spec.md` (indented under a kept-open question) | `/crav1-resolve-open-questions`, `/crav1-plan-from-spec`, `/crav1-tighten-and-plan-ready-to-build` | The question blocks no current task. A short reason in parentheses is optional. No Blocks line still means the whole slice. |
 | `Reviewed: <date>, P# open: <n>` | `docs/specs/<slug>/plan.md` (under the # Plan title) | `/crav1-review-plan`, `/crav1-tighten-plan` | The plan was reviewed, and how many reviewer findings are still open. |
 | `(after: T<n>[, T<n>])` | `docs/specs/<slug>/tasks.md` (end of a task line) | `/crav1-plan-from-spec` | The task needs those tasks done first. |
 <!-- crav1-readiness:end -->
@@ -207,7 +208,7 @@ When a mark is missing, the reader falls back and labels the reason **inferred**
 
 - No `Reviewed:` line: the task can still be ready, with a warning to run `/crav1-review-plan`.
 - No `(after: …)`: the task just before it blocks it while unticked (1.103.0; before, every earlier unticked task did).
-- A kept-open question, or a plan Risk that says do not implement until resolved, with no `Blocks:` line: it blocks the whole slice.
+- A kept-open question with no `Blocks:` line blocks the whole slice. `Blocks: none` blocks no task. A plan Risk that says do not implement until resolved blocks the whole slice only when it is not about a question that already has a `Blocks:` line. That line wins.
 
 A ticked task is Done only when `verify.md` lists it as verified. Otherwise it shows as Needs verify.
 
@@ -307,6 +308,7 @@ Every mark and line format the kit writes inside product files, generated from [
 | Asked | `  - Asked: <date>, <channel> to <who>. Question <n>. Date from <the user's yes \| email <date> \| meeting <date> \| chat <date>>.` | `docs/specs/<slug>/spec.md` (indented under an open question) | `/crav1-show-or-ask-open-questions` | `/crav1-resolve-open-questions`, `/crav1-show-or-ask-open-questions` | 1.40.0 |
 | Answered | `  - Answered: <date>, <who>, <kind>: "<quote>" Source: docs/sources/YYYY-MM-DD-<slug>/` | `docs/specs/<slug>/spec.md` (indented under an open question) | `/crav1-add-to-spec` | `/crav1-resolve-open-questions`, `/crav1-show-or-ask-open-questions` | 1.40.0 |
 | Blocks | `  - Blocks: T<n>[, T<n>]` | `docs/specs/<slug>/spec.md` (indented under a kept-open question) | `/crav1-resolve-open-questions`, `/crav1-plan-from-spec` | `/crav1-tasks-ready-to-build` | 1.54.0 |
+| Blocks none | `  - Blocks: none [(<reason>)]` | `docs/specs/<slug>/spec.md` (indented under a kept-open question) | `/crav1-resolve-open-questions`, `/crav1-plan-from-spec`, `/crav1-tighten-and-plan-ready-to-build` | `/crav1-tasks-ready-to-build` | 1.125.0 |
 
 ### Research and stale marks
 
