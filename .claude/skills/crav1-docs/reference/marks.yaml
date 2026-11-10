@@ -1058,6 +1058,21 @@ marks:
     mention: '(?m)^- Step: '
     since: 1.119.0
 
+  - id: walk-extra
+    name: "Extra"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md"]
+    format: "- Extra: <review-security | research | model-data | show-or-ask-open-questions | suggest-tests-for-code>"
+    pattern: '^- Extra: (review-security|research|model-data|show-or-ask-open-questions|suggest-tests-for-code)$'
+    examples:
+      - "- Extra: review-security"
+      - "- Extra: model-data"
+    meaning: "An optional extra this walk ran. Recorded when it finishes. Not a locked step. Its write does not reopen earlier steps."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    mention: '(?m)^- Extra: '
+    since: 1.123.0
+
   - id: walk-done
     name: "Done"
     group: walk

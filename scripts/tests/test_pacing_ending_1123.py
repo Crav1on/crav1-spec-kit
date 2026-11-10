@@ -31,7 +31,9 @@ class PacingAndEnding(unittest.TestCase):
         )
         self.assertIn("Waiting:", progress)
         self.assertIn("Uncommitted:", progress)
+        self.assertIn("- Extra: review-security", progress)
         self.assertIn("cover --yes", progress)
+        self.assertIn("outside this walk", progress)
         self.assertIn("nothing new", progress)
 
     def test_commit_next_line_follows_run_ending(self):

@@ -70,22 +70,70 @@ class InsideWalk(unittest.TestCase):
         self.assertEqual(status["review-and-tighten-plan"], "keep")
         self.assertEqual(nxt, "tasks-ready-to-build")
 
-    def test_optional_extra_cover_keeps_earlier_steps(self):
+    def test_in_walk_extra_is_recorded_and_does_not_reopen(self):
         self.record("review-architecture")
         self.record("tighten-spec")
         (self.root / "spec.md").write_text("spec after security review\n", encoding="utf-8")
         before, nxt = self.statuses()
-        self.assertEqual(before["review-architecture"], "keep")
         self.assertEqual(before["tighten-spec"], "reopen")
         self.assertEqual(nxt, "tighten-spec")
+        self.record("review-security")
+        text = (self.root / "walk-progress.md").read_text(encoding="utf-8")
+        self.assertIn("- Extra: review-security", text)
+        self.assertNotIn("- Step: review-security", text)
+        payload = must(["resume", "--root", str(self.root), "--no-playbook"])
+        by_id = {row["id"]: row for row in payload["steps"]}
+        self.assertEqual(by_id["review-architecture"]["status"], "keep")
+        self.assertEqual(by_id["tighten-spec"]["status"], "keep")
+        self.assertEqual(by_id["review-security"]["status"], "keep")
+        self.assertTrue(by_id["review-security"]["extra"])
+        self.assertEqual(payload["continue_from"], "resolve-open-questions")
+        (self.root / "spec.md").write_text("spec after tighten\n", encoding="utf-8")
+        self.record("resolve-open-questions")
+        text = (self.root / "walk-progress.md").read_text(encoding="utf-8")
+        self.assertIn("- Extra: review-security", text)
+        status, nxt = self.statuses()
+        self.assertEqual(status["tighten-spec"], "keep")
+        self.assertEqual(status["resolve-open-questions"], "keep")
+        self.assertEqual(nxt, "plan-from-spec")
+
+    def test_in_walk_extra_plan_write_does_not_reopen_the_plan_review(self):
+        self.record("review-architecture", "nothing-to-do")
+        self.record("tighten-spec", "nothing-to-do")
+        self.record("resolve-open-questions", "nothing-to-do")
+        self.record("plan-from-spec")
+        self.record("review-and-tighten-plan")
+        (self.root / "plan.md").write_text("plan after the data model\n", encoding="utf-8")
+        (self.root / "tasks.md").write_text("tasks after the data model\n", encoding="utf-8")
+        self.record("model-data")
+        status, nxt = self.statuses()
+        self.assertEqual(status["plan-from-spec"], "keep")
+        self.assertEqual(status["review-and-tighten-plan"], "keep")
+        self.assertEqual(nxt, "tasks-ready-to-build")
+        self.assertIn("- Extra: model-data", (self.root / "walk-progress.md").read_text(encoding="utf-8"))
+
+    def test_cover_is_optional_for_an_outside_write_and_names_no_extra(self):
+        self.record("review-architecture")
+        self.record("tighten-spec")
+        (self.root / "spec.md").write_text("spec edited outside the walk\n", encoding="utf-8")
         code, payload = run(["cover", "--root", str(self.root)])
         self.assertEqual(code, 2)
         self.assertEqual(payload["code"], "needs-yes")
         must(["cover", "--root", str(self.root), "--yes"])
-        after, nxt = self.statuses()
-        self.assertEqual(after["review-architecture"], "keep")
-        self.assertEqual(after["tighten-spec"], "keep")
+        text = (self.root / "walk-progress.md").read_text(encoding="utf-8")
+        self.assertNotIn("- Extra:", text)
+        status, nxt = self.statuses()
+        self.assertEqual(status["review-architecture"], "keep")
+        self.assertEqual(status["tighten-spec"], "keep")
         self.assertEqual(nxt, "resolve-open-questions")
+
+    def test_unknown_extra_is_rejected(self):
+        code, payload = run([
+            "record", "--root", str(self.root), "--step", "not-an-extra",
+            "--result", "done", "--yes",
+        ])
+        self.assertEqual(code, 1)
+        self.assertEqual(payload["code"], "step")
 
     def test_architecture_reopens_only_when_it_is_the_latest_spec_step(self):
         self.record("review-architecture")

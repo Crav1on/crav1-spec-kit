@@ -33,11 +33,24 @@ Slice: docs/specs/orders-retry/
   Verify version: missing
 ```
 
-A playbook step records `Playbook:` only. It does not record spec, plan, or tasks versions. Other result words are `skipped` and `reapplied`. The ready check is the only step that records `Verify version:`.
+A playbook step records `Playbook:` only. It does not record spec, plan, or tasks versions. Other result words are `skipped` and `reapplied`. The ready check is the only step that records `Verify version:`. An extra records spec, plan, and tasks versions:
+
+```text
+- Extra: review-security
+  Done: 2026-11-09T10:19:09+01:00
+  Result: done
+  Spec version: a1b2c3d4e5f6
+  Plan version: b2c3d4e5f6a1
+  Tasks version: c3d4e5f6a1b2
+```
 
 The script stamps `Done` itself, as `YYYY-MM-DDTHH:MM:SS+HH:MM`. Do not pass `--when`. A date alone is rejected.
 
-Recording a step updates the versions on earlier steps. Their `Done` and `Result` stay. A later step's write does not reopen them. That includes a plan step that edits the plan. After an optional extra inside the walk writes, for example `/crav1-review-security`, run `cover --yes` before `resume`. Cover marks the current spec, plan, tasks, and verify as already covered. It does not touch the playbook line.
+Recording a step updates the versions on earlier steps. Their `Done` and `Result` stay. A later step's write does not reopen them. That includes a plan step that edits the plan.
+
+An optional extra this walk offered and ran is recorded when it finishes, before `resume`. The user does not run `cover` for that. The line is `- Extra: review-security` (or `research`, `model-data`, `show-or-ask-open-questions`, `suggest-tests-for-code`), with `Done`, `Result`, and the spec, plan, and tasks versions. The yes that ran the extra is enough. That record leaves earlier steps done. An extra is not a locked step. Resume does not stop on it, and a later outside change does not reopen it.
+
+`cover --yes` is optional. It counts the current spec, plan, tasks, and verify as part of the walk and does not add an `- Extra:` line. Use it when a write happened outside this walk and you want that write counted here. It does not touch the playbook line.
 
 A change from outside the walk is one nobody recorded or covered. A hand edit, or `/crav1-add-to-spec` between sessions, is outside. Resume then reopens only the steps that change affects.
 
@@ -47,7 +60,7 @@ A change from outside the walk is one nobody recorded or covered. A hand edit, o
 
 At the start of a run, resume before recording anything. Redo `continue_from`. Do not record a later step to clear an earlier reopen.
 
-On resume, run `resume`. With no playbook on this command, add `--no-playbook` so a playbook step that was never started stays skipped. The script returns `keep`, `reopen`, or `not-started`, and `continue_from`. Explain each reopen with its `impact` before redoing it. Leave `keep` steps as they are. After a step is recorded, or after `cover`, run `resume` again.
+On resume, run `resume`. With no playbook on this command, add `--no-playbook` so a playbook step that was never started stays skipped. The script returns `keep`, `reopen`, or `not-started`, and `continue_from`. A recorded extra is `keep` and does not change `continue_from`. Explain each reopen with its `impact` before redoing it. Leave `keep` steps as they are. After a step or an extra is recorded, run `resume` again.
 
 `clear --step <id> --yes` refreshes one reopened step after the user says `nothing new`. `Done` and `Result` stay. Other steps stay as they are.
 

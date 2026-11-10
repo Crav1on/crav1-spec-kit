@@ -6,9 +6,11 @@ where the guided walk is, which version of each file a step covered, and which
 ready-check rows belong to which step. It does not edit those files, does not
 apply a playbook, and does not start a build.
 
-A later step inside the walk, and an optional extra covered with `cover`,
-leave earlier steps done. A change that nobody recorded or covered reopens
-only the steps that change affects.
+A later step inside the walk leaves earlier steps done. An optional extra
+the walk itself runs is recorded with `- Extra:` when it finishes, and that
+record does the same. `cover` is optional: it counts a write made outside
+this walk as part of the walk, and does not name an extra. A change that
+nobody recorded or covered reopens only the steps that change affects.
 
 Usage (JSON on stdout):
   walk_progress.py version --root <spec-folder>
@@ -109,6 +111,19 @@ STEP_COMMAND = {
 }
 DONE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}$")
 
+# Optional extras the walk can offer. They are not locked steps. Recording
+# one when the walk finishes it counts that write as inside the walk.
+EXTRAS = (
+    "review-security",
+    "research",
+    "model-data",
+    "show-or-ask-open-questions",
+    "suggest-tests-for-code",
+)
+for _extra in EXTRAS:
+    COVERS[_extra] = ("spec", "plan", "tasks")
+    AFFECTS[_extra] = ()
+
 # Ready-check rows. The command is the skill that owns the fix. can_jump_back
 # is false when that skill is outside this walk.
 JUMP = {
@@ -163,9 +178,16 @@ def parse_progress(text: str) -> dict:
             continue
         if line.startswith("- Step: "):
             step = line[len("- Step: "):]
-            if step not in COVERS:
+            if step not in ORDER:
                 fail("progress-file", f"unknown step {step}")
             current = {"step": step}
+            steps[step] = current
+            continue
+        if line.startswith("- Extra: "):
+            step = line[len("- Extra: "):]
+            if step not in EXTRAS:
+                fail("progress-file", f"unknown extra {step}")
+            current = {"step": step, "extra": True}
             steps[step] = current
             continue
         if current is None:
@@ -225,6 +247,16 @@ def render(slice_label: str, steps: dict) -> str:
             for token in COVERS[step]:
                 lines.append(f"  {LABEL[token]}: {body[token]}")
         lines.append("")
+    for step in EXTRAS:
+        body = steps.get(step)
+        if not body:
+            continue
+        lines.append(f"- Extra: {step}")
+        lines.append(f"  Done: {body['when']}")
+        lines.append(f"  Result: {body['result']}")
+        for token in COVERS[step]:
+            lines.append(f"  {LABEL[token]}: {body[token]}")
+        lines.append("")
     return "\n".join(lines).rstrip() + "\n"
 
 
@@ -281,9 +313,13 @@ def record(args: argparse.Namespace) -> None:
     data = load(root)
     body = {"when": done_stamp(args.when), "result": args.result}
     body.update(current_tokens(root, args.step, Path(args.playbook) if args.playbook else None))
-    # A later step's own write updates earlier steps' versions. Their Done
-    # and Result stay. Resume then leaves them keep (1.123.0).
-    restamp_earlier(root, data["steps"], args.step)
+    # A write inside the walk updates versions already recorded. Done and
+    # Result stay. An extra the walk just finished updates every locked
+    # step, because the extra is not itself a place in the locked order.
+    if args.step in EXTRAS:
+        restamp_recorded(root, data["steps"], set(COVERS[args.step]))
+    else:
+        restamp_earlier(root, data["steps"], args.step)
     data["steps"][args.step] = body
     label = args.slice or data["slice"] or f"docs/specs/{root.name}/"
     if not str(label).endswith("/"):
@@ -329,11 +365,19 @@ def affected_drift(root: Path, step: str, body: dict, steps: dict) -> list[str]:
     return [token for token in hash_drift(root, step, body) if token in affects]
 
 
+def _restamp_body(body: dict, name: str, now: dict, tokens: set[str]) -> None:
+    for token in COVERS[name]:
+        if token == "playbook" or token not in tokens:
+            continue
+        body[token] = now[token]
+
+
 def restamp_earlier(root: Path, steps: dict, step: str) -> None:
-    """Bring earlier steps' covered versions up to the current files.
+    """Bring earlier locked steps' covered versions up to the current files.
 
     Done and Result stay. Tokens this step does not cover stay, and the
-    playbook line stays. The playbook is intake only.
+    playbook line stays. The playbook is intake only. Recorded extras keep
+    the version they saw.
     """
     now = versions(root)
     covered = set(COVERS[step])
@@ -341,10 +385,20 @@ def restamp_earlier(root: Path, steps: dict, step: str) -> None:
         body = steps.get(earlier)
         if not body:
             continue
-        for token in COVERS[earlier]:
-            if token == "playbook" or token not in covered:
-                continue
-            body[token] = now[token]
+        _restamp_body(body, earlier, now, covered)
+
+
+def restamp_recorded(root: Path, steps: dict, tokens: set[str]) -> None:
+    """An extra finished inside the walk. Update locked steps already recorded.
+
+    Done and Result stay. Extras keep the version they saw.
+    """
+    now = versions(root)
+    for name in ORDER:
+        body = steps.get(name)
+        if not body:
+            continue
+        _restamp_body(body, name, now, tokens)
 
 
 def refresh_versions(root: Path, step: str, body: dict) -> None:
@@ -421,6 +475,16 @@ def resume(args: argparse.Namespace) -> None:
         if continue_from is None and status in ("not-started", "reopen"):
             continue_from = step
         rows.append(row)
+    for step in EXTRAS:
+        body = data["steps"].get(step)
+        if not body:
+            continue
+        rows.append({
+            "id": step,
+            "status": "keep",
+            "result": body["result"],
+            "extra": True,
+        })
     book = data["steps"].get("playbook")
     emit({
         "ok": True,
@@ -570,9 +634,11 @@ def _hit(task, kind: str, command_key: str | None, why: str) -> dict:
 
 
 def cover(args: argparse.Namespace) -> None:
-    """Mark the current spec, plan, tasks, and verify as covered by steps already recorded.
+    """Count the current spec, plan, tasks, and verify as part of the walk.
 
-    Used after an optional extra inside the walk writes. The playbook line stays.
+    Optional. For a write made outside this walk. An extra the walk itself
+    just ran is recorded with `- Extra:` instead. The playbook line stays.
+    Cover does not add an extra line.
     """
     if not args.yes:
         fail("needs-yes", "cover writes the progress file only with --yes", status=2)

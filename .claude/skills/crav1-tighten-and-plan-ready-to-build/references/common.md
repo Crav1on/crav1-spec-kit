@@ -12,7 +12,7 @@ This walk's own prompts are the playbook choice, one batch of optional offers wh
 
 The progress script is `scripts/walk_progress.py` in this skill. Use it for versions, resume, playbook status, and the ready-check map. Do not keep a second copy of those rules in chat. Pass `--yes` only after the user has confirmed that record.
 
-After a step finishes, record it, then run `resume`. Recording updates earlier steps, so this step's write does not reopen them. Run `cover --yes` after an optional extra writes, then `resume`. A write in an earlier step can still reopen a later one. A change from outside the walk reopens only the steps that change affects. Explain that impact in the script's words before redoing only those steps.
+After a step finishes, record it, then run `resume`. Recording updates earlier steps, so this step's write does not reopen them. When an optional extra this walk offered and ran finishes, record that extra in the same way. The yes that ran the extra is the yes for that record. Do not ask the user to run `cover`. A write in an earlier step can still reopen a later one. A change from outside the walk reopens only the steps that change affects. Explain that impact in the script's words before redoing only those steps.
 
 Spec, plan, and tasks remain the source of truth. The progress file does not.
 
