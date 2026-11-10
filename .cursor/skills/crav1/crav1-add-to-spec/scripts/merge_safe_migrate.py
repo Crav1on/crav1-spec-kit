@@ -38,6 +38,19 @@ import argparse, datetime, difflib, re, subprocess, sys, tempfile
 from collections import Counter
 from pathlib import Path
 
+
+def _utf8_stdout() -> None:
+    reconfigure = getattr(sys.stdout, "reconfigure", None)
+    if not callable(reconfigure):
+        return
+    try:
+        reconfigure(encoding="utf-8")
+    except (AttributeError, OSError, ValueError):
+        return
+
+
+_utf8_stdout()
+
 SYNC = re.compile(r"^Synced at: (\S+) (.+?)\s*$")
 ENTRY = re.compile(r"^(\S+)@([0-9a-f]{7,40}), (\d{4}-\d{2}-\d{2})( \(dropped\))?$")
 QNUM = re.compile(r"^(?:\d+[.)]\s+)?(?:\*\*)?Q\d+[.:)]?(?:\*\*)?\s+(.*)$")

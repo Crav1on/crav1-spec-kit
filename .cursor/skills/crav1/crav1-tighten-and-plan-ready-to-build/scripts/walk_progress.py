@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Progress file for /crav1-tighten-and-plan-ready-to-build (kit 1.123.0, unlinked 1.125.0).
+"""Progress file for /crav1-tighten-and-plan-ready-to-build (kit 1.123.0, ready rows 1.126.0).
 
 The spec, plan, and tasks stay the source of truth. This script only tracks
 where the guided walk is, which version of each file a step covered, and which
@@ -20,11 +20,16 @@ Usage (JSON on stdout):
   walk_progress.py clear --root <spec-folder> --step <id> --yes
   walk_progress.py resume --root <spec-folder>
   walk_progress.py playbook-status --root <spec-folder> --playbook <file>
+  walk_progress.py readiness --root <spec-folder>
   walk_progress.py readiness --json <file> [--root <spec-folder>]
   walk_progress.py unlinked --root <spec-folder>
 
+readiness --root builds the rows from task_order.py and question_blocks.py
+and adds the Reviewed warnings. Do not hand-build that JSON.
+
 record, cover, and clear without --yes write nothing and exit 2.
-The script stamps Done itself. --when, when passed, must be a full timestamp.
+record takes one step per call and stamps Done itself. --when, when passed,
+must be a full timestamp. Do not pass --when from the walk.
 Standard library only.
 """
 
@@ -36,6 +41,19 @@ import json
 import re
 import sys
 from datetime import datetime
+
+
+def _utf8_stdout() -> None:
+    reconfigure = getattr(sys.stdout, "reconfigure", None)
+    if not callable(reconfigure):
+        return
+    try:
+        reconfigure(encoding="utf-8")
+    except (AttributeError, OSError, ValueError):
+        return
+
+
+_utf8_stdout()
 
 sys.dont_write_bytecode = True  # before any sibling import; no __pycache__ in the project (1.121.1)
 
@@ -301,9 +319,26 @@ def done_stamp(when: str | None) -> str:
     return when
 
 
+def _one_step(values) -> str:
+    """One step id. A comma, 'and', or a repeated --step is refused."""
+    if isinstance(values, str):
+        values = [values]
+    parts: list[str] = []
+    for value in values or []:
+        parts.extend(part for part in re.split(r"\s*,\s*|\s+\band\b\s+", value) if part)
+    if len(parts) != 1:
+        fail(
+            "one-step",
+            "record takes one step per call. Record the step that just finished, "
+            "then record the next step in its own call.",
+        )
+    return parts[0]
+
+
 def record(args: argparse.Namespace) -> None:
-    if args.step not in COVERS:
-        fail("step", f"unknown step {args.step}")
+    step = _one_step(args.step)
+    if step not in COVERS:
+        fail("step", f"unknown step {step}")
     if args.result not in RESULTS:
         fail("result", f"result must be one of {', '.join(RESULTS)}")
     if not args.yes:
@@ -316,22 +351,56 @@ def record(args: argparse.Namespace) -> None:
     if not root.is_dir():
         fail("root", f"not a folder: {root}")
     data = load(root)
-    body = {"when": done_stamp(args.when), "result": args.result}
-    body.update(current_tokens(root, args.step, Path(args.playbook) if args.playbook else None))
+    previous = data["steps"].get(step)
+    result = args.result
+    kept_done = False
+    # A reopened step with nothing new is clear, not a fresh nothing-to-do.
+    # nothing-to-do does not replace an earlier done Result.
+    if previous and result == "nothing-to-do":
+        drift = affected_drift(root, step, previous, data["steps"])
+        if drift:
+            fail(
+                "use-clear",
+                f"{step} is reopened. Run clear --step {step} --yes when nothing new. "
+                "Do not record nothing-to-do.",
+            )
+        if previous.get("result") == "done":
+            result = "done"
+            kept_done = True
+    body = {"when": done_stamp(args.when), "result": result}
+    body.update(current_tokens(root, step, Path(args.playbook) if args.playbook else None))
     # A write inside the walk updates versions already recorded. Done and
     # Result stay. An extra the walk just finished updates every locked
     # step, because the extra is not itself a place in the locked order.
-    if args.step in EXTRAS:
-        restamp_recorded(root, data["steps"], set(COVERS[args.step]))
+    if step in EXTRAS:
+        restamp_recorded(root, data["steps"], set(COVERS[step]))
     else:
-        restamp_earlier(root, data["steps"], args.step)
-    data["steps"][args.step] = body
+        restamp_earlier(root, data["steps"], step)
+    data["steps"][step] = body
     label = args.slice or data["slice"] or f"docs/specs/{root.name}/"
     if not str(label).endswith("/"):
         label = f"{label}/"
     text = render(label, data["steps"])
     progress_path(root).write_text(text, encoding="utf-8")
-    emit({"ok": True, "wrote": PROGRESS_NAME, "step": args.step, "result": args.result, "when": body["when"]})
+    payload = {"ok": True, "wrote": PROGRESS_NAME, "step": step, "result": result, "when": body["when"]}
+    if kept_done:
+        payload["kept_done"] = True
+    emit(payload)
+
+
+def done_stamp_warning(steps: dict) -> str | None:
+    """Set when two or more steps were stamped at the same second."""
+    grouped: dict[str, list[str]] = {}
+    for step in list(ORDER) + list(EXTRAS):
+        body = steps.get(step)
+        if not body or "when" not in body:
+            continue
+        grouped.setdefault(body["when"], []).append(step)
+    dupes = [(when, names) for when, names in grouped.items() if len(names) >= 2]
+    if not dupes:
+        return None
+    bits = [f"{', '.join(names)} share Done {when}" for when, names in dupes]
+    return "Record each step when it finishes, one record per call. " + "; ".join(bits) + "."
 
 
 def hash_drift(root: Path, step: str, body: dict) -> list[str]:
@@ -498,6 +567,7 @@ def resume(args: argparse.Namespace) -> None:
         "steps": rows,
         "continue_from": continue_from,
         "playbook": book.get("playbook") if book else None,
+        "done_stamp_warning": done_stamp_warning(data["steps"]),
     })
 
 
@@ -604,7 +674,7 @@ def unlinked(args: argparse.Namespace) -> None:
     emit({"ok": True, "count": len(missing), "questions": missing})
 
 
-def classify(row: dict) -> dict | None:
+def classify(row: dict, resolve_kept: bool = False) -> dict | None:
     bucket = str(row.get("bucket") or "")
     reason = str(row.get("reason") or "")
     warning = str(row.get("warning") or "")
@@ -632,15 +702,47 @@ def classify(row: dict) -> dict | None:
         return None
     if bucket == "ready" and warning:
         return _hit(task, "assumption", None, f"Unrecognized ready warning: {warning}")
+    if "no tasks" in text:
+        return _hit(task, "blocker", "plan-from-spec", "There is no tasks.md. Run /crav1-plan-from-spec.")
     if "no plan" in text:
         return _hit(task, "blocker", "plan-from-spec", "There is no plan.md. Run /crav1-plan-from-spec.")
     if "open question" in text:
+        # Already settled as kept-open at this spec version: waiting, not a jump back.
+        if resolve_kept:
+            return _waiting(row)
         return _hit(task, "blocker", "resolve-open-questions", "An open question blocks the work. Run /crav1-resolve-open-questions.")
     if "plan risk" in text:
         return _hit(task, "blocker", "tighten-plan", "A plan risk blocks the work. Run /crav1-review-plan, then /crav1-tighten-plan.")
-    if "cycle" in text or "after names no task" in text or "waits on" in text:
+    # A cycle, or an after: that names no task, is a blocker. Waiting on a
+    # real earlier task is the order, not a blocker (1.126.0).
+    if "cycle" in text or "names no task" in text:
         return _hit(task, "blocker", "tighten-plan", "A task dependency is blocked. Fix the (after:) marks with /crav1-tighten-plan.")
+    if re.search(r"waits on\s+t\d+", text):
+        return None
     return _hit(task, "blocker", None, f"Unrecognized blocker: {reason or bucket}")
+
+
+def _waiting(row: dict) -> dict:
+    who = row.get("who")
+    if isinstance(who, str):
+        who = who.strip() or None
+    else:
+        who = None
+    return {
+        "task": row.get("task"),
+        "bucket": "waiting",
+        "step": "resolve-open-questions",
+        "command": None,
+        "can_jump_back": False,
+        "outside_walk": False,
+        "kind": "waiting",
+        "who": who,
+        "asked": bool(row.get("asked")),
+        "why": (
+            "Resolve-open-questions already covers this spec. "
+            "The question waits on someone else. Do not jump back."
+        ),
+    }
 
 
 def _hit(task, kind: str, command_key: str | None, why: str) -> dict:
@@ -757,29 +859,236 @@ def reopened_hits(root: Path) -> list[dict]:
     return hits
 
 
+def order_mod():
+    import importlib.util
+
+    path = Path(__file__).resolve().parents[2] / "crav1-tasks-ready-to-build" / "scripts" / "task_order.py"
+    spec = importlib.util.spec_from_file_location("task_order_rows", path)
+    if spec is None or spec.loader is None:
+        fail("order", f"cannot load {path}")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+REVIEWED_RE = re.compile(r"^Reviewed:\s*.*?P# open:\s*(\d+)", re.M)
+
+
+def reviewed_warning(plan_text: str) -> str | None:
+    if not plan_text.strip():
+        return "plan review unknown (inferred), run /crav1-review-plan"
+    match = REVIEWED_RE.search(plan_text)
+    if not match:
+        return "plan review unknown (inferred), run /crav1-review-plan"
+    count = int(match.group(1))
+    if count > 0:
+        return f"plan review has {count} open P# (recorded), see /crav1-tighten-plan"
+    return None
+
+
+def _verify_for(text: str | None, tid: str) -> tuple[str, str | None]:
+    if not text:
+        return "needs-verify", "no verify.md row"
+    for line in text.splitlines():
+        if not line.startswith("|"):
+            continue
+        cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+        if not cells or cells[0] != tid or len(cells) < 3:
+            continue
+        status = cells[2].lower()
+        if "unverified" in status or "claimed" in status:
+            return "needs-verify", "claimed done, unverified"
+        if "failed" in status:
+            return "needs-verify", "verify failed"
+        if "verified" in status:
+            return "done", None
+        return "needs-verify", "no verify.md row"
+    for line in text.splitlines():
+        if not re.search(rf"\b{re.escape(tid)}\b", line):
+            continue
+        low = line.lower()
+        if "unverified" in low or "claimed done" in low:
+            return "needs-verify", "claimed done, unverified"
+        if "verify failed" in low:
+            return "needs-verify", "verify failed"
+        if "implemented, verified" in low:
+            return "done", None
+    return "needs-verify", "no verify.md row"
+
+
+def _oq_row(tid: str, question: dict, whole: bool) -> dict:
+    sentence = str(question.get("text") or "").strip()
+    if whole:
+        reason = f'open question "{sentence}" blocks the whole slice (inferred)'
+    else:
+        reason = f'open question "{sentence}" (recorded)'
+    row = {
+        "bucket": "blocked",
+        "task": tid,
+        "reason": reason,
+        "asked": bool(question.get("asked")),
+    }
+    if question.get("who"):
+        row["who"] = question["who"]
+    return row
+
+
+def _question_row(blocks: dict, tid: str) -> dict | None:
+    slice_q = None
+    for question in blocks.get("questions") or []:
+        if question.get("mark") == "tasks" and tid in (question.get("tasks") or []):
+            return _oq_row(tid, question, whole=False)
+        if question.get("blocks_slice") and slice_q is None:
+            slice_q = question
+    if slice_q is not None:
+        return _oq_row(tid, slice_q, whole=True)
+    for risk in blocks.get("risks") or []:
+        if not risk.get("blocks_slice"):
+            continue
+        short = str(risk.get("text") or "").strip()
+        if short.startswith("- "):
+            short = short[2:].strip()
+        return {
+            "bucket": "blocked",
+            "task": tid,
+            "reason": f'plan Risk "{short}" blocks the whole slice (inferred)',
+        }
+    return None
+
+
+def build_rows(root: Path) -> list[dict]:
+    """Ready-check rows from the spec folder. The walk does not hand-build these."""
+    tasks_path = root / "tasks.md"
+    plan_path = root / "plan.md"
+    spec_path = root / "spec.md"
+    verify_path = root / "verify.md"
+    if not tasks_path.is_file():
+        return [{"bucket": "blocked", "task": None, "reason": "no tasks.md"}]
+    order = order_mod()
+    tasks = order.parse(tasks_path.read_text(encoding="utf-8"))
+    if not tasks:
+        return [{"bucket": "blocked", "task": None, "reason": "no tasks.md"}]
+    analysed = order.analyse(tasks)
+    by_reason = {row["id"]: row for row in analysed["rows"]}
+    plan_text = plan_path.read_text(encoding="utf-8") if plan_path.is_file() else ""
+    spec_text = spec_path.read_text(encoding="utf-8") if spec_path.is_file() else ""
+    blocks = blocks_mod().analyse(spec_text, plan_text)
+    verify_text = verify_path.read_text(encoding="utf-8") if verify_path.is_file() else None
+    warning = reviewed_warning(plan_text) if plan_path.is_file() else None
+    rows = []
+    for task in tasks:
+        tid = f"T{task['id']}"
+        if task["done"]:
+            bucket, reason = _verify_for(verify_text, tid)
+            row = {"bucket": bucket, "task": tid}
+            if reason:
+                row["reason"] = reason
+            rows.append(row)
+            continue
+        if not plan_path.is_file():
+            rows.append({"bucket": "blocked", "task": tid, "reason": "no plan.md (recorded)"})
+            continue
+        question = _question_row(blocks, tid)
+        if question:
+            rows.append(question)
+            continue
+        dep = by_reason.get(task["id"])
+        if dep and dep.get("reason"):
+            rows.append({"bucket": "blocked", "task": tid, "reason": dep["reason"]})
+            continue
+        row = {"bucket": "ready", "task": tid}
+        if warning:
+            row["warning"] = warning
+        rows.append(row)
+    return rows
+
+
+def resolve_is_keep(root: Path) -> bool:
+    """True when resolve-open-questions is recorded against the current spec."""
+    if not root.is_dir():
+        return False
+    data = load(root)
+    body = data["steps"].get("resolve-open-questions")
+    if not body:
+        return False
+    return not affected_drift(root, "resolve-open-questions", body, data["steps"])
+
+
+def _slug(root: Path) -> str:
+    data = load(root) if root.is_dir() else {"slice": None}
+    parts = [part for part in str(data.get("slice") or "").strip("/").split("/") if part]
+    if parts:
+        return parts[-1]
+    return root.name
+
+
+def _waiting_lines(waiting: list[dict], slug: str) -> tuple[str | None, str | None]:
+    if not waiting:
+        return None, None
+    tasks: list[str] = []
+    whos: list[str] = []
+    for hit in waiting:
+        task = hit.get("task")
+        if task and task not in tasks:
+            tasks.append(task)
+        who = hit.get("who")
+        if who and who not in whos:
+            whos.append(who)
+    count = len(tasks) or len(waiting)
+    tail = f" ({', '.join(whos)})" if whos else ""
+    line = f"Waiting: {count} tasks wait on open questions{tail}."
+    if all(hit.get("asked") for hit in waiting):
+        nxt = (
+            f"/crav1-tighten-and-plan-ready-to-build {slug}, "
+            "because the walk resumes when the answers arrive."
+        )
+    else:
+        nxt = (
+            f"/crav1-show-or-ask-open-questions {slug}, "
+            "because the questions are not asked yet."
+        )
+    return line, nxt
+
+
 def readiness(args: argparse.Namespace) -> None:
-    try:
-        payload = json.loads(Path(args.json).read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as exc:
-        fail("readiness", f"cannot read rows: {exc}")
-    rows = payload.get("rows")
-    if not isinstance(rows, list):
-        fail("readiness", "rows must be a list")
-    hits = []
+    root = Path(args.root) if args.root else None
+    built = False
+    if args.json:
+        try:
+            payload = json.loads(Path(args.json).read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            fail("readiness", f"cannot read rows: {exc}")
+        rows = payload.get("rows")
+        if not isinstance(rows, list):
+            fail("readiness", "rows must be a list")
+    elif root is not None:
+        if not root.is_dir():
+            fail("root", f"not a folder: {root}")
+        rows = build_rows(root)
+        built = True
+    else:
+        fail("readiness", "pass --root <spec-folder>, or --json <rows file>")
     for row in rows:
         if not isinstance(row, dict):
             fail("readiness", "each row must be an object")
-        hit = classify(row)
+    resolve_kept = resolve_is_keep(root) if root is not None else False
+    hits = []
+    for row in rows:
+        hit = classify(row, resolve_kept=resolve_kept)
         if hit:
             hits.append(hit)
-    reopened = reopened_hits(Path(args.root)) if args.root else []
+    reopened = reopened_hits(root) if root is not None else []
     hits.extend(reopened)
     blockers = [h for h in hits if h["kind"] == "blocker" and not h["outside_walk"]]
     outside = [h for h in hits if h["outside_walk"]]
     assumptions = [h for h in hits if h["kind"] == "assumption"]
-    unmapped = [h for h in hits if h["command"] is None]
+    waiting = [h for h in hits if h["kind"] == "waiting"]
+    unmapped = [h for h in hits if h["command"] is None and h["kind"] != "waiting"]
+    jump = [h for h in hits if h["can_jump_back"]]
     ready = not hits
-    emit({
+    slug = _slug(root) if root is not None else ""
+    waiting_line, waiting_next = _waiting_lines(waiting, slug)
+    out = {
         "ok": True,
         "ready": ready,
         "start_build": False,
@@ -787,9 +1096,18 @@ def readiness(args: argparse.Namespace) -> None:
         "outside_walk": outside,
         "assumptions": assumptions,
         "unmapped": unmapped,
-        "jump_back": [h for h in hits if h["can_jump_back"]],
+        "waiting": waiting,
+        "waiting_line": waiting_line,
+        "waiting_next": waiting_next,
+        "recommend_jump": bool(jump),
+        "jump_back": jump,
         "reopened": reopened,
-    })
+    }
+    if built:
+        out["rows"] = rows
+    if root is not None and root.is_dir():
+        out["done_stamp_warning"] = done_stamp_warning(load(root)["steps"])
+    emit(out)
 
 
 def cmd_version(args: argparse.Namespace) -> None:
@@ -798,6 +1116,7 @@ def cmd_version(args: argparse.Namespace) -> None:
 
 
 def main(argv: list[str] | None = None) -> None:
+    _utf8_stdout()
     parser = argparse.ArgumentParser(description="Guided walk progress file")
     sub = parser.add_subparsers(dest="cmd", required=True)
 
@@ -809,7 +1128,7 @@ def main(argv: list[str] | None = None) -> None:
     r = sub.add_parser("record")
     r.add_argument("--root", required=True)
     r.add_argument("--slice")
-    r.add_argument("--step", required=True)
+    r.add_argument("--step", action="append", required=True, help="One step id. More than one is refused.")
     r.add_argument("--result", required=True)
     r.add_argument("--when", help="Full timestamp. Omit to let the script stamp Done.")
     r.add_argument("--playbook")
@@ -838,8 +1157,8 @@ def main(argv: list[str] | None = None) -> None:
     p.set_defaults(func=playbook_status)
 
     d = sub.add_parser("readiness")
-    d.add_argument("--json", required=True)
-    d.add_argument("--root", help="Spec folder. Reopened walk steps block ready.")
+    d.add_argument("--json", help="Rows file. Omit with --root to build the rows from the spec folder.")
+    d.add_argument("--root", help="Spec folder. Builds the rows when --json is omitted. Reopened steps block ready.")
     d.set_defaults(func=readiness)
 
     u = sub.add_parser("unlinked")

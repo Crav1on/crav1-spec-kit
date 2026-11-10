@@ -23,7 +23,7 @@ For each task, in this order:
 | --- | --- |
 | Ticked in `tasks.md` | **Done** when `verify.md` lists it as verified, otherwise **Needs verify** |
 | `plan.md` missing | Blocked |
-| A kept-open question in `spec.md` | Blocked when its `Blocks:` line names the task (recorded). `Blocks: none` blocks no task (recorded). With no `Blocks:` line, it blocks the whole slice (inferred). A plan Risk that says do not implement until resolved does the same only when that question has no `Blocks:` line. The line wins |
+| A kept-open question in `spec.md` | Blocked when its `Blocks:` line names the task (recorded). `Blocks: none` blocks no task (recorded). With no `Blocks:` line, it blocks the whole slice (inferred). A plan Risk that says do not implement until resolved does the same when it matches no question, or matches a question with no `Blocks:` line. It matches on the question's first sentence, a `(question: <first words>)` tag, or the same Blocks tasks named in the risk. The line wins |
 | Tasks it waits on | Blocked while a task in its `(after: T#)` is unticked (recorded). With no `(after: …)`, the task just before it blocks it (inferred). Tasks that wait on each other in a loop are blocked as a cycle |
 | Otherwise | **Ready**. When `plan.md` has no `Reviewed:` line, it adds a warning to run `/crav1-review-plan` (inferred). When the review still has open `P#`s, it says so |
 

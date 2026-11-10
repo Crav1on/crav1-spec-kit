@@ -99,6 +99,7 @@ class QuestionBlocks(unittest.TestCase):
         self.assertTrue(got["questions"][0]["blocks_slice"])
         self.assertTrue(got["risks"][0]["blocks_slice"])
         self.assertIsNone(got["risks"][0]["question"])
+        self.assertEqual(got["risks"][0]["because"], "no matching question")
 
     def test_cli_prints_json(self):
         with tempfile.TemporaryDirectory() as tmp:

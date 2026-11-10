@@ -16,6 +16,8 @@ The progress file is `docs/specs/<slug>/walk-progress.md`. It records the step, 
 
 1.125.0: the progress confirm shows the line and gets a yes, unless the step's own confirm already included that record. An extra's yes stays that confirm. An already-applied playbook still asks skip (Recommended) or reapply. Optional extras are offered once, after open questions, when any apply, including show-or-ask when a question is for someone else. Before the plan step is recorded, kept-open questions with no `Blocks:` line are offered, one by one or as one batch.
 
+1.126.0: ready means the first task can start, the rest wait in order, and nothing else blocks. A waits-on-T# reason for a real task is not a blocker. A cycle, or an after: that names no task, still blocks. `readiness --root` builds the rows. When resolve-open-questions is already current, an open question is waiting, not a jump back. Who comes from the latest Asked or Pending line. Next is show-or-ask when the questions are not asked yet, or this walk when the answers arrive. A jump back reruns the owning skill, even for a small patch. The walk does not edit spec.md, plan.md, or tasks.md on that jump, and it does not write Reviewed. A reopened step with nothing new is clear, not a fresh nothing-to-do, and nothing-to-do keeps an earlier done Result. Record one step per call, right when it finishes. record refuses more than one step. Resume warns when two or more steps share a Done stamp.
+
 ## Runs when
 
 A spec should be tightened and planned until it is ready to build. Called by the user.
@@ -28,13 +30,13 @@ The walk's own prompts are the playbook skip or reapply question, asked even whe
 
 In short: The spec folder, an optional playbook (outside the project or under `docs/playbooks/`), and the progress file when one exists.
 
-Reads the spec folder, the optional playbook, and `walk-progress.md` when resuming. The ready check reads `spec.md`, `plan.md`, `tasks.md`, and `verify.md` through [`/crav1-tasks-ready-to-build`](crav1-tasks-ready-to-build.md). It does not read production data.
+Reads the spec folder, the optional playbook, and `walk-progress.md` when resuming. The ready check is `scripts/walk_progress.py readiness --root`, which reads `spec.md`, `plan.md`, `tasks.md`, and `verify.md` through `task_order.py` and `question_blocks.py`. It does not read production data.
 
 ## Writes
 
 In short: `docs/specs/<slug>/walk-progress.md` after a yes, with the `docs/playbooks/` path when a playbook was applied. The playbook copy is written by apply.
 
-Writes `docs/specs/<slug>/walk-progress.md` through `scripts/walk_progress.py`, and only after a yes that was shown the progress line, unless that step's confirm already included the record. The playbook step records `docs/playbooks/<topic>.md`, not the outside path. Spec, plan, and task edits happen inside the skill the walk runs, after that skill's own yes, except a `Blocks:` line (and the matching Risk sentence when it is `Blocks: none`) for a kept-open question that still has no line after the plan. [`/crav1-resolve-open-questions`](crav1-resolve-open-questions.md) with `apply <file>` writes playbook answers and the `docs/playbooks/` copy, including Kept items through the rules of [`/crav1-add-to-spec`](crav1-add-to-spec.md), and this walk does not call [`/crav1-add-to-spec`](crav1-add-to-spec.md) a second time for those items.
+Writes `docs/specs/<slug>/walk-progress.md` through `scripts/walk_progress.py`, and only after a yes that was shown the progress line, unless that step's confirm already included the record. One record per step, right when that step finishes. The playbook step records `docs/playbooks/<topic>.md`, not the outside path. Spec, plan, and task edits happen inside the skill the walk runs, after that skill's own yes, except a `Blocks:` line (and the matching Risk sentence when it is `Blocks: none`) for a kept-open question that still has no line after the plan. A jump back reruns that skill and does not edit those files, and it does not write `Reviewed:`. [`/crav1-resolve-open-questions`](crav1-resolve-open-questions.md) with `apply <file>` writes playbook answers and the `docs/playbooks/` copy, including Kept items through the rules of [`/crav1-add-to-spec`](crav1-add-to-spec.md), and this walk does not call [`/crav1-add-to-spec`](crav1-add-to-spec.md) a second time for those items.
 
 ## Does not
 

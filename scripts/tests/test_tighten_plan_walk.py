@@ -268,6 +268,8 @@ class Progress(unittest.TestCase):
             {"bucket": "blocked", "reason": "no plan.md"},
             {"bucket": "blocked", "task": "T4", "reason": "plan Risk blocks the slice"},
             {"bucket": "blocked", "task": "T6", "reason": "waits on T5"},
+            {"bucket": "blocked", "task": "T9", "reason": "cycle T2 → T3 → T2 (recorded)"},
+            {"bucket": "blocked", "task": "T10", "reason": "after: T99 names no task (recorded)"},
             {"bucket": "ready", "task": "T1", "warning": "plan review has 2 open P#"},
             {"bucket": "blocked", "task": "T8", "reason": "something new"},
         ]}), encoding="utf-8")
@@ -284,7 +286,9 @@ class Progress(unittest.TestCase):
         self.assertEqual(by_task["T5"]["kind"], "assumption")
         self.assertEqual(by_task[None]["command"], "/crav1-plan-from-spec")
         self.assertEqual(by_task["T4"]["step"], "review-and-tighten-plan")
-        self.assertEqual(by_task["T6"]["command"], "/crav1-tighten-plan")
+        self.assertNotIn("T6", by_task)
+        self.assertEqual(by_task["T9"]["command"], "/crav1-tighten-plan")
+        self.assertEqual(by_task["T10"]["command"], "/crav1-tighten-plan")
         self.assertEqual(by_task["T1"]["command"], "/crav1-tighten-plan")
         self.assertIsNone(by_task["T8"]["command"])
         self.assertFalse(by_task["T8"]["can_jump_back"])
