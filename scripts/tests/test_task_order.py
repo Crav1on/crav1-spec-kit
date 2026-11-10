@@ -89,6 +89,8 @@ class TaskOrder(unittest.TestCase):
     def test_titles_strip_marks(self):
         res = run("- [ ] T1: Do it (verify: unit — x) (spec: R1) (branch: feat/orders-retry)\n")
         self.assertEqual(res["rows"][0]["title"], "Do it")
+        marked = run("- [ ] T1: Do it (step: 1) (map: feat/cancel-refund)\n")
+        self.assertEqual(marked["rows"][0]["title"], "Do it")
 
 
 if __name__ == "__main__":

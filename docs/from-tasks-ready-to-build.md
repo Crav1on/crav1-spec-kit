@@ -2,7 +2,7 @@
 
 Kit not in this project yet? [Install first](install.md) (Cursor and Claude Code; the slash commands match, the files do not).
 
-Use this when you want to know which tasks can be built now, and why the others cannot. It reads your spec folders and writes nothing. Run it any time: before Build, between tasks, or after new information changed a spec. It is command-only (1.88.0): type `/crav1-tasks-ready-to-build`. Asking "which tasks are ready?" in plain words does not start it.
+Use this when you want to know which tasks can be built now, and why the others cannot. Run it any time: before Build, between tasks, or after new information changed a spec. It is command-only (1.88.0): type `/crav1-tasks-ready-to-build`. Asking "which tasks are ready?" in plain words does not start it. Every run rewrites `docs/specs/<slug>/build-map.md` (1.128.0). The task list is unchanged apart from one line pointing at that file.
 
 This is cross-cutting. It is not its own lane. It was added at Rhea's request so runners can pick the next task without guessing.
 
@@ -14,6 +14,12 @@ This is cross-cutting. It is not its own lane. It was added at Rhea's request so
 ```
 
 Leave out the folder to check every slice under `docs/specs/`.
+
+To see only the build map, put the word first. The rest is the same scope, including a slice such as `cc 1.0`:
+
+```text
+/crav1-tasks-ready-to-build build-map cc 1.0
+```
 
 ## What it checks
 
@@ -54,6 +60,7 @@ Done: 3
 
 Next: /crav1-build-tasks T5 (cancel-booking), because that task unblocks the most others.
 Source: docs/specs/cancel-booking/spec.md, plan.md, tasks.md, verify.md
+Build map: docs/specs/cancel-booking/build-map.md
 ```
 
 ## Getting recorded reasons
@@ -68,9 +75,17 @@ The more the kit records, the fewer reasons are inferred:
 
 It never reads Azure Boards (ADO). A task closed there but not ticked here still shows as not done. Run [`/crav1-ado-sync`](from-ado-sync-pull-tasks.md) to bring task states back.
 
+## The build map (1.128.0)
+
+The file `docs/specs/<slug>/build-map.md` is how the work will be built, by branch. One branch per numbered step in the plan. A task can name another branch with `(map: feat/cancel-refund)`, and `(step: 1)` links a task to a step when the step text does not. No steps means one branch per task, and the file says so.
+
+Branches sit in waves. Wave 1 can start from a dependency point of view. Later waves open after those merge. A flowchart at the top shows what waits on what. Each branch row has six things: the branch name, one line on what it delivers, the task titles, which branches it waits for, any open question and who has the answer, and whether it is ready now. Task ids are not in the file. The chat stays short. The word `build-map` prints the path and the waves, not the task list.
+
+The script writes the file. This command does not commit it. Commit it with the spec when you are ready.
+
 ## What does not get written
 
-Nothing. No file, no commit, no command run.
+No commit, and no other file. The build map is the one file this command writes.
 
 ## After
 

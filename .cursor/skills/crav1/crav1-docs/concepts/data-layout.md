@@ -94,6 +94,7 @@ docs/specs/
 | `docs/data-model/<model>/` | Confirmed and proposed data model, questions, both comparison views, pinned sources, `history.md` for revised items (1.121.0), and immutable review snapshots | `/crav1-model-data`; `reviews/` by `/crav1-what-do-we-know-about-this` `report-data-model-full` | `/crav1-model-data`, `/crav1-what-do-we-know-about-this` |
 | `docs/specs/<slug>/spec.md` | What and why, acceptance, open questions | spark, ideas, intake (through `crav1-bundle-slice-agent`), match; then tighten-spec, resolve-open-questions, add-to-spec, match-dump, add-to-spec, and review-security | Every later lane |
 | `docs/specs/<slug>/plan.md`, `tasks.md` | How, constraints, files, linter; ordered testable tasks | `/crav1-plan-from-spec`, `/crav1-tighten-plan`; `[x]` on a task row by implement and build-tasks | Build, verify, review |
+| `docs/specs/<slug>/build-map.md` | How the slice will be built, by branch, in waves. One branch per Approach step unless a task has `(map:)`. No task ids. Rewritten every run; committed with the spec | `/crav1-tasks-ready-to-build`, through `scripts/build_map.py` | The owner, and `/crav1-tasks-ready-to-build` `build-map` |
 | `docs/specs/<slug>/verify.md` | The acceptance matrix | `/crav1-verify-build-against-spec`; one row by `/crav1-fix-build-gaps` | `/crav1-open-pr`, `/crav1-review-pr` |
 | `docs/specs/<slug>/fix-log.md` | One gap from verify, the fix, and the re-proof | `/crav1-fix-build-gaps` | Verify, review |
 | `docs/specs/<slug>/live-fix.md` | Legacy. New incidents go in `fix-log.md` | Nothing new | Read when present |
@@ -191,7 +192,7 @@ Under each item in a spec's `## Open questions`, the kit can add four kinds of l
 
 ## Readiness marks
 
-[`/crav1-tasks-ready-to-build`](../from-tasks-ready-to-build.md) reads three optional marks. Each is written only by the skills named here; the reader writes nothing:
+[`/crav1-tasks-ready-to-build`](../from-tasks-ready-to-build.md) reads these marks and does not write them. It rewrites `build-map.md` every run (1.128.0):
 
 <!-- crav1-readiness:start -->
 <!-- Generated from docs/reference/marks.yaml by scripts/gen-marks.py. Do not edit by hand. -->
@@ -202,6 +203,8 @@ Under each item in a spec's `## Open questions`, the kit can add four kinds of l
 | `Blocks: none [(<reason>)]` | `docs/specs/<slug>/spec.md` (indented under a kept-open question) | `/crav1-resolve-open-questions`, `/crav1-plan-from-spec`, `/crav1-tighten-and-plan-ready-to-build` | The question blocks no current task. A short reason in parentheses is optional. No Blocks line still means the whole slice. |
 | `Reviewed: <date>, P# open: <n>` | `docs/specs/<slug>/plan.md` (under the # Plan title) | `/crav1-review-plan`, `/crav1-tighten-plan` | The plan was reviewed, and how many reviewer findings are still open. |
 | `(after: T<n>[, T<n>])` | `docs/specs/<slug>/tasks.md` (end of a task line) | `/crav1-plan-from-spec` | The task needs those tasks done first. |
+| `(step: <n>)` | `docs/specs/<slug>/tasks.md` (end of a task line) | `/crav1-plan-from-spec` | The task belongs to this numbered Approach step on the build map. When absent, a task id written in the step is the link. This mark wins when both are present. |
+| `(map: [<repo> ]<branch>)` | `docs/specs/<slug>/tasks.md` (end of a task line) | `/crav1-plan-from-spec` | The task is built on this branch instead of its plan step's branch. Tasks that name the same branch share it. When absent, the task stays on the step branch. |
 <!-- crav1-readiness:end -->
 
 When a mark is missing, the reader falls back and labels the reason **inferred**:
@@ -332,6 +335,8 @@ Every mark and line format the kit writes inside product files, generated from [
 | (spec: …) | `(spec: <REQ or acceptance>)` | `docs/specs/<slug>/tasks.md` (on a task line) | `/crav1-plan-from-spec`, `/crav1-tighten-plan` | `/crav1-review-plan`, `/crav1-ado-sync` | 1.0.0 |
 | (after: …) | `(after: T<n>[, T<n>])` | `docs/specs/<slug>/tasks.md` (end of a task line) | `/crav1-plan-from-spec` | `/crav1-tasks-ready-to-build`, `/crav1-help` | 1.54.0 |
 | (branch: …) | `(branch: [<repo> ]<branch>)` | `docs/specs/<slug>/tasks.md` (end of a task line, after (after: …)) | `/crav1-plan-from-spec` | `/crav1-build-tasks`, `/crav1-build-features`, `/crav1-create-feature-branch`, `/crav1-tasks-ready-to-build`, `/crav1-verify-build-against-spec`, `/crav1-help`, `/crav1-review-pr` | 1.64.0 |
+| (step: …) | `(step: <n>)` | `docs/specs/<slug>/tasks.md` (end of a task line) | `/crav1-plan-from-spec` | `/crav1-tasks-ready-to-build` | 1.128.0 |
+| (map: …) | `(map: [<repo> ]<branch>)` | `docs/specs/<slug>/tasks.md` (end of a task line) | `/crav1-plan-from-spec` | `/crav1-tasks-ready-to-build` | 1.128.0 |
 
 ### Walk progress
 

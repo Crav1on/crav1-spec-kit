@@ -2,6 +2,16 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.128.0 (2026-11-10)
+
+A build map: how the slice will actually be built, by branch, without task ids. A minor release because `/crav1-tasks-ready-to-build` now writes a file.
+
+- **Build map.** Every run rewrites `docs/specs/<slug>/build-map.md`, next to the plan. The task list is unchanged apart from one line, `Build map: docs/specs/<slug>/build-map.md`. The word `build-map` shows only a short summary (the path and the waves). The same scope as the command follows the word, including a slice such as `cc 1.0`.
+- **Grouping.** One branch per numbered step under `## Approach`. A task id in the step, or `(step: 1)` on the task, is the link. `(map: feat/cancel-refund)` puts that task on another branch. Tasks that name the same branch share it. No steps, or steps that name no task, means one branch per task, and the file says so.
+- **Waves.** Wave 1 does not wait for another open branch. Later waves open after those. A flowchart at the top shows what waits on what. A cycle, or an `(after:)` that names no task, is listed under Blocked.
+- **A row.** Six things: a short `feat/<slug>-<words>` branch name, one line on what it delivers, the task titles, the branches it waits for, any open question and who has the answer, and whether it is ready now (`ready`, `waiting on a question`, `waits in order`, or `blocked`). Who uses the 1.127.0 rule. No estimates and no file lists. Task ids stay out of the file.
+- **Script.** `scripts/build_map.py` writes the file, reusing the task order and the question blocks. The interpreter is [Running a kit script](docs/reference/running-scripts.md).
+
 ## 1.127.0 (2026-11-10)
 
 Fixes from a live tighten-and-plan walk and a live ready check on Windows. A minor release because the ready-check rows, the progress result, and how a kit script is started change.

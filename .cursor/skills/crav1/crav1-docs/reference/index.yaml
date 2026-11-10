@@ -135,7 +135,7 @@ skills:
     lane: cross-cutting
     starter: false
     page: reference/skills/crav1-tasks-ready-to-build.md
-    purpose: "List the tasks ready to build, for one spec or all, and why the others are blocked. Read-only."
+    purpose: "List the tasks ready to build, for one spec or all, and why the others are blocked. Rewrites each slice build map."
   crav1-explain-existing-system:
     lane: cross-cutting
     starter: false

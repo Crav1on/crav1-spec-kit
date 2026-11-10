@@ -527,6 +527,36 @@ marks:
     mention: '\(branch:'
     since: 1.64.0
 
+  - id: task-step
+    name: "(step: …)"
+    group: plan
+    files: ["docs/specs/<slug>/tasks.md (end of a task line)"]
+    format: "(step: <n>)"
+    pattern: '^\(step: \d+\)$'
+    examples:
+      - "(step: 1)"
+    meaning: "The task belongs to this numbered Approach step on the build map. When absent, a task id written in the step is the link. This mark wins when both are present."
+    written_by: [crav1-plan-from-spec]
+    read_by: [crav1-tasks-ready-to-build]
+    readiness: true
+    mention: '\(step:'
+    since: 1.128.0
+
+  - id: task-map
+    name: "(map: …)"
+    group: plan
+    files: ["docs/specs/<slug>/tasks.md (end of a task line)"]
+    format: "(map: [<repo> ]<branch>)"
+    pattern: '^\(map: (\S+ )?\S+\)$'
+    examples:
+      - "(map: feat/cancel-refund)"
+    meaning: "The task is built on this branch instead of its plan step's branch. Tasks that name the same branch share it. When absent, the task stays on the step branch."
+    written_by: [crav1-plan-from-spec]
+    read_by: [crav1-tasks-ready-to-build]
+    readiness: true
+    mention: '\(map:'
+    since: 1.128.0
+
   # ---------- docs/system/repos.md ----------
   - id: synced-at-repo
     name: "Synced at (repo line)"
