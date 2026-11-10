@@ -52,7 +52,7 @@ Writes the PR note's `## PR record` (a Point per point, Order, your Read line, R
 
 ## Does not
 
-Leaves code, specs, plans, tasks and work items alone. Never posts a reply, votes, approves, merges, or changes a thread without its own yes.
+Leaves code, specs, plans, tasks and work items alone. Never posts a reply, votes, approves, merges, or changes a thread without its own yes. Leaves a `Read: sweep` line alone (1.124.0).
 
 Limits and exceptions: Signed out, the one prompt is the signed-out question and the offers are listed as text for the next run. Headless and bot runs ask nothing and list the offers as text.
 

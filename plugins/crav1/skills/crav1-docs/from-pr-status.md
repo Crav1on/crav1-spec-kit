@@ -68,6 +68,8 @@ One pull request, one PR note, one record. `/crav1-pr-status`, `/crav1-review-pr
 - Point: general | needs Robin K. | Alex Doe | thread 106 | Merge order of feat/orders-queue
 - Point: tests/test_retry_store.py:45 | done 3c9d2e1 | Sam Lee | thread 98; host fixed | Fixture could clean live tables
 - Read: Alex Doe | 7b41a0c, push 6, newest comment 2026-10-26T15:03Z | 2026-10-27
+
+A `Read: sweep` line on the same record is the watermark from `/crav1-update-specs-from-changes-and-prs`. It is not a person. `since last` does not use it.
 - Ready: no | 1 needs Robin K.; after PR 40 (not merged) | 2026-10-27 by pr-status
 - State: active | 2026-10-27
 ```

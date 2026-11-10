@@ -69,6 +69,7 @@ Keep the picture current:
 - [Retire, merge, park, or convert a spec](from-retire-spec.md): take one spec out of the work, or un-park it
 - [What's known about one thing](from-what-do-we-know-about-this.md)
 - [Model the data](from-model-data.md)
+- [Update specs from changes and pull requests](from-update-specs-from-changes-and-prs.md)
 - [The glossary](from-glossary.md): show it, look up one word, fill the `to be researched` rows
 - [Keep the picture current](from-refresh-system-notes.md)
 - [From Azure DevOps pipelines](from-map-pipeline-environments.md)
