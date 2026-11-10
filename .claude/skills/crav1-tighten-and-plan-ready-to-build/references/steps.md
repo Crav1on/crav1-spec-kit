@@ -1,6 +1,6 @@
 # Steps 2 to 6
 
-Run these in order. Each one is the existing skill, not a copy of it. A step with nothing to do says so in one line, records `Result: nothing-to-do` with the versions it covers, and moves on.
+Run these in order. Each one is the existing skill, not a copy of it. A step with nothing to do says so in one line, records `Result: nothing-to-do` with the versions it covers, and moves on. Record that one step right then. One `record` call per step. Do not record several steps in one command. Do not pass `--when`. The script stamps Done. `record` refuses more than one step.
 
 After a step, show the progress line and get a yes before `record --yes`. The answers inside the step do not cover that line. Skip this confirm only when the step's own confirm already included this record. An extra's yes is that case.
 
@@ -48,8 +48,14 @@ Before step 5 is recorded, run `scripts/walk_progress.py unlinked --root <spec-f
 
 An empty list: say so, record the plan step, and move on.
 
-A list: offer to set them before the plan review. Options: `one batch` (Recommended), `one by one`. For each question, the choices are the unticked tasks it blocks (`Blocks: T2, T4`), **None** (`Blocks: none`, and a short reason in parentheses when they give one, such as `later phase`), or **The whole slice** (no line). One yes writes only those lines. None also replaces "do not implement until resolved" on that question's Risk line with `kept open; does not block the current tasks.` The whole slice leaves no line and still blocks every current task. Do not start the plan review until this offer is answered. Then record the plan step, so the spec version includes these lines.
+A list: offer to set them before the plan review. Options: `one batch` (Recommended), `one by one`. For each question, the choices are the unticked tasks it blocks (`Blocks: T2, T4`), **None** (`Blocks: none`, and a short reason in parentheses when they give one, such as `later phase`), or **The whole slice** (no line). One yes writes only those lines. A task list also sets that question's Risk line to `kept open; blocks T2, T4 until resolved.` None replaces "do not implement until resolved" on that question's Risk line with `kept open; does not block the current tasks.` The whole slice leaves no line, keeps "do not implement until resolved", and still blocks every current task. Do not start the plan review until this offer is answered. Then record the plan step, so the spec version includes these lines.
 
 ## 6. Review the plan, then tighten it
 
 Run `/crav1-review-plan`, then `/crav1-tighten-plan`, in that order. Review writes the `Reviewed:` line and does not edit the plan otherwise. Tighten walks plan issues and does not edit `spec.md`. When either has nothing to do, say so. Record one progress step, `review-and-tighten-plan`, only after both have finished or both had nothing to do.
+
+## Jump back
+
+A jump back reruns the skill that owns the step, even for a small patch. The walk does not edit `spec.md`, `plan.md`, or `tasks.md` on a jump back, and it does not write `Reviewed:`. `/crav1-review-plan` writes that line. `/crav1-plan-from-spec` writes the plan and the tasks. `/crav1-tighten-plan` walks plan issues. `/crav1-resolve-open-questions` settles questions. Do not record a step `done` after editing those files yourself. Do not record `nothing-to-do` for a step you did not run.
+
+When a reopened step truly has nothing new, run `clear --step <id> --yes`. Do not record `nothing-to-do` over it. A `nothing-to-do` record keeps an earlier `done` Result.

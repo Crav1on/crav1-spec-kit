@@ -18,6 +18,8 @@ File-level `plan.md` and `tasks.md`; each verify note names the checks before co
 
 1.125.0: once `tasks.md` exists, a leftover that blocks some current tasks gets `Blocks: T#` and the risk line says do not implement until resolved. A leftover that blocks no current task gets `Blocks: none`, and that risk line does not say do not implement until resolved. When current or later is unclear, one short batch asks. No `Blocks:` line still means the whole slice.
 
+1.126.0: a question with `Blocks: T2, T4` gets the risk line `kept open; blocks T2, T4 until resolved.` Only a question with no `Blocks:` line keeps do not implement until resolved. A risk matches on the question first sentence or a `(question: <first words>)` tag, not the whole line.
+
 ## Runs when
 
 Spec is accepted. Called by the user.
@@ -36,7 +38,7 @@ Reads the accepted spec, diagrams, ADRs, exports, kept security findings already
 
 In short: `plan.md`, `tasks.md`, `Blocks:` or `Blocks: none` on kept-open questions, and matching OpenSpec export files when those already exist.
 
-Writes `plan.md` and `tasks.md`, and matching OpenSpec export files when those already exist. A built piece that already matches v0 is marked already there and gets no rebuild task. A piece the user leaves gets one line in the plan and no task. Lists each kept-open question under Risks without asking whether to park it, and stale research findings under Risks. That does not block the plan. Writes `Blocks: T#` or `Blocks: none` under a kept-open question. A `Blocks: none` risk does not say do not implement until resolved.
+Writes `plan.md` and `tasks.md`, and matching OpenSpec export files when those already exist. A built piece that already matches v0 is marked already there and gets no rebuild task. A piece the user leaves gets one line in the plan and no task. Lists each kept-open question under Risks without asking whether to park it, and stale research findings under Risks. That does not block the plan. Writes `Blocks: T#` or `Blocks: none` under a kept-open question. A `Blocks: T#` risk says kept open; blocks those tasks until resolved. A `Blocks: none` risk says kept open; does not block the current tasks. Only a question with no `Blocks:` line keeps do not implement until resolved.
 
 ## Does not
 

@@ -185,7 +185,7 @@ Under each item in a spec's `## Open questions`, the kit can add four kinds of l
   - Blocks: T2, T4
 ```
 
-`Blocks:` names the tasks that wait on a kept-open question, or `Blocks: none` when the question blocks no current task. A short reason may follow in parentheses: `Blocks: none (later phase)`. `/crav1-resolve-open-questions` writes a task list after a keep-open pick of tasks, and writes `Blocks: none` when the pick is None. The whole slice leaves no line. `/crav1-plan-from-spec` writes `Blocks: T#` for a question that blocks some current tasks, and `Blocks: none` for a leftover that blocks none. Without a `Blocks:` line, a kept-open question blocks the whole slice for [`/crav1-tasks-ready-to-build`](../from-tasks-ready-to-build.md). Any `Blocks:` line wins over a plan Risk that says do not implement until resolved. Older specs with no line behave as before. See [Readiness marks](#readiness-marks).
+`Blocks:` names the tasks that wait on a kept-open question, or `Blocks: none` when the question blocks no current task. A short reason may follow in parentheses: `Blocks: none (later phase)`. `/crav1-resolve-open-questions` writes a task list after a keep-open pick of tasks, and writes `Blocks: none` when the pick is None. The whole slice leaves no line. `/crav1-plan-from-spec` writes `Blocks: T#` for a question that blocks some current tasks, and `Blocks: none` for a leftover that blocks none. The risk line for `Blocks: T2, T4` is `kept open; blocks T2, T4 until resolved.` Only a question with no `Blocks:` line keeps "do not implement until resolved" (1.126.0). Without a `Blocks:` line, a kept-open question blocks the whole slice for [`/crav1-tasks-ready-to-build`](../from-tasks-ready-to-build.md). Any `Blocks:` line wins over a plan Risk that says do not implement until resolved. A risk matches on the question's first sentence, a `(question: <first words>)` tag, or the same Blocks tasks named in the risk. A risk that matches no question still blocks the slice. Older specs with no line behave as before. See [Readiness marks](#readiness-marks).
 
 `/crav1-show-or-ask-open-questions` writes `Pending:` or `Asked:` after you say whether the draft was sent. `/crav1-add-to-spec` write `Answered:` when a kept quote clearly answers that question. `/crav1-resolve-open-questions` then walks the question with you. The full format is in [open-questions.md](../../.cursor/skills/crav1/crav1-add-to-spec/references/open-questions.md).
 
@@ -208,7 +208,7 @@ When a mark is missing, the reader falls back and labels the reason **inferred**
 
 - No `Reviewed:` line: the task can still be ready, with a warning to run `/crav1-review-plan`.
 - No `(after: …)`: the task just before it blocks it while unticked (1.103.0; before, every earlier unticked task did).
-- A kept-open question with no `Blocks:` line blocks the whole slice. `Blocks: none` blocks no task. A plan Risk that says do not implement until resolved blocks the whole slice only when it is not about a question that already has a `Blocks:` line. That line wins.
+- A kept-open question with no `Blocks:` line blocks the whole slice. `Blocks: none` blocks no task. A plan Risk that says do not implement until resolved blocks the whole slice when it matches no question, or matches a question with no `Blocks:` line. It matches on the question's first sentence, a `(question: <first words>)` tag, or the same Blocks tasks named in the risk (1.126.0). A `Blocks:` line wins.
 
 A ticked task is Done only when `verify.md` lists it as verified. Otherwise it shows as Needs verify.
 

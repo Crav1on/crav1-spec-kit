@@ -2,6 +2,17 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.126.0 (2026-11-10)
+
+The tighten-and-plan walk can call a slice ready when later tasks only wait their turn, and a kept-open question that already waits on someone else is not a jump back. A minor release because the ready check, the risk wording, and how the walk records a step change.
+
+- **Ready check.** A task that waits on an earlier real task is in order, not a blocker. Ready means the first task can start, the rest wait in order, and nothing else blocks. A cycle, or an `(after:)` that names no task, still blocks. `walk_progress.py readiness --root <spec-folder>` builds the rows from `task_order.py` and `question_blocks.py` and adds the `Reviewed:` warnings. The walk does not hand-build that JSON. `task_order.py --json` uses `T1` style ids.
+- **Risk link.** A question with `Blocks: T2, T4` gets the risk line `kept open; blocks T2, T4 until resolved.` Only a question with no `Blocks:` line keeps "do not implement until resolved". A risk matches its question on the question's first sentence, or on `(question: <first words>)`, not on the whole line. The same Blocks tasks named in the risk also match. A risk that uses the phrase and matches no question says why as "no matching question".
+- **Waiting.** When resolve-open-questions is already current, an open question is waiting, not a jump back. Who comes from the latest `Asked:` or `Pending:` line. The stop line is `Waiting: <n> tasks wait on open questions (<who>).` Next is `/crav1-show-or-ask-open-questions` when they are not asked yet, or the walk when the answers arrive. A jump back that cannot change anything is not Recommended.
+- **Jump back.** It reruns the skill that owns the file, even for a small patch. The walk does not edit `spec.md`, `plan.md`, or `tasks.md`, and it does not write `Reviewed:`. A reopened step with nothing new is `clear --step <id> --yes`. A `nothing-to-do` record does not replace an earlier `done`.
+- **Record.** Record each step when it finishes, one step per call. `record` refuses more than one step. Resume warns when two or more steps share a Done stamp. The script stamps the time.
+- **Windows.** Kit scripts that print set stdout to UTF-8, and the task order falls back to `->` when that fails.
+
 ## 1.125.0 (2026-11-10)
 
 A kept-open question can block no current task, and the tighten-and-plan walk asks the choices it was skipping. A minor release because the ready check, plan leftovers, and the walk's prompts change.

@@ -44,7 +44,7 @@ A playbook step records `Playbook:` only. It does not record spec, plan, or task
   Tasks version: c3d4e5f6a1b2
 ```
 
-The script stamps `Done` itself, as `YYYY-MM-DDTHH:MM:SS+HH:MM`. Do not pass `--when`. A date alone is rejected.
+The script stamps `Done` itself, as `YYYY-MM-DDTHH:MM:SS+HH:MM`. Do not pass `--when`. A date alone is rejected. Record one step per call, right when that step finishes. Do not record several steps in one command. `resume` returns `done_stamp_warning` when two or more steps share a Done stamp. Say that warning. Those steps were recorded together. The times are not evidence each one finished then.
 
 Recording a step updates the versions on earlier steps. Their `Done` and `Result` stay. A later step's write does not reopen them. That includes a plan step that edits the plan.
 
@@ -62,7 +62,7 @@ At the start of a run, resume before recording anything. Redo `continue_from`. D
 
 On resume, run `resume`. With no playbook on this command, add `--no-playbook` so a playbook step that was never started stays skipped. The script returns `keep`, `reopen`, or `not-started`, and `continue_from`. A recorded extra is `keep` and does not change `continue_from`. Explain each reopen with its `impact` before redoing it. Leave `keep` steps as they are. After a step or an extra is recorded, run `resume` again.
 
-`clear --step <id> --yes` refreshes one reopened step after the user says `nothing new`. `Done` and `Result` stay. Other steps stay as they are.
+`clear --step <id> --yes` refreshes one reopened step after the user says `nothing new`. `Done` and `Result` stay. Other steps stay as they are. That is the path when a reopened step has nothing new. Do not record `nothing-to-do` over it. A `nothing-to-do` record keeps an earlier `done` Result.
 
 `playbook-status` answers whether this walk already applied that file. It does not read the spec. The apply compare in step 1 does that.
 

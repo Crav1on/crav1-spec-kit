@@ -44,6 +44,19 @@ import re
 import sys
 from datetime import datetime, timezone
 
+
+def _utf8_stdout() -> None:
+    reconfigure = getattr(sys.stdout, "reconfigure", None)
+    if not callable(reconfigure):
+        return
+    try:
+        reconfigure(encoding="utf-8")
+    except (AttributeError, OSError, ValueError):
+        return
+
+
+_utf8_stdout()
+
 sys.dont_write_bytecode = True  # before any sibling import; no __pycache__ in the project (1.121.1)
 
 PROGRESS_NAME = "sweep-progress.md"

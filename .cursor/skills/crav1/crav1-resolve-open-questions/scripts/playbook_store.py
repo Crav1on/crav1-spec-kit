@@ -35,6 +35,19 @@ import re
 import sys
 from pathlib import Path
 
+
+def _utf8_stdout() -> None:
+    reconfigure = getattr(sys.stdout, "reconfigure", None)
+    if not callable(reconfigure):
+        return
+    try:
+        reconfigure(encoding="utf-8")
+    except (AttributeError, OSError, ValueError):
+        return
+
+
+_utf8_stdout()
+
 NAME_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*\.md$")
 DOCS_LINE_RE = re.compile(r"^Docs path: (docs/playbooks/[a-z0-9]+(?:-[a-z0-9]+)*\.md)$", re.M)
 APPLIED_LINE_RE = re.compile(r"^Applied as: ([0-9a-f]{12})$", re.M)

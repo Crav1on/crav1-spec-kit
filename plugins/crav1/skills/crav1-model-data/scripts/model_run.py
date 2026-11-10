@@ -22,6 +22,19 @@ import zlib
 from datetime import datetime, timezone
 from pathlib import Path
 
+
+def _utf8_stdout() -> None:
+    reconfigure = getattr(sys.stdout, "reconfigure", None)
+    if not callable(reconfigure):
+        return
+    try:
+        reconfigure(encoding="utf-8")
+    except (AttributeError, OSError, ValueError):
+        return
+
+
+_utf8_stdout()
+
 STAGES = ("business-model", "physical-design")
 EVIDENCE = (
     "requirement",

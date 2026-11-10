@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Dependency order for a slice's tasks.md (kit 1.103.0).
+"""Dependency order for a slice's tasks.md (kit 1.103.0, JSON ids 1.126.0).
 
 Reads `- [ ] T#: ...` / `- [x] T#: ...` lines. A task's dependencies are its `(after: T1, T3)` mark; a task
 with no `(after: ...)` waits on the task just before it in the file (the first task waits on nothing).
@@ -14,6 +14,19 @@ Standard library only. Prints nothing secret; reads only the file it is given.
 import json
 import re
 import sys
+
+
+def _utf8_stdout() -> None:
+    reconfigure = getattr(sys.stdout, "reconfigure", None)
+    if not callable(reconfigure):
+        return
+    try:
+        reconfigure(encoding="utf-8")
+    except (AttributeError, OSError, ValueError):
+        return
+
+
+_utf8_stdout()
 
 TASK = re.compile(r"^\s*- \[( |x|X)\] T(\d+)\b[:.]?\s*(.*)$")
 AFTER = re.compile(r"\(after:\s*([^)]*)\)")
@@ -145,16 +158,56 @@ def render(res):
     return "\n".join(out)
 
 
+def _tid(n):
+    if n is None:
+        return None
+    return f"T{n}"
+
+
+def public(res):
+    """JSON shape. Task ids are T1 style. analyse() itself still uses ints."""
+    def row(item):
+        return {**item, "id": _tid(item["id"])}
+
+    return {
+        "order": [_tid(n) for n in res["order"]],
+        "ready": [_tid(n) for n in res["ready"]],
+        "blocked": [row(item) for item in res["blocked"]],
+        "next": _tid(res["next"]),
+        "depends_on_failed": res["depends_on_failed"],
+        "rows": [row(item) for item in res["rows"]],
+    }
+
+
+def emit_text(text):
+    _utf8_stdout()
+    try:
+        sys.stdout.write(text)
+        if not text.endswith("\n"):
+            sys.stdout.write("\n")
+        sys.stdout.flush()
+    except UnicodeEncodeError:
+        safe = text.replace("\u2192", "->").replace("\u2014", "-")
+        sys.stdout.write(safe)
+        if not safe.endswith("\n"):
+            sys.stdout.write("\n")
+        sys.stdout.flush()
+
+
 def main(argv):
+    _utf8_stdout()
     if not argv or argv[0] in ("-h", "--help"):
-        print(__doc__)
+        emit_text(__doc__ or "")
         return 0
     failed = []
     if "--failed" in argv:
         failed = [int(x) for x in re.findall(r"\d+", argv[argv.index("--failed") + 1])]
     with open(argv[0], encoding="utf-8") as fh:
         res = analyse(parse(fh.read()), failed)
-    print(json.dumps(res, ensure_ascii=False, indent=1) if "--json" in argv else render(res))
+    if "--json" in argv:
+        emit_text(json.dumps(public(res), ensure_ascii=False, indent=1))
+    else:
+        emit_text(render(res))
     return 0
 
 

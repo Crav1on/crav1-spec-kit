@@ -22,6 +22,8 @@ Shows summary counts per slice, then Ready, Blocked (one reason each, recorded o
 
 1.125.0: `Blocks: none` blocks no task. A `Blocks:` line wins over a Risk that says do not implement until resolved. No line still blocks the whole slice. Older specs with no line behave as before.
 
+1.126.0: a Risk that says do not implement until resolved matches a question on the question first sentence, a `(question: <first words>)` tag, or the same Blocks tasks named in the Risk. A Risk that matches no question still blocks the slice. `scripts/task_order.py --json` uses T1 style ids.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
