@@ -47,6 +47,19 @@ Rules that already pick a first step keep that choice, and use this shape.
 - A `Conflict:` line was written: `Next` is `/crav1-resolve-open-questions` for that slug, because the conflict is unsettled.
 - New information changed an existing slice, and no `Conflict:` line was written: `Next` is `/crav1-tighten-spec` for that slug, because the new information is not tightened yet. Resolve and the plan are not listed here.
 - Spark, ideas, and bundle keep one `Left:` line with one `Next:` on that same last line. `Next` is `/crav1-tighten-spec` while gaps or open questions remain, and `/crav1-plan-from-spec` when nothing is left to tighten.
+- The committed or changed files include a `walk-progress.md`, and `resume` for that folder reports a `continue_from` (1.123.0). `Next` is `/crav1-tighten-and-plan-ready-to-build`, with the playbook path when the progress file has one, because the walk paused before that step. This comes before a pull request.
+
+```text
+Next: /crav1-tighten-and-plan-ready-to-build docs/playbooks/orders-retry.md, because the walk paused before plan-from-spec.
+```
+
+- That does not apply, and HEAD is a base branch (`main`, `master`, `develop`, the `Merges into` branch, or `release/*`). Do not name `/crav1-open-pr`. That command cannot open a pull request from the base into itself. `Next` is the push, using the branch name HEAD is on.
+
+```text
+Next: push main, because a pull request cannot open from main into itself.
+```
+
+On a feature branch, with no unfinished walk, `Next` stays `/crav1-open-pr` when the skill that just committed already names it.
 
 ```text
 Left: 2 gaps to tighten, 3 open questions. Next: /crav1-tighten-spec orders-retry, because those gaps are still in the spec.

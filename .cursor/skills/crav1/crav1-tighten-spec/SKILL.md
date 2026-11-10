@@ -91,7 +91,11 @@ Read `references/catalog.md` ("When they pick `suggest`") only when the user pic
 3. If acceptance is still mushy on *this* issue and they did not choose `make-testable`, say so — do not silently rewrite.
 4. Advance to the next unanswered issue (same format). If none remain, run the tight-enough checklist.
 
-**Batch (1.70.0).** Show every issue at once, each with its options and the recommended one first, and ask once: a single `yes` applies every recommendation; a batch such as `I1 B, I3 keep` overrides those issues; answering one issue at a time still works. Then patch, and give one recap for the run.
+**Batch (1.70.0).** When there are 8 or fewer issues, show every issue at once, each with its options and the recommended one first, and ask once: a single `yes` applies every recommendation; a batch such as `I1 B, I3 keep` overrides those issues; answering one issue at a time still works. Then patch, and give one recap for the run.
+
+**Open questions (1.123.0).** An issue whose only work is an `Answered:` line, or that only repeats a question already under `## Open questions`, is not walked. One line, no menu: `Left for /crav1-resolve-open-questions: I3, I10.`
+
+**Large batch (1.123.0).** More than 8 issues: read [references/pacing.md](references/pacing.md). Do not print the full list first.
 
 ## Resolution catalog (per issue, not per turn)
 

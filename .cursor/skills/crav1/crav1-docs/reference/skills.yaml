@@ -527,6 +527,7 @@ skills:
     issue after the user chooses. When the slice is partial or `## In the code` names paths, reads the
     committed code on the repo and branch the spec names before wording issues. A spec with no code behind
     it skips that read. Does not offer finish, add a test, or leave.
+  - '1.123.0: more than 8 issues starts with one line of counts (issues to fix, open questions, small wording) and does not print the full list. Each time, one issue or a small group; one by one is always offered. An issue whose only work is an Answered line, or that repeats an open question, is one line passed to `/crav1-resolve-open-questions`, with no menu.'
   - '1.64.0: reads every listed work branch without checkout; a yes on writing the branch adds to the `Branch:` list; a listed branch that is gone and not merged is offered `(dropped)` (`mark-dropped`); a deleted branch whose work is in the base shows `merged, branch deleted`.'
   - '1.68.0: reads and writes the `(spec branch)` and `(into …)` markers on the Match `Branch:` list after a yes.'
   - '1.86.0: a yes on writing the branch adds one Match `Branch:` line in sorted place (repo, then branch); never `; `-joined.'
@@ -1217,14 +1218,13 @@ skills:
     and saves the answer in a `trailer-hook` rule. `Signed-off-by` and human `Co-authored-by` lines stay. A teammate whose
     repo has the hook but not the config gets the config line on their first run, with no question.
     `keep trailers` saves no and never asks again.'
-  - 'Fetch, pull and check (1.81.0): after the commit it fetches. When the branch is behind its upstream
-    it pulls with a merge (`git pull --no-rebase`, never a rebase) and resolves conflicts in specs, system
+  - 'Fetch, pull and check (1.81.0, 1.123.0): after the commit it fetches. When the branch is behind its upstream
+    it merges with `git pull --no-rebase --no-commit` (never a rebase, never an automatic merge commit) and resolves conflicts in specs, system
     files and notes by the kit''s rules: both sides'' added lines kept, ours first; the newest `Synced at`
-    entry per branch; note indexes rebuilt with `notes_index.py`. Before the merge commit it checks that
-    no line either side added is missing. One question only when the two sides say different things about
+    entry per branch; note indexes rebuilt with `notes_index.py` and folded into the one merge commit, noted in that message. This run makes at most two commits. `scripts/nothing_lost.py` is the check; say nothing was lost only when it reports that. One question only when the two sides say different things about
     the same fact: keep both (a `**Conflict:**` line), mine, theirs, or stop. Code file conflicts stay with
     you. When not behind, it checks any unpushed merge, including one made by hand, and offers to restore
-    dropped lines; restored lines go into this run''s commit (1.91.0). `pull` does this with no commit first. It never pushes; it ends with `Ready to push.`'
+    dropped lines; restored lines go into this run''s commit (1.91.0). `pull` does this with no commit first. It never pushes. Next follows run-ending.md: an unfinished walk resumes the walk; a base branch says to push; a feature branch names `/crav1-open-pr`.'
   use_when: You want the commit message, or the commit itself
   table:
     reads: 'Only write the message: The diff, recent git log, and `work-item.md`; Commit: The same commit
@@ -1867,13 +1867,13 @@ skills:
   since: 1.119.0
   stage: stable
   prompt_budget: 4
-  prompt_note: 'The walk''s own prompts are the playbook skip or reapply question when a playbook is given, one batch of optional offers when the spec needs them, one jump-back question when the ready check is not clear, and the yes before the progress file is written when that yes is not already the step''s confirm. Questions inside a step belong to that step''s skill and its own budget. A value the user left out is outside the budget. A headless run stops before any of these.'
+  prompt_note: 'The walk''s own prompts are the playbook skip or reapply question when a playbook is given, one batch of optional offers when the spec needs them, one jump-back question when the ready check is not clear (jump back, or clear a reopened step with nothing new), and the yes before the progress file is written when that yes is not already the step''s confirm. Questions inside a step belong to that step''s skill and its own budget. A value the user left out is outside the budget. A headless run stops before any of these.'
   walkthrough: docs/from-tighten-and-plan.md
   purpose: Walk a draft spec through architecture, tighten, questions, and the plan until the ready check is clear.
   in_depth:
   - '`/crav1-tighten-and-plan-ready-to-build` (1.119.0) is one guided walk with two starts. A playbook path is optional. Without one, step 1 is skipped. Both starts then use the same steps and the same ready check. The walk runs the existing skills. It does not replace them. There is no automatic mode.'
   - 'Locked order: playbook when given; `/crav1-review-architecture` always; `/crav1-tighten-spec` one issue at a time; `/crav1-resolve-open-questions`; `/crav1-plan-from-spec`, which writes `plan.md` and `tasks.md`; `/crav1-review-plan` then `/crav1-tighten-plan`; `/crav1-tasks-ready-to-build`. A step with nothing to do says so and moves on. Research, `/crav1-review-security`, `/crav1-model-data`, `/crav1-show-or-ask-open-questions`, and `/crav1-suggest-tests-for-code` are offered only when the spec needs them.'
-  - 'The progress file is `docs/specs/<slug>/walk-progress.md`. It records the step, when, and the version of each file that step covered. On resume, only a step whose covered file changed is reopened. Spec, plan, and tasks stay the source of truth. The playbook is intake only. After apply, the playbook line is the `docs/playbooks/<topic>.md` path, not the outside path, so resume works on any machine. The walk accepts a `docs/playbooks/` path as its playbook argument. A Blocked or Needs verify row is named back to its step. Needs verify is outside the walk. The walk never reports ready with a blocker or an open assumption, and it never starts build.'
+  - 'The progress file is `docs/specs/<slug>/walk-progress.md`. It records the step, when, and the version of each file that step covered. Since 1.123.0 the script stamps Done. A later step inside the walk, and an optional extra after cover, leaves earlier steps done. A hand edit or `/crav1-add-to-spec` between sessions reopens only the steps that change affects. A reopened step blocks the ready check until it is rerun or cleared with nothing new. Spec, plan, and tasks stay the source of truth. The playbook is intake only. After apply, the playbook line is the `docs/playbooks/<topic>.md` path, not the outside path, so resume works on any machine. The walk accepts a `docs/playbooks/` path as its playbook argument. A Blocked or Needs verify row is named back to its step. Needs verify is outside the walk. The walk never reports ready with a blocker, a reopened step, or an open assumption, and it never starts build. Stopping partway is one paused-at line, then Next, Waiting only if blocked, and Uncommitted.'
   use_when: A spec should be tightened and planned until it is ready to build
   table:
     reads: The spec folder, an optional playbook (outside the project or under `docs/playbooks/`), and the progress file when one exists

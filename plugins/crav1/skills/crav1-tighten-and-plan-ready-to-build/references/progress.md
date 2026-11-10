@@ -35,6 +35,32 @@ Slice: docs/specs/orders-retry/
 
 A playbook step records `Playbook:` only. It does not record spec, plan, or tasks versions. Other result words are `skipped` and `reapplied`. The ready check is the only step that records `Verify version:`.
 
-On resume, run `resume`. With no playbook on this command, add `--no-playbook` so a playbook step that was never started stays skipped. The script returns `keep`, `reopen`, or `not-started`, and `continue_from`. Explain each reopen with its `impact` before redoing it. Leave `keep` steps as they are. After a step writes, run `resume` again.
+The script stamps `Done` itself, as `YYYY-MM-DDTHH:MM:SS+HH:MM`. Do not pass `--when`. A date alone is rejected.
+
+Recording a step updates the versions on earlier steps. Their `Done` and `Result` stay. A later step's write does not reopen them. That includes a plan step that edits the plan. After an optional extra inside the walk writes, for example `/crav1-review-security`, run `cover --yes` before `resume`. Cover marks the current spec, plan, tasks, and verify as already covered. It does not touch the playbook line.
+
+A change from outside the walk is one nobody recorded or covered. A hand edit, or `/crav1-add-to-spec` between sessions, is outside. Resume then reopens only the steps that change affects.
+
+- A spec change reopens tighten-spec, resolve-open-questions, and the plan steps. It does not reopen the architecture review once a later spec step is recorded. When that review is the only spec step so far, a spec change reopens it.
+- A plan or tasks change reopens the plan review and the ready check. It does not reopen plan-from-spec. A spec change does, because the plan was written from the spec.
+- A `verify.md` change reopens only the ready check. A playbook file change reopens only the playbook step.
+
+At the start of a run, resume before recording anything. Redo `continue_from`. Do not record a later step to clear an earlier reopen.
+
+On resume, run `resume`. With no playbook on this command, add `--no-playbook` so a playbook step that was never started stays skipped. The script returns `keep`, `reopen`, or `not-started`, and `continue_from`. Explain each reopen with its `impact` before redoing it. Leave `keep` steps as they are. After a step is recorded, or after `cover`, run `resume` again.
+
+`clear --step <id> --yes` refreshes one reopened step after the user says `nothing new`. `Done` and `Result` stay. Other steps stay as they are.
 
 `playbook-status` answers whether this walk already applied that file. It does not read the spec. The apply compare in step 1 does that.
+
+## Stop
+
+When the user stops partway, including after a record, end with one paused-at line and the shared ending. No other next-step prose.
+
+```text
+Paused at resolve-open-questions.
+Next: /crav1-tighten-and-plan-ready-to-build docs/playbooks/orders-retry.md, because the walk paused before plan-from-spec.
+Uncommitted: 2 files; commit with /crav1-finalize-commit when ready.
+```
+
+`Paused at` is the step just recorded, or the step they stopped in. `Next` names this command and `continue_from` from `resume`. Include the playbook path when `resume` returns one. Add `Waiting:` only when that next step is blocked. Leave `Uncommitted:` out when nothing is uncommitted.

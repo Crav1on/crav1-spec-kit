@@ -1,20 +1,27 @@
 #!/usr/bin/env python3
-"""Progress file for /crav1-tighten-and-plan-ready-to-build (kit 1.119.0).
+"""Progress file for /crav1-tighten-and-plan-ready-to-build (kit 1.123.0).
 
 The spec, plan, and tasks stay the source of truth. This script only tracks
 where the guided walk is, which version of each file a step covered, and which
 ready-check rows belong to which step. It does not edit those files, does not
 apply a playbook, and does not start a build.
 
+A later step inside the walk, and an optional extra covered with `cover`,
+leave earlier steps done. A change that nobody recorded or covered reopens
+only the steps that change affects.
+
 Usage (JSON on stdout):
   walk_progress.py version --root <spec-folder>
   walk_progress.py record --root <spec-folder> --slice docs/specs/<slug> --step <id>
-      --result <result> --when <ISO-8601> --yes [--playbook <file>]
+      --result <result> --yes [--when <full timestamp>] [--playbook <file>]
+  walk_progress.py cover --root <spec-folder> --yes
+  walk_progress.py clear --root <spec-folder> --step <id> --yes
   walk_progress.py resume --root <spec-folder>
   walk_progress.py playbook-status --root <spec-folder> --playbook <file>
-  walk_progress.py readiness --json <file>
+  walk_progress.py readiness --json <file> [--root <spec-folder>]
 
-record without --yes writes nothing and exits 2.
+record, cover, and clear without --yes write nothing and exit 2.
+The script stamps Done itself. --when, when passed, must be a full timestamp.
 Standard library only.
 """
 
@@ -23,7 +30,9 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import sys
+from datetime import datetime
 
 sys.dont_write_bytecode = True  # before any sibling import; no __pycache__ in the project (1.121.1)
 
@@ -74,6 +83,31 @@ IMPACT = {
     "verify": "verify.md changed since the ready check, so the check no longer covers it.",
     "playbook": "The playbook file changed since this step. The playbook is intake only.",
 }
+
+# Which file change reopens a step (1.123.0). Narrower than COVERS.
+# review-architecture is handled in affects_of: once a later step covers the
+# spec, a spec change does not send the walk back to the architecture review.
+# plan-from-spec writes the plan from the spec, so a hand edit of the plan
+# reopens the plan review, not the step that wrote the plan.
+AFFECTS = {
+    "playbook": ("playbook",),
+    "review-architecture": ("spec",),
+    "tighten-spec": ("spec",),
+    "resolve-open-questions": ("spec",),
+    "plan-from-spec": ("spec",),
+    "review-and-tighten-plan": ("spec", "plan", "tasks"),
+    "tasks-ready-to-build": ("spec", "plan", "tasks", "verify"),
+}
+STEP_COMMAND = {
+    "playbook": "/crav1-tighten-and-plan-ready-to-build",
+    "review-architecture": "/crav1-review-architecture",
+    "tighten-spec": "/crav1-tighten-spec",
+    "resolve-open-questions": "/crav1-resolve-open-questions",
+    "plan-from-spec": "/crav1-plan-from-spec",
+    "review-and-tighten-plan": "/crav1-review-plan",
+    "tasks-ready-to-build": "/crav1-tasks-ready-to-build",
+}
+DONE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}$")
 
 # Ready-check rows. The command is the skill that owns the fix. can_jump_back
 # is false when that skill is outside this walk.
@@ -221,6 +255,19 @@ def current_tokens(root: Path, step: str, playbook: Path | None) -> dict:
     return out
 
 
+def done_stamp(when: str | None) -> str:
+    """The script writes Done. A passed --when must already be a full timestamp."""
+    if when is None or when == "":
+        return datetime.now().astimezone().isoformat(timespec="seconds")
+    if not DONE_RE.fullmatch(when):
+        fail(
+            "when",
+            "Done is a full timestamp YYYY-MM-DDTHH:MM:SS+HH:MM, "
+            "for example 2026-11-09T10:19:09+01:00. Omit --when and the script stamps it.",
+        )
+    return when
+
+
 def record(args: argparse.Namespace) -> None:
     if args.step not in COVERS:
         fail("step", f"unknown step {args.step}")
@@ -232,18 +279,22 @@ def record(args: argparse.Namespace) -> None:
     if not root.is_dir():
         fail("root", f"not a folder: {root}")
     data = load(root)
-    body = {"when": args.when, "result": args.result}
+    body = {"when": done_stamp(args.when), "result": args.result}
     body.update(current_tokens(root, args.step, Path(args.playbook) if args.playbook else None))
+    # A later step's own write updates earlier steps' versions. Their Done
+    # and Result stay. Resume then leaves them keep (1.123.0).
+    restamp_earlier(root, data["steps"], args.step)
     data["steps"][args.step] = body
     label = args.slice or data["slice"] or f"docs/specs/{root.name}/"
     if not str(label).endswith("/"):
         label = f"{label}/"
     text = render(label, data["steps"])
     progress_path(root).write_text(text, encoding="utf-8")
-    emit({"ok": True, "wrote": PROGRESS_NAME, "step": args.step, "result": args.result})
+    emit({"ok": True, "wrote": PROGRESS_NAME, "step": args.step, "result": args.result, "when": body["when"]})
 
 
-def changed_tokens(root: Path, step: str, body: dict) -> list[str]:
+def hash_drift(root: Path, step: str, body: dict) -> list[str]:
+    """Covered files whose bytes differ from the version this step recorded."""
     changed = []
     if step == "playbook":
         path = Path(body["playbook"])
@@ -260,6 +311,61 @@ def changed_tokens(root: Path, step: str, body: dict) -> list[str]:
         if now[token] != body[token]:
             changed.append(token)
     return changed
+
+
+def affects_of(step: str, steps: dict) -> tuple[str, ...]:
+    """Files that reopen this step. Later spec steps supersede the architecture review."""
+    if step == "review-architecture":
+        own = ORDER.index(step)
+        for later in ORDER[own + 1:]:
+            if later in steps and "spec" in AFFECTS[later]:
+                return ()
+    return AFFECTS[step]
+
+
+def affected_drift(root: Path, step: str, body: dict, steps: dict) -> list[str]:
+    """Drift that reopens the step. A file it merely recorded does not."""
+    affects = set(affects_of(step, steps))
+    return [token for token in hash_drift(root, step, body) if token in affects]
+
+
+def restamp_earlier(root: Path, steps: dict, step: str) -> None:
+    """Bring earlier steps' covered versions up to the current files.
+
+    Done and Result stay. Tokens this step does not cover stay, and the
+    playbook line stays. The playbook is intake only.
+    """
+    now = versions(root)
+    covered = set(COVERS[step])
+    for earlier in ORDER[:ORDER.index(step)]:
+        body = steps.get(earlier)
+        if not body:
+            continue
+        for token in COVERS[earlier]:
+            if token == "playbook" or token not in covered:
+                continue
+            body[token] = now[token]
+
+
+def refresh_versions(root: Path, step: str, body: dict) -> None:
+    """Set one step's recorded versions to the files on disk. Done stays."""
+    if step == "playbook":
+        path = Path(body["playbook"])
+        if not path.is_file():
+            alt = find_playbook(root, body["playbook"])
+            path = alt if alt is not None else path
+        body["playbook_version"] = version_of(path)
+        return
+    now = versions(root)
+    for token in COVERS[step]:
+        body[token] = now[token]
+
+
+def write_progress(root: Path, data: dict, slice_label: str | None = None) -> None:
+    label = slice_label or data["slice"] or f"docs/specs/{root.name}/"
+    if not str(label).endswith("/"):
+        label = f"{label}/"
+    progress_path(root).write_text(render(label, data["steps"]), encoding="utf-8")
 
 
 def find_playbook(root: Path, recorded: str) -> Path | None:
@@ -299,7 +405,7 @@ def resume(args: argparse.Namespace) -> None:
             status = "not-started"
             row = {"id": step, "status": status}
         else:
-            drift = changed_tokens(root, step, body)
+            drift = affected_drift(root, step, body, data["steps"])
             if drift:
                 status = "reopen"
                 row = {
@@ -315,12 +421,14 @@ def resume(args: argparse.Namespace) -> None:
         if continue_from is None and status in ("not-started", "reopen"):
             continue_from = step
         rows.append(row)
+    book = data["steps"].get("playbook")
     emit({
         "ok": True,
         "source_of_truth": "spec.md, plan.md, and tasks.md",
         "progress_file": PROGRESS_NAME,
         "steps": rows,
         "continue_from": continue_from,
+        "playbook": book.get("playbook") if book else None,
     })
 
 
@@ -461,6 +569,93 @@ def _hit(task, kind: str, command_key: str | None, why: str) -> dict:
     }
 
 
+def cover(args: argparse.Namespace) -> None:
+    """Mark the current spec, plan, tasks, and verify as covered by steps already recorded.
+
+    Used after an optional extra inside the walk writes. The playbook line stays.
+    """
+    if not args.yes:
+        fail("needs-yes", "cover writes the progress file only with --yes", status=2)
+    root = Path(args.root)
+    if not root.is_dir():
+        fail("root", f"not a folder: {root}")
+    data = load(root)
+    if not data["steps"]:
+        fail("progress-file", "no walk progress to cover")
+    now = versions(root)
+    covered = []
+    for step, body in data["steps"].items():
+        if step == "playbook":
+            continue
+        for token in COVERS[step]:
+            body[token] = now[token]
+        covered.append(step)
+    write_progress(root, data)
+    emit({"ok": True, "wrote": PROGRESS_NAME, "covered": covered})
+
+
+def clear(args: argparse.Namespace) -> None:
+    """Refresh one reopened step after a one-line 'nothing new' confirmation.
+
+    Done and Result stay. Other steps stay as they are.
+    """
+    if args.step not in COVERS:
+        fail("step", f"unknown step {args.step}")
+    if not args.yes:
+        fail("needs-yes", "clear writes the progress file only with --yes", status=2)
+    root = Path(args.root)
+    if not root.is_dir():
+        fail("root", f"not a folder: {root}")
+    data = load(root)
+    body = data["steps"].get(args.step)
+    if body is None:
+        fail("step", f"{args.step} is not recorded")
+    drift = affected_drift(root, args.step, body, data["steps"])
+    if not drift:
+        fail("not-reopened", f"{args.step} is not reopened")
+    refresh_versions(root, args.step, body)
+    write_progress(root, data)
+    emit({
+        "ok": True,
+        "wrote": PROGRESS_NAME,
+        "cleared": args.step,
+        "confirmation": "nothing new",
+        "changed": drift,
+    })
+
+
+def reopen_hit(step: str, drift: list[str]) -> dict:
+    why = " ".join(IMPACT[token] for token in drift)
+    why += " Jump back and rerun this step, or clear it with nothing new."
+    return {
+        "task": None,
+        "bucket": "reopened",
+        "step": step,
+        "command": STEP_COMMAND[step],
+        "can_jump_back": True,
+        "outside_walk": False,
+        "kind": "blocker",
+        "clear": "nothing new",
+        "changed": drift,
+        "why": why,
+    }
+
+
+def reopened_hits(root: Path) -> list[dict]:
+    if not root.is_dir():
+        fail("root", f"not a folder: {root}")
+    data = load(root)
+    hits = []
+    for step in ORDER:
+        body = data["steps"].get(step)
+        if not body:
+            continue
+        drift = affected_drift(root, step, body, data["steps"])
+        if drift:
+            hits.append(reopen_hit(step, drift))
+    return hits
+
+
 def readiness(args: argparse.Namespace) -> None:
     try:
         payload = json.loads(Path(args.json).read_text(encoding="utf-8"))
@@ -476,6 +671,8 @@ def readiness(args: argparse.Namespace) -> None:
         hit = classify(row)
         if hit:
             hits.append(hit)
+    reopened = reopened_hits(Path(args.root)) if args.root else []
+    hits.extend(reopened)
     blockers = [h for h in hits if h["kind"] == "blocker" and not h["outside_walk"]]
     outside = [h for h in hits if h["outside_walk"]]
     assumptions = [h for h in hits if h["kind"] == "assumption"]
@@ -490,6 +687,7 @@ def readiness(args: argparse.Namespace) -> None:
         "assumptions": assumptions,
         "unmapped": unmapped,
         "jump_back": [h for h in hits if h["can_jump_back"]],
+        "reopened": reopened,
     })
 
 
@@ -512,10 +710,21 @@ def main(argv: list[str] | None = None) -> None:
     r.add_argument("--slice")
     r.add_argument("--step", required=True)
     r.add_argument("--result", required=True)
-    r.add_argument("--when", required=True)
+    r.add_argument("--when", help="Full timestamp. Omit to let the script stamp Done.")
     r.add_argument("--playbook")
     r.add_argument("--yes", action="store_true")
     r.set_defaults(func=record)
+
+    c = sub.add_parser("cover")
+    c.add_argument("--root", required=True)
+    c.add_argument("--yes", action="store_true")
+    c.set_defaults(func=cover)
+
+    k = sub.add_parser("clear")
+    k.add_argument("--root", required=True)
+    k.add_argument("--step", required=True)
+    k.add_argument("--yes", action="store_true")
+    k.set_defaults(func=clear)
 
     s = sub.add_parser("resume")
     s.add_argument("--root", required=True)
@@ -529,6 +738,7 @@ def main(argv: list[str] | None = None) -> None:
 
     d = sub.add_parser("readiness")
     d.add_argument("--json", required=True)
+    d.add_argument("--root", help="Spec folder. Reopened walk steps block ready.")
     d.set_defaults(func=readiness)
 
     args = parser.parse_args(argv)
