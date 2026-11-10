@@ -58,6 +58,8 @@ STEP_LINE = re.compile(r"^(\d+)[.)]\s*(.*)$")
 TASK_ID = re.compile(r"\bT(\d+)\b")
 STEP_MARK = re.compile(r"\(step:\s*(\d+)\)")
 MAP_MARK = re.compile(r"\(map:\s*([^)]*)\)")
+SPEC_MARK = re.compile(r"\(spec:\s*([^)]*)\)", re.I)
+TICK_PATH = re.compile(r"`([^`\n]+)`")
 WORD = re.compile(r"(?<![\w-])build-map(?![\w-])")
 PIPELINE = re.compile(r"(?<![\w-])pipeline runs(?![\w-])")
 STOP = {
@@ -162,6 +164,26 @@ def parse_steps(plan_text):
     return steps
 
 
+def task_areas(rest):
+    """Shared work a branch can collide on. A note only; it does not change readiness.
+
+    A requirement is the text of `(spec: …)`, case folded. A path is a backtick
+    span that contains `/` or a file extension, compared exactly as written.
+    """
+    areas = set()
+    for match in SPEC_MARK.finditer(rest or ""):
+        token = clean_prose(match.group(1)).lower()
+        if token:
+            areas.add(("requirement", token))
+    for match in TICK_PATH.finditer(rest or ""):
+        path = match.group(1).strip()
+        if " " in path:
+            continue
+        if "/" in path or re.search(r"\.[A-Za-z0-9]+$", path):
+            areas.add(("path", path))
+    return areas
+
+
 def parse_tasks(text):
     parsed = task_order.parse(text or "")
     extras = []
@@ -173,7 +195,11 @@ def parse_tasks(text):
         step = STEP_MARK.search(rest)
         mapped = MAP_MARK.search(rest)
         name = mapped.group(1).strip() if mapped else ""
-        extras.append({"step": int(step.group(1)) if step else None, "map": name or None})
+        extras.append({
+            "step": int(step.group(1)) if step else None,
+            "map": name or None,
+            "areas": task_areas(rest),
+        })
     for task, extra in zip(parsed, extras):
         task.update(extra)
     return parsed
@@ -320,12 +346,16 @@ def build(slug, spec_text, plan_text, tasks_text):
         else:
             name = _suggest(slug, members[0]["title"], used_names)
             deliver = clean_prose(members[0]["title"]) or "work"
+        areas = set()
+        for task in members:
+            areas.update(task.get("areas") or ())
         branches.append({
             "key": key,
             "name": name,
             "deliver": deliver or "work",
             "tasks": members,
             "task_ids": [task["id"] for task in members],
+            "areas": areas,
         })
 
     id_branch = {}
@@ -441,6 +471,38 @@ def _waits_line(branch, by_name):
     return "; ".join(parts) if parts else "none"
 
 
+def parallel_phrase(members):
+    """How many branches in a wave can run together. A question hold is not a start."""
+    count = len(members)
+    held = sum(1 for branch in members if branch["status"] == "waiting on a question")
+    if held == 0 and count == 1:
+        return "1 branch"
+    if held == 0:
+        return f"{count} branches, can run in parallel"
+    noun = "branch" if count == 1 else "branches"
+    return f"{count} {noun}, {count - held} can start now"
+
+
+def overlap_lines(members):
+    """Pairs in one wave that share a requirement or a path. A note only."""
+    ordered = sorted(members, key=lambda branch: (branch["tasks"][0]["id"], branch["name"]))
+    lines = []
+    for index, left in enumerate(ordered):
+        for right in ordered[index + 1:]:
+            shared = sorted(set(left.get("areas") or ()) & set(right.get("areas") or ()))
+            if not shared:
+                continue
+            requirements = [token for kind, token in shared if kind == "requirement"]
+            paths = [token for kind, token in shared if kind == "path"]
+            bits = []
+            if requirements:
+                bits.append("both cover " + " and ".join(requirements))
+            if paths:
+                bits.append("both name " + " and ".join(f"`{path}`" for path in paths))
+            lines.append(f"Overlap: {left['name']} and {right['name']} " + "; ".join(bits) + ".")
+    return lines
+
+
 def _render(slug, grouping, branches, by_name, risks, has_plan, risk_blocks):
     lines = ["# Build map", "", grouping, ""]
     diagram = _mermaid(branches, by_name)
@@ -473,9 +535,13 @@ def _render(slug, grouping, branches, by_name, risks, has_plan, risk_blocks):
         else:
             waves.setdefault(branch["wave"], []).append(branch)
     for number in sorted(waves):
-        lines.append(f"## Wave {number}")
+        members = sorted(waves[number], key=lambda item: item["tasks"][0]["id"])
+        lines.append(f"## Wave {number}: {parallel_phrase(members)}")
         lines.append("")
-        for branch in sorted(waves[number], key=lambda item: item["tasks"][0]["id"]):
+        for note in overlap_lines(members):
+            lines.append(note)
+            lines.append("")
+        for branch in members:
             lines.extend(_branch_block(branch, by_name))
     if blocked:
         lines.append("## Blocked")
@@ -506,24 +572,38 @@ def _mermaid_label(name):
 
 def _mermaid(branches, by_name):
     if not branches:
-        return "flowchart TD\n  none[\"Nothing left to build\"]"
-    ordered = sorted(
-        branches,
-        key=lambda branch: (
-            branch["section"] == "blocked",
-            branch["wave"] or 99,
-            branch["tasks"][0]["id"],
-        ),
-    )
-    ids = {branch["name"]: f"b{i}" for i, branch in enumerate(ordered, start=1)}
-    lines = ["flowchart TD"]
-    for branch in ordered:
-        lines.append(f'  {ids[branch["name"]]}["{_mermaid_label(branch["name"])}"]')
+        return "flowchart LR\n  none[\"Nothing left to build\"]"
+    waves = {}
+    blocked = []
+    for branch in branches:
+        if branch["section"] == "blocked":
+            blocked.append(branch)
+        else:
+            waves.setdefault(branch["wave"], []).append(branch)
+    lines = ["flowchart LR"]
+    ids = {}
+    number = 1
+
+    def add_group(group_id, title, members):
+        nonlocal number
+        lines.append(f'  subgraph {group_id}["{_mermaid_label(title)}"]')
+        lines.append("    direction TB")
+        for branch in sorted(members, key=lambda item: item["tasks"][0]["id"]):
+            node = f"b{number}"
+            number += 1
+            ids[branch["name"]] = node
+            lines.append(f'    {node}["{_mermaid_label(branch["name"])}"]')
+        lines.append("  end")
+
+    for wave_number in sorted(waves):
+        add_group(f"w{wave_number}", f"Wave {wave_number}", waves[wave_number])
+    if blocked:
+        add_group("blocked", "Blocked", blocked)
     seen = set()
-    for branch in ordered:
+    for branch in branches:
         for dep in branch["waits"]:
-            edge = (ids[dep], ids[branch["name"]])
-            if edge in seen or dep not in ids:
+            edge = (ids.get(dep), ids.get(branch["name"]))
+            if edge in seen or None in edge:
                 continue
             seen.add(edge)
             lines.append(f"  {edge[0]} --> {edge[1]}")
@@ -549,13 +629,15 @@ def _summary(slug, pointer, branches):
         if branch["section"] == "blocked":
             blocked.append((branch["tasks"][0]["id"], label))
         else:
-            waves.setdefault(branch["wave"], []).append((branch["tasks"][0]["id"], label))
+            waves.setdefault(branch["wave"], []).append((branch["tasks"][0]["id"], branch, label))
     numbers = sorted(waves)
     if blocked and 1 not in waves:
         lines.append("Wave 1: none")
     for number in numbers:
-        labels = [label for _, label in sorted(waves[number])]
-        lines.append(f"Wave {number}: {_short_list(labels)}")
+        ordered = sorted(waves[number], key=lambda item: item[0])
+        members = [branch for _, branch, _ in ordered]
+        labels = [label for _, _, label in ordered]
+        lines.append(f"Wave {number}: {parallel_phrase(members)} — {_short_list(labels)}")
     if blocked:
         labels = [label for _, label in sorted(blocked)]
         lines.append("Blocked: " + _short_list(labels))

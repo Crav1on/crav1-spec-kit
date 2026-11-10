@@ -25,7 +25,11 @@ Six things, and nothing else. No estimates. No file lists. No task ids anywhere 
 5. **Question.** Each open question holding the branch, then who has the answer. Who comes from the question's own "Waiting for <who>" phrase, then the latest `Pending:` or `Asked:` line, otherwise `not named yet`.
 6. **Ready now.** One of `ready`, `waiting on a question`, `waits in order`, `blocked`. A wait inside the same branch does not change this. `blocked` is a cycle, a dependency that names no task, a plan risk, or a missing plan.
 
-Wave 1 is the branches that do not wait for another open branch. Wave 2 is what opens after those, and so on. A branch held only by a question can still sit in wave 1; Ready now says it is waiting. Blocked branches are listed under `## Blocked`, not in a wave. The flowchart at the top is `flowchart TD`. An arrow means the later branch waits for the earlier one.
+Wave 1 is the branches that do not wait for another open branch. Wave 2 is what opens after those, and so on. A branch held only by a question can still sit in wave 1; Ready now says it is waiting. The wave heading counts them: `Wave 1: 3 branches, can run in parallel`, `Wave 1: 1 branch`, or `Wave 1: 3 branches, 2 can start now` when a question holds some. That count is also the first part of each wave line in the `build-map` summary. Blocked branches are listed under `## Blocked`, not in a wave.
+
+The flowchart is `flowchart LR`. Each wave is one subgraph, with `direction TB` inside, so the branches in a wave sit side by side across the page and one above another inside the wave. An arrow means the later branch waits for the earlier one.
+
+Under a wave, an `Overlap:` line names a pair of branches in that wave that share a requirement or a path. A requirement is the text of `(spec: …)` on a task, compared with case folded and extra space collapsed. A path is a backtick span in the task line that contains `/` or a file extension, compared exactly as written. The plan's file list is not used. The note does not block, and it does not change Ready now or which wave a branch is in. A branch row still has the six fields above, and still no file list.
 
 ## Grouping
 

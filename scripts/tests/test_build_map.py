@@ -93,10 +93,15 @@ class BuildMap(unittest.TestCase):
         self.assertIn("Ready now: ready", wave1)
         self.assertIn("Ready now: waits in order", wave2)
         diagram = mermaid(text)
-        self.assertIn("flowchart TD", diagram)
+        self.assertIn("flowchart LR", diagram)
+        self.assertIn('subgraph w1["Wave 1"]', diagram)
+        self.assertIn('subgraph w2["Wave 2"]', diagram)
+        self.assertIn("direction TB", diagram)
         self.assertIn('b1["feat/cancel-booking-record-refund-decision"]', diagram)
         self.assertIn('b2["feat/cancel-booking-send-receipt"]', diagram)
         self.assertIn("b1 --> b2", diagram)
+        self.assertIn("## Wave 1: 1 branch", text)
+        self.assertIn("## Wave 2: 1 branch", text)
 
     def test_who_uses_waiting_for_then_latest_mark_then_unnamed(self):
         spec = """# Cancel a booking
@@ -195,7 +200,7 @@ class BuildMap(unittest.TestCase):
         text = render()["markdown"]
         self.assertIsNone(TASK_ID.search(text))
         self.assertIn("```mermaid", text)
-        self.assertIn("flowchart TD", text)
+        self.assertIn("flowchart LR", text)
         self.assertNotIn("## Files", text)
         for field in ("- Delivers:", "- Tasks:", "- Waits for:", "- Question:", "- Ready now:"):
             self.assertIn(field, text)
@@ -274,6 +279,75 @@ class BuildMap(unittest.TestCase):
         self.assertIn("### feat/cancel-booking-send-receipt", text)
         self.assertNotIn("(step:", text)
         self.assertNotIn("(map:", text)
+
+    def test_parallel_count_names_question_holds(self):
+        spec = """# Cancel a booking
+
+## Open questions
+
+- Which currency for refunds?
+  - Pending: 2026-10-10, for the partner, mail.
+  - Blocks: T3
+"""
+        plan = """# Plan
+
+## Approach
+
+1. Record the decision. (T1)
+2. Store the card. (T2)
+3. Send the receipt. (T3)
+"""
+        tasks = """# Tasks
+
+- [ ] T1: Record the decision (after: ) (spec: decision)
+- [ ] T2: Store the card (after: ) (spec: card)
+- [ ] T3: Send the receipt (after: ) (spec: receipt)
+"""
+        result = bm.build("cancel-booking", spec, plan, tasks)
+        text = result["markdown"]
+        self.assertIn("## Wave 1: 3 branches, 2 can start now", text)
+        self.assertIn("Wave 1: 3 branches, 2 can start now —", result["summary"])
+        self.assertIn("Ready now: waiting on a question", text)
+        self.assertEqual(text.count("Ready now: ready"), 2)
+        diagram = mermaid(text)
+        self.assertIn('subgraph w1["Wave 1"]', diagram)
+        self.assertIn("direction TB", diagram)
+        self.assertIn("flowchart LR", diagram)
+
+    def test_overlap_is_a_note_and_does_not_change_readiness(self):
+        plan = """# Plan
+
+## Approach
+
+1. Record the decision. (T1)
+2. Store the card. (T2)
+3. Send the receipt. (T3)
+"""
+        shared = """# Tasks
+
+- [ ] T1: Record the decision in `src/refund.py` (after: ) (spec: refund)
+- [ ] T2: Store the card in `src/refund.py` (after: ) (spec: refund)
+- [ ] T3: Send the receipt (after: ) (spec: receipt)
+"""
+        separate = """# Tasks
+
+- [ ] T1: Record the decision (after: ) (spec: decision)
+- [ ] T2: Store the card (after: ) (spec: card)
+- [ ] T3: Send the receipt (after: ) (spec: receipt)
+"""
+        hit = bm.build("cancel-booking", SPEC, plan, shared)
+        quiet = bm.build("cancel-booking", SPEC, plan, separate)
+        self.assertIn(
+            "Overlap: feat/cancel-booking-record-decision and feat/cancel-booking-store-card both cover refund; both name `src/refund.py`.",
+            hit["markdown"],
+        )
+        self.assertNotIn("Overlap:", quiet["markdown"])
+        for result in (hit, quiet):
+            self.assertIn("## Wave 1: 3 branches, can run in parallel", result["markdown"])
+            self.assertEqual(result["markdown"].count("Ready now: ready"), 3)
+            self.assertNotIn("## Blocked", result["markdown"])
+            self.assertIsNone(TASK_ID.search(result["markdown"]))
+            self.assertIn("Wave 1: 3 branches, can run in parallel —", result["summary"])
 
     def test_same_branch_internal_wait_stays_ready(self):
         text = render()["markdown"]

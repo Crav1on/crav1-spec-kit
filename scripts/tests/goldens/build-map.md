@@ -3,15 +3,21 @@
 One branch per plan step.
 
 ```mermaid
-flowchart TD
-  b1["feat/cancel-booking-record-refund-decision"]
-  b2["feat/cancel-booking-send-receipt"]
+flowchart LR
+  subgraph w1["Wave 1"]
+    direction TB
+    b1["feat/cancel-booking-record-refund-decision"]
+  end
+  subgraph w2["Wave 2"]
+    direction TB
+    b2["feat/cancel-booking-send-receipt"]
+  end
   b1 --> b2
 ```
 
 An arrow means the later branch waits for the earlier one.
 
-## Wave 1
+## Wave 1: 1 branch
 
 ### feat/cancel-booking-record-refund-decision
 
@@ -21,7 +27,7 @@ An arrow means the later branch waits for the earlier one.
 - Question: none
 - Ready now: ready
 
-## Wave 2
+## Wave 2: 1 branch
 
 ### feat/cancel-booking-send-receipt
 
