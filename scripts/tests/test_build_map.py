@@ -342,6 +342,13 @@ class BuildMap(unittest.TestCase):
             hit["markdown"],
         )
         self.assertNotIn("Overlap:", quiet["markdown"])
+        note = "Overlap: feat/cancel-booking-record-decision and feat/cancel-booking-store-card both cover refund; both name `src/refund.py`."
+        self.assertIn(note, hit["summary"])
+        wave_at = hit["summary"].index("Wave 1:")
+        self.assertGreater(hit["summary"].index(note), wave_at)
+        self.assertNotIn("Overlap:", quiet["summary"])
+        self.assertEqual(hit["pointer"], "Build map: docs/specs/cancel-booking/build-map.md")
+        self.assertNotIn("Overlap", hit["pointer"])
         for result in (hit, quiet):
             self.assertIn("## Wave 1: 3 branches, can run in parallel", result["markdown"])
             self.assertEqual(result["markdown"].count("Ready now: ready"), 3)

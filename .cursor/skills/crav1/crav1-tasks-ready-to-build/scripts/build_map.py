@@ -638,6 +638,7 @@ def _summary(slug, pointer, branches):
         members = [branch for _, branch, _ in ordered]
         labels = [label for _, _, label in ordered]
         lines.append(f"Wave {number}: {parallel_phrase(members)} — {_short_list(labels)}")
+        lines.extend(overlap_lines(members))
     if blocked:
         labels = [label for _, label in sorted(blocked)]
         lines.append("Blocked: " + _short_list(labels))
