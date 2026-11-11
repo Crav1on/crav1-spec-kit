@@ -2,6 +2,19 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.131.0 (2026-11-11)
+
+Update the installed kit from a published release, on the branch you are already on. A minor release because `/crav1-update-kit` is a new command.
+
+- **Command.** `/crav1-update-kit`, optional `to vX.Y.Z`. With no version, the target is the latest published release tag. `main`, a branch, a commit, and an open pull request are refused in one line.
+- **This branch only.** Before any write, the command names the branch, says only this branch gets the new kit, and says other branches stay on the old kit until you merge this branch into them. It says merge develop into the branch, and it never rebases. It suggests merging first or switching branch when this branch should not move, and it warns about uncommitted changes. It does not switch branches. It continues only after a yes in this run. An agent's yes does not count.
+- **Files.** Kit-owned files are three-way merged against the previous release. Edits that do not overlap are combined. A clash shows both sides; the recommendation keeps the local side. A copied template is replaced only when it still matches the old release byte for byte. Specs, walk-progress, plans, tasks, notes, playbooks, and the build map are left alone, so a paused walk can stay put.
+- **Plugin.** A Cursor plugin or a user-scope install is not a commit. The command compares the installed version with the latest release, says how to refresh or recopy, and still offers migration steps.
+- **Bootstrap.** Each GitHub release attaches `crav1-update-kit.py` so an install that does not have the command yet can make the first jump. The release notes command attaches it, and `kit-update-asset.yml` attaches it when the release was created without the file. [Install](docs/install.md) has the steps.
+- **Migrations.** After the kit files are replaced, version steps for the jump are dry-run and listed. They are written only on a separate yes, and they are not staged into the kit commit.
+- **Commit.** One local commit, `Update CRAV1 kit vA to vB`, then stop. The script does not push. A push happens only when the user already asked for it in this run.
+- **Version.** The installed version is `version` in `plugin.json`, or the `Kit version:` line in `crav1-docs/reference/workflow.md`.
+
 ## 1.130.0 (2026-11-11)
 
 Fixes from a live tighten-and-plan walk. A minor release because a question card's typed answer moves onto the card's own free-text option.

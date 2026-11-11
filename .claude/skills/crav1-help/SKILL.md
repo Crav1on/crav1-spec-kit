@@ -121,7 +121,7 @@ When the user questions an answer ("don't we need tighten-spec first?"), re-read
 
 ## Newer-version notice
 
-Read `references/modes.md` ("Newer-version notice") only when a newer kit version may exist.
+Read `references/modes.md` ("Newer-version notice") only when a newer kit version may exist. The notice may name `/crav1-update-kit`. Do not run it.
 
 ## Parked and retired specs (1.60.0)
 

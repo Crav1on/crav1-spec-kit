@@ -1,0 +1,28 @@
+name: Release bootstrap asset
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
+      - name: Attach crav1-update-kit.py when the release has none
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tag="${{ github.event.release.tag_name }}"
+          if gh release view "$tag" --json assets --jq '.assets[].name' | grep -qx 'crav1-update-kit.py'; then
+            echo "crav1-update-kit.py already attached"
+            exit 0
+          fi
+          cp .cursor/skills/crav1/crav1-update-kit/scripts/update_kit.py crav1-update-kit.py
+          gh release upload "$tag" crav1-update-kit.py

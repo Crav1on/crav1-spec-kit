@@ -95,6 +95,7 @@ The same walk, `/crav1-tighten-and-plan-ready-to-build`, runs `/crav1-plan-from-
 | Skill | `/crav1-pr-status` |
 | Skill | `/crav1-merge-pr` |
 | Skill | `/crav1-help` |
+| Skill | `/crav1-update-kit` |
 | Skill | `/crav1-tasks-ready-to-build` |
 | Skill | `/crav1-explain-existing-system` |
 | Skill | `/crav1-explain-this-code` |
@@ -131,6 +132,8 @@ The same walk, `/crav1-tighten-and-plan-ready-to-build`, runs `/crav1-plan-from-
 `/crav1-merge-pr` may run from any lane, and only when the user explicitly asks in that turn to merge a named pull request. It does not move work into Specify, Plan, or Build.
 
 `/crav1-help` may run from any lane. It answers what to run next, in what order, and what a skill does, from the kit's own docs (the kit repo's `docs/`, or the `crav1-docs/` folder bundled next to the skills in every install), never GitHub. The order comes from the routes in `docs/reference/workflow.yaml`. Every answer names its source. It writes nothing and runs no skill. `todo` ranks what to do next from the records, scoped by person, spec, topic, branch, or pull request as [`.cursor/skills/crav1/crav1-add-to-spec/references/scope.md`](../.cursor/skills/crav1/crav1-add-to-spec/references/scope.md) says. It does not move work into Specify, Plan, or Build. It is not a starter option. Agents call it before they suggest more than one next step, as `crav1.mdc` says.
+
+`/crav1-update-kit` may run from any lane when the user, or a guild agent, asks to update the installed kit. Optional `to vX.Y.Z`. The default is the latest published release tag. It refuses `main`, a branch, a commit, and an open pull request in one line. It does not switch branches. Before any write it names the branch, says only this branch gets the new kit, and says other branches stay on the old kit until this branch is merged into them (merge develop into the branch; never rebase). A yes from an agent does not write, commit, or push. A plugin install is advice plus any migration steps, not a kit commit. It does not move work into Specify, Plan, or Build. It is not a starter option.
 
 `/crav1-tasks-ready-to-build` may run from any lane, any time, when you type it. It is command-only (1.88.0). It lists which tasks are ready to build and why the others are blocked, from `spec.md`, `plan.md`, `tasks.md`, and `verify.md`. It never reads Azure Boards. Every run rewrites `docs/specs/<slug>/build-map.md` and runs no skill. The word `build-map` shows only that map. It names `/crav1-build-tasks` and does not run it. It does not move work into Build. It is not a starter option.
 
@@ -286,6 +289,7 @@ cross_cutting:
     - crav1-pr-status
     - crav1-merge-pr
     - crav1-help
+    - crav1-update-kit
     - crav1-tasks-ready-to-build
     - crav1-explain-existing-system
     - crav1-explain-this-code

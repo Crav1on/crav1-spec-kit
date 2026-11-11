@@ -207,6 +207,21 @@ If this window is the **kit repo**, drop-in skills are already under `.cursor/` 
 
 ## Keeping the kit updated
 
+In a consumer project that already has the command, run `/crav1-update-kit`. Optional `to vX.Y.Z`. With no version, the target is the latest published release tag. It will not take `main`, a branch, a commit, or an open pull request. It commits on the current branch only after a yes, and it does not push unless you say yes to that push in that run. Other branches stay on the old kit until you merge this branch into them. Say merge develop into the branch. Do not rebase.
+
+A Cursor plugin install, including one that auto-updates from a team marketplace, is not a commit in the product repo. The command compares the installed version with the latest release, tells you how to refresh or recopy, and still offers any project-file migration steps.
+
+**First jump, when the command is not installed yet.** Each GitHub release attaches `crav1-update-kit.py` (the same script the command runs). From 1.131.0 on, the release is created with that file attached, and `.github/workflows/kit-update-asset.yml` attaches it if the release was published without it. From the product repo:
+
+```bash
+curl -fsSL -o crav1-update-kit.py https://github.com/Crav1on/crav1-spec-kit/releases/latest/download/crav1-update-kit.py
+python3 crav1-update-kit.py detect
+```
+
+Resolve a published tag, then plan and apply only after a yes. The script does not push. After that jump the command is on the branch, and the downloaded file can be deleted. A release older than 1.131.0 has no asset; copy the drop-in by hand from that tag, then use the command for the next jump.
+
+The manual copy still works when you want to do it yourself:
+
 | You installed with | Update by |
 | --- | --- |
 | Cursor drop-in copy | Copy the same `.cursor/` folders again from a newer kit; commit in the product repo |

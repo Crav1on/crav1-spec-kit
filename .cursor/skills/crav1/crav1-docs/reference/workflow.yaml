@@ -204,6 +204,8 @@ also_next:
   crav1-review-security: [/crav1-finalize-commit]
   crav1-run-exploratory-test: [/crav1-finalize-commit]
   crav1-suggest-tests-for-code: [/crav1-plan-from-spec]
+  # The override below is the real next step. This entry lets a walkthrough After section name the command.
+  crav1-update-kit: []
 
 # Replaces the generated list. Free text is allowed here only.
 override:
@@ -213,4 +215,5 @@ override:
   crav1-what-do-we-know-about-this: ["The one skill it names, if any"]
   crav1-export-spec: []
   crav1-help: [The skill or route step it names]
+  crav1-update-kit: ["nothing needed now"]
   crav1-tasks-ready-to-build: [/crav1-build-tasks]

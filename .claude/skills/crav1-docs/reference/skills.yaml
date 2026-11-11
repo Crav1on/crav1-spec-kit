@@ -1573,6 +1573,59 @@ skills:
   first_prompt: '/crav1-help
 
     I have new information from a meeting and tasks that are not built. What do I run, in order?'
+- name: crav1-update-kit
+  lane: cross-cutting
+  group: Start
+  starter: false
+  since: 1.131.0
+  stage: stable
+  prompt_budget: 2
+  walkthrough: docs/from-update-kit.md
+  purpose: Update the installed kit on the current branch to a published release.
+  in_depth:
+  - '**`/crav1-update-kit`** takes an optional `to vX.Y.Z`. With no version, the target is the latest published
+    release tag. `main`, a branch, a commit, and an open pull request are refused in one line. It detects
+    the installed version from `plugin.json` or the `Kit version:` line in `crav1-docs/reference/workflow.md`
+    (the changelog heading when that line is missing).'
+  - It commits on the current branch and does not switch. Before any write it shows which branch that is,
+    that only this branch gets the new kit, and that other branches stay on the old kit until this branch
+    is merged into them (merge develop into the branch; never rebase). It suggests merging first or switching
+    branch when this branch should not move, and it warns about uncommitted changes. A yes from an agent
+    or an earlier chat does not count.
+  - Kit-owned files are three-way merged against the previous release. Non-overlapping edits combine. A clash
+    shows both sides; the recommendation keeps the local side. A copied `docs/specs/_template/` or
+    `docs/system/_template/` file is replaced only when it still matches the old release byte for byte.
+    Specs, walk-progress, plans, tasks, notes, playbooks, and the build map are not part of the replace.
+  - A plugin or user-scope install is not a commit. The command compares versions, says how to refresh or
+    recopy, and still offers migration steps. After the replace, migration steps for the jump are dry-run,
+    listed, and written only on yes. They are not staged into the kit commit.
+  - 'The commit message is `Update CRAV1 kit vA to vB`. The script does not push. A push happens only when
+    the user already asked for it in this run. The default ending is a local commit and stop. The heads-up
+    card is not skipped by a word in the opening message. The yes is the user''s answer after the branch is shown.'
+  use_when: The installed kit should move to a published release
+  table:
+    reads: The installed version, the published release tags, and the kit files on this branch
+    writes: Kit-owned files on this branch, a byte-identical copied template, an optional migration after
+      a separate yes, and one local commit
+  reads: Reads `plugin.json` or the `Kit version:` line, the published `vX.Y.Z` tags, the old release,
+    the new release, and the working tree. It does not read a branch or an open pull request as a target.
+  writes: Writes kit-owned files on the current branch after a yes, replaces a copied template that still
+    matches the old release byte for byte, and commits `Update CRAV1 kit vA to vB` when the user chose the
+    commit. A migration listed for the jump is dry-run and written only on its own yes, and is left unstaged.
+  leaves_alone: Leaves specs, `walk-progress.md`, plans, tasks, notes, playbooks, the build map, persist
+    rules, the transfer data policy, and `kit-maintainer.mdc` alone. Does not switch branches, rebase, or
+    push. A plugin install gets no kit commit.
+  exceptions: a target that is not a published release tag stops in one line. A clash is not overwritten.
+    An edited template is listed and left. The kit source checkout is refused. An agent's yes does not write,
+    commit, or push.
+  called_by: Called by the user, or by a guild agent. The user's yes in this run is still required before a write, a commit, or a push.
+  runs_by_itself: Calls no skill. Runs `scripts/update_kit.py`.
+  you_run_next:
+  - nothing needed now
+  first_prompt: '/crav1-update-kit
+
+
+    Update the kit in this consumer project.'
 - name: crav1-tasks-ready-to-build
   lane: cross-cutting
   group: Start
@@ -2713,6 +2766,15 @@ routing:
           next from the records, scoped by person, spec, topic, branch, or pull request as [`.cursor/skills/crav1/crav1-add-to-spec/references/scope.md`](../.cursor/skills/crav1/crav1-add-to-spec/references/scope.md)
           says. It does not move work into Specify, Plan, or Build. It is not a starter option. Agents
           call it before they suggest more than one next step, as `crav1.mdc` says.'
+        crav1-update-kit:
+        - '`/crav1-update-kit` may run from any lane when the user, or a guild agent, asks to update the
+          installed kit. Optional `to vX.Y.Z`. The default is the latest published release tag. It refuses
+          `main`, a branch, a commit, and an open pull request in one line. It does not switch branches.
+          Before any write it names the branch, says only this branch gets the new kit, and says other
+          branches stay on the old kit until this branch is merged into them (merge develop into the branch;
+          never rebase). A yes from an agent does not write, commit, or push. A plugin install is advice
+          plus any migration steps, not a kit commit. It does not move work into Specify, Plan, or Build.
+          It is not a starter option.'
         crav1-tasks-ready-to-build:
         - '`/crav1-tasks-ready-to-build` may run from any lane, any time, when you type it. It is command-only
           (1.88.0). It lists which tasks are ready to build and why the others are blocked, from `spec.md`,
