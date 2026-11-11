@@ -10,6 +10,8 @@ Walk plan.md/tasks.md issues one by one (including [`/crav1-review-plan`](crav1-
 
 One plan issue at a time; patches plan/tasks only (spec findings go to tighten-spec)
 
+1.130.0: the batch is one card. `yes (Recommended)` applies every recommendation. Typed changes go on that card's free-text answer, for example `P1 A, P3 keep`. An item not mentioned keeps its recommendation. There is no Edits option.
+
 ## Runs when
 
 Plan findings, or mushy tasks. Called by the user.

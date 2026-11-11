@@ -41,17 +41,18 @@ List secrets last. One line per kind. Do not number them. Do not show the value.
 
 ### One question for the recommendations
 
-Ask this question when there is at least one numbered item, and the rule or this run says review. One question. Three answers. Use the questions tool when it is available. Stop until the user picks.
+Ask this question when there is at least one numbered item, and the rule or this run says review. One question card, as `crav1-docs/reference/question-cards.md` says. Use the questions tool when it is available. Stop until the user picks.
 
-1. **Accept all recommendations.**
+1. **Accept all recommendations (Recommended).**
 2. **Go through them one by one.** The recommendation is shown on each item, and in its question as the first option with ` (Recommended)`.
-3. **Change some.** The user names items to flip, for example keep 3, redact 5.
+
+The card's free-text answer carries the hint `Type the flips, e.g. keep 3, redact 5`. Do not add a **Change some** option.
 
 Accept all recommendations applies every numbered recommendation.
 
 Go through them one by one asks keep or redact for each numbered item. One item at a time. Options only. Use the questions tool when it is available. The recommended choice is the first option, labelled ` (Recommended)`, for example `Redact (Recommended)`, then the other. Stop until the user picks.
 
-Change some waits for the user to name the items. The named choice replaces the recommendation for that item. An item they do not name keeps its recommendation. When a number is not on the list, or the reply does not name an item, ask again. Do not guess.
+The free-text answer names the items to flip. The named choice replaces the recommendation for that item. An item they do not name keeps its recommendation. When a number is not on the list, or the reply does not name an item, ask again. Do not guess.
 
 When the rule or this run says auto-accept, do not ask that question. Apply each numbered recommendation. That auto-accept covers these keep and redact lines. Images inside a mail says when it also covers an image recommendation.
 

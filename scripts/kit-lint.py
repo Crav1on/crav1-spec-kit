@@ -8,6 +8,7 @@
   after import sys and before that import (1.121.1)
 - every SKILL.md points at crav1-docs/reference/run-ending.md, unless the skill is in RUN_ENDING_EXEMPT (1.122.0)
 - no skill file has a Next: instruction that names more than one step to run now (1.122.0)
+- no question card offers an Edits option, a Change some option, an Other name option, or an option that says to type under Other (1.130.0)
 """
 import ast, os, re, sys, glob
 
@@ -214,6 +215,72 @@ def run_ending_problems(kit):
     return out
 
 
+# A question-card option that only tells the user to type somewhere else (1.130.0).
+# "There is no Edits option" and "Do not add an Edits option" are the rule, not an offer.
+DEAD_REPLY = re.compile(r"(?i)reply with (?:your )?edits")
+DEAD_CHOOSE = re.compile(r"(?i)choose this, then type")
+DEAD_UNDER = re.compile(r"(?i)type(?: your [\w' -]{0,48})? under other")
+DEAD_EDITS = re.compile(
+    r"(?i)(?:^|\s)(?:[-*]|\d+\.)\s+(?:\*\*)?`?Edits`?\b|\*\*Edits\*\*|offer(?:s|ed)?\s+(?:an\s+)?`?Edits`?\b"
+)
+DEAD_EDITS_OK = re.compile(r"(?i)(?:there is )?no `?Edits`?|do not add an? `?Edits`?")
+DEAD_CHANGE_SOME = re.compile(r"(?m)^\s*\d+\.\s+\*\*Change some")
+DEAD_OTHER_NAME = re.compile(r"\*\*Other name\*\*")
+
+
+def dead_card_hits(text):
+    """Lines that tell an agent to offer a dead Edits / type-under-Other option."""
+    hits = []
+    for i, line in enumerate(text.splitlines(), 1):
+        if DEAD_REPLY.search(line):
+            hits.append((i, "reply with edits"))
+        if DEAD_CHOOSE.search(line):
+            hits.append((i, "choose this, then type"))
+        if DEAD_UNDER.search(line):
+            hits.append((i, "type under Other"))
+        if DEAD_EDITS.search(line) and not DEAD_EDITS_OK.search(line):
+            hits.append((i, "Edits option"))
+        if DEAD_CHANGE_SOME.search(line):
+            hits.append((i, "Change some option"))
+        if DEAD_OTHER_NAME.search(line):
+            hits.append((i, "Other name option"))
+    return hits
+
+
+def _card_sources(kit):
+    roots = [
+        os.path.join(kit, ".cursor", "skills", "crav1"),
+        os.path.join(kit, ".cursor", "rules"),
+        os.path.join(kit, "docs"),
+    ]
+    found = []
+    for root in roots:
+        if not os.path.isdir(root):
+            continue
+        for dirpath, dirnames, filenames in os.walk(root):
+            dirnames[:] = [d for d in dirnames if d not in ("crav1-docs", "__pycache__")]
+            for name in filenames:
+                if not name.endswith(".md"):
+                    continue
+                if name == "CHANGELOG.md":
+                    continue
+                found.append(os.path.join(dirpath, name))
+    rule = os.path.join(kit, ".cursor", "rules", "crav1.mdc")
+    if os.path.isfile(rule):
+        found.append(rule)
+    return found
+
+
+def dead_card_problems(kit):
+    out = []
+    for path in sorted(set(_card_sources(kit))):
+        with open(path, encoding="utf-8") as fh:
+            text = fh.read()
+        for lineno, why in dead_card_hits(text):
+            out.append(f"{os.path.relpath(path, kit)}:{lineno}: question card offers a dead option ({why})")
+    return out
+
+
 def bytecode_problems(kit):
     out = []
     for path in sorted(py_entry_points(kit)):
@@ -269,6 +336,7 @@ def main(argv):
             if a != b: errs.append(f"{os.path.relpath(other, kit)}/{s}: files differ ({', '.join(sorted(a ^ b)[:3])})")
     errs.extend(bytecode_problems(kit))
     errs.extend(run_ending_problems(kit))
+    errs.extend(dead_card_problems(kit))
     for e in errs: print("FAIL  " + e)
     print(f"kit lint: {len(skills)} skills, {len(errs)} problem(s)")
     return 1 if errs else 0

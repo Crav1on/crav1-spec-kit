@@ -20,8 +20,9 @@ class OpenPrExisting(unittest.TestCase):
         for t in ("`update` Update description | `comment` Add as comment",
                   "`comment` Add as comment | `update` Update description",
                   "`push-only` Push only", "`stop` Stop",
-                  "> **Reply yes** (or \"confirm\") to post it as shown.",
-                  "Nothing is posted until you say yes.",
+                  "`yes (Recommended)`: post it as shown.",
+                  "Nothing is posted until that yes.",
+                  "Do not add an `Edits` option.",
                   "kit-neutral", "gh pr comment", "az repos pr update"):
             self.assertIn(t, r)
 

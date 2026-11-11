@@ -16,9 +16,10 @@ class HostSetup(unittest.TestCase):
 
     def test_reference(self):
         r = (HS / "references/host-setup.md").read_text()
-        for t in ("> **Reply yes** (or \"confirm\") to run it as shown.",
-                  "To change something first, reply with your edits",
-                  "Nothing runs until you say yes.",
+        for t in ("`yes (Recommended)`: run it as shown.",
+                  "Type your changes, e.g. make it optional",
+                  "Do not add an `Edits` option.",
+                  "Nothing runs until that yes.",
                   "`apply`", "`check`", "kit-neutral", "## Secrets",
                   "infra/ado/<name>.sh", "generated from these comments"):
             self.assertIn(t, r)

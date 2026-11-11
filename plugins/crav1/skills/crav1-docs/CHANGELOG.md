@@ -2,6 +2,14 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.130.0 (2026-11-11)
+
+A question card no longer offers a choice that only tells you to type somewhere else. A patch because the confirm already accepted typed changes; the card was sending them to a button that opens no text field.
+
+- **The free-text answer.** On a question card, `yes (Recommended)` applies what was shown. Typed changes go on that card's own free-text answer, and the hint lives on that answer, for example `Type your changes, e.g. C1: keep it open`. An item the answer does not mention keeps its recommendation. The rule is [Question cards](docs/reference/question-cards.md).
+- **No Edits option.** A batch confirm, a sort, a map, a conflict list, an apply list, a host-setup script, and a pull-request post use that card. They do not add `Edits`, `Change some`, or `Other name` as a choice whose only job is to say "type under Other". Go through them one by one, use an existing branch, stay, and stop stay when they do something different.
+- **Branch name.** A typed branch name is that same card's free-text answer, hint `Type a branch name`. A label `Other name` with no branch is asked again.
+
 ## 1.129.0 (2026-11-11)
 
 Fixes from a live one-task build and from the build map. A minor release because the branch prompt, a worker status, and the build map change.

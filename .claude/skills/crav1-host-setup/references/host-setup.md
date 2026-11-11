@@ -39,13 +39,14 @@ A service connection, a secret variable or any credential is always manual. The 
 
 ## Show, confirm, run
 
-Before any `apply`, show the exact commands (the script's `apply` part with variables filled in), the scope of each (this branch, this repository, the whole project) and the manual steps. A project-wide setting says so in bold. Then ask, word for word:
+Before any `apply`, show the exact commands (the script's `apply` part with variables filled in), the scope of each (this branch, this repository, the whole project) and the manual steps. A project-wide setting says so in bold. Then one question card, as `crav1-docs/reference/question-cards.md` says.
 
-> **Reply yes** (or "confirm") to run it as shown.
-> To change something first, reply with your edits, for example "make it optional" or "only on develop".
-> Nothing runs until you say yes.
+- `yes (Recommended)`: run it as shown. Nothing runs until that yes.
+- The card's free-text answer. Hint: `Type your changes, e.g. make it optional` or `only on develop`.
 
-Edits redraft the script and steps and show them again. Run `apply` only after yes, then run `check`. A command that fails for permission says which permission is missing and stops; it never retries with other credentials. Not signed in (`az account show` or `gh auth status` fails): stop and name the sign-in; do not run anything.
+Do not add an `Edits` option.
+
+A typed answer redrafts the script and steps and shows them again. Run `apply` only after yes, then run `check`. A command that fails for permission says which permission is missing and stops; it never retries with other credentials. Not signed in (`az account show` or `gh auth status` fails): stop and name the sign-in; do not run anything.
 
 Headless or bot runs never apply: they write the script and steps and stop with `Host setup not applied. Run it after a yes.`
 

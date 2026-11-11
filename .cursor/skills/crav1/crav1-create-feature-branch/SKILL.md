@@ -38,17 +38,18 @@ Run git (PATH fallback if needed). If not a repo, skip.
 
 **Specify** (spark / ideas / intake, before writing spec files):
 
-1. **`feat/<slug>`** — one branch for this spec **and** later build (default, **first/top**)
+1. **`feat/<slug>` (Recommended)** — one branch for this spec **and** later build (default, **first/top**)
 2. **`spec/<slug>`** — specify-only. Merge this to the default branch (PR in GitKraken or your git host when they want). Build later on `feat/<slug>` from that default so another feature can be specified while this one is built
 3. **Stay** on the current branch
-4. **Other** — they name the branch
+
+A typed branch name is that card's free-text answer, hint `Type a branch name`, not its own option. The rule is `crav1-docs/reference/question-cards.md`.
 
 Intake (several slugs): one branch for the dump. Slug = short landscape kebab, or `system` if unnamed. Options are `feat/<that>` vs `spec/<that>`.
 
 **Build** (implement / build-tasks / fix-build-gaps, before the first code change or worker): follow [references/code-branch.md](references/code-branch.md) (1.99.0).
 
-- On a **base branch** (main, master, develop, the `Merges into` branch, `release/*`): **Create `feat/<slug>` from `<into>` (Recommended)**, **Use an existing branch**, a typed branch name on this same card, **Stop**. No Stay on a base. There is no second card to collect the name (1.129.0).
-- On **another** branch (`chore/x`, detached HEAD): the same, with **Stay on `<current>`** in place of the typed name.
+- On a **base branch** (main, master, develop, the `Merges into` branch, `release/*`): **Create `feat/<slug>` from `<into>` (Recommended)**, **Use an existing branch**, **Stop**. A typed branch name is that card's free-text answer, hint `Type a branch name`, not its own option. No Stay on a base. There is no second card to collect the name (1.129.0). The rule is `crav1-docs/reference/question-cards.md`.
+- On **another** branch (`chore/x`, detached HEAD): the same, with **Stay on `<current>`** in place of the free-text name.
 - When the prompt is for a task, option 1 is that task's branch from [references/task-branch.md](references/task-branch.md), not a new name. The branch card is alone. Permissions are the next card.
 - Headless with no person: stop before any code, unless the invocation has the choice word `new branch`.
 

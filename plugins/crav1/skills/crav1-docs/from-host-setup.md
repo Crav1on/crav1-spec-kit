@@ -21,7 +21,7 @@ Require a green build of orders-api-ci on develop in orders-api.
 | Ask | Say what the setting should do | Restates the setting, host, repository and branch. Asks only for what is missing, with options. Routes repo-readable things to their lane and offers a spec for a larger ask |
 | Read | — | Reads the live setting when signed in and says what is there now |
 | Draft | Read the script and the steps | Writes `infra/ado/<name>.sh` (or `infra/github/<name>.sh`) with a what and why comment above each command, `apply` and `check` parts, and the manual steps generated from those comments. Shows the scope and what changes for people |
-| Iterate | Reply with edits, or yes, `manual` or stop | Redrafts and shows it again until yes. Nothing runs before yes |
+| Iterate | `yes (Recommended)`, or type changes on that card, or `manual` or stop | The free-text answer redrafts the script and shows it again. Nothing runs before yes (1.130.0) |
 | Apply | — | On a work branch, runs `apply`, then `check`, and reports each line. Done only when every line is `ok` |
 | Commit | — | Commits the script with a short message naming the setting. Does not push |
 

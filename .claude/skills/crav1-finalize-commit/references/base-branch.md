@@ -12,7 +12,7 @@ The `Commit this message?` prompt becomes `Commit on a work branch?`, with these
 
 1. `Create feat/<slug> from <into> and commit (Recommended)`. The slug is the spec the staged files belong to, else the draft subject in kebab case (at most five words). On `release/<x>`: `fix/<slug>`, and `(into release/<x>)` is written on its Match `Branch:` entry.
 2. `Use an existing branch`: as the guard says (non-base branches, the spec's own first).
-3. `Other name`: they name a work branch. A base name is refused.
+3. The card's free-text answer is the branch name, hint `Type a branch name`. Do not offer an option labelled `Other name`. A base name is refused. The rule is `crav1-docs/reference/question-cards.md`.
 4. `stop`: no commit. They can still copy the blocks.
 
 `copy` and `change` still work when typed. This prompt replaces the commit question, so it is the same one prompt.

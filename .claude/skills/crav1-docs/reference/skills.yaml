@@ -248,6 +248,7 @@ skills:
     plus a bundle to match; and one spec (the architecture spec), or system notes plus one spec per feature.
     It skips a question the message answers. It still runs only when the user names the repos. It replaces
     repos-to-spec and match-to-specs; their rules are kept as branches.'
+  - '1.130.0: the map confirm is one card. `yes (Recommended)` writes what was shown. Typed changes go on that card''s free-text answer. An item not mentioned keeps what was shown. There is no Edits option.'
   - 'Repos plus a bundle (was `/crav1-match-to-specs`): Existing repos plus a dump → where the spec files
     go, then `docs/system/` (including `glossary.md`) and one spec per confirmed slice (done, partial,
     or not in the code). Fills a missing `glossary.md` when the folder already exists. New glossary rows
@@ -465,6 +466,7 @@ skills:
   - '1.99.0: implementation code is never built on a base branch (main, master, develop, Merges into, `release/*`): no Stay there; Create `feat/<slug>` from the into branch (Recommended), Use an existing branch, Other name or Stop; `hotfix/` is a work prefix; specs, docs and the specs repo are exempt. Rules in `references/code-branch.md`.'
   - '1.68.0: a missing task sub-branch is offered as **Create it from the spec branch (Recommended)**; the `(into …)` marker is written after the yes.'
   - '1.129.0: a task''s Build prompt offers the branch `scripts/build_map.py --recommend T#` prints, the same name as the build map row: `(map:)`, else `(branch:)`, else the plan step, else `committed later on`. The branch question is its own card, and a typed name on that card is the answer. A different pick writes `(map: <picked>)` on the task in the specs repo and does not commit it.'
+  - '1.130.0: a typed branch name is that card''s free-text answer, hint `Type a branch name`. There is no option labelled Other name.'
   use_when: 'Brownfield: leave the default branch'
   table:
     reads: Current branch, default branch, dirty tree
@@ -529,6 +531,7 @@ skills:
     committed code on the repo and branch the spec names before wording issues. A spec with no code behind
     it skips that read. Does not offer finish, add a test, or leave.
   - '1.123.0: more than 8 issues starts with one line of counts (issues to fix, open questions, small wording) and does not print the full list. Each time, one issue or a small group; one by one is always offered. An issue whose only work is an Answered line, or that repeats an open question, is one line passed to `/crav1-resolve-open-questions`, with no menu.'
+  - '1.130.0: eight or fewer issues are one card. `yes (Recommended)` applies every recommendation. Typed changes go on that card''s free-text answer, for example `I1 B, I3 keep`. An item not mentioned keeps its recommendation. There is no Edits option.'
   - '1.64.0: reads every listed work branch without checkout; a yes on writing the branch adds to the `Branch:` list; a listed branch that is gone and not merged is offered `(dropped)` (`mark-dropped`); a deleted branch whose work is in the base shows `merged, branch deleted`.'
   - '1.68.0: reads and writes the `(spec branch)` and `(into …)` markers on the Match `Branch:` list after a yes.'
   - '1.86.0: a yes on writing the branch adds one Match `Branch:` line in sorted place (repo, then branch); never `; `-joined.'
@@ -580,6 +583,7 @@ skills:
   - '`detailed` shows an extended entry per question: what it blocks, why it matters, what is known, who can answer, asked status and date, sources, and a suggested answer. No extra questions.'
   - '`apply <file>` (1.120.0) copies a filled playbook to `docs/playbooks/<topic>.md` after the same yes. The name comes from the subject, lowercase kebab-case, and is shown once. A `Docs path:` line, or the one committed file with the same subject, is the same playbook later. Reapply overwrites that file. An edit in the repo since `Applied as:` is shown and confirmed first. Each spec the apply changed gets `Playbook: docs/playbooks/<topic>.md`. A draft with no filled answer is not copied. This is not a git commit.'
   - '1.125.0: when `tasks.md` exists, None writes `Blocks: none`. The whole slice still writes no line. No line still blocks the whole slice.'
+  - '1.130.0: the batch is one card. `yes (Recommended)` applies every recommendation. Typed changes go on that card''s free-text answer, for example `Q1 A, Q3 keep` or `C1: keep it open`. An item not mentioned keeps its recommendation. There is no Edits option.'
   use_when: Open questions remain
   table:
     reads: Open questions, assumptions and Conflict lines in `spec.md`, and the playbook file on apply
@@ -686,6 +690,7 @@ skills:
     a meeting (minutes or a transcript). It skips the question when the message shows
     which. It replaces match-dump-to-specs, code-into-specs, and meeting-to-specs; their rules are kept
     as branches, and a kept quote from any of them goes through the fact rules.'
+  - '1.130.0: a dump sort, a code-change sort, and the same kind of confirm are one card. `yes (Recommended)` writes what was shown. Typed changes go on that card''s free-text answer. An item not mentioned keeps what was shown. There is no Edits option. Keep, leave, and dismiss stay real options on a meeting item.'
   - 'A fact (was `/crav1-add-to-spec`): New information aimed at one spec that already exists is **`/crav1-add-to-spec`**.
     `/crav1-tighten-spec` stays for mushy wording. Match, intake, spark, and ideas create the folders.
     This command does not plan.'
@@ -946,6 +951,7 @@ skills:
   purpose: Walk plan.md/tasks.md issues one by one (including /crav1-review-plan P#s).
   in_depth:
   - One plan issue at a time; patches plan/tasks only (spec findings go to tighten-spec)
+  - '1.130.0: the batch is one card. `yes (Recommended)` applies every recommendation. Typed changes go on that card''s free-text answer, for example `P1 A, P3 keep`. An item not mentioned keeps its recommendation. There is no Edits option.'
   use_when: Plan findings, or mushy tasks
   table:
     reads: Plan, tasks, spec, and those findings
@@ -1135,6 +1141,7 @@ skills:
     gaps.
   in_depth:
   - '1.99.0: before the first code edit on a base branch, offers Create `fix/<slug>` from the into branch (Recommended), an existing branch, another name or stop; never edits code there; headless stops unless `new branch`.'
+  - '1.130.0: a typed branch name is that card''s free-text answer, hint `Type a branch name`. There is no option labelled Other name.'
   - '**`/crav1-fix-build-gaps`** opens with one question: gaps from the verify report, or a live-site
     gap (ports, proxy, SQL, unpublished URL). It skips the question when the message says which. It replaces
     fix-from-verify and fix-live; their rules are kept as branches.'
@@ -1202,6 +1209,7 @@ skills:
   purpose: Draft the commit message, then commit, copy, change, or stop.
   in_depth:
   - '1.99.0: never commits implementation code on a base branch, even with `commit now`; the prompt becomes `Commit on a work branch?` (create `feat/<slug>` from the into branch and commit, an existing branch, another name, stop). Spec and doc commits on a base are unchanged.'
+  - '1.130.0: a typed branch name on that prompt is the card''s free-text answer, hint `Type a branch name`. There is no option labelled Other name.'
   - '**`/crav1-finalize-commit`** always drafts first, then offers commit, copy, change, or stop (1.83.0;
     there is no opening question). When no style rule is saved, it drafts in the recommended style and
     asks CRAV1 style or git log in the same prompt as those choices (1.89.0), at most once per run (1.90.5). `message only` drafts with
@@ -1257,6 +1265,7 @@ skills:
   walkthrough: docs/from-commit.md
   purpose: Open a pull request for the current change branch, or push to an existing one and update its description or comment (push with explicit yes).
   in_depth:
+  - '1.130.0: the post confirm is one card. `yes (Recommended)` posts the text as shown. Typed changes go on that card''s free-text answer. There is no Edits option. Nothing is posted before that yes.'
   - Push the change branch only after an explicit yes, then open one pull request (no merge, no commit).
     The body is a short summary and headed sections (see 1.98.0), with a Work item section when `work-item.md` exists. On Windows,
     a multi-line Azure DevOps description is passed as `--description "@<file>"` (UTF-8 without BOM).
@@ -1265,7 +1274,7 @@ skills:
   - '1.66.0: a push rejected because the remote branch moved says to pull with `git pull --no-rebase`, resolve conflicts, and push again. Never a rebase or a force-push.'
   - '1.68.0: the into step is offered and written: a head that split off another spec branch gets one yes/no question, and a sub-branch''s PR goes into its spec branch.'
   - '1.98.0: the body is format A: a 1-2 line summary, then Changes (grouped by area, at most about 8 link-first bullets, each with a bold title and what and why; the why only from the spec, a plan task, a commit message or a code comment), Verified (the check written out, with dates), Risks and rollback, Merge order, Not in this PR, Questions for reviewers and Work item, each left out when empty. File and line links are pinned to the head commit (Azure DevOps `version=GC<sha>`, GitHub `blob/<sha>/…?plain=1#L<n>`). There is no Spec section and no link to the spec. A missing rollback on an infra, pipeline or PROD change is said in the chat only. `/crav1-pr-status` reads the Merge order, Questions for reviewers and Not in this PR sections on its next run.'
-  - '1.114.0: when a pull request is already open for the branch, it pushes (after your yes), shows the new commits since the description was written, and offers update description, add as comment, push only or stop. Add as comment comes first on someone else''s pull request. The comment says what was pushed and why, written for reviewers. You see the exact text first: reply yes to post it as shown, or reply with edits to redraft. Nothing is posted until yes. Next-step lines elsewhere name the pull request, for example `/crav1-open-pr` to push to PR 77 and update its description or comment.'
+  - '1.114.0: when a pull request is already open for the branch, it pushes (after your yes), shows the new commits since the description was written, and offers update description, add as comment, push only or stop. Add as comment comes first on someone else''s pull request. The comment says what was pushed and why, written for reviewers. You see the exact text first. `yes (Recommended)` posts it as shown. A typed change on that card''s free-text answer redrafts it. Nothing is posted until yes. Next-step lines elsewhere name the pull request, for example `/crav1-open-pr` to push to PR 77 and update its description or comment.'
   use_when: Commits exist; want a pull request
   table:
     reads: The change branch, the spec, and `verify.md`
@@ -1292,7 +1301,8 @@ skills:
   walkthrough: docs/from-host-setup.md
   purpose: Change one Azure DevOps or GitHub setting that does not live in the repo, through a checked-in script applied after a yes and read back live.
   in_depth:
-  - '1.115.0: a host setting with no file in the repo (a branch policy or required build, required reviewers, an environment approval, a variable group) is built like code. You describe it; the kit drafts a checked-in `az` or `gh` script under `infra/ado/` or `infra/github/` with a what and why comment above each command, and generates the manual steps from those comments. You see the commands, their scope and the steps, reply with edits until it is right, then yes. It runs the script, reads the live setting back with the script''s `check` part and commits the script on a work branch. Done means the read-back says `ok`. Service connections and secret values are always manual: the script only checks they exist by name. Pipeline YAML, templates and infrastructure as code stay ordinary code. The plan route (plan-from-spec, build-tasks, verify) uses the same shared reference for `(host setup)` tasks, so both routes write the same script.'
+  - '1.130.0: the apply confirm is one card. `yes (Recommended)` runs the script as shown. Typed changes go on that card''s free-text answer and redraft the script. There is no Edits option. Nothing runs before yes.'
+  - '1.115.0: a host setting with no file in the repo (a branch policy or required build, required reviewers, an environment approval, a variable group) is built like code. You describe it; the kit drafts a checked-in `az` or `gh` script under `infra/ado/` or `infra/github/` with a what and why comment above each command, and generates the manual steps from those comments. You see the commands, their scope and the steps. `yes (Recommended)` runs them. A typed change on that card''s free-text answer redrafts them until yes. It runs the script, reads the live setting back with the script''s `check` part and commits the script on a work branch. Done means the read-back says `ok`. Service connections and secret values are always manual: the script only checks they exist by name. Pipeline YAML, templates and infrastructure as code stay ordinary code. The plan route (plan-from-spec, build-tasks, verify) uses the same shared reference for `(host setup)` tasks, so both routes write the same script.'
   use_when: You need a branch policy, required build, reviewers, an approval or a variable group set on the host
   table:
     reads: The ask, the repo's remote and pipelines, and the live host setting
@@ -1768,6 +1778,7 @@ skills:
   walkthrough: docs/from-what-do-we-know-about-this.md
   purpose: Answer one question about a feature, slice, resource, or not-yet-feature from the specs first.
   in_depth:
+  - '1.130.0: the apply offer at the end of a walk is one card. `yes (Recommended)` runs apply. Typed changes go on that card''s free-text answer. There is no Edits option.'
   - 'A word `report-<type>-<depth>` picks a fixed Markdown report (1.104.0): `report-feature-short`, `report-feature-full`, `report-change-short`, `report-change-full`, `report-build-short`, `report-build-full`, and (1.109.0, preview) `report-playbook-short`, `report-playbook-full`, and (1.116.0) `report-playbook-walk`, which resumes a guided walk in chat through an existing playbook report (`report-playbook-full` asks to walk after writing; answers are saved into the report as they come; headless runs never walk). `report-data-model-full` (1.118.0) reads one saved model and writes an immutable Markdown review and a PDF with rendered diagrams; it does not model again. It routes first and loads only `reports/common.md` and that one `reports/<type>-<depth>.md`; no report word stays the free-form answer and opens no report file. Mermaid wherever a picture helps, only the diagrams that file lists; C4 always in feature-full, in change-full only when the change alters architecture or pipelines. Build reports list tasks in dependency order. Playbook reports sort decisions into Kept, Needs your answer (a recommended answer and why; undecided or decided by a named person, never a hand-off) and Compose, then list the kit skills in order (short at most 8 steps) with a dependency-order diagram; answers stay in the report until the user confirms. During a walk (1.117.0) the chat states each item in words and does not use item ids; `go to N9` still jumps. When what the user says and the record disagree, the walk works out the intended outcome with them and writes only after an explicit yes. Apply at the end, on yes, writes filled confirmed lines and does not run plan, build, or merge. It does not start `/crav1-help` or `/crav1-pr-status`. A live source that needs a sign-in, a permission, or a missing tool is asked about first (Allow or Skip); facts are tagged `Live read.`, guesses `(inference, not in the docs)`. Feature, change, and build reports are written outside the project, to Downloads when reachable, else a temp folder, and the chat always links or attaches them. The first playbook write is the same. On apply, a filled playbook is copied to `docs/playbooks/` (1.120.0). A draft with no filled answer is not copied. `report-data-model-full` is the exception: one new immutable `report.md` and `report.pdf` under `docs/data-model/<model>/reviews/`, and it does not edit the saved model. 1.121.0 builds that review from the saved records (one title, each section once, an empty section is one line, a run-ending line near the top) and the PDF carries the same prose. Diagrams are titled by name, wrapped so the text stays readable, and a wide diagram gets a landscape page or numbered parts.'
   - 'A gap in the answer (unknown or inferred) that matches an open question in a spec ends with one line naming `/crav1-show-or-ask-open-questions ask research <a few words from that question>`, with the spec only when the words match more than one spec (1.78.0). Each matching question gets its own line, never one line for several (1.90.4). It does not run it and asks nothing.'
   - 'When the user asks about one feature, slice, resource, or not-yet-feature, **`/crav1-what-do-we-know-about-this`**
@@ -1926,6 +1937,7 @@ skills:
   - 'Locked order: playbook when given; `/crav1-review-architecture` always; `/crav1-tighten-spec` one issue at a time; `/crav1-resolve-open-questions`; `/crav1-plan-from-spec`, which writes `plan.md` and `tasks.md`; `/crav1-review-plan` then `/crav1-tighten-plan`; `/crav1-tasks-ready-to-build`. A step with nothing to do says so and moves on. Research, `/crav1-review-security`, `/crav1-model-data`, `/crav1-show-or-ask-open-questions`, and `/crav1-suggest-tests-for-code` are offered only when the spec needs them.'
   - 'The progress file is `docs/specs/<slug>/walk-progress.md`. It records the step, when, and the version of each file that step covered. Since 1.123.0 the script stamps Done. A later step inside the walk leaves earlier steps done. An optional extra the walk itself runs is recorded with `- Extra:` when it finishes, and that write does not reopen earlier steps. `cover` is optional and only counts a write made outside the walk. A hand edit or `/crav1-add-to-spec` between sessions reopens only the steps that change affects. A reopened step blocks the ready check until it is rerun or cleared with nothing new. Spec, plan, and tasks stay the source of truth. The playbook is intake only. After apply, the playbook line is the `docs/playbooks/<topic>.md` path, not the outside path, so resume works on any machine. The walk accepts a `docs/playbooks/` path as its playbook argument. A Blocked or Needs verify row is named back to its step. Needs verify is outside the walk. The walk never reports ready with a blocker, a reopened step, or an open assumption, and it never starts build. Stopping partway is one paused-at line, then Next, Waiting only if blocked, and Uncommitted.'
   - '1.125.0: the progress confirm shows the line and gets a yes, unless the step''s own confirm already included that record. An extra''s yes stays that confirm. An already-applied playbook still asks skip (Recommended) or reapply. Optional extras are offered once, after open questions, when any apply, including show-or-ask when a question is for someone else. Before the plan step is recorded, kept-open questions with no `Blocks:` line are offered, one by one or as one batch.'
+  - '1.130.0: when the open-questions batch and the progress line share one card, `yes (Recommended)` covers both. Typed changes go on that card''s free-text answer. There is no Edits option.'
   - '1.126.0: ready means the first task can start, the rest wait in order, and nothing else blocks. A waits-on-T# reason for a real task is not a blocker. A cycle, or an after: that names no task, still blocks. `readiness --root` builds the rows. When resolve-open-questions is already current, an open question is waiting, not a jump back. Who comes from the latest Asked or Pending line. Next is show-or-ask when the questions are not asked yet, or this walk when the answers arrive. A jump back reruns the owning skill, even for a small patch. The walk does not edit spec.md, plan.md, or tasks.md on that jump, and it does not write Reviewed. A reopened step with nothing new is clear, not a fresh nothing-to-do, and nothing-to-do keeps an earlier done Result. Record one step per call, right when it finishes. record refuses more than one step. Resume warns when two or more steps share a Done stamp.'
   - '1.127.0: the playbook question comes before any later step, including a read-only check. Resume may report status and does not start a step. Who comes from the question''s "Waiting for" phrase, then the latest Pending or Asked line, or "not named yet", and an unnamed task still counts. Row buckets are waits-in-order, waiting, and blocked. The ready check records Result ready or Result not-ready. An older Result done still reads. `ack-stamps` acknowledges one shared Done stamp after a yes. A new shared stamp warns again.'
   use_when: A spec should be tightened and planned until it is ready to build

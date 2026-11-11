@@ -31,7 +31,7 @@ One card. Do not put the permissions question on it. Permissions come after, on 
 3. **Use an existing branch**.
 4. **Stop**.
 
-Stay only off a base, in place of nothing on a base. No Stay on a base. A typed branch name on this card is the answer. There is no follow-up card to collect a name.
+Stay only off a base, in place of nothing on a base. No Stay on a base. A typed branch name is this card's free-text answer, hint `Type a branch name`, not its own option. Do not offer an option labelled `Other name`. There is no follow-up card to collect a name. The rule is `crav1-docs/reference/question-cards.md`.
 
 A missing answer, or `continue` / `click` / `stop` on this card, is asked again. Use skill `crav1-build-tasks`, `scripts/ask_order.py`. Do not guess.
 

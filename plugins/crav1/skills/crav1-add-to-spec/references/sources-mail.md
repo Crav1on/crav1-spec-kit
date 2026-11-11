@@ -27,17 +27,18 @@ Number each image. The line says inline or attached, the file name or content id
 
 ### One question for the images
 
-After the list, one question when there is at least one image. Three answers. Use the questions tool when it is available. Stop until the user picks.
+After the list, one question card when there is at least one image, as `crav1-docs/reference/question-cards.md` says. Use the questions tool when it is available. Stop until the user picks.
 
-1. **Accept all recommendations.**
+1. **Accept all recommendations (Recommended).**
 2. **Go through them one by one.** The recommendation is shown on each image. The four options are the answers; the recommended one comes first with ` (Recommended)`.
-3. **Change some.** The user names images and the option, for example convert 2, compress 4.
+
+The card's free-text answer carries the hint `Type the flips, e.g. convert 2, compress 4`. Do not add a **Change some** option.
 
 Accept all recommendations applies every listed recommendation.
 
 Go through them one by one asks the four options for each image. One image at a time. Options only. Use the questions tool when it is available. The recommended option comes first with ` (Recommended)` at the end of its label; the question text does not repeat it. Stop until the user picks.
 
-Change some waits for the user to name the images and the option. The named option replaces the recommendation for that image. An image they do not name keeps its recommendation. When a number is not on the list, or the reply names an image and no option, ask again. Do not guess.
+The free-text answer names the images and the option. The named option replaces the recommendation for that image. An image they do not name keeps its recommendation. When a number is not on the list, or the reply names an image and no option, ask again. Do not guess.
 
 The transfer data policy `auto-accept` applies to keep and redact recommendations. Apply it to these image recommendations only when the rule text clearly covers them. The template says auto-accept applies the keep and redact recommendations. That line does not cover the four image options. Ask this question. A rule the user edited covers the image recommendations only when its own text says so, for example that auto-accept applies to embedded-image options. A keep and redact line is not that cover. Do not add an image choice to the rule. Do not rewrite the rule for this.
 

@@ -61,7 +61,7 @@ For **only** the current `Q#`:
 
 Every option: **letter**, **name**, **what it means**, **impact** (v0/demo/tests, and which files/sections). Use the catalog below. Tailor the answer letters to *this* question (e.g. “self-register” vs “admin-provisions”) — do not offer generic “apply notes.”
 
-4. How to answer: `A` / `B` / … or prose (“Q2: passwords min 12 chars, no recovery in v0”). Batch: `Q1 A, Q2 keep, Q4 C`.
+4. How to answer: `A` / `B` / … or prose (“Q2: passwords min 12 chars, no recovery in v0”). Batch on the card's free-text answer: `Q1 A, Q2 keep, Q4 C`.
 
 Stop. Do not edit. Do not preview a full patched spec.
 
@@ -81,7 +81,7 @@ If none remain, print one of these and not both.
 - New gaps appeared: `Next: /crav1-tighten-spec <slug>, because new gaps are not tightened yet.`
 - No new gaps: `Next: /crav1-plan-from-spec <slug>, because the open questions are settled or kept open.`
 
-**Batch (1.70.0).** Show every question at once, each with its options and the recommended one first, and ask once: a single `yes` applies every recommendation; a batch such as `Q1 A, Q3 keep` overrides those questions; answering one question at a time still works. Then patch, and give one recap for the run.
+**Batch (1.130.0).** One card, as `crav1-docs/reference/question-cards.md` says. `yes (Recommended)` applies every recommendation. Free-text hint: `Type your changes, e.g. Q1 A, Q3 keep`. An item not mentioned keeps its recommendation. One at a time still works. Then one recap.
 
 ## Resolution catalog (per question)
 

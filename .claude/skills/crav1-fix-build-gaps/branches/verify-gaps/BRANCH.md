@@ -53,7 +53,7 @@ Confirm the before-state: re-run that row’s evidence once. Quote the failure. 
 
 ## Branch (1.99.0)
 
-Before the first code edit, check the checkout as skill `crav1-create-feature-branch`, `references/code-branch.md` says. On a work branch, go ahead. On a base branch (main, master, develop, the `Merges into` branch, `release/*`) never edit code there: ask once, **Create `fix/<slug>` from `<into>` (Recommended)**, **Use an existing branch**, **Other name**, **Stop**. On another branch, the same with **Stay on `<current>`** in place of Other name. Headless: stop with the reference's one line unless the invocation has `new branch`. Inside the build worker the branch is already checked; skip this.
+Before the first code edit, check the checkout as skill `crav1-create-feature-branch`, `references/code-branch.md` says. On a work branch, go ahead. On a base branch (main, master, develop, the `Merges into` branch, `release/*`) never edit code there: ask once, **Create `fix/<slug>` from `<into>` (Recommended)**, **Use an existing branch**, **Stop**. A typed branch name is that card's free-text answer, hint `Type a branch name`. Do not offer an option labelled `Other name`. On another branch, the same with **Stay on `<current>`** as a real option. Headless: stop with the reference's one line unless the invocation has `new branch`. Inside the build worker the branch is already checked; skip this.
 
 ## Fix (in spec)
 

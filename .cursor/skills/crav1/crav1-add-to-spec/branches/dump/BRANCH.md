@@ -46,11 +46,12 @@ This skill does not ask keep, leave, or dismiss one fact at a time. It does not 
 
 On an edit, the user can mark a fact keep, leave, or dismiss. Keep moves it to belongs. Leave and dismiss write nothing beyond the full note.
 
-End the sort with this block, word for word except the examples, as the last thing in the message:
+End the sort with one question card, as `crav1-docs/reference/question-cards.md` says, as the last thing in the message.
 
-> **Reply yes** (or "confirm") to write it as shown.
-> To change something first, reply with your edits, for example "drop 13" or "leave out the Figure 3 inference".
-> Nothing gets committed either way.
+- `yes (Recommended)`: write it as shown.
+- The card's free-text answer. Hint: `Type your changes, e.g. drop 13` or `leave out the Figure 3 inference`. An item that answer does not mention keeps what was shown.
+
+Nothing gets committed either way. Do not add an `Edits` option.
 
 Stop. They confirm or edit the sort. Do not write files. That confirmation is the only stop before writes. Do not ask for a slug. Do not open a mushy interview, an architecture interview, or an export-format question. If they edit the sort, the edit is the confirmation. Do not ask again. Use their slugs and piles. A fact they struck, or that you never put on the sort, stays labeled inferred if it appears later. Confirming the sort confirms the facts they left on it.
 

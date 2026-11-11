@@ -10,6 +10,8 @@ Fix gaps a build left, one at a time inside the spec; asks verify-report gaps or
 
 1.99.0: before the first code edit on a base branch, offers Create `fix/<slug>` from the into branch (Recommended), an existing branch, another name or stop; never edits code there; headless stops unless `new branch`.
 
+1.130.0: a typed branch name is that card's free-text answer, hint `Type a branch name`. There is no option labelled Other name.
+
 **[`/crav1-fix-build-gaps`](crav1-fix-build-gaps.md)** opens with one question: gaps from the verify report, or a live-site gap (ports, proxy, SQL, unpublished URL). It skips the question when the message says which. It replaces fix-from-verify and fix-live; their rules are kept as branches.
 
 Verify report gaps (was `/crav1-fix-from-verify`): After verify-build-against-spec, walk inner-loop gaps (failed → unverified → `G#`); omit Gap for the next; writes `fix-log.md`.
