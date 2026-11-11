@@ -2,6 +2,16 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.132.0 (2026-11-11)
+
+The ready check can be partly ready, and the build map keeps finished tasks. A minor release because both change what a run records and what `/crav1-build-tasks` will start.
+
+- **ready-partial.** `/crav1-tasks-ready-to-build` and the tighten-and-plan ready check now have a third result, beside `ready` and `not-ready`. When some tasks can start and some are held by an open question, the result is `ready-partial`. The tasks that can start are listed as ready, and the line says where the hold begins (`Ready: T1, T2. Held from T3.`). Held tasks stay under Waiting, each with its question and who has the answer. A task that depends on a held task is held too, through later tasks, with the reason `held, waits on T3`. The walk records `Result: ready-partial`, stamps `Done`, covers the step, and ends. It does not write `not-ready`. Next is `/crav1-build-tasks` for the tasks that can start. A later rerun, after the answers are in the spec, moves the held tasks to ready and can record `ready`. `not-ready` remains when nothing can start. A cycle, a missing task, no plan, Needs verify, an open plan-review warning, a reopened walk step, or a question that is still a jump back also records `not-ready`, because the walk still has that row.
+- **Build gate.** `/crav1-build-tasks` and `/crav1-build-features` start the tasks `can_start` lists when the result is `ready` or `ready-partial`. A held task is refused with its reason. The run does not ask to build it anyway. When the result is `not-ready`, no worker starts.
+- **Build map.** A ticked task stays in its wave. The row strikes the short name through and marks it done, with the pull request link, or the branch or commit when there is no pull request: `~~short name~~ ✓ done ([PR 12](https://github.com/contoso/orders-api/pull/12))`. The heading counts done tasks apart from the branches that can start. A wave whose every task is done is a `<details>` block (`Wave N done (K tasks)`). The rows stay in the file.
+- **First jump on Windows.** [Install](docs/install.md) shows a PowerShell download next to the bash one. In Windows PowerShell 5.1, `curl` is an alias for `Invoke-WebRequest`, so the curl flags fail. On Windows, `python3` is often missing. Use `python` or `py`.
+- **Line endings.** The three-way compare treats CRLF and LF as the same text. A local file that matches the old kit apart from line endings is a plain update, not a clash. A real edit on the same lines still clashes. The written file keeps that file's line endings (or `.gitattributes` `eol`, otherwise LF), so the update is not a whole-file line-ending diff. A copied template that matches the old release apart from line endings is still replaced. `fetch` clones with `core.autocrlf=false`.
+
 ## 1.131.0 (2026-11-11)
 
 Update the installed kit from a published release, on the branch you are already on. A minor release because `/crav1-update-kit` is a new command.

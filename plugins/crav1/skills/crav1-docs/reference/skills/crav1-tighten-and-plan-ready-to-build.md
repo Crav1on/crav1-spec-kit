@@ -22,6 +22,8 @@ The progress file is `docs/specs/<slug>/walk-progress.md`. It records the step, 
 
 1.127.0: the playbook question comes before any later step, including a read-only check. Resume may report status and does not start a step. Who comes from the question's "Waiting for" phrase, then the latest Pending or Asked line, or "not named yet", and an unnamed task still counts. Row buckets are waits-in-order, waiting, and blocked. The ready check records Result ready or Result not-ready. An older Result done still reads. `ack-stamps` acknowledges one shared Done stamp after a yes. A new shared stamp warns again.
 
+1.132.0: the ready check also records Result ready-partial when some tasks can start and some are held. A task that depends on a held task is held too. The line names the split. The walk ends, the step is covered, and there is no not-ready mark. Next is [`/crav1-build-tasks`](crav1-build-tasks.md) for the tasks that can start. A later rerun can record ready. not-ready remains when nothing can start, and when a cycle, a missing task, no plan, Needs verify, an assumption, a reopened step, or a jump-back question remains.
+
 ## Runs when
 
 A spec should be tightened and planned until it is ready to build. Called by the user.

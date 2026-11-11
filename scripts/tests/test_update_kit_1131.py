@@ -6,6 +6,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPT = ROOT / ".cursor/skills/crav1/crav1-update-kit/scripts/update_kit.py"
@@ -163,6 +164,17 @@ class VersionsAndTargets(unittest.TestCase):
         self.assertIn("not a published release tag", result.stderr)
         self.assertFalse(Path("/tmp/crav1-update-kit-should-not-exist").exists())
 
+    def test_fetch_clones_with_autocrlf_off(self):
+        dest = Path(tempfile.mkdtemp()) / "release"
+        with patch("subprocess.run") as run:
+            run.return_value = subprocess.CompletedProcess([], 0)
+            kit.fetch_release("v1.131.0", dest, "https://example.invalid/kit.git")
+        cmd = run.call_args.args[0]
+        self.assertEqual(cmd[0], "git")
+        self.assertIn("-c", cmd)
+        self.assertIn("core.autocrlf=false", cmd)
+        self.assertIn("clone", cmd)
+
 
 class Overlay(unittest.TestCase):
     def setUp(self):
@@ -255,6 +267,54 @@ class Overlay(unittest.TestCase):
         self.assertIn("alpha local", (self.root / clash).read_text(encoding="utf-8"))
         for path in PROJECT_PATHS:
             self.assertEqual((self.root / path).read_bytes(), self.before[path], path)
+
+    def test_line_endings_alone_are_an_update_and_the_write_keeps_local_lf(self):
+        rel = ".cursor/skills/crav1/crav1-example/SKILL.md"
+        (self.old / rel).parent.mkdir(parents=True, exist_ok=True)
+        (self.old / rel).write_bytes(b"alpha\r\nbeta\r\n")
+        (self.root / rel).parent.mkdir(parents=True, exist_ok=True)
+        (self.root / rel).write_bytes(b"alpha\nbeta\n")
+        (self.new / rel).parent.mkdir(parents=True, exist_ok=True)
+        (self.new / rel).write_bytes(b"alpha\r\nbeta kit\r\n")
+        plan = json.loads(run_cli(
+            ["plan", "--root", str(self.root), "--old", str(self.old), "--new", str(self.new)]
+        ).stdout)
+        self.assertIn(rel, plan["files"]["update"])
+        self.assertNotIn(rel, [item["path"] for item in plan["files"]["clash"]])
+        applied = run_cli(
+            ["apply", "--root", str(self.root), "--old", str(self.old), "--new", str(self.new), "--yes"]
+        )
+        self.assertEqual(applied.returncode, 0, applied.stderr)
+        written = (self.root / rel).read_bytes()
+        self.assertEqual(written, b"alpha\nbeta kit\n")
+        self.assertNotIn(b"\r", written)
+
+    def test_a_real_edit_still_clashes_when_line_endings_differ(self):
+        rel = ".cursor/skills/crav1/crav1-example/SKILL.md"
+        (self.old / rel).parent.mkdir(parents=True, exist_ok=True)
+        (self.old / rel).write_bytes(b"alpha\r\nbeta\r\ngamma\r\n")
+        (self.root / rel).parent.mkdir(parents=True, exist_ok=True)
+        (self.root / rel).write_bytes(b"alpha local\nbeta local\ngamma\n")
+        (self.new / rel).parent.mkdir(parents=True, exist_ok=True)
+        (self.new / rel).write_bytes(b"alpha\r\nbeta kit\r\ngamma new\r\n")
+        plan = json.loads(run_cli(
+            ["plan", "--root", str(self.root), "--old", str(self.old), "--new", str(self.new)]
+        ).stdout)
+        clashes = {item["path"]: item for item in plan["files"]["clash"]}
+        self.assertIn(rel, clashes)
+        blob = json.dumps(clashes[rel]["hunks"])
+        self.assertIn("beta local", blob)
+        self.assertIn("beta kit", blob)
+        applied = run_cli(
+            [
+                "apply", "--root", str(self.root), "--old", str(self.old), "--new", str(self.new),
+                "--yes", "--keep", rel,
+            ]
+        )
+        self.assertEqual(applied.returncode, 0, applied.stderr)
+        written = (self.root / rel).read_bytes()
+        self.assertEqual(written, b"alpha local\nbeta local\ngamma new\n")
+        self.assertNotIn(b"\r", written)
 
     def test_template_updates_only_when_it_still_matches_the_old_kit(self):
         rel_same = "docs/specs/_template/spec.md"

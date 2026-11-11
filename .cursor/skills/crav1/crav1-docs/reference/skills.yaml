@@ -1013,6 +1013,7 @@ skills:
   - '1.64.0: a task''s `(branch: …)` is offered first (Recommended) in the Build prompt; range and all-tasks runs switch to each task''s branch on a clean tree, and a missing branch blocks that task.'
   - '1.68.0: offers to create a missing task sub-branch from its spec branch and writes its `(into …)` marker after the yes.'
   - '1.129.0: the branch question is its own card, before permissions, and a typed branch name on that card is the answer. A missing answer, or one that belongs on the other card, is re-asked. The offered branch is the build map row (`scripts/build_map.py --recommend T#`). A different pick writes `(map: <picked>)` and does not commit it. A missing person''s yes is `needs_yes` and a Waiting line, not blocked, and the task stays unticked. A new `.sh` file with no `*.sh eol=lf` rule, when autocrlf is true or the host is Windows, offers `*.sh text eol=lf` and does not add it without a yes.'
+  - '1.132.0: when the ready check result is `ready` or `ready-partial`, the tasks in `can_start` may start. A held task (`refused`) is refused with its reason, including `held, waits on T#`. The run does not ask to build it anyway. When the result is `not-ready`, no worker starts.'
   use_when: You want to build one task, a range, or all unticked tasks
   table:
     reads: 'Inside each worker: One `T#`, the plan, and the spec; One task: One `T#` and the persist rule;
@@ -1060,6 +1061,7 @@ skills:
   - '1.99.0: `feat/<slug>` forks from the into branch (Merges into, else default), a task naming a base branch is blocked.'
   - '1.64.0: tasks with `(branch: …)` are built on that branch; the board shows `done (n branches not merged)`.'
   - '1.129.0: each task is built on the build map row from `scripts/build_map.py --recommend T#`. A worker `needs_yes` is waiting, not blocked.'
+  - '1.132.0: the same ready-check gate as `/crav1-build-tasks`. `ready` and `ready-partial` start `can_start`. A held task is refused with its reason. `not-ready` starts no worker on that slug.'
   use_when: Several specs, one after another
   table:
     reads: Ready spec folders on the default branch
@@ -1594,7 +1596,7 @@ skills:
     or an earlier chat does not count.
   - Kit-owned files are three-way merged against the previous release. Non-overlapping edits combine. A clash
     shows both sides; the recommendation keeps the local side. A copied `docs/specs/_template/` or
-    `docs/system/_template/` file is replaced only when it still matches the old release byte for byte.
+    `docs/system/_template/` file is replaced only when it still matches the old release apart from line endings.
     Specs, walk-progress, plans, tasks, notes, playbooks, and the build map are not part of the replace.
   - A plugin or user-scope install is not a commit. The command compares versions, says how to refresh or
     recopy, and still offers migration steps. After the replace, migration steps for the jump are dry-run,
@@ -1602,15 +1604,16 @@ skills:
   - 'The commit message is `Update CRAV1 kit vA to vB`. The script does not push. A push happens only when
     the user already asked for it in this run. The default ending is a local commit and stop. The heads-up
     card is not skipped by a word in the opening message. The yes is the user''s answer after the branch is shown.'
+  - '1.132.0: the first jump, before the command is installed, has a Windows PowerShell download next to the bash one. In Windows PowerShell 5.1, `curl` is an alias for `Invoke-WebRequest`. On Windows, use `python` or `py`. The three-way compare treats CRLF and LF as the same text. A line-ending-only difference is an update, not a clash. A real edit on the same lines still clashes. The written file keeps the local line endings. `fetch` clones with `core.autocrlf=false`.'
   use_when: The installed kit should move to a published release
   table:
     reads: The installed version, the published release tags, and the kit files on this branch
-    writes: Kit-owned files on this branch, a byte-identical copied template, an optional migration after
+    writes: Kit-owned files on this branch, a copied template that still matches the old release apart from line endings, an optional migration after
       a separate yes, and one local commit
   reads: Reads `plugin.json` or the `Kit version:` line, the published `vX.Y.Z` tags, the old release,
     the new release, and the working tree. It does not read a branch or an open pull request as a target.
   writes: Writes kit-owned files on the current branch after a yes, replaces a copied template that still
-    matches the old release byte for byte, and commits `Update CRAV1 kit vA to vB` when the user chose the
+    matches the old release apart from line endings, and commits `Update CRAV1 kit vA to vB` when the user chose the
     commit. A migration listed for the jump is dry-run and written only on its own yes, and is left unstaged.
   leaves_alone: Leaves specs, `walk-progress.md`, plans, tasks, notes, playbooks, the build map, persist
     rules, the transfer data policy, and `kit-maintainer.mdc` alone. Does not switch branches, rebase, or
@@ -1647,6 +1650,7 @@ skills:
   - '1.127.0: the report splits Ready, Waiting on a question, Waits in order, and Blocked. `task_order.py` text uses the same Waits in order and Blocked headings. Who on a question comes from "Waiting for", then the latest Pending or Asked line, or not named yet. The interpreter is `docs/reference/running-scripts.md`.'
   - '1.128.0: every run rewrites `docs/specs/<slug>/build-map.md` through `scripts/build_map.py`. The task list is unchanged apart from one line pointing at that file. The word `build-map` shows only the short summary: the path, how many branches in each wave can run in parallel, then the Overlap lines for that wave, one per pair. The ready-check list stays the one pointer line. One branch per numbered Approach step, unless a task has `(map:)`. `(step:)` links a task to a step. No steps, or steps that name no task, means one branch per task, and the file says so. Each wave is a subgraph so its branches sit side by side. A question hold is counted in the wave heading (`3 branches, 2 can start now`). An overlap note names two branches in one wave that share a `(spec:)` requirement or a backtick path. The note does not change readiness or waves. Six fields per branch, no task ids and no file list in a row. Who uses the 1.127.0 rule. A cycle or an unknown `(after:)` is under Blocked.'
   - '1.129.0: the row branch is `(map:)`, else `(branch:)`, else the plan step, else `committed later on`, else `feat/<slug>-<words>`. `--recommend T#` prints that name and does not write. Tasks are short names (a `task: T#` title in `work-item.md`, else the text up to ` (`, `, in `, or the sentence end, about 80 characters). A removed task id does not leave a dangling possessive, empty parentheses, a leading comma, or a double space. The wave heading is always `N branches, M can start now`, including `1 branch, 1 can start now`. A row whose task text names another branch adds `Task text names feat/x; built on feat/y`.'
+  - '1.132.0: the result is `ready`, `ready-partial`, or `not-ready`. `ready-partial` lists the tasks that can start and the line (`Ready: T1, T2. Held from T3.`). A task that waits on a held task is held too, reason `held, waits on T3`, and stays under Waiting. `not-ready` is when nothing can start. A ticked task stays in the build map, struck through with its pull request, branch, or commit. A wave whose every task is done is a details block. The rows stay. The heading counts done tasks apart from branches that can start.'
   choice_words:
   - question: Show the build map?
     words:
@@ -1993,6 +1997,7 @@ skills:
   - '1.130.0: when the open-questions batch and the progress line share one card, `yes (Recommended)` covers both. Typed changes go on that card''s free-text answer. There is no Edits option. The optional-extras card is a multi-select and includes None, go to plan. Skipping does not need a typed word.'
   - '1.126.0: ready means the first task can start, the rest wait in order, and nothing else blocks. A waits-on-T# reason for a real task is not a blocker. A cycle, or an after: that names no task, still blocks. `readiness --root` builds the rows. When resolve-open-questions is already current, an open question is waiting, not a jump back. Who comes from the latest Asked or Pending line. Next is show-or-ask when the questions are not asked yet, or this walk when the answers arrive. A jump back reruns the owning skill, even for a small patch. The walk does not edit spec.md, plan.md, or tasks.md on that jump, and it does not write Reviewed. A reopened step with nothing new is clear, not a fresh nothing-to-do, and nothing-to-do keeps an earlier done Result. Record one step per call, right when it finishes. record refuses more than one step. Resume warns when two or more steps share a Done stamp.'
   - '1.127.0: the playbook question comes before any later step, including a read-only check. Resume may report status and does not start a step. Who comes from the question''s "Waiting for" phrase, then the latest Pending or Asked line, or "not named yet", and an unnamed task still counts. Row buckets are waits-in-order, waiting, and blocked. The ready check records Result ready or Result not-ready. An older Result done still reads. `ack-stamps` acknowledges one shared Done stamp after a yes. A new shared stamp warns again.'
+  - '1.132.0: the ready check also records Result ready-partial when some tasks can start and some are held. A task that depends on a held task is held too. The line names the split. The walk ends, the step is covered, and there is no not-ready mark. Next is `/crav1-build-tasks` for the tasks that can start. A later rerun can record ready. not-ready remains when nothing can start, and when a cycle, a missing task, no plan, Needs verify, an assumption, a reopened step, or a jump-back question remains.'
   use_when: A spec should be tightened and planned until it is ready to build
   table:
     reads: The spec folder, an optional playbook (outside the project or under `docs/playbooks/`), and the progress file when one exists

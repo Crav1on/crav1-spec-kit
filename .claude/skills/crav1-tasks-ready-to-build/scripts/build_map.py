@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Build map for one slice (kit 1.129.0).
+"""Build map for one slice (kit 1.132.0).
 
-Groups the open tasks onto branches. The row name is the task branch, in this
+Groups the tasks onto branches, including tasks that are already done. The row name is the task branch, in this
 order: `(map: <branch>)`, else `(branch: <branch>)`, else the plan step's
 `feat/<slug>-<words>` name, else a branch the task text names as
 `committed later on <branch>`, else `feat/<slug>-<words>` from the task.
@@ -11,8 +11,10 @@ the same name share a row.
 A task id written in a step, or `(step: <n>)` on the task, is the link.
 `(step:)` wins when both are present.
 
-When the plan has no steps, or the steps name no task, each open task gets
-its own branch and the file says so.
+When the plan has no steps, or the steps name no task, each task gets
+its own branch and the file says so. A done task stays in its wave, struck
+through, with its pull request, branch, or commit. A wave whose every task
+is done is wrapped in a details block. The rows stay in the file.
 
 Waves are branch dependencies. Wave 1 does not wait for another open branch.
 A later wave opens after the branches it waits for. A cycle, or an `(after:)`
@@ -395,6 +397,109 @@ def _branch_cycles(names, waits):
     return on_cycle
 
 
+PR_NUM = re.compile(r"\(PR\s+(\d+)\)", re.I)
+HTTP_URL = re.compile(r"https://[^\s)>\"']+")
+SHA = re.compile(r"\b([0-9a-f]{7,40})\b", re.I)
+
+
+def pull_requests(spec_text):
+    """Branch token to a PR link, or `PR n` when the spec has no repo URL.
+
+    A Match `Branch:` line ending in `(PR n)` is the link. A URL on that line,
+    or a URL elsewhere in the spec whose path contains the repo prefix, becomes
+    a Markdown link. Azure DevOps URLs use `/pullrequest/`. No network read.
+    """
+    text = spec_text or ""
+    urls = [url.rstrip(").,") for url in HTTP_URL.findall(text)]
+    found = {}
+    for line in text.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("- "):
+            stripped = stripped[2:].strip()
+        if not stripped.lower().startswith("branch:"):
+            continue
+        body = stripped.split(":", 1)[1].strip()
+        pr = PR_NUM.search(body)
+        if not pr:
+            continue
+        number = pr.group(1)
+        cleaned = re.sub(r"\([^)]*\)", " ", body)
+        token = branch_token(cleaned)
+        if not token:
+            continue
+        found[token] = _pr_evidence(number, body, urls)
+    return found
+
+
+def _join_pr(url, number):
+    base = url.rstrip("/")
+    low = base.lower()
+    if "dev.azure.com" in low or "visualstudio.com" in low or "/_git/" in low:
+        return f"[PR {number}]({base}/pullrequest/{number})"
+    return f"[PR {number}]({base}/pull/{number})"
+
+
+def _pr_evidence(number, body, urls):
+    line_urls = [url.rstrip(").,") for url in HTTP_URL.findall(body)]
+    for url in line_urls:
+        low = url.lower().rstrip("/")
+        if low.endswith(f"/pull/{number}") or low.endswith(f"/pullrequest/{number}"):
+            return f"[PR {number}]({url.rstrip('/')})"
+    for url in line_urls:
+        return _join_pr(url, number)
+    raw = re.sub(r"\([^)]*\)", " ", body).split()
+    repo = raw[0].lower() if len(raw) >= 2 and "/" not in raw[0] else ""
+    if repo:
+        for url in urls:
+            low = url.lower()
+            if "/pull/" in low or "/pullrequest/" in low:
+                continue
+            if repo in low:
+                return _join_pr(url, number)
+    return f"PR {number}"
+
+
+def task_pr(rest):
+    """A pull request URL written on the task line, as a Markdown link."""
+    for url in HTTP_URL.findall(rest or ""):
+        url = url.rstrip(").,")
+        match = re.search(r"/(?:pull|pullrequest)/(\d+)", url, re.I)
+        if match:
+            return f"[PR {match.group(1)}]({url})"
+    return None
+
+
+def verify_sha(text, task_id):
+    """A commit sha on the verify row for this task, or None."""
+    if not text:
+        return None
+    tid = f"T{task_id}"
+    for line in text.splitlines():
+        if not re.search(rf"\b{re.escape(tid)}\b", line):
+            continue
+        match = SHA.search(line)
+        if match:
+            return match.group(1)[:12]
+    return None
+
+
+def done_evidence(task, branch_name, prs, verify_text):
+    """PR link, else the recorded branch, else a verify commit, else the row branch."""
+    direct = task_pr(task.get("rest") or "")
+    if direct:
+        return direct
+    recorded = task.get("map") or task.get("branch") or committed_later(task.get("rest") or "")
+    for key in (recorded, branch_name):
+        if key and key in prs:
+            return prs[key]
+    if recorded:
+        return recorded
+    sha = verify_sha(verify_text, task["id"])
+    if sha:
+        return sha
+    return branch_name
+
+
 def _explicit(task):
     """(map:) wins over (branch:). Either one names the row instead of the step."""
     if task.get("map"):
@@ -404,7 +509,7 @@ def _explicit(task):
     return None
 
 
-def build(slug, spec_text, plan_text, tasks_text, work_item_text=""):
+def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text=""):
     """Return markdown, a short chat summary, and the one-line pointer."""
     tasks = parse_tasks(tasks_text)
     titles = work_item_titles(work_item_text)
@@ -426,7 +531,9 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text=""):
         for task_id in step["ids"]:
             mentioned.setdefault(task_id, step["n"])
 
-    open_tasks = [task for task in tasks if not task["done"]]
+    prs = pull_requests(spec_text or "")
+    # Done tasks stay on the map (1.132.0). They are not dropped.
+    open_tasks = list(tasks)
     linked = []
     missing_step = False
     for task in open_tasks:
@@ -492,7 +599,13 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text=""):
     branches = []
     for name, members in sorted(groups.items(), key=lambda item: (min(task["id"] for task in item[1]), item[0])):
         members = sorted(members, key=lambda task: task["id"])
-        shorts = [name_of.get(task["id"]) or "work" for task in members]
+        shorts = []
+        for task in members:
+            short = name_of.get(task["id"]) or "work"
+            if task["done"]:
+                evidence = done_evidence(task, name, prs, verify_text)
+                short = f"~~{short}~~ ✓ done ({evidence})"
+            shorts.append(short)
         owners = {task.get("owner") for task in members}
         owner = next(iter(owners)) if len(owners) == 1 else None
         if (
@@ -531,30 +644,29 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text=""):
     for branch in branches:
         seen_q = set()
         for task in branch["tasks"]:
-            questions_here = _questions_for(task["id"], questions) if has_plan or spec_text else _questions_for(task["id"], questions)
-            if not has_plan:
-                task_blocked[branch["name"]] = True
-            elif questions_here:
-                for question in questions_here:
-                    marker = question["text"]
-                    if marker not in seen_q:
-                        seen_q.add(marker)
-                        holding[branch["name"]].append(question)
-            elif risk_blocks:
-                task_blocked[branch["name"]] = True
-            else:
-                reason = (rows.get(task["id"]) or {}).get("reason") or ""
-                low = reason.lower()
-                if "cycle" in low or "names no task" in low:
+            if not task["done"]:
+                questions_here = _questions_for(task["id"], questions) if has_plan or spec_text else _questions_for(task["id"], questions)
+                if not has_plan:
                     task_blocked[branch["name"]] = True
-                if "names no task" in low:
-                    unknown[branch["name"]] = True
+                elif questions_here:
+                    for question in questions_here:
+                        marker = question["text"]
+                        if marker not in seen_q:
+                            seen_q.add(marker)
+                            holding[branch["name"]].append(question)
+                elif risk_blocks:
+                    task_blocked[branch["name"]] = True
+                else:
+                    reason = (rows.get(task["id"]) or {}).get("reason") or ""
+                    low = reason.lower()
+                    if "cycle" in low or "names no task" in low:
+                        task_blocked[branch["name"]] = True
+                    if "names no task" in low:
+                        unknown[branch["name"]] = True
             for dep in task["deps"]:
                 if dep not in by_id:
                     unknown[branch["name"]] = True
                     task_blocked[branch["name"]] = True
-                    continue
-                if by_id[dep]["done"]:
                     continue
                 other = id_branch.get(dep)
                 if other is None or other["name"] == branch["name"]:
@@ -565,7 +677,10 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text=""):
     cycles = _branch_cycles(set(names), waits)
     for branch in branches:
         name = branch["name"]
-        if not has_plan or task_blocked[name] or name in cycles:
+        finished = bool(branch["tasks"]) and all(task["done"] for task in branch["tasks"])
+        if finished and has_plan and name not in cycles and not task_blocked[name]:
+            status = "done"
+        elif not has_plan or task_blocked[name] or name in cycles:
             status = "blocked"
         elif holding[name]:
             status = "waiting on a question"
@@ -578,6 +693,28 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text=""):
         branch["unknown"] = unknown[name]
         branch["questions"] = holding[name]
         branch["cycle"] = name in cycles
+        branch["held_on"] = []
+
+    by_name = {branch["name"]: branch for branch in branches}
+    for branch in branches:
+        if branch["status"] != "waits in order" or branch["unknown"]:
+            continue
+        if branch["waits"] and all(by_name[name]["status"] == "done" for name in branch["waits"]):
+            branch["status"] = "ready"
+    held_names = {branch["name"] for branch in branches if branch["status"] == "waiting on a question"}
+    changed = True
+    while changed:
+        changed = False
+        for branch in branches:
+            if branch["name"] in held_names or branch["status"] in ("blocked", "done"):
+                continue
+            deps = [name for name in branch["waits"] if name in held_names]
+            if not deps:
+                continue
+            branch["status"] = "held"
+            branch["held_on"] = deps
+            held_names.add(branch["name"])
+            changed = True
 
     wave = {}
     indeg = {branch["name"]: len(branch["waits"]) for branch in branches}
@@ -605,7 +742,6 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text=""):
             branch["section"] = "wave"
             branch["wave"] = wave[branch["name"]]
 
-    by_name = {branch["name"]: branch for branch in branches}
     markdown = _render(slug, grouping, branches, by_name, risks, has_plan, risk_blocks, name_of)
     pointer = f"Build map: docs/specs/{slug}/build-map.md"
     summary = _summary(slug, pointer, branches)
@@ -618,6 +754,8 @@ def recommended_branches(slug, spec_text, plan_text, tasks_text, work_item_text=
     found = {}
     for branch in result["branches"]:
         for task in branch["tasks"]:
+            if task["done"]:
+                continue
             found[task["id"]] = branch["name"]
     return found
 
@@ -653,16 +791,28 @@ def _waits_line(branch, by_name):
     return "; ".join(parts) if parts else "none"
 
 
-def parallel_phrase(members):
-    """How many branches in a wave can start now. A question hold is not a start.
+def _ready_now(branch):
+    if branch["status"] == "held":
+        return "held, waits on " + "; ".join(branch.get("held_on") or [])
+    return branch["status"]
 
-    Always `N branch(es), M can start now`, including one branch and a wave
-    where every branch can start.
+
+def parallel_phrase(members):
+    """How many branches in a wave can start now, and how many tasks are done.
+
+    Always `N branch(es), M can start now`. A question hold, a hold that
+    waits on one, and a branch whose tasks are all done are not a start.
+    When the wave has done tasks, the heading adds `, K done`.
     """
     count = len(members)
-    held = sum(1 for branch in members if branch["status"] == "waiting on a question")
+    not_start = {"waiting on a question", "held", "done"}
+    start = sum(1 for branch in members if branch["status"] not in not_start)
+    done_tasks = sum(1 for branch in members for task in branch["tasks"] if task.get("done"))
     noun = "branch" if count == 1 else "branches"
-    return f"{count} {noun}, {count - held} can start now"
+    text = f"{count} {noun}, {start} can start now"
+    if done_tasks:
+        text += f", {done_tasks} done"
+    return text
 
 
 def overlap_lines(members):
@@ -718,13 +868,24 @@ def _render(slug, grouping, branches, by_name, risks, has_plan, risk_blocks, nam
             waves.setdefault(branch["wave"], []).append(branch)
     for number in sorted(waves):
         members = sorted(waves[number], key=lambda item: item["tasks"][0]["id"])
-        lines.append(f"## Wave {number}: {parallel_phrase(members)}")
-        lines.append("")
+        block = [f"## Wave {number}: {parallel_phrase(members)}", ""]
         for note in overlap_lines(members):
-            lines.append(note)
-            lines.append("")
+            block.append(note)
+            block.append("")
         for branch in members:
-            lines.extend(_branch_block(branch, by_name, names))
+            block.extend(_branch_block(branch, by_name, names))
+        tasks = [task for branch in members for task in branch["tasks"]]
+        if tasks and all(task.get("done") for task in tasks):
+            count = len(tasks)
+            noun = "task" if count == 1 else "tasks"
+            lines.append("<details>")
+            lines.append(f"<summary>Wave {number} done ({count} {noun})</summary>")
+            lines.append("")
+            lines.extend(block)
+            lines.append("</details>")
+            lines.append("")
+        else:
+            lines.extend(block)
     if blocked:
         lines.append("## Blocked")
         lines.append("")
@@ -743,7 +904,7 @@ def _branch_block(branch, by_name, names=None):
         f"- Tasks: {titles}",
         f"- Waits for: {_waits_line(branch, by_name)}",
         f"- Question: {_question_line(branch['questions'], names)}",
-        f"- Ready now: {branch['status']}",
+        f"- Ready now: {_ready_now(branch)}",
     ]
     if branch.get("note"):
         lines.append(f"- {branch['note']}")
@@ -810,7 +971,7 @@ def _summary(slug, pointer, branches):
     waves = {}
     blocked = []
     for branch in branches:
-        label = f"{branch['name']} ({branch['status']})"
+        label = f"{branch['name']} ({_ready_now(branch)})"
         if branch["section"] == "blocked":
             blocked.append((branch["tasks"][0]["id"], label))
         else:
@@ -876,12 +1037,13 @@ def run_dir(directory, chat=False, stdout=False, recommend=None):
     spec = _read(directory / "spec.md") or ""
     plan = _read(directory / "plan.md")
     work = _read(directory / "work-item.md") or ""
+    verify = _read(directory / "verify.md") or ""
     if recommend:
         name = recommended_branch(slug, spec, plan, tasks, recommend, work)
         if not name:
             return f"No open task {recommend}.", 2
         return name, 0
-    result = build(slug, spec, plan, tasks, work)
+    result = build(slug, spec, plan, tasks, work, verify)
     if not stdout:
         (directory / "build-map.md").write_text(result["markdown"], encoding="utf-8")
     if stdout and not chat:

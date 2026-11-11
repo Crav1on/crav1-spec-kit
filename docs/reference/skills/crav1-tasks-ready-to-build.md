@@ -30,6 +30,8 @@ Shows summary counts per slice, then Ready, Waiting on a question, Waits in orde
 
 1.129.0: the row branch is `(map:)`, else `(branch:)`, else the plan step, else `committed later on`, else `feat/<slug>-<words>`. `--recommend T#` prints that name and does not write. Tasks are short names (a `task: T#` title in `work-item.md`, else the text up to ` (`, `, in `, or the sentence end, about 80 characters). A removed task id does not leave a dangling possessive, empty parentheses, a leading comma, or a double space. The wave heading is always `N branches, M can start now`, including `1 branch, 1 can start now`. A row whose task text names another branch adds `Task text names feat/x; built on feat/y`.
 
+1.132.0: the result is `ready`, `ready-partial`, or `not-ready`. `ready-partial` lists the tasks that can start and the line (`Ready: T1, T2. Held from T3.`). A task that waits on a held task is held too, reason `held, waits on T3`, and stays under Waiting. `not-ready` is when nothing can start. A ticked task stays in the build map, struck through with its pull request, branch, or commit. A wave whose every task is done is a details block. The rows stay. The heading counts done tasks apart from branches that can start.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.

@@ -12,11 +12,13 @@ Update the installed kit on the current branch to a published release.
 
 It commits on the current branch and does not switch. Before any write it shows which branch that is, that only this branch gets the new kit, and that other branches stay on the old kit until this branch is merged into them (merge develop into the branch; never rebase). It suggests merging first or switching branch when this branch should not move, and it warns about uncommitted changes. A yes from an agent or an earlier chat does not count.
 
-Kit-owned files are three-way merged against the previous release. Non-overlapping edits combine. A clash shows both sides; the recommendation keeps the local side. A copied `docs/specs/_template/` or `docs/system/_template/` file is replaced only when it still matches the old release byte for byte. Specs, walk-progress, plans, tasks, notes, playbooks, and the build map are not part of the replace.
+Kit-owned files are three-way merged against the previous release. Non-overlapping edits combine. A clash shows both sides; the recommendation keeps the local side. A copied `docs/specs/_template/` or `docs/system/_template/` file is replaced only when it still matches the old release apart from line endings. Specs, walk-progress, plans, tasks, notes, playbooks, and the build map are not part of the replace.
 
 A plugin or user-scope install is not a commit. The command compares versions, says how to refresh or recopy, and still offers migration steps. After the replace, migration steps for the jump are dry-run, listed, and written only on yes. They are not staged into the kit commit.
 
 The commit message is `Update CRAV1 kit vA to vB`. The script does not push. A push happens only when the user already asked for it in this run. The default ending is a local commit and stop. The heads-up card is not skipped by a word in the opening message. The yes is the user's answer after the branch is shown.
+
+1.132.0: the first jump, before the command is installed, has a Windows PowerShell download next to the bash one. In Windows PowerShell 5.1, `curl` is an alias for `Invoke-WebRequest`. On Windows, use `python` or `py`. The three-way compare treats CRLF and LF as the same text. A line-ending-only difference is an update, not a clash. A real edit on the same lines still clashes. The written file keeps the local line endings. `fetch` clones with `core.autocrlf=false`.
 
 ## Runs when
 
@@ -34,9 +36,9 @@ Reads `plugin.json` or the `Kit version:` line, the published `vX.Y.Z` tags, the
 
 ## Writes
 
-In short: Kit-owned files on this branch, a byte-identical copied template, an optional migration after a separate yes, and one local commit.
+In short: Kit-owned files on this branch, a copied template that still matches the old release apart from line endings, an optional migration after a separate yes, and one local commit.
 
-Writes kit-owned files on the current branch after a yes, replaces a copied template that still matches the old release byte for byte, and commits `Update CRAV1 kit vA to vB` when the user chose the commit. A migration listed for the jump is dry-run and written only on its own yes, and is left unstaged.
+Writes kit-owned files on the current branch after a yes, replaces a copied template that still matches the old release apart from line endings, and commits `Update CRAV1 kit vA to vB` when the user chose the commit. A migration listed for the jump is dry-run and written only on its own yes, and is left unstaged.
 
 ## Does not
 

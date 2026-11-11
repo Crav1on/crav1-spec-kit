@@ -96,6 +96,8 @@ For each queued slug, after switch:
 
 Run the build-tasks **T# loop** on **this** slug’s `tasks.md` (all remaining `- [ ]` unless they named a range **for that slug** — v1: all unchecked on that slug), in dependency order with its ready check before each `T#` (1.103.0, `/crav1-build-tasks` several-tasks branch).
 
+**Held (1.132.0).** The same gate as `/crav1-build-tasks`. `readiness` `result` `ready` or `ready-partial` starts tasks in `can_start`. A gate with `refused` true is refused with its reason. Do not ask to build it anyway. Skip it and continue with the next task that can start. When `result` is `not-ready`, do not start a worker on this slug.
+
 1. Launch **crav1-build-task-agent** with this spec folder, this `T#`, `resume: start`, `approvals: already-done`, `branch: already-done`, style already set.
 2. Wait for STATUS. Do not implement. Do not start `T+1` or the next slug while this worker is open.
 3. Handle STATUS:

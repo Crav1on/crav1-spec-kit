@@ -28,6 +28,8 @@ A range or all (was `/crav1-complete-tasks`): Orchestrates one worker per `T#` (
 
 1.129.0: the branch question is its own card, before permissions, and a typed branch name on that card is the answer. A missing answer, or one that belongs on the other card, is re-asked. The offered branch is the build map row (`scripts/build_map.py --recommend T#`). A different pick writes `(map: <picked>)` and does not commit it. A missing person's yes is `needs_yes` and a Waiting line, not blocked, and the task stays unticked. A new `.sh` file with no `*.sh eol=lf` rule, when autocrlf is true or the host is Windows, offers `*.sh text eol=lf` and does not add it without a yes.
 
+1.132.0: when the ready check result is `ready` or `ready-partial`, the tasks in `can_start` may start. A held task (`refused`) is refused with its reason, including `held, waits on T#`. The run does not ask to build it anyway. When the result is `not-ready`, no worker starts.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
