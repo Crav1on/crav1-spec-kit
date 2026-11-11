@@ -100,8 +100,9 @@ class BuildMap(unittest.TestCase):
         self.assertIn('b1["feat/cancel-booking-record-refund-decision"]', diagram)
         self.assertIn('b2["feat/cancel-booking-send-receipt"]', diagram)
         self.assertIn("b1 --> b2", diagram)
-        self.assertIn("## Wave 1: 1 branch", text)
-        self.assertIn("## Wave 2: 1 branch", text)
+        self.assertIn("## Wave 1: 1 branch, 1 can start now", text)
+        self.assertIn("## Wave 2: 1 branch, 1 can start now", text)
+        self.assertNotIn("can run in parallel", text)
 
     def test_who_uses_waiting_for_then_latest_mark_then_unnamed(self):
         spec = """# Cancel a booking
@@ -350,17 +351,178 @@ class BuildMap(unittest.TestCase):
         self.assertEqual(hit["pointer"], "Build map: docs/specs/cancel-booking/build-map.md")
         self.assertNotIn("Overlap", hit["pointer"])
         for result in (hit, quiet):
-            self.assertIn("## Wave 1: 3 branches, can run in parallel", result["markdown"])
+            self.assertIn("## Wave 1: 3 branches, 3 can start now", result["markdown"])
+            self.assertNotIn("can run in parallel", result["markdown"])
             self.assertEqual(result["markdown"].count("Ready now: ready"), 3)
             self.assertNotIn("## Blocked", result["markdown"])
             self.assertIsNone(TASK_ID.search(result["markdown"]))
-            self.assertIn("Wave 1: 3 branches, can run in parallel —", result["summary"])
+            self.assertIn("Wave 1: 3 branches, 3 can start now —", result["summary"])
 
     def test_same_branch_internal_wait_stays_ready(self):
         text = render()["markdown"]
         record = text.split("## Wave 1", 1)[1].split("\n## ", 1)[0]
         self.assertIn("Ready now: ready", record)
         self.assertIn("Waits for: none", record)
+
+    def test_removing_a_task_id_does_not_leave_broken_text(self):
+        self.assertEqual(
+            bm.clean_prose("Nothing else starts before T1's `check` prints ok."),
+            "Nothing else starts before `check` prints ok.",
+        )
+        self.assertEqual(
+            bm.clean_prose("in step with T1's stopped state"),
+            "in step with stopped state",
+        )
+        self.assertEqual(
+            bm.clean_prose("(T1, blocked by the currency question)"),
+            "(blocked by the currency question)",
+        )
+        named = {1: "Disable pipelines 7"}
+        self.assertEqual(
+            bm.clean_prose("Nothing else starts before T1's `check` prints ok.", named),
+            "Nothing else starts before Disable pipelines 7's `check` prints ok.",
+        )
+        self.assertEqual(
+            bm.clean_prose("in step with T1's stopped state", {1: "Persist the decision"}),
+            "in step with Persist the decision's stopped state",
+        )
+        self.assertEqual(
+            bm.clean_prose("(T1, blocked by the currency question)", named),
+            "(Disable pipelines 7, blocked by the currency question)",
+        )
+        for text in (
+            bm.clean_prose("before T1's `check`"),
+            bm.clean_prose("(T1, T2, blocked by the currency question)"),
+            bm.clean_prose("in step with T9's stopped state"),
+        ):
+            self.assertIsNone(re.search(r"(^|\s)'s\b", text), text)
+            self.assertNotIn("(,", text)
+            self.assertNotIn("()", text)
+            self.assertNotIn("  ", text)
+            self.assertFalse(text.startswith(","), text)
+
+    def test_tasks_field_uses_a_short_name(self):
+        plan = """# Plan
+
+## Approach
+
+1. Host setup first: disable pipelines 7 and 24. Nothing else starts before T1's `check` prints ok. (T1)
+"""
+        tasks = """# Tasks
+
+- [ ] T1: (host setup) Disable pipelines 7 (build) and 24 (release), in a script `infra/ado/disable-pipelines.sh`, run before any branch exists and committed later on feat/orders-cicd. Nothing else starts before T1's `check` prints ok. (verify: script — check prints ok) (after: )
+"""
+        result = bm.build("cancel-booking", SPEC, plan, tasks)
+        text = result["markdown"]
+        row = text.split("### ", 1)[1]
+        self.assertIn("- Tasks: Disable pipelines 7\n", row)
+        self.assertNotIn("infra/ado", row.split("- Waits for:", 1)[0].split("- Tasks:", 1)[1])
+        self.assertNotIn("(host setup)", row.split("- Tasks:", 1)[1].split("- Waits for:", 1)[0])
+        self.assertNotIn("committed later", row.split("- Tasks:", 1)[1].split("- Waits for:", 1)[0])
+        self.assertIn("Disable pipelines 7's `check`", row)
+        self.assertIn(
+            "- Task text names feat/orders-cicd; built on feat/cancel-booking-host-setup-first-disable",
+            row,
+        )
+        prose = "\n".join(line for line in text.splitlines() if line.startswith("- "))
+        self.assertIsNone(re.search(r"(^|\s)'s\b", prose))
+        self.assertNotIn("(,", prose)
+        self.assertNotIn("()", prose)
+        self.assertNotIn("  ", prose)
+        self.assertIsNone(TASK_ID.search(text))
+        self.assertIn("## Wave 1: 1 branch, 1 can start now", text)
+
+    def test_work_item_title_is_the_short_name(self):
+        tasks = "- [ ] T1: (host setup) Disable pipelines 7 (build) and 24 (release), in a script `infra/ado/disable-pipelines.sh` (after: )\n"
+        plan = "# Plan\n\n## Approach\n\n1. Turn the pipelines off. (T1)\n"
+        work = "Work item: 44 — task: T1 Turn off pipelines 7 and 24 (ADO: example/orders)\n"
+        text = bm.build("cancel-booking", SPEC, plan, tasks, work)["markdown"]
+        self.assertIn("- Tasks: Turn off pipelines 7 and 24\n", text)
+        self.assertNotIn("infra/ado", text.split("- Tasks:", 1)[1].split("- Waits for:", 1)[0])
+        long = "Persist " + " ".join(["word"] * 40)
+        self.assertLessEqual(len(bm.short_name(long)), 80)
+        self.assertTrue(bm.short_name(long).startswith("Persist word"))
+
+    def test_recommended_branch_equals_the_row(self):
+        result = render()
+        recommended = bm.recommended_branches("cancel-booking", SPEC, PLAN, TASKS)
+        for branch in result["branches"]:
+            for task in branch["tasks"]:
+                self.assertEqual(recommended[task["id"]], branch["name"])
+                self.assertIn(f"### {branch['name']}", result["markdown"])
+        self.assertEqual(recommended[1], "feat/cancel-booking-record-refund-decision")
+        self.assertEqual(recommended[3], "feat/cancel-booking-send-receipt")
+
+        mapped = TASKS.replace(
+            "- [ ] T2: Reject an unknown booking (verify: unit — unknown) (spec: refund) (after: T1)",
+            "- [ ] T2: Reject an unknown booking (verify: unit — unknown) (spec: refund) (after: T1) (map: feat/cancel-extra)",
+        )
+        moved = render(tasks=mapped)
+        recommended = bm.recommended_branches("cancel-booking", SPEC, PLAN, mapped)
+        self.assertEqual(recommended[2], "feat/cancel-extra")
+        self.assertEqual(recommended[2], next(b["name"] for b in moved["branches"] if any(t["id"] == 2 for t in b["tasks"])))
+        self.assertIn("### feat/cancel-extra", moved["markdown"])
+        self.assertEqual(recommended[1], "feat/cancel-booking-record-refund-decision")
+
+        marked = TASKS.replace(
+            "- [ ] T1: Persist the decision (verify: unit — saved) (spec: refund)",
+            "- [ ] T1: Persist the decision (verify: unit — saved) (spec: refund) (branch: orders-api feat/orders-retry)",
+        )
+        branched = render(tasks=marked)
+        recommended = bm.recommended_branches("cancel-booking", SPEC, PLAN, marked)
+        self.assertEqual(recommended[1], "feat/orders-retry")
+        self.assertIn("### feat/orders-retry", branched["markdown"])
+        self.assertNotIn("Task text names", branched["markdown"].split("### feat/orders-retry", 1)[1].split("###", 1)[0])
+        self.assertEqual(recommended[2], "feat/cancel-booking-record-refund-decision")
+
+    def test_committed_later_loses_to_a_plan_step_and_wins_with_no_step(self):
+        plan = "# Plan\n\n## Approach\n\n1. Record the refund decision. (T1)\n"
+        tasks = "- [ ] T1: Save the decision, committed later on feat/orders-cicd (after: )\n"
+        on_step = bm.build("cancel-booking", SPEC, plan, tasks)
+        self.assertEqual(bm.recommended_branch("cancel-booking", SPEC, plan, tasks, 1), "feat/cancel-booking-record-refund-decision")
+        self.assertIn("Task text names feat/orders-cicd; built on feat/cancel-booking-record-refund-decision", on_step["markdown"])
+
+        loose = bm.build("cancel-booking", SPEC, "# Plan\n\n## Risks\n\n- None.\n", tasks)
+        self.assertEqual(
+            bm.recommended_branch("cancel-booking", SPEC, "# Plan\n\n## Risks\n\n- None.\n", tasks, 1),
+            "feat/orders-cicd",
+        )
+        self.assertNotIn("Task text names", loose["markdown"])
+
+        both = "- [ ] T1: Save it, committed later on feat/orders-cicd (branch: feat/orders-retry) (map: feat/cancel-extra) (after: )\n"
+        overridden = bm.build("cancel-booking", SPEC, plan, both)
+        self.assertEqual(bm.recommended_branch("cancel-booking", SPEC, plan, both, 1), "feat/cancel-extra")
+        self.assertIn(
+            "Task text names feat/orders-retry and feat/orders-cicd; built on feat/cancel-extra",
+            overridden["markdown"],
+        )
+
+    def test_a_question_hold_still_counts_as_not_started(self):
+        spec = """# Cancel a booking
+
+## Open questions
+
+- Which currency for refunds?
+  - Pending: 2026-10-10, for the partner, mail.
+  - Blocks: T1
+"""
+        text = bm.build("cancel-booking", spec, "# Plan\n\n## Approach\n\n1. Store the decision. (T1)\n", "- [ ] T1: Store the decision (after: )\n")["markdown"]
+        self.assertIn("## Wave 1: 1 branch, 0 can start now", text)
+
+    def test_recommend_flag_prints_the_row_and_does_not_write(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            folder = pathlib.Path(tmp) / "cancel-booking"
+            folder.mkdir()
+            (folder / "tasks.md").write_text(TASKS, encoding="utf-8")
+            (folder / "plan.md").write_text(PLAN, encoding="utf-8")
+            (folder / "spec.md").write_text(SPEC, encoding="utf-8")
+            text, code = bm.run_dir(folder, recommend="T3")
+            self.assertEqual(code, 0)
+            self.assertEqual(text, "feat/cancel-booking-send-receipt")
+            self.assertFalse((folder / "build-map.md").exists())
+            missing, code = bm.run_dir(folder, recommend="T9")
+            self.assertEqual(code, 2)
+            self.assertIn("No open task", missing)
 
     def test_skill_routes_the_word_and_points_at_the_script(self):
         skill = (ROOT / ".cursor/skills/crav1/crav1-tasks-ready-to-build/SKILL.md").read_text(encoding="utf-8")

@@ -24,7 +24,7 @@ Implementation code is never written or committed on a base branch. Every skill 
 - **On a base branch:** never write code there and never offer Stay. One prompt, at most 4 options:
   1. `Create feat/<slug> from <into> (Recommended)`. When `feat/<slug>` exists: `Check out feat/<slug> (Recommended)`. `/crav1-fix-build-gaps` offers `fix/<slug>`. On `release/<x>`: `Create fix/<slug> from release/<x> (Recommended)`, then write `(into release/<x>)` on its Match `Branch:` entry.
   2. `Use an existing branch`: the repo's branches outside the base set (local and `origin`, no `spec/`), the spec's own branches first. Show up to 10 names in the prompt; with several, a follow-up list asks which (at most 4 options, the last `Other name`); that is a prompt for a value they left out, outside the prompt budget.
-  3. `Other name`: they name the branch. A base name is refused; a missing branch is created from `<into>`.
+  3. A typed branch name on this same card (the old Other name follow-up is not a second card, 1.129.0). A base name is refused; a missing branch is created from `<into>`.
   4. `Stop`: no code.
 
   After a pick that the spec doesn't list, write it on the spec's Match `Branch:` list in sorted place with `(into <into>)`, in the specs repo, not committed.

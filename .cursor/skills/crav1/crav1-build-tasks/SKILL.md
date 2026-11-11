@@ -45,6 +45,8 @@ When a choice is missing and the run is headless or started by a bot (no person 
 
 Each worker follows [branches/one-task/references/run.md](branches/one-task/references/run.md), which runs the implement rules in [branches/implement/BRANCH.md](branches/implement/BRANCH.md) (gate, branch check, one task, verify step, evidence), then the commit, `/crav1-verify-build-against-spec`, and the optional fix loop. The implement rules no longer run in this chat: where they say "this turn" or "this chat", read "this worker".
 
+Branch and permissions are two questions (1.129.0). The branch question comes first, on its own card, and a typed branch name on that card is the answer. The permissions question comes after. A missing answer, or an answer that belongs on the other card, is re-asked. Do not guess. The branch is `scripts/build_map.py --recommend T#` (skill `crav1-tasks-ready-to-build`). A different pick is written as `(map: <picked>)`. Details: skill `crav1-create-feature-branch`, `references/task-branch.md`. A worker that needs a person's yes returns `needs_yes`. That is waiting, not blocked. The task stays unticked.
+
 ## After
 
 Every path ends with the batch or single-task TL;DR from its branch, then names `/crav1-open-pr`. Do not run it. Do not push.

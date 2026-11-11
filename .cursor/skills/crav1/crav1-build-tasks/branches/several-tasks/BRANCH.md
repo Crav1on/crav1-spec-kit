@@ -26,9 +26,9 @@ Before the first worker, follow **style-persist.md**. If you must ask, this turn
 
 Do not ask again per `T#`. Workers must not ask style.
 
-**Branch:** before tool approvals and the first worker, follow `/crav1-create-feature-branch` (skill `crav1-create-feature-branch`, `SKILL.md`) **Build** prompt. On a base branch it has no Stay and a headless run stops before any worker unless it has `new branch` (1.99.0, skill `crav1-create-feature-branch`, `references/code-branch.md`). If needed, that turn is branch only. If on `spec/<slug>`, stop (no workers) and follow **Build on a spec-only branch**. Pass `branch: already-done` on every worker. Workers must not create branches.
+**Branch:** before tool approvals and the first worker, follow `/crav1-create-feature-branch` (skill `crav1-create-feature-branch`, `references/task-branch.md`) **Build** prompt. On a base branch it has no Stay and a headless run stops before any worker unless it has `new branch` (1.99.0, skill `crav1-create-feature-branch`, `references/code-branch.md`). If needed, that turn is branch only. Permissions are the next turn, on their own card. If an answer is missing or belongs on the other card, re-ask that one question (`scripts/ask_order.py`). Do not guess. If on `spec/<slug>`, stop (no workers) and follow **Build on a spec-only branch**. Pass `branch: already-done` on every worker. Workers must not create branches.
 
-**Task branches (1.64.0; sub-branches 1.68.0).** A missing task sub-branch is offered as **Create X from <spec branch> (Recommended)** and gets its `(into …)` marker after the yes, as `/crav1-create-feature-branch` says under **Task branch**. Work in queue order (dependency order). When the next task ends with `(branch: X)` and X is not the checkout, switch to X before its worker, only on a clean tree (workers commit, so it should be clean). Starting a range or all-tasks run is consent to use each task's named branch; do not ask per task. A task without a branch part uses the branch the run started on, never a base branch. A task whose `(branch: X)` is a base branch is `blocked: branch X is a base branch`; never switch to it. When X exists only as `origin/X`, `git checkout X` makes the local branch. When X exists nowhere, the task is blocked with that reason; never create X. A dirty tree stops the run before the switch. A `(branch: <repo> X)` for another repo is blocked here with `belongs to <repo>`.
+**Task branches (1.129.0).** Each task's branch is the name `scripts/build_map.py --recommend T#` prints (skill `crav1-tasks-ready-to-build`), the same name as its build map row. A missing sub-branch is offered as **Create X from <spec branch> (Recommended)** and gets its `(into …)` marker after the yes, as `references/task-branch.md` says. Work in queue order (dependency order). When that name is not the checkout and the branch exists, switch to it before its worker, only on a clean tree (workers commit, so it should be clean). Starting a range or all-tasks run is consent to use each task's recommended branch; do not ask per task when the branch exists. When the name exists nowhere, use the task-branch card once. Do not invent a different recommended name, and do not create it without a yes. A task whose recommended name is a base branch is `blocked: branch X is a base branch`; never switch to it. When X exists only as `origin/X`, `git checkout X` makes the local branch. A dirty tree stops the run before the switch. A name for another repo is blocked here with `belongs to <repo>`.
 
 ## Tool approvals (once for the batch)
 
@@ -54,10 +54,11 @@ For each `T#` **one at a time**:
 | `needs_fix` | Ask the user `fix` / `stop` (this is their input). `fix` → **same T#** worker with `resume: fix` (still that task’s chat/worker, new launch is OK). Repeat until `done` or they `stop`. |
 | `needs_ready` | Ask them to refresh the host, then `ready` / `stop`. `ready` → worker `resume: ready`. |
 | `needs_dependency` | Show the BLOCKER line at the top. Ask start / skip / stop. `start` → worker `resume: dependency-start`; `skip` → `resume: dependency-skip`; `stop` → end. Headless: two-pass questions file. |
-| `blocked` / `failed` | **End the batch.** Do not launch the next `T#`. |
+| `needs_yes` | Not blocked. Leave the task unticked and do not launch the next `T#`. End with `Waiting: <who>'s yes to <what>.` and `Next: /crav1-build-tasks <T#>, because that yes is not on record yet.` |
+| `blocked` / `failed` | **End the batch.** Do not launch the next `T#`. A missing yes is `needs_yes`, not this row. |
 | User `stop` | End the batch. |
 
-Do not skip a blocked `T#` unless they explicitly say skip.
+Do not skip a blocked `T#` unless they explicitly say skip. A `needs_yes` task is not blocked. A `NOTES:` line is the optional `.gitattributes` offer from the one-task branch. Accept is `resume: eol` on that worker. Skip adds nothing.
 
 You may summarize each worker briefly on the board. Do not redo their implement/verify.
 

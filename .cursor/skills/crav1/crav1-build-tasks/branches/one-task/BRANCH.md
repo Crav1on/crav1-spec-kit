@@ -13,7 +13,7 @@ Follow this skill’s [references/style-persist.md](references/style-persist.md)
 
 Then, **only if this chat is a standalone the one task branch of `/crav1-build-tasks`** (the user invoked this skill, not the range or all branch of `/crav1-build-tasks`): follow [references/tool-approvals.md](references/tool-approvals.md) — pause with directions, wait for `continue` / `click` / `stop`. If the range or all branch of `/crav1-build-tasks` launched you or passed `approvals: already-done`, **skip** that pause.
 
-**Branch:** before the worker, follow `/crav1-create-feature-branch` (skill `crav1-create-feature-branch`, `SKILL.md`) **Build** prompt. When the task ends with `(branch: X)`, that prompt offers **X (Recommended)** first (1.64.0); on X already, no prompt. On a base branch the prompt has no Stay and a headless run stops before the worker (1.99.0, skill `crav1-create-feature-branch`, `references/code-branch.md`). If that prompt is needed, this turn is branch only (after style). If you are on `spec/<slug>`, stop (no worker) and follow **Build on a spec-only branch**. Pass `branch: already-done` to the worker. Workers must not create branches.
+**Branch:** before the worker, and before permissions, follow `/crav1-create-feature-branch` (skill `crav1-create-feature-branch`, `references/task-branch.md`) **Build** prompt. Option 1 is the branch `scripts/build_map.py --recommend T#` prints. On that branch already, no prompt. The branch question is its own card. A typed branch name on that card is the answer. There is no second card to collect a name. On a base branch the prompt has no Stay and a headless run stops before the worker (1.99.0, skill `crav1-create-feature-branch`, `references/code-branch.md`). If that prompt is needed, this turn is branch only (after style). The permissions question is the next turn, on its own card. If an answer is missing or belongs on the other card, re-ask that one question (`scripts/ask_order.py`). Do not guess. If you are on `spec/<slug>`, stop (no worker) and follow **Build on a spec-only branch**. Pass `branch: already-done` to the worker. Workers must not create branches.
 
 ## Find the work
 
@@ -42,7 +42,10 @@ Show the worker’s recap and STATUS.
 | `needs_fix` | Ask `fix` / `stop`. `fix` → launch the **same** worker again with `resume: fix`. `stop` → end. |
 | `needs_ready` | Ask them to refresh the live host, then `ready` / `stop`. `ready` → worker with `resume: ready`. |
 | `needs_dependency` | Show the BLOCKER line first. Ask start / skip / stop for that dependency. `start` → same worker with `resume: dependency-start`; `skip` → `resume: dependency-skip`; `stop` → end. Headless: use the two-pass questions file. |
-| `blocked` / `failed` | Show DETAIL. Do not start another `T#`. |
+| `needs_yes` | Not blocked. The task stays unticked. End with `Waiting: <who>'s yes to <what>.` and `Next: /crav1-build-tasks <T#>, because that yes is not on record yet.` Example: `Waiting: the partner's yes to turn off pipelines 7 and 24.` |
+| `blocked` / `failed` | Show DETAIL. Do not start another `T#`. A missing yes is `needs_yes`, not this row. |
+
+When STATUS includes a `NOTES:` line from `scripts/sh_eol.py`, offer accept / skip under it. Accept launches the same worker with `resume: eol`, which adds `*.sh text eol=lf` to `.gitattributes` and nothing else. Skip adds nothing. A headless run skips. Never add the line without a yes. This offer is outside the prompt budget.
 
 After this standalone run ends (any STATUS, or they `stop`), follow **tool-approvals.md → Undo**. Do not undo if this invocation skipped the pause (`approvals: already-done` from build-tasks).
 

@@ -4,7 +4,7 @@ Kit not in this project yet? [Install first](install.md) (Cursor and Claude Code
 
 Use this when a starter has written `docs/specs/<slug>/spec.md` and it is not yet good enough to plan from. A kit script this command runs uses the interpreter in [Running a kit script](reference/running-scripts.md). The goal is a spec you accept: acceptance lines a stranger could mark yes or no, non-goals, and only the open questions you choose to keep. Every step here edits the spec one issue at a time, after you pick. None of them writes code or a plan.
 
-On a brownfield repo, put the work on a branch first. `/crav1-create-feature-branch` offers `feat/<slug>` (spec and build on one branch) or `spec/<slug>` (specify only; build later on `feat/<slug>` after this spec is on the default branch). Starters already ask this; run it on its own when you skipped that prompt.
+On a brownfield repo, put the work on a branch first. `/crav1-create-feature-branch` offers `feat/<slug>` (spec and build on one branch) or `spec/<slug>` (specify only; build later on `feat/<slug>` after this spec is on the default branch). Starters already ask this; run it on its own when you skipped that prompt. When the same command is the Build prompt for a task, option 1 is the branch the build map already uses for that task, and a typed name on that card is the answer (1.129.0). A different pick is written back as `(map:)` on the task and is not committed.
 
 ## First prompt
 

@@ -28,6 +28,8 @@ Shows summary counts per slice, then Ready, Waiting on a question, Waits in orde
 
 1.128.0: every run rewrites `docs/specs/<slug>/build-map.md` through `scripts/build_map.py`. The task list is unchanged apart from one line pointing at that file. The word `build-map` shows only the short summary: the path, how many branches in each wave can run in parallel, then the Overlap lines for that wave, one per pair. The ready-check list stays the one pointer line. One branch per numbered Approach step, unless a task has `(map:)`. `(step:)` links a task to a step. No steps, or steps that name no task, means one branch per task, and the file says so. Each wave is a subgraph so its branches sit side by side. A question hold is counted in the wave heading (`3 branches, 2 can start now`). An overlap note names two branches in one wave that share a `(spec:)` requirement or a backtick path. The note does not change readiness or waves. Six fields per branch, no task ids and no file list in a row. Who uses the 1.127.0 rule. A cycle or an unknown `(after:)` is under Blocked.
 
+1.129.0: the row branch is `(map:)`, else `(branch:)`, else the plan step, else `committed later on`, else `feat/<slug>-<words>`. `--recommend T#` prints that name and does not write. Tasks are short names (a `task: T#` title in `work-item.md`, else the text up to ` (`, `, in `, or the sentence end, about 80 characters). A removed task id does not leave a dangling possessive, empty parentheses, a leading comma, or a double space. The wave heading is always `N branches, M can start now`, including `1 branch, 1 can start now`. A row whose task text names another branch adds `Task text names feat/x; built on feat/y`.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
@@ -49,7 +51,7 @@ Prompt budget: 0 (asks nothing). A prompt may hold several questions. See the as
 
 In short: `spec.md` open questions, `plan.md`, `tasks.md`, and `verify.md` per slice.
 
-Reads, for one slice or every slice under `docs/specs/`, the open questions in `spec.md` with their `Blocks:`, `Asked:`, `Pending:`, and `Answered:` lines, the `Reviewed:` line, `## Approach`, and `## Risks` in `plan.md`, the task lines in `tasks.md` with their ticks, `(after: T#)`, `(step:)`, and `(map:)`, and `verify.md` when it exists.
+Reads, for one slice or every slice under `docs/specs/`, the open questions in `spec.md` with their `Blocks:`, `Asked:`, `Pending:`, and `Answered:` lines, the `Reviewed:` line, `## Approach`, and `## Risks` in `plan.md`, the task lines in `tasks.md` with their ticks, `(after: T#)`, `(branch:)`, `(step:)`, and `(map:)`, a `task: T#` title in `work-item.md` when that file exists, and `verify.md` when it exists.
 
 ## Writes
 

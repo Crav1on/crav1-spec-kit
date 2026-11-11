@@ -47,21 +47,14 @@ Intake (several slugs): one branch for the dump. Slug = short landscape kebab, o
 
 **Build** (implement / build-tasks / fix-build-gaps, before the first code change or worker): follow [references/code-branch.md](references/code-branch.md) (1.99.0).
 
-- On a **base branch** (main, master, develop, the `Merges into` branch, `release/*`): **Create `feat/<slug>` from `<into>` (Recommended)**, **Use an existing branch**, **Other name**, **Stop**. No Stay on a base.
-- On **another** branch (`chore/x`, detached HEAD): the same, with **Stay on `<current>`** in place of Other name.
+- On a **base branch** (main, master, develop, the `Merges into` branch, `release/*`): **Create `feat/<slug>` from `<into>` (Recommended)**, **Use an existing branch**, a typed branch name on this same card, **Stop**. No Stay on a base. There is no second card to collect the name (1.129.0).
+- On **another** branch (`chore/x`, detached HEAD): the same, with **Stay on `<current>`** in place of the typed name.
+- When the prompt is for a task, option 1 is that task's branch from [references/task-branch.md](references/task-branch.md), not a new name. The branch card is alone. Permissions are the next card.
 - Headless with no person: stop before any code, unless the invocation has the choice word `new branch`.
 
 Do not offer `spec/<slug>` on a build prompt.
 
-**Task branch (1.64.0).** When the task being built ends with `(branch: X)` (or `(branch: <repo> X)` for the open repo):
-
-- On X already: skip the prompt.
-- Otherwise the Build prompt is **X (Recommended)** first, then `feat/<slug>`, **Other name** and **Stop** (Stay only off a base).
-- When X is a base branch, the task is `blocked: branch X is a base branch`; never switch to it.
-- When X exists only as `origin/X`, `git checkout X` makes the local branch.
-- When X exists nowhere and the spec's Match `Branch:` list has a `(spec branch)` S, or X has an `(into S)` entry (1.68.0, setup 4 in skill `crav1-add-to-spec`, `references/branches.md`): the prompt is **Create X from S (Recommended)**, then `feat/<slug>`, **Other name** and **Stop**. After that yes, create X from S (local `S`, else `origin/S`; never fetch) and write `(into S)` on X's Match `Branch:` line (adding the line in sorted place, 1.86.0). A headless run doesn't create X.
-- When X exists nowhere otherwise, say so and offer `feat/<slug>` or **Other**. Never create X from the default branch without asking.
-- A `(branch: <repo> X)` for another repo is not built here; say which checkout it belongs to.
+**Task branch (1.129.0).** Follow [references/task-branch.md](references/task-branch.md). Option 1 is the branch `scripts/build_map.py --recommend T#` prints (skill `crav1-tasks-ready-to-build`), the same name as the build map row. On that branch already, no prompt. A base branch is still `blocked: branch X is a base branch`. A sub-branch is created from its parent only after a yes, and never from the default without asking. Another repo's branch is not built here. A picked name that is not the recommended one is written back as `(map: <picked>)` on that task, in the specs repo, and not committed.
 
 If the working tree is dirty (other than `agent-tools/`), **do not checkout** an existing branch. On a base branch, creating the new branch from HEAD with `git switch -c` carries the changes over (see the reference); never send a dirty base tree to `/crav1-finalize-commit`. Otherwise tell them to commit on their branch or stash themselves. Re-ask branch after the tree is clean.
 

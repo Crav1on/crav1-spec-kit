@@ -21,7 +21,7 @@ It is not `/crav1-what-do-we-know-about-this` (what is known about one thing) an
 
 Route first. The word `build-map` shows only the map. The words after it are the scope, the same scope as this command with no word (a slug such as `cc 1.0`, an `@` folder, or every slice). No word keeps the task list.
 
-Every run, rebuild `docs/specs/<slug>/build-map.md` with `scripts/build_map.py`. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. Do not hand-edit it. The task list gains one line: `Build map: docs/specs/<slug>/build-map.md`. With the word, run `--chat` and print only that summary: each wave, then that wave's Overlap lines. Read `references/build-map.md` only when the script cannot run. Do not invent the map.
+Every run, rebuild `docs/specs/<slug>/build-map.md` with `scripts/build_map.py`. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. Do not hand-edit it. The task list gains one line: `Build map: docs/specs/<slug>/build-map.md`. With the word, run `--chat` and print only that summary: each wave, then that wave's Overlap lines. `--recommend T#` prints that task's row branch and does not write (1.129.0). Read `references/build-map.md` only when the script cannot run. Do not invent the map.
 
 ## Scope
 

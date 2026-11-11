@@ -56,9 +56,9 @@ Implementation code is never written or committed on a base branch: `main`, `mas
 
 - **Create feat/orders-retry from develop (Recommended)**: forks from the into branch, so a repo that merges into `develop` forks from `develop`, not `main`. Uncommitted changes come along when you are on that branch.
 - **Use an existing branch**: lists the repo's other branches, the spec's own first. A pick the spec doesn't list is added to its Match `Branch:` list with `(into develop)`.
-- **Other name** and **Stop**. There is no Stay.
+- A typed branch name on that same card, and **Stop**. There is no second card to collect the name, and there is no Stay.
 
-On a branch that is neither (`chore/x`, a detached checkout) the same prompt offers **Stay** instead of Other name. A release fix goes on `fix/<slug>` marked `(into release/x)`. A headless run stops with one line unless it has the choice word `new branch`. `/crav1-build-features` forks `feat/<slug>` from the into branch without asking. The worker returns `blocked` if it ever finds itself on a base branch. Spec and doc writes, and the specs repo itself, are exempt.
+On a branch that is neither (`chore/x`, a detached checkout) the same prompt offers **Stay** instead of the typed name. A release fix goes on `fix/<slug>` marked `(into release/x)`. A headless run stops with one line unless it has the choice word `new branch`. `/crav1-build-features` forks `feat/<slug>` from the into branch without asking. The worker returns `blocked` if it ever finds itself on a base branch. Spec and doc writes, and the specs repo itself, are exempt.
 
 ## A spec branch with task sub-branches (1.68.0)
 
@@ -71,9 +71,26 @@ Some teams give a spec its own long-lived branch and each task a short sub-branc
 - **Done.** Status shows `Sub-branches: 1 of 2 merged into feat/orders-capacity.` The spec is done when the spec branch has reached the base branch. A sub-branch that never merged is reported as `left behind: feat/orders-capacity-t4 (not in feat/orders-capacity)` and doesn't block done.
 - **Reverts.** A merged branch whose change was later reverted on the base shows `feat/orders-retry: merged, reverted on develop (<sha>)`. It is report only and doesn't change done.
 
+## The branch the build offers (1.129.0)
+
+The branch question is its own card, before the permissions question. Option 1 is the branch the build map already uses for that task (`scripts/build_map.py --recommend T1`). On that branch already, there is no prompt. A typed name on the card is the answer. If you pick a different branch, the task line gains `(map: <that branch>)` in the specs repo. That write is not a commit. A `(host setup)` option says the script will live on the recommended branch, and says when the task text names a branch that is cut later.
+
+A missing permissions answer, or a branch name in the permissions slot, is asked again. The run does not guess `click`.
+
+## A yes that is not on record (1.129.0)
+
+When the live change needs someone's yes (host setup, or another approval), and that yes is not already on record, the worker returns `needs_yes`. The task stays unticked. That is waiting, not blocked.
+
+```text
+Waiting: the partner's yes to turn off pipelines 7 and 24.
+Next: /crav1-build-tasks T1, because that yes is not on record yet.
+```
+
 ## Host setup tasks (1.115.0)
 
-A task marked `(host setup)` is a host setting, not a file. The worker writes the checked-in script and its manual steps, shows them, and runs the script only after your yes; it ticks the task only when the script's `check` part reads the setting back `ok`. A worker with nobody to answer leaves it unticked. The rules are the same as [Set up a host setting](from-host-setup.md) (`/crav1-host-setup`).
+A task marked `(host setup)` is a host setting, not a file. The worker writes the checked-in script and its manual steps, shows them, and runs the script only after your yes; it ticks the task only when the script's `check` part reads the setting back `ok`. Without that yes the task stays unticked and the run waits, as above. The rules are the same as [Set up a host setting](from-host-setup.md) (`/crav1-host-setup`).
+
+When the build writes a new `.sh` file, the repo has no `*.sh` rule with `eol=lf`, and `core.autocrlf` is true or the host is Windows, the run offers one line in `.gitattributes`: `*.sh text eol=lf`. It does not add the line unless you accept.
 
 ## After
 
@@ -81,4 +98,4 @@ Prove the slice against the spec: [Verify and fix](from-verify.md). Then [From c
 
 Reference pages: [build-tasks](reference/skills/crav1-build-tasks.md) · [build-tasks](reference/skills/crav1-build-tasks.md) · [build-tasks](reference/skills/crav1-build-tasks.md) · [build-features](reference/skills/crav1-build-features.md) · [subagents](reference/skills.md#subagents)
 
-The run ends as [How a run ends](reference/run-ending.md) says: one `Next:` line, `Waiting:` only when a step is blocked, and `Uncommitted:` when files changed and are not committed.
+The run ends as [How a run ends](reference/run-ending.md) says: one `Next:` line, `Waiting:` when a step is blocked or waits on a person's yes, and `Uncommitted:` when files changed and are not committed.

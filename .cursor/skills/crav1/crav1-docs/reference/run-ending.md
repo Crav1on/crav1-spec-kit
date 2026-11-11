@@ -24,10 +24,13 @@ Do not list a second step on that line, in a second `Next:` line, or as an equal
 
 ## Waiting
 
-`Waiting:` appears only when a step is blocked. It names the step and who or what it waits on. One line per blocked step. Keep it short. Leave the line out when nothing is blocked.
+`Waiting:` appears when a step is blocked, and when a step waits on a person's yes that is not a blocker (1.129.0). It names the step and who or what it waits on. One line per such step. Keep it short. Leave the line out when nothing is waiting.
+
+A yes that is not on record is not a blocker. The task stays unticked. `Next` is to rerun that task after the yes.
 
 ```text
 Waiting: /crav1-resolve-open-questions orders-retry, after a reviewer answers the open question.
+Waiting: the partner's yes to turn off pipelines 7 and 24.
 ```
 
 ## Uncommitted
