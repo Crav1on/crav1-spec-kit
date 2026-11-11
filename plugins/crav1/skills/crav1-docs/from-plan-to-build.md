@@ -9,7 +9,7 @@ Use this when `plan.md` and `tasks.md` are accepted. Build one task `T#` at a ti
 | One task, here, and watch the diff | `/crav1-build-tasks T1` |
 | One task, start to commit, in an isolated worker | `/crav1-build-tasks T1` |
 | Several tasks on one spec | `/crav1-build-tasks T1-T3` (or all unchecked) |
-| Several ready specs, one after another | `/crav1-build-features <slug-a> <slug-b>` (or all ready) |
+| Several ready specs, one after another | `/crav1-build-features <slug-a> <slug-b>` (or all ready). Since 1.134.0 it opens the build-tasks T# loop and the branch-rule files, and does not start those commands. See [Opening another kit skill](reference/open-skill-file.md) |
 
 ## First prompt
 

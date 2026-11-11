@@ -12,6 +12,8 @@ When the user names a host, **[`/crav1-read-environment`](crav1-read-environment
 
 The user names the host. One pass reads every non-prod environment. Azure, AWS, and Google Cloud readers. Any other host stops with no reader. Naming production, prod, or live stops. Never production data. Pre-prod, shared-with-prod, and prod-only are shape and connections only, after one yes. A no leaves prod-only skipped. After that read, optional SQL metadata and storage structure, only when the user says yes. Never rows, blobs, or production. Look-inside never opens production. Appends confirmed lines to `docs/environments/marks.md`. Does not write `docs/system`, `docs/architecture/spec.md`, a feature spec, or `docs/architecture/left-out.md`. After a confirmed section, the owner adds only what is new. A fact is seen in that environment. A link only when the environment shows the connection. Does not start Specify, Plan, or Build.
 
+1.134.0: a confirmed section opens the owner file and follows only that handoff. System opens `..[`/crav1-refresh-system-notes`](crav1-refresh-system-notes.md)/references/handoff-read-environment.md`. Architecture and left-out open `..[`/crav1-existing-to-specs`](crav1-existing-to-specs.md)/branches/repos-only/BRANCH.md` at **From [`/crav1-read-environment`](crav1-read-environment.md)**. Match opens `..[`/crav1-add-to-spec`](crav1-add-to-spec.md)/references/handoffs-read-environment.md`. It does not start those commands. The picture question still does not run refresh. The rule is `docs/reference/open-skill-file.md`.
+
 ## Runs when
 
 The user names the host. Called by the user.
@@ -43,7 +45,7 @@ Limits and exceptions: does not guess the host. Naming production, prod, or live
 ## You run next / Runs by itself
 
 - You run next: [`/crav1-finalize-commit`](crav1-finalize-commit.md)
-- Runs by itself: Calls [`/crav1-refresh-system-notes`](crav1-refresh-system-notes.md), [`/crav1-existing-to-specs`](crav1-existing-to-specs.md), and [`/crav1-add-to-spec`](crav1-add-to-spec.md) for the append only after that section is confirmed.
+- Runs by itself: Opens [`/crav1-refresh-system-notes`](crav1-refresh-system-notes.md), [`/crav1-existing-to-specs`](crav1-existing-to-specs.md), and [`/crav1-add-to-spec`](crav1-add-to-spec.md) for the append only after that section is confirmed, and does not start those commands.
 
 ## Lane and group
 

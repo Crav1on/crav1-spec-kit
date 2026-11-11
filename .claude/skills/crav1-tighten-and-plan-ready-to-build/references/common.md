@@ -6,7 +6,7 @@ The spec folder is the one the user @-mentions. Otherwise the most recently edit
 
 Two routes, one walk. With a playbook, step 1 is that file. Without a playbook, step 1 is skipped. Steps 2 through 7 are the same, and the ready check is the same.
 
-Run each locked skill by following that skill's own `SKILL.md`. Do not copy its rules into this walk. Do not replace it.
+Run each locked skill by opening the file that step names, from this skill's folder, and following it. Read [open-skill-file.md](../crav1-docs/reference/open-skill-file.md) once before the first locked skill (1.134.0). Do not copy that skill's rules into this walk. Do not replace it.
 
 This walk's own prompts are the playbook choice, asked even when that file is already applied, one batch of optional extras once after open questions when any extra applies, one batch for kept-open questions that still have no `Blocks:` line after the plan, one jump-back question when the check is not clear, and the yes before `walk-progress.md` is written. That yes shows the progress line, unless the step's own confirm already included this record. An extra's yes is that case. Questions inside a step belong to that step's skill.
 

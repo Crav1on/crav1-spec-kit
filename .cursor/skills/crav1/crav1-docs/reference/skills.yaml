@@ -370,6 +370,7 @@ skills:
     a feature spec, or `docs/architecture/left-out.md`. After a confirmed section, the owner adds only
     what is new. A fact is seen in that environment. A link only when the environment shows the connection.
     Does not start Specify, Plan, or Build.
+  - '1.134.0: a confirmed section opens the owner file and follows only that handoff. System opens `../crav1-refresh-system-notes/references/handoff-read-environment.md`. Architecture and left-out open `../crav1-existing-to-specs/branches/repos-only/BRANCH.md` at **From /crav1-read-environment**. Match opens `../crav1-add-to-spec/references/handoffs-read-environment.md`. It does not start those commands. The picture question still does not run refresh. The rule is `docs/reference/open-skill-file.md`.'
   use_when: The user names the host
   table:
     reads: Non-prod resources on that host
@@ -391,8 +392,8 @@ skills:
     not run it. After `marks.md` lines are added, it asks once whether to run `/crav1-refresh-system-notes` and
     does not run that refresh from the question.
   called_by: Called by the user.
-  runs_by_itself: Calls `/crav1-refresh-system-notes`, `/crav1-existing-to-specs`, and `/crav1-add-to-spec` for the
-    append only after that section is confirmed.
+  runs_by_itself: Opens `/crav1-refresh-system-notes`, `/crav1-existing-to-specs`, and `/crav1-add-to-spec` for the
+    append only after that section is confirmed, and does not start those commands.
   you_run_next:
   - /crav1-finalize-commit
   first_prompt: '/crav1-read-environment
@@ -427,6 +428,7 @@ skills:
     a lane and not a stretch of verify. Starter option. Asking for startup options names it and does not
     run it. It still runs only when the user names a real bug. Not a new-repo start. Not started automatically.
     Spark, specify, plan, and verify do not run it.
+  - '1.134.0: it does not open the next skill''s file. A command-only refusal is expected, and the run still ends on the Next line. The rule is `docs/reference/open-skill-file.md`.'
   use_when: The user names a real bug
   table:
     reads: That bug and a spec already in front
@@ -584,6 +586,7 @@ skills:
   - '`apply <file>` (1.120.0) copies a filled playbook to `docs/playbooks/<topic>.md` after the same yes. The name comes from the subject, lowercase kebab-case, and is shown once. A `Docs path:` line, or the one committed file with the same subject, is the same playbook later. Reapply overwrites that file. An edit in the repo since `Applied as:` is shown and confirmed first. Each spec the apply changed gets `Playbook: docs/playbooks/<topic>.md`. A draft with no filled answer is not copied. This is not a git commit.'
   - '1.125.0: when `tasks.md` exists, None writes `Blocks: none`. The whole slice still writes no line. No line still blocks the whole slice.'
   - '1.130.0: the batch is one card. `yes (Recommended)` applies every recommendation. Typed changes go on that card''s free-text answer, for example `Q1 A, Q3 keep` or `C1: keep it open`. An item not mentioned keeps its recommendation. There is no Edits option.'
+  - '1.134.0: on apply, a kept item opens `../crav1-add-to-spec/references/fact.md` and does not start `/crav1-add-to-spec`. The rule is `docs/reference/open-skill-file.md`.'
   use_when: Open questions remain
   table:
     reads: Open questions, assumptions and Conflict lines in `spec.md`, and the playbook file on apply
@@ -595,7 +598,7 @@ skills:
     `Change:` lines in the playbook file. Does not copy a draft. Does not git-commit.
   exceptions: null
   called_by: Called by the user.
-  runs_by_itself: Calls no skill.
+  runs_by_itself: On apply, a kept item opens `/crav1-add-to-spec` `references/fact.md` and does not start that command. The question walk calls no skill.
   you_run_next:
   - /crav1-ado-sync
   - /crav1-plan-from-spec
@@ -690,6 +693,7 @@ skills:
     a meeting (minutes or a transcript). It skips the question when the message shows
     which. It replaces match-dump-to-specs, code-into-specs, and meeting-to-specs; their rules are kept
     as branches, and a kept quote from any of them goes through the fact rules.'
+  - '1.134.0: `references/pr-record.md`, `references/merge-safe.md`, and `references/handoffs-picture.md` name other skills and do not run them. They do not open those files. A command-only refusal is not a reason to stop. The rule is `docs/reference/open-skill-file.md`.'
   - '1.130.0: a dump sort, a code-change sort, and the same kind of confirm are one card. `yes (Recommended)` writes what was shown. Typed changes go on that card''s free-text answer. An item not mentioned keeps what was shown. There is no Edits option. Keep, leave, and dismiss stay real options on a meeting item.'
   - 'A fact (was `/crav1-add-to-spec`): New information aimed at one spec that already exists is **`/crav1-add-to-spec`**.
     `/crav1-tighten-spec` stays for mushy wording. Match, intake, spark, and ideas create the folders.
@@ -1062,6 +1066,7 @@ skills:
   - '1.64.0: tasks with `(branch: …)` are built on that branch; the board shows `done (n branches not merged)`.'
   - '1.129.0: each task is built on the build map row from `scripts/build_map.py --recommend T#`. A worker `needs_yes` is waiting, not blocked.'
   - '1.132.0: the same ready-check gate as `/crav1-build-tasks`. `ready` and `ready-partial` start `can_start`. A held task is refused with its reason. `not-ready` starts no worker on that slug.'
+  - '1.134.0: the T# loop opens `../crav1-build-tasks/branches/several-tasks/BRANCH.md`. Branch rules open `../crav1-create-feature-branch/SKILL.md` and its `references/code-branch.md` and `references/task-branch.md`. It does not start those commands. The rule is `docs/reference/open-skill-file.md`.'
   use_when: Several specs, one after another
   table:
     reads: Ready spec folders on the default branch
@@ -1074,8 +1079,7 @@ skills:
   exceptions: one ready slug stops and points at `/crav1-build-tasks` without running it. When a slice
     is marked done or retired, it asks once whether to run `/crav1-refresh-system-notes` and does not run it.
   called_by: Called by the user.
-  runs_by_itself: Calls `/crav1-create-feature-branch` for that checkout, without re-prompting, and `crav1-build-task-agent`
-    one `T#` at a time.
+  runs_by_itself: Opens `/crav1-create-feature-branch` and the several-tasks branch of `/crav1-build-tasks` and follows those files, without re-prompting, and calls `crav1-build-task-agent` one `T#` at a time. It does not start those skills as slash commands.
   you_run_next:
   - /crav1-open-pr
   first_prompt: /crav1-build-features <slug-a> <slug-b>
@@ -1963,6 +1967,7 @@ skills:
   - 'Manual flow asks once before a read-only fetch, then confirms the inventory (items can be dropped), then goes one by one. Small groups of at most four are offered when there are more than eight items. A spec change is shown before it is written. Auto flow fetches without asking and writes notes and `Synced at` only. Every spec change is a proposal.'
   - 'State is `docs/system/sweep-progress.md`, written only by `scripts/sweep_progress.py`. A stopped run resumes the same queue and does not redo a finished item. A pull request whose threads were read gets one `Read: sweep` line on its PR note. The budget is 20 minutes unless a number is given, and the script will not go past 45. A failed fetch skips that repo, lists it under Waiting, and the run continues.'
   - 'The run does not commit, push, post, vote, resolve a thread, or run `/crav1-review-pr`, `/crav1-pr-status`, `/crav1-resolve-open-questions`, or `/crav1-finalize-commit`. Proposals print first in auto flow. Next is this command when items or proposals remain, or `/crav1-resolve-open-questions` when a conflict or open question was written onto a spec. The commit stays on Uncommitted.'
+  - '1.134.0: each item opens `../crav1-add-to-spec/SKILL.md` and follows that item''s choice words. It does not start `/crav1-add-to-spec` as a command. The rule is `docs/reference/open-skill-file.md`.'
   use_when: Many repos or pull requests should be caught up into the specs
   table:
     reads: '`docs/system/repos.md`, `Synced at`, sibling checkouts, and open or recently closed pull requests on the host'
@@ -1972,7 +1977,7 @@ skills:
   leaves_alone: Leaves base branches, the specs repo's branches, a person's `Read` line, and every thread on the host alone. Does not run `/crav1-review-pr` or `/crav1-pr-status`. Does not commit, push, or delete.
   exceptions: No flow word asks, and a headless run with no word stops. Auto flow cannot record a spec write. A fetch failure skips that repo. The first sweep has no closed-since list. A budget stop finishes the current item and resumes later.
   called_by: Called by the user.
-  runs_by_itself: Runs `/crav1-add-to-spec` for each inventory item, under that skill's note and `Synced at` rules. It does not run `/crav1-review-pr`, `/crav1-pr-status`, `/crav1-resolve-open-questions`, or `/crav1-finalize-commit`.
+  runs_by_itself: Opens `/crav1-add-to-spec` for each inventory item and follows that skill's note and `Synced at` rules. It does not start that command. It does not run `/crav1-review-pr`, `/crav1-pr-status`, `/crav1-resolve-open-questions`, or `/crav1-finalize-commit`.
   you_run_next:
   - /crav1-resolve-open-questions
   - /crav1-update-specs-from-changes-and-prs
@@ -2000,6 +2005,7 @@ skills:
   - '1.127.0: the playbook question comes before any later step, including a read-only check. Resume may report status and does not start a step. Who comes from the question''s "Waiting for" phrase, then the latest Pending or Asked line, or "not named yet", and an unnamed task still counts. Row buckets are waits-in-order, waiting, and blocked. The ready check records Result ready or Result not-ready. An older Result done still reads. `ack-stamps` acknowledges one shared Done stamp after a yes. A new shared stamp warns again.'
   - '1.132.0: the ready check also records Result ready-partial when some tasks can start and some are held. A task that depends on a held task is held too. The walk ends, the step is covered, and there is no not-ready mark. Next is `/crav1-build-tasks` for the tasks that can start. A later rerun can record ready. not-ready remains when nothing can start, and when a cycle, a missing task, no plan, Needs verify, an assumption, a reopened step, or a jump-back question remains.'
   - '1.133.0: the ready-check ending groups ready tasks and held tasks by the build-map row, the same branch as `scripts/build_map.py --recommend`. Order is wave, then map order. A task is `T#` plus its short name. One Next line per ready branch. The walk record stays Result ready-partial.'
+  - '1.134.0: each locked step, extra, jump back, and the playbook apply path opens that skill''s file from this skill''s folder (`../crav1-<name>/SKILL.md`, or the reference that step names, including `references/apply.md` and add-to-spec''s fact rules). The rule is `docs/reference/open-skill-file.md`. The walk does not start those skills as slash commands or with a skill tool. A command-only refusal is not a reason to stop the walk. `disable-model-invocation: true` stays.'
   use_when: A spec should be tightened and planned until it is ready to build
   table:
     reads: The spec folder, an optional playbook (outside the project or under `docs/playbooks/`), and the progress file when one exists
@@ -2009,7 +2015,7 @@ skills:
   leaves_alone: Leaves `spec.md`, `plan.md`, and `tasks.md` to the skills that own them, except that one `Blocks:` pass. Does not change `Answer:` or `Change:` lines in the playbook. Does not start `/crav1-build-tasks`, `/crav1-build-features`, or `/crav1-verify-build-against-spec`. Does not git-commit.
   exceptions: A headless run stops. No playbook skips step 1. Architecture review always runs inside the walk even though the new-slice route marks it optional. Needs verify is named and not started. An open plan-review warning is not ready. The progress script does not decide that a playbook was already applied unless this walk recorded that apply.
   called_by: Called by the user.
-  runs_by_itself: Runs the locked skills inside the walk, each under its own rules, and `/crav1-resolve-open-questions` with `apply <file>` on yes when a playbook is applied. It does not run Build.
+  runs_by_itself: Opens each locked skill's file from this skill's folder and follows it, including `/crav1-resolve-open-questions` `references/apply.md` on yes when a playbook is applied. It does not start those skills as slash commands. It does not run Build.
   you_run_next:
   - /crav1-build-tasks
   first_prompt: '/crav1-tighten-and-plan-ready-to-build
@@ -2464,6 +2470,7 @@ skills:
     existing spec through `/crav1-add-to-spec`. Plan turns it into a task. Does not write the tests, change
     the code, or start Specify, Plan, or Build. Not a starter option. Asking for startup options names
     only the six and does not run this command. The six starter options stay unchanged.
+  - '1.134.0: a kept suggestion opens `../crav1-add-to-spec/references/handoffs-suggest-tests.md` and does not start `/crav1-add-to-spec`. The rule is `docs/reference/open-skill-file.md`.'
   use_when: The user points at existing code
   table:
     reads: That code, its tests, and the spec
@@ -2476,7 +2483,7 @@ skills:
     nothing and is offered again. Dismiss is not offered again. It does not start Specify, Plan, or Build.
     Plan turns a kept suggestion into a task. It is not a starter option.
   called_by: Called by the user.
-  runs_by_itself: Calls `/crav1-add-to-spec` for one kept suggestion and for one dismissed suggestion.
+  runs_by_itself: Opens `/crav1-add-to-spec` for one kept suggestion and for one dismissed suggestion, and does not start that command.
   you_run_next:
   - /crav1-plan-from-spec
   first_prompt: '/crav1-suggest-tests-for-code

@@ -30,7 +30,7 @@ A small group is at most four items. One by one stays available: they can say so
 
 ## Each item
 
-Take the next item from `resume`. Run the note and `Synced at` part of `/crav1-add-to-spec` for that item's command. That part does not need a yes.
+Take the next item from `resume`. Open `../crav1-add-to-spec/SKILL.md` from this skill's folder and follow the note and `Synced at` part for that item's command. The rule is [open-skill-file.md](../../crav1-docs/reference/open-skill-file.md) (1.134.0). Do not start `/crav1-add-to-spec`. That part does not need a yes.
 
 If the sort, an `Answered:` line, or a new open question would change a spec, show that change and wait. Yes writes it (`complete --outcome spec`, and `--question` or `--conflict` when that line was written). No leaves the spec alone (`complete --outcome notes` or `synced-at`, no proposal). Do not ask a second time for the same change.
 

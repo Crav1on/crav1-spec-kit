@@ -1,5 +1,7 @@
 # Merge-safe formats (1.84.0, Branch lines 1.86.0, PR record 1.97.0)
 
+Naming `/crav1-finalize-commit` `references/pull.md` is not running that skill. Do not open that file from here. A refused start is expected. The rule is [open-skill-file.md](../../crav1-docs/reference/open-skill-file.md) (1.134.0).
+
 Two people run the kit on their own machines and merge. These formats keep their additions on different lines, so git merges them without a conflict most of the time. Every skill that writes a `Synced at` stamp, a Match `Branch:` line, an open question, a `**New:**` line or a glossary row follows this file. `/crav1-finalize-commit` `references/pull.md` resolves what still conflicts.
 
 ## Synced at: one line per repo and branch

@@ -4,6 +4,8 @@ Read this only at the ready check.
 
 When a playbook was named, do not run this check until that question is answered. Resume may already have reported status.
 
+A jump back opens the owning skill's file from this skill's folder and follows it. The rule is [open-skill-file.md](../../crav1-docs/reference/open-skill-file.md) (1.134.0). This check follows Open `../crav1-tasks-ready-to-build/SKILL.md` where this file does not say otherwise. Needs verify is named and its file stays closed.
+
 Run `scripts/walk_progress.py readiness --root <spec-folder>`. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. It runs `task_order.py` and `question_blocks.py`, builds the rows, and adds the `Reviewed:` warnings. Do not hand-build a rows JSON file. Do not pass `--json`. Use the script's step and command for each row. Do not invent a step the script leaves unmapped. Say the script has no step for it, and do not report ready.
 
 Row buckets: `waits-in-order` is a task that only waits on an earlier real task. `waiting` is a task held by an open question. `blocked` is a true blocker only (a cycle, an `(after:)` that names no task, a missing plan or tasks file, a plan risk, or a question that is still a jump back).
@@ -18,13 +20,13 @@ A reopened walk step is a blocker. The script names it and sets `clear` to `noth
 
 The script maps:
 
-- No `plan.md` or no `tasks.md` to `/crav1-plan-from-spec`.
-- An open question to `/crav1-resolve-open-questions`, unless that step is already `keep` at the current spec. Then the row is `waiting`, not a jump back. Who comes first from the question's own "Waiting for <who>" phrase, then from the latest `Pending:` or `Asked:` line. When neither names anyone, who is `not named yet`, and that task still counts in `waiting_line`. `can_jump_back` is false. Do not mark that jump back Recommended. It cannot change anything.
-- A plan risk, a cycle, or an `(after:)` mark that names no task to step 6, starting at `/crav1-tighten-plan` after `/crav1-review-plan` when the review line is missing.
+- No `plan.md` or no `tasks.md`: Open `../crav1-plan-from-spec/SKILL.md` (`/crav1-plan-from-spec`).
+- An open question: Open `../crav1-resolve-open-questions/SKILL.md` (`/crav1-resolve-open-questions`), unless that step is already `keep` at the current spec. Then the row is `waiting`, not a jump back. Who comes first from the question's own "Waiting for <who>" phrase, then from the latest `Pending:` or `Asked:` line. When neither names anyone, who is `not named yet`, and that task still counts in `waiting_line`. `can_jump_back` is false. Do not mark that jump back Recommended. It cannot change anything.
+- A plan risk, a cycle, or an `(after:)` mark that names no task to step 6, starting at Open `../crav1-tighten-plan/SKILL.md` (`/crav1-tighten-plan`) after Open `../crav1-review-plan/SKILL.md` (`/crav1-review-plan`) when the review line is missing.
 - A plan-review warning (`plan review unknown`, or open `P#`) as an assumption, not as ready. The ready skill still lists those tasks as Ready with a warning. This walk does not. An open assumption is not a clear check.
-- **Needs verify** to `/crav1-verify-build-against-spec`. That skill is outside this walk. Name it, do not jump into it, and do not start it.
+- **Needs verify** names `/crav1-verify-build-against-spec`. That skill is outside this walk. Name it, do not jump into it, do not start it, and do not open its file.
 
-When the script says the check is not ready, name each row's step in the words the script returns. Offer to jump back only for rows with `can_jump_back`. Options: jump back (Recommended) when `recommend_jump` is true, clear with `nothing new` when a walk step is reopened, or stop. On jump back, rerun the owning skill, even for a small patch, then run this check again. The walk does not edit `spec.md`, `plan.md`, or `tasks.md` on a jump back, and it does not write `Reviewed:`. That line belongs to `/crav1-review-plan`. On `nothing new`, clear only the step just named. A row that cannot jump back stays named. The check is still not ready.
+When the script says the check is not ready, name each row's step in the words the script returns. Offer to jump back only for rows with `can_jump_back`. Options: jump back (Recommended) when `recommend_jump` is true, clear with `nothing new` when a walk step is reopened, or stop. On jump back, open the owning skill's file and follow it, even for a small patch, then run this check again. The walk does not edit `spec.md`, `plan.md`, or `tasks.md` on a jump back, and it does not write `Reviewed:`. That line belongs to `/crav1-review-plan`. On `nothing new`, clear only the step just named. A row that cannot jump back stays named. The check is still not ready.
 
 When the only rows are `waiting` and `result` is `not-ready`, do not offer jump back. The stop ending adds the script's `waiting_line`: `Waiting: <n> tasks wait on open questions (<who>).` Next is the script's `waiting_next`: `/crav1-show-or-ask-open-questions <slug>` when the questions are not asked yet, or this walk when the answers arrive.
 
@@ -32,6 +34,6 @@ When `result` is `ready-partial`, do not offer jump back and do not record `not-
 
 Ready is only when the script says `result` `ready` and `start_build` is false, with no blockers, no waiting, no Needs verify, and no assumptions. Then say the slice is ready to build. Print each `next_lines` entry, one per ready branch. One branch is one line: `Next: /crav1-build-tasks T1` (on `feat/orders-api-record`). Do not run it. Add the Uncommitted line when `walk-progress.md` is not committed. Stop.
 
-When they pick stop and the check is not ready, and the rows are not only waiting, `Next` is the first jump-back row's command, because that row blocks ready. Do not list the other rows in the ending. They were already named in the check. This walk still runs a step when they pick jump back, by running that skill.
+When they pick stop and the check is not ready, and the rows are not only waiting, `Next` is the first jump-back row's command, because that row blocks ready. Do not list the other rows in the ending. They were already named in the check. This walk still runs a step when they pick jump back, by opening that skill's file and following it.
 
 Record step `tasks-ready-to-build` when this check finishes, one `record` call, with the versions the script stores, including `Verify version:`, after the user confirms the record. Use `Result: ready` when the script says `ready`, `Result: ready-partial` when it says `ready-partial`, and `Result: not-ready` when it says `not-ready`. Do not record `Result: done` for this step. An older `Result: done` still reads as recorded. Resume treats `ready`, `ready-partial`, `not-ready`, and an older `done` as recorded. Do not batch it with other steps. Do not pass `--when`. A later change to `verify.md` reopens only this check.

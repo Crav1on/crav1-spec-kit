@@ -40,7 +40,7 @@ Do not add an `Edits` option.
 After the yes or the typed answer, then:
 - N answers: patch the open question as this skill's answer path does (one batch).
 - C answers: settle the `**Conflict:**` line as this skill's conflict path does.
-- K changes: write through `/crav1-add-to-spec`'s rules (show the change, then write).
+- K changes: Open `../crav1-add-to-spec/references/fact.md` from this skill's folder (show the change, then write). The rule is [open-skill-file.md](../../crav1-docs/reference/open-skill-file.md) (1.134.0). Do not start `/crav1-add-to-spec`.
 - Never edit the filled file itself. Do not change its `Answer:` or `Change:` lines. The copy under `docs/playbooks/` is a separate write.
 
 ## Copy into the repo (1.120.0)

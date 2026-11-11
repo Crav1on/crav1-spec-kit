@@ -10,4 +10,4 @@ The question is exactly:
 
 The system picture may now be out of date. Run `/crav1-refresh-system-notes`?
 
-Options are yes and no. Use the questions tool when it is available. Do not run `/crav1-refresh-system-notes`. Do not open the impact question from this offer. Do not edit the picture in this turn.
+Options are yes and no. Use the questions tool when it is available. Do not run `/crav1-refresh-system-notes`. Do not open `../crav1-refresh-system-notes/SKILL.md`. A refused start is expected. The rule is [open-skill-file.md](../../crav1-docs/reference/open-skill-file.md) (1.134.0). Do not open the impact question from this offer. Do not edit the picture in this turn.

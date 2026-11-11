@@ -12,6 +12,8 @@ When a real bug is named, **[`/crav1-fix-bug`](crav1-fix-bug.md)** says where it
 
 Names one real bug the user already named (a verify failure on work that is already shipping, or a defect from outside). Says where it was seen, what it breaks, and the lane. Does not start that lane, edit code, open a pull request, or create an Azure Boards work item. Stops when no bug is named. Not a lane and not a stretch of verify. Starter option. Asking for startup options names it and does not run it. It still runs only when the user names a real bug. Not a new-repo start. Not started automatically. Spark, specify, plan, and verify do not run it.
 
+1.134.0: it does not open the next skill's file. A command-only refusal is expected, and the run still ends on the Next line. The rule is `docs/reference/open-skill-file.md`.
+
 ## Runs when
 
 The user names a real bug. Called by the user.

@@ -16,7 +16,7 @@ Then a read-only `git fetch` for each repo in scope. Do not push or delete. Reco
 
 Take every item `common.md` would inventory. Do not ask which to drop. Do not drop stale branches; they are items, and their spec text stays a proposal.
 
-For each item, run the note and `Synced at` part of the item's command. Write the PR note, its history, its new Points, and the `Synced at` line the read actually earned. Do not give the yes a sort would need. Do not write a quote, an `Answered:` line, a new open question, or a `Conflict:` line onto a spec.
+For each item, Open `../crav1-add-to-spec/SKILL.md` from this skill's folder and follow the note and `Synced at` part of the item's command. The rule is [open-skill-file.md](../../crav1-docs/reference/open-skill-file.md) (1.134.0). Do not start `/crav1-add-to-spec`. Write the PR note, its history, its new Points, and the `Synced at` line the read actually earned. Do not give the yes a sort would need. Do not write a quote, an `Answered:` line, a new open question, or a `Conflict:` line onto a spec.
 
 `complete --outcome proposal` with one short line of that spec change. Notes that were written stay written; the outcome is still `proposal` when any spec line was held back. Do not pass `--question` or `--conflict` unless that line was written onto a spec, which auto flow does not do.
 

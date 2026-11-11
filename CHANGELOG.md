@@ -2,6 +2,16 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.134.0 (2026-11-11)
+
+A skill that runs another kit skill opens that skill's file. Command-only stays on. A minor release because a guided walk and several chaining skills change how they start the next skill.
+
+- **Open the file.** Almost every kit skill has `disable-model-invocation: true`, so it runs when a person types the command. `/crav1-tighten-and-plan-ready-to-build` and the other skills that run a kit skill were trying to start that command. The host refused, and the run stopped. Those skills now name the file from this skill's folder, for example `../crav1-review-architecture/SKILL.md`, and the agent opens it with the file-read tool and follows it. It does not start a slash command or a skill tool. If a start is refused because the skill is command-only, the agent opens the file and continues. That refusal is not a reason to stop the walk.
+- **One rule.** The path and the refusal rule live in [Opening another kit skill](docs/reference/open-skill-file.md). The same sibling path is the installed file on Claude Code (`.claude/skills/crav1-<name>/SKILL.md`), the Cursor drop-in (`.cursor/skills/crav1/crav1-<name>/SKILL.md`), and the Cursor plugin (`skills/crav1-<name>/SKILL.md`).
+- **Who opens a file.** The walk's locked steps, extras, jump back, and playbook apply. `/crav1-build-features` for the T# loop and branch rules. `/crav1-update-specs-from-changes-and-prs` for each add-to-spec item. `/crav1-read-environment` for a confirmed system, architecture, match, or left-out section. `/crav1-suggest-tests-for-code` for a kept suggestion. Apply's kept items follow add-to-spec's fact rules.
+- **Who does not.** `/crav1-fix-bug` still names the lane and does not open that skill. The add-to-spec PR record, merge-safe formats, and picture offer name other skills and do not open them. A `Next:` line is still not a start.
+- **Command-only stays.** `disable-model-invocation: true` is unchanged on the step skills.
+
 ## 1.133.0 (2026-11-11)
 
 The ready check groups tasks by the branch they will be built on, and the build map shows the task id with the short name. A minor release because both change what a ready check prints and what `build-map.md` contains.
