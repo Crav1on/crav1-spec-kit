@@ -24,9 +24,11 @@ Compare the old release, the local file, and the new release.
 - The two sides change different lines: merge them.
 - The two sides change the same lines: a clash. Show both sides on the heads-up card. `keep` keeps the local side and still takes non-overlapping kit lines. `take` takes the kit side and still keeps non-overlapping local lines. A clash with no `keep` or `take` refuses to write.
 
+CRLF and LF compare equal (1.132.0). A local file that matches the old release apart from line endings is a plain update, not a clash. A real edit on the same lines still clashes. The written file keeps that file's line endings. When the file has no clear style, `.gitattributes` `eol` is used, otherwise LF. `fetch` clones with `core.autocrlf=false`.
+
 ## Copied templates
 
-`docs/specs/_template/` and `docs/system/_template/` are not merged line by line. A file that is already in the project and still matches the old release byte for byte is replaced. Anything else is left alone and listed, including a template the project never copied. Do not add a template file the project does not already have.
+`docs/specs/_template/` and `docs/system/_template/` are not merged line by line. A file that is already in the project and still matches the old release, apart from line endings, is replaced. A real edit is left alone and listed, including a template the project never copied. Do not add a template file the project does not already have. The written template keeps the local line endings.
 
 ## Left alone
 

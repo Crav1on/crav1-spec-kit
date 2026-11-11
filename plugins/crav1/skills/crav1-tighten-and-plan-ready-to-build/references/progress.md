@@ -33,7 +33,7 @@ Slice: docs/specs/orders-retry/
   Verify version: missing
 ```
 
-A playbook step records `Playbook:` only. It does not record spec, plan, or tasks versions. Other result words are `skipped` and `reapplied`. The ready check records `Result: ready` when the readiness output says ready, and `Result: not-ready` when it does not. Do not record `Result: done` for that step. An older `Result: done` on that step still reads as recorded. Resume treats `ready`, `not-ready`, and an older `done` as recorded. The ready check is the only step that records `Verify version:`. An extra records spec, plan, and tasks versions:
+A playbook step records `Playbook:` only. It does not record spec, plan, or tasks versions. Other result words are `skipped` and `reapplied`. The ready check records `Result: ready` when the readiness output says ready, `Result: ready-partial` when some tasks can start and some are held, and `Result: not-ready` when nothing can start or another walk blocker remains. Do not record `Result: done` for that step. An older `Result: done` on that step still reads as recorded. Resume treats `ready`, `ready-partial`, `not-ready`, and an older `done` as recorded. `ready-partial` covers this step. It is not a `not-ready` mark. The ready check is the only step that records `Verify version:`. An extra records spec, plan, and tasks versions:
 
 ```text
 - Extra: review-security

@@ -18,7 +18,7 @@ Spec folder: user @-mention, else most recently edited `docs/specs/` excluding `
 
 Skip `[x]` unless they named a checked id (then say it is already done). Unknown ids: list, continue. Empty queue: stop.
 
-**Dependency order (1.103.0).** Order the queue with `/crav1-tasks-ready-to-build` **Dependency order** (its `scripts/task_order.py` when Python runs; pick the interpreter as `crav1-docs/reference/running-scripts.md` says), not by task number. Before each worker, check the next queued task again with its rules: when it is still blocked (it waits on a task that is not ticked, an open question, or a cycle), end the batch there with that reason. Do not jump to a later queued task.
+**Dependency order (1.103.0).** Order the queue with `/crav1-tasks-ready-to-build` **Dependency order** (its `scripts/task_order.py` when Python runs; pick the interpreter as `crav1-docs/reference/running-scripts.md` says), not by task number. Before each worker, check the next queued task with `walk_progress.py readiness --root` (skill `crav1-tighten-and-plan-ready-to-build`). When `result` is `ready` or `ready-partial`, start tasks in `can_start`. When `result` is `not-ready`, end the batch. A gate with `refused` true is held: say its `reason` and do not ask to build it anyway. Skip it and continue with the next task in `can_start` that does not depend on a held task. A task that only waits on a task this batch has not ticked still waits its turn. A cycle, or an `(after:)` that names no task, still ends the batch with that reason, and the question (build it anyway or pick another) stays for that blocker.
 
 ## Style once (rule from now on)
 

@@ -463,6 +463,89 @@ def _binary(data: bytes | None) -> bool:
     return data is not None and (b"\0" in data or _preview(data).startswith("<binary "))
 
 
+def _newline_style(data: bytes | None) -> str | None:
+    """lf, crlf, mixed, or None when the bytes have no newline. Binary is None."""
+    if data is None or _binary(data):
+        return None
+    crlf = data.count(b"\r\n")
+    bare_lf = data.count(b"\n") - crlf
+    bare_cr = data.count(b"\r") - crlf
+    if crlf and not bare_lf and not bare_cr:
+        return "crlf"
+    if bare_lf and not crlf and not bare_cr:
+        return "lf"
+    if crlf or bare_lf or bare_cr:
+        return "mixed"
+    return None
+
+
+def _normalize_newlines(data: bytes | None) -> bytes | None:
+    """CRLF and LF compare equal. Binary bytes stay as they are."""
+    if data is None or _binary(data):
+        return data
+    return data.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+
+
+def _restyle(data: bytes | None, style: str) -> bytes | None:
+    """Write text with lf or crlf. Binary bytes stay as they are."""
+    if data is None or _binary(data) or style not in {"lf", "crlf"}:
+        return data
+    text = data.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+    if style == "crlf":
+        return text.replace(b"\n", b"\r\n")
+    return text
+
+
+def _attr_match(pattern: str, rel: str) -> bool:
+    rel = rel.replace("\\", "/")
+    if pattern.startswith("/"):
+        pattern = pattern[1:]
+    if pattern == "*":
+        return True
+    if pattern.startswith("*."):
+        return rel.endswith(pattern[1:])
+    return rel == pattern or rel.endswith("/" + pattern)
+
+
+def gitattributes_eol(root: Path, rel: str) -> str | None:
+    """eol from the repo's .gitattributes, last matching pattern wins."""
+    path = root / ".gitattributes"
+    if not path.is_file():
+        return None
+    chosen = None
+    try:
+        text = path.read_text(encoding="utf-8")
+    except UnicodeError:
+        return None
+    for raw in text.splitlines():
+        line = raw.strip()
+        if not line or line.startswith("#"):
+            continue
+        parts = line.split()
+        if len(parts) < 2 or not _attr_match(parts[0], rel):
+            continue
+        eol = None
+        for attr in parts[1:]:
+            if attr in {"eol=lf", "eol=crlf"}:
+                eol = attr.split("=", 1)[1]
+            if attr in {"binary", "-text"}:
+                eol = None
+        if eol:
+            chosen = eol
+    return chosen
+
+
+def preferred_newline(root: Path, rel: str, local: bytes | None) -> str:
+    """The file's own endings, else .gitattributes eol, else LF."""
+    style = _newline_style(local)
+    if style in {"lf", "crlf"}:
+        return style
+    attr = gitattributes_eol(root, rel)
+    if attr in {"lf", "crlf"}:
+        return attr
+    return "lf"
+
+
 def _lines(text: str) -> list[str]:
     if text == "":
         return []
@@ -578,30 +661,42 @@ def merge_text(old: str, local: str, new: str) -> dict:
     return {"status": "merged", "text": "".join(keep_lines)}
 
 
-def classify_file(old: bytes | None, local: bytes | None, new: bytes | None) -> dict:
-    if local == old == new:
+def classify_file(old: bytes | None, local: bytes | None, new: bytes | None, style: str = "lf") -> dict:
+    """Three-way classify. CRLF and LF are the same text (1.132.0).
+
+    A local file that matches the old release apart from line endings is a
+    plain update. Written text uses `style`, which is the file's own endings.
+    """
+    old_n = _normalize_newlines(old)
+    local_n = _normalize_newlines(local)
+    new_n = _normalize_newlines(new)
+
+    def styled(data: bytes | None) -> bytes | None:
+        return _restyle(data, style)
+
+    if local_n == old_n == new_n:
         return {"op": "unchanged"}
-    if local == old:
+    if local_n == old_n:
         if new is None:
             return {"op": "delete"} if old is not None else {"op": "unchanged"}
         if old is None:
-            return {"op": "add", "data": new}
-        return {"op": "write", "data": new, "why": "matches-old"}
-    if new == old or local == new:
-        return {"op": "unchanged"} if local == new else {"op": "leave", "why": "no-upstream-change"}
+            return {"op": "add", "data": styled(new_n)}
+        return {"op": "write", "data": styled(new_n), "why": "matches-old"}
+    if new_n == old_n or local_n == new_n:
+        return {"op": "unchanged"} if local_n == new_n else {"op": "leave", "why": "no-upstream-change"}
     if new is None:
         return {
             "op": "clash",
-            "hunks": [{"local": _preview(local), "kit": ""}],
-            "keep_data": local,
+            "hunks": [{"local": _preview(local_n), "kit": ""}],
+            "keep_data": styled(local_n),
             "take_data": None,
         }
     if local is None:
         return {
             "op": "clash",
-            "hunks": [{"local": "", "kit": _preview(new)}],
+            "hunks": [{"local": "", "kit": _preview(new_n)}],
             "keep_data": None,
-            "take_data": new,
+            "take_data": styled(new_n),
         }
     if _binary(old) or _binary(local) or _binary(new):
         return {
@@ -610,26 +705,29 @@ def classify_file(old: bytes | None, local: bytes | None, new: bytes | None) -> 
             "keep_data": local,
             "take_data": new,
         }
-    merged = merge_text(old.decode("utf-8"), local.decode("utf-8"), new.decode("utf-8"))
+    merged = merge_text(old_n.decode("utf-8"), local_n.decode("utf-8"), new_n.decode("utf-8"))
     if merged["status"] == "clash":
         return {
             "op": "clash",
             "hunks": merged["hunks"],
-            "keep_data": merged["keep_text"].encode("utf-8"),
-            "take_data": merged["take_text"].encode("utf-8"),
+            "keep_data": styled(merged["keep_text"].encode("utf-8")),
+            "take_data": styled(merged["take_text"].encode("utf-8")),
         }
-    return {"op": "write", "data": merged["text"].encode("utf-8"), "why": merged["status"]}
+    return {"op": "write", "data": styled(merged["text"].encode("utf-8")), "why": merged["status"]}
 
 
-def classify_template(old: bytes | None, local: bytes | None, new: bytes | None) -> dict:
+def classify_template(old: bytes | None, local: bytes | None, new: bytes | None, style: str = "lf") -> dict:
     if local is None:
         return {"op": "absent"}
-    if old is not None and local == old:
+    old_n = _normalize_newlines(old)
+    local_n = _normalize_newlines(local)
+    new_n = _normalize_newlines(new)
+    if old is not None and local_n == old_n:
         if new is None:
             return {"op": "delete"}
-        if new == local:
+        if new_n == local_n:
             return {"op": "unchanged"}
-        return {"op": "write", "data": new}
+        return {"op": "write", "data": _restyle(new_n, style)}
     reason = "edited" if old is not None else "not-in-old-kit"
     return {"op": "leave", "reason": reason}
 
@@ -687,7 +785,8 @@ def build_actions(root: Path, old_root: Path, new_root: Path, hosts: set[str]) -
     for path in paths:
         if not is_kit_path(path):
             continue
-        action = classify_file(old_files.get(path), local_files.get(path), new_files.get(path))
+        style = preferred_newline(root, path, local_files.get(path))
+        action = classify_file(old_files.get(path), local_files.get(path), new_files.get(path), style)
         op = action["op"]
         if op == "write":
             bucket = "merge" if action.get("why") == "merged" else "update"
@@ -714,7 +813,8 @@ def build_actions(root: Path, old_root: Path, new_root: Path, hosts: set[str]) -
     templates = {"update": [], "delete": [], "left": []}
     template_payloads: dict[str, bytes | None] = {}
     for path in sorted(set(local_templates) | set(old_templates) | set(new_templates)):
-        action = classify_template(old_templates.get(path), local_templates.get(path), new_templates.get(path))
+        style = preferred_newline(root, path, local_templates.get(path))
+        action = classify_template(old_templates.get(path), local_templates.get(path), new_templates.get(path), style)
         if action["op"] == "write":
             templates["update"].append(path)
             template_payloads[path] = action["data"]
@@ -931,7 +1031,7 @@ def fetch_release(tag: str, dest: Path, url: str) -> None:
     if dest.exists():
         refuse(f"Refused: {dest} already exists.")
     subprocess.run(
-        ["git", "clone", "--depth", "1", "--branch", normalized, url, str(dest)],
+        ["git", "-c", "core.autocrlf=false", "clone", "--depth", "1", "--branch", normalized, url, str(dest)],
         check=True,
     )
 

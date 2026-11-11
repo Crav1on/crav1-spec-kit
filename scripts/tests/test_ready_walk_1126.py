@@ -200,7 +200,7 @@ class Waiting(unittest.TestCase):
         self.assertEqual(payload["blockers"], [])
         self.assertEqual(payload["jump_back"], [])
         self.assertFalse(payload["recommend_jump"])
-        self.assertEqual(len(payload["waiting"]), 1)
+        self.assertGreaterEqual(len(payload["waiting"]), 1)
         row = payload["waiting"][0]
         self.assertEqual(row["task"], "T1")
         self.assertEqual(row["who"], "the partner")
@@ -208,8 +208,11 @@ class Waiting(unittest.TestCase):
         self.assertFalse(row["can_jump_back"])
         self.assertEqual(
             payload["waiting_line"],
-            "Waiting: 1 tasks wait on open questions (the partner).",
+            "Waiting: 3 tasks wait on open questions (the partner).",
         )
+        by_task = {item["task"]: item for item in payload["waiting"]}
+        self.assertIn("held, waits on T1", by_task["T2"]["reason"])
+        self.assertIn("held, waits on T2", by_task["T3"]["reason"])
         self.assertIn("/crav1-tighten-and-plan-ready-to-build the-slice", payload["waiting_next"])
         self.assertIn("answers arrive", payload["waiting_next"])
 

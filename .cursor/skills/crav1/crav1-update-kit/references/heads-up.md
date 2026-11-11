@@ -1,5 +1,19 @@
 # Heads-up before any write
 
+When this command is not installed yet, the first jump downloads the release asset. A kit script's interpreter is `running-scripts.md`. On bash:
+
+```bash
+curl -fsSL -o crav1-update-kit.py https://github.com/Crav1on/crav1-spec-kit/releases/latest/download/crav1-update-kit.py
+python3 crav1-update-kit.py detect
+```
+
+On Windows PowerShell 5.1, `curl` is an alias for `Invoke-WebRequest`, so the curl flags fail. On Windows, `python3` is often missing. Use `python` or `py`.
+
+```powershell
+Invoke-WebRequest -Uri https://github.com/Crav1on/crav1-spec-kit/releases/latest/download/crav1-update-kit.py -OutFile crav1-update-kit.py
+python crav1-update-kit.py detect
+```
+
 Run `detect` and `resolve-target` first. They do not write. For a drop-in, also run `plan` (it does not write) so the card can name the files. Then stop and show this card. Pass `--yes` only after the user answers `yes` or `write only` in this run.
 
 A checkout that is the kit source (`mode` is `kit-repo`) stops with the script's one line. Do not overlay the kit onto itself.

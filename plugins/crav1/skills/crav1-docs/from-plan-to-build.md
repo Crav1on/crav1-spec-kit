@@ -50,6 +50,10 @@ A task line can name its branch: `- [ ] T3: … (after: T1) (branch: feat/orders
 - The next-step line after a build names `/crav1-open-pr` to push and open the PR. When the branch already has one (its Match line ends in `(PR 77)`), it says `/crav1-open-pr` to push to PR 77 and update its description or comment instead (1.114.0).
 - `/crav1-tasks-ready-to-build` shows the branch beside each ready task, and one Branches line. It also rewrites `docs/specs/<slug>/build-map.md` (1.128.0).
 
+## Some tasks can start (1.132.0)
+
+When the ready check says `ready-partial`, `/crav1-build-tasks` and `/crav1-build-features` start the tasks that can start now. A held task is refused with its reason, including `held, waits on T3` when the task only depends on a held task. The run does not ask to build a held task anyway. When the result is `not-ready`, nothing starts. A ticked task stays on the build map, struck through, with its pull request link.
+
 ## Never on a base branch (1.99.0)
 
 Implementation code is never written or committed on a base branch: `main`, `master`, `develop`, the repo's `Merges into` branch, or any `release/*`. On a work branch (`feat/`, `feature/`, `bug/`, `bugfix/`, `fix/`, `hotfix/`, or one a spec names) the build goes ahead. On a base branch, `/crav1-build-tasks` and `/crav1-fix-build-gaps` ask once:

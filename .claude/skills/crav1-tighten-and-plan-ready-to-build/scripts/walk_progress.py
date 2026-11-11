@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Progress file for /crav1-tighten-and-plan-ready-to-build (kit 1.127.0).
+"""Progress file for /crav1-tighten-and-plan-ready-to-build (kit 1.132.0).
 
 The spec, plan, and tasks stay the source of truth. This script only tracks
 where the guided walk is, which version of each file a step covered, and which
@@ -62,9 +62,10 @@ from pathlib import Path
 
 WALK = "tighten-and-plan-ready-to-build"
 PROGRESS_NAME = "walk-progress.md"
-RESULTS = ("done", "nothing-to-do", "skipped", "applied", "reapplied", "ready", "not-ready")
-# The ready check records ready or not-ready. An older Result: done still reads.
-READY_RESULTS = ("ready", "not-ready", "nothing-to-do")
+RESULTS = ("done", "nothing-to-do", "skipped", "applied", "reapplied", "ready", "ready-partial", "not-ready")
+# The ready check records ready, ready-partial, or not-ready. An older Result: done still reads.
+READY_RESULTS = ("ready", "ready-partial", "not-ready", "nothing-to-do")
+READY_ONLY = ("ready", "ready-partial", "not-ready")
 NOT_NAMED = "not named yet"
 APPLIED = {"applied", "reapplied"}
 
@@ -378,11 +379,12 @@ def record(args: argparse.Namespace) -> None:
     if step == "tasks-ready-to-build" and args.result not in READY_RESULTS:
         fail(
             "result",
-            "tasks-ready-to-build records Result: ready or Result: not-ready, "
-            "from the readiness output. An older Result: done still reads.",
+            "tasks-ready-to-build records Result: ready, Result: ready-partial, "
+            "or Result: not-ready, from the readiness output. "
+            "An older Result: done still reads.",
         )
-    if step != "tasks-ready-to-build" and args.result in ("ready", "not-ready"):
-        fail("result", "ready and not-ready are only for tasks-ready-to-build")
+    if step != "tasks-ready-to-build" and args.result in READY_ONLY:
+        fail("result", "ready, ready-partial, and not-ready are only for tasks-ready-to-build")
     if not args.yes:
         fail(
             "needs-yes",
@@ -778,6 +780,10 @@ def classify(row: dict, resolve_kept: bool = False) -> dict | None:
         return _hit(task, "blocker", "resolve-open-questions", "An open question blocks the work. Run /crav1-resolve-open-questions.")
     if "plan risk" in text:
         return _hit(task, "blocker", "tighten-plan", "A plan risk blocks the work. Run /crav1-review-plan, then /crav1-tighten-plan.")
+    # A task that depends on a held task is held too, even with no question
+    # of its own (1.132.0). That is waiting, not a jump back.
+    if "held, waits on" in text:
+        return _waiting(row)
     # A cycle, or an after: that names no task, is a blocker. Waiting on a
     # real earlier task is the order, not a blocker (1.126.0).
     if "cycle" in text or "names no task" in text:
@@ -805,6 +811,7 @@ def _waiting(row: dict) -> dict:
         "kind": "waiting",
         "who": who,
         "asked": bool(row.get("asked")),
+        "reason": row.get("reason"),
         "why": (
             "Resolve-open-questions already covers this spec. "
             "The question waits on someone else. Do not jump back."
@@ -1050,13 +1057,17 @@ def build_rows(root: Path) -> list[dict]:
             row = {"bucket": bucket, "task": tid}
             if reason:
                 row["reason"] = reason
+            _attach_deps(row, task)
             rows.append(row)
             continue
         if not plan_path.is_file():
-            rows.append({"bucket": "blocked", "task": tid, "reason": "no plan.md (recorded)"})
+            row = {"bucket": "blocked", "task": tid, "reason": "no plan.md (recorded)"}
+            _attach_deps(row, task)
+            rows.append(row)
             continue
         question = _question_row(blocks, tid)
         if question:
+            _attach_deps(question, task)
             rows.append(question)
             continue
         dep = by_reason.get(task["id"])
@@ -1068,13 +1079,21 @@ def build_rows(root: Path) -> list[dict]:
                 bucket = "waits-in-order"
             else:
                 bucket = "blocked"
-            rows.append({"bucket": bucket, "task": tid, "reason": reason})
+            row = {"bucket": bucket, "task": tid, "reason": reason}
+            _attach_deps(row, task)
+            rows.append(row)
             continue
         row = {"bucket": "ready", "task": tid}
         if warning:
             row["warning"] = warning
+        _attach_deps(row, task)
         rows.append(row)
     return rows
+
+
+def _attach_deps(row: dict, task: dict) -> None:
+    row["deps"] = [f"T{dep}" for dep in task["deps"]]
+    row["dep_recorded"] = bool(task["recorded"])
 
 
 def resolve_is_keep(root: Path) -> bool:
@@ -1134,6 +1153,119 @@ def _waiting_lines(waiting: list[dict], slug: str) -> tuple[str | None, str | No
     return line, nxt
 
 
+def propagate_held(rows: list[dict], hits: list[dict]) -> None:
+    """A task that depends on a held task is held too (1.132.0).
+
+    The dependency is the one tasks.md already records (`(after: …)`, or the
+    task just before it). A cycle, or an after: that names no task, stays a
+    blocker. A question that is still a jump back is not propagated: only a
+    row already classified as waiting seeds the hold.
+    """
+    held: dict[str, dict] = {}
+    for hit in hits:
+        if hit.get("kind") != "waiting" or not hit.get("task"):
+            continue
+        held[hit["task"]] = hit
+    changed = True
+    while changed:
+        changed = False
+        for row in rows:
+            task = row.get("task")
+            if not task or task in held:
+                continue
+            if row.get("bucket") in ("needs-verify", "done"):
+                continue
+            reason = (row.get("reason") or "").lower()
+            if "cycle" in reason or "names no task" in reason:
+                continue
+            if "no plan" in reason or "no tasks" in reason or "plan risk" in reason:
+                continue
+            deps = [dep for dep in row.get("deps") or [] if dep in held]
+            if not deps:
+                continue
+            tag = "recorded" if row.get("dep_recorded") else "inferred"
+            if len(deps) == 1:
+                text = f"held, waits on {deps[0]} ({tag})"
+            else:
+                text = "held, waits on " + ", ".join(deps) + f" ({tag})"
+            row["bucket"] = "waiting"
+            row["reason"] = text
+            row["held"] = True
+            source = held[deps[0]]
+            if source.get("who"):
+                row["who"] = source["who"]
+            if "asked" in source:
+                row["asked"] = source.get("asked")
+            hit = _waiting(row)
+            hits.append(hit)
+            held[task] = hit
+            changed = True
+
+
+def slice_result(rows: list[dict], hits: list[dict]) -> tuple[str, list, list]:
+    """ready, ready-partial, or not-ready.
+
+    ready-partial is some tasks that can start now and some that are held,
+    with no other walk blocker. not-ready is when nothing can start, and also
+    when a walk blocker other than a kept-open question is still open (a
+    cycle, a missing task, no plan, needs verify, an assumption, a reopened
+    step, or a question that is still a jump back).
+    """
+    hard = [hit for hit in hits if hit.get("kind") != "waiting"]
+    can_start = [row.get("task") for row in rows if row.get("bucket") == "ready" and row.get("task")]
+    held = [row.get("task") for row in rows if row.get("bucket") == "waiting" and row.get("task")]
+    if hard:
+        return "not-ready", can_start, held
+    if can_start and held:
+        return "ready-partial", can_start, held
+    if held and not can_start:
+        return "not-ready", can_start, held
+    return "ready", can_start, held
+
+
+def line_for(result: str, can_start: list, held: list) -> str | None:
+    if result != "ready-partial":
+        return None
+    ready = ", ".join(task for task in can_start if task) or "none"
+    first = next((task for task in held if task), "the held tasks")
+    return f"Ready: {ready}. Held from {first}."
+
+
+def gates_for(rows: list[dict]) -> list[dict]:
+    """Per-task build gate. A held task is refused. A ready task may start."""
+    gates = []
+    for row in rows:
+        task = row.get("task")
+        if not task or row.get("bucket") == "done":
+            continue
+        if row.get("bucket") == "waiting" or row.get("held"):
+            gates.append({
+                "task": task,
+                "allow": False,
+                "refused": True,
+                "reason": row.get("reason") or "held",
+            })
+        elif row.get("bucket") == "ready":
+            gates.append({"task": task, "allow": True, "refused": False})
+        else:
+            gates.append({
+                "task": task,
+                "allow": False,
+                "refused": False,
+                "reason": row.get("reason") or row.get("bucket"),
+            })
+    return gates
+
+
+def next_for(result: str, can_start: list, waiting_next: str | None) -> str | None:
+    if result == "ready":
+        return "/crav1-build-tasks, because the slice is ready to build."
+    if result == "ready-partial":
+        ids = ", ".join(task for task in can_start if task)
+        return f"/crav1-build-tasks {ids}, because those tasks can start now."
+    return waiting_next
+
+
 def readiness(args: argparse.Namespace) -> None:
     root = Path(args.root) if args.root else None
     built = False
@@ -1163,6 +1295,7 @@ def readiness(args: argparse.Namespace) -> None:
             hits.append(hit)
             if hit["kind"] == "waiting":
                 row["bucket"] = "waiting"
+    propagate_held(rows, hits)
     reopened = reopened_hits(root) if root is not None else []
     hits.extend(reopened)
     blockers = [h for h in hits if h["kind"] == "blocker" and not h["outside_walk"]]
@@ -1171,12 +1304,19 @@ def readiness(args: argparse.Namespace) -> None:
     waiting = [h for h in hits if h["kind"] == "waiting"]
     unmapped = [h for h in hits if h["command"] is None and h["kind"] != "waiting"]
     jump = [h for h in hits if h["can_jump_back"]]
-    ready = not hits
+    result, can_start, held = slice_result(rows, hits)
+    ready = result == "ready"
     slug = _slug(root) if root is not None else ""
     waiting_line, waiting_next = _waiting_lines(waiting, slug)
     out = {
         "ok": True,
         "ready": ready,
+        "result": result,
+        "can_start": can_start,
+        "held": held,
+        "line": line_for(result, can_start, held),
+        "gates": gates_for(rows),
+        "next": next_for(result, can_start, waiting_next),
         "start_build": False,
         "blockers": blockers,
         "outside_walk": outside,
@@ -1185,7 +1325,7 @@ def readiness(args: argparse.Namespace) -> None:
         "waiting": waiting,
         "waiting_line": waiting_line,
         "waiting_next": waiting_next,
-        "recommend_jump": bool(jump),
+        "recommend_jump": bool(jump) and result == "not-ready",
         "jump_back": jump,
         "reopened": reopened,
     }

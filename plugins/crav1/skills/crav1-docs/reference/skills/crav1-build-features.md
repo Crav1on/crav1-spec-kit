@@ -16,6 +16,8 @@ Serial board of ready slugs: `feat/<slug>` from default, then that spec’s buil
 
 1.129.0: each task is built on the build map row from `scripts/build_map.py --recommend T#`. A worker `needs_yes` is waiting, not blocked.
 
+1.132.0: the same ready-check gate as [`/crav1-build-tasks`](crav1-build-tasks.md). `ready` and `ready-partial` start `can_start`. A held task is refused with its reason. `not-ready` starts no worker on that slug.
+
 ## Runs when
 
 Several specs, one after another. Called by the user.

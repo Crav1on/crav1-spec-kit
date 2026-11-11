@@ -138,9 +138,10 @@ class WaitingWho(unittest.TestCase):
         self.assertEqual(payload["waiting"][0]["who"], "not named yet")
         self.assertEqual(
             payload["waiting_line"],
-            "Waiting: 1 tasks wait on open questions (1 not named yet).",
+            "Waiting: 3 tasks wait on open questions (3 not named yet).",
         )
-        self.assertEqual(len(payload["waiting"]), 1)
+        self.assertEqual(len(payload["waiting"]), 3)
+        self.assertEqual(payload["result"], "not-ready")
 
     def test_question_blocks_parser_prefers_waiting_for(self):
         import importlib.util

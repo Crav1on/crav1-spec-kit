@@ -1193,13 +1193,14 @@ marks:
     name: "Result"
     group: walk
     files: ["docs/specs/<slug>/walk-progress.md (under a step)"]
-    format: "  Result: <done | nothing-to-do | skipped | applied | reapplied | ready | not-ready>"
-    pattern: '^  Result: (done|nothing-to-do|skipped|applied|reapplied|ready|not-ready)$'
+    format: "  Result: <done | nothing-to-do | skipped | applied | reapplied | ready | ready-partial | not-ready>"
+    pattern: '^  Result: (done|nothing-to-do|skipped|applied|reapplied|ready|ready-partial|not-ready)$'
     examples:
       - "  Result: done"
       - "  Result: ready"
+      - "  Result: ready-partial"
       - "  Result: not-ready"
-    meaning: "How the step ended. The ready check records ready or not-ready. An older done on that step still reads. nothing-to-do still counts as covered for those versions."
+    meaning: "How the step ended. The ready check records ready, ready-partial, or not-ready. ready-partial means some tasks can start and some are held. It is covered, and it is not a not-ready mark. An older done on that step still reads. nothing-to-do still counts as covered for those versions."
     written_by: [crav1-tighten-and-plan-ready-to-build]
     read_by: [crav1-tighten-and-plan-ready-to-build]
     mention: '(?m)^  Result: '

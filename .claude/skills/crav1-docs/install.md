@@ -218,6 +218,13 @@ curl -fsSL -o crav1-update-kit.py https://github.com/Crav1on/crav1-spec-kit/rele
 python3 crav1-update-kit.py detect
 ```
 
+On Windows PowerShell 5.1, `curl` is an alias for `Invoke-WebRequest`, so the curl flags fail. On Windows, `python3` is often missing. Use `python` or `py`.
+
+```powershell
+Invoke-WebRequest -Uri https://github.com/Crav1on/crav1-spec-kit/releases/latest/download/crav1-update-kit.py -OutFile crav1-update-kit.py
+python crav1-update-kit.py detect
+```
+
 Resolve a published tag, then plan and apply only after a yes. The script does not push. After that jump the command is on the branch, and the downloaded file can be deleted. A release older than 1.131.0 has no asset; copy the drop-in by hand from that tag, then use the command for the next jump.
 
 The manual copy still works when you want to do it yourself:

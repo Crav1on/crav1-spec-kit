@@ -28,7 +28,9 @@ Then ask one question. List the tasks that are ready, using the rules in `/crav1
 
 Skip the question when the message already answers it: one `T#` is option 1, a range or several `T#`s is option 2, `all` or "continue until blocked" is option 3.
 
-A picked task that is blocked: say why (the tasks-ready-to-build reason) and ask whether to build it anyway or pick another. Do not skip that question.
+A picked task that is blocked by a cycle, or by an `(after:)` that names no task: say why and ask whether to build it anyway or pick another. Do not skip that question.
+
+**Held tasks (1.132.0).** Run `walk_progress.py readiness --root <spec-folder>` (skill `crav1-tighten-and-plan-ready-to-build`). When `result` is `ready` or `ready-partial`, start each task in `can_start`. A gate with `refused` true is held: say its `reason` (`open question …` or `held, waits on T#`) and do not ask to build it anyway. Do not start it. Continue with the other tasks that can start. When `result` is `not-ready`, do not start a worker.
 
 ## Choice words
 

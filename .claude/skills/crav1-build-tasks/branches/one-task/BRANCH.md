@@ -21,6 +21,8 @@ Spec folder: user @-mention, else most recently edited `docs/specs/` excluding `
 
 **T#:** the id they named, else the first `- [ ]`. If all checked, stop (`/crav1-verify-build-against-spec` or the range or all branch of `/crav1-build-tasks`).
 
+**Held (1.132.0).** Before the worker, run `walk_progress.py readiness --root` (skill `crav1-tighten-and-plan-ready-to-build`). A gate with `refused` true is refused with its reason. Do not ask to build it anyway. Do not start the worker. A task in `can_start` may start when `result` is `ready` or `ready-partial`. When `result` is `not-ready`, do not start the worker.
+
 ## What to pass the worker
 
 - Spec folder paths (`spec.md`, `tasks.md`, `plan.md`, `verify.md` if any)
