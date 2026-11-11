@@ -40,6 +40,20 @@ class DeadCard(unittest.TestCase):
         self.assertIn("Change some option", why)
         self.assertIn("Other name option", why)
 
+    def test_typing_none_to_skip_fails(self):
+        text = "Pick none to go straight to /crav1-plan-from-spec (type none under Other).\n"
+        why = [w for _, w in lint.dead_card_hits(text)]
+        self.assertIn("typed choice", why)
+        self.assertIn("type under Other", why)
+
+    def test_a_real_none_option_is_allowed(self):
+        text = (
+            "Always include **None, go to plan**. That option runs no extra.\n"
+            "Do not tell them to type none.\n"
+            "**Skip** is a real option. Hint: `Type the id, e.g. 52`.\n"
+        )
+        self.assertEqual(lint.dead_card_hits(text), [])
+
     def test_the_free_text_hint_is_allowed(self):
         text = (
             "- `yes (Recommended)`: write it as shown.\n"
@@ -58,6 +72,8 @@ class DeadCard(unittest.TestCase):
         self.assertIn("Never add an option that only tells the user to type somewhere else.", page)
         self.assertIn("free-text answer", page)
         self.assertIn("the hint lives on that option", page)
+        self.assertIn("None, go to plan", page)
+        self.assertIn("Skipping does not need typing.", page)
         rule = (ROOT / ".cursor/rules/crav1.mdc").read_text(encoding="utf-8")
         self.assertIn("question-cards.md", rule)
         self.assertNotIn("reply with your edits", rule)

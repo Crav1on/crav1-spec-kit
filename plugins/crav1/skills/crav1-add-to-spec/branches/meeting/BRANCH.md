@@ -45,12 +45,9 @@ Stop until the user picks. Do not extract until the kind is known. One kind for 
 
 The date comes from the input. The meeting date, an email's sent date, or one date the chat thread shows for the whole thread is the date. Do not invent a date. Do not pick one message time and call it the date.
 
-When the input shows no date, ask once per run whether to add one. Options only. Use the questions tool when it is available. The options are only:
+When the input shows no date, ask once per run whether to add one. One question card, as `crav1-docs/reference/question-cards.md` says. **Skip** is a real option and means no date. A date is that card's free-text answer, hint `Type the date`. Do not tell them to type skip. There is no **Give a date** option.
 
-1. **Give a date**
-2. **Skip**
-
-Stop until the user picks. A date the user gives is used. If they pick give a date and the reply has no date, stop until they give one. Skip means no date. Do not ask again after skip. One date for the run, or none. It applies to every item.
+Stop until the user picks. A date in that answer is used. An answer with no date is the same as Skip. Do not ask again after skip. One date for the run, or none. It applies to every item.
 
 ## Extract
 
@@ -120,7 +117,7 @@ Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-spe
 
 - No input and no `@`: stop. Options only. Do not guess a file. An email or a chat thread is accepted as well as minutes or a transcript.
 - The kind comes from what the input shows: `meeting`, `email`, or `chat`. Do not guess. If it is not clear, ask once: meeting, email, or chat.
-- The date comes from the input. Do not invent one. If the input shows no date, ask once: give a date, or skip. Skip means no date.
+- The date comes from the input. Do not invent one. If the input shows no date, ask once. **Skip** is a real option and means no date. A date is that card's free-text answer, hint `Type the date`. Do not tell them to type skip.
 - One kind and one date for the run. They apply to every item. The chat `Source` line is `<kind> <date>`, or `<kind>`. The spec `Source:` line is the source folder, written by the fact branch of `/crav1-add-to-spec` after the folder exists.
 - Extract requirements, decisions, changes, open questions, and bugs. Each item is a quote. Include speaker and time when the input shows them.
 - Read spec open questions first. A clear answer is linked without a question through the fact branch of `/crav1-add-to-spec`. An unclear or partial answer is shown as a possible answer and the question stays open. A question the input shows being asked gets an `Asked:` mark with the input's date. Follow `crav1-add-to-spec` `references/open-questions.md`. Answers that change spec lines name `/crav1-resolve-open-questions`. Do not run it.

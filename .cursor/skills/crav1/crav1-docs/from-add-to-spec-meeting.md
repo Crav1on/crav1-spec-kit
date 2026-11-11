@@ -12,7 +12,7 @@ It is a later skill. It is not a starter option. When the user asks for startup 
 
 When a kept addition quotes a mail, a transcript, a chat, a screenshot, or another original, the command writes that source under `docs/sources/YYYY-MM-DD-<slug>/`, with the original files and a `README.md`, following the imported-sources convention. It does not write the spec. It does not commit. The quote reaches the spec through `/crav1-add-to-spec`, and that spec's `Source:` and `Trace:` lines link to the folder. A leave, a dismiss, a kept new feature, and a kept bug do not write the folder.
 
-Since 1.61.0 the whole input is always saved once as one full note, `docs/notes/YYYY-MM/YYYY-MM-DD-<slug>.md`, filed by the meeting date or the mail's sent date (no date: the import date, and it says so). There is no Note choice. Each kept addition links that note as `Full source:`. A left item stays in the full note. The same mail or meeting again is not imported twice: it says `already imported on <date> as <note>` and offers reuse or skip. Indexes are generated, not hand-edited. Dismiss stays for a greeting, scheduling, and thanks.
+Since 1.61.0 the whole input is always saved once as one full note, `docs/notes/YYYY-MM/YYYY-MM-DD-<slug>.md`, filed by the meeting date or the mail's sent date (no date: the import date, and it says so). There is no Note choice. Each kept addition links that note as `Full source:`. A left item stays in the full note. The same mail or meeting again is not imported twice: it says `already imported on <date> as <note>` and offers **Reuse** or **Skip**. Indexes are generated, not hand-edited. Dismiss stays for a greeting, scheduling, and thanks.
 
 ## First prompt
 
@@ -34,7 +34,7 @@ If the message has no input and no `@`, the command stops. Options only. It does
 | Phase | You | Agent |
 | --- | --- | --- |
 | Input | Pasted or `@` a file | Minutes, a transcript, an email, or a chat thread. Stops when nothing was pointed at. Does not scan the repo. Does not guess |
-| Kind and date | Glance | Kind from what the input shows: meeting, email, or chat. Date from the input. Asks once when the kind is not clear. Asks once when there is no date: give a date, or skip |
+| Kind and date | Glance | Kind from what the input shows: meeting, email, or chat. Date from the input. Asks once when the kind is not clear. Asks once when there is no date: **Skip** is a real option, and a date is typed on that card (1.130.0) |
 | Extract | Read the list | Requirements, decisions, changes, open questions, bugs, and information worth keeping that is not yet a spec. Each item is a quote. Speaker and time when the input shows them. Small talk is dropped |
 | Match | Read every item | Addition, new feature, bug, or unclear. Every candidate spec stays listed. Skip `_template`. the notes indexes are checked first for the same source |
 | Build state | Read the line | One `State:` line on each item that matches a spec, in the list and in the question. `Fits: none` has no state line |

@@ -24,7 +24,7 @@ Then the extras batch below, once. Do not go on to the plan first.
 
 ## After step 4, one batch of extras
 
-Once, after `/crav1-resolve-open-questions`, when the kept-open questions are known. Not at an earlier step, and not again later. Offer the ones that apply, in one batch, at most four options, a fifth under Other. List a recommended one first and end its label with ` (Recommended)`. When any extra applies, do not go on to the plan without that offer. When none apply, say so in one line and move on. Do not run any of them unless the user picks it.
+Once, after `/crav1-resolve-open-questions`, when the kept-open questions are known. Not at an earlier step, and not again later. One multi-select card, as `crav1-docs/reference/question-cards.md` says. Each extra that applies is an option. List a recommended one first and end its label with ` (Recommended)`. Always include **None, go to plan**. That option runs no extra and the walk goes on to `/crav1-plan-from-spec`. At most three extras on the card, plus that option. A further extra is named in the question. When any extra applies, do not go on to the plan without that offer. When none apply, say so in one line and move on. Do not run any of them unless the user picks it. Do not tell them to type none.
 
 Offer `/crav1-show-or-ask-open-questions` when any kept-open question is for someone else.
 

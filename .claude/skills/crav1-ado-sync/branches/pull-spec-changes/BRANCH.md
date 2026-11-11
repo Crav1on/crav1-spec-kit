@@ -77,7 +77,7 @@ Show it as one line:
 Post comment on Feature <id>: <text>
 ```
 
-The user can change the text, post it, or skip it. Use the questions tool when it is available. A change to the text that adds a fact still goes into the spec first, through `/crav1-add-to-spec`, before the post.
+One question card, as `crav1-docs/reference/question-cards.md` says. **Post (Recommended)** posts it as shown. **Skip** posts nothing. The free-text answer changes the text. Hint: `Type your changes`. Do not tell them to type skip. A change to the text that adds a fact still goes into the spec first, through `/crav1-add-to-spec`, before the post.
 
 Post only on yes. Follow the comment call in the Azure Boards reference. Do not show the command.
 

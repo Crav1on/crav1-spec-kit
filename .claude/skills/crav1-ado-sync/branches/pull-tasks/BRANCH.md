@@ -64,7 +64,7 @@ When a task's discussion asks a question and the spec already answers it, draft 
 Post comment on <id>: <text>
 ```
 
-Strip it the same way the push tasks branch of `/crav1-ado-sync` strips: no file paths, no line numbers, no spec references, no `docs/sources/` paths, no kit or skill names, never the specs repo. Code repo names stay. The user can change the text, post it, or skip it. A change that adds a fact goes into the spec first, through `/crav1-add-to-spec`. Post only on yes. When the spec has no answer, offer the question as an open question for the spec instead.
+Strip it the same way the push tasks branch of `/crav1-ado-sync` strips: no file paths, no line numbers, no spec references, no `docs/sources/` paths, no kit or skill names, never the specs repo. Code repo names stay. One question card, as `crav1-docs/reference/question-cards.md` says. **Post (Recommended)** posts it as shown. **Skip** posts nothing. The free-text answer changes the text. Hint: `Type your changes`. Do not tell them to type skip. A change that adds a fact goes into the spec first, through `/crav1-add-to-spec`. Post only on yes. When the spec has no answer, offer the question as an open question for the spec instead.
 
 ## Stop
 

@@ -219,13 +219,16 @@ def run_ending_problems(kit):
 # "There is no Edits option" and "Do not add an Edits option" are the rule, not an offer.
 DEAD_REPLY = re.compile(r"(?i)reply with (?:your )?edits")
 DEAD_CHOOSE = re.compile(r"(?i)choose this, then type")
-DEAD_UNDER = re.compile(r"(?i)type(?: your [\w' -]{0,48})? under other")
+DEAD_UNDER = re.compile(r"(?i)type(?: your [\w' -]{0,48}| [\w' -]{1,24})? under other")
 DEAD_EDITS = re.compile(
     r"(?i)(?:^|\s)(?:[-*]|\d+\.)\s+(?:\*\*)?`?Edits`?\b|\*\*Edits\*\*|offer(?:s|ed)?\s+(?:an\s+)?`?Edits`?\b"
 )
 DEAD_EDITS_OK = re.compile(r"(?i)(?:there is )?no `?Edits`?|do not add an? `?Edits`?")
 DEAD_CHANGE_SOME = re.compile(r"(?m)^\s*\d+\.\s+\*\*Change some")
 DEAD_OTHER_NAME = re.compile(r"\*\*Other name\*\*")
+# A choice word the card tells the user to type (none, skip, all) instead of offering it (1.130.0).
+DEAD_TYPED = re.compile(r"(?i)\btype\s+(?:none|skip|all)\b")
+DEAD_TYPED_OK = re.compile(r"(?i)\b(?:do not|never|not)\b")
 
 
 def dead_card_hits(text):
@@ -244,6 +247,8 @@ def dead_card_hits(text):
             hits.append((i, "Change some option"))
         if DEAD_OTHER_NAME.search(line):
             hits.append((i, "Other name option"))
+        if DEAD_TYPED.search(line) and not DEAD_TYPED_OK.search(line):
+            hits.append((i, "typed choice"))
     return hits
 
 

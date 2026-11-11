@@ -35,7 +35,7 @@ A spec with no Feature id is not offered. When the user names one, say it has no
 
 Read that spec's `tasks.md`. List every task, numbered as the file numbers them (`T1`, `T2`, …), one line each: the number, the task's own short wording, and `Update #<id>` when `work-item.md` already records it. Every task stays listed. Do not drop one to keep the list short. A spec with no `tasks.md`, or with no tasks, says so and stops. Name `/crav1-plan-from-spec`. Do not run it.
 
-The user picks by number, or all. Stop until they pick. Do not preview a task they did not pick.
+The user picks one or more. On the card, **All** and **None** are real options. None previews nothing. Do not tell them to type all or none. Use the questions tool when the tasks plus those two options fit in four. A further task is named in the question. Otherwise the numbered table is the choice, and **All** and **None** stay real choices beside the numbers. Stop until they pick. Do not preview a task they did not pick.
 
 ## Child type
 

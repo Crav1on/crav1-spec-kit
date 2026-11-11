@@ -45,7 +45,7 @@ A kept change goes to the spec through `/crav1-add-to-spec`, labelled as coming 
 
 A Feature with no spec yet suggests making the spec first, for example `/crav1-spark-to-spec`, from what was written on the Feature. The command does not run that starter.
 
-When the Feature discussion asks a question and the spec already answers it, the command drafts a reply with no reference to the specs repo. It shows `Post comment on Feature <id>: <text>`. The user can change it, post it, or skip it. It is posted only on yes. When the spec has no answer, no reply is drafted. The question is offered as an open question for the spec instead.
+When the Feature discussion asks a question and the spec already answers it, the command drafts a reply with no reference to the specs repo. It shows `Post comment on Feature <id>: <text>`. **Post (Recommended)** posts it as shown. **Skip** posts nothing. A change is typed on that card (1.130.0). It is posted only on yes. When the spec has no answer, no reply is drafted. The question is offered as an open question for the spec instead.
 
 ## What gets written
 
