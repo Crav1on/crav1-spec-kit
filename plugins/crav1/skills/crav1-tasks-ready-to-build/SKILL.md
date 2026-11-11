@@ -67,7 +67,7 @@ Every task list is in **dependency order**, not task-number order. Each task get
 
 The sort ships next to this file as `scripts/task_order.py`. When Python runs, use it for each slice: `<interpreter> <this skill folder>/scripts/task_order.py docs/specs/<slug>/tasks.md`. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. It prints Ready, Waits in order, Blocked, the Order line and Next. Waits in order is a real earlier task. Blocked is a cycle or an `(after:)` that names no task. Add the rule 1 to 3 results on top: a question is Waiting on a question, not Blocked. A dependent of a held task is Waiting too. The walk's `scripts/walk_progress.py readiness --root` prints `result`: `ready`, `ready-partial`, or `not-ready`. Without Python, apply the same rule by hand.
 
-Other skills (`/crav1-build-tasks`, `/crav1-build-features`, `/crav1-verify-build-against-spec`) use this order and this Next rule.
+Other skills (`/crav1-build-tasks`, `/crav1-build-features`, `/crav1-verify-build-against-spec`) use this order. The ready check's Next lines are one per ready branch (1.133.0), not the single task that unblocks the most.
 
 ## Output
 
@@ -81,39 +81,41 @@ Tasks ready to build — <slug> | all specs (<n> slices)
 | <slug> | 1 | 1 | 1 | 1 | 1 | 4 |
 
 Result: ready-partial
-Line: Ready: T5. Held from T7.
 
-Ready (dependency order)
-- <slug> T5: <title> (branch: feat/orders-retry). Warning: plan review unknown (inferred), run /crav1-review-plan.
+Ready now
+- `feat/orders-retry` (wave 1): T5 refund to the original card
+- `feat/orders-export` (wave 1): T6 export the receipt
 
-Waiting on a question
-- <slug> T7: open question "Which currency for refunds?" (recorded). Waiting for the partner.
+Held
+- `feat/orders-currency` (wave 1): T7 choose the currency — open question "Which currency for refunds?" Waiting for the partner.
+- `feat/orders-archive` (wave 2): T8 archive the receipt — held, waits on T7
 
 Waits in order (dependency order)
-- <slug> T6: waits on T5 (recorded).
+- T9 send the mail: waits on T5 (recorded).
 
 Blocked (dependency order)
-- <slug> T8: cycle T8 → T9 → T8 (recorded).
+- T10 cycle T10 → T11 → T10 (recorded).
 
 Needs verify
-- <slug> T3: no verify.md row.
+- T3 short name: no verify.md row.
 
 Done: 4
-Order: T5 → T6 → T7 → T8
+Order: T5 → T9 → T7 → T8
 Branches: 1 of 3 merged into develop. Not merged: feat/orders-retry (2 commits), feature/orders-export (3 commits).
 
-Next: /crav1-build-tasks T5 (orders-retry), because that task unblocks the most others.
+Next: /crav1-build-tasks T5 (on `feat/orders-retry`)
+Next: /crav1-build-tasks T6 (on `feat/orders-export`)
 Source: docs/specs/<slug>/spec.md, plan.md, tasks.md, verify.md
 Build map: docs/specs/<slug>/build-map.md
 ```
 
-- **Result (1.132.0)** is `ready` when the tasks that are not done can start or only wait in order, `ready-partial` when some can start now and some are held, and `not-ready` when nothing can start. `ready-partial` names the line: `Ready: T1, T2. Held from T3.` A cycle, a missing task, no plan, Needs verify, or a plan-review warning still records `not-ready`.
-- **Order** shows the slice's unticked tasks in dependency order, `|` between tasks of the same wave. One Order line per slice when listing all specs.
-- **Next** is one line, as `crav1-docs/reference/run-ending.md` says. It names the ready task that unblocks the most other unticked tasks (every task downstream of it), lowest number on a tie, in the first slice that has one. When the result is `ready-partial`, Next is `/crav1-build-tasks` for those ready tasks.
+- **By branch (1.133.0).** When Python runs, `readiness --root` (skill `crav1-tighten-and-plan-ready-to-build`, `scripts/walk_progress.py`) prints `ready_lines`, `held_lines`, and `next_lines`. Print those. Do not flatten them. The branch is `scripts/build_map.py --recommend T#`, the same row as the map. Order is wave, then map order. A task is `T#` plus its short name, in the lists and on the map. One ready branch is still one group and one Next line. Without Python, use `references/build-map.md` under Ready check.
+- **Result (1.132.0)** is `ready` when the tasks that are not done can start or only wait in order, `ready-partial` when some can start now and some are held, and `not-ready` when nothing can start. The walk record stays `Result: ready-partial`. A cycle, a missing task, no plan, Needs verify, or a plan-review warning still records `not-ready`.
+- **Order** shows the slice's unticked tasks in dependency order, `|` between tasks of the same wave. One Order line per slice when listing all specs. The Order line keeps task ids.
+- **Next** is one line per branch that can start, when the result is `ready` or `ready-partial`: `Next: /crav1-build-tasks T5 T6` (on `feat/orders-retry`). The ids are the command. The names are on the Ready now line. This is the ready-check exception in `crav1-docs/reference/run-ending.md`. Do not run it.
 - Nothing is ready, and an open question blocks the first task: `Next: /crav1-resolve-open-questions <slug>, because that question blocks the first task.`
 - Only Needs verify is left: `Next: /crav1-verify-build-against-spec <slug>, because the built tasks are not verified yet.`
 - Nothing is left to build or verify: `Next: nothing needed now.`
-- A ready task with `(branch: …)` shows that branch beside it.
 - **Source** names every file it read, per slice.
 - **Build map** is one line per slice, the path the script just wrote. The task list above it is unchanged.
 - When the slice has `work-item.md`, add the Azure Boards line from **What it reads**.

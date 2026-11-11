@@ -34,9 +34,11 @@ For each task, in this order:
 | Otherwise | **Ready**. When `plan.md` has no `Reviewed:` line, it adds a warning to run `/crav1-review-plan` (inferred). When the review still has open `P#`s, it says so |
 | Waits on a held task | **Waiting** too, reason `held, waits on T3` (1.132.0). Who is the person on the question that started the hold |
 
-The result line is `ready`, `ready-partial`, or `not-ready` (1.132.0). `ready-partial` means some tasks can start now and some are held. It names the line, for example `Ready: T1, T2. Held from T3.` `not-ready` means nothing can start. A cycle, a missing task, no plan, Needs verify, or a plan-review warning still records `not-ready`. `/crav1-build-tasks` starts the ready tasks and refuses a held task with its reason.
+The result line is `ready`, `ready-partial`, or `not-ready` (1.132.0). `ready-partial` means some tasks can start now and some are held. `not-ready` means nothing can start. A cycle, a missing task, no plan, Needs verify, or a plan-review warning still records `not-ready`. The walk record stays `Result: ready-partial`. `/crav1-build-tasks` starts the ready tasks and refuses a held task with its reason.
 
-Lists are in **dependency order** (1.103.0), not task number: tasks with nothing to wait on first, then the tasks they unblock, wave by wave, lowest number first inside a wave. For a slice where T7 waits on T2, T3 and T6 on T7, T4 on T3 and T7, and T5 on T4, the order is T1 → T2 → T7 → T3 | T6 → T4 → T5. **Next** is the ready task that unblocks the most other tasks. `/crav1-build-tasks`, `/crav1-build-features` and `/crav1-verify-build-against-spec` use the same order.
+Since 1.133.0 the ready tasks and the held tasks are grouped by the build-map branch, not as one flat list. The branch is the name `scripts/build_map.py --recommend` prints. Order is wave, then the map's row order. A task is shown as `T#` plus its short name, the same words as the Tasks field in `build-map.md`. A held task names the open question and who has it, or `held, waits on T3`. Each branch that can start gets its own Next line, so those branches can be started together. One branch is still one line.
+
+Lists inside a branch follow the map. The wider task graph is still **dependency order** (1.103.0): tasks with nothing to wait on first, then the tasks they unblock, wave by wave, lowest number first inside a wave. For a slice where T7 waits on T2, T3 and T6 on T7, T4 on T3 and T7, and T5 on T4, the order is T1 → T2 → T7 → T3 | T6 → T4 → T5. `/crav1-build-tasks`, `/crav1-build-features` and `/crav1-verify-build-against-spec` use that order.
 
 Every reason says **recorded** (from a mark in a file) or **inferred** (a fallback). The marks are in [Readiness marks](concepts/data-layout.md#readiness-marks).
 
@@ -47,21 +49,21 @@ Every reason says **recorded** (from a mark in a file) or **inferred** (a fallba
 | --- | --- | --- | --- | --- | --- | --- |
 | cancel-booking | 1 | 1 | 1 | 0 | 1 | 3 |
 
-Ready (dependency order)
-- cancel-booking T5: Refund to the original card. Warning: plan review unknown (inferred), run /crav1-review-plan.
+Ready now
+- `feat/orders-retry` (wave 1): T5 refund to the original card
 
-Waiting on a question
-- cancel-booking T7: open question "Which currency for refunds?" (recorded). Waiting for the partner.
+Held
+- `feat/orders-currency` (wave 1): T7 choose the currency — open question "Which currency for refunds?" Waiting for the partner.
 
 Waits in order (dependency order)
-- cancel-booking T6: waits on T5 (recorded).
+- T6 send the mail: waits on T5 (recorded).
 
 Needs verify
-- cancel-booking T3: no verify.md row.
+- T3 short name: no verify.md row.
 
 Done: 3
 
-Next: /crav1-build-tasks T5 (cancel-booking), because that task unblocks the most others.
+Next: /crav1-build-tasks T5 (on `feat/orders-retry`)
 Source: docs/specs/cancel-booking/spec.md, plan.md, tasks.md, verify.md
 Build map: docs/specs/cancel-booking/build-map.md
 ```
@@ -103,4 +105,4 @@ Build the task it named:
 
 Reference page: [tasks-ready-to-build](reference/skills/crav1-tasks-ready-to-build.md) · Routes: [Workflow routes](reference/workflow.md)
 
-The run ends as [How a run ends](reference/run-ending.md) says: one `Next:` line, `Waiting:` only when a step is blocked, and `Uncommitted:` when files changed and are not committed.
+The run ends as [How a run ends](reference/run-ending.md) says: one `Next:` line per ready branch, `Waiting:` only when a step is blocked, and `Uncommitted:` when files changed and are not committed.

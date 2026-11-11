@@ -8,6 +8,8 @@ A skill names the next step. It does not run it, unless that skill already runs 
 
 `Next:` is exactly one line. It names the single step to run now, and a short reason why.
 
+The ready check is the exception (1.133.0). When tasks that can start sit on more than one build-map branch, `/crav1-tasks-ready-to-build` and the tighten-and-plan ready check print one `Next:` line per branch. Each line is still one `/crav1-build-tasks` command, for the tasks on that branch. Those branches do not wait on each other, so they can start together. One ready branch stays one line. Every other skill keeps one `Next:` line.
+
 ```text
 Next: /crav1-pr-status pr71, pr73, pr74, because this run added Points nothing has sorted yet.
 ```
@@ -20,7 +22,7 @@ When nothing is needed now:
 Next: nothing needed now.
 ```
 
-Do not list a second step on that line, in a second `Next:` line, or as an equal bullet. A step that depends on this step's result is not listed. The step named here says what comes after, when that applies. Do not list `pr<n> candidates` in the same ending as pr-status. That later command is named when the record has candidates.
+Do not list a second step on that line, in a second `Next:` line, or as an equal bullet. The ready check's one line per ready branch is the exception above. A step that depends on this step's result is not listed. The step named here says what comes after, when that applies. Do not list `pr<n> candidates` in the same ending as pr-status. That later command is named when the record has candidates.
 
 ## Waiting
 
