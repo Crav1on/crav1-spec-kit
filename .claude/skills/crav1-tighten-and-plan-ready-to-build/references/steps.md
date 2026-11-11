@@ -2,7 +2,7 @@
 
 Run these in order. When a playbook was named, the playbook question is answered before any later step, including a read-only check. Each one is the existing skill, not a copy of it. A step with nothing to do says so in one line, records `Result: nothing-to-do` with the versions it covers, and moves on. Record that one step right then. One `record` call per step. Do not record several steps in one command. Do not pass `--when`. The script stamps Done. `record` refuses more than one step.
 
-After a step, show the progress line and get a yes before `record --yes`. The answers inside the step do not cover that line. Skip this confirm only when the step's own confirm already included this record. An extra's yes is that case.
+After a step, show the progress line and get a yes before `record --yes`. The answers inside the step do not cover that line. Skip this confirm only when the step's own confirm already included this record. An extra's yes is that case. When that confirm shares one card with the step's batch, `yes (Recommended)` covers the recommendations and the progress line. Typed changes are that card's free-text answer. Do not add an `Edits` option. The rule is `crav1-docs/reference/question-cards.md`.
 
 The new-slice route in `docs/reference/workflow.yaml` marks `/crav1-review-architecture` optional, and it also has optional `/crav1-create-feature-branch` and `/crav1-ado-sync`. This walk does not change that route. Inside the walk, architecture review always runs. The walk does not run create-feature-branch or ado-sync. They are not locked steps.
 
@@ -24,7 +24,7 @@ Then the extras batch below, once. Do not go on to the plan first.
 
 ## After step 4, one batch of extras
 
-Once, after `/crav1-resolve-open-questions`, when the kept-open questions are known. Not at an earlier step, and not again later. Offer the ones that apply, in one batch, at most four options, a fifth under Other. List a recommended one first and end its label with ` (Recommended)`. When any extra applies, do not go on to the plan without that offer. When none apply, say so in one line and move on. Do not run any of them unless the user picks it.
+Once, after `/crav1-resolve-open-questions`, when the kept-open questions are known. Not at an earlier step, and not again later. One multi-select card, as `crav1-docs/reference/question-cards.md` says. Each extra that applies is an option. List a recommended one first and end its label with ` (Recommended)`. Always include **None, go to plan**. That option runs no extra and the walk goes on to `/crav1-plan-from-spec`. At most three extras on the card, plus that option. A further extra is named in the question. When any extra applies, do not go on to the plan without that offer. When none apply, say so in one line and move on. Do not run any of them unless the user picks it. Do not tell them to type none.
 
 Offer `/crav1-show-or-ask-open-questions` when any kept-open question is for someone else.
 

@@ -100,6 +100,7 @@ Install:
 - [Skills reference](reference/skills.md). Every command and subagent, by lane, with one page each. Generated from [`skills.yaml`](reference/skills.yaml).
 - [How a run ends](reference/run-ending.md). One `Next:` line, `Waiting:` only when a step is blocked, and `Uncommitted:` when files changed (1.122.0).
 - [Running a kit script](reference/running-scripts.md). Try `python3`, then `python`, then `py -3`, and treat the Store alias message as not found (1.127.0).
+- [Question cards](reference/question-cards.md). The recommended choice, plus the card's free-text answer for typed changes. No option whose only job is to send the user to type somewhere else (1.130.0).
 - [Guild routing](guild-routing.md). Which lane each command belongs to.
 - [Environment marks](environments-marks.md). The line format of `docs/environments/marks.md`.
 - [Promotion lines](environments-promotion.md). The line format of `docs/environments/promotion.md` and the `Promotion:` status line (1.69.0).

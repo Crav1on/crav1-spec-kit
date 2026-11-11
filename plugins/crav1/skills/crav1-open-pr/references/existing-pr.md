@@ -33,13 +33,14 @@ Show the pull request (`PR <n>`, title, author, URL) and what is new, then ask o
 
 ## Edit before posting
 
-Show the exact text in a fenced block, then end with:
+Show the exact text in a fenced block, then one question card, as `crav1-docs/reference/question-cards.md` says.
 
-> **Reply yes** (or "confirm") to post it as shown.
-> To change something first, reply with your edits, for example "drop the second bullet".
-> Nothing is posted until you say yes.
+- `yes (Recommended)`: post it as shown. Nothing is posted until that yes.
+- The card's free-text answer. Hint: `Type your changes, e.g. drop the second bullet`.
 
-On edits, apply only those, show the whole text again with the same three lines. Post only on a yes given after the latest text was shown. A yes from before a redraft does not count.
+Do not add an `Edits` option.
+
+On a typed answer, apply only those changes, show the whole text again, and offer the same card. Post only on a yes given after the latest text was shown. A yes from before a redraft does not count.
 
 ## Post
 

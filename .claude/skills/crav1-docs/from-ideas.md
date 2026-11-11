@@ -213,7 +213,7 @@ Do not change spec.md.
 
 To link commits and the pull request to an Azure Boards work item, `docs/specs/<slug>/work-item.md` holds one id per line. A line may name the milestone or slice: `Work item: 52` or `Work item: 81 — October billing`. A file with one unlabeled line is the old format and is still read. The commented starter is [docs/specs/_template/work-item.md](specs/_template/work-item.md). Leave the ids out of `tasks.md`.
 
-On an Azure Repos remote (`dev.azure.com` or `*.visualstudio.com`), `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, and `/crav1-bundle-to-specs` ask once after they create a new spec folder. The question is optional: reply with the id, or skip. Intake lists every new slug in that one question so the user can give an id per slug. A reply writes one line per id. Skip writes nothing and does not ask again in that run. GitHub and other hosts are not asked. Those skills do not create the Feature. Creating a Feature is [`/crav1-ado-sync`](from-ado-sync-push-features.md).
+On an Azure Repos remote (`dev.azure.com` or `*.visualstudio.com`), `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, and `/crav1-bundle-to-specs` ask once after they create a new spec folder. The question is optional. **Skip** is a real option. The id is typed on that card (1.130.0). Intake lists every new slug in that one question so the user can give an id per slug. A reply writes one line per id. Skip writes nothing and does not ask again in that run. GitHub and other hosts are not asked. Those skills do not create the Feature. Creating a Feature is [`/crav1-ado-sync`](from-ado-sync-push-features.md).
 
 The commit mention picks the line whose label matches the slice being worked. If that match is unclear, the commit skills ask. They do not guess.
 

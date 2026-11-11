@@ -20,8 +20,9 @@ class PlaybookWalk(unittest.TestCase):
         w = (SK / "references/walk.md").read_text()
         for n in ("first item whose `Answer:`", "Blocking answers first", "`skip`", "Steps order", "`go to N9`",
                   "**Why this matters**", "`more`", "`yes`", "Never edit a spec", "Free flow",
-                  "Compose, Merge order, Steps", "**Reply yes** (or \"confirm\")",
-                  "To change something first, reply with your edits", "Headless or bot run", "never walk",
+                  "Compose, Merge order, Steps", "`yes (Recommended)`",
+                  "Type your changes, e.g. keep the third question open",
+                  "Do not add an `Edits` option.", "Headless or bot run", "never walk",
                   "Out of scope"):
             self.assertIn(n, w, n)
         self.assertNotRegex(w, r"(?i)vault|thomas|nyx")

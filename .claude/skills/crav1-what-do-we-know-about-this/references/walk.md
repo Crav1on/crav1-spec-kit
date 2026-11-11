@@ -61,11 +61,12 @@ A merge trial is allowed only for an order this report already suggests, only ou
 
 ## End
 
-When the last item is walked (or the user says `done`), show a short summary: the answers given, the kept-decision changes, the direction changes, and the items still open. Then offer apply, word for word except the examples:
+When the last item is walked (or the user says `done`), show a short summary: the answers given, the kept-decision changes, the direction changes, and the items still open. Then one question card, as `crav1-docs/reference/question-cards.md` says.
 
-> **Reply yes** (or "confirm") to run `/crav1-resolve-open-questions apply <this file>` and write these answers into the specs; it shows each change before writing. On that yes a filled playbook is also written to `docs/playbooks/<topic>.md`.
-> To change something first, reply with your edits, for example "keep the third question open" or "drop the separate branch".
-> A git commit still waits for `/crav1-finalize-commit`.
+- `yes (Recommended)`: run `/crav1-resolve-open-questions apply <this file>` and write these answers into the specs; it shows each change before writing. On that yes a filled playbook is also written to `docs/playbooks/<topic>.md`. A git commit still waits for `/crav1-finalize-commit`.
+- The card's free-text answer. Hint: `Type your changes, e.g. keep the third question open` or `drop the separate branch`. An item that answer does not mention keeps what was shown.
+
+Do not add an `Edits` option.
 
 On yes, hand over to `/crav1-resolve-open-questions apply <this file>`: the one skill this command may start, and only on that yes. Apply writes filled, confirmed lines only (kept-decision changes, open-question answers, and conflict answers) and copies a filled playbook to `docs/playbooks/`. It does not run plan, build, or merge. It does not create a git commit. Empty lines stay open. A draft with no filled line is not copied. Stopping halfway is fine: the file keeps the answers, and `report-playbook-walk` picks up again, including from `docs/playbooks/`.
 

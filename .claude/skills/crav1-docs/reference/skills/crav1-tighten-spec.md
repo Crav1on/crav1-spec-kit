@@ -12,6 +12,8 @@ One issue at a time, with explained resolutions (plus get a suggestion) and impa
 
 1.123.0: more than 8 issues starts with one line of counts (issues to fix, open questions, small wording) and does not print the full list. Each time, one issue or a small group; one by one is always offered. An issue whose only work is an Answered line, or that repeats an open question, is one line passed to [`/crav1-resolve-open-questions`](crav1-resolve-open-questions.md), with no menu.
 
+1.130.0: eight or fewer issues are one card. `yes (Recommended)` applies every recommendation. Typed changes go on that card's free-text answer, for example `I1 B, I3 keep`. An item not mentioned keeps its recommendation. There is no Edits option.
+
 1.64.0: reads every listed work branch without checkout; a yes on writing the branch adds to the `Branch:` list; a listed branch that is gone and not merged is offered `(dropped)` (`mark-dropped`); a deleted branch whose work is in the base shows `merged, branch deleted`.
 
 1.68.0: reads and writes the `(spec branch)` and `(into …)` markers on the Match `Branch:` list after a yes.

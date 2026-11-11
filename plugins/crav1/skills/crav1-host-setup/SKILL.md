@@ -44,11 +44,11 @@ Show, in this order:
 2. The script.
 3. The manual steps.
 4. What changes for people once it is live, for example "pull requests into develop then need a green build of orders-api-ci before they can merge".
-5. The confirm block from the reference, word for word.
+5. The confirm card from the reference.
 
 ## Iterate
 
-A reply with edits redrafts the script, regenerates the manual steps and shows all of it again with the confirm block. Keep going until yes or stop. `stop` or `no` writes nothing and runs nothing.
+A typed answer redrafts the script, regenerates the manual steps and shows all of it again with the confirm card. Keep going until yes or stop. `stop` or `no` writes nothing and runs nothing.
 
 The user may choose `manual` instead of yes: then do not run the script. They do the steps; when they say done, run `check` only.
 

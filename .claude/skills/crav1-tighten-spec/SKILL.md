@@ -74,7 +74,7 @@ Every option: **letter**, **name**, **what changes**, **impact** (who/v0/tests, 
 
 Offer **2–4** mutually exclusive **patch** resolutions, then **`suggest`**. Add `ask` / `keep` only when they fit. `suggest` does not count toward the 2–4.
 
-4. How to answer: `A` / `B` / … for this issue, or a batch: `I1 A, I3 C, I4 D`. Unmentioned issues stay for later.
+4. How to answer: `A` / `B` / … for this issue, or a batch: `I1 A, I3 C, I4 D`. On the batch card that line is the free-text answer, not its own option. Unmentioned issues stay for later.
 
 Stop. Do not edit. Do not preview a full patched spec.
 
@@ -91,7 +91,7 @@ Read `references/catalog.md` ("When they pick `suggest`") only when the user pic
 3. If acceptance is still mushy on *this* issue and they did not choose `make-testable`, say so — do not silently rewrite.
 4. Advance to the next unanswered issue (same format). If none remain, run the tight-enough checklist.
 
-**Batch (1.70.0).** When there are 8 or fewer issues, show every issue at once, each with its options and the recommended one first, and ask once: a single `yes` applies every recommendation; a batch such as `I1 B, I3 keep` overrides those issues; answering one issue at a time still works. Then patch, and give one recap for the run.
+**Batch (1.130.0).** When there are 8 or fewer issues, one question card for the whole list, as `crav1-docs/reference/question-cards.md` says. `yes (Recommended)` applies every recommendation. The card's free-text answer carries the hint `Type your changes, e.g. I1 B, I3 keep`. An item that answer does not mention keeps its recommendation. One issue at a time still works. Then patch, and give one recap for the run.
 
 **Open questions (1.123.0).** An issue whose only work is an `Answered:` line, or that only repeats a question already under `## Open questions`, is not walked. One line, no menu: `Left for /crav1-resolve-open-questions: I3, I10.`
 

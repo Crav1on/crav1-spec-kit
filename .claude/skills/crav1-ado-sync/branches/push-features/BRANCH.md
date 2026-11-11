@@ -36,7 +36,7 @@ A **No spec yet** row has no repo. Ask its home with the same options, and sugge
 
 Run the suggest features branch of `/crav1-ado-sync` and show that list. The rules in that skill are the rules for the rows (this skill's `branches/suggest-features/BRANCH.md`).
 
-The user picks one or more by number, or all. Every row stays listed. Do not drop one to keep the list short. Use the questions tool when it is available and the list fits. Otherwise the numbered table is the choice, and the reply is the numbers or all.
+The user picks one or more. On the card, **All** and **None** are real options. None previews nothing. Do not tell them to type all or none. Every row stays listed. Do not drop one to keep the list short. Use the questions tool when it is available and the rows plus those two options fit in four. A further row is named in the question. Otherwise the numbered table is the choice, and **All** and **None** stay real choices beside the numbers.
 
 Stop until they pick. Do not preview a row they did not pick.
 

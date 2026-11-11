@@ -44,7 +44,7 @@ Not written: `spec.md`, other tasks. No push, no pull request.
 
 A task line can name its branch: `- [ ] T3: … (after: T1) (branch: feat/orders-retry)`.
 
-- `/crav1-build-tasks` on one task offers **feat/orders-retry (Recommended)** first in the `/crav1-create-feature-branch` Build prompt, then `feat/<slug>`, Other name and Stop (Stay only off a base branch). A task naming a base branch is blocked. A branch that exists nowhere is never created from default without asking.
+- `/crav1-build-tasks` on one task offers **feat/orders-retry (Recommended)** first in the `/crav1-create-feature-branch` Build prompt, then `feat/<slug>` and Stop (Stay only off a base branch). A typed branch name is that card's free-text answer, hint `Type a branch name` (1.130.0). A task naming a base branch is blocked. A branch that exists nowhere is never created from default without asking.
 - A range or all-tasks run switches to each task's branch on a clean tree; starting the run is the consent. A missing branch blocks that task.
 - `/crav1-build-features` does the same per slug. A slug whose tasks are done but whose branches aren't all merged shows `done (2 branches not merged)`.
 - The next-step line after a build names `/crav1-open-pr` to push and open the PR. When the branch already has one (its Match line ends in `(PR 77)`), it says `/crav1-open-pr` to push to PR 77 and update its description or comment instead (1.114.0).

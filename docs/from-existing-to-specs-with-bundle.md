@@ -40,7 +40,7 @@ That slash command *is* the prompt.
 | Stop | Glance, then `/crav1-finalize-commit` if this dump should be in git | Does not plan, implement, or commit |
 
 
-The map confirmation is the only product stop before writing. Confirming the map accepts the facts left on it. Facts that were not confirmed stay labeled inferred.
+The map confirmation is the only product stop before writing. The card is `yes (Recommended)` to write it as shown, or typed changes on that card's free-text answer (1.130.0). Confirming the map accepts the facts left on it. Facts that were not confirmed stay labeled inferred.
 
 A new clean repo is created only if that option was picked. Other repos are listed in `repos.md`. They do not get their own spec trees.
 

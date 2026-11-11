@@ -56,11 +56,12 @@ On the side, list code no slice covers: repo, path, one line about what it is. M
 
 Put every fact you will treat as accepted on the map. A fact you leave off stays inferred.
 
-End the map with this block, word for word except the examples, as the last thing in the message:
+End the map with one question card, as `crav1-docs/reference/question-cards.md` says, as the last thing in the message.
 
-> **Reply yes** (or "confirm") to write it as shown.
-> To change something first, reply with your edits, for example "drop slice 3" or "move 5 to the orders repo".
-> Nothing gets committed either way.
+- `yes (Recommended)`: write it as shown.
+- The card's free-text answer. Hint: `Type your changes, e.g. drop slice 3` or `move 5 to the orders repo`. An item that answer does not mention keeps what was shown.
+
+Nothing gets committed either way. Do not add an `Edits` option.
 
 Stop. They confirm or edit the map. Do not write files. That confirmation is the only product stop before writing. Do not open a mushy interview, an architecture interview, or an export-format question. If they edit the map, the edit is the confirmation. Do not ask again. Use their slugs, repos, and match statuses. A fact they struck, or that you never put on the map, stays labeled inferred if it appears later. Confirming the map confirms the facts they left on it.
 
@@ -70,7 +71,7 @@ If they picked a new clean repo, create it now, before the branch prompt. No com
 
 Follow `/crav1-create-feature-branch` (skill `crav1-create-feature-branch`, `SKILL.md`) in the **destination** repo. One branch for the whole dump. Not one branch per slice.
 
-Slug for that prompt: a short landscape kebab, or `system` if unnamed. Specify options: `feat/<that>` first, then `spec/<that>`, stay, or other. Do not write `docs/system/` or specs until that choice is done or skipped. A new clean repo with no commits skips the prompt (create-feature-branch skip). Do not push. Do not open a pull request.
+Slug for that prompt: a short landscape kebab, or `system` if unnamed. Specify options: `feat/<that>` first, then `spec/<that>`, stay. A typed branch name is that card's free-text answer, hint `Type a branch name`. Do not write `docs/system/` or specs until that choice is done or skipped. A new clean repo with no commits skips the prompt (create-feature-branch skip). Do not push. Do not open a pull request.
 
 ## Landscape
 

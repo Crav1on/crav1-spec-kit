@@ -30,13 +30,14 @@ One question per conflict, with the questions tool when available, at most 4 opt
 
 ## Write
 
-Nothing is written until the user confirms the whole list with one `yes` (or picks items). End the list with this block, word for word except the examples:
+Nothing is written until the user confirms the whole list. One question card, as `crav1-docs/reference/question-cards.md` says.
 
-> **Reply yes** (or "confirm") to write it as shown.
-> To change something first, reply with your edits, for example "only 1 and 3" or "skip K2".
-> A filled playbook is written to `docs/playbooks/<topic>.md` on that yes. A git commit still waits for `/crav1-finalize-commit`.
+- `yes (Recommended)`: write it as shown. A filled playbook is written to `docs/playbooks/<topic>.md` on that yes. A git commit still waits for `/crav1-finalize-commit`.
+- The card's free-text answer. Hint: `Type your changes, e.g. only 1 and 3` or `skip K2`. An item that answer does not mention keeps what was shown.
 
-After the yes or the edits, then:
+Do not add an `Edits` option.
+
+After the yes or the typed answer, then:
 - N answers: patch the open question as this skill's answer path does (one batch).
 - C answers: settle the `**Conflict:**` line as this skill's conflict path does.
 - K changes: write through `/crav1-add-to-spec`'s rules (show the change, then write).

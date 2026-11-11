@@ -55,7 +55,7 @@ Read this skill's `branches/repos-only/references/read.md` now, before you go on
 
 After every section has an answer, and after you create a new clean repo if they picked one. A repo with no commits skips the prompt. On a later re-read, when every confirmed fact and accepted guess is already a line in `docs/architecture/spec.md` and in the system notes this pass may edit, and `docs/architecture/left-out.md` would not gain, lose, or move a line, skip the branch. Write nothing. Say the files are current. A missing `docs/architecture/spec.md` is not current. Do not skip that write because the notes already state the facts.
 
-Follow `/crav1-create-feature-branch` (skill `crav1-create-feature-branch`, `SKILL.md`) in the **destination** repo. Slug: `architecture`. Specify options: `feat/architecture` first, then `spec/architecture`, stay, or other. Do not write files until that choice is done or skipped. Do not push. Do not open a pull request.
+Follow `/crav1-create-feature-branch` (skill `crav1-create-feature-branch`, `SKILL.md`) in the **destination** repo. Slug: `architecture`. Specify options: `feat/architecture` first, then `spec/architecture`, stay. A typed branch name is that card's free-text answer, hint `Type a branch name`. Do not write files until that choice is done or skipped. Do not push. Do not open a pull request.
 
 ## Write
 

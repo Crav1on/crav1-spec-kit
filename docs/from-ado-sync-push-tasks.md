@@ -34,7 +34,7 @@ Each task goes to the home of its repo, from the **Work items go to** column in 
 
 The user picks one spec. Only specs whose `work-item.md` already records a Feature id are offered. A spec without one points at `/crav1-ado-sync`.
 
-Every task in that spec's `tasks.md` is listed, numbered `T1`, `T2`, …, with `Update #<id>` next to a task that was sent before. The user picks by number, or all.
+Every task in that spec's `tasks.md` is listed, numbered `T1`, `T2`, …, with `Update #<id>` next to a task that was sent before. The user picks one or more. **All** and **None** are real options (1.130.0). None previews nothing.
 
 ### Child type, once
 

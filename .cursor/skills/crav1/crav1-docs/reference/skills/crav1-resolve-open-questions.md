@@ -18,6 +18,8 @@ Conflict lines (1.111.0) are listed after the questions; settling one replaces o
 
 1.125.0: when `tasks.md` exists, None writes `Blocks: none`. The whole slice still writes no line. No line still blocks the whole slice.
 
+1.130.0: the batch is one card. `yes (Recommended)` applies every recommendation. Typed changes go on that card's free-text answer, for example `Q1 A, Q3 keep` or `C1: keep it open`. An item not mentioned keeps its recommendation. There is no Edits option.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.

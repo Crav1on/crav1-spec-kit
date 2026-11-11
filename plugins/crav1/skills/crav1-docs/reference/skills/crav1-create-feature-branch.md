@@ -18,6 +18,8 @@ Prompt for `feat/<slug>` or specify-only `spec/<slug>`; no silent checkout, no p
 
 1.129.0: a task's Build prompt offers the branch `scripts/build_map.py --recommend T#` prints, the same name as the build map row: `(map:)`, else `(branch:)`, else the plan step, else `committed later on`. The branch question is its own card, and a typed name on that card is the answer. A different pick writes `(map: <picked>)` on the task in the specs repo and does not commit it.
 
+1.130.0: a typed branch name is that card's free-text answer, hint `Type a branch name`. There is no option labelled Other name.
+
 ## Runs when
 
 Brownfield: leave the default branch. Called by the user, [`/crav1-spark-to-spec`](crav1-spark-to-spec.md), [`/crav1-ideas-to-spec`](crav1-ideas-to-spec.md), [`/crav1-bundle-to-specs`](crav1-bundle-to-specs.md), [`/crav1-existing-to-specs`](crav1-existing-to-specs.md), [`/crav1-build-tasks`](crav1-build-tasks.md), and [`/crav1-build-features`](crav1-build-features.md).

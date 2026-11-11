@@ -36,7 +36,7 @@ A spec whose repos are in several homes gets one Feature in each home, each hold
 
 ### Pick, preview, then send
 
-The user sees the candidate list and picks one or more by number, or all. Before the form, the command reads the project's Feature fields. When that type has Acceptance Criteria, the spec's checks go there. When it does not, the checks go in the Description as an Acceptance checks numbered list, and the preview says so in one line. A failed field read states the issue, suggests a fix, and offers a skip. It does not guess.
+The user sees the candidate list and picks one or more. **All** and **None** are real options (1.130.0). None previews nothing. Before the form, the command reads the project's Feature fields. When that type has Acceptance Criteria, the spec's checks go there. When it does not, the checks go in the Description as an Acceptance checks numbered list, and the preview says so in one line. A failed field read states the issue, suggests a fix, and offers a skip. It does not guess.
 
 Each pick is shown as the Feature form: title, State New, Area default, Value area Business, Iteration and Priority blank, Target Date only when the spec states it, tags for the slice name and the code repos it touches, and a description that stands alone. The checks are the spec's checks and nothing else. Acceptance stays blank when the spec has none. The same field rule applies on an update, so a re-run moves checks that were stored off the form into the Description.
 

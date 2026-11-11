@@ -24,19 +24,11 @@ On GitHub or any other host that is not Azure Repos, never ask.
 
 One question. Optional. Non-blocking. The spec files are already written. In the same turn, state that creating a Feature is the push features branch of `/crav1-ado-sync` and that this only records an id the user already has. Do not run the push features branch of `/crav1-ado-sync`.
 
-The question must accept a free-text id. If a questions tool cannot take that id, ask in the reply. Skip is a valid answer.
+One question card, as `crav1-docs/reference/question-cards.md` says. **Skip** is a real option and writes nothing. The id is the card's free-text answer. Hint: `Type the id, e.g. 52`. For several slugs, `billing: 52`. Do not tell them to type skip. If a questions tool cannot take that id, ask in the reply, and **Skip** stays a real option.
 
-One new slug:
+One new slug: link an Azure Boards work item to `<slug>`?
 
-```text
-Optional: link an Azure Boards work item to <slug>? Reply with the id, or skip.
-```
-
-Several new slugs (intake, or any run that created more than one folder that still lacks the file). One question lists every such slug. Do not ask once per slug.
-
-```text
-Optional: link an Azure Boards work item to these new specs (<slug-a>, <slug-b>)? Reply with an id per slug, or skip.
-```
+Several new slugs (intake, or any run that created more than one folder that still lacks the file). One question lists every such slug. Do not ask once per slug. Link an Azure Boards work item to these new specs (`<slug-a>`, `<slug-b>`)?
 
 If the user skips or does not answer, write nothing and do not ask again in this run.
 
