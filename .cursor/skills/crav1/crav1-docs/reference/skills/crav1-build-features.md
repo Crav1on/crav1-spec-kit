@@ -18,6 +18,8 @@ Serial board of ready slugs: `feat/<slug>` from default, then that spec’s buil
 
 1.132.0: the same ready-check gate as [`/crav1-build-tasks`](crav1-build-tasks.md). `ready` and `ready-partial` start `can_start`. A held task is refused with its reason. `not-ready` starts no worker on that slug.
 
+1.134.0: the T# loop opens `..[`/crav1-build-tasks`](crav1-build-tasks.md)/branches/several-tasks/BRANCH.md`. Branch rules open `..[`/crav1-create-feature-branch`](crav1-create-feature-branch.md)/SKILL.md` and its `references/code-branch.md` and `references/task-branch.md`. It does not start those commands. The rule is `docs/reference/open-skill-file.md`.
+
 ## Runs when
 
 Several specs, one after another. Called by the user.
@@ -47,7 +49,7 @@ Limits and exceptions: one ready slug stops and points at [`/crav1-build-tasks`]
 ## You run next / Runs by itself
 
 - You run next: [`/crav1-open-pr`](crav1-open-pr.md)
-- Runs by itself: Calls [`/crav1-create-feature-branch`](crav1-create-feature-branch.md) for that checkout, without re-prompting, and `crav1-build-task-agent` one `T#` at a time.
+- Runs by itself: Opens [`/crav1-create-feature-branch`](crav1-create-feature-branch.md) and the several-tasks branch of [`/crav1-build-tasks`](crav1-build-tasks.md) and follows those files, without re-prompting, and calls `crav1-build-task-agent` one `T#` at a time. It does not start those skills as slash commands.
 
 ## Lane and group
 

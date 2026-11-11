@@ -34,13 +34,15 @@ A headless or bot run stops before any step. This walk is guided only. It does n
 
 The order matches the new-slice route from architecture review through the ready check. One difference is called out in [references/steps.md](references/steps.md): on that route the architecture review is optional, and inside this walk it always runs.
 
-1. Playbook, only when a playbook was given. `skip` leaves it, `reapply` runs it again when this walk already applied that same file.
-2. `/crav1-review-architecture`
-3. `/crav1-tighten-spec`, one issue at a time, as that skill already walks.
-4. `/crav1-resolve-open-questions`
-5. `/crav1-plan-from-spec`, which writes `plan.md` and `tasks.md`.
-6. `/crav1-review-plan`, then `/crav1-tighten-plan`.
-7. `/crav1-tasks-ready-to-build`
+Open each file below from this skill's folder and follow it. Read [open-skill-file.md](../crav1-docs/reference/open-skill-file.md) once before the first one (1.134.0).
+
+1. Playbook, only when a playbook was given. `skip` leaves it, `reapply` runs it again when this walk already applied that same file. Apply is in [references/playbook.md](references/playbook.md).
+2. Open `../crav1-review-architecture/SKILL.md` (`/crav1-review-architecture`).
+3. Open `../crav1-tighten-spec/SKILL.md` (`/crav1-tighten-spec`), one issue at a time, as that skill already walks.
+4. Open `../crav1-resolve-open-questions/SKILL.md` (`/crav1-resolve-open-questions`).
+5. Open `../crav1-plan-from-spec/SKILL.md` (`/crav1-plan-from-spec`), which writes `plan.md` and `tasks.md`.
+6. Open `../crav1-review-plan/SKILL.md` (`/crav1-review-plan`), then Open `../crav1-tighten-plan/SKILL.md` (`/crav1-tighten-plan`).
+7. Open `../crav1-tasks-ready-to-build/SKILL.md` (`/crav1-tasks-ready-to-build`).
 
 A step with nothing to do says so, records that, and moves on. Optional offers are not steps. They are offered once, after open questions, when any apply. They are named in [references/steps.md](references/steps.md). After the plan, questions that still have no `Blocks:` line are offered there too, before that step is recorded.
 

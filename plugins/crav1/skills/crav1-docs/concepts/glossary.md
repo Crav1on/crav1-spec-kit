@@ -76,6 +76,8 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 
 **Kit script.** A `.py` file a skill names. Since 1.127.0 the interpreter is `python3`, then `python`, then `py -3` on Windows. The Store alias message `Python was not found` means that command was not found. See [Running a kit script](../reference/running-scripts.md).
 
+**Command-only.** A kit skill whose frontmatter says `disable-model-invocation: true`. It runs when a person types the slash command. Since 1.134.0 another skill that runs it opens that skill's file with the file-read tool and follows it. The path is the sibling `../crav1-<name>/SKILL.md` from the running skill's folder. That sibling is `.claude/skills/crav1-<name>/SKILL.md` on Claude Code, `.cursor/skills/crav1/crav1-<name>/SKILL.md` in the Cursor drop-in, and `skills/crav1-<name>/SKILL.md` in the Cursor plugin. A refusal because the skill is command-only is not a reason to stop. See [Opening another kit skill](../reference/open-skill-file.md). `/crav1-help` and `/crav1-update-kit` are not command-only.
+
 **Kit update.** `/crav1-update-kit` (1.131.0). Replaces the installed kit on the current branch with a published release. The default target is the latest published release. It asks before it writes, commits, or pushes. The commit message is `Update CRAV1 kit vA to vB`. Other branches keep the previous kit until this branch is merged into them.
 
 **Published release.** A `vX.Y.Z` tag on the kit's GitHub releases. `/crav1-update-kit` accepts only that. `main`, a branch, a commit, and an open pull request are refused.

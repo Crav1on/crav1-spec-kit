@@ -1,5 +1,7 @@
 # The PR record (1.97.0)
 
+The skills named in this file are not started from here, and their files are not opened from here. A refused start is expected. The rule is [open-skill-file.md](../../crav1-docs/reference/open-skill-file.md) (1.134.0).
+
 One pull request, one PR note, one record. The PR note (`docs/notes/YYYY-MM/YYYY-MM-DD-pr-<repo>-<n>.md`, [notes.md](notes.md) **PR note**) holds a `## PR record` section: what is done, what is left and why, who owes the next step, the merge order and whether it can merge. `/crav1-pr-status`, `/crav1-review-pr`, `/crav1-add-to-spec` and `/crav1-merge-pr` all read and write this one section. There is no separate follow-ups note and no `State on <date>` line any more; a project made before 1.97.0 runs `/crav1-add-to-spec migrate formats` once ([merge-safe.md](merge-safe.md) **Migration**).
 
 ## Layout of the PR note

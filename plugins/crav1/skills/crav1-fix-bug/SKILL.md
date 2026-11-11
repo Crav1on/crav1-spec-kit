@@ -92,6 +92,8 @@ Do not edit code. Do not edit `spec.md`, `plan.md`, `tasks.md`, or `verify.md`. 
 
 Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, `/crav1-tighten-spec`, `/crav1-plan-from-spec`, `/crav1-build-tasks`, `/crav1-fix-build-gaps`, `/crav1-verify-build-against-spec`, `/crav1-open-pr`, `/crav1-refresh-system-notes`, or `/crav1-finalize-commit`.
 
+This skill does not run another kit skill. Do not open those skill files. A refused start because a skill is command-only is expected. Continue to the Next line. The rule is [open-skill-file.md](../crav1-docs/reference/open-skill-file.md) (1.134.0).
+
 ## Hard rules
 
 - No bug named in this turn: stop. Do not hunt.

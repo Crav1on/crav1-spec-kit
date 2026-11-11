@@ -13,13 +13,13 @@ color: green
 
 You **manage** a queue of **slugs**. You do **not** implement, verify, or `git commit` in this chat.
 
-Each slug is one feature: `docs/specs/<slug>/` + branch `feat/<slug>` created from the **into branch** (Merges into, else default; not from the previous feature). Inside a slug, reuse the `/crav1-build-tasks` loop: one **crav1-build-task-agent** worker per `T#`, one at a time.
+Each slug is one feature: `docs/specs/<slug>/` + branch `feat/<slug>` created from the **into branch** (Merges into, else default; not from the previous feature). Inside a slug, reuse the build-tasks T# loop: one **crav1-build-task-agent** worker per `T#`, one at a time. Open `../crav1-build-tasks/branches/several-tasks/BRANCH.md` for that loop. Do not start `/crav1-build-tasks`.
 
 This is **not** parallel. Two `feat/` branches cannot share this working tree. True parallel (handoff / worktrees / Cloud Agents) is **out of scope** for this skill.
 
 Command: `/crav1-build-features`. One spec: `/crav1-build-tasks`. One task: `/crav1-build-tasks`.
 
-Worker: `.cursor/agents/crav1-build-task-agent.md` (plugin: `agents/crav1-build-task-agent.md`). Protocol: `crav1-build-tasks` [references/run.md](../crav1-build-tasks/branches/one-task/references/run.md). Style: [style-persist.md](../crav1-build-tasks/branches/one-task/references/style-persist.md). Approvals: [tool-approvals.md](../crav1-build-tasks/branches/one-task/references/tool-approvals.md). Branch rules: `/crav1-create-feature-branch` (skill `crav1-create-feature-branch`, `SKILL.md`).
+Worker: `.cursor/agents/crav1-build-task-agent.md` (plugin: `agents/crav1-build-task-agent.md`). Protocol: `crav1-build-tasks` [references/run.md](../crav1-build-tasks/branches/one-task/references/run.md). Style: [style-persist.md](../crav1-build-tasks/branches/one-task/references/style-persist.md). Approvals: [tool-approvals.md](../crav1-build-tasks/branches/one-task/references/tool-approvals.md). Branch rules, from this skill's folder: Open `../crav1-create-feature-branch/SKILL.md` for **Build on a spec-only branch**, Open `../crav1-create-feature-branch/references/code-branch.md`, and Open `../crav1-create-feature-branch/references/task-branch.md`. The rule is [open-skill-file.md](../crav1-docs/reference/open-skill-file.md) (1.134.0). Do not start `/crav1-create-feature-branch`. The consent section below still covers the checkout.
 
 ## Which slugs
 
@@ -55,19 +55,19 @@ Starting this command **is** consent to use `feat/<slug>` from the **into branch
 
 One confirm if they are still on the default branch or on an unrelated branch: **continue** (first/top) = proceed with that checkout plan; **stop** = abort. If already on `feat/<first-slug>`, start there.
 
-If currently on `spec/<anything>`: stop. No workers. Follow create-feature-branch **Build on a spec-only branch**.
+If currently on `spec/<anything>`: stop. No workers. Open `../crav1-create-feature-branch/SKILL.md` at **Build on a spec-only branch**.
 
 ## Tool approvals (once for the whole board)
 
 Follow [tool-approvals.md](../crav1-build-tasks/branches/one-task/references/tool-approvals.md) **once before the first worker** (you are an orchestrator, same as build-tasks).
 
-Pass **`approvals: already-done`** and **`branch: already-done`** to every worker. Workers and nested `/crav1-build-tasks` must **not** pause. Do not start a nested `/crav1-build-tasks` skill (it would pause again); run its **T# loop yourself**.
+Pass **`approvals: already-done`** and **`branch: already-done`** to every worker. Workers and nested `/crav1-build-tasks` must **not** pause. Do not start a nested `/crav1-build-tasks` skill (it would pause again). Open `../crav1-build-tasks/branches/several-tasks/BRANCH.md` from this skill's folder and run that **T# loop** yourself, as [open-skill-file.md](../crav1-docs/reference/open-skill-file.md) says.
 
 Cloud Agents: skip the pause.
 
 ## Switch to a slug (before that slug’s first T#)
 
-Into branch and base branches (1.99.0): as skill `crav1-create-feature-branch`, `references/code-branch.md` says. The into branch is the repo's `Merges into` branch (also read from a sibling specs repo), else the default branch.
+Into branch and base branches (1.99.0): Open `../crav1-create-feature-branch/references/code-branch.md` from this skill's folder. The into branch is the repo's `Merges into` branch (also read from a sibling specs repo), else the default branch.
 
 1. Working tree dirty except `agent-tools/` → **do not checkout**. On a base branch, offer to carry the changes onto `feat/<slug>` with `git switch -c` when HEAD is the into branch; never send them to `/crav1-finalize-commit` on a base. Otherwise they commit on their work branch or clean it. Wait. Never stash unless they ask.
 2. `git checkout feat/<slug>` if it exists, else `git switch -c feat/<slug> <into>` **from the into branch** (local, else `origin/<into>`), so a repo that merges into `develop` forks from `develop`, not `main`. Never create `feat/<slug>` from the previous feature branch.
@@ -76,7 +76,7 @@ Into branch and base branches (1.99.0): as skill `crav1-create-feature-branch`, 
 
 After a slug’s last worker, the tree should be clean (workers commit). Then switch to the next slug with this same procedure.
 
-**Task branches (1.129.0).** Inside a slug, a task is built on the branch `scripts/build_map.py --recommend T#` prints (skill `crav1-tasks-ready-to-build`), the same name as its build map row. That name comes from `(map:)` when the task has one, else `(branch:)`. Switch to it before its worker, only on a clean tree (`git checkout X`, which also makes the local branch from `origin/X`). A name that is a base branch is `blocked` with `branch X is a base branch`; never switch to it. Starting the board is consent to these switches when the branch exists. When the name exists nowhere, use the task-branch card once (skill `crav1-create-feature-branch`, `references/task-branch.md`). Do not invent a different recommended name, and do not create it without a yes. A name for another repo is `blocked` with `belongs to <repo>`. A worker `needs_yes` is waiting, not blocked. The task stays unticked.
+**Task branches (1.129.0).** Inside a slug, a task is built on the branch `scripts/build_map.py --recommend T#` prints (skill `crav1-tasks-ready-to-build`), the same name as its build map row. That name comes from `(map:)` when the task has one, else `(branch:)`. Switch to it before its worker, only on a clean tree (`git checkout X`, which also makes the local branch from `origin/X`). A name that is a base branch is `blocked` with `branch X is a base branch`; never switch to it. Starting the board is consent to these switches when the branch exists. When the name exists nowhere, use the task-branch card once. Open `../crav1-create-feature-branch/references/task-branch.md` from this skill's folder. Do not invent a different recommended name, and do not create it without a yes. A name for another repo is `blocked` with `belongs to <repo>`. A worker `needs_yes` is waiting, not blocked. The task stays unticked.
 
 ## Board (keep this updated)
 
@@ -94,7 +94,7 @@ The branch column shows each task's branch when tasks name one. A slug whose tas
 
 For each queued slug, after switch:
 
-Run the build-tasks **T# loop** on **this** slug’s `tasks.md` (all remaining `- [ ]` unless they named a range **for that slug** — v1: all unchecked on that slug), in dependency order with its ready check before each `T#` (1.103.0, `/crav1-build-tasks` several-tasks branch).
+Open `../crav1-build-tasks/branches/several-tasks/BRANCH.md` and run that **T# loop** on **this** slug’s `tasks.md` (all remaining `- [ ]` unless they named a range **for that slug** — v1: all unchecked on that slug), in dependency order with its ready check before each `T#` (1.103.0). Do not start `/crav1-build-tasks`.
 
 **Held (1.132.0).** The same gate as `/crav1-build-tasks`. `readiness` `result` `ready` or `ready-partial` starts tasks in `can_start`. A gate with `refused` true is refused with its reason. Do not ask to build it anyway. Skip it and continue with the next task that can start. When `result` is `not-ready`, do not start a worker on this slug.
 

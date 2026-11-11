@@ -11,7 +11,7 @@ disable-model-invocation: true
 
 # Update specs from changes and pull requests
 
-One command sweeps the linked repos, finds changed branches and open or recently closed pull requests, and feeds each one through `/crav1-add-to-spec`. It is its own skill. It is not a choice on `/crav1-add-to-spec`.
+One command sweeps the linked repos, finds changed branches and open or recently closed pull requests, and feeds each one through add-to-spec by opening that skill's file. It is its own skill. It is not a choice on `/crav1-add-to-spec`.
 
 Command: `/crav1-update-specs-from-changes-and-prs`.
 
@@ -33,7 +33,7 @@ The inventory is the same. Manual flow asks once before fetching, then confirms 
 
 ## Runs these
 
-This skill runs `/crav1-add-to-spec` for each item, with the choice words in [references/common.md](references/common.md). An inner ending is not this run's ending. Do not print it.
+For each item, Open `../crav1-add-to-spec/SKILL.md` from this skill's folder and follow the choice words in [references/common.md](references/common.md). The rule is [open-skill-file.md](../crav1-docs/reference/open-skill-file.md) (1.134.0). Do not start `/crav1-add-to-spec`. An inner ending is not this run's ending. Do not print it.
 
 It does not run `/crav1-review-pr`, `/crav1-pr-status`, `/crav1-resolve-open-questions`, `/crav1-finalize-commit`, or `/crav1-tighten-spec`. It does not commit, push, delete, post, vote, or resolve a thread.
 

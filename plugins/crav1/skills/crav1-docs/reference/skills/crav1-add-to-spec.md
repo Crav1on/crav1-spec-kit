@@ -10,6 +10,8 @@ Bring new information into existing specs; asks what you have: a fact, a dump, a
 
 **[`/crav1-add-to-spec`](crav1-add-to-spec.md)** opens with one question: what you have, a fact, a dump (a mail or a chat goes here), a code change, or a meeting (minutes or a transcript). It skips the question when the message shows which. It replaces match-dump-to-specs, code-into-specs, and meeting-to-specs; their rules are kept as branches, and a kept quote from any of them goes through the fact rules.
 
+1.134.0: `references/pr-record.md`, `references/merge-safe.md`, and `references/handoffs-picture.md` name other skills and do not run them. They do not open those files. A command-only refusal is not a reason to stop. The rule is `docs/reference/open-skill-file.md`.
+
 1.130.0: a dump sort, a code-change sort, and the same kind of confirm are one card. `yes (Recommended)` writes what was shown. Typed changes go on that card's free-text answer. An item not mentioned keeps what was shown. There is no Edits option. Keep, leave, and dismiss stay real options on a meeting item.
 
 A fact (was [`/crav1-add-to-spec`](crav1-add-to-spec.md)): New information aimed at one spec that already exists is **[`/crav1-add-to-spec`](crav1-add-to-spec.md)**. [`/crav1-tighten-spec`](crav1-tighten-spec.md) stays for mushy wording. Match, intake, spark, and ideas create the folders. This command does not plan.

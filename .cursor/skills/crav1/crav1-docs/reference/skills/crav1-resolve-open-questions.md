@@ -20,6 +20,8 @@ Conflict lines (1.111.0) are listed after the questions; settling one replaces o
 
 1.130.0: the batch is one card. `yes (Recommended)` applies every recommendation. Typed changes go on that card's free-text answer, for example `Q1 A, Q3 keep` or `C1: keep it open`. An item not mentioned keeps its recommendation. There is no Edits option.
 
+1.134.0: on apply, a kept item opens `..[`/crav1-add-to-spec`](crav1-add-to-spec.md)/references/fact.md` and does not start [`/crav1-add-to-spec`](crav1-add-to-spec.md). The rule is `docs/reference/open-skill-file.md`.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
@@ -58,7 +60,7 @@ Leaves application code and kept-open questions alone. Does not change `Answer:`
 ## You run next / Runs by itself
 
 - You run next: [`/crav1-ado-sync`](crav1-ado-sync.md); [`/crav1-plan-from-spec`](crav1-plan-from-spec.md)
-- Runs by itself: Calls no skill.
+- Runs by itself: On apply, a kept item opens [`/crav1-add-to-spec`](crav1-add-to-spec.md) `references/fact.md` and does not start that command. The question walk calls no skill.
 
 ## Lane and group
 

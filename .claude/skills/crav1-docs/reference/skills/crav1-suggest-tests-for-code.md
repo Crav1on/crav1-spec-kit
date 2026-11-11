@@ -12,6 +12,8 @@ When the user points at code that already exists, one repo or one area, **[`/cra
 
 The user points at code that already exists, one repo or one area, not the whole system. Suggests tests for what that code can break. A function gets a few checks. A page gets a browser check. A boundary gets an integration check. Does not dump every test type. Every suggestion stays listed. Keep, leave, or dismiss, in one batch. Dismiss means it is not offered again. A kept suggestion goes onto the existing spec through [`/crav1-add-to-spec`](crav1-add-to-spec.md). Plan turns it into a task. Does not write the tests, change the code, or start Specify, Plan, or Build. Not a starter option. Asking for startup options names only the six and does not run this command. The six starter options stay unchanged.
 
+1.134.0: a kept suggestion opens `..[`/crav1-add-to-spec`](crav1-add-to-spec.md)/references/handoffs-suggest-tests.md` and does not start [`/crav1-add-to-spec`](crav1-add-to-spec.md). The rule is `docs/reference/open-skill-file.md`.
+
 ## Runs when
 
 The user points at existing code. Called by the user.
@@ -41,7 +43,7 @@ Limits and exceptions: the whole system, no code pointed at, or no existing spec
 ## You run next / Runs by itself
 
 - You run next: [`/crav1-plan-from-spec`](crav1-plan-from-spec.md)
-- Runs by itself: Calls [`/crav1-add-to-spec`](crav1-add-to-spec.md) for one kept suggestion and for one dismissed suggestion.
+- Runs by itself: Opens [`/crav1-add-to-spec`](crav1-add-to-spec.md) for one kept suggestion and for one dismissed suggestion, and does not start that command.
 
 ## Lane and group
 

@@ -18,6 +18,8 @@ State is `docs/system/sweep-progress.md`, written only by `scripts/sweep_progres
 
 The run does not commit, push, post, vote, resolve a thread, or run [`/crav1-review-pr`](crav1-review-pr.md), [`/crav1-pr-status`](crav1-pr-status.md), [`/crav1-resolve-open-questions`](crav1-resolve-open-questions.md), or [`/crav1-finalize-commit`](crav1-finalize-commit.md). Proposals print first in auto flow. Next is this command when items or proposals remain, or [`/crav1-resolve-open-questions`](crav1-resolve-open-questions.md) when a conflict or open question was written onto a spec. The commit stays on Uncommitted.
 
+1.134.0: each item opens `..[`/crav1-add-to-spec`](crav1-add-to-spec.md)/SKILL.md` and follows that item's choice words. It does not start [`/crav1-add-to-spec`](crav1-add-to-spec.md) as a command. The rule is `docs/reference/open-skill-file.md`.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
@@ -58,7 +60,7 @@ Limits and exceptions: No flow word asks, and a headless run with no word stops.
 ## You run next / Runs by itself
 
 - You run next: [`/crav1-resolve-open-questions`](crav1-resolve-open-questions.md); [`/crav1-update-specs-from-changes-and-prs`](crav1-update-specs-from-changes-and-prs.md); [`/crav1-finalize-commit`](crav1-finalize-commit.md)
-- Runs by itself: Runs [`/crav1-add-to-spec`](crav1-add-to-spec.md) for each inventory item, under that skill's note and `Synced at` rules. It does not run [`/crav1-review-pr`](crav1-review-pr.md), [`/crav1-pr-status`](crav1-pr-status.md), [`/crav1-resolve-open-questions`](crav1-resolve-open-questions.md), or [`/crav1-finalize-commit`](crav1-finalize-commit.md).
+- Runs by itself: Opens [`/crav1-add-to-spec`](crav1-add-to-spec.md) for each inventory item and follows that skill's note and `Synced at` rules. It does not start that command. It does not run [`/crav1-review-pr`](crav1-review-pr.md), [`/crav1-pr-status`](crav1-pr-status.md), [`/crav1-resolve-open-questions`](crav1-resolve-open-questions.md), or [`/crav1-finalize-commit`](crav1-finalize-commit.md).
 
 ## Lane and group
 

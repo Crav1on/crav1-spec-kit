@@ -6,6 +6,8 @@ Use this when a draft spec should be tightened and planned until the tasks are h
 
 You can start with a playbook report, or without one. Both go through the same steps and the same ready check. The walk runs the existing skills. It does not replace them. It is guided only. You confirm each write before it happens.
 
+Since 1.134.0 the walk opens each step skill's file and follows it. It does not start that skill as a slash command. Those skills stay command-only. The rule is [Opening another kit skill](reference/open-skill-file.md). A refusal because a skill is command-only is not a reason to stop the walk.
+
 This is cross-cutting. It may run from any lane. It is a later skill, not a starter option. It does not start Build.
 
 The new-slice route is unchanged. You can still run each skill on its own. On that route the architecture review is optional. Inside this walk it always runs.

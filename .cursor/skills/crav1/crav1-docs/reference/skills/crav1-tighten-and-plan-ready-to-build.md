@@ -26,6 +26,8 @@ The progress file is `docs/specs/<slug>/walk-progress.md`. It records the step, 
 
 1.133.0: the ready-check ending groups ready tasks and held tasks by the build-map row, the same branch as `scripts/build_map.py --recommend`. Order is wave, then map order. A task is `T#` plus its short name. One Next line per ready branch. The walk record stays Result ready-partial.
 
+1.134.0: each locked step, extra, jump back, and the playbook apply path opens that skill's file from this skill's folder (`../crav1-<name>/SKILL.md`, or the reference that step names, including `references/apply.md` and add-to-spec's fact rules). The rule is `docs/reference/open-skill-file.md`. The walk does not start those skills as slash commands or with a skill tool. A command-only refusal is not a reason to stop the walk. `disable-model-invocation: true` stays.
+
 ## Runs when
 
 A spec should be tightened and planned until it is ready to build. Called by the user.
@@ -55,7 +57,7 @@ Limits and exceptions: A headless run stops. No playbook skips step 1. Architect
 ## You run next / Runs by itself
 
 - You run next: [`/crav1-build-tasks`](crav1-build-tasks.md)
-- Runs by itself: Runs the locked skills inside the walk, each under its own rules, and [`/crav1-resolve-open-questions`](crav1-resolve-open-questions.md) with `apply <file>` on yes when a playbook is applied. It does not run Build.
+- Runs by itself: Opens each locked skill's file from this skill's folder and follows it, including [`/crav1-resolve-open-questions`](crav1-resolve-open-questions.md) `references/apply.md` on yes when a playbook is applied. It does not start those skills as slash commands. It does not run Build.
 
 ## Lane and group
 

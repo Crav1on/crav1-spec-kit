@@ -20,6 +20,8 @@ The word picks the flow. A repo name from `docs/system/repos.md` may follow. A w
 
 Both flows follow the same inventory and the same state machine, `scripts/sweep_progress.py` in the skill. Pick the interpreter as [Running a kit script](reference/running-scripts.md) says. Do not edit `docs/system/sweep-progress.md` by hand.
 
+Since 1.134.0 each item opens the add-to-spec skill file and follows that item's choice words. It does not start `/crav1-add-to-spec` as a command. The rule is [Opening another kit skill](reference/open-skill-file.md).
+
 ## What it looks at
 
 Every `docs/system/repos.md` row with a URL that is not `proposed`, except the specs repo. Manual flow asks, in that same start prompt, whether to read the specs repo's pull request comments this time. Auto flow leaves the specs repo out unless you named it. Neither flow reads the specs repo's branches.

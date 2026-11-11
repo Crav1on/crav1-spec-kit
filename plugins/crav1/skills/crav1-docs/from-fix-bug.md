@@ -12,6 +12,8 @@ When you ask for startup options, this command is one of the six starter options
 
 A missing or wrong host setting (a branch policy, required build, reviewers, an approval) is not a bug for this command. It points at [`/crav1-host-setup`](from-host-setup.md) (1.115.0).
 
+Since 1.134.0 this command still does not open the next skill's file. It names the lane and stops. A command-only refusal is expected. The rule is [Opening another kit skill](reference/open-skill-file.md).
+
 ## First prompt
 
 New chat. Name the bug in this message. Say where you saw it.
