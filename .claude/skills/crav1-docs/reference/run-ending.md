@@ -33,7 +33,10 @@ A yes that is not on record is not a blocker. The task stays unticked. `Next` is
 ```text
 Waiting: /crav1-resolve-open-questions orders-retry, after a reviewer answers the open question.
 Waiting: the partner's yes to turn off pipelines 7 and 24.
+Waiting: /crav1-verify-build-against-spec orders-api - verify.md is behind tasks.md (T2, T45)
 ```
+
+When the ready check says `verify.md` is behind `tasks.md` (1.135.0), that last line is the Waiting line. Do not print the `Next:` line from `verify.md`. `Next` stays the ready check's own line for tasks that can still start.
 
 ## Uncommitted
 

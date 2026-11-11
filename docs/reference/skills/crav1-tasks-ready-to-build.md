@@ -34,6 +34,8 @@ Shows summary counts per slice, then Ready and Held grouped by build-map branch,
 
 1.133.0: ready tasks and held tasks are grouped by the build-map row. The branch is `scripts/build_map.py --recommend T#`, so it matches the map. Order is wave, then map order. One `Next:` line per ready branch, for example `Next: [`/crav1-build-tasks`](crav1-build-tasks.md) T2 T5 T6` (on `feat/orders-api-record`). A held line names the open question and who has it, or `held, waits on T3`. The Tasks field is `T#` plus the short name, and a done task is `~~T# short name~~ ✓ done` with its pull request. The ready-check report uses that same form. The map is rewritten every ready check, so the ids do not go stale. Prose outside the Tasks field still drops a task id, and the dangling-text cleanup stays. The walk record stays `Result: ready-partial`.
 
+1.135.0: the ready check compares `tasks.md` with `verify.md`. A ticked task, or a task whose pull request is recorded merged (`(PR n)` and the word merged on the task line or its Match `Branch:` line), that `verify.md` still lists as not implemented, is behind. So is a `Next:` line in `verify.md` that names such a task. The check prints `Waiting: [`/crav1-verify-build-against-spec`](crav1-verify-build-against-spec.md) <slug> - verify.md is behind tasks.md (T2, T45)` and does not print that Next line. It does not write `verify.md`. `build-map.md` stays the one file this command writes.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
@@ -65,7 +67,7 @@ Writes a list in the chat with summary counts, Ready and Held grouped by build-m
 
 ## Does not
 
-Leaves every file other than `build-map.md` alone, and never reads Azure Boards. It does not commit the map.
+Leaves every file other than `build-map.md` alone, including `verify.md`, and never reads Azure Boards. It does not commit the map.
 
 Limits and exceptions: does not guess a dependency or a blocking link from task text. Where nothing is recorded it uses a fallback and marks the reason inferred. It writes no readiness marks; review-plan, tighten-plan, plan-from-spec, and resolve-open-questions write them. The map is written only by `scripts/build_map.py`.
 

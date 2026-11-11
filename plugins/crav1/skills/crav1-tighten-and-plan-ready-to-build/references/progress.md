@@ -44,6 +44,25 @@ A playbook step records `Playbook:` only. It does not record spec, plan, or task
   Tasks version: c3d4e5f6a1b2
 ```
 
+A spec finding during plan review is not a locked step. `spec-finding --choice tighten-spec --yes` records one jump back. The same finding coming back is an open point. `Continue:` is the walk after that record. `Result: jumped` and `Result: open-point` are only on those records, not on a locked step.
+
+```text
+- Jump-back: P2
+  Done: 2026-11-11T20:30:00+00:00
+  Finding: the plan requires a named person's yes to stop a prod function app
+  Result: jumped
+  Open: ../crav1-tighten-spec/SKILL.md
+  Continue: plan-from-spec, review-and-tighten-plan, tasks-ready-to-build
+  Key: 6a034c36ad9e
+
+- Open point: P2
+  Done: 2026-11-11T20:30:00+00:00
+  Finding: the plan requires a named person's yes to stop a prod function app
+  Result: open-point
+  Continue: review-and-tighten-plan, tasks-ready-to-build
+  Key: 6a034c36ad9e
+```
+
 The script stamps `Done` itself, as `YYYY-MM-DDTHH:MM:SS+HH:MM`. Do not pass `--when`. A date alone is rejected. Record one step per call, right when that step finishes. Do not record several steps in one command. `resume` and `readiness` return `done_stamp_warning` when two or more steps share a Done stamp that has not been acknowledged. Say that warning. Those steps were recorded together. The times are not evidence each one finished then.
 
 A shared stamp from before the one-step rule can be acknowledged once. Show the line, get a yes, then run `walk_progress.py ack-stamps --root <spec-folder> --yes`. It writes one line, before the steps:

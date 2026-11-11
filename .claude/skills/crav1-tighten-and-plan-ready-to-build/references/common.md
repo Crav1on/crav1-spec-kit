@@ -8,7 +8,7 @@ Two routes, one walk. With a playbook, step 1 is that file. Without a playbook, 
 
 Run each locked skill by opening the file that step names, from this skill's folder, and following it. Read [open-skill-file.md](../crav1-docs/reference/open-skill-file.md) once before the first locked skill (1.134.0). Do not copy that skill's rules into this walk. Do not replace it.
 
-This walk's own prompts are the playbook choice, asked even when that file is already applied, one batch of optional extras once after open questions when any extra applies, one batch for kept-open questions that still have no `Blocks:` line after the plan, one jump-back question when the check is not clear, and the yes before `walk-progress.md` is written. That yes shows the progress line, unless the step's own confirm already included this record. An extra's yes is that case. Questions inside a step belong to that step's skill.
+This walk's own prompts are the playbook choice, asked even when that file is already applied, one batch of optional extras once after open questions when any extra applies, one batch for kept-open questions that still have no `Blocks:` line after the plan, one jump-back card per spec finding during plan review (a finding already jumped does not ask again), one jump-back question when the check is not clear, and the yes before `walk-progress.md` is written. That yes shows the progress line, unless the step's own confirm already included this record. An extra's yes is that case. Questions inside a step belong to that step's skill.
 
 The progress script is `scripts/walk_progress.py` in this skill. Use it for versions, resume, playbook status, and the ready check. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. The ready check is `readiness --root`. Do not hand-build rows. Do not keep a second copy of those rules in chat. Pass `--yes` only after you have shown the line and the user has confirmed that record.
 
@@ -18,4 +18,4 @@ After a step finishes, record that one step, then run `resume`. One `record` cal
 
 Spec, plan, and tasks remain the source of truth. The progress file does not. A jump back reruns the skill that owns the step, even for a small patch. This walk does not edit `spec.md`, `plan.md`, or `tasks.md` on that jump, and it does not write the `Reviewed:` line.
 
-Do not run `/crav1-build-tasks`, `/crav1-build-features`, `/crav1-verify-build-against-spec`, or `/crav1-fix-build-gaps`. Do not create a git commit. The playbook copy under `docs/playbooks/` is a file write inside apply, not a git commit.
+Do not run `/crav1-build-tasks`, `/crav1-build-features`, `/crav1-verify-build-against-spec`, or `/crav1-fix-build-gaps`. This walk never writes `verify.md`. Do not create a git commit. The playbook copy under `docs/playbooks/` is a file write inside apply, not a git commit.

@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Progress file for /crav1-tighten-and-plan-ready-to-build (kit 1.132.0).
+"""Progress file for /crav1-tighten-and-plan-ready-to-build (kit 1.135.0).
 
 The spec, plan, and tasks stay the source of truth. This script only tracks
 where the guided walk is, which version of each file a step covered, and which
 ready-check rows belong to which step. It does not edit those files, does not
-apply a playbook, and does not start a build.
+apply a playbook, and does not start a build. It never writes verify.md.
+build-map.md stays with /crav1-tasks-ready-to-build.
 
 A later step inside the walk leaves earlier steps done. An optional extra
 the walk itself runs is recorded with `- Extra:` when it finishes, and that
@@ -24,9 +25,14 @@ Usage (JSON on stdout):
   walk_progress.py readiness --json <file> [--root <spec-folder>]
   walk_progress.py unlinked --root <spec-folder>
   walk_progress.py ack-stamps --root <spec-folder> --yes
+  walk_progress.py spec-finding --root <spec-folder> --id P2 --text "<finding>"
+      [--tag spec|plan] [--choice tighten-spec|open-point] [--yes]
 
 readiness --root builds the rows from task_order.py and question_blocks.py
-and adds the Reviewed warnings. Do not hand-build that JSON.
+and adds the Reviewed warnings. It also compares tasks.md with verify.md.
+Do not hand-build that JSON. spec-finding offers one jump back for a spec
+finding, or records an open point when that finding already jumped. A plan
+tag writes nothing.
 
 record, cover, and clear without --yes write nothing and exit 2.
 record takes one step per call and stamps Done itself. --when, when passed,
@@ -157,6 +163,17 @@ JUMP = {
     "tighten-plan": "/crav1-tighten-plan",
 }
 
+# One jump back from a spec-tagged plan finding (1.135.0). The path is the
+# sibling file the walk opens. A second sighting of the same finding is an
+# open point. This script does not edit spec.md and does not write verify.md.
+TIGHTEN_SPEC_PATH = "../crav1-tighten-spec/SKILL.md"
+CONTINUE_JUMP = "plan-from-spec, review-and-tighten-plan, tasks-ready-to-build"
+CONTINUE_POINT = "review-and-tighten-plan, tasks-ready-to-build"
+JUMP_CHOICE = "run /crav1-tighten-spec on just that finding now (Recommended)"
+POINT_CHOICE = "keep it as an open point and continue"
+FINDING_ID = re.compile(r"^P[1-9][0-9]*$")
+JUMP_RESULTS = {"jumped", "open-point"}
+
 
 def version_of(path: Path) -> str:
     if not path.is_file():
@@ -206,11 +223,35 @@ def _ack_line(when: str, names: list[str]) -> str:
     return f"Acknowledged stamp: {when} ({', '.join(names)})"
 
 
+def _take_jump_line(current: dict, line: str) -> None:
+    key, _, value = line.partition(": ")
+    if not value:
+        fail("progress-file", f"line has no value: {line}")
+    if key == "Done":
+        current["when"] = value
+    elif key == "Finding":
+        current["finding"] = value
+    elif key == "Result":
+        if value not in JUMP_RESULTS:
+            fail("progress-file", f"unknown jump result {value}")
+        current["result"] = value
+    elif key == "Open":
+        current["open"] = value
+    elif key == "Continue":
+        current["continue"] = value
+    elif key == "Key":
+        current["key"] = value
+    else:
+        fail("progress-file", f"unknown line: {line}")
+
+
 def parse_progress(text: str) -> dict:
     """Parse the progress file. A line the format does not allow is an error."""
     steps: dict[str, dict] = {}
     acks: list[dict] = []
+    jumps: list[dict] = []
     current: dict | None = None
+    kind: str | None = None
     slice_line = None
     for raw in text.splitlines():
         line = raw.strip()
@@ -224,12 +265,24 @@ def parse_progress(text: str) -> dict:
         if line.startswith("Acknowledged stamp: "):
             acks.append(_parse_ack(line))
             continue
+        if line.startswith("- Jump-back: ") or line.startswith("- Open point: "):
+            label, _, fid = line.partition(": ")
+            if not FINDING_ID.fullmatch(fid):
+                fail("progress-file", f"jump id is not a P#: {line}")
+            current = {
+                "kind": "jump-back" if label == "- Jump-back" else "open-point",
+                "id": fid,
+            }
+            jumps.append(current)
+            kind = "jump"
+            continue
         if line.startswith("- Step: "):
             step = line[len("- Step: "):]
             if step not in ORDER:
                 fail("progress-file", f"unknown step {step}")
             current = {"step": step}
             steps[step] = current
+            kind = "step"
             continue
         if line.startswith("- Extra: "):
             step = line[len("- Extra: "):]
@@ -237,9 +290,13 @@ def parse_progress(text: str) -> dict:
                 fail("progress-file", f"unknown extra {step}")
             current = {"step": step, "extra": True}
             steps[step] = current
+            kind = "step"
             continue
         if current is None:
             fail("progress-file", f"line outside a step: {line}")
+        if kind == "jump":
+            _take_jump_line(current, line)
+            continue
         key, _, value = line.partition(": ")
         if not value:
             fail("progress-file", f"line has no value: {line}")
@@ -270,19 +327,45 @@ def parse_progress(text: str) -> dict:
                     fail("progress-file", f"step {step} has no playbook line")
             elif token not in body:
                 fail("progress-file", f"step {step} has no {LABEL[token]}")
-    return {"slice": slice_line, "steps": steps, "acks": acks}
+    for jump in jumps:
+        for need in ("when", "finding", "result", "continue", "key"):
+            if need not in jump:
+                fail("progress-file", f"{jump['kind']} {jump['id']} has no {need}")
+        if jump["kind"] == "jump-back":
+            if jump["result"] != "jumped":
+                fail("progress-file", f"jump-back {jump['id']} result is not jumped")
+            if jump.get("open") != TIGHTEN_SPEC_PATH:
+                fail("progress-file", f"jump-back {jump['id']} does not name {TIGHTEN_SPEC_PATH}")
+        elif jump["result"] != "open-point":
+            fail("progress-file", f"open point {jump['id']} result is not open-point")
+    return {"slice": slice_line, "steps": steps, "acks": acks, "jumps": jumps}
 
 
 def load(root: Path) -> dict:
     path = progress_path(root)
     if not path.is_file():
-        return {"slice": None, "steps": {}, "acks": []}
+        return {"slice": None, "steps": {}, "acks": [], "jumps": []}
     data = parse_progress(path.read_text(encoding="utf-8"))
     data.setdefault("acks", [])
+    data.setdefault("jumps", [])
     return data
 
 
-def render(slice_label: str, steps: dict, acks: list | None = None) -> str:
+def _render_jumps(lines: list[str], jumps: list | None) -> None:
+    for jump in jumps or []:
+        title = "Jump-back" if jump["kind"] == "jump-back" else "Open point"
+        lines.append(f"- {title}: {jump['id']}")
+        lines.append(f"  Done: {jump['when']}")
+        lines.append(f"  Finding: {jump['finding']}")
+        lines.append(f"  Result: {jump['result']}")
+        if jump.get("open"):
+            lines.append(f"  Open: {jump['open']}")
+        lines.append(f"  Continue: {jump['continue']}")
+        lines.append(f"  Key: {jump['key']}")
+        lines.append("")
+
+
+def render(slice_label: str, steps: dict, acks: list | None = None, jumps: list | None = None) -> str:
     lines = ["# Walk progress", "", f"Walk: {WALK}", f"Slice: {slice_label}", ""]
     for ack in acks or []:
         lines.append(_ack_line(ack["when"], ack["steps"]))
@@ -311,6 +394,7 @@ def render(slice_label: str, steps: dict, acks: list | None = None) -> str:
         for token in COVERS[step]:
             lines.append(f"  {LABEL[token]}: {body[token]}")
         lines.append("")
+    _render_jumps(lines, jumps)
     return "\n".join(lines).rstrip() + "\n"
 
 
@@ -424,7 +508,7 @@ def record(args: argparse.Namespace) -> None:
     label = args.slice or data["slice"] or f"docs/specs/{root.name}/"
     if not str(label).endswith("/"):
         label = f"{label}/"
-    text = render(label, data["steps"], data.get("acks"))
+    text = render(label, data["steps"], data.get("acks"), data.get("jumps"))
     progress_path(root).write_text(text, encoding="utf-8")
     payload = {"ok": True, "wrote": PROGRESS_NAME, "step": step, "result": result, "when": body["when"]}
     if kept_done:
@@ -558,7 +642,10 @@ def write_progress(root: Path, data: dict, slice_label: str | None = None) -> No
     label = slice_label or data["slice"] or f"docs/specs/{root.name}/"
     if not str(label).endswith("/"):
         label = f"{label}/"
-    progress_path(root).write_text(render(label, data["steps"], data.get("acks")), encoding="utf-8")
+    progress_path(root).write_text(
+        render(label, data["steps"], data.get("acks"), data.get("jumps")),
+        encoding="utf-8",
+    )
 
 
 def find_playbook(root: Path, recorded: str) -> Path | None:
@@ -633,6 +720,15 @@ def resume(args: argparse.Namespace) -> None:
         "continue_from": continue_from,
         "playbook": book.get("playbook") if book else None,
         "done_stamp_warning": done_stamp_warning(data["steps"], data.get("acks")),
+        "spec_findings": [
+            {
+                "id": jump["id"],
+                "key": jump["key"],
+                "result": jump["result"],
+                "continue": [part for part in jump["continue"].split(", ") if part],
+            }
+            for jump in data.get("jumps") or []
+        ],
     })
 
 
@@ -996,6 +1092,170 @@ def reviewed_warning(plan_text: str) -> str | None:
     return None
 
 
+def _pr_merged(text: str) -> bool:
+    """A pull request recorded on this line is merged. Local text only."""
+    return bool(re.search(r"\(PR\s+\d+", text or "", re.I) and re.search(r"\bmerged\b", text or "", re.I))
+
+
+def _merged_branches(spec_text: str) -> set[str]:
+    names: set[str] = set()
+    mod = map_mod()
+    for line in (spec_text or "").splitlines():
+        stripped = line.strip()
+        if stripped.startswith("- "):
+            stripped = stripped[2:].strip()
+        if not stripped.lower().startswith("branch:"):
+            continue
+        if not _pr_merged(stripped):
+            continue
+        body = stripped.split(":", 1)[1]
+        cleaned = re.sub(r"\([^)]*\)", " ", body)
+        cleaned = re.sub(r"\bmerged\b", " ", cleaned, flags=re.I)
+        token = mod.branch_token(cleaned)
+        if token:
+            names.add(token)
+    return names
+
+
+def _task_merged(rest: str, branches: set[str]) -> bool:
+    if _pr_merged(rest):
+        return True
+    mod = map_mod()
+    for mark in re.finditer(r"\((?:branch|map):\s*([^)]+)\)", rest or "", re.I):
+        token = mod.branch_token(mark.group(1))
+        if token and token in branches:
+            return True
+    return False
+
+
+def _task_rests(text: str) -> dict[int, str]:
+    rests = {}
+    for line in (text or "").splitlines():
+        match = order_mod().TASK.match(line)
+        if match:
+            rests[int(match.group(2))] = match.group(3)
+    return rests
+
+
+def _overview_status(text: str | None, tid: str) -> str | None:
+    """Status cell on the verify tasks table, or None when that row is absent."""
+    if not text:
+        return None
+    in_tasks = False
+    for line in text.splitlines():
+        if line.startswith("## Tasks"):
+            in_tasks = True
+            continue
+        if in_tasks and line.startswith("## "):
+            break
+        if not in_tasks or not line.startswith("|"):
+            continue
+        cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+        if cells and cells[0] == tid and len(cells) >= 3 and cells[2] not in ("Status", "---"):
+            return cells[2]
+    return None
+
+
+def _not_implemented(status: str | None) -> bool:
+    return bool(status) and "not implemented" in status.lower()
+
+
+def _tldr_not_implemented(text: str | None, tid: str) -> bool:
+    if not text:
+        return False
+    for line in text.splitlines():
+        if not line.startswith("|"):
+            continue
+        cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+        if not cells or cells[0].lower() != "not implemented":
+            continue
+        blob = " ".join(cells[1:])
+        if re.search(rf"\b{re.escape(tid)}\b", blob):
+            return True
+    return False
+
+
+def _listed_not_implemented(text: str | None, tid: str) -> bool:
+    status = _overview_status(text, tid)
+    if status is not None:
+        return _not_implemented(status)
+    return _tldr_not_implemented(text, tid)
+
+
+def _built_ids(tasks_text: str, spec_text: str) -> dict[str, dict]:
+    """Tasks that are ticked, or whose pull request is recorded merged."""
+    branches = _merged_branches(spec_text)
+    rests = _task_rests(tasks_text)
+    built = {}
+    for task in order_mod().parse(tasks_text):
+        tid = f"T{task['id']}"
+        rest = rests.get(task["id"], "")
+        merged = _task_merged(rest, branches)
+        if task["done"] or merged:
+            built[tid] = {"done": task["done"], "merged": merged, "id": task["id"]}
+    return built
+
+
+def _stale_next(verify_text: str, built: set[str]) -> str | None:
+    hits = []
+    for line in (verify_text or "").splitlines():
+        stripped = line.strip()
+        if not stripped.lower().startswith("next:"):
+            continue
+        named = re.findall(r"\bT\d+\b", stripped)
+        if any(tid in built for tid in named):
+            hits.append(stripped)
+    return " ".join(hits) if hits else None
+
+
+def verify_gap_from(tasks_text: str, spec_text: str, verify_text: str, slug: str) -> dict:
+    """verify.md is behind when a built task is still not implemented, or Next names one.
+
+    Built means ticked in tasks.md, or the task's pull request is recorded merged
+    on the task line or on its Match Branch line. This does not write verify.md.
+    """
+    empty = {"behind": False, "tasks": [], "waiting": None, "stale_next": None}
+    if not verify_text.strip() or not tasks_text.strip():
+        return empty
+    built = _built_ids(tasks_text, spec_text)
+    stale: list[str] = []
+    for tid in built:
+        if _listed_not_implemented(verify_text, tid):
+            stale.append(tid)
+    stale_next = _stale_next(verify_text, set(built))
+    if stale_next:
+        for tid in re.findall(r"\bT\d+\b", stale_next):
+            if tid in built and tid not in stale:
+                stale.append(tid)
+    if not stale:
+        return empty
+    ordered = sorted(stale, key=lambda tid: int(tid[1:]))
+    ids = ", ".join(ordered)
+    waiting = (
+        f"Waiting: /crav1-verify-build-against-spec {slug} - "
+        f"verify.md is behind tasks.md ({ids})"
+    )
+    return {"behind": True, "tasks": ordered, "waiting": waiting, "stale_next": stale_next}
+
+
+def verify_gap(root: Path) -> dict:
+    empty = {"behind": False, "tasks": [], "waiting": None, "stale_next": None}
+    if root is None or not root.is_dir():
+        return empty
+    verify_path = root / "verify.md"
+    tasks_path = root / "tasks.md"
+    if not verify_path.is_file() or not tasks_path.is_file():
+        return empty
+    spec_path = root / "spec.md"
+    spec_text = spec_path.read_text(encoding="utf-8") if spec_path.is_file() else ""
+    return verify_gap_from(
+        tasks_path.read_text(encoding="utf-8"),
+        spec_text,
+        verify_path.read_text(encoding="utf-8"),
+        _slug(root),
+    )
+
+
 def _verify_for(text: str | None, tid: str) -> tuple[str, str | None]:
     if not text:
         return "needs-verify", "no verify.md row"
@@ -1078,21 +1338,49 @@ def build_rows(root: Path) -> list[dict]:
     tasks = order.parse(tasks_path.read_text(encoding="utf-8"))
     if not tasks:
         return [{"bucket": "blocked", "task": None, "reason": "no tasks.md"}]
-    analysed = order.analyse(tasks)
-    by_reason = {row["id"]: row for row in analysed["rows"]}
     plan_text = plan_path.read_text(encoding="utf-8") if plan_path.is_file() else ""
     spec_text = spec_path.read_text(encoding="utf-8") if spec_path.is_file() else ""
+    rests = _task_rests(tasks_path.read_text(encoding="utf-8"))
+    merged_branches = _merged_branches(spec_text)
+    for task in tasks:
+        task["ticked"] = task["done"]
+        task["merged"] = _task_merged(rests.get(task["id"], ""), merged_branches)
+        # A merged pull request is built, so later tasks do not wait on it.
+        if task["merged"]:
+            task["done"] = True
+    analysed = order.analyse(tasks)
+    by_reason = {row["id"]: row for row in analysed["rows"]}
     blocks = blocks_mod().analyse(spec_text, plan_text)
     verify_text = verify_path.read_text(encoding="utf-8") if verify_path.is_file() else None
     warning = reviewed_warning(plan_text) if plan_path.is_file() else None
     rows = []
     for task in tasks:
         tid = f"T{task['id']}"
-        if task["done"]:
-            bucket, reason = _verify_for(verify_text, tid)
-            row = {"bucket": bucket, "task": tid}
-            if reason:
-                row["reason"] = reason
+        merged = task["merged"]
+        if task["ticked"] or merged:
+            # A built task that verify.md still calls not implemented is stale,
+            # not Needs verify. The waiting line names the catch-up (1.135.0).
+            if _listed_not_implemented(verify_text, tid):
+                row = {"bucket": "done", "task": tid, "stale_verify": True}
+                _attach_deps(row, task)
+                rows.append(row)
+                continue
+            if task["ticked"]:
+                bucket, reason = _verify_for(verify_text, tid)
+                row = {"bucket": bucket, "task": tid}
+                if reason:
+                    row["reason"] = reason
+                _attach_deps(row, task)
+                rows.append(row)
+                continue
+            status = (_overview_status(verify_text, tid) or "").lower()
+            if "unverified" in status or "claimed" in status or "failed" in status:
+                bucket, reason = _verify_for(verify_text, tid)
+                row = {"bucket": bucket, "task": tid}
+                if reason:
+                    row["reason"] = reason
+            else:
+                row = {"bucket": "done", "task": tid}
             _attach_deps(row, task)
             rows.append(row)
             continue
@@ -1357,6 +1645,9 @@ def readiness(args: argparse.Namespace) -> None:
         line = report["line"]
     else:
         line = line_for(result, can_start, held)
+    gap = verify_gap(root) if root is not None else {
+        "behind": False, "tasks": [], "waiting": None, "stale_next": None,
+    }
     out = {
         "ok": True,
         "ready": ready,
@@ -1380,6 +1671,11 @@ def readiness(args: argparse.Namespace) -> None:
         "recommend_jump": bool(jump) and result == "not-ready",
         "jump_back": jump,
         "reopened": reopened,
+        "verify_behind": gap["behind"],
+        "verify_stale": gap["tasks"],
+        "verify_waiting": gap["waiting"],
+        "stale_next": gap["stale_next"],
+        "trust_stale_next": False,
     }
     if built:
         out["rows"] = rows
@@ -1427,6 +1723,161 @@ def ack_stamps(args: argparse.Namespace) -> None:
     data["acks"] = acks
     write_progress(root, data)
     emit({"ok": True, "wrote": PROGRESS_NAME, "lines": lines})
+
+
+def _finding_key(text: str) -> str:
+    norm = re.sub(r"\s+", " ", text.strip().lower())
+    return hashlib.sha256(norm.encode("utf-8")).hexdigest()[:12]
+
+
+def _short_finding(text: str) -> str:
+    one = re.sub(r"\s+", " ", text.strip())
+    if len(one) > 160:
+        return one[:157].rstrip() + "..."
+    return one
+
+
+def _continue_list(text: str) -> list[str]:
+    return [part for part in text.split(", ") if part]
+
+
+def _append_finding(root: Path, data: dict, kind: str, fid: str, text: str, key: str, result: str, continue_line: str, open_path: str | None = None) -> None:
+    jump = {
+        "kind": kind,
+        "id": fid,
+        "when": done_stamp(None),
+        "finding": _short_finding(text),
+        "result": result,
+        "continue": continue_line,
+        "key": key,
+    }
+    if open_path:
+        jump["open"] = open_path
+    data.setdefault("jumps", []).append(jump)
+    if not data.get("slice"):
+        data["slice"] = f"docs/specs/{root.name}/"
+    write_progress(root, data)
+
+
+def spec_finding(args: argparse.Namespace) -> None:
+    """One jump-back card for a spec finding. A plan finding is left as it is.
+
+    The same finding (the same words) is offered once. After that jump, a
+    return is an open point and the walk continues. This writes walk-progress.md
+    only with --yes. It does not write verify.md, spec.md, plan.md, or tasks.md.
+    """
+    tag = args.tag or "spec"
+    if tag == "plan":
+        emit({
+            "ok": True,
+            "offer": None,
+            "spec": False,
+            "behave_as_today": True,
+            "pause": False,
+            "wrote": None,
+            "message": "A plan finding stays in /crav1-tighten-plan. This walk does not jump back for it.",
+        })
+        return
+    if tag != "spec":
+        fail("tag", "tag must be spec or plan")
+    if not args.text or not str(args.text).strip():
+        fail("finding", "a spec finding needs --text")
+    if not FINDING_ID.fullmatch(args.id or ""):
+        fail("finding", "id must be a P# such as P2")
+    root = Path(args.root)
+    if not root.is_dir():
+        fail("root", f"not a folder: {root}")
+    data = load(root)
+    key = _finding_key(args.text)
+    jumps = data.get("jumps") or []
+    jumped = any(item.get("key") == key and item["kind"] == "jump-back" for item in jumps)
+    pointed = any(item.get("key") == key and item["kind"] == "open-point" for item in jumps)
+    if jumped or pointed:
+        payload = {
+            "ok": True,
+            "offer": None,
+            "spec": True,
+            "finding": args.id,
+            "already_jumped": jumped,
+            "open_point": True,
+            "pause": False,
+            "continue": _continue_list(CONTINUE_POINT),
+            "refused_second_jump": args.choice == "tighten-spec",
+        }
+        if pointed:
+            payload["already_recorded"] = True
+            payload["wrote"] = None
+            emit(payload)
+            return
+        if not args.yes:
+            payload["needs_record"] = True
+            payload["wrote"] = None
+            emit(payload)
+            return
+        _append_finding(root, data, "open-point", args.id, args.text, key, "open-point", CONTINUE_POINT)
+        payload["recorded"] = "open-point"
+        payload["wrote"] = PROGRESS_NAME
+        emit(payload)
+        return
+    if not args.choice:
+        emit({
+            "ok": True,
+            "offer": "jump-back",
+            "spec": True,
+            "finding": args.id,
+            "question": (
+                f"{args.id} is a spec finding. Jump back to /crav1-tighten-spec "
+                "for this finding only, or keep it as an open point and continue?"
+            ),
+            "options": [
+                {"id": "tighten-spec", "label": JUMP_CHOICE, "recommended": True},
+                {"id": "open-point", "label": POINT_CHOICE, "recommended": False},
+            ],
+            "path": TIGHTEN_SPEC_PATH,
+            "already_jumped": False,
+            "pause": False,
+            "wrote": None,
+        })
+        return
+    if args.choice not in ("tighten-spec", "open-point"):
+        fail("choice", "choice must be tighten-spec or open-point")
+    if not args.yes:
+        fail(
+            "needs-yes",
+            "spec-finding writes the progress file only with --yes, after the card was answered",
+            status=2,
+        )
+    if args.choice == "tighten-spec":
+        _append_finding(
+            root, data, "jump-back", args.id, args.text, key, "jumped",
+            CONTINUE_JUMP, TIGHTEN_SPEC_PATH,
+        )
+        emit({
+            "ok": True,
+            "offer": None,
+            "spec": True,
+            "finding": args.id,
+            "recorded": "jump-back",
+            "choice": "tighten-spec",
+            "path": TIGHTEN_SPEC_PATH,
+            "scoped_to": args.id,
+            "pause": False,
+            "continue": _continue_list(CONTINUE_JUMP),
+            "wrote": PROGRESS_NAME,
+        })
+        return
+    _append_finding(root, data, "open-point", args.id, args.text, key, "open-point", CONTINUE_POINT)
+    emit({
+        "ok": True,
+        "offer": None,
+        "spec": True,
+        "finding": args.id,
+        "recorded": "open-point",
+        "choice": "open-point",
+        "pause": False,
+        "continue": _continue_list(CONTINUE_POINT),
+        "wrote": PROGRESS_NAME,
+    })
 
 
 def cmd_version(args: argparse.Namespace) -> None:
@@ -1488,6 +1939,15 @@ def main(argv: list[str] | None = None) -> None:
     a.add_argument("--root", required=True)
     a.add_argument("--yes", action="store_true")
     a.set_defaults(func=ack_stamps)
+
+    f = sub.add_parser("spec-finding")
+    f.add_argument("--root", required=True)
+    f.add_argument("--id", required=True)
+    f.add_argument("--text", required=True)
+    f.add_argument("--tag", default="spec", help="spec offers a jump back. plan behaves as today.")
+    f.add_argument("--choice", help="tighten-spec or open-point")
+    f.add_argument("--yes", action="store_true")
+    f.set_defaults(func=spec_finding)
 
     args = parser.parse_args(argv)
     args.func(args)

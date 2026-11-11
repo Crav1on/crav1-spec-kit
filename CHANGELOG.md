@@ -2,6 +2,13 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.135.0 (2026-11-11)
+
+A spec finding during the tighten-and-plan walk can jump back to the spec, and a stale verify file is called out at the ready check. A minor release because the walk no longer stops on that finding, and the ready check no longer trusts a Next line that names work already built.
+
+- **Jump back to the spec.** When `/crav1-review-plan` inside `/crav1-tighten-and-plan-ready-to-build` finds a problem that is really a spec defect (the plan requires a named person's yes to stop a prod function app, and the spec names no approver), the walk asks one question card. The recommended option runs `/crav1-tighten-spec` on that finding now. The walk opens `../crav1-tighten-spec/SKILL.md` and follows it, with that skill's own confirms. It then reruns the plan for the parts that finding changed, reviews and tightens the plan, and runs the ready check. It does not pause. The other option keeps the finding as an open point and continues. The same finding is offered once. If it comes back, the walk records an open point and continues. `walk-progress.md` records `- Jump-back:` and `Continue:`. A plan finding that is not a spec defect stays in `/crav1-tighten-plan`.
+- **verify.md behind.** The ready check compares `tasks.md` with `verify.md`. `build-map.md` stays the file `/crav1-tasks-ready-to-build` writes, and the walk's ready check still refreshes it. `verify.md` stays with `/crav1-verify-build-against-spec`. The walk never runs that command and never writes `verify.md`. When a task is ticked, or its pull request is recorded merged, and `verify.md` still lists it as not implemented, or the `Next:` line in `verify.md` names a task that is ticked or merged, the check flags `verify.md` as behind. It does not show that Next line. It adds `Waiting: /crav1-verify-build-against-spec orders-api - verify.md is behind tasks.md (T2, T45)`.
+
 ## 1.134.0 (2026-11-11)
 
 A skill that runs another kit skill opens that skill's file. Command-only stays on. A minor release because a guided walk and several chaining skills change how they start the next skill.
