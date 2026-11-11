@@ -38,6 +38,8 @@ I have new information from a meeting and tasks that are not built. What do I ru
 
 Called with nothing, it shows this list with examples. Every answer ends with a line such as `Source: reference/workflow.md#new-info`.
 
+When a newer release tag exists, the notice names it and names `/crav1-update-kit`. Help does not run that command (1.131.0). See [Update the installed kit](from-update-kit.md).
+
 A skill, route, concept or free-form answer is at most 5 lines (1.95.0). Ask it to do something, such as "review my branch", and you get one line, for example `Run /crav1-review-pr branch: it diffs your branch against its base and checks it against the spec.` Help never runs the command for you.
 
 ## Routes and file state

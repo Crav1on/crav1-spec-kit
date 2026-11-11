@@ -59,6 +59,7 @@ Once specs exist:
 Find your way:
 
 - [Ask the kit for help](from-help.md): what to run next, in what order, and what a command does
+- [Update the installed kit](from-update-kit.md): move a consumer project onto a published release, on the branch you are already on
 - [Workflow routes](reference/workflow.md)
 - [Tasks ready to build](from-tasks-ready-to-build.md): which tasks can be built now, and why the others cannot
 

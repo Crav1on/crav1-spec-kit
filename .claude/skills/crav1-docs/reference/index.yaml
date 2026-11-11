@@ -131,6 +131,11 @@ skills:
     starter: false
     page: reference/skills/crav1-help.md
     purpose: "Answer questions about the kit from its own local docs, with the source file and anchor for every answer."
+  crav1-update-kit:
+    lane: cross-cutting
+    starter: false
+    page: reference/skills/crav1-update-kit.md
+    purpose: "Update the installed kit on the current branch to a published release."
   crav1-tasks-ready-to-build:
     lane: cross-cutting
     starter: false

@@ -107,6 +107,8 @@ docs/specs/
 
 The host file names for the two rules are in [install](../install.md) and on the skill pages.
 
+**Kit drop-in (1.131.0).** `/crav1-update-kit` replaces the installed kit on the current branch from a published release: `.cursor/skills/crav1/`, `.cursor/agents/crav1-*.md`, the `crav1-*` folders and `README.md` under `.cursor/agent-assets/`, `.cursor/rules/crav1.mdc`, and the Claude Code twins under `.claude/` (`crav1-*` skills, `crav1-docs`, `crav1-*` agents, `crav1-*` agent assets, and `CLAUDE.md`). A file already copied from `docs/specs/_template/` or `docs/system/_template/` is replaced only when it still matches the old kit byte for byte. Specs, `walk-progress.md`, plans, tasks, notes, playbooks, the build map, and the rest of `docs/system/` are not part of that replace.
+
 ## Notes
 
 Since 1.61.0 every `/crav1-add-to-spec` input (fact, dump, code change, meeting) becomes **one note** that holds the full input and its source. A fact's note holds the fact plus the passage around it. Each matching spec gets only its own short points, each followed by `Full source: docs/notes/YYYY-MM/<file>.md`. Notes are never absorbed; `used_by` grows as specs take points. There is no Note choice and no "never used" flag. The rule is `crav1-add-to-spec` `references/notes.md`.

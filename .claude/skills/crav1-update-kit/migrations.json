@@ -1,0 +1,11 @@
+{
+  "migrations": [
+    {
+      "id": "merge-safe-formats",
+      "below": "1.97.0",
+      "at_least": "1.84.0",
+      "summary": "Rewrite spec.md and docs/system/repos.md to the merge-safe formats, and fold review follow-ups into the shared PR record when those notes exist. A second run changes nothing. It does not edit walk-progress.md.",
+      "script": "crav1-add-to-spec/scripts/merge_safe_migrate.py"
+    }
+  ]
+}
