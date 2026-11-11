@@ -41,8 +41,8 @@ Open each file below from this skill's folder and follow it. Read [open-skill-fi
 3. Open `../crav1-tighten-spec/SKILL.md` (`/crav1-tighten-spec`), one issue at a time, as that skill already walks.
 4. Open `../crav1-resolve-open-questions/SKILL.md` (`/crav1-resolve-open-questions`).
 5. Open `../crav1-plan-from-spec/SKILL.md` (`/crav1-plan-from-spec`), which writes `plan.md` and `tasks.md`.
-6. Open `../crav1-review-plan/SKILL.md` (`/crav1-review-plan`), then Open `../crav1-tighten-plan/SKILL.md` (`/crav1-tighten-plan`).
-7. Open `../crav1-tasks-ready-to-build/SKILL.md` (`/crav1-tasks-ready-to-build`).
+6. Open `../crav1-review-plan/SKILL.md` (`/crav1-review-plan`), then Open `../crav1-tighten-plan/SKILL.md` (`/crav1-tighten-plan`). A spec-tagged finding is one jump-back card, then the walk continues. The rule is in [references/steps.md](references/steps.md) (1.135.0).
+7. Open `../crav1-tasks-ready-to-build/SKILL.md` (`/crav1-tasks-ready-to-build`). That check rewrites `build-map.md`. This walk never writes `verify.md`.
 
 A step with nothing to do says so, records that, and moves on. Optional offers are not steps. They are offered once, after open questions, when any apply. They are named in [references/steps.md](references/steps.md). After the plan, questions that still have no `Blocks:` line are offered there too, before that step is recorded.
 
@@ -50,7 +50,7 @@ A step with nothing to do says so, records that, and moves on. Optional offers a
 
 The spec, the plan, and the tasks stay the source of truth. `walk-progress.md` only records position. Do not edit `spec.md`, `plan.md`, or `tasks.md` from this skill, except a `Blocks:` line the pass after plan-from-spec writes after a yes, and the matching Risk sentence when that line is `Blocks: none`. A jump back is not that pass. It reruns the owning skill, even for a small patch. This walk does not edit those files on a jump back, and it does not write `Reviewed:`. Every other spec, plan, and task write happens inside the skill that owns it, after that skill's own yes.
 
-Do not report ready while a blocker, a reopened step, or an open assumption remains. A `ready-partial` result is not that report: some tasks can start, the held ones stay listed by build-map branch, and the walk records `Result: ready-partial` with no `not-ready` mark. The lists and the Next lines are in [references/readiness.md](references/readiness.md) (1.133.0). Do not start Build. Do not create a git commit. Apply writes the playbook copy under `docs/playbooks/`; that write is not a git commit.
+Do not report ready while a blocker, a reopened step, or an open assumption remains. A `ready-partial` result is not that report: some tasks can start, the held ones stay listed by build-map branch, and the walk records `Result: ready-partial` with no `not-ready` mark. The lists and the Next lines are in [references/readiness.md](references/readiness.md) (1.133.0). Do not start Build. This walk never writes `verify.md`. Do not create a git commit. Apply writes the playbook copy under `docs/playbooks/`; that write is not a git commit.
 
 When the user stops partway, one line `Paused at <step>.` then the shared ending in [references/progress.md](references/progress.md). `Next` is this command, because the walk paused before `continue_from`.
 

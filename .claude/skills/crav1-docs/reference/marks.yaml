@@ -1193,14 +1193,16 @@ marks:
     name: "Result"
     group: walk
     files: ["docs/specs/<slug>/walk-progress.md (under a step)"]
-    format: "  Result: <done | nothing-to-do | skipped | applied | reapplied | ready | ready-partial | not-ready>"
-    pattern: '^  Result: (done|nothing-to-do|skipped|applied|reapplied|ready|ready-partial|not-ready)$'
+    format: "  Result: <done | nothing-to-do | skipped | applied | reapplied | ready | ready-partial | not-ready | jumped | open-point>"
+    pattern: '^  Result: (done|nothing-to-do|skipped|applied|reapplied|ready|ready-partial|not-ready|jumped|open-point)$'
     examples:
       - "  Result: done"
       - "  Result: ready"
       - "  Result: ready-partial"
       - "  Result: not-ready"
-    meaning: "How the step ended. The ready check records ready, ready-partial, or not-ready. ready-partial means some tasks can start and some are held. It is covered, and it is not a not-ready mark. An older done on that step still reads. nothing-to-do still counts as covered for those versions."
+      - "  Result: jumped"
+      - "  Result: open-point"
+    meaning: "How the step ended. The ready check records ready, ready-partial, or not-ready. ready-partial means some tasks can start and some are held. It is covered, and it is not a not-ready mark. An older done on that step still reads. nothing-to-do still counts as covered for those versions. jumped is only on a jump-back record. open-point is only on an open-point record. A locked step does not use those two."
     written_by: [crav1-tighten-and-plan-ready-to-build]
     read_by: [crav1-tighten-and-plan-ready-to-build]
     mention: '(?m)^  Result: '
@@ -1287,6 +1289,90 @@ marks:
     written_by: [crav1-tighten-and-plan-ready-to-build]
     read_by: [crav1-tighten-and-plan-ready-to-build]
     since: 1.119.0
+
+  - id: walk-jump-back
+    name: "Jump-back"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md (after the locked steps)"]
+    format: "- Jump-back: <P#>"
+    pattern: '^- Jump-back: P[1-9][0-9]*$'
+    examples:
+      - "- Jump-back: P2"
+    meaning: "One jump back to tighten-spec for a spec finding during plan review. The same finding is not jumped again."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    mention: '(?m)^- Jump-back: '
+    since: 1.135.0
+
+  - id: walk-open-point
+    name: "Open point"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md (after the locked steps)"]
+    format: "- Open point: <P#>"
+    pattern: '^- Open point: P[1-9][0-9]*$'
+    examples:
+      - "- Open point: P2"
+    meaning: "A spec finding the walk will not jump back for again. The walk continues."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    mention: '(?m)^- Open point: '
+    since: 1.135.0
+
+  - id: walk-finding
+    name: "Finding"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md (under a jump-back or open point)"]
+    format: "  Finding: <one line>"
+    pattern: '^  Finding: .+$'
+    examples:
+      - "  Finding: the plan requires a named person's yes to stop a prod function app"
+    meaning: "The spec finding that jump back was for, on one line."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    mention: '(?m)^  Finding: '
+    since: 1.135.0
+
+  - id: walk-jump-open
+    name: "Jump open"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md (under a jump-back)"]
+    format: "  Open: ../crav1-tighten-spec/SKILL.md"
+    pattern: '^  Open: \.\./crav1-tighten-spec/SKILL\.md$'
+    examples:
+      - "  Open: ../crav1-tighten-spec/SKILL.md"
+    meaning: "The sibling file the walk opens for that one finding. An open point does not have this line."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    since: 1.135.0
+
+  - id: walk-continue
+    name: "Continue"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md (under a jump-back or open point)"]
+    format: "  Continue: <step>[, <step>]"
+    pattern: '^  Continue: [a-z0-9-]+(?:, [a-z0-9-]+)*$'
+    examples:
+      - "  Continue: plan-from-spec, review-and-tighten-plan, tasks-ready-to-build"
+      - "  Continue: review-and-tighten-plan, tasks-ready-to-build"
+    meaning: "The walk steps that run after this record. A jump back continues through the plan and the ready check. An open point continues the plan review and the ready check."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    mention: '(?m)^  Continue: '
+    since: 1.135.0
+
+  - id: walk-finding-key
+    name: "Finding key"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md (under a jump-back or open point)"]
+    format: "  Key: <12 hex>"
+    pattern: '^  Key: [0-9a-f]{12}$'
+    examples:
+      - "  Key: 6a034c36ad9e"
+    meaning: "The finding's words, hashed. The same words are the same finding, so the jump back is offered once."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    mention: '(?m)^  Key: '
+    since: 1.135.0
 
   - id: spec-playbook
     name: "Playbook link"

@@ -63,7 +63,7 @@ When Python runs, rule 3 may use `scripts/question_blocks.py` beside this skill:
 
 ## Dependency order (1.103.0)
 
-Every task list is in **dependency order**, not task-number order. Each task gets a wave: 0 when it waits on nothing, otherwise one more than the latest wave of the tasks it waits on. List wave by wave, lowest number first inside a wave; tasks in one wave can be built in either order. Tasks on a cycle go last. For the slice in the example below (T7 after T2, T3 and T6 after T7, T4 after T3 and T7, T5 after T4) the order is T1 → T2 → T7 → T3 | T6 → T4 → T5.
+Every task list is in **dependency order**, not task-number order. Each task gets a wave: 0 when it waits on nothing, otherwise one more than the latest wave of the tasks it waits on. List wave by wave, lowest number first inside a wave; tasks in one wave can be built in either order. Tasks on a cycle go last.
 
 The sort ships next to this file as `scripts/task_order.py`. When Python runs, use it for each slice: `<interpreter> <this skill folder>/scripts/task_order.py docs/specs/<slug>/tasks.md`. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. It prints Ready, Waits in order, Blocked, the Order line and Next. Waits in order is a real earlier task. Blocked is a cycle or an `(after:)` that names no task. Add the rule 1 to 3 results on top: a question is Waiting on a question, not Blocked. A dependent of a held task is Waiting too. The walk's `scripts/walk_progress.py readiness --root` prints `result`: `ready`, `ready-partial`, or `not-ready`. Without Python, apply the same rule by hand.
 
@@ -118,13 +118,14 @@ Build map: docs/specs/<slug>/build-map.md
 - Nothing is left to build or verify: `Next: nothing needed now.`
 - **Source** names every file it read, per slice.
 - **Build map** is one line per slice, the path the script just wrote. The task list above it is unchanged.
+- **verify.md behind (1.135.0).** When `verify_behind` is true, print `verify_waiting` and do not print `stale_next`. A ticked or merged task that `verify.md` still lists as not implemented, or a `Next:` line there that names one, is behind. This skill does not write `verify.md`.
 - When the slice has `work-item.md`, add the Azure Boards line from **What it reads**.
 
 ## What it does not do
 
 - No commit, no network read, no Azure Boards read, no fetch, no checkout. The only write is `build-map.md`, through the script.
 - No skill run. It names the next step and stops.
-- No new readiness marks. `Reviewed:`, `(after: …)`, `(branch: …)`, and `Blocks:` are written by `/crav1-review-plan`, `/crav1-tighten-plan`, `/crav1-plan-from-spec`, and `/crav1-resolve-open-questions`. `(step:)` and `(map:)` are optional and written by `/crav1-plan-from-spec`. This skill only reads them.
+- No new readiness marks. `Reviewed:`, `(after:)`, `(branch:)`, and `Blocks:` are written by the plan and question skills. This skill only reads them. It does not write `verify.md`.
 
 
 ## Choice words (1.69.0)

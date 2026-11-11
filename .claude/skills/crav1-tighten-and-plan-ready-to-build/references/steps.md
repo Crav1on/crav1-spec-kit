@@ -54,6 +54,41 @@ A list: offer to set them before the plan review. Options: `one batch` (Recommen
 
 Open `../crav1-review-plan/SKILL.md` (`/crav1-review-plan`), then Open `../crav1-tighten-plan/SKILL.md` (`/crav1-tighten-plan`), in that order. Review writes the `Reviewed:` line and does not edit the plan otherwise. Tighten walks plan issues and does not edit `spec.md`. When either has nothing to do, say so. Record one progress step, `review-and-tighten-plan`, only after both have finished or both had nothing to do.
 
+## Spec finding during plan review (1.135.0)
+
+A finding from the plan review that is tagged **spec** is a spec defect. Inside this walk it is not a pause. A plan-tagged finding stays in `/crav1-tighten-plan`, as that skill already walks it. Do not pass a plan finding to `spec-finding`.
+
+Run `scripts/walk_progress.py spec-finding --root <spec-folder> --id P2 --text "<the finding>"`. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. With no `--choice` it writes nothing. `--tag plan` is not a jump back.
+
+When `offer` is `jump-back`, ask one question card, as `crav1-docs/reference/question-cards.md` says. Use the script's `options`, in that order. The recommended label is `run /crav1-tighten-spec on just that finding now (Recommended)`. The other label is `keep it as an open point and continue`. Do not add a third option.
+
+On the recommended yes, run the same command with `--choice tighten-spec --yes`. Then Open `../crav1-tighten-spec/SKILL.md` (`/crav1-tighten-spec`) and follow it for that finding only, with that skill's own confirms. Do not start it as a slash command. The rule is [open-skill-file.md](../../crav1-docs/reference/open-skill-file.md) (1.134.0). After that skill finishes, continue this walk. Open `../crav1-plan-from-spec/SKILL.md` for the parts that finding changed, then Open `../crav1-review-plan/SKILL.md` and Open `../crav1-tighten-plan/SKILL.md`, then the ready check. Do not pause.
+
+On the other option, run `spec-finding` with `--choice open-point --yes` and continue `/crav1-tighten-plan`, then the ready check. Do not reopen the spec for that finding.
+
+The same finding is the same words. The script stores `Key:`. It is offered once. When `already_jumped` is true, do not ask again. Pass `--yes` so the open point is recorded, then continue review-and-tighten-plan and the ready check. A second `tighten-spec` choice is refused.
+
+`walk-progress.md` records the jump-back step. Do not hand-edit it.
+
+```text
+- Jump-back: P2
+  Done: 2026-11-11T20:30:00+00:00
+  Finding: the plan requires a named person's yes to stop a prod function app
+  Result: jumped
+  Open: ../crav1-tighten-spec/SKILL.md
+  Continue: plan-from-spec, review-and-tighten-plan, tasks-ready-to-build
+  Key: 6a034c36ad9e
+
+- Open point: P2
+  Done: 2026-11-11T20:30:00+00:00
+  Finding: the plan requires a named person's yes to stop a prod function app
+  Result: open-point
+  Continue: review-and-tighten-plan, tasks-ready-to-build
+  Key: 6a034c36ad9e
+```
+
+`Result: jumped` is only on `- Jump-back:`. `Result: open-point` is only on `- Open point:`. This walk does not edit `spec.md` on the jump. The skill that owns the spec does, after its own yes. The walk does not write `Reviewed:`. This walk never writes `verify.md`.
+
 ## Jump back
 
 A jump back opens the file of the skill that owns the step, even for a small patch, and follows it. The walk does not edit `spec.md`, `plan.md`, or `tasks.md` on a jump back, and it does not write `Reviewed:`. Open `../crav1-review-plan/SKILL.md` (`/crav1-review-plan`) for that line. Open `../crav1-plan-from-spec/SKILL.md` (`/crav1-plan-from-spec`) for the plan and the tasks. Open `../crav1-tighten-plan/SKILL.md` (`/crav1-tighten-plan`) for plan issues. Open `../crav1-resolve-open-questions/SKILL.md` (`/crav1-resolve-open-questions`) for questions. Do not record a step `done` after editing those files yourself. Do not record `nothing-to-do` for a step you did not run.
