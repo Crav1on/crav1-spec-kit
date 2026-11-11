@@ -26,6 +26,12 @@ If the parent said `approvals: already-done`, skip this file’s wait entirely.
 
 Cloud Agents: skip (no Run Modes). Say so and continue.
 
+## Its own card (1.129.0)
+
+This question comes after the branch question, on a new card. Do not put both questions on one card. The branch card is skill `crav1-create-feature-branch`, `references/task-branch.md`.
+
+The only answers are `continue`, `click`, and `stop`. A missing answer, or any other text (including a branch name such as `feat/orders-retry`), is not an answer. Re-ask this question. Do not guess `click`. Use `scripts/ask_order.py` (this skill): `permissions "<text>"` prints `ok` or `re-ask`. A branch answer that is `continue`, `click`, or `stop` is re-asked on the branch card, not accepted here.
+
 ## Pause (directions, then wait)
 
 Do **not** launch a worker on this turn.

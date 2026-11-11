@@ -12,7 +12,7 @@ Read `tasks.md`, `plan.md`, `spec.md`. Task row shape is this skill’s `assets/
 
 If `tasks.md` is missing, stop. Next: `/crav1-plan-from-spec`.
 
-**Branch:** before any code, follow `/crav1-create-feature-branch` (skill `crav1-create-feature-branch`, `SKILL.md`) **Build** prompt. When the task ends with `(branch: X)`, that prompt offers **X (Recommended)** first (1.64.0); on X already, go ahead. Implementation code is never written on a base branch (1.99.0): follow skill `crav1-create-feature-branch`, `references/code-branch.md`; on a base there is no Stay, and a task `(branch: X)` naming a base is blocked. A dirty tree still means no checkout of an existing branch. If you are on `spec/<slug>`, stop (no code) and follow that skill’s **Build on a spec-only branch**.
+**Branch:** before any code, follow `/crav1-create-feature-branch` (skill `crav1-create-feature-branch`, `references/task-branch.md`) **Build** prompt. Option 1 is the branch `scripts/build_map.py --recommend T#` prints (skill `crav1-tasks-ready-to-build`); on that branch already, go ahead. Implementation code is never written on a base branch (1.99.0): follow skill `crav1-create-feature-branch`, `references/code-branch.md`; on a base there is no Stay, and a recommended name that is a base is blocked. A dirty tree still means no checkout of an existing branch. If you are on `spec/<slug>`, stop (no code) and follow that skill’s **Build on a spec-only branch**.
 
 ## Gate
 
@@ -36,7 +36,7 @@ If two file layouts still fit, follow `plan.md` “files likely touched.” Do n
 
 ### Host setup tasks (1.115.0)
 
-A task marked `(host setup)` follows skill `crav1-host-setup`, `references/host-setup.md`: write the checked-in script and the manual steps from its comments, show the commands, their scope and the steps, and run `apply` only after the user's explicit yes, then `check`. A worker with no person to answer never applies: it writes the script, leaves the box `[ ]` and says `Host setup not applied. Run it after a yes.` Tick the box only when `check` prints `ok` for every setting.
+A task marked `(host setup)` follows skill `crav1-host-setup`, `references/host-setup.md`: write the checked-in script and the manual steps from its comments, show the commands, their scope and the steps, and run `apply` only after the user's explicit yes, then `check`. A yes that is not already on record (this chat, or an `Answered:` line) is not a blocker. Inside a worker, return `STATUS: needs_yes` from `references/run.md`, leave the box `[ ]`, and do not apply. The same status is used for any other approval gate that needs a named person's yes. Who is the person the task or the question names, or `not named yet`. Tick the box only when `check` prints `ok` for every setting. A worker with no person to answer never applies.
 
 ## After one task
 

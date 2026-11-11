@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
-"""Build map for one slice (kit 1.128.0).
+"""Build map for one slice (kit 1.129.0).
 
-Groups the open tasks onto branches: one branch per numbered step under
-plan.md `## Approach` by default. A task id written in that step, or
-`(step: <n>)` on the task, is the link. `(step:)` wins when both are present.
-`(map: <branch>)` puts the task on that branch instead. Tasks that name the
-same branch share it.
+Groups the open tasks onto branches. The row name is the task branch, in this
+order: `(map: <branch>)`, else `(branch: <branch>)`, else the plan step's
+`feat/<slug>-<words>` name, else a branch the task text names as
+`committed later on <branch>`, else `feat/<slug>-<words>` from the task.
+`--recommend T1` prints that name and does not write. Tasks that resolve to
+the same name share a row.
+
+A task id written in a step, or `(step: <n>)` on the task, is the link.
+`(step:)` wins when both are present.
 
 When the plan has no steps, or the steps name no task, each open task gets
 its own branch and the file says so.
@@ -16,6 +20,7 @@ that names no task, is listed under Blocked. The rendered file has no task ids.
 
 Usage:
   build_map.py <spec-dir> [--chat] [--stdout]
+  build_map.py <spec-dir> --recommend T1
   build_map.py --root <docs/specs> [--scope <words>] [--chat] [--stdout]
 
 The interpreter is python3, then python, then py -3. The Store alias message
@@ -57,8 +62,17 @@ question_blocks = _load("question_blocks")
 STEP_LINE = re.compile(r"^(\d+)[.)]\s*(.*)$")
 TASK_ID = re.compile(r"\bT(\d+)\b")
 STEP_MARK = re.compile(r"\(step:\s*(\d+)\)")
-MAP_MARK = re.compile(r"\(map:\s*([^)]*)\)")
+MAP_MARK = re.compile(r"\(map:\s*([^)]*)\)", re.I)
+BRANCH_MARK = re.compile(r"\(branch:\s*([^)]*)\)", re.I)
 SPEC_MARK = re.compile(r"\(spec:\s*([^)]*)\)", re.I)
+MARKER = re.compile(r"\((?:verify|spec|after|branch|step|map|question):[^)]*\)", re.I)
+HOST_MARK = re.compile(r"\((?:host setup|manual,\s*secret)\)", re.I)
+ONLY_IDS = re.compile(r"\(\s*(?:T\d+\s*,?\s*)+\)")
+COMMITTED_LATER = re.compile(r"committed later on\s+`?([^\s`,.;)]+)`?", re.I)
+WI_TASK = re.compile(r"task:\s*T(\d+)\s+(.+?)(?:\s+\(ADO:[^)]*\))?\s*$", re.I)
+NAMED_BRANCH = re.compile(
+    r"\b((?:feature|feat|hotfix|bugfix|fix|spec|chore|bug)/[A-Za-z0-9][A-Za-z0-9._/-]*)"
+)
 TICK_PATH = re.compile(r"`([^`\n]+)`")
 WORD = re.compile(r"(?<![\w-])build-map(?![\w-])")
 PIPELINE = re.compile(r"(?<![\w-])pipeline runs(?![\w-])")
@@ -103,14 +117,135 @@ def scope_folder_names(scope):
     return names
 
 
-def clean_prose(text):
-    text = re.sub(r"\((?:verify|spec|after|branch|step|map|question):[^)]*\)", "", text or "", flags=re.I)
-    text = re.sub(r"\(\s*(?:T\d+\s*,?\s*)+\)", "", text)
-    text = re.sub(r"\bT\d+\b", "", text)
+def branch_token(value):
+    """The branch in a mark. A repo prefix is the first word; the branch is the last."""
+    parts = (value or "").strip().split()
+    return parts[-1].strip("`.,;:") if parts else ""
+
+
+def clean_prose(text, names=None):
+    """Drop kit marks and task ids. A known id becomes that task's short name.
+
+    A removed id must not leave a dangling possessive, an empty pair of
+    parentheses, a leading comma, or a double space.
+    """
+    names = names or {}
+    text = MARKER.sub(" ", text or "")
+    text = ONLY_IDS.sub(" ", text)
+
+    def possess(match):
+        name = names.get(int(match.group(1)))
+        if not name:
+            return " "
+        return name + ("'" if name.endswith("s") else "'s")
+
+    def bare(match):
+        return names.get(int(match.group(1))) or " "
+
+    text = re.sub(r"\bT(\d+)'s\b", possess, text)
+    text = re.sub(r"\bT(\d+)\b", bare, text)
+    text = re.sub(r"(^|\s)'s\b", r"\1", text)
+    previous = None
+    while previous != text:
+        previous = text
+        text = re.sub(r"\(\s*,\s*", "(", text)
+        text = re.sub(r",\s*,+", ",", text)
+        text = re.sub(r",\s*\)", ")", text)
+        text = re.sub(r"\(\s*\)", " ", text)
     text = re.sub(r"\s+", " ", text)
     text = re.sub(r"\s+([,.;:])", r"\1", text)
-    text = re.sub(r"\(\s*\)", "", text)
+    text = re.sub(r"\(\s+", "(", text)
+    text = re.sub(r"\s+\)", ")", text)
     return text.strip(" ,;")
+
+
+def _trim80(text):
+    text = re.sub(r"\s+", " ", text or "").strip()
+    if len(text) <= 80:
+        return text
+    cut = text[:80]
+    if " " in cut:
+        cut = cut.rsplit(" ", 1)[0]
+    return cut.rstrip(" ,;.") or text[:80].rstrip()
+
+
+def short_name(rest, work_title=None):
+    """A task's short name: its work-item title, else the text up to the first cut.
+
+    Cuts are ` (`, `, in `, and the end of the sentence, whichever comes first.
+    Kit marks and branch prefixes are dropped. The result is at most 80 characters.
+    """
+    if work_title:
+        return _trim80(work_title) or "work"
+    text = MARKER.sub(" ", rest or "")
+    text = HOST_MARK.sub(" ", text)
+    text = re.sub(r"\s+", " ", text).strip()
+    cuts = []
+    for pattern in (r" \(", r", in ", r"\.(?:\s|$)"):
+        match = re.search(pattern, text)
+        if match:
+            cuts.append(match.start())
+    if cuts:
+        text = text[:min(cuts)]
+    text = NAMED_BRANCH.sub(" ", text)
+    text = re.sub(r"\s+", " ", text).strip(" ,;.")
+    return _trim80(text) or "work"
+
+
+def work_item_titles(text):
+    """`task: T# <title>` lines from work-item.md. The ADO suffix is not part of the title."""
+    titles = {}
+    for line in (text or "").splitlines():
+        match = WI_TASK.search(line.strip())
+        if match:
+            titles[int(match.group(1))] = re.sub(r"\s+", " ", match.group(2)).strip()
+    return titles
+
+
+def committed_later(rest):
+    match = COMMITTED_LATER.search(rest or "")
+    if not match:
+        return None
+    token = branch_token(match.group(1))
+    return token or None
+
+
+def branches_named_in_text(rest):
+    """Branch names written on the task line, in the order they appear."""
+    found = []
+
+    def add(token):
+        token = branch_token(token)
+        if token and token not in found:
+            found.append(token)
+
+    for match in BRANCH_MARK.finditer(rest or ""):
+        add(match.group(1))
+    for match in COMMITTED_LATER.finditer(rest or ""):
+        add(match.group(1))
+    for match in NAMED_BRANCH.finditer(rest or ""):
+        add(match.group(1).rstrip(".,;:"))
+    for match in MAP_MARK.finditer(rest or ""):
+        add(match.group(1))
+    return found
+
+
+def mismatch_note(row, rests):
+    """One note when the task text names a branch other than the row. Otherwise None."""
+    named = []
+    for rest in rests:
+        for token in branches_named_in_text(rest):
+            if token != row and token not in named:
+                named.append(token)
+    if not named:
+        return None
+    if len(named) == 1:
+        listed = named[0]
+    elif len(named) == 2:
+        listed = f"{named[0]} and {named[1]}"
+    else:
+        listed = ", ".join(named[:-1]) + ", and " + named[-1]
+    return f"Task text names {listed}; built on {row}"
 
 
 def kebab(text, limit=4):
@@ -194,11 +329,13 @@ def parse_tasks(text):
         rest = match.group(3)
         step = STEP_MARK.search(rest)
         mapped = MAP_MARK.search(rest)
-        name = mapped.group(1).strip() if mapped else ""
+        marked = BRANCH_MARK.search(rest)
         extras.append({
             "step": int(step.group(1)) if step else None,
-            "map": name or None,
+            "map": branch_token(mapped.group(1)) if mapped else None,
+            "branch": branch_token(marked.group(1)) if marked else None,
             "areas": task_areas(rest),
+            "rest": rest,
         })
     for task, extra in zip(parsed, extras):
         task.update(extra)
@@ -258,9 +395,23 @@ def _branch_cycles(names, waits):
     return on_cycle
 
 
-def build(slug, spec_text, plan_text, tasks_text):
+def _explicit(task):
+    """(map:) wins over (branch:). Either one names the row instead of the step."""
+    if task.get("map"):
+        return task["map"]
+    if task.get("branch"):
+        return task["branch"]
+    return None
+
+
+def build(slug, spec_text, plan_text, tasks_text, work_item_text=""):
     """Return markdown, a short chat summary, and the one-line pointer."""
     tasks = parse_tasks(tasks_text)
+    titles = work_item_titles(work_item_text)
+    name_of = {
+        task["id"]: short_name(task.get("rest") or task["title"], titles.get(task["id"]))
+        for task in tasks
+    }
     steps = parse_steps(plan_text if plan_text is not None else "")
     has_plan = plan_text is not None
     questions = question_blocks.kept_open(spec_text or "")
@@ -311,51 +462,60 @@ def build(slug, spec_text, plan_text, tasks_text):
         mode = "steps"
 
     used_names = set()
+    step_names = {}
+    if mode == "steps":
+        for step in steps:
+            if any(not _explicit(task) and task.get("owner") == step["n"] for task in open_tasks):
+                step_names[step["n"]] = _suggest(slug, step["body"], used_names)
+
+    resolved = {}
+    for task in open_tasks:
+        explicit = _explicit(task)
+        if explicit:
+            resolved[task["id"]] = explicit
+            used_names.add(explicit)
+            continue
+        if mode == "steps" and task.get("owner") in step_names:
+            resolved[task["id"]] = step_names[task["owner"]]
+            continue
+        later = committed_later(task.get("rest") or "")
+        if later:
+            resolved[task["id"]] = later
+            used_names.add(later)
+            continue
+        resolved[task["id"]] = _suggest(slug, task.get("rest") or task["title"], used_names)
+
     groups = {}
     for task in open_tasks:
-        if task["map"]:
-            key = ("map", task["map"])
-        elif mode == "steps" and task.get("owner") in step_by_n:
-            key = ("step", task["owner"])
-        else:
-            key = ("task", task["id"])
-        groups.setdefault(key, []).append(task)
-
-    def sort_key(item):
-        key, members = item
-        return (min(task["id"] for task in members), key[0], str(key[1]))
+        groups.setdefault(resolved[task["id"]], []).append(task)
 
     branches = []
-    for key, members in sorted(groups.items(), key=sort_key):
+    for name, members in sorted(groups.items(), key=lambda item: (min(task["id"] for task in item[1]), item[0])):
         members = sorted(members, key=lambda task: task["id"])
-        if key[0] == "map":
-            name = key[1]
-            if name in used_names:
-                name = _suggest(slug, name, used_names)
-            else:
-                used_names.add(name)
-            deliver = "; ".join(clean_prose(task["title"]) or "work" for task in members)
-        elif key[0] == "step":
-            step = step_by_n[key[1]]
-            step_tasks = [task for task in open_tasks if task.get("owner") == key[1] and not task["map"]]
-            name = _suggest(slug, step["body"], used_names)
-            if len(step_tasks) == len(members) and all(task in members for task in step_tasks):
-                deliver = clean_prose(step["body"]) or "; ".join(clean_prose(task["title"]) for task in members)
-            else:
-                deliver = "; ".join(clean_prose(task["title"]) or "work" for task in members)
+        shorts = [name_of.get(task["id"]) or "work" for task in members]
+        owners = {task.get("owner") for task in members}
+        owner = next(iter(owners)) if len(owners) == 1 else None
+        if (
+            mode == "steps"
+            and owner in step_names
+            and all(not _explicit(task) for task in members)
+            and all(resolved[task["id"]] == step_names.get(owner) for task in members)
+        ):
+            deliver = clean_prose(step_by_n[owner]["body"], name_of) or "; ".join(shorts)
         else:
-            name = _suggest(slug, members[0]["title"], used_names)
-            deliver = clean_prose(members[0]["title"]) or "work"
+            deliver = "; ".join(shorts)
         areas = set()
         for task in members:
             areas.update(task.get("areas") or ())
         branches.append({
-            "key": key,
+            "key": name,
             "name": name,
             "deliver": deliver or "work",
             "tasks": members,
             "task_ids": [task["id"] for task in members],
+            "task_names": shorts,
             "areas": areas,
+            "note": mismatch_note(name, [task.get("rest") or "" for task in members]),
         })
 
     id_branch = {}
@@ -446,18 +606,40 @@ def build(slug, spec_text, plan_text, tasks_text):
             branch["wave"] = wave[branch["name"]]
 
     by_name = {branch["name"]: branch for branch in branches}
-    markdown = _render(slug, grouping, branches, by_name, risks, has_plan, risk_blocks)
+    markdown = _render(slug, grouping, branches, by_name, risks, has_plan, risk_blocks, name_of)
     pointer = f"Build map: docs/specs/{slug}/build-map.md"
     summary = _summary(slug, pointer, branches)
     return {"markdown": markdown, "summary": summary, "pointer": pointer, "branches": branches, "grouping": grouping}
 
 
-def _question_line(questions):
+def recommended_branches(slug, spec_text, plan_text, tasks_text, work_item_text=""):
+    """Open task id to the build-map row branch. The same names `build` writes."""
+    result = build(slug, spec_text, plan_text, tasks_text, work_item_text)
+    found = {}
+    for branch in result["branches"]:
+        for task in branch["tasks"]:
+            found[task["id"]] = branch["name"]
+    return found
+
+
+def recommended_branch(slug, spec_text, plan_text, tasks_text, task_id, work_item_text=""):
+    """The row branch for one open task, or None when that task is not open."""
+    try:
+        task_id = int(task_id)
+    except (TypeError, ValueError):
+        match = re.search(r"(\d+)", str(task_id or ""))
+        if not match:
+            return None
+        task_id = int(match.group(1))
+    return recommended_branches(slug, spec_text, plan_text, tasks_text, work_item_text).get(task_id)
+
+
+def _question_line(questions, names=None):
     if not questions:
         return "none"
     parts = []
     for question in questions:
-        short = clean_prose(_first_sentence(question["text"])) or "open question"
+        short = clean_prose(_first_sentence(question["text"]), names) or "open question"
         who = question.get("who") or "not named yet"
         parts.append(f"{short} — {who}")
     return "; ".join(parts)
@@ -472,13 +654,13 @@ def _waits_line(branch, by_name):
 
 
 def parallel_phrase(members):
-    """How many branches in a wave can run together. A question hold is not a start."""
+    """How many branches in a wave can start now. A question hold is not a start.
+
+    Always `N branch(es), M can start now`, including one branch and a wave
+    where every branch can start.
+    """
     count = len(members)
     held = sum(1 for branch in members if branch["status"] == "waiting on a question")
-    if held == 0 and count == 1:
-        return "1 branch"
-    if held == 0:
-        return f"{count} branches, can run in parallel"
     noun = "branch" if count == 1 else "branches"
     return f"{count} {noun}, {count - held} can start now"
 
@@ -503,7 +685,7 @@ def overlap_lines(members):
     return lines
 
 
-def _render(slug, grouping, branches, by_name, risks, has_plan, risk_blocks):
+def _render(slug, grouping, branches, by_name, risks, has_plan, risk_blocks, names=None):
     lines = ["# Build map", "", grouping, ""]
     diagram = _mermaid(branches, by_name)
     lines.extend(["```mermaid", diagram, "```", ""])
@@ -521,7 +703,7 @@ def _render(slug, grouping, branches, by_name, risks, has_plan, risk_blocks):
         for risk in risks:
             if not risk["blocks_slice"]:
                 continue
-            short = clean_prose(risk["text"])
+            short = clean_prose(risk["text"], names)
             if short and short not in texts:
                 texts.append(short)
         detail = "; ".join(texts) if texts else "do not implement until resolved"
@@ -542,28 +724,31 @@ def _render(slug, grouping, branches, by_name, risks, has_plan, risk_blocks):
             lines.append(note)
             lines.append("")
         for branch in members:
-            lines.extend(_branch_block(branch, by_name))
+            lines.extend(_branch_block(branch, by_name, names))
     if blocked:
         lines.append("## Blocked")
         lines.append("")
         for branch in sorted(blocked, key=lambda item: item["tasks"][0]["id"]):
-            lines.extend(_branch_block(branch, by_name))
+            lines.extend(_branch_block(branch, by_name, names))
     text = "\n".join(lines).rstrip() + "\n"
     return text
 
 
-def _branch_block(branch, by_name):
-    titles = "; ".join(clean_prose(task["title"]) or "work" for task in branch["tasks"])
-    return [
+def _branch_block(branch, by_name, names=None):
+    titles = "; ".join(branch.get("task_names") or []) or "work"
+    lines = [
         f"### {branch['name']}",
         "",
         f"- Delivers: {branch['deliver']}",
         f"- Tasks: {titles}",
         f"- Waits for: {_waits_line(branch, by_name)}",
-        f"- Question: {_question_line(branch['questions'])}",
+        f"- Question: {_question_line(branch['questions'], names)}",
         f"- Ready now: {branch['status']}",
-        "",
     ]
+    if branch.get("note"):
+        lines.append(f"- {branch['note']}")
+    lines.append("")
+    return lines
 
 
 def _mermaid_label(name):
@@ -682,13 +867,21 @@ def slice_dirs(root, scope=""):
     return out
 
 
-def run_dir(directory, chat=False, stdout=False):
+def run_dir(directory, chat=False, stdout=False, recommend=None):
     directory = pathlib.Path(directory)
     slug = directory.name
     tasks = _read(directory / "tasks.md")
     if tasks is None:
         return f"no tasks yet (run /crav1-plan-from-spec): {slug}", 0
-    result = build(slug, _read(directory / "spec.md") or "", _read(directory / "plan.md"), tasks)
+    spec = _read(directory / "spec.md") or ""
+    plan = _read(directory / "plan.md")
+    work = _read(directory / "work-item.md") or ""
+    if recommend:
+        name = recommended_branch(slug, spec, plan, tasks, recommend, work)
+        if not name:
+            return f"No open task {recommend}.", 2
+        return name, 0
+    result = build(slug, spec, plan, tasks, work)
     if not stdout:
         (directory / "build-map.md").write_text(result["markdown"], encoding="utf-8")
     if stdout and not chat:
@@ -710,6 +903,7 @@ def main(argv):
     args = [arg for arg in argv if arg not in ("--chat", "--stdout")]
     scope = ""
     root = None
+    recommend = None
     positional = []
     i = 0
     while i < len(args):
@@ -721,8 +915,19 @@ def main(argv):
             root = args[i + 1]
             i += 2
             continue
+        if args[i] == "--recommend" and i + 1 < len(args):
+            recommend = args[i + 1]
+            i += 2
+            continue
         positional.append(args[i])
         i += 1
+    if recommend is not None:
+        if len(positional) != 1:
+            sys.stdout.write("Name one spec folder with --recommend.\n")
+            return 2
+        text, code = run_dir(positional[0], recommend=recommend)
+        sys.stdout.write(text + ("\n" if text and not text.endswith("\n") else ""))
+        return code
     if root is not None:
         dirs = slice_dirs(root, scope)
         if scope and not dirs:

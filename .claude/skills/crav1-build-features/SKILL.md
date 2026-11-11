@@ -76,7 +76,7 @@ Into branch and base branches (1.99.0): as skill `crav1-create-feature-branch`, 
 
 After a slug’s last worker, the tree should be clean (workers commit). Then switch to the next slug with this same procedure.
 
-**Task branches (1.64.0).** Inside a slug, a task that ends with `(branch: X)` is built on X: switch to X before its worker, only on a clean tree (`git checkout X`, which also makes the local branch from `origin/X`). Tasks without a branch part use `feat/<slug>`, as above. A task whose X is a base branch is `blocked` with `branch X is a base branch`; never switch to it. Starting the board is consent to these switches. When X exists nowhere, that task is `blocked` with the reason `branch X not found`; never create X. A `(branch: <repo> X)` for another repo is `blocked` with `belongs to <repo>`.
+**Task branches (1.129.0).** Inside a slug, a task is built on the branch `scripts/build_map.py --recommend T#` prints (skill `crav1-tasks-ready-to-build`), the same name as its build map row. That name comes from `(map:)` when the task has one, else `(branch:)`. Switch to it before its worker, only on a clean tree (`git checkout X`, which also makes the local branch from `origin/X`). A name that is a base branch is `blocked` with `branch X is a base branch`; never switch to it. Starting the board is consent to these switches when the branch exists. When the name exists nowhere, use the task-branch card once (skill `crav1-create-feature-branch`, `references/task-branch.md`). Do not invent a different recommended name, and do not create it without a yes. A name for another repo is `blocked` with `belongs to <repo>`. A worker `needs_yes` is waiting, not blocked. The task stays unticked.
 
 ## Board (keep this updated)
 

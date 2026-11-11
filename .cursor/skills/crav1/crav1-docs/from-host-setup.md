@@ -31,7 +31,7 @@ Service connections and secret variables are always manual. The script only chec
 
 ## From a plan
 
-A plan task marked `(host setup)` follows the same rules inside [Build tasks](from-plan-to-build.md), and [Verify and fix](from-verify.md) counts it done only when the live setting reads back `ok`. `/crav1-pr-status` closes a pull request point that asked for the setting once it reads it back live.
+A plan task marked `(host setup)` follows the same rules inside [Build tasks](from-plan-to-build.md), and [Verify and fix](from-verify.md) counts it done only when the live setting reads back `ok`. `/crav1-pr-status` closes a pull request point that asked for the setting once it reads it back live. During a build, a yes that is not on record is waiting, not blocked, and the task stays unticked. The script is committed on the branch the build map names for that task.
 
 ## After
 

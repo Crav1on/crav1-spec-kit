@@ -26,6 +26,8 @@ A range or all (was `/crav1-complete-tasks`): Orchestrates one worker per `T#` (
 
 1.68.0: offers to create a missing task sub-branch from its spec branch and writes its `(into …)` marker after the yes.
 
+1.129.0: the branch question is its own card, before permissions, and a typed branch name on that card is the answer. A missing answer, or one that belongs on the other card, is re-asked. The offered branch is the build map row (`scripts/build_map.py --recommend T#`). A different pick writes `(map: <picked>)` and does not commit it. A missing person's yes is `needs_yes` and a Waiting line, not blocked, and the task stays unticked. A new `.sh` file with no `*.sh eol=lf` rule, when autocrlf is true or the host is Windows, offers `*.sh text eol=lf` and does not add it without a yes.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
@@ -55,7 +57,7 @@ Inside each worker: Reads one `T#` in `tasks.md`, plus `plan.md` and `spec.md`. 
 
 In short: Inside each worker: The code and checks that `T#` names, and `[x]` on that row when its verify passes; One task: The commit-style rule when it is missing; its worker writes that task's code, `tasks.md`, `verify.md`, `fix-log.md` when a fix runs, and the commits; A range or all: The commit-style rule once, when missing; one worker per `T#` writes that task's code, `tasks.md`, `verify.md`, `fix-log.md` when a fix runs, and the commits.
 
-Inside each worker: Writes the code and the checks that row names, and marks the row `[x]` only when that verify passes. One task: Writes the commit-style rule when it is missing. A range or all: Writes the commit-style rule once when it is missing.
+Inside each worker: Writes the code and the checks that row names, and marks the row `[x]` only when that verify passes. One task: Writes the commit-style rule when it is missing. A range or all: Writes the commit-style rule once when it is missing. When the picked branch is not the build map's name, writes `(map: <picked>)` on that task in the specs repo and does not commit it.
 
 ## Does not
 

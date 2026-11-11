@@ -2,6 +2,18 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.129.0 (2026-11-11)
+
+Fixes from a live one-task build and from the build map. A minor release because the branch prompt, a worker status, and the build map change.
+
+- **One card at a time.** The branch question comes first, on its own card. A typed branch name on that card is the answer. There is no second card to collect a name. The permissions question (`continue`, `click`, or `stop`) comes after, on its own card. A missing answer, or an answer that belongs on the other card, is asked again. The run does not guess.
+- **A yes is waiting.** When a live change needs a named person's yes that is not on record (host setup, or another approval gate), the worker returns `needs_yes`. The task stays unticked. The run ends with `Waiting: the partner's yes to turn off pipelines 7 and 24.` and `Next` to rerun that task after the yes. `blocked` stays for a real blocker.
+- **The build map names the branch.** `/crav1-build-tasks` and the Build prompt offer the branch `scripts/build_map.py --recommend T#` prints, the same name as the map row. The order is `(map:)`, then `(branch:)`, then the plan step's `feat/<slug>-<words>` name, then `committed later on <branch>` when the task is not on a step. On that branch already, no prompt. A `(host setup)` option says the script will live on that branch, and says when the task text names a branch that is cut later. A different pick is written back as `(map: <picked>)` on the task, in the specs repo, and not committed.
+- **Shell line endings.** When a build writes a new `.sh` file, the repo has no `*.sh` rule with `eol=lf`, and `core.autocrlf` is true or the host is Windows, the run offers `*.sh text eol=lf` in `.gitattributes`. It does not add the line without a yes.
+- **Build map text.** A task id that is removed is replaced with the task's short name, or the phrase is cleaned. The file does not keep a dangling `'s`, an empty `()`, a leading comma, or a double space. The Tasks field is a short name: the `task: T#` title in `work-item.md` when that line exists, otherwise the task text up to the first ` (`, `, in `, or the end of the sentence, at most about 80 characters. Marks and branch prefixes are dropped.
+- **Wave heading.** Every wave says how many can start, including one branch: `1 branch, 1 can start now`.
+- **A mismatch stays visible.** When a row's branch differs from a branch named in the task text, the row has one line: `Task text names feat/orders-cicd; built on feat/orders-retry`.
+
 ## 1.128.0 (2026-11-10)
 
 A build map: how the slice will actually be built, by branch, without task ids. A minor release because `/crav1-tasks-ready-to-build` now writes a file.

@@ -16,6 +16,10 @@ The parent already switched to the task's `(branch: …)` when it has one and pa
 
 **Base guard (1.99.0).** Before the first edit and before every loop-commit, check the checkout as skill `crav1-create-feature-branch`, `references/code-branch.md` says. On a base branch (main, master, develop, the `Merges into` branch, `release/*`) return `STATUS: blocked` with the reason `on base branch <b>`, even when the parent passed `branch: already-done`. Never commit implementation code there.
 
+**A person's yes (1.129.0).** When the live change needs a named person's yes that is not already on record (host setup `apply`, or another approval gate), return `STATUS: needs_yes`. DETAIL is `<who>'s yes to <what>`, for example `the partner's yes to turn off pipelines 7 and 24`. Who is the person the task or the question names. When nobody is named, who is `not named yet`. Leave the task `[ ]`. Do not apply. Do not return `blocked` for this.
+
+**Shell line endings (1.129.0).** When this task wrote a new `.sh` file, run `scripts/sh_eol.py` (this skill) with `--wrote-sh`, the repo's `.gitattributes` (omit the flag's file when there is none), `git config --get core.autocrlf`, and `--windows` when the host is Windows. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. When the script prints a line, put it on `NOTES:`. Do not edit `.gitattributes` unless the parent passed `resume: eol`. That resume adds the one line `*.sh text eol=lf` and loop-commits it. Never add the line without that yes.
+
 ## Loop-commit
 
 After a step that may have changed files:
@@ -51,6 +55,7 @@ Stop and return a **status block** (below) if:
 | `resume: dependency-start` | Start the dependency as `test-dependencies.md` says, check it answers, re-run the waiting phase |
 | `resume: dependency-skip` | Run the tests without the ones that need it; record them in `verify.md` → **Skipped tests**; continue |
 | `resume: stop` | `STATUS: blocked` — do not edit |
+| `resume: eol` | Add `*.sh text eol=lf` to `.gitattributes` only, then loop-commit. Do not apply anything else |
 
 ## implement
 
@@ -58,7 +63,7 @@ Follow **the implement step of `crav1-build-tasks`** for this `T#` only.
 
 Then loop-commit.
 
-If the row did not go `[x]`, `STATUS: blocked`. Do not verify-build-against-spec as if the task shipped.
+If the row did not go `[x]` because a person's yes is not on record, `STATUS: needs_yes`. Otherwise `STATUS: blocked`. Do not verify-build-against-spec as if the task shipped.
 
 ## verify
 
@@ -96,12 +101,15 @@ Left unchecked: <other T#s or none>
 ## Status block (always end with this)
 
 ```text
-STATUS: done | blocked | needs_fix | needs_ready | needs_dependency | failed
+STATUS: done | blocked | needs_yes | needs_fix | needs_ready | needs_dependency | failed
 T#: Tn
 PHASE: implement | verify | fix | done
 COMMITS: <hashes>
 DETAIL: <one short paragraph>
+NOTES: <the sh_eol.py line, or omit>
 ```
+
+`needs_yes` is waiting, not blocked. The parent prints `Waiting:`, not a blocker.
 
 `PHASE` is the step you were in (or just finished). Do not write A, B, C, or D.
 

@@ -464,12 +464,13 @@ skills:
   - '1.64.0: the Build prompt puts a task''s `(branch: …)` first, marked (Recommended), and never creates it from default without asking.'
   - '1.99.0: implementation code is never built on a base branch (main, master, develop, Merges into, `release/*`): no Stay there; Create `feat/<slug>` from the into branch (Recommended), Use an existing branch, Other name or Stop; `hotfix/` is a work prefix; specs, docs and the specs repo are exempt. Rules in `references/code-branch.md`.'
   - '1.68.0: a missing task sub-branch is offered as **Create it from the spec branch (Recommended)**; the `(into …)` marker is written after the yes.'
+  - '1.129.0: a task''s Build prompt offers the branch `scripts/build_map.py --recommend T#` prints, the same name as the build map row: `(map:)`, else `(branch:)`, else the plan step, else `committed later on`. The branch question is its own card, and a typed name on that card is the answer. A different pick writes `(map: <picked>)` on the task in the specs repo and does not commit it.'
   use_when: 'Brownfield: leave the default branch'
   table:
     reads: Current branch, default branch, dirty tree
     writes: A local `feat/<slug>` or `spec/<slug>` checkout
   reads: Reads the current branch, the default branch, and whether the tree is dirty.
-  writes: Writes a local checkout of `feat/<slug>` or `spec/<slug>` after the user picks.
+  writes: 'Writes a local checkout of `feat/<slug>` or `spec/<slug>` after the user picks. When a build prompt picks a branch other than the build map''s name for that task, writes `(map: <picked>)` on the task line in the specs repo and does not commit it.'
   leaves_alone: Leaves commits, push, and the pull request alone.
   exceptions: skips the prompt when there is no repo, no commits, or the branch is already right. A dirty
     tree does not checkout.
@@ -1005,6 +1006,7 @@ skills:
     stops the batch when a worker needs you.'
   - '1.64.0: a task''s `(branch: …)` is offered first (Recommended) in the Build prompt; range and all-tasks runs switch to each task''s branch on a clean tree, and a missing branch blocks that task.'
   - '1.68.0: offers to create a missing task sub-branch from its spec branch and writes its `(into …)` marker after the yes.'
+  - '1.129.0: the branch question is its own card, before permissions, and a typed branch name on that card is the answer. A missing answer, or one that belongs on the other card, is re-asked. The offered branch is the build map row (`scripts/build_map.py --recommend T#`). A different pick writes `(map: <picked>)` and does not commit it. A missing person''s yes is `needs_yes` and a Waiting line, not blocked, and the task stays unticked. A new `.sh` file with no `*.sh eol=lf` rule, when autocrlf is true or the host is Windows, offers `*.sh text eol=lf` and does not add it without a yes.'
   use_when: You want to build one task, a range, or all unticked tasks
   table:
     reads: 'Inside each worker: One `T#`, the plan, and the spec; One task: One `T#` and the persist rule;
@@ -1018,7 +1020,8 @@ skills:
     one `T#` and the persist rule. A range or all: Reads the `T#` queue on one spec.'
   writes: 'Inside each worker: Writes the code and the checks that row names, and marks the row `[x]`
     only when that verify passes. One task: Writes the commit-style rule when it is missing. A range or
-    all: Writes the commit-style rule once when it is missing.'
+    all: Writes the commit-style rule once when it is missing. When the picked branch is not the build
+    map''s name, writes `(map: <picked>)` on that task in the specs repo and does not commit it.'
   leaves_alone: 'Inside each worker: Leaves `spec.md` and other tasks alone. One task: Leaves product
     code, `spec.md`, push, and the pull request alone in this chat. A range or all: Leaves product code,
     commits, `spec.md`, push, and the pull request alone in this chat.'
@@ -1050,6 +1053,7 @@ skills:
     parallel, no push, no PR.'
   - '1.99.0: `feat/<slug>` forks from the into branch (Merges into, else default), a task naming a base branch is blocked.'
   - '1.64.0: tasks with `(branch: …)` are built on that branch; the board shows `done (n branches not merged)`.'
+  - '1.129.0: each task is built on the build map row from `scripts/build_map.py --recommend T#`. A worker `needs_yes` is waiting, not blocked.'
   use_when: Several specs, one after another
   table:
     reads: Ready spec folders on the default branch
@@ -1579,6 +1583,7 @@ skills:
   - '1.126.0: a Risk that says do not implement until resolved matches a question on the question first sentence, a `(question: <first words>)` tag, or the same Blocks tasks named in the Risk. A Risk that matches no question still blocks the slice. `scripts/task_order.py --json` uses T1 style ids.'
   - '1.127.0: the report splits Ready, Waiting on a question, Waits in order, and Blocked. `task_order.py` text uses the same Waits in order and Blocked headings. Who on a question comes from "Waiting for", then the latest Pending or Asked line, or not named yet. The interpreter is `docs/reference/running-scripts.md`.'
   - '1.128.0: every run rewrites `docs/specs/<slug>/build-map.md` through `scripts/build_map.py`. The task list is unchanged apart from one line pointing at that file. The word `build-map` shows only the short summary: the path, how many branches in each wave can run in parallel, then the Overlap lines for that wave, one per pair. The ready-check list stays the one pointer line. One branch per numbered Approach step, unless a task has `(map:)`. `(step:)` links a task to a step. No steps, or steps that name no task, means one branch per task, and the file says so. Each wave is a subgraph so its branches sit side by side. A question hold is counted in the wave heading (`3 branches, 2 can start now`). An overlap note names two branches in one wave that share a `(spec:)` requirement or a backtick path. The note does not change readiness or waves. Six fields per branch, no task ids and no file list in a row. Who uses the 1.127.0 rule. A cycle or an unknown `(after:)` is under Blocked.'
+  - '1.129.0: the row branch is `(map:)`, else `(branch:)`, else the plan step, else `committed later on`, else `feat/<slug>-<words>`. `--recommend T#` prints that name and does not write. Tasks are short names (a `task: T#` title in `work-item.md`, else the text up to ` (`, `, in `, or the sentence end, about 80 characters). A removed task id does not leave a dangling possessive, empty parentheses, a leading comma, or a double space. The wave heading is always `N branches, M can start now`, including `1 branch, 1 can start now`. A row whose task text names another branch adds `Task text names feat/x; built on feat/y`.'
   choice_words:
   - question: Show the build map?
     words:
@@ -1592,7 +1597,7 @@ skills:
   table:
     reads: '`spec.md` open questions, `plan.md`, `tasks.md`, and `verify.md` per slice'
     writes: '`docs/specs/<slug>/build-map.md` every run, and a list in chat'
-  reads: 'Reads, for one slice or every slice under `docs/specs/`, the open questions in `spec.md` with their `Blocks:`, `Asked:`, `Pending:`, and `Answered:` lines, the `Reviewed:` line, `## Approach`, and `## Risks` in `plan.md`, the task lines in `tasks.md` with their ticks, `(after: T#)`, `(step:)`, and `(map:)`, and `verify.md` when it exists.'
+  reads: 'Reads, for one slice or every slice under `docs/specs/`, the open questions in `spec.md` with their `Blocks:`, `Asked:`, `Pending:`, and `Answered:` lines, the `Reviewed:` line, `## Approach`, and `## Risks` in `plan.md`, the task lines in `tasks.md` with their ticks, `(after: T#)`, `(branch:)`, `(step:)`, and `(map:)`, a `task: T#` title in `work-item.md` when that file exists, and `verify.md` when it exists.'
   writes: 'Writes a list in the chat with summary counts, Ready, Waiting on a question, Waits in order, Blocked, Needs verify, a Done count, the next step, and its source, plus one line pointing at the build map. Every run rewrites `docs/specs/<slug>/build-map.md`. The word `build-map` prints only the short summary of that file.'
   leaves_alone: 'Leaves every file other than `build-map.md` alone, and never reads Azure Boards. It does not commit the map.'
   exceptions: 'does not guess a dependency or a blocking link from task text. Where nothing is recorded it uses a fallback and marks the reason inferred. It writes no readiness marks; review-plan, tighten-plan, plan-from-spec, and resolve-open-questions write them. The map is written only by `scripts/build_map.py`.'
