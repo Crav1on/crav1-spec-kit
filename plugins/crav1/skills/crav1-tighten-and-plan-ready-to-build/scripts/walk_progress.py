@@ -945,6 +945,42 @@ def order_mod():
     return mod
 
 
+def map_mod():
+    import importlib.util
+
+    path = Path(__file__).resolve().parents[2] / "crav1-tasks-ready-to-build" / "scripts" / "build_map.py"
+    spec = importlib.util.spec_from_file_location("build_map_rows", path)
+    if spec is None or spec.loader is None:
+        fail("map", f"cannot load {path}")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def branch_report(root: Path, rows: list[dict]) -> dict | None:
+    """Ready and held tasks grouped by the build-map row (1.133.0).
+
+    The branch is the one `build_map.py --recommend` prints. Missing files
+    leave the report empty so the caller keeps the older line.
+    """
+    if root is None or not root.is_dir():
+        return None
+    tasks_path = root / "tasks.md"
+    if not tasks_path.is_file():
+        return None
+    plan_path = root / "plan.md"
+    spec_path = root / "spec.md"
+    verify_path = root / "verify.md"
+    work_path = root / "work-item.md"
+    tasks = tasks_path.read_text(encoding="utf-8")
+    spec = spec_path.read_text(encoding="utf-8") if spec_path.is_file() else ""
+    plan = plan_path.read_text(encoding="utf-8") if plan_path.is_file() else None
+    work = work_path.read_text(encoding="utf-8") if work_path.is_file() else ""
+    verify = verify_path.read_text(encoding="utf-8") if verify_path.is_file() else ""
+    built = map_mod().build(root.name, spec, plan, tasks, work, verify)
+    return map_mod().report_by_branch(built, rows)
+
+
 REVIEWED_RE = re.compile(r"^Reviewed:\s*.*?P# open:\s*(\d+)", re.M)
 
 
@@ -1308,15 +1344,31 @@ def readiness(args: argparse.Namespace) -> None:
     ready = result == "ready"
     slug = _slug(root) if root is not None else ""
     waiting_line, waiting_next = _waiting_lines(waiting, slug)
+    report = branch_report(root, rows) if root is not None else None
+    ready_lines = (report or {}).get("ready_lines") or []
+    held_lines = (report or {}).get("held_lines") or []
+    next_lines = (report or {}).get("next_lines") or []
+    if result in ("ready", "ready-partial") and next_lines:
+        nxt = "\n".join(next_lines)
+    else:
+        nxt = next_for(result, can_start, waiting_next)
+        next_lines = []
+    if result == "ready-partial" and report and report.get("line"):
+        line = report["line"]
+    else:
+        line = line_for(result, can_start, held)
     out = {
         "ok": True,
         "ready": ready,
         "result": result,
         "can_start": can_start,
         "held": held,
-        "line": line_for(result, can_start, held),
+        "line": line,
+        "ready_lines": ready_lines,
+        "held_lines": held_lines,
+        "next_lines": next_lines,
         "gates": gates_for(rows),
-        "next": next_for(result, can_start, waiting_next),
+        "next": nxt,
         "start_build": False,
         "blockers": blockers,
         "outside_walk": outside,

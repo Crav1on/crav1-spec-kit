@@ -129,8 +129,16 @@ class ReadyPartial(unittest.TestCase):
         self.assertFalse(payload["ready"])
         self.assertEqual(payload["can_start"], ["T1", "T2"])
         self.assertEqual(payload["held"], ["T3", "T4", "T5"])
-        self.assertEqual(payload["line"], "Ready: T1, T2. Held from T3.")
-        self.assertIn("/crav1-build-tasks T1, T2", payload["next"])
+        self.assertIn("Ready now", payload["line"])
+        self.assertIn("T1 Record the decision", payload["line"])
+        self.assertIn("T2 Store the card", payload["line"])
+        self.assertIn("Held", payload["line"])
+        self.assertIn("T3 Choose the currency", payload["line"])
+        self.assertIn("held, waits on T3", payload["line"])
+        self.assertNotIn("Held from", payload["line"])
+        self.assertIn("Next: /crav1-build-tasks T1", payload["next"])
+        self.assertIn("Next: /crav1-build-tasks T2", payload["next"])
+        self.assertNotIn("T1, T2", payload["next"])
         self.assertNotIn("not-ready", payload["result"])
         by_task = {row["task"]: row for row in payload["waiting"]}
         self.assertIn("Which currency", by_task["T3"]["reason"])
@@ -275,13 +283,16 @@ Reviewed: 2026-11-11, P# open: 0
 """
         text = self.bm.build("cancel-booking", spec, plan, tasks, "", verify)["markdown"]
         self.assertIn(
-            "~~Persist the decision~~ ✓ done ([PR 12](https://github.com/contoso/orders-api/pull/12))",
+            "~~T1 Persist the decision~~ ✓ done ([PR 12](https://github.com/contoso/orders-api/pull/12))",
             text,
         )
-        self.assertIn("~~Store the card~~ ✓ done (feat/orders-card)", text)
-        self.assertIn("Email the receipt", text)
+        self.assertIn("~~T2 Store the card~~ ✓ done (feat/orders-card)", text)
+        self.assertIn("T3 Email the receipt", text)
         self.assertNotIn("Nothing left to build.", text)
-        self.assertIsNone(re.search(r"\bT\d+\b", text))
+        tasks_lines = [line for line in text.splitlines() if line.startswith("- Tasks:")]
+        self.assertTrue(tasks_lines)
+        other = "\n".join(line for line in text.splitlines() if not line.startswith("- Tasks:"))
+        self.assertIsNone(re.search(r"\bT\d+\b", other))
         folded = re.search(r"<details>\n<summary>Wave 1 done \(2 tasks\)</summary>\n\n(.*?)\n</details>", text, re.S)
         self.assertIsNotNone(folded)
         body = folded.group(1)

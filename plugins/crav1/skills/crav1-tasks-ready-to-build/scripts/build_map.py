@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build map for one slice (kit 1.132.0).
+"""Build map for one slice (kit 1.133.0).
 
 Groups the tasks onto branches, including tasks that are already done. The row name is the task branch, in this
 order: `(map: <branch>)`, else `(branch: <branch>)`, else the plan step's
@@ -18,7 +18,10 @@ is done is wrapped in a details block. The rows stay in the file.
 
 Waves are branch dependencies. Wave 1 does not wait for another open branch.
 A later wave opens after the branches it waits for. A cycle, or an `(after:)`
-that names no task, is listed under Blocked. The rendered file has no task ids.
+that names no task, is listed under Blocked. The Tasks field shows each task
+as `T#` plus its short name. Other prose still drops task ids. The dangling
+text left by a removed id is cleaned. The map is rewritten on every ready
+check, so the ids match the tasks file.
 
 Usage:
   build_map.py <spec-dir> [--chat] [--stdout]
@@ -169,6 +172,12 @@ def _trim80(text):
     if " " in cut:
         cut = cut.rsplit(" ", 1)[0]
     return cut.rstrip(" ,;.") or text[:80].rstrip()
+
+
+def task_label(task_id, short):
+    """`T#` plus the short name. The Tasks field and the ready check use this."""
+    name = re.sub(r"\s+", " ", short or "").strip() or "work"
+    return f"T{task_id} {name}"
 
 
 def short_name(rest, work_title=None):
@@ -600,12 +609,19 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text
     for name, members in sorted(groups.items(), key=lambda item: (min(task["id"] for task in item[1]), item[0])):
         members = sorted(members, key=lambda task: task["id"])
         shorts = []
+        shown = []
         for task in members:
-            short = name_of.get(task["id"]) or "work"
+            plain = name_of.get(task["id"]) or "work"
+            label = task_label(task["id"], plain)
+            task["short"] = plain
+            task["label"] = label
             if task["done"]:
                 evidence = done_evidence(task, name, prs, verify_text)
-                short = f"~~{short}~~ ✓ done ({evidence})"
-            shorts.append(short)
+                shorts.append(f"~~{plain}~~ ✓ done ({evidence})")
+                shown.append(f"~~{label}~~ ✓ done ({evidence})")
+            else:
+                shorts.append(plain)
+                shown.append(label)
         owners = {task.get("owner") for task in members}
         owner = next(iter(owners)) if len(owners) == 1 else None
         if (
@@ -626,7 +642,7 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text
             "deliver": deliver or "work",
             "tasks": members,
             "task_ids": [task["id"] for task in members],
-            "task_names": shorts,
+            "task_names": shown,
             "areas": areas,
             "note": mismatch_note(name, [task.get("rest") or "" for task in members]),
         })
@@ -770,6 +786,122 @@ def recommended_branch(slug, spec_text, plan_text, tasks_text, task_id, work_ite
             return None
         task_id = int(match.group(1))
     return recommended_branches(slug, spec_text, plan_text, tasks_text, work_item_text).get(task_id)
+
+
+def _task_num(token):
+    match = re.fullmatch(r"T(\d+)", str(token or "").strip())
+    if match:
+        return int(match.group(1))
+    try:
+        return int(token)
+    except (TypeError, ValueError):
+        return None
+
+
+def held_phrase(row):
+    """The held reason on a ready-check line.
+
+    An open question names the question and who has it. A task that only
+    waits on a held task says `held, waits on T#`. The recorded or inferred
+    tag stays off this line.
+    """
+    reason = (row.get("reason") or "").strip()
+    who = (row.get("who") or "").strip() or "not named yet"
+    core = re.sub(r"\s*\((?:recorded|inferred)\)\s*$", "", reason).strip()
+    if core.lower().startswith("held, waits on"):
+        return core
+    match = re.search(r'open question "([^"]*)"', reason)
+    if match:
+        question = re.split(r"(?<=[.!?])\s", match.group(1).strip(), maxsplit=1)[0]
+        return f'open question "{question}" Waiting for {who}.'
+    return core or "held"
+
+
+def _branch_order(branches):
+    """Wave order, then the map's row order (lowest first task id)."""
+    def key(branch):
+        section = 0 if branch.get("section") == "wave" else 1
+        wave = branch.get("wave") if branch.get("wave") is not None else 10**9
+        first = branch["tasks"][0]["id"] if branch.get("tasks") else 10**9
+        return (section, wave, first, branch["name"])
+
+    return sorted(branches, key=key)
+
+
+def _where(branch):
+    if branch.get("section") == "wave" and branch.get("wave") is not None:
+        return f"wave {branch['wave']}"
+    return "blocked"
+
+
+def report_by_branch(built, rows):
+    """Group ready and held tasks by the build-map row.
+
+    The branch is the row `build()` writes, which is the name `--recommend`
+    prints. Branches are ordered by wave, then map order. Tasks inside a
+    branch stay in map order. A task is `T#` plus its short name.
+    """
+    by_num = {}
+    for branch in built.get("branches") or []:
+        for task in branch["tasks"]:
+            by_num[task["id"]] = (branch, task)
+
+    ready = []
+    held = []
+    for row in rows or []:
+        num = _task_num(row.get("task"))
+        if num is None or num not in by_num:
+            continue
+        if row.get("bucket") == "ready":
+            ready.append((num, row))
+        elif row.get("bucket") == "waiting" or row.get("held"):
+            held.append((num, row))
+
+    def gather(pairs):
+        buckets = {}
+        for num, row in pairs:
+            branch, task = by_num[num]
+            buckets.setdefault(branch["name"], {"branch": branch, "items": []})
+            buckets[branch["name"]]["items"].append((task, row))
+        groups = []
+        for branch in _branch_order(built.get("branches") or []):
+            group = buckets.get(branch["name"])
+            if not group:
+                continue
+            group["items"].sort(key=lambda pair: pair[0]["id"])
+            groups.append(group)
+        return groups
+
+    ready_groups = gather(ready)
+    held_groups = gather(held)
+    ready_lines = []
+    for group in ready_groups:
+        labels = "; ".join(task.get("label") or task_label(task["id"], task.get("short")) for task, _row in group["items"])
+        ready_lines.append(f"- `{group['branch']['name']}` ({_where(group['branch'])}): {labels}")
+    held_lines = []
+    for group in held_groups:
+        bits = []
+        for task, row in group["items"]:
+            label = task.get("label") or task_label(task["id"], task.get("short"))
+            bits.append(f"{label} — {held_phrase(row)}")
+        held_lines.append(f"- `{group['branch']['name']}` ({_where(group['branch'])}): " + "; ".join(bits))
+    next_lines = []
+    for group in ready_groups:
+        ids = " ".join(f"T{task['id']}" for task, _row in group["items"])
+        next_lines.append(f"Next: /crav1-build-tasks {ids} (on `{group['branch']['name']}`)")
+    parts = []
+    if ready_lines:
+        parts.append("Ready now")
+        parts.extend(ready_lines)
+    if held_lines:
+        parts.append("Held")
+        parts.extend(held_lines)
+    return {
+        "ready_lines": ready_lines,
+        "held_lines": held_lines,
+        "next_lines": next_lines,
+        "line": "\n".join(parts) if parts else None,
+    }
 
 
 def _question_line(questions, names=None):

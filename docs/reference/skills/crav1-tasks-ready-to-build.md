@@ -10,7 +10,7 @@ List the tasks ready to build, for one spec or all, and why the others are block
 
 **[`/crav1-tasks-ready-to-build`](crav1-tasks-ready-to-build.md)** reads `spec.md` open questions, `plan.md` (the `Reviewed:` line and `## Risks`), `tasks.md`, and `verify.md` for one slice or every slice. A ticked task is Done when `verify.md` lists it as verified, otherwise Needs verify. Then a task is blocked by a missing `plan.md`, by a kept-open question whose `Blocks:` line names it, by a kept-open question with no `Blocks:` line (the whole slice, inferred), by a plan Risk that says do not implement until resolved only when that question has no `Blocks:` line, or by an unticked task in its `(after: T#)` (recorded) or, with no `(after: …)`, the task just before it (inferred). `Blocks: none` blocks no task. Any `Blocks:` line wins over that Risk wording. Lists and Next follow dependency order (1.103.0): the `(after: …)` graph in waves, lowest number first in a wave; Next is the ready task that unblocks the most; a cycle blocks its tasks. It may run `scripts/task_order.py` and `scripts/question_blocks.py` next to the skill. Otherwise it is Ready, with a warning when the plan review is unknown (inferred) or still has open `P#`s.
 
-Shows summary counts per slice, then Ready, Waiting on a question, Waits in order, and Blocked (one reason each, recorded or inferred), Needs verify, a Done count, one `Next:` line (the ready task that unblocks the most others, with a short reason; the unblock step when nothing is ready; verify when only Needs verify is left), and a `Source:` line. A wait on a real earlier task is Waits in order. A cycle, or an after: that names no task, is Blocked. An open question is Waiting on a question. Local only: it never reads Azure Boards and names [`/crav1-ado-sync`](crav1-ado-sync.md) for task states there. It runs no other skill. It can run any time. It is cross-cutting. It is not a starter option.
+Shows summary counts per slice, then Ready and Held grouped by build-map branch, Waits in order, and Blocked (one reason each, recorded or inferred), Needs verify, a Done count, one `Next:` line per ready branch, and a `Source:` line. A wait on a real earlier task is Waits in order. A cycle, or an after: that names no task, is Blocked. An open question is Held with that question. Local only: it never reads Azure Boards and names [`/crav1-ado-sync`](crav1-ado-sync.md) for task states there. It runs no other skill. It can run any time. It is cross-cutting. It is not a starter option.
 
 1.64.0: shows a task's `(branch: …)` and one Branches line from local git only.
 
@@ -30,7 +30,9 @@ Shows summary counts per slice, then Ready, Waiting on a question, Waits in orde
 
 1.129.0: the row branch is `(map:)`, else `(branch:)`, else the plan step, else `committed later on`, else `feat/<slug>-<words>`. `--recommend T#` prints that name and does not write. Tasks are short names (a `task: T#` title in `work-item.md`, else the text up to ` (`, `, in `, or the sentence end, about 80 characters). A removed task id does not leave a dangling possessive, empty parentheses, a leading comma, or a double space. The wave heading is always `N branches, M can start now`, including `1 branch, 1 can start now`. A row whose task text names another branch adds `Task text names feat/x; built on feat/y`.
 
-1.132.0: the result is `ready`, `ready-partial`, or `not-ready`. `ready-partial` lists the tasks that can start and the line (`Ready: T1, T2. Held from T3.`). A task that waits on a held task is held too, reason `held, waits on T3`, and stays under Waiting. `not-ready` is when nothing can start. A ticked task stays in the build map, struck through with its pull request, branch, or commit. A wave whose every task is done is a details block. The rows stay. The heading counts done tasks apart from branches that can start.
+1.132.0: the result is `ready`, `ready-partial`, or `not-ready`. `ready-partial` lists the tasks that can start and where the hold begins. A task that waits on a held task is held too, reason `held, waits on T3`. `not-ready` is when nothing can start. A ticked task stays in the build map, struck through with its pull request, branch, or commit. A wave whose every task is done is a details block. The rows stay. The heading counts done tasks apart from branches that can start.
+
+1.133.0: ready tasks and held tasks are grouped by the build-map row. The branch is `scripts/build_map.py --recommend T#`, so it matches the map. Order is wave, then map order. One `Next:` line per ready branch, for example `Next: [`/crav1-build-tasks`](crav1-build-tasks.md) T2 T5 T6` (on `feat/orders-api-record`). A held line names the open question and who has it, or `held, waits on T3`. The Tasks field is `T#` plus the short name, and a done task is `~~T# short name~~ ✓ done` with its pull request. The ready-check report uses that same form. The map is rewritten every ready check, so the ids do not go stale. Prose outside the Tasks field still drops a task id, and the dangling-text cleanup stays. The walk record stays `Result: ready-partial`.
 
 ## Choice words
 
@@ -57,9 +59,9 @@ Reads, for one slice or every slice under `docs/specs/`, the open questions in `
 
 ## Writes
 
-In short: `docs/specs/<slug>/build-map.md` every run, and a list in chat.
+In short: `docs/specs/<slug>/build-map.md` every run, with `T#` plus the short name in the Tasks field, and a list in chat grouped by branch.
 
-Writes a list in the chat with summary counts, Ready, Waiting on a question, Waits in order, Blocked, Needs verify, a Done count, the next step, and its source, plus one line pointing at the build map. Every run rewrites `docs/specs/<slug>/build-map.md`. The word `build-map` prints only the short summary of that file.
+Writes a list in the chat with summary counts, Ready and Held grouped by build-map branch, Waits in order, Blocked, Needs verify, a Done count, one Next line per ready branch, and its source, plus one line pointing at the build map. Every run rewrites `docs/specs/<slug>/build-map.md`. The Tasks field is `T#` plus the short name. The word `build-map` prints only the short summary of that file.
 
 ## Does not
 

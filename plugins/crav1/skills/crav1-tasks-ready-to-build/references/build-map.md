@@ -1,4 +1,4 @@
-# Build map (1.129.0)
+# Build map (1.133.0)
 
 Read this only when `scripts/build_map.py` cannot run. The script writes the file. Do not invent the map and do not hand-edit it.
 
@@ -19,11 +19,11 @@ The file is committed with the spec. This command does not commit.
 
 ## What a row shows
 
-Six things, and nothing else, plus one note when the task text names a different branch. No estimates. No file lists. No task ids anywhere in the file.
+Six things, and nothing else, plus one note when the task text names a different branch. No estimates. No file lists. Task ids appear in the Tasks field as `T#` plus the short name (1.133.0). Other fields still drop them. The map is rewritten on every ready check, so those ids match `tasks.md`.
 
 1. **Branch.** The task's branch, in this order: `(map: <branch>)`, else `(branch: <branch>)`, else the plan step's `feat/<slug>-<words>` name, else a branch named as `committed later on <branch>` when the task is not on a step, else `feat/<slug>-<words>` from the task. A repo prefix on a mark is dropped. Words in a generated name come from the step or the task, with the small words dropped.
-2. **Delivers.** One line, the step sentence, or the short task names when the branch is not the whole step. A task id is replaced with that task's short name. A removed id does not leave a dangling `'s`, an empty `()`, a leading comma, or a double space.
-3. **Tasks.** One short name per task, separated by `; `. The short name is the `task: T# <title>` line in the slice's `work-item.md` when that line exists. Otherwise it is the task text up to the first ` (`, `, in `, or sentence end, at most about 80 characters. Marks such as `(host setup)`, `(manual, secret)`, `(verify: …)`, `(spec: …)`, `(after: …)`, and branch prefixes are dropped.
+2. **Delivers.** One line, the step sentence, or the short task names when the branch is not the whole step. A task id in that prose is replaced with that task's short name, or removed. A removed id does not leave a dangling `'s`, an empty `()`, a leading comma, or a double space.
+3. **Tasks.** One task per entry, separated by `; `, as `T#` plus the short name. Example: `T5 orders-api: require pipeline 6 as build validation`. The short name is the `task: T# <title>` line in the slice's `work-item.md` when that line exists. Otherwise it is the task text up to the first ` (`, `, in `, or sentence end, at most about 80 characters. Marks such as `(host setup)`, `(manual, secret)`, `(verify: …)`, `(spec: …)`, `(after: …)`, and branch prefixes are dropped. The `T#` stays.
 4. **Waits for.** The other branches it waits for, or `none`. A dependency that names no task is `a dependency that names no task`.
 5. **Question.** Each open question holding the branch, then who has the answer. Who comes from the question's own "Waiting for <who>" phrase, then the latest `Pending:` or `Asked:` line, otherwise `not named yet`.
 6. **Ready now.** One of `ready`, `waiting on a question`, `waits in order`, `blocked`, `done`, or `held, waits on <branch>`. A wait inside the same branch does not change this. `blocked` is a cycle, a dependency that names no task, a plan risk, or a missing plan. `done` means every task on the branch is ticked. `held, waits on <branch>` means this branch has no question of its own and waits on a branch a question holds. That branch cannot start now.
@@ -44,4 +44,27 @@ Numbered items under `## Approach` are the plan steps. A step owns the tasks who
 
 When the plan has no steps, the file says `The plan has no steps, so this map uses one branch per task.` When the steps name no task, it says `The plan steps do not name tasks, so this map uses one branch per task.` A task the steps do not name gets its own branch, and the file says so. A cycle, or an `(after:)` that names no task, is listed under Blocked.
 
-A ticked task stays in its wave row (1.132.0). The Tasks field strikes it through and marks it done, with its pull request link, or the recorded branch, or a commit from `verify.md` when there is no pull request: `~~short name~~ ✓ done ([PR 12](https://github.com/contoso/orders-api/pull/12))`. The link comes from a Match `Branch:` line `(PR n)` and a repo URL in the spec. No network read. A wave whose every task is done is wrapped in `<details><summary>Wave N done (K tasks)</summary>`. The heading, the rows, and the fields stay in the file. Nothing is deleted. When there are no tasks, the file says `Nothing left to build.`
+A ticked task stays in its wave row (1.132.0). The Tasks field strikes the id and the short name through and marks it done, with its pull request link, or the recorded branch, or a commit from `verify.md` when there is no pull request: `~~T5 short name~~ ✓ done ([PR 12](https://github.com/contoso/orders-api/pull/12))`. The link comes from a Match `Branch:` line `(PR n)` and a repo URL in the spec. No network read. A wave whose every task is done is wrapped in `<details><summary>Wave N done (K tasks)</summary>`. The heading, the rows, and the fields stay in the file. Nothing is deleted. When there are no tasks, the file says `Nothing left to build.`
+
+## Ready check (1.133.0)
+
+Read this when the readiness script cannot run. Do not invent branches.
+
+Group the tasks that can start, and the held tasks, by the row `scripts/build_map.py --recommend T#` prints. That is the same branch as the map. Order the branches by wave, then by the order of the rows in the file. One ready branch is still one group.
+
+Print one line per branch. A task is `T#` plus its short name, the same words as the Tasks field.
+
+```text
+Ready now
+- `feat/orders-api-record` (wave 1): T2 Record the decision; T5 Store the card
+- `feat/orders-api-export` (wave 1): T6 Email the receipt
+
+Held
+- `feat/orders-api-currency` (wave 1): T3 Choose the currency — open question "Which currency for refunds?" Waiting for the partner.
+- `feat/orders-api-archive` (wave 2): T4 Archive the receipt — held, waits on T3
+
+Next: /crav1-build-tasks T2 T5 (on `feat/orders-api-record`)
+Next: /crav1-build-tasks T6 (on `feat/orders-api-export`)
+```
+
+A held task names its open question and who has the answer, or `held, waits on T#`. One `Next:` line per branch that has a task that can start, and only when the result is `ready` or `ready-partial`. The ids on that line are the command. The names are on the Ready now line. Do not flatten the branches into one list or one Next line.

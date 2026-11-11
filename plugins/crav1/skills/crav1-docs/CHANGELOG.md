@@ -2,6 +2,13 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.133.0 (2026-11-11)
+
+The ready check groups tasks by the branch they will be built on, and the build map shows the task id with the short name. A minor release because both change what a ready check prints and what `build-map.md` contains.
+
+- **By branch.** `/crav1-tasks-ready-to-build` and the tighten-and-plan ready check no longer print one flat list (`Ready now: T2, T45, T5, T6, T27`) and one Next line. Ready tasks and held tasks are grouped by the build-map row. The branch is the name `scripts/build_map.py --recommend` prints, so it matches the map. Branches are ordered by wave, then by the map's row order. Each ready branch gets its own Next line, for example `Next: /crav1-build-tasks T2 T5 T6` (on `feat/orders-api-record`), so those branches can start together. One ready branch is still one line. A held task stays with its branch and its reason: the open question and who has it, or `held, waits on T3`. The walk record is unchanged: `Result: ready-partial`, `ready`, or `not-ready`.
+- **Task ids on the map.** 1.128.0 kept task ids out of `build-map.md`. The Tasks field now shows `T#` plus the short name, for example `T5 orders-api: require pipeline 6 as build validation`. A done task keeps the 1.132.0 strike and the pull request, with the id: `~~T5 short name~~ ✓ done ([PR 12](https://github.com/contoso/orders-api/pull/12))`. The ready-check report uses that same `T# short name` wherever it names a task. The map is rewritten on every ready check, so the ids match `tasks.md` and do not go stale. Prose outside the Tasks field still drops a task id, and a removed id still does not leave a dangling `'s`, an empty `()`, a leading comma, or a double space.
+
 ## 1.132.0 (2026-11-11)
 
 The ready check can be partly ready, and the build map keeps finished tasks. A minor release because both change what a run records and what `/crav1-build-tasks` will start.

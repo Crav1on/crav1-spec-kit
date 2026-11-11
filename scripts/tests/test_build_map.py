@@ -13,6 +13,17 @@ bm = wrapper.load()
 
 TASK_ID = re.compile(r"\bT\d+\b")
 
+
+def ids_outside_tasks(text):
+    """Task ids belong on the Tasks field (1.133.0). Other lines still drop them."""
+    bad = []
+    for line in text.splitlines():
+        if line.startswith("- Tasks:"):
+            continue
+        if TASK_ID.search(line):
+            bad.append(line)
+    return bad
+
 PLAN = """# Plan: Cancel a booking
 
 ## Approach
@@ -63,7 +74,7 @@ class BuildMap(unittest.TestCase):
         self.assertIn("Persist the decision", record)
         self.assertIn("Reject an unknown booking", record)
         self.assertNotIn("Email the receipt", record)
-        self.assertIsNone(TASK_ID.search(text))
+        self.assertEqual(ids_outside_tasks(text), [])
 
     def test_override_moves_one_task_off_the_step_branch(self):
         tasks = TASKS.replace(
@@ -80,7 +91,7 @@ class BuildMap(unittest.TestCase):
         self.assertIn("- Delivers: Reject an unknown booking", extra)
         receipt = text.split("### feat/cancel-booking-send-receipt", 1)[1]
         self.assertIn("Waits for: feat/cancel-extra", receipt)
-        self.assertIsNone(TASK_ID.search(text))
+        self.assertEqual(ids_outside_tasks(text), [])
 
     def test_waves_follow_branch_dependencies(self):
         text = render()["markdown"]
@@ -127,7 +138,7 @@ class BuildMap(unittest.TestCase):
         self.assertIn("Which locale is on the receipt? — not named yet", record)
         self.assertIn("Which inbox receives the receipt? — a colleague", receipt)
         self.assertIn("Ready now: waiting on a question", record)
-        self.assertIsNone(TASK_ID.search(text))
+        self.assertEqual(ids_outside_tasks(text), [])
 
     def test_readiness_states(self):
         waiting = render(spec="""# Cancel a booking
@@ -161,7 +172,7 @@ class BuildMap(unittest.TestCase):
         self.assertIn("Ready now: blocked", blocked)
         self.assertIn("Waits for: feat/cancel-booking-notify-guest", blocked)
         self.assertIn("Waits for: feat/cancel-booking-store-decision", blocked)
-        self.assertIsNone(TASK_ID.search(cycle["markdown"]))
+        self.assertEqual(ids_outside_tasks(cycle["markdown"]), [])
 
         missing = bm.build("cancel-booking", SPEC, """# Plan
 
@@ -175,7 +186,7 @@ class BuildMap(unittest.TestCase):
         self.assertIn("## Blocked", missing["markdown"])
         self.assertIn(f"Waits for: {bm.UNKNOWN_DEP}", missing["markdown"])
         self.assertIn("Ready now: blocked", missing["markdown"])
-        self.assertIsNone(TASK_ID.search(missing["markdown"]))
+        self.assertEqual(ids_outside_tasks(missing["markdown"]), [])
         self.assertIn("Wave 1: none", missing["summary"])
 
         risk = bm.build(
@@ -186,7 +197,7 @@ class BuildMap(unittest.TestCase):
         )
         self.assertIn("Held: a plan risk blocks the whole slice", risk["markdown"])
         self.assertIn("Ready now: blocked", risk["markdown"])
-        self.assertIsNone(TASK_ID.search(risk["markdown"]))
+        self.assertEqual(ids_outside_tasks(risk["markdown"]), [])
 
         missing_plan = bm.build("cancel-booking", "", None, "- [ ] T1: Store the decision\n")
         self.assertIn("Held: no plan.md.", missing_plan["markdown"])
@@ -199,7 +210,7 @@ class BuildMap(unittest.TestCase):
 
     def test_rendered_map_has_no_task_ids_and_has_mermaid(self):
         text = render()["markdown"]
-        self.assertIsNone(TASK_ID.search(text))
+        self.assertEqual(ids_outside_tasks(text), [])
         self.assertIn("```mermaid", text)
         self.assertIn("flowchart LR", text)
         self.assertNotIn("## Files", text)
@@ -240,7 +251,7 @@ class BuildMap(unittest.TestCase):
             self.assertEqual(pointer, "Build map: docs/specs/cc-1-0/build-map.md")
             self.assertTrue((folder / "build-map.md").is_file())
             written = (folder / "build-map.md").read_text(encoding="utf-8")
-            self.assertIsNone(TASK_ID.search(written))
+            self.assertEqual(ids_outside_tasks(written), [])
             self.assertIn("```mermaid", written)
 
     def test_no_steps_falls_back_to_one_branch_per_task(self):
@@ -252,7 +263,7 @@ class BuildMap(unittest.TestCase):
         self.assertIn("### feat/cancel-booking-persist-decision", text)
         self.assertIn("### feat/cancel-booking-reject-unknown-booking", text)
         self.assertIn("### feat/cancel-booking-email-receipt", text)
-        self.assertIsNone(TASK_ID.search(text))
+        self.assertEqual(ids_outside_tasks(text), [])
 
         unnamed = render(plan="# Plan\n\n## Approach\n\n1. Record the refund decision.\n2. Send the receipt.\n")
         self.assertIn(bm.UNNAMED, unnamed["markdown"])
@@ -355,7 +366,7 @@ class BuildMap(unittest.TestCase):
             self.assertNotIn("can run in parallel", result["markdown"])
             self.assertEqual(result["markdown"].count("Ready now: ready"), 3)
             self.assertNotIn("## Blocked", result["markdown"])
-            self.assertIsNone(TASK_ID.search(result["markdown"]))
+            self.assertEqual(ids_outside_tasks(result["markdown"]), [])
             self.assertIn("Wave 1: 3 branches, 3 can start now —", result["summary"])
 
     def test_same_branch_internal_wait_stays_ready(self):
@@ -415,7 +426,7 @@ class BuildMap(unittest.TestCase):
         result = bm.build("cancel-booking", SPEC, plan, tasks)
         text = result["markdown"]
         row = text.split("### ", 1)[1]
-        self.assertIn("- Tasks: Disable pipelines 7\n", row)
+        self.assertIn("- Tasks: T1 Disable pipelines 7\n", row)
         self.assertNotIn("infra/ado", row.split("- Waits for:", 1)[0].split("- Tasks:", 1)[1])
         self.assertNotIn("(host setup)", row.split("- Tasks:", 1)[1].split("- Waits for:", 1)[0])
         self.assertNotIn("committed later", row.split("- Tasks:", 1)[1].split("- Waits for:", 1)[0])
@@ -429,7 +440,7 @@ class BuildMap(unittest.TestCase):
         self.assertNotIn("(,", prose)
         self.assertNotIn("()", prose)
         self.assertNotIn("  ", prose)
-        self.assertIsNone(TASK_ID.search(text))
+        self.assertEqual(ids_outside_tasks(text), [])
         self.assertIn("## Wave 1: 1 branch, 1 can start now", text)
 
     def test_work_item_title_is_the_short_name(self):
@@ -437,7 +448,7 @@ class BuildMap(unittest.TestCase):
         plan = "# Plan\n\n## Approach\n\n1. Turn the pipelines off. (T1)\n"
         work = "Work item: 44 — task: T1 Turn off pipelines 7 and 24 (ADO: example/orders)\n"
         text = bm.build("cancel-booking", SPEC, plan, tasks, work)["markdown"]
-        self.assertIn("- Tasks: Turn off pipelines 7 and 24\n", text)
+        self.assertIn("- Tasks: T1 Turn off pipelines 7 and 24\n", text)
         self.assertNotIn("infra/ado", text.split("- Tasks:", 1)[1].split("- Waits for:", 1)[0])
         long = "Persist " + " ".join(["word"] * 40)
         self.assertLessEqual(len(bm.short_name(long)), 80)
