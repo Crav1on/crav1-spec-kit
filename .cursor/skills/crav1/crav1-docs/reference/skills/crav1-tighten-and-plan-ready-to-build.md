@@ -34,6 +34,8 @@ The progress file is `docs/specs/<slug>/walk-progress.md`. It records the step, 
 
 1.137.0: `Spec body:` and `Questions version:` split the spec stamp. An edit confined to `## Open questions` reopens resolve-open-questions and does not reopen tighten-spec, plan-from-spec, review-and-tighten-plan, or tasks-ready-to-build. A question with a `Blocks:` line, or one listed on `Kept questions:`, stays Waiting through that drift. A hold inferred from `T#` ids in the question text stays Waiting too. A reopened resolve-open-questions step alone does not force `not-ready` when some tasks can start: the result is `ready-partial`, with `resolve_waiting` and a Next line for that step. When later steps are reopened, Next is `Next: rerun or clear <steps>.`
 
+1.138.0: a task checkbox, a `(PR n)` or `(done)` note on that task line, and `(PR n)` or a trailing merged word on a Match `Branch:` line are progress. The stamp hashes normalized text and writes `Content stamp: normalized`. Those edits do not reopen a step and do not ask to clear. CRLF and LF match. An older step with no Content stamp line still matches a progress-only edit (raw bytes, the other line ending, one hash-undo, then HEAD once). The next record writes the new line. A sentence change or a renamed branch still reopens. When `result` is `not-ready` and `can_start` is not empty, that list is not a start. Print `because`. It names the reopened steps, or the question that holds the whole slice. A progress-only edit leaves a held slice `ready-partial`.
+
 ## Runs when
 
 A spec should be tightened and planned until it is ready to build. Called by the user.

@@ -4,7 +4,7 @@ Read this when `walk-progress.md` is already beside the spec, and again when you
 
 The script `scripts/walk_progress.py` in this skill reads and writes it. Do not hand-edit it. `record` writes only with `--yes`. Show the progress line and get a yes before `record --yes`. The answers inside tighten, open questions, or the plan do not cover that line. Skip this confirm only when the step's own confirm already included this record. An extra's yes is that case, and it stays one confirm.
 
-A version is the first 12 hex characters of the SHA-256 of the file's bytes. A missing file is `missing`. The playbook version is the same kind of hash, of the committed file when one exists. Since 1.137.0 a step that covers the spec also records `Spec body:` (the spec with `## Open questions` removed) and `Questions version:` (that section). An edit confined to that section reopens resolve-open-questions and does not reopen tighten-spec, plan-from-spec, review-and-tighten-plan, or tasks-ready-to-build. That step also records `Kept questions:` for the questions already waiting. A spec change does not reopen the playbook step. The playbook is intake only. After apply, the `Playbook:` line is `docs/playbooks/<topic>.md@<12 hex>`, not the outside path, so resume works on any machine. The script stores that docs path when the file has a `Docs path: docs/playbooks/<topic>.md` line or the same subject as a file under `docs/playbooks/`. Specs apply touched use `Playbook: docs/playbooks/<topic>.md`.
+A version is the first 12 hex characters of a SHA-256. A missing file is `missing`. Since 1.138.0 the hash is of the normalized text, and the step has `Content stamp: normalized`. Progress marks and line endings are not part of that text. The rule is under Progress marks. The playbook version is the same kind of hash, of the committed file when one exists. Since 1.137.0 a step that covers the spec also records `Spec body:` (the spec with `## Open questions` removed) and `Questions version:` (that section). An edit confined to that section reopens resolve-open-questions and does not reopen tighten-spec, plan-from-spec, review-and-tighten-plan, or tasks-ready-to-build. That step also records `Kept questions:` for the questions already waiting. A spec change does not reopen the playbook step. The playbook is intake only. After apply, the `Playbook:` line is `docs/playbooks/<topic>.md@<12 hex>`, not the outside path, so resume works on any machine. The script stores that docs path when the file has a `Docs path: docs/playbooks/<topic>.md` line or the same subject as a file under `docs/playbooks/`. Specs apply touched use `Playbook: docs/playbooks/<topic>.md`.
 
 Shape of the file:
 
@@ -84,6 +84,21 @@ A change from outside the walk is one nobody recorded or covered. A hand edit, o
 - A spec change outside `## Open questions` reopens tighten-spec, resolve-open-questions, and the plan steps. It does not reopen the architecture review once a later spec step is recorded. When that review is the only spec step so far, a spec change reopens it. An edit confined to `## Open questions` reopens only resolve-open-questions.
 - A plan or tasks change reopens the plan review and the ready check. It does not reopen plan-from-spec. A spec change outside the open questions does, because the plan was written from the spec.
 - A `verify.md` change does not reopen the ready check (1.136.0). A playbook file change reopens only the playbook step.
+- A progress-only edit does not reopen any step (1.138.0). Do not ask to clear. Resume stays `keep`.
+
+## Progress marks (1.138.0)
+
+The stamp compares content. It does not compare progress, and it does not compare CRLF with LF.
+
+Ignored on `tasks.md`: the `[ ]` / `[x]` checkbox, a `(PR n)` or `(PR n, merged)` note on that task line, a trailing `(done)`, and a trailing `merged` on that line. The task title, `(branch:)`, `(map:)`, `(after:)`, and `(spec:)` still count.
+
+Ignored on `spec.md` branch lines (`Branch:` under Match, with or without the leading `-`): `(PR n)` and a trailing `merged`. The branch name, `(into …)`, and `(spec branch)` still count. Adding a branch line, or renaming a branch, is a spec change.
+
+`plan.md`, `verify.md`, the playbook, and `## Open questions` ignore line endings only.
+
+A new record writes `Content stamp: normalized` on that step. Resume does not rewrite the file. The next `record` updates earlier steps to that stamp. `Done` and `Result` stay.
+
+An older step has no `Content stamp` line. Its stored hash is the raw bytes from that kit. An unchanged file still matches. A progress-only edit matches too: the script compares the raw bytes, then the other line ending, then one hash-undo over checkbox and `(PR n)` variants (the full set when that is at most 16384, otherwise one line at a time, which covers one tick and any number of added `(PR n)` marks on a short branch list), then `HEAD` once when that blob is the stored stamp and the normalized text matches. It does not walk history. Two or more checkbox edits on a task list longer than 14 lines, when those bytes are not `HEAD`, still look like a content change. The next record writes the new stamp. Do not reopen every old file just because the hash moved.
 
 At the start of a run, resume before recording anything. Resume may report status. When a playbook was named, it does not start a later step, and the playbook question is answered first, including before a read-only check. Redo `continue_from` only after that choice. Do not record a later step to clear an earlier reopen.
 

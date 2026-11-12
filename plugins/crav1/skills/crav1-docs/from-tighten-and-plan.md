@@ -83,7 +83,9 @@ A playbook applied before 1.120.0: reapply the same file. That creates the `docs
 
 ## After
 
-Since 1.137.0 an edit confined to `## Open questions` does not reopen tighten-spec, plan-from-spec, the plan review, or the ready check. It reopens resolve-open-questions. That step alone leaves the result `ready-partial` when some tasks can start, with a Waiting line and a Next line for `/crav1-resolve-open-questions`. When later steps really did reopen, Next names them: `Next: rerun or clear <steps>.`
+Since 1.137.0 an edit confined to `## Open questions` does not reopen tighten-spec, plan-from-spec, the plan review, or the ready check. It reopens resolve-open-questions. That step alone leaves the result `ready-partial` when some tasks can start, with a Waiting line and a Next line for `/crav1-resolve-open-questions`. When later steps really did reopen, Next names them: `Next: rerun or clear <steps>.` The result of that real change is `not-ready`. Do not say the tasks in `can_start` can start. The check's `because` line names the reopened steps, or the question when it holds the whole slice.
+
+Since 1.138.0 a checkbox tick, a `(PR n)` or `(done)` note on that task line, and `(PR n)` on a Match `Branch:` line are progress. They do not reopen a step, and the walk does not ask to clear. CRLF and LF are the same text. An older `walk-progress.md` with no `Content stamp:` line still matches those edits. The next record writes `Content stamp: normalized`. A sentence change, or a renamed branch, still reopens the steps that change affects.
 
 When the check is clear, the slice is ready to build. You run build yourself:
 

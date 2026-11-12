@@ -1247,7 +1247,7 @@ marks:
     examples:
       - "  Spec version: a1b2c3d4e5f6"
       - "  Spec version: missing"
-    meaning: "The whole spec file that step covered. Since 1.123.0 a later step inside the walk updates this and the earlier step stays done. Since 1.137.0 Spec body and Questions version say whether the change was only the open questions. A change from outside the walk reopens the step only when a spec change affects it."
+    meaning: "The whole spec file that step covered. Since 1.123.0 a later step inside the walk updates this and the earlier step stays done. Since 1.137.0 Spec body and Questions version say whether the change was only the open questions. Since 1.138.0, with Content stamp normalized, (PR n) on a Match Branch line does not change this hash. A change from outside the walk reopens the step only when a spec change affects it."
     written_by: [crav1-tighten-and-plan-ready-to-build]
     read_by: [crav1-tighten-and-plan-ready-to-build]
     since: 1.119.0
@@ -1294,6 +1294,19 @@ marks:
     read_by: [crav1-tighten-and-plan-ready-to-build]
     since: 1.137.0
 
+  - id: walk-content-stamp
+    name: "Content stamp"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md (under a step)"]
+    format: "  Content stamp: normalized"
+    pattern: '^  Content stamp: normalized$'
+    examples:
+      - "  Content stamp: normalized"
+    meaning: "The versions on this step hash normalized text. Line endings do not count. A task checkbox, a (PR n) or (done) note on that task line, and (PR n) or a trailing merged word on a Match Branch line do not count. An older step has no such line. A progress-only edit still matches. The next record writes this line."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    since: 1.138.0
+
   - id: walk-plan-version
     name: "Plan version"
     group: walk
@@ -1317,7 +1330,7 @@ marks:
     examples:
       - "  Tasks version: a1b2c3d4e5f6"
       - "  Tasks version: missing"
-    meaning: "The tasks contents that step covered."
+    meaning: "The tasks contents that step covered. Since 1.138.0, with Content stamp normalized, a checkbox tick and a PR or done note on the task line do not change this hash."
     written_by: [crav1-tighten-and-plan-ready-to-build]
     read_by: [crav1-tighten-and-plan-ready-to-build]
     since: 1.119.0

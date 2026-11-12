@@ -2,6 +2,15 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.138.0 (2026-11-12)
+
+Recording progress no longer reopens the tighten-and-plan walk. A minor release because the stamp, the clear question, and the not-ready wording change.
+
+- **Progress is not content.** A task checkbox (`[ ]` / `[x]`), a `(PR n)` or `(done)` note on that task line, and `(PR n)` or a trailing `merged` on a Match `Branch:` line are ignored when the walk compares `spec.md` and `tasks.md`. CRLF and LF are the same text. The branch name, `(into …)`, `(spec branch)`, `(branch:)`, and `(map:)` still count. A sentence change, or a renamed branch, still reopens the steps that change affects.
+- **No clear question.** When those are the only edits, resume stays `keep`. The walk does not ask to clear steps. The next `record` writes `Content stamp: normalized` and refreshes the stored hashes. `Done` and `Result` stay. Resume itself does not rewrite the file.
+- **Older stamps.** A step with no `Content stamp` line still has the raw hash from that kit. An unchanged file matches. A progress-only edit matches too: raw bytes, then the other line ending, then one hash-undo over checkbox and `(PR n)` variants (the full set up to 16384, otherwise one line at a time, which covers one tick and added `(PR n)` marks), then `HEAD` once when that blob is the stored stamp. It does not walk git history. Two or more checkbox edits on a task list longer than 14 lines, when those bytes are not `HEAD`, still look like a content change until the next record writes the new line. Old files do not all reopen just because the hash moved.
+- **not-ready and can_start.** A hard hit (a reopened step, a jump-back question, Needs verify, an assumption) forces `not-ready` and can still list ready-bucket tasks in `can_start`. Those tasks are not a start. `because` names the reopened steps, or the question when a row holds the whole slice. A checkbox tick plus `(PR n)` on a branch line is not that hit. With open questions that hold some tasks and leave others free, the result stays `ready-partial`.
+
 ## 1.137.0 (2026-11-12)
 
 One new open question no longer freezes a slice that was already ready-partial. A minor release because question holds, the spec stamp, the tick path, and spec-folder matching all change.
