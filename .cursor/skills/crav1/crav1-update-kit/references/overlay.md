@@ -32,7 +32,7 @@ CRLF and LF compare equal (1.132.0). A local file that matches the old release a
 
 ## Left alone
 
-Never write these, even if a release tree contains them: a spec folder (`walk-progress.md`, `spec.md`, `plan.md`, `tasks.md`, `verify.md`, `work-item.md`, `build-map.md`), the rest of `docs/system/`, `docs/notes/`, `docs/playbooks/`, `docs/environments/`, `docs/research/`, `docs/sources/`, a product `AGENTS.md`, `kit-maintainer.mdc`, the draft-commit persist rules, and the transfer data policy. Do not run `sync-crav1-plugin.sh` or the other maintainer generators in the consumer project. The release already contains the generated docs and the Claude Code drop-in.
+Never write these, even if a release tree contains them: a spec folder (`walk-progress.md`, `spec.md`, `plan.md`, `tasks.md`, `verify.md`, `work-item.md`, `build-map.md`), the rest of `docs/system/`, `docs/notes/`, `docs/playbooks/`, `docs/environments/`, `docs/research/`, `docs/sources/`, a product `AGENTS.md`, `kit-maintainer.mdc`, the draft-commit persist rules, and the transfer data policy. Do not run `sync-crav1-plugin.sh` or the other maintainer generators in the consumer project. The release already contains the generated docs and the Claude Code drop-in. A later `git merge` that conflicts on `walk-progress.md` version lines is `/crav1-finalize-commit` `references/pull.md` (1.139.0), not this replace.
 
 ## Commit
 
