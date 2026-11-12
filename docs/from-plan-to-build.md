@@ -96,6 +96,10 @@ A task marked `(host setup)` is a host setting, not a file. The worker writes th
 
 When the build writes a new `.sh` file, the repo has no `*.sh` rule with `eol=lf`, and `core.autocrlf` is true or the host is Windows, the run offers one line in `.gitattributes`: `*.sh text eol=lf`. It does not add the line unless you accept.
 
+## One walk for the branch (1.142.0)
+
+`/crav1-build-walk` is the guided path. It opens `/crav1-build-tasks` for the tasks on one work branch, then verify, commit, the pull request, merging the base into the branch, the merge, and the tick. While that walk runs, the open-pr line from a build is not printed. The walk prints one Next. See [Build one branch, then the next](from-build-walk.md).
+
 ## After
 
 Prove the slice against the spec: [Verify and fix](from-verify.md). Then [From commit to merge](from-commit.md).

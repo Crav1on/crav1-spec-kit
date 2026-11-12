@@ -182,8 +182,9 @@ Read `references/fallback.md` ("Auth notes") only when a CLI says it is not sign
 - Do not run `az rest` to complete, update, or bypass a pull request. The parent-count fallback in **Merge** may GET one commit when git cannot see it.
 - Do not claim a merge commit hash the host did not return.
 - Do not claim a no-fast-forward merge unless the parent count was verified as two. A null `lastMergeCommit.parents` is not that count.
-- Do not run this skill from `/crav1-open-pr`, `crav1-build-task-agent`, or `/crav1-review-pr`.
+- Do not run this skill from `/crav1-open-pr`, `crav1-build-task-agent`, or `/crav1-review-pr`. A yes on `/crav1-build-walk`'s card that names this pull request is the ask in this turn. The walk opens this file after that yes.
 - Do not run `/crav1-review-pr`. A review is not a merge ask. A required host check that is red still stops this skill.
+- When `/crav1-build-walk` opened this file, do not print a line of your own for what to run next. The walk prints its one line (1.142.0).
 
 
 ## Choice words (1.69.0)

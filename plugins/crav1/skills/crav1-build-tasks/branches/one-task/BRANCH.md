@@ -49,6 +49,8 @@ Show the worker’s recap and STATUS.
 | `needs_yes` | Not blocked. The task stays unticked. Offer the Approval needed item as skill `crav1-build-tasks`, `references/approval-needed.md` says. End with `Waiting: <who>'s yes to <what>.` Example: `Waiting: the partner's yes to turn off pipelines 7 and 24.` |
 | `blocked` / `failed` | Show DETAIL. Do not start another `T#`. A missing yes is `needs_yes`, not this row. |
 
+When `/crav1-build-walk` opened this skill, do not print the open-pr line in the done row. The walk prints its one line (1.142.0).
+
 When STATUS includes a `NOTES:` line from `scripts/sh_eol.py`, offer accept / skip under it. Accept launches the same worker with `resume: eol`, which adds `*.sh text eol=lf` to `.gitattributes` and nothing else. Skip adds nothing. A headless run skips. Never add the line without a yes. This offer is outside the prompt budget.
 
 After this standalone run ends (any STATUS, or they `stop`), follow **tool-approvals.md → Undo**. Do not undo if this invocation skipped the pause (`approvals: already-done` from build-tasks).

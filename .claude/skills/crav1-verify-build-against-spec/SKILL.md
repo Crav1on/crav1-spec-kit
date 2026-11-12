@@ -92,6 +92,8 @@ Same order as the file. Do **not** open with the full acceptance matrix.
    - All verified, and a work branch is not merged: `Next: /crav1-open-pr, because a work branch is not merged yet.` Say `built and verified, not merged yet: <branches>`. A branch with `(PR <n>)` names it: `/crav1-open-pr` to push to PR <n> and update its description or comment.
    - All verified and every work branch is merged: `Next: nothing needed now.` The spec is demoable.
 
+When `/crav1-build-walk` opened this skill, do not print the case line above. The walk prints its one line (1.142.0).
+
 Do not start implementing in this turn unless they already named a `T#` to fix.
 
 ## Hard rules

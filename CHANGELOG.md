@@ -2,6 +2,17 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.142.0 (2026-11-12)
+
+One guided walk for the build side of a slice. A minor release because `/crav1-build-walk` is a new command, a step skill's Next is replaced while that walk runs, and a live task records the user's own yes.
+
+- **Command.** `/crav1-build-walk` is in the Build lane. It walks one work branch through build (`/crav1-build-tasks`), verify, `/crav1-finalize-commit`, `/crav1-open-pr`, merging the base into the branch, merging the pull request, the tick, and the next task. It opens those skills by file. It does not replace them. A step that writes, pushes, opens, or merges asks `yes` first. It never rebases.
+- **One Next.** While one branch is in progress the reply has one `Next:` line, the walk's. A step skill's own Next, such as `/crav1-open-pr` after a build, is not printed. Started from a ready-to-build report, before a branch is chosen, the walk prints one Next per ready branch, with the T number beside the task name.
+- **Progress.** One file per work branch, `docs/specs/<slug>/build-progress/<branch>.md`. The file name writes each `/` as `--`. Hashes follow the walk-progress rule: `Content stamp: normalized` ignores line endings, a checkbox, a `(PR n)` or `(done)` note, and a `(live yes: …)` note. A stamp-only merge conflict is settled by `build_walk.py resolve-stamps`. `/crav1-finalize-commit` runs that on the pull path. `/crav1-update-kit` leaves the file alone.
+- **Other-owner mode.** When the pull request author or a commit author is someone else, the walk confirms before `switch`. In that mode it never opens a pull request, never merges the base into the branch, and never merges or completes the pull request. It posts one comment per push. It edits the description only on `edit description`. Ticks wait until that pull request is merged.
+- **Stacking.** Work may continue on other branches while earlier branches are unmerged. A task that needs code from an unmerged branch is cut from that branch, not from `develop`. The progress file and the report show the merge list, child first, back into the branch it was cut from. A merged or deleted branch is not offered. The offer uses the 1.140.0 helper.
+- **Runs live.** A task marked `(Runs live)` gets a script, a dry run (`check`), then the user's yes before the live run. The yes is `(live yes: <name>, <date>)` on the task line. Without that yes the script may be written and the task stays unticked. An unapproved `## Approval needed` item holds the task and the Next line is `/crav1-record-approval` or the draft request. An `Approved:` line does not replace the user's own yes.
+
 ## 1.141.0 (2026-11-12)
 
 A named person's yes can be recorded, and it stays recorded. A minor release because the spec gains an Approval needed item, the ready check holds only the tasks that item names, and a new command writes the lasting line.

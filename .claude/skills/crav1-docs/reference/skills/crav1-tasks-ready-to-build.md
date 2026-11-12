@@ -81,7 +81,7 @@ Limits and exceptions: does not guess a dependency or a blocking link from task 
 
 ## You run next / Runs by itself
 
-- You run next: [`/crav1-build-tasks`](crav1-build-tasks.md)
+- You run next: [`/crav1-build-walk`](crav1-build-walk.md); [`/crav1-build-tasks`](crav1-build-tasks.md)
 - Runs by itself: Calls no skill.
 
 ## Lane and group

@@ -51,6 +51,11 @@ routes:
       - skills: [crav1-tasks-ready-to-build]
         optional: true
         when: Any time, to see which tasks are ready, which are blocked and why. Read-only.
+      - skills: [crav1-build-walk]
+        optional: true
+        when: "One work branch at a time: build, verify, commit, open the pull request, merge the base into the branch, merge the pull request, tick, then the next task. One Next while it runs. It does not replace build-tasks."
+        then:
+          crav1-build-walk: [crav1-verify-build-against-spec]
       - skills: [crav1-build-tasks, crav1-build-features]
         when: "One task, a range, or all (build-tasks), or whole features (build-features). Each task runs in its own worker that implements, commits, and verifies it, so they go straight to the pull request."
         then:
@@ -217,4 +222,5 @@ override:
   crav1-export-spec: []
   crav1-help: [The skill or route step it names]
   crav1-update-kit: ["nothing needed now"]
-  crav1-tasks-ready-to-build: [/crav1-build-tasks]
+  crav1-tasks-ready-to-build: [/crav1-build-walk, /crav1-build-tasks]
+  crav1-build-walk: [/crav1-build-walk, /crav1-verify-build-against-spec]

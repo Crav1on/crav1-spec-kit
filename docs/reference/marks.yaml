@@ -1532,3 +1532,150 @@ marks:
     read_by: [crav1-resolve-open-questions, crav1-tighten-and-plan-ready-to-build]
     since: 1.120.0
 
+  - id: build-walk-name
+    name: "Build walk"
+    group: walk
+    files: ["docs/specs/<slug>/build-progress/<branch>.md (near the title)"]
+    format: "Walk: build-walk"
+    pattern: '^Walk: build-walk$'
+    examples:
+      - "Walk: build-walk"
+    meaning: "This file is one work branch of /crav1-build-walk. It is not walk-progress.md."
+    written_by: [crav1-build-walk]
+    read_by: [crav1-build-walk]
+    since: 1.142.0
+
+  - id: build-branch
+    name: "Build branch"
+    group: walk
+    files: ["docs/specs/<slug>/build-progress/<branch>.md (near the title)"]
+    format: "Branch: <branch>"
+    pattern: '^Branch: \S+$'
+    examples:
+      - "Branch: feat/orders-host-setup-scripts"
+    meaning: "The work branch this progress file records. The file name writes each slash as --."
+    written_by: [crav1-build-walk]
+    read_by: [crav1-build-walk]
+    since: 1.142.0
+
+  - id: build-owner
+    name: "Build owner"
+    group: walk
+    files: ["docs/specs/<slug>/build-progress/<branch>.md (near the title)"]
+    format: "Owner: <self | other>"
+    pattern: '^Owner: (self|other)$'
+    examples:
+      - "Owner: self"
+      - "Owner: other"
+    meaning: "self is this user's branch. other is another developer's branch, and only after switch."
+    written_by: [crav1-build-walk]
+    read_by: [crav1-build-walk]
+    since: 1.142.0
+
+  - id: build-tasks-line
+    name: "Build tasks"
+    group: walk
+    files: ["docs/specs/<slug>/build-progress/<branch>.md (near the title)"]
+    format: "Tasks: <T# name>[; <T# name>]"
+    pattern: '^Tasks: (none|T\d+ .+(?:; T\d+ .+)*)$'
+    examples:
+      - "Tasks: T3 Apply the CI build policy"
+      - "Tasks: none"
+    meaning: "The tasks on this work branch, T number beside the short name."
+    written_by: [crav1-build-walk]
+    read_by: [crav1-build-walk]
+    since: 1.142.0
+
+  - id: build-cut-from
+    name: "Cut from"
+    group: walk
+    files: ["docs/specs/<slug>/build-progress/<branch>.md (near the title)"]
+    format: "Cut from: <branch>"
+    pattern: '^Cut from: \S+$'
+    examples:
+      - "Cut from: develop"
+      - "Cut from: feat/orders-host-setup-scripts"
+    meaning: "The branch this work branch was cut from. An unmerged dependency branch, not the base, when the task needs that code."
+    written_by: [crav1-build-walk]
+    read_by: [crav1-build-walk]
+    since: 1.142.0
+
+  - id: build-merge-list-none
+    name: "Merge list none"
+    group: walk
+    files: ["docs/specs/<slug>/build-progress/<branch>.md (near the title)"]
+    format: "Merge list: none"
+    pattern: '^Merge list: none$'
+    examples:
+      - "Merge list: none"
+    meaning: "This branch was not cut from another unmerged work branch."
+    written_by: [crav1-build-walk]
+    read_by: [crav1-build-walk]
+    since: 1.142.0
+
+  - id: build-merge
+    name: "Merge order"
+    group: walk
+    files: ["docs/specs/<slug>/build-progress/<branch>.md (under Merge list)"]
+    format: "Merge: <branch> into <branch>"
+    pattern: '^Merge: \S+ into \S+$'
+    examples:
+      - "Merge: feat/orders-note into feat/orders-host-setup-scripts"
+    meaning: "This branch merges back into the branch it was cut from. Child lines come before the parent."
+    written_by: [crav1-build-walk]
+    read_by: [crav1-build-walk]
+    since: 1.142.0
+
+  - id: build-step
+    name: "Build step"
+    group: walk
+    files: ["docs/specs/<slug>/build-progress/<branch>.md"]
+    format: "- Step: <build | verify | commit | open-pr | merge-base | merge-pr | tick | comment>"
+    pattern: '^- Step: (build|verify|commit|open-pr|merge-base|merge-pr|tick|comment)$'
+    examples:
+      - "- Step: build"
+    meaning: "A finished step on this work branch. One record per step."
+    written_by: [crav1-build-walk]
+    read_by: [crav1-build-walk]
+    since: 1.142.0
+
+  - id: build-content-stamp
+    name: "Build content stamp"
+    group: walk
+    files: ["docs/specs/<slug>/build-progress/<branch>.md (under a step)"]
+    format: "  Content stamp: normalized"
+    pattern: '^  Content stamp: normalized$'
+    examples:
+      - "  Content stamp: normalized"
+    meaning: "The hashes on this step ignore line endings, a checkbox, a (PR n) or (done) note, and a (live yes) note."
+    written_by: [crav1-build-walk]
+    read_by: [crav1-build-walk]
+    mention: 'Content stamp'
+    since: 1.142.0
+
+  - id: runs-live
+    name: "Runs live"
+    group: plan
+    files: ["docs/specs/<slug>/tasks.md (on a task line)"]
+    format: "(Runs live)"
+    pattern: '^\(Runs live\)$'
+    examples:
+      - "(Runs live)"
+    meaning: "This task's build runs a live change, such as a CI policy or a host setting. The walk writes the script, runs check, then asks for the user's yes."
+    written_by: [crav1-build-walk]
+    read_by: [crav1-build-walk]
+    since: 1.142.0
+
+  - id: live-yes
+    name: "Live yes"
+    group: plan
+    files: ["docs/specs/<slug>/tasks.md (on a Runs live task line)"]
+    format: "(live yes: <name>, <YYYY-MM-DD>)"
+    pattern: '^\(live yes: [^,]+, \d{4}-\d{2}-\d{2}\)$'
+    examples:
+      - "(live yes: person A, 2026-11-12)"
+    meaning: "The user's own yes to run the live change, with name and date. An Approved line does not replace it. The checkbox stays open until the later tick."
+    written_by: [crav1-build-walk]
+    read_by: [crav1-build-walk]
+    since: 1.142.0
+

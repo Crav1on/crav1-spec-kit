@@ -18,6 +18,8 @@ Draft the commit message, then commit, copy, change, or stop.
 
 Only write the message (was `/crav1-draft-commit-message`): Paste-ready Summary/Description for any git client; CRAV1 style or live git log, once or onward (deletable rule); does not commit unless they ask. Optional Azure Boards mention from `docs/specs/<slug>/work-item.md` is the last description line.
 
+1.142.0: an unfinished build-progress file for this branch comes before the open-pr line. A build-progress conflict that is only hash lines is settled on the pull path, the same way as walk-progress.md.
+
 Commit (was [`/crav1-finalize-commit`](crav1-finalize-commit.md)): Same draft, then **commit first**, then copy for your git client, change (edit or rewrite), or stop (no push). Keeps that mention through the HEAD check and the strip of the known tool trailers it did not write (the list in `references/tool-trailers.md`: Cursor, Claude Code, Copilot, Aider, Codex, Gemini, Jules, Devin and more); `Signed-off-by` and a real person's `Co-authored-by` stay (1.94.0).
 
 Trailer hook (1.90.0): asked once per repo in the same prompt, "Strip tool trailers on every commit for this repo?". `strip trailers` writes a committed `.githooks/commit-msg` (POSIX sh) that removes only the known tool trailers in `references/tool-trailers.md`, runs `git config core.hooksPath .githooks`, and saves the answer in a `trailer-hook` rule. `Signed-off-by` and human `Co-authored-by` lines stay. A teammate whose repo has the hook but not the config gets the config line on their first run, with no question. `keep trailers` saves no and never asks again.

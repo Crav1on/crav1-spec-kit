@@ -66,6 +66,7 @@ docs/specs/
     notes.md         # optional, from ideas-to-spec
     explore.md       # bugs from /crav1-run-exploratory-test
     walk-progress.md # position of /crav1-tighten-and-plan-ready-to-build; not the source of truth
+    build-progress/  # one file per work branch for /crav1-build-walk; not the source of truth
     work-item.md     # Azure Boards ids, one per line
 ```
 
@@ -95,6 +96,7 @@ docs/specs/
 | `docs/specs/<slug>/spec.md` | What and why, acceptance, open questions | spark, ideas, intake (through `crav1-bundle-slice-agent`), match; then tighten-spec, resolve-open-questions, add-to-spec, match-dump, add-to-spec, and review-security | Every later lane |
 | `docs/specs/<slug>/plan.md`, `tasks.md` | How, constraints, files, linter; ordered testable tasks | `/crav1-plan-from-spec`, `/crav1-tighten-plan`; `[x]` on a task row by implement and build-tasks | Build, verify, review |
 | `docs/specs/<slug>/build-map.md` | How the slice will be built, by branch, in waves. The row branch is `(map:)`, else `(branch:)`, else the plan step, else `committed later on` (1.129.0). Since 1.133.0 the Tasks field is `T#` plus the short name (`T5 orders-api: require pipeline 6 as build validation`). A done task is `~~T# short name~~ ✓ done` with its pull request, branch, or commit. Other prose drops task ids. A mismatch note when the task text names another branch. Since 1.132.0 a ticked task stays in its wave. A wave whose every task is done is a `<details>` block; the rows stay. Rewritten every ready check, so the ids match `tasks.md`; committed with the spec | `/crav1-tasks-ready-to-build`, through `scripts/build_map.py` | The owner, `/crav1-build-tasks`, and `/crav1-tasks-ready-to-build` `build-map` |
+| `docs/specs/<slug>/build-progress/<branch>.md` | Position of `/crav1-build-walk` for one work branch (1.142.0). The file name writes each `/` as `--`. It records the step, normalized hashes (`Content stamp: normalized`), `Owner:`, `Cut from:`, and the merge list. A checkbox, a `(PR n)`, and `(live yes: …)` do not change the hash. Not the source of truth | `/crav1-build-walk`, through `scripts/build_walk.py`, after a yes | `/crav1-build-walk`. `/crav1-finalize-commit` settles a stamp-only conflict. `/crav1-update-kit` leaves it alone |
 | `docs/specs/<slug>/verify.md` | The acceptance matrix. Since 1.136.0 it can list **Implemented, verified, tick pending**. The ready check reads it and, when it is behind `tasks.md`, prints a Waiting line. A verify-only change does not reopen the ready check. The tighten-and-plan walk and `/crav1-tasks-ready-to-build` do not write it. Verify may tick one merged row in `tasks.md` after a yes | `/crav1-verify-build-against-spec`; one row by `/crav1-fix-build-gaps` | `/crav1-open-pr`, `/crav1-review-pr`, `/crav1-tasks-ready-to-build`, `/crav1-tighten-and-plan-ready-to-build` |
 | `docs/specs/<slug>/fix-log.md` | One gap from verify, the fix, and the re-proof | `/crav1-fix-build-gaps` | Verify, review |
 | `docs/specs/<slug>/live-fix.md` | Legacy. New incidents go in `fix-log.md` | Nothing new | Read when present |
@@ -107,7 +109,7 @@ docs/specs/
 
 The host file names for the two rules are in [install](../install.md) and on the skill pages.
 
-**Kit drop-in (1.131.0).** `/crav1-update-kit` replaces the installed kit on the current branch from a published release: `.cursor/skills/crav1/`, `.cursor/agents/crav1-*.md`, the `crav1-*` folders and `README.md` under `.cursor/agent-assets/`, `.cursor/rules/crav1.mdc`, and the Claude Code twins under `.claude/` (`crav1-*` skills, `crav1-docs`, `crav1-*` agents, `crav1-*` agent assets, and `CLAUDE.md`). A file already copied from `docs/specs/_template/` or `docs/system/_template/` is replaced only when it still matches the old kit apart from line endings (1.132.0). Kit files are compared the same way: CRLF and LF are not a local edit. Specs, `walk-progress.md`, plans, tasks, notes, playbooks, the build map, and the rest of `docs/system/` are not part of that replace.
+**Kit drop-in (1.131.0).** `/crav1-update-kit` replaces the installed kit on the current branch from a published release: `.cursor/skills/crav1/`, `.cursor/agents/crav1-*.md`, the `crav1-*` folders and `README.md` under `.cursor/agent-assets/`, `.cursor/rules/crav1.mdc`, and the Claude Code twins under `.claude/` (`crav1-*` skills, `crav1-docs`, `crav1-*` agents, `crav1-*` agent assets, and `CLAUDE.md`). A file already copied from `docs/specs/_template/` or `docs/system/_template/` is replaced only when it still matches the old kit apart from line endings (1.132.0). Kit files are compared the same way: CRLF and LF are not a local edit. Specs, `walk-progress.md`, `build-progress/`, plans, tasks, notes, playbooks, the build map, and the rest of `docs/system/` are not part of that replace.
 
 ## Notes
 
@@ -365,6 +367,8 @@ Every mark and line format the kit writes inside product files, generated from [
 | (branch: …) | `(branch: [<repo> ]<branch>)` | `docs/specs/<slug>/tasks.md` (end of a task line, after (after: …)) | `/crav1-plan-from-spec` | `/crav1-build-tasks`, `/crav1-build-features`, `/crav1-create-feature-branch`, `/crav1-tasks-ready-to-build`, `/crav1-verify-build-against-spec`, `/crav1-help`, `/crav1-review-pr` | 1.64.0 |
 | (step: …) | `(step: <n>)` | `docs/specs/<slug>/tasks.md` (end of a task line) | `/crav1-plan-from-spec` | `/crav1-tasks-ready-to-build` | 1.128.0 |
 | (map: …) | `(map: [<repo> ]<branch>)` | `docs/specs/<slug>/tasks.md` (end of a task line) | `/crav1-plan-from-spec`, `/crav1-create-feature-branch` | `/crav1-tasks-ready-to-build`, `/crav1-build-tasks`, `/crav1-create-feature-branch`, `/crav1-build-features` | 1.128.0 |
+| Runs live | `(Runs live)` | `docs/specs/<slug>/tasks.md` (on a task line) | `/crav1-build-walk` | `/crav1-build-walk` | 1.142.0 |
+| Live yes | `(live yes: <name>, <YYYY-MM-DD>)` | `docs/specs/<slug>/tasks.md` (on a Runs live task line) | `/crav1-build-walk` | `/crav1-build-walk` | 1.142.0 |
 
 ### Walk progress
 
@@ -392,6 +396,15 @@ Every mark and line format the kit writes inside product files, generated from [
 | Jump open | `  Open: ../crav1-tighten-spec/SKILL.md` | `docs/specs/<slug>/walk-progress.md` (under a jump-back) | `/crav1-tighten-and-plan-ready-to-build` | `/crav1-tighten-and-plan-ready-to-build` | 1.135.0 |
 | Continue | `  Continue: <step>[, <step>]` | `docs/specs/<slug>/walk-progress.md` (under a jump-back or open point) | `/crav1-tighten-and-plan-ready-to-build` | `/crav1-tighten-and-plan-ready-to-build` | 1.135.0 |
 | Finding key | `  Key: <12 hex>` | `docs/specs/<slug>/walk-progress.md` (under a jump-back or open point) | `/crav1-tighten-and-plan-ready-to-build` | `/crav1-tighten-and-plan-ready-to-build` | 1.135.0 |
+| Build walk | `Walk: build-walk` | `docs/specs/<slug>/build-progress/<branch>.md` (near the title) | `/crav1-build-walk` | `/crav1-build-walk` | 1.142.0 |
+| Build branch | `Branch: <branch>` | `docs/specs/<slug>/build-progress/<branch>.md` (near the title) | `/crav1-build-walk` | `/crav1-build-walk` | 1.142.0 |
+| Build owner | `Owner: <self \| other>` | `docs/specs/<slug>/build-progress/<branch>.md` (near the title) | `/crav1-build-walk` | `/crav1-build-walk` | 1.142.0 |
+| Build tasks | `Tasks: <T# name>[; <T# name>]` | `docs/specs/<slug>/build-progress/<branch>.md` (near the title) | `/crav1-build-walk` | `/crav1-build-walk` | 1.142.0 |
+| Cut from | `Cut from: <branch>` | `docs/specs/<slug>/build-progress/<branch>.md` (near the title) | `/crav1-build-walk` | `/crav1-build-walk` | 1.142.0 |
+| Merge list none | `Merge list: none` | `docs/specs/<slug>/build-progress/<branch>.md` (near the title) | `/crav1-build-walk` | `/crav1-build-walk` | 1.142.0 |
+| Merge order | `Merge: <branch> into <branch>` | `docs/specs/<slug>/build-progress/<branch>.md` (under Merge list) | `/crav1-build-walk` | `/crav1-build-walk` | 1.142.0 |
+| Build step | `- Step: <build \| verify \| commit \| open-pr \| merge-base \| merge-pr \| tick \| comment>` | `docs/specs/<slug>/build-progress/<branch>.md` | `/crav1-build-walk` | `/crav1-build-walk` | 1.142.0 |
+| Build content stamp | `  Content stamp: normalized` | `docs/specs/<slug>/build-progress/<branch>.md` (under a step) | `/crav1-build-walk` | `/crav1-build-walk` | 1.142.0 |
 
 ### `docs/playbooks/`
 

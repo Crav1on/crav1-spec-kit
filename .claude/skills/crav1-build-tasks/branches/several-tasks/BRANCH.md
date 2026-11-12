@@ -68,6 +68,8 @@ TL;DR: finished `T#`s, blocked `T#` + why, not started, commits the workers repo
 
 `Next: /crav1-open-pr, because the work is not on a pull request yet.` When the head's Match `Branch:` line ends in `(PR <n>)` or a pull request is known to be open for it, name it instead: `/crav1-open-pr` to push to PR <n> and update its description or comment. Do not run it from this skill.
 
+When `/crav1-build-walk` opened this skill, do not print that line. The walk prints its one line (1.142.0).
+
 If every selected task is `done`: one sentence that the requested slice is demoable (other unchecked `T#`s may remain if they passed a range).
 
 Then follow **tool-approvals.md → Undo** once (restore the mode they wrote at the pause). Do not undo after each `T#`.

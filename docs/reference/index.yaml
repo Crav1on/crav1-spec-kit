@@ -91,6 +91,11 @@ skills:
     starter: false
     page: reference/skills/crav1-build-features.md
     purpose: "Serial board: build several ready specs one slug after another in this checkout."
+  crav1-build-walk:
+    lane: build
+    starter: false
+    page: reference/skills/crav1-build-walk.md
+    purpose: "Walk one work branch from build through merge, with one Next while it runs."
   crav1-verify-build-against-spec:
     lane: build
     starter: false

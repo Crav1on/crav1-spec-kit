@@ -44,6 +44,7 @@ The core loop, after a starter:
 - [Tighten and plan until ready to build](from-tighten-and-plan.md): one guided walk, with or without a playbook, stopping before build
 - [From a spec to a plan](from-spec-to-plan.md)
 - [Build tasks](from-plan-to-build.md)
+- [Build one branch, then the next](from-build-walk.md)
 - [Verify and fix](from-verify.md)
 - [From commit to merge](from-commit.md)
 

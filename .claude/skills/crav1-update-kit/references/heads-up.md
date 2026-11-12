@@ -28,7 +28,7 @@ The body, in this order:
 
 1. You are on `<branch>`. Only this branch gets the new kit. Other branches stay on the old kit until you merge this branch into them. Say merge develop into the branch. Never rebase.
 2. If this branch should not get the new kit, merge first or switch branch, then run the command again. This command does not switch branches.
-3. Uncommitted changes: list `uncommitted_kit` and `uncommitted_project`, or say there are none. Kit files with local edits go through the three-way merge. Specs, walk-progress, plans, notes, the build map, and other project files stay as they are and are not part of the kit commit.
+3. Uncommitted changes: list `uncommitted_kit` and `uncommitted_project`, or say there are none. Kit files with local edits go through the three-way merge. Specs, walk-progress, build-progress, plans, notes, the build map, and other project files stay as they are and are not part of the kit commit.
 4. Installed version, the file it was read from, and the target tag.
 5. The plan counts: files to update, merge, add, or delete; templates left alone; each clash, with both sides.
 
