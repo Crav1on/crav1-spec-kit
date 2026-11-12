@@ -2,7 +2,7 @@
 
 Guided only. There is no automatic mode. Every write is explained and confirmed before it happens, using the confirm the skill that owns the write already uses. Do not add a second confirm for the same write. Do not write on a headless or bot run. Stop and say the walk needs a person.
 
-The spec folder is the one the user @-mentions. Otherwise the most recently edited tree under `docs/specs/`, excluding `_template`. If several are current, ask which slug once.
+The spec folder is the one the user @-mentions, or the one folder `../crav1-tasks-ready-to-build/scripts/resolve_spec.py` prints. Exact folder first, then hyphen and space forms (`orders 1.0` matches `orders-1-0`), then one unique playbook basename, spec title, or work-item name in `spec.md`. Several matches: list them and stop. Do not pick the most recently edited tree. No name: ask which slug once.
 
 Two routes, one walk. With a playbook, step 1 is that file. Without a playbook, step 1 is skipped. Steps 2 through 7 are the same, and the ready check is the same.
 

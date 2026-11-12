@@ -9,6 +9,7 @@ Date:
 | | Count | Ids |
 | --- | --- | --- |
 | Implemented, verified | 0 | |
+| Implemented, verified, tick pending | 0 | |
 | Implemented, verify failed | 0 | |
 | Not implemented | 0 | |
 | Claimed done, unverified | 0 | |
@@ -22,7 +23,9 @@ Next: `/crav1-fix-build-gaps`, because a verify id is not proved yet.
 
 ## Tasks — overview (dependency order)
 
-Sorted: verified, then verify failed, then not implemented, then unverified.
+Sorted: verified, then tick pending, then verify failed, then not implemented, then unverified.
+
+<!-- Tick pending (1.136.0): Tick pending: T2. Say yes to tick `[x]` in tasks.md. Verify does not tick without that yes. The open checkbox stays a Gap. -->
 
 | T# | Title | Status | Verify |
 | --- | --- | --- | --- |

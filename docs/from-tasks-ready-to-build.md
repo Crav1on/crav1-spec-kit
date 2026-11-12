@@ -90,9 +90,11 @@ A ticked task stays in its wave (1.132.0). The row strikes the short name throug
 
 The script writes the file. This command does not commit it. Commit it with the spec when you are ready.
 
-## When verify.md is behind (1.135.0)
+## When verify.md is behind (1.136.0)
 
-The check reads `verify.md` and does not write it. A task is built when it is ticked, or when its pull request is recorded merged: `(PR n)` and the word merged on the task line, or on the Match `Branch:` line for that task's branch. When `verify.md` still lists that task as not implemented, or its `Next:` line names a built task, the check adds:
+The check reads `verify.md` and does not write it. A task stays done for later tasks when it is ticked, or when its pull request is recorded merged: `(PR n)` and the word merged on the task line, or on the Match `Branch:` line for that task's branch. The check adds a Waiting line when a ticked task is still `Not implemented`, when `Next:` names a ticked task, or when a merged task is still `Not implemented`. A merged row whose status is **Implemented, verified, tick pending** is not behind. The checkbox is the only leftover. `task_order.py` lists that task under Needs tick, not under Ready. A verify-only change does not force `not-ready`. This command only writes `build-map.md`. Only the walk's record or `clear --yes` restamps `walk-progress.md`.
+
+When verify is behind, the check adds:
 
 ```text
 Waiting: /crav1-verify-build-against-spec orders-api - verify.md is behind tasks.md (T2, T45)

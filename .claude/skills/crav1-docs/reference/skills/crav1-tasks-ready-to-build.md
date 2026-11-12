@@ -36,6 +36,8 @@ Shows summary counts per slice, then Ready and Held grouped by build-map branch,
 
 1.135.0: the ready check compares `tasks.md` with `verify.md`. A ticked task, or a task whose pull request is recorded merged (`(PR n)` and the word merged on the task line or its Match `Branch:` line), that `verify.md` still lists as not implemented, is behind. So is a `Next:` line in `verify.md` that names such a task. The check prints `Waiting: [`/crav1-verify-build-against-spec`](crav1-verify-build-against-spec.md) <slug> - verify.md is behind tasks.md (T2, T45)` and does not print that Next line. It does not write `verify.md`. `build-map.md` stays the one file this command writes.
 
+1.136.0: a `Next:` line is stale only when it names a ticked task. A ticked task still listed as `Not implemented` is behind, and so is a merged task still listed as `Not implemented`. A merged `[ ]` row whose status is `Implemented, verified, tick pending` is not behind. A verify-only change does not force `not-ready`. This command does not restamp `walk-progress.md`. Only the walk's record or `clear --yes` does. `scripts/task_order.py` lists a recorded-merged task under Needs tick. `scripts/resolve_spec.py` resolves a named spec: exact folder first, then one unique playbook basename, spec title, or work-item name. Several matches are listed and the run stops.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.

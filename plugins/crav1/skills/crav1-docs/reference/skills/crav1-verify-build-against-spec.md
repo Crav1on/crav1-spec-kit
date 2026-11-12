@@ -18,6 +18,8 @@ Before the tests, a local dependency preflight checks Azurite, database containe
 
 1.69.0: the `Promotion:` line in the TL;DR and verify.md, with the optional `pipeline runs` check; done stays merged.
 
+1.136.0: the spec folder is `scripts/resolve_spec.py` (exact folder, then hyphen and space forms, then one unique playbook basename, spec title, or work-item name). Several matches are listed and the run stops. It does not pick the most recently edited tree. A task whose evidence passed, whose row is still `[ ]`, and whose pull request is recorded merged is **Implemented, verified, tick pending**. That is not Not implemented. Next skips tasks the ready check counts as done and names the first task that can start, one line per ready branch. The open checkbox stays a Gap. After a yes, the report may tick that one row. It does not re-implement.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
@@ -42,13 +44,13 @@ Reads `spec.md`, `tasks.md`, `plan.md`, and the running tree.
 
 ## Writes
 
-In short: `verify.md`.
+In short: `verify.md`, and one `[x]` on a tick-pending row after a yes.
 
-Writes `verify.md`.
+Writes `verify.md`. After a yes on a tick-pending line, ticks that one `[ ]` row in `tasks.md`.
 
 ## Does not
 
-Leaves `spec.md` and product code alone.
+Leaves `spec.md` and product code alone. Does not tick a row without a yes, and does not re-implement.
 
 Limits and exceptions: does not run [`/crav1-fix-bug`](crav1-fix-bug.md) or [`/crav1-review-pr`](crav1-review-pr.md).
 

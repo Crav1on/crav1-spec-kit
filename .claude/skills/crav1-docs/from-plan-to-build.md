@@ -26,7 +26,7 @@ Use this when `plan.md` and `tasks.md` are accepted. Build one task `T#` at a ti
 | Linter gate | When `## Linter` says none and you have not chosen to go on, decide first | Stops with no code until you choose |
 | Approvals (worker commands) | Answer the one pause: `continue` or `click` | `/crav1-build-tasks`, and `/crav1-build-features` pause once for the host's tool-approval setting, not per task or per slug. When the run ends they say how to restore it |
 | Commit style (worker commands) | Pick a commit style once when asked | Writes the commit-style rule once when it is missing. Workers then commit without asking |
-| Build | Watch the diff | `/crav1-build-tasks` writes the code and the checks the row names, runs that verify step, and marks the row `[x]` only when it passes. A worker (`crav1-build-task-agent`) does the same in isolation: implement, commit, verify, and an optional fix |
+| Build | Watch the diff | `/crav1-build-tasks` writes the code and the checks the row names, runs that verify step, and marks the row `[x]` only when it passes. A worker (`crav1-build-task-agent`) does the same in isolation: implement, commit, verify, and an optional fix. Since 1.136.0 a recorded-merged or already-verified row that is still `[ ]` is ticked with no worker and no re-implementation, when the ready check is `ready` or `ready-partial`. A `not-ready` result does not tick it |
 | Batch stop | Answer the worker | `/crav1-build-tasks` stops the batch when a worker needs you. `/crav1-build-features` runs specs one after another, never in parallel, and with one ready slug points at `/crav1-build-tasks` |
 | Picture | Say yes or no | `/crav1-build-features` asks once whether to run `/crav1-refresh-system-notes` when a slice is marked done or retired, and does not run it. The other build commands do not ask |
 
@@ -34,7 +34,7 @@ Before the tests run, the kit checks their local dependencies (Azurite, a databa
 
 ## What gets written
 
-- The code and checks for each task, and `[x]` on that row in `tasks.md` after its verify passes.
+- The code and checks for each task, and `[x]` on that row in `tasks.md` after its verify passes. A tick-only row gets `[x]` and no code change.
 - Worker commands also write `verify.md`, `fix-log.md` when a fix runs, and the commits, plus the commit-style rule once.
 - `/crav1-build-features`: a `feat/<slug>` checkout per slug.
 

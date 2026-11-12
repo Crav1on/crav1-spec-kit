@@ -1018,6 +1018,7 @@ skills:
   - '1.68.0: offers to create a missing task sub-branch from its spec branch and writes its `(into …)` marker after the yes.'
   - '1.129.0: the branch question is its own card, before permissions, and a typed branch name on that card is the answer. A missing answer, or one that belongs on the other card, is re-asked. The offered branch is the build map row (`scripts/build_map.py --recommend T#`). A different pick writes `(map: <picked>)` and does not commit it. A missing person''s yes is `needs_yes` and a Waiting line, not blocked, and the task stays unticked. A new `.sh` file with no `*.sh eol=lf` rule, when autocrlf is true or the host is Windows, offers `*.sh text eol=lf` and does not add it without a yes.'
   - '1.132.0: when the ready check result is `ready` or `ready-partial`, the tasks in `can_start` may start. A held task (`refused`) is refused with its reason, including `held, waits on T#`. The run does not ask to build it anyway. When the result is `not-ready`, no worker starts.'
+  - '1.136.0: a recorded-merged or already-verified row that is still `[ ]` is tick-only. `scripts/tick_only.py` ticks `[x]` and starts no worker when the result is `ready` or `ready-partial`, including when that task is already done for `can_start`. It does not re-implement. A `not-ready` result does not tick and does not start a worker. The spec folder is `scripts/resolve_spec.py`: exact folder first (`orders 1.0` matches `orders-1-0`), then one unique playbook basename, spec title, or work-item name. Several matches are listed and the run stops.'
   use_when: You want to build one task, a range, or all unticked tasks
   table:
     reads: 'Inside each worker: One `T#`, the plan, and the spec; One task: One `T#` and the persist rule;
@@ -1030,7 +1031,8 @@ skills:
   reads: 'Inside each worker: Reads one `T#` in `tasks.md`, plus `plan.md` and `spec.md`. One task: Reads
     one `T#` and the persist rule. A range or all: Reads the `T#` queue on one spec.'
   writes: 'Inside each worker: Writes the code and the checks that row names, and marks the row `[x]`
-    only when that verify passes. One task: Writes the commit-style rule when it is missing. A range or
+    only when that verify passes. A tick-only row is marked `[x]` by `scripts/tick_only.py` with no worker
+    and no code change. One task: Writes the commit-style rule when it is missing. A range or
     all: Writes the commit-style rule once when it is missing. When the picked branch is not the build
     map''s name, writes `(map: <picked>)` on that task in the specs repo and does not commit it.'
   leaves_alone: 'Inside each worker: Leaves `spec.md` and other tasks alone. One task: Leaves product
@@ -1103,6 +1105,7 @@ skills:
   - '1.64.0: the TL;DR adds a Branches line (merged into the base, deleted-but-merged, rewritten, shared); demoable needs every work branch merged. Report only.'
   - '1.68.0: the `Sub-branches:` and `left behind:` lines, done when the top-level branches reached the base, and `merged, reverted on <base> (<sha>)`, report only.'
   - '1.69.0: the `Promotion:` line in the TL;DR and verify.md, with the optional `pipeline runs` check; done stays merged.'
+  - '1.136.0: the spec folder is `scripts/resolve_spec.py` (exact folder, then hyphen and space forms, then one unique playbook basename, spec title, or work-item name). Several matches are listed and the run stops. It does not pick the most recently edited tree. A task whose evidence passed, whose row is still `[ ]`, and whose pull request is recorded merged is **Implemented, verified, tick pending**. That is not Not implemented. Next skips tasks the ready check counts as done and names the first task that can start, one line per ready branch. The open checkbox stays a Gap. After a yes, the report may tick that one row. It does not re-implement.'
   choice_words:
   - question: Also check the latest pipeline runs?
     words:
@@ -1111,10 +1114,10 @@ skills:
   use_when: Want proof against acceptance
   table:
     reads: Spec, tasks, plan, and the running tree
-    writes: '`verify.md`'
+    writes: '`verify.md`, and one `[x]` on a tick-pending row after a yes'
   reads: Reads `spec.md`, `tasks.md`, `plan.md`, and the running tree.
-  writes: Writes `verify.md`.
-  leaves_alone: Leaves `spec.md` and product code alone.
+  writes: Writes `verify.md`. After a yes on a tick-pending line, ticks that one `[ ]` row in `tasks.md`.
+  leaves_alone: Leaves `spec.md` and product code alone. Does not tick a row without a yes, and does not re-implement.
   exceptions: does not run `/crav1-fix-bug` or `/crav1-review-pr`.
   called_by: Called by the user and by `crav1-build-task-agent`.
   runs_by_itself: Calls no skill.
@@ -1657,6 +1660,7 @@ skills:
   - '1.132.0: the result is `ready`, `ready-partial`, or `not-ready`. `ready-partial` lists the tasks that can start and where the hold begins. A task that waits on a held task is held too, reason `held, waits on T3`. `not-ready` is when nothing can start. A ticked task stays in the build map, struck through with its pull request, branch, or commit. A wave whose every task is done is a details block. The rows stay. The heading counts done tasks apart from branches that can start.'
   - '1.133.0: ready tasks and held tasks are grouped by the build-map row. The branch is `scripts/build_map.py --recommend T#`, so it matches the map. Order is wave, then map order. One `Next:` line per ready branch, for example `Next: /crav1-build-tasks T2 T5 T6` (on `feat/orders-api-record`). A held line names the open question and who has it, or `held, waits on T3`. The Tasks field is `T#` plus the short name, and a done task is `~~T# short name~~ ✓ done` with its pull request. The ready-check report uses that same form. The map is rewritten every ready check, so the ids do not go stale. Prose outside the Tasks field still drops a task id, and the dangling-text cleanup stays. The walk record stays `Result: ready-partial`.'
   - '1.135.0: the ready check compares `tasks.md` with `verify.md`. A ticked task, or a task whose pull request is recorded merged (`(PR n)` and the word merged on the task line or its Match `Branch:` line), that `verify.md` still lists as not implemented, is behind. So is a `Next:` line in `verify.md` that names such a task. The check prints `Waiting: /crav1-verify-build-against-spec <slug> - verify.md is behind tasks.md (T2, T45)` and does not print that Next line. It does not write `verify.md`. `build-map.md` stays the one file this command writes.'
+  - '1.136.0: a `Next:` line is stale only when it names a ticked task. A ticked task still listed as `Not implemented` is behind, and so is a merged task still listed as `Not implemented`. A merged `[ ]` row whose status is `Implemented, verified, tick pending` is not behind. A verify-only change does not force `not-ready`. This command does not restamp `walk-progress.md`. Only the walk''s record or `clear --yes` does. `scripts/task_order.py` lists a recorded-merged task under Needs tick. `scripts/resolve_spec.py` resolves a named spec: exact folder first, then one unique playbook basename, spec title, or work-item name. Several matches are listed and the run stops.'
   choice_words:
   - question: Show the build map?
     words:
@@ -2008,6 +2012,7 @@ skills:
   - '1.133.0: the ready-check ending groups ready tasks and held tasks by the build-map row, the same branch as `scripts/build_map.py --recommend`. Order is wave, then map order. A task is `T#` plus its short name. One Next line per ready branch. The walk record stays Result ready-partial.'
   - '1.134.0: each locked step, extra, jump back, and the playbook apply path opens that skill''s file from this skill''s folder (`../crav1-<name>/SKILL.md`, or the reference that step names, including `references/apply.md` and add-to-spec''s fact rules). The rule is `docs/reference/open-skill-file.md`. The walk does not start those skills as slash commands or with a skill tool. A command-only refusal is not a reason to stop the walk. `disable-model-invocation: true` stays.'
   - '1.135.0: a spec-tagged finding during plan review is one jump-back card. The recommended option runs `/crav1-tighten-spec` on that finding, by opening `../crav1-tighten-spec/SKILL.md`. The walk then reruns plan-from-spec for the affected parts, review-and-tighten-plan, and the ready check. It does not pause. The other option keeps the finding as an open point and continues. The same finding is offered once. A return is an open point. `walk-progress.md` records `- Jump-back:` and, when it comes back, `- Open point:`, each with `Continue:`. A plan-tagged finding stays in `/crav1-tighten-plan`. The ready check compares `tasks.md` with `verify.md`. A ticked task, or a task whose pull request is recorded merged, that `verify.md` still lists as not implemented, or a `Next:` line in `verify.md` that names such a task, makes `verify.md` behind. The check prints `Waiting: /crav1-verify-build-against-spec <slug> - verify.md is behind tasks.md (T2, T45)` and does not print that stale Next line. The walk never writes `verify.md` and never runs `/crav1-verify-build-against-spec`. It still reaches the ready check, which still rewrites `build-map.md` through `/crav1-tasks-ready-to-build`.'
+  - '1.136.0: a `Next:` line is stale only when it names a ticked task. A merged `[ ]` row whose only leftover is the tick is not behind. A verify-only change does not reopen the ready check and does not force `not-ready`. The result stays `ready` or `ready-partial`, and `verify_waiting` is shown when verify is behind. Where spec, plan, or tasks drift offers a jump back to the ready check, only the walk''s record or `clear --yes` restamps `walk-progress.md`. `/crav1-tasks-ready-to-build` only writes `build-map.md`. The spec folder is `../crav1-tasks-ready-to-build/scripts/resolve_spec.py`. Several matches are listed and the run stops. It does not pick the most recently edited tree.'
   use_when: A spec should be tightened and planned until it is ready to build
   table:
     reads: The spec folder, an optional playbook (outside the project or under `docs/playbooks/`), and the progress file when one exists

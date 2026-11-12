@@ -17,7 +17,7 @@ Lead with a **TL;DR**: which tasks are implemented and verified, which are not. 
 
 ## Find the spec
 
-User @-mention, else the most recently edited tree under `docs/specs/` excluding `_template/`.
+The spec folder is the user's @-mention, or the one folder `scripts/resolve_spec.py` prints (skill `crav1-tasks-ready-to-build`, `--root docs/specs`). Exact folder first, then hyphen and space forms (`orders 1.0` matches `orders-1-0`), then one unique playbook basename, spec title, or work-item name in `spec.md`. Several matches: list them and stop. Do not pick the most recently edited tree. Do not search the rest of the tree. No name: ask which slug.
 
 Read `spec.md` acceptance (and EARS/BDD export if present — spec.md still wins). Read `tasks.md` if it exists. Skim tests and the files `plan.md` said would be touched.
 
@@ -30,9 +30,12 @@ A task downstream of an **Implemented, verify failed** task (it waits on it, dir
 | Status | Meaning |
 | --- | --- |
 | **Implemented, verified** | Row is `[x]` **and** its verify evidence ran and passed |
+| **Implemented, verified, tick pending** | Evidence passed, the row is still `[ ]`, and the pull request is recorded merged (`(PR n)` and the word `merged` on the task line, or on the Match `Branch:` line for its `(branch:)` or `(map:)`). Not **Not implemented**. The open checkbox is a Gap |
 | **Implemented, verify failed** | `[x]` or code exists for this `T#`, but verify ran and failed |
-| **Not implemented** | Still `- [ ]` (or no code for this `T#`) |
+| **Not implemented** | Still `- [ ]`, and it is not tick pending (or no code for this `T#`) |
 | **Claimed done, unverified** | `[x]` but evidence could not be run (no command, no browser). Also a ticked task whose `(branch: X)` is not the checkout: **Claimed done, unverified (on X, not checked out)** |
+
+**Tick pending (1.136.0).** That status is not Not implemented. Next skips every task the ready check already counts as done (ticked, or recorded merged) and names the first task that can start, one `Next:` line per ready branch, the same shape as the ready check. The open checkbox stays a Gap. After a passed check the report may offer the tick on its own line: `Tick pending: T2. Say yes to tick [x] in tasks.md.` Tick that one row only after that yes. Do not re-implement. The offer is an alternative exit. It does not replace the Next line for tasks that can start.
 
 **Host setup tasks (1.115.0).** A task marked `(host setup)` is **Implemented, verified** only when its script's `check` part, run now against the live host, prints `ok` for every setting (skill `crav1-host-setup`, `references/host-setup.md`). A written script that was not applied, or a `missing` line, is **Implemented, verify failed**. Not signed in to the host: **Claimed done, unverified**. Verify never runs `apply`.
 
@@ -60,13 +63,13 @@ Then:
 1. If any acceptance or task verify is **live** (running Aspire/compose/dev host, published URL, browser against localhost), follow this skill’s [references/live-host.md](references/live-host.md) **before** that evidence. Record refresh/health in **Commands run**.
 2. Before any test command, run the local dependency preflight in this skill's [references/test-dependencies.md](references/test-dependencies.md): detect what the tests need (Azurite, a database container, an emulator), check each is running, and ask start, skip, or stop for one that is not. Then run the documented test/lint commands from `AGENTS.md` or the repo README when they exist. Record the command and outcome. A test skipped for a missing dependency blocks **Implemented, verified** unless the user chose skip; that task is **Claimed done, unverified**, and the missing dependency goes at the top of the report as a blocker.
 3. For UI acceptance, use the browser if available; otherwise mark **untested** and say why.
-4. Map `tasks.md` rows: checked but failing verify → **Implemented, verify failed**; unchecked → **Not implemented**.
+4. Map `tasks.md` rows: checked but failing verify → **Implemented, verify failed**; evidence passed, row still `[ ]`, pull request recorded merged → **Implemented, verified, tick pending**; other unchecked → **Not implemented**.
 
 ## Write `docs/specs/<slug>/verify.md`
 
 Follow this skill’s `assets/verify.md` **section order**. Do not put the long acceptance table first.
 
-1. **TL;DR** — counts + id lists, then the Branches line when the spec has work branches. Then one line: next command (`/crav1-fix-build-gaps` if failed/unverified/`G#` remain, else `/crav1-build-tasks` or ship).
+1. **TL;DR** — counts + id lists, including tick pending, then the Branches line when the spec has work branches. Next skips tasks the ready check counts as done and names the first task that can start, one line per ready branch. A tick-pending Gap does not by itself make Next `/crav1-fix-build-gaps`.
 2. **Tasks — overview** — one short table: `T#` | title | status | verify result, in dependency order (above).
 3. **Acceptance — details** — the full A# matrix (quote, evidence, result).
 4. **Commands run**
@@ -82,8 +85,8 @@ Same order as the file. Do **not** open with the full acceptance matrix.
 2. **TL;DR** (copy the id lists and the Branches line; they should be scannable in a few seconds)
 3. Point at the Tasks overview in the file
 4. One `Next` line, the first case that applies, as `crav1-docs/reference/run-ending.md` says. Do not list the other cases. Do not run it. Add the Uncommitted line when `verify.md` changed and is not committed.
-   - Inner-loop ids remain (verify failed, claimed done unverified, or a wiring `G#`): `Next: /crav1-fix-build-gaps, because verify could not prove those ids.` Omit Gap to walk them in order.
-   - Only not-implemented tasks remain: `Next: /crav1-build-tasks` for the first of those, because they are not built.
+   - Inner-loop ids remain (verify failed, claimed done unverified, or a wiring `G#`): `Next: /crav1-fix-build-gaps, because verify could not prove those ids.` A tick-pending Gap is not an inner-loop id. Omit Gap to walk them in order.
+   - Only not-implemented tasks remain: `Next: /crav1-build-tasks` for the first that can start, one line per ready branch, because they are not built. Do not name a ticked or recorded-merged task.
    - An acceptance line has no task and should stay: `Next: /crav1-plan-from-spec, because that acceptance line has no task.`
    - An acceptance line should die: `Next: /crav1-tighten-spec, because that acceptance line should not stay.`
    - All verified, and a work branch is not merged: `Next: /crav1-open-pr, because a work branch is not merged yet.` Say `built and verified, not merged yet: <branches>`. A branch with `(PR <n>)` names it: `/crav1-open-pr` to push to PR <n> and update its description or comment.

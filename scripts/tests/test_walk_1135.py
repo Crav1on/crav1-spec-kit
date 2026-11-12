@@ -1,8 +1,9 @@
 """1.135.0: one jump back from a spec finding, and a stale verify.md.
 
 The walk offers the jump once, records Continue, and does not write verify.md.
-The ready check flags verify.md when a built task is still not implemented,
-or when verify.md's Next line names a built task.
+The ready check flags verify.md when a ticked task is still not implemented,
+when Next names a ticked task, or when a merged task is still Not implemented.
+A merged unticked task whose only leftover is the tick is not behind.
 """
 
 from __future__ import annotations
