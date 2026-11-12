@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Progress file for /crav1-tighten-and-plan-ready-to-build (kit 1.137.0).
+"""Progress file for /crav1-tighten-and-plan-ready-to-build (kit 1.138.0).
 
 The spec, plan, and tasks stay the source of truth. This script only tracks
 where the guided walk is, which version of each file a step covered, and which
@@ -46,6 +46,7 @@ import argparse
 import hashlib
 import json
 import re
+import subprocess
 import sys
 from datetime import datetime
 
@@ -142,6 +143,17 @@ AFFECTS = {
     "review-and-tighten-plan": ("spec", "plan", "tasks"),
     "tasks-ready-to-build": ("spec", "plan", "tasks"),
 }
+# Versions since 1.138.0 ignore line endings and progress marks. The line
+# `Content stamp: normalized` says so. An older step has no such line.
+CONTENT_STAMP = "normalized"
+# Full product of progress variants. Above this, undo one slot at a time.
+_UNDO_CAP = 1 << 14
+_TASK_LINE = re.compile(r"^(\s*- \[)([ xX])(\] T\d+\b)(.*)$")
+_BRANCH_LINE = re.compile(r"^(?:- )?Branch:\s+\S", re.I)
+_PR_PAREN = re.compile(r"\s*\(PR\s+\d+(?:,\s*merged)?\)", re.I)
+_TRAILING_MERGED = re.compile(r"(?i)\s+merged$")
+_TRAILING_DONE = re.compile(r"(?i)\s+\(done\)$")
+
 # An edit confined to ## Open questions does not reopen these steps (1.137.0).
 # They compare Spec body. resolve-open-questions also compares Questions version.
 BODY_SPEC_STEPS = frozenset({
@@ -205,6 +217,266 @@ def version_text(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()[:12]
 
 
+def _hash12(blob: bytes) -> str:
+    return hashlib.sha256(blob).hexdigest()[:12]
+
+
+def _lf_text(text: str) -> str:
+    return text.replace("\r\n", "\n").replace("\r", "\n")
+
+
+def _ending_hashes(lf_text: str) -> set[str]:
+    """SHA-256 prefixes of the LF text and the same text with CRLF."""
+    lf = lf_text.encode("utf-8")
+    crlf = lf_text.replace("\n", "\r\n").encode("utf-8")
+    return {_hash12(lf), _hash12(crlf)}
+
+
+def _task_rest_stripped(rest: str) -> str:
+    """Drop a PR or done note the kit writes on a task line. Keep the title."""
+    rest = _PR_PAREN.sub("", rest)
+    rest = _TRAILING_DONE.sub("", rest)
+    rest = _TRAILING_MERGED.sub("", rest)
+    rest = re.sub(r"[ \t]{2,}", " ", rest)
+    return rest.rstrip()
+
+
+def _strip_branch_progress(line: str) -> str:
+    """Drop (PR n) and a trailing merged word. Keep the branch and its markers."""
+    line = _PR_PAREN.sub("", line)
+    line = _TRAILING_MERGED.sub("", line)
+    line = re.sub(r"[ \t]{2,}", " ", line)
+    return line.rstrip()
+
+
+def _task_canonical(line: str) -> str:
+    match = _TASK_LINE.match(line)
+    if not match:
+        return line
+    rest = _task_rest_stripped(match.group(4))
+    return f"{match.group(1)} {match.group(3)}{rest}"
+
+
+def normalize_text(kind: str, text: str) -> str:
+    """Content used for a stamp. LF, and progress marks removed.
+
+    spec: a Match Branch line loses `(PR n)` and a trailing `merged`.
+    tasks: a checkbox is `[ ]`, and a PR or `(done)` note on that line is
+    dropped. plan, verify, playbook, and questions: line endings only.
+    A branch name, `(into …)`, `(spec branch)`, `(branch:)`, and `(map:)` stay.
+    """
+    text = _lf_text(text or "")
+    if kind not in ("spec", "tasks"):
+        return text
+    lines = text.split("\n")
+    out = []
+    for line in lines:
+        if kind == "tasks" and _TASK_LINE.match(line):
+            out.append(_task_canonical(line))
+        elif kind == "spec" and _BRANCH_LINE.match(line):
+            out.append(_strip_branch_progress(line))
+        else:
+            out.append(line)
+    return "\n".join(out)
+
+
+def _task_options(line: str) -> list[str]:
+    match = _TASK_LINE.match(line)
+    if not match:
+        return [line]
+    rest = match.group(4)
+    stripped = _task_rest_stripped(rest)
+    rests = [rest] if rest == stripped else [rest, stripped]
+    boxes = [" ", "x"]
+    if match.group(2) == "X":
+        boxes.append("X")
+    out = []
+    for box in boxes:
+        for item in rests:
+            out.append(f"{match.group(1)}{box}{match.group(3)}{item}")
+    return list(dict.fromkeys(out))
+
+
+def _line_options(line: str, kind: str) -> list[str]:
+    if kind == "tasks" and _TASK_LINE.match(line):
+        return _task_options(line)
+    if kind == "spec" and _BRANCH_LINE.match(line):
+        stripped = _strip_branch_progress(line)
+        if stripped == line:
+            return [line]
+        return [line, stripped]
+    return [line]
+
+
+def _iter_product(options: list[list[str]]):
+    if not options:
+        yield []
+        return
+    indexes = [0] * len(options)
+    while True:
+        yield [options[i][indexes[i]] for i in range(len(options))]
+        cursor = len(options) - 1
+        while cursor >= 0:
+            indexes[cursor] += 1
+            if indexes[cursor] < len(options[cursor]):
+                break
+            indexes[cursor] = 0
+            cursor -= 1
+        else:
+            return
+
+
+def _stripped_lines(lines: list[str], kind: str) -> list[str]:
+    """Notes removed. Checkboxes stay as they are now."""
+    out = []
+    for line in lines:
+        if kind == "tasks" and _TASK_LINE.match(line):
+            match = _TASK_LINE.match(line)
+            rest = _task_rest_stripped(match.group(4))
+            out.append(f"{match.group(1)}{match.group(2)}{match.group(3)}{rest}")
+        elif kind == "spec" and _BRANCH_LINE.match(line):
+            out.append(_strip_branch_progress(line))
+        else:
+            out.append(line)
+    return out
+
+
+def _hash_undo(stored: str, lf_text: str, kind: str) -> bool:
+    """True when some progress variant of this text hashes to an old stamp.
+
+    The product of checkbox and PR-note choices is tried when it is at most
+    16384. Above that, each line is undone on its own, and once with every
+    PR note removed and one checkbox flipped. That covers one tick and any
+    number of added `(PR n)` marks. Two or more checkbox edits on a long
+    task list are not proved here. The caller then tries HEAD once.
+    """
+    lines = lf_text.split("\n")
+    options = [_line_options(line, kind) for line in lines]
+    product = 1
+    over = False
+    for opts in options:
+        product *= len(opts)
+        if product > _UNDO_CAP:
+            over = True
+            break
+
+    def hits(candidate: str) -> bool:
+        return stored in _ending_hashes(candidate)
+
+    if not over:
+        for combo in _iter_product(options):
+            if hits("\n".join(combo)):
+                return True
+        return False
+    if hits("\n".join(lines)):
+        return True
+    stripped = _stripped_lines(lines, kind)
+    if hits("\n".join(stripped)):
+        return True
+    for index, opts in enumerate(options):
+        for alt in opts:
+            if alt == lines[index]:
+                continue
+            trial = list(lines)
+            trial[index] = alt
+            if hits("\n".join(trial)):
+                return True
+            trial = list(stripped)
+            trial[index] = alt
+            if hits("\n".join(trial)):
+                return True
+    return False
+
+
+def _git_blob(path: Path) -> bytes | None:
+    """HEAD blob for this path, once. Missing git or a missing blob is None."""
+    repo = None
+    for base in [path.parent, *path.parents]:
+        if (base / ".git").exists():
+            repo = base
+            break
+        if str(base) == path.anchor:
+            break
+    if repo is None:
+        return None
+    try:
+        rel = path.resolve().relative_to(repo.resolve()).as_posix()
+    except (OSError, ValueError):
+        return None
+    try:
+        proc = subprocess.run(
+            ["git", "-C", str(repo), "show", f"HEAD:{rel}"],
+            capture_output=True,
+            timeout=5,
+            check=False,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    if proc.returncode != 0:
+        return None
+    return proc.stdout
+
+
+def _git_undo(stored: str, path: Path | None, kind: str, piece: str, part: str) -> bool:
+    """One compare against HEAD. Match when that blob is the stored stamp
+    and its normalized text equals the current piece."""
+    if path is None or not path.is_file():
+        return False
+    blob = _git_blob(path)
+    if blob is None:
+        return False
+    try:
+        old = blob.decode("utf-8")
+    except UnicodeDecodeError:
+        return False
+    old_lf = _lf_text(old)
+    if part == "spec_body":
+        old_piece, _questions = spec_parts(old_lf)
+    elif part == "questions":
+        _body, old_piece = spec_parts(old_lf)
+    else:
+        old_piece = old_lf
+        if _hash12(blob) == stored and normalize_text(kind, old) == normalize_text(kind, piece):
+            return True
+    if stored not in _ending_hashes(old_piece) and _hash12(old_piece.encode("utf-8")) != stored:
+        return False
+    return normalize_text(kind, old_piece) == normalize_text(kind, piece)
+
+
+def stamp_matches(
+    stored: str | None,
+    text: str | None,
+    kind: str,
+    normalized_stamp: bool,
+    raw_bytes: bytes | None = None,
+    path: Path | None = None,
+    part: str = "file",
+) -> bool:
+    """True when the stored version still covers this text.
+
+    A `Content stamp: normalized` step compares the normalized text. An older
+    step compares the raw bytes, then the other line ending, then one
+    hash-undo over progress variants, then HEAD once. A progress-only edit
+    matches. A sentence change does not.
+    """
+    if stored in (None, "missing"):
+        return text is None
+    if text is None:
+        return False
+    if stored == version_text(normalize_text(kind, text)):
+        return True
+    if normalized_stamp:
+        return False
+    if raw_bytes is not None and _hash12(raw_bytes) == stored:
+        return True
+    lf = _lf_text(text)
+    if stored in _ending_hashes(lf):
+        return True
+    if _hash_undo(stored, lf, kind):
+        return True
+    return _git_undo(stored, path, kind, lf, part)
+
+
 def spec_parts(text: str) -> tuple[str, str]:
     """Split spec text into the body and the Open questions section.
 
@@ -232,18 +504,36 @@ def spec_parts(text: str) -> tuple[str, str]:
     return body, questions
 
 
+def _read_pair(path: Path) -> tuple[str | None, bytes | None]:
+    if not path.is_file():
+        return None, None
+    raw = path.read_bytes()
+    try:
+        text = raw.decode("utf-8")
+    except UnicodeDecodeError:
+        text = path.read_text(encoding="utf-8")
+    return text, raw
+
+
+def stamp_file(path: Path, kind: str) -> str:
+    text, _raw = _read_pair(path)
+    if text is None:
+        return "missing"
+    return version_text(normalize_text(kind, text))
+
+
 def versions(root: Path, playbook: Path | None = None) -> dict:
-    out = {key: version_of(root / name) for key, name in FILE_OF.items()}
-    spec_path = root / "spec.md"
-    if spec_path.is_file():
-        body, questions = spec_parts(spec_path.read_text(encoding="utf-8"))
-        out["spec_body"] = version_text(body)
-        out["questions"] = version_text(questions)
-    else:
+    out = {key: stamp_file(root / name, key) for key, name in FILE_OF.items()}
+    spec_text, _raw = _read_pair(root / "spec.md")
+    if spec_text is None:
         out["spec_body"] = "missing"
         out["questions"] = "missing"
+    else:
+        body, questions = spec_parts(_lf_text(spec_text))
+        out["spec_body"] = version_text(normalize_text("spec", body))
+        out["questions"] = version_text(normalize_text("questions", questions))
     if playbook is not None:
-        out["playbook"] = version_of(playbook)
+        out["playbook"] = stamp_file(playbook, "playbook")
     return out
 
 
@@ -380,6 +670,10 @@ def parse_progress(text: str) -> dict:
             current["questions"] = value
         elif key == "Kept questions":
             current["kept_questions"] = value
+        elif key == "Content stamp":
+            if value != CONTENT_STAMP:
+                fail("progress-file", f"unknown content stamp: {line}")
+            current["content_stamp"] = value
         else:
             fail("progress-file", f"unknown line: {line}")
     for step, body in steps.items():
@@ -414,6 +708,11 @@ def load(root: Path) -> dict:
     data.setdefault("acks", [])
     data.setdefault("jumps", [])
     return data
+
+
+def _render_stamp(lines: list[str], body: dict) -> None:
+    if body.get("content_stamp"):
+        lines.append(f"  Content stamp: {body['content_stamp']}")
 
 
 def _render_jumps(lines: list[str], jumps: list | None) -> None:
@@ -454,6 +753,7 @@ def render(slice_label: str, steps: dict, acks: list | None = None, jumps: list 
                 lines.append(f"  Questions version: {body['questions']}")
             if "kept_questions" in body:
                 lines.append(f"  Kept questions: {body['kept_questions']}")
+        _render_stamp(lines, body)
         lines.append("")
     for step in EXTRAS:
         body = steps.get(step)
@@ -468,6 +768,7 @@ def render(slice_label: str, steps: dict, acks: list | None = None, jumps: list 
             lines.append(f"  Spec body: {body['spec_body']}")
         if "questions" in body:
             lines.append(f"  Questions version: {body['questions']}")
+        _render_stamp(lines, body)
         lines.append("")
     _render_jumps(lines, jumps)
     return "\n".join(lines).rstrip() + "\n"
@@ -537,7 +838,7 @@ def current_tokens(root: Path, step: str, playbook: Path | None) -> dict:
                 fail("playbook", "the playbook step needs --playbook")
             recorded, hashed = playbook_mod().recorded_playbook(root, playbook)
             out["playbook"] = recorded
-            out["playbook_version"] = version_of(hashed)
+            out["playbook_version"] = stamp_file(hashed, "playbook")
         else:
             out[token] = got[token]
     if "spec" in COVERS[step]:
@@ -545,6 +846,7 @@ def current_tokens(root: Path, step: str, playbook: Path | None) -> dict:
         out["questions"] = got["questions"]
     if step == "resolve-open-questions":
         out["kept_questions"] = kept_question_line(root)
+    out["content_stamp"] = CONTENT_STAMP
     return out
 
 
@@ -679,42 +981,68 @@ def _split_ready(body: dict) -> bool:
     return "spec_body" in body and "questions" in body
 
 
-def hash_drift(root: Path, step: str, body: dict) -> list[str]:
-    """Covered files whose bytes differ from the version this step recorded.
+def _piece_match(root: Path, body: dict, token: str, part: str) -> bool:
+    """Whether one recorded version still covers the file, body, or questions."""
+    normalized = body.get("content_stamp") == CONTENT_STAMP
+    name = FILE_OF[token]
+    path = root / name
+    text, raw = _read_pair(path)
+    kind = token
+    piece = text
+    raw_bytes = raw if part == "file" else None
+    if text is not None and part != "file":
+        body_text, questions = spec_parts(_lf_text(text))
+        piece = body_text if part == "spec_body" else questions
+        kind = "spec" if part == "spec_body" else "questions"
+    stored = body.get("spec_body" if part == "spec_body" else "questions" if part == "questions" else token)
+    return stamp_matches(
+        stored, piece, kind, normalized, raw_bytes=raw_bytes, path=path, part=part,
+    )
 
-    When Spec body and Questions version are recorded, a change confined to
-    ## Open questions reopens resolve-open-questions only. The other spec
-    steps compare Spec body. A step recorded before that split still compares
-    the whole-file Spec version.
+
+def hash_drift(root: Path, step: str, body: dict) -> list[str]:
+    """Covered files whose content differs from the version this step recorded.
+
+    Progress marks do not count: a task checkbox, a PR or done note on that
+    task line, and `(PR n)` or a trailing merged word on a Match Branch line.
+    Line endings do not count. When Spec body and Questions version are
+    recorded, a change confined to ## Open questions reopens
+    resolve-open-questions only. The other spec steps compare Spec body.
+    A step recorded before that split still compares the whole-file spec.
+    An older step has no Content stamp line. It still matches a progress-only
+    edit, by raw bytes, by the other line ending, by one hash-undo, or by
+    one compare with HEAD.
     """
     changed = []
     if step == "playbook":
         path = Path(body["playbook"])
         if not path.is_file():
-            # The recorded path may be repo-relative. Also try it under the root's parents.
             alt = find_playbook(root, body["playbook"])
             path = alt if alt is not None else path
-        now = version_of(path)
-        if now != body["playbook_version"]:
+        text, raw = _read_pair(path)
+        normalized = body.get("content_stamp") == CONTENT_STAMP
+        if not stamp_matches(
+            body.get("playbook_version"), text, "playbook", normalized,
+            raw_bytes=raw, path=path, part="file",
+        ):
             changed.append("playbook")
         return changed
-    now = versions(root)
     for token in COVERS[step]:
         if token == "spec" and _split_ready(body):
-            body_changed = now["spec_body"] != body["spec_body"]
-            questions_changed = now["questions"] != body["questions"]
+            body_same = _piece_match(root, body, "spec", "spec_body")
+            questions_same = _piece_match(root, body, "spec", "questions")
             if step in BODY_SPEC_STEPS:
-                if body_changed:
+                if not body_same:
                     changed.append("spec")
             elif step == "resolve-open-questions":
-                if body_changed:
+                if not body_same:
                     changed.append("spec")
-                if questions_changed:
+                if not questions_same:
                     changed.append("questions")
-            elif now["spec"] != body.get("spec"):
+            elif not _piece_match(root, body, "spec", "file"):
                 changed.append("spec")
             continue
-        if now[token] != body[token]:
+        if not _piece_match(root, body, token, "file"):
             changed.append(token)
     return changed
 
@@ -736,13 +1064,18 @@ def affected_drift(root: Path, step: str, body: dict, steps: dict) -> list[str]:
 
 
 def _restamp_body(body: dict, name: str, now: dict, tokens: set[str]) -> None:
+    touched = False
     for token in COVERS[name]:
         if token == "playbook" or token not in tokens:
             continue
         body[token] = now[token]
+        touched = True
     if "spec" in tokens and "spec" in COVERS[name]:
         body["spec_body"] = now["spec_body"]
         body["questions"] = now["questions"]
+        touched = True
+    if touched:
+        body["content_stamp"] = CONTENT_STAMP
 
 
 def restamp_earlier(root: Path, steps: dict, step: str) -> None:
@@ -785,7 +1118,8 @@ def refresh_versions(root: Path, step: str, body: dict) -> None:
         if not path.is_file():
             alt = find_playbook(root, body["playbook"])
             path = alt if alt is not None else path
-        body["playbook_version"] = version_of(path)
+        body["playbook_version"] = stamp_file(path, "playbook")
+        body["content_stamp"] = CONTENT_STAMP
         return
     now = versions(root)
     for token in COVERS[step]:
@@ -795,6 +1129,7 @@ def refresh_versions(root: Path, step: str, body: dict) -> None:
         body["questions"] = now["questions"]
     if step == "resolve-open-questions":
         body["kept_questions"] = kept_question_line(root)
+    body["content_stamp"] = CONTENT_STAMP
 
 
 def write_progress(root: Path, data: dict, slice_label: str | None = None) -> None:
@@ -931,7 +1266,8 @@ def playbook_status(args: argparse.Namespace) -> None:
     playbook = resolve_playbook(root, args.playbook)
     data = load(root) if root.is_dir() else {"steps": {}}
     body = data["steps"].get("playbook")
-    now = version_of(playbook)
+    text, raw = _read_pair(playbook)
+    now = stamp_file(playbook, "playbook")
     if body is None:
         emit({
             "ok": True,
@@ -942,7 +1278,11 @@ def playbook_status(args: argparse.Namespace) -> None:
         })
         return
     same_path = same_playbook_path(root, body["playbook"], args.playbook, playbook)
-    same_hash = body.get("playbook_version") == now and now != "missing"
+    same_hash = now != "missing" and stamp_matches(
+        body.get("playbook_version"), text, "playbook",
+        body.get("content_stamp") == CONTENT_STAMP,
+        raw_bytes=raw, path=playbook, part="file",
+    )
     if same_path and same_hash and body["result"] in APPLIED:
         emit({
             "ok": True,
@@ -1150,6 +1490,7 @@ def cover(args: argparse.Namespace) -> None:
             body["questions"] = now["questions"]
         if step == "resolve-open-questions":
             body["kept_questions"] = kept_question_line(root)
+        body["content_stamp"] = CONTENT_STAMP
         covered.append(step)
     write_progress(root, data)
     emit({"ok": True, "wrote": PROGRESS_NAME, "covered": covered})
@@ -1777,6 +2118,38 @@ def slice_result(rows: list[dict], hits: list[dict]) -> tuple[str, list, list]:
     return "ready", can_start, held
 
 
+def not_ready_because(result: str, rows: list[dict], hits: list[dict], can_start: list) -> str | None:
+    """Why the result is not-ready, when can_start is also filled.
+
+    A hard hit (a reopened step, a jump-back question, a whole-slice hold)
+    forces not-ready and still lists tasks whose bucket is ready. Those
+    tasks are not a start. A whole-slice question is named from its row.
+    """
+    if result != "not-ready":
+        return None
+    bits = []
+    reopened = [hit["step"] for hit in hits if hit.get("bucket") == "reopened" and hit.get("step")]
+    if reopened:
+        bits.append("Reopened: " + ", ".join(reopened))
+    for row in rows:
+        reason = str(row.get("reason") or "")
+        if "whole slice" in reason.lower():
+            bits.append(reason)
+            break
+    if not reopened and not any("whole slice" in bit.lower() for bit in bits):
+        for hit in hits:
+            if hit.get("kind") == "waiting" or hit.get("bucket") == "reopened":
+                continue
+            why = hit.get("why")
+            if why and why not in bits:
+                bits.append(why)
+                break
+    if can_start:
+        ids = ", ".join(task for task in can_start if task)
+        bits.append(f"{ids} stay in can_start and are not a start while the result is not-ready")
+    return ". ".join(bits) if bits else "not ready"
+
+
 def line_for(result: str, can_start: list, held: list) -> str | None:
     if result != "ready-partial":
         return None
@@ -1860,6 +2233,7 @@ def readiness(args: argparse.Namespace) -> None:
     unmapped = [h for h in hits if h["command"] is None and h["kind"] != "waiting"]
     jump = [h for h in hits if h["can_jump_back"]]
     result, can_start, held = slice_result(rows, hits)
+    because = not_ready_because(result, rows, hits, can_start)
     ready = result == "ready"
     slug = _slug(root) if root is not None else ""
     waiting_line, waiting_next = _waiting_lines(waiting, slug)
@@ -1912,6 +2286,7 @@ def readiness(args: argparse.Namespace) -> None:
         "result": result,
         "can_start": can_start,
         "held": held,
+        "because": because,
         "line": line,
         "ready_lines": ready_lines,
         "held_lines": held_lines,
