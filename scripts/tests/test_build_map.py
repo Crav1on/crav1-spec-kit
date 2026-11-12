@@ -426,13 +426,13 @@ class BuildMap(unittest.TestCase):
         result = bm.build("cancel-booking", SPEC, plan, tasks)
         text = result["markdown"]
         row = text.split("### ", 1)[1]
+        self.assertIn("### feat/orders-cicd", text)
         self.assertIn("- Tasks: T1 Disable pipelines 7\n", row)
         self.assertNotIn("infra/ado", row.split("- Waits for:", 1)[0].split("- Tasks:", 1)[1])
         self.assertNotIn("(host setup)", row.split("- Tasks:", 1)[1].split("- Waits for:", 1)[0])
         self.assertNotIn("committed later", row.split("- Tasks:", 1)[1].split("- Waits for:", 1)[0])
-        self.assertIn("Disable pipelines 7's `check`", row)
         self.assertIn(
-            "- Task text names feat/orders-cicd; built on feat/cancel-booking-host-setup-first-disable",
+            "- Plan step names feat/cancel-booking-host-setup-first-disable; built on feat/orders-cicd",
             row,
         )
         prose = "\n".join(line for line in text.splitlines() if line.startswith("- "))
@@ -486,12 +486,15 @@ class BuildMap(unittest.TestCase):
         self.assertNotIn("Task text names", branched["markdown"].split("### feat/orders-retry", 1)[1].split("###", 1)[0])
         self.assertEqual(recommended[2], "feat/cancel-booking-record-refund-decision")
 
-    def test_committed_later_loses_to_a_plan_step_and_wins_with_no_step(self):
+    def test_committed_later_wins_over_a_plan_step_and_with_no_step(self):
         plan = "# Plan\n\n## Approach\n\n1. Record the refund decision. (T1)\n"
         tasks = "- [ ] T1: Save the decision, committed later on feat/orders-cicd (after: )\n"
         on_step = bm.build("cancel-booking", SPEC, plan, tasks)
-        self.assertEqual(bm.recommended_branch("cancel-booking", SPEC, plan, tasks, 1), "feat/cancel-booking-record-refund-decision")
-        self.assertIn("Task text names feat/orders-cicd; built on feat/cancel-booking-record-refund-decision", on_step["markdown"])
+        self.assertEqual(bm.recommended_branch("cancel-booking", SPEC, plan, tasks, 1), "feat/orders-cicd")
+        self.assertIn(
+            "Plan step names feat/cancel-booking-record-refund-decision; built on feat/orders-cicd",
+            on_step["markdown"],
+        )
 
         loose = bm.build("cancel-booking", SPEC, "# Plan\n\n## Risks\n\n- None.\n", tasks)
         self.assertEqual(
@@ -529,7 +532,9 @@ class BuildMap(unittest.TestCase):
             (folder / "spec.md").write_text(SPEC, encoding="utf-8")
             text, code = bm.run_dir(folder, recommend="T3")
             self.assertEqual(code, 0)
-            self.assertEqual(text, "feat/cancel-booking-send-receipt")
+            self.assertEqual(text.splitlines()[0], "feat/cancel-booking-send-receipt")
+            self.assertIn("source: build map", text)
+            self.assertNotIn("\r", text)
             self.assertFalse((folder / "build-map.md").exists())
             missing, code = bm.run_dir(folder, recommend="T9")
             self.assertEqual(code, 2)

@@ -16,6 +16,8 @@ Serial board of ready slugs: `feat/<slug>` from default, then that spec’s buil
 
 1.129.0: each task is built on the build map row from `scripts/build_map.py --recommend T#`. A worker `needs_yes` is waiting, not blocked.
 
+1.140.0: each task is built on the first line of `--recommend`. A branch named on the task line wins over the plan step. A merged or deleted branch is not used.
+
 1.132.0: the same ready-check gate as [`/crav1-build-tasks`](crav1-build-tasks.md). `ready` and `ready-partial` start `can_start`. A held task is refused with its reason. `not-ready` starts no worker on that slug.
 
 1.134.0: the T# loop opens `..[`/crav1-build-tasks`](crav1-build-tasks.md)/branches/several-tasks/BRANCH.md`. Branch rules open `..[`/crav1-create-feature-branch`](crav1-create-feature-branch.md)/SKILL.md` and its `references/code-branch.md` and `references/task-branch.md`. It does not start those commands. The rule is `docs/reference/open-skill-file.md`.

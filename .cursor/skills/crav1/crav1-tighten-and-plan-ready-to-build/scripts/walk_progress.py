@@ -1614,6 +1614,7 @@ def branch_report(root: Path, rows: list[dict]) -> dict | None:
         work,
         verify,
         resolve_recorded=resolve_ever_recorded(root),
+        repo=map_mod().find_repo(root),
     )
     return map_mod().report_by_branch(built, rows)
 

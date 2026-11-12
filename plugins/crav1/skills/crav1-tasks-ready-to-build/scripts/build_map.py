@@ -1,12 +1,21 @@
 #!/usr/bin/env python3
-"""Build map for one slice (kit 1.133.0).
+"""Build map for one slice (kit 1.140.0).
 
 Groups the tasks onto branches, including tasks that are already done. The row name is the task branch, in this
-order: `(map: <branch>)`, else `(branch: <branch>)`, else the plan step's
-`feat/<slug>-<words>` name, else a branch the task text names as
-`committed later on <branch>`, else `feat/<slug>-<words>` from the task.
-`--recommend T1` prints that name and does not write. Tasks that resolve to
-the same name share a row.
+order: a branch named on the task line (`(map: <branch>)`, else
+`(branch: <branch>)`, else a `feat/…` name in the sentence, else
+`committed later on <branch>`), else the plan step's `feat/<slug>-<words>`
+name, else `feat/<slug>-<words>` from the task. A `from <base>` after the
+task-line branch is that branch's base. The plan step is only the fallback
+when the task line names no branch.
+`--recommend T1` prints that name and does not write. The first line is the
+branch. Later lines say where it came from (`source: task line`,
+`source: build map`, or `source: new`), the `from:` base when the task line
+states one, and `because:` when a merged or deleted branch was skipped.
+A merged branch (its pull request is recorded merged, or its tip is already
+in the base or the default branch) is not offered. A branch deleted locally
+and on the remote is not offered. A name that does not exist yet is offered
+so it can be created. Tasks that resolve to the same name share a row.
 
 A task id written in a step, or `(step: <n>)` on the task, is the link.
 `(step:)` wins when both are present.
@@ -35,6 +44,7 @@ Standard library only. Writes build-map.md in the spec folder unless --stdout.
 import importlib.util
 import pathlib
 import re
+import subprocess
 import sys
 
 sys.dont_write_bytecode = True
@@ -124,7 +134,7 @@ def scope_folder_names(scope):
 
 def branch_token(value):
     """The branch in a mark. A repo prefix is the first word; the branch is the last."""
-    parts = (value or "").strip().split()
+    parts = (value or "").replace("\r", " ").strip().split()
     return parts[-1].strip("`.,;:") if parts else ""
 
 
@@ -241,22 +251,256 @@ def branches_named_in_text(rest):
     return found
 
 
-def mismatch_note(row, rests):
-    """One note when the task text names a branch other than the row. Otherwise None."""
+def mismatch_note(row, rests, step_name=None):
+    """One note when the row is not the only branch in view. Otherwise None.
+
+    A branch in the task text that is not the row stays
+    `Task text names feat/x; built on feat/y`. When the row is the task-line
+    branch and the plan step's name is the other one, the note points that
+    way: `Plan step names feat/step; built on feat/y`.
+    """
     named = []
     for rest in rests:
         for token in branches_named_in_text(rest):
             if token != row and token not in named:
                 named.append(token)
-    if not named:
+    if named:
+        if len(named) == 1:
+            listed = named[0]
+        elif len(named) == 2:
+            listed = f"{named[0]} and {named[1]}"
+        else:
+            listed = ", ".join(named[:-1]) + ", and " + named[-1]
+        return f"Task text names {listed}; built on {row}"
+    if step_name and step_name != row:
+        return f"Plan step names {step_name}; built on {row}"
+    return None
+
+
+def sentence_branch(rest):
+    """A branch written in the task sentence, outside the marks and `committed later on`."""
+    text = BRANCH_MARK.sub(" ", rest or "")
+    text = MAP_MARK.sub(" ", text)
+    text = COMMITTED_LATER.sub(" ", text)
+    match = NAMED_BRANCH.search(text)
+    if not match:
         return None
-    if len(named) == 1:
-        listed = named[0]
-    elif len(named) == 2:
-        listed = f"{named[0]} and {named[1]}"
+    return match.group(1).rstrip(".,;:")
+
+
+def stated_base(rest, branch):
+    """The `from <base>` written after this branch on the task line, or None."""
+    if not branch:
+        return None
+    match = re.search(
+        re.escape(branch) + r"\s+from\s+`?([A-Za-z0-9][A-Za-z0-9._/-]*)`?",
+        rest or "",
+        re.I,
+    )
+    if not match:
+        return None
+    return match.group(1).rstrip(".,;:")
+
+
+def task_line_choice(task):
+    """Branch named on the task line, and its stated base.
+
+    `(map:)` wins, then `(branch:)`, then a branch in the sentence, then
+    `committed later on`. Returns `(None, None)` when the line names none.
+    """
+    rest = task.get("rest") or ""
+    if task.get("map"):
+        return task["map"], stated_base(rest, task["map"])
+    if task.get("branch"):
+        return task["branch"], stated_base(rest, task["branch"])
+    named = sentence_branch(rest)
+    if named:
+        return named, stated_base(rest, named)
+    later = committed_later(rest)
+    if later:
+        return later, stated_base(rest, later)
+    return None, None
+
+
+_PR_MARK = re.compile(r"\(PR\s+\d+", re.I)
+_MERGED_WORD = re.compile(r"\bmerged\b", re.I)
+
+
+def _pr_merged_line(line):
+    return bool(_PR_MARK.search(line or "") and _MERGED_WORD.search(line or ""))
+
+
+def task_records_merge(task):
+    """This task's own line records its pull request as merged."""
+    return _pr_merged_line(task.get("rest") or "")
+
+
+def merged_branch_names(*texts):
+    """Branch names a line records as merged. Local text only. No network."""
+    found = []
+    for text in texts:
+        for line in (text or "").splitlines():
+            if not _pr_merged_line(line):
+                continue
+            for token in branches_named_in_text(line):
+                if token not in found:
+                    found.append(token)
+            if "branch:" in line.lower():
+                body = re.sub(r"\([^)]*\)", " ", line.split(":", 1)[-1])
+                token = branch_token(body)
+                if token and token not in found:
+                    found.append(token)
+    return found
+
+
+def _git(repo, *args):
+    try:
+        proc = subprocess.run(
+            ["git", "-C", str(repo), *args],
+            capture_output=True,
+            text=True,
+            timeout=20,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    if proc.returncode != 0:
+        return None
+    return proc.stdout
+
+
+def find_repo(start):
+    """The git work tree that holds `start`, or None. Does not fetch."""
+    if not start:
+        return None
+    path = pathlib.Path(start).resolve()
+    if path.is_file():
+        path = path.parent
+    for parent in [path, *path.parents]:
+        if (parent / ".git").exists():
+            return parent
+    return None
+
+
+def _rev(repo, ref):
+    if not ref or str(ref).startswith("-"):
+        return None
+    return _git(repo, "rev-parse", "--verify", "--quiet", ref)
+
+
+def _branch_tips(repo, name):
+    """Tips of the local branch and every remote-tracking ref with this name."""
+    if not name or name.startswith("-"):
+        return []
+    tips = []
+    local = _rev(repo, f"refs/heads/{name}")
+    if local:
+        tips.append(local.strip())
+    listed = _git(repo, "for-each-ref", "--format=%(objectname) %(refname)", "refs/remotes") or ""
+    suffix = "/" + name
+    for line in listed.splitlines():
+        parts = line.split(" ", 1)
+        if len(parts) == 2 and parts[1].endswith(suffix):
+            tip = parts[0].strip()
+            if tip and tip not in tips:
+                tips.append(tip)
+    return tips
+
+
+def _base_tips(repo, stated):
+    """Tips of the stated base and the default branch. Equal tips are kept once."""
+    names = []
+    if stated and not str(stated).startswith("-"):
+        names.append(stated)
+    symbolic = _git(repo, "symbolic-ref", "--quiet", "refs/remotes/origin/HEAD")
+    if symbolic:
+        names.append(symbolic.strip().split("refs/remotes/")[-1].split("/", 1)[-1])
     else:
-        listed = ", ".join(named[:-1]) + ", and " + named[-1]
-    return f"Task text names {listed}; built on {row}"
+        for candidate in ("main", "master"):
+            if _rev(repo, f"refs/heads/{candidate}") or _rev(repo, f"refs/remotes/origin/{candidate}"):
+                names.append(candidate)
+                break
+    tips = []
+    seen = set()
+    for name in names:
+        if name in seen:
+            continue
+        seen.add(name)
+        for ref in (f"refs/heads/{name}", f"refs/remotes/origin/{name}"):
+            tip = _rev(repo, ref)
+            if tip and tip.strip() not in tips:
+                tips.append(tip.strip())
+    return tips
+
+
+def _strictly_contained(repo, tip, base_tip):
+    """True when `tip` is already in `base_tip` and the two are not the same commit.
+
+    A branch cut from the base and not yet committed has the same tip. That
+    branch is not merged.
+    """
+    if not tip or not base_tip or tip == base_tip:
+        return False
+    try:
+        proc = subprocess.run(
+            ["git", "-C", str(repo), "merge-base", "--is-ancestor", tip, base_tip],
+            capture_output=True,
+            text=True,
+            timeout=20,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return False
+    return proc.returncode == 0
+
+
+def _reflog_mentions(repo, name):
+    text = _git(repo, "reflog", "show", "-n", "800", "--format=%gs", "HEAD") or ""
+    return re.search(rf"(?<![\w./-]){re.escape(name)}(?![\w./-])", text) is not None
+
+
+def branch_fate(name, spec_text, tasks_text, repo, stated):
+    """`ok`, `absent`, `merged`, or `deleted`.
+
+    `absent` means the name is not on disk and was not checked out here, so
+    it can be created. `merged` means a recorded merged pull request, or a
+    tip already contained in the base or the default branch. `deleted` means
+    the branch was checked out here and is now gone locally and on every
+    remote. No fetch.
+    """
+    if not name:
+        return "absent"
+    recorded = name in merged_branch_names(spec_text, tasks_text)
+    if repo is None:
+        return "merged" if recorded else "ok"
+    tips = _branch_tips(repo, name)
+    if tips and any(_strictly_contained(repo, tip, base) for tip in tips for base in _base_tips(repo, stated)):
+        return "merged"
+    if recorded:
+        return "merged"
+    if not tips and _reflog_mentions(repo, name):
+        return "deleted"
+    if not tips:
+        return "absent"
+    return "ok"
+
+
+def _why(name, fate):
+    if fate == "merged":
+        return f"{name} is already merged"
+    if fate == "deleted":
+        return f"{name} was deleted locally and on the remote"
+    return None
+
+
+def _fresh_name(slug, label, used, avoided):
+    blocked = set(used) | {name for name in avoided if name}
+    base = f"feat/{kebab(slug, 6)}-{kebab(label)}"
+    name = base
+    n = 2
+    while name in blocked:
+        name = f"{base}-{n}"
+        n += 1
+    used.add(name)
+    return name
 
 
 def kebab(text, limit=4):
@@ -518,7 +762,7 @@ def _explicit(task):
     return None
 
 
-def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text="", resolve_recorded=False):
+def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text="", resolve_recorded=False, repo=None):
     """Return markdown, a short chat summary, and the one-line pointer."""
     tasks = parse_tasks(tasks_text)
     titles = work_item_titles(work_item_text)
@@ -586,25 +830,57 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text
     step_names = {}
     if mode == "steps":
         for step in steps:
-            if any(not _explicit(task) and task.get("owner") == step["n"] for task in open_tasks):
+            if any(task.get("owner") == step["n"] for task in open_tasks):
                 step_names[step["n"]] = _suggest(slug, step["body"], used_names)
 
     resolved = {}
+    offers = {}
     for task in open_tasks:
-        explicit = _explicit(task)
-        if explicit:
-            resolved[task["id"]] = explicit
-            used_names.add(explicit)
-            continue
-        if mode == "steps" and task.get("owner") in step_names:
-            resolved[task["id"]] = step_names[task["owner"]]
-            continue
-        later = committed_later(task.get("rest") or "")
-        if later:
-            resolved[task["id"]] = later
-            used_names.add(later)
-            continue
-        resolved[task["id"]] = _suggest(slug, task.get("rest") or task["title"], used_names)
+        line_name, line_base = task_line_choice(task)
+        step_name = step_names.get(task.get("owner")) if mode == "steps" else None
+        if line_name:
+            planned, source, base = line_name, "task line", line_base
+        elif step_name:
+            planned, source, base = step_name, "build map", None
+        else:
+            planned = _suggest(slug, task.get("rest") or task["title"], used_names)
+            source, base = "new", None
+        chosen, offer_source, offer_base = planned, source, base
+        because = None
+        # A ticked task stays on the branch where that work landed. So does a
+        # task whose own line records the merge: the map shows that branch.
+        # The offer for every open task still skips a merged or deleted name
+        # (1.140.0). A task that is not that merged work is moved on the map too.
+        if not task["done"]:
+            fate = branch_fate(planned, spec_text, tasks_text, repo, base or line_base)
+            if fate in ("merged", "deleted"):
+                because = _why(planned, fate)
+                alt = step_name if source == "task line" and step_name and step_name != planned else None
+                alt_fate = branch_fate(alt, spec_text, tasks_text, repo, None) if alt else None
+                if alt and alt_fate not in ("merged", "deleted"):
+                    chosen, offer_source, offer_base = alt, "build map", None
+                else:
+                    chosen = _fresh_name(
+                        slug,
+                        task.get("rest") or task["title"],
+                        used_names,
+                        {planned, alt},
+                    )
+                    offer_source, offer_base = "new", line_base
+        on_map = planned if (task["done"] or task_records_merge(task)) else chosen
+        if source == "task line" and on_map == line_name:
+            used_names.add(on_map)
+        elif offer_source == "task line":
+            used_names.add(chosen)
+        resolved[task["id"]] = on_map
+        if not task["done"]:
+            offers[task["id"]] = {
+                "name": chosen,
+                "source": offer_source,
+                "base": offer_base,
+                "because": because,
+            }
+        task["step_name"] = step_name
 
     groups = {}
     for task in open_tasks:
@@ -632,7 +908,7 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text
         if (
             mode == "steps"
             and owner in step_names
-            and all(not _explicit(task) for task in members)
+            and all(not task_line_choice(task)[0] for task in members)
             and all(resolved[task["id"]] == step_names.get(owner) for task in members)
         ):
             deliver = clean_prose(step_by_n[owner]["body"], name_of) or "; ".join(shorts)
@@ -649,7 +925,11 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text
             "task_ids": [task["id"] for task in members],
             "task_names": shown,
             "areas": areas,
-            "note": mismatch_note(name, [task.get("rest") or "" for task in members]),
+            "note": mismatch_note(
+                name,
+                [task.get("rest") or "" for task in members],
+                step_names.get(owner) if owner in step_names else None,
+            ),
         })
 
     id_branch = {}
@@ -766,7 +1046,14 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text
     markdown = _render(slug, grouping, branches, by_name, risks, has_plan, risk_blocks, name_of)
     pointer = f"Build map: docs/specs/{slug}/build-map.md"
     summary = _summary(slug, pointer, branches)
-    return {"markdown": markdown, "summary": summary, "pointer": pointer, "branches": branches, "grouping": grouping}
+    return {
+        "markdown": markdown,
+        "summary": summary,
+        "pointer": pointer,
+        "branches": branches,
+        "grouping": grouping,
+        "offers": offers,
+    }
 
 
 def recommended_branches(slug, spec_text, plan_text, tasks_text, work_item_text=""):
@@ -781,16 +1068,45 @@ def recommended_branches(slug, spec_text, plan_text, tasks_text, work_item_text=
     return found
 
 
-def recommended_branch(slug, spec_text, plan_text, tasks_text, task_id, work_item_text=""):
-    """The row branch for one open task, or None when that task is not open."""
+def _task_number(task_id):
     try:
-        task_id = int(task_id)
+        return int(task_id)
     except (TypeError, ValueError):
         match = re.search(r"(\d+)", str(task_id or ""))
         if not match:
             return None
-        task_id = int(match.group(1))
-    return recommended_branches(slug, spec_text, plan_text, tasks_text, work_item_text).get(task_id)
+        return int(match.group(1))
+
+
+def recommendation(slug, spec_text, plan_text, tasks_text, task_id, work_item_text="", repo=None):
+    """The branch to offer for one open task, or None when that task is not open.
+
+    `name` is the branch. `source` is `task line`, `build map`, or `new`.
+    `base` is the `from` base on the task line, or None. `because` is one
+    plain line when a merged or deleted branch was skipped, or None.
+    """
+    task_id = _task_number(task_id)
+    if task_id is None:
+        return None
+    result = build(slug, spec_text, plan_text, tasks_text, work_item_text, repo=repo)
+    offer = (result.get("offers") or {}).get(task_id)
+    return dict(offer) if offer else None
+
+
+def format_offer(offer):
+    """The lines `--recommend` prints. The first line is the branch name."""
+    lines = [offer["name"], f"source: {offer['source']}"]
+    if offer.get("base"):
+        lines.append(f"from: {offer['base']}")
+    if offer.get("because"):
+        lines.append(f"because: {offer['because']}")
+    return "\n".join(lines)
+
+
+def recommended_branch(slug, spec_text, plan_text, tasks_text, task_id, work_item_text="", repo=None):
+    """The branch `--recommend` offers for one open task, or None."""
+    offer = recommendation(slug, spec_text, plan_text, tasks_text, task_id, work_item_text, repo=repo)
+    return offer["name"] if offer else None
 
 
 def _task_num(token):
@@ -1193,12 +1509,13 @@ def run_dir(directory, chat=False, stdout=False, recommend=None):
     resolve_recorded = False
     if progress.is_file():
         resolve_recorded = "- Step: resolve-open-questions" in progress.read_text(encoding="utf-8")
+    repo = find_repo(directory)
     if recommend:
-        name = recommended_branch(slug, spec, plan, tasks, recommend, work)
-        if not name:
+        offer = recommendation(slug, spec, plan, tasks, recommend, work, repo=repo)
+        if not offer:
             return f"No open task {recommend}.", 2
-        return name, 0
-    result = build(slug, spec, plan, tasks, work, verify, resolve_recorded=resolve_recorded)
+        return format_offer(offer), 0
+    result = build(slug, spec, plan, tasks, work, verify, resolve_recorded=resolve_recorded, repo=repo)
     if not stdout:
         (directory / "build-map.md").write_text(result["markdown"], encoding="utf-8")
     if stdout and not chat:

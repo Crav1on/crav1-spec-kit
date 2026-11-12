@@ -12,7 +12,7 @@ Read `tasks.md`, `plan.md`, `spec.md`. Task row shape is this skill’s `assets/
 
 If `tasks.md` is missing, stop. Next: `/crav1-plan-from-spec`.
 
-**Branch:** before any code, follow `/crav1-create-feature-branch` (skill `crav1-create-feature-branch`, `references/task-branch.md`) **Build** prompt. Option 1 is the branch `scripts/build_map.py --recommend T#` prints (skill `crav1-tasks-ready-to-build`); on that branch already, go ahead. Implementation code is never written on a base branch (1.99.0): follow skill `crav1-create-feature-branch`, `references/code-branch.md`; on a base there is no Stay, and a recommended name that is a base is blocked. A dirty tree still means no checkout of an existing branch. If you are on `spec/<slug>`, stop (no code) and follow that skill’s **Build on a spec-only branch**.
+**Branch:** before any code, follow `/crav1-create-feature-branch` (skill `crav1-create-feature-branch`, `references/task-branch.md`) **Build** prompt. Option 1 is the first line of `scripts/build_map.py --recommend T#` (skill `crav1-tasks-ready-to-build`); on that branch already, go ahead. Implementation code is never written on a base branch (1.99.0): follow skill `crav1-create-feature-branch`, `references/code-branch.md`; on a base there is no Stay, and a recommended name that is a base is blocked. A dirty tree still means no checkout of an existing branch. If you are on `spec/<slug>`, stop (no code) and follow that skill’s **Build on a spec-only branch**.
 
 ## Gate
 

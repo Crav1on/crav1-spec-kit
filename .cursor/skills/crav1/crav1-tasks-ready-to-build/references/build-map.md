@@ -1,4 +1,4 @@
-# Build map (1.133.0)
+# Build map (1.140.0)
 
 Read this only when `scripts/build_map.py` cannot run. The script writes the file. Do not invent the map and do not hand-edit it.
 
@@ -11,7 +11,7 @@ Pick the interpreter as `crav1-docs/reference/running-scripts.md` says: `python3
 <interpreter> <this skill folder>/scripts/build_map.py docs/specs/<slug> --recommend T1
 ```
 
-`--recommend T1` prints that open task's row branch and does not write the file. `/crav1-build-tasks` and the Build prompt use that line as option 1. It is the same name the file uses for the row.
+`--recommend T1` prints that open task's branch and does not write the file. The first line is the branch. `/crav1-build-tasks` and the Build prompt use that line as option 1. Later lines are `source: task line`, `source: build map`, or `source: new`, then `from: <base>` when the task line states one, and `because:` when a merged or deleted branch was skipped. A task whose own line records a merged pull request stays on that branch in the file. `--recommend` does not print a merged or deleted branch, including for that task.
 
 `--chat` prints the short summary: the path, each wave's parallel count, then that wave's `Overlap:` lines, one per pair, in the same words as the file. Without it the script prints one `Build map:` line per slice. The ready-check list keeps that one line. Both write `docs/specs/<slug>/build-map.md`. `--stdout` prints and does not write. A folder with `spec.md` and no `tasks.md` is `no tasks yet (run /crav1-plan-from-spec)` and gets no file.
 
@@ -21,14 +21,14 @@ The file is committed with the spec. This command does not commit.
 
 Six things, and nothing else, plus one note when the task text names a different branch. No estimates. No file lists. Task ids appear in the Tasks field as `T#` plus the short name (1.133.0). Other fields still drop them. The map is rewritten on every ready check, so those ids match `tasks.md`.
 
-1. **Branch.** The task's branch, in this order: `(map: <branch>)`, else `(branch: <branch>)`, else the plan step's `feat/<slug>-<words>` name, else a branch named as `committed later on <branch>` when the task is not on a step, else `feat/<slug>-<words>` from the task. A repo prefix on a mark is dropped. Words in a generated name come from the step or the task, with the small words dropped.
+1. **Branch.** The task's branch, in this order: a branch named on the task line, else the plan step's `feat/<slug>-<words>` name, else `feat/<slug>-<words>` from the task. On the task line, `(map: <branch>)` wins, then `(branch: <branch>)`, then a `feat/…` name in the sentence, then `committed later on <branch>`. A repo prefix on a mark is dropped. `from <base>` after that branch is its base. Words in a generated name come from the step or the task, with the small words dropped. A merged branch, or a branch deleted locally and on the remote, is not the row for a task that is not itself that merged work (1.140.0).
 2. **Delivers.** One line, the step sentence, or the short task names when the branch is not the whole step. A task id in that prose is replaced with that task's short name, or removed. A removed id does not leave a dangling `'s`, an empty `()`, a leading comma, or a double space.
 3. **Tasks.** One task per entry, separated by `; `, as `T#` plus the short name. Example: `T5 orders-api: require pipeline 6 as build validation`. The short name is the `task: T# <title>` line in the slice's `work-item.md` when that line exists. Otherwise it is the task text up to the first ` (`, `, in `, or sentence end, at most about 80 characters. Marks such as `(host setup)`, `(manual, secret)`, `(verify: …)`, `(spec: …)`, `(after: …)`, and branch prefixes are dropped. The `T#` stays.
 4. **Waits for.** The other branches it waits for, or `none`. A dependency that names no task is `a dependency that names no task`.
 5. **Question.** Each open question holding the branch, then who has the answer. Who comes from the question's own "Waiting for <who>" phrase, then the latest `Pending:` or `Asked:` line, otherwise `not named yet`.
 6. **Ready now.** One of `ready`, `waiting on a question`, `waits in order`, `blocked`, `done`, or `held, waits on <branch>`. A wait inside the same branch does not change this. `blocked` is a cycle, a dependency that names no task, a plan risk, or a missing plan. `done` means every task on the branch is ticked. `held, waits on <branch>` means this branch has no question of its own and waits on a branch a question holds. That branch cannot start now.
 
-When the row branch differs from a branch named in the task text (`(branch: …)`, `committed later on <branch>`, or another `feat/…` name), the row adds one line: `Task text names feat/orders-cicd; built on feat/orders-retry`. The row's own name is not listed. The note does not change Ready now or the wave.
+When the row branch differs from a branch named in the task text (`(branch: …)`, `committed later on <branch>`, or another `feat/…` name), the row adds one line: `Task text names feat/orders-cicd; built on feat/orders-retry`. When the row is the branch named on the task line and the plan step's name is the other one, the line points the other way: `Plan step names feat/orders-one-commit-cleanup-main; built on feat/orders-host-setup-scripts`. The row's own name is not listed. The note does not change Ready now or the wave.
 
 Wave 1 is the branches that do not wait for another branch. Wave 2 is what opens after those, and so on. A branch held only by a question can still sit in wave 1; Ready now says it is waiting. The wave heading is always `N branch, M can start now` or `N branches, M can start now`, including one branch (`Wave 1: 1 branch, 1 can start now`) and a wave where every branch can start (`Wave 1: 3 branches, 3 can start now`). A question hold, or a branch held because it waits on one, lowers M (`Wave 1: 3 branches, 2 can start now`, or `Wave 1: 1 branch, 0 can start now`). A done branch does not count as able to start. When the wave has done tasks, the heading adds them after that count: `1 branch, 1 can start now, 2 done`. That count is also the first part of each wave line in the `build-map` summary. Each `Overlap:` line for that wave follows it, one pair per line. Blocked branches are listed under `## Blocked`, not in a wave.
 
@@ -40,7 +40,7 @@ Under a wave, an `Overlap:` line names a pair of branches in that wave that shar
 
 Numbered items under `## Approach` are the plan steps. A step owns the tasks whose ids are written in that step. `(step: 1)` on a task line is the same link, and it wins when the step text names a different step. One branch per step.
 
-`(map: feat/cancel-refund)` puts that task on the named branch instead. `(branch: feat/orders-retry)` does the same when no `(map:)` is set. Tasks that resolve to the same name share it. Leave the marks off and the task stays on its plan step. A task that is not on a step and says `committed later on feat/orders-cicd` uses that branch.
+`(map: feat/cancel-refund)` puts that task on the named branch. `(branch: feat/orders-retry)` does the same when no `(map:)` is set. A `feat/…` name in the sentence, or `committed later on feat/orders-cicd`, does the same when neither mark is set. Tasks that resolve to the same name share it. Leave every branch off the task line and the task stays on its plan step. Two tasks on one step can name different branches. The plan step's name is only the fallback.
 
 When the plan has no steps, the file says `The plan has no steps, so this map uses one branch per task.` When the steps name no task, it says `The plan steps do not name tasks, so this map uses one branch per task.` A task the steps do not name gets its own branch, and the file says so. A cycle, or an `(after:)` that names no task, is listed under Blocked.
 

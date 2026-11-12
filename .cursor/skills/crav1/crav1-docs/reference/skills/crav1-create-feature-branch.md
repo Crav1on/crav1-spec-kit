@@ -18,6 +18,8 @@ Prompt for `feat/<slug>` or specify-only `spec/<slug>`; no silent checkout, no p
 
 1.129.0: a task's Build prompt offers the branch `scripts/build_map.py --recommend T#` prints, the same name as the build map row: `(map:)`, else `(branch:)`, else the plan step, else `committed later on`. The branch question is its own card, and a typed name on that card is the answer. A different pick writes `(map: <picked>)` on the task in the specs repo and does not commit it.
 
+1.140.0: a branch named on the task line wins over the plan step. That is `(map:)`, else `(branch:)`, else a `feat/…` name in the sentence, else `committed later on`. `from <base>` after that name is the base, for example `feat/orders-host-setup-scripts from develop`. The plan step is the fallback when the task line names none. `--recommend` prints the branch on the first line, then `source: task line`, `source: build map`, or `source: new`, and `because:` when a merged or deleted branch was skipped. A merged pull request, a tip already in the base or the default branch, or a branch deleted locally and on the remote is not offered. The card lists the recommended option first. The description says where the name came from. When `because:` is present, that sentence is the description.
+
 1.130.0: a typed branch name is that card's free-text answer, hint `Type a branch name`. There is no option labelled Other name.
 
 ## Runs when

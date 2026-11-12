@@ -75,9 +75,9 @@ Some teams give a spec its own long-lived branch and each task a short sub-branc
 - **Done.** Status shows `Sub-branches: 1 of 2 merged into feat/orders-capacity.` The spec is done when the spec branch has reached the base branch. A sub-branch that never merged is reported as `left behind: feat/orders-capacity-t4 (not in feat/orders-capacity)` and doesn't block done.
 - **Reverts.** A merged branch whose change was later reverted on the base shows `feat/orders-retry: merged, reverted on develop (<sha>)`. It is report only and doesn't change done.
 
-## The branch the build offers (1.129.0)
+## The branch the build offers (1.140.0)
 
-The branch question is its own card, before the permissions question. Option 1 is the branch the build map already uses for that task (`scripts/build_map.py --recommend T1`). On that branch already, there is no prompt. A typed name on the card is the answer. If you pick a different branch, the task line gains `(map: <that branch>)` in the specs repo. That write is not a commit. A `(host setup)` option says the script will live on the recommended branch, and says when the task text names a branch that is cut later.
+The branch question is its own card, before the permissions question. The recommended option is first. Option 1 is the first line of `scripts/build_map.py --recommend T1`. A branch named on the task line wins over the plan step's generated name, including `feat/orders-host-setup-scripts from develop`. The plan step is the fallback when the task line names none. The description says where the name came from: `From the task line.`, `From the build map.`, or `New.`. A merged branch, or a branch deleted locally and on the remote, is not offered. When the script prints `because:`, that sentence is the description, for example `New, because feat/orders-one-commit-cleanup-main is already merged.` On that branch already, there is no prompt. A typed name on the card is the answer. If you pick a different branch, the task line gains `(map: <that branch>)` in the specs repo. That write is not a commit. A `(host setup)` option says the script will live on the recommended branch, and says when the task text names a branch that is cut later.
 
 A missing permissions answer, or a branch name in the permissions slot, is asked again. The run does not guess `click`.
 
