@@ -74,9 +74,14 @@ The same walk, `/crav1-tighten-and-plan-ready-to-build`, runs `/crav1-plan-from-
 | --- | --- |
 | Skill | `/crav1-build-tasks` |
 | Skill | `/crav1-build-features` |
+| Skill | `/crav1-build-walk` |
 | Skill | `/crav1-verify-build-against-spec` |
 | Skill | `/crav1-fix-build-gaps` |
 | Subagent | `crav1-build-task-agent` |
+
+`/crav1-build-walk` (1.142.0) is in the Build lane. The user asks for the walk. It opens the build, verify, commit, and pull-request skills by file and does not replace them. While one branch is in progress the reply has one Next, the walk's, and a step skill's own Next is not printed. It does not push, open, or merge without a yes in that run. It never rebases.
+
+Started from a ready-to-build report, the walk offers each ready branch as its own Next, with the T number beside the task name. One checkout follows one branch. A task that needs code from an unmerged branch is cut from that branch. The merge list says which branch merges back into the branch it was cut from, and in what order. Other-owner mode never opens a pull request and never merges.
 
 ## Cross-cutting
 
@@ -212,6 +217,9 @@ The merged skills take exact choice words instead of `--flags`. A word in the in
 | `/crav1-add-to-spec` | What you have | `fact` · `dump` · `code change` · `meeting` · `mail` · `chat` |
 | `/crav1-build-tasks` | Which tasks | `one task` · `range` · `all tasks` |
 | `/crav1-build-tasks` | Branch | `new branch` |
+| `/crav1-build-walk` | Do this step | `yes` · `stop` |
+| `/crav1-build-walk` | Whose branch | `switch` · `own` |
+| `/crav1-build-walk` | Pull request description | `edit description` |
 | `/crav1-verify-build-against-spec` | Also check the latest pipeline runs? | `pipeline runs` |
 | `/crav1-fix-build-gaps` | Which gaps | `verify gaps` · `live gaps` |
 | `/crav1-fix-build-gaps` | Branch | `new branch` |
@@ -274,6 +282,7 @@ build:
   skills:
     - crav1-build-tasks
     - crav1-build-features
+    - crav1-build-walk
     - crav1-verify-build-against-spec
     - crav1-fix-build-gaps
   subagents:

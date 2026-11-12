@@ -53,7 +53,7 @@ Branch and permissions are two questions (1.129.0). The branch question comes fi
 
 ## After
 
-Every path ends with the batch or single-task TL;DR from its branch, then names `/crav1-open-pr`. Do not run it. Do not push.
+Every path ends with the batch or single-task TL;DR from its branch, then names `/crav1-open-pr`. Do not run it. Do not push. When `/crav1-build-walk` opened this skill, do not print that line. The walk prints its one line (1.142.0).
 
 ## Parked and retired specs (1.60.0)
 

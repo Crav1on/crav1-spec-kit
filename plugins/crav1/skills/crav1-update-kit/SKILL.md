@@ -63,5 +63,5 @@ Do not push unless the user, in this run, already said to push. Do not add a pus
 - Never write, commit, or push without the user's yes in this run.
 - Never switch branches, and never rebase. Other branches stay on the old kit until this branch is merged into them.
 - Never target `main`, a branch, a commit, or an open pull request.
-- Never edit a spec, `walk-progress.md`, a plan, a task list, a note, a playbook, or a build map as part of the file replace.
+- Never edit a spec, `walk-progress.md`, a `build-progress` file, a plan, a task list, a note, a playbook, or a build map as part of the file replace.
 - One commit, message `Update CRAV1 kit vA to vB`. The script does not push.

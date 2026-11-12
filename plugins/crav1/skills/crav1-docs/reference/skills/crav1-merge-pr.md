@@ -16,6 +16,8 @@ Merge one named pull request only when that turn asks; always a merge commit; no
 
 1.139.0: if that merge leaves `walk-progress.md` conflicted only on version lines, run `resolve-stamps` as [`/crav1-finalize-commit`](crav1-finalize-commit.md) `references/pull.md` says. This skill still does not merge the branch itself.
 
+1.142.0: a yes on [`/crav1-build-walk`](crav1-build-walk.md)'s card that names this pull request is the ask. When the walk opened this skill, the walk prints the one Next.
+
 1.68.0: after a sub-branch merge, says `<n> of <m> sub-branches merged into <spec branch>` and any `left behind` branch; a reverted branch shows `merged, reverted on <base> (<sha>)`, report only.
 
 1.69.0: the `Promotion:` line after the after-merge line, with the optional `pipeline runs` check.

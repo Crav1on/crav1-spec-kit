@@ -8,7 +8,7 @@ A skill names the next step. It does not run it, unless that skill already runs 
 
 `Next:` is exactly one line. It names the single step to run now, and a short reason why.
 
-The ready check is the exception (1.133.0). When tasks that can start sit on more than one build-map branch, `/crav1-tasks-ready-to-build` and the tighten-and-plan ready check print one `Next:` line per branch. Each line is still one `/crav1-build-tasks` command, for the tasks on that branch. Those branches do not wait on each other, so they can start together. One ready branch stays one line. Every other skill keeps one `Next:` line.
+The ready check is the exception (1.133.0). When tasks that can start sit on more than one build-map branch, `/crav1-tasks-ready-to-build` and the tighten-and-plan ready check print one `Next:` line per branch. Each line is still one `/crav1-build-tasks` command, for the tasks on that branch. Those branches do not wait on each other, so they can start together. One ready branch stays one line. `/crav1-build-walk` has the same shape at the start (1.142.0). When it is started from a ready-to-build report and no branch is chosen, it prints one `Next:` line per ready branch. Each line names that branch's tasks as `T#` plus the short name. Once one branch is in progress, the walk prints one `Next:` line. A step skill it opened does not add its own `Next:` line. Every other skill keeps one `Next:` line.
 
 ```text
 Next: /crav1-pr-status pr71, pr73, pr74, because this run added Points nothing has sorted yet.
@@ -56,6 +56,7 @@ Rules that already pick a first step keep that choice, and use this shape.
 - New information changed an existing slice, and no `Conflict:` line was written: `Next` is `/crav1-tighten-spec` for that slug, because the new information is not tightened yet. Resolve and the plan are not listed here.
 - Spark, ideas, and bundle keep one `Left:` line with one `Next:` on that same last line. `Next` is `/crav1-tighten-spec` while gaps or open questions remain, and `/crav1-plan-from-spec` when nothing is left to tighten.
 - The committed or changed files include a `walk-progress.md`, and `resume` for that folder reports a `continue_from` (1.123.0). `Next` is `/crav1-tighten-and-plan-ready-to-build`, with the playbook path when the progress file has one, because the walk paused before that step. This comes before a pull request.
+- The checkout has an unfinished `build-progress` file for the branch HEAD is on (1.142.0). `Next` is `/crav1-build-walk`, because that walk has not finished this branch. This comes before a pull request, after the specify walk when both are unfinished.
 
 ```text
 Next: /crav1-tighten-and-plan-ready-to-build docs/playbooks/orders-retry.md, because the walk paused before plan-from-spec.

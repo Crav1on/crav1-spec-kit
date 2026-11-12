@@ -1012,6 +1012,7 @@ skills:
   you_run_next:
   - /crav1-ado-sync
   - /crav1-tasks-ready-to-build
+  - /crav1-build-walk
   - /crav1-build-tasks
   - /crav1-build-features
   first_prompt: '/crav1-tighten-plan
@@ -1041,6 +1042,7 @@ skills:
   purpose: Build tasks from tasks.md, always in an isolated worker per task; asks which tasks (one, a
     range, or all).
   in_depth:
+  - '1.142.0: when `/crav1-build-walk` opened this skill, do not print the open-pr Next. The walk prints its one Next.'
   - '1.141.0: when a named person''s yes is not on record, the parent writes or offers an `## Approval needed` item. It does not write `Approved:`. A matching `Approved:` line means that yes is on record. A live `apply` still needs the user''s own yes in that run, and the task stays unticked until `check` is ok.'
   - '1.99.0: on a base branch the Build prompt has no Stay, a headless run stops unless `new branch`, a task naming a base branch is blocked, and the worker returns blocked on a base before any edit or commit.'
   - '**`/crav1-build-tasks`** opens with one question: which tasks to build, one `T#`, a range, or all
@@ -1133,6 +1135,52 @@ skills:
   you_run_next:
   - /crav1-open-pr
   first_prompt: /crav1-build-features <slug-a> <slug-b>
+- name: crav1-build-walk
+  choice_words:
+  - question: Do this step
+    words:
+    - word: "yes"
+      means: "do the write, push, open, or merge just shown"
+    - word: "stop"
+      means: "do not do it"
+  - question: Whose branch
+    words:
+    - word: "switch"
+      means: "build on the other person's branch, in other-owner mode"
+    - word: "own"
+      means: "this branch is ours"
+  - question: Pull request description
+    words:
+    - word: "edit description"
+      means: "change the other owner's pull request description, only because this run asked"
+  lane: build
+  group: Build
+  starter: false
+  since: 1.142.0
+  stage: stable
+  prompt_budget: 4
+  walkthrough: docs/from-build-walk.md
+  purpose: Walk one work branch from build through merge, with one Next while it runs.
+  in_depth:
+  - '**`/crav1-build-walk`** (1.142.0) is one guided walk of one work branch. It opens `/crav1-build-tasks`, verify, `/crav1-finalize-commit`, `/crav1-open-pr`, the merge of the base into the branch, `/crav1-merge-pr`, and the tick, by file. It does not replace those skills. While one branch is in progress the reply has one Next, and the step skill''s own Next is not printed. A start from a ready-to-build report prints one Next per ready branch, with the T number beside the task name.'
+  - 'Each step that writes, pushes, opens, or merges asks `yes` first. It never rebases. Other-owner mode, after `switch`, never opens a pull request, never merges the base in, and never merges or completes the pull request. It posts one comment per push and edits the description only on `edit description`. Ticks wait until that pull request is merged.'
+  - 'A task that needs code from an unmerged branch is cut from that branch. The progress file and the report show the merge list, child first, back into the branch it was cut from. A merged or deleted branch is not offered. A `(Runs live)` task gets a script, a dry run, then the user''s own yes, recorded as `(live yes: <name>, <date>)`. An unapproved Approval needed item holds the task. An `Approved:` line does not replace that yes. Without the yes the task stays unticked.'
+  use_when: A ready slice should be built one work branch at a time, through the pull request and the merge
+  table:
+    reads: The spec folder, the build map, the pull request author, and commit authors
+    writes: 'One `build-progress/<branch>.md` per work branch, after yes, and `(live yes: <name>, <date>)` on a Runs live task after yes'
+  reads: Reads `spec.md`, `plan.md`, `tasks.md`, `build-map.md`, and this branch's `build-progress` file. The branch offer is `scripts/build_map.py --recommend` through `scripts/build_walk.py`. It reads the pull request author and the branch's commit authors before other-owner mode.
+  writes: 'Writes `docs/specs/<slug>/build-progress/<branch>.md` after yes, with normalized hashes and `Content stamp: normalized`. Writes `(live yes: <name>, <date>)` on the task line after the live yes. Posts one pull request comment per push in other-owner mode, after yes. Does not commit that progress file itself.'
+  leaves_alone: Leaves `spec.md` alone except that live-yes note. Does not tick a row itself. Does not push, open, or merge before `yes`. Does not edit another owner's pull request description unless this run said `edit description`. Never rebases.
+  exceptions: 'A headless run stops before any step. An unnamed current user is not a switch. A merged or deleted branch is not offered. An unapproved Approval needed item is not built. An `Approved:` line does not run the live change. Other-owner mode does not open, merge the base, or merge the pull request. It is not a starter option.'
+  called_by: Called by the user.
+  runs_by_itself: Opens `/crav1-build-tasks`, `/crav1-verify-build-against-spec`, `/crav1-finalize-commit`, `/crav1-open-pr`, and `/crav1-merge-pr` by file and follows them. It does not start those slash commands. In other-owner mode it does not open the pull-request or merge skills.
+  you_run_next:
+  - /crav1-build-walk
+  - /crav1-verify-build-against-spec
+  first_prompt: '/crav1-build-walk
+
+    @docs/specs/<slug>/'
 - name: crav1-verify-build-against-spec
   lane: build
   group: Verify and fix
@@ -1143,6 +1191,7 @@ skills:
   walkthrough: docs/from-verify.md
   purpose: Map every v0 acceptance line to tests or UI checks and report pass, fail, or missing.
   in_depth:
+  - '1.142.0: when `/crav1-build-walk` opened this skill, do not print the case Next. The walk prints its one Next.'
   - TL;DR of implemented vs not, then acceptance details in `verify.md`.
   - >-
     Before the tests, a local dependency preflight checks Azurite, database containers, and emulators the
@@ -1276,6 +1325,7 @@ skills:
   - 'Only write the message (was `/crav1-draft-commit-message`): Paste-ready Summary/Description for any
     git client; CRAV1 style or live git log, once or onward (deletable rule); does not commit unless they
     ask. Optional Azure Boards mention from `docs/specs/<slug>/work-item.md` is the last description line.'
+  - '1.142.0: an unfinished build-progress file for this branch comes before the open-pr line. A build-progress conflict that is only hash lines is settled on the pull path, the same way as walk-progress.md.'
   - 'Commit (was `/crav1-finalize-commit`): Same draft, then **commit first**, then copy for your git
     client, change (edit or rewrite), or stop (no push). Keeps that mention through the HEAD check and the strip
     of the known tool trailers it did not write (the list in `references/tool-trailers.md`: Cursor, Claude Code,
@@ -1560,6 +1610,7 @@ skills:
   - '1.64.0: after a confirmed merge, says `<n> of <m> branches of <slug> now merged into <target>` per spec. No file edits.'
   - '1.66.0: a branch that is behind the base or has conflicts gets one line: merge the base into the branch, push, then ask to merge again. Never a rebase.'
   - '1.139.0: if that merge leaves `walk-progress.md` conflicted only on version lines, run `resolve-stamps` as `/crav1-finalize-commit` `references/pull.md` says. This skill still does not merge the branch itself.'
+  - '1.142.0: a yes on `/crav1-build-walk`''s card that names this pull request is the ask. When the walk opened this skill, the walk prints the one Next.'
   - '1.68.0: after a sub-branch merge, says `<n> of <m> sub-branches merged into <spec branch>` and any `left behind` branch; a reverted branch shows `merged, reverted on <base> (<sha>)`, report only.'
   - '1.69.0: the `Promotion:` line after the after-merge line, with the optional `pipeline runs` check.'
   - '1.97.0: before the merge it reads the merge-readiness line (`Ready:`) of the PR note''s shared PR record. `Ready: no` stops the merge and lists the reasons, unless the turn says `anyway`; `anyway` never skips a required check, policy or review. No line: it goes on and names `/crav1-pr-status`. After the merge it sets `State: merged` and `Ready: merged` in the record instead of a `State on <date>` line.'
@@ -1658,7 +1709,7 @@ skills:
   - Kit-owned files are three-way merged against the previous release. Non-overlapping edits combine. A clash
     shows both sides; the recommendation keeps the local side. A copied `docs/specs/_template/` or
     `docs/system/_template/` file is replaced only when it still matches the old release apart from line endings.
-    Specs, walk-progress, plans, tasks, notes, playbooks, and the build map are not part of the replace.
+    Specs, walk-progress, build-progress, plans, tasks, notes, playbooks, and the build map are not part of the replace.
   - A plugin or user-scope install is not a commit. The command compares versions, says how to refresh or
     recopy, and still offers migration steps. After the replace, migration steps for the jump are dry-run,
     listed, and written only on yes. They are not staged into the kit commit.
@@ -1676,7 +1727,7 @@ skills:
   writes: Writes kit-owned files on the current branch after a yes, replaces a copied template that still
     matches the old release apart from line endings, and commits `Update CRAV1 kit vA to vB` when the user chose the
     commit. A migration listed for the jump is dry-run and written only on its own yes, and is left unstaged.
-  leaves_alone: Leaves specs, `walk-progress.md`, plans, tasks, notes, playbooks, the build map, persist
+  leaves_alone: Leaves specs, `walk-progress.md`, `build-progress/`, plans, tasks, notes, playbooks, the build map, persist
     rules, the transfer data policy, and `kit-maintainer.mdc` alone. Does not switch branches, rebase, or
     push. A plugin install gets no kit commit.
   exceptions: a target that is not a published release tag stops in one line. A clash is not overwritten.
@@ -1738,6 +1789,7 @@ skills:
   called_by: Called by the user with its slash command, any time (command-only).
   runs_by_itself: Calls no skill.
   you_run_next:
+  - /crav1-build-walk
   - /crav1-build-tasks
   first_prompt: '/crav1-tasks-ready-to-build
 
@@ -2460,6 +2512,7 @@ skills:
   you_run_next:
   - /crav1-plan-from-spec
   - /crav1-tasks-ready-to-build
+  - /crav1-build-walk
   - /crav1-build-tasks
   - /crav1-build-features
   - /crav1-finalize-commit
@@ -2732,8 +2785,11 @@ routing:
       notes:
       - 'The same walk, `/crav1-tighten-and-plan-ready-to-build`, runs `/crav1-plan-from-spec`, then `/crav1-review-plan` and `/crav1-tighten-plan`, then the ready check. It does not replace those skills. It stops when the check is clear and does not start `/crav1-build-tasks`.'
     build:
-      skills: {}
-      notes: []
+      skills:
+        crav1-build-walk:
+        - '`/crav1-build-walk` (1.142.0) is in the Build lane. The user asks for the walk. It opens the build, verify, commit, and pull-request skills by file and does not replace them. While one branch is in progress the reply has one Next, the walk''s, and a step skill''s own Next is not printed. It does not push, open, or merge without a yes in that run. It never rebases.'
+      notes:
+      - 'Started from a ready-to-build report, the walk offers each ready branch as its own Next, with the T number beside the task name. One checkout follows one branch. A task that needs code from an unmerged branch is cut from that branch. The merge list says which branch merges back into the branch it was cut from, and in what order. Other-owner mode never opens a pull request and never merges.'
     cross-cutting:
       skills:
         crav1-merge-pr:

@@ -23,6 +23,8 @@ Use this after tasks are built. Verify maps every v0 acceptance line in `spec.md
 
 On a base branch (`main`, `develop`, the `Merges into` branch, `release/*`) `/crav1-fix-build-gaps` edits no code: it first offers **Create fix/<slug> from <into> (Recommended)**, an existing branch, or stop (1.99.0). A typed branch name is that card's free-text answer, hint `Type a branch name` (1.130.0). A headless run stops unless it has `new branch`.
 
+When `/crav1-build-walk` opened `/crav1-verify-build-against-spec`, the case line is not the Next line. The walk prints its one Next (1.142.0).
+
 ## Local test dependencies
 
 Before any test runs, in build, verify, and fix, the kit checks the local dependencies the tests need: Azurite for Azure Storage, a database container, an emulator, whatever the repo's tests, config, compose files, or README name. For each one that is not running it asks:
