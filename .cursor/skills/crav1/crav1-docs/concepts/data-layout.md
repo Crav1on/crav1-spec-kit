@@ -192,6 +192,19 @@ Under each item in a spec's `## Open questions`, the kit can add four kinds of l
 
 `/crav1-show-or-ask-open-questions` writes `Pending:` or `Asked:` after you say whether the draft was sent. `/crav1-add-to-spec` write `Answered:` when a kept quote clearly answers that question. `/crav1-resolve-open-questions` then walks the question with you. The full format is in [open-questions.md](../../.cursor/skills/crav1/crav1-add-to-spec/references/open-questions.md).
 
+## Approval needed
+
+`## Approval needed` sits beside `## Open questions`. An item is a gate, not a question to fold into the spec. Resolve does not walk it and does not remove it.
+
+```text
+- The partner approves applying the CI build policy.
+  - Person: the partner
+  - Holds: T4
+  - Approved: the partner, 2026-10-02, https://github.com/example/widgets/pull/12#discussion_r9, "Yes, apply the policy." (accepted by Alex 2026-11-12)
+```
+
+`Person:` is who gives the yes. `Holds:` is the tasks that wait. A matching `Approved:` line clears the hold and stays. The source date is the quote's date. The date in parentheses is the day it was accepted. `/crav1-show-or-ask-open-questions` may write `Asked:` or `Pending:` under the item and never sends the draft. An edit confined to this section does not reopen a tighten-and-plan step. The ready check reads the live section.
+
 ## Readiness marks
 
 [`/crav1-tasks-ready-to-build`](../from-tasks-ready-to-build.md) reads these marks and does not write them. It rewrites `build-map.md` every run (1.128.0):
@@ -204,6 +217,9 @@ Under each item in a spec's `## Open questions`, the kit can add four kinds of l
 | `Blocks: T<n>[, T<n>]` | `docs/specs/<slug>/spec.md` (indented under a kept-open question) | `/crav1-resolve-open-questions`, `/crav1-plan-from-spec` | The question blocks only those tasks. This line wins over a plan Risk that says do not implement until resolved. |
 | `Blocks: none [(<reason>)]` | `docs/specs/<slug>/spec.md` (indented under a kept-open question) | `/crav1-resolve-open-questions`, `/crav1-plan-from-spec`, `/crav1-tighten-and-plan-ready-to-build` | The question blocks no current task. A short reason in parentheses is optional. Since 1.137.0 a missing Blocks line holds T# ids named in the question text, and holds the whole slice only when no task is named and resolve-open-questions has never been recorded. |
 | `Blocks: whole slice` | `docs/specs/<slug>/spec.md` (indented under a kept-open question) | `/crav1-resolve-open-questions` | The question holds every unfinished task. The ready check says Holds the whole slice. This stays after resolve-open-questions is recorded and through an open-questions edit. A missing Blocks line does not mean this. |
+| `Person: <who>` | `docs/specs/<slug>/spec.md` (indented under an Approval needed item) | `/crav1-plan-from-spec`, `/crav1-build-tasks` | The person whose yes the item waits on. |
+| `Holds: T<n>[, T<n>]` | `docs/specs/<slug>/spec.md` (indented under an Approval needed item) | `/crav1-plan-from-spec`, `/crav1-build-tasks` | The tasks that wait until a matching Approved line is recorded. Other tasks can still start. |
+| `Approved: <person>, <source date>, <source>, "<quote>" (accepted by <recorder> <date>)` | `docs/specs/<slug>/spec.md` (indented under an Approval needed item) | `/crav1-record-approval` | A lasting record of a named person's yes. The source date is the quote's date. The last date is when it was accepted. Resolve and every other skill leave the line in place. This is not the data-model stage line. |
 | `Reviewed: <date>, P# open: <n>` | `docs/specs/<slug>/plan.md` (under the # Plan title) | `/crav1-review-plan`, `/crav1-tighten-plan` | The plan was reviewed, and how many reviewer findings are still open. |
 | `(after: T<n>[, T<n>])` | `docs/specs/<slug>/tasks.md` (end of a task line) | `/crav1-plan-from-spec` | The task needs those tasks done first. |
 | `(step: <n>)` | `docs/specs/<slug>/tasks.md` (end of a task line) | `/crav1-plan-from-spec` | The task belongs to this numbered Approach step on the build map. When absent, a task id written in the step is the link. This mark wins when both are present. |
@@ -316,6 +332,14 @@ Every mark and line format the kit writes inside product files, generated from [
 | Blocks | `  - Blocks: T<n>[, T<n>]` | `docs/specs/<slug>/spec.md` (indented under a kept-open question) | `/crav1-resolve-open-questions`, `/crav1-plan-from-spec` | `/crav1-tasks-ready-to-build` | 1.54.0 |
 | Blocks none | `  - Blocks: none [(<reason>)]` | `docs/specs/<slug>/spec.md` (indented under a kept-open question) | `/crav1-resolve-open-questions`, `/crav1-plan-from-spec`, `/crav1-tighten-and-plan-ready-to-build` | `/crav1-tasks-ready-to-build` | 1.125.0 |
 | Blocks whole slice | `  - Blocks: whole slice` | `docs/specs/<slug>/spec.md` (indented under a kept-open question) | `/crav1-resolve-open-questions` | `/crav1-tasks-ready-to-build` | 1.137.0 |
+
+### Approval needed
+
+| Mark | Format | Where | Written by | Read by | Since |
+| --- | --- | --- | --- | --- | --- |
+| Person | `  - Person: <who>` | `docs/specs/<slug>/spec.md` (indented under an Approval needed item) | `/crav1-plan-from-spec`, `/crav1-build-tasks` | `/crav1-tasks-ready-to-build`, `/crav1-record-approval`, `/crav1-show-or-ask-open-questions` | 1.141.0 |
+| Holds | `  - Holds: T<n>[, T<n>]` | `docs/specs/<slug>/spec.md` (indented under an Approval needed item) | `/crav1-plan-from-spec`, `/crav1-build-tasks` | `/crav1-tasks-ready-to-build`, `/crav1-build-tasks`, `/crav1-record-approval` | 1.141.0 |
+| Approved (person's yes) | `  - Approved: <person>, <source date>, <source>, "<quote>" (accepted by <recorder> <date>)` | `docs/specs/<slug>/spec.md` (indented under an Approval needed item) | `/crav1-record-approval` | `/crav1-tasks-ready-to-build`, `/crav1-build-tasks`, `/crav1-resolve-open-questions`, `/crav1-show-or-ask-open-questions` | 1.141.0 |
 
 ### Research and stale marks
 
@@ -450,6 +474,7 @@ The kit finds these headings by name. Keep the names when you edit by hand.
 | --- | --- | --- |
 | `## Acceptance criteria` | `spec.md` | Yes or no lines. Plan maps each to a task. Verify checks them |
 | `## Open questions` | `spec.md` | Tighten-spec, resolve-open-questions, show-or-ask-open-questions; the marks above |
+| `## Approval needed` | `spec.md` | Plan-from-spec and build-tasks add an item. Record-approval writes `Approved:`. Show-or-ask drafts the request. Resolve does not remove the item or an `Approved:` line |
 | `## Assumptions`, `## Constraints` | `spec.md` | Written by intake and ideas; read by resolve-open-questions and plan |
 | `## Repos` | `spec.md` | Written by intake for a one-repo feature |
 | `## Match` | `spec.md` | Match status: done, partial, not in the code, or retired. Read by plan, tighten-spec, explain-existing-system, build-features |

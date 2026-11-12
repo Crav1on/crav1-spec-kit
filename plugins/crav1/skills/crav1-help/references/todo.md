@@ -10,7 +10,7 @@ Read only on `todo`. What to do next, ranked from the records the kit already ke
 
 ## What it reads
 
-Every `docs/specs/<slug>/spec.md` in scope (skip `_template`, `retired/`, `Moved:` pointers): `## Open questions` with their `Asked:`, `Pending:`, `Answered:`, `Blocks:` lines, `Waiting for <who>` and `Decision.` points, `## Research findings` stale lines, a `Parked:` line, and dates written in `## Constraints`. Each `tasks.md`, counted with the readiness rules of `/crav1-tasks-ready-to-build`. The generated notes indexes for `waiting_for`. The `## PR record` of each PR note whose `State` is not `merged`, `abandoned` or `closed` (1.97.0; `crav1-add-to-spec` `references/pr-record.md`): its `waiting on <name>` and `needs <name>` Points. No Azure Boards, no pipeline runs, no host read.
+Every `docs/specs/<slug>/spec.md` in scope (skip `_template`, `retired/`, `Moved:` pointers): `## Open questions` with their `Asked:`, `Pending:`, `Answered:`, `Blocks:` lines, `Waiting for <who>` and `Decision.` points, each `## Approval needed` item that has no matching `Approved:` line (its `Person:` and `Holds:`), `## Research findings` stale lines, a `Parked:` line, and dates written in `## Constraints`. Each `tasks.md`, counted with the readiness rules of `/crav1-tasks-ready-to-build`. The generated notes indexes for `waiting_for`. The `## PR record` of each PR note whose `State` is not `merged`, `abandoned` or `closed` (1.97.0; `crav1-add-to-spec` `references/pr-record.md`): its `waiting on <name>` and `needs <name>` Points. No Azure Boards, no pipeline runs, no host read.
 
 ## Ranking
 

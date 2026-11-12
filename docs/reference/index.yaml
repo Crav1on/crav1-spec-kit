@@ -56,6 +56,11 @@ skills:
     starter: false
     page: reference/skills/crav1-show-or-ask-open-questions.md
     purpose: "Show the cross-spec overview of open questions (read-only), or draft them to ask; asks which."
+  crav1-record-approval:
+    lane: cross-cutting
+    starter: false
+    page: reference/skills/crav1-record-approval.md
+    purpose: "Record a named person's yes on an Approval needed item, after accept in this run."
   crav1-add-to-spec:
     lane: cross-cutting
     starter: false

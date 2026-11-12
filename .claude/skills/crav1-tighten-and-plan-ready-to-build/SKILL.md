@@ -48,7 +48,7 @@ A step with nothing to do says so, records that, and moves on. Optional offers a
 
 ## Stop
 
-The spec, the plan, and the tasks stay the source of truth. `walk-progress.md` only records position. Do not edit `spec.md`, `plan.md`, or `tasks.md` from this skill, except a `Blocks:` line the pass after plan-from-spec writes after a yes, and the matching Risk sentence when that line is `Blocks: none` or `Blocks: whole slice`. A jump back is not that pass. It reruns the owning skill, even for a small patch. This walk does not edit those files on a jump back, and it does not write `Reviewed:`. Every other spec, plan, and task write happens inside the skill that owns it, after that skill's own yes.
+The spec, the plan, and the tasks stay the source of truth. `walk-progress.md` only records position. Do not edit `spec.md`, `plan.md`, or `tasks.md` from this skill, except a `Blocks:` line the pass after plan-from-spec writes after a yes, and the matching Risk sentence when that line is `Blocks: none` or `Blocks: whole slice`. An Approval needed item is written by plan-from-spec, not by this walk. A jump back is not that pass. It reruns the owning skill, even for a small patch. This walk does not edit those files on a jump back, and it does not write `Reviewed:`. Every other spec, plan, and task write happens inside the skill that owns it, after that skill's own yes.
 
 A checkbox tick, a `(PR n)` or `(done)` note on that task line, or `(PR n)` on a Match `Branch:` line does not reopen a step and does not ask to clear (1.138.0). The rule is [references/progress.md](references/progress.md).
 

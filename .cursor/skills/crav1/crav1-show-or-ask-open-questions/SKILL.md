@@ -45,7 +45,7 @@ Read `references/asked.md` ("Parked and retired specs (1.60.0)") only when a spe
 
 ## Stop
 
-The only file this command writes is `docs/specs/<slug>/spec.md`, and in that file only the `Asked:` and `Pending:` lines under open questions, and the transfer data policy after a yes, as the personal-data check says. It does not write `docs/system/`, `plan.md`, `tasks.md`, `verify.md`, or a draft file. It does not send, post, or reply. It does not commit, push, or open a pull request.
+The only file this command writes is `docs/specs/<slug>/spec.md`, and in that file only the `Asked:` and `Pending:` lines under open questions and under `## Approval needed` items, and the transfer data policy after a yes, as the personal-data check says. It does not write `Approved:`. It does not write `docs/system/`, `plan.md`, `tasks.md`, `verify.md`, or a draft file. It does not send, post, or reply. It does not commit, push, or open a pull request.
 
 End with:
 
@@ -62,7 +62,7 @@ End with:
 - No person, spec, or topic: stop and ask. Options only.
 - Pending questions come first. Mark as sent, keep pending, or drop the mark.
 - Gather every question that fits. Nothing is dropped to keep the list short.
-- Four kinds: mail, meeting agenda, chat message, meeting questions. Meeting questions lists all of them.
+- Four kinds for open questions: mail, meeting agenda, chat message, meeting questions. An Approval needed item may also be a PR comment. Read `references/approval.md`. Meeting questions lists all of the questions. Nothing is sent.
 - Numbered, grouped by topic in plain words, with enough context.
 - No spec slug, path, file, or question id in the draft.
 - English by default, or the language named.

@@ -46,7 +46,7 @@ Show the worker’s recap and STATUS.
 | `needs_fix` | Ask `fix` / `stop`. `fix` → launch the **same** worker again with `resume: fix`. `stop` → end. |
 | `needs_ready` | Ask them to refresh the live host, then `ready` / `stop`. `ready` → worker with `resume: ready`. |
 | `needs_dependency` | Show the BLOCKER line first. Ask start / skip / stop for that dependency. `start` → same worker with `resume: dependency-start`; `skip` → `resume: dependency-skip`; `stop` → end. Headless: use the two-pass questions file. |
-| `needs_yes` | Not blocked. The task stays unticked. End with `Waiting: <who>'s yes to <what>.` and `Next: /crav1-build-tasks <T#>, because that yes is not on record yet.` Example: `Waiting: the partner's yes to turn off pipelines 7 and 24.` |
+| `needs_yes` | Not blocked. The task stays unticked. Offer the Approval needed item as skill `crav1-build-tasks`, `references/approval-needed.md` says. End with `Waiting: <who>'s yes to <what>.` Example: `Waiting: the partner's yes to turn off pipelines 7 and 24.` |
 | `blocked` / `failed` | Show DETAIL. Do not start another `T#`. A missing yes is `needs_yes`, not this row. |
 
 When STATUS includes a `NOTES:` line from `scripts/sh_eol.py`, offer accept / skip under it. Accept launches the same worker with `resume: eol`, which adds `*.sh text eol=lf` to `.gitattributes` and nothing else. Skip adds nothing. A headless run skips. Never add the line without a yes. This offer is outside the prompt budget.

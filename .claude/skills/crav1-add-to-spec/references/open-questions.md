@@ -16,6 +16,8 @@ An open question is a `- ` bullet under `## Open questions` in `docs/specs/<slug
   - Blocks: T2, T4
 ```
 
+A yes for an `## Approval needed` item is not an `Answered:` line. Do not write `Approved:` here. That line is lasting and is written only by `/crav1-record-approval` after `accept` in that run. Resolve does not remove it.
+
 `Blocks: none` is the same kind of line when the question blocks no current task. A short reason may follow in parentheses: `Blocks: none (later phase)`. `Blocks: whole slice` holds every unfinished task. A question has at most one `Blocks:` line.
 
 - `<who>` is the person or group the user named. `<channel>` is `mail`, `meeting agenda`, `chat`, or `meeting questions`.

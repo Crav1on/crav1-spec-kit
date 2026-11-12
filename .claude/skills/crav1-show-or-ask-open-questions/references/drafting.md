@@ -10,6 +10,7 @@ When the user did not name one, ask. Options only, each explained:
 2. **Meeting agenda** — a title, the purpose, each topic as an agenda point with its questions under it, and the time to set aside when the user names it. For a booked meeting.
 3. **Chat message** — a short opener and the numbered questions. No headings. For a team chat.
 4. **Meeting questions** — every selected question as a numbered list to ask out loud, in a standup, a call, or a longer meeting. Grouped by topic. No agenda layout and no intro text. It lists all of them, not a short cut. Questions not answered in the meeting go back to open.
+5. **PR comment** — only when the draft includes an Approval needed item. The text they would paste on the pull request. Nothing is posted. See `references/approval.md`.
 
 ## Write the draft
 

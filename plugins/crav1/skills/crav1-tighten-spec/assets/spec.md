@@ -24,3 +24,7 @@ Who hurts, and what happens today?
 ## Open questions
 
 - 
+
+## Approval needed
+
+- 

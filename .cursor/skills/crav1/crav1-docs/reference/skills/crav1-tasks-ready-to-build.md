@@ -12,6 +12,8 @@ List the tasks ready to build, for one spec or all, and why the others are block
 
 Shows summary counts per slice, then Ready and Held grouped by build-map branch, Waits in order, and Blocked (one reason each, recorded or inferred), Needs verify, a Done count, one `Next:` line per ready branch, and a `Source:` line. A wait on a real earlier task is Waits in order. A cycle, or an after: that names no task, is Blocked. An open question is Held with that question. Local only: it never reads Azure Boards and names [`/crav1-ado-sync`](crav1-ado-sync.md) for task states there. It runs no other skill. It can run any time. It is cross-cutting. It is not a starter option.
 
+1.141.0: an unapproved `## Approval needed` item holds its `Holds:` tasks. They are Waiting on that person. Other tasks still start (`ready-partial`). A matching `Approved:` line clears the hold. `task_order.py` lists them under Waiting on approval.
+
 1.64.0: shows a task's `(branch: …)` and one Branches line from local git only.
 
 1.68.0: the `Sub-branches:` and `left behind:` lines and `merged, reverted on <base> (<sha>)`, report only.

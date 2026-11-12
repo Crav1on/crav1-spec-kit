@@ -8,6 +8,8 @@
 
 Serial board: build several ready specs one slug after another in this checkout.
 
+1.141.0: a worker `needs_yes` is waiting. The parent offers the Approval needed item and does not write `Approved:`.
+
 Serial board of ready slugs: `feat/<slug>` from default, then that spec’s build-tasks loop; no parallel, no push, no PR.
 
 1.99.0: `feat/<slug>` forks from the into branch (Merges into, else default), a task naming a base branch is blocked.

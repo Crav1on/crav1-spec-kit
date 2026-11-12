@@ -23,6 +23,7 @@ This run makes at most two commits: the drafted commit, and one merge commit whe
 2. Conflicts in kit files, resolved by rule:
    - Both sides added lines in the same spot: keep both, ours first, then theirs. A `**New:**` line, a glossary row or an open question goes in its sorted place instead, as `crav1-add-to-spec` `references/merge-safe.md` says (1.84.0).
    - Open questions are matched by their words, never by a `Q<n>`: the same question on both sides is one question, with both sides' `Pending:`, `Asked:`, `Answered:` lines under it (one `Blocks:` line; the newer one).
+   - Approval needed items are matched by their words. Both sides' `Asked:`, `Pending:`, and `Approved:` lines stay under the item. Never drop an `Approved:` line. One `Holds:` line, the newer. One `Person:` line, the newer.
    - `Synced at`: one line per repo and branch (1.84.0); for the same repo and branch the newer date (then the later commit) wins; lines only one side has are kept, in sorted place (repo, then branch). An old `; `-joined line from a side not yet migrated counts as its entries, one line each.
    - Match `Branch:` lines (1.86.0): one line per branch; lines only one side has are kept, in sorted place (repo, then branch). The same branch on both sides is one line carrying both sides' markers (the newer `(PR <n>)` wins). An old `; `-joined line counts as its entries, one line each.
    - `docs/notes/index.md` and the month indexes: take either side, then rebuild. Never merge them by hand.

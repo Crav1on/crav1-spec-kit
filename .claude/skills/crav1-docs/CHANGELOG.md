@@ -2,6 +2,19 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.141.0 (2026-11-12)
+
+A named person's yes can be recorded, and it stays recorded. A minor release because the spec gains an Approval needed item, the ready check holds only the tasks that item names, and a new command writes the lasting line.
+
+- **Approval needed.** `## Approval needed` sits beside `## Open questions`. An item names the person (`Person:`), what they approve, and the tasks it holds (`Holds: T4`). It is not a question to fold in. `/crav1-resolve-open-questions` does not walk it and does not remove it.
+- **Approved.** The lasting line is `Approved: <person>, <source date>, <source>, "<quote>" (accepted by <recorder> <date>)`. The source date is the quote's date. The last date is the day this run accepted it. No skill removes the line. It is not the data-model stage line.
+- **Record it.** `/crav1-record-approval` is command-only. It takes the person, the source, and the quote, shows the line, the constraint, and the tasks it unblocks, and writes only after `accept` in that run. An earlier quote does not count against a later constraint. The kit shows both and asks. Nothing is sent.
+- **Where the item comes from.** `/crav1-plan-from-spec`, including the plan step of `/crav1-tighten-and-plan-ready-to-build`, reads a constraint such as `The partner gives a yes before the script is applied.` and adds the item linked to those tasks. When a build finds that yes missing, `/crav1-build-tasks` writes or offers the item instead of only a Waiting line. It does not write `Approved:`.
+- **Ready check.** Tasks held by an unapproved item are Waiting on that person. Other tasks still start (`ready-partial`). A matching `Approved:` line clears the hold. A live `apply` still needs the user's own yes in that run, and the task stays unticked until `check` is ok. `task_order.py` lists the same tasks under Waiting on approval.
+- **On record.** The build worker treats a named person's yes as on record when a matching `Approved:` line exists, and still when it was said in this chat or an `Answered:` line names it. `Answered:` is unchanged. Resolve still removes an `Answered:` line when it folds that question.
+- **Ask.** `/crav1-show-or-ask-open-questions` can draft the approval request as a mail, a chat message, a meeting agenda, or a PR comment. It writes `Asked:` or `Pending:` under the item. It never sends.
+- **Stamp.** An edit confined to `## Approval needed` does not reopen a tighten-and-plan step. The section is in neither the spec body nor the questions stamp.
+
 ## 1.140.0 (2026-11-12)
 
 The branch offered for a task is the one named on that task's line. A merged or deleted branch is not offered. A minor release because the build card and the build map row change.

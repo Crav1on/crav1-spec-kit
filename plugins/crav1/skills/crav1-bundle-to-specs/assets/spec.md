@@ -40,3 +40,7 @@ Idea cluster → section (what was dropped).
 ## Open questions
 
 - 
+
+## Approval needed
+
+- 

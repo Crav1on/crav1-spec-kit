@@ -356,6 +356,53 @@ marks:
     mention: 'Blocks: whole slice'
     since: 1.137.0
 
+  # ---------- spec.md: approval needed ----------
+  - id: approval-person
+    name: "Person"
+    group: approval
+    files: ["docs/specs/<slug>/spec.md (indented under an Approval needed item)"]
+    format: "  - Person: <who>"
+    pattern: '^  - Person: .+$'
+    examples:
+      - "  - Person: the partner"
+    meaning: "The person whose yes the item waits on."
+    written_by: [crav1-plan-from-spec, crav1-build-tasks]
+    read_by: [crav1-tasks-ready-to-build, crav1-record-approval, crav1-show-or-ask-open-questions]
+    readiness: true
+    mention: 'Person:'
+    since: 1.141.0
+
+  - id: approval-holds
+    name: "Holds"
+    group: approval
+    files: ["docs/specs/<slug>/spec.md (indented under an Approval needed item)"]
+    format: "  - Holds: T<n>[, T<n>]"
+    pattern: '^  - Holds: T\d+(, T\d+)*$'
+    examples:
+      - "  - Holds: T4"
+      - "  - Holds: T2, T4"
+    meaning: "The tasks that wait until a matching Approved line is recorded. Other tasks can still start."
+    written_by: [crav1-plan-from-spec, crav1-build-tasks]
+    read_by: [crav1-tasks-ready-to-build, crav1-build-tasks, crav1-record-approval]
+    readiness: true
+    mention: 'Holds:'
+    since: 1.141.0
+
+  - id: approval-approved
+    name: "Approved (person's yes)"
+    group: approval
+    files: ["docs/specs/<slug>/spec.md (indented under an Approval needed item)"]
+    format: '  - Approved: <person>, <source date>, <source>, "<quote>" (accepted by <recorder> <date>)'
+    pattern: '^  - Approved: .+, \d{4}-\d{2}-\d{2}, .+, ".+" \(accepted by .+ \d{4}-\d{2}-\d{2}\)$'
+    examples:
+      - '  - Approved: the partner, 2026-10-02, https://github.com/example/widgets/pull/12#discussion_r9, "Yes, apply the policy." (accepted by Alex 2026-11-12)'
+    meaning: "A lasting record of a named person's yes. The source date is the quote's date. The last date is when it was accepted. Resolve and every other skill leave the line in place. This is not the data-model stage line."
+    written_by: [crav1-record-approval]
+    read_by: [crav1-tasks-ready-to-build, crav1-build-tasks, crav1-resolve-open-questions, crav1-show-or-ask-open-questions]
+    readiness: true
+    mention: 'Approved:'
+    since: 1.141.0
+
   # ---------- research stale marks ----------
   - id: stale-note
     name: "Stale (note)"

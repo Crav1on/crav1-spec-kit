@@ -40,7 +40,7 @@ Not fixed steps. Security and tests stay optional. When one of them finishes ins
 
 ## 5. Plan
 
-Open `../crav1-plan-from-spec/SKILL.md` (`/crav1-plan-from-spec`). That skill writes `plan.md` and `tasks.md`. When both already match the spec and it has nothing to add, say so and move on. Do not write the plan from this walk.
+Open `../crav1-plan-from-spec/SKILL.md` (`/crav1-plan-from-spec`). That skill writes `plan.md` and `tasks.md`, and an `## Approval needed` item when a constraint says a named person gives a yes before something (`references/write.md` in that skill, "Approval needed"). When both already match the spec and it has nothing to add, say so and move on. Do not write the plan, or that item, from this walk.
 
 ## After the plan, questions with no Blocks line
 

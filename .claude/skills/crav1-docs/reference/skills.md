@@ -82,7 +82,8 @@ When the user asks for startup options, these six are the only ways in. That ask
 
 | Command | Starter | Use when | Reads | Writes | You run next | Runs by itself | Walkthrough |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| [`/crav1-show-or-ask-open-questions`](skills/crav1-show-or-ask-open-questions.md) | — | You want to see what is still open, or draft questions to ask | Open questions on the specs for a person, a spec, or a topic | A draft in chat; `Asked:` or `Pending:` lines under those questions after yes or pending; the transfer data policy after a yes | [`/crav1-add-to-spec`](skills/crav1-add-to-spec.md); [`/crav1-finalize-commit`](skills/crav1-finalize-commit.md) | — | [Ask open questions](../from-show-or-ask-open-questions.md) |
+| [`/crav1-show-or-ask-open-questions`](skills/crav1-show-or-ask-open-questions.md) | — | You want to see what is still open, or draft questions to ask | Open questions on the specs for a person, a spec, or a topic | A draft in chat; `Asked:` or `Pending:` lines under those questions and under Approval needed items after yes or pending; the transfer data policy after a yes | [`/crav1-add-to-spec`](skills/crav1-add-to-spec.md); [`/crav1-record-approval`](skills/crav1-record-approval.md); [`/crav1-finalize-commit`](skills/crav1-finalize-commit.md) | — | [Ask open questions](../from-show-or-ask-open-questions.md) |
+| [`/crav1-record-approval`](skills/crav1-record-approval.md) | — | You have a person's yes to record on an Approval needed item | One spec's Approval needed items, its constraints, and tasks.md | One `Approved:` line under that item, after accept | [`/crav1-build-tasks`](skills/crav1-build-tasks.md); [`/crav1-finalize-commit`](skills/crav1-finalize-commit.md) | — | [Record a person's yes](../from-record-approval.md) |
 
 ### Cross-cutting: Keep the picture current
 

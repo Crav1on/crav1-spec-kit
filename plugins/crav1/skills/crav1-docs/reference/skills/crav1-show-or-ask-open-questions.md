@@ -12,6 +12,8 @@ Show the cross-spec overview of open questions (read-only), or draft them to ask
 
 Drafts the open questions for a person, a spec, or a topic as a mail, a meeting agenda, a chat message, or meeting questions. No spec names in the draft. Nothing is sent. Yes, no, or pending records whether they were asked.
 
+1.141.0: an `## Approval needed` item with no matching `Approved:` line is drafted the same way, including as a PR comment. `Asked:` and `Pending:` go under that item. It does not write `Approved:` and it never sends.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
@@ -34,23 +36,23 @@ Prompt budget: 2 (the most prompts in one run, the closing yes included). A prom
 
 In short: Open questions on the specs for a person, a spec, or a topic.
 
-Reads `## Open questions`, unresolved assumptions, and their `Asked:`, `Pending:`, and `Answered:` lines on every `docs/specs/<slug>/spec.md`, skipping `_template`, for the person, spec, or topic the user named.
+Reads `## Open questions`, unresolved assumptions, and their `Asked:`, `Pending:`, and `Answered:` lines, and `## Approval needed` items with no matching `Approved:` line, on every `docs/specs/<slug>/spec.md`, skipping `_template`, for the person, spec, or topic the user named.
 
 ## Writes
 
-In short: A draft in chat; `Asked:` or `Pending:` lines under those questions after yes or pending; the transfer data policy after a yes.
+In short: A draft in chat; `Asked:` or `Pending:` lines under those questions and under Approval needed items after yes or pending; the transfer data policy after a yes.
 
-Writes a draft in the chat only (mail, meeting agenda, chat message, or meeting questions), numbered and grouped by topic in plain words, in English or the language named, with no spec slug, path, or question id. After yes or pending, writes only `Asked:` or `Pending:` lines under those questions, following `crav1-add-to-spec` `references/open-questions.md`. The personal-data and secrets check in `crav1-add-to-spec` `references/sources.md` runs on the draft and may write the transfer data policy after a yes.
+Writes a draft in the chat only (mail, meeting agenda, chat message, meeting questions, or a PR comment for an Approval needed item), numbered and grouped by topic in plain words, in English or the language named, with no spec slug, path, or question id. After yes or pending, writes only `Asked:` or `Pending:` lines under those questions and under those items, following `crav1-add-to-spec` `references/open-questions.md`. It does not write `Approved:`. The personal-data and secrets check in `crav1-add-to-spec` `references/sources.md` runs on the draft and may write the transfer data policy after a yes.
 
 ## Does not
 
-Leaves the question text, every other spec line, `docs/system/`, plan, tasks, and code alone. Sends nothing. Does not commit.
+Leaves the question text, the Approval needed item text, every other spec line, `docs/system/`, plan, tasks, and code alone. Sends nothing. Does not commit. Does not write `Approved:`.
 
 Limits and exceptions: no person, spec, or topic stops and asks. Pending questions are shown first: mark as sent, keep pending, or drop the mark. No writes nothing. Meeting questions lists every selected question. It names [`/crav1-add-to-spec`](crav1-add-to-spec.md) for the answers and [`/crav1-finalize-commit`](crav1-finalize-commit.md) when a mark was written, and does not run them. It is not a starter option.
 
 ## You run next / Runs by itself
 
-- You run next: [`/crav1-add-to-spec`](crav1-add-to-spec.md); [`/crav1-finalize-commit`](crav1-finalize-commit.md)
+- You run next: [`/crav1-add-to-spec`](crav1-add-to-spec.md); [`/crav1-record-approval`](crav1-record-approval.md); [`/crav1-finalize-commit`](crav1-finalize-commit.md)
 - Runs by itself: Calls no skill.
 
 ## Lane and group

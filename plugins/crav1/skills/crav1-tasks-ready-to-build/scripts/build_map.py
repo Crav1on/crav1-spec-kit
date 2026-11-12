@@ -1135,6 +1135,10 @@ def held_phrase(row):
     ).strip()
     if core.lower().startswith("held, waits on"):
         return core
+    match = re.search(r'approval needed "([^"]*)"', reason, re.I)
+    if match:
+        what = re.split(r"(?<=[.!?])\s", match.group(1).strip(), maxsplit=1)[0]
+        return f'approval "{what}" Waiting for {who}.'
     match = re.search(r'open question "([^"]*)"', reason)
     if match:
         question = re.split(r"(?<=[.!?])\s", match.group(1).strip(), maxsplit=1)[0]
