@@ -87,6 +87,8 @@ Since 1.137.0 an edit confined to `## Open questions` does not reopen tighten-sp
 
 Since 1.138.0 a checkbox tick, a `(PR n)` or `(done)` note on that task line, and `(PR n)` on a Match `Branch:` line are progress. They do not reopen a step, and the walk does not ask to clear. CRLF and LF are the same text. An older `walk-progress.md` with no `Content stamp:` line still matches those edits. The next record writes `Content stamp: normalized`. A sentence change, or a renamed branch, still reopens the steps that change affects.
 
+Since 1.139.0 a merge that conflicts only on those hash lines is settled by `scripts/walk_progress.py resolve-stamps`. `/crav1-finalize-commit` runs it. The walk does not. `Done` and `Result` stay. A real edit keeps the upstream hash.
+
 When the check is clear, the slice is ready to build. You run build yourself:
 
 ```text

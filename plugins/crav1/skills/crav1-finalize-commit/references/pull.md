@@ -6,7 +6,7 @@ This run makes at most two commits: the drafted commit, and one merge commit whe
 
 ## Kit files
 
-`docs/specs/**/spec.md`, `docs/architecture/spec.md`, `docs/system/*.md` and `docs/notes/**`. Every other file is a code file: its conflicts stay with the user, as before. Say which ones, stop, and do not commit the merge.
+`docs/specs/**/spec.md`, `docs/architecture/spec.md`, `docs/system/*.md` and `docs/notes/**`. `docs/specs/<slug>/walk-progress.md` is neither of those: its hash lines are settled by the stamp rule in step 3. Every other file is a code file: its conflicts stay with the user, as before. Say which ones, stop, and do not commit the merge.
 
 ## Fetch
 
@@ -19,7 +19,7 @@ This run makes at most two commits: the drafted commit, and one merge commit whe
 
 `pull` with uncommitted changes: stop and name `commit` instead; never stash.
 
-1. `git pull --no-rebase --no-commit`. Never rebase. Never `git pull --no-rebase` without `--no-commit`: that auto-commits a clean merge, and the check below cannot run first. A clean merge stays uncommitted until the one merge commit in step 5.
+1. `git pull --no-rebase --no-commit`. Never rebase. Never `git pull --no-rebase` without `--no-commit`: that auto-commits a clean merge, and the check below cannot run first. A clean merge stays uncommitted until the one merge commit in step 6.
 2. Conflicts in kit files, resolved by rule:
    - Both sides added lines in the same spot: keep both, ours first, then theirs. A `**New:**` line, a glossary row or an open question goes in its sorted place instead, as `crav1-add-to-spec` `references/merge-safe.md` says (1.84.0).
    - Open questions are matched by their words, never by a `Q<n>`: the same question on both sides is one question, with both sides' `Pending:`, `Asked:`, `Answered:` lines under it (one `Blocks:` line; the newer one).
@@ -27,10 +27,14 @@ This run makes at most two commits: the drafted commit, and one merge commit whe
    - Match `Branch:` lines (1.86.0): one line per branch; lines only one side has are kept, in sorted place (repo, then branch). The same branch on both sides is one line carrying both sides' markers (the newer `(PR <n>)` wins). An old `; `-joined line counts as its entries, one line each.
    - `docs/notes/index.md` and the month indexes: take either side, then rebuild. Never merge them by hand.
    - Both sides changed the same existing line in different ways (the same fact, said differently): ask the one question below.
-3. Run `notes_index.py --check` from crav1-add-to-spec's `scripts/`. When it fails, on a conflict or on a clean merge, rebuild with `notes_index.py` (no extra arguments) and `git add` the indexes. Do not commit yet.
-4. Run `scripts/nothing_lost.py` in this skill, with `--root` set to the repo. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. Before the merge commit, the working tree is the merge. Do not say Nothing lost unless the script prints `"nothing_lost": true`. Lines lost: do not commit; list each line with its file and side, and restore them first.
-5. One merge commit, and no other. Stage the rebuilt indexes with the merge. When the index was rebuilt, append `Rebuilt the notes index into this merge.` to the merge message, then commit that message once. Otherwise `git commit --no-edit`. Do not make a second commit for the index.
-6. End, only when the script said nothing was lost: `Merged <upstream> into <branch>. Nothing lost. Ready to push.` When the index was rebuilt, say it is in the merge commit.
+3. `walk-progress.md` stamp conflicts (1.139.0). For each unmerged `docs/specs/<slug>/walk-progress.md`, run `walk_progress.py resolve-stamps --root <spec-folder> --yes` from `crav1-tighten-and-plan-ready-to-build` `scripts/`. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. Do not reimplement the hash. The same command is the rule whenever the kit finishes a merge that leaves this file conflicted, including `git merge <base>` after `/crav1-open-pr` or `/crav1-merge-pr` says to merge the base in. `/crav1-update-kit` does not merge this file.
+   - **Stamp-only.** When every conflict hunk is only a hash line the script writes (`Spec version`, `Plan version`, `Tasks version`, `Verify version`, `Spec body`, `Questions version`, `Kept questions`, `Content stamp`, `Key`, or `Playbook:`), the script takes the upstream text and may rewrite those lines. `Done`, `Result`, and every other recorded line stay. It `git add`s the file. `--yes` is the yes already given to commit. Do not push. Say the script's `line` once.
+   - **Restamp rule.** A hash line becomes the merged file's normalized hash only when at least one side's recorded hash matches that side's file, and every matching side differs from the merged file only by progress as 1.138.0 defines it (line endings, and for `spec.md` and `tasks.md` a checkbox or a `(PR n)` or `(done)` mark). Otherwise the upstream hash stays, so a real edit still reopens the steps that edit affects. When every hash on the step is that merged hash, the script writes `Content stamp: normalized`. An older step with no such line still matches. The script reads each side's file. It does not use the HEAD fallback.
+   - **Mixed.** When any hunk touches `Done`, `Result`, a finding, a note, or any other recorded line, the script writes nothing. Show its `line`. It names the stamp-only hunks and the other hunks. Offer `settle stamps` / `stop`. `settle stamps` runs the command again with `--settle-stamps --yes`, which rewrites only the stamp hunks and leaves the other markers. Do not `git add` that file and do not commit the merge. `stop` leaves the merge unfinished. Do not abort it unless they ask.
+4. Run `notes_index.py --check` from crav1-add-to-spec's `scripts/`. When it fails, on a conflict or on a clean merge, rebuild with `notes_index.py` (no extra arguments) and `git add` the indexes. Do not commit yet.
+5. Run `scripts/nothing_lost.py` in this skill, with `--root` set to the repo. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. Before the merge commit, the working tree is the merge. Do not say Nothing lost unless the script prints `"nothing_lost": true`. Lines lost: do not commit; list each line with its file and side, and restore them first.
+6. One merge commit, and no other. Stage the rebuilt indexes with the merge. A settled `walk-progress.md` is already staged. When the index was rebuilt, append `Rebuilt the notes index into this merge.` to the merge message, then commit that message once. Otherwise `git commit --no-edit`. Do not make a second commit for the index. Do not commit while a mixed `walk-progress.md` conflict remains.
+7. End, only when the script said nothing was lost: `Merged <upstream> into <branch>. Nothing lost. Ready to push.` When the index was rebuilt, say it is in the merge commit. The stamp line from step 3 was already said.
 
 If the merge is already committed when you get here (an older pull that auto-committed), do not make another commit. When the index check fails, rebuild it, leave it uncommitted, and name it on the `Uncommitted:` line.
 

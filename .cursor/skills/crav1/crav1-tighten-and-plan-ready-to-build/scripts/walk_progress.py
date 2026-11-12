@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Progress file for /crav1-tighten-and-plan-ready-to-build (kit 1.138.0).
+"""Progress file for /crav1-tighten-and-plan-ready-to-build (kit 1.139.0).
 
 The spec, plan, and tasks stay the source of truth. This script only tracks
 where the guided walk is, which version of each file a step covered, and which
@@ -27,6 +27,8 @@ Usage (JSON on stdout):
   walk_progress.py ack-stamps --root <spec-folder> --yes
   walk_progress.py spec-finding --root <spec-folder> --id P2 --text "<finding>"
       [--tag spec|plan] [--choice tighten-spec|open-point] [--yes]
+  walk_progress.py resolve-stamps --root <spec-folder> --yes
+      [--settle-stamps] [--ours-root <folder> --theirs-root <folder>]
 
 readiness --root builds the rows from task_order.py and question_blocks.py
 and adds the Reviewed warnings. It also compares tasks.md with verify.md.
@@ -2514,6 +2516,831 @@ def spec_finding(args: argparse.Namespace) -> None:
     })
 
 
+# Hash lines resolve-stamps may rewrite (1.139.0). Done, Result, findings,
+# notes, and Acknowledged stamp are recorded facts and are not in this set.
+_STAMP_KEYS = frozenset({
+    "Spec version",
+    "Plan version",
+    "Tasks version",
+    "Verify version",
+    "Spec body",
+    "Questions version",
+    "Kept questions",
+    "Content stamp",
+    "Key",
+    "Playbook",
+})
+_HEX12 = re.compile(r"^[0-9a-fA-F]{12}$")
+_KEPT_VALUE = re.compile(r"^(?:none|[0-9a-fA-F]{12}(?: [0-9a-fA-F]{12})*)$")
+
+
+def _stamp_label(line: str) -> str | None:
+    text = line.strip()
+    if not text:
+        return ""
+    if text.startswith("Playbook: "):
+        _path, sep, hashed = text[len("Playbook: "):].rpartition("@")
+        if sep and _path and _HEX12.fullmatch(hashed):
+            return "Playbook"
+        return None
+    key, sep, value = text.partition(": ")
+    if not sep or key not in _STAMP_KEYS:
+        return None
+    if key == "Content stamp":
+        return key if value == CONTENT_STAMP else None
+    if key == "Kept questions":
+        return key if _KEPT_VALUE.fullmatch(value) else None
+    if value == "missing" or _HEX12.fullmatch(value):
+        return key
+    return None
+
+
+def _is_stamp_line(line: str) -> bool:
+    return _stamp_label(line) is not None
+
+
+def _marker_kind(line: str) -> str | None:
+    if line.startswith("<<<<<<<"):
+        return "start"
+    if line.startswith("|||||||"):
+        return "base"
+    if line.startswith("=======") and set(line.strip()) <= {"="}:
+        return "mid"
+    if line.startswith(">>>>>>>"):
+        return "end"
+    return None
+
+
+def _parse_hunks(lines: list[str]) -> tuple[list[dict], str | None]:
+    hunks: list[dict] = []
+    i = 0
+    while i < len(lines):
+        kind = _marker_kind(lines[i])
+        if kind is None:
+            i += 1
+            continue
+        if kind != "start":
+            return [], "conflict marker out of order"
+        start = i
+        i += 1
+        ours: list[str] = []
+        base: list[str] | None = None
+        while i < len(lines) and _marker_kind(lines[i]) not in ("mid", "base"):
+            if _marker_kind(lines[i]) in ("start", "end"):
+                return [], "broken conflict marker"
+            ours.append(lines[i])
+            i += 1
+        if i >= len(lines):
+            return [], "conflict marker has no end"
+        if _marker_kind(lines[i]) == "base":
+            base = []
+            i += 1
+            while i < len(lines) and _marker_kind(lines[i]) != "mid":
+                if _marker_kind(lines[i]) is not None:
+                    return [], "broken conflict marker"
+                base.append(lines[i])
+                i += 1
+        if i >= len(lines) or _marker_kind(lines[i]) != "mid":
+            return [], "conflict marker has no separator"
+        i += 1
+        theirs: list[str] = []
+        while i < len(lines) and _marker_kind(lines[i]) != "end":
+            if _marker_kind(lines[i]) is not None:
+                return [], "nested conflict marker"
+            theirs.append(lines[i])
+            i += 1
+        if i >= len(lines):
+            return [], "conflict marker has no end"
+        i += 1
+        hunks.append({
+            "index": len(hunks) + 1,
+            "start": start,
+            "end": i,
+            "ours": ours,
+            "theirs": theirs,
+            "base": base,
+        })
+    return hunks, None
+
+
+def _enclosing_step(lines: list[str], start: int) -> str | None:
+    i = start - 1
+    while i >= 0:
+        if lines[i].startswith(">>>>>>>"):
+            while i >= 0 and not lines[i].startswith("<<<<<<<"):
+                i -= 1
+            i -= 1
+            continue
+        text = lines[i].strip()
+        if text.startswith("- Step: "):
+            return text[len("- Step: "):]
+        if text.startswith("- Extra: "):
+            return text[len("- Extra: "):]
+        if text.startswith("- Jump-back: ") or text.startswith("- Open point: "):
+            return text
+        i -= 1
+    return None
+
+
+def _hunk_names(hunk: dict) -> list[str]:
+    names: list[str] = []
+    for line in hunk["ours"] + hunk["theirs"] + (hunk["base"] or []):
+        text = line.strip()
+        if not text:
+            continue
+        key = text.split(":", 1)[0].strip()
+        if key not in names:
+            names.append(key)
+    return names
+
+
+def _classify_hunk(hunk: dict, lines: list[str]) -> None:
+    sides = hunk["ours"] + hunk["theirs"] + (hunk["base"] or [])
+    hunk["step"] = _enclosing_step(lines, hunk["start"])
+    hunk["lines"] = _hunk_names(hunk)
+    stamp = all(_is_stamp_line(line) for line in sides)
+    hunk["class"] = "stamp" if stamp and hunk["step"] else "blocked"
+
+
+def _reconstruct(lines: list[str], hunks: list[dict], side: str) -> str:
+    out: list[str] = []
+    cursor = 0
+    for hunk in hunks:
+        out.extend(lines[cursor:hunk["start"]])
+        out.extend(hunk[side])
+        cursor = hunk["end"]
+    out.extend(lines[cursor:])
+    return "\n".join(out) + "\n"
+
+
+def _try_parse(text: str) -> tuple[dict | None, str | None]:
+    caught: dict[str, str] = {}
+
+    def boom(code: str, message: str, status: int = 1) -> None:
+        caught["message"] = message
+        raise RuntimeError(message)
+
+    original = globals()["fail"]
+    globals()["fail"] = boom
+    try:
+        return parse_progress(text), None
+    except RuntimeError:
+        return None, caught.get("message", "progress file could not be read")
+    finally:
+        globals()["fail"] = original
+
+
+def _find_repo(start: Path) -> Path | None:
+    for base in [start, *start.parents]:
+        if (base / ".git").exists():
+            return base
+        if base.parent == base:
+            break
+    return None
+
+
+def _git_bytes(repo: Path, spec: str) -> bytes | None:
+    try:
+        proc = subprocess.run(
+            ["git", "-C", str(repo), "show", spec],
+            capture_output=True,
+            check=False,
+            timeout=5,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    if proc.returncode != 0:
+        return None
+    return proc.stdout
+
+
+def _pair_from_bytes(blob: bytes | None) -> tuple[str | None, bytes | None]:
+    if blob is None:
+        return None, None
+    try:
+        return blob.decode("utf-8"), blob
+    except UnicodeDecodeError:
+        return blob.decode("utf-8", "replace"), blob
+
+
+def _tree_from_folder(folder: Path | None) -> dict[str, tuple[str | None, bytes | None]]:
+    tree: dict[str, tuple[str | None, bytes | None]] = {}
+    for key, name in FILE_OF.items():
+        tree[key] = _read_pair(folder / name) if folder is not None else (None, None)
+    return tree
+
+
+def _tree_from_git(repo: Path, rev: str, rel: str) -> dict[str, tuple[str | None, bytes | None]]:
+    tree: dict[str, tuple[str | None, bytes | None]] = {}
+    prefix = rel.strip("/")
+    for key, name in FILE_OF.items():
+        spec = f"{rev}:{prefix}/{name}" if prefix else f"{rev}:{name}"
+        tree[key] = _pair_from_bytes(_git_bytes(repo, spec))
+    return tree
+
+
+def _has_conflict(text: str | None) -> bool:
+    if not text:
+        return False
+    return any(line.startswith("<<<<<<<") for line in text.splitlines())
+
+
+def _piece_text(text: str | None, part: str) -> str | None:
+    if text is None:
+        return None
+    lf = _lf_text(text)
+    if part == "spec_body":
+        body, _questions = spec_parts(lf)
+        return body
+    if part == "questions":
+        _body, questions = spec_parts(lf)
+        return questions
+    return lf
+
+
+def _field_rows(step: str, body: dict) -> list[tuple[str, str, str]]:
+    """(body key, part, kind) for hash fields this step records."""
+    if step == "playbook":
+        return [("playbook_version", "file", "playbook")]
+    rows: list[tuple[str, str, str]] = []
+    for token in COVERS.get(step, ()):
+        if token == "playbook":
+            continue
+        if token in body:
+            rows.append((token, "file", token))
+    if "spec_body" in body:
+        rows.append(("spec_body", "spec_body", "spec"))
+    if "questions" in body:
+        rows.append(("questions", "questions", "questions"))
+    if "kept_questions" in body:
+        rows.append(("kept_questions", "kept", "questions"))
+    return rows
+
+
+def _kept_line_from(spec_text: str | None, tasks_text: str | None) -> str:
+    if not spec_text:
+        return "none"
+    task_ids = None
+    if tasks_text is not None:
+        task_ids = blocks_mod().task_ids_from_tasks(tasks_text)
+    questions = blocks_mod().kept_open(
+        spec_text,
+        task_ids=task_ids,
+        resolve_recorded=True,
+    )
+    keys: list[str] = []
+    for question in questions:
+        key = question.get("key") or blocks_mod().question_key(question.get("text") or "")
+        if key and key not in keys:
+            keys.append(key)
+    return " ".join(keys) if keys else "none"
+
+
+def _playbook_pair(body: dict, folder: Path | None, repo: Path | None, rev: str | None) -> tuple[str | None, bytes | None]:
+    rel = body.get("playbook")
+    if not rel:
+        return None, None
+    if folder is not None:
+        direct = folder / rel
+        if direct.is_file():
+            return _read_pair(direct)
+        found = find_playbook(folder, rel)
+        if found is not None:
+            return _read_pair(found)
+    if repo is not None and rev:
+        return _pair_from_bytes(_git_bytes(repo, f"{rev}:{rel}"))
+    return None, None
+
+
+def _field_matches(body: dict, field: str, part: str, kind: str, tree: dict, playbook: tuple[str | None, bytes | None]) -> bool:
+    """1.138 stamp match against this side's file. No HEAD fallback.
+
+    During a merge, HEAD is one side. The side file is passed in, so the
+    HEAD lookup in stamp_matches would answer a different question.
+    """
+    normalized = body.get("content_stamp") == CONTENT_STAMP
+    if field == "kept_questions":
+        spec_text = tree.get("spec", (None, None))[0]
+        tasks_text = tree.get("tasks", (None, None))[0]
+        return body.get("kept_questions") == _kept_line_from(spec_text, tasks_text)
+    if field == "playbook_version":
+        text, raw = playbook
+        return stamp_matches(
+            body.get("playbook_version"), text, "playbook", normalized,
+            raw_bytes=raw, path=None, part="file",
+        )
+    if part == "file":
+        text, raw = tree.get(kind, (None, None))
+        return stamp_matches(
+            body.get(field), text, kind, normalized,
+            raw_bytes=raw, path=None, part="file",
+        )
+    text, _raw = tree.get("spec", (None, None))
+    piece = _piece_text(text, part)
+    use_kind = "spec" if part == "spec_body" else "questions"
+    return stamp_matches(
+        body.get(field), piece, use_kind, normalized,
+        raw_bytes=None, path=None, part=part,
+    )
+
+
+def _progress_only(part: str, kind: str, side_tree: dict, merged_tree: dict, ours_body: dict, theirs_body: dict) -> bool:
+    """True when the merged piece differs from this side only by 1.138 progress."""
+    if part == "kept":
+        part = "questions"
+        kind = "questions"
+    if kind == "playbook":
+        if ours_body.get("playbook") != theirs_body.get("playbook"):
+            return False
+        side = side_tree.get("playbook", (None, None))[0]
+        merged = merged_tree.get("playbook", (None, None))[0]
+        use_kind = "playbook"
+    elif part == "file":
+        side = side_tree.get(kind, (None, None))[0]
+        merged = merged_tree.get(kind, (None, None))[0]
+        use_kind = kind
+    else:
+        side = side_tree.get("spec", (None, None))[0]
+        merged = merged_tree.get("spec", (None, None))[0]
+        use_kind = "spec" if part == "spec_body" else "questions"
+    if _has_conflict(side) or _has_conflict(merged):
+        return False
+    if side is None and merged is None:
+        return True
+    if side is None or merged is None:
+        return False
+    left = _piece_text(side, part)
+    right = _piece_text(merged, part)
+    if left is None or right is None:
+        return False
+    return normalize_text(use_kind, left) == normalize_text(use_kind, right)
+
+
+def _merged_hash(field: str, part: str, kind: str, tree: dict, playbook: tuple[str | None, bytes | None]) -> str:
+    if field == "kept_questions":
+        spec_text = tree.get("spec", (None, None))[0]
+        tasks_text = tree.get("tasks", (None, None))[0]
+        return _kept_line_from(spec_text, tasks_text)
+    if field == "playbook_version":
+        text, _raw = playbook
+        if text is None:
+            return "missing"
+        return version_text(normalize_text("playbook", text))
+    if part == "file":
+        text = tree.get(kind, (None, None))[0]
+        if text is None:
+            return "missing"
+        return version_text(normalize_text(kind, _lf_text(text)))
+    text = tree.get("spec", (None, None))[0]
+    piece = _piece_text(text, part)
+    if piece is None:
+        return "missing"
+    use_kind = "spec" if part == "spec_body" else "questions"
+    return version_text(normalize_text(use_kind, piece))
+
+
+def _human_field(field: str) -> str:
+    if field == "spec_body":
+        return "Spec body"
+    if field == "questions":
+        return "Questions version"
+    if field == "kept_questions":
+        return "Kept questions"
+    if field == "playbook_version":
+        return "Playbook"
+    if field == "content_stamp":
+        return "Content stamp"
+    return LABEL.get(field, field)
+
+
+def _join_steps(names: list[str]) -> str:
+    if not names:
+        return ""
+    if len(names) == 1:
+        return names[0]
+    if len(names) == 2:
+        return f"{names[0]} and {names[1]}"
+    return ", ".join(names[:-1]) + ", and " + names[-1]
+
+
+def _decide_step(step: str, ours_body: dict, theirs_body: dict, ours: dict, theirs: dict, merged: dict, ours_play, theirs_play, merged_play) -> dict:
+    """Restamp rule (1.139.0).
+
+    Start from the upstream step. A hash line is rewritten to the merged
+    file's normalized hash only when at least one side's recorded hash
+    matches that side's file, and every matching side differs from the
+    merged file only by progress (line endings, and for spec and tasks a
+    checkbox or a PR or done mark). Otherwise the upstream hash stays, so
+    a real edit still reopens the steps that edit affects. When every hash
+    on the step is that merged normalized hash, write Content stamp.
+    """
+    rows = {row[0]: row for row in _field_rows(step, theirs_body)}
+    for row in _field_rows(step, ours_body):
+        rows.setdefault(row[0], row)
+    differing = [rows[key] for key in rows if ours_body.get(key) != theirs_body.get(key)]
+    restamped: list[str] = []
+    kept: list[str] = []
+    reopen = False
+    for field, part, kind in differing:
+        witnesses = []
+        for body, tree, play in (
+            (ours_body, ours, ours_play),
+            (theirs_body, theirs, theirs_play),
+        ):
+            if _field_matches(body, field, part, kind, tree, play):
+                witnesses.append((body, tree, play))
+        progress = bool(witnesses) and all(
+            _progress_only(part, kind, tree, merged, ours_body, theirs_body)
+            for _body, tree, _play in witnesses
+        )
+        label = _human_field(field)
+        if progress:
+            theirs_body[field] = _merged_hash(field, part, kind, merged, merged_play)
+            restamped.append(label)
+        else:
+            kept.append(label)
+            if witnesses:
+                reopen = True
+    normalized_now = True
+    for field, part, kind in rows.values():
+        if field == "kept_questions":
+            continue
+        expect = _merged_hash(field, part, kind, merged, merged_play)
+        if theirs_body.get(field) != expect:
+            normalized_now = False
+            break
+    had_stamp = theirs_body.get("content_stamp") == CONTENT_STAMP
+    if rows and normalized_now:
+        if not had_stamp:
+            restamped.append("Content stamp")
+        theirs_body["content_stamp"] = CONTENT_STAMP
+    elif not had_stamp:
+        theirs_body.pop("content_stamp", None)
+    return {"step": step, "restamped": restamped, "kept": kept, "reopen": reopen}
+
+
+def _align_jump_keys(ours: dict, theirs: dict) -> list[dict]:
+    actions = []
+    ours_by = {(jump["kind"], jump["id"]): jump for jump in ours.get("jumps") or []}
+    for jump in theirs.get("jumps") or []:
+        twin = ours_by.get((jump["kind"], jump["id"]))
+        if twin is None or twin.get("finding") != jump.get("finding"):
+            continue
+        recomputed = _finding_key(jump["finding"])
+        if jump.get("key") != recomputed or twin.get("key") != recomputed:
+            if jump.get("key") != twin.get("key") or jump.get("key") != recomputed:
+                jump["key"] = recomputed
+                title = "Jump-back" if jump["kind"] == "jump-back" else "Open point"
+                actions.append({
+                    "step": f"{title} {jump['id']}",
+                    "restamped": ["Key"],
+                    "kept": [],
+                    "reopen": False,
+                })
+    return actions
+
+
+def _report_line(actions: list[dict], path_name: str) -> str:
+    restamped: dict[tuple[str, ...], list[str]] = {}
+    kept: dict[tuple[str, ...], list[str]] = {}
+    reopen = False
+    for action in actions:
+        if action["restamped"]:
+            restamped.setdefault(tuple(action["restamped"]), []).append(action["step"])
+        if action["kept"]:
+            kept.setdefault(tuple(action["kept"]), []).append(action["step"])
+            if action["reopen"]:
+                reopen = True
+    bits = []
+    for labels, steps in restamped.items():
+        bits.append(f"restamped {', '.join(labels)} on {_join_steps(steps)}")
+    for labels, steps in kept.items():
+        bits.append(f"kept upstream {', '.join(labels)} on {_join_steps(steps)}")
+    if not bits:
+        return f"Settled {path_name} stamp conflicts."
+    line = f"Settled {path_name}: " + "; ".join(bits)
+    if reopen:
+        line += ", so a real edit still reopens the steps it affects"
+    return line + "."
+
+
+def _load_sides(args: argparse.Namespace, root: Path) -> tuple[dict, dict, dict, tuple, tuple, tuple, Path | None]:
+    repo = _find_repo(root)
+    ours_root = Path(args.ours_root) if args.ours_root else None
+    theirs_root = Path(args.theirs_root) if args.theirs_root else None
+    if (ours_root is None) != (theirs_root is None):
+        fail("need-sides", "pass both --ours-root and --theirs-root, or neither to read HEAD and MERGE_HEAD")
+    if ours_root is not None:
+        ours = _tree_from_folder(ours_root)
+        theirs = _tree_from_folder(theirs_root)
+        merged = _tree_from_folder(root)
+        return ours, theirs, merged, (ours_root, None, None), (theirs_root, None, None), (root, None, None), repo
+    if repo is None:
+        fail("need-sides", "walk-progress.md is not in a git repo; pass --ours-root and --theirs-root")
+    git_dir = subprocess.run(
+        ["git", "-C", str(repo), "rev-parse", "--git-path", "MERGE_HEAD"],
+        capture_output=True, text=True, check=False,
+    )
+    if git_dir.returncode != 0:
+        fail("not-a-merge", "no merge in progress; pass --ours-root and --theirs-root")
+    marker = Path(git_dir.stdout.strip())
+    if not marker.is_absolute():
+        marker = repo / git_dir.stdout.strip()
+    if not marker.is_file():
+        fail("not-a-merge", "no merge in progress; pass --ours-root and --theirs-root")
+    try:
+        rel = root.resolve().relative_to(repo.resolve()).as_posix()
+    except ValueError:
+        fail("root", "the spec folder is not inside the git repo")
+    ours = _tree_from_git(repo, "HEAD", rel)
+    theirs = _tree_from_git(repo, "MERGE_HEAD", rel)
+    merged = _tree_from_folder(root)
+    return (
+        ours, theirs, merged,
+        (None, repo, "HEAD"),
+        (None, repo, "MERGE_HEAD"),
+        (root, repo, None),
+        repo,
+    )
+
+
+def _play_for(body: dict, where: tuple) -> tuple[str | None, bytes | None]:
+    folder, repo, rev = where
+    return _playbook_pair(body, folder, repo, rev)
+
+
+def _apply_actions(ours_data: dict, theirs_data: dict, steps: set[str], ours, theirs, merged, ours_where, theirs_where, merged_where) -> list[dict]:
+    actions = []
+    for step in steps:
+        if step.startswith("- "):
+            continue
+        ours_body = ours_data["steps"].get(step)
+        theirs_body = theirs_data["steps"].get(step)
+        if not ours_body or not theirs_body:
+            actions.append({
+                "step": step,
+                "restamped": [],
+                "kept": ["upstream step"],
+                "reopen": False,
+            })
+            continue
+        ours_play = _play_for(ours_body, ours_where)
+        theirs_play = _play_for(theirs_body, theirs_where)
+        merged_play = _play_for(theirs_body, merged_where)
+        ours["playbook"] = ours_play
+        theirs["playbook"] = theirs_play
+        merged["playbook"] = merged_play
+        actions.append(_decide_step(
+            step, ours_body, theirs_body, ours, theirs, merged,
+            ours_play, theirs_play, merged_play,
+        ))
+    actions.extend(_align_jump_keys(ours_data, theirs_data))
+    return actions
+
+
+def _steps_in(hunks: list[dict], kind: str) -> list[str]:
+    seen: list[str] = []
+    for hunk in hunks:
+        if hunk["class"] != kind:
+            continue
+        name = hunk.get("step") or "(no step)"
+        if name not in seen:
+            seen.append(name)
+    return seen
+
+
+def _emit_exit(payload: dict, status: int) -> None:
+    emit(payload)
+    raise SystemExit(status)
+
+
+def _stage_progress(root: Path, repo: Path | None) -> tuple[bool, str | None]:
+    if repo is None:
+        return False, "not a git repo"
+    path = progress_path(root)
+    try:
+        rel = path.resolve().relative_to(repo.resolve()).as_posix()
+    except ValueError:
+        return False, "walk-progress.md is outside the git repo"
+    proc = subprocess.run(
+        ["git", "-C", str(repo), "add", "--", rel],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if proc.returncode != 0:
+        return False, (proc.stderr or proc.stdout).strip()
+    return True, None
+
+
+def _write_progress_bytes(path: Path, text: str, newline: str) -> None:
+    if newline == "\r\n":
+        text = text.replace("\r\n", "\n").replace("\n", "\r\n")
+    path.write_bytes(text.encode("utf-8"))
+
+
+def resolve_stamps(args: argparse.Namespace) -> None:
+    """Settle a walk-progress.md merge when every conflict is a hash line.
+
+    Takes the upstream text, then recomputes a hash line from the merged
+    spec, plan, tasks, or verify file only when the rule in _decide_step
+    says so. --yes writes that file and git-adds it when no conflict marker
+    remains. A hunk that touches Done, Result, or any other recorded line
+    is not rewritten unless --settle-stamps is also set, and then only the
+    stamp hunks are rewritten. The merge is not pushed.
+    """
+    root = Path(args.root)
+    path = progress_path(root)
+    if not path.is_file():
+        _emit_exit({
+            "ok": False,
+            "code": "missing",
+            "resolved": False,
+            "line": f"No {PROGRESS_NAME} in {root}.",
+        }, 1)
+    raw = path.read_bytes()
+    newline = "\r\n" if b"\r\n" in raw else "\n"
+    try:
+        text = raw.decode("utf-8")
+    except UnicodeDecodeError:
+        fail("progress-file", f"{PROGRESS_NAME} is not utf-8")
+    lines = text.splitlines()
+    hunks, error = _parse_hunks(lines)
+    if error:
+        _emit_exit({
+            "ok": False,
+            "code": "conflict-markers",
+            "resolved": False,
+            "line": f"{PROGRESS_NAME} has a broken conflict marker. {error}.",
+        }, 1)
+    if not hunks:
+        _emit_exit({
+            "ok": True,
+            "code": "clean",
+            "resolved": False,
+            "wrote": None,
+            "line": f"No stamp conflict in {PROGRESS_NAME}.",
+        }, 0)
+    for hunk in hunks:
+        _classify_hunk(hunk, lines)
+    blocked = [hunk for hunk in hunks if hunk["class"] != "stamp"]
+    stamps = [hunk for hunk in hunks if hunk["class"] == "stamp"]
+
+    def hunk_public(hunk: dict) -> dict:
+        return {
+            "index": hunk["index"],
+            "step": hunk.get("step"),
+            "class": hunk["class"],
+            "lines": hunk["lines"],
+        }
+
+    if blocked and not args.settle_stamps:
+        stamp_bits = [
+            f"{hunk['index']} {hunk.get('step') or '(no step)'} ({', '.join(hunk['lines'])})"
+            for hunk in stamps
+        ]
+        blocked_bits = [
+            f"{hunk['index']} {hunk.get('step') or '(no step)'} ({', '.join(hunk['lines']) or 'unmarked'})"
+            for hunk in blocked
+        ]
+        line = (
+            f"{PROGRESS_NAME} is still conflicted. "
+            f"Stamp-only hunks: {', '.join(stamp_bits) or 'none'}. "
+            f"Other hunks: {', '.join(blocked_bits)}. "
+            "Say settle stamps to resolve the stamp lines."
+        )
+        _emit_exit({
+            "ok": False,
+            "code": "mixed-conflict",
+            "resolved": False,
+            "wrote": None,
+            "line": line,
+            "stamp_hunks": [hunk_public(hunk) for hunk in stamps],
+            "blocked_hunks": [hunk_public(hunk) for hunk in blocked],
+            "offer": "settle stamps",
+        }, 1)
+
+    ours_text = _reconstruct(lines, hunks, "ours")
+    theirs_text = _reconstruct(lines, hunks, "theirs")
+    ours_data, ours_err = _try_parse(ours_text)
+    theirs_data, theirs_err = _try_parse(theirs_text)
+    if ours_data is None or theirs_data is None:
+        detail = ours_err or theirs_err or "progress file could not be read"
+        _emit_exit({
+            "ok": False,
+            "code": "progress-file",
+            "resolved": False,
+            "line": f"{PROGRESS_NAME} could not be settled. {detail}.",
+        }, 1)
+    ours_tree, theirs_tree, merged_tree, ours_where, theirs_where, merged_where, repo = _load_sides(args, root)
+    step_names = []
+    for hunk in stamps:
+        name = hunk.get("step")
+        if name and not name.startswith("- ") and name not in step_names:
+            step_names.append(name)
+    actions = _apply_actions(
+        ours_data, theirs_data, set(step_names),
+        ours_tree, theirs_tree, merged_tree,
+        ours_where, theirs_where, merged_where,
+    )
+    line = _report_line(actions, PROGRESS_NAME)
+    if not args.yes:
+        _emit_exit({
+            "ok": False,
+            "code": "needs-yes",
+            "resolved": False,
+            "wrote": None,
+            "line": line,
+            "actions": actions,
+            "message": "resolve-stamps writes the progress file only with --yes",
+        }, 2)
+    label = theirs_data.get("slice") or f"docs/specs/{root.name}/"
+    rendered = render(label, theirs_data["steps"], theirs_data.get("acks"), theirs_data.get("jumps"))
+    if blocked:
+        # A mixed file keeps its conflict markers. Only the stamp hunks change.
+        written = _settle_stamp_hunks(lines, hunks, theirs_data)
+        text_out = "\n".join(written).rstrip("\n") + "\n"
+        _write_progress_bytes(path, text_out, newline)
+        _emit_exit({
+            "ok": False,
+            "code": "mixed-conflict",
+            "resolved": False,
+            "settled_stamps": True,
+            "staged": False,
+            "wrote": PROGRESS_NAME,
+            "line": line + " Other conflicts remain.",
+            "actions": actions,
+            "blocked_hunks": [hunk_public(hunk) for hunk in blocked],
+            "offer": "stop",
+        }, 1)
+    _write_progress_bytes(path, rendered, newline)
+    staged, stage_error = _stage_progress(root, repo)
+    payload = {
+        "ok": True,
+        "code": "settled",
+        "resolved": True,
+        "staged": staged,
+        "wrote": PROGRESS_NAME,
+        "line": line,
+        "actions": actions,
+    }
+    if stage_error and repo is not None:
+        payload["stage_error"] = stage_error
+    _emit_exit(payload, 0)
+
+
+def _line_for_label(body: dict, label: str) -> str | None:
+    if label == "Content stamp":
+        if body.get("content_stamp"):
+            return f"  Content stamp: {body['content_stamp']}"
+        return None
+    if label == "Playbook":
+        return f"  Playbook: {body['playbook']}@{body['playbook_version']}"
+    if label == "Kept questions":
+        return f"  Kept questions: {body['kept_questions']}"
+    if label == "Spec body":
+        return f"  Spec body: {body['spec_body']}"
+    if label == "Questions version":
+        return f"  Questions version: {body['questions']}"
+    if label == "Key":
+        return None
+    token = next((name for name, title in LABEL.items() if title == label), None)
+    if token is None or token not in body:
+        return None
+    return f"  {label}: {body[token]}"
+
+
+def _settle_stamp_hunks(lines: list[str], hunks: list[dict], data: dict) -> list[str]:
+    out: list[str] = []
+    cursor = 0
+    for hunk in hunks:
+        out.extend(lines[cursor:hunk["start"]])
+        if hunk["class"] != "stamp":
+            out.extend(lines[hunk["start"]:hunk["end"]])
+        else:
+            step = hunk.get("step") or ""
+            body = data["steps"].get(step)
+            labels: list[str] = []
+            for line in hunk["theirs"] + hunk["ours"]:
+                label = _stamp_label(line)
+                if label and label not in labels:
+                    labels.append(label)
+            if body is None:
+                out.extend(hunk["theirs"])
+            else:
+                for label in labels:
+                    written = _line_for_label(body, label)
+                    if written:
+                        out.append(written)
+                if body.get("content_stamp") and "Content stamp" not in labels:
+                    window = "\n".join(lines[hunk["end"]:hunk["end"] + 8])
+                    if "Content stamp:" not in window:
+                        out.append(f"  Content stamp: {body['content_stamp']}")
+        cursor = hunk["end"]
+    out.extend(lines[cursor:])
+    return out
+
+
 def cmd_version(args: argparse.Namespace) -> None:
     root = Path(args.root)
     emit({"ok": True, "versions": versions(root, Path(args.playbook) if args.playbook else None)})
@@ -2582,6 +3409,14 @@ def main(argv: list[str] | None = None) -> None:
     f.add_argument("--choice", help="tighten-spec or open-point")
     f.add_argument("--yes", action="store_true")
     f.set_defaults(func=spec_finding)
+
+    rs = sub.add_parser("resolve-stamps")
+    rs.add_argument("--root", required=True)
+    rs.add_argument("--yes", action="store_true")
+    rs.add_argument("--settle-stamps", action="store_true")
+    rs.add_argument("--ours-root")
+    rs.add_argument("--theirs-root")
+    rs.set_defaults(func=resolve_stamps)
 
     args = parser.parse_args(argv)
     args.func(args)

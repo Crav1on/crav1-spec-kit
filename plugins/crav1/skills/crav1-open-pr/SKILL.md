@@ -73,7 +73,7 @@ Read `references/host.md` to pick **one** create path: GitHub `gh`, then Azure D
 Only after they pick `push` on the current draft.
 
 1. `git push -u <remote> <head>`. Never `--force`, `--force-with-lease`, `--force-if-includes`, or a refspec that starts with `+`.
-2. If the push fails, show the error. Do not open a pull request. Do not force-push. When it was rejected because the remote branch has commits this one lacks, say: `Pull <head> with git pull --no-rebase, resolve any conflicts, then push again.` Never suggest a rebase or a force-push (1.66.0).
+2. If the push fails, show the error. Do not open a pull request. Do not force-push. When it was rejected because the remote branch has commits this one lacks, say: `Pull <head> with git pull --no-rebase, resolve any conflicts, then push again.` A `walk-progress.md` conflict that is only version lines is `resolve-stamps`, the same command `/crav1-finalize-commit` runs (1.139.0). Never suggest a rebase or a force-push (1.66.0).
 3. Open one pull request (below). If one already exists for this head → base, follow **Existing pull request** instead.
 
 ## Open only

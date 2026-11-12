@@ -10,6 +10,6 @@ Stop unless all of these are true after the ready step:
 | `reviewDecision` | `APPROVED`, or empty when `mergeStateStatus` is `CLEAN` | `REVIEW_REQUIRED`, `CHANGES_REQUESTED` |
 | `gh pr checks` | every required check passed; exit 0 | failing or pending lines |
 
-`BEHIND` means the head is behind the base. `DIRTY` means the branch has conflicts with the base. Report that. Do not update the branch in this skill. Say how to fix it by merging the base in, never a rebase (1.66.0): `Merge <base> into <head> (resolve any conflicts there), push, then ask to merge again.` When they want the steps: `git switch <base>`, `git pull --ff-only`, `git switch <head>`, `git merge <base>`, `git push`. On GitHub, **Update branch** with **Update with merge commit** does the same for a branch that is only behind.
+`BEHIND` means the head is behind the base. `DIRTY` means the branch has conflicts with the base. Report that. Do not update the branch in this skill. Say how to fix it by merging the base in, never a rebase (1.66.0): `Merge <base> into <head> (resolve any conflicts there), push, then ask to merge again.` When they want the steps: `git switch <base>`, `git pull --ff-only`, `git switch <head>`, `git merge <base>`, `git push`. If that merge leaves `walk-progress.md` conflicted only on version lines, run `resolve-stamps` as `/crav1-finalize-commit` `references/pull.md` says (1.139.0). On GitHub, **Update branch** with **Update with merge commit** does the same for a branch that is only behind.
 
 `UNSTABLE` is not a pass. Report the check names. Do not merge.

@@ -2,6 +2,15 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.139.0 (2026-11-12)
+
+A merge no longer stops when `walk-progress.md` conflicts only on version lines. A minor release because the pull path now settles those lines and can rewrite the stored hashes.
+
+- **Stamp conflicts.** When `git pull --no-rebase --no-commit` leaves `docs/specs/<slug>/walk-progress.md` conflicted, and every conflict hunk is only a hash line (`Spec version`, `Plan version`, `Tasks version`, `Verify version`, `Spec body`, `Questions version`, `Kept questions`, `Content stamp`, `Key`, or `Playbook:`), `/crav1-finalize-commit` settles it. The same command is used when any kit merge leaves that file conflicted, including merging the base into a branch. `/crav1-update-kit` still does not merge the file.
+- **Restamp rule.** The script takes the upstream text. `Done`, `Result`, and every other recorded line stay. A hash line becomes the merged file's normalized hash only when at least one side's recorded hash matches that side's file, and every matching side differs from the merged file only by progress (line endings, and for `spec.md` and `tasks.md` a checkbox or a `(PR n)` or `(done)` mark). Otherwise the upstream hash stays, so a real edit still reopens the steps that edit affects. When every hash on the step is that merged hash, the line `Content stamp: normalized` is written. An older step with no such line still matches a progress-only edit.
+- **Mixed conflicts.** A hunk that also touches `Done`, `Result`, a finding, or any other recorded line is not rewritten. The run names the stamp-only hunks and the other hunks and offers `settle stamps`. That rewrites only the stamp hunks and leaves the rest. The merge is not committed, and nothing is pushed.
+- **Script.** `walk_progress.py resolve-stamps --root <spec-folder> --yes`. It is line-ending neutral. On a full settle it `git add`s the file into the merge commit this run was already going to make. It does not push.
+
 ## 1.138.0 (2026-11-12)
 
 Recording progress no longer reopens the tighten-and-plan walk. A minor release because the stamp, the clear question, and the not-ready wording change.

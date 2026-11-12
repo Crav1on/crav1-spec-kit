@@ -16,6 +16,8 @@ Push the change branch only after an explicit yes, then open one pull request (n
 
 1.66.0: a push rejected because the remote branch moved says to pull with `git pull --no-rebase`, resolve conflicts, and push again. Never a rebase or a force-push.
 
+1.139.0: a `walk-progress.md` conflict that is only version lines is `resolve-stamps`, the same command [`/crav1-finalize-commit`](crav1-finalize-commit.md) runs. Do not reimplement it.
+
 1.68.0: the into step is offered and written: a head that split off another spec branch gets one yes/no question, and a sub-branch's PR goes into its spec branch.
 
 1.98.0: the body is format A: a 1-2 line summary, then Changes (grouped by area, at most about 8 link-first bullets, each with a bold title and what and why; the why only from the spec, a plan task, a commit message or a code comment), Verified (the check written out, with dates), Risks and rollback, Merge order, Not in this PR, Questions for reviewers and Work item, each left out when empty. File and line links are pinned to the head commit (Azure DevOps `version=GC<sha>`, GitHub `blob/<sha>/…?plain=1#L<n>`). There is no Spec section and no link to the spec. A missing rollback on an infra, pipeline or PROD change is said in the chat only. [`/crav1-pr-status`](crav1-pr-status.md) reads the Merge order, Questions for reviewers and Not in this PR sections on its next run.

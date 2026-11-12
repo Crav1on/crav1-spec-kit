@@ -22,6 +22,8 @@ Trailer hook (1.90.0): asked once per repo in the same prompt, "Strip tool trail
 
 Fetch, pull and check (1.81.0, 1.123.0): after the commit it fetches. When the branch is behind its upstream it merges with `git pull --no-rebase --no-commit` (never a rebase, never an automatic merge commit) and resolves conflicts in specs, system files and notes by the kit's rules: both sides' added lines kept, ours first; the newest `Synced at` entry per branch; note indexes rebuilt with `notes_index.py` and folded into the one merge commit, noted in that message. This run makes at most two commits. `scripts/nothing_lost.py` is the check; say nothing was lost only when it reports that. One question only when the two sides say different things about the same fact: keep both (a `**Conflict:**` line), mine, theirs, or stop. Code file conflicts stay with you. When not behind, it checks any unpushed merge, including one made by hand, and offers to restore dropped lines; restored lines go into this run's commit (1.91.0). `pull` does this with no commit first. It never pushes. Next follows run-ending.md: an unfinished walk resumes the walk; a base branch says to push; a feature branch names [`/crav1-open-pr`](crav1-open-pr.md).
 
+1.139.0: a conflict in `docs/specs/<slug>/walk-progress.md` whose every hunk is only a version line (`Spec version`, `Plan version`, `Tasks version`, `Verify version`, `Spec body`, `Questions version`, `Kept questions`, `Content stamp`, `Key`, or `Playbook:`) is settled by `walk_progress.py resolve-stamps --root <spec-folder> --yes`. The script takes the upstream text. It rewrites a hash to the merged file's normalized hash only when at least one side's recorded hash matches that side's file and every matching side differs from the merge only by progress (line endings, and for spec and tasks a checkbox or a `(PR n)` or `(done)` mark). Otherwise the upstream hash stays, so a real edit still reopens the steps it affects. `Done` and `Result` stay. The file is staged into the merge commit. A hunk that touches `Done`, `Result`, or any other recorded line is not rewritten. The run shows which hunks are stamp-only and offers `settle stamps`. It does not push.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
@@ -56,7 +58,7 @@ Only write the message: Reads the staged or unstaged diff, recent `git log`, an 
 
 In short: Only write the message: A host persist rule when onward is chosen; a commit only when also asked in that turn; Commit: The persist rule when onward is chosen, and the git commit when picked.
 
-Only write the message: Writes a host persist rule only when the user chooses onward. Commit: Writes the persist rule when onward is chosen, and the git commit when the user picks commit. When behind, a merge commit from the pull path, with kit-file conflicts resolved and note indexes rebuilt (1.81.0).
+Only write the message: Writes a host persist rule only when the user chooses onward. Commit: Writes the persist rule when onward is chosen, and the git commit when the user picks commit. When behind, a merge commit from the pull path, with kit-file conflicts resolved and note indexes rebuilt (1.81.0). A stamp-only `walk-progress.md` conflict is settled into that merge (1.139.0).
 
 ## Does not
 
