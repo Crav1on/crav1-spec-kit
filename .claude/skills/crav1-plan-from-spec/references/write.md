@@ -16,6 +16,24 @@ The one exception to leaving `spec.md` alone. Once `tasks.md` exists, every kept
 
 A kept-open question with no `Blocks:` line holds the `T#` ids named in its text for `/crav1-tasks-ready-to-build`, and holds the whole slice only when no task is named and resolve-open-questions has never been recorded (1.137.0). `Blocks: none` blocks no task. Any `Blocks:` line wins over Risk wording. List each `Blocks:` line in the recap.
 
+## Approval needed (1.141.0)
+
+A constraint that a named person gives a yes before something becomes an item under `## Approval needed`. The shape is:
+
+```text
+- The partner approves applying the CI build policy.
+  - Person: the partner
+  - Holds: T4
+```
+
+Read `## Constraints`. A line like `The partner gives a yes before the CI build policy script is applied.` is one item. The person is the name in that line. What they approve is the rest. `Holds:` is every new task that does that work: a task whose line shares those words, including a `(host setup)` task whose `apply` is that work. When no task matches, ask once which tasks, in one batch. Do not hold the whole slice. Do not write `Holds: none` for that case.
+
+When Python runs, `scripts/approval_needed.py` (skill `crav1-record-approval`) prints `gates` with a suggested `holds` list. Use that list. Do not invent a second item for the same person and the same what. On a re-plan that renumbers tasks, replace the `Holds:` line this plan wrote.
+
+Do not write `Approved:`. An earlier quote is not a yes. The constraint stays. The walk's plan step follows this file, so it writes the same item. The walk does not write it itself.
+
+List each item in the recap: the person, what they approve, and the tasks.
+
 ## tasks.md
 
 Read this skill’s [references/checks.md](references/checks.md) before writing tasks (this skill's `references/checks.md`). Name the checks there. Do not write test code.

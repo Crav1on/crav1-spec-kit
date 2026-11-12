@@ -8,6 +8,8 @@
 
 Walk Open questions and Conflict lines in spec.md one by one.
 
+1.141.0: does not walk `## Approval needed` and does not remove an `Approved:` line. Folding an answer still removes that question's `Answered:` line.
+
 One Open question at a time; keep it open or answer with impact; patch only that question, found by its words (`Q#` is display only).
 
 Conflict lines (1.111.0) are listed after the questions; settling one replaces or keeps the decided line, removes the Conflict line, and adds a trace to the note.

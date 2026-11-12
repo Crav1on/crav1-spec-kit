@@ -51,7 +51,7 @@ Check each task in this order and stop at the first rule that decides it. Every 
    - The task line has `(after: T1, T3)`: waits in order while any of those is unticked, `waits on T1 (recorded)`. A named task that does not exist is blocked, `after: T9 names no task (recorded)`.
    - No `(after: …)`: the task waits in order on the task just before it in `tasks.md` (the first task waits on nothing). Waits in order while that one is unticked, `waits on T2 (inferred)`.
    - Tasks that wait on each other in a loop are blocked, `cycle T3 → T7 → T3 (recorded)`. Fix the `(after: …)` marks with `/crav1-tighten-plan`.
-   - **Held dependents (1.132.0).** A task that waits on a held task is held too, through later tasks. The reason is `held, waits on T3 (recorded)` or `(inferred)`. It stays under Waiting, with that reason. It is not Waits in order. Who is the person on the question that started the hold, or not named yet.
+   - **Held dependents (1.132.0).** A task that waits on a held task is held too. The reason is `held, waits on T3 (recorded)` or `(inferred)`. It stays under Waiting. It is not Waits in order. Who is the person on the question or the Approval needed item. See [references/approval-holds.md](references/approval-holds.md).
 5. **Ready.** Otherwise the task is ready.
    - `plan.md` has `Reviewed: <date>, P# open: 0`: ready.
    - `Reviewed:` with `P# open:` above 0: ready, with the warning `plan review has <n> open P# (recorded), see /crav1-tighten-plan`.
@@ -59,7 +59,7 @@ Check each task in this order and stop at the first rule that decides it. Every 
 
 Do not guess a dependency or a blocking link from the task text. Use only the marks above and the fallbacks.
 
-When Python runs, rule 3 may use `scripts/question_blocks.py` beside this skill: `<interpreter> <this skill folder>/scripts/question_blocks.py docs/specs/<slug>/spec.md docs/specs/<slug>/plan.md` [tasks.md]. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. Use its result. It does not write. Marks are in [references/question-holds.md](references/question-holds.md).
+When Python runs, rule 3 may use `scripts/question_blocks.py` beside this skill, and `scripts/approval_needed.py` (skill `crav1-record-approval`) for `## Approval needed`. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. Use its result. It does not write. Marks are in [references/question-holds.md](references/question-holds.md) and [references/approval-holds.md](references/approval-holds.md).
 
 ## Dependency order (1.103.0)
 

@@ -81,9 +81,9 @@ The branch question is its own card, before the permissions question. The recomm
 
 A missing permissions answer, or a branch name in the permissions slot, is asked again. The run does not guess `click`.
 
-## A yes that is not on record (1.129.0)
+## A yes that is not on record (1.129.0, 1.141.0)
 
-When the live change needs someone's yes (host setup, or another approval), and that yes is not already on record, the worker returns `needs_yes`. The task stays unticked. That is waiting, not blocked.
+When the live change needs someone's yes (host setup, or another approval), and that yes is not already on record, the worker returns `needs_yes`. On record means it was said in this chat, an `Answered:` line names it, or a matching `Approved:` line exists. The task stays unticked. That is waiting, not blocked. The parent writes or offers an `## Approval needed` item. It does not write `Approved:`. A matching line still does not run `apply`: your own yes in this run is required, and the task stays unticked until `check` is ok. See [Record a person's yes](from-record-approval.md).
 
 ```text
 Waiting: the partner's yes to turn off pipelines 7 and 24.

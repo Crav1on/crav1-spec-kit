@@ -77,7 +77,7 @@ A requirement that is a host setting with no file in the repo (a branch policy o
 
 ### Blocks lines
 
-The one exception to leaving `spec.md` alone: a `Blocks:` line under a kept-open question, `Blocks: T#` or `Blocks: none`. Read `references/write.md` ("Blocks lines") when any question stays open. List each `Blocks:` line in the recap.
+The one exception to leaving `spec.md` alone: a `Blocks:` line under a kept-open question, `Blocks: T#` or `Blocks: none`, and an `## Approval needed` item from a constraint. Read `references/write.md` ("Blocks lines" and "Approval needed"). List each `Blocks:` line and each approval item in the recap.
 
 ### tasks.md
 

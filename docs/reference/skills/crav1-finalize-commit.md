@@ -8,6 +8,8 @@
 
 Draft the commit message, then commit, copy, change, or stop.
 
+1.141.0: a merge of `spec.md` keeps every `Approved:` line under `## Approval needed`. The pull path never drops one.
+
 1.99.0: never commits implementation code on a base branch, even with `commit now`; the prompt becomes `Commit on a work branch?` (create `feat/<slug>` from the into branch and commit, an existing branch, another name, stop). Spec and doc commits on a base are unchanged.
 
 1.130.0: a typed branch name on that prompt is the card's free-text answer, hint `Type a branch name`. There is no option labelled Other name.

@@ -4,7 +4,7 @@ Read only when `SKILL.md` routes here (`show`). Moved word for word from `SKILL.
 
 ## Show
 
-Read `## Open questions` in every `docs/specs/<slug>/spec.md` (skip `_template`), with the lines under each question, as `crav1-add-to-spec` `references/open-questions.md` describes. Write nothing. Draft nothing. Send nothing.
+Read `## Open questions` in every `docs/specs/<slug>/spec.md` (skip `_template`), with the lines under each question, as `crav1-add-to-spec` `references/open-questions.md` describes. Also list each unapproved `## Approval needed` item. Read `references/approval.md`. Write nothing. Draft nothing. Send nothing.
 
 - One section per spec with open questions, then one line per question that has no `Answered:` line: its `Q#` (document order, display only, never written; 1.84.0), the question in plain words, then its marks: `Asked <date>, <channel> to <who>`, `Pending since <date> for <who>`, `Blocks T2, T4`, or `not asked yet`.
 - An answered question still waiting on `/crav1-resolve-open-questions` is listed under **Answered, not resolved**.

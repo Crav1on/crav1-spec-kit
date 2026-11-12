@@ -35,6 +35,7 @@ AGENTS_DIR = ROOT / ".cursor/agents"
 GROUPS = {
     "spec": "`spec.md` lines",
     "open-questions": "Open question marks",
+    "approval": "Approval needed",
     "research": "Research and stale marks",
     "plan": "`plan.md` and `tasks.md`",
     "walk": "Walk progress",

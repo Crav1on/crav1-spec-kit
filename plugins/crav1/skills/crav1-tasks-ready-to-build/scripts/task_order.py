@@ -10,7 +10,10 @@ unblocks the most unticked tasks (all tasks downstream of it), lowest number on 
 A recorded-merged task counts as done (1.136.0), the same rule as walk_progress: `(PR n)` and the word
 merged on the task line, or on the Match Branch line for its `(branch:)` or `(map:)` branch. It is not
 Ready and not Next. It is listed under Needs tick while the checkbox is still open. A sibling spec.md
-is read when this file is given a tasks.md path.
+is read when this file is given a tasks.md path. An unapproved `## Approval needed`
+item moves the tasks it holds out of Ready and into Waiting on approval (1.141.0).
+A task that waits on one of those is listed there too. A matching `Approved:` line
+clears the hold. The section is omitted when nothing is held.
 
 Usage: task_order.py <tasks.md> [--failed T7,T9] [--json]
 Standard library only. Prints nothing secret; reads only the file it is given and a sibling spec.md.
@@ -19,6 +22,8 @@ import json
 import pathlib
 import re
 import sys
+
+sys.dont_write_bytecode = True  # before any sibling import; no __pycache__ in the project (1.121.1)
 
 
 def _utf8_stdout() -> None:
@@ -232,12 +237,106 @@ def _wait_line(row):
     return f"- T{row['id']}: {row['reason']}"
 
 
+def _approval_mod():
+    import importlib.util
+
+    path = pathlib.Path(__file__).resolve().parents[2] / "crav1-record-approval" / "scripts" / "approval_needed.py"
+    spec = importlib.util.spec_from_file_location("approval_needed", path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"cannot load {path}")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def apply_approval_holds(res, tasks, spec_text):
+    """Move tasks an unapproved Approval needed item holds out of Ready.
+
+    A task that only waits on one of those moves too. A cycle, or an after
+    that names no task, stays blocked. analyse() is unchanged when this is
+    not called.
+    """
+    waiting = []
+    if not spec_text:
+        res["waiting_on_approval"] = waiting
+        return res
+    ids = [f"T{task['id']}" for task in tasks]
+    held = dict(_approval_mod().holds(spec_text, ids))
+    for task in tasks:
+        if task["done"]:
+            held.pop(f"T{task['id']}", None)
+    if not held:
+        res["waiting_on_approval"] = waiting
+        return res
+    changed = True
+    while changed:
+        changed = False
+        for task in tasks:
+            if task["done"]:
+                continue
+            tid = f"T{task['id']}"
+            if tid in held:
+                continue
+            for dep in task["deps"]:
+                via = f"T{dep}"
+                if via not in held:
+                    continue
+                held[tid] = {**held[via], "via": via}
+                changed = True
+                break
+
+    def take(row):
+        tid = f"T{row['id']}"
+        info = held.get(tid)
+        if not info:
+            return False
+        reason = row.get("reason") or ""
+        if "cycle" in reason.lower() or "names no task" in reason.lower():
+            return False
+        who = info.get("who") or "not named yet"
+        if info.get("via"):
+            shown = f"held, waits on {info['via']}"
+        else:
+            shown = f"waiting for {who}"
+        waiting.append({"id": row["id"], "title": row.get("title") or "", "reason": shown, "who": who})
+        return True
+
+    ready_left = []
+    by_row = {row["id"]: row for row in res["rows"]}
+    for number in res["ready"]:
+        row = by_row.get(number) or {"id": number, "title": "", "reason": None}
+        if take(row):
+            row["ready"] = False
+            row["reason"] = waiting[-1]["reason"]
+        else:
+            ready_left.append(number)
+    blocked_left = []
+    for row in res["blocked"]:
+        if take(row):
+            row["reason"] = waiting[-1]["reason"]
+        else:
+            blocked_left.append(row)
+    res["ready"] = ready_left
+    res["blocked"] = blocked_left
+    res["waiting_on_approval"] = waiting
+    ready_rows = [row for row in res["rows"] if row["id"] in set(ready_left)]
+    res["next"] = min(ready_rows, key=lambda row: (-row["unblocks"], row["id"]))["id"] if ready_rows else None
+    return res
+
+
 def render(res):
     waits, blockers = _split_blocked(res["blocked"])
     out = ["Ready (dependency order)"]
     out += [f"- T{r['id']}: {r['title']}" for r in res["rows"] if r["ready"]] or ["- none"]
     out.append("Waits in order (dependency order)")
     out += [_wait_line(r) for r in waits] or ["- none"]
+    approvals = res.get("waiting_on_approval") or []
+    if approvals:
+        out.append("Waiting on approval")
+        for row in approvals:
+            title = (row.get("title") or "").strip()
+            label = f"T{row['id']} {title}".strip()
+            out.append(f"- {label}: {row['reason']}")
     out.append("Blocked (dependency order)")
     out += [f"- T{r['id']}: {r['reason']}" for r in blockers] or ["- none"]
     needs = res.get("needs_tick") or []
@@ -270,6 +369,7 @@ def public(res):
         "blocked": [row(item) for item in blockers],
         "next": _tid(res["next"]),
         "needs_tick": [row(item) for item in res.get("needs_tick") or []],
+        "waiting_on_approval": [row(item) for item in res.get("waiting_on_approval") or []],
         "depends_on_failed": res["depends_on_failed"],
         "rows": [row(item) for item in res["rows"]],
     }
@@ -302,7 +402,9 @@ def main(argv):
     text = tasks_path.read_text(encoding="utf-8")
     spec_path = tasks_path.parent / "spec.md"
     spec_text = spec_path.read_text(encoding="utf-8") if spec_path.is_file() else ""
-    res = analyse(parse(text), failed, merged_ids(text, spec_text))
+    parsed = parse(text)
+    res = analyse(parsed, failed, merged_ids(text, spec_text))
+    apply_approval_holds(res, parsed, spec_text)
     if "--json" in argv:
         emit_text(json.dumps(public(res), ensure_ascii=False, indent=1))
     else:

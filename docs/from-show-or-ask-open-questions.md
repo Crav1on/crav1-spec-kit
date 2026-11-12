@@ -2,7 +2,7 @@
 
 Kit not in this project yet? [Install first](install.md) (Cursor and Claude Code; the slash commands match, the files do not). After a Cursor plugin install, the short command loop is [plugins/crav1/README.md](../plugins/crav1/README.md). Claude Code has no plugin.
 
-Use this when the specs hold open questions that only someone else can answer: a partner, a customer, or a colleague. The command gathers those questions for one person, one spec, or one topic, and drafts them for you to send or ask. It records whether you asked. Nothing is sent by the kit.
+Use this when the specs hold open questions that only someone else can answer: a partner, a customer, or a colleague. The command gathers those questions for one person, one spec, or one topic, and drafts them for you to send or ask. It also drafts an Approval needed item that has no `Approved:` line, as a mail, a chat message, a meeting agenda, or a PR comment. It records whether you asked. Nothing is sent by the kit. It does not write `Approved:`.
 
 This is not `/crav1-resolve-open-questions`. Resolve walks the questions with you and writes your decisions into the spec. This command drafts the questions for someone else and writes only the asked and pending marks.
 

@@ -54,7 +54,7 @@ For each `T#` **one at a time**:
 | `needs_fix` | Ask the user `fix` / `stop` (this is their input). `fix` → **same T#** worker with `resume: fix` (still that task’s chat/worker, new launch is OK). Repeat until `done` or they `stop`. |
 | `needs_ready` | Ask them to refresh the host, then `ready` / `stop`. `ready` → worker `resume: ready`. |
 | `needs_dependency` | Show the BLOCKER line at the top. Ask start / skip / stop. `start` → worker `resume: dependency-start`; `skip` → `resume: dependency-skip`; `stop` → end. Headless: two-pass questions file. |
-| `needs_yes` | Not blocked. Leave the task unticked and do not launch the next `T#`. End with `Waiting: <who>'s yes to <what>.` and `Next: /crav1-build-tasks <T#>, because that yes is not on record yet.` |
+| `needs_yes` | Not blocked. Leave the task unticked and do not launch the next `T#`. Offer the Approval needed item as skill `crav1-build-tasks`, `references/approval-needed.md` says. End with `Waiting: <who>'s yes to <what>.` |
 | `blocked` / `failed` | **End the batch.** Do not launch the next `T#`. A missing yes is `needs_yes`, not this row. |
 | User `stop` | End the batch. |
 
@@ -74,6 +74,6 @@ Then follow **tool-approvals.md → Undo** once (restore the mode they wrote at 
 
 ## Hard rules
 
-- This chat is orchestration only: no product edits, no `git commit`, no push, no PR, no `spec.md` edits.
+- This chat is orchestration only: no product edits, no `git commit`, no push, no PR. The one `spec.md` write is an Approval needed item, as skill `crav1-build-tasks`, `references/approval-needed.md` says. Do not write `Approved:`.
 - One worker per `T#` at a time. All phases of that `T#` belong to that worker, not to extra chats.
 - Do not flatten the batch into one implement pass in this chat.

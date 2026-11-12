@@ -8,6 +8,8 @@
 
 Walk a draft spec through architecture, tighten, questions, and the plan until the ready check is clear.
 
+1.141.0: the plan step writes an `## Approval needed` item when a constraint says a named person gives a yes before something. The walk does not write that item itself. An edit confined to that section reopens no step. An unapproved item holds only its tasks (`ready-partial`).
+
 [`/crav1-tighten-and-plan-ready-to-build`](crav1-tighten-and-plan-ready-to-build.md) (1.119.0) is one guided walk with two starts. A playbook path is optional. Without one, step 1 is skipped. Both starts then use the same steps and the same ready check. The walk runs the existing skills. It does not replace them. There is no automatic mode.
 
 Locked order: playbook when given; [`/crav1-review-architecture`](crav1-review-architecture.md) always; [`/crav1-tighten-spec`](crav1-tighten-spec.md) one issue at a time; [`/crav1-resolve-open-questions`](crav1-resolve-open-questions.md); [`/crav1-plan-from-spec`](crav1-plan-from-spec.md), which writes `plan.md` and `tasks.md`; [`/crav1-review-plan`](crav1-review-plan.md) then [`/crav1-tighten-plan`](crav1-tighten-plan.md); [`/crav1-tasks-ready-to-build`](crav1-tasks-ready-to-build.md). A step with nothing to do says so and moves on. Research, [`/crav1-review-security`](crav1-review-security.md), [`/crav1-model-data`](crav1-model-data.md), [`/crav1-show-or-ask-open-questions`](crav1-show-or-ask-open-questions.md), and [`/crav1-suggest-tests-for-code`](crav1-suggest-tests-for-code.md) are offered only when the spec needs them.

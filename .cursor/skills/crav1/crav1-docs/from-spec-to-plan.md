@@ -46,6 +46,10 @@ When the spec's work sits on several branches (its `Synced at` lines, its Match 
 
 `/crav1-tighten-spec` reads the same branches. A yes on "write the branch onto the spec?" adds a `Branch:` line in sorted place (1.86.0) instead of replacing the list. A listed branch that is gone and was never merged is offered `(dropped)`; a deleted branch whose work is already in the base is reported as `merged, branch deleted` and isn't offered.
 
+## A yes before something is applied (1.141.0)
+
+A constraint such as `The partner gives a yes before the CI build policy script is applied.` becomes an item under `## Approval needed`, with `Person:` and `Holds:` for the tasks that do that work. `/crav1-plan-from-spec` writes the item. It does not write `Approved:`. An earlier quote is not a yes. Record that later with [Record a person's yes](from-record-approval.md).
+
 ## Host setup tasks (1.115.0)
 
 A requirement that is a host setting with no file in the repo (a branch policy, required build, reviewers, an approval, a variable group) becomes its own task marked `(host setup)`, verified by reading the live setting back. Pipeline YAML and infrastructure as code stay ordinary tasks. See [Set up a host setting](from-host-setup.md).

@@ -479,31 +479,50 @@ def stamp_matches(
     return _git_undo(stored, path, kind, lf, part)
 
 
-def spec_parts(text: str) -> tuple[str, str]:
-    """Split spec text into the body and the Open questions section.
-
-    The section runs from its heading through the line before the next
-    `## ` heading. A spec with no such section has an empty questions part,
-    and the body is the whole file.
-    """
-    if not text:
-        return "", ""
-    lines = text.splitlines(keepends=True)
+def _cut_heading(lines: list[str], heading: str) -> tuple[list[str], list[str]]:
+    """Drop one `## ` section. The section runs through the line before the next heading."""
     start = None
+    want = heading.strip().lower()
     for i, line in enumerate(lines):
-        if line.strip().lower() == "## open questions":
+        if line.strip().lower() == want:
             start = i
             break
     if start is None:
-        return text, ""
+        return lines, []
     end = len(lines)
     for j in range(start + 1, len(lines)):
         if lines[j].startswith("## "):
             end = j
             break
-    body = "".join(lines[:start] + lines[end:])
-    questions = "".join(lines[start:end])
-    return body, questions
+    return lines[:start] + lines[end:], lines[start:end]
+
+
+def spec_without_approval(text: str) -> str:
+    """The spec with `## Approval needed` removed.
+
+    Recording or editing that section does not change the spec stamp, so it
+    does not reopen a walk step (1.141.0).
+    """
+    if not text:
+        return ""
+    kept, _section = _cut_heading(text.splitlines(keepends=True), "## approval needed")
+    return "".join(kept)
+
+
+def spec_parts(text: str) -> tuple[str, str]:
+    """Split spec text into the body and the Open questions section.
+
+    The section runs from its heading through the line before the next
+    `## ` heading. A spec with no such section has an empty questions part.
+    `## Approval needed` is removed from the body and is not part of the
+    questions part, so an edit there reopens no step (1.141.0).
+    """
+    if not text:
+        return "", ""
+    lines = text.splitlines(keepends=True)
+    body_lines, questions = _cut_heading(lines, "## open questions")
+    body_lines, _approval = _cut_heading(body_lines, "## approval needed")
+    return "".join(body_lines), "".join(questions)
 
 
 def _read_pair(path: Path) -> tuple[str | None, bytes | None]:
@@ -531,7 +550,9 @@ def versions(root: Path, playbook: Path | None = None) -> dict:
         out["spec_body"] = "missing"
         out["questions"] = "missing"
     else:
-        body, questions = spec_parts(_lf_text(spec_text))
+        lf = _lf_text(spec_text)
+        out["spec"] = version_text(normalize_text("spec", spec_without_approval(lf)))
+        body, questions = spec_parts(lf)
         out["spec_body"] = version_text(normalize_text("spec", body))
         out["questions"] = version_text(normalize_text("questions", questions))
     if playbook is not None:
@@ -992,6 +1013,9 @@ def _piece_match(root: Path, body: dict, token: str, part: str) -> bool:
     kind = token
     piece = text
     raw_bytes = raw if part == "file" else None
+    if text is not None and token == "spec" and part == "file":
+        # Approval needed is not part of the spec stamp (1.141.0).
+        piece = spec_without_approval(text)
     if text is not None and part != "file":
         body_text, questions = spec_parts(_lf_text(text))
         piece = body_text if part == "spec_body" else questions
@@ -1007,9 +1031,10 @@ def hash_drift(root: Path, step: str, body: dict) -> list[str]:
 
     Progress marks do not count: a task checkbox, a PR or done note on that
     task line, and `(PR n)` or a trailing merged word on a Match Branch line.
-    Line endings do not count. When Spec body and Questions version are
+    Line endings do not count.     When Spec body and Questions version are
     recorded, a change confined to ## Open questions reopens
     resolve-open-questions only. The other spec steps compare Spec body.
+    `## Approval needed` is in neither stamp, so editing it reopens no step.
     A step recorded before that split still compares the whole-file spec.
     An older step has no Content stamp line. It still matches a progress-only
     edit, by raw bytes, by the other line ending, by one hash-undo, or by
@@ -1316,16 +1341,24 @@ def playbook_status(args: argparse.Namespace) -> None:
     })
 
 
-def blocks_mod():
+def _load_script(folder: str, filename: str, code: str):
     import importlib.util
 
-    path = Path(__file__).resolve().parents[2] / "crav1-tasks-ready-to-build" / "scripts" / "question_blocks.py"
-    spec = importlib.util.spec_from_file_location("question_blocks", path)
+    path = Path(__file__).resolve().parents[2] / folder / "scripts" / filename
+    spec = importlib.util.spec_from_file_location(filename[:-3], path)
     if spec is None or spec.loader is None:
-        fail("blocks", f"cannot load {path}")
+        fail(code, f"cannot load {path}")
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
     return mod
+
+
+def blocks_mod():
+    return _load_script("crav1-tasks-ready-to-build", "question_blocks.py", "blocks")
+
+
+def approval_mod():
+    return _load_script("crav1-record-approval", "approval_needed.py", "approval")
 
 
 def unlinked(args: argparse.Namespace) -> None:
@@ -1373,6 +1406,8 @@ def classify(row: dict, resolve_kept: bool = False, resolve_recorded: bool = Fal
         return _hit(task, "blocker", "plan-from-spec", "There is no tasks.md. Run /crav1-plan-from-spec.")
     if "no plan" in text:
         return _hit(task, "blocker", "plan-from-spec", "There is no plan.md. Run /crav1-plan-from-spec.")
+    if row.get("approval") or "approval needed" in text:
+        return _waiting(row)
     if "open question" in text:
         # A Blocks line, a question already recorded as waiting, or a hold
         # inferred from the question text stays waiting through spec drift.
@@ -1422,21 +1457,32 @@ def _waiting(row: dict) -> dict:
         who = None
     if not who:
         who = NOT_NAMED
+    approval = bool(row.get("approval"))
+    if approval:
+        why = (
+            "An Approval needed item holds this task until a matching Approved line is recorded. "
+            "Do not jump back to resolve-open-questions."
+        )
+        step = None
+    else:
+        why = (
+            "Resolve-open-questions already covers this spec. "
+            "The question waits on someone else. Do not jump back."
+        )
+        step = "resolve-open-questions"
     return {
         "task": row.get("task"),
         "bucket": "waiting",
-        "step": "resolve-open-questions",
+        "step": step,
         "command": None,
         "can_jump_back": False,
         "outside_walk": False,
         "kind": "waiting",
         "who": who,
         "asked": bool(row.get("asked")),
+        "approval": approval,
         "reason": row.get("reason"),
-        "why": (
-            "Resolve-open-questions already covers this spec. "
-            "The question waits on someone else. Do not jump back."
-        ),
+        "why": why,
     }
 
 
@@ -1911,6 +1957,7 @@ def build_rows(root: Path) -> list[dict]:
         resolve_recorded=recorded,
     )
     kept = kept_question_keys(root)
+    approval_holds = approval_mod().holds(spec_text, task_ids)
     verify_text = verify_path.read_text(encoding="utf-8") if verify_path.is_file() else None
     warning = reviewed_warning(plan_text) if plan_path.is_file() else None
     rows = []
@@ -1953,6 +2000,20 @@ def build_rows(root: Path) -> list[dict]:
         if question:
             _attach_deps(question, task)
             rows.append(question)
+            continue
+        approval = approval_holds.get(tid)
+        if approval:
+            row = {
+                "bucket": "blocked",
+                "task": tid,
+                "reason": f'approval needed "{approval.get("text") or ""}" (recorded)',
+                "asked": bool(approval.get("asked")),
+                "approval": True,
+            }
+            if approval.get("who"):
+                row["who"] = approval["who"]
+            _attach_deps(row, task)
+            rows.append(row)
             continue
         dep = by_reason.get(task["id"])
         if dep and dep.get("reason"):
@@ -1999,9 +2060,7 @@ def _slug(root: Path) -> str:
     return root.name
 
 
-def _waiting_lines(waiting: list[dict], slug: str) -> tuple[str | None, str | None]:
-    if not waiting:
-        return None, None
+def _wait_phrase(waiting: list[dict], noun: str) -> str:
     tasks: list[str] = []
     whos: list[str] = []
     unnamed = 0
@@ -2023,16 +2082,34 @@ def _waiting_lines(waiting: list[dict], slug: str) -> tuple[str | None, str | No
         tail = f" ({unnamed} not named yet)"
     else:
         tail = ""
-    line = f"Waiting: {count} tasks wait on open questions{tail}."
-    if all(hit.get("asked") for hit in waiting):
-        nxt = (
-            f"/crav1-tighten-and-plan-ready-to-build {slug}, "
-            "because the walk resumes when the answers arrive."
-        )
-    else:
+    return f"Waiting: {count} tasks wait on {noun}{tail}."
+
+
+def _waiting_lines(waiting: list[dict], slug: str) -> tuple[str | None, str | None]:
+    if not waiting:
+        return None, None
+    questions = [hit for hit in waiting if not hit.get("approval")]
+    approvals = [hit for hit in waiting if hit.get("approval")]
+    parts = []
+    if questions:
+        parts.append(_wait_phrase(questions, "open questions"))
+    if approvals:
+        parts.append(_wait_phrase(approvals, "an approval"))
+    line = " ".join(parts)
+    if any(not hit.get("asked") for hit in waiting):
         nxt = (
             f"/crav1-show-or-ask-open-questions {slug}, "
             "because the questions are not asked yet."
+        )
+    elif approvals:
+        nxt = (
+            f"/crav1-record-approval {slug}, "
+            "because that yes is not on record yet."
+        )
+    else:
+        nxt = (
+            f"/crav1-tighten-and-plan-ready-to-build {slug}, "
+            "because the walk resumes when the answers arrive."
         )
     return line, nxt
 
@@ -2080,6 +2157,8 @@ def propagate_held(rows: list[dict], hits: list[dict]) -> None:
                 row["who"] = source["who"]
             if "asked" in source:
                 row["asked"] = source.get("asked")
+            if source.get("approval"):
+                row["approval"] = True
             hit = _waiting(row)
             hits.append(hit)
             held[task] = hit

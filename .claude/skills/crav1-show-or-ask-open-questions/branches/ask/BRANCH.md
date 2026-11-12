@@ -28,7 +28,7 @@ Collect every open question that fits the selection.
 
 Person, spec, topic, branch, and pull request (`pr71`, `#71`) follow skill `crav1-add-to-spec`, `references/scope.md`.
 
-Skip a question that already has a clear `Answered:` line. Say how many were skipped and why. Skip a question with an `Asked:` line for this person unless the user asks to ask again. Say how many were skipped and when they were asked.
+Skip a question that already has a clear `Answered:` line. Say how many were skipped and why. Skip a question with an `Asked:` line for this person unless the user asks to ask again. Say how many were skipped and when they were asked. Also gather each `## Approval needed` item with no matching `Approved:` line. Read `references/approval.md`.
 
 Every question that fits stays listed. Nothing is dropped to keep the list short. When the same question sits on two specs, it is one question in the draft, and both specs get the mark.
 

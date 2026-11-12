@@ -8,6 +8,8 @@
 
 Turn an accepted spec into a file-level plan.md and independently testable tasks.md.
 
+1.141.0: a constraint that a named person gives a yes before something becomes an `## Approval needed` item, with `Person:` and `Holds:` for the tasks that do that work. It does not write `Approved:`.
+
 File-level `plan.md` and `tasks.md`; each verify note names the checks before code; names a linter or checker when the repo has one, and stops before Build when it does not; refuses to code and does not install a linter. When the spec is partial or `## In the code` names paths, reads that repo and branch and chooses finish the gap, add a verify test, or leave it before any task. A piece that already matches v0 is not a choice.
 
 1.64.0: Built pieces reads every work branch of the spec without checkout (and `../<repo>` for another repo), labels pieces `only on <branch>, not merged`, and ends a task with `(branch: …)` when its piece lives on one branch.
@@ -40,11 +42,11 @@ Reads the accepted spec, diagrams, ADRs, exports, kept security findings already
 
 In short: `plan.md`, `tasks.md`, `Blocks:`, `Blocks: none`, or `Blocks: whole slice` on kept-open questions, and matching OpenSpec export files when those already exist.
 
-Writes `plan.md` and `tasks.md`, and matching OpenSpec export files when those already exist. A built piece that already matches v0 is marked already there and gets no rebuild task. A piece the user leaves gets one line in the plan and no task. Lists each kept-open question under Risks without asking whether to park it, and stale research findings under Risks. That does not block the plan. Writes `Blocks: T#`, `Blocks: none`, or `Blocks: whole slice` under a kept-open question. A `Blocks: T#` risk says kept open; blocks those tasks until resolved. A `Blocks: none` risk says kept open; does not block the current tasks. A `Blocks: whole slice` risk says kept open; blocks the whole slice until resolved. A `Blocks:` line wins over that Risk wording. Only a question with no `Blocks:` line keeps do not implement until resolved.
+Writes `plan.md` and `tasks.md`, and matching OpenSpec export files when those already exist. A built piece that already matches v0 is marked already there and gets no rebuild task. A piece the user leaves gets one line in the plan and no task. Lists each kept-open question under Risks without asking whether to park it, and stale research findings under Risks. That does not block the plan. Writes `Blocks: T#`, `Blocks: none`, or `Blocks: whole slice` under a kept-open question. A `Blocks: T#` risk says kept open; blocks those tasks until resolved. A `Blocks: none` risk says kept open; does not block the current tasks. A `Blocks: whole slice` risk says kept open; blocks the whole slice until resolved. A `Blocks:` line wins over that Risk wording. Only a question with no `Blocks:` line keeps do not implement until resolved. Writes an `## Approval needed` item when a constraint says a named person gives a yes before something, with `Person:` and `Holds:` (1.141.0). It does not write `Approved:`.
 
 ## Does not
 
-Leaves `spec.md` alone except a `Blocks:` line under a kept-open question. Leaves application code and any linter install alone.
+Leaves `spec.md` alone except a `Blocks:` line under a kept-open question and an `## Approval needed` item from a constraint. Leaves application code and any linter install alone.
 
 Limits and exceptions: when `## Linter` says this repo has no linter for the code the tasks will touch, it stops before Build until the user chooses. A line under `## Dismissed test suggestions` is not a task. A kept test suggestion that is already an acceptance line maps to a task. A gap or a disagreement is finish, add a verify test, or leave before any task exists. A later run does not turn a left piece into work unless the user says so. Stale research does not fail the gate.
 
