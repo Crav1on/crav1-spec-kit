@@ -53,4 +53,4 @@ function Get-Crav1Python {
 
 Do not use `/tmp` as a portable path. On Windows that path is not the temp folder. Use the host temp directory (`$TMPDIR`, `$TEMP`, or `[System.IO.Path]::GetTempPath()`), or write the script's result to stdout and skip a file.
 
-`scripts/build_map.py --recommend T1` needs a spec folder. Passing `tasks.md` or `spec.md` prints `A spec folder is required` and the parent folder to pass instead.
+`scripts/build_map.py --recommend T1` needs a spec folder. Passing `tasks.md` or `spec.md` prints `A spec folder is required` and the parent folder to pass instead. The first line is the branch name (1.140.0). Later lines are `source`, `from`, and `because`. Do not use those later lines as the branch name.

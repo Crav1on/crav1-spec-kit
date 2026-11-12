@@ -2,6 +2,14 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.140.0 (2026-11-12)
+
+The branch offered for a task is the one named on that task's line. A merged or deleted branch is not offered. A minor release because the build card and the build map row change.
+
+- **Task line wins.** A branch written on the task line wins over the plan step's generated `feat/<slug>-<words>` name. On the line, `(map:)` wins, then `(branch:)`, then a `feat/…` name in the sentence, then `committed later on`. `from <base>` after that name is the base, for example `feat/orders-host-setup-scripts from develop`. The plan step is only the fallback when the task line names no branch. Two tasks on one step keep their own branches. When the row is that task-line branch, the note points the other way: `Plan step names feat/orders-one-commit-cleanup-main; built on feat/orders-host-setup-scripts`. A `(map:)` row that is not the branch in the task text still says `Task text names feat/orders-cicd; built on feat/orders-retry`.
+- **Merged or deleted.** `--recommend` does not offer a branch whose pull request is recorded merged, whose tip is already in its base or the default branch, or that was checked out here and is now gone locally and on every remote. A branch that only sits on the base, with no commits of its own, is still offered. A name that does not exist yet is offered so it can be created. When no candidate is usable, the offer is a new branch from the stated base. Local git only. No fetch. A task whose own line records the merge stays on that branch in the map. `--recommend` does not print that branch, including for that task, and the `because:` line says it is already merged.
+- **The card.** The recommended option is first. The description says where the name came from: `From the task line.`, `From the build map.`, or `New.`. When a name was skipped, that description is one plain line, for example `New, because feat/orders-one-commit-cleanup-main is already merged.` The first line of `--recommend` is the branch. Later lines are `source`, `from`, and `because`. It does not write the map. CRLF and LF are the same text.
+
 ## 1.139.0 (2026-11-12)
 
 A merge no longer stops when `walk-progress.md` conflicts only on version lines. A minor release because the pull path now settles those lines and can rewrite the stored hashes.

@@ -207,7 +207,7 @@ Under each item in a spec's `## Open questions`, the kit can add four kinds of l
 | `Reviewed: <date>, P# open: <n>` | `docs/specs/<slug>/plan.md` (under the # Plan title) | `/crav1-review-plan`, `/crav1-tighten-plan` | The plan was reviewed, and how many reviewer findings are still open. |
 | `(after: T<n>[, T<n>])` | `docs/specs/<slug>/tasks.md` (end of a task line) | `/crav1-plan-from-spec` | The task needs those tasks done first. |
 | `(step: <n>)` | `docs/specs/<slug>/tasks.md` (end of a task line) | `/crav1-plan-from-spec` | The task belongs to this numbered Approach step on the build map. When absent, a task id written in the step is the link. This mark wins when both are present. |
-| `(map: [<repo> ]<branch>)` | `docs/specs/<slug>/tasks.md` (end of a task line) | `/crav1-plan-from-spec`, `/crav1-create-feature-branch` | The task is built on this branch instead of its plan step's branch. Tasks that name the same branch share it. When absent, a (branch:) mark is the row, else the plan step. Since 1.129.0 the build prompt writes this mark, and does not commit it, when the picked branch is not the build map's branch. |
+| `(map: [<repo> ]<branch>)` | `docs/specs/<slug>/tasks.md` (end of a task line) | `/crav1-plan-from-spec`, `/crav1-create-feature-branch` | The task is built on this branch instead of its plan step's branch. Tasks that name the same branch share it. When absent, a branch named on the task line is the row, else the plan step (1.140.0). Since 1.129.0 the build prompt writes this mark, and does not commit it, when the picked branch is not the offered branch. |
 <!-- crav1-readiness:end -->
 
 When a mark is missing, the reader falls back and labels the reason **inferred**:

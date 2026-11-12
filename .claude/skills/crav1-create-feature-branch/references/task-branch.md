@@ -1,8 +1,8 @@
-# Task branch (1.129.0)
+# Task branch (1.140.0)
 
-Read this when a build prompt is for one task. The build map is the source of truth for that task's branch. Do not invent a name, and do not compute one by hand.
+Read this when a build prompt is for one task. Do not invent a name, and do not compute one by hand.
 
-Run this and use the line it prints. It is the same name as that task's row in `docs/specs/<slug>/build-map.md`. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says.
+Run this and use the first line it prints. That line is the branch. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says.
 
 ```text
 <interpreter> <skill crav1-tasks-ready-to-build>/scripts/build_map.py docs/specs/<slug> --recommend T1
@@ -10,23 +10,33 @@ Run this and use the line it prints. It is the same name as that task's row in `
 
 `--recommend` does not write the map. On that branch already, no prompt.
 
+The later lines are `source: task line`, `source: build map`, or `source: new`. `from: develop` is present when the task line states a base. `because:` is one plain line when a merged or deleted branch was skipped, for example `feat/orders-one-commit-cleanup-main is already merged`.
+
 ## How the name is chosen
 
 The script checks, in order, and build-tasks uses that same result:
 
-1. `(map: <branch>)` on the task. A repo prefix is ignored; the branch is the last word.
-2. `(branch: <branch>)` on the task, the same way, when no `(map:)` is set.
-3. The plan step's branch, `feat/<slug>-<words>`, when the task sits on a numbered Approach step.
-4. A branch the task text names as `committed later on <branch>`, when the task is not on a step and has neither mark.
-5. `feat/<slug>-<words>` from the task text.
+1. A branch named on the task's own line. `(map: <branch>)` wins, then `(branch: <branch>)`, then a `feat/…` name written in the sentence, then `committed later on <branch>`. A repo prefix on a mark is ignored; the branch is the last word. `from <base>` after that branch is its base, for example `feat/orders-host-setup-scripts from develop`.
+2. The plan step's branch, `feat/<slug>-<words>`, when the task line names no branch.
+3. `feat/<slug>-<words>` from the task text, when there is no step either.
+
+A merged branch is not offered. Merged means the pull request is recorded merged (`(PR n)` and the word merged on the task line or its Match `Branch:` line), or the branch tip is already in that base or the default branch and the tips differ. A branch that only sits on the base, with no commits of its own, is still offered. A branch that was checked out here and is now gone locally and on every remote is not offered. A name that does not exist yet is offered so it can be created. No fetch.
+
+When the task-line branch is merged or deleted, the step name is used if that name is still usable. When no candidate is usable, the offer is a new branch from the stated base. `source` is `new` and `because` says why.
+
+A task whose own line records the merge stays on that branch in the map. `--recommend` does not print that branch, including for that task.
 
 A `(host setup)` task uses this same name. Do not offer an arbitrary new branch ahead of it.
 
+The map row follows the same order. When the row is the task-line branch and the plan step's name differs, the note is `Plan step names feat/orders-one-commit-cleanup-main; built on feat/orders-host-setup-scripts`. When a `(map:)` row is not the branch the task text names, the note stays `Task text names feat/orders-cicd; built on feat/orders-retry`.
+
 ## The card
 
-One card. Do not put the permissions question on it. Permissions come after, on their own card (skill `crav1-build-tasks`, `references/tool-approvals.md`).
+One card. The recommended option is first. Do not put the permissions question on it. Permissions come after, on their own card (skill `crav1-build-tasks`, `references/tool-approvals.md`).
 
-1. **`<name> (Recommended)`**. When the branch does not exist: **Create `<name>` from `<into>` (Recommended)**. When `<name>` is a sub-branch (the spec's Match `Branch:` list has a `(spec branch)` S, or `<name>` has an `(into S)` entry), the option is **Create `<name>` from S (Recommended)** instead, from local `S`, else `origin/S`, never a fetch (1.68.0). A `(host setup)` label says the script will live on this branch. When the task text names a different branch as `committed later on <branch>`, the label also says that branch is cut later.
+The question is `Which branch for T1?`
+
+1. **`<name> (Recommended)`**. When the branch does not exist: **Create `<name>` from `<base> (Recommended)`**. `<base>` is the `from:` line when the script prints one, otherwise the into branch. When there is no `from:` and `<name>` is a sub-branch (the spec's Match `Branch:` list has a `(spec branch)` S, or `<name>` has an `(into S)` entry), the option is **Create `<name>` from S (Recommended)** instead, from local `S`, else `origin/S`, never a fetch (1.68.0). The description says where the name came from: `From the task line.`, `From the build map.`, or `New.`. When the script prints `because:`, that sentence replaces the description, for example `New, because feat/orders-one-commit-cleanup-main is already merged.` A `(host setup)` label says the script will live on this branch. When the task text names a different branch as `committed later on <branch>`, and that branch is not the offer, the label also says that branch is cut later.
 2. **`feat/<slug>`**, when it is not already option 1.
 3. **Use an existing branch**.
 4. **Stop**.

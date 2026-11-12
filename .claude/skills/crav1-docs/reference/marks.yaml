@@ -538,7 +538,7 @@ marks:
     examples:
       - "(branch: feat/orders-retry)"
       - "(branch: orders-api feat/orders-retry)"
-    meaning: "The branch the task is built on when no (map:) is set. The build map uses it as the row name in that case. The repo is named when the spec spans repos. A task with neither mark uses the plan step's branch."
+    meaning: "The branch the task is built on when no (map:) is set. The build map uses it as the row name in that case. The repo is named when the spec spans repos. Since 1.140.0 a feat/ name or committed later on the task line also wins over the plan step. The plan step is used only when the task line names no branch."
     written_by: [crav1-plan-from-spec]
     read_by: [crav1-build-tasks, crav1-build-features, crav1-create-feature-branch, crav1-tasks-ready-to-build, crav1-verify-build-against-spec, crav1-help, crav1-review-pr]
     mention: '\(branch:'
@@ -567,7 +567,7 @@ marks:
     pattern: '^\(map: (\S+ )?\S+\)$'
     examples:
       - "(map: feat/cancel-refund)"
-    meaning: "The task is built on this branch instead of its plan step's branch. Tasks that name the same branch share it. When absent, a (branch:) mark is the row, else the plan step. Since 1.129.0 the build prompt writes this mark, and does not commit it, when the picked branch is not the build map's branch."
+    meaning: "The task is built on this branch instead of its plan step's branch. Tasks that name the same branch share it. When absent, a branch named on the task line is the row, else the plan step (1.140.0). Since 1.129.0 the build prompt writes this mark, and does not commit it, when the picked branch is not the offered branch."
     written_by: [crav1-plan-from-spec, crav1-create-feature-branch]
     read_by: [crav1-tasks-ready-to-build, crav1-build-tasks, crav1-create-feature-branch, crav1-build-features]
     readiness: true
