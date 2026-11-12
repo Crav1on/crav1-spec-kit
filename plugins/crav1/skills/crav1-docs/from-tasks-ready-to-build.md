@@ -29,7 +29,7 @@ For each task, in this order:
 | --- | --- |
 | Ticked in `tasks.md` | **Done** when `verify.md` lists it as verified, otherwise **Needs verify** |
 | `plan.md` missing | Blocked |
-| A kept-open question in `spec.md` | **Waiting on a question** when its `Blocks:` line names the task (recorded). `Blocks: none` blocks no task (recorded). With no `Blocks:` line, the question holds the whole slice (inferred). Who comes from "Waiting for", then the latest Pending or Asked line, or not named yet. A plan Risk that says do not implement until resolved is **Blocked** when it matches no question, or matches a question with no `Blocks:` line. It matches on the question's first sentence, a `(question: <first words>)` tag, or the same Blocks tasks named in the risk. The line wins |
+| A kept-open question in `spec.md` | **Waiting on a question** when its `Blocks:` line names the task (recorded). `Blocks: none` blocks no task (recorded). `Blocks: whole slice` holds every unfinished task (recorded) and the line says Holds the whole slice. With no `Blocks:` line, the question holds the `T#` ids named in its text (inferred from the text), and holds the whole slice only when no task is named and resolve-open-questions has never been recorded (1.137.0). Who comes from "Waiting for", then the latest Pending or Asked line, or not named yet. A plan Risk that says do not implement until resolved is **Blocked** when it matches no question, or matches a question with no `Blocks:` line and no inferred tasks. It matches on the question's first sentence, a `(question: <first words>)` tag, or the same Blocks tasks named in the risk. The line wins |
 | Tasks it waits on | **Waits in order** while a real earlier task is unticked (recorded from `(after: T#)`, or inferred from the task just before it). A cycle, or an `(after:)` that names no task, is **Blocked** |
 | Otherwise | **Ready**. When `plan.md` has no `Reviewed:` line, it adds a warning to run `/crav1-review-plan` (inferred). When the review still has open `P#`s, it says so |
 | Waits on a held task | **Waiting** too, reason `held, waits on T3` (1.132.0). Who is the person on the question that started the hold |
@@ -74,7 +74,7 @@ The more the kit records, the fewer reasons are inferred:
 
 - `/crav1-review-plan` writes `Reviewed: <date>, P# open: <n>` in `plan.md`, and `/crav1-tighten-plan` lowers the count.
 - `/crav1-plan-from-spec` ends a task line with `(after: T1)` when the task needs an earlier one.
-- `/crav1-resolve-open-questions` asks which tasks a kept-open question blocks and writes `Blocks: T#`. **None** writes `Blocks: none`. **The whole slice** leaves no line. `/crav1-plan-from-spec` writes `Blocks: T#` or `Blocks: none` for a question it parks as a risk.
+- `/crav1-resolve-open-questions` asks which tasks a kept-open question blocks and writes `Blocks: T#`. **None** writes `Blocks: none`. **The whole slice** writes `Blocks: whole slice`. `/crav1-plan-from-spec` writes `Blocks: T#` or `Blocks: none` for a question it parks as a risk.
 
 ## Azure Boards
 

@@ -277,7 +277,8 @@ class Records(unittest.TestCase):
             "record", "--root", str(self.root), "--step", "tighten-spec",
             "--result", "done", "--when", WHEN, "--yes",
         ])
-        (self.root / "spec.md").write_text(SPEC + "\nedited\n", encoding="utf-8")
+        text = (self.root / "spec.md").read_text(encoding="utf-8")
+        (self.root / "spec.md").write_text(text.replace("# Spec", "# Spec edited", 1), encoding="utf-8")
         code, payload = run([
             "record", "--root", str(self.root), "--step", "tighten-spec",
             "--result", "nothing-to-do", "--yes",

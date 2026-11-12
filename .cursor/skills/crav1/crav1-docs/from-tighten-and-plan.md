@@ -29,7 +29,7 @@ With a playbook, add the report path on the next line. You do not type brackets.
 | 2. Architecture review | Always runs. It writes nothing. If there is nothing to critique, the walk says so. |
 | 3. Tighten the spec | One issue at a time, as `/crav1-tighten-spec` already walks. More than 8 issues: a one-line count first, then one issue or a small group. One by one is always offered. An open question that belongs to the next step is one line, with no menu. No issues: it says so. |
 | 4. Open questions | `/crav1-resolve-open-questions`. Nothing left to settle: it says so. Then, once, the optional extras that apply, as a multi-select. **None, go to plan** is a real option and runs none of them (1.130.0). The walk does not go on to the plan without that offer when one applies. Show-or-ask is offered when a question is for someone else. |
-| 5. Plan | `/crav1-plan-from-spec` writes `plan.md` and `tasks.md`. Before that step is recorded, questions that still have no `Blocks:` line are offered, one by one or as one batch. |
+| 5. Plan | `/crav1-plan-from-spec` writes `plan.md` and `tasks.md`. Before that step is recorded, questions that still have no `Blocks:` line are offered, one by one or as one batch. **The whole slice** writes `- Blocks: whole slice`, and that Risk line is `kept open; blocks the whole slice until resolved.` A `Blocks:` line wins over that Risk wording. |
 | 6. Plan review, then tighten | `/crav1-review-plan`, then `/crav1-tighten-plan`. A finding that is really a spec defect is one card: run `/crav1-tighten-spec` on that finding (Recommended), or keep it as an open point and continue. On yes the walk opens that skill for the finding, then continues the plan and the ready check. It does not pause. The same finding is offered once. A plan finding stays in the plan tighten. |
 | 7. Ready check | `/crav1-tasks-ready-to-build`. The walk stops here. |
 
@@ -82,6 +82,8 @@ Make a fresh `report-playbook-full` only when the new information changes the pl
 A playbook applied before 1.120.0: reapply the same file. That creates the `docs/playbooks/` copy. Spec answers already present stay as they are.
 
 ## After
+
+Since 1.137.0 an edit confined to `## Open questions` does not reopen tighten-spec, plan-from-spec, the plan review, or the ready check. It reopens resolve-open-questions. That step alone leaves the result `ready-partial` when some tasks can start, with a Waiting line and a Next line for `/crav1-resolve-open-questions`. When later steps really did reopen, Next names them: `Next: rerun or clear <steps>.`
 
 When the check is clear, the slice is ready to build. You run build yourself:
 

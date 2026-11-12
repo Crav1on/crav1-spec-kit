@@ -23,7 +23,7 @@ Spec folder: the user's @-mention, or the one folder `scripts/resolve_spec.py` p
 
 **Held (1.132.0).** Before the worker, run `walk_progress.py readiness --root` (skill `crav1-tighten-and-plan-ready-to-build`). A gate with `refused` true is refused with its reason. Do not ask to build it anyway. Do not start the worker. A task in `can_start` may start when `result` is `ready` or `ready-partial`. When `result` is `not-ready`, do not start the worker.
 
-**Tick only (1.136.0).** Run `scripts/tick_only.py --root <spec-folder> T#` before the worker. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. When it reports tick-only and the result is `ready` or `ready-partial`, pass `--yes`, tick `[x]`, and start no worker. Do not re-implement. When the result is `not-ready`, do not tick and do not start the worker.
+**Tick only (1.137.0).** Run `scripts/tick_only.py --root <spec-folder> T#` before the worker. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. When it reports tick-only, pass `--yes`, tick `[x]`, and start no worker, whatever the ready-check result, including `not-ready`. Do not re-implement. When the result is `not-ready`, do not start the worker for any other task.
 
 ## What to pass the worker
 

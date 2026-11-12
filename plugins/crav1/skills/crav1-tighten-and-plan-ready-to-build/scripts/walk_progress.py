@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Progress file for /crav1-tighten-and-plan-ready-to-build (kit 1.135.0).
+"""Progress file for /crav1-tighten-and-plan-ready-to-build (kit 1.137.0).
 
 The spec, plan, and tasks stay the source of truth. This script only tracks
 where the guided walk is, which version of each file a step covered, and which
@@ -114,6 +114,10 @@ IMPACT = {
     "tasks": "The tasks changed since this step, so the step no longer covers the current tasks.",
     "verify": "verify.md changed since the ready check, so the check no longer covers it.",
     "playbook": "The playbook file changed since this step. The playbook is intake only.",
+    "questions": (
+        "The open questions changed since this step, so resolve-open-questions "
+        "no longer covers them."
+    ),
 }
 # A verify.md edit is recorded (COVERS) and does not reopen the ready check (1.136.0).
 # Only this walk's record, or clear --yes, rewrites walk-progress.md.
@@ -133,11 +137,19 @@ AFFECTS = {
     "playbook": ("playbook",),
     "review-architecture": ("spec",),
     "tighten-spec": ("spec",),
-    "resolve-open-questions": ("spec",),
+    "resolve-open-questions": ("spec", "questions"),
     "plan-from-spec": ("spec",),
     "review-and-tighten-plan": ("spec", "plan", "tasks"),
     "tasks-ready-to-build": ("spec", "plan", "tasks"),
 }
+# An edit confined to ## Open questions does not reopen these steps (1.137.0).
+# They compare Spec body. resolve-open-questions also compares Questions version.
+BODY_SPEC_STEPS = frozenset({
+    "tighten-spec",
+    "plan-from-spec",
+    "review-and-tighten-plan",
+    "tasks-ready-to-build",
+})
 STEP_COMMAND = {
     "playbook": "/crav1-tighten-and-plan-ready-to-build",
     "review-architecture": "/crav1-review-architecture",
@@ -189,8 +201,47 @@ def version_of(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()[:12]
 
 
+def version_text(text: str) -> str:
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()[:12]
+
+
+def spec_parts(text: str) -> tuple[str, str]:
+    """Split spec text into the body and the Open questions section.
+
+    The section runs from its heading through the line before the next
+    `## ` heading. A spec with no such section has an empty questions part,
+    and the body is the whole file.
+    """
+    if not text:
+        return "", ""
+    lines = text.splitlines(keepends=True)
+    start = None
+    for i, line in enumerate(lines):
+        if line.strip().lower() == "## open questions":
+            start = i
+            break
+    if start is None:
+        return text, ""
+    end = len(lines)
+    for j in range(start + 1, len(lines)):
+        if lines[j].startswith("## "):
+            end = j
+            break
+    body = "".join(lines[:start] + lines[end:])
+    questions = "".join(lines[start:end])
+    return body, questions
+
+
 def versions(root: Path, playbook: Path | None = None) -> dict:
     out = {key: version_of(root / name) for key, name in FILE_OF.items()}
+    spec_path = root / "spec.md"
+    if spec_path.is_file():
+        body, questions = spec_parts(spec_path.read_text(encoding="utf-8"))
+        out["spec_body"] = version_text(body)
+        out["questions"] = version_text(questions)
+    else:
+        out["spec_body"] = "missing"
+        out["questions"] = "missing"
     if playbook is not None:
         out["playbook"] = version_of(playbook)
     return out
@@ -323,6 +374,12 @@ def parse_progress(text: str) -> dict:
         elif key in LABEL.values():
             token = next(name for name, label in LABEL.items() if label == key)
             current[token] = value
+        elif key == "Spec body":
+            current["spec_body"] = value
+        elif key == "Questions version":
+            current["questions"] = value
+        elif key == "Kept questions":
+            current["kept_questions"] = value
         else:
             fail("progress-file", f"unknown line: {line}")
     for step, body in steps.items():
@@ -391,6 +448,12 @@ def render(slice_label: str, steps: dict, acks: list | None = None, jumps: list 
         else:
             for token in COVERS[step]:
                 lines.append(f"  {LABEL[token]}: {body[token]}")
+            if "spec_body" in body:
+                lines.append(f"  Spec body: {body['spec_body']}")
+            if "questions" in body:
+                lines.append(f"  Questions version: {body['questions']}")
+            if "kept_questions" in body:
+                lines.append(f"  Kept questions: {body['kept_questions']}")
         lines.append("")
     for step in EXTRAS:
         body = steps.get(step)
@@ -401,6 +464,10 @@ def render(slice_label: str, steps: dict, acks: list | None = None, jumps: list 
         lines.append(f"  Result: {body['result']}")
         for token in COVERS[step]:
             lines.append(f"  {LABEL[token]}: {body[token]}")
+        if "spec_body" in body:
+            lines.append(f"  Spec body: {body['spec_body']}")
+        if "questions" in body:
+            lines.append(f"  Questions version: {body['questions']}")
         lines.append("")
     _render_jumps(lines, jumps)
     return "\n".join(lines).rstrip() + "\n"
@@ -418,6 +485,49 @@ def playbook_mod():
     return mod
 
 
+def kept_question_line(root: Path) -> str:
+    """Question keys present when resolve-open-questions is recorded.
+
+    A later outside edit keeps these questions Waiting. `none` means the
+    section had no kept-open question.
+    """
+    spec = root / "spec.md"
+    if not spec.is_file():
+        return "none"
+    tasks_path = root / "tasks.md"
+    task_ids = None
+    if tasks_path.is_file():
+        task_ids = blocks_mod().task_ids_from_tasks(tasks_path.read_text(encoding="utf-8"))
+    questions = blocks_mod().kept_open(
+        spec.read_text(encoding="utf-8"),
+        task_ids=task_ids,
+        resolve_recorded=True,
+    )
+    keys: list[str] = []
+    for question in questions:
+        key = question.get("key") or blocks_mod().question_key(question.get("text") or "")
+        if key and key not in keys:
+            keys.append(key)
+    return " ".join(keys) if keys else "none"
+
+
+def kept_question_keys(root: Path) -> set[str]:
+    if not root.is_dir():
+        return set()
+    body = load(root)["steps"].get("resolve-open-questions") or {}
+    raw = str(body.get("kept_questions") or "")
+    if not raw or raw == "none":
+        return set()
+    return {part for part in raw.split() if part and part != "none"}
+
+
+def resolve_ever_recorded(root: Path) -> bool:
+    """True when resolve-open-questions has a progress line, drifted or not."""
+    if not root.is_dir():
+        return False
+    return "resolve-open-questions" in load(root)["steps"]
+
+
 def current_tokens(root: Path, step: str, playbook: Path | None) -> dict:
     got = versions(root)
     out = {}
@@ -430,6 +540,11 @@ def current_tokens(root: Path, step: str, playbook: Path | None) -> dict:
             out["playbook_version"] = version_of(hashed)
         else:
             out[token] = got[token]
+    if "spec" in COVERS[step]:
+        out["spec_body"] = got["spec_body"]
+        out["questions"] = got["questions"]
+    if step == "resolve-open-questions":
+        out["kept_questions"] = kept_question_line(root)
     return out
 
 
@@ -560,8 +675,18 @@ def done_stamp_warning(steps: dict, acks: list | None = None) -> str | None:
     )
 
 
+def _split_ready(body: dict) -> bool:
+    return "spec_body" in body and "questions" in body
+
+
 def hash_drift(root: Path, step: str, body: dict) -> list[str]:
-    """Covered files whose bytes differ from the version this step recorded."""
+    """Covered files whose bytes differ from the version this step recorded.
+
+    When Spec body and Questions version are recorded, a change confined to
+    ## Open questions reopens resolve-open-questions only. The other spec
+    steps compare Spec body. A step recorded before that split still compares
+    the whole-file Spec version.
+    """
     changed = []
     if step == "playbook":
         path = Path(body["playbook"])
@@ -575,6 +700,20 @@ def hash_drift(root: Path, step: str, body: dict) -> list[str]:
         return changed
     now = versions(root)
     for token in COVERS[step]:
+        if token == "spec" and _split_ready(body):
+            body_changed = now["spec_body"] != body["spec_body"]
+            questions_changed = now["questions"] != body["questions"]
+            if step in BODY_SPEC_STEPS:
+                if body_changed:
+                    changed.append("spec")
+            elif step == "resolve-open-questions":
+                if body_changed:
+                    changed.append("spec")
+                if questions_changed:
+                    changed.append("questions")
+            elif now["spec"] != body.get("spec"):
+                changed.append("spec")
+            continue
         if now[token] != body[token]:
             changed.append(token)
     return changed
@@ -601,6 +740,9 @@ def _restamp_body(body: dict, name: str, now: dict, tokens: set[str]) -> None:
         if token == "playbook" or token not in tokens:
             continue
         body[token] = now[token]
+    if "spec" in tokens and "spec" in COVERS[name]:
+        body["spec_body"] = now["spec_body"]
+        body["questions"] = now["questions"]
 
 
 def restamp_earlier(root: Path, steps: dict, step: str) -> None:
@@ -617,6 +759,8 @@ def restamp_earlier(root: Path, steps: dict, step: str) -> None:
         if not body:
             continue
         _restamp_body(body, earlier, now, covered)
+    if "spec" in covered and "resolve-open-questions" in steps and ORDER.index(step) > ORDER.index("resolve-open-questions"):
+        steps["resolve-open-questions"]["kept_questions"] = kept_question_line(root)
 
 
 def restamp_recorded(root: Path, steps: dict, tokens: set[str]) -> None:
@@ -630,6 +774,8 @@ def restamp_recorded(root: Path, steps: dict, tokens: set[str]) -> None:
         if not body:
             continue
         _restamp_body(body, name, now, tokens)
+    if "spec" in tokens and "resolve-open-questions" in steps:
+        steps["resolve-open-questions"]["kept_questions"] = kept_question_line(root)
 
 
 def refresh_versions(root: Path, step: str, body: dict) -> None:
@@ -644,6 +790,11 @@ def refresh_versions(root: Path, step: str, body: dict) -> None:
     now = versions(root)
     for token in COVERS[step]:
         body[token] = now[token]
+    if "spec" in COVERS[step]:
+        body["spec_body"] = now["spec_body"]
+        body["questions"] = now["questions"]
+    if step == "resolve-open-questions":
+        body["kept_questions"] = kept_question_line(root)
 
 
 def write_progress(root: Path, data: dict, slice_label: str | None = None) -> None:
@@ -846,7 +997,7 @@ def unlinked(args: argparse.Namespace) -> None:
     emit({"ok": True, "count": len(missing), "questions": missing})
 
 
-def classify(row: dict, resolve_kept: bool = False) -> dict | None:
+def classify(row: dict, resolve_kept: bool = False, resolve_recorded: bool = False) -> dict | None:
     bucket = str(row.get("bucket") or "")
     reason = str(row.get("reason") or "")
     warning = str(row.get("warning") or "")
@@ -881,8 +1032,10 @@ def classify(row: dict, resolve_kept: bool = False) -> dict | None:
     if "no plan" in text:
         return _hit(task, "blocker", "plan-from-spec", "There is no plan.md. Run /crav1-plan-from-spec.")
     if "open question" in text:
-        # Already settled as kept-open at this spec version: waiting, not a jump back.
-        if resolve_kept:
+        # A Blocks line, a question already recorded as waiting, or a hold
+        # inferred from the question text stays waiting through spec drift.
+        # A new or unparsed question jumps back only for the tasks it holds.
+        if _question_stays(row, resolve_kept, resolve_recorded):
             return _waiting(row)
         return _hit(task, "blocker", "resolve-open-questions", "An open question blocks the work. Run /crav1-resolve-open-questions.")
     if "plan risk" in text:
@@ -898,6 +1051,25 @@ def classify(row: dict, resolve_kept: bool = False) -> dict | None:
     if re.search(r"waits on\s+t\d+", text):
         return None
     return _hit(task, "blocker", None, f"Unrecognized blocker: {reason or bucket}")
+
+
+def _question_stays(row: dict, resolve_kept: bool, resolve_recorded: bool = False) -> bool:
+    """True when this question stays Waiting instead of jumping back.
+
+    Before resolve-open-questions is recorded, an open question is still a
+    jump back. After that record, a Blocks line, a question already recorded
+    as waiting, or a hold inferred from the text stays Waiting through drift.
+    """
+    if resolve_kept:
+        return True
+    if not resolve_recorded:
+        return False
+    if row.get("kept") or row.get("inferred_text"):
+        return True
+    reason = (row.get("reason") or "").lower()
+    if "(recorded)" in reason or "inferred from the text" in reason:
+        return True
+    return False
 
 
 def _waiting(row: dict) -> dict:
@@ -973,6 +1145,11 @@ def cover(args: argparse.Namespace) -> None:
             continue
         for token in COVERS[step]:
             body[token] = now[token]
+        if "spec" in COVERS[step]:
+            body["spec_body"] = now["spec_body"]
+            body["questions"] = now["questions"]
+        if step == "resolve-open-questions":
+            body["kept_questions"] = kept_question_line(root)
         covered.append(step)
     write_progress(root, data)
     emit({"ok": True, "wrote": PROGRESS_NAME, "covered": covered})
@@ -1086,7 +1263,15 @@ def branch_report(root: Path, rows: list[dict]) -> dict | None:
     plan = plan_path.read_text(encoding="utf-8") if plan_path.is_file() else None
     work = work_path.read_text(encoding="utf-8") if work_path.is_file() else ""
     verify = verify_path.read_text(encoding="utf-8") if verify_path.is_file() else ""
-    built = map_mod().build(root.name, spec, plan, tasks, work, verify)
+    built = map_mod().build(
+        root.name,
+        spec,
+        plan,
+        tasks,
+        work,
+        verify,
+        resolve_recorded=resolve_ever_recorded(root),
+    )
     return map_mod().report_by_branch(built, rows)
 
 
@@ -1303,9 +1488,13 @@ def _verify_for(text: str | None, tid: str) -> tuple[str, str | None]:
     return "needs-verify", "no verify.md row"
 
 
-def _oq_row(tid: str, question: dict, whole: bool) -> dict:
+def _oq_row(tid: str, question: dict, whole: bool, kept: set[str]) -> dict:
     sentence = str(question.get("text") or "").strip()
-    if whole:
+    if question.get("mark") == "inferred":
+        reason = f'open question "{sentence}" (inferred from the text)'
+    elif question.get("mark") == "whole":
+        reason = f'open question "{sentence}" blocks the whole slice (recorded)'
+    elif whole:
         reason = f'open question "{sentence}" blocks the whole slice (inferred)'
     else:
         reason = f'open question "{sentence}" (recorded)'
@@ -1314,21 +1503,23 @@ def _oq_row(tid: str, question: dict, whole: bool) -> dict:
         "task": tid,
         "reason": reason,
         "asked": bool(question.get("asked")),
+        "kept": bool(question.get("recorded")) or question.get("key") in kept,
+        "inferred_text": question.get("mark") == "inferred",
     }
     if question.get("who"):
         row["who"] = question["who"]
     return row
 
 
-def _question_row(blocks: dict, tid: str) -> dict | None:
+def _question_row(blocks: dict, tid: str, kept: set[str]) -> dict | None:
     slice_q = None
     for question in blocks.get("questions") or []:
-        if question.get("mark") == "tasks" and tid in (question.get("tasks") or []):
-            return _oq_row(tid, question, whole=False)
+        if question.get("mark") in ("tasks", "inferred") and tid in (question.get("tasks") or []):
+            return _oq_row(tid, question, whole=False, kept=kept)
         if question.get("blocks_slice") and slice_q is None:
             slice_q = question
     if slice_q is not None:
-        return _oq_row(tid, slice_q, whole=True)
+        return _oq_row(tid, slice_q, whole=True, kept=kept)
     for risk in blocks.get("risks") or []:
         if not risk.get("blocks_slice"):
             continue
@@ -1367,7 +1558,15 @@ def build_rows(root: Path) -> list[dict]:
             task["done"] = True
     analysed = order.analyse(tasks)
     by_reason = {row["id"]: row for row in analysed["rows"]}
-    blocks = blocks_mod().analyse(spec_text, plan_text)
+    task_ids = [f"T{task['id']}" for task in tasks]
+    recorded = resolve_ever_recorded(root)
+    blocks = blocks_mod().analyse(
+        spec_text,
+        plan_text,
+        task_ids=task_ids,
+        resolve_recorded=recorded,
+    )
+    kept = kept_question_keys(root)
     verify_text = verify_path.read_text(encoding="utf-8") if verify_path.is_file() else None
     warning = reviewed_warning(plan_text) if plan_path.is_file() else None
     rows = []
@@ -1406,7 +1605,7 @@ def build_rows(root: Path) -> list[dict]:
             _attach_deps(row, task)
             rows.append(row)
             continue
-        question = _question_row(blocks, tid)
+        question = _question_row(blocks, tid, kept)
         if question:
             _attach_deps(question, task)
             rows.append(question)
@@ -1543,6 +1742,17 @@ def propagate_held(rows: list[dict], hits: list[dict]) -> None:
             changed = True
 
 
+def _resolve_reopen_only(hits: list[dict]) -> bool:
+    """True when every hard hit is a reopened resolve-open-questions step."""
+    hard = [hit for hit in hits if hit.get("kind") != "waiting"]
+    if not hard:
+        return False
+    return all(
+        hit.get("bucket") == "reopened" and hit.get("step") == "resolve-open-questions"
+        for hit in hard
+    )
+
+
 def slice_result(rows: list[dict], hits: list[dict]) -> tuple[str, list, list]:
     """ready, ready-partial, or not-ready.
 
@@ -1550,14 +1760,17 @@ def slice_result(rows: list[dict], hits: list[dict]) -> tuple[str, list, list]:
     with no other walk blocker. not-ready is when nothing can start, and also
     when a walk blocker other than a kept-open question is still open (a
     cycle, a missing task, no plan, needs verify, an assumption, a reopened
-    step, or a question that is still a jump back).
+    step, or a question that is still a jump back). A reopened
+    resolve-open-questions step alone does not force not-ready when some
+    tasks can start (1.137.0).
     """
     hard = [hit for hit in hits if hit.get("kind") != "waiting"]
     can_start = [row.get("task") for row in rows if row.get("bucket") == "ready" and row.get("task")]
     held = [row.get("task") for row in rows if row.get("bucket") == "waiting" and row.get("task")]
-    if hard:
+    resolve_only = bool(can_start) and _resolve_reopen_only(hits)
+    if hard and not resolve_only:
         return "not-ready", can_start, held
-    if can_start and held:
+    if can_start and (held or resolve_only):
         return "ready-partial", can_start, held
     if held and not can_start:
         return "not-ready", can_start, held
@@ -1629,9 +1842,10 @@ def readiness(args: argparse.Namespace) -> None:
         if not isinstance(row, dict):
             fail("readiness", "each row must be an object")
     resolve_kept = resolve_is_keep(root) if root is not None else False
+    resolve_recorded = resolve_ever_recorded(root) if root is not None else False
     hits = []
     for row in rows:
-        hit = classify(row, resolve_kept=resolve_kept)
+        hit = classify(row, resolve_kept=resolve_kept, resolve_recorded=resolve_recorded)
         if hit:
             hits.append(hit)
             if hit["kind"] == "waiting":
@@ -1653,11 +1867,38 @@ def readiness(args: argparse.Namespace) -> None:
     ready_lines = (report or {}).get("ready_lines") or []
     held_lines = (report or {}).get("held_lines") or []
     next_lines = (report or {}).get("next_lines") or []
-    if result in ("ready", "ready-partial") and next_lines:
+    later = [hit for hit in reopened if hit.get("step") != "resolve-open-questions"]
+    resolve_open = next(
+        (hit for hit in reopened if hit.get("step") == "resolve-open-questions"),
+        None,
+    )
+    resolve_waiting = None
+    resolve_next = (
+        f"Next: /crav1-resolve-open-questions {slug}, "
+        "because that step needs a rerun or clear."
+    )
+    if later:
+        names = ", ".join(hit["step"] for hit in reopened)
+        nxt = f"Next: rerun or clear {names}."
+        next_lines = []
+    elif result in ("ready", "ready-partial") and next_lines:
+        if resolve_open and result == "ready-partial":
+            resolve_waiting = (
+                f"Waiting: /crav1-resolve-open-questions {slug}, "
+                "because that step needs a rerun or clear."
+            )
+            next_lines = list(next_lines) + [resolve_next]
         nxt = "\n".join(next_lines)
     else:
         nxt = next_for(result, can_start, waiting_next)
         next_lines = []
+        if resolve_open and result == "ready-partial":
+            resolve_waiting = (
+                f"Waiting: /crav1-resolve-open-questions {slug}, "
+                "because that step needs a rerun or clear."
+            )
+            nxt = f"{nxt}\n{resolve_next}" if nxt else resolve_next
+            next_lines = [resolve_next]
     if result == "ready-partial" and report and report.get("line"):
         line = report["line"]
     else:
@@ -1685,6 +1926,7 @@ def readiness(args: argparse.Namespace) -> None:
         "waiting": waiting,
         "waiting_line": waiting_line,
         "waiting_next": waiting_next,
+        "resolve_waiting": resolve_waiting,
         "recommend_jump": bool(jump) and result == "not-ready",
         "jump_back": jump,
         "reopened": reopened,
