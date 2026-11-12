@@ -35,7 +35,7 @@ class TaskOrder(unittest.TestCase):
             "Blocked (dependency order)", 1
         )[0]
         blocked = rendered.split("Blocked (dependency order)", 1)[1].split("Order:", 1)[0]
-        self.assertIn("- T2: waits on T1 (inferred)", waits)
+        self.assertIn("- T2 b: waits on T1 (inferred)", waits)
         self.assertNotIn("T3:", waits)
         self.assertIn("names no task", blocked)
         self.assertNotIn("T2:", blocked)
@@ -85,6 +85,36 @@ class TaskOrder(unittest.TestCase):
         res = run((FIX / "xbid-tasks.md").read_text(), failed=[7])
         self.assertEqual(res["depends_on_failed"], {"T3": "depends on T7 (failed)", "T4": "depends on T7 (failed)",
                                                     "T5": "depends on T7 (failed)", "T6": "depends on T7 (failed)"})
+
+    def test_merged_unticked_is_needs_tick_not_ready(self):
+        text = (
+            "- [ ] T2: export the receipt (PR 78, merged) (spec: A1)\n"
+            "- [ ] T3: record the order (after: T2)\n"
+            "- [ ] T6: send the mail (after: )\n"
+        )
+        spec = (
+            "# Orders export\n\n## Match\n\n"
+            "- Branch: orders-api feat/orders-export (PR 45) merged\n"
+        )
+        res = to.analyse(to.parse(text), merged=to.merged_ids(text, spec))
+        self.assertEqual(res["needs_tick"], [{"id": 2, "title": "export the receipt"}])
+        self.assertNotIn(2, res["ready"])
+        self.assertNotIn(2, res["order"])
+        self.assertEqual(res["next"], 3)
+        self.assertIn(3, res["ready"])
+        self.assertIn(6, res["ready"])
+        rendered = to.render(res)
+        self.assertIn("Needs tick\n- T2: export the receipt", rendered)
+        ready = rendered.split("Waits in order", 1)[0]
+        self.assertNotIn("T2", ready)
+        self.assertNotIn("Next: T2", rendered)
+
+    def test_branch_merge_without_a_pr_on_the_task_line(self):
+        text = "- [ ] T2: export the receipt (branch: feat/orders-export)\n- [ ] T3: record the order\n"
+        spec = "# Orders\n\n## Match\n\n- Branch: orders-api feat/orders-export (PR 78) merged\n"
+        res = to.analyse(to.parse(text), merged=to.merged_ids(text, spec))
+        self.assertEqual([item["id"] for item in res["needs_tick"]], [2])
+        self.assertEqual(res["next"], 3)
 
     def test_titles_strip_marks(self):
         res = run("- [ ] T1: Do it (verify: unit — x) (spec: R1) (branch: feat/orders-retry)\n")

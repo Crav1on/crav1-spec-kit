@@ -17,11 +17,13 @@ Then, **only if this chat is a standalone the one task branch of `/crav1-build-t
 
 ## Find the work
 
-Spec folder: user @-mention, else most recently edited `docs/specs/` excluding `_template/`. Need `tasks.md` or stop (`/crav1-plan-from-spec`).
+Spec folder: the user's @-mention, or the one folder `scripts/resolve_spec.py` prints (skill `crav1-tasks-ready-to-build`). Several matches: list them and stop. Do not pick the most recently edited tree. Need `tasks.md` or stop (`/crav1-plan-from-spec`).
 
 **T#:** the id they named, else the first `- [ ]`. If all checked, stop (`/crav1-verify-build-against-spec` or the range or all branch of `/crav1-build-tasks`).
 
 **Held (1.132.0).** Before the worker, run `walk_progress.py readiness --root` (skill `crav1-tighten-and-plan-ready-to-build`). A gate with `refused` true is refused with its reason. Do not ask to build it anyway. Do not start the worker. A task in `can_start` may start when `result` is `ready` or `ready-partial`. When `result` is `not-ready`, do not start the worker.
+
+**Tick only (1.136.0).** Run `scripts/tick_only.py --root <spec-folder> T#` before the worker. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. When it reports tick-only and the result is `ready` or `ready-partial`, pass `--yes`, tick `[x]`, and start no worker. Do not re-implement. When the result is `not-ready`, do not tick and do not start the worker.
 
 ## What to pass the worker
 

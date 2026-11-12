@@ -4,7 +4,7 @@ You implement **one** row from `tasks.md`. Then you run that row’s **verify** 
 
 ## Find the work
 
-Spec folder: user @-mention, else the most recently edited tree under `docs/specs/` excluding `_template/`.
+Spec folder: the user's @-mention, or the one folder `scripts/resolve_spec.py` prints (skill `crav1-tasks-ready-to-build`). Several matches: list them and stop. Do not pick the most recently edited tree.
 
 Read `tasks.md`, `plan.md`, `spec.md`. Task row shape is this skill’s `assets/tasks.md`. Use diagrams/ADRs as constraints. Spec wins if they disagree.
 

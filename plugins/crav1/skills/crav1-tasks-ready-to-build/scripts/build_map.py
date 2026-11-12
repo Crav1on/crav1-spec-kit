@@ -1219,6 +1219,14 @@ def main(argv):
         if len(positional) != 1:
             sys.stdout.write("Name one spec folder with --recommend.\n")
             return 2
+        given = pathlib.Path(positional[0])
+        if given.is_file() and given.name in ("tasks.md", "spec.md"):
+            sys.stdout.write(
+                "A spec folder is required. Pass the parent folder: "
+                + str(given.parent)
+                + "\n"
+            )
+            return 2
         text, code = run_dir(positional[0], recommend=recommend)
         sys.stdout.write(text + ("\n" if text and not text.endswith("\n") else ""))
         return code

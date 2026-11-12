@@ -25,7 +25,7 @@ Every run, rebuild `docs/specs/<slug>/build-map.md` with `scripts/build_map.py`.
 
 ## Scope
 
-- A named slug (or an @-mentioned spec folder): that slice only. `cc 1.0` matches a folder `cc 1.0`, `cc-1.0`, or `cc-1-0`.
+- A named slug, title, playbook, or work-item name: `scripts/resolve_spec.py`. Exact folder first (`orders 1.0` matches `orders-1-0`), then one unique playbook basename, spec title, or work-item name in `spec.md`. Several matches: list them and stop. Do not search the rest of the tree.
 - No slug: every folder under `docs/specs/` that has `tasks.md`, skipping `_template`. A folder with `spec.md` but no `tasks.md` is listed once as `no tasks yet (run /crav1-plan-from-spec)`.
 
 ## What it reads
@@ -65,7 +65,7 @@ When Python runs, rule 3 may use `scripts/question_blocks.py` beside this skill:
 
 Every task list is in **dependency order**, not task-number order. Each task gets a wave: 0 when it waits on nothing, otherwise one more than the latest wave of the tasks it waits on. List wave by wave, lowest number first inside a wave; tasks in one wave can be built in either order. Tasks on a cycle go last.
 
-The sort ships next to this file as `scripts/task_order.py`. When Python runs, use it for each slice: `<interpreter> <this skill folder>/scripts/task_order.py docs/specs/<slug>/tasks.md`. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. It prints Ready, Waits in order, Blocked, the Order line and Next. Waits in order is a real earlier task. Blocked is a cycle or an `(after:)` that names no task. Add the rule 1 to 3 results on top: a question is Waiting on a question, not Blocked. A dependent of a held task is Waiting too. The walk's `scripts/walk_progress.py readiness --root` prints `result`: `ready`, `ready-partial`, or `not-ready`. Without Python, apply the same rule by hand.
+The sort ships next to this file as `scripts/task_order.py`. When Python runs, use it for each slice: `<interpreter> <this skill folder>/scripts/task_order.py docs/specs/<slug>/tasks.md`. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. It prints Ready, Waits in order, Blocked, Needs tick, and Next. A recorded-merged task is under Needs tick (1.136.0). Waits in order is a real earlier task. Blocked is a cycle or an `(after:)` that names no task. Add the rule 1 to 3 results on top: a question is Waiting on a question, not Blocked. A dependent of a held task is Waiting too. The walk's `scripts/walk_progress.py readiness --root` prints `result`: `ready`, `ready-partial`, or `not-ready`.
 
 Other skills (`/crav1-build-tasks`, `/crav1-build-features`, `/crav1-verify-build-against-spec`) use this order. The ready check's Next lines are one per ready branch (1.133.0), not the single task that unblocks the most.
 
@@ -118,7 +118,7 @@ Build map: docs/specs/<slug>/build-map.md
 - Nothing is left to build or verify: `Next: nothing needed now.`
 - **Source** names every file it read, per slice.
 - **Build map** is one line per slice, the path the script just wrote. The task list above it is unchanged.
-- **verify.md behind (1.135.0).** When `verify_behind` is true, print `verify_waiting` and do not print `stale_next`. A ticked or merged task that `verify.md` still lists as not implemented, or a `Next:` line there that names one, is behind. This skill does not write `verify.md`.
+- **verify.md behind (1.136.0).** When `verify_behind` is true, print `verify_waiting`. A verify-only change does not force `not-ready`. This command does not restamp `walk-progress.md` and does not write `verify.md`. The rule is [references/verify-behind.md](references/verify-behind.md).
 - When the slice has `work-item.md`, add the Azure Boards line from **What it reads**.
 
 ## What it does not do

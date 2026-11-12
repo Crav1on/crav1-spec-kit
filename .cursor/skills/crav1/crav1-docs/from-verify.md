@@ -15,8 +15,8 @@ Use this after tasks are built. Verify maps every v0 acceptance line in `spec.md
 
 | Step | You | Agent |
 | --- | --- | --- |
-| Verify | — | Reads `spec.md`, `tasks.md`, `plan.md`, and the running tree. Leads with a TL;DR: which tasks are implemented and verified, which are not, and acceptance lines with no task. Then the details in `verify.md`. Ends by naming the next command |
-| Read the result | Decide: fix, build more, or ship | Each task is implemented and verified, implemented but verify failed, not implemented, or claimed done but unverified. Wiring gaps are numbered `G#`. A task that is not implemented goes back to [Build tasks](from-plan-to-build.md), not to fix |
+| Verify | — | Reads `spec.md`, `tasks.md`, `plan.md`, and the running tree. The spec folder is the one you @-mention, or the one folder the resolver prints (`orders 1.0` matches `orders-1-0`, then one unique playbook, title, or work-item name). Several matches are listed and the run stops. It does not pick the most recently edited tree. Leads with a TL;DR: which tasks are implemented and verified, which are tick pending, which are not, and acceptance lines with no task. Then the details in `verify.md`. Ends by naming the next command |
+| Read the result | Decide: fix, build more, tick, or ship | Each task is implemented and verified, implemented and verified with the tick still open, implemented but verify failed, not implemented, or claimed done but unverified. Wiring gaps are numbered `G#`. A task that is not implemented goes back to [Build tasks](from-plan-to-build.md), not to fix. A tick-pending gap is not that path |
 | Fix | `/crav1-fix-build-gaps`, or name a gap `G#` | Takes one gap in order: failed, then unverified, then `G#`. Omit the gap to take the next. Makes the smallest fix inside the spec, appends to `fix-log.md`, and updates that one `verify.md` row |
 | Live wiring | `/crav1-fix-build-gaps` when the gap is a live path (ports, proxy, SQL, an unpublished URL) | Same queue and same writes as fix-build-gaps, preferring live or untested wiring rows. When the fix changes how the parts connect, asks once whether to run `/crav1-refresh-system-notes` and does not run it |
 | Prove again | `/crav1-verify-build-against-spec` | Re-runs the matrix |
@@ -33,9 +33,14 @@ Before any test runs, in build, verify, and fix, the kit checks the local depend
 
 A test skipped for a missing dependency is not a pass. The task is not marked verified, and its box is not ticked, unless you chose skip. A run with no window writes the question to the two-pass questions file in the system temp folder and puts the missing dependency at the top of the summary as a `BLOCKER:` line, not a footnote. When tests skip anyway for a dependency the check missed, for example "5 skipped because Azurite wasn't running", the kit treats it the same way. A worker returns `STATUS: needs_dependency` and the orchestrator asks.
 
+## Tick pending (1.136.0)
+
+When the evidence passed, the `tasks.md` row is still `[ ]`, and the pull request is recorded merged, the status is **Implemented, verified, tick pending**. That is not Not implemented. Next skips every task the ready check already counts as done and names the first task that can start, one line per ready branch. The open checkbox stays a Gap. The report may also offer the tick on its own line. Say yes and it ticks that one row. It does not re-implement. That offer is an alternative exit. It does not replace the Next line for tasks that can start.
+
 ## What gets written
 
-- `docs/specs/<slug>/verify.md`: the acceptance matrix, plus **Skipped tests** when you chose skip for a missing dependency.
+- `docs/specs/<slug>/verify.md`: the acceptance matrix, plus **Skipped tests** when you chose skip for a missing dependency. Since 1.136.0 the TL;DR includes **Implemented, verified, tick pending**.
+- One `[x]` on a tick-pending row in `tasks.md`, only after you say yes.
 - `docs/specs/<slug>/fix-log.md`: one entry per gap, with the fix and the re-proof.
 - The smallest code fix for that gap.
 

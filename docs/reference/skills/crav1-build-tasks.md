@@ -30,6 +30,8 @@ A range or all (was `/crav1-complete-tasks`): Orchestrates one worker per `T#` (
 
 1.132.0: when the ready check result is `ready` or `ready-partial`, the tasks in `can_start` may start. A held task (`refused`) is refused with its reason, including `held, waits on T#`. The run does not ask to build it anyway. When the result is `not-ready`, no worker starts.
 
+1.136.0: a recorded-merged or already-verified row that is still `[ ]` is tick-only. `scripts/tick_only.py` ticks `[x]` and starts no worker when the result is `ready` or `ready-partial`, including when that task is already done for `can_start`. It does not re-implement. A `not-ready` result does not tick and does not start a worker. The spec folder is `scripts/resolve_spec.py`: exact folder first (`orders 1.0` matches `orders-1-0`), then one unique playbook basename, spec title, or work-item name. Several matches are listed and the run stops.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
@@ -59,7 +61,7 @@ Inside each worker: Reads one `T#` in `tasks.md`, plus `plan.md` and `spec.md`. 
 
 In short: Inside each worker: The code and checks that `T#` names, and `[x]` on that row when its verify passes; One task: The commit-style rule when it is missing; its worker writes that task's code, `tasks.md`, `verify.md`, `fix-log.md` when a fix runs, and the commits; A range or all: The commit-style rule once, when missing; one worker per `T#` writes that task's code, `tasks.md`, `verify.md`, `fix-log.md` when a fix runs, and the commits.
 
-Inside each worker: Writes the code and the checks that row names, and marks the row `[x]` only when that verify passes. One task: Writes the commit-style rule when it is missing. A range or all: Writes the commit-style rule once when it is missing. When the picked branch is not the build map's name, writes `(map: <picked>)` on that task in the specs repo and does not commit it.
+Inside each worker: Writes the code and the checks that row names, and marks the row `[x]` only when that verify passes. A tick-only row is marked `[x]` by `scripts/tick_only.py` with no worker and no code change. One task: Writes the commit-style rule when it is missing. A range or all: Writes the commit-style rule once when it is missing. When the picked branch is not the build map's name, writes `(map: <picked>)` on that task in the specs repo and does not commit it.
 
 ## Does not
 

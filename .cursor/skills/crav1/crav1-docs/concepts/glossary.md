@@ -88,7 +88,11 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 
 **Open point.** A spec finding the tighten-and-plan walk will not jump back for again (1.135.0). Recorded as `- Open point:` in `walk-progress.md`. The walk continues.
 
-**verify.md behind.** The ready check's flag when `verify.md` still lists a ticked task, or a task whose pull request is recorded merged, as not implemented, or when its `Next:` line names such a task (1.135.0). The check prints `Waiting: /crav1-verify-build-against-spec <slug> - verify.md is behind tasks.md (T2, T45)` and does not print that Next line. The walk and the ready check do not write `verify.md`.
+**verify.md behind.** The ready check's flag when `verify.md` still lists a ticked task as not implemented, when its `Next:` line names a ticked task, or when a merged task is still `Not implemented` (1.136.0). A merged task whose row is still `[ ]`, and whose only leftover is the tick, is not behind. The check prints `Waiting: /crav1-verify-build-against-spec <slug> - verify.md is behind tasks.md (T2)` and does not print that Next line. A verify-only change does not force `not-ready`. The walk and the ready check do not write `verify.md`. Only the walk's record or `clear --yes` restamps `walk-progress.md`.
+
+**Tick pending.** The verify status **Implemented, verified, tick pending** (1.136.0). The evidence passed, the `tasks.md` row is still `[ ]`, and the pull request is recorded merged. It is not Not implemented. The open checkbox is a Gap. Verify may tick that one row after a yes. `/crav1-build-tasks` can tick it with no worker when the ready check is `ready` or `ready-partial`.
+
+**Needs tick.** The `task_order.py` section for a recorded-merged task that is still unticked (1.136.0). The task is done for dependency order, so it is not Ready and not Next.
 
 **Slice, slug.** A slice is one feature's spec folder. Its slug is the folder name under `docs/specs/`.
 

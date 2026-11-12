@@ -115,12 +115,20 @@ IMPACT = {
     "verify": "verify.md changed since the ready check, so the check no longer covers it.",
     "playbook": "The playbook file changed since this step. The playbook is intake only.",
 }
+# A verify.md edit is recorded (COVERS) and does not reopen the ready check (1.136.0).
+# Only this walk's record, or clear --yes, rewrites walk-progress.md.
+RESTAMP = (
+    "Only the walk's record or `clear --yes` restamps walk-progress.md. "
+    "/crav1-tasks-ready-to-build only writes build-map.md."
+)
 
 # Which file change reopens a step (1.123.0). Narrower than COVERS.
 # review-architecture is handled in affects_of: once a later step covers the
 # spec, a spec change does not send the walk back to the architecture review.
 # plan-from-spec writes the plan from the spec, so a hand edit of the plan
 # reopens the plan review, not the step that wrote the plan.
+# verify stays in COVERS so the ready check still snapshots its hash. It is
+# not in AFFECTS: a verify-only change does not reopen this step (1.136.0).
 AFFECTS = {
     "playbook": ("playbook",),
     "review-architecture": ("spec",),
@@ -128,7 +136,7 @@ AFFECTS = {
     "resolve-open-questions": ("spec",),
     "plan-from-spec": ("spec",),
     "review-and-tighten-plan": ("spec", "plan", "tasks"),
-    "tasks-ready-to-build": ("spec", "plan", "tasks", "verify"),
+    "tasks-ready-to-build": ("spec", "plan", "tasks"),
 }
 STEP_COMMAND = {
     "playbook": "/crav1-tighten-and-plan-ready-to-build",
@@ -688,12 +696,15 @@ def resume(args: argparse.Namespace) -> None:
             drift = affected_drift(root, step, body, data["steps"])
             if drift:
                 status = "reopen"
+                impact = " ".join(IMPACT[token] for token in drift)
+                if step == "tasks-ready-to-build":
+                    impact = impact + " " + RESTAMP
                 row = {
                     "id": step,
                     "status": status,
                     "result": body["result"],
                     "changed": drift,
-                    "impact": " ".join(IMPACT[token] for token in drift),
+                    "impact": impact,
                 }
             else:
                 status = "keep"
@@ -1000,6 +1011,8 @@ def clear(args: argparse.Namespace) -> None:
 def reopen_hit(step: str, drift: list[str]) -> dict:
     why = " ".join(IMPACT[token] for token in drift)
     why += " Jump back and rerun this step, or clear it with nothing new."
+    if step == "tasks-ready-to-build":
+        why += " " + RESTAMP
     return {
         "task": None,
         "bucket": "reopened",
@@ -1196,36 +1209,40 @@ def _built_ids(tasks_text: str, spec_text: str) -> dict[str, dict]:
     return built
 
 
-def _stale_next(verify_text: str, built: set[str]) -> str | None:
+def _stale_next(verify_text: str, ticked: set[str]) -> str | None:
+    """A Next line is stale only when it names a ticked task (1.136.0)."""
     hits = []
     for line in (verify_text or "").splitlines():
         stripped = line.strip()
         if not stripped.lower().startswith("next:"):
             continue
         named = re.findall(r"\bT\d+\b", stripped)
-        if any(tid in built for tid in named):
+        if any(tid in ticked for tid in named):
             hits.append(stripped)
     return " ".join(hits) if hits else None
 
 
 def verify_gap_from(tasks_text: str, spec_text: str, verify_text: str, slug: str) -> dict:
-    """verify.md is behind when a built task is still not implemented, or Next names one.
+    """verify.md is behind for a ticked task, or a merged task still Not implemented.
 
-    Built means ticked in tasks.md, or the task's pull request is recorded merged
-    on the task line or on its Match Branch line. This does not write verify.md.
+    A Next line is stale only when it names a ticked task. A merged task that
+    is still unticked, and whose verify status is not Not implemented, is not
+    behind: the checkbox is the only leftover. Merged tasks stay done for
+    dependents. This does not write verify.md.
     """
     empty = {"behind": False, "tasks": [], "waiting": None, "stale_next": None}
     if not verify_text.strip() or not tasks_text.strip():
         return empty
     built = _built_ids(tasks_text, spec_text)
+    ticked = {tid for tid, info in built.items() if info["done"]}
     stale: list[str] = []
     for tid in built:
         if _listed_not_implemented(verify_text, tid):
             stale.append(tid)
-    stale_next = _stale_next(verify_text, set(built))
+    stale_next = _stale_next(verify_text, ticked)
     if stale_next:
         for tid in re.findall(r"\bT\d+\b", stale_next):
-            if tid in built and tid not in stale:
+            if tid in ticked and tid not in stale:
                 stale.append(tid)
     if not stale:
         return empty

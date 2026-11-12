@@ -225,10 +225,20 @@ class Progress(unittest.TestCase):
         (self.root / "verify.md").write_text("verify v1\n", encoding="utf-8")
         verify = must(["resume", "--root", str(self.root)])
         by_id = {row["id"]: row for row in verify["steps"]}
-        self.assertEqual(by_id["tasks-ready-to-build"]["status"], "reopen")
-        self.assertEqual(by_id["tasks-ready-to-build"]["changed"], ["verify"])
+        self.assertEqual(by_id["tasks-ready-to-build"]["status"], "keep")
+        self.assertNotIn("changed", by_id["tasks-ready-to-build"])
         self.assertEqual(by_id["plan-from-spec"]["status"], "keep")
-        self.assertEqual(verify["continue_from"], "tasks-ready-to-build")
+        self.assertIsNone(verify["continue_from"])
+
+        (self.root / "tasks.md").write_text("tasks v2\n", encoding="utf-8")
+        tasks = must(["resume", "--root", str(self.root)])
+        by_id = {row["id"]: row for row in tasks["steps"]}
+        self.assertEqual(by_id["tasks-ready-to-build"]["status"], "reopen")
+        self.assertEqual(by_id["tasks-ready-to-build"]["changed"], ["tasks"])
+        self.assertIn("clear --yes", by_id["tasks-ready-to-build"]["impact"])
+        self.assertIn("walk-progress.md", by_id["tasks-ready-to-build"]["impact"])
+        self.assertIn("build-map.md", by_id["tasks-ready-to-build"]["impact"])
+        self.assertEqual(by_id["plan-from-spec"]["status"], "keep")
 
         self.playbook.write_text("playbook v2\n", encoding="utf-8")
         (self.root / "verify.md").unlink()

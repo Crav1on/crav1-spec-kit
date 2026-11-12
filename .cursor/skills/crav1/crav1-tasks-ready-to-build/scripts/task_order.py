@@ -7,11 +7,16 @@ Dependency order is a topological sort in waves (a task's wave is one more than 
 lowest task number first inside a wave.
 Ready: unticked, every dependency ticked, no missing dependency, not in a cycle. Next: the ready task that
 unblocks the most unticked tasks (all tasks downstream of it), lowest number on a tie.
+A recorded-merged task counts as done (1.136.0), the same rule as walk_progress: `(PR n)` and the word
+merged on the task line, or on the Match Branch line for its `(branch:)` or `(map:)` branch. It is not
+Ready and not Next. It is listed under Needs tick while the checkbox is still open. A sibling spec.md
+is read when this file is given a tasks.md path.
 
 Usage: task_order.py <tasks.md> [--failed T7,T9] [--json]
-Standard library only. Prints nothing secret; reads only the file it is given.
+Standard library only. Prints nothing secret; reads only the file it is given and a sibling spec.md.
 """
 import json
+import pathlib
 import re
 import sys
 
@@ -30,6 +35,58 @@ _utf8_stdout()
 
 TASK = re.compile(r"^\s*- \[( |x|X)\] T(\d+)\b[:.]?\s*(.*)$")
 AFTER = re.compile(r"\(after:\s*([^)]*)\)")
+BRANCH_MARK = re.compile(r"\((?:branch|map):\s*([^)]+)\)", re.I)
+
+
+def branch_token(value):
+    """The branch in a mark. A repo prefix is the first word; the branch is the last."""
+    parts = (value or "").strip().split()
+    return parts[-1].strip("`.,;:") if parts else ""
+
+
+def pr_merged(text):
+    """A pull request recorded on this line is merged. Local text only."""
+    return bool(re.search(r"\(PR\s+\d+", text or "", re.I) and re.search(r"\bmerged\b", text or "", re.I))
+
+
+def merged_branch_names(spec_text):
+    """Match Branch lines whose pull request is recorded merged."""
+    names = set()
+    for line in (spec_text or "").splitlines():
+        stripped = line.strip()
+        if stripped.startswith("- "):
+            stripped = stripped[2:].strip()
+        if not stripped.lower().startswith("branch:"):
+            continue
+        if not pr_merged(stripped):
+            continue
+        body = stripped.split(":", 1)[1]
+        cleaned = re.sub(r"\([^)]*\)", " ", body)
+        cleaned = re.sub(r"\bmerged\b", " ", cleaned, flags=re.I)
+        token = branch_token(cleaned)
+        if token:
+            names.add(token)
+    return names
+
+
+def merged_ids(tasks_text, spec_text=""):
+    """Task ids that are recorded merged and still count as done (1.136.0)."""
+    branches = merged_branch_names(spec_text)
+    found = set()
+    for line in (tasks_text or "").splitlines():
+        match = TASK.match(line)
+        if not match:
+            continue
+        number, rest = int(match.group(2)), match.group(3)
+        if pr_merged(rest):
+            found.add(number)
+            continue
+        for mark in BRANCH_MARK.finditer(rest or ""):
+            token = branch_token(mark.group(1))
+            if token and token in branches:
+                found.add(number)
+                break
+    return found
 
 
 def parse(text):
@@ -46,7 +103,8 @@ def parse(text):
         else:
             deps = [prev] if prev is not None else []
             recorded = False
-        title = re.sub(r"\s*\((verify|spec|after|branch|step|map):[^)]*\)", "", rest).strip()
+        title = re.sub(r"\s*\((verify|spec|after|branch|step|map):[^)]*\)", "", rest)
+        title = re.sub(r"\s*\(PR\s+\d+[^)]*\)", "", title, flags=re.I).strip()
         tasks.append({"id": num, "done": m.group(1) != " ", "title": title, "deps": deps, "recorded": recorded})
         prev = num
     return tasks
@@ -77,7 +135,13 @@ def _cycles(ids, deps):
     return on_cycle
 
 
-def analyse(tasks, failed=()):
+def analyse(tasks, failed=(), merged=()):
+    merged = set(merged or ())
+    needs_tick = []
+    for task in tasks:
+        if task["id"] in merged and not task["done"]:
+            needs_tick.append({"id": task["id"], "title": task["title"]})
+            task["done"] = True
     ids = {t["id"] for t in tasks}
     by = {t["id"]: t for t in tasks}
     deps = {t["id"]: t["deps"] for t in tasks}
@@ -142,6 +206,7 @@ def analyse(tasks, failed=()):
                 failed_deps.setdefault(u, f)
     return {"order": [n for n in order if not by[n]["done"]], "ready": [r["id"] for r in ready],
             "blocked": [r for r in rows if not r["ready"]], "next": nxt,
+            "needs_tick": needs_tick,
             "depends_on_failed": {f"T{k}": f"depends on T{v} (failed)" for k, v in sorted(failed_deps.items())},
             "rows": rows}
 
@@ -160,14 +225,25 @@ def _split_blocked(blocked):
     return waits, blockers
 
 
+def _wait_line(row):
+    title = (row.get("title") or "").strip()
+    if title:
+        return f"- T{row['id']} {title}: {row['reason']}"
+    return f"- T{row['id']}: {row['reason']}"
+
+
 def render(res):
     waits, blockers = _split_blocked(res["blocked"])
     out = ["Ready (dependency order)"]
     out += [f"- T{r['id']}: {r['title']}" for r in res["rows"] if r["ready"]] or ["- none"]
     out.append("Waits in order (dependency order)")
-    out += [f"- T{r['id']}: {r['reason']}" for r in waits] or ["- none"]
+    out += [_wait_line(r) for r in waits] or ["- none"]
     out.append("Blocked (dependency order)")
     out += [f"- T{r['id']}: {r['reason']}" for r in blockers] or ["- none"]
+    needs = res.get("needs_tick") or []
+    if needs:
+        out.append("Needs tick")
+        out += [f"- T{r['id']}: {r['title']}" for r in needs]
     out.append("Order: " + " → ".join(f"T{n}" for n in res["order"]))
     out.append(f"Next: T{res['next']}" if res["next"] else "Next: none ready")
     for k, v in res["depends_on_failed"].items():
@@ -193,6 +269,7 @@ def public(res):
         "waits_in_order": [row(item) for item in waits],
         "blocked": [row(item) for item in blockers],
         "next": _tid(res["next"]),
+        "needs_tick": [row(item) for item in res.get("needs_tick") or []],
         "depends_on_failed": res["depends_on_failed"],
         "rows": [row(item) for item in res["rows"]],
     }
@@ -221,8 +298,11 @@ def main(argv):
     failed = []
     if "--failed" in argv:
         failed = [int(x) for x in re.findall(r"\d+", argv[argv.index("--failed") + 1])]
-    with open(argv[0], encoding="utf-8") as fh:
-        res = analyse(parse(fh.read()), failed)
+    tasks_path = pathlib.Path(argv[0])
+    text = tasks_path.read_text(encoding="utf-8")
+    spec_path = tasks_path.parent / "spec.md"
+    spec_text = spec_path.read_text(encoding="utf-8") if spec_path.is_file() else ""
+    res = analyse(parse(text), failed, merged_ids(text, spec_text))
     if "--json" in argv:
         emit_text(json.dumps(public(res), ensure_ascii=False, indent=1))
     else:

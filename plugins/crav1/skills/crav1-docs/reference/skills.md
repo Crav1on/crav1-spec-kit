@@ -62,7 +62,7 @@ When the user asks for startup options, these six are the only ways in. That ask
 
 | Command | Starter | Use when | Reads | Writes | You run next | Runs by itself | Walkthrough |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| [`/crav1-verify-build-against-spec`](skills/crav1-verify-build-against-spec.md) | — | Want proof against acceptance | Spec, tasks, plan, and the running tree | `verify.md` | [`/crav1-fix-build-gaps`](skills/crav1-fix-build-gaps.md); [`/crav1-finalize-commit`](skills/crav1-finalize-commit.md) | — | [Verify and fix](../from-verify.md) |
+| [`/crav1-verify-build-against-spec`](skills/crav1-verify-build-against-spec.md) | — | Want proof against acceptance | Spec, tasks, plan, and the running tree | `verify.md`, and one `[x]` on a tick-pending row after a yes | [`/crav1-fix-build-gaps`](skills/crav1-fix-build-gaps.md); [`/crav1-finalize-commit`](skills/crav1-finalize-commit.md) | — | [Verify and fix](../from-verify.md) |
 | [`/crav1-fix-build-gaps`](skills/crav1-fix-build-gaps.md) | — | verify.md lists gaps, or a live host path fails | Verify report gaps: `verify.md` and the spec folder; Live-site gaps: The same queue as fix-build-gaps | Verify report gaps: The smallest in-spec fix, an appended `fix-log.md`, and that one `verify.md` row; Live-site gaps: What `/crav1-fix-build-gaps` writes | [`/crav1-verify-build-against-spec`](skills/crav1-verify-build-against-spec.md) | `/crav1-fix-build-gaps` | [Verify and fix](../from-verify.md) |
 
 ## Cross-cutting

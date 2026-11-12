@@ -2,6 +2,18 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.136.0 (2026-11-12)
+
+A merged task that only needs its checkbox ticked no longer loops between verify and the ready check. A minor release because verify's Next line, the ready-check result, and the tick path all change.
+
+- **Stale Next is a ticked task.** The ready check flags `verify.md` as behind when a ticked task is still `Not implemented`, when a `Next:` line names a ticked task, or when a merged task is still `Not implemented`. A merged task whose row is still `[ ]`, and whose only leftover is the tick, is not behind. Merged tasks stay done for later tasks and for `can_start`.
+- **Tick pending.** `/crav1-verify-build-against-spec` uses **Implemented, verified, tick pending** when the evidence passed, the row is still `[ ]`, and the pull request is recorded merged. That status is not Not implemented. Next skips tasks the ready check already counts as done and names the first task that can start, one line per ready branch. The open checkbox stays a Gap. After a passed check the report may offer the tick. That needs a yes, on a visible line. The offer is an alternative exit.
+- **Tick only.** `/crav1-build-tasks` for a recorded-merged or already-verified unticked row ticks `[x]` in `tasks.md`, starts no worker, and does not re-implement. That is allowed when the ready check is `ready` or `ready-partial`, including when the task is already done for `can_start`. It is not a way around a real `not-ready` blocker.
+- **verify.md does not reopen the ready check.** `verify` stays in the files the ready check records, and it is no longer a change that reopens that step. A verify-only edit does not force `not-ready`. The result stays `ready` or `ready-partial`, and `verify_waiting` is shown when verify is behind. `/crav1-tasks-ready-to-build` only writes `build-map.md`. Only the walk's record or `clear --yes` restamps `walk-progress.md`.
+- **Needs tick.** `task_order.py` treats a recorded-merged task as done, so it is not Ready and not Next. It lists that task under Needs tick. A Waits in order line includes the short title.
+- **Which spec.** Verify, the ready check, build-tasks, and the tighten-and-plan walk resolve a named spec with one script: exact folder first (`orders 1.0` matches `orders-1-0`), then one unique playbook basename, spec title, or work-item name in `spec.md`. Several matches are listed and the run stops. Verify no longer picks the most recently edited tree.
+- **Scripts.** [Running a kit script](docs/reference/running-scripts.md) has a silent Python finder for bash and PowerShell. It tries `python3`, `python`, and `py -3`, and treats the Windows Store message `Python was not found` as not found. Do not use `/tmp` as a portable path. `build_map.py --recommend`, given `tasks.md` or `spec.md`, says a spec folder is required and names the parent folder.
+
 ## 1.135.0 (2026-11-11)
 
 A spec finding during the tighten-and-plan walk can jump back to the spec, and a stale verify file is called out at the ready check. A minor release because the walk no longer stops on that finding, and the ready check no longer trusts a Next line that names work already built.
