@@ -823,7 +823,9 @@ def held_phrase(row):
     if match:
         question = re.split(r"(?<=[.!?])\s", match.group(1).strip(), maxsplit=1)[0]
         note = ""
-        if "inferred from the text" in reason.lower():
+        if "blocks the whole slice (recorded)" in reason.lower():
+            note = " Holds the whole slice."
+        elif "inferred from the text" in reason.lower():
             note = " Inferred from the text."
         return f'open question "{question}" Waiting for {who}.{note}'
     return core or "held"
@@ -925,6 +927,8 @@ def _question_line(questions, names=None):
         who = question.get("who") or "not named yet"
         if question.get("mark") == "inferred":
             parts.append(f"{short} — {who} (inferred from the text)")
+        elif question.get("mark") == "whole":
+            parts.append(f"{short} — {who} (holds the whole slice)")
         else:
             parts.append(f"{short} — {who}")
     return "; ".join(parts)

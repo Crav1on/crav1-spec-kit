@@ -243,7 +243,7 @@ class WalkWording(unittest.TestCase):
             ROOT / ".cursor/skills/crav1/crav1-resolve-open-questions/SKILL.md"
         ).read_text(encoding="utf-8")
         self.assertIn("**None** writes `- Blocks: none`", resolve)
-        self.assertIn("**The whole slice** writes no `Blocks:` line", resolve)
+        self.assertIn("**The whole slice** writes `- Blocks: whole slice`", resolve)
         shared = (
             ROOT / ".cursor/skills/crav1/crav1-add-to-spec/references/open-questions.md"
         ).read_text(encoding="utf-8")

@@ -18,6 +18,8 @@ Conflict lines (1.111.0) are listed after the questions; settling one replaces o
 
 1.125.0: when `tasks.md` exists, None writes `Blocks: none`. The whole slice still writes no line. No line still blocks the whole slice.
 
+1.137.0: The whole slice writes `- Blocks: whole slice`. That recorded hold covers every unfinished task after resolve is recorded, including through an open-questions edit. A missing `Blocks:` line still infers `T#` from the text, and holds the whole slice only when no task is named and this step has never been recorded.
+
 1.130.0: the batch is one card. `yes (Recommended)` applies every recommendation. Typed changes go on that card's free-text answer, for example `Q1 A, Q3 keep` or `C1: keep it open`. An item not mentioned keeps its recommendation. There is no Edits option.
 
 1.134.0: on apply, a kept item opens `..[`/crav1-add-to-spec`](crav1-add-to-spec.md)/references/fact.md` and does not start [`/crav1-add-to-spec`](crav1-add-to-spec.md). The rule is `docs/reference/open-skill-file.md`.

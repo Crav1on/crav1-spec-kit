@@ -4,11 +4,13 @@
 Reads `## Open questions` in spec.md and `## Risks` in plan.md. A question with
 an Answered line is not kept open. `Blocks: T2, T4` blocks those tasks.
 `Blocks: none` blocks no task, with an optional reason in parentheses.
-No Blocks line: `T#` ids in the question text that exist in tasks.md are the
-hold, marked inferred from the text. The whole slice is held only when the
-text names no such task and the caller says resolve-open-questions has never
-been recorded. Any Blocks line wins over a Risk that says "do not implement
-until resolved".
+`Blocks: whole slice` (also `the whole slice`, any case) holds every
+unfinished task and stays a recorded hold after resolve-open-questions is
+recorded. No Blocks line: `T#` ids in the question text that exist in
+tasks.md are the hold, marked inferred from the text. The whole slice is
+held only when the text names no such task and the caller says
+resolve-open-questions has never been recorded. Any Blocks line wins over a
+Risk that says "do not implement until resolved".
 
 A Risk matches a question on the question's first sentence, on an explicit
 `(question: <first words>)` tag, or when the Risk names the same `Blocks T#`
@@ -41,6 +43,7 @@ TASKS = re.compile(r"^T\d+(, T\d+)*$")
 TASK_ID = re.compile(r"\bT\d+\b")
 TASK_LINE = re.compile(r"(?m)^- \[[ xX]\] (T\d+)\b")
 NONE = re.compile(r"^none(?: \(([^)]+)\))?$")
+WHOLE = re.compile(r"^(?:the\s+)?whole\s+slice$", re.I)
 PHRASE = "do not implement until resolved"
 QUESTION_TAG = re.compile(r"\(question:\s*([^)]+)\)", re.I)
 NAMED_BLOCKS = re.compile(r"\bblocks:?\s*((?:T\d+\s*(?:,\s*)?)+)", re.I)
@@ -181,10 +184,11 @@ def _match_question(line, questions):
 def kept_open(text, task_ids=None, resolve_recorded=False):
     """Kept-open questions, in document order.
 
-    mark is tasks, none, inferred, missing, or unparsed. blocks_slice is true
-    only when there is no readable Blocks line and the text names no task
-    that exists in tasks.md, and resolve-open-questions has never been
-    recorded. A Blocks line still limits or clears the block.
+    mark is tasks, none, whole, inferred, missing, or unparsed. `Blocks:
+    whole slice` is recorded and blocks_slice. A missing line blocks_slice
+    only when the text names no task that exists in tasks.md and
+    resolve-open-questions has never been recorded. A Blocks line still
+    limits or clears the block.
     """
     questions = []
     current = None
@@ -201,7 +205,10 @@ def kept_open(text, task_ids=None, resolve_recorded=False):
     for q in questions:
         if any(m.startswith("Answered:") for m in q["marks"]):
             continue
-        blocks = [m[len("Blocks:"):].strip() for m in q["marks"] if m.startswith("Blocks:")]
+        blocks = []
+        for mark_line in q["marks"]:
+            if mark_line.lower().startswith("blocks:"):
+                blocks.append(mark_line.split(":", 1)[1].strip())
         line = blocks[-1] if blocks else None
         reason = None
         blocks_slice = False
@@ -218,6 +225,9 @@ def kept_open(text, task_ids=None, resolve_recorded=False):
             none = NONE.fullmatch(line)
             if none:
                 mark, tasks, reason = "none", [], none.group(1)
+            elif WHOLE.fullmatch(line):
+                mark, tasks = "whole", []
+                blocks_slice = True
             elif TASKS.fullmatch(line):
                 mark, tasks = "tasks", [part.strip() for part in line.split(",")]
             else:
@@ -235,7 +245,7 @@ def kept_open(text, task_ids=None, resolve_recorded=False):
             "asked": asked,
             "blocks_slice": blocks_slice,
             "inferred": mark == "inferred",
-            "recorded": mark in ("tasks", "none"),
+            "recorded": mark in ("tasks", "none", "whole"),
         })
     return out
 

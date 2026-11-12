@@ -132,7 +132,7 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 
 **Research note, stale mark, point.** A research note lives in `docs/research/`. When a later quote changes what it says, the note gets a `Stale since` mark after a yes, and each spec that relies on it gets one `Point:` line per hit.
 
-**Open question marks.** `Pending:`, `Asked:`, `Answered:`, and `Blocks:` lines under a spec's open question, including `Blocks: none` when the question blocks no current task (1.125.0). Since 1.137.0 a missing `Blocks:` line holds `T#` ids named in the question text. See [Data layout](data-layout.md#open-question-marks).
+**Open question marks.** `Pending:`, `Asked:`, `Answered:`, and `Blocks:` lines under a spec's open question, including `Blocks: none` when the question blocks no current task (1.125.0). Since 1.137.0 a missing `Blocks:` line holds `T#` ids named in the question text. `Blocks: whole slice` holds every unfinished task and stays after resolve-open-questions is recorded. See [Data layout](data-layout.md#open-question-marks).
 
 **Environment marks.** Confirmed lines in `docs/environments/marks.md` saying which environment a cloud resource belongs to. See [Environment marks](../environments-marks.md).
 

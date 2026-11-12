@@ -339,6 +339,23 @@ marks:
     mention: 'Blocks: none'
     since: 1.125.0
 
+  - id: oq-blocks-whole
+    name: "Blocks whole slice"
+    group: open-questions
+    files: ["docs/specs/<slug>/spec.md (indented under a kept-open question)"]
+    format: "  - Blocks: whole slice"
+    pattern: '^  - Blocks: ([Tt]he )?[Ww]hole [Ss]lice$'
+    examples:
+      - "  - Blocks: whole slice"
+      - "  - Blocks: the whole slice"
+      - "  - Blocks: Whole Slice"
+    meaning: "The question holds every unfinished task. The ready check says Holds the whole slice. This stays after resolve-open-questions is recorded and through an open-questions edit. A missing Blocks line does not mean this."
+    written_by: [crav1-resolve-open-questions]
+    read_by: [crav1-tasks-ready-to-build]
+    readiness: true
+    mention: 'Blocks: whole slice'
+    since: 1.137.0
+
   # ---------- research stale marks ----------
   - id: stale-note
     name: "Stale (note)"

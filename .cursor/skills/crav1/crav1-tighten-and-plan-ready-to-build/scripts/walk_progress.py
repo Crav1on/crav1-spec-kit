@@ -1492,6 +1492,8 @@ def _oq_row(tid: str, question: dict, whole: bool, kept: set[str]) -> dict:
     sentence = str(question.get("text") or "").strip()
     if question.get("mark") == "inferred":
         reason = f'open question "{sentence}" (inferred from the text)'
+    elif question.get("mark") == "whole":
+        reason = f'open question "{sentence}" blocks the whole slice (recorded)'
     elif whole:
         reason = f'open question "{sentence}" blocks the whole slice (inferred)'
     else:

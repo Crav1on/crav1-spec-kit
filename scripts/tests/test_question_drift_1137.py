@@ -319,6 +319,108 @@ class ResolverTokens(unittest.TestCase):
         self.assertEqual(payload["nearest"], ["orders-export"])
 
 
+class WholeSliceMark(unittest.TestCase):
+    def test_explicit_whole_slice_holds_after_resolve_and_an_open_questions_edit(self):
+        root = Path(tempfile.mkdtemp()) / "orders-export"
+        root.mkdir()
+        spec = """# Orders export
+
+The receipt lists the order id.
+
+## Match
+
+- Branch: orders-api feat/orders-export (PR 78) merged
+
+## Open questions
+
+- Who signs the export?
+  - Blocks: whole slice
+"""
+        tasks = """# Tasks
+
+- [ ] T2: export the receipt (PR 78, merged) (after: )
+- [ ] T3: record the order (after: )
+- [ ] T6: send the mail (after: )
+"""
+        verify = """# Verify
+
+## Tasks — overview (dependency order)
+
+| T# | Title | Status | Verify |
+| --- | --- | --- | --- |
+| T2 | export the receipt | Implemented, verified, tick pending | unit |
+| T3 | record the order | Not implemented | |
+| T6 | send the mail | Not implemented | |
+"""
+        (root / "spec.md").write_text(spec, encoding="utf-8")
+        (root / "plan.md").write_text(PLAN, encoding="utf-8")
+        (root / "tasks.md").write_text(tasks, encoding="utf-8")
+        (root / "verify.md").write_text(verify, encoding="utf-8")
+        for step, result in (
+            ("tighten-spec", "done"),
+            ("resolve-open-questions", "done"),
+            ("plan-from-spec", "done"),
+            ("review-and-tighten-plan", "done"),
+            ("tasks-ready-to-build", "not-ready"),
+        ):
+            must_json(WALK, [
+                "record", "--root", str(root), "--slice", "docs/specs/orders-export",
+                "--step", step, "--result", result, "--when", WHEN, "--yes",
+            ])
+        held = must_json(WALK, ["readiness", "--root", str(root)])
+        self.assertEqual(held["can_start"], [])
+        self.assertEqual(held["held"], ["T3", "T6"])
+        self.assertEqual(held["result"], "not-ready")
+        by_task = {row["task"]: row for row in held["rows"]}
+        self.assertIn("blocks the whole slice (recorded)", by_task["T3"]["reason"])
+        self.assertIn("Holds the whole slice.", "\n".join(held["held_lines"]))
+
+        edited = spec.rstrip() + "\n- Which lane prints the label?\n  - Blocks: none\n"
+        (root / "spec.md").write_text(edited, encoding="utf-8")
+        after = must_json(WALK, ["readiness", "--root", str(root)])
+        self.assertEqual(after["can_start"], [])
+        self.assertEqual(after["held"], ["T3", "T6"])
+        self.assertNotIn("T3", {row["task"] for row in after["blockers"]})
+        resumed = must_json(WALK, ["resume", "--root", str(root), "--no-playbook"])
+        by_id = {row["id"]: row for row in resumed["steps"]}
+        self.assertEqual(by_id["resolve-open-questions"]["status"], "reopen")
+        for step in LATER:
+            self.assertEqual(by_id[step]["status"], "keep", step)
+        ticked = must_json(TICK, ["--root", str(root), "T2", "--yes"])
+        self.assertTrue(ticked["ticked"])
+        self.assertFalse(ticked["worker"])
+        self.assertEqual(ticked["result"], "not-ready")
+        self.assertIn("- [x] T2:", (root / "tasks.md").read_text(encoding="utf-8"))
+
+    def test_parser_accepts_whole_slice_wording_and_the_skill_writes_the_mark(self):
+        root = Path(tempfile.mkdtemp())
+        spec = root / "spec.md"
+        plan = root / "plan.md"
+        spec.write_text(
+            "# Orders export\n\n## Open questions\n\n"
+            "- Who signs the export?\n  - Blocks: the whole slice\n"
+            "- Which lane prints the label?\n  - Blocks: Whole Slice\n",
+            encoding="utf-8",
+        )
+        plan.write_text("## Risks\n", encoding="utf-8")
+        code, out, err = run(BLOCKS, [str(spec), str(plan)])
+        self.assertEqual(code, 0, err + out)
+        payload = json.loads(out)
+        for row in payload["questions"]:
+            self.assertEqual(row["mark"], "whole")
+            self.assertTrue(row["blocks_slice"])
+            self.assertTrue(row["recorded"])
+        skill = (
+            ROOT / ".cursor/skills/crav1/crav1-resolve-open-questions/SKILL.md"
+        ).read_text(encoding="utf-8")
+        reference = (
+            ROOT / ".cursor/skills/crav1/crav1-add-to-spec/references/open-questions.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn("**The whole slice** writes `- Blocks: whole slice`", skill)
+        self.assertIn("Blocks: whole slice", reference)
+        self.assertNotIn("writes no `Blocks:` line", skill)
+
+
 class InferredBlocks(unittest.TestCase):
     def test_text_ids_are_limited_to_tasks_that_exist(self):
         root = Path(tempfile.mkdtemp())
