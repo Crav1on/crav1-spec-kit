@@ -218,6 +218,11 @@ class WalkWording(unittest.TestCase):
         self.assertIn("`one batch` (Recommended)", steps)
         self.assertIn("`one by one`", steps)
         self.assertIn("Before step 5 is recorded", steps)
+        self.assertIn("**The whole slice** (`- Blocks: whole slice`)", steps)
+        self.assertIn("kept open; blocks the whole slice until resolved.", steps)
+        self.assertIn("A `Blocks:` line wins over that Risk wording", steps)
+        self.assertNotIn("(no line)", steps)
+        self.assertNotIn("leaves no line", steps)
         self.assertLess(
             steps.index("## After the plan, questions with no Blocks line"),
             steps.index("## 6. Review the plan, then tighten it"),

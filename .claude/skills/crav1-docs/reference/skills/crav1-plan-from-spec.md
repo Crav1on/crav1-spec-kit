@@ -38,9 +38,9 @@ Reads the accepted spec, diagrams, ADRs, exports, kept security findings already
 
 ## Writes
 
-In short: `plan.md`, `tasks.md`, `Blocks:` or `Blocks: none` on kept-open questions, and matching OpenSpec export files when those already exist.
+In short: `plan.md`, `tasks.md`, `Blocks:`, `Blocks: none`, or `Blocks: whole slice` on kept-open questions, and matching OpenSpec export files when those already exist.
 
-Writes `plan.md` and `tasks.md`, and matching OpenSpec export files when those already exist. A built piece that already matches v0 is marked already there and gets no rebuild task. A piece the user leaves gets one line in the plan and no task. Lists each kept-open question under Risks without asking whether to park it, and stale research findings under Risks. That does not block the plan. Writes `Blocks: T#` or `Blocks: none` under a kept-open question. A `Blocks: T#` risk says kept open; blocks those tasks until resolved. A `Blocks: none` risk says kept open; does not block the current tasks. Only a question with no `Blocks:` line keeps do not implement until resolved.
+Writes `plan.md` and `tasks.md`, and matching OpenSpec export files when those already exist. A built piece that already matches v0 is marked already there and gets no rebuild task. A piece the user leaves gets one line in the plan and no task. Lists each kept-open question under Risks without asking whether to park it, and stale research findings under Risks. That does not block the plan. Writes `Blocks: T#`, `Blocks: none`, or `Blocks: whole slice` under a kept-open question. A `Blocks: T#` risk says kept open; blocks those tasks until resolved. A `Blocks: none` risk says kept open; does not block the current tasks. A `Blocks: whole slice` risk says kept open; blocks the whole slice until resolved. A `Blocks:` line wins over that Risk wording. Only a question with no `Blocks:` line keeps do not implement until resolved.
 
 ## Does not
 
