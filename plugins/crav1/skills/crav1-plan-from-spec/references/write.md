@@ -14,7 +14,7 @@ The one exception to leaving `spec.md` alone. Once `tasks.md` exists, every kept
 - It blocks no current task: write `- Blocks: none`, or `- Blocks: none (later phase)` when the reason is that short. Do not ask. The risk entry is the question's words, then `kept open; does not block the current tasks.` Do not write "do not implement until resolved" on that entry.
 - You cannot tell whether it is current work or later: ask once, in one short batch, for every such question together. Not one question at a time. Each option is `current` or `later`, with no recommendation. `later` writes `Blocks: none` and the risk wording above. `current` writes `Blocks: T#` when it blocks some tasks, with `kept open; blocks T2, T4 until resolved.`, or no line when it blocks the whole current slice. Only a question with no `Blocks:` line keeps "do not implement until resolved".
 
-A kept-open question with no `Blocks:` line still blocks the whole slice for `/crav1-tasks-ready-to-build` (inferred). `Blocks: none` blocks no task. Any `Blocks:` line wins over Risk wording. List each `Blocks:` line in the recap.
+A kept-open question with no `Blocks:` line holds the `T#` ids named in its text for `/crav1-tasks-ready-to-build`, and holds the whole slice only when no task is named and resolve-open-questions has never been recorded (1.137.0). `Blocks: none` blocks no task. Any `Blocks:` line wins over Risk wording. List each `Blocks:` line in the recap.
 
 ## tasks.md
 

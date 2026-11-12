@@ -26,7 +26,7 @@ Use this when `plan.md` and `tasks.md` are accepted. Build one task `T#` at a ti
 | Linter gate | When `## Linter` says none and you have not chosen to go on, decide first | Stops with no code until you choose |
 | Approvals (worker commands) | Answer the one pause: `continue` or `click` | `/crav1-build-tasks`, and `/crav1-build-features` pause once for the host's tool-approval setting, not per task or per slug. When the run ends they say how to restore it |
 | Commit style (worker commands) | Pick a commit style once when asked | Writes the commit-style rule once when it is missing. Workers then commit without asking |
-| Build | Watch the diff | `/crav1-build-tasks` writes the code and the checks the row names, runs that verify step, and marks the row `[x]` only when it passes. A worker (`crav1-build-task-agent`) does the same in isolation: implement, commit, verify, and an optional fix. Since 1.136.0 a recorded-merged or already-verified row that is still `[ ]` is ticked with no worker and no re-implementation, when the ready check is `ready` or `ready-partial`. A `not-ready` result does not tick it |
+| Build | Watch the diff | `/crav1-build-tasks` writes the code and the checks the row names, runs that verify step, and marks the row `[x]` only when it passes. A worker (`crav1-build-task-agent`) does the same in isolation: implement, commit, verify, and an optional fix. Since 1.137.0 a recorded-merged or already-verified row that is still `[ ]` is ticked with no worker and no re-implementation, whatever the ready-check result, including `not-ready`. A `not-ready` result still starts no worker |
 | Batch stop | Answer the worker | `/crav1-build-tasks` stops the batch when a worker needs you. `/crav1-build-features` runs specs one after another, never in parallel, and with one ready slug points at `/crav1-build-tasks` |
 | Picture | Say yes or no | `/crav1-build-features` asks once whether to run `/crav1-refresh-system-notes` when a slice is marked done or retired, and does not run it. The other build commands do not ask |
 
@@ -52,7 +52,7 @@ A task line can name its branch: `- [ ] T3: … (after: T1) (branch: feat/orders
 
 ## Some tasks can start (1.132.0)
 
-When the ready check says `ready-partial`, `/crav1-build-tasks` and `/crav1-build-features` start the tasks that can start now. A held task is refused with its reason, including `held, waits on T3` when the task only depends on a held task. The run does not ask to build a held task anyway. When the result is `not-ready`, nothing starts. A ticked task stays on the build map, struck through, with its pull request link.
+When the ready check says `ready-partial`, `/crav1-build-tasks` and `/crav1-build-features` start the tasks that can start now. A held task is refused with its reason, including `held, waits on T3` when the task only depends on a held task. The run does not ask to build a held task anyway. When the result is `not-ready`, no worker starts. A recorded-merged or already-verified checkbox is still ticked. A ticked task stays on the build map, struck through, with its pull request link.
 
 ## Never on a base branch (1.99.0)
 

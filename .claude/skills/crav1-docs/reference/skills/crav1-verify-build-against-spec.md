@@ -20,6 +20,8 @@ Before the tests, a local dependency preflight checks Azurite, database containe
 
 1.136.0: the spec folder is `scripts/resolve_spec.py` (exact folder, then hyphen and space forms, then one unique playbook basename, spec title, or work-item name). Several matches are listed and the run stops. It does not pick the most recently edited tree. A task whose evidence passed, whose row is still `[ ]`, and whose pull request is recorded merged is **Implemented, verified, tick pending**. That is not Not implemented. Next skips tasks the ready check counts as done and names the first task that can start, one line per ready branch. The open checkbox stays a Gap. After a yes, the report may tick that one row. It does not re-implement.
 
+1.137.0: `scripts/resolve_spec.py` also accepts one unique ordered token subsequence of a folder name, playbook basename, spec title, or work-item name (`cc 1.0` matches `cc-process-1-0`). Several matches are listed and the run stops. No match lists the nearest slugs.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.

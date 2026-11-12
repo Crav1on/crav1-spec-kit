@@ -363,7 +363,7 @@ def _questions_for(task_id, questions):
     for question in questions:
         if question["mark"] == "none":
             continue
-        if question["mark"] == "tasks":
+        if question["mark"] in ("tasks", "inferred"):
             if token in question["tasks"]:
                 holding.append(question)
         elif question["blocks_slice"]:
@@ -518,7 +518,7 @@ def _explicit(task):
     return None
 
 
-def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text=""):
+def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text="", resolve_recorded=False):
     """Return markdown, a short chat summary, and the one-line pointer."""
     tasks = parse_tasks(tasks_text)
     titles = work_item_titles(work_item_text)
@@ -528,7 +528,12 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text
     }
     steps = parse_steps(plan_text if plan_text is not None else "")
     has_plan = plan_text is not None
-    questions = question_blocks.kept_open(spec_text or "")
+    task_ids = [f"T{task['id']}" for task in tasks]
+    questions = question_blocks.kept_open(
+        spec_text or "",
+        task_ids=task_ids,
+        resolve_recorded=resolve_recorded,
+    )
     risks = question_blocks.risks(plan_text or "", questions) if has_plan else []
     risk_blocks = any(row["blocks_slice"] for row in risks)
     analysed = task_order.analyse(tasks)
@@ -807,13 +812,20 @@ def held_phrase(row):
     """
     reason = (row.get("reason") or "").strip()
     who = (row.get("who") or "").strip() or "not named yet"
-    core = re.sub(r"\s*\((?:recorded|inferred)\)\s*$", "", reason).strip()
+    core = re.sub(
+        r"\s*\((?:recorded|inferred|inferred from the text)\)\s*$",
+        "",
+        reason,
+    ).strip()
     if core.lower().startswith("held, waits on"):
         return core
     match = re.search(r'open question "([^"]*)"', reason)
     if match:
         question = re.split(r"(?<=[.!?])\s", match.group(1).strip(), maxsplit=1)[0]
-        return f'open question "{question}" Waiting for {who}.'
+        note = ""
+        if "inferred from the text" in reason.lower():
+            note = " Inferred from the text."
+        return f'open question "{question}" Waiting for {who}.{note}'
     return core or "held"
 
 
@@ -911,7 +923,10 @@ def _question_line(questions, names=None):
     for question in questions:
         short = clean_prose(_first_sentence(question["text"]), names) or "open question"
         who = question.get("who") or "not named yet"
-        parts.append(f"{short} — {who}")
+        if question.get("mark") == "inferred":
+            parts.append(f"{short} — {who} (inferred from the text)")
+        else:
+            parts.append(f"{short} — {who}")
     return "; ".join(parts)
 
 
@@ -1170,12 +1185,16 @@ def run_dir(directory, chat=False, stdout=False, recommend=None):
     plan = _read(directory / "plan.md")
     work = _read(directory / "work-item.md") or ""
     verify = _read(directory / "verify.md") or ""
+    progress = directory / "walk-progress.md"
+    resolve_recorded = False
+    if progress.is_file():
+        resolve_recorded = "- Step: resolve-open-questions" in progress.read_text(encoding="utf-8")
     if recommend:
         name = recommended_branch(slug, spec, plan, tasks, recommend, work)
         if not name:
             return f"No open task {recommend}.", 2
         return name, 0
-    result = build(slug, spec, plan, tasks, work, verify)
+    result = build(slug, spec, plan, tasks, work, verify, resolve_recorded=resolve_recorded)
     if not stdout:
         (directory / "build-map.md").write_text(result["markdown"], encoding="utf-8")
     if stdout and not chat:

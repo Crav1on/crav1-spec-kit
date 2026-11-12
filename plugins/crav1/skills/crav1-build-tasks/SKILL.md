@@ -18,7 +18,7 @@ This replaces `/crav1-implement-task`, `/crav1-complete-task`, and `/crav1-compl
 
 ## Opening question
 
-Find the spec folder: the user's @-mention, or the one folder `scripts/resolve_spec.py` prints (skill `crav1-tasks-ready-to-build`, `--root docs/specs`). Exact folder first, then hyphen and space forms (`orders 1.0` matches `orders-1-0`), then one unique playbook basename, spec title, or work-item name in `spec.md`. Several matches: list them and stop. Do not pick the most recently edited tree. No name: ask which slug. When `tasks.md` is missing, stop and name `/crav1-plan-from-spec`.
+Find the spec folder: the user's @-mention, or the one folder `scripts/resolve_spec.py` prints (skill `crav1-tasks-ready-to-build`, `--root docs/specs`). Exact folder first, then hyphen and space forms (`orders 1.0` matches `orders-1-0`), then one unique playbook basename, spec title, or work-item name in `spec.md`, then one unique ordered token subsequence of those names (`cc 1.0` matches `cc-process-1-0`). Several matches: list them and stop. No match: say so and list the nearest slugs. Do not pick the most recently edited tree. No name: ask which slug. When `tasks.md` is missing, stop and name `/crav1-plan-from-spec`.
 
 Then ask one question. List the tasks that are ready, using the rules in `/crav1-tasks-ready-to-build` (its `SKILL.md` next to this one), with their titles, in dependency order (its **Dependency order** section), and say how many are blocked and what comes after, for example `5 blocked; after T2 comes T7, then T3 and T6`. Put its **Next** task first as Recommended.
 
@@ -32,7 +32,7 @@ A picked task that is blocked by a cycle, or by an `(after:)` that names no task
 
 **Held tasks (1.132.0).** Run `walk_progress.py readiness --root <spec-folder>` (skill `crav1-tighten-and-plan-ready-to-build`). When `result` is `ready` or `ready-partial`, start each task in `can_start`. A gate with `refused` true is held: say its `reason` (`open question …` or `held, waits on T#`) and do not ask to build it anyway. Do not start it. Continue with the other tasks that can start. When `result` is `not-ready`, do not start a worker.
 
-**Tick only (1.136.0).** Before a worker, run `scripts/tick_only.py --root <spec-folder> T#`. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. A recorded-merged or already-verified row that is still `[ ]` is tick-only. When the ready-check result is `ready` or `ready-partial`, the named `T#` is the request: pass `--yes`, tick `[x]` in `tasks.md`, and start no worker. Do not re-implement. The task may already be done for `can_start`. When the result is `not-ready`, do not tick and do not start a worker. That is not a way around a real blocker. A task the script calls `not-tick-only` follows the worker path.
+**Tick only (1.137.0).** Before a worker, run `scripts/tick_only.py --root <spec-folder> T#`. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. A recorded-merged or already-verified row that is still `[ ]` is tick-only. Pass `--yes`, tick `[x]` in `tasks.md`, and start no worker, whatever the ready-check result, including `not-ready`. Do not re-implement. The task may already be done for `can_start`. That tick is not a worker and is not a way to build a held task. When the result is `not-ready`, do not start a worker for any other task. A task the script calls `not-tick-only` follows the worker path.
 
 ## Choice words
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Tick one recorded-merged or already-verified task. No worker (1.136.0).
+"""Tick one recorded-merged or already-verified task. No worker (1.137.0).
 
 tick_only.py --root <spec-folder> T2 [--yes]
 
@@ -8,9 +8,9 @@ on the task line, or on the Match Branch line for its `(branch:)` or `(map:)`.
 Already verified is a verify.md status that says verified and is not failed,
 claimed, or unverified, including Implemented, verified, tick pending.
 
-Allowed when the ready check result is ready or ready-partial. A not-ready
-result refuses the tick. That is not a way around a real blocker. Without
---yes this writes nothing.
+The slice result does not matter. A not-ready result still ticks this row.
+That tick starts no worker and does not re-implement. It is not a way to
+build a task the ready check refuses. Without --yes this writes nothing.
 
 Prints JSON. worker is false. Standard library only.
 """
@@ -171,15 +171,6 @@ def main(argv):
     if report is None:
         return emit({"ok": False, "code": "readiness", "worker": False, "ticked": False}, 2)
     result = report.get("result")
-    if result not in ("ready", "ready-partial"):
-        return emit({
-            "ok": False,
-            "code": "not-ready",
-            "result": result,
-            "task": f"T{number}",
-            "worker": False,
-            "ticked": False,
-        }, 2)
     if not yes:
         return emit({
             "ok": False,

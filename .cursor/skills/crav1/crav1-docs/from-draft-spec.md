@@ -45,7 +45,7 @@ Questions only someone else can answer: draft them with [`/crav1-show-or-ask-ope
 - `docs/specs/<slug>/spec.md`: only the issue or question you picked, each time.
 - The named diagram, ADR, or export, only when that pick says so.
 - A branch line on the spec, only after a yes.
-- `Blocks: T#` under a question you keep open, when the slice has `tasks.md` and you pick the tasks it blocks in `/crav1-resolve-open-questions`. **None** writes `Blocks: none`. **The whole slice** leaves no line, and that still blocks the whole slice in [Tasks ready to build](from-tasks-ready-to-build.md).
+- `Blocks: T#` under a question you keep open, when the slice has `tasks.md` and you pick the tasks it blocks in `/crav1-resolve-open-questions`. **None** writes `Blocks: none`. **The whole slice** leaves no line. Since 1.137.0 that holds the slice in [Tasks ready to build](from-tasks-ready-to-build.md) only when the question names no task and resolve-open-questions has never been recorded. A `T#` in the question text holds that task.
 - A cleared research stale mark, when a resolved question settles the last open point.
 - The slug in `used_by` on a note in `docs/notes/YYYY-MM/` that tighten quotes (generated index rebuilt).
 - On `apply <file>`, `docs/playbooks/<topic>.md` for a filled playbook, and a `Playbook:` line on each spec that apply changed. The name is shown once. A draft is not copied. A hand-edit of the committed file is shown before overwrite.

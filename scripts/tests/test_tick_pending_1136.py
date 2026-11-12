@@ -210,7 +210,7 @@ class TickPending(unittest.TestCase):
         self.assertEqual(payload["verify_stale"], ["T2"])
         self.assertIn("T2", payload["stale_next"])
 
-    def test_tick_only_refuses_a_real_not_ready_blocker(self):
+    def test_tick_only_ticks_a_merged_row_when_the_slice_is_not_ready(self):
         root = Path(tempfile.mkdtemp()) / "orders-export"
         root.mkdir()
         (root / "spec.md").write_text("# Orders export\n\n## Open questions\n", encoding="utf-8")
@@ -223,15 +223,23 @@ class TickPending(unittest.TestCase):
             encoding="utf-8",
         )
         (root / "verify.md").write_text(VERIFY_PENDING, encoding="utf-8")
-        before = (root / "tasks.md").read_text(encoding="utf-8")
-        code, out, err = run(TICK, ["--root", str(root), "T2", "--yes"])
+        ready = must_json(WALK, ["readiness", "--root", str(root)])
+        self.assertEqual(ready["result"], "not-ready")
+        ticked = must_json(TICK, ["--root", str(root), "T2", "--yes"])
+        self.assertEqual(ticked["task"], "T2")
+        self.assertEqual(ticked["result"], "not-ready")
+        self.assertTrue(ticked["ticked"])
+        self.assertFalse(ticked["worker"])
+        text = (root / "tasks.md").read_text(encoding="utf-8")
+        self.assertIn("- [x] T2:", text)
+        self.assertIn("- [ ] T3:", text)
+        self.assertIn("- [ ] T4:", text)
+        code, out, err = run(TICK, ["--root", str(root), "T3", "--yes"])
         self.assertEqual(code, 2, err + out)
-        payload = json.loads(out)
-        self.assertFalse(payload["ok"])
-        self.assertEqual(payload["code"], "not-ready")
-        self.assertFalse(payload["worker"])
-        self.assertFalse(payload["ticked"])
-        self.assertEqual((root / "tasks.md").read_text(encoding="utf-8"), before)
+        refused = json.loads(out)
+        self.assertEqual(refused["code"], "not-tick-only")
+        self.assertFalse(refused["worker"])
+        self.assertFalse(refused["ticked"])
 
 
 class NeedsTickOrder(unittest.TestCase):

@@ -32,6 +32,8 @@ The progress file is `docs/specs/<slug>/walk-progress.md`. It records the step, 
 
 1.136.0: a `Next:` line is stale only when it names a ticked task. A merged `[ ]` row whose only leftover is the tick is not behind. A verify-only change does not reopen the ready check and does not force `not-ready`. The result stays `ready` or `ready-partial`, and `verify_waiting` is shown when verify is behind. Where spec, plan, or tasks drift offers a jump back to the ready check, only the walk's record or `clear --yes` restamps `walk-progress.md`. [`/crav1-tasks-ready-to-build`](crav1-tasks-ready-to-build.md) only writes `build-map.md`. The spec folder is `..[`/crav1-tasks-ready-to-build`](crav1-tasks-ready-to-build.md)/scripts/resolve_spec.py`. Several matches are listed and the run stops. It does not pick the most recently edited tree.
 
+1.137.0: `Spec body:` and `Questions version:` split the spec stamp. An edit confined to `## Open questions` reopens resolve-open-questions and does not reopen tighten-spec, plan-from-spec, review-and-tighten-plan, or tasks-ready-to-build. A question with a `Blocks:` line, or one listed on `Kept questions:`, stays Waiting through that drift. A hold inferred from `T#` ids in the question text stays Waiting too. A reopened resolve-open-questions step alone does not force `not-ready` when some tasks can start: the result is `ready-partial`, with `resolve_waiting` and a Next line for that step. When later steps are reopened, Next is `Next: rerun or clear <steps>.`
+
 ## Runs when
 
 A spec should be tightened and planned until it is ready to build. Called by the user.

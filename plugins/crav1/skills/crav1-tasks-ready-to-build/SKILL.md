@@ -25,7 +25,7 @@ Every run, rebuild `docs/specs/<slug>/build-map.md` with `scripts/build_map.py`.
 
 ## Scope
 
-- A named slug, title, playbook, or work-item name: `scripts/resolve_spec.py`. Exact folder first (`orders 1.0` matches `orders-1-0`), then one unique playbook basename, spec title, or work-item name in `spec.md`. Several matches: list them and stop. Do not search the rest of the tree.
+- A named slug, title, playbook, or work-item name: `scripts/resolve_spec.py`. Exact folder first (`orders 1.0` matches `orders-1-0`), then one unique playbook basename, spec title, or work-item name in `spec.md`, then one unique ordered token subsequence of those names (`cc 1.0` matches `cc-process-1-0`). Several matches: list them and stop. No match: say so and list the nearest slugs. Do not search the rest of the tree.
 - No slug: every folder under `docs/specs/` that has `tasks.md`, skipping `_template`. A folder with `spec.md` but no `tasks.md` is listed once as `no tasks yet (run /crav1-plan-from-spec)`.
 
 ## What it reads
@@ -45,7 +45,7 @@ Check each task in this order and stop at the first rule that decides it. Every 
 3. **Blocking questions (1.125.0).**
    - A kept-open question under `## Open questions` (no `Answered:` line) with `Blocks: T#` that names this task: waiting on a question, `open question "<short question>" (recorded)`. Who comes first from the question's own "Waiting for <who>" phrase, then the latest `Pending:` or `Asked:` line. When neither names anyone, say not named yet.
    - `Blocks: none`, optionally `Blocks: none (later phase)`: this question blocks no task (recorded).
-   - A kept-open question with no `Blocks:` line: waiting on a question for every unticked task in the slice, `open question "<short question>" blocks the whole slice (inferred)`. Older specs with no line behave as before. This is waiting, not a task-order block.
+   - No `Blocks:` line (1.137.0): [references/question-holds.md](references/question-holds.md). A `T#` in the text that exists in `tasks.md` is the hold, noted inferred from the text. The whole slice is held only when no task is named and resolve-open-questions has never been recorded.
    - A line under `## Risks` in `plan.md` that says do not implement until resolved blocks every unticked task, `plan Risk "<short risk>" blocks the whole slice (inferred)`, only when that risk is not about a question that already has a `Blocks:` line. Any `Blocks:` line wins over that wording, including `Blocks: none`. The risk matches its question on the question's first sentence, on `(question: <first words>)`, or when the risk names the same `Blocks` tasks. A risk that uses the phrase and matches no question still blocks the slice.
 4. **Dependencies.**
    - The task line has `(after: T1, T3)`: waits in order while any of those is unticked, `waits on T1 (recorded)`. A named task that does not exist is blocked, `after: T9 names no task (recorded)`.
@@ -59,7 +59,7 @@ Check each task in this order and stop at the first rule that decides it. Every 
 
 Do not guess a dependency or a blocking link from the task text. Use only the marks above and the fallbacks.
 
-When Python runs, rule 3 may use `scripts/question_blocks.py` beside this skill: `<interpreter> <this skill folder>/scripts/question_blocks.py docs/specs/<slug>/spec.md docs/specs/<slug>/plan.md`. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. Use its result. It does not write. A question it marks `none` blocks no task. A question it marks `missing` blocks the whole slice. A Risk it marks `blocks_slice: false` does not.
+When Python runs, rule 3 may use `scripts/question_blocks.py` beside this skill: `<interpreter> <this skill folder>/scripts/question_blocks.py docs/specs/<slug>/spec.md docs/specs/<slug>/plan.md` [tasks.md]. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. Use its result. It does not write. Marks are in [references/question-holds.md](references/question-holds.md).
 
 ## Dependency order (1.103.0)
 

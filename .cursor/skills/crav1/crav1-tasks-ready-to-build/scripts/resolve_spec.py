@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
-"""Resolve one spec folder from a name (1.136.0).
+"""Resolve one spec folder from a name (1.137.0).
 
 Exact folder first, then hyphen and space forms (`orders 1.0` matches
 `orders-1-0`). If none, one unique match on a playbook basename the spec
-names, the spec title, or a work-item name in spec.md. Several matches are
-listed and the command stops. It does not search the rest of the tree.
+names, the spec title, or a work-item name in spec.md. If none of those are
+equal, one unique ordered token subsequence of a folder name, a playbook
+basename, a spec title, or a work-item name (`cc 1.0` matches
+`cc-process-1-0`). Several matches are listed and the command stops. No
+match says so and lists the nearest slugs. It does not search the rest of
+the tree.
 
 Usage: resolve_spec.py <query> [--root docs/specs] [--json]
 Standard library only. Reads spec.md under the root. Writes nothing.
@@ -53,6 +57,33 @@ def norm(text):
     return re.sub(r"[^a-z0-9]+", "-", (text or "").lower()).strip("-")
 
 
+def tokens(text):
+    return [part for part in re.split(r"[^a-z0-9]+", (text or "").lower()) if part]
+
+
+def _subsequence(needle, hay):
+    """True when every needle token appears in hay, in order, not necessarily adjacent."""
+    if not needle:
+        return False
+    index = 0
+    for tok in hay:
+        if tok == needle[index]:
+            index += 1
+            if index == len(needle):
+                return True
+    return False
+
+
+def _overlap(needle, hay):
+    if not needle:
+        return 0
+    index = 0
+    for tok in hay:
+        if index < len(needle) and tok == needle[index]:
+            index += 1
+    return index
+
+
 def playbook_basenames(spec_text):
     names = []
     for match in PLAYBOOK.finditer(spec_text or ""):
@@ -82,6 +113,25 @@ def work_item_names(spec_text):
         if name and not ID_ONLY.fullmatch(name):
             names.append(name)
     return names
+
+
+def _labels(child, text):
+    labels = [("folder", child.name)]
+    for name in playbook_basenames(text):
+        labels.append(("playbook", name))
+    title = spec_title(text)
+    if title:
+        labels.append(("title", title))
+    for name in work_item_names(text):
+        labels.append(("work-item", name))
+    return labels
+
+
+def _nearest(scored, limit=8):
+    ordered = sorted(scored, key=lambda row: (-row[0], row[1]))
+    positive = [name for score, name in ordered if score > 0]
+    chosen = positive or [name for _score, name in ordered]
+    return chosen[:limit]
 
 
 def _specs(root):
@@ -159,7 +209,49 @@ def resolve(root, query):
             "matches": [{"slug": hit["slug"], "how": hit["how"]} for hit in hits],
             "query": query,
         }
-    return {"ok": False, "code": "none", "matches": [], "query": query}
+    needle = tokens(query)
+    sub_hits = []
+    scored = []
+    for child in folders:
+        text = (child / "spec.md").read_text(encoding="utf-8")
+        reasons = []
+        best = 0
+        for how, name in _labels(child, text):
+            hay = tokens(name)
+            best = max(best, _overlap(needle, hay))
+            if _subsequence(needle, hay) and how not in reasons:
+                reasons.append(how)
+        scored.append((best, child.name))
+        if reasons:
+            sub_hits.append({
+                "slug": child.name,
+                "how": ", ".join(reasons),
+                "folder": str(child),
+            })
+    if len(sub_hits) == 1:
+        hit = sub_hits[0]
+        return {
+            "ok": True,
+            "code": hit["how"],
+            "slug": hit["slug"],
+            "folder": hit["folder"],
+            "how": hit["how"],
+            "matches": [{"slug": hit["slug"], "how": hit["how"]}],
+        }
+    if len(sub_hits) > 1:
+        return {
+            "ok": False,
+            "code": "several",
+            "matches": [{"slug": hit["slug"], "how": hit["how"]} for hit in sub_hits],
+            "query": query,
+        }
+    return {
+        "ok": False,
+        "code": "none",
+        "matches": [],
+        "nearest": _nearest(scored),
+        "query": query,
+    }
 
 
 def render(result):
@@ -170,7 +262,13 @@ def render(result):
         for match in result.get("matches") or []:
             lines.append(f"- {match['slug']} ({match['how']})")
         return "\n".join(lines)
-    return f"No spec folder matches {result.get('query', '')!r}."
+    lines = [f"No spec folder matches {result.get('query', '')!r}."]
+    nearest = result.get("nearest") or []
+    if nearest:
+        lines.append("Nearest:")
+        for slug in nearest:
+            lines.append(f"- {slug}")
+    return "\n".join(lines)
 
 
 def main(argv):

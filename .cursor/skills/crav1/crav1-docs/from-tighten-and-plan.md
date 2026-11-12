@@ -83,6 +83,8 @@ A playbook applied before 1.120.0: reapply the same file. That creates the `docs
 
 ## After
 
+Since 1.137.0 an edit confined to `## Open questions` does not reopen tighten-spec, plan-from-spec, the plan review, or the ready check. It reopens resolve-open-questions. That step alone leaves the result `ready-partial` when some tasks can start, with a Waiting line and a Next line for `/crav1-resolve-open-questions`. When later steps really did reopen, Next names them: `Next: rerun or clear <steps>.`
+
 When the check is clear, the slice is ready to build. You run build yourself:
 
 ```text

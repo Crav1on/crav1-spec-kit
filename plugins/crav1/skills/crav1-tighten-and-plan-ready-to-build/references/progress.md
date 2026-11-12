@@ -4,7 +4,7 @@ Read this when `walk-progress.md` is already beside the spec, and again when you
 
 The script `scripts/walk_progress.py` in this skill reads and writes it. Do not hand-edit it. `record` writes only with `--yes`. Show the progress line and get a yes before `record --yes`. The answers inside tighten, open questions, or the plan do not cover that line. Skip this confirm only when the step's own confirm already included this record. An extra's yes is that case, and it stays one confirm.
 
-A version is the first 12 hex characters of the SHA-256 of the file's bytes. A missing file is `missing`. The playbook version is the same kind of hash, of the committed file when one exists. A spec change does not reopen the playbook step. The playbook is intake only. After apply, the `Playbook:` line is `docs/playbooks/<topic>.md@<12 hex>`, not the outside path, so resume works on any machine. The script stores that docs path when the file has a `Docs path: docs/playbooks/<topic>.md` line or the same subject as a file under `docs/playbooks/`. Specs apply touched use `Playbook: docs/playbooks/<topic>.md`.
+A version is the first 12 hex characters of the SHA-256 of the file's bytes. A missing file is `missing`. The playbook version is the same kind of hash, of the committed file when one exists. Since 1.137.0 a step that covers the spec also records `Spec body:` (the spec with `## Open questions` removed) and `Questions version:` (that section). An edit confined to that section reopens resolve-open-questions and does not reopen tighten-spec, plan-from-spec, review-and-tighten-plan, or tasks-ready-to-build. That step also records `Kept questions:` for the questions already waiting. A spec change does not reopen the playbook step. The playbook is intake only. After apply, the `Playbook:` line is `docs/playbooks/<topic>.md@<12 hex>`, not the outside path, so resume works on any machine. The script stores that docs path when the file has a `Docs path: docs/playbooks/<topic>.md` line or the same subject as a file under `docs/playbooks/`. Specs apply touched use `Playbook: docs/playbooks/<topic>.md`.
 
 Shape of the file:
 
@@ -81,9 +81,9 @@ An optional extra this walk offered and ran is recorded when it finishes, before
 
 A change from outside the walk is one nobody recorded or covered. A hand edit, or `/crav1-add-to-spec` between sessions, is outside. Resume then reopens only the steps that change affects.
 
-- A spec change reopens tighten-spec, resolve-open-questions, and the plan steps. It does not reopen the architecture review once a later spec step is recorded. When that review is the only spec step so far, a spec change reopens it.
-- A plan or tasks change reopens the plan review and the ready check. It does not reopen plan-from-spec. A spec change does, because the plan was written from the spec.
-- A `verify.md` change reopens only the ready check. A playbook file change reopens only the playbook step.
+- A spec change outside `## Open questions` reopens tighten-spec, resolve-open-questions, and the plan steps. It does not reopen the architecture review once a later spec step is recorded. When that review is the only spec step so far, a spec change reopens it. An edit confined to `## Open questions` reopens only resolve-open-questions.
+- A plan or tasks change reopens the plan review and the ready check. It does not reopen plan-from-spec. A spec change outside the open questions does, because the plan was written from the spec.
+- A `verify.md` change does not reopen the ready check (1.136.0). A playbook file change reopens only the playbook step.
 
 At the start of a run, resume before recording anything. Resume may report status. When a playbook was named, it does not start a later step, and the playbook question is answered first, including before a read-only check. Redo `continue_from` only after that choice. Do not record a later step to clear an earlier reopen.
 

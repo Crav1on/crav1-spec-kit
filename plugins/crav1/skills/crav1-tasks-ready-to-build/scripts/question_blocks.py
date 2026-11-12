@@ -1,20 +1,26 @@
 #!/usr/bin/env python3
-"""Which kept-open questions block which tasks (kit 1.127.0).
+"""Which kept-open questions block which tasks (kit 1.137.0).
 
 Reads `## Open questions` in spec.md and `## Risks` in plan.md. A question with
 an Answered line is not kept open. `Blocks: T2, T4` blocks those tasks.
 `Blocks: none` blocks no task, with an optional reason in parentheses.
-No Blocks line blocks the whole slice. Any Blocks line wins over a Risk that
-says "do not implement until resolved".
+No Blocks line: `T#` ids in the question text that exist in tasks.md are the
+hold, marked inferred from the text. The whole slice is held only when the
+text names no such task and the caller says resolve-open-questions has never
+been recorded. Any Blocks line wins over a Risk that says "do not implement
+until resolved".
 
 A Risk matches a question on the question's first sentence, on an explicit
 `(question: <first words>)` tag, or when the Risk names the same `Blocks T#`
 tasks. A Risk that uses the phrase and matches no question blocks the slice;
 `because` is "no matching question".
 
-Usage: question_blocks.py <spec.md> [plan.md]
-Prints JSON. Standard library only. Writes nothing.
+Usage: question_blocks.py <spec.md> [plan.md] [tasks.md]
+Prints JSON. Standard library only. Writes nothing. The ready check passes
+resolve_recorded when that step is already in walk-progress.md. This command
+does not, so a question that names no task still holds the slice.
 """
+import hashlib
 import json
 import re
 import sys
@@ -32,6 +38,8 @@ def _utf8_stdout() -> None:
 _utf8_stdout()
 
 TASKS = re.compile(r"^T\d+(, T\d+)*$")
+TASK_ID = re.compile(r"\bT\d+\b")
+TASK_LINE = re.compile(r"(?m)^- \[[ xX]\] (T\d+)\b")
 NONE = re.compile(r"^none(?: \(([^)]+)\))?$")
 PHRASE = "do not implement until resolved"
 QUESTION_TAG = re.compile(r"\(question:\s*([^)]+)\)", re.I)
@@ -65,6 +73,37 @@ def _section(text, heading):
 
 def _norm(text):
     return re.sub(r"\s+", " ", text).strip().lower()
+
+
+def question_key(text):
+    """Stable id for one question's words. Used to remember it was already waiting."""
+    return hashlib.sha256(_norm(text or "").encode("utf-8")).hexdigest()[:12]
+
+
+def task_ids_from_tasks(text):
+    """T# ids on task lines, in document order."""
+    found = []
+    for match in TASK_LINE.finditer(text or ""):
+        tid = match.group(1)
+        if tid not in found:
+            found.append(tid)
+    return found
+
+
+def _text_tasks(text, known):
+    """T# ids named in the question text that exist in tasks.md, in order.
+
+    known is None when tasks.md was not passed. Then nothing is inferred.
+    """
+    if known is None:
+        return []
+    allowed = set(known)
+    found = []
+    for match in TASK_ID.finditer(text or ""):
+        tid = match.group(0)
+        if tid in allowed and tid not in found:
+            found.append(tid)
+    return found
 
 
 def _first_sentence(text):
@@ -139,11 +178,13 @@ def _match_question(line, questions):
     return None
 
 
-def kept_open(text):
+def kept_open(text, task_ids=None, resolve_recorded=False):
     """Kept-open questions, in document order.
 
-    mark is tasks, none, missing, or unparsed. blocks_slice is true only when
-    there is no readable Blocks line that limits or clears the block.
+    mark is tasks, none, inferred, missing, or unparsed. blocks_slice is true
+    only when there is no readable Blocks line and the text names no task
+    that exists in tasks.md, and resolve-open-questions has never been
+    recorded. A Blocks line still limits or clears the block.
     """
     questions = []
     current = None
@@ -163,8 +204,16 @@ def kept_open(text):
         blocks = [m[len("Blocks:"):].strip() for m in q["marks"] if m.startswith("Blocks:")]
         line = blocks[-1] if blocks else None
         reason = None
+        blocks_slice = False
         if line is None:
-            mark, tasks = "missing", []
+            named = _text_tasks(q["text"], task_ids)
+            if named:
+                mark, tasks = "inferred", named
+            elif resolve_recorded:
+                mark, tasks = "missing", []
+            else:
+                mark, tasks = "missing", []
+                blocks_slice = True
         else:
             none = NONE.fullmatch(line)
             if none:
@@ -173,16 +222,19 @@ def kept_open(text):
                 mark, tasks = "tasks", [part.strip() for part in line.split(",")]
             else:
                 mark, tasks = "unparsed", []
+                blocks_slice = True
         mark_who, asked = _who_asked(q["marks"])
         who = _who_waiting(q["text"]) or mark_who
         out.append({
             "text": q["text"],
+            "key": question_key(q["text"]),
             "mark": mark,
             "tasks": tasks,
             "reason": reason,
             "who": who,
             "asked": asked,
-            "blocks_slice": mark in ("missing", "unparsed"),
+            "blocks_slice": blocks_slice,
+            "inferred": mark == "inferred",
             "recorded": mark in ("tasks", "none"),
         })
     return out
@@ -203,9 +255,15 @@ def risks(plan_text, questions):
         if matched is None:
             blocks = True
             because = "no matching question"
+        elif matched["mark"] == "inferred":
+            blocks = False
+            because = "inferred from the text"
         elif matched["mark"] != "missing":
             blocks = False
             because = "the question has a Blocks line"
+        elif not matched["blocks_slice"]:
+            blocks = False
+            because = "resolve-open-questions is already recorded"
         else:
             blocks = True
             because = "no Blocks line"
@@ -218,8 +276,8 @@ def risks(plan_text, questions):
     return rows
 
 
-def analyse(spec_text, plan_text=""):
-    questions = kept_open(spec_text)
+def analyse(spec_text, plan_text="", task_ids=None, resolve_recorded=False):
+    questions = kept_open(spec_text, task_ids=task_ids, resolve_recorded=resolve_recorded)
     return {"questions": questions, "risks": risks(plan_text, questions)}
 
 
@@ -239,7 +297,10 @@ def main(argv):
         return 0
     spec = open(argv[0], encoding="utf-8").read()
     plan = open(argv[1], encoding="utf-8").read() if len(argv) > 1 else ""
-    _emit(json.dumps(analyse(spec, plan), ensure_ascii=False, indent=1) + "\n")
+    task_ids = None
+    if len(argv) > 2:
+        task_ids = task_ids_from_tasks(open(argv[2], encoding="utf-8").read())
+    _emit(json.dumps(analyse(spec, plan, task_ids=task_ids), ensure_ascii=False, indent=1) + "\n")
     return 0
 
 

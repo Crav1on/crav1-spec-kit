@@ -32,6 +32,8 @@ A range or all (was `/crav1-complete-tasks`): Orchestrates one worker per `T#` (
 
 1.136.0: a recorded-merged or already-verified row that is still `[ ]` is tick-only. `scripts/tick_only.py` ticks `[x]` and starts no worker when the result is `ready` or `ready-partial`, including when that task is already done for `can_start`. It does not re-implement. A `not-ready` result does not tick and does not start a worker. The spec folder is `scripts/resolve_spec.py`: exact folder first (`orders 1.0` matches `orders-1-0`), then one unique playbook basename, spec title, or work-item name. Several matches are listed and the run stops.
 
+1.137.0: tick-only ticks a recorded-merged or already-verified `[ ]` row whatever the ready-check result, including `not-ready`. It starts no worker and does not re-implement. A `not-ready` result still starts no worker for any other task. `scripts/resolve_spec.py` then accepts one unique ordered token subsequence (`cc 1.0` matches `cc-process-1-0`). Several matches are listed and the run stops. No match lists the nearest slugs.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
