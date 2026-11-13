@@ -17,7 +17,7 @@ Command: `/crav1-tighten-and-plan-ready-to-build`. The playbook path is an optio
 
 This walk is cross-cutting. It is not a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs`, `/crav1-read-environment`, and `/crav1-fix-bug`. That ask names the list. It does not run this command. The six starter options stay unchanged.
 
-It does not replace the skills it runs. It does not start Build. It never runs `/crav1-build-tasks`, `/crav1-build-walk`, or `/crav1-build-features`. When the check is ready, or ready-partial with tasks that can start, Next recommends `/crav1-build-walk` and names `/crav1-build-tasks` as the alternative for one task (1.143.0). Naming either command is not running it.
+It does not replace the skills it runs. It does not start Build. It never runs `/crav1-build-tasks`, `/crav1-build-walk`, or `/crav1-build-features`. When the check is ready, or ready-partial with tasks that can start, the reply prints `ending`. `Run next:` is first (1.150.0). Each command is alone in a code span and is a complete invocation for a new session: the `T#`s, and the slug when the repo has more than one slice. The full Next line still names `/crav1-build-walk` and `/crav1-build-tasks` for one task (1.143.0). Naming either command is not running it. Do not say `above`, `listed above`, or earlier output.
 
 ## Route first (1.119.0)
 
@@ -42,7 +42,7 @@ Open each file below from this skill's folder and follow it. Read [open-skill-fi
 4. Open `../crav1-resolve-open-questions/SKILL.md` (`/crav1-resolve-open-questions`).
 5. Open `../crav1-plan-from-spec/SKILL.md` (`/crav1-plan-from-spec`), which writes `plan.md` and `tasks.md`.
 6. Open `../crav1-review-plan/SKILL.md` (`/crav1-review-plan`), then Open `../crav1-tighten-plan/SKILL.md` (`/crav1-tighten-plan`). A spec-tagged finding is one jump-back card, then the walk continues. The rule is in [references/steps.md](references/steps.md) (1.135.0).
-7. Ready check. Run `<interpreter> -X utf8 scripts/walk_progress.py readiness --root <spec-folder> --write-map`, as `crav1-docs/reference/running-scripts.md` says, and print the script's lines. That rewrites `build-map.md`. Do not open `../crav1-tasks-ready-to-build/SKILL.md`. `/crav1-tasks-ready-to-build` stays the standalone command. This walk never writes `verify.md`.
+7. Ready check. Run `<interpreter> -X utf8 scripts/walk_progress.py readiness --root <spec-folder> --write-map`, as `crav1-docs/reference/running-scripts.md` says, and print the script's `ending`. That rewrites `build-map.md`. Do not open `../crav1-tasks-ready-to-build/SKILL.md`. `/crav1-tasks-ready-to-build` stays the standalone command. This walk never writes `verify.md`.
 
 A step with nothing to do says so, records that, and moves on. Optional offers are not steps. They are offered once, after open questions, when any apply. They are named in [references/steps.md](references/steps.md). After the plan, questions that still have no `Blocks:` line are offered there too, before that step is recorded.
 
@@ -52,7 +52,7 @@ The spec, the plan, and the tasks stay the source of truth. `walk-progress.md` o
 
 A checkbox tick, a `(PR n)` or `(done)` note on that task line, or `(PR n)` on a Match `Branch:` line does not reopen a step and does not ask to clear (1.138.0). Since 1.148.0 a spec edit reopens from the first step that owns the changed section. Say `reopen_line` once. The map is [references/section-reopen.md](references/section-reopen.md). The rule is [references/progress.md](references/progress.md).
 
-Do not report ready while a blocker, a reopened step, or an open assumption remains. A `ready-partial` result is not that report: some tasks can start, the held ones stay listed by build-map branch, and the walk records `Result: ready-partial` with no `not-ready` mark. The lists and the Next lines are in [references/readiness.md](references/readiness.md) (1.133.0). Do not start Build. This walk never writes `verify.md`. Do not create a git commit. Apply writes the playbook copy under `docs/playbooks/`; that write is not a git commit.
+Do not report ready while a blocker, a reopened step other than `tasks-ready-to-build`, or an open assumption remains. Running the ready check replaces that step's own record (1.150.0). A `ready-partial` result is not that report: some tasks can start, and `ending` prints each held line in that reply. The walk records `Result: ready-partial` with no `not-ready` mark. The lists and the Next lines are in [references/readiness.md](references/readiness.md) (1.133.0). Do not say `above`, `listed above`, or earlier output. Do not start Build. This walk never writes `verify.md`. Do not create a git commit. Apply writes the playbook copy under `docs/playbooks/`; that write is not a git commit.
 
 When the user stops partway, one line `Paused at <step>.` then the shared ending in [references/progress.md](references/progress.md). `Next` is this command, because the walk paused before `continue_from`.
 

@@ -2377,7 +2377,7 @@ def branch_report(root: Path, rows: list[dict]) -> dict | None:
         resolve_recorded=resolve_ever_recorded(root),
         repo=map_mod().find_repo(root),
     )
-    return map_mod().report_by_branch(built, rows)
+    return map_mod().report_by_branch(built, rows, slug=command_slug(root))
 
 
 REVIEWED_RE = re.compile(r"^Reviewed:\s*.*?P# open:\s*(\d+)", re.M)
@@ -2834,6 +2834,37 @@ def _slug(root: Path) -> str:
     return root.name
 
 
+def _only_spec(root: Path) -> bool:
+    """True when this folder is the only slice under docs/specs."""
+    parent = root.parent
+    if parent.name != "specs" or parent.parent.name != "docs":
+        return False
+    found = []
+    try:
+        children = list(parent.iterdir())
+    except OSError:
+        return False
+    for child in children:
+        if not child.is_dir() or child.name.startswith("_") or child.name == "retired":
+            continue
+        if any((child / name).is_file() for name in ("spec.md", "plan.md", "tasks.md")):
+            found.append(child)
+    return len(found) == 1 and found[0].resolve() == root.resolve()
+
+
+def command_slug(root: Path) -> str | None:
+    """Slug for a fresh-session command, or None when the repo has one slice.
+
+    A new chat has no earlier reply. The walk can see the repo. One slice
+    under docs/specs is that slice, so the command does not repeat the slug.
+    More than one slice, or a folder outside that layout, needs the slug.
+    """
+    if root is None or _only_spec(root):
+        return None
+    slug = _slug(root)
+    return slug or None
+
+
 def _wait_phrase(waiting: list[dict], noun: str) -> str:
     tasks: list[str] = []
     whos: list[str] = []
@@ -3040,6 +3071,54 @@ def gates_for(rows: list[dict]) -> list[dict]:
     return gates
 
 
+READY_STEP = "tasks-ready-to-build"
+REPLACED_RECORD = "The earlier tasks-ready-to-build record is replaced."
+
+
+def _without_self_reopen(reopened: list[dict]) -> tuple[list[dict], str | None]:
+    """The ready check does not block on its own stale record (1.150.0).
+
+    Running readiness reads the current spec, plan, and tasks, so that
+    step's staleness is cured by this run. Other reopened steps still block.
+    When this step was the only reopen, the earlier record is replaced by
+    the normal record confirm. Say that once.
+    """
+    others = [hit for hit in reopened if hit.get("step") != READY_STEP]
+    own = any(hit.get("step") == READY_STEP for hit in reopened)
+    replaced = REPLACED_RECORD if own and not others else None
+    return others, replaced
+
+
+def compose_ending(
+    result: str,
+    run_lines: list[str],
+    held_lines: list[str],
+    waiting: list[str],
+    next_lines: list[str],
+    because: str | None,
+    replaced: str | None,
+) -> str:
+    """The reply for a walk ending. Print this text. Do not point at earlier output.
+
+    Run next comes first on ready and ready-partial, before any Waiting line.
+    Each held line is in this text. A not-ready result has no Run next block.
+    """
+    parts: list[str] = []
+    if result in ("ready", "ready-partial") and run_lines:
+        parts.append("Run next:\n\n" + "\n\n".join(run_lines))
+    if held_lines:
+        parts.append("Held:\n" + "\n".join(held_lines))
+    if waiting:
+        parts.append("\n".join(waiting))
+    if result == "not-ready" and because:
+        parts.append(because)
+    if next_lines:
+        parts.append("\n".join(next_lines))
+    if replaced:
+        parts.append(replaced)
+    return "\n\n".join(parts)
+
+
 def next_for(result: str, can_start: list, waiting_next: str | None) -> str | None:
     """Fallback when the branch report has no ready line (1.143.0).
 
@@ -3089,7 +3168,8 @@ def readiness(args: argparse.Namespace) -> None:
             if hit["kind"] == "waiting":
                 row["bucket"] = "waiting"
     propagate_held(rows, hits)
-    reopened = reopened_hits(root) if root is not None else []
+    reopened_raw = reopened_hits(root) if root is not None else []
+    reopened, replaced = _without_self_reopen(reopened_raw)
     hits.extend(reopened)
     blockers = [h for h in hits if h["kind"] == "blocker" and not h["outside_walk"]]
     outside = [h for h in hits if h["outside_walk"]]
@@ -3106,6 +3186,7 @@ def readiness(args: argparse.Namespace) -> None:
     ready_lines = (report or {}).get("ready_lines") or []
     held_lines = (report or {}).get("held_lines") or []
     next_lines = (report or {}).get("next_lines") or []
+    run_lines = (report or {}).get("run_lines") or []
     later = [hit for hit in reopened if hit.get("step") != "resolve-open-questions"]
     resolve_open = next(
         (hit for hit in reopened if hit.get("step") == "resolve-open-questions"),
@@ -3145,6 +3226,24 @@ def readiness(args: argparse.Namespace) -> None:
     gap = verify_gap(root) if root is not None else {
         "behind": False, "tasks": [], "waiting": None, "stale_next": None,
     }
+    waiting_bits = []
+    if gap.get("waiting"):
+        waiting_bits.append(gap["waiting"])
+    if resolve_waiting:
+        waiting_bits.append(resolve_waiting)
+    if result == "not-ready" and not can_start and waiting_line:
+        waiting_bits.append(waiting_line)
+    if next_lines:
+        shown_next = list(next_lines)
+    elif nxt:
+        text = str(nxt)
+        shown_next = [text if text.startswith("Next:") else f"Next: {text}"]
+    else:
+        shown_next = []
+    shown_run = run_lines if result in ("ready", "ready-partial") else []
+    ending = compose_ending(
+        result, shown_run, held_lines, waiting_bits, shown_next, because, replaced,
+    )
     out = {
         "ok": True,
         "ready": ready,
@@ -3156,6 +3255,9 @@ def readiness(args: argparse.Namespace) -> None:
         "ready_lines": ready_lines,
         "held_lines": held_lines,
         "next_lines": next_lines,
+        "run_lines": shown_run,
+        "ending": ending,
+        "replaced": replaced,
         "gates": gates_for(rows),
         "next": nxt,
         "start_build": False,

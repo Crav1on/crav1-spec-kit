@@ -5,6 +5,7 @@ from __future__ import annotations
 import importlib.util
 import inspect
 import json
+import re
 import subprocess
 import sys
 import tempfile
@@ -151,6 +152,31 @@ class BatchOffer(unittest.TestCase):
             self.assertIn("this reply", text, rel)
             self.assertIn("table above", text, rel)
             self.assertIn("Never ask the card without the table", text, rel)
+
+    def test_walk_endings_print_held_lines_and_do_not_point_above(self):
+        """1.150.0: an ending prints held lines. It does not point at earlier output."""
+        files = (
+            ".cursor/skills/crav1/crav1-tighten-and-plan-ready-to-build/SKILL.md",
+            ".cursor/skills/crav1/crav1-tighten-and-plan-ready-to-build/references/readiness.md",
+            ".cursor/skills/crav1/crav1-tighten-and-plan-ready-to-build/references/progress.md",
+        )
+        pointer = re.compile(
+            r"listed above|as listed|earlier output|already named|"
+            r"the (?:table|list|lines|tasks|held).{0,40}\babove\b",
+            re.I,
+        )
+        ban = re.compile(r"\b(never|do not|don't|does not)\b", re.I)
+        for rel in files:
+            text = (ROOT / rel).read_text(encoding="utf-8")
+            for line in text.splitlines():
+                if pointer.search(line):
+                    self.assertRegex(line, ban, f"{rel}: {line}")
+        ready = (ROOT / files[1]).read_text(encoding="utf-8")
+        self.assertIn("Print the script's `ending`", ready)
+        self.assertIn("held line", ready)
+        self.assertIn("Run next:", ready)
+        self.assertIn("Do not say `above`, `listed above`, or earlier output.", ready)
+        self.assertNotIn("already named", ready)
 
     def test_the_shared_rule_names_the_command_and_the_example(self):
         page = (ROOT / "docs/reference/question-cards.md").read_text(encoding="utf-8")
