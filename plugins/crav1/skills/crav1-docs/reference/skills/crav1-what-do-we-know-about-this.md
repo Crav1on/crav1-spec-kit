@@ -8,6 +8,8 @@
 
 Answer one question about a feature, slice, resource, or not-yet-feature from the specs first.
 
+1.149.0: no matching slice, and a `report-` word, each open one references file. A named slice does not open them. The rules are unchanged.
+
 1.130.0: the apply offer at the end of a walk is one card. `yes (Recommended)` runs apply. Typed changes go on that card's free-text answer. There is no Edits option.
 
 1.145.0: that end card prints a findings table in the same reply before the card. The card names each item and its recommendation. It does not say `table above`. The card is not asked without the table.

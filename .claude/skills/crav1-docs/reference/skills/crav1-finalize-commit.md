@@ -8,6 +8,8 @@
 
 Draft the commit message, then commit, copy, change, or stop.
 
+1.149.0: the commit steps are read only after `commit` or `commit now`. The trailer-hook file is read only when that question is asked, or when a teammate has the hook and the config line is missing. The rules are unchanged.
+
 1.141.0: a merge of `spec.md` keeps every `Approved:` line under `## Approval needed`. The pull path never drops one.
 
 1.99.0: never commits implementation code on a base branch, even with `commit now`; the prompt becomes `Commit on a work branch?` (create `feat/<slug>` from the into branch and commit, an existing branch, another name, stop). Spec and doc commits on a base are unchanged.

@@ -35,17 +35,17 @@ A task downstream of an **Implemented, verify failed** task (it waits on it, dir
 | **Not implemented** | Still `- [ ]`, and it is not tick pending (or no code for this `T#`) |
 | **Claimed done, unverified** | `[x]` but evidence could not be run (no command, no browser). Also a ticked task whose `(branch: X)` is not the checkout: **Claimed done, unverified (on X, not checked out)** |
 
-**Tick pending (1.136.0).** That status is not Not implemented. Next skips every task the ready check already counts as done (ticked, or recorded merged) and names the first task that can start, one `Next:` line per ready branch, the same shape as the ready check. The open checkbox stays a Gap. After a passed check the report may offer the tick on its own line: `Tick pending: T2. Say yes to tick [x] in tasks.md.` Tick that one row only after that yes. Do not re-implement. The offer is an alternative exit. It does not replace the Next line for tasks that can start.
+Read `references/tick-pending.md` ("Tick pending") only when evidence passed, the row is still `[ ]`, and the pull request is recorded merged.
 
-**Host setup tasks (1.115.0).** A task marked `(host setup)` is **Implemented, verified** only when its script's `check` part, run now against the live host, prints `ok` for every setting (skill `crav1-host-setup`, `references/host-setup.md`). A written script that was not applied, or a `missing` line, is **Implemented, verify failed**. Not signed in to the host: **Claimed done, unverified**. Verify never runs `apply`.
+Read `references/host-setup-task.md` ("Host setup tasks") only when a task is marked `(host setup)` (1.115.0, skill `crav1-host-setup`).
 
 ## Branches (1.64.0)
 
-When the spec has work branches (its `Synced at` lines, Match `Branch:` list and task `(branch: …)` parts, minus base branches and `(dropped)` entries), work out the Branches line as skill `crav1-add-to-spec`, `references/branches.md` says: per repo, merged into its into branch or not, own commits since the fork point, `merged, branch deleted`, `branch rewritten since last read`, `unknown (branch gone)`, `(also in <slug>)` for a branch other specs list too, and the age of each remote copy. Use refs on disk; never fetch, never check out. Host checks only for GitHub (`gh`) and Azure DevOps (`az`) when already signed in. Report only: never change `Status:` or any spec line because of it.
+Read `references/work-branches.md` ("Work branches") only when the spec has work branches (its `Synced at` lines, Match `Branch:` list, or task `(branch: …)` parts, minus base branches and `(dropped)` entries).
 
-**Sub-branches and reverts (1.68.0).** As that file says under **Spec branch and sub-branches** and **Reverted**: sub-branches (entries with `(into <spec branch>)`) are left out of the Branches count and get `Sub-branches: <n> of <m> merged into <spec branch>.`, plus `left behind: <branch> (not in <spec branch>)` for one that never merged after the spec branch reached the base; done counts top-level branches only. A merged branch whose change was later undone on the base shows `<branch>: merged, reverted on <base> (<revert sha>)`. Both are report only and never block done. In verify.md they go with the Branches line in the TL;DR. "Demoable; they can ship / PR" needs every top-level branch merged, not every sub-branch.
+Read `references/sub-branches.md` ("Sub-branches and reverts") only when a branch entry has `(into <spec branch>)`, or a merged change was later undone on the base.
 
-**Promotion (1.69.0).** When the spec repo has `docs/environments/promotion.md`, add the `Promotion:` line after the Branches line, as skill `crav1-add-to-spec`, `references/branches.md` says under **Promotion**: per repo, the furthest environment reached and each later one not yet reached, as `on the branch that deploys to <env> (<branch>)` or `not yet on the branch that deploys to <env> (<branch>)`, release patterns as `on release/<x> (deploys to <env>)`, tag lines as `in tag <tag> (deploys to <env>)` or `not yet tagged`, the chain at the end, `Unclear:` for an unknown word with no `(after …)`, and `<branch>: not back on <base>` for a release fix. Branch reach, never `deployed to`. When a pipeline-sourced line is behind it, end with **Also check the latest pipeline runs?** (**Check pipeline runs** / **No, keep the git answer**); the choice word `pipeline runs` runs the check without asking; headless without it gives the git answer plus `Pipeline runs not checked. Add the word: pipeline runs.` Azure DevOps only, read-only; `az has no login` keeps the git answer. Report only: done stays merged into the base. In verify.md the Promotion line goes in the TL;DR under the Branches line.
+Read `references/promotion.md` ("Promotion") only when the spec repo has `docs/environments/promotion.md`, or the invocation has `pipeline runs`.
 
 Acceptance lines with **no** `T#` stay in the detail matrix as **missing** coverage — also list their ids in the TL;DR.
 
@@ -84,15 +84,15 @@ Same order as the file. Do **not** open with the full acceptance matrix.
 1. Path to `verify.md`
 2. **TL;DR** (copy the id lists and the Branches line; they should be scannable in a few seconds)
 3. Point at the Tasks overview in the file
-4. One `Next` line, the first case that applies, as `crav1-docs/reference/run-ending.md` says. Do not list the other cases. Do not run it. Add the Uncommitted line when `verify.md` changed and is not committed.
-   - Inner-loop ids remain (verify failed, claimed done unverified, or a wiring `G#`): `Next: /crav1-fix-build-gaps, because verify could not prove those ids.` A tick-pending Gap is not an inner-loop id. Omit Gap to walk them in order.
-   - Only not-implemented tasks remain: `Next: /crav1-build-tasks` for the first that can start, one line per ready branch, because they are not built. Do not name a ticked or recorded-merged task.
-   - An acceptance line has no task and should stay: `Next: /crav1-plan-from-spec, because that acceptance line has no task.`
-   - An acceptance line should die: `Next: /crav1-tighten-spec, because that acceptance line should not stay.`
-   - All verified, and a work branch is not merged: `Next: /crav1-open-pr, because a work branch is not merged yet.` Say `built and verified, not merged yet: <branches>`. A branch with `(PR <n>)` names it: `/crav1-open-pr` to push to PR <n> and update its description or comment.
-   - All verified and every work branch is merged: `Next: nothing needed now.` The spec is demoable.
+4. One `Next` line, the first case that applies, as `crav1-docs/reference/run-ending.md` says. Do not list the other cases. Do not run it. Add the Uncommitted line when `verify.md` changed and is not committed. Read only the file for that case:
+   - Read `references/next-fix.md` ("Fix the gaps") only when inner-loop ids remain (verify failed, claimed done unverified, or a wiring `G#`). A tick-pending Gap is not an inner-loop id.
+   - Read `references/next-build.md` ("Build what is left") only when only not-implemented tasks remain.
+   - Read `references/next-plan.md` ("Acceptance with no task") only when an acceptance line has no task and should stay.
+   - Read `references/next-tighten.md` ("Acceptance that should not stay") only when an acceptance line should die.
+   - Read `references/next-open-pr.md` ("Open a pull request") only when all are verified and a work branch is not merged. A branch with `(PR <n>)` names it: `/crav1-open-pr` to push to PR <n> and update its description or comment.
+   - Read `references/next-done.md` ("Nothing needed") only when all are verified and every work branch is merged.
 
-When `/crav1-build-walk` opened this skill, do not print the case line above. The walk prints its one line (1.142.0).
+Read `references/next-walk.md` ("Walk owns the next line") only when `/crav1-build-walk` opened this skill. Do not print the case line then.
 
 Do not start implementing in this turn unless they already named a `T#` to fix.
 
@@ -109,4 +109,4 @@ Do not start implementing in this turn unless they already named a `T#` to fix.
 
 ## Choice words (1.69.0)
 
-- Pipeline runs: `pipeline runs` (check the latest successful Azure DevOps runs behind the Promotion line without asking). There are no `--flags`.
+- Pipeline runs: `pipeline runs`. Read `references/promotion.md` ("Promotion") only when the invocation has that word. There are no `--flags`.

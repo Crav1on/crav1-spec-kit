@@ -96,6 +96,8 @@ No spec edit. No `plan.md`. No `tasks.md`. No marks. No application code.
 
 The answer leaves out an empty section. It does not pad. A guess is labeled `(inference, not in the docs)`.
 
+Since 1.149.0, `/crav1-what-do-we-know-about-this` answers a named slice from the skill file. No matching slice, and a `report-` word, each open one references file. Live reads still open only the section that applies.
+
 ## After
 
 When there is no slice, the answer names one next command. This command does not run it.

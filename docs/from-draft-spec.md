@@ -52,6 +52,8 @@ Questions only someone else can answer: draft them with [`/crav1-show-or-ask-ope
 
 Not written: application code, `plan.md`, `tasks.md`. Nothing is git-committed.
 
+Since 1.149.0, `/crav1-resolve-open-questions` shows the question and its options from the skill file. The patch, a single named question, a stale research point, and the empty-list ending are each read only when that case applies.
+
 ## After
 
 Commit the accepted spec if you want it in git before planning:

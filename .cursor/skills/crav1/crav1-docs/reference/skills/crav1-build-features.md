@@ -8,6 +8,8 @@
 
 Serial board: build several ready specs one slug after another in this checkout.
 
+1.149.0: the spec-branch skill opens only on `spec/<slug>`. The task-branch file opens only when the recommended name exists nowhere. A dirty tree, a parked spec, a worker status other than `done`, and the picture question are separate files. The rules are unchanged.
+
 1.141.0: a worker `needs_yes` is waiting. The parent offers the Approval needed item and does not write `Approved:`.
 
 Serial board of ready slugs: `feat/<slug>` from default, then that spec’s build-tasks loop; no parallel, no push, no PR.

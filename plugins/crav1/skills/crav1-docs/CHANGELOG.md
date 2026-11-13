@@ -2,6 +2,17 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.149.0 (2026-11-13)
+
+Branch rules stay in the kit and load only when that case applies. A minor release because a typical run no longer reads the cases that do not apply. The rules are unchanged. Each file is named from `SKILL.md` with a load-when line. `/crav1-review-pr` is unchanged: its verdict and hard rules are what a review still reads, and the host differences are already one-line pointers.
+
+- **Ready check.** `/crav1-tasks-ready-to-build` reads work branches, a sub-branch, promotion, a work item, a blocking plan risk, and a next line other than the ready list only when that case is true.
+- **Verify.** `/crav1-verify-build-against-spec` reads the branch line, sub-branches, promotion, tick pending, a host-setup task, and one next line only when that case is true.
+- **Several features.** `/crav1-build-features` opens the spec-branch skill only on `spec/<slug>`, and the task-branch file only when the recommended name exists nowhere. A dirty tree, a parked spec, a worker status other than `done`, and the picture question are separate files.
+- **What we know.** `/crav1-what-do-we-know-about-this` reads the no-slice file only when nothing matches, and the report-writes file only for a `report-` word.
+- **Commit.** `/crav1-finalize-commit` reads the commit steps only after `commit` or `commit now`.
+- **Questions.** `/crav1-resolve-open-questions` reads the patch, a single named question, a stale point, and the empty-list ending only when that case applies.
+
 ## 1.148.0 (2026-11-13)
 
 A spec edit during a tighten-and-plan walk reopens from the first step that owns the changed section. A minor release because resume no longer reopens every later step when the spec hash moves.
@@ -133,15 +144,5 @@ A spec finding during the tighten-and-plan walk can jump back to the spec, and a
 
 - **Jump back to the spec.** When `/crav1-review-plan` inside `/crav1-tighten-and-plan-ready-to-build` finds a problem that is really a spec defect (the plan requires a named person's yes to stop a prod function app, and the spec names no approver), the walk asks one question card. The recommended option runs `/crav1-tighten-spec` on that finding now. The walk opens `../crav1-tighten-spec/SKILL.md` and follows it, with that skill's own confirms. It then reruns the plan for the parts that finding changed, reviews and tightens the plan, and runs the ready check. It does not pause. The other option keeps the finding as an open point and continues. The same finding is offered once. If it comes back, the walk records an open point and continues. `walk-progress.md` records `- Jump-back:` and `Continue:`. A plan finding that is not a spec defect stays in `/crav1-tighten-plan`.
 - **verify.md behind.** The ready check compares `tasks.md` with `verify.md`. `build-map.md` stays the file `/crav1-tasks-ready-to-build` writes, and the walk's ready check still refreshes it. `verify.md` stays with `/crav1-verify-build-against-spec`. The walk never runs that command and never writes `verify.md`. When a task is ticked, or its pull request is recorded merged, and `verify.md` still lists it as not implemented, or the `Next:` line in `verify.md` names a task that is ticked or merged, the check flags `verify.md` as behind. It does not show that Next line. It adds `Waiting: /crav1-verify-build-against-spec orders-api - verify.md is behind tasks.md (T2, T45)`.
-
-## 1.134.0 (2026-11-11)
-
-A skill that runs another kit skill opens that skill's file. Command-only stays on. A minor release because a guided walk and several chaining skills change how they start the next skill.
-
-- **Open the file.** Almost every kit skill has `disable-model-invocation: true`, so it runs when a person types the command. `/crav1-tighten-and-plan-ready-to-build` and the other skills that run a kit skill were trying to start that command. The host refused, and the run stopped. Those skills now name the file from this skill's folder, for example `../crav1-review-architecture/SKILL.md`, and the agent opens it with the file-read tool and follows it. It does not start a slash command or a skill tool. If a start is refused because the skill is command-only, the agent opens the file and continues. That refusal is not a reason to stop the walk.
-- **One rule.** The path and the refusal rule live in [Opening another kit skill](docs/reference/open-skill-file.md). The same sibling path is the installed file on Claude Code (`.claude/skills/crav1-<name>/SKILL.md`), the Cursor drop-in (`.cursor/skills/crav1/crav1-<name>/SKILL.md`), and the Cursor plugin (`skills/crav1-<name>/SKILL.md`).
-- **Who opens a file.** The walk's locked steps, extras, jump back, and playbook apply. `/crav1-build-features` for the T# loop and branch rules. `/crav1-update-specs-from-changes-and-prs` for each add-to-spec item. `/crav1-read-environment` for a confirmed system, architecture, match, or left-out section. `/crav1-suggest-tests-for-code` for a kept suggestion. Apply's kept items follow add-to-spec's fact rules.
-- **Who does not.** `/crav1-fix-bug` still names the lane and does not open that skill. The add-to-spec PR record, merge-safe formats, and picture offer name other skills and do not open them. A `Next:` line is still not a start.
-- **Command-only stays.** `disable-model-invocation: true` is unchanged on the step skills.
 
 The newest 15 releases are above. The full changelog is https://github.com/Crav1on/crav1-spec-kit/blob/main/CHANGELOG.md.

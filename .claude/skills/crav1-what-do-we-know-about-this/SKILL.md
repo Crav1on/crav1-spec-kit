@@ -36,6 +36,8 @@ Route first, load second. Check the message for one word `report-<type>-<depth>`
 
 **Walk (1.116.0, chat 1.117.0):** after `report-playbook-full`, ask `Walk through it now?`. On yes, or for `report-playbook-walk`, read `references/walk.md` and walk in chat. Chat does not use item ids; the report keeps them, and `go to N9` still jumps. Headless: never walk; say how to resume.
 
+Read `references/report-writes.md` ("Report writes") only when the message has a `report-` word.
+
 That one report file names its sections and the only diagrams to draw. Feature, change, and build reports go outside the project. A playbook's first write does too; apply copies a filled one to `docs/playbooks/`. `report-data-model-full` writes one new immutable snapshot under the saved model and does not edit the model. The chat always links or attaches the file.
 
 ## Input
@@ -72,15 +74,7 @@ A hit only in code, in `docs/architecture/spec.md`, or in `docs/environments/mar
 
 A code-only hit, with no spec and no architecture note, is also case 3. Show what the code says. Fill in **Unexplained**.
 
-Nothing anywhere: say so. Name `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, or `/crav1-bundle-to-specs`. Do not run them.
-
-When case 3 has enough written down to pick one command, name that one:
-
-- One or two sentences: `/crav1-spark-to-spec`
-- A pile of ideas and technical hunches: `/crav1-ideas-to-spec`
-- Several features, or mixed files: `/crav1-bundle-to-specs`
-
-When nothing is written down, name those three and stop. Do not pick one.
+Read `references/no-slice.md` ("No slice") only when no slice matches.
 
 ## Match, one pass
 
@@ -122,15 +116,11 @@ Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-spe
 - Exact name first. Key words only when the exact name misses. Spec titles and Match quotes weigh highest.
 - One pass picks the slice. No second search, and no hunt through the whole codebase. An `@` keeps that search inside that path. Later reads of that slice are not another pass. Do not run `/crav1-pr-status`.
 - One winning slice: answer and name the path. Two or more close hits: list every one and ask. Do not guess.
-- No slice: say so, show what is known, present a candidate, and name spark, ideas, or intake. Do not run it.
-- Minutes or a long dump: name `/crav1-add-to-spec` and stop.
-- Live reads come after the repo part. Tag each live fact `Live read.`
-- When the git remote is not Azure Repos and `docs/environments/marks.md` does not name the Azure DevOps org and project, derive them from Azure DevOps URLs in `docs/system/repos.md`. Then read work items, open pull requests, and branches the same way. Tag each fact `Live read.`
-- Before reporting `az` as not installed, check the default install paths on Windows, macOS, and Linux. Use that path when it is there.
-- Production is shape and connections only, after the same yes or no as `/crav1-read-environment`. Never data. Never a secret value. Never a row or a blob.
-- A failed live read is one prompt: the issue, a fix when there is one, Retry or Skip. Skip is the repo-only answer, with why the live checks did not run.
-- A focus still runs the full read. The answer shows only those sections.
+- No slice: `references/no-slice.md`, only when no slice matches.
+- Minutes or a long dump: `references/inputs.md`, only when the input is minutes or a dump. Name `/crav1-add-to-spec` and stop.
+- Live reads come after the repo part. Tag each live fact `Live read.` The Azure DevOps, `az` path, production, and failed-read rules are the matching sections of `references/live-reads.md`, only the section that applies.
+- A focus still runs the full read. The answer shows only those sections. The sections are `references/focus.md`, only when the question names a focus.
 - People come from what is written. A guess is labeled `(inference, not in the docs)`.
-- Feature, change, and build reports write nothing in the project. Playbook apply copies a filled file to `docs/playbooks/` (1.120.0). `report-data-model-full` writes one new snapshot and does not edit the model. During a walk that report is the only file written. Do not run another skill, except `apply` on yes at the end of a walk, for filled confirmed lines only. Do not start `/crav1-help`.
-- Do not start Specify, Plan, or Build.
+- Report writes: `references/report-writes.md`, only when the message has a `report-` word.
+- Do not start Specify, Plan, or Build. Do not start `/crav1-help`.
 - Later skill. Not a starter option. Asking for startup options names only the six and does not run this command.
