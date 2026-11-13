@@ -108,7 +108,7 @@ Install:
 - [Guild routing](guild-routing.md). Which lane each command belongs to.
 - [Environment marks](environments-marks.md). The line format of `docs/environments/marks.md`.
 - [Promotion lines](environments-promotion.md). The line format of `docs/environments/promotion.md` and the `Promotion:` status line (1.69.0).
-- [Changelog](../CHANGELOG.md).
+- [Changelog](../CHANGELOG.md). Full history in this repo. An install bundles the newest 15 releases in `crav1-docs/CHANGELOG.md`.
 
 ### Explanation
 
@@ -156,7 +156,7 @@ You change the kit itself.
 1. [Contributing](../CONTRIBUTING.md)
 2. [Agent instructions for this repo](../AGENTS.md)
 3. [`skills.yaml`](reference/skills.yaml) and the generator `scripts/gen-skill-docs.py`
-4. [Changelog](../CHANGELOG.md)
+4. [Changelog](../CHANGELOG.md) (full history; installs bundle the newest 15)
 
 ## Renamed skills (1.56.0)
 

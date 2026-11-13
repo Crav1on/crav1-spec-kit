@@ -16,8 +16,9 @@ mkdir -p "$PLUGIN/skills" "$PLUGIN/agents" "$PLUGIN/rules" "$PLUGIN/agent-assets
 rm -rf "$ROOT/.cursor/skills/crav1/crav1-docs"
 mkdir -p "$ROOT/.cursor/skills/crav1/crav1-docs"
 cp -a "$ROOT/docs/." "$ROOT/.cursor/skills/crav1/crav1-docs/"
-# CHANGELOG travels with the docs so /crav1-help can answer "whats new" locally.
-cp -a "$ROOT/CHANGELOG.md" "$ROOT/.cursor/skills/crav1/crav1-docs/CHANGELOG.md"
+# Bundled CHANGELOG is the newest 15 releases so /crav1-help can answer
+# "whats new" locally. The repo-root file stays the full history.
+python3 "$ROOT/scripts/slice-changelog.py" --write "$ROOT/.cursor/skills/crav1/crav1-docs/CHANGELOG.md"
 rm -rf "$PLUGIN/docs"
 
 # skills: replace tree
