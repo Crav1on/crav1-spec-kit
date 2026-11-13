@@ -11,13 +11,16 @@ The source date is the quote's date. The accepted date is the day this run
 accepted it. An earlier quote does not count until `write --yes`.
 
 Usage:
-  approval_needed.py <spec.md> [tasks.md]
+  approval_needed.py <spec.md-or-spec-folder> [tasks.md]
   approval_needed.py show --root <spec-folder> --person ... --source-date ... --source ... --quote ... --recorder ... --accepted ...
   approval_needed.py write --root <spec-folder> ... --yes
   approval_needed.py add-item --root <spec-folder> --person ... --what ... --holds T4,T5 --yes
 
-Standard library only. Line endings of a file it edits stay as they were.
-`show` writes nothing. `write` and `add-item` write only with `--yes`.
+A folder argument uses <folder>/spec.md, and a sibling tasks.md when the
+second argument is omitted. A missing file is a one-line error and exit 2.
+Exit 0 on success. Nonzero only for a real error. Standard library only.
+Line endings of a file it edits stay as they were. `show` writes nothing.
+`write` and `add-item` write only with `--yes`.
 """
 import json
 import re
@@ -375,7 +378,19 @@ def _find_item(spec_text: str, person: str | None, item_prefix: str | None, task
     return hits
 
 
+def _as_file(path: Path | str, name: str):
+    """A folder uses <folder>/<name>. A missing file is a one-line error."""
+    target = Path(path)
+    if target.is_dir():
+        target = target / name
+    if not target.is_file():
+        return None, f"{name} not found: {target}"
+    return target, None
+
+
 def _spec_path(root: Path) -> Path:
+    if root.is_file():
+        return root
     return root / "spec.md"
 
 
@@ -648,8 +663,29 @@ def main(argv: list[str]) -> int:
         return cmd_write(argv[1:])
     if argv[0] == "add-item":
         return cmd_add(argv[1:])
-    spec = Path(argv[0]).read_text(encoding="utf-8")
-    tasks = Path(argv[1]).read_text(encoding="utf-8") if len(argv) > 1 else ""
+    spec_path, err = _as_file(argv[0], "spec.md")
+    if err:
+        return _fail("spec", err)
+    try:
+        spec = spec_path.read_text(encoding="utf-8")
+    except OSError:
+        return _fail("spec", f"cannot read {spec_path}")
+    tasks = ""
+    if len(argv) > 1:
+        tasks_path, err = _as_file(argv[1], "tasks.md")
+        if err:
+            return _fail("tasks", err)
+        try:
+            tasks = tasks_path.read_text(encoding="utf-8")
+        except OSError:
+            return _fail("tasks", f"cannot read {tasks_path}")
+    else:
+        sibling = spec_path.parent / "tasks.md"
+        if sibling.is_file():
+            try:
+                tasks = sibling.read_text(encoding="utf-8")
+            except OSError:
+                tasks = ""
     _emit(analyse(spec, tasks))
     return 0
 

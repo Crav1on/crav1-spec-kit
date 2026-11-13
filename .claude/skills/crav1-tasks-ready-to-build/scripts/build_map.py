@@ -12,10 +12,14 @@ when the task line names no branch.
 branch. Later lines say where it came from (`source: task line`,
 `source: build map`, or `source: new`), the `from:` base when the task line
 states one, and `because:` when a merged or deleted branch was skipped.
-A merged branch (its pull request is recorded merged, or its tip is already
-in the base or the default branch) is not offered. A branch deleted locally
-and on the remote is not offered. A name that does not exist yet is offered
-so it can be created. Tasks that resolve to the same name share a row.
+A merged branch is not offered only when git proves its tip is already in
+the base or the default branch. A recorded merge in the specs is not
+enough to skip the name when git cannot tell, or shows the tip is not
+contained. The task-line branch then stays. A branch deleted locally and
+on the remote is not offered. A name that does not exist yet is offered
+so it can be created. A fallback name is short and does not use a
+person's name from the task line. Tasks that resolve to the same name
+share a row.
 
 A task id written in a step, or `(step: <n>)` on the task, is the link.
 `(step:)` wins when both are present.
@@ -175,14 +179,27 @@ def clean_prose(text, names=None):
     return text.strip(" ,;")
 
 
-def _trim80(text):
+def _trim80(text, ellipsis=False):
     text = re.sub(r"\s+", " ", text or "").strip()
     if len(text) <= 80:
         return text
     cut = text[:80]
     if " " in cut:
         cut = cut.rsplit(" ", 1)[0]
-    return cut.rstrip(" ,;.") or text[:80].rstrip()
+    cut = cut.rstrip(" ,;.") or text[:80].rstrip()
+    if ellipsis and cut != text:
+        return cut + "..."
+    return cut
+
+
+def _readable(text):
+    """First readable words: marks, branch names, and empty ticks are dropped."""
+    text = MARKER.sub(" ", text or "")
+    text = HOST_MARK.sub(" ", text)
+    text = NAMED_BRANCH.sub(" ", text)
+    text = re.sub(r"`+", " ", text)
+    text = re.sub(r"\s+", " ", text).strip(" ,;.:")
+    return text
 
 
 def task_label(task_id, short):
@@ -191,17 +208,15 @@ def task_label(task_id, short):
     return f"T{task_id} {name}"
 
 
-def ready_next_line(labels, branch_name):
-    """One Next for a ready branch (1.143.0).
+def ready_next_line(labels, branch_name, slug=None):
+    """One Next for a ready branch (1.152.0).
 
-    Recommends the build walk, with the T number beside each short name.
-    Names build-tasks as the way to build one task without the walk.
+    Same shape as Run next: the command alone in a code span, with the slug
+    when the caller passes one, and the branch and task names on the next
+    line. The build-tasks sentence is a line of its own, not on the command.
     """
-    named = ", ".join(labels)
-    return (
-        f"Next: /crav1-build-walk {named}, because that work is on {branch_name}. "
-        "/crav1-build-tasks builds one task without the walk."
-    )
+    entry = run_entry(labels, branch_name, slug=slug)
+    return entry + "\n/crav1-build-tasks builds one task without the walk."
 
 
 def run_entry(labels, branch_name, slug=None):
@@ -229,14 +244,26 @@ def run_entry(labels, branch_name, slug=None):
     return f"`{command}`\n{detail}"
 
 
-def short_name(rest, work_title=None):
+def short_name(rest, work_title=None, trim=True):
     """A task's short name: its work-item title, else the text up to the first cut.
 
     Cuts are ` (`, `, in `, and the end of the sentence, whichever comes first.
-    Kit marks and branch prefixes are dropped. The result is at most 80 characters.
+    Kit marks, branch prefixes, and leftover backticks are dropped. The
+    result is never blank. When `trim` is true the name is at most 80
+    characters, cut at a word boundary with an ellipsis.
     """
-    if work_title:
-        return _trim80(work_title) or "work"
+    def finish(text):
+        cleaned = _readable(text)
+        if not cleaned:
+            cleaned = _readable(rest)
+        if not cleaned:
+            return "work"
+        if trim:
+            return _trim80(cleaned, ellipsis=True) or "work"
+        return cleaned
+
+    if work_title and _readable(work_title):
+        return finish(work_title)
     text = MARKER.sub(" ", rest or "")
     text = HOST_MARK.sub(" ", text)
     text = re.sub(r"\s+", " ", text).strip()
@@ -248,8 +275,7 @@ def short_name(rest, work_title=None):
     if cuts:
         text = text[:min(cuts)]
     text = NAMED_BRANCH.sub(" ", text)
-    text = re.sub(r"\s+", " ", text).strip(" ,;.")
-    return _trim80(text) or "work"
+    return finish(text)
 
 
 def work_item_titles(text):
@@ -361,12 +387,14 @@ def task_line_choice(task):
     return None, None
 
 
-_PR_MARK = re.compile(r"\(PR\s+\d+", re.I)
-_MERGED_WORD = re.compile(r"\bmerged\b", re.I)
+# A recorded merge ties `merged` to the PR mark itself, as in `(PR 78, merged)`
+# or `(PR 78) merged`. A future line such as `(PR 12) ... to be merged into
+# develop` is not a recorded merge.
+_PR_MERGED = re.compile(r"\(PR\s+\d+\s*(?:,\s*merged|merged|\)\s*merged)\b", re.I)
 
 
 def _pr_merged_line(line):
-    return bool(_PR_MARK.search(line or "") and _MERGED_WORD.search(line or ""))
+    return bool(_PR_MERGED.search(line or ""))
 
 
 def task_records_merge(task):
@@ -497,25 +525,26 @@ def _reflog_mentions(repo, name):
 
 
 def branch_fate(name, spec_text, tasks_text, repo, stated):
-    """`ok`, `absent`, `merged`, or `deleted`.
+    """`ok`, `absent`, `merged`, `deleted`, or `unchecked`.
 
     `absent` means the name is not on disk and was not checked out here, so
-    it can be created. `merged` means a recorded merged pull request, or a
-    tip already contained in the base or the default branch. `deleted` means
-    the branch was checked out here and is now gone locally and on every
-    remote. No fetch.
+    it can be created. `merged` means git proves the tip is already in the
+    base or the default branch. A recorded merge in the specs is not enough
+    to skip the name when git is missing, offline, or shows the tip is not
+    contained. `deleted` means the branch was checked out here and is now
+    gone locally and on every remote. `unchecked` means git could not tell
+    (no repo, or no tips and not a recorded deletion). No fetch.
     """
     if not name:
         return "absent"
-    recorded = name in merged_branch_names(spec_text, tasks_text)
     if repo is None:
-        return "merged" if recorded else "ok"
+        return "unchecked"
     tips = _branch_tips(repo, name)
     if tips and any(_strictly_contained(repo, tip, base) for tip in tips for base in _base_tips(repo, stated)):
         return "merged"
-    if recorded:
-        return "merged"
-    if not tips and _reflog_mentions(repo, name):
+    if tips:
+        return "ok"
+    if _reflog_mentions(repo, name):
         return "deleted"
     if not tips:
         return "absent"
@@ -527,12 +556,30 @@ def _why(name, fate):
         return f"{name} is already merged"
     if fate == "deleted":
         return f"{name} was deleted locally and on the remote"
+    if fate == "unchecked":
+        return f"could not check whether {name} is merged"
     return None
 
 
-def _fresh_name(slug, label, used, avoided):
+PERSON_NAME = re.compile(r"\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)\b")
+
+
+def drop_names(text):
+    """Drop capitalized person-name sequences from free text used in a slug."""
+    return PERSON_NAME.sub(" ", text or "")
+
+
+def _fresh_name(slug, label, used, avoided, task_id=None):
+    """A short fallback branch. Never built from a person's name."""
     blocked = set(used) | {name for name in avoided if name}
-    base = f"feat/{kebab(slug, 6)}-{kebab(label)}"
+    slug_part = kebab(slug, 4)
+    label_part = kebab(drop_names(label), 2, fallback="")
+    if label_part:
+        base = f"feat/{slug_part}-{label_part}"
+    elif task_id is not None:
+        base = f"feat/{slug_part}-t{task_id}"
+    else:
+        base = f"feat/{slug_part}-work"
     name = base
     n = 2
     while name in blocked:
@@ -542,11 +589,11 @@ def _fresh_name(slug, label, used, avoided):
     return name
 
 
-def kebab(text, limit=4):
-    words = re.findall(r"[a-z0-9]+", clean_prose(text).lower())
+def kebab(text, limit=4, fallback="work"):
+    words = re.findall(r"[a-z0-9]+", clean_prose(drop_names(text)).lower())
     words = [w for w in words if w not in STOP]
     if not words:
-        words = ["work"]
+        return fallback
     return "-".join(words[:limit])
 
 
@@ -801,12 +848,16 @@ def _explicit(task):
     return None
 
 
-def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text="", resolve_recorded=False, repo=None):
+def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text="", resolve_recorded=False, repo=None, claims_text=""):
     """Return markdown, a short chat summary, and the one-line pointer."""
     tasks = parse_tasks(tasks_text)
     titles = work_item_titles(work_item_text)
     name_of = {
         task["id"]: short_name(task.get("rest") or task["title"], titles.get(task["id"]))
+        for task in tasks
+    }
+    full_of = {
+        task["id"]: short_name(task.get("rest") or task["title"], titles.get(task["id"]), trim=False)
         for task in tasks
     }
     steps = parse_steps(plan_text if plan_text is not None else "")
@@ -820,7 +871,10 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text
     risks = question_blocks.risks(plan_text or "", questions) if has_plan else []
     risk_blocks = any(row["blocks_slice"] for row in risks)
     analysed = task_order.analyse(tasks)
+    if claims_text:
+        task_order.apply_claim_holds(analysed, tasks, claims_text)
     rows = {row["id"]: row for row in analysed["rows"]}
+    claimed_ids = {row["id"] for row in (analysed.get("waiting_in_progress") or [])}
     by_id = {task["id"]: task for task in tasks}
     step_by_n = {step["n"]: step for step in steps}
     mentioned = {}
@@ -888,22 +942,30 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text
         because = None
         # A ticked task stays on the branch where that work landed. So does a
         # task whose own line records the merge: the map shows that branch.
-        # The offer for every open task still skips a merged or deleted name
-        # (1.140.0). A task that is not that merged work is moved on the map too.
+        # The offer skips only a name git proves merged or deleted (1.152.0).
+        # The task-line branch always wins over an invented name when git
+        # cannot tell, or shows the tip is not in the base.
         if not task["done"]:
             fate = branch_fate(planned, spec_text, tasks_text, repo, base or line_base)
-            if fate in ("merged", "deleted"):
+            if fate == "unchecked" and source == "task line" and planned in merged_branch_names(spec_text, tasks_text):
+                because = _why(planned, fate)
+            elif fate in ("merged", "deleted"):
                 because = _why(planned, fate)
                 alt = step_name if source == "task line" and step_name and step_name != planned else None
                 alt_fate = branch_fate(alt, spec_text, tasks_text, repo, None) if alt else None
-                if alt and alt_fate not in ("merged", "deleted"):
+                if alt and alt_fate not in ("merged", "deleted", "unchecked"):
                     chosen, offer_source, offer_base = alt, "build map", None
+                elif source == "task line" and fate != "deleted" and repo is None:
+                    # Offline: keep the task-line branch; do not invent a name.
+                    chosen, offer_source, offer_base = planned, source, base
+                    because = _why(planned, "unchecked")
                 else:
                     chosen = _fresh_name(
                         slug,
                         task.get("rest") or task["title"],
                         used_names,
                         {planned, alt},
+                        task_id=task["id"],
                     )
                     offer_source, offer_base = "new", line_base
         on_map = planned if (task["done"] or task_records_merge(task)) else chosen
@@ -932,9 +994,12 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text
         shown = []
         for task in members:
             plain = name_of.get(task["id"]) or "work"
+            full = full_of.get(task["id"]) or plain
             label = task_label(task["id"], plain)
             task["short"] = plain
+            task["full"] = full
             task["label"] = label
+            task["run_label"] = task_label(task["id"], full)
             if task["done"]:
                 evidence = done_evidence(task, name, prs, verify_text)
                 shorts.append(f"~~{plain}~~ ✓ done ({evidence})")
@@ -1041,7 +1106,12 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text
             continue
         if branch["waits"] and all(by_name[name]["status"] == "done" for name in branch["waits"]):
             branch["status"] = "ready"
-    held_names = {branch["name"] for branch in branches if branch["status"] == "waiting on a question"}
+    for branch in branches:
+        open_ids = [task["id"] for task in branch["tasks"] if not task["done"]]
+        if open_ids and all(task_id in claimed_ids for task_id in open_ids) and branch["status"] == "ready":
+            branch["status"] = "held"
+            branch["held_on"] = [f"T{task_id}" for task_id in open_ids]
+    held_names = {branch["name"] for branch in branches if branch["status"] in ("waiting on a question", "held")}
     changed = True
     while changed:
         changed = False
@@ -1117,17 +1187,18 @@ def _task_number(task_id):
         return int(match.group(1))
 
 
-def recommendation(slug, spec_text, plan_text, tasks_text, task_id, work_item_text="", repo=None):
+def recommendation(slug, spec_text, plan_text, tasks_text, task_id, work_item_text="", repo=None, claims_text=""):
     """The branch to offer for one open task, or None when that task is not open.
 
     `name` is the branch. `source` is `task line`, `build map`, or `new`.
     `base` is the `from` base on the task line, or None. `because` is one
-    plain line when a merged or deleted branch was skipped, or None.
+    plain line when a merged or deleted branch was skipped, or when git
+    could not check a task-line branch, or None.
     """
     task_id = _task_number(task_id)
     if task_id is None:
         return None
-    result = build(slug, spec_text, plan_text, tasks_text, work_item_text, repo=repo)
+    result = build(slug, spec_text, plan_text, tasks_text, work_item_text, repo=repo, claims_text=claims_text)
     offer = (result.get("offers") or {}).get(task_id)
     return dict(offer) if offer else None
 
@@ -1142,9 +1213,9 @@ def format_offer(offer):
     return "\n".join(lines)
 
 
-def recommended_branch(slug, spec_text, plan_text, tasks_text, task_id, work_item_text="", repo=None):
+def recommended_branch(slug, spec_text, plan_text, tasks_text, task_id, work_item_text="", repo=None, claims_text=""):
     """The branch `--recommend` offers for one open task, or None."""
-    offer = recommendation(slug, spec_text, plan_text, tasks_text, task_id, work_item_text, repo=repo)
+    offer = recommendation(slug, spec_text, plan_text, tasks_text, task_id, work_item_text, repo=repo, claims_text=claims_text)
     return offer["name"] if offer else None
 
 
@@ -1263,10 +1334,10 @@ def report_by_branch(built, rows, slug=None):
     ready_branches = []
     for group in ready_groups:
         labels = [
-            task.get("label") or task_label(task["id"], task.get("short"))
+            task.get("run_label") or task.get("label") or task_label(task["id"], task.get("full") or task.get("short"))
             for task, _row in group["items"]
         ]
-        next_lines.append(ready_next_line(labels, group["branch"]["name"]))
+        next_lines.append(ready_next_line(labels, group["branch"]["name"], slug=slug))
         run_lines.append(run_entry(labels, group["branch"]["name"], slug=slug))
         ready_branches.append({
             "branch": group["branch"]["name"],
@@ -1325,13 +1396,15 @@ def _ready_now(branch):
 def parallel_phrase(members):
     """How many branches in a wave can start now, and how many tasks are done.
 
-    Always `N branch(es), M can start now`. A question hold, a hold that
-    waits on one, and a branch whose tasks are all done are not a start.
-    When the wave has done tasks, the heading adds `, K done`.
+    Always `N branch(es), M can start now`. Only a branch whose status is
+    `ready` counts as able to start, the same rule as the ready check: a
+    question hold, a hold that waits on one, a claimed branch, a branch
+    that waits in order, a blocked branch, and a branch whose tasks are
+    all done are not a start. When the wave has done tasks, the heading
+    adds `, K done`.
     """
     count = len(members)
-    not_start = {"waiting on a question", "held", "done"}
-    start = sum(1 for branch in members if branch["status"] not in not_start)
+    start = sum(1 for branch in members if branch["status"] == "ready")
     done_tasks = sum(1 for branch in members for task in branch["tasks"] if task.get("done"))
     noun = "branch" if count == 1 else "branches"
     text = f"{count} {noun}, {start} can start now"
@@ -1563,17 +1636,18 @@ def run_dir(directory, chat=False, stdout=False, recommend=None):
     plan = _read(directory / "plan.md")
     work = _read(directory / "work-item.md") or ""
     verify = _read(directory / "verify.md") or ""
+    claims = _read(directory / "claims.md") or ""
     progress = directory / "walk-progress.md"
     resolve_recorded = False
     if progress.is_file():
         resolve_recorded = "- Step: resolve-open-questions" in progress.read_text(encoding="utf-8")
     repo = find_repo(directory)
     if recommend:
-        offer = recommendation(slug, spec, plan, tasks, recommend, work, repo=repo)
+        offer = recommendation(slug, spec, plan, tasks, recommend, work, repo=repo, claims_text=claims)
         if not offer:
             return f"No open task {recommend}.", 2
         return format_offer(offer), 0
-    result = build(slug, spec, plan, tasks, work, verify, resolve_recorded=resolve_recorded, repo=repo)
+    result = build(slug, spec, plan, tasks, work, verify, resolve_recorded=resolve_recorded, repo=repo, claims_text=claims)
     if not stdout:
         (directory / "build-map.md").write_text(result["markdown"], encoding="utf-8")
     if stdout and not chat:

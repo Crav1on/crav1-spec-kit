@@ -153,8 +153,9 @@ class MergedAndDeleted(unittest.TestCase):
                 "- Branch: orders-api feat/orders-one-commit-cleanup-main (PR 78) merged\n"
             )
             marked = bm.recommendation("orders", recorded, plan, tasks, 1)
-            self.assertNotEqual(marked["name"], "feat/orders-one-commit-cleanup-main")
-            self.assertIn("already merged", marked["because"])
+            # No git proof: a recorded merge in the specs does not skip the name.
+            self.assertEqual(marked["name"], "feat/orders-one-commit-cleanup-main")
+            self.assertIsNone(marked["because"])
 
             same_tip = "- [ ] T1: Start the scripts on feat/orders-fresh from main\n"
             fresh = bm.recommendation("orders", SPEC, plan, same_tip, 1, repo=repo)
@@ -178,8 +179,10 @@ class MergedAndDeleted(unittest.TestCase):
             mapped = bm.build("orders", own, own_plan, own_tasks)["markdown"]
             self.assertIn("### feat/orders-export", mapped)
             own_offer = bm.recommendation("orders", own, own_plan, own_tasks, 2)
-            self.assertNotEqual(own_offer["name"], "feat/orders-export")
-            self.assertIn("already merged", own_offer["because"])
+            # Offline: keep the task-line branch and say git could not check.
+            self.assertEqual(own_offer["name"], "feat/orders-export")
+            self.assertEqual(own_offer["source"], "task line")
+            self.assertIn("could not check whether feat/orders-export is merged", own_offer["because"])
 
     def test_deleted_branch_is_not_recommended(self):
         with tempfile.TemporaryDirectory() as tmp:

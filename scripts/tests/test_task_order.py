@@ -18,7 +18,7 @@ def run(text, failed=()):
 class TaskOrder(unittest.TestCase):
     def test_golden_xbid(self):
         res = run((FIX / "xbid-tasks.md").read_text())
-        self.assertEqual(to.render(res) + "\n", (FIX / "xbid-expected.txt").read_text())
+        self.assertEqual(to.render(res, full=True) + "\n", (FIX / "xbid-expected.txt").read_text())
 
     def test_xbid_from_start(self):
         text = (FIX / "xbid-tasks.md").read_text().replace("- [x] T1", "- [ ] T1")

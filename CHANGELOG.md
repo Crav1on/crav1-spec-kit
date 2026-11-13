@@ -2,6 +2,17 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.152.0 (2026-11-13)
+
+The ready check keeps the branch on the task line, and its printed commands work in a new session. A minor release because the map, the Next lines, and the script commands a ready check runs all change.
+
+- **Task-line branch.** A branch counts as merged only when git proves its tip is already in the base or the default branch. A line that only mentions a future merge, such as `(PR 12) to be merged into develop`, is not a recorded merge. When git cannot tell, or shows the tip is not in the base, the task-line branch stays. A fallback name is short and does not use a person's name from the task line.
+- **Script paths.** Every skill whose docs run `scripts/repo_sync.py` or `scripts/claims.py` now ships a thin wrapper to the build-walk copy. `approval_needed.py`, `question_blocks.py`, `task_order.py`, and `build_map.py` accept a spec folder or a file. A missing file is a one-line error and a nonzero exit. `question_blocks.py` exits 0 when questions are found, and nonzero only for a real error. The documented-invocation check fails when a skill documents `scripts/<name>.py` and that file is not in the skill folder, unless the paragraph names another skill that has it.
+- **Titles and Next.** A task label never prints blank. Leftover backticks fall back to the first readable words, or `work`. Short names cut at a word boundary with an ellipsis. Run next and the Next lines use the untrimmed name. Each Next line matches Run next: the command alone in a code span, with the slug when `docs/specs` has several slices, and the branch and task on the next line. `/crav1-build-tasks` stays on a line of its own.
+- **Shorter output.** `task_order.py` prints short labels by default. Pass `--full` for the complete title.
+- **Can start now.** The map summary's `M can start now` uses the same readiness rule: only a ready branch counts. A later wave that waits in order, a claimed branch, or a question hold is 0 for that branch. `Wave 2: 1 branch, 0 can start now` when it still waits on wave 1.
+- **Claims on stop.** A mid-walk stop, such as before a merge step, does not clear the claim. The claim is cleared when the branch is merged or ticked, or the user says stop and is done with this walk, or `release claim`. This matches the build-walk skill text. A later ready check in a new session still holds that task as in progress.
+
 ## 1.151.0 (2026-11-13)
 
 Two people can work on the same specs repo without one walk disappearing from the other. A minor release because the ready check, the tighten-and-plan walk, and `/crav1-build-walk` now fetch first, hold claimed tasks, and push the walk's files at the end.

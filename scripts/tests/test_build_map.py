@@ -112,7 +112,7 @@ class BuildMap(unittest.TestCase):
         self.assertIn('b2["feat/cancel-booking-send-receipt"]', diagram)
         self.assertIn("b1 --> b2", diagram)
         self.assertIn("## Wave 1: 1 branch, 1 can start now", text)
-        self.assertIn("## Wave 2: 1 branch, 1 can start now", text)
+        self.assertIn("## Wave 2: 1 branch, 0 can start now", text)
         self.assertNotIn("can run in parallel", text)
 
     def test_who_uses_waiting_for_then_latest_mark_then_unnamed(self):

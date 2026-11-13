@@ -27,7 +27,7 @@ An arrow means the later branch waits for the earlier one.
 - Question: none
 - Ready now: ready
 
-## Wave 2: 1 branch, 1 can start now
+## Wave 2: 1 branch, 0 can start now
 
 ### feat/cancel-booking-send-receipt
 
