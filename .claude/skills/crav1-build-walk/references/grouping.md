@@ -5,10 +5,15 @@ Read this when no branch is chosen, including when the user started from a ready
 Run `scripts/build_walk.py next --json <file>` with `"mode": "grouping"`. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. Each ready branch is one parallel piece of work. The report prints one next line per branch. The line names each task as `T#` plus the short name, then the branch.
 
 ```text
-Next: /crav1-build-walk T3 Apply the CI build policy, because that work is on feat/orders-host-setup-scripts.
+Run next:
+
+`/crav1-build-walk T3`
+branch feat/orders-host-setup-scripts, T3 Apply the CI build policy
+
+Next: /crav1-build-walk T3, because that work is on feat/orders-host-setup-scripts (T3 Apply the CI build policy).
 ```
 
-One branch is still one line. A task that needs code from an unmerged branch is not offered as a second ready branch on `develop`. `SKILL.md` sends that case to the stack file. Do not open it from here.
+One branch is still one Run next entry. The command is alone in the code span. A task that needs code from an unmerged branch is not offered as a second ready branch on `develop`. `SKILL.md` sends that case to the stack file. Do not open it from here.
 
 The branch name is `scripts/build_map.py docs/specs/<slug> --recommend T#` through `build_walk.py offer`. A merged or deleted branch is not offered. The card says where the name came from: the task line, the build map, or new. A `because:` line is the description when a name was skipped, for example `New, because feat/orders-one-commit-cleanup-main is already merged.`
 

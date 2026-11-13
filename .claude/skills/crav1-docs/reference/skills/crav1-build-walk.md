@@ -18,6 +18,8 @@ A task that needs code from an unmerged branch is cut from that branch. The prog
 
 1.144.0: the next line is `scripts/build_walk.py next --json <file>`. A stack command is `scripts/build_walk.py stack --json <file>`. `--recommend` is `scripts/build_map.py docs/specs/<slug> --recommend T#`. On Windows the interpreter is `python` with `PYTHONUTF8=1`. Elsewhere it is `python3`.
 
+1.150.0: the reply prints `ending`. `Run next:` is first. Each command is alone in a code span and works in a new session: [`/crav1-build-walk`](crav1-build-walk.md) T3`, plus the slug when `docs/specs` has more than one slice. The next line names the branch and the short task name. Waiting and Uncommitted follow. The full Next line is last. Another branch whose tasks can start, from readiness `can_start` grouped by build-map branch, is its own Run next entry. Recording a step commits `build-progress/<branch>.md` after yes, in the same commit when the step already commits other files, otherwise on its own, using the persisted commit style. Nothing is pushed. `T27` and `27` are the same id. `next --json` accepts task strings or `{id, title}` objects. Bad input returns `{"ok": false, "code", "line"}`.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
@@ -48,7 +50,7 @@ Reads `spec.md`, `plan.md`, `tasks.md`, `build-map.md`, and this branch's `build
 
 In short: One `build-progress/<branch>.md` per work branch, after yes, and `(live yes: <name>, <date>)` on a Runs live task after yes.
 
-Writes `docs/specs/<slug>/build-progress/<branch>.md` after yes, with normalized hashes and `Content stamp: normalized`. Writes `(live yes: <name>, <date>)` on the task line after the live yes. Posts one pull request comment per push in other-owner mode, after yes. Does not commit that progress file itself.
+Writes `docs/specs/<slug>/build-progress/<branch>.md` after yes, with normalized hashes and `Content stamp: normalized`, and commits that file after the yes. When the step already commits other files, the progress file is in that same commit. Otherwise it is its own commit, using the persisted commit style. Nothing is pushed. Writes `(live yes: <name>, <date>)` on the task line after the live yes. Posts one pull request comment per push in other-owner mode, after yes.
 
 ## Does not
 

@@ -34,11 +34,18 @@ A task that needs code from an unmerged branch is cut from that branch. The prog
 
 ## What gets written
 
-`docs/specs/orders-capacity/build-progress/feat--orders-host-setup-scripts.md`, after yes. It records the step, the normalized hashes, and the merge list. The spec, plan, and tasks stay the source of truth, except `(live yes: …)` on a Runs live task after yes.
+`docs/specs/orders-capacity/build-progress/feat--orders-host-setup-scripts.md`, after yes. It records the step, the normalized hashes, and the merge list. That file is committed after the yes, in the same commit when the step already commits other files, otherwise on its own, using the persisted commit style. Nothing is pushed. The spec, plan, and tasks stay the source of truth, except `(live yes: …)` on a Runs live task after yes.
 
 ## After
 
-`Next: /crav1-build-walk, because T5 Note the policy can start on feat/orders-note.`
+```text
+Run next:
+
+`/crav1-build-walk T5`
+branch feat/orders-note, T5 Note the policy
+
+Next: /crav1-build-walk T5, because that work is on feat/orders-note (T5 Note the policy).
+```
 
 When no work branch remains:
 

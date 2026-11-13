@@ -73,7 +73,7 @@ The same walk, `/crav1-tighten-and-plan-ready-to-build`, runs `/crav1-plan-from-
 | Skill | `/crav1-fix-build-gaps` |
 | Subagent | `crav1-build-task-agent` |
 
-`/crav1-build-walk` is in the Build lane. The user asks for the walk. It opens the build, verify, commit, and pull-request skills by file and does not replace them. While one branch is in progress the reply has one Next, the walk's, and a step skill's own Next is not printed. It does not push, open, or merge without a yes in that run. It never rebases.
+`/crav1-build-walk` is in the Build lane. The user asks for the walk. It opens the build, verify, commit, and pull-request skills by file and does not replace them. The reply prints Run next first, one complete command per branch that can start, and a step skill's own Next is not printed. Recording a step commits the progress file and does not push. It does not push, open, or merge without a yes in that run. It never rebases.
 
 Started from a ready-to-build report, the walk offers each ready branch as its own Next, with the T number beside the task name. A task that needs code from an unmerged branch is cut from that branch, and the merge list says the order back. Other-owner mode never opens a pull request and never merges.
 

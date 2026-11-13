@@ -1260,6 +1260,7 @@ def report_by_branch(built, rows, slug=None):
         held_lines.append(f"- `{group['branch']['name']}` ({_where(group['branch'])}): " + "; ".join(bits))
     next_lines = []
     run_lines = []
+    ready_branches = []
     for group in ready_groups:
         labels = [
             task.get("label") or task_label(task["id"], task.get("short"))
@@ -1267,6 +1268,13 @@ def report_by_branch(built, rows, slug=None):
         ]
         next_lines.append(ready_next_line(labels, group["branch"]["name"]))
         run_lines.append(run_entry(labels, group["branch"]["name"], slug=slug))
+        ready_branches.append({
+            "branch": group["branch"]["name"],
+            "tasks": [
+                {"id": f"T{task['id']}", "title": task.get("short") or ""}
+                for task, _row in group["items"]
+            ],
+        })
     parts = []
     if ready_lines:
         parts.append("Ready now")
@@ -1279,6 +1287,7 @@ def report_by_branch(built, rows, slug=None):
         "held_lines": held_lines,
         "next_lines": next_lines,
         "run_lines": run_lines,
+        "ready_branches": ready_branches,
         "line": "\n".join(parts) if parts else None,
     }
 

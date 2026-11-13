@@ -18,6 +18,10 @@ Command: `/crav1-build-walk`. A slug or a `T#` may follow. `orders-capacity` is 
 
 It does not replace the skills it opens. It does not push, open a pull request, merge, or run a live change until this run's `yes`. It never rebases.
 
+The in-walk reply prints `ending` from `scripts/build_walk.py next --json <file>`. `Run next:` is first (1.150.0). Each command is alone in a code span and works in a new session, for example `` `/crav1-build-walk T3` ``, plus the slug when `docs/specs` has more than one slice (`` `/crav1-build-walk orders-api T3` ``). The next line names the branch and the short task name. Waiting and Uncommitted follow. The full Next line is last. Another branch whose tasks can start, from readiness `can_start` grouped by build-map branch, gets its own Run next entry. Do not mention that branch only in prose.
+
+The JSON object is documented in [references/common.md](references/common.md). Fields include `phase`, `owner`, `branch`, `tasks`, `base`, `pr`, `slug`, `root`, `spec_count`, `ready_branches`, `waiting`, and `uncommitted`. `tasks` may be `"T3"` or `{"id": "T3", "title": "Apply the CI build policy"}`. `T3` and `3` are the same id. Bad input returns `{"ok": false, "code", "line"}` and does not traceback.
+
 ## Route first (1.142.0)
 
 Read [references/common.md](references/common.md) once. Then open only the file for the point you are at. Do not open the others yet.
@@ -45,13 +49,13 @@ Exact words. There are no `--flags`. A word in the invocation answers its questi
 
 One branch at a time. The order is in [references/steps.md](references/steps.md). Open each step skill from this folder and follow it. Read [open-skill-file.md](../crav1-docs/reference/open-skill-file.md) once before the first one.
 
-While this walk runs, print one `Next:` line, the walk's. Do not also print the step skill's Next. A ready-to-build start that has not picked a branch is the exception in [references/grouping.md](references/grouping.md).
+While this walk runs, print `ending`. Do not also print the step skill's Next. A ready-to-build start that has not picked a branch is the exception in [references/grouping.md](references/grouping.md). Each ready branch there is its own Run next entry.
 
 ## Stop
 
 `build-progress/<branch>.md` only records position. Do not edit `spec.md` except the `(live yes: <name>, <date>)` note [references/live.md](references/live.md) writes after `yes`. Do not tick a task from this file. The tick is the tick-only path, after `yes`.
 
-Do not create a git commit from this skill. `/crav1-finalize-commit` commits, after `yes`.
+Recording a step commits `docs/specs/<slug>/build-progress/<branch>.md` after that yes (1.150.0). When the step already commits other files, such as the tick or verify, include the progress file in that same commit. Otherwise commit the progress file on its own after the yes. Use the persisted commit style, the draft-commit rule already in the repo. Nothing is pushed. `/crav1-finalize-commit` still commits the product files on the commit step, after `yes`.
 
 When the user stops partway, one line `Paused at <step>.` Then the ending in [references/progress.md](references/progress.md).
 

@@ -2865,6 +2865,33 @@ def command_slug(root: Path) -> str | None:
     return slug or None
 
 
+def ready_branches(root: Path) -> list[dict]:
+    """Tasks that can start, grouped by build-map branch.
+
+    Empty when the ready check is not-ready. A not-ready list is not a start.
+    """
+    if root is None or not root.is_dir():
+        return []
+    rows = build_rows(root)
+    resolve_kept = resolve_is_keep(root)
+    resolve_recorded = resolve_ever_recorded(root)
+    hits = []
+    for row in rows:
+        hit = classify(row, resolve_kept=resolve_kept, resolve_recorded=resolve_recorded)
+        if hit:
+            hits.append(hit)
+            if hit["kind"] == "waiting":
+                row["bucket"] = "waiting"
+    propagate_held(rows, hits)
+    reopened, _replaced = _without_self_reopen(reopened_hits(root))
+    hits.extend(reopened)
+    result, _can_start, _held = slice_result(rows, hits)
+    if result not in ("ready", "ready-partial"):
+        return []
+    report = branch_report(root, rows) or {}
+    return report.get("ready_branches") or []
+
+
 def _wait_phrase(waiting: list[dict], noun: str) -> str:
     tasks: list[str] = []
     whos: list[str] = []
@@ -3256,6 +3283,7 @@ def readiness(args: argparse.Namespace) -> None:
         "held_lines": held_lines,
         "next_lines": next_lines,
         "run_lines": shown_run,
+        "ready_branches": (report or {}).get("ready_branches") or [] if result in ("ready", "ready-partial") else [],
         "ending": ending,
         "replaced": replaced,
         "gates": gates_for(rows),
