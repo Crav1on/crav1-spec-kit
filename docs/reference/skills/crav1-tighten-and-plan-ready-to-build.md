@@ -40,6 +40,8 @@ The progress file is `docs/specs/<slug>/walk-progress.md`. It records the step, 
 
 1.139.0: `scripts/walk_progress.py resolve-stamps` settles a merge conflict in `walk-progress.md` when every hunk is only a version line. [`/crav1-finalize-commit`](crav1-finalize-commit.md) runs it on the pull path. The walk itself does not. A hash is rewritten to the merged file only when the recorded hash matched that side and the merge differs by progress alone. A real edit keeps the upstream hash. `Done` and `Result` stay.
 
+1.143.0: when the result is `ready`, or `ready-partial` with tasks that can start, each Next line recommends [`/crav1-build-walk`](crav1-build-walk.md) with the T number beside the short name and the branch, and names [`/crav1-build-tasks`](crav1-build-tasks.md) as the alternative for one task without the walk. The walk does not run either command. A `not-ready` result does not recommend the walk.
+
 ## Runs when
 
 A spec should be tightened and planned until it is ready to build. Called by the user.
@@ -68,7 +70,7 @@ Limits and exceptions: A headless run stops. No playbook skips step 1. Architect
 
 ## You run next / Runs by itself
 
-- You run next: [`/crav1-build-tasks`](crav1-build-tasks.md)
+- You run next: [`/crav1-build-walk`](crav1-build-walk.md); [`/crav1-build-tasks`](crav1-build-tasks.md)
 - Runs by itself: Opens each locked skill's file from this skill's folder and follows it, including [`/crav1-resolve-open-questions`](crav1-resolve-open-questions.md) `references/apply.md` on yes when a playbook is applied. It does not start those skills as slash commands. It does not run Build.
 
 ## Lane and group

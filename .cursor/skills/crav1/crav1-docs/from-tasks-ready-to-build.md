@@ -37,7 +37,7 @@ For each task, in this order:
 
 The result line is `ready`, `ready-partial`, or `not-ready` (1.132.0). `ready-partial` means some tasks can start now and some are held. `not-ready` means nothing can start. A cycle, a missing task, no plan, Needs verify, or a plan-review warning still records `not-ready`. The walk record stays `Result: ready-partial`. `/crav1-build-tasks` starts the ready tasks and refuses a held task with its reason.
 
-Since 1.133.0 the ready tasks and the held tasks are grouped by the build-map branch, not as one flat list. The branch is the name `scripts/build_map.py --recommend` prints. Order is wave, then the map's row order. A task is shown as `T#` plus its short name, the same words as the Tasks field in `build-map.md`. A held task names the open question and who has it, or `held, waits on T3`. Each branch that can start gets its own Next line, so those branches can be started together. One branch is still one line.
+Since 1.133.0 the ready tasks and the held tasks are grouped by the build-map branch, not as one flat list. The branch is the name `scripts/build_map.py --recommend` prints. Order is wave, then the map's row order. A task is shown as `T#` plus its short name, the same words as the Tasks field in `build-map.md`. A held task names the open question and who has it, or `held, waits on T3`. Each branch that can start gets its own Next line, so those branches can be started together. One branch is still one line. Since 1.143.0 that line recommends `/crav1-build-walk`, with the T number beside the short name, and names `/crav1-build-tasks` for one task without the walk.
 
 Lists inside a branch follow the map. The wider task graph is still **dependency order** (1.103.0): tasks with nothing to wait on first, then the tasks they unblock, wave by wave, lowest number first inside a wave. For a slice where T7 waits on T2, T3 and T6 on T7, T4 on T3 and T7, and T5 on T4, the order is T1 → T2 → T7 → T3 | T6 → T4 → T5. `/crav1-build-tasks`, `/crav1-build-features` and `/crav1-verify-build-against-spec` use that order.
 
@@ -64,7 +64,7 @@ Needs verify
 
 Done: 3
 
-Next: /crav1-build-tasks T5 (on `feat/orders-retry`)
+Next: /crav1-build-walk T5 refund to the original card, because that work is on feat/orders-retry. /crav1-build-tasks builds one task without the walk.
 Source: docs/specs/cancel-booking/spec.md, plan.md, tasks.md, verify.md
 Build map: docs/specs/cancel-booking/build-map.md
 ```
@@ -109,10 +109,10 @@ No commit, and no other file. The build map is the one file this command writes.
 
 ## After
 
-Build the task it named:
+The Next line recommends the build walk, with the T number beside the short name. `/crav1-build-tasks` builds one task without the walk:
 
 ```text
-/crav1-build-tasks T5
+/crav1-build-walk T5 refund to the original card
 @docs/specs/<slug>/
 ```
 

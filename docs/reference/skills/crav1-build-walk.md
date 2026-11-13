@@ -14,6 +14,8 @@ Each step that writes, pushes, opens, or merges asks `yes` first. It never rebas
 
 A task that needs code from an unmerged branch is cut from that branch. The progress file and the report show the merge list, child first, back into the branch it was cut from. A merged or deleted branch is not offered. A `(Runs live)` task gets a script, a dry run, then the user's own yes, recorded as `(live yes: <name>, <date>)`. An unapproved Approval needed item holds the task. An `Approved:` line does not replace that yes. Without the yes the task stays unticked.
 
+1.143.0: on a `(Runs live)` task, a recorded yes that the assistant's permission check refused is not a missing yes. Waiting says the yes is on record and the check blocked the command. The offer is to run that exact command, or allow that one command and rerun. Next is [`/crav1-build-walk`](crav1-build-walk.md) after the command has run. It does not suggest working around the check.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.

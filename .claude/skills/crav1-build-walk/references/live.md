@@ -21,5 +21,6 @@ An `Approved:` line clears that hold. It never replaces the user's own yes for t
 2. Write the script. Run the dry run, the `check` mode. Do not run the live change.
 3. Ask for `yes` before the live run. `yes` records `(live yes: <name>, <date>)` on the task line and then runs it. `stop` leaves the script written. The task stays `[ ]`.
 4. The tick stays a later step, after `check` reads back ok.
+5. When the live command was refused by the assistant's permission check, and the user's yes is already on record (`(live yes: …)` or yes in this run), do not say the yes is missing. Follow skill `crav1-build-tasks`, `references/permission-block.md`, with `--rerun /crav1-build-walk`. Print that script's `lines`. The task stays `[ ]`. Do not suggest working around the check.
 
 The normalized hash ignores `(live yes: …)`, the same way it ignores a checkbox.

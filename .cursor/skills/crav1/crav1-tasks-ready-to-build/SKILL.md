@@ -101,10 +101,9 @@ Needs verify
 
 Done: 4
 Order: T5 → T9 → T7 → T8
-Branches: 1 of 3 merged into develop. Not merged: feat/orders-retry (2 commits), feature/orders-export (3 commits).
 
-Next: /crav1-build-tasks T5 (on `feat/orders-retry`)
-Next: /crav1-build-tasks T6 (on `feat/orders-export`)
+Next: /crav1-build-walk T5 refund to the original card, because that work is on feat/orders-retry. /crav1-build-tasks builds one task without the walk.
+Next: /crav1-build-walk T6 export the receipt, because that work is on feat/orders-export. /crav1-build-tasks builds one task without the walk.
 Source: docs/specs/<slug>/spec.md, plan.md, tasks.md, verify.md
 Build map: docs/specs/<slug>/build-map.md
 ```
@@ -112,7 +111,7 @@ Build map: docs/specs/<slug>/build-map.md
 - **By branch (1.133.0).** When Python runs, `readiness --root` (skill `crav1-tighten-and-plan-ready-to-build`, `scripts/walk_progress.py`) prints `ready_lines`, `held_lines`, and `next_lines`. Print those. Do not flatten them. The branch is `scripts/build_map.py --recommend T#`, the same row as the map. Order is wave, then map order. A task is `T#` plus its short name, in the lists and on the map. One ready branch is still one group and one Next line. Without Python, use `references/build-map.md` under Ready check.
 - **Result (1.132.0)** is `ready` when the tasks that are not done can start or only wait in order, `ready-partial` when some can start now and some are held, and `not-ready` when nothing can start. The walk record stays `Result: ready-partial`. A cycle, a missing task, no plan, Needs verify, or a plan-review warning still records `not-ready`.
 - **Order** shows the slice's unticked tasks in dependency order, `|` between tasks of the same wave. One Order line per slice when listing all specs. The Order line keeps task ids.
-- **Next** is one line per branch that can start, when the result is `ready` or `ready-partial`: `Next: /crav1-build-tasks T5 T6` (on `feat/orders-retry`). The ids are the command. The names are on the Ready now line. This is the ready-check exception in `crav1-docs/reference/run-ending.md`. Do not run it.
+- **Next** is the script's `next_lines` when the result is `ready` or `ready-partial`: `/crav1-build-walk`, and `/crav1-build-tasks` builds one task without the walk. See `run-ending.md`. Do not run it.
 - Nothing is ready, and an open question blocks the first task: `Next: /crav1-resolve-open-questions <slug>, because that question blocks the first task.`
 - Only Needs verify is left: `Next: /crav1-verify-build-against-spec <slug>, because the built tasks are not verified yet.`
 - Nothing is left to build or verify: `Next: nothing needed now.`

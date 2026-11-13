@@ -89,13 +89,12 @@ Since 1.138.0 a checkbox tick, a `(PR n)` or `(done)` note on that task line, an
 
 Since 1.139.0 a merge that conflicts only on those hash lines is settled by `scripts/walk_progress.py resolve-stamps`. `/crav1-finalize-commit` runs it. The walk does not. `Done` and `Result` stay. A real edit keeps the upstream hash.
 
-When the check is clear, the slice is ready to build. You run build yourself:
+When the check is clear, or ready-partial with tasks that can start, the ending recommends the build walk. One line per ready branch, with the T number beside the short name:
 
 ```text
-/crav1-build-tasks
-@docs/specs/<slug>/
+Next: /crav1-build-walk T1 Record the decision, because that work is on feat/orders-api-record. /crav1-build-tasks builds one task without the walk.
 ```
 
-This walk does not run `/crav1-build-tasks`. The ending is `Next: /crav1-build-tasks, because the slice is ready to build.` When the progress file is not committed: `Uncommitted: 1 file; commit with /crav1-finalize-commit when ready.` See [How a run ends](reference/run-ending.md).
+`/crav1-build-tasks` is the alternative for one task without the walk. This walk does not run `/crav1-build-tasks` or `/crav1-build-walk`. A not-ready result does not recommend the walk. When the progress file is not committed: `Uncommitted: 1 file; commit with /crav1-finalize-commit when ready.` See [How a run ends](reference/run-ending.md).
 
 Reference page: [tighten and plan, ready to build](reference/skills/crav1-tighten-and-plan-ready-to-build.md)

@@ -55,7 +55,8 @@ For each `T#` **one at a time**:
 | `needs_ready` | Ask them to refresh the host, then `ready` / `stop`. `ready` → worker `resume: ready`. |
 | `needs_dependency` | Show the BLOCKER line at the top. Ask start / skip / stop. `start` → worker `resume: dependency-start`; `skip` → `resume: dependency-skip`; `stop` → end. Headless: two-pass questions file. |
 | `needs_yes` | Not blocked. Leave the task unticked and do not launch the next `T#`. Offer the Approval needed item as skill `crav1-build-tasks`, `references/approval-needed.md` says. End with `Waiting: <who>'s yes to <what>.` |
-| `blocked` / `failed` | **End the batch.** Do not launch the next `T#`. A missing yes is `needs_yes`, not this row. |
+| `permission_refused` | Not a missing yes. The user's yes is on record and the assistant's permission check blocked the command. Follow `references/permission-block.md`. Leave the task unticked and do not launch the next `T#`. |
+| `blocked` / `failed` | **End the batch.** Do not launch the next `T#`. A missing yes is `needs_yes`, not this row. A permission refusal with the yes on record is `permission_refused`, not this row. |
 | User `stop` | End the batch. |
 
 Do not skip a blocked `T#` unless they explicitly say skip. A `needs_yes` task is not blocked. A `NOTES:` line is the optional `.gitattributes` offer from the one-task branch. Accept is `resume: eol` on that worker. Skip adds nothing.

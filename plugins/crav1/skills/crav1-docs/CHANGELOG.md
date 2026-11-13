@@ -2,6 +2,13 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.143.0 (2026-11-13)
+
+A recorded yes is not a missing yes, and a ready slice's next step is the build walk. A minor release because the Waiting line for a blocked live command changes, and the tighten-and-plan ending names a different command.
+
+- **Permission block.** When a live command, such as a `(Runs live)` task's `apply`, was refused by the coding assistant's own permission check, and the user's yes is already on record, `/crav1-build-tasks` and the live step of `/crav1-build-walk` do not say the yes is missing. Waiting says the yes is on record and the check blocked the command. The offer is only: run that exact command, or allow that one command and rerun. Next is the build step again after the command has run. The lines do not suggest working around the check. A yes that is not on record stays the missing-yes path. `scripts/permission_block.py` distinguishes the two.
+- **Ready ending.** When `/crav1-tighten-and-plan-ready-to-build` finishes `ready`, or `ready-partial` with tasks that can start, each Next line recommends `/crav1-build-walk`, with the T number beside the short name and the branch, and names `/crav1-build-tasks` as the alternative for one task without the walk. The same `next_lines` are what `/crav1-tasks-ready-to-build` prints. A `not-ready` result does not recommend the walk. The walk still does not run either command.
+
 ## 1.142.0 (2026-11-12)
 
 One guided walk for the build side of a slice. A minor release because `/crav1-build-walk` is a new command, a step skill's Next is replaced while that walk runs, and a live task records the user's own yes.

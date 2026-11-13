@@ -8,7 +8,7 @@ A skill names the next step. It does not run it, unless that skill already runs 
 
 `Next:` is exactly one line. It names the single step to run now, and a short reason why.
 
-The ready check is the exception (1.133.0). When tasks that can start sit on more than one build-map branch, `/crav1-tasks-ready-to-build` and the tighten-and-plan ready check print one `Next:` line per branch. Each line is still one `/crav1-build-tasks` command, for the tasks on that branch. Those branches do not wait on each other, so they can start together. One ready branch stays one line. `/crav1-build-walk` has the same shape at the start (1.142.0). When it is started from a ready-to-build report and no branch is chosen, it prints one `Next:` line per ready branch. Each line names that branch's tasks as `T#` plus the short name. Once one branch is in progress, the walk prints one `Next:` line. A step skill it opened does not add its own `Next:` line. Every other skill keeps one `Next:` line.
+The ready check is the exception (1.133.0). When tasks that can start sit on more than one build-map branch, `/crav1-tasks-ready-to-build` and the tighten-and-plan ready check print one `Next:` line per branch. Since 1.143.0 each of those lines recommends `/crav1-build-walk`, with the T number beside the task name and the branch, and names `/crav1-build-tasks` as the alternative for building one task without the walk. That alternative is not a second Next. Those branches do not wait on each other, so they can start together. One ready branch stays one line. `/crav1-build-walk` has the same shape at the start (1.142.0). When it is started from a ready-to-build report and no branch is chosen, it prints one `Next:` line per ready branch. Each line names that branch's tasks as `T#` plus the short name. Once one branch is in progress, the walk prints one `Next:` line. A step skill it opened does not add its own `Next:` line. Every other skill keeps one `Next:` line.
 
 ```text
 Next: /crav1-pr-status pr71, pr73, pr74, because this run added Points nothing has sorted yet.
@@ -22,7 +22,7 @@ When nothing is needed now:
 Next: nothing needed now.
 ```
 
-Do not list a second step on that line, in a second `Next:` line, or as an equal bullet. The ready check's one line per ready branch is the exception above. A step that depends on this step's result is not listed. The step named here says what comes after, when that applies. Do not list `pr<n> candidates` in the same ending as pr-status. That later command is named when the record has candidates.
+Do not list a second step on that line, in a second `Next:` line, or as an equal bullet. The ready check's one line per ready branch is the exception above, and the `/crav1-build-tasks` name on that line is the alternative for one task, not a second step. A step that depends on this step's result is not listed. The step named here says what comes after, when that applies. Do not list `pr<n> candidates` in the same ending as pr-status. That later command is named when the record has candidates.
 
 ## Waiting
 
@@ -30,9 +30,12 @@ Do not list a second step on that line, in a second `Next:` line, or as an equal
 
 A yes that is not on record is not a blocker. The task stays unticked. `Next` is to rerun that task after the yes.
 
+A recorded yes that the assistant's permission check refused is not a missing yes (1.143.0). Waiting says the yes is on record and the check blocked the command. The offer is to run that exact command, or allow that one command and rerun. Next is the build step again after the command has run. Do not suggest working around the check.
+
 ```text
 Waiting: /crav1-resolve-open-questions orders-retry, after a reviewer answers the open question.
 Waiting: the partner's yes to turn off pipelines 7 and 24.
+Waiting: your yes is on record. The assistant's permission check blocked the command.
 Waiting: /crav1-verify-build-against-spec orders-api - verify.md is behind tasks.md (T2, T45)
 ```
 

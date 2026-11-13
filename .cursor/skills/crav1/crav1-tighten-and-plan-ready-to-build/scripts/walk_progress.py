@@ -2267,11 +2267,19 @@ def gates_for(rows: list[dict]) -> list[dict]:
 
 
 def next_for(result: str, can_start: list, waiting_next: str | None) -> str | None:
+    """Fallback when the branch report has no ready line (1.143.0).
+
+    A ready or ready-partial slice recommends the build walk. build-tasks is
+    named as the alternative for one task. A not-ready result does not.
+    """
+    alt = " /crav1-build-tasks builds one task without the walk."
     if result == "ready":
-        return "/crav1-build-tasks, because the slice is ready to build."
+        return "/crav1-build-walk, because the slice is ready to build." + alt
     if result == "ready-partial":
         ids = ", ".join(task for task in can_start if task)
-        return f"/crav1-build-tasks {ids}, because those tasks can start now."
+        if not ids:
+            return None
+        return f"/crav1-build-walk {ids}, because those tasks can start now." + alt
     return waiting_next
 
 

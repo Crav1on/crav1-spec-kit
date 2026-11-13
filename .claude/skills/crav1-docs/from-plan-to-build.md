@@ -90,6 +90,15 @@ Waiting: the partner's yes to turn off pipelines 7 and 24.
 Next: /crav1-build-tasks T1, because that yes is not on record yet.
 ```
 
+Since 1.143.0 a different stop looks similar and is not that one. The user's yes is already on record, and the coding assistant's permission check refused the live command, for example `bash infra/ado/develop-build-policy.sh apply` as modifying shared resources. Waiting says the yes is on record and the check blocked the command. It does not say the yes is missing. The offer is to run that exact command, or allow that one command and rerun. Next is the build step again after the command has run. The run does not suggest working around the check.
+
+```text
+Waiting: your yes is on record. The assistant's permission check blocked the command.
+Run it yourself: bash infra/ado/develop-build-policy.sh apply
+Or allow that one command and rerun.
+Next: /crav1-build-tasks T3, because T3 Apply the CI build policy can rerun after the command has run.
+```
+
 ## Host setup tasks (1.115.0)
 
 A task marked `(host setup)` is a host setting, not a file. The worker writes the checked-in script and its manual steps, shows them, and runs the script only after your yes; it ticks the task only when the script's `check` part reads the setting back `ok`. Without that yes the task stays unticked and the run waits, as above. The rules are the same as [Set up a host setting](from-host-setup.md) (`/crav1-host-setup`).

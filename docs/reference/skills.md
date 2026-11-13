@@ -132,7 +132,7 @@ When the user asks for startup options, these six are the only ways in. That ask
 
 | Command | Starter | Use when | Reads | Writes | You run next | Runs by itself | Walkthrough |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| [`/crav1-tighten-and-plan-ready-to-build`](skills/crav1-tighten-and-plan-ready-to-build.md) | — | A spec should be tightened and planned until it is ready to build | The spec folder, an optional playbook (outside the project or under `docs/playbooks/`), and the progress file when one exists | `docs/specs/<slug>/walk-progress.md` after a yes, with the `docs/playbooks/` path when a playbook was applied. The playbook copy is written by apply | [`/crav1-build-tasks`](skills/crav1-build-tasks.md) | `/crav1-resolve-open-questions` | [Tighten and plan until ready to build](../from-tighten-and-plan.md) |
+| [`/crav1-tighten-and-plan-ready-to-build`](skills/crav1-tighten-and-plan-ready-to-build.md) | — | A spec should be tightened and planned until it is ready to build | The spec folder, an optional playbook (outside the project or under `docs/playbooks/`), and the progress file when one exists | `docs/specs/<slug>/walk-progress.md` after a yes, with the `docs/playbooks/` path when a playbook was applied. The playbook copy is written by apply | [`/crav1-build-walk`](skills/crav1-build-walk.md); [`/crav1-build-tasks`](skills/crav1-build-tasks.md) | `/crav1-resolve-open-questions` | [Tighten and plan until ready to build](../from-tighten-and-plan.md) |
 
 ## Subagents
 

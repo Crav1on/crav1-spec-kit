@@ -55,6 +55,7 @@ class SingleNext(unittest.TestCase):
         "approval",
         "live-dry",
         "live-yes",
+        "permission-refused",
         "build",
         "verify",
         "commit",
