@@ -23,7 +23,7 @@ Usage (JSON on stdout):
   walk_progress.py start --root <spec-folder-or-slug> [--playbook <file>]
   walk_progress.py resume --root <spec-folder>
   walk_progress.py playbook-status --root <spec-folder> --playbook <file>
-  walk_progress.py readiness --root <spec-folder> [--write-map]
+  walk_progress.py readiness --root <spec-folder> [--write-map] [--brief|--full]
   walk_progress.py readiness --json <file> [--root <spec-folder>]
   walk_progress.py unlinked --root <spec-folder>
   walk_progress.py ack-stamps --root <spec-folder> --yes
@@ -35,8 +35,10 @@ Usage (JSON on stdout):
 
 readiness --root builds the rows from task_order.py and question_blocks.py
 and adds the Reviewed warnings. It also compares tasks.md with verify.md.
---write-map writes build-map.md through build_map.py and does not write
-verify.md. Do not hand-build that JSON. start resolves a folder or a slug
+--brief prints only result, a counts row, the ending, and claim warnings.
+--full (the default) prints the complete JSON. --write-map writes
+build-map.md through build_map.py and does not write verify.md. Do not
+hand-build that JSON. start resolves a folder or a slug
 the way resolve_spec.py does and returns resume and playbook-status together.
 spec-finding offers one jump back for a spec finding, or records an open
 point when that finding already jumped. A close reword of a recorded finding
@@ -2549,6 +2551,29 @@ def _stale_next(verify_text: str, ticked: set[str]) -> str | None:
     return " ".join(hits) if hits else None
 
 
+def _orphan_verify_ids(verify_text: str, task_ids: set[str]) -> list[str]:
+    """T# rows in the verify.md tasks table that do not exist in tasks.md."""
+    found: list[str] = []
+    in_tasks = False
+    for line in (verify_text or "").splitlines():
+        if line.startswith("## Tasks"):
+            in_tasks = True
+            continue
+        if in_tasks and line.startswith("## "):
+            break
+        if not in_tasks or not line.startswith("|"):
+            continue
+        cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+        if not cells or not re.fullmatch(r"T\d+", cells[0]):
+            continue
+        if len(cells) < 3 or cells[2] in ("Status", "---"):
+            continue
+        tid = cells[0]
+        if tid not in task_ids and tid not in found:
+            found.append(tid)
+    return found
+
+
 def verify_gap_from(tasks_text: str, spec_text: str, verify_text: str, slug: str) -> dict:
     """verify.md is behind for a ticked task, or a merged task still Not implemented.
 
@@ -2557,7 +2582,10 @@ def verify_gap_from(tasks_text: str, spec_text: str, verify_text: str, slug: str
     behind: the checkbox is the only leftover. Merged tasks stay done for
     dependents. This does not write verify.md.
     """
-    empty = {"behind": False, "tasks": [], "waiting": None, "stale_next": None}
+    empty = {
+        "behind": False, "tasks": [], "waiting": None, "stale_next": None,
+        "orphan_tasks": [], "orphan_waiting": None,
+    }
     if not verify_text.strip() or not tasks_text.strip():
         return empty
     built = _built_ids(tasks_text, spec_text)
@@ -2571,19 +2599,39 @@ def verify_gap_from(tasks_text: str, spec_text: str, verify_text: str, slug: str
         for tid in re.findall(r"\bT\d+\b", stale_next):
             if tid in ticked and tid not in stale:
                 stale.append(tid)
-    if not stale:
+    task_ids = {f"T{task['id']}" for task in order_mod().parse(tasks_text)}
+    orphans = _orphan_verify_ids(verify_text, task_ids)
+    orphan_waiting = None
+    if orphans:
+        listed = ", ".join(orphans)
+        orphan_waiting = (
+            f"Waiting: verify.md has a row for {listed}, which is not in tasks.md. "
+            "Fix it with /crav1-verify-build-against-spec or /crav1-tighten-plan."
+        )
+    if not stale and not orphans:
         return empty
+    if not stale:
+        return {
+            "behind": False, "tasks": [], "waiting": None, "stale_next": stale_next,
+            "orphan_tasks": orphans, "orphan_waiting": orphan_waiting,
+        }
     ordered = sorted(stale, key=lambda tid: int(tid[1:]))
     ids = ", ".join(ordered)
     waiting = (
         f"Waiting: /crav1-verify-build-against-spec {slug} - "
         f"verify.md is behind tasks.md ({ids})"
     )
-    return {"behind": True, "tasks": ordered, "waiting": waiting, "stale_next": stale_next}
+    return {
+        "behind": True, "tasks": ordered, "waiting": waiting, "stale_next": stale_next,
+        "orphan_tasks": orphans, "orphan_waiting": orphan_waiting,
+    }
 
 
 def verify_gap(root: Path) -> dict:
-    empty = {"behind": False, "tasks": [], "waiting": None, "stale_next": None}
+    empty = {
+        "behind": False, "tasks": [], "waiting": None, "stale_next": None,
+        "orphan_tasks": [], "orphan_waiting": None,
+    }
     if root is None or not root.is_dir():
         return empty
     verify_path = root / "verify.md"
@@ -2975,18 +3023,39 @@ def _wait_phrase(waiting: list[dict], noun: str) -> str:
     return f"Waiting: {count} tasks wait on {noun}{tail}."
 
 
+def _direct_question_or_approval(hit: dict) -> bool:
+    """True when this hold is itself an open question or an approval.
+
+    A task that only waits on another task, or is in progress, is not
+    counted in the open-questions or approval waiting line (1.153.0).
+    """
+    if hit.get("propagated"):
+        return False
+    reason = (hit.get("reason") or "").lower()
+    if "held, waits on" in reason or "in progress" in reason:
+        return False
+    if hit.get("approval") or "approval needed" in reason:
+        return True
+    if "open question" in reason:
+        return True
+    return False
+
+
 def _waiting_lines(waiting: list[dict], slug: str) -> tuple[str | None, str | None]:
     if not waiting:
         return None, None
-    questions = [hit for hit in waiting if not hit.get("approval")]
-    approvals = [hit for hit in waiting if hit.get("approval")]
+    direct = [hit for hit in waiting if _direct_question_or_approval(hit)]
+    if not direct:
+        return None, None
+    questions = [hit for hit in direct if not hit.get("approval")]
+    approvals = [hit for hit in direct if hit.get("approval")]
     parts = []
     if questions:
         parts.append(_wait_phrase(questions, "open questions"))
     if approvals:
         parts.append(_wait_phrase(approvals, "an approval"))
     line = " ".join(parts)
-    if any(not hit.get("asked") for hit in waiting):
+    if any(not hit.get("asked") for hit in direct):
         nxt = (
             f"/crav1-show-or-ask-open-questions {slug}, "
             "because the questions are not asked yet."
@@ -3050,6 +3119,7 @@ def propagate_held(rows: list[dict], hits: list[dict]) -> None:
             if source.get("approval"):
                 row["approval"] = True
             hit = _waiting(row)
+            hit["propagated"] = True
             hits.append(hit)
             held[task] = hit
             changed = True
@@ -3174,6 +3244,45 @@ def _without_self_reopen(reopened: list[dict]) -> tuple[list[dict], str | None]:
     return others, replaced
 
 
+def _alternative_lines(next_lines: list[str], run_lines: list[str]) -> list[str]:
+    """Keep at most the one-line alternative; never a second copy of the command.
+
+    The Run next block already has the walk command. A Next: line, or any
+    line that repeats that command, is dropped (1.153.0).
+    """
+    commands = []
+    for entry in run_lines or []:
+        for line in str(entry).splitlines():
+            text = line.strip().strip("`")
+            if "/crav1-build-walk" in text:
+                commands.append(text)
+    out: list[str] = []
+    for item in next_lines or []:
+        text = str(item).strip()
+        if not text:
+            continue
+        if text.startswith("Next:"):
+            # Keep only a trailing alternative sentence, if present.
+            kept = []
+            for line in text.splitlines():
+                if "build-tasks builds one task" in line and "/crav1-build-walk" not in line:
+                    kept.append(line.strip())
+            text = "\n".join(kept)
+            if not text:
+                continue
+        if any(cmd and cmd in text for cmd in commands):
+            kept = []
+            for line in text.splitlines():
+                if "build-tasks builds one task" in line and "/crav1-build-walk" not in line:
+                    kept.append(line.strip())
+            text = "\n".join(kept)
+            if not text:
+                continue
+        if text not in out:
+            out.append(text)
+    return out
+
+
 def compose_ending(
     result: str,
     run_lines: list[str],
@@ -3187,6 +3296,8 @@ def compose_ending(
 
     Run next comes first on ready and ready-partial, before any Waiting line.
     Each held line is in this text. A not-ready result has no Run next block.
+    The bottom keeps Waiting lines and at most a one-line alternative. The
+    walk command appears only in the Run next block (1.153.0).
     """
     parts: list[str] = []
     if result in ("ready", "ready-partial") and run_lines:
@@ -3197,8 +3308,9 @@ def compose_ending(
         parts.append("\n".join(waiting))
     if result == "not-ready" and because:
         parts.append(because)
-    if next_lines:
-        parts.append("\n".join(next_lines))
+    alternatives = _alternative_lines(next_lines, run_lines if result in ("ready", "ready-partial") else [])
+    if alternatives:
+        parts.append("\n".join(alternatives))
     if replaced:
         parts.append(replaced)
     return "\n\n".join(parts)
@@ -3207,18 +3319,73 @@ def compose_ending(
 def next_for(result: str, can_start: list, waiting_next: str | None) -> str | None:
     """Fallback when the branch report has no ready line (1.143.0).
 
-    A ready or ready-partial slice recommends the build walk. build-tasks is
-    named as the alternative for one task. A not-ready result does not.
+    A ready or ready-partial slice names only the one-line alternative.
+    The walk command lives in the Run next block, not here (1.153.0).
+    A not-ready result may still name a waiting next step.
     """
-    alt = " /crav1-build-tasks builds one task without the walk."
+    alt = "/crav1-build-tasks builds one task without the walk."
     if result == "ready":
-        return "/crav1-build-walk, because the slice is ready to build." + alt
+        return alt
     if result == "ready-partial":
         ids = ", ".join(task for task in can_start if task)
         if not ids:
             return None
-        return f"/crav1-build-walk {ids}, because those tasks can start now." + alt
+        return alt
     return waiting_next
+
+
+def counts_for(rows: list[dict], slug: str = "") -> dict:
+    """One counts row for the brief ready-check output (1.153.0)."""
+    counts = {
+        "ready": 0,
+        "waiting": 0,
+        "waits_in_order": 0,
+        "blocked": 0,
+        "needs_verify": 0,
+        "done": 0,
+    }
+    for row in rows or []:
+        if not row.get("task"):
+            continue
+        bucket = row.get("bucket") or ""
+        if bucket == "ready":
+            counts["ready"] += 1
+        elif bucket == "waiting" or row.get("held"):
+            counts["waiting"] += 1
+        elif bucket == "waits-in-order":
+            counts["waits_in_order"] += 1
+        elif bucket == "blocked":
+            counts["blocked"] += 1
+        elif bucket == "needs-verify":
+            counts["needs_verify"] += 1
+        elif bucket == "done":
+            counts["done"] += 1
+    counts["slug"] = slug
+    counts["line"] = (
+        f"{slug}\tReady {counts['ready']}\tWaiting {counts['waiting']}\t"
+        f"Waits in order {counts['waits_in_order']}\tBlocked {counts['blocked']}\t"
+        f"Needs verify {counts['needs_verify']}\tDone {counts['done']}"
+    )
+    return counts
+
+
+def brief_payload(out: dict) -> dict:
+    """The short ready-check JSON: result, counts, ending, claim warnings."""
+    brief = {
+        "ok": out.get("ok", True),
+        "result": out.get("result"),
+        "counts": out.get("counts"),
+        "ending": out.get("ending"),
+        "claim_warnings": out.get("claim_warnings") or [],
+        "stop": out.get("stop", False),
+    }
+    if out.get("build_map"):
+        brief["build_map"] = out["build_map"]
+    if out.get("build_map_wrote"):
+        brief["build_map_wrote"] = out["build_map_wrote"]
+    if out.get("line") and out.get("stop"):
+        brief["line"] = out["line"]
+    return brief
 
 
 def readiness(args: argparse.Namespace) -> None:
@@ -3226,7 +3393,7 @@ def readiness(args: argparse.Namespace) -> None:
     built = False
     sync = preflight_sync(root, skip=getattr(args, "skip_sync", False))
     if sync.get("stop"):
-        emit({
+        stopped = {
             "ok": True,
             "stop": True,
             "ready": False,
@@ -3240,7 +3407,9 @@ def readiness(args: argparse.Namespace) -> None:
             "next_lines": [],
             "held_lines": [],
             "claim_warnings": [],
-        })
+            "counts": counts_for([], _slug(root) if root is not None else ""),
+        }
+        emit(brief_payload(stopped) if getattr(args, "brief", False) else stopped)
         return
     if args.json:
         try:
@@ -3334,20 +3503,27 @@ def readiness(args: argparse.Namespace) -> None:
     waiting_bits = []
     if gap.get("waiting"):
         waiting_bits.append(gap["waiting"])
+    if gap.get("orphan_waiting"):
+        waiting_bits.append(gap["orphan_waiting"])
     if sync.get("state") == "ahead" and sync.get("waiting"):
         waiting_bits.append(sync["waiting"])
     if resolve_waiting:
         waiting_bits.append(resolve_waiting)
     if result == "not-ready" and not can_start and waiting_line:
         waiting_bits.append(waiting_line)
-    if next_lines:
-        shown_next = list(next_lines)
+    shown_run = run_lines if result in ("ready", "ready-partial") else []
+    if result in ("ready", "ready-partial"):
+        alt = "/crav1-build-tasks builds one task without the walk."
+        shown_next = [alt]
+        next_lines = [alt]
+        nxt = alt
+    elif next_lines:
+        shown_next = [line for line in next_lines if not str(line).startswith("Next:")]
     elif nxt:
         text = str(nxt)
-        shown_next = [text if text.startswith("Next:") else f"Next: {text}"]
+        shown_next = [] if text.startswith("Next:") else [text]
     else:
         shown_next = []
-    shown_run = run_lines if result in ("ready", "ready-partial") else []
     ending = compose_ending(
         result, shown_run, held_lines, waiting_bits, shown_next, because, replaced,
     )
@@ -3400,6 +3576,9 @@ def readiness(args: argparse.Namespace) -> None:
         "stop": False,
         "claims": claim_info.get("ids") or [],
         "claim_warnings": warnings,
+        "counts": counts_for(rows, slug),
+        "orphan_tasks": gap.get("orphan_tasks") or [],
+        "orphan_waiting": gap.get("orphan_waiting"),
     }
     if built:
         out["rows"] = rows
@@ -3420,7 +3599,7 @@ def readiness(args: argparse.Namespace) -> None:
         out["reopen_steps"] = effect["reopen_steps"]
         out["changed_questions"] = effect["changed_questions"]
         out["restamp_only"] = effect["restamp_only"]
-    emit(out)
+    emit(brief_payload(out) if getattr(args, "brief", False) else out)
 
 
 def ack_stamps(args: argparse.Namespace) -> None:
@@ -4778,6 +4957,8 @@ def main(argv: list[str] | None = None) -> None:
     d.add_argument("--json", help="Rows file. Omit with --root to build the rows from the spec folder.")
     d.add_argument("--root", help="Spec folder. Builds the rows when --json is omitted. Reopened steps block ready.")
     d.add_argument("--write-map", action="store_true", help="Write build-map.md in the standalone command's format.")
+    d.add_argument("--brief", action="store_true", help="Print only result, the counts row, the ending, and claim warnings.")
+    d.add_argument("--full", action="store_true", help="Print the complete JSON. This is the default.")
     d.add_argument("--new-question", action="append", default=[], help="Exact question key to treat as new, not as a recorded question.")
     d.add_argument("--skip-sync", action="store_true", help="Skip the fetch. Tests and an already-fetched copy.")
     d.set_defaults(func=readiness)

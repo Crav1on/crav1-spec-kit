@@ -184,8 +184,9 @@ class QuestionDrift(unittest.TestCase):
         self.assertEqual(reopened, ["resolve-open-questions"])
         for step in LATER:
             self.assertNotIn(step, reopened)
-        self.assertIn("rerun or clear", payload["next"])
-        self.assertIn("/crav1-resolve-open-questions orders-export", payload["next"])
+        self.assertIn("rerun or clear", payload["ending"])
+        self.assertIn("/crav1-resolve-open-questions orders-export", payload["ending"])
+        self.assertNotIn("Next: /crav1-resolve-open-questions", payload["next"] or "")
         self.assertIn("Waiting:", payload["resolve_waiting"])
         self.assertIn("resolve-open-questions", payload["resolve_waiting"])
         joined = "\n".join(payload["held_lines"])
