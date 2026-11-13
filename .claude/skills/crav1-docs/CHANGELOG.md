@@ -15,6 +15,15 @@ Branch-specific rules move out of the long skills into files read only when that
 - **Left for later.** `/crav1-review-pr` is already a router. Its verdict and hard rules are what a typical review still reads, so this release does not split them.
 - **Tests.** `scripts/tests/test_load_path_1149.py` checks the load-when lines, that the moved rules are still in the files, and that each `SKILL.md` stays under its word cap.
 
+## 1.146.0 (2026-11-13)
+
+A recorded finding stays recorded when the words move a little, and the tighten-and-plan walk no longer opens the ready-to-build skill to write the map. A minor release because the finding card, the walk's first command, and the ready check change.
+
+- **Stable finding.** A spec finding keeps the first-seen `Key:`. A later wording that is the same point is an `Alias:`. Exact words are not asked again. A close reword asks `same recorded finding` or `this is new`. The same P# plus a short topic, such as `approver`, is that id. A different topic is not merged, and two close findings are not merged. An older `walk-progress.md` that has only `Key:` still matches those words.
+- **Stable question.** A question recorded on the resolve step keeps an exact key and a stable key. The stable key ignores a refreshed commit list. One close reword of a stored question stays that question. Two close questions are not merged. Say `this is new` to split one. A `Blocks:` line still holds its tasks.
+- **Ready check.** `/crav1-tighten-and-plan-ready-to-build` runs `walk_progress.py readiness --root <spec-folder> --write-map` and prints the script's lines. That writes `build-map.md` in the same format as `/crav1-tasks-ready-to-build`. The walk does not open that skill. `/crav1-tasks-ready-to-build` stays the standalone command.
+- **One start command.** `walk_progress.py start --root <folder-or-slug>` resolves a spec folder or a slug the way `resolve_spec.py` does, and returns resume and playbook-status together. Add `--playbook <file>` when a playbook was named. The walk's first step uses that command.
+
 ## 1.145.0 (2026-11-13)
 
 A batch card shows the findings it applies. A minor release because the reply before that card, and the card text, both change.
