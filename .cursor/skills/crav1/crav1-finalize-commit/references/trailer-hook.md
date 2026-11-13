@@ -17,7 +17,7 @@ Never a separate prompt and never before the paste blocks. A headless or bot run
 
 ## The question
 
-`Strip tool trailers on every commit for this repo?` Options: `strip trailers` (recommended) / `keep trailers`. Both are choice words; typed in the invocation they answer it without asking.
+`Strip tool trailers on every commit for this repo?` Options: `strip trailers` (recommended) / `keep trailers`. Both are choice words; typed in the invocation they answer it without asking. Asked once per repo. A reply that names neither word (for example only `commit`) leaves it unanswered: install no hook, save no answer, and ask again next run; never apply the Recommended pick on its own. A teammate with the hook but no config gets the config line without a question.
 
 ## On `strip trailers`
 

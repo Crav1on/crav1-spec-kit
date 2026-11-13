@@ -19,7 +19,9 @@ This is **not** parallel. Two `feat/` branches cannot share this working tree. T
 
 Command: `/crav1-build-features`. One spec: `/crav1-build-tasks`. One task: `/crav1-build-tasks`.
 
-Worker: `.cursor/agents/crav1-build-task-agent.md` (plugin: `agents/crav1-build-task-agent.md`). Protocol: `crav1-build-tasks` [references/run.md](../crav1-build-tasks/branches/one-task/references/run.md). Style: [style-persist.md](../crav1-build-tasks/branches/one-task/references/style-persist.md). Approvals: [tool-approvals.md](../crav1-build-tasks/branches/one-task/references/tool-approvals.md). Branch rules, from this skill's folder: Open `../crav1-create-feature-branch/SKILL.md` for **Build on a spec-only branch**, Open `../crav1-create-feature-branch/references/code-branch.md`, and Open `../crav1-create-feature-branch/references/task-branch.md`. The rule is [open-skill-file.md](../crav1-docs/reference/open-skill-file.md) (1.134.0). Do not start `/crav1-create-feature-branch`. The consent section below still covers the checkout.
+Worker: `.cursor/agents/crav1-build-task-agent.md` (plugin: `agents/crav1-build-task-agent.md`). Protocol: `crav1-build-tasks` [references/run.md](../crav1-build-tasks/branches/one-task/references/run.md). Style: [style-persist.md](../crav1-build-tasks/branches/one-task/references/style-persist.md). Approvals: [tool-approvals.md](../crav1-build-tasks/branches/one-task/references/tool-approvals.md). The rule is [open-skill-file.md](../crav1-docs/reference/open-skill-file.md) (1.134.0). Do not start `/crav1-create-feature-branch`. The consent section below still covers the checkout.
+
+Branch files, only when that case applies: on `spec/<anything>`, Open `../crav1-create-feature-branch/SKILL.md` at **Build on a spec-only branch** (do not open it otherwise). Before the first checkout of a slug, Open `../crav1-create-feature-branch/references/code-branch.md`. When `--recommend`'s first line is not `feat/<slug>`, read `references/task-branches.md` (it opens `../crav1-create-feature-branch/references/task-branch.md`). Do not open that file when the line is `feat/<slug>`.
 
 ## Which slugs
 
@@ -55,7 +57,7 @@ Starting this command **is** consent to use `feat/<slug>` from the **into branch
 
 One confirm if they are still on the default branch or on an unrelated branch: **continue** (first/top) = proceed with that checkout plan; **stop** = abort. If already on `feat/<first-slug>`, start there.
 
-If currently on `spec/<anything>`: stop. No workers. Open `../crav1-create-feature-branch/SKILL.md` at **Build on a spec-only branch**.
+If currently on `spec/<anything>`: stop. No workers. Open `../crav1-create-feature-branch/SKILL.md` at **Build on a spec-only branch**. Do not open that file otherwise.
 
 ## Tool approvals (once for the whole board)
 
@@ -69,14 +71,14 @@ Cloud Agents: skip the pause.
 
 Into branch and base branches (1.99.0): Open `../crav1-create-feature-branch/references/code-branch.md` from this skill's folder. The into branch is the repo's `Merges into` branch (also read from a sibling specs repo), else the default branch.
 
-1. Working tree dirty except `agent-tools/` → **do not checkout**. On a base branch, offer to carry the changes onto `feat/<slug>` with `git switch -c` when HEAD is the into branch; never send them to `/crav1-finalize-commit` on a base. Otherwise they commit on their work branch or clean it. Wait. Never stash unless they ask.
+1. When the working tree is dirty (anything other than `agent-tools/`), read `references/dirty-tree.md` before checkout. A clean tree skips it.
 2. `git checkout feat/<slug>` if it exists, else `git switch -c feat/<slug> <into>` **from the into branch** (local, else `origin/<into>`), so a repo that merges into `develop` forks from `develop`, not `main`. Never create `feat/<slug>` from the previous feature branch.
 3. If checkout fails, **block** this slug; do not start the next unless they skip.
 4. Never `git push`. Never open a PR. Never `git commit` in this chat.
 
 After a slug’s last worker, the tree should be clean (workers commit). Then switch to the next slug with this same procedure.
 
-**Task branches (1.140.0).** Inside a slug, a task is built on the first line of `scripts/build_map.py docs/specs/<slug> --recommend T#` (skill `crav1-tasks-ready-to-build`). A branch named on the task line wins over the plan step. On that line, `(map:)` wins, then `(branch:)`. A merged or deleted branch is not used. Switch to it before its worker, only on a clean tree (`git checkout X`, which also makes the local branch from `origin/X`). A name that is a base branch is `blocked` with `branch X is a base branch`; never switch to it. Starting the board is consent to these switches when the branch exists. When the name exists nowhere, use the task-branch card once. Open `../crav1-create-feature-branch/references/task-branch.md` from this skill's folder. Do not invent a different recommended name, and do not create it without a yes. A name for another repo is `blocked` with `belongs to <repo>`. A worker `needs_yes` is waiting, not blocked. The task stays unticked. The parent offers the Approval needed item, as skill `crav1-build-tasks`, `references/approval-needed.md` says. It does not write `Approved:`.
+**Task branches (1.140.0).** Before each `T#`, the branch is the first line of `scripts/build_map.py docs/specs/<slug> --recommend T#` (skill `crav1-tasks-ready-to-build`). When that line is `feat/<slug>`, stay on it. Otherwise read `references/task-branches.md` before the worker. Do not open it when the line is `feat/<slug>`. A worker `needs_yes` is waiting, not blocked: read `references/needs-yes.md`. Do not open that file on `done`.
 
 ## Board (keep this updated)
 
@@ -100,19 +102,7 @@ Open `../crav1-build-tasks/branches/several-tasks/BRANCH.md` and run that **T# l
 
 1. Launch **crav1-build-task-agent** with this spec folder, this `T#`, `resume: start`, `approvals: already-done`, `branch: already-done`, style already set.
 2. Wait for STATUS. Do not implement. Do not start `T+1` or the next slug while this worker is open.
-3. Handle STATUS:
-
-| STATUS | Orchestrator |
-| --- | --- |
-| `done` | Next `T#` on **this** slug. If no unchecked left → slug `done`, switch to next slug. |
-| `needs_fix` | Ask `fix` / `skip-slug` / `stop`. `fix` → same `T#` worker `resume: fix`. |
-| `needs_ready` | Ask them to refresh the live host, then `ready` / `skip-slug` / `stop`. `ready` → `resume: ready`. |
-| `needs_dependency` | Show the BLOCKER line at the top. Ask start / skip / `skip-slug` / stop. `start` → `resume: dependency-start`; `skip` → `resume: dependency-skip`. Headless: two-pass questions file. |
-| `blocked` / `failed` | Slug `blocked`. **End the board.** Do not start the next slug. |
-| User `skip-slug` | Mark skipped. Switch to next slug (if any). |
-| User `stop` | End the board. |
-
-Do not skip a blocked slug unless they `skip-slug`.
+3. Handle STATUS. `done`: next `T#` on **this** slug. If no unchecked left → slug `done`, switch to next slug. When STATUS is anything else, or the user says `skip-slug` or `stop`, read `references/worker-status.md`. Do not open it when every worker returns `done`.
 
 ## After the board
 
@@ -124,19 +114,11 @@ Then **tool-approvals.md → Undo** once. Do not undo per slug or per `T#`.
 
 ## Picture offer
 
-When this run marks a slug `done` on the board, or a slice on this board is marked `retired`, ask once at the end, after the board TL;DR. A slice is marked `retired` when the user says it is retired in this run, or that slug’s feature-index Notes or `## Match` status says `retired`. Do not write `retired` into a file. Do not edit `spec.md`.
-
-Ask once for the board, not once per slug. The question is exactly:
-
-The system picture may now be out of date. Run `/crav1-refresh-system-notes`?
-
-Options are yes and no. Do not run `/crav1-refresh-system-notes`. A yes waits for a later turn. A no ends without that command.
-
-Do not ask when no slug was marked done and none was marked retired. Do not add this question to `/crav1-build-tasks`.
+When this run marks a slug `done` on the board, or a slice on this board is marked `retired`, read `references/picture-offer.md` after the board TL;DR. Do not open it when no slug was marked done and none was marked retired.
 
 ## Parked and retired specs (1.60.0)
 
-Skip every spec under `docs/specs/retired/`, and every old-path `spec.md` that is only a `Moved:` pointer. A spec whose `spec.md` has a `Parked:` line is parked: do not build it, and leave it off the board's to-build list. Say `skipped: <slug> (parked)` and name `/crav1-retire-spec un-park docs/specs/<slug>/`. Do not remove the mark.
+When a spec is under `docs/specs/retired/`, is only a `Moved:` pointer, or its `spec.md` has a `Parked:` line, read `references/parked.md`. Do not build it. Do not open that file for a ready slug.
 
 ## Hard rules
 

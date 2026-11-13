@@ -19,7 +19,7 @@ Command: `/crav1-what-do-we-know-about-this`.
 
 This is cross-cutting. It is not a lane. It may run from any lane. It does not move work into Specify, Plan, or Build.
 
-This command is a later skill. It is not a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs`, `/crav1-read-environment`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane.
+This command is a later skill. It is not a starter option. When the user asks for startup options, read `references/startup-options.md`. Do not open it for a feature, slice, or resource question.
 
 Other skills do not run this one. Spark, specify, plan, and verify do not run it. It is not started automatically.
 
@@ -66,21 +66,7 @@ Read `references/inputs.md` ("Minutes and dumps") only when the input is minutes
 
 1. **A slice exists and the user named it.** They used the slug, the spec title, or `@` of that spec folder. Answer from that spec, its plan, its tasks, its Match, and its open questions.
 2. **A slice exists and the user did not name it.** Find it by matching. Answer from it. Name its path.
-3. **No slice.** Say so. Show what the repo, the code, and the environment notes do know. Present that as a candidate slice. Name one next command. Do not run it. Do not create a slug.
-
-A hit only in code, in `docs/architecture/spec.md`, or in `docs/environments/marks.md`, with no slice, is case 3.
-
-A code-only hit, with no spec and no architecture note, is also case 3. Show what the code says. Fill in **Unexplained**.
-
-Nothing anywhere: say so. Name `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, or `/crav1-bundle-to-specs`. Do not run them.
-
-When case 3 has enough written down to pick one command, name that one:
-
-- One or two sentences: `/crav1-spark-to-spec`
-- A pile of ideas and technical hunches: `/crav1-ideas-to-spec`
-- Several features, or mixed files: `/crav1-bundle-to-specs`
-
-When nothing is written down, name those three and stop. Do not pick one.
+3. **No slice.** Say so. Show what the repo, the code, and the environment notes do know. Present that as a candidate slice. Name one next command. Do not run it. Do not create a slug. Read `references/no-slice.md`. Do not open it when a slice was named or matched.
 
 ## Match, one pass
 
@@ -131,6 +117,6 @@ Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-spe
 - A failed live read is one prompt: the issue, a fix when there is one, Retry or Skip. Skip is the repo-only answer, with why the live checks did not run.
 - A focus still runs the full read. The answer shows only those sections.
 - People come from what is written. A guess is labeled `(inference, not in the docs)`.
-- Feature, change, and build reports write nothing in the project. Playbook apply copies a filled file to `docs/playbooks/` (1.120.0). `report-data-model-full` writes one new snapshot and does not edit the model. During a walk that report is the only file written. Do not run another skill, except `apply` on yes at the end of a walk, for filled confirmed lines only. Do not start `/crav1-help`.
+- A `report-*` word: feature, change, and build reports write nothing in the project. The rest of the write limits are in `reports/common.md`, read only with that word. A walk's limits are in `references/walk.md`, read only on yes or `report-playbook-walk`. Do not start `/crav1-help`.
 - Do not start Specify, Plan, or Build.
-- Later skill. Not a starter option. Asking for startup options names only the six and does not run this command.
+- Later skill. Not a starter option. Asking for startup options reads `references/startup-options.md` and does not run this command.

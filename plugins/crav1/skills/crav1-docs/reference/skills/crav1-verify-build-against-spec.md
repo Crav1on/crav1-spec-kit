@@ -8,6 +8,8 @@
 
 Map every v0 acceptance line to tests or UI checks and report pass, fail, or missing.
 
+1.149.0: work branches, sub-branches, promotion, a host-setup task, and tick pending are files read only when that case applies. The classify table, the results, and the Next cases stay in the skill. The rules are unchanged.
+
 1.142.0: when [`/crav1-build-walk`](crav1-build-walk.md) opened this skill, do not print the case Next. The walk prints its one Next.
 
 TL;DR of implemented vs not, then acceptance details in `verify.md`.

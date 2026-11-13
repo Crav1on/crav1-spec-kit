@@ -109,6 +109,10 @@ When the build writes a new `.sh` file, the repo has no `*.sh` rule with `eol=lf
 
 `/crav1-build-walk` is the guided path. It opens `/crav1-build-tasks` for the tasks on one work branch, then verify, commit, the pull request, merging the base into the branch, the merge, and the tick. While that walk runs, the open-pr line from a build is not printed. The walk prints one Next. See [Build one branch, then the next](from-build-walk.md).
 
+## Load path (1.149.0)
+
+`/crav1-build-features` opens the spec-branch skill only on `spec/<anything>`, and the task-branch file only when `--recommend` is not `feat/<slug>`. A dirty tree, a worker status other than done, a parked spec, and the picture question are files read only then. The rules are unchanged.
+
 ## After
 
 Prove the slice against the spec: [Verify and fix](from-verify.md). Then [From commit to merge](from-commit.md).

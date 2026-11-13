@@ -52,6 +52,10 @@ Questions only someone else can answer: draft them with [`/crav1-show-or-ask-ope
 
 Not written: application code, `plan.md`, `tasks.md`. Nothing is git-committed.
 
+## Load path (1.149.0)
+
+`/crav1-resolve-open-questions` reads the resolution catalog when it writes options. A stale research point, and a run that named one question, are files read only then. Conflict lines and `apply` stay their own files. The rules are unchanged.
+
 ## After
 
 Commit the accepted spec if you want it in git before planning:

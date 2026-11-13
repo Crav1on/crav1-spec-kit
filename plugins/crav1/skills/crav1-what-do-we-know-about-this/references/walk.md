@@ -40,7 +40,7 @@ Those follow-ups are how the item gets understood. They do not count against the
 
 - `yes`, an own answer, or a change to a kept decision: write it on that item's `Answer:` or `Change:` line in the report file right away, then move on. The file is the saved progress and the final record; do not print it each time. Do this only once the item is clear. When the section above applies, the explicit yes comes first.
 - Added information: take it in, say in one line what it changes (or that it changes nothing), and update the item's recommendation when it moves. Then ask again.
-- Never edit a spec, a plan, the tasks, `docs/system/` or code during the walk. The report file is the only file written.
+- Never edit a spec, a plan, the tasks, `docs/system/` or code during the walk. The report file is the only file written. During a walk that report is the only file written.
 - A pause or a stop leaves the item open. Say where the walk resumes. Do not write, and do not open a new product question to get back on track.
 
 ## Free flow

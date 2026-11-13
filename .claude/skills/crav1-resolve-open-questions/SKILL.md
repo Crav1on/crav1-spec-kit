@@ -59,7 +59,7 @@ For **only** the current `Q#`:
 
 **Always** include **Keep open**. Always include at least two **substantive** answers (not only keep vs cut) unless the only honest answers are keep vs cut-from-v0.
 
-Every option: **letter**, **name**, **what it means**, **impact** (v0/demo/tests, and which files/sections). Use the catalog below. Tailor the answer letters to *this* question (e.g. “self-register” vs “admin-provisions”) — do not offer generic “apply notes.”
+Every option: **letter**, **name**, **what it means**, **impact** (v0/demo/tests, and which files/sections). When you write the Options for the current question, read [references/catalog.md](references/catalog.md). Do not open it when you are only printing the index. Tailor the answer letters to *this* question (e.g. “self-register” vs “admin-provisions”) — do not offer generic “apply notes.”
 
 4. How to answer: `A` / `B` / … or prose (“Q2: passwords min 12 chars, no recovery in v0”). Batch on the card's free-text answer: `Q1 A, Q2 keep, Q4 C`.
 
@@ -73,8 +73,8 @@ Stop. Do not edit. Do not preview a full patched spec.
    - **Cut from v0:** move to non-goals/later; remove from Open questions.
 2. Recap **Added / Removed / Still open** for this `Q#`.
 3. If the answer makes a named diagram/ADR wrong, either they also chose `sync-here`, or the **next** item is that drift (do not silently skip).
-4. When this question was waiting on a stale research point, re-check that point. The question says so, or `## Research findings` names the point and this question. Follow the answered-later part of skill `crav1-add-to-spec`, `references/research-stale-clear.md`. Do not ask the user whether the point is settled. Keep open does not re-check. When the answer settles the point, record it and clear the mark when no point is open. When it does not, leave the mark and say why. Include that summary in the recap. Do not commit. Do not send anything.
-5. When the run named one question (`Q2`, `orders Q3`, or words matching one question), stop after it (1.90.5): do not show or ask another question. End with the still-open titles and one line: `Next: /crav1-resolve-open-questions <slug>, because other questions are still open.` Otherwise advance to the next unanswered `Q#`.
+4. When this question was waiting on a stale research point, read [references/stale-point.md](references/stale-point.md). Keep open does not re-check and does not open that file.
+5. When the run named one question (`Q2`, `orders Q3`, or words matching one question), read [references/one-question.md](references/one-question.md) and stop after it (1.90.5). Do not open that file when the run is walking the whole list. Otherwise advance to the next unanswered `Q#`.
 
 If none remain, print one of these and not both.
 
@@ -82,21 +82,6 @@ If none remain, print one of these and not both.
 - No new gaps: `Next: /crav1-plan-from-spec <slug>, because the open questions are settled or kept open.`
 
 **Batch (1.145.0).** Read **Batch of several items** in `crav1-docs/reference/question-cards.md` now. Print the findings table in this reply, then ask. Never write `table above` unless that table is in this reply. Never ask the card without the table. Hint: `Type your changes, e.g. Q1 A, Q3 keep`.
-
-## Resolution catalog (per question)
-
-| Id | Name | What it does | Typical impact |
-| --- | --- | --- | --- |
-| `keep-open` | Keep open | Leave this question unanswered. No product decision. | Still blocks a fully closed spec. Disk: none, unless they asked to rephrase. **Always offer this.** |
-| `answer-A` … | Answer: \<concrete choice\> | Commit one of the real alternatives you listed. | `spec.md` gains a SHALL, constraint, or non-goal; this `Q#` leaves the open list. |
-| `answer-custom` | Answer in my words | Use their prose as the decision. Put it in the correct section; do not dump the paragraph into Open questions. | Same as a concrete answer. Offer when choices might not fit. |
-| `cut-from-v0` | Cut from v0 | Not deciding how — deciding **not in v0**. | Smaller demo; question removed; lives under non-goals/later. |
-| `to-constraint` | Record as constraint | The answer is an accepted tech/limit, not a user journey. | `## Constraints`; not a REQ SHALL about libraries/tables. |
-| `to-adr` | Decide via ADR | Real alternatives remain worth recording. Write/update `adr/NNNN`, status `proposed` or `accepted` as they said. | Requirements stay behavioral; question removed once the ADR captures the choice (or stays open if they only drafted the ADR as proposed **and** asked to keep the question — rare; default is remove). |
-| `ask` | Narrow first | Ask at most 3 multiple-choice questions **about this Q#**. No file edits. | Retry this `Q#` next turn. Use when your answer options would be a guess. |
-| `sync-here` | Sync this artifact | Update the diagram/ADR this answer invalidates. | Only with an answer, not with keep-open. |
-
-Do **not** offer a turn-level “answer all with assumptions.” Guessing is `ask` or `keep-open`.
 
 ## Hard rules
 

@@ -104,6 +104,10 @@ After the commit, `/crav1-finalize-commit` fetches. It never pushes. It makes at
 
 `/crav1-open-pr` does not save the body it drafts: that is its own summary. Since 1.98.0 each change is a bullet that starts with a link to its file and lines at the head commit, then a bold title and what changed and why; the why comes only from the spec, a plan task, a commit message or a code comment. The verify result is written out under Verified, and the body never links the spec. When an infra, pipeline or PROD change states no rollback, the chat says `No rollback stated` (the body does not). The next `/crav1-pr-status` run turns the Merge order section into `Order` lines, Questions for reviewers into Points tagged `asked`, and offers Not in this PR as follow-ups. After a confirmed merge, `/crav1-merge-pr` writes or updates the pull request's PR note in the specs repo (`docs/notes/YYYY-MM/YYYY-MM-DD-pr-<repo>-<n>.md`, its title and description, `kind: pull request`), with any edits made to the description since, and sets its PR record's `State` and `Ready` lines to merged (1.97.0). Before merging it reads the `Ready` line and stops on `no` unless you say `anyway`. It is not committed. A review with `/crav1-review-pr` writes the same note. From the specs repo, a pull request in another repo is reviewed with `/crav1-review-pr <repo> <n>`.
 
+## Load path (1.149.0)
+
+`/crav1-finalize-commit` drafts first. The commit steps are read when the pick is commit or the word is `commit now`. The trailer-hook file is read only when no answer is saved and the hook is missing or off. The rules are unchanged.
+
 ## After
 
 After an outside pull request merges, `/crav1-review-pr` names `/crav1-refresh-system-notes` to catch the picture up: [Keep the picture current](from-refresh-system-notes.md).

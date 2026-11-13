@@ -17,7 +17,7 @@ Visual first. Draw a Mermaid diagram wherever a picture explains faster than pro
 ## The file
 
 - Name: `<topic-slug>-report-<type>-<depth>-<YYYY-MM-DD>.md`.
-- Where: the user's Downloads folder when you can write there; otherwise the system temp folder. Never inside the project, and never commit it. This is the first write. A playbook stays here until apply. A draft with no filled `Answer:` or `Change:` line is not copied. On apply, `/crav1-resolve-open-questions` copies a filled playbook to `docs/playbooks/<topic>.md` (1.120.0) and stamps `Docs path:`. See skill `crav1-resolve-open-questions`, `references/apply.md`. The walk also accepts a `docs/playbooks/` path.
+- Where: the user's Downloads folder when you can write there; otherwise the system temp folder. Never inside the project, and never commit it. Feature, change, and build reports write nothing in the project. This is the first write. A playbook stays here until apply. A draft with no filled `Answer:` or `Change:` line is not copied. On apply, `/crav1-resolve-open-questions` copies a filled playbook to `docs/playbooks/<topic>.md` (1.120.0) and stamps `Docs path:`. See skill `crav1-resolve-open-questions`, `references/apply.md`. The walk also accepts a `docs/playbooks/` path.
 - First lines: the title, then `Report: report-<type>-<depth> · <date> · kit <version>`, then the Verdict.
 - Leave out a section that has nothing under it. Do not print placeholders.
 

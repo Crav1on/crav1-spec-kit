@@ -96,8 +96,10 @@ REQUIRED = {
     skill_file("crav1-build-features", "SKILL.md"): [
         "../crav1-create-feature-branch/SKILL.md",
         "../crav1-create-feature-branch/references/code-branch.md",
-        "../crav1-create-feature-branch/references/task-branch.md",
         "../crav1-build-tasks/branches/several-tasks/BRANCH.md",
+    ],
+    skill_file("crav1-build-features", "references", "task-branches.md"): [
+        "../crav1-create-feature-branch/references/task-branch.md",
     ],
     skill_file("crav1-update-specs-from-changes-and-prs", "SKILL.md"): [
         "../crav1-add-to-spec/SKILL.md",

@@ -2,6 +2,19 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.149.0 (2026-11-13)
+
+Branch-specific rules move out of the long skills into files read only when that case applies. A minor release because a typical run no longer loads those cases. The rules are unchanged. Each file is named from `SKILL.md` with a load-when line.
+
+- **Verify.** `/crav1-verify-build-against-spec` keeps the classify table, the results, and the Next cases. Work branches, sub-branches and reverts, promotion, a `(host setup)` task, and tick pending each have a file. A typical run (local tests, work branches, no sub-branches, no `promotion.md`, no host-setup task, no tick-pending row) loads 2,115 words, down from 2,468.
+- **Build features.** `/crav1-build-features` opens the spec-branch skill only on `spec/<anything>`, and the task-branch file only when `--recommend` is not `feat/<slug>`. A dirty tree, a status other than `done`, `needs_yes`, a parked spec, and the picture question are files read only then. A typical board (two ready slugs, a clean tree, every task on `feat/<slug>`, workers return `done`) loads 1,538 words, down from 3,827, because it no longer opens the spec-branch skill or the task-branch file up front.
+- **Tasks ready.** `/crav1-tasks-ready-to-build` prints the task list from `references/task-list.md`. Work branches, promotion, a work-item line, a Next line that is not `ready` or `ready-partial`, a plan risk, and a dependency cycle are files read only then. A typical ready-partial slice with work branches and no promotion file loads 1,929 words, down from 1,999.
+- **What's known.** `/crav1-what-do-we-know-about-this` reads startup options only when asked for them, and the no-slice file only when no slice matches. A typical free-form answer for a named slug loads 3,197 words, down from 3,323.
+- **Finalize commit.** The commit steps are `references/commit.md`, read on `commit` or `commit now`. The trailer-hook file is read only when no answer is saved and the hook is missing or off. Every run through the choice prompt loads 2,183 words, down from 2,694. A commit then also reads that commit file and the pull file.
+- **Resolve.** The resolution catalog is read when writing options. A stale research point and a run that named one question are files read only then. A typical walk that writes options, with no conflict, no `apply`, and no `detailed`, loads 1,488 words, down from 1,539.
+- **Left for later.** `/crav1-review-pr` is already a router. Its verdict and hard rules are what a typical review still reads, so this release does not split them.
+- **Tests.** `scripts/tests/test_load_path_1149.py` checks the load-when lines, that the moved rules are still in the files, and that each `SKILL.md` stays under its word cap.
+
 ## 1.145.0 (2026-11-13)
 
 A batch card shows the findings it applies. A minor release because the reply before that card, and the card text, both change.

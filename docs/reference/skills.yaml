@@ -584,6 +584,7 @@ skills:
   walkthrough: docs/from-draft-spec.md
   purpose: Walk Open questions and Conflict lines in spec.md one by one.
   in_depth:
+  - '1.149.0: the resolution catalog is read when writing options. A stale research point and a run that named one question are files read only then. The rules are unchanged.'
   - '1.141.0: does not walk `## Approval needed` and does not remove an `Approved:` line. Folding an answer still removes that question''s `Answered:` line.'
   - One Open question at a time; keep it open or answer with impact; patch only that question, found by its words (`Q#` is display only).
   - Conflict lines (1.111.0) are listed after the questions; settling one replaces or keeps the decided line, removes the Conflict line, and adds a trace to the note.
@@ -1119,6 +1120,7 @@ skills:
   walkthrough: docs/from-plan-to-build.md
   purpose: 'Serial board: build several ready specs one slug after another in this checkout.'
   in_depth:
+  - '1.149.0: the spec-branch skill opens only on `spec/<anything>`. The task-branch file opens only when `--recommend` is not `feat/<slug>`. A dirty tree, a status other than done, a parked spec, `needs_yes`, and the picture question are files read only then. The rules are unchanged.'
   - '1.141.0: a worker `needs_yes` is waiting. The parent offers the Approval needed item and does not write `Approved:`.'
   - 'Serial board of ready slugs: `feat/<slug>` from default, then that spec’s build-tasks loop; no
     parallel, no push, no PR.'
@@ -1202,6 +1204,7 @@ skills:
   walkthrough: docs/from-verify.md
   purpose: Map every v0 acceptance line to tests or UI checks and report pass, fail, or missing.
   in_depth:
+  - '1.149.0: work branches, sub-branches, promotion, a host-setup task, and tick pending are files read only when that case applies. The classify table, the results, and the Next cases stay in the skill. The rules are unchanged.'
   - '1.142.0: when `/crav1-build-walk` opened this skill, do not print the case Next. The walk prints its one Next.'
   - TL;DR of implemented vs not, then acceptance details in `verify.md`.
   - >-
@@ -1327,6 +1330,7 @@ skills:
   walkthrough: docs/from-commit.md
   purpose: Draft the commit message, then commit, copy, change, or stop.
   in_depth:
+  - '1.149.0: the commit steps are `references/commit.md`, read on commit or `commit now`. The trailer-hook file is read only when no answer is saved and the hook is missing or off. The rules are unchanged.'
   - '1.141.0: a merge of `spec.md` keeps every `Approved:` line under `## Approval needed`. The pull path never drops one.'
   - '1.99.0: never commits implementation code on a base branch, even with `commit now`; the prompt becomes `Commit on a work branch?` (create `feat/<slug>` from the into branch and commit, an existing branch, another name, stop). Spec and doc commits on a base are unchanged.'
   - '1.130.0: a typed branch name on that prompt is the card''s free-text answer, hint `Type a branch name`. There is no option labelled Other name.'
@@ -1763,6 +1767,7 @@ skills:
   walkthrough: docs/from-tasks-ready-to-build.md
   purpose: 'List the tasks ready to build, for one spec or all, and why the others are blocked. Rewrites each slice build map.'
   in_depth:
+  - '1.149.0: the task list is `references/task-list.md`. Work branches, promotion, a work-item line, a Next line that is not ready or ready-partial, a plan risk, and a dependency cycle are files read only when that case applies. The rules are unchanged.'
   - '**`/crav1-tasks-ready-to-build`** reads `spec.md` open questions, `plan.md` (the `Reviewed:` line and `## Risks`), `tasks.md`, and `verify.md` for one slice or every slice. A ticked task is Done when `verify.md` lists it as verified, otherwise Needs verify. Then a task is blocked by a missing `plan.md`, by a kept-open question whose `Blocks:` line names it, by a kept-open question with no `Blocks:` line (tasks named in the text, or the whole slice only when none are named and resolve-open-questions has never been recorded), by a plan Risk that says do not implement until resolved only when that question has no `Blocks:` line, or by an unticked task in its `(after: T#)` (recorded) or, with no `(after: …)`, the task just before it (inferred). `Blocks: none` blocks no task. Any `Blocks:` line wins over that Risk wording. Lists and Next follow dependency order (1.103.0): the `(after: …)` graph in waves, lowest number first in a wave; Next is the ready task that unblocks the most; a cycle blocks its tasks. It may run `scripts/task_order.py` and `scripts/question_blocks.py` next to the skill. Otherwise it is Ready, with a warning when the plan review is unknown (inferred) or still has open `P#`s.'
   - 'Shows summary counts per slice, then Ready and Held grouped by build-map branch, Waits in order, and Blocked (one reason each, recorded or inferred), Needs verify, a Done count, one `Next:` line per ready branch, and a `Source:` line. A wait on a real earlier task is Waits in order. A cycle, or an after: that names no task, is Blocked. An open question is Held with that question. Local only: it never reads Azure Boards and names `/crav1-ado-sync` for task states there. It runs no other skill. It can run any time. It is cross-cutting. It is not a starter option.'
   - '1.141.0: an unapproved `## Approval needed` item holds its `Holds:` tasks. They are Waiting on that person. Other tasks still start (`ready-partial`). A matching `Approved:` line clears the hold. `task_order.py` lists them under Waiting on approval.'
@@ -1968,6 +1973,7 @@ skills:
   walkthrough: docs/from-what-do-we-know-about-this.md
   purpose: Answer one question about a feature, slice, resource, or not-yet-feature from the specs first.
   in_depth:
+  - '1.149.0: startup options and a case with no slice are files read only then. The rules are unchanged.'
   - '1.130.0: the apply offer at the end of a walk is one card. `yes (Recommended)` runs apply. Typed changes go on that card''s free-text answer. There is no Edits option.'
   - '1.145.0: that end card prints a findings table in the same reply before the card. The card names each item and its recommendation. It does not say `table above`. The card is not asked without the table.'
   - 'A word `report-<type>-<depth>` picks a fixed Markdown report (1.104.0): `report-feature-short`, `report-feature-full`, `report-change-short`, `report-change-full`, `report-build-short`, `report-build-full`, and (1.109.0, preview) `report-playbook-short`, `report-playbook-full`, and (1.116.0) `report-playbook-walk`, which resumes a guided walk in chat through an existing playbook report (`report-playbook-full` asks to walk after writing; answers are saved into the report as they come; headless runs never walk). `report-data-model-full` (1.118.0) reads one saved model and writes an immutable Markdown review and a PDF with rendered diagrams; it does not model again. It routes first and loads only `reports/common.md` and that one `reports/<type>-<depth>.md`; no report word stays the free-form answer and opens no report file. Mermaid wherever a picture helps, only the diagrams that file lists; C4 always in feature-full, in change-full only when the change alters architecture or pipelines. Build reports list tasks in dependency order. Playbook reports sort decisions into Kept, Needs your answer (a recommended answer and why; undecided or decided by a named person, never a hand-off) and Compose, then list the kit skills in order (short at most 8 steps) with a dependency-order diagram; answers stay in the report until the user confirms. During a walk (1.117.0) the chat states each item in words and does not use item ids; `go to N9` still jumps. When what the user says and the record disagree, the walk works out the intended outcome with them and writes only after an explicit yes. Apply at the end, on yes, writes filled confirmed lines and does not run plan, build, or merge. It does not start `/crav1-help` or `/crav1-pr-status`. A live source that needs a sign-in, a permission, or a missing tool is asked about first (Allow or Skip); facts are tagged `Live read.`, guesses `(inference, not in the docs)`. Feature, change, and build reports are written outside the project, to Downloads when reachable, else a temp folder, and the chat always links or attaches them. The first playbook write is the same. On apply, a filled playbook is copied to `docs/playbooks/` (1.120.0). A draft with no filled answer is not copied. `report-data-model-full` is the exception: one new immutable `report.md` and `report.pdf` under `docs/data-model/<model>/reviews/`, and it does not edit the saved model. 1.121.0 builds that review from the saved records (one title, each section once, an empty section is one line, a run-ending line near the top) and the PDF carries the same prose. Diagrams are titled by name, wrapped so the text stays readable, and a wide diagram gets a landscape page or numbered parts.'

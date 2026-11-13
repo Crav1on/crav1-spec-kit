@@ -27,7 +27,7 @@ class OpenPrExisting(unittest.TestCase):
             self.assertIn(t, r)
 
     def test_next_step_lines_name_pr(self):
-        for p in ("crav1-finalize-commit/SKILL.md", "crav1-build-features/SKILL.md",
+        for p in ("crav1-finalize-commit/references/commit.md", "crav1-build-features/SKILL.md",
                   "crav1-build-tasks/branches/one-task/BRANCH.md",
                   "crav1-build-tasks/branches/several-tasks/BRANCH.md",
                   "crav1-verify-build-against-spec/SKILL.md",

@@ -96,6 +96,10 @@ No spec edit. No `plan.md`. No `tasks.md`. No marks. No application code.
 
 The answer leaves out an empty section. It does not pad. A guess is labeled `(inference, not in the docs)`.
 
+## Load path (1.149.0)
+
+`/crav1-what-do-we-know-about-this` reads the startup-options file only when asked for startup options, and the no-slice file only when no slice matches. A report word still reads only `reports/common.md` and that one report. The rules are unchanged.
+
 ## After
 
 When there is no slice, the answer names one next command. This command does not run it.
