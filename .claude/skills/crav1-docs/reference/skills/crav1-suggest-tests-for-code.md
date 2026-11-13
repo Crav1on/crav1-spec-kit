@@ -14,6 +14,8 @@ The user points at code that already exists, one repo or one area, not the whole
 
 1.134.0: a kept suggestion opens `..[`/crav1-add-to-spec`](crav1-add-to-spec.md)/references/handoffs-suggest-tests.md` and does not start [`/crav1-add-to-spec`](crav1-add-to-spec.md). The rule is `docs/reference/open-skill-file.md`.
 
+1.145.0: each suggestion is its own question and that question names it. One card for every suggestion prints a findings table in that same reply before the card. The card names each item and its recommendation. It does not say `table above`. The card is not asked without the table.
+
 ## Runs when
 
 The user points at existing code. Called by the user.

@@ -56,7 +56,7 @@ On the side, list code no slice covers: repo, path, one line about what it is. M
 
 Put every fact you will treat as accepted on the map. A fact you leave off stays inferred.
 
-End the map with one question card, as `crav1-docs/reference/question-cards.md` says, as the last thing in the message.
+End the map with one question card, as `crav1-docs/reference/question-cards.md` says, as the last thing in the message. Follow **Batch of several items** in that file before this card. Print the findings table in this reply, then ask. The card names each item and its recommendation, for example `P4 tasks miss the 400 path: A add a test`. Never write `table above` unless that table is in this reply. Never ask the card without the table.
 
 - `yes (Recommended)`: write it as shown.
 - The card's free-text answer. Hint: `Type your changes, e.g. drop slice 3` or `move 5 to the orders repo`. An item that answer does not mention keeps what was shown.

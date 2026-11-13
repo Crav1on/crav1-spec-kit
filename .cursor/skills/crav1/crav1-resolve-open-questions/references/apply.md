@@ -30,7 +30,7 @@ One question per conflict, with the questions tool when available, at most 4 opt
 
 ## Write
 
-Nothing is written until the user confirms the whole list. One question card, as `crav1-docs/reference/question-cards.md` says.
+Nothing is written until the user confirms the whole list. One question card, as `crav1-docs/reference/question-cards.md` says. Follow **Batch of several items** in that file before this card. Print the findings table in this reply, then ask. The card names each item and its recommendation, for example `P4 tasks miss the 400 path: A add a test`. Never write `table above` unless that table is in this reply. Never ask the card without the table.
 
 - `yes (Recommended)`: write it as shown. A filled playbook is written to `docs/playbooks/<topic>.md` on that yes. A git commit still waits for `/crav1-finalize-commit`.
 - The card's free-text answer. Hint: `Type your changes, e.g. only 1 and 3` or `skip K2`. An item that answer does not mention keeps what was shown.

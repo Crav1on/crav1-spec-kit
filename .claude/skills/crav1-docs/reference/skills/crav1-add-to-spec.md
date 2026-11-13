@@ -14,6 +14,8 @@ Bring new information into existing specs; asks what you have: a fact, a dump, a
 
 1.130.0: a dump sort, a code-change sort, and the same kind of confirm are one card. `yes (Recommended)` writes what was shown. Typed changes go on that card's free-text answer. An item not mentioned keeps what was shown. There is no Edits option. Keep, leave, and dismiss stay real options on a meeting item.
 
+1.145.0: a dump sort, a code-change sort, flagged lines, and images in a mail print a findings table in that same reply before the card. The card names each item and its recommendation. It does not say `table above`. A meeting item stays its own question. Collapsing those questions onto one card prints the same table. The card is not asked without the table.
+
 A fact (was [`/crav1-add-to-spec`](crav1-add-to-spec.md)): New information aimed at one spec that already exists is **[`/crav1-add-to-spec`](crav1-add-to-spec.md)**. [`/crav1-tighten-spec`](crav1-tighten-spec.md) stays for mushy wording. Match, intake, spark, and ideas create the folders. This command does not plan.
 
 A fact (was [`/crav1-add-to-spec`](crav1-add-to-spec.md)): New information for one existing spec → quote it into that `spec.md`, then report whether the landscape or another spec has to change. Does not rewrite those other files unless asked. Does not create a glossary. A new glossary row can be one listed edit and is not written unless apply is chosen. A meaning the new information does not state is `to be researched`. Existing rows are not rewritten. Does not plan, implement, or commit.

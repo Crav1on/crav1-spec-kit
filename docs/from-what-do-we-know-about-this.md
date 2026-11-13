@@ -70,6 +70,8 @@ A playbook lists; it does not take answers in chat. Kept decisions can still be 
 
 Already applied, then new information landed in the specs? Do not re-walk the playbook: [what to run](from-tighten-and-plan.md#already-applied-then-new-information).
 
+The yes at the end of a chat walk is one card for the answers just given. Since 1.145.0 that reply prints a findings table immediately before the card. The card names each item and its recommendation. It does not say `table above` unless that table is in the reply. The card is not asked without the table.
+
 ## Steps
 
 | Phase | You | Agent |

@@ -91,7 +91,7 @@ Read `references/catalog.md` ("When they pick `suggest`") only when the user pic
 3. If acceptance is still mushy on *this* issue and they did not choose `make-testable`, say so — do not silently rewrite.
 4. Advance to the next unanswered issue (same format). If none remain, run the tight-enough checklist.
 
-**Batch (1.130.0).** When there are 8 or fewer issues, one question card for the whole list, as `crav1-docs/reference/question-cards.md` says. `yes (Recommended)` applies every recommendation. The card's free-text answer carries the hint `Type your changes, e.g. I1 B, I3 keep`. An item that answer does not mention keeps its recommendation. One issue at a time still works. Then patch, and give one recap for the run.
+**Batch (1.145.0).** When there are 8 or fewer issues, one question card for the whole list. Follow **Batch of several items** in `crav1-docs/reference/question-cards.md` before this card. Print the findings table in this reply, then ask. The card names each item and its recommendation, for example `P4 tasks miss the 400 path: A add a test`. Never write `table above` unless that table is in this reply. Never ask the card without the table. `yes (Recommended)` applies every recommendation. The card's free-text answer carries the hint `Type your changes, e.g. I1 B, I3 keep`. An item that answer does not mention keeps its recommendation. One issue at a time still works. Then patch, and give one recap for the run.
 
 **Open questions (1.123.0).** An issue whose only work is an `Answered:` line, or that only repeats a question already under `## Open questions`, is not walked. One line, no menu: `Left for /crav1-resolve-open-questions: I3, I10.`
 

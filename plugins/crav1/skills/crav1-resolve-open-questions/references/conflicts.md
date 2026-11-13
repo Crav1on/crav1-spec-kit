@@ -22,7 +22,7 @@ Recommend one option and put it first, with ` (Recommended)` at the end of its l
 
 ## Write
 
-Nothing is written until the user confirms the whole batch. One question card, as `crav1-docs/reference/question-cards.md` says.
+Nothing is written until the user confirms the whole batch. One question card, as `crav1-docs/reference/question-cards.md` says. Follow **Batch of several items** in that file before this card. Print the findings table in this reply, then ask. The card names each item and its recommendation, for example `P4 tasks miss the 400 path: A add a test`. Never write `table above` unless that table is in this reply. Never ask the card without the table.
 
 - `yes (Recommended)`: write it as shown.
 - The card's free-text answer. Hint: `Type your changes, e.g. only C1` or `C2: keep it open`. An item that answer does not mention keeps what was shown.

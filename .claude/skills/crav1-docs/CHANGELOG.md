@@ -2,6 +2,15 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.145.0 (2026-11-13)
+
+A batch card shows the findings it applies. A minor release because the reply before that card, and the card text, both change.
+
+- **Findings table.** When one card applies a recommendation to each of several items, the reply prints a findings table immediately before the card. Columns are Id, Issue, Options, and Recommendation. The card is never asked without that table in the same reply. This covers `/crav1-tighten-plan`, `/crav1-tighten-spec` (including a small group answered as a batch), `/crav1-resolve-open-questions` (the question batch, conflict batch, and apply list), `/crav1-add-to-spec` (dump sort, code-change sort, a meeting collapsed onto one card, flagged lines, and images in a mail), `/crav1-suggest-tests-for-code` when the suggestions are one card, the map confirm in `/crav1-existing-to-specs`, the end card of a `/crav1-what-do-we-know-about-this` playbook walk, and the Blocks batch inside `/crav1-tighten-and-plan-ready-to-build`.
+- **The card names each item.** The question text is self-contained, for example `P4 tasks miss the 400 path: A add a test`. It still makes sense if the table scrolled away. `yes (Recommended)` still applies every recommendation. Typed changes stay on the free-text answer.
+- **No table above.** The card does not say `table above`, `the table recommends`, or `as in the table`. Those phrases are allowed only when the table is in that same reply, and the card still names each item.
+- **Script.** `<interpreter> -X utf8 <skill crav1-tighten-plan>/scripts/batch_offer.py --title "Tighten-plan batch" --items <file>` prints the table and the `Card:` line together. The card line is built from the table rows. No rows, and the command prints no card. The rule is [Question cards](docs/reference/question-cards.md).
+
 ## 1.144.0 (2026-11-13)
 
 A kit script command names the interpreter and every required argument. A minor release because the command a skill tells the assistant to run changes, and `resolve_spec.py` accepts a missing `--root`.

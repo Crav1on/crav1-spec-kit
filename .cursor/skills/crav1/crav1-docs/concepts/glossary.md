@@ -114,6 +114,8 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 
 **Feature index.** The table in `docs/system/landscape.md` with one row per slice and its status.
 
+**Findings table.** The chat table printed immediately before a batch card (1.145.0). Columns are Id, Issue, Options, and Recommendation. It is not a file under `docs/specs/`. The card names each item and its recommendation, for example `P4 tasks miss the 400 path: A add a test`. The card is not asked without the table in that same reply, and it does not say `table above` unless that table is in the reply. `/crav1-tighten-plan`, `/crav1-tighten-spec`, `/crav1-resolve-open-questions`, `/crav1-add-to-spec`, `/crav1-suggest-tests-for-code`, `/crav1-existing-to-specs`, `/crav1-what-do-we-know-about-this`, and `/crav1-tighten-and-plan-ready-to-build` use it when one card applies a yes to several items. See [Question cards](../reference/question-cards.md).
+
 **Glossary rows.** The words a source already uses, in `docs/system/glossary.md`. New rows are added in sorted place by term. Existing rows are not rewritten. A meaning the source does not state is `to be researched`. `/crav1-glossary` shows the rows, answers one word, and fills `to be researched` rows: from `docs/` with a file and line link, or from the web for public terms after a yes (1.101.0). `/crav1-glossary as-file` writes the list to `.crav1/glossary-list.md`, ignored by git (1.102.0).
 
 **Match status.** Under a spec's `## Match`: done, partial, not in the code, or retired.

@@ -27,7 +27,7 @@ Number each image. The line says inline or attached, the file name or content id
 
 ### One question for the images
 
-After the list, one question card when there is at least one image, as `crav1-docs/reference/question-cards.md` says. Use the questions tool when it is available. Stop until the user picks.
+After the list, one question card when there is at least one image, as `crav1-docs/reference/question-cards.md` says. Follow **Batch of several items** in that file before this card. Print the findings table in this reply, then ask. The card names each item and its recommendation, for example `P4 tasks miss the 400 path: A add a test`. Never write `table above` unless that table is in this reply. Never ask the card without the table. Use the questions tool when it is available. Stop until the user picks.
 
 1. **Accept all recommendations (Recommended).**
 2. **Go through them one by one.** The recommendation is shown on each image. The four options are the answers; the recommended one comes first with ` (Recommended)`.

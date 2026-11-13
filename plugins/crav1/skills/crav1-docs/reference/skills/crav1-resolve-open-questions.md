@@ -24,6 +24,8 @@ Conflict lines (1.111.0) are listed after the questions; settling one replaces o
 
 1.130.0: the batch is one card. `yes (Recommended)` applies every recommendation. Typed changes go on that card's free-text answer, for example `Q1 A, Q3 keep` or `C1: keep it open`. An item not mentioned keeps its recommendation. There is no Edits option.
 
+1.145.0: the question batch, the conflict batch, and the apply list each print a findings table in that same reply before the card. The card names each item and its recommendation. It does not say `table above`. The card is not asked without the table.
+
 1.134.0: on apply, a kept item opens `..[`/crav1-add-to-spec`](crav1-add-to-spec.md)/references/fact.md` and does not start [`/crav1-add-to-spec`](crav1-add-to-spec.md). The rule is `docs/reference/open-skill-file.md`.
 
 ## Choice words
