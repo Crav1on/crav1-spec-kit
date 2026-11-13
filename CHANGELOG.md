@@ -2,6 +2,15 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.148.0 (2026-11-13)
+
+A spec edit during a tighten-and-plan walk reopens from the first step that owns the changed section. A minor release because resume no longer reopens every later step when the spec hash moves.
+
+- **Section stamps.** `walk-progress.md` records `Section stamps` on each step that covers the spec, and `Question ids` on resolve-open-questions. Resume compares sections. `reopen_line` names what changed and which steps reopen. Say that line once.
+- **Requirement sections.** Problem, Goals, Non-goals, Users and journeys, Acceptance criteria, Constraints, Requirements, Scope, Decisions, Background, Context, What the dump says, Trace, Research findings, the text before the first heading, and any other heading reopen tighten-spec, plan-from-spec, review-and-tighten-plan, and the ready check. They do not reopen resolve-open-questions when the question ids are unchanged. An unknown heading uses that same row, so a new constraint still reopens the plan.
+- **Questions.** A new, removed, or reworded open question reopens only resolve-open-questions. Ask only the ids in `changed_questions`. The stable key from 1.146.0 (`question_stable_key`) ignores a refreshed commit list, and one close reword of a stored question stays that question. An explicit `Id:` mark still reopens when the words change. An `Answered:` line on the same words, or a new question that is already answered, does not reopen and does not re-ask.
+- **No reopen.** `## Match` (including a renamed branch), `## In the code`, a `Synced at:` line, and `## Approval needed` do not reopen a step. When the change is only Match, In the code, Synced at, or an already-answered question, `/crav1-add-to-spec` offers Restamp. `walk_progress.py restamp-covered --root <spec-folder> --yes` refreshes the stamps. `Done` and `Result` stay. A step recorded before this release, with no `Section stamps` line, still uses the 1.137 rule.
+
 ## 1.147.0 (2026-11-13)
 
 Install bundles keep a short changelog, and guild routing stays a short map. A minor release because the bundled changelog is a slice of the full file, and `/crav1-help` reads that slice in an install.

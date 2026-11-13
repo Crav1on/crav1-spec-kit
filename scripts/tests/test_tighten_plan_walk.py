@@ -200,14 +200,17 @@ class Progress(unittest.TestCase):
         spec = must(["resume", "--root", str(self.root)])
         by_id = {row["id"]: row for row in spec["steps"]}
         # Architecture already has a later spec step, so a spec edit does not
-        # send the walk back there (1.123.0). The steps that edit or consume
-        # the spec do reopen.
+        # send the walk back there (1.123.0). An unsectioned rewrite is the
+        # introduction (1.148.0): tighten and the plan reopen. Resolve stays
+        # covered when no question id changed.
         self.assertEqual(by_id["playbook"]["status"], "keep")
         self.assertEqual(by_id["review-architecture"]["status"], "keep")
-        for step in ("tighten-spec", "resolve-open-questions", "plan-from-spec", "review-and-tighten-plan", "tasks-ready-to-build"):
+        self.assertEqual(by_id["resolve-open-questions"]["status"], "keep")
+        for step in ("tighten-spec", "plan-from-spec", "review-and-tighten-plan", "tasks-ready-to-build"):
             self.assertEqual(by_id[step]["status"], "reopen", step)
             self.assertEqual(by_id[step]["changed"], ["spec"])
         self.assertEqual(spec["continue_from"], "tighten-spec")
+        self.assertIn("Reopen: tighten-spec, plan-from-spec", spec["reopen_line"])
 
         (self.root / "spec.md").write_text("spec v1\n", encoding="utf-8")
         (self.root / "plan.md").write_text("plan v2\n", encoding="utf-8")

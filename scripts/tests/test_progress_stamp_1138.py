@@ -277,6 +277,9 @@ class ProgressStamp(unittest.TestCase):
         )
         status = statuses(root)
         for step in STEPS:
+            if step == "resolve-open-questions":
+                self.assertEqual(status[step], "keep", step)
+                continue
             self.assertEqual(status[step], "reopen", step)
         payload = must(["readiness", "--root", str(root)])
         self.assertEqual(payload["result"], "not-ready")
@@ -286,7 +289,7 @@ class ProgressStamp(unittest.TestCase):
         self.assertNotIn("can start now", payload["next"])
         self.assertIn("rerun or clear", payload["next"])
 
-    def test_a_branch_rename_still_reopens(self):
+    def test_a_match_branch_rename_does_not_reopen(self):
         root = fresh()
         record_walk(root)
         text = (root / "spec.md").read_text(encoding="utf-8")
@@ -295,8 +298,11 @@ class ProgressStamp(unittest.TestCase):
             encoding="utf-8",
         )
         status = statuses(root)
-        self.assertEqual(status["tighten-spec"], "reopen")
-        self.assertEqual(status["tasks-ready-to-build"], "reopen")
+        for step in STEPS:
+            self.assertEqual(status[step], "keep", step)
+        payload = must(["resume", "--root", str(root), "--no-playbook"])
+        self.assertTrue(payload["restamp_only"])
+        self.assertIn("Changed: Match. Reopen: none.", payload["reopen_line"])
 
     def test_old_split_stamp_matches_progress_and_the_next_record_upgrades(self):
         root = fresh()

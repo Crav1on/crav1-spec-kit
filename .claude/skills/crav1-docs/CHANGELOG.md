@@ -2,6 +2,15 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.148.0 (2026-11-13)
+
+A spec edit during a tighten-and-plan walk reopens from the first step that owns the changed section. A minor release because resume no longer reopens every later step when the spec hash moves.
+
+- **Section stamps.** `walk-progress.md` records `Section stamps` on each step that covers the spec, and `Question ids` on resolve-open-questions. Resume compares sections. `reopen_line` names what changed and which steps reopen. Say that line once.
+- **Requirement sections.** Problem, Goals, Non-goals, Users and journeys, Acceptance criteria, Constraints, Requirements, Scope, Decisions, Background, Context, What the dump says, Trace, Research findings, the text before the first heading, and any other heading reopen tighten-spec, plan-from-spec, review-and-tighten-plan, and the ready check. They do not reopen resolve-open-questions when the question ids are unchanged. An unknown heading uses that same row, so a new constraint still reopens the plan.
+- **Questions.** A new, removed, or reworded open question reopens only resolve-open-questions. Ask only the ids in `changed_questions`. The stable key from 1.146.0 (`question_stable_key`) ignores a refreshed commit list, and one close reword of a stored question stays that question. An explicit `Id:` mark still reopens when the words change. An `Answered:` line on the same words, or a new question that is already answered, does not reopen and does not re-ask.
+- **No reopen.** `## Match` (including a renamed branch), `## In the code`, a `Synced at:` line, and `## Approval needed` do not reopen a step. When the change is only Match, In the code, Synced at, or an already-answered question, `/crav1-add-to-spec` offers Restamp. `walk_progress.py restamp-covered --root <spec-folder> --yes` refreshes the stamps. `Done` and `Result` stay. A step recorded before this release, with no `Section stamps` line, still uses the 1.137 rule.
+
 ## 1.147.0 (2026-11-13)
 
 Install bundles keep a short changelog, and guild routing stays a short map. A minor release because the bundled changelog is a slice of the full file, and `/crav1-help` reads that slice in an install.
@@ -134,12 +143,5 @@ A skill that runs another kit skill opens that skill's file. Command-only stays 
 - **Who opens a file.** The walk's locked steps, extras, jump back, and playbook apply. `/crav1-build-features` for the T# loop and branch rules. `/crav1-update-specs-from-changes-and-prs` for each add-to-spec item. `/crav1-read-environment` for a confirmed system, architecture, match, or left-out section. `/crav1-suggest-tests-for-code` for a kept suggestion. Apply's kept items follow add-to-spec's fact rules.
 - **Who does not.** `/crav1-fix-bug` still names the lane and does not open that skill. The add-to-spec PR record, merge-safe formats, and picture offer name other skills and do not open them. A `Next:` line is still not a start.
 - **Command-only stays.** `disable-model-invocation: true` is unchanged on the step skills.
-
-## 1.133.0 (2026-11-11)
-
-The ready check groups tasks by the branch they will be built on, and the build map shows the task id with the short name. A minor release because both change what a ready check prints and what `build-map.md` contains.
-
-- **By branch.** `/crav1-tasks-ready-to-build` and the tighten-and-plan ready check no longer print one flat list (`Ready now: T2, T45, T5, T6, T27`) and one Next line. Ready tasks and held tasks are grouped by the build-map row. The branch is the name `scripts/build_map.py --recommend` prints, so it matches the map. Branches are ordered by wave, then by the map's row order. Each ready branch gets its own Next line, for example `Next: /crav1-build-tasks T2 T5 T6` (on `feat/orders-api-record`), so those branches can start together. One ready branch is still one line. A held task stays with its branch and its reason: the open question and who has it, or `held, waits on T3`. The walk record is unchanged: `Result: ready-partial`, `ready`, or `not-ready`.
-- **Task ids on the map.** 1.128.0 kept task ids out of `build-map.md`. The Tasks field now shows `T#` plus the short name, for example `T5 orders-api: require pipeline 6 as build validation`. A done task keeps the 1.132.0 strike and the pull request, with the id: `~~T5 short name~~ ✓ done ([PR 12](https://github.com/contoso/orders-api/pull/12))`. The ready-check report uses that same `T# short name` wherever it names a task. The map is rewritten on every ready check, so the ids match `tasks.md` and do not go stale. Prose outside the Tasks field still drops a task id, and a removed id still does not leave a dangling `'s`, an empty `()`, a leading comma, or a double space.
 
 The newest 15 releases are above. The full changelog is https://github.com/Crav1on/crav1-spec-kit/blob/main/CHANGELOG.md.

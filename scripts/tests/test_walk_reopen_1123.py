@@ -152,10 +152,14 @@ class InsideWalk(unittest.TestCase):
         by_id = {row["id"]: row for row in payload["steps"]}
         self.assertEqual(by_id["review-architecture"]["status"], "keep")
         self.assertEqual(by_id["tighten-spec"]["status"], "reopen")
-        self.assertEqual(by_id["resolve-open-questions"]["status"], "reopen")
+        # 1.148.0: an unsectioned rewrite is the introduction. It reopens
+        # tighten and the plan. It does not reopen resolve when no question
+        # id changed.
+        self.assertEqual(by_id["resolve-open-questions"]["status"], "keep")
         self.assertEqual(by_id["plan-from-spec"]["status"], "reopen")
         self.assertEqual(by_id["plan-from-spec"]["changed"], ["spec"])
         self.assertEqual(payload["continue_from"], "tighten-spec")
+        self.assertIn("Reopen: tighten-spec, plan-from-spec", payload["reopen_line"])
 
     def test_outside_plan_change_does_not_reopen_spec_steps_or_plan_from_spec(self):
         self.record("review-architecture", "nothing-to-do")
