@@ -47,7 +47,7 @@ The message names a kit word or file, such as `work item homes`, `choice words`,
 
 ### 8. What's new
 
-`whats new`: the `CHANGELOG.md` section for the installed version (see **Newer-version notice** for how it is found). `whats new since x.y` or `since x.y.z`: every section after that version, newest first, up to the installed one. Summarize each release in a few bullets and cite its heading anchor, for example `Source: CHANGELOG.md#1540-2026-10-14`. Never read a newer version's notes from GitHub; when a newer tag exists, only the one notice line names it.
+`whats new`: the `CHANGELOG.md` section for the installed version (see **Newer-version notice** for how it is found). In an install that file is the newest 15 releases and ends with a line to the full changelog. The kit repo root file is the full history. `whats new since x.y` or `since x.y.z`: every section in that file after that version, newest first, up to the installed one. When the named version is not in the file, say the bundled changelog keeps the newest 15 and cite that last line. Do not fetch the full file. Summarize each release that is in the file in a few bullets and cite its heading anchor, for example `Source: CHANGELOG.md#1540-2026-10-14`. Never read a newer version's notes from GitHub; when a newer tag exists, only the one notice line names it.
 
 ## Newer-version notice
 

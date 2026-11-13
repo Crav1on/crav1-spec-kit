@@ -2,6 +2,13 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.147.0 (2026-11-13)
+
+Install bundles keep a short changelog, and guild routing stays a short map. A minor release because the bundled changelog is a slice of the full file, and `/crav1-help` reads that slice in an install.
+
+- **Bundled changelog.** The repo-root `CHANGELOG.md` stays the full history. Each install's `crav1-docs/CHANGELOG.md` (Cursor drop-in, Cursor plugin, Claude Code) keeps the newest 15 releases and ends with a line to the full file on GitHub. `scripts/slice-changelog.py` writes that slice. Sync and CI fail when a bundled copy is not that slice. `/crav1-update-kit` still reads the newest heading. `/crav1-help` `whats new` still reads the installed version's section. In an install, a version older than those 15 is named from the pointer line and is not fetched.
+- **Guild routing.** Each skill note in the `routing` block of `docs/reference/skills.yaml` is a short purpose and handoff. A rule that decides which lane runs, or which command is named and not run, stays in the note. Procedure that already lives on that skill's reference page stays there. `docs/guild-routing.md` stays the lane tables plus those short notes. No skill's behavior changes.
+
 ## 1.145.0 (2026-11-13)
 
 A batch card shows the findings it applies. A minor release because the reply before that card, and the card text, both change.
