@@ -32,7 +32,7 @@ class Playbook(unittest.TestCase):
             for m in re.finditer(r"for [<A-Za-z][^ ]* to decide", t):
                 line = t[t.rfind("\n", 0, m.start()) + 1 : t.find("\n", m.end())]
                 self.assertIn("Never write a hand-off", line)
-            self.assertNotIn("for Arvid", t)
+            self.assertNotIn("for person A", t)
 
     def test_no_step_cap(self):
         for d in DEPTHS:

@@ -33,7 +33,7 @@ I have new information from a meeting and tasks that are not built. What do I ru
 | `/crav1-help renamed`, or an old name | The old-to-new names, the choice word to use, and that the old names were removed in 1.58.0 |
 | `/crav1-help compare build-tasks build-features` | Two commands side by side: lane, purpose, reads, writes, next steps, and when to pick which |
 | `/crav1-help compare explain-this-code explain-existing-system` | explain-this-code reads one piece of code (a file, function, selection, or PR diff); explain-existing-system reads the system notes in `docs/system/`. Both are read-only |
-| `/crav1-help whats new`, `/crav1-help whats new since 1.50` | The changelog for your installed version, or every release since the one you name |
+| `/crav1-help whats new`, `/crav1-help whats new since 1.50` | The changelog section for your installed version, or every release since the one you name that the file still has. An install keeps the newest 15; older notes are the full changelog the last line points at |
 | Any other question about the kit | The answer from the docs, or "the kit doesn't say" when they do not cover it |
 
 Called with nothing, it shows this list with examples. Every answer ends with a line such as `Source: reference/workflow.md#new-info`.
@@ -77,7 +77,7 @@ The skill names its docs folder for each host and reads it directly (1.96.1). It
 - Claude Code: `.claude/skills/crav1-docs/`, or `~/.claude/skills/crav1-docs/` in user scope.
 - When only the skill folders were copied and `crav1-docs/` is missing, the command answers from the skill files only and says so.
 
-Each release bundles its own docs and `CHANGELOG.md`, so the answer fits the version you have. The answer starts with the answer, not with a line about which docs it used; the `Source:` line at the end says where it came from.
+Each release bundles its own docs and a `CHANGELOG.md` of the newest 15 releases, so `whats new` fits the version you have. The kit repo root file is the full history. The answer starts with the answer, not with a line about which docs it used; the `Source:` line at the end says where it came from.
 
 It never fetches an answer from GitHub. When the machine is online, it reads the kit's tag names once and adds one line when a newer version is tagged.
 

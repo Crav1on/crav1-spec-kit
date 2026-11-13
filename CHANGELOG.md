@@ -13,6 +13,14 @@ Branch rules stay in the kit and load only when that case applies. A minor relea
 - **Commit.** `/crav1-finalize-commit` reads the commit steps only after `commit` or `commit now`.
 - **Questions.** `/crav1-resolve-open-questions` reads the patch, a single named question, a stale point, and the empty-list ending only when that case applies.
 
+## 1.147.0 (2026-11-13)
+
+Install bundles keep a short changelog, and guild routing stays a short map. A minor release because the bundled changelog is a slice of the full file, and `/crav1-help` reads that slice in an install.
+
+- **Bundled changelog.** The repo-root `CHANGELOG.md` stays the full history. Each install's `crav1-docs/CHANGELOG.md` (Cursor drop-in, Cursor plugin, Claude Code) keeps the newest 15 releases and ends with a line to the full file on GitHub. `scripts/slice-changelog.py` writes that slice. Sync and CI fail when a bundled copy is not that slice. `/crav1-update-kit` still reads the newest heading. `/crav1-help` `whats new` still reads the installed version's section. In an install, a version older than those 15 is named from the pointer line and is not fetched.
+- **Guild routing.** Each skill note in the `routing` block of `docs/reference/skills.yaml` is a short purpose and handoff. A rule that decides which lane runs, or which command is named and not run, stays in the note. Procedure that already lives on that skill's reference page stays there. `docs/guild-routing.md` stays the lane tables plus those short notes. No skill's behavior changes.
+- **Examples.** Customer example names in older notes are replaced with generic ones.
+
 ## 1.146.0 (2026-11-13)
 
 A recorded finding stays recorded when the words move a little, and the tighten-and-plan walk no longer opens the ready-to-build skill to write the map. A minor release because the finding card, the walk's first command, and the ready check change.
@@ -1729,7 +1737,7 @@ Unchanged: spark-to-spec, ideas-to-spec, tighten-spec, plan-from-spec, review-pl
 
 - New cross-cutting skill `/crav1-ask-open-questions`. The user names a person, one spec, or a topic. It gathers the open questions on the specs for that selection. For a person, that includes questions routed via that person, for example a partner's questions that go through one contact. It drafts a mail, a meeting agenda, a chat message, or meeting questions to ask out loud in a standup, a call, or a longer meeting. Meeting questions lists every selected question, not a short cut, and has no agenda layout. The questions are numbered and grouped by topic in plain words, each with enough context to be answered. The draft never names a spec slug, a path, or a question id. The kit keeps which question came from which spec on the spec itself. The draft is in English, or in the language the user names. The personal-data and secrets check runs on the draft, the same as for other outbound text. Nothing is sent. It is a later skill. It is not a starter option.
 
-- After the draft, the skill asks whether the questions were asked. Each option says what it does. Yes writes an `Asked:` line under each question, with the date, how, and who. No writes nothing. Pending writes a `Pending:` line with the date and who, for text copied now and sent later. On the next run, pending questions are shown first, for example `Drafted for Arvid on 2026-10-11 (mail), not marked as sent yet.` The user can mark them as sent, keep them pending, or drop the mark. They are not mixed silently into the new draft.
+- After the draft, the skill asks whether the questions were asked. Each option says what it does. Yes writes an `Asked:` line under each question, with the date, how, and who. No writes nothing. Pending writes a `Pending:` line with the date and who, for text copied now and sent later. On the next run, pending questions are shown first, for example `Drafted for person A on 2026-10-11 (mail), not marked as sent yet.` The user can mark them as sent, keep them pending, or drop the mark. They are not mixed silently into the new draft.
 
 - When `/crav1-meeting-to-specs`, `/crav1-match-dump-to-specs`, or `/crav1-add-to-spec` import a mail, a transcript, minutes, or a chat, a clear answer to a spec open question is linked under that question with the quote and the source, and the question is marked answered. Meeting does not ask keep for it. Match-dump links it with the confirmed sort. An unclear or partial answer is shown as a possible answer and the question stays open. An answer that would change a spec line names `/crav1-resolve-questions`. An answer that settles a stale research point runs the existing research re-check. Matching works whether the question is asked, pending, or not marked.
 
