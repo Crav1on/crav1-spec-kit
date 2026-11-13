@@ -265,10 +265,14 @@ class QuestionDrift(unittest.TestCase):
         self.assertEqual(payload["result"], "not-ready")
         reopened = [hit["step"] for hit in payload["reopened"]]
         for step in LATER:
-            self.assertIn(step, reopened)
+            if step == "tasks-ready-to-build":
+                self.assertNotIn(step, reopened)
+                self.assertNotIn(step, payload["next"])
+                self.assertNotIn(step, payload["because"])
+            else:
+                self.assertIn(step, reopened)
+                self.assertIn(step, payload["next"])
         self.assertIn("rerun or clear", payload["next"])
-        for step in LATER:
-            self.assertIn(step, payload["next"])
         ticked = must_json(TICK, ["--root", str(root), "T2", "--yes"])
         self.assertTrue(ticked["ticked"])
         self.assertFalse(ticked["worker"])

@@ -2,6 +2,18 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.150.0 (2026-11-13)
+
+The tighten-and-plan walk prints its ending in the reply, and the ready check no longer blocks on its own stale record. A minor release because the reply shape changes, and a reopened ready-check step no longer asks for a jump back before the record.
+
+- **Ending.** `walk_progress.py readiness` returns `ending`. The reply prints that text. It includes each held line, one branch per line, with the T# , the short name, and who it waits on. The reply does not say above, listed above, or earlier output. This covers ready, ready-partial, not-ready, the waiting stop, and the stop ending.
+- **Run next.** On ready and ready-partial, `Run next:` is first, before any Waiting line. Each ready branch is a code span with only the command. The command is a complete invocation for a new session: each T# on that branch, and the slug when `docs/specs` has more than one slice, for example `/crav1-build-walk orders-api T3`. One slice needs no slug. The next line names the branch and the short task name. A blank line separates branches. The full Next lines stay after that and still name `/crav1-build-tasks` for one task. The walk does not run either command.
+- **Own step.** When tasks-ready-to-build is the only reopened step, readiness does not list it as a blocker. The result is ready, ready-partial, or not-ready from the rows. The reply says once that the earlier record is replaced, then the normal record confirm. Another reopened step still forces not-ready. `clear --step` with nothing new is unchanged.
+- **Build walk ending.** `/crav1-build-walk` prints the same `Run next:` block. The command is alone in a code span and works in a new session: `/crav1-build-walk T3`, plus the slug when `docs/specs` has more than one slice. The next line names the branch and the short task name. Waiting and Uncommitted follow. The full Next line is last. Another branch whose tasks can start, from readiness `can_start` grouped by build-map branch, is its own Run next entry.
+- **Progress file.** Recording a build-walk step commits `build-progress/<branch>.md` after the yes. When the step already commits other files, the progress file is in that same commit. Otherwise it is its own commit. The persisted commit style is used. Nothing is pushed.
+- **Task id.** `T27` and `27` are the same id. A label does not print `TT27`.
+- **next JSON.** `build_walk.py next --json <file>` takes an object. `tasks` may be `"T27"` or `{"id", "title"}`. The fields are `phase`, `owner`, `branch`, `tasks`, `base`, `pr`, `slug`, `root`, `spec_count`, and `ready_branches`. Bad input returns `{"ok": false, "code", "line"}` and does not traceback.
+
 ## 1.149.0 (2026-11-13)
 
 Branch rules stay in the kit and load only when that case applies. A minor release because a typical run no longer reads the cases that do not apply. The rules are unchanged. Each file is named from `SKILL.md` with a load-when line. `/crav1-review-pr` is unchanged: its verdict and hard rules are what a review still reads, and the host differences are already one-line pointers.

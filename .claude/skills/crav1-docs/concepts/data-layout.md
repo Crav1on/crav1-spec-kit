@@ -209,7 +209,7 @@ Under each item in a spec's `## Open questions`, the kit can add four kinds of l
 
 ## Readiness marks
 
-[`/crav1-tasks-ready-to-build`](../from-tasks-ready-to-build.md) reads these marks and does not write them. It rewrites `build-map.md` every run (1.128.0):
+[`/crav1-tasks-ready-to-build`](../from-tasks-ready-to-build.md) reads these marks and does not write them. It rewrites `build-map.md` every run (1.128.0). Since 1.150.0 the tighten-and-plan ready check prints a `Run next:` block first. Each command is a complete invocation for a new session, and each held line is in that same reply. A reopened tasks-ready-to-build step is not a blocker.
 
 <!-- crav1-readiness:start -->
 <!-- Generated from docs/reference/marks.yaml by scripts/gen-marks.py. Do not edit by hand. -->

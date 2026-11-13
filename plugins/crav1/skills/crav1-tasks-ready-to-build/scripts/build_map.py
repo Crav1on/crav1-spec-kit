@@ -204,6 +204,31 @@ def ready_next_line(labels, branch_name):
     )
 
 
+def run_entry(labels, branch_name, slug=None):
+    """One ready branch in the Run next block (1.150.0).
+
+    The command is alone on its line, inside a code span. It is a complete
+    invocation for a new session: the command, each T# on that branch, and
+    the slug when the caller passes one. The next line names the branch and
+    each short task name. Nothing else shares the command line.
+    """
+    ids = []
+    names = []
+    for label in labels:
+        match = re.match(r"(T\d+)\s+(.*)", str(label).strip())
+        if match:
+            ids.append(match.group(1))
+            names.append(f"{match.group(1)} {match.group(2).strip()}")
+        else:
+            token = str(label).strip()
+            ids.append(token)
+            names.append(token)
+    ids_text = ", ".join(ids)
+    command = f"/crav1-build-walk {slug} {ids_text}" if slug else f"/crav1-build-walk {ids_text}"
+    detail = f"branch {branch_name}, {', '.join(names)}"
+    return f"`{command}`\n{detail}"
+
+
 def short_name(rest, work_title=None):
     """A task's short name: its work-item title, else the text up to the first cut.
 
@@ -1182,7 +1207,7 @@ def _where(branch):
     return "blocked"
 
 
-def report_by_branch(built, rows):
+def report_by_branch(built, rows, slug=None):
     """Group ready and held tasks by the build-map row.
 
     The branch is the row `build()` writes, which is the name `--recommend`
@@ -1234,12 +1259,22 @@ def report_by_branch(built, rows):
             bits.append(f"{label} — {held_phrase(row)}")
         held_lines.append(f"- `{group['branch']['name']}` ({_where(group['branch'])}): " + "; ".join(bits))
     next_lines = []
+    run_lines = []
+    ready_branches = []
     for group in ready_groups:
         labels = [
             task.get("label") or task_label(task["id"], task.get("short"))
             for task, _row in group["items"]
         ]
         next_lines.append(ready_next_line(labels, group["branch"]["name"]))
+        run_lines.append(run_entry(labels, group["branch"]["name"], slug=slug))
+        ready_branches.append({
+            "branch": group["branch"]["name"],
+            "tasks": [
+                {"id": f"T{task['id']}", "title": task.get("short") or ""}
+                for task, _row in group["items"]
+            ],
+        })
     parts = []
     if ready_lines:
         parts.append("Ready now")
@@ -1251,6 +1286,8 @@ def report_by_branch(built, rows):
         "ready_lines": ready_lines,
         "held_lines": held_lines,
         "next_lines": next_lines,
+        "run_lines": run_lines,
+        "ready_branches": ready_branches,
         "line": "\n".join(parts) if parts else None,
     }
 

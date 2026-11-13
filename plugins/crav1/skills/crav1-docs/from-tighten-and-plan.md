@@ -89,12 +89,17 @@ Since 1.138.0 a checkbox tick, a `(PR n)` or `(done)` note on that task line, an
 
 Since 1.139.0 a merge that conflicts only on those hash lines is settled by `scripts/walk_progress.py resolve-stamps --root <spec-folder> --yes`. `/crav1-finalize-commit` runs it. The walk does not. `Done` and `Result` stay. A real edit keeps the upstream hash.
 
-When the check is clear, or ready-partial with tasks that can start, the ending recommends the build walk. One line per ready branch, with the T number beside the short name:
+When the check is clear, or ready-partial with tasks that can start, the ending prints `Run next:` first, before any Waiting line (1.150.0). Each command is alone in a code span and works in a new session. It names the T#s on that branch, and the slug when `docs/specs` has more than one slice. The next line names the branch and the short task name. Each held line is in that same reply. The full Next line stays after that:
 
 ```text
+Run next:
+
+`/crav1-build-walk orders-api T1`
+branch feat/orders-api-record, T1 Record the decision
+
 Next: /crav1-build-walk T1 Record the decision, because that work is on feat/orders-api-record. /crav1-build-tasks builds one task without the walk.
 ```
 
-`/crav1-build-tasks` is the alternative for one task without the walk. This walk does not run `/crav1-build-tasks` or `/crav1-build-walk`. A not-ready result does not recommend the walk. When the progress file is not committed: `Uncommitted: 1 file; commit with /crav1-finalize-commit when ready.` See [How a run ends](reference/run-ending.md).
+`/crav1-build-tasks` is the alternative for one task without the walk. This walk does not run `/crav1-build-tasks` or `/crav1-build-walk`. A not-ready result does not recommend the walk. When the ready check's own record is the only stale step, the reply says once that the earlier record is replaced, and the result comes from the tasks. Another reopened step still blocks. When the progress file is not committed: `Uncommitted: 1 file; commit with /crav1-finalize-commit when ready.` See [How a run ends](reference/run-ending.md).
 
 Reference page: [tighten and plan, ready to build](reference/skills/crav1-tighten-and-plan-ready-to-build.md)

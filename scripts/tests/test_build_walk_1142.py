@@ -364,6 +364,112 @@ class Command(unittest.TestCase):
         self.assertNotIn("/crav1-open-pr", found["next"][0])
 
 
+class RunNext(unittest.TestCase):
+    def test_t_prefix_is_not_doubled(self):
+        self.assertEqual(bw._task_label({"id": "T27", "title": "Record the decision"}), "T27 Record the decision")
+        self.assertEqual(bw._task_label({"id": 27, "title": "Record the decision"}), "T27 Record the decision")
+        self.assertEqual(bw._task_label({"id": "27", "title": "Record the decision"}), "T27 Record the decision")
+        self.assertNotIn("TT27", bw._task_label({"id": "T27", "title": "Record the decision"}))
+
+    def test_in_walk_ending_puts_the_command_alone_then_the_branch(self):
+        result = bw.next_for(state(phase="verify", slug="orders-api", spec_count=2))
+        ending = result["ending"]
+        self.assertLess(ending.index("Run next:"), ending.index("Next:"))
+        commands = [line for line in ending.splitlines() if line.startswith("`/crav1-build-walk")]
+        self.assertEqual(commands, ["`/crav1-build-walk orders-api T3`"])
+        detail = ending.splitlines()[ending.splitlines().index(commands[0]) + 1]
+        self.assertTrue(detail.startswith(f"branch {BRANCH}, T3 "))
+        self.assertIn("Apply the CI build policy", detail)
+        self.assertNotIn("because", commands[0])
+        alone = bw.next_for(state(phase="verify", slug="orders-api", spec_count=1))
+        self.assertIn("`/crav1-build-walk T3`", alone["ending"])
+        self.assertNotIn("orders-api", "\n".join(line for line in alone["ending"].splitlines() if line.startswith("`")))
+
+    def test_other_ready_branches_each_get_a_run_next_entry(self):
+        result = bw.next_for(state(
+            phase="tick",
+            ready_branches=[
+                {"branch": NOTE, "tasks": [task(5, "Note the policy", NOTE)]},
+            ],
+        ))
+        ending = result["ending"]
+        commands = [line for line in ending.splitlines() if line.startswith("`/crav1-build-walk")]
+        self.assertEqual(len(commands), 2)
+        self.assertIn("`/crav1-build-walk T3`", commands)
+        self.assertIn("`/crav1-build-walk T5`", commands)
+        self.assertNotIn("can start on", ending)
+        self.assertEqual(result["count"], 2)
+
+    def test_string_tasks_are_accepted_and_bad_input_is_not_a_traceback(self):
+        good = {"phase": "build", "owner": "self", "branch": BRANCH, "tasks": ["T27 Record the decision"]}
+        with tempfile.TemporaryDirectory() as tmp:
+            path = pathlib.Path(tmp) / "state.json"
+            path.write_text(json.dumps(good), encoding="utf-8")
+            proc = subprocess.run([sys.executable, str(SCRIPT), "next", "--json", str(path)], capture_output=True, text=True, check=False)
+            self.assertEqual(proc.returncode, 0, proc.stderr)
+            found = json.loads(proc.stdout)
+            self.assertIn("`/crav1-build-walk T27`", found["ending"])
+            self.assertNotIn("TT27", found["ending"])
+            path.write_text(json.dumps({"phase": "build", "tasks": ["not a task"]}), encoding="utf-8")
+            bad = subprocess.run([sys.executable, str(SCRIPT), "next", "--json", str(path)], capture_output=True, text=True, check=False)
+        self.assertNotEqual(bad.returncode, 0)
+        self.assertNotIn("Traceback", bad.stderr)
+        self.assertNotIn("Traceback", bad.stdout)
+        payload = json.loads(bad.stdout)
+        self.assertFalse(payload["ok"])
+        self.assertEqual(payload["code"], "tasks")
+        self.assertIn("line", payload)
+        self.assertTrue(payload["line"])
+
+    def test_root_uses_readiness_can_start_grouped_by_branch(self):
+        spec = "# Spec\n\n## Open questions\n"
+        plan = "# Plan: orders-api\n\nReviewed: 2026-11-13, P# open: 0\n\n## Approach\n\n1. Apply the policy. (T3)\n2. Note the policy. (T5)\n\n## Risks\n"
+        tasks = (
+            "# Tasks\n\n"
+            "- [ ] T3: Apply the CI build policy (branch: feat/orders-host-setup-scripts) (after: )\n"
+            "- [ ] T5: Note the policy (branch: feat/orders-note) (after: )\n"
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp) / "docs" / "specs" / "orders-api"
+            root.mkdir(parents=True)
+            (root / "spec.md").write_text(spec, encoding="utf-8")
+            (root / "plan.md").write_text(plan, encoding="utf-8")
+            (root / "tasks.md").write_text(tasks, encoding="utf-8")
+            other = pathlib.Path(tmp) / "docs" / "specs" / "orders-export"
+            other.mkdir()
+            (other / "spec.md").write_text(spec, encoding="utf-8")
+            result = bw.next_for({
+                "phase": "next-task",
+                "owner": "self",
+                "branch": BRANCH,
+                "slug": "orders-api",
+                "root": str(root),
+                "tasks": [],
+            })
+        commands = [line for line in result["ending"].splitlines() if line.startswith("`/crav1-build-walk")]
+        self.assertGreaterEqual(len(commands), 2)
+        joined = "\n".join(commands)
+        self.assertIn("orders-api", joined)
+        self.assertIn("T3", joined)
+        self.assertIn("T5", joined)
+        self.assertNotIn("can start on", result["ending"])
+
+    def test_recording_a_step_commits_the_progress_file_and_does_not_push(self):
+        files = [
+            ROOT / ".cursor/skills/crav1/crav1-build-walk/SKILL.md",
+            ROOT / ".cursor/skills/crav1/crav1-build-walk/references/steps.md",
+            ROOT / ".cursor/skills/crav1/crav1-build-walk/references/progress.md",
+        ]
+        for path in files:
+            text = path.read_text(encoding="utf-8")
+            self.assertIn("build-progress", text, path.name)
+            self.assertIn("persisted commit style", text, path.name)
+            self.assertRegex(text, r"Nothing is pushed|nothing is pushed", path.name)
+        skill = files[0].read_text(encoding="utf-8")
+        self.assertNotIn("Do not create a git commit from this skill", skill)
+        self.assertIn("same commit", skill)
+
+
 class Routing(unittest.TestCase):
     def test_skill_routes_before_loading_every_path(self):
         skill = (ROOT / ".cursor/skills/crav1/crav1-build-walk/SKILL.md").read_text(encoding="utf-8")

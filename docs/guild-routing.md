@@ -60,7 +60,7 @@ After a quote is kept, `/crav1-add-to-spec` compares it with `docs/research/` th
 
 `/crav1-review-plan` reads the plan and writes nothing. The user calls it. It calls no skill. It names `/crav1-tighten-plan` and does not run it.
 
-The same walk, `/crav1-tighten-and-plan-ready-to-build`, runs `/crav1-plan-from-spec`, then `/crav1-review-plan` and `/crav1-tighten-plan`, then the ready check. It does not replace those skills. It stops when the check is clear and does not start `/crav1-build-tasks`. When the slice is ready, or ready-partial with tasks that can start, the ending recommends `/crav1-build-walk` and names `/crav1-build-tasks` as the alternative for one task without the walk.
+The same walk, `/crav1-tighten-and-plan-ready-to-build`, runs `/crav1-plan-from-spec`, then `/crav1-review-plan` and `/crav1-tighten-plan`, then the ready check. It does not replace those skills. It stops when the check is clear and does not start `/crav1-build-tasks`. When the slice is ready, or ready-partial with tasks that can start, the ending recommends `/crav1-build-walk` and names `/crav1-build-tasks` as the alternative for one task without the walk. Since 1.150.0 that recommendation is a Run next block first, and each command is a complete invocation for a new session.
 
 ## Build
 
@@ -73,7 +73,7 @@ The same walk, `/crav1-tighten-and-plan-ready-to-build`, runs `/crav1-plan-from-
 | Skill | `/crav1-fix-build-gaps` |
 | Subagent | `crav1-build-task-agent` |
 
-`/crav1-build-walk` is in the Build lane. The user asks for the walk. It opens the build, verify, commit, and pull-request skills by file and does not replace them. While one branch is in progress the reply has one Next, the walk's, and a step skill's own Next is not printed. It does not push, open, or merge without a yes in that run. It never rebases.
+`/crav1-build-walk` is in the Build lane. The user asks for the walk. It opens the build, verify, commit, and pull-request skills by file and does not replace them. The reply prints Run next first, one complete command per branch that can start, and a step skill's own Next is not printed. Recording a step commits the progress file and does not push. It does not push, open, or merge without a yes in that run. It never rebases.
 
 Started from a ready-to-build report, the walk offers each ready branch as its own Next, with the T number beside the task name. A task that needs code from an unmerged branch is cut from that branch, and the merge list says the order back. Other-owner mode never opens a pull request and never merges.
 
@@ -151,7 +151,7 @@ Started from a ready-to-build report, the walk offers each ready branch as its o
 
 `/crav1-update-specs-from-changes-and-prs` may run from any lane. It runs `/crav1-add-to-spec` for each item and does not replace it. It does not run `/crav1-review-pr` or `/crav1-pr-status`. It does not commit. It does not move work into Specify, Plan, or Build. It is not a starter option.
 
-`/crav1-tighten-and-plan-ready-to-build` may run from any lane when the user asks to tighten and plan a spec until it is ready to build. It is a guided walk, not a new lane and not a starter option. Asking for startup options names only the six and does not run this command. It runs the existing Specify and Plan skills inside the walk and does not replace them. It does not start Build, and it does not run `/crav1-build-tasks` or `/crav1-build-walk`. When the slice is ready, or ready-partial with tasks that can start, the ending recommends `/crav1-build-walk` and names `/crav1-build-tasks` as the alternative for one task without the walk.
+`/crav1-tighten-and-plan-ready-to-build` may run from any lane when the user asks to tighten and plan a spec until it is ready to build. It is a guided walk, not a new lane and not a starter option. Asking for startup options names only the six and does not run this command. It runs the existing Specify and Plan skills inside the walk and does not replace them. It does not start Build, and it does not run `/crav1-build-tasks` or `/crav1-build-walk`. When the slice is ready, or ready-partial with tasks that can start, the ending recommends `/crav1-build-walk` and names `/crav1-build-tasks` as the alternative for one task without the walk. Since 1.150.0 that recommendation is a Run next block first. Each command is a complete invocation for a new session, and the reply prints each held line.
 
 `/crav1-refresh-system-notes` may run from any lane, on its own. It adds what is new to the picture. It does not move work into Specify, Plan, or Build, and it does not design or build the change. `/crav1-build-features`, `/crav1-fix-bug`, `/crav1-fix-build-gaps`, `/crav1-read-environment`, and `/crav1-add-to-spec` may ask whether to run it and do not run it. `/crav1-build-tasks` does not ask. It does not commit.
 

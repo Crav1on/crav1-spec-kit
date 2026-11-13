@@ -2,6 +2,18 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.150.0 (2026-11-13)
+
+The tighten-and-plan walk prints its ending in the reply, and the ready check no longer blocks on its own stale record. A minor release because the reply shape changes, and a reopened ready-check step no longer asks for a jump back before the record.
+
+- **Ending.** `walk_progress.py readiness` returns `ending`. The reply prints that text. It includes each held line, one branch per line, with the T# , the short name, and who it waits on. The reply does not say above, listed above, or earlier output. This covers ready, ready-partial, not-ready, the waiting stop, and the stop ending.
+- **Run next.** On ready and ready-partial, `Run next:` is first, before any Waiting line. Each ready branch is a code span with only the command. The command is a complete invocation for a new session: each T# on that branch, and the slug when `docs/specs` has more than one slice, for example `/crav1-build-walk orders-api T3`. One slice needs no slug. The next line names the branch and the short task name. A blank line separates branches. The full Next lines stay after that and still name `/crav1-build-tasks` for one task. The walk does not run either command.
+- **Own step.** When tasks-ready-to-build is the only reopened step, readiness does not list it as a blocker. The result is ready, ready-partial, or not-ready from the rows. The reply says once that the earlier record is replaced, then the normal record confirm. Another reopened step still forces not-ready. `clear --step` with nothing new is unchanged.
+- **Build walk ending.** `/crav1-build-walk` prints the same `Run next:` block. The command is alone in a code span and works in a new session: `/crav1-build-walk T3`, plus the slug when `docs/specs` has more than one slice. The next line names the branch and the short task name. Waiting and Uncommitted follow. The full Next line is last. Another branch whose tasks can start, from readiness `can_start` grouped by build-map branch, is its own Run next entry.
+- **Progress file.** Recording a build-walk step commits `build-progress/<branch>.md` after the yes. When the step already commits other files, the progress file is in that same commit. Otherwise it is its own commit. The persisted commit style is used. Nothing is pushed.
+- **Task id.** `T27` and `27` are the same id. A label does not print `TT27`.
+- **next JSON.** `build_walk.py next --json <file>` takes an object. `tasks` may be `"T27"` or `{"id", "title"}`. The fields are `phase`, `owner`, `branch`, `tasks`, `base`, `pr`, `slug`, `root`, `spec_count`, and `ready_branches`. Bad input returns `{"ok": false, "code", "line"}` and does not traceback.
+
 ## 1.149.0 (2026-11-13)
 
 Branch rules stay in the kit and load only when that case applies. A minor release because a typical run no longer reads the cases that do not apply. The rules are unchanged. Each file is named from `SKILL.md` with a load-when line. `/crav1-review-pr` is unchanged: its verdict and hard rules are what a review still reads, and the host differences are already one-line pointers.
@@ -137,12 +149,5 @@ A merged task that only needs its checkbox ticked no longer loops between verify
 - **Needs tick.** `task_order.py` treats a recorded-merged task as done, so it is not Ready and not Next. It lists that task under Needs tick. A Waits in order line includes the short title.
 - **Which spec.** Verify, the ready check, build-tasks, and the tighten-and-plan walk resolve a named spec with one script: exact folder first (`orders 1.0` matches `orders-1-0`), then one unique playbook basename, spec title, or work-item name in `spec.md`. Several matches are listed and the run stops. Verify no longer picks the most recently edited tree.
 - **Scripts.** [Running a kit script](docs/reference/running-scripts.md) has a silent Python finder for bash and PowerShell. It tries `python3`, `python`, and `py -3`, and treats the Windows Store message `Python was not found` as not found. Do not use `/tmp` as a portable path. `build_map.py --recommend`, given `tasks.md` or `spec.md`, says a spec folder is required and names the parent folder.
-
-## 1.135.0 (2026-11-11)
-
-A spec finding during the tighten-and-plan walk can jump back to the spec, and a stale verify file is called out at the ready check. A minor release because the walk no longer stops on that finding, and the ready check no longer trusts a Next line that names work already built.
-
-- **Jump back to the spec.** When `/crav1-review-plan` inside `/crav1-tighten-and-plan-ready-to-build` finds a problem that is really a spec defect (the plan requires a named person's yes to stop a prod function app, and the spec names no approver), the walk asks one question card. The recommended option runs `/crav1-tighten-spec` on that finding now. The walk opens `../crav1-tighten-spec/SKILL.md` and follows it, with that skill's own confirms. It then reruns the plan for the parts that finding changed, reviews and tightens the plan, and runs the ready check. It does not pause. The other option keeps the finding as an open point and continues. The same finding is offered once. If it comes back, the walk records an open point and continues. `walk-progress.md` records `- Jump-back:` and `Continue:`. A plan finding that is not a spec defect stays in `/crav1-tighten-plan`.
-- **verify.md behind.** The ready check compares `tasks.md` with `verify.md`. `build-map.md` stays the file `/crav1-tasks-ready-to-build` writes, and the walk's ready check still refreshes it. `verify.md` stays with `/crav1-verify-build-against-spec`. The walk never runs that command and never writes `verify.md`. When a task is ticked, or its pull request is recorded merged, and `verify.md` still lists it as not implemented, or the `Next:` line in `verify.md` names a task that is ticked or merged, the check flags `verify.md` as behind. It does not show that Next line. It adds `Waiting: /crav1-verify-build-against-spec orders-api - verify.md is behind tasks.md (T2, T45)`.
 
 The newest 15 releases are above. The full changelog is https://github.com/Crav1on/crav1-spec-kit/blob/main/CHANGELOG.md.

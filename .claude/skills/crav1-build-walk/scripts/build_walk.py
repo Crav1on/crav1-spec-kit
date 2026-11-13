@@ -244,12 +244,74 @@ def offer_for(slug: str, spec: str, plan: str, tasks: str, task_id, repo=None, w
     return offer
 
 
+class InputError(Exception):
+    def __init__(self, code: str, line: str) -> None:
+        self.code = code
+        self.line = line
+        super().__init__(line)
+
+
+def _task_number(value) -> int:
+    """T27 and 27 are the same id. Anything else is not a task id."""
+    text = str(value).strip()
+    match = re.fullmatch(r"T?(\d+)", text, re.I)
+    if not match:
+        raise InputError("tasks", f"task id is not a T# or a number: {value}")
+    return int(match.group(1))
+
+
+def _task_token(value) -> str:
+    return f"T{_task_number(value)}"
+
+
 def _task_label(task: dict) -> str:
     title = (task.get("title") or "").strip()
     title = RUNS_LIVE.sub("", title)
     title = LIVE_YES.sub("", title)
     title = re.sub(r"\s{2,}", " ", title).strip(" .")
-    return f"T{task['id']} {title}".strip()
+    return f"{_task_token(task.get('id'))} {title}".strip()
+
+
+def normalize_task(item) -> dict:
+    """A task is a T# string, a number, or an object with id and optional title."""
+    if isinstance(item, str):
+        match = re.fullmatch(r"(T?\d+)(?:\s+(.*))?", item.strip(), re.I)
+        if not match:
+            raise InputError("tasks", f"task is not a T# or an object: {item}")
+        return {"id": _task_token(match.group(1)), "title": (match.group(2) or "").strip()}
+    if isinstance(item, int) and not isinstance(item, bool):
+        return {"id": _task_token(item), "title": ""}
+    if isinstance(item, dict):
+        if "id" not in item:
+            raise InputError("tasks", "each task object needs an id")
+        task = dict(item)
+        task["id"] = _task_token(item["id"])
+        task["title"] = str(task.get("title") or "").strip()
+        return task
+    raise InputError("tasks", "each task must be a T# string or an object with id and title")
+
+
+def normalize_tasks(tasks) -> list:
+    if tasks is None:
+        return []
+    if isinstance(tasks, str) or not isinstance(tasks, list):
+        raise InputError("tasks", "tasks must be a list of T# strings or {id, title} objects")
+    return [normalize_task(item) for item in tasks]
+
+
+def normalize_branches(branches, code: str) -> list:
+    if branches is None:
+        return []
+    if not isinstance(branches, list):
+        raise InputError(code, f"{code} must be a list of branch objects")
+    out = []
+    for branch in branches:
+        if not isinstance(branch, dict):
+            raise InputError(code, f"each {code} entry must be an object")
+        row = dict(branch)
+        row["tasks"] = normalize_tasks(row.get("tasks"))
+        out.append(row)
+    return out
 
 
 def cut_from_for(task_branch: str | None, dep_branches: list, merged: set, default_base: str = DEFAULT_BASE) -> str:
@@ -308,7 +370,7 @@ def stack_from_tasks(tasks: list, merged: set | None = None, default_base: str =
     A dependency whose branch is not merged supplies the cut-from branch.
     """
     merged = set(merged or [])
-    by_id = {int(task["id"]): task for task in tasks}
+    by_id = {_task_number(task["id"]): task for task in tasks}
     cuts = {}
     rows = []
     for task in tasks:
@@ -317,14 +379,14 @@ def stack_from_tasks(tasks: list, merged: set | None = None, default_base: str =
             continue
         deps = []
         for dep in task.get("deps") or []:
-            other = by_id.get(int(dep))
+            other = by_id.get(_task_number(dep))
             if other and other.get("branch"):
                 deps.append(other["branch"])
         base = task.get("base") or default_base
         cut = cut_from_for(branch, deps, merged, base)
         cuts[branch] = cut
         rows.append({
-            "id": int(task["id"]),
+            "id": _task_number(task["id"]),
             "title": task.get("title") or "",
             "branch": branch,
             "cut_from": cut,
@@ -466,17 +528,113 @@ def _task_list(tasks: list) -> str:
     return ", ".join(_task_label(task) for task in tasks)
 
 
-def grouping_lines(branches: list) -> list[str]:
-    """One Next per ready branch, T number beside the task name. Parallel work."""
-    lines = []
+def _slug_for(state: dict) -> str | None:
+    """Slug on a fresh-session command, or None when the repo has one slice."""
+    slug = str(state.get("slug") or "").strip() or None
+    root = state.get("root")
+    if root:
+        path = Path(str(root))
+        if path.is_dir():
+            needed = walk_mod().command_slug(path)
+            if needed is None and walk_mod()._only_spec(path):
+                return None
+            slug = slug or (needed if needed else path.name)
+    count = state.get("spec_count")
+    if count is not None:
+        try:
+            count = int(count)
+        except (TypeError, ValueError):
+            count = None
+    if count == 1:
+        return None
+    if count is not None and count > 1:
+        return slug
+    return slug
+
+
+def _invocation(command: str, tasks: list, slug: str | None) -> str:
+    """A command a new session can run. The T#s are on the command, not in because."""
+    ids = ", ".join(_task_token(task["id"]) for task in tasks if task.get("id") is not None)
+    if command == "/crav1-build-walk":
+        if slug and ids:
+            return f"/crav1-build-walk {slug} {ids}"
+        if ids:
+            return f"/crav1-build-walk {ids}"
+        if slug:
+            return f"/crav1-build-walk {slug}"
+        return "/crav1-build-walk"
+    if slug:
+        return f"{command} {slug}"
+    return command
+
+
+def _entry(command: str, because: str, tasks: list, branch: str, slug: str | None) -> dict:
+    labels = [_task_label(task) for task in tasks] or []
+    invoked = _invocation(command, tasks, slug)
+    if labels and branch:
+        run = map_mod().run_entry(labels, branch, slug=slug if command == "/crav1-build-walk" else None)
+        if command != "/crav1-build-walk":
+            detail = run.split("\n", 1)[1]
+            run = f"`{invoked}`\n{detail}"
+    elif labels:
+        run = f"`{invoked}`"
+    else:
+        run = f"`{invoked}`"
+    return {"command": invoked, "run": run, "next": _one(invoked, because)}
+
+
+def _compose_ending(entries: list, waiting, uncommitted) -> str:
+    parts = []
+    runs = [entry["run"] for entry in entries if entry.get("run")]
+    if runs:
+        parts.append("Run next:\n\n" + "\n\n".join(runs))
+    if waiting:
+        text = str(waiting)
+        parts.append(text if text.startswith("Waiting:") else f"Waiting: {text}")
+    if uncommitted:
+        text = str(uncommitted)
+        parts.append(text if text.startswith("Uncommitted:") else f"Uncommitted: {text}")
+    nxt = [entry["next"] for entry in entries if entry.get("next")]
+    if nxt:
+        parts.append("\n".join(nxt))
+    return "\n\n".join(parts)
+
+
+def _other_ready(state: dict, current: str | None) -> list:
+    """Other branches whose tasks can start, from readiness or from ready_branches."""
+    branches = state.get("ready_branches")
+    if branches is None and state.get("root"):
+        path = Path(str(state["root"]))
+        if path.is_dir():
+            branches = walk_mod().ready_branches(path)
+    out = []
+    for branch in branches or []:
+        if not isinstance(branch, dict):
+            continue
+        name = branch.get("branch")
+        if not name or name == current:
+            continue
+        tasks = branch.get("tasks") or []
+        if tasks:
+            out.append(branch)
+    return out
+
+
+def grouping_lines(branches: list, slug: str | None = None) -> list[dict]:
+    """One entry per ready branch. Parallel work, each a complete command."""
+    entries = []
     for branch in branches:
         tasks = branch.get("tasks") or []
-        label = _task_list(tasks) or branch.get("branch")
-        lines.append(_one(
-            f"/crav1-build-walk {label}",
-            f"that work is on {branch.get('branch')}",
+        name = branch.get("branch") or ""
+        label = _task_list(tasks) or name
+        entries.append(_entry(
+            "/crav1-build-walk",
+            f"that work is on {name}" + (f" ({label})" if label and label != name else ""),
+            tasks,
+            name,
+            slug,
         ))
-    return lines
+    return entries
 
 
 def _because(phase: str, state: dict) -> tuple[str, str]:
@@ -542,15 +700,23 @@ OTHER_FORBIDDEN = {"open-pr", "merge-base", "merge-pr"}
 
 
 def next_for(state: dict) -> dict:
-    """Exactly one Next line, unless mode is grouping (one line per branch).
+    """The walk ending. Run next is first. One full Next line per entry.
 
-    The line replaces a step skill's own Next. `suppressed` names those commands.
+    While this branch is in progress, the first entry continues the walk.
+    Each other branch whose tasks can start is its own entry. Grouping is
+    one entry per ready branch. The step skill's own Next is not included.
     """
+    slug = _slug_for(state)
+    waiting = state.get("waiting")
+    uncommitted = state.get("uncommitted")
     if state.get("mode") == "grouping":
-        lines = grouping_lines(state.get("branches") or [])
+        entries = grouping_lines(state.get("branches") or [], slug)
+        lines = [entry["next"] for entry in entries]
+        ending = _compose_ending(entries, waiting, uncommitted)
         return {
             "mode": "grouping",
             "next": lines,
+            "ending": ending,
             "count": len(lines),
             "suppressed": [],
             "allowed": allowed_actions(state.get("owner"), state.get("description_asked")),
@@ -560,22 +726,55 @@ def next_for(state: dict) -> dict:
     if owner == "other" and phase in OTHER_FORBIDDEN:
         phase = "comment" if state.get("pushed") and not state.get("commented") else "wait-merge"
     command, because = _because(phase, state)
-    line = _one(command, because)
+    branch = state.get("branch") or ""
+    tasks = state.get("tasks") or []
+    entries = []
+    if phase == "next-task":
+        ready = list(state.get("ready_branches") or [])
+        if not ready and state.get("root"):
+            path = Path(str(state["root"]))
+            if path.is_dir():
+                ready = walk_mod().ready_branches(path)
+        if ready:
+            entries.extend(grouping_lines(ready, slug))
+        else:
+            use_tasks = state.get("next_tasks") or []
+            use_branch = state.get("next_branch") or ""
+            entries.append(_entry(command, because, use_tasks, use_branch, slug))
+    else:
+        entries.append(_entry(command, because, tasks, branch, slug))
+        for other in _other_ready(state, branch):
+            other_tasks = other.get("tasks") or []
+            name = other.get("branch") or ""
+            label = _task_list(other_tasks) or name
+            entries.append(_entry(
+                "/crav1-build-walk",
+                f"that work is on {name}" + (f" ({label})" if label and label != name else ""),
+                other_tasks,
+                name,
+                slug,
+            ))
+    lines = [entry["next"] for entry in entries]
+    ending = _compose_ending(entries, waiting, uncommitted)
     outcome = state.get("_permission") if phase == "permission-refused" else None
     result = {
         "mode": "walk",
         "phase": phase,
-        "next": [line],
-        "count": 1,
+        "next": lines,
+        "ending": ending,
+        "count": len(lines),
         "suppressed": list(SUPPRESSED.get(phase, [])),
         "allowed": allowed_actions(owner, state.get("description_asked")),
-        "command": command,
+        "command": entries[0]["command"] if entries else command,
     }
     if outcome:
         result["waiting"] = outcome["waiting"]
         result["offer"] = outcome["offer"]
         result["says_yes_missing"] = False
         result["lines"] = permission_mod().printable(outcome)
+        if not waiting:
+            ending = _compose_ending(entries, outcome["waiting"], uncommitted)
+            result["ending"] = ending
     return result
 
 
@@ -736,16 +935,48 @@ def settle_stamps(text: str, hashes: dict | None = None) -> str | None:
     return text_out
 
 
-def _read_json(path: str) -> dict:
+def _load_json(path: str):
     return json.loads(Path(path).read_text(encoding="utf-8"))
 
 
+def _read_json(path: str):
+    try:
+        return _load_json(path)
+    except (OSError, json.JSONDecodeError) as exc:
+        raise InputError("json", f"cannot read next json: {exc}") from exc
+
+
+def prepare_state(state: dict) -> dict:
+    """Normalize the next --json object. tasks may be T# strings or objects."""
+    if not isinstance(state, dict):
+        raise InputError("json", "next --json must be an object")
+    state = dict(state)
+    if "tasks" in state:
+        state["tasks"] = normalize_tasks(state.get("tasks"))
+    if "next_tasks" in state:
+        state["next_tasks"] = normalize_tasks(state.get("next_tasks"))
+    if "branches" in state:
+        state["branches"] = normalize_branches(state.get("branches"), "branches")
+    if "ready_branches" in state:
+        state["ready_branches"] = normalize_branches(state.get("ready_branches"), "ready_branches")
+    return state
+
+
+def _bad(code: str, line: str, status: int = 2) -> int:
+    return _emit({"ok": False, "code": code, "line": line}, status)
+
+
 def cmd_next(args: argparse.Namespace) -> int:
-    state = _read_json(args.json)
-    if not state.get("phase") and state.get("mode") != "grouping":
-        state = dict(state)
-        state["phase"] = current_phase(state)
-    result = next_for(state)
+    try:
+        raw = _read_json(args.json)
+        state = prepare_state(raw)
+        if not state.get("phase") and state.get("mode") != "grouping":
+            state["phase"] = current_phase(state)
+        result = next_for(state)
+    except InputError as exc:
+        return _bad(exc.code, exc.line)
+    except (AttributeError, TypeError, ValueError, KeyError) as exc:
+        return _bad("input", f"next input is not usable: {exc}")
     result["ok"] = True
     return _emit(result)
 
@@ -764,7 +995,7 @@ def cmd_comment(args: argparse.Namespace) -> int:
 
 
 def cmd_live(args: argparse.Namespace) -> int:
-    state = _read_json(args.json)
+    state = _load_json(args.json)
     result = live_gate(
         state.get("line") or "",
         approval_holding=bool(state.get("approval_holding")),
@@ -780,7 +1011,7 @@ def cmd_live(args: argparse.Namespace) -> int:
 
 
 def cmd_stack(args: argparse.Namespace) -> int:
-    state = _read_json(args.json)
+    state = _load_json(args.json)
     if "tasks" in state and "spec" not in state:
         result = stack_from_tasks(state.get("tasks") or [], set(state.get("merged") or []), state.get("base") or DEFAULT_BASE)
     else:
