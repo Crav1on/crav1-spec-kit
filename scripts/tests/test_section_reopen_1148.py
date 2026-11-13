@@ -366,6 +366,15 @@ class NoReopen(unittest.TestCase):
         self.assertTrue(payload["restamp_only"])
         self.assertEqual(payload["reopen_steps"], [])
 
+    def test_a_pull_request_number_inside_a_question_does_not_reopen(self):
+        text = (self.root / "spec.md").read_text(encoding="utf-8")
+        payload = self._keep(text.replace(
+            "Which lane prints the label?",
+            "Which lane prints the label (PR 12)?",
+        ))
+        self.assertIn("Reopen: none", payload["reopen_line"])
+        self.assertEqual(payload["changed_questions"], [])
+
     def test_blocks_line_does_not_reopen_or_offer_a_restamp(self):
         text = (self.root / "spec.md").read_text(encoding="utf-8")
         payload = self._keep(text.replace("Blocks: none", "Blocks: T1"))

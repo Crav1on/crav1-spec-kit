@@ -25,6 +25,8 @@ A requirement change does not reopen resolve-open-questions when `changed_questi
 
 `## Match` and `## In the code` set `restamp_only`. So does a `Synced at:` line, and an already-answered question. No step reopens. `/crav1-add-to-spec` may restamp. A `Blocks:` or `Asked:` line that does not change the question's words also reopens nothing. It does not set `restamp_only`.
 
+Since 1.146.0 the question id is `question_stable_key` when that function exists. A refreshed commit list, pull-request number, or date does not reopen. One close reword of a stored question stays that question. Two close questions are not merged. An explicit `Id:` mark still reopens when the words change.
+
 When the architecture review is the only spec step recorded so far, a requirement change reopens that review. Once a later spec step is recorded, a spec change does not send the walk back there.
 
 A plan or tasks change is unchanged: it reopens the plan review and the ready check, not plan-from-spec. A `verify.md` change does not reopen the ready check. A progress mark does not reopen any step.

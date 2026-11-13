@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""Progress file for /crav1-tighten-and-plan-ready-to-build (kit 1.139.0).
+"""Progress file for /crav1-tighten-and-plan-ready-to-build (kit 1.146.0).
 
 The spec, plan, and tasks stay the source of truth. This script only tracks
 where the guided walk is, which version of each file a step covered, and which
 ready-check rows belong to which step. It does not edit those files, does not
 apply a playbook, and does not start a build. It never writes verify.md.
-build-map.md stays with /crav1-tasks-ready-to-build.
+readiness --write-map writes build-map.md in the same format as
+/crav1-tasks-ready-to-build. Without that flag it writes nothing.
 
 A later step inside the walk leaves earlier steps done. An optional extra
 the walk itself runs is recorded with `- Extra:` when it finishes, and that
@@ -19,9 +20,10 @@ Usage (JSON on stdout):
       --result <result> --yes [--when <full timestamp>] [--playbook <file>]
   walk_progress.py cover --root <spec-folder> --yes
   walk_progress.py clear --root <spec-folder> --step <id> --yes
+  walk_progress.py start --root <spec-folder-or-slug> [--playbook <file>]
   walk_progress.py resume --root <spec-folder>
   walk_progress.py playbook-status --root <spec-folder> --playbook <file>
-  walk_progress.py readiness --root <spec-folder>
+  walk_progress.py readiness --root <spec-folder> [--write-map]
   walk_progress.py readiness --json <file> [--root <spec-folder>]
   walk_progress.py unlinked --root <spec-folder>
   walk_progress.py ack-stamps --root <spec-folder> --yes
@@ -33,9 +35,13 @@ Usage (JSON on stdout):
 
 readiness --root builds the rows from task_order.py and question_blocks.py
 and adds the Reviewed warnings. It also compares tasks.md with verify.md.
-Do not hand-build that JSON. spec-finding offers one jump back for a spec
-finding, or records an open point when that finding already jumped. A plan
-tag writes nothing.
+--write-map writes build-map.md through build_map.py and does not write
+verify.md. Do not hand-build that JSON. start resolves a folder or a slug
+the way resolve_spec.py does and returns resume and playbook-status together.
+spec-finding offers one jump back for a spec finding, or records an open
+point when that finding already jumped. A close reword of a recorded finding
+is offered as that finding, and --new keeps it separate. The first-seen Key
+stays. Later wordings are Alias. A plan tag writes nothing.
 
 record, cover, and clear without --yes write nothing and exit 2.
 record takes one step per call and stamps Done itself. --when, when passed,
@@ -714,7 +720,7 @@ def _lookup_stable_id(text: str, marks: list[str]) -> str | None:
         mod = blocks_mod()
     except SystemExit:
         return None
-    for name in ("stable_question_id", "question_identity"):
+    for name in ("question_stable_key", "stable_question_id", "question_identity"):
         fn = getattr(mod, name, None)
         if not callable(fn):
             continue
@@ -769,20 +775,83 @@ def _parse_question_ids(value: str | None) -> tuple[dict[str, str], dict[str, st
     return open_ids, answered
 
 
-def _diff_questions(stored: str | None, text: str) -> dict:
+def _stable_key_of(text: str) -> str | None:
+    try:
+        fn = getattr(blocks_mod(), "question_stable_key", None)
+    except SystemExit:
+        return None
+    if not callable(fn):
+        return None
+    found = str(fn(text) or "")
+    if found and re.fullmatch(r"[A-Za-z0-9._-]+", found):
+        return found
+    return None
+
+
+def _close_reword_ids(prev_rows: list[dict], curr_rows: list[dict], stored_rows: list[dict]) -> set[str]:
+    """Ids of one close reword. Two close questions are not merged (1.146.0)."""
+    try:
+        mod = blocks_mod()
+    except SystemExit:
+        return set()
+    sim = getattr(mod, "question_similarity", None)
+    if not callable(sim):
+        return set()
+    close = float(getattr(mod, "CLOSE_QUESTION", 0.86))
+    stored_text = {}
+    for row in stored_rows or []:
+        for key in (row.get("stable"), row.get("key")):
+            if key and row.get("text"):
+                stored_text[key] = row["text"]
+    same: set[str] = set()
+    for prev in prev_rows:
+        ptext = stored_text.get(prev["id"]) or ""
+        if not ptext:
+            continue
+        hits = [curr for curr in curr_rows if sim(ptext, curr.get("text") or "") >= close]
+        if len(hits) != 1:
+            continue
+        curr = hits[0]
+        back = [
+            other for other in prev_rows
+            if sim(stored_text.get(other["id"]) or "", curr.get("text") or "") >= close
+        ]
+        if len(back) == 1:
+            same.add(prev["id"])
+            same.add(curr["id"])
+    return same
+
+
+def _diff_questions(stored: str | None, text: str, stored_rows: list[dict] | None = None) -> dict:
     """Which questions must be asked again.
 
     A settled question stays settled when an Answered line is added or a new
-    answered question appears. A new open question, a removed open question,
-    or a word change on the same stable id reopens resolve-open-questions.
+    answered question appears. The stable key from 1.146.0 ignores a refreshed
+    commit list, so that edit does not reopen. One close reword of a stored
+    question stays that question. A new open question, a removed open question,
+    or a word change on an explicit id reopens resolve-open-questions.
     """
     prev_open, prev_answered = _parse_question_ids(stored)
     current = []
     for question in _iter_questions(text):
         ident, word, answered = _question_identity(question["text"], question["marks"])
-        current.append({"id": ident, "word": word, "answered": answered})
+        current.append({
+            "id": ident,
+            "word": word,
+            "answered": answered,
+            "text": question["text"],
+        })
     curr_all = {row["id"]: row for row in current}
     curr_open = {row["id"]: row for row in current if not row["answered"]}
+    fresh_prev = [
+        {"id": ident, "word": word}
+        for ident, word in prev_open.items()
+        if ident not in curr_open and not (
+            curr_all.get(ident) and curr_all[ident]["answered"]
+        )
+    ]
+    fresh_curr = [row for ident, row in curr_open.items() if ident not in prev_open]
+    same = _close_reword_ids(fresh_prev, fresh_curr, stored_rows or [])
     changed: list[dict] = []
     reopen = False
     answered_events = False
@@ -794,27 +863,35 @@ def _diff_questions(stored: str | None, text: str) -> dict:
             reopen = True
 
     for ident, row in curr_open.items():
+        if ident in same:
+            continue
         if ident not in prev_open:
             note(ident, "reopened" if ident in prev_answered else "new", True)
         elif prev_open[ident] != row["word"]:
+            # Same stable key: only a commit list, a PR number, or a date moved.
+            if _stable_key_of(row["text"]) == ident:
+                continue
             note(ident, "reworded", True)
     for ident, word in prev_open.items():
-        if ident in curr_open:
+        if ident in same or ident in curr_open:
             continue
         row = curr_all.get(ident)
         if row and row["answered"] and row["word"] == word:
             answered_events = True
             continue
         if row and row["answered"]:
+            if _stable_key_of(row["text"]) == ident:
+                answered_events = True
+                continue
             note(ident, "reworded", True)
             continue
         note(ident, "removed", True)
     for ident, row in curr_all.items():
-        if not row["answered"] or ident in prev_open:
+        if not row["answered"] or ident in prev_open or ident in same:
             continue
         if ident not in prev_answered:
             answered_events = True
-        elif prev_answered[ident] != row["word"]:
+        elif prev_answered[ident] != row["word"] and _stable_key_of(row["text"]) != ident:
             note(ident, "reworded", True)
     return {
         "reopen": reopen,
@@ -898,8 +975,10 @@ def section_effect(root: Path, steps: dict) -> dict:
     changed = _changed_slugs(baseline.get("section_stamps"), text)
     resolve = steps.get("resolve-open-questions") or {}
     qdiff = {"reopen": False, "answered_only": False, "changed": []}
-    if "open-questions" in changed and resolve.get("question_ids"):
-        qdiff = _diff_questions(resolve.get("question_ids"), text)
+    if "open-questions" in changed and (resolve.get("question_ids") or resolve.get("question_rows")):
+        qdiff = _diff_questions(
+            resolve.get("question_ids"), text, resolve.get("question_rows") or [],
+        )
     elif "open-questions" in changed and resolve:
         qdiff = {"reopen": True, "answered_only": False, "changed": []}
     reopen, requirement = _steps_for_slugs(changed, bool(qdiff["reopen"]), steps)
@@ -1027,6 +1106,13 @@ def _take_jump_line(current: dict, line: str) -> None:
         current["continue"] = value
     elif key == "Key":
         current["key"] = value
+    elif key == "Topic":
+        current["topic"] = value
+    elif key == "Alias":
+        parts = value.split()
+        if not parts or any(not _HEX12.fullmatch(part) for part in parts):
+            fail("progress-file", f"alias is not 12 hex: {line}")
+        current["aliases"] = parts
     else:
         fail("progress-file", f"unknown line: {line}")
 
@@ -1115,6 +1201,15 @@ def parse_progress(text: str) -> dict:
             if not _QUESTION_ID_VALUE.fullmatch(value):
                 fail("progress-file", f"question ids are not id@hash: {line}")
             current["question_ids"] = value
+        elif key == "Question":
+            parts = value.split(" ", 2)
+            if len(parts) < 3 or not _HEX12.fullmatch(parts[0]) or not _HEX12.fullmatch(parts[1]):
+                fail("progress-file", f"question line is not two keys and text: {line}")
+            current.setdefault("question_rows", []).append({
+                "key": parts[0],
+                "stable": parts[1],
+                "text": parts[2],
+            })
         elif key == "Content stamp":
             if value != CONTENT_STAMP:
                 fail("progress-file", f"unknown content stamp: {line}")
@@ -1171,6 +1266,10 @@ def _render_jumps(lines: list[str], jumps: list | None) -> None:
             lines.append(f"  Open: {jump['open']}")
         lines.append(f"  Continue: {jump['continue']}")
         lines.append(f"  Key: {jump['key']}")
+        if jump.get("topic"):
+            lines.append(f"  Topic: {jump['topic']}")
+        if jump.get("aliases"):
+            lines.append(f"  Alias: {' '.join(jump['aliases'])}")
         lines.append("")
 
 
@@ -1202,6 +1301,8 @@ def render(slice_label: str, steps: dict, acks: list | None = None, jumps: list 
                 lines.append(f"  Question ids: {body['question_ids']}")
             if "section_stamps" in body:
                 lines.append(f"  Section stamps: {body['section_stamps']}")
+            for row in body.get("question_rows") or []:
+                lines.append(f"  Question: {row['key']} {row['stable']} {row['text']}")
         _render_stamp(lines, body)
         lines.append("")
     for step in EXTRAS:
@@ -1237,6 +1338,39 @@ def playbook_mod():
     return mod
 
 
+def question_record_list(root: Path) -> list[dict]:
+    """Exact key, stable key, and text for each kept-open question.
+
+    The stable key ignores a refreshed commit list. Old progress files have
+    no Question lines and still match on the exact key.
+    """
+    spec = root / "spec.md"
+    if not spec.is_file():
+        return []
+    tasks_path = root / "tasks.md"
+    task_ids = None
+    if tasks_path.is_file():
+        task_ids = blocks_mod().task_ids_from_tasks(tasks_path.read_text(encoding="utf-8"))
+    questions = blocks_mod().kept_open(
+        spec.read_text(encoding="utf-8"),
+        task_ids=task_ids,
+        resolve_recorded=True,
+    )
+    rows = []
+    for question in questions:
+        text = question.get("text") or ""
+        key = question.get("key") or blocks_mod().question_key(text)
+        stable = question.get("stable_key") or blocks_mod().question_stable_key(text)
+        if key and text:
+            rows.append({"key": key, "stable": stable, "text": text})
+    return rows
+
+
+def _store_questions(root: Path, body: dict) -> None:
+    body["kept_questions"] = kept_question_line(root)
+    body["question_rows"] = question_record_list(root)
+
+
 def kept_question_line(root: Path) -> str:
     """Question keys present when resolve-open-questions is recorded.
 
@@ -1268,9 +1402,22 @@ def kept_question_keys(root: Path) -> set[str]:
         return set()
     body = load(root)["steps"].get("resolve-open-questions") or {}
     raw = str(body.get("kept_questions") or "")
-    if not raw or raw == "none":
-        return set()
-    return {part for part in raw.split() if part and part != "none"}
+    keys = set()
+    if raw and raw != "none":
+        keys.update(part for part in raw.split() if part and part != "none")
+    for row in body.get("question_rows") or []:
+        if row.get("key"):
+            keys.add(row["key"])
+        if row.get("stable"):
+            keys.add(row["stable"])
+    return keys
+
+
+def question_rows_of(root: Path) -> list[dict]:
+    if not root.is_dir():
+        return []
+    body = load(root)["steps"].get("resolve-open-questions") or {}
+    return list(body.get("question_rows") or [])
 
 
 def resolve_ever_recorded(root: Path) -> bool:
@@ -1299,6 +1446,7 @@ def current_tokens(root: Path, step: str, playbook: Path | None) -> dict:
     if step == "resolve-open-questions":
         out["kept_questions"] = kept_question_line(root)
         out["question_ids"] = got.get("question_ids") or "none"
+        out["question_rows"] = question_record_list(root)
     out["content_stamp"] = CONTENT_STAMP
     return out
 
@@ -1570,7 +1718,7 @@ def restamp_earlier(root: Path, steps: dict, step: str) -> None:
             continue
         _restamp_body(body, earlier, now, covered)
     if "spec" in covered and "resolve-open-questions" in steps and ORDER.index(step) > ORDER.index("resolve-open-questions"):
-        steps["resolve-open-questions"]["kept_questions"] = kept_question_line(root)
+        _store_questions(root, steps["resolve-open-questions"])
         steps["resolve-open-questions"]["question_ids"] = now.get("question_ids") or "none"
 
 
@@ -1586,7 +1734,7 @@ def restamp_recorded(root: Path, steps: dict, tokens: set[str]) -> None:
             continue
         _restamp_body(body, name, now, tokens)
     if "spec" in tokens and "resolve-open-questions" in steps:
-        steps["resolve-open-questions"]["kept_questions"] = kept_question_line(root)
+        _store_questions(root, steps["resolve-open-questions"])
         steps["resolve-open-questions"]["question_ids"] = now.get("question_ids") or "none"
 
 
@@ -1608,7 +1756,7 @@ def refresh_versions(root: Path, step: str, body: dict) -> None:
         body["questions"] = now["questions"]
         body["section_stamps"] = now.get("section_stamps") or "none"
     if step == "resolve-open-questions":
-        body["kept_questions"] = kept_question_line(root)
+        _store_questions(root, body)
         body["question_ids"] = now.get("question_ids") or "none"
     body["content_stamp"] = CONTENT_STAMP
 
@@ -1647,13 +1795,17 @@ def resume(args: argparse.Namespace) -> None:
     root = Path(args.root)
     if not root.is_dir():
         fail("root", f"not a folder: {root}")
+    emit(resume_payload(root, args.no_playbook))
+
+
+def resume_payload(root: Path, no_playbook: bool) -> dict:
     data = load(root)
     effect = section_effect(root, data["steps"])
     rows = []
     continue_from = None
     for step in ORDER:
         body = data["steps"].get(step)
-        if body is None and step == "playbook" and args.no_playbook:
+        if body is None and step == "playbook" and no_playbook:
             row = {"id": step, "status": "skipped", "result": "skipped"}
             rows.append(row)
             continue
@@ -1695,7 +1847,7 @@ def resume(args: argparse.Namespace) -> None:
             "extra": True,
         })
     book = data["steps"].get("playbook")
-    emit({
+    return {
         "ok": True,
         "source_of_truth": "spec.md, plan.md, and tasks.md",
         "progress_file": PROGRESS_NAME,
@@ -1712,12 +1864,14 @@ def resume(args: argparse.Namespace) -> None:
             {
                 "id": jump["id"],
                 "key": jump["key"],
+                "topic": jump.get("topic") or "",
+                "aliases": list(jump.get("aliases") or []),
                 "result": jump["result"],
                 "continue": [part for part in jump["continue"].split(", ") if part],
             }
             for jump in data.get("jumps") or []
         ],
-    })
+    }
 
 
 def resolve_playbook(root: Path, given: str) -> Path:
@@ -1754,28 +1908,31 @@ def same_playbook_path(root: Path, recorded: str, given: str, resolved: Path) ->
 
 def playbook_status(args: argparse.Namespace) -> None:
     root = Path(args.root)
-    playbook = resolve_playbook(root, args.playbook)
+    emit(playbook_payload(root, args.playbook))
+
+
+def playbook_payload(root: Path, playbook_arg: str) -> dict:
+    playbook = resolve_playbook(root, playbook_arg)
     data = load(root) if root.is_dir() else {"steps": {}}
     body = data["steps"].get("playbook")
     text, raw = _read_pair(playbook)
     now = stamp_file(playbook, "playbook")
     if body is None:
-        emit({
+        return {
             "ok": True,
             "status": "not-recorded",
             "already_applied": False,
             "offer": "show-changes",
             "note": "No progress line for this playbook. Use the apply compare. Do not treat it as already applied.",
-        })
-        return
-    same_path = same_playbook_path(root, body["playbook"], args.playbook, playbook)
+        }
+    same_path = same_playbook_path(root, body["playbook"], playbook_arg, playbook)
     same_hash = now != "missing" and stamp_matches(
         body.get("playbook_version"), text, "playbook",
         body.get("content_stamp") == CONTENT_STAMP,
         raw_bytes=raw, path=playbook, part="file",
     )
     if same_path and same_hash and body["result"] in APPLIED:
-        emit({
+        return {
             "ok": True,
             "status": "already-applied",
             "already_applied": True,
@@ -1785,24 +1942,116 @@ def playbook_status(args: argparse.Namespace) -> None:
                 "Ask once: skip (Recommended) or reapply, even when the file has not changed. "
                 "Do not move on without that question."
             ),
-        })
-        return
+        }
     if same_path and same_hash and body["result"] == "skipped":
-        emit({
+        return {
             "ok": True,
             "status": "already-skipped",
             "already_applied": False,
             "offer": "skip-or-apply",
             "result": body["result"],
-        })
-        return
-    emit({
+        }
+    return {
         "ok": True,
         "status": "changed" if same_path else "different-file",
         "already_applied": False,
         "offer": "show-changes",
         "result": body.get("result"),
-    })
+    }
+
+
+def resolve_mod():
+    return _load_script("crav1-tasks-ready-to-build", "resolve_spec.py", "resolve-spec")
+
+
+def _specs_roots() -> list[Path]:
+    found: list[Path] = []
+    cwd = Path.cwd()
+    for base in [cwd, *cwd.parents]:
+        candidate = base / "docs" / "specs"
+        if candidate.is_dir():
+            found.append(candidate)
+            break
+        if str(base) == base.anchor:
+            break
+    return found
+
+
+def resolve_start(raw: str) -> dict:
+    """A spec folder, or a slug the way resolve_spec.py matches one."""
+    text = (raw or "").strip()
+    if not text:
+        return {
+            "ok": False,
+            "code": "none",
+            "matches": [],
+            "nearest": [],
+            "query": text,
+            "message": "Pass --root with a spec folder or a slug.",
+        }
+    path = Path(text)
+    if path.is_dir() and (path / "spec.md").is_file() and path.name not in ("_template", "retired"):
+        return {
+            "ok": True,
+            "code": "folder",
+            "slug": path.name,
+            "folder": str(path),
+            "how": "folder",
+            "matches": [{"slug": path.name, "how": "folder"}],
+        }
+    if path.is_dir():
+        return {
+            "ok": False,
+            "code": "root",
+            "matches": [],
+            "query": text,
+            "message": f"{path} is not a spec folder. Pass a slug or docs/specs/<slug>.",
+        }
+    roots = _specs_roots()
+    if not roots:
+        return {
+            "ok": False,
+            "code": "none",
+            "matches": [],
+            "nearest": [],
+            "query": text,
+            "message": "No specs folder at docs/specs. From the repo root pass --root docs/specs/<slug>.",
+        }
+    last = None
+    for specs in roots:
+        result = resolve_mod().resolve(str(specs), text)
+        last = result
+        if result.get("ok") or result.get("code") == "several":
+            return result
+    return last or {
+        "ok": False,
+        "code": "none",
+        "matches": [],
+        "nearest": [],
+        "query": text,
+    }
+
+
+def start(args: argparse.Namespace) -> None:
+    """Resume and playbook status in one call. --root is a folder or a slug."""
+    found = resolve_start(args.root)
+    if not found.get("ok"):
+        emit(found)
+        raise SystemExit(2)
+    folder = Path(found["folder"])
+    if not folder.is_dir():
+        fail("root", f"not a folder: {folder}")
+    payload = {
+        "ok": True,
+        "slug": found.get("slug") or folder.name,
+        "folder": str(folder),
+        "how": found.get("how") or "folder",
+        "resume": resume_payload(folder, no_playbook=not args.playbook),
+        "playbook_status": None,
+    }
+    if args.playbook:
+        payload["playbook_status"] = playbook_payload(folder, args.playbook)
+    emit(payload)
 
 
 def _load_script(folder: str, filename: str, code: str):
@@ -2002,7 +2251,7 @@ def cover(args: argparse.Namespace) -> None:
             body["questions"] = now["questions"]
             body["section_stamps"] = now.get("section_stamps") or "none"
         if step == "resolve-open-questions":
-            body["kept_questions"] = kept_question_line(root)
+            _store_questions(root, body)
             body["question_ids"] = now.get("question_ids") or "none"
         body["content_stamp"] = CONTENT_STAMP
         covered.append(step)
@@ -2344,7 +2593,57 @@ def _verify_for(text: str | None, tid: str) -> tuple[str, str | None]:
     return "needs-verify", "no verify.md row"
 
 
-def _oq_row(tid: str, question: dict, whole: bool, kept: set[str]) -> dict:
+def _question_alias(question: dict, kept: set[str], stored: list[dict], excluded: set[str], task_ids) -> tuple[bool, dict | None]:
+    """Whether this question is one already kept, and a note when the words moved.
+
+    Exact key: kept, no note. Stable key: a refreshed commit list. One close
+    wording: the same question. Two close wordings are not merged. Blocks
+    tasks that name different T# ids are not the same question.
+    """
+    key = question.get("key") or ""
+    stable = question.get("stable_key") or ""
+    if key and key in excluded:
+        return False, None
+    if key and key in kept:
+        return True, None
+    text = question.get("text") or ""
+    if stable and stable in kept:
+        matched = next(
+            (row for row in stored if row.get("stable") == stable or row.get("key") == stable),
+            None,
+        )
+        return True, {
+            "how": "stable",
+            "key": key,
+            "text": text,
+            "matched": (matched or {}).get("text") or "",
+            "similarity": 1.0,
+        }
+    hits = []
+    current_tasks = set(question.get("tasks") or [])
+    for row in stored:
+        if row.get("key") in excluded:
+            continue
+        sim = blocks_mod().question_similarity(text, row.get("text") or "")
+        if sim < FINDING_CLOSE:
+            continue
+        named = set(blocks_mod()._text_tasks(row.get("text") or "", task_ids))
+        if current_tasks and named and current_tasks.isdisjoint(named):
+            continue
+        hits.append((sim, row))
+    if len(hits) != 1:
+        return False, None
+    sim, row = hits[0]
+    return True, {
+        "how": "similar",
+        "key": key,
+        "text": text,
+        "matched": row.get("text") or "",
+        "similarity": round(sim, 3),
+    }
+
+
+def _oq_row(tid: str, question: dict, whole: bool, kept: set[str], alias_kept: set[str] | None = None) -> dict:
     sentence = str(question.get("text") or "").strip()
     if question.get("mark") == "inferred":
         reason = f'open question "{sentence}" (inferred from the text)'
@@ -2359,7 +2658,7 @@ def _oq_row(tid: str, question: dict, whole: bool, kept: set[str]) -> dict:
         "task": tid,
         "reason": reason,
         "asked": bool(question.get("asked")),
-        "kept": bool(question.get("recorded")) or question.get("key") in kept,
+        "kept": bool(question.get("recorded")) or question.get("key") in kept or question.get("key") in (alias_kept or set()),
         "inferred_text": question.get("mark") == "inferred",
     }
     if question.get("who"):
@@ -2367,15 +2666,15 @@ def _oq_row(tid: str, question: dict, whole: bool, kept: set[str]) -> dict:
     return row
 
 
-def _question_row(blocks: dict, tid: str, kept: set[str]) -> dict | None:
+def _question_row(blocks: dict, tid: str, kept: set[str], alias_kept: set[str] | None = None) -> dict | None:
     slice_q = None
     for question in blocks.get("questions") or []:
         if question.get("mark") in ("tasks", "inferred") and tid in (question.get("tasks") or []):
-            return _oq_row(tid, question, whole=False, kept=kept)
+            return _oq_row(tid, question, whole=False, kept=kept, alias_kept=alias_kept)
         if question.get("blocks_slice") and slice_q is None:
             slice_q = question
     if slice_q is not None:
-        return _oq_row(tid, slice_q, whole=True, kept=kept)
+        return _oq_row(tid, slice_q, whole=True, kept=kept, alias_kept=alias_kept)
     for risk in blocks.get("risks") or []:
         if not risk.get("blocks_slice"):
             continue
@@ -2390,7 +2689,7 @@ def _question_row(blocks: dict, tid: str, kept: set[str]) -> dict | None:
     return None
 
 
-def build_rows(root: Path) -> list[dict]:
+def build_rows(root: Path, excluded: set[str] | None = None, aliases: list | None = None) -> list[dict]:
     """Ready-check rows from the spec folder. The walk does not hand-build these."""
     tasks_path = root / "tasks.md"
     plan_path = root / "plan.md"
@@ -2423,6 +2722,15 @@ def build_rows(root: Path) -> list[dict]:
         resolve_recorded=recorded,
     )
     kept = kept_question_keys(root)
+    stored_questions = question_rows_of(root)
+    excluded = excluded or set()
+    alias_kept: set[str] = set()
+    for question in blocks.get("questions") or []:
+        flagged, note = _question_alias(question, kept, stored_questions, excluded, task_ids)
+        if flagged and question.get("key"):
+            alias_kept.add(question["key"])
+        if note is not None and aliases is not None:
+            aliases.append(note)
     approval_holds = approval_mod().holds(spec_text, task_ids)
     verify_text = verify_path.read_text(encoding="utf-8") if verify_path.is_file() else None
     warning = reviewed_warning(plan_text) if plan_path.is_file() else None
@@ -2462,7 +2770,7 @@ def build_rows(root: Path) -> list[dict]:
             _attach_deps(row, task)
             rows.append(row)
             continue
-        question = _question_row(blocks, tid, kept)
+        question = _question_row(blocks, tid, kept, alias_kept)
         if question:
             _attach_deps(question, task)
             rows.append(question)
@@ -2763,7 +3071,8 @@ def readiness(args: argparse.Namespace) -> None:
     elif root is not None:
         if not root.is_dir():
             fail("root", f"not a folder: {root}")
-        rows = build_rows(root)
+        aliases: list[dict] = []
+        rows = build_rows(root, excluded=set(args.new_question or []), aliases=aliases)
         built = True
     else:
         fail("readiness", "pass --root <spec-folder>, or --json <rows file>")
@@ -2874,6 +3183,14 @@ def readiness(args: argparse.Namespace) -> None:
     }
     if built:
         out["rows"] = rows
+        out["question_aliases"] = aliases
+    if getattr(args, "write_map", False) and root is not None and root.is_dir():
+        text, code = map_mod().run_dir(root)
+        if code:
+            fail("build-map", text or "could not write build-map.md")
+        out["build_map"] = text.strip()
+        map_path = root / "build-map.md"
+        out["build_map_wrote"] = str(map_path) if map_path.is_file() else None
     if root is not None and root.is_dir():
         loaded = load(root)
         out["done_stamp_warning"] = done_stamp_warning(loaded["steps"], loaded.get("acks"))
@@ -2926,9 +3243,153 @@ def ack_stamps(args: argparse.Namespace) -> None:
     emit({"ok": True, "wrote": PROGRESS_NAME, "lines": lines})
 
 
+FINDING_CLOSE = 0.86
+SAME_CHOICE = "same recorded finding (Recommended)"
+NEW_CHOICE = "this is new"
+NEW_CHOICE_REC = "this is new (Recommended)"
+VAGUE_TOPICS = frozenset({
+    "spec", "plan", "task", "tasks", "finding", "issue", "note", "question",
+})
+
+
 def _finding_key(text: str) -> str:
+    """First 12 hex of the exact normalized words. Old progress files use this."""
     norm = re.sub(r"\s+", " ", text.strip().lower())
     return hashlib.sha256(norm.encode("utf-8")).hexdigest()[:12]
+
+
+def _norm_topic(text: str | None) -> str:
+    raw = re.sub(r"[^a-z0-9]+", " ", (text or "").lower())
+    raw = re.sub(r"\s+", " ", raw).strip()
+    if len(raw) > 48:
+        raw = raw[:48].rstrip()
+    return raw
+
+
+def _topic_ok(topic: str) -> bool:
+    if len(topic) < 4 or topic in VAGUE_TOPICS:
+        return False
+    return re.fullmatch(r"[a-z0-9]+(?:[ -][a-z0-9]+)*", topic) is not None
+
+
+def _jump_keys(jump: dict) -> set[str]:
+    keys = set()
+    if jump.get("key"):
+        keys.add(jump["key"])
+    for alias in jump.get("aliases") or []:
+        keys.add(alias)
+    return keys
+
+
+def _family(jumps: list, text_key: str) -> tuple[str | None, list[str], str, str]:
+    """First-seen key, aliases, topic, and recorded words for this text key."""
+    first = None
+    aliases: list[str] = []
+    topic = ""
+    finding = ""
+    for jump in jumps:
+        if text_key not in _jump_keys(jump):
+            continue
+        if first is None:
+            first = jump.get("key")
+            finding = jump.get("finding") or ""
+        if jump.get("topic") and not topic:
+            topic = jump["topic"]
+        for alias in jump.get("aliases") or []:
+            if alias not in aliases:
+                aliases.append(alias)
+    return first, aliases, topic, finding
+
+
+def _remember_alias(jumps: list, first_key: str, new_key: str, topic: str) -> bool:
+    """Point later wording at the first-seen key. Returns whether anything changed."""
+    changed = False
+    for jump in jumps:
+        if jump.get("key") != first_key:
+            continue
+        aliases = list(jump.get("aliases") or [])
+        if new_key and new_key != first_key and new_key not in aliases:
+            aliases.append(new_key)
+            jump["aliases"] = aliases
+            changed = True
+        if topic and not jump.get("topic"):
+            jump["topic"] = topic
+            changed = True
+    return changed
+
+
+def _close_findings(jumps: list, text: str, fid: str, topic: str) -> list[dict]:
+    """Recorded findings a close reword might be. Exact keys are not listed.
+
+    An explicit topic matches only the same P#. A different topic never matches,
+    even when the words are close. Two hits stay two hits.
+    """
+    text_key = _finding_key(text)
+    by_key: dict[str, dict] = {}
+    for jump in jumps:
+        if text_key in _jump_keys(jump):
+            continue
+        stored_topic = jump.get("topic") or ""
+        if topic and stored_topic and topic != stored_topic:
+            continue
+        sim = blocks_mod().question_similarity(text, jump.get("finding") or "")
+        same_topic = bool(topic and stored_topic and topic == stored_topic and jump.get("id") == fid)
+        if not same_topic and sim < FINDING_CLOSE:
+            continue
+        key = jump.get("key") or ""
+        row = by_key.get(key)
+        if row is None or sim > row["similarity"]:
+            by_key[key] = {
+                "key": key,
+                "id": jump.get("id"),
+                "finding": jump.get("finding") or "",
+                "similarity": round(sim, 3),
+                "how": "topic" if same_topic else "similar",
+                "topic": stored_topic,
+            }
+    return list(by_key.values())
+
+
+def _same_or_new_offer(fid: str, close: list[dict]) -> dict:
+    if len(close) == 1:
+        hit = close[0]
+        options = [
+            {"id": "same", "label": SAME_CHOICE, "recommended": True, "match_key": hit["key"]},
+            {"id": "new", "label": NEW_CHOICE, "recommended": False},
+        ]
+        question = (
+            f"{fid} looks like the recorded finding \"{hit['finding']}\". "
+            "Treat it as that finding, or is this new?"
+        )
+    else:
+        options = [{"id": "new", "label": NEW_CHOICE_REC, "recommended": True}]
+        for hit in close[:3]:
+            short = hit["finding"]
+            if len(short) > 80:
+                short = short[:77].rstrip() + "..."
+            options.append({
+                "id": "same",
+                "label": f"same as {hit['id']}: {short}",
+                "recommended": False,
+                "match_key": hit["key"],
+            })
+        question = (
+            f"{fid} is close to more than one recorded finding. "
+            "This is new unless you pick one."
+        )
+    return {
+        "ok": True,
+        "offer": "same-or-new",
+        "spec": True,
+        "finding": fid,
+        "matched": [hit["id"] for hit in close],
+        "matches": close,
+        "question": question,
+        "options": options,
+        "already_jumped": False,
+        "pause": False,
+        "wrote": None,
+    }
 
 
 def _short_finding(text: str) -> str:
@@ -2942,7 +3403,7 @@ def _continue_list(text: str) -> list[str]:
     return [part for part in text.split(", ") if part]
 
 
-def _append_finding(root: Path, data: dict, kind: str, fid: str, text: str, key: str, result: str, continue_line: str, open_path: str | None = None) -> None:
+def _append_finding(root: Path, data: dict, kind: str, fid: str, text: str, key: str, result: str, continue_line: str, open_path: str | None = None, topic: str = "", aliases: list | None = None) -> None:
     jump = {
         "kind": kind,
         "id": fid,
@@ -2952,6 +3413,10 @@ def _append_finding(root: Path, data: dict, kind: str, fid: str, text: str, key:
         "continue": continue_line,
         "key": key,
     }
+    if topic:
+        jump["topic"] = topic
+    if aliases:
+        jump["aliases"] = list(aliases)
     if open_path:
         jump["open"] = open_path
     data.setdefault("jumps", []).append(jump)
@@ -2960,12 +3425,35 @@ def _append_finding(root: Path, data: dict, kind: str, fid: str, text: str, key:
     write_progress(root, data)
 
 
+def _jump_back_offer(fid: str) -> dict:
+    return {
+        "ok": True,
+        "offer": "jump-back",
+        "spec": True,
+        "finding": fid,
+        "question": (
+            f"{fid} is a spec finding. Jump back to /crav1-tighten-spec "
+            "for this finding only, or keep it as an open point and continue?"
+        ),
+        "options": [
+            {"id": "tighten-spec", "label": JUMP_CHOICE, "recommended": True},
+            {"id": "open-point", "label": POINT_CHOICE, "recommended": False},
+        ],
+        "path": TIGHTEN_SPEC_PATH,
+        "already_jumped": False,
+        "pause": False,
+        "wrote": None,
+    }
+
+
 def spec_finding(args: argparse.Namespace) -> None:
     """One jump-back card for a spec finding. A plan finding is left as it is.
 
-    The same finding (the same words) is offered once. After that jump, a
-    return is an open point and the walk continues. This writes walk-progress.md
-    only with --yes. It does not write verify.md, spec.md, plan.md, or tasks.md.
+    The same finding is the first-seen key, or an alias of a later wording.
+    Exact words are not asked again. A close reword is offered as that
+    finding, and --new keeps it separate. After a jump, a return is an open
+    point and the walk continues. This writes walk-progress.md only with
+    --yes. It does not write verify.md, spec.md, plan.md, or tasks.md.
     """
     tag = args.tag or "spec"
     if tag == "plan":
@@ -2985,29 +3473,85 @@ def spec_finding(args: argparse.Namespace) -> None:
         fail("finding", "a spec finding needs --text")
     if not FINDING_ID.fullmatch(args.id or ""):
         fail("finding", "id must be a P# such as P2")
+    topic = _norm_topic(args.topic) if args.topic else ""
+    if args.topic and not _topic_ok(topic):
+        fail("topic", "topic is a short specific name, at least 4 letters, such as approver")
     root = Path(args.root)
     if not root.is_dir():
         fail("root", f"not a folder: {root}")
     data = load(root)
     key = _finding_key(args.text)
     jumps = data.get("jumps") or []
-    jumped = any(item.get("key") == key and item["kind"] == "jump-back" for item in jumps)
-    pointed = any(item.get("key") == key and item["kind"] == "open-point" for item in jumps)
+    force_new = bool(args.new or args.choice == "new")
+    if args.choice == "same":
+        first, _aliases, _stored_topic, _finding = _family(jumps, key)
+        if first is None:
+            close = _close_findings(jumps, args.text, args.id, topic)
+            if not close:
+                fail("choice", "no recorded finding is close to this wording")
+            if len(close) > 1:
+                hits = [row for row in close if row["key"] == args.match_key]
+                if len(hits) != 1:
+                    fail("choice", "more than one recorded finding is close; pass --match-key")
+                hit = hits[0]
+            else:
+                hit = close[0]
+                if args.match_key and args.match_key != hit["key"]:
+                    fail("choice", "--match-key is not the close finding")
+            if not args.yes:
+                fail(
+                    "needs-yes",
+                    "spec-finding writes the progress file only with --yes, after the card was answered",
+                    status=2,
+                )
+            _remember_alias(jumps, hit["key"], key, topic or hit.get("topic") or "")
+            first = hit["key"]
+        elif not args.yes:
+            fail(
+                "needs-yes",
+                "spec-finding writes the progress file only with --yes, after the card was answered",
+                status=2,
+            )
+        else:
+            _remember_alias(jumps, first, key, topic)
+    elif not force_new:
+        first, _aliases, _stored_topic, _finding = _family(jumps, key)
+        if first is None:
+            close = _close_findings(jumps, args.text, args.id, topic)
+            if close:
+                if args.choice in ("tighten-spec", "open-point"):
+                    emit(_same_or_new_offer(args.id, close))
+                    return
+                emit(_same_or_new_offer(args.id, close))
+                return
+    first, aliases, stored_topic, recorded = _family(jumps, key)
+    use_topic = stored_topic or topic
+    if key != first and key not in aliases and first:
+        aliases = list(aliases) + [key]
+    jumped = any(first and item.get("key") == first and item["kind"] == "jump-back" for item in jumps)
+    pointed = any(first and item.get("key") == first and item["kind"] == "open-point" for item in jumps)
     if jumped or pointed:
         payload = {
             "ok": True,
             "offer": None,
             "spec": True,
             "finding": args.id,
+            "key": first,
             "already_jumped": jumped,
             "open_point": True,
             "pause": False,
             "continue": _continue_list(CONTINUE_POINT),
             "refused_second_jump": args.choice == "tighten-spec",
         }
+        if key != first:
+            payload["aliased"] = True
         if pointed:
             payload["already_recorded"] = True
-            payload["wrote"] = None
+            if key != first or (topic and not stored_topic):
+                write_progress(root, data)
+                payload["wrote"] = PROGRESS_NAME
+            else:
+                payload["wrote"] = None
             emit(payload)
             return
         if not args.yes:
@@ -3015,33 +3559,19 @@ def spec_finding(args: argparse.Namespace) -> None:
             payload["wrote"] = None
             emit(payload)
             return
-        _append_finding(root, data, "open-point", args.id, args.text, key, "open-point", CONTINUE_POINT)
+        _append_finding(
+            root, data, "open-point", args.id, recorded or args.text, first or key,
+            "open-point", CONTINUE_POINT, topic=use_topic, aliases=aliases,
+        )
         payload["recorded"] = "open-point"
         payload["wrote"] = PROGRESS_NAME
         emit(payload)
         return
-    if not args.choice:
-        emit({
-            "ok": True,
-            "offer": "jump-back",
-            "spec": True,
-            "finding": args.id,
-            "question": (
-                f"{args.id} is a spec finding. Jump back to /crav1-tighten-spec "
-                "for this finding only, or keep it as an open point and continue?"
-            ),
-            "options": [
-                {"id": "tighten-spec", "label": JUMP_CHOICE, "recommended": True},
-                {"id": "open-point", "label": POINT_CHOICE, "recommended": False},
-            ],
-            "path": TIGHTEN_SPEC_PATH,
-            "already_jumped": False,
-            "pause": False,
-            "wrote": None,
-        })
+    if args.choice in (None, "new", "same"):
+        emit(_jump_back_offer(args.id))
         return
     if args.choice not in ("tighten-spec", "open-point"):
-        fail("choice", "choice must be tighten-spec or open-point")
+        fail("choice", "choice must be tighten-spec, open-point, same, or new")
     if not args.yes:
         fail(
             "needs-yes",
@@ -3051,13 +3581,14 @@ def spec_finding(args: argparse.Namespace) -> None:
     if args.choice == "tighten-spec":
         _append_finding(
             root, data, "jump-back", args.id, args.text, key, "jumped",
-            CONTINUE_JUMP, TIGHTEN_SPEC_PATH,
+            CONTINUE_JUMP, TIGHTEN_SPEC_PATH, topic=topic,
         )
         emit({
             "ok": True,
             "offer": None,
             "spec": True,
             "finding": args.id,
+            "key": key,
             "recorded": "jump-back",
             "choice": "tighten-spec",
             "path": TIGHTEN_SPEC_PATH,
@@ -3067,12 +3598,16 @@ def spec_finding(args: argparse.Namespace) -> None:
             "wrote": PROGRESS_NAME,
         })
         return
-    _append_finding(root, data, "open-point", args.id, args.text, key, "open-point", CONTINUE_POINT)
+    _append_finding(
+        root, data, "open-point", args.id, args.text, key, "open-point",
+        CONTINUE_POINT, topic=topic,
+    )
     emit({
         "ok": True,
         "offer": None,
         "spec": True,
         "finding": args.id,
+        "key": key,
         "recorded": "open-point",
         "choice": "open-point",
         "pause": False,
@@ -3953,7 +4488,7 @@ def restamp_covered(args: argparse.Namespace) -> None:
         body["questions"] = now["questions"]
         body["section_stamps"] = now.get("section_stamps") or "none"
         if step == "resolve-open-questions":
-            body["kept_questions"] = kept_question_line(root)
+            _store_questions(root, body)
             body["question_ids"] = now.get("question_ids") or "none"
         body["content_stamp"] = CONTENT_STAMP
         stamped.append(step)
@@ -4003,6 +4538,11 @@ def main(argv: list[str] | None = None) -> None:
     k.add_argument("--yes", action="store_true")
     k.set_defaults(func=clear)
 
+    st = sub.add_parser("start")
+    st.add_argument("--root", required=True, help="Spec folder, or a slug, title, or playbook name.")
+    st.add_argument("--playbook")
+    st.set_defaults(func=start)
+
     s = sub.add_parser("resume")
     s.add_argument("--root", required=True)
     s.add_argument("--no-playbook", action="store_true")
@@ -4016,6 +4556,8 @@ def main(argv: list[str] | None = None) -> None:
     d = sub.add_parser("readiness")
     d.add_argument("--json", help="Rows file. Omit with --root to build the rows from the spec folder.")
     d.add_argument("--root", help="Spec folder. Builds the rows when --json is omitted. Reopened steps block ready.")
+    d.add_argument("--write-map", action="store_true", help="Write build-map.md in the standalone command's format.")
+    d.add_argument("--new-question", action="append", default=[], help="Exact question key to treat as new, not as a recorded question.")
     d.set_defaults(func=readiness)
 
     u = sub.add_parser("unlinked")
@@ -4032,7 +4574,10 @@ def main(argv: list[str] | None = None) -> None:
     f.add_argument("--id", required=True)
     f.add_argument("--text", required=True)
     f.add_argument("--tag", default="spec", help="spec offers a jump back. plan behaves as today.")
-    f.add_argument("--choice", help="tighten-spec or open-point")
+    f.add_argument("--choice", help="tighten-spec, open-point, same, or new")
+    f.add_argument("--topic", help="Short stable topic, such as approver. Same P# and topic are one finding.")
+    f.add_argument("--new", action="store_true", help="This wording is a new finding.")
+    f.add_argument("--match-key", help="First-seen key when more than one recorded finding is close.")
     f.add_argument("--yes", action="store_true")
     f.set_defaults(func=spec_finding)
 

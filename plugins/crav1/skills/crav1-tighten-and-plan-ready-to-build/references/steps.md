@@ -66,7 +66,7 @@ On the recommended yes, run the same command with `--choice tighten-spec --yes`.
 
 On the other option, run `spec-finding` with `--choice open-point --yes` and continue `/crav1-tighten-plan`, then the ready check. Do not reopen the spec for that finding.
 
-The same finding is the same words. The script stores `Key:`. It is offered once. When `already_jumped` is true, do not ask again. Pass `--yes` so the open point is recorded, then continue review-and-tighten-plan and the ready check. A second `tighten-spec` choice is refused.
+The same finding is the first-seen `Key:`, or an `Alias:` of a later wording (1.146.0). Exact words are not asked again. When `offer` is `same-or-new`, ask that card. Use the script's `options`. When one finding matches, the recommended label is `same recorded finding (Recommended)` and the other label is `this is new`. On same, run `spec-finding` with `--choice same --yes`. On this is new, run it again with `--new`, then the jump-back card. When more than one finding is close, the recommended label is `this is new (Recommended)`. Do not merge them. Pass `--match-key` only when they pick one. An explicit `--topic approver` with the same P# is that stable id. A different topic does not match. Pass `--topic` when the finding has a short name. An old file with only `Key:` still matches those words. When `already_jumped` is true, do not ask again. Pass `--yes` so the open point is recorded, then continue review-and-tighten-plan and the ready check. A second `tighten-spec` choice is refused.
 
 `walk-progress.md` records the jump-back step. Do not hand-edit it.
 
@@ -78,6 +78,8 @@ The same finding is the same words. The script stores `Key:`. It is offered once
   Open: ../crav1-tighten-spec/SKILL.md
   Continue: plan-from-spec, review-and-tighten-plan, tasks-ready-to-build
   Key: 6a034c36ad9e
+  Topic: approver
+  Alias: b7c8d9e0f1a2
 
 - Open point: P2
   Done: 2026-11-11T20:30:00+00:00
