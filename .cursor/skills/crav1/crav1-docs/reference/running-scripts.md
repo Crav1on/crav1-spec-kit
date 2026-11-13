@@ -35,6 +35,18 @@ In a skill instruction, `<interpreter>` means that choice. The command still inc
 <interpreter> -X utf8 <skill crav1-tasks-ready-to-build>/scripts/build_map.py docs/specs/<slug> --recommend T1
 ```
 
+The tighten-and-plan walk starts with one command. `--root` is a spec folder or a slug. `--playbook` is optional.
+
+```text
+<interpreter> -X utf8 <skill crav1-tighten-and-plan-ready-to-build>/scripts/walk_progress.py start --root <folder-or-slug>
+```
+
+The walk's ready check writes the build map. The standalone `/crav1-tasks-ready-to-build` command still writes that file itself.
+
+```text
+<interpreter> -X utf8 <skill crav1-tighten-and-plan-ready-to-build>/scripts/walk_progress.py readiness --root <spec-folder> --write-map
+```
+
 ## A silent finder (1.136.0)
 
 Copy one of these when the shell should pick the interpreter and stay quiet. On Windows try `python`, then `py -3`, then `python3`. Elsewhere try `python3`, then `python`, then `py -3`. The Windows Store alias writes `Python was not found`. That message means the command was not found. Do not stop on it, and do not print it. The finder sets `PYTHONUTF8=1`. Pass `-X utf8` when you run the script.

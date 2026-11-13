@@ -44,7 +44,7 @@ A playbook step records `Playbook:` only. It does not record spec, plan, or task
   Tasks version: c3d4e5f6a1b2
 ```
 
-A spec finding during plan review is not a locked step. `spec-finding --choice tighten-spec --yes` records one jump back. The same finding coming back is an open point. `Continue:` is the walk after that record. `Result: jumped` and `Result: open-point` are only on those records, not on a locked step.
+A spec finding during plan review is not a locked step. `spec-finding --choice tighten-spec --yes` records one jump back. The same finding coming back is an open point. Since 1.146.0 the same finding is the first-seen `Key:`, or an `Alias:` of a later wording. A close reword is offered as that finding, and `this is new` keeps it separate. An old file with only `Key:` still matches those words. `Continue:` is the walk after that record. `Result: jumped` and `Result: open-point` are only on those records, not on a locked step.
 
 ```text
 - Jump-back: P2
@@ -54,6 +54,8 @@ A spec finding during plan review is not a locked step. `spec-finding --choice t
   Open: ../crav1-tighten-spec/SKILL.md
   Continue: plan-from-spec, review-and-tighten-plan, tasks-ready-to-build
   Key: 6a034c36ad9e
+  Topic: approver
+  Alias: b7c8d9e0f1a2
 
 - Open point: P2
   Done: 2026-11-11T20:30:00+00:00
@@ -61,6 +63,12 @@ A spec finding during plan review is not a locked step. `spec-finding --choice t
   Result: open-point
   Continue: review-and-tighten-plan, tasks-ready-to-build
   Key: 6a034c36ad9e
+```
+
+A resolve step also records each kept question. The first hash is the exact words. The second ignores a refreshed commit list. An old file with no `Question:` line still matches `Kept questions:`.
+
+```text
+  Question: a1b2c3d4e5f6 a1b2c3d4e5f6 Which currency for refunds?
 ```
 
 The script stamps `Done` itself, as `YYYY-MM-DDTHH:MM:SS+HH:MM`. Do not pass `--when`. A date alone is rejected. Record one step per call, right when that step finishes. Do not record several steps in one command. `resume` and `readiness` return `done_stamp_warning` when two or more steps share a Done stamp that has not been acknowledged. Say that warning. Those steps were recorded together. The times are not evidence each one finished then.
@@ -100,7 +108,7 @@ A new record writes `Content stamp: normalized` on that step. Resume does not re
 
 An older step has no `Content stamp` line. Its stored hash is the raw bytes from that kit. An unchanged file still matches. A progress-only edit matches too: the script compares the raw bytes, then the other line ending, then one hash-undo over checkbox and `(PR n)` variants (the full set when that is at most 16384, otherwise one line at a time, which covers one tick and any number of added `(PR n)` marks on a short branch list), then `HEAD` once when that blob is the stored stamp and the normalized text matches. It does not walk history. Two or more checkbox edits on a task list longer than 14 lines, when those bytes are not `HEAD`, still look like a content change. The next record writes the new stamp. Do not reopen every old file just because the hash moved.
 
-At the start of a run, resume before recording anything. Resume may report status. When a playbook was named, it does not start a later step, and the playbook question is answered first, including before a read-only check. Redo `continue_from` only after that choice. Do not record a later step to clear an earlier reopen.
+At the start of a run, `start` returns `resume` before anything is recorded. That resume may report status. When a playbook was named, it does not start a later step, and the playbook question is answered first, including before a read-only check. Redo `continue_from` only after that choice. Do not record a later step to clear an earlier reopen.
 
 On resume, run `resume`. With no playbook on this command, add `--no-playbook` so a playbook step that was never started stays skipped. The script returns `keep`, `reopen`, or `not-started`, and `continue_from`. A recorded extra is `keep` and does not change `continue_from`. Explain each reopen with its `impact` before redoing it. Leave `keep` steps as they are. After a step or an extra is recorded, run `resume` again.
 

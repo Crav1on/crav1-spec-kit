@@ -62,8 +62,8 @@ LOCKED = [
     "../crav1-plan-from-spec/SKILL.md",
     "../crav1-review-plan/SKILL.md",
     "../crav1-tighten-plan/SKILL.md",
-    "../crav1-tasks-ready-to-build/SKILL.md",
 ]
+# The ready check writes the map itself (1.146.0). It does not open that skill.
 EXTRAS = [
     "../crav1-review-security/SKILL.md",
     "../crav1-model-data/SKILL.md",
@@ -78,16 +78,13 @@ def skill_file(*parts: str) -> Path:
 
 REQUIRED = {
     skill_file(WALK, "SKILL.md"): LOCKED,
-    skill_file(WALK, "references", "steps.md"): [
-        path for path in LOCKED if path != "../crav1-tasks-ready-to-build/SKILL.md"
-    ] + EXTRAS,
+    skill_file(WALK, "references", "steps.md"): LOCKED + EXTRAS,
     skill_file(WALK, "references", "playbook.md"): [
         "../crav1-resolve-open-questions/references/apply.md",
         "../crav1-add-to-spec/SKILL.md",
         "../crav1-add-to-spec/references/fact.md",
     ],
     skill_file(WALK, "references", "readiness.md"): [
-        "../crav1-tasks-ready-to-build/SKILL.md",
         "../crav1-plan-from-spec/SKILL.md",
         "../crav1-resolve-open-questions/SKILL.md",
         "../crav1-review-plan/SKILL.md",
