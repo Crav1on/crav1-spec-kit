@@ -89,7 +89,7 @@ An optional extra this walk offered and ran is recorded when it finishes, before
 
 A change from outside the walk is one nobody recorded or covered. A hand edit, or `/crav1-add-to-spec` between sessions, is outside. Resume then reopens only the steps that change affects.
 
-- A spec change outside `## Open questions` reopens tighten-spec, resolve-open-questions, and the plan steps. It does not reopen the architecture review once a later spec step is recorded. When that review is the only spec step so far, a spec change reopens it. An edit confined to `## Open questions` reopens only resolve-open-questions.
+- Since 1.148.0 a recorded step has `Section stamps`. Resume compares each section and reopens from the first step that owns a changed section, not every later step. Say `reopen_line` once. The map is [section-reopen.md](section-reopen.md). A requirement section reopens tighten-spec and the plan steps. It does not reopen resolve-open-questions when `changed_questions` is empty. Ask only those ids. Do not re-ask a question whose id is unchanged. `## Match`, `## In the code`, a `Synced at:` line, and an already-answered question set `restamp_only` and reopen nothing. `## Approval needed` still reopens nothing. An unknown heading reopens tighten-spec and the plan steps. When the architecture review is the only spec step so far, a requirement change reopens it. An older step with no `Section stamps` line still uses the 1.137 rule: a spec change outside `## Open questions` reopens tighten-spec, resolve-open-questions, and the plan steps.
 - A plan or tasks change reopens the plan review and the ready check. It does not reopen plan-from-spec. A spec change outside the open questions does, because the plan was written from the spec.
 - A `verify.md` change does not reopen the ready check (1.136.0). A playbook file change reopens only the playbook step.
 - A progress-only edit does not reopen any step (1.138.0). Do not ask to clear. Resume stays `keep`.
@@ -100,7 +100,7 @@ The stamp compares content. It does not compare progress, and it does not compar
 
 Ignored on `tasks.md`: the `[ ]` / `[x]` checkbox, a `(PR n)` or `(PR n, merged)` note on that task line, a trailing `(done)`, and a trailing `merged` on that line. The task title, `(branch:)`, `(map:)`, `(after:)`, and `(spec:)` still count.
 
-Ignored on `spec.md` branch lines (`Branch:` under Match, with or without the leading `-`): `(PR n)` and a trailing `merged`. The branch name, `(into …)`, and `(spec branch)` still count. Adding a branch line, or renaming a branch, is a spec change.
+Ignored on `spec.md` branch lines (`Branch:` under Match, with or without the leading `-`): `(PR n)` and a trailing `merged`. The branch name, `(into …)`, and `(spec branch)` still change the Match section. Since 1.148.0 a Match-only change, including a renamed branch or a new branch line, does not reopen a step. `restamp_only` is true. A `Synced at:` line does not reopen a step.
 
 `plan.md`, `verify.md`, the playbook, and `## Open questions` ignore line endings only.
 

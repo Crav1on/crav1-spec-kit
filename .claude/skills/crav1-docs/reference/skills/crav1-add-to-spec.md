@@ -16,6 +16,8 @@ Bring new information into existing specs; asks what you have: a fact, a dump, a
 
 1.145.0: a dump sort, a code-change sort, flagged lines, and images in a mail print a findings table in that same reply before the card. The card names each item and its recommendation. It does not say `table above`. A meeting item stays its own question. Collapsing those questions onto one card prints the same table. The card is not asked without the table.
 
+1.148.0: when the spec just written has `walk-progress.md` and `resume` says `restamp_only`, the change is only `## Match`, `## In the code`, a `Synced at` line, or an already-answered question. One card offers Restamp (Recommended) or Leave the stamps. Restamp runs `walk_progress.py restamp-covered --root <spec-folder> --yes`. No step reopens. The command does not start the walk. The rule is `references/walk-restamp.md`.
+
 A fact (was [`/crav1-add-to-spec`](crav1-add-to-spec.md)): New information aimed at one spec that already exists is **[`/crav1-add-to-spec`](crav1-add-to-spec.md)**. [`/crav1-tighten-spec`](crav1-tighten-spec.md) stays for mushy wording. Match, intake, spark, and ideas create the folders. This command does not plan.
 
 A fact (was [`/crav1-add-to-spec`](crav1-add-to-spec.md)): New information for one existing spec → quote it into that `spec.md`, then report whether the landscape or another spec has to change. Does not rewrite those other files unless asked. Does not create a glossary. A new glossary row can be one listed edit and is not written unless apply is chosen. A meaning the new information does not state is `to be researched`. Existing rows are not rewritten. Does not plan, implement, or commit.
@@ -63,7 +65,7 @@ New information for specs that already exist. Called by the user, by [`/crav1-re
 
 ## Prompts
 
-Prompt budget: 2 (the most prompts in one run, the closing yes included). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
+The opening question (skipped when the message already names fact, dump, code change, meeting, mail, or chat), the confirm that writes the sort, and, only when that spec has walk-progress.md and the edit is Match, In the code, a Synced at line, or an already-answered question, one restamp card (Restamp recommended). A headless run takes Restamp. A value the user left out is outside the budget. A prompt may hold several questions. See the asking rule in `crav1.mdc`.
 
 ## Reads
 
