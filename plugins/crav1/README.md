@@ -29,7 +29,7 @@ Every skill and subagent, grouped by lane (Specify, Plan, Build, Cross-cutting),
 - Skills: `/crav1-…`. Type `/crav1` to list them.
 - Help: `/crav1-help` answers what to run next, in what order, and what a command does, from the docs bundled in this plugin (`skills/crav1-docs/`), for this exact version. Every answer names its source.
 - Update: a copied drop-in in a consumer project uses `/crav1-update-kit`. This plugin does not commit kit files into that repo. Refresh a team marketplace install, or recopy a local plugin, as [install](https://github.com/Crav1on/crav1-spec-kit/blob/main/docs/install.md) describes.
-- Docs: the kit's `docs/` for this release in `skills/crav1-docs/`, including [Workflow routes](skills/crav1-docs/reference/workflow.md).
+- Docs: the kit's `docs/` for this release in `skills/crav1-docs/`, including [Workflow routes](skills/crav1-docs/reference/workflow.md). The bundled changelog is the newest 15 releases and points at the full file on GitHub. `/crav1-help` reads that copy for what is new.
 - Subagents: `crav1-spec-reviewer-agent`, `crav1-review-architecture-agent`, `crav1-plan-reviewer-agent`, `crav1-build-task-agent`, and `crav1-bundle-slice-agent`. See [Subagents](https://github.com/Crav1on/crav1-spec-kit/blob/main/docs/reference/skills.md#subagents).
 - Rule: specs live under `docs/specs/`; system landscape under `docs/system/`. Every folder the kit writes: [Data layout](https://github.com/Crav1on/crav1-spec-kit/blob/main/docs/concepts/data-layout.md).
 
