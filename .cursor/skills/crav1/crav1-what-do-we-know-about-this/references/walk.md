@@ -61,7 +61,7 @@ A merge trial is allowed only for an order this report already suggests, only ou
 
 ## End
 
-When the last item is walked (or the user says `done`), show a short summary: the answers given, the kept-decision changes, the direction changes, and the items still open. Then one question card, as `crav1-docs/reference/question-cards.md` says.
+When the last item is walked (or the user says `done`), show a short summary: the answers given, the kept-decision changes, the direction changes, and the items still open. Then one question card, as `crav1-docs/reference/question-cards.md` says. Follow **Batch of several items** in that file before this card. Print the findings table in this reply, then ask. The card names each item and its recommendation, for example `P4 tasks miss the 400 path: A add a test`. Never write `table above` unless that table is in this reply. Never ask the card without the table.
 
 - `yes (Recommended)`: run `/crav1-resolve-open-questions apply <this file>` and write these answers into the specs; it shows each change before writing. On that yes a filled playbook is also written to `docs/playbooks/<topic>.md`. A git commit still waits for `/crav1-finalize-commit`.
 - The card's free-text answer. Hint: `Type your changes, e.g. keep the third question open` or `drop the separate branch`. An item that answer does not mention keeps what was shown.

@@ -66,6 +66,6 @@ Resolve and the plan are not listed here. `/crav1-tighten-spec` names them when 
 
 A handoff from `/crav1-read-environment` or `/crav1-suggest-tests-for-code` asks once at the end of that run, not once per item: The system picture may now be out of date. Run `/crav1-refresh-system-notes`? It does not run that command. A meeting handoff does not ask.
 
-A dump or a code change confirms the sort on one card: `yes (Recommended)`, or typed changes on that card's free-text answer (1.130.0). See [From a dump](from-add-to-spec-dump.md) and [From a code change](from-add-to-spec-code-change.md).
+A dump or a code change confirms the sort on one card: `yes (Recommended)`, or typed changes on that card's free-text answer (1.130.0). Since 1.145.0 that reply prints a findings table immediately before the card. The card names each item and its recommendation. It does not say `table above` unless that table is in the reply. The card is not asked without the table. A meeting item stays its own question, which already names the item. See [From a dump](from-add-to-spec-dump.md) and [From a code change](from-add-to-spec-code-change.md).
 
 Reference page: [add-to-spec](reference/skills/crav1-add-to-spec.md)

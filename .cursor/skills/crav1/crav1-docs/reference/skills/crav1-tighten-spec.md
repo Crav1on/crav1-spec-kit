@@ -14,6 +14,8 @@ One issue at a time, with explained resolutions (plus get a suggestion) and impa
 
 1.130.0: eight or fewer issues are one card. `yes (Recommended)` applies every recommendation. Typed changes go on that card's free-text answer, for example `I1 B, I3 keep`. An item not mentioned keeps its recommendation. There is no Edits option.
 
+1.145.0: that card is asked only after a findings table in the same reply (Id, Issue, Options, Recommendation). The card names each item, for example `I1 acceptance is not yes/no: A make-testable`. It does not say `table above`. A small group answered as a batch prints the same table. The command is `<interpreter> -X utf8 <skill crav1-tighten-plan>/scripts/batch_offer.py --title "Tighten-plan batch" --items <file>`. It prints no card without rows.
+
 1.64.0: reads every listed work branch without checkout; a yes on writing the branch adds to the `Branch:` list; a listed branch that is gone and not merged is offered `(dropped)` (`mark-dropped`); a deleted branch whose work is in the base shows `merged, branch deleted`.
 
 1.68.0: reads and writes the `(spec branch)` and `(into …)` markers on the Match `Branch:` list after a yes.

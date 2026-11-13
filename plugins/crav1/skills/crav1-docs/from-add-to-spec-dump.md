@@ -42,7 +42,7 @@ A mail or a chat goes the same way (1.72.0). Write `/crav1-add-to-spec mail` or 
 
 No spec folders under `docs/specs/` (other than `_template`): the command stops and points at spark, ideas, intake, or match. It does not create a slug.
 
-The sort confirmation is the only stop before writing. The card is `yes (Recommended)` to write it as shown, or typed changes on that card's free-text answer (1.130.0). An item you do not mention keeps what was shown. Nothing gets committed either way. Confirming the sort accepts the facts left on it. Facts that were not confirmed stay labeled inferred.
+The sort confirmation is the only stop before writing. The card is `yes (Recommended)` to write it as shown, or typed changes on that card's free-text answer (1.130.0). Since 1.145.0 the reply prints a findings table immediately before the card. The card names each item and its recommendation. It does not say `table above` unless that table is in the reply. The card is not asked without the table. An item you do not mention keeps what was shown. Nothing gets committed either way. Confirming the sort accepts the facts left on it. Facts that were not confirmed stay labeled inferred.
 
 A hint about where something belongs is evidence. It is not a requirement. If the dump names a slug, that slug is used. If it does not, the sort matches by what the dump says.
 

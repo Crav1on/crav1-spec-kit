@@ -41,7 +41,7 @@ List secrets last. One line per kind. Do not number them. Do not show the value.
 
 ### One question for the recommendations
 
-Ask this question when there is at least one numbered item, and the rule or this run says review. One question card, as `crav1-docs/reference/question-cards.md` says. Use the questions tool when it is available. Stop until the user picks.
+Ask this question when there is at least one numbered item, and the rule or this run says review. One question card, as `crav1-docs/reference/question-cards.md` says. Follow **Batch of several items** in that file before this card. Print the findings table in this reply, then ask. The card names each item and its recommendation, for example `P4 tasks miss the 400 path: A add a test`. Never write `table above` unless that table is in this reply. Never ask the card without the table. Use the questions tool when it is available. Stop until the user picks.
 
 1. **Accept all recommendations (Recommended).**
 2. **Go through them one by one.** The recommendation is shown on each item, and in its question as the first option with ` (Recommended)`.

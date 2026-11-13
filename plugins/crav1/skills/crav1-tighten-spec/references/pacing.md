@@ -30,4 +30,4 @@ Ask each time, for what remains. One by one is always offered, and it is first.
 - A small group. They name at most 4 ids. Show the full block for those only.
 - stop
 
-Do not offer the whole list. After that group is done, give the short count again and ask the same way. A batch of `I#: letter` still works for the issues in front of them.
+Do not offer the whole list. After that group is done, give the short count again and ask the same way. A batch of `I#: letter` still works for the issues in front of them. That batch card follows **Batch of several items** in `crav1-docs/reference/question-cards.md` (1.145.0). Print the findings table for those issues in this reply, then ask. The card names each item and its recommendation. Never write `table above` unless that table is in this reply. Never ask the card without the table. The count line is not that card and still does not print findings.

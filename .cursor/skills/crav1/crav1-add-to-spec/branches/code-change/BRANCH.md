@@ -52,7 +52,7 @@ Split a fact that is partly new and partly already described. One fact is in one
 
 Put every fact you will treat as accepted on the sort. A fact you leave off stays inferred.
 
-End the sort with one question card, as `crav1-docs/reference/question-cards.md` says, as the last thing in the message.
+End the sort with one question card, as `crav1-docs/reference/question-cards.md` says, as the last thing in the message. Follow **Batch of several items** in that file before this card. Print the findings table in this reply, then ask. The card names each item and its recommendation, for example `P4 tasks miss the 400 path: A add a test`. Never write `table above` unless that table is in this reply. Never ask the card without the table.
 
 - `yes (Recommended)`: write it as shown.
 - The card's free-text answer. Hint: `Type your changes, e.g. drop 13` or `leave out the Figure 3 inference`. An item that answer does not mention keeps what was shown.

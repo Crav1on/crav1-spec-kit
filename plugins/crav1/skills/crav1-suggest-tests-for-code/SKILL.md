@@ -87,7 +87,7 @@ On every later turn, list every suggestion again. Mark the ones already answered
 
 ## In one batch (1.70.0)
 
-Ask about every suggestion in one questions call, each with its options and a single `yes` keeping the recommended option of each. The options are only:
+Ask about every suggestion in one questions call, each with its options and a single `yes` keeping the recommended option of each. Each question names that suggestion. Do not replace them with one card that says `table above`. If one card covers every suggestion, follow **Batch of several items** in `crav1-docs/reference/question-cards.md`. Print the findings table in this reply, then ask. The card names each item and its recommendation, for example `P4 tasks miss the 400 path: A add a test`. Never write `table above` unless that table is in this reply. Never ask the card without the table. The options are only:
 
 1. **Keep**
 2. **Leave**

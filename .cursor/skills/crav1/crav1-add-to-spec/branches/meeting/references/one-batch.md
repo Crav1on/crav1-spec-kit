@@ -4,7 +4,7 @@ Part of `branches/meeting/BRANCH.md`, read only when that file sends you here. M
 
 ## In one batch (1.70.0)
 
-Ask about every item in one questions call, one question per item; a single `yes` takes the recommended option for every item. Use the questions tool when it is available. The question text names the item and the spec when one fits, then the same `State` line that is on the item. It does not say `Recommendation:`. The options are only these three. The recommended one comes first with ` (Recommended)` at the end of its label; the others keep this order:
+Ask about every item in one questions call, one question per item; a single `yes` takes the recommended option for every item. Use the questions tool when it is available. The question text names the item and the spec when one fits, then the same `State` line that is on the item. It does not say `Recommendation:`. Each question names that item. Do not replace them with one card that says `table above`. If one card covers every item, follow **Batch of several items** in `crav1-docs/reference/question-cards.md`. Print the findings table in this reply, then ask. The card names each item and its recommendation, for example `P4 tasks miss the 400 path: A add a test`. Never write `table above` unless that table is in this reply. Never ask the card without the table. The options are only these three. The recommended one comes first with ` (Recommended)` at the end of its label; the others keep this order:
 
 - **Keep**
 - **Leave**

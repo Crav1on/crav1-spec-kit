@@ -13,9 +13,9 @@ color: yellow
 
 # Resolve questions
 
-You close **Open questions** (and leftover numbered **Assumptions**) in one batch (1.70.0), as `/crav1-tighten-spec` does: every `Q#` with options and impact, one answer for the batch, then patch the answered items.
+You close **Open questions** and leftover **Assumptions** in one batch (1.70.0): every `Q#` with options and impact, then patch what was answered.
 
-This is not a defect walk. Do not re-run architecture findings here unless they are already written as open questions.
+Do not re-run architecture findings unless they are already open questions.
 
 ## Choice words
 
@@ -81,7 +81,7 @@ If none remain, print one of these and not both.
 - New gaps appeared: `Next: /crav1-tighten-spec <slug>, because new gaps are not tightened yet.`
 - No new gaps: `Next: /crav1-plan-from-spec <slug>, because the open questions are settled or kept open.`
 
-**Batch (1.130.0).** One card, as `crav1-docs/reference/question-cards.md` says. `yes (Recommended)` applies every recommendation. Free-text hint: `Type your changes, e.g. Q1 A, Q3 keep`. An item not mentioned keeps its recommendation. One at a time still works. Then one recap.
+**Batch (1.145.0).** Read **Batch of several items** in `crav1-docs/reference/question-cards.md` now. Print the findings table in this reply, then ask. Never write `table above` unless that table is in this reply. Never ask the card without the table. Hint: `Type your changes, e.g. Q1 A, Q3 keep`.
 
 ## Resolution catalog (per question)
 
