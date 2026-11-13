@@ -215,14 +215,15 @@ A Cursor plugin install, including one that auto-updates from a team marketplace
 
 ```bash
 curl -fsSL -o crav1-update-kit.py https://github.com/Crav1on/crav1-spec-kit/releases/latest/download/crav1-update-kit.py
-python3 crav1-update-kit.py detect
+PYTHONUTF8=1 python3 -X utf8 crav1-update-kit.py detect
 ```
 
 On Windows PowerShell 5.1, `curl` is an alias for `Invoke-WebRequest`, so the curl flags fail. On Windows, `python3` is often missing. Use `python` or `py`.
 
 ```powershell
 Invoke-WebRequest -Uri https://github.com/Crav1on/crav1-spec-kit/releases/latest/download/crav1-update-kit.py -OutFile crav1-update-kit.py
-python crav1-update-kit.py detect
+$env:PYTHONUTF8 = "1"
+python -X utf8 crav1-update-kit.py detect
 ```
 
 Resolve a published tag, then plan and apply only after a yes. The script does not push. After that jump the command is on the branch, and the downloaded file can be deleted. A release older than 1.131.0 has no asset; copy the drop-in by hand from that tag, then use the command for the next jump.
@@ -236,14 +237,14 @@ The manual copy still works when you want to do it yourself:
 | Cursor team marketplace | Auto Refresh or Dashboard **Refresh**, then update/reinstall the plugin if Cursor asks |
 | Cursor local plugin | `scripts/sync-crav1-plugin.sh` in the kit, copy `plugins/crav1` to `~/.cursor/plugins/local/crav1`, reload |
 
-**Updating to 1.84.0 or later from an older kit:** run `/crav1-add-to-spec migrate formats` once in each product repo that has specs. It rewrites every `spec.md` and `docs/system/repos.md` to the merge-safe formats (one `Synced at` line per repo and branch, plain-bullet open questions, and since 1.86.0 one Match `Branch:` line per branch; a repo already on 1.84.0 runs it again). It keeps every line, checks nothing was lost before it writes, and changes nothing on a second run. The same script runs without an agent: `python3 .cursor/skills/crav1/crav1-add-to-spec/scripts/merge_safe_migrate.py --dry-run`, then without `--dry-run` (Claude Code: `.claude/skills/crav1-add-to-spec/scripts/`). Commit the result yourself.
+**Updating to 1.84.0 or later from an older kit:** run `/crav1-add-to-spec migrate formats` once in each product repo that has specs. It rewrites every `spec.md` and `docs/system/repos.md` to the merge-safe formats (one `Synced at` line per repo and branch, plain-bullet open questions, and since 1.86.0 one Match `Branch:` line per branch; a repo already on 1.84.0 runs it again). It keeps every line, checks nothing was lost before it writes, and changes nothing on a second run. The same script runs without an agent. `<interpreter>` is `python` with `PYTHONUTF8=1` on Windows and `python3` elsewhere, as [Running a kit script](reference/running-scripts.md) says. Pass `-X utf8`. Cursor drop-in: `<interpreter> -X utf8 .cursor/skills/crav1/crav1-add-to-spec/scripts/merge_safe_migrate.py --dry-run`, then the same command without `--dry-run` (Claude Code: `.claude/skills/crav1-add-to-spec/scripts/`). Commit the result yourself.
 
 **Updating to 1.97.0 or later:** run `/crav1-add-to-spec migrate formats` again in each specs repo that has PR notes or review-pr follow-ups notes. It gives every PR note its shared `## PR record` and moves each `review-pr-[<repo>-]<n>-follow-ups.md` into its PR note (one `Point` per bullet, text verbatim; the comment history by date; then the old file is deleted and links to it rewritten). The dry run prints a unified diff of every change and writes nothing; it writes only on your yes. It stops and leaves a note alone when anything would be lost (`LOST`, exit 2), and a second run changes nothing. Without an agent, from the specs repo root:
 
 ```text
-python3 .cursor/skills/crav1/crav1-add-to-spec/scripts/merge_safe_migrate.py --dry-run
-python3 .cursor/skills/crav1/crav1-add-to-spec/scripts/merge_safe_migrate.py
-python3 .cursor/skills/crav1/crav1-add-to-spec/scripts/merge_safe_migrate.py --check
+<interpreter> -X utf8 .cursor/skills/crav1/crav1-add-to-spec/scripts/merge_safe_migrate.py --dry-run
+<interpreter> -X utf8 .cursor/skills/crav1/crav1-add-to-spec/scripts/merge_safe_migrate.py
+<interpreter> -X utf8 .cursor/skills/crav1/crav1-add-to-spec/scripts/merge_safe_migrate.py --check
 ```
 
 Commit the result yourself.

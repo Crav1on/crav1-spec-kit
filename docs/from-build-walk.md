@@ -2,7 +2,7 @@
 
 Kit not in this project yet? [Install first](install.md) (Cursor and Claude Code; the slash commands match, the files do not).
 
-Use this when a slice is ready, or ready with some tasks held, and you want one path from the tasks on a work branch through the pull request and the merge. The walk opens the skills that already build, verify, commit, open, and merge. It does not replace them. While one branch is in progress there is one Next line.
+Use this when a slice is ready, or ready with some tasks held, and you want one path from the tasks on a work branch through the pull request and the merge. Since 1.144.0 the next line is `build_walk.py next --json <file>`, and the branch offer is `build_map.py docs/specs/<slug> --recommend T#`. The interpreter is [Running a kit script](reference/running-scripts.md). The walk opens the skills that already build, verify, commit, open, and merge. It does not replace them. While one branch is in progress there is one Next line.
 
 ## First prompt
 

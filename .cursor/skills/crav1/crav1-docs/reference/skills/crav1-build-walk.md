@@ -16,6 +16,8 @@ A task that needs code from an unmerged branch is cut from that branch. The prog
 
 1.143.0: on a `(Runs live)` task, a recorded yes that the assistant's permission check refused is not a missing yes. Waiting says the yes is on record and the check blocked the command. The offer is to run that exact command, or allow that one command and rerun. Next is [`/crav1-build-walk`](crav1-build-walk.md) after the command has run. It does not suggest working around the check.
 
+1.144.0: the next line is `scripts/build_walk.py next --json <file>`. A stack command is `scripts/build_walk.py stack --json <file>`. `--recommend` is `scripts/build_map.py docs/specs/<slug> --recommend T#`. On Windows the interpreter is `python` with `PYTHONUTF8=1`. Elsewhere it is `python3`.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
@@ -40,7 +42,7 @@ Prompt budget: 4 (the most prompts in one run, the closing yes included). A prom
 
 In short: The spec folder, the build map, the pull request author, and commit authors.
 
-Reads `spec.md`, `plan.md`, `tasks.md`, `build-map.md`, and this branch's `build-progress` file. The branch offer is `scripts/build_map.py --recommend` through `scripts/build_walk.py`. It reads the pull request author and the branch's commit authors before other-owner mode.
+Reads `spec.md`, `plan.md`, `tasks.md`, `build-map.md`, and this branch's `build-progress` file. The branch offer is `scripts/build_map.py docs/specs/<slug> --recommend T#` through `scripts/build_walk.py`. It reads the pull request author and the branch's commit authors before other-owner mode.
 
 ## Writes
 

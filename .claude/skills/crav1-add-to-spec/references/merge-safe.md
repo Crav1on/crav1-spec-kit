@@ -46,7 +46,7 @@ A project made before 1.84.0 runs `/crav1-add-to-spec migrate formats` once afte
 Run from the product repo root (drop-in path shown; plugin: the same script under `skills/crav1-add-to-spec/scripts/`). Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. The lines below are the first try:
 
 ```text
-python3 .claude/skills/crav1-add-to-spec/scripts/merge_safe_migrate.py --dry-run
-python3 .claude/skills/crav1-add-to-spec/scripts/merge_safe_migrate.py
-python3 .claude/skills/crav1-add-to-spec/scripts/merge_safe_migrate.py --check
+<interpreter> -X utf8 .claude/skills/crav1-add-to-spec/scripts/merge_safe_migrate.py --dry-run
+<interpreter> -X utf8 .claude/skills/crav1-add-to-spec/scripts/merge_safe_migrate.py
+<interpreter> -X utf8 .claude/skills/crav1-add-to-spec/scripts/merge_safe_migrate.py --check
 ```

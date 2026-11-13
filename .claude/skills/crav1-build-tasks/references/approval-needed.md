@@ -16,7 +16,7 @@ When no item exists, show the item that would be written:
 
 `<what>` is the worker's DETAIL, without the person's name. `<T#>` is this task, plus a later task only when the worker named it.
 
-Ask once: `write the item (Recommended)` or `leave it`. `write the item` runs `scripts/approval_needed.py add-item` (skill `crav1-record-approval`) with `--yes`. `leave it` writes nothing. A headless run writes the item and says `Wrote the Approval needed item. No Approved line.`
+Ask once: `write the item (Recommended)` or `leave it`. `write the item` runs `<interpreter> -X utf8 <skill crav1-record-approval>/scripts/approval_needed.py add-item --root <spec-folder> --person "<who>" --what "<what>" --holds <T#> --yes`, as `crav1-docs/reference/running-scripts.md` says. `leave it` writes nothing. A headless run writes the item and says `Wrote the Approval needed item. No Approved line.`
 
 Do not write `Approved:` here. That is `/crav1-record-approval`, after `accept` in that run.
 

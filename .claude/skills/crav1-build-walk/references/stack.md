@@ -2,7 +2,7 @@
 
 Read this when a task needs code that is still only on an unmerged branch. Work may continue on other branches while earlier branches are unmerged. One checkout still follows one branch.
 
-The task is cut from that unmerged branch, not from `develop` (or the other stated base). `scripts/build_walk.py stack` writes `Cut from:`. A dependency whose branch is already merged does not change the cut. The branch offer still refuses a merged or deleted name, using the same helper as `build_map.py --recommend` (1.140.0).
+The task is cut from that unmerged branch, not from `develop` (or the other stated base). `scripts/build_walk.py stack --json <file>` writes `Cut from:`. A dependency whose branch is already merged does not change the cut. The branch offer still refuses a merged or deleted name, using the same helper as `build_map.py docs/specs/<slug> --recommend T#` (1.140.0).
 
 The merge list is ordered. A branch merges back into the branch it was cut from before that parent merges onward.
 

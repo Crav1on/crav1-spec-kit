@@ -24,14 +24,14 @@ When no constraint names this person, say so, and still ask before writing.
 
 ## What it unblocks
 
-`scripts/approval_needed.py show` prints `unblocks`. Those are the item's `Holds:` tasks. Say them in the chat. A matching line clears that hold on the next ready check. Other tasks were never held by this item.
+The show command prints `unblocks`. Those are the item's `Holds:` tasks. Say them in the chat. A matching line clears that hold on the next ready check. Other tasks were never held by this item.
 
 ## Script
 
-Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. The script is `scripts/approval_needed.py` beside this skill.
+Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. On Windows `<interpreter>` is `python` with `PYTHONUTF8=1`. Elsewhere it is `python3`. Pass `-X utf8`.
 
-- `show` writes nothing. It prints the line, the constraint, and `unblocks`.
-- `write --yes` appends the line. Without `--yes` it writes nothing.
+- `<interpreter> -X utf8 scripts/approval_needed.py show --root <spec-folder> --person "<person>" --source-date <date> --source "<source>" --quote "<quote>" --recorder "<recorder>" --accepted <date>` writes nothing. It prints the line, the constraint, and `unblocks`.
+- `<interpreter> -X utf8 scripts/approval_needed.py write --root <spec-folder> --person "<person>" --source-date <date> --source "<source>" --quote "<quote>" --recorder "<recorder>" --accepted <date> --yes` appends the line. Without `--yes` it writes nothing.
 - It keeps the file's line endings.
 
 An item that already has the same line is left as it is.

@@ -195,7 +195,7 @@ When a note in `docs/research/` is updated, the skill that writes it follows the
 
 ## Maintainer note
 
-This page is generated (1.107.0). Lanes come from each skill's and subagent's `lane`, and the text from the `routing` block, in [`docs/reference/skills.yaml`](reference/skills.yaml). Edit that file, then run `python3 scripts/gen-skill-docs.py`; CI fails when this page is stale. Notify your process orchestrator or guild lead, if you have one, with the routing diff.
+This page is generated (1.107.0). Lanes come from each skill's and subagent's `lane`, and the text from the `routing` block, in [`docs/reference/skills.yaml`](reference/skills.yaml). Edit that file, then run `scripts/gen-skill-docs.py` with the interpreter in `docs/reference/running-scripts.md`; CI fails when this page is stale. Notify your process orchestrator or guild lead, if you have one, with the routing diff.
 
 ## Recommended option
 

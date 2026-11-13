@@ -24,6 +24,8 @@ Before the tests, a local dependency preflight checks Azurite, database containe
 
 1.137.0: `scripts/resolve_spec.py` also accepts one unique ordered token subsequence of a folder name, playbook basename, spec title, or work-item name (`cc 1.0` matches `cc-process-1-0`). Several matches are listed and the run stops. No match lists the nearest slugs.
 
+1.144.0: the spec folder command is `<interpreter> -X utf8 <skill crav1-tasks-ready-to-build>/scripts/resolve_spec.py "<query>" --root docs/specs`. On Windows `<interpreter>` is `python` with `PYTHONUTF8=1`. Elsewhere it is `python3`. The rule is `docs/reference/running-scripts.md`.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.

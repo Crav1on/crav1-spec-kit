@@ -4,7 +4,7 @@ Kit not in this project yet? [Install first](install.md) (Cursor and Claude Code
 
 Use this when a draft spec should be tightened and planned until the tasks are honestly ready to build. The command is [`/crav1-tighten-and-plan-ready-to-build`](reference/skills/crav1-tighten-and-plan-ready-to-build.md).
 
-You can start with a playbook report, or without one. Both go through the same steps and the same ready check. The walk runs the existing skills. It does not replace them. It is guided only. You confirm each write before it happens.
+You can start with a playbook report, or without one. Since 1.144.0 a named playbook or slug is resolved with `<interpreter> -X utf8` and `resolve_spec.py "<query>" --root docs/specs`, as [Running a kit script](reference/running-scripts.md) says. On Windows the interpreter is `python`. Both go through the same steps and the same ready check. The walk runs the existing skills. It does not replace them. It is guided only. You confirm each write before it happens.
 
 Since 1.134.0 the walk opens each step skill's file and follows it. It does not start that skill as a slash command. Those skills stay command-only. The rule is [Opening another kit skill](reference/open-skill-file.md). A refusal because a skill is command-only is not a reason to stop the walk.
 
@@ -87,7 +87,7 @@ Since 1.137.0 an edit confined to `## Open questions` does not reopen tighten-sp
 
 Since 1.138.0 a checkbox tick, a `(PR n)` or `(done)` note on that task line, and `(PR n)` on a Match `Branch:` line are progress. They do not reopen a step, and the walk does not ask to clear. CRLF and LF are the same text. An older `walk-progress.md` with no `Content stamp:` line still matches those edits. The next record writes `Content stamp: normalized`. A sentence change, or a renamed branch, still reopens the steps that change affects.
 
-Since 1.139.0 a merge that conflicts only on those hash lines is settled by `scripts/walk_progress.py resolve-stamps`. `/crav1-finalize-commit` runs it. The walk does not. `Done` and `Result` stay. A real edit keeps the upstream hash.
+Since 1.139.0 a merge that conflicts only on those hash lines is settled by `scripts/walk_progress.py resolve-stamps --root <spec-folder> --yes`. `/crav1-finalize-commit` runs it. The walk does not. `Done` and `Result` stay. A real edit keeps the upstream hash.
 
 When the check is clear, or ready-partial with tasks that can start, the ending recommends the build walk. One line per ready branch, with the T number beside the short name:
 

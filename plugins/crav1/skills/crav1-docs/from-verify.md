@@ -2,7 +2,7 @@
 
 Kit not in this project yet? [Install first](install.md) (Cursor and Claude Code; the slash commands match, the files do not). After a Cursor plugin install, the short command loop is [plugins/crav1/README.md](../plugins/crav1/README.md). Claude Code has no plugin.
 
-Use this after tasks are built. Verify maps every v0 acceptance line in `spec.md` to a test or a browser check and reports pass, fail, or missing. A kit script this command runs uses the interpreter in [Running a kit script](reference/running-scripts.md). Fix takes the inner-loop gaps one at a time and proves each again. A bug in work that is already shipping is not this page: that is [`/crav1-fix-bug`](from-fix-bug.md).
+Use this after tasks are built. Verify maps every v0 acceptance line in `spec.md` to a test or a browser check and reports pass, fail, or missing. A kit script this command runs uses the interpreter in [Running a kit script](reference/running-scripts.md). Since 1.144.0 that is `python` on Windows and `python3` elsewhere, with `PYTHONUTF8=1` and `-X utf8`. The spec folder command includes `--root docs/specs`. Fix takes the inner-loop gaps one at a time and proves each again. A bug in work that is already shipping is not this page: that is [`/crav1-fix-bug`](from-fix-bug.md).
 
 ## First prompt
 

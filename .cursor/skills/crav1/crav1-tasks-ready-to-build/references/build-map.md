@@ -2,7 +2,7 @@
 
 Read this only when `scripts/build_map.py` cannot run. The script writes the file. Do not invent the map and do not hand-edit it.
 
-Pick the interpreter as `crav1-docs/reference/running-scripts.md` says: `python3`, then `python`, then `py -3`. The Store alias message `Python was not found` means that command was not found. Try the next interpreter.
+Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. On Windows that is `python` with `PYTHONUTF8=1`. Elsewhere it is `python3`. Pass `-X utf8`. The Store alias message `Python was not found` means that command was not found. Try the next interpreter.
 
 ```text
 <interpreter> <this skill folder>/scripts/build_map.py --root docs/specs
@@ -50,7 +50,7 @@ A ticked task stays in its wave row (1.132.0). The Tasks field strikes the id an
 
 Read this when the readiness script cannot run. Do not invent branches.
 
-Group the tasks that can start, and the held tasks, by the row `scripts/build_map.py --recommend T#` prints. That is the same branch as the map. Order the branches by wave, then by the order of the rows in the file. One ready branch is still one group.
+Group the tasks that can start, and the held tasks, by the row `scripts/build_map.py docs/specs/<slug> --recommend T#` prints. That is the same branch as the map. Order the branches by wave, then by the order of the rows in the file. One ready branch is still one group.
 
 Print one line per branch. A task is `T#` plus its short name, the same words as the Tasks field.
 

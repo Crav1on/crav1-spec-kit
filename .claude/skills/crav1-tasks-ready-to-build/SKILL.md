@@ -25,7 +25,7 @@ Every run, rebuild `docs/specs/<slug>/build-map.md` with `scripts/build_map.py`.
 
 ## Scope
 
-- A named slug, title, playbook, or work-item name: `scripts/resolve_spec.py`. Exact folder first (`orders 1.0` matches `orders-1-0`), then one unique playbook basename, spec title, or work-item name in `spec.md`, then one unique ordered token subsequence of those names (`cc 1.0` matches `cc-process-1-0`). Several matches: list them and stop. No match: say so and list the nearest slugs. Do not search the rest of the tree.
+- A named slug, title, playbook, or work-item name: `<interpreter> -X utf8 scripts/resolve_spec.py "<query>" --root docs/specs`. Exact folder first (`orders 1.0` matches `orders-1-0`), then one unique playbook basename, spec title, or work-item name in `spec.md`, then one unique ordered token subsequence of those names (`cc 1.0` matches `cc-process-1-0`). Several matches: list them and stop. No match: say so and list the nearest slugs. Do not search the rest of the tree.
 - No slug: every folder under `docs/specs/` that has `tasks.md`, skipping `_template`. A folder with `spec.md` but no `tasks.md` is listed once as `no tasks yet (run /crav1-plan-from-spec)`.
 
 ## What it reads
@@ -65,7 +65,7 @@ When Python runs, rule 3 may use `scripts/question_blocks.py` beside this skill,
 
 Every task list is in **dependency order**, not task-number order. Each task gets a wave: 0 when it waits on nothing, otherwise one more than the latest wave of the tasks it waits on. List wave by wave, lowest number first inside a wave; tasks in one wave can be built in either order. Tasks on a cycle go last.
 
-The sort ships next to this file as `scripts/task_order.py`. When Python runs, use it for each slice: `<interpreter> <this skill folder>/scripts/task_order.py docs/specs/<slug>/tasks.md`. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. It prints Ready, Waits in order, Blocked, Needs tick, and Next. A recorded-merged task is under Needs tick (1.136.0). Waits in order is a real earlier task. Blocked is a cycle or an `(after:)` that names no task. Add the rule 1 to 3 results on top: a question is Waiting on a question, not Blocked. A dependent of a held task is Waiting too. The walk's `scripts/walk_progress.py readiness --root` prints `result`: `ready`, `ready-partial`, or `not-ready`.
+The sort ships next to this file as `scripts/task_order.py`. When Python runs, use it for each slice: `<interpreter> <this skill folder>/scripts/task_order.py docs/specs/<slug>/tasks.md`. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. It prints Ready, Waits in order, Blocked, Needs tick, and Next. A recorded-merged task is under Needs tick (1.136.0). Waits in order is a real earlier task. Blocked is a cycle or an `(after:)` that names no task. Add the rule 1 to 3 results on top: a question is Waiting on a question, not Blocked. A dependent of a held task is Waiting too. The walk's `scripts/walk_progress.py readiness --root <spec-folder>` prints `result`: `ready`, `ready-partial`, or `not-ready`.
 
 Other skills (`/crav1-build-tasks`, `/crav1-build-features`, `/crav1-verify-build-against-spec`) use this order. The ready check's Next lines are one per ready branch (1.133.0), not the single task that unblocks the most.
 
@@ -108,7 +108,7 @@ Source: docs/specs/<slug>/spec.md, plan.md, tasks.md, verify.md
 Build map: docs/specs/<slug>/build-map.md
 ```
 
-- **By branch (1.133.0).** When Python runs, `readiness --root` (skill `crav1-tighten-and-plan-ready-to-build`, `scripts/walk_progress.py`) prints `ready_lines`, `held_lines`, and `next_lines`. Print those. Do not flatten them. The branch is `scripts/build_map.py --recommend T#`, the same row as the map. Order is wave, then map order. A task is `T#` plus its short name, in the lists and on the map. One ready branch is still one group and one Next line. Without Python, use `references/build-map.md` under Ready check.
+- **By branch (1.133.0).** When Python runs, `scripts/walk_progress.py readiness --root <spec-folder>` (skill `crav1-tighten-and-plan-ready-to-build`) prints `ready_lines`, `held_lines`, and `next_lines`. Print those. Do not flatten them. The branch is `scripts/build_map.py docs/specs/<slug> --recommend T#`, the same row as the map. Order is wave, then map order. A task is `T#` plus its short name, in the lists and on the map. One ready branch is still one group and one Next line. Without Python, use `references/build-map.md` under Ready check.
 - **Result (1.132.0)** is `ready` when the tasks that are not done can start or only wait in order, `ready-partial` when some can start now and some are held, and `not-ready` when nothing can start. The walk record stays `Result: ready-partial`. A cycle, a missing task, no plan, Needs verify, or a plan-review warning still records `not-ready`.
 - **Order** shows the slice's unticked tasks in dependency order, `|` between tasks of the same wave. One Order line per slice when listing all specs. The Order line keeps task ids.
 - **Next** is the script's `next_lines` when the result is `ready` or `ready-partial`: `/crav1-build-walk`, and `/crav1-build-tasks` builds one task without the walk. See `run-ending.md`. Do not run it.

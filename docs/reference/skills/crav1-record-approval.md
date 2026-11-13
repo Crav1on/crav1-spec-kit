@@ -12,6 +12,8 @@ Record a named person's yes on an Approval needed item, after accept in this run
 
 The line is `Approved: <person>, <source date>, <source>, "<quote>" (accepted by <recorder> <date>)` under `## Approval needed`. No skill removes it. A live `apply` still needs the user's own yes in the build run.
 
+1.144.0: the spec folder command is `<interpreter> -X utf8 <skill crav1-tasks-ready-to-build>/scripts/resolve_spec.py "<query>" --root docs/specs`. `show` and `write` pass `--root`, `--person`, `--source-date`, `--source`, `--quote`, `--recorder`, and `--accepted`. `write` also passes `--yes`. On Windows `<interpreter>` is `python` with `PYTHONUTF8=1`. Elsewhere it is `python3`.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.

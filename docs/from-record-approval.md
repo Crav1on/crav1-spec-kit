@@ -2,7 +2,7 @@
 
 Kit not in this project yet? [Install first](install.md) (Cursor and Claude Code; the slash commands match, the files do not).
 
-Use this when a named person has already said yes to something an Approval needed item is holding, and you want that yes written down. The command shows the line, the constraint, and the tasks it unblocks. It writes only after you accept in this run. An earlier quote does not count by itself.
+Use this when a named person has already said yes to something an Approval needed item is holding, and you want that yes written down. Since 1.144.0 a named spec is resolved with `--root docs/specs`, and `show` and `write` pass every flag those commands require. The interpreter is [Running a kit script](reference/running-scripts.md). The command shows the line, the constraint, and the tasks it unblocks. It writes only after you accept in this run. An earlier quote does not count by itself.
 
 ## First prompt
 

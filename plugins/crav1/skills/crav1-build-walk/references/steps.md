@@ -19,6 +19,6 @@ Next: /crav1-verify-build-against-spec orders-capacity, because no work branch r
 
 Other-owner mode skips steps 4, 5, and 6. After the commit, a push that already has a pull request gets one comment, posted after `yes`. The description stays unless this run said `edit description`. The tick waits until that pull request is merged.
 
-After you follow a step skill, do not print its Next line. Print the one line `build_walk.py next` returns for the new phase.
+After you follow a step skill, do not print its Next line. Print the one line `build_walk.py next --json <file>` returns for the new phase.
 
 Record the step in this branch's progress file after `yes`, with `Content stamp: normalized`.

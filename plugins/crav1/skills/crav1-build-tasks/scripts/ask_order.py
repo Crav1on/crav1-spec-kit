@@ -11,7 +11,8 @@ Usage:
   ask_order.py permissions "<text>"
 
 Prints `ok` or `re-ask`. Exit 0 either way. Exit 2 when the slot is unknown.
-The interpreter is python3, then python, then py -3.
+On Windows the interpreter is python. Elsewhere it is python3. Then py -3.
+Set PYTHONUTF8=1 and pass -X utf8.
 """
 import sys
 
