@@ -2,6 +2,16 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.144.0 (2026-11-13)
+
+A kit script command names the interpreter and every required argument. A minor release because the command a skill tells the assistant to run changes, and `resolve_spec.py` accepts a missing `--root`.
+
+- **Interpreter.** On Windows the interpreter is `python`. Elsewhere it is `python3`. If that command is missing, or Windows prints the Store alias message `Python was not found`, try `py -3`, then the other name. Set `PYTHONUTF8=1` and pass `-X utf8`. Do not run `python3` alone. The rule is [Running a kit script](docs/reference/running-scripts.md). The silent finder tries `python` first on Windows.
+- **Which spec.** The command is `<interpreter> -X utf8 <skill crav1-tasks-ready-to-build>/scripts/resolve_spec.py "<query>" --root docs/specs`. Verify, the ready check, build-tasks, record-approval, and the tighten-and-plan walk use that command. Several matches are listed and the run stops.
+- **Default root.** When `--root` is omitted, `resolve_spec.py` uses `docs/specs` from the current directory, which is the repo root. A missing folder is an error that names `--root docs/specs`. Pass the flag anyway. A script that takes one spec folder, such as `walk_progress.py readiness --root <spec-folder>`, still requires that folder. A script that takes the repo root still defaults `--root` to `.`.
+- **Other commands.** `build_map.py --recommend` names `docs/specs/<slug>`. `build_walk.py next` and `stack` pass `--json <file>`. `tick_only.py` passes `--root <spec-folder>` and the task id. Approval `show`, `write`, and `add-item` pass their required flags. Notes index and merge-safe migration use `<interpreter> -X utf8`, not `python3` alone.
+- **Check.** `scripts/check-script-invocations.py` fails when a documented command hardcodes `python3` for a script with no Windows `python` command beside it, or omits a required flag. It scans skill instructions and current docs. The changelog and the generated reference pages are not scanned.
+
 ## 1.143.0 (2026-11-13)
 
 A recorded yes is not a missing yes, and a ready slice's next step is the build walk. A minor release because the Waiting line for a blocked live command changes, and the tighten-and-plan ending names a different command.

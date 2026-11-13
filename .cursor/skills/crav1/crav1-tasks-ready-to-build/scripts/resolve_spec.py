@@ -11,6 +11,12 @@ match says so and lists the nearest slugs. It does not search the rest of
 the tree.
 
 Usage: resolve_spec.py <query> [--root docs/specs] [--json]
+
+--root defaults to docs/specs from the current directory (the repo root).
+Pass it anyway. A missing folder is an error that names --root docs/specs.
+On Windows the interpreter is python. Elsewhere it is python3. Set
+PYTHONUTF8=1 and pass -X utf8. The rule is docs/reference/running-scripts.md.
+
 Standard library only. Reads spec.md under the root. Writes nothing.
 """
 import json
@@ -290,8 +296,17 @@ def main(argv):
             continue
         positional.append(args[i])
         i += 1
-    if len(positional) != 1 or root is None:
+    if len(positional) != 1:
         sys.stdout.write("Usage: resolve_spec.py <query> --root <docs/specs> [--json]\n")
+        return 2
+    if root is None:
+        root = "docs/specs"
+    if not pathlib.Path(root).is_dir():
+        sys.stdout.write(
+            "No specs folder at "
+            + root
+            + ". From the repo root pass --root docs/specs.\n"
+        )
         return 2
     result = resolve(root, positional[0])
     if as_json:

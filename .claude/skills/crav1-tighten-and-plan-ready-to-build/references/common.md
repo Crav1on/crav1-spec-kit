@@ -2,7 +2,7 @@
 
 Guided only. There is no automatic mode. Every write is explained and confirmed before it happens, using the confirm the skill that owns the write already uses. Do not add a second confirm for the same write. Do not write on a headless or bot run. Stop and say the walk needs a person.
 
-The spec folder is the one the user @-mentions, or the one folder `../crav1-tasks-ready-to-build/scripts/resolve_spec.py` prints. Exact folder first, then hyphen and space forms (`orders 1.0` matches `orders-1-0`), then one unique playbook basename, spec title, or work-item name in `spec.md`. Several matches: list them and stop. Do not pick the most recently edited tree. No name: ask which slug once.
+The spec folder is the one the user @-mentions, or the one folder `<interpreter> -X utf8 <skill crav1-tasks-ready-to-build>/scripts/resolve_spec.py "<query>" --root docs/specs` prints. `<interpreter>` is `python` with `PYTHONUTF8=1` on Windows and `python3` elsewhere, as `crav1-docs/reference/running-scripts.md` says. Do not run `python3` alone. Exact folder first, then hyphen and space forms (`orders 1.0` matches `orders-1-0`), then one unique playbook basename, spec title, or work-item name in `spec.md`. Several matches: list them and stop. Do not pick the most recently edited tree. No name: ask which slug once.
 
 Two routes, one walk. With a playbook, step 1 is that file. Without a playbook, step 1 is skipped. Steps 2 through 7 are the same, and the ready check is the same.
 
@@ -10,7 +10,7 @@ Run each locked skill by opening the file that step names, from this skill's fol
 
 This walk's own prompts are the playbook choice, asked even when that file is already applied, one batch of optional extras once after open questions when any extra applies, one batch for kept-open questions that still have no `Blocks:` line after the plan, one jump-back card per spec finding during plan review (a finding already jumped does not ask again), one jump-back question when the check is not clear, and the yes before `walk-progress.md` is written. That yes shows the progress line, unless the step's own confirm already included this record. An extra's yes is that case. Questions inside a step belong to that step's skill.
 
-The progress script is `scripts/walk_progress.py` in this skill. Use it for versions, resume, playbook status, and the ready check. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. The ready check is `readiness --root`. Do not hand-build rows. Do not keep a second copy of those rules in chat. Pass `--yes` only after you have shown the line and the user has confirmed that record.
+The progress script is `scripts/walk_progress.py` in this skill. Use it for versions, resume, playbook status, and the ready check. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. The ready check is `<interpreter> -X utf8 scripts/walk_progress.py readiness --root <spec-folder>`. Do not hand-build rows. Do not keep a second copy of those rules in chat. Pass `--yes` only after you have shown the line and the user has confirmed that record.
 
 When a playbook was named, ask that question before any later step, including a read-only check. Resume may report status. It does not start the next step.
 

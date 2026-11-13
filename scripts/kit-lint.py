@@ -9,8 +9,9 @@
 - every SKILL.md points at crav1-docs/reference/run-ending.md, unless the skill is in RUN_ENDING_EXEMPT (1.122.0)
 - no skill file has a Next: instruction that names more than one step to run now (1.122.0)
 - no question card offers an Edits option, a Change some option, an Other name option, or an option that says to type under Other (1.130.0)
+- a documented kit-script command includes the script's required arguments and does not hardcode python3 alone (1.144.0)
 """
-import ast, os, re, sys, glob
+import ast, glob, os, re, subprocess, sys
 
 # Calls that load a .py file. Bytecode is written when that file is executed.
 LOADERS = {"spec_from_file_location", "spec_from_loader", "SourceFileLoader", "SourcelessFileLoader", "exec_module"}
@@ -302,6 +303,17 @@ def bytecode_problems(kit):
     return out
 
 
+def invocation_problems(kit):
+    """Documented script commands (1.144.0). See scripts/check-script-invocations.py."""
+    path = os.path.join(kit, "scripts", "check-script-invocations.py")
+    proc = subprocess.run([sys.executable, path, kit], capture_output=True, text=True)
+    lines = [line[6:] for line in (proc.stdout or "").splitlines() if line.startswith("FAIL  ")]
+    if proc.returncode and not lines:
+        detail = (proc.stderr or proc.stdout or "script invocation check failed").strip()
+        lines.append(detail)
+    return lines
+
+
 def main(argv):
     kit = os.path.abspath(argv[1] if len(argv) > 1 else os.environ.get("KIT_DIR", "."))
     errs = []
@@ -349,6 +361,7 @@ def main(argv):
     errs.extend(bytecode_problems(kit))
     errs.extend(run_ending_problems(kit))
     errs.extend(dead_card_problems(kit))
+    errs.extend(invocation_problems(kit))
     for e in errs: print("FAIL  " + e)
     print(f"kit lint: {len(skills)} skills, {len(errs)} problem(s)")
     return 1 if errs else 0

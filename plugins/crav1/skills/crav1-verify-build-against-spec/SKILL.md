@@ -17,7 +17,7 @@ Lead with a **TL;DR**: which tasks are implemented and verified, which are not. 
 
 ## Find the spec
 
-The spec folder is the user's @-mention, or the one folder `scripts/resolve_spec.py` prints (skill `crav1-tasks-ready-to-build`, `--root docs/specs`). Exact folder first, then hyphen and space forms (`orders 1.0` matches `orders-1-0`), then one unique playbook basename, spec title, or work-item name in `spec.md`, then one unique ordered token subsequence of those names (`cc 1.0` matches `cc-process-1-0`). Several matches: list them and stop. No match: say so and list the nearest slugs. Do not pick the most recently edited tree. Do not search the rest of the tree. No name: ask which slug.
+The spec folder is the user's @-mention, or the one folder `<interpreter> -X utf8 <skill crav1-tasks-ready-to-build>/scripts/resolve_spec.py "<query>" --root docs/specs` prints, as `crav1-docs/reference/running-scripts.md` says. Exact folder first, then hyphen and space forms (`orders 1.0` matches `orders-1-0`), then one unique playbook basename, spec title, or work-item name in `spec.md`, then one unique ordered token subsequence of those names (`cc 1.0` matches `cc-process-1-0`). Several matches: list them and stop. No match: say so and list the nearest slugs. Do not pick the most recently edited tree. Do not search the rest of the tree. No name: ask which slug.
 
 Read `spec.md` acceptance (and EARS/BDD export if present — spec.md still wins). Read `tasks.md` if it exists. Skim tests and the files `plan.md` said would be touched.
 

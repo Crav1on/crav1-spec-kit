@@ -42,6 +42,8 @@ A range or all (was `/crav1-complete-tasks`): Orchestrates one worker per `T#` (
 
 1.143.0: a live command the assistant's permission check refused, when the user's yes is already on record, is `permission_refused`, not `needs_yes`. Waiting says the yes is on record and the check blocked the command. The offer is to run that exact command, or allow that one command and rerun. Next is the build step again after the command has run. It does not suggest working around the check. `scripts/permission_block.py` distinguishes the two.
 
+1.144.0: the spec folder command is `<interpreter> -X utf8 <skill crav1-tasks-ready-to-build>/scripts/resolve_spec.py "<query>" --root docs/specs`. Tick-only is `scripts/tick_only.py --root <spec-folder> T#`. `--recommend` names `docs/specs/<slug>`. On Windows `<interpreter>` is `python` with `PYTHONUTF8=1`. Elsewhere it is `python3`.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.

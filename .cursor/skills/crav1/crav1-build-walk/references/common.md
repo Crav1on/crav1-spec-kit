@@ -6,7 +6,7 @@ The walk opens a step skill by its sibling path, for example `../crav1-build-tas
 
 ## One Next
 
-For one branch in progress, the reply has exactly one next line. It is the line `scripts/build_walk.py next` prints.
+For one branch in progress, the reply has exactly one next line. It is the line `scripts/build_walk.py next --json <file>` prints.
 
 The step skill's own suggestion is not printed. That includes `/crav1-open-pr` after a build or a commit, and `/crav1-review-pr` after a pull request opens.
 

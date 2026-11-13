@@ -4,7 +4,7 @@ You implement **one** row from `tasks.md`. Then you run that row’s **verify** 
 
 ## Find the work
 
-Spec folder: the user's @-mention, or the one folder `scripts/resolve_spec.py` prints (skill `crav1-tasks-ready-to-build`). Several matches: list them and stop. Do not pick the most recently edited tree.
+Spec folder: the user's @-mention, or the one folder `<interpreter> -X utf8 <skill crav1-tasks-ready-to-build>/scripts/resolve_spec.py "<query>" --root docs/specs` prints (`crav1-docs/reference/running-scripts.md`). Several matches: list them and stop. Do not pick the most recently edited tree.
 
 Read `tasks.md`, `plan.md`, `spec.md`. Task row shape is this skill’s `assets/tasks.md`. Use diagrams/ADRs as constraints. Spec wins if they disagree.
 
@@ -12,7 +12,7 @@ Read `tasks.md`, `plan.md`, `spec.md`. Task row shape is this skill’s `assets/
 
 If `tasks.md` is missing, stop. Next: `/crav1-plan-from-spec`.
 
-**Branch:** before any code, follow `/crav1-create-feature-branch` (skill `crav1-create-feature-branch`, `references/task-branch.md`) **Build** prompt. Option 1 is the first line of `scripts/build_map.py --recommend T#` (skill `crav1-tasks-ready-to-build`); on that branch already, go ahead. Implementation code is never written on a base branch (1.99.0): follow skill `crav1-create-feature-branch`, `references/code-branch.md`; on a base there is no Stay, and a recommended name that is a base is blocked. A dirty tree still means no checkout of an existing branch. If you are on `spec/<slug>`, stop (no code) and follow that skill’s **Build on a spec-only branch**.
+**Branch:** before any code, follow `/crav1-create-feature-branch` (skill `crav1-create-feature-branch`, `references/task-branch.md`) **Build** prompt. Option 1 is the first line of `scripts/build_map.py docs/specs/<slug> --recommend T#` (skill `crav1-tasks-ready-to-build`); on that branch already, go ahead. Implementation code is never written on a base branch (1.99.0): follow skill `crav1-create-feature-branch`, `references/code-branch.md`; on a base there is no Stay, and a recommended name that is a base is blocked. A dirty tree still means no checkout of an existing branch. If you are on `spec/<slug>`, stop (no code) and follow that skill’s **Build on a spec-only branch**.
 
 ## Gate
 

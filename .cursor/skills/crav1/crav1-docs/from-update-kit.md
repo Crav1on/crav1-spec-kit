@@ -4,14 +4,15 @@ Kit not in this project yet? [Install first](install.md) (Cursor and Claude Code
 
 ```bash
 curl -fsSL -o crav1-update-kit.py https://github.com/Crav1on/crav1-spec-kit/releases/latest/download/crav1-update-kit.py
-python3 crav1-update-kit.py detect
+PYTHONUTF8=1 python3 -X utf8 crav1-update-kit.py detect
 ```
 
 On Windows PowerShell 5.1, `curl` is an alias for `Invoke-WebRequest`, so the curl flags fail. On Windows, `python3` is often missing. Use `python` or `py`.
 
 ```powershell
 Invoke-WebRequest -Uri https://github.com/Crav1on/crav1-spec-kit/releases/latest/download/crav1-update-kit.py -OutFile crav1-update-kit.py
-python crav1-update-kit.py detect
+$env:PYTHONUTF8 = "1"
+python -X utf8 crav1-update-kit.py detect
 ```
 
 Use this in a consumer project when the installed kit should move to a published release. `/crav1-update-kit` takes an optional `to vX.Y.Z`. With no version, the target is the latest published release tag.

@@ -12,7 +12,7 @@ Read the saved files only: `index.md`, `confirmed.md`, `proposed.md`, `questions
 
 ## Write the snapshot
 
-Run `scripts/model_run.py report` from skill `crav1-model-data`. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. Do not pass `--now`. The script reads its own clock.
+Run `<interpreter> -X utf8 <skill crav1-model-data>/scripts/model_run.py report --home docs/data-model/<model> --kit <version>`. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. Do not pass `--now`. The script reads its own clock.
 
 `<interpreter> <crav1-model-data>/scripts/model_run.py report --home docs/data-model/<model> --kit <version>`
 

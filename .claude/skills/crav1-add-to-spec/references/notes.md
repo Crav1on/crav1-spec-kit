@@ -43,9 +43,9 @@ A pull request's title and description are saved as **one note per pull request*
 
 Do not edit `docs/notes/index.md` or `docs/notes/YYYY-MM/index.md` by hand. After writing or changing notes, run the generator from the product repo root. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. The lines below are the first try:
 
-- Cursor drop-in: `python3 .claude/skills/crav1-add-to-spec/scripts/notes_index.py`
-- Plugin: this skill's `scripts/notes_index.py`
-- Claude Code: `python3 .claude/skills/crav1-add-to-spec/scripts/notes_index.py`
+- Cursor drop-in: `<interpreter> -X utf8 .claude/skills/crav1-add-to-spec/scripts/notes_index.py`
+- Plugin: `<interpreter> -X utf8 <this skill>/scripts/notes_index.py`
+- Claude Code: `<interpreter> -X utf8 .claude/skills/crav1-add-to-spec/scripts/notes_index.py`
 
 `--check` exits 1 when an index differs from the front matter (a product repo can run it in CI). When Python cannot run, say the indexes need a rebuild and name the command; do not hand-edit.
 

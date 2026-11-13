@@ -42,6 +42,8 @@ The progress file is `docs/specs/<slug>/walk-progress.md`. It records the step, 
 
 1.143.0: when the result is `ready`, or `ready-partial` with tasks that can start, each Next line recommends [`/crav1-build-walk`](crav1-build-walk.md) with the T number beside the short name and the branch, and names [`/crav1-build-tasks`](crav1-build-tasks.md) as the alternative for one task without the walk. The walk does not run either command. A `not-ready` result does not recommend the walk.
 
+1.144.0: the spec folder command is `<interpreter> -X utf8 <skill crav1-tasks-ready-to-build>/scripts/resolve_spec.py "<query>" --root docs/specs`. On Windows `<interpreter>` is `python` with `PYTHONUTF8=1`. Elsewhere it is `python3`. Do not run `python3` alone. The ready check is `readiness --root <spec-folder>`. Playbook status passes `--playbook <file>` as well as `--root`. The rule is `docs/reference/running-scripts.md`.
+
 ## Runs when
 
 A spec should be tightened and planned until it is ready to build. Called by the user.
@@ -54,7 +56,7 @@ The walk's own prompts are the playbook skip or reapply question, asked even whe
 
 In short: The spec folder, an optional playbook (outside the project or under `docs/playbooks/`), and the progress file when one exists.
 
-Reads the spec folder, the optional playbook, and `walk-progress.md` when resuming. The ready check is `scripts/walk_progress.py readiness --root`, which reads `spec.md`, `plan.md`, `tasks.md`, and `verify.md` through `task_order.py` and `question_blocks.py`. It does not read production data.
+Reads the spec folder, the optional playbook, and `walk-progress.md` when resuming. The ready check is `scripts/walk_progress.py readiness --root <spec-folder>`, which reads `spec.md`, `plan.md`, `tasks.md`, and `verify.md` through `task_order.py` and `question_blocks.py`. It does not read production data.
 
 ## Writes
 

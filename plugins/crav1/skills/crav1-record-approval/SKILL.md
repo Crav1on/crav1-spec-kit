@@ -22,11 +22,11 @@ The user names the person, the source, and the quote. The source is a pull-reque
 
 A missing person, source, or quote: stop and ask for that value. Do not guess. A headless run with one of them missing stops and names it.
 
-Find the spec with `scripts/resolve_spec.py` (skill `crav1-tasks-ready-to-build`) when they did not point at a folder. Several matches: list them and stop.
+Find the spec with `<interpreter> -X utf8 <skill crav1-tasks-ready-to-build>/scripts/resolve_spec.py "<query>" --root docs/specs` when they did not point at a folder, as `crav1-docs/reference/running-scripts.md` says. Several matches: list them and stop.
 
 ## Show, then accept
 
-Read [references/line.md](references/line.md). Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. Run `scripts/approval_needed.py show` and show what it prints: the `Approved:` line, the constraint, and the tasks it unblocks. An earlier quote never counts by itself. The word `yes` inside the quote is not acceptance.
+Read [references/line.md](references/line.md). Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. Run `<interpreter> -X utf8 scripts/approval_needed.py show --root <spec-folder> --person "<person>" --source-date <date> --source "<source>" --quote "<quote>" --recorder "<recorder>" --accepted <date>` and show what it prints: the `Approved:` line, the constraint, and the tasks it unblocks. An earlier quote never counts by itself. The word `yes` inside the quote is not acceptance.
 
 The choice word is `accept`. It has to be in this run, after the line is shown. A yes from an earlier chat, or a quote that already says yes, is not `accept`.
 
@@ -37,7 +37,7 @@ A headless run without `accept` stops. `Missing choice. Use: accept.` It does no
 
 ## Write
 
-Only after `accept` in this run. Run `scripts/approval_needed.py write` with `--yes`. That is the only write. It appends the `Approved:` line under that item. It does not remove the item, `Person:`, `Holds:`, `Asked:`, `Pending:`, or the constraint.
+Only after `accept` in this run. Run `<interpreter> -X utf8 scripts/approval_needed.py write --root <spec-folder> --person "<person>" --source-date <date> --source "<source>" --quote "<quote>" --recorder "<recorder>" --accepted <date> --yes`. That is the only write. It appends the `Approved:` line under that item. It does not remove the item, `Person:`, `Holds:`, `Asked:`, `Pending:`, or the constraint.
 
 No item, or two items: stop and list them. Do not invent an item. Plan and build create items.
 

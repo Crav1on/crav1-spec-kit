@@ -57,4 +57,4 @@ When the user stops partway, one line `Paused at <step>.` Then the ending in [re
 
 ## Run ending (1.122.0)
 
-End as [run-ending.md](../crav1-docs/reference/run-ending.md) says. The script prints the line: `scripts/build_walk.py next`. Pick the interpreter as [running-scripts.md](../crav1-docs/reference/running-scripts.md) says.
+End as [run-ending.md](../crav1-docs/reference/run-ending.md) says. The script prints the line: `scripts/build_walk.py next --json <file>`. Pick the interpreter as [running-scripts.md](../crav1-docs/reference/running-scripts.md) says.

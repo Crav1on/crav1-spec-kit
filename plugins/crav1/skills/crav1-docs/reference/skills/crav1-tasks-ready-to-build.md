@@ -46,6 +46,8 @@ Shows summary counts per slice, then Ready and Held grouped by build-map branch,
 
 1.137.0: a question with no `Blocks:` line holds `T#` ids named in its text that exist in `tasks.md`, shown like a Blocks hold and noted inferred from the text. It holds the whole slice only when no task is named and resolve-open-questions has never been recorded. `Blocks: whole slice` (also `the whole slice`, any case) is a recorded hold of every unfinished task and stays Waiting through spec drift. A question with a `Blocks:` line, or one already recorded as waiting, stays Waiting through spec drift. A new or unparsed question jumps back only for the tasks it holds. `scripts/resolve_spec.py` also accepts one unique ordered token subsequence (`cc 1.0` matches `cc-process-1-0`). No match lists the nearest slugs.
 
+1.144.0: a named spec is `<interpreter> -X utf8 scripts/resolve_spec.py "<query>" --root docs/specs`. On Windows `<interpreter>` is `python` with `PYTHONUTF8=1`. Elsewhere it is `python3`. `--recommend` is `scripts/build_map.py docs/specs/<slug> --recommend T#`. The rule is `docs/reference/running-scripts.md`.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.

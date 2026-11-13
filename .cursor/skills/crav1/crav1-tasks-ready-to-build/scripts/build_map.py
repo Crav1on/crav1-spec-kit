@@ -37,7 +37,8 @@ Usage:
   build_map.py <spec-dir> --recommend T1
   build_map.py --root <docs/specs> [--scope <words>] [--chat] [--stdout]
 
-The interpreter is python3, then python, then py -3. The Store alias message
+On Windows the interpreter is python. Elsewhere it is python3. Then py -3.
+Set PYTHONUTF8=1 and pass -X utf8. The Store alias message
 `Python was not found` means that command was not found.
 Standard library only. Writes build-map.md in the spec folder unless --stdout.
 """

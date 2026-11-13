@@ -10,7 +10,8 @@ Usage:
   sh_eol.py --wrote-sh --gitattributes <file> --autocrlf <value> [--windows]
 
 `--gitattributes -` reads the attributes text on stdin. A missing file is the
-same as an empty one. The interpreter is python3, then python, then py -3.
+same as an empty one. On Windows the interpreter is python. Elsewhere it is
+python3. Then py -3. Set PYTHONUTF8=1 and pass -X utf8.
 """
 import pathlib
 import re
