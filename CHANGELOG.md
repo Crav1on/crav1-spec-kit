@@ -2,6 +2,14 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.151.0 (2026-11-13)
+
+Two people can work on the same specs repo without one walk disappearing from the other. A minor release because the ready check, the tighten-and-plan walk, and `/crav1-build-walk` now fetch first, hold claimed tasks, and push the walk's files at the end.
+
+- **Claim.** When `/crav1-build-walk` starts on a branch, it writes `In progress: feat/orders-api-host-setup, T27, person A, since 2026-11-13T15:50:00+01:00` in `docs/specs/<slug>/claims.md`. After one yes it commits and pushes only that file. The ready check and `/crav1-tasks-ready-to-build` hold those tasks as `in progress by <user> since <date>` and do not offer them in Run next. Tighten-and-plan, plan-from-spec, and tighten-plan leave claimed task lines unchanged (no renumber, reorder, rewrite, or removal), may change other tasks, and say once which claimed tasks were kept. The walk clears the claim, then commits and pushes after yes, when the branch is merged or ticked, or the user says stop or `release claim`. A claim older than three days (or `Claim max age: N days`) gets a warning and the clear words. It is never cleared on its own. Normalized content stamps ignore claim lines. The file is `claims.md`, not a section of `build-map.md`, because the ready check rewrites the map, and not `walk-progress.md` or `build-progress/`, which record position, not a shared lock.
+- **Pull before reading.** `/crav1-build-walk`, `/crav1-tighten-and-plan-ready-to-build`, and the ready check fetch the specs repo first. Behind origin, they stop before reading or writing, and Run next is `git pull --no-rebase` (merge, never rebase). No upstream, or a failed fetch, is said once and the command continues. Ahead continues with a Waiting line to push. Diverged stops.
+- **Settle and push.** When a walk branch finishes, or the user stops, the walk lists every uncommitted specs-repo file it or its step skills wrote (the progress file, notes and their indexes, `verify.md`, `build-map.md`, `tasks.md` ticks, `claims.md`), commits them with the persisted commit style, then one card to push, naming how many commits the specs repo is ahead. Files it did not write are listed and left uncommitted. If the branch is behind, it merges origin in first and never rebases. A conflict stops and names the files. After a successful push the ending says the specs repo is in step with origin. An unpushed repo is a Waiting line, never a buried note. A headless run stops and names `yes` and `stop`.
+
 ## 1.150.0 (2026-11-13)
 
 The tighten-and-plan walk prints its ending in the reply, and the ready check no longer blocks on its own stale record. A minor release because the reply shape changes, and a reopened ready-check step no longer asks for a jump back before the record.

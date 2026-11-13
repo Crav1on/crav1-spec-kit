@@ -32,7 +32,7 @@ Resume that matches the stored hash stays on the recorded step. It does not ask 
 
 ## Commit the progress file (1.150.0)
 
-Writing this file is not the end of the step. After the yes that recorded the step, commit `build-progress/<branch>.md`. When that step already commits other files, such as a tick or a verify edit, include this file in that same commit. Otherwise commit this file on its own. Use the persisted commit style, the draft-commit rule already in the repo. Nothing is pushed.
+Writing this file is not the end of the step. After the yes that recorded the step, commit `build-progress/<branch>.md`. When that step already commits other files, such as a tick or a verify edit, include this file in that same commit. Otherwise commit this file on its own. Use the persisted commit style, the draft-commit rule already in the repo. The end-of-walk push, including this file, is [sync.md](sync.md).
 
 Paused: `Paused at <step>.` Then print `ending`.
 

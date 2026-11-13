@@ -14,6 +14,8 @@ One plan issue at a time; patches plan/tasks only (spec findings go to tighten-s
 
 1.145.0: the batch card is asked only after a findings table in that same reply (Id, Issue, Options, Recommendation). The card names each item, for example `P4 tasks miss the 400 path: A add a test`. It does not say `table above`. The command is `<interpreter> -X utf8 <skill crav1-tighten-plan>/scripts/batch_offer.py --title "Tighten-plan batch" --items <file>`. It prints no card without rows.
 
+1.151.0: a task listed in `claims.md` as `In progress:` is left unchanged: no renumber, reorder, rewrite, or removal. After writing `tasks.md`, the step preserves those lines and says once which claimed tasks were kept.
+
 ## Runs when
 
 Plan findings, or mushy tasks. Called by the user.
@@ -26,7 +28,7 @@ Prompt budget: 1 (the most prompts in one run, the closing yes included). A prom
 
 In short: Plan, tasks, spec, and those findings.
 
-Reads `plan.md`, `tasks.md`, `spec.md`, and plan-review findings already in the chat.
+Reads `plan.md`, `tasks.md`, `spec.md`, `claims.md` when it exists, and plan-review findings already in the chat.
 
 ## Writes
 
@@ -36,7 +38,7 @@ Writes only the picked plan issue in `plan.md` or `tasks.md`.
 
 ## Does not
 
-Leaves `spec.md` and application code alone.
+Leaves `spec.md` and application code alone. Leaves a claimed `In progress:` task line in `tasks.md` unchanged.
 
 Limits and exceptions: a spec-tagged finding is not patched here.
 

@@ -83,6 +83,10 @@ The one exception to leaving `spec.md` alone: a `Blocks:` line under a kept-open
 
 Read `references/write.md` ("tasks.md") and [references/checks.md](references/checks.md) before writing tasks: the line format, `(after: …)`, `(branch: …)`, and the mapping rules. Do not write test code.
 
+## Claimed tasks (1.151.0)
+
+A task listed in `docs/specs/<slug>/claims.md` as `In progress:` is left unchanged: no renumber, reorder, rewrite, or removal. Other tasks may change. After writing `tasks.md`, run `<interpreter> -X utf8 scripts/claims.py preserve --before <old tasks.md> --after docs/specs/<slug>/tasks.md --root <spec-folder> --write`, as `crav1-docs/reference/running-scripts.md` says, and say once which claimed tasks were kept.
+
 ## After writing
 
 Output only:

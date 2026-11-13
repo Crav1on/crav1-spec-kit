@@ -45,6 +45,8 @@ The card that merges names the pull request number. That `yes` is the explicit a
 
 Never rebase. A branch that is behind is fixed by merging the base into it, after `yes`.
 
+The specs repo is fetched before this walk reads the spec folder, and a claim is pushed when it starts on a branch (1.151.0). Those rules are [sync.md](sync.md) and [claims.md](claims.md).
+
 ## Script
 
 `scripts/build_walk.py` in this skill. The interpreter is `crav1-docs/reference/running-scripts.md`. The kit repo wrapper is `scripts/build-walk.py`. Pass state as `--json`. The script does not push, open, merge, or run a live change.

@@ -118,6 +118,10 @@ The Next line recommends the build walk, with the T number beside the short name
 @docs/specs/<slug>/
 ```
 
+## Claims and a fresh copy (1.151.0)
+
+The ready check fetches the specs repo before it reads. If that copy is behind origin, it stops and Run next is `git pull --no-rebase`. A task with an `In progress:` line in `docs/specs/<slug>/claims.md` is held `in progress by <user> since <date>` and is not offered in Run next.
+
 Reference page: [tasks-ready-to-build](reference/skills/crav1-tasks-ready-to-build.md) · Routes: [Workflow routes](reference/workflow.md)
 
 The run ends as [How a run ends](reference/run-ending.md) says: one `Next:` line per ready branch, `Waiting:` only when a step is blocked, and `Uncommitted:` when files changed and are not committed.

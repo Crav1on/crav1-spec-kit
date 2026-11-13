@@ -24,6 +24,8 @@ File-level `plan.md` and `tasks.md`; each verify note names the checks before co
 
 1.128.0: optional `(step: 1)` links a task to a numbered Approach step, and optional `(map: feat/cancel-refund)` puts that task on another branch. Leave both off. The default build map is one branch per step.
 
+1.151.0: a task listed in `claims.md` as `In progress:` is left unchanged: no renumber, reorder, rewrite, or removal. After writing `tasks.md`, the step preserves those lines and says once which claimed tasks were kept.
+
 ## Runs when
 
 Spec is accepted. Called by the user.
@@ -36,7 +38,7 @@ The gate may ask one architecture batch. Leftovers that might be current work or
 
 In short: Spec, diagrams, ADRs; the named repo and branch when the slice is partial.
 
-Reads the accepted spec, diagrams, ADRs, exports, kept security findings already written, and, when the spec is partial or `## In the code` names paths, that same committed repo and branch before any task is written.
+Reads the accepted spec, diagrams, ADRs, exports, kept security findings already written, and `claims.md` when it exists, and, when the spec is partial or `## In the code` names paths, that same committed repo and branch before any task is written.
 
 ## Writes
 
@@ -46,7 +48,7 @@ Writes `plan.md` and `tasks.md`, and matching OpenSpec export files when those a
 
 ## Does not
 
-Leaves `spec.md` alone except a `Blocks:` line under a kept-open question and an `## Approval needed` item from a constraint. Leaves application code and any linter install alone.
+Leaves `spec.md` alone except a `Blocks:` line under a kept-open question and an `## Approval needed` item from a constraint. Leaves a claimed `In progress:` task line in `tasks.md` unchanged. Leaves application code and any linter install alone.
 
 Limits and exceptions: when `## Linter` says this repo has no linter for the code the tasks will touch, it stops before Build until the user chooses. A line under `## Dismissed test suggestions` is not a task. A kept test suggestion that is already an acceptance line maps to a task. A gap or a disagreement is finish, add a verify test, or leave before any task exists. A later run does not turn a left piece into work unless the user says so. Stale research does not fail the gate.
 

@@ -102,4 +102,8 @@ Next: /crav1-build-walk T1 Record the decision, because that work is on feat/ord
 
 `/crav1-build-tasks` is the alternative for one task without the walk. This walk does not run `/crav1-build-tasks` or `/crav1-build-walk`. A not-ready result does not recommend the walk. When the ready check's own record is the only stale step, the reply says once that the earlier record is replaced, and the result comes from the tasks. Another reopened step still blocks. When the progress file is not committed: `Uncommitted: 1 file; commit with /crav1-finalize-commit when ready.` See [How a run ends](reference/run-ending.md).
 
+## Claims and a fresh copy (1.151.0)
+
+The walk fetches the specs repo before it reads. If that copy is behind origin, it stops and Run next is `git pull --no-rebase`. A task with an `In progress:` line in `docs/specs/<slug>/claims.md` is left unchanged: no renumber, reorder, rewrite, or removal. The walk says once which claimed tasks were kept. The ready check holds those tasks as `in progress by <user> since <date>` and does not offer them in Run next.
+
 Reference page: [tighten and plan, ready to build](reference/skills/crav1-tighten-and-plan-ready-to-build.md)
