@@ -2,6 +2,16 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.153.0 (2026-11-13)
+
+The ready check keeps an open task on its own branch, prints one Run next block, and stays short enough to read. A minor release because the map, the ending, and the script output all change.
+
+- **Task-line branch.** The branch on the task line, or beside that T# in a leading Branches paragraph, is the map row for an open task even when it shares a plan step with a done task on an already-merged branch. An open task is never placed under a branch git proves merged, or under a done sibling's branch, when another name is written for it. Held lines use that same row.
+- **One Run next.** The ready-check ending has exactly one Run next block, at the top. The walk command appears only there. The bottom keeps Waiting lines and at most a one-line `/crav1-build-tasks` alternative, with no second copy of the command and no `Next:` line. The reply must print that block verbatim and must never write a `Next:` line of its own.
+- **Brief output.** `walk_progress.py readiness --root <folder> --brief` prints only the result, a counts row, the ending, and claim warnings, under 8 KB for a 45-task slice. `--full` (the default) still prints the complete JSON. The ready check calls the brief form. `build_map.py` with no flag still prints only the one-line path of the file it wrote.
+- **Open-question count.** The Waiting line counts only tasks whose hold is itself an open question or an approval, and names only the people on those questions. A task that waits on another task is not counted there.
+- **Orphan verify row.** A `verify.md` table row for a T# that is not in `tasks.md` is one Waiting line naming that T#, and the fix is `/crav1-verify-build-against-spec` or tighten. Report only; the check does not edit `verify.md`.
+
 ## 1.152.0 (2026-11-13)
 
 The ready check keeps the branch on the task line, and its printed commands work in a new session. A minor release because the map, the Next lines, and the script commands a ready check runs all change.

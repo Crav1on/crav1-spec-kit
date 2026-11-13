@@ -21,7 +21,7 @@ It is not `/crav1-what-do-we-know-about-this` (what is known about one thing) an
 
 Route first. The word `build-map` shows only the map. The words after it are the scope, the same scope as this command with no word (a slug such as `cc 1.0`, an `@` folder, or every slice). No word keeps the task list.
 
-Every run, rebuild `docs/specs/<slug>/build-map.md` with `scripts/build_map.py`. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. Do not hand-edit it. The task list gains one line: `Build map: docs/specs/<slug>/build-map.md`. With the word, run `--chat` and print only that summary: each wave, then that wave's Overlap lines. `--recommend T#` prints the branch to offer. The first line is the name (1.140.0). Read `references/build-map.md` only when the script cannot run. Do not invent the map.
+Every run, rebuild `docs/specs/<slug>/build-map.md` with `scripts/build_map.py`. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. Do not hand-edit it. With no flag, it prints only the one-line path. The task list gains that line. With the word, run `--chat` and print only that summary: each wave, then that wave's Overlap lines. `--recommend T#` prints the branch to offer. The first line is the name (1.140.0). Read `references/build-map.md` only when the script cannot run. Do not invent the map.
 
 ## Scope
 
@@ -71,9 +71,9 @@ When Python runs, rule 3 may use `scripts/question_blocks.py` beside this skill,
 
 Every task list is in **dependency order**, not task-number order. Each task gets a wave: 0 when it waits on nothing, otherwise one more than the latest wave of the tasks it waits on. List wave by wave, lowest number first inside a wave; tasks in one wave can be built in either order. Tasks on a cycle go last.
 
-The sort ships next to this file as `scripts/task_order.py`. When Python runs, use it for each slice: `<interpreter> <this skill folder>/scripts/task_order.py docs/specs/<slug>/tasks.md`. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. It prints Ready, Waits in order, Blocked, Needs tick, and Next. A recorded-merged task is under Needs tick (1.136.0). Waits in order is a real earlier task. Blocked is a cycle or an `(after:)` that names no task. Add the rule 1 to 3 results on top: a question is Waiting on a question, not Blocked. A dependent of a held task is Waiting too. The walk's `scripts/walk_progress.py readiness --root <spec-folder>` (skill `crav1-tighten-and-plan-ready-to-build`) prints `result`: `ready`, `ready-partial`, or `not-ready`.
+When Python runs, run the walk's `scripts/walk_progress.py readiness --root <spec-folder> --brief --write-map` (skill `crav1-tighten-and-plan-ready-to-build`). Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. Print that output. Start the ending with the script's `Run next` block, verbatim. Never write a `Next:` line of your own. `scripts/task_order.py` is only needed with `--full`. A recorded-merged task is under Needs tick (1.136.0). Waits in order is a real earlier task. Blocked is a cycle or an `(after:)` that names no task. A question hold, and a dependent of a held task, stay under Waiting.
 
-Other skills (`/crav1-build-tasks`, `/crav1-build-features`, `/crav1-verify-build-against-spec`) use this order. The ready check's Next lines are one per ready branch (1.133.0), not the single task that unblocks the most.
+Other skills (`/crav1-build-tasks`, `/crav1-build-features`, `/crav1-verify-build-against-spec`) use this order. Run next is one entry per ready branch (1.133.0), not the single task that unblocks the most.
 
 ## Output
 
@@ -108,22 +108,29 @@ Needs verify
 Done: 4
 Order: T5 → T9 → T7 → T8
 
-Next: /crav1-build-walk T5 refund to the original card, because that work is on feat/orders-retry. /crav1-build-tasks builds one task without the walk.
-Next: /crav1-build-walk T6 export the receipt, because that work is on feat/orders-export. /crav1-build-tasks builds one task without the walk.
+Run next:
+
+`/crav1-build-walk T5`
+branch feat/orders-retry, T5 refund to the original card
+
+`/crav1-build-walk T6`
+branch feat/orders-export, T6 export the receipt
+
+/crav1-build-tasks builds one task without the walk.
 Source: docs/specs/<slug>/spec.md, plan.md, tasks.md, verify.md
 Build map: docs/specs/<slug>/build-map.md
 ```
 
-- **By branch (1.133.0).** When Python runs, `scripts/walk_progress.py readiness --root <spec-folder>` (skill `crav1-tighten-and-plan-ready-to-build`) prints `ready_lines`, `held_lines`, and `next_lines`. Print those. Do not flatten them. The branch is `scripts/build_map.py docs/specs/<slug> --recommend T#`, the same row as the map. Order is wave, then map order. A task is `T#` plus its short name, in the lists and on the map. One ready branch is still one group and one Next line. Without Python, use `references/build-map.md` under Ready check.
+- **By branch (1.133.0).** When Python runs, print the brief `ending` from `readiness --root <spec-folder> --brief --write-map`. Do not flatten it, and do not add a `Next:` line. The branch is `scripts/build_map.py docs/specs/<slug> --recommend T#`, the same row as the map. Order is wave, then map order. A task is `T#` plus its short name. One ready branch is still one Run next entry. Without Python, use `references/build-map.md` under Ready check.
 - **Result (1.132.0)** is `ready` when the tasks that are not done can start or only wait in order, `ready-partial` when some can start now and some are held, and `not-ready` when nothing can start. The walk record stays `Result: ready-partial`. A cycle, a missing task, no plan, Needs verify, or a plan-review warning still records `not-ready`.
 - **Order** shows the slice's unticked tasks in dependency order, `|` between tasks of the same wave. One Order line per slice when listing all specs. The Order line keeps task ids.
-- **Next** is the script's `next_lines` when the result is `ready` or `ready-partial`: `/crav1-build-walk`, and `/crav1-build-tasks` builds one task without the walk. See `run-ending.md`. Do not run it.
+- **Run next (1.153.0)** is the script's ending block, printed verbatim at the start. The walk command appears only there. The bottom may keep Waiting lines and one `/crav1-build-tasks` alternative. Never write a `Next:` line of your own. See `run-ending.md`. Do not run either command.
 - Read `references/next-question.md` ("Question blocks the first task") only when nothing is ready and an open question blocks the first task.
 - Read `references/next-verify.md` ("Only needs verify") only when only Needs verify is left.
 - Read `references/next-nothing.md` ("Nothing left") only when nothing is left to build or verify.
 - **Source** names every file it read, per slice.
 - **Build map** is one line per slice, the path the script just wrote. The task list above it is unchanged.
-- **verify.md behind (1.136.0).** When `verify_behind` is true, print `verify_waiting`. A verify-only change does not force `not-ready`. This command does not restamp `walk-progress.md` and does not write `verify.md`. The rule is [references/verify-behind.md](references/verify-behind.md).
+- **verify.md behind (1.136.0).** When `verify_behind` is true, print `verify_waiting`. A verify.md row for a T# not in tasks.md is one Waiting line; fix it with `/crav1-verify-build-against-spec` or tighten, and do not edit `verify.md`. A verify-only change does not force `not-ready`. This command does not restamp `walk-progress.md` and does not write `verify.md`. The rule is [references/verify-behind.md](references/verify-behind.md).
 - When the slice has `work-item.md`, add the Azure Boards line from **What it reads**.
 
 ## What it does not do

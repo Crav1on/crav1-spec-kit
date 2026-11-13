@@ -3,9 +3,12 @@
 
 Groups the tasks onto branches, including tasks that are already done. The row name is the task branch, in this
 order: a branch named on the task line (`(map: <branch>)`, else
-`(branch: <branch>)`, else a `feat/…` name in the sentence, else
+`(branch: <branch>)`, else the name beside that T# in a leading Branches
+paragraph, else a `feat/…` or `chore/…` name in the sentence, else
 `committed later on <branch>`), else the plan step's `feat/<slug>-<words>`
-name, else `feat/<slug>-<words>` from the task. A `from <base>` after the
+name, else `feat/<slug>-<words>` from the task. An open task is never
+placed under a branch git proves merged, or under a done sibling's
+branch, when the task line or the Branches paragraph names another. A `from <base>` after the
 task-line branch is that branch's base. The plan step is only the fallback
 when the task line names no branch.
 `--recommend T1` prints that name and does not write. The first line is the
@@ -45,6 +48,7 @@ On Windows the interpreter is python. Elsewhere it is python3. Then py -3.
 Set PYTHONUTF8=1 and pass -X utf8. The Store alias message
 `Python was not found` means that command was not found.
 Standard library only. Writes build-map.md in the spec folder unless --stdout.
+With no flag, prints only the one-line path of that file.
 """
 import importlib.util
 import pathlib
@@ -367,24 +371,85 @@ def stated_base(rest, branch):
     return match.group(1).rstrip(".,;:")
 
 
-def task_line_choice(task):
+def paragraph_branches(text):
+    """Branch named for each task in a leading Branches paragraph.
+
+    A clause such as `chore/merge-main-into-develop` (T4) assigns that
+    branch to T4. Ranges such as (T9–T12) and possessives such as
+    (T1's and T45's) assign the preceding named branch. A T# that
+    appears only as `after T4` outside the clause's first parentheses
+    is not assigned.
+    """
+    mapping = {}
+    if not text:
+        return mapping
+    match = re.search(r"^Branches\b", text, re.I | re.M)
+    if not match:
+        return mapping
+    rest = text[match.start():]
+    stop = re.search(r"^\s*-\s*\[[ xX]\]\s*T\d+", rest, re.M)
+    if stop:
+        rest = rest[:stop.start()]
+    heading = re.search(r"^##?\s+", rest[1:], re.M)
+    if heading:
+        rest = rest[: heading.start() + 1]
+    found = list(NAMED_BRANCH.finditer(rest))
+    for i, hit in enumerate(found):
+        name = hit.group(1).rstrip(".,;:")
+        end = found[i + 1].start() if i + 1 < len(found) else len(rest)
+        clause = rest[hit.end():end]
+        paren = re.search(r"\(([^)]*)\)", clause)
+        if not paren:
+            continue
+        for tm in re.finditer(r"T(\d+)(?:'s)?(?:\s*[–-]\s*T?(\d+))?", paren.group(1), re.I):
+            start_id = int(tm.group(1))
+            end_id = int(tm.group(2)) if tm.group(2) else start_id
+            if end_id < start_id:
+                start_id, end_id = end_id, start_id
+            if end_id - start_id > 40:
+                continue
+            for tid in range(start_id, end_id + 1):
+                mapping[tid] = name
+    return mapping
+
+
+def task_line_choice(task, paragraph_branch=None, avoid=None):
     """Branch named on the task line, and its stated base.
 
-    `(map:)` wins, then `(branch:)`, then a branch in the sentence, then
-    `committed later on`. Returns `(None, None)` when the line names none.
+    `(map:)` wins, then `(branch:)`, then the Branches-paragraph name
+    for this task when it is not in `avoid`, then a branch in the
+    sentence (preferring one not in `avoid`), then `committed later on`.
+    Returns `(None, None)` when the line and paragraph name none.
+    `avoid` is branch names an open task must not sit on when another
+    name exists: a done sibling's branch, or a branch git already merged.
     """
     rest = task.get("rest") or ""
+    skipped = set(avoid or ())
     if task.get("map"):
         return task["map"], stated_base(rest, task["map"])
     if task.get("branch"):
         return task["branch"], stated_base(rest, task["branch"])
-    named = sentence_branch(rest)
-    if named:
-        return named, stated_base(rest, named)
-    later = committed_later(rest)
-    if later:
-        return later, stated_base(rest, later)
-    return None, None
+    named = branches_named_in_text(rest)
+    candidates = list(named)
+    if paragraph_branch and paragraph_branch not in candidates:
+        candidates.append(paragraph_branch)
+    if not candidates:
+        return None, None
+    preferred = [name for name in candidates if name not in skipped]
+    pool = preferred or list(candidates)
+    if paragraph_branch and paragraph_branch in preferred:
+        chosen = paragraph_branch
+    elif preferred and skipped:
+        # A predecessor on the line was skipped; the later name is usually
+        # this task's own branch (`after feat/merged, on chore/own`).
+        chosen = preferred[-1]
+    elif preferred:
+        chosen = preferred[0]
+    elif paragraph_branch and paragraph_branch in pool:
+        chosen = paragraph_branch
+    else:
+        chosen = pool[0]
+    return chosen, stated_base(rest, chosen)
 
 
 # A recorded merge ties `merged` to the PR mark itself, as in `(PR 78, merged)`
@@ -926,10 +991,19 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text
             if any(task.get("owner") == step["n"] for task in open_tasks):
                 step_names[step["n"]] = _suggest(slug, step["body"], used_names)
 
+    paragraph = paragraph_branches(tasks_text)
+    done_branches = set()
+    for task in open_tasks:
+        if task["done"] or task_records_merge(task):
+            name, _base = task_line_choice(task, paragraph.get(task["id"]))
+            if name:
+                done_branches.add(name)
+
     resolved = {}
     offers = {}
     for task in open_tasks:
-        line_name, line_base = task_line_choice(task)
+        avoid = None if (task["done"] or task_records_merge(task)) else done_branches
+        line_name, line_base = task_line_choice(task, paragraph.get(task["id"]), avoid)
         step_name = step_names.get(task.get("owner")) if mode == "steps" else None
         if line_name:
             planned, source, base = line_name, "task line", line_base
@@ -945,15 +1019,39 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text
         # The offer skips only a name git proves merged or deleted (1.152.0).
         # The task-line branch always wins over an invented name when git
         # cannot tell, or shows the tip is not in the base.
+        # An open task is never placed under a branch git proves merged when
+        # the task line or the Branches paragraph names another branch, and
+        # is never grouped under a done sibling's branch when it has its own
+        # name (1.153.0).
         if not task["done"]:
             fate = branch_fate(planned, spec_text, tasks_text, repo, base or line_base)
             if fate == "unchecked" and source == "task line" and planned in merged_branch_names(spec_text, tasks_text):
                 because = _why(planned, fate)
             elif fate in ("merged", "deleted"):
                 because = _why(planned, fate)
+                others = []
+                for name in branches_named_in_text(task.get("rest") or ""):
+                    if name != planned and name not in others:
+                        others.append(name)
+                para = paragraph.get(task["id"])
+                if para and para != planned and para not in others:
+                    others.insert(0, para)
+                picked_alt = None
+                for name in others:
+                    other_base = stated_base(task.get("rest") or "", name)
+                    other_fate = branch_fate(name, spec_text, tasks_text, repo, other_base)
+                    if other_fate not in ("merged", "deleted"):
+                        picked_alt = name
+                        break
                 alt = step_name if source == "task line" and step_name and step_name != planned else None
                 alt_fate = branch_fate(alt, spec_text, tasks_text, repo, None) if alt else None
-                if alt and alt_fate not in ("merged", "deleted", "unchecked"):
+                if picked_alt:
+                    chosen, offer_source, offer_base = (
+                        picked_alt,
+                        "task line",
+                        stated_base(task.get("rest") or "", picked_alt),
+                    )
+                elif alt and alt_fate not in ("merged", "deleted", "unchecked"):
                     chosen, offer_source, offer_base = alt, "build map", None
                 elif source == "task line" and fate != "deleted" and repo is None:
                     # Offline: keep the task-line branch; do not invent a name.
@@ -964,7 +1062,7 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text
                         slug,
                         task.get("rest") or task["title"],
                         used_names,
-                        {planned, alt},
+                        {planned, alt, picked_alt},
                         task_id=task["id"],
                     )
                     offer_source, offer_base = "new", line_base

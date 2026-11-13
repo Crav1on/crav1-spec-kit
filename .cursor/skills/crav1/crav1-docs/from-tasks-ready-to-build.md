@@ -64,7 +64,12 @@ Needs verify
 
 Done: 3
 
-Next: /crav1-build-walk T5 refund to the original card, because that work is on feat/orders-retry. /crav1-build-tasks builds one task without the walk.
+Run next:
+
+`/crav1-build-walk T5`
+branch feat/orders-retry, T5 refund to the original card
+
+/crav1-build-tasks builds one task without the walk.
 Source: docs/specs/cancel-booking/spec.md, plan.md, tasks.md, verify.md
 Build map: docs/specs/cancel-booking/build-map.md
 ```

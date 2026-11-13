@@ -44,7 +44,7 @@ Open each file below from this skill's folder and follow it. Read [open-skill-fi
 4. Open `../crav1-resolve-open-questions/SKILL.md` (`/crav1-resolve-open-questions`).
 5. Open `../crav1-plan-from-spec/SKILL.md` (`/crav1-plan-from-spec`), which writes `plan.md` and `tasks.md`.
 6. Open `../crav1-review-plan/SKILL.md` (`/crav1-review-plan`), then Open `../crav1-tighten-plan/SKILL.md` (`/crav1-tighten-plan`). A spec-tagged finding is one jump-back card, then the walk continues. The rule is in [references/steps.md](references/steps.md) (1.135.0).
-7. Ready check. Run `<interpreter> -X utf8 scripts/walk_progress.py readiness --root <spec-folder> --write-map`, as `crav1-docs/reference/running-scripts.md` says, and print the script's `ending`. That rewrites `build-map.md`. Do not open `../crav1-tasks-ready-to-build/SKILL.md`. `/crav1-tasks-ready-to-build` stays the standalone command. This walk never writes `verify.md`.
+7. Ready check. Run `<interpreter> -X utf8 scripts/walk_progress.py readiness --root <spec-folder> --brief --write-map`, as `crav1-docs/reference/running-scripts.md` says, and print the script's `ending`. That rewrites `build-map.md`. Do not open `../crav1-tasks-ready-to-build/SKILL.md`. `/crav1-tasks-ready-to-build` stays the standalone command. This walk never writes `verify.md`.
 
 A step with nothing to do says so, records that, and moves on. Optional offers are not steps. They are offered once, after open questions, when any apply. They are named in [references/steps.md](references/steps.md). After the plan, questions that still have no `Blocks:` line are offered there too, before that step is recorded.
 

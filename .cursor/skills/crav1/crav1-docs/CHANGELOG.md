@@ -2,6 +2,16 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.153.0 (2026-11-13)
+
+The ready check keeps an open task on its own branch, prints one Run next block, and stays short enough to read. A minor release because the map, the ending, and the script output all change.
+
+- **Task-line branch.** The branch on the task line, or beside that T# in a leading Branches paragraph, is the map row for an open task even when it shares a plan step with a done task on an already-merged branch. An open task is never placed under a branch git proves merged, or under a done sibling's branch, when another name is written for it. Held lines use that same row.
+- **One Run next.** The ready-check ending has exactly one Run next block, at the top. The walk command appears only there. The bottom keeps Waiting lines and at most a one-line `/crav1-build-tasks` alternative, with no second copy of the command and no `Next:` line. The reply must print that block verbatim and must never write a `Next:` line of its own.
+- **Brief output.** `walk_progress.py readiness --root <folder> --brief` prints only the result, a counts row, the ending, and claim warnings, under 8 KB for a 45-task slice. `--full` (the default) still prints the complete JSON. The ready check calls the brief form. `build_map.py` with no flag still prints only the one-line path of the file it wrote.
+- **Open-question count.** The Waiting line counts only tasks whose hold is itself an open question or an approval, and names only the people on those questions. A task that waits on another task is not counted there.
+- **Orphan verify row.** A `verify.md` table row for a T# that is not in `tasks.md` is one Waiting line naming that T#, and the fix is `/crav1-verify-build-against-spec` or tighten. Report only; the check does not edit `verify.md`.
+
 ## 1.152.0 (2026-11-13)
 
 The ready check keeps the branch on the task line, and its printed commands work in a new session. A minor release because the map, the Next lines, and the script commands a ready check runs all change.
@@ -136,14 +146,5 @@ A merge no longer stops when `walk-progress.md` conflicts only on version lines.
 - **Restamp rule.** The script takes the upstream text. `Done`, `Result`, and every other recorded line stay. A hash line becomes the merged file's normalized hash only when at least one side's recorded hash matches that side's file, and every matching side differs from the merged file only by progress (line endings, and for `spec.md` and `tasks.md` a checkbox or a `(PR n)` or `(done)` mark). Otherwise the upstream hash stays, so a real edit still reopens the steps that edit affects. When every hash on the step is that merged hash, the line `Content stamp: normalized` is written. An older step with no such line still matches a progress-only edit.
 - **Mixed conflicts.** A hunk that also touches `Done`, `Result`, a finding, or any other recorded line is not rewritten. The run names the stamp-only hunks and the other hunks and offers `settle stamps`. That rewrites only the stamp hunks and leaves the rest. The merge is not committed, and nothing is pushed.
 - **Script.** `walk_progress.py resolve-stamps --root <spec-folder> --yes`. It is line-ending neutral. On a full settle it `git add`s the file into the merge commit this run was already going to make. It does not push.
-
-## 1.138.0 (2026-11-12)
-
-Recording progress no longer reopens the tighten-and-plan walk. A minor release because the stamp, the clear question, and the not-ready wording change.
-
-- **Progress is not content.** A task checkbox (`[ ]` / `[x]`), a `(PR n)` or `(done)` note on that task line, and `(PR n)` or a trailing `merged` on a Match `Branch:` line are ignored when the walk compares `spec.md` and `tasks.md`. CRLF and LF are the same text. The branch name, `(into …)`, `(spec branch)`, `(branch:)`, and `(map:)` still count. A sentence change, or a renamed branch, still reopens the steps that change affects.
-- **No clear question.** When those are the only edits, resume stays `keep`. The walk does not ask to clear steps. The next `record` writes `Content stamp: normalized` and refreshes the stored hashes. `Done` and `Result` stay. Resume itself does not rewrite the file.
-- **Older stamps.** A step with no `Content stamp` line still has the raw hash from that kit. An unchanged file matches. A progress-only edit matches too: raw bytes, then the other line ending, then one hash-undo over checkbox and `(PR n)` variants (the full set up to 16384, otherwise one line at a time, which covers one tick and added `(PR n)` marks), then `HEAD` once when that blob is the stored stamp. It does not walk git history. Two or more checkbox edits on a task list longer than 14 lines, when those bytes are not `HEAD`, still look like a content change until the next record writes the new line. Old files do not all reopen just because the hash moved.
-- **not-ready and can_start.** A hard hit (a reopened step, a jump-back question, Needs verify, an assumption) forces `not-ready` and can still list ready-bucket tasks in `can_start`. Those tasks are not a start. `because` names the reopened steps, or the question when a row holds the whole slice. A checkbox tick plus `(PR n)` on a branch line is not that hit. With open questions that hold some tasks and leave others free, the result stays `ready-partial`.
 
 The newest 15 releases are above. The full changelog is https://github.com/Crav1on/crav1-spec-kit/blob/main/CHANGELOG.md.

@@ -164,7 +164,8 @@ class EndingBlock(unittest.TestCase):
         ending = payload["ending"]
         self.assertEqual(payload["result"], "ready-partial")
         self.assertLess(ending.index("Run next:"), ending.index("Waiting:"))
-        self.assertLess(ending.index("Waiting:"), ending.rindex("`/crav1-build-walk"))
+        self.assertLess(ending.rindex("`/crav1-build-walk"), ending.index("Waiting:"))
+        self.assertEqual(ending.count("`/crav1-build-walk"), len(payload["run_lines"]))
         self.assertIn("/crav1-build-tasks builds one task without the walk.", ending)
         self.assertNotIn("Next: /crav1-build-walk", ending)
         self.assertIn("verify.md is behind tasks.md (T1)", ending)
