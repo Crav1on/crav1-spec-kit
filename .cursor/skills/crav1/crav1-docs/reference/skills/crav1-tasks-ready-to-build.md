@@ -52,6 +52,8 @@ Shows summary counts per slice, then Ready and Held grouped by build-map branch,
 
 1.151.0: the ready check fetches the specs repo before it reads. Behind or diverged, it stops and Run next is `git pull --no-rebase`. A task with an `In progress:` line in `claims.md` is held `in progress by <user> since <date>` and is not offered in Run next. A claim older than three days, or `Claim max age:`, warns and is never cleared on its own.
 
+1.152.0: a branch counts as merged only when git proves its tip is already in the base or the default branch. A future line such as `(PR 12) to be merged into develop` is not a recorded merge. When git cannot tell, the task-line branch stays. A fallback name is short and does not use a person's name. Next lines match Run next: the command alone in a code span, with the slug when `docs/specs` has several slices, and the branch and task on the next line. Task labels are never blank, and short names cut at a word boundary with an ellipsis. `task_order.py` prints short labels unless `--full` is passed. `M can start now` counts only ready branches. `approval_needed.py`, `question_blocks.py`, and `task_order.py` accept a spec folder or a file. A missing file is a one-line error. `question_blocks.py` exits 0 when questions are found. Skills that document `scripts/repo_sync.py` or `scripts/claims.py` ship a wrapper to the build-walk copy.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.

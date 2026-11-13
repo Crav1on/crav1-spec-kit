@@ -22,6 +22,8 @@ A task that needs code from an unmerged branch is cut from that branch. The prog
 
 1.151.0: before the walk reads the spec folder it fetches the specs repo. Behind or diverged, it stops and Run next is `git pull --no-rebase`. When it starts on a branch it writes `In progress:` in `docs/specs/<slug>/claims.md` and, after yes, commits and pushes only that file. The ready check holds those tasks as `in progress by <user> since <date>` and does not offer them in Run next. At the end, or on stop, it commits the files it wrote and pushes the specs repo after yes. `release claim` clears the claim. A claim older than three days, or `Claim max age:`, warns and is never cleared on its own.
 
+1.152.0: a mid-walk stop, such as before a merge step, does not clear the claim. The claim is cleared when the branch is merged or ticked, or the user says stop and is done with this walk, or `release claim`. A later ready check in a new session still holds that task as in progress.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.

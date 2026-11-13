@@ -236,10 +236,9 @@ class NeverRecommendMerged(unittest.TestCase):
         self.assertIsNone(bw.refuse_unusable(CLEANUP, "deleted"))
         self.assertEqual(bw.refuse_unusable(BRANCH, "ok"), BRANCH)
         fate = bm.branch_fate(CLEANUP, spec, tasks, None, BASE)
-        self.assertEqual(fate, "merged")
-        forced = dict(offer)
-        forced["fate"] = fate
-        self.assertIsNone(bw.refuse_unusable(CLEANUP, forced["fate"]))
+        # Offline: a recorded merge is not proof, so the name is not skipped.
+        self.assertEqual(fate, "unchecked")
+        self.assertEqual(bw.refuse_unusable(CLEANUP, fate), CLEANUP)
 
     def test_a_recorded_merge_on_the_only_name_is_not_offered(self):
         spec = (
@@ -249,9 +248,10 @@ class NeverRecommendMerged(unittest.TestCase):
         plan = "# Plan\n\n## Approach\n\n1. One commit cleanup on main. (T1)\n"
         tasks = "- [ ] T1: Clean the commit on feat/orders-one-commit-cleanup-main\n"
         offer = bw.offer_for("orders", spec, plan, tasks, 1)
-        self.assertNotEqual(offer["name"], CLEANUP)
+        # No git proof: keep the task-line branch and say so.
+        self.assertEqual(offer["name"], CLEANUP)
         self.assertTrue(offer["name"])
-        self.assertIn("already merged", offer.get("because") or "")
+        self.assertIn("could not check whether", offer.get("because") or "")
 
 
 class RunsLive(unittest.TestCase):

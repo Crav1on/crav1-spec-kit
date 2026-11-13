@@ -30,6 +30,8 @@ Clear the claim, then commit and push `claims.md` after one yes, when:
 - the user says `stop` and is done with this walk
 - the user says `release claim`
 
+A mid-walk stop, such as before a merge step, does not clear the claim.
+
 `<interpreter> -X utf8 scripts/claims.py clear --root <spec-folder> --branch <branch>` clears that branch. Add `--tasks T27` to clear one task.
 
 Normalized content stamps ignore `In progress:` and `Claim max age:` lines.

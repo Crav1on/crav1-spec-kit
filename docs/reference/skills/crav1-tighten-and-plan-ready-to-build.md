@@ -54,6 +54,8 @@ The progress file is `docs/specs/<slug>/walk-progress.md`. It records the step, 
 
 1.151.0: the walk fetches the specs repo before it reads. Behind or diverged, it stops and Run next is `git pull --no-rebase`. A task with an `In progress:` line in `claims.md` is left unchanged, and the walk says once which claimed tasks were kept. The ready check holds those tasks as `in progress by <user> since <date>` and does not offer them in Run next. A claim older than three days, or `Claim max age:`, warns and is never cleared on its own.
 
+1.152.0: the ready check's Next lines match Run next, and `M can start now` counts only ready branches. `scripts/repo_sync.py` and `scripts/claims.py` in this skill are thin wrappers to the build-walk copies. A mid-walk stop does not clear a claim.
+
 ## Runs when
 
 A spec should be tightened and planned until it is ready to build. Called by the user.

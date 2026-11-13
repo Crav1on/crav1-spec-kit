@@ -17,10 +17,14 @@ A Risk matches a question on the question's first sentence, on an explicit
 tasks. A Risk that uses the phrase and matches no question blocks the slice;
 `because` is "no matching question".
 
-Usage: question_blocks.py <spec.md> [plan.md] [tasks.md]
-Prints JSON. Standard library only. Writes nothing. The ready check passes
-resolve_recorded when that step is already in walk-progress.md. This command
-does not, so a question that names no task still holds the slice.
+Usage: question_blocks.py <spec.md-or-spec-folder> [plan.md] [tasks.md]
+A folder argument uses <folder>/spec.md, and sibling plan.md and tasks.md
+when those arguments are omitted. Prints JSON. Exit 0 on success, including
+when questions are found. Exit 2 when a file is missing or cannot be read.
+Nonzero only for a real error. Standard library only. Writes nothing. The
+ready check passes resolve_recorded when that step is already in
+walk-progress.md. This command does not, so a question that names no task
+still holds the slice.
 """
 import difflib
 import hashlib
@@ -352,16 +356,73 @@ def _emit(text):
         sys.stdout.flush()
 
 
+def _as_file(path, name):
+    """A folder uses <folder>/<name>. A missing file is a one-line error."""
+    import pathlib
+    target = pathlib.Path(path)
+    if target.is_dir():
+        target = target / name
+    if not target.is_file():
+        return None, f"{name} not found: {target}"
+    return target, None
+
+
+def _read_or_empty(path):
+    import pathlib
+    target = pathlib.Path(path)
+    if not target.is_file():
+        return ""
+    try:
+        return target.read_text(encoding="utf-8")
+    except OSError:
+        return ""
+
+
 def main(argv):
     _utf8_stdout()
     if not argv or argv[0] in ("-h", "--help"):
         _emit(__doc__ or "")
         return 0
-    spec = open(argv[0], encoding="utf-8").read()
-    plan = open(argv[1], encoding="utf-8").read() if len(argv) > 1 else ""
+    spec_path, err = _as_file(argv[0], "spec.md")
+    if err:
+        _emit(err + "\n")
+        return 2
+    try:
+        spec = spec_path.read_text(encoding="utf-8")
+    except OSError:
+        _emit(f"cannot read {spec_path}\n")
+        return 2
+    plan = ""
     task_ids = None
+    if len(argv) > 1:
+        plan_path, err = _as_file(argv[1], "plan.md")
+        if err:
+            _emit(err + "\n")
+            return 2
+        try:
+            plan = plan_path.read_text(encoding="utf-8")
+        except OSError:
+            _emit(f"cannot read {plan_path}\n")
+            return 2
+    else:
+        plan = _read_or_empty(spec_path.parent / "plan.md")
     if len(argv) > 2:
-        task_ids = task_ids_from_tasks(open(argv[2], encoding="utf-8").read())
+        tasks_path, err = _as_file(argv[2], "tasks.md")
+        if err:
+            _emit(err + "\n")
+            return 2
+        try:
+            task_ids = task_ids_from_tasks(tasks_path.read_text(encoding="utf-8"))
+        except OSError:
+            _emit(f"cannot read {tasks_path}\n")
+            return 2
+    else:
+        sibling = spec_path.parent / "tasks.md"
+        if sibling.is_file():
+            try:
+                task_ids = task_ids_from_tasks(sibling.read_text(encoding="utf-8"))
+            except OSError:
+                task_ids = None
     _emit(json.dumps(analyse(spec, plan, task_ids=task_ids), ensure_ascii=False, indent=1) + "\n")
     return 0
 

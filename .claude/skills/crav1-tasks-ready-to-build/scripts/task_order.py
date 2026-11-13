@@ -19,8 +19,11 @@ tasks leave Ready and are listed under Waiting, in progress, as
 `in progress by <user> since <date>`. They are never a Next. A claim is not
 cleared here.
 
-Usage: task_order.py <tasks.md> [--failed T7,T9] [--json]
-Standard library only. Prints nothing secret; reads only the file it is given and a sibling spec.md.
+Usage: task_order.py <tasks.md-or-spec-folder> [--failed T7,T9] [--json] [--full]
+A folder uses <folder>/tasks.md. Default output is short labels (T# plus a
+short title). Pass --full for the complete title. Exit 0 on success, 2 when
+the file is missing or cannot be read. Standard library only. Prints nothing
+secret; reads only the file it is given and a sibling spec.md.
 """
 import json
 import pathlib
@@ -45,6 +48,9 @@ _utf8_stdout()
 TASK = re.compile(r"^\s*- \[( |x|X)\] T(\d+)\b[:.]?\s*(.*)$")
 AFTER = re.compile(r"\(after:\s*([^)]*)\)")
 BRANCH_MARK = re.compile(r"\((?:branch|map):\s*([^)]+)\)", re.I)
+BRANCH_NAME = re.compile(
+    r"\b((?:feature|feat|hotfix|bugfix|fix|spec|chore|bug)/[A-Za-z0-9][A-Za-z0-9._/-]*)"
+)
 
 
 def branch_token(value):
@@ -53,9 +59,41 @@ def branch_token(value):
     return parts[-1].strip("`.,;:") if parts else ""
 
 
+def first_words(rest):
+    """First readable words of a task line. Never blank."""
+    text = re.sub(r"\s*\((verify|spec|after|branch|step|map):[^)]*\)", " ", rest or "")
+    text = re.sub(r"\s*\(PR\s+\d+[^)]*\)", " ", text, flags=re.I)
+    text = BRANCH_NAME.sub(" ", text)
+    text = re.sub(r"`+", " ", text)
+    text = re.sub(r"\s+", " ", text).strip(" ,;.:")
+    return text or "work"
+
+
+def short_title(title, limit=60):
+    """A short label for default CLI output. Cut at a word boundary with an ellipsis."""
+    text = re.sub(r"\s+", " ", title or "").strip()
+    if not text:
+        return "work"
+    if len(text) <= limit:
+        return text
+    cut = text[:limit]
+    if " " in cut:
+        cut = cut.rsplit(" ", 1)[0]
+    cut = cut.rstrip(" ,;.") or text[:limit].rstrip()
+    return cut + "..." if cut != text else cut
+
+
+_PR_MERGED = re.compile(r"\(PR\s+\d+\s*(?:,\s*merged|merged|\)\s*merged)\b", re.I)
+
+
 def pr_merged(text):
-    """A pull request recorded on this line is merged. Local text only."""
-    return bool(re.search(r"\(PR\s+\d+", text or "", re.I) and re.search(r"\bmerged\b", text or "", re.I))
+    """A pull request recorded on this line is merged. Local text only.
+
+    The word `merged` must sit on the PR mark, as in `(PR 78, merged)` or
+    `(PR 78) merged`. A future line such as `(PR 12) to be merged into
+    develop` is not a recorded merge.
+    """
+    return bool(_PR_MERGED.search(text or ""))
 
 
 def merged_branch_names(spec_text):
@@ -113,7 +151,12 @@ def parse(text):
             deps = [prev] if prev is not None else []
             recorded = False
         title = re.sub(r"\s*\((verify|spec|after|branch|step|map):[^)]*\)", "", rest)
-        title = re.sub(r"\s*\(PR\s+\d+[^)]*\)", "", title, flags=re.I).strip()
+        title = re.sub(r"\s*\(PR\s+\d+[^)]*\)", "", title, flags=re.I)
+        title = BRANCH_NAME.sub(" ", title)
+        title = re.sub(r"`+", " ", title)
+        title = re.sub(r"\s+", " ", title).strip(" ,;.:")
+        if not title:
+            title = first_words(rest)
         tasks.append({"id": num, "done": m.group(1) != " ", "title": title, "deps": deps, "recorded": recorded})
         prev = num
     return tasks
@@ -234,8 +277,10 @@ def _split_blocked(blocked):
     return waits, blockers
 
 
-def _wait_line(row):
+def _wait_line(row, full=False):
     title = (row.get("title") or "").strip()
+    if title and not full:
+        title = short_title(title)
     if title:
         return f"- T{row['id']} {title}: {row['reason']}"
     return f"- T{row['id']}: {row['reason']}"
@@ -416,24 +461,29 @@ def apply_claim_holds(res, tasks, claims_text, now=None):
     return res
 
 
-def render(res):
+def render(res, full=False):
     waits, blockers = _split_blocked(res["blocked"])
+
+    def shown(title):
+        text = (title or "").strip() or "work"
+        return text if full else short_title(text)
+
     out = ["Ready (dependency order)"]
-    out += [f"- T{r['id']}: {r['title']}" for r in res["rows"] if r["ready"]] or ["- none"]
+    out += [f"- T{r['id']}: {shown(r['title'])}" for r in res["rows"] if r["ready"]] or ["- none"]
     out.append("Waits in order (dependency order)")
-    out += [_wait_line(r) for r in waits] or ["- none"]
+    out += [_wait_line(r, full=full) for r in waits] or ["- none"]
     approvals = res.get("waiting_on_approval") or []
     if approvals:
         out.append("Waiting on approval")
         for row in approvals:
-            title = (row.get("title") or "").strip()
+            title = shown(row.get("title"))
             label = f"T{row['id']} {title}".strip()
             out.append(f"- {label}: {row['reason']}")
     in_progress = res.get("waiting_in_progress") or []
     if in_progress:
         out.append("Waiting, in progress")
         for row in in_progress:
-            title = (row.get("title") or "").strip()
+            title = shown(row.get("title"))
             label = f"T{row['id']} {title}".strip()
             out.append(f"- {label}: {row['reason']}")
     out.append("Blocked (dependency order)")
@@ -441,7 +491,7 @@ def render(res):
     needs = res.get("needs_tick") or []
     if needs:
         out.append("Needs tick")
-        out += [f"- T{r['id']}: {r['title']}" for r in needs]
+        out += [f"- T{r['id']}: {shown(r['title'])}" for r in needs]
     out.append("Order: " + " → ".join(f"T{n}" for n in res["order"]))
     out.append(f"Next: T{res['next']}" if res["next"] else "Next: none ready")
     for k, v in res["depends_on_failed"].items():
@@ -490,28 +540,69 @@ def emit_text(text):
         sys.stdout.flush()
 
 
+def _as_file(path, name):
+    """A folder uses <folder>/<name>. A missing file is a one-line error."""
+    target = pathlib.Path(path)
+    if target.is_dir():
+        target = target / name
+    if not target.is_file():
+        return None, f"{name} not found: {target}"
+    try:
+        return target, None
+    except OSError as exc:
+        return None, f"cannot read {target}: {exc}"
+
+
 def main(argv):
     _utf8_stdout()
     if not argv or argv[0] in ("-h", "--help"):
         emit_text(__doc__ or "")
         return 0
     failed = []
-    if "--failed" in argv:
-        failed = [int(x) for x in re.findall(r"\d+", argv[argv.index("--failed") + 1])]
-    tasks_path = pathlib.Path(argv[0])
-    text = tasks_path.read_text(encoding="utf-8")
+    flags = set()
+    positional = []
+    i = 0
+    while i < len(argv):
+        if argv[i] == "--failed" and i + 1 < len(argv):
+            failed = [int(x) for x in re.findall(r"\d+", argv[i + 1])]
+            i += 2
+            continue
+        if argv[i] in ("--json", "--full"):
+            flags.add(argv[i])
+            i += 1
+            continue
+        positional.append(argv[i])
+        i += 1
+    if not positional:
+        emit_text("tasks.md not found: (no path given)")
+        return 2
+    tasks_path, err = _as_file(positional[0], "tasks.md")
+    if err:
+        emit_text(err)
+        return 2
+    try:
+        text = tasks_path.read_text(encoding="utf-8")
+    except OSError:
+        emit_text(f"cannot read {tasks_path}")
+        return 2
     spec_path = tasks_path.parent / "spec.md"
-    spec_text = spec_path.read_text(encoding="utf-8") if spec_path.is_file() else ""
+    try:
+        spec_text = spec_path.read_text(encoding="utf-8") if spec_path.is_file() else ""
+    except OSError:
+        spec_text = ""
     parsed = parse(text)
     res = analyse(parsed, failed, merged_ids(text, spec_text))
     apply_approval_holds(res, parsed, spec_text)
     claims_path = tasks_path.parent / "claims.md"
-    claims_text = claims_path.read_text(encoding="utf-8") if claims_path.is_file() else ""
+    try:
+        claims_text = claims_path.read_text(encoding="utf-8") if claims_path.is_file() else ""
+    except OSError:
+        claims_text = ""
     apply_claim_holds(res, parsed, claims_text)
-    if "--json" in argv:
+    if "--json" in flags:
         emit_text(json.dumps(public(res), ensure_ascii=False, indent=1))
     else:
-        emit_text(render(res))
+        emit_text(render(res, full="--full" in flags))
     return 0
 
 

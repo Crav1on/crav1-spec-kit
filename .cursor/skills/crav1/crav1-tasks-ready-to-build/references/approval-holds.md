@@ -13,4 +13,4 @@ An item under `## Approval needed` names the person (`Person:`), what they appro
 
 Other tasks still start. The result is `ready-partial` when some can start and some are held, and `not-ready` only when nothing can start. The ready check does not tick the task. A live `apply` still needs the user's own yes in that build run.
 
-When Python runs, `scripts/approval_needed.py <spec.md>` (skill `crav1-record-approval`) prints the items. `walk_progress.py readiness --root <spec-folder>` applies them. `task_order.py` lists the same tasks under Waiting on approval.
+When Python runs, `scripts/approval_needed.py <spec.md-or-spec-folder>` (skill `crav1-record-approval`) prints the items. A folder uses `<folder>/spec.md`. A missing file is a one-line error and a nonzero exit. `walk_progress.py readiness --root <spec-folder>` applies them. `task_order.py` lists the same tasks under Waiting on approval.

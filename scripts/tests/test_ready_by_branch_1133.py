@@ -138,11 +138,18 @@ class ReadyByBranch(unittest.TestCase):
             '- `feat/orders-api-currency` (wave 1): T3 Choose the currency — open question "Which currency for refunds?" Waiting for the partner.',
             "- `feat/orders-api-archive` (wave 2): T4 Archive the receipt — held, waits on T3",
         ])
-        self.assertEqual(payload["next_lines"], [
-            "Next: /crav1-build-walk T2 Record the decision, T5 Store the card, because that work is on feat/orders-api-record. /crav1-build-tasks builds one task without the walk.",
-            "Next: /crav1-build-walk T6 Email the receipt, because that work is on feat/orders-api-export. /crav1-build-tasks builds one task without the walk.",
-        ])
+        self.assertEqual(
+            payload["next_lines"],
+            [
+                line + "\n/crav1-build-tasks builds one task without the walk."
+                for line in payload["run_lines"]
+            ],
+        )
         self.assertEqual(payload["next"], "\n".join(payload["next_lines"]))
+        self.assertIn("`/crav1-build-walk", payload["next_lines"][0])
+        self.assertIn("branch feat/orders-api-record, T2 Record the decision, T5 Store the card", payload["next_lines"][0])
+        self.assertIn("branch feat/orders-api-export, T6 Email the receipt", payload["next_lines"][1])
+        self.assertNotIn("Next: /crav1-build-walk", payload["next"])
         self.assertEqual(payload["line"], "Ready now\n" + "\n".join(payload["ready_lines"] + ["Held"] + payload["held_lines"]))
         for line in payload["ready_lines"] + payload["held_lines"]:
             self.assertRegex(line, r"T\d+ \S")
@@ -174,10 +181,16 @@ class ReadyByBranch(unittest.TestCase):
         self.assertEqual(payload["ready_lines"], [
             "- `feat/orders-api-record` (wave 1): T1 Record the decision; T2 Store the card",
         ])
-        self.assertEqual(payload["next_lines"], [
-            "Next: /crav1-build-walk T1 Record the decision, T2 Store the card, because that work is on feat/orders-api-record. /crav1-build-tasks builds one task without the walk.",
-        ])
-        self.assertEqual(payload["next"].count("\n"), 0)
+        self.assertEqual(
+            payload["next_lines"],
+            [
+                line + "\n/crav1-build-tasks builds one task without the walk."
+                for line in payload["run_lines"]
+            ],
+        )
+        self.assertIn("`/crav1-build-walk", payload["next_lines"][0])
+        self.assertIn("branch feat/orders-api-record, T1 Record the decision, T2 Store the card", payload["next_lines"][0])
+        self.assertNotIn("Next: /crav1-build-walk", payload["next"])
 
     def test_a_task_that_waits_in_order_is_not_on_the_next_line(self):
         tasks = """# Tasks
@@ -193,10 +206,16 @@ class ReadyByBranch(unittest.TestCase):
         self.assertEqual(payload["ready_lines"], [
             "- `feat/orders-api-record` (wave 1): T1 Record the decision",
         ])
-        self.assertEqual(payload["next_lines"], [
-            "Next: /crav1-build-walk T1 Record the decision, because that work is on feat/orders-api-record. /crav1-build-tasks builds one task without the walk.",
-        ])
+        self.assertEqual(
+            payload["next_lines"],
+            [
+                line + "\n/crav1-build-tasks builds one task without the walk."
+                for line in payload["run_lines"]
+            ],
+        )
+        self.assertIn("branch feat/orders-api-record, T1 Record the decision", payload["next_lines"][0])
         self.assertNotIn("T2", payload["next"])
+        self.assertNotIn("Next: /crav1-build-walk", payload["next"])
 
 
 class MapShowsTaskIds(unittest.TestCase):
