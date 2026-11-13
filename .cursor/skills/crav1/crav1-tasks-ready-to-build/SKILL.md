@@ -32,7 +32,13 @@ Every run, rebuild `docs/specs/<slug>/build-map.md` with `scripts/build_map.py`.
 
 Per slice, read only: `spec.md` (`## Open questions` and their indented lines), `plan.md` (the `Reviewed:` line and `## Risks`), `tasks.md`, and `verify.md` when it exists. Nothing else, except read-only local git for the Branches line below. Never read Azure Boards (ADO) or any network source.
 
-**Branches (1.64.0).** When the slice has work branches (`Synced at` lines, Match `Branch:` entries, and `(branch: …)`, minus base branches and `(dropped)` entries), add the Branches line under the counts from skill `crav1-add-to-spec`, `references/branches.md` (local git only: contained, or the same change by `git cherry`). No host check here, so a squash merge can show as not merged; say `squash merges are checked by /crav1-help status`. A shared branch gets `(also in <slug>)`. **Sub-branches and reverts (1.68.0)** use `(into <spec branch>)`, and **Promotion (1.69.0)** reads `docs/environments/promotion.md`. Both are that same file, under those headings. Report only. They do not change readiness or the Done count. The choice word `pipeline runs` runs the promotion check; headless without it gives the git answer plus `Pipeline runs not checked. Add the word: pipeline runs.` When the slice has `work-item.md`, add one line: task states in Azure Boards are not read here; `/crav1-ado-sync` brings them back.
+Read `references/work-branches.md` ("Work branches") only when the slice has work branches (`Synced at` lines, Match `Branch:` entries, or `(branch: …)`, minus base branches and `(dropped)` entries).
+
+Read `references/sub-branches.md` ("Sub-branches and reverts") only when a branch entry has `(into <spec branch>)`, or a merged change was later undone on the base.
+
+Read `references/promotion.md` ("Promotion") only when `docs/environments/promotion.md` exists, or the invocation has `pipeline runs`.
+
+Read `references/work-item-line.md` ("Work item") only when the slice has `work-item.md`.
 
 ## Rules, in order
 
@@ -46,7 +52,7 @@ Check each task in this order and stop at the first rule that decides it. Every 
    - A kept-open question under `## Open questions` (no `Answered:` line) with `Blocks: T#` that names this task: waiting on a question, `open question "<short question>" (recorded)`. Who comes first from the question's own "Waiting for <who>" phrase, then the latest `Pending:` or `Asked:` line. When neither names anyone, say not named yet.
    - `Blocks: none`, optionally `Blocks: none (later phase)`: this question blocks no task (recorded).
    - No `Blocks:` line (1.137.0): [references/question-holds.md](references/question-holds.md). A `T#` in the text that exists in `tasks.md` is the hold, noted inferred from the text. The whole slice is held only when no task is named and resolve-open-questions has never been recorded.
-   - A line under `## Risks` in `plan.md` that says do not implement until resolved blocks every unticked task, `plan Risk "<short risk>" blocks the whole slice (inferred)`, only when that risk is not about a question that already has a `Blocks:` line. Any `Blocks:` line wins over that wording, including `Blocks: none`. The risk matches its question on the question's first sentence, on `(question: <first words>)`, or when the risk names the same `Blocks` tasks. A risk that uses the phrase and matches no question still blocks the slice.
+   - Read `references/risk-blocks.md` ("Plan risk blocks") only when a line under `## Risks` in `plan.md` says do not implement until resolved. Any `Blocks:` line wins over that wording, including `Blocks: none`.
 4. **Dependencies.**
    - The task line has `(after: T1, T3)`: waits in order while any of those is unticked, `waits on T1 (recorded)`. A named task that does not exist is blocked, `after: T9 names no task (recorded)`.
    - No `(after: …)`: the task waits in order on the task just before it in `tasks.md` (the first task waits on nothing). Waits in order while that one is unticked, `waits on T2 (inferred)`.
@@ -112,9 +118,9 @@ Build map: docs/specs/<slug>/build-map.md
 - **Result (1.132.0)** is `ready` when the tasks that are not done can start or only wait in order, `ready-partial` when some can start now and some are held, and `not-ready` when nothing can start. The walk record stays `Result: ready-partial`. A cycle, a missing task, no plan, Needs verify, or a plan-review warning still records `not-ready`.
 - **Order** shows the slice's unticked tasks in dependency order, `|` between tasks of the same wave. One Order line per slice when listing all specs. The Order line keeps task ids.
 - **Next** is the script's `next_lines` when the result is `ready` or `ready-partial`: `/crav1-build-walk`, and `/crav1-build-tasks` builds one task without the walk. See `run-ending.md`. Do not run it.
-- Nothing is ready, and an open question blocks the first task: `Next: /crav1-resolve-open-questions <slug>, because that question blocks the first task.`
-- Only Needs verify is left: `Next: /crav1-verify-build-against-spec <slug>, because the built tasks are not verified yet.`
-- Nothing is left to build or verify: `Next: nothing needed now.`
+- Read `references/next-question.md` ("Question blocks the first task") only when nothing is ready and an open question blocks the first task.
+- Read `references/next-verify.md` ("Only needs verify") only when only Needs verify is left.
+- Read `references/next-nothing.md` ("Nothing left") only when nothing is left to build or verify.
 - **Source** names every file it read, per slice.
 - **Build map** is one line per slice, the path the script just wrote. The task list above it is unchanged.
 - **verify.md behind (1.136.0).** When `verify_behind` is true, print `verify_waiting`. A verify-only change does not force `not-ready`. This command does not restamp `walk-progress.md` and does not write `verify.md`. The rule is [references/verify-behind.md](references/verify-behind.md).
@@ -130,4 +136,4 @@ Build map: docs/specs/<slug>/build-map.md
 ## Choice words (1.69.0)
 
 - Build map: `build-map` (show only the build map; the words after it are the scope, same as this command with no word, such as `cc 1.0`). The task list stays off. There are no `--flags`.
-- Pipeline runs: `pipeline runs` (check the latest successful Azure DevOps runs behind the Promotion line without asking). There are no `--flags`.
+- Pipeline runs: `pipeline runs`. Read `references/promotion.md` ("Promotion") only when the invocation has that word. There are no `--flags`.

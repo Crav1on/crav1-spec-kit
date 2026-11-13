@@ -2,6 +2,17 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.149.0 (2026-11-13)
+
+Branch rules stay in the kit and load only when that case applies. A minor release because a typical run no longer reads the cases that do not apply. The rules are unchanged. Each file is named from `SKILL.md` with a load-when line. `/crav1-review-pr` is unchanged: its verdict and hard rules are what a review still reads, and the host differences are already one-line pointers.
+
+- **Ready check.** `/crav1-tasks-ready-to-build` reads work branches, a sub-branch, promotion, a work item, a blocking plan risk, and a next line other than the ready list only when that case is true.
+- **Verify.** `/crav1-verify-build-against-spec` reads the branch line, sub-branches, promotion, tick pending, a host-setup task, and one next line only when that case is true.
+- **Several features.** `/crav1-build-features` opens the spec-branch skill only on `spec/<slug>`, and the task-branch file only when the recommended name exists nowhere. A dirty tree, a parked spec, a worker status other than `done`, and the picture question are separate files.
+- **What we know.** `/crav1-what-do-we-know-about-this` reads the no-slice file only when nothing matches, and the report-writes file only for a `report-` word.
+- **Commit.** `/crav1-finalize-commit` reads the commit steps only after `commit` or `commit now`.
+- **Questions.** `/crav1-resolve-open-questions` reads the patch, a single named question, a stale point, and the empty-list ending only when that case applies.
+
 ## 1.146.0 (2026-11-13)
 
 A recorded finding stays recorded when the words move a little, and the tighten-and-plan walk no longer opens the ready-to-build skill to write the map. A minor release because the finding card, the walk's first command, and the ready check change.

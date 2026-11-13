@@ -107,6 +107,8 @@ It does not show that `Next:` line from `verify.md`. `/crav1-tasks-ready-to-buil
 
 No commit, and no other file. The build map is the one file this command writes. `verify.md` stays with `/crav1-verify-build-against-spec`.
 
+Since 1.149.0, `/crav1-tasks-ready-to-build` keeps the task rules in its skill file and reads a references file only when that case applies: work branches, a sub-branch, promotion, a work item, a plan risk that blocks the slice, or a next line that is not the ready list.
+
 ## After
 
 The Next line recommends the build walk, with the T number beside the short name. `/crav1-build-tasks` builds one task without the walk:

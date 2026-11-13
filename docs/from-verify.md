@@ -62,6 +62,8 @@ When the spec's work sits on several branches, `/crav1-verify-build-against-spec
 
 A `(host setup)` task passes only when its script's `check` part, run now against the live host, prints `ok` for every setting. Verify never applies the script. See [Set up a host setting](from-host-setup.md).
 
+Since 1.149.0, `/crav1-verify-build-against-spec` reads the branch line, a sub-branch, promotion, a tick-pending row, a host-setup task, and the one next line only when that case applies. The pass, fail, and missing meanings stay in the skill file.
+
 ## After
 
 When the matrix is green: [From commit to merge](from-commit.md). When the spec itself was wrong, fix the spec first ([From a draft spec to an accepted spec](from-draft-spec.md)), then the plan, then build again.

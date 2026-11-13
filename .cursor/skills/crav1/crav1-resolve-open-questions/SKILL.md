@@ -67,21 +67,15 @@ Stop. Do not edit. Do not preview a full patched spec.
 
 ### After a choice
 
-1. Patch **only** this question.
-   - **Keep open:** leave the bullet. You may sharpen the wording if they asked; do not resolve it. When the slice has `tasks.md`, ask once which tasks it blocks, as options: each unticked `T#` (multi-select), **The whole slice**, or **None**. A pick of tasks writes one indented line under the question, `- Blocks: T2, T4`, replacing an earlier `Blocks:` line (see `crav1-add-to-spec` `references/open-questions.md`). **None** writes `- Blocks: none`, not nothing. Reason may follow. **The whole slice** writes `- Blocks: whole slice`, not nothing. `Blocks: none` blocks no current task. A missing `Blocks:` line is not this pick.
-   - **Answer:** fold the decision into the right place (requirement/journey/acceptance, `## Constraints`, non-goals/later, or a new/updated ADR). When the question had an `Answered:` line, keep that quote and its source with the decision. **Remove** it from Open questions, with its `Asked:`, `Pending:`, and `Answered:` lines (or mark the assumption resolved). Never remove an `Approved:` line. An acceptance line you add is yes/no. Name unit, system, or browser only when that kind is already obvious from the answer. Otherwise leave the kind for plan. Do not invent a test list.
-   - **Cut from v0:** move to non-goals/later; remove from Open questions.
-2. Recap **Added / Removed / Still open** for this `Q#`.
-3. If the answer makes a named diagram/ADR wrong, either they also chose `sync-here`, or the **next** item is that drift (do not silently skip).
-4. When this question was waiting on a stale research point, re-check that point. The question says so, or `## Research findings` names the point and this question. Follow the answered-later part of skill `crav1-add-to-spec`, `references/research-stale-clear.md`. Do not ask the user whether the point is settled. Keep open does not re-check. When the answer settles the point, record it and clear the mark when no point is open. When it does not, leave the mark and say why. Include that summary in the recap. Do not commit. Do not send anything.
-5. When the run named one question (`Q2`, `orders Q3`, or words matching one question), stop after it (1.90.5): do not show or ask another question. End with the still-open titles and one line: `Next: /crav1-resolve-open-questions <slug>, because other questions are still open.` Otherwise advance to the next unanswered `Q#`.
+Read `references/after-choice.md` ("After a choice") only when the user has picked a letter for the current question, or a batch of `Q#: letter` answers. Do not patch before that. **None** writes `- Blocks: none`. **The whole slice** writes `- Blocks: whole slice`. Never remove an `Approved:` line.
 
-If none remain, print one of these and not both.
+Read `references/stale-point.md` ("Stale research point") only when this question was waiting on a stale research point.
 
-- New gaps appeared: `Next: /crav1-tighten-spec <slug>, because new gaps are not tightened yet.`
-- No new gaps: `Next: /crav1-plan-from-spec <slug>, because the open questions are settled or kept open.`
+Read `references/one-question.md` ("One question") only when the run named one question (`Q2`, `orders Q3`, or words matching one question).
 
-**Batch (1.145.0).** Read **Batch of several items** in `crav1-docs/reference/question-cards.md` now. Print the findings table in this reply, then ask. Never write `table above` unless that table is in this reply. Never ask the card without the table. Hint: `Type your changes, e.g. Q1 A, Q3 keep`.
+Read `references/list-done.md` ("When the list is done") only when no questions or Conflict lines remain to walk.
+
+**Batch (1.145.0).** Read **Batch of several items** in `crav1-docs/reference/question-cards.md` only when one card applies a recommendation to several questions. Print the findings table in this reply, then ask. Never write `table above` unless that table is in this reply. Never ask the card without the table. Hint: `Type your changes, e.g. Q1 A, Q3 keep`.
 
 ## Resolution catalog (per question)
 
@@ -106,12 +100,6 @@ Do **not** offer a turn-level “answer all with assumptions.” Guessing is `as
 - Architecture answers go to Constraints or ADRs, not journeys.
 - Do not write application code. Do not start Plan Mode until they are done or they ask.
 - Do not patch “to be helpful” when they have not chosen.
+- Never remove an `Approved:` line.
 
-## When the list is done
-
-- Remaining items are only those they **kept open** (questions or Conflict lines), or the list is empty.
-- Kept-open items stay as the spec’s honest unknowns. `Next: nothing needed now.`
-- Empty list: `Next: /crav1-plan-from-spec <slug>, because the open questions are settled or kept open.`
-- Do not list export or an architecture review in the ending.
-
-End as [run-ending.md](../crav1-docs/reference/run-ending.md) says.
+End as [run-ending.md](../crav1-docs/reference/run-ending.md) says. The ending lines for an empty list are in `references/list-done.md`, read only when no questions or Conflict lines remain.

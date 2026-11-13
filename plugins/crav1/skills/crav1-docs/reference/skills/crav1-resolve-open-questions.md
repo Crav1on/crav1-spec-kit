@@ -8,6 +8,8 @@
 
 Walk Open questions and Conflict lines in spec.md one by one.
 
+1.149.0: the patch, a single named question, a stale research point, and the empty-list ending are references files, each read only when that case applies. The rules are unchanged.
+
 1.141.0: does not walk `## Approval needed` and does not remove an `Approved:` line. Folding an answer still removes that question's `Answered:` line.
 
 One Open question at a time; keep it open or answer with impact; patch only that question, found by its words (`Q#` is display only).

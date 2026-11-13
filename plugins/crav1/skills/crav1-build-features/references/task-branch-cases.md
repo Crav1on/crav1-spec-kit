@@ -1,0 +1,3 @@
+# Task branch cases
+
+A merged or deleted branch is not used. A name that is a base branch is `blocked` with `branch X is a base branch`; never switch to it. When the name exists nowhere, use the task-branch card once. Open `../crav1-create-feature-branch/references/task-branch.md` from this skill's folder. Do not invent a different recommended name, and do not create it without a yes. A name for another repo is `blocked` with `belongs to <repo>`. A worker `needs_yes` is waiting, not blocked. The task stays unticked. The parent offers the Approval needed item, as skill `crav1-build-tasks`, `references/approval-needed.md` says. It does not write `Approved:`.
