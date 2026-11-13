@@ -190,6 +190,19 @@ def task_label(task_id, short):
     return f"T{task_id} {name}"
 
 
+def ready_next_line(labels, branch_name):
+    """One Next for a ready branch (1.143.0).
+
+    Recommends the build walk, with the T number beside each short name.
+    Names build-tasks as the way to build one task without the walk.
+    """
+    named = ", ".join(labels)
+    return (
+        f"Next: /crav1-build-walk {named}, because that work is on {branch_name}. "
+        "/crav1-build-tasks builds one task without the walk."
+    )
+
+
 def short_name(rest, work_title=None):
     """A task's short name: its work-item title, else the text up to the first cut.
 
@@ -1221,8 +1234,11 @@ def report_by_branch(built, rows):
         held_lines.append(f"- `{group['branch']['name']}` ({_where(group['branch'])}): " + "; ".join(bits))
     next_lines = []
     for group in ready_groups:
-        ids = " ".join(f"T{task['id']}" for task, _row in group["items"])
-        next_lines.append(f"Next: /crav1-build-tasks {ids} (on `{group['branch']['name']}`)")
+        labels = [
+            task.get("label") or task_label(task["id"], task.get("short"))
+            for task, _row in group["items"]
+        ]
+        next_lines.append(ready_next_line(labels, group["branch"]["name"]))
     parts = []
     if ready_lines:
         parts.append("Ready now")

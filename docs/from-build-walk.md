@@ -19,7 +19,7 @@ A task id works too: `/crav1-build-walk T3`.
 | --- | --- | --- |
 | Branches | Pick one ready branch | When you start from a ready-to-build report, each ready branch is its own Next, with the T number beside the task name. One checkout follows one branch |
 | Build | Watch the diff | Opens `/crav1-build-tasks` for the tasks on that branch. A merged or deleted branch is not offered |
-| Runs live | `yes` before the live run, or stop | A `(Runs live)` task gets a script and a dry run (`check`) first. `yes` records `(live yes: person A, 2026-11-12)` and then runs it. Without `yes` the task stays unticked. An unapproved Approval needed item holds the task |
+| Runs live | `yes` before the live run, or stop | A `(Runs live)` task gets a script and a dry run (`check`) first. `yes` records `(live yes: person A, 2026-11-12)` and then runs it. Without `yes` the task stays unticked. An unapproved Approval needed item holds the task. When that yes is on record and the assistant's permission check refuses the command, Waiting says so and does not say the yes is missing. Run the exact command yourself, or allow that one command and rerun. Next is this walk after the command has run |
 | Verify | Read the report | Opens `/crav1-verify-build-against-spec` |
 | Commit | `yes` | Opens `/crav1-finalize-commit` |
 | Pull request | `yes` | Opens `/crav1-open-pr`. Own mode only |

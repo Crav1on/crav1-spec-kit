@@ -40,6 +40,8 @@ A range or all (was `/crav1-complete-tasks`): Orchestrates one worker per `T#` (
 
 1.137.0: tick-only ticks a recorded-merged or already-verified `[ ]` row whatever the ready-check result, including `not-ready`. It starts no worker and does not re-implement. A `not-ready` result still starts no worker for any other task. `scripts/resolve_spec.py` then accepts one unique ordered token subsequence (`cc 1.0` matches `cc-process-1-0`). Several matches are listed and the run stops. No match lists the nearest slugs.
 
+1.143.0: a live command the assistant's permission check refused, when the user's yes is already on record, is `permission_refused`, not `needs_yes`. Waiting says the yes is on record and the check blocked the command. The offer is to run that exact command, or allow that one command and rerun. Next is the build step again after the command has run. It does not suggest working around the check. `scripts/permission_block.py` distinguishes the two.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.

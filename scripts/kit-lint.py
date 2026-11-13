@@ -173,10 +173,17 @@ def _next_spans(text):
 
 
 def next_step_problems(path, text):
-    """A Next: instruction that names more than one distinct kit command."""
+    """A Next: instruction that names more than one distinct kit command.
+
+    Since 1.143.0 a ready Next line may also name /crav1-build-tasks in the
+    sentence "builds one task without the walk". That names the alternative,
+    not a second step. See docs/reference/run-ending.md.
+    """
     out = []
     for lineno, block in _next_spans(text):
         cmds = list(dict.fromkeys(CMD.findall(block)))
+        if "builds one task without the walk" in block and "/crav1-build-walk" in cmds:
+            cmds = [cmd for cmd in cmds if cmd != "/crav1-build-tasks"]
         if len(cmds) > 1:
             out.append(
                 f"{path}:{lineno}: Next: names {len(cmds)} steps ({', '.join(cmds)}); "

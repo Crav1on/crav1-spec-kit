@@ -25,7 +25,7 @@ Read [references/common.md](references/common.md) once. Then open only the file 
 - No branch is chosen, or the user started from a ready-to-build report: read [references/grouping.md](references/grouping.md). That start may print one Next per ready branch.
 - A `build-progress` file for this branch already exists: read [references/progress.md](references/progress.md). Resume reports the step. It does not start it.
 - The pull request author or a commit author is someone else: read [references/other-owner.md](references/other-owner.md) before any switch.
-- The task line has `(Runs live)`, or an Approval needed item holds it: read [references/live.md](references/live.md).
+- The task line has `(Runs live)`, or an Approval needed item holds it: read [references/live.md](references/live.md). A recorded yes that the assistant's permission check refused is not a missing yes (1.143.0).
 - A task needs code that is still only on an unmerged branch: read [references/stack.md](references/stack.md).
 - The step itself: read [references/steps.md](references/steps.md).
 

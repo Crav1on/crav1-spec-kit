@@ -110,7 +110,7 @@ class Registry(unittest.TestCase):
         ):
             self.assertIn(skill, new_slice)
         self.assertNotIn("crav1-tighten-and-plan-ready-to-build", new_slice)
-        self.assertIn("crav1-tighten-and-plan-ready-to-build: [/crav1-build-tasks]", workflow)
+        self.assertIn("crav1-tighten-and-plan-ready-to-build: [/crav1-build-walk, /crav1-build-tasks]", workflow)
         skills = (ROOT / "docs/reference/skills.yaml").read_text(encoding="utf-8")
         self.assertIn("Inside the walk it always runs.", skills)
         self.assertIn("does not start `/crav1-build-tasks`", skills)

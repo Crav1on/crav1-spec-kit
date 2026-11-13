@@ -203,7 +203,7 @@ also_next:
   crav1-glossary: [/crav1-finalize-commit]
   crav1-model-data: [/crav1-finalize-commit, "/crav1-what-do-we-know-about-this report-data-model-full <model>", /crav1-add-to-spec]
   crav1-update-specs-from-changes-and-prs: [/crav1-resolve-open-questions, /crav1-update-specs-from-changes-and-prs, /crav1-finalize-commit]
-  crav1-tighten-and-plan-ready-to-build: [/crav1-build-tasks]
+  crav1-tighten-and-plan-ready-to-build: [/crav1-build-walk, /crav1-build-tasks]
   crav1-refresh-system-notes: [/crav1-finalize-commit]
   crav1-map-pipeline-environments: [/crav1-read-environment]
   crav1-host-setup: [/crav1-open-pr, /crav1-pr-status]

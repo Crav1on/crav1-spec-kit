@@ -72,6 +72,7 @@ SUPPRESSED = {
     "approval": ["/crav1-build-tasks", "/crav1-open-pr"],
     "live-dry": ["/crav1-open-pr", "/crav1-merge-pr"],
     "live-yes": ["/crav1-open-pr", "/crav1-merge-pr"],
+    "permission-refused": ["/crav1-open-pr", "/crav1-merge-pr"],
     "build": ["/crav1-open-pr"],
     "verify": ["/crav1-open-pr", "/crav1-fix-build-gaps"],
     "commit": ["/crav1-open-pr"],
@@ -118,6 +119,10 @@ def map_mod():
 
 def approval_mod():
     return _load("crav1-record-approval", "approval_needed.py")
+
+
+def permission_mod():
+    return _load("crav1-build-tasks", "permission_block.py")
 
 
 def same_person(left: str | None, right: str | None) -> bool:
@@ -372,11 +377,13 @@ def record_live_yes(line: str, name: str, date: str) -> str:
     return line.rstrip() + " " + mark
 
 
-def live_gate(line: str, approval_holding: bool = False, approval_asked: bool = False, dry_ran: bool = False, user_yes: bool = False, approved: bool = False, name: str | None = None, date: str | None = None) -> dict:
+def live_gate(line: str, approval_holding: bool = False, approval_asked: bool = False, dry_ran: bool = False, user_yes: bool = False, approved: bool = False, name: str | None = None, date: str | None = None, permission_refused: bool = False, live_command: str = "") -> dict:
     """Write the script, dry-run, then ask. An Approved line is not the live yes.
 
     Without the user's yes the script may be written and the task stays unticked.
     A held Approval needed item stops before the dry run.
+    A recorded yes that the assistant's permission check refused does not run,
+    and the lines do not say the yes is missing (1.143.0).
     """
     if not runs_live(line):
         return {"applies": False, "held": False, "run_live": False, "tick": False, "approved_counts_as_yes": False}
@@ -417,9 +424,27 @@ def live_gate(line: str, approval_holding: bool = False, approval_asked: bool = 
             "run_check": False,
             "record": False,
             "line": line,
+            "says_yes_missing": True,
         })
         return base
     recorded = record_live_yes(line, name or "", date or "")
+    if permission_refused:
+        outcome = permission_mod().classify(True, True, live_command, "/crav1-build-walk")
+        base.update({
+            "phase": "permission-refused",
+            "held": False,
+            "write_script": True,
+            "run_check": False,
+            "run_live": False,
+            "record": True,
+            "line": recorded,
+            "waiting": outcome["waiting"],
+            "offer": outcome["offer"],
+            "next_line": outcome["next"],
+            "says_yes_missing": False,
+            "still_unticked": "[ ]" in recorded or "[x]" not in recorded,
+        })
+        return base
     base.update({
         "phase": "run-live",
         "held": False,
@@ -472,6 +497,13 @@ def _because(phase: str, state: dict) -> tuple[str, str]:
         return ("/crav1-build-walk", f"{tasks or 'the task'} runs live and the dry run has not been run")
     if phase == "live-yes":
         return ("/crav1-build-walk", f"{tasks or 'the task'} runs live and the live run needs your yes")
+    if phase == "permission-refused":
+        outcome = permission_mod().classify(
+            True, True, state.get("command") or "", "/crav1-build-walk", tasks,
+        )
+        state["_permission"] = outcome
+        why = outcome["next"].split(", because ", 1)[1].rstrip(".")
+        return ("/crav1-build-walk", why)
     if phase == "build":
         return ("/crav1-build-walk", f"the next step on {branch} is to build {tasks or 'the tasks'}")
     if phase == "verify":
@@ -529,7 +561,8 @@ def next_for(state: dict) -> dict:
         phase = "comment" if state.get("pushed") and not state.get("commented") else "wait-merge"
     command, because = _because(phase, state)
     line = _one(command, because)
-    return {
+    outcome = state.get("_permission") if phase == "permission-refused" else None
+    result = {
         "mode": "walk",
         "phase": phase,
         "next": [line],
@@ -538,6 +571,12 @@ def next_for(state: dict) -> dict:
         "allowed": allowed_actions(owner, state.get("description_asked")),
         "command": command,
     }
+    if outcome:
+        result["waiting"] = outcome["waiting"]
+        result["offer"] = outcome["offer"]
+        result["says_yes_missing"] = False
+        result["lines"] = permission_mod().printable(outcome)
+    return result
 
 
 def current_phase(facts: dict) -> str:
@@ -549,6 +588,8 @@ def current_phase(facts: dict) -> str:
         return "approval"
     if facts.get("runs_live") and not facts.get("dry_ran"):
         return "live-dry"
+    if facts.get("runs_live") and facts.get("live_yes") and facts.get("permission_refused"):
+        return "permission-refused"
     if facts.get("runs_live") and not facts.get("live_yes"):
         return "live-yes"
     if not facts.get("built"):

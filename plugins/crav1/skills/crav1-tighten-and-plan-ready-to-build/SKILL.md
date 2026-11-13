@@ -17,7 +17,7 @@ Command: `/crav1-tighten-and-plan-ready-to-build`. The playbook path is an optio
 
 This walk is cross-cutting. It is not a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs`, `/crav1-read-environment`, and `/crav1-fix-bug`. That ask names the list. It does not run this command. The six starter options stay unchanged.
 
-It does not replace the skills it runs. It does not start Build. It never runs `/crav1-build-tasks` or `/crav1-build-features`. Naming `/crav1-build-tasks` after a clear check is not running it.
+It does not replace the skills it runs. It does not start Build. It never runs `/crav1-build-tasks`, `/crav1-build-walk`, or `/crav1-build-features`. When the check is ready, or ready-partial with tasks that can start, Next recommends `/crav1-build-walk` and names `/crav1-build-tasks` as the alternative for one task (1.143.0). Naming either command is not running it.
 
 ## Route first (1.119.0)
 

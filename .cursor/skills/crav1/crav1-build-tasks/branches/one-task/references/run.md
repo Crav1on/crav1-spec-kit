@@ -18,6 +18,8 @@ The parent already switched to the task's `(branch: …)` when it has one and pa
 
 **A person's yes (1.129.0, 1.141.0).** When the live change needs a named person's yes that is not already on record (host setup `apply`, or another approval gate), return `STATUS: needs_yes`. On record means said in this chat, an `Answered:` line, or a matching `Approved:` line (same person, and the item holds this task). A matching `Approved:` line does not run `apply`. The user's own yes in this run is still required, and the task stays `[ ]` until `check` prints `ok`. DETAIL is `<who>'s yes to <what>`, for example `the partner's yes to turn off pipelines 7 and 24`. Who is the person the task, the question, or the Approval needed item names. When nobody is named, who is `not named yet`. Leave the task `[ ]`. Do not apply. Do not edit `spec.md`. Do not write `Approved:`. Do not return `blocked` for this.
 
+**Permission check (1.143.0).** When the user's yes for the live command is already on record and the assistant's permission check refused that command, return `STATUS: permission_refused`. DETAIL is the exact command. Do not return `needs_yes`. Do not say the yes is missing. Do not run the command another way. The parent follows `references/permission-block.md`.
+
 **Shell line endings (1.129.0).** When this task wrote a new `.sh` file, run `scripts/sh_eol.py` (this skill) with `--wrote-sh`, the repo's `.gitattributes` (omit the flag's file when there is none), `git config --get core.autocrlf`, and `--windows` when the host is Windows. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. When the script prints a line, put it on `NOTES:`. Do not edit `.gitattributes` unless the parent passed `resume: eol`. That resume adds the one line `*.sh text eol=lf` and loop-commits it. Never add the line without that yes.
 
 ## Loop-commit
@@ -63,7 +65,7 @@ Follow **the implement step of `crav1-build-tasks`** for this `T#` only.
 
 Then loop-commit.
 
-If the row did not go `[x]` because a person's yes is not on record, `STATUS: needs_yes`. Otherwise `STATUS: blocked`. Do not verify-build-against-spec as if the task shipped.
+If the row did not go `[x]` because a person's yes is not on record, `STATUS: needs_yes`. If the user's yes is on record and the assistant's permission check refused the live command, `STATUS: permission_refused`. Otherwise `STATUS: blocked`. Do not verify-build-against-spec as if the task shipped.
 
 ## verify
 
@@ -101,7 +103,7 @@ Left unchecked: <other T#s or none>
 ## Status block (always end with this)
 
 ```text
-STATUS: done | blocked | needs_yes | needs_fix | needs_ready | needs_dependency | failed
+STATUS: done | blocked | needs_yes | permission_refused | needs_fix | needs_ready | needs_dependency | failed
 T#: Tn
 PHASE: implement | verify | fix | done
 COMMITS: <hashes>
@@ -110,6 +112,8 @@ NOTES: <the sh_eol.py line, or omit>
 ```
 
 `needs_yes` is waiting, not blocked. The parent prints `Waiting:`, not a blocker.
+
+`permission_refused` is waiting, and it is not a missing yes. The parent prints the lines from `references/permission-block.md`.
 
 `PHASE` is the step you were in (or just finished). Do not write A, B, C, or D.
 

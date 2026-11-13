@@ -63,8 +63,8 @@ Held
 - `feat/orders-api-currency` (wave 1): T3 Choose the currency — open question "Which currency for refunds?" Waiting for the partner.
 - `feat/orders-api-archive` (wave 2): T4 Archive the receipt — held, waits on T3
 
-Next: /crav1-build-tasks T2 T5 (on `feat/orders-api-record`)
-Next: /crav1-build-tasks T6 (on `feat/orders-api-export`)
+Next: /crav1-build-walk T2 Record the decision, T5 Store the card, because that work is on feat/orders-api-record. /crav1-build-tasks builds one task without the walk.
+Next: /crav1-build-walk T6 Email the receipt, because that work is on feat/orders-api-export. /crav1-build-tasks builds one task without the walk.
 ```
 
-A held task names its open question and who has the answer, or `held, waits on T#`. One `Next:` line per branch that has a task that can start, and only when the result is `ready` or `ready-partial`. The ids on that line are the command. The names are on the Ready now line. Do not flatten the branches into one list or one Next line.
+A held task names its open question and who has the answer, or `held, waits on T#`. One `Next:` line per branch that has a task that can start, and only when the result is `ready` or `ready-partial`. Since 1.143.0 that line recommends `/crav1-build-walk`, with the T number beside the short name, and `/crav1-build-tasks` builds one task without the walk. Do not flatten the branches into one list or one Next line.
