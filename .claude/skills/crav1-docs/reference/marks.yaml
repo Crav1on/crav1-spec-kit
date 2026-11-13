@@ -1723,6 +1723,36 @@ marks:
     mention: 'Content stamp'
     since: 1.142.0
 
+  - id: in-progress-claim
+    name: "In progress claim"
+    group: walk
+    files: ["docs/specs/<slug>/claims.md"]
+    format: "In progress: <branch>, <T#>, <user>, since <ISO time>"
+    pattern: '^In progress: \S+, T\d+(?:, T\d+)*, .+, since \S.+$'
+    examples:
+      - "In progress: feat/orders-api-host-setup, T27, person A, since 2026-11-13T15:50:00+01:00"
+      - "In progress: feat/orders-api-host-setup, T3, T27, person A, since 2026-11-13T15:50:00+01:00"
+    meaning: "A build walk is in progress on that branch and those tasks. The ready check holds them and does not offer them in Run next. The claim is never cleared on its own."
+    written_by: [crav1-build-walk]
+    read_by: [crav1-build-walk, crav1-tasks-ready-to-build, crav1-tighten-and-plan-ready-to-build, crav1-plan-from-spec, crav1-tighten-plan]
+    mention: 'In progress:'
+    readiness: true
+    since: 1.151.0
+
+  - id: claim-max-age
+    name: "Claim max age"
+    group: walk
+    files: ["docs/specs/<slug>/claims.md"]
+    format: "Claim max age: <N> days"
+    pattern: '^Claim max age: \d+ days$'
+    examples:
+      - "Claim max age: 3 days"
+    meaning: "How old a claim may be before the ready check warns. The default is 3 days when this line is absent. The claim is never cleared on its own."
+    written_by: [crav1-build-walk]
+    read_by: [crav1-build-walk, crav1-tasks-ready-to-build, crav1-tighten-and-plan-ready-to-build]
+    mention: 'Claim max age:'
+    since: 1.151.0
+
   - id: runs-live
     name: "Runs live"
     group: plan

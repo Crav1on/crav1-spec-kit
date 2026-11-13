@@ -18,6 +18,8 @@ Command: `/crav1-build-walk`. A slug or a `T#` may follow. `orders-capacity` is 
 
 It does not replace the skills it opens. It does not push, open a pull request, merge, or run a live change until this run's `yes`. It never rebases.
 
+Before it reads the spec folder, it fetches the specs repo (1.151.0). The rule is [references/sync.md](references/sync.md). When it starts on a branch, it writes an `In progress:` line in `docs/specs/<slug>/claims.md` and, after yes, commits and pushes only that file. The rule is [references/claims.md](references/claims.md). When the walk ends, or the user stops, it commits the files it wrote and pushes the specs repo after one yes.
+
 The in-walk reply prints `ending` from `scripts/build_walk.py next --json <file>`. `Run next:` is first (1.150.0). Each command is alone in a code span and works in a new session, for example `` `/crav1-build-walk T3` ``, plus the slug when `docs/specs` has more than one slice (`` `/crav1-build-walk orders-api T3` ``). The next line names the branch and the short task name. Waiting and Uncommitted follow. The full Next line is last. Another branch whose tasks can start, from readiness `can_start` grouped by build-map branch, gets its own Run next entry. Do not mention that branch only in prose.
 
 The JSON object is documented in [references/common.md](references/common.md). Fields include `phase`, `owner`, `branch`, `tasks`, `base`, `pr`, `slug`, `root`, `spec_count`, `ready_branches`, `waiting`, and `uncommitted`. `tasks` may be `"T3"` or `{"id": "T3", "title": "Apply the CI build policy"}`. `T3` and `3` are the same id. Bad input returns `{"ok": false, "code", "line"}` and does not traceback.
@@ -31,6 +33,8 @@ Read [references/common.md](references/common.md) once. Then open only the file 
 - The pull request author or a commit author is someone else: read [references/other-owner.md](references/other-owner.md) before any switch.
 - The task line has `(Runs live)`, or an Approval needed item holds it: read [references/live.md](references/live.md). A recorded yes that the assistant's permission check refused is not a missing yes (1.143.0).
 - A task needs code that is still only on an unmerged branch: read [references/stack.md](references/stack.md).
+- Starting on a branch, or `release claim`: read [references/claims.md](references/claims.md).
+- The first action of a run, or the walk is ending or the user stopped: read [references/sync.md](references/sync.md).
 - The step itself: read [references/steps.md](references/steps.md).
 
 A headless or bot run stops before any step. This walk is guided only. It does not guess a mode.
@@ -43,7 +47,8 @@ Exact words. There are no `--flags`. A word in the invocation answers its questi
 - `switch` — build on the other person's branch, in other-owner mode.
 - `own` — this branch is ours. Do not switch.
 - `edit description` — change that pull request's description. Other-owner mode only, and only because this run asked.
-- `stop` — write nothing further.
+- `stop` — write nothing further. At the end of a walk, still offer the settle-and-push card unless the user already refused it.
+- `release claim` — clear this branch's claim, then commit and push `claims.md` after yes.
 
 ## Locked steps
 
@@ -57,7 +62,7 @@ While this walk runs, print `ending`. Do not also print the step skill's Next. A
 
 Recording a step commits `docs/specs/<slug>/build-progress/<branch>.md` after that yes (1.150.0). When the step already commits other files, such as the tick or verify, include the progress file in that same commit. Otherwise commit the progress file on its own after the yes. Use the persisted commit style, the draft-commit rule already in the repo. Nothing is pushed. `/crav1-finalize-commit` still commits the product files on the commit step, after `yes`.
 
-When the user stops partway, one line `Paused at <step>.` Then the ending in [references/progress.md](references/progress.md).
+When the user stops partway, one line `Paused at <step>.` Then the settle-and-push card in [references/sync.md](references/sync.md), then the ending in [references/progress.md](references/progress.md).
 
 ## Run ending (1.122.0)
 

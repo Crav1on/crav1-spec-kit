@@ -50,6 +50,8 @@ Shows summary counts per slice, then Ready and Held grouped by build-map branch,
 
 1.144.0: a named spec is `<interpreter> -X utf8 scripts/resolve_spec.py "<query>" --root docs/specs`. On Windows `<interpreter>` is `python` with `PYTHONUTF8=1`. Elsewhere it is `python3`. `--recommend` is `scripts/build_map.py docs/specs/<slug> --recommend T#`. The rule is `docs/reference/running-scripts.md`.
 
+1.151.0: the ready check fetches the specs repo before it reads. Behind or diverged, it stops and Run next is `git pull --no-rebase`. A task with an `In progress:` line in `claims.md` is held `in progress by <user> since <date>` and is not offered in Run next. A claim older than three days, or `Claim max age:`, warns and is never cleared on its own.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
@@ -71,7 +73,7 @@ Prompt budget: 0 (asks nothing). A prompt may hold several questions. See the as
 
 In short: `spec.md` open questions, `plan.md`, `tasks.md`, and `verify.md` per slice.
 
-Reads, for one slice or every slice under `docs/specs/`, the open questions in `spec.md` with their `Blocks:`, `Asked:`, `Pending:`, and `Answered:` lines, the `Reviewed:` line, `## Approach`, and `## Risks` in `plan.md`, the task lines in `tasks.md` with their ticks, `(after: T#)`, `(branch:)`, `(step:)`, and `(map:)`, a `task: T#` title in `work-item.md` when that file exists, and `verify.md` when it exists.
+Reads, for one slice or every slice under `docs/specs/`, the open questions in `spec.md` with their `Blocks:`, `Asked:`, `Pending:`, and `Answered:` lines, the `Reviewed:` line, `## Approach`, and `## Risks` in `plan.md`, the task lines in `tasks.md` with their ticks, `(after: T#)`, `(branch:)`, `(step:)`, and `(map:)`, a `task: T#` title in `work-item.md` when that file exists, `claims.md` when it exists (`In progress:` lines), and `verify.md` when it exists. It fetches the specs repo before it reads.
 
 ## Writes
 
@@ -81,7 +83,7 @@ Writes a list in the chat with summary counts, Ready and Held grouped by build-m
 
 ## Does not
 
-Leaves every file other than `build-map.md` alone, including `verify.md`, and never reads Azure Boards. It does not commit the map.
+Leaves every file other than `build-map.md` alone, including `verify.md` and `claims.md`, and never reads Azure Boards. It fetches the specs repo first. It does not commit the map.
 
 Limits and exceptions: does not guess a dependency or a blocking link from task text. Where nothing is recorded it uses a fallback and marks the reason inferred. It writes no readiness marks; review-plan, tighten-plan, plan-from-spec, and resolve-open-questions write them. The map is written only by `scripts/build_map.py`.
 

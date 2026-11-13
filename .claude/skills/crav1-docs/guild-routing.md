@@ -207,7 +207,7 @@ The merged skills take exact choice words instead of `--flags`. A word in the in
 | `/crav1-add-to-spec` | What you have | `fact` · `dump` · `code change` · `meeting` · `mail` · `chat` |
 | `/crav1-build-tasks` | Which tasks | `one task` · `range` · `all tasks` |
 | `/crav1-build-tasks` | Branch | `new branch` |
-| `/crav1-build-walk` | Do this step | `yes` · `stop` |
+| `/crav1-build-walk` | Do this step | `yes` · `stop` · `release claim` |
 | `/crav1-build-walk` | Whose branch | `switch` · `own` |
 | `/crav1-build-walk` | Pull request description | `edit description` |
 | `/crav1-verify-build-against-spec` | Also check the latest pipeline runs? | `pipeline runs` |

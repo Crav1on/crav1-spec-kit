@@ -112,6 +112,10 @@ Build each `P#`'s options from [references/catalog.md](references/catalog.md) (`
 
 `plan.md` may have `Reviewed: <date>, P# open: <n>` under its title, written by `/crav1-review-plan`. After each patched `P#`, and when a `P#` is dropped as not an issue, lower `<n>` to the number of reviewer `P#`s still open. Keep the date. A `P#` the user leaves open stays counted. When there is no `Reviewed:` line, do not add one: only `/crav1-review-plan` records a review. This line is the only `plan.md` change this skill makes outside the picked patches.
 
+## Claimed tasks (1.151.0)
+
+A task listed in `docs/specs/<slug>/claims.md` as `In progress:` is left unchanged: no renumber, reorder, rewrite, or removal. Other tasks may change. After writing `tasks.md`, run `<interpreter> -X utf8 scripts/claims.py preserve --before <old tasks.md> --after docs/specs/<slug>/tasks.md --root <spec-folder> --write`, as `crav1-docs/reference/running-scripts.md` says, and say once which claimed tasks were kept.
+
 ## Hard rules
 
 - Prefer **splitting or dropping** over adding product scope.

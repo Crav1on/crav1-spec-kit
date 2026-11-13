@@ -14,6 +14,10 @@ is read when this file is given a tasks.md path. An unapproved `## Approval need
 item moves the tasks it holds out of Ready and into Waiting on approval (1.141.0).
 A task that waits on one of those is listed there too. A matching `Approved:` line
 clears the hold. The section is omitted when nothing is held.
+A sibling claims.md holds a task that a build walk has claimed (1.151.0). Those
+tasks leave Ready and are listed under Waiting, in progress, as
+`in progress by <user> since <date>`. They are never a Next. A claim is not
+cleared here.
 
 Usage: task_order.py <tasks.md> [--failed T7,T9] [--json]
 Standard library only. Prints nothing secret; reads only the file it is given and a sibling spec.md.
@@ -324,6 +328,94 @@ def apply_approval_holds(res, tasks, spec_text):
     return res
 
 
+def _claims_mod():
+    import importlib.util
+
+    path = pathlib.Path(__file__).resolve().parents[2] / "crav1-build-walk" / "scripts" / "claims.py"
+    spec = importlib.util.spec_from_file_location("claims", path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"cannot load {path}")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def apply_claim_holds(res, tasks, claims_text, now=None):
+    """Move claimed tasks out of Ready into Waiting, in progress (1.151.0)."""
+    waiting = []
+    res["waiting_in_progress"] = waiting
+    if not claims_text:
+        return res
+    parsed = _claims_mod().parse_claims(claims_text, now=now)
+    claims = parsed.get("claims") or []
+    if not claims:
+        return res
+    by_task = {}
+    for claim in claims:
+        for task in claim["tasks"]:
+            by_task[task] = claim
+    held = {}
+    for task in tasks:
+        if task["done"]:
+            continue
+        tid = f"T{task['id']}"
+        if tid in by_task:
+            held[tid] = by_task[tid]
+    changed = True
+    while changed:
+        changed = False
+        for task in tasks:
+            if task["done"]:
+                continue
+            tid = f"T{task['id']}"
+            if tid in held:
+                continue
+            for dep in task["deps"]:
+                via = f"T{dep}"
+                if via not in held:
+                    continue
+                held[tid] = {**held[via], "via": via}
+                changed = True
+                break
+
+    def take(row):
+        tid = f"T{row['id']}"
+        info = held.get(tid)
+        if not info:
+            return False
+        reason = row.get("reason") or ""
+        if "cycle" in reason.lower() or "names no task" in reason.lower():
+            return False
+        if info.get("via"):
+            shown = f"held, waits on {info['via']}"
+        else:
+            shown = info.get("phrase") or f"in progress by {info.get('user') or 'someone'} since {info.get('since_date') or 'unknown'}"
+        waiting.append({"id": row["id"], "title": row.get("title") or "", "reason": shown, "who": info.get("user")})
+        return True
+
+    ready_left = []
+    by_row = {row["id"]: row for row in res["rows"]}
+    for number in res["ready"]:
+        row = by_row.get(number) or {"id": number, "title": "", "reason": None}
+        if take(row):
+            row["ready"] = False
+            row["reason"] = waiting[-1]["reason"]
+        else:
+            ready_left.append(number)
+    blocked_left = []
+    for row in res["blocked"]:
+        if take(row):
+            row["reason"] = waiting[-1]["reason"]
+        else:
+            blocked_left.append(row)
+    res["ready"] = ready_left
+    res["blocked"] = blocked_left
+    res["waiting_in_progress"] = waiting
+    ready_rows = [row for row in res["rows"] if row["id"] in set(ready_left)]
+    res["next"] = min(ready_rows, key=lambda row: (-row["unblocks"], row["id"]))["id"] if ready_rows else None
+    return res
+
+
 def render(res):
     waits, blockers = _split_blocked(res["blocked"])
     out = ["Ready (dependency order)"]
@@ -334,6 +426,13 @@ def render(res):
     if approvals:
         out.append("Waiting on approval")
         for row in approvals:
+            title = (row.get("title") or "").strip()
+            label = f"T{row['id']} {title}".strip()
+            out.append(f"- {label}: {row['reason']}")
+    in_progress = res.get("waiting_in_progress") or []
+    if in_progress:
+        out.append("Waiting, in progress")
+        for row in in_progress:
             title = (row.get("title") or "").strip()
             label = f"T{row['id']} {title}".strip()
             out.append(f"- {label}: {row['reason']}")
@@ -370,6 +469,7 @@ def public(res):
         "next": _tid(res["next"]),
         "needs_tick": [row(item) for item in res.get("needs_tick") or []],
         "waiting_on_approval": [row(item) for item in res.get("waiting_on_approval") or []],
+        "waiting_in_progress": [row(item) for item in res.get("waiting_in_progress") or []],
         "depends_on_failed": res["depends_on_failed"],
         "rows": [row(item) for item in res["rows"]],
     }
@@ -405,6 +505,9 @@ def main(argv):
     parsed = parse(text)
     res = analyse(parsed, failed, merged_ids(text, spec_text))
     apply_approval_holds(res, parsed, spec_text)
+    claims_path = tasks_path.parent / "claims.md"
+    claims_text = claims_path.read_text(encoding="utf-8") if claims_path.is_file() else ""
+    apply_claim_holds(res, parsed, claims_text)
     if "--json" in argv:
         emit_text(json.dumps(public(res), ensure_ascii=False, indent=1))
     else:

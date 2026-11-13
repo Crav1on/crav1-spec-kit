@@ -266,6 +266,19 @@ def _task_canonical(line: str) -> str:
     return f"{match.group(1)} {match.group(3)}{rest}"
 
 
+_CLAIM_LINE = re.compile(r"^\s*In progress:\s+", re.I)
+_CLAIM_AGE_LINE = re.compile(r"^\s*Claim max age:\s*\d+\s*days?\s*$", re.I)
+
+
+def _strip_claim_lines(text: str) -> str:
+    """Claim lines are not part of a content stamp (1.151.0)."""
+    return "\n".join(
+        line
+        for line in (text or "").split("\n")
+        if not _CLAIM_LINE.match(line) and not _CLAIM_AGE_LINE.match(line)
+    )
+
+
 def normalize_text(kind: str, text: str) -> str:
     """Content used for a stamp. LF, and progress marks removed.
 
@@ -273,8 +286,9 @@ def normalize_text(kind: str, text: str) -> str:
     tasks: a checkbox is `[ ]`, and a PR or `(done)` note on that line is
     dropped. plan, verify, playbook, and questions: line endings only.
     A branch name, `(into …)`, `(spec branch)`, `(branch:)`, and `(map:)` stay.
+    In progress: and Claim max age: lines are ignored (1.151.0).
     """
-    text = _lf_text(text or "")
+    text = _strip_claim_lines(_lf_text(text or ""))
     if kind not in ("spec", "tasks"):
         return text
     lines = text.split("\n")
@@ -2041,11 +2055,24 @@ def start(args: argparse.Namespace) -> None:
     folder = Path(found["folder"])
     if not folder.is_dir():
         fail("root", f"not a folder: {folder}")
+    sync = preflight_sync(folder, skip=getattr(args, "skip_sync", False))
+    if sync.get("stop"):
+        emit({
+            "ok": True,
+            "stop": True,
+            "sync": sync,
+            "slug": found.get("slug") or folder.name,
+            "folder": str(folder),
+            "ending": sync.get("ending"),
+            "line": sync.get("line"),
+        })
+        return
     payload = {
         "ok": True,
         "slug": found.get("slug") or folder.name,
         "folder": str(folder),
         "how": found.get("how") or "folder",
+        "sync": sync,
         "resume": resume_payload(folder, no_playbook=not args.playbook),
         "playbook_status": None,
     }
@@ -2072,6 +2099,14 @@ def blocks_mod():
 
 def approval_mod():
     return _load_script("crav1-record-approval", "approval_needed.py", "approval")
+
+
+def claims_mod():
+    return _load_script("crav1-build-walk", "claims.py", "claims")
+
+
+def sync_mod():
+    return _load_script("crav1-build-walk", "repo_sync.py", "sync")
 
 
 def unlinked(args: argparse.Namespace) -> None:
@@ -2132,6 +2167,8 @@ def classify(row: dict, resolve_kept: bool = False, resolve_recorded: bool = Fal
         return _hit(task, "blocker", "tighten-plan", "A plan risk blocks the work. Run /crav1-review-plan, then /crav1-tighten-plan.")
     # A task that depends on a held task is held too, even with no question
     # of its own (1.132.0). That is waiting, not a jump back.
+    if "in progress by" in text:
+        return _waiting(row)
     if "held, waits on" in text:
         return _waiting(row)
     # A cycle, or an after: that names no task, is a blocker. Waiting on a
@@ -2865,6 +2902,26 @@ def command_slug(root: Path) -> str | None:
     return slug or None
 
 
+def apply_claims(root: Path | None, rows: list[dict]) -> dict:
+    """Hold claimed tasks as in progress. Empty when there is no claims.md."""
+    empty = {"claims": [], "warnings": [], "ids": []}
+    if root is None or not root.is_dir():
+        return empty
+    loaded = claims_mod().load_claims(root)
+    claims = loaded.get("claims") or []
+    if claims:
+        claims_mod().apply_to_rows(rows, claims)
+    warnings = claims_mod().age_warnings(claims, loaded.get("max_age_days") or 3)
+    return {"claims": claims, "warnings": warnings, "ids": claims_mod().claimed_ids(claims)}
+
+
+def preflight_sync(root: Path | None, skip: bool = False) -> dict:
+    """Fetch the specs repo. Behind or diverged stops before a read or write."""
+    if skip or root is None:
+        return {"ok": True, "state": "skipped", "continue": True, "stop": False}
+    return sync_mod().inspect(root, do_fetch=True)
+
+
 def ready_branches(root: Path) -> list[dict]:
     """Tasks that can start, grouped by build-map branch.
 
@@ -2873,6 +2930,7 @@ def ready_branches(root: Path) -> list[dict]:
     if root is None or not root.is_dir():
         return []
     rows = build_rows(root)
+    apply_claims(root, rows)
     resolve_kept = resolve_is_keep(root)
     resolve_recorded = resolve_ever_recorded(root)
     hits = []
@@ -3166,6 +3224,24 @@ def next_for(result: str, can_start: list, waiting_next: str | None) -> str | No
 def readiness(args: argparse.Namespace) -> None:
     root = Path(args.root) if args.root else None
     built = False
+    sync = preflight_sync(root, skip=getattr(args, "skip_sync", False))
+    if sync.get("stop"):
+        emit({
+            "ok": True,
+            "stop": True,
+            "ready": False,
+            "result": "not-ready",
+            "sync": sync,
+            "ending": sync.get("ending"),
+            "line": sync.get("line"),
+            "can_start": [],
+            "held": [],
+            "run_lines": [],
+            "next_lines": [],
+            "held_lines": [],
+            "claim_warnings": [],
+        })
+        return
     if args.json:
         try:
             payload = json.loads(Path(args.json).read_text(encoding="utf-8"))
@@ -3174,11 +3250,13 @@ def readiness(args: argparse.Namespace) -> None:
         rows = payload.get("rows")
         if not isinstance(rows, list):
             fail("readiness", "rows must be a list")
+        claim_info = apply_claims(root, rows) if root is not None else {"claims": [], "warnings": [], "ids": []}
     elif root is not None:
         if not root.is_dir():
             fail("root", f"not a folder: {root}")
         aliases: list[dict] = []
         rows = build_rows(root, excluded=set(args.new_question or []), aliases=aliases)
+        claim_info = apply_claims(root, rows)
         built = True
     else:
         fail("readiness", "pass --root <spec-folder>, or --json <rows file>")
@@ -3256,6 +3334,8 @@ def readiness(args: argparse.Namespace) -> None:
     waiting_bits = []
     if gap.get("waiting"):
         waiting_bits.append(gap["waiting"])
+    if sync.get("state") == "ahead" and sync.get("waiting"):
+        waiting_bits.append(sync["waiting"])
     if resolve_waiting:
         waiting_bits.append(resolve_waiting)
     if result == "not-ready" and not can_start and waiting_line:
@@ -3271,6 +3351,12 @@ def readiness(args: argparse.Namespace) -> None:
     ending = compose_ending(
         result, shown_run, held_lines, waiting_bits, shown_next, because, replaced,
     )
+    claim_info = claim_info if "claim_info" in locals() else {"claims": [], "warnings": [], "ids": []}
+    warnings = list(claim_info.get("warnings") or [])
+    if sync.get("state") in ("no-upstream", "offline") and sync.get("message"):
+        ending = (ending + "\n\n" if ending else "") + sync["message"]
+    if warnings:
+        ending = (ending + "\n\n" if ending else "") + "\n".join(warnings)
     out = {
         "ok": True,
         "ready": ready,
@@ -3310,6 +3396,10 @@ def readiness(args: argparse.Namespace) -> None:
         "verify_waiting": gap["waiting"],
         "stale_next": gap["stale_next"],
         "trust_stale_next": False,
+        "sync": sync,
+        "stop": False,
+        "claims": claim_info.get("ids") or [],
+        "claim_warnings": warnings,
     }
     if built:
         out["rows"] = rows
@@ -4671,6 +4761,7 @@ def main(argv: list[str] | None = None) -> None:
     st = sub.add_parser("start")
     st.add_argument("--root", required=True, help="Spec folder, or a slug, title, or playbook name.")
     st.add_argument("--playbook")
+    st.add_argument("--skip-sync", action="store_true", help="Skip the fetch. Tests and an already-fetched copy.")
     st.set_defaults(func=start)
 
     s = sub.add_parser("resume")
@@ -4688,6 +4779,7 @@ def main(argv: list[str] | None = None) -> None:
     d.add_argument("--root", help="Spec folder. Builds the rows when --json is omitted. Reopened steps block ready.")
     d.add_argument("--write-map", action="store_true", help="Write build-map.md in the standalone command's format.")
     d.add_argument("--new-question", action="append", default=[], help="Exact question key to treat as new, not as a recorded question.")
+    d.add_argument("--skip-sync", action="store_true", help="Skip the fetch. Tests and an already-fetched copy.")
     d.set_defaults(func=readiness)
 
     u = sub.add_parser("unlinked")

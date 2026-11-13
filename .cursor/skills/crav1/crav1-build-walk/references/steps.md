@@ -21,4 +21,4 @@ Other-owner mode skips steps 4, 5, and 6. After the commit, a push that already 
 
 After you follow a step skill, do not print its Next line. Print `ending` from `build_walk.py next --json <file>` for the new phase. Pass `root` as the spec folder so another branch that can start is its own Run next entry.
 
-Record the step in this branch's progress file after `yes`, with `Content stamp: normalized`. Commit that file in the same turn. When this step already commits other files, include `build-progress/<branch>.md` in that commit. Otherwise commit the progress file on its own after the yes. Use the persisted commit style. Nothing is pushed.
+Record the step in this branch's progress file after `yes`, with `Content stamp: normalized`. Commit that file in the same turn. When this step already commits other files, include `build-progress/<branch>.md` in that commit. Otherwise commit the progress file on its own after the yes. Use the persisted commit style. Nothing is pushed on that commit. The end-of-walk push is [sync.md](sync.md), after the last step or `stop`.

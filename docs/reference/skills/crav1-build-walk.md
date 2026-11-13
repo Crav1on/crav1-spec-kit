@@ -20,6 +20,8 @@ A task that needs code from an unmerged branch is cut from that branch. The prog
 
 1.150.0: the reply prints `ending`. `Run next:` is first. Each command is alone in a code span and works in a new session: [`/crav1-build-walk`](crav1-build-walk.md) T3`, plus the slug when `docs/specs` has more than one slice. The next line names the branch and the short task name. Waiting and Uncommitted follow. The full Next line is last. Another branch whose tasks can start, from readiness `can_start` grouped by build-map branch, is its own Run next entry. Recording a step commits `build-progress/<branch>.md` after yes, in the same commit when the step already commits other files, otherwise on its own, using the persisted commit style. Nothing is pushed. `T27` and `27` are the same id. `next --json` accepts task strings or `{id, title}` objects. Bad input returns `{"ok": false, "code", "line"}`.
 
+1.151.0: before the walk reads the spec folder it fetches the specs repo. Behind or diverged, it stops and Run next is `git pull --no-rebase`. When it starts on a branch it writes `In progress:` in `docs/specs/<slug>/claims.md` and, after yes, commits and pushes only that file. The ready check holds those tasks as `in progress by <user> since <date>` and does not offer them in Run next. At the end, or on stop, it commits the files it wrote and pushes the specs repo after yes. `release claim` clears the claim. A claim older than three days, or `Claim max age:`, warns and is never cleared on its own.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
@@ -28,6 +30,7 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 | --- | --- | --- |
 | Do this step | `yes` | do the write, push, open, or merge just shown |
 | Do this step | `stop` | do not do it |
+| Do this step | `release claim` | clear this branch's In progress: claim, then commit and push claims.md after yes |
 | Whose branch | `switch` | build on the other person's branch, in other-owner mode |
 | Whose branch | `own` | this branch is ours |
 | Pull request description | `edit description` | change the other owner's pull request description, only because this run asked |
@@ -44,17 +47,17 @@ Prompt budget: 4 (the most prompts in one run, the closing yes included). A prom
 
 In short: The spec folder, the build map, the pull request author, and commit authors.
 
-Reads `spec.md`, `plan.md`, `tasks.md`, `build-map.md`, and this branch's `build-progress` file. The branch offer is `scripts/build_map.py docs/specs/<slug> --recommend T#` through `scripts/build_walk.py`. It reads the pull request author and the branch's commit authors before other-owner mode.
+Reads `spec.md`, `plan.md`, `tasks.md`, `build-map.md`, `claims.md` when it exists, and this branch's `build-progress` file. It fetches the specs repo before it reads. The branch offer is `scripts/build_map.py docs/specs/<slug> --recommend T#` through `scripts/build_walk.py`. It reads the pull request author and the branch's commit authors before other-owner mode.
 
 ## Writes
 
-In short: One `build-progress/<branch>.md` per work branch, after yes, and `(live yes: <name>, <date>)` on a Runs live task after yes.
+In short: One `build-progress/<branch>.md` per work branch, after yes, `claims.md` after yes when the walk starts, and `(live yes: <name>, <date>)` on a Runs live task after yes.
 
-Writes `docs/specs/<slug>/build-progress/<branch>.md` after yes, with normalized hashes and `Content stamp: normalized`, and commits that file after the yes. When the step already commits other files, the progress file is in that same commit. Otherwise it is its own commit, using the persisted commit style. Nothing is pushed. Writes `(live yes: <name>, <date>)` on the task line after the live yes. Posts one pull request comment per push in other-owner mode, after yes.
+Writes `docs/specs/<slug>/build-progress/<branch>.md` after yes, with normalized hashes and `Content stamp: normalized`, and commits that file after the yes. When the step already commits other files, the progress file is in that same commit. Otherwise it is its own commit, using the persisted commit style. Nothing is pushed until the end-of-walk card, or the claim card. Writes `docs/specs/<slug>/claims.md` when the walk starts on a branch, and commits and pushes only that file after yes. Writes `(live yes: <name>, <date>)` on the task line after the live yes. Posts one pull request comment per push in other-owner mode, after yes.
 
 ## Does not
 
-Leaves `spec.md` alone except that live-yes note. Does not tick a row itself. Does not push, open, or merge before `yes`. Does not edit another owner's pull request description unless this run said `edit description`. Never rebases.
+Leaves `spec.md` alone except that live-yes note. Does not tick a row itself. Does not push, open, or merge before `yes`. Does not overwrite another user's `In progress:` claim. Does not edit another owner's pull request description unless this run said `edit description`. Never rebases.
 
 Limits and exceptions: A headless run stops before any step. An unnamed current user is not a switch. A merged or deleted branch is not offered. An unapproved Approval needed item is not built. An `Approved:` line does not run the live change. Other-owner mode does not open, merge the base, or merge the pull request. It is not a starter option.
 

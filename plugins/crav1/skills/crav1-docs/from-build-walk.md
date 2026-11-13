@@ -34,9 +34,14 @@ A task that needs code from an unmerged branch is cut from that branch. The prog
 
 ## What gets written
 
-`docs/specs/orders-capacity/build-progress/feat--orders-host-setup-scripts.md`, after yes. It records the step, the normalized hashes, and the merge list. That file is committed after the yes, in the same commit when the step already commits other files, otherwise on its own, using the persisted commit style. Nothing is pushed. The spec, plan, and tasks stay the source of truth, except `(live yes: …)` on a Runs live task after yes.
+`docs/specs/orders-capacity/claims.md`, after yes when the walk starts on a branch: an `In progress:` line such as `In progress: feat/orders-host-setup-scripts, T3, person A, since 2026-11-13T15:50:00+01:00`. That file is committed and pushed on its own after that yes, so another session can see the walk.
+
+`docs/specs/orders-capacity/build-progress/feat--orders-host-setup-scripts.md`, after yes. It records the step, the normalized hashes, and the merge list. That file is committed after the yes, in the same commit when the step already commits other files, otherwise on its own, using the persisted commit style. When the walk ends, or the user stops, the files this walk wrote are committed and the specs repo is pushed after one yes. The spec, plan, and tasks stay the source of truth, except `(live yes: …)` on a Runs live task after yes.
 
 ## After
+
+The walk fetches the specs repo before it reads. If that copy is behind origin, it stops and Run next is `git pull --no-rebase`.
+
 
 ```text
 Run next:

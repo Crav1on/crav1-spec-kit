@@ -30,7 +30,7 @@ Every run, rebuild `docs/specs/<slug>/build-map.md` with `scripts/build_map.py`.
 
 ## What it reads
 
-Per slice, read only: `spec.md` (`## Open questions` and their indented lines), `plan.md` (the `Reviewed:` line and `## Risks`), `tasks.md`, and `verify.md` when it exists. Nothing else, except read-only local git for the Branches line below. Never read Azure Boards (ADO) or any network source.
+Before reading a slice, fetch the specs repo and read `claims.md` when it exists, as [references/claims-and-sync.md](references/claims-and-sync.md) says (1.151.0). Then, per slice, read only: `spec.md` (`## Open questions` and their indented lines), `plan.md` (the `Reviewed:` line and `## Risks`), `tasks.md`, `claims.md` when it exists (`In progress:` and `Claim max age:` lines), and `verify.md` when it exists. Nothing else, except read-only local git for the Branches line below. Never read Azure Boards (ADO).
 
 Read `references/work-branches.md` ("Work branches") only when the slice has work branches (`Synced at` lines, Match `Branch:` entries, or `(branch: …)`, minus base branches and `(dropped)` entries).
 

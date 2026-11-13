@@ -1,5 +1,7 @@
 # Step 7, ready to build
 
+Before this check reads or writes, fetch the specs repo (1.151.0). Behind or diverged: stop, and Run next is `git pull --no-rebase`. A task with an `In progress:` line in `claims.md` is held `in progress by <user> since <date>` and is not offered in Run next.
+
 Read this only at the ready check.
 
 When a playbook was named, do not run this check until that question is answered. Resume may already have reported status.

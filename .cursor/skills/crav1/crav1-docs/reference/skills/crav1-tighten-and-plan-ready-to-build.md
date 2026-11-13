@@ -52,6 +52,8 @@ The progress file is `docs/specs/<slug>/walk-progress.md`. It records the step, 
 
 1.150.0: `readiness` returns `ending`, and that text is the reply. It prints each held line, one branch per line, with the T# , the short name, and who it waits on. It does not say above, listed above, or earlier output. On ready and ready-partial, `Run next:` is first, before any Waiting line. Each command is alone in a code span and is a complete invocation for a new session: the T#s on that branch, and the slug when `docs/specs` has more than one slice, for example [`/crav1-build-walk`](crav1-build-walk.md) orders-api T3`. One slice needs no slug. The next line names the branch and the short task name. The full Next lines stay after that. A reopened tasks-ready-to-build step is not a blocker. The result comes from the rows, and the reply says once that the earlier record is replaced. Another reopened step still forces not-ready. Clear with nothing new is unchanged.
 
+1.151.0: the walk fetches the specs repo before it reads. Behind or diverged, it stops and Run next is `git pull --no-rebase`. A task with an `In progress:` line in `claims.md` is left unchanged, and the walk says once which claimed tasks were kept. The ready check holds those tasks as `in progress by <user> since <date>` and does not offer them in Run next. A claim older than three days, or `Claim max age:`, warns and is never cleared on its own.
+
 ## Runs when
 
 A spec should be tightened and planned until it is ready to build. Called by the user.
@@ -64,7 +66,7 @@ The walk's own prompts are the playbook skip or reapply question, asked even whe
 
 In short: The spec folder, an optional playbook (outside the project or under `docs/playbooks/`), and the progress file when one exists.
 
-Reads the spec folder, the optional playbook, and `walk-progress.md` when resuming. The first command is `scripts/walk_progress.py start --root <folder-or-slug>`, which returns resume and playbook-status. The ready check is `scripts/walk_progress.py readiness --root <spec-folder> --write-map`, which reads `spec.md`, `plan.md`, `tasks.md`, and `verify.md` through `task_order.py` and `question_blocks.py`. It does not read production data.
+Reads the spec folder, the optional playbook, and `walk-progress.md` when resuming. The first command is `scripts/walk_progress.py start --root <folder-or-slug>`, which returns resume and playbook-status. The ready check is `scripts/walk_progress.py readiness --root <spec-folder> --write-map`, which reads `spec.md`, `plan.md`, `tasks.md`, `claims.md` when it exists, and `verify.md` through `task_order.py` and `question_blocks.py`. It fetches the specs repo before it reads. It does not read production data.
 
 ## Writes
 
