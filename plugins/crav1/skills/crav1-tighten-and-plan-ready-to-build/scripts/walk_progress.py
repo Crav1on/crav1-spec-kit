@@ -29,6 +29,7 @@ Usage (JSON on stdout):
       [--tag spec|plan] [--choice tighten-spec|open-point] [--yes]
   walk_progress.py resolve-stamps --root <spec-folder> --yes
       [--settle-stamps] [--ours-root <folder> --theirs-root <folder>]
+  walk_progress.py restamp-covered --root <spec-folder> --yes
 
 readiness --root builds the rows from task_order.py and question_blocks.py
 and adds the Reviewed warnings. It also compares tasks.md with verify.md.
@@ -525,6 +526,415 @@ def spec_parts(text: str) -> tuple[str, str]:
     return "".join(body_lines), "".join(questions)
 
 
+# Which spec section reopens which walk steps (1.148.0).
+# The first step in a tuple is the owner. Later steps are there only when
+# that section is what the plan was written from. A change reopens that
+# set, not every later step, and not resolve-open-questions unless the
+# question's words or its stable id changed.
+# An unknown heading uses REQUIREMENT_STEPS. That is the safe default:
+# a new constraint must still reopen the plan.
+REQUIREMENT_STEPS = (
+    "tighten-spec",
+    "plan-from-spec",
+    "review-and-tighten-plan",
+    "tasks-ready-to-build",
+)
+QUESTION_STEPS = ("resolve-open-questions",)
+# These sections may change without reopening. add-to-spec can restamp.
+RESTAMP_SLUGS = frozenset({"match", "in-the-code"})
+# Approval needed is omitted from the stamp entirely (1.141.0).
+_SKIP_SECTIONS = frozenset({"approval-needed"})
+SECTION_STEPS = {
+    "preamble": REQUIREMENT_STEPS,
+    "problem": REQUIREMENT_STEPS,
+    "goals": REQUIREMENT_STEPS,
+    "non-goals": REQUIREMENT_STEPS,
+    "users-and-journeys": REQUIREMENT_STEPS,
+    "acceptance-criteria": REQUIREMENT_STEPS,
+    "constraints": REQUIREMENT_STEPS,
+    "requirements": REQUIREMENT_STEPS,
+    "scope": REQUIREMENT_STEPS,
+    "decisions": REQUIREMENT_STEPS,
+    "background": REQUIREMENT_STEPS,
+    "context": REQUIREMENT_STEPS,
+    "what-the-dump-says": REQUIREMENT_STEPS,
+    "trace": REQUIREMENT_STEPS,
+    "research-findings": REQUIREMENT_STEPS,
+    "open-questions": QUESTION_STEPS,
+    "match": (),
+    "in-the-code": (),
+}
+SECTION_TITLES = {
+    "preamble": "the spec introduction",
+    "problem": "Problem",
+    "goals": "Goals",
+    "non-goals": "Non-goals",
+    "users-and-journeys": "Users and journeys",
+    "acceptance-criteria": "Acceptance criteria",
+    "constraints": "Constraints",
+    "requirements": "Requirements",
+    "scope": "Scope",
+    "decisions": "Decisions",
+    "background": "Background",
+    "context": "Context",
+    "what-the-dump-says": "What the dump says",
+    "trace": "Trace",
+    "research-findings": "Research findings",
+    "open-questions": "Open questions",
+    "match": "Match",
+    "in-the-code": "In the code",
+}
+_HEADING = re.compile(r"^##\s+(.+?)\s*$")
+_SYNCED_LINE = re.compile(r"^Synced at:\s+\S", re.I)
+_SECTION_VALUE = re.compile(r"^(?:none|[a-z0-9-]+@[0-9a-f]{12}(?: [a-z0-9-]+@[0-9a-f]{12})*)$")
+_QUESTION_ID_VALUE = re.compile(
+    r"^(?:none|[A-Za-z0-9._-]+@[0-9a-f]{12}(?:=a)?(?: [A-Za-z0-9._-]+@[0-9a-f]{12}(?:=a)?)*)$"
+)
+_ID_MARK = re.compile(r"^(?:Id|Qid|Stable id):\s*([A-Za-z0-9._-]+)\s*$", re.I)
+
+
+def section_slug(title: str) -> str:
+    slug = re.sub(r"[^a-z0-9]+", "-", (title or "").strip().lower()).strip("-")
+    return slug or "section"
+
+
+def section_title(slug: str) -> str:
+    if slug in SECTION_TITLES:
+        return SECTION_TITLES[slug]
+    text = slug.replace("-", " ").strip()
+    return text[:1].upper() + text[1:] if text else slug
+
+
+def spec_section_map(text: str) -> list[tuple[str, str]]:
+    """(slug, normalized hash) in document order.
+
+    The preamble is the text before the first heading, without `Synced at`
+    lines. Those lines are a sync stamp, not a requirement. `## Approval
+    needed` is omitted. Duplicate headings are joined in order.
+    """
+    lines = _lf_text(text or "").split("\n")
+    blocks: list[tuple[str, list[str]]] = [("preamble", [])]
+    for line in lines:
+        match = _HEADING.match(line)
+        if match:
+            blocks.append((section_slug(match.group(1)), [line]))
+        else:
+            blocks[-1][1].append(line)
+    ordered: list[str] = []
+    chunks: dict[str, list[str]] = {}
+    for slug, chunk in blocks:
+        if slug in _SKIP_SECTIONS:
+            continue
+        if slug == "preamble":
+            chunk = [item for item in chunk if not _SYNCED_LINE.match(item.strip())]
+            # A Synced at line leaves a blank line behind. That blank is not a requirement.
+            raw_preamble = re.sub(r"\n{3,}", "\n\n", "\n".join(chunk))
+            chunk = raw_preamble.split("\n")
+        if slug not in chunks:
+            ordered.append(slug)
+            chunks[slug] = []
+        chunks[slug].extend(chunk)
+    out = []
+    for slug in ordered:
+        raw = "\n".join(chunks[slug])
+        out.append((slug, version_text(normalize_text("spec", raw))))
+    return out
+
+
+def section_stamp_line(text: str | None) -> str:
+    if text is None:
+        return "none"
+    parts = [f"{slug}@{hashed}" for slug, hashed in spec_section_map(text)]
+    return " ".join(parts) if parts else "none"
+
+
+def _parse_section_stamps(value: str | None) -> dict[str, str]:
+    if not value or value == "none":
+        return {}
+    out: dict[str, str] = {}
+    for part in value.split():
+        slug, _, hashed = part.partition("@")
+        if slug and hashed:
+            out[slug] = hashed
+    return out
+
+
+def _changed_slugs(stored: str | None, text: str) -> list[str]:
+    old = _parse_section_stamps(stored)
+    current = spec_section_map(text)
+    new = {slug: hashed for slug, hashed in current}
+    changed = [slug for slug, hashed in current if old.get(slug) != hashed]
+    changed.extend(slug for slug in old if slug not in new)
+    return changed
+
+
+def _word_hash(text: str) -> str:
+    """Hash of the question's words. Stays a word hash if question_key becomes a stable id."""
+    norm = re.sub(r"\s+", " ", (text or "").strip().lower())
+    return hashlib.sha256(norm.encode("utf-8")).hexdigest()[:12]
+
+
+def _iter_questions(text: str) -> list[dict]:
+    """Every question bullet, including ones that already have Answered:."""
+    lines = _lf_text(text or "").split("\n")
+    start = None
+    for index, line in enumerate(lines):
+        if line.strip().lower() == "## open questions":
+            start = index + 1
+            break
+    if start is None:
+        return []
+    questions: list[dict] = []
+    current: dict | None = None
+    for line in lines[start:]:
+        if line.startswith("## "):
+            break
+        if line.startswith("- ") and not line.startswith("  "):
+            body = line[2:].strip()
+            current = {"text": body, "marks": []} if body else None
+            if current:
+                questions.append(current)
+            continue
+        if current is not None and line.startswith("  - "):
+            current["marks"].append(line[4:].strip())
+    return questions
+
+
+def _lookup_stable_id(text: str, marks: list[str]) -> str | None:
+    """A stable id from an Id mark, or from question_blocks when 1.146.0 provides one.
+
+    question_key is used only when it is no longer the word hash, which is
+    how a later kit can publish a stable id without a new function name.
+    """
+    for mark in marks or []:
+        match = _ID_MARK.match(mark.strip())
+        if match:
+            return match.group(1)
+    try:
+        mod = blocks_mod()
+    except SystemExit:
+        return None
+    for name in ("stable_question_id", "question_identity"):
+        fn = getattr(mod, name, None)
+        if not callable(fn):
+            continue
+        try:
+            found = fn(text, marks)
+        except TypeError:
+            found = fn(text)
+        if found and re.fullmatch(r"[A-Za-z0-9._-]+", str(found)):
+            return str(found)
+    key_fn = getattr(mod, "question_key", None)
+    if callable(key_fn):
+        key = str(key_fn(text) or "")
+        if key and key != _word_hash(text) and re.fullmatch(r"[A-Za-z0-9._-]+", key):
+            return key
+    return None
+
+
+def _question_identity(text: str, marks: list[str]) -> tuple[str, str, bool]:
+    word = _word_hash(text)
+    stable = _lookup_stable_id(text, marks)
+    answered = any(mark.startswith("Answered:") for mark in marks or [])
+    return (stable or word), word, answered
+
+
+def question_id_line(text: str | None) -> str:
+    if not text:
+        return "none"
+    parts = []
+    for question in _iter_questions(text):
+        ident, word, answered = _question_identity(question["text"], question["marks"])
+        token = f"{ident}@{word}" + ("=a" if answered else "")
+        parts.append(token)
+    return " ".join(parts) if parts else "none"
+
+
+def _parse_question_ids(value: str | None) -> tuple[dict[str, str], dict[str, str]]:
+    """Open ids and answered ids, each mapping id to the word hash."""
+    open_ids: dict[str, str] = {}
+    answered: dict[str, str] = {}
+    if not value or value == "none":
+        return open_ids, answered
+    for part in value.split():
+        answered_mark = part.endswith("=a")
+        core = part[:-2] if answered_mark else part
+        ident, _, word = core.partition("@")
+        if not ident or not word:
+            continue
+        if answered_mark:
+            answered[ident] = word
+        else:
+            open_ids[ident] = word
+    return open_ids, answered
+
+
+def _diff_questions(stored: str | None, text: str) -> dict:
+    """Which questions must be asked again.
+
+    A settled question stays settled when an Answered line is added or a new
+    answered question appears. A new open question, a removed open question,
+    or a word change on the same stable id reopens resolve-open-questions.
+    """
+    prev_open, prev_answered = _parse_question_ids(stored)
+    current = []
+    for question in _iter_questions(text):
+        ident, word, answered = _question_identity(question["text"], question["marks"])
+        current.append({"id": ident, "word": word, "answered": answered})
+    curr_all = {row["id"]: row for row in current}
+    curr_open = {row["id"]: row for row in current if not row["answered"]}
+    changed: list[dict] = []
+    reopen = False
+    answered_events = False
+
+    def note(ident: str, reason: str, does_reopen: bool) -> None:
+        nonlocal reopen
+        changed.append({"id": ident, "reason": reason})
+        if does_reopen:
+            reopen = True
+
+    for ident, row in curr_open.items():
+        if ident not in prev_open:
+            note(ident, "reopened" if ident in prev_answered else "new", True)
+        elif prev_open[ident] != row["word"]:
+            note(ident, "reworded", True)
+    for ident, word in prev_open.items():
+        if ident in curr_open:
+            continue
+        row = curr_all.get(ident)
+        if row and row["answered"] and row["word"] == word:
+            answered_events = True
+            continue
+        if row and row["answered"]:
+            note(ident, "reworded", True)
+            continue
+        note(ident, "removed", True)
+    for ident, row in curr_all.items():
+        if not row["answered"] or ident in prev_open:
+            continue
+        if ident not in prev_answered:
+            answered_events = True
+        elif prev_answered[ident] != row["word"]:
+            note(ident, "reworded", True)
+    return {
+        "reopen": reopen,
+        "answered_only": answered_events and not reopen,
+        "changed": changed,
+    }
+
+
+def _architecture_absorbs(steps: dict) -> bool:
+    """True when the architecture review is the latest recorded spec step."""
+    if "review-architecture" not in steps:
+        return False
+    own = ORDER.index("review-architecture")
+    for later in ORDER[own + 1:]:
+        if later in steps and "spec" in AFFECTS.get(later, ()):
+            return False
+    return True
+
+
+def _steps_for_slugs(changed: list[str], question_reopen: bool, steps: dict) -> tuple[list[str], bool]:
+    """Recorded steps to reopen, and whether a requirement section changed."""
+    wanted: list[str] = []
+
+    def add(step: str) -> None:
+        if step not in wanted:
+            wanted.append(step)
+
+    requirement = False
+    for slug in changed:
+        if slug == "open-questions":
+            if question_reopen:
+                add("resolve-open-questions")
+            continue
+        if slug in RESTAMP_SLUGS:
+            continue
+        owners = SECTION_STEPS.get(slug, REQUIREMENT_STEPS)
+        if owners == REQUIREMENT_STEPS or "tighten-spec" in owners:
+            requirement = True
+        for step in owners:
+            add(step)
+    if _architecture_absorbs(steps) and "tighten-spec" in wanted:
+        add("review-architecture")
+    recorded = [step for step in ORDER if step in wanted and step in steps]
+    return recorded, requirement
+
+
+def _body_hash(text: str) -> str:
+    body, _questions = spec_parts(_lf_text(text))
+    return version_text(normalize_text("spec", body))
+
+
+def section_effect(root: Path, steps: dict) -> dict:
+    """What a spec edit invalidates, from the recorded section stamps.
+
+    Inactive when no recorded step has `Section stamps` (a walk recorded
+    before 1.148.0). Those steps keep the 1.137 whole-body rule.
+    """
+    baseline = None
+    # Extras keep the version they saw. The baseline is the latest locked step.
+    for step in list(ORDER) + list(EXTRAS):
+        if step in EXTRAS and baseline is not None:
+            break
+        body = steps.get(step) or {}
+        if body.get("section_stamps"):
+            baseline = body
+    empty = {
+        "active": False,
+        "changed_slugs": [],
+        "titles": [],
+        "reopen_steps": [],
+        "reopen_line": None,
+        "changed_questions": [],
+        "restamp_only": False,
+        "question_reopen": False,
+        "requirement_hit": False,
+    }
+    if baseline is None:
+        return empty
+    spec_text, _raw = _read_pair(root / "spec.md")
+    text = spec_text or ""
+    changed = _changed_slugs(baseline.get("section_stamps"), text)
+    resolve = steps.get("resolve-open-questions") or {}
+    qdiff = {"reopen": False, "answered_only": False, "changed": []}
+    if "open-questions" in changed and resolve.get("question_ids"):
+        qdiff = _diff_questions(resolve.get("question_ids"), text)
+    elif "open-questions" in changed and resolve:
+        qdiff = {"reopen": True, "answered_only": False, "changed": []}
+    reopen, requirement = _steps_for_slugs(changed, bool(qdiff["reopen"]), steps)
+    titles = [section_title(slug) for slug in changed]
+    body_differs = False
+    stored_body = baseline.get("spec_body")
+    if stored_body and stored_body not in (None, "missing") and text:
+        body_differs = stored_body != _body_hash(text)
+    if not changed and body_differs:
+        titles = ["Synced at"]
+    restamp_slugs = set(RESTAMP_SLUGS)
+    only_restamp = all(
+        slug in restamp_slugs or (slug == "open-questions" and qdiff["answered_only"])
+        for slug in changed
+    )
+    restamp_only = bool(titles) and not reopen and only_restamp and (
+        "open-questions" not in changed or bool(qdiff["answered_only"])
+    )
+    line = None
+    if titles:
+        names = ", ".join(reopen) if reopen else "none"
+        line = f"Changed: {', '.join(titles)}. Reopen: {names}."
+    return {
+        "active": True,
+        "changed_slugs": changed,
+        "titles": titles,
+        "reopen_steps": reopen,
+        "reopen_line": line,
+        "changed_questions": qdiff["changed"],
+        "restamp_only": restamp_only,
+        "question_reopen": bool(qdiff["reopen"]),
+        "requirement_hit": requirement,
+    }
+
+
 def _read_pair(path: Path) -> tuple[str | None, bytes | None]:
     if not path.is_file():
         return None, None
@@ -549,12 +959,16 @@ def versions(root: Path, playbook: Path | None = None) -> dict:
     if spec_text is None:
         out["spec_body"] = "missing"
         out["questions"] = "missing"
+        out["section_stamps"] = "none"
+        out["question_ids"] = "none"
     else:
         lf = _lf_text(spec_text)
         out["spec"] = version_text(normalize_text("spec", spec_without_approval(lf)))
         body, questions = spec_parts(lf)
         out["spec_body"] = version_text(normalize_text("spec", body))
         out["questions"] = version_text(normalize_text("questions", questions))
+        out["section_stamps"] = section_stamp_line(lf)
+        out["question_ids"] = question_id_line(lf)
     if playbook is not None:
         out["playbook"] = stamp_file(playbook, "playbook")
     return out
@@ -693,6 +1107,14 @@ def parse_progress(text: str) -> dict:
             current["questions"] = value
         elif key == "Kept questions":
             current["kept_questions"] = value
+        elif key == "Section stamps":
+            if not _SECTION_VALUE.fullmatch(value):
+                fail("progress-file", f"section stamps are not slug@hash: {line}")
+            current["section_stamps"] = value
+        elif key == "Question ids":
+            if not _QUESTION_ID_VALUE.fullmatch(value):
+                fail("progress-file", f"question ids are not id@hash: {line}")
+            current["question_ids"] = value
         elif key == "Content stamp":
             if value != CONTENT_STAMP:
                 fail("progress-file", f"unknown content stamp: {line}")
@@ -776,6 +1198,10 @@ def render(slice_label: str, steps: dict, acks: list | None = None, jumps: list 
                 lines.append(f"  Questions version: {body['questions']}")
             if "kept_questions" in body:
                 lines.append(f"  Kept questions: {body['kept_questions']}")
+            if "question_ids" in body:
+                lines.append(f"  Question ids: {body['question_ids']}")
+            if "section_stamps" in body:
+                lines.append(f"  Section stamps: {body['section_stamps']}")
         _render_stamp(lines, body)
         lines.append("")
     for step in EXTRAS:
@@ -791,6 +1217,8 @@ def render(slice_label: str, steps: dict, acks: list | None = None, jumps: list 
             lines.append(f"  Spec body: {body['spec_body']}")
         if "questions" in body:
             lines.append(f"  Questions version: {body['questions']}")
+        if "section_stamps" in body:
+            lines.append(f"  Section stamps: {body['section_stamps']}")
         _render_stamp(lines, body)
         lines.append("")
     _render_jumps(lines, jumps)
@@ -867,8 +1295,10 @@ def current_tokens(root: Path, step: str, playbook: Path | None) -> dict:
     if "spec" in COVERS[step]:
         out["spec_body"] = got["spec_body"]
         out["questions"] = got["questions"]
+        out["section_stamps"] = got.get("section_stamps") or "none"
     if step == "resolve-open-questions":
         out["kept_questions"] = kept_question_line(root)
+        out["question_ids"] = got.get("question_ids") or "none"
     out["content_stamp"] = CONTENT_STAMP
     return out
 
@@ -1026,7 +1456,7 @@ def _piece_match(root: Path, body: dict, token: str, part: str) -> bool:
     )
 
 
-def hash_drift(root: Path, step: str, body: dict) -> list[str]:
+def hash_drift(root: Path, step: str, body: dict, steps: dict | None = None) -> list[str]:
     """Covered files whose content differs from the version this step recorded.
 
     Progress marks do not count: a task checkbox, a PR or done note on that
@@ -1035,6 +1465,11 @@ def hash_drift(root: Path, step: str, body: dict) -> list[str]:
     recorded, a change confined to ## Open questions reopens
     resolve-open-questions only. The other spec steps compare Spec body.
     `## Approval needed` is in neither stamp, so editing it reopens no step.
+    A step with `Section stamps` (1.148.0) reopens only when a changed
+    section names this step. Match, In the code, a Synced at line, and an
+    already-answered question do not. A requirement section reopens
+    tighten-spec and the plan steps, not resolve, unless the question ids
+    changed too.
     A step recorded before that split still compares the whole-file spec.
     An older step has no Content stamp line. It still matches a progress-only
     edit, by raw bytes, by the other line ending, by one hash-undo, or by
@@ -1054,7 +1489,20 @@ def hash_drift(root: Path, step: str, body: dict) -> list[str]:
         ):
             changed.append("playbook")
         return changed
+    effect = section_effect(root, steps or {}) if body.get("section_stamps") else None
     for token in COVERS[step]:
+        if token == "spec" and effect and effect["active"]:
+            if step in effect["reopen_steps"]:
+                questions_only = (
+                    step == "resolve-open-questions" and not effect["requirement_hit"]
+                )
+                if questions_only:
+                    changed.append("questions")
+                else:
+                    changed.append("spec")
+                    if step == "resolve-open-questions" and effect["question_reopen"]:
+                        changed.append("questions")
+            continue
         if token == "spec" and _split_ready(body):
             body_same = _piece_match(root, body, "spec", "spec_body")
             questions_same = _piece_match(root, body, "spec", "questions")
@@ -1087,7 +1535,7 @@ def affects_of(step: str, steps: dict) -> tuple[str, ...]:
 def affected_drift(root: Path, step: str, body: dict, steps: dict) -> list[str]:
     """Drift that reopens the step. A file it merely recorded does not."""
     affects = set(affects_of(step, steps))
-    return [token for token in hash_drift(root, step, body) if token in affects]
+    return [token for token in hash_drift(root, step, body, steps) if token in affects]
 
 
 def _restamp_body(body: dict, name: str, now: dict, tokens: set[str]) -> None:
@@ -1100,6 +1548,8 @@ def _restamp_body(body: dict, name: str, now: dict, tokens: set[str]) -> None:
     if "spec" in tokens and "spec" in COVERS[name]:
         body["spec_body"] = now["spec_body"]
         body["questions"] = now["questions"]
+        if now.get("section_stamps"):
+            body["section_stamps"] = now["section_stamps"]
         touched = True
     if touched:
         body["content_stamp"] = CONTENT_STAMP
@@ -1121,6 +1571,7 @@ def restamp_earlier(root: Path, steps: dict, step: str) -> None:
         _restamp_body(body, earlier, now, covered)
     if "spec" in covered and "resolve-open-questions" in steps and ORDER.index(step) > ORDER.index("resolve-open-questions"):
         steps["resolve-open-questions"]["kept_questions"] = kept_question_line(root)
+        steps["resolve-open-questions"]["question_ids"] = now.get("question_ids") or "none"
 
 
 def restamp_recorded(root: Path, steps: dict, tokens: set[str]) -> None:
@@ -1136,6 +1587,7 @@ def restamp_recorded(root: Path, steps: dict, tokens: set[str]) -> None:
         _restamp_body(body, name, now, tokens)
     if "spec" in tokens and "resolve-open-questions" in steps:
         steps["resolve-open-questions"]["kept_questions"] = kept_question_line(root)
+        steps["resolve-open-questions"]["question_ids"] = now.get("question_ids") or "none"
 
 
 def refresh_versions(root: Path, step: str, body: dict) -> None:
@@ -1154,8 +1606,10 @@ def refresh_versions(root: Path, step: str, body: dict) -> None:
     if "spec" in COVERS[step]:
         body["spec_body"] = now["spec_body"]
         body["questions"] = now["questions"]
+        body["section_stamps"] = now.get("section_stamps") or "none"
     if step == "resolve-open-questions":
         body["kept_questions"] = kept_question_line(root)
+        body["question_ids"] = now.get("question_ids") or "none"
     body["content_stamp"] = CONTENT_STAMP
 
 
@@ -1194,6 +1648,7 @@ def resume(args: argparse.Namespace) -> None:
     if not root.is_dir():
         fail("root", f"not a folder: {root}")
     data = load(root)
+    effect = section_effect(root, data["steps"])
     rows = []
     continue_from = None
     for step in ORDER:
@@ -1210,6 +1665,8 @@ def resume(args: argparse.Namespace) -> None:
             if drift:
                 status = "reopen"
                 impact = " ".join(IMPACT[token] for token in drift)
+                if effect["reopen_line"] and step in effect["reopen_steps"]:
+                    impact = effect["reopen_line"]
                 if step == "tasks-ready-to-build":
                     impact = impact + " " + RESTAMP
                 row = {
@@ -1219,6 +1676,8 @@ def resume(args: argparse.Namespace) -> None:
                     "changed": drift,
                     "impact": impact,
                 }
+                if step == "resolve-open-questions" and effect["changed_questions"]:
+                    row["changed_questions"] = effect["changed_questions"]
             else:
                 status = "keep"
                 row = {"id": step, "status": status, "result": body["result"]}
@@ -1244,6 +1703,11 @@ def resume(args: argparse.Namespace) -> None:
         "continue_from": continue_from,
         "playbook": book.get("playbook") if book else None,
         "done_stamp_warning": done_stamp_warning(data["steps"], data.get("acks")),
+        "reopen_line": effect["reopen_line"],
+        "changed_sections": effect["titles"],
+        "reopen_steps": effect["reopen_steps"],
+        "changed_questions": effect["changed_questions"],
+        "restamp_only": effect["restamp_only"],
         "spec_findings": [
             {
                 "id": jump["id"],
@@ -1536,8 +2000,10 @@ def cover(args: argparse.Namespace) -> None:
         if "spec" in COVERS[step]:
             body["spec_body"] = now["spec_body"]
             body["questions"] = now["questions"]
+            body["section_stamps"] = now.get("section_stamps") or "none"
         if step == "resolve-open-questions":
             body["kept_questions"] = kept_question_line(root)
+            body["question_ids"] = now.get("question_ids") or "none"
         body["content_stamp"] = CONTENT_STAMP
         covered.append(step)
     write_progress(root, data)
@@ -2395,6 +2861,11 @@ def readiness(args: argparse.Namespace) -> None:
         "recommend_jump": bool(jump) and result == "not-ready",
         "jump_back": jump,
         "reopened": reopened,
+        "reopen_line": None,
+        "changed_sections": [],
+        "reopen_steps": [],
+        "changed_questions": [],
+        "restamp_only": False,
         "verify_behind": gap["behind"],
         "verify_stale": gap["tasks"],
         "verify_waiting": gap["waiting"],
@@ -2406,6 +2877,12 @@ def readiness(args: argparse.Namespace) -> None:
     if root is not None and root.is_dir():
         loaded = load(root)
         out["done_stamp_warning"] = done_stamp_warning(loaded["steps"], loaded.get("acks"))
+        effect = section_effect(root, loaded["steps"])
+        out["reopen_line"] = effect["reopen_line"]
+        out["changed_sections"] = effect["titles"]
+        out["reopen_steps"] = effect["reopen_steps"]
+        out["changed_questions"] = effect["changed_questions"]
+        out["restamp_only"] = effect["restamp_only"]
     emit(out)
 
 
@@ -2614,6 +3091,8 @@ _STAMP_KEYS = frozenset({
     "Spec body",
     "Questions version",
     "Kept questions",
+    "Section stamps",
+    "Question ids",
     "Content stamp",
     "Key",
     "Playbook",
@@ -2638,6 +3117,10 @@ def _stamp_label(line: str) -> str | None:
         return key if value == CONTENT_STAMP else None
     if key == "Kept questions":
         return key if _KEPT_VALUE.fullmatch(value) else None
+    if key == "Section stamps":
+        return key if _SECTION_VALUE.fullmatch(value) else None
+    if key == "Question ids":
+        return key if _QUESTION_ID_VALUE.fullmatch(value) else None
     if value == "missing" or _HEX12.fullmatch(value):
         return key
     return None
@@ -3386,6 +3869,14 @@ def _line_for_label(body: dict, label: str) -> str | None:
         return f"  Playbook: {body['playbook']}@{body['playbook_version']}"
     if label == "Kept questions":
         return f"  Kept questions: {body['kept_questions']}"
+    if label == "Section stamps":
+        if body.get("section_stamps"):
+            return f"  Section stamps: {body['section_stamps']}"
+        return None
+    if label == "Question ids":
+        if body.get("question_ids"):
+            return f"  Question ids: {body['question_ids']}"
+        return None
     if label == "Spec body":
         return f"  Spec body: {body['spec_body']}"
     if label == "Questions version":
@@ -3427,6 +3918,53 @@ def _settle_stamp_hunks(lines: list[str], hunks: list[dict], data: dict) -> list
         cursor = hunk["end"]
     out.extend(lines[cursor:])
     return out
+
+
+def restamp_covered(args: argparse.Namespace) -> None:
+    """Refresh spec stamps when the edit reopens no step (1.148.0).
+
+    Match, In the code, a Synced at line, and an already-answered question.
+    Done and Result stay. A requirement change is refused.
+    """
+    root = Path(args.root)
+    if not root.is_dir():
+        fail("root", f"not a folder: {root}")
+    data = load(root)
+    if not data["steps"]:
+        fail("progress-file", "no walk progress to restamp")
+    effect = section_effect(root, data["steps"])
+    if not effect["restamp_only"]:
+        fail("not-restamp", effect["reopen_line"] or "nothing to restamp")
+    if not args.yes:
+        emit({
+            "ok": False,
+            "code": "needs-yes",
+            "reopen_line": effect["reopen_line"],
+            "message": "restamp-covered writes the progress file only with --yes",
+        })
+        raise SystemExit(2)
+    now = versions(root)
+    stamped = []
+    for step, body in data["steps"].items():
+        if step == "playbook" or "spec" not in COVERS.get(step, ()):
+            continue
+        body["spec"] = now["spec"]
+        body["spec_body"] = now["spec_body"]
+        body["questions"] = now["questions"]
+        body["section_stamps"] = now.get("section_stamps") or "none"
+        if step == "resolve-open-questions":
+            body["kept_questions"] = kept_question_line(root)
+            body["question_ids"] = now.get("question_ids") or "none"
+        body["content_stamp"] = CONTENT_STAMP
+        stamped.append(step)
+    write_progress(root, data)
+    emit({
+        "ok": True,
+        "wrote": PROGRESS_NAME,
+        "restamped": stamped,
+        "reopen_line": effect["reopen_line"],
+        "reopen_steps": [],
+    })
 
 
 def cmd_version(args: argparse.Namespace) -> None:
@@ -3505,6 +4043,11 @@ def main(argv: list[str] | None = None) -> None:
     rs.add_argument("--ours-root")
     rs.add_argument("--theirs-root")
     rs.set_defaults(func=resolve_stamps)
+
+    rc = sub.add_parser("restamp-covered")
+    rc.add_argument("--root", required=True)
+    rc.add_argument("--yes", action="store_true")
+    rc.set_defaults(func=restamp_covered)
 
     args = parser.parse_args(argv)
     args.func(args)

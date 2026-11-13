@@ -85,6 +85,10 @@ A thin spec (match status `not in the code`, or only Match / What the dump says 
 
 Also compare the kept quote with research. Follow [references/research-stale.md](references/research-stale.md). Read [references/research-stale-mark.md](references/research-stale-mark.md) only on a hit. Read `docs/research/*.md` and `## Research findings` on the specs this quote touches, and the notes those findings link to. List a clear contradiction and an answered open question. An unclear case is not a hit. Ask before any new mark. Write the stale block and the findings line only after the user says yes. Then offer the revisit draft. The kit drafts only. It does not send it. It does not contact the note's owner. When the user pointed this command at an updated note in `docs/research/`, or this run writes one, follow the clear section, [references/research-stale-clear.md](references/research-stale-clear.md). Judge each listed point. An older mark with no point lines is not one point. Split it as that file says. Also route the note's own open questions when the answer lies outside the note's owner. That still runs when the mark clears. Do not ask the user whether the update resolves the mark. A kept quote that answers a point already waiting is re-checked there too. That re-check does not ask.
 
+## Walk restamp (1.148.0)
+
+Read [references/walk-restamp.md](references/walk-restamp.md) only when the spec just written has `walk-progress.md` beside it.
+
 ## Run ending (1.122.0)
 
 End as [run-ending.md](../crav1-docs/reference/run-ending.md) says.

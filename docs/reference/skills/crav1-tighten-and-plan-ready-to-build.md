@@ -46,6 +46,8 @@ The progress file is `docs/specs/<slug>/walk-progress.md`. It records the step, 
 
 1.144.0: the spec folder command is `<interpreter> -X utf8 <skill crav1-tasks-ready-to-build>/scripts/resolve_spec.py "<query>" --root docs/specs`. On Windows `<interpreter>` is `python` with `PYTHONUTF8=1`. Elsewhere it is `python3`. Do not run `python3` alone. The ready check is `readiness --root <spec-folder>`. Playbook status passes `--playbook <file>` as well as `--root`. The rule is `docs/reference/running-scripts.md`.
 
+1.148.0: a spec edit reopens from the first step that owns the changed section, not every later step. `resume` and `readiness` return `reopen_line`. Say it once. A requirement section (Problem, Goals, Non-goals, Users and journeys, Acceptance criteria, Constraints, and the other rows in `references/section-reopen.md`) reopens tighten-spec and the plan steps. It does not reopen resolve-open-questions when `changed_questions` is empty. Ask only those ids. An `Id:` mark, or a stable id from `question_blocks.py` when that id is not the word hash, keeps a reword as the same question. `## Match`, `## In the code`, a `Synced at` line, and an already-answered question set `restamp_only` and reopen nothing. An unknown heading reopens the plan. An older step with no `Section stamps` line still uses the 1.137 rule.
+
 ## Runs when
 
 A spec should be tightened and planned until it is ready to build. Called by the user.
