@@ -396,6 +396,9 @@ Every mark and line format the kit writes inside product files, generated from [
 | Jump open | `  Open: ../crav1-tighten-spec/SKILL.md` | `docs/specs/<slug>/walk-progress.md` (under a jump-back) | `/crav1-tighten-and-plan-ready-to-build` | `/crav1-tighten-and-plan-ready-to-build` | 1.135.0 |
 | Continue | `  Continue: <step>[, <step>]` | `docs/specs/<slug>/walk-progress.md` (under a jump-back or open point) | `/crav1-tighten-and-plan-ready-to-build` | `/crav1-tighten-and-plan-ready-to-build` | 1.135.0 |
 | Finding key | `  Key: <12 hex>` | `docs/specs/<slug>/walk-progress.md` (under a jump-back or open point) | `/crav1-tighten-and-plan-ready-to-build` | `/crav1-tighten-and-plan-ready-to-build` | 1.135.0 |
+| Finding topic | `  Topic: <short topic>` | `docs/specs/<slug>/walk-progress.md` (under a jump-back or open point) | `/crav1-tighten-and-plan-ready-to-build` | `/crav1-tighten-and-plan-ready-to-build` | 1.146.0 |
+| Finding alias | `  Alias: <12 hex> [<12 hex> ...]` | `docs/specs/<slug>/walk-progress.md` (under a jump-back or open point) | `/crav1-tighten-and-plan-ready-to-build` | `/crav1-tighten-and-plan-ready-to-build` | 1.146.0 |
+| Question key | `  Question: <12 hex> <12 hex> <text>` | `docs/specs/<slug>/walk-progress.md` (under resolve-open-questions) | `/crav1-tighten-and-plan-ready-to-build` | `/crav1-tighten-and-plan-ready-to-build` | 1.146.0 |
 | Build walk | `Walk: build-walk` | `docs/specs/<slug>/build-progress/<branch>.md` (near the title) | `/crav1-build-walk` | `/crav1-build-walk` | 1.142.0 |
 | Build branch | `Branch: <branch>` | `docs/specs/<slug>/build-progress/<branch>.md` (near the title) | `/crav1-build-walk` | `/crav1-build-walk` | 1.142.0 |
 | Build owner | `Owner: <self \| other>` | `docs/specs/<slug>/build-progress/<branch>.md` (near the title) | `/crav1-build-walk` | `/crav1-build-walk` | 1.142.0 |

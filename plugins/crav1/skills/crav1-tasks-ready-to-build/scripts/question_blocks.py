@@ -22,6 +22,7 @@ Prints JSON. Standard library only. Writes nothing. The ready check passes
 resolve_recorded when that step is already in walk-progress.md. This command
 does not, so a question that names no task still holds the slice.
 """
+import difflib
 import hashlib
 import json
 import re
@@ -78,9 +79,59 @@ def _norm(text):
     return re.sub(r"\s+", " ", text).strip().lower()
 
 
+# Commit ids, pull-request numbers, and dates are not part of the question.
+# question_key stays the exact words so an old Kept questions line still matches.
+_VOLATILE = re.compile(
+    r"\b[0-9a-fA-F]{7,40}\b"
+    r"|\bPR\s*#?\d+\b"
+    r"|\(\s*PR\s+\d+(?:,\s*merged)?\s*\)"
+    r"|\bcommits?\b"
+    r"|\b\d{4}-\d{2}-\d{2}\b",
+    re.I,
+)
+_COMPARE_STOP = frozenset(
+    "a an the of to for and or in on at by with from that this is are was be it as do not "
+    "before after should would can".split()
+)
+# One recorded question at or above this is the same question. Two at this
+# bar are not merged. Below it, the question is new.
+CLOSE_QUESTION = 0.86
+
+
 def question_key(text):
-    """Stable id for one question's words. Used to remember it was already waiting."""
+    """Exact-words id. An old Kept questions line uses this hash."""
     return hashlib.sha256(_norm(text or "").encode("utf-8")).hexdigest()[:12]
+
+
+def strip_volatile(text):
+    """Drop commit ids, pull-request numbers, and dates. Leave the words."""
+    return _VOLATILE.sub(" ", text or "")
+
+
+def question_stable_key(text):
+    """Id after commit ids and pull-request numbers are removed.
+
+    A refreshed commit list keeps this key. The exact key stays question_key.
+    """
+    return hashlib.sha256(_norm(strip_volatile(text or "")).encode("utf-8")).hexdigest()[:12]
+
+
+def compare_text(text):
+    """Words used to see whether two findings or questions are the same point."""
+    raw = re.sub(r"[^a-z0-9]+", " ", strip_volatile(text).lower())
+    words = [word for word in raw.split() if word not in _COMPARE_STOP and not word.isdigit()]
+    return " ".join(words)
+
+
+def question_similarity(left, right):
+    """1.0 when the words match once commit ids are gone. 0.0 when either side is too short."""
+    a = compare_text(left)
+    b = compare_text(right)
+    if len(a) < 12 or len(b) < 12:
+        return 0.0
+    if a == b:
+        return 1.0
+    return difflib.SequenceMatcher(None, a, b).ratio()
 
 
 def task_ids_from_tasks(text):
@@ -238,6 +289,7 @@ def kept_open(text, task_ids=None, resolve_recorded=False):
         out.append({
             "text": q["text"],
             "key": question_key(q["text"]),
+            "stable_key": question_stable_key(q["text"]),
             "mark": mark,
             "tasks": tasks,
             "reason": reason,
