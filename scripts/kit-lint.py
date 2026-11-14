@@ -294,6 +294,57 @@ def dead_card_problems(kit):
     return out
 
 
+# A ready-check ending has one Run next block at the top and no Next: line of
+# its own (1.153.0). A skill file must not tell the agent to write a Next line
+# after the Waiting or Held lines, or give a `Next: /crav1-build-walk` example
+# for that ending (1.154.0).
+STRAY_NEXT_AFTER = re.compile(
+    r"(?i)\bNext:?\s+lines?\b[^.\n]{0,80}?\b(?:stays?|follows?|comes?|goes|is printed|are printed)\b"
+    r"[^.\n]{0,40}?\bafter\b[^.\n]{0,40}?\b(?:Waiting|Held)\b"
+)
+STRAY_NEXT_WALK = re.compile(r"Next:\s*/crav1-build-walk\b")
+STRAY_NEXT_OK = re.compile(r"(?i)\b(?:never|do not|don't|no)\b[^.\n]{0,40}Next")
+
+
+# The ready-check skills, whose ending is the readiness script's Run next block.
+READY_CHECK_SKILLS = ("crav1-tighten-and-plan-ready-to-build", "crav1-tasks-ready-to-build")
+
+
+def stray_next_hits(text, ready_check=True):
+    """Lines that tell the agent to write a Next line after Waiting (1.154.0)."""
+    hits = []
+    for i, line in enumerate(text.splitlines(), 1):
+        if STRAY_NEXT_AFTER.search(line) and not STRAY_NEXT_OK.search(line):
+            hits.append((i, "a Next line after the Waiting lines"))
+        elif ready_check and STRAY_NEXT_WALK.search(line):
+            hits.append((i, "a `Next: /crav1-build-walk` example"))
+    return hits
+
+
+def stray_next_problems(kit):
+    root = os.path.join(kit, ".cursor", "skills", "crav1")
+    out = []
+    if not os.path.isdir(root):
+        return out
+    for name in sorted(os.listdir(root)):
+        if name == "crav1-docs":
+            continue
+        skill = os.path.join(root, name)
+        paths = [os.path.join(skill, "SKILL.md")]
+        paths += glob.glob(os.path.join(skill, "references", "**", "*.md"), recursive=True)
+        for path in paths:
+            if not os.path.isfile(path):
+                continue
+            with open(path, encoding="utf-8") as fh:
+                text = fh.read()
+            for lineno, why in stray_next_hits(text, name in READY_CHECK_SKILLS):
+                out.append(
+                    f"{os.path.relpath(path, kit)}:{lineno}: tells the agent to write {why}; "
+                    "the ending has one Run next block and no Next: line (1.153.0)"
+                )
+    return out
+
+
 def bytecode_problems(kit):
     out = []
     for path in sorted(py_entry_points(kit)):
@@ -361,6 +412,7 @@ def main(argv):
     errs.extend(bytecode_problems(kit))
     errs.extend(run_ending_problems(kit))
     errs.extend(dead_card_problems(kit))
+    errs.extend(stray_next_problems(kit))
     errs.extend(invocation_problems(kit))
     for e in errs: print("FAIL  " + e)
     print(f"kit lint: {len(skills)} skills, {len(errs)} problem(s)")

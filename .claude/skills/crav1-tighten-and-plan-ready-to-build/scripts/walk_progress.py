@@ -2156,6 +2156,12 @@ def classify(row: dict, resolve_kept: bool = False, resolve_recorded: bool = Fal
         return _hit(task, "blocker", "plan-from-spec", "There is no tasks.md. Run /crav1-plan-from-spec.")
     if "no plan" in text:
         return _hit(task, "blocker", "plan-from-spec", "There is no plan.md. Run /crav1-plan-from-spec.")
+    if row.get("loop") or text.startswith("in a loop"):
+        # A branch in a loop is blocked in the map and here (1.154.0). Other
+        # tasks can still start, so this hit alone does not force not-ready.
+        hit = _hit(task, "blocker", "tighten-plan", LOOP_WHY)
+        hit["loop"] = True
+        return hit
     if row.get("approval") or "approval needed" in text:
         return _waiting(row)
     if "open question" in text:
@@ -2386,11 +2392,15 @@ def map_mod():
     return mod
 
 
-def branch_report(root: Path, rows: list[dict]) -> dict | None:
-    """Ready and held tasks grouped by the build-map row (1.133.0).
+_MAP_CACHE: dict = {}
 
-    The branch is the one `build_map.py --recommend` prints. Missing files
-    leave the report empty so the caller keeps the older line.
+
+def map_built(root: Path) -> dict | None:
+    """The same build the map writes, shared by the ready check (1.154.0).
+
+    The rows, the held lines, and build-map.md all read this one judgement,
+    so a branch in a loop is blocked in each of them. Missing files return
+    None.
     """
     if root is None or not root.is_dir():
         return None
@@ -2406,17 +2416,69 @@ def branch_report(root: Path, rows: list[dict]) -> dict | None:
     plan = plan_path.read_text(encoding="utf-8") if plan_path.is_file() else None
     work = work_path.read_text(encoding="utf-8") if work_path.is_file() else ""
     verify = verify_path.read_text(encoding="utf-8") if verify_path.is_file() else ""
-    built = map_mod().build(
+    recorded = resolve_ever_recorded(root)
+    key = (str(root.resolve()), tasks, spec, plan, work, verify, recorded)
+    cached = _MAP_CACHE.get(key)
+    if cached is not None:
+        return cached
+    mod = map_mod()
+    built = mod.build(
         root.name,
         spec,
         plan,
         tasks,
         work,
         verify,
-        resolve_recorded=resolve_ever_recorded(root),
-        repo=map_mod().find_repo(root),
+        resolve_recorded=recorded,
+        repo=mod.find_repo(root),
     )
+    _MAP_CACHE.clear()
+    _MAP_CACHE[key] = built
+    return built
+
+
+def branch_report(root: Path, rows: list[dict]) -> dict | None:
+    """Ready and held tasks grouped by the build-map row (1.133.0).
+
+    The branch is the one `build_map.py --recommend` prints. Missing files
+    leave the report empty so the caller keeps the older line.
+    """
+    built = map_built(root)
+    if built is None:
+        return None
     return map_mod().report_by_branch(built, rows, slug=command_slug(root))
+
+
+LOOP_WHY = "Two or more branches wait for each other. Fix one of the task lines the Loop line names in tasks.md with /crav1-tighten-plan."
+
+
+def apply_loop_holds(root: Path | None, rows: list[dict]) -> list[str]:
+    """Block the open tasks on a branch caught in a loop (1.154.0).
+
+    The judgement is the map's own, so the ready check and build-map.md
+    agree. Done and Needs verify rows keep their state. Tasks on other
+    branches keep theirs too: ready, waiting on a question, or waits in
+    order. Returns the plain Loop lines for the ending.
+    """
+    if root is None:
+        return []
+    try:
+        built = map_built(root)
+    except Exception:  # noqa: BLE001 - a map failure must not hide the rows
+        return []
+    if not built:
+        return []
+    holds = map_mod().loop_holds(built)
+    for row in rows:
+        num = re.fullmatch(r"T(\d+)", str(row.get("task") or ""))
+        if not num or int(num.group(1)) not in holds:
+            continue
+        if row.get("bucket") in ("done", "needs-verify"):
+            continue
+        row["bucket"] = "blocked"
+        row["loop"] = True
+        row["reason"] = "in a loop: " + holds[int(num.group(1))]
+    return list(built.get("loop_lines") or [])
 
 
 REVIEWED_RE = re.compile(r"^Reviewed:\s*.*?P# open:\s*(\d+)", re.M)
@@ -2979,6 +3041,7 @@ def ready_branches(root: Path) -> list[dict]:
         return []
     rows = build_rows(root)
     apply_claims(root, rows)
+    apply_loop_holds(root, rows)
     resolve_kept = resolve_is_keep(root)
     resolve_recorded = resolve_ever_recorded(root)
     hits = []
@@ -3147,15 +3210,16 @@ def slice_result(rows: list[dict], hits: list[dict]) -> tuple[str, list, list]:
     resolve-open-questions step alone does not force not-ready when some
     tasks can start (1.137.0).
     """
-    hard = [hit for hit in hits if hit.get("kind") != "waiting"]
+    hard = [hit for hit in hits if hit.get("kind") != "waiting" and not hit.get("loop")]
+    looped = [row.get("task") for row in rows if row.get("loop") and row.get("task")]
     can_start = [row.get("task") for row in rows if row.get("bucket") == "ready" and row.get("task")]
     held = [row.get("task") for row in rows if row.get("bucket") == "waiting" and row.get("task")]
-    resolve_only = bool(can_start) and _resolve_reopen_only(hits)
+    resolve_only = bool(can_start) and _resolve_reopen_only([hit for hit in hits if not hit.get("loop")])
     if hard and not resolve_only:
         return "not-ready", can_start, held
-    if can_start and (held or resolve_only):
+    if can_start and (held or resolve_only or looped):
         return "ready-partial", can_start, held
-    if held and not can_start:
+    if (held or looped) and not can_start:
         return "not-ready", can_start, held
     return "ready", can_start, held
 
@@ -3429,6 +3493,9 @@ def readiness(args: argparse.Namespace) -> None:
         built = True
     else:
         fail("readiness", "pass --root <spec-folder>, or --json <rows file>")
+    loop_lines: list[str] = []
+    if root is not None and root.is_dir():
+        loop_lines = apply_loop_holds(root, rows)
     for row in rows:
         if not isinstance(row, dict):
             fail("readiness", "each row must be an object")
@@ -3500,7 +3567,7 @@ def readiness(args: argparse.Namespace) -> None:
     gap = verify_gap(root) if root is not None else {
         "behind": False, "tasks": [], "waiting": None, "stale_next": None,
     }
-    waiting_bits = []
+    waiting_bits = list(loop_lines)
     if gap.get("waiting"):
         waiting_bits.append(gap["waiting"])
     if gap.get("orphan_waiting"):
@@ -3579,6 +3646,7 @@ def readiness(args: argparse.Namespace) -> None:
         "counts": counts_for(rows, slug),
         "orphan_tasks": gap.get("orphan_tasks") or [],
         "orphan_waiting": gap.get("orphan_waiting"),
+        "loop_lines": loop_lines,
     }
     if built:
         out["rows"] = rows

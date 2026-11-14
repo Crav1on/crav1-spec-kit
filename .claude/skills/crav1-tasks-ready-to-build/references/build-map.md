@@ -26,11 +26,11 @@ Six things, and nothing else, plus one note when the task text names a different
 3. **Tasks.** One task per entry, separated by `; `, as `T#` plus the short name. Example: `T5 orders-api: require pipeline 6 as build validation`. The short name is the `task: T# <title>` line in the slice's `work-item.md` when that line exists. Otherwise it is the task text up to the first ` (`, `, in `, or sentence end, at most about 80 characters. Marks such as `(host setup)`, `(manual, secret)`, `(verify: …)`, `(spec: …)`, `(after: …)`, and branch prefixes are dropped. The `T#` stays.
 4. **Waits for.** The other branches it waits for, or `none`. A dependency that names no task is `a dependency that names no task`.
 5. **Question.** Each open question holding the branch, then who has the answer. Who comes from the question's own "Waiting for <who>" phrase, then the latest `Pending:` or `Asked:` line, otherwise `not named yet`.
-6. **Ready now.** One of `ready`, `waiting on a question`, `waits in order`, `blocked`, `done`, or `held, waits on <branch>`. A wait inside the same branch does not change this. `blocked` is a cycle, a dependency that names no task, a plan risk, or a missing plan. `done` means every task on the branch is ticked. `held, waits on <branch>` means this branch has no question of its own and waits on a branch a question holds. That branch cannot start now.
+6. **Ready now.** One of `ready`, `waiting on a question`, `waits in order`, `blocked`, `done`, or `held, waits on <branch>`. A wait inside the same branch does not change this. `blocked` is a cycle, a dependency that names no task, a plan risk, or a missing plan. A branch caught in a loop says `blocked, in a loop` (1.154.0). `done` means every task on the branch is ticked. `held, waits on <branch>` means this branch has no question of its own and waits on a branch a question holds. That branch cannot start now.
 
 When the row branch differs from a branch named in the task text (`(branch: …)`, `committed later on <branch>`, or another `feat/…` name), the row adds one line: `Task text names feat/orders-cicd; built on feat/orders-retry`. When the row is the branch named on the task line and the plan step's name is the other one, the line points the other way: `Plan step names feat/orders-one-commit-cleanup-main; built on feat/orders-host-setup-scripts`. The row's own name is not listed. The note does not change Ready now or the wave.
 
-Wave 1 is the branches that do not wait for another branch. Wave 2 is what opens after those, and so on. A branch held only by a question can still sit in wave 1; Ready now says it is waiting. The wave heading is always `N branch, M can start now` or `N branches, M can start now`, including one branch (`Wave 1: 1 branch, 1 can start now`) and a wave where every branch can start (`Wave 1: 3 branches, 3 can start now`). A question hold, a claimed branch, a branch held because it waits on one, or a branch that waits in order, lowers M (`Wave 1: 3 branches, 2 can start now`, or `Wave 2: 1 branch, 0 can start now`). Only a branch that is ready under the same rule as the ready check counts as able to start. A done branch does not. When the wave has done tasks, the heading adds them after that count: `1 branch, 1 can start now, 2 done`. That count is also the first part of each wave line in the `build-map` summary. Each `Overlap:` line for that wave follows it, one pair per line. Blocked branches are listed under `## Blocked`, not in a wave.
+Wave 1 is the branches that do not wait for another branch. Wave 2 is what opens after those, and so on. A branch held only by a question can still sit in wave 1; Ready now says it is waiting. The wave heading is always `N branch, M can start now` or `N branches, M can start now`, including one branch (`Wave 1: 1 branch, 1 can start now`) and a wave where every branch can start (`Wave 1: 3 branches, 3 can start now`). A question hold, a claimed branch, a branch held because it waits on one, or a branch that waits in order, lowers M (`Wave 1: 3 branches, 2 can start now`, or `Wave 2: 1 branch, 0 can start now`). Only a branch that is ready under the same rule as the ready check counts as able to start. A done branch does not. When the wave has done tasks, the heading adds them after that count: `1 branch, 1 can start now, 2 done`. That count is also the first part of each wave line in the `build-map` summary. Each `Overlap:` line for that wave follows it, one pair per line. Blocked branches are listed under `## Blocked`, not in a wave. A branch always sits in a later wave than every branch it waits for, unless both are in the same loop. Branches in one loop share a wave number and are listed under `## Blocked`, in an `In a loop` subgraph. A branch that only waits for a loop keeps its own wave and Ready now (1.154.0).
 
 The flowchart is `flowchart LR`. Each wave is one subgraph, with `direction TB` inside, so the branches in a wave sit side by side across the page and one above another inside the wave. An arrow means the later branch waits for the earlier one.
 
@@ -42,7 +42,7 @@ Numbered items under `## Approach` are the plan steps. A step owns the tasks who
 
 `(map: feat/cancel-refund)` puts that task on the named branch. `(branch: feat/orders-retry)` does the same when no `(map:)` is set. A `feat/…` name in the sentence, or `committed later on feat/orders-cicd`, does the same when neither mark is set. Tasks that resolve to the same name share it. Leave every branch off the task line and the task stays on its plan step. Two tasks on one step can name different branches. The plan step's name is only the fallback.
 
-When the plan has no steps, the file says `The plan has no steps, so this map uses one branch per task.` When the steps name no task, it says `The plan steps do not name tasks, so this map uses one branch per task.` A task the steps do not name gets its own branch, and the file says so. A cycle, or an `(after:)` that names no task, is listed under Blocked.
+When the plan has no steps, the file says `The plan has no steps, so this map uses one branch per task.` When the steps name no task, it says `The plan steps do not name tasks, so this map uses one branch per task.` A task the steps do not name gets its own branch, and the file says so. A cycle, or an `(after:)` that names no task, is listed under Blocked. Branches that wait for each other get one `Loop:` line near the top of the file, naming the branches and the task line behind each direction of the wait, ending `Fix one of these lines in tasks.md.` (1.154.0).
 
 A ticked task stays in its wave row (1.132.0). The Tasks field strikes the id and the short name through and marks it done, with its pull request link, or the recorded branch, or a commit from `verify.md` when there is no pull request: `~~T5 short name~~ ✓ done ([PR 12](https://github.com/contoso/orders-api/pull/12))`. The link comes from a Match `Branch:` line `(PR n)` and a repo URL in the spec. No network read. A wave whose every task is done is wrapped in `<details><summary>Wave N done (K tasks)</summary>`. The heading, the rows, and the fields stay in the file. Nothing is deleted. When there are no tasks, the file says `Nothing left to build.`
 
@@ -55,16 +55,21 @@ Group the tasks that can start, and the held tasks, by the row `scripts/build_ma
 Print one line per branch. A task is `T#` plus its short name, the same words as the Tasks field.
 
 ```text
-Ready now
-- `feat/orders-api-record` (wave 1): T2 Record the decision; T5 Store the card
-- `feat/orders-api-export` (wave 1): T6 Email the receipt
+Run next:
 
-Held
+`/crav1-build-walk T2 T5`
+branch feat/orders-api-record, T2 Record the decision, T5 Store the card
+
+`/crav1-build-walk T6`
+branch feat/orders-api-export, T6 Email the receipt
+
+Held:
 - `feat/orders-api-currency` (wave 1): T3 Choose the currency — open question "Which currency for refunds?" Waiting for the partner.
 - `feat/orders-api-archive` (wave 2): T4 Archive the receipt — held, waits on T3
 
-Next: /crav1-build-walk T2 Record the decision, T5 Store the card, because that work is on feat/orders-api-record. /crav1-build-tasks builds one task without the walk.
-Next: /crav1-build-walk T6 Email the receipt, because that work is on feat/orders-api-export. /crav1-build-tasks builds one task without the walk.
+/crav1-build-tasks builds one task without the walk.
 ```
 
-A held task names its open question and who has the answer, or `held, waits on T#`. One `Next:` line per branch that has a task that can start, and only when the result is `ready` or `ready-partial`. Since 1.143.0 that line recommends `/crav1-build-walk`, with the T number beside the short name, and `/crav1-build-tasks` builds one task without the walk. Do not flatten the branches into one list or one Next line.
+A held task names its open question and who has the answer, or `held, waits on T#`. The Run next block is first and is the only place the walk command appears, one entry per branch that has a task that can start, and only when the result is `ready` or `ready-partial`. The bottom keeps Waiting lines and the one-line `/crav1-build-tasks` alternative. Never write a `Next:` line after the Waiting or Held lines (1.153.0). Do not flatten the branches into one list.
+
+A held line shows the wave, or `in a loop` for a branch caught in a loop. It never shows `(blocked)` (1.154.0). When branches wait for each other, print one Loop line per loop before the Waiting lines, naming the branches and the task line behind each direction of the wait: `Loop: feat/orders-api-x and feat/orders-api-y wait for each other: T14 on feat/orders-api-x waits for T13 on feat/orders-api-y, and T13 on feat/orders-api-y waits for T12 on feat/orders-api-x. Fix one of these lines in tasks.md.`

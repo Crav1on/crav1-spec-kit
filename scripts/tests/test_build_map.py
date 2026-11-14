@@ -15,10 +15,13 @@ TASK_ID = re.compile(r"\bT\d+\b")
 
 
 def ids_outside_tasks(text):
-    """Task ids belong on the Tasks field (1.133.0). Other lines still drop them."""
+    """Task ids belong on the Tasks field (1.133.0). Other lines still drop them.
+
+    A Loop line names the task lines to fix, so it keeps its ids (1.154.0).
+    """
     bad = []
     for line in text.splitlines():
-        if line.startswith("- Tasks:"):
+        if line.startswith("- Tasks:") or line.startswith("Loop: "):
             continue
         if TASK_ID.search(line):
             bad.append(line)
