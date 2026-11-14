@@ -8,7 +8,7 @@
 
 Create or check out feat/<slug> (one branch for spec+build) or spec/<slug> (specify-only; build later on feat/<slug>).
 
-1.160.0: a task-line branch that is only on origin, or is the head of an open pull request, is offered with a last `checkout: <name>` line. The Build prompt then has no card: it says `Using <name> from origin (task line).` and checks the branch out.
+1.160.0: a task-line branch that is only on origin, or is the head of an open pull request, is offered with a last `checkout: <name>` line. The Build prompt then has no card: it says `Using <name> from origin (task line).` and checks the branch out, in the `repo:` checkout when one is printed. The branch is checked in the task's code repo, not only the specs repo.
 
 Prompt for `feat/<slug>` or specify-only `spec/<slug>`; no silent checkout, no push, no PR.
 

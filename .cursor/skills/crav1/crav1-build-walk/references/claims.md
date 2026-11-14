@@ -12,7 +12,7 @@ When this walk starts on a branch, write one line per open task on that branch, 
 In progress: feat/orders-api-host-setup, T27, person A, since 2026-11-13T15:50:00+01:00
 ```
 
-The user is `git config user.name` in the specs repo. The time is an ISO timestamp. `<interpreter> -X utf8 scripts/claims.py add --root <spec-folder> --branch <branch> --tasks T27 --user "<name>"` writes the file, as `crav1-docs/reference/running-scripts.md` says. Show the line, then one card. `yes` (Recommended) commits only `claims.md` and pushes it. `stop` does not. There is no Edits option. A headless run stops and names `yes` and `stop`. Do not guess. Nothing else is committed on that card.
+The user is `git config user.name` in the specs repo. The time is an ISO timestamp in local time with the local offset, to the second, for example `2026-11-14T23:40:00+01:00` (1.160.0). An older line written in UTC (`+00:00`, with or without microseconds) still reads, and is written back in local time. `<interpreter> -X utf8 scripts/claims.py add --root <spec-folder> --branch <branch> --tasks T27 --user "<name>"` writes the file, as `crav1-docs/reference/running-scripts.md` says. Show the line, then one card. `yes` (Recommended) commits only `claims.md` and pushes it. `stop` does not. There is no Edits option. A headless run stops and names `yes` and `stop`. Do not guess. Nothing else is committed on that card.
 
 ## Whole-branch run (1.155.0)
 
@@ -29,6 +29,8 @@ If the script returns `claimed`, that task is already in progress by someone els
 ## While it runs
 
 The ready check holds a claimed task as `in progress by <user> since <date>` and does not offer it in Run next. This walk continues on its own claim.
+
+Your own claim does not hold a task (1.160.0). `walk_progress.py readiness --root <spec-folder>` takes `--user <name>` (default `git config user.name` in the specs repo) and `--branch <branch>` (the branch being walked). A claim by that user, on that branch when `--branch` is given, keeps the task's own state: its gate has `refused` false and `reason` `in progress by you`, and the reply says `In progress by you: T#.` Someone else's claim, or your claim on another branch when `--branch` is given, still holds the task and refuses it.
 
 A claim older than the max age (default 3 days, or `Claim max age: N days` in the file) gets a warning. It is not cleared on its own. The warning names `release claim`.
 

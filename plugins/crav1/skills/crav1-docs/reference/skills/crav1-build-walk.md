@@ -8,6 +8,8 @@
 
 Walk one work branch from build through merge, with one Next while it runs.
 
+1.160.0: `claims.py` writes `since` in local time with the local offset, to the second, for example `2026-11-14T23:40:00+01:00`; an older UTC line still reads. Your own claim does not hold a task in the ready check: `walk_progress.py readiness --root <spec-folder> --user <name> --branch <branch>` (user defaults to `git config user.name`) gives your claimed task `refused` false and `in progress by you`. Someone else's claim still refuses it.
+
 1.160.0: the walk offer keeps a task-line branch that is only on origin, or is the head of an open pull request, and checks it out without a card when `--recommend` prints `checkout:`. Only a branch missing everywhere gets a new name.
 
 **[`/crav1-build-walk`](crav1-build-walk.md)** (1.142.0) is one guided walk of one work branch. It opens [`/crav1-build-tasks`](crav1-build-tasks.md), verify, [`/crav1-finalize-commit`](crav1-finalize-commit.md), [`/crav1-open-pr`](crav1-open-pr.md), the merge of the base into the branch, [`/crav1-merge-pr`](crav1-merge-pr.md), and the tick, by file. It does not replace those skills. While one branch is in progress the reply has one Next, and the step skill's own Next is not printed. A start from a ready-to-build report prints one Next per ready branch, with the T number beside the task name.

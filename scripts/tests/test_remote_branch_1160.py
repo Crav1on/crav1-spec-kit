@@ -1,4 +1,7 @@
-"""1.160.0: a task-line branch that is only on origin, or is the head of an open pull request, is offered."""
+"""1.160.0: a task-line branch that is only on origin, or is the head of an open pull request, is offered.
+
+The branch is checked in the code repo, which can be a separate checkout from the specs repo.
+"""
 import importlib.util
 import os
 import pathlib
@@ -159,6 +162,136 @@ class RemoteBranch(unittest.TestCase):
         self.assertEqual(code, 0)
         self.assertEqual(text.splitlines()[0], BRANCH)
         self.assertIn(f"checkout: {BRANCH}", text)
+
+
+def make_repo(path):
+    path.mkdir(parents=True)
+    git(path, "init", "-b", "main")
+    git(path, "config", "user.email", "person-a@contoso.example")
+    git(path, "config", "user.name", "Person A")
+    git(path, "config", "commit.gpgsign", "false")
+    (path / "readme.md").write_text(path.name + "\n", encoding="utf-8")
+    git(path, "add", "readme.md")
+    git(path, "commit", "-m", "init")
+
+
+class SeparateRepos(unittest.TestCase):
+    """Specs in specs-platform, code in a sibling orders-ops checkout."""
+
+    def setUp(self):
+        self._env = {k: os.environ.get(k) for k in ("CRAV1_GH", "CRAV1_NO_REMOTE_CHECK")}
+        os.environ["CRAV1_GH"] = ""
+        os.environ.pop("CRAV1_NO_REMOTE_CHECK", None)
+        self.tmp = tempfile.TemporaryDirectory()
+        tmp = pathlib.Path(self.tmp.name)
+        self.specs = tmp / "specs-platform"
+        self.code = tmp / "orders-ops"
+        bare = tmp / "orders-ops.git"
+        subprocess.run(["git", "init", "--bare", "-b", "main", str(bare)], capture_output=True, check=True)
+        make_repo(self.specs)
+        # The same name was once checked out and deleted in the specs repo, so
+        # its reflog names it: the old check called it deleted.
+        git(self.specs, "checkout", "-b", BRANCH)
+        git(self.specs, "checkout", "main")
+        git(self.specs, "branch", "-D", BRANCH)
+        make_repo(self.code)
+        git(self.code, "remote", "add", "origin", str(bare))
+        git(self.code, "push", "-u", "origin", "main")
+        git(self.code, "checkout", "-b", BRANCH)
+        git(self.code, "commit", "--allow-empty", "-m", "incoming table")
+        git(self.code, "push", "-u", "origin", BRANCH)
+        git(self.code, "checkout", "main")
+        git(self.code, "branch", "-D", BRANCH)
+        git(self.code, "update-ref", "-d", f"refs/remotes/origin/{BRANCH}")
+        self.folder = self.specs / "docs/specs/orders"
+        self.folder.mkdir(parents=True)
+        (self.folder / "plan.md").write_text(PLAN, encoding="utf-8")
+
+    def tearDown(self):
+        for key, value in self._env.items():
+            if value is None:
+                os.environ.pop(key, None)
+            else:
+                os.environ[key] = value
+        self.tmp.cleanup()
+
+    def write(self, tasks, spec=SPEC):
+        (self.folder / "spec.md").write_text(spec, encoding="utf-8")
+        (self.folder / "tasks.md").write_text(tasks, encoding="utf-8")
+
+    def recommend(self, code_repo=None):
+        text, code = bm.run_dir(self.folder, recommend="T5", code_repo=code_repo)
+        self.assertEqual(code, 0)
+        return text
+
+    def test_specs_repo_alone_used_to_say_deleted(self):
+        self.write(TASKS)
+        text = self.recommend()
+        self.assertIn("was deleted locally and on the remote", text)
+
+    def test_repo_line_in_tasks_checks_the_sibling(self):
+        self.write("Repo: orders-ops\n\n" + TASKS)
+        text = self.recommend()
+        self.assertEqual(
+            text,
+            f"{BRANCH}\nsource: task line\nfrom: develop\n"
+            f"because: {BRANCH} is on origin only; checkout creates the local tracking branch\n"
+            f"repo: ../orders-ops\n"
+            f"checkout: {BRANCH}",
+        )
+
+    def test_branch_mark_repo_prefix_checks_the_sibling(self):
+        self.write(f"- [ ] T5: PR 71: READMEs describe the incoming table (branch: orders-ops {BRANCH})\n")
+        text = self.recommend()
+        self.assertEqual(text.splitlines()[0], BRANCH)
+        self.assertIn(f"checkout: {BRANCH}", text)
+        self.assertNotIn("deleted", text)
+
+    def test_match_branch_line_names_the_repo(self):
+        spec = SPEC + f"\n## Match\n\n- Branch: orders-ops {BRANCH} (PR 71)\n"
+        self.write(TASKS, spec)
+        text = self.recommend()
+        self.assertEqual(text.splitlines()[0], BRANCH)
+        self.assertIn(f"checkout: {BRANCH}", text)
+
+    def test_code_repo_not_found_is_never_called_deleted(self):
+        self.write("Repo: orders-billing\n\n" + TASKS)
+        text = self.recommend()
+        self.assertEqual(
+            text,
+            f"{BRANCH}\nsource: task line\nfrom: develop\nbecause: could not check orders-billing from here",
+        )
+
+    def test_explicit_code_repo_wins(self):
+        moved = pathlib.Path(self.tmp.name) / "elsewhere" / "ops-checkout"
+        moved.parent.mkdir()
+        self.code.rename(moved)
+        self.write("Repo: orders-ops\n\n" + TASKS)
+        self.assertIn("could not check orders-ops from here", self.recommend())
+        text = self.recommend(code_repo=str(moved))
+        self.assertIn(f"checkout: {BRANCH}", text)
+
+    def test_truly_gone_in_the_code_repo_gets_a_new_branch(self):
+        git(self.code, "push", "origin", "--delete", BRANCH)
+        git(self.code, "checkout", "-b", "tmp-reflog")
+        git(self.code, "checkout", "-b", BRANCH)
+        git(self.code, "checkout", "main")
+        git(self.code, "branch", "-D", BRANCH)
+        self.write("Repo: orders-ops\n\n" + TASKS)
+        text = self.recommend()
+        self.assertNotEqual(text.splitlines()[0], BRANCH)
+        self.assertIn(f"{BRANCH} was deleted locally and on the remote", text)
+
+    def test_walk_offer_reuses_the_code_repo_answer(self):
+        walk_spec = importlib.util.spec_from_file_location("build_walk_wrapper_1160", ROOT / "scripts/build-walk.py")
+        walk_wrapper = importlib.util.module_from_spec(walk_spec)
+        walk_spec.loader.exec_module(walk_wrapper)
+        bw = walk_wrapper.load()
+        tasks = "Repo: orders-ops\n\n" + TASKS
+        offer = bw.offer_for("orders", SPEC, PLAN, tasks, 5, repo=self.specs)
+        self.assertEqual(offer["name"], BRANCH)
+        self.assertFalse(offer["refused"])
+        self.assertEqual(offer["fate"], "remote")
 
 
 if __name__ == "__main__":
