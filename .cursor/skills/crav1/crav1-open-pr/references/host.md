@@ -23,3 +23,9 @@ Read the skill's own `references/azure-devops.md` ("Azure DevOps (`az`)") only w
 ## Other remotes
 
 - **open-pr:** when the remote is neither GitHub nor Azure DevOps, print the GitHub-shaped fallback. Do not claim a pull request was opened. When no host CLI can open the pull request, read `references/fallback.md` ("Fallback (no URL)").
+
+## Windows
+
+Moved word for word from `SKILL.md` in 1.158.0.
+
+On Windows, `git` may not be on `PATH`. Try `git`, then `C:\Program Files\Git\cmd\git.exe`. `az` may be `az.cmd`. When PowerShell calls `az.cmd`, `cmd.exe` cuts a multi-line argument at the first newline, and an unquoted `--query` value that contains parentheses is a syntax error. Quote every `--query` value (`--query "value[].pullRequestId"`). A multi-line pull-request description uses the `@file` steps in **Create**.

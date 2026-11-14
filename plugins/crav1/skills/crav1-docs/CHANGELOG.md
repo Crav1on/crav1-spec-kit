@@ -2,6 +2,16 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.158.0 (2026-11-14)
+
+The four pull-request skills share one page and one script for the steps they have in common, and each skill file is shorter. A minor release because the four skills gain a shared reference and a shared script.
+
+- **One page for the shared steps.** `/crav1-open-pr`, `/crav1-merge-pr`, `/crav1-pr-status` and `/crav1-review-pr` used to repeat the same plumbing: which pull request a number or URL names, the host order, Windows quoting, the open state, never logging in, never rebasing, and how a run ends. That now lives once in `docs/reference/pr-common.md`, shipped next to the skills as `crav1-docs/reference/pr-common.md`. Each skill points at it and keeps its own judgement. Where a skill's own rule differs, the skill wins.
+- **One small script.** `scripts/pr_common.py` is read-only and does the lookups: `parse` (which host and number a reference names, and whether it matches this remote), `host`, `find` (the open pull requests for one branch, never picking the newest), `checks` (state, draft, and the checks as passing, failing and pending), `claim` (the `In progress:` lines for one branch in `claims.md`) and `behind` (commits behind and ahead of the base, with the advice to merge the base in, never rebase). The full script ships with `/crav1-open-pr`; the other three ship a thin copy that runs it.
+- **Shorter skill files.** open-pr drops from 1,468 to about 1,140 words, merge-pr from 1,476 to about 1,130, pr-status from 1,495 to about 1,110, and review-pr from 1,542 to about 1,260. Every rule that left a skill file moved word for word into that skill's `references/` or the shared page: open-pr's checks before the draft (`references/checks.md`) and GitHub create steps (`references/github.md`), merge-pr's GitHub host and read steps and its Azure DevOps ready step, pr-status's status table, output order and hand-offs, and review-pr's Ship or not (`references/ship.md`).
+- **Merging is unchanged.** `/crav1-merge-pr` still merges only when this turn names the pull request and asks to merge it, always with a merge commit (`gh pr merge --merge`, Azure Repos `--squash false`), never squash, rebase or a bypass, stops on `Ready: no` unless the turn says `anyway`, and prints nothing of its own for the next step when `/crav1-build-walk` opened it. It never writes or clears `claims.md`; the walk clears its own claim after the merge, as before.
+- **Tests.** Each skill file stays under its new word cap, the shared script parses GitHub and Azure DevOps references, refuses a branch name and a mismatched repo, never picks the newest of several pull requests, sums up checks, reads claims without writing them, and gives merge-in advice only. The merge-pr yes gate, merge method, claim rule and walk ending are checked word for word.
+
 ## 1.157.0 (2026-11-14)
 
 The rule file loaded into every session is short again, and every build-walk ending is only the Run next block. A minor release because the always-loaded rule and the walk ending change.
@@ -141,12 +151,5 @@ A kit script command names the interpreter and every required argument. A minor 
 - **Default root.** When `--root` is omitted, `resolve_spec.py` uses `docs/specs` from the current directory, which is the repo root. A missing folder is an error that names `--root docs/specs`. Pass the flag anyway. A script that takes one spec folder, such as `walk_progress.py readiness --root <spec-folder>`, still requires that folder. A script that takes the repo root still defaults `--root` to `.`.
 - **Other commands.** `build_map.py --recommend` names `docs/specs/<slug>`. `build_walk.py next` and `stack` pass `--json <file>`. `tick_only.py` passes `--root <spec-folder>` and the task id. Approval `show`, `write`, and `add-item` pass their required flags. Notes index and merge-safe migration use `<interpreter> -X utf8`, not `python3` alone.
 - **Check.** `scripts/check-script-invocations.py` fails when a documented command hardcodes `python3` for a script with no Windows `python` command beside it, or omits a required flag. It scans skill instructions and current docs. The changelog and the generated reference pages are not scanned.
-
-## 1.143.0 (2026-11-13)
-
-A recorded yes is not a missing yes, and a ready slice's next step is the build walk. A minor release because the Waiting line for a blocked live command changes, and the tighten-and-plan ending names a different command.
-
-- **Permission block.** When a live command, such as a `(Runs live)` task's `apply`, was refused by the coding assistant's own permission check, and the user's yes is already on record, `/crav1-build-tasks` and the live step of `/crav1-build-walk` do not say the yes is missing. Waiting says the yes is on record and the check blocked the command. The offer is only: run that exact command, or allow that one command and rerun. Next is the build step again after the command has run. The lines do not suggest working around the check. A yes that is not on record stays the missing-yes path. `scripts/permission_block.py` distinguishes the two.
-- **Ready ending.** When `/crav1-tighten-and-plan-ready-to-build` finishes `ready`, or `ready-partial` with tasks that can start, each Next line recommends `/crav1-build-walk`, with the T number beside the short name and the branch, and names `/crav1-build-tasks` as the alternative for one task without the walk. The same `next_lines` are what `/crav1-tasks-ready-to-build` prints. A `not-ready` result does not recommend the walk. The walk still does not run either command.
 
 The newest 15 releases are above. The full changelog is https://github.com/Crav1on/crav1-spec-kit/blob/main/CHANGELOG.md.

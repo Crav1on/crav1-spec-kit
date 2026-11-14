@@ -2,6 +2,26 @@
 
 Read every run, from **Output** in `SKILL.md`. Plain words, short lines, no tables wider than five columns. Names as the host shows them; "you" for the signed-in user.
 
+## Order
+
+Moved word for word from `SKILL.md` in 1.158.0; the rules are unchanged.
+
+Print, in this order:
+
+1. The heading: `<repo> PR <n>: <title> (<source> -> <target>), you: <mode>, as of <date>`.
+2. **Verdict line**: counts by status, the points waiting on you first, for example `Verdict: 2 waiting on you, 1 needs Robin K., 3 agreed (code checked: 1 done), 1 declined.`
+3. **Waiting on you**, oldest first, then the other points grouped by status, one line each: anchor, status, owner, the point in plain words, the evidence (who said what, when; the commit).
+4. **Flags**: resolved while the code is unchanged, and done with the thread still active.
+5. **Spec and decision candidates** (see **Hand-offs**).
+6. **Follow-ups** (drafts).
+7. **Order**: pull requests this one depends on or that depend on it, and the merge order.
+8. **Drafted replies (not posted)**: one per thread that waits on you.
+9. **Run ending** (1.122.0): one `Next:` line, then `Waiting:` lines, then `Uncommitted:` when the note is not committed. See `references/output.md`.
+10. **Merge readiness**: `Ready: yes | no | merged`, with the reasons.
+11. `PR record: <repo>: <path>`, as a code span.
+
+`since last` prints only changes; see **Since last**.
+
 ## Shape
 
 ```text

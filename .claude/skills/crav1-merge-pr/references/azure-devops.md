@@ -47,6 +47,22 @@ Keep `title`, source branch (`headRefName` or `sourceRefName`), and target branc
 
 
 
+### Azure DevOps (Mark ready)
+
+Moved word for word from `SKILL.md` in 1.158.0; the rules are unchanged.
+
+Azure DevOps: set `isDraft` false and do not complete in the same call.
+
+```text
+az repos pr update --org <org-url> --id <n> --draft false --detect false --output json
+```
+
+`--draft` accepts `false` or `true`. This call uses `--draft false`. Do not pass `--project`, `--repository`, or `--status` on it.
+
+Then read the pull request and its policies again. Publishing can queue checks. If the checks are not passing yet, stop and report that. Do not complete while the checks are queued. If this update fails, print the Azure DevOps fallback. Do not complete. Do not retry.
+
+If `az` is missing and the pull request is a draft, print a first PATCH body `{"isDraft": false}` in the fallback below, then the complete PATCH. Do not claim either call was sent.
+
 ### Azure DevOps (What must pass)
 
 Stop unless all of these are true after the ready step:

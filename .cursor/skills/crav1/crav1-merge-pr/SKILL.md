@@ -16,94 +16,41 @@ Merge **one** named pull request with a **merge commit**, then stop. Never squas
 
 Command: `/crav1-merge-pr`.
 
-Run it only when **this turn** explicitly asks to merge a specific pull request, named by number or URL. `/crav1-open-pr`, a build-tasks loop, `/crav1-review-pr`, or an earlier turn naming a URL is not that ask. Do not run this skill from those steps. Do not run `/crav1-review-pr` from this skill. A review is not a merge ask. If this turn does not name a pull request, ask which one. That turn is the question only. No merge.
+Run it only when **this turn** explicitly asks to merge a specific pull request, named by number or URL. `/crav1-open-pr`, a build-tasks loop, `/crav1-review-pr`, or an earlier turn naming a URL is not that ask. Do not run this skill from those steps. If this turn does not name a pull request, ask which one. That turn is the question only. No merge.
 
-On Windows, `git` may not be on `PATH`. Try `git`, then `C:\Program Files\Git\cmd\git.exe`. `az` may be `az.cmd`. Quote any `--query` value that contains parentheses; `cmd.exe` treats an unquoted `(` as syntax. This skill does not pass a multi-line body to `az`. A multi-line `--description` on Windows uses the `@file` steps in `/crav1-open-pr`.
+The steps shared with open-pr, pr-status and review-pr (which pull request, host order, Windows, state, claims, catching up, signing in) are [pr-common.md](../crav1-docs/reference/pr-common.md) (1.158.0). Read it every run. The merge rules here win over that page.
 
 ## Which pull request
 
-Accept a number (`123`) or a URL.
-
-| URL | Id |
-| --- | --- |
-| `https://github.com/<owner>/<repo>/pull/<n>` | `<n>` |
-| `https://dev.azure.com/<org>/<project>/_git/<repo>/pullrequest/<n>` | `<n>` |
-| `https://<org>.visualstudio.com/<project>/_git/<repo>/pullrequest/<n>` | `<n>` |
-
-A branch name is not a pull request. Do not pick the newest pull request for the current branch. If the URL's repository is not this git remote, stop and name both. Do not merge across that mismatch.
-
-Remote: the single `git remote`. If several remotes exist, ask which one. A full URL still names the host. A bare number needs that remote, or a `gh` repo that matches it.
+A number (`123`) or a URL, as [pr-common.md](../crav1-docs/reference/pr-common.md) ("Which pull request") says. A branch name is not a pull request; never pick the newest. A URL whose repository is not this git remote: stop, name both, and do not merge across that mismatch.
 
 ## Host
 
 Resolve **one** merge path, in this order: GitHub `gh`, then Azure DevOps `az`, then printed commands and web UI steps. Do not claim the pull request was merged unless that path returned a merge commit hash. On Azure DevOps, that commit must also have two parents, counted with `git rev-list` after the completed re-read (commits API only when git cannot see the commit).
 
-### GitHub (`gh`)
-
-Use `gh` only when **both** are true: `gh auth status` succeeds, and the pull request is on GitHub (`github.com` in the URL or the remote, or `gh repo view` succeeds for that repo).
-
-**Merge** then uses the GitHub steps. If the pull request is on GitHub and `gh auth status` does not succeed, print the GitHub fallback below. Do not use `az`.
-
-### Azure DevOps (`az`)
-
-Read `references/azure-devops.md` ("Azure DevOps (`az`)") only when the remote is Azure DevOps.
-
-### Other remotes
-
-When the pull request is neither GitHub nor Azure DevOps, print the GitHub-shaped fallback below. Do not claim it was merged.
+Read `references/github.md` ("GitHub (Host)") for GitHub or another host, `references/azure-devops.md` ("Azure DevOps (`az`)") for Azure DevOps.
 
 ## Read it first
 
 The pull request must be **open**. Anything else: stop and say the state. Do not reopen it.
 
-### GitHub
-
-```text
-gh pr view <n-or-url> --json number,url,title,body,author,createdAt,state,isDraft,baseRefName,headRefName,mergeable,mergeStateStatus,reviewDecision,statusCheckRollup
-gh pr checks <n-or-url>
-```
-
-`state` must be `OPEN`.
-
-### Azure DevOps
-
-Read `references/azure-devops.md` ("Azure DevOps (Read it first)") only when the remote is Azure DevOps.
+Read `references/github.md` ("GitHub (Read it first)") on GitHub, where `state` must be `OPEN`, and `references/azure-devops.md` ("Azure DevOps (Read it first)") on Azure DevOps.
 
 ## Mark ready
 
 Only when this turn is the explicit merge ask, and the pull request is a draft.
 
-GitHub: `gh pr ready <n-or-url>`. That is the whole ready step. Do not pass extra flags.
-
-Azure DevOps: set `isDraft` false and do not complete in the same call.
-
-```text
-az repos pr update --org <org-url> --id <n> --draft false --detect false --output json
-```
-
-`--draft` accepts `false` or `true`. This call uses `--draft false`. Do not pass `--project`, `--repository`, or `--status` on it.
-
-Then read the pull request and its policies again. Publishing can queue checks. If the checks are not passing yet, stop and report that. Do not complete while the checks are queued. If this update fails, print the Azure DevOps fallback. Do not complete. Do not retry.
-
-If `az` is missing and the pull request is a draft, print a first PATCH body `{"isDraft": false}` in the fallback below, then the complete PATCH. Do not claim either call was sent.
+GitHub: `gh pr ready <n-or-url>`. That is the whole ready step. Do not pass extra flags. Azure DevOps, or `az` missing: read `references/azure-devops.md` ("Azure DevOps (Mark ready)").
 
 ## What must pass
 
-Required checks, branch policies, and reviews must pass. If anything blocks, stop and report what. Do not merge. This skill still stops when a required host check is red. `/crav1-review-pr` does not replace that stop, and this skill does not run it.
+Required checks, branch policies, and reviews must pass. If anything blocks, stop and report what. Do not merge. A red required host check stops this skill; `/crav1-review-pr` does not replace that stop. Never bypass (no `gh pr merge --admin`, `--bypass-policy`, `bypassPolicy: true`, or admin override in the web UI steps you print).
 
-Never bypass. No `gh pr merge --admin`. No `--bypass-policy`. No `bypassPolicy: true`. No admin override in the web UI steps you print.
-
-### GitHub
-
-Read `references/github.md` ("GitHub (What must pass)") only when the remote is GitHub.
-
-### Azure DevOps
-
-Read `references/azure-devops.md` ("Azure DevOps (What must pass)") only when the remote is Azure DevOps.
+Read `references/github.md` ("GitHub (What must pass)") only when the remote is GitHub, and `references/azure-devops.md` ("Azure DevOps (What must pass)") only when it is Azure DevOps. `scripts/pr_common.py checks --ref <n-or-url>` only sums them up for the chat; it is not the gate.
 
 ## PR record gate (1.97.0)
 
-Read `references/pr-record-gate.md` ("The Ready line") before **Show, then merge**, every run. The PR note's merge-readiness line (`Ready:`) from `/crav1-pr-status` or `/crav1-review-pr` stops the merge when it says `no`, unless this turn says `anyway`. `anyway` never skips a required check, policy or review.
+Read `references/pr-record-gate.md` ("The Ready line") before **Show, then merge**, every run. The PR note's `Ready: no` stops the merge unless this turn says `anyway`. `anyway` never skips a required check, policy or review.
 
 ## Show, then merge
 
@@ -143,29 +90,14 @@ If merge fails, show the error and the GitHub fallback. Do not retry with anothe
 
 Read `references/azure-devops.md` ("Azure DevOps (Merge)") only when the remote is Azure DevOps.
 
-## Fallback (no merge)
+## Fallback and after the merge
 
-Read `references/fallback.md` ("Fallback (no merge)") only when the merge cannot run (no CLI, no rights, blocked).
+- The merge cannot run (no CLI, no rights, blocked): `references/fallback.md` ("Fallback (no merge)"). Not signed in or no rights: its "Auth notes".
+- The merge went through: `references/after-merge.md` ("After it merged", "Local main", "Branches"; "Tracker" when a work item is linked).
 
-## After it merged
+## Claims (1.158.0)
 
-Read `references/after-merge.md` ("After it merged") only when the merge went through.
-
-## Local main
-
-Read `references/after-merge.md` ("Local main") only when the merge went through.
-
-## Branches
-
-Read `references/after-merge.md` ("Branches") only when the merge went through.
-
-## Tracker
-
-Read `references/after-merge.md` ("Tracker") only when the merge went through and a work item is linked.
-
-## Auth notes
-
-Read `references/fallback.md` ("Auth notes") only when a CLI says it is not signed in or lacks rights.
+This skill never writes, clears, commits or pushes `claims.md`. `/crav1-build-walk` clears its own claim after the merge; a standalone merge leaves `claims.md` as it is.
 
 ## Hard rules
 
@@ -177,15 +109,13 @@ Read `references/fallback.md` ("Auth notes") only when a CLI says it is not sign
 - No `git commit`, no stash, no new branch, no force-push.
 - The only file this skill writes is the PR note with its PR record (and the generated notes indexes) in the specs repo, after a confirmed merge. Never committed.
 - No branch delete unless the user asked in this turn.
-- No dialog-box or browser Microsoft sign-in (`az login`, `az devops login`, device code, or a web login).
-- No token printed, echoed, or created. An `AZURE_DEVOPS_EXT_PAT` the user already set is the PAT route in **Auth notes**.
+- No dialog-box or browser Microsoft sign-in (`az login`, `az devops login`, device code, or a web login). No token printed, echoed, or created; an `AZURE_DEVOPS_EXT_PAT` the user already set is the PAT route in **Auth notes**.
 - Do not run `az rest` to complete, update, or bypass a pull request. The parent-count fallback in **Merge** may GET one commit when git cannot see it.
 - Do not claim a merge commit hash the host did not return.
 - Do not claim a no-fast-forward merge unless the parent count was verified as two. A null `lastMergeCommit.parents` is not that count.
 - Do not run this skill from `/crav1-open-pr`, `crav1-build-task-agent`, or `/crav1-review-pr`. A yes on `/crav1-build-walk`'s card that names this pull request is the ask in this turn. The walk opens this file after that yes.
 - Do not run `/crav1-review-pr`. A review is not a merge ask. A required host check that is red still stops this skill.
 - When `/crav1-build-walk` opened this file, do not print a line of your own for what to run next. The walk prints its one line (1.142.0).
-
 
 ## Choice words (1.69.0)
 

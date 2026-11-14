@@ -8,6 +8,8 @@
 
 Merge one named pull request with a merge commit.
 
+1.158.0: the shared pull-request steps are `crav1-docs/reference/pr-common.md` and `scripts/pr_common.py`. The merge rules are unchanged: the explicit merge ask, the merge commit (`gh pr merge --merge`, Azure Repos `--squash false`), never squash, rebase or bypass, the PR record gate and `anyway`, and the walk printing its own Run next. It never writes or clears `claims.md`; [`/crav1-build-walk`](crav1-build-walk.md) clears its own claim after the merge. The GitHub host and read steps moved word for word to `references/github.md`, the Azure DevOps ready step to `references/azure-devops.md`.
+
 Merge one named pull request only when that turn asks; always a merge commit; no squash, rebase, or policy bypass. After the completed re-read, two parents are confirmed with `git rev-list` (commits API if git cannot see the commit). Does not run [`/crav1-review-pr`](crav1-review-pr.md). Stops when a required host check is red.
 
 1.64.0: after a confirmed merge, says `<n> of <m> branches of <slug> now merged into <target>` per spec. No file edits.

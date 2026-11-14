@@ -2,6 +2,16 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.158.0 (2026-11-14)
+
+The four pull-request skills share one page and one script for the steps they have in common, and each skill file is shorter. A minor release because the four skills gain a shared reference and a shared script.
+
+- **One page for the shared steps.** `/crav1-open-pr`, `/crav1-merge-pr`, `/crav1-pr-status` and `/crav1-review-pr` used to repeat the same plumbing: which pull request a number or URL names, the host order, Windows quoting, the open state, never logging in, never rebasing, and how a run ends. That now lives once in `docs/reference/pr-common.md`, shipped next to the skills as `crav1-docs/reference/pr-common.md`. Each skill points at it and keeps its own judgement. Where a skill's own rule differs, the skill wins.
+- **One small script.** `scripts/pr_common.py` is read-only and does the lookups: `parse` (which host and number a reference names, and whether it matches this remote), `host`, `find` (the open pull requests for one branch, never picking the newest), `checks` (state, draft, and the checks as passing, failing and pending), `claim` (the `In progress:` lines for one branch in `claims.md`) and `behind` (commits behind and ahead of the base, with the advice to merge the base in, never rebase). The full script ships with `/crav1-open-pr`; the other three ship a thin copy that runs it.
+- **Shorter skill files.** open-pr drops from 1,468 to about 1,140 words, merge-pr from 1,476 to about 1,130, pr-status from 1,495 to about 1,110, and review-pr from 1,542 to about 1,260. Every rule that left a skill file moved word for word into that skill's `references/` or the shared page: open-pr's checks before the draft (`references/checks.md`) and GitHub create steps (`references/github.md`), merge-pr's GitHub host and read steps and its Azure DevOps ready step, pr-status's status table, output order and hand-offs, and review-pr's Ship or not (`references/ship.md`).
+- **Merging is unchanged.** `/crav1-merge-pr` still merges only when this turn names the pull request and asks to merge it, always with a merge commit (`gh pr merge --merge`, Azure Repos `--squash false`), never squash, rebase or a bypass, stops on `Ready: no` unless the turn says `anyway`, and prints nothing of its own for the next step when `/crav1-build-walk` opened it. It never writes or clears `claims.md`; the walk clears its own claim after the merge, as before.
+- **Tests.** Each skill file stays under its new word cap, the shared script parses GitHub and Azure DevOps references, refuses a branch name and a mismatched repo, never picks the newest of several pull requests, sums up checks, reads claims without writing them, and gives merge-in advice only. The merge-pr yes gate, merge method, claim rule and walk ending are checked word for word.
+
 ## 1.157.0 (2026-11-14)
 
 The rule file loaded into every session is short again, and every build-walk ending is only the Run next block. A minor release because the always-loaded rule and the walk ending change.

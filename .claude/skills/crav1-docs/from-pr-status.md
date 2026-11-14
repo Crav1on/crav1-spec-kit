@@ -78,6 +78,10 @@ A `Read: sweep` line on the same record is the watermark from `/crav1-update-spe
 
 A point that asked for a host setting, such as a required build on `develop`, becomes `done host` when the setting reads back live in this run (1.115.0). No commit is needed, and the skill never applies anything; when it is not set yet it names `/crav1-host-setup`.
 
+## Shared pull-request steps (1.158.0)
+
+`/crav1-pr-status` reads the pull request the same way as open-pr, merge-pr and review-pr, as [Shared pull-request steps](reference/pr-common.md) says. With no pull request named, `scripts/pr_common.py find --branch <current-branch>` looks for the one open pull request on the current branch; more than one, and it asks which. The output and the record are unchanged.
+
 ## What does not get written
 
 No code, spec, plan or task edit. No reply posted, no vote, no merge. Replies are drafts. A thread status changes only on that thread's yes. Follow-ups are drafts; no work item is created. The only file it writes is the PR note in the specs repo, not committed.
