@@ -2,6 +2,16 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.159.0 (2026-11-14)
+
+`/crav1-tighten-plan` and `/crav1-plan-from-spec` compute their own ordering, batches and endings, and both skill files are shorter. A minor release because both skills gain a script whose output they show as-is.
+
+- **One script for both.** `scripts/plan_check.py` ships with `/crav1-plan-from-spec`, and `/crav1-tighten-plan` ships a thin copy that runs it. `order` prints the dependency waves from the `(after: …)` marks, using the same sort as the ready check, and names a loop, an `after:` that names no task, tasks whose order is only guessed from the file, and task lines with no verify kind or no `(spec: …)` mark. `recap` prints the plan-from-spec After writing recap in its usual order, ending with its one `Next` line. `queue` prints the tighten-plan index and counts, and the one empty-queue `Next` line once no plan finding is open. `batch` prints the findings table and its card line together, through the same `batch_offer.py` as before. `reviewed` lowers `P# open` on the Reviewed line, keeps the date, and never adds a line.
+- **The same output.** Apart from the acceptance line below, the Next lines, the linter rule, the batch card with its table in the same reply, and the Reviewed line say exactly what they said before. The assistant still decides what is a finding, its tag, its options and its recommendation, and which built pieces and security checks apply. The script does the counting and the wording.
+- **Acceptance check by meaning.** The recap line that lists acceptance lines with no matching task now reads `Check these acceptance lines, no task matched their wording:`. The script matches by wording only, so a reworded line can be listed even when a task covers it. The agent compares each listed line by meaning with the trace table and tasks first. When a task covers it, the agent adds or fixes the trace row or `(spec: …)` mark without asking. Only a line nothing covers is a gap, and the plan is not done until it has a task, is marked `already there`, or is `left as committed`. `references/recap.md` suggests spec ids such as `AC-1`, which make the match exact, and never requires them. `/crav1-tighten-plan` treats a reworded line a task already covers as a `fix-trace`, not a new task.
+- **Shorter skill files.** tighten-plan drops from 1,396 to about 1,100 words and plan-from-spec from 1,433 to about 1,140. Every rule that left a skill file moved word for word: tighten-plan's plan shapes, empty-queue lines, Reviewed line and suggest step to `references/issues.md`; plan-from-spec's After writing list to `references/recap.md`, and its plan.md sections and host setup tasks to `references/write.md`.
+- **Tests.** Each skill file stays under its new word cap, every moved rule can still be found word for word, the waves match the ready check's order, the recap and empty-queue Next lines match the references, the batch output is the same as `batch_offer.py` for the open plan findings, and the Reviewed line keeps its date and is never added.
+
 ## 1.158.0 (2026-11-14)
 
 The four pull-request skills share one page and one script for the steps they have in common, and each skill file is shorter. A minor release because the four skills gain a shared reference and a shared script.
@@ -141,15 +151,5 @@ A batch card shows the findings it applies. A minor release because the reply be
 - **The card names each item.** The question text is self-contained, for example `P4 tasks miss the 400 path: A add a test`. It still makes sense if the table scrolled away. `yes (Recommended)` still applies every recommendation. Typed changes stay on the free-text answer.
 - **No table above.** The card does not say `table above`, `the table recommends`, or `as in the table`. Those phrases are allowed only when the table is in that same reply, and the card still names each item.
 - **Script.** `<interpreter> -X utf8 <skill crav1-tighten-plan>/scripts/batch_offer.py --title "Tighten-plan batch" --items <file>` prints the table and the `Card:` line together. The card line is built from the table rows. No rows, and the command prints no card. The rule is [Question cards](docs/reference/question-cards.md).
-
-## 1.144.0 (2026-11-13)
-
-A kit script command names the interpreter and every required argument. A minor release because the command a skill tells the assistant to run changes, and `resolve_spec.py` accepts a missing `--root`.
-
-- **Interpreter.** On Windows the interpreter is `python`. Elsewhere it is `python3`. If that command is missing, or Windows prints the Store alias message `Python was not found`, try `py -3`, then the other name. Set `PYTHONUTF8=1` and pass `-X utf8`. Do not run `python3` alone. The rule is [Running a kit script](docs/reference/running-scripts.md). The silent finder tries `python` first on Windows.
-- **Which spec.** The command is `<interpreter> -X utf8 <skill crav1-tasks-ready-to-build>/scripts/resolve_spec.py "<query>" --root docs/specs`. Verify, the ready check, build-tasks, record-approval, and the tighten-and-plan walk use that command. Several matches are listed and the run stops.
-- **Default root.** When `--root` is omitted, `resolve_spec.py` uses `docs/specs` from the current directory, which is the repo root. A missing folder is an error that names `--root docs/specs`. Pass the flag anyway. A script that takes one spec folder, such as `walk_progress.py readiness --root <spec-folder>`, still requires that folder. A script that takes the repo root still defaults `--root` to `.`.
-- **Other commands.** `build_map.py --recommend` names `docs/specs/<slug>`. `build_walk.py next` and `stack` pass `--json <file>`. `tick_only.py` passes `--root <spec-folder>` and the task id. Approval `show`, `write`, and `add-item` pass their required flags. Notes index and merge-safe migration use `<interpreter> -X utf8`, not `python3` alone.
-- **Check.** `scripts/check-script-invocations.py` fails when a documented command hardcodes `python3` for a script with no Windows `python` command beside it, or omits a required flag. It scans skill instructions and current docs. The changelog and the generated reference pages are not scanned.
 
 The newest 15 releases are above. The full changelog is https://github.com/Crav1on/crav1-spec-kit/blob/main/CHANGELOG.md.

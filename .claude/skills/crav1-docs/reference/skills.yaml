@@ -930,6 +930,7 @@ skills:
   walkthrough: docs/from-spec-to-plan.md
   purpose: Turn an accepted spec into a file-level plan.md and independently testable tasks.md.
   in_depth:
+  - '1.159.0: the After writing recap (paths written, task count, acceptance lines no task matched by wording, to compare by meaning first, the dependency waves, verify notes with no kind, kept-open questions and their `Blocks:` lines, approval items, stale research, the linter line and the one `Next` line) is printed by `scripts/plan_check.py recap`; the agent passes only what it alone knows (built pieces, the branch read, unmapped security checks). `plan_check.py order` checks the waves after `tasks.md` is written. The After writing list moved word for word to `references/recap.md`, the plan.md section list and host setup tasks to `references/write.md`.'
   - '1.141.0: a constraint that a named person gives a yes before something becomes an `## Approval needed` item, with `Person:` and `Holds:` for the tasks that do that work. It does not write `Approved:`.'
   - File-level `plan.md` and `tasks.md`; each verify note names the checks before code; names a linter
     or checker when the repo has one, and stops before Build when it does not; refuses to code and does
@@ -1007,6 +1008,7 @@ skills:
   walkthrough: docs/from-spec-to-plan.md
   purpose: Walk plan.md/tasks.md issues one by one (including /crav1-review-plan P#s).
   in_depth:
+  - '1.159.0: the index (remaining `P#` titles, the current one marked, plan or spec), the finding counts, the dependency waves and ordering problems, the batch card with its findings table, the one empty-queue `Next` line and the `Reviewed:` line come from `scripts/plan_check.py` (`order`, `queue`, `batch`, `reviewed`), a thin copy of the script that ships with `/crav1-plan-from-spec`. The skill prints its output as-is. The typical plan shapes, the empty-queue rules, the Reviewed line, the items file and the suggest step moved word for word to `references/issues.md`.'
   - One plan issue at a time; patches plan/tasks only (spec findings go to tighten-spec)
   - '1.130.0: the batch is one card. `yes (Recommended)` applies every recommendation. Typed changes go on that card''s free-text answer, for example `P1 A, P3 keep`. An item not mentioned keeps its recommendation. There is no Edits option.'
   - '1.145.0: the batch card is asked only after a findings table in that same reply (Id, Issue, Options, Recommendation). The card names each item, for example `P4 tasks miss the 400 path: A add a test`. It does not say `table above`. The command is `<interpreter> -X utf8 <skill crav1-tighten-plan>/scripts/batch_offer.py --title "Tighten-plan batch" --items <file>`. It prints no card without rows.'

@@ -18,6 +18,16 @@ Do **not** offer a single menu (“fix the whole review”). That hides per-find
 
 **Do not patch until the user picks a resolution for the current issue** (or a batch of `P#: letter` answers). `suggest` is not a patch. `send-to-spec` is not a plan patch.
 
+## Computed output (1.159.0)
+
+The index, counts, dependency order, batch card, empty-queue `Next` line and Reviewed line come from one script, run as `crav1-docs/reference/running-scripts.md` says. Print its stdout as-is. Never add, drop, or rewrite a line, and never write a second `Next` line. The rules it computes are in [references/issues.md](references/issues.md).
+
+- `<interpreter> -X utf8 scripts/plan_check.py order --root <spec-folder>`: the waves and any ordering or task-line problem.
+- `<interpreter> -X utf8 scripts/plan_check.py queue --items <file> --root <spec-folder>`: the index and counts; with no plan `P#` open, the one empty-queue `Next` line. Flags: `--went-on-without-linter` (chosen this turn), `--uncommitted <n>`.
+- `<interpreter> -X utf8 scripts/plan_check.py batch --items <file>`: the findings table and its `Card:` line.
+- `<interpreter> -X utf8 scripts/plan_check.py reviewed --root <spec-folder> --open <n> --write`.
+
+Its `<file>` fields are in `references/issues.md` ("Items file"). Choosing those values is your judgement; the script does the rest. When Python cannot run, follow `references/issues.md` by hand with the same wording.
 
 ## Find the spec folder
 
@@ -36,36 +46,9 @@ Number issues `P1`, `P2`, … Each issue is **one** plan/task defect.
 Sources, in order:
 
 1. Numbered `P#`s already listed by the plan reviewer in this chat (preserve meaning; split if they bundled two problems). Keep their **plan** vs **spec** tag.
-2. Fresh read of `plan.md` / `tasks.md` against `spec.md` (add only what the reviewer missed)
+2. Fresh read of `plan.md` / `tasks.md` against `spec.md` (add only what the reviewer missed), starting from what `order` printed. The typical plan shapes, the **spec** tag, and skip-nitpicks are in `references/issues.md`.
 
-Typical **plan** shapes:
-
-- `T#` too big to verify alone (“add authentication”)
-- Missing `verify:` kind, missing named checks, or missing `(spec: …)`
-- An algorithm with one happy check and no corner cases
-- Behavior that already works, with no regression check
-- Two parts meet, with no integration test for that edge
-- A kept security check with no task and no “covered by T#”
-- Load or speed goal the spec did not state
-- Smoke after deploy, chaos, or fuzzing for its own sake, or test code in the plan
-- Task or approach step invents behavior the spec does not require
-- Acceptance / REQ with no task (or task with no spec line)
-- Files likely touched wrong, missing, or not `(proposed)` when there is no repo
-- `## Linter` missing, or it never says whether this repo has a linter or checker for the code the tasks will touch
-- Plan treats a kept-open spec question as decided
-
-**Spec** tag: the plan is fine or cannot be honest until `spec.md` changes. Do not “fix” that by writing product behavior into the plan.
-
-Skip nitpicks. Merge duplicates. Prefer fewer sharp issues.
-
-If **no plan issues** remain, say so and print one `Next` line. Do not list the other cases.
-
-- A spec-tagged finding is a spec defect: `Next: /crav1-tighten-spec, because that finding is a spec defect.`
-- A spec-tagged finding is an open question: `Next: /crav1-resolve-open-questions, because that finding is an open question.`
-- None remain, and the plan names a linter or they chose to go on without one: `Next: /crav1-build-tasks, because the plan issues are done.` A new chat, with `plan.md`, `tasks.md`, and `spec.md` attached.
-- No linter, and they have not chosen to go on: `Next: nothing needed now.` Do not name build.
-
-When `## Linter` says this repo has no linter or checker for the code the tasks will touch, do not name those Build commands. Stop before Build. The user decides to add the linter or to go on without one. Do not install one. When they already chose to go on without one in this turn, the Build next step applies, and the plan still says none. A plan that already says none is not a `P#` by itself.
+If **no plan issues** remain, print the `queue` output: it says so and prints one `Next` line.
 
 ## Walk one issue at a time
 
@@ -73,7 +56,7 @@ Walk **plan**-tagged `P#`s here. When the current item is **spec**-tagged: do no
 
 ### Index (every turn, short)
 
-Remaining `P#` titles only. Mark the current one. Note plan vs spec.
+Print the `queue` output: remaining `P#` titles only, the current one marked, plan vs spec.
 
 ### Current issue (full)
 
@@ -93,24 +76,20 @@ If they already answered this `P#` with a **patch** letter in the same message, 
 
 ### When they pick `suggest`
 
-Do **not** patch. Stay on this `P#`. Name the letter you would pick and why (2–4 sentences). Re-offer the same patch letters, with the suggested one first and its label ending in ` (Recommended)` (letters do not change). At most **one** alternate suggestion, then they must pick a patch letter, `ask`, `keep`, or `send-to-spec`.
+Do **not** patch. Stay on this `P#`. Follow `references/issues.md` ("When they pick `suggest`").
 
 ### After a choice
 
 1. Patch **only** `plan.md` and/or `tasks.md` as that resolution allows. Never `spec.md`.
 2. Recap **Added / Removed / Still open** for this `P#`.
 3. If `export/openspec/design.md` or `tasks.md` exist, update them to **match** (same tasks, no extra scope) when the resolution changed tasks.
-4. Advance to the next unanswered `P#`. If none remain, give the empty-queue next steps above.
+4. Run `reviewed` when the `Reviewed:` line applies (`references/issues.md`, "Reviewed line"). Advance to the next unanswered `P#`. If none remain, print the `queue` output.
 
-**Batch (1.145.0).** Follow **Batch of several items** in `crav1-docs/reference/question-cards.md` before this card. Print the findings table in this reply, then ask. The card names each item and its recommendation, for example `P4 tasks miss the 400 path: A add a test`. Never write `table above` unless that table is in this reply. Never ask the card without the table. `yes (Recommended)` applies every recommendation. The card's free-text answer carries the hint `Type your changes, e.g. P1 A, P3 keep`. An item that answer does not mention keeps its recommendation. One issue at a time still works. Then patch, and give one recap for the run.
+**Batch (1.145.0).** Follow **Batch of several items** in `crav1-docs/reference/question-cards.md` before this card. Print the findings table in this reply, then ask: the `batch` command prints the table and the `Card:` line together. The card names each item and its recommendation, for example `P4 tasks miss the 400 path: A add a test`. Never write `table above` unless that table is in this reply. Never ask the card without the table. `yes (Recommended)` applies every recommendation. The card's free-text answer carries the hint `Type your changes, e.g. P1 A, P3 keep`. An item that answer does not mention keeps its recommendation. One issue at a time still works. Then patch, and give one recap for the run.
 
 ## Resolution catalog (per plan issue)
 
 Build each `P#`'s options from [references/catalog.md](references/catalog.md) (`split-task`, `add-verify`, `add-cases`, `add-regression`, `add-integration`, `cover-security`, `drop-scope`, `fix-trace`, `retarget-files`, `name-linter`, `park-risk`, `send-to-spec`, `keep`, `suggest`, `ask`). Do **not** offer `apply-notes` for the whole review.
-
-## Reviewed line
-
-`plan.md` may have `Reviewed: <date>, P# open: <n>` under its title, written by `/crav1-review-plan`. After each patched `P#`, and when a `P#` is dropped as not an issue, lower `<n>` to the number of reviewer `P#`s still open. Keep the date. A `P#` the user leaves open stays counted. When there is no `Reviewed:` line, do not add one: only `/crav1-review-plan` records a review. This line is the only `plan.md` change this skill makes outside the picked patches.
 
 ## Claimed tasks (1.151.0)
 

@@ -57,3 +57,22 @@ Rules:
 - A task that finishes or tests a built piece found only on one work branch ends its line with `(branch: <name>)`, after `(verify:)`, `(spec:)` and `(after:)`. When the spec spans repos, name the repo too: `(branch: orders-api feat/orders-retry)`. New work with no home gets no branch part, and there is no new question. With one branch or none, write no branch part. A task without one uses `feat/<slug>` as today
 - Build map (1.128.0), optional. Leave these off unless the plan is overriding the default of one branch per Approach step. End a task line with `(step: 1)` when that step's text does not already name the task. End it with `(map: feat/cancel-refund)` when that task is built on a different branch from its step. Tasks that share a `(map:)` branch share the branch. Do not invent either mark for the default.
 - No task is “and also the rest of the app”
+
+## Host setup tasks (1.115.0)
+
+A requirement that is a host setting with no file in the repo (a branch policy or required build, required reviewers, an environment approval, a variable group, a service connection) gets its own task marked `(host setup)`. Its verify is the script's `check` part reading the live setting, for example `infra/ado/develop-build-policy.sh check prints ok`. Pipeline YAML, templates and infrastructure as code stay ordinary code tasks. Read skill `crav1-host-setup`, `references/host-setup.md` for the split. A secret is a manual task: the plan names what to create and where, never a value.
+
+## plan.md (moved from SKILL.md in 1.159.0)
+
+Use the template in this skill’s `assets/plan.md`. Fill:
+
+- **Constraints** — from spec constraints + accepted ADRs only
+- **Approach** — ordered steps for v0; reference diagrams
+- **Files likely touched** — real paths if a repo exists; otherwise proposed paths consistent with the spec, marked `(proposed)`
+- **Linter** — whether this repo has a linter or checker for the code those files will hold. See **Linter, before Build** in `references/checks.md`. Specify does not name the linter
+- **Requirements trace** — table: acceptance / REQ id → task ids
+- **Risks** — one entry per kept-open question, as **Blocks lines** in `references/write.md` says, and each stale research finding. One line per mark: the stale line, and the note path when there is one. Stale research does not block the plan. Do not clear the mark.
+- **Out of scope** — spec non-goals; do not plan them
+- **Left as committed** — only when the user left a piece; see `references/write.md` ("Left as committed").
+
+Stay inside v0. File-level, not class-by-class essays. No new product behavior. A piece marked already there is named in the trace as `already there` and has no rebuild task. A left piece has no task.
