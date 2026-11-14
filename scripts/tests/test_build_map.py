@@ -18,10 +18,11 @@ def ids_outside_tasks(text):
     """Task ids belong on the Tasks field (1.133.0). Other lines still drop them.
 
     A Loop line names the task lines to fix, so it keeps its ids (1.154.0).
+    So do the fix lines under it (1.161.0).
     """
     bad = []
     for line in text.splitlines():
-        if line.startswith("- Tasks:") or line.startswith("Loop: "):
+        if line.startswith(("- Tasks:", "Loop: ", "Recommended fix (", "Other fix (", "No single change")):
             continue
         if TASK_ID.search(line):
             bad.append(line)

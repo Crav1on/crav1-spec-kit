@@ -89,7 +89,7 @@ Do **not** patch. Stay on this `P#`. Follow `references/issues.md` ("When they p
 
 ## Resolution catalog (per plan issue)
 
-Build each `P#`'s options from [references/catalog.md](references/catalog.md) (`split-task`, `add-verify`, `add-cases`, `add-regression`, `add-integration`, `cover-security`, `drop-scope`, `fix-trace`, `retarget-files`, `name-linter`, `park-risk`, `send-to-spec`, `keep`, `suggest`, `ask`). Do **not** offer `apply-notes` for the whole review.
+Build each `P#`'s options from [references/catalog.md](references/catalog.md) (`split-task`, `add-verify`, `add-cases`, `add-regression`, `add-integration`, `cover-security`, `drop-scope`, `fix-trace`, `fix-loop`, `retarget-files`, `name-linter`, `park-risk`, `send-to-spec`, `keep`, `suggest`, `ask`). Do **not** offer `apply-notes` for the whole review.
 
 ## Claimed tasks (1.151.0)
 

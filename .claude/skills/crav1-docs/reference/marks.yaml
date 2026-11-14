@@ -614,8 +614,8 @@ marks:
     pattern: '^\(map: (\S+ )?\S+\)$'
     examples:
       - "(map: feat/cancel-refund)"
-    meaning: "The task is built on this branch instead of its plan step's branch. Tasks that name the same branch share it. When absent, a branch named on the task line is the row, else the plan step (1.140.0). Since 1.129.0 the build prompt writes this mark, and does not commit it, when the picked branch is not the offered branch."
-    written_by: [crav1-plan-from-spec, crav1-create-feature-branch]
+    meaning: "The task is built on this branch instead of its plan step's branch. Tasks that name the same branch share it. When absent, a branch named on the task line is the row, else the plan step (1.140.0). Since 1.129.0 the build prompt writes this mark, and does not commit it, when the picked branch is not the offered branch. Since 1.161.0 a confirmed `fix loop` (ready check) or `fix-loop` plan issue (tighten-plan) writes or replaces it, uncommitted, to break a loop between branches, keeping a repo word."
+    written_by: [crav1-plan-from-spec, crav1-create-feature-branch, crav1-tasks-ready-to-build, crav1-tighten-plan]
     read_by: [crav1-tasks-ready-to-build, crav1-build-tasks, crav1-create-feature-branch, crav1-build-features]
     readiness: true
     mention: '\(map:'

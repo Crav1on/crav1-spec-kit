@@ -71,3 +71,7 @@ An acceptance line traced to `already there` or `left as committed` is not a mis
 ## Stay out
 
 Smoke after deploy, chaos, and fuzzing for its own sake stay out. A **property** check for an algorithm with many inputs stays; that is not fuzzing for its own sake.
+
+## Branch loops (1.161.0)
+
+`plan_check.py order` lists branches that wait for each other as a `Branch loop:` line, with the fixes the ready check offers in plain words, the recommended one first. Never ask the user to edit `tasks.md` by hand. Show the recommended fix, and on the user's yes run `<interpreter> -X utf8 <skill crav1-tighten-and-plan-ready-to-build>/scripts/walk_progress.py fix-loop --root <spec-folder> --pick <n> --yes`. It writes the `(map:)` marks or drops the one wait in `tasks.md` and rebuilds `build-map.md`. Then run `order` again.

@@ -11,7 +11,7 @@ color: green
 
 # Tasks ready to build
 
-You list which tasks can be built now and why the others cannot. The only file you write is `docs/specs/<slug>/build-map.md`, through the script. You commit nothing and run no other skill. Naming `/crav1-build-tasks` is not running it.
+You list which tasks can be built now and why the others cannot. The only file you write is `docs/specs/<slug>/build-map.md`, through the script, plus the loop fix in `tasks.md` after a yes (`fix loop`). You commit nothing and run no other skill. Naming `/crav1-build-tasks` is not running it.
 
 This is cross-cutting. It is not its own lane. It can run any time: before Build, between tasks, or after new information. It does not move work into Build.
 
@@ -28,7 +28,8 @@ The readiness script decides every task and prints the finished reply: the count
 3. **Sync and claims.** The script fetches the specs repo and reads `claims.md` first, as [references/claims-and-sync.md](references/claims-and-sync.md) says (1.151.0). When it stops for a pull, print its reply (one Run next entry, `git pull --no-rebase`) and stop.
 4. **Run it.** Per slice: `<interpreter> -X utf8 scripts/walk_progress.py readiness --root <spec-folder> --write-map --text` (skill `crav1-tighten-and-plan-ready-to-build`). Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. That rewrites `build-map.md` with `scripts/build_map.py` and prints the reply, ending `Build map: docs/specs/<slug>/build-map.md`. Print it verbatim, one slice after another when listing every slice. With `full`, run `--full` instead and add the per-task lists and the Order line from its `rows`, as [references/rules.md](references/rules.md) shows, then the same `ending`.
 5. **Build map word.** With `build-map`, run `scripts/build_map.py docs/specs/<slug> --chat` and print only that summary: each wave, then that wave's Overlap lines. `--recommend T#` prints the branch to offer; the first line is the name (1.140.0). Do not hand-edit the map. Read `references/build-map.md` only when the script cannot run. Do not invent the map.
-6. **Stop.** Do not run either command the reply names.
+6. **Loop.** A `Loop:` line is followed by the fix offer. Never tell the user to edit `tasks.md` by hand. On `fix loop` or `fix loop <n>`, read [references/loop-fix.md](references/loop-fix.md): run `walk_progress.py fix-loop --root <spec-folder> --pick <n> --text`, ask its card, and on yes run it again with `--yes` (1.161.0).
+7. **Stop.** Do not run either command the reply names.
 
 ## What it reads
 
@@ -56,12 +57,13 @@ Without Python at all, follow [references/rules.md](references/rules.md) and `re
 
 ## What it does not do
 
-- No commit, no Azure Boards read, no checkout. The only network read is the script's fetch. The only write is `build-map.md`, through the script.
+- No commit, no Azure Boards read, no checkout. The only network read is the script's fetch. The only writes are `build-map.md` and a confirmed loop fix in `tasks.md`, through the scripts.
 - No skill run. It names the next step and stops.
-- No new readiness marks. `Reviewed:`, `(after:)`, `(branch:)`, and `Blocks:` are written by the plan and question skills. This skill only reads them. It does not write `verify.md`, and it does not restamp `walk-progress.md`.
+- No new readiness marks, except the `(map:)` or `(after:)` change a confirmed `fix loop` writes. `Reviewed:`, `(after:)`, `(branch:)`, and `Blocks:` are written by the plan and question skills. This skill only reads them. It does not write `verify.md`, and it does not restamp `walk-progress.md`.
 
 ## Choice words (1.69.0)
 
 - Build map: `build-map` (show only the build map; the words after it are the scope, same as this command with no word, such as `cc 1.0`). The task list stays off. There are no `--flags`.
 - Full list: `full` (1.156.0). The long form with every per-task list and the Order line. The brief reply is the default.
+- Fix the loop: `fix loop` (the recommended fix), `fix loop <n>` (that numbered fix) (1.161.0). The card confirms before anything is written.
 - Pipeline runs: `pipeline runs`. Read `references/promotion.md` ("Promotion") only when the invocation has that word. There are no `--flags`.
