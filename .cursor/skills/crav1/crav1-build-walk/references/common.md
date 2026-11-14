@@ -12,7 +12,7 @@ The step skill's own suggestion is not printed. That includes `/crav1-open-pr` a
 
 A new session has no earlier reply. The command is `/crav1-build-walk` plus each `T#` on that branch. When `docs/specs` has more than one slice, the slug is on that same line. One slice needs no slug.
 
-Another branch whose tasks can start is its own Run next entry. The script groups readiness `can_start` by build-map branch when `root` is the spec folder, or reads `ready_branches` when that list is already in the JSON. It does not bury those branches in the because text.
+Another branch whose tasks can start is its own Run next entry. Since 1.155.0 that is the next task, `/crav1-build-walk <slug> T#`, and, when the branch has two or more open tasks (`open_tasks`), a second entry for the whole branch, `/crav1-build-walk <slug> <branch>`, with `branch <branch>, every open task: …` underneath. The script groups readiness `can_start` by build-map branch when `root` is the spec folder, or reads `ready_branches` when that list is already in the JSON. It does not bury those branches in the because text.
 
 ## next JSON
 

@@ -419,6 +419,7 @@ Every mark and line format the kit writes inside product files, generated from [
 | Next task | `Next task: <T# \| none>` | `docs/specs/<slug>/build-progress/<branch>.md` (under ## Run) | `/crav1-build-walk` | `/crav1-build-walk` | 1.155.0 |
 | Built | `- Built: <T#>, commit <sha>, tests <green \| red \| none>` | `docs/specs/<slug>/build-progress/<branch>.md` (under ## Run) | `/crav1-build-walk` | `/crav1-build-walk` | 1.155.0 |
 | Fresh session hint | `Fresh session hint: every <N> tasks` | `docs/specs/<slug>/build-progress/<branch>.md` (under ## Run) | `/crav1-build-walk` | `/crav1-build-walk` | 1.155.0 |
+| Branch run status | `- Branch run: <branch>: <state> (<ISO time>). Log: build-progress/<file>.md` | `docs/specs/<slug>/walk-progress.md` (under ## Branch runs) | `/crav1-build-walk` | `/crav1-build-walk`, `/crav1-tasks-ready-to-build`, `/crav1-tighten-and-plan-ready-to-build` | 1.155.0 |
 | In progress claim | `In progress: <branch>, <T#>, <user>, since <ISO time>` | `docs/specs/<slug>/claims.md` | `/crav1-build-walk` | `/crav1-build-walk`, `/crav1-tasks-ready-to-build`, `/crav1-tighten-and-plan-ready-to-build`, `/crav1-plan-from-spec`, `/crav1-tighten-plan` | 1.151.0 |
 | Claim max age | `Claim max age: <N> days` | `docs/specs/<slug>/claims.md` | `/crav1-build-walk` | `/crav1-build-walk`, `/crav1-tasks-ready-to-build`, `/crav1-tighten-and-plan-ready-to-build` | 1.151.0 |
 

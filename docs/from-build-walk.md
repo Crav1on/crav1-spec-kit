@@ -35,6 +35,8 @@ It stops only for:
 
 When every task is built, it opens or updates the pull request and stops. The reply is Run next first, each command alone on its own line, for example `` `/crav1-build-walk orders-capacity feat/orders-cicd` `` to merge after your yes and `` `/crav1-build-walk orders-capacity feat/orders-dev-switch` `` for the next ready branch. Then each built task with its commit and test result, then anything left: skipped tasks, open questions, and verify rows that are behind. It never merges by itself.
 
+Each task also updates one line in `docs/specs/orders-capacity/walk-progress.md`, such as `- Branch run: feat/orders-cicd: running, T2 done, next T3 (2026-11-14T09:40:00+01:00). Log: build-progress/feat--orders-cicd.md`, then `stopped before merge`, then `merged`. That file stays the one place to look, and the ready check prints those lines. Run next in the ready check, tighten-and-plan, and this walk offers the whole branch beside the next task whenever a branch has two or more open tasks.
+
 To resume after a stop or in a new session, run the same command. It picks up at the next open task, keeps its own claim, and does not build a task twice. A stop partway keeps the claim unless you say `release claim`.
 
 ## Steps

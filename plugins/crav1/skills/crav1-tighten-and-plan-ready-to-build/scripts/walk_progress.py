@@ -1084,6 +1084,45 @@ def progress_path(root: Path) -> Path:
     return root / PROGRESS_NAME
 
 
+# One status line per whole-branch build run (1.155.0). The detailed log is
+# the branch's build-progress file. Two sessions may each update their own
+# line; a conflict that is only these lines is settled by the newest time.
+BRANCH_RUN_LINE = re.compile(
+    r"^- Branch run: (?P<branch>\S+): (?P<state>.+?) \((?P<when>\d{4}-\d{2}-\d{2}T[^)\s]+)\)\. "
+    r"Log: (?P<log>build-progress/\S+\.md)$"
+)
+BRANCH_RUNS_HEADING = "## Branch runs"
+
+
+def parse_branch_run(line: str) -> dict | None:
+    match = BRANCH_RUN_LINE.fullmatch((line or "").strip())
+    if not match:
+        return None
+    return {key: match.group(key) for key in ("branch", "state", "when", "log")}
+
+
+def branch_run_line(run: dict) -> str:
+    return f"- Branch run: {run['branch']}: {run['state']} ({run['when']}). Log: {run['log']}"
+
+
+def _newer(left: dict, right: dict) -> dict:
+    """The later of two status lines for one branch. A tie keeps the right side."""
+    try:
+        from datetime import datetime as _dt
+        a = _dt.fromisoformat(left["when"])
+        b = _dt.fromisoformat(right["when"])
+        return left if a > b else right
+    except (ValueError, TypeError):
+        return right
+
+
+def merge_branch_runs(ours: dict, theirs: dict) -> dict:
+    out = dict(theirs or {})
+    for branch, run in (ours or {}).items():
+        out[branch] = _newer(run, out[branch]) if branch in out else run
+    return out
+
+
 ACK_LINE = re.compile(
     r"^Acknowledged stamp: (\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}) \(([^)]+)\)$"
 )
@@ -1141,11 +1180,20 @@ def parse_progress(text: str) -> dict:
     current: dict | None = None
     kind: str | None = None
     slice_line = None
+    branch_runs: dict[str, dict] = {}
     for raw in text.splitlines():
         line = raw.strip()
         if not line or line.startswith("#"):
             continue
         if line == f"Walk: {WALK}":
+            continue
+        if line.startswith("- Branch run: "):
+            run = parse_branch_run(line)
+            if run is None:
+                fail("progress-file", f"branch run line is not branch: state (time). Log: file: {line}")
+            branch_runs[run["branch"]] = run
+            current = None
+            kind = None
             continue
         if line.startswith("Slice: "):
             slice_line = line[len("Slice: "):]
@@ -1253,16 +1301,17 @@ def parse_progress(text: str) -> dict:
                 fail("progress-file", f"jump-back {jump['id']} does not name {TIGHTEN_SPEC_PATH}")
         elif jump["result"] != "open-point":
             fail("progress-file", f"open point {jump['id']} result is not open-point")
-    return {"slice": slice_line, "steps": steps, "acks": acks, "jumps": jumps}
+    return {"slice": slice_line, "steps": steps, "acks": acks, "jumps": jumps, "branch_runs": branch_runs}
 
 
 def load(root: Path) -> dict:
     path = progress_path(root)
     if not path.is_file():
-        return {"slice": None, "steps": {}, "acks": [], "jumps": []}
+        return {"slice": None, "steps": {}, "acks": [], "jumps": [], "branch_runs": {}}
     data = parse_progress(path.read_text(encoding="utf-8"))
     data.setdefault("acks", [])
     data.setdefault("jumps", [])
+    data.setdefault("branch_runs", {})
     return data
 
 
@@ -1289,7 +1338,7 @@ def _render_jumps(lines: list[str], jumps: list | None) -> None:
         lines.append("")
 
 
-def render(slice_label: str, steps: dict, acks: list | None = None, jumps: list | None = None) -> str:
+def render(slice_label: str, steps: dict, acks: list | None = None, jumps: list | None = None, branch_runs: dict | None = None) -> str:
     lines = ["# Walk progress", "", f"Walk: {WALK}", f"Slice: {slice_label}", ""]
     for ack in acks or []:
         lines.append(_ack_line(ack["when"], ack["steps"]))
@@ -1339,6 +1388,12 @@ def render(slice_label: str, steps: dict, acks: list | None = None, jumps: list 
         _render_stamp(lines, body)
         lines.append("")
     _render_jumps(lines, jumps)
+    if branch_runs:
+        lines.append(BRANCH_RUNS_HEADING)
+        lines.append("")
+        for branch in sorted(branch_runs):
+            lines.append(branch_run_line(branch_runs[branch]))
+        lines.append("")
     return "\n".join(lines).rstrip() + "\n"
 
 
@@ -1550,7 +1605,7 @@ def record(args: argparse.Namespace) -> None:
     label = args.slice or data["slice"] or f"docs/specs/{root.name}/"
     if not str(label).endswith("/"):
         label = f"{label}/"
-    text = render(label, data["steps"], data.get("acks"), data.get("jumps"))
+    text = render(label, data["steps"], data.get("acks"), data.get("jumps"), data.get("branch_runs"))
     progress_path(root).write_text(text, encoding="utf-8")
     payload = {"ok": True, "wrote": PROGRESS_NAME, "step": step, "result": result, "when": body["when"]}
     if kept_done:
@@ -1782,9 +1837,54 @@ def write_progress(root: Path, data: dict, slice_label: str | None = None) -> No
     if not str(label).endswith("/"):
         label = f"{label}/"
     progress_path(root).write_text(
-        render(label, data["steps"], data.get("acks"), data.get("jumps")),
+        render(label, data["steps"], data.get("acks"), data.get("jumps"), data.get("branch_runs")),
         encoding="utf-8",
     )
+
+
+def set_branch_run(root: Path, branch: str, state: str, when: str | None = None) -> dict:
+    """Write or replace the one status line for a branch run (1.155.0).
+
+    Only that line changes. Steps, acks, and jumps stay as they are.
+    """
+    from datetime import datetime as _dt
+    state = " ".join((state or "").split()).rstrip(".")
+    if not branch or not state:
+        fail("branch-run", "a branch run needs --branch and --state")
+    when = when or _dt.now().astimezone().replace(microsecond=0).isoformat()
+    data = load(root)
+    log = f"build-progress/{branch.replace('/', '--')}.md"
+    run = {"branch": branch, "state": state, "when": when, "log": log}
+    if parse_branch_run(branch_run_line(run)) is None:
+        fail("branch-run", f"not a usable status line: {branch_run_line(run)}")
+    data["branch_runs"][branch] = run
+    write_progress(root, data)
+    return {"ok": True, "line": branch_run_line(run), "path": str(progress_path(root))}
+
+
+def branch_run_lines(root: Path | None, include_merged: bool = False) -> list[str]:
+    """Status lines the ready check prints. A merged run is left out."""
+    if root is None:
+        return []
+    path = progress_path(root)
+    if not path.is_file():
+        return []
+    data, _err = _try_parse(path.read_text(encoding="utf-8"))
+    if not data:
+        return []
+    out = []
+    for branch in sorted(data.get("branch_runs") or {}):
+        run = data["branch_runs"][branch]
+        if run["state"] == "merged" and not include_merged:
+            continue
+        out.append(f"- {branch}: {run['state']} (log: {run['log']})")
+    return out
+
+
+def cmd_branch_status(args: argparse.Namespace) -> None:
+    if not args.yes:
+        fail("needs-yes", "branch-status writes walk-progress.md only with --yes", 2)
+    emit(set_branch_run(Path(args.root), args.branch, args.state, args.when))
 
 
 def find_playbook(root: Path, recorded: str) -> Path | None:
@@ -1887,6 +1987,10 @@ def resume_payload(root: Path, no_playbook: bool) -> dict:
             }
             for jump in data.get("jumps") or []
         ],
+        "branch_runs": [
+            branch_run_line(data["branch_runs"][name]) for name in sorted(data.get("branch_runs") or {})
+        ],
+        "has_steps": bool(data["steps"]),
     }
 
 
@@ -3355,6 +3459,7 @@ def compose_ending(
     next_lines: list[str],
     because: str | None,
     replaced: str | None,
+    branch_runs: list[str] | None = None,
 ) -> str:
     """The reply for a walk ending. Print this text. Do not point at earlier output.
 
@@ -3368,6 +3473,8 @@ def compose_ending(
         parts.append("Run next:\n\n" + "\n\n".join(run_lines))
     if held_lines:
         parts.append("Held:\n" + "\n".join(held_lines))
+    if branch_runs:
+        parts.append("Branch runs:\n" + "\n".join(branch_runs))
     if waiting:
         parts.append("\n".join(waiting))
     if result == "not-ready" and because:
@@ -3591,8 +3698,9 @@ def readiness(args: argparse.Namespace) -> None:
         shown_next = [] if text.startswith("Next:") else [text]
     else:
         shown_next = []
+    run_status = branch_run_lines(root)
     ending = compose_ending(
-        result, shown_run, held_lines, waiting_bits, shown_next, because, replaced,
+        result, shown_run, held_lines, waiting_bits, shown_next, because, replaced, run_status,
     )
     claim_info = claim_info if "claim_info" in locals() else {"claims": [], "warnings": [], "ids": []}
     warnings = list(claim_info.get("warnings") or [])
@@ -3612,6 +3720,7 @@ def readiness(args: argparse.Namespace) -> None:
         "held_lines": held_lines,
         "next_lines": next_lines,
         "run_lines": shown_run,
+        "branch_runs": run_status,
         "ready_branches": (report or {}).get("ready_branches") or [] if result in ("ready", "ready-partial") else [],
         "ending": ending,
         "replaced": replaced,
@@ -4231,6 +4340,13 @@ def _classify_hunk(hunk: dict, lines: list[str]) -> None:
     sides = hunk["ours"] + hunk["theirs"] + (hunk["base"] or [])
     hunk["step"] = _enclosing_step(lines, hunk["start"])
     hunk["lines"] = _hunk_names(hunk)
+    filled = [line for line in sides if line.strip()]
+    if filled and all(parse_branch_run(line) for line in filled):
+        # Status lines only (1.155.0): settled by the newest time per branch.
+        hunk["class"] = "stamp"
+        hunk["step"] = "- Branch runs"
+        hunk["status"] = True
+        return
     stamp = all(_is_stamp_line(line) for line in sides)
     hunk["class"] = "stamp" if stamp and hunk["step"] else "blocked"
 
@@ -4828,7 +4944,9 @@ def resolve_stamps(args: argparse.Namespace) -> None:
             "message": "resolve-stamps writes the progress file only with --yes",
         }, 2)
     label = theirs_data.get("slice") or f"docs/specs/{root.name}/"
-    rendered = render(label, theirs_data["steps"], theirs_data.get("acks"), theirs_data.get("jumps"))
+    merged_runs = merge_branch_runs(ours_data.get("branch_runs"), theirs_data.get("branch_runs"))
+    theirs_data["branch_runs"] = merged_runs
+    rendered = render(label, theirs_data["steps"], theirs_data.get("acks"), theirs_data.get("jumps"), merged_runs)
     if blocked:
         # A mixed file keeps its conflict markers. Only the stamp hunks change.
         written = _settle_stamp_hunks(lines, hunks, theirs_data)
@@ -4898,6 +5016,11 @@ def _settle_stamp_hunks(lines: list[str], hunks: list[dict], data: dict) -> list
         out.extend(lines[cursor:hunk["start"]])
         if hunk["class"] != "stamp":
             out.extend(lines[hunk["start"]:hunk["end"]])
+        elif hunk.get("status"):
+            ours = {r["branch"]: r for r in map(parse_branch_run, hunk["ours"]) if r}
+            theirs = {r["branch"]: r for r in map(parse_branch_run, hunk["theirs"]) if r}
+            merged = merge_branch_runs(ours, theirs)
+            out.extend(branch_run_line(merged[name]) for name in sorted(merged))
         else:
             step = hunk.get("step") or ""
             body = data["steps"].get(step)
@@ -5051,6 +5174,14 @@ def main(argv: list[str] | None = None) -> None:
     f.add_argument("--match-key", help="First-seen key when more than one recorded finding is close.")
     f.add_argument("--yes", action="store_true")
     f.set_defaults(func=spec_finding)
+
+    bs = sub.add_parser("branch-status")
+    bs.add_argument("--root", required=True)
+    bs.add_argument("--branch", required=True)
+    bs.add_argument("--state", required=True)
+    bs.add_argument("--when")
+    bs.add_argument("--yes", action="store_true")
+    bs.set_defaults(func=cmd_branch_status)
 
     rs = sub.add_parser("resolve-stamps")
     rs.add_argument("--root", required=True)

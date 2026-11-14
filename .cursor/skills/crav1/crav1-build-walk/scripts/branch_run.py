@@ -23,6 +23,12 @@ Usage (JSON on stdout):
   branch_run.py record --root <spec-folder> --branch <name> --task <T#> --commit <sha>
       --tests <green|red|none> [--repo <git dir> --push]
   branch_run.py ending --json <file>
+  branch_run.py status --root <spec-folder> --branch <name> --state "<state>"
+
+Each start and record also writes one status line for the branch in
+walk-progress.md, for example `running, T9 done, next T10`, `stopped before
+merge`, or `merged`, with a link to this log. That file stays the one place
+every skill reads.
 
 `start` without --yes writes nothing. `record --push` pushes the work
 branch with no card: the start yes covers every push in the run. It never
@@ -94,6 +100,27 @@ def claims_mod():
 
 def approval_mod():
     return _load("crav1-record-approval", "approval_needed.py")
+
+
+def walk_mod():
+    return _load("crav1-tighten-and-plan-ready-to-build", "walk_progress.py")
+
+
+def set_status(root: Path, branch: str, state: str, when: str | None = None) -> str | None:
+    """One status line per branch in walk-progress.md (1.155.0). Returns the line."""
+    try:
+        out = walk_mod().set_branch_run(Path(root), branch, state, when)
+    except SystemExit:
+        return None
+    return out.get("line")
+
+
+def run_state(next_task: str | None, done: str | None = None) -> str:
+    if not next_task:
+        return "stopped before merge"
+    if done:
+        return f"running, {done} done, next {next_task}"
+    return f"running, next {next_task}"
 
 
 def questions_mod():
@@ -374,6 +401,8 @@ def start(root: Path, branch: str, user: str, yes: bool, hint_every: int | None 
     run["stamps"] = {row["id"]: row["stamp"] for row in plan["tasks"] if row["id"] in remaining} or run.get("stamps", {})
     run["next"] = next_task
     write_run(progress_path(root, branch), run, branch)
+    last = run["built"][-1]["task"] if run.get("built") else None
+    payload["status_line"] = set_status(root, branch, run_state(next_task, last))
     payload["wrote"] = True
     payload["progress"] = str(progress_path(root, branch))
     return payload
@@ -484,15 +513,16 @@ def record(root: Path, branch: str, task: str, commit: str, tests: str,
     run["next"] = remaining[0] if remaining else None
     path = progress_path(root, branch)
     write_run(path, run, branch)
+    status = set_status(root, branch, run_state(run["next"], task))
     out = {"ok": True, "task": task, "next_task": run["next"], "progress": str(path),
-           "committed": False, "pushed": False}
+           "status_line": status, "committed": False, "pushed": False}
     if repo is None:
         return out
     rel = str(path.resolve().relative_to(Path(repo).resolve()))
-    claims_file = root / "claims.md"
     paths = [rel]
-    if claims_file.is_file():
-        paths.append(str(claims_file.resolve().relative_to(Path(repo).resolve())))
+    for extra in (root / "claims.md", root / "walk-progress.md"):
+        if extra.is_file():
+            paths.append(str(extra.resolve().relative_to(Path(repo).resolve())))
     for item in paths:
         _git(repo, "add", "--", item)
     proc = _git(repo, "commit", "-m", f"Record {task} on {branch} in the build progress")
@@ -522,6 +552,16 @@ def push_branch(repo: Path, branch: str) -> dict:
 
 # ---------- the ending ----------
 
+def _label(task) -> str:
+    if isinstance(task, dict):
+        ident = tid(task.get("id"))
+        title = (task.get("title") or "").strip()
+        return f"{ident} {title}".strip()
+    text = str(task).strip()
+    match = re.match(r"^T?(\d+)\b\s*(.*)$", text, re.I)
+    return f"T{int(match.group(1))} {match.group(2)}".strip() if match else text
+
+
 def ending(state: dict) -> dict:
     """Run next, then what was built, then what is left. One string."""
     slug = state.get("slug")
@@ -540,9 +580,18 @@ def ending(state: dict) -> dict:
     else:
         runs.append((f"`{prefix} {branch}`", f"continue {branch} once this is settled: {stop.get('line') or kind}"))
     for other in state.get("ready_branches") or []:
-        name = other.get("branch") if isinstance(other, dict) else str(other)
-        if name and name != branch:
-            runs.append((f"`{prefix} {name}`", f"build every open task on {name}"))
+        if not isinstance(other, dict):
+            other = {"branch": str(other), "tasks": []}
+        name = other.get("branch")
+        if not name or name == branch:
+            continue
+        tasks = [_label(task) for task in other.get("tasks") or []]
+        opens = [_label(task) for task in (other.get("open_tasks") or other.get("tasks") or [])]
+        if tasks:
+            first = tasks[0]
+            runs.append((f"`{prefix} {first.split()[0]}`", f"branch {name}, {first}"))
+        if len(opens) >= 2:
+            runs.append((f"`{prefix} {name}`", f"branch {name}, every open task: {', '.join(opens)}"))
     parts = ["Run next:\n\n" + "\n\n".join(f"{cmd}\n{why}" for cmd, why in runs)]
     built = state.get("built") or []
     if built:
@@ -602,6 +651,10 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--push", action="store_true")
     p = sub.add_parser("ending")
     p.add_argument("--json", required=True)
+    p = sub.add_parser("status")
+    p.add_argument("--root", required=True)
+    p.add_argument("--branch", required=True)
+    p.add_argument("--state", required=True)
     args = parser.parse_args(argv)
     try:
         if args.cmd == "parse":
@@ -621,6 +674,9 @@ def main(argv: list[str] | None = None) -> int:
             out = record(Path(args.root), args.branch, args.task, args.commit, args.tests,
                          Path(args.repo) if args.repo else None, args.push)
             return _emit(out, 0 if out["ok"] else 2)
+        if args.cmd == "status":
+            line = set_status(Path(args.root), args.branch, args.state)
+            return _emit({"ok": bool(line), "line": line or "walk-progress.md could not be updated"}, 0 if line else 2)
         if args.cmd == "ending":
             return _emit({"ok": True, **ending(_json(args.json))})
     except (ValueError, KeyError, OSError, json.JSONDecodeError) as exc:

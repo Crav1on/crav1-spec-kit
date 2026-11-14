@@ -36,7 +36,7 @@ Next task: T3
 - Built: T2, commit a1b2c3d4e5f6, tests green
 ```
 
-`Run yes:` is the start yes that covers each push. `Task stamps:` are the task lines at the start, ignoring the checkbox and progress notes, so a change by someone else is a stop. `Next task:` is where a resume picks up. A `- Built:` task is never built again. It is not `walk-progress.md`, which belongs to the tighten-and-plan walk.
+`Run yes:` is the start yes that covers each push. `Task stamps:` are the task lines at the start, ignoring the checkbox and progress notes, so a change by someone else is a stop. `Next task:` is where a resume picks up. A `- Built:` task is never built again. The run also keeps one `- Branch run:` status line for this branch in `walk-progress.md`, which links here, so that file stays the one place every skill reads (see [branch-run.md](branch-run.md)).
 
 ## Stamp
 

@@ -58,6 +58,8 @@ Shows summary counts per slice, then Ready and Held grouped by build-map branch,
 
 1.154.0: branches that wait for each other are a loop. The map and the ready-check ending print one `Loop:` line per loop, naming the branches and the task line behind each direction of the wait, then `Fix one of these lines in tasks.md.` The open tasks on those branches are Blocked in both, from one shared judgement, and are not offered in Run next. A branch downstream of a loop keeps its own wave and state. A branch always sits in a later wave than each branch it waits for, unless both are in the same loop. A held line shows the wave, or `in a loop`, never `(blocked)`.
 
+1.155.0: Run next offers each ready branch's next task, [`/crav1-build-walk`](crav1-build-walk.md) <slug> T#`, and, when that branch has two or more open tasks, the whole branch, [`/crav1-build-walk`](crav1-build-walk.md) <slug> <branch>`, as its own entry with `branch <branch>, every open task: …` underneath. `next_lines` carry the same entries. A `Branch runs:` block prints each unmerged `- Branch run:` status line from `walk-progress.md`.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.

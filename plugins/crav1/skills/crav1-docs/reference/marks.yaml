@@ -1802,6 +1802,22 @@ marks:
     read_by: [crav1-build-walk]
     since: 1.155.0
 
+  - id: branch-run-status
+    name: "Branch run status"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md (under ## Branch runs)"]
+    format: "- Branch run: <branch>: <state> (<ISO time>). Log: build-progress/<file>.md"
+    pattern: '^- Branch run: \S+: .+ \(\d{4}-\d{2}-\d{2}T\S+\)\. Log: build-progress/\S+\.md$'
+    examples:
+      - "- Branch run: feat/orders-cicd: running, T9 done, next T10 (2026-11-14T09:40:00+01:00). Log: build-progress/feat--orders-cicd.md"
+      - "- Branch run: feat/orders-cicd: stopped before merge (2026-11-14T11:00:00+01:00). Log: build-progress/feat--orders-cicd.md"
+      - "- Branch run: feat/orders-cicd: merged (2026-11-14T12:00:00+01:00). Log: build-progress/feat--orders-cicd.md"
+    meaning: "One status line per whole-branch run, so walk-progress.md stays the one file every skill reads. The detailed log is the linked build-progress file. A conflict that is only these lines keeps each branch's newest line."
+    written_by: [crav1-build-walk]
+    read_by: [crav1-build-walk, crav1-tasks-ready-to-build, crav1-tighten-and-plan-ready-to-build]
+    mention: 'Branch run'
+    since: 1.155.0
+
   - id: in-progress-claim
     name: "In progress claim"
     group: walk

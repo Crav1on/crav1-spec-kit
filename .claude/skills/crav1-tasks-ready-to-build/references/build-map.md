@@ -57,8 +57,11 @@ Print one line per branch. A task is `T#` plus its short name, the same words as
 ```text
 Run next:
 
-`/crav1-build-walk T2 T5`
-branch feat/orders-api-record, T2 Record the decision, T5 Store the card
+`/crav1-build-walk T2`
+branch feat/orders-api-record, T2 Record the decision
+
+`/crav1-build-walk feat/orders-api-record`
+branch feat/orders-api-record, every open task: T2 Record the decision, T5 Store the card
 
 `/crav1-build-walk T6`
 branch feat/orders-api-export, T6 Email the receipt
@@ -69,6 +72,8 @@ Held:
 
 /crav1-build-tasks builds one task without the walk.
 ```
+
+Each ready branch offers its next task as `/crav1-build-walk <slug> T#`. When that branch has two or more open tasks, the whole branch, `/crav1-build-walk <slug> <branch>`, is a second entry, with `branch <branch>, every open task: …` underneath (1.155.0). A branch with one open task gets only the T# entry. After Held, a `Branch runs:` block lists each `- Branch run:` status line in `walk-progress.md` that is not `merged`, for example `- feat/orders-api-record: running, T2 done, next T5 (log: build-progress/feat--orders-api-record.md)`.
 
 A held task names its open question and who has the answer, or `held, waits on T#`. The Run next block is first and is the only place the walk command appears, one entry per branch that has a task that can start, and only when the result is `ready` or `ready-partial`. The bottom keeps Waiting lines and the one-line `/crav1-build-tasks` alternative. Never write a `Next:` line after the Waiting or Held lines (1.153.0). Do not flatten the branches into one list.
 

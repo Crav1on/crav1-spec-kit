@@ -69,10 +69,15 @@ Run next:
 `/crav1-build-walk T5`
 branch feat/orders-retry, T5 refund to the original card
 
+`/crav1-build-walk feat/orders-retry`
+branch feat/orders-retry, every open task: T5 refund to the original card, T6 send the mail
+
 /crav1-build-tasks builds one task without the walk.
 Source: docs/specs/cancel-booking/spec.md, plan.md, tasks.md, verify.md
 Build map: docs/specs/cancel-booking/build-map.md
 ```
+
+Since 1.155.0 each ready branch offers its next task, and, when the branch has two or more open tasks, the whole branch as a second entry, built in one run by `/crav1-build-walk <slug> <branch>`. A branch with one open task gets only the T# entry. When a whole-branch run is going, or stopped, the ending also has a `Branch runs:` block from the `- Branch run:` status lines in `walk-progress.md`, for example `- feat/orders-retry: running, T5 done, next T6 (log: build-progress/feat--orders-retry.md)`. A merged run is left out.
 
 ## Getting recorded reasons
 

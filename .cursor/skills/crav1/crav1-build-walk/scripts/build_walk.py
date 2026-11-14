@@ -310,6 +310,8 @@ def normalize_branches(branches, code: str) -> list:
             raise InputError(code, f"each {code} entry must be an object")
         row = dict(branch)
         row["tasks"] = normalize_tasks(row.get("tasks"))
+        if "open_tasks" in row:
+            row["open_tasks"] = normalize_tasks(row.get("open_tasks"))
         out.append(row)
     return out
 
@@ -620,20 +622,45 @@ def _other_ready(state: dict, current: str | None) -> list:
     return out
 
 
-def grouping_lines(branches: list, slug: str | None = None) -> list[dict]:
-    """One entry per ready branch. Parallel work, each a complete command."""
+def branch_entries(branch: dict, slug: str | None = None) -> list[dict]:
+    """Run next entries for one ready branch (1.155.0).
+
+    The next task, `/crav1-build-walk <slug> T#`, then the whole branch,
+    `/crav1-build-walk <slug> <branch>`, only when the branch has two or more
+    open tasks. Each is its own entry with its own Next line.
+    """
+    tasks = branch.get("tasks") or []
+    name = branch.get("branch") or ""
+    opens = branch.get("open_tasks")
+    if opens is None:
+        opens = tasks
     entries = []
-    for branch in branches:
-        tasks = branch.get("tasks") or []
-        name = branch.get("branch") or ""
-        label = _task_list(tasks) or name
+    if tasks:
+        first = tasks[:1]
+        label = _task_list(first) or name
         entries.append(_entry(
             "/crav1-build-walk",
             f"that work is on {name}" + (f" ({label})" if label and label != name else ""),
-            tasks,
+            first,
             name,
             slug,
         ))
+    if name and len(opens) >= 2:
+        command = f"/crav1-build-walk {slug} {name}" if slug else f"/crav1-build-walk {name}"
+        run = map_mod().branch_entry([_task_label(task) for task in opens], name, slug=slug)
+        entries.append({
+            "command": command,
+            "run": run,
+            "next": _one(command, f"every open task on {name} builds in one run ({_task_list(opens)})"),
+        })
+    return entries
+
+
+def grouping_lines(branches: list, slug: str | None = None) -> list[dict]:
+    """Entries per ready branch. Parallel work, each a complete command."""
+    entries = []
+    for branch in branches:
+        entries.extend(branch_entries(branch, slug))
     return entries
 
 
@@ -744,16 +771,7 @@ def next_for(state: dict) -> dict:
     else:
         entries.append(_entry(command, because, tasks, branch, slug))
         for other in _other_ready(state, branch):
-            other_tasks = other.get("tasks") or []
-            name = other.get("branch") or ""
-            label = _task_list(other_tasks) or name
-            entries.append(_entry(
-                "/crav1-build-walk",
-                f"that work is on {name}" + (f" ({label})" if label and label != name else ""),
-                other_tasks,
-                name,
-                slug,
-            ))
+            entries.extend(branch_entries(other, slug))
     lines = [entry["next"] for entry in entries]
     ending = _compose_ending(entries, waiting, uncommitted)
     outcome = state.get("_permission") if phase == "permission-refused" else None
