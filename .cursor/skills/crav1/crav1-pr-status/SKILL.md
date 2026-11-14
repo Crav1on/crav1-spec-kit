@@ -41,7 +41,7 @@ At most **one** prompt per run, the closing one included, as `crav1.mdc` says. A
 
 ## Read
 
-Resolve the pull request, its host, the code repo and the specs repo as `/crav1-review-pr` does (**Specs repo and code repo**). Read everything as `crav1-add-to-spec` `references/pr-threads.md` says (skill `crav1-add-to-spec`, `references/pr-threads.md`): the threads with every comment, the pushes with their commits, the files each push changed, and who is signed in. Never log in. Never print a token. Skip system and bot threads.
+Resolve the pull request and its host as [pr-common.md](../crav1-docs/reference/pr-common.md) says (1.158.0; with no pull request named, `scripts/pr_common.py find --branch <current-branch>`), and the code repo and specs repo as `/crav1-review-pr` does (**Specs repo and code repo**). Read everything as `crav1-add-to-spec` `references/pr-threads.md` says (skill `crav1-add-to-spec`, `references/pr-threads.md`): the threads with every comment, the pushes with their commits, the files each push changed, and who is signed in. Skip system and bot threads.
 
 Then read the PR note and its `## PR record`, as `crav1-add-to-spec` `references/pr-record.md` says (skill `crav1-add-to-spec`, `references/pr-record.md`). No PR note yet: write it as `/crav1-review-pr` **PR note** does. An old follow-ups note is read as `migrated` Points; say once to run `/crav1-add-to-spec migrate formats`.
 
@@ -51,40 +51,13 @@ Read `references/modes.md` ("Pick the mode") every run. In short: you opened the
 
 ## Points and statuses
 
-Read `references/classify.md` every run. One thread can hold several points; split them. Each point gets exactly one of the six statuses:
+Read `references/classify.md` every run: it splits threads into points and gives each point exactly one of six statuses, `done <sha>`, `agreed`, `declined`, `open`, `waiting on <name>` or `needs <name>`. Never guess `done`: no commit, no `done`. When the text does not settle a status, use `open` and say why.
 
-| Status | Means |
-| --- | --- |
-| `done <sha>` | The change is in the code; a commit after the request touched the anchor. Needs the commit. |
-| `agreed` | The other side said yes or will do it; no commit shows it yet. |
-| `declined` | The other side will not do it; the reason is kept. |
-| `open` | Still being discussed, or not answered. |
-| `waiting on <name>` | The last message asks that person or hands them the next step. |
-| `needs <name>` | Someone outside the thread has to act or answer. |
-
-A point that belongs to later work keeps its status and is also offered as a follow-up. Never guess `done`: no commit, no `done`. When the text does not settle a status, use `open` and say why.
-
-**Host settings (1.115.0).** A point that asks for a host setting (a branch policy, required build, reviewers, an approval) is `done host` (the `done` status with `host` in place of the sha) when that repo's host-setup script `check` part, or the same read, shows the setting live in this run; no commit is needed. Read-only: never run `apply`. Not set yet, or not signed in: keep the status and name `/crav1-host-setup`.
-
-**Resolved while the code is unchanged.** A thread the host shows as resolved (Azure DevOps `fixed`, `closed`, `wontFix`, `byDesign`; GitHub resolved) whose point is not `done`, `declined` or settled in the thread, with no push after the request touching its anchor, is flagged `resolved, code unchanged`. The opposite, `done` in the code while the thread is still active, is flagged `done, thread still active`. Both are offered as a status change.
+**Host settings (1.115.0).** A point that asks for a host setting is `done host` when that repo's host-setup script `check` part shows it live in this run. Read-only: never run `apply`. Not set yet, or not signed in: keep the status and name `/crav1-host-setup`. The full rule and the resolved-while-unchanged flags are in `references/classify.md` ("Statuses").
 
 ## Output
 
-Read `references/output.md` every run. Print, in this order:
-
-1. The heading: `<repo> PR <n>: <title> (<source> -> <target>), you: <mode>, as of <date>`.
-2. **Verdict line**: counts by status, the points waiting on you first, for example `Verdict: 2 waiting on you, 1 needs Robin K., 3 agreed (code checked: 1 done), 1 declined.`
-3. **Waiting on you**, oldest first, then the other points grouped by status, one line each: anchor, status, owner, the point in plain words, the evidence (who said what, when; the commit).
-4. **Flags**: resolved while the code is unchanged, and done with the thread still active.
-5. **Spec and decision candidates** (see **Hand-offs**).
-6. **Follow-ups** (drafts).
-7. **Order**: pull requests this one depends on or that depend on it, and the merge order.
-8. **Drafted replies (not posted)**: one per thread that waits on you.
-9. **Run ending** (1.122.0): one `Next:` line, then `Waiting:` lines, then `Uncommitted:` when the note is not committed. See `references/output.md`.
-10. **Merge readiness**: `Ready: yes | no | merged`, with the reasons.
-11. `PR record: <repo>: <path>`, as a code span.
-
-`since last` prints only changes; see **Since last**.
+Read `references/output.md` every run and print in its **Order**: the heading, the `Verdict:` line, the points waiting on you first and then by status, flags, spec and decision candidates, follow-ups, merge order, drafted replies (not posted), the run ending, `Ready: yes | no | merged` with its reasons, and the `PR record:` line. `since last` prints only changes; see **Since last**.
 
 ## Since last
 
@@ -92,7 +65,7 @@ Read `references/since-last.md` only on `since last`, or when your `Read` line e
 
 ## Write the record
 
-Every run writes the PR note's `## PR record` as `references/pr-record.md` says, merge-safe, each line in sorted place: one Point per point, `Order` lines, your `Read` line, the `Ready` line and the `State` line. A Point keeps its line; a changed status replaces that line where it is. Never delete a Point. The drafted replies go in a `## Replies as drafted, <date> (not posted)` history section, after the personal-data and secrets check. Then run the notes index generator (`scripts/notes_index.py` in `crav1-add-to-spec`). Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. Do not commit. The run ending's Uncommitted line covers the note.
+Every run writes the PR note's `## PR record` as `references/pr-record.md` says, merge-safe, each line in sorted place: one Point per point, `Order` lines, your `Read` line, the `Ready` line and the `State` line. A Point keeps its line; a changed status replaces that line where it is. Never delete a Point. The drafted replies go in a `## Replies as drafted, <date> (not posted)` history section, after the personal-data and secrets check. Then run the notes index generator (`scripts/notes_index.py` in `crav1-add-to-spec`), with the interpreter `crav1-docs/reference/running-scripts.md` names. Do not commit. The run ending's Uncommitted line covers the note.
 
 Writing the record needs no yes: it is a note in the specs repo, as `/crav1-review-pr` writes its notes. When no specs repo is found, print the record with the path it would have.
 
@@ -100,9 +73,7 @@ Writing the record needs no yes: it is a note in the specs repo, as `/crav1-revi
 
 Read `references/offers.md` only when there is something to offer.
 
-- **Spec or decision candidates.** A point that settles how the system works, accepts a limit for now, or drops a goal is a candidate. The record tags it `to spec` or `to decision`. Name the command to type, `/crav1-add-to-spec pr<n> candidates`; never run it or ask about it (1.100.0).
-- **Follow-up work items.** A point accepted for later becomes a drafted item for `/crav1-ado-sync` (title and description, in the format of that skill's push branch). The record marks its Point `follow-up` only on a yes. Never create a work item.
-- **Thread status changes.** One question per thread, each its own yes. Only a yes sets that one thread's status on the host, as `references/pr-threads.md` says. Never several threads on one yes.
+Its **Hand-offs** section holds the three kinds: spec or decision candidates (name `/crav1-add-to-spec pr<n> candidates`; never run it or ask about it, 1.100.0), follow-up work items (drafts for `/crav1-ado-sync`, marked `follow-up` only on a yes; never create a work item), and thread status changes (one question and one yes per thread; never several threads on one yes).
 
 ## Hard rules
 
@@ -110,7 +81,7 @@ Read `references/offers.md` only when there is something to offer.
 - Replies and messages to other people are drafts. Never send them.
 - No edits to code, `spec.md`, `plan.md`, `tasks.md` or `verify.md`. The only writes are the PR note with its record, and the generated notes indexes.
 - Read-only toward the code repo; the only git write is a fetch of the pull request's two branches, as `/crav1-review-pr` asks first.
-- Never log in. Never print, echo or store a token. Redact secrets and personal data the way `/crav1-review-pr` does.
+- Never log in. Never print, echo or store a token. Redact secrets and personal data the way `/crav1-review-pr` does ([pr-common.md](../crav1-docs/reference/pr-common.md), "Signing in and secrets").
 - Do not run `/crav1-review-pr`, `/crav1-merge-pr`, `/crav1-add-to-spec` or `/crav1-ado-sync`. Name them when they fit.
 - No rebase advice; suggest merging the base into the branch.
 

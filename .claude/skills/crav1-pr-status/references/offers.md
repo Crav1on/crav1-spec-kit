@@ -25,3 +25,11 @@ Signed out, headless, or a bot run: list the same questions as text under `Offer
 A no changes nothing and is not asked again in the same run.
 
 Spec and decision candidates are never asked (1.100.0): the output names `/crav1-add-to-spec pr<n> candidates`, which only runs when you type it. Pick some by retagging a Point in the record, or with `pr<n> candidates 1,3`.
+
+## Hand-offs
+
+Moved word for word from `SKILL.md` in 1.158.0; the rules are unchanged.
+
+- **Spec or decision candidates.** A point that settles how the system works, accepts a limit for now, or drops a goal is a candidate. The record tags it `to spec` or `to decision`. Name the command to type, `/crav1-add-to-spec pr<n> candidates`; never run it or ask about it (1.100.0).
+- **Follow-up work items.** A point accepted for later becomes a drafted item for `/crav1-ado-sync` (title and description, in the format of that skill's push branch). The record marks its Point `follow-up` only on a yes. Never create a work item.
+- **Thread status changes.** One question per thread, each its own yes. Only a yes sets that one thread's status on the host, as `references/pr-threads.md` says. Never several threads on one yes.

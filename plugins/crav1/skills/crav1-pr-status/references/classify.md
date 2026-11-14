@@ -2,6 +2,27 @@
 
 Read every run, from **Points and statuses** in `SKILL.md`. Record format: `crav1-add-to-spec` `references/pr-record.md`.
 
+## Statuses
+
+Moved word for word from `SKILL.md` in 1.158.0; the rules are unchanged.
+
+One thread can hold several points; split them. Each point gets exactly one of the six statuses:
+
+| Status | Means |
+| --- | --- |
+| `done <sha>` | The change is in the code; a commit after the request touched the anchor. Needs the commit. |
+| `agreed` | The other side said yes or will do it; no commit shows it yet. |
+| `declined` | The other side will not do it; the reason is kept. |
+| `open` | Still being discussed, or not answered. |
+| `waiting on <name>` | The last message asks that person or hands them the next step. |
+| `needs <name>` | Someone outside the thread has to act or answer. |
+
+A point that belongs to later work keeps its status and is also offered as a follow-up. Never guess `done`: no commit, no `done`. When the text does not settle a status, use `open` and say why.
+
+**Host settings (1.115.0).** A point that asks for a host setting (a branch policy, required build, reviewers, an approval) is `done host` (the `done` status with `host` in place of the sha) when that repo's host-setup script `check` part, or the same read, shows the setting live in this run; no commit is needed. Read-only: never run `apply`. Not set yet, or not signed in: keep the status and name `/crav1-host-setup`.
+
+**Resolved while the code is unchanged.** A thread the host shows as resolved (Azure DevOps `fixed`, `closed`, `wontFix`, `byDesign`; GitHub resolved) whose point is not `done`, `declined` or settled in the thread, with no push after the request touching its anchor, is flagged `resolved, code unchanged`. The opposite, `done` in the code while the thread is still active, is flagged `done, thread still active`. Both are offered as a status change.
+
 ## Split threads into points
 
 - A thread starts as one point: its first comment's request or question, at the thread's anchor (`path:line`, `path:start-end`, or `general` for a thread with no file).

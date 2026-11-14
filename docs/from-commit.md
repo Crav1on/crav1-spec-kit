@@ -85,6 +85,10 @@ git merge develop
 git push
 ```
 
+## Shared pull-request steps (1.158.0)
+
+`/crav1-open-pr`, `/crav1-merge-pr`, `/crav1-pr-status` and `/crav1-review-pr` share one page for the steps they have in common: which pull request a number or URL names, the host order (GitHub, then Azure DevOps, then printed steps), Windows quoting, the open state, claims, catching up by merging the base in (never a rebase), signing in, and the run ending. It is [Shared pull-request steps](reference/pr-common.md). Each skill keeps its own judgement and its own rules win. One read-only script, `scripts/pr_common.py`, does the lookups: `parse` (which host and number), `find` (the open pull requests for one branch, never picking the newest), `checks` (passing, failing and pending), `claim` (the `In progress:` lines for a branch) and `behind` (how far behind the base, with the merge-in advice). It never pushes, posts, merges or writes `claims.md`. Nothing changes in what you see: `/crav1-merge-pr` still merges only on your explicit ask, always with a merge commit, and `/crav1-build-walk` still clears its own claim after the merge.
+
 ## Someone else pushed first (1.81.0)
 
 After the commit, `/crav1-finalize-commit` fetches. It never pushes. It makes at most two commits: the one you just drafted, and one merge commit when the branch was behind.

@@ -218,6 +218,10 @@ A finding is `open`, a follow-up is `follow-up`, a question is `waiting on <auth
 
 Before 1.97.0 the follow-ups lived in a separate `docs/notes/YYYY-MM/review-pr-[<repo>-]<n>-follow-ups.md`. A review still reads one and says to run `/crav1-add-to-spec migrate formats`, which moves it into the PR note ([install](install.md)).
 
+## Shared pull-request steps (1.158.0)
+
+`/crav1-review-pr` resolves, reads and checks the state of the pull request the same way as open-pr, merge-pr and pr-status, as [Shared pull-request steps](reference/pr-common.md) says. The review, the verdict and the post offer are unchanged.
+
 ## What does not get written
 
 No code edit. No `spec.md` edit. No `plan.md` edit. No test run. No comment, vote, or thread resolve without your yes. The only file it writes is the PR note with its PR record, in the specs repo. In the code repo it only fetches the pull request's two branches, and only after you pick that. No branch-protection change. No merge.

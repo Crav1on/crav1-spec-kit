@@ -8,6 +8,8 @@
 
 Open a pull request for the current change branch, or push to an existing one and update its description or comment (push with explicit yes).
 
+1.158.0: the steps it shares with merge-pr, pr-status and review-pr (which pull request, host order, Windows, finding the pull request for a branch, state and checks, claims, catching up by merging the base in, signing in, run ending) are one page, `crav1-docs/reference/pr-common.md`, with one read-only script, `scripts/pr_common.py` (`parse`, `host`, `find`, `checks`, `claim`, `behind`). The skill ships the script; the other three run it from here. The checks before the draft moved word for word to `references/checks.md`, the GitHub create steps to `references/github.md`.
+
 1.130.0: the post confirm is one card. `yes (Recommended)` posts the text as shown. Typed changes go on that card's free-text answer. There is no Edits option. Nothing is posted before that yes.
 
 Push the change branch only after an explicit yes, then open one pull request (no merge, no commit). The body is a short summary and headed sections (see 1.98.0), with a Work item section when `work-item.md` exists. On Windows, a multi-line Azure DevOps description is passed as `--description "@<file>"` (UTF-8 without BOM). May name [`/crav1-review-pr`](crav1-review-pr.md) and does not run it. Next explicit ask to merge is [`/crav1-merge-pr`](crav1-merge-pr.md).
