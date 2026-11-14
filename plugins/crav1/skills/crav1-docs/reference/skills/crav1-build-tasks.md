@@ -8,6 +8,8 @@
 
 Build tasks from tasks.md, always in an isolated worker per task; asks which tasks (one, a range, or all).
 
+1.160.0: when `--recommend` prints a `checkout:` line, the task-line branch is only on origin or is the head of an open pull request. The build checks it out (`git checkout <name>` makes the local tracking branch) without the branch card.
+
 1.142.0: when [`/crav1-build-walk`](crav1-build-walk.md) opened this skill, do not print the open-pr Next. The walk prints its one Next.
 
 1.141.0: when a named person's yes is not on record, the parent writes or offers an `## Approval needed` item. It does not write `Approved:`. A matching `Approved:` line means that yes is on record. A live `apply` still needs the user's own yes in that run, and the task stays unticked until `check` is ok.

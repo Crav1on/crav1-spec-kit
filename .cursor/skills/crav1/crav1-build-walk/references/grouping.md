@@ -13,6 +13,6 @@ branch feat/orders-host-setup-scripts, T3 Apply the CI build policy
 
 Each branch offers its next task. A branch with two or more open tasks also offers the whole branch, `/crav1-build-walk <slug> <branch>`, as a second entry (1.155.0). Each command is alone in the code span. A task that needs code from an unmerged branch is not offered as a second ready branch on `develop`. `SKILL.md` sends that case to the stack file. Do not open it from here.
 
-The branch name is `scripts/build_map.py docs/specs/<slug> --recommend T#` (skill `crav1-tasks-ready-to-build`) through `build_walk.py offer`. A merged or deleted branch is not offered. The card says where the name came from: the task line, the build map, or new. A `because:` line is the description when a name was skipped, for example `New, because feat/orders-one-commit-cleanup-main is already merged.`
+The branch name is `scripts/build_map.py docs/specs/<slug> --recommend T#` (skill `crav1-tasks-ready-to-build`) through `build_walk.py offer`. A merged or deleted branch is not offered. A task-line branch that is only on origin, or is the head of an open pull request, prints a `checkout:` line: `git checkout <name>` makes the local tracking branch, with no card (1.160.0). The card says where the name came from: the task line, the build map, or new. A `because:` line is the description when a name was skipped, for example `New, because feat/orders-one-commit-cleanup-main is already merged.`
 
 Pick one branch, then stop this file. The next turn reads progress, not this file. One checkout follows one branch.

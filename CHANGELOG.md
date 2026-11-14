@@ -2,6 +2,16 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.160.0 (2026-11-14)
+
+The branch offer finds a task branch that was deleted only on your computer, and the build uses it without asking. A minor release because `--recommend` reads the remote and gains a `checkout:` line.
+
+- **The bug.** A task line named `feature/orders-incoming-table`, the source branch of open PR 71 that the task had to land in. The local branch had been deleted, and the `origin/` ref was missing too. `build_map.py --recommend` then said the branch `was deleted locally and on the remote` and offered a new branch named after the plan step, `feat/orders-pr-71-gets-readme` from develop. The branch was still on origin, so the build had to ask which branch to use.
+- **Remotes are read for real.** `build_map.py` reads each remote with `git ls-remote --heads` once per run, besides the `origin/<name>` refs, and, when `gh` works, the open pull requests with `gh pr list`. A branch is called deleted on the remote only when a remote that could be read lacks it. A remote that cannot be reached is never taken as gone. `CRAV1_NO_REMOTE_CHECK=1` turns both reads off.
+- **Origin only means use it.** When the task-line branch is only on a remote, `--recommend` keeps it as `source: task line`, says `because: feature/orders-incoming-table is on origin only; checkout creates the local tracking branch`, and prints a last `checkout: feature/orders-incoming-table` line. `/crav1-build-tasks`, `/crav1-build-walk` and the Build prompt in `/crav1-create-feature-branch` then check it out with no branch card.
+- **An open pull request wins.** An open pull request whose head is the task-line branch beats merged and deleted, and a `PR n` on the task line picks that pull request. The `because:` line names it. Only a branch missing everywhere, with no open pull request, gets a new step-named branch, as before.
+- **Tests.** With a bare origin in a temp repo: a branch deleted locally but still on origin is offered, with and without its `origin/` ref; a branch gone everywhere gets a new name; an open pull request head wins over a deleted or merged branch; another pull request's head does not count; and turning the remote check off keeps the old answer.
+
 ## 1.159.0 (2026-11-14)
 
 `/crav1-tighten-plan` and `/crav1-plan-from-spec` compute their own ordering, batches and endings, and both skill files are shorter. A minor release because both skills gain a script whose output they show as-is.
