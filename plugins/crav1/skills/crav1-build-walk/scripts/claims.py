@@ -108,12 +108,15 @@ def parse_when(value: str) -> datetime:
 def format_when(when: datetime) -> str:
     """Local time with the local offset, to the second (1.160.0).
 
-    For example 2026-11-14T23:40:00+01:00. An old UTC line still reads, and
-    is written back in local time.
+    For example 2026-11-14T23:40:00+01:00. A time that already carries a
+    non-UTC offset keeps it. A UTC time, including an old UTC line, is
+    written in local time.
     """
     if when.tzinfo is None:
         when = when.replace(tzinfo=timezone.utc)
-    return when.astimezone().replace(microsecond=0).isoformat()
+    if when.utcoffset() == timedelta(0):
+        when = when.astimezone()
+    return when.replace(microsecond=0).isoformat()
 
 
 def date_of(when: datetime) -> str:
