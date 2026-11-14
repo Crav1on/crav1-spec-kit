@@ -15,7 +15,7 @@ Typical **plan** shapes:
 - Load or speed goal the spec did not state
 - Smoke after deploy, chaos, or fuzzing for its own sake, or test code in the plan
 - Task or approach step invents behavior the spec does not require
-- Acceptance / REQ with no task (or task with no spec line)
+- Acceptance / REQ with no task (or task with no spec line). Compare by meaning first: a reworded line a task already covers is a `fix-trace`, not a new task.
 - Files likely touched wrong, missing, or not `(proposed)` when there is no repo
 - `## Linter` missing, or it never says whether this repo has a linter or checker for the code the tasks will touch
 - Plan treats a kept-open spec question as decided

@@ -79,7 +79,7 @@ Print the recap with one command, as `crav1-docs/reference/running-scripts.md` s
 
 `<interpreter> -X utf8 scripts/plan_check.py recap --root <spec-folder> --branch <current branch> --facts <file>`
 
-It computes every line [references/recap.md](references/recap.md) lists, including the dependency waves and the one `Next` line that `crav1-docs/reference/run-ending.md` asks for (1.159.0). Add `--uncommitted <n>` when files changed and are not committed. `<file>` is JSON with what only you know: `built_pieces` (a list of `{piece, choice}`), `branch_read` when **Built pieces** ran, and `security_unmapped` (kept security checks with no task). A line it prints that must be none, and is not, means the plan failed: fix `plan.md` or `tasks.md` and run it again. When Python cannot run, follow that reference by hand.
+It computes every line [references/recap.md](references/recap.md) lists, including the dependency waves and the one `Next` line that `crav1-docs/reference/run-ending.md` asks for (1.159.0). Add `--uncommitted <n>` when files changed and are not committed. `<file>` is JSON with what only you know: `built_pieces` (a list of `{piece, choice}`), `branch_read` when **Built pieces** ran, and `security_unmapped` (kept security checks with no task). Check listed acceptance lines by meaning first. A line that must be none, and is not, means the plan failed: fix `plan.md` or `tasks.md` and rerun. When Python cannot run, follow that reference by hand.
 
 Do not start coding in this chat.
 

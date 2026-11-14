@@ -145,7 +145,7 @@ class Recap(unittest.TestCase):
                        "--facts", str(facts), "--uncommitted", "2")
             self.assertEqual(proc.returncode, 0, proc.stderr)
             out = proc.stdout
-            heads = ["Written: ", "Tasks: 4. Acceptance lines with no task: none", "Order (", "Built piece: refund client: already there",
+            heads = ["Written: ", "Tasks: 4. Check these acceptance lines, no task matched their wording: none", "Order (", "Built piece: refund client: already there",
                      "Branch read: ", "Verify notes with no kind, and other task-line gaps: none",
                      "Kept security checks with no task: none", "Kept-open questions parked as risks:",
                      "Approval needed:", "Stale research under Risks: Card network limits",
@@ -170,7 +170,9 @@ class Recap(unittest.TestCase):
         tasks = TASKS.replace("(spec: order id)", "(spec: export)")
         with tempfile.TemporaryDirectory() as tmp:
             out = run(CHECK, "recap", "--root", str(slice_root(Path(tmp), plan=plan, tasks=tasks)), "--branch", "feat/x").stdout
-            self.assertIn("Acceptance lines with no task: The receipt lists the order id.", out)
+            self.assertIn("Check these acceptance lines, no task matched their wording: The receipt lists the order id. (compare each by meaning with the trace table and tasks first.", out)
+            self.assertIn("A line nothing covers is missing: the plan is not done until it has a task, already there, or left as committed)", out)
+            self.assertNotIn("Acceptance lines with no task", out)
             self.assertIn("Build is not named until you add a linter or choose to go on without one.", out)
 
 
@@ -256,6 +258,7 @@ class SkillText(unittest.TestCase):
         tp, pf = tree("crav1-tighten-plan"), tree("crav1-plan-from-spec")
         for rule in (
             "- `T#` too big to verify alone (“add authentication”)",
+            "Compare by meaning first: a reworded line a task already covers is a `fix-trace`, not a new task.",
             "**Spec** tag: the plan is fine or cannot be honest until `spec.md` changes.",
             "Remaining `P#` titles only. Mark the current one. Note plan vs spec.",
             "`Next: /crav1-build-tasks, because the plan issues are done.` A new chat, with `plan.md`, `tasks.md`, and `spec.md` attached.",
@@ -270,7 +273,9 @@ class SkillText(unittest.TestCase):
             "- **Requirements trace** — table: acceptance / REQ id → task ids",
             "Its verify is the script's `check` part reading the live setting",
             "A secret is a manual task: the plan names what to create and where, never a value.",
-            "- Task count and any acceptance line with no task, not marked `already there`, and not `left as committed` (must be none, or the plan failed)",
+            "Compare each by meaning with the trace table and tasks first. When a task covers it, add or fix its trace row or `(spec: …)` mark without asking",
+            "Only a line nothing covers is a gap: the plan is not done until it has a task, is marked `already there`, or is `left as committed`.",
+            "Suggest them, never require them.",
             "Do not name tighten-plan or build in this ending.",
             "Do not start coding in this chat.",
         ):

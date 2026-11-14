@@ -250,6 +250,14 @@ def _ids(text: str) -> set[str]:
     return set(re.findall(r"\b(?:REQ|AC|A)-?\d+\b", text, re.I))
 
 
+# The match is by wording only, so a reworded line can be listed when a task
+# does cover it. The note tells the agent to compare by meaning first.
+ACCEPTANCE_HEAD = "Check these acceptance lines, no task matched their wording: "
+ACCEPTANCE_NOTE = (" (compare each by meaning with the trace table and tasks first. A line a task covers needs"
+                   " only its trace row or (spec: ...) mark. A line nothing covers is missing: the plan is not done"
+                   " until it has a task, already there, or left as committed)")
+
+
 def untraced(spec: str, plan: str, tasks_text: str) -> list[str]:
     rows = trace_rows(plan)
     marks = [m.group(1) for m in re.finditer(r"\(spec:\s*([^)]+)\)", tasks_text, re.I)]
@@ -353,7 +361,7 @@ def recap(root: Path, branch: str, facts: dict, uncommitted: int | None) -> str:
     task_ids = [m.group(2) for m in map(TASK_LINE.match, tasks_text.splitlines()) if m]
     out = ["Written: " + ", ".join(written)]
     missing = untraced(spec, plan, tasks_text)
-    out.append(f"Tasks: {len(task_ids)}. Acceptance lines with no task: " + ("none" if not missing else "; ".join(missing) + " (the plan is not done until each has a task, already there, or left as committed)"))
+    out.append(f"Tasks: {len(task_ids)}. {ACCEPTANCE_HEAD}" + ("none" if not missing else "; ".join(missing) + ACCEPTANCE_NOTE))
     out += order_lines(root)
     for piece in facts.get("built_pieces") or []:
         out.append(f"Built piece: {piece.get('piece')}: {piece.get('choice')}")

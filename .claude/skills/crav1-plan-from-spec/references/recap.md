@@ -1,13 +1,13 @@
 # crav1-plan-from-spec: the After writing recap
 
-Read only when the pointer in `SKILL.md` sends you here. Moved word for word from `SKILL.md` in 1.159.0; the rules are unchanged. The recap command in `SKILL.md` prints this output in this order. Follow it by hand only when Python cannot run.
+Read only when the pointer in `SKILL.md` sends you here. Moved word for word from `SKILL.md` in 1.159.0; the rules are unchanged, except that the acceptance line is now compared by meaning first. The recap command in `SKILL.md` prints this output in this order. Follow it by hand only when Python cannot run.
 
 ## After writing (the rules the recap computes)
 
 Output only:
 
 - Paths written
-- Task count and any acceptance line with no task, not marked `already there`, and not `left as committed` (must be none, or the plan failed)
+- Task count and the acceptance lines no task matched by wording. Compare each by meaning with the trace table and tasks first. When a task covers it, add or fix its trace row or `(spec: …)` mark without asking, and run the recap again. Only a line nothing covers is a gap: the plan is not done until it has a task, is marked `already there`, or is `left as committed`. Spec ids such as `AC-1` on acceptance lines and trace rows make the match exact. Suggest them, never require them.
 - Each built piece: already there, finish the gap, add a verify test, or left as committed
 - The branch read, when **Built pieces** ran
 - Any verify note with no kind, and any kept security check with no task (must be none, or you failed)
