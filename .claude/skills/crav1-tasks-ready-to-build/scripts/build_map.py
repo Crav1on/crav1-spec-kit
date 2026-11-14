@@ -252,6 +252,35 @@ def run_entry(labels, branch_name, slug=None):
     return f"`{command}`\n{detail}"
 
 
+def branch_entry(open_labels, branch_name, slug=None):
+    """The whole-branch Run next entry (1.155.0).
+
+    `/crav1-build-walk <slug> <branch>` alone in a code span, then the branch
+    and every open task on it on the next line. Offered only when the branch
+    has two or more open tasks.
+    """
+    names = [str(label).strip() for label in open_labels or [] if str(label).strip()]
+    command = f"/crav1-build-walk {slug} {branch_name}" if slug else f"/crav1-build-walk {branch_name}"
+    return f"`{command}`\nbranch {branch_name}, every open task: {', '.join(names)}"
+
+
+def run_entries(labels, branch_name, slug=None, open_labels=None):
+    """Run next entries for one ready branch (1.155.0).
+
+    The next task as `/crav1-build-walk <slug> T#`, then, when the branch has
+    two or more open tasks, the whole branch as `/crav1-build-walk <slug>
+    <branch>`. Each is its own entry.
+    """
+    labels = [label for label in labels or [] if str(label).strip()]
+    if not labels:
+        return []
+    entries = [run_entry(labels[:1], branch_name, slug=slug)]
+    opens = list(open_labels) if open_labels is not None else list(labels)
+    if len(opens) >= 2:
+        entries.append(branch_entry(opens, branch_name, slug=slug))
+    return entries
+
+
 def short_name(rest, work_title=None, trim=True):
     """A task's short name: its work-item title, else the text up to the first cut.
 
@@ -1569,13 +1598,28 @@ def report_by_branch(built, rows, slug=None):
             task.get("run_label") or task.get("label") or task_label(task["id"], task.get("full") or task.get("short"))
             for task, _row in group["items"]
         ]
-        next_lines.append(ready_next_line(labels, group["branch"]["name"], slug=slug))
-        run_lines.append(run_entry(labels, group["branch"]["name"], slug=slug))
+        open_tasks = [task for task in group["branch"].get("tasks") or [] if not task.get("done")]
+        open_labels = [
+            task.get("run_label") or task.get("label") or task_label(task["id"], task.get("full") or task.get("short"))
+            for task in open_tasks
+        ]
+        entries = run_entries(labels, group["branch"]["name"], slug=slug, open_labels=open_labels)
+        # next_lines carry the same entries as run_lines (1.155.0).
+        for index, entry in enumerate(entries):
+            if index == 0:
+                next_lines.append(entry + "\n/crav1-build-tasks builds one task without the walk.")
+            else:
+                next_lines.append(entry)
+        run_lines.extend(entries)
         ready_branches.append({
             "branch": group["branch"]["name"],
             "tasks": [
                 {"id": f"T{task['id']}", "title": task.get("short") or ""}
                 for task, _row in group["items"]
+            ],
+            "open_tasks": [
+                {"id": f"T{task['id']}", "title": task.get("short") or ""}
+                for task in open_tasks
             ],
         })
     parts = []

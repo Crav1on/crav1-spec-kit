@@ -133,4 +133,6 @@ Uncommitted: 2 files; commit with /crav1-finalize-commit when ready.
 
 `Paused at` is the step just recorded, or the step they stopped in. The Run next entry is this command alone in a code span, then `continues from` and `continue_from` from `resume` (1.154.0). Do not write a `Next:` line. Include the playbook path when `resume` returns one. Add `Waiting:` only when that next step is blocked. Leave `Uncommitted:` out when nothing is uncommitted.
 
+`walk-progress.md` may also have a `## Branch runs` section: one `- Branch run: <branch>: <state> (<time>). Log: build-progress/<file>.md` line per whole-branch run of `/crav1-build-walk` (1.155.0). This walk does not write those lines. `record`, `cover`, and `clear` keep them. `resume` returns them as `branch_runs`. A file with only those lines has no step, so it is not a paused walk. `resolve-stamps` settles a conflict that is only those lines, or only hash lines, keeping each branch's newest line.
+
 When the ready check has run, print its `ending` in this reply as well (1.150.0). That text includes each held line, one branch per line, with the T# , the short name, and who it waits on. On ready and ready-partial, `Run next:` is first, before any Waiting line, and it is the only Run next block. Never add a `Next:` line after the Waiting lines (1.153.0). Do not say `above`, `listed above`, or earlier output.

@@ -4,7 +4,8 @@ description: >-
   Use when a slice is ready to build and you want one guided walk of one
   work branch: build the tasks, verify, commit, open the pull request,
   merge the base in, merge the pull request, tick, then the next task.
-  One Next while it runs.
+  Name a branch to build all its open tasks in one run, stopping before
+  the merge.
 disable-model-invocation: true
 icon: workflow
 color: blue
@@ -14,13 +15,13 @@ color: blue
 
 The user wants one guided walk of one work branch, from the tasks on that branch through verify, commit, the pull request, merging the base into the branch, merging that pull request, the tick, and the next task. It is in the Build lane. It is not a starter option.
 
-Command: `/crav1-build-walk`. A slug or a `T#` may follow. `orders-capacity` is a slice. `T3` is one task.
+Command: `/crav1-build-walk`. A slug, then a `T#` or a branch, may follow. `orders-capacity` is a slice. `T3` is one task. `feat/orders-cicd` builds every open task on that branch in task order, in one run that stops only for a real stop and always before the merge (1.155.0).
 
 It does not replace the skills it opens. It does not push, open a pull request, merge, or run a live change until this run's `yes`. It never rebases.
 
 Before it reads the spec folder, it fetches the specs repo (1.151.0). The rule is [references/sync.md](references/sync.md). When it starts on a branch, it writes an `In progress:` line in `docs/specs/<slug>/claims.md` and, after yes, commits and pushes only that file. The rule is [references/claims.md](references/claims.md). When the walk ends, or the user stops, it commits the files it wrote and pushes the specs repo after one yes.
 
-The in-walk reply prints `ending` from `scripts/build_walk.py next --json <file>`. `Run next:` is first (1.150.0). Each command is alone in a code span and works in a new session, for example `` `/crav1-build-walk T3` ``, plus the slug when `docs/specs` has more than one slice (`` `/crav1-build-walk orders-api T3` ``). The next line names the branch and the short task name. Waiting and Uncommitted follow. The full Next line is last. Another branch whose tasks can start, from readiness `can_start` grouped by build-map branch, gets its own Run next entry. Do not mention that branch only in prose.
+The in-walk reply prints `ending` from `scripts/build_walk.py next --json <file>`. `Run next:` is first (1.150.0). Each command is alone in a code span and works in a new session, for example `` `/crav1-build-walk T3` ``, plus the slug when `docs/specs` has more than one slice (`` `/crav1-build-walk orders-api T3` ``). The next line names the branch and the short task name. Waiting and Uncommitted follow. The full Next line is last. Another branch whose tasks can start, from readiness `can_start` grouped by build-map branch, gets its own Run next entry: its next task, plus the whole branch (`` `/crav1-build-walk orders-api feat/orders-cicd` ``) when it has two or more open tasks (1.155.0). Do not mention that branch only in prose.
 
 The JSON object is documented in [references/common.md](references/common.md). Fields include `phase`, `owner`, `branch`, `tasks`, `base`, `pr`, `slug`, `root`, `spec_count`, `ready_branches`, `waiting`, and `uncommitted`. `tasks` may be `"T3"` or `{"id": "T3", "title": "Apply the CI build policy"}`. `T3` and `3` are the same id. Bad input returns `{"ok": false, "code", "line"}` and does not traceback.
 
@@ -28,6 +29,7 @@ The JSON object is documented in [references/common.md](references/common.md). F
 
 Read [references/common.md](references/common.md) once. Then open only the file for the point you are at. Do not open the others yet.
 
+- The invocation names a branch, not a `T#`: read [references/branch-run.md](references/branch-run.md). It replaces the per-step cards with one start yes, until a stop.
 - No branch is chosen, or the user started from a ready-to-build report: read [references/grouping.md](references/grouping.md). That start may print one Next per ready branch.
 - A `build-progress` file for this branch already exists: read [references/progress.md](references/progress.md). Resume reports the step. It does not start it.
 - The pull request author or a commit author is someone else: read [references/other-owner.md](references/other-owner.md) before any switch.

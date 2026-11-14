@@ -58,6 +58,8 @@ The progress file is `docs/specs/<slug>/walk-progress.md`. It records the step, 
 
 1.154.0: the walk's references match the 1.153.0 ending: one Run next block at the top, the walk command only there, and no `Next:` line after the Waiting lines. A stop prints the walk command in a Run next entry, not a `Next:` line. The ending adds one `Loop:` line per pair or ring of branches that wait for each other, and those tasks count as Blocked in the counts and in `build-map.md`. Other tasks keep their state, so the result can stay `ready-partial`. Kit lint fails when a skill file tells the agent to write a Next line after the Waiting lines.
 
+1.155.0: `walk-progress.md` also holds one `- Branch run:` status line per whole-branch run of [`/crav1-build-walk`](crav1-build-walk.md), under `## Branch runs`. Record, cover, and clear keep those lines, `resume` returns them as `branch_runs`, the ready check prints the unmerged ones, and `resolve-stamps` settles a conflict that is only those lines by keeping each branch's newest line. The ready-check Run next offers the whole branch beside the next task when the branch has two or more open tasks.
+
 ## Runs when
 
 A spec should be tightened and planned until it is ready to build. Called by the user.

@@ -67,6 +67,7 @@ VERIFY = """# Verify
 """
 
 COMMAND = re.compile(r"^`/crav1-build-walk(?: [a-z0-9][a-z0-9-]*)? T\d+(?:, T\d+)*`$")
+BRANCH_COMMAND = re.compile(r"^`/crav1-build-walk(?: (?P<slug>[a-z0-9][a-z0-9-]*))? (?P<branch>[a-z]+/\S+)`$")
 
 
 def run(args: list[str]) -> tuple[int, dict]:
@@ -133,6 +134,17 @@ def assert_complete(test: unittest.TestCase, ending: str, slug: str | None) -> N
     test.assertGreaterEqual(len(commands), 1)
     for index, line in enumerate(lines):
         if line not in commands:
+            continue
+        branch_form = BRANCH_COMMAND.match(line)
+        if branch_form:
+            # 1.155.0: the whole-branch entry, offered beside the next task.
+            detail = lines[index + 1]
+            test.assertTrue(detail.startswith(f"branch {branch_form.group('branch')}, every open task: "), detail)
+            test.assertGreaterEqual(len(re.findall(r"T\d+", detail)), 2)
+            if slug:
+                test.assertEqual(branch_form.group("slug"), slug)
+            else:
+                test.assertIsNone(branch_form.group("slug"))
             continue
         test.assertRegex(line, COMMAND)
         inner = line.strip("`")
@@ -217,7 +229,8 @@ class EndingBlock(unittest.TestCase):
             many = must(["readiness", "--root", str(one)])
         assert_complete(self, alone["ending"], None)
         for line in command_lines(alone["ending"]):
-            self.assertNotIn("orders-api", line)
+            # The slug is left out; a branch name may still contain it.
+            self.assertNotIn("/crav1-build-walk orders-api ", line)
         assert_complete(self, many["ending"], "orders-api")
         for line in command_lines(many["ending"]):
             self.assertNotIn("orders-export", line)

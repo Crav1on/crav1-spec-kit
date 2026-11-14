@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import re
 import pathlib
 import subprocess
 import sys
@@ -222,8 +223,11 @@ class EndingCommandOnce(unittest.TestCase):
         ending = payload["ending"]
         self.assertTrue(ending.startswith("Run next:"), ending)
         self.assertEqual(payload["can_start"], ["T43"])
-        self.assertEqual(ending.count("/crav1-build-walk"), 1)
-        self.assertEqual(ending.count("`/crav1-build-walk"), 1)
+        # 1.155.0: each command once; a whole-branch entry may sit beside the T# entry.
+        commands = [line for line in ending.splitlines() if line.startswith("`/crav1-build-walk")]
+        self.assertEqual(len(commands), len(set(commands)))
+        self.assertEqual(ending.count("/crav1-build-walk"), len(commands))
+        self.assertTrue(any(re.search(r" T43`$", line) for line in commands), commands)
         self.assertIn("/crav1-build-tasks builds one task without the walk.", ending)
         self.assertLess(ending.index("Run next:"), ending.index("/crav1-build-tasks builds one task"))
         self.assertNotIn("Next: /crav1-build-walk", ending)

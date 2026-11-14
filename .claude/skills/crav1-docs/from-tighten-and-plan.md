@@ -97,8 +97,13 @@ Run next:
 `/crav1-build-walk orders-api T1`
 branch feat/orders-api-record, T1 Record the decision
 
+`/crav1-build-walk orders-api feat/orders-api-record`
+branch feat/orders-api-record, every open task: T1 Record the decision, T2 Store the card
+
 /crav1-build-tasks builds one task without the walk.
 ```
+
+Since 1.155.0 the whole-branch entry is offered only when that branch has two or more open tasks. `walk-progress.md` also holds one `- Branch run:` status line per whole-branch run of `/crav1-build-walk`, under `## Branch runs`, linking to that branch's `build-progress` log. Recording a step keeps those lines, `resume` returns them as `branch_runs`, and the ready check prints the unmerged ones under `Branch runs:`. A conflict that is only those lines is settled by `resolve-stamps`, newest line per branch.
 
 When two branches wait for each other, the ending and `build-map.md` both carry one Loop line (1.154.0), for example `Loop: feat/orders-x and feat/orders-y wait for each other: T14 on feat/orders-x waits for T13 on feat/orders-y, and T13 on feat/orders-y waits for T12 on feat/orders-x. Fix one of these lines in tasks.md.` Those branches count as Blocked in both. Other branches keep their wave and state.
 

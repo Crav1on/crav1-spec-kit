@@ -14,6 +14,16 @@ In progress: feat/orders-api-host-setup, T27, person A, since 2026-11-13T15:50:0
 
 The user is `git config user.name` in the specs repo. The time is an ISO timestamp. `<interpreter> -X utf8 scripts/claims.py add --root <spec-folder> --branch <branch> --tasks T27 --user "<name>"` writes the file, as `crav1-docs/reference/running-scripts.md` says. Show the line, then one card. `yes` (Recommended) commits only `claims.md` and pushes it. `stop` does not. There is no Edits option. A headless run stops and names `yes` and `stop`. Do not guess. Nothing else is committed on that card.
 
+## Whole-branch run (1.155.0)
+
+A run started with a branch, as [branch-run.md](branch-run.md) says, writes one line that names every open task on that branch:
+
+```text
+In progress: feat/orders-cicd, T2, T3, T5, person A, since 2026-11-14T09:00:00+01:00
+```
+
+It is the same line format, so an older ready check reads it too, and every task on it shows as in progress. Rerunning the same command reuses that line. It does not write a new one. Before each task the run checks the file again. Someone else's claim on one of those tasks is a stop that names who.
+
 If the script returns `claimed`, that task is already in progress by someone else. Say so and stop. Do not overwrite it.
 
 ## While it runs
