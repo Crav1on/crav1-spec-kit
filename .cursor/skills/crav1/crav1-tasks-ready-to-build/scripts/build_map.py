@@ -33,8 +33,12 @@ through, with its pull request, branch, or commit. A wave whose every task
 is done is wrapped in a details block. The rows stay in the file.
 
 Waves are branch dependencies. Wave 1 does not wait for another open branch.
-A later wave opens after the branches it waits for. A cycle, or an `(after:)`
-that names no task, is listed under Blocked. The Tasks field shows each task
+A later wave opens after the branches it waits for, and always sits in a
+later wave than each of them. Branches that wait for each other are a loop:
+the file names them and the task line behind each direction of the wait, and
+they are listed under Blocked. A branch downstream of a loop keeps its own
+wave and state. An `(after:)` that names no task is listed under Blocked too
+(1.154.0). The Tasks field shows each task
 as `T#` plus its short name. Other prose still drops task ids. The dangling
 text left by a removed id is cleaned. The map is rewritten on every ready
 check, so the ids match the tasks file.
@@ -777,28 +781,128 @@ def _suggest(slug, label, used):
     return name
 
 
-def _branch_cycles(names, waits):
-    on_cycle, color, stack = {}, {}, []
+def _branch_loops(order, waits):
+    """Groups of branches that wait for each other (1.154.0).
 
-    def visit(node):
-        color[node] = 1
+    Each group is a strongly connected set of two or more branches in the
+    branch wait graph, listed in map order. A branch in no group is not in
+    a loop.
+    """
+    order = list(order)
+    names = set(order)
+    rank = {name: index for index, name in enumerate(order)}
+    index_of, low, on_stack, stack, groups = {}, {}, set(), [], []
+    counter = [0]
+
+    def strong(node):
+        index_of[node] = low[node] = counter[0]
+        counter[0] += 1
         stack.append(node)
+        on_stack.add(node)
         for dep in waits.get(node, ()):
             if dep not in names:
                 continue
-            if color.get(dep) == 1:
-                path = stack[stack.index(dep):] + [dep]
-                for item in path[:-1]:
-                    on_cycle.setdefault(item, path)
-            elif not color.get(dep):
-                visit(dep)
-        stack.pop()
-        color[node] = 2
+            if dep not in index_of:
+                strong(dep)
+                low[node] = min(low[node], low[dep])
+            elif dep in on_stack:
+                low[node] = min(low[node], index_of[dep])
+        if low[node] == index_of[node]:
+            group = []
+            while True:
+                item = stack.pop()
+                on_stack.discard(item)
+                group.append(item)
+                if item == node:
+                    break
+            if len(group) > 1:
+                groups.append(sorted(group, key=lambda name: rank[name]))
 
-    for node in names:
-        if not color.get(node):
-            visit(node)
-    return on_cycle
+    for node in order:
+        if node not in index_of:
+            strong(node)
+    return sorted(groups, key=lambda group: rank[group[0]])
+
+
+def _waves(order, waits, loops):
+    """Wave per branch: one more than the latest wave it waits for (1.154.0).
+
+    The branches in one loop share a wave. Every other wait puts the later
+    branch in a strictly later wave, so a branch never sits in a wave at or
+    before a branch it waits for. Branches downstream of a loop still get a
+    wave instead of disappearing into Blocked.
+    """
+    comp = {name: name for name in order}
+    for group in loops:
+        for name in group:
+            comp[name] = group[0]
+    members = {}
+    for name in order:
+        members.setdefault(comp[name], []).append(name)
+    deps = {key: set() for key in members}
+    for name in order:
+        for dep in waits.get(name, ()):
+            if dep in comp and comp[dep] != comp[name]:
+                deps[comp[name]].add(comp[dep])
+    wave = {}
+    for key in members:
+        if key in wave:
+            continue
+        work = [(key, False)]
+        while work:
+            node, ready = work.pop()
+            if node in wave:
+                continue
+            if ready:
+                wave[node] = 1 + max((wave[dep] for dep in deps[node]), default=0)
+                continue
+            work.append((node, True))
+            for dep in deps[node]:
+                if dep not in wave:
+                    work.append((dep, False))
+    return {name: wave[comp[name]] for name in order}
+
+
+def _loop_link(edge, id_branch):
+    """`T14 on feat/x waits for T13 on feat/y` for one wait inside a loop."""
+    task_id, dep_id, recorded = edge
+    text = (
+        f"T{task_id} on {id_branch[task_id]['name']} waits for "
+        f"T{dep_id} on {id_branch[dep_id]['name']}"
+    )
+    if not recorded:
+        text += " (the task just before it, no (after:) mark)"
+    return text
+
+
+def loop_line(group, why, id_branch):
+    """The plain warning for one loop (1.154.0).
+
+    It names the branches and the task line behind each direction of the
+    wait, then says to fix one of those lines in tasks.md.
+    """
+    if len(group) == 2:
+        head = f"{group[0]} and {group[1]} wait for each other"
+    else:
+        head = ", ".join(group[:-1]) + f" and {group[-1]} wait for each other in a loop"
+    links = []
+    for name in group:
+        for dep in group:
+            if dep == name:
+                continue
+            edges = why.get((name, dep)) or []
+            if not edges:
+                continue
+            text = _loop_link(edges[0], id_branch)
+            if len(edges) > 1:
+                more = ", ".join(f"T{edge[0]}" for edge in edges[1:])
+                text += f" (also {more})"
+            links.append(text)
+    if len(links) > 1:
+        body = ", ".join(links[:-1]) + ", and " + links[-1]
+    else:
+        body = links[0] if links else "the waits close a loop"
+    return f"Loop: {head}: {body}. Fix one of these lines in tasks.md."
 
 
 PR_NUM = re.compile(r"\(PR\s+(\d+)\)", re.I)
@@ -1141,6 +1245,7 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text
 
     names = [branch["name"] for branch in branches]
     waits = {branch["name"]: [] for branch in branches}
+    wait_why = {}
     unknown = {branch["name"]: False for branch in branches}
     holding = {branch["name"]: [] for branch in branches}
     task_blocked = {branch["name"]: False for branch in branches}
@@ -1174,10 +1279,14 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text
                 other = id_branch.get(dep)
                 if other is None or other["name"] == branch["name"]:
                     continue
+                wait_why.setdefault((branch["name"], other["name"]), []).append(
+                    (task["id"], dep, bool(task.get("recorded")))
+                )
                 if other["name"] not in waits[branch["name"]]:
                     waits[branch["name"]].append(other["name"])
 
-    cycles = _branch_cycles(set(names), waits)
+    loops = _branch_loops(names, waits)
+    cycles = {name for group in loops for name in group}
     for branch in branches:
         name = branch["name"]
         finished = bool(branch["tasks"]) and all(task["done"] for task in branch["tasks"])
@@ -1196,6 +1305,7 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text
         branch["unknown"] = unknown[name]
         branch["questions"] = holding[name]
         branch["cycle"] = name in cycles
+        branch["loop"] = name in cycles
         branch["held_on"] = []
 
     by_name = {branch["name"]: branch for branch in branches}
@@ -1224,36 +1334,40 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text
             held_names.add(branch["name"])
             changed = True
 
-    wave = {}
-    indeg = {branch["name"]: len(branch["waits"]) for branch in branches}
-    frontier = sorted(name for name, degree in indeg.items() if degree == 0)
-    for name in frontier:
-        wave[name] = 1
-    while frontier:
-        nxt = []
-        for name in frontier:
-            for branch in branches:
-                if name in branch["waits"]:
-                    indeg[branch["name"]] -= 1
-                    wave[branch["name"]] = max(wave.get(branch["name"], 1), wave[name] + 1)
-                    if indeg[branch["name"]] == 0:
-                        nxt.append(branch["name"])
-        frontier = sorted(nxt)
+    # One shared wave rule (1.154.0): a loop shares one wave, every other
+    # wait is strictly later, and a branch downstream of a loop keeps its
+    # own state and wave instead of going under Blocked.
+    wave = _waves(names, waits, loops)
     for branch in branches:
-        if branch["name"] in cycles or branch["name"] not in wave:
+        branch["wave"] = wave[branch["name"]]
+        if branch["name"] in cycles or branch["status"] == "blocked":
             branch["section"] = "blocked"
-            branch["wave"] = None
-        elif branch["status"] == "blocked":
-            branch["section"] = "blocked"
-            branch["wave"] = wave[branch["name"]]
         else:
             branch["section"] = "wave"
-            branch["wave"] = wave[branch["name"]]
+    loop_rows = []
+    for group in loops:
+        open_ids = [
+            task["id"]
+            for name in group
+            for task in by_name[name]["tasks"]
+            if not task["done"]
+        ]
+        loop_rows.append({
+            "branches": list(group),
+            "line": loop_line(group, wait_why, id_branch),
+            "tasks": sorted(open_ids),
+        })
+    for row in loop_rows:
+        for name in row["branches"]:
+            by_name[name]["loop_line"] = row["line"]
 
-    markdown = _render(slug, grouping, branches, by_name, risks, has_plan, risk_blocks, name_of)
+    loop_lines = [row["line"] for row in loop_rows]
+    markdown = _render(slug, grouping, branches, by_name, risks, has_plan, risk_blocks, name_of, loop_lines)
     pointer = f"Build map: docs/specs/{slug}/build-map.md"
-    summary = _summary(slug, pointer, branches)
+    summary = _summary(slug, pointer, branches, loop_lines)
     return {
+        "loops": loop_rows,
+        "loop_lines": loop_lines,
         "markdown": markdown,
         "summary": summary,
         "pointer": pointer,
@@ -1371,9 +1485,29 @@ def _branch_order(branches):
 
 
 def _where(branch):
-    if branch.get("section") == "wave" and branch.get("wave") is not None:
+    """Where a ready or held line sits: `wave N`, or `in a loop` (1.154.0).
+
+    Every branch has a wave now. Only a branch caught in a loop says so.
+    """
+    if branch.get("loop"):
+        return "in a loop"
+    if branch.get("wave") is not None:
         return f"wave {branch['wave']}"
     return "blocked"
+
+
+def loop_holds(built):
+    """Open task id to its loop line, from the same build the map writes.
+
+    The ready check uses this so a task on a branch in a loop is blocked in
+    both the map and the check (1.154.0). Tasks on other branches keep their
+    own state.
+    """
+    holds = {}
+    for row in (built or {}).get("loops") or []:
+        for task_id in row["tasks"]:
+            holds.setdefault(task_id, row["line"])
+    return holds
 
 
 def report_by_branch(built, rows, slug=None):
@@ -1457,6 +1591,7 @@ def report_by_branch(built, rows, slug=None):
         "next_lines": next_lines,
         "run_lines": run_lines,
         "ready_branches": ready_branches,
+        "loop_lines": list(built.get("loop_lines") or []),
         "line": "\n".join(parts) if parts else None,
     }
 
@@ -1486,6 +1621,8 @@ def _waits_line(branch, by_name):
 
 
 def _ready_now(branch):
+    if branch.get("loop"):
+        return "blocked, in a loop"
     if branch["status"] == "held":
         return "held, waits on " + "; ".join(branch.get("held_on") or [])
     return branch["status"]
@@ -1531,8 +1668,11 @@ def overlap_lines(members):
     return lines
 
 
-def _render(slug, grouping, branches, by_name, risks, has_plan, risk_blocks, names=None):
+def _render(slug, grouping, branches, by_name, risks, has_plan, risk_blocks, names=None, loop_lines=None):
     lines = ["# Build map", "", grouping, ""]
+    for line in loop_lines or []:
+        lines.append(line)
+        lines.append("")
     diagram = _mermaid(branches, by_name)
     lines.extend(["```mermaid", diagram, "```", ""])
     if branches:
@@ -1639,8 +1779,12 @@ def _mermaid(branches, by_name):
 
     for wave_number in sorted(waves):
         add_group(f"w{wave_number}", f"Wave {wave_number}", waves[wave_number])
-    if blocked:
-        add_group("blocked", "Blocked", blocked)
+    looped = [branch for branch in blocked if branch.get("loop")]
+    others = [branch for branch in blocked if not branch.get("loop")]
+    if looped:
+        add_group("inloop", "In a loop", looped)
+    if others:
+        add_group("blocked", "Blocked", others)
     seen = set()
     for branch in branches:
         for dep in branch["waits"]:
@@ -1659,8 +1803,9 @@ def _short_list(items, limit=6):
     return ", ".join(items[:limit]) + f", and {extra} more"
 
 
-def _summary(slug, pointer, branches):
+def _summary(slug, pointer, branches, loop_lines=None):
     lines = [f"Build map — {slug}", pointer]
+    lines.extend(loop_lines or [])
     if not branches:
         lines.append("Nothing left to build.")
         return "\n".join(lines)

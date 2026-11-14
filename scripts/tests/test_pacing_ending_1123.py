@@ -25,10 +25,12 @@ class PacingAndEnding(unittest.TestCase):
             ROOT / ".cursor/skills/crav1/crav1-tighten-and-plan-ready-to-build/references/progress.md"
         ).read_text(encoding="utf-8")
         self.assertIn("Paused at resolve-open-questions.", progress)
+        # 1.154.0: the pause names the command in a Run next block, not a Next: line.
         self.assertIn(
-            "Next: /crav1-tighten-and-plan-ready-to-build docs/playbooks/orders-retry.md, because the walk paused before plan-from-spec.",
+            "Run next:\n\n`/crav1-tighten-and-plan-ready-to-build docs/playbooks/orders-retry.md`\ncontinues from plan-from-spec",
             progress,
         )
+        self.assertNotIn("Next: /crav1-tighten-and-plan-ready-to-build", progress)
         self.assertIn("Waiting:", progress)
         self.assertIn("Uncommitted:", progress)
         self.assertIn("- Extra: review-security", progress)

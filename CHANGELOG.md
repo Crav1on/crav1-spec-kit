@@ -2,6 +2,16 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.154.0 (2026-11-14)
+
+The build map and the ready check name a dependency loop in plain words, agree on what is blocked, and keep the wave order. The tighten-and-plan references stop asking for a Next line under the Waiting lines. A minor release because the map, the ready-check result, and the ending change.
+
+- **Loops are named.** When branches wait for each other, the map and the ready-check ending (also `readiness --brief`) print one line per loop, for example `Loop: feat/orders-x and feat/orders-y wait for each other: T14 on feat/orders-x waits for T13 on feat/orders-y, and T13 on feat/orders-y waits for T12 on feat/orders-x. Fix one of these lines in tasks.md.` A wait that comes only from file order says it is the task just before, with no `(after:)` mark. The flowchart puts those branches in an `In a loop` group.
+- **One judgement.** The ready check reads the loops from the same build the map writes. The open tasks on a branch in a loop are Blocked in the counts and in the map, and are not offered in Run next. Tasks on other branches keep their real state: ready, waiting on a question, or waits in order. When other tasks can start, the result is `ready-partial`; when only loop tasks are left, it is `not-ready`.
+- **Wave order.** A branch is always in a later wave than each branch it waits for, unless both are in the same loop. Branches in one loop share a wave. A branch downstream of a loop keeps its own wave and state instead of being listed under Blocked.
+- **Held label.** A held line shows the wave, or `in a loop`. It never shows `(blocked)`.
+- **No stray Next line.** The tighten-and-plan skill, its readiness and progress references, the ready-check fallback in `build-map.md`, the walkthrough, the glossary, and `run-ending.md` now match 1.153.0: one Run next block at the top, the walk command only there, and no `Next:` line after the Waiting lines. A stop prints the walk command as a Run next entry. Kit lint fails when a skill file tells the agent to write a Next line after the Waiting or Held lines, or gives a `Next: /crav1-build-walk` example for the ready check.
+
 ## 1.153.0 (2026-11-13)
 
 The ready check keeps an open task on its own branch, prints one Run next block, and stays short enough to read. A minor release because the map, the ending, and the script output all change.

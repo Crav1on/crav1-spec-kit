@@ -56,6 +56,8 @@ The progress file is `docs/specs/<slug>/walk-progress.md`. It records the step, 
 
 1.152.0: the ready check's Next lines match Run next, and `M can start now` counts only ready branches. `scripts/repo_sync.py` and `scripts/claims.py` in this skill are thin wrappers to the build-walk copies. A mid-walk stop does not clear a claim.
 
+1.154.0: the walk's references match the 1.153.0 ending: one Run next block at the top, the walk command only there, and no `Next:` line after the Waiting lines. A stop prints the walk command in a Run next entry, not a `Next:` line. The ending adds one `Loop:` line per pair or ring of branches that wait for each other, and those tasks count as Blocked in the counts and in `build-map.md`. Other tasks keep their state, so the result can stay `ready-partial`. Kit lint fails when a skill file tells the agent to write a Next line after the Waiting lines.
+
 ## Runs when
 
 A spec should be tightened and planned until it is ready to build. Called by the user.

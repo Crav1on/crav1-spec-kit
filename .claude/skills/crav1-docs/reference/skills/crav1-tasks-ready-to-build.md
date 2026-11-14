@@ -56,6 +56,8 @@ Shows summary counts per slice, then Ready and Held grouped by build-map branch,
 
 1.153.0: the map row for an open task is the branch on the task line, or beside that T# in a leading Branches paragraph, even when a done sibling sits on an already-merged branch. An open task is never placed under a branch git proves merged when another name is written for it. The ending has one Run next block at the top; the walk command appears only there; the reply prints that block verbatim and never writes a Next: line. `readiness --brief` prints only the result, a counts row, the ending, and claim warnings. The Waiting line counts only tasks held by an open question or an approval. A verify.md table row for a T# that is not in tasks.md is one Waiting line; the check does not edit verify.md.
 
+1.154.0: branches that wait for each other are a loop. The map and the ready-check ending print one `Loop:` line per loop, naming the branches and the task line behind each direction of the wait, then `Fix one of these lines in tasks.md.` The open tasks on those branches are Blocked in both, from one shared judgement, and are not offered in Run next. A branch downstream of a loop keeps its own wave and state. A branch always sits in a later wave than each branch it waits for, unless both are in the same loop. A held line shows the wave, or `in a loop`, never `(blocked)`.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.

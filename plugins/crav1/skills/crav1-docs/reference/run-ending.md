@@ -81,4 +81,4 @@ Left: 2 gaps to tighten, 3 open questions. Next: /crav1-tighten-spec orders-retr
 
 After the skill's own recap, print `Next`, then any `Waiting` lines, then `Uncommitted` when it applies. Nothing else is a next-step list.
 
-The tighten-and-plan ready check is the exception (1.150.0). Print `Run next:` first, then each held line, then any `Waiting` lines, then the full `Next` lines, then `Uncommitted` when it applies. `Run next:` is not a second step. It is the same build-walk command, short enough to start in a new session.
+The tighten-and-plan ready check is the exception (1.150.0). Print `Run next:` first, then each held line, then any `Loop` and `Waiting` lines, then at most the one-line `/crav1-build-tasks` alternative, then `Uncommitted` when it applies. No `Next:` line follows the Waiting lines (1.153.0). `Run next:` is not a second step. It is the same build-walk command, short enough to start in a new session.
