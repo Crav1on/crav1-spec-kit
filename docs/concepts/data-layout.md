@@ -228,7 +228,7 @@ Under each item in a spec's `## Open questions`, the kit can add four kinds of l
 | `(after: T<n>[, T<n>])` | `docs/specs/<slug>/tasks.md` (end of a task line) | `/crav1-plan-from-spec` | The task needs those tasks done first. |
 | `(step: <n>)` | `docs/specs/<slug>/tasks.md` (end of a task line) | `/crav1-plan-from-spec` | The task belongs to this numbered Approach step on the build map. When absent, a task id written in the step is the link. This mark wins when both are present. |
 | `(map: [<repo> ]<branch>)` | `docs/specs/<slug>/tasks.md` (end of a task line) | `/crav1-plan-from-spec`, `/crav1-create-feature-branch` | The task is built on this branch instead of its plan step's branch. Tasks that name the same branch share it. When absent, a branch named on the task line is the row, else the plan step (1.140.0). Since 1.129.0 the build prompt writes this mark, and does not commit it, when the picked branch is not the offered branch. |
-| `In progress: <branch>, <T#>, <user>, since <ISO time>` | `docs/specs/<slug>/claims.md` | `/crav1-build-walk` | A build walk is in progress on that branch and those tasks. The ready check holds them and does not offer them in Run next. The claim is never cleared on its own. |
+| `In progress: <branch>, <T#>, <user>, since <ISO time>` | `docs/specs/<slug>/claims.md` | `/crav1-build-walk` | A build walk is in progress on that branch and those tasks. A whole-branch run (1.155.0) names every open task on the branch on one line. The ready check holds them and does not offer them in Run next. The claim is never cleared on its own. |
 <!-- crav1-readiness:end -->
 
 When a mark is missing, the reader falls back and labels the reason **inferred**:
@@ -413,6 +413,12 @@ Every mark and line format the kit writes inside product files, generated from [
 | Merge order | `Merge: <branch> into <branch>` | `docs/specs/<slug>/build-progress/<branch>.md` (under Merge list) | `/crav1-build-walk` | `/crav1-build-walk` | 1.142.0 |
 | Build step | `- Step: <build \| verify \| commit \| open-pr \| merge-base \| merge-pr \| tick \| comment>` | `docs/specs/<slug>/build-progress/<branch>.md` | `/crav1-build-walk` | `/crav1-build-walk` | 1.142.0 |
 | Build content stamp | `  Content stamp: normalized` | `docs/specs/<slug>/build-progress/<branch>.md` (under a step) | `/crav1-build-walk` | `/crav1-build-walk` | 1.142.0 |
+| Whole-branch run | `Run: whole branch` | `docs/specs/<slug>/build-progress/<branch>.md` (under ## Run) | `/crav1-build-walk` | `/crav1-build-walk` | 1.155.0 |
+| Run yes | `Run yes: <user>, <ISO time>` | `docs/specs/<slug>/build-progress/<branch>.md` (under ## Run) | `/crav1-build-walk` | `/crav1-build-walk` | 1.155.0 |
+| Task stamps | `Task stamps: <T#> <hash>[, <T#> <hash>]` | `docs/specs/<slug>/build-progress/<branch>.md` (under ## Run) | `/crav1-build-walk` | `/crav1-build-walk` | 1.155.0 |
+| Next task | `Next task: <T# \| none>` | `docs/specs/<slug>/build-progress/<branch>.md` (under ## Run) | `/crav1-build-walk` | `/crav1-build-walk` | 1.155.0 |
+| Built | `- Built: <T#>, commit <sha>, tests <green \| red \| none>` | `docs/specs/<slug>/build-progress/<branch>.md` (under ## Run) | `/crav1-build-walk` | `/crav1-build-walk` | 1.155.0 |
+| Fresh session hint | `Fresh session hint: every <N> tasks` | `docs/specs/<slug>/build-progress/<branch>.md` (under ## Run) | `/crav1-build-walk` | `/crav1-build-walk` | 1.155.0 |
 | In progress claim | `In progress: <branch>, <T#>, <user>, since <ISO time>` | `docs/specs/<slug>/claims.md` | `/crav1-build-walk` | `/crav1-build-walk`, `/crav1-tasks-ready-to-build`, `/crav1-tighten-and-plan-ready-to-build`, `/crav1-plan-from-spec`, `/crav1-tighten-plan` | 1.151.0 |
 | Claim max age | `Claim max age: <N> days` | `docs/specs/<slug>/claims.md` | `/crav1-build-walk` | `/crav1-build-walk`, `/crav1-tasks-ready-to-build`, `/crav1-tighten-and-plan-ready-to-build` | 1.151.0 |
 

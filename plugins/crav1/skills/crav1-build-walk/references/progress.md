@@ -22,6 +22,22 @@ Merge list: none
 
 `Owner: other` is other-owner mode, only after `switch`. `Cut from:` is the branch this one was cut from. `Merge:` lines are the ordered merge list. `Merge list: none` means this branch was cut from the base.
 
+## Run section (1.155.0)
+
+A whole-branch run, as [branch-run.md](branch-run.md) says, adds a `## Run` section to the same file. `scripts/branch_run.py` writes it. Do not edit it by hand.
+
+```text
+## Run
+
+Run: whole branch
+Run yes: person A, 2026-11-14T09:00:00+01:00
+Task stamps: T2 7888ebce45d1, T3 228042a732a4, T5 ce3a1895e974
+Next task: T3
+- Built: T2, commit a1b2c3d4e5f6, tests green
+```
+
+`Run yes:` is the start yes that covers each push. `Task stamps:` are the task lines at the start, ignoring the checkbox and progress notes, so a change by someone else is a stop. `Next task:` is where a resume picks up. A `- Built:` task is never built again. It is not `walk-progress.md`, which belongs to the tighten-and-plan walk.
+
 ## Stamp
 
 Each step records `Done`, `Result`, and the normalized hashes: `Spec version`, `Plan version`, `Tasks version`, `Verify version`, and `Content stamp: normalized`. The hash ignores line endings, a checkbox, a `(PR n)` or `(done)` note, and a `(live yes: …)` note. A sentence change still counts.

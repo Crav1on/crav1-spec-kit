@@ -13,6 +13,30 @@ Use this when a slice is ready, or ready with some tasks held, and you want one 
 
 A task id works too: `/crav1-build-walk T3`.
 
+## Build a whole branch in one run (1.155.0)
+
+Name the branch instead of a task:
+
+```text
+/crav1-build-walk orders-capacity feat/orders-cicd
+```
+
+The walk lists the open tasks on that branch in task order, shows the first thing that would stop it, and asks one `yes`. That yes writes one claim line that names every open task on the branch, such as `In progress: feat/orders-cicd, T2, T3, T5, person A, since 2026-11-14T09:00:00+01:00`, and covers every commit and push in the run. Then, for each task, it fetches and merges origin in when behind (never a rebase), builds the task, runs its tests, commits it, records it, and pushes, with one line such as `T2 done, tests green, starting T3`. Every few tasks that line adds a soft hint to continue in a fresh session. It is never a stop.
+
+It stops only for:
+
+- an open question on the next task
+- a stakeholder yes that is not recorded
+- a `(manual, secret)`, `(host setup)`, or `(Runs live)` step
+- tests or lint still red after a fair try
+- a change it wants outside the task's scope
+- someone else claiming or changing one of the run's tasks
+- the pull request merge, always
+
+When every task is built, it opens or updates the pull request and stops. The reply is Run next first, each command alone on its own line, for example `` `/crav1-build-walk orders-capacity feat/orders-cicd` `` to merge after your yes and `` `/crav1-build-walk orders-capacity feat/orders-dev-switch` `` for the next ready branch. Then each built task with its commit and test result, then anything left: skipped tasks, open questions, and verify rows that are behind. It never merges by itself.
+
+To resume after a stop or in a new session, run the same command. It picks up at the next open task, keeps its own claim, and does not build a task twice. A stop partway keeps the claim unless you say `release claim`.
+
 ## Steps
 
 | Step | You | Agent |
@@ -36,7 +60,7 @@ A task that needs code from an unmerged branch is cut from that branch. The prog
 
 `docs/specs/orders-capacity/claims.md`, after yes when the walk starts on a branch: an `In progress:` line such as `In progress: feat/orders-host-setup-scripts, T3, person A, since 2026-11-13T15:50:00+01:00`. That file is committed and pushed on its own after that yes, so another session can see the walk.
 
-`docs/specs/orders-capacity/build-progress/feat--orders-host-setup-scripts.md`, after yes. It records the step, the normalized hashes, and the merge list. That file is committed after the yes, in the same commit when the step already commits other files, otherwise on its own, using the persisted commit style. When the walk ends, or the user stops, the files this walk wrote are committed and the specs repo is pushed after one yes. The spec, plan, and tasks stay the source of truth, except `(live yes: …)` on a Runs live task after yes.
+`docs/specs/orders-capacity/build-progress/feat--orders-host-setup-scripts.md`, after yes. On a whole-branch run it also has a `## Run` section with `Next task:` and one `- Built: T2, commit a1b2c3d4e5f6, tests green` line per task, committed and pushed after each task. It records the step, the normalized hashes, and the merge list. That file is committed after the yes, in the same commit when the step already commits other files, otherwise on its own, using the persisted commit style. When the walk ends, or the user stops, the files this walk wrote are committed and the specs repo is pushed after one yes. The spec, plan, and tasks stay the source of truth, except `(live yes: …)` on a Runs live task after yes.
 
 ## After
 

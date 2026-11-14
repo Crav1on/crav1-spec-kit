@@ -1723,6 +1723,85 @@ marks:
     mention: 'Content stamp'
     since: 1.142.0
 
+  - id: build-run
+    name: "Whole-branch run"
+    group: walk
+    files: ["docs/specs/<slug>/build-progress/<branch>.md (under ## Run)"]
+    format: "Run: whole branch"
+    pattern: '^Run: whole branch$'
+    examples:
+      - "Run: whole branch"
+    meaning: "This branch is built in one run that stops only for a real stop and always before the merge."
+    written_by: [crav1-build-walk]
+    read_by: [crav1-build-walk]
+    since: 1.155.0
+
+  - id: build-run-yes
+    name: "Run yes"
+    group: walk
+    files: ["docs/specs/<slug>/build-progress/<branch>.md (under ## Run)"]
+    format: "Run yes: <user>, <ISO time>"
+    pattern: '^Run yes: .+, \d{4}-\d{2}-\d{2}T\S+$'
+    examples:
+      - "Run yes: person A, 2026-11-14T09:00:00+01:00"
+    meaning: "The start yes that covers each commit and push in the run. Without it nothing is pushed."
+    written_by: [crav1-build-walk]
+    read_by: [crav1-build-walk]
+    since: 1.155.0
+
+  - id: build-task-stamps
+    name: "Task stamps"
+    group: walk
+    files: ["docs/specs/<slug>/build-progress/<branch>.md (under ## Run)"]
+    format: "Task stamps: <T#> <hash>[, <T#> <hash>]"
+    pattern: '^Task stamps: T\d+ [0-9a-f]{12}(?:, T\d+ [0-9a-f]{12})*$'
+    examples:
+      - "Task stamps: T2 7888ebce45d1, T3 228042a732a4"
+    meaning: "Each run task's line at the start, ignoring the checkbox and progress notes. A change by someone else stops the run."
+    written_by: [crav1-build-walk]
+    read_by: [crav1-build-walk]
+    since: 1.155.0
+
+  - id: build-next-task
+    name: "Next task"
+    group: walk
+    files: ["docs/specs/<slug>/build-progress/<branch>.md (under ## Run)"]
+    format: "Next task: <T# | none>"
+    pattern: '^Next task: (T\d+|none)$'
+    examples:
+      - "Next task: T3"
+      - "Next task: none"
+    meaning: "Where rerunning the same command picks up. none means every task is built and the run stops before the merge."
+    written_by: [crav1-build-walk]
+    read_by: [crav1-build-walk]
+    since: 1.155.0
+
+  - id: build-built
+    name: "Built"
+    group: walk
+    files: ["docs/specs/<slug>/build-progress/<branch>.md (under ## Run)"]
+    format: "- Built: <T#>, commit <sha>, tests <green | red | none>"
+    pattern: '^- Built: T\d+, commit [0-9a-f]{7,40}, tests (green|red|none)$'
+    examples:
+      - "- Built: T2, commit a1b2c3d4e5f6, tests green"
+    meaning: "A task the run built, committed, and pushed. It is never built again on resume."
+    written_by: [crav1-build-walk]
+    read_by: [crav1-build-walk]
+    since: 1.155.0
+
+  - id: build-fresh-hint
+    name: "Fresh session hint"
+    group: walk
+    files: ["docs/specs/<slug>/build-progress/<branch>.md (under ## Run)"]
+    format: "Fresh session hint: every <N> tasks"
+    pattern: '^Fresh session hint: every \d+ tasks$'
+    examples:
+      - "Fresh session hint: every 5 tasks"
+    meaning: "How often the progress line suggests a fresh session. The default is 3 when the line is absent. It is never a stop."
+    written_by: [crav1-build-walk]
+    read_by: [crav1-build-walk]
+    since: 1.155.0
+
   - id: in-progress-claim
     name: "In progress claim"
     group: walk
@@ -1732,7 +1811,8 @@ marks:
     examples:
       - "In progress: feat/orders-api-host-setup, T27, person A, since 2026-11-13T15:50:00+01:00"
       - "In progress: feat/orders-api-host-setup, T3, T27, person A, since 2026-11-13T15:50:00+01:00"
-    meaning: "A build walk is in progress on that branch and those tasks. The ready check holds them and does not offer them in Run next. The claim is never cleared on its own."
+      - "In progress: feat/orders-cicd, T2, T3, T5, person A, since 2026-11-14T09:00:00+01:00"
+    meaning: "A build walk is in progress on that branch and those tasks. A whole-branch run (1.155.0) names every open task on the branch on one line. The ready check holds them and does not offer them in Run next. The claim is never cleared on its own."
     written_by: [crav1-build-walk]
     read_by: [crav1-build-walk, crav1-tasks-ready-to-build, crav1-tighten-and-plan-ready-to-build, crav1-plan-from-spec, crav1-tighten-plan]
     mention: 'In progress:'
