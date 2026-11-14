@@ -72,7 +72,7 @@ class ReadyChain(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_slice(root, CHAIN)
-            payload = must(["readiness", "--root", str(root)])
+            payload = must(["readiness", "--full", "--root", str(root)])
         self.assertTrue(payload["ready"])
         self.assertFalse(payload["start_build"])
         self.assertEqual(payload["blockers"], [])
@@ -86,9 +86,9 @@ class ReadyChain(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_slice(root, "- [ ] T1: a\n- [ ] T2: b (after: T3)\n- [ ] T3: c (after: T2)\n")
-            cycle = must(["readiness", "--root", str(root)])
+            cycle = must(["readiness", "--full", "--root", str(root)])
             write_slice(root, "- [ ] T1: a (after: T9)\n")
-            missing = must(["readiness", "--root", str(root)])
+            missing = must(["readiness", "--full", "--root", str(root)])
         self.assertFalse(cycle["ready"])
         commands = {row["task"]: row["command"] for row in cycle["blockers"]}
         self.assertEqual(commands["T2"], "/crav1-tighten-plan")
@@ -192,7 +192,7 @@ class Waiting(unittest.TestCase):
                 "--step", "resolve-open-questions", "--result", "done",
                 "--when", WHEN, "--yes",
             ])
-        return must(["readiness", "--root", str(root)])
+        return must(["readiness", "--full", "--root", str(root)])
 
     def test_kept_resolve_is_waiting_not_a_jump_back(self):
         payload = self._ready(self.ASKED, recorded=True)

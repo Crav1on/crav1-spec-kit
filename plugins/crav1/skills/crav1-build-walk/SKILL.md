@@ -21,7 +21,7 @@ It does not replace the skills it opens. It does not push, open a pull request, 
 
 Before it reads the spec folder, it fetches the specs repo (1.151.0). The rule is [references/sync.md](references/sync.md). When it starts on a branch, it writes an `In progress:` line in `docs/specs/<slug>/claims.md` and, after yes, commits and pushes only that file. The rule is [references/claims.md](references/claims.md). When the walk ends, or the user stops, it commits the files it wrote and pushes the specs repo after one yes.
 
-The in-walk reply prints `ending` from `scripts/build_walk.py next --json <file>`. `Run next:` is first (1.150.0). Each command is alone in a code span and works in a new session, for example `` `/crav1-build-walk T3` ``, plus the slug when `docs/specs` has more than one slice (`` `/crav1-build-walk orders-api T3` ``). The next line names the branch and the short task name. Waiting and Uncommitted follow. The full Next line is last. Another branch whose tasks can start, from readiness `can_start` grouped by build-map branch, gets its own Run next entry: its next task, plus the whole branch (`` `/crav1-build-walk orders-api feat/orders-cicd` ``) when it has two or more open tasks (1.155.0). Do not mention that branch only in prose.
+The in-walk reply prints `ending` from `scripts/build_walk.py next --json <file>`, as-is. That text is the shared walk ending (1.156.0): `Run next:` first, then Built and Left, then Waiting and Uncommitted, then the walk's own Next line. Each command is alone in a code span, such as `` `/crav1-build-walk orders-api T3` ``, and another ready branch gets its own entries. The shape is in [run-ending.md](../crav1-docs/reference/run-ending.md); never add a line of your own.
 
 The JSON object is documented in [references/common.md](references/common.md). Fields include `phase`, `owner`, `branch`, `tasks`, `base`, `pr`, `slug`, `root`, `spec_count`, `ready_branches`, `waiting`, and `uncommitted`. `tasks` may be `"T3"` or `{"id": "T3", "title": "Apply the CI build policy"}`. `T3` and `3` are the same id. Bad input returns `{"ok": false, "code", "line"}` and does not traceback.
 
@@ -56,7 +56,7 @@ Exact words. There are no `--flags`. A word in the invocation answers its questi
 
 One branch at a time. The order is in [references/steps.md](references/steps.md). Open each step skill from this folder and follow it. Read [open-skill-file.md](../crav1-docs/reference/open-skill-file.md) once before the first one.
 
-While this walk runs, print `ending`. Do not also print the step skill's Next. A ready-to-build start that has not picked a branch is the exception in [references/grouping.md](references/grouping.md). Each ready branch there is its own Run next entry.
+While this walk runs, print `ending`. Do not also print the step skill's Next. A start with no branch picked is in [references/grouping.md](references/grouping.md).
 
 ## Stop
 
@@ -68,4 +68,4 @@ When the user stops partway, one line `Paused at <step>.` Then the settle-and-pu
 
 ## Run ending (1.122.0)
 
-End as [run-ending.md](../crav1-docs/reference/run-ending.md) says. The script prints the line: `scripts/build_walk.py next --json <file>`. Pick the interpreter as [running-scripts.md](../crav1-docs/reference/running-scripts.md) says.
+Print the script's `ending` (shared, skill `crav1-tasks-ready-to-build` `scripts/walk_ending.py`). Pick the interpreter as [running-scripts.md](../crav1-docs/reference/running-scripts.md) says.

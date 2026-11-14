@@ -305,7 +305,7 @@ class ReadinessClaimTests(unittest.TestCase):
             "--user", "person A",
             "--since", "2026-11-13T15:50:00+01:00",
         ])
-        code, payload, err = run_py(WALK, ["readiness", "--root", str(self.root)])
+        code, payload, err = run_py(WALK, ["readiness", "--full", "--root", str(self.root)])
         self.assertEqual(code, 0, err + json.dumps(payload)[:500])
         self.assertIn("T2", payload.get("held") or [])
         self.assertNotIn("T2", payload.get("can_start") or [])
@@ -526,7 +526,7 @@ class ReadinessSyncTests(unittest.TestCase):
             (other / "extra.md").write_text("upstream\n", encoding="utf-8")
             commit_all(other, "Upstream ahead")
             git(other, "push", "origin", "HEAD")
-            code, payload, err = run_py(WALK, ["readiness", "--root", str(spec)])
+            code, payload, err = run_py(WALK, ["readiness", "--full", "--root", str(spec)])
             self.assertEqual(payload.get("sync", {}).get("state"), "behind", err + json.dumps(payload)[:800])
             self.assertTrue(payload.get("stop"))
             self.assertIn("git pull --no-rebase", payload.get("ending") or "")

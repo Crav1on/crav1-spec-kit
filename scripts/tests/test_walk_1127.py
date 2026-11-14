@@ -70,7 +70,7 @@ class Buckets(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_slice(root)
-            payload = must(["readiness", "--root", str(root)])
+            payload = must(["readiness", "--full", "--root", str(root)])
         buckets = {row["task"]: row["bucket"] for row in payload["rows"]}
         self.assertEqual(buckets["T1"], "ready")
         self.assertEqual(buckets["T2"], "waits-in-order")
@@ -112,7 +112,7 @@ class WaitingWho(unittest.TestCase):
             "--step", "resolve-open-questions", "--result", "done",
             "--when", WHEN, "--yes",
         ])
-        return must(["readiness", "--root", str(root)])
+        return must(["readiness", "--full", "--root", str(root)])
 
     def test_waiting_for_wins_over_the_asked_line(self):
         payload = self._ready(self.MIXED)
@@ -255,7 +255,7 @@ class AckStamps(unittest.TestCase):
         self.assertIn(preview["lines"][0], text)
         quiet = must(["resume", "--root", str(self.root), "--no-playbook"])
         self.assertIsNone(quiet["done_stamp_warning"])
-        checked = must(["readiness", "--root", str(self.root)])
+        checked = must(["readiness", "--full", "--root", str(self.root)])
         self.assertIsNone(checked["done_stamp_warning"])
         self._share("plan-from-spec", WHEN_LATER)
         self._share("review-and-tighten-plan", WHEN_LATER)

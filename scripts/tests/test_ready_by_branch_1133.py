@@ -124,7 +124,7 @@ class ReadyByBranch(unittest.TestCase):
             root = Path(tmp)
             write_slice(root, TASKS, SPEC, PLAN)
             record_resolve(root)
-            payload = must(["readiness", "--root", str(root)])
+            payload = must(["readiness", "--full", "--root", str(root)])
             bm = load_map()
             text = (root / "tasks.md").read_text(encoding="utf-8")
             spec = (root / "spec.md").read_text(encoding="utf-8")
@@ -173,7 +173,7 @@ class ReadyByBranch(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_slice(root, ONE, ONE_SPEC, ONE_PLAN)
-            payload = must(["readiness", "--root", str(root)])
+            payload = must(["readiness", "--full", "--root", str(root)])
         self.assertEqual(payload["result"], "ready")
         self.assertIsNone(payload["line"])
         self.assertEqual(payload["held_lines"], [])
@@ -198,7 +198,7 @@ class ReadyByBranch(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_slice(root, tasks, ONE_SPEC, ONE_PLAN)
-            payload = must(["readiness", "--root", str(root)])
+            payload = must(["readiness", "--full", "--root", str(root)])
         self.assertEqual(payload["result"], "ready")
         self.assertEqual(payload["ready_lines"], [
             "- `feat/orders-api-record` (wave 1): T1 Record the decision",

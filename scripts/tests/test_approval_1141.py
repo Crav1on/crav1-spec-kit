@@ -74,7 +74,7 @@ def run_py(script: Path, args: list[str]) -> subprocess.CompletedProcess[str]:
 
 
 def readiness(root: Path) -> dict:
-    proc = run_py(WALK, ["readiness", "--root", str(root)])
+    proc = run_py(WALK, ["readiness", "--full", "--root", str(root)])
     try:
         payload = json.loads(proc.stdout or "{}")
     except json.JSONDecodeError as exc:

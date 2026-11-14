@@ -2,6 +2,16 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.156.0 (2026-11-14)
+
+The ready check prints its own ending, the three walks share one ending, and the short reply is the default. A minor release because the readiness output, its default, and a choice word change.
+
+- **The script prints the reply.** `walk_progress.py readiness --root <spec-folder> --write-map --text` prints the whole ready-check reply: the header, the counts row, `Result:`, the ending (Run next first, Held, Branch runs, Loop and Waiting lines, claim warnings), `Source:` and `Build map:`. The assistant shows it as-is and never adds a `Next:` line. When nothing can start, the script also prints the one Next line the reply keeps (resolve the question, verify, or nothing needed now).
+- **A shorter skill.** `/crav1-tasks-ready-to-build` drops from 1,900 to about 960 words. It keeps the step order, the stops and the choice words. The rules it used to restate moved to `references/rules.md`, word for word, for when the script cannot run.
+- **One shared ending.** The ready check, the tighten-and-plan ready check and `/crav1-build-walk` (in-walk and whole-branch endings) build their ending with one script, `scripts/walk_ending.py` in the ready-check skill, which each of the three skills ships. For the same ready branches, all three print the same Run next entries, word for word. The shape is one section in `run-ending.md`, and the tighten-and-plan and build-walk skills point at it instead of describing their own.
+- **Brief by default.** `readiness` prints the short output unless asked for `--full`, which prints the complete JSON. `/crav1-build-tasks` asks for `--full` for its held-task check. In chat, the new word `full` (`/crav1-tasks-ready-to-build full <slug>`) adds the per-task lists and the Order line.
+- **Tests.** The Run next entries match across the three skills for the same state, the ending order is shared, readiness is brief without a flag, the ready-check skill stays between 800 and 1,100 words, and no skill instruction asks for a Next line after the Waiting lines.
+
 ## 1.155.0 (2026-11-14)
 
 `/crav1-build-walk` can build a whole branch in one run. A minor release because the walk gains a branch argument, a per-task push after one yes, a new section in the progress file, a status line in `walk-progress.md`, and a second Run next entry per branch.
@@ -139,18 +149,5 @@ One guided walk for the build side of a slice. A minor release because `/crav1-b
 - **Other-owner mode.** When the pull request author or a commit author is someone else, the walk confirms before `switch`. In that mode it never opens a pull request, never merges the base into the branch, and never merges or completes the pull request. It posts one comment per push. It edits the description only on `edit description`. Ticks wait until that pull request is merged.
 - **Stacking.** Work may continue on other branches while earlier branches are unmerged. A task that needs code from an unmerged branch is cut from that branch, not from `develop`. The progress file and the report show the merge list, child first, back into the branch it was cut from. A merged or deleted branch is not offered. The offer uses the 1.140.0 helper.
 - **Runs live.** A task marked `(Runs live)` gets a script, a dry run (`check`), then the user's yes before the live run. The yes is `(live yes: <name>, <date>)` on the task line. Without that yes the script may be written and the task stays unticked. An unapproved `## Approval needed` item holds the task and the Next line is `/crav1-record-approval` or the draft request. An `Approved:` line does not replace the user's own yes.
-
-## 1.141.0 (2026-11-12)
-
-A named person's yes can be recorded, and it stays recorded. A minor release because the spec gains an Approval needed item, the ready check holds only the tasks that item names, and a new command writes the lasting line.
-
-- **Approval needed.** `## Approval needed` sits beside `## Open questions`. An item names the person (`Person:`), what they approve, and the tasks it holds (`Holds: T4`). It is not a question to fold in. `/crav1-resolve-open-questions` does not walk it and does not remove it.
-- **Approved.** The lasting line is `Approved: <person>, <source date>, <source>, "<quote>" (accepted by <recorder> <date>)`. The source date is the quote's date. The last date is the day this run accepted it. No skill removes the line. It is not the data-model stage line.
-- **Record it.** `/crav1-record-approval` is command-only. It takes the person, the source, and the quote, shows the line, the constraint, and the tasks it unblocks, and writes only after `accept` in that run. An earlier quote does not count against a later constraint. The kit shows both and asks. Nothing is sent.
-- **Where the item comes from.** `/crav1-plan-from-spec`, including the plan step of `/crav1-tighten-and-plan-ready-to-build`, reads a constraint such as `The partner gives a yes before the script is applied.` and adds the item linked to those tasks. When a build finds that yes missing, `/crav1-build-tasks` writes or offers the item instead of only a Waiting line. It does not write `Approved:`.
-- **Ready check.** Tasks held by an unapproved item are Waiting on that person. Other tasks still start (`ready-partial`). A matching `Approved:` line clears the hold. A live `apply` still needs the user's own yes in that run, and the task stays unticked until `check` is ok. `task_order.py` lists the same tasks under Waiting on approval.
-- **On record.** The build worker treats a named person's yes as on record when a matching `Approved:` line exists, and still when it was said in this chat or an `Answered:` line names it. `Answered:` is unchanged. Resolve still removes an `Answered:` line when it folds that question.
-- **Ask.** `/crav1-show-or-ask-open-questions` can draft the approval request as a mail, a chat message, a meeting agenda, or a PR comment. It writes `Asked:` or `Pending:` under the item. It never sends.
-- **Stamp.** An edit confined to `## Approval needed` does not reopen a tighten-and-plan step. The section is in neither the spec body nor the questions stamp.
 
 The newest 15 releases are above. The full changelog is https://github.com/Crav1on/crav1-spec-kit/blob/main/CHANGELOG.md.

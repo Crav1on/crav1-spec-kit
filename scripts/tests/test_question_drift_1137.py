@@ -155,7 +155,7 @@ class QuestionDrift(unittest.TestCase):
         root.mkdir()
         write_slice(root)
         record_walk(root)
-        before = must_json(WALK, ["readiness", "--root", str(root)])
+        before = must_json(WALK, ["readiness", "--full", "--root", str(root)])
         self.assertEqual(before["result"], "ready-partial")
         self.assertIn("T3", before["can_start"])
         self.assertIn("T6", before["can_start"])
@@ -164,7 +164,7 @@ class QuestionDrift(unittest.TestCase):
             self.assertIn(tid, before["held"])
 
         (root / "spec.md").write_text(with_new_question(), encoding="utf-8")
-        payload = must_json(WALK, ["readiness", "--root", str(root)])
+        payload = must_json(WALK, ["readiness", "--full", "--root", str(root)])
         self.assertEqual(payload["result"], "ready-partial")
         self.assertEqual(payload["can_start"], ["T3", "T6"])
         for tid in ("T43", "T44", "T45"):
@@ -219,7 +219,7 @@ class QuestionDrift(unittest.TestCase):
         self.assertEqual(by_id["resolve-open-questions"]["status"], "keep")
         for step in LATER:
             self.assertEqual(by_id[step]["status"], "keep", step)
-        payload = must_json(WALK, ["readiness", "--root", str(root)])
+        payload = must_json(WALK, ["readiness", "--full", "--root", str(root)])
         self.assertEqual(payload["result"], "ready-partial")
         self.assertEqual(payload["reopened"], [])
         self.assertIn("T43", payload["held"])
@@ -235,7 +235,7 @@ class QuestionDrift(unittest.TestCase):
         (root / "spec.md").write_text(spec, encoding="utf-8")
         (root / "plan.md").write_text(PLAN, encoding="utf-8")
         (root / "tasks.md").write_text(tasks, encoding="utf-8")
-        held = must_json(WALK, ["readiness", "--root", str(root)])
+        held = must_json(WALK, ["readiness", "--full", "--root", str(root)])
         self.assertEqual(held["result"], "not-ready")
         self.assertEqual(held["can_start"], [])
         blocked = {row["task"] for row in held["blockers"]}
@@ -247,7 +247,7 @@ class QuestionDrift(unittest.TestCase):
             "--step", "resolve-open-questions", "--result", "done",
             "--when", WHEN, "--yes",
         ])
-        clear = must_json(WALK, ["readiness", "--root", str(root)])
+        clear = must_json(WALK, ["readiness", "--full", "--root", str(root)])
         self.assertEqual(clear["can_start"], ["T3", "T6"])
         self.assertEqual(clear["held"], [])
         self.assertEqual(clear["result"], "ready")
@@ -262,7 +262,7 @@ class QuestionDrift(unittest.TestCase):
             text.replace("The receipt lists the order id.", "The receipt lists the order id and the lane."),
             encoding="utf-8",
         )
-        payload = must_json(WALK, ["readiness", "--root", str(root)])
+        payload = must_json(WALK, ["readiness", "--full", "--root", str(root)])
         self.assertEqual(payload["result"], "not-ready")
         reopened = [hit["step"] for hit in payload["reopened"]]
         for step in LATER:
@@ -372,7 +372,7 @@ The receipt lists the order id.
                 "record", "--root", str(root), "--slice", "docs/specs/orders-export",
                 "--step", step, "--result", result, "--when", WHEN, "--yes",
             ])
-        held = must_json(WALK, ["readiness", "--root", str(root)])
+        held = must_json(WALK, ["readiness", "--full", "--root", str(root)])
         self.assertEqual(held["can_start"], [])
         self.assertEqual(held["held"], ["T3", "T6"])
         self.assertEqual(held["result"], "not-ready")
@@ -382,7 +382,7 @@ The receipt lists the order id.
 
         edited = spec.rstrip() + "\n- Which lane prints the label?\n  - Blocks: none\n"
         (root / "spec.md").write_text(edited, encoding="utf-8")
-        after = must_json(WALK, ["readiness", "--root", str(root)])
+        after = must_json(WALK, ["readiness", "--full", "--root", str(root)])
         self.assertEqual(after["can_start"], [])
         self.assertEqual(after["held"], ["T3", "T6"])
         self.assertNotIn("T3", {row["task"] for row in after["blockers"]})

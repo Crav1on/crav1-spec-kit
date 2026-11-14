@@ -23,7 +23,7 @@ Usage (JSON on stdout):
   walk_progress.py start --root <spec-folder-or-slug> [--playbook <file>]
   walk_progress.py resume --root <spec-folder>
   walk_progress.py playbook-status --root <spec-folder> --playbook <file>
-  walk_progress.py readiness --root <spec-folder> [--write-map] [--brief|--full]
+  walk_progress.py readiness --root <spec-folder> [--write-map] [--full|--text]
   walk_progress.py readiness --json <file> [--root <spec-folder>]
   walk_progress.py unlinked --root <spec-folder>
   walk_progress.py ack-stamps --root <spec-folder> --yes
@@ -35,8 +35,10 @@ Usage (JSON on stdout):
 
 readiness --root builds the rows from task_order.py and question_blocks.py
 and adds the Reviewed warnings. It also compares tasks.md with verify.md.
---brief prints only result, a counts row, the ending, and claim warnings.
---full (the default) prints the complete JSON. --write-map writes
+Brief is the default (1.156.0): result, a counts row, the ending, the
+finished reply, and claim warnings. --brief is accepted and changes nothing.
+--full prints the complete JSON, only on an explicit ask. --text prints
+only the reply, to show as-is. --write-map writes
 build-map.md through build_map.py and does not write verify.md. Do not
 hand-build that JSON. start resolves a folder or a slug
 the way resolve_spec.py does and returns resume and playbook-status together.
@@ -2496,6 +2498,24 @@ def map_mod():
     return mod
 
 
+_ENDING_MOD: list = []
+
+
+def ending_mod():
+    """The shared walk ending (1.156.0), skill crav1-tasks-ready-to-build scripts/walk_ending.py."""
+    if not _ENDING_MOD:
+        import importlib.util
+
+        path = Path(__file__).resolve().parents[2] / "crav1-tasks-ready-to-build" / "scripts" / "walk_ending.py"
+        spec = importlib.util.spec_from_file_location("walk_ending_wp", path)
+        if spec is None or spec.loader is None:
+            fail("ending", f"cannot load {path}")
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        _ENDING_MOD.append(mod)
+    return _ENDING_MOD[0]
+
+
 _MAP_CACHE: dict = {}
 
 
@@ -3468,23 +3488,17 @@ def compose_ending(
     The bottom keeps Waiting lines and at most a one-line alternative. The
     walk command appears only in the Run next block (1.153.0).
     """
-    parts: list[str] = []
-    if result in ("ready", "ready-partial") and run_lines:
-        parts.append("Run next:\n\n" + "\n\n".join(run_lines))
-    if held_lines:
-        parts.append("Held:\n" + "\n".join(held_lines))
-    if branch_runs:
-        parts.append("Branch runs:\n" + "\n".join(branch_runs))
-    if waiting:
-        parts.append("\n".join(waiting))
-    if result == "not-ready" and because:
-        parts.append(because)
-    alternatives = _alternative_lines(next_lines, run_lines if result in ("ready", "ready-partial") else [])
-    if alternatives:
-        parts.append("\n".join(alternatives))
-    if replaced:
-        parts.append(replaced)
-    return "\n\n".join(parts)
+    shown = result in ("ready", "ready-partial")
+    alternatives = _alternative_lines(next_lines, run_lines if shown else [])
+    return ending_mod().compose(
+        run=run_lines if shown else None,
+        held=held_lines,
+        branch_runs=branch_runs,
+        waiting=waiting,
+        because=because if result == "not-ready" else None,
+        alternatives=alternatives,
+        notes=[replaced] if replaced else None,
+    )
 
 
 def next_for(result: str, can_start: list, waiting_next: str | None) -> str | None:
@@ -3549,6 +3563,7 @@ def brief_payload(out: dict) -> dict:
         "ending": out.get("ending"),
         "claim_warnings": out.get("claim_warnings") or [],
         "stop": out.get("stop", False),
+        "reply": out.get("reply") or out.get("ending") or "",
     }
     if out.get("build_map"):
         brief["build_map"] = out["build_map"]
@@ -3557,6 +3572,46 @@ def brief_payload(out: dict) -> dict:
     if out.get("line") and out.get("stop"):
         brief["line"] = out["line"]
     return brief
+
+
+READ_FILES = ("spec.md", "plan.md", "tasks.md", "verify.md", "claims.md")
+
+
+def _emit_readiness(args: argparse.Namespace, out: dict) -> None:
+    """Brief by default (1.156.0). --full prints the complete JSON, --text the reply."""
+    if getattr(args, "text", False):
+        _utf8_stdout()
+        print(out.get("reply") or out.get("ending") or "")
+        return
+    emit(out if getattr(args, "full", False) else brief_payload(out))
+
+
+def reply_for(root: Path | None, out: dict) -> str:
+    """The finished ready-check reply, from the shared ending (1.156.0)."""
+    slug = _slug(root) if root is not None else ""
+    if out.get("stop"):
+        return ending_mod().ready_reply(slug, "not-ready", None, out.get("ending") or "", stop=True)
+    sources = [name for name in READ_FILES if root is not None and (root / name).is_file()]
+    build_map = None
+    if out.get("build_map_wrote"):
+        build_map = f"docs/specs/{slug}/build-map.md"
+    next_line = None
+    if not out.get("run_lines"):
+        question_first = any(
+            _direct_question_or_approval(hit) and not hit.get("approval")
+            for hit in out.get("waiting") or []
+        )
+        next_line = ending_mod().not_ready_next(slug, out.get("counts"), question_first)
+    return ending_mod().ready_reply(
+        slug,
+        out.get("result") or "",
+        out.get("counts"),
+        out.get("ending") or "",
+        sources=sources,
+        build_map=build_map,
+        work_item=root is not None and (root / "work-item.md").is_file(),
+        next_line=next_line,
+    )
 
 
 def readiness(args: argparse.Namespace) -> None:
@@ -3580,7 +3635,8 @@ def readiness(args: argparse.Namespace) -> None:
             "claim_warnings": [],
             "counts": counts_for([], _slug(root) if root is not None else ""),
         }
-        emit(brief_payload(stopped) if getattr(args, "brief", False) else stopped)
+        stopped["reply"] = reply_for(root, stopped)
+        _emit_readiness(args, stopped)
         return
     if args.json:
         try:
@@ -3776,7 +3832,8 @@ def readiness(args: argparse.Namespace) -> None:
         out["reopen_steps"] = effect["reopen_steps"]
         out["changed_questions"] = effect["changed_questions"]
         out["restamp_only"] = effect["restamp_only"]
-    emit(brief_payload(out) if getattr(args, "brief", False) else out)
+    out["reply"] = reply_for(root, out)
+    _emit_readiness(args, out)
 
 
 def ack_stamps(args: argparse.Namespace) -> None:
@@ -5148,8 +5205,9 @@ def main(argv: list[str] | None = None) -> None:
     d.add_argument("--json", help="Rows file. Omit with --root to build the rows from the spec folder.")
     d.add_argument("--root", help="Spec folder. Builds the rows when --json is omitted. Reopened steps block ready.")
     d.add_argument("--write-map", action="store_true", help="Write build-map.md in the standalone command's format.")
-    d.add_argument("--brief", action="store_true", help="Print only result, the counts row, the ending, and claim warnings.")
-    d.add_argument("--full", action="store_true", help="Print the complete JSON. This is the default.")
+    d.add_argument("--brief", action="store_true", help="The default (1.156.0): result, the counts row, the ending, the reply, and claim warnings.")
+    d.add_argument("--full", action="store_true", help="Print the complete JSON. Only on an explicit ask.")
+    d.add_argument("--text", action="store_true", help="Print only the finished reply text, to show as-is.")
     d.add_argument("--new-question", action="append", default=[], help="Exact question key to treat as new, not as a recorded question.")
     d.add_argument("--skip-sync", action="store_true", help="Skip the fetch. Tests and an already-fetched copy.")
     d.set_defaults(func=readiness)

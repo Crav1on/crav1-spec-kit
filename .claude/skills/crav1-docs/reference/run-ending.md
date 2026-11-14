@@ -4,6 +4,19 @@ Every skill ends a run in this shape (1.122.0). The skill still chooses which st
 
 A skill names the next step. It does not run it, unless that skill already runs the step today. The tighten-and-plan walk runs the steps inside the walk. Every other skill only names the step.
 
+## The shared walk ending (1.156.0)
+
+The ready check (`/crav1-tasks-ready-to-build`), the tighten-and-plan ready check, and `/crav1-build-walk` build their ending with one shared script, skill `crav1-tasks-ready-to-build` `scripts/walk_ending.py --json <state>` (each of the three skills ships a copy of that `walk_ending` script). The skill prints that text as-is. It never adds, drops, or rewrites a line, and never adds a `Next:` line of its own. For the same ready branches, the three print the same Run next entries. The order is:
+
+1. `Run next:` first. Each command alone in its own code span, with the branch and task line under it. A ready branch gets its next task, `` `/crav1-build-walk <slug> T#` ``, and, with two or more open tasks, the whole branch, `` `/crav1-build-walk <slug> <branch>` `` (1.155.0).
+2. `Held:` lines, then `Branch runs:` status lines.
+3. For a branch run: `Built on <branch>:` (one line per task, with its commit and tests), then `Left:`.
+4. `Loop:`, verify-behind, orphan verify rows, and other `Waiting:` lines.
+5. The not-ready reason, at most the one-line `/crav1-build-tasks` alternative, notes, and `Uncommitted:`.
+6. A `Next:` line only where the script writes it: the build walk's own entry, or a not-ready ready check (resolve, verify, or nothing needed now).
+
+The standalone ready check prints a brief reply by default (1.156.0): the header, the counts row, `Result:`, that ending, `Source:` and `Build map:`. The script prints it with `walk_progress.py readiness --root <spec-folder> --write-map --text`. The per-task lists and the Order line come only with the word `full`.
+
 ## Next
 
 `Next:` is exactly one line. It names the single step to run now, and a short reason why.

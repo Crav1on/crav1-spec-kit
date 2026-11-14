@@ -80,7 +80,7 @@ def already_verified(status):
 
 def readiness(root):
     proc = subprocess.run(
-        [sys.executable, str(WALK), "readiness", "--root", str(root)],
+        [sys.executable, str(WALK), "readiness", "--full", "--root", str(root)],
         capture_output=True,
         text=True,
         check=False,

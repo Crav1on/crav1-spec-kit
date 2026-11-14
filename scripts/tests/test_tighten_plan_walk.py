@@ -286,7 +286,7 @@ class Progress(unittest.TestCase):
             {"bucket": "ready", "task": "T1", "warning": "plan review has 2 open P#"},
             {"bucket": "blocked", "task": "T8", "reason": "something new"},
         ]}), encoding="utf-8")
-        payload = must(["readiness", "--json", str(path)])
+        payload = must(["readiness", "--full", "--json", str(path)])
         self.assertFalse(payload["ready"])
         self.assertFalse(payload["start_build"])
         by_task = {row["task"]: row for row in payload["blockers"] + payload["outside_walk"] + payload["assumptions"] + payload["unmapped"]}
@@ -311,7 +311,7 @@ class Progress(unittest.TestCase):
             {"bucket": "ready", "task": "T1"},
             {"bucket": "done", "task": "T2"},
         ]}), encoding="utf-8")
-        ready = must(["readiness", "--json", str(clear)])
+        ready = must(["readiness", "--full", "--json", str(clear)])
         self.assertTrue(ready["ready"])
         self.assertFalse(ready["start_build"])
         self.assertEqual(ready["blockers"], [])

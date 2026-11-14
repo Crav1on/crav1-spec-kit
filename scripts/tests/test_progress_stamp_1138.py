@@ -249,7 +249,7 @@ class ProgressStamp(unittest.TestCase):
         status = statuses(root)
         for step in STEPS:
             self.assertEqual(status[step], "keep", step)
-        payload = must(["readiness", "--root", str(root)])
+        payload = must(["readiness", "--full", "--root", str(root)])
         self.assertEqual(payload["result"], "ready-partial")
         self.assertEqual(payload["reopened"], [])
         self.assertEqual(payload["can_start"], ["T3", "T7"])
@@ -281,7 +281,7 @@ class ProgressStamp(unittest.TestCase):
                 self.assertEqual(status[step], "keep", step)
                 continue
             self.assertEqual(status[step], "reopen", step)
-        payload = must(["readiness", "--root", str(root)])
+        payload = must(["readiness", "--full", "--root", str(root)])
         self.assertEqual(payload["result"], "not-ready")
         self.assertEqual(payload["can_start"], ["T3", "T6", "T7"])
         self.assertIn("Reopened:", payload["because"])
@@ -353,14 +353,14 @@ class ProgressStamp(unittest.TestCase):
     def test_questions_with_blocks_stay_ready_partial_after_progress_edits(self):
         root = fresh()
         record_walk(root)
-        before = must(["readiness", "--root", str(root)])
+        before = must(["readiness", "--full", "--root", str(root)])
         self.assertEqual(before["result"], "ready-partial")
         self.assertEqual(before["can_start"], ["T3", "T6", "T7"])
         for tid in ("T8", "T9", "T10", "T11", "T12"):
             self.assertIn(tid, before["held"])
         (root / "spec.md").write_text(add_branch_pr(SPEC), encoding="utf-8")
         (root / "tasks.md").write_text(tick_t6(TASKS), encoding="utf-8")
-        payload = must(["readiness", "--root", str(root)])
+        payload = must(["readiness", "--full", "--root", str(root)])
         self.assertEqual(payload["result"], "ready-partial")
         self.assertEqual(payload["can_start"], ["T3", "T7"])
         self.assertEqual(payload["reopened"], [])
@@ -375,7 +375,7 @@ class ProgressStamp(unittest.TestCase):
         )
         (root / "spec.md").write_text(spec, encoding="utf-8")
         record_walk(root)
-        payload = must(["readiness", "--root", str(root)])
+        payload = must(["readiness", "--full", "--root", str(root)])
         self.assertEqual(payload["result"], "not-ready")
         self.assertEqual(payload["can_start"], [])
         self.assertIn("whole slice", payload["because"].lower())

@@ -128,7 +128,7 @@ class StatusLineTests(unittest.TestCase):
     def test_ready_check_prints_open_runs_not_merged(self):
         wp.set_branch_run(self.root, "feat/orders-cicd", "running, T1 done, next T2", "2026-11-14T09:00:00+01:00")
         wp.set_branch_run(self.root, "feat/orders-note", "merged", "2026-11-14T09:00:00+01:00")
-        code, out = walk("readiness", "--root", str(self.root), "--skip-sync")
+        code, out = walk("readiness", "--full", "--root", str(self.root), "--skip-sync")
         self.assertEqual(code, 0, out)
         self.assertIn("Branch runs:\n- feat/orders-cicd: running, T1 done, next T2 (log: build-progress/feat--orders-cicd.md)", out["ending"])
         self.assertNotIn("feat/orders-note: merged", out["ending"])
