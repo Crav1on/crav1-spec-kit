@@ -45,24 +45,16 @@ Every reason says **recorded** (from a mark in a file) or **inferred** (a fallba
 
 ## What you see
 
+Since 1.156.0 the script prints the whole reply and the assistant shows it as-is: `walk_progress.py readiness --root <spec-folder> --write-map --text`. The brief reply is the default: the counts row, the result, the shared ending, the sources and the build map.
+
 ```text
+Tasks ready to build — cancel-booking
+
 | Slice | Ready | Waiting | Waits in order | Blocked | Needs verify | Done |
 | --- | --- | --- | --- | --- | --- | --- |
 | cancel-booking | 1 | 1 | 1 | 0 | 1 | 3 |
 
-Ready now
-- `feat/orders-retry` (wave 1): T5 refund to the original card
-
-Held
-- `feat/orders-currency` (wave 1): T7 choose the currency — open question "Which currency for refunds?" Waiting for the partner.
-
-Waits in order (dependency order)
-- T6 send the mail: waits on T5 (recorded).
-
-Needs verify
-- T3 short name: no verify.md row.
-
-Done: 3
+Result: ready-partial
 
 Run next:
 
@@ -72,10 +64,31 @@ branch feat/orders-retry, T5 refund to the original card
 `/crav1-build-walk feat/orders-retry`
 branch feat/orders-retry, every open task: T5 refund to the original card, T6 send the mail
 
+Held:
+- `feat/orders-currency` (wave 1): T7 choose the currency — open question "Which currency for refunds?" Waiting for the partner.
+
 /crav1-build-tasks builds one task without the walk.
+
 Source: docs/specs/cancel-booking/spec.md, plan.md, tasks.md, verify.md
 Build map: docs/specs/cancel-booking/build-map.md
 ```
+
+Say `full` (`/crav1-tasks-ready-to-build full cancel-booking`) for the long form. It adds the per-task lists after the result line:
+
+```text
+Ready now
+- `feat/orders-retry` (wave 1): T5 refund to the original card
+
+Waits in order (dependency order)
+- T6 send the mail: waits on T5 (recorded).
+
+Needs verify
+- T3 short name: no verify.md row.
+
+Done: 3
+```
+
+The ending is shared (1.156.0). `/crav1-tasks-ready-to-build`, the tighten-and-plan ready check and `/crav1-build-walk` build it with one shared `walk_ending` script, so for the same ready branches the Run next entries are the same words in all three. `/crav1-build-tasks` reads the full readiness JSON (`--full`) to start the ready tasks. See [How a run ends](reference/run-ending.md#the-shared-walk-ending-11560).
 
 Since 1.155.0 each ready branch offers its next task, and, when the branch has two or more open tasks, the whole branch as a second entry, built in one run by `/crav1-build-walk <slug> <branch>`. A branch with one open task gets only the T# entry. When a whole-branch run is going, or stopped, the ending also has a `Branch runs:` block from the `- Branch run:` status lines in `walk-progress.md`, for example `- feat/orders-retry: running, T5 done, next T6 (log: build-progress/feat--orders-retry.md)`. A merged run is left out.
 

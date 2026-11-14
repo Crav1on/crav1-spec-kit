@@ -28,6 +28,8 @@ A task that needs code from an unmerged branch is cut from that branch. The prog
 
 1.152.0: a mid-walk stop, such as before a merge step, does not clear the claim. The claim is cleared when the branch is merged or ticked, or the user says stop and is done with this walk, or `release claim`. A later ready check in a new session still holds that task as in progress.
 
+1.156.0: the in-walk and branch-run endings are built by the shared walk ending (`scripts/walk_ending.py`), so for the same ready branches the Run next entries match the ready check word for word. The skill points at that ending instead of describing it.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.

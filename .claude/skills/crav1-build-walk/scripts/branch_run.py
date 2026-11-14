@@ -98,6 +98,11 @@ def claims_mod():
     return _load("crav1-build-walk", "claims.py")
 
 
+def ending_mod():
+    """The shared walk ending (1.156.0)."""
+    return _load("crav1-tasks-ready-to-build", "walk_ending.py")
+
+
 def approval_mod():
     return _load("crav1-record-approval", "approval_needed.py")
 
@@ -573,12 +578,12 @@ def ending(state: dict) -> dict:
     runs = []
     if kind == "merge":
         if not pr or state.get("pr_failed"):
-            runs.append(("`/crav1-open-pr`", f"open the pull request for {branch}"))
+            runs.append(f"`/crav1-open-pr`\nopen the pull request for {branch}")
         else:
-            runs.append((f"`{prefix} {branch}`",
-                         f"merge PR {pr} into {state.get('base') or 'develop'}, after your yes"))
+            runs.append(f"`{prefix} {branch}`\nmerge PR {pr} into {state.get('base') or 'develop'}, after your yes")
     else:
-        runs.append((f"`{prefix} {branch}`", f"continue {branch} once this is settled: {stop.get('line') or kind}"))
+        runs.append(f"`{prefix} {branch}`\ncontinue {branch} once this is settled: {stop.get('line') or kind}")
+    em = ending_mod()
     for other in state.get("ready_branches") or []:
         if not isinstance(other, dict):
             other = {"branch": str(other), "tasks": []}
@@ -588,16 +593,15 @@ def ending(state: dict) -> dict:
         tasks = [_label(task) for task in other.get("tasks") or []]
         opens = [_label(task) for task in (other.get("open_tasks") or other.get("tasks") or [])]
         if tasks:
-            first = tasks[0]
-            runs.append((f"`{prefix} {first.split()[0]}`", f"branch {name}, {first}"))
+            runs.append(em.run_entry(tasks[:1], name, slug=slug))
         if len(opens) >= 2:
-            runs.append((f"`{prefix} {name}`", f"branch {name}, every open task: {', '.join(opens)}"))
-    parts = ["Run next:\n\n" + "\n\n".join(f"{cmd}\n{why}" for cmd, why in runs)]
+            runs.append(em.branch_entry(opens, name, slug=slug))
     built = state.get("built") or []
+    header = None
+    rows = []
     if built:
         header = f"Built on {branch}" + (f" (PR {pr} is open and up to date):" if pr and not state.get("pr_failed") else ":")
         rows = [f"- {row['task']}{(' ' + row['title']) if row.get('title') else ''}: commit {row['commit'][:7]}, tests {row['tests']}" for row in built]
-        parts.append(header + "\n" + "\n".join(rows))
     left = []
     if kind != "merge" and stop.get("line"):
         left.append(f"- Stopped: {stop['line']}")
@@ -607,9 +611,8 @@ def ending(state: dict) -> dict:
         left.append(f"- Open question: {text}")
     for text in state.get("verify_behind") or []:
         left.append(f"- verify.md is behind: {text}")
-    if left:
-        parts.append("Left:\n" + "\n".join(left))
-    return {"ending": "\n\n".join(parts), "kind": kind, "merges": False}
+    text = em.compose(run=runs, built=rows, built_header=header, left=left)
+    return {"ending": text, "kind": kind, "merges": False}
 
 
 # ---------- CLI ----------

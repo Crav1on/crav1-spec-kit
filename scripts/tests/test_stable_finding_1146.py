@@ -238,7 +238,7 @@ class StableQuestion(unittest.TestCase):
             "  - Blocks: T1\n",
             encoding="utf-8",
         )
-        held = must_json(["readiness", "--root", str(root)])
+        held = must_json(["readiness", "--full", "--root", str(root)])
         self.assertEqual(len(held["question_aliases"]), 1)
         self.assertEqual(held["question_aliases"][0]["how"], "similar")
         self.assertEqual(held["question_aliases"][0]["matched"], "Which currency for refunds?")
@@ -246,7 +246,7 @@ class StableQuestion(unittest.TestCase):
         self.assertEqual(rows["T1"]["bucket"], "waiting")
         self.assertTrue(rows["T1"]["kept"])
         escaped = must_json([
-            "readiness", "--root", str(root),
+            "readiness", "--full", "--root", str(root),
             "--new-question", held["question_aliases"][0]["key"],
         ])
         self.assertEqual(escaped["question_aliases"], [])
@@ -270,7 +270,7 @@ class StableQuestion(unittest.TestCase):
             "  - Blocks: T1\n",
             encoding="utf-8",
         )
-        mixed = must_json(["readiness", "--root", str(root)])
+        mixed = must_json(["readiness", "--full", "--root", str(root)])
         self.assertEqual(mixed["question_aliases"], [])
 
     def test_a_refreshed_commit_list_uses_the_stable_key(self):
@@ -291,7 +291,7 @@ class StableQuestion(unittest.TestCase):
             "  - Blocks: T1\n",
             encoding="utf-8",
         )
-        payload = must_json(["readiness", "--root", str(root)])
+        payload = must_json(["readiness", "--full", "--root", str(root)])
         self.assertEqual(payload["question_aliases"][0]["how"], "stable")
         self.assertEqual(payload["question_aliases"][0]["similarity"], 1.0)
 
@@ -303,10 +303,10 @@ class WalkMapAndStart(unittest.TestCase):
         self.assertEqual(code, 0, err or out)
         standalone = (root / "build-map.md").read_bytes()
         (root / "build-map.md").unlink()
-        plain = must_json(["readiness", "--root", str(root)])
+        plain = must_json(["readiness", "--full", "--root", str(root)])
         self.assertNotIn("build_map", plain)
         self.assertFalse((root / "build-map.md").exists())
-        wrote = must_json(["readiness", "--root", str(root), "--write-map"])
+        wrote = must_json(["readiness", "--full", "--root", str(root), "--write-map"])
         self.assertEqual((root / "build-map.md").read_bytes(), standalone)
         self.assertTrue(wrote["build_map"].startswith("Build map:"))
         self.assertTrue(str(wrote["build_map_wrote"]).endswith("build-map.md"))

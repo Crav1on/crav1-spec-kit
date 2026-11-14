@@ -227,58 +227,33 @@ def ready_next_line(labels, branch_name, slug=None):
     return entry + "\n/crav1-build-tasks builds one task without the walk."
 
 
-def run_entry(labels, branch_name, slug=None):
-    """One ready branch in the Run next block (1.150.0).
+_ENDING = []
 
-    The command is alone on its line, inside a code span. It is a complete
-    invocation for a new session: the command, each T# on that branch, and
-    the slug when the caller passes one. The next line names the branch and
-    each short task name. Nothing else shares the command line.
-    """
-    ids = []
-    names = []
-    for label in labels:
-        match = re.match(r"(T\d+)\s+(.*)", str(label).strip())
-        if match:
-            ids.append(match.group(1))
-            names.append(f"{match.group(1)} {match.group(2).strip()}")
-        else:
-            token = str(label).strip()
-            ids.append(token)
-            names.append(token)
-    ids_text = ", ".join(ids)
-    command = f"/crav1-build-walk {slug} {ids_text}" if slug else f"/crav1-build-walk {ids_text}"
-    detail = f"branch {branch_name}, {', '.join(names)}"
-    return f"`{command}`\n{detail}"
+
+def _ending_mod():
+    """The shared walk ending, beside this script (1.156.0)."""
+    if not _ENDING:
+        path = pathlib.Path(__file__).resolve().parent / "walk_ending.py"
+        spec = importlib.util.spec_from_file_location("walk_ending_bm", path)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        _ENDING.append(mod)
+    return _ENDING[0]
+
+
+def run_entry(labels, branch_name, slug=None):
+    """One ready branch in the Run next block (1.150.0); shared in walk_ending.py."""
+    return _ending_mod().run_entry(labels, branch_name, slug=slug)
 
 
 def branch_entry(open_labels, branch_name, slug=None):
-    """The whole-branch Run next entry (1.155.0).
-
-    `/crav1-build-walk <slug> <branch>` alone in a code span, then the branch
-    and every open task on it on the next line. Offered only when the branch
-    has two or more open tasks.
-    """
-    names = [str(label).strip() for label in open_labels or [] if str(label).strip()]
-    command = f"/crav1-build-walk {slug} {branch_name}" if slug else f"/crav1-build-walk {branch_name}"
-    return f"`{command}`\nbranch {branch_name}, every open task: {', '.join(names)}"
+    """The whole-branch Run next entry (1.155.0); shared in walk_ending.py."""
+    return _ending_mod().branch_entry(open_labels, branch_name, slug=slug)
 
 
 def run_entries(labels, branch_name, slug=None, open_labels=None):
-    """Run next entries for one ready branch (1.155.0).
-
-    The next task as `/crav1-build-walk <slug> T#`, then, when the branch has
-    two or more open tasks, the whole branch as `/crav1-build-walk <slug>
-    <branch>`. Each is its own entry.
-    """
-    labels = [label for label in labels or [] if str(label).strip()]
-    if not labels:
-        return []
-    entries = [run_entry(labels[:1], branch_name, slug=slug)]
-    opens = list(open_labels) if open_labels is not None else list(labels)
-    if len(opens) >= 2:
-        entries.append(branch_entry(opens, branch_name, slug=slug))
-    return entries
+    """Run next entries for one ready branch (1.155.0); shared in walk_ending.py."""
+    return _ending_mod().run_entries(labels, branch_name, slug=slug, open_labels=open_labels)
 
 
 def short_name(rest, work_title=None, trim=True):

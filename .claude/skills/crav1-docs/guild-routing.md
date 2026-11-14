@@ -229,6 +229,7 @@ The merged skills take exact choice words instead of `--flags`. A word in the in
 | `/crav1-help` | Also check the latest pipeline runs? | `pipeline runs` |
 | `/crav1-help` | What to do next (optional, never asked) | `todo` · `todo next` · `todo top N` |
 | `/crav1-tasks-ready-to-build` | Show the build map? | `build-map` |
+| `/crav1-tasks-ready-to-build` | Show the full list? | `full` |
 | `/crav1-tasks-ready-to-build` | Also check the latest pipeline runs? | `pipeline runs` |
 | `/crav1-explain-this-code` | How deep | `what it does` · `what and why` · `teach the language` |
 | `/crav1-retire-spec` | What to do | `retire` · `merge` · `park` · `convert to note` |

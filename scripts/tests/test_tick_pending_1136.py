@@ -135,7 +135,7 @@ class TickPending(unittest.TestCase):
         root.mkdir()
         write_slice(root, VERIFY_PENDING)
         record_resolve(root)
-        payload = must_json(WALK, ["readiness", "--root", str(root)])
+        payload = must_json(WALK, ["readiness", "--full", "--root", str(root)])
         self.assertFalse(payload["verify_behind"])
         self.assertIsNone(payload["verify_waiting"])
         self.assertEqual(payload["result"], "ready-partial")
@@ -164,7 +164,7 @@ class TickPending(unittest.TestCase):
         )
         write_slice(root, verify)
         record_resolve(root)
-        payload = must_json(WALK, ["readiness", "--root", str(root)])
+        payload = must_json(WALK, ["readiness", "--full", "--root", str(root)])
         self.assertFalse(payload["verify_behind"])
         self.assertIsNone(payload["stale_next"])
         self.assertEqual(payload["result"], "ready-partial")
@@ -180,7 +180,7 @@ class TickPending(unittest.TestCase):
             "--when", WHEN, "--yes",
         ])
         (root / "verify.md").write_text(VERIFY_NOT, encoding="utf-8")
-        payload = must_json(WALK, ["readiness", "--root", str(root)])
+        payload = must_json(WALK, ["readiness", "--full", "--root", str(root)])
         self.assertTrue(payload["verify_behind"])
         self.assertIn("T2", payload["verify_stale"])
         self.assertEqual(payload["result"], "ready-partial")
@@ -205,7 +205,7 @@ class TickPending(unittest.TestCase):
             "| T2 | export the receipt | Not implemented | |\n",
             encoding="utf-8",
         )
-        payload = must_json(WALK, ["readiness", "--root", str(root)])
+        payload = must_json(WALK, ["readiness", "--full", "--root", str(root)])
         self.assertTrue(payload["verify_behind"])
         self.assertEqual(payload["verify_stale"], ["T2"])
         self.assertIn("T2", payload["stale_next"])
@@ -223,7 +223,7 @@ class TickPending(unittest.TestCase):
             encoding="utf-8",
         )
         (root / "verify.md").write_text(VERIFY_PENDING, encoding="utf-8")
-        ready = must_json(WALK, ["readiness", "--root", str(root)])
+        ready = must_json(WALK, ["readiness", "--full", "--root", str(root)])
         self.assertEqual(ready["result"], "not-ready")
         ticked = must_json(TICK, ["--root", str(root), "T2", "--yes"])
         self.assertEqual(ticked["task"], "T2")

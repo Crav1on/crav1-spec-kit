@@ -60,6 +60,8 @@ Shows summary counts per slice, then Ready and Held grouped by build-map branch,
 
 1.155.0: Run next offers each ready branch's next task, [`/crav1-build-walk`](crav1-build-walk.md) <slug> T#`, and, when that branch has two or more open tasks, the whole branch, [`/crav1-build-walk`](crav1-build-walk.md) <slug> <branch>`, as its own entry with `branch <branch>, every open task: …` underneath. `next_lines` carry the same entries. A `Branch runs:` block prints each unmerged `- Branch run:` status line from `walk-progress.md`.
 
+1.156.0: the readiness script prints the finished reply (`walk_progress.py readiness --root <spec-folder> --write-map --text`): the header, the counts row, `Result:`, the shared walk ending (Run next first, Held, Branch runs, Loop and Waiting lines, claim warnings), `Source:` and `Build map:`. The skill shows it as-is and never adds a `Next:` line. The brief reply is the default; the word `full` adds the per-task lists and the Order line. The rules moved to `references/rules.md`. The ending is shared with tighten-and-plan and build-walk through `scripts/walk_ending.py`.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
@@ -67,6 +69,7 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 | Question | Word | Means |
 | --- | --- | --- |
 | Show the build map? | `build-map` | show only the build map for the same scope, such as cc 1.0; the task list stays off |
+| Show the full list? | `full` | the long form: every per-task list and the Order line; the brief reply is the default |
 | Also check the latest pipeline runs? | `pipeline runs` | check the latest successful Azure DevOps runs behind the Promotion line (read-only) |
 
 ## Runs when

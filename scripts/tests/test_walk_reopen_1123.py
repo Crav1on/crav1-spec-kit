@@ -221,7 +221,7 @@ class InsideWalk(unittest.TestCase):
             {"bucket": "ready", "task": "T1"},
             {"bucket": "done", "task": "T2"},
         ]}), encoding="utf-8")
-        blocked = must(["readiness", "--json", str(rows), "--root", str(self.root)])
+        blocked = must(["readiness", "--full", "--json", str(rows), "--root", str(self.root)])
         self.assertFalse(blocked["ready"])
         self.assertFalse(blocked["start_build"])
         self.assertEqual(len(blocked["reopened"]), 1)
@@ -233,7 +233,7 @@ class InsideWalk(unittest.TestCase):
         self.assertEqual(row["kind"], "blocker")
         self.assertIn(row, blocked["jump_back"])
         must(["clear", "--root", str(self.root), "--step", "tighten-spec", "--yes"])
-        clear = must(["readiness", "--json", str(rows), "--root", str(self.root)])
+        clear = must(["readiness", "--full", "--json", str(rows), "--root", str(self.root)])
         self.assertTrue(clear["ready"])
         self.assertEqual(clear["reopened"], [])
 

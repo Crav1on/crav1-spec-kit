@@ -194,7 +194,7 @@ class StaleVerify(unittest.TestCase):
     def test_ticked_task_merged_pr_and_stale_next(self):
         root = slice_dir()
         before = (root / "verify.md").read_bytes()
-        payload = must(["readiness", "--root", str(root)])
+        payload = must(["readiness", "--full", "--root", str(root)])
         self.assertTrue(payload["verify_behind"])
         self.assertEqual(payload["verify_stale"], ["T2", "T45"])
         self.assertEqual(payload["verify_waiting"], WAITING)
@@ -225,7 +225,7 @@ class StaleVerify(unittest.TestCase):
             "| T2 | export the receipt | Not implemented | |\n",
             encoding="utf-8",
         )
-        payload = must(["readiness", "--root", str(root)])
+        payload = must(["readiness", "--full", "--root", str(root)])
         self.assertEqual(payload["verify_stale"], ["T2"])
         self.assertIn("(T2)", payload["verify_waiting"])
         self.assertNotIn("T2", payload["can_start"])
@@ -245,7 +245,7 @@ class StaleVerify(unittest.TestCase):
             encoding="utf-8",
         )
         before = (root / "verify.md").read_bytes()
-        payload = must(["readiness", "--root", str(root)])
+        payload = must(["readiness", "--full", "--root", str(root)])
         self.assertEqual(payload["verify_stale"], ["T2"])
         self.assertEqual(
             payload["verify_waiting"],
@@ -270,7 +270,7 @@ class StaleVerify(unittest.TestCase):
             "| T1 | record the order | Not implemented | |\n",
             encoding="utf-8",
         )
-        payload = must(["readiness", "--root", str(root)])
+        payload = must(["readiness", "--full", "--root", str(root)])
         self.assertFalse(payload["verify_behind"])
         self.assertEqual(payload["verify_stale"], [])
         self.assertIsNone(payload["verify_waiting"])

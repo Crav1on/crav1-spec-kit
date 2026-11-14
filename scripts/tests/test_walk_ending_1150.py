@@ -172,7 +172,7 @@ class EndingBlock(unittest.TestCase):
             root = Path(tmp)
             write_slice(root)
             record(root, "resolve-open-questions")
-            payload = must(["readiness", "--root", str(root)])
+            payload = must(["readiness", "--full", "--root", str(root)])
         ending = payload["ending"]
         self.assertEqual(payload["result"], "ready-partial")
         self.assertLess(ending.index("Run next:"), ending.index("Waiting:"))
@@ -205,7 +205,7 @@ class EndingBlock(unittest.TestCase):
             root = Path(tmp)
             write_slice(root, spec=spec, verify=None)
             record(root, "resolve-open-questions")
-            payload = must(["readiness", "--root", str(root)])
+            payload = must(["readiness", "--full", "--root", str(root)])
         ending = payload["ending"]
         self.assertEqual(payload["result"], "not-ready")
         self.assertNotIn("Run next:", ending)
@@ -222,11 +222,11 @@ class EndingBlock(unittest.TestCase):
             one.mkdir(parents=True)
             write_slice(one, tasks=OPEN_TASKS, verify=None)
             record(one, "resolve-open-questions")
-            alone = must(["readiness", "--root", str(one)])
+            alone = must(["readiness", "--full", "--root", str(one)])
             other = Path(tmp) / "docs" / "specs" / "orders-export"
             other.mkdir()
             write_slice(other, tasks=OPEN_TASKS, verify=None)
-            many = must(["readiness", "--root", str(one)])
+            many = must(["readiness", "--full", "--root", str(one)])
         assert_complete(self, alone["ending"], None)
         for line in command_lines(alone["ending"]):
             # The slug is left out; a branch name may still contain it.
@@ -248,7 +248,7 @@ class SelfReopen(unittest.TestCase):
                 encoding="utf-8",
             )
             must(["clear", "--root", str(root), "--step", "review-and-tighten-plan", "--yes"])
-            payload = must(["readiness", "--root", str(root)])
+            payload = must(["readiness", "--full", "--root", str(root)])
             resumed = must(["resume", "--root", str(root), "--no-playbook"])
         self.assertEqual(payload["result"], "ready-partial")
         self.assertIsNone(payload["because"])
@@ -275,7 +275,7 @@ class SelfReopen(unittest.TestCase):
                 tasks.replace("Store the card", "Store the card now"),
                 encoding="utf-8",
             )
-            payload = must(["readiness", "--root", str(root)])
+            payload = must(["readiness", "--full", "--root", str(root)])
         self.assertEqual(payload["result"], "not-ready")
         steps = [hit["step"] for hit in payload["reopened"]]
         self.assertIn("review-and-tighten-plan", steps)
@@ -317,7 +317,7 @@ class SelfReopen(unittest.TestCase):
             text = (root / "walk-progress.md").read_text(encoding="utf-8")
             self.assertIn("Result: ready-partial", text)
             self.assertNotIn("Result: not-ready", text)
-            payload = must(["readiness", "--root", str(root)])
+            payload = must(["readiness", "--full", "--root", str(root)])
             code, again = run([
                 "clear", "--root", str(root), "--step", "tasks-ready-to-build", "--yes",
             ])

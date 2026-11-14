@@ -192,7 +192,7 @@ Branches: `feat/orders-one-commit-cleanup-main` from `origin/main` (T2, PR 78, m
                 "In progress: chore/merge-main-into-develop, T4, person A, since 2026-11-13T15:50:00+01:00\n",
                 encoding="utf-8",
             )
-            payload = must(["readiness", "--root", str(root), "--skip-sync"])
+            payload = must(["readiness", "--full", "--root", str(root), "--skip-sync"])
         held = "\n".join(payload["held_lines"])
         self.assertIn("`chore/merge-main-into-develop`", held)
         self.assertIn("T4", held)
@@ -219,7 +219,7 @@ class EndingCommandOnce(unittest.TestCase):
                 "In progress: chore/merge-main-into-develop, T4, person A, since 2026-11-13T15:50:00+01:00\n",
                 encoding="utf-8",
             )
-            payload = must(["readiness", "--root", str(root), "--skip-sync"])
+            payload = must(["readiness", "--full", "--root", str(root), "--skip-sync"])
         ending = payload["ending"]
         self.assertTrue(ending.startswith("Run next:"), ending)
         self.assertEqual(payload["can_start"], ["T43"])
@@ -259,7 +259,7 @@ class BriefOutput(unittest.TestCase):
             write_slice(root, tasks=tasks, spec="# Orders\n\n## Open questions\n", plan=plan, verify="".join(verify_rows))
             record_resolve(root)
             brief = run_walk(["readiness", "--root", str(root), "--skip-sync", "--brief", "--write-map"])
-            full = run_walk(["readiness", "--root", str(root), "--skip-sync"])
+            full = run_walk(["readiness", "--full", "--root", str(root), "--skip-sync"])
         self.assertEqual(brief.returncode, 0, brief.stderr + brief.stdout)
         self.assertEqual(full.returncode, 0, full.stderr + full.stdout)
         self.assertLess(len(brief.stdout.encode("utf-8")), 8000)
@@ -298,7 +298,7 @@ class WaitingLineCountsDirectHolds(unittest.TestCase):
             root.mkdir()
             write_slice(root)
             record_resolve(root)
-            payload = must(["readiness", "--root", str(root), "--skip-sync"])
+            payload = must(["readiness", "--full", "--root", str(root), "--skip-sync"])
         line = payload["waiting_line"] or ""
         # T25, T34, T35 are direct question holds. T8, T28 and others wait on tasks.
         self.assertIn("3 tasks wait on open questions", line)
@@ -319,7 +319,7 @@ class OrphanVerifyRow(unittest.TestCase):
             write_slice(root)
             record_resolve(root)
             before = (root / "verify.md").read_text(encoding="utf-8")
-            payload = must(["readiness", "--root", str(root), "--skip-sync"])
+            payload = must(["readiness", "--full", "--root", str(root), "--skip-sync"])
             after = (root / "verify.md").read_text(encoding="utf-8")
         self.assertEqual(before, after)
         self.assertIn("T44", payload.get("orphan_tasks") or [])

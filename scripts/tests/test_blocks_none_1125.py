@@ -138,7 +138,7 @@ class WalkScripts(unittest.TestCase):
                 {"bucket": "blocked", "task": "T4", "reason": "plan Risk blocks the slice"},
                 {"bucket": "needs-verify", "task": "T3", "reason": "no verify.md row"},
             ]}), encoding="utf-8")
-            code, payload = run_walk(["readiness", "--json", str(path)])
+            code, payload = run_walk(["readiness", "--full", "--json", str(path)])
         self.assertEqual(code, 0)
         self.assertFalse(payload["ready"])
         tasks = [row["task"] for row in payload["blockers"] + payload["outside_walk"]]

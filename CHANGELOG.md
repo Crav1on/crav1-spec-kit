@@ -2,6 +2,16 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.156.0 (2026-11-14)
+
+The ready check prints its own ending, the three walks share one ending, and the short reply is the default. A minor release because the readiness output, its default, and a choice word change.
+
+- **The script prints the reply.** `walk_progress.py readiness --root <spec-folder> --write-map --text` prints the whole ready-check reply: the header, the counts row, `Result:`, the ending (Run next first, Held, Branch runs, Loop and Waiting lines, claim warnings), `Source:` and `Build map:`. The assistant shows it as-is and never adds a `Next:` line. When nothing can start, the script also prints the one Next line the reply keeps (resolve the question, verify, or nothing needed now).
+- **A shorter skill.** `/crav1-tasks-ready-to-build` drops from 1,900 to about 960 words. It keeps the step order, the stops and the choice words. The rules it used to restate moved to `references/rules.md`, word for word, for when the script cannot run.
+- **One shared ending.** The ready check, the tighten-and-plan ready check and `/crav1-build-walk` (in-walk and whole-branch endings) build their ending with one script, `scripts/walk_ending.py` in the ready-check skill, which each of the three skills ships. For the same ready branches, all three print the same Run next entries, word for word. The shape is one section in `run-ending.md`, and the tighten-and-plan and build-walk skills point at it instead of describing their own.
+- **Brief by default.** `readiness` prints the short output unless asked for `--full`, which prints the complete JSON. `/crav1-build-tasks` asks for `--full` for its held-task check. In chat, the new word `full` (`/crav1-tasks-ready-to-build full <slug>`) adds the per-task lists and the Order line.
+- **Tests.** The Run next entries match across the three skills for the same state, the ending order is shared, readiness is brief without a flag, the ready-check skill stays between 800 and 1,100 words, and no skill instruction asks for a Next line after the Waiting lines.
+
 ## 1.155.0 (2026-11-14)
 
 `/crav1-build-walk` can build a whole branch in one run. A minor release because the walk gains a branch argument, a per-task push after one yes, a new section in the progress file, a status line in `walk-progress.md`, and a second Run next entry per branch.

@@ -117,6 +117,11 @@ def map_mod():
     return _load("crav1-tasks-ready-to-build", "build_map.py")
 
 
+def ending_mod():
+    """The shared walk ending (1.156.0)."""
+    return _load("crav1-tasks-ready-to-build", "walk_ending.py")
+
+
 def approval_mod():
     return _load("crav1-record-approval", "approval_needed.py")
 
@@ -586,20 +591,13 @@ def _entry(command: str, because: str, tasks: list, branch: str, slug: str | Non
 
 
 def _compose_ending(entries: list, waiting, uncommitted) -> str:
-    parts = []
-    runs = [entry["run"] for entry in entries if entry.get("run")]
-    if runs:
-        parts.append("Run next:\n\n" + "\n\n".join(runs))
-    if waiting:
-        text = str(waiting)
-        parts.append(text if text.startswith("Waiting:") else f"Waiting: {text}")
-    if uncommitted:
-        text = str(uncommitted)
-        parts.append(text if text.startswith("Uncommitted:") else f"Uncommitted: {text}")
-    nxt = [entry["next"] for entry in entries if entry.get("next")]
-    if nxt:
-        parts.append("\n".join(nxt))
-    return "\n\n".join(parts)
+    """Run next, Waiting, Uncommitted, then this walk's Next lines (shared order, 1.156.0)."""
+    return ending_mod().compose(
+        run=[entry["run"] for entry in entries if entry.get("run")],
+        waiting=waiting or None,
+        uncommitted=uncommitted or None,
+        next_lines=[entry["next"] for entry in entries if entry.get("next")],
+    )
 
 
 def _other_ready(state: dict, current: str | None) -> list:

@@ -104,7 +104,7 @@ def readiness(root, *extra):
         "--step", "resolve-open-questions", "--result", "done", "--yes",
     ])
     assert record.returncode == 0, record.stderr + record.stdout
-    proc = run_walk(["readiness", "--root", str(root), "--skip-sync", *extra])
+    proc = run_walk(["readiness", "--full", "--root", str(root), "--skip-sync", *extra])
     assert proc.returncode == 0, proc.stderr + proc.stdout
     return json.loads(proc.stdout)
 

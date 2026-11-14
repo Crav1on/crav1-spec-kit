@@ -60,6 +60,8 @@ The progress file is `docs/specs/<slug>/walk-progress.md`. It records the step, 
 
 1.155.0: `walk-progress.md` also holds one `- Branch run:` status line per whole-branch run of [`/crav1-build-walk`](crav1-build-walk.md), under `## Branch runs`. Record, cover, and clear keep those lines, `resume` returns them as `branch_runs`, the ready check prints the unmerged ones, and `resolve-stamps` settles a conflict that is only those lines by keeping each branch's newest line. The ready-check Run next offers the whole branch beside the next task when the branch has two or more open tasks.
 
+1.156.0: the ready check uses the shared walk ending (`scripts/walk_ending.py`, the same one the standalone ready check and build-walk use), and `readiness` is brief by default; `--full` prints the complete JSON only on an explicit ask. The skill points at that ending instead of describing it.
+
 ## Runs when
 
 A spec should be tightened and planned until it is ready to build. Called by the user.

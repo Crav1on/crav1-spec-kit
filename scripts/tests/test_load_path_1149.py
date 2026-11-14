@@ -55,7 +55,7 @@ CASES = (
 )
 
 CAPS = {
-    "crav1-tasks-ready-to-build": 1900,
+    "crav1-tasks-ready-to-build": 1100,
     "crav1-verify-build-against-spec": 1500,
     "crav1-build-features": 1600,
     "crav1-finalize-commit": 1300,
