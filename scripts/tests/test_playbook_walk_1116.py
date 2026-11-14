@@ -55,7 +55,7 @@ class WalkChat1117(unittest.TestCase):
         self.assertIn("filled, confirmed lines only", w)
         self.assertIn("does not run plan, build, or merge", w)
         self.assertIn("While `/crav1-what-do-we-know-about-this` is the running skill, do not start `/crav1-help`",
-                      (ROOT / ".cursor/rules/crav1.mdc").read_text())
+                      (ROOT / "docs/reference/standing-rules.md").read_text())
 
     def test_reads_trials_and_gaps(self):
         w = (SK / "references/walk.md").read_text()

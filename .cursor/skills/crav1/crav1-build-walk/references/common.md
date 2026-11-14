@@ -4,9 +4,9 @@ Read this once, from `SKILL.md`. A step file does not repeat it.
 
 The walk opens a step skill by its sibling path, for example `../crav1-build-tasks/SKILL.md`, and follows that file. It does not start a slash command. A command-only refusal is not a reason to stop. The rule is `crav1-docs/reference/open-skill-file.md`.
 
-## One Next
+## The ending
 
-Print `ending` from `scripts/build_walk.py next --json <file>` (1.150.0). `Run next:` is first. Each command is alone in a code span. The next line names the branch and the short task name. Then `Waiting:` when a step is blocked or waits on a yes, then `Uncommitted:` when files are uncommitted, then the full Next line.
+Print `ending` from `scripts/build_walk.py next --json <file>` (1.150.0). `Run next:` is first. Each command is alone in a code span. The next line names the branch and the short task name. Then `Waiting:` when a step is blocked or waits on a yes, then `Uncommitted:` when files are uncommitted. The ending has no `Next:` line (1.157.0). The JSON `next` list keeps one sentence per Run next entry, as data; do not print it.
 
 The step skill's own suggestion is not printed. That includes `/crav1-open-pr` after a build or a commit, and `/crav1-review-pr` after a pull request opens.
 

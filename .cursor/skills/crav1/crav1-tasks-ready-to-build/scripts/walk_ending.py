@@ -13,9 +13,9 @@ check, and /crav1-build-walk all end a run in the same shape, built here:
   4. Loop, verify-behind, orphan and other Waiting lines.
   5. The not-ready reason, at most the one-line /crav1-build-tasks
      alternative, notes, and Uncommitted.
-  6. Next lines only where a skill's script still writes them (the build
-     walk's own entries, and a not-ready ready check). An agent never adds
-     a Next line of its own.
+  A walk ending has no Next line (1.157.0). Only a not-ready ready check
+  prints one, from not_ready_next(). An agent never adds a Next line of
+  its own.
 
 The skills print the text these functions return, as-is. The ready check's
 `reply` (header, counts, Result, ending, Source, Build map) is ready_reply().
@@ -131,7 +131,6 @@ def compose(
     alternatives=None,
     notes=None,
     uncommitted=None,
-    next_lines=None,
 ) -> str:
     """The one ending, in the shared order. Empty parts are left out."""
     parts: list[str] = []
@@ -163,10 +162,6 @@ def compose(
             parts.append(str(note))
     if uncommitted:
         parts.append(_prefixed(uncommitted, "Uncommitted"))
-    if next_lines:
-        lines = [str(line) for line in next_lines if str(line).strip()]
-        if lines:
-            parts.append("\n".join(lines))
     return "\n\n".join(parts)
 
 

@@ -101,7 +101,8 @@ Install:
 ### Reference
 
 - [Skills reference](reference/skills.md). Every command and subagent, by lane, with one page each. Generated from [`skills.yaml`](reference/skills.yaml).
-- [How a run ends](reference/run-ending.md). One `Next:` line, `Waiting:` only when a step is blocked, and `Uncommitted:` when files changed (1.122.0).
+- [How a run ends](reference/run-ending.md). One `Next:` line, `Waiting:` only when a step is blocked, and `Uncommitted:` when files changed (1.122.0). The ready checks and the build walk end with the Run next block and no `Next:` line (1.157.0).
+- [Standing rules, in full](reference/standing-rules.md). The full text and examples of the short rules in `crav1.mdc`, the rule loaded into every session (1.157.0).
 - [Running a kit script](reference/running-scripts.md). On Windows use `python`, elsewhere `python3`, then `py -3`, with `PYTHONUTF8=1` and `-X utf8`. The Store alias message means that command was not found (1.144.0).
 - [Question cards](reference/question-cards.md). The recommended choice, plus the card's free-text answer for typed changes. No option whose only job is to send the user to type somewhere else (1.130.0). A batch of several items prints a findings table in that reply immediately before the card, and the card names each item (1.145.0).
 - [Opening another kit skill](reference/open-skill-file.md). Open the sibling `SKILL.md` with the file-read tool. A command-only refusal is not a reason to stop (1.134.0).

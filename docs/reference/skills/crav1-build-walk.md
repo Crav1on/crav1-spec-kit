@@ -30,6 +30,8 @@ A task that needs code from an unmerged branch is cut from that branch. The prog
 
 1.156.0: the in-walk and branch-run endings are built by the shared walk ending (`scripts/walk_ending.py`), so for the same ready branches the Run next entries match the ready check word for word. The skill points at that ending instead of describing it.
 
+1.157.0: every walk ending, one task or a whole branch, is the Run next block first, then what was built, what is left, and Waiting. The script no longer writes a `Next:` line under it. A held step (an Approval needed item, a live yes, a pull request still to merge, someone else's branch) says why on a `Waiting:` line instead, and with no work branch left Run next is [`/crav1-verify-build-against-spec`](crav1-verify-build-against-spec.md). The JSON `next` list still has one sentence per Run next entry, and is not printed.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.

@@ -3,7 +3,8 @@
 
 One progress file per work branch. The spec, plan, and tasks stay the source
 of truth. This script records position, the normalized hashes a step covered,
-the merge list, and the single Next line for the current state. It does not
+the merge list, and the ending for the current state (Run next first, no
+Next line since 1.157.0). It does not
 push, open a pull request, merge, or run a live change. Those wait for a yes
 in the walk. It never rebases.
 
@@ -65,8 +66,8 @@ HASH_LINE = re.compile(
     r"|^(?:  )?Content stamp: normalized$"
 )
 
-# While one branch is in progress the walk prints one Next. These are the
-# step-skill lines that must not be printed beside it.
+# While one branch is in progress the walk prints only its own ending. These
+# are the step-skill lines that must not be printed beside it.
 SUPPRESSED = {
     "confirm-owner": ["/crav1-open-pr", "/crav1-merge-pr"],
     "approval": ["/crav1-build-tasks", "/crav1-open-pr"],
@@ -591,12 +592,15 @@ def _entry(command: str, because: str, tasks: list, branch: str, slug: str | Non
 
 
 def _compose_ending(entries: list, waiting, uncommitted) -> str:
-    """Run next, Waiting, Uncommitted, then this walk's Next lines (shared order, 1.156.0)."""
+    """Run next, Waiting, Uncommitted (shared order, 1.156.0).
+
+    No Next line is printed (1.157.0). Each entry's `next` sentence stays in
+    the JSON, one per Run next entry, in the same order.
+    """
     return ending_mod().compose(
         run=[entry["run"] for entry in entries if entry.get("run")],
         waiting=waiting or None,
         uncommitted=uncommitted or None,
-        next_lines=[entry["next"] for entry in entries if entry.get("next")],
     )
 
 
@@ -714,18 +718,25 @@ def _because(phase: str, state: dict) -> tuple[str, str]:
         nxt_tasks = _task_list(state.get("next_tasks") or [])
         if nxt:
             return ("/crav1-build-walk", f"{nxt_tasks or 'the next task'} can start on {nxt}")
-        return ("/crav1-build-walk", "no work branch remains")
+        return ("/crav1-verify-build-against-spec", "no work branch remains")
     if owner == "other":
         return ("/crav1-build-walk", f"the walk is on {branch} in other-owner mode")
     return ("/crav1-build-walk", f"the walk is on {branch}")
 
+
+# Phases that wait on a person or a merge. With no Next line (1.157.0), the
+# reason is a Waiting line when the caller passed none.
+WAIT_PHASES = {"confirm-owner", "approval", "live-yes", "wait-merge"}
 
 # Phases that other-owner mode must never enter.
 OTHER_FORBIDDEN = {"open-pr", "merge-base", "merge-pr"}
 
 
 def next_for(state: dict) -> dict:
-    """The walk ending. Run next is first. One full Next line per entry.
+    """The walk ending. Run next is first, and the ending has no Next line (1.157.0).
+
+    `next` keeps one full Next sentence per Run next entry, in the same
+    order, as data. It is not printed.
 
     While this branch is in progress, the first entry continues the walk.
     Each other branch whose tasks can start is its own entry. Grouping is
@@ -751,6 +762,9 @@ def next_for(state: dict) -> dict:
     if owner == "other" and phase in OTHER_FORBIDDEN:
         phase = "comment" if state.get("pushed") and not state.get("commented") else "wait-merge"
     command, because = _because(phase, state)
+    if not waiting and phase in WAIT_PHASES:
+        # No Next line carries the reason any more (1.157.0): say it as Waiting.
+        waiting = f"Waiting: {because[:1].upper()}{because[1:]}."
     branch = state.get("branch") or ""
     tasks = state.get("tasks") or []
     entries = []

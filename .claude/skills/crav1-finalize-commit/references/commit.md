@@ -9,7 +9,12 @@
 6. If the message has any line that was **not** in the draft (a `Co-authored-by`, `Signed-off-by`, `Generated with` or other trailer from Cursor, Claude Code or another tool), read [references/added-lines.md](added-lines.md).
 7. After the commit message is settled (including a one-time strip of added lines), follow Which step stays Next in run-ending.md (1.123.0, build walk 1.142.0). An unfinished specify walk comes first. An unfinished build-progress file for this branch comes first too. On a base branch, name a push, because a pull request cannot open from that branch into itself. A failed commit has no next line.
 
-   Next: /crav1-build-walk, because that walk has not finished this branch.
+   Unfinished build walk on this branch: a Run next entry, not a `Next:` line (1.157.0). The command resumes that walk: the branch for a `Run: whole branch` file, otherwise the file's first unticked `T#`.
+
+   Run next:
+
+   `/crav1-build-walk orders-api feat/orders-cicd`
+   continue feat/orders-cicd, the build walk has not finished this branch
 
    On a feature branch with no unfinished walk:
 

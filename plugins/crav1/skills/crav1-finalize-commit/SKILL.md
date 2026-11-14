@@ -95,7 +95,7 @@ The final message is exactly what this skill drafted. Any other line: read [refe
 - Do not install a hook to enforce the work-item line. Do not block the commit when `work-item.md` is missing. The only hook is the trailer hook, after `strip trailers`.
 - Do not change product files except the persist rules the draft skill already writes, and the trailer hook and its saved answer (`.githooks/commit-msg`, `trailer-hook` rule). Cursor: `.cursor/rules/draft-commit-style.mdc` or `.cursor/rules/draft-commit-gitlog.mdc`. Claude Code project: `.claude/rules/draft-commit-style.md` or `.claude/rules/draft-commit-gitlog.md`. Claude Code user: `~/.claude/rules/draft-commit-style.md` or `~/.claude/rules/draft-commit-gitlog.md`.
 - Never commit implementation code on a base branch ([references/base-branch.md](references/base-branch.md)).
-- Never push and never rebase. Do not open a PR. This run makes at most two commits: the drafted commit, and one merge commit when the branch was behind. Do not commit a notes index rebuild on its own. After a successful commit, the Next line follows run-ending.md. Do not invoke the command it names.
+- Never push and never rebase. Do not open a PR. This run makes at most two commits: the drafted commit, and one merge commit when the branch was behind. Do not commit a notes index rebuild on its own. After a successful commit, the ending follows run-ending.md. Do not invoke the command it names.
 
 ## Run ending (1.122.0)
 
