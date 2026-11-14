@@ -337,7 +337,9 @@ def stray_next_problems(kit):
                 continue
             with open(path, encoding="utf-8") as fh:
                 text = fh.read()
-            for lineno, why in stray_next_hits(text, name in READY_CHECK_SKILLS):
+            # Since 1.157.0 no skill shows a `Next: /crav1-build-walk` example:
+            # every walk ending, and a resume of one, is a Run next entry.
+            for lineno, why in stray_next_hits(text, True):
                 out.append(
                     f"{os.path.relpath(path, kit)}:{lineno}: tells the agent to write {why}; "
                     "the ending has one Run next block and no Next: line (1.153.0)"

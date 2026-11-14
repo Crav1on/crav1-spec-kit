@@ -2,6 +2,16 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.157.0 (2026-11-14)
+
+The rule file loaded into every session is short again, and every build-walk ending is only the Run next block. A minor release because the always-loaded rule and the walk ending change.
+
+- **A shorter always-loaded rule.** `crav1.mdc` drops from about 1,175 to about 655 words, close to the 650 of 1.42.0. It keeps only what every session needs: specs are the source of truth, the six startup options, the generated order, follow the running skill's own rules, call `/crav1-help` for an order, how a run ends, asking (no re-asking, stated defaults, one batch, one final yes, at most four options, the recommended one first, plain choice words and never `--flags`), never rebase and catch up by merging the base in, no code on a base branch, edit with the host's edit tool, run only named scripts, name local files as code spans, never read production data, and do not scaffold.
+- **Nothing lost.** The longer text of each rule, with its examples and edge cases, moved word for word to a new page, `docs/reference/standing-rules.md`, that ships next to the skills as `crav1-docs/reference/standing-rules.md`. The rule points at it. The interpreter order stays in `running-scripts.md`, the card rules in `question-cards.md`, and the base-branch rules in `code-branch.md`.
+- **Walk endings are Run next only.** `/crav1-build-walk`, for one task or a whole branch, ends with the Run next block first, then what was built, what is left, and Waiting. The script no longer writes a `Next:` line under it. When a step is held (an Approval needed item, a live yes, a pull request still to merge, someone else's branch), the reason is a `Waiting:` line. With no work branch left, Run next is `/crav1-verify-build-against-spec`.
+- **Commit after a paused walk.** When `/crav1-finalize-commit` finds an unfinished build walk on the branch, it now ends with a Run next entry holding the command that resumes it, `/crav1-build-walk <slug> <branch>` for a whole-branch run or `/crav1-build-walk <slug> T#` for one task, instead of a bare `Next: /crav1-build-walk` line.
+- **Tests.** The rule stays at or under 700 words, every rule that moved can still be found word for word, the walk endings have no `Next:` line, held steps say why on a Waiting line, and no skill file shows a `Next: /crav1-build-walk` example.
+
 ## 1.156.0 (2026-11-14)
 
 The ready check prints its own ending, the three walks share one ending, and the short reply is the default. A minor release because the readiness output, its default, and a choice word change.
@@ -138,16 +148,5 @@ A recorded yes is not a missing yes, and a ready slice's next step is the build 
 
 - **Permission block.** When a live command, such as a `(Runs live)` task's `apply`, was refused by the coding assistant's own permission check, and the user's yes is already on record, `/crav1-build-tasks` and the live step of `/crav1-build-walk` do not say the yes is missing. Waiting says the yes is on record and the check blocked the command. The offer is only: run that exact command, or allow that one command and rerun. Next is the build step again after the command has run. The lines do not suggest working around the check. A yes that is not on record stays the missing-yes path. `scripts/permission_block.py` distinguishes the two.
 - **Ready ending.** When `/crav1-tighten-and-plan-ready-to-build` finishes `ready`, or `ready-partial` with tasks that can start, each Next line recommends `/crav1-build-walk`, with the T number beside the short name and the branch, and names `/crav1-build-tasks` as the alternative for one task without the walk. The same `next_lines` are what `/crav1-tasks-ready-to-build` prints. A `not-ready` result does not recommend the walk. The walk still does not run either command.
-
-## 1.142.0 (2026-11-12)
-
-One guided walk for the build side of a slice. A minor release because `/crav1-build-walk` is a new command, a step skill's Next is replaced while that walk runs, and a live task records the user's own yes.
-
-- **Command.** `/crav1-build-walk` is in the Build lane. It walks one work branch through build (`/crav1-build-tasks`), verify, `/crav1-finalize-commit`, `/crav1-open-pr`, merging the base into the branch, merging the pull request, the tick, and the next task. It opens those skills by file. It does not replace them. A step that writes, pushes, opens, or merges asks `yes` first. It never rebases.
-- **One Next.** While one branch is in progress the reply has one `Next:` line, the walk's. A step skill's own Next, such as `/crav1-open-pr` after a build, is not printed. Started from a ready-to-build report, before a branch is chosen, the walk prints one Next per ready branch, with the T number beside the task name.
-- **Progress.** One file per work branch, `docs/specs/<slug>/build-progress/<branch>.md`. The file name writes each `/` as `--`. Hashes follow the walk-progress rule: `Content stamp: normalized` ignores line endings, a checkbox, a `(PR n)` or `(done)` note, and a `(live yes: …)` note. A stamp-only merge conflict is settled by `build_walk.py resolve-stamps`. `/crav1-finalize-commit` runs that on the pull path. `/crav1-update-kit` leaves the file alone.
-- **Other-owner mode.** When the pull request author or a commit author is someone else, the walk confirms before `switch`. In that mode it never opens a pull request, never merges the base into the branch, and never merges or completes the pull request. It posts one comment per push. It edits the description only on `edit description`. Ticks wait until that pull request is merged.
-- **Stacking.** Work may continue on other branches while earlier branches are unmerged. A task that needs code from an unmerged branch is cut from that branch, not from `develop`. The progress file and the report show the merge list, child first, back into the branch it was cut from. A merged or deleted branch is not offered. The offer uses the 1.140.0 helper.
-- **Runs live.** A task marked `(Runs live)` gets a script, a dry run (`check`), then the user's yes before the live run. The yes is `(live yes: <name>, <date>)` on the task line. Without that yes the script may be written and the task stays unticked. An unapproved `## Approval needed` item holds the task and the Next line is `/crav1-record-approval` or the draft request. An `Approved:` line does not replace the user's own yes.
 
 The newest 15 releases are above. The full changelog is https://github.com/Crav1on/crav1-spec-kit/blob/main/CHANGELOG.md.

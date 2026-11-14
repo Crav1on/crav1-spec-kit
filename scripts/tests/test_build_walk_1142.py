@@ -374,7 +374,8 @@ class RunNext(unittest.TestCase):
     def test_in_walk_ending_puts_the_command_alone_then_the_branch(self):
         result = bw.next_for(state(phase="verify", slug="orders-api", spec_count=2))
         ending = result["ending"]
-        self.assertLess(ending.index("Run next:"), ending.index("Next:"))
+        self.assertTrue(ending.startswith("Run next:"))
+        self.assertNotIn("Next:", ending.replace("Run next:", ""))  # 1.157.0
         commands = [line for line in ending.splitlines() if line.startswith("`/crav1-build-walk")]
         self.assertEqual(commands, ["`/crav1-build-walk orders-api T3`"])
         detail = ending.splitlines()[ending.splitlines().index(commands[0]) + 1]

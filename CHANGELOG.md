@@ -2,6 +2,16 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.157.0 (2026-11-14)
+
+The rule file loaded into every session is short again, and every build-walk ending is only the Run next block. A minor release because the always-loaded rule and the walk ending change.
+
+- **A shorter always-loaded rule.** `crav1.mdc` drops from about 1,175 to about 655 words, close to the 650 of 1.42.0. It keeps only what every session needs: specs are the source of truth, the six startup options, the generated order, follow the running skill's own rules, call `/crav1-help` for an order, how a run ends, asking (no re-asking, stated defaults, one batch, one final yes, at most four options, the recommended one first, plain choice words and never `--flags`), never rebase and catch up by merging the base in, no code on a base branch, edit with the host's edit tool, run only named scripts, name local files as code spans, never read production data, and do not scaffold.
+- **Nothing lost.** The longer text of each rule, with its examples and edge cases, moved word for word to a new page, `docs/reference/standing-rules.md`, that ships next to the skills as `crav1-docs/reference/standing-rules.md`. The rule points at it. The interpreter order stays in `running-scripts.md`, the card rules in `question-cards.md`, and the base-branch rules in `code-branch.md`.
+- **Walk endings are Run next only.** `/crav1-build-walk`, for one task or a whole branch, ends with the Run next block first, then what was built, what is left, and Waiting. The script no longer writes a `Next:` line under it. When a step is held (an Approval needed item, a live yes, a pull request still to merge, someone else's branch), the reason is a `Waiting:` line. With no work branch left, Run next is `/crav1-verify-build-against-spec`.
+- **Commit after a paused walk.** When `/crav1-finalize-commit` finds an unfinished build walk on the branch, it now ends with a Run next entry holding the command that resumes it, `/crav1-build-walk <slug> <branch>` for a whole-branch run or `/crav1-build-walk <slug> T#` for one task, instead of a bare `Next: /crav1-build-walk` line.
+- **Tests.** The rule stays at or under 700 words, every rule that moved can still be found word for word, the walk endings have no `Next:` line, held steps say why on a Waiting line, and no skill file shows a `Next: /crav1-build-walk` example.
+
 ## 1.156.0 (2026-11-14)
 
 The ready check prints its own ending, the three walks share one ending, and the short reply is the default. A minor release because the readiness output, its default, and a choice word change.

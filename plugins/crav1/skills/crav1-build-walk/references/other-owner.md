@@ -10,4 +10,4 @@ After a push, write one pull request comment that says what was pushed. One push
 
 `edit description` is the only way to change the description, and only because this run asked. Without that word, leave the description as it is.
 
-Ticks for tasks on this branch wait until that pull request is merged. The row stays `[ ]`. The Next line says the ticks are waiting. Do not tick early.
+Ticks for tasks on this branch wait until that pull request is merged. The row stays `[ ]`. The Waiting line says the ticks are waiting. Do not tick early.

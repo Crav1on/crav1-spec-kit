@@ -2,15 +2,13 @@
 
 Read this when no branch is chosen, including when the user started from a ready-to-build report.
 
-Run `scripts/build_walk.py next --json <file>` with `"mode": "grouping"`. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. Each ready branch is one parallel piece of work. The report prints one next line per branch. The line names each task as `T#` plus the short name, then the branch.
+Run `scripts/build_walk.py next --json <file>` with `"mode": "grouping"`. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. Each ready branch is one parallel piece of work. The ending prints one Run next entry per branch, and no `Next:` line (1.157.0). The line names each task as `T#` plus the short name, then the branch.
 
 ```text
 Run next:
 
 `/crav1-build-walk T3`
 branch feat/orders-host-setup-scripts, T3 Apply the CI build policy
-
-Next: /crav1-build-walk T3, because that work is on feat/orders-host-setup-scripts (T3 Apply the CI build policy).
 ```
 
 Each branch offers its next task. A branch with two or more open tasks also offers the whole branch, `/crav1-build-walk <slug> <branch>`, as a second entry (1.155.0). Each command is alone in the code span. A task that needs code from an unmerged branch is not offered as a second ready branch on `develop`. `SKILL.md` sends that case to the stack file. Do not open it from here.

@@ -1190,6 +1190,7 @@ skills:
   - '1.155.0: each start and each recorded task also writes this branch''s one status line in `walk-progress.md` (`- Branch run: feat/orders-cicd: running, T9 done, next T10 (<time>). Log: build-progress/feat--orders-cicd.md`), then `stopped before merge`, `stopped at T#: <why>`, or `merged` through `branch_run.py status`. The ending offers each other ready branch''s next task, plus the whole branch when it has two or more open tasks.'
   - '1.152.0: a mid-walk stop, such as before a merge step, does not clear the claim. The claim is cleared when the branch is merged or ticked, or the user says stop and is done with this walk, or `release claim`. A later ready check in a new session still holds that task as in progress.'
   - '1.156.0: the in-walk and branch-run endings are built by the shared walk ending (`scripts/walk_ending.py`), so for the same ready branches the Run next entries match the ready check word for word. The skill points at that ending instead of describing it.'
+  - '1.157.0: every walk ending, one task or a whole branch, is the Run next block first, then what was built, what is left, and Waiting. The script no longer writes a `Next:` line under it. A held step (an Approval needed item, a live yes, a pull request still to merge, someone else''s branch) says why on a `Waiting:` line instead, and with no work branch left Run next is `/crav1-verify-build-against-spec`. The JSON `next` list still has one sentence per Run next entry, and is not printed.'
   use_when: A ready slice should be built one work branch at a time, through the pull request and the merge
   table:
     reads: The spec folder, the build map, the pull request author, and commit authors
@@ -1354,6 +1355,7 @@ skills:
     git client; CRAV1 style or live git log, once or onward (deletable rule); does not commit unless they
     ask. Optional Azure Boards mention from `docs/specs/<slug>/work-item.md` is the last description line.'
   - '1.142.0: an unfinished build-progress file for this branch comes before the open-pr line. A build-progress conflict that is only hash lines is settled on the pull path, the same way as walk-progress.md.'
+  - '1.157.0: when an unfinished build walk is on this branch, the ending is a Run next entry with the command that resumes it, `/crav1-build-walk <slug> <branch>` for a whole-branch run, otherwise `/crav1-build-walk <slug> T#`, not a bare `Next: /crav1-build-walk` line.'
   - 'Commit (was `/crav1-finalize-commit`): Same draft, then **commit first**, then copy for your git
     client, change (edit or rewrite), or stop (no push). Keeps that mention through the HEAD check and the strip
     of the known tool trailers it did not write (the list in `references/tool-trailers.md`: Cursor, Claude Code,

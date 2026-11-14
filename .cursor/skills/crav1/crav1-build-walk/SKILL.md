@@ -21,7 +21,7 @@ It does not replace the skills it opens. It does not push, open a pull request, 
 
 Before it reads the spec folder, it fetches the specs repo (1.151.0). The rule is [references/sync.md](references/sync.md). When it starts on a branch, it writes an `In progress:` line in `docs/specs/<slug>/claims.md` and, after yes, commits and pushes only that file. The rule is [references/claims.md](references/claims.md). When the walk ends, or the user stops, it commits the files it wrote and pushes the specs repo after one yes.
 
-The in-walk reply prints `ending` from `scripts/build_walk.py next --json <file>`, as-is. That text is the shared walk ending (1.156.0): `Run next:` first, then Built and Left, then Waiting and Uncommitted, then the walk's own Next line. Each command is alone in a code span, such as `` `/crav1-build-walk orders-api T3` ``, and another ready branch gets its own entries. The shape is in [run-ending.md](../crav1-docs/reference/run-ending.md); never add a line of your own.
+The in-walk reply prints `ending` from `scripts/build_walk.py next --json <file>`, as-is. That text is the shared walk ending (1.156.0): `Run next:` first, then Built and Left, then Waiting and Uncommitted, and no Next line (1.157.0). Each command is alone in a code span, such as `` `/crav1-build-walk orders-api T3` ``, and another ready branch gets its own entries. The shape is in [run-ending.md](../crav1-docs/reference/run-ending.md); never add a line of your own.
 
 The JSON object is documented in [references/common.md](references/common.md). Fields include `phase`, `owner`, `branch`, `tasks`, `base`, `pr`, `slug`, `root`, `spec_count`, `ready_branches`, `waiting`, and `uncommitted`. `tasks` may be `"T3"` or `{"id": "T3", "title": "Apply the CI build policy"}`. `T3` and `3` are the same id. Bad input returns `{"ok": false, "code", "line"}` and does not traceback.
 
@@ -30,7 +30,7 @@ The JSON object is documented in [references/common.md](references/common.md). F
 Read [references/common.md](references/common.md) once. Then open only the file for the point you are at. Do not open the others yet.
 
 - The invocation names a branch, not a `T#`: read [references/branch-run.md](references/branch-run.md). It replaces the per-step cards with one start yes, until a stop.
-- No branch is chosen, or the user started from a ready-to-build report: read [references/grouping.md](references/grouping.md). That start may print one Next per ready branch.
+- No branch is chosen, or the user started from a ready-to-build report: read [references/grouping.md](references/grouping.md). That start prints one Run next entry per ready branch.
 - A `build-progress` file for this branch already exists: read [references/progress.md](references/progress.md). Resume reports the step. It does not start it.
 - The pull request author or a commit author is someone else: read [references/other-owner.md](references/other-owner.md) before any switch.
 - The task line has `(Runs live)`, or an Approval needed item holds it: read [references/live.md](references/live.md). A recorded yes that the assistant's permission check refused is not a missing yes (1.143.0).

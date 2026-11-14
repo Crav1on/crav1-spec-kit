@@ -57,6 +57,4 @@ Run next:
 
 `/crav1-build-walk T3`
 branch feat/orders-host-setup-scripts, T3 Apply the CI build policy
-
-Next: /crav1-build-walk T3, because the walk paused before verify.
 ```

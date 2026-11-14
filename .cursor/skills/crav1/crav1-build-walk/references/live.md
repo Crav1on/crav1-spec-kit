@@ -4,16 +4,26 @@ Read this when the task line contains `(Runs live)`, or an `## Approval needed` 
 
 `(Runs live)` means the build runs something live, such as a CI policy or a host setting. The order is fixed.
 
-1. An unapproved Approval needed item holds the task. Do not write the script yet. When the item has no `Asked:` line, the Next line is the draft request.
+1. An unapproved Approval needed item holds the task. Do not write the script yet. When the item has no `Asked:` line, Run next is the draft request, and the Waiting line says why (1.157.0).
 
 ```text
-Next: /crav1-show-or-ask-open-questions, because T4 Apply the CI build policy is held and that Approval needed item is unanswered.
+Run next:
+
+`/crav1-show-or-ask-open-questions`
+branch feat/orders-host-setup-scripts, T4 Apply the CI build policy
+
+Waiting: T4 Apply the CI build policy is held and that Approval needed item is unanswered.
 ```
 
-When it was asked, the Next line is the record command.
+When it was asked, Run next is the record command.
 
 ```text
-Next: /crav1-record-approval, because T4 Apply the CI build policy is held and that Approval needed item can be recorded.
+Run next:
+
+`/crav1-record-approval`
+branch feat/orders-host-setup-scripts, T4 Apply the CI build policy
+
+Waiting: T4 Apply the CI build policy is held and that Approval needed item can be recorded.
 ```
 
 An `Approved:` line clears that hold. It never replaces the user's own yes for the live run.
