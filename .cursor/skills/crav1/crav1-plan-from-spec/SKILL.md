@@ -47,41 +47,27 @@ Read `references/built-pieces.md` ("Built pieces (before any task)") only when a
 
 When **Built pieces** left a choice unanswered, stop. Do not write files yet.
 
-Write only:
-
-```text
-docs/specs/<slug>/plan.md
-docs/specs/<slug>/tasks.md
-```
+Write only `docs/specs/<slug>/plan.md` and `docs/specs/<slug>/tasks.md`.
 
 If `export/openspec/design.md` or `export/openspec/tasks.md` already exist, update them to **match** these files (same tasks, no extra scope). Do not create a full OpenSpec tree unless they asked `/crav1-export-spec` Format: OpenSpec.
 
 ### plan.md
 
-Use the template in this skill’s `assets/plan.md`. Fill:
-
-- **Constraints** — from spec constraints + accepted ADRs only
-- **Approach** — ordered steps for v0; reference diagrams
-- **Files likely touched** — real paths if a repo exists; otherwise proposed paths consistent with the spec, marked `(proposed)`
-- **Linter** — whether this repo has a linter or checker for the code those files will hold. See **Linter, before Build** in `references/checks.md`. Specify does not name the linter
-- **Requirements trace** — table: acceptance / REQ id → task ids
-- **Risks** — one entry per kept-open question, as **Blocks lines** in `references/write.md` says, and each stale research finding. One line per mark: the stale line, and the note path when there is one. Stale research does not block the plan. Do not clear the mark.
-- **Out of scope** — spec non-goals; do not plan them
-- **Left as committed** — only when the user left a piece; see `references/write.md` ("Left as committed").
+Use the template in this skill’s `assets/plan.md`. Fill each section as `references/write.md` ("plan.md") says: Constraints, Approach, Files likely touched, Linter (**Linter, before Build** in `references/checks.md`; Specify does not name the linter), the Trace table, Risks, Out of scope, and Left as committed.
 
 Stay inside v0. File-level, not class-by-class essays. No new product behavior. A piece marked already there is named in the trace as `already there` and has no rebuild task. A left piece has no task.
 
 ### Host setup tasks (1.115.0)
 
-A requirement that is a host setting with no file in the repo (a branch policy or required build, required reviewers, an environment approval, a variable group, a service connection) gets its own task marked `(host setup)`. Its verify is the script's `check` part reading the live setting, for example `infra/ado/develop-build-policy.sh check prints ok`. Pipeline YAML, templates and infrastructure as code stay ordinary code tasks. Read skill `crav1-host-setup`, `references/host-setup.md` for the split. A secret is a manual task: the plan names what to create and where, never a value.
+A host setting with no repo file is its own `(host setup)` task. Read `references/write.md` ("Host setup tasks") and skill `crav1-host-setup`, `references/host-setup.md`.
 
 ### Blocks lines
 
-The one exception to leaving `spec.md` alone: a `Blocks:` line under a kept-open question, `Blocks: T#` or `Blocks: none`, and an `## Approval needed` item from a constraint. Read `references/write.md` ("Blocks lines" and "Approval needed"). List each `Blocks:` line and each approval item in the recap.
+The one exception to leaving `spec.md` alone: a `Blocks:` line under a kept-open question, `Blocks: T#` or `Blocks: none`, and an `## Approval needed` item from a constraint. Read `references/write.md` ("Blocks lines" and "Approval needed"). The recap lists each `Blocks:` line and each approval item.
 
 ### tasks.md
 
-Read `references/write.md` ("tasks.md") and [references/checks.md](references/checks.md) before writing tasks: the line format, `(after: …)`, `(branch: …)`, and the mapping rules. Do not write test code.
+Read `references/write.md` ("tasks.md") and [references/checks.md](references/checks.md) before writing tasks: the line format, `(after: …)`, `(branch: …)`, and the mapping rules. Do not write test code. Then run `<interpreter> -X utf8 scripts/plan_check.py order --root <spec-folder>` and fix any loop or `after:` that names no task before the recap.
 
 ## Claimed tasks (1.151.0)
 
@@ -89,20 +75,11 @@ A task listed in `docs/specs/<slug>/claims.md` as `In progress:` is left unchang
 
 ## After writing
 
-Output only:
+Print the recap with one command, as `crav1-docs/reference/running-scripts.md` says, and show its stdout as-is. Never add, drop, or rewrite a line, and never write a second `Next` line:
 
-- Paths written
-- Task count and any acceptance line with no task, not marked `already there`, and not `left as committed` (must be none, or the plan failed)
-- Each built piece: already there, finish the gap, add a verify test, or left as committed
-- The branch read, when **Built pieces** ran
-- Any verify note with no kind, and any kept security check with no task (must be none, or you failed)
-- Kept-open questions parked as risks, one line each. The current-or-later batch is the only ask, and only when a leftover is unclear.
-- Each stale research finding listed under Risks, or that none was marked stale
-- These notes name the checks. `/crav1-verify-build-against-spec` is the gate that says they passed. Do not run it here.
-- The linter line: the tool and command, or that this repo has none for the code these tasks will touch.
-- One `Next` line, as `crav1-docs/reference/run-ending.md` says. Do not run it. Add the Uncommitted line when a file changed and is not committed. Do not name tighten-plan or build in this ending.
-- This branch is `spec/<slug>`: `Next: /crav1-open-pr, because this specify-only branch is not on the default branch yet.` Do not implement here.
-- Any other branch: `Next: /crav1-review-plan, because the plan is written and not reviewed.` When the plan says there is no linter, say build is not named until they add one or choose to go on without one. Do not install one.
+`<interpreter> -X utf8 scripts/plan_check.py recap --root <spec-folder> --branch <current branch> --facts <file>`
+
+It computes every line [references/recap.md](references/recap.md) lists, including the dependency waves and the one `Next` line that `crav1-docs/reference/run-ending.md` asks for (1.159.0). Add `--uncommitted <n>` when files changed and are not committed. `<file>` is JSON with what only you know: `built_pieces` (a list of `{piece, choice}`), `branch_read` when **Built pieces** ran, and `security_unmapped` (kept security checks with no task). A line it prints that must be none, and is not, means the plan failed: fix `plan.md` or `tasks.md` and run it again. When Python cannot run, follow that reference by hand.
 
 Do not start coding in this chat.
 

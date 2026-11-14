@@ -8,6 +8,8 @@
 
 Turn an accepted spec into a file-level plan.md and independently testable tasks.md.
 
+1.159.0: the After writing recap (paths written, task count, acceptance lines with no task, the dependency waves, verify notes with no kind, kept-open questions and their `Blocks:` lines, approval items, stale research, the linter line and the one `Next` line) is printed by `scripts/plan_check.py recap`; the agent passes only what it alone knows (built pieces, the branch read, unmapped security checks). `plan_check.py order` checks the waves after `tasks.md` is written. The After writing list moved word for word to `references/recap.md`, the plan.md section list and host setup tasks to `references/write.md`.
+
 1.141.0: a constraint that a named person gives a yes before something becomes an `## Approval needed` item, with `Person:` and `Holds:` for the tasks that do that work. It does not write `Approved:`.
 
 File-level `plan.md` and `tasks.md`; each verify note names the checks before code; names a linter or checker when the repo has one, and stops before Build when it does not; refuses to code and does not install a linter. When the spec is partial or `## In the code` names paths, reads that repo and branch and chooses finish the gap, add a verify test, or leave it before any task. A piece that already matches v0 is not a choice.

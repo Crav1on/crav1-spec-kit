@@ -2,6 +2,15 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.159.0 (2026-11-14)
+
+`/crav1-tighten-plan` and `/crav1-plan-from-spec` compute their own ordering, batches and endings, and both skill files are shorter. A minor release because both skills gain a script whose output they show as-is.
+
+- **One script for both.** `scripts/plan_check.py` ships with `/crav1-plan-from-spec`, and `/crav1-tighten-plan` ships a thin copy that runs it. `order` prints the dependency waves from the `(after: …)` marks, using the same sort as the ready check, and names a loop, an `after:` that names no task, tasks whose order is only guessed from the file, and task lines with no verify kind or no `(spec: …)` mark. `recap` prints the plan-from-spec After writing recap in its usual order, ending with its one `Next` line. `queue` prints the tighten-plan index and counts, and the one empty-queue `Next` line once no plan finding is open. `batch` prints the findings table and its card line together, through the same `batch_offer.py` as before. `reviewed` lowers `P# open` on the Reviewed line, keeps the date, and never adds a line.
+- **The same output.** The Next lines, the linter rule, the batch card with its table in the same reply, and the Reviewed line say exactly what they said before. The assistant still decides what is a finding, its tag, its options and its recommendation, and which built pieces and security checks apply. The script does the counting and the wording.
+- **Shorter skill files.** tighten-plan drops from 1,396 to about 1,100 words and plan-from-spec from 1,433 to about 1,140. Every rule that left a skill file moved word for word: tighten-plan's plan shapes, empty-queue lines, Reviewed line and suggest step to `references/issues.md`; plan-from-spec's After writing list to `references/recap.md`, and its plan.md sections and host setup tasks to `references/write.md`.
+- **Tests.** Each skill file stays under its new word cap, every moved rule can still be found word for word, the waves match the ready check's order, the recap and empty-queue Next lines match the references, the batch output is the same as `batch_offer.py` for the open plan findings, and the Reviewed line keeps its date and is never added.
+
 ## 1.158.0 (2026-11-14)
 
 The four pull-request skills share one page and one script for the steps they have in common, and each skill file is shorter. A minor release because the four skills gain a shared reference and a shared script.

@@ -8,6 +8,8 @@
 
 Walk plan.md/tasks.md issues one by one (including [`/crav1-review-plan`](crav1-review-plan.md) P#s).
 
+1.159.0: the index (remaining `P#` titles, the current one marked, plan or spec), the finding counts, the dependency waves and ordering problems, the batch card with its findings table, the one empty-queue `Next` line and the `Reviewed:` line come from `scripts/plan_check.py` (`order`, `queue`, `batch`, `reviewed`), a thin copy of the script that ships with [`/crav1-plan-from-spec`](crav1-plan-from-spec.md). The skill prints its output as-is. The typical plan shapes, the empty-queue rules, the Reviewed line, the items file and the suggest step moved word for word to `references/issues.md`.
+
 One plan issue at a time; patches plan/tasks only (spec findings go to tighten-spec)
 
 1.130.0: the batch is one card. `yes (Recommended)` applies every recommendation. Typed changes go on that card's free-text answer, for example `P1 A, P3 keep`. An item not mentioned keeps its recommendation. There is no Edits option.
