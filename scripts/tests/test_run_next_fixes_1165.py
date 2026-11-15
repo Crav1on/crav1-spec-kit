@@ -1,7 +1,8 @@
 """1.165.0: Run next fixes found on a real plan, on generic fixtures.
 
 1. The branch sentence is a clean plan sentence, else the step heading, else
-   left out. Plan notes (colon lists) never show.
+   left out. Plan notes (colon lists) never show. (1.166.0 changed this: see
+   test_branch_description_1166.py.)
 2. A long line is cut at a clause end or a word, never on a dangling word.
 3. A heading-like question (`Client certificate.`) gives way to the question.
 4. Tasks are listed in walk order; a task that cannot start says why, and
@@ -110,14 +111,17 @@ def readiness_text() -> str:
 
 class BranchSentence(unittest.TestCase):
     def test_clean_sentence_is_kept(self):
-        self.assertEqual(we.about_sentence("Record the decision. Then mail it."), "Record the decision.")
+        # Up to three clean sentences since 1.166.0.
+        self.assertEqual(we.about_sentence("Record the decision. Then mail it."), "Record the decision. Then mail it.")
 
-    def test_plan_notes_are_left_out(self):
-        self.assertEqual(we.about_sentence(NOTES), "")
+    def test_plan_notes_trim_to_opening_clause(self):
+        # 1.166.0: plan notes give their opening clause, not nothing.
+        self.assertEqual(we.about_sentence(NOTES), "The orders CI/CD branch, cut from develop after billing-ops.")
 
     def test_person_lead_falls_back_to_heading(self):
-        self.assertEqual(we.about_sentence(PERSON), "")
-        self.assertEqual(we.about_sentence(f"**Receipt API fixes** — {PERSON}"), "Receipt API fixes.")
+        # 1.166.0: the person lead is dropped and the clause after it kept.
+        self.assertEqual(we.about_sentence(PERSON), "GetReceipts answers 404 for a cursor that matches no stored receipt.")
+        self.assertEqual(we.about_sentence(f"**Receipt API fixes** — {PERSON}"), "GetReceipts answers 404 for a cursor that matches no stored receipt.")
         self.assertEqual(we.about_sentence(f"Receipt API fixes: {PERSON}"), "Receipt API fixes.")
 
     def test_no_full_stop_is_not_clean(self):
@@ -185,11 +189,12 @@ class EndToEnd(unittest.TestCase):
 
     def test_all_six(self):
         text = self.ending
-        # 1 and 5: no plan notes, no person in a branch sentence.
-        self.assertNotIn("cut from develop", text)
-        self.assertNotIn("Person A builds", text)
-        self.assertIn("**feat/orders-api-fixes**\nReceipt API fixes.\n2 open tasks:", text)
-        self.assertIn("**feat/orders-cicd**\n2 open tasks:", text)
+        # 1 and 5: no plan notes, no person in a branch sentence; since
+        # 1.166.0 every branch keeps a description.
+        self.assertNotIn("merge main into develop", text)
+        self.assertNotIn("Person A", text)
+        self.assertIn("**feat/orders-api-fixes**\n" + "GetReceipts answers 404 for a cursor that matches no stored receipt." + "\n2 open tasks:", text)
+        self.assertIn("**feat/orders-cicd**\nThe orders CI/CD branch, cut from develop after billing-ops.\n2 open tasks:", text)
         # 2: the long question is whole or cut at a word, never mid-word.
         line = next(row for row in text.splitlines() if "T25" in row and "open question" in row)
         quoted = line.split('"')[1]

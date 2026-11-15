@@ -2119,9 +2119,11 @@ def held_phrase(row):
     if match:
         what = re.split(r"(?<=[.!?])\s", match.group(1).strip(), maxsplit=1)[0]
         return f'approval "{what}" Waiting for {who}.'
-    match = re.search(r'open question "([^"]*)"', reason)
+    # Greedy to the last quote before the tag (1.166.0): a question that
+    # quotes another one keeps its inner quotes.
+    match = re.search(r'open question "(.*)"(?=\s+\(|\s+blocks the whole slice|\s*$)', reason)
     if match:
-        question = short_question(match.group(1))
+        question = short_question(match.group(1), quote=row.get("quote"))
         note = ""
         if "blocks the whole slice (recorded)" in reason.lower():
             note = " Holds the whole slice."
@@ -2131,11 +2133,12 @@ def held_phrase(row):
     return core or "held"
 
 
-def short_question(text, limit=160):
-    """The quoted open question, short (1.164.0, 1.165.0): see
-    walk_ending.question_text. A heading-like first sentence gives way to
-    the question itself, and a long line is cut at a clause end."""
-    return _ending_mod().question_text(text, limit)
+def short_question(text, limit=160, quote=None):
+    """The quoted open question, short (1.164.0, 1.165.0, 1.166.0): see
+    walk_ending.question_text. A heading-like first sentence, or a pointer
+    to a note, gives way to the question itself (the blockquote `quote`
+    when there is one), and a long line is cut at a clause end."""
+    return _ending_mod().question_text(text, limit, quote=quote)
 
 
 def _branch_order(branches):

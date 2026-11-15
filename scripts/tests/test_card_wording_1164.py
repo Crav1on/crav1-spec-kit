@@ -221,7 +221,7 @@ class RunNextLayout(unittest.TestCase):
             slug="orders-api", about="Build and test **orders-api** on every push. Then deploy to dev.")
         self.assertEqual(block, "\n".join([
             "**feat/orders-cicd**",
-            "Build and test orders-api on every push.",
+            "Build and test orders-api on every push. Then deploy to dev.",
             "2 open tasks:",
             "- T9 Add the pipeline",
             "- T10 Add the test stage",
@@ -234,7 +234,8 @@ class RunNextLayout(unittest.TestCase):
 
     def test_one_task_no_sentence_no_slug(self):
         block = self.we.branch_block("feat/orders-note", ["T5 Note the export"], first="T5 Note the export")
-        self.assertEqual(block, "**feat/orders-note**\n1 open task:\n- T5 Note the export\n\nRun T5:\n`/crav1-build-walk T5`")
+        # No plan step: the description comes from the task name (1.166.0).
+        self.assertEqual(block, "**feat/orders-note**\nNote the export.\n1 open task:\n- T5 Note the export\n\nRun T5:\n`/crav1-build-walk T5`")
 
     def test_open_map_line_under_build_map(self):
         reply = self.we.ready_reply("orders-api", "ready", None, "Run next:", build_map="docs/specs/orders-api/build-map.md")
