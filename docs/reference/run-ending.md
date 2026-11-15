@@ -23,7 +23,22 @@ Before a ready-check or walk ending, the reply has at most one short lead senten
    `/crav1-build-walk orders-api feat/orders-api-record`
    Run only T2, the first task:
    `/crav1-build-walk orders-api T2`
+
+   ---
+
+   **feat/orders-api-fixes**
+   Receipt API fixes.
+   2 open tasks:
+   - T43 Read the receipt body
+   - T8 Take in develop (waits on T5)
+
+   Run the whole branch:
+   `/crav1-build-walk orders-api feat/orders-api-fixes`
+   Run only T43, the first task:
+   `/crav1-build-walk orders-api T43`
    ```
+
+   Since 1.165.0 a `---` line, with a blank line on each side, stands between two branch blocks so they never run together in a Markdown viewer. The open tasks are listed in the order the walk runs them. A listed task that cannot start yet says why on its line, for example `- T8 Take in develop (waits on T5)`, and when the first listed task cannot start the label is `Run only T#, the first task that can start:`. The plain sentence is used only when the plan step's first sentence is clean: it ends with a full stop, has no colon list, and does not open with a person (`Person A builds ...`). Otherwise the step's heading in plain words is used, or the line is left out. A long line, a sentence or a held question, is cut at a clause end or a word, never on a dangling word such as `the`, and a held question that opens with a heading such as `Client certificate.` shows the question itself.
 2. `Held:` lines, then `Branch runs:` status lines.
 3. For a branch run: `Built on <branch>:` (one line per task, with its commit and tests), then `Left:`.
 4. `Loop:`, verify-behind, orphan verify rows, and other `Waiting:` lines.

@@ -6,9 +6,10 @@ check, and /crav1-build-walk all end a run in the same shape, built here:
 
   1. Run next, first. One block per ready branch (1.164.0): the bold
      branch, one plain sentence from its plan step, `<n> open tasks:` one
-     per line, then `Run the whole branch:` and `Run only T#, the first
-     task:`, each command alone in its code span on the line under its
-     label. One open task: `Run T#:` and one command.
+     per line in walk order, then `Run the whole branch:` and `Run only T#,
+     the first task:`, each command alone in its code span on the line
+     under its label. One open task: `Run T#:` and one command. A `---`
+     line sits between two blocks (1.165.0).
   2. Held lines, then Branch runs status lines.
   3. Built (one line per task) and Left, for a branch run.
   4. Loop, verify-behind, orphan and other Waiting lines.
@@ -92,18 +93,135 @@ def branch_entry(open_labels, branch_name, slug=None):
     return f"`{command}`\nbranch {branch_name}, every open task: {', '.join(names)}"
 
 
-def about_sentence(text, limit=140):
-    """One plain sentence of what a branch does, from its plan step (1.164.0)."""
+# Words a cut line must not end on (1.165.0).
+DANGLING = frozenset(
+    "a an the and or but nor of to in on at by for from with into onto via "
+    "that which who whose when where than as if so its their his her our your".split()
+)
+PERSON_LEAD = re.compile(
+    r"^(?:[A-Z][\w'-]*(?:\s+[A-Z][\w'-]*){0,3})\s+"
+    r"(?:builds|owns|writes|takes|handles|reviews|merges|leads|drives|implements)\b"
+)
+SENTENCE_SPLIT = re.compile(r"(?<=[.!?])\s+")
+
+
+def _plain(text):
     one = re.sub(r"[*_`]+", "", str(text or ""))
-    one = re.sub(r"\s+", " ", one).strip()
-    if not one:
+    return re.sub(r"\s+", " ", one).strip()
+
+
+def shorten(text, limit=160):
+    """Shorten one line at a clause end, else a word boundary (1.165.0).
+
+    A line that fits is returned as is. Otherwise the cut is at the last
+    `, ` `; ` or ` — ` that keeps at least half the limit, else at the last
+    space. A dangling article, preposition or conjunction at the end is
+    dropped, then `…` marks the cut. A word is never split.
+    """
+    one = _plain(text)
+    if len(one) <= limit:
+        return one
+    room = one[: limit - 1]
+    cut = -1
+    for mark in (", ", "; ", " — ", " - "):
+        cut = max(cut, room.rfind(mark))
+    if cut < limit // 2:
+        cut = room.rfind(" ")
+    if cut <= 0:
+        cut = len(room)
+    head = room[:cut].rstrip(" ,;:—-")
+    words = head.split(" ")
+    while len(words) > 1 and words[-1].lower().strip(",;:") in DANGLING:
+        words.pop()
+    return " ".join(words).rstrip(" ,;:—-") + "…"
+
+
+def _sentences(text):
+    return [part.strip() for part in SENTENCE_SPLIT.split(_plain(text)) if part.strip()]
+
+
+def _clean_sentence(sentence):
+    """A plain description: ends with a full stop, no colon list, no person lead."""
+    if not sentence.endswith("."):
+        return False
+    if ":" in sentence:
+        return False
+    if PERSON_LEAD.match(sentence):
+        return False
+    return len(sentence.split()) >= 3
+
+
+def step_heading(text):
+    """A plan step's heading in plain words, or "" (1.165.0).
+
+    The heading is a leading bold span (`**Export the receipt**`), or the
+    words before ` — ` or a first `:` when they are short (at most eight
+    words, no comma) and do not lead with a person.
+    """
+    raw = str(text or "").strip()
+    match = re.match(r"\*\*([^*]{2,80})\*\*", raw)
+    if match:
+        head = match.group(1)
+    else:
+        plain = _plain(raw)
+        match = re.match(r"(.{2,80}?)(?:\s+[—–]\s+|:\s)", plain)
+        if not match:
+            return ""
+        head = match.group(1)
+        if "," in head or len(head.split()) > 8:
+            return ""
+    head = _plain(head).strip(" .:;—–-")
+    if not head:
         return ""
-    one = re.split(r"(?<=[.!?])\s", one, maxsplit=1)[0]
-    if len(one) > limit:
-        one = one[: limit - 1].rsplit(" ", 1)[0].rstrip(" ,;:") + "…"
-    if one[-1] not in ".!?…":
-        one += "."
-    return one[:1].upper() + one[1:]
+    if re.match(r"^(?:[A-Z][\w'-]*\s+){0,3}[A-Z][\w'-]*\s+(?:builds|owns|writes)\b", head):
+        return ""
+    return head[:1].upper() + head[1:] + "."
+
+
+def about_sentence(text, limit=160):
+    """One plain sentence of what a branch does, from its plan step (1.165.0).
+
+    Only a clean first sentence counts: it ends with a full stop, has no
+    colon list and does not open with a person (`Person A builds ...`).
+    Otherwise the step's heading in plain words. Otherwise "" and the line
+    is left out. A long sentence is cut at a clause end (shorten()).
+    """
+    raw = str(text or "")
+    body = raw
+    match = re.match(r"\s*\*\*[^*]{2,80}\*\*\s*[—–:.-]?\s*", raw)
+    if match:
+        body = raw[match.end():]
+    sentences = _sentences(body)
+    if sentences and _clean_sentence(sentences[0]):
+        one = sentences[0]
+        if len(one) > limit:
+            one = shorten(one, limit)
+        return one[:1].upper() + one[1:]
+    return step_heading(raw)
+
+
+def question_text(text, limit=160):
+    """The quoted open question, short (1.165.0).
+
+    No markdown markers such as `**New:**`. The first sentence, unless it is
+    a heading-like fragment (fewer than four words, such as `Client
+    certificate.`): then the first sentence that ends with `?`, else the next
+    real sentence. Cut at a clause end, never mid-word.
+    """
+    one = re.sub(r"\*\*[^*]{0,40}:\*\*\s*", "", str(text or ""))
+    sentences = _sentences(one)
+    if not sentences:
+        return ""
+    pick = sentences[0]
+    if len(pick.split()) < 4 and not pick.endswith("?"):
+        rest = sentences[1:]
+        asked = [s for s in rest if s.endswith("?")]
+        real = [s for s in rest if len(s.split()) >= 4]
+        if asked:
+            pick = asked[0]
+        elif real:
+            pick = real[0]
+    return shorten(pick, limit)
 
 
 def _task_id(label):
@@ -111,14 +229,18 @@ def _task_id(label):
     return match.group(1) if match else str(label).strip()
 
 
-def branch_block(branch_name, open_labels, first=None, slug=None, about=None):
-    """One ready branch in Run next (1.164.0).
+def branch_block(branch_name, open_labels, first=None, slug=None, about=None, waits=None):
+    """One ready branch in Run next (1.164.0, 1.165.0).
 
     The bold branch, one plain sentence from its plan step (left out when
-    there is none), the open tasks one per line, then each command alone in
-    its code span under a label line: the whole branch first, then only the
-    first task. A branch with one open task gets `Run T#:` and one command.
+    there is none), the open tasks one per line in the order the walk runs
+    them, then each command alone in its code span under a label line: the
+    whole branch first, then only the first task. A listed task that cannot
+    start yet says why, `(waits on T5)`, from `waits` (T# to reason). When
+    the first listed task cannot start, the task command names the first one
+    that can and says so. One open task: `Run T#:` and one command.
     """
+    waits = {str(key): str(value) for key, value in (waits or {}).items() if value}
     names = [str(label).strip() for label in open_labels or [] if str(label).strip()]
     first = str(first).strip() if first else (names[0] if names else "")
     if not names and first:
@@ -131,7 +253,9 @@ def branch_block(branch_name, open_labels, first=None, slug=None, about=None):
         lines.append(sentence)
     count = len(names)
     lines.append(f"{count} open task{'' if count == 1 else 's'}:")
-    lines.extend(f"- {name}" for name in names)
+    for name in names:
+        why = waits.get(_task_id(name))
+        lines.append(f"- {name} ({why})" if why else f"- {name}")
     lines.append("")
     first_id = _task_id(first)
     task_cmd = f"/crav1-build-walk {slug} {first_id}" if slug else f"/crav1-build-walk {first_id}"
@@ -142,26 +266,37 @@ def branch_block(branch_name, open_labels, first=None, slug=None, about=None):
         branch_cmd = f"/crav1-build-walk {slug} {branch_name}" if slug else f"/crav1-build-walk {branch_name}"
         lines.append("Run the whole branch:")
         lines.append(f"`{branch_cmd}`")
-        lines.append(f"Run only {first_id}, the first task:")
+        if _task_id(names[0]) == first_id:
+            lines.append(f"Run only {first_id}, the first task:")
+        else:
+            lines.append(f"Run only {first_id}, the first task that can start:")
         lines.append(f"`{task_cmd}`")
     return "\n".join(lines)
 
 
-def run_entries(labels, branch_name, slug=None, open_labels=None, about=None):
+def run_entries(labels, branch_name, slug=None, open_labels=None, about=None, waits=None):
     """One Run next block per ready branch (1.164.0): see branch_block."""
     labels = [label for label in labels or [] if str(label).strip()]
     if not labels:
         return []
     opens = list(open_labels) if open_labels is not None else list(labels)
-    return [branch_block(branch_name, opens, first=labels[0], slug=slug, about=about)]
+    return [branch_block(branch_name, opens, first=labels[0], slug=slug, about=about, waits=waits)]
+
+
+BLOCK_RULE = "\n\n---\n\n"
 
 
 def run_block(entries) -> str:
-    """`Run next:` and each entry, a blank line between entries."""
-    runs = [str(entry) for entry in entries or [] if str(entry).strip()]
+    """`Run next:` and each entry (1.165.0).
+
+    A horizontal rule (`---`, with a blank line on each side so it never
+    turns the line above into a heading) sits between two entries, so each
+    branch block stands apart in any Markdown viewer.
+    """
+    runs = [str(entry).strip("\n") for entry in entries or [] if str(entry).strip()]
     if not runs:
         return ""
-    return "Run next:\n\n" + "\n\n".join(runs)
+    return "Run next:\n\n" + BLOCK_RULE.join(runs)
 
 
 # ---------- The ending ----------

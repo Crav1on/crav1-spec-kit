@@ -2,6 +2,17 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.165.0 (2026-11-15)
+
+Fixes to the Run next ending from 1.164.0, found when it ran on a real plan. A minor release because the ending reads differently in the ready check, the tighten-and-plan ready check and the build walk.
+
+- **Clear gaps between branches.** A `---` line, with a blank line on each side, now stands between two branch blocks in Run next, so the next branch's name never sits right under the previous command in a Markdown viewer.
+- **The branch sentence is a description, not plan notes.** The line under a branch is the plan step's first sentence only when it is clean: it ends with a full stop, has no colon list and does not open with a person, such as `Person A builds PR 73: ...`. Otherwise it is the step's heading in plain words (a bold lead, or short words before ` — ` or `:`). Otherwise the line is left out. So a person's name no longer leads that line.
+- **Cuts at a clause or a word.** A long branch sentence or held question is cut at a clause end, else at a word, never on a dangling word such as `the` or `that`. There is a bit more room, about 160 characters.
+- **The question, not its heading.** A held question that opens with a short heading, such as `Client certificate.`, shows the question sentence (the one ending in `?`), or else the next real sentence.
+- **The first task matches the list.** A branch's open tasks are listed in the order the walk runs them. A task that cannot start yet says why on its line, for example `- T8 Take in develop (waits on T5)`. When the first listed task cannot start, the task command says `Run only T43, the first task that can start:`.
+- `run-ending.md`, the build-map fallback reference, the grouping reference and both walkthroughs show the new form. Tests: `scripts/tests/test_run_next_fixes_1165.py`.
+
 ## 1.164.0 (2026-11-15)
 
 The kit's question cards now share one wording rule, and an automatic check holds the walks and the pull-request skills to it. A minor release because several cards and Waiting lines read differently, and settle-and-push asks one card instead of two.

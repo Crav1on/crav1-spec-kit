@@ -271,13 +271,13 @@ def branch_entry(open_labels, branch_name, slug=None):
     return _ending_mod().branch_entry(open_labels, branch_name, slug=slug)
 
 
-def run_entries(labels, branch_name, slug=None, open_labels=None, about=None):
+def run_entries(labels, branch_name, slug=None, open_labels=None, about=None, waits=None):
     """Run next block for one ready branch (1.164.0); shared in walk_ending.py."""
-    return _ending_mod().run_entries(labels, branch_name, slug=slug, open_labels=open_labels, about=about)
+    return _ending_mod().run_entries(labels, branch_name, slug=slug, open_labels=open_labels, about=about, waits=waits)
 
 
-def branch_block(branch_name, open_labels, first=None, slug=None, about=None):
-    return _ending_mod().branch_block(branch_name, open_labels, first=first, slug=slug, about=about)
+def branch_block(branch_name, open_labels, first=None, slug=None, about=None, waits=None):
+    return _ending_mod().branch_block(branch_name, open_labels, first=first, slug=slug, about=about, waits=waits)
 
 
 def short_name(rest, work_title=None, trim=True):
@@ -1634,6 +1634,15 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text
     claimed_ids = {row["id"] for row in (analysed.get("waiting_in_progress") or [])}
     by_id = {task["id"]: task for task in tasks}
     step_by_n = {step["n"]: step for step in steps}
+    # The order the walk runs tasks in, and what an open task still waits on
+    # (1.165.0): Run next lists a branch's tasks in this order.
+    walk_pos = {task_id: index for index, task_id in enumerate(analysed.get("order") or [])}
+    for task in tasks:
+        task["walk"] = walk_pos.get(task["id"], 10**6)
+        task["waits_on"] = [
+            dep for dep in task.get("deps") or []
+            if dep in by_id and not by_id[dep]["done"]
+        ]
     mentioned = {}
     for step in steps:
         for task_id in step["ids"]:
@@ -2122,16 +2131,11 @@ def held_phrase(row):
     return core or "held"
 
 
-def short_question(text, limit=100):
-    """The quoted open question, short (1.164.0): no markdown markers such as
-    `**New:**`, the first sentence only, at most about `limit` characters."""
-    one = re.sub(r"\*\*[^*]{0,40}:\*\*\s*", "", text or "")
-    one = re.sub(r"[*_`]+", "", one)
-    one = re.sub(r"\s+", " ", one).strip()
-    one = re.split(r"(?<=[.!?])\s", one, maxsplit=1)[0]
-    if len(one) > limit:
-        one = one[: limit - 1].rsplit(" ", 1)[0].rstrip(" ,;:") + "…"
-    return one
+def short_question(text, limit=160):
+    """The quoted open question, short (1.164.0, 1.165.0): see
+    walk_ending.question_text. A heading-like first sentence gives way to
+    the question itself, and a long line is cut at a clause end."""
+    return _ending_mod().question_text(text, limit)
 
 
 def _branch_order(branches):
@@ -2171,6 +2175,20 @@ def loop_holds(built):
     return holds
 
 
+def wait_reason(task, row=None):
+    """Why an open task on a ready branch cannot start yet (1.165.0).
+
+    `waits on T5` for open tasks it comes after, `held` for an open
+    question or approval, else `can't start yet`.
+    """
+    deps = task.get("waits_on") or []
+    if deps:
+        return "waits on " + ", ".join(f"T{dep}" for dep in deps)
+    if row and (row.get("held") or row.get("bucket") == "waiting"):
+        return "held"
+    return "can't start yet"
+
+
 def report_by_branch(built, rows, slug=None):
     """Group ready and held tasks by the build-map row.
 
@@ -2183,6 +2201,11 @@ def report_by_branch(built, rows, slug=None):
         for task in branch["tasks"]:
             by_num[task["id"]] = (branch, task)
 
+    rows_by_num = {}
+    for row in rows or []:
+        num = _task_num(row.get("task"))
+        if num is not None:
+            rows_by_num.setdefault(num, row)
     ready = []
     held = []
     for row in rows or []:
@@ -2232,12 +2255,23 @@ def report_by_branch(built, rows, slug=None):
             task.get("run_label") or task.get("label") or task_label(task["id"], task.get("full") or task.get("short"))
             for task, _row in group["items"]
         ]
-        open_tasks = [task for task in group["branch"].get("tasks") or [] if not task.get("done")]
+        # Walk order (1.165.0): the first listed task is the one the walk
+        # runs first. A task that cannot start says why on its line.
+        open_tasks = sorted(
+            (task for task in group["branch"].get("tasks") or [] if not task.get("done")),
+            key=lambda task: (task.get("walk", 10**6), task["id"]),
+        )
+        ready_ids = {task["id"] for task, _row in group["items"]}
         open_labels = [
             task.get("run_label") or task.get("label") or task_label(task["id"], task.get("full") or task.get("short"))
             for task in open_tasks
         ]
-        entries = run_entries(labels, group["branch"]["name"], slug=slug, open_labels=open_labels, about=group["branch"].get("about"))
+        waits = {f"T{task['id']}": wait_reason(task, rows_by_num.get(task["id"])) for task in open_tasks if task["id"] not in ready_ids}
+        firsts = [task for task in open_tasks if task["id"] in ready_ids]
+        if firsts:
+            first = firsts[0]
+            labels = [first.get("run_label") or first.get("label") or task_label(first["id"], first.get("full") or first.get("short"))]
+        entries = run_entries(labels, group["branch"]["name"], slug=slug, open_labels=open_labels, about=group["branch"].get("about"), waits=waits)
         # next_lines carry the same entries as run_lines (1.155.0).
         for index, entry in enumerate(entries):
             if index == 0:
@@ -2250,10 +2284,10 @@ def report_by_branch(built, rows, slug=None):
             "about": group["branch"].get("about") or "",
             "tasks": [
                 {"id": f"T{task['id']}", "title": task.get("short") or ""}
-                for task, _row in group["items"]
+                for task in (firsts or [task for task, _row in group["items"]])
             ],
             "open_tasks": [
-                {"id": f"T{task['id']}", "title": task.get("short") or ""}
+                {"id": f"T{task['id']}", "title": task.get("short") or "", "waits": waits.get(f"T{task['id']}") or ""}
                 for task in open_tasks
             ],
         })

@@ -651,7 +651,8 @@ def branch_entries(branch: dict, slug: str | None = None) -> list[dict]:
         slug,
     )
     open_labels = [_task_label(task) for task in opens] or [_task_label(task) for task in first]
-    block = map_mod().branch_block(name, open_labels, first=_task_label(first[0]), slug=slug, about=branch.get("about"))
+    waits = {_task_token(task.get("id")): task.get("waits") for task in opens if isinstance(task, dict) and task.get("waits")}
+    block = map_mod().branch_block(name, open_labels, first=_task_label(first[0]), slug=slug, about=branch.get("about"), waits=waits)
     if name and len(opens) >= 2:
         command = f"/crav1-build-walk {slug} {name}" if slug else f"/crav1-build-walk {name}"
         entries.append({
