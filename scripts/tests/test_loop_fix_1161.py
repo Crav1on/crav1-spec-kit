@@ -103,7 +103,7 @@ class MoveFix(unittest.TestCase):
         self.assertEqual(len(result["loops"]), 1)
         fix = result["loops"][0]["fixes"][0]
         self.assertEqual((fix["kind"], fix["tasks"], fix["target"]), ("move", [14, 15], "feat/orders-dev-switch"))
-        self.assertEqual(fix["word"], "fix loop")
+        self.assertEqual(fix["word"], "fix-loop")
         line = result["loop_lines"][1]
         card = result["loops"][0]["card"]
         option = card["options"][0]
@@ -118,7 +118,7 @@ class MoveFix(unittest.TestCase):
             # the order after
             self.assertIn("Then feat/orders-cicd holds T9-T12 and merges first, and "
                           "feat/orders-dev-switch runs T13, T14, T15, T16.", text)
-        self.assertTrue(line.startswith("Recommended fix (say `fix loop`): "))
+        self.assertTrue(line.startswith("Recommended fix (say `fix-loop`): "))
         self.assertIn("already describes this work", line)
         self.assertTrue(option["label"].endswith("(Recommended)"))
         self.assertEqual(card["question"], "Two branches wait for each other, so neither can start. How should I fix it?")
@@ -128,7 +128,7 @@ class MoveFix(unittest.TestCase):
 
     def test_alternatives_are_numbered_and_drop_warns_about_order(self):
         fixes = built(TASKS)["loops"][0]["fixes"]
-        self.assertEqual([fix["word"] for fix in fixes], ["fix loop", "fix loop 2", "fix loop 3"][: len(fixes)])
+        self.assertEqual([fix["word"] for fix in fixes], ["fix-loop", "fix-loop 2", "fix-loop 3"][: len(fixes)])
         drops = [fix for fix in fixes if fix["kind"] == "drop"]
         self.assertTrue(drops)
         self.assertIn("this changes the build order", drops[0]["detail"])
@@ -166,7 +166,7 @@ class Apply(unittest.TestCase):
             self.assertEqual(proc.returncode, 2, proc.stderr)
             self.assertEqual((folder / "tasks.md").read_text(encoding="utf-8"), TASKS)
             self.assertIn("Card: Two branches wait for each other", proc.stdout)
-            self.assertIn("1. Build T14 and T15 on feat/orders-dev-switch (Recommended) (`fix loop`)", proc.stdout)
+            self.assertIn("1. Build T14 and T15 on feat/orders-dev-switch (Recommended) (`fix-loop`)", proc.stdout)
             self.assertIn("The tasks stay the same; only the branch and pull request they go into change.", proc.stdout)
 
     def test_yes_writes_map_marks_replaces_the_old_one_and_the_rerun_has_no_loop(self):
@@ -203,9 +203,9 @@ class Apply(unittest.TestCase):
             folder = write_slice(tmp, TASKS + "- [ ] T20: Other work (map: feat/orders-other) (after: )\n")
             proc = run(WALK, "readiness", "--root", folder, "--skip-sync", "--full")
             payload = json.loads(proc.stdout)
-            self.assertIn("Recommended fix (say `fix loop`)", payload["ending"])
-            self.assertIn("`/crav1-tasks-ready-to-build fix loop`", payload["ending"])
-            self.assertEqual(payload["loop_card"]["options"][0]["word"], "fix loop")
+            self.assertIn("Recommended fix (say `fix-loop`)", payload["ending"])
+            self.assertIn("`/crav1-tasks-ready-to-build fix-loop`", payload["ending"])
+            self.assertEqual(payload["loop_card"]["options"][0]["word"], "fix-loop")
 
 
 class PlanTime(unittest.TestCase):

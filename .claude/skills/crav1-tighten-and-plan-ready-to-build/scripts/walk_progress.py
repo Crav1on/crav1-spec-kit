@@ -2573,13 +2573,13 @@ def branch_report(root: Path, rows: list[dict]) -> dict | None:
     return map_mod().report_by_branch(built, rows, slug=command_slug(root))
 
 
-LOOP_WHY = "Two or more branches wait for each other. The ready check offers a fix under the Loop line; say `fix loop` to apply it."
+LOOP_WHY = "Two or more branches wait for each other. The ready check offers a fix under the Loop line; say `fix-loop` to apply it."
 
 
 def loop_offer(root: Path | None) -> dict:
     """The fix offer for the first loop (1.161.0): a Run next entry, the card, every fix.
 
-    The fix numbers run across all loops, so `fix loop 3` always names the
+    The fix numbers run across all loops, so `fix-loop 3` always names the
     same fix the Loop lines print.
     """
     empty = {"entries": [], "card": None, "fixes": []}
@@ -5299,7 +5299,7 @@ def main(argv: list[str] | None = None) -> None:
 
     fl = sub.add_parser("fix-loop")
     fl.add_argument("--root", required=True, help="Spec folder.")
-    fl.add_argument("--pick", type=int, default=1, help="The fix number the Loop lines print. `fix loop` is 1, `fix loop 2` is 2.")
+    fl.add_argument("--pick", type=int, default=1, help="The fix number the Loop lines print. `fix-loop` is 1, `fix-loop 2` is 2.")
     fl.add_argument("--yes", action="store_true", help="Write tasks.md and build-map.md. Only after the fix was shown and confirmed.")
     fl.add_argument("--text", action="store_true", help="Print only the reply.")
     fl.set_defaults(func=fix_loop_cmd)

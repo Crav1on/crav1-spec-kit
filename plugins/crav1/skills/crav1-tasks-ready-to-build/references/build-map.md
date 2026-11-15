@@ -19,7 +19,7 @@ The file is committed with the spec. This command does not commit.
 
 ## The page line (1.162.0)
 
-Under the `# Build map` heading, one line names the zoomable page: to zoom the diagram, `/crav1-tasks-ready-to-build <slug> open map`; to share the map as one file, `/crav1-tasks-ready-to-build <slug> export map`. See [map-page.md](map-page.md).
+Under the `# Build map` heading, one line names the zoomable page: to zoom the diagram, `/crav1-tasks-ready-to-build <slug> open-map`; to share the map as one file, `/crav1-tasks-ready-to-build <slug> export-map`. See [map-page.md](map-page.md).
 
 ## What a row shows
 
@@ -81,4 +81,4 @@ Each ready branch offers its next task as `/crav1-build-walk <slug> T#`. When th
 
 A held task names its open question and who has the answer, or `held, waits on T#`. The Run next block is first and is the only place the walk command appears, one entry per branch that has a task that can start, and only when the result is `ready` or `ready-partial`. The bottom keeps Waiting lines and the one-line `/crav1-build-tasks` alternative. Never write a `Next:` line after the Waiting or Held lines (1.153.0). Do not flatten the branches into one list.
 
-A held line shows the wave, or `in a loop` for a branch caught in a loop. It never shows `(blocked)` (1.154.0). When branches wait for each other, print one Loop line per loop before the Waiting lines, naming the branches and the task line behind each direction of the wait: `Loop: feat/orders-api-x and feat/orders-api-y wait for each other: T14 on feat/orders-api-x waits for T13 on feat/orders-api-y, and T13 on feat/orders-api-y waits for T12 on feat/orders-api-x.` Then print the fix lines under it, `Recommended fix (say `fix loop`): …` first ([loop-fix.md](loop-fix.md), 1.161.0).
+A held line shows the wave, or `in a loop` for a branch caught in a loop. It never shows `(blocked)` (1.154.0). When branches wait for each other, print one Loop line per loop before the Waiting lines, naming the branches and the task line behind each direction of the wait: `Loop: feat/orders-api-x and feat/orders-api-y wait for each other: T14 on feat/orders-api-x waits for T13 on feat/orders-api-y, and T13 on feat/orders-api-y waits for T12 on feat/orders-api-x.` Then print the fix lines under it, `Recommended fix (say `fix-loop`): …` first ([loop-fix.md](loop-fix.md), 1.161.0).

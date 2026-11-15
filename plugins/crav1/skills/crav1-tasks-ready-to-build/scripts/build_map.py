@@ -117,7 +117,7 @@ NAMED_BRANCH = re.compile(
 TICK_PATH = re.compile(r"`([^`\n]+)`")
 WORD = re.compile(r"(?<![\w-])build-map(?![\w-])")
 PIPELINE = re.compile(r"(?<![\w-])pipeline runs(?![\w-])")
-PAGE = re.compile(r"(?<![\w-])(open|export) map(?![\w-])")
+PAGE = re.compile(r"(?<![\w-])(open|export)-map(?![\w-])")
 STOP = {
     "a", "an", "the", "and", "or", "of", "to", "for", "on", "in", "with",
     "from", "by", "its", "into",
@@ -133,7 +133,7 @@ UNKNOWN_DEP = "a dependency that names no task"
 def parse_invocation(text):
     """The word build-map selects the map. The remaining words are the scope.
 
-    `open map` or `export map` sets page to open or export (1.162.0).
+    `open-map` or `export-map` sets page to open or export (1.163.0).
     """
     raw = (text or "").strip()
     raw = re.sub(r"^/crav1-tasks-ready-to-build\b", "", raw).strip()
@@ -1450,7 +1450,7 @@ def _fix_words(fix, group):
 
 
 def fix_choice(number):
-    return "fix loop" if number == 1 else f"fix loop {number}"
+    return "fix-loop" if number == 1 else f"fix-loop {number}"
 
 
 def fix_lines(fixes, start=1):
@@ -2390,8 +2390,8 @@ def page_line(slug):
     """The pointer to the zoomable page, near the top of the file (1.162.0)."""
     command = f"/crav1-tasks-ready-to-build {slug}"
     return (
-        f"To zoom the diagram, run `{command} open map`. "
-        f"To share the map as one file, run `{command} export map`."
+        f"To zoom the diagram, run `{command} open-map`. "
+        f"To share the map as one file, run `{command} export-map`."
     )
 
 

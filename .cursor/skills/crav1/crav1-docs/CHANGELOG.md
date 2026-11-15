@@ -2,6 +2,14 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.163.0 (2026-11-15)
+
+The ready check's choice words are now one hyphenated word each, so a tool or a permission check cannot split them. A minor release because the words you say have changed, and the spaced forms are no longer accepted.
+
+- **The words.** `fix-loop`, `fix-loop <n>`, `open-map` and `export-map` replace `fix loop`, `fix loop <n>`, `open map` and `export map`. The kit prints only the hyphenated forms: the Loop offer, the Run next entry, the map's heading line, the card, and the docs. Say `/crav1-tasks-ready-to-build <slug> open-map`, or `fix-loop` under a Loop line.
+- **No aliases.** The ready-check parser recognizes only the hyphenated words. A spaced `open map` or `export map` is not a page command. The script flags `--fix-loop` and `--export`, and the `walk_progress.py fix-loop` subcommand, stay as they are.
+- **Tests.** The parser accepts `open-map` and `export-map` and leaves a spaced form unrecognized, the Loop lines and the card say `fix-loop`, the map heading names the hyphenated commands, and the routing table lists them.
+
 ## 1.162.0 (2026-11-15)
 
 The build map opens as a zoomable page in your browser, and exports as one file you can send. A minor release because the ready check gains the `open map` and `export map` choice words and a new script.
@@ -152,14 +160,5 @@ Branch rules stay in the kit and load only when that case applies. A minor relea
 - **What we know.** `/crav1-what-do-we-know-about-this` reads the no-slice file only when nothing matches, and the report-writes file only for a `report-` word.
 - **Commit.** `/crav1-finalize-commit` reads the commit steps only after `commit` or `commit now`.
 - **Questions.** `/crav1-resolve-open-questions` reads the patch, a single named question, a stale point, and the empty-list ending only when that case applies.
-
-## 1.148.0 (2026-11-13)
-
-A spec edit during a tighten-and-plan walk reopens from the first step that owns the changed section. A minor release because resume no longer reopens every later step when the spec hash moves.
-
-- **Section stamps.** `walk-progress.md` records `Section stamps` on each step that covers the spec, and `Question ids` on resolve-open-questions. Resume compares sections. `reopen_line` names what changed and which steps reopen. Say that line once.
-- **Requirement sections.** Problem, Goals, Non-goals, Users and journeys, Acceptance criteria, Constraints, Requirements, Scope, Decisions, Background, Context, What the dump says, Trace, Research findings, the text before the first heading, and any other heading reopen tighten-spec, plan-from-spec, review-and-tighten-plan, and the ready check. They do not reopen resolve-open-questions when the question ids are unchanged. An unknown heading uses that same row, so a new constraint still reopens the plan.
-- **Questions.** A new, removed, or reworded open question reopens only resolve-open-questions. Ask only the ids in `changed_questions`. The stable key from 1.146.0 (`question_stable_key`) ignores a refreshed commit list, and one close reword of a stored question stays that question. An explicit `Id:` mark still reopens when the words change. An `Answered:` line on the same words, or a new question that is already answered, does not reopen and does not re-ask.
-- **No reopen.** `## Match` (including a renamed branch), `## In the code`, a `Synced at:` line, and `## Approval needed` do not reopen a step. When the change is only Match, In the code, Synced at, or an already-answered question, `/crav1-add-to-spec` offers Restamp. `walk_progress.py restamp-covered --root <spec-folder> --yes` refreshes the stamps. `Done` and `Result` stay. A step recorded before this release, with no `Section stamps` line, still uses the 1.137 rule.
 
 The newest 15 releases are above. The full changelog is https://github.com/Crav1on/crav1-spec-kit/blob/main/CHANGELOG.md.

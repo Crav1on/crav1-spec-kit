@@ -62,7 +62,9 @@ The progress file is `docs/specs/<slug>/walk-progress.md`. It records the step, 
 
 1.156.0: the ready check uses the shared walk ending (`scripts/walk_ending.py`, the same one the standalone ready check and build-walk use), and `readiness` is brief by default; `--full` prints the complete JSON only on an explicit ask. The skill points at that ending instead of describing it.
 
-1.161.0: the readiness ending follows each `Loop:` line with the fix offer, the recommended fix first (`fix loop`, then `fix loop <n>`), and a ready or ready-partial ending adds the Run next entry [`/crav1-tasks-ready-to-build`](crav1-tasks-ready-to-build.md) <slug> fix loop`. The JSON has `loop_card` and `loop_fixes`. New subcommand `walk_progress.py fix-loop --root <spec-folder> [--pick <n>] [--yes]`: without `--yes` it writes nothing and prints the card; with it, it writes `tasks.md` and `build-map.md` and reports what is left.
+1.161.0: the readiness ending follows each `Loop:` line with the fix offer, the recommended fix first (`fix-loop`, then `fix-loop <n>`), and a ready or ready-partial ending adds the Run next entry [`/crav1-tasks-ready-to-build`](crav1-tasks-ready-to-build.md) <slug> fix-loop`. The JSON has `loop_card` and `loop_fixes`. New subcommand `walk_progress.py fix-loop --root <spec-folder> [--pick <n>] [--yes]`: without `--yes` it writes nothing and prints the card; with it, it writes `tasks.md` and `build-map.md` and reports what is left.
+
+1.163.0: the ready-check Loop offer and Run next entry use `fix-loop` and `fix-loop <n>` only. The spaced form is no longer accepted. The `walk_progress.py fix-loop` subcommand is unchanged.
 
 ## Runs when
 

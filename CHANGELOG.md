@@ -2,6 +2,14 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.163.0 (2026-11-15)
+
+The ready check's choice words are now one hyphenated word each, so a tool or a permission check cannot split them. A minor release because the words you say have changed, and the spaced forms are no longer accepted.
+
+- **The words.** `fix-loop`, `fix-loop <n>`, `open-map` and `export-map` replace `fix loop`, `fix loop <n>`, `open map` and `export map`. The kit prints only the hyphenated forms: the Loop offer, the Run next entry, the map's heading line, the card, and the docs. Say `/crav1-tasks-ready-to-build <slug> open-map`, or `fix-loop` under a Loop line.
+- **No aliases.** The ready-check parser recognizes only the hyphenated words. A spaced `open map` or `export map` is not a page command. The script flags `--fix-loop` and `--export`, and the `walk_progress.py fix-loop` subcommand, stay as they are.
+- **Tests.** The parser accepts `open-map` and `export-map` and leaves a spaced form unrecognized, the Loop lines and the card say `fix-loop`, the map heading names the hyphenated commands, and the routing table lists them.
+
 ## 1.162.0 (2026-11-15)
 
 The build map opens as a zoomable page in your browser, and exports as one file you can send. A minor release because the ready check gains the `open map` and `export map` choice words and a new script.

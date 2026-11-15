@@ -113,7 +113,7 @@ class LoopIsNamed(unittest.TestCase):
         result = bm.build("orders-api", SPEC, PLAN, TASKS)
         # 1.161.0: the fix offer follows the Loop line.
         self.assertEqual(result["loop_lines"][0], LOOP_LINE)
-        self.assertTrue(result["loop_lines"][1].startswith("Recommended fix (say `fix loop`)"))
+        self.assertTrue(result["loop_lines"][1].startswith("Recommended fix (say `fix-loop`)"))
         self.assertIn(LOOP_LINE, result["markdown"])
         self.assertIn(LOOP_LINE, result["summary"])
         self.assertEqual(result["loops"][0]["branches"], ["feat/orders-cicd", "feat/orders-dev-switch"])
