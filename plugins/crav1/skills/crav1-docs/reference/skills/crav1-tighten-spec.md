@@ -22,8 +22,6 @@ One issue at a time, with explained resolutions (plus get a suggestion) and impa
 
 1.86.0: a yes on writing the branch adds one Match `Branch:` line in sorted place (repo, then branch); never `; `-joined.
 
-1.168.0: an acceptance that `verify.md` gives `pass` while its `spec.md` box is still `- [ ]` is one issue, offered `tick` (set `[x]` on that one line, after a yes) or `keep`. The verify reply names this command for it in Catch up first.
-
 ## Runs when
 
 The spec is still mushy. Called by the user.

@@ -827,29 +827,23 @@ def verify_changes(previous, current, task_ids=None):
     return lines
 
 
-def verify_catch_up_block(slug=None, uncommitted=None, ahead=0, plan_notes=None, unticked=None):
+def verify_catch_up_block(slug=None, uncommitted=None, ahead=0, plan_notes=None):
     """`**Catch up first**` for the verify reply (1.168.0), or "".
 
     What the user can settle now with one command each: a plan note such as
-    `T24 to T26 may belong to another slice` (`/crav1-tighten-plan`), an
-    acceptance that passed while its spec.md box is open (`/crav1-tighten-spec`,
-    never a hand edit), then the files this run wrote and did not commit
+    `T24 to T26 may belong to another slice` (`/crav1-tighten-plan`), then
+    the files this run wrote and did not commit
     (`/crav1-finalize-commit`) and the push. Same layout as catch_up_block().
     """
     notes = [_plain(note).rstrip(".") + "." for note in plan_notes or [] if _plain(note)]
-    ticks = [str(a).strip() for a in unticked or [] if str(a).strip()]
     files = [str(f).strip() for f in uncommitted or [] if str(f).strip()]
     try:
         ahead = int(ahead or 0)
     except (TypeError, ValueError):
         ahead = 0
-    if not (notes or ticks or files or ahead > 0):
+    if not (notes or files or ahead > 0):
         return ""
     sentences = list(notes)
-    if ticks:
-        verb = "passes" if len(ticks) == 1 else "pass"
-        box = "its box" if len(ticks) == 1 else "their boxes"
-        sentences.append(f"{_join(ticks)} {verb}, and {box} in spec.md {'is' if len(ticks) == 1 else 'are'} still open.")
     if files:
         sentences.append(f"{_join(files)} {'is' if len(files) == 1 else 'are'} not committed.")
     unit = "commit" if ahead == 1 else "commits"
@@ -860,9 +854,6 @@ def verify_catch_up_block(slug=None, uncommitted=None, ahead=0, plan_notes=None,
     if notes:
         lines.append("Settle the plan note in the plan:" if len(notes) == 1 else "Settle the plan notes in the plan:")
         lines.append(f"`/crav1-tighten-plan{tail}`")
-    if ticks:
-        lines.append(f"Tick {_join(ticks)} in spec.md:")
-        lines.append(f"`/crav1-tighten-spec{tail}`")
     if files:
         lines.append(f"Commit {_join(files)}:")
         lines.append(f"`{FINALIZE_COMMAND}`")
@@ -925,7 +916,7 @@ def verify_reply(
         if isinstance(catch_up, dict):
             catch_up = verify_catch_up_block(slug=slug, **{
                 key: catch_up.get(key)
-                for key in ("uncommitted", "ahead", "plan_notes", "unticked")
+                for key in ("uncommitted", "ahead", "plan_notes")
                 if key in catch_up
             })
         entries = [step_block(step) for step in steps or []]
@@ -974,8 +965,8 @@ def verify_state(state):
     `root` is the spec folder. The counts, the changed tasks and the
     Uncommitted files come from verify.md, the committed verify.md
     (`git show HEAD:`, or `previous`, a file path), tasks.md and git status.
-    The skill adds only what it judged: `steps`, `plan_notes`, `unticked`,
-    `waiting`, `walk`, `full`.
+    The skill adds only what it judged: `steps`, `plan_notes`, `waiting`,
+    `walk`, `full`.
     """
     root = Path(state["root"])
     slug = state.get("slug") or root.name
@@ -1012,7 +1003,6 @@ def verify_state(state):
             "uncommitted": uncommitted,
             "ahead": ahead,
             "plan_notes": state.get("plan_notes") or [],
-            "unticked": state.get("unticked") or [],
         },
         "waiting": state.get("waiting") or [],
         "report": state.get("report") or f"docs/specs/{slug}/verify.md",

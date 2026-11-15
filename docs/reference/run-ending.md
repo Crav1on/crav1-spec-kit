@@ -73,16 +73,16 @@ The standalone ready check prints a brief reply by default (1.156.0): the header
 
 `/crav1-verify-build-against-spec` ends the same way, through the same script: `walk_ending.py --verify <state file>` (the skill ships a wrapper). The reply is brief: `Verify — <slug>`, a `Result:` line with the counts, `Changed since the last verify:` with one line per task whose state changed (`T6 failed: ...`, `T44 row dropped: not in tasks.md`), `Run next:`, then `Waiting:` lines for what the user cannot act on now, then `Report: docs/specs/<slug>/verify.md`. It never has a `Next:` line. The TL;DR, the tables, branch and promotion detail stay in `verify.md`; the word `full` shows the TL;DR and Tasks overview in chat.
 
-Run next opens with a `**Catch up first**` block, in the 1.167.0 layout, when something can be settled now: a plan note such as `T24 to T26 may belong to another slice` (`/crav1-tighten-plan <slug>`), an acceptance that passes while its spec.md box is open (`/crav1-tighten-spec <slug>`, never a hand edit), and the files the run wrote and did not commit (`/crav1-finalize-commit`, then `git push` under its own label, since finalize-commit never pushes). That replaces the verify reply's `Uncommitted:` line. Then the step: the reason once, the label on its own line, the command alone in its code span.
+Run next opens with a `**Catch up first**` block, in the 1.167.0 layout, when something can be settled now: a plan note such as `T24 to T26 may belong to another slice` (`/crav1-tighten-plan <slug>`), and the files the run wrote and did not commit (`/crav1-finalize-commit`, then `git push` under its own label, since finalize-commit never pushes). That replaces the verify reply's `Uncommitted:` line. Then the step: the reason once, the label on its own line, the command alone in its code span.
 
 ```text
 Run next:
 
 **Catch up first**
-A5 passes, and its box in spec.md is still open. verify.md is not committed.
+The plan says T24 to T26 may belong to another slice. verify.md is not committed.
 
-Tick A5 in spec.md:
-`/crav1-tighten-spec orders-api`
+Settle the plan note in the plan:
+`/crav1-tighten-plan orders-api`
 Commit verify.md:
 `/crav1-finalize-commit`
 Then push the specs repo:

@@ -14,7 +14,6 @@ Print its output once, as-is. Do not add a lead recap longer than one sentence, 
 
 - `steps`: the next step from the case file, a list of `{"reason", "label", "command"}`. The reason once, the label on its own line, the command alone in its code span. One entry per ready branch when the case says so, with `heading` set to the branch.
 - `plan_notes`: a plan note the user can settle now, such as `The plan says T24 to T26 may belong to another slice`. Catch up first gives `/crav1-tighten-plan <slug>`.
-- `unticked`: acceptance ids that pass while their `spec.md` box is still open, such as `["A5"]`. Catch up first gives `/crav1-tighten-spec <slug>`. Never tell the user to edit a spec file by hand.
 - `waiting`: only what the user cannot act on now, such as a person's review or a merge.
 - `full`: `true` with the word `full`. The TL;DR and the Tasks overview follow the Result line.
 - `walk`: `true` when `/crav1-build-walk` opened this skill. The walk owns Run next.
@@ -22,8 +21,7 @@ Print its output once, as-is. Do not add a lead recap longer than one sentence, 
 ```json
 {"root": "docs/specs/orders-api",
  "steps": [{"reason": "T6's four tests fail on stale asserts at the PR's tip.", "label": "Fix T6:", "command": "/crav1-fix-build-gaps orders-api T6"}],
- "plan_notes": ["The plan says T24 to T26 may belong to another slice"],
- "unticked": ["A5"]}
+ "plan_notes": ["The plan says T24 to T26 may belong to another slice"]}
 ```
 
 ## The shape
@@ -40,12 +38,10 @@ Changed since the last verify:
 Run next:
 
 **Catch up first**
-The plan says T24 to T26 may belong to another slice. A5 passes, and its box in spec.md is still open. verify.md is not committed.
+The plan says T24 to T26 may belong to another slice. verify.md is not committed.
 
 Settle the plan note in the plan:
 `/crav1-tighten-plan orders-api`
-Tick A5 in spec.md:
-`/crav1-tighten-spec orders-api`
 Commit verify.md:
 `/crav1-finalize-commit`
 Then push the specs repo:

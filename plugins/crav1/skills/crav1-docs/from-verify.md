@@ -46,7 +46,7 @@ When the evidence passed, the `tasks.md` row is still `[ ]`, and the pull reques
 
 ## The reply (1.168.0)
 
-The chat reply is brief: `Verify — <slug>`, the counts on one `Result:` line, one line per task whose state changed since the last verify (for example `T6 failed: 4 cursor tests fail at the PR's tip` or `T44 row dropped: not in tasks.md`), then `Run next:`, Waiting and `Report: docs/specs/<slug>/verify.md`. Run next opens with **Catch up first** when something can be settled now: a plan note goes to `/crav1-tighten-plan`, a passing acceptance whose box in `spec.md` is still open goes to `/crav1-tighten-spec`, and an uncommitted `verify.md` gets `/crav1-finalize-commit` and then `git push`. The next step follows: the reason once, a label, and the command alone. Say `full` to see the TL;DR and the Tasks overview in chat; they are always in `verify.md`.
+The chat reply is brief: `Verify — <slug>`, the counts on one `Result:` line, one line per task whose state changed since the last verify (for example `T6 failed: 4 cursor tests fail at the PR's tip` or `T44 row dropped: not in tasks.md`), then `Run next:`, Waiting and `Report: docs/specs/<slug>/verify.md`. Run next opens with **Catch up first** when something can be settled now: a plan note goes to `/crav1-tighten-plan`, and an uncommitted `verify.md` gets `/crav1-finalize-commit` and then `git push`. The next step follows: the reason once, a label, and the command alone. Say `full` to see the TL;DR and the Tasks overview in chat; they are always in `verify.md`.
 - `docs/specs/<slug>/fix-log.md`: one entry per gap, with the fix and the re-proof.
 - The smallest code fix for that gap.
 

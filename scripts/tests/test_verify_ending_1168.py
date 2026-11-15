@@ -115,7 +115,7 @@ class Reply(unittest.TestCase):
 
     def test_shape_and_order(self):
         out = self.reply(
-            catch_up={"uncommitted": ["verify.md"], "plan_notes": ["The plan says T24 to T26 may belong to another slice"], "unticked": ["A5"]},
+            catch_up={"uncommitted": ["verify.md"], "plan_notes": ["The plan says T24 to T26 may belong to another slice"]},
             waiting=["T5 merges after a review."],
         )
         heads = [out.index(h) for h in ("Verify — orders-api", "Result:", "Changed since the last verify:",
@@ -141,16 +141,22 @@ class Reply(unittest.TestCase):
             slug="orders-api",
             uncommitted=["verify.md"],
             plan_notes=["The plan says T24 to T26 may belong to another slice"],
-            unticked=["A5"],
         )
         self.assertTrue(block.startswith("**Catch up first**\n"))
         self.assertEqual(
             _commands(block),
-            ["`/crav1-tighten-plan orders-api`", "`/crav1-tighten-spec orders-api`", "`/crav1-finalize-commit`", "`git push`"],
+            ["`/crav1-tighten-plan orders-api`", "`/crav1-finalize-commit`", "`git push`"],
         )
-        self.assertIn("Tick A5 in spec.md:\n`/crav1-tighten-spec orders-api`", block)
+        self.assertIn("Settle the plan note in the plan:\n`/crav1-tighten-plan orders-api`", block)
+        self.assertNotIn("spec.md", block)
         self.assertIn("Commit verify.md:\n`/crav1-finalize-commit`\nThen push the specs repo:\n`git push`", block)
         self.assertNotIn("by hand", block.lower())
+
+    def test_unticked_is_not_a_state_key(self):
+        state = {"root": "/nonexistent/orders-api", "unticked": ["A5"], "uncommitted": [], "ahead": 0}
+        self.assertNotIn("unticked", we.verify_state(state)["catch_up"])
+        with self.assertRaises(TypeError):
+            we.verify_catch_up_block(unticked=["A5"])
 
     def test_catch_up_push_only_and_empty(self):
         self.assertIn("Push the specs repo (2 commits ahead):\n`git push`", we.verify_catch_up_block(ahead=2))
@@ -191,7 +197,7 @@ class Cli(unittest.TestCase):
             subprocess.run(git + ["commit", "-qm", "init"], cwd=repo, check=True)
             (folder / "verify.md").write_text(AFTER, encoding="utf-8")
             state = repo / "state.json"
-            state.write_text(json.dumps({"root": str(folder), "steps": [STEP], "unticked": ["A5"]}), encoding="utf-8")
+            state.write_text(json.dumps({"root": str(folder), "steps": [STEP]}), encoding="utf-8")
             wrapper = VERIFY / "scripts/walk_ending.py"
             out = subprocess.run(
                 [sys.executable, "-X", "utf8", str(wrapper), "--verify", str(state)],
@@ -229,15 +235,16 @@ class SkillText(unittest.TestCase):
             self.assertNotIn("Next:", body, path.name)
             self.assertIn("1.168.0", body, path.name)
 
-    def test_reply_reference_never_suggests_hand_edits(self):
+    def test_reply_reference_has_no_acceptance_tick(self):
         body = (VERIFY / "references/reply.md").read_text(encoding="utf-8")
-        self.assertIn("Never tell the user to edit a spec file by hand.", body)
+        self.assertNotIn("unticked", body)
+        self.assertNotIn("/crav1-tighten-spec", body)
         for word in ("contoso", "person a"):
             self.assertNotIn(word, body.lower())
 
-    def test_tighten_spec_offers_the_tick(self):
+    def test_tighten_spec_is_unchanged(self):
         body = (SKILLS / "crav1-tighten-spec/SKILL.md").read_text(encoding="utf-8")
-        self.assertIn("An open acceptance box that verify passed (1.168.0)", body)
+        self.assertNotIn("1.168.0", body)
 
     def test_wrapper_matches_build_walk_wrapper(self):
         a = (VERIFY / "scripts/walk_ending.py").read_bytes()

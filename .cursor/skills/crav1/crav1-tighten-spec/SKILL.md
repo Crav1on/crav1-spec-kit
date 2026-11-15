@@ -41,7 +41,6 @@ Sources, in order:
 3. Fresh read of `spec.md` / diagrams / ADRs (add only issues the reviewer missed). Wording issues come after the code read.
 4. **A gone, unmerged branch (1.64.0)** may be one issue. A listed work branch that is gone (no local branch, no `origin/<name>`) and is not merged by any test in skill `crav1-add-to-spec`, `references/branches.md` under **Gone, rewritten, shared** (its recorded SHA in the base, its `commits:` in the base as the same change, or a merged PR on GitHub or Azure DevOps). Offer `mark-dropped` (end its `Synced at` line with ` (dropped)`) and `to-open-question` (ask where the work went), plus `keep`, so it stops counting toward done. A branch that is gone but merged gets `merged, branch deleted` in the summary and no offer. A branch that still exists is never offered `(dropped)`. A rewritten branch is reported as `branch rewritten since last read` and is not an issue by itself.
 5. A stale mark may be one issue. Read `## Research findings` and a note that section links to. Follow the readers section of skill `crav1-add-to-spec`, `references/research-stale.md`. Quote the mark. Name the path. Do not clear the mark. Do not rewrite the research note. When no mark is there, do not invent this issue.
-6. **An open acceptance box that verify passed (1.168.0)** is one issue: `verify.md` gives that A# `pass` while its `spec.md` box is `- [ ]`. Offer `tick` (set `[x]` on that one line, after a yes) and `keep`. Do not change the wording.
 
 Typical issue shapes (from this skill’s job):
 
