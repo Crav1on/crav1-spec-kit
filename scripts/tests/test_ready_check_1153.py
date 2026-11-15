@@ -326,7 +326,11 @@ class OrphanVerifyRow(unittest.TestCase):
         self.assertIn("verify.md has a row for T44, which is not in tasks.md", payload.get("orphan_waiting") or "")
         self.assertIn("verify.md has a row for T44, which is not in tasks.md", payload["ending"])
         self.assertIn("/crav1-verify-build-against-spec", payload["orphan_waiting"])
-        self.assertIn("/crav1-tighten-plan", payload["orphan_waiting"])
+        # 1.167.0: the verify skill drops the row, so only it is named, and
+        # the ending shows it in the Catch up first block, not as Waiting.
+        self.assertNotIn("/crav1-tighten-plan", payload["orphan_waiting"])
+        self.assertNotIn("Waiting: verify.md has a row", payload["ending"])
+        self.assertIn("**Catch up first**", payload["ending"])
 
 
 if __name__ == "__main__":

@@ -41,7 +41,7 @@ When the evidence passed, the `tasks.md` row is still `[ ]`, and the pull reques
 
 ## What gets written
 
-- `docs/specs/<slug>/verify.md`: the acceptance matrix, plus **Skipped tests** when you chose skip for a missing dependency. Since 1.136.0 the TL;DR includes **Implemented, verified, tick pending**.
+- `docs/specs/<slug>/verify.md`: the acceptance matrix, plus **Skipped tests** when you chose skip for a missing dependency. Since 1.136.0 the TL;DR includes **Implemented, verified, tick pending**. Since 1.167.0 the Tasks overview has one row per T# in `tasks.md`; a row for a T# that `tasks.md` does not have is dropped and the reply names it, so the ready check's `**Catch up first**` block needs only this command for both a behind task and a stray row.
 - One `[x]` on a tick-pending row in `tasks.md`, only after you say yes.
 - `docs/specs/<slug>/fix-log.md`: one entry per gap, with the fix and the re-proof.
 - The smallest code fix for that gap.

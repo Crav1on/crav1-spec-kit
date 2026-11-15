@@ -4,7 +4,9 @@
 The ready check (/crav1-tasks-ready-to-build), the tighten-and-plan ready
 check, and /crav1-build-walk all end a run in the same shape, built here:
 
-  1. Run next, first. One block per ready branch (1.164.0): the bold
+  1. Run next, first. A `**Catch up first**` block leads when verify.md
+     is behind, has a row for a T# not in tasks.md, or the specs repo is
+     ahead of origin (1.167.0). Then one block per ready branch (1.164.0): the bold
      branch, one plain sentence from its plan step, `<n> open tasks:` one
      per line in walk order, then `Run the whole branch:` and `Run only T#,
      the first task:`, each command alone in its code span on the line
@@ -12,7 +14,8 @@ check, and /crav1-build-walk all end a run in the same shape, built here:
      line sits between two blocks (1.165.0).
   2. Held lines, then Branch runs status lines.
   3. Built (one line per task) and Left, for a branch run.
-  4. Loop, verify-behind, orphan and other Waiting lines.
+  4. Loop and other Waiting lines: only what the user cannot act on now
+     (1.167.0).
   5. The not-ready reason (only when it is not already the Run next
      line), at most the one-line /crav1-build-tasks alternative, notes,
      and Uncommitted.
@@ -498,16 +501,85 @@ def run_entries(labels, branch_name, slug=None, open_labels=None, about=None, wa
 
 
 BLOCK_RULE = "\n\n---\n\n"
+VERIFY_COMMAND = "/crav1-verify-build-against-spec"
+PUSH_COMMAND = "git push"
 
 
-def run_block(entries) -> str:
-    """`Run next:` and each entry (1.165.0).
+def _ids(ids):
+    out = []
+    for tid in ids or []:
+        tid = str(tid).strip()
+        if tid and tid not in out:
+            out.append(tid)
+    return sorted(out, key=lambda t: (int(t[1:]) if re.fullmatch(r"T\d+", t) else 10**9, t))
+
+
+def catch_up_block(slug=None, behind=None, orphans=None, ahead=0):
+    """`**Catch up first**` for Run next (1.167.0), or "".
+
+    Things behind that the user can fix now with one command each, before
+    any branch: verify.md behind tasks.md (`behind`, T#s), a verify.md row
+    for a T# that is not in tasks.md (`orphans`), and a specs repo ahead of
+    origin (`ahead`, commits). The bold heading, one or two plain sentences
+    of what is behind, then each command alone in its code span under its
+    label. /crav1-verify-build-against-spec both checks the behind tasks
+    and drops an orphan row, so those two share one command and one label.
+    Empty when nothing is behind.
+    """
+    behind = _ids(behind)
+    orphans = _ids(orphans)
+    try:
+        ahead = int(ahead or 0)
+    except (TypeError, ValueError):
+        ahead = 0
+    if not behind and not orphans and ahead <= 0:
+        return ""
+    sentences = []
+    behind_text = _join(behind) if behind else ""
+    orphan_text = _join(orphans) if orphans else ""
+    rows = "a row" if len(orphans) == 1 else "rows"
+    which = "which is not in tasks.md" if len(orphans) == 1 else "which are not in tasks.md"
+    if behind and orphans:
+        sentences.append(f"verify.md is behind for {behind_text}, and it has {rows} for {orphan_text}, {which}.")
+    elif behind:
+        sentences.append(f"verify.md is behind for {behind_text}.")
+    elif orphans:
+        sentences.append(f"verify.md has {rows} for {orphan_text}, {which}.")
+    unit = "commit" if ahead == 1 else "commits"
+    if ahead > 0:
+        sentences.append(f"The specs repo is {ahead} {unit} ahead of origin.")
+    lines = ["**Catch up first**", " ".join(sentences), ""]
+    verify_cmd = f"{VERIFY_COMMAND} {slug}" if slug else VERIFY_COMMAND
+    row_word = "row" if len(orphans) == 1 else "rows"
+    if behind and orphans:
+        lines.append(f"Check {behind_text} against the spec and remove the {orphan_text} {row_word}:")
+        lines.append(f"`{verify_cmd}`")
+    elif behind:
+        lines.append(f"Check {behind_text} against the spec:")
+        lines.append(f"`{verify_cmd}`")
+    elif orphans:
+        where = "it is" if len(orphans) == 1 else "they are"
+        lines.append(f"Remove the {orphan_text} {row_word} ({where} in verify.md but not in tasks.md):")
+        lines.append(f"`{verify_cmd}`")
+    if ahead > 0:
+        lines.append(f"Push the specs repo ({ahead} {unit} ahead):")
+        lines.append(f"`{PUSH_COMMAND}`")
+    return "\n".join(lines)
+
+
+def run_block(entries, catch_up=None) -> str:
+    """`Run next:` and each entry (1.165.0, 1.167.0).
 
     A horizontal rule (`---`, with a blank line on each side so it never
     turns the line above into a heading) sits between two entries, so each
-    branch block stands apart in any Markdown viewer.
+    branch block stands apart in any Markdown viewer. A catch-up block
+    (catch_up_block()) comes first, with the same rule before the first
+    branch block.
     """
     runs = [str(entry).strip("\n") for entry in entries or [] if str(entry).strip()]
+    first = str(catch_up or "").strip("\n")
+    if first.strip():
+        runs = [first] + runs
     if not runs:
         return ""
     return "Run next:\n\n" + BLOCK_RULE.join(runs)
@@ -534,10 +606,19 @@ def compose(
     alternatives=None,
     notes=None,
     uncommitted=None,
+    catch_up=None,
 ) -> str:
-    """The one ending, in the shared order. Empty parts are left out."""
+    """The one ending, in the shared order. Empty parts are left out.
+
+    `catch_up` is a catch_up_block() text, or a dict of its keywords
+    (`slug`, `behind`, `orphans`, `ahead`); it leads Run next (1.167.0).
+    """
     parts: list[str] = []
-    block = run_block(run)
+    if isinstance(catch_up, dict):
+        catch_up = catch_up_block(**{
+            key: catch_up.get(key) for key in ("slug", "behind", "orphans", "ahead") if key in catch_up
+        })
+    block = run_block(run, catch_up)
     if block:
         parts.append(block)
     if held:

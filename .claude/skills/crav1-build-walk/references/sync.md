@@ -8,7 +8,7 @@ Before reading or writing the spec folder, run `<interpreter> -X utf8 scripts/re
 
 - Behind origin: stop. Print the script's `ending`. Run next is `git pull --no-rebase` (merge, never rebase). Do not read or write yet.
 - Diverged: stop. The same Run next applies. Merge origin in, never rebase.
-- Ahead: continue. Print the Waiting line to push.
+- Ahead: continue. The ready check shows it in the `**Catch up first**` block with `git push` (1.167.0); in a walk, the push is the settle card below.
 - No upstream, or the fetch failed (offline): say so once and continue from the local copy.
 - No git repository: continue. Say nothing.
 - In step: continue.

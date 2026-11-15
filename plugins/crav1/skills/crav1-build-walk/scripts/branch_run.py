@@ -611,7 +611,7 @@ def ending(state: dict) -> dict:
         left.append(f"- Open question: {text}")
     for text in state.get("verify_behind") or []:
         left.append(f"- verify.md is behind: {text}")
-    text = em.compose(run=runs, built=rows, built_header=header, left=left)
+    text = em.compose(run=runs, built=rows, built_header=header, left=left, catch_up=state.get("catch_up") or None)
     return {"ending": text, "kind": kind, "merges": False}
 
 

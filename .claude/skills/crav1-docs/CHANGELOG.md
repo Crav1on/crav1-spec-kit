@@ -2,6 +2,16 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.167.0 (2026-11-15)
+
+What you can fix now leads Run next as a Catch up first block, instead of sitting in Waiting lines at the bottom. A minor release because the ending reads differently in the ready check, the tighten-and-plan ready check and the build walk.
+
+- **Catch up first.** verify.md behind tasks.md, a verify.md row for a T# that is not in tasks.md, and a specs repo ahead of origin are one `**Catch up first**` block at the top of Run next, before the branch blocks and in their layout: the bold heading, one or two plain sentences of what is behind (`verify.md is behind for T4 and T7, and it has a row for T44, which is not in tasks.md.`), then each command alone in its code span under its label (`Check T4 and T7 against the spec and remove the T44 row:` with `` `/crav1-verify-build-against-spec <slug>` ``, `Push the specs repo (2 commits ahead):` with `` `git push` ``), and a `---` line before the first branch block. Left out when nothing is behind. A not-ready ending puts the same block first and drops its separate verify or push entry.
+- **One command for the stray row.** `/crav1-verify-build-against-spec` now says it writes one Tasks overview row per T# in `tasks.md` and drops a row for a T# that `tasks.md` does not have, naming it in the reply. The ready check therefore names only that command, and no longer `/crav1-tighten-plan`, which never wrote `verify.md`.
+- **Waiting is for waits.** Waiting lines keep only what you cannot act on now, such as a person's answer or a merge.
+- One shared builder, `walk_ending.catch_up_block()`, used by the ready check and the tighten-and-plan ready check (`catch_up` in the readiness JSON), and passed through by `/crav1-build-walk` and the branch run when their state carries `catch_up`.
+- `run-ending.md`, the readiness, rules, verify-behind, next-verify and sync references, the build-walk state table, three walkthroughs and the skill pages show it. Tests: `scripts/tests/test_catch_up_block_1167.py`; two older tests now expect the block.
+
 ## 1.166.0 (2026-11-15)
 
 Every Run next branch block has a description again, and a held question that points to a note shows the question itself. A minor release because the ending reads differently in the ready check, the tighten-and-plan ready check and the build walk.
@@ -160,16 +170,5 @@ The ready check keeps an open task on its own branch, prints one Run next block,
 - **Brief output.** `walk_progress.py readiness --root <folder> --brief` prints only the result, a counts row, the ending, and claim warnings, under 8 KB for a 45-task slice. `--full` (the default) still prints the complete JSON. The ready check calls the brief form. `build_map.py` with no flag still prints only the one-line path of the file it wrote.
 - **Open-question count.** The Waiting line counts only tasks whose hold is itself an open question or an approval, and names only the people on those questions. A task that waits on another task is not counted there.
 - **Orphan verify row.** A `verify.md` table row for a T# that is not in `tasks.md` is one Waiting line naming that T#, and the fix is `/crav1-verify-build-against-spec` or tighten. Report only; the check does not edit `verify.md`.
-
-## 1.152.0 (2026-11-13)
-
-The ready check keeps the branch on the task line, and its printed commands work in a new session. A minor release because the map, the Next lines, and the script commands a ready check runs all change.
-
-- **Task-line branch.** A branch counts as merged only when git proves its tip is already in the base or the default branch. A line that only mentions a future merge, such as `(PR 12) to be merged into develop`, is not a recorded merge. When git cannot tell, or shows the tip is not in the base, the task-line branch stays. A fallback name is short and does not use a person's name from the task line.
-- **Script paths.** Every skill whose docs run `scripts/repo_sync.py` or `scripts/claims.py` now ships a thin wrapper to the build-walk copy. `approval_needed.py`, `question_blocks.py`, `task_order.py`, and `build_map.py` accept a spec folder or a file. A missing file is a one-line error and a nonzero exit. `question_blocks.py` exits 0 when questions are found, and nonzero only for a real error. The documented-invocation check fails when a skill documents `scripts/<name>.py` and that file is not in the skill folder, unless the paragraph names another skill that has it.
-- **Titles and Next.** A task label never prints blank. Leftover backticks fall back to the first readable words, or `work`. Short names cut at a word boundary with an ellipsis. Run next and the Next lines use the untrimmed name. Each Next line matches Run next: the command alone in a code span, with the slug when `docs/specs` has several slices, and the branch and task on the next line. `/crav1-build-tasks` stays on a line of its own.
-- **Shorter output.** `task_order.py` prints short labels by default. Pass `--full` for the complete title.
-- **Can start now.** The map summary's `M can start now` uses the same readiness rule: only a ready branch counts. A later wave that waits in order, a claimed branch, or a question hold is 0 for that branch. `Wave 2: 1 branch, 0 can start now` when it still waits on wave 1.
-- **Claims on stop.** A mid-walk stop, such as before a merge step, does not clear the claim. The claim is cleared when the branch is merged or ticked, or the user says stop and is done with this walk, or `release claim`. This matches the build-walk skill text. A later ready check in a new session still holds that task as in progress.
 
 The newest 15 releases are above. The full changelog is https://github.com/Crav1on/crav1-spec-kit/blob/main/CHANGELOG.md.

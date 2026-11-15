@@ -8,6 +8,8 @@
 
 Map every v0 acceptance line to tests or UI checks and report pass, fail, or missing.
 
+1.167.0: the Tasks overview has one row per T# in `tasks.md`; a row for a T# that `tasks.md` does not have is dropped and the reply names it. The ready check's Catch up first block names only this command for a behind task and a stray row.
+
 1.149.0: the branch line, sub-branches, promotion, tick pending, a host-setup task, and the one next line are references files, each read only when that case applies. The rules are unchanged.
 
 1.142.0: when [`/crav1-build-walk`](crav1-build-walk.md) opened this skill, do not print the case Next. The walk prints its one Next.
