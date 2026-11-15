@@ -8,6 +8,8 @@
 
 Open a pull request for the current change branch, or push to an existing one and update its description or comment (push with explicit yes).
 
+1.164.0: the post-or-update card follows the card wording rule in `docs/reference/question-cards.md`, for example `Post this comment on PR 71?` with **Post it (Recommended)**. Typed changes stay on the free-text answer.
+
 1.158.0: the steps it shares with merge-pr, pr-status and review-pr (which pull request, host order, Windows, finding the pull request for a branch, state and checks, claims, catching up by merging the base in, signing in, run ending) are one page, `crav1-docs/reference/pr-common.md`, with one read-only script, `scripts/pr_common.py` (`parse`, `host`, `find`, `checks`, `claim`, `behind`). The skill ships the script; the other three run it from here. The checks before the draft moved word for word to `references/checks.md`, the GitHub create steps to `references/github.md`.
 
 1.130.0: the post confirm is one card. `yes (Recommended)` posts the text as shown. Typed changes go on that card's free-text answer. There is no Edits option. Nothing is posted before that yes.

@@ -725,6 +725,29 @@ def _because(phase: str, state: dict) -> tuple[str, str]:
     return ("/crav1-build-walk", f"the walk is on {branch}")
 
 
+def _waiting_line(phase: str, state: dict, because: str) -> str:
+    """A plain Waiting line: who or what the walk waits for, and why (1.164.0)."""
+    branch = state.get("branch") or "this branch"
+    tasks = _task_list(state.get("tasks") or []) or "the task"
+    pr = state.get("pr")
+    named = f"pull request {pr}" if pr else "the pull request"
+    who = state.get("who")
+    if phase == "confirm-owner":
+        text = f"you, to say whether your work goes into {who or 'the other owner'}'s pull request on {branch}"
+    elif phase == "approval":
+        if state.get("approval_asked"):
+            text = f"the approval that holds {tasks} to be recorded"
+        else:
+            text = f"an answer on the approval that holds {tasks}"
+    elif phase == "live-yes":
+        text = f"your yes to run {tasks} live"
+    elif phase == "wait-merge":
+        text = (f"{who} to merge {named}" if who else f"{named} to be merged") + f", then the tasks on {branch} are ticked"
+    else:
+        text = because
+    return f"Waiting: {text}."
+
+
 # Phases that wait on a person or a merge. With no Next line (1.157.0), the
 # reason is a Waiting line when the caller passed none.
 WAIT_PHASES = {"confirm-owner", "approval", "live-yes", "wait-merge"}
@@ -764,8 +787,9 @@ def next_for(state: dict) -> dict:
         phase = "comment" if state.get("pushed") and not state.get("commented") else "wait-merge"
     command, because = _because(phase, state)
     if not waiting and phase in WAIT_PHASES:
-        # No Next line carries the reason any more (1.157.0): say it as Waiting.
-        waiting = f"Waiting: {because[:1].upper()}{because[1:]}."
+        # No Next line carries the reason any more (1.157.0): say it as Waiting,
+        # in plain words that name who or what and why (1.164.0).
+        waiting = _waiting_line(phase, state, because)
     branch = state.get("branch") or ""
     tasks = state.get("tasks") or []
     entries = []

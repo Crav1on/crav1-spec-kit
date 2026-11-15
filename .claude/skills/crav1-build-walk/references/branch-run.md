@@ -8,7 +8,13 @@ Read this when the invocation names a branch, for example `/crav1-build-walk ord
 
 1. Fetch first, as [sync.md](sync.md) says.
 2. `<interpreter> -X utf8 scripts/branch_run.py plan --root <spec-folder> --branch <branch> --user "<git user.name>"` lists the open tasks on that branch in task order, each with the stop that holds it.
-3. `<interpreter> -X utf8 scripts/branch_run.py start --root <spec-folder> --branch <branch> --user "<name>"` (no `--yes`) shows what the run will do. Show the tasks in order, the first stop if there is one, and the claim line. Then one card: `yes` (Recommended) or `stop`. A headless run stops and names `yes` and `stop`.
+3. `<interpreter> -X utf8 scripts/branch_run.py start --root <spec-folder> --branch <branch> --user "<name>"` (no `--yes`) shows what the run will do. Show the tasks in order, the first stop if there is one, and the claim line. Then one card:
+
+   Card: Build every open task on feat/orders-cicd, in this order?
+   - **Build them all (Recommended)** (`yes`): claim the tasks, build them one by one and push, pausing only at a real stop. Why: one yes covers the whole run.
+   - **Stop** (`stop`): claim nothing and build nothing.
+
+   A headless run stops and names `yes` and `stop`.
 4. On `yes`, rerun `start` with `--yes`. It writes one claim line that names every open task on the branch, the `## Run` section of `build-progress/<branch>.md`, and this branch's one status line in `walk-progress.md`. Commit `claims.md`, `walk-progress.md`, and the progress file, and push. This yes covers every commit and push in the run. There is no other card until a stop.
 
 `start` returns `claimed` when someone else holds one of those tasks. Say who and since when, and stop.

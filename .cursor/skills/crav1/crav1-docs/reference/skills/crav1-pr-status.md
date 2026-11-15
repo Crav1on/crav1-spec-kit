@@ -8,6 +8,8 @@
 
 Show where one pull request stands, point by point, and who owes the next step.
 
+1.164.0: each closing offer follows the card wording rule in `docs/reference/question-cards.md`: one background sentence, then a short question such as `Set thread 112 back to active?`, each option saying what happens.
+
 1.158.0: the shared pull-request steps are `crav1-docs/reference/pr-common.md` and `scripts/pr_common.py`, which also finds the one open pull request for the current branch when none is named. The status table, the output order and the hand-offs moved word for word to `references/classify.md`, `references/output.md` and `references/offers.md`.
 
 **[`/crav1-pr-status`](crav1-pr-status.md)** reads one named pull request's threads, pushes and commits on Azure DevOps or GitHub (read-only, `references/pr-threads.md` in `crav1-add-to-spec`) and splits the threads into points. Each point gets one of six statuses: `done <sha>` (a commit after the request changed the lines), `agreed`, `declined` (with the reason), `open`, `waiting on <name>`, or `needs <name>` for a third person. It picks reviewer or author mode from who opened the pull request; `as-reviewer` or `as-author` overrides it, and an unclear sign-in is guessed without asking.

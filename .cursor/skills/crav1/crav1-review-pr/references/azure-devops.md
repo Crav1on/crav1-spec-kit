@@ -19,7 +19,9 @@ When the pull request is in another repo, read the diff in that repo's checkout 
 First compare the copies on disk (`<remote>/<source>` and `<remote>/<target>`, else the local branches) with the pull request's `lastMergeSourceCommit.commitId` and `lastMergeTargetCommit.commitId`. A copy matches when it points at that commit or already contains it.
 
 - **Both match.** No question. `git diff <target>...<source>` on the copies on disk.
-- **A copy is missing or older.** Ask one question, options only:
+- **A copy is missing or older.** Say in one sentence which copy is older. Then one card, options only:
+
+  Card: Fetch the pull request's two branches before the review?
   1. **Fetch only the PR's two branches (Recommended).** `git fetch <remote> <source> <target>` in that checkout, then the diff. This moves remote-tracking refs only. Never check out, merge, commit, or push there. It is the one exception to the no-fetch rule for a sibling checkout in `references/branches.md`.
   2. **Use what's on disk.** Diff the copies on disk. Say each copy's newest commit date and age, and `the copy on disk is older than the PR; newer commits may be missed`.
   3. **Stop.** Say `Fetch <source> and <target> in <path> and rerun.` and stop.

@@ -2061,7 +2061,7 @@ def playbook_payload(root: Path, playbook_arg: str) -> dict:
             "offer": "skip-or-reapply",
             "result": body["result"],
             "note": (
-                "Ask once: skip (Recommended) or reapply, even when the file has not changed. "
+                "Ask once, with the already-applied card, even when the file has not changed: skip (Recommended) keeps it as it is, reapply applies it again. "
                 "Do not move on without that question."
             ),
         }
@@ -2438,6 +2438,60 @@ def clear(args: argparse.Namespace) -> None:
         "confirmation": "nothing new",
         "changed": drift,
     })
+
+
+# Plain names for the clear-or-rerun card (1.164.0): no step ids, stamps, or commands.
+STEP_PLAIN = {
+    "playbook": "the playbook",
+    "review-architecture": "the architecture review",
+    "tighten-spec": "the spec tightening",
+    "resolve-open-questions": "the open questions",
+    "plan-from-spec": "the plan",
+    "review-and-tighten-plan": "the plan review",
+    "tasks-ready-to-build": "the ready check",
+}
+CHANGE_PLAIN = {
+    "spec": "the spec changed",
+    "plan": "the plan changed",
+    "tasks": "the tasks changed",
+    "verify": "verify.md changed",
+    "playbook": "the playbook file changed",
+    "questions": "the open questions changed",
+}
+
+
+def reopen_card(step: str, drift: list[str], recommend_rerun: bool) -> dict:
+    """The clear-or-rerun card for one reopened step, in plain words (1.164.0).
+
+    `rerun` jumps back to the step's skill; `nothing new` runs clear --yes.
+    """
+    name = STEP_PLAIN.get(step, "this step")
+    changes = [CHANGE_PLAIN[token] for token in drift if token in CHANGE_PLAIN] or ["a file changed"]
+    said = changes[0] if len(changes) == 1 else ", ".join(changes[:-1]) + " and " + changes[-1]
+    rerun = {
+        "id": "rerun",
+        "label": f"Redo {name}",
+        "text": f"Run {name} again on the current files, then the walk goes on.",
+    }
+    skip = {
+        "id": "nothing new",
+        "label": f"Skip redoing {name}",
+        "text": f"Keep {name} as done and go straight on, because the change does not affect it.",
+    }
+    if recommend_rerun:
+        rerun["label"] += " (Recommended)"
+        rerun["text"] += " Why: the change can affect it."
+        options = [rerun, skip]
+    else:
+        skip["label"] += " (Recommended)"
+        skip["text"] += " Why: only the files around it changed."
+        options = [skip, rerun]
+    return {
+        "step": step,
+        "background": f"{name[:1].upper()}{name[1:]} reopened because {said}.",
+        "question": f"Skip redoing {name}?",
+        "options": options,
+    }
 
 
 def reopen_hit(step: str, drift: list[str]) -> dict:
@@ -3958,7 +4012,8 @@ def readiness(args: argparse.Namespace) -> None:
         ending = (ending + "\n\n" if ending else "") + "\n".join(warnings)
     own = [row.get("task") for row in rows if row.get("own_claim") and row.get("bucket") != "done" and row.get("task")]
     if own:
-        ending = (ending + "\n\n" if ending else "") + f"In progress by you: {', '.join(own)}. Your own claim does not hold them."
+        pronoun = "it" if len(own) == 1 else "them"
+        ending = (ending + "\n\n" if ending else "") + f"In progress by you: {', '.join(own)}. Your own claim does not hold {pronoun}."
     out = {
         "ok": True,
         "ready": ready,
@@ -3987,6 +4042,10 @@ def readiness(args: argparse.Namespace) -> None:
         "waiting_next": waiting_next,
         "resolve_waiting": resolve_waiting,
         "recommend_jump": bool(jump) and result == "not-ready",
+        "reopen_cards": [
+            reopen_card(h["step"], h.get("changed") or [], bool(jump) and result == "not-ready")
+            for h in hits if h.get("bucket") == "reopened" and h.get("step")
+        ],
         "jump_back": jump,
         "reopened": reopened,
         "reopen_line": None,
@@ -4184,15 +4243,16 @@ def _same_or_new_offer(fid: str, close: list[dict]) -> dict:
     if len(close) == 1:
         hit = close[0]
         options = [
-            {"id": "same", "label": SAME_CHOICE, "recommended": True, "match_key": hit["key"]},
-            {"id": "new", "label": NEW_CHOICE, "recommended": False},
+            {"id": "same", "label": SAME_CHOICE, "recommended": True, "match_key": hit["key"],
+             "text": "Count it as the finding already recorded, so it is not jumped back twice. Why: the words are close."},
+            {"id": "new", "label": NEW_CHOICE, "recommended": False,
+             "text": "Record it as a new finding, then offer the jump back for it."},
         ]
-        question = (
-            f"{fid} looks like the recorded finding \"{hit['finding']}\". "
-            "Treat it as that finding, or is this new?"
-        )
+        background = f"{fid} looks like the recorded finding \"{hit['finding']}\"."
+        question = f"Is {fid} the same as that recorded finding?"
     else:
-        options = [{"id": "new", "label": NEW_CHOICE_REC, "recommended": True}]
+        options = [{"id": "new", "label": NEW_CHOICE_REC, "recommended": True,
+                    "text": "Record it as a new finding, then offer the jump back for it. Why: more than one recorded finding is close."}]
         for hit in close[:3]:
             short = hit["finding"]
             if len(short) > 80:
@@ -4202,11 +4262,10 @@ def _same_or_new_offer(fid: str, close: list[dict]) -> dict:
                 "label": f"same as {hit['id']}: {short}",
                 "recommended": False,
                 "match_key": hit["key"],
+                "text": f"Count it as {hit['id']}, so it is not jumped back twice.",
             })
-        question = (
-            f"{fid} is close to more than one recorded finding. "
-            "This is new unless you pick one."
-        )
+        background = f"{fid} is close to more than one recorded finding."
+        question = f"Is {fid} new, or the same as one of them?"
     return {
         "ok": True,
         "offer": "same-or-new",
@@ -4214,6 +4273,7 @@ def _same_or_new_offer(fid: str, close: list[dict]) -> dict:
         "finding": fid,
         "matched": [hit["id"] for hit in close],
         "matches": close,
+        "background": background,
         "question": question,
         "options": options,
         "already_jumped": False,
@@ -4261,13 +4321,13 @@ def _jump_back_offer(fid: str) -> dict:
         "offer": "jump-back",
         "spec": True,
         "finding": fid,
-        "question": (
-            f"{fid} is a spec finding. Jump back to /crav1-tighten-spec "
-            "for this finding only, or keep it as an open point and continue?"
-        ),
+        "background": f"{fid} is about the spec, not the plan.",
+        "question": f"Fix {fid} in the spec now, before the plan goes on?",
         "options": [
-            {"id": "tighten-spec", "label": JUMP_CHOICE, "recommended": True},
-            {"id": "open-point", "label": POINT_CHOICE, "recommended": False},
+            {"id": "tighten-spec", "label": JUMP_CHOICE, "recommended": True,
+             "text": f"Open /crav1-tighten-spec for {fid} only, then the walk goes on with the plan. Why: the plan is built from the spec."},
+            {"id": "open-point", "label": POINT_CHOICE, "recommended": False,
+             "text": f"Record {fid} as an open point and go on; the spec stays as it is for now."},
         ],
         "path": TIGHTEN_SPEC_PATH,
         "already_jumped": False,

@@ -20,7 +20,7 @@ class OpenPrExisting(unittest.TestCase):
         for t in ("`update` Update description | `comment` Add as comment",
                   "`comment` Add as comment | `update` Update description",
                   "`push-only` Push only", "`stop` Stop",
-                  "`yes (Recommended)`: post it as shown.",
+                  "**Post it (Recommended)** (`yes`): post the text exactly as shown.",  # Card block since 1.164.0
                   "Nothing is posted until that yes.",
                   "Do not add an `Edits` option.",
                   "kit-neutral", "gh pr comment", "az repos pr update"):

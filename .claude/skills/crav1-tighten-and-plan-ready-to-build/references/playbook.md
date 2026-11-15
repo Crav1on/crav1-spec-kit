@@ -8,13 +8,26 @@ The start command's `playbook_status` is this answer. Do not run playbook-status
 
 A later check is `<interpreter> -X utf8 scripts/walk_progress.py playbook-status --root <spec-folder> --playbook <file>`. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. A `docs/playbooks/` path is the same playbook this walk recorded when the path matches.
 
-- **already-applied** (this walk recorded `applied` or `reapplied` for the same file and the same contents): ask one question, even when the file has not changed. Do not move on without it. Options: `skip` (Recommended), `reapply`. `skip` records `Result: skipped` only when the previous result was not already an apply; if it was applied, leave the applied line as it is and move on. `reapply` shows the changes and writes only on yes.
-- **already-skipped** (same file and contents, result `skipped`): options `skip` (Recommended), `apply`. `apply` is the show-changes path below.
+Before a playbook card, say one plain sentence, for example `The playbook is already in the spec and has not changed since.` Do not name step ids, file paths, or what the walk does next inside the question or in brackets. Where the walk goes next belongs in the option text, in plain words.
+
+- **already-applied** (this walk recorded `applied` or `reapplied` for the same file and the same contents): ask this card once, even when the file has not changed. Do not move on without it.
+
+  Card: This playbook is already applied. Apply it again?
+  - **Keep it as it is (Recommended)** (`skip`): change nothing and move on. Why: its answers are already in the spec.
+  - **Apply it again** (`reapply`): show the changes, then write only on yes.
+
+  `skip` records `Result: skipped` only when the previous result was not already an apply; if it was applied, leave the applied line as it is and move on. `reapply` shows the changes and writes only on yes.
+- **already-skipped** (same file and contents, result `skipped`): ask this card once.
+
+  Card: This playbook was skipped before. Apply it now?
+  - **Skip it again (Recommended)** (`skip`): change nothing and move on. Why: you skipped these same contents before.
+  - **Apply it** (`apply`): show the changes, then write only on yes. That is the show-changes path below.
+
 - **not-recorded**, **changed**, or **different-file**: do not call it already applied. Show the changes, then apply only on yes.
 
 Showing and applying uses the existing apply path. Open `../crav1-resolve-open-questions/references/apply.md` from this skill's folder (`/crav1-resolve-open-questions apply <file>`). The rule is [open-skill-file.md](../../crav1-docs/reference/open-skill-file.md) (1.134.0). That file already sorts each filled item as new, already settled the same way, or conflicting, and it writes nothing until one yes. Kept items (K) are written through add-to-spec's rules inside that same apply. Open `../crav1-add-to-spec/SKILL.md` and follow only the fact write: Open `../crav1-add-to-spec/references/fact.md`. Do not start `/crav1-add-to-spec` again for those items. A second start would write them twice.
 
-If that compare finds every filled item already settled the same way, say the playbook was already applied even though this walk has no progress line for it, and offer `skip` (Recommended) or `reapply`. The progress script cannot see that compare. It only knows what this walk recorded.
+If that compare finds every filled item already settled the same way, say the playbook was already applied even though this walk has no progress line for it, and ask the already-applied card above. The progress script cannot see that compare. It only knows what this walk recorded.
 
 On yes, let apply write. Apply copies a filled playbook with `scripts/playbook_store.py` in skill `crav1-resolve-open-questions` (see that skill's `references/apply.md`). It shows the kebab-case name once before the first copy, and it shows the diff before overwrite when `Applied as:` says the committed file was edited in the repo. A `Docs path:` line, or the one committed file with the same subject, is the same playbook. The name stays fixed after that. Then record step `playbook` with result `applied` or `reapplied`, the `docs/playbooks/<topic>.md` path apply returned, and that file's content version. Do not record the outside path. On skip, record `skipped` when no apply line exists yet, and record the `docs/playbooks/` path when the playbook already has one. Empty answer lines stay open. Do not edit `Answer:` or `Change:` lines. A draft with no filled line is not copied.
 

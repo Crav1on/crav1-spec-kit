@@ -197,7 +197,7 @@ class WalkWording(unittest.TestCase):
         playbook = (WALK_SKILL / "references/playbook.md").read_text(encoding="utf-8")
         self.assertIn("even when the file has not changed", playbook)
         self.assertIn("Do not move on without it", playbook)
-        self.assertIn("`skip` (Recommended)", playbook)
+        self.assertIn("(Recommended)** (`skip`)", playbook)  # Card block since 1.164.0
 
     def test_extras_are_offered_once_after_open_questions(self):
         steps = (WALK_SKILL / "references/steps.md").read_text(encoding="utf-8")
@@ -215,7 +215,7 @@ class WalkWording(unittest.TestCase):
         steps = (WALK_SKILL / "references/steps.md").read_text(encoding="utf-8")
         self.assertIn("## After the plan, questions with no Blocks line", steps)
         self.assertIn("unlinked --root", steps)
-        self.assertIn("`one batch` (Recommended)", steps)
+        self.assertIn("(Recommended)** (`one batch`)", steps)  # Card block since 1.164.0
         self.assertIn("`one by one`", steps)
         self.assertIn("Before step 5 is recorded", steps)
         self.assertIn("**The whole slice** (`- Blocks: whole slice`)", steps)
