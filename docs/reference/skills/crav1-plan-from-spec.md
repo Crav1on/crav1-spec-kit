@@ -28,6 +28,8 @@ File-level `plan.md` and `tasks.md`; each verify note names the checks before co
 
 1.151.0: a task listed in `claims.md` as `In progress:` is left unchanged: no renumber, reorder, rewrite, or removal. After writing `tasks.md`, the step preserves those lines and says once which claimed tasks were kept.
 
+1.161.0: `plan_check.py order` also lists branches that wait for each other as a `Branch loop:` line with the recommended fix in plain words. Before the recap, apply it on the user's yes with `walk_progress.py fix-loop --root <spec-folder> --pick <n> --yes`.
+
 ## Runs when
 
 Spec is accepted. Called by the user.

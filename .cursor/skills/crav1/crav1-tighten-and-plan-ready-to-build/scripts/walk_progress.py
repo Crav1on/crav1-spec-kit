@@ -2573,7 +2573,55 @@ def branch_report(root: Path, rows: list[dict]) -> dict | None:
     return map_mod().report_by_branch(built, rows, slug=command_slug(root))
 
 
-LOOP_WHY = "Two or more branches wait for each other. Fix one of the task lines the Loop line names in tasks.md with /crav1-tighten-plan."
+LOOP_WHY = "Two or more branches wait for each other. The ready check offers a fix under the Loop line; say `fix loop` to apply it."
+
+
+def loop_offer(root: Path | None) -> dict:
+    """The fix offer for the first loop (1.161.0): a Run next entry, the card, every fix.
+
+    The fix numbers run across all loops, so `fix loop 3` always names the
+    same fix the Loop lines print.
+    """
+    empty = {"entries": [], "card": None, "fixes": []}
+    if root is None:
+        return empty
+    try:
+        built = map_built(root)
+    except Exception:  # noqa: BLE001 - a map failure must not hide the rows
+        return empty
+    loops = (built or {}).get("loops") or []
+    if not loops:
+        return empty
+    fixes = [fix for row in loops for fix in row.get("fixes") or []]
+    first = (loops[0].get("fixes") or [None])[0]
+    entries = []
+    if first:
+        slug = command_slug(root)
+        words = " ".join(bit for bit in (slug, first["word"]) if bit)
+        entries.append(f"`/crav1-tasks-ready-to-build {words}`\n{first['summary']}")
+    return {"entries": entries, "card": loops[0].get("card"), "fixes": fixes}
+
+
+def fix_loop_cmd(args: argparse.Namespace) -> None:
+    """Apply one loop fix after a yes (1.161.0). Without --yes this writes nothing."""
+    root = Path(args.root)
+    if not root.is_dir():
+        fail("root", f"not a folder: {root}")
+    out, code = map_mod().fix_loop(root, pick=args.pick, yes=args.yes)
+    _MAP_CACHE.clear()
+    if code == 0 and out.get("wrote"):
+        command = " ".join(bit for bit in ("/crav1-tasks-ready-to-build", command_slug(root)) if bit)
+        out["reply"] = out["line"] + "\n\nRun next:\n\n" + f"`{command}`" + "\nreruns the ready check with the fix in place"
+    else:
+        out["reply"] = out.get("line") or "\n".join(bit for bit in (out.get("change"), out.get("message")) if bit)
+    if getattr(args, "text", False):
+        print(out["reply"])
+        if code:
+            raise SystemExit(code)
+        return
+    emit(out)
+    if code:
+        raise SystemExit(code)
 
 
 def apply_loop_holds(root: Path | None, rows: list[dict]) -> list[str]:
@@ -3765,6 +3813,9 @@ def readiness(args: argparse.Namespace) -> None:
     if result == "not-ready" and not can_start and waiting_line:
         waiting_bits.append(waiting_line)
     shown_run = run_lines if result in ("ready", "ready-partial") else []
+    offer = loop_offer(root) if loop_lines and root is not None and root.is_dir() else {"entries": [], "card": None, "fixes": []}
+    if shown_run is not None and result in ("ready", "ready-partial"):
+        shown_run = list(shown_run) + offer["entries"]
     if result in ("ready", "ready-partial"):
         alt = "/crav1-build-tasks builds one task without the walk."
         shown_next = [alt]
@@ -3838,6 +3889,8 @@ def readiness(args: argparse.Namespace) -> None:
         "orphan_tasks": gap.get("orphan_tasks") or [],
         "orphan_waiting": gap.get("orphan_waiting"),
         "loop_lines": loop_lines,
+        "loop_card": offer["card"],
+        "loop_fixes": offer["fixes"],
     }
     if built:
         out["rows"] = rows
@@ -5243,6 +5296,13 @@ def main(argv: list[str] | None = None) -> None:
     u = sub.add_parser("unlinked")
     u.add_argument("--root", required=True)
     u.set_defaults(func=unlinked)
+
+    fl = sub.add_parser("fix-loop")
+    fl.add_argument("--root", required=True, help="Spec folder.")
+    fl.add_argument("--pick", type=int, default=1, help="The fix number the Loop lines print. `fix loop` is 1, `fix loop 2` is 2.")
+    fl.add_argument("--yes", action="store_true", help="Write tasks.md and build-map.md. Only after the fix was shown and confirmed.")
+    fl.add_argument("--text", action="store_true", help="Print only the reply.")
+    fl.set_defaults(func=fix_loop_cmd)
 
     a = sub.add_parser("ack-stamps")
     a.add_argument("--root", required=True)

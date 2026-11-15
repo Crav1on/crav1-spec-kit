@@ -67,7 +67,7 @@ The one exception to leaving `spec.md` alone: a `Blocks:` line under a kept-open
 
 ### tasks.md
 
-Read `references/write.md` ("tasks.md") and [references/checks.md](references/checks.md) before writing tasks: the line format, `(after: …)`, `(branch: …)`, and the mapping rules. Do not write test code. Then run `<interpreter> -X utf8 scripts/plan_check.py order --root <spec-folder>` and fix any loop or `after:` that names no task before the recap.
+Read `references/write.md` ("tasks.md") and [references/checks.md](references/checks.md) before writing tasks: the line format, `(after: …)`, `(branch: …)`, and the mapping rules. Do not write test code. Then run `<interpreter> -X utf8 scripts/plan_check.py order --root <spec-folder>` and fix any loop (`references/checks.md`) or `after:` that names no task before the recap.
 
 ## Claimed tasks (1.151.0)
 

@@ -55,6 +55,7 @@ check, so the ids match the tasks file.
 Usage:
   build_map.py <spec-dir> [--chat] [--stdout]
   build_map.py <spec-dir> --recommend T1 [--code-repo <path>]
+  build_map.py <spec-dir> --fix-loop [--pick N] [--yes] [--json]
   build_map.py --root <docs/specs> [--scope <words>] [--chat] [--stdout]
 
 On Windows the interpreter is python. Elsewhere it is python3. Then py -3.
@@ -1148,7 +1149,7 @@ def loop_line(group, why, id_branch):
     """The plain warning for one loop (1.154.0).
 
     It names the branches and the task line behind each direction of the
-    wait, then says to fix one of those lines in tasks.md.
+    wait. The offer to fix it follows on its own lines (1.161.0).
     """
     if len(group) == 2:
         head = f"{group[0]} and {group[1]} wait for each other"
@@ -1171,7 +1172,314 @@ def loop_line(group, why, id_branch):
         body = ", ".join(links[:-1]) + ", and " + links[-1]
     else:
         body = links[0] if links else "the waits close a loop"
-    return f"Loop: {head}: {body}. Fix one of these lines in tasks.md."
+    return f"Loop: {head}: {body}."
+
+
+# ---------- loop fixes (1.161.0) ----------
+
+FIX_WORD = re.compile(r"[a-z0-9]+")
+FIX_STOP = STOP | {"t", "be", "is", "are", "it", "this", "that", "after", "before", "then", "so", "as", "at"}
+
+
+def _fix_tokens(text):
+    text = NAMED_BRANCH.sub(" ", text or "")
+    text = MARKER.sub(" ", text)
+    text = TASK_ID.sub(" ", text)
+    return {word for word in FIX_WORD.findall(text.lower()) if word not in FIX_STOP and (len(word) > 1 or word.isdigit())}
+
+
+def _assign_waits(tasks, assign, deps_of=None):
+    """Branch waits for one assignment of task ids to branches."""
+    waits = {}
+    for task in tasks:
+        name = assign.get(task["id"])
+        if name is None:
+            continue
+        waits.setdefault(name, [])
+        deps = (deps_of or {}).get(task["id"], task["deps"])
+        for dep in deps:
+            other = assign.get(dep)
+            if other is None or other == name:
+                continue
+            if other not in waits[name]:
+                waits[name].append(other)
+    return waits
+
+
+def _loop_sets(names, waits):
+    present = [name for name in names if name in waits]
+    return {frozenset(group) for group in _branch_loops(present, waits)}
+
+
+def _ids_text(ids):
+    ids = [f"T{i}" for i in ids]
+    if len(ids) <= 1:
+        return "".join(ids)
+    return ", ".join(ids[:-1]) + " and " + ids[-1]
+
+
+def _runs_text(ids):
+    """`T9-T12` for a run of consecutive ids, as the steering example reads."""
+    ids = sorted(ids)
+    parts, start, prev = [], None, None
+    for task_id in ids + [None]:
+        if start is None:
+            start = prev = task_id
+            continue
+        if task_id is not None and task_id == prev + 1:
+            prev = task_id
+            continue
+        if prev - start >= 2:
+            parts.append(f"T{start}-T{prev}")
+        else:
+            parts.extend(f"T{i}" for i in range(start, prev + 1))
+        start = prev = task_id
+    return ", ".join(parts)
+
+
+def _order_text(group, assign, waits):
+    """`Then A holds T9-T12 and merges first, and B runs T13, T14, T15, T16.`"""
+    first = [name for name in group if not any(dep in group for dep in waits.get(name, ()))]
+    bits = []
+    for name in sorted(group, key=lambda n: (n not in first, group.index(n))):
+        ids = sorted(task_id for task_id, branch in assign.items() if branch == name)
+        if not ids:
+            continue
+        if name in first:
+            bits.append(f"{name} holds {_runs_text(ids)} and merges first")
+        else:
+            bits.append(f"{name} runs {', '.join(f'T{i}' for i in ids)}")
+    if not bits:
+        return ""
+    if len(bits) == 1:
+        return f"Then {bits[0]}."
+    return "Then " + ", ".join(bits[:-1]) + ", and " + bits[-1] + "."
+
+
+def _task_cycle(tasks, deps_of=None):
+    """Task ids on a wait cycle between tasks, after an optional change of waits."""
+    ids = {task["id"] for task in tasks}
+    deps = {task["id"]: (deps_of or {}).get(task["id"], task["deps"]) for task in tasks}
+    return set(task_order._cycles(ids, deps))
+
+
+def _followers(start, src, tasks, assign):
+    """The start task plus the open tasks on src that wait on it, directly or through each other."""
+    moved = [start]
+    changed = True
+    while changed:
+        changed = False
+        for task in tasks:
+            if task["id"] in moved or assign.get(task["id"]) != src:
+                continue
+            if any(dep in moved for dep in task["deps"]):
+                moved.append(task["id"])
+                changed = True
+    return sorted(moved)
+
+
+def loop_fixes(group, tasks, assign, desc, names):
+    """Candidate fixes for one loop, best first (1.161.0).
+
+    A move builds a task, plus the tasks on its branch that wait on it, on
+    the branch it waits for. A drop lets one task start without one wait. A
+    fix is kept only when that loop is gone and no new loop appears.
+    """
+    group = list(group)
+    gset = set(group)
+    by_id = {task["id"]: task for task in tasks}
+    before = _loop_sets(names, _assign_waits(tasks, assign))
+    mine = {task["id"] for task in tasks if assign.get(task["id"]) in gset}
+    # A loop between tasks themselves is not broken by moving a task: only
+    # dropping a wait on it helps.
+    task_cycle = bool(_task_cycle(tasks) & mine)
+    keep = before - {frozenset(group)}
+    moves, seen = [], set()
+    for task in tasks:
+        src = assign.get(task["id"])
+        if task["done"] or src not in gset:
+            continue
+        for dep in task["deps"]:
+            target = assign.get(dep)
+            if target not in gset or target == src:
+                continue
+            moved = _followers(task["id"], src, tasks, assign)
+            key = (tuple(moved), target)
+            if key in seen:
+                continue
+            seen.add(key)
+            if task_cycle or any(by_id[i]["done"] for i in moved):
+                continue
+            if len(moved) >= sum(1 for branch in assign.values() if branch == src):
+                continue
+            new = dict(assign)
+            for task_id in moved:
+                new[task_id] = target
+            waits = _assign_waits(tasks, new)
+            if not _loop_sets(names, waits) <= keep:
+                continue
+            words = set()
+            for task_id in moved:
+                words |= _fix_tokens(by_id[task_id].get("rest") or by_id[task_id]["title"])
+            shared = sorted(words & _fix_tokens(desc.get(target, "")))
+            overlap = len(shared) / len(words) if words else 0.0
+            cross = sorted({d for i in moved for d in by_id[i]["deps"] if assign.get(d) == target})
+            moves.append({
+                "kind": "move",
+                "tasks": moved,
+                "source": src,
+                "target": target,
+                "trigger": task["id"],
+                "waits_for": cross,
+                "shared": shared,
+                "overlap": overlap,
+                "assign": new,
+                "waits": waits,
+            })
+    moves.sort(key=lambda fix: (-fix["overlap"], len(fix["tasks"]), -fix["trigger"]))
+    drops = []
+    for task in tasks:
+        src = assign.get(task["id"])
+        if task["done"] or src not in gset:
+            continue
+        for dep in task["deps"]:
+            other = assign.get(dep)
+            if other not in gset or other == src:
+                continue
+            deps_of = {task["id"]: [d for d in task["deps"] if d != dep]}
+            waits = _assign_waits(tasks, assign, deps_of)
+            if not _loop_sets(names, waits) <= keep:
+                continue
+            if task_cycle and _task_cycle(tasks, deps_of) & mine:
+                continue
+            drops.append({
+                "kind": "drop",
+                "tasks": [task["id"]],
+                "task": task["id"],
+                "dep": dep,
+                "recorded": bool(task.get("recorded")),
+                "source": src,
+                "target": other,
+                "assign": dict(assign),
+                "waits": waits,
+            })
+    good = [fix for fix in moves if fix["overlap"] > 0]
+    weak = [fix for fix in moves if fix["overlap"] <= 0]
+    ordered = good + weak[:1] + drops if good else weak[:1] + drops + weak[1:]
+    fixes = ordered[:3]
+    problem = _problem_text(group, tasks, assign)
+    for fix in fixes:
+        fix["problem"] = problem
+        fix.update(_fix_words(fix, group))
+    return fixes
+
+
+def _problem_text(group, tasks, assign):
+    """One plain sentence on why the branches wait for each other."""
+    by_id = {task["id"]: task for task in tasks}
+    links = []
+    for task in tasks:
+        src = assign.get(task["id"])
+        if src not in group:
+            continue
+        for dep in task["deps"]:
+            other = assign.get(dep)
+            if other in group and other != src:
+                links.append((task["id"], src, dep, other))
+                break
+    if not links:
+        return "These branches wait for each other."
+    if len(group) == 2 and len(links) >= 2:
+        (a, a_src, a_dep, a_other), (b, b_src, b_dep, b_other) = links[-1], links[0]
+        if a_src == b_src:
+            b = next((link for link in links if link[1] != a_src), links[0])
+            b, b_src, b_dep, b_other = b
+        return (
+            f"T{a} is on {a_src}, but it waits for T{a_dep} on {a_other}, which itself waits "
+            f"for {a_src} to merge (T{b} waits for T{b_dep}), so the two branches wait for each other."
+        )
+    parts = [f"T{t} on {s} waits for T{d} on {o}" for t, s, d, o in links]
+    return "; ".join(parts) + ", so these branches wait for each other."
+
+
+def _fix_words(fix, group):
+    """Plain words for one fix: the problem, the change, what stays, the new order."""
+    order = _order_text(group, fix["assign"], fix["waits"])
+    if fix["kind"] == "move":
+        ids = fix["tasks"]
+        them = "they" if len(ids) > 1 else "it"
+        problem = (
+            f"{_ids_text(ids)} {'are' if len(ids) > 1 else 'is'} on {fix['source']}, but {them} "
+            f"wait{'' if len(ids) > 1 else 's'} for {_ids_text(fix['waits_for'])} on {fix['target']}, "
+            f"which itself waits for {fix['source']} to merge, so the two branches wait for each other."
+        ) if len(group) == 2 else fix["problem"]
+        after = max(fix["waits_for"]) if fix["waits_for"] else None
+        change = f"Build {_ids_text(ids)} on {fix['target']} instead" + (f", right after T{after}." if after else ".")
+        stays = "The tasks stay the same; only the branch and pull request they go into change."
+        if fix["overlap"] >= 0.34:
+            shown = sorted(fix["shared"], key=lambda word: (word.isdigit(), -len(word), word))[:4]
+            why = f"the plan step for {fix['target']} already describes this work ({', '.join(shown)})."
+        else:
+            why = f"{_ids_text(ids)} wait{'' if len(ids) > 1 else 's'} for work on {fix['target']}."
+        label = f"Build {_ids_text(ids)} on {fix['target']}"
+        detail = " ".join(bit for bit in (problem, change, stays, order) if bit)
+        brief = " ".join(bit for bit in (change, stays, order) if bit)
+        return {"label": label, "why": why, "detail": detail, "brief": brief,
+                "summary": f"builds {_ids_text(ids)} on {fix['target']}, so the loop is gone"}
+    task, dep = fix["task"], fix["dep"]
+    if len(group) == 2:
+        fix["problem"] = (
+            f"T{task} is on {fix['source']}, but it waits for T{dep} on {fix['target']}, which itself "
+            f"waits for {fix['source']} to merge, so the two branches wait for each other."
+        )
+    where = "" if fix["recorded"] else f" (T{task} has no (after:) mark, so it waits for the task just before it)"
+    change = f"Let T{task} start without waiting for T{dep}{where}."
+    stays = "No task moves branch, but this changes the build order: check that T{0} is safe to build before T{1} is merged.".format(task, dep)
+    label = f"Let T{task} start without waiting for T{dep}"
+    detail = " ".join(bit for bit in (fix["problem"], change, stays, order) if bit)
+    brief = " ".join(bit for bit in (change, stays, order) if bit)
+    return {"label": label, "why": "it changes the build order, so it is only a fallback.", "detail": detail, "brief": brief,
+            "summary": f"lets T{task} start without waiting for T{dep}, so the loop is gone"}
+
+
+def fix_choice(number):
+    return "fix loop" if number == 1 else f"fix loop {number}"
+
+
+def fix_lines(fixes, start=1):
+    """The offer under a Loop line: every fix in plain words with its choice word."""
+    lines = []
+    for offset, fix in enumerate(fixes):
+        number = start + offset
+        head = "Recommended fix" if offset == 0 else "Other fix"
+        text = fix["detail"] if offset == 0 else fix["brief"]
+        lines.append(f"{head} (say `{fix_choice(number)}`): {text} Why: {fix['why']}")
+    if not fixes:
+        lines.append(
+            "No single change breaks this loop. Run /crav1-tighten-plan and say which wait should go."
+        )
+    return lines
+
+
+def _fix_public(fix, number):
+    """The JSON shape of one fix: no internal maps."""
+    out = {key: value for key, value in fix.items() if key not in ("assign", "waits")}
+    out["number"] = number
+    out["word"] = fix_choice(number)
+    return out
+
+
+def loop_card(fixes, start=1, size=2):
+    """The question card: a plain question, the recommended fix first, each option saying what happens."""
+    if not fixes:
+        return None
+    options = []
+    for offset, fix in enumerate(fixes):
+        label = fix["label"] + (" (Recommended)" if offset == 0 else "")
+        options.append({"label": label, "word": fix_choice(start + offset), "text": f"{fix['detail']} Why: {fix['why']}"})
+    options.append({"label": "Leave it", "word": "stop", "text": "Change nothing. Both branches stay blocked."})
+    who = "Two branches wait for each other, so neither can start." if size == 2 else f"{size} branches wait for each other in a loop, so none can start."
+    return {"question": f"{who} How should I fix it?", "options": options}
 
 
 PR_NUM = re.compile(r"\(PR\s+(\d+)\)", re.I)
@@ -1644,6 +1952,21 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text
         else:
             branch["section"] = "wave"
     loop_rows = []
+    assign = {task_id: branch["name"] for task_id, branch in id_branch.items()}
+    desc = {}
+    for branch in branches:
+        bits = []
+        for task in branch["tasks"]:
+            owner = task.get("owner")
+            if owner in step_by_n and step_by_n[owner]["body"] not in bits:
+                bits.append(step_by_n[owner]["body"])
+        for step in steps:
+            if branch["name"] in step["body"] and step["body"] not in bits:
+                bits.append(step["body"])
+        # The plan step is the branch's own description. Without one, the
+        # row's Delivers text is all there is.
+        desc[branch["name"]] = " ".join(bits) or branch["deliver"]
+    number = 1
     for group in loops:
         open_ids = [
             task["id"]
@@ -1651,16 +1974,23 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text
             for task in by_name[name]["tasks"]
             if not task["done"]
         ]
+        fixes = loop_fixes(group, tasks, assign, desc, names)
+        line = loop_line(group, wait_why, id_branch)
+        offer = fix_lines(fixes, number)
         loop_rows.append({
             "branches": list(group),
-            "line": loop_line(group, wait_why, id_branch),
+            "line": line,
             "tasks": sorted(open_ids),
+            "fixes": [_fix_public(fix, number + index) for index, fix in enumerate(fixes)],
+            "fix_lines": offer,
+            "card": loop_card(fixes, number, len(group)),
         })
+        number += len(fixes)
     for row in loop_rows:
         for name in row["branches"]:
             by_name[name]["loop_line"] = row["line"]
 
-    loop_lines = [row["line"] for row in loop_rows]
+    loop_lines = [text for row in loop_rows for text in [row["line"], *row["fix_lines"]]]
     markdown = _render(slug, grouping, branches, by_name, risks, has_plan, risk_blocks, name_of, loop_lines)
     pointer = f"Build map: docs/specs/{slug}/build-map.md"
     summary = _summary(slug, pointer, branches, loop_lines)
@@ -2218,6 +2548,124 @@ def run_dir(directory, chat=False, stdout=False, recommend=None, code_repo=None)
     return result["pointer"], 0
 
 
+AFTER_MARK = re.compile(r"\(after:\s*([^)]*)\)", re.I)
+
+
+def _line_with_map(line, target):
+    """Write or replace the (map: ...) mark. A repo word before the old branch is kept."""
+    found = MAP_MARK.search(line)
+    if found:
+        words = found.group(1).split()
+        prefix = " ".join(words[:-1])
+        mark = f"(map: {prefix + ' ' if prefix else ''}{target})"
+        return line[: found.start()] + mark + line[found.end():]
+    return line.rstrip() + f" (map: {target})"
+
+
+def _line_without_wait(line, dep):
+    found = AFTER_MARK.search(line)
+    if not found:
+        return line.rstrip() + " (after: )"
+    kept = [token for token in re.findall(r"T\d+", found.group(1)) if token != f"T{dep}"]
+    return line[: found.start()] + f"(after: {', '.join(kept)})" + line[found.end():]
+
+
+def apply_fix_text(tasks_text, fix):
+    """tasks.md with one fix written: (map:) marks for a move, one wait removed for a drop."""
+    targets = set(fix["tasks"])
+    out = []
+    for line in (tasks_text or "").splitlines(keepends=True):
+        match = task_order.TASK.match(line.rstrip("\r\n"))
+        if match and int(match.group(2)) in targets:
+            ending = line[len(line.rstrip("\r\n")):]
+            body = line.rstrip("\r\n")
+            if fix["kind"] == "move":
+                body = _line_with_map(body, fix["target"])
+            else:
+                body = _line_without_wait(body, fix["dep"])
+            line = body + ending
+        out.append(line)
+    return "".join(out)
+
+
+def fix_loop(directory, pick=1, yes=False, code_repo=None):
+    """Offer or apply one loop fix (1.161.0). Returns (dict, exit code).
+
+    Without yes it writes nothing and returns the change it would make.
+    With yes it writes tasks.md, rebuilds build-map.md, and reports what is
+    left: no loop, or the next loop with its own fixes. It never touches
+    spec.md and commits nothing.
+    """
+    directory = pathlib.Path(directory)
+    slug = directory.name
+    tasks_path = directory / "tasks.md"
+    tasks = _read(tasks_path)
+    if tasks is None:
+        return {"ok": False, "code": "tasks", "message": f"no tasks.md in {directory}"}, 2
+    spec = _read(directory / "spec.md") or ""
+    plan = _read(directory / "plan.md")
+    work = _read(directory / "work-item.md") or ""
+    verify = _read(directory / "verify.md") or ""
+    claims = _read(directory / "claims.md") or ""
+    repo = find_repo(directory)
+    built = build(slug, spec, plan, tasks, work, verify, repo=repo, claims_text=claims, code_repo=code_repo)
+    fixes = [fix for row in built["loops"] for fix in row["fixes"]]
+    if not built["loops"]:
+        return {"ok": True, "wrote": None, "loops": [], "line": "No loop to fix. The branches do not wait for each other."}, 0
+    chosen = next((fix for fix in fixes if fix["number"] == pick), None)
+    if chosen is None:
+        words = ", ".join(f"`{fix['word']}`" for fix in fixes) or "none"
+        return {"ok": False, "code": "pick", "message": f"No fix {pick}. The fixes are {words}."}, 2
+    if chosen["kind"] == "move":
+        change = f"tasks.md: {_ids_text(chosen['tasks'])} now carry (map: {chosen['target']}), so they are built on {chosen['target']}."
+    else:
+        change = f"tasks.md: T{chosen['task']} no longer waits for T{chosen['dep']} in its (after:) mark."
+    if not yes:
+        row = next((row for row in built["loops"] if chosen in row["fixes"]), built["loops"][0])
+        card = dict(row.get("card") or {})
+        options = list(card.get("options") or [])
+        mine = [option for option in options if option.get("word") == chosen["word"]]
+        rest = [option for option in options if option.get("word") != chosen["word"]]
+        for option in rest:
+            option["label"] = option["label"].replace(" (Recommended)", "")
+        if mine and "(Recommended)" not in mine[0]["label"]:
+            mine[0]["label"] += " (Recommended)"
+        card["options"] = mine + rest
+        lines = [f"Change: {change}", f"Card: {card.get('question', '')}"]
+        for index, option in enumerate(card["options"], start=1):
+            lines.append(f"{index}. {option['label']} (`{option['word']}`): {option['text']}")
+        return {
+            "ok": False,
+            "code": "needs-yes",
+            "fix": chosen,
+            "change": change,
+            "card": card,
+            "line": "\n".join(lines),
+            "message": "fix-loop writes tasks.md only with --yes, after the fix was shown and confirmed.",
+        }, 2
+    new_text = apply_fix_text(tasks, chosen)
+    with open(tasks_path, "w", encoding="utf-8", newline="") as handle:
+        handle.write(new_text)
+    after = build(slug, spec, plan, new_text, work, verify, repo=repo, claims_text=claims, code_repo=code_repo)
+    (directory / "build-map.md").write_text(after["markdown"], encoding="utf-8")
+    lines = [f"Wrote {change}", "Rebuilt build-map.md."]
+    if after["loops"]:
+        lines.append("Another loop is left:")
+        lines.extend(after["loop_lines"])
+    else:
+        lines.append("No loop left. The branches no longer wait for each other.")
+    lines.append(f"Uncommitted: docs/specs/{slug}/tasks.md, docs/specs/{slug}/build-map.md")
+    return {
+        "ok": True,
+        "wrote": ["tasks.md", "build-map.md"],
+        "fix": chosen,
+        "change": change,
+        "loops": after["loops"],
+        "lines": lines,
+        "line": "\n".join(lines),
+    }, 0
+
+
 def main(argv):
     _utf8_stdout()
     if not argv or argv[0] in ("-h", "--help"):
@@ -2225,6 +2673,26 @@ def main(argv):
         if not (__doc__ or "").endswith("\n"):
             sys.stdout.write("\n")
         return 0
+    if "--fix-loop" in argv:
+        rest = [arg for arg in argv if arg not in ("--fix-loop", "--yes", "--json")]
+        pick = 1
+        if "--pick" in rest:
+            at = rest.index("--pick")
+            try:
+                pick = int(rest[at + 1])
+            except (IndexError, ValueError):
+                sys.stdout.write("--pick takes a fix number.\n")
+                return 2
+            del rest[at:at + 2]
+        if len(rest) != 1:
+            sys.stdout.write("Name one spec folder with --fix-loop.\n")
+            return 2
+        out, code = fix_loop(rest[0], pick=pick, yes="--yes" in argv)
+        if "--json" in argv:
+            sys.stdout.write(json.dumps(out, indent=2) + "\n")
+        else:
+            sys.stdout.write((out.get("line") or out.get("change") or out.get("message") or "") + "\n")
+        return code
     chat = "--chat" in argv
     stdout = "--stdout" in argv
     args = [arg for arg in argv if arg not in ("--chat", "--stdout")]

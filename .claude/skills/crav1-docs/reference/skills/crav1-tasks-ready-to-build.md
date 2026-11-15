@@ -58,11 +58,13 @@ Shows summary counts per slice, then Ready and Held grouped by build-map branch,
 
 1.153.0: the map row for an open task is the branch on the task line, or beside that T# in a leading Branches paragraph, even when a done sibling sits on an already-merged branch. An open task is never placed under a branch git proves merged when another name is written for it. The ending has one Run next block at the top; the walk command appears only there; the reply prints that block verbatim and never writes a Next: line. `readiness --brief` prints only the result, a counts row, the ending, and claim warnings. The Waiting line counts only tasks held by an open question or an approval. A verify.md table row for a T# that is not in tasks.md is one Waiting line; the check does not edit verify.md.
 
-1.154.0: branches that wait for each other are a loop. The map and the ready-check ending print one `Loop:` line per loop, naming the branches and the task line behind each direction of the wait, then `Fix one of these lines in tasks.md.` The open tasks on those branches are Blocked in both, from one shared judgement, and are not offered in Run next. A branch downstream of a loop keeps its own wave and state. A branch always sits in a later wave than each branch it waits for, unless both are in the same loop. A held line shows the wave, or `in a loop`, never `(blocked)`.
+1.154.0: branches that wait for each other are a loop. The map and the ready-check ending print one `Loop:` line per loop, naming the branches and the task line behind each direction of the wait, (since 1.161.0 followed by a fix offer, not a request to edit `tasks.md` by hand) The open tasks on those branches are Blocked in both, from one shared judgement, and are not offered in Run next. A branch downstream of a loop keeps its own wave and state. A branch always sits in a later wave than each branch it waits for, unless both are in the same loop. A held line shows the wave, or `in a loop`, never `(blocked)`.
 
 1.155.0: Run next offers each ready branch's next task, [`/crav1-build-walk`](crav1-build-walk.md) <slug> T#`, and, when that branch has two or more open tasks, the whole branch, [`/crav1-build-walk`](crav1-build-walk.md) <slug> <branch>`, as its own entry with `branch <branch>, every open task: …` underneath. `next_lines` carry the same entries. A `Branch runs:` block prints each unmerged `- Branch run:` status line from `walk-progress.md`.
 
 1.156.0: the readiness script prints the finished reply (`walk_progress.py readiness --root <spec-folder> --write-map --text`): the header, the counts row, `Result:`, the shared walk ending (Run next first, Held, Branch runs, Loop and Waiting lines, claim warnings), `Source:` and `Build map:`. The skill shows it as-is and never adds a `Next:` line. The brief reply is the default; the word `full` adds the per-task lists and the Order line. The rules moved to `references/rules.md`. The ending is shared with tighten-and-plan and build-walk through `scripts/walk_ending.py`.
+
+1.161.0: a loop no longer ends with a line telling you to edit `tasks.md` by hand. Under the `Loop:` line the reply offers fixes, best first, each in plain words: what is wrong, the change (build these tasks on the other branch, or let one task start without one wait), that the tasks stay the same and only the branch and pull request they go into change, and the order afterwards. A move is recommended when the target branch's plan step already describes the tasks. Dropping a wait is only an alternative, or the only fix when the tasks themselves wait for each other, with a warning that it changes the build order. A fix is offered only when it removes that loop without making a new one. Say `fix loop` (the recommended fix) or `fix loop <n>`. The card confirms, and on yes `walk_progress.py fix-loop --root <spec-folder> --pick <n> --yes` writes or replaces the `(map:)` marks, or removes the one `(after:)` wait, rebuilds `build-map.md`, and reports the loop gone or the next one. `tasks.md` and `build-map.md` stay uncommitted. `spec.md` is never touched. A ready or ready-partial reply also has a Run next entry, [`/crav1-tasks-ready-to-build`](crav1-tasks-ready-to-build.md) <slug> fix loop`.
 
 ## Choice words
 
@@ -72,6 +74,8 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 | --- | --- | --- |
 | Show the build map? | `build-map` | show only the build map for the same scope, such as cc 1.0; the task list stays off |
 | Show the full list? | `full` | the long form: every per-task list and the Order line; the brief reply is the default |
+| Fix the loop? | `fix loop` | apply the recommended fix for branches that wait for each other, after the card confirms it |
+| Fix the loop? | `fix loop <n>` | apply the fix with that number from the Loop lines instead |
 | Also check the latest pipeline runs? | `pipeline runs` | check the latest successful Azure DevOps runs behind the Promotion line (read-only) |
 
 ## Runs when
@@ -96,9 +100,9 @@ Writes a list in the chat with summary counts, Ready and Held grouped by build-m
 
 ## Does not
 
-Leaves every file other than `build-map.md` alone, including `verify.md` and `claims.md`, and never reads Azure Boards. It fetches the specs repo first. It does not commit the map.
+Leaves every file other than `build-map.md` alone, including `verify.md` and `claims.md`, except the `(map:)` or `(after:)` marks a confirmed `fix loop` writes in `tasks.md`, and never reads Azure Boards. It fetches the specs repo first. It does not commit the map.
 
-Limits and exceptions: does not guess a dependency or a blocking link from task text. Where nothing is recorded it uses a fallback and marks the reason inferred. It writes no readiness marks; review-plan, tighten-plan, plan-from-spec, and resolve-open-questions write them. The map is written only by `scripts/build_map.py`.
+Limits and exceptions: does not guess a dependency or a blocking link from task text. Where nothing is recorded it uses a fallback and marks the reason inferred. It writes no readiness marks except a confirmed `fix loop` (1.161.0); review-plan, tighten-plan, plan-from-spec, and resolve-open-questions write them. The map is written only by `scripts/build_map.py`.
 
 ## You run next / Runs by itself
 

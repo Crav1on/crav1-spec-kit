@@ -60,8 +60,7 @@ TASKS = """# Tasks
 LOOP_LINE = (
     "Loop: feat/orders-cicd and feat/orders-dev-switch wait for each other: "
     "T14 on feat/orders-cicd waits for T13 on feat/orders-dev-switch, and "
-    "T13 on feat/orders-dev-switch waits for T12 on feat/orders-cicd. "
-    "Fix one of these lines in tasks.md."
+    "T13 on feat/orders-dev-switch waits for T12 on feat/orders-cicd."
 )
 
 
@@ -112,7 +111,9 @@ def readiness(root, *extra):
 class LoopIsNamed(unittest.TestCase):
     def test_map_names_both_branches_and_each_task_line(self):
         result = bm.build("orders-api", SPEC, PLAN, TASKS)
-        self.assertEqual(result["loop_lines"], [LOOP_LINE])
+        # 1.161.0: the fix offer follows the Loop line.
+        self.assertEqual(result["loop_lines"][0], LOOP_LINE)
+        self.assertTrue(result["loop_lines"][1].startswith("Recommended fix (say `fix loop`)"))
         self.assertIn(LOOP_LINE, result["markdown"])
         self.assertIn(LOOP_LINE, result["summary"])
         self.assertEqual(result["loops"][0]["branches"], ["feat/orders-cicd", "feat/orders-dev-switch"])
@@ -233,7 +234,7 @@ class ReadyCheckAgreesWithTheMap(unittest.TestCase):
             row = next(row for row in payload["rows"] if row["task"] == task)
             self.assertEqual(row["bucket"], "blocked")
         self.assertEqual(payload["counts"]["blocked"], 3)
-        self.assertEqual(payload["loop_lines"], [LOOP_LINE])
+        self.assertEqual(payload["loop_lines"][0], LOOP_LINE)
         self.assertIn(LOOP_LINE, payload["ending"])
         self.assertIn(LOOP_LINE, mapped)
         self.assertTrue(payload["ending"].startswith("Run next:"))

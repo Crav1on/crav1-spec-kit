@@ -11,7 +11,8 @@ Commands:
       Waves from the (after: ...) graph, the same sort the ready check uses
       (skill crav1-tasks-ready-to-build, scripts/task_order.py). Lists a
       loop, an after: that names no task, and a task line with no verify
-      kind or no (spec: ...) mark.
+      kind or no (spec: ...) mark. Branches that wait for each other are a
+      Branch loop line with the fixes the ready check offers (1.161.0).
   recap   --root <spec-folder> --branch <name> [--facts <file>] [--uncommitted <n>]
       The plan-from-spec "After writing" output, in its fixed order, ending
       with its one Next line. <file> is JSON with what only the agent can
@@ -86,6 +87,38 @@ def _load(skill: str, name: str, alias: str):
 
 def _task_order():
     return _load("crav1-tasks-ready-to-build", "task_order.py", "plan_check_task_order")
+
+
+def _build_map():
+    return _load("crav1-tasks-ready-to-build", "build_map.py", "plan_check_build_map")
+
+
+def branch_loop_lines(root: Path, tasks_text: str) -> list[str]:
+    """Branches that wait for each other, with the fix the ready check offers (1.161.0).
+
+    The same judgement as the build map: a loop between branches, not only
+    between tasks. Each fix is one candidate plan issue, applied on the
+    batch yes with walk_progress.py fix-loop.
+    """
+    try:
+        bm = _build_map()
+        built = bm.build(root.name, _read(root / "spec.md"), _read(root / "plan.md") if (root / "plan.md").is_file() else None,
+                         tasks_text, repo=None)
+    except PlanCheckError:
+        return []
+    lines: list[str] = []
+    for row in built.get("loops") or []:
+        lines.append("- Branch loop: " + row["line"][len("Loop: "):])
+        fixes = row.get("fixes") or []
+        if not fixes:
+            lines.append("  - No single change breaks it. Ask which wait should go.")
+        for index, fix in enumerate(fixes):
+            head = "Recommended fix" if index == 0 else "Other fix"
+            lines.append(
+                f"  - {head} {fix['number']} (fix-loop): {fix['detail']} Why: {fix['why']} "
+                f"Apply on the batch yes: walk_progress.py fix-loop --root {root.as_posix()} --pick {fix['number']} --yes"
+            )
+    return lines
 
 
 def _batch_offer():
@@ -201,6 +234,7 @@ def order_lines(root: Path) -> list[str]:
             continue
         seen.add(key)
         lines.append("- Loop: " + " → ".join(f"T{x}" for x in path) + ". Fix one (after: ...) mark.")
+    lines.extend(branch_loop_lines(root, text))
     leftover = sorted(looped - set(cycles))
     if leftover:
         lines.append("- Waits on a loop: " + ", ".join(f"T{i}" for i in leftover))
