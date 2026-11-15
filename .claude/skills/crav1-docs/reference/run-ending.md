@@ -8,6 +8,8 @@ A skill names the next step. It does not run it, unless that skill already runs 
 
 The ready check (`/crav1-tasks-ready-to-build`), the tighten-and-plan ready check, and `/crav1-build-walk` build their ending with one shared script, skill `crav1-tasks-ready-to-build` `scripts/walk_ending.py --json <state>` (each of the three skills ships a copy of that `walk_ending` script). The skill gives that text once as its answer, as-is. It never pastes the raw tool output and then repeats the reply, never adds more than one short lead sentence before it, never adds, drops, or rewrites a line, and never adds a `Next:` line of its own. For the same ready branches, the three print the same Run next entries. The order is:
 
+Before a ready-check or walk ending, the reply has at most one short lead sentence of recap, for example `The plan review is done.`, then the ending, `Run next:` first. No longer recap and no list before it (1.164.0).
+
 1. `Run next:` first. Each command alone in its own code span, with the branch and task line under it. A ready branch gets its next task, `` `/crav1-build-walk <slug> T#` ``, and, with two or more open tasks, the whole branch, `` `/crav1-build-walk <slug> <branch>` `` (1.155.0).
 2. `Held:` lines, then `Branch runs:` status lines.
 3. For a branch run: `Built on <branch>:` (one line per task, with its commit and tests), then `Left:`.

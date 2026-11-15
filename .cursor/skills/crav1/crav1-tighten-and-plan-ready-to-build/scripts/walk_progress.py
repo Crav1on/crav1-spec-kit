@@ -1916,6 +1916,23 @@ def resume(args: argparse.Namespace) -> None:
     emit(resume_payload(root, args.no_playbook))
 
 
+# The one reference the next step needs (1.164.0). The walk opens only this file.
+READ_FOR = {
+    "playbook": "references/playbook.md",
+    "review-architecture": "references/steps.md",
+    "tighten-spec": "references/steps.md",
+    "resolve-open-questions": "references/steps.md",
+    "plan-from-spec": "references/steps.md",
+    "review-and-tighten-plan": "references/steps.md",
+    "tasks-ready-to-build": "references/readiness.md",
+}
+
+
+def read_for(step: str | None) -> str:
+    """The reference file for continue_from; every step done is the ready check."""
+    return READ_FOR.get(step or "", "references/readiness.md")
+
+
 def resume_payload(root: Path, no_playbook: bool) -> dict:
     data = load(root)
     effect = section_effect(root, data["steps"])
@@ -1971,6 +1988,7 @@ def resume_payload(root: Path, no_playbook: bool) -> dict:
         "progress_file": PROGRESS_NAME,
         "steps": rows,
         "continue_from": continue_from,
+        "read": read_for(continue_from),
         "playbook": book.get("playbook") if book else None,
         "done_stamp_warning": done_stamp_warning(data["steps"], data.get("acks")),
         "reopen_line": effect["reopen_line"],

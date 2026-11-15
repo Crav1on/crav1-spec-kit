@@ -8,7 +8,7 @@
 
 List the tasks ready to build, for one spec or all, and why the others are blocked. Rewrites each slice build map.
 
-1.164.0: the loop-fix card and Waiting lines follow the card wording rule in `docs/reference/question-cards.md`. `scripts/kit-lint.py` checks this skill's cards.
+1.164.0: the loop-fix card and Waiting lines follow the card wording rule in `docs/reference/question-cards.md`. Held tasks in the ending are one per line under their branch, with the open question shortened to its first sentence, about 100 characters at most. `scripts/kit-lint.py` checks this skill's cards.
 
 1.163.0: multi-word choice words are hyphenated only. On this skill: `fix-loop`, `fix-loop <n>`, `open-map`, `export-map` and `pipeline-runs`. Spaced forms are no longer accepted. The script flags `--fix-loop` and `--export` are unchanged. The same hyphen-only rule applies to the kit's other choice words, including `release-claim`, `new-branch`, `one-task`, `git-log` (the style word), and the rest listed in the 1.163.0 changelog. A successful `walk_progress.py fix-loop` preview (no `--yes`) exits 0. The loop-fix `Why:` line is a plain reason with no keyword list. The skill gives the script's formatted reply once as the answer, not the raw tool output and then the reply again, with at most one short lead sentence before it. A not-ready ending starts with `Run next:` for the first real next step, in plain words.
 

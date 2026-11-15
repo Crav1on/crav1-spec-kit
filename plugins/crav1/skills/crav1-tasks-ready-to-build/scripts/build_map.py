@@ -2102,7 +2102,7 @@ def held_phrase(row):
         return f'approval "{what}" Waiting for {who}.'
     match = re.search(r'open question "([^"]*)"', reason)
     if match:
-        question = re.split(r"(?<=[.!?])\s", match.group(1).strip(), maxsplit=1)[0]
+        question = short_question(match.group(1))
         note = ""
         if "blocks the whole slice (recorded)" in reason.lower():
             note = " Holds the whole slice."
@@ -2110,6 +2110,18 @@ def held_phrase(row):
             note = " Inferred from the text."
         return f'open question "{question}" Waiting for {who}.{note}'
     return core or "held"
+
+
+def short_question(text, limit=100):
+    """The quoted open question, short (1.164.0): no markdown markers such as
+    `**New:**`, the first sentence only, at most about `limit` characters."""
+    one = re.sub(r"\*\*[^*]{0,40}:\*\*\s*", "", text or "")
+    one = re.sub(r"[*_`]+", "", one)
+    one = re.sub(r"\s+", " ", one).strip()
+    one = re.split(r"(?<=[.!?])\s", one, maxsplit=1)[0]
+    if len(one) > limit:
+        one = one[: limit - 1].rsplit(" ", 1)[0].rstrip(" ,;:") + "…"
+    return one
 
 
 def _branch_order(branches):
@@ -2195,11 +2207,13 @@ def report_by_branch(built, rows, slug=None):
         ready_lines.append(f"- `{group['branch']['name']}` ({_where(group['branch'])}): {labels}")
     held_lines = []
     for group in held_groups:
-        bits = []
+        # One task per line under its branch heading (1.164.0).
+        rows = [f"- `{group['branch']['name']}` ({_where(group['branch'])}):"]
         for task, row in group["items"]:
             label = task.get("label") or task_label(task["id"], task.get("short"))
-            bits.append(f"{label} — {held_phrase(row)}")
-        held_lines.append(f"- `{group['branch']['name']}` ({_where(group['branch'])}): " + "; ".join(bits))
+            phrase = re.sub(r"([.!?])[.;]+", r"\1", held_phrase(row))
+            rows.append(f"  - {label} — {phrase}")
+        held_lines.append("\n".join(rows))
     next_lines = []
     run_lines = []
     ready_branches = []

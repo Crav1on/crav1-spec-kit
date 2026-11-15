@@ -135,8 +135,8 @@ class ReadyByBranch(unittest.TestCase):
             "- `feat/orders-api-export` (wave 1): T6 Email the receipt",
         ])
         self.assertEqual(payload["held_lines"], [
-            '- `feat/orders-api-currency` (wave 1): T3 Choose the currency — open question "Which currency for refunds?" Waiting for the partner.',
-            "- `feat/orders-api-archive` (wave 2): T4 Archive the receipt — held, waits on T3",
+            '- `feat/orders-api-currency` (wave 1):\n  - T3 Choose the currency — open question "Which currency for refunds?" Waiting for the partner.',
+            "- `feat/orders-api-archive` (wave 2):\n  - T4 Archive the receipt — held, waits on T3",  # one task per line, 1.164.0
         ])
         self.assertEqual(payload["next_lines"], ["/crav1-build-tasks builds one task without the walk."])
         self.assertEqual(payload["next"], "/crav1-build-tasks builds one task without the walk.")

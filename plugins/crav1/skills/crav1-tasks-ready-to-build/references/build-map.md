@@ -71,14 +71,16 @@ branch feat/orders-api-record, every open task: T2 Record the decision, T5 Store
 branch feat/orders-api-export, T6 Email the receipt
 
 Held:
-- `feat/orders-api-currency` (wave 1): T3 Choose the currency — open question "Which currency for refunds?" Waiting for the partner.
-- `feat/orders-api-archive` (wave 2): T4 Archive the receipt — held, waits on T3
+- `feat/orders-api-currency` (wave 1):
+  - T3 Choose the currency — open question "Which currency for refunds?" Waiting for the partner.
+- `feat/orders-api-archive` (wave 2):
+  - T4 Archive the receipt — held, waits on T3
 
 /crav1-build-tasks builds one task without the walk.
 ```
 
 Each ready branch offers its next task as `/crav1-build-walk <slug> T#`. When that branch has two or more open tasks, the whole branch, `/crav1-build-walk <slug> <branch>`, is a second entry, with `branch <branch>, every open task: …` underneath (1.155.0). A branch with one open task gets only the T# entry. After Held, a `Branch runs:` block lists each `- Branch run:` status line in `walk-progress.md` that is not `merged`, for example `- feat/orders-api-record: running, T2 done, next T5 (log: build-progress/feat--orders-api-record.md)`.
 
-A held task names its open question and who has the answer, or `held, waits on T#`. The Run next block is first and is the only place the walk command appears, one entry per branch that has a task that can start, and only when the result is `ready` or `ready-partial`. The bottom keeps Waiting lines and the one-line `/crav1-build-tasks` alternative. Never write a `Next:` line after the Waiting or Held lines (1.153.0). Do not flatten the branches into one list.
+A held task names its open question and who has the answer, or `held, waits on T#`. Each held task is its own line under its branch, and the question is short: its first sentence, no markdown markers, about 100 characters at most (1.164.0). The Run next block is first and is the only place the walk command appears, one entry per branch that has a task that can start, and only when the result is `ready` or `ready-partial`. The bottom keeps Waiting lines and the one-line `/crav1-build-tasks` alternative. Never write a `Next:` line after the Waiting or Held lines (1.153.0). Do not flatten the branches into one list.
 
 A held line shows the wave, or `in a loop` for a branch caught in a loop. It never shows `(blocked)` (1.154.0). When branches wait for each other, print one Loop line per loop before the Waiting lines, naming the branches and the task line behind each direction of the wait: `Loop: feat/orders-api-x and feat/orders-api-y wait for each other: T14 on feat/orders-api-x waits for T13 on feat/orders-api-y, and T13 on feat/orders-api-y waits for T12 on feat/orders-api-x.` Then print the fix lines under it, `Recommended fix (say `fix-loop`): …` first ([loop-fix.md](loop-fix.md), 1.161.0).

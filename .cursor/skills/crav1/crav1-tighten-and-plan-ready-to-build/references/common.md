@@ -19,3 +19,5 @@ After a step finishes, record that one step, then run `resume`. One `record` cal
 Spec, plan, and tasks remain the source of truth. The progress file does not. A jump back reruns the skill that owns the step, even for a small patch. This walk does not edit `spec.md`, `plan.md`, or `tasks.md` on that jump, and it does not write the `Reviewed:` line.
 
 Do not run `/crav1-build-tasks`, `/crav1-build-features`, `/crav1-verify-build-against-spec`, or `/crav1-fix-build-gaps`. This walk never writes `verify.md`. Do not create a git commit. The playbook copy under `docs/playbooks/` is a file write inside apply, not a git commit.
+
+**Fewer reads (1.164.0).** `start` and `resume` return `read`, the one reference the next step needs: `references/playbook.md`, `references/steps.md`, or `references/readiness.md`. Open only that file. Do not open `progress.md`, `playbook.md`, or `steps.md` when `read` does not name them; `progress.md` is only for a stop or a clear.

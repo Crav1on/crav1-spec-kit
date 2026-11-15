@@ -179,5 +179,37 @@ class LiveRunCards(unittest.TestCase):
         self.assertIn("Do not name step ids", playbook)
 
 
+class HeldLines(unittest.TestCase):
+    def test_short_question(self):
+        bm = _load("build_map_held_1164", SKILLS / "crav1-tasks-ready-to-build/scripts/build_map.py")
+        self.assertEqual(bm.short_question("**New:** Which currency for refunds? It matters for EU."), "Which currency for refunds?")
+        long = "Which " + "very " * 40 + "long question is this?"
+        out = bm.short_question(long)
+        self.assertLessEqual(len(out), 100)
+        self.assertTrue(out.endswith("…"))
+
+
+class FewerReadsAndScripts(unittest.TestCase):
+    def test_read_field(self):
+        walk = _load("walk_progress_read_1164", SKILLS / "crav1-tighten-and-plan-ready-to-build/scripts/walk_progress.py")
+        self.assertEqual(walk.read_for("playbook"), "references/playbook.md")
+        self.assertEqual(walk.read_for("plan-from-spec"), "references/steps.md")
+        self.assertEqual(walk.read_for("tasks-ready-to-build"), "references/readiness.md")
+        self.assertEqual(walk.read_for(None), "references/readiness.md")
+        src = (SKILLS / "crav1-tighten-and-plan-ready-to-build/scripts/walk_progress.py").read_text(encoding="utf-8")
+        self.assertIn('"read": read_for(continue_from)', src)
+        for rel in set(walk.READ_FOR.values()):
+            self.assertTrue((SKILLS / "crav1-tighten-and-plan-ready-to-build" / rel).is_file(), rel)
+
+    def test_lead_sentence_and_powershell(self):
+        ending = (ROOT / "docs/reference/run-ending.md").read_text(encoding="utf-8")
+        self.assertIn("at most one short lead sentence of recap", ending)
+        readiness = (SKILLS / "crav1-tighten-and-plan-ready-to-build/references/readiness.md").read_text(encoding="utf-8")
+        self.assertIn("at most one short lead sentence of recap", readiness)
+        scripts = (ROOT / "docs/reference/running-scripts.md").read_text(encoding="utf-8")
+        self.assertIn("do not redirect a script's output with `>`", scripts)
+        self.assertIn("BOM", scripts)
+
+
 if __name__ == "__main__":
     unittest.main()
