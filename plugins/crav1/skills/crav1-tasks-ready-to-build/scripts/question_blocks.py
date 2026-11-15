@@ -256,6 +256,13 @@ def kept_open(text, task_ids=None, resolve_recorded=False):
             continue
         if current is not None and line.startswith("  - "):
             current["marks"].append(line[4:].strip())
+            continue
+        # A blockquote under the bullet is the quoted question a pointer
+        # sentence (`The note x.md ... says:`) leads to (1.166.0). It is
+        # kept apart, so the question's key and text do not change.
+        quoted = re.match(r"^\s{2,}>\s?(.*)$", line)
+        if current is not None and quoted and not current["marks"]:
+            current.setdefault("quote", []).append(quoted.group(1).strip())
     out = []
     for q in questions:
         if any(m.startswith("Answered:") for m in q["marks"]):
@@ -292,6 +299,7 @@ def kept_open(text, task_ids=None, resolve_recorded=False):
         who = _who_waiting(q["text"]) or mark_who
         out.append({
             "text": q["text"],
+            "quote": " ".join(part for part in q.get("quote") or [] if part),
             "key": question_key(q["text"]),
             "stable_key": question_stable_key(q["text"]),
             "mark": mark,

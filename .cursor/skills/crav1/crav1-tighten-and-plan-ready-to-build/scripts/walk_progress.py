@@ -3054,6 +3054,8 @@ def _oq_row(tid: str, question: dict, whole: bool, kept: set[str], alias_kept: s
     }
     if question.get("who"):
         row["who"] = question["who"]
+    if question.get("quote"):
+        row["quote"] = question["quote"]
     return row
 
 

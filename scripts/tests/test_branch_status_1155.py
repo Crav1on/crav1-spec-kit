@@ -182,9 +182,11 @@ class RunNextChoiceTests(unittest.TestCase):
     def test_two_open_tasks_offer_task_and_branch(self):
         entries = bm.run_entries(["T1 Add the build pipeline"], "feat/orders-cicd", slug="orders-api",
                                  open_labels=["T1 Add the build pipeline", "T2 Add the test stage"])
-        # One block per branch, whole branch first (1.164.0).
+        # One block per branch, whole branch first (1.164.0). With no plan
+        # step the description comes from the task names (1.166.0).
         self.assertEqual(entries, [
-            "**feat/orders-cicd**\n2 open tasks:\n- T1 Add the build pipeline\n- T2 Add the test stage\n\n"
+            "**feat/orders-cicd**\nAdd the build pipeline and add the test stage.\n"
+            "2 open tasks:\n- T1 Add the build pipeline\n- T2 Add the test stage\n\n"
             "Run the whole branch:\n`/crav1-build-walk orders-api feat/orders-cicd`\n"
             "Run only T1, the first task:\n`/crav1-build-walk orders-api T1`",
         ])
@@ -192,7 +194,7 @@ class RunNextChoiceTests(unittest.TestCase):
     def test_one_open_task_offers_only_the_task(self):
         entries = bm.run_entries(["T4 Note the export"], "feat/orders-note", slug="orders-api",
                                  open_labels=["T4 Note the export"])
-        self.assertEqual(entries, ["**feat/orders-note**\n1 open task:\n- T4 Note the export\n\nRun T4:\n`/crav1-build-walk orders-api T4`"])
+        self.assertEqual(entries, ["**feat/orders-note**\nNote the export.\n1 open task:\n- T4 Note the export\n\nRun T4:\n`/crav1-build-walk orders-api T4`"])
 
     def test_ready_check_run_and_next_lines_agree(self):
         root = write_slice(Path(tempfile.mkdtemp()))
@@ -242,7 +244,7 @@ class RunNextChoiceTests(unittest.TestCase):
                                              "open_tasks": [{"id": "T1", "title": "Add the build pipeline"},
                                                             {"id": "T2", "title": "Add the test stage"}]}]})
         text = out["ending"]
-        self.assertIn("**feat/orders-cicd**\n2 open tasks:\n- T1 Add the build pipeline\n- T2 Add the test stage", text)
+        self.assertIn("**feat/orders-cicd**\nAdd the build pipeline and add the test stage.\n2 open tasks:\n- T1 Add the build pipeline\n- T2 Add the test stage", text)
         self.assertIn("Run the whole branch:\n`/crav1-build-walk orders-api feat/orders-cicd`\nRun only T1, the first task:\n`/crav1-build-walk orders-api T1`", text)
 
 

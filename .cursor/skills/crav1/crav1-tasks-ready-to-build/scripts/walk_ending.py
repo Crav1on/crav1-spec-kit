@@ -140,17 +140,6 @@ def _sentences(text):
     return [part.strip() for part in SENTENCE_SPLIT.split(_plain(text)) if part.strip()]
 
 
-def _clean_sentence(sentence):
-    """A plain description: ends with a full stop, no colon list, no person lead."""
-    if not sentence.endswith("."):
-        return False
-    if ":" in sentence:
-        return False
-    if PERSON_LEAD.match(sentence):
-        return False
-    return len(sentence.split()) >= 3
-
-
 def step_heading(text):
     """A plan step's heading in plain words, or "" (1.165.0).
 
@@ -171,50 +160,273 @@ def step_heading(text):
         if "," in head or len(head.split()) > 8:
             return ""
     head = _plain(head).strip(" .:;—–-")
-    if not head:
+    if not head or _fileish(head):
         return ""
     if re.match(r"^(?:[A-Z][\w'-]*\s+){0,3}[A-Z][\w'-]*\s+(?:builds|owns|writes)\b", head):
         return ""
     return head[:1].upper() + head[1:] + "."
 
 
-def about_sentence(text, limit=160):
-    """One plain sentence of what a branch does, from its plan step (1.165.0).
+# Branch description limits (1.166.0): up to three clean plan sentences,
+# about 300 characters, cut only at a sentence end. A line built from task
+# names stays near 160 characters.
+DESCRIPTION_LIMIT = 300
+TASK_SUMMARY_LIMIT = 160
+FILE_EXT = re.compile(
+    r"\.(?:md|markdown|ya?ml|py|json|bicep|cs|csproj|ts|js|txt|sh|ps1|xml|sql|toml|ini|cfg)$",
+    re.I,
+)
+TASK_PREFIX = re.compile(r"^T\d+\s+")
+ITEM_CUT = re.compile(r",\s|\s[—–]\s|\s(?:with|for|during|via|so that)\s")
 
-    Only a clean first sentence counts: it ends with a full stop, has no
-    colon list and does not open with a person (`Person A builds ...`).
-    Otherwise the step's heading in plain words. Otherwise "" and the line
-    is left out. A long sentence is cut at a clause end (shorten()).
+
+def _fileish(text):
+    """True when the text names a file or a path (1.166.0).
+
+    `infra-orders/`, `docs/notes/x.md`, `cd-orders.yml`. A short upper-case
+    pair such as `CI/CD` is not a path.
+    """
+    for token in str(text or "").split():
+        tok = token.strip(",.;:()[]\"'`…")
+        if not tok:
+            continue
+        if FILE_EXT.search(tok):
+            return True
+        if "/" in tok:
+            if tok.endswith("/") or tok.count("/") >= 2 or "." in tok:
+                return True
+            if re.fullmatch(r"[a-z0-9_-]{4,}/[a-z0-9_.-]+", tok):
+                return True
+    return False
+
+
+def _cap(text):
+    return text[:1].upper() + text[1:] if text else text
+
+
+def _clean_sentence(sentence):
+    """A plain description: ends with a full stop, no colon list, no person
+    lead, no file or path list."""
+    if not sentence.endswith("."):
+        return False
+    if ":" in sentence:
+        return False
+    if PERSON_LEAD.match(sentence):
+        return False
+    if _fileish(sentence):
+        return False
+    return len(sentence.split()) >= 3
+
+
+def _drop_dangling(text):
+    words = text.rstrip(" ,;:—–-.").split(" ")
+    while len(words) > 1 and words[-1].lower().strip(",;:") in DANGLING:
+        words.pop()
+    return " ".join(words).rstrip(" ,;:—–-.")
+
+
+def opening_clause(text, limit=DESCRIPTION_LIMIT):
+    """A plan note trimmed to its opening clause, or "" (1.166.0).
+
+    A step written as notes (`The orders CI/CD branch, cut from develop
+    after billing-ops: merge main ...`) keeps the words before the first
+    `:` or ` — `: `The orders CI/CD branch, cut from develop after
+    billing-ops.` A person lead (`Person A builds PR 73: ...`) is dropped
+    and the clause is taken from what follows. A trailing fragment (a short
+    comma part such as `PR 73`, or a path) and a dangling word are dropped.
+    The clause needs at least four words and no file or path.
+    """
+    one = _plain(text)
+    if not one:
+        return ""
+    lead = PERSON_LEAD.match(one)
+    if lead:
+        if ":" not in one[lead.end():]:
+            return ""
+        one = one[lead.end():].split(":", 1)[1].strip()
+    head = re.split(r":\s|:$|\s[—–]\s", one, maxsplit=1)[0]
+    head = SENTENCE_SPLIT.split(head, maxsplit=1)[0]
+    parts = [part.strip() for part in head.split(", ")]
+    while len(parts) > 1 and (
+        len(parts[-1].split()) < 3
+        or _fileish(parts[-1])
+        or re.fullmatch(r"(?:PR|T)\s?\d+", parts[-1])
+    ):
+        parts.pop()
+    head = _drop_dangling(", ".join(parts))
+    if len(head.split()) < 4 or _fileish(head) or PERSON_LEAD.match(head):
+        return ""
+    if len(head) + 1 > limit:
+        return ""
+    return _cap(head) + "."
+
+
+def _task_item(name):
+    """A task name cut to its core words for a branch summary (1.166.0)."""
+    match = ITEM_CUT.search(name)
+    if match and len(name[: match.start()].split()) >= 2:
+        name = name[: match.start()]
+    return _drop_dangling(name)
+
+
+def _join(items):
+    if len(items) == 1:
+        return items[0]
+    if len(items) == 2:
+        return f"{items[0]} and {items[1]}"
+    return ", ".join(items[:-1]) + ", and " + items[-1]
+
+
+def tasks_sentence(names, limit=TASK_SUMMARY_LIMIT):
+    """One plain sentence from a branch's open task names, or "" (1.166.0).
+
+    The last fallback for the branch description. A prefix every name
+    shares (`Orders CI/CD:`) leads once and the rest are joined:
+    `Orders CI/CD: infra Bicep, cd pipeline, ci lint and tests, and deploy
+    README.` Each name keeps its words before a clause mark (`, `, ` with `,
+    ` for ` ...). The line stays under `limit`, whole items only; items
+    left out are counted (`and 2 more`).
+    """
+    items = [TASK_PREFIX.sub("", _plain(name)).strip() for name in names or []]
+    items = [item for item in items if item and not PERSON_LEAD.match(item)]
+    if not items:
+        return ""
+    if len(items) == 1:
+        one = _drop_dangling(items[0])
+        if len(one) + 1 > limit:
+            one = shorten(one, limit).rstrip("…")
+            one = _drop_dangling(one)
+        return _cap(one) + "." if len(one.split()) >= 2 else ""
+    prefix = ""
+    heads = [item.split(":", 1)[0].strip() for item in items if ":" in item]
+    if len(heads) == len(items) and len({head.lower() for head in heads}) == 1:
+        prefix = heads[0] + ": "
+        items = [item.split(":", 1)[1].strip() for item in items]
+    elif len(heads) == len(items) or any(":" in item for item in items):
+        items = [
+            item.split(":", 1)[1].strip() if ":" in item and len(item.split(":", 1)[0].split()) <= 3 else item
+            for item in items
+        ]
+    items = [_task_item(item) for item in items]
+    items = [item for item in items if item]
+    if not items:
+        return ""
+    # Only the line's first word is capitalised: `Add the pipeline and add
+    # the test stage.` An acronym (`CI`, `README`) keeps its case.
+    items = [items[0]] + [
+        item[:1].lower() + item[1:] if re.match(r"[A-Z][a-z]", item) else item
+        for item in items[1:]
+    ]
+    if not prefix:
+        items[0] = _cap(items[0])
+    for keep in range(len(items), 0, -1):
+        shown = items[:keep]
+        left = len(items) - keep
+        if left:
+            shown = shown + [f"{left} more"]
+        line = prefix + _join(shown) + "."
+        if len(line) <= limit:
+            return line
+    return ""
+
+
+def about_sentence(text, limit=DESCRIPTION_LIMIT, names=None):
+    """What a branch does, for its Run next block (1.164.0, 1.165.0, 1.166.0).
+
+    In order, the first that gives a line:
+      a. Up to three clean sentences from the start of the plan step (each
+         ends with a full stop, no colon list, no person lead, no path),
+         together at most about `limit` (300) characters. Cut only at a
+         sentence end, never mid-sentence.
+      b. The plan note trimmed to its opening clause (opening_clause()).
+      c. The step's heading in plain words (step_heading()).
+      d. One sentence from the branch's open task names (tasks_sentence()).
+    "" only when there is no plan step and no usable task name. A person's
+    name is never shown.
     """
     raw = str(text or "")
-    body = raw
-    match = re.match(r"\s*\*\*[^*]{2,80}\*\*\s*[—–:.-]?\s*", raw)
-    if match:
-        body = raw[match.end():]
-    sentences = _sentences(body)
-    if sentences and _clean_sentence(sentences[0]):
-        one = sentences[0]
-        if len(one) > limit:
-            one = shorten(one, limit)
-        return one[:1].upper() + one[1:]
-    return step_heading(raw)
+    if raw.strip():
+        body = raw
+        match = re.match(r"\s*\*\*[^*]{2,80}\*\*\s*[—–:.-]?\s*", raw)
+        if match:
+            body = raw[match.end():]
+        picked = []
+        for sentence in _sentences(body)[:3]:
+            if not _clean_sentence(sentence):
+                break
+            if len(" ".join(picked + [sentence])) > limit:
+                break
+            picked.append(sentence)
+        if picked:
+            return _cap(" ".join(picked))
+        for fallback in (opening_clause(body, limit), step_heading(raw)):
+            if fallback:
+                return fallback
+    return tasks_sentence(names or [])
 
 
-def question_text(text, limit=160):
-    """The quoted open question, short (1.165.0).
+# A sentence that only points to a note (1.166.0): `The note
+# docs/notes/x.md, in Open questions, question 5, says:`.
+POINTER_WORDS = re.compile(r"\b(?:says|said|asks|writes|reads|note|notes|see|per|quote[sd]?)\b", re.I)
+INLINE_QUOTE = re.compile(r":\s*[\"“]([^\"”]{8,})[\"”]")
+
+
+def _pointer(sentence):
+    """True for a sentence that ends with `:` or only points to a note."""
+    one = sentence.strip()
+    if one.endswith(":"):
+        return True
+    if one.endswith("?"):
+        return False
+    return _fileish(one) and bool(POINTER_WORDS.search(one))
+
+
+def _unquote(text):
+    return _plain(text).strip(" >\"“”'")
+
+
+def question_text(text, limit=160, quote=None):
+    """The quoted open question, short (1.165.0, 1.166.0).
 
     No markdown markers such as `**New:**`. The first sentence, unless it is
     a heading-like fragment (fewer than four words, such as `Client
-    certificate.`): then the first sentence that ends with `?`, else the next
-    real sentence. Cut at a clause end, never mid-word.
+    certificate.`) or a pointer to a note (a sentence that ends with `:`,
+    or names a file and says `says`, `note`, `see` ...). For a pointer, the
+    quoted question that follows: the blockquote under the bullet
+    (`quote`), else text in quotes after the colon, else the first sentence
+    ending in `?`. Cut at a clause end, never mid-word.
     """
     one = re.sub(r"\*\*[^*]{0,40}:\*\*\s*", "", str(text or ""))
-    sentences = _sentences(one)
-    if not sentences:
+    quoted = INLINE_QUOTE.search(one)
+    inline = quoted.group(1) if quoted else ""
+    if quoted:
+        one = one[: quoted.start() + 1] + " " + one[quoted.end():]
+    # A colon that ends a pointer ends its sentence too.
+    units = []
+    for sentence in _sentences(one):
+        head, sep, tail = sentence.partition(": ")
+        if sep and _pointer(head + ":") and (_fileish(head) or POINTER_WORDS.search(head)):
+            units.extend([head + ":", tail.strip()] if tail.strip() else [head + ":"])
+        else:
+            units.append(sentence)
+    units = [unit for unit in units if unit]
+    if not units and not (quote or inline):
         return ""
-    pick = sentences[0]
+    real = [u for u in units if not _pointer(u) and (len(u.split()) >= 4 or u.endswith("?"))]
+    pointer = any(_pointer(u) for u in units)
+    if pointer:
+        for found in (_unquote(quote or ""), _unquote(inline)):
+            if found:
+                return shorten(found, limit)
+        asked = [u for u in real if u.endswith("?")]
+        if asked:
+            return shorten(_unquote(asked[0]), limit)
+        if real:
+            return shorten(_unquote(real[0]), limit)
+        return shorten(units[0], limit)
+    pick = units[0] if units else _unquote(inline)
     if len(pick.split()) < 4 and not pick.endswith("?"):
-        rest = sentences[1:]
+        rest = units[1:]
         asked = [s for s in rest if s.endswith("?")]
         real = [s for s in rest if len(s.split()) >= 4]
         if asked:
@@ -248,7 +460,9 @@ def branch_block(branch_name, open_labels, first=None, slug=None, about=None, wa
     if not names:
         return ""
     lines = [f"**{branch_name}**"]
-    sentence = about_sentence(about) if about else ""
+    # Always a description when there is a plan step or a usable task
+    # name (1.166.0).
+    sentence = about_sentence(about, names=names)
     if sentence:
         lines.append(sentence)
     count = len(names)

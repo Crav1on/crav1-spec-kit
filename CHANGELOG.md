@@ -2,6 +2,15 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.166.0 (2026-11-15)
+
+Every Run next branch block has a description again, and a held question that points to a note shows the question itself. A minor release because the ending reads differently in the ready check, the tighten-and-plan ready check and the build walk.
+
+- **A description under every branch.** 1.165.0 left the line out when the plan step's first sentence was not clean, so on a real plan most branches had none. Now the line between the bold branch and `<n> open tasks:` is, in order: up to three clean sentences from the plan step (each ends with a full stop, has no colon list, no person leading it and no file or path), about 300 characters at most and cut only at a sentence end, never mid-sentence; else the plan note trimmed to its opening clause, the words before the first `:` or ` — `, for example `The orders CI/CD branch, cut from develop after billing-ops.`; else the step's heading in plain words; else one sentence from the branch's open task names, a shared prefix once, for example `Orders CI/CD: infra Bicep, cd pipeline, ci lint and tests, and deploy README.`, about 160 characters. The line is left out only when the branch has no plan step and no usable task name.
+- **No person's name.** A plan note that opens with a person, such as `Person A builds PR 73: GetReceipts answers 404 ...`, drops that lead and describes the work after it: `GetReceipts answers 404 for a cursor that matches no stored receipt.` A short trailing fragment such as `PR 73` is dropped too.
+- **The quoted question, not the pointer.** A held question whose text ends with `:` or only points to a note, such as `The note docs/notes/x.md, in Open questions, question 5, says:`, shows the quoted question that follows: the `>` blockquote under the bullet in the spec, else the text in quotes after the colon, else the first sentence ending in `?`. The question's key and stored text do not change, so recorded answers still match. A question that quotes another one keeps its inner quotes on the held line.
+- `run-ending.md`, the build-map fallback reference, the grouping reference, both walkthroughs and the skill page show the new rule. Tests: `scripts/tests/test_branch_description_1166.py`; three older tests now expect the description line.
+
 ## 1.165.0 (2026-11-15)
 
 Fixes to the Run next ending from 1.164.0, found when it ran on a real plan. A minor release because the ending reads differently in the ready check, the tighten-and-plan ready check and the build walk.
