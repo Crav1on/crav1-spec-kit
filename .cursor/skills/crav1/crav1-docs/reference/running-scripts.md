@@ -35,6 +35,13 @@ In a skill instruction, `<interpreter>` means that choice. The command still inc
 <interpreter> -X utf8 <skill crav1-tasks-ready-to-build>/scripts/build_map.py docs/specs/<slug> --recommend T1
 ```
 
+The map page (1.162.0) needs the spec folder or its `build-map.md`. `--export` writes one file to share; without it the page goes to a temp file and opens in the browser.
+
+```text
+<interpreter> -X utf8 <skill crav1-tasks-ready-to-build>/scripts/open_build_map.py docs/specs/<slug>
+<interpreter> -X utf8 <skill crav1-tasks-ready-to-build>/scripts/open_build_map.py docs/specs/<slug> --export
+```
+
 The tighten-and-plan walk starts with one command. `--root` is a spec folder or a slug. `--playbook` is optional.
 
 ```text

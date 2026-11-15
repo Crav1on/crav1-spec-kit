@@ -17,6 +17,10 @@ Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. On Windo
 
 The file is committed with the spec. This command does not commit.
 
+## The page line (1.162.0)
+
+Under the `# Build map` heading, one line names the zoomable page: to zoom the diagram, `/crav1-tasks-ready-to-build <slug> open map`; to share the map as one file, `/crav1-tasks-ready-to-build <slug> export map`. See [map-page.md](map-page.md).
+
 ## What a row shows
 
 Six things, and nothing else, plus one note when the task text names a different branch. No estimates. No file lists. Task ids appear in the Tasks field as `T#` plus the short name (1.133.0). Other fields still drop them. The map is rewritten on every ready check, so those ids match `tasks.md`.
@@ -24,7 +28,7 @@ Six things, and nothing else, plus one note when the task text names a different
 1. **Branch.** The task's branch, in this order: a branch named on the task line, else the name beside that T# in a leading Branches paragraph (for example `chore/merge-main-into-develop` (T4)), else the plan step's `feat/<slug>-<words>` name, else `feat/<slug>-<words>` from the task. On the task line, `(map: <branch>)` wins, then `(branch: <branch>)`, then the Branches-paragraph name, then a `feat/…` or `chore/…` name in the sentence, then `committed later on <branch>`. When the line names more than one branch, the task's own name wins over a done sibling's already-merged branch. A repo prefix on a mark is dropped. `from <base>` after that branch is its base. Words in a generated name come from the step or the task, with the small words dropped. An open task is never placed under a branch git proves merged, or under a done sibling's branch, when the task line or the Branches paragraph names another (1.153.0).
 2. **Delivers.** One line, the step sentence, or the short task names when the branch is not the whole step. A task id in that prose is replaced with that task's short name, or removed. A removed id does not leave a dangling `'s`, an empty `()`, a leading comma, or a double space.
 3. **Tasks.** One task per entry, separated by `; `, as `T#` plus the short name. Example: `T5 orders-api: require pipeline 6 as build validation`. The short name is the `task: T# <title>` line in the slice's `work-item.md` when that line exists. Otherwise it is the task text up to the first ` (`, `, in `, or sentence end, at most about 80 characters. Marks such as `(host setup)`, `(manual, secret)`, `(verify: …)`, `(spec: …)`, `(after: …)`, and branch prefixes are dropped. The `T#` stays.
-4. **Waits for.** The other branches it waits for, or `none`. A dependency that names no task is `a dependency that names no task`.
+4. **Waits for.** The other branches it waits for, or `none`. A dependency that names no task is `a dependency that names no task`. On a branch whose every task is done the field is `Waited for:`, because nothing waits any more (1.162.0).
 5. **Question.** Each open question holding the branch, then who has the answer. Who comes from the question's own "Waiting for <who>" phrase, then the latest `Pending:` or `Asked:` line, otherwise `not named yet`.
 6. **Ready now.** One of `ready`, `waiting on a question`, `waits in order`, `blocked`, `done`, or `held, waits on <branch>`. A wait inside the same branch does not change this. `blocked` is a cycle, a dependency that names no task, a plan risk, or a missing plan. A branch caught in a loop says `blocked, in a loop` (1.154.0). `done` means every task on the branch is ticked. `held, waits on <branch>` means this branch has no question of its own and waits on a branch a question holds. That branch cannot start now.
 

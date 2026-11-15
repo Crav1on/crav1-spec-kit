@@ -117,6 +117,7 @@ NAMED_BRANCH = re.compile(
 TICK_PATH = re.compile(r"`([^`\n]+)`")
 WORD = re.compile(r"(?<![\w-])build-map(?![\w-])")
 PIPELINE = re.compile(r"(?<![\w-])pipeline runs(?![\w-])")
+PAGE = re.compile(r"(?<![\w-])(open|export) map(?![\w-])")
 STOP = {
     "a", "an", "the", "and", "or", "of", "to", "for", "on", "in", "with",
     "from", "by", "its", "into",
@@ -130,17 +131,23 @@ UNKNOWN_DEP = "a dependency that names no task"
 
 
 def parse_invocation(text):
-    """The word build-map selects the map. The remaining words are the scope."""
+    """The word build-map selects the map. The remaining words are the scope.
+
+    `open map` or `export map` sets page to open or export (1.162.0).
+    """
     raw = (text or "").strip()
     raw = re.sub(r"^/crav1-tasks-ready-to-build\b", "", raw).strip()
     mode = "map" if WORD.search(raw) else "report"
     raw = WORD.sub(" ", raw)
     pipeline = bool(PIPELINE.search(raw))
     raw = PIPELINE.sub(" ", raw)
+    page = PAGE.search(raw)
+    page = page.group(1) if page else None
+    raw = PAGE.sub(" ", raw)
     scope = re.sub(r"\s+", " ", raw).strip()
     if scope.startswith("@"):
         scope = scope[1:].strip()
-    return {"mode": mode, "scope": scope, "pipeline_runs": pipeline}
+    return {"mode": mode, "scope": scope, "pipeline_runs": pipeline, "page": page}
 
 
 def scope_folder_names(scope):
@@ -2317,7 +2324,7 @@ def overlap_lines(members):
 
 
 def _render(slug, grouping, branches, by_name, risks, has_plan, risk_blocks, names=None, loop_lines=None):
-    lines = ["# Build map", "", grouping, ""]
+    lines = ["# Build map", "", page_line(slug), "", grouping, ""]
     for line in loop_lines or []:
         lines.append(line)
         lines.append("")
@@ -2379,6 +2386,23 @@ def _render(slug, grouping, branches, by_name, risks, has_plan, risk_blocks, nam
     return text
 
 
+def page_line(slug):
+    """The pointer to the zoomable page, near the top of the file (1.162.0)."""
+    command = f"/crav1-tasks-ready-to-build {slug}"
+    return (
+        f"To zoom the diagram, run `{command} open map`. "
+        f"To share the map as one file, run `{command} export map`."
+    )
+
+
+def waits_label(branch):
+    """`Waited for` on a branch whose every task is done, else `Waits for` (1.162.0)."""
+    tasks = branch.get("tasks") or []
+    if tasks and all(task.get("done") for task in tasks):
+        return "Waited for"
+    return "Waits for"
+
+
 def _branch_block(branch, by_name, names=None):
     titles = "; ".join(branch.get("task_names") or []) or "work"
     lines = [
@@ -2386,7 +2410,7 @@ def _branch_block(branch, by_name, names=None):
         "",
         f"- Delivers: {branch['deliver']}",
         f"- Tasks: {titles}",
-        f"- Waits for: {_waits_line(branch, by_name)}",
+        f"- {waits_label(branch)}: {_waits_line(branch, by_name)}",
         f"- Question: {_question_line(branch['questions'], names)}",
         f"- Ready now: {_ready_now(branch)}",
     ]

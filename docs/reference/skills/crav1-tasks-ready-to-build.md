@@ -8,6 +8,8 @@
 
 List the tasks ready to build, for one spec or all, and why the others are blocked. Rewrites each slice build map.
 
+1.162.0: `open map` shows the whole `build-map.md` as a zoomable page in the browser, the text in a readable column and each Mermaid diagram in place, full window width, with wheel zoom, drag to pan, Fit, 100% and Fullscreen. `export map` writes one self-contained HTML file to share, `<slug>-build-map-<YYYY-MM-DD>.html` in Downloads, never inside the specs repo. The script is `scripts/open_build_map.py docs/specs/<slug>` (`--export`, `--out`, `--no-open`). It loads Mermaid 11.4.1 and marked 18.2.0 from `scripts/vendor/`, or from jsDelivr when that folder is missing; the export inlines both. The map file gets one line under its heading naming both commands, and a done branch says `Waited for:` instead of `Waits for:`.
+
 1.160.0: `build_map.py --recommend` reads remotes with `git ls-remote --heads` once per run, besides the `origin/<name>` refs, and, when `gh` works, the open pull requests. A task-line branch deleted only locally is offered, not replaced by a new step-named branch: `because: <name> is on origin only; checkout creates the local tracking branch`, then a last `checkout: <name>` line. An open pull request whose head is the name wins over merged and deleted, and a `PR n` on the task line picks it. A remote that cannot be read is never taken as gone. Only a branch missing everywhere, with no open pull request, gets a new name. `CRAV1_NO_REMOTE_CHECK=1` turns the remote reads off. The branch is checked in the task's code repo, which can be a separate checkout from the specs repo: a repo prefix on `(map:)`/`(branch:)`, a Match `Branch: <repo> <branch>` line, or a `Repo:` line in tasks.md names it, and `--code-repo <path>`, the specs repo, or a sibling checkout with that name holds it. `repo: <path>` is printed when that is not the specs repo. When the named repo is not found, the line is `because: could not check <repo> from here`, never deleted.
 
 1.149.0: work branches, a sub-branch, promotion, a work item, a blocking plan risk, and a next line other than the ready list are references files. SKILL.md names each with a load-when line. The rules are unchanged.
@@ -76,6 +78,8 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 | Show the full list? | `full` | the long form: every per-task list and the Order line; the brief reply is the default |
 | Fix the loop? | `fix loop` | apply the recommended fix for branches that wait for each other, after the card confirms it |
 | Fix the loop? | `fix loop <n>` | apply the fix with that number from the Loop lines instead |
+| Open the map as a zoomable page? | `open map` | open the whole build map in the browser, with a diagram you can zoom and pan |
+| Open the map as a zoomable page? | `export map` | write the map as one HTML file to send, outside the specs repo |
 | Also check the latest pipeline runs? | `pipeline runs` | check the latest successful Azure DevOps runs behind the Promotion line (read-only) |
 
 ## Runs when
@@ -96,7 +100,7 @@ Reads, for one slice or every slice under `docs/specs/`, the open questions in `
 
 In short: `docs/specs/<slug>/build-map.md` every run, with `T#` plus the short name in the Tasks field, and a list in chat grouped by branch.
 
-Writes a list in the chat with summary counts, Ready and Held grouped by build-map branch, Waits in order, Blocked, Needs verify, a Done count, one Next line per ready branch, and its source, plus one line pointing at the build map. Every run rewrites `docs/specs/<slug>/build-map.md`. The Tasks field is `T#` plus the short name. The word `build-map` prints only the short summary of that file.
+Writes a list in the chat with summary counts, Ready and Held grouped by build-map branch, Waits in order, Blocked, Needs verify, a Done count, one Next line per ready branch, and its source, plus one line pointing at the build map. Every run rewrites `docs/specs/<slug>/build-map.md`. The Tasks field is `T#` plus the short name. The word `build-map` prints only the short summary of that file. `open map` writes a temp page and `export map` one HTML file outside the repo (1.162.0).
 
 ## Does not
 

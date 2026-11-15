@@ -2,6 +2,17 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.162.0 (2026-11-15)
+
+The build map opens as a zoomable page in your browser, and exports as one file you can send. A minor release because the ready check gains the `open map` and `export map` choice words and a new script.
+
+- **The problem.** A wide build map shrinks to fit the Markdown preview, so the diagram text gets small and hard to read. The preview cannot zoom into a diagram.
+- **Open map.** `/crav1-tasks-ready-to-build <slug> open map` runs `scripts/open_build_map.py docs/specs/<slug>`. It renders the whole `build-map.md` as a dark page in a temp file and opens the browser: headings, text, lists, code spans, links, and the wave lists, which still fold. Each Mermaid diagram sits in place, unchanged, with zoom at the mouse wheel, drag to pan, and `-`, `+`, `Fit`, `100%` and `Fullscreen` buttons, plus `+`, `-` and `0` when it is focused. The text stays in a readable column. The diagram pane uses the full width of the browser window and refits when the window is resized while it is at Fit. The `.md` file is not changed.
+- **Works offline.** The kit ships Mermaid 11.4.1 and marked 18.2.0 in `crav1-tasks-ready-to-build/scripts/vendor/`, with `VERSIONS.txt` and their MIT licences in `LICENSES.txt`. The open page loads them from there, and falls back to the same pinned versions on jsDelivr when the folder is missing.
+- **Export map.** `export map` runs the script with `--export` and writes one self-contained HTML file with both libraries inside, about 2.6 MB, that works offline in any browser with nothing to install. The default is `<slug>-build-map-<YYYY-MM-DD>.html` in Downloads, else the current folder, else the temp folder. It is never written inside the specs repo, and an `--out` path inside it is refused. The page shows `Exported <date> from build-map.md`.
+- **The map file.** `build-map.md` gets one line under its heading naming both commands. A branch whose every task is done says `Waited for:` instead of `Waits for:`, since nothing waits any more. Open branches keep `Waits for:`.
+- **Tests.** The Mermaid blocks are found as the page draws them, a label holding `</script>` cannot break out of the page, the export has no external script or CDN address, the open page points at the vendor folder, the default export name uses the spec folder and today's date and is never inside the specs repo, the page CSS lets the diagram pane span the window, and a done branch says `Waited for:` while an open one says `Waits for:`.
+
 ## 1.161.0 (2026-11-15)
 
 When two branches wait for each other, the kit works out the fix and applies it on a yes, instead of asking you to edit `tasks.md` by hand. A minor release because the ready check gains the `fix loop` choice word and `walk_progress.py` gains `fix-loop`.
@@ -150,13 +161,5 @@ A spec edit during a tighten-and-plan walk reopens from the first step that owns
 - **Requirement sections.** Problem, Goals, Non-goals, Users and journeys, Acceptance criteria, Constraints, Requirements, Scope, Decisions, Background, Context, What the dump says, Trace, Research findings, the text before the first heading, and any other heading reopen tighten-spec, plan-from-spec, review-and-tighten-plan, and the ready check. They do not reopen resolve-open-questions when the question ids are unchanged. An unknown heading uses that same row, so a new constraint still reopens the plan.
 - **Questions.** A new, removed, or reworded open question reopens only resolve-open-questions. Ask only the ids in `changed_questions`. The stable key from 1.146.0 (`question_stable_key`) ignores a refreshed commit list, and one close reword of a stored question stays that question. An explicit `Id:` mark still reopens when the words change. An `Answered:` line on the same words, or a new question that is already answered, does not reopen and does not re-ask.
 - **No reopen.** `## Match` (including a renamed branch), `## In the code`, a `Synced at:` line, and `## Approval needed` do not reopen a step. When the change is only Match, In the code, Synced at, or an already-answered question, `/crav1-add-to-spec` offers Restamp. `walk_progress.py restamp-covered --root <spec-folder> --yes` refreshes the stamps. `Done` and `Result` stay. A step recorded before this release, with no `Section stamps` line, still uses the 1.137 rule.
-
-## 1.147.0 (2026-11-13)
-
-Install bundles keep a short changelog, and guild routing stays a short map. A minor release because the bundled changelog is a slice of the full file, and `/crav1-help` reads that slice in an install.
-
-- **Bundled changelog.** The repo-root `CHANGELOG.md` stays the full history. Each install's `crav1-docs/CHANGELOG.md` (Cursor drop-in, Cursor plugin, Claude Code) keeps the newest 15 releases and ends with a line to the full file on GitHub. `scripts/slice-changelog.py` writes that slice. Sync and CI fail when a bundled copy is not that slice. `/crav1-update-kit` still reads the newest heading. `/crav1-help` `whats new` still reads the installed version's section. In an install, a version older than those 15 is named from the pointer line and is not fetched.
-- **Guild routing.** Each skill note in the `routing` block of `docs/reference/skills.yaml` is a short purpose and handoff. A rule that decides which lane runs, or which command is named and not run, stays in the note. Procedure that already lives on that skill's reference page stays there. `docs/guild-routing.md` stays the lane tables plus those short notes. No skill's behavior changes.
-- **Examples.** Customer example names in older notes are replaced with generic ones.
 
 The newest 15 releases are above. The full changelog is https://github.com/Crav1on/crav1-spec-kit/blob/main/CHANGELOG.md.
