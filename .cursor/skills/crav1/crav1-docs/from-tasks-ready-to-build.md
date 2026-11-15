@@ -45,7 +45,7 @@ Every reason says **recorded** (from a mark in a file) or **inferred** (a fallba
 
 ## What you see
 
-Since 1.156.0 the script prints the whole reply and the assistant shows it as-is: `walk_progress.py readiness --root <spec-folder> --write-map --text`. The brief reply is the default: the counts row, the result, the shared ending, the sources and the build map.
+Since 1.156.0 the script prints the whole reply and the assistant gives it once as the answer, as-is, with at most one short lead sentence and without first pasting the raw tool output: `walk_progress.py readiness --root <spec-folder> --write-map --text`. Since 1.163.0 a not-ready ending starts with `Run next:` naming the first real next step. The brief reply is the default: the counts row, the result, the shared ending, the sources and the build map.
 
 ```text
 Tasks ready to build — cancel-booking

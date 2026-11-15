@@ -17,7 +17,7 @@ Each fix says, in plain words, generated from the tasks:
 2. The change, for example `Build T14 and T15 on feat/orders-dev-switch instead, right after T13.`
 3. What stays: `The tasks stay the same; only the branch and pull request they go into change.`
 4. The order afterwards, for example `Then feat/orders-cicd holds T9-T12 and merges first, and feat/orders-dev-switch runs T13, T14, T15, T16.`
-5. `Why:` in a few words.
+5. `Why:` in a few words, for example `Why: the plan step for feat/orders-dev-switch already describes this work.` with no list of matched keywords.
 
 The fix numbers run across every loop in the reply, so `fix-loop 3` always names the same fix. A ready or ready-partial reply also has a Run next entry, `/crav1-tasks-ready-to-build <slug> fix-loop`.
 
@@ -30,6 +30,6 @@ The fix numbers run across every loop in the reply, so `fix-loop 3` always names
 ## Apply it
 
 1. The user says `fix-loop` or `fix-loop <n>`, or picks it from Run next.
-2. Run `<interpreter> -X utf8 scripts/walk_progress.py fix-loop --root <spec-folder> --pick <n> --text` (skill `crav1-tighten-and-plan-ready-to-build`). It writes nothing and prints `Change:` and a `Card:` with numbered options. Ask that card as it is: the plain question, the picked fix first and marked Recommended, each option saying what happens, and `Leave it` last.
+2. Run `<interpreter> -X utf8 scripts/walk_progress.py fix-loop --root <spec-folder> --pick <n> --text` (skill `crav1-tighten-and-plan-ready-to-build`). It writes nothing, exits 0, and prints `Change:` and a `Card:` with numbered options. Ask that card as it is: the plain question, the picked fix first and marked Recommended, each option saying what happens, and `Leave it` last.
 3. On yes, run the same command with `--yes`. It writes or replaces the `(map: <branch>)` mark on each moved task line (a repo word before the old branch is kept), or removes the one task from the `(after:)` mark, rebuilds `build-map.md`, and prints `No loop left.` or the next loop with its own fixes. Then `Uncommitted: docs/specs/<slug>/tasks.md, docs/specs/<slug>/build-map.md`.
 4. Print its Run next entry, which reruns the ready check. Commit nothing. Never touch `spec.md`.

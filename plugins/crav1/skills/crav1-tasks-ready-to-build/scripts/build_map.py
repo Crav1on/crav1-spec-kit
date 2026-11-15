@@ -1424,8 +1424,7 @@ def _fix_words(fix, group):
         change = f"Build {_ids_text(ids)} on {fix['target']} instead" + (f", right after T{after}." if after else ".")
         stays = "The tasks stay the same; only the branch and pull request they go into change."
         if fix["overlap"] >= 0.34:
-            shown = sorted(fix["shared"], key=lambda word: (word.isdigit(), -len(word), word))[:4]
-            why = f"the plan step for {fix['target']} already describes this work ({', '.join(shown)})."
+            why = f"the plan step for {fix['target']} already describes this work."
         else:
             why = f"{_ids_text(ids)} wait{'' if len(ids) > 1 else 's'} for work on {fix['target']}."
         label = f"Build {_ids_text(ids)} on {fix['target']}"
@@ -2615,10 +2614,11 @@ def apply_fix_text(tasks_text, fix):
 def fix_loop(directory, pick=1, yes=False, code_repo=None):
     """Offer or apply one loop fix (1.161.0). Returns (dict, exit code).
 
-    Without yes it writes nothing and returns the change it would make.
-    With yes it writes tasks.md, rebuilds build-map.md, and reports what is
-    left: no loop, or the next loop with its own fixes. It never touches
-    spec.md and commits nothing.
+    Without yes it writes nothing, returns the change it would make, and
+    exits 0. A nonzero exit is only for a real error (no tasks.md, no such
+    fix). With yes it writes tasks.md, rebuilds build-map.md, and reports
+    what is left: no loop, or the next loop with its own fixes. It never
+    touches spec.md and commits nothing.
     """
     directory = pathlib.Path(directory)
     slug = directory.name
@@ -2659,14 +2659,14 @@ def fix_loop(directory, pick=1, yes=False, code_repo=None):
         for index, option in enumerate(card["options"], start=1):
             lines.append(f"{index}. {option['label']} (`{option['word']}`): {option['text']}")
         return {
-            "ok": False,
+            "ok": True,
             "code": "needs-yes",
             "fix": chosen,
             "change": change,
             "card": card,
             "line": "\n".join(lines),
             "message": "fix-loop writes tasks.md only with --yes, after the fix was shown and confirmed.",
-        }, 2
+        }, 0
     new_text = apply_fix_text(tasks, chosen)
     with open(tasks_path, "w", encoding="utf-8", newline="") as handle:
         handle.write(new_text)

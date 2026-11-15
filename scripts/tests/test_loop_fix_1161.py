@@ -119,7 +119,8 @@ class MoveFix(unittest.TestCase):
             self.assertIn("Then feat/orders-cicd holds T9-T12 and merges first, and "
                           "feat/orders-dev-switch runs T13, T14, T15, T16.", text)
         self.assertTrue(line.startswith("Recommended fix (say `fix-loop`): "))
-        self.assertIn("already describes this work", line)
+        self.assertIn("already describes this work.", line)
+        self.assertNotRegex(line, r"already describes this work \(")
         self.assertTrue(option["label"].endswith("(Recommended)"))
         self.assertEqual(card["question"], "Two branches wait for each other, so neither can start. How should I fix it?")
         self.assertEqual(card["options"][-1]["word"], "stop")
@@ -163,7 +164,7 @@ class Apply(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             folder = write_slice(tmp, TASKS)
             proc = run(WALK, "fix-loop", "--root", folder, "--text")
-            self.assertEqual(proc.returncode, 2, proc.stderr)
+            self.assertEqual(proc.returncode, 0, proc.stderr)
             self.assertEqual((folder / "tasks.md").read_text(encoding="utf-8"), TASKS)
             self.assertIn("Card: Two branches wait for each other", proc.stdout)
             self.assertIn("1. Build T14 and T15 on feat/orders-dev-switch (Recommended) (`fix-loop`)", proc.stdout)

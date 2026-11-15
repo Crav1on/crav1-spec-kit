@@ -208,7 +208,8 @@ class EndingBlock(unittest.TestCase):
             payload = must(["readiness", "--full", "--root", str(root)])
         ending = payload["ending"]
         self.assertEqual(payload["result"], "not-ready")
-        self.assertNotIn("Run next:", ending)
+        self.assertTrue(ending.startswith("Run next:"))
+        self.assertIn("/crav1-tighten-and-plan-ready-to-build", ending)
         self.assertTrue(payload["held_lines"])
         for held in payload["held_lines"]:
             self.assertIn(held, ending)
@@ -280,11 +281,14 @@ class SelfReopen(unittest.TestCase):
         steps = [hit["step"] for hit in payload["reopened"]]
         self.assertIn("review-and-tighten-plan", steps)
         self.assertNotIn("tasks-ready-to-build", steps)
-        self.assertIn("review-and-tighten-plan", payload["because"])
+        self.assertIn("The plan was reopened for review", payload["because"])
+        self.assertIn("/crav1-tighten-plan", payload["because"])
         self.assertNotIn("tasks-ready-to-build", payload["because"])
+        self.assertNotIn("Reopened:", payload["because"] or "")
         self.assertIsNone(payload["replaced"])
         self.assertNotIn("The earlier tasks-ready-to-build record is replaced.", payload["ending"])
-        self.assertNotIn("Run next:", payload["ending"])
+        self.assertTrue(payload["ending"].startswith("Run next:"))
+        self.assertIn("/crav1-tighten-plan", payload["ending"])
         for held in payload["held_lines"]:
             self.assertIn(held, payload["ending"])
         self.assertTrue(payload["recommend_jump"])

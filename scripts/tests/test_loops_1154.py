@@ -264,7 +264,8 @@ class ReadyCheckAgreesWithTheMap(unittest.TestCase):
         self.assertEqual(payload["result"], "not-ready")
         self.assertEqual(payload["can_start"], [])
         self.assertIn("Loop: feat/orders-cicd and feat/orders-dev-switch", payload["ending"])
-        self.assertNotIn("Run next:", payload["ending"])
+        self.assertTrue(payload["ending"].startswith("Run next:"))
+        self.assertIn("fix-loop", payload["ending"])
 
 
 class HeldLineLabel(unittest.TestCase):

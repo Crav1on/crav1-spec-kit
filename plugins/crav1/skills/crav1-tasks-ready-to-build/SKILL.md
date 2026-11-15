@@ -13,20 +13,20 @@ color: green
 
 You list which tasks can be built now and why the others cannot. The only file you write in the repo is `docs/specs/<slug>/build-map.md`, through the script, plus the loop fix in `tasks.md` after a yes (`fix-loop`). You commit nothing and run no other skill. Naming `/crav1-build-tasks` is not running it.
 
-This is cross-cutting. It is not its own lane. It can run any time: before Build, between tasks, or after new information. It does not move work into Build.
+This is cross-cutting, not its own lane. It can run any time and does not move work into Build.
 
 It is not `/crav1-what-do-we-know-about-this` (what is known about one thing) and not `/crav1-ado-sync` (which specs could become Features). It is not the batch board of `/crav1-build-tasks`.
 
 ## The script owns the judgement (1.156.0)
 
-The readiness script decides every task and prints the finished reply: the counts row, `Result:`, the shared ending (Run next first, Held, Branch runs, Loop, verify-behind and orphan Waiting lines, claim warnings), `Source:` and `Build map:`. Show that reply as-is. Do not re-derive a rule, re-sort a list, or rewrite a line. Never add your own `Next:` line. The rules it applies, with `scripts/question_blocks.py` and `scripts/task_order.py`, are in [references/rules.md](references/rules.md); read that only when the script cannot run, or to explain one result. The shared ending is `scripts/walk_ending.py --json <state>` beside this skill, described in [run-ending.md](../crav1-docs/reference/run-ending.md).
+The readiness script decides every task and prints the finished reply: the counts row, `Result:`, the shared ending, `Source:` and `Build map:`. Give that formatted reply once as your answer. Do not paste the raw tool output and then repeat the reply. At most one short lead sentence may come before it. Do not re-derive a rule, re-sort a list, or rewrite a line. Never add your own `Next:` line. The rules it applies, with `scripts/question_blocks.py` and `scripts/task_order.py`, are in [references/rules.md](references/rules.md); read that only when the script cannot run, or to explain one result. The shared ending is `scripts/walk_ending.py --json <state>` beside this skill, described in [run-ending.md](../crav1-docs/reference/run-ending.md).
 
 ## Steps, in order
 
 1. **Route.** The word `build-map` shows only the map; the words after it are the scope. The word `full` asks for the long form. No word: the brief reply (the default).
 2. **Scope.** A named slug, title, playbook, or work-item name: `<interpreter> -X utf8 scripts/resolve_spec.py "<query>" --root docs/specs`. Exact folder first (`orders 1.0` matches `orders-1-0`), then one unique playbook basename, spec title, or work-item name in `spec.md`, then one unique ordered token subsequence of those names (`cc 1.0` matches `cc-process-1-0`). Several matches: list them and stop. No match: say so and list the nearest slugs. Do not search the rest of the tree. No slug: every folder under `docs/specs/` that has `tasks.md`, skipping `_template`. A folder with `spec.md` but no `tasks.md` is listed once as `no tasks yet (run /crav1-plan-from-spec)`.
 3. **Sync and claims.** The script fetches the specs repo and reads `claims.md` first, as [references/claims-and-sync.md](references/claims-and-sync.md) says (1.151.0). When it stops for a pull, print its reply (one Run next entry, `git pull --no-rebase`) and stop.
-4. **Run it.** Per slice: `<interpreter> -X utf8 scripts/walk_progress.py readiness --root <spec-folder> --write-map --text` (skill `crav1-tighten-and-plan-ready-to-build`). Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. That rewrites `build-map.md` with `scripts/build_map.py` and prints the reply, ending `Build map: docs/specs/<slug>/build-map.md`. Print it verbatim, one slice after another when listing every slice. With `full`, run `--full` instead and add the per-task lists and the Order line from its `rows`, as [references/rules.md](references/rules.md) shows, then the same `ending`.
+4. **Run it.** Per slice: `<interpreter> -X utf8 scripts/walk_progress.py readiness --root <spec-folder> --write-map --text` (skill `crav1-tighten-and-plan-ready-to-build`). Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. That rewrites `build-map.md` with `scripts/build_map.py` and prints the reply, ending `Build map: docs/specs/<slug>/build-map.md`. Print it, one slice after another when listing every slice. With `full`, run `--full` instead and add the per-task lists and the Order line from its `rows`, as [references/rules.md](references/rules.md) shows, then the same `ending`.
 5. **Build map word.** With `build-map`, run `scripts/build_map.py docs/specs/<slug> --chat` and print only that summary: each wave, then that wave's Overlap lines. `--recommend T#` prints the branch to offer; the first line is the name (1.140.0). Do not hand-edit the map. Read `references/build-map.md` only when the script cannot run. Do not invent the map.
 6. **Loop.** A `Loop:` line is followed by the fix offer. Never tell the user to edit `tasks.md` by hand. On `fix-loop` or `fix-loop <n>`, read [references/loop-fix.md](references/loop-fix.md): run `walk_progress.py fix-loop --root <spec-folder> --pick <n> --text`, ask its card, and on yes run it again with `--yes` (1.161.0).
 7. **Stop.** Do not run either command the reply names.
@@ -47,7 +47,7 @@ Read `references/risk-blocks.md` ("Plan risk blocks") only when a line under `##
 
 ## Not-ready endings
 
-The script prints the one `Next:` line a not-ready reply keeps. Without Python:
+When not-ready, the ending starts with `Run next:`: the first real next step, the command in a code span, and a one-line reason. Without Python:
 
 - Read `references/next-question.md` ("Question blocks the first task") only when nothing is ready and an open question blocks the first task.
 - Read `references/next-verify.md` ("Only needs verify") only when only Needs verify is left.
