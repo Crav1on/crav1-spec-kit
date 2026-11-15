@@ -2252,6 +2252,19 @@ def classify(row: dict, resolve_kept: bool = False, resolve_recorded: bool = Fal
     warning = str(row.get("warning") or "")
     text = f"{reason} {warning}".lower()
     task = row.get("task")
+    if bucket == "needs-verify" and "verify failed" in text:
+        # A failed verify is fixed, not verified again (1.169.0).
+        return {
+            "task": task,
+            "bucket": "needs-verify",
+            "step": None,
+            "command": "/crav1-fix-build-gaps",
+            "can_jump_back": False,
+            "outside_walk": True,
+            "kind": "blocker",
+            "failed": True,
+            "why": f"{task or 'A task'} failed verify. /crav1-fix-build-gaps fixes it, outside this walk. Do not start it. Do not report ready.",
+        }
     if bucket == "needs-verify" or "needs verify" in text or "no verify.md" in text:
         return {
             "task": task,
@@ -2844,15 +2857,73 @@ def _built_ids(tasks_text: str, spec_text: str) -> dict[str, dict]:
     return built
 
 
+def _row_status(text: str | None, tid: str) -> str | None:
+    """The task's own verify.md status: the tasks table row, else any table row."""
+    status = _overview_status(text, tid)
+    if status is not None:
+        return status
+    for line in (text or "").splitlines():
+        if not line.startswith("|"):
+            continue
+        cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+        if cells and cells[0] == tid and len(cells) >= 3 and cells[2] not in ("Status", "---"):
+            return cells[2]
+    return None
+
+
+def _verify_current(text: str | None, tid: str) -> bool:
+    """verify.md is current for a task whose own row says Verified or Failed (1.169.0).
+
+    Not implemented, claimed done or unverified, and no row at all are not
+    current. Tick pending rows read as verified.
+    """
+    status = (_row_status(text, tid) or "").lower()
+    if not status or "not implemented" in status:
+        return False
+    if "unverified" in status or "claimed" in status:
+        return False
+    return "verified" in status or "failed" in status
+
+
+def _verify_failed(text: str | None, tid: str) -> bool:
+    status = (_row_status(text, tid) or "").lower()
+    return "failed" in status and "not implemented" not in status
+
+
+def _failed_reason(text: str | None, tid: str) -> str:
+    """The Verify cell of a failed row, as a short reason, or ""."""
+    in_tasks = False
+    for line in (text or "").splitlines():
+        if line.startswith("## Tasks"):
+            in_tasks = True
+            continue
+        if in_tasks and line.startswith("## "):
+            break
+        if not in_tasks or not line.startswith("|"):
+            continue
+        cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+        if cells and cells[0] == tid and len(cells) >= 4:
+            reason = cells[3].strip()
+            if reason and reason not in ("—", "-", "fail", "failed"):
+                return reason
+    return ""
+
+
 def _stale_next(verify_text: str, ticked: set[str]) -> str | None:
-    """A Next line is stale only when it names a ticked task (1.136.0)."""
+    """A Next line is stale only for a ticked task whose row is not current.
+
+    1.136.0 flagged every ticked task the line named. Right after a fresh
+    verify that line names the tasks verify just checked, so a Verified or
+    Failed row now means verify is current (1.169.0). Verify no longer
+    writes a Next line; older files that have one still read.
+    """
     hits = []
     for line in (verify_text or "").splitlines():
         stripped = line.strip()
         if not stripped.lower().startswith("next:"):
             continue
         named = re.findall(r"\bT\d+\b", stripped)
-        if any(tid in ticked for tid in named):
+        if any(tid in ticked and not _verify_current(verify_text, tid) for tid in named):
             hits.append(stripped)
     return " ".join(hits) if hits else None
 
@@ -2890,7 +2961,7 @@ def verify_gap_from(tasks_text: str, spec_text: str, verify_text: str, slug: str
     """
     empty = {
         "behind": False, "tasks": [], "waiting": None, "stale_next": None,
-        "orphan_tasks": [], "orphan_waiting": None,
+        "orphan_tasks": [], "orphan_waiting": None, "failed": [],
     }
     if not verify_text.strip() or not tasks_text.strip():
         return empty
@@ -2903,8 +2974,14 @@ def verify_gap_from(tasks_text: str, spec_text: str, verify_text: str, slug: str
     stale_next = _stale_next(verify_text, ticked)
     if stale_next:
         for tid in re.findall(r"\bT\d+\b", stale_next):
-            if tid in ticked and tid not in stale:
+            if tid in ticked and tid not in stale and not _verify_current(verify_text, tid):
                 stale.append(tid)
+    # A built task whose row says verify failed goes to fix-build-gaps (1.169.0).
+    failed = [
+        {"task": tid, "reason": _failed_reason(verify_text, tid)}
+        for tid in sorted(built, key=lambda t: int(t[1:]))
+        if tid not in stale and _verify_failed(verify_text, tid)
+    ]
     task_ids = {f"T{task['id']}" for task in order_mod().parse(tasks_text)}
     orphans = _orphan_verify_ids(verify_text, task_ids)
     orphan_waiting = None
@@ -2914,12 +2991,12 @@ def verify_gap_from(tasks_text: str, spec_text: str, verify_text: str, slug: str
             f"Waiting: verify.md has a row for {listed}, which is not in tasks.md. "
             "Fix it with /crav1-verify-build-against-spec, which drops that row."
         )
-    if not stale and not orphans:
+    if not stale and not orphans and not failed:
         return empty
     if not stale:
         return {
             "behind": False, "tasks": [], "waiting": None, "stale_next": stale_next,
-            "orphan_tasks": orphans, "orphan_waiting": orphan_waiting,
+            "orphan_tasks": orphans, "orphan_waiting": orphan_waiting, "failed": failed,
         }
     ordered = sorted(stale, key=lambda tid: int(tid[1:]))
     ids = ", ".join(ordered)
@@ -2929,7 +3006,7 @@ def verify_gap_from(tasks_text: str, spec_text: str, verify_text: str, slug: str
     )
     return {
         "behind": True, "tasks": ordered, "waiting": waiting, "stale_next": stale_next,
-        "orphan_tasks": orphans, "orphan_waiting": orphan_waiting,
+        "orphan_tasks": orphans, "orphan_waiting": orphan_waiting, "failed": failed,
     }
 
 
@@ -3477,15 +3554,20 @@ def slice_result(rows: list[dict], hits: list[dict]) -> tuple[str, list, list]:
     tasks can start (1.137.0).
     """
     hard = [hit for hit in hits if hit.get("kind") != "waiting" and not hit.get("loop")]
+    # Needs verify is outside the walk and holds only that task: it never
+    # hides tasks that can start (1.169.0). It still keeps the result from
+    # being ready.
+    verify_only = [hit for hit in hard if hit.get("bucket") == "needs-verify"]
+    hard = [hit for hit in hard if hit.get("bucket") != "needs-verify"]
     looped = [row.get("task") for row in rows if row.get("loop") and row.get("task")]
     can_start = [row.get("task") for row in rows if row.get("bucket") == "ready" and row.get("task")]
     held = [row.get("task") for row in rows if row.get("bucket") == "waiting" and row.get("task")]
     resolve_only = bool(can_start) and _resolve_reopen_only([hit for hit in hits if not hit.get("loop")])
     if hard and not resolve_only:
         return "not-ready", can_start, held
-    if can_start and (held or resolve_only or looped):
+    if can_start and (held or resolve_only or looped or verify_only):
         return "ready-partial", can_start, held
-    if (held or looped) and not can_start:
+    if (held or looped or verify_only) and not can_start:
         return "not-ready", can_start, held
     return "ready", can_start, held
 
@@ -3619,7 +3701,7 @@ def not_ready_run(
     gap = gap or {}
     counts = counts or {}
     left = sum(int(counts.get(key, 0) or 0) for key in ("ready", "waiting", "waits_in_order", "blocked"))
-    if catch_up and (gap.get("behind") or gap.get("orphan_tasks") or (sync and sync.get("state") == "ahead")):
+    if catch_up and (gap.get("behind") or gap.get("orphan_tasks") or gap.get("failed") or (sync and sync.get("state") == "ahead")):
         if question_first and not counts.get("ready"):
             command = _command_with_slug("/crav1-resolve-open-questions", slug)
             return [_run_entry(command, "that question blocks the first task.")]
@@ -3782,7 +3864,8 @@ def catch_up_for(slug: str, gap: dict | None, sync: dict | None) -> str:
             ahead = int(sync.get("ahead") or 1)
         except (TypeError, ValueError):
             ahead = 1
-    return ending_mod().catch_up_block(slug or None, behind, orphans, ahead)
+    failed = list(gap.get("failed") or [])
+    return ending_mod().catch_up_block(slug or None, behind, orphans, ahead, failed=failed)
 
 
 def next_for(result: str, can_start: list, waiting_next: str | None) -> str | None:
@@ -4032,6 +4115,10 @@ def readiness(args: argparse.Namespace) -> None:
     )
     if result in ("ready", "ready-partial"):
         shown_run = list(run_lines) + offer["entries"]
+        # Questions not asked yet stay a Run next entry after the branch
+        # blocks, never instead of them (1.169.0).
+        if waiting_next and waiting_next.startswith("/crav1-show-or-ask-open-questions"):
+            shown_run.append(_run_from_clause(waiting_next))
         alt = "/crav1-build-tasks builds one task without the walk."
         shown_next = [alt]
         next_lines = [alt]

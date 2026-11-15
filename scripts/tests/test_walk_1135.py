@@ -230,7 +230,9 @@ class StaleVerify(unittest.TestCase):
         self.assertIn("(T2)", payload["verify_waiting"])
         self.assertNotIn("T2", payload["can_start"])
 
-    def test_stale_next_when_the_row_is_already_verified(self):
+    def test_old_next_line_is_not_stale_when_the_row_is_verified(self):
+        # 1.169.0: a Verified row means verify is current, whatever an older
+        # Next line in verify.md says (1.135.0 flagged it as behind).
         root = slice_dir()
         (root / "tasks.md").write_text(
             "# Tasks\n\n- [x] T2: export the receipt (spec: A1)\n",
@@ -246,13 +248,11 @@ class StaleVerify(unittest.TestCase):
         )
         before = (root / "verify.md").read_bytes()
         payload = must(["readiness", "--full", "--root", str(root)])
-        self.assertEqual(payload["verify_stale"], ["T2"])
-        self.assertEqual(
-            payload["verify_waiting"],
-            "Waiting: /crav1-verify-build-against-spec orders-api - "
-            "verify.md is behind tasks.md (T2)",
-        )
-        self.assertNotIn(payload["stale_next"], payload["next"] or "")
+        self.assertEqual(payload["verify_stale"], [])
+        self.assertFalse(payload["verify_behind"])
+        self.assertIsNone(payload["verify_waiting"])
+        self.assertIsNone(payload["stale_next"])
+        self.assertNotIn("/crav1-build-tasks T2, because", payload["ending"])
         self.assertFalse(payload["trust_stale_next"])
         self.assertEqual((root / "verify.md").read_bytes(), before)
 

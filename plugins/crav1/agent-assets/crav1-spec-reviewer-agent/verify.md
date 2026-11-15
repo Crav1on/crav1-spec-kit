@@ -12,8 +12,6 @@ Date:
 | Claimed done, unverified | 0 | |
 | Acceptance with no task | 0 | |
 
-Next: `/crav1-fix-build-gaps`, because a verify id is not proved yet.
-
 ## Tasks — overview
 
 Sorted: verified, then verify failed, then not implemented, then unverified.

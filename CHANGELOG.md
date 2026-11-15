@@ -2,6 +2,16 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.169.0 (2026-11-15)
+
+The ready check no longer says verify is behind right after a fresh verify, and a failed verify no longer hides the branches you can build. A minor release because the ready check and the tighten-and-plan ready check read differently, and the verify template drops a line. The build walk and the verify reply are unchanged.
+
+- **A fresh verify is current.** An older `Next:` line in `verify.md` is stale only for a ticked task whose own row says Not implemented, claimed done or unverified, or that has no row. A row that says Verified or Failed means verify is current. In 1.168.0 a line like `Next: /crav1-fix-build-gaps <slug> T6, because ... T4 and T7 are verified.` flagged T4, T6 and T7 as behind.
+- **A failed task goes to the fix.** A built task whose verify failed is in the Catch up first block as `T6 failed verify: <reason>.` (the reason is that row's Verify cell), with `Fix T6:` and `` `/crav1-fix-build-gaps <slug> T6` ``, not sent back to verify.
+- **Ready branches always show.** Needs verify holds only its own task. With tasks that can start, the result is ready-partial and each ready branch keeps its block after the catch-up block and the `---` line. In 1.168.0 one failed task made the result not-ready and Run next kept only the catch-up block or the questions line. With nothing that can start the result stays not-ready. Questions that are not asked yet stay a `/crav1-show-or-ask-open-questions <slug>` entry after the branch blocks.
+- **No Next line in verify.md.** The verify template and the spec reviewer's copy drop the TL;DR `Next:` line; the chat reply's Run next names the next step (1.168.0). Older files that still have one read as above.
+- `walk_ending.catch_up_block()` takes `failed`; the readiness JSON's verify gap carries `failed`. The readiness, rules, verify-behind and tick-pending references, four walkthroughs, the glossary, data layout, run-ending and the skill pages show it. Tests: `scripts/tests/test_verify_current_1169.py`; the 1.135.0 test for a Next line over a verified row now expects it current.
+
 ## 1.168.0 (2026-11-15)
 
 The verify reply gets the shared ending. A minor release because `/crav1-verify-build-against-spec` reads differently in chat; the live checks and `verify.md` are unchanged.

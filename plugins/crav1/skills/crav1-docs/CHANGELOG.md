@@ -2,6 +2,16 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.169.0 (2026-11-15)
+
+The ready check no longer says verify is behind right after a fresh verify, and a failed verify no longer hides the branches you can build. A minor release because the ready check and the tighten-and-plan ready check read differently, and the verify template drops a line. The build walk and the verify reply are unchanged.
+
+- **A fresh verify is current.** An older `Next:` line in `verify.md` is stale only for a ticked task whose own row says Not implemented, claimed done or unverified, or that has no row. A row that says Verified or Failed means verify is current. In 1.168.0 a line like `Next: /crav1-fix-build-gaps <slug> T6, because ... T4 and T7 are verified.` flagged T4, T6 and T7 as behind.
+- **A failed task goes to the fix.** A built task whose verify failed is in the Catch up first block as `T6 failed verify: <reason>.` (the reason is that row's Verify cell), with `Fix T6:` and `` `/crav1-fix-build-gaps <slug> T6` ``, not sent back to verify.
+- **Ready branches always show.** Needs verify holds only its own task. With tasks that can start, the result is ready-partial and each ready branch keeps its block after the catch-up block and the `---` line. In 1.168.0 one failed task made the result not-ready and Run next kept only the catch-up block or the questions line. With nothing that can start the result stays not-ready. Questions that are not asked yet stay a `/crav1-show-or-ask-open-questions <slug>` entry after the branch blocks.
+- **No Next line in verify.md.** The verify template and the spec reviewer's copy drop the TL;DR `Next:` line; the chat reply's Run next names the next step (1.168.0). Older files that still have one read as above.
+- `walk_ending.catch_up_block()` takes `failed`; the readiness JSON's verify gap carries `failed`. The readiness, rules, verify-behind and tick-pending references, four walkthroughs, the glossary, data layout, run-ending and the skill pages show it. Tests: `scripts/tests/test_verify_current_1169.py`; the 1.135.0 test for a Next line over a verified row now expects it current.
+
 ## 1.168.0 (2026-11-15)
 
 The verify reply gets the shared ending. A minor release because `/crav1-verify-build-against-spec` reads differently in chat; the live checks and `verify.md` are unchanged.
@@ -161,15 +171,5 @@ The ready check prints its own ending, the three walks share one ending, and the
 - **One place to look.** `walk-progress.md` stays the one file every skill reads. A whole-branch run keeps one line there per branch, under `## Branch runs`, for example `- Branch run: feat/orders-cicd: running, T9 done, next T10 (2026-11-14T09:40:00+01:00). Log: build-progress/feat--orders-cicd.md`, then `stopped before merge`, `stopped at T4: <why>`, or `merged`. The line links to the detailed log in the branch's build-progress file. It is updated with each per-task push. The ready check and tighten-and-plan print the lines that are not merged. Recording a tighten-and-plan step keeps them, and a file with only these lines is not a paused walk. When two sessions change the file, a merge conflict that is only these lines, or only hash lines, is settled by `walk_progress.py resolve-stamps`, which keeps each branch's newest line.
 - **Run next offers both.** The ready check, the tighten-and-plan ending, and the build-walk ending offer each ready branch's next task, `/crav1-build-walk <slug> T#`, and, when that branch has two or more open tasks, the whole branch, `/crav1-build-walk <slug> <branch>`, as a separate entry. Each command is alone in its own code span on its own line, with the branch and task names underneath. A branch with one open task gets only the T# entry. The T# entry now names only the next task, not every ready task on the branch, because the branch entry covers the rest. `next_lines` carry the same entries.
 - **Script.** `scripts/branch_run.py` in the build-walk skill (`parse`, `plan`, `start`, `guard`, `after`, `record`, `ending`), with the kit wrapper `scripts/branch-run.py`.
-
-## 1.154.0 (2026-11-14)
-
-The build map and the ready check name a dependency loop in plain words, agree on what is blocked, and keep the wave order. The tighten-and-plan references stop asking for a Next line under the Waiting lines. A minor release because the map, the ready-check result, and the ending change.
-
-- **Loops are named.** When branches wait for each other, the map and the ready-check ending (also `readiness --brief`) print one line per loop, for example `Loop: feat/orders-x and feat/orders-y wait for each other: T14 on feat/orders-x waits for T13 on feat/orders-y, and T13 on feat/orders-y waits for T12 on feat/orders-x. Fix one of these lines in tasks.md.` A wait that comes only from file order says it is the task just before, with no `(after:)` mark. The flowchart puts those branches in an `In a loop` group.
-- **One judgement.** The ready check reads the loops from the same build the map writes. The open tasks on a branch in a loop are Blocked in the counts and in the map, and are not offered in Run next. Tasks on other branches keep their real state: ready, waiting on a question, or waits in order. When other tasks can start, the result is `ready-partial`; when only loop tasks are left, it is `not-ready`.
-- **Wave order.** A branch is always in a later wave than each branch it waits for, unless both are in the same loop. Branches in one loop share a wave. A branch downstream of a loop keeps its own wave and state instead of being listed under Blocked.
-- **Held label.** A held line shows the wave, or `in a loop`. It never shows `(blocked)`.
-- **No stray Next line.** The tighten-and-plan skill, its readiness and progress references, the ready-check fallback in `build-map.md`, the walkthrough, the glossary, and `run-ending.md` now match 1.153.0: one Run next block at the top, the walk command only there, and no `Next:` line after the Waiting lines. A stop prints the walk command as a Run next entry. Kit lint fails when a skill file tells the agent to write a Next line after the Waiting or Held lines, or gives a `Next: /crav1-build-walk` example for the ready check.
 
 The newest 15 releases are above. The full changelog is https://github.com/Crav1on/crav1-spec-kit/blob/main/CHANGELOG.md.
