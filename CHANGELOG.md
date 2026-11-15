@@ -2,6 +2,17 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.162.0 (2026-11-15)
+
+The build map opens as a zoomable page in your browser, and exports as one file you can send. A minor release because the ready check gains the `open map` and `export map` choice words and a new script.
+
+- **The problem.** A wide build map shrinks to fit the Markdown preview, so the diagram text gets small and hard to read. The preview cannot zoom into a diagram.
+- **Open map.** `/crav1-tasks-ready-to-build <slug> open map` runs `scripts/open_build_map.py docs/specs/<slug>`. It renders the whole `build-map.md` as a dark page in a temp file and opens the browser: headings, text, lists, code spans, links, and the wave lists, which still fold. Each Mermaid diagram sits in place, unchanged, with zoom at the mouse wheel, drag to pan, and `-`, `+`, `Fit`, `100%` and `Fullscreen` buttons, plus `+`, `-` and `0` when it is focused. The text stays in a readable column. The diagram pane uses the full width of the browser window and refits when the window is resized while it is at Fit. The `.md` file is not changed.
+- **Works offline.** The kit ships Mermaid 11.4.1 and marked 18.2.0 in `crav1-tasks-ready-to-build/scripts/vendor/`, with `VERSIONS.txt` and their MIT licences in `LICENSES.txt`. The open page loads them from there, and falls back to the same pinned versions on jsDelivr when the folder is missing.
+- **Export map.** `export map` runs the script with `--export` and writes one self-contained HTML file with both libraries inside, about 2.6 MB, that works offline in any browser with nothing to install. The default is `<slug>-build-map-<YYYY-MM-DD>.html` in Downloads, else the current folder, else the temp folder. It is never written inside the specs repo, and an `--out` path inside it is refused. The page shows `Exported <date> from build-map.md`.
+- **The map file.** `build-map.md` gets one line under its heading naming both commands. A branch whose every task is done says `Waited for:` instead of `Waits for:`, since nothing waits any more. Open branches keep `Waits for:`.
+- **Tests.** The Mermaid blocks are found as the page draws them, a label holding `</script>` cannot break out of the page, the export has no external script or CDN address, the open page points at the vendor folder, the default export name uses the spec folder and today's date and is never inside the specs repo, the page CSS lets the diagram pane span the window, and a done branch says `Waited for:` while an open one says `Waits for:`.
+
 ## 1.161.0 (2026-11-15)
 
 When two branches wait for each other, the kit works out the fix and applies it on a yes, instead of asking you to edit `tasks.md` by hand. A minor release because the ready check gains the `fix loop` choice word and `walk_progress.py` gains `fix-loop`.

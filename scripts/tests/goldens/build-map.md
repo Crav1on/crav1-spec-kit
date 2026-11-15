@@ -1,5 +1,7 @@
 # Build map
 
+To zoom the diagram, run `/crav1-tasks-ready-to-build cancel-booking open map`. To share the map as one file, run `/crav1-tasks-ready-to-build cancel-booking export map`.
+
 One branch per plan step.
 
 ```mermaid

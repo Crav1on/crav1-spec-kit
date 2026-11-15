@@ -11,7 +11,7 @@ color: green
 
 # Tasks ready to build
 
-You list which tasks can be built now and why the others cannot. The only file you write is `docs/specs/<slug>/build-map.md`, through the script, plus the loop fix in `tasks.md` after a yes (`fix loop`). You commit nothing and run no other skill. Naming `/crav1-build-tasks` is not running it.
+You list which tasks can be built now and why the others cannot. The only file you write in the repo is `docs/specs/<slug>/build-map.md`, through the script, plus the loop fix in `tasks.md` after a yes (`fix loop`). You commit nothing and run no other skill. Naming `/crav1-build-tasks` is not running it.
 
 This is cross-cutting. It is not its own lane. It can run any time: before Build, between tasks, or after new information. It does not move work into Build.
 
@@ -66,4 +66,5 @@ Without Python at all, follow [references/rules.md](references/rules.md) and `re
 - Build map: `build-map` (show only the build map; the words after it are the scope, same as this command with no word, such as `cc 1.0`). The task list stays off. There are no `--flags`.
 - Full list: `full` (1.156.0). The long form with every per-task list and the Order line. The brief reply is the default.
 - Fix the loop: `fix loop` (the recommended fix), `fix loop <n>` (that numbered fix) (1.161.0). The card confirms before anything is written.
+- Map page: `open map` (the map as a zoomable page in the browser), `export map` (one HTML file to share) (1.162.0). Read [references/map-page.md](references/map-page.md).
 - Pipeline runs: `pipeline runs`. Read `references/promotion.md` ("Promotion") only when the invocation has that word. There are no `--flags`.

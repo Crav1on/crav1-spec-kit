@@ -114,6 +114,22 @@ A ticked task stays in its wave (1.132.0). The row strikes the short name throug
 
 The script writes the file. This command does not commit it. Commit it with the spec when you are ready.
 
+## Zoom the map, or send it (1.162.0)
+
+A wide map shrinks to fit the Markdown preview. Say `open map` to see the whole `build-map.md` as a page in your browser:
+
+`/crav1-tasks-ready-to-build orders-api open map`
+
+The page shows the same text, lists and wave lists, which still fold. The diagram sits in place with zoom on the mouse wheel, drag to pan, and `-`, `+`, `Fit`, `100%` and `Fullscreen` buttons. The text stays in a readable column, and the diagram pane uses the full width of the window. It works offline: the kit ships Mermaid and marked in `crav1-tasks-ready-to-build/scripts/vendor/`.
+
+To show the map to someone, say `export map`:
+
+`/crav1-tasks-ready-to-build orders-api export map`
+
+That writes one file, for example `orders-api-build-map-2026-11-15.html`, to your Downloads folder, never into the specs repo. It is about 2.6 MB and opens with a double-click in any browser, offline, with nothing to install. It is a snapshot of the map and holds everything the map shows, so export again after the plan changes and send it only to people who may see the plan.
+
+A done branch says `Waited for:` instead of `Waits for:`, since nothing waits any more. The line under the map's heading names both commands.
+
 ## When verify.md is behind (1.136.0)
 
 The check reads `verify.md` and does not write it. A task stays done for later tasks when it is ticked, or when its pull request is recorded merged: `(PR n)` and the word merged on the task line, or on the Match `Branch:` line for that task's branch. The check adds a Waiting line when a ticked task is still `Not implemented`, when `Next:` names a ticked task, or when a merged task is still `Not implemented`. A merged row whose status is **Implemented, verified, tick pending** is not behind. The checkbox is the only leftover. `task_order.py` lists that task under Needs tick, not under Ready. A verify-only change does not force `not-ready`. This command only writes `build-map.md`. Only the walk's record or `clear --yes` restamps `walk-progress.md`.
