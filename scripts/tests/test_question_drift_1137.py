@@ -268,12 +268,14 @@ class QuestionDrift(unittest.TestCase):
         for step in LATER:
             if step == "tasks-ready-to-build":
                 self.assertNotIn(step, reopened)
-                self.assertNotIn(step, payload["next"])
-                self.assertNotIn(step, payload["because"])
+                self.assertNotIn(step, payload["next"] or "")
+                self.assertNotIn(step, payload["because"] or "")
             else:
                 self.assertIn(step, reopened)
-                self.assertIn(step, payload["next"])
-        self.assertIn("rerun or clear", payload["next"])
+        self.assertIn("/crav1-tighten-spec", payload["next"])
+        self.assertIn("The spec was reopened for tightening", payload["because"])
+        self.assertTrue(payload["ending"].startswith("Run next:"))
+        self.assertNotIn("rerun or clear", payload["next"] or "")
         ticked = must_json(TICK, ["--root", str(root), "T2", "--yes"])
         self.assertTrue(ticked["ticked"])
         self.assertFalse(ticked["worker"])

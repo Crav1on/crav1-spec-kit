@@ -49,7 +49,7 @@ Shared steps (host order, Windows, state, claims, catching up, signing in): [pr-
 
 ## Choice words
 
-Exact words for bots and scripted runs (`branch`, `fetch pr branches`, `use disk`, `stop pr review`, `comment posted`, `newest comment`, `skip comment record`). There are no `--flags`. Read `references/choice-words.md` ("Choice words") when a word is given or a question would offer them.
+Exact words for bots and scripted runs (`branch`, `fetch-pr-branches`, `use-disk`, `stop-pr-review`, `comment-posted`, `newest-comment`, `skip-comment-record`). There are no `--flags`. Read `references/choice-words.md` ("Choice words") when a word is given or a question would offer them.
 
 ## First section
 
@@ -88,7 +88,7 @@ Read `references/posting.md` ("Post it") only when the user answers the post que
 ## Hard rules
 
 - No edits to code, `spec.md`, `plan.md`, `tasks.md`, or `verify.md`. The only writes are the PR note (with its PR record), the context file when outside context was added, in the specs repo's `docs/notes/YYYY-MM/`, and the generated indexes.
-- Read-only toward the code repo and its host. The only git write there is the fetch of the pull request's two branches after **Fetch only the PR's two branches** or `fetch pr branches`.
+- Read-only toward the code repo and its host. The only git write there is the fetch of the pull request's two branches after **Fetch only the PR's two branches** or `fetch-pr-branches`.
 - No test run, and no ask to run tests. When the slug has `plan.md`, quote `verify.md` or say it is missing. When the pull request is outside the kit, do not say `verify.md` is missing. Read the pipeline's recorded test results.
 - No linter install, branch-protection change, or required-check edit.
 - No comment, no vote, and no thread resolve without the user's yes in [Post it](#post-it). One comment, no inline threads, never Reject. No label, no reviewer assignment.

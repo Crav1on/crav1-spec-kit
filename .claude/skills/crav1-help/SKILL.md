@@ -64,12 +64,12 @@ A short usage guide that lists every mode with one example each:
 | A concept | `/crav1-help work item homes`, `/crav1-help marks.md`, `/crav1-help stale marks` |
 | The skill list, or one lane | `/crav1-help list`, `/crav1-help list build` |
 | Where a slice is | `/crav1-help status cancel-booking`, `/crav1-help where am I` |
-| What to do now | `/crav1-help todo next pr71` |
+| What to do now | `/crav1-help todo-next pr71` |
 | A word in the project glossary (its own skill, 1.101.0) | `/crav1-glossary bcas` |
 | The whole glossary as a file you can open, kept out of git (1.102.0) | `/crav1-glossary as-file` |
 | Where a pull request stands (its own skill, 1.97.0) | `/crav1-pr-status pr71` |
 | Two skills side by side | `/crav1-help compare build-tasks build-features` |
-| What changed | `/crav1-help whats new`, `/crav1-help whats new since 1.50` |
+| What changed | `/crav1-help whats new`, `/crav1-help whats-new since 1.50` |
 | Renamed skills | `/crav1-help renamed`, `/crav1-help complete-task` |
 | Anything else about the kit | `/crav1-help where do review follow-ups go?` |
 
@@ -136,5 +136,5 @@ Read `references/modes.md` ("Parked and retired specs (1.60.0)") only when a sli
 
 ## Choice words (1.69.0)
 
-- Todo: `todo` / `todo next` / `todo top N`, then an optional scope.
-- Pipeline runs: `pipeline runs` (check the latest successful Azure DevOps runs behind the Promotion line without asking). There are no `--flags`.
+- Todo: `todo` / `todo-next` / `todo-top N`, then an optional scope.
+- Pipeline runs: `pipeline-runs` (check the latest successful Azure DevOps runs behind the Promotion line without asking). There are no `--flags`.

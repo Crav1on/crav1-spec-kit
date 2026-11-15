@@ -119,7 +119,7 @@ This skill never writes, clears, commits or pushes `claims.md`. `/crav1-build-wa
 
 ## Choice words (1.69.0)
 
-- Pipeline runs: `pipeline runs` (check the latest successful Azure DevOps runs behind the Promotion line without asking). There are no `--flags`.
+- Pipeline runs: `pipeline-runs` (check the latest successful Azure DevOps runs behind the Promotion line without asking). There are no `--flags`.
 - Not ready: `anyway` (1.97.0; merge although the PR record says `Ready: no`; host checks still apply).
 
 ## Run ending (1.122.0)

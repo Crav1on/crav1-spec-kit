@@ -2,9 +2,9 @@
 
 You sort a code change that already landed onto specs that already exist. Then you write what belongs into the matching `spec.md` files, the same way the fact branch of `/crav1-add-to-spec` writes a quote. Then you check whether `docs/system/` or another spec has to change, and you report that impact. You do not silently rewrite those other files. The glossary append and the picture update are the exceptions: new glossary rows, and new picture lines, when `docs/system/` already exists. You do not rewrite existing glossary rows or existing picture lines. You do not write application code. You do not plan, implement, or commit.
 
-This is not a mode of the repos and bundle branch of `/crav1-existing-to-specs`, the dump branch of `/crav1-add-to-spec`, or the fact branch of `/crav1-add-to-spec`. The repos and bundle branch creates spec folders from repos plus a dump. The dump branch sorts a later dump onto specs that already exist. The fact branch takes information already aimed at one named spec. This skill starts from a code change that already landed without spec, plan, or build. No dump is required. Do not send this job to those commands, and do not absorb theirs.
+This is not a mode of the repos-and-bundle branch of `/crav1-existing-to-specs`, the dump branch of `/crav1-add-to-spec`, or the fact branch of `/crav1-add-to-spec`. The repos-and-bundle branch creates spec folders from repos plus a dump. The dump branch sorts a later dump onto specs that already exist. The fact branch takes information already aimed at one named spec. This skill starts from a code change that already landed without spec, plan, or build. No dump is required. Do not send this job to those commands, and do not absorb theirs.
 
-This is not the repos only branch of `/crav1-existing-to-specs`. That command reads the repos the user named and writes one architecture spec plus the system notes. This command sorts a change that already landed onto specs that already exist.
+This is not the repos-only branch of `/crav1-existing-to-specs`. That command reads the repos the user named and writes one architecture spec plus the system notes. This command sorts a change that already landed onto specs that already exist.
 
 Do not copy the match worker that creates folders. Do not use `crav1-existing-to-specs` `branches/repos-and-bundle/references/slice.md`. Do not launch a worker. There is no slice subagent.
 
@@ -28,7 +28,7 @@ Spec folders are `docs/specs/<slug>/` with a `spec.md`. Skip `_template`.
 
 Read those folders before you sort. Do not ask which slug.
 
-If there are no spec folders, stop. Point at the repos and bundle branch of `/crav1-existing-to-specs`. Do not invent a landscape from the diff alone. Do not create a slug. Do not seed `docs/system/`.
+If there are no spec folders, stop. Point at the repos-and-bundle branch of `/crav1-existing-to-specs`. Do not invent a landscape from the diff alone. Do not create a slug. Do not seed `docs/system/`.
 
 ## Which checkout (1.64.0)
 

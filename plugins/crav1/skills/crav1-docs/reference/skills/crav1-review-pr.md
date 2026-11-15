@@ -18,9 +18,9 @@ Reads one named open pull request. When the slug has `plan.md`, spec, plan, `ver
 
 1.66.0: the comment follows `references/comment-layout.md`: no verdict line, one short plain opening, Blockers, Bugs, Tests to add with this PR, and A question, each point starting with the host link to its file and line on the source branch and then an indented paragraph, at most one fix per point, no follow-ups, no table, no closing. Any Blocker or Bug means Changes needed; only tests or a question, Approve with comments. It posts one comment, no inline threads, and votes (never Reject) only after your yes. Advice about merge order says to merge the base into the branch, never to rebase.
 
-1.67.0: the follow-ups note keeps the comment as drafted and the comment as posted, word for word in code fences. At the start of every run on the pull request it looks for the posted comment on the host (read-only) or takes a paste, compares it with the draft, and marks drafted points you left out as not in the posted comment and still open, without dropping them. A re-review compares against the posted comment and keeps points you cut out of the new comment unless you include them. Post it adds "I'll post it myself"; choice words `comment posted`, `newest comment` and `skip comment record`.
+1.67.0: the follow-ups note keeps the comment as drafted and the comment as posted, word for word in code fences. At the start of every run on the pull request it looks for the posted comment on the host (read-only) or takes a paste, compares it with the draft, and marks drafted points you left out as not in the posted comment and still open, without dropping them. A re-review compares against the posted comment and keeps points you cut out of the new comment unless you include them. Post it adds "I'll post it myself"; choice words `comment-posted`, `newest-comment` and `skip-comment-record`.
 
-1.97.0: no separate follow-ups note. Findings, follow-ups and questions go into the PR note's shared `## PR record` (`crav1-add-to-spec` `references/pr-record.md`) as Point lines, drafted points you cut get `not posted <date>`, and the comment as drafted and as posted go into the PR note's history. A re-review reads the record first. An old follow-ups note is still read; run [`/crav1-add-to-spec`](crav1-add-to-spec.md) migrate formats` to move it. Thread reads follow `references/pr-threads.md` (there is no `az repos pr thread list`). For where every thread stands, run [`/crav1-pr-status`](crav1-pr-status.md).
+1.97.0: no separate follow-ups note. Findings, follow-ups and questions go into the PR note's shared `## PR record` (`crav1-add-to-spec` `references/pr-record.md`) as Point lines, drafted points you cut get `not posted <date>`, and the comment as drafted and as posted go into the PR note's history. A re-review reads the record first. An old follow-ups note is still read; run [`/crav1-add-to-spec`](crav1-add-to-spec.md) migrate-formats` to move it. Thread reads follow `references/pr-threads.md` (there is no `az repos pr thread list`). For where every thread stands, run [`/crav1-pr-status`](crav1-pr-status.md).
 
 1.98.0: a format A description from [`/crav1-open-pr`](crav1-open-pr.md) is compared with the diff bullet by bullet (each Changes bullet against the lines it links, each change against a bullet), and a choice a bullet's why calls deliberate, or that Not in this PR names as left out, is not raised as a fault unless the repo says otherwise.
 
@@ -31,12 +31,12 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 | Question | Word | Means |
 | --- | --- | --- |
 | Review a branch (optional, 1.80.0) | `branch` | review a branch with no pull request: local diff from its base, same checks, PR-only parts skipped, verdict in chat |
-| PR branches on disk older than the pull request | `fetch pr branches` | fetch only the PR's two branches |
-| PR branches on disk older than the pull request | `use disk` | review the copies on disk |
-| PR branches on disk older than the pull request | `stop pr review` | stop |
-| The comment as posted | `comment posted` | only record the posted comment, no review |
-| The comment as posted | `newest comment` | several candidates: take the newest match by you |
-| The comment as posted | `skip comment record` | do not record; the review goes on |
+| PR branches on disk older than the pull request | `fetch-pr-branches` | fetch only the PR's two branches |
+| PR branches on disk older than the pull request | `use-disk` | review the copies on disk |
+| PR branches on disk older than the pull request | `stop-pr-review` | stop |
+| The comment as posted | `comment-posted` | only record the posted comment, no review |
+| The comment as posted | `newest-comment` | several candidates: take the newest match by you |
+| The comment as posted | `skip-comment-record` | do not record; the review goes on |
 
 ## Runs when
 

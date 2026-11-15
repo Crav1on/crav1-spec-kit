@@ -219,21 +219,21 @@ skills:
   choice_words:
   - question: What to read
     words:
-    - word: "repos only"
+    - word: "repos-only"
       means: "repos only"
-    - word: "repos and bundle"
+    - word: "repos-and-bundle"
       means: "repos plus a bundle"
   - question: What to write
     words:
-    - word: "one spec"
+    - word: "one-spec"
       means: "one spec (the architecture spec)"
-    - word: "spec per feature"
+    - word: "spec-per-feature"
       means: "system notes plus one spec per feature"
   - question: Recheck existing specs (1.108.0)
     words:
     - word: "recheck"
       means: compare the repos with the specs that exist; report code with no spec and stale claims; refresh the landscape note
-    - word: "repos vs specs"
+    - word: "repos-vs-specs"
       means: the same as recheck
   lane: cross-cutting
   group: Start
@@ -673,7 +673,7 @@ skills:
   first_prompt: '/crav1-show-or-ask-open-questions
 
 
-    The open questions for <a person, one spec, or a topic>, as a mail.'
+    The open questions for <a person, one-spec, or a topic>, as a mail.'
 - name: crav1-record-approval
   choice_words:
   - question: Write the line
@@ -719,7 +719,7 @@ skills:
       means: "one fact"
     - word: "dump"
       means: "a dump"
-    - word: "code change"
+    - word: "code-change"
       means: "a code change"
     - word: "meeting"
       means: "a meeting (minutes or transcript)"
@@ -727,7 +727,7 @@ skills:
       means: "a mail, sorted as a dump"
     - word: "chat"
       means: "a chat, sorted as a dump"
-    note: "After a PR: `all`. A PR ref alone (`pr71`, `pr 71`, `#71`, `pr <repo> 71`) means `code change`, offline. `pr71 all` also checks for new commits and adds the description and every comment thread to the PR note (1.76.0), and a PR record Point for each new thread (1.97.0). After `/crav1-pr-status`: `pr71 candidates` (or `pr71 candidates 1,3`) takes only the record's `to spec` and `to decision` Points into a spec as one fact, a pending decision as an open question, and marks each `in spec <slug>` (1.100.0). Every open branch: `branches`, with `branches all` or `branches skip stale` to skip the question (1.79.0). Once after updating to 1.84.0, 1.86.0 or 1.97.0: `migrate formats` rewrites every spec, `docs/system/repos.md` and every PR note to the merge-safe formats (one `Synced at` line per repo and branch, plain-bullet open questions, the shared PR record with old review follow-ups notes moved into it), after a dry run with a diff and one yes; idempotent, nothing lost, never commits."
+    note: "After a PR: `all`. A PR ref alone (`pr71`, `pr 71`, `#71`, `pr <repo> 71`) means `code-change`, offline. `pr71 all` also checks for new commits and adds the description and every comment thread to the PR note (1.76.0), and a PR record Point for each new thread (1.97.0). After `/crav1-pr-status`: `pr71 candidates` (or `pr71 candidates 1,3`) takes only the record's `to spec` and `to decision` Points into a spec as one fact, a pending decision as an open question, and marks each `in spec <slug>` (1.100.0). Every open branch: `branches`, with `branches-all` or `branches-skip-stale` to skip the question (1.79.0). Once after updating to 1.84.0, 1.86.0 or 1.97.0: `migrate-formats` rewrites every spec, `docs/system/repos.md` and every PR note to the merge-safe formats (one `Synced at` line per repo and branch, plain-bullet open questions, the shared PR record with old review follow-ups notes moved into it), after a dry run with a diff and one yes; idempotent, nothing lost, never commits."
   lane: cross-cutting
   group: Keep the picture current
   starter: false
@@ -799,8 +799,8 @@ skills:
   - '1.65.0: a code change can be a pull request (`code change orders-api PR 71`, or its URL). It writes or reuses the PR note (the pull request''s title and description, `kind: pull request`) and links it from the code-change note with `pr_note:`. Given a branch, it writes the PR note when a signed-in `gh` or `az` host shows exactly one pull request for that branch; otherwise it says why it wrote none.'
   - '1.67.1: a one-slice read of a work branch also adds that branch to the spec''s Match `Branch:` list (never a base branch; existing entries and markers stay).'
   - '1.68.0: a code change asks whether a branch that split off another spec branch merges into it; a yes writes `(into …)` and `(spec branch)` on the Match `Branch:` list, a headless run writes nothing and treats it as stacked. The commit list leaves out merge commits, and a spec-branch read imports only its own commits.'
-  - '1.86.0: Match `Branch:` is one line per branch, a new one in sorted place (repo, then branch); `migrate formats` splits old `; `-joined lists, markers kept.'
-  - '1.97.0: the PR note holds one shared `## PR record` (`references/pr-record.md`) that `/crav1-pr-status`, `/crav1-review-pr`, this skill and `/crav1-merge-pr` read and write, one sorted line per point, other pull request, reader, readiness and state. `pr<n> all` adds a Point per new thread and keeps the host status as a tag. The host reads for every skill are in `references/pr-threads.md`. `migrate formats` adds the record to every PR note and moves old review follow-ups notes into it, after a dry-run diff and one yes; idempotent, nothing lost.'
+  - '1.86.0: Match `Branch:` is one line per branch, a new one in sorted place (repo, then branch); `migrate-formats` splits old `; `-joined lists, markers kept.'
+  - '1.97.0: the PR note holds one shared `## PR record` (`references/pr-record.md`) that `/crav1-pr-status`, `/crav1-review-pr`, this skill and `/crav1-merge-pr` read and write, one sorted line per point, other pull request, reader, readiness and state. `pr<n> all` adds a Point per new thread and keeps the host status as a tag. The host reads for every skill are in `references/pr-threads.md`. `migrate-formats` adds the record to every PR note and moves old review follow-ups notes into it, after a dry-run diff and one yes; idempotent, nothing lost.'
   - '1.100.0: `pr<n> candidates` reads only the PR record''s `to spec` and `to decision` Points not yet `in spec` (`references/pr-candidates.md`), takes them into a spec as one fact with the PR note as the source, a decision not yet made as an open question with `Pending: <name>`, and sets `in spec <slug>` on each. `/crav1-pr-status` names this command; you type it.'
   use_when: New information for specs that already exist
   table:
@@ -1039,15 +1039,15 @@ skills:
   choice_words:
   - question: Which tasks
     words:
-    - word: "one task"
+    - word: "one-task"
       means: "one task (add `T#`, or the first unticked)"
     - word: "range"
       means: "a range (add `T#-T#`)"
-    - word: "all tasks"
+    - word: "all-tasks"
       means: "all unticked tasks"
   - question: Branch
     words:
-    - word: "new branch"
+    - word: "new-branch"
       means: "on a base or other branch, create feat/<slug> from the into branch (1.99.0)"
   lane: build
   group: Build
@@ -1063,7 +1063,7 @@ skills:
   - '1.160.0: when `--recommend` prints a `checkout:` line, the task-line branch is only on origin or is the head of an open pull request. The build checks it out (`git checkout <name>` makes the local tracking branch) without the branch card.'
   - '1.142.0: when `/crav1-build-walk` opened this skill, do not print the open-pr Next. The walk prints its one Next.'
   - '1.141.0: when a named person''s yes is not on record, the parent writes or offers an `## Approval needed` item. It does not write `Approved:`. A matching `Approved:` line means that yes is on record. A live `apply` still needs the user''s own yes in that run, and the task stays unticked until `check` is ok.'
-  - '1.99.0: on a base branch the Build prompt has no Stay, a headless run stops unless `new branch`, a task naming a base branch is blocked, and the worker returns blocked on a base before any edit or commit.'
+  - '1.99.0: on a base branch the Build prompt has no Stay, a headless run stops unless `new-branch`, a task naming a base branch is blocked, and the worker returns blocked on a base before any edit or commit.'
   - '**`/crav1-build-tasks`** opens with one question: which tasks to build, one `T#`, a range, or all
     unticked, listing the ready ones with the `/crav1-tasks-ready-to-build` rules. It skips the question
     when the message names the tasks. Every task runs in its own worker (implement, commit, verify, optional
@@ -1165,7 +1165,7 @@ skills:
       means: "do the write, push, open, or merge just shown"
     - word: "stop"
       means: "do not do it"
-    - word: "release claim"
+    - word: "release-claim"
       means: "clear this branch's In progress: claim, then commit and push claims.md after yes"
   - question: Whose branch
     words:
@@ -1175,7 +1175,7 @@ skills:
       means: "this branch is ours"
   - question: Pull request description
     words:
-    - word: "edit description"
+    - word: "edit-description"
       means: "change the other owner's pull request description, only because this run asked"
   lane: build
   group: Build
@@ -1189,15 +1189,15 @@ skills:
   - '1.160.0: `claims.py` writes `since` in local time with the local offset, to the second, for example `2026-11-14T23:40:00+01:00`; an older UTC line still reads. Your own claim does not hold a task in the ready check: `walk_progress.py readiness --root <spec-folder> --user <name> --branch <branch>` (user defaults to `git config user.name`) gives your claimed task `refused` false and `in progress by you`. Someone else''s claim still refuses it.'
   - '1.160.0: the walk offer keeps a task-line branch that is only on origin, or is the head of an open pull request, and checks it out without a card when `--recommend` prints `checkout:`. Only a branch missing everywhere gets a new name.'
   - '**`/crav1-build-walk`** (1.142.0) is one guided walk of one work branch. It opens `/crav1-build-tasks`, verify, `/crav1-finalize-commit`, `/crav1-open-pr`, the merge of the base into the branch, `/crav1-merge-pr`, and the tick, by file. It does not replace those skills. While one branch is in progress the reply has one Next, and the step skill''s own Next is not printed. A start from a ready-to-build report prints one Next per ready branch, with the T number beside the task name.'
-  - 'Each step that writes, pushes, opens, or merges asks `yes` first. It never rebases. Other-owner mode, after `switch`, never opens a pull request, never merges the base in, and never merges or completes the pull request. It posts one comment per push and edits the description only on `edit description`. Ticks wait until that pull request is merged.'
+  - 'Each step that writes, pushes, opens, or merges asks `yes` first. It never rebases. Other-owner mode, after `switch`, never opens a pull request, never merges the base in, and never merges or completes the pull request. It posts one comment per push and edits the description only on `edit-description`. Ticks wait until that pull request is merged.'
   - 'A task that needs code from an unmerged branch is cut from that branch. The progress file and the report show the merge list, child first, back into the branch it was cut from. A merged or deleted branch is not offered. A `(Runs live)` task gets a script, a dry run, then the user''s own yes, recorded as `(live yes: <name>, <date>)`. An unapproved Approval needed item holds the task. An `Approved:` line does not replace that yes. Without the yes the task stays unticked.'
   - '1.143.0: on a `(Runs live)` task, a recorded yes that the assistant''s permission check refused is not a missing yes. Waiting says the yes is on record and the check blocked the command. The offer is to run that exact command, or allow that one command and rerun. Next is `/crav1-build-walk` after the command has run. It does not suggest working around the check.'
   - '1.144.0: the next line is `scripts/build_walk.py next --json <file>`. A stack command is `scripts/build_walk.py stack --json <file>`. `--recommend` is `scripts/build_map.py docs/specs/<slug> --recommend T#`. On Windows the interpreter is `python` with `PYTHONUTF8=1`. Elsewhere it is `python3`.'
   - '1.150.0: the reply prints `ending`. `Run next:` is first. Each command is alone in a code span and works in a new session: `/crav1-build-walk T3`, plus the slug when `docs/specs` has more than one slice. The next line names the branch and the short task name. Waiting and Uncommitted follow. The full Next line is last. Another branch whose tasks can start, from readiness `can_start` grouped by build-map branch, is its own Run next entry. Recording a step commits `build-progress/<branch>.md` after yes, in the same commit when the step already commits other files, otherwise on its own, using the persisted commit style. Nothing is pushed. `T27` and `27` are the same id. `next --json` accepts task strings or `{id, title}` objects. Bad input returns `{"ok": false, "code", "line"}`.'
-  - '1.151.0: before the walk reads the spec folder it fetches the specs repo. Behind or diverged, it stops and Run next is `git pull --no-rebase`. When it starts on a branch it writes `In progress:` in `docs/specs/<slug>/claims.md` and, after yes, commits and pushes only that file. The ready check holds those tasks as `in progress by <user> since <date>` and does not offer them in Run next. At the end, or on stop, it commits the files it wrote and pushes the specs repo after yes. `release claim` clears the claim. A claim older than three days, or `Claim max age:`, warns and is never cleared on its own.'
+  - '1.151.0: before the walk reads the spec folder it fetches the specs repo. Behind or diverged, it stops and Run next is `git pull --no-rebase`. When it starts on a branch it writes `In progress:` in `docs/specs/<slug>/claims.md` and, after yes, commits and pushes only that file. The ready check holds those tasks as `in progress by <user> since <date>` and does not offer them in Run next. At the end, or on stop, it commits the files it wrote and pushes the specs repo after yes. `release-claim` clears the claim. A claim older than three days, or `Claim max age:`, warns and is never cleared on its own.'
   - '1.155.0: `/crav1-build-walk <slug> <branch>` builds every open task on that branch in task order, in one run. `/crav1-build-walk <slug> T5` still builds one task. After one start yes the run claims every open task on the branch on one `In progress:` line, builds each task, runs its tests, commits it, records `- Built: T#, commit <sha>, tests <result>` in the `## Run` section of `build-progress/<branch>.md`, and pushes with no card. It prints one progress line per task, such as `T9 done, tests green, starting T10`, with a soft fresh-session hint every three tasks (`Fresh session hint: every N tasks`). It stops only for an open question on the next task, a stakeholder yes that is not recorded, a manual, secret, host-setup, or Runs live step, tests or lint still red after a fair try, a wanted change outside the task''s scope, someone else''s claim on or change to a run task (fetched before each task, merged in when only behind, never rebased), and always before the merge. At that stop it opens or updates the pull request and prints Run next first, then each built task with its commit and test result, then what is left. Rerunning the same command resumes from `Next task:`, reuses its own claim, and builds nothing twice. The script is `scripts/branch_run.py`.'
   - '1.155.0: each start and each recorded task also writes this branch''s one status line in `walk-progress.md` (`- Branch run: feat/orders-cicd: running, T9 done, next T10 (<time>). Log: build-progress/feat--orders-cicd.md`), then `stopped before merge`, `stopped at T#: <why>`, or `merged` through `branch_run.py status`. The ending offers each other ready branch''s next task, plus the whole branch when it has two or more open tasks.'
-  - '1.152.0: a mid-walk stop, such as before a merge step, does not clear the claim. The claim is cleared when the branch is merged or ticked, or the user says stop and is done with this walk, or `release claim`. A later ready check in a new session still holds that task as in progress.'
+  - '1.152.0: a mid-walk stop, such as before a merge step, does not clear the claim. The claim is cleared when the branch is merged or ticked, or the user says stop and is done with this walk, or `release-claim`. A later ready check in a new session still holds that task as in progress.'
   - '1.156.0: the in-walk and branch-run endings are built by the shared walk ending (`scripts/walk_ending.py`), so for the same ready branches the Run next entries match the ready check word for word. The skill points at that ending instead of describing it.'
   - '1.157.0: every walk ending, one task or a whole branch, is the Run next block first, then what was built, what is left, and Waiting. The script no longer writes a `Next:` line under it. A held step (an Approval needed item, a live yes, a pull request still to merge, someone else''s branch) says why on a `Waiting:` line instead, and with no work branch left Run next is `/crav1-verify-build-against-spec`. The JSON `next` list still has one sentence per Run next entry, and is not printed.'
   use_when: A ready slice should be built one work branch at a time, through the pull request and the merge
@@ -1206,7 +1206,7 @@ skills:
     writes: 'One `build-progress/<branch>.md` per work branch, after yes, with a `## Run` section on a whole-branch run, `claims.md` after yes when the walk starts, and `(live yes: <name>, <date>)` on a Runs live task after yes'
   reads: Reads `spec.md`, `plan.md`, `tasks.md`, `build-map.md`, `claims.md` when it exists, and this branch's `build-progress` file. It fetches the specs repo before it reads. The branch offer is `scripts/build_map.py docs/specs/<slug> --recommend T#` through `scripts/build_walk.py`. It reads the pull request author and the branch's commit authors before other-owner mode.
   writes: 'Writes `docs/specs/<slug>/build-progress/<branch>.md` after yes, with normalized hashes and `Content stamp: normalized`, and commits that file after the yes. When the step already commits other files, the progress file is in that same commit. Otherwise it is its own commit, using the persisted commit style. Nothing is pushed until the end-of-walk card, or the claim card, except on a whole-branch run (1.155.0), where the start yes covers a push after each task and the `## Run` section records each built task. Writes `docs/specs/<slug>/claims.md` when the walk starts on a branch, and commits and pushes only that file after yes. Writes `(live yes: <name>, <date>)` on the task line after the live yes. Posts one pull request comment per push in other-owner mode, after yes.'
-  leaves_alone: Leaves `spec.md` alone except that live-yes note. Does not tick a row itself. Does not push, open, or merge before `yes`. Does not overwrite another user's `In progress:` claim. Does not edit another owner's pull request description unless this run said `edit description`. Never rebases.
+  leaves_alone: Leaves `spec.md` alone except that live-yes note. Does not tick a row itself. Does not push, open, or merge before `yes`. Does not overwrite another user's `In progress:` claim. Does not edit another owner's pull request description unless this run said `edit-description`. Never rebases.
   exceptions: 'A headless run stops before any step. An unnamed current user is not a switch. A merged or deleted branch is not offered. An unapproved Approval needed item is not built. An `Approved:` line does not run the live change. Other-owner mode does not open, merge the base, or merge the pull request. It is not a starter option.'
   called_by: Called by the user.
   runs_by_itself: Opens `/crav1-build-tasks`, `/crav1-verify-build-against-spec`, `/crav1-finalize-commit`, `/crav1-open-pr`, and `/crav1-merge-pr` by file and follows them. It does not start those slash commands. In other-owner mode it does not open the pull-request or merge skills.
@@ -1237,14 +1237,14 @@ skills:
     which uses the two-pass questions file.
   - '1.64.0: the TL;DR adds a Branches line (merged into the base, deleted-but-merged, rewritten, shared); demoable needs every work branch merged. Report only.'
   - '1.68.0: the `Sub-branches:` and `left behind:` lines, done when the top-level branches reached the base, and `merged, reverted on <base> (<sha>)`, report only.'
-  - '1.69.0: the `Promotion:` line in the TL;DR and verify.md, with the optional `pipeline runs` check; done stays merged.'
+  - '1.69.0: the `Promotion:` line in the TL;DR and verify.md, with the optional `pipeline-runs` check; done stays merged.'
   - '1.136.0: the spec folder is `scripts/resolve_spec.py` (exact folder, then hyphen and space forms, then one unique playbook basename, spec title, or work-item name). Several matches are listed and the run stops. It does not pick the most recently edited tree. A task whose evidence passed, whose row is still `[ ]`, and whose pull request is recorded merged is **Implemented, verified, tick pending**. That is not Not implemented. Next skips tasks the ready check counts as done and names the first task that can start, one line per ready branch. The open checkbox stays a Gap. After a yes, the report may tick that one row. It does not re-implement.'
   - '1.137.0: `scripts/resolve_spec.py` also accepts one unique ordered token subsequence of a folder name, playbook basename, spec title, or work-item name (`cc 1.0` matches `cc-process-1-0`). Several matches are listed and the run stops. No match lists the nearest slugs.'
   - '1.144.0: the spec folder command is `<interpreter> -X utf8 <skill crav1-tasks-ready-to-build>/scripts/resolve_spec.py "<query>" --root docs/specs`. On Windows `<interpreter>` is `python` with `PYTHONUTF8=1`. Elsewhere it is `python3`. The rule is `docs/reference/running-scripts.md`.'
   choice_words:
   - question: Also check the latest pipeline runs?
     words:
-    - word: "pipeline runs"
+    - word: "pipeline-runs"
       means: "check the latest successful Azure DevOps runs behind the Promotion line (read-only)"
   use_when: Want proof against acceptance
   table:
@@ -1266,13 +1266,13 @@ skills:
   choice_words:
   - question: Which gaps
     words:
-    - word: "verify gaps"
+    - word: "verify-gaps"
       means: "gaps from the verify report"
-    - word: "live gaps"
+    - word: "live-gaps"
       means: "live-site gaps"
   - question: Branch
     words:
-    - word: "new branch"
+    - word: "new-branch"
       means: "on a base or other branch, create fix/<slug> from the into branch (1.99.0)"
   lane: build
   group: Verify and fix
@@ -1284,7 +1284,7 @@ skills:
   purpose: Fix gaps a build left, one at a time inside the spec; asks verify-report gaps or live-site
     gaps.
   in_depth:
-  - '1.99.0: before the first code edit on a base branch, offers Create `fix/<slug>` from the into branch (Recommended), an existing branch, another name or stop; never edits code there; headless stops unless `new branch`.'
+  - '1.99.0: before the first code edit on a base branch, offers Create `fix/<slug>` from the into branch (Recommended), an existing branch, another name or stop; never edits code there; headless stops unless `new-branch`.'
   - '1.130.0: a typed branch name is that card''s free-text answer, hint `Type a branch name`. There is no option labelled Other name.'
   - '**`/crav1-fix-build-gaps`** opens with one question: gaps from the verify report, or a live-site
     gap (ports, proxy, SQL, unpublished URL). It skips the question when the message says which. It replaces
@@ -1319,13 +1319,13 @@ skills:
     words:
     - word: "commit"
       means: "the same as commit now (1.76.1)"
-    - word: "message only"
+    - word: "message-only"
       means: "draft and show, no git commit; the same as copy (1.83.0)"
-    - word: "commit now"
+    - word: "commit-now"
       means: "draft, show, then commit with no choice question (never pushes)"
   - question: Base branch
     words:
-    - word: "new branch"
+    - word: "new-branch"
       means: "code staged on a base branch: create feat/<slug> from the into branch and commit there (1.99.0)"
   - question: Pull
     words:
@@ -1335,13 +1335,13 @@ skills:
     words:
     - word: "crav1"
       means: "CRAV1 style, this commit only"
-    - word: "git log"
+    - word: "git-log"
       means: "match git log, this commit only"
   - question: Trailer hook
     words:
-    - word: "strip trailers"
+    - word: "strip-trailers"
       means: "add the shared .githooks/commit-msg hook that strips known tool trailers, and save yes (1.90.0); on commit, the hook and its project rule go into that commit (1.90.6)"
-    - word: "keep trailers"
+    - word: "keep-trailers"
       means: "no hook; save no so it is not asked again (1.90.0)"
   lane: cross-cutting
   group: Commit and pull request
@@ -1352,13 +1352,13 @@ skills:
   walkthrough: docs/from-commit.md
   purpose: Draft the commit message, then commit, copy, change, or stop.
   in_depth:
-  - '1.149.0: the commit steps are read only after `commit` or `commit now`. The trailer-hook file is read only when that question is asked, or when a teammate has the hook and the config line is missing. The rules are unchanged.'
+  - '1.149.0: the commit steps are read only after `commit` or `commit-now`. The trailer-hook file is read only when that question is asked, or when a teammate has the hook and the config line is missing. The rules are unchanged.'
   - '1.141.0: a merge of `spec.md` keeps every `Approved:` line under `## Approval needed`. The pull path never drops one.'
-  - '1.99.0: never commits implementation code on a base branch, even with `commit now`; the prompt becomes `Commit on a work branch?` (create `feat/<slug>` from the into branch and commit, an existing branch, another name, stop). Spec and doc commits on a base are unchanged.'
+  - '1.99.0: never commits implementation code on a base branch, even with `commit-now`; the prompt becomes `Commit on a work branch?` (create `feat/<slug>` from the into branch and commit, an existing branch, another name, stop). Spec and doc commits on a base are unchanged.'
   - '1.130.0: a typed branch name on that prompt is the card''s free-text answer, hint `Type a branch name`. There is no option labelled Other name.'
   - '**`/crav1-finalize-commit`** always drafts first, then offers commit, copy, change, or stop (1.83.0;
     there is no opening question). When no style rule is saved, it drafts in the recommended style and
-    asks CRAV1 style or git log in the same prompt as those choices (1.89.0), at most once per run (1.90.5). `message only` drafts with
+    asks CRAV1 style or git log in the same prompt as those choices (1.89.0), at most once per run (1.90.5). `message-only` drafts with
     no commit, the same as copy, and a headless run with no choice word ends as copy. It replaces draft-commit-message; its rules are kept as a branch.'
   - 'Only write the message (was `/crav1-draft-commit-message`): Paste-ready Summary/Description for any
     git client; CRAV1 style or live git log, once or onward (deletable rule); does not commit unless they
@@ -1370,11 +1370,11 @@ skills:
     of the known tool trailers it did not write (the list in `references/tool-trailers.md`: Cursor, Claude Code,
     Copilot, Aider, Codex, Gemini, Jules, Devin and more); `Signed-off-by` and a real person''s `Co-authored-by` stay (1.94.0).'
   - 'Trailer hook (1.90.0): asked once per repo in the same prompt, "Strip tool trailers on every commit
-    for this repo?". `strip trailers` writes a committed `.githooks/commit-msg` (POSIX sh) that removes only
+    for this repo?". `strip-trailers` writes a committed `.githooks/commit-msg` (POSIX sh) that removes only
     the known tool trailers in `references/tool-trailers.md`, runs `git config core.hooksPath .githooks`,
     and saves the answer in a `trailer-hook` rule. `Signed-off-by` and human `Co-authored-by` lines stay. A teammate whose
     repo has the hook but not the config gets the config line on their first run, with no question.
-    `keep trailers` saves no and never asks again.'
+    `keep-trailers` saves no and never asks again.'
   - 'Fetch, pull and check (1.81.0, 1.123.0): after the commit it fetches. When the branch is behind its upstream
     it merges with `git pull --no-rebase --no-commit` (never a rebase, never an automatic merge commit) and resolves conflicts in specs, system
     files and notes by the kit''s rules: both sides'' added lines kept, ours first; the newest `Synced at`
@@ -1480,19 +1480,19 @@ skills:
       means: "review a branch with no pull request: local diff from its base, same checks, PR-only parts skipped, verdict in chat"
   - question: PR branches on disk older than the pull request
     words:
-    - word: "fetch pr branches"
+    - word: "fetch-pr-branches"
       means: "fetch only the PR's two branches"
-    - word: "use disk"
+    - word: "use-disk"
       means: "review the copies on disk"
-    - word: "stop pr review"
+    - word: "stop-pr-review"
       means: "stop"
   - question: The comment as posted
     words:
-    - word: "comment posted"
+    - word: "comment-posted"
       means: "only record the posted comment, no review"
-    - word: "newest comment"
+    - word: "newest-comment"
       means: "several candidates: take the newest match by you"
-    - word: "skip comment record"
+    - word: "skip-comment-record"
       means: "do not record; the review goes on"
   lane: cross-cutting
   group: Commit and pull request
@@ -1545,8 +1545,8 @@ skills:
     or takes a paste, compares it with the draft, and marks drafted points you left out as not in the posted
     comment and still open, without dropping them. A re-review compares against the posted comment and keeps
     points you cut out of the new comment unless you include them. Post it adds "I''ll post it myself"; choice
-    words `comment posted`, `newest comment` and `skip comment record`.'
-  - '1.97.0: no separate follow-ups note. Findings, follow-ups and questions go into the PR note''s shared `## PR record` (`crav1-add-to-spec` `references/pr-record.md`) as Point lines, drafted points you cut get `not posted <date>`, and the comment as drafted and as posted go into the PR note''s history. A re-review reads the record first. An old follow-ups note is still read; run `/crav1-add-to-spec migrate formats` to move it. Thread reads follow `references/pr-threads.md` (there is no `az repos pr thread list`). For where every thread stands, run `/crav1-pr-status`.'
+    words `comment-posted`, `newest-comment` and `skip-comment-record`.'
+  - '1.97.0: no separate follow-ups note. Findings, follow-ups and questions go into the PR note''s shared `## PR record` (`crav1-add-to-spec` `references/pr-record.md`) as Point lines, drafted points you cut get `not posted <date>`, and the comment as drafted and as posted go into the PR note''s history. A re-review reads the record first. An old follow-ups note is still read; run `/crav1-add-to-spec migrate-formats` to move it. Thread reads follow `references/pr-threads.md` (there is no `az repos pr thread list`). For where every thread stands, run `/crav1-pr-status`.'
   - '1.98.0: a format A description from `/crav1-open-pr` is compared with the diff bullet by bullet (each Changes bullet against the lines it links, each change against a bullet), and a choice a bullet''s why calls deliberate, or that Not in this PR names as left out, is not raised as a fault unless the repo says otherwise.'
   use_when: This turn names an open pull request
   table:
@@ -1585,15 +1585,15 @@ skills:
       means: "that pull request (also `pr <n>`, `#<n>`, `pr <repo> <n>`, or its URL)"
   - question: Your side (optional; picked from the PR author otherwise)
     words:
-    - word: "as reviewer"
+    - word: "as-reviewer"
       means: "reviewer mode: you are not the author"
-    - word: "as author"
+    - word: "as-author"
       means: "author mode: you opened the pull request"
   - question: How much
     words:
-    - word: "since last"
+    - word: "since-last"
       means: "only what changed since your last run"
-    - word: "no code"
+    - word: "no-code"
       means: "threads only; no diff or commit check, so nothing is marked done"
   lane: cross-cutting
   group: Commit and pull request
@@ -1605,8 +1605,8 @@ skills:
   purpose: Show where one pull request stands, point by point, and who owes the next step.
   in_depth:
   - '1.158.0: the shared pull-request steps are `crav1-docs/reference/pr-common.md` and `scripts/pr_common.py`, which also finds the one open pull request for the current branch when none is named. The status table, the output order and the hand-offs moved word for word to `references/classify.md`, `references/output.md` and `references/offers.md`.'
-  - '**`/crav1-pr-status`** reads one named pull request''s threads, pushes and commits on Azure DevOps or GitHub (read-only, `references/pr-threads.md` in `crav1-add-to-spec`) and splits the threads into points. Each point gets one of six statuses: `done <sha>` (a commit after the request changed the lines), `agreed`, `declined` (with the reason), `open`, `waiting on <name>`, or `needs <name>` for a third person. It picks reviewer or author mode from who opened the pull request; `as reviewer` or `as author` overrides it, and an unclear sign-in is guessed without asking.'
-  - 'It prints a verdict line with the points waiting on you first, then the points by status, flags for threads resolved while the code is unchanged (and done points whose thread is still active), spec and decision candidates, follow-ups drafted for `/crav1-ado-sync`, the pull requests this one depends on and the merge order, drafted replies, a `Next for you` list (Now, After <name> answers, Later), and a merge-readiness line. `since last` shows only what changed since your last run.'
+  - '**`/crav1-pr-status`** reads one named pull request''s threads, pushes and commits on Azure DevOps or GitHub (read-only, `references/pr-threads.md` in `crav1-add-to-spec`) and splits the threads into points. Each point gets one of six statuses: `done <sha>` (a commit after the request changed the lines), `agreed`, `declined` (with the reason), `open`, `waiting on <name>`, or `needs <name>` for a third person. It picks reviewer or author mode from who opened the pull request; `as-reviewer` or `as-author` overrides it, and an unclear sign-in is guessed without asking.'
+  - 'It prints a verdict line with the points waiting on you first, then the points by status, flags for threads resolved while the code is unchanged (and done points whose thread is still active), spec and decision candidates, follow-ups drafted for `/crav1-ado-sync`, the pull requests this one depends on and the merge order, drafted replies, a `Next for you` list (Now, After <name> answers, Later), and a merge-readiness line. `since-last` shows only what changed since your last run.'
   - 'It writes all of it to the PR note''s shared `## PR record`, the same record `/crav1-review-pr`, `/crav1-add-to-spec` and `/crav1-merge-pr` use; `/crav1-merge-pr` stops on `Ready: no`. Replies are drafts and are never posted. A thread status change on the host is offered one thread at a time and made only on that thread''s yes. Spec or decision candidates are named with the command to type, `/crav1-add-to-spec pr<n> candidates`; pr-status never runs it. Follow-ups are drafts; no work item is created.'
   - '1.98.0: also reads the pull request description: a `### Merge order` section becomes `Order` lines, `### Questions for reviewers` becomes Points tagged `asked; from description <date>`, and `### Not in this PR` is offered as follow-ups (a `follow-up` Point only on a yes). `/crav1-open-pr` writes those sections.'
   - '1.100.0: the output ends with `Next for you` before the `Ready` line: **Now** (steps nothing blocks, commands in route order), **After <name> answers <point>** (one group per person, with each path when the thread names the options), and **Later** (steps behind a merge, `Ready: yes` or a push). Commands are named, never run. The closing prompt no longer asks about spec candidates; it names `/crav1-add-to-spec pr<n> candidates` instead.'
@@ -1615,7 +1615,7 @@ skills:
     reads: The pull request's threads, pushes and commits, its diff, and its PR record
     writes: The PR record in the PR note in `docs/notes/`; one thread status on the host per yes
   reads: Reads one named pull request's threads with every comment, its pushes with their commits and changed
-    files, the signed-in user, the diff of the source branch (unless `no code`), other pull requests named as
+    files, the signed-in user, the diff of the source branch (unless `no-code`), other pull requests named as
     merge-order dependencies, and the PR note with its `## PR record` in the specs repo.
   writes: Writes the PR note's `## PR record` (a Point per point, Order, your Read line, Ready, State) and a
     `## Replies as drafted` history section, then regenerates the notes indexes; never committed. On a yes for
@@ -1655,12 +1655,12 @@ skills:
   - '1.139.0: if that merge leaves `walk-progress.md` conflicted only on version lines, run `resolve-stamps` as `/crav1-finalize-commit` `references/pull.md` says. This skill still does not merge the branch itself.'
   - '1.142.0: a yes on `/crav1-build-walk`''s card that names this pull request is the ask. When the walk opened this skill, the walk prints the one Next.'
   - '1.68.0: after a sub-branch merge, says `<n> of <m> sub-branches merged into <spec branch>` and any `left behind` branch; a reverted branch shows `merged, reverted on <base> (<sha>)`, report only.'
-  - '1.69.0: the `Promotion:` line after the after-merge line, with the optional `pipeline runs` check.'
+  - '1.69.0: the `Promotion:` line after the after-merge line, with the optional `pipeline-runs` check.'
   - '1.97.0: before the merge it reads the merge-readiness line (`Ready:`) of the PR note''s shared PR record. `Ready: no` stops the merge and lists the reasons, unless the turn says `anyway`; `anyway` never skips a required check, policy or review. No line: it goes on and names `/crav1-pr-status`. After the merge it sets `State: merged` and `Ready: merged` in the record instead of a `State on <date>` line.'
   choice_words:
   - question: Also check the latest pipeline runs?
     words:
-    - word: "pipeline runs"
+    - word: "pipeline-runs"
       means: "check the latest successful Azure DevOps runs behind the Promotion line (read-only)"
   - question: The PR record says not ready (1.97.0)
     words:
@@ -1695,25 +1695,25 @@ skills:
   walkthrough: docs/from-help.md
   purpose: Answer questions about the kit from its own local docs, with the source file and anchor for every answer.
   in_depth:
-  - 'Called with nothing, **`/crav1-help`** shows a usage guide with example questions. With a skill name, it says what the skill does, when to use it, what it reads and writes, and its before and after steps. With `next` or a situation, it picks the route in `docs/reference/workflow.yaml` and lists the steps in order, marked done, next, skipped, or to do from the slice''s file state (open questions, `plan.md`, ticked tasks, `verify.md`, `work-item.md`). It also explains a concept from the glossary and concept pages, lists skills by lane (`list`, `list <lane>`), gives the status of one slice (`status <slug>`, `where am I`) with the readiness rules of `/crav1-tasks-ready-to-build` and the route step it is on, compares two skills (`compare A B`), and summarizes the changelog for the installed version (`whats new`, `whats new since x.y`). A free-form question is answered from the docs, or with "the kit doesn''t say". Every answer ends with `Source: <file>#<anchor>`. On pushback it re-reads the file and keeps the answer unless the file says otherwise.'
-  - It reads the kit repo's `docs/`, or the `crav1-docs/` folder bundled next to the skills (plugin, Cursor drop-in, Claude Code drop-in), never GitHub. The bundled `CHANGELOG.md` is the newest 15 releases and ends with a line to the full file. The kit repo root `CHANGELOG.md` is the full history. `whats new` reads the installed version's section from the file for that install and does not fetch an older section. When online, it reads the tag names once and says so when a newer version is tagged. It writes nothing and runs no other skill. It is cross-cutting. It is not a starter option.
+  - 'Called with nothing, **`/crav1-help`** shows a usage guide with example questions. With a skill name, it says what the skill does, when to use it, what it reads and writes, and its before and after steps. With `next` or a situation, it picks the route in `docs/reference/workflow.yaml` and lists the steps in order, marked done, next, skipped, or to do from the slice''s file state (open questions, `plan.md`, ticked tasks, `verify.md`, `work-item.md`). It also explains a concept from the glossary and concept pages, lists skills by lane (`list`, `list <lane>`), gives the status of one slice (`status <slug>`, `where am I`) with the readiness rules of `/crav1-tasks-ready-to-build` and the route step it is on, compares two skills (`compare A B`), and summarizes the changelog for the installed version (`whats-new`, `whats-new since x.y`). A free-form question is answered from the docs, or with "the kit doesn''t say". Every answer ends with `Source: <file>#<anchor>`. On pushback it re-reads the file and keeps the answer unless the file says otherwise.'
+  - It reads the kit repo's `docs/`, or the `crav1-docs/` folder bundled next to the skills (plugin, Cursor drop-in, Claude Code drop-in), never GitHub. The bundled `CHANGELOG.md` is the newest 15 releases and ends with a line to the full file. The kit repo root `CHANGELOG.md` is the full history. `whats-new` reads the installed version's section from the file for that install and does not fetch an older section. When online, it reads the tag names once and says so when a newer version is tagged. It writes nothing and runs no other skill. It is cross-cutting. It is not a starter option.
   - '1.64.0: `status <slug>` and `where am I` add the Branches line and route unmerged work to `/crav1-open-pr` or `/crav1-merge-pr`.'
   - '1.67.1: remote copy ages count whole calendar days in local time; a commit made today is `today`, not `1 day old`.'
   - '1.68.0: status adds the `Sub-branches:` and `left behind:` lines and `merged, reverted on <base> (<sha>)`, report only.'
-  - '1.69.0: status adds the `Promotion:` line from `docs/environments/promotion.md` (branch reach, release and tag patterns, `not back on <base>`), with the optional `pipeline runs` check.'
-  - '1.75.0: `todo`, `todo next` (top 5) and `todo top N`, with an optional scope (person, spec, topic, branch, or pull request), rank what to do next from the records. Read-only; nothing is stored. A **Yours first** group comes from `git config user.name` or `todo for <name>`.'
+  - '1.69.0: status adds the `Promotion:` line from `docs/environments/promotion.md` (branch reach, release and tag patterns, `not back on <base>`), with the optional `pipeline-runs` check.'
+  - '1.75.0: `todo`, `todo-next` (top 5) and `todo-top N`, with an optional scope (person, spec, topic, branch, or pull request), rank what to do next from the records. Read-only; nothing is stored. A **Yours first** group comes from `git config user.name` or `todo for <name>`.'
   choice_words:
   - question: Also check the latest pipeline runs?
     words:
-    - word: "pipeline runs"
+    - word: "pipeline-runs"
       means: "check the latest successful Azure DevOps runs behind the Promotion line (read-only)"
   - question: What to do next (optional, never asked)
     words:
     - word: "todo"
       means: "every action from the records, ranked (read-only)"
-    - word: "todo next"
+    - word: "todo-next"
       means: "the top 5"
-    - word: "todo top N"
+    - word: "todo-top N"
       means: "the top N"
   use_when: You want to know what to run next, in what order, or what a skill does
   table:
@@ -1794,7 +1794,8 @@ skills:
   walkthrough: docs/from-tasks-ready-to-build.md
   purpose: 'List the tasks ready to build, for one spec or all, and why the others are blocked. Rewrites each slice build map.'
   in_depth:
-  - '1.162.0: `open map` shows the whole `build-map.md` as a zoomable page in the browser, the text in a readable column and each Mermaid diagram in place, full window width, with wheel zoom, drag to pan, Fit, 100% and Fullscreen. `export map` writes one self-contained HTML file to share, `<slug>-build-map-<YYYY-MM-DD>.html` in Downloads, never inside the specs repo. The script is `scripts/open_build_map.py docs/specs/<slug>` (`--export`, `--out`, `--no-open`). It loads Mermaid 11.4.1 and marked 18.2.0 from `scripts/vendor/`, or from jsDelivr when that folder is missing; the export inlines both. The map file gets one line under its heading naming both commands, and a done branch says `Waited for:` instead of `Waits for:`.'
+  - '1.163.0: multi-word choice words are hyphenated only. On this skill: `fix-loop`, `fix-loop <n>`, `open-map`, `export-map` and `pipeline-runs`. Spaced forms are no longer accepted. The script flags `--fix-loop` and `--export` are unchanged. The same hyphen-only rule applies to the kit''s other choice words, including `release-claim`, `new-branch`, `one-task`, `git-log` (the style word), and the rest listed in the 1.163.0 changelog. A successful `walk_progress.py fix-loop` preview (no `--yes`) exits 0. The loop-fix `Why:` line is a plain reason with no keyword list. The skill gives the script''s formatted reply once as the answer, not the raw tool output and then the reply again, with at most one short lead sentence before it. A not-ready ending starts with `Run next:` for the first real next step, in plain words.'
+  - '1.162.0: `open-map` shows the whole `build-map.md` as a zoomable page in the browser, the text in a readable column and each Mermaid diagram in place, full window width, with wheel zoom, drag to pan, Fit, 100% and Fullscreen. `export-map` writes one self-contained HTML file to share, `<slug>-build-map-<YYYY-MM-DD>.html` in Downloads, never inside the specs repo. The script is `scripts/open_build_map.py docs/specs/<slug>` (`--export`, `--out`, `--no-open`). It loads Mermaid 11.4.1 and marked 18.2.0 from `scripts/vendor/`, or from jsDelivr when that folder is missing; the export inlines both. The map file gets one line under its heading naming both commands, and a done branch says `Waited for:` instead of `Waits for:`.'
   - '1.160.0: `build_map.py --recommend` reads remotes with `git ls-remote --heads` once per run, besides the `origin/<name>` refs, and, when `gh` works, the open pull requests. A task-line branch deleted only locally is offered, not replaced by a new step-named branch: `because: <name> is on origin only; checkout creates the local tracking branch`, then a last `checkout: <name>` line. An open pull request whose head is the name wins over merged and deleted, and a `PR n` on the task line picks it. A remote that cannot be read is never taken as gone. Only a branch missing everywhere, with no open pull request, gets a new name. `CRAV1_NO_REMOTE_CHECK=1` turns the remote reads off. The branch is checked in the task''s code repo, which can be a separate checkout from the specs repo: a repo prefix on `(map:)`/`(branch:)`, a Match `Branch: <repo> <branch>` line, or a `Repo:` line in tasks.md names it, and `--code-repo <path>`, the specs repo, or a sibling checkout with that name holds it. `repo: <path>` is printed when that is not the specs repo. When the named repo is not found, the line is `because: could not check <repo> from here`, never deleted.'
   - '1.149.0: work branches, a sub-branch, promotion, a work item, a blocking plan risk, and a next line other than the ready list are references files. SKILL.md names each with a load-when line. The rules are unchanged.'
   - '**`/crav1-tasks-ready-to-build`** reads `spec.md` open questions, `plan.md` (the `Reviewed:` line and `## Risks`), `tasks.md`, and `verify.md` for one slice or every slice. A ticked task is Done when `verify.md` lists it as verified, otherwise Needs verify. Then a task is blocked by a missing `plan.md`, by a kept-open question whose `Blocks:` line names it, by a kept-open question with no `Blocks:` line (tasks named in the text, or the whole slice only when none are named and resolve-open-questions has never been recorded), by a plan Risk that says do not implement until resolved only when that question has no `Blocks:` line, or by an unticked task in its `(after: T#)` (recorded) or, with no `(after: …)`, the task just before it (inferred). `Blocks: none` blocks no task. Any `Blocks:` line wins over that Risk wording. Lists and Next follow dependency order (1.103.0): the `(after: …)` graph in waves, lowest number first in a wave; Next is the ready task that unblocks the most; a cycle blocks its tasks. It may run `scripts/task_order.py` and `scripts/question_blocks.py` next to the skill. Otherwise it is Ready, with a warning when the plan review is unknown (inferred) or still has open `P#`s.'
@@ -1802,7 +1803,7 @@ skills:
   - '1.141.0: an unapproved `## Approval needed` item holds its `Holds:` tasks. They are Waiting on that person. Other tasks still start (`ready-partial`). A matching `Approved:` line clears the hold. `task_order.py` lists them under Waiting on approval.'
   - '1.64.0: shows a task''s `(branch: …)` and one Branches line from local git only.'
   - '1.68.0: the `Sub-branches:` and `left behind:` lines and `merged, reverted on <base> (<sha>)`, report only.'
-  - '1.69.0: the `Promotion:` line under the Branches line, with the optional `pipeline runs` check.'
+  - '1.69.0: the `Promotion:` line under the Branches line, with the optional `pipeline-runs` check.'
   - '1.88.0: command-only (`disable-model-invocation: true`). It runs only when you type `/crav1-tasks-ready-to-build`; the agent does not start it from a plain question, and its description no longer loads in every chat.'
   - '1.125.0: `Blocks: none` blocks no task. A `Blocks:` line wins over a Risk that says do not implement until resolved. No line still blocks the whole slice. Older specs with no line behave as before.'
   - '1.126.0: a Risk that says do not implement until resolved matches a question on the question first sentence, a `(question: <first words>)` tag, or the same Blocks tasks named in the Risk. A Risk that matches no question still blocks the slice. `scripts/task_order.py --json` uses T1 style ids.'
@@ -1823,7 +1824,7 @@ skills:
   - '1.154.0: branches that wait for each other are a loop. The map and the ready-check ending print one `Loop:` line per loop, naming the branches and the task line behind each direction of the wait, (since 1.161.0 followed by a fix offer, not a request to edit `tasks.md` by hand) The open tasks on those branches are Blocked in both, from one shared judgement, and are not offered in Run next. A branch downstream of a loop keeps its own wave and state. A branch always sits in a later wave than each branch it waits for, unless both are in the same loop. A held line shows the wave, or `in a loop`, never `(blocked)`.'
   - '1.155.0: Run next offers each ready branch''s next task, `/crav1-build-walk <slug> T#`, and, when that branch has two or more open tasks, the whole branch, `/crav1-build-walk <slug> <branch>`, as its own entry with `branch <branch>, every open task: …` underneath. `next_lines` carry the same entries. A `Branch runs:` block prints each unmerged `- Branch run:` status line from `walk-progress.md`.'
   - '1.156.0: the readiness script prints the finished reply (`walk_progress.py readiness --root <spec-folder> --write-map --text`): the header, the counts row, `Result:`, the shared walk ending (Run next first, Held, Branch runs, Loop and Waiting lines, claim warnings), `Source:` and `Build map:`. The skill shows it as-is and never adds a `Next:` line. The brief reply is the default; the word `full` adds the per-task lists and the Order line. The rules moved to `references/rules.md`. The ending is shared with tighten-and-plan and build-walk through `scripts/walk_ending.py`.'
-  - '1.161.0: a loop no longer ends with a line telling you to edit `tasks.md` by hand. Under the `Loop:` line the reply offers fixes, best first, each in plain words: what is wrong, the change (build these tasks on the other branch, or let one task start without one wait), that the tasks stay the same and only the branch and pull request they go into change, and the order afterwards. A move is recommended when the target branch''s plan step already describes the tasks. Dropping a wait is only an alternative, or the only fix when the tasks themselves wait for each other, with a warning that it changes the build order. A fix is offered only when it removes that loop without making a new one. Say `fix loop` (the recommended fix) or `fix loop <n>`. The card confirms, and on yes `walk_progress.py fix-loop --root <spec-folder> --pick <n> --yes` writes or replaces the `(map:)` marks, or removes the one `(after:)` wait, rebuilds `build-map.md`, and reports the loop gone or the next one. `tasks.md` and `build-map.md` stay uncommitted. `spec.md` is never touched. A ready or ready-partial reply also has a Run next entry, `/crav1-tasks-ready-to-build <slug> fix loop`.'
+  - '1.161.0: a loop no longer ends with a line telling you to edit `tasks.md` by hand. Under the `Loop:` line the reply offers fixes, best first, each in plain words: what is wrong, the change (build these tasks on the other branch, or let one task start without one wait), that the tasks stay the same and only the branch and pull request they go into change, and the order afterwards. A move is recommended when the target branch''s plan step already describes the tasks. Dropping a wait is only an alternative, or the only fix when the tasks themselves wait for each other, with a warning that it changes the build order. A fix is offered only when it removes that loop without making a new one. Say `fix-loop` (the recommended fix) or `fix-loop <n>`. The card confirms, and on yes `walk_progress.py fix-loop --root <spec-folder> --pick <n> --yes` writes or replaces the `(map:)` marks, or removes the one `(after:)` wait, rebuilds `build-map.md`, and reports the loop gone or the next one. `tasks.md` and `build-map.md` stay uncommitted. `spec.md` is never touched. A ready or ready-partial reply also has a Run next entry, `/crav1-tasks-ready-to-build <slug> fix-loop`.'
   choice_words:
   - question: Show the build map?
     words:
@@ -1835,28 +1836,28 @@ skills:
       means: "the long form: every per-task list and the Order line; the brief reply is the default"
   - question: Fix the loop?
     words:
-    - word: "fix loop"
+    - word: "fix-loop"
       means: "apply the recommended fix for branches that wait for each other, after the card confirms it"
-    - word: "fix loop <n>"
+    - word: "fix-loop <n>"
       means: "apply the fix with that number from the Loop lines instead"
   - question: Open the map as a zoomable page?
     words:
-    - word: "open map"
+    - word: "open-map"
       means: "open the whole build map in the browser, with a diagram you can zoom and pan"
-    - word: "export map"
+    - word: "export-map"
       means: "write the map as one HTML file to send, outside the specs repo"
   - question: Also check the latest pipeline runs?
     words:
-    - word: "pipeline runs"
+    - word: "pipeline-runs"
       means: "check the latest successful Azure DevOps runs behind the Promotion line (read-only)"
   use_when: 'You want to know which tasks can be built now, and why the others cannot, or you want the build map'
   table:
     reads: '`spec.md` open questions, `plan.md`, `tasks.md`, and `verify.md` per slice'
     writes: '`docs/specs/<slug>/build-map.md` every run, with `T#` plus the short name in the Tasks field, and a list in chat grouped by branch'
   reads: 'Reads, for one slice or every slice under `docs/specs/`, the open questions in `spec.md` with their `Blocks:`, `Asked:`, `Pending:`, and `Answered:` lines, the `Reviewed:` line, `## Approach`, and `## Risks` in `plan.md`, the task lines in `tasks.md` with their ticks, `(after: T#)`, `(branch:)`, `(step:)`, and `(map:)`, a `task: T#` title in `work-item.md` when that file exists, `claims.md` when it exists (`In progress:` lines), and `verify.md` when it exists. It fetches the specs repo before it reads.'
-  writes: 'Writes a list in the chat with summary counts, Ready and Held grouped by build-map branch, Waits in order, Blocked, Needs verify, a Done count, one Next line per ready branch, and its source, plus one line pointing at the build map. Every run rewrites `docs/specs/<slug>/build-map.md`. The Tasks field is `T#` plus the short name. The word `build-map` prints only the short summary of that file. `open map` writes a temp page and `export map` one HTML file outside the repo (1.162.0).'
-  leaves_alone: 'Leaves every file other than `build-map.md` alone, including `verify.md` and `claims.md`, except the `(map:)` or `(after:)` marks a confirmed `fix loop` writes in `tasks.md`, and never reads Azure Boards. It fetches the specs repo first. It does not commit the map.'
-  exceptions: 'does not guess a dependency or a blocking link from task text. Where nothing is recorded it uses a fallback and marks the reason inferred. It writes no readiness marks except a confirmed `fix loop` (1.161.0); review-plan, tighten-plan, plan-from-spec, and resolve-open-questions write them. The map is written only by `scripts/build_map.py`.'
+  writes: 'Writes a list in the chat with summary counts, Ready and Held grouped by build-map branch, Waits in order, Blocked, Needs verify, a Done count, one Next line per ready branch, and its source, plus one line pointing at the build map. Every run rewrites `docs/specs/<slug>/build-map.md`. The Tasks field is `T#` plus the short name. The word `build-map` prints only the short summary of that file. `open-map` writes a temp page and `export-map` one HTML file outside the repo (1.162.0).'
+  leaves_alone: 'Leaves every file other than `build-map.md` alone, including `verify.md` and `claims.md`, except the `(map:)` or `(after:)` marks a confirmed `fix-loop` writes in `tasks.md`, and never reads Azure Boards. It fetches the specs repo first. It does not commit the map.'
+  exceptions: 'does not guess a dependency or a blocking link from task text. Where nothing is recorded it uses a fallback and marks the reason inferred. It writes no readiness marks except a confirmed `fix-loop` (1.161.0); review-plan, tighten-plan, plan-from-spec, and resolve-open-questions write them. The map is written only by `scripts/build_map.py`.'
   called_by: Called by the user with its slash command, any time (command-only).
   runs_by_itself: Calls no skill.
   you_run_next:
@@ -1918,11 +1919,11 @@ skills:
   choice_words:
   - question: How deep
     words:
-    - word: "what it does"
+    - word: "what-it-does"
       means: "what it does"
-    - word: "what and why"
+    - word: "what-and-why"
       means: "what and why"
-    - word: "teach the language"
+    - word: "teach-the-language"
       means: "teach the language"
   lane: cross-cutting
   group: Keep the picture current
@@ -1958,7 +1959,7 @@ skills:
   called_by: Called by the user.
   runs_by_itself: Calls no skill.
   you_run_next: []
-  first_prompt: '/crav1-explain-this-code what it does
+  first_prompt: '/crav1-explain-this-code what-it-does
 
     @src/<file>'
 - name: crav1-retire-spec
@@ -1971,7 +1972,7 @@ skills:
       means: "merge"
     - word: "park"
       means: "park"
-    - word: "convert to note"
+    - word: "convert-to-note"
       means: "convert to note"
   lane: cross-cutting
   group: Keep the picture current
@@ -2210,7 +2211,8 @@ skills:
   - '1.154.0: the walk''s references match the 1.153.0 ending: one Run next block at the top, the walk command only there, and no `Next:` line after the Waiting lines. A stop prints the walk command in a Run next entry, not a `Next:` line. The ending adds one `Loop:` line per pair or ring of branches that wait for each other, and those tasks count as Blocked in the counts and in `build-map.md`. Other tasks keep their state, so the result can stay `ready-partial`. Kit lint fails when a skill file tells the agent to write a Next line after the Waiting lines.'
   - '1.155.0: `walk-progress.md` also holds one `- Branch run:` status line per whole-branch run of `/crav1-build-walk`, under `## Branch runs`. Record, cover, and clear keep those lines, `resume` returns them as `branch_runs`, the ready check prints the unmerged ones, and `resolve-stamps` settles a conflict that is only those lines by keeping each branch''s newest line. The ready-check Run next offers the whole branch beside the next task when the branch has two or more open tasks.'
   - '1.156.0: the ready check uses the shared walk ending (`scripts/walk_ending.py`, the same one the standalone ready check and build-walk use), and `readiness` is brief by default; `--full` prints the complete JSON only on an explicit ask. The skill points at that ending instead of describing it.'
-  - '1.161.0: the readiness ending follows each `Loop:` line with the fix offer, the recommended fix first (`fix loop`, then `fix loop <n>`), and a ready or ready-partial ending adds the Run next entry `/crav1-tasks-ready-to-build <slug> fix loop`. The JSON has `loop_card` and `loop_fixes`. New subcommand `walk_progress.py fix-loop --root <spec-folder> [--pick <n>] [--yes]`: without `--yes` it writes nothing and prints the card; with it, it writes `tasks.md` and `build-map.md` and reports what is left.'
+  - '1.161.0: the readiness ending follows each `Loop:` line with the fix offer, the recommended fix first (`fix-loop`, then `fix-loop <n>`), and a ready or ready-partial ending adds the Run next entry `/crav1-tasks-ready-to-build <slug> fix-loop`. The JSON has `loop_card` and `loop_fixes`. New subcommand `walk_progress.py fix-loop --root <spec-folder> [--pick <n>] [--yes]`: without `--yes` it writes nothing and prints the card; with it, it writes `tasks.md` and `build-map.md` and reports what is left.'
+  - '1.163.0: the ready-check Loop offer and Run next entry use `fix-loop` and `fix-loop <n>` only. The spaced form is no longer accepted. The `walk_progress.py fix-loop` subcommand is unchanged, except a successful preview (no `--yes`) now exits 0. Other kit choice words follow the same hyphen-only rule. A not-ready ending starts with `Run next:` for the first real next step, with a plain reason such as `The plan was reopened for review, so T5, T9 and T43 wait until /crav1-tighten-plan finishes.`'
   use_when: A spec should be tightened and planned until it is ready to build
   table:
     reads: The spec folder, an optional playbook (outside the project or under `docs/playbooks/`), and the progress file when one exists
@@ -2448,15 +2450,15 @@ skills:
   choice_words:
   - question: Which sync
     words:
-    - word: "suggest features"
+    - word: "suggest-features"
       means: "suggest Features"
-    - word: "push features"
+    - word: "push-features"
       means: "push Features"
-    - word: "push tasks"
+    - word: "push-tasks"
       means: "push tasks"
-    - word: "pull tasks"
+    - word: "pull-tasks"
       means: "pull tasks"
-    - word: "pull spec changes"
+    - word: "pull-spec-changes"
       means: "pull spec changes"
   lane: cross-cutting
   group: Azure Boards
@@ -2823,7 +2825,7 @@ routing:
         - >-
           `/crav1-existing-to-specs` is a starter option. Asking for startup options names it and does not run it. It may run from any lane, and only when the user names repos. It does not start Specify, Plan, or Build. It is not `/crav1-add-to-spec`.
         - >-
-          `/crav1-existing-to-specs recheck` (also `repos vs specs`) may run from any lane once specs exist. It writes nothing into any spec and never an open question. A gap goes to `/crav1-add-to-spec` only after a yes. A new feature is named, not started.
+          `/crav1-existing-to-specs recheck` (also `repos-vs-specs`) may run from any lane once specs exist. It writes nothing into any spec and never an open question. A gap goes to `/crav1-add-to-spec` only after a yes. A new feature is named, not started.
         crav1-read-environment:
         - >-
           `/crav1-read-environment` is a starter option. Asking for startup options names it and does not run it. It may run from any lane, and only when the user names the host. Naming production, prod, or live stops. It never reads production data. It does not start Specify, Plan, or Build. Confirmed system facts go through `/crav1-refresh-system-notes`, architecture facts through `/crav1-existing-to-specs`, and a slice Match through `/crav1-add-to-spec`. It asks once whether to run `/crav1-refresh-system-notes` and does not run that refresh from the question.
@@ -2847,7 +2849,7 @@ routing:
           `/crav1-explain-this-code` may run from any lane, any time. It is not `/crav1-explain-existing-system`. It writes nothing into the repo unless the user picks Save as .md, and then only outside the repo. It does not move work into Specify, Plan, or Build.
         crav1-retire-spec:
         - >-
-          `/crav1-retire-spec` may run from any lane, on one spec the user names. Choice words are `retire`, `merge`, `park`, and `convert to note`. It runs no other skill. Parked specs are skipped by `/crav1-plan-from-spec`, `/crav1-build-tasks`, `/crav1-build-features`, and the push branches of `/crav1-ado-sync`. It does not move work into Specify, Plan, or Build.
+          `/crav1-retire-spec` may run from any lane, on one spec the user names. Choice words are `retire`, `merge`, `park`, and `convert-to-note`. It runs no other skill. Parked specs are skipped by `/crav1-plan-from-spec`, `/crav1-build-tasks`, `/crav1-build-features`, and the push branches of `/crav1-ado-sync`. It does not move work into Specify, Plan, or Build.
         crav1-model-data:
         - >-
           `/crav1-model-data` may run from any lane when the user asks for a data model. It does not move work into Specify, Plan, or Build. It does not edit spec requirements, generate schema, or start a watcher. It is not a starter option.
@@ -2915,5 +2917,5 @@ routing:
   choice_words_intro: The merged skills take exact choice words instead of `--flags`. A word in the invocation
     takes that choice without asking, for a person, a bot, or a headless run. A headless or bot run with
     no word stops and names the valid words; it does not guess. Runners should always pass the word.
-  choice_words_example: 'Example: `/crav1-ado-sync push tasks`, `/crav1-existing-to-specs repos and bundle
+  choice_words_example: 'Example: `/crav1-ado-sync push-tasks`, `/crav1-existing-to-specs repos-and-bundle
     spec per feature`.'

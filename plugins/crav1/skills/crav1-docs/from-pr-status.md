@@ -20,10 +20,10 @@ A number, `#42`, `pr orders-api 42` or the URL. No pull request named and your b
 
 | Word | Means |
 | --- | --- |
-| `as reviewer` | Reviewer mode, whoever opened the pull request |
-| `as author` | Author mode |
-| `since last` | Only what changed since your last run |
-| `no code` | Threads only; no diff or commit check, so nothing is marked done |
+| `as-reviewer` | Reviewer mode, whoever opened the pull request |
+| `as-author` | Author mode |
+| `since-last` | Only what changed since your last run |
+| `no-code` | Threads only; no diff or commit check, so nothing is marked done |
 
 ## Steps
 
@@ -69,12 +69,12 @@ One pull request, one PR note, one record. `/crav1-pr-status`, `/crav1-review-pr
 - Point: tests/test_retry_store.py:45 | done 3c9d2e1 | Sam Lee | thread 98; host fixed | Fixture could clean live tables
 - Read: Alex Doe | 7b41a0c, push 6, newest comment 2026-10-26T15:03Z | 2026-10-27
 
-A `Read: sweep` line on the same record is the watermark from `/crav1-update-specs-from-changes-and-prs`. It is not a person. `since last` does not use it.
+A `Read: sweep` line on the same record is the watermark from `/crav1-update-specs-from-changes-and-prs`. It is not a person. `since-last` does not use it.
 - Ready: no | 1 needs Robin K.; after PR 40 (not merged) | 2026-10-27 by pr-status
 - State: active | 2026-10-27
 ```
 
-`/crav1-merge-pr` reads the `Ready` line and stops on `no` unless you add `anyway`; host checks still apply. A project from before 1.97.0 runs `/crav1-add-to-spec migrate formats` once ([install](install.md)).
+`/crav1-merge-pr` reads the `Ready` line and stops on `no` unless you add `anyway`; host checks still apply. A project from before 1.97.0 runs `/crav1-add-to-spec migrate-formats` once ([install](install.md)).
 
 A point that asked for a host setting, such as a required build on `develop`, becomes `done host` when the setting reads back live in this run (1.115.0). No commit is needed, and the skill never applies anything; when it is not set yet it names `/crav1-host-setup`.
 

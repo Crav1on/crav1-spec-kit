@@ -21,10 +21,10 @@ Read `references/opening.md` ("Opening question (1.56.0)") only when no branch w
 
 Exact words for bots and scripted runs. There are no `--flags`.
 
-- What you have: `fact` / `dump` / `code change` / `meeting` / `mail` / `chat`.
-- Code change, every open branch: `branches` (`branches all`, `branches skip stale`); read `references/branches-sweep.md`.
-- Once after updating to 1.84.0, 1.86.0 or 1.97.0: `migrate formats`; see **Merge-safe formats** below.
-- After a PR: `all`. A PR ref alone (`pr71`, `#71`, as `references/scope.md` parses) means `code change`; `pr71 all` adds description and comments per `references/pr-comments.md`, and a record Point per new thread (`references/pr-record.md`, 1.97.0).
+- What you have: `fact` / `dump` / `code-change` / `meeting` / `mail` / `chat`.
+- Code change, every open branch: `branches` (`branches-all`, `branches-skip-stale`); read `references/branches-sweep.md`.
+- Once after updating to 1.84.0, 1.86.0 or 1.97.0: `migrate-formats`; see **Merge-safe formats** below.
+- After a PR: `all`. A PR ref alone (`pr71`, `#71`, as `references/scope.md` parses) means `code-change`; `pr71 all` adds description and comments per `references/pr-comments.md`, and a record Point per new thread (`references/pr-record.md`, 1.97.0).
 - After `/crav1-pr-status`: `pr<n> candidates` (or `pr<n> candidates 1,3`) takes only the record's `to spec` and `to decision` Points that are not yet `in spec`; read `references/pr-candidates.md` (1.100.0).
 
 Not this skill: "what code is not in any spec" with no change named. Name `/crav1-existing-to-specs recheck` (1.108.0) and stop.
@@ -33,13 +33,13 @@ Not this skill: "what code is not in any spec" with no change named. Name `/crav
 
 When the invocation contains one of these words (for example `/crav1-add-to-spec fact`), take that choice and do not ask. This holds for a person, a bot, or a headless run.
 
-When a choice is missing and the run is headless or started by a bot (no person in the chat to answer), do not guess. Stop and name the valid words, for example: `Missing choice. Use one of: fact, dump, code change, meeting, mail, chat.`
+When a choice is missing and the run is headless or started by a bot (no person in the chat to answer), do not guess. Stop and name the valid words, for example: `Missing choice. Use one of: fact, dump, code-change, meeting, mail, chat.`
 
 ## Merge-safe formats (1.84.0)
 
 Every `Synced at` line, open question, `**New:**` line, glossary row and PR record line (1.97.0) this skill writes follows `references/merge-safe.md`: one `Synced at` line per repo and branch, questions found by their words (`Q#` is display only), and new lines in sorted place, not at the end.
 
-`migrate formats` rewrites every spec, `docs/system/repos.md` and (1.97.0) every PR note once, moving old review follow-ups notes into their PR notes' record. Run `<interpreter> <this skill>/scripts/merge_safe_migrate.py --dry-run` from the repo root and show its list and diff. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. After one yes (headless: the word is the yes), run it without `--dry-run`. It checks nothing was lost before it writes; a `LOST` line means that file was left alone, so show it and stop. A second run says `already merge-safe`. Do not commit.
+`migrate-formats` rewrites every spec, `docs/system/repos.md` and (1.97.0) every PR note once, moving old review follow-ups notes into their PR notes' record. Run `<interpreter> <this skill>/scripts/merge_safe_migrate.py --dry-run` from the repo root and show its list and diff. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. After one yes (headless: the word is the yes), run it without `--dry-run`. It checks nothing was lost before it writes; a `LOST` line means that file was left alone, so show it and stop. A second run says `already merge-safe`. Do not commit.
 
 ## From /crav1-read-environment
 
@@ -49,13 +49,13 @@ Read `references/handoffs-read-environment.md` ("From /crav1-read-environment") 
 
 Read `references/handoffs-suggest-tests.md` ("From /crav1-suggest-tests-for-code") only when the call comes from /crav1-suggest-tests-for-code.
 
-## From the push features branch of /crav1-ado-sync
+## From the push-features branch of /crav1-ado-sync
 
-Read `references/handoffs-ado-push.md` ("From the push features branch of /crav1-ado-sync") only when the call comes from the ado-sync push features branch.
+Read `references/handoffs-ado-push.md` ("From the push-features branch of /crav1-ado-sync") only when the call comes from the ado-sync push-features branch.
 
-## From the pull spec changes branch of /crav1-ado-sync
+## From the pull-spec-changes branch of /crav1-ado-sync
 
-Read `references/handoffs-ado-pull.md` ("From the pull spec changes branch of /crav1-ado-sync") only when the call comes from the ado-sync pull spec changes branch.
+Read `references/handoffs-ado-pull.md` ("From the pull-spec-changes branch of /crav1-ado-sync") only when the call comes from the ado-sync pull-spec-changes branch.
 
 ## From the meeting branch of /crav1-add-to-spec
 

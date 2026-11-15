@@ -14,7 +14,7 @@ Walk one work branch from build through merge, with one Next while it runs.
 
 **[`/crav1-build-walk`](crav1-build-walk.md)** (1.142.0) is one guided walk of one work branch. It opens [`/crav1-build-tasks`](crav1-build-tasks.md), verify, [`/crav1-finalize-commit`](crav1-finalize-commit.md), [`/crav1-open-pr`](crav1-open-pr.md), the merge of the base into the branch, [`/crav1-merge-pr`](crav1-merge-pr.md), and the tick, by file. It does not replace those skills. While one branch is in progress the reply has one Next, and the step skill's own Next is not printed. A start from a ready-to-build report prints one Next per ready branch, with the T number beside the task name.
 
-Each step that writes, pushes, opens, or merges asks `yes` first. It never rebases. Other-owner mode, after `switch`, never opens a pull request, never merges the base in, and never merges or completes the pull request. It posts one comment per push and edits the description only on `edit description`. Ticks wait until that pull request is merged.
+Each step that writes, pushes, opens, or merges asks `yes` first. It never rebases. Other-owner mode, after `switch`, never opens a pull request, never merges the base in, and never merges or completes the pull request. It posts one comment per push and edits the description only on `edit-description`. Ticks wait until that pull request is merged.
 
 A task that needs code from an unmerged branch is cut from that branch. The progress file and the report show the merge list, child first, back into the branch it was cut from. A merged or deleted branch is not offered. A `(Runs live)` task gets a script, a dry run, then the user's own yes, recorded as `(live yes: <name>, <date>)`. An unapproved Approval needed item holds the task. An `Approved:` line does not replace that yes. Without the yes the task stays unticked.
 
@@ -24,13 +24,13 @@ A task that needs code from an unmerged branch is cut from that branch. The prog
 
 1.150.0: the reply prints `ending`. `Run next:` is first. Each command is alone in a code span and works in a new session: [`/crav1-build-walk`](crav1-build-walk.md) T3`, plus the slug when `docs/specs` has more than one slice. The next line names the branch and the short task name. Waiting and Uncommitted follow. The full Next line is last. Another branch whose tasks can start, from readiness `can_start` grouped by build-map branch, is its own Run next entry. Recording a step commits `build-progress/<branch>.md` after yes, in the same commit when the step already commits other files, otherwise on its own, using the persisted commit style. Nothing is pushed. `T27` and `27` are the same id. `next --json` accepts task strings or `{id, title}` objects. Bad input returns `{"ok": false, "code", "line"}`.
 
-1.151.0: before the walk reads the spec folder it fetches the specs repo. Behind or diverged, it stops and Run next is `git pull --no-rebase`. When it starts on a branch it writes `In progress:` in `docs/specs/<slug>/claims.md` and, after yes, commits and pushes only that file. The ready check holds those tasks as `in progress by <user> since <date>` and does not offer them in Run next. At the end, or on stop, it commits the files it wrote and pushes the specs repo after yes. `release claim` clears the claim. A claim older than three days, or `Claim max age:`, warns and is never cleared on its own.
+1.151.0: before the walk reads the spec folder it fetches the specs repo. Behind or diverged, it stops and Run next is `git pull --no-rebase`. When it starts on a branch it writes `In progress:` in `docs/specs/<slug>/claims.md` and, after yes, commits and pushes only that file. The ready check holds those tasks as `in progress by <user> since <date>` and does not offer them in Run next. At the end, or on stop, it commits the files it wrote and pushes the specs repo after yes. `release-claim` clears the claim. A claim older than three days, or `Claim max age:`, warns and is never cleared on its own.
 
 1.155.0: [`/crav1-build-walk`](crav1-build-walk.md) <slug> <branch>` builds every open task on that branch in task order, in one run. [`/crav1-build-walk`](crav1-build-walk.md) <slug> T5` still builds one task. After one start yes the run claims every open task on the branch on one `In progress:` line, builds each task, runs its tests, commits it, records `- Built: T#, commit <sha>, tests <result>` in the `## Run` section of `build-progress/<branch>.md`, and pushes with no card. It prints one progress line per task, such as `T9 done, tests green, starting T10`, with a soft fresh-session hint every three tasks (`Fresh session hint: every N tasks`). It stops only for an open question on the next task, a stakeholder yes that is not recorded, a manual, secret, host-setup, or Runs live step, tests or lint still red after a fair try, a wanted change outside the task's scope, someone else's claim on or change to a run task (fetched before each task, merged in when only behind, never rebased), and always before the merge. At that stop it opens or updates the pull request and prints Run next first, then each built task with its commit and test result, then what is left. Rerunning the same command resumes from `Next task:`, reuses its own claim, and builds nothing twice. The script is `scripts/branch_run.py`.
 
 1.155.0: each start and each recorded task also writes this branch's one status line in `walk-progress.md` (`- Branch run: feat/orders-cicd: running, T9 done, next T10 (<time>). Log: build-progress/feat--orders-cicd.md`), then `stopped before merge`, `stopped at T#: <why>`, or `merged` through `branch_run.py status`. The ending offers each other ready branch's next task, plus the whole branch when it has two or more open tasks.
 
-1.152.0: a mid-walk stop, such as before a merge step, does not clear the claim. The claim is cleared when the branch is merged or ticked, or the user says stop and is done with this walk, or `release claim`. A later ready check in a new session still holds that task as in progress.
+1.152.0: a mid-walk stop, such as before a merge step, does not clear the claim. The claim is cleared when the branch is merged or ticked, or the user says stop and is done with this walk, or `release-claim`. A later ready check in a new session still holds that task as in progress.
 
 1.156.0: the in-walk and branch-run endings are built by the shared walk ending (`scripts/walk_ending.py`), so for the same ready branches the Run next entries match the ready check word for word. The skill points at that ending instead of describing it.
 
@@ -44,10 +44,10 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 | --- | --- | --- |
 | Do this step | `yes` | do the write, push, open, or merge just shown |
 | Do this step | `stop` | do not do it |
-| Do this step | `release claim` | clear this branch's In progress: claim, then commit and push claims.md after yes |
+| Do this step | `release-claim` | clear this branch's In progress: claim, then commit and push claims.md after yes |
 | Whose branch | `switch` | build on the other person's branch, in other-owner mode |
 | Whose branch | `own` | this branch is ours |
-| Pull request description | `edit description` | change the other owner's pull request description, only because this run asked |
+| Pull request description | `edit-description` | change the other owner's pull request description, only because this run asked |
 
 ## Runs when
 
@@ -71,7 +71,7 @@ Writes `docs/specs/<slug>/build-progress/<branch>.md` after yes, with normalized
 
 ## Does not
 
-Leaves `spec.md` alone except that live-yes note. Does not tick a row itself. Does not push, open, or merge before `yes`. Does not overwrite another user's `In progress:` claim. Does not edit another owner's pull request description unless this run said `edit description`. Never rebases.
+Leaves `spec.md` alone except that live-yes note. Does not tick a row itself. Does not push, open, or merge before `yes`. Does not overwrite another user's `In progress:` claim. Does not edit another owner's pull request description unless this run said `edit-description`. Never rebases.
 
 Limits and exceptions: A headless run stops before any step. An unnamed current user is not a switch. A merged or deleted branch is not offered. An unapproved Approval needed item is not built. An `Approved:` line does not run the live change. Other-owner mode does not open, merge the base, or merge the pull request. It is not a starter option.
 

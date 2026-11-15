@@ -23,4 +23,4 @@ When HEAD is the into branch, `git switch -c <new>` moves the index and the work
 
 ## Choice words
 
-`commit` and `commit now` on a base ask this prompt instead of committing. `new branch` answers it with option 1. A headless run without `new branch` ends as `copy` with the guard's one stop line.
+`commit` and `commit-now` on a base ask this prompt instead of committing. `new-branch` answers it with option 1. A headless run without `new-branch` ends as `copy` with the guard's one stop line.

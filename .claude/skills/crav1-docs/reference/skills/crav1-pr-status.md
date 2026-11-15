@@ -10,9 +10,9 @@ Show where one pull request stands, point by point, and who owes the next step.
 
 1.158.0: the shared pull-request steps are `crav1-docs/reference/pr-common.md` and `scripts/pr_common.py`, which also finds the one open pull request for the current branch when none is named. The status table, the output order and the hand-offs moved word for word to `references/classify.md`, `references/output.md` and `references/offers.md`.
 
-**[`/crav1-pr-status`](crav1-pr-status.md)** reads one named pull request's threads, pushes and commits on Azure DevOps or GitHub (read-only, `references/pr-threads.md` in `crav1-add-to-spec`) and splits the threads into points. Each point gets one of six statuses: `done <sha>` (a commit after the request changed the lines), `agreed`, `declined` (with the reason), `open`, `waiting on <name>`, or `needs <name>` for a third person. It picks reviewer or author mode from who opened the pull request; `as reviewer` or `as author` overrides it, and an unclear sign-in is guessed without asking.
+**[`/crav1-pr-status`](crav1-pr-status.md)** reads one named pull request's threads, pushes and commits on Azure DevOps or GitHub (read-only, `references/pr-threads.md` in `crav1-add-to-spec`) and splits the threads into points. Each point gets one of six statuses: `done <sha>` (a commit after the request changed the lines), `agreed`, `declined` (with the reason), `open`, `waiting on <name>`, or `needs <name>` for a third person. It picks reviewer or author mode from who opened the pull request; `as-reviewer` or `as-author` overrides it, and an unclear sign-in is guessed without asking.
 
-It prints a verdict line with the points waiting on you first, then the points by status, flags for threads resolved while the code is unchanged (and done points whose thread is still active), spec and decision candidates, follow-ups drafted for [`/crav1-ado-sync`](crav1-ado-sync.md), the pull requests this one depends on and the merge order, drafted replies, a `Next for you` list (Now, After <name> answers, Later), and a merge-readiness line. `since last` shows only what changed since your last run.
+It prints a verdict line with the points waiting on you first, then the points by status, flags for threads resolved while the code is unchanged (and done points whose thread is still active), spec and decision candidates, follow-ups drafted for [`/crav1-ado-sync`](crav1-ado-sync.md), the pull requests this one depends on and the merge order, drafted replies, a `Next for you` list (Now, After <name> answers, Later), and a merge-readiness line. `since-last` shows only what changed since your last run.
 
 It writes all of it to the PR note's shared `## PR record`, the same record [`/crav1-review-pr`](crav1-review-pr.md), [`/crav1-add-to-spec`](crav1-add-to-spec.md) and [`/crav1-merge-pr`](crav1-merge-pr.md) use; [`/crav1-merge-pr`](crav1-merge-pr.md) stops on `Ready: no`. Replies are drafts and are never posted. A thread status change on the host is offered one thread at a time and made only on that thread's yes. Spec or decision candidates are named with the command to type, [`/crav1-add-to-spec`](crav1-add-to-spec.md) pr<n> candidates`; pr-status never runs it. Follow-ups are drafts; no work item is created.
 
@@ -27,10 +27,10 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 | Question | Word | Means |
 | --- | --- | --- |
 | Which pull request | `pr<n>` | that pull request (also `pr <n>`, `#<n>`, `pr <repo> <n>`, or its URL) |
-| Your side (optional; picked from the PR author otherwise) | `as reviewer` | reviewer mode: you are not the author |
-| Your side (optional; picked from the PR author otherwise) | `as author` | author mode: you opened the pull request |
-| How much | `since last` | only what changed since your last run |
-| How much | `no code` | threads only; no diff or commit check, so nothing is marked done |
+| Your side (optional; picked from the PR author otherwise) | `as-reviewer` | reviewer mode: you are not the author |
+| Your side (optional; picked from the PR author otherwise) | `as-author` | author mode: you opened the pull request |
+| How much | `since-last` | only what changed since your last run |
+| How much | `no-code` | threads only; no diff or commit check, so nothing is marked done |
 
 ## Runs when
 
@@ -44,7 +44,7 @@ Prompt budget: 1 (the most prompts in one run, the closing yes included). A prom
 
 In short: The pull request's threads, pushes and commits, its diff, and its PR record.
 
-Reads one named pull request's threads with every comment, its pushes with their commits and changed files, the signed-in user, the diff of the source branch (unless `no code`), other pull requests named as merge-order dependencies, and the PR note with its `## PR record` in the specs repo.
+Reads one named pull request's threads with every comment, its pushes with their commits and changed files, the signed-in user, the diff of the source branch (unless `no-code`), other pull requests named as merge-order dependencies, and the PR note with its `## PR record` in the specs repo.
 
 ## Writes
 

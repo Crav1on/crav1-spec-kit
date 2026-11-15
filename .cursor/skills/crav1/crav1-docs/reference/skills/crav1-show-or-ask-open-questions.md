@@ -68,7 +68,7 @@ Stage: stable. Since: 1.40.0 ([changelog](../../../CHANGELOG.md)).
 ```text
 /crav1-show-or-ask-open-questions
 
-The open questions for <a person, one spec, or a topic>, as a mail.
+The open questions for <a person, one-spec, or a topic>, as a mail.
 ```
 
 ## Walkthrough

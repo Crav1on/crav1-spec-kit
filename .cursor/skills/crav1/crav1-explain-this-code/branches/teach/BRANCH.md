@@ -1,6 +1,6 @@
 # Explain this code: Teach the language branch
 
-Read only when `SKILL.md` routes here (`teach the language`). Moved word for word from `SKILL.md` in 1.106.0; the rules are unchanged. The shared sections in `SKILL.md` still apply. A `references/…` or `assets/…` path is relative to the skill folder, not this branch.
+Read only when `SKILL.md` routes here (`teach-the-language`). Moved word for word from `SKILL.md` in 1.106.0; the rules are unchanged. The shared sections in `SKILL.md` still apply. A `references/…` or `assets/…` path is relative to the skill folder, not this branch.
 
 ## Teach the language
 

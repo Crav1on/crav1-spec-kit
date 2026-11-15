@@ -4,11 +4,11 @@ Specs already exist and the code kept moving. You read the named repos, compare 
 
 Paths in backticks are relative to the skill folder unless they start with `docs/`.
 
-This is not the repos and bundle branch (that creates spec folders from repos plus a bundle) and not the code change branch of `/crav1-add-to-spec` (that sorts one pointed change onto specs). This branch runs only when the user calls it. Do not schedule it, hook it, or run it again because new commits appeared.
+This is not the repos-and-bundle branch (that creates spec folders from repos plus a bundle) and not the code-change branch of `/crav1-add-to-spec` (that sorts one pointed change onto specs). This branch runs only when the user calls it. Do not schedule it, hook it, or run it again because new commits appeared.
 
 ## Input
 
-Choice words `recheck` or `repos vs specs`. The two opening questions of `SKILL.md` are not asked.
+Choice words `recheck` or `repos-vs-specs`. The two opening questions of `SKILL.md` are not asked.
 
 - **Repos:** the repos named after the word, for example `/crav1-existing-to-specs recheck orders-api`. With none named, use every repo row in `docs/system/repos.md`. With no repo named and no `repos.md`, stop and ask for the repos. A headless run stops: `No repos named and no docs/system/repos.md. Name the repos.`
 - **Scope (optional):** a path inside one repo (`recheck orders-api src/billing`). Only units under that path are compared. Stale claims are checked only for cited paths under it.
@@ -22,7 +22,7 @@ Read every `docs/specs/<slug>/spec.md`. Skip `_template`. Read its `## In the co
 
 Parked and retired specs do not count as coverage (see Report).
 
-If there are no spec folders, stop. Point at the repos and bundle branch (`/crav1-existing-to-specs repos and bundle`). Do not create a slug.
+If there are no spec folders, stop. Point at the repos-and-bundle branch (`/crav1-existing-to-specs repos-and-bundle`). Do not create a slug.
 
 ## Large repo
 

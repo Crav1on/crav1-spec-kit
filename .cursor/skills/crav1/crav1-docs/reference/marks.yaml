@@ -86,7 +86,7 @@ marks:
     examples:
       - "Synced at: orders-api develop@00344be, 2026-10-15"
       - "Synced at: orders-api feat/orders-retry@155b5c4, 2026-10-19"
-    meaning: "The code commit a one-slice read last read. Since 1.84.0 one line per repo and branch, sorted by repo, then branch; a new read replaces only its own line. Older `; `-joined lines are split by `/crav1-add-to-spec migrate formats`."
+    meaning: "The code commit a one-slice read last read. Since 1.84.0 one line per repo and branch, sorted by repo, then branch; a new read replaces only its own line. Older `; `-joined lines are split by `/crav1-add-to-spec migrate-formats`."
     written_by: [crav1-add-to-spec, crav1-bundle-to-specs, crav1-bundle-slice-agent, crav1-spark-to-spec, crav1-ideas-to-spec, crav1-refresh-system-notes]
     read_by: [crav1-plan-from-spec, crav1-tighten-spec, crav1-help, crav1-verify-build-against-spec, crav1-tasks-ready-to-build, crav1-open-pr, crav1-merge-pr, crav1-review-pr, crav1-update-specs-from-changes-and-prs]
     mention: 'Synced at'
@@ -614,7 +614,7 @@ marks:
     pattern: '^\(map: (\S+ )?\S+\)$'
     examples:
       - "(map: feat/cancel-refund)"
-    meaning: "The task is built on this branch instead of its plan step's branch. Tasks that name the same branch share it. When absent, a branch named on the task line is the row, else the plan step (1.140.0). Since 1.129.0 the build prompt writes this mark, and does not commit it, when the picked branch is not the offered branch. Since 1.161.0 a confirmed `fix loop` (ready check) or `fix-loop` plan issue (tighten-plan) writes or replaces it, uncommitted, to break a loop between branches, keeping a repo word."
+    meaning: "The task is built on this branch instead of its plan step's branch. Tasks that name the same branch share it. When absent, a branch named on the task line is the row, else the plan step (1.140.0). Since 1.129.0 the build prompt writes this mark, and does not commit it, when the picked branch is not the offered branch. Since 1.161.0 a confirmed `fix-loop` (ready check) or `fix-loop` plan issue (tighten-plan) writes or replaces it, uncommitted, to break a loop between branches, keeping a repo word."
     written_by: [crav1-plan-from-spec, crav1-create-feature-branch, crav1-tasks-ready-to-build, crav1-tighten-plan]
     read_by: [crav1-tasks-ready-to-build, crav1-build-tasks, crav1-create-feature-branch, crav1-build-features]
     readiness: true
@@ -670,10 +670,10 @@ marks:
     group: system
     files: ["docs/system/sweep-progress.md (## Items)"]
     format: "- <id> | <pending | current | done | collected | dropped | skipped> | <branch | pr> | <repo> | <ref> | <command> | <outcome> | <flags> | <slug or reason>"
-    pattern: '^- [A-Za-z0-9][A-Za-z0-9._/-]* \| (pending|current|done|collected|dropped|skipped) \| (branch|pr) \| [A-Za-z0-9][A-Za-z0-9._-]* \| \S+ \| /crav1-add-to-spec (code change \S+ \S+|pr \S+ \d+ all) \| (-|notes|synced-at|notes\+synced-at|proposal|spec) \| (-|[A-Za-z0-9:./_-]+(?:;[A-Za-z0-9:./_-]+)*) \| (-|[a-z0-9-]+(?:,[a-z0-9-]+)*|reason: [^|]+)$'
+    pattern: '^- [A-Za-z0-9][A-Za-z0-9._/-]* \| (pending|current|done|collected|dropped|skipped) \| (branch|pr) \| [A-Za-z0-9][A-Za-z0-9._-]* \| \S+ \| /crav1-add-to-spec (code-change \S+ \S+|pr \S+ \d+ all) \| (-|notes|synced-at|notes\+synced-at|proposal|spec) \| (-|[A-Za-z0-9:./_-]+(?:;[A-Za-z0-9:./_-]+)*) \| (-|[a-z0-9-]+(?:,[a-z0-9-]+)*|reason: [^|]+)$'
     examples:
       - "- orders-api/pr/71 | collected | pr | orders-api | 71 | /crav1-add-to-spec pr orders-api 71 all | proposal | draft;head:feat/orders-retry | orders-retry"
-      - "- orders-api/branch/feat/orders-retry | dropped | branch | orders-api | feat/orders-retry | /crav1-add-to-spec code change orders-api feat/orders-retry | - | - | reason: covered by pr 71"
+      - "- orders-api/branch/feat/orders-retry | dropped | branch | orders-api | feat/orders-retry | /crav1-add-to-spec code-change orders-api feat/orders-retry | - | - | reason: covered by pr 71"
     meaning: "One branch or pull request in the current sweep, and whether it is still to do. The script writes the line. A hand edit is not a resume point."
     written_by: [crav1-update-specs-from-changes-and-prs]
     read_by: [crav1-update-specs-from-changes-and-prs]

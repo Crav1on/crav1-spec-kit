@@ -50,7 +50,7 @@ The clock is checked between items. When the time is used, the current item fini
 
 `- Read: sweep | 7b41a0c, push 6, newest comment 2026-10-26T15:03Z | 2026-10-27`
 
-That line is the sweep's watermark. It is not yours. `/crav1-pr-status` `since last` still uses your own `Read` line.
+That line is the sweep's watermark. It is not yours. `/crav1-pr-status` `since-last` still uses your own `Read` line.
 
 `Synced at` stays the branch stamp. This command does not write a second sha.
 

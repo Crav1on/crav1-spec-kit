@@ -90,7 +90,7 @@ routes:
         when: When the slice has `plan.md` or `tasks.md`, so the plan and the tasks follow the new spec.
       - skills: [crav1-ado-sync]
         optional: true
-        when: When the Feature or its tasks are in Azure Boards (push Features only when the Feature itself changed; push tasks for the tasks).
+        when: When the Feature or its tasks are in Azure Boards (push Features only when the Feature itself changed; push-tasks for the tasks).
       - skills: [crav1-tasks-ready-to-build]
         optional: true
         when: Any time, to see which tasks are ready after the change, which are blocked and why. Read-only.
@@ -168,7 +168,7 @@ routes:
     when: Specs and Azure Boards (ADO) should match.
     steps:
       - skills: [crav1-ado-sync]
-        when: "It asks which: suggest Features, push Features, push tasks (when the slice has `tasks.md`), pull task states, or pull spec changes from Features."
+        when: "It asks which: suggest Features, push Features, push-tasks (when the slice has `tasks.md`), pull task states, or pull-spec-changes from Features."
       - skills: [crav1-finalize-commit]
         when: When the sync changed a file.
   - id: repo-gaps

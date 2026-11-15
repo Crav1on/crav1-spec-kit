@@ -45,7 +45,7 @@ Read `references/work-branches.md` ("Work branches") only when the spec has work
 
 Read `references/sub-branches.md` ("Sub-branches and reverts") only when a branch entry has `(into <spec branch>)`, or a merged change was later undone on the base.
 
-Read `references/promotion.md` ("Promotion") only when the spec repo has `docs/environments/promotion.md`, or the invocation has `pipeline runs`.
+Read `references/promotion.md` ("Promotion") only when the spec repo has `docs/environments/promotion.md`, or the invocation has `pipeline-runs`.
 
 Acceptance lines with **no** `T#` stay in the detail matrix as **missing** coverage — also list their ids in the TL;DR.
 
@@ -109,4 +109,4 @@ Do not start implementing in this turn unless they already named a `T#` to fix.
 
 ## Choice words (1.69.0)
 
-- Pipeline runs: `pipeline runs`. Read `references/promotion.md` ("Promotion") only when the invocation has that word. There are no `--flags`.
+- Pipeline runs: `pipeline-runs`. Read `references/promotion.md` ("Promotion") only when the invocation has that word. There are no `--flags`.

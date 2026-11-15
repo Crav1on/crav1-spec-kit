@@ -38,7 +38,7 @@ If they named `T#` / `A#` / `G#`:
 - Inner-loop (failed, unverified, or a wiring `G#`) → that is the current item
 - Not implemented / no-task → **stop**, send them to the table above. Do not implement a new `T#` here just because they typed the id
 
-If they **omitted Gap**: take the **first remaining** item in the queue above. List the rest as `F2`, `F3`, … so the next the verify gaps branch of `/crav1-fix-build-gaps` with no Gap continues the walk.
+If they **omitted Gap**: take the **first remaining** item in the queue above. List the rest as `F2`, `F3`, … so the next the verify-gaps branch of `/crav1-fix-build-gaps` with no Gap continues the walk.
 
 Build the queue fresh from `verify.md` each turn (minus what `fix-log.md` already marked fixed **and** whose evidence you re-ran green). Deduplicate: one live SQL proxy failure that explains three unverified rows is still **one** current item — after the fix, re-run **each** of those rows’ evidence.
 
@@ -53,7 +53,7 @@ Confirm the before-state: re-run that row’s evidence once. Quote the failure. 
 
 ## Branch (1.99.0)
 
-Before the first code edit, check the checkout as skill `crav1-create-feature-branch`, `references/code-branch.md` says. On a work branch, go ahead. On a base branch (main, master, develop, the `Merges into` branch, `release/*`) never edit code there: ask once, **Create `fix/<slug>` from `<into>` (Recommended)**, **Use an existing branch**, **Stop**. A typed branch name is that card's free-text answer, hint `Type a branch name`. Do not offer an option labelled `Other name`. On another branch, the same with **Stay on `<current>`** as a real option. Headless: stop with the reference's one line unless the invocation has `new branch`. Inside the build worker the branch is already checked; skip this.
+Before the first code edit, check the checkout as skill `crav1-create-feature-branch`, `references/code-branch.md` says. On a work branch, go ahead. On a base branch (main, master, develop, the `Merges into` branch, `release/*`) never edit code there: ask once, **Create `fix/<slug>` from `<into>` (Recommended)**, **Use an existing branch**, **Stop**. A typed branch name is that card's free-text answer, hint `Type a branch name`. Do not offer an option labelled `Other name`. On another branch, the same with **Stay on `<current>`** as a real option. Headless: stop with the reference's one line unless the invocation has `new-branch`. Inside the build worker the branch is already checked; skip this.
 
 ## Fix (in spec)
 

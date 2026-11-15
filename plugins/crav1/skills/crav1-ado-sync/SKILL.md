@@ -34,11 +34,11 @@ Where a branch says it calls or names another of these five, that is the matchin
 
 Exact words for bots and scripted runs. There are no `--flags`.
 
-- Which sync: `suggest features` / `push features` / `push tasks` / `pull tasks` / `pull spec changes`.
+- Which sync: `suggest-features` / `push-features` / `push-tasks` / `pull-tasks` / `pull-spec-changes`.
 
-When the invocation contains one of these words (for example `/crav1-ado-sync suggest features`), take that choice and do not ask. This holds for a person, a bot, or a headless run.
+When the invocation contains one of these words (for example `/crav1-ado-sync suggest-features`), take that choice and do not ask. This holds for a person, a bot, or a headless run.
 
-When a choice is missing and the run is headless or started by a bot (no person in the chat to answer), do not guess. Stop and name the valid words, for example: `Missing choice. Use one of: suggest features, push features, push tasks, pull tasks, pull spec changes.`
+When a choice is missing and the run is headless or started by a bot (no person in the chat to answer), do not guess. Stop and name the valid words, for example: `Missing choice. Use one of: suggest-features, push-features, push-tasks, pull-tasks, pull-spec-changes.`
 
 ## After
 
@@ -46,7 +46,7 @@ Each branch ends with its own recap and next step.
 
 ## Parked and retired specs (1.60.0)
 
-Skip every spec under `docs/specs/retired/`, and every old-path `spec.md` that is only a `Moved:` pointer. A spec whose `spec.md` has a `Parked:` line is parked: the push branches (`suggest features`, `push features`, `push tasks`) do not push it. The pull branches still read it. Say `skipped: <slug> (parked)` and name `/crav1-retire-spec un-park docs/specs/<slug>/`. Do not remove the mark.
+Skip every spec under `docs/specs/retired/`, and every old-path `spec.md` that is only a `Moved:` pointer. A spec whose `spec.md` has a `Parked:` line is parked: the push branches (`suggest-features`, `push-features`, `push-tasks`) do not push it. The pull branches still read it. Say `skipped: <slug> (parked)` and name `/crav1-retire-spec un-park docs/specs/<slug>/`. Do not remove the mark.
 A note under `docs/notes/` (month folders since 1.61.0) with the slug in `waiting_for` (or an old `Waiting for <slug> (parked)` line) is read like any other note.
 
 ## Run ending (1.122.0)

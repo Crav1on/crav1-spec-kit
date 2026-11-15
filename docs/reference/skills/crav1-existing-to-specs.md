@@ -26,12 +26,12 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 
 | Question | Word | Means |
 | --- | --- | --- |
-| What to read | `repos only` | repos only |
-| What to read | `repos and bundle` | repos plus a bundle |
-| What to write | `one spec` | one spec (the architecture spec) |
-| What to write | `spec per feature` | system notes plus one spec per feature |
+| What to read | `repos-only` | repos only |
+| What to read | `repos-and-bundle` | repos plus a bundle |
+| What to write | `one-spec` | one spec (the architecture spec) |
+| What to write | `spec-per-feature` | system notes plus one spec per feature |
 | Recheck existing specs (1.108.0) | `recheck` | compare the repos with the specs that exist; report code with no spec and stale claims; refresh the landscape note |
-| Recheck existing specs (1.108.0) | `repos vs specs` | the same as recheck |
+| Recheck existing specs (1.108.0) | `repos-vs-specs` | the same as recheck |
 
 ## Runs when
 

@@ -479,7 +479,7 @@ class Routing(unittest.TestCase):
         for name in ("common.md", "grouping.md", "progress.md", "other-owner.md", "live.md", "stack.md", "steps.md"):
             self.assertIn(f"references/{name}", skill)
             self.assertTrue((ROOT / ".cursor/skills/crav1/crav1-build-walk/references" / name).is_file())
-        for word in ("yes", "switch", "own", "edit description", "stop"):
+        for word in ("yes", "switch", "own", "edit-description", "stop"):
             self.assertIn(f"`{word}`", skill)
 
 

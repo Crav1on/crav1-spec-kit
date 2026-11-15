@@ -5,7 +5,7 @@ Read only on `todo`. What to do next, ranked from the records the kit already ke
 ## Words and scope
 
 - `todo`: every item, grouped by rank.
-- `todo next`: the top 5. `todo top N`: the top N.
+- `todo-next`: the top 5. `todo-top N`: the top N.
 - A scope may follow: a person, a spec, a topic, a branch, or a pull request (`pr71`, `pr 71`, `#71`, `pr <repo> 71`), as `crav1-add-to-spec` `references/scope.md` says (skill `crav1-add-to-spec`, `references/scope.md`). No scope: every spec. `todo for <name>` sets who "you" are.
 
 ## What it reads
@@ -35,4 +35,4 @@ Match `git config user.name` (or its first word), or the `todo for <name>` name,
 
 ## Each line
 
-`<n>. <slug>: <the item in plain words>. <reason with the age>. Next: <skill>`. The next skill is resolve-open-questions (1, 2, 8), show-or-ask-open-questions (3, 4), pr-status (5; the line is `<n>. PR <n> <repo>: …`), a revisit request (7), build-tasks (9), retire-spec un-park (10), and for 6 the skill the dated item needs. End with `<m> more: todo top <N>` when cut, and the Source line.
+`<n>. <slug>: <the item in plain words>. <reason with the age>. Next: <skill>`. The next skill is resolve-open-questions (1, 2, 8), show-or-ask-open-questions (3, 4), pr-status (5; the line is `<n>. PR <n> <repo>: …`), a revisit request (7), build-tasks (9), retire-spec un-park (10), and for 6 the skill the dated item needs. End with `<m> more: todo-top <N>` when cut, and the Source line.

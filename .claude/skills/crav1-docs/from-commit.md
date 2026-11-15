@@ -15,18 +15,18 @@ It drafts first, then offers commit, copy, change, or stop (1.83.0: there is no 
 Only want the message to paste into your own git client:
 
 ```text
-/crav1-finalize-commit message only
+/crav1-finalize-commit message-only
 ```
 
-`message only` drafts and shows the Summary and Description, then stops, the same as picking copy. A headless or bot run with no choice word ends the same way.
+`message-only` drafts and shows the Summary and Description, then stops, the same as picking copy. A headless or bot run with no choice word ends the same way.
 
 Commit in one go, with no questions (1.73.0):
 
 ```text
-/crav1-finalize-commit commit now crav1
+/crav1-finalize-commit commit-now crav1
 ```
 
-`commit now`, or just `commit` (1.76.1), drafts, shows the Summary and Description, then commits without the choice question. It never pushes. When `agent-tools/` or build output is in the file set, it warns and offers the normal choices instead. `crav1` (CRAV1 style) or `git log` (match the repo's log) answers the style question for this commit; a saved style rule still works as before.
+`commit-now`, or just `commit` (1.76.1), drafts, shows the Summary and Description, then commits without the choice question. It never pushes. When `agent-tools/` or build output is in the file set, it warns and offers the normal choices instead. `crav1` (CRAV1 style) or `git-log` (match the repo's log) answers the style question for this commit; a saved style rule still works as before.
 
 Pull and check only, with no commit (1.81.0):
 
@@ -59,11 +59,11 @@ Not written: branch deletion, work item links, squash or rebase merges.
 
 ## On a base branch (1.99.0)
 
-When you are on `main`, `develop`, the `Merges into` branch or a `release/*` branch and anything staged is code (outside `docs/` and the root Markdown files), `/crav1-finalize-commit` never commits there, even with `commit now`. Its one prompt becomes `Commit on a work branch?`: **Create feat/<slug> from <into> and commit (Recommended)**, **Use an existing branch**, or **stop**. A typed branch name is that card's free-text answer, hint `Type a branch name` (1.130.0). Create moves your staged changes onto the new branch and commits there. `new branch` answers it in one line. Spec and doc commits on a base branch are unchanged, and so is the specs repo.
+When you are on `main`, `develop`, the `Merges into` branch or a `release/*` branch and anything staged is code (outside `docs/` and the root Markdown files), `/crav1-finalize-commit` never commits there, even with `commit-now`. Its one prompt becomes `Commit on a work branch?`: **Create feat/<slug> from <into> and commit (Recommended)**, **Use an existing branch**, or **stop**. A typed branch name is that card's free-text answer, hint `Type a branch name` (1.130.0). Create moves your staged changes onto the new branch and commits there. `new-branch` answers it in one line. Spec and doc commits on a base branch are unchanged, and so is the specs repo.
 
 ## Trailer hook (1.90.0)
 
-The first time `/crav1-finalize-commit` runs in a repo without the hook, its one prompt also asks: Strip tool trailers on every commit for this repo? `strip trailers` adds `.githooks/commit-msg`, runs `git config core.hooksPath .githooks`, and saves the answer, so it never asks again. When you pick commit, the hook and the saved answer go into that same commit, so teammates get the hook when they pull (1.90.6); with copy or stop they are left ready to commit. The hook removes only the known tool trailers (Cursor, Claude Code, GitHub Copilot, Aider, OpenAI Codex, Gemini, Jules, Devin, Windsurf, Amazon Q, Cline, Amp and JetBrains AI; 1.94.0), even from tools that ignore their own attribution setting. A co-author line for a real person, such as `Co-authored-by: Ada Example <ada@example.com>`, and any `Signed-off-by` line stay. When a teammate's repo has the hook but not the config line, their first run sets it without asking. `keep trailers` saves no and adds nothing.
+The first time `/crav1-finalize-commit` runs in a repo without the hook, its one prompt also asks: Strip tool trailers on every commit for this repo? `strip-trailers` adds `.githooks/commit-msg`, runs `git config core.hooksPath .githooks`, and saves the answer, so it never asks again. When you pick commit, the hook and the saved answer go into that same commit, so teammates get the hook when they pull (1.90.6); with copy or stop they are left ready to commit. The hook removes only the known tool trailers (Cursor, Claude Code, GitHub Copilot, Aider, OpenAI Codex, Gemini, Jules, Devin, Windsurf, Amazon Q, Cline, Amp and JetBrains AI; 1.94.0), even from tools that ignore their own attribution setting. A co-author line for a real person, such as `Co-authored-by: Ada Example <ada@example.com>`, and any `Signed-off-by` line stay. When a teammate's repo has the hook but not the config line, their first run sets it without asking. `keep-trailers` saves no and adds nothing.
 
 Where `/crav1-finalize-commit` has no questions tool, it asks in plain text: numbered lists, one per question, ending with `Reply with choice words in one line, e.g. commit once strip trailers.` (1.90.3).
 
@@ -108,7 +108,7 @@ After the commit, `/crav1-finalize-commit` fetches. It never pushes. It makes at
 
 `/crav1-open-pr` does not save the body it drafts: that is its own summary. Since 1.98.0 each change is a bullet that starts with a link to its file and lines at the head commit, then a bold title and what changed and why; the why comes only from the spec, a plan task, a commit message or a code comment. The verify result is written out under Verified, and the body never links the spec. When an infra, pipeline or PROD change states no rollback, the chat says `No rollback stated` (the body does not). The next `/crav1-pr-status` run turns the Merge order section into `Order` lines, Questions for reviewers into Points tagged `asked`, and offers Not in this PR as follow-ups. After a confirmed merge, `/crav1-merge-pr` writes or updates the pull request's PR note in the specs repo (`docs/notes/YYYY-MM/YYYY-MM-DD-pr-<repo>-<n>.md`, its title and description, `kind: pull request`), with any edits made to the description since, and sets its PR record's `State` and `Ready` lines to merged (1.97.0). Before merging it reads the `Ready` line and stops on `no` unless you say `anyway`. It is not committed. A review with `/crav1-review-pr` writes the same note. From the specs repo, a pull request in another repo is reviewed with `/crav1-review-pr <repo> <n>`.
 
-Since 1.149.0, `/crav1-finalize-commit` shows the draft and the choices from the skill file. The commit steps are read only after `commit` or `commit now`. The trailer-hook file is read only when that question is asked, or when a teammate has the hook and the config line is missing.
+Since 1.149.0, `/crav1-finalize-commit` shows the draft and the choices from the skill file. The commit steps are read only after `commit` or `commit-now`. The trailer-hook file is read only when that question is asked, or when a teammate has the hook and the config line is missing.
 
 ## After
 

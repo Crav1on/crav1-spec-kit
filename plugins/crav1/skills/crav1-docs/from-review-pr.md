@@ -139,10 +139,10 @@ On GitHub you can't approve or request changes on your own pull request, so ther
 
 You often edit the comment before posting it. So the PR note keeps both texts in its history, each word for word in a code fence (1.97.0; before that, a separate follow-ups note did):
 
-- `## Comment as drafted, <date>`: the paste-ready block of each review, in a four-backtick fence. Since 1.114.2 only a review that ends with a new block adds one; recording the comment as posted (`comment posted`, `newest comment`, a paste) never does. Since 1.114.3 the heading is always plain, on a re-review too; a re-review tag goes only on the `## Kit record` heading.
+- `## Comment as drafted, <date>`: the paste-ready block of each review, in a four-backtick fence. Since 1.114.2 only a review that ends with a new block adds one; recording the comment as posted (`comment-posted`, `newest-comment`, a paste) never does. Since 1.114.3 the heading is always plain, on a re-review too; a re-review tag goes only on the `## Kit record` heading.
 - `## Comment as posted, <date> (by <name>)`: what the reviewers see, with one line saying where it came from (read from the PR thread, pasted in chat, or posted from this review), which draft it was compared with, and which `Description as of` section of the PR note the review read. `by` is your name as the host shows it.
 
-**How it gets the posted text.** When the review posts on your yes, it saves the text the host returns at once. When you pick **I'll post it myself**, say "posted" when it's up, or run `/crav1-review-pr orders-api 42 comment posted`. Every later run on that pull request also checks first. It looks read-only for your review or comment on the pull request (GitHub reviews and conversation comments; Azure DevOps top-level threads, or your reply in the earlier thread), posted after the draft, that matches it. One match: it asks you to confirm. Several: it lists them, and you may pick more than one. None: it says so in one line and goes on, since you may not have posted it yet. No `gh` or `az` session, or nothing found after `comment posted`: it asks you to paste it. An edit on the host later adds a new section ending `, edited`; the earlier one stays.
+**How it gets the posted text.** When the review posts on your yes, it saves the text the host returns at once. When you pick **I'll post it myself**, say "posted" when it's up, or run `/crav1-review-pr orders-api 42 comment-posted`. Every later run on that pull request also checks first. It looks read-only for your review or comment on the pull request (GitHub reviews and conversation comments; Azure DevOps top-level threads, or your reply in the earlier thread), posted after the draft, that matches it. One match: it asks you to confirm. Several: it lists them, and you may pick more than one. None: it says so in one line and goes on, since you may not have posted it yet. No `gh` or `az` session, or nothing found after `comment-posted`: it asks you to paste it. An edit on the host later adds a new section ending `, edited`; the earlier one stays.
 
 **Comparing.** Points are paired by their link and title. The chat lists them as drafted, changed, not in the posted comment, or added. A drafted point you left out stays in the note as a bullet ending `(Not in the posted comment, <date>; still open.)`. A cut question keeps its `Asked on the PR:` line, with the mark added. A question you added gets an `Asked on the PR:` line.
 
@@ -167,7 +167,7 @@ I've looked through the PR and run it through my checks. This is what I found:
 
 The pasted or fetched text goes through the personal-data and secrets check first, like the PR note. Secrets are removed and named by kind, and the source line says `Verbatim except: <kind> removed.`
 
-For bots: `comment posted` records only, `newest comment` takes the newest match, and `skip comment record` skips the step. A headless run with several candidates or none stops and names these words. No word posts.
+For bots: `comment-posted` records only, `newest-comment` takes the newest match, and `skip-comment-record` skips the step. A headless run with several candidates or none stops and names these words. No word posts.
 
 ## Re-review
 
@@ -194,13 +194,13 @@ A GitHub diff comes from `gh pr diff`. An Azure DevOps diff comes from the code 
 2. **Use what's on disk**: diffs the copies there and says how old they are and that newer commits may be missed.
 3. **Stop**: you fetch and rerun.
 
-A bot passes `fetch pr branches`, `use disk` or `stop pr review`. When the copies already match, nothing is asked.
+A bot passes `fetch-pr-branches`, `use-disk` or `stop-pr-review`. When the copies already match, nothing is asked.
 
 Run from the code repo with the specs repo not open, it finds the specs repo next door (`../orders-specs`, by its `repos.md` row), writes the notes there, never commits them, and names the full path.
 
 ## PR note (1.65.0)
 
-Every review saves the pull request's title and description as a **PR note** in the specs repo, so specs can link to it locally: `docs/notes/YYYY-MM/YYYY-MM-DD-pr-orders-api-71.md`, filed by the pull request's created date, `kind: pull request`, `source: PR 71 dev.azure.com/contoso/orders/orders-api`. A later review reuses it; when the description changed, it appends a `## Description as of <date>` section and never removes the earlier text. The description goes through the same personal-data and secrets check as an imported mail, and each image gets the four options. Pull requests made by `/crav1-open-pr` get one too. `/crav1-merge-pr` writes or updates it after a merge, and `/crav1-add-to-spec code change orders-api PR 71` uses it. Code-change notes link it with `pr_note:`.
+Every review saves the pull request's title and description as a **PR note** in the specs repo, so specs can link to it locally: `docs/notes/YYYY-MM/YYYY-MM-DD-pr-orders-api-71.md`, filed by the pull request's created date, `kind: pull request`, `source: PR 71 dev.azure.com/contoso/orders/orders-api`. A later review reuses it; when the description changed, it appends a `## Description as of <date>` section and never removes the earlier text. The description goes through the same personal-data and secrets check as an imported mail, and each image gets the four options. Pull requests made by `/crav1-open-pr` get one too. `/crav1-merge-pr` writes or updates it after a merge, and `/crav1-add-to-spec code-change orders-api PR 71` uses it. Code-change notes link it with `pr_note:`.
 
 ## Follow-ups and the PR record (1.97.0)
 
@@ -216,7 +216,7 @@ The kit record in the PR note lists them; the chat only says `Kit record: <path>
 
 A finding is `open`, a follow-up is `follow-up`, a question is `waiting on <author>` tagged `asked`, and a drafted point you cut from the posted comment gets `not posted <date>`. A re-review reads the record first, sets a point the code now addresses to `done <short sha>`, and never deletes a line. The same record is read and written by [`/crav1-pr-status`](from-pr-status.md) (where every thread stands), `/crav1-add-to-spec pr<n> all` and `/crav1-merge-pr` (which stops on `Ready: no`). The follow-ups come back through the existing note flow: [`/crav1-ado-sync`](from-ado-sync-suggest-features.md) reads `follow-up` Points as open items, and the spec that takes one adds itself to the note's `used_by`. Notes are never absorbed. The note is not committed; `/crav1-finalize-commit` does that.
 
-Before 1.97.0 the follow-ups lived in a separate `docs/notes/YYYY-MM/review-pr-[<repo>-]<n>-follow-ups.md`. A review still reads one and says to run `/crav1-add-to-spec migrate formats`, which moves it into the PR note ([install](install.md)).
+Before 1.97.0 the follow-ups lived in a separate `docs/notes/YYYY-MM/review-pr-[<repo>-]<n>-follow-ups.md`. A review still reads one and says to run `/crav1-add-to-spec migrate-formats`, which moves it into the PR note ([install](install.md)).
 
 ## Shared pull-request steps (1.158.0)
 

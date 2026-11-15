@@ -17,7 +17,7 @@ CURSOR = ROOT / ".cursor/skills/crav1"
 CASES = (
     ("crav1-tasks-ready-to-build", "work-branches.md", "squash merges are checked"),
     ("crav1-tasks-ready-to-build", "sub-branches.md", "Spec branch and sub-branches"),
-    ("crav1-tasks-ready-to-build", "promotion.md", "pipeline runs"),
+    ("crav1-tasks-ready-to-build", "promotion.md", "pipeline-runs"),
     ("crav1-tasks-ready-to-build", "work-item-line.md", "crav1-ado-sync"),
     ("crav1-tasks-ready-to-build", "risk-blocks.md", "matches no question still blocks"),
     ("crav1-tasks-ready-to-build", "next-question.md", "crav1-resolve-open-questions"),

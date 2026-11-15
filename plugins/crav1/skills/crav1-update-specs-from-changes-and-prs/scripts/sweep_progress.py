@@ -457,7 +457,7 @@ def item_id(kind: str, repo: str, ref: str) -> str:
 
 def command_for(kind: str, repo: str, ref: str) -> str:
     if kind == "branch":
-        return f"/crav1-add-to-spec code change {repo} {ref}"
+        return f"/crav1-add-to-spec code-change {repo} {ref}"
     return f"/crav1-add-to-spec pr {repo} {ref} all"
 
 

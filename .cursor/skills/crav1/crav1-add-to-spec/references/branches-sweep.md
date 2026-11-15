@@ -21,7 +21,7 @@ One question:
 - C) Name the ones I want
 - D) Stop
 
-`branches all` takes A and `branches skip stale` takes B without asking. A headless or bot run with neither stops: `Missing choice. Use one of: branches all, branches skip stale.`
+`branches-all` takes A and `branches-skip-stale` takes B without asking. A headless or bot run with neither stops: `Missing choice. Use one of: branches-all, branches-skip-stale.`
 
 ## Import
 

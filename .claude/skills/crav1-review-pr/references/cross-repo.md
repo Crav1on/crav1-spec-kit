@@ -21,4 +21,4 @@ For a pull request in another repo, pass its URL (or `--repo <owner>/<repo>` wit
 
 A spec over several repos (1.65.0): an item or task that belongs to another repo is not a spec miss on this pull request. That is a task `(branch: <other repo> …)`, a Match `Branch:` item with another repo's prefix, or a requirement the spec ties to another repo. List those parts in the `I3` info note.
 
-For a pull request in another repo (1.65.0), the same line also names `/crav1-add-to-spec code change <repo> <head branch>`, which brings the merged branch into the spec. Do not run either.
+For a pull request in another repo (1.65.0), the same line also names `/crav1-add-to-spec code-change <repo> <head branch>`, which brings the merged branch into the spec. Do not run either.

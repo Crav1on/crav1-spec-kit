@@ -278,7 +278,7 @@ def age_warnings(claims: list[dict], max_age: int = DEFAULT_AGE_DAYS) -> list[st
         warnings.append(
             f"Warning: {tasks} has been in progress by {claim['user']} since "
             f"{claim['since_date']} ({days} days, over the {max_age}-day mark). "
-            "It is not cleared. To release it, say release claim."
+            "It is not cleared. To release it, say release-claim."
         )
     return warnings
 
@@ -635,7 +635,7 @@ def cmd_add(args: argparse.Namespace) -> int:
 
 def cmd_clear(args: argparse.Namespace) -> int:
     if getattr(args, "headless", False) and not getattr(args, "yes", False):
-        return fail("headless", "a headless run stops. The words are yes, stop, and release claim.")
+        return fail("headless", "a headless run stops. The words are yes, stop, and release-claim.")
     if args.all:
         result = clear_all(Path(args.root), age_days=args.age_days)
     else:

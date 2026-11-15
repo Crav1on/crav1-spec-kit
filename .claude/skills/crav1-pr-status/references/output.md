@@ -20,7 +20,7 @@ Print, in this order:
 10. **Merge readiness**: `Ready: yes | no | merged`, with the reasons.
 11. `PR record: <repo>: <path>`, as a code span.
 
-`since last` prints only changes; see **Since last**.
+`since-last` prints only changes; see **Since last**.
 
 ## Shape
 
@@ -64,7 +64,7 @@ Drafted replies (not posted)
 - To Robin K. (not sent): "Hi Robin, Sam and I need the merge order of feat/orders-queue (PR 40) and PR 42. Plan: PR 40 into develop first. OK with you?"
 
 Next: post the drafted reply in thread 104, because that thread is waiting on you.
-Waiting: /crav1-pr-status pr42 since last, after Robin K. answers the merge order.
+Waiting: /crav1-pr-status pr42 since-last, after Robin K. answers the merge order.
 Waiting: /crav1-merge-pr pr42, after PR 40 is merged and Ready is yes.
 Uncommitted: 1 file; commit with /crav1-finalize-commit when ready.
 
@@ -84,7 +84,7 @@ The last lines before `Ready`, as `crav1-docs/reference/run-ending.md` says. Bui
 - **After `<name>` answers** and **Later** become `Waiting:` lines. One line per blocked step: the step, and who or what it waits on. When the thread names options, keep them in the Order section. One Waiting line for that person, not one line per option. Nothing made up.
 - `Uncommitted:` when the PR note changed and is not committed. Do not put the commit command in `Next`.
 
-Commands are named, never run. `since last` uses the same shape for steps that moved. Nothing new: `Next: nothing needed now.`
+Commands are named, never run. `since-last` uses the same shape for steps that moved. Nothing new: `Next: nothing needed now.`
 
 ## Verdict line
 
@@ -99,7 +99,7 @@ Commands are named, never run. `since last` uses the same shape for steps that m
 - a `resolved, code unchanged` flag;
 - an `Order: after` pull request that is not merged;
 - the host says draft, conflicts, or a required check or policy is failing (read-only, as `/crav1-merge-pr` reads them);
-- `no code` was used and an agreed point has no commit check.
+- `no-code` was used and an agreed point has no commit check.
 
 `declined` points the asker accepted, `done` points and follow-ups do not block. Otherwise `Ready: yes`. Merged or closed on the host: `Ready: merged` or `State: closed`, and no verdict. `/crav1-merge-pr` reads this line and stops on `no`.
 

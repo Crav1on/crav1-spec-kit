@@ -42,11 +42,11 @@ Ask for a reason in the same turn when none was given. The reason is one short l
 
 Exact words for bots and scripted runs. There are no `--flags`.
 
-- What to do: `retire` / `merge` / `park` / `convert to note`.
+- What to do: `retire` / `merge` / `park` / `convert-to-note`.
 
 When the invocation contains one of these words (for example `/crav1-retire-spec park docs/specs/orders-export/ waiting on partner`), take that choice and do not ask. This holds for a person, a bot, or a headless run.
 
-When a choice is missing and the run is headless or started by a bot (no person in the chat to answer), do not guess. Stop and name the valid words: `Missing choice. Use one of: retire, merge, park, convert to note.`
+When a choice is missing and the run is headless or started by a bot (no person in the chat to answer), do not guess. Stop and name the valid words: `Missing choice. Use one of: retire, merge, park, convert-to-note.`
 
 ## Summary first
 
@@ -71,7 +71,7 @@ Route first, load second. Pick the branch from the choice word or the answer to 
 - **Retire** (`retire`): follow [branches/retire/BRANCH.md](branches/retire/BRANCH.md).
 - **Merge** (`merge`): follow [branches/merge/BRANCH.md](branches/merge/BRANCH.md).
 - **Park and un-park** (`park`, or un-park): follow [branches/park/BRANCH.md](branches/park/BRANCH.md).
-- **Convert to note** (`convert to note`): follow [branches/convert/BRANCH.md](branches/convert/BRANCH.md).
+- **Convert to note** (`convert-to-note`): follow [branches/convert/BRANCH.md](branches/convert/BRANCH.md).
 
 ## Stop
 

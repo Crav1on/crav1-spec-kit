@@ -284,10 +284,14 @@ class ProgressStamp(unittest.TestCase):
         payload = must(["readiness", "--full", "--root", str(root)])
         self.assertEqual(payload["result"], "not-ready")
         self.assertEqual(payload["can_start"], ["T3", "T6", "T7"])
-        self.assertIn("Reopened:", payload["because"])
-        self.assertIn("not a start", payload["because"])
-        self.assertNotIn("can start now", payload["next"])
-        self.assertIn("rerun or clear", payload["next"])
+        self.assertIn("The spec was reopened for tightening", payload["because"])
+        self.assertIn("wait until /crav1-tighten-spec", payload["because"])
+        self.assertNotIn("can_start", payload["because"])
+        self.assertNotIn("Reopened:", payload["because"])
+        self.assertIn("/crav1-tighten-spec", payload["next"])
+        self.assertIn("Run next:", payload["ending"])
+        self.assertNotIn("can start now", payload["next"] or "")
+        self.assertNotIn("rerun or clear", payload["next"] or "")
 
     def test_a_match_branch_rename_does_not_reopen(self):
         root = fresh()

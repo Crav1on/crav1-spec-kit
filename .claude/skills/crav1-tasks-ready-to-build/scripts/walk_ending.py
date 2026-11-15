@@ -11,11 +11,12 @@ check, and /crav1-build-walk all end a run in the same shape, built here:
   2. Held lines, then Branch runs status lines.
   3. Built (one line per task) and Left, for a branch run.
   4. Loop, verify-behind, orphan and other Waiting lines.
-  5. The not-ready reason, at most the one-line /crav1-build-tasks
-     alternative, notes, and Uncommitted.
-  A walk ending has no Next line (1.157.0). Only a not-ready ready check
-  prints one, from not_ready_next(). An agent never adds a Next line of
-  its own.
+  5. The not-ready reason (only when it is not already the Run next
+     line), at most the one-line /crav1-build-tasks alternative, notes,
+     and Uncommitted.
+  A walk ending has no Next line (1.157.0). A not-ready ready check
+  starts its ending with Run next, naming the first real next step
+  (1.163.0). An agent never adds a Next line of its own.
 
 The skills print the text these functions return, as-is. The ready check's
 `reply` (header, counts, Result, ending, Source, Build map) is ready_reply().

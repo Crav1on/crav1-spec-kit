@@ -33,6 +33,6 @@ Implementation code is never written or committed on a base branch. Every skill 
 
 **Task on a base.** A task `(branch: X)` where X is a base branch is `blocked: branch X is a base branch`. No switch.
 
-**Headless.** With no person to answer, stop before any code edit, in one line: `Stopped: on base branch <b>. Implementation is never built on a base branch. Re-run with "new branch" or check out a feat/ or fix/ branch.` The choice word `new branch` answers the prompt with option 1. Starting `/crav1-build-features` is that answer for each slug.
+**Headless.** With no person to answer, stop before any code edit, in one line: `Stopped: on base branch <b>. Implementation is never built on a base branch. Re-run with "new-branch" or check out a feat/ or fix/ branch.` The choice word `new-branch` answers the prompt with option 1. Starting `/crav1-build-features` is that answer for each slug.
 
 **Worker.** The worker checks before its first edit and before every commit. On a base branch it returns `STATUS: blocked` with the reason `on base branch <b>`, even when the parent passed `branch: already-done`.

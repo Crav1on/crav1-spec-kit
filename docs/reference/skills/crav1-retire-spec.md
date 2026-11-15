@@ -19,7 +19,7 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 | What to do | `retire` | retire |
 | What to do | `merge` | merge |
 | What to do | `park` | park |
-| What to do | `convert to note` | convert to note |
+| What to do | `convert-to-note` | convert to note |
 
 ## Runs when
 

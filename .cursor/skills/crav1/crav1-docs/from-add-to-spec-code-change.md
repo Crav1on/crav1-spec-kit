@@ -59,7 +59,7 @@ No `plan.md`. No `tasks.md`. No application code. A missing `docs/system/` is no
 The work for one spec often sits on several branches, and sometimes in another repo. In this example the specs live in `orders-specs`, the code in the sibling checkout `../orders-api`, whose default branch is `main` but whose work merges into `develop`. Three branches carry the `orders` spec: `feature/orders-openapi` (1 commit), `feat/orders-retry` (2) and `feature/orders-export` (3).
 
 ```text
-/crav1-add-to-spec code change orders-api feature/orders-openapi
+/crav1-add-to-spec code-change orders-api feature/orders-openapi
 ```
 
 - **Which checkout.** `orders-api` is read from `../orders-api`, read-only. When it isn't there, the kit asks for the path (options only). A headless run stops with `No checkout found for orders-api. Name its path.`
@@ -74,7 +74,7 @@ The work for one spec often sits on several branches, and sometimes in another r
 
 ## From a pull request (1.65.0)
 
-A code change can be a pull request: `/crav1-add-to-spec code change orders-api PR 71`, or its URL. The change is its commits, read from the code repo's checkout. The pull request's title and description are saved as the PR note (`docs/notes/YYYY-MM/YYYY-MM-DD-pr-orders-api-71.md`, by its created date, `kind: pull request`), or reused when it exists, after the personal-data and secrets check. The code-change note links it with `pr_note:`, and a spec point taken from the description gets `Full source:` with the PR note's path.
+A code change can be a pull request: `/crav1-add-to-spec code-change orders-api PR 71`, or its URL. The change is its commits, read from the code repo's checkout. The pull request's title and description are saved as the PR note (`docs/notes/YYYY-MM/YYYY-MM-DD-pr-orders-api-71.md`, by its created date, `kind: pull request`), or reused when it exists, after the personal-data and secrets check. The code-change note links it with `pr_note:`, and a spec point taken from the description gets `Full source:` with the PR note's path.
 
 Given a branch instead, it also writes the PR note when a signed-in `gh` or `az` host shows exactly one pull request for that branch. Otherwise it writes none and says why in one line, for example `no PR note: 2 PRs for feat/orders-retry; name one as PR <n>`. It never asks, and never stops because of it.
 
@@ -87,11 +87,11 @@ feat/orders-retry      3 new, last 2026-10-20, remote: 2 days
 feat/orders-export     1 new, last 2026-06-02, remote: 4 months, stale (no commits since 2026-06-02)
 ```
 
-One question: A) Yes, all, B) Yes, skip the stale ones, C) Name the ones I want, D) Stop. `branches all` and `branches skip stale` answer it up front. Each chosen branch runs the usual branch import, a commit shared by two branches is imported once, and all sorts are confirmed in one batch. A stale branch left out is named once as worth deleting on the host. The kit never deletes, pushes or fetches.
+One question: A) Yes, all, B) Yes, skip the stale ones, C) Name the ones I want, D) Stop. `branches-all` and `branches-skip-stale` answer it up front. Each chosen branch runs the usual branch import, a commit shared by two branches is imported once, and all sorts are confirmed in one batch. A stale branch left out is named once as worth deleting on the host. The kit never deletes, pushes or fetches.
 
 ## A PR ref alone, and `all` (1.76.0)
 
-`/crav1-add-to-spec pr71` (also `pr 71`, `#71`, or `pr orders-api 71`) is the same code change; the `code change` word is not needed. It does not read comments.
+`/crav1-add-to-spec pr71` (also `pr 71`, `#71`, or `pr orders-api 71`) is the same code change; the `code-change` word is not needed. It does not read comments.
 
 `/crav1-add-to-spec pr71 all` also checks for new commits and appends `## PR updates as of <date>` to the PR note: the description when it changed, then one heading per thread, such as `### src/Orders/Retry.cs:42 (resolved)` or `### Conversation (open)`, each comment with its author as the host shows it, the date and the text, replies nested. Bot and system threads are left out. A token in a comment is redacted. A later `all` adds only new or edited comments and one line per resolved or reopened thread. A comment that answers an open question is linked as `Answered:`; a decision becomes an open question. Signed out, it asks once: A) I've signed in, look it up, B) Paste the comments instead, C) Stop.
 

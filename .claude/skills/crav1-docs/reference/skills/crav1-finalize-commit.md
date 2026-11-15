@@ -8,15 +8,15 @@
 
 Draft the commit message, then commit, copy, change, or stop.
 
-1.149.0: the commit steps are read only after `commit` or `commit now`. The trailer-hook file is read only when that question is asked, or when a teammate has the hook and the config line is missing. The rules are unchanged.
+1.149.0: the commit steps are read only after `commit` or `commit-now`. The trailer-hook file is read only when that question is asked, or when a teammate has the hook and the config line is missing. The rules are unchanged.
 
 1.141.0: a merge of `spec.md` keeps every `Approved:` line under `## Approval needed`. The pull path never drops one.
 
-1.99.0: never commits implementation code on a base branch, even with `commit now`; the prompt becomes `Commit on a work branch?` (create `feat/<slug>` from the into branch and commit, an existing branch, another name, stop). Spec and doc commits on a base are unchanged.
+1.99.0: never commits implementation code on a base branch, even with `commit-now`; the prompt becomes `Commit on a work branch?` (create `feat/<slug>` from the into branch and commit, an existing branch, another name, stop). Spec and doc commits on a base are unchanged.
 
 1.130.0: a typed branch name on that prompt is the card's free-text answer, hint `Type a branch name`. There is no option labelled Other name.
 
-**[`/crav1-finalize-commit`](crav1-finalize-commit.md)** always drafts first, then offers commit, copy, change, or stop (1.83.0; there is no opening question). When no style rule is saved, it drafts in the recommended style and asks CRAV1 style or git log in the same prompt as those choices (1.89.0), at most once per run (1.90.5). `message only` drafts with no commit, the same as copy, and a headless run with no choice word ends as copy. It replaces draft-commit-message; its rules are kept as a branch.
+**[`/crav1-finalize-commit`](crav1-finalize-commit.md)** always drafts first, then offers commit, copy, change, or stop (1.83.0; there is no opening question). When no style rule is saved, it drafts in the recommended style and asks CRAV1 style or git log in the same prompt as those choices (1.89.0), at most once per run (1.90.5). `message-only` drafts with no commit, the same as copy, and a headless run with no choice word ends as copy. It replaces draft-commit-message; its rules are kept as a branch.
 
 Only write the message (was `/crav1-draft-commit-message`): Paste-ready Summary/Description for any git client; CRAV1 style or live git log, once or onward (deletable rule); does not commit unless they ask. Optional Azure Boards mention from `docs/specs/<slug>/work-item.md` is the last description line.
 
@@ -26,7 +26,7 @@ Only write the message (was `/crav1-draft-commit-message`): Paste-ready Summary/
 
 Commit (was [`/crav1-finalize-commit`](crav1-finalize-commit.md)): Same draft, then **commit first**, then copy for your git client, change (edit or rewrite), or stop (no push). Keeps that mention through the HEAD check and the strip of the known tool trailers it did not write (the list in `references/tool-trailers.md`: Cursor, Claude Code, Copilot, Aider, Codex, Gemini, Jules, Devin and more); `Signed-off-by` and a real person's `Co-authored-by` stay (1.94.0).
 
-Trailer hook (1.90.0): asked once per repo in the same prompt, "Strip tool trailers on every commit for this repo?". `strip trailers` writes a committed `.githooks/commit-msg` (POSIX sh) that removes only the known tool trailers in `references/tool-trailers.md`, runs `git config core.hooksPath .githooks`, and saves the answer in a `trailer-hook` rule. `Signed-off-by` and human `Co-authored-by` lines stay. A teammate whose repo has the hook but not the config gets the config line on their first run, with no question. `keep trailers` saves no and never asks again.
+Trailer hook (1.90.0): asked once per repo in the same prompt, "Strip tool trailers on every commit for this repo?". `strip-trailers` writes a committed `.githooks/commit-msg` (POSIX sh) that removes only the known tool trailers in `references/tool-trailers.md`, runs `git config core.hooksPath .githooks`, and saves the answer in a `trailer-hook` rule. `Signed-off-by` and human `Co-authored-by` lines stay. A teammate whose repo has the hook but not the config gets the config line on their first run, with no question. `keep-trailers` saves no and never asks again.
 
 Fetch, pull and check (1.81.0, 1.123.0): after the commit it fetches. When the branch is behind its upstream it merges with `git pull --no-rebase --no-commit` (never a rebase, never an automatic merge commit) and resolves conflicts in specs, system files and notes by the kit's rules: both sides' added lines kept, ours first; the newest `Synced at` entry per branch; note indexes rebuilt with `notes_index.py` and folded into the one merge commit, noted in that message. This run makes at most two commits. `scripts/nothing_lost.py` is the check; say nothing was lost only when it reports that. One question only when the two sides say different things about the same fact: keep both (a `**Conflict:**` line), mine, theirs, or stop. Code file conflicts stay with you. When not behind, it checks any unpushed merge, including one made by hand, and offers to restore dropped lines; restored lines go into this run's commit (1.91.0). `pull` does this with no commit first. It never pushes. Next follows run-ending.md: an unfinished walk resumes the walk; a base branch says to push; a feature branch names [`/crav1-open-pr`](crav1-open-pr.md).
 
@@ -39,14 +39,14 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 | Question | Word | Means |
 | --- | --- | --- |
 | Commit or message | `commit` | the same as commit now (1.76.1) |
-| Commit or message | `message only` | draft and show, no git commit; the same as copy (1.83.0) |
-| Commit or message | `commit now` | draft, show, then commit with no choice question (never pushes) |
-| Base branch | `new branch` | code staged on a base branch: create feat/<slug> from the into branch and commit there (1.99.0) |
+| Commit or message | `message-only` | draft and show, no git commit; the same as copy (1.83.0) |
+| Commit or message | `commit-now` | draft, show, then commit with no choice question (never pushes) |
+| Base branch | `new-branch` | code staged on a base branch: create feat/<slug> from the into branch and commit there (1.99.0) |
 | Pull | `pull` | fetch, then the pull path or the nothing-lost check, with no commit first (1.81.0) |
 | Style | `crav1` | CRAV1 style, this commit only |
-| Style | `git log` | match git log, this commit only |
-| Trailer hook | `strip trailers` | add the shared .githooks/commit-msg hook that strips known tool trailers, and save yes (1.90.0); on commit, the hook and its project rule go into that commit (1.90.6) |
-| Trailer hook | `keep trailers` | no hook; save no so it is not asked again (1.90.0) |
+| Style | `git-log` | match git log, this commit only |
+| Trailer hook | `strip-trailers` | add the shared .githooks/commit-msg hook that strips known tool trailers, and save yes (1.90.0); on commit, the hook and its project rule go into that commit (1.90.6) |
+| Trailer hook | `keep-trailers` | no hook; save no so it is not asked again (1.90.0) |
 
 ## Runs when
 

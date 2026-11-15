@@ -44,7 +44,7 @@ The detailed log stays in the `## Run` section of the build-progress file. A sto
 
 Only these stop the run: an open question on the next task; a stakeholder yes that is not recorded; a `(manual …)`, `(… secret)`, `(host setup)`, or `(Runs live)` step; tests or lint still red after a fair try; a wanted change outside the task's scope; someone else's claim or change; a sync conflict or a rejected push; and, always, the pull request merge. Do not stop for anything else, and never show a continue card between tasks.
 
-A stop before the merge keeps the claim. `release claim` clears it, as [claims.md](claims.md) says.
+A stop before the merge keeps the claim. `release-claim` clears it, as [claims.md](claims.md) says.
 
 ## Resume
 

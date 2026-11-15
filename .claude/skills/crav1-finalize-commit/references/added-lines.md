@@ -23,5 +23,5 @@ A last line of `#<id>` or `AB#<id>` that the draft has is the work-item mention.
    - Jules: Settings → **Commit Authoring** → **User only**. ([Changelog](https://jules.google/docs/changelog/2026-02-19/))
    - Devin: Settings → Preferences → **Git commit author** → **You only**; an enterprise setting can override it. ([GitHub integration](https://docs.devin.ai/integrations/gh))
 
-   The other tools in the strip list (the Copilot cloud agent, Codex, Gemini, Windsurf, Amazon Q, Cline, JetBrains AI) document no off switch; rely on `strip trailers` and the trailer hook ([trailer-hook.md](trailer-hook.md)), which works for every tool.
-5. Install no other hook. The trailer hook is installed only after `strip trailers`.
+   The other tools in the strip list (the Copilot cloud agent, Codex, Gemini, Windsurf, Amazon Q, Cline, JetBrains AI) document no off switch; rely on `strip-trailers` and the trailer hook ([trailer-hook.md](trailer-hook.md)), which works for every tool.
+5. Install no other hook. The trailer hook is installed only after `strip-trailers`.

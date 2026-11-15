@@ -30,7 +30,7 @@ bm = load(BUILD_MAP, "build_map_1162")
 
 MAP = """# Build map
 
-To zoom the diagram, run `/crav1-tasks-ready-to-build orders-api open map`.
+To zoom the diagram, run `/crav1-tasks-ready-to-build orders-api open-map`.
 
 One branch per plan step.
 
@@ -267,26 +267,32 @@ class MapFile(unittest.TestCase):
         self.assertEqual(lines[0], "# Build map")
         self.assertEqual(
             lines[2],
-            "To zoom the diagram, run `/crav1-tasks-ready-to-build orders-api open map`. "
-            "To share the map as one file, run `/crav1-tasks-ready-to-build orders-api export map`.",
+            "To zoom the diagram, run `/crav1-tasks-ready-to-build orders-api open-map`. "
+            "To share the map as one file, run `/crav1-tasks-ready-to-build orders-api export-map`.",
         )
 
     def test_choice_words_parse(self):
-        parsed = bm.parse_invocation("/crav1-tasks-ready-to-build orders-api export map")
+        parsed = bm.parse_invocation("/crav1-tasks-ready-to-build orders-api export-map")
         self.assertEqual((parsed["scope"], parsed["page"]), ("orders-api", "export"))
-        parsed = bm.parse_invocation("cc 1.0 open map")
+        parsed = bm.parse_invocation("cc 1.0 open-map")
         self.assertEqual((parsed["scope"], parsed["page"]), ("cc 1.0", "open"))
         self.assertIsNone(bm.parse_invocation("cc 1.0")["page"])
+        spaced = bm.parse_invocation("/crav1-tasks-ready-to-build orders-api export map")
+        self.assertEqual((spaced["scope"], spaced["page"]), ("orders-api export map", None))
+        spaced = bm.parse_invocation("cc 1.0 open map")
+        self.assertEqual((spaced["scope"], spaced["page"]), ("cc 1.0 open map", None))
 
     def test_skill_names_the_words_and_the_reference(self):
         skill = (SK / "SKILL.md").read_text(encoding="utf-8")
-        self.assertIn("`open map`", skill)
-        self.assertIn("`export map`", skill)
+        self.assertIn("`open-map`", skill)
+        self.assertIn("`export-map`", skill)
+        self.assertNotIn("`open map`", skill)
+        self.assertNotIn("`export map`", skill)
         self.assertIn("references/map-page.md", skill)
         ref = (SK / "references/map-page.md").read_text(encoding="utf-8")
         self.assertIn("scripts/open_build_map.py docs/specs/<slug> --export", ref)
         routing = (ROOT / "docs/guild-routing.md").read_text(encoding="utf-8")
-        self.assertIn("| `/crav1-tasks-ready-to-build` | Open the map as a zoomable page? | `open map` · `export map` |", routing)
+        self.assertIn("| `/crav1-tasks-ready-to-build` | Open the map as a zoomable page? | `open-map` · `export-map` |", routing)
 
 
 if __name__ == "__main__":

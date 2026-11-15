@@ -167,7 +167,7 @@ class ClaimsTests(unittest.TestCase):
         self.assertEqual(code, 0)
         self.assertTrue(listed["claims"][0]["stale"])
         self.assertTrue(listed["warnings"])
-        self.assertIn("release claim", listed["warnings"][0])
+        self.assertIn("release-claim", listed["warnings"][0])
         self.assertTrue((self.root / "claims.md").is_file())
         self.assertIn("T27", (self.root / "claims.md").read_text(encoding="utf-8"))
 

@@ -37,7 +37,7 @@ When every task is built, it opens or updates the pull request and stops. The re
 
 Each task also updates one line in `docs/specs/orders-capacity/walk-progress.md`, such as `- Branch run: feat/orders-cicd: running, T2 done, next T3 (2026-11-14T09:40:00+01:00). Log: build-progress/feat--orders-cicd.md`, then `stopped before merge`, then `merged`. That file stays the one place to look, and the ready check prints those lines. Run next in the ready check, tighten-and-plan, and this walk offers the whole branch beside the next task whenever a branch has two or more open tasks.
 
-To resume after a stop or in a new session, run the same command. It picks up at the next open task, keeps its own claim, and does not build a task twice. A stop partway keeps the claim unless you say `release claim`.
+To resume after a stop or in a new session, run the same command. It picks up at the next open task, keeps its own claim, and does not build a task twice. A stop partway keeps the claim unless you say `release-claim`.
 
 ## Steps
 
@@ -54,7 +54,7 @@ To resume after a stop or in a new session, run the same command. It picks up at
 | Tick | `yes` when the only leftover is the checkbox | Ticks a recorded-merged row. Does not re-implement |
 | Next task | Pick the next branch, or stop | One Run next entry per ready branch, or verify when no work branch remains |
 
-Someone else's branch or pull request asks `switch` before other-owner mode. In that mode the walk does not open a pull request, does not merge the base in, and does not merge the pull request. Each push gets one comment. The description changes only if you say `edit description`. Ticks wait until that pull request is merged.
+Someone else's branch or pull request asks `switch` before other-owner mode. In that mode the walk does not open a pull request, does not merge the base in, and does not merge the pull request. Each push gets one comment. The description changes only if you say `edit-description`. Ticks wait until that pull request is merged.
 
 A task that needs code from an unmerged branch is cut from that branch. The progress file and the report list which branch merges back into which, child first.
 

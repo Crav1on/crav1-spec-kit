@@ -22,7 +22,7 @@ Merge one named pull request only when that turn asks; always a merge commit; no
 
 1.68.0: after a sub-branch merge, says `<n> of <m> sub-branches merged into <spec branch>` and any `left behind` branch; a reverted branch shows `merged, reverted on <base> (<sha>)`, report only.
 
-1.69.0: the `Promotion:` line after the after-merge line, with the optional `pipeline runs` check.
+1.69.0: the `Promotion:` line after the after-merge line, with the optional `pipeline-runs` check.
 
 1.97.0: before the merge it reads the merge-readiness line (`Ready:`) of the PR note's shared PR record. `Ready: no` stops the merge and lists the reasons, unless the turn says `anyway`; `anyway` never skips a required check, policy or review. No line: it goes on and names [`/crav1-pr-status`](crav1-pr-status.md). After the merge it sets `State: merged` and `Ready: merged` in the record instead of a `State on <date>` line.
 
@@ -32,7 +32,7 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 
 | Question | Word | Means |
 | --- | --- | --- |
-| Also check the latest pipeline runs? | `pipeline runs` | check the latest successful Azure DevOps runs behind the Promotion line (read-only) |
+| Also check the latest pipeline runs? | `pipeline-runs` | check the latest successful Azure DevOps runs behind the Promotion line (read-only) |
 | The PR record says not ready (1.97.0) | `anyway` | merge although the record's `Ready:` line says no; host checks, policies and reviews still apply |
 
 ## Runs when

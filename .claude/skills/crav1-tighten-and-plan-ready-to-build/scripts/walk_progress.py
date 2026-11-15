@@ -2573,13 +2573,13 @@ def branch_report(root: Path, rows: list[dict]) -> dict | None:
     return map_mod().report_by_branch(built, rows, slug=command_slug(root))
 
 
-LOOP_WHY = "Two or more branches wait for each other. The ready check offers a fix under the Loop line; say `fix loop` to apply it."
+LOOP_WHY = "Two or more branches wait for each other. The ready check offers a fix under the Loop line; say `fix-loop` to apply it."
 
 
 def loop_offer(root: Path | None) -> dict:
     """The fix offer for the first loop (1.161.0): a Run next entry, the card, every fix.
 
-    The fix numbers run across all loops, so `fix loop 3` always names the
+    The fix numbers run across all loops, so `fix-loop 3` always names the
     same fix the Loop lines print.
     """
     empty = {"entries": [], "card": None, "fixes": []}
@@ -3416,36 +3416,142 @@ def slice_result(rows: list[dict], hits: list[dict]) -> tuple[str, list, list]:
     return "ready", can_start, held
 
 
-def not_ready_because(result: str, rows: list[dict], hits: list[dict], can_start: list) -> str | None:
-    """Why the result is not-ready, when can_start is also filled.
+# The first real next step when a locked walk step was reopened (1.163.0).
+# review-and-tighten-plan starts with tighten-plan, the command the user
+# runs to finish that review.
+REOPEN_NEXT = {
+    "playbook": ("/crav1-tighten-and-plan-ready-to-build", "The playbook step was reopened"),
+    "review-architecture": ("/crav1-review-architecture", "The architecture review was reopened"),
+    "tighten-spec": ("/crav1-tighten-spec", "The spec was reopened for tightening"),
+    "resolve-open-questions": ("/crav1-resolve-open-questions", "Open questions were reopened"),
+    "plan-from-spec": ("/crav1-plan-from-spec", "The plan needs to be rewritten from the spec"),
+    "review-and-tighten-plan": ("/crav1-tighten-plan", "The plan was reopened for review"),
+    "tasks-ready-to-build": ("/crav1-tasks-ready-to-build", "The ready check was reopened"),
+}
+
+
+def _task_ids_text(ids) -> str:
+    names = [task for task in ids or [] if task]
+    if not names:
+        return ""
+    if len(names) == 1:
+        return names[0]
+    return ", ".join(names[:-1]) + " and " + names[-1]
+
+
+def _command_with_slug(command: str, slug: str) -> str:
+    command = str(command).strip().strip("`")
+    if slug and not command.startswith("git "):
+        return f"{command} {slug}"
+    return command
+
+
+def _run_entry(command: str, reason: str) -> str:
+    return f"`{command}`\n{str(reason).strip()}"
+
+
+def _wait_until(lead: str, can_start: list, command: str) -> str:
+    ids = _task_ids_text(can_start)
+    if ids:
+        return f"{lead}, so {ids} wait until {command} finishes."
+    return f"{lead}, so the work waits until {command} finishes."
+
+
+def _run_from_clause(text: str) -> str:
+    """Turn 'command, because reason' (or a Next: line) into a Run next entry."""
+    text = str(text).strip()
+    if text.startswith("Next:"):
+        text = text[len("Next:"):].strip()
+    if ", because " in text:
+        command, reason = text.split(", because ", 1)
+        return _run_entry(command.strip().strip("`"), reason.strip())
+    if text.startswith("`") and "\n" in text:
+        return text
+    return text
+
+
+def _first_reopened_step(hits: list[dict]) -> str | None:
+    reopened = [hit.get("step") for hit in hits if hit.get("bucket") == "reopened" and hit.get("step")]
+    if not reopened:
+        return None
+    return next((step for step in ORDER if step in reopened), reopened[0])
+
+
+def not_ready_because(result: str, rows: list[dict], hits: list[dict], can_start: list, slug: str = "") -> str | None:
+    """Why the result is not-ready, in plain words (1.163.0).
 
     A hard hit (a reopened step, a jump-back question, a whole-slice hold)
     forces not-ready and still lists tasks whose bucket is ready. Those
-    tasks are not a start. A whole-slice question is named from its row.
+    tasks wait until the first real next step finishes. A whole-slice
+    question is named from its row.
     """
     if result != "not-ready":
         return None
-    bits = []
-    reopened = [hit["step"] for hit in hits if hit.get("bucket") == "reopened" and hit.get("step")]
-    if reopened:
-        bits.append("Reopened: " + ", ".join(reopened))
+    step = _first_reopened_step(hits)
+    if step:
+        command, lead = REOPEN_NEXT.get(step, (STEP_COMMAND.get(step, f"/crav1-{step}"), "An earlier step was reopened"))
+        command = _command_with_slug(command, slug)
+        return _wait_until(lead, can_start, command)
     for row in rows:
         reason = str(row.get("reason") or "")
         if "whole slice" in reason.lower():
-            bits.append(reason)
-            break
-    if not reopened and not any("whole slice" in bit.lower() for bit in bits):
-        for hit in hits:
-            if hit.get("kind") == "waiting" or hit.get("bucket") == "reopened":
-                continue
-            why = hit.get("why")
-            if why and why not in bits:
-                bits.append(why)
-                break
-    if can_start:
-        ids = ", ".join(task for task in can_start if task)
-        bits.append(f"{ids} stay in can_start and are not a start while the result is not-ready")
-    return ". ".join(bits) if bits else "not ready"
+            ids = _task_ids_text(can_start)
+            if ids:
+                return f"{reason.rstrip('.')}, so {ids} wait."
+            return reason
+    for hit in hits:
+        if hit.get("kind") == "waiting" or hit.get("bucket") == "reopened":
+            continue
+        why = hit.get("why")
+        if why:
+            return why
+    ids = _task_ids_text(can_start)
+    if ids:
+        return f"{ids} cannot start yet."
+    return "not ready"
+
+
+def not_ready_run(
+    result: str,
+    slug: str,
+    hits: list[dict],
+    can_start: list,
+    waiting_next: str | None,
+    gap: dict | None,
+    sync: dict | None,
+    offer: dict | None,
+    counts: dict | None,
+    because: str | None,
+    question_first: bool,
+) -> list[str]:
+    """The first real next step when not-ready, as one Run next entry (1.163.0)."""
+    if result != "not-ready":
+        return []
+    step = _first_reopened_step(hits)
+    if step:
+        command, lead = REOPEN_NEXT.get(step, (STEP_COMMAND.get(step, f"/crav1-{step}"), "An earlier step was reopened"))
+        command = _command_with_slug(command, slug)
+        reason = because or _wait_until(lead, can_start, command)
+        return [_run_entry(command, reason)]
+    if offer and offer.get("entries"):
+        return [str(offer["entries"][0])]
+    if waiting_next:
+        return [_run_from_clause(waiting_next)]
+    gap = gap or {}
+    counts = counts or {}
+    left = sum(int(counts.get(key, 0) or 0) for key in ("ready", "waiting", "waits_in_order", "blocked"))
+    if gap.get("behind") or (left == 0 and counts.get("needs_verify")):
+        command = _command_with_slug("/crav1-verify-build-against-spec", slug)
+        return [_run_entry(command, "verify.md is behind, so the built tasks need to be verified.")]
+    if sync and sync.get("state") == "ahead":
+        ahead = int(sync.get("ahead") or 1)
+        unit = "commits" if ahead != 1 else "commit"
+        reason = f"The specs repo is {ahead} {unit} ahead of origin."
+        return [_run_entry("git push", reason)]
+    if question_first and not counts.get("ready"):
+        command = _command_with_slug("/crav1-resolve-open-questions", slug)
+        return [_run_entry(command, "that question blocks the first task.")]
+    return []
 
 
 def line_for(result: str, can_start: list, held: list) -> str | None:
@@ -3554,19 +3660,20 @@ def compose_ending(
 ) -> str:
     """The reply for a walk ending. Print this text. Do not point at earlier output.
 
-    Run next comes first on ready and ready-partial, before any Waiting line.
-    Each held line is in this text. A not-ready result has no Run next block.
+    Run next comes first, before any Waiting line, on ready, ready-partial,
+    and not-ready when there is a next step. Each held line is in this text.
     The bottom keeps Waiting lines and at most a one-line alternative. The
-    walk command appears only in the Run next block (1.153.0).
+    walk command appears only in the Run next block (1.153.0). A not-ready
+    reason already used as the Run next line is not repeated below.
     """
     shown = result in ("ready", "ready-partial")
     alternatives = _alternative_lines(next_lines, run_lines if shown else [])
     return ending_mod().compose(
-        run=run_lines if shown else None,
+        run=run_lines if run_lines else None,
         held=held_lines,
         branch_runs=branch_runs,
         waiting=waiting,
-        because=because if result == "not-ready" else None,
+        because=because if result == "not-ready" and because and not run_lines else None,
         alternatives=alternatives,
         notes=[replaced] if replaced else None,
     )
@@ -3667,7 +3774,10 @@ def reply_for(root: Path | None, out: dict) -> str:
     if out.get("build_map_wrote"):
         build_map = f"docs/specs/{slug}/build-map.md"
     next_line = None
-    if not out.get("run_lines"):
+    # A not-ready ending already starts with Run next (1.163.0). Only keep a
+    # trailing Next line when there is still no Run next block, and never
+    # when the result is not-ready (those cases live in the ending).
+    if not out.get("run_lines") and out.get("result") != "not-ready":
         question_first = any(
             _direct_question_or_approval(hit) and not hit.get("approval")
             for hit in out.get("waiting") or []
@@ -3753,9 +3863,9 @@ def readiness(args: argparse.Namespace) -> None:
     unmapped = [h for h in hits if h["command"] is None and h["kind"] != "waiting"]
     jump = [h for h in hits if h["can_jump_back"]]
     result, can_start, held = slice_result(rows, hits)
-    because = not_ready_because(result, rows, hits, can_start)
-    ready = result == "ready"
     slug = _slug(root) if root is not None else ""
+    because = not_ready_because(result, rows, hits, can_start, slug=slug)
+    ready = result == "ready"
     waiting_line, waiting_next = _waiting_lines(waiting, slug)
     report = branch_report(root, rows) if root is not None else None
     ready_lines = (report or {}).get("ready_lines") or []
@@ -3772,7 +3882,7 @@ def readiness(args: argparse.Namespace) -> None:
         f"Next: /crav1-resolve-open-questions {slug}, "
         "because that step needs a rerun or clear."
     )
-    if later:
+    if later and result != "not-ready":
         names = ", ".join(hit["step"] for hit in reopened)
         nxt = f"Next: rerun or clear {names}."
         next_lines = []
@@ -3812,22 +3922,30 @@ def readiness(args: argparse.Namespace) -> None:
         waiting_bits.append(resolve_waiting)
     if result == "not-ready" and not can_start and waiting_line:
         waiting_bits.append(waiting_line)
-    shown_run = run_lines if result in ("ready", "ready-partial") else []
     offer = loop_offer(root) if loop_lines and root is not None and root.is_dir() else {"entries": [], "card": None, "fixes": []}
-    if shown_run is not None and result in ("ready", "ready-partial"):
-        shown_run = list(shown_run) + offer["entries"]
+    question_first = any(
+        _direct_question_or_approval(hit) and not hit.get("approval")
+        for hit in waiting
+    )
     if result in ("ready", "ready-partial"):
+        shown_run = list(run_lines) + offer["entries"]
         alt = "/crav1-build-tasks builds one task without the walk."
         shown_next = [alt]
         next_lines = [alt]
         nxt = alt
-    elif next_lines:
-        shown_next = [line for line in next_lines if not str(line).startswith("Next:")]
-    elif nxt:
-        text = str(nxt)
-        shown_next = [] if text.startswith("Next:") else [text]
     else:
+        shown_run = not_ready_run(
+            result, slug, hits, can_start, waiting_next, gap, sync, offer,
+            counts_for(rows, slug), because, question_first,
+        )
         shown_next = []
+        next_lines = []
+        if shown_run:
+            nxt = shown_run[0]
+        elif because:
+            nxt = because
+        else:
+            nxt = next_for(result, can_start, waiting_next)
     run_status = branch_run_lines(root)
     ending = compose_ending(
         result, shown_run, held_lines, waiting_bits, shown_next, because, replaced, run_status,
@@ -5299,7 +5417,7 @@ def main(argv: list[str] | None = None) -> None:
 
     fl = sub.add_parser("fix-loop")
     fl.add_argument("--root", required=True, help="Spec folder.")
-    fl.add_argument("--pick", type=int, default=1, help="The fix number the Loop lines print. `fix loop` is 1, `fix loop 2` is 2.")
+    fl.add_argument("--pick", type=int, default=1, help="The fix number the Loop lines print. `fix-loop` is 1, `fix-loop 2` is 2.")
     fl.add_argument("--yes", action="store_true", help="Write tasks.md and build-map.md. Only after the fix was shown and confirmed.")
     fl.add_argument("--text", action="store_true", help="Print only the reply.")
     fl.set_defaults(func=fix_loop_cmd)

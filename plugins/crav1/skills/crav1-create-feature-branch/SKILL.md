@@ -51,7 +51,7 @@ Intake (several slugs): one branch for the dump. Slug = short landscape kebab, o
 - On a **base branch** (main, master, develop, the `Merges into` branch, `release/*`): **Create `feat/<slug>` from `<into>` (Recommended)**, **Use an existing branch**, **Stop**. A typed branch name is that card's free-text answer, hint `Type a branch name`, not its own option. No Stay on a base. There is no second card to collect the name (1.129.0). The rule is `crav1-docs/reference/question-cards.md`.
 - On **another** branch (`chore/x`, detached HEAD): the same, with **Stay on `<current>`** in place of the free-text name.
 - When the prompt is for a task, option 1 is that task's branch from [references/task-branch.md](references/task-branch.md), not a new name. The branch card is alone. Permissions are the next card.
-- Headless with no person: stop before any code, unless the invocation has the choice word `new branch`.
+- Headless with no person: stop before any code, unless the invocation has the choice word `new-branch`.
 
 Do not offer `spec/<slug>` on a build prompt.
 

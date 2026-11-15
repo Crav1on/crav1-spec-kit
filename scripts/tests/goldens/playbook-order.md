@@ -5,7 +5,7 @@ The two order diagrams from a real playbook run, rewritten with the safe diagram
 ```mermaid
 flowchart TD
   A[Answer step, Kept changes and N1-N11] --> B[Spec steps 1-14, add-to-spec and resolve-open-questions]
-  B --> C[Boards, ado-sync push features, Step 15]
+  B --> C[Boards, ado-sync push-features, Step 15]
   B --> D[Plan and tasks, Steps 17-19]
   D --> E[Branch from main removes the old functions deploy, Step 21]
   E --> F[Pull request into main merged, Step 22]

@@ -7,8 +7,8 @@ Read only when the pointer in `SKILL.md` sends you here. Moved word for word fro
 Exact words for bots and scripted runs. There are no `--flags`.
 
 - No pull request: `branch` (1.80.0), see `references/branch.md`.
-- Branches on disk older than the pull request: `fetch pr branches` / `use disk` / `stop pr review`.
-- The comment as posted (1.67.0): `comment posted` (run only the record step, no review), `newest comment` (several candidates: take the newest match by the signed-in user), `skip comment record` (do not record; the review goes on).
+- Branches on disk older than the pull request: `fetch-pr-branches` / `use-disk` / `stop-pr-review`.
+- The comment as posted (1.67.0): `comment-posted` (run only the record step, no review), `newest-comment` (several candidates: take the newest match by the signed-in user), `skip-comment-record` (do not record; the review goes on).
 
 Read `references/azure-devops.md` ("Branches on disk: choice words") only when the branches-on-disk question comes up.
 

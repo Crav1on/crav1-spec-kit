@@ -1,6 +1,6 @@
 # Map page (1.162.0)
 
-Read this only on `open map` or `export map`. The page shows the whole `build-map.md`, with a diagram you can zoom. The `.md` file stays the main view and is not changed.
+Read this only on `open-map` or `export-map`. The page shows the whole `build-map.md`, with a diagram you can zoom. The `.md` file stays the main view and is not changed.
 
 Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. On Windows that is `python` with `PYTHONUTF8=1`. Elsewhere it is `python3`. Pass `-X utf8`.
 

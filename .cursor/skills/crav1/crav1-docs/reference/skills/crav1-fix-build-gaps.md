@@ -8,7 +8,7 @@
 
 Fix gaps a build left, one at a time inside the spec; asks verify-report gaps or live-site gaps.
 
-1.99.0: before the first code edit on a base branch, offers Create `fix/<slug>` from the into branch (Recommended), an existing branch, another name or stop; never edits code there; headless stops unless `new branch`.
+1.99.0: before the first code edit on a base branch, offers Create `fix/<slug>` from the into branch (Recommended), an existing branch, another name or stop; never edits code there; headless stops unless `new-branch`.
 
 1.130.0: a typed branch name is that card's free-text answer, hint `Type a branch name`. There is no option labelled Other name.
 
@@ -24,9 +24,9 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 
 | Question | Word | Means |
 | --- | --- | --- |
-| Which gaps | `verify gaps` | gaps from the verify report |
-| Which gaps | `live gaps` | live-site gaps |
-| Branch | `new branch` | on a base or other branch, create fix/<slug> from the into branch (1.99.0) |
+| Which gaps | `verify-gaps` | gaps from the verify report |
+| Which gaps | `live-gaps` | live-site gaps |
+| Branch | `new-branch` | on a base or other branch, create fix/<slug> from the into branch (1.99.0) |
 
 ## Runs when
 

@@ -2,7 +2,7 @@
 
 You draft paste-ready **Summary** and **Description** (GitKraken fields). You do **not** create the commit unless the user also asked you to commit.
 
-Command: `/crav1-finalize-commit` (every run drafts with this file; `message only` stops after the blocks). To **edit** the text and/or **create** the commit after they accept it, use the commit branch of `/crav1-finalize-commit` (it follows this skill, then a commit / copy / change / stop menu, **commit first**).
+Command: `/crav1-finalize-commit` (every run drafts with this file; `message-only` stops after the blocks). To **edit** the text and/or **create** the commit after they accept it, use the commit branch of `/crav1-finalize-commit` (it follows this skill, then a commit / copy / change / stop menu, **commit first**).
 
 Bundled CRAV1 style: [references/style.md](references/style.md).  
 Git-log style: this repo’s recent `git log` (subject + body).
@@ -50,7 +50,7 @@ Do **not** ask before the draft (1.89.0). Draft in the recommended style (CRAV1 
 
 If `git log` is empty or unavailable, say that `log-once` / `log-onward` have no pattern to copy; they can still pick CRAV1 style.
 
-If they already named an id (`once`, `onward`, `log-once`, `log-onward`), skip the style question. The choice word `crav1` is `once`; `git log` is `log-once`.
+If they already named an id (`once`, `onward`, `log-once`, `log-onward`), skip the style question. The choice word `crav1` is `once`; `git-log` is `log-once`.
 
 After `onward` or `log-onward`: write the matching **new** rule name as soon as they answer (redraft first if the style changed), and delete the other persist files (including legacy names) so only one remains. Tell them they undo by **deleting that rule file**.
 

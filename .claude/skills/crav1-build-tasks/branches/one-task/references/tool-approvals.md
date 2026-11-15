@@ -18,7 +18,7 @@ Documented behavior: [Claude Code permissions](https://code.claude.com/docs/en/p
 | --- | --- |
 | The range or all branch of `/crav1-build-tasks` (orchestrator) | **Yes**, once, before the first worker |
 | `/crav1-build-features` (orchestrator) | **Yes**, once, before the first worker (same as build-tasks) |
-| The one task branch of `/crav1-build-tasks` **standalone** (user typed that command) | **Yes**, once, before launching the worker |
+| The one-task branch of `/crav1-build-tasks` **standalone** (user typed that command) | **Yes**, once, before launching the worker |
 | `crav1-build-task-agent` **worker** (subagent) | **Never** |
 | Worker launched by build-tasks or build-features | **Never** — parent already paused. Pass `approvals: already-done` |
 
