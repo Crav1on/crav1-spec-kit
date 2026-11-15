@@ -37,7 +37,7 @@ A test skipped for a missing dependency is not a pass. The task is not marked ve
 
 ## Tick pending (1.136.0)
 
-When the evidence passed, the `tasks.md` row is still `[ ]`, and the pull request is recorded merged, the status is **Implemented, verified, tick pending**. That is not Not implemented. Next skips every task the ready check already counts as done and names the first task that can start, one line per ready branch. The open checkbox stays a Gap. The report may also offer the tick on its own line. Say yes and it ticks that one row. It does not re-implement. That offer is an alternative exit. It does not replace the Next line for tasks that can start.
+When the evidence passed, the `tasks.md` row is still `[ ]`, and the pull request is recorded merged, the status is **Implemented, verified, tick pending**. That is not Not implemented. The reply's Run next skips every task the ready check already counts as done and names the first task that can start. Since 1.169.0 `verify.md` has no `Next:` line. The open checkbox stays a Gap. The report may also offer the tick on its own line. Say yes and it ticks that one row. It does not re-implement. That offer is an alternative exit. It does not replace the Next line for tasks that can start.
 
 ## What gets written
 

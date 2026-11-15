@@ -504,6 +504,7 @@ def run_entries(labels, branch_name, slug=None, open_labels=None, about=None, wa
 BLOCK_RULE = "\n\n---\n\n"
 VERIFY_COMMAND = "/crav1-verify-build-against-spec"
 PUSH_COMMAND = "git push"
+FIX_COMMAND = "/crav1-fix-build-gaps"
 
 
 def _ids(ids):
@@ -515,7 +516,7 @@ def _ids(ids):
     return sorted(out, key=lambda t: (int(t[1:]) if re.fullmatch(r"T\d+", t) else 10**9, t))
 
 
-def catch_up_block(slug=None, behind=None, orphans=None, ahead=0):
+def catch_up_block(slug=None, behind=None, orphans=None, ahead=0, failed=None):
     """`**Catch up first**` for Run next (1.167.0), or "".
 
     Things behind that the user can fix now with one command each, before
@@ -525,15 +526,26 @@ def catch_up_block(slug=None, behind=None, orphans=None, ahead=0):
     of what is behind, then each command alone in its code span under its
     label. /crav1-verify-build-against-spec both checks the behind tasks
     and drops an orphan row, so those two share one command and one label.
-    Empty when nothing is behind.
+    A built task whose verify failed (`failed`, T#s or dicts with `task` and
+    `reason`, 1.169.0) gets its own `Fix T#:` label and
+    /crav1-fix-build-gaps command, not a second verify. Empty when nothing
+    is behind.
     """
+    fails = []
+    for item in failed or []:
+        if isinstance(item, dict):
+            tid, why = str(item.get("task") or "").strip(), _plain(item.get("reason") or "")
+        else:
+            tid, why = str(item).strip(), ""
+        if tid and tid not in [f[0] for f in fails]:
+            fails.append((tid, why))
     behind = _ids(behind)
     orphans = _ids(orphans)
     try:
         ahead = int(ahead or 0)
     except (TypeError, ValueError):
         ahead = 0
-    if not behind and not orphans and ahead <= 0:
+    if not behind and not orphans and ahead <= 0 and not fails:
         return ""
     sentences = []
     behind_text = _join(behind) if behind else ""
@@ -546,6 +558,8 @@ def catch_up_block(slug=None, behind=None, orphans=None, ahead=0):
         sentences.append(f"verify.md is behind for {behind_text}.")
     elif orphans:
         sentences.append(f"verify.md has {rows} for {orphan_text}, {which}.")
+    for tid, why in fails:
+        sentences.append(f"{tid} failed verify: {why.rstrip('.')}." if why else f"{tid} failed verify.")
     unit = "commit" if ahead == 1 else "commits"
     if ahead > 0:
         sentences.append(f"The specs repo is {ahead} {unit} ahead of origin.")
@@ -562,6 +576,9 @@ def catch_up_block(slug=None, behind=None, orphans=None, ahead=0):
         where = "it is" if len(orphans) == 1 else "they are"
         lines.append(f"Remove the {orphan_text} {row_word} ({where} in verify.md but not in tasks.md):")
         lines.append(f"`{verify_cmd}`")
+    for tid, _why in fails:
+        lines.append(f"Fix {tid}:")
+        lines.append(f"`{FIX_COMMAND} {slug} {tid}`" if slug else f"`{FIX_COMMAND} {tid}`")
     if ahead > 0:
         lines.append(f"Push the specs repo ({ahead} {unit} ahead):")
         lines.append(f"`{PUSH_COMMAND}`")
