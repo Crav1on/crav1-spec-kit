@@ -72,6 +72,8 @@ Run the whole branch:
 Run only T2, the first task:
 `/crav1-build-walk T2`
 
+---
+
 **feat/orders-api-export**
 1 open task:
 - T6 Email the receipt
@@ -88,7 +90,7 @@ Held:
 /crav1-build-tasks builds one task without the walk.
 ```
 
-Since 1.164.0 each ready branch is one block: the branch in bold, one plain sentence of what it does from the plan step that owns it (left out when there is none), `<n> open tasks:` with one task per line, then `Run the whole branch:` with `/crav1-build-walk <slug> <branch>` and `Run only T#, the first task:` with `/crav1-build-walk <slug> T#`. Each label is on its own line and each command is alone in its code span on the next line. A branch with one open task says `1 open task:`, then `Run T#:` and the one command. The slug rule is unchanged. After Held, a `Branch runs:` block lists each `- Branch run:` status line in `walk-progress.md` that is not `merged`, for example `- feat/orders-api-record: running, T2 done, next T5 (log: build-progress/feat--orders-api-record.md)`.
+Since 1.164.0 each ready branch is one block: the branch in bold, one plain sentence of what it does from the plan step that owns it (left out when there is none), `<n> open tasks:` with one task per line, then `Run the whole branch:` with `/crav1-build-walk <slug> <branch>` and `Run only T#, the first task:` with `/crav1-build-walk <slug> T#`. Each label is on its own line and each command is alone in its code span on the next line. A branch with one open task says `1 open task:`, then `Run T#:` and the one command. Since 1.165.0 a `---` line, with a blank line on each side, stands between two branch blocks so they never run together in a Markdown viewer. The open tasks are listed in the order the walk runs them. A listed task that cannot start yet says why on its line, for example `- T8 Take in develop (waits on T5)`, and when the first listed task cannot start the label is `Run only T#, the first task that can start:`. The plain sentence is used only when the plan step's first sentence is clean: it ends with a full stop, has no colon list, and does not open with a person (`Person A builds ...`). Otherwise the step's heading in plain words is used, or the line is left out. A long line, a sentence or a held question, is cut at a clause end or a word, never on a dangling word such as `the`, and a held question that opens with a heading such as `Client certificate.` shows the question itself. The slug rule is unchanged. After Held, a `Branch runs:` block lists each `- Branch run:` status line in `walk-progress.md` that is not `merged`, for example `- feat/orders-api-record: running, T2 done, next T5 (log: build-progress/feat--orders-api-record.md)`.
 
 A held task names its open question and who has the answer, or `held, waits on T#`. Each held task is its own line under its branch, and the question is short: its first sentence, no markdown markers, about 100 characters at most (1.164.0). The Run next block is first and is the only place the walk command appears, one entry per branch that has a task that can start, and only when the result is `ready` or `ready-partial`. The bottom keeps Waiting lines and the one-line `/crav1-build-tasks` alternative. Never write a `Next:` line after the Waiting or Held lines (1.153.0). Do not flatten the branches into one list.
 

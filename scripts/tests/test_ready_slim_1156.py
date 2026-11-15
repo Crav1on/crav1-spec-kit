@@ -76,7 +76,7 @@ def run_block(text: str) -> str:
     start = parts.index("Run next:")
     out = [parts[start]]
     for part in parts[start + 1:]:
-        if not part.startswith(("`/crav1-", "**", "Run ")):  # 1.164.0 blocks
+        if not part.startswith(("`/crav1-", "**", "Run ", "---")):  # 1.164.0 blocks, 1.165.0 rule
             break
         out.append(part)
     return "\n\n".join(out)
@@ -115,7 +115,8 @@ class SharedEnding(unittest.TestCase):
                 "pr": None, "ready_branches": ready, "built": [],
             }
             text = br.ending(state)["ending"]
-            others = run_block(text).split("\n\n")[2:]
+            # Its own entry, then the `---` rule between blocks (1.165.0).
+            others = run_block(text).split("\n\n")[3:]
             self.assertEqual("\n\n".join(others), "\n\n".join(readiness_block.split("\n\n")[1:]))
             self.assertIn(f"**{first}**", readiness_block)
 

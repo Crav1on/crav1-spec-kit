@@ -594,7 +594,8 @@ def ending(state: dict) -> dict:
         opens = [_label(task) for task in (other.get("open_tasks") or other.get("tasks") or [])]
         if tasks:
             # One block per ready branch (1.164.0).
-            runs.append(em.branch_block(name, opens or tasks[:1], first=tasks[0], slug=slug, about=other.get("about")))
+            waits = {tid(task.get("id")): task.get("waits") for task in (other.get("open_tasks") or []) if isinstance(task, dict) and task.get("waits")}
+            runs.append(em.branch_block(name, opens or tasks[:1], first=tasks[0], slug=slug, about=other.get("about"), waits=waits))
     built = state.get("built") or []
     header = None
     rows = []

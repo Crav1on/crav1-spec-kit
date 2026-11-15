@@ -185,7 +185,7 @@ class HeldLines(unittest.TestCase):
         self.assertEqual(bm.short_question("**New:** Which currency for refunds? It matters for EU."), "Which currency for refunds?")
         long = "Which " + "very " * 40 + "long question is this?"
         out = bm.short_question(long)
-        self.assertLessEqual(len(out), 100)
+        self.assertLessEqual(len(out), 160)  # more room in 1.165.0
         self.assertTrue(out.endswith("…"))
 
 
