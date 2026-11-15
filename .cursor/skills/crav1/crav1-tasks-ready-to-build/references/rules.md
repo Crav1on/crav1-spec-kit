@@ -11,7 +11,7 @@ Check each task in this order and stop at the first rule that decides it. Every 
    - `verify.md` is missing, or has no row for it, or lists it as failed or **Claimed done, unverified**: **Needs verify**, with what `verify.md` says or `no verify.md row`. Not counted as done.
 2. **No plan.** No `plan.md`: every task is blocked, `no plan.md (recorded)`.
 3. **Blocking questions (1.125.0).**
-   - A kept-open question under `## Open questions` (no `Answered:` line) with `Blocks: T#` that names this task: waiting on a question, `open question "<short question>" (recorded)`. Who comes first from the question's own "Waiting for <who>" phrase, then the latest `Pending:` or `Asked:` line. When neither names anyone, say not named yet.
+   - A kept-open question under `## Open questions` (no `Answered:` line) with `Blocks: T#` that names this task: waiting on a question, `open question "<short question>" (recorded)`. Who comes first from the question's own "Waiting for <who>" phrase, then the latest `Pending:` or `Asked:` line. When neither names anyone, the held line says `Nobody is named to answer it yet.` (1.170.0), not `Waiting for not named yet`.
    - `Blocks: none`, optionally `Blocks: none (later phase)`: this question blocks no task (recorded).
    - No `Blocks:` line (1.137.0): [question-holds.md](question-holds.md). A `T#` in the text that exists in `tasks.md` is the hold, noted inferred from the text. The whole slice is held only when no task is named and resolve-open-questions has never been recorded.
    - A line under `## Risks` in `plan.md` that says do not implement until resolved: [risk-blocks.md](risk-blocks.md). Any `Blocks:` line wins over that wording, including `Blocks: none`.

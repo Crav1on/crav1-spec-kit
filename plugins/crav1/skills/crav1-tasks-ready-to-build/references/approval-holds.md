@@ -4,7 +4,7 @@ Read this when a spec has `## Approval needed`, or when a task is waiting on a p
 
 An item under `## Approval needed` names the person (`Person:`), what they approve, and the tasks it holds (`Holds: T2, T4`). It is not an open question. `Blocks:` does not apply.
 
-- No matching `Approved:` line: those tasks are **Waiting**, `approval "<item>" Waiting for <who>`. Who is `Person:`. When that line is missing, who is `not named yet`, and the task still counts.
+- No matching `Approved:` line: those tasks are **Waiting**, `approval "<item>" Waiting for <who>`. Who is `Person:`. When that line is missing, nobody is named: the line says `approval "<item>" Nobody is named to give it yet.` (1.170.0), and the task still counts.
 - `Holds: none` holds no task.
 - No `Holds:` line: hold the `T#` ids in the item text that exist in `tasks.md`. The reason stays recorded when `Holds:` is written.
 - A `Holds:` line that is neither tasks nor `none` holds nothing. Do not hold the whole slice.

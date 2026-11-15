@@ -2,6 +2,14 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.170.0 (2026-11-15)
+
+The ready check's Catch up first line for a failed verify is short, and a hold with nobody named reads in plain words. A minor release because the ready check, the walk and the verify reply read differently; `verify.md` and the JSON are unchanged.
+
+- **A short failed-verify reason.** `T6 failed verify: <reason>.` pasted the whole Verify cell from `verify.md`, a long paragraph of test names. The reason is now the cell's opening sentence, plus the sentence that names the cause (`... made the asserts stale.`, `... because ...`) when it fits, about 200 characters, cut only at a sentence end (a single long sentence is cut at a clause end). Leading run detail such as `fail at PR 7's tip abc1234: pipeline 6 run 251 (Run tests, log 19), 110 failed, 173 passed.` gives way to the next sentence, which keeps `at PR 7's tip abc1234`. Example: `T6 failed verify: four of the tests T6's verify rests on fail at PR 7's tip abc1234. 9f8e7d6 made the asserts stale.` The full cell stays in `verify.md` and in the readiness JSON for `/crav1-fix-build-gaps`. The verify reply's `T6 failed:` change line uses the same reason.
+- **Nobody named, in plain words.** A held question with nobody named said `Waiting for not named yet.`; it now says `Nobody is named to answer it yet.` An approval says `Nobody is named to give it yet.`, the Waiting line says `(the partner; nobody named for 1)`, the build map's Question line says `nobody named yet`, and the build walk's approval stop says nobody is named to give the yes. The JSON `who` value is unchanged.
+- `walk_ending.failed_reason()` is new; `catch_up_block()` and `verify_changes()` use it. The readiness, rules, approval-holds, build-map and verify-behind references, two walkthroughs, run-ending and the skill pages show it. Tests: `scripts/tests/test_short_reason_1170.py`; the 1.127.0 Waiting-line and build-map Question-line tests expect the new words.
+
 ## 1.169.0 (2026-11-15)
 
 The ready check no longer says verify is behind right after a fresh verify, and a failed verify no longer hides the branches you can build. A minor release because the ready check and the tighten-and-plan ready check read differently, and the verify template drops a line. The build walk and the verify reply are unchanged.

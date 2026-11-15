@@ -2099,6 +2099,14 @@ def _task_num(token):
         return None
 
 
+# Who for a hold that names nobody (1.170.0). An older "not named yet"
+# value reads the same; the line says so in plain words.
+NO_WHO = frozenset({"", "not named yet", "nobody named yet", "none", "nobody"})
+NOBODY_ANSWERS = "Nobody is named to answer it yet."
+NOBODY_GIVES = "Nobody is named to give it yet."
+NOBODY_SHORT = "nobody named yet"
+
+
 def held_phrase(row):
     """The held reason on a ready-check line.
 
@@ -2107,7 +2115,9 @@ def held_phrase(row):
     tag stays off this line.
     """
     reason = (row.get("reason") or "").strip()
-    who = (row.get("who") or "").strip() or "not named yet"
+    who = (row.get("who") or "").strip()
+    if who.lower() in NO_WHO:
+        who = ""
     core = re.sub(
         r"\s*\((?:recorded|inferred|inferred from the text)\)\s*$",
         "",
@@ -2118,7 +2128,8 @@ def held_phrase(row):
     match = re.search(r'approval needed "([^"]*)"', reason, re.I)
     if match:
         what = re.split(r"(?<=[.!?])\s", match.group(1).strip(), maxsplit=1)[0]
-        return f'approval "{what}" Waiting for {who}.'
+        wait = f"Waiting for {who}." if who else NOBODY_GIVES
+        return f'approval "{what}" {wait}'
     # Greedy to the last quote before the tag (1.166.0): a question that
     # quotes another one keeps its inner quotes.
     match = re.search(r'open question "(.*)"(?=\s+\(|\s+blocks the whole slice|\s*$)', reason)
@@ -2129,7 +2140,8 @@ def held_phrase(row):
             note = " Holds the whole slice."
         elif "inferred from the text" in reason.lower():
             note = " Inferred from the text."
-        return f'open question "{question}" Waiting for {who}.{note}'
+        wait = f"Waiting for {who}." if who else NOBODY_ANSWERS
+        return f'open question "{question}" {wait}{note}'
     return core or "held"
 
 
@@ -2318,7 +2330,9 @@ def _question_line(questions, names=None):
     parts = []
     for question in questions:
         short = clean_prose(_first_sentence(question["text"]), names) or "open question"
-        who = question.get("who") or "not named yet"
+        who = question.get("who") or ""
+        if who.strip().lower() in NO_WHO:
+            who = NOBODY_SHORT
         if question.get("mark") == "inferred":
             parts.append(f"{short} — {who} (inferred from the text)")
         elif question.get("mark") == "whole":

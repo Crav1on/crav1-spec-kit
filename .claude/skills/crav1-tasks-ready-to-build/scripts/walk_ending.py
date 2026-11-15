@@ -144,6 +144,87 @@ def _sentences(text):
     return [part.strip() for part in SENTENCE_SPLIT.split(_plain(text)) if part.strip()]
 
 
+# A failed verify's reason in the Catch up first block (1.170.0).
+FAILED_REASON_LIMIT = 200
+RUN_DETAIL = re.compile(r"^(?:tests?\s+)?fail(?:s|ed)?\s+(at\s+[^:]{3,80}?):\s+", re.I)
+CAUSE_WORDS = re.compile(
+    r"\bmade\b.{0,60}\bstale\b|\bbecause\b|\bcaused\b|\bdue to\b|\bbroke\b|\bsince commit\b",
+    re.I,
+)
+LOWER_LEAD = frozenset(
+    "the a an all some most several every each no none one two three four five six "
+    "seven eight nine ten test tests it its this these those both".split()
+)
+EARLIER_PASS = re.compile(r"^(?:earlier|previous|last)\s+(?:pass|run)\b", re.I)
+
+
+def _clause_cut(sentence, limit):
+    """A sentence cut at its last clause end that fits, or "" (1.170.0)."""
+    one = sentence.rstrip(".!?")
+    if len(one) + 1 <= limit:
+        return one + "."
+    room = one[: limit - 1]
+    cut = -1
+    for mark in ("; ", ", ", " — ", " - "):
+        cut = max(cut, room.rfind(mark))
+    if cut < 20:
+        return ""
+    head = _drop_dangling(room[:cut])
+    return head + "." if len(head.split()) >= 3 else ""
+
+
+def failed_reason(text, limit=FAILED_REASON_LIMIT):
+    """A failed verify's Verify cell as one short reason (1.170.0).
+
+    The cell's opening sentence, plus the sentence that names the cause
+    (`3971963 made the asserts stale.`, `... because ...`) when there is
+    one and it fits, about `limit` characters, cut only at a sentence end.
+    Leading run detail (`fail at PR 7's tip abc1234: pipeline 6 run 251
+    (Run tests, log 19), 110 failed, 173 passed.`) gives way to the next
+    sentence, which keeps `at PR 7's tip abc1234` when it ends on `fail`.
+    One sentence that is too long is cut at a clause end, else shortened
+    at a word with `…`. The full cell stays in verify.md.
+    """
+    sentences = _sentences(text)
+    if not sentences:
+        return ""
+    where = ""
+    match = RUN_DETAIL.match(sentences[0])
+    if match:
+        where = match.group(1).strip()
+        rest = sentences[0][match.end():].strip()
+        if len(sentences) > 1:
+            sentences = sentences[1:]
+        elif rest:
+            sentences = [rest]
+    lead = sentences[0]
+    if where and re.search(r"\bfail(?:s|ed)?[.!]?$", lead, re.I):
+        lead = lead.rstrip(".!") + " " + where + "."
+    if not lead.endswith((".", "!", "?")):
+        lead += "."
+    cause = ""
+    for sentence in sentences[1:]:
+        if EARLIER_PASS.match(sentence):
+            continue
+        if CAUSE_WORDS.search(sentence):
+            cause = sentence if sentence.endswith((".", "!", "?")) else sentence + "."
+            break
+    if len(lead) > limit:
+        cut = _clause_cut(lead, limit)
+        lead = cut or shorten(lead, limit)
+        cause = ""
+    if cause and len(cause) > limit - len(lead) - 1:
+        cut = _clause_cut(cause, limit - len(lead) - 1) if limit - len(lead) - 1 > 30 else ""
+        cause = cut
+    if cause and not CAUSE_WORDS.search(cause):
+        cause = ""
+    out = f"{lead} {cause}".strip() if cause else lead
+    first = out.split(" ", 1)[0]
+    if first.lower() in LOWER_LEAD and first[:1].isupper():
+        out = out[:1].lower() + out[1:]
+    return out
+
+
 def step_heading(text):
     """A plan step's heading in plain words, or "" (1.165.0).
 
@@ -529,12 +610,13 @@ def catch_up_block(slug=None, behind=None, orphans=None, ahead=0, failed=None):
     A built task whose verify failed (`failed`, T#s or dicts with `task` and
     `reason`, 1.169.0) gets its own `Fix T#:` label and
     /crav1-fix-build-gaps command, not a second verify. Empty when nothing
-    is behind.
+    is behind. The reason is failed_reason(), one short sentence or two
+    (1.170.0), never the whole Verify cell.
     """
     fails = []
     for item in failed or []:
         if isinstance(item, dict):
-            tid, why = str(item.get("task") or "").strip(), _plain(item.get("reason") or "")
+            tid, why = str(item.get("task") or "").strip(), failed_reason(item.get("reason") or "")
         else:
             tid, why = str(item).strip(), ""
         if tid and tid not in [f[0] for f in fails]:
@@ -836,7 +918,8 @@ def verify_changes(previous, current, task_ids=None):
             continue
         word = words.get(key, "checked")
         head = f"{tid} {word}" if before is not None else f"{tid} new, {word}"
-        lines.append(f"{head}: {shorten(verify, 120)}" if verify else head)
+        short = failed_reason(verify, 160).rstrip(".") if key == "failed" else shorten(verify, 120)
+        lines.append(f"{head}: {short}" if verify else head)
     known = set(task_ids) if task_ids is not None else None
     for tid in previous:
         if tid not in current and (known is None or tid not in known):

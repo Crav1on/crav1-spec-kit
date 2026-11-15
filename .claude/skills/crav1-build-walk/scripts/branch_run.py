@@ -216,9 +216,12 @@ def stop_for(task_id: str, line: str, questions: list, holds: dict) -> dict | No
                     "line": f"{task_id} has an open question: {question.get('text')}"}
     item = holds.get(task_id)
     if item:
-        who = item.get("who") or "not named yet"
-        return {"kind": "approval", "task": task_id,
-                "line": f"{task_id} needs a yes from {who} that is not recorded"}
+        who = (item.get("who") or "").strip()
+        if who.lower() in ("", "not named yet", "nobody named yet"):
+            line = f"{task_id} needs a yes that is not recorded, and nobody is named to give it yet"
+        else:
+            line = f"{task_id} needs a yes from {who} that is not recorded"
+        return {"kind": "approval", "task": task_id, "line": line}
     if MANUAL_MARK.search(line or ""):
         return {"kind": "manual", "task": task_id,
                 "line": f"{task_id} has a manual, secret, or live step that needs you"}
