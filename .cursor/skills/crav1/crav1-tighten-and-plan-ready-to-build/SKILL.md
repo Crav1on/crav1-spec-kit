@@ -21,11 +21,11 @@ It does not replace the skills it runs. It does not start Build. It never runs `
 
 ## Route first (1.119.0)
 
-Read [references/common.md](references/common.md) once. Then open only the file for the point you are at. Do not open the others yet.
+Read [references/common.md](references/common.md) once. Then open only the file for the point you are at.
 
 Before any step reads or writes, fetch the specs repo with `<interpreter> -X utf8 scripts/repo_sync.py status --repo <specs-repo>`, as `crav1-docs/reference/running-scripts.md` says (1.151.0). Behind or diverged: stop and print Run next as `git pull --no-rebase`. Never rebase. No upstream or offline: say so once and continue. A claimed task in `docs/specs/<slug>/claims.md` (`In progress:` lines) is left unchanged: no renumber, reorder, rewrite, or removal. A claim older than three days, or the file's `Claim max age:` line, gets a warning and is never cleared on its own. After writing `tasks.md`, run `<interpreter> -X utf8 scripts/claims.py preserve --before <old> --after docs/specs/<slug>/tasks.md --root <spec-folder> --write` and say once which claimed tasks were kept.
 
-- A `walk-progress.md` already beside the spec: read [references/progress.md](references/progress.md). Resume may report status. It does not start a step.
+- A `walk-progress.md` beside the spec: open only the file `read` names. Resume may report status. [references/progress.md](references/progress.md) is for a stop or a clear (1.164.0).
 - A playbook path was given: read [references/playbook.md](references/playbook.md) and ask the step 1 question before any later step, including a read-only check such as readiness. No step runs until that choice is answered. No playbook: do not open that file. Say step 1 is skipped and go to step 2.
 - Steps 2 through 6: read [references/steps.md](references/steps.md).
 - Step 7: read [references/readiness.md](references/readiness.md). Do not open it, and do not run readiness, until the playbook choice is answered when a playbook was named.

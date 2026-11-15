@@ -135,12 +135,12 @@ def assert_complete(test: unittest.TestCase, ending: str, slug: str | None) -> N
     for index, line in enumerate(lines):
         if line not in commands:
             continue
+        label = lines[index - 1] if index else ""
         branch_form = BRANCH_COMMAND.match(line)
         if branch_form:
-            # 1.155.0: the whole-branch entry, offered beside the next task.
-            detail = lines[index + 1]
-            test.assertTrue(detail.startswith(f"branch {branch_form.group('branch')}, every open task: "), detail)
-            test.assertGreaterEqual(len(re.findall(r"T\d+", detail)), 2)
+            # 1.164.0: the whole branch, under its label, before the first task.
+            test.assertEqual(label, "Run the whole branch:", label)
+            test.assertTrue(lines[index + 1].startswith("Run only T"), lines[index + 1])
             if slug:
                 test.assertEqual(branch_form.group("slug"), slug)
             else:
@@ -153,11 +153,10 @@ def assert_complete(test: unittest.TestCase, ending: str, slug: str | None) -> N
         test.assertNotIn("branch", inner)
         args = inner.split()
         test.assertEqual(args[0], "/crav1-build-walk")
-        detail = lines[index + 1]
-        test.assertTrue(detail.startswith("branch "))
+        # 1.164.0: the label line names the same T#.
+        test.assertRegex(label, r"^Run (only T\d+, the first task|T\d+):$")
         command_ids = re.findall(r"T\d+", inner)
-        detail_ids = re.findall(r"T\d+", detail)
-        test.assertEqual(command_ids, detail_ids)
+        test.assertEqual(command_ids, re.findall(r"T\d+", label))
         test.assertGreaterEqual(len(command_ids), 1)
         if slug:
             test.assertIn(slug, args)
@@ -177,7 +176,7 @@ class EndingBlock(unittest.TestCase):
         self.assertEqual(payload["result"], "ready-partial")
         self.assertLess(ending.index("Run next:"), ending.index("Waiting:"))
         self.assertLess(ending.rindex("`/crav1-build-walk"), ending.index("Waiting:"))
-        self.assertEqual(ending.count("`/crav1-build-walk"), len(payload["run_lines"]))
+        self.assertEqual(ending.count("`/crav1-build-walk"), sum(entry.count("`/crav1-build-walk") for entry in payload["run_lines"]))
         self.assertIn("/crav1-build-tasks builds one task without the walk.", ending)
         self.assertNotIn("Next: /crav1-build-walk", ending)
         self.assertIn("verify.md is behind tasks.md (T1)", ending)
@@ -185,10 +184,11 @@ class EndingBlock(unittest.TestCase):
         lines = ending.splitlines()
         commands = command_lines(ending)
         self.assertGreaterEqual(len(commands), 2)
-        # A blank line separates branch entries.
-        first = lines.index(commands[0])
-        second = lines.index(commands[1])
-        self.assertEqual(lines[second - 1], "")
+        # A blank line comes before each bold branch heading (1.164.0).
+        heads = [i for i, line in enumerate(lines) if line.startswith("**") and line.endswith("**")]
+        self.assertTrue(heads)
+        for head in heads:
+            self.assertEqual(lines[head - 1], "")
         for held in payload["held_lines"]:
             self.assertIn(held, ending)
             self.assertRegex(held, r"T\d+ \S")

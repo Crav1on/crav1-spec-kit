@@ -8,7 +8,22 @@ A skill names the next step. It does not run it, unless that skill already runs 
 
 The ready check (`/crav1-tasks-ready-to-build`), the tighten-and-plan ready check, and `/crav1-build-walk` build their ending with one shared script, skill `crav1-tasks-ready-to-build` `scripts/walk_ending.py --json <state>` (each of the three skills ships a copy of that `walk_ending` script). The skill gives that text once as its answer, as-is. It never pastes the raw tool output and then repeats the reply, never adds more than one short lead sentence before it, never adds, drops, or rewrites a line, and never adds a `Next:` line of its own. For the same ready branches, the three print the same Run next entries. The order is:
 
-1. `Run next:` first. Each command alone in its own code span, with the branch and task line under it. A ready branch gets its next task, `` `/crav1-build-walk <slug> T#` ``, and, with two or more open tasks, the whole branch, `` `/crav1-build-walk <slug> <branch>` `` (1.155.0).
+Before a ready-check or walk ending, the reply has at most one short lead sentence of recap, for example `The plan review is done.`, then the ending, `Run next:` first. No longer recap and no list before it (1.164.0).
+
+1. `Run next:` first. Since 1.164.0 each ready branch is one block: the branch in bold, one plain sentence of what it does from the plan step that owns it (left out when there is none), `<n> open tasks:` with one task per line, then `Run the whole branch:` with `/crav1-build-walk <slug> <branch>` and `Run only T#, the first task:` with `/crav1-build-walk <slug> T#`. Each label is on its own line and each command is alone in its code span on the next line. A branch with one open task says `1 open task:`, then `Run T#:` and the one command. For example:
+
+   ```text
+   **feat/orders-api-record**
+   Record each decision with who made it and when.
+   2 open tasks:
+   - T2 Record the decision
+   - T5 Store the card
+
+   Run the whole branch:
+   `/crav1-build-walk orders-api feat/orders-api-record`
+   Run only T2, the first task:
+   `/crav1-build-walk orders-api T2`
+   ```
 2. `Held:` lines, then `Branch runs:` status lines.
 3. For a branch run: `Built on <branch>:` (one line per task, with its commit and tests), then `Left:`.
 4. `Loop:`, verify-behind, orphan verify rows, and other `Waiting:` lines.
@@ -102,3 +117,7 @@ Left: 2 gaps to tighten, 3 open questions. Next: /crav1-tighten-spec orders-retr
 After the skill's own recap, print `Next`, then any `Waiting` lines, then `Uncommitted` when it applies. Nothing else is a next-step list.
 
 The tighten-and-plan ready check is the exception (1.150.0). Print `Run next:` first, then each held line, then any `Loop` and `Waiting` lines, then at most the one-line `/crav1-build-tasks` alternative, then `Uncommitted` when it applies. No `Next:` line follows the Waiting lines (1.153.0). `Run next:` is not a second step. It is the same build-walk command, short enough to start in a new session.
+
+## Zoom the map (1.164.0)
+
+The ready-check reply has the `Build map: <path>` line, then a label on its own line, `Zoom the map in your browser:`, then the command alone in its code span, `` `/crav1-tasks-ready-to-build <slug> open-map` ``. Only `open-map` is offered there. `export-map` stays inside `build-map.md`.

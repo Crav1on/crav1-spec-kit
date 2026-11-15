@@ -593,9 +593,8 @@ def ending(state: dict) -> dict:
         tasks = [_label(task) for task in other.get("tasks") or []]
         opens = [_label(task) for task in (other.get("open_tasks") or other.get("tasks") or [])]
         if tasks:
-            runs.append(em.run_entry(tasks[:1], name, slug=slug))
-        if len(opens) >= 2:
-            runs.append(em.branch_entry(opens, name, slug=slug))
+            # One block per ready branch (1.164.0).
+            runs.append(em.branch_block(name, opens or tasks[:1], first=tasks[0], slug=slug, about=other.get("about")))
     built = state.get("built") or []
     header = None
     rows = []

@@ -4,10 +4,11 @@
 The ready check (/crav1-tasks-ready-to-build), the tighten-and-plan ready
 check, and /crav1-build-walk all end a run in the same shape, built here:
 
-  1. Run next, first. Each command alone in its own code span, with the
-     branch and task line under it. A ready branch gets its next task
-     (`/crav1-build-walk <slug> T#`) and, with two or more open tasks, the
-     whole branch (`/crav1-build-walk <slug> <branch>`).
+  1. Run next, first. One block per ready branch (1.164.0): the bold
+     branch, one plain sentence from its plan step, `<n> open tasks:` one
+     per line, then `Run the whole branch:` and `Run only T#, the first
+     task:`, each command alone in its code span on the line under its
+     label. One open task: `Run T#:` and one command.
   2. Held lines, then Branch runs status lines.
   3. Built (one line per task) and Left, for a branch run.
   4. Loop, verify-behind, orphan and other Waiting lines.
@@ -91,16 +92,68 @@ def branch_entry(open_labels, branch_name, slug=None):
     return f"`{command}`\nbranch {branch_name}, every open task: {', '.join(names)}"
 
 
-def run_entries(labels, branch_name, slug=None, open_labels=None):
-    """The next task, then the whole branch when it has two or more open tasks."""
+def about_sentence(text, limit=140):
+    """One plain sentence of what a branch does, from its plan step (1.164.0)."""
+    one = re.sub(r"[*_`]+", "", str(text or ""))
+    one = re.sub(r"\s+", " ", one).strip()
+    if not one:
+        return ""
+    one = re.split(r"(?<=[.!?])\s", one, maxsplit=1)[0]
+    if len(one) > limit:
+        one = one[: limit - 1].rsplit(" ", 1)[0].rstrip(" ,;:") + "…"
+    if one[-1] not in ".!?…":
+        one += "."
+    return one[:1].upper() + one[1:]
+
+
+def _task_id(label):
+    match = re.match(r"(T\d+)\b", str(label).strip())
+    return match.group(1) if match else str(label).strip()
+
+
+def branch_block(branch_name, open_labels, first=None, slug=None, about=None):
+    """One ready branch in Run next (1.164.0).
+
+    The bold branch, one plain sentence from its plan step (left out when
+    there is none), the open tasks one per line, then each command alone in
+    its code span under a label line: the whole branch first, then only the
+    first task. A branch with one open task gets `Run T#:` and one command.
+    """
+    names = [str(label).strip() for label in open_labels or [] if str(label).strip()]
+    first = str(first).strip() if first else (names[0] if names else "")
+    if not names and first:
+        names = [first]
+    if not names:
+        return ""
+    lines = [f"**{branch_name}**"]
+    sentence = about_sentence(about) if about else ""
+    if sentence:
+        lines.append(sentence)
+    count = len(names)
+    lines.append(f"{count} open task{'' if count == 1 else 's'}:")
+    lines.extend(f"- {name}" for name in names)
+    lines.append("")
+    first_id = _task_id(first)
+    task_cmd = f"/crav1-build-walk {slug} {first_id}" if slug else f"/crav1-build-walk {first_id}"
+    if count == 1:
+        lines.append(f"Run {first_id}:")
+        lines.append(f"`{task_cmd}`")
+    else:
+        branch_cmd = f"/crav1-build-walk {slug} {branch_name}" if slug else f"/crav1-build-walk {branch_name}"
+        lines.append("Run the whole branch:")
+        lines.append(f"`{branch_cmd}`")
+        lines.append(f"Run only {first_id}, the first task:")
+        lines.append(f"`{task_cmd}`")
+    return "\n".join(lines)
+
+
+def run_entries(labels, branch_name, slug=None, open_labels=None, about=None):
+    """One Run next block per ready branch (1.164.0): see branch_block."""
     labels = [label for label in labels or [] if str(label).strip()]
     if not labels:
         return []
-    entries = [run_entry(labels[:1], branch_name, slug=slug)]
     opens = list(open_labels) if open_labels is not None else list(labels)
-    if len(opens) >= 2:
-        entries.append(branch_entry(opens, branch_name, slug=slug))
-    return entries
+    return [branch_block(branch_name, opens, first=labels[0], slug=slug, about=about)]
 
 
 def run_block(entries) -> str:
@@ -205,6 +258,10 @@ def ready_reply(
         tail.append(f"Source: docs/specs/{slug}/" + ", ".join(sources))
     if build_map:
         tail.append(f"Build map: {build_map}")
+        # The zoomable page, label on its own line, command alone (1.164.0).
+        # export-map stays inside build-map.md.
+        tail.append("Zoom the map in your browser:")
+        tail.append(f"`/crav1-tasks-ready-to-build {slug} open-map`")
     if tail:
         parts.append("\n".join(tail))
     return "\n\n".join(parts)

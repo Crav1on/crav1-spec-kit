@@ -628,9 +628,8 @@ def _other_ready(state: dict, current: str | None) -> list:
 def branch_entries(branch: dict, slug: str | None = None) -> list[dict]:
     """Run next entries for one ready branch (1.155.0).
 
-    The next task, `/crav1-build-walk <slug> T#`, then the whole branch,
-    `/crav1-build-walk <slug> <branch>`, only when the branch has two or more
-    open tasks. Each is its own entry with its own Next line.
+    One Run next block (1.164.0): the whole branch first when it has two or
+    more open tasks, then the first task. Each keeps its own Next sentence.
     """
     tasks = branch.get("tasks") or []
     name = branch.get("branch") or ""
@@ -638,24 +637,33 @@ def branch_entries(branch: dict, slug: str | None = None) -> list[dict]:
     if opens is None:
         opens = tasks
     entries = []
-    if tasks:
-        first = tasks[:1]
-        label = _task_list(first) or name
-        entries.append(_entry(
-            "/crav1-build-walk",
-            f"that work is on {name}" + (f" ({label})" if label and label != name else ""),
-            first,
-            name,
-            slug,
-        ))
+    if not tasks:
+        return entries
+    # One Run next block per branch (1.164.0): whole branch first, then the
+    # first task. The second entry keeps its Next sentence as data only.
+    first = tasks[:1]
+    label = _task_list(first) or name
+    task_entry = _entry(
+        "/crav1-build-walk",
+        f"that work is on {name}" + (f" ({label})" if label and label != name else ""),
+        first,
+        name,
+        slug,
+    )
+    open_labels = [_task_label(task) for task in opens] or [_task_label(task) for task in first]
+    block = map_mod().branch_block(name, open_labels, first=_task_label(first[0]), slug=slug, about=branch.get("about"))
     if name and len(opens) >= 2:
         command = f"/crav1-build-walk {slug} {name}" if slug else f"/crav1-build-walk {name}"
-        run = map_mod().branch_entry([_task_label(task) for task in opens], name, slug=slug)
         entries.append({
             "command": command,
-            "run": run,
+            "run": block,
             "next": _one(command, f"every open task on {name} builds in one run ({_task_list(opens)})"),
         })
+        task_entry["run"] = ""
+        entries.append(task_entry)
+    else:
+        task_entry["run"] = block
+        entries.append(task_entry)
     return entries
 
 
@@ -725,6 +733,29 @@ def _because(phase: str, state: dict) -> tuple[str, str]:
     return ("/crav1-build-walk", f"the walk is on {branch}")
 
 
+def _waiting_line(phase: str, state: dict, because: str) -> str:
+    """A plain Waiting line: who or what the walk waits for, and why (1.164.0)."""
+    branch = state.get("branch") or "this branch"
+    tasks = _task_list(state.get("tasks") or []) or "the task"
+    pr = state.get("pr")
+    named = f"pull request {pr}" if pr else "the pull request"
+    who = state.get("who")
+    if phase == "confirm-owner":
+        text = f"you, to say whether your work goes into {who or 'the other owner'}'s pull request on {branch}"
+    elif phase == "approval":
+        if state.get("approval_asked"):
+            text = f"the approval that holds {tasks} to be recorded"
+        else:
+            text = f"an answer on the approval that holds {tasks}"
+    elif phase == "live-yes":
+        text = f"your yes to run {tasks} live"
+    elif phase == "wait-merge":
+        text = (f"{who} to merge {named}" if who else f"{named} to be merged") + f", then the tasks on {branch} are ticked"
+    else:
+        text = because
+    return f"Waiting: {text}."
+
+
 # Phases that wait on a person or a merge. With no Next line (1.157.0), the
 # reason is a Waiting line when the caller passed none.
 WAIT_PHASES = {"confirm-owner", "approval", "live-yes", "wait-merge"}
@@ -764,8 +795,9 @@ def next_for(state: dict) -> dict:
         phase = "comment" if state.get("pushed") and not state.get("commented") else "wait-merge"
     command, because = _because(phase, state)
     if not waiting and phase in WAIT_PHASES:
-        # No Next line carries the reason any more (1.157.0): say it as Waiting.
-        waiting = f"Waiting: {because[:1].upper()}{because[1:]}."
+        # No Next line carries the reason any more (1.157.0): say it as Waiting,
+        # in plain words that name who or what and why (1.164.0).
+        waiting = _waiting_line(phase, state, because)
     branch = state.get("branch") or ""
     tasks = state.get("tasks") or []
     entries = []

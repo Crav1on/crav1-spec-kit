@@ -8,6 +8,8 @@
 
 Walk one work branch from build through merge, with one Next while it runs.
 
+1.164.0: cards follow the card wording rule in `docs/reference/question-cards.md`: a plain question, each option saying what happens, the recommended one first with why. The other-owner card asks `Should I add my work to their pull request?`. Settle-and-push is one card: one yes commits the walk's files and pushes the specs repo. Waiting lines name who or what and why, for example `Waiting: person A to merge pull request 71, then the tasks on feat/orders-cicd are ticked.`
+
 1.160.0: `claims.py` writes `since` in local time with the local offset, to the second, for example `2026-11-14T23:40:00+01:00`; an older UTC line still reads. Your own claim does not hold a task in the ready check: `walk_progress.py readiness --root <spec-folder> --user <name> --branch <branch>` (user defaults to `git config user.name`) gives your claimed task `refused` false and `in progress by you`. Someone else's claim still refuses it.
 
 1.160.0: the walk offer keeps a task-line branch that is only on origin, or is the head of an open pull request, and checks it out without a card when `--recommend` prints `checkout:`. Only a branch missing everywhere gets a new name.

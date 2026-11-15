@@ -8,6 +8,8 @@
 
 Walk a draft spec through architecture, tighten, questions, and the plan until the ready check is clear.
 
+1.164.0: cards follow the card wording rule in `docs/reference/question-cards.md`. The playbook, kept-open batch, jump-back and same-or-new cards ask a plain question and each option says what happens. `spec-finding` prints a `background` sentence and an option `text`, for example `Fix P2 in the spec now, before the plan goes on?`. The readiness output adds `reopen_cards`, a plain clear-or-rerun card per reopened step, for example `Skip redoing the plan review?`. The record card says what will be saved, without quoting the progress line. One own-claimed task reads `Your own claim does not hold it.` `start` and `resume` return `read`, the one reference the next step needs, and the walk opens only that file. At most one short lead sentence comes before the ending.
+
 1.141.0: the plan step writes an `## Approval needed` item when a constraint says a named person gives a yes before something. The walk does not write that item itself. An edit confined to that section reopens no step. An unapproved item holds only its tasks (`ready-partial`).
 
 [`/crav1-tighten-and-plan-ready-to-build`](crav1-tighten-and-plan-ready-to-build.md) (1.119.0) is one guided walk with two starts. A playbook path is optional. Without one, step 1 is skipped. Both starts then use the same steps and the same ready check. The walk runs the existing skills. It does not replace them. There is no automatic mode.

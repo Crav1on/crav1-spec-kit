@@ -112,6 +112,14 @@ At the start of a run, `start` returns `resume` before anything is recorded. Tha
 
 On resume, run `resume`. With no playbook on this command, add `--no-playbook` so a playbook step that was never started stays skipped. The script returns `keep`, `reopen`, or `not-started`, and `continue_from`. A recorded extra is `keep` and does not change `continue_from`. Explain each reopen with its `impact` before redoing it. Leave `keep` steps as they are. After a step or an extra is recorded, run `resume` again.
 
+Ask the clear-or-rerun question with the readiness output's `reopen_cards` entry for that step: its `background` sentence first, then its `question`, then its `options` in that order, each with its `text`. For example:
+
+Card: Skip redoing the plan review?
+- **Skip redoing the plan review (Recommended)** (`nothing new`): keep the plan review as done and go straight on to the ready check. Why: only branch tags were added to three tasks; no task text changed.
+- **Redo the plan review** (`rerun`): run the plan review again on the current files, then the walk goes on.
+
+The background names the change in plain words, for example `The plan review only reopened because three tasks got a branch tag.` Never put stamps, `Done`, `Result`, step ids, or a command in the card.
+
 `clear --step <id> --yes` refreshes one reopened step after the user says `nothing new`. `Done` and `Result` stay. Other steps stay as they are. That is the path when a reopened step has nothing new. Do not record `nothing-to-do` over it. A `nothing-to-do` record keeps an earlier `done` Result.
 
 `playbook-status` answers whether this walk already applied that file. It does not read the spec. The apply compare in step 1 does that.

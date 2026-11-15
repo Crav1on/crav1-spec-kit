@@ -58,11 +58,16 @@ Result: ready-partial
 
 Run next:
 
-`/crav1-build-walk T5`
-branch feat/orders-retry, T5 refund to the original card
+**feat/orders-retry**
+Retry a failed refund to the original card.
+2 open tasks:
+- T5 refund to the original card
+- T6 send the mail
 
+Run the whole branch:
 `/crav1-build-walk feat/orders-retry`
-branch feat/orders-retry, every open task: T5 refund to the original card, T6 send the mail
+Run only T5, the first task:
+`/crav1-build-walk T5`
 
 Held:
 - `feat/orders-currency` (wave 1): T7 choose the currency — open question "Which currency for refunds?" Waiting for the partner.
@@ -90,7 +95,7 @@ Done: 3
 
 The ending is shared (1.156.0). `/crav1-tasks-ready-to-build`, the tighten-and-plan ready check and `/crav1-build-walk` build it with one shared `walk_ending` script, so for the same ready branches the Run next entries are the same words in all three. `/crav1-build-tasks` reads the full readiness JSON (`--full`) to start the ready tasks. See [How a run ends](reference/run-ending.md#the-shared-walk-ending-11560).
 
-Since 1.155.0 each ready branch offers its next task, and, when the branch has two or more open tasks, the whole branch as a second entry, built in one run by `/crav1-build-walk <slug> <branch>`. A branch with one open task gets only the T# entry. When a whole-branch run is going, or stopped, the ending also has a `Branch runs:` block from the `- Branch run:` status lines in `walk-progress.md`, for example `- feat/orders-retry: running, T5 done, next T6 (log: build-progress/feat--orders-retry.md)`. A merged run is left out.
+Since 1.164.0 each ready branch is one block with its open tasks listed, `Run the whole branch:` first and `Run only T#, the first task:` second, each command alone on its own line under its label; the reply also ends with `Zoom the map in your browser:` and `/crav1-tasks-ready-to-build <slug> open-map`. Before that, since 1.155.0 each ready branch offered its next task, and, when the branch has two or more open tasks, the whole branch as a second entry, built in one run by `/crav1-build-walk <slug> <branch>`. A branch with one open task gets only the T# entry. When a whole-branch run is going, or stopped, the ending also has a `Branch runs:` block from the `- Branch run:` status lines in `walk-progress.md`, for example `- feat/orders-retry: running, T5 done, next T6 (log: build-progress/feat--orders-retry.md)`. A merged run is left out.
 
 ## Getting recorded reasons
 

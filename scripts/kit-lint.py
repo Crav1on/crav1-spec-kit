@@ -347,6 +347,138 @@ def stray_next_problems(kit):
     return out
 
 
+# Card wording (1.164.0). A card in a skill file is written as a block:
+#   Card: <short plain question>
+#   - **<label> (Recommended)** (`word`): <what happens>. Why: <reason>
+#   - **<label>** (`word`): <what happens>
+# Only `Card:` lines and the option lines right under them are read, so prose
+# is never checked. The check runs on the skills in CARD_LINT_SKILLS (a
+# ratchet: 1.165.0 adds the rest). The rule is docs/reference/question-cards.md.
+CARD_LINT_SKILLS = (
+    "crav1-tasks-ready-to-build",
+    "crav1-build-walk",
+    "crav1-tighten-and-plan-ready-to-build",
+    "crav1-open-pr",
+    "crav1-merge-pr",
+    "crav1-pr-status",
+    "crav1-review-pr",
+)
+# Kit terms that never belong in a card's question or options.
+CARD_JARGON = (
+    "needs_yes",
+    "needs-yes",
+    "other-owner mode",
+    "step name",
+    "map mark",
+    "progress file",
+    "Owner: other",
+    "Owner: self",
+    "headless",
+)
+CARD_LINE = re.compile(r"^\s*(?:[-*]\s+)?Card:\s*(.*)$")
+CARD_OPTION = re.compile(r"^\s*(?:\d+\.|[-*])\s+(.*)$")
+CARD_BRACKETS = re.compile(r"[()\[\]{}<>]")
+CARD_WORD = re.compile(r"^\s*\(`[^`\n]+`\)")
+# An option list written inline in prose instead of a Card block.
+INLINE_CARD = re.compile(
+    r"(?i)(?:\bcard is|\boptions?:?|\boffer)\s+`[^`\n]+`\s*\(Recommended\)\s*(?:,|\bor\b|/)"
+    r"|\*\*[^*\n]+\(Recommended\)\*\*\s*/\s*\*\*"
+)
+
+
+def _jargon(text):
+    low = text.lower()
+    return [word for word in CARD_JARGON if word.lower() in low]
+
+
+def card_option_parts(line):
+    """(label, description) of one option line, or None when it is not one."""
+    match = CARD_OPTION.match(line)
+    if not match:
+        return None
+    rest = match.group(1).strip()
+    bold = re.match(r"^\*\*(.+?)\*\*(.*)$", rest)
+    if bold:
+        label, tail = bold.group(1), bold.group(2)
+        tail = CARD_WORD.sub("", tail)
+        return label.strip().rstrip(".:"), tail.strip().lstrip(":.—-").strip()
+    plain = re.sub(r"`[^`\n]*`", lambda m: "x" * len(m.group(0)), rest)
+    cut = plain.find(": ")
+    if cut < 0:
+        return rest, ""
+    return rest[:cut].strip(), rest[cut + 2:].strip()
+
+
+def card_hits(question, options):
+    """Problems with one card: its question and its (label, description) options."""
+    hits = []
+    if CARD_BRACKETS.search(question):
+        hits.append("the question has brackets")
+    for word in _jargon(question):
+        hits.append(f"the question uses the kit term `{word}`")
+    if not options:
+        hits.append("the card has no options")
+    for index, (label, text) in enumerate(options):
+        if len(re.findall(r"[A-Za-z0-9]+", text)) < 3:
+            hits.append(f"option `{label}` does not say what happens")
+        for word in _jargon(label + " " + text):
+            hits.append(f"option `{label}` uses the kit term `{word}`")
+        if index and "(Recommended)" in label:
+            hits.append(f"option `{label}` is Recommended but not first")
+    return hits
+
+
+def card_blocks(text):
+    """(line number, question, options) for each Card block outside code fences."""
+    blocks, fence, lines = [], False, text.splitlines()
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        if line.lstrip().startswith("```"):
+            fence = not fence
+        match = None if fence else CARD_LINE.match(line)
+        if match:
+            options, j = [], i + 1
+            indent = _indent(lines[j]) if j < len(lines) else 0
+            while j < len(lines) and card_option_parts(lines[j]) is not None and _indent(lines[j]) == indent:
+                options.append(card_option_parts(lines[j]))
+                j += 1
+            blocks.append((i + 1, match.group(1).strip(), options))
+            i = j
+            continue
+        i += 1
+    return blocks
+
+
+def card_text_hits(text):
+    """Card problems in one skill file: every Card block, plus inline option lists."""
+    hits = []
+    for lineno, question, options in card_blocks(text):
+        hits.extend((lineno, why) for why in card_hits(question, options))
+    for i, line in enumerate(text.splitlines(), 1):
+        if INLINE_CARD.search(line):
+            hits.append((i, "options listed inline; write a Card block"))
+    return hits
+
+
+def card_wording_problems(kit, skills=CARD_LINT_SKILLS):
+    root = os.path.join(kit, ".cursor", "skills", "crav1")
+    out = []
+    for name in skills:
+        skill = os.path.join(root, name)
+        paths = [os.path.join(skill, "SKILL.md")]
+        paths += glob.glob(os.path.join(skill, "references", "**", "*.md"), recursive=True)
+        paths += glob.glob(os.path.join(skill, "branches", "**", "*.md"), recursive=True)
+        for path in sorted(paths):
+            if not os.path.isfile(path):
+                continue
+            with open(path, encoding="utf-8") as fh:
+                text = fh.read()
+            for lineno, why in card_text_hits(text):
+                out.append(f"{os.path.relpath(path, kit)}:{lineno}: card wording: {why} (docs/reference/question-cards.md)")
+    return out
+
+
 def bytecode_problems(kit):
     out = []
     for path in sorted(py_entry_points(kit)):
@@ -415,6 +547,7 @@ def main(argv):
     errs.extend(run_ending_problems(kit))
     errs.extend(dead_card_problems(kit))
     errs.extend(stray_next_problems(kit))
+    errs.extend(card_wording_problems(kit))
     errs.extend(invocation_problems(kit))
     for e in errs: print("FAIL  " + e)
     print(f"kit lint: {len(skills)} skills, {len(errs)} problem(s)")

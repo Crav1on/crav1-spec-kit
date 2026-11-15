@@ -9,11 +9,25 @@ All offers go in **one** prompt at the end of the run, the run's only prompt. Ea
 Order of questions:
 
 1. **Thread status**, one question per thread with a flag or a settled point you may change:
-   - `Thread 112 (src/orders/handler.py:238) is resolved, but the code is unchanged since the request. Set it back to active?` **Leave it (Recommended)** / **Set to active**
-   - `Thread 98 (tests/test_retry_store.py:45) is done in 3c9d2e1 and still active. Set it to fixed?` **Set to fixed (Recommended)** / **Leave it**
+   Background, one sentence before the card: `Thread 112 (src/orders/handler.py:238) is resolved, but the code is unchanged since the request.`
+
+   Card: Set thread 112 back to active?
+   - **Leave it (Recommended)**: keep thread 112 resolved and change nothing on the host. Why: undoing someone else's resolve is their call.
+   - **Set to active**: reopen thread 112 so the author sees it again.
+
+   Background: `Thread 98 (tests/test_retry_store.py:45) is done in 3c9d2e1 and still active.`
+
+   Card: Set thread 98 to fixed?
+   - **Set to fixed (Recommended)**: mark thread 98 fixed on the host. Why: commit 3c9d2e1 already does what it asked.
+   - **Leave it**: keep thread 98 active.
+
    - GitHub: **Resolve thread** / **Unresolve thread** in the same way.
    Recommend **Leave it** for any change that undoes someone else's resolve.
-2. **Follow-ups**, one question: `Mark these as follow-ups for /crav1-ado-sync? (drafts; no work item is created)` **Mark them (Recommended)** / **Not now**.
+2. **Follow-ups**, one question. Background: `These 2 points are follow-ups; marking them creates no work item.`
+
+   Card: Mark these 2 points as follow-ups for /crav1-ado-sync?
+   - **Mark them (Recommended)**: tag them as follow-up drafts in the PR record, and no work item is created. Why: /crav1-ado-sync can pick them up later.
+   - **Not now**: leave the points as they are.
 
 Signed out, headless, or a bot run: list the same questions as text under `Offers (not asked):`, say `Run /crav1-pr-status pr<n> again to answer them.`, and change nothing on the host.
 

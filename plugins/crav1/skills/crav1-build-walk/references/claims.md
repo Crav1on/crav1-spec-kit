@@ -12,7 +12,13 @@ When this walk starts on a branch, write one line per open task on that branch, 
 In progress: feat/orders-api-host-setup, T27, person A, since 2026-11-13T15:50:00+01:00
 ```
 
-The user is `git config user.name` in the specs repo. The time is an ISO timestamp in local time with the local offset, to the second, for example `2026-11-14T23:40:00+01:00` (1.160.0). An older line written in UTC (`+00:00`, with or without microseconds) still reads, and is written back in local time. A `--since` with its own non-UTC offset keeps it. `<interpreter> -X utf8 scripts/claims.py add --root <spec-folder> --branch <branch> --tasks T27 --user "<name>"` writes the file, as `crav1-docs/reference/running-scripts.md` says. Show the line, then one card. `yes` (Recommended) commits only `claims.md` and pushes it. `stop` does not. There is no Edits option. A headless run stops and names `yes` and `stop`. Do not guess. Nothing else is committed on that card.
+The user is `git config user.name` in the specs repo. The time is an ISO timestamp in local time with the local offset, to the second, for example `2026-11-14T23:40:00+01:00` (1.160.0). An older line written in UTC (`+00:00`, with or without microseconds) still reads, and is written back in local time. A `--since` with its own non-UTC offset keeps it. `<interpreter> -X utf8 scripts/claims.py add --root <spec-folder> --branch <branch> --tasks T27 --user "<name>"` writes the file, as `crav1-docs/reference/running-scripts.md` says. Show the line, then one card:
+
+Card: Claim T27 for you and push the claim?
+- **Claim and push (Recommended)** (`yes`): commit only `claims.md` and push it, so others see T27 is taken. Why: it stops two people building the same task.
+- **Do not claim** (`stop`): write nothing, and T27 stays open for anyone.
+
+There is no Edits option. A headless run stops and names `yes` and `stop`. Do not guess. Nothing else is committed on that card.
 
 ## Whole-branch run (1.155.0)
 

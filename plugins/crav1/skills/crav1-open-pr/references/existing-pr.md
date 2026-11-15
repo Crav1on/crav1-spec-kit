@@ -35,8 +35,10 @@ Show the pull request (`PR <n>`, title, author, URL) and what is new, then ask o
 
 Show the exact text in a fenced block, then one question card, as `crav1-docs/reference/question-cards.md` says.
 
-- `yes (Recommended)`: post it as shown. Nothing is posted until that yes.
-- The card's free-text answer. Hint: `Type your changes, e.g. drop the second bullet`.
+Card: Post this comment on PR 71?
+- **Post it (Recommended)** (`yes`): post the text exactly as shown. Why: it is the text you just read. Nothing is posted until that yes.
+
+Typed changes go in the card's free-text answer. Hint: `Type your changes, e.g. drop the second bullet`.
 
 Do not add an `Edits` option.
 

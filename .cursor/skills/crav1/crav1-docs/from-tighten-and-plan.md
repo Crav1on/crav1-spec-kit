@@ -89,16 +89,21 @@ Since 1.138.0 a checkbox tick, a `(PR n)` or `(done)` note on that task line, an
 
 Since 1.139.0 a merge that conflicts only on those hash lines is settled by `scripts/walk_progress.py resolve-stamps --root <spec-folder> --yes`. `/crav1-finalize-commit` runs it. The walk does not. `Done` and `Result` stay. A real edit keeps the upstream hash.
 
-When the check is clear, or ready-partial with tasks that can start, the ending prints `Run next:` first, before any Waiting line (1.150.0). Each command is alone in a code span and works in a new session. It names the T#s on that branch, and the slug when `docs/specs` has more than one slice. The next line names the branch and the short task name. Each held line is in that same reply. The walk command is only in that one block. The bottom keeps any Loop line, the Waiting lines, and the one-line alternative, with no `Next:` line (1.153.0):
+When the check is clear, or ready-partial with tasks that can start, the ending prints `Run next:` first, before any Waiting line (1.150.0). Each command is alone in a code span and works in a new session. It names the T#s on that branch, and the slug when `docs/specs` has more than one slice. Since 1.164.0 each branch is one block: the bold branch, one plain sentence from its plan step, its open tasks, then `Run the whole branch:` and `Run only T#, the first task:`. Each held line is in that same reply. The walk command is only in that one block. The bottom keeps any Loop line, the Waiting lines, and the one-line alternative, with no `Next:` line (1.153.0):
 
 ```text
 Run next:
 
-`/crav1-build-walk orders-api T1`
-branch feat/orders-api-record, T1 Record the decision
+**feat/orders-api-record**
+Record each decision with who made it and when.
+2 open tasks:
+- T1 Record the decision
+- T2 Store the card
 
+Run the whole branch:
 `/crav1-build-walk orders-api feat/orders-api-record`
-branch feat/orders-api-record, every open task: T1 Record the decision, T2 Store the card
+Run only T1, the first task:
+`/crav1-build-walk orders-api T1`
 
 /crav1-build-tasks builds one task without the walk.
 ```
@@ -114,3 +119,5 @@ When two branches wait for each other, the ending and `build-map.md` both carry 
 The walk fetches the specs repo before it reads. If that copy is behind origin, it stops and Run next is `git pull --no-rebase`. A task with an `In progress:` line in `docs/specs/<slug>/claims.md` is left unchanged: no renumber, reorder, rewrite, or removal. The walk says once which claimed tasks were kept. The ready check holds those tasks as `in progress by <user> since <date>` and does not offer them in Run next.
 
 Reference page: [tighten and plan, ready to build](reference/skills/crav1-tighten-and-plan-ready-to-build.md)
+
+Since 1.164.0 `start` and `resume` name the one reference the next step needs in `read`, and the walk opens only that file. Its cards follow the card wording rule in [Question cards](reference/question-cards.md): a reopened step asks `Skip redoing the plan review?` after one plain sentence, and the record card asks `Save the ready check as done?` without quoting the progress line.

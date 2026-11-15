@@ -35,3 +35,29 @@ Build the table and the card with one command. Print its stdout in the reply. Th
 `<file>` is JSON, a list of objects with `id`, `issue`, `options`, and `recommendation`. The interpreter is [Running a kit script](running-scripts.md). On Windows it is `python`. Elsewhere it is `python3`. Set `PYTHONUTF8=1` and pass `-X utf8`.
 
 A card that is one yes for one action, such as post this text or run this script, is not this batch. One question per item, when that question already names the item and the recommendation, is not this batch. Do not collapse those questions into a card that says `table above`. Collapsing them onto one card makes it this batch.
+
+## Card wording (1.164.0)
+
+Every card the kit asks follows these six rules.
+
+1. **A short plain question.** No brackets and no kit terms such as other-owner mode, step name, `needs_yes`, or map mark. Name the thing itself: `Merge PR 71 into develop?`
+2. **Each option says what happens.** A bare `yes` or `stop` is not enough. For example **Add to their pull request (Recommended)**: `Build T5 on PR 71's branch so it lands in PR 71.` The choice word stays the reply word, hyphen-only as before.
+3. **The recommended option is first**, its label ends with ` (Recommended)`, and it says why in a few words, for example `Why: the branch is already theirs.`
+4. **Background goes before the card**, in one short sentence, never inside the question. For example `PR 71 on feat/orders-cicd is person A's.`, then the card.
+5. **Fewer cards.** Questions in a row that you would always answer together are one card, for example commit and push the walk's files. Never ask again for a yes that is already on record.
+6. **Plain Waiting lines.** A Waiting line names who or what, and why: `Waiting for person A to approve T7`, not `needs_yes T7`.
+
+The rules above still hold: no `Edits` option, typed changes go in the free-text answer, a missing word is asked again, and the merge card names the pull request.
+
+### How a skill file writes a card
+
+```
+Card: Should I add my work to their pull request?
+- **Add to their pull request (Recommended)** (`switch`): build T5 on PR 71's branch so it lands in PR 71. Why: the branch is already theirs.
+- **Keep it as my own** (`own`): build as usual, and I open and merge the pull request myself.
+- **Stop** (`stop`): change nothing and end the walk here.
+```
+
+A script that prints a card uses the same shape: a `Card:` line, then numbered options, each with what happens.
+
+`scripts/kit-lint.py` reads only `Card:` lines and the option lines right under them, so prose is not checked. It flags a question with brackets, an option that does not say what happens, a Recommended option that is not first, a kit term from its short list, and options listed inline instead of in a `Card:` block. Since 1.164.0 it checks the build walk, the two ready checks, and the four pull-request skills. Whether an option really says what happens still needs a person to read it.

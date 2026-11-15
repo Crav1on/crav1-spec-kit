@@ -12,7 +12,7 @@ The step skill's own suggestion is not printed. That includes `/crav1-open-pr` a
 
 A new session has no earlier reply. The command is `/crav1-build-walk` plus each `T#` on that branch. When `docs/specs` has more than one slice, the slug is on that same line. One slice needs no slug.
 
-Another branch whose tasks can start is its own Run next entry. Since 1.155.0 that is the next task, `/crav1-build-walk <slug> T#`, and, when the branch has two or more open tasks (`open_tasks`), a second entry for the whole branch, `/crav1-build-walk <slug> <branch>`, with `branch <branch>, every open task: …` underneath. The script groups readiness `can_start` by build-map branch when `root` is the spec folder, or reads `ready_branches` when that list is already in the JSON. It does not bury those branches in the because text.
+Another branch whose tasks can start is its own Run next block, laid out as `crav1-docs/reference/run-ending.md` says (1.164.0). Since 1.155.0 that is the next task, `/crav1-build-walk <slug> T#`, and, when the branch has two or more open tasks (`open_tasks`), a second entry for the whole branch, `/crav1-build-walk <slug> <branch>`, with `branch <branch>, every open task: …` underneath. The script groups readiness `can_start` by build-map branch when `root` is the spec folder, or reads `ready_branches` when that list is already in the JSON. It does not bury those branches in the because text.
 
 ## next JSON
 
@@ -39,9 +39,21 @@ Another branch whose tasks can start is its own Run next entry. Since 1.155.0 th
 
 ## Yes before a write
 
-A step that writes, pushes, opens, or merges shows the action, then one card. `yes` (Recommended) does that action and then the walk opens the step skill. `stop` does not. There is no Edits option. A missing word is asked again. Do not guess.
+A step that writes, pushes, opens, or merges shows the action in one sentence, then one card that names the action and its target:
 
-The card that merges names the pull request number. That `yes` is the explicit ask `/crav1-merge-pr` requires. The walk opens `../crav1-merge-pr/SKILL.md` only after it.
+Card: Commit these 3 files on feat/orders-cicd?
+- **Commit them (Recommended)** (`yes`): commit the files shown, then the walk opens the commit step. Why: the step is done and checked.
+- **Stop here** (`stop`): write nothing and pause the walk at this step.
+
+`yes` does that action and then the walk opens the step skill. `stop` does not. There is no Edits option. A missing word is asked again. Do not guess.
+
+The card that merges names the pull request number:
+
+Card: Merge PR 71 into develop?
+- **Merge PR 71 (Recommended)** (`yes`): merge PR 71 now, then the walk opens the merge step. Why: its checks are green and the record says ready.
+- **Not yet** (`stop`): leave PR 71 open and pause the walk.
+
+That `yes` is the explicit ask `/crav1-merge-pr` requires. The walk opens `../crav1-merge-pr/SKILL.md` only after it.
 
 Never rebase. A branch that is behind is fixed by merging the base into it, after `yes`.
 
