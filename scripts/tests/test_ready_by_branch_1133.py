@@ -143,10 +143,14 @@ class ReadyByBranch(unittest.TestCase):
         self.assertTrue(any("`/crav1-build-walk" in line for line in payload["run_lines"]))
         joined = "\n".join(payload["run_lines"])
         # 1.155.0: the next task, then the whole branch when it has 2+ open tasks.
-        self.assertIn("`/crav1-build-walk orders-api T2`\nbranch feat/orders-api-record, T2 Record the decision", joined)
-        self.assertIn("`/crav1-build-walk orders-api feat/orders-api-record`\nbranch feat/orders-api-record, every open task: T2 Record the decision, T5 Store the card", joined)
+        # 1.164.0: one block per branch, whole branch first, then the first task.
+        self.assertIn("**feat/orders-api-record**", joined)
+        self.assertIn("2 open tasks:\n- T2 Record the decision\n- T5 Store the card", joined)
+        self.assertIn("Run the whole branch:\n`/crav1-build-walk orders-api feat/orders-api-record`\nRun only T2, the first task:\n`/crav1-build-walk orders-api T2`", joined)
         self.assertNotIn("`/crav1-build-walk orders-api feat/orders-api-export`", joined)
-        self.assertIn("branch feat/orders-api-export, T6 Email the receipt", "\n".join(payload["run_lines"]))
+        # The plain sentence comes from the plan step that owns the branch.
+        self.assertIn("**feat/orders-api-export**\nExport the receipt.\n1 open task:\n- T6 Email the receipt\n\nRun T6:\n`/crav1-build-walk orders-api T6`", joined)
+        self.assertIn("**feat/orders-api-record**\nRecord the decision.\n2 open tasks:", joined)
         self.assertNotIn("/crav1-build-walk", payload["next"])
         self.assertNotIn("Next: /crav1-build-walk", payload["next"])
         self.assertEqual(payload["line"], "Ready now\n" + "\n".join(payload["ready_lines"] + ["Held"] + payload["held_lines"]))
@@ -182,10 +186,9 @@ class ReadyByBranch(unittest.TestCase):
         ])
         self.assertEqual(payload["next_lines"], ["/crav1-build-tasks builds one task without the walk."])
         self.assertIn("`/crav1-build-walk", payload["run_lines"][0])
-        self.assertEqual(len(payload["run_lines"]), 2)
-        self.assertIn("branch feat/orders-api-record, T1 Record the decision", payload["run_lines"][0])
-        self.assertNotIn("T2", payload["run_lines"][0])
-        self.assertIn("feat/orders-api-record`\nbranch feat/orders-api-record, every open task: T1 Record the decision, T2 Store the card", payload["run_lines"][1])
+        self.assertEqual(len(payload["run_lines"]), 1)  # one block per branch, 1.164.0
+        self.assertIn("Run only T1, the first task:\n`/crav1-build-walk", payload["run_lines"][0])
+        self.assertIn("- T1 Record the decision\n- T2 Store the card", payload["run_lines"][0])
         self.assertNotIn("/crav1-build-walk", payload["next"])
         self.assertNotIn("Next: /crav1-build-walk", payload["next"])
 
@@ -204,10 +207,10 @@ class ReadyByBranch(unittest.TestCase):
             "- `feat/orders-api-record` (wave 1): T1 Record the decision",
         ])
         self.assertEqual(payload["next_lines"], ["/crav1-build-tasks builds one task without the walk."])
-        self.assertIn("branch feat/orders-api-record, T1 Record the decision", payload["run_lines"][0])
-        self.assertNotIn("T2", payload["run_lines"][0])
-        # 1.155.0: T2 waits in order, so only the whole-branch entry names it.
-        self.assertIn("every open task: T1 Record the decision, T2 Store the card", payload["run_lines"][1])
+        # 1.164.0: T2 waits in order, so only the whole branch and the open list name it.
+        self.assertIn("Run only T1, the first task:", payload["run_lines"][0])
+        self.assertNotIn("T2`", payload["run_lines"][0])
+        self.assertIn("- T1 Record the decision\n- T2 Store the card", payload["run_lines"][0])
         self.assertNotIn("/crav1-build-walk", payload["next"])
         self.assertNotIn("Next: /crav1-build-walk", payload["next"])
 

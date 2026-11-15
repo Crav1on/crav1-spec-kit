@@ -271,9 +271,13 @@ def branch_entry(open_labels, branch_name, slug=None):
     return _ending_mod().branch_entry(open_labels, branch_name, slug=slug)
 
 
-def run_entries(labels, branch_name, slug=None, open_labels=None):
-    """Run next entries for one ready branch (1.155.0); shared in walk_ending.py."""
-    return _ending_mod().run_entries(labels, branch_name, slug=slug, open_labels=open_labels)
+def run_entries(labels, branch_name, slug=None, open_labels=None, about=None):
+    """Run next block for one ready branch (1.164.0); shared in walk_ending.py."""
+    return _ending_mod().run_entries(labels, branch_name, slug=slug, open_labels=open_labels, about=about)
+
+
+def branch_block(branch_name, open_labels, first=None, slug=None, about=None):
+    return _ending_mod().branch_block(branch_name, open_labels, first=first, slug=slug, about=about)
 
 
 def short_name(rest, work_title=None, trim=True):
@@ -1833,6 +1837,11 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text
             deliver = clean_prose(step_by_n[owner]["body"], name_of) or "; ".join(shorts)
         else:
             deliver = "; ".join(shorts)
+        # One plain sentence for Run next (1.164.0): the plan step that owns
+        # every task on this branch, even when the task lines name the branch.
+        about = ""
+        if mode == "steps" and owner in step_by_n:
+            about = clean_prose(step_by_n[owner]["body"], name_of) or ""
         areas = set()
         for task in members:
             areas.update(task.get("areas") or ())
@@ -1840,6 +1849,7 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text
             "key": name,
             "name": name,
             "deliver": deliver or "work",
+            "about": about or "",
             "tasks": members,
             "task_ids": [task["id"] for task in members],
             "task_names": shown,
@@ -2227,7 +2237,7 @@ def report_by_branch(built, rows, slug=None):
             task.get("run_label") or task.get("label") or task_label(task["id"], task.get("full") or task.get("short"))
             for task in open_tasks
         ]
-        entries = run_entries(labels, group["branch"]["name"], slug=slug, open_labels=open_labels)
+        entries = run_entries(labels, group["branch"]["name"], slug=slug, open_labels=open_labels, about=group["branch"].get("about"))
         # next_lines carry the same entries as run_lines (1.155.0).
         for index, entry in enumerate(entries):
             if index == 0:
@@ -2237,6 +2247,7 @@ def report_by_branch(built, rows, slug=None):
         run_lines.extend(entries)
         ready_branches.append({
             "branch": group["branch"]["name"],
+            "about": group["branch"].get("about") or "",
             "tasks": [
                 {"id": f"T{task['id']}", "title": task.get("short") or ""}
                 for task, _row in group["items"]

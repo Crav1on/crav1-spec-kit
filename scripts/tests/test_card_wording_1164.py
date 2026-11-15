@@ -211,5 +211,39 @@ class FewerReadsAndScripts(unittest.TestCase):
         self.assertIn("BOM", scripts)
 
 
+class RunNextLayout(unittest.TestCase):
+    def setUp(self):
+        self.we = _load("walk_ending_layout_1164", SKILLS / "crav1-tasks-ready-to-build/scripts/walk_ending.py")
+
+    def test_two_tasks_with_plan_sentence(self):
+        block = self.we.branch_block(
+            "feat/orders-cicd", ["T9 Add the pipeline", "T10 Add the test stage"], first="T9 Add the pipeline",
+            slug="orders-api", about="Build and test **orders-api** on every push. Then deploy to dev.")
+        self.assertEqual(block, "\n".join([
+            "**feat/orders-cicd**",
+            "Build and test orders-api on every push.",
+            "2 open tasks:",
+            "- T9 Add the pipeline",
+            "- T10 Add the test stage",
+            "",
+            "Run the whole branch:",
+            "`/crav1-build-walk orders-api feat/orders-cicd`",
+            "Run only T9, the first task:",
+            "`/crav1-build-walk orders-api T9`",
+        ]))
+
+    def test_one_task_no_sentence_no_slug(self):
+        block = self.we.branch_block("feat/orders-note", ["T5 Note the export"], first="T5 Note the export")
+        self.assertEqual(block, "**feat/orders-note**\n1 open task:\n- T5 Note the export\n\nRun T5:\n`/crav1-build-walk T5`")
+
+    def test_open_map_line_under_build_map(self):
+        reply = self.we.ready_reply("orders-api", "ready", None, "Run next:", build_map="docs/specs/orders-api/build-map.md")
+        lines = reply.splitlines()
+        at = lines.index("Build map: docs/specs/orders-api/build-map.md")
+        self.assertEqual(lines[at + 1], "Zoom the map in your browser:")
+        self.assertEqual(lines[at + 2], "`/crav1-tasks-ready-to-build orders-api open-map`")
+        self.assertNotIn("export-map", reply)
+
+
 if __name__ == "__main__":
     unittest.main()

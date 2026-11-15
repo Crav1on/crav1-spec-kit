@@ -76,7 +76,7 @@ def run_block(text: str) -> str:
     start = parts.index("Run next:")
     out = [parts[start]]
     for part in parts[start + 1:]:
-        if not part.startswith("`/crav1-"):
+        if not part.startswith(("`/crav1-", "**", "Run ")):  # 1.164.0 blocks
             break
         out.append(part)
     return "\n\n".join(out)
@@ -87,10 +87,13 @@ class SharedEnding(unittest.TestCase):
         labels = ["T5 refund to the original card", "T9 send the mail"]
         shared = we.run_entries(labels, "feat/orders-retry", slug="orders-api")
         self.assertEqual(bm.run_entries(labels, "feat/orders-retry", slug="orders-api"), shared)
-        self.assertEqual(shared[0], "`/crav1-build-walk orders-api T5`\nbranch feat/orders-retry, T5 refund to the original card")
-        self.assertEqual(shared[1].splitlines()[0], "`/crav1-build-walk orders-api feat/orders-retry`")
+        # One block per branch, whole branch first (1.164.0).
+        self.assertEqual(len(shared), 1)
+        self.assertIn("Run the whole branch:\n`/crav1-build-walk orders-api feat/orders-retry`\nRun only T5, the first task:\n`/crav1-build-walk orders-api T5`", shared[0])
         one = we.run_entries(labels[:1], "feat/orders-retry", slug="orders-api")
-        self.assertEqual(len(one), 1, "a branch with one open task gets no branch entry")
+        self.assertEqual(len(one), 1)
+        self.assertNotIn("feat/orders-retry`", one[0], "a branch with one open task gets no branch command")
+        self.assertIn("Run T5:", one[0])
 
     def test_same_state_gives_the_same_run_next_in_all_three_skills(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -114,7 +117,7 @@ class SharedEnding(unittest.TestCase):
             text = br.ending(state)["ending"]
             others = run_block(text).split("\n\n")[2:]
             self.assertEqual("\n\n".join(others), "\n\n".join(readiness_block.split("\n\n")[1:]))
-            self.assertIn(f"branch {first}", readiness_block)
+            self.assertIn(f"**{first}**", readiness_block)
 
     def test_compose_order_is_shared(self):
         text = we.compose(

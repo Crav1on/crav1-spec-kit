@@ -628,9 +628,8 @@ def _other_ready(state: dict, current: str | None) -> list:
 def branch_entries(branch: dict, slug: str | None = None) -> list[dict]:
     """Run next entries for one ready branch (1.155.0).
 
-    The next task, `/crav1-build-walk <slug> T#`, then the whole branch,
-    `/crav1-build-walk <slug> <branch>`, only when the branch has two or more
-    open tasks. Each is its own entry with its own Next line.
+    One Run next block (1.164.0): the whole branch first when it has two or
+    more open tasks, then the first task. Each keeps its own Next sentence.
     """
     tasks = branch.get("tasks") or []
     name = branch.get("branch") or ""
@@ -638,24 +637,33 @@ def branch_entries(branch: dict, slug: str | None = None) -> list[dict]:
     if opens is None:
         opens = tasks
     entries = []
-    if tasks:
-        first = tasks[:1]
-        label = _task_list(first) or name
-        entries.append(_entry(
-            "/crav1-build-walk",
-            f"that work is on {name}" + (f" ({label})" if label and label != name else ""),
-            first,
-            name,
-            slug,
-        ))
+    if not tasks:
+        return entries
+    # One Run next block per branch (1.164.0): whole branch first, then the
+    # first task. The second entry keeps its Next sentence as data only.
+    first = tasks[:1]
+    label = _task_list(first) or name
+    task_entry = _entry(
+        "/crav1-build-walk",
+        f"that work is on {name}" + (f" ({label})" if label and label != name else ""),
+        first,
+        name,
+        slug,
+    )
+    open_labels = [_task_label(task) for task in opens] or [_task_label(task) for task in first]
+    block = map_mod().branch_block(name, open_labels, first=_task_label(first[0]), slug=slug, about=branch.get("about"))
     if name and len(opens) >= 2:
         command = f"/crav1-build-walk {slug} {name}" if slug else f"/crav1-build-walk {name}"
-        run = map_mod().branch_entry([_task_label(task) for task in opens], name, slug=slug)
         entries.append({
             "command": command,
-            "run": run,
+            "run": block,
             "next": _one(command, f"every open task on {name} builds in one run ({_task_list(opens)})"),
         })
+        task_entry["run"] = ""
+        entries.append(task_entry)
+    else:
+        task_entry["run"] = block
+        entries.append(task_entry)
     return entries
 
 
