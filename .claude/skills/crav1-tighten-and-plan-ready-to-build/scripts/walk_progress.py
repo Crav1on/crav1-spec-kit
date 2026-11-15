@@ -2912,7 +2912,7 @@ def verify_gap_from(tasks_text: str, spec_text: str, verify_text: str, slug: str
         listed = ", ".join(orphans)
         orphan_waiting = (
             f"Waiting: verify.md has a row for {listed}, which is not in tasks.md. "
-            "Fix it with /crav1-verify-build-against-spec or /crav1-tighten-plan."
+            "Fix it with /crav1-verify-build-against-spec, which drops that row."
         )
     if not stale and not orphans:
         return empty
@@ -3597,8 +3597,13 @@ def not_ready_run(
     counts: dict | None,
     because: str | None,
     question_first: bool,
+    catch_up: bool = False,
 ) -> list[str]:
-    """The first real next step when not-ready, as one Run next entry (1.163.0)."""
+    """The first real next step when not-ready, as one Run next entry (1.163.0).
+
+    With a catch-up block (1.167.0) the verify-behind and push entries are
+    left out: that block already leads Run next with those commands.
+    """
     if result != "not-ready":
         return []
     step = _first_reopened_step(hits)
@@ -3614,6 +3619,11 @@ def not_ready_run(
     gap = gap or {}
     counts = counts or {}
     left = sum(int(counts.get(key, 0) or 0) for key in ("ready", "waiting", "waits_in_order", "blocked"))
+    if catch_up and (gap.get("behind") or gap.get("orphan_tasks") or (sync and sync.get("state") == "ahead")):
+        if question_first and not counts.get("ready"):
+            command = _command_with_slug("/crav1-resolve-open-questions", slug)
+            return [_run_entry(command, "that question blocks the first task.")]
+        return []
     if gap.get("behind") or (left == 0 and counts.get("needs_verify")):
         command = _command_with_slug("/crav1-verify-build-against-spec", slug)
         return [_run_entry(command, "verify.md is behind, so the built tasks need to be verified.")]
@@ -3731,6 +3741,7 @@ def compose_ending(
     because: str | None,
     replaced: str | None,
     branch_runs: list[str] | None = None,
+    catch_up: str | None = None,
 ) -> str:
     """The reply for a walk ending. Print this text. Do not point at earlier output.
 
@@ -3750,7 +3761,28 @@ def compose_ending(
         because=because if result == "not-ready" and because and not run_lines else None,
         alternatives=alternatives,
         notes=[replaced] if replaced else None,
+        catch_up=catch_up or None,
     )
+
+
+def catch_up_for(slug: str, gap: dict | None, sync: dict | None) -> str:
+    """The `**Catch up first**` block for this check, or "" (1.167.0).
+
+    verify.md behind (gap tasks), a verify.md row for a T# not in tasks.md
+    (gap orphan_tasks), and a specs repo ahead of origin. Built by
+    walk_ending.catch_up_block, the same text for every ending.
+    """
+    gap = gap or {}
+    sync = sync or {}
+    behind = list(gap.get("tasks") or []) if gap.get("behind") else []
+    orphans = list(gap.get("orphan_tasks") or [])
+    ahead = 0
+    if sync.get("state") == "ahead":
+        try:
+            ahead = int(sync.get("ahead") or 1)
+        except (TypeError, ValueError):
+            ahead = 1
+    return ending_mod().catch_up_block(slug or None, behind, orphans, ahead)
 
 
 def next_for(result: str, can_start: list, waiting_next: str | None) -> str | None:
@@ -3985,13 +4017,10 @@ def readiness(args: argparse.Namespace) -> None:
     gap = verify_gap(root) if root is not None else {
         "behind": False, "tasks": [], "waiting": None, "stale_next": None,
     }
+    # What the user can fix now leads Run next as one block (1.167.0); the
+    # Waiting lines keep only what waits on people or merges.
+    catch_up = catch_up_for(slug, gap, sync)
     waiting_bits = list(loop_lines)
-    if gap.get("waiting"):
-        waiting_bits.append(gap["waiting"])
-    if gap.get("orphan_waiting"):
-        waiting_bits.append(gap["orphan_waiting"])
-    if sync.get("state") == "ahead" and sync.get("waiting"):
-        waiting_bits.append(sync["waiting"])
     if resolve_waiting:
         waiting_bits.append(resolve_waiting)
     if result == "not-ready" and not can_start and waiting_line:
@@ -4011,10 +4040,13 @@ def readiness(args: argparse.Namespace) -> None:
         shown_run = not_ready_run(
             result, slug, hits, can_start, waiting_next, gap, sync, offer,
             counts_for(rows, slug), because, question_first,
+            catch_up=bool(catch_up),
         )
         shown_next = []
         next_lines = []
-        if shown_run:
+        if catch_up:
+            nxt = catch_up
+        elif shown_run:
             nxt = shown_run[0]
         elif because:
             nxt = because
@@ -4023,6 +4055,7 @@ def readiness(args: argparse.Namespace) -> None:
     run_status = branch_run_lines(root)
     ending = compose_ending(
         result, shown_run, held_lines, waiting_bits, shown_next, because, replaced, run_status,
+        catch_up=catch_up,
     )
     claim_info = claim_info if "claim_info" in locals() else {"claims": [], "warnings": [], "ids": []}
     warnings = list(claim_info.get("warnings") or [])
@@ -4085,6 +4118,7 @@ def readiness(args: argparse.Namespace) -> None:
         "counts": counts_for(rows, slug),
         "orphan_tasks": gap.get("orphan_tasks") or [],
         "orphan_waiting": gap.get("orphan_waiting"),
+        "catch_up": catch_up,
         "loop_lines": loop_lines,
         "loop_card": offer["card"],
         "loop_fixes": offer["fixes"],

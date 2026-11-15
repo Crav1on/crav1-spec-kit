@@ -141,11 +141,26 @@ A done branch says `Waited for:` instead of `Waits for:`, since nothing waits an
 
 The check reads `verify.md` and does not write it. A task stays done for later tasks when it is ticked, or when its pull request is recorded merged: `(PR n)` and the word merged on the task line, or on the Match `Branch:` line for that task's branch. The check adds a Waiting line when a ticked task is still `Not implemented`, when `Next:` names a ticked task, or when a merged task is still `Not implemented`. A merged row whose status is **Implemented, verified, tick pending** is not behind. The checkbox is the only leftover. `task_order.py` lists that task under Needs tick, not under Ready. A verify-only change does not force `not-ready`. This command only writes `build-map.md`. Only the walk's record or `clear --yes` restamps `walk-progress.md`.
 
-When verify is behind, the check adds:
+Since 1.167.0 what you can fix now with one command is not a Waiting line any more. It leads Run next as a `**Catch up first**` block, before the branch blocks and in the same layout: verify.md behind tasks.md, a verify.md row for a T# that is not in tasks.md, and a specs repo ahead of origin. `/crav1-verify-build-against-spec` checks the behind tasks and drops a row for a T# that tasks.md does not have, so the two share one command. The block is left out when nothing is behind, and Waiting keeps only what waits on a person or a merge:
 
 ```text
-Waiting: /crav1-verify-build-against-spec orders-api - verify.md is behind tasks.md (T2, T45)
+Run next:
+
+**Catch up first**
+verify.md is behind for T2 and T45, and it has a row for T44, which is not in tasks.md. The specs repo is 2 commits ahead of origin.
+
+Check T2 and T45 against the spec and remove the T44 row:
+`/crav1-verify-build-against-spec orders-api`
+Push the specs repo (2 commits ahead):
+`git push`
+
+---
+
+**feat/orders-api-record**
+...
 ```
+
+With only the orphan row the label is `Remove the T44 row (it is in verify.md but not in tasks.md):`. Before 1.167.0 the check printed `Waiting: /crav1-verify-build-against-spec orders-api - verify.md is behind tasks.md (T2, T45)` near the bottom.
 
 It does not show that `Next:` line from `verify.md`. `/crav1-tasks-ready-to-build` still rewrites only `build-map.md`.
 

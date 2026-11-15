@@ -33,6 +33,7 @@ Another branch whose tasks can start is its own Run next block, laid out as `cra
 | `branches` | Grouping mode only. One object per ready branch, same shape as `ready_branches` |
 | `mode` | `walk` or `grouping` |
 | `waiting` | Optional Waiting line |
+| `catch_up` | Optional. The ready check's `catch_up` text, or `{"slug", "behind", "orphans", "ahead"}`; it leads Run next as the `**Catch up first**` block (1.167.0) |
 | `uncommitted` | Optional Uncommitted line |
 | `next_branch` | The next branch when `phase` is `next-task` and no ready list is present |
 | `next_tasks` | Tasks on `next_branch` |

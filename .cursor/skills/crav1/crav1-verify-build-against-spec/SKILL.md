@@ -70,7 +70,7 @@ Then:
 Follow this skill’s `assets/verify.md` **section order**. Do not put the long acceptance table first.
 
 1. **TL;DR** — counts + id lists, including tick pending, then the Branches line when the spec has work branches. Next skips tasks the ready check counts as done and names the first task that can start, one line per ready branch. A tick-pending Gap does not by itself make Next `/crav1-fix-build-gaps`.
-2. **Tasks — overview** — one short table: `T#` | title | status | verify result, in dependency order (above).
+2. **Tasks — overview** — one short table: `T#` | title | status | verify result, in dependency order (above). One row per T# in `tasks.md`; a row for a T# that `tasks.md` does not have is dropped, and the reply names it (1.167.0). The ready check's Catch up first block relies on this.
 3. **Acceptance — details** — the full A# matrix (quote, evidence, result).
 4. **Commands run**
 5. **Gaps** (`G1`, `G2`, …)

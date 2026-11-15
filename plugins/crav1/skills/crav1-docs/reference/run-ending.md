@@ -41,11 +41,31 @@ Before a ready-check or walk ending, the reply has at most one short lead senten
    Since 1.165.0 a `---` line, with a blank line on each side, stands between two branch blocks so they never run together in a Markdown viewer. The open tasks are listed in the order the walk runs them. A listed task that cannot start yet says why on its line, for example `- T8 Take in develop (waits on T5)`, and when the first listed task cannot start the label is `Run only T#, the first task that can start:`. The plain sentence is used only when the plan step's first sentence is clean: it ends with a full stop, has no colon list, and does not open with a person (`Person A builds ...`). Otherwise the step's heading in plain words is used, or the line is left out. A long line, a sentence or a held question, is cut at a clause end or a word, never on a dangling word such as `the`, and a held question that opens with a heading such as `Client certificate.` shows the question itself.
 
    Since 1.166.0 every branch block has a description line between the bold branch and `<n> open tasks:`. In order: up to three clean sentences from the plan step (each ends with a full stop, has no colon list, no person leading it and no file or path), about 300 characters at most and cut only at a sentence end, never mid-sentence; else the plan note trimmed to its opening clause, the words before the first `:` or ` — `, with a person lead such as `Person A builds PR 73:` dropped, for example `The orders CI/CD branch, cut from develop after billing-ops.`; else the step's heading in plain words; else one sentence from the open task names, a shared prefix once, for example `Orders CI/CD: infra Bicep, cd pipeline, ci lint and tests, and deploy README.`, about 160 characters. The line is left out only when the branch has no plan step and no usable task name, and a person's name never shows. A held question that ends with `:` or only points to a note, such as `The note docs/notes/x.md, in Open questions, question 5, says:`, shows the quoted question that follows: the `>` blockquote under the bullet, else the text in quotes after the colon, else the first sentence ending in `?`.
+
+   Since 1.167.0 what you can fix now with one command leads Run next as a `**Catch up first**` block, before the first branch block and in the same layout: the bold heading, one or two plain sentences of what is behind, then each command alone in its code span under its label line, and the same `---` line before the first branch block. It covers verify.md behind tasks.md, a verify.md row for a T# that is not in tasks.md, and a specs repo ahead of origin. `/crav1-verify-build-against-spec` both checks the behind tasks and drops a row for a T# that tasks.md does not have, so those two share one label and one command. The push is `git push` (the specs repo is never behind here; a copy behind origin stops the check first). The block is left out when nothing is behind, and those items are no longer `Waiting:` lines. For example:
+
+   ```text
+   **Catch up first**
+   verify.md is behind for T4 and T7, and it has a row for T44, which is not in tasks.md. The specs repo is 2 commits ahead of origin.
+
+   Check T4 and T7 against the spec and remove the T44 row:
+   `/crav1-verify-build-against-spec orders-api`
+   Push the specs repo (2 commits ahead):
+   `git push`
+
+   ---
+
+   **feat/orders-cicd**
+   The orders CI/CD branch, cut from develop after billing-ops.
+   ...
+   ```
+
+   Only the orphan row gives `Remove the T44 row (it is in verify.md but not in tasks.md):`, and only the behind tasks give `Check T4 and T7 against the spec:`. A not-ready ending puts the same block first, before its one next step.
 2. `Held:` lines, then `Branch runs:` status lines.
 3. For a branch run: `Built on <branch>:` (one line per task, with its commit and tests), then `Left:`.
-4. `Loop:`, verify-behind, orphan verify rows, and other `Waiting:` lines.
+4. `Loop:` and other `Waiting:` lines. Since 1.167.0 Waiting keeps only what you cannot act on now, such as a person's answer or a merge; verify-behind, orphan verify rows and an unpushed specs repo are the Catch up first block.
 5. The not-ready reason (only when it is not already the Run next line), at most the one-line `/crav1-build-tasks` alternative, notes, and `Uncommitted:`.
-6. A not-ready ready check starts its ending with `Run next:`, naming the first real next step (1.163.0): `/crav1-tighten-plan <slug>` when the plan was reopened for review, `/crav1-verify-build-against-spec <slug>` when verify.md is behind, or `git push` when the specs repo is ahead. A build-walk ending, one task or a whole branch, never has a `Next:` line (1.157.0). It is only the Run next block first, then Built, Left, and Waiting. A wait that used to be the reason on a Next line is a `Waiting:` line.
+6. A not-ready ready check starts its ending with `Run next:`, naming the first real next step (1.163.0): `/crav1-tighten-plan <slug>` when the plan was reopened for review, `/crav1-verify-build-against-spec <slug>` when verify.md is behind, or `git push` when the specs repo is ahead. Since 1.167.0 the verify and push steps come as the Catch up first block, not as a separate entry. A build-walk ending, one task or a whole branch, never has a `Next:` line (1.157.0). It is only the Run next block first, then Built, Left, and Waiting. A wait that used to be the reason on a Next line is a `Waiting:` line.
 
 The standalone ready check prints a brief reply by default (1.156.0): the header, the counts row, `Result:`, that ending, `Source:` and `Build map:`. The script prints it with `walk_progress.py readiness --root <spec-folder> --write-map --text`. The per-task lists and the Order line come only with the word `full`.
 

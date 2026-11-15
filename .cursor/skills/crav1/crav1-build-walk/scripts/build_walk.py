@@ -592,16 +592,19 @@ def _entry(command: str, because: str, tasks: list, branch: str, slug: str | Non
     return {"command": invoked, "run": run, "next": _one(invoked, because)}
 
 
-def _compose_ending(entries: list, waiting, uncommitted) -> str:
+def _compose_ending(entries: list, waiting, uncommitted, catch_up=None) -> str:
     """Run next, Waiting, Uncommitted (shared order, 1.156.0).
 
     No Next line is printed (1.157.0). Each entry's `next` sentence stays in
-    the JSON, one per Run next entry, in the same order.
+    the JSON, one per Run next entry, in the same order. `catch_up` (the
+    ready check's `catch_up` text, or a dict of walk_ending.catch_up_block
+    keywords) leads Run next (1.167.0).
     """
     return ending_mod().compose(
         run=[entry["run"] for entry in entries if entry.get("run")],
         waiting=waiting or None,
         uncommitted=uncommitted or None,
+        catch_up=catch_up or None,
     )
 
 
@@ -781,7 +784,7 @@ def next_for(state: dict) -> dict:
     if state.get("mode") == "grouping":
         entries = grouping_lines(state.get("branches") or [], slug)
         lines = [entry["next"] for entry in entries]
-        ending = _compose_ending(entries, waiting, uncommitted)
+        ending = _compose_ending(entries, waiting, uncommitted, state.get("catch_up"))
         return {
             "mode": "grouping",
             "next": lines,
@@ -819,7 +822,7 @@ def next_for(state: dict) -> dict:
         for other in _other_ready(state, branch):
             entries.extend(branch_entries(other, slug))
     lines = [entry["next"] for entry in entries]
-    ending = _compose_ending(entries, waiting, uncommitted)
+    ending = _compose_ending(entries, waiting, uncommitted, state.get("catch_up"))
     outcome = state.get("_permission") if phase == "permission-refused" else None
     result = {
         "mode": "walk",
@@ -837,7 +840,7 @@ def next_for(state: dict) -> dict:
         result["says_yes_missing"] = False
         result["lines"] = permission_mod().printable(outcome)
         if not waiting:
-            ending = _compose_ending(entries, outcome["waiting"], uncommitted)
+            ending = _compose_ending(entries, outcome["waiting"], uncommitted, state.get("catch_up"))
             result["ending"] = ending
     return result
 

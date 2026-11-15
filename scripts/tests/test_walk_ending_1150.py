@@ -174,12 +174,15 @@ class EndingBlock(unittest.TestCase):
             payload = must(["readiness", "--full", "--root", str(root)])
         ending = payload["ending"]
         self.assertEqual(payload["result"], "ready-partial")
-        self.assertLess(ending.index("Run next:"), ending.index("Waiting:"))
-        self.assertLess(ending.rindex("`/crav1-build-walk"), ending.index("Waiting:"))
+        # 1.167.0: verify-behind is the Catch up first block, before the
+        # branch blocks; no Waiting line is left for it.
+        self.assertLess(ending.index("Run next:"), ending.index("**Catch up first**"))
+        self.assertLess(ending.index("**Catch up first**"), ending.index("`/crav1-build-walk"))
+        self.assertNotIn("verify.md is behind tasks.md", ending)
         self.assertEqual(ending.count("`/crav1-build-walk"), sum(entry.count("`/crav1-build-walk") for entry in payload["run_lines"]))
         self.assertIn("/crav1-build-tasks builds one task without the walk.", ending)
         self.assertNotIn("Next: /crav1-build-walk", ending)
-        self.assertIn("verify.md is behind tasks.md (T1)", ending)
+        self.assertIn("verify.md is behind for T1.", ending)
         assert_complete(self, ending, "orders-api")
         lines = ending.splitlines()
         commands = command_lines(ending)

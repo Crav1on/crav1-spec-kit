@@ -2,6 +2,16 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.167.0 (2026-11-15)
+
+What you can fix now leads Run next as a Catch up first block, instead of sitting in Waiting lines at the bottom. A minor release because the ending reads differently in the ready check, the tighten-and-plan ready check and the build walk.
+
+- **Catch up first.** verify.md behind tasks.md, a verify.md row for a T# that is not in tasks.md, and a specs repo ahead of origin are one `**Catch up first**` block at the top of Run next, before the branch blocks and in their layout: the bold heading, one or two plain sentences of what is behind (`verify.md is behind for T4 and T7, and it has a row for T44, which is not in tasks.md.`), then each command alone in its code span under its label (`Check T4 and T7 against the spec and remove the T44 row:` with `` `/crav1-verify-build-against-spec <slug>` ``, `Push the specs repo (2 commits ahead):` with `` `git push` ``), and a `---` line before the first branch block. Left out when nothing is behind. A not-ready ending puts the same block first and drops its separate verify or push entry.
+- **One command for the stray row.** `/crav1-verify-build-against-spec` now says it writes one Tasks overview row per T# in `tasks.md` and drops a row for a T# that `tasks.md` does not have, naming it in the reply. The ready check therefore names only that command, and no longer `/crav1-tighten-plan`, which never wrote `verify.md`.
+- **Waiting is for waits.** Waiting lines keep only what you cannot act on now, such as a person's answer or a merge.
+- One shared builder, `walk_ending.catch_up_block()`, used by the ready check and the tighten-and-plan ready check (`catch_up` in the readiness JSON), and passed through by `/crav1-build-walk` and the branch run when their state carries `catch_up`.
+- `run-ending.md`, the readiness, rules, verify-behind, next-verify and sync references, the build-walk state table, three walkthroughs and the skill pages show it. Tests: `scripts/tests/test_catch_up_block_1167.py`; two older tests now expect the block.
+
 ## 1.166.0 (2026-11-15)
 
 Every Run next branch block has a description again, and a held question that points to a note shows the question itself. A minor release because the ending reads differently in the ready check, the tighten-and-plan ready check and the build walk.
