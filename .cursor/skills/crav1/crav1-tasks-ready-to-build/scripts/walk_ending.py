@@ -28,6 +28,7 @@ The skills print the text these functions return, as-is. The ready check's
 
 Usage:
   walk_ending.py --json <state file>   prints compose() of that state
+  walk_ending.py --verify <state file> prints the verify reply (1.168.0)
 Standard library only.
 """
 
@@ -716,11 +717,321 @@ def not_ready_next(slug: str, counts: dict | None, question_first: bool) -> str 
     return None
 
 
+
+# ---------- The verify reply (1.168.0) ----------
+
+VERIFY_STATUSES = (
+    ("tick_pending", "Implemented, verified, tick pending", "verified, tick pending"),
+    ("verified", "Implemented, verified", "verified"),
+    ("failed", "Implemented, verify failed", "failed"),
+    ("not_implemented", "Not implemented", "not implemented"),
+    ("unverified", "Claimed done, unverified", "unverified"),
+    ("no_task", "Acceptance with no task", "acceptance with no task"),
+)
+TASK_LINE = re.compile(r"^\s*- \[(?: |x|X)\] (T\d+)\b")
+FINALIZE_COMMAND = "/crav1-finalize-commit"
+
+
+def _cells(line):
+    return [cell.strip() for cell in line.strip().strip("|").split("|")]
+
+
+def _section(text, prefix):
+    """The lines under the `## <prefix>...` heading, up to the next `## `."""
+    out, inside = [], False
+    for line in str(text or "").splitlines():
+        if line.startswith("## "):
+            if inside:
+                break
+            inside = line[3:].strip().startswith(prefix)
+            continue
+        if inside:
+            out.append(line)
+    return out
+
+
+def status_key(status):
+    """The verify status key for a Status cell, or "" (1.168.0)."""
+    plain = _plain(status).lower()
+    for key, label, _word in VERIFY_STATUSES:
+        if plain.startswith(label.lower()):
+            return key
+    return ""
+
+
+def verify_counts(text):
+    """Counts from verify.md's TL;DR table, by status key (1.168.0)."""
+    counts = {}
+    for line in _section(text, "TL;DR"):
+        if not line.strip().startswith("|"):
+            continue
+        cells = _cells(line)
+        if len(cells) < 2:
+            continue
+        key = ""
+        for k, label, _word in VERIFY_STATUSES:
+            if _plain(cells[0]).lower() == label.lower():
+                key = k
+        if key and cells[1].strip().isdigit():
+            counts[key] = int(cells[1])
+    return counts
+
+
+def verify_tasks(text):
+    """T# to (status key, Verify cell) from verify.md's Tasks overview, in file order."""
+    rows = {}
+    for line in _section(text, "Tasks"):
+        if not line.strip().startswith("|"):
+            continue
+        cells = _cells(line)
+        if len(cells) < 3 or not re.fullmatch(r"T\d+", _plain(cells[0])):
+            continue
+        verify = cells[3] if len(cells) > 3 else ""
+        rows[_plain(cells[0])] = (status_key(cells[2]), _plain(verify))
+    return rows
+
+
+def result_line(counts):
+    """`Result:` with the non-zero counts, verified first (1.168.0)."""
+    counts = counts or {}
+    parts = []
+    for key, _label, word in VERIFY_STATUSES:
+        n = int(counts.get(key, 0) or 0)
+        if n:
+            parts.append(f"{n} {word}")
+    return "Result: " + (", ".join(parts) if parts else "no tasks checked") + "."
+
+
+def verify_changes(previous, current, task_ids=None):
+    """One line per task whose state changed since the last verify (1.168.0).
+
+    `previous` and `current` are verify_tasks() maps. A status change gives
+    `T6 failed: <its Verify cell, shortened>`. A row the new file no longer
+    has gives `T44 row dropped: not in tasks.md`. No previous file: no lines.
+    """
+    if not previous:
+        return []
+    words = {key: word for key, _label, word in VERIFY_STATUSES}
+    lines = []
+    for tid, (key, verify) in current.items():
+        before = previous.get(tid)
+        if before is not None and before[0] == key:
+            continue
+        word = words.get(key, "checked")
+        head = f"{tid} {word}" if before is not None else f"{tid} new, {word}"
+        lines.append(f"{head}: {shorten(verify, 120)}" if verify else head)
+    known = set(task_ids) if task_ids is not None else None
+    for tid in previous:
+        if tid not in current and (known is None or tid not in known):
+            lines.append(f"{tid} row dropped: not in tasks.md")
+    return lines
+
+
+def verify_catch_up_block(slug=None, uncommitted=None, ahead=0, plan_notes=None, unticked=None):
+    """`**Catch up first**` for the verify reply (1.168.0), or "".
+
+    What the user can settle now with one command each: a plan note such as
+    `T24 to T26 may belong to another slice` (`/crav1-tighten-plan`), an
+    acceptance that passed while its spec.md box is open (`/crav1-tighten-spec`,
+    never a hand edit), then the files this run wrote and did not commit
+    (`/crav1-finalize-commit`) and the push. Same layout as catch_up_block().
+    """
+    notes = [_plain(note).rstrip(".") + "." for note in plan_notes or [] if _plain(note)]
+    ticks = [str(a).strip() for a in unticked or [] if str(a).strip()]
+    files = [str(f).strip() for f in uncommitted or [] if str(f).strip()]
+    try:
+        ahead = int(ahead or 0)
+    except (TypeError, ValueError):
+        ahead = 0
+    if not (notes or ticks or files or ahead > 0):
+        return ""
+    sentences = list(notes)
+    if ticks:
+        verb = "passes" if len(ticks) == 1 else "pass"
+        box = "its box" if len(ticks) == 1 else "their boxes"
+        sentences.append(f"{_join(ticks)} {verb}, and {box} in spec.md {'is' if len(ticks) == 1 else 'are'} still open.")
+    if files:
+        sentences.append(f"{_join(files)} {'is' if len(files) == 1 else 'are'} not committed.")
+    unit = "commit" if ahead == 1 else "commits"
+    if ahead > 0:
+        sentences.append(f"The specs repo is {ahead} {unit} ahead of origin.")
+    lines = ["**Catch up first**", " ".join(sentences), ""]
+    tail = f" {slug}" if slug else ""
+    if notes:
+        lines.append("Settle the plan note in the plan:" if len(notes) == 1 else "Settle the plan notes in the plan:")
+        lines.append(f"`/crav1-tighten-plan{tail}`")
+    if ticks:
+        lines.append(f"Tick {_join(ticks)} in spec.md:")
+        lines.append(f"`/crav1-tighten-spec{tail}`")
+    if files:
+        lines.append(f"Commit {_join(files)}:")
+        lines.append(f"`{FINALIZE_COMMAND}`")
+        lines.append("Then push the specs repo:")
+        lines.append(f"`{PUSH_COMMAND}`")
+    elif ahead > 0:
+        lines.append(f"Push the specs repo ({ahead} {unit} ahead):")
+        lines.append(f"`{PUSH_COMMAND}`")
+    return "\n".join(lines)
+
+
+def step_block(step):
+    """One verify next step (1.168.0): the reason once, then the label on its
+    own line and the command alone in its code span. A dict with `reason`,
+    `label`, `command` and an optional bold `heading`; no command: the
+    reason only (`Nothing needed now.`)."""
+    if isinstance(step, str):
+        return step.strip()
+    step = step or {}
+    lines = []
+    if step.get("heading"):
+        lines.append(f"**{step['heading']}**")
+    if step.get("reason"):
+        lines.append(_plain(step["reason"]))
+    command = str(step.get("command") or "").strip().strip("`")
+    if command:
+        if lines:
+            lines.append("")
+        lines.append(str(step.get("label") or "Run:").strip())
+        lines.append(f"`{command}`")
+    return "\n".join(lines)
+
+
+def verify_reply(
+    slug,
+    counts=None,
+    changes=None,
+    steps=None,
+    catch_up=None,
+    waiting=None,
+    report=None,
+    walk=False,
+    full_text=None,
+):
+    """The brief verify reply (1.168.0). Print it verbatim.
+
+    The header, the Result line, one line per changed task, Run next (a
+    Catch up first block, then each step), Waiting (only what the user
+    cannot act on now), then `Report:`. With the word `full`, `full_text`
+    (verify.md's TL;DR and Tasks overview) follows the Result line. When
+    /crav1-build-walk opened verify (`walk`), the walk owns Run next.
+    """
+    parts = [f"Verify — {slug}", result_line(counts)]
+    if full_text:
+        parts.append(full_text.strip())
+    lines = [str(line).strip() for line in changes or [] if str(line).strip()]
+    if lines:
+        parts.append("Changed since the last verify:\n" + "\n".join(f"- {line}" for line in lines))
+    if not walk:
+        if isinstance(catch_up, dict):
+            catch_up = verify_catch_up_block(slug=slug, **{
+                key: catch_up.get(key)
+                for key in ("uncommitted", "ahead", "plan_notes", "unticked")
+                if key in catch_up
+            })
+        entries = [step_block(step) for step in steps or []]
+        entries = [entry for entry in entries if entry.strip()]
+        if not entries and not (catch_up or "").strip():
+            entries = ["Nothing needed now."]
+        parts.append(run_block(entries, catch_up))
+    if waiting:
+        if isinstance(waiting, str):
+            waiting = [waiting]
+        wait = [_prefixed(line, "Waiting") for line in waiting if str(line).strip()]
+        if wait:
+            parts.append("\n".join(wait))
+    parts.append(f"Report: {report or f'docs/specs/{slug}/verify.md'}")
+    return "\n\n".join(part for part in parts if part)
+
+
+def _git(root, *args):
+    import subprocess
+
+    try:
+        done = subprocess.run(
+            ["git", *args], cwd=str(root), capture_output=True, text=True, encoding="utf-8", timeout=30
+        )
+    except (OSError, subprocess.SubprocessError):
+        return None
+    return done.stdout if done.returncode == 0 else None
+
+
+def _full_text(text):
+    keep = []
+    for prefix, title in (("TL;DR", "## TL;DR"), ("Tasks", "## Tasks — overview (dependency order)")):
+        body = [line for line in _section(text, prefix) if not line.startswith("Next:") and not line.startswith("<!--")]
+        while body and not body[0].strip():
+            body.pop(0)
+        while body and not body[-1].strip():
+            body.pop()
+        if body:
+            keep.append(title + "\n\n" + "\n".join(body))
+    return "\n\n".join(keep)
+
+
+def verify_state(state):
+    """The verify_reply() keywords from a state dict (1.168.0).
+
+    `root` is the spec folder. The counts, the changed tasks and the
+    Uncommitted files come from verify.md, the committed verify.md
+    (`git show HEAD:`, or `previous`, a file path), tasks.md and git status.
+    The skill adds only what it judged: `steps`, `plan_notes`, `unticked`,
+    `waiting`, `walk`, `full`.
+    """
+    root = Path(state["root"])
+    slug = state.get("slug") or root.name
+    text = (root / "verify.md").read_text(encoding="utf-8") if (root / "verify.md").is_file() else ""
+    if state.get("previous"):
+        prev_path = Path(state["previous"])
+        previous = prev_path.read_text(encoding="utf-8") if prev_path.is_file() else ""
+    else:
+        previous = _git(root, "show", "HEAD:./verify.md") or ""
+    tasks_file = root / "tasks.md"
+    task_ids = None
+    if tasks_file.is_file():
+        task_ids = [m.group(1) for m in (TASK_LINE.match(l) for l in tasks_file.read_text(encoding="utf-8").splitlines()) if m]
+    changes = state.get("changes")
+    if changes is None:
+        changes = verify_changes(verify_tasks(previous), verify_tasks(text), task_ids)
+    uncommitted = state.get("uncommitted")
+    if uncommitted is None:
+        uncommitted = []
+        for name in state.get("written") or ["verify.md"]:
+            out = _git(root, "status", "--porcelain", "--", name)
+            if out and out.strip():
+                uncommitted.append(name)
+    ahead = state.get("ahead")
+    if ahead is None:
+        out = _git(root, "rev-list", "--count", "@{u}..HEAD")
+        ahead = int(out.strip()) if out and out.strip().isdigit() else 0
+    return {
+        "slug": slug,
+        "counts": verify_counts(text),
+        "changes": changes,
+        "steps": state.get("steps") or [],
+        "catch_up": {
+            "uncommitted": uncommitted,
+            "ahead": ahead,
+            "plan_notes": state.get("plan_notes") or [],
+            "unticked": state.get("unticked") or [],
+        },
+        "waiting": state.get("waiting") or [],
+        "report": state.get("report") or f"docs/specs/{slug}/verify.md",
+        "walk": bool(state.get("walk")),
+        "full_text": _full_text(text) if state.get("full") else None,
+    }
+
+
 def main(argv=None) -> int:
     _utf8_stdout()
     parser = argparse.ArgumentParser(description="Compose the shared walk ending")
-    parser.add_argument("--json", required=True, help="state file with compose() keys")
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("--json", help="state file with compose() keys")
+    group.add_argument("--verify", help="state file for the verify reply (1.168.0): root, steps, ...")
     args = parser.parse_args(argv)
+    if args.verify:
+        state = json.loads(Path(args.verify).read_text(encoding="utf-8-sig"))
+        print(verify_reply(**verify_state(state)))
+        return 0
     state = json.loads(Path(args.json).read_text(encoding="utf-8"))
     keys = compose.__code__.co_varnames[: compose.__code__.co_argcount]
     print(compose(**{key: state[key] for key in keys if key in state}))

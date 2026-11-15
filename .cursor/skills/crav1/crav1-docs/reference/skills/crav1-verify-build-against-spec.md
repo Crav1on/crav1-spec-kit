@@ -8,6 +8,8 @@
 
 Map every v0 acceptance line to tests or UI checks and report pass, fail, or missing.
 
+1.168.0: the chat reply is brief and built by `scripts/walk_ending.py --verify <state file>` (a wrapper for the shared ending script): `Verify — <slug>`, a `Result:` line with the counts, one line per task whose state changed since the last verify (`T6 failed: ...`, `T44 row dropped: not in tasks.md`), `Run next:`, Waiting for what you cannot act on now, then `Report: docs/specs/<slug>/verify.md`. Run next opens with a `**Catch up first**` block when something can be settled now: a plan note ([`/crav1-tighten-plan`](crav1-tighten-plan.md) <slug>`), a passing acceptance whose spec.md box is open ([`/crav1-tighten-spec`](crav1-tighten-spec.md) <slug>`), and an uncommitted `verify.md` ([`/crav1-finalize-commit`](crav1-finalize-commit.md), then `git push`). Then the next step: the reason once, the label on its own line and the command alone in its code span; there is no `Next:` line. The TL;DR, tables and branch detail stay in `verify.md`; the word `full` shows the TL;DR and Tasks overview in chat. The run reads only spec, plan, tasks, the previous `verify.md` and the reference a step names, not `build-map.md`, `claims.md`, `walk-progress.md` or a log. The live checks and `verify.md` are unchanged.
+
 1.167.0: the Tasks overview has one row per T# in `tasks.md`; a row for a T# that `tasks.md` does not have is dropped and the reply names it. The ready check's Catch up first block names only this command for a behind task and a stray row.
 
 1.149.0: the branch line, sub-branches, promotion, tick pending, a host-setup task, and the one next line are references files, each read only when that case applies. The rules are unchanged.
@@ -37,6 +39,7 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 | Question | Word | Means |
 | --- | --- | --- |
 | Also check the latest pipeline runs? | `pipeline-runs` | check the latest successful Azure DevOps runs behind the Promotion line (read-only) |
+| Long reply? | `full` | show the TL;DR and Tasks overview in chat (1.168.0); the brief reply is the default |
 
 ## Runs when
 
@@ -50,7 +53,7 @@ Prompt budget: 3 (the most prompts in one run, the closing yes included). A prom
 
 In short: Spec, tasks, plan, and the running tree.
 
-Reads `spec.md`, `tasks.md`, `plan.md`, and the running tree.
+Reads `spec.md`, `plan.md`, `tasks.md`, the previous `verify.md`, and the running tree. It does not open `build-map.md`, `claims.md`, `walk-progress.md` or a log unless a step names it (1.168.0).
 
 ## Writes
 
