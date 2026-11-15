@@ -16,9 +16,9 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 
 | Question | Word | Means |
 | --- | --- | --- |
-| How deep | `what it does` | what it does |
-| How deep | `what and why` | what and why |
-| How deep | `teach the language` | teach the language |
+| How deep | `what-it-does` | what it does |
+| How deep | `what-and-why` | what and why |
+| How deep | `teach-the-language` | teach the language |
 
 ## Runs when
 
@@ -62,7 +62,7 @@ Stage: stable. Since: 1.59.0 ([changelog](../../../CHANGELOG.md)).
 ## First prompt
 
 ```text
-/crav1-explain-this-code what it does
+/crav1-explain-this-code what-it-does
 @src/<file>
 ```
 

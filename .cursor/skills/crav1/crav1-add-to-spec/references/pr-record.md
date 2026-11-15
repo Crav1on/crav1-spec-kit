@@ -2,7 +2,7 @@
 
 The skills named in this file are not started from here, and their files are not opened from here. A refused start is expected. The rule is [open-skill-file.md](../../crav1-docs/reference/open-skill-file.md) (1.134.0).
 
-One pull request, one PR note, one record. The PR note (`docs/notes/YYYY-MM/YYYY-MM-DD-pr-<repo>-<n>.md`, [notes.md](notes.md) **PR note**) holds a `## PR record` section: what is done, what is left and why, who owes the next step, the merge order and whether it can merge. `/crav1-pr-status`, `/crav1-review-pr`, `/crav1-add-to-spec` and `/crav1-merge-pr` all read and write this one section. There is no separate follow-ups note and no `State on <date>` line any more; a project made before 1.97.0 runs `/crav1-add-to-spec migrate formats` once ([merge-safe.md](merge-safe.md) **Migration**).
+One pull request, one PR note, one record. The PR note (`docs/notes/YYYY-MM/YYYY-MM-DD-pr-<repo>-<n>.md`, [notes.md](notes.md) **PR note**) holds a `## PR record` section: what is done, what is left and why, who owes the next step, the merge order and whether it can merge. `/crav1-pr-status`, `/crav1-review-pr`, `/crav1-add-to-spec` and `/crav1-merge-pr` all read and write this one section. There is no separate follow-ups note and no `State on <date>` line any more; a project made before 1.97.0 runs `/crav1-add-to-spec migrate-formats` once ([merge-safe.md](merge-safe.md) **Migration**).
 
 ## Layout of the PR note
 
@@ -60,7 +60,7 @@ These follow [merge-safe.md](merge-safe.md) so two people's runs rarely conflict
 - Kinds in the order above. Within a kind, in sorted place by key, case ignored: Order by PR number, Point by anchor then text, Read by name.
 - A skill changes only its own line: it finds a Point by its thread id, else by anchor and text words (case, spacing and trailing punctuation ignored), and replaces that line where it is. A status or tag change does not move the line. Existing lines are never reordered.
 - Change a record line with the host's file edit tool, one edit per line, showing the old and new line. Find the line by reading the note, not with a script; when the words match two lines, ask instead of guessing. The only scripts a record write runs are the ones a skill names (`notes_index.py`) (1.99.1).
-- A new line goes in sorted place. `Ready` and `State` are replaced in place; `Read` is one line per person. `Read: sweep` is the sweep watermark from `/crav1-update-specs-from-changes-and-prs` (1.124.0). It is not a person. `since last` does not use it. A skill replaces only its own `Read` line.
+- A new line goes in sorted place. `Ready` and `State` are replaced in place; `Read` is one line per person. `Read: sweep` is the sweep watermark from `/crav1-update-specs-from-changes-and-prs` (1.124.0). It is not a person. `since-last` does not use it. A skill replaces only its own `Read` line.
 - Never delete a Point. A point that no longer applies becomes `declined` or `done <sha>` with the reason in its text.
 
 ## Who writes what
@@ -76,4 +76,4 @@ These follow [merge-safe.md](merge-safe.md) so two people's runs rarely conflict
 
 - `Ready` is stale when a push or a comment on the host is newer than its date; a reader says `stale since <date>` and still shows it.
 - A Point whose `host` tag says resolved while its status is `open`, `agreed` or `waiting on …`, with no later push touching its anchor, is flagged `resolved, code unchanged`.
-- An old follow-ups note (`review-pr-[<repo>-]<n>-follow-ups.md`) that is still there is read as if its bullets were `migrated` Points, and the run says once: `Old follow-ups note found; run /crav1-add-to-spec migrate formats.`
+- An old follow-ups note (`review-pr-[<repo>-]<n>-follow-ups.md`) that is still there is read as if its bullets were `migrated` Points, and the run says once: `Old follow-ups note found; run /crav1-add-to-spec migrate-formats.`

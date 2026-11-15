@@ -28,12 +28,12 @@ Skip the question when the message already says which: a `Gap` id, `T#`, or "fro
 
 Exact words for bots and scripted runs. There are no `--flags`.
 
-- Which gaps: `verify gaps` / `live gaps`.
-- Branch (1.99.0, on a base or other branch): `new branch` (create `fix/<slug>` from the into branch).
+- Which gaps: `verify-gaps` / `live-gaps`.
+- Branch (1.99.0, on a base or other branch): `new-branch` (create `fix/<slug>` from the into branch).
 
-When the invocation contains one of these words (for example `/crav1-fix-build-gaps verify gaps`), take that choice and do not ask. This holds for a person, a bot, or a headless run.
+When the invocation contains one of these words (for example `/crav1-fix-build-gaps verify-gaps`), take that choice and do not ask. This holds for a person, a bot, or a headless run.
 
-When a choice is missing and the run is headless or started by a bot (no person in the chat to answer), do not guess. Stop and name the valid words, for example: `Missing choice. Use one of: verify gaps, live gaps.`
+When a choice is missing and the run is headless or started by a bot (no person in the chat to answer), do not guess. Stop and name the valid words, for example: `Missing choice. Use one of: verify-gaps, live-gaps.`
 
 ## After
 

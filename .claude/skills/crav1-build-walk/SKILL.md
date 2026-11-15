@@ -35,7 +35,7 @@ Read [references/common.md](references/common.md) once. Then open only the file 
 - The pull request author or a commit author is someone else: read [references/other-owner.md](references/other-owner.md) before any switch.
 - The task line has `(Runs live)`, or an Approval needed item holds it: read [references/live.md](references/live.md). A recorded yes that the assistant's permission check refused is not a missing yes (1.143.0).
 - A task needs code that is still only on an unmerged branch: read [references/stack.md](references/stack.md).
-- Starting on a branch, or `release claim`: read [references/claims.md](references/claims.md).
+- Starting on a branch, or `release-claim`: read [references/claims.md](references/claims.md).
 - The first action of a run, or the walk is ending or the user stopped: read [references/sync.md](references/sync.md).
 - The step itself: read [references/steps.md](references/steps.md).
 
@@ -48,9 +48,9 @@ Exact words. There are no `--flags`. A word in the invocation answers its questi
 - `yes` — do the write, push, open, or merge that was just shown.
 - `switch` — build on the other person's branch, in other-owner mode.
 - `own` — this branch is ours. Do not switch.
-- `edit description` — change that pull request's description. Other-owner mode only, and only because this run asked.
+- `edit-description` — change that pull request's description. Other-owner mode only, and only because this run asked.
 - `stop` — write nothing further. At the end of a walk, still offer the settle-and-push card unless the user already refused it.
-- `release claim` — clear this branch's claim, then commit and push `claims.md` after yes.
+- `release-claim` — clear this branch's claim, then commit and push `claims.md` after yes.
 
 ## Locked steps
 

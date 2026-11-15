@@ -62,7 +62,7 @@ Only after they pick a name that is not Stop:
 - A `(branch: <repo> <name>)` or `(map: <repo> <name>)` for another repo is not built here. Say which checkout it belongs to.
 - Never create the branch from the default without this yes.
 
-The choice word `new branch` still creates `feat/<slug>` from the into branch. It does not switch the recommended name. On a one-task run, when `feat/<slug>` is not the recommended name, the different-pick write below applies. On a range, `new branch` only leaves the base. Each task still uses its own recommended name, and those tasks are not rewritten onto `feat/<slug>`.
+The choice word `new-branch` still creates `feat/<slug>` from the into branch. It does not switch the recommended name. On a one-task run, when `feat/<slug>` is not the recommended name, the different-pick write below applies. On a range, `new-branch` only leaves the base. Each task still uses its own recommended name, and those tasks are not rewritten onto `feat/<slug>`.
 
 ## A different pick
 

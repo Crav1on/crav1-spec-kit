@@ -20,7 +20,7 @@ Before the tests, a local dependency preflight checks Azurite, database containe
 
 1.68.0: the `Sub-branches:` and `left behind:` lines, done when the top-level branches reached the base, and `merged, reverted on <base> (<sha>)`, report only.
 
-1.69.0: the `Promotion:` line in the TL;DR and verify.md, with the optional `pipeline runs` check; done stays merged.
+1.69.0: the `Promotion:` line in the TL;DR and verify.md, with the optional `pipeline-runs` check; done stays merged.
 
 1.136.0: the spec folder is `scripts/resolve_spec.py` (exact folder, then hyphen and space forms, then one unique playbook basename, spec title, or work-item name). Several matches are listed and the run stops. It does not pick the most recently edited tree. A task whose evidence passed, whose row is still `[ ]`, and whose pull request is recorded merged is **Implemented, verified, tick pending**. That is not Not implemented. Next skips tasks the ready check counts as done and names the first task that can start, one line per ready branch. The open checkbox stays a Gap. After a yes, the report may tick that one row. It does not re-implement.
 
@@ -34,7 +34,7 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 
 | Question | Word | Means |
 | --- | --- | --- |
-| Also check the latest pipeline runs? | `pipeline runs` | check the latest successful Azure DevOps runs behind the Promotion line (read-only) |
+| Also check the latest pipeline runs? | `pipeline-runs` | check the latest successful Azure DevOps runs behind the Promotion line (read-only) |
 
 ## Runs when
 

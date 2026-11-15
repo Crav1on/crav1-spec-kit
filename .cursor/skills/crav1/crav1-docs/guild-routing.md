@@ -115,7 +115,7 @@ Started from a ready-to-build report, the walk offers each ready branch as its o
 
 `/crav1-existing-to-specs` is a starter option. Asking for startup options names it and does not run it. It may run from any lane, and only when the user names repos. It does not start Specify, Plan, or Build. It is not `/crav1-add-to-spec`.
 
-`/crav1-existing-to-specs recheck` (also `repos vs specs`) may run from any lane once specs exist. It writes nothing into any spec and never an open question. A gap goes to `/crav1-add-to-spec` only after a yes. A new feature is named, not started.
+`/crav1-existing-to-specs recheck` (also `repos-vs-specs`) may run from any lane once specs exist. It writes nothing into any spec and never an open question. A gap goes to `/crav1-add-to-spec` only after a yes. A new feature is named, not started.
 
 `/crav1-read-environment` is a starter option. Asking for startup options names it and does not run it. It may run from any lane, and only when the user names the host. Naming production, prod, or live stops. It never reads production data. It does not start Specify, Plan, or Build. Confirmed system facts go through `/crav1-refresh-system-notes`, architecture facts through `/crav1-existing-to-specs`, and a slice Match through `/crav1-add-to-spec`. It asks once whether to run `/crav1-refresh-system-notes` and does not run that refresh from the question.
 
@@ -143,7 +143,7 @@ Started from a ready-to-build report, the walk offers each ready branch as its o
 
 `/crav1-explain-this-code` may run from any lane, any time. It is not `/crav1-explain-existing-system`. It writes nothing into the repo unless the user picks Save as .md, and then only outside the repo. It does not move work into Specify, Plan, or Build.
 
-`/crav1-retire-spec` may run from any lane, on one spec the user names. Choice words are `retire`, `merge`, `park`, and `convert to note`. It runs no other skill. Parked specs are skipped by `/crav1-plan-from-spec`, `/crav1-build-tasks`, `/crav1-build-features`, and the push branches of `/crav1-ado-sync`. It does not move work into Specify, Plan, or Build.
+`/crav1-retire-spec` may run from any lane, on one spec the user names. Choice words are `retire`, `merge`, `park`, and `convert-to-note`. It runs no other skill. Parked specs are skipped by `/crav1-plan-from-spec`, `/crav1-build-tasks`, `/crav1-build-features`, and the push branches of `/crav1-ado-sync`. It does not move work into Specify, Plan, or Build.
 
 `/crav1-what-do-we-know-about-this` may run from any lane when the user asks about one feature, slice, or resource. With no report word it writes nothing in the project. A `report-*` word other than `report-data-model-full` writes one report outside the project. `report-data-model-full` writes under `docs/data-model/<model>/reviews/` and does not edit the saved model. No slice: it names a starter and does not run it. Pasted minutes name `/crav1-add-to-spec` and stop. It does not run another skill and does not move work into Specify, Plan, or Build. It is not a starter option.
 
@@ -197,50 +197,50 @@ The merged skills take exact choice words instead of `--flags`. A word in the in
 
 | Skill | Question | Words |
 | --- | --- | --- |
-| `/crav1-existing-to-specs` | What to read | `repos only` · `repos and bundle` |
-| `/crav1-existing-to-specs` | What to write | `one spec` · `spec per feature` |
-| `/crav1-existing-to-specs` | Recheck existing specs (1.108.0) | `recheck` · `repos vs specs` |
+| `/crav1-existing-to-specs` | What to read | `repos-only` · `repos-and-bundle` |
+| `/crav1-existing-to-specs` | What to write | `one-spec` · `spec-per-feature` |
+| `/crav1-existing-to-specs` | Recheck existing specs (1.108.0) | `recheck` · `repos-vs-specs` |
 | `/crav1-resolve-open-questions` | List (optional, never asked) | `detailed` · `apply` |
 | `/crav1-show-or-ask-open-questions` | Show or ask | `show` · `ask` |
 | `/crav1-show-or-ask-open-questions` | Channel after ask (optional) | `research` |
 | `/crav1-record-approval` | Write the line | `accept` |
-| `/crav1-add-to-spec` | What you have | `fact` · `dump` · `code change` · `meeting` · `mail` · `chat` |
-| `/crav1-build-tasks` | Which tasks | `one task` · `range` · `all tasks` |
-| `/crav1-build-tasks` | Branch | `new branch` |
-| `/crav1-build-walk` | Do this step | `yes` · `stop` · `release claim` |
+| `/crav1-add-to-spec` | What you have | `fact` · `dump` · `code-change` · `meeting` · `mail` · `chat` |
+| `/crav1-build-tasks` | Which tasks | `one-task` · `range` · `all-tasks` |
+| `/crav1-build-tasks` | Branch | `new-branch` |
+| `/crav1-build-walk` | Do this step | `yes` · `stop` · `release-claim` |
 | `/crav1-build-walk` | Whose branch | `switch` · `own` |
-| `/crav1-build-walk` | Pull request description | `edit description` |
-| `/crav1-verify-build-against-spec` | Also check the latest pipeline runs? | `pipeline runs` |
-| `/crav1-fix-build-gaps` | Which gaps | `verify gaps` · `live gaps` |
-| `/crav1-fix-build-gaps` | Branch | `new branch` |
-| `/crav1-finalize-commit` | Commit or message | `commit` · `message only` · `commit now` |
-| `/crav1-finalize-commit` | Base branch | `new branch` |
+| `/crav1-build-walk` | Pull request description | `edit-description` |
+| `/crav1-verify-build-against-spec` | Also check the latest pipeline runs? | `pipeline-runs` |
+| `/crav1-fix-build-gaps` | Which gaps | `verify-gaps` · `live-gaps` |
+| `/crav1-fix-build-gaps` | Branch | `new-branch` |
+| `/crav1-finalize-commit` | Commit or message | `commit` · `message-only` · `commit-now` |
+| `/crav1-finalize-commit` | Base branch | `new-branch` |
 | `/crav1-finalize-commit` | Pull | `pull` |
-| `/crav1-finalize-commit` | Style | `crav1` · `git log` |
-| `/crav1-finalize-commit` | Trailer hook | `strip trailers` · `keep trailers` |
+| `/crav1-finalize-commit` | Style | `crav1` · `git-log` |
+| `/crav1-finalize-commit` | Trailer hook | `strip-trailers` · `keep-trailers` |
 | `/crav1-review-pr` | Review a branch (optional, 1.80.0) | `branch` |
-| `/crav1-review-pr` | PR branches on disk older than the pull request | `fetch pr branches` · `use disk` · `stop pr review` |
-| `/crav1-review-pr` | The comment as posted | `comment posted` · `newest comment` · `skip comment record` |
+| `/crav1-review-pr` | PR branches on disk older than the pull request | `fetch-pr-branches` · `use-disk` · `stop-pr-review` |
+| `/crav1-review-pr` | The comment as posted | `comment-posted` · `newest-comment` · `skip-comment-record` |
 | `/crav1-pr-status` | Which pull request | `pr<n>` |
-| `/crav1-pr-status` | Your side (optional; picked from the PR author otherwise) | `as reviewer` · `as author` |
-| `/crav1-pr-status` | How much | `since last` · `no code` |
-| `/crav1-merge-pr` | Also check the latest pipeline runs? | `pipeline runs` |
+| `/crav1-pr-status` | Your side (optional; picked from the PR author otherwise) | `as-reviewer` · `as-author` |
+| `/crav1-pr-status` | How much | `since-last` · `no-code` |
+| `/crav1-merge-pr` | Also check the latest pipeline runs? | `pipeline-runs` |
 | `/crav1-merge-pr` | The PR record says not ready (1.97.0) | `anyway` |
-| `/crav1-help` | Also check the latest pipeline runs? | `pipeline runs` |
-| `/crav1-help` | What to do next (optional, never asked) | `todo` · `todo next` · `todo top N` |
+| `/crav1-help` | Also check the latest pipeline runs? | `pipeline-runs` |
+| `/crav1-help` | What to do next (optional, never asked) | `todo` · `todo-next` · `todo-top N` |
 | `/crav1-tasks-ready-to-build` | Show the build map? | `build-map` |
 | `/crav1-tasks-ready-to-build` | Show the full list? | `full` |
 | `/crav1-tasks-ready-to-build` | Fix the loop? | `fix-loop` · `fix-loop <n>` |
 | `/crav1-tasks-ready-to-build` | Open the map as a zoomable page? | `open-map` · `export-map` |
-| `/crav1-tasks-ready-to-build` | Also check the latest pipeline runs? | `pipeline runs` |
-| `/crav1-explain-this-code` | How deep | `what it does` · `what and why` · `teach the language` |
-| `/crav1-retire-spec` | What to do | `retire` · `merge` · `park` · `convert to note` |
+| `/crav1-tasks-ready-to-build` | Also check the latest pipeline runs? | `pipeline-runs` |
+| `/crav1-explain-this-code` | How deep | `what-it-does` · `what-and-why` · `teach-the-language` |
+| `/crav1-retire-spec` | What to do | `retire` · `merge` · `park` · `convert-to-note` |
 | `/crav1-model-data` | Which flow | `manual-flow` · `auto-flow` |
 | `/crav1-update-specs-from-changes-and-prs` | Which flow | `manual-flow` · `auto-flow` |
 | `/crav1-glossary` | Which mode | `as-file` · `research` · `<term>` |
-| `/crav1-ado-sync` | Which sync | `suggest features` · `push features` · `push tasks` · `pull tasks` · `pull spec changes` |
+| `/crav1-ado-sync` | Which sync | `suggest-features` · `push-features` · `push-tasks` · `pull-tasks` · `pull-spec-changes` |
 
-Example: `/crav1-ado-sync push tasks`, `/crav1-existing-to-specs repos and bundle spec per feature`.
+Example: `/crav1-ado-sync push-tasks`, `/crav1-existing-to-specs repos-and-bundle spec per feature`.
 
 ## Machine-readable map
 

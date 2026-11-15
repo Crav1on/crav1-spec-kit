@@ -14,10 +14,10 @@ The message is a skill name, with or without `/` and `crav1-`. From its `referen
 - What it reads and what it writes.
 - Before and after: the steps before it and after it in each route that has it (`workflow.yaml`), and its `you_run_next`.
 - Its walkthrough, when it has one.
-- Its choice words, when its page has a Choice words section (the merged skills): every question with its exact words and what each means, plus its `note` line when it has one (such as `After a PR: all`), and an example such as `/crav1-ado-sync push tasks`. Say that a word in the invocation skips the question, and that a headless or bot run without a word stops and names the words.
+- Its choice words, when its page has a Choice words section (the merged skills): every question with its exact words and what each means, plus its `note` line when it has one (such as `After a PR: all`), and an example such as `/crav1-ado-sync push-tasks`. Say that a word in the invocation skips the question, and that a headless or bot run without a word stops and names the words.
 - For `/crav1-tasks-ready-to-build`, say that it can run any time, not only at its route step.
 
-An old name from before 1.56.0 (in the **Renamed skills** table in `README.md`): answer first, in one line, "`/crav1-<old>` was renamed to `/crav1-<new>`, removed in 1.58.0", with the choice word to use when the table names one (for example `/crav1-ado-sync push tasks`). The old name no longer runs. Then answer for the new skill as above.
+An old name from before 1.56.0 (in the **Renamed skills** table in `README.md`): answer first, in one line, "`/crav1-<old>` was renamed to `/crav1-<new>`, removed in 1.58.0", with the choice word to use when the table names one (for example `/crav1-ado-sync push-tasks`). The old name no longer runs. Then answer for the new skill as above.
 
 "renamed", "renamed skills", or "what are the new names": list the whole **Renamed skills** table (old name, new name, choice word) and say the old names were removed in 1.58.0. Source: `README.md#renamed-skills-1560` and the 1.56.0 and 1.58.0 entries in `CHANGELOG.md`.
 
@@ -47,7 +47,7 @@ The message names a kit word or file, such as `work item homes`, `choice words`,
 
 ### 8. What's new
 
-`whats new`: the `CHANGELOG.md` section for the installed version (see **Newer-version notice** for how it is found). In an install that file is the newest 15 releases and ends with a line to the full changelog. The kit repo root file is the full history. `whats new since x.y` or `since x.y.z`: every section in that file after that version, newest first, up to the installed one. When the named version is not in the file, say the bundled changelog keeps the newest 15 and cite that last line. Do not fetch the full file. Summarize each release that is in the file in a few bullets and cite its heading anchor, for example `Source: CHANGELOG.md#1540-2026-10-14`. Never read a newer version's notes from GitHub; when a newer tag exists, only the one notice line names it.
+`whats-new`: the `CHANGELOG.md` section for the installed version (see **Newer-version notice** for how it is found). In an install that file is the newest 15 releases and ends with a line to the full changelog. The kit repo root file is the full history. `whats-new since x.y` or `since x.y.z`: every section in that file after that version, newest first, up to the installed one. When the named version is not in the file, say the bundled changelog keeps the newest 15 and cite that last line. Do not fetch the full file. Summarize each release that is in the file in a few bullets and cite its heading anchor, for example `Source: CHANGELOG.md#1540-2026-10-14`. Never read a newer version's notes from GitHub; when a newer tag exists, only the one notice line names it.
 
 ## Newer-version notice
 

@@ -34,7 +34,7 @@ Not in the inventory: Slack, mail, issues, and a new `/crav1-review-pr`. Host co
 
 Item commands the script stores:
 
-- branch: `/crav1-add-to-spec code change <repo> <branch>`
+- branch: `/crav1-add-to-spec code-change <repo> <branch>`
 - pull request: `/crav1-add-to-spec pr <repo> <n> all`
 
 Open `../crav1-add-to-spec/SKILL.md` from this skill's folder and follow that command's note and `Synced at` rules. The choice words above are the branch inside that file. The rule is [open-skill-file.md](../../crav1-docs/reference/open-skill-file.md) (1.134.0). Do not start `/crav1-add-to-spec`. The personal-data and secrets check stays inside add-to-spec. In this sweep, do not print add-to-spec's own ending, and do not run the `/crav1-pr-status` it names.
@@ -45,7 +45,7 @@ When a pull request's threads were read, add or replace one line on its PR note,
 
 `- Read: sweep | 7b41a0c, push 6, newest comment 2026-10-26T15:03Z | 2026-10-27`
 
-`read-line` prints the line. `<n>` is the Azure DevOps iteration id, or the GitHub commit count. No comment yet: `newest comment none`. This line is not a person. `since last` on `/crav1-pr-status` does not use it.
+`read-line` prints the line. `<n>` is the Azure DevOps iteration id, or the GitHub commit count. No comment yet: `newest comment none`. This line is not a person. `since-last` on `/crav1-pr-status` does not use it.
 
 ## Clock
 

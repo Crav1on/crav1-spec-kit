@@ -62,7 +62,7 @@ Implementation code is never written or committed on a base branch: `main`, `mas
 - **Use an existing branch**: lists the repo's other branches, the spec's own first. A pick the spec doesn't list is added to its Match `Branch:` list with `(into develop)`.
 - A typed branch name on that same card, and **Stop**. There is no second card to collect the name, and there is no Stay.
 
-On a branch that is neither (`chore/x`, a detached checkout) the same prompt offers **Stay** instead of the typed name. A release fix goes on `fix/<slug>` marked `(into release/x)`. A headless run stops with one line unless it has the choice word `new branch`. `/crav1-build-features` forks `feat/<slug>` from the into branch without asking. The worker returns `blocked` if it ever finds itself on a base branch. Spec and doc writes, and the specs repo itself, are exempt.
+On a branch that is neither (`chore/x`, a detached checkout) the same prompt offers **Stay** instead of the typed name. A release fix goes on `fix/<slug>` marked `(into release/x)`. A headless run stops with one line unless it has the choice word `new-branch`. `/crav1-build-features` forks `feat/<slug>` from the into branch without asking. The worker returns `blocked` if it ever finds itself on a base branch. Spec and doc writes, and the specs repo itself, are exempt.
 
 ## A spec branch with task sub-branches (1.68.0)
 

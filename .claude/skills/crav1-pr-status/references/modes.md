@@ -4,7 +4,7 @@ Read every run, from **Mode** in `SKILL.md`.
 
 ## Pick the mode
 
-1. A choice word in this turn (`as reviewer`, `as author`) wins. Say `Mode: <mode> (as asked).`
+1. A choice word in this turn (`as-reviewer`, `as-author`) wins. Say `Mode: <mode> (as asked).`
 2. Else compare the signed-in user with the pull request's author, as `crav1-add-to-spec` `references/pr-threads.md` **Who is signed in** says:
    - GitHub: `gh api user -q .login` against `author.login`.
    - Azure DevOps: `az account show --query user.name` against `createdBy.uniqueName`, case ignored. A PAT run (`AZURE_DEVOPS_EXT_PAT`) has no `user.name`: use git `user.email`, then `user.name` against `createdBy.uniqueName` and `createdBy.displayName`.

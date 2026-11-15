@@ -58,7 +58,7 @@ Minutes, a mail, a chat, or a new fact changes a spec that already exists, built
 | 2 | `/crav1-tighten-spec` | Always, on each spec that changed. New text needs the same tightening as the first draft. |
 | 3 | `/crav1-resolve-open-questions` | When the change added or answered open questions. Use `/crav1-show-or-ask-open-questions` for the ones someone else must answer. |
 | 4 | `/crav1-plan-from-spec` | When the slice has `plan.md` or `tasks.md`, so the plan and the tasks follow the new spec. |
-| 5 | `/crav1-ado-sync` | Optional. When the Feature or its tasks are in Azure Boards (push Features only when the Feature itself changed; push tasks for the tasks). |
+| 5 | `/crav1-ado-sync` | Optional. When the Feature or its tasks are in Azure Boards (push Features only when the Feature itself changed; push-tasks for the tasks). |
 | 6 | `/crav1-tasks-ready-to-build` | Optional. Any time, to see which tasks are ready after the change, which are blocked and why. Read-only. |
 | 7 | `/crav1-build-tasks` | To build the tasks that are not built yet. Each task is verified inside its worker. |
 | 8 | `/crav1-verify-build-against-spec` | For the whole slice when you want one report. |
@@ -115,7 +115,7 @@ Specs and Azure Boards (ADO) should match.
 
 | Step | Command | When |
 | --- | --- | --- |
-| 1 | `/crav1-ado-sync` | It asks which: suggest Features, push Features, push tasks (when the slice has `tasks.md`), pull task states, or pull spec changes from Features. |
+| 1 | `/crav1-ado-sync` | It asks which: suggest Features, push Features, push-tasks (when the slice has `tasks.md`), pull task states, or pull-spec-changes from Features. |
 | 2 | `/crav1-finalize-commit` | When the sync changed a file. |
 
 <a id="repo-gaps"></a>

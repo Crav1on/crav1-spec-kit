@@ -8,9 +8,9 @@
 
 Answer questions about the kit from its own local docs, with the source file and anchor for every answer.
 
-Called with nothing, **[`/crav1-help`](crav1-help.md)** shows a usage guide with example questions. With a skill name, it says what the skill does, when to use it, what it reads and writes, and its before and after steps. With `next` or a situation, it picks the route in `docs/reference/workflow.yaml` and lists the steps in order, marked done, next, skipped, or to do from the slice's file state (open questions, `plan.md`, ticked tasks, `verify.md`, `work-item.md`). It also explains a concept from the glossary and concept pages, lists skills by lane (`list`, `list <lane>`), gives the status of one slice (`status <slug>`, `where am I`) with the readiness rules of [`/crav1-tasks-ready-to-build`](crav1-tasks-ready-to-build.md) and the route step it is on, compares two skills (`compare A B`), and summarizes the changelog for the installed version (`whats new`, `whats new since x.y`). A free-form question is answered from the docs, or with "the kit doesn't say". Every answer ends with `Source: <file>#<anchor>`. On pushback it re-reads the file and keeps the answer unless the file says otherwise.
+Called with nothing, **[`/crav1-help`](crav1-help.md)** shows a usage guide with example questions. With a skill name, it says what the skill does, when to use it, what it reads and writes, and its before and after steps. With `next` or a situation, it picks the route in `docs/reference/workflow.yaml` and lists the steps in order, marked done, next, skipped, or to do from the slice's file state (open questions, `plan.md`, ticked tasks, `verify.md`, `work-item.md`). It also explains a concept from the glossary and concept pages, lists skills by lane (`list`, `list <lane>`), gives the status of one slice (`status <slug>`, `where am I`) with the readiness rules of [`/crav1-tasks-ready-to-build`](crav1-tasks-ready-to-build.md) and the route step it is on, compares two skills (`compare A B`), and summarizes the changelog for the installed version (`whats-new`, `whats-new since x.y`). A free-form question is answered from the docs, or with "the kit doesn't say". Every answer ends with `Source: <file>#<anchor>`. On pushback it re-reads the file and keeps the answer unless the file says otherwise.
 
-It reads the kit repo's `docs/`, or the `crav1-docs/` folder bundled next to the skills (plugin, Cursor drop-in, Claude Code drop-in), never GitHub. The bundled `CHANGELOG.md` is the newest 15 releases and ends with a line to the full file. The kit repo root `CHANGELOG.md` is the full history. `whats new` reads the installed version's section from the file for that install and does not fetch an older section. When online, it reads the tag names once and says so when a newer version is tagged. It writes nothing and runs no other skill. It is cross-cutting. It is not a starter option.
+It reads the kit repo's `docs/`, or the `crav1-docs/` folder bundled next to the skills (plugin, Cursor drop-in, Claude Code drop-in), never GitHub. The bundled `CHANGELOG.md` is the newest 15 releases and ends with a line to the full file. The kit repo root `CHANGELOG.md` is the full history. `whats-new` reads the installed version's section from the file for that install and does not fetch an older section. When online, it reads the tag names once and says so when a newer version is tagged. It writes nothing and runs no other skill. It is cross-cutting. It is not a starter option.
 
 1.64.0: `status <slug>` and `where am I` add the Branches line and route unmerged work to [`/crav1-open-pr`](crav1-open-pr.md) or [`/crav1-merge-pr`](crav1-merge-pr.md).
 
@@ -18,9 +18,9 @@ It reads the kit repo's `docs/`, or the `crav1-docs/` folder bundled next to the
 
 1.68.0: status adds the `Sub-branches:` and `left behind:` lines and `merged, reverted on <base> (<sha>)`, report only.
 
-1.69.0: status adds the `Promotion:` line from `docs/environments/promotion.md` (branch reach, release and tag patterns, `not back on <base>`), with the optional `pipeline runs` check.
+1.69.0: status adds the `Promotion:` line from `docs/environments/promotion.md` (branch reach, release and tag patterns, `not back on <base>`), with the optional `pipeline-runs` check.
 
-1.75.0: `todo`, `todo next` (top 5) and `todo top N`, with an optional scope (person, spec, topic, branch, or pull request), rank what to do next from the records. Read-only; nothing is stored. A **Yours first** group comes from `git config user.name` or `todo for <name>`.
+1.75.0: `todo`, `todo-next` (top 5) and `todo-top N`, with an optional scope (person, spec, topic, branch, or pull request), rank what to do next from the records. Read-only; nothing is stored. A **Yours first** group comes from `git config user.name` or `todo for <name>`.
 
 ## Choice words
 
@@ -28,10 +28,10 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 
 | Question | Word | Means |
 | --- | --- | --- |
-| Also check the latest pipeline runs? | `pipeline runs` | check the latest successful Azure DevOps runs behind the Promotion line (read-only) |
+| Also check the latest pipeline runs? | `pipeline-runs` | check the latest successful Azure DevOps runs behind the Promotion line (read-only) |
 | What to do next (optional, never asked) | `todo` | every action from the records, ranked (read-only) |
-| What to do next (optional, never asked) | `todo next` | the top 5 |
-| What to do next (optional, never asked) | `todo top N` | the top N |
+| What to do next (optional, never asked) | `todo-next` | the top 5 |
+| What to do next (optional, never asked) | `todo-top N` | the top N |
 
 ## Runs when
 

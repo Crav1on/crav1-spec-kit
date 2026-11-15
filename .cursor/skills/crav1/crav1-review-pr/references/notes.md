@@ -17,7 +17,7 @@ Write the record as `crav1-add-to-spec` `references/pr-record.md` says (skill `c
 
 **Re-review.** Read the record first. Do not write a second note. Set `imported` to this review's date, add Points for new findings and follow-ups, a new `## Comment as drafted` section, and set a Point the code now addresses to `done <short sha>`. Never delete a Point. Leave `used_by` as it is, then rerun the generator.
 
-**Old follow-ups note.** A `review-pr-[<repo>-]<n>-follow-ups.md` note from before 1.97.0 is still read: its bullets count as `migrated` Points and its comment sections as history. Do not write to it. Add once to the kit record: `Old follow-ups note found; run /crav1-add-to-spec migrate formats.`
+**Old follow-ups note.** A `review-pr-[<repo>-]<n>-follow-ups.md` note from before 1.97.0 is still read: its bullets count as `migrated` Points and its comment sections as history. Do not write to it. Add once to the kit record: `Old follow-ups note found; run /crav1-add-to-spec migrate-formats.`
 
 When the specs repo is not in this workspace, write the note into the specs repo found as a sibling (see [Specs repo and code repo](../SKILL.md#specs-repo-and-code-repo-1650)), never commit it, and name its full path. When no specs repo is found, write nothing; the chat line says `Kit record: not saved, no specs repo`.
 

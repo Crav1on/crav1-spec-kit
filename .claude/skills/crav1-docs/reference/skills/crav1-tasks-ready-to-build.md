@@ -8,7 +8,7 @@
 
 List the tasks ready to build, for one spec or all, and why the others are blocked. Rewrites each slice build map.
 
-1.163.0: the choice words are `fix-loop`, `fix-loop <n>`, `open-map` and `export-map` only. The spaced forms `fix loop`, `open map` and `export map` are no longer accepted. The script flags `--fix-loop` and `--export` are unchanged.
+1.163.0: multi-word choice words are hyphenated only. On this skill: `fix-loop`, `fix-loop <n>`, `open-map`, `export-map` and `pipeline-runs`. Spaced forms are no longer accepted. The script flags `--fix-loop` and `--export` are unchanged. The same hyphen-only rule applies to the kit's other choice words, including `release-claim`, `new-branch`, `one-task`, `git-log` (the style word), and the rest listed in the 1.163.0 changelog.
 
 1.162.0: `open-map` shows the whole `build-map.md` as a zoomable page in the browser, the text in a readable column and each Mermaid diagram in place, full window width, with wheel zoom, drag to pan, Fit, 100% and Fullscreen. `export-map` writes one self-contained HTML file to share, `<slug>-build-map-<YYYY-MM-DD>.html` in Downloads, never inside the specs repo. The script is `scripts/open_build_map.py docs/specs/<slug>` (`--export`, `--out`, `--no-open`). It loads Mermaid 11.4.1 and marked 18.2.0 from `scripts/vendor/`, or from jsDelivr when that folder is missing; the export inlines both. The map file gets one line under its heading naming both commands, and a done branch says `Waited for:` instead of `Waits for:`.
 
@@ -26,7 +26,7 @@ Shows summary counts per slice, then Ready and Held grouped by build-map branch,
 
 1.68.0: the `Sub-branches:` and `left behind:` lines and `merged, reverted on <base> (<sha>)`, report only.
 
-1.69.0: the `Promotion:` line under the Branches line, with the optional `pipeline runs` check.
+1.69.0: the `Promotion:` line under the Branches line, with the optional `pipeline-runs` check.
 
 1.88.0: command-only (`disable-model-invocation: true`). It runs only when you type [`/crav1-tasks-ready-to-build`](crav1-tasks-ready-to-build.md); the agent does not start it from a plain question, and its description no longer loads in every chat.
 
@@ -82,7 +82,7 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 | Fix the loop? | `fix-loop <n>` | apply the fix with that number from the Loop lines instead |
 | Open the map as a zoomable page? | `open-map` | open the whole build map in the browser, with a diagram you can zoom and pan |
 | Open the map as a zoomable page? | `export-map` | write the map as one HTML file to send, outside the specs repo |
-| Also check the latest pipeline runs? | `pipeline runs` | check the latest successful Azure DevOps runs behind the Promotion line (read-only) |
+| Also check the latest pipeline runs? | `pipeline-runs` | check the latest successful Azure DevOps runs behind the Promotion line (read-only) |
 
 ## Runs when
 

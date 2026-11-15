@@ -116,7 +116,7 @@ NAMED_BRANCH = re.compile(
 )
 TICK_PATH = re.compile(r"`([^`\n]+)`")
 WORD = re.compile(r"(?<![\w-])build-map(?![\w-])")
-PIPELINE = re.compile(r"(?<![\w-])pipeline runs(?![\w-])")
+PIPELINE = re.compile(r"(?<![\w-])pipeline-runs(?![\w-])")
 PAGE = re.compile(r"(?<![\w-])(open|export)-map(?![\w-])")
 STOP = {
     "a", "an", "the", "and", "or", "of", "to", "for", "on", "in", "with",

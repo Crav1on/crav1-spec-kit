@@ -3,7 +3,7 @@ name: crav1-pr-status
 description: >-
   Use when the user asks where one open pull request stands. Lists every
   thread point as done, agreed, declined, open, or waiting, who owes the next
-  step, dependencies, and a merge-readiness line. `since last` shows only
+  step, dependencies, and a merge-readiness line. `since-last` shows only
   changes. Saves the PR record in the specs repo notes.
 disable-model-invocation: true
 icon: list-checks
@@ -25,9 +25,9 @@ Run it when this turn names a pull request (number or URL) or clearly asks for i
 Exact words for bots and scripted runs. There are no `--flags`.
 
 - Which pull request: `pr<n>`, `pr <n>`, `#<n>`, `pr <repo> <n>`, or the URL, parsed as `crav1-add-to-spec` `references/scope.md` says.
-- Mode: `as reviewer`, `as author`. They override the mode the run would pick.
-- `since last`: show only what changed since your last run.
-- `no code`: threads only; no diff and no commit check. Points that would need the code to say `done` stay `agreed` and the output says `code not checked`.
+- Mode: `as-reviewer`, `as-author`. They override the mode the run would pick.
+- `since-last`: show only what changed since your last run.
+- `no-code`: threads only; no diff and no commit check. Points that would need the code to say `done` stay `agreed` and the output says `code not checked`.
 
 A choice word answers its question; the run does not ask it.
 
@@ -43,11 +43,11 @@ At most **one** prompt per run, the closing one included, as `crav1.mdc` says. A
 
 Resolve the pull request and its host as [pr-common.md](../crav1-docs/reference/pr-common.md) says (1.158.0; with no pull request named, `scripts/pr_common.py find --branch <current-branch>`), and the code repo and specs repo as `/crav1-review-pr` does (**Specs repo and code repo**). Read everything as `crav1-add-to-spec` `references/pr-threads.md` says (skill `crav1-add-to-spec`, `references/pr-threads.md`): the threads with every comment, the pushes with their commits, the files each push changed, and who is signed in. Skip system and bot threads.
 
-Then read the PR note and its `## PR record`, as `crav1-add-to-spec` `references/pr-record.md` says (skill `crav1-add-to-spec`, `references/pr-record.md`). No PR note yet: write it as `/crav1-review-pr` **PR note** does. An old follow-ups note is read as `migrated` Points; say once to run `/crav1-add-to-spec migrate formats`.
+Then read the PR note and its `## PR record`, as `crav1-add-to-spec` `references/pr-record.md` says (skill `crav1-add-to-spec`, `references/pr-record.md`). No PR note yet: write it as `/crav1-review-pr` **PR note** does. An old follow-ups note is read as `migrated` Points; say once to run `/crav1-add-to-spec migrate-formats`.
 
 ## Mode
 
-Read `references/modes.md` ("Pick the mode") every run. In short: you opened the pull request, so author mode; otherwise reviewer mode. The choice word wins. When the signed-in name can't be read, guess without asking and say `Mode: reviewer (guessed; say as author to switch).`
+Read `references/modes.md` ("Pick the mode") every run. In short: you opened the pull request, so author mode; otherwise reviewer mode. The choice word wins. When the signed-in name can't be read, guess without asking and say `Mode: reviewer (guessed; say as-author to switch).`
 
 ## Points and statuses
 
@@ -57,11 +57,11 @@ Read `references/classify.md` every run: it splits threads into points and gives
 
 ## Output
 
-Read `references/output.md` every run and print in its **Order**: the heading, the `Verdict:` line, the points waiting on you first and then by status, flags, spec and decision candidates, follow-ups, merge order, drafted replies (not posted), the run ending, `Ready: yes | no | merged` with its reasons, and the `PR record:` line. `since last` prints only changes; see **Since last**.
+Read `references/output.md` every run and print in its **Order**: the heading, the `Verdict:` line, the points waiting on you first and then by status, flags, spec and decision candidates, follow-ups, merge order, drafted replies (not posted), the run ending, `Ready: yes | no | merged` with its reasons, and the `PR record:` line. `since-last` prints only changes; see **Since last**.
 
 ## Since last
 
-Read `references/since-last.md` only on `since last`, or when your `Read` line exists and the user asked what changed. Without your `Read` line, `since last` prints the full view and says `No earlier run of yours; showing everything.`
+Read `references/since-last.md` only on `since-last`, or when your `Read` line exists and the user asked what changed. Without your `Read` line, `since-last` prints the full view and says `No earlier run of yours; showing everything.`
 
 ## Write the record
 

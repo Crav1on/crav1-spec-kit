@@ -1,4 +1,4 @@
-"""1.108.0: /crav1-existing-to-specs recheck (repos vs specs)."""
+"""1.108.0: /crav1-existing-to-specs recheck (repos-vs-specs)."""
 import pathlib, re, unittest
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
@@ -10,7 +10,7 @@ class Recheck(unittest.TestCase):
     def test_router_points_at_branch_only(self):
         s = (SK / "SKILL.md").read_text()
         self.assertIn("(branches/recheck/BRANCH.md)", s)
-        self.assertIn("`recheck` / `repos vs specs`", s)
+        self.assertIn("`recheck` / `repos-vs-specs`", s)
         self.assertIn("do not read the other branches", s)
 
     def test_branch_size_and_references(self):
@@ -37,7 +37,7 @@ class Recheck(unittest.TestCase):
     def test_choice_words_in_data(self):
         y = (ROOT / "docs/reference/skills.yaml").read_text()
         self.assertRegex(y, r'word: "recheck"')
-        self.assertRegex(y, r'word: "repos vs specs"')
+        self.assertRegex(y, r'word: "repos-vs-specs"')
 
     def test_pointers_from_add_to_spec_and_route(self):
         self.assertIn("/crav1-existing-to-specs recheck", (ROOT / ".cursor/skills/crav1/crav1-add-to-spec/SKILL.md").read_text())

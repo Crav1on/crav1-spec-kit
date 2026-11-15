@@ -2,9 +2,9 @@
 
 You **manage** the batch. You do **not** implement, verify, or `git commit` in this chat. Each `T#` runs in its own isolated **crav1-build-task-agent** worker (the “new chat” for that task).
 
-Command: `/crav1-build-tasks`. One task: the one task branch of `/crav1-build-tasks`. Several specs (serial): `/crav1-build-features`.
+Command: `/crav1-build-tasks`. One task: the one-task branch of `/crav1-build-tasks`. Several specs (serial): `/crav1-build-features`.
 
-Worker: `.cursor/agents/crav1-build-task-agent.md` (plugin: `agents/crav1-build-task-agent.md`). Protocol: the one task branch of `crav1-build-tasks` [references/run.md](../../../crav1-build-tasks/branches/one-task/references/run.md). Style: [style-persist.md](../../../crav1-build-tasks/branches/one-task/references/style-persist.md). Approvals: [tool-approvals.md](../../../crav1-build-tasks/branches/one-task/references/tool-approvals.md).
+Worker: `.cursor/agents/crav1-build-task-agent.md` (plugin: `agents/crav1-build-task-agent.md`). Protocol: the one-task branch of `crav1-build-tasks` [references/run.md](../../../crav1-build-tasks/branches/one-task/references/run.md). Style: [style-persist.md](../../../crav1-build-tasks/branches/one-task/references/style-persist.md). Approvals: [tool-approvals.md](../../../crav1-build-tasks/branches/one-task/references/tool-approvals.md).
 
 ## Which tasks
 
@@ -26,7 +26,7 @@ Before the first worker, follow **style-persist.md**. If you must ask, this turn
 
 Do not ask again per `T#`. Workers must not ask style.
 
-**Branch:** before tool approvals and the first worker, follow `/crav1-create-feature-branch` (skill `crav1-create-feature-branch`, `references/task-branch.md`) **Build** prompt. On a base branch it has no Stay and a headless run stops before any worker unless it has `new branch` (1.99.0, skill `crav1-create-feature-branch`, `references/code-branch.md`). If needed, that turn is branch only. Permissions are the next turn, on their own card. If an answer is missing or belongs on the other card, re-ask that one question (`scripts/ask_order.py`). Do not guess. If on `spec/<slug>`, stop (no workers) and follow **Build on a spec-only branch**. Pass `branch: already-done` on every worker. Workers must not create branches.
+**Branch:** before tool approvals and the first worker, follow `/crav1-create-feature-branch` (skill `crav1-create-feature-branch`, `references/task-branch.md`) **Build** prompt. On a base branch it has no Stay and a headless run stops before any worker unless it has `new-branch` (1.99.0, skill `crav1-create-feature-branch`, `references/code-branch.md`). If needed, that turn is branch only. Permissions are the next turn, on their own card. If an answer is missing or belongs on the other card, re-ask that one question (`scripts/ask_order.py`). Do not guess. If on `spec/<slug>`, stop (no workers) and follow **Build on a spec-only branch**. Pass `branch: already-done` on every worker. Workers must not create branches.
 
 **Task branches (1.140.0).** Each task's branch is the first line of `scripts/build_map.py docs/specs/<slug> --recommend T#` (skill `crav1-tasks-ready-to-build`). A branch on the task line wins over the plan step. A merged or deleted branch is not that line. A branch only on origin is (`checkout:` line), and is checked out without asking (1.160.0). A missing sub-branch is offered as **Create X from <spec branch> (Recommended)** and gets its `(into …)` marker after the yes, as `references/task-branch.md` says. Work in queue order (dependency order). When that name is not the checkout and the branch exists, switch to it before its worker, only on a clean tree (workers commit, so it should be clean). Starting a range or all-tasks run is consent to use each task's recommended branch; do not ask per task when the branch exists. When the name exists nowhere, use the task-branch card once. Do not invent a different recommended name, and do not create it without a yes. A task whose recommended name is a base branch is `blocked: branch X is a base branch`; never switch to it. When X exists only as `origin/X`, `git checkout X` makes the local branch. A dirty tree stops the run before the switch. A name for another repo is blocked here with `belongs to <repo>`.
 
@@ -34,7 +34,7 @@ Do not ask again per `T#`. Workers must not ask style.
 
 Those **Allow / Stop** buttons on each worker are Cursor, not kit `fix`/`stop`. Follow [tool-approvals.md](../../../crav1-build-tasks/branches/one-task/references/tool-approvals.md) **once before the first worker** (pause, directions, wait for `continue` / `click` / `stop`).
 
-When you launch a worker, pass **`approvals: already-done`**. Workers and the one task branch of `/crav1-build-tasks` must **not** pause again.
+When you launch a worker, pass **`approvals: already-done`**. Workers and the one-task branch of `/crav1-build-tasks` must **not** pause again.
 
 After `continue`, do not treat IDE Allow/Stop as a reason to halt the board. After `click`, still do not re-ask per `T#`.
 

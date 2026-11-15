@@ -42,11 +42,11 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 
 | Question | Word | Means |
 | --- | --- | --- |
-| Which sync | `suggest features` | suggest Features |
-| Which sync | `push features` | push Features |
-| Which sync | `push tasks` | push tasks |
-| Which sync | `pull tasks` | pull tasks |
-| Which sync | `pull spec changes` | pull spec changes |
+| Which sync | `suggest-features` | suggest Features |
+| Which sync | `push-features` | push Features |
+| Which sync | `push-tasks` | push tasks |
+| Which sync | `pull-tasks` | pull tasks |
+| Which sync | `pull-spec-changes` | pull spec changes |
 
 ## Runs when
 

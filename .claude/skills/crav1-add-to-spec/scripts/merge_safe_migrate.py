@@ -421,7 +421,7 @@ def migrate_pr(pr_lines, fu, fu_rel, today):
         fmtext = "; ".join(x.strip() for x in ffm if x.strip() and x.strip() != "---")
         title = next((ln for ln in fhead if ln.startswith("# ")), "")
         moved = ["## Review follow-ups, moved %s" % today, "",
-                 "Moved from `%s` by `migrate formats` (1.97.0). Its title: %s. Its front matter: %s." % (fu_rel, title[2:].strip() or "none", fmtext or "none"), ""] + strip_blank(intro) + [""]
+                 "Moved from `%s` by `migrate-formats` (1.97.0). Its title: %s. Its front matter: %s." % (fu_rel, title[2:].strip() or "none", fmtext or "none"), ""] + strip_blank(intro) + [""]
         for d, s in fsecs:
             # before the first existing section with a later date; existing sections never move
             pos = next((i for i, (dd, _) in enumerate(secs) if dd > d), len(secs))

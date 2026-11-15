@@ -45,11 +45,11 @@ Skip the question when the wording already answers it: "what does this do", "wal
 
 Exact words for bots and scripted runs. There are no `--flags`.
 
-- How deep: `what it does` / `what and why` / `teach the language`.
+- How deep: `what-it-does` / `what-and-why` / `teach-the-language`.
 
-When the invocation contains one of these words (for example `/crav1-explain-this-code what and why @src/orders.py`), take that choice and do not ask. This holds for a person, a bot, or a headless run.
+When the invocation contains one of these words (for example `/crav1-explain-this-code what-and-why @src/orders.py`), take that choice and do not ask. This holds for a person, a bot, or a headless run.
 
-When a choice is missing and the run is headless or started by a bot (no person in the chat to answer), do not guess. Stop and name the valid words: `Missing choice. Use one of: what it does, what and why, teach the language.`
+When a choice is missing and the run is headless or started by a bot (no person in the chat to answer), do not guess. Stop and name the valid words: `Missing choice. Use one of: what-it-does, what-and-why, teach-the-language.`
 
 ## Reading
 
@@ -61,9 +61,9 @@ Never guess. When something cannot be read, say so: `not read: <what> (<why>)`. 
 
 Route first, load second. Pick the branch from the choice word or the answer to the opening question, then read only that branch file. Do not read the other branches.
 
-- **What it does** (`what it does`): follow [branches/what/BRANCH.md](branches/what/BRANCH.md).
-- **What and why** (`what and why`): follow [branches/why/BRANCH.md](branches/why/BRANCH.md).
-- **Teach the language** (`teach the language`): follow [branches/teach/BRANCH.md](branches/teach/BRANCH.md).
+- **What it does** (`what-it-does`): follow [branches/what/BRANCH.md](branches/what/BRANCH.md).
+- **What and why** (`what-and-why`): follow [branches/why/BRANCH.md](branches/why/BRANCH.md).
+- **Teach the language** (`teach-the-language`): follow [branches/teach/BRANCH.md](branches/teach/BRANCH.md).
 
 ## Flowchart
 

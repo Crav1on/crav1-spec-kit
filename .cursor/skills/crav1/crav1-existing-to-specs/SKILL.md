@@ -18,7 +18,7 @@ This replaces `/crav1-repos-to-spec` and `/crav1-match-to-specs` (1.56.0). Their
 
 ## Recheck (1.108.0)
 
-When the invocation has `recheck` or `repos vs specs`, or the user asks what code no existing spec covers, follow only [branches/recheck/BRANCH.md](branches/recheck/BRANCH.md). Do not ask the opening questions and do not read the other branches.
+When the invocation has `recheck` or `repos-vs-specs`, or the user asks what code no existing spec covers, follow only [branches/recheck/BRANCH.md](branches/recheck/BRANCH.md). Do not ask the opening questions and do not read the other branches.
 
 ## Opening questions
 
@@ -46,13 +46,13 @@ When the user names no repos, stop and ask for them. Do not read the open checko
 
 Exact words for bots and scripted runs. There are no `--flags`.
 
-- What to read: `repos only` / `repos and bundle`.
-- What to write: `one spec` / `spec per feature`.
-- Recheck existing specs against the repos: `recheck` / `repos vs specs`, optionally a repo, a path, and `since`.
+- What to read: `repos-only` / `repos-and-bundle`.
+- What to write: `one-spec` / `spec-per-feature`.
+- Recheck existing specs against the repos: `recheck` / `repos-vs-specs`, optionally a repo, a path, and `since`.
 
-When the invocation contains one of these words (for example `/crav1-existing-to-specs repos only`), take that choice and do not ask that question. This holds for a person, a bot, or a headless run.
+When the invocation contains one of these words (for example `/crav1-existing-to-specs repos-only`), take that choice and do not ask that question. This holds for a person, a bot, or a headless run.
 
-When a choice is missing and the run is headless or started by a bot (no person in the chat to answer), do not guess. Stop and name the valid words, for example: `Missing choice. Use one of: repos only, repos and bundle.` Each question with no word stops the same way.
+When a choice is missing and the run is headless or started by a bot (no person in the chat to answer), do not guess. Stop and name the valid words, for example: `Missing choice. Use one of: repos-only, repos-and-bundle.` Each question with no word stops the same way.
 
 ## After
 

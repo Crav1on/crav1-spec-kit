@@ -24,7 +24,7 @@ It asks one question and a one-line reason. The recommended option is first. It 
 | Retire (Recommended) | `retire` | Moves to `docs/specs/retired/<slug>/` with `Retired: date, reason`. The feature-index row is removed. Links to it are listed for you to fix. Every skill skips `docs/specs/retired/`. |
 | Merge | `merge` | Moves content, open questions, and decisions into a target spec, marked `(from <slug>)`. Name the target, or it suggests only real fits, each with a reason (shared feature area, overlapping requirements, same system in landscape, links), best first. When nothing fits it says `no good merge fit found` and offers park, retire, or convert to note. The source moves to `docs/specs/retired/`. |
 | Park | `park` | Stays in place with `Parked: date, reason`. Plan, build, and ado-sync push skip it. Help and open questions list it as parked. |
-| Convert to note | `convert to note` | Becomes `docs/notes/YYYY-MM/<date>-<slug>.md` (by the spec's first commit date) with a `Source:` line and a generated index row, plus one line under `## How the parts connect` in landscape. The feature-index row is removed. A converted note has no research owner, so no revisit request. |
+| Convert to note | `convert-to-note` | Becomes `docs/notes/YYYY-MM/<date>-<slug>.md` (by the spec's first commit date) with a `Source:` line and a generated index row, plus one line under `## How the parts connect` in landscape. The feature-index row is removed. A converted note has no research owner, so no revisit request. |
 
 A headless or bot run with no choice word stops and lists the four words.
 

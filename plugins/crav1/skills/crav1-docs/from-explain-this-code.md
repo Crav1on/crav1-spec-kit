@@ -11,7 +11,7 @@ This is cross-cutting. It is not its own lane. It can run any time and does not 
 ## First prompt
 
 ```text
-/crav1-explain-this-code what it does
+/crav1-explain-this-code what-it-does
 @src/orders/service.py
 ```
 
@@ -23,9 +23,9 @@ It asks one question. The recommended option is first. It skips the question whe
 
 | Option | Choice word | What you get |
 | --- | --- | --- |
-| What it does (Recommended) | `what it does` | A walk-through in run order, from reading the code and the code it calls, with file and line. |
-| What and why | `what and why` | Adds reasons, only from the code itself, specs, plan decisions, system notes, and commits. A step with no stated reason says `no stated reason found`. |
-| Teach the language | `teach the language` | Adds idiom notes as they come up (language detected from the file), a one-line comparison to a language you know (it asks; skip is fine), and a few topics to look up next. |
+| What it does (Recommended) | `what-it-does` | A walk-through in run order, from reading the code and the code it calls, with file and line. |
+| What and why | `what-and-why` | Adds reasons, only from the code itself, specs, plan decisions, system notes, and commits. A step with no stated reason says `no stated reason found`. |
+| Teach the language | `teach-the-language` | Adds idiom notes as they come up (language detected from the file), a one-line comparison to a language you know (it asks; skip is fine), and a few topics to look up next. |
 
 A headless or bot run with no choice word stops and lists the three words.
 

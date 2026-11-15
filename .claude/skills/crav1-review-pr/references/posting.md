@@ -4,7 +4,7 @@ Read only when the pointer in `SKILL.md` sends you here. Moved word for word fro
 
 ## Post it
 
-After the paste-ready block, offer to post. One question. Use the questions tool when it is available. Say it posts under the user's own account as one comment, and name the vote it will set. Options: **post**, **I'll post it myself**, or **do not post** (1.67.0). Nothing posts without that yes. **I'll post it myself** ends the run with `When it's posted, say "posted" here, or run /crav1-review-pr <repo> <n> comment posted.`
+After the paste-ready block, offer to post. One question. Use the questions tool when it is available. Say it posts under the user's own account as one comment, and name the vote it will set. Options: **post**, **I'll post it myself**, or **do not post** (1.67.0). Nothing posts without that yes. **I'll post it myself** ends the run with `When it's posted, say "posted" here, or run /crav1-review-pr <repo> <n> comment-posted.`
 
 On yes (1.66.0):
 

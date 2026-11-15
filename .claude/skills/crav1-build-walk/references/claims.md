@@ -1,6 +1,6 @@
 # Claims (1.151.0)
 
-Read this when `/crav1-build-walk` starts on a branch, when a claim is already in `docs/specs/<slug>/claims.md`, or when the user says `release claim`.
+Read this when `/crav1-build-walk` starts on a branch, when a claim is already in `docs/specs/<slug>/claims.md`, or when the user says `release-claim`.
 
 The file is `claims.md` in the spec folder. It is not a section of `build-map.md`, which the ready check rewrites. It is not `walk-progress.md` or `build-progress/`, which record position, not a shared lock. A claim can be committed and pushed on its own after yes.
 
@@ -32,7 +32,7 @@ The ready check holds a claimed task as `in progress by <user> since <date>` and
 
 Your own claim does not hold a task (1.160.0). `walk_progress.py readiness --root <spec-folder>` takes `--user <name>` (default `git config user.name` in the specs repo) and `--branch <branch>` (the branch being walked). A claim by that user, on that branch when `--branch` is given, keeps the task's own state: its gate has `refused` false and `reason` `in progress by you`, and the reply says `In progress by you: T#.` Someone else's claim, or your claim on another branch when `--branch` is given, still holds the task and refuses it.
 
-A claim older than the max age (default 3 days, or `Claim max age: N days` in the file) gets a warning. It is not cleared on its own. The warning names `release claim`.
+A claim older than the max age (default 3 days, or `Claim max age: N days` in the file) gets a warning. It is not cleared on its own. The warning names `release-claim`.
 
 ## Clear
 
@@ -40,7 +40,7 @@ Clear the claim, then commit and push `claims.md` after one yes, when:
 
 - the branch's tasks are ticked or the pull request is merged
 - the user says `stop` and is done with this walk
-- the user says `release claim`
+- the user says `release-claim`
 
 A mid-walk stop, such as before a merge step, does not clear the claim.
 

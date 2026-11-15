@@ -36,7 +36,7 @@ def main() -> int:
         errors.append(f"{GUARD} is missing")
     else:
         g = guard.read_text(encoding="utf-8")
-        for need in ("release/*", "hotfix/", "Use an existing branch", "Other name", "Stop", "new branch", "STATUS: blocked"):
+        for need in ("release/*", "hotfix/", "Use an existing branch", "Other name", "Stop", "new-branch", "STATUS: blocked"):
             if need not in g:
                 errors.append(f"{GUARD} does not mention {need!r}")
     for rel in CODE_WRITERS:

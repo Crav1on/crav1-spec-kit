@@ -39,7 +39,7 @@ The `## Description as of` sections are not changed. They keep the author's desc
 
 ## The record step
 
-Run it at the start of **every** run on a pull request whose PR note (or old follow-ups note) has a `Comment as drafted` section with no `Comment as posted` section after it, or has a posted section the host may have edited since. Run it before the review. The `comment posted` choice word runs only this step and no review. In the same chat, the user saying "posted" (or pasting the text) after **I'll post it myself** runs it too.
+Run it at the start of **every** run on a pull request whose PR note (or old follow-ups note) has a `Comment as drafted` section with no `Comment as posted` section after it, or has a posted section the host may have edited since. Run it before the review. The `comment-posted` choice word runs only this step and no review. In the same chat, the user saying "posted" (or pasting the text) after **I'll post it myself** runs it too.
 
 ### Finding the comment on the host
 
@@ -66,7 +66,7 @@ Use the signed-in `gh` or `az` session only, read-only. Never log in.
 3. **One match:** show its date, first line and URL, then ask `Is this the comment you posted? Options: save it / not this one / paste it`. A comment this skill posted is saved without asking.
 4. **Several:** list them (date, first line, points matched) as options, plus **paste it**. The user may pick more than one when they split the comment. Each pick gets its own section, in post order.
 5. **None by the user:** show candidates by other authors only if they match.
-6. **Nothing matches on a host that could be read:** in the automatic step, say `No posted comment found on PR <n>; nothing recorded.` and go on with the review. The comment may simply not be posted yet, so do not ask every run. After `comment posted` or "posted", ask for a paste instead.
+6. **Nothing matches on a host that could be read:** in the automatic step, say `No posted comment found on PR <n>; nothing recorded.` and go on with the review. The comment may simply not be posted yet, so do not ask every run. After `comment-posted` or "posted", ask for a paste instead.
 7. **Pasted, and the host can be read too:** save the host text, and say so when the two differ.
 
 ## Comparing with the draft
@@ -113,8 +113,8 @@ Before anything is written, run the personal-data and secrets check of `crav1-ad
 The choice words are in [Choice words](../SKILL.md#choice-words-1650). With no word:
 
 - **One match:** save it without asking.
-- **Several:** stop with `Several comments could be the posted one. Use one of: newest comment, skip comment record.`
-- **None, or the host can't be read,** after `comment posted`: stop with `No posted comment found on PR <n>. Paste it in chat, or use: skip comment record.` In the automatic step, print `No posted comment found on PR <n>; nothing recorded.` and go on; nothing to paste in a headless run.
+- **Several:** stop with `Several comments could be the posted one. Use one of: newest-comment, skip-comment-record.`
+- **None, or the host can't be read,** after `comment-posted`: stop with `No posted comment found on PR <n>. Paste it in chat, or use: skip comment record.` In the automatic step, print `No posted comment found on PR <n>; nothing recorded.` and go on; nothing to paste in a headless run.
 
 Posting stays interactive only. There is no choice word that posts.
 
@@ -177,5 +177,5 @@ I've looked through the PR and run it through my checks. This is what I found:
 
 Moved word for word from `SKILL.md` in 1.80.2.
 
-- A record-only run (`comment posted`, `newest comment`, a paste, or saving the posted comment found at the start of a run) writes `## Comment as posted` and Point tags only. It never writes a `## Comment as drafted` section; only a run that ends with a new paste-ready block drafts (1.114.2).
+- A record-only run (`comment-posted`, `newest-comment`, a paste, or saving the posted comment found at the start of a run) writes `## Comment as posted` and Point tags only. It never writes a `## Comment as drafted` section; only a run that ends with a new paste-ready block drafts (1.114.2).
 - The record step only reads the host (the signed-in `gh` or `az` session) or takes a paste. Never rewrite or remove a `## Comment as drafted` or `## Comment as posted` section; an edit on the host is a new `, edited` section.

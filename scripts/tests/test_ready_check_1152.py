@@ -324,7 +324,7 @@ class ClaimStopDocs(unittest.TestCase):
         layout = (ROOT / "docs/concepts/data-layout.md").read_text(encoding="utf-8")
         glossary = (ROOT / "docs/concepts/glossary.md").read_text(encoding="utf-8")
         self.assertIn("the user says `stop` and is done with this walk", claims)
-        self.assertIn("`release claim`", skill)
+        self.assertIn("`release-claim`", skill)
         self.assertIn("write nothing further", skill)
         self.assertIn("stop and is done with this walk", layout)
         self.assertIn("stop and is done with this walk", glossary)

@@ -18,7 +18,7 @@ Spec folders are `docs/specs/<slug>/` with a `spec.md`. Skip `_template`.
 
 Read those folders before you sort. Do not ask which slug.
 
-If there are no spec folders, stop. Point at `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, or the repos and bundle branch of `/crav1-existing-to-specs`. Do not create a slug. Do not seed `docs/system/`.
+If there are no spec folders, stop. Point at `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, or the repos-and-bundle branch of `/crav1-existing-to-specs`. Do not create a slug. Do not seed `docs/system/`.
 
 ## Duplicate check (1.61.0)
 

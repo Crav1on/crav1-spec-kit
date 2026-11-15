@@ -39,7 +39,7 @@ Read `references/work-branches.md` ("Work branches") only when the slice has wor
 
 Read `references/sub-branches.md` ("Sub-branches and reverts") only when a branch entry has `(into <spec branch>)`, or a merged change was later undone on the base.
 
-Read `references/promotion.md` ("Promotion") only when `docs/environments/promotion.md` exists, or the invocation has `pipeline runs`.
+Read `references/promotion.md` ("Promotion") only when `docs/environments/promotion.md` exists, or the invocation has `pipeline-runs`.
 
 Read `references/work-item-line.md` ("Work item") only when the slice has `work-item.md`; the script already prints that line.
 
@@ -67,4 +67,4 @@ Without Python at all, follow [references/rules.md](references/rules.md) and `re
 - Full list: `full` (1.156.0). The long form with every per-task list and the Order line. The brief reply is the default.
 - Fix the loop: `fix-loop` (the recommended fix), `fix-loop <n>` (that numbered fix) (1.161.0). The card confirms before anything is written.
 - Map page: `open-map` (the map as a zoomable page in the browser), `export-map` (one HTML file to share) (1.162.0). Read [references/map-page.md](references/map-page.md).
-- Pipeline runs: `pipeline runs`. Read `references/promotion.md` ("Promotion") only when the invocation has that word. There are no `--flags`.
+- Pipeline runs: `pipeline-runs`. Read `references/promotion.md` ("Promotion") only when the invocation has that word. There are no `--flags`.

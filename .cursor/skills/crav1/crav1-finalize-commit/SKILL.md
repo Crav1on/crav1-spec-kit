@@ -3,7 +3,7 @@ name: crav1-finalize-commit
 description: >-
   Use when the user wants a commit message drafted or a commit made. Drafts
   Summary and Description first, then offers commit, copy, change, or stop.
-  Choice words: `message only`, `commit now`, `pull`; `crav1` or `git log`
+  Choice words: `message-only`, `commit-now`, `pull`; `crav1` or `git-log`
   sets the style. Never pushes.
 disable-model-invocation: true
 icon: git-branch
@@ -14,7 +14,7 @@ color: green
 
 ## No opening question (1.83.0)
 
-Always draft first. There is no question before the wording. The draft rules are the message only branch, [branches/message-only/BRANCH.md](branches/message-only/BRANCH.md), whose style, work-item mention, and work-item offer rules apply to every run.
+Always draft first. There is no question before the wording. The draft rules are the message-only branch, [branches/message-only/BRANCH.md](branches/message-only/BRANCH.md), whose style, work-item mention, and work-item offer rules apply to every run.
 
 First produce the Summary and Description. Then keep those two fields in play until they pick **commit**, **copy**, or **stop**.
 
@@ -59,7 +59,7 @@ Without a questions tool, use numbered lists, one per question, then end with `R
 
 Never call the questions tool (or any blocking choice UI) before step 2.
 
-Trailer hook (1.90.0): when no answer is saved and `.githooks/commit-msg` is missing or not turned on, the same prompt adds `Strip tool trailers on every commit for this repo?` (`strip trailers` / `keep trailers`), asked once per repo. Read [references/trailer-hook.md](references/trailer-hook.md) ("When to ask") only then, and when a teammate has the hook but `core.hooksPath` is not `.githooks`. A reply that names neither word (for example only `commit`) leaves it unanswered: install no hook, save no answer, and ask again next run; never apply the Recommended pick on its own. A teammate with the hook but no config gets the config line without a question.
+Trailer hook (1.90.0): when no answer is saved and `.githooks/commit-msg` is missing or not turned on, the same prompt adds `Strip tool trailers on every commit for this repo?` (`strip-trailers` / `keep-trailers`), asked once per repo. Read [references/trailer-hook.md](references/trailer-hook.md) ("When to ask") only then, and when a teammate has the hook but `core.hooksPath` is not `.githooks`. A reply that names neither word (for example only `commit`) leaves it unanswered: install no hook, save no answer, and ask again next run; never apply the Recommended pick on its own. A teammate with the hook but no config gets the config line without a question.
 
 | Id | Choice | What it does |
 | --- | --- | --- |
@@ -72,7 +72,7 @@ If they named `copy`/`change`/`commit` **before** any wording exists, ignore it,
 
 Do not invent extra options (push, amend, commit subsets they did not name). A push asked for after the commit is a **new** request.
 
-**Base branch (1.99.0).** Before offering the choices, when HEAD is a base branch and anything staged is implementation code, read [references/base-branch.md](references/base-branch.md): the prompt becomes `Commit on a work branch?`, and nothing is committed on the base, even with `commit now`; `new branch` answers it.
+**Base branch (1.99.0).** Before offering the choices, when HEAD is a base branch and anything staged is implementation code, read [references/base-branch.md](references/base-branch.md): the prompt becomes `Commit on a work branch?`, and nothing is committed on the base, even with `commit-now`; `new-branch` answers it.
 
 ## When they pick `change`
 
@@ -80,7 +80,7 @@ Read [references/change.md](references/change.md). Redraft or edit, show the new
 
 ## When they pick `commit`
 
-Read `references/commit.md` ("When they pick commit") only when they pick `commit` or `commit now`. A pull request already open is named there: `/crav1-open-pr` to push to PR <n> and update its description or comment. Do not run it from this skill.
+Read `references/commit.md` ("When they pick commit") only when they pick `commit` or `commit-now`. A pull request already open is named there: `/crav1-open-pr` to push to PR <n> and update its description or comment. Do not run it from this skill.
 
 ## Added lines
 
@@ -92,7 +92,7 @@ The final message is exactly what this skill drafted. Any other line: read [refe
 - No commit until `commit` (or an unambiguous “commit this message now”) **after** they have seen the current blocks.
 - `copy` never runs `git commit`.
 - The committed message is exactly the drafted Summary + Description, including a trailing work-item mention. Added lines: [references/added-lines.md](references/added-lines.md).
-- Do not install a hook to enforce the work-item line. Do not block the commit when `work-item.md` is missing. The only hook is the trailer hook, after `strip trailers`.
+- Do not install a hook to enforce the work-item line. Do not block the commit when `work-item.md` is missing. The only hook is the trailer hook, after `strip-trailers`.
 - Do not change product files except the persist rules the draft skill already writes, and the trailer hook and its saved answer (`.githooks/commit-msg`, `trailer-hook` rule). Cursor: `.cursor/rules/draft-commit-style.mdc` or `.cursor/rules/draft-commit-gitlog.mdc`. Claude Code project: `.claude/rules/draft-commit-style.md` or `.claude/rules/draft-commit-gitlog.md`. Claude Code user: `~/.claude/rules/draft-commit-style.md` or `~/.claude/rules/draft-commit-gitlog.md`.
 - Never commit implementation code on a base branch ([references/base-branch.md](references/base-branch.md)).
 - Never push and never rebase. Do not open a PR. This run makes at most two commits: the drafted commit, and one merge commit when the branch was behind. Do not commit a notes index rebuild on its own. After a successful commit, the ending follows run-ending.md. Do not invoke the command it names.

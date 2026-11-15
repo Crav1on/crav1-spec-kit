@@ -2,7 +2,7 @@
 
 Read only when the pointer in `SKILL.md` sends you here. Moved word for word from `SKILL.md` in 1.71.0 and from `handoffs.md` in 1.71.1; the rules are unchanged. The sections it names (**Input**, **Target**, **Add to that spec.md**, **Notes**, **Impact**, **Stop**) are in [fact.md](fact.md).
 
-## From the pull spec changes branch of /crav1-ado-sync
+## From the pull-spec-changes branch of /crav1-ado-sync
 
 When `/crav1-ado-sync` hands one kept change or one answer for an existing spec, the spec is the one that skill already named. Do not ask for a slug. Do not create a slug. Do not create a spec folder.
 

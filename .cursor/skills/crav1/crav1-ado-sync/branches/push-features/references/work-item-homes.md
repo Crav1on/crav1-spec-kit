@@ -72,4 +72,4 @@ An older line without `(<project>)` is read as the line for the marks.md project
 
 ## Unchanged
 
-Nothing goes to Azure Boards without a yes. Iteration and Priority stay blank. Code repo names stay in the text, paths and line numbers are stripped, and the specs repo is never mentioned. The State handling of the push tasks branch of `/crav1-ado-sync` is unchanged.
+Nothing goes to Azure Boards without a yes. Iteration and Priority stay blank. Code repo names stay in the text, paths and line numbers are stripped, and the specs repo is never mentioned. The State handling of the push-tasks branch of `/crav1-ado-sync` is unchanged.

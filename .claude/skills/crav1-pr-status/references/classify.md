@@ -59,7 +59,7 @@ Never guess. When a reply is unclear, use `open` and quote the words that left i
 
 ## Verify in code
 
-Skip on `no code`; then a point that would need it says `agreed (code not checked)`.
+Skip on `no-code`; then a point that would need it says `agreed (code not checked)`.
 
 1. The pushes (Azure DevOps iterations, GitHub commits) newer than the reply that agreed. For each, the files it changed (Azure DevOps iteration changes with `$compareTo`; GitHub `gh api repos/<o>/<r>/commits/<sha>`).
 2. A push touched the anchor's file: diff that file between the commit the comment was made on (Azure DevOps `threadContext` with the iteration of the comment, GitHub `original_commit_id`) and the head, and check the anchored lines (moved lines are followed by their text, not only their number).

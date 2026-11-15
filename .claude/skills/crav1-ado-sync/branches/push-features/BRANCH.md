@@ -34,7 +34,7 @@ A **No spec yet** row has no repo. Ask its home with the same options, and sugge
 
 ## Candidates
 
-Run the suggest features branch of `/crav1-ado-sync` and show that list. The rules in that skill are the rules for the rows (this skill's `branches/suggest-features/BRANCH.md`).
+Run the suggest-features branch of `/crav1-ado-sync` and show that list. The rules in that skill are the rules for the rows (this skill's `branches/suggest-features/BRANCH.md`).
 
 The user picks one or more. On the card, **All** and **None** are real options. None previews nothing. Do not tell them to type all or none. Every row stays listed. Do not drop one to keep the list short. Use the questions tool when it is available and the rows plus those two options fit in four. A further row is named in the question. Otherwise the numbered table is the choice, and **All** and **None** stay real choices beside the numbers.
 
@@ -71,7 +71,7 @@ The same field rule applies on an update. When the type has no Acceptance Criter
 
 ### Nothing from the specs repo
 
-Strip before the preview. The candidate list from the suggest features branch of `/crav1-ado-sync` carries spec-internal material: spec paths, `docs/sources/` folders, `docs/research/` and `docs/notes/` paths, source headings, and spec references such as `(source: <slug>, Milestones)`. Remove all of it from the title, the description, the acceptance, and the tags before the form is shown. Keep the facts, the names, the dates, and the quotes. The preview is what will be sent, so it must already be stripped.
+Strip before the preview. The candidate list from the suggest-features branch of `/crav1-ado-sync` carries spec-internal material: spec paths, `docs/sources/` folders, `docs/research/` and `docs/notes/` paths, source headings, and spec references such as `(source: <slug>, Milestones)`. Remove all of it from the title, the description, the acceptance, and the tags before the form is shown. Keep the facts, the names, the dates, and the quotes. The preview is what will be sent, so it must already be stripped.
 
 Anything that would be sent — title, description, acceptance, tags, comment — must not mention the repo that holds the specs. No spec path, no link to that repo, no kit name, no skill name. Say the goal in the words the spec uses, without pointing at the file.
 
@@ -107,7 +107,7 @@ After a create, write the new id. This write is a required final step of the run
 Work item: 52 — <milestone or slice label> (ADO: <org>/<project>)
 ```
 
-The line ends with its home. Add the tag to older lines in that file that have none, as [references/work-item-homes.md](references/work-item-homes.md) says, without asking. The label is the milestone or slice name. An undated spec uses the spec title. The line format is [work-item-mention.md](../../../crav1-finalize-commit/branches/message-only/references/work-item-mention.md). Create the file when it is missing. Do not copy `docs/specs/_template/work-item.md`. Do not add the HTML comment. Do not put the id in `tasks.md`. When that id and label are already on a line, leave the line. Task lines (`— task: T<n>`) belong to the push tasks branch of `/crav1-ado-sync`. They are not a recorded Feature id for this command.
+The line ends with its home. Add the tag to older lines in that file that have none, as [references/work-item-homes.md](references/work-item-homes.md) says, without asking. The label is the milestone or slice name. An undated spec uses the spec title. The line format is [work-item-mention.md](../../../crav1-finalize-commit/branches/message-only/references/work-item-mention.md). Create the file when it is missing. Do not copy `docs/specs/_template/work-item.md`. Do not add the HTML comment. Do not put the id in `tasks.md`. When that id and label are already on a line, leave the line. Task lines (`— task: T<n>`) belong to the push-tasks branch of `/crav1-ado-sync`. They are not a recorded Feature id for this command.
 
 **No spec yet.** Append a row to `## No spec yet in ADO` in `docs/system/landscape.md`. Columns: Id, Title, Date. The Id cell carries the home: `52 (ADO: <org>/<project>)`. Create the heading and the table when they are missing. Do not rewrite other landscape sections. Do not rewrite an existing row. A row whose cells are all empty is the template placeholder. Replace that placeholder with the first real row. Do not treat the placeholder as a Feature. The Date cell is the target date the docs stated. When they stated none, the date is the day the row is written, and the report says it is the day the row was written, not a target date.
 
@@ -123,8 +123,8 @@ Say what was created and what was updated. One line each: the id, the home, the 
 
 When a create wrote a file, name that file. Say that without that file a later run offers Create again and would make a duplicate. Add the Uncommitted line. Do not run a commit.
 
-- That spec has tasks: `Next: /crav1-ado-sync push tasks, because the Feature exists and its tasks are not on the board yet.`
+- That spec has tasks: `Next: /crav1-ado-sync push-tasks, because the Feature exists and its tasks are not on the board yet.`
 - Otherwise: `Next: nothing needed now.`
-- Do not name the pull spec changes branch in the ending. Do not run the next step.
+- Do not name the pull-spec-changes branch in the ending. Do not run the next step.
 
 Do not plan. Do not implement. Do not commit.

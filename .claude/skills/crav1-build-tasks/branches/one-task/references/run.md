@@ -40,7 +40,7 @@ Stop and return a **status block** (below) if:
 - the implement step of `crav1-build-tasks` would stop (parked Q, non-goal, playbook-only, missing `tasks.md`)
 - That task’s row verify failed or you could not run it (`[ ]`)
 - Spec disagrees with the code → tell them `/crav1-tighten-spec`; do not edit `spec.md`
-- the verify gaps branch of `crav1-fix-build-gaps` would stop (spec frozen, non-goal)
+- the verify-gaps branch of `crav1-fix-build-gaps` would stop (spec frozen, non-goal)
 - Commit / added lines need them
 - Live host refresh needs them (`crav1-verify-build-against-spec` `references/live-host.md`) → `STATUS: needs_ready`
 - A local test dependency is not running, or tests skipped for one (`crav1-verify-build-against-spec` `references/test-dependencies.md`) → `STATUS: needs_dependency`. DETAIL starts with `BLOCKER: <dependency> is not running. <n> tests need it. Not verified.` Do not mark the task verified
@@ -82,7 +82,7 @@ Inner-loop = verify failed → claimed/unverified → wiring `G#`. Other unimple
 
 Only after `resume: fix`:
 
-1. **the verify gaps branch of `crav1-fix-build-gaps`** with no Gap.
+1. **the verify-gaps branch of `crav1-fix-build-gaps`** with no Gap.
 2. Loop-commit.
 3. If inner-loop empty → verify-build-against-spec again, loop-commit if needed; still dirty → `STATUS: needs_fix`; clean → **done**.
 4. If queue remains after the fix, continue (1) until empty or a gate.
