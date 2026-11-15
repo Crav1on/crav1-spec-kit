@@ -3419,11 +3419,11 @@ def _wait_phrase(waiting: list[dict], noun: str) -> str:
             whos.append(who)
     count = len(tasks) or len(waiting)
     if whos and unnamed:
-        tail = f" ({', '.join(whos)}; {unnamed} not named yet)"
+        tail = f" ({', '.join(whos)}; nobody named for {unnamed})"
     elif whos:
         tail = f" ({', '.join(whos)})"
     elif unnamed:
-        tail = f" ({unnamed} not named yet)"
+        tail = f" (nobody named for {unnamed})"
     else:
         tail = ""
     return f"Waiting: {count} tasks wait on {noun}{tail}."

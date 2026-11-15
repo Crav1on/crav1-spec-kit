@@ -139,7 +139,7 @@ class BuildMap(unittest.TestCase):
         record = text.split("### feat/cancel-booking-record-refund-decision", 1)[1].split("###", 1)[0]
         receipt = text.split("### feat/cancel-booking-send-receipt", 1)[1]
         self.assertIn("Waiting for the partner to confirm the currency? — the partner", record)
-        self.assertIn("Which locale is on the receipt? — not named yet", record)
+        self.assertIn("Which locale is on the receipt? — nobody named yet", record)
         self.assertIn("Which inbox receives the receipt? — a colleague", receipt)
         self.assertIn("Ready now: waiting on a question", record)
         self.assertEqual(ids_outside_tasks(text), [])

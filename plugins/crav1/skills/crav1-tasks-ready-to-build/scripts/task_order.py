@@ -345,6 +345,8 @@ def apply_approval_holds(res, tasks, spec_text):
         who = info.get("who") or "not named yet"
         if info.get("via"):
             shown = f"held, waits on {info['via']}"
+        elif who.strip().lower() in ("not named yet", "nobody named yet", ""):
+            shown = "nobody is named to answer it yet"
         else:
             shown = f"waiting for {who}"
         waiting.append({"id": row["id"], "title": row.get("title") or "", "reason": shown, "who": who})

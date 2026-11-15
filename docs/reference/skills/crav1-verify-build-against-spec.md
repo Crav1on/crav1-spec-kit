@@ -8,6 +8,8 @@
 
 Map every v0 acceptance line to tests or UI checks and report pass, fail, or missing.
 
+1.170.0: a `T6 failed:` change line in the reply keeps the Verify cell's opening sentence and the sentence naming the cause, not the run detail; the ready check's Catch up first line uses the same short reason.
+
 1.169.0: `verify.md` has no `Next:` line any more; the chat reply's Run next names the next step. The ready check still reads an older file that has one, and a Verified or Failed row there is never behind.
 
 1.168.0: the chat reply is brief and built by `scripts/walk_ending.py --verify <state file>` (a wrapper for the shared ending script): `Verify — <slug>`, a `Result:` line with the counts, one line per task whose state changed since the last verify (`T6 failed: ...`, `T44 row dropped: not in tasks.md`), `Run next:`, Waiting for what you cannot act on now, then `Report: docs/specs/<slug>/verify.md`. Run next opens with a `**Catch up first**` block when something can be settled now: a plan note ([`/crav1-tighten-plan`](crav1-tighten-plan.md) <slug>`) and an uncommitted `verify.md` ([`/crav1-finalize-commit`](crav1-finalize-commit.md), then `git push`). Then the next step: the reason once, the label on its own line and the command alone in its code span; there is no `Next:` line. The TL;DR, tables and branch detail stay in `verify.md`; the word `full` shows the TL;DR and Tasks overview in chat. The run reads only spec, plan, tasks, the previous `verify.md` and the reference a step names, not `build-map.md`, `claims.md`, `walk-progress.md` or a log. The live checks and `verify.md` are unchanged.
