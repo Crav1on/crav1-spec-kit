@@ -114,3 +114,5 @@ When two branches wait for each other, the ending and `build-map.md` both carry 
 The walk fetches the specs repo before it reads. If that copy is behind origin, it stops and Run next is `git pull --no-rebase`. A task with an `In progress:` line in `docs/specs/<slug>/claims.md` is left unchanged: no renumber, reorder, rewrite, or removal. The walk says once which claimed tasks were kept. The ready check holds those tasks as `in progress by <user> since <date>` and does not offer them in Run next.
 
 Reference page: [tighten and plan, ready to build](reference/skills/crav1-tighten-and-plan-ready-to-build.md)
+
+Since 1.164.0 `start` and `resume` name the one reference the next step needs in `read`, and the walk opens only that file. Its cards follow the card wording rule in [Question cards](reference/question-cards.md): a reopened step asks `Skip redoing the plan review?` after one plain sentence, and the record card asks `Save the ready check as done?` without quoting the progress line.
