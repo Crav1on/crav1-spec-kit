@@ -10,7 +10,7 @@ Run this and use the first line it prints. That line is the branch. Pick the int
 
 `--recommend` does not write the map. On that branch already, no prompt.
 
-The later lines are `source: task line`, `source: build map`, or `source: new`. `from: develop` is present when the task line states a base. `because:` is one plain line when a merged or deleted branch was skipped, for example `feat/orders-one-commit-cleanup-main is already merged`.
+The later lines are `source: task line`, `source: build map`, or `source: new`. `from: develop` is present when the task line states a base. `because:` is one plain line when a merged or deleted branch was skipped, for example `feat/orders-one-commit-cleanup-main is already merged`. `checkout: <name>` is the last line when the branch is only on a remote or is the head of an open pull request, for example `because: feature/orders-incoming-table is on origin only; checkout creates the local tracking branch` (1.160.0).
 
 ## How the name is chosen
 
@@ -22,6 +22,10 @@ The script checks, in order, and build-tasks uses that same result:
 
 A merged branch is not offered. Merged means the pull request is recorded merged (`(PR n)` and the word merged on the task line or its Match `Branch:` line), or the branch tip is already in that base or the default branch and the tips differ. A branch that only sits on the base, with no commits of its own, is still offered. A branch that was checked out here and is now gone locally and on every remote is not offered. A name that does not exist yet is offered so it can be created. No fetch.
 
+Remotes are read with `git ls-remote --heads` once per run, as well as the `origin/<name>` refs, so a branch deleted only locally is still found on origin. When `gh` works, an open pull request whose head is the name wins over merged and deleted; a `PR n` on the task line picks that pull request. A remote that cannot be reached is never read as gone. `CRAV1_NO_REMOTE_CHECK=1` turns both reads off (1.160.0).
+
+The branch is checked in the code repo, which can be a separate checkout from the specs repo (1.160.0). The repo is named by a repo prefix on `(map:)` or `(branch:)`, else a Match `Branch: <repo> <branch>` line in the spec, else a `Repo: <name>` line in `tasks.md`. It is found as `--code-repo <path>` when given, else the specs repo when its folder or origin has that name, else a sibling checkout with that folder or origin name, for example `../orders-ops`. When it is not the specs repo, `repo: <path>` is printed before `checkout:`; switch branches in that checkout. When the named repo is not found, the task-line branch is kept with `because: could not check <repo> from here`. A branch is never called deleted unless it was checked in the right repo. With no repo named, the specs repo is checked as before.
+
 When the task-line branch is merged or deleted, the step name is used if that name is still usable. When no candidate is usable, the offer is a new branch from the stated base. `source` is `new` and `because` says why.
 
 A task whose own line records the merge stays on that branch in the map. `--recommend` does not print that branch, including for that task.
@@ -31,6 +35,9 @@ A `(host setup)` task uses this same name. Do not offer an arbitrary new branch 
 The map row follows the same order. When the row is the task-line branch and the plan step's name differs, the note is `Plan step names feat/orders-one-commit-cleanup-main; built on feat/orders-host-setup-scripts`. When a `(map:)` row is not the branch the task text names, the note stays `Task text names feat/orders-cicd; built on feat/orders-retry`.
 
 ## The card
+
+When the script prints `checkout: <name>`, there is no card. Say `Using <name> from origin (task line).` and run `git checkout <name>`, which makes the local tracking branch (1.160.0). Run it in the `repo:` checkout when one is printed. A `because: could not check <repo> from here` line keeps the usual card, with that sentence as the description.
+
 
 One card. The recommended option is first. Do not put the permissions question on it. Permissions come after, on their own card (skill `crav1-build-tasks`, `references/tool-approvals.md`).
 

@@ -19,7 +19,16 @@ A merged branch is not offered only when git proves its tip is already in
 the base or the default branch. A recorded merge in the specs is not
 enough to skip the name when git cannot tell, or shows the tip is not
 contained. The task-line branch then stays. A branch deleted locally and
-on the remote is not offered. A name that does not exist yet is offered
+on the remote is not offered. A branch only on a remote (`origin/<name>`, or
+`git ls-remote --heads`), or the head of an open pull request (`gh pr list`),
+is offered with `because:` and a last `checkout: <name>` line, so the build
+checks it out without asking (1.160.0). The branch is checked in the
+code repo that holds it, which can be a separate checkout from the specs
+repo: a repo prefix on `(map:)`/`(branch:)`, a Match `Branch: <repo> <name>`
+line, or a `Repo:` line in tasks.md names it, and `--code-repo <path>`, the
+specs repo, or a sibling checkout with that name is used. When that repo is
+not found, the task-line branch is kept with `because: could not check
+<repo> from here`; a branch is never called deleted from the wrong repo. A name that does not exist yet is offered
 so it can be created. A fallback name is short and does not use a
 person's name from the task line. Tasks that resolve to the same name
 share a row.
@@ -45,7 +54,7 @@ check, so the ids match the tasks file.
 
 Usage:
   build_map.py <spec-dir> [--chat] [--stdout]
-  build_map.py <spec-dir> --recommend T1
+  build_map.py <spec-dir> --recommend T1 [--code-repo <path>]
   build_map.py --root <docs/specs> [--scope <words>] [--chat] [--stdout]
 
 On Windows the interpreter is python. Elsewhere it is python3. Then py -3.
@@ -55,8 +64,11 @@ Standard library only. Writes build-map.md in the spec folder unless --stdout.
 With no flag, prints only the one-line path of that file.
 """
 import importlib.util
+import json
+import os
 import pathlib
 import re
+import shutil
 import subprocess
 import sys
 
@@ -597,40 +609,293 @@ def _reflog_mentions(repo, name):
     return re.search(rf"(?<![\w./-]){re.escape(name)}(?![\w./-])", text) is not None
 
 
-def branch_fate(name, spec_text, tasks_text, repo, stated):
-    """`ok`, `absent`, `merged`, `deleted`, or `unchecked`.
+# Remote heads and open pull requests, read once per build (1.160.0).
+_REMOTE_CACHE = {}
 
-    `absent` means the name is not on disk and was not checked out here, so
-    it can be created. `merged` means git proves the tip is already in the
-    base or the default branch. A recorded merge in the specs is not enough
-    to skip the name when git is missing, offline, or shows the tip is not
-    contained. `deleted` means the branch was checked out here and is now
-    gone locally and on every remote. `unchecked` means git could not tell
-    (no repo, or no tips and not a recorded deletion). No fetch.
+
+def _remote_check_off():
+    return os.environ.get("CRAV1_NO_REMOTE_CHECK", "").strip() not in ("", "0")
+
+
+def _ls_remote(repo, remote):
+    """`git ls-remote --heads <remote>` that never prompts for a login. None when it fails."""
+    env = dict(os.environ)
+    env["GIT_TERMINAL_PROMPT"] = "0"
+    env["GCM_INTERACTIVE"] = "never"
+    env.setdefault("GIT_SSH_COMMAND", "ssh -o BatchMode=yes")
+    try:
+        proc = subprocess.run(
+            ["git", "-C", str(repo), "ls-remote", "--heads", remote],
+            capture_output=True,
+            stdin=subprocess.DEVNULL,
+            text=True,
+            timeout=15,
+            env=env,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    if proc.returncode != 0:
+        return None
+    return proc.stdout
+
+
+def _remote_heads(repo):
+    """Remote name to the set of branch heads it really has, from `git ls-remote --heads`.
+
+    Read once per build. A remote that cannot be reached is left out, so a
+    branch is never called gone from a remote nobody could read.
+    """
+    key = ("heads", str(repo))
+    if key in _REMOTE_CACHE:
+        return _REMOTE_CACHE[key]
+    found = {}
+    if not _remote_check_off():
+        for remote in (_git(repo, "remote") or "").split():
+            if remote.startswith("-"):
+                continue
+            listed = _ls_remote(repo, remote)
+            if listed is None:
+                continue
+            heads = {}
+            for line in listed.splitlines():
+                parts = line.split("\t", 1)
+                if len(parts) == 2 and parts[1].startswith("refs/heads/"):
+                    heads[parts[1][len("refs/heads/"):].strip()] = parts[0].strip()
+            found[remote] = heads
+    _REMOTE_CACHE[key] = found
+    return found
+
+
+def _gh_command():
+    value = os.environ.get("CRAV1_GH")
+    if value is not None:
+        return value.strip() or None
+    return shutil.which("gh")
+
+
+def _open_prs(repo):
+    """Open pull requests as (number, head branch), from `gh pr list`. Empty when gh is missing or fails."""
+    key = ("prs", str(repo))
+    if key in _REMOTE_CACHE:
+        return _REMOTE_CACHE[key]
+    found = []
+    gh = None if _remote_check_off() else _gh_command()
+    if gh:
+        try:
+            proc = subprocess.run(
+                [gh, "pr", "list", "--state", "open", "--limit", "200", "--json", "number,headRefName"],
+                cwd=str(repo),
+                capture_output=True,
+                stdin=subprocess.DEVNULL,
+                text=True,
+                timeout=20,
+            )
+            if proc.returncode == 0:
+                for row in json.loads(proc.stdout or "[]"):
+                    head = str(row.get("headRefName") or "").strip()
+                    if head and row.get("number") is not None:
+                        found.append((int(row["number"]), head))
+        except (OSError, subprocess.TimeoutExpired, ValueError, TypeError):
+            found = []
+    _REMOTE_CACHE[key] = found
+    return found
+
+
+TASK_PR = re.compile(r"(?<![\w/])PR\s*#?(\d+)\b|/(?:pull|pullrequest)/(\d+)", re.I)
+
+
+def task_pr_numbers(rest):
+    """Pull request numbers written on a task line, such as `PR 71`."""
+    numbers = []
+    for match in TASK_PR.finditer(rest or ""):
+        number = int(match.group(1) or match.group(2))
+        if number not in numbers:
+            numbers.append(number)
+    return numbers
+
+
+def open_pr_for(repo, name, numbers=None):
+    """The open pull request whose head is `name`, or None. A number on the task line is preferred."""
+    if repo is None or not name:
+        return None
+    heads = [number for number, head in _open_prs(repo) if head == name]
+    if not heads:
+        return None
+    for number in numbers or []:
+        if number in heads:
+            return number
+    return heads[0]
+
+
+def _remote_only(repo, name):
+    """The remote that has `name` when the local branch is gone, or None."""
+    listed = _git(repo, "for-each-ref", "--format=%(refname)", "refs/remotes") or ""
+    for line in listed.splitlines():
+        ref = line.strip()
+        if ref.endswith("/" + name) and ref.count("/") >= 3:
+            remote = ref[len("refs/remotes/"):][: -len(name) - 1]
+            if remote and "/" not in remote:
+                return remote
+    for remote, heads in _remote_heads(repo).items():
+        if name in heads:
+            return remote
+    return None
+
+
+# The code repo for a task (1.160.0). The specs repo and the code repo can be
+# separate checkouts. A branch is only checked in the repo that holds it.
+CODE_REPO_LINE = re.compile(r"^\s*(?:[-*]\s+)?(?:\*\*)?Repo:(?:\*\*)?\s*(.+?)\s*$", re.I | re.M)
+MATCH_BRANCH_LINE = re.compile(r"^\s*(?:[-*]\s+)?(?:\*\*)?Branch:(?:\*\*)?\s*(.+?)\s*$", re.I | re.M)
+NOT_FOUND = "not found"
+
+
+def _repo_word(value):
+    """A repo name from `orders-ops`, `contoso/orders-ops`, or a clone URL."""
+    words = [word.strip("`<>.,;:()") for word in (value or "").split()]
+    words = [word for word in words if word]
+    if not words:
+        return None
+    plain = [word for word in words if "://" not in word and "@" not in word]
+    word = plain[0] if plain else words[0]
+    word = word.rstrip("/")
+    if word.endswith(".git"):
+        word = word[:-4]
+    word = re.split(r"[/:]", word)[-1]
+    return word or None
+
+
+def _mark_repo(value):
+    """The repo word in `(branch: <repo> <name>)`, or None when the mark is only a branch."""
+    parts = (value or "").replace("\r", " ").split()
+    return _repo_word(parts[0]) if len(parts) >= 2 else None
+
+
+def task_repo_name(task, spec_text, tasks_text, branch):
+    """The repo a task's branch lives in, or None when nothing names one.
+
+    In order: a repo prefix on `(map:)` or `(branch:)`, a Match `Branch:`
+    line in the spec that names this branch with a repo, then a `Repo:`
+    line in tasks.md.
+    """
+    rest = task.get("rest") or ""
+    for mark in (MAP_MARK, BRANCH_MARK):
+        found = mark.search(rest)
+        if found and branch_token(found.group(1)) == branch:
+            name = _mark_repo(found.group(1))
+            if name:
+                return name
+    for line in MATCH_BRANCH_LINE.findall(spec_text or ""):
+        words = re.sub(r"\(.*?\)", " ", line).split()
+        if len(words) >= 2 and words[-1].strip("`.,;:") == branch:
+            name = _repo_word(words[0])
+            if name and name != branch:
+                return name
+    found = CODE_REPO_LINE.search(tasks_text or "")
+    if found:
+        return _repo_word(found.group(1))
+    return None
+
+
+def _origin_name(repo):
+    url = (_git(repo, "remote", "get-url", "origin") or "").strip()
+    return _repo_word(url) if url else None
+
+
+def _relative_repo(specs_repo, task_repo):
+    """The code repo as a path from the specs repo, or None when it is the specs repo."""
+    if not task_repo or task_repo == NOT_FOUND or specs_repo is None:
+        return str(task_repo) if task_repo and task_repo != NOT_FOUND and specs_repo is None else None
+    if pathlib.Path(task_repo).resolve() == pathlib.Path(specs_repo).resolve():
+        return None
+    try:
+        return os.path.relpath(str(task_repo), str(specs_repo)).replace(os.sep, "/")
+    except ValueError:
+        return str(task_repo)
+
+
+def resolve_code_repo(specs_repo, name, explicit=None):
+    """The checkout that holds repo `name`, `NOT_FOUND`, or `specs_repo` when no repo is named.
+
+    `explicit` (`--code-repo PATH`) wins. Otherwise the specs repo when its
+    folder or its origin has that name, else a sibling checkout with that
+    folder name, else `NOT_FOUND`. Never guesses another repo.
+    """
+    if explicit:
+        found = find_repo(explicit)
+        return found if found else NOT_FOUND
+    if not name:
+        return specs_repo
+    if specs_repo is None:
+        return None
+    low = name.lower()
+    if specs_repo.name.lower() == low or (_origin_name(specs_repo) or "").lower() == low:
+        return specs_repo
+    parent = specs_repo.parent
+    try:
+        children = list(parent.iterdir())
+    except OSError:
+        children = []
+    for child in children:
+        if child.is_dir() and child.name.lower() == low and (child / ".git").exists():
+            return child
+    for child in children:
+        if child.is_dir() and child != specs_repo and (child / ".git").exists():
+            if (_origin_name(child) or "").lower() == low:
+                return child
+    return NOT_FOUND
+
+
+def branch_fate(name, spec_text, tasks_text, repo, stated, prs=None):
+    """`ok`, `remote`, `absent`, `merged`, `deleted`, or `unchecked`.
+
+    `absent` means the name is not on disk, not on any remote, and was not
+    checked out here, so it can be created. `remote` means the local branch
+    is missing but a remote has it (a remote-tracking ref, or `git ls-remote`
+    shows it), or an open pull request has it as its head; checkout creates
+    the local tracking branch (1.160.0). `merged` means git proves the tip is
+    already in the base or the default branch. A recorded merge in the specs
+    is not enough to skip the name when git is missing, offline, or shows the
+    tip is not contained. `deleted` means the branch was checked out here and
+    is now gone locally and on every remote that could be read. An open pull
+    request whose head is the name wins over `merged` and `deleted`.
+    `unchecked` means git could not tell. `prs` are the pull request numbers
+    on the task line. No fetch: remotes are read with `git ls-remote`.
     """
     if not name:
         return "absent"
     if repo is None:
         return "unchecked"
+    local = _rev(repo, f"refs/heads/{name}") if not name.startswith("-") else None
     tips = _branch_tips(repo, name)
     if tips and any(_strictly_contained(repo, tip, base) for tip in tips for base in _base_tips(repo, stated)):
+        if open_pr_for(repo, name, prs):
+            return "ok" if local else "remote"
         return "merged"
-    if tips:
+    if local:
         return "ok"
+    if not name.startswith("-") and _remote_only(repo, name):
+        return "remote"
+    if open_pr_for(repo, name, prs):
+        return "remote"
     if _reflog_mentions(repo, name):
         return "deleted"
-    if not tips:
-        return "absent"
-    return "ok"
+    return "absent"
 
 
-def _why(name, fate):
+def _why(name, fate, repo=None, prs=None):
     if fate == "merged":
         return f"{name} is already merged"
     if fate == "deleted":
         return f"{name} was deleted locally and on the remote"
     if fate == "unchecked":
         return f"could not check whether {name} is merged"
+    if fate == "remote":
+        number = open_pr_for(repo, name, prs)
+        remote = _remote_only(repo, name) if repo is not None else None
+        where = f"on {remote} only" if remote else "not local"
+        if number:
+            return f"{name} is {where} and PR {number} is open from it; checkout creates the local tracking branch"
+        return f"{name} is {where}; checkout creates the local tracking branch"
     return None
 
 
@@ -1021,8 +1286,9 @@ def _explicit(task):
     return None
 
 
-def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text="", resolve_recorded=False, repo=None, claims_text=""):
+def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text="", resolve_recorded=False, repo=None, claims_text="", code_repo=None):
     """Return markdown, a short chat summary, and the one-line pointer."""
+    _REMOTE_CACHE.clear()
     tasks = parse_tasks(tasks_text)
     titles = work_item_titles(work_item_text)
     name_of = {
@@ -1122,6 +1388,9 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text
             source, base = "new", None
         chosen, offer_source, offer_base = planned, source, base
         because = None
+        checkout = None
+        chosen_fate = None
+        task_repo = repo
         # A ticked task stays on the branch where that work landed. So does a
         # task whose own line records the merge: the map shows that branch.
         # The offer skips only a name git proves merged or deleted (1.152.0).
@@ -1132,8 +1401,23 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text
         # is never grouped under a done sibling's branch when it has its own
         # name (1.153.0).
         if not task["done"]:
-            fate = branch_fate(planned, spec_text, tasks_text, repo, base or line_base)
-            if fate == "unchecked" and source == "task line" and planned in merged_branch_names(spec_text, tasks_text):
+            pr_numbers = task_pr_numbers(task.get("rest") or "")
+            repo_name = task_repo_name(task, spec_text, tasks_text, planned)
+            task_repo = resolve_code_repo(repo, repo_name, code_repo)
+            if task_repo == NOT_FOUND:
+                # Never call a branch deleted from a repo that does not hold it.
+                fate = "unreachable"
+                because = f"could not check {repo_name or 'the code repo'} from here"
+                task_repo = None
+            else:
+                fate = branch_fate(planned, spec_text, tasks_text, task_repo, base or line_base, pr_numbers)
+            chosen_fate = fate
+            if fate == "unreachable":
+                pass
+            elif fate == "remote":
+                because = _why(planned, fate, task_repo, pr_numbers)
+                checkout = planned
+            elif fate == "unchecked" and source == "task line" and planned in merged_branch_names(spec_text, tasks_text):
                 because = _why(planned, fate)
             elif fate in ("merged", "deleted"):
                 because = _why(planned, fate)
@@ -1147,24 +1431,30 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text
                 picked_alt = None
                 for name in others:
                     other_base = stated_base(task.get("rest") or "", name)
-                    other_fate = branch_fate(name, spec_text, tasks_text, repo, other_base)
+                    other_fate = branch_fate(name, spec_text, tasks_text, task_repo, other_base, pr_numbers)
                     if other_fate not in ("merged", "deleted"):
                         picked_alt = name
                         break
                 alt = step_name if source == "task line" and step_name and step_name != planned else None
-                alt_fate = branch_fate(alt, spec_text, tasks_text, repo, None) if alt else None
+                alt_fate = branch_fate(alt, spec_text, tasks_text, task_repo, None) if alt else None
                 if picked_alt:
                     chosen, offer_source, offer_base = (
                         picked_alt,
                         "task line",
                         stated_base(task.get("rest") or "", picked_alt),
                     )
+                    chosen_fate = other_fate
+                    if other_fate == "remote":
+                        because = because + "; " + _why(picked_alt, other_fate, task_repo, pr_numbers)
+                        checkout = picked_alt
                 elif alt and alt_fate not in ("merged", "deleted", "unchecked"):
                     chosen, offer_source, offer_base = alt, "build map", None
-                elif source == "task line" and fate != "deleted" and repo is None:
+                    chosen_fate = alt_fate
+                elif source == "task line" and fate != "deleted" and task_repo is None:
                     # Offline: keep the task-line branch; do not invent a name.
                     chosen, offer_source, offer_base = planned, source, base
                     because = _why(planned, "unchecked")
+                    chosen_fate = "unchecked"
                 else:
                     chosen = _fresh_name(
                         slug,
@@ -1174,6 +1464,7 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text
                         task_id=task["id"],
                     )
                     offer_source, offer_base = "new", line_base
+                    chosen_fate = "absent"
         on_map = planned if (task["done"] or task_records_merge(task)) else chosen
         if source == "task line" and on_map == line_name:
             used_names.add(on_map)
@@ -1186,6 +1477,10 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text
                 "source": offer_source,
                 "base": offer_base,
                 "because": because,
+                "checkout": checkout if checkout == chosen else None,
+                "fate": chosen_fate,
+                "repo": str(task_repo) if task_repo else None,
+                "code_repo": _relative_repo(repo, task_repo),
             }
         task["step_name"] = step_name
 
@@ -1403,7 +1698,7 @@ def _task_number(task_id):
         return int(match.group(1))
 
 
-def recommendation(slug, spec_text, plan_text, tasks_text, task_id, work_item_text="", repo=None, claims_text=""):
+def recommendation(slug, spec_text, plan_text, tasks_text, task_id, work_item_text="", repo=None, claims_text="", code_repo=None):
     """The branch to offer for one open task, or None when that task is not open.
 
     `name` is the branch. `source` is `task line`, `build map`, or `new`.
@@ -1414,7 +1709,7 @@ def recommendation(slug, spec_text, plan_text, tasks_text, task_id, work_item_te
     task_id = _task_number(task_id)
     if task_id is None:
         return None
-    result = build(slug, spec_text, plan_text, tasks_text, work_item_text, repo=repo, claims_text=claims_text)
+    result = build(slug, spec_text, plan_text, tasks_text, work_item_text, repo=repo, claims_text=claims_text, code_repo=code_repo)
     offer = (result.get("offers") or {}).get(task_id)
     return dict(offer) if offer else None
 
@@ -1426,6 +1721,10 @@ def format_offer(offer):
         lines.append(f"from: {offer['base']}")
     if offer.get("because"):
         lines.append(f"because: {offer['because']}")
+    if offer.get("code_repo"):
+        lines.append(f"repo: {offer['code_repo']}")
+    if offer.get("checkout"):
+        lines.append(f"checkout: {offer['checkout']}")
     return "\n".join(lines)
 
 
@@ -1888,7 +2187,7 @@ def slice_dirs(root, scope=""):
     return out
 
 
-def run_dir(directory, chat=False, stdout=False, recommend=None):
+def run_dir(directory, chat=False, stdout=False, recommend=None, code_repo=None):
     directory = pathlib.Path(directory)
     slug = directory.name
     tasks = _read(directory / "tasks.md")
@@ -1905,11 +2204,11 @@ def run_dir(directory, chat=False, stdout=False, recommend=None):
         resolve_recorded = "- Step: resolve-open-questions" in progress.read_text(encoding="utf-8")
     repo = find_repo(directory)
     if recommend:
-        offer = recommendation(slug, spec, plan, tasks, recommend, work, repo=repo, claims_text=claims)
+        offer = recommendation(slug, spec, plan, tasks, recommend, work, repo=repo, claims_text=claims, code_repo=code_repo)
         if not offer:
             return f"No open task {recommend}.", 2
         return format_offer(offer), 0
-    result = build(slug, spec, plan, tasks, work, verify, resolve_recorded=resolve_recorded, repo=repo, claims_text=claims)
+    result = build(slug, spec, plan, tasks, work, verify, resolve_recorded=resolve_recorded, repo=repo, claims_text=claims, code_repo=code_repo)
     if not stdout:
         (directory / "build-map.md").write_text(result["markdown"], encoding="utf-8")
     if stdout and not chat:
@@ -1932,6 +2231,7 @@ def main(argv):
     scope = ""
     root = None
     recommend = None
+    code_repo = None
     positional = []
     i = 0
     while i < len(args):
@@ -1941,6 +2241,10 @@ def main(argv):
             continue
         if args[i] == "--root" and i + 1 < len(args):
             root = args[i + 1]
+            i += 2
+            continue
+        if args[i] == "--code-repo" and i + 1 < len(args):
+            code_repo = args[i + 1]
             i += 2
             continue
         if args[i] == "--recommend" and i + 1 < len(args):
@@ -1961,7 +2265,7 @@ def main(argv):
                 + "\n"
             )
             return 2
-        text, code = run_dir(positional[0], recommend=recommend)
+        text, code = run_dir(positional[0], recommend=recommend, code_repo=code_repo)
         sys.stdout.write(text + ("\n" if text and not text.endswith("\n") else ""))
         return code
     if root is not None:
@@ -1976,7 +2280,7 @@ def main(argv):
         return 2
     pieces = []
     for directory in dirs:
-        text, code = run_dir(directory, chat=chat, stdout=stdout)
+        text, code = run_dir(directory, chat=chat, stdout=stdout, code_repo=code_repo)
         if code:
             return code
         pieces.append(text.rstrip("\n"))

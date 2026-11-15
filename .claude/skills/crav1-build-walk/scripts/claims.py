@@ -106,9 +106,17 @@ def parse_when(value: str) -> datetime:
 
 
 def format_when(when: datetime) -> str:
+    """Local time with the local offset, to the second (1.160.0).
+
+    For example 2026-11-14T23:40:00+01:00. A time that already carries a
+    non-UTC offset keeps it. A UTC time, including an old UTC line, is
+    written in local time.
+    """
     if when.tzinfo is None:
         when = when.replace(tzinfo=timezone.utc)
-    return when.isoformat()
+    if when.utcoffset() == timedelta(0):
+        when = when.astimezone()
+    return when.replace(microsecond=0).isoformat()
 
 
 def date_of(when: datetime) -> str:
@@ -469,8 +477,24 @@ def clear_all(root: Path, age_days: int | None = None, now: datetime | None = No
     }
 
 
-def apply_to_rows(rows: list[dict], claims: list[dict]) -> list[dict]:
-    """Mark claimed, unfinished tasks as held in progress. Mutates rows."""
+def same_person(left: str | None, right: str | None) -> bool:
+    return (left or "").strip().casefold() == (right or "").strip().casefold()
+
+
+def is_own(claim: dict, user: str | None, branch: str | None = None) -> bool:
+    """The claim belongs to `user`, on `branch` when one is given (1.160.0)."""
+    if not user or not same_person(claim.get("user"), user):
+        return False
+    return not branch or (claim.get("branch") or "").strip() == branch.strip()
+
+
+def apply_to_rows(rows: list[dict], claims: list[dict], user: str | None = None, branch: str | None = None) -> list[dict]:
+    """Mark claimed, unfinished tasks as held in progress. Mutates rows.
+
+    Your own claim (`user`, and `branch` when given) does not hold the task:
+    the row keeps its bucket and says `in progress by you` (1.160.0).
+    Someone else's claim still holds it.
+    """
     by_task = {}
     for claim in claims:
         for task in claim["tasks"]:
@@ -482,6 +506,14 @@ def apply_to_rows(rows: list[dict], claims: list[dict]) -> list[dict]:
         if row.get("bucket") == "done":
             continue
         claim = by_task[task]
+        if is_own(claim, user, branch):
+            row["claim"] = True
+            row["own_claim"] = True
+            row["who"] = claim["user"]
+            row["claim_since"] = claim.get("since")
+            row["claim_stale"] = bool(claim.get("stale"))
+            row["claim_phrase"] = "in progress by you"
+            continue
         row["bucket"] = "waiting"
         row["held"] = True
         row["claim"] = True

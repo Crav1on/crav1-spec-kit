@@ -241,7 +241,8 @@ def offer_for(slug: str, spec: str, plan: str, tasks: str, task_id, repo=None, w
     if not offer:
         return None
     offer = dict(offer)
-    fate = bm.branch_fate(offer["name"], spec, tasks, repo, offer.get("base"))
+    # The offer was checked in the task's code repo (1.160.0); reuse that answer.
+    fate = offer["fate"] if offer.get("fate") else bm.branch_fate(offer["name"], spec, tasks, repo, offer.get("base"))
     offer["fate"] = fate
     offer["refused"] = fate in ("merged", "deleted")
     if offer["refused"]:
@@ -419,7 +420,7 @@ def stack_from_texts(slug: str, spec: str, plan: str, tasks_text: str, repo=None
         offer = offer_for(slug, spec, plan, tasks_text, task["id"], repo=repo)
         if not offer or not offer.get("name"):
             continue
-        fate = bm.branch_fate(offer["name"], spec, tasks_text, repo, offer.get("base"))
+        fate = offer.get("fate") or bm.branch_fate(offer["name"], spec, tasks_text, repo, offer.get("base"))
         if fate == "merged":
             merged.add(offer["name"])
             continue

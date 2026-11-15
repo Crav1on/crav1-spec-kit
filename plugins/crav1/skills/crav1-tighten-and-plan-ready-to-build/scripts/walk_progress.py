@@ -3136,15 +3136,35 @@ def command_slug(root: Path) -> str | None:
     return slug or None
 
 
-def apply_claims(root: Path | None, rows: list[dict]) -> dict:
-    """Hold claimed tasks as in progress. Empty when there is no claims.md."""
+def _git_user(root: Path | None) -> str | None:
+    """`git config user.name` in the specs repo, or None."""
+    if root is None:
+        return None
+    try:
+        proc = subprocess.run(
+            ["git", "-C", str(root), "config", "user.name"],
+            capture_output=True, text=True, timeout=10, stdin=subprocess.DEVNULL,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    name = (proc.stdout or "").strip() if proc.returncode == 0 else ""
+    return name or None
+
+
+def apply_claims(root: Path | None, rows: list[dict], user: str | None = None, branch: str | None = None) -> dict:
+    """Hold claimed tasks as in progress. Empty when there is no claims.md.
+
+    A claim by `user` (else `git config user.name`), on `branch` when one is
+    given, is yours: the task is not held, and says `in progress by you`
+    (1.160.0). Someone else's claim still holds it.
+    """
     empty = {"claims": [], "warnings": [], "ids": []}
     if root is None or not root.is_dir():
         return empty
     loaded = claims_mod().load_claims(root)
     claims = loaded.get("claims") or []
     if claims:
-        claims_mod().apply_to_rows(rows, claims)
+        claims_mod().apply_to_rows(rows, claims, user=user or _git_user(root), branch=branch)
     warnings = claims_mod().age_warnings(claims, loaded.get("max_age_days") or 3)
     return {"claims": claims, "warnings": warnings, "ids": claims_mod().claimed_ids(claims)}
 
@@ -3402,6 +3422,9 @@ def gates_for(rows: list[dict]) -> list[dict]:
                 "refused": True,
                 "reason": row.get("reason") or "held",
             })
+        elif row.get("bucket") == "ready" and row.get("own_claim"):
+            # Your own claim never refuses the task (1.160.0).
+            gates.append({"task": task, "allow": True, "refused": False, "reason": row.get("claim_phrase") or "in progress by you"})
         elif row.get("bucket") == "ready":
             gates.append({"task": task, "allow": True, "refused": False})
         else:
@@ -3646,13 +3669,13 @@ def readiness(args: argparse.Namespace) -> None:
         rows = payload.get("rows")
         if not isinstance(rows, list):
             fail("readiness", "rows must be a list")
-        claim_info = apply_claims(root, rows) if root is not None else {"claims": [], "warnings": [], "ids": []}
+        claim_info = apply_claims(root, rows, getattr(args, "user", None), getattr(args, "branch", None)) if root is not None else {"claims": [], "warnings": [], "ids": []}
     elif root is not None:
         if not root.is_dir():
             fail("root", f"not a folder: {root}")
         aliases: list[dict] = []
         rows = build_rows(root, excluded=set(args.new_question or []), aliases=aliases)
-        claim_info = apply_claims(root, rows)
+        claim_info = apply_claims(root, rows, getattr(args, "user", None), getattr(args, "branch", None))
         built = True
     else:
         fail("readiness", "pass --root <spec-folder>, or --json <rows file>")
@@ -3764,6 +3787,9 @@ def readiness(args: argparse.Namespace) -> None:
         ending = (ending + "\n\n" if ending else "") + sync["message"]
     if warnings:
         ending = (ending + "\n\n" if ending else "") + "\n".join(warnings)
+    own = [row.get("task") for row in rows if row.get("own_claim") and row.get("bucket") != "done" and row.get("task")]
+    if own:
+        ending = (ending + "\n\n" if ending else "") + f"In progress by you: {', '.join(own)}. Your own claim does not hold them."
     out = {
         "ok": True,
         "ready": ready,
@@ -5210,6 +5236,8 @@ def main(argv: list[str] | None = None) -> None:
     d.add_argument("--text", action="store_true", help="Print only the finished reply text, to show as-is.")
     d.add_argument("--new-question", action="append", default=[], help="Exact question key to treat as new, not as a recorded question.")
     d.add_argument("--skip-sync", action="store_true", help="Skip the fetch. Tests and an already-fetched copy.")
+    d.add_argument("--user", default=None, help="Claim owner that is you. Default: git config user.name in the specs repo (1.160.0).")
+    d.add_argument("--branch", default=None, help="The branch being walked. Your claim counts as yours only on this branch when given (1.160.0).")
     d.set_defaults(func=readiness)
 
     u = sub.add_parser("unlinked")
