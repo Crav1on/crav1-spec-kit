@@ -211,6 +211,7 @@ The merged skills take exact choice words instead of `--flags`. A word in the in
 | `/crav1-build-walk` | Whose branch | `switch` · `own` |
 | `/crav1-build-walk` | Pull request description | `edit-description` |
 | `/crav1-verify-build-against-spec` | Also check the latest pipeline runs? | `pipeline-runs` |
+| `/crav1-verify-build-against-spec` | Long reply? | `full` |
 | `/crav1-fix-build-gaps` | Which gaps | `verify-gaps` · `live-gaps` |
 | `/crav1-fix-build-gaps` | Branch | `new-branch` |
 | `/crav1-finalize-commit` | Commit or message | `commit` · `message-only` · `commit-now` |

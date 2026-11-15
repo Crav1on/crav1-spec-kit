@@ -13,13 +13,13 @@ color: orange
 
 You prove the **running system** (or current tree) against `spec.md`. You do not add features. You do not “fix” the spec to match the code.
 
-Lead with a **TL;DR**: which tasks are implemented and verified, which are not. Same facts as today — **overview first, details below**.
+`verify.md` leads with a **TL;DR**: which tasks are implemented and verified, which are not, **overview first, details below**.
 
 ## Find the spec
 
 The spec folder is the user's @-mention, or the one folder `<interpreter> -X utf8 <skill crav1-tasks-ready-to-build>/scripts/resolve_spec.py "<query>" --root docs/specs` prints, as `crav1-docs/reference/running-scripts.md` says. Exact folder first, then hyphen and space forms (`orders 1.0` matches `orders-1-0`), then one unique playbook basename, spec title, or work-item name in `spec.md`, then one unique ordered token subsequence of those names (`cc 1.0` matches `cc-process-1-0`). Several matches: list them and stop. No match: say so and list the nearest slugs. Do not pick the most recently edited tree. Do not search the rest of the tree. No name: ask which slug.
 
-Read `spec.md` acceptance (and EARS/BDD export if present — spec.md still wins). Read `tasks.md` if it exists. Skim tests and the files `plan.md` said would be touched.
+Read only (1.168.0): `spec.md` acceptance (an EARS/BDD export too; spec.md wins), `plan.md`, `tasks.md`, the previous `verify.md`, the reference a step names, then the tests and files `plan.md` names. Do not open `build-map.md`, `claims.md`, `walk-progress.md` or a log unless a step names it.
 
 ## Classify each task (before writing)
 
@@ -79,20 +79,18 @@ Do not rewrite `spec.md`.
 
 ## After the report (chat)
 
-Same order as the file. Do **not** open with the full acceptance matrix.
+The reply is brief (1.168.0), shaped as `crav1-docs/reference/run-ending.md` says. Read `references/reply.md` ("The reply") once `verify.md` is written: it names the state file for `<interpreter> -X utf8 scripts/walk_ending.py --verify <state file>`. Print the output once, as-is, with no `Next:` line of your own.
 
-1. Path to `verify.md`
-2. **TL;DR** (copy the id lists and the Branches line; they should be scannable in a few seconds)
-3. Point at the Tasks overview in the file
-4. One `Next` line, the first case that applies, as `crav1-docs/reference/run-ending.md` says. Do not list the other cases. Do not run it. Add the Uncommitted line when `verify.md` changed and is not committed. Read only the file for that case:
-   - Read `references/next-fix.md` ("Fix the gaps") only when inner-loop ids remain (verify failed, claimed done unverified, or a wiring `G#`). A tick-pending Gap is not an inner-loop id.
-   - Read `references/next-build.md` ("Build what is left") only when only not-implemented tasks remain.
-   - Read `references/next-plan.md` ("Acceptance with no task") only when an acceptance line has no task and should stay.
-   - Read `references/next-tighten.md` ("Acceptance that should not stay") only when an acceptance line should die.
-   - Read `references/next-open-pr.md` ("Open a pull request") only when all are verified and a work branch is not merged. A branch with `(PR <n>)` names it: `/crav1-open-pr` to push to PR <n> and update its description or comment.
-   - Read `references/next-done.md` ("Nothing needed") only when all are verified and every work branch is merged.
+The state's `steps` is the next step, the first case that applies. Read only the file for that case:
 
-Read `references/next-walk.md` ("Walk owns the next line") only when `/crav1-build-walk` opened this skill. Do not print the case line then.
+- Read `references/next-fix.md` ("Fix the gaps") only when inner-loop ids remain (verify failed, claimed done unverified, or a wiring `G#`). A tick-pending Gap is not an inner-loop id.
+- Read `references/next-build.md` ("Build what is left") only when only not-implemented tasks remain.
+- Read `references/next-plan.md` ("Acceptance with no task") only when an acceptance line has no task and should stay.
+- Read `references/next-tighten.md` ("Acceptance that should not stay") only when an acceptance line should die.
+- Read `references/next-open-pr.md` ("Open a pull request") only when all are verified and a work branch is not merged. A branch with `(PR <n>)`: `/crav1-open-pr` to push to PR <n> and update its description or comment.
+- Read `references/next-done.md` ("Nothing needed") only when all are verified and every work branch is merged.
+
+Read `references/next-walk.md` ("Walk owns the next line") only when `/crav1-build-walk` opened this skill.
 
 Do not start implementing in this turn unless they already named a `T#` to fix.
 
@@ -110,3 +108,4 @@ Do not start implementing in this turn unless they already named a `T#` to fix.
 ## Choice words (1.69.0)
 
 - Pipeline runs: `pipeline-runs`. Read `references/promotion.md` ("Promotion") only when the invocation has that word. There are no `--flags`.
+- Long reply: `full` (1.168.0). The TL;DR and Tasks overview in chat. The brief reply is the default.
