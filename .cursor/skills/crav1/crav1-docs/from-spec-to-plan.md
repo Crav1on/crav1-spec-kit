@@ -62,7 +62,7 @@ See which tasks are ready, any time: `/crav1-tasks-ready-to-build`. Then build o
 
 Reference pages: [plan-from-spec](reference/skills/crav1-plan-from-spec.md) · [review-plan](reference/skills/crav1-review-plan.md) · [tighten-plan](reference/skills/crav1-tighten-plan.md)
 
-The run ends as [How a run ends](reference/run-ending.md) says: one `Next:` line, `Waiting:` only when a step is blocked, and `Uncommitted:` when files changed and are not committed.
+The run ends as [How a run ends](reference/run-ending.md) says: Run next, never a `Next:` line (1.176.0, 1.177.0), `Waiting:` only when a step is blocked, and `Uncommitted:` when files changed and are not committed.
 
 
 ## Claimed tasks (1.151.0)

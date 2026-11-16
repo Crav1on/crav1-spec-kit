@@ -220,10 +220,10 @@ class OwnMergeFirst(unittest.TestCase):
     def test_label_names_yours_and_others(self):
         order = [{"pr": 71, "owner": "yours"}, {"pr": 73, "owner": "yours"}, {"pr": 82, "owner": "person B"}]
         self.assertEqual(wp.own_merge_entry(order),
-                         "Merge your PRs 71 and 73 first (PR 82 is person B's):\n`/crav1-merge-pr 71`")
+                         "Merge your PRs 71 and 73 first:\n`/crav1-merge-pr 71`")
         order = [{"pr": 82, "owner": "person B"}, {"pr": 73, "owner": "yours"}]
         self.assertEqual(wp.own_merge_entry(order),
-                         "Merge your PR 73 first (PR 82 is person B's):\n`/crav1-merge-pr 73`")
+                         "Merge your PR 73 first:\n`/crav1-merge-pr 73`")
 
     def test_none_of_yours_adds_nothing(self):
         self.assertIsNone(wp.own_merge_entry([{"pr": 82, "owner": "person B"}]))
@@ -232,15 +232,51 @@ class OwnMergeFirst(unittest.TestCase):
     def test_ready_check_leads_with_your_merge(self):
         with tempfile.TemporaryDirectory() as tmp:
             text = rb.ending(rb.two_pr_slice(tmp))
-            entry = "Merge your PR 71 first (PR 82 is person B's):\n`/crav1-merge-pr 71`"
+            entry = "Merge your PR 71 first:\n`/crav1-merge-pr 71`"
             self.assertIn(entry, text)
             self.assertLess(text.index(entry), text.index("Held:"))
             self.assertLess(text.index("Run next:"), text.index(entry))
+            self.assertIn("Waiting: PR 82 is person B's; it unblocks T13.", text)
 
     def test_resume_stays_below_the_merge_entry(self):
         merge = wp.own_merge_entry([{"pr": 71, "owner": "yours"}, {"pr": 82, "owner": "person B"}])
         text = we.compose(run=[merge, RESUME])
         self.assertLess(text.index("/crav1-merge-pr 71"), text.index("Resume the walk when the answers arrive:"))
+
+
+class PrOwnerIsWhoOpenedIt(unittest.TestCase):
+    def test_pr_note_author_wins_over_the_claimer(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = rb.two_pr_slice(tmp)
+            notes = Path(tmp) / "specs/docs/notes/2026-11"
+            notes.mkdir(parents=True)
+            (notes / "2026-11-16-pr-orders-api-71.md").write_text(
+                "---\nkind: pr\nauthor: person C\n---\n# PR 71\n", encoding="utf-8")
+            self.assertEqual(wp.pr_author(root, 71), "person C")
+            prs = wp.open_prs(root)
+            self.assertEqual((prs[71]["owner"], prs[71]["added"]), ("person C", ["T5"]))
+            text = rb.ending(root)
+            self.assertIn("1. PR 71 (person C's, you added T5, feat/orders-readme): ticks T5", text)
+            self.assertNotIn("Merge your PR", text)
+            self.assertIn("Waiting: PR 71 is person C's; it unblocks T6.", text)
+
+    def test_no_author_recorded_is_not_yours(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = rb.two_pr_slice(tmp)
+            log = root / "build-progress/feat--orders-readme.md"
+            log.write_text(log.read_text(encoding="utf-8").replace("PR author: person A\n", ""), encoding="utf-8")
+            self.assertIsNone(wp.pr_author(root, 71))
+            self.assertEqual(wp.open_prs(root)[71]["owner"], "owner not recorded")
+            text = rb.ending(root)
+            self.assertIn("1. PR 71 (owner not recorded, feat/orders-readme)", text)
+            self.assertNotIn("Merge your PR", text)
+            self.assertIn("Waiting: PR 71 (owner not recorded); it unblocks T6.", text)
+
+    def test_waiting_groups_one_owner(self):
+        order = [{"pr": 71, "owner": "person A", "ticks": ["T5"], "starts": []},
+                 {"pr": 73, "owner": "person A", "ticks": ["T43"], "starts": ["T8"]},
+                 {"pr": 74, "owner": "yours", "ticks": ["T2"], "starts": []}]
+        self.assertEqual(wp.others_merge_waits(order), ["Waiting: PR 71 and PR 73 are person A's; they unblock T8."])
 
 
 class BlankLineAfterMergeList(unittest.TestCase):
