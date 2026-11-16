@@ -92,3 +92,63 @@ class OrderedMergeList(unittest.TestCase):
             root = two_pr_slice(tmp, t9_after="T1, T5", extra=extra)
             order = [item["pr"] for item in wp.merge_order(wp.build_rows(root), wp.open_prs(root))]
             self.assertEqual(order, [71, 82], "a PR the other depends on comes first")
+
+
+import test_branch_run_1155 as brt  # noqa: E402
+
+br = brt.br
+
+
+def clone_pair(base_dir: Path, name: str) -> Path:
+    bare = base_dir / f"{name}.git"
+    subprocess.run(["git", "init", "--bare", "-b", "main", str(bare)], check=True, capture_output=True)
+    work = base_dir / name
+    subprocess.run(["git", "clone", str(bare), str(work)], check=True, capture_output=True)
+    for key, value in (("user.email", "person-a@example.com"), ("user.name", "person A"), ("commit.gpgsign", "false")):
+        brt.git(work, "config", key, value)
+    return work
+
+
+class TwoRepoRecord(unittest.TestCase):
+    def setUp(self):
+        self.base = Path(tempfile.mkdtemp())
+        self.specs = clone_pair(self.base, "specs")
+        self.code = clone_pair(self.base, "code")
+        self.root = brt.write_slice(self.specs)
+        (self.root / "verify.md").write_text("# Verify\n", encoding="utf-8")
+        (self.root / "work-item.md").write_text("# Work item\n\nAB#2 Orders CI/CD\n", encoding="utf-8")
+        brt.git(self.specs, "add", "-A")
+        brt.git(self.specs, "commit", "-m", "Start")
+        brt.git(self.specs, "push", "-u", "origin", "main")
+        brt.git(self.code, "checkout", "-b", "feat/orders-cicd")
+        (self.code / "a.txt").write_text("a", encoding="utf-8")
+        brt.git(self.code, "add", "-A")
+        brt.git(self.code, "commit", "-m", "Build T2")
+        br.start(self.root, "feat/orders-cicd", "person A", yes=True)
+        brt.git(self.specs, "add", "-A")
+        brt.git(self.specs, "commit", "-m", "Claim")
+
+    def test_code_repo_passed_as_repo_no_longer_crashes(self):
+        sha = brt.git(self.code, "rev-parse", "HEAD").stdout.strip()
+        (self.root / "verify.md").write_text("# Verify\n\n- T2 evidence\n", encoding="utf-8")
+        out = br.record(self.root, "feat/orders-cicd", "T2", sha, "green", self.code, push=True)
+        self.assertTrue(out["ok"], out)
+        self.assertEqual(out["code_repo"], str(self.code.resolve()))
+        self.assertEqual(out["specs_repo"], str(self.specs.resolve()))
+        self.assertIn("docs/specs/orders-api/verify.md", out["files"])
+        self.assertTrue(out["code_pushed"] and out["specs_pushed"], out)
+        message = brt.git(self.specs, "log", "-1", "--format=%B").stdout
+        self.assertIn("Record T2 on feat/orders-cicd with its verify evidence", message)
+        self.assertIn("AB#2", message)
+        self.assertEqual(brt.git(self.specs, "status", "--porcelain").stdout.strip(), "")
+
+    def test_bad_specs_repo_writes_nothing(self):
+        before = (self.root / "walk-progress.md").read_text(encoding="utf-8")
+        progress = br.progress_path(self.root, "feat/orders-cicd").read_text(encoding="utf-8")
+        out = br.record(self.root, "feat/orders-cicd", "T2", "a1b2c3d", "green",
+                        specs_repo=self.code, code_repo=self.code)
+        self.assertFalse(out["ok"])
+        self.assertEqual(out["code"], "specs-repo")
+        self.assertIn("Nothing was written", out["line"])
+        self.assertEqual((self.root / "walk-progress.md").read_text(encoding="utf-8"), before)
+        self.assertEqual(br.progress_path(self.root, "feat/orders-cicd").read_text(encoding="utf-8"), progress)
