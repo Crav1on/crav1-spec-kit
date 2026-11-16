@@ -76,8 +76,8 @@ The walk fetches the specs repo before it reads. If that copy is behind origin, 
 ```text
 Run next:
 
+Build T5 Note the policy on feat/orders-note:
 `/crav1-build-walk T5`
-branch feat/orders-note, T5 Note the policy
 ```
 
 When no work branch remains:
@@ -89,3 +89,7 @@ Run next:
 ```
 
 Reference page: [build-walk](reference/skills/crav1-build-walk.md)
+
+Since 1.176.0 a whole-branch run keeps the specs repo and the code repo apart: the record step takes `--code-repo` (the specs repo is the top level of the spec folder), checks both before it writes, and commits `verify.md` with the progress file in one specs commit that ends with the work-item mention. The ending reads `build-progress/<branch>.md` itself (`branch_run.py ending --root <spec-folder> --branch <branch>`), and notes for the user go under `Before the merge:` after what was built. The ready check lists open pull requests as `Merge these PRs, in this order:`, one numbered PR per line with its owner and what merging it ticks and lets start, and Branch runs reads `built, PR 82 open` instead of `stopped before merge`.
+
+Since 1.176.0 the yes card of a whole-branch run names each task by its short title from `verify.md`, for example `T10 Orders CI/CD: deploy pipeline`, not the first 80 characters of the task line.

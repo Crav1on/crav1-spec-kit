@@ -8,6 +8,8 @@
 
 Show where one pull request stands, point by point, and who owes the next step.
 
+1.176.0: reads format B task lines as the tasks the pull request carries. `Order` lines come from the ready check's merge list and `build-progress/`, questions from the spec's open questions; with neither it says so plainly. Older Merge order, Questions for reviewers and Not in this PR sections are still read for existing pull requests, and the kit's state wins when they differ.
+
 1.164.0: each closing offer follows the card wording rule in `docs/reference/question-cards.md`: one background sentence, then a short question such as `Set thread 112 back to active?`, each option saying what happens.
 
 1.158.0: the shared pull-request steps are `crav1-docs/reference/pr-common.md` and `scripts/pr_common.py`, which also finds the one open pull request for the current branch when none is named. The status table, the output order and the hand-offs moved word for word to `references/classify.md`, `references/output.md` and `references/offers.md`.

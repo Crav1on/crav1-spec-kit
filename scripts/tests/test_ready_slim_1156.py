@@ -76,7 +76,8 @@ def run_block(text: str) -> str:
     start = parts.index("Run next:")
     out = [parts[start]]
     for part in parts[start + 1:]:
-        if not part.startswith(("`/crav1-", "**", "Run ", "---")):  # 1.164.0 blocks, 1.165.0 rule
+        # 1.164.0 blocks, 1.165.0 rule, 1.176.0 a label line above the command
+        if not (part.startswith(("`/crav1-", "**", "Run ", "---")) or "\n`/crav1-" in part):
             break
         out.append(part)
     return "\n\n".join(out)
@@ -180,7 +181,7 @@ class BriefByDefault(unittest.TestCase):
 
     def test_not_ready_next_lines_come_from_the_script(self):
         nothing = {"ready": 0, "waiting": 0, "waits_in_order": 0, "blocked": 0, "needs_verify": 0, "done": 3}
-        self.assertEqual(we.not_ready_next("orders-api", nothing, False), "Next: nothing needed now.")
+        self.assertEqual(we.not_ready_next("orders-api", nothing, False), "Nothing needed now.")
         verify = dict(nothing, needs_verify=2)
         self.assertIn("/crav1-verify-build-against-spec orders-api", we.not_ready_next("orders-api", verify, False))
         held = dict(nothing, waiting=2)

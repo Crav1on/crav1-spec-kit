@@ -8,6 +8,8 @@
 
 Build tasks from tasks.md, always in an isolated worker per task; asks which tasks (one, a range, or all).
 
+1.176.0: the one-task ending is a Run next entry, label above command, no `Next:` line. Verified on an unmerged branch is not a tick.
+
 1.172.0: when the build walk or the range or all branch passes `approvals: already-done`, the one-task branch does not open `tool-approvals.md`.
 
 1.160.0: the held check never refuses a task claimed by you. `walk_progress.py readiness` reads you from `--user` or `git config user.name`; your claimed task's gate has `refused` false and `reason` `in progress by you`. Someone else's claim still refuses it.

@@ -16,7 +16,7 @@ Output only:
 - These notes name the checks. `/crav1-verify-build-against-spec` is the gate that says they passed. Do not run it here.
 - The linter line: the tool and command, or that this repo has none for the code these tasks will touch.
 - One `Next` line, as `crav1-docs/reference/run-ending.md` says. Do not run it. Add the Uncommitted line when a file changed and is not committed. Do not name tighten-plan or build in this ending.
-- This branch is `spec/<slug>`: `Next: /crav1-open-pr, because this specify-only branch is not on the default branch yet.` Do not implement here.
-- Any other branch: `Next: /crav1-review-plan, because the plan is written and not reviewed.` When the plan says there is no linter, say build is not named until they add one or choose to go on without one. Do not install one.
+- This branch is `spec/<slug>`: Run next with the label "Open the pull request, since this specify-only branch is not on the default branch yet:" on its own line above `` `/crav1-open-pr <slug>` ``. Do not implement here.
+- Any other branch: Run next with the label "Review the plan, which is written and not reviewed yet:" on its own line above `` `/crav1-review-plan <slug>` ``. When the plan says there is no linter, say build is not named until they add one or choose to go on without one. Do not install one.
 
 Do not start coding in this chat.

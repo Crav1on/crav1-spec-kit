@@ -29,7 +29,7 @@ Resolve these before you push or create anything. Prompt when a value is missing
 | Base | The head's into branch, then the repo's `Merges into` branch, then the repo default branch. See **Base branch**. Confirm when ambiguous. |
 | Head | Current branch when it is not the base. Otherwise ask. Do not check out a different branch in this skill. |
 | Title | `<slug>: <short summary>` when the head is `feat/<slug>` or `spec/<slug>`. Summary is the `spec.md` H1 when `docs/specs/<slug>/spec.md` exists; otherwise the latest commit subject on the head. No slug: latest commit subject. |
-| Body | Format A in `references/draft.md`: a short summary, then headed sections with link-first bullets pinned to the head commit. No spec link. |
+| Body | Format B in `references/draft.md`: summary, one line per task, how it was verified, work-item mention. No links. |
 | Push | Ask once, **after** the title and body are visible. Options in order: **push and open PR** (first/top), **open PR only** (remote already has the branch), **stop**. |
 
 The steps shared with merge-pr, pr-status and review-pr (host order, finding the pull request for a branch, claims, catching up, signing in) are [pr-common.md](../crav1-docs/reference/pr-common.md) (1.158.0). Read it every run. This file keeps what open-pr drafts and pushes. On Windows, read `references/host.md` ("Windows").
@@ -46,7 +46,7 @@ Every run, read `references/checks.md` ("Checks (before the draft)") and run its
 
 ## Draft title and body
 
-Read `references/draft.md` ("Draft title and body") only when you draft the title and body (Format A, 1.98.0). Never link the spec; a missing rollback on an infra or PROD change is said in the chat only.
+Read `references/draft.md` ("Draft title and body") only when you draft the title and body (Format B, 1.176.0). No links in the body; a missing rollback on an infra or PROD change is said in the chat only.
 
 ## Host
 

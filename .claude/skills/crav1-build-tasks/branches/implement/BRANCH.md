@@ -10,7 +10,7 @@ Read `tasks.md`, `plan.md`, `spec.md`. Task row shape is this skill’s `assets/
 
 **Which task:** the `T#` they named, else the first unchecked `- [ ]`. If all checked, say so and tell them to run `/crav1-verify-build-against-spec`.
 
-If `tasks.md` is missing, stop. Next: `/crav1-plan-from-spec`.
+If `tasks.md` is missing, stop, and end with `Write the plan and the task list, since there is none yet:` above `/crav1-plan-from-spec`.
 
 **Branch:** before any code, follow `/crav1-create-feature-branch` (skill `crav1-create-feature-branch`, `references/task-branch.md`) **Build** prompt. Option 1 is the first line of `scripts/build_map.py docs/specs/<slug> --recommend T#` (skill `crav1-tasks-ready-to-build`); on that branch already, go ahead. Implementation code is never written on a base branch (1.99.0): follow skill `crav1-create-feature-branch`, `references/code-branch.md`; on a base there is no Stay, and a recommended name that is a base is blocked. A dirty tree still means no checkout of an existing branch. If you are on `spec/<slug>`, stop (no code) and follow that skill’s **Build on a spec-only branch**.
 
@@ -45,11 +45,11 @@ Output only:
 - `T#` done or blocked
 - Files changed
 - Verify command and result
-- One `Next` line, the first case that applies. Do not list the others. Add the Uncommitted line when files changed and are not committed.
-- `tasks.md` is missing: `Next: /crav1-plan-from-spec, because there is no task list.`
-- This task is not through verify: `Next: /crav1-build-tasks <T#>, because verify is still open.`
-- They named a range: `Next: /crav1-build-tasks` for that range, because that is the batch they named.
-- This turn's tasks are done: `Next: /crav1-verify-build-against-spec, because this turn's tasks are done.`
+- One Run next entry, the first case that applies: a plain label on its own line, then the command alone in its code span (1.176.0). Do not list the others. No Next line. Add the Uncommitted line when files changed and are not committed.
+- `tasks.md` is missing: `Write the plan and the task list, since there is none yet:` above `/crav1-plan-from-spec`.
+- This task is not through verify: `Finish T#, since its verify is still open:` above `/crav1-build-tasks <T#>`.
+- They named a range: `Build the rest of the range you named:` above `/crav1-build-tasks <range>`.
+- This turn's tasks are done: `Verify this turn's tasks:` above `/crav1-verify-build-against-spec`.
 
 Do not keep going through the list unless they wrote `T2 and T3` or “continue until blocked.”
 

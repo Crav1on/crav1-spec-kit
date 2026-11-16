@@ -293,6 +293,96 @@ def cmd_behind(args) -> int:
                  "line": f"{args.head} is {behind} behind and {ahead} ahead of {args.base}." + (" " + advice if advice else "")})
 
 
+# ---------- the Azure DevOps 4,000-character description (1.176.0) ----------
+
+ADO_LIMIT = 4000
+SHORTENED = "Task lines were shortened to fit."
+_TASK_LINE = re.compile(r"^\s*[-*]\s+T\d+\b")
+
+
+def _task_lines(lines: list[str]) -> list[int]:
+    """Indexes of the task lines: `- T#` bullets, else the bullets under `### Tasks`."""
+    found = [i for i, line in enumerate(lines) if _TASK_LINE.match(line)]
+    if found:
+        return found
+    inside = False
+    for i, line in enumerate(lines):
+        if line.startswith("#"):
+            inside = line.lstrip("#").strip().lower() == "tasks"
+            continue
+        if inside and line.lstrip().startswith(("- ", "* ")):
+            found.append(i)
+    return found
+
+
+def _first_sentence(line: str) -> str:
+    return re.split(r"(?<=[.!?])\s+(?=[A-Z`])", line, maxsplit=1)[0].rstrip()
+
+
+def _cut_words(line: str, room: int) -> str:
+    if len(line) <= room:
+        return line
+    cut = line[:room]
+    return (cut.rsplit(" ", 1)[0] if " " in cut else cut).rstrip(" ,;:.")
+
+
+def fit_body(text: str, limit: int = ADO_LIMIT) -> dict:
+    """A guard for a PR description over `limit` characters (format B, 1.176.0).
+
+    Only the task lines give way: first to the task name (the first
+    sentence), then cut at a word. A plain `Task lines were shortened to
+    fit.` line follows them. No link and no overflow comment is added; the
+    summary, Verified and the work-item mention stay as written.
+    """
+    body = str(text or "").replace("\r\n", "\n")
+    steps: list[str] = []
+
+    def fits(value: str) -> bool:
+        return len(value) <= limit
+
+    if fits(body):
+        return {"body": body, "length": len(body), "limit": limit, "fits": True, "trimmed": steps}
+    lines = body.split("\n")
+    tasks = _task_lines(lines)
+    if tasks:
+        for i in tasks:
+            lines[i] = _first_sentence(lines[i])
+        lines.insert(tasks[-1] + 1, SHORTENED)
+        steps.append("task-names")
+        body = "\n".join(lines)
+        if not fits(body):
+            over = len(body) - limit
+            longest = max(len(lines[i]) for i in tasks)
+            room = longest
+            while over > 0 and room > 20:
+                room -= 10
+                over = len(body) - limit - sum(max(0, len(lines[i]) - room) for i in tasks)
+            for i in tasks:
+                lines[i] = _cut_words(lines[i], room)
+            steps.append("task-cut")
+            body = "\n".join(lines)
+    return {"body": body, "length": len(body), "limit": limit, "fits": fits(body), "trimmed": steps}
+
+
+def limit_of(out: dict) -> int:
+    return int(out["limit"])
+
+
+def cmd_fit(args) -> int:
+    path = Path(args.body)
+    text = path.read_text(encoding="utf-8-sig")
+    out = fit_body(text, args.limit)
+    if args.text:
+        if not out["fits"]:
+            print(f"Still {out['length']} characters after trimming; the limit is {limit_of(out)}.", file=sys.stderr)
+            return 2
+        sys.stdout.write(out["body"])
+        return 0
+    if not args.show:
+        out.pop("body")
+    return emit({"ok": out["fits"], **out}, 0 if out["fits"] else 2)
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="pr_common.py", description=__doc__.splitlines()[0])
     sub = parser.add_subparsers(dest="cmd", required=True)
@@ -313,6 +403,11 @@ def main(argv: list[str] | None = None) -> int:
     cl = sub.add_parser("claim")
     cl.add_argument("--root", required=True)
     cl.add_argument("--branch", required=True)
+    ft = sub.add_parser("fit")
+    ft.add_argument("--body", required=True, help="the PR body file, UTF-8")
+    ft.add_argument("--limit", type=int, default=ADO_LIMIT)
+    ft.add_argument("--text", action="store_true", help="print only the trimmed body, to redirect into the file you pass to create")
+    ft.add_argument("--show", action="store_true", help="print the trimmed body in the JSON")
     b = sub.add_parser("behind")
     b.add_argument("--head", required=True)
     b.add_argument("--base", required=True)
@@ -323,7 +418,7 @@ def main(argv: list[str] | None = None) -> int:
         return emit(out, 0 if out.get("status") == "ok" else 1)
     if args.cmd == "host":
         return emit(host_of(args.remote_url))
-    return {"find": cmd_find, "checks": cmd_checks, "claim": cmd_claim, "behind": cmd_behind}[args.cmd](args)
+    return {"find": cmd_find, "checks": cmd_checks, "claim": cmd_claim, "behind": cmd_behind, "fit": cmd_fit}[args.cmd](args)
 
 
 if __name__ == "__main__":

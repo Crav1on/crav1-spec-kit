@@ -371,15 +371,28 @@ def stale_lines(spec: str) -> list[str]:
 
 
 NO_LINTER = re.compile(r"\b(no|none|not have|has no|lacks|without)\b[^.]*\b(linter|checker|lint)\b|^\W*none\W*$", re.I)
+# 1.176.0: a "No linter ... for <subset>" line is partial. When another line
+# names a tool, or going on without one is recorded, the linter is named.
+WENT_ON = re.compile(r"\bgo(?:es|ing)? on without (?:one|a linter|it)\b|\bwent on without\b", re.I)
 
 
 def linter_line(plan: str) -> tuple[str, bool]:
     """(text, named). named is False when the section is missing, empty, or says there is none."""
     body = section(plan, "Linter")
-    text = " ".join(l.strip("- ").strip() for l in body.splitlines() if l.strip("- ").strip())
+    lines = [l.strip("- ").strip() for l in body.splitlines() if l.strip("- ").strip()]
+    text = " ".join(lines)
     if not text:
         return ("", False)
-    return (text, not NO_LINTER.search(text))
+    if WENT_ON.search(text):
+        return (text, True)
+    if any(not NO_LINTER.search(line) for line in lines):
+        return (text, True)
+    return (text, False)
+
+
+def run_next(label: str, command: str) -> str:
+    """Run next with the label on its own line above the command (1.176.0)."""
+    return f"Run next:\n\n{label}\n`{command}`"
 
 
 def recap(root: Path, branch: str, facts: dict, uncommitted: int | None) -> str:
@@ -419,12 +432,15 @@ def recap(root: Path, branch: str, facts: dict, uncommitted: int | None) -> str:
     out.append("Linter: " + (text if text else "not stated yet"))
     out.append("")
     if branch.strip() == f"spec/{slug}":
-        out.append("Next: /crav1-open-pr, because this specify-only branch is not on the default branch yet.")
+        out.append(run_next("Open the pull request, since this specify-only branch is not on the default branch yet:",
+                            f"/crav1-open-pr {slug}"))
     else:
-        out.append("Next: /crav1-review-plan, because the plan is written and not reviewed.")
+        out.append(run_next("Review the plan, which is written and not reviewed yet:", f"/crav1-review-plan {slug}"))
         if not named:
+            out.append("")
             out.append("Build is not named until you add a linter or choose to go on without one.")
     if uncommitted:
+        out.append("")
         out.append(f"Uncommitted: {uncommitted} files; commit with /crav1-finalize-commit when ready.")
     return "\n".join(out) + "\n"
 
@@ -432,6 +448,9 @@ def recap(root: Path, branch: str, facts: dict, uncommitted: int | None) -> str:
 # ---------- queue (tighten-plan) ----------
 
 DONE = {"patched", "dropped", "kept", "skipped", "done", "sent"}
+# A spec finding skipped or sent in the plan walk still waits on the spec;
+# one patched, dropped or kept is settled and sends nobody back (1.176.0).
+SPEC_DONE = {"patched", "dropped", "kept", "done"}
 
 
 def _items(path: str) -> list[dict]:
@@ -460,16 +479,18 @@ def _items(path: str) -> list[dict]:
     return sorted(data, key=lambda i: (int(re.sub(r"\D", "", str(i["id"])) or 0), str(i["id"])))
 
 
-def empty_queue_next(items: list[dict], linter_named: bool, went_on: bool) -> str:
-    spec = [i for i in items if i["tag"] == "spec"]
+def empty_queue_next(items: list[dict], linter_named: bool, went_on: bool, slug: str | None = None) -> str:
+    """Run next once no plan finding is open (1.176.0: open spec findings only)."""
+    spec = [i for i in items if i["tag"] == "spec" and i.get("status", "open") not in SPEC_DONE]
+    tail = f" {slug}" if slug else ""
     if any(str(i.get("kind", "defect")).lower() != "question" for i in spec):
-        return "Next: /crav1-tighten-spec, because that finding is a spec defect."
+        return run_next("Fix the spec finding, which is a spec defect:", f"/crav1-tighten-spec{tail}")
     if spec:
-        return "Next: /crav1-resolve-open-questions, because that finding is an open question."
+        return run_next("Resolve the spec finding, which is an open question:", f"/crav1-resolve-open-questions{tail}")
     if linter_named or went_on:
-        return ("Next: /crav1-build-tasks, because the plan issues are done. "
-                "A new chat, with plan.md, tasks.md, and spec.md attached.")
-    return "Next: nothing needed now."
+        return (run_next("Build the tasks in a new chat, with plan.md, tasks.md and spec.md attached, since the plan issues are done:",
+                         f"/crav1-build-tasks{tail}"))
+    return "Nothing needed now."
 
 
 def queue(items: list[dict], root: Path | None, went_on: bool, uncommitted: int | None) -> str:
@@ -501,7 +522,7 @@ def queue(items: list[dict], root: Path | None, went_on: bool, uncommitted: int 
         if not remaining:
             out.append("No plan issues remain.")
         out.append("")
-        out.append(empty_queue_next(items, named, went_on))
+        out.append(empty_queue_next(items, named, went_on, root.name if root is not None else None))
         if uncommitted:
             out.append(f"Uncommitted: {uncommitted} files; commit with /crav1-finalize-commit when ready.")
     return "\n".join(out) + "\n"

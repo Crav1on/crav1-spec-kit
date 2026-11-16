@@ -195,6 +195,19 @@ def _who_asked(marks):
     return who, asked
 
 
+# 1.176.0: prose that says the question went to someone counts as asked.
+# The person must start with a capital letter ("Waiting for the export" is
+# not a person), so "Raised with Person A" and "Waiting for Contoso" count.
+def _said_asked(text, marks):
+    """True when the question or its marks say it was raised with or waits for someone."""
+    for piece in [text or "", *(marks or [])]:
+        for found in re.finditer(r"\b(raised with|waiting for|sent to|asked)\s+(?:the\s+)?(\S+)", piece, re.I):
+            who = found.group(2)
+            if who[:1].isupper():
+                return True
+    return False
+
+
 def _named_blocks(line):
     found = []
     for match in NAMED_BLOCKS.finditer(line):
@@ -296,6 +309,7 @@ def kept_open(text, task_ids=None, resolve_recorded=False):
                 mark, tasks = "unparsed", []
                 blocks_slice = True
         mark_who, asked = _who_asked(q["marks"])
+        asked = asked or _said_asked(q["text"], q["marks"])
         who = _who_waiting(q["text"]) or mark_who
         out.append({
             "text": q["text"],

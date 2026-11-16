@@ -8,6 +8,8 @@
 
 Update the installed kit on the current branch to a published release.
 
+1.176.0: a persisted commit-style rule that is the old release's copy, or names the missing `crav1-draft-commit-message/` skill, is rewritten from the current message-only asset in the same yes. A rule changed by hand is left and listed in `style_rules_left`.
+
 **[`/crav1-update-kit`](crav1-update-kit.md)** takes an optional `to vX.Y.Z`. With no version, the target is the latest published release tag. `main`, a branch, a commit, and an open pull request are refused in one line. It detects the installed version from `plugin.json` or the `Kit version:` line in `crav1-docs/reference/workflow.md` (the changelog heading when that line is missing).
 
 It commits on the current branch and does not switch. Before any write it shows which branch that is, that only this branch gets the new kit, and that other branches stay on the old kit until this branch is merged into them (merge develop into the branch; never rebase). It suggests merging first or switching branch when this branch should not move, and it warns about uncommitted changes. A yes from an agent or an earlier chat does not count.
@@ -42,7 +44,7 @@ Writes kit-owned files on the current branch after a yes, replaces a copied temp
 
 ## Does not
 
-Leaves specs, `walk-progress.md`, `build-progress/`, plans, tasks, notes, playbooks, the build map, persist rules, the transfer data policy, and `kit-maintainer.mdc` alone. Does not switch branches, rebase, or push. A plugin install gets no kit commit.
+Leaves specs, `walk-progress.md`, `build-progress/`, plans, tasks, notes, playbooks, the build map, persist rules (except a stale commit-style rule, 1.176.0), the transfer data policy, and `kit-maintainer.mdc` alone. Does not switch branches, rebase, or push. A plugin install gets no kit commit.
 
 Limits and exceptions: a target that is not a published release tag stops in one line. A clash is not overwritten. An edited template is listed and left. The kit source checkout is refused. An agent's yes does not write, commit, or push.
 

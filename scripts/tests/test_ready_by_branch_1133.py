@@ -138,7 +138,7 @@ class ReadyByBranch(unittest.TestCase):
             '- `feat/orders-api-currency` (wave 1):\n  - T3 Choose the currency — open question "Which currency for refunds?" Waiting for the partner.',
             "- `feat/orders-api-archive` (wave 2):\n  - T4 Archive the receipt — held, waits on T3",  # one task per line, 1.164.0
         ])
-        self.assertEqual(payload["next_lines"], ["/crav1-build-tasks builds one task without the walk."])
+        self.assertEqual(payload["next_lines"], [])  # the hint moved to help, 1.176.0
         self.assertEqual(payload["next"], "/crav1-build-tasks builds one task without the walk.")
         self.assertTrue(any("`/crav1-build-walk" in line for line in payload["run_lines"]))
         joined = "\n".join(payload["run_lines"])
@@ -184,7 +184,7 @@ class ReadyByBranch(unittest.TestCase):
         self.assertEqual(payload["ready_lines"], [
             "- `feat/orders-api-record` (wave 1): T1 Record the decision; T2 Store the card",
         ])
-        self.assertEqual(payload["next_lines"], ["/crav1-build-tasks builds one task without the walk."])
+        self.assertEqual(payload["next_lines"], [])  # the hint moved to help, 1.176.0
         self.assertIn("`/crav1-build-walk", payload["run_lines"][0])
         self.assertEqual(len(payload["run_lines"]), 1)  # one block per branch, 1.164.0
         self.assertIn("Run only T1, the first task:\n`/crav1-build-walk", payload["run_lines"][0])
@@ -206,7 +206,7 @@ class ReadyByBranch(unittest.TestCase):
         self.assertEqual(payload["ready_lines"], [
             "- `feat/orders-api-record` (wave 1): T1 Record the decision",
         ])
-        self.assertEqual(payload["next_lines"], ["/crav1-build-tasks builds one task without the walk."])
+        self.assertEqual(payload["next_lines"], [])  # the hint moved to help, 1.176.0
         # 1.164.0: T2 waits in order, so only the whole branch and the open list name it.
         self.assertIn("Run only T1, the first task:", payload["run_lines"][0])
         self.assertNotIn("T2`", payload["run_lines"][0])

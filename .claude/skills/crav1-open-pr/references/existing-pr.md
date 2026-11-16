@@ -11,7 +11,7 @@ After the push (or open only) succeeded, read the open pull request for head →
 
 When the author cannot be told, treat it as someone else's pull request. When no host CLI can read it, print the URL, say the description was not updated and no comment was posted, and stop.
 
-**What is new.** List the commits on the head since the description was written: since the last commit the description links to (format A links are pinned to a commit), else since the pull request was last updated, else since it was created. Show them as one short list (short sha, subject). When none are new, say so and offer only **push only** (already done) and **stop**.
+**What is new.** List the commits on the head since the description was written: since the pull request was last updated, else since it was created. Show them as one short list (short sha, subject). When none are new, say so and offer only **push only** (already done) and **stop**.
 
 ## Choices
 
@@ -28,7 +28,7 @@ Show the pull request (`PR <n>`, title, author, URL) and what is new, then ask o
 
 ## Draft the text
 
-- **Update description.** Keep format A (`references/draft.md`). Add or change only the bullets and sections the new commits touch; re-pin their links to the new head commit. Keep every line a person wrote or edited (anything not in format A, reworded bullets, added notes) unless it is now wrong; then say which line and why. Show the full new description, then the changed lines as a short `Changed:` list (added, edited, removed).
+- **Update description.** Write it in format B (`references/draft.md`, 1.176.0): add a task line for each task the new commits built, and change the summary or Verified lines only when the new commits change them. An older format A description is rewritten to format B, with no links. Keep every line a person wrote or edited unless it is now wrong; then say which line and why. Show the full new description, then the changed lines as a short `Changed:` list (added, edited, removed).
 - **Add as comment.** A short comment: one opening line saying what was pushed and why, then one bullet per change, link first to its file and lines at the new head commit, then what changed and why. End with anything a reviewer should look at again. It is kit-neutral, like a posted review: no specs, plans, tasks, lanes, notes, skill or command names, tool names, or file-type words; it reads as a person's comment.
 
 ## Edit before posting

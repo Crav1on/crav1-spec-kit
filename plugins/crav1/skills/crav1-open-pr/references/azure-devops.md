@@ -51,6 +51,8 @@ If the list call fails, do not create. Print the Azure DevOps fallback from **Ho
 
 If the list is empty, create one pull request.
 
+**4,000 characters (1.176.0).** Azure DevOps refuses a description longer than 4,000 characters. Format B nearly always fits. As a guard, before `create` (and before an update), write the body to a UTF-8 file and run `<interpreter> -X utf8 scripts/pr_common.py fit --body <file> --text > <fitted file>`, then pass `<fitted file>` to `create`. The script never writes a file. When the body is too long it shortens the task lines to the task name and adds the plain line `Task lines were shortened to fit.` It adds no link and no overflow comment. `ok: false` means it still does not fit; say so and stop. Never count characters by hand.
+
 Non-Windows: pass `--description` as one value (a HEREDOC is fine) so quotes and Markdown survive. Microsoft documents each `--description` value as one new line.
 
 ```text

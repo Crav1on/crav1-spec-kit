@@ -326,7 +326,7 @@ class EndingTests(unittest.TestCase):
         self.assertTrue(text.startswith("Run next:"))
         self.assertLess(text.index("Run next:"), text.index("Built on"))
         self.assertLess(text.index("Built on"), text.index("Left:"))
-        self.assertIn("\n`/crav1-build-walk orders-api feat/orders-cicd`\nmerge PR 12 into develop", text)
+        self.assertIn("Merge PR 12 into develop, after your yes:\n`/crav1-build-walk orders-api feat/orders-cicd`", text)
         self.assertIn("**feat/orders-dev-switch**\n1 open task:\n- T7\n\nRun T7:\n`/crav1-build-walk orders-api T7`", text)
         self.assertNotIn("`/crav1-build-walk orders-api feat/orders-dev-switch`", text)
         self.assertIn("- T2 Add the build pipeline: commit a1b2c3d, tests green", text)

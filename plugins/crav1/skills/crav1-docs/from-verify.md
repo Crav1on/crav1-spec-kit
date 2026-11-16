@@ -77,3 +77,5 @@ When the matrix is green: [From commit to merge](from-commit.md). When the spec 
 Reference pages: [verify-build-against-spec](reference/skills/crav1-verify-build-against-spec.md) · [fix-build-gaps](reference/skills/crav1-fix-build-gaps.md) · [fix-build-gaps](reference/skills/crav1-fix-build-gaps.md)
 
 The run ends as [How a run ends](reference/run-ending.md) says: Run next, never a `Next:` line. Since 1.171.0 the branch blocks for what can start come from the ready check, the same as the build walk, so a task that waits on a merge is not offered. `Waiting:` only when a step is blocked.
+
+Since 1.176.0 a task whose checks passed on a work branch that is not merged yet is **Implemented, verified on branch**, with the branch, the commit and the pull request in the evidence, not **Not implemented**. A check that can only pass after the merge is pending. The ready check says `verified on feat/orders-readme, waits for PR 71 to merge`, and the row becomes **Implemented, verified, tick pending** once the merge is recorded. `/crav1-verify-build-against-spec` writes it.

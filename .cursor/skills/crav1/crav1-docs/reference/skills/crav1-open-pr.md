@@ -8,6 +8,8 @@
 
 Open a pull request for the current change branch, or push to an existing one and update its description or comment (push with explicit yes).
 
+1.176.0: the body is format B, on GitHub and Azure DevOps: a 2-3 sentence summary, one line per task with its full name and what it does, 1-2 lines on how it was verified, and the work-item mention. No links at all and no per-file detail; detail goes in the commit messages. On Azure DevOps `pr_common.py fit --body <file> --text` is a guard for 4,000 characters: it shortens the task lines and adds `Task lines were shortened to fit.`, with no link.
+
 1.172.0: on Windows, pull request threads are listed and posted with `crav1-review-pr/scripts/ado_threads.py`, which reads az JSON from stdout and decodes UTF-8, then cp1252.
 
 1.171.0: the ending is Run next, never a `Next:` line: a Catch up first `git push` when the specs repo is ahead, then `Review PR <n>:` with [`/crav1-review-pr`](crav1-review-pr.md) <repo> <n>`.
@@ -18,7 +20,7 @@ Open a pull request for the current change branch, or push to an existing one an
 
 1.130.0: the post confirm is one card. `yes (Recommended)` posts the text as shown. Typed changes go on that card's free-text answer. There is no Edits option. Nothing is posted before that yes.
 
-Push the change branch only after an explicit yes, then open one pull request (no merge, no commit). The body is a short summary and headed sections (see 1.98.0), with a Work item section when `work-item.md` exists. On Windows, a multi-line Azure DevOps description is passed as `--description "@<file>"` (UTF-8 without BOM). May name [`/crav1-review-pr`](crav1-review-pr.md) and does not run it. Next explicit ask to merge is [`/crav1-merge-pr`](crav1-merge-pr.md).
+Push the change branch only after an explicit yes, then open one pull request (no merge, no commit). The body is format B (1.176.0), a short summary, one line per task, how it was verified, and the work-item mention, with no links. On Windows, a multi-line Azure DevOps description is passed as `--description "@<file>"` (UTF-8 without BOM). May name [`/crav1-review-pr`](crav1-review-pr.md) and does not run it. Next explicit ask to merge is [`/crav1-merge-pr`](crav1-merge-pr.md).
 
 1.64.0: the base is the head's `(into …)` branch, then the repo's `Merges into` branch (also from a sibling spec repo), then the default branch. The slug is also found from a spec that lists the head branch.
 

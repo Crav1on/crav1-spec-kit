@@ -263,7 +263,7 @@ class BuiltClaims(unittest.TestCase):
             self.assertNotIn("Continue the build walk", ending)
             self.assertNotIn("in progress by person B since", ending)
             self.assertIn("built by person B, waits for PR 82 to merge", ending)
-            self.assertIn("Waiting: T9 to T12 are person B's, built, and wait for PR 82 to merge.", ending)
+            self.assertIn("1. PR 82 (person B's, feat/orders-cicd): ticks T9 to T12, then T13 can start.", ending)  # 1.176.0
             self.assertNotIn("reopened", ending)
 
 

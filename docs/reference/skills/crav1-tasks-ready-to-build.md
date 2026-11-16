@@ -8,6 +8,12 @@
 
 List the tasks ready to build, for one spec or all, and why the others are blocked. Rewrites each slice build map.
 
+1.176.0: the readiness ending leaves out [`/crav1-build-tasks`](crav1-build-tasks.md) builds one task without the walk.`; [`/crav1-help`](crav1-help.md) status` names it.
+
+1.176.0: open pull requests are one `Merge these PRs, in this order:` block, one numbered PR per line with its owner (`yours` or the name) and what merging it ticks and lets start, in dependency order. Branch runs reads `built, PR <n> open`. A task verified on an unmerged branch reads `verified on <branch>, waits for PR <n> to merge`.
+
+1.176.0: branch entries read `Build <T# full name> on <branch>:` above the command; a held task quotes its whole question; a question that says `Raised with` or `Waiting for` a person counts as asked; uncommitted slice files add `Commit the walk's changes, <n> files:` above [`/crav1-finalize-commit`](crav1-finalize-commit.md) before the push; task titles keep their code text with no stray ` ,` or ` )`.
+
 1.175.0: a claimed task that is built on a branch that is not merged reads `built by <name>, waits for PR <n> to merge` in the Held list and on `build-map.md`, not `in progress by <name> since <date>`. A reopened step's entry gives the reason in one plain sentence above `Finish the reopened <command> step:`. The Catch up first push entry names how far ahead only in its label.
 
 1.174.0: a done task's commit is its branch's `merge-pr` result in `build-progress`, never a later tick or commit step's hash; that hash is only a last fallback and never replaces a mark. A branch whose open tasks are all claimed or walked reads `built, waits for PR <n> to merge` or `in progress` on `build-map.md`, never `held, waits on` its own tasks. `Delivers:` and `Tasks:` lines use full names. Run next continues an unfinished branch walk first.

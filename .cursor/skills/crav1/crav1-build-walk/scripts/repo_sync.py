@@ -128,8 +128,17 @@ def pull_ending(label: str = "Merge origin into your local branch, since it is b
     return "Run next:\n\n" + label + "\n`git pull --no-rebase`"
 
 
+def repo_name(repo: Path) -> str:
+    """`The specs repo` when the repo holds docs/specs, else `The repo at <folder>` (1.176.0)."""
+    if (Path(repo) / "docs" / "specs").is_dir():
+        return "The specs repo"
+    return f"The repo at {Path(repo).name}"
+
+
 def _status_payload(repo: Path, fetched: bool, fetch_error: str | None) -> dict:
     branch = current_branch(repo)
+    # 1.176.0: name the code repo by its folder, not as the specs repo.
+    who = repo_name(repo)
     upstream = upstream_of(repo)
     payload = {
         "ok": True,
@@ -150,19 +159,19 @@ def _status_payload(repo: Path, fetched: bool, fetch_error: str | None) -> dict:
     if fetch_error and not fetched:
         payload["state"] = "offline"
         payload["message"] = (
-            "The specs repo could not be fetched (offline). Continuing from the local copy."
+            f"{who} could not be fetched (offline). Continuing from the local copy."
         )
         payload["line"] = payload["message"]
         return payload
     if not upstream:
         payload["state"] = "no-upstream"
-        payload["message"] = "The specs repo has no upstream. Continuing from the local copy."
+        payload["message"] = f"{who} has no upstream. Continuing from the local copy."
         payload["line"] = payload["message"]
         return payload
     counts = ahead_behind(repo, upstream)
     if counts is None:
         payload["state"] = "unknown"
-        payload["message"] = "The specs repo could not be compared to origin. Continuing from the local copy."
+        payload["message"] = f"{who} could not be compared to origin. Continuing from the local copy."
         payload["line"] = payload["message"]
         return payload
     ahead, behind = counts
@@ -173,7 +182,7 @@ def _status_payload(repo: Path, fetched: bool, fetch_error: str | None) -> dict:
         payload["continue"] = False
         payload["stop"] = True
         payload["message"] = (
-            f"The specs repo has diverged from {upstream} "
+            f"{who} has diverged from {upstream} "
             f"({ahead} ahead, {behind} behind). Merge origin in, never rebase."
         )
         payload["ending"] = pull_ending(
@@ -186,7 +195,7 @@ def _status_payload(repo: Path, fetched: bool, fetch_error: str | None) -> dict:
         payload["continue"] = False
         payload["stop"] = True
         payload["message"] = (
-            f"The specs repo is {behind} commit"
+            f"{who} is {behind} commit"
             f"{'s' if behind != 1 else ''} behind {upstream}. Pull before reading."
         )
         payload["ending"] = pull_ending()
@@ -202,7 +211,7 @@ def _status_payload(repo: Path, fetched: bool, fetch_error: str | None) -> dict:
         payload["line"] = payload["waiting"]
         return payload
     payload["state"] = "in-step"
-    payload["message"] = "The specs repo is in step with origin."
+    payload["message"] = f"{who} is in step with origin."
     payload["line"] = payload["message"]
     return payload
 

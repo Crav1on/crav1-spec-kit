@@ -8,6 +8,8 @@
 
 Turn an accepted spec into a file-level plan.md and independently testable tasks.md.
 
+1.176.0: the recap ends with Run next, `Review the plan, which is written and not reviewed yet:` above [`/crav1-review-plan`](crav1-review-plan.md) <slug>`, no `Next:` line. A `## Linter` section that names a tool, or records going on without one, counts as named even beside a partial `No linter ... for <part>` line.
+
 1.159.0: the After writing recap (paths written, task count, acceptance lines no task matched by wording, to compare by meaning first, the dependency waves, verify notes with no kind, kept-open questions and their `Blocks:` lines, approval items, stale research, the linter line and the one `Next` line) is printed by `scripts/plan_check.py recap`; the agent passes only what it alone knows (built pieces, the branch read, unmapped security checks). `plan_check.py order` checks the waves after `tasks.md` is written. The After writing list moved word for word to `references/recap.md`, the plan.md section list and host setup tasks to `references/write.md`.
 
 1.141.0: a constraint that a named person gives a yes before something becomes an `## Approval needed` item, with `Person:` and `Holds:` for the tasks that do that work. It does not write `Approved:`.

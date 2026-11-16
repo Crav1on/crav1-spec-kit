@@ -180,7 +180,7 @@ class EndingBlock(unittest.TestCase):
         self.assertLess(ending.index("**Catch up first**"), ending.index("`/crav1-build-walk"))
         self.assertNotIn("verify.md is behind tasks.md", ending)
         self.assertEqual(ending.count("`/crav1-build-walk"), sum(entry.count("`/crav1-build-walk") for entry in payload["run_lines"]))
-        self.assertIn("/crav1-build-tasks builds one task without the walk.", ending)
+        self.assertNotIn("/crav1-build-tasks builds one task without the walk.", ending)  # moved to help, 1.176.0
         self.assertNotIn("Next: /crav1-build-walk", ending)
         self.assertIn("verify.md is behind for T1.", ending)
         assert_complete(self, ending, "orders-api")

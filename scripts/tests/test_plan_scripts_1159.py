@@ -149,18 +149,18 @@ class Recap(unittest.TestCase):
                      "Branch read: ", "Verify notes with no kind, and other task-line gaps: none",
                      "Kept security checks with no task: none", "Kept-open questions parked as risks:",
                      "Approval needed:", "Stale research under Risks: Card network limits",
-                     "These notes name the checks.", "Linter: ruff", "Next: ", "Uncommitted: 2 files"]
+                     "These notes name the checks.", "Linter: ruff", "Run next:", "Uncommitted: 2 files"]
             positions = [out.index(h) for h in heads]
             self.assertEqual(positions, sorted(positions))
             self.assertIn("- Should a partial refund mail the customer? Blocks: T2", out)
             self.assertIn("- Which currency rounding applies? No Blocks line.", out)
-            nxt = [l for l in out.splitlines() if l.startswith("Next:")]
-            self.assertEqual(nxt, ["Next: /crav1-review-plan, because the plan is written and not reviewed."])
-            self.assertIn(nxt[0], ref)
+            self.assertNotIn("Next:", out)
+            self.assertIn("Review the plan, which is written and not reviewed yet:\n`/crav1-review-plan orders-api`", out)
+            self.assertIn("Review the plan, which is written and not reviewed yet:", ref)
             spec_branch = run(CHECK, "recap", "--root", str(root), "--branch", "spec/orders-api").stdout
-            line = [l for l in spec_branch.splitlines() if l.startswith("Next:")]
-            self.assertEqual(line, ["Next: /crav1-open-pr, because this specify-only branch is not on the default branch yet."])
-            self.assertIn(line[0], ref)
+            self.assertNotIn("Next:", spec_branch)
+            self.assertIn("Open the pull request, since this specify-only branch is not on the default branch yet:\n`/crav1-open-pr orders-api`", spec_branch)
+            self.assertIn("Open the pull request, since this specify-only branch is not on the default branch yet:", ref)
             self.assertNotIn("tighten-plan", out)
             self.assertNotIn("/crav1-build", out)
 
@@ -189,11 +189,20 @@ class Queue(unittest.TestCase):
 
     def test_empty_queue_next_line_is_one_of_the_reference_lines(self):
         ref = (SK / "crav1-tighten-plan/references/issues.md").read_text(encoding="utf-8")
-        allowed = re.findall(r"`(Next: [^`]+)`", ref.split("## Empty queue", 1)[1].split("\n## ", 1)[0])
-        self.assertEqual(len(allowed), 4)
+        section = ref.split("## Empty queue", 1)[1].split("\n## ", 1)[0]
+        self.assertNotIn("Next:", section)
+        allowed = [
+            "Fix the spec finding, which is a spec defect:",
+            "Resolve the spec finding, which is an open question:",
+            "Build the tasks in a new chat, with plan.md, tasks.md and spec.md attached, since the plan issues are done:",
+            "Nothing needed now.",
+        ]
+        for label in allowed:
+            self.assertIn(label, section)
         done = [dict(i, status="patched") for i in ITEMS if i["tag"] == "plan"]
         cases = [
             (done + [{"id": "P9", "issue": "a spec gap", "tag": "spec", "kind": "defect", "status": "skipped"}], PLAN, False, 0),
+            (done + [{"id": "P9", "issue": "a spec gap", "tag": "spec", "kind": "defect", "status": "patched"}], PLAN, False, 2),
             (done + [ITEMS[3]], PLAN, False, 1),
             (done, PLAN, False, 2),
             (done, PLAN.replace("- ruff, `ruff check src/`, covers src/.", "- None: this repo has no linter for this code."), False, 3),
@@ -206,9 +215,11 @@ class Queue(unittest.TestCase):
                 if went_on:
                     args.append("--went-on-without-linter")
                 out = run(CHECK, *args).stdout
-                nxt = [l for l in out.splitlines() if l.startswith("Next:")]
-                self.assertEqual(len(nxt), 1, out)
-                self.assertTrue(nxt[0].startswith(allowed[want]), (nxt[0], allowed[want]))
+                self.assertNotIn("Next:", out)
+                self.assertIn(allowed[want], out)
+                for other, label in enumerate(allowed):
+                    if other != want:
+                        self.assertNotIn(label, out)
                 if want == 3:
                     self.assertNotIn("/crav1-build", out)
 
@@ -261,7 +272,7 @@ class SkillText(unittest.TestCase):
             "Compare by meaning first: a reworded line a task already covers is a `fix-trace`, not a new task.",
             "**Spec** tag: the plan is fine or cannot be honest until `spec.md` changes.",
             "Remaining `P#` titles only. Mark the current one. Note plan vs spec.",
-            "`Next: /crav1-build-tasks, because the plan issues are done.` A new chat, with `plan.md`, `tasks.md`, and `spec.md` attached.",
+            "Build the tasks in a new chat, with plan.md, tasks.md and spec.md attached, since the plan issues are done:",
             "A plan that already says none is not a `P#` by itself.",
             "This line is the only `plan.md` change this skill makes outside the picked patches.",
             "At most **one** alternate suggestion, then they must pick a patch letter, `ask`, `keep`, or `send-to-spec`.",

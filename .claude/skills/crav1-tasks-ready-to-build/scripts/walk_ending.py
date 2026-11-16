@@ -70,8 +70,8 @@ def run_entry(labels, branch_name, slug=None):
 
     The command is alone on its line, inside a code span, and is a complete
     invocation for a new session: the command, each T#, and the slug when
-    the caller passes one. The next line names the branch and each short
-    task name.
+    the caller passes one. The label above it names each full task name and
+    the branch (1.176.0: label above the command, no lowercase line under it).
     """
     ids = []
     names = []
@@ -86,15 +86,14 @@ def run_entry(labels, branch_name, slug=None):
             names.append(token)
     ids_text = ", ".join(ids)
     command = f"/crav1-build-walk {slug} {ids_text}" if slug else f"/crav1-build-walk {ids_text}"
-    detail = f"branch {branch_name}, {', '.join(names)}"
-    return f"`{command}`\n{detail}"
+    return f"Build {_join(names)} on {branch_name}:\n`{command}`"
 
 
 def branch_entry(open_labels, branch_name, slug=None):
     """The whole-branch entry (1.155.0), offered with two or more open tasks."""
     names = [str(label).strip() for label in open_labels or [] if str(label).strip()]
     command = f"/crav1-build-walk {slug} {branch_name}" if slug else f"/crav1-build-walk {branch_name}"
-    return f"`{command}`\nbranch {branch_name}, every open task: {', '.join(names)}"
+    return f"Build every open task on {branch_name} ({', '.join(names)}):\n`{command}`"
 
 
 # Words a cut line must not end on (1.165.0).
@@ -625,7 +624,7 @@ def _ids(ids):
     return sorted(out, key=lambda t: (int(t[1:]) if re.fullmatch(r"T\d+", t) else 10**9, t))
 
 
-def catch_up_block(slug=None, behind=None, orphans=None, ahead=0, failed=None):
+def catch_up_block(slug=None, behind=None, orphans=None, ahead=0, failed=None, uncommitted=None):
     """`**Catch up first**` for Run next (1.167.0), or "".
 
     Things behind that the user can fix now with one command each, before
@@ -655,7 +654,8 @@ def catch_up_block(slug=None, behind=None, orphans=None, ahead=0, failed=None):
         ahead = int(ahead or 0)
     except (TypeError, ValueError):
         ahead = 0
-    if not behind and not orphans and ahead <= 0 and not fails:
+    files = [str(f).strip() for f in uncommitted or [] if str(f).strip()]
+    if not behind and not orphans and ahead <= 0 and not fails and not files:
         return ""
     sentences = []
     behind_text = _join(behind) if behind else ""
@@ -691,7 +691,15 @@ def catch_up_block(slug=None, behind=None, orphans=None, ahead=0, failed=None):
     for tid, _why in fails:
         lines.append(f"Fix {tid}:")
         lines.append(f"`{FIX_COMMAND} {slug} {tid}`" if slug else f"`{FIX_COMMAND} {tid}`")
-    if ahead > 0:
+    if files:
+        # 1.176.0: commit the walk's own changes before any push, on every result.
+        count = len(files)
+        noun = "file" if count == 1 else "files"
+        lines.append(f"Commit the walk's changes, {count} {noun}:")
+        lines.append("`/crav1-finalize-commit`")
+        lines.append("Then push the specs repo:")
+        lines.append(f"`{PUSH_COMMAND}`")
+    elif ahead > 0:
         lines.append(f"Push the specs repo, which is {ahead} {unit} ahead of origin:")
         lines.append(f"`{PUSH_COMMAND}`")
     return "\n".join(lines)
@@ -828,20 +836,21 @@ def ready_reply(
 
 
 def not_ready_next(slug: str, counts: dict | None, question_first: bool) -> str | None:
-    """The one Next line a not-ready ready check prints (references next-*)."""
+    """The one Run next entry a ready check without branch blocks prints (references next-*)."""
     counts = counts or {}
     left = sum(int(counts.get(key, 0) or 0) for key in ("ready", "waiting", "waits_in_order", "blocked"))
+    # Run next with the label above the command, never a Next: line (1.176.0).
     if left == 0 and not counts.get("needs_verify"):
-        return "Next: nothing needed now."
+        return "Nothing needed now."
     if left == 0:
         return (
-            f"Next: /crav1-verify-build-against-spec {slug}, "
-            "because the built tasks are not verified yet."
+            "Run next:\n\nVerify the built tasks, which aren't verified yet:\n"
+            f"`/crav1-verify-build-against-spec {slug}`"
         )
     if question_first and not counts.get("ready"):
         return (
-            f"Next: /crav1-resolve-open-questions {slug}, "
-            "because that question blocks the first task."
+            "Run next:\n\nResolve the open question that blocks the first task:\n"
+            f"`/crav1-resolve-open-questions {slug}`"
         )
     return None
 
@@ -851,6 +860,7 @@ def not_ready_next(slug: str, counts: dict | None, question_first: bool) -> str 
 
 VERIFY_STATUSES = (
     ("tick_pending", "Implemented, verified, tick pending", "verified, tick pending"),
+    ("on_branch", "Implemented, verified on branch", "verified on branch"),
     ("verified", "Implemented, verified", "verified"),
     ("failed", "Implemented, verify failed", "failed"),
     ("not_implemented", "Not implemented", "not implemented"),

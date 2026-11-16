@@ -34,12 +34,12 @@ Remaining `P#` titles only. Mark the current one. Note plan vs spec. The `queue`
 
 ## Empty queue
 
-If **no plan issues** remain, say so and print one `Next` line. Do not list the other cases.
+If **no plan issues** remain, say so and print one Run next entry, its label on its own line above the command. Do not list the other cases.
 
-- A spec-tagged finding is a spec defect: `Next: /crav1-tighten-spec, because that finding is a spec defect.`
-- A spec-tagged finding is an open question: `Next: /crav1-resolve-open-questions, because that finding is an open question.`
-- None remain, and the plan names a linter or they chose to go on without one: `Next: /crav1-build-tasks, because the plan issues are done.` A new chat, with `plan.md`, `tasks.md`, and `spec.md` attached.
-- No linter, and they have not chosen to go on: `Next: nothing needed now.` Do not name build.
+- An open spec-tagged finding is a spec defect: Run next, "Fix the spec finding, which is a spec defect:" above `` `/crav1-tighten-spec <slug>` ``. A spec finding already patched, dropped or kept is settled and sends nobody back.
+- An open spec-tagged finding is an open question: Run next, "Resolve the spec finding, which is an open question:" above `` `/crav1-resolve-open-questions <slug>` ``.
+- None remain, and the plan names a linter or they chose to go on without one: Run next, "Build the tasks in a new chat, with plan.md, tasks.md and spec.md attached, since the plan issues are done:" above `` `/crav1-build-tasks <slug>` ``.
+- No linter, and they have not chosen to go on: "Nothing needed now." Do not name build.
 
 When `## Linter` says this repo has no linter or checker for the code the tasks will touch, do not name those Build commands. Stop before Build. The user decides to add the linter or to go on without one. Do not install one. When they already chose to go on without one in this turn, the Build next step applies, and the plan still says none. A plan that already says none is not a `P#` by itself.
 
