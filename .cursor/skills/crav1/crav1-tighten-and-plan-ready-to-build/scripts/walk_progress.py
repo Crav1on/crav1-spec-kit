@@ -1920,7 +1920,14 @@ def branch_run_lines(root: Path | None, include_merged: bool = False) -> list[st
         run = data["branch_runs"][branch]
         if run["state"] == "merged" and not include_merged:
             continue
-        out.append(f"- {branch}: {run['state']} (log: {run['log']})")
+        state = run["state"]
+        if str(state).strip().lower() == "stopped before merge":
+            # 1.176.0: say what is true, built with its PR open.
+            log = Path(root) / str(run.get("log") or "")
+            prs = _PROGRESS_PR.findall(log.read_text(encoding="utf-8")) if log.is_file() else []
+            if prs:
+                state = f"built, PR {prs[-1]} open"
+        out.append(f"- {branch}: {state} (log: {run['log']})")
     return out
 
 
@@ -3735,6 +3742,131 @@ def apply_progress_waits(root: Path | None, rows: list[dict]) -> dict:
     return waits
 
 
+def open_prs(root: Path | None, user: str | None = None) -> dict:
+    """Pull requests that wait to merge, from build-progress (1.176.0).
+
+    {pr: {"branch", "tasks", "owner"}}. A walk at `comment` or `wait-merge`,
+    and a walk whose claimed tasks are all built with a known PR (someone
+    else's walk stopped before the merge). `owner` is `yours` when the claim
+    or `Run yes:` user is the local git user, else that name.
+    """
+    out: dict = {}
+    if root is None:
+        return out
+    local = None
+    looked = False
+
+    def owner_of(branch: str, text: str, fallback: str | None) -> str:
+        nonlocal local, looked
+        who = walk_owner(root, branch, text).get("user")
+        if who:
+            if not looked:
+                local = user or _git_user(root)
+                looked = True
+            if local and claims_mod().same_person(who, local):
+                return "yours"
+            return who
+        return "yours" if (fallback or "self").lower() == "self" else "someone else"
+
+    for task, info in progress_merge_waits(root).items():
+        pr = info.get("pr")
+        if not pr:
+            continue
+        entry = out.setdefault(pr, {"branch": info["branch"], "tasks": [], "owner": None})
+        if task not in entry["tasks"]:
+            entry["tasks"].append(task)
+        if entry["owner"] is None:
+            log = Path(root) / "build-progress" / f"{info['branch'].replace('/', '--')}.md"
+            text = log.read_text(encoding="utf-8") if log.is_file() else ""
+            entry["owner"] = owner_of(info["branch"], text, info.get("owner"))
+    built = walk_built(root)
+    for branch, info in _unfinished_walks(root, user).items():
+        pr = info.get("pr")
+        tasks = info["owner"]["tasks"]
+        if not pr or not tasks or not all(task in built for task in tasks):
+            continue
+        entry = out.setdefault(pr, {"branch": branch, "tasks": [], "owner": None})
+        for task in tasks:
+            if task not in entry["tasks"]:
+                entry["tasks"].append(task)
+        if entry["owner"] is None:
+            name = info["owner"]["user"]
+            entry["owner"] = "yours" if info["own"] else (name or "someone else")
+    return out
+
+
+def _task_num(task: str) -> int:
+    match = re.fullmatch(r"T(\d+)", str(task))
+    return int(match.group(1)) if match else 10**9
+
+
+def merge_order(rows: list[dict], prs: dict) -> list[dict]:
+    """The PRs in merge order, each with what merging it unblocks (1.176.0).
+
+    A PR whose tasks another PR's tasks depend on comes first. Ties go to the
+    PR that unblocks more tasks, then the lower PR number. `ticks` are the
+    PR's own tasks; `starts` are tasks held only by dependencies that can
+    start once this PR and the ones before it are merged.
+    """
+    by_task = {row.get("task"): row for row in rows if row.get("task")}
+    done = {task for task, row in by_task.items() if row.get("bucket") == "done"}
+    in_pr = {task for info in prs.values() for task in info["tasks"]}
+
+    def startable(merged: set[str]) -> set[str]:
+        out = set()
+        for task, row in by_task.items():
+            if task in done or task in in_pr or row.get("bucket") in ("ready", "done", "needs-verify"):
+                continue
+            if "open question" in str(row.get("reason") or "") or row.get("claim") and not row.get("own_claim"):
+                continue
+            deps = [dep for dep in row.get("deps") or [] if dep]
+            if deps and any(dep in merged for dep in deps) and all(dep in done or dep in merged for dep in deps):
+                out.add(task)
+        return out
+
+    needs: dict = {pr: set() for pr in prs}
+    for pr, info in prs.items():
+        for task in info["tasks"]:
+            for dep in (by_task.get(task) or {}).get("deps") or []:
+                for other, oinfo in prs.items():
+                    if other != pr and dep in oinfo["tasks"]:
+                        needs[pr].add(other)
+    order: list[dict] = []
+    merged: set[str] = set()
+    left = set(prs)
+    while left:
+        free = [pr for pr in left if not (needs[pr] & left)] or sorted(left)
+        before = startable(merged)
+
+        def gain(pr):
+            return len(startable(merged | set(prs[pr]["tasks"])) - before)
+
+        free.sort(key=lambda pr: (-gain(pr), int(pr)))
+        pick = free[0]
+        merged |= set(prs[pick]["tasks"])
+        starts = sorted(startable(merged) - before, key=_task_num)
+        order.append({"pr": pick, **prs[pick], "ticks": sorted(prs[pick]["tasks"], key=_task_num), "starts": starts})
+        left.discard(pick)
+    return order
+
+
+def merge_order_block(rows: list[dict], prs: dict) -> str:
+    """`Merge these PRs, in this order:` with one numbered PR per line (1.176.0)."""
+    order = merge_order(rows, prs)
+    if not order:
+        return ""
+    lines = ["Merge these PRs, in this order:"]
+    for i, item in enumerate(order, 1):
+        owner = item.get("owner") or "someone else"
+        whose = "yours" if owner == "yours" else f"{owner}'s"
+        what = f"ticks {_ids_span(item['ticks'])}"
+        if item["starts"]:
+            verb = "can" if len(item["starts"]) > 1 else "can"
+            what += f", then {_ids_span(item['starts'])} {verb} start"
+        lines.append(f"{i}. PR {item['pr']} ({whose}, {item['branch']}): {what}.")
+    return "\n".join(lines)
+
+
 def merge_wait_lines(rows: list[dict]) -> list[str]:
     """Plain Waiting lines for tasks that wait on a merge (1.171.0)."""
     by_pr: dict = {}
@@ -4582,7 +4714,13 @@ def readiness(args: argparse.Namespace) -> None:
     # Waiting lines keep only what waits on people or merges.
     catch_up = catch_up_for(slug, gap, sync, root)
     waiting_bits = list(loop_lines)
-    waiting_bits.extend(merge_wait_lines(rows))
+    # 1.176.0: one ordered merge list replaces the per-PR Waiting lines.
+    merge_prs = open_prs(root, getattr(args, "user", None)) if root is not None and root.is_dir() else {}
+    merge_block = merge_order_block(rows, merge_prs) if merge_prs else ""
+    if merge_block:
+        waiting_bits.append(merge_block)
+    else:
+        waiting_bits.extend(merge_wait_lines(rows))
     if resolve_waiting:
         waiting_bits.append(resolve_waiting)
     if result == "not-ready" and not can_start and waiting_line:
@@ -4622,6 +4760,8 @@ def readiness(args: argparse.Namespace) -> None:
     local_user = getattr(args, "user", None)
     resume_entries = resume_walk_entries(root, command_slug(root) if root is not None and root.is_dir() else slug, user=local_user)
     for line in walk_owner_waits(root, local_user):
+        if merge_block and ", built, and wait" in line or merge_block and ", built, and waits" in line:
+            continue
         if line not in waiting_bits:
             waiting_bits.append(line)
     if resume_entries:
