@@ -3765,8 +3765,28 @@ def _run_label(command: str, reason: str) -> str:
     return text[0].upper() + text[1:] + ":"
 
 
-def _run_entry(command: str, reason: str) -> str:
-    return f"{_run_label(command, reason)}\n`{command}`"
+REASON_LABELS = {
+    "the walk resumes when the answers arrive.": "Resume the walk when the answers arrive:",
+}
+
+
+def _run_entry(command: str, reason: str, label: str | None = None) -> str:
+    return f"{label or _run_label(command, reason)}\n`{command}`"
+
+
+def _reopened_label(can_start: list, command: str) -> str:
+    """`T1 waits until the reopened /crav1-tighten-plan step finishes:` (1.173.0).
+
+    The real T# list and the step's command, without the slug. Two or more
+    tasks wait; with none it is the work that waits.
+    """
+    ids = _task_ids_text(can_start)
+    step = str(command).split()[0] if str(command).split() else str(command)
+    names = [task for task in can_start or [] if task]
+    if not ids:
+        return f"The work waits until the reopened {step} step finishes:"
+    verb = "waits" if len(names) == 1 else "wait"
+    return f"{ids} {verb} until the reopened {step} step finishes:"
 
 
 def _wait_until(lead: str, can_start: list, command: str) -> str:
@@ -3783,7 +3803,8 @@ def _run_from_clause(text: str) -> str:
         text = text[len("Next:"):].strip()
     if ", because " in text:
         command, reason = text.split(", because ", 1)
-        return _run_entry(command.strip().strip("`"), reason.strip())
+        reason = reason.strip()
+        return _run_entry(command.strip().strip("`"), reason, REASON_LABELS.get(reason))
     if text.startswith("`") and "\n" in text:
         return text
     return text
@@ -3856,7 +3877,7 @@ def not_ready_run(
         command, lead = REOPEN_NEXT.get(step, (STEP_COMMAND.get(step, f"/crav1-{step}"), "An earlier step was reopened"))
         command = _command_with_slug(command, slug)
         reason = because or _wait_until(lead, can_start, command)
-        return [_run_entry(command, reason)]
+        return [_run_entry(command, reason, _reopened_label(can_start, command))]
     if offer and offer.get("entries"):
         return [str(offer["entries"][0])]
     if waiting_next:
@@ -3867,19 +3888,19 @@ def not_ready_run(
     if catch_up and (gap.get("behind") or gap.get("orphan_tasks") or gap.get("failed") or (sync and sync.get("state") == "ahead")):
         if question_first and not counts.get("ready"):
             command = _command_with_slug("/crav1-resolve-open-questions", slug)
-            return [_run_entry(command, "that question blocks the first task.")]
+            return [_run_entry(command, "that question blocks the first task.", "Resolve the open question that blocks the first task:")]
         return []
     if gap.get("behind") or (left == 0 and counts.get("needs_verify")):
         command = _command_with_slug("/crav1-verify-build-against-spec", slug)
-        return [_run_entry(command, "verify.md is behind, so the built tasks need to be verified.")]
+        return [_run_entry(command, "verify.md is behind, so the built tasks need to be verified.", "Verify the built tasks, since verify.md is behind:")]
     if sync and sync.get("state") == "ahead":
         ahead = int(sync.get("ahead") or 1)
         unit = "commits" if ahead != 1 else "commit"
         reason = f"The specs repo is {ahead} {unit} ahead of origin."
-        return [_run_entry("git push", reason)]
+        return [_run_entry("git push", reason, f"Push the specs repo, which is {ahead} {unit} ahead of origin:")]
     if question_first and not counts.get("ready"):
         command = _command_with_slug("/crav1-resolve-open-questions", slug)
-        return [_run_entry(command, "that question blocks the first task.")]
+        return [_run_entry(command, "that question blocks the first task.", "Resolve the open question that blocks the first task:")]
     return []
 
 

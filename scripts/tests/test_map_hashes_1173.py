@@ -157,6 +157,33 @@ class OpenQuestionsLabel(unittest.TestCase):
         self.assertTrue(label[0].isupper() and label.endswith(":"))
 
 
+class MovedLabels(unittest.TestCase):
+    def test_reopened_step_label_one_task(self):
+        entry = wp.not_ready_run("not-ready", "orders-api", [{"bucket": "reopened", "step": "review-and-tighten-plan"}],
+                                 ["T1"], None, {}, None, None, {}, None, False)
+        self.assertEqual(entry, ["T1 waits until the reopened /crav1-tighten-plan step finishes:\n`/crav1-tighten-plan orders-api`"])
+
+    def test_reopened_step_label_several_tasks(self):
+        entry = wp.not_ready_run("not-ready", "orders-api", [{"bucket": "reopened", "step": "tighten-spec"}],
+                                 ["T1", "T2", "T5"], None, {}, None, None, {}, None, False)
+        self.assertTrue(entry[0].startswith("T1, T2 and T5 wait until the reopened /crav1-tighten-spec step finishes:\n"))
+
+    def test_reopened_step_label_no_tasks(self):
+        entry = wp.not_ready_run("not-ready", "", [{"bucket": "reopened", "step": "plan-from-spec"}],
+                                 [], None, {}, None, None, {}, None, False)
+        self.assertEqual(entry, ["The work waits until the reopened /crav1-plan-from-spec step finishes:\n`/crav1-plan-from-spec`"])
+
+    def test_verify_push_resolve_and_resume_labels(self):
+        verify = wp.not_ready_run("not-ready", "orders-api", [], [], None, {"behind": True}, None, None, {}, None, False)
+        self.assertEqual(verify, ["Verify the built tasks, since verify.md is behind:\n`/crav1-verify-build-against-spec orders-api`"])
+        push = wp.not_ready_run("not-ready", "orders-api", [], [], None, {}, {"state": "ahead", "ahead": 2}, None, {}, None, False)
+        self.assertEqual(push, ["Push the specs repo, which is 2 commits ahead of origin:\n`git push`"])
+        resolve = wp.not_ready_run("not-ready", "orders-api", [], [], None, {}, None, None, {}, None, True)
+        self.assertEqual(resolve, ["Resolve the open question that blocks the first task:\n`/crav1-resolve-open-questions orders-api`"])
+        resume = wp._run_from_clause("/crav1-tighten-and-plan-ready-to-build orders-api, because the walk resumes when the answers arrive.")
+        self.assertEqual(resume, "Resume the walk when the answers arrive:\n`/crav1-tighten-and-plan-ready-to-build orders-api`")
+
+
 class FinalizeCommitEndings(unittest.TestCase):
     def test_every_ending_is_run_next_or_nothing(self):
         skill = (SK / "crav1-finalize-commit/SKILL.md").read_text(encoding="utf-8")
