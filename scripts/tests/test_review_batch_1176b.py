@@ -424,3 +424,21 @@ class TodoLayout(unittest.TestCase):
         text = (SK / "crav1-help/references/todo.md").read_text(encoding="utf-8")
         self.assertNotIn("Next: <skill>", text)
         self.assertIn("Answer the question:\n`/crav1-resolve-open-questions orders-api`", text)
+
+
+class ReviewAndStatusReadFormatB(unittest.TestCase):
+    def test_pr_status_takes_order_and_questions_from_the_kit(self):
+        text = (SK / "crav1-pr-status/references/classify.md").read_text(encoding="utf-8")
+        self.assertIn("format B", text)
+        self.assertIn("`Merge these PRs, in this order:`", text)
+        self.assertIn("`Order: not known from the kit's records.`", text)
+        self.assertIn("Older descriptions (format A, 1.98.0)", text)
+        self.assertNotIn("`/crav1-open-pr` writes these `###` sections", text)
+
+    def test_review_pr_checks_the_short_body_task_by_task(self):
+        first = (SK / "crav1-review-pr/references/first-section.md").read_text(encoding="utf-8")
+        self.assertIn("A format B body (1.176.0) is compared task by task", first)
+        self.assertIn("An older format A body (1.98.0) is compared bullet by bullet", first)
+        checklist = (SK / "crav1-review-pr/references/checklist.md").read_text(encoding="utf-8")
+        self.assertIn("the description is not the source", checklist)
+        self.assertIn("`The kit has no recorded merge order for this pull request.`", checklist)

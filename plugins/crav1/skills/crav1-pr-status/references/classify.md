@@ -30,15 +30,18 @@ A point that belongs to later work keeps its status and is also offered as a fol
 - A point already in the record keeps its line: match by `thread <id>`, then by anchor and words. Never make a second Point for it.
 - A record Point with no thread (from `/crav1-review-pr`, or `migrated`) is matched to a thread the same way; no match keeps it as it is, with `no thread` shown in the chat.
 
-## The description (1.98.0)
+## The description (1.176.0)
 
-Read the pull request's description too. `/crav1-open-pr` writes these `###` sections (format A); read them when they are there, by heading, whoever wrote the body:
+Read the pull request's description too. Since 1.176.0 `/crav1-open-pr` writes format B: a short summary, a `### Tasks` section with one line per task (`T#`, full name, what it does), a `### Verified` section, and the work-item mention. Read its task lines as the tasks this pull request carries, matched to `tasks.md` by `T#`. None of format B is a record line.
 
-- **Merge order:** each bullet names another pull request or branch and says before or after. One `Order` line each, as **Candidates** says, with `from the description` as its source.
-- **Questions for reviewers:** each bullet is a point the author asked. Anchor from its link (`path:line` or `path:start-end`; no link: `general`), owner the author, tags `asked; from description <date>`. Its status comes from the replies as for any point; no reply is `waiting on <reviewer>` when the pull request names one reviewer, else `open`. A thread that answers it is matched by words or anchor, as for a Point with no thread.
-- **Not in this PR:** each bullet is a **Follow-up** candidate, offered in the follow-ups question. It is written only on a yes, as a `follow-up` Point with the same tags rule (`from description <date>`).
+Merge order and questions come from the kit's own state, not from the description:
 
-A point already in the record keeps its line. The other sections (Changes, Verified, Risks and rollback) are not record lines. A body without these headings is read as before: an order the description states in words is still an **Order** candidate.
+- **Order:** take it from the ready check's merge list (`<interpreter> -X utf8 <skill crav1-tighten-and-plan-ready-to-build>/scripts/walk_progress.py readiness --root <spec-folder> --skip-sync --text`, read only, its `Merge these PRs, in this order:` block) and the branch's `build-progress/<branch>.md`. One `Order` line per pull request it puts before or after this one, as **Candidates** says, with `from the ready check` or `from build-progress` as its source. With no spec folder or no merge list, write `Order: not known from the kit's records.` in the chat and add no `Order` line.
+- **Questions:** take them from the spec's open questions that hold a task this pull request carries (`Open questions` in `spec.md`, still unanswered). Each is a point with owner who can answer it, tags `asked; from spec <date>`. No spec: say `No open questions recorded for this pull request.`
+
+**Older descriptions (format A, 1.98.0).** An existing pull request may still have the old `###` sections. Read them by heading, whoever wrote the body, as before: **Merge order** bullets become `Order` lines with `from the description` as their source; **Questions for reviewers** bullets become points (anchor from the link, else `general`; owner the author; tags `asked; from description <date>`; no reply is `waiting on <reviewer>` when the pull request names one reviewer, else `open`); **Not in this PR** bullets are **Follow-up** candidates, written only on a yes. The kit no longer writes these sections. When both the description and the kit's state give an order, the kit's state wins and the difference is said once in the chat.
+
+A point already in the record keeps its line. Changes, Verified, Risks and rollback are not record lines. A body without these headings is read as before: an order the description states in words is still an **Order** candidate.
 
 ## Read the replies
 
