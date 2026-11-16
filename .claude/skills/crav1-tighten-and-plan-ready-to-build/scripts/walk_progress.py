@@ -3869,6 +3869,29 @@ def merge_order_block(rows: list[dict], prs: dict) -> str:
     return "\n".join(lines)
 
 
+def own_merge_entry(order: list[dict]) -> str | None:
+    """The Run next entry that merges your own pull requests first (1.177.0).
+
+    When the merge list holds at least one PR that is yours, the ready check
+    leads with `Merge your PRs 71 and 73 first (PR 82 is person B's):` above
+    `/crav1-merge-pr 71`, the first of yours in list order. None when no
+    listed PR is yours.
+    """
+    mine = [str(item["pr"]) for item in order if item.get("owner") == "yours"]
+    if not mine:
+        return None
+    others = [item for item in order if item.get("owner") != "yours"]
+
+    def _and(items: list[str]) -> str:
+        return items[0] if len(items) == 1 else ", ".join(items[:-1]) + " and " + items[-1]
+
+    head = f"Merge your PR {mine[0]} first" if len(mine) == 1 else f"Merge your PRs {_and(mine)} first"
+    if others:
+        bits = [f"PR {item['pr']} is {item.get('owner') or 'someone else'}'s" for item in others]
+        head += f" ({_and(bits)})"
+    return _run_entry(f"/crav1-merge-pr {mine[0]}", "", head + ":")
+
+
 ON_BRANCH = "implemented, verified on branch"
 
 
@@ -4816,6 +4839,13 @@ def readiness(args: argparse.Namespace) -> None:
             waiting_bits.append(line)
     if resume_entries:
         shown_run = resume_entries + [entry for entry in shown_run if entry not in resume_entries]
+        if result not in ("ready", "ready-partial") and not catch_up:
+            nxt = shown_run[0]
+    # 1.177.0: your own PRs in the merge list lead Run next, above the
+    # resume entry; with none of yours the order stays as it was.
+    own_merge = own_merge_entry(merge_order(rows, merge_prs)) if merge_block else None
+    if own_merge and own_merge not in shown_run:
+        shown_run = [own_merge] + list(shown_run)
         if result not in ("ready", "ready-partial") and not catch_up:
             nxt = shown_run[0]
     ending = compose_ending(

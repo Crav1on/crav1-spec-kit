@@ -8,6 +8,8 @@
 
 Merge one named pull request with a merge commit.
 
+1.177.0: a bare number is resolved from the kit's records before this checkout's remote (`pr_common.py resolve`); several candidates are asked, never picked. Only the resolved host's CLI is named, and the ending is Run next, never a `Next:` line.
+
 1.164.0: the build walk's merge card names the pull request, for example `Merge PR 71 into develop?`, as the card wording rule in `docs/reference/question-cards.md` says. That yes is still the explicit ask.
 
 1.158.0: the shared pull-request steps are `crav1-docs/reference/pr-common.md` and `scripts/pr_common.py`. The merge rules are unchanged: the explicit merge ask, the merge commit (`gh pr merge --merge`, Azure Repos `--squash false`), never squash, rebase or bypass, the PR record gate and `anyway`, and the walk printing its own Run next. It never writes or clears `claims.md`; [`/crav1-build-walk`](crav1-build-walk.md) clears its own claim after the merge. The GitHub host and read steps moved word for word to `references/github.md`, the Azure DevOps ready step to `references/azure-devops.md`.

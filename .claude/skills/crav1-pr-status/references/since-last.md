@@ -16,6 +16,6 @@ Compare the host now with your `Read` line and the record:
 - Each Point whose status or flags changed: `4. src/orders/handler.py:238-244: agreed -> done 3c9d2e1.`
 - `Order` and `Ready` changes, and a host state change.
 
-Print the heading, then `Since your last run on <date> (<sha>, push <n>):`, then those lines, then the verdict line, the run ending from `references/output.md`, and the `Ready` line, and the offers. Nothing changed: `Nothing new since your last run on <date>.`, `Next: nothing needed now.`, and the verdict line.
+Print the heading, then `Since your last run on <date> (<sha>, push <n>):`, then those lines, then the verdict line, the run ending from `references/output.md`, and the `Ready` line, and the offers. Nothing changed: `Nothing new since your last run on <date>.`, `Run next: nothing needed now.`, and the verdict line.
 
 The record is still written in full, so the next run compares with this one. Someone else's `Read` line is never used or changed. A `Read: sweep` line is the sweep watermark, not a person. `since-last` does not use it and does not change it.

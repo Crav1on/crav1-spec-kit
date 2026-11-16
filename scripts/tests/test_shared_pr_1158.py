@@ -232,7 +232,7 @@ class MergeStaysTheSame(unittest.TestCase):
 
     def test_walk_ending(self):
         b = self.body()
-        self.assertIn("- When `/crav1-build-walk` opened this file, do not print a line of your own for what to run next. The walk prints its one line (1.142.0).", b)
+        self.assertIn("- When `/crav1-build-walk` opened this file, do not print a Run next of your own. The walk prints its ending (1.142.0).", b)
         self.assertIn("End as [run-ending.md](../crav1-docs/reference/run-ending.md) says.", b)
 
     def test_moved_host_and_read_steps(self):

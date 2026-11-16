@@ -48,7 +48,7 @@ Sources, in order:
 1. Numbered `P#`s already listed by the plan reviewer in this chat (preserve meaning; split if they bundled two problems). Keep their **plan** vs **spec** tag.
 2. Fresh read of `plan.md` / `tasks.md` against `spec.md` (add only what the reviewer missed), starting from what `order` printed. The typical plan shapes, the **spec** tag, and skip-nitpicks are in `references/issues.md`.
 
-If **no plan issues** remain, print the `queue` output: it says so and prints one `Next` line.
+If **no plan issues** remain, print the `queue` output: it says so and prints one Run next step.
 
 ## Walk one issue at a time
 

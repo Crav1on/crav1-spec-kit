@@ -27,7 +27,7 @@ class RunEndingTest(unittest.TestCase):
         self.assertIn("Waiting:", text)
         self.assertIn("Uncommitted:", text)
         self.assertIn("nothing needed now", text)
-        self.assertIn("`Next:` is exactly one line.", text)
+        self.assertIn("## Run next for every other skill (1.177.0)", text)
         self.assertIn("does not run it", text)
 
     def test_every_skill_points_at_the_rule_and_next_names_one_step(self):

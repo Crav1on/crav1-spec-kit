@@ -23,6 +23,14 @@ Subcommands, each printing one JSON object:
   behind  --head <ref> --base <ref> [--repo <dir>]
           Commits the head is behind and ahead of the base, and the
           catch-up advice: merge the base in, never rebase.
+  resolve --ref <n-or-url> [--remote-url <url>] [--root <specs-repo>]...
+          Which pull request a reference means (1.177.0). A bare number
+          (`82`, `pr82`, `PR 82`, `#82`) is looked up in the kit's own
+          records first: build-progress files, the merge list, PR notes
+          and docs/system/repos.md. One record match wins; a record match
+          and a different remote, or several records, is `ask`. Only with
+          no record does it fall back to this checkout's remote. `tool`
+          is the one CLI the resolved host needs (gh or az).
 
 The interpreter is crav1-docs/reference/running-scripts.md. The canonical
 copy lives in skill crav1-open-pr; the other three skills ship a thin copy
@@ -59,7 +67,7 @@ AZURE_PR = re.compile(
     r"/(?P<project>[^/]+)/_git/(?P<repo>[^/]+)/pullrequest/(?P<n>\d+)/?(?:[?#].*)?$",
     re.I,
 )
-NUMBER = re.compile(r"^#?(?P<n>\d+)$")
+NUMBER = re.compile(r"^(?:#|pr\s*#?|pull request\s+#?)?(?P<n>\d+)$", re.I)
 GITHUB_REMOTE = re.compile(r"github\.com[:/](?P<owner>[^/]+)/(?P<repo>[^/]+?)(?:\.git)?/?$", re.I)
 AZURE_REMOTE = re.compile(
     r"(?:dev\.azure\.com[:/](?:v3/)?(?P<org>[^/]+)|(?P<org2>[^./@]+)\.visualstudio\.com(?::v3)?)"
@@ -383,6 +391,164 @@ def cmd_fit(args) -> int:
     return emit({"ok": out["fits"], **out}, 0 if out["fits"] else 2)
 
 
+# ---------- resolve a pull request reference from the kit's records (1.177.0) ----------
+
+PR_URL_ANY = re.compile(
+    r"https?://(?:github\.com/[^/\s]+/[^/\s]+/pull/\d+"
+    r"|(?:dev\.azure\.com/[^/\s]+|[^./\s]+\.visualstudio\.com)/[^/\s]+/_git/[^/\s]+/pullrequest/\d+)",
+    re.I,
+)
+PR_NOTE_NAME = re.compile(r"^\d{4}-\d{2}-\d{2}-pr-(?P<repo>.+)-(?P<n>\d+)\.md$", re.I)
+TOOL = {"github": "gh", "azure": "az"}
+
+
+def _url_key(info: dict) -> tuple:
+    keys = ("owner", "repo") if info.get("host") == "github" else ("org", "project", "repo")
+    return (info.get("host"),) + tuple((info.get(k) or "").lower().removesuffix(".git") for k in keys) + (info.get("number"),)
+
+
+def _repos_rows(root: Path) -> dict:
+    """{repo name (lower): URL} from docs/system/repos.md."""
+    path = root / "docs" / "system" / "repos.md"
+    rows: dict = {}
+    if not path.is_file():
+        return rows
+    for raw in path.read_text(encoding="utf-8", errors="replace").splitlines():
+        cells = [c.strip().strip("`") for c in raw.strip().strip("|").split("|")]
+        if len(cells) < 4 or not cells[0] or cells[0].lower() in ("repo", "---") or set(cells[0]) <= {"-", ":"}:
+            continue
+        url = next((c for c in cells if c.lower().startswith(("http://", "https://", "git@"))), "")
+        if url:
+            rows[cells[0].lower()] = url
+    return rows
+
+
+def _pr_url_for(repo_url: str, number: int) -> str:
+    info = host_of(repo_url)
+    if info["host"] == "github":
+        return f"https://github.com/{info['owner']}/{info['repo'].removesuffix('.git')}/pull/{number}"
+    if info["host"] == "azure":
+        return f"https://dev.azure.com/{info['org']}/{info['project']}/_git/{info['repo'].removesuffix('.git')}/pullrequest/{number}"
+    return ""
+
+
+def record_files(root: Path) -> list[tuple[str, Path]]:
+    """(kind, path) for every record a bare number is looked up in."""
+    out: list[tuple[str, Path]] = []
+    specs = root / "docs" / "specs"
+    if specs.is_dir():
+        for slug in sorted(p for p in specs.iterdir() if p.is_dir() and not p.name.startswith("_")):
+            for path in sorted((slug / "build-progress").glob("**/*.md")) if (slug / "build-progress").is_dir() else []:
+                out.append(("build-progress", path))
+            for name in ("build-map.md", "walk-progress.md"):
+                if (slug / name).is_file():
+                    out.append(("merge list", slug / name))
+    notes = root / "docs" / "notes"
+    if notes.is_dir():
+        for path in sorted(notes.glob("**/*.md")):
+            if PR_NOTE_NAME.match(path.name):
+                out.append(("PR note", path))
+    return out
+
+
+def record_candidates(roots: list[Path], number: int) -> list[dict]:
+    """Every pull request numbered `number` that the kit's records name, one per URL."""
+    found: dict = {}
+    for root in roots:
+        repos = _repos_rows(root)
+        for kind, path in record_files(root):
+            try:
+                text = path.read_text(encoding="utf-8", errors="replace")
+            except OSError:
+                continue
+            rel = path.relative_to(root).as_posix()
+            urls = []
+            for raw in PR_URL_ANY.findall(text):
+                ref = parse_ref(raw)
+                if ref.get("status") == "ok" and ref.get("number") == number:
+                    urls.append(ref)
+            if kind == "PR note":
+                m = PR_NOTE_NAME.match(path.name)
+                if int(m.group("n")) == number and m.group("repo").lower() in repos:
+                    built = _pr_url_for(repos[m.group("repo").lower()], number)
+                    if built:
+                        urls.append(parse_ref(built))
+            for ref in urls:
+                key = _url_key(ref)
+                row = found.setdefault(key, {"host": ref["host"], "number": number, "url": ref["url"],
+                                             "repo": ref.get("repo"), "tool": TOOL.get(ref["host"]), "sources": []})
+                if rel not in row["sources"]:
+                    row["sources"].append(rel)
+    return list(found.values())
+
+
+def _default_roots(repo: str | None) -> list[Path]:
+    here = Path(repo or ".").resolve()
+    for p in (here, *here.parents):
+        if (p / "docs" / "specs").is_dir() or (p / "docs" / "notes").is_dir():
+            return [p]
+    return [here]
+
+
+def resolve_ref(ref: str, remote_url: str | None = None, roots: list[Path] | None = None,
+                remote_has_pr: bool = False) -> dict:
+    """Which pull request `ref` means: the kit's records first, the remote last (1.177.0).
+
+    The remote is a candidate beside a record only when `remote_has_pr` says
+    this checkout's host already showed a pull request with that number.
+    The script never asks a host itself.
+    """
+    text = (ref or "").strip()
+    if GITHUB_PR.match(text) or AZURE_PR.match(text):
+        out = parse_ref(text, remote_url)
+        out["source"] = "url"
+        out["tool"] = TOOL.get(out.get("host"))
+        if out["status"] == "ok":
+            out["line"] = f"PR {out['number']} is {out['url']}; use {out['tool']}."
+        else:
+            # A full URL names its host; the review reads it from the records or repos.md.
+            out["line"] = out.get("line", "") + f" The URL names its host; use {out['tool']} for it."
+        return out
+    m = NUMBER.match(text)
+    if not m:
+        return {"status": "not-a-pr", "line": f"{text!r} is not a pull request number or URL. A branch name is not a pull request."}
+    number = int(m.group("n"))
+    cands = record_candidates(roots or [], number)
+    remote = host_of(remote_url)
+    remote_pr = None
+    if remote["host"] in ("github", "azure"):
+        remote_pr = _pr_url_for(remote_url or "", number)
+    if len(cands) == 1:
+        c = cands[0]
+        if remote_pr and remote_has_pr and not same_repo(parse_ref(c["url"]), host_of(remote_url)):
+            options = [dict(c, label=f"PR {number} in the kit's records ({', '.join(c['sources'])})"),
+                       {"host": remote["host"], "number": number, "url": remote_pr, "repo": remote.get("repo"),
+                        "tool": TOOL.get(remote["host"]), "sources": ["this checkout's git remote"],
+                        "label": f"PR {number} on this checkout's remote"}]
+            return {"status": "ask", "number": number, "candidates": options,
+                    "line": f"PR {number} could be {c['url']} (the kit's records) or {remote_pr} (this checkout's remote). Ask which one."}
+        return {"status": "ok", "source": "records", **c,
+                "line": f"PR {number} is {c['url']}, from {', '.join(c['sources'])}; use {c['tool']}."}
+    if len(cands) > 1:
+        return {"status": "ask", "number": number, "candidates": cands,
+                "line": f"The kit's records name {len(cands)} pull requests numbered {number}: "
+                        + "; ".join(c["url"] for c in cands) + ". Ask which one."}
+    if remote_pr:
+        return {"status": "ok", "source": "remote", "host": remote["host"], "number": number, "url": remote_pr,
+                "repo": remote.get("repo"), "tool": TOOL.get(remote["host"]), "candidates": [],
+                "line": f"No kit record names PR {number}; using this checkout's remote: {remote_pr}; use {TOOL.get(remote['host'])}."}
+    return {"status": "needs-remote", "number": number, "candidates": [],
+            "line": f"No kit record names PR {number} and this checkout has no single GitHub or Azure DevOps remote. Ask for the pull request URL."}
+
+
+def cmd_resolve(args) -> int:
+    roots = [Path(r) for r in (args.root or [])] or _default_roots(args.repo)
+    remote = args.remote_url if args.remote_url is not None else _remote_url(args.repo)
+    out = resolve_ref(args.ref, remote, roots, args.remote_has_pr)
+    out["note"] = "Read-only. Name only the tool for the resolved host; never ask to install or sign in to the other one."
+    return emit(out, 0 if out.get("status") in ("ok", "ask") else 1)
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="pr_common.py", description=__doc__.splitlines()[0])
     sub = parser.add_subparsers(dest="cmd", required=True)
@@ -412,13 +578,20 @@ def main(argv: list[str] | None = None) -> int:
     b.add_argument("--head", required=True)
     b.add_argument("--base", required=True)
     b.add_argument("--repo")
+    r = sub.add_parser("resolve")
+    r.add_argument("--ref", required=True)
+    r.add_argument("--remote-url")
+    r.add_argument("--root", action="append", help="a specs repo or checkout to read records from; repeatable")
+    r.add_argument("--repo")
+    r.add_argument("--remote-has-pr", action="store_true",
+                   help="this checkout's host already showed a pull request with that number")
     args = parser.parse_args(argv)
     if args.cmd == "parse":
         out = parse_ref(args.ref, args.remote_url)
         return emit(out, 0 if out.get("status") == "ok" else 1)
     if args.cmd == "host":
         return emit(host_of(args.remote_url))
-    return {"find": cmd_find, "checks": cmd_checks, "claim": cmd_claim, "behind": cmd_behind, "fit": cmd_fit}[args.cmd](args)
+    return {"find": cmd_find, "checks": cmd_checks, "claim": cmd_claim, "behind": cmd_behind, "fit": cmd_fit, "resolve": cmd_resolve}[args.cmd](args)
 
 
 if __name__ == "__main__":

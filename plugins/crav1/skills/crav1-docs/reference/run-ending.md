@@ -96,15 +96,25 @@ Fix T6:
 `/crav1-fix-build-gaps orders-api T6`
 ```
 
-## Next
+## Run next for every other skill (1.177.0)
 
-`Next:` is exactly one line. It names the single step to run now, and a short reason why.
-
-The ready check is the exception (1.133.0). When tasks that can start sit on more than one build-map branch, `/crav1-tasks-ready-to-build` and the tighten-and-plan ready check print one `Next:` line per branch. Since 1.143.0 each of those lines recommends `/crav1-build-walk`, with the T number beside the task name and the branch, and names `/crav1-build-tasks` as the alternative for building one task without the walk. That alternative is not a second Next. Those branches do not wait on each other, so they can start together. One ready branch stays one line. Since 1.155.0 a ready branch with two or more open tasks also gets a whole-branch entry, `` `/crav1-build-walk <slug> <branch>` ``, beside its next-task entry. Since 1.150.0 the tighten-and-plan ready and ready-partial endings print `Run next:` first, before any Waiting line. Each command is alone in a code span and is a complete invocation for a new session: the T#s on that branch, and the slug when `docs/specs` has more than one slice. Since 1.153.0 that ending has exactly one Run next block, and the walk command appears only there. The bottom keeps Waiting lines and at most a one-line `/crav1-build-tasks` alternative, with no second copy of the command and no `Next:` line of its own. The ready-check reply must give that ending once, verbatim, and must never write a `Next:` line. Since 1.163.0 a not-ready ready check also starts with `Run next:`. Each held line is in that same reply. The reply does not say above or listed above. `/crav1-build-walk` ends the same way (1.157.0). Started from a ready-to-build report with no branch chosen, it prints one Run next entry per ready branch, naming that branch's next task as `T#` plus the short name. Once one branch is in progress, it prints `Run next:` first, then Waiting and Uncommitted, and no `Next:` line. Another branch whose tasks can start is its own Run next entry. A step skill it opened does not add its own `Next:` line. Since 1.168.0 `/crav1-verify-build-against-spec` ends with Run next too (above). Since 1.173.0 every `/crav1-finalize-commit` ending, `commit`, `copy`, `stop`, or a failed commit, is Run next or nothing, never a `Next:` line. Every other skill keeps one `Next:` line.
+A skill names the single step to run now as Run next: `Run next:`, one short reason, then a label on its own line and the command alone in its code span on the next line. The label goes above the command, never under it. One step, even when the command names several pull requests or slugs.
 
 ```text
-Next: /crav1-pr-status pr71, pr73, pr74, because this run added Points nothing has sorted yet.
+Run next:
+This run added Points nothing has sorted yet.
+
+Sort the new Points on PR 71, PR 73 and PR 74:
+`/crav1-pr-status pr71, pr73, pr74`
 ```
+
+When nothing is needed now: `Run next: nothing needed now.`
+
+The four PR skills (`/crav1-open-pr`, `/crav1-pr-status`, `/crav1-review-pr`, `/crav1-merge-pr`) and their references and scripts never print a `Next:` line (1.177.0). A skill whose own file still shows the older one-line form names one step on that line and moves to Run next when it is next changed.
+
+### The older one-line form
+
+The ready check is the exception (1.133.0). When tasks that can start sit on more than one build-map branch, `/crav1-tasks-ready-to-build` and the tighten-and-plan ready check print one `Next:` line per branch. Since 1.143.0 each of those lines recommends `/crav1-build-walk`, with the T number beside the task name and the branch, and names `/crav1-build-tasks` as the alternative for building one task without the walk. That alternative is not a second Next. Those branches do not wait on each other, so they can start together. One ready branch stays one line. Since 1.155.0 a ready branch with two or more open tasks also gets a whole-branch entry, `` `/crav1-build-walk <slug> <branch>` ``, beside its next-task entry. Since 1.150.0 the tighten-and-plan ready and ready-partial endings print `Run next:` first, before any Waiting line. Each command is alone in a code span and is a complete invocation for a new session: the T#s on that branch, and the slug when `docs/specs` has more than one slice. Since 1.153.0 that ending has exactly one Run next block, and the walk command appears only there. The bottom keeps Waiting lines and at most a one-line `/crav1-build-tasks` alternative, with no second copy of the command and no `Next:` line of its own. The ready-check reply must give that ending once, verbatim, and must never write a `Next:` line. Since 1.163.0 a not-ready ready check also starts with `Run next:`. Each held line is in that same reply. The reply does not say above or listed above. `/crav1-build-walk` ends the same way (1.157.0). Started from a ready-to-build report with no branch chosen, it prints one Run next entry per ready branch, naming that branch's next task as `T#` plus the short name. Once one branch is in progress, it prints `Run next:` first, then Waiting and Uncommitted, and no `Next:` line. Another branch whose tasks can start is its own Run next entry. A step skill it opened does not add its own `Next:` line. Since 1.168.0 `/crav1-verify-build-against-spec` ends with Run next too (above). Since 1.173.0 every `/crav1-finalize-commit` ending, `commit`, `copy`, `stop`, or a failed commit, is Run next or nothing, never a `Next:` line. Since 1.177.0 the four PR skills end with Run next too (above). A skill not moved yet keeps the one-line form.
 
 A skill that runs on several pull requests or slugs at once may name them in that one command. That is still one step.
 
@@ -178,7 +188,7 @@ Left: 2 gaps to tighten, 3 open questions. Next: /crav1-tighten-spec orders-retr
 
 ## Order
 
-After the skill's own recap, print `Next`, then any `Waiting` lines, then `Uncommitted` when it applies. Nothing else is a next-step list.
+After the skill's own recap, print Run next (or, in a skill not moved yet, its one `Next:` line), then any `Waiting` lines, then `Uncommitted` when it applies. Nothing else is a next-step list.
 
 The tighten-and-plan ready check is the exception (1.150.0). Print `Run next:` first, then each held line, then any `Loop` and `Waiting` lines, then at most the one-line `/crav1-build-tasks` alternative, then `Uncommitted` when it applies. No `Next:` line follows the Waiting lines (1.153.0). `Run next:` is not a second step. It is the same build-walk command, short enough to start in a new session.
 

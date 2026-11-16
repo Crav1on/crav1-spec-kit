@@ -8,6 +8,8 @@
 
 Open a pull request for the current change branch, or push to an existing one and update its description or comment (push with explicit yes).
 
+1.177.0: an existing pull request named by bare number is resolved from the kit's records first (`pr_common.py resolve`), and only the resolved host's CLI is named. The ending stays Run next, never a `Next:` line.
+
 1.176.0: the body is format B, on GitHub and Azure DevOps: a 2-3 sentence summary, one line per task with its full name and what it does, 1-2 lines on how it was verified, and the work-item mention. No links at all and no per-file detail; detail goes in the commit messages. On Azure DevOps `pr_common.py fit --body <file> --text` is a guard for 4,000 characters: it shortens the task lines and adds `Task lines were shortened to fit.`, with no link.
 
 1.172.0: on Windows, pull request threads are listed and posted with `crav1-review-pr/scripts/ado_threads.py`, which reads az JSON from stdout and decodes UTF-8, then cp1252.

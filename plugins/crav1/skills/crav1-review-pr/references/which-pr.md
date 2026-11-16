@@ -4,7 +4,7 @@ Read only when the pointer in `SKILL.md` sends you here. Moved word for word fro
 
 ## Which pull request
 
-Accept a number (`123`), a URL, or `<repo> <n>` (1.65.0), for example `orders-api 71`, where `<repo>` is a repo in `docs/system/repos.md` or a workspace folder.
+Accept a number (`123`, `pr82`, `PR 82`), a URL, or `<repo> <n>` (1.65.0), for example `orders-api 71`, where `<repo>` is a repo in `docs/system/repos.md` or a workspace folder.
 
 | URL | Id |
 | --- | --- |
@@ -22,7 +22,9 @@ A URL or `<repo> <n>` is accepted when its repository is one of these (1.65.0):
 
 Otherwise stop and name what you looked at: `PR repository <url> is not this remote, a workspace folder, or a repos.md row.` Do not review across that mismatch.
 
-Remote: the single `git remote`. If several remotes exist, ask which one. A full URL still names the host. A bare number needs that remote, or a `gh` repo that matches it.
+Remote: the single `git remote`. If several remotes exist, ask which one. A full URL names its host.
+
+A bare number is resolved from the kit's records first (1.177.0): `<interpreter> -X utf8 scripts/pr_common.py resolve --ref <ref> --root <specs-repo>`, as `crav1-docs/reference/pr-common.md` ("A bare number") says. One record match is the pull request, on its own host, even when this checkout's remote is another host. `ask` lists every candidate and asks which one. Only with no record does the number mean this checkout's remote. Use the `tool` it names: never tell the user to install or sign in to `gh` for an Azure DevOps pull request, or to set up `az` for a GitHub one.
 
 ## Other skills
 

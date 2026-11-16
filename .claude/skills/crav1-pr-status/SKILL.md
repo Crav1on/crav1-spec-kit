@@ -24,7 +24,7 @@ Run it when this turn names a pull request (number or URL) or clearly asks for i
 
 Exact words for bots and scripted runs. There are no `--flags`.
 
-- Which pull request: `pr<n>`, `pr <n>`, `#<n>`, `pr <repo> <n>`, or the URL, parsed as `crav1-add-to-spec` `references/scope.md` says.
+- Which pull request: `pr<n>`, `pr <n>`, `#<n>`, `pr <repo> <n>`, or the URL, parsed as `crav1-add-to-spec` `references/scope.md` says. A bare number goes through `scripts/pr_common.py resolve --ref <n>` first (1.177.0).
 - Mode: `as-reviewer`, `as-author`. They override the mode the run would pick.
 - `since-last`: show only what changed since your last run.
 - `no-code`: threads only; no diff and no commit check. Points that would need the code to say `done` stay `agreed` and the output says `code not checked`.

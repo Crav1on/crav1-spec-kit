@@ -732,6 +732,26 @@ def _prefixed(text, word):
     return text if text.startswith(word + ":") else f"{word}: {text}"
 
 
+_LIST_ITEM = re.compile(r"^\s*\d+\.\s")
+
+
+def _join_after_list(lines: list[str]) -> str:
+    """Join the bottom lines; a line after a numbered list gets a blank line first (1.177.0).
+
+    Without it Markdown folds `Waiting: ...` into the merge list's last item.
+    """
+    out = ""
+    prev_last = ""
+    for line in lines:
+        first = line.split("\n", 1)[0]
+        if out:
+            sep = "\n\n" if _LIST_ITEM.match(prev_last) and not _LIST_ITEM.match(first) else "\n"
+            out += sep
+        out += line
+        prev_last = line.rsplit("\n", 1)[-1]
+    return out
+
+
 def compose(
     run=None,
     held=None,
@@ -772,7 +792,7 @@ def compose(
             waiting = [_prefixed(waiting, "Waiting")]
         lines = [str(line) for line in waiting if str(line).strip()]
         if lines:
-            parts.append("\n".join(lines))
+            parts.append(_join_after_list(lines))
     if because:
         parts.append(str(because))
     if alternatives:

@@ -1442,6 +1442,7 @@ skills:
   walkthrough: docs/from-commit.md
   purpose: Open a pull request for the current change branch, or push to an existing one and update its description or comment (push with explicit yes).
   in_depth:
+  - '1.177.0: an existing pull request named by bare number is resolved from the kit''s records first (`pr_common.py resolve`), and only the resolved host''s CLI is named. The ending stays Run next, never a `Next:` line.'
   - '1.176.0: the body is format B, on GitHub and Azure DevOps: a 2-3 sentence summary, one line per task with its full name and what it does, 1-2 lines on how it was verified, and the work-item mention. No links at all and no per-file detail; detail goes in the commit messages. On Azure DevOps `pr_common.py fit --body <file> --text` is a guard for 4,000 characters: it shortens the task lines and adds `Task lines were shortened to fit.`, with no link.'
   - '1.172.0: on Windows, pull request threads are listed and posted with `crav1-review-pr/scripts/ado_threads.py`, which reads az JSON from stdout and decodes UTF-8, then cp1252.'
   - '1.171.0: the ending is Run next, never a `Next:` line: a Catch up first `git push` when the specs repo is ahead, then `Review PR <n>:` with `/crav1-review-pr <repo> <n>`.'
@@ -1534,6 +1535,7 @@ skills:
   walkthrough: docs/from-review-pr.md
   purpose: Read one named open pull request and report whether it can ship.
   in_depth:
+  - '1.177.0: a bare number (`82`, `pr82`, `PR 82`) is resolved from the kit''s records first (`pr_common.py resolve`: build-progress files, the merge list, PR notes, `docs/system/repos.md`). One record match is the pull request on its own host, even when this checkout''s remote is another; several, or a record and a known remote pull request, are asked. It names only the CLI of the resolved host and ends with Run next, never a `Next:` line.'
   - '1.176.0: the body check reads the short format B description (summary, one line per task, Verified, work item) task by task; an older format A body is still checked bullet by bullet. The merge order comes from the ready check''s merge list and `build-progress/`, not the description, or it says the kit has none recorded.'
   - '1.172.0: `scripts/ado_threads.py list`, `compare --draft <file>` and `post --file <file> --yes` read and post Azure DevOps threads. It reads `az -o json` from stdout as bytes and decodes UTF-8, then UTF-8 with a BOM, then cp1252, so a Windows code page no longer breaks the JSON. A post is always a new top-level thread. `comment-as-posted.md` is read only when the PR note''s draft has no `## Comment as posted` section.'
   - '1.171.0: an Azure DevOps re-review posts a new top-level thread, not a reply in an earlier thread; it replies in a thread only to answer a question asked there. After the post offer the reply ends with Run next (`/crav1-finalize-commit`, then `git push`) while the PR note is uncommitted, and the Uncommitted line shows in chat.'
@@ -1639,6 +1641,7 @@ skills:
   walkthrough: docs/from-pr-status.md
   purpose: Show where one pull request stands, point by point, and who owes the next step.
   in_depth:
+  - '1.177.0: a bare number is resolved from the kit''s records before this checkout''s remote (`pr_common.py resolve`), and only the resolved host''s CLI is named. The ending is Run next, the label above the command; nothing needed is `Run next: nothing needed now.`, never a `Next:` line.'
   - '1.176.0: reads format B task lines as the tasks the pull request carries. `Order` lines come from the ready check''s merge list and `build-progress/`, questions from the spec''s open questions; with neither it says so plainly. Older Merge order, Questions for reviewers and Not in this PR sections are still read for existing pull requests, and the kit''s state wins when they differ.'
   - '1.164.0: each closing offer follows the card wording rule in `docs/reference/question-cards.md`: one background sentence, then a short question such as `Set thread 112 back to active?`, each option saying what happens.'
   - '1.158.0: the shared pull-request steps are `crav1-docs/reference/pr-common.md` and `scripts/pr_common.py`, which also finds the one open pull request for the current branch when none is named. The status table, the output order and the hand-offs moved word for word to `references/classify.md`, `references/output.md` and `references/offers.md`.'
@@ -1682,6 +1685,7 @@ skills:
   walkthrough: docs/from-commit.md
   purpose: Merge one named pull request with a merge commit.
   in_depth:
+  - '1.177.0: a bare number is resolved from the kit''s records before this checkout''s remote (`pr_common.py resolve`); several candidates are asked, never picked. Only the resolved host''s CLI is named, and the ending is Run next, never a `Next:` line.'
   - '1.164.0: the build walk''s merge card names the pull request, for example `Merge PR 71 into develop?`, as the card wording rule in `docs/reference/question-cards.md` says. That yes is still the explicit ask.'
   - '1.158.0: the shared pull-request steps are `crav1-docs/reference/pr-common.md` and `scripts/pr_common.py`. The merge rules are unchanged: the explicit merge ask, the merge commit (`gh pr merge --merge`, Azure Repos `--squash false`), never squash, rebase or bypass, the PR record gate and `anyway`, and the walk printing its own Run next. It never writes or clears `claims.md`; `/crav1-build-walk` clears its own claim after the merge. The GitHub host and read steps moved word for word to `references/github.md`, the Azure DevOps ready step to `references/azure-devops.md`.'
   - Merge one named pull request only when that turn asks; always a merge commit; no squash, rebase, or
@@ -1836,6 +1840,7 @@ skills:
   purpose: 'List the tasks ready to build, for one spec or all, and why the others are blocked. Rewrites each slice build map.'
   in_depth:
   - '1.176.0: the readiness ending leaves out `/crav1-build-tasks builds one task without the walk.`; `/crav1-help status` names it.'
+  - '1.177.0: when the merge list holds a pull request that is yours, Run next leads with it, for example `Merge your PRs 71 and 73 first (PR 82 is person B''s):` above `/crav1-merge-pr 71`, above the entry that resumes the walk; with none of yours nothing is added. A blank line separates the numbered list from the Waiting line under it.'
   - '1.176.0: open pull requests are one `Merge these PRs, in this order:` block, one numbered PR per line with its owner (`yours` or the name) and what merging it ticks and lets start, in dependency order. Branch runs reads `built, PR <n> open`. A task verified on an unmerged branch reads `verified on <branch>, waits for PR <n> to merge`.'
   - '1.176.0: branch entries read `Build <T# full name> on <branch>:` above the command; a held task quotes its whole question; a question that says `Raised with` or `Waiting for` a person counts as asked; uncommitted slice files add `Commit the walk''s changes, <n> files:` above `/crav1-finalize-commit` before the push; task titles keep their code text with no stray ` ,` or ` )`.'
   - '1.175.0: a claimed task that is built on a branch that is not merged reads `built by <name>, waits for PR <n> to merge` in the Held list and on `build-map.md`, not `in progress by <name> since <date>`. A reopened step''s entry gives the reason in one plain sentence above `Finish the reopened <command> step:`. The Catch up first push entry names how far ahead only in its label.'

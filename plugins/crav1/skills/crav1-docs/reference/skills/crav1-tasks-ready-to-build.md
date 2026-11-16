@@ -10,6 +10,8 @@ List the tasks ready to build, for one spec or all, and why the others are block
 
 1.176.0: the readiness ending leaves out [`/crav1-build-tasks`](crav1-build-tasks.md) builds one task without the walk.`; [`/crav1-help`](crav1-help.md) status` names it.
 
+1.177.0: when the merge list holds a pull request that is yours, Run next leads with it, for example `Merge your PRs 71 and 73 first (PR 82 is person B's):` above [`/crav1-merge-pr`](crav1-merge-pr.md) 71`, above the entry that resumes the walk; with none of yours nothing is added. A blank line separates the numbered list from the Waiting line under it.
+
 1.176.0: open pull requests are one `Merge these PRs, in this order:` block, one numbered PR per line with its owner (`yours` or the name) and what merging it ticks and lets start, in dependency order. Branch runs reads `built, PR <n> open`. A task verified on an unmerged branch reads `verified on <branch>, waits for PR <n> to merge`.
 
 1.176.0: branch entries read `Build <T# full name> on <branch>:` above the command; a held task quotes its whole question; a question that says `Raised with` or `Waiting for` a person counts as asked; uncommitted slice files add `Commit the walk's changes, <n> files:` above [`/crav1-finalize-commit`](crav1-finalize-commit.md) before the push; task titles keep their code text with no stray ` ,` or ` )`.

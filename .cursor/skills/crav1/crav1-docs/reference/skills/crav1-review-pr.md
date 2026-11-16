@@ -8,6 +8,8 @@
 
 Read one named open pull request and report whether it can ship.
 
+1.177.0: a bare number (`82`, `pr82`, `PR 82`) is resolved from the kit's records first (`pr_common.py resolve`: build-progress files, the merge list, PR notes, `docs/system/repos.md`). One record match is the pull request on its own host, even when this checkout's remote is another; several, or a record and a known remote pull request, are asked. It names only the CLI of the resolved host and ends with Run next, never a `Next:` line.
+
 1.176.0: the body check reads the short format B description (summary, one line per task, Verified, work item) task by task; an older format A body is still checked bullet by bullet. The merge order comes from the ready check's merge list and `build-progress/`, not the description, or it says the kit has none recorded.
 
 1.172.0: `scripts/ado_threads.py list`, `compare --draft <file>` and `post --file <file> --yes` read and post Azure DevOps threads. It reads `az -o json` from stdout as bytes and decodes UTF-8, then UTF-8 with a BOM, then cp1252, so a Windows code page no longer breaks the JSON. A post is always a new top-level thread. `comment-as-posted.md` is read only when the PR note's draft has no `## Comment as posted` section.

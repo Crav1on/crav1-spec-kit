@@ -16,7 +16,7 @@ Print, in this order:
 6. **Follow-ups** (drafts).
 7. **Order**: pull requests this one depends on or that depend on it, and the merge order.
 8. **Drafted replies (not posted)**: one per thread that waits on you.
-9. **Run ending** (1.122.0): one `Next:` line, then `Waiting:` lines, then `Uncommitted:` when the note is not committed. See `references/output.md`.
+9. **Run ending** (1.177.0): `Run next:` with the label above the command, then `Waiting:` lines, then `Uncommitted:` when the note is not committed. See "Run ending" below.
 10. **Merge readiness**: `Ready: yes | no | merged`, with the reasons.
 11. `PR record: <repo>: <path>`, as a code span.
 
@@ -63,7 +63,12 @@ Drafted replies (not posted)
 - Thread 104 (src/orders/audit.py): "Agreed for the pilot. I'll add the restructure as a follow-up so it isn't lost."
 - To Robin K. (not sent): "Hi Robin, Sam and I need the merge order of feat/orders-queue (PR 40) and PR 42. Plan: PR 40 into develop first. OK with you?"
 
-Next: post the drafted reply in thread 104, because that thread is waiting on you.
+Run next:
+Thread 104 is waiting on you.
+
+After you post the drafted reply in thread 104, check again:
+`/crav1-pr-status pr71 since-last`
+
 Waiting: /crav1-pr-status pr42 since-last, after Robin K. answers the merge order.
 Waiting: /crav1-merge-pr pr42, after PR 40 is merged and Ready is yes.
 Uncommitted: 1 file; commit with /crav1-finalize-commit when ready.
@@ -74,17 +79,17 @@ PR record: `orders-api: docs/notes/2026-10/2026-10-08-pr-orders-api-71.md`
 
 Local files, the `PR record:` line included, are named as a code span with the repo first: `` `orders-api: docs/notes/…` ``. Never as a Markdown link, `file://`, `vscode://` or an absolute path, in the shape or in closing prose. Web links only for things on the host (the pull request, a thread, a commit) (1.99.1).
 
-## Run ending (1.122.0)
+## Run ending (1.122.0, 1.177.0)
 
 The last lines before `Ready`, as `crav1-docs/reference/run-ending.md` says. Build the old Now / After / Later groups in your head, from record lines, never from guesses, then print the shape and not the groups.
 
 - **Now** (not printed as a heading): steps nothing blocks, from `waiting on <you>` Points, drafted replies, open candidates and follow-ups. Order them by `docs/reference/workflow.md`, then oldest, then anchor. That file is the source, so no help call is needed.
-- `Next:` is the first Now item, one line, with a short reason. Now empty: `Next: nothing needed now.`
-- A Now item that is not first stays in the report section that already lists it (candidates, follow-ups, drafted replies). It is not a second `Next` line and not a `Waiting` line.
+- `Run next:` is the first Now item: one short reason, then a label on its own line and the command alone in its code span on the next line. Now empty: `Run next: nothing needed now.`
+- A Now item that is not first stays in the report section that already lists it (candidates, follow-ups, drafted replies). It is not a second Run next entry and not a `Waiting` line.
 - **After `<name>` answers** and **Later** become `Waiting:` lines. One line per blocked step: the step, and who or what it waits on. When the thread names options, keep them in the Order section. One Waiting line for that person, not one line per option. Nothing made up.
-- `Uncommitted:` when the PR note changed and is not committed. Do not put the commit command in `Next`.
+- `Uncommitted:` when the PR note changed and is not committed. Do not put the commit command in Run next.
 
-Commands are named, never run. `since-last` uses the same shape for steps that moved. Nothing new: `Next: nothing needed now.`
+Commands are named, never run. `since-last` uses the same shape for steps that moved. Nothing new: `Run next: nothing needed now.` Never a `Next:` line (1.177.0).
 
 ## Verdict line
 
