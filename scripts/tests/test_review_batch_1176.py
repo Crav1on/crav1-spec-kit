@@ -317,5 +317,36 @@ class LabelAboveCommand(unittest.TestCase):
         self.assertIn("crav1-plan-from-spec", lint.RUN_NEXT_ONLY_SKILLS)
 
 
+
+class SmallPersonBFixes(unittest.TestCase):
+    def test_repo_sync_names_a_code_repo_by_folder(self):
+        rs = load(SK / "crav1-build-walk/scripts/repo_sync.py", "repo_sync_1176")
+        code = Path(tempfile.mkdtemp()) / "orders-api"
+        code.mkdir()
+        self.assertEqual(rs.repo_name(code), "The repo at orders-api")
+        (code / "docs" / "specs").mkdir(parents=True)
+        self.assertEqual(rs.repo_name(code), "The specs repo")
+
+    def test_status_without_upstream_says_which_repo(self):
+        rs = load(SK / "crav1-build-walk/scripts/repo_sync.py", "repo_sync_1176_status")
+        code = Path(tempfile.mkdtemp()) / "orders-api"
+        code.mkdir()
+        subprocess.run(["git", "init", "-q", str(code)], check=True)
+        payload = rs._status_payload(code, True, None)
+        self.assertEqual(payload["state"], "no-upstream")
+        self.assertTrue(payload["message"].startswith("The repo at orders-api has no upstream"))
+
+    def test_docs_agree_on_whole_branch_commits(self):
+        claims = (SK / "crav1-build-walk/references/claims.md").read_text(encoding="utf-8")
+        steps = (SK / "crav1-build-walk/references/steps.md").read_text(encoding="utf-8")
+        self.assertIn("A whole-branch start is different: it also commits `walk-progress.md` and its progress file", claims)
+        self.assertIn("A whole-branch run follows [branch-run.md](branch-run.md) for its commits and pushes instead.", steps)
+
+    def test_style_rule_names_its_real_path(self):
+        asset = SK / "crav1-finalize-commit/branches/message-only/assets/draft-commit-style.mdc"
+        self.assertIn("crav1-finalize-commit/branches/message-only/references/style.md", asset.read_text(encoding="utf-8").splitlines()[1])
+        self.assertTrue((SK / "crav1-finalize-commit/branches/message-only/references/style.md").is_file())
+
+
 if __name__ == "__main__":
     unittest.main()

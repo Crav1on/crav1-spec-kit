@@ -18,7 +18,7 @@ Card: Claim T27 for you and push the claim?
 - **Claim and push (Recommended)** (`yes`): commit only `claims.md` and push it, so others see T27 is taken. Why: it stops two people building the same task.
 - **Do not claim** (`stop`): write nothing, and T27 stays open for anyone.
 
-There is no Edits option. A headless run stops and names `yes` and `stop`. Do not guess. Nothing else is committed on that card.
+There is no Edits option. A headless run stops and names `yes` and `stop`. Do not guess. Nothing else is committed on that card. A whole-branch start is different: it also commits `walk-progress.md` and its progress file; see [branch-run.md](branch-run.md).
 
 ## Whole-branch run (1.155.0)
 
