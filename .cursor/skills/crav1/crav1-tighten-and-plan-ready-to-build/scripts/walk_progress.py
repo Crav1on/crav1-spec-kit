@@ -2723,7 +2723,8 @@ def loop_offer(root: Path | None) -> dict:
     if first:
         slug = command_slug(root)
         words = " ".join(bit for bit in (slug, first["word"]) if bit)
-        entries.append(f"`/crav1-tasks-ready-to-build {words}`\n{first['summary']}")
+        # Label above the command (1.174.0), like every other Run next entry.
+        entries.append(_run_entry(f"/crav1-tasks-ready-to-build {words}", str(first["summary"])))
     return {"entries": entries, "card": loops[0].get("card"), "fixes": fixes}
 
 
@@ -3448,6 +3449,48 @@ def progress_merge_waits(root: Path | None) -> dict:
                 "owner": owner_line.group(1) if owner_line else "self",
                 "step": steps[-1].strip().lower(),
             }
+    return out
+
+
+def resume_walk_entries(root: Path | None, slug: str) -> list[str]:
+    """Run next entries that continue an unfinished branch walk (1.174.0).
+
+    A branch run in walk-progress.md that is not merged, whose own
+    build-progress file is not at `comment` or `wait-merge` and whose owner
+    is not someone else, is offered first: `Continue the build walk on
+    <branch>:` above `/crav1-build-walk <slug> <branch>`. A walk that waits on
+    a merge stays a Waiting line (1.171.0).
+    """
+    if root is None:
+        return []
+    path = progress_path(root)
+    if not path.is_file():
+        return []
+    data, _err = _try_parse(path.read_text(encoding="utf-8"))
+    if not data:
+        return []
+    out = []
+    for branch in sorted(data.get("branch_runs") or {}):
+        run = data["branch_runs"][branch]
+        if str(run.get("state") or "").strip().lower() == "merged":
+            continue
+        log = Path(root) / str(run.get("log") or f"build-progress/{branch.replace('/', '--')}.md")
+        if log.is_file():
+            try:
+                text = log.read_text(encoding="utf-8")
+            except (OSError, UnicodeDecodeError):
+                text = ""
+            steps = _PROGRESS_STEP.findall(text)
+            if steps and steps[-1].strip().lower() in MERGE_WAIT_STEPS:
+                continue
+            if steps and steps[-1].strip().lower() == "merge-pr":
+                continue
+            head = text.split("\n- Step:", 1)[0]
+            owner = re.search(r"^Owner:\s*(\S+)", head, re.M)
+            if owner and owner.group(1).strip().lower() == "other":
+                continue
+        command = f"/crav1-build-walk {slug} {branch}" if slug else f"/crav1-build-walk {branch}"
+        out.append(_run_entry(command, "", f"Continue the build walk on {branch}:"))
     return out
 
 
@@ -4326,6 +4369,11 @@ def readiness(args: argparse.Namespace) -> None:
         else:
             nxt = next_for(result, can_start, waiting_next)
     run_status = branch_run_lines(root)
+    resume_entries = resume_walk_entries(root, command_slug(root) if root is not None and root.is_dir() else slug)
+    if resume_entries:
+        shown_run = resume_entries + [entry for entry in shown_run if entry not in resume_entries]
+        if result not in ("ready", "ready-partial") and not catch_up:
+            nxt = shown_run[0]
     ending = compose_ending(
         result, shown_run, held_lines, waiting_bits, shown_next, because, replaced, run_status,
         catch_up=catch_up,
