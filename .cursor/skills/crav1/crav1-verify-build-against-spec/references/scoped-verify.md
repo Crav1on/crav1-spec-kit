@@ -1,6 +1,6 @@
 # crav1-verify-build-against-spec: scoped verify
 
-Read when a previous `verify.md` exists, before re-verifying.
+Read when a previous `verify.md` exists, before re-verifying. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says.
 
 ## Re-verify only what moved (1.172.0)
 
