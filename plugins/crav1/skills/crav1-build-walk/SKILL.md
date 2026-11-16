@@ -21,13 +21,15 @@ It does not replace the skills it opens. It does not push, open a pull request, 
 
 Before it reads the spec folder, it fetches the specs repo (1.151.0). The rule is [references/sync.md](references/sync.md). When it starts on a branch, it writes an `In progress:` line in `docs/specs/<slug>/claims.md` and, after yes, commits and pushes only that file. The rule is [references/claims.md](references/claims.md). When the walk ends, or the user stops, it commits the files it wrote and pushes the specs repo after one yes.
 
-The in-walk reply prints `ending` from `scripts/build_walk.py next --json <file>`, as-is. That text is the shared walk ending (1.156.0): `Run next:` first, then Built and Left, then Waiting and Uncommitted, and no Next line (1.157.0). Each command is alone in a code span, such as `` `/crav1-build-walk orders-api T3` ``, and another ready branch gets its own entries. The shape is in [run-ending.md](../crav1-docs/reference/run-ending.md); never add a line of your own. Before it, print only the JSON `lead` (1.171.0; [references/common.md](references/common.md)).
+The in-walk reply prints `ending` from `scripts/build_walk.py next --root <spec folder> --branch <branch>` (1.172.0), as-is. That text is the shared walk ending (1.156.0): `Run next:` first, then Built and Left, then Waiting and Uncommitted, and no Next line (1.157.0). Each command is alone in a code span, such as `` `/crav1-build-walk orders-api T3` ``, and another ready branch gets its own entries. The shape is in [run-ending.md](../crav1-docs/reference/run-ending.md); never add a line of your own. Before it, print only the JSON `lead` (1.171.0; [references/common.md](references/common.md)).
 
 The JSON object is documented in [references/common.md](references/common.md). Fields include `phase`, `owner`, `branch`, `tasks`, `base`, `pr`, `slug`, `root`, `spec_count`, `ready_branches`, `waiting`, and `uncommitted`. `tasks` may be `"T3"` or `{"id": "T3", "title": "Apply the CI build policy"}`. `T3` and `3` are the same id. Bad input returns `{"ok": false, "code", "line"}` and does not traceback.
 
 ## Route first (1.142.0)
 
-Read [references/common.md](references/common.md) once. Then open only the file for the point you are at. Do not open the others yet.
+Progress file at `comment` or `wait-merge`: print the script's `lead` and `ending`, then stop. Read no reference (1.172.0).
+
+Otherwise read [references/common.md](references/common.md) once. Then open only the file for the point you are at. Do not open the others yet.
 
 - The invocation names a branch, not a `T#`: read [references/branch-run.md](references/branch-run.md). It replaces the per-step cards with one start yes, until a stop.
 - No branch is chosen, or the user started from a ready-to-build report: read [references/grouping.md](references/grouping.md). That start prints one Run next entry per ready branch.

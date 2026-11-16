@@ -2,6 +2,17 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.172.0 (2026-11-16)
+
+Walk tooling: the build walk reads its state from the files instead of hand-written JSON, Azure DevOps threads have one safe helper, the walk and review read fewer references, and a verify rerun checks only what moved. A minor release because the build walk, review-pr, open-pr, verify and the one-task build gain scripts and route differently.
+
+- **Walk state from files.** `build_walk.py next --root <spec folder> --branch <branch>` reads phase, owner and pull request from `build-progress/<branch>.md`, full task names from `tasks.md`, and the Uncommitted line from `git status`. `--waiting`, `--who` and `--pr` add what the files do not hold; `--json <file>` still works.
+- **Progress file by script.** `build_walk.py progress init --root --branch --owner --tasks --cut-from` writes the header, and `progress record --root --branch --step --result` adds one step with `Done` and the normalized stamps. Both preview without `--yes`. The walk never writes the file by hand.
+- **Azure DevOps thread helper.** `crav1-review-pr/scripts/ado_threads.py list`, `compare --draft <file>` and `post --file <file> --yes`. It reads `az -o json` from stdout as bytes and decodes UTF-8, then UTF-8 with a BOM, then cp1252, so a Windows code page no longer breaks `json.load`. A post is always a new top-level thread (`parentCommentId` 0). Review-pr posting and the open-pr Windows section point at it.
+- **Fewer reference reads.** At `comment` or `wait-merge` the walk prints `lead` and `ending` straight from the script and reads no reference. The one-task build skips `tool-approvals.md` when `approvals: already-done` is passed. Review-pr reads `comment-as-posted.md` only when the PR note's draft has no posted section.
+- **Scoped verify.** `crav1-verify-build-against-spec/scripts/verify_rows.py scope` says which rows to verify again: a row whose branch or tip moved, a row with no recorded tip, or every row when spec.md, plan.md or tasks.md changed (a ticked checkbox does not count). The reply prints `kept_line`, such as `Kept from the last verify: T1, T3 (branch and tip unchanged).` `verify_rows.py set --task T# --status <status> --evidence <evidence> --branch <b> --tip <sha> --yes` writes one row, recounts the TL;DR and records the tip under `## Row tips`.
+- Tests: `scripts/tests/test_walk_tooling_1172.py` (mocked az output with cp1252 bytes).
+
 ## 1.171.0 (2026-11-16)
 
 Fixes found on a real build session: the walk no longer offers a task that only waits on someone else's merge, task names and branch descriptions read cleanly, and the last skills that still printed a `Next:` line end with Run next. A minor release because the ready check, the build walk, the verify reply, fix-build-gaps, finalize-commit, open-pr and review-pr read differently.

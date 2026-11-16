@@ -8,6 +8,8 @@
 
 Map every v0 acceptance line to tests or UI checks and report pass, fail, or missing.
 
+1.172.0: a rerun verifies again only the rows whose branch or tip moved since the last verify, or every row when spec.md, plan.md or tasks.md changed (`scripts/verify_rows.py scope`), and the reply says which rows were kept (`Kept from the last verify: T1, T3 (branch and tip unchanged).`). `verify_rows.py set --task T# --status <status> --evidence <evidence> --branch <b> --tip <sha> --yes` writes one row, recounts the TL;DR and records the tip under `## Row tips`.
+
 1.171.0: with no hand-written steps, the reply's branch blocks come from the ready check (`walk_ending.ready_branch_blocks`), with descriptions, open tasks and the whole-branch entry; a task that waits on a merge is not offered.
 
 1.170.0: a `T6 failed:` change line in the reply keeps the Verify cell's opening sentence and the sentence naming the cause, not the run detail; the ready check's Catch up first line uses the same short reason.

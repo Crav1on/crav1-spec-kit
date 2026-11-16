@@ -21,6 +21,8 @@ The spec folder is the user's @-mention, or the one folder `<interpreter> -X utf
 
 Read only (1.168.0): `spec.md` acceptance (an EARS/BDD export too; spec.md wins), `plan.md`, `tasks.md`, the previous `verify.md`, the reference a step names, then the tests and files `plan.md` names. Do not open `build-map.md`, `claims.md`, `walk-progress.md` or a log unless a step names it.
 
+With a previous `verify.md`: `references/scoped-verify.md` (1.172.0).
+
 ## Classify each task (before writing)
 
 For every `T#` in `tasks.md`, in dependency order (`/crav1-tasks-ready-to-build` **Dependency order**, its `scripts/task_order.py` when Python runs; pick the interpreter as `crav1-docs/reference/running-scripts.md` says), so a task is checked after the tasks it waits on. List tasks in that order in the Tasks overview and the TL;DR id lists, under the heading `Tasks — overview (dependency order)`.

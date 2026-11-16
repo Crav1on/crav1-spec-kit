@@ -1079,6 +1079,208 @@ def settle_stamps(text: str, hashes: dict | None = None) -> str | None:
     return text_out
 
 
+# Walk state from files (1.172.0). `next --root --branch` and `progress
+# init/record` replace hand-written next JSON and a hand-written progress file.
+
+SELF_ORDER = ["build", "verify", "commit", "open-pr", "merge-base", "merge-pr", "tick", "next-task"]
+OTHER_ORDER = ["build", "verify", "commit", "comment", "wait-merge", "tick", "next-task"]
+STEP_NAMES = set(SELF_ORDER) | set(OTHER_ORDER) | {"approval", "live-dry", "live-yes", "confirm-owner", "permission-refused"}
+_STEP_BLOCK = re.compile(r"^- Step:\s*(?P<step>\S+)\s*$(?P<body>(?:\n  .*)*)", re.M)
+_PR_IN = re.compile(r"\b(?:PR|pull request)\s+#?(\d+)", re.I)
+
+
+def read_progress(text: str) -> dict:
+    """Header fields and steps of a build-progress file."""
+    head = (text or "").split("\n- Step:", 1)[0]
+
+    def field(label):
+        match = re.search(rf"^{label}:\s*(.*)$", head, re.M)
+        return match.group(1).strip() if match else None
+
+    steps = []
+    for match in _STEP_BLOCK.finditer(text or ""):
+        body = match.group("body") or ""
+        result = re.search(r"^  Result:\s*(.*)$", body, re.M)
+        done = re.search(r"^  Done:\s*(.*)$", body, re.M)
+        steps.append({
+            "step": match.group("step").strip().lower(),
+            "result": result.group(1).strip() if result else "",
+            "when": done.group(1).strip() if done else "",
+        })
+    prs = _PR_IN.findall(text or "")
+    tasks_field = field("Tasks") or ""
+    return {
+        "branch": field("Branch"),
+        "owner": (field("Owner") or "self").lower(),
+        "slice": field("Slice"),
+        "cut_from": field("Cut from"),
+        "task_ids": [f"T{int(n)}" for n in re.findall(r"\bT(\d+)\b", tasks_field)],
+        "steps": steps,
+        "pr": int(prs[-1]) if prs else None,
+    }
+
+
+def phase_from_progress(info: dict) -> str:
+    """The step the walk is on. A done step moves to the next one in order."""
+    steps = info.get("steps") or []
+    if not steps:
+        return "build"
+    last = steps[-1]
+    step = last["step"]
+    order = OTHER_ORDER if info.get("owner") == "other" else SELF_ORDER
+    result = (last.get("result") or "").lower()
+    if step == "wait-merge":
+        return "tick" if result.startswith("merged") else "wait-merge"
+    if not result.startswith("done") and not result.startswith("merged"):
+        return step if step in STEP_NAMES else "build"
+    if step in order:
+        i = order.index(step)
+        return order[min(i + 1, len(order) - 1)]
+    return "build"
+
+
+def task_titles(root: Path) -> dict:
+    path = Path(root) / "tasks.md"
+    if not path.is_file():
+        return {}
+    out = {}
+    for task in map_mod().parse_tasks(path.read_text(encoding="utf-8")):
+        out[f"T{int(task['id'])}"] = task
+    return out
+
+
+def _git(root: Path, *args: str) -> str | None:
+    import subprocess
+
+    try:
+        done = subprocess.run(["git", *args], cwd=str(root), capture_output=True, timeout=30)
+    except (OSError, subprocess.SubprocessError):
+        return None
+    if done.returncode != 0:
+        return None
+    return done.stdout.decode("utf-8", errors="replace")
+
+
+def uncommitted_line(root: Path) -> str | None:
+    """Uncommitted line from git status of the spec folder, or None when clean."""
+    out = _git(Path(root), "status", "--porcelain", "-uall", "--", ".")
+    if not out:
+        return None
+    names = []
+    for row in out.splitlines():
+        name = row[3:].strip().strip('"')
+        if " -> " in name:
+            name = name.split(" -> ", 1)[1]
+        if name:
+            names.append(name.rsplit("/", 1)[-1])
+    if not names:
+        return None
+    count = len(names)
+    files = "1 file" if count == 1 else f"{count} files"
+    return f"Uncommitted: {files} ({', '.join(names[:5])}{', …' if count > 5 else ''})."
+
+
+def state_from_files(root: Path, branch: str, waiting: str | None = None, who: str | None = None, pr=None) -> dict:
+    """The next JSON, derived from build-progress, tasks.md and git status."""
+    root = Path(root)
+    path = progress_path(root, branch)
+    info = read_progress(path.read_text(encoding="utf-8")) if path.is_file() else {"owner": "self", "steps": [], "task_ids": [], "pr": None}
+    titles = task_titles(root)
+    ids = info.get("task_ids") or [tid for tid, t in titles.items() if t.get("branch") == branch and not t.get("done")]
+    tasks = [{"id": tid, "title": (titles.get(tid) or {}).get("title") or ""} for tid in ids]
+    state = {
+        "phase": phase_from_progress(info),
+        "owner": info.get("owner") or "self",
+        "branch": branch,
+        "tasks": tasks,
+        "root": str(root),
+        "slug": root.name,
+        "progress_file": path.is_file(),
+    }
+    if info.get("cut_from"):
+        state["base"] = info["cut_from"]
+    if pr or info.get("pr"):
+        state["pr"] = int(pr or info["pr"])
+    if waiting:
+        state["waiting"] = waiting
+    if who:
+        state["who"] = who
+    line = uncommitted_line(root)
+    if line:
+        state["uncommitted"] = line
+    return state
+
+
+def _now_stamp() -> str:
+    import datetime
+
+    return datetime.datetime.now().astimezone().replace(microsecond=0).isoformat()
+
+
+def file_stamps(root: Path) -> dict:
+    """Normalized hashes of spec, plan, tasks and verify, as each step records."""
+    out = {}
+    for label, name, kind in (
+        ("Spec version", "spec.md", "spec"),
+        ("Plan version", "plan.md", "plan"),
+        ("Tasks version", "tasks.md", "tasks"),
+        ("Verify version", "verify.md", "verify"),
+    ):
+        path = Path(root) / name
+        if path.is_file():
+            out[label] = text_hash(kind, path.read_text(encoding="utf-8"))
+        else:
+            out[label] = "missing"
+    return out
+
+
+def progress_init(root: Path, branch: str, owner: str = "self", tasks: list | None = None, cut_from: str = DEFAULT_BASE, merges: list | None = None) -> str:
+    titles = task_titles(root)
+    rows = [{"id": tid, "title": (titles.get(tid) or {}).get("title") or ""} for tid in (tasks or [])]
+    slice_label = f"docs/specs/{Path(root).name}/"
+    return render_progress(slice_label, branch, owner, rows, cut_from or DEFAULT_BASE, merges or [], [])
+
+
+def progress_record(text: str, root: Path, step: str, result: str, when: str | None = None) -> str:
+    entry = {"step": step, "when": when or _now_stamp(), "result": result, "content_stamp": True}
+    entry.update(file_stamps(root))
+    lines = [f"- Step: {entry['step']}", f"  Done: {entry['when']}", f"  Result: {entry['result']}"]
+    for label in ("Spec version", "Plan version", "Tasks version", "Verify version"):
+        lines.append(f"  {label}: {entry[label]}")
+    lines.append("  Content stamp: normalized")
+    return (text or "").rstrip() + "\n\n" + "\n".join(lines) + "\n"
+
+
+def cmd_progress(args: argparse.Namespace) -> int:
+    root = Path(args.root)
+    if not root.is_dir():
+        return _bad("root", f"no spec folder {root}")
+    try:
+        path = progress_path(root, args.branch)
+    except ValueError as exc:
+        return _bad("branch", str(exc))
+    if args.action == "init":
+        if path.is_file():
+            return _emit({"ok": True, "wrote": False, "path": str(path), "line": "The build progress file already exists. Nothing was rewritten."})
+        ids = [_task_token(normalize_task(t)["id"]) for t in re.split(r"[,\s]+", args.tasks or "") if t]
+        text = progress_init(root, args.branch, args.owner, ids, args.cut_from)
+    else:
+        if not args.step or args.step not in STEP_NAMES:
+            return _bad("step", f"--step must be one of: {', '.join(sorted(STEP_NAMES))}")
+        if not args.result:
+            return _bad("result", "--result is required for record")
+        if not path.is_file():
+            return _bad("file", "No build progress file yet. Run progress init first.")
+        text = progress_record(path.read_text(encoding="utf-8"), root, args.step, args.result)
+    wrote = False
+    if args.yes:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="utf-8", newline="\n")
+        wrote = True
+    return _emit({"ok": True, "wrote": wrote, "path": str(path), "text": text,
+                  "line": "Wrote the build progress file." if wrote else "Preview only. Add --yes after the user's yes to write it."})
+
+
 def _load_json(path: str):
     return json.loads(Path(path).read_text(encoding="utf-8"))
 
@@ -1112,7 +1314,14 @@ def _bad(code: str, line: str, status: int = 2) -> int:
 
 def cmd_next(args: argparse.Namespace) -> int:
     try:
-        raw = _read_json(args.json)
+        if args.json:
+            raw = _read_json(args.json)
+        elif args.root and args.branch:
+            if not Path(args.root).is_dir():
+                return _bad("root", f"no spec folder {args.root}")
+            raw = state_from_files(Path(args.root), args.branch, args.waiting, args.who, args.pr)
+        else:
+            return _bad("input", "next needs --json <file>, or --root <spec folder> and --branch <branch>")
         state = prepare_state(raw)
         if not state.get("phase") and state.get("mode") != "grouping":
             state["phase"] = current_phase(state)
@@ -1200,8 +1409,25 @@ def main(argv: list[str] | None = None) -> int:
     sub = parser.add_subparsers(dest="cmd", required=True)
 
     nxt = sub.add_parser("next")
-    nxt.add_argument("--json", required=True)
+    nxt.add_argument("--json")
+    nxt.add_argument("--root")
+    nxt.add_argument("--branch")
+    nxt.add_argument("--waiting")
+    nxt.add_argument("--who")
+    nxt.add_argument("--pr")
     nxt.set_defaults(func=cmd_next)
+
+    prog = sub.add_parser("progress")
+    prog.add_argument("action", choices=["init", "record"])
+    prog.add_argument("--root", required=True)
+    prog.add_argument("--branch", required=True)
+    prog.add_argument("--owner", default="self", choices=["self", "other"])
+    prog.add_argument("--tasks", default="")
+    prog.add_argument("--cut-from", default=DEFAULT_BASE)
+    prog.add_argument("--step")
+    prog.add_argument("--result")
+    prog.add_argument("--yes", action="store_true")
+    prog.set_defaults(func=cmd_progress)
 
     own = sub.add_parser("owner")
     own.add_argument("--user", default="")

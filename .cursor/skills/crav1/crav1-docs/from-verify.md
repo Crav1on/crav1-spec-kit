@@ -11,6 +11,8 @@ Use this after tasks are built. Verify maps every v0 acceptance line in `spec.md
 @docs/specs/<slug>/
 ```
 
+A verify rerun checks again only the tasks whose branch or tip moved since the last verify (1.172.0), and says which rows it kept, for example `Kept from the last verify: T1, T3 (branch and tip unchanged).` When spec.md, plan.md or tasks.md changed, every row is checked again. Rows are written by `scripts/verify_rows.py set --file docs/specs/orders-api/verify.md --task T6 --status "Implemented, verified" --evidence "tests pass" --yes`.
+
 ## Steps
 
 | Step | You | Agent |

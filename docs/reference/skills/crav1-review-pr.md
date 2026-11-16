@@ -8,6 +8,8 @@
 
 Read one named open pull request and report whether it can ship.
 
+1.172.0: `scripts/ado_threads.py list`, `compare --draft <file>` and `post --file <file> --yes` read and post Azure DevOps threads. It reads `az -o json` from stdout as bytes and decodes UTF-8, then UTF-8 with a BOM, then cp1252, so a Windows code page no longer breaks the JSON. A post is always a new top-level thread. `comment-as-posted.md` is read only when the PR note's draft has no `## Comment as posted` section.
+
 1.171.0: an Azure DevOps re-review posts a new top-level thread, not a reply in an earlier thread; it replies in a thread only to answer a question asked there. After the post offer the reply ends with Run next ([`/crav1-finalize-commit`](crav1-finalize-commit.md), then `git push`) while the PR note is uncommitted, and the Uncommitted line shows in chat.
 
 1.164.0: the fetch card for an older copy on disk follows the card wording rule in `docs/reference/question-cards.md`: one sentence names the older copy, then `Fetch the pull request's two branches before the review?`.

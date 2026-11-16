@@ -36,7 +36,7 @@ Read `references/output.md` ("Output") every run, before you show anything. The 
 - No plan.md or tasks.md (outside the kit): `references/outside-the-kit.md` ("Recorded tests (outside the kit only)"; "Info" also when only some slugs have them).
 - Bugs, missing tests or questions found: `references/comment.md` ("Bugs, tests, questions").
 - Reviewed before (an earlier review comment, PR record Point, or old follow-ups note): `references/re-review.md` ("Re-review").
-- The record step runs: `references/comment-as-posted.md` ("Record step rules").
+- Record step, draft with no posted section (1.172.0): `references/comment-as-posted.md` ("Record step rules").
 - Saving the review's points, follow-ups and comment, after the comment: `references/notes.md` ("PR record"; 1.97.0, one shared record in the PR note, no follow-ups note).
 
 ## Specs repo and code repo
