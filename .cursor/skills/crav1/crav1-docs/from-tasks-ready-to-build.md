@@ -193,7 +193,7 @@ The Next line recommends the build walk, with the T number beside the short name
 
 The ready check fetches the specs repo before it reads. If that copy is behind origin, it stops and Run next is `git pull --no-rebase`. A task with an `In progress:` line in `docs/specs/<slug>/claims.md` is held `in progress by <user> since <date>` and is not offered in Run next.
 
-Since 1.177.1 a pull request in the `Merge these PRs, in this order:` list gets no Waiting line of its own. When none of the listed pull requests is yours, Run next leads with `Ask the PR owners to merge, in this order:` and one line per owner. A merge-list line that says `owner not recorded` means neither the kit's records nor the pull request's host named who opened it; the skill asks you once and records your answer with `pr_common.py author`, so you never edit a spec file.
+Since 1.177.1 a pull request in the `Merge these PRs, in this order:` list gets no Waiting line of its own. When none of the listed pull requests is yours, Run next leads with `Ask the PR owners to merge, in this order:` and one line per owner. A merge-list line that says `owner not recorded` means neither the kit's records nor the pull request's host named who opened it; the skill asks you once and records your answer with `pr_common.py author --root <spec-folder> --pr <n> --name "<who>"`, so you never edit a spec file.
 
 Reference page: [tasks-ready-to-build](reference/skills/crav1-tasks-ready-to-build.md) · Routes: [Workflow routes](reference/workflow.md)
 
