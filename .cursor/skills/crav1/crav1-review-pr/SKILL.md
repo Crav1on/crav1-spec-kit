@@ -26,7 +26,7 @@ You read the diff. You do not edit code, the spec, or the plan, run or ask to ru
 
 ## Output (1.113.0)
 
-Read `references/output.md` ("Output") every run, before you show anything. The chat shows only the postable review, its verdict, one line naming the PR note, and the post offer; everything else is the kit record in the PR note, and outside context gets its own read-only section. After the post offer, end with Run next (1.171.0), never a `Next:` line. While the PR note is uncommitted: `Run next:`, then the label `Commit the PR note:` on its own line and `/crav1-finalize-commit` alone in its code span, then `Then push the specs repo:` and `git push` alone in its code span. The Uncommitted line shows in chat, after Run next, and in the kit record.
+Read `references/output.md` ("Output") every run, before you show anything. The chat shows only the postable review, its verdict, one line naming the PR note, and the post offer; everything else is the kit record in the PR note, and outside context gets its own read-only section. After the post offer, end with Run next (1.171.0), no Next line: `Commit the PR note:` with `/crav1-finalize-commit`, then `Then push the specs repo:` with `git push`, each alone in its code span. Uncommitted shows in chat.
 
 ## Which file, when
 

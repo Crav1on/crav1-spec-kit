@@ -103,6 +103,7 @@ class Lead(unittest.TestCase):
 
     def test_skill_prints_only_the_lead(self):
         self.assertIn("print only the JSON `lead`", read("crav1-build-walk/SKILL.md"))
+        self.assertIn("Print only that before `Run next:`", read("crav1-build-walk/references/common.md"))
 
 
 class FullNames(unittest.TestCase):

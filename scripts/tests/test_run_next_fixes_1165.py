@@ -116,7 +116,8 @@ class BranchSentence(unittest.TestCase):
 
     def test_plan_notes_trim_to_opening_clause(self):
         # 1.166.0: plan notes give their opening clause, not nothing.
-        self.assertEqual(we.about_sentence(NOTES), "The orders CI/CD branch, cut from develop after billing-ops.")
+        # 1.171.0: how the branch was cut is a planning note, not a description.
+        self.assertEqual(we.about_sentence(NOTES), "")
 
     def test_person_lead_falls_back_to_heading(self):
         # 1.166.0: the person lead is dropped and the clause after it kept.
@@ -194,7 +195,7 @@ class EndToEnd(unittest.TestCase):
         self.assertNotIn("merge main into develop", text)
         self.assertNotIn("Person A", text)
         self.assertIn("**feat/orders-api-fixes**\n" + "GetReceipts answers 404 for a cursor that matches no stored receipt." + "\n2 open tasks:", text)
-        self.assertIn("**feat/orders-cicd**\nThe orders CI/CD branch, cut from develop after billing-ops.\n2 open tasks:", text)
+        self.assertIn("**feat/orders-cicd**\nOrders CI/CD: infra for dev, test and prod and pipeline with three stages.\n2 open tasks:", text)  # 1.171.0
         # 2: the long question is whole or cut at a word, never mid-word.
         line = next(row for row in text.splitlines() if "T25" in row and "open question" in row)
         quoted = line.split('"')[1]
