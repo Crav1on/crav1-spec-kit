@@ -2565,6 +2565,45 @@ def reopen_card(step: str, drift: list[str], recommend_rerun: bool) -> dict:
     }
 
 
+CHANGED_FILE = {
+    "spec": "the spec",
+    "plan": "plan.md",
+    "tasks": "tasks.md",
+    "questions": "the open questions in the spec",
+    "playbook": "the playbook",
+    "verify": "verify.md",
+}
+
+
+def _and_list(items: list[str]) -> str:
+    items = [item for item in items if item]
+    if len(items) <= 1:
+        return "".join(items)
+    return ", ".join(items[:-1]) + " and " + items[-1]
+
+
+def reopen_reason(step: str, drift: list[str], titles: list[str] | None = None) -> str:
+    """Why a step reopened, in one plain sentence (1.175.0).
+
+    Names the changed spec sections when the section stamps say which, else
+    the changed files. A build walk's own files (claims.md, walk-progress.md,
+    build-progress, verify.md, task ticks) never reopen a step, so the
+    sentence always names a real edit.
+    """
+    command = STEP_COMMAND.get(step, f"/crav1-{step}")
+    real = [title for title in titles or [] if title and title != "Synced at"]
+    if real and "spec" in drift:
+        noun = "section" if len(real) == 1 else "sections"
+        what = f"The spec's {_and_list(real)} {noun} changed"
+        others = [CHANGED_FILE[token] for token in drift if token not in ("spec", "questions") and token in CHANGED_FILE]
+        if others:
+            what += f", and so did {_and_list(others)}"
+    else:
+        files = [CHANGED_FILE.get(token, token) for token in drift] or ["a covered file"]
+        what = f"{_and_list(files)[:1].upper()}{_and_list(files)[1:]} changed"
+    return f"{what} after {command} was last recorded in walk-progress.md."
+
+
 def reopen_hit(step: str, drift: list[str]) -> dict:
     why = " ".join(IMPACT[token] for token in drift)
     why += " Jump back and rerun this step, or clear it with nothing new."
@@ -2589,13 +2628,22 @@ def reopened_hits(root: Path) -> list[dict]:
         fail("root", f"not a folder: {root}")
     data = load(root)
     hits = []
+    titles = None
     for step in ORDER:
         body = data["steps"].get(step)
         if not body:
             continue
         drift = affected_drift(root, step, body, data["steps"])
         if drift:
-            hits.append(reopen_hit(step, drift))
+            hit = reopen_hit(step, drift)
+            if titles is None:
+                try:
+                    effect = section_effect(root, data["steps"])
+                    titles = list(effect.get("titles") or []) if effect.get("active") else []
+                except Exception:  # noqa: BLE001 - the reason is words only
+                    titles = []
+            hit["reason"] = reopen_reason(step, drift, titles)
+            hits.append(hit)
     return hits
 
 
@@ -3405,6 +3453,7 @@ def apply_claims(root: Path | None, rows: list[dict], user: str | None = None, b
     claims = loaded.get("claims") or []
     if claims:
         claims_mod().apply_to_rows(rows, claims, user=user or _git_user(root), branch=branch)
+        apply_built_claims(root, rows)
     warnings = claims_mod().age_warnings(claims, loaded.get("max_age_days") or 3)
     return {"claims": claims, "warnings": warnings, "ids": claims_mod().claimed_ids(claims)}
 
@@ -3412,6 +3461,54 @@ def apply_claims(root: Path | None, rows: list[dict], user: str | None = None, b
 MERGE_WAIT_STEPS = {"comment", "wait-merge"}
 _PROGRESS_STEP = re.compile(r"^- Step:\s*(\S+)", re.M)
 _PROGRESS_PR = re.compile(r"\b(?:PR|pull request)\s+#?(\d+)", re.I)
+
+
+def walk_built(root: Path | None) -> dict:
+    """Tasks built on a branch walk that is not merged (1.175.0).
+
+    From build-progress/*.md: a done `Step: build T#` or a `- Built: T#` row,
+    while the file has no merge-pr result. Returns {"T9": {"branch", "pr"}}.
+    """
+    out: dict = {}
+    if root is None or not (Path(root) / "build-progress").is_dir():
+        return out
+    try:
+        walks = map_mod().progress_state(root)
+    except Exception:  # noqa: BLE001 - a bad progress file must not hide the rows
+        return out
+    for branch, walk in (walks or {}).items():
+        if walk.get("merged"):
+            continue
+        for num in sorted(walk.get("built") or ()):
+            out[f"T{int(num)}"] = {"branch": branch, "pr": walk.get("pr")}
+    return out
+
+
+def built_claim_phrase(who: str, pr) -> str:
+    """`built by person B, waits for PR 82 to merge` (1.175.0)."""
+    who = (who or "").strip() or "someone"
+    wait = f"waits for PR {pr} to merge" if pr else "waits for its pull request to merge"
+    return f"built by {who}, {wait}"
+
+
+def apply_built_claims(root: Path | None, rows: list[dict]) -> None:
+    """Someone else's claim on a built task says built, not in progress (1.175.0).
+
+    The claim stays until the merge (branch-run.md), so the task is still
+    held. Only its words change: `built by <name>, waits for PR <n> to merge`
+    instead of `in progress by <name> since <date>`.
+    """
+    built = walk_built(root)
+    if not built:
+        return
+    for row in rows:
+        task = row.get("task")
+        if not task or task not in built or not row.get("claim") or row.get("own_claim"):
+            continue
+        if row.get("bucket") == "done":
+            continue
+        row["claim_built"] = built[task]
+        row["reason"] = built_claim_phrase(row.get("who") or "", built[task].get("pr"))
 
 
 def progress_merge_waits(root: Path | None) -> dict:
@@ -3452,29 +3549,99 @@ def progress_merge_waits(root: Path | None) -> dict:
     return out
 
 
-def resume_walk_entries(root: Path | None, slug: str) -> list[str]:
-    """Run next entries that continue an unfinished branch walk (1.174.0).
+def _ids_span(ids: list[str]) -> str:
+    """`T9 to T12` for a run of numbers, else `T9, T10 and T12` (1.175.0)."""
+    nums = []
+    for task in ids:
+        match = re.fullmatch(r"T(\d+)", str(task).strip())
+        if not match:
+            return _task_ids_text(ids)
+        nums.append(int(match.group(1)))
+    if len(nums) > 2 and nums == list(range(nums[0], nums[0] + len(nums))):
+        return f"T{nums[0]} to T{nums[-1]}"
+    return _task_ids_text([f"T{n}" for n in nums])
 
-    A branch run in walk-progress.md that is not merged, whose own
-    build-progress file is not at `comment` or `wait-merge` and whose owner
-    is not someone else, is offered first: `Continue the build walk on
-    <branch>:` above `/crav1-build-walk <slug> <branch>`. A walk that waits on
-    a merge stays a Waiting line (1.171.0).
+
+_RUN_YES = re.compile(r"^Run yes:\s*(.+?),\s*\d{4}-\d{2}-\d{2}T", re.M)
+
+
+def walk_owner(root: Path | None, branch: str, text: str = "") -> dict:
+    """Who runs a branch walk, from claims.md and the progress file (1.175.0).
+
+    The claim user on that branch, else the `Run yes:` name. `Owner: self`
+    is relative to whoever ran the walk, so it is never used alone. Returns
+    {"user": name or None, "tasks": [T#, ...]}.
     """
+    user = None
+    tasks: list[str] = []
+    try:
+        claims = (claims_mod().load_claims(root) or {}).get("claims") or [] if root is not None else []
+    except Exception:  # noqa: BLE001 - a bad claims file is reported elsewhere
+        claims = []
+    for claim in claims:
+        if (claim.get("branch") or "").strip() == branch:
+            user = user or (claim.get("user") or "").strip() or None
+            for task in claim.get("tasks") or []:
+                if task not in tasks:
+                    tasks.append(task)
+    if user is None and text:
+        match = _RUN_YES.search(text)
+        if match:
+            user = match.group(1).strip() or None
+    return {"user": user, "tasks": tasks}
+
+
+def walk_owner_waits(root: Path | None, user: str | None = None) -> list[str]:
+    """Waiting lines for someone else's unfinished branch walk (1.175.0).
+
+    `T9 to T12 are person B's, built, and wait for PR 82 to merge.` when
+    every claimed task is built and the pull request is known, else
+    `T9 to T12 are in progress by person B.` No continue offer.
+    """
+    out = []
+    built = walk_built(root)
+    for branch, info in _unfinished_walks(root, user).items():
+        owner = info["owner"]
+        if not owner["user"] or info["own"] is not False:
+            continue
+        tasks = owner["tasks"]
+        names = _ids_span(tasks) if tasks else f"The tasks on {branch}"
+        plural = len(tasks) != 1
+        pr = info.get("pr")
+        if tasks and pr and all(task in built for task in tasks):
+            verb = "wait" if plural else "waits"
+            be = "are" if plural else "is"
+            out.append(f"Waiting: {names} {be} {owner['user']}'s, built, and {verb} for PR {pr} to merge.")
+        else:
+            be = "are" if plural or not tasks else "is"
+            out.append(f"Waiting: {names} {be} in progress by {owner['user']}.")
+    return out
+
+
+def _unfinished_walks(root: Path | None, user: str | None = None) -> dict:
+    """Branch runs that are not merged and not waiting on a merge (1.175.0).
+
+    {branch: {"run", "owner", "own", "pr"}}. `own` is True when the walk's
+    claim user is the local `git config user.name` (the claims `yours`
+    check), False when it is someone else, None when no name is recorded.
+    """
+    out: dict = {}
     if root is None:
-        return []
+        return out
     path = progress_path(root)
     if not path.is_file():
-        return []
+        return out
     data, _err = _try_parse(path.read_text(encoding="utf-8"))
     if not data:
-        return []
-    out = []
+        return out
+    local = None
+    looked = False
     for branch in sorted(data.get("branch_runs") or {}):
         run = data["branch_runs"][branch]
         if str(run.get("state") or "").strip().lower() == "merged":
             continue
         log = Path(root) / str(run.get("log") or f"build-progress/{branch.replace('/', '--')}.md")
+        text = ""
         if log.is_file():
             try:
                 text = log.read_text(encoding="utf-8")
@@ -3485,10 +3652,39 @@ def resume_walk_entries(root: Path | None, slug: str) -> list[str]:
                 continue
             if steps and steps[-1].strip().lower() == "merge-pr":
                 continue
+        owner = walk_owner(root, branch, text)
+        own = None
+        if owner["user"]:
+            if not looked:
+                local = user or _git_user(root)
+                looked = True
+            own = bool(local) and claims_mod().same_person(owner["user"], local)
+        else:
             head = text.split("\n- Step:", 1)[0]
-            owner = re.search(r"^Owner:\s*(\S+)", head, re.M)
-            if owner and owner.group(1).strip().lower() == "other":
-                continue
+            match = re.search(r"^Owner:\s*(\S+)", head, re.M)
+            if match and match.group(1).strip().lower() == "other":
+                own = False
+        prs = _PROGRESS_PR.findall(text)
+        out[branch] = {"run": run, "owner": owner, "own": own, "pr": int(prs[-1]) if prs else None}
+    return out
+
+
+def resume_walk_entries(root: Path | None, slug: str, user: str | None = None) -> list[str]:
+    """Run next entries that continue an unfinished branch walk (1.174.0).
+
+    A branch run in walk-progress.md that is not merged, whose own
+    build-progress file is not at `comment` or `wait-merge` and whose owner
+    is not someone else, is offered first: `Continue the build walk on
+    <branch>:` above `/crav1-build-walk <slug> <branch>`. A walk that waits on
+    a merge stays a Waiting line (1.171.0). Only your own walk is offered:
+    the walk's claim user must match `git config user.name`, the same check
+    as a claim that is yours (1.175.0). Someone else's walk is a Waiting
+    line from walk_owner_waits().
+    """
+    out = []
+    for branch, info in _unfinished_walks(root, user).items():
+        if info["own"] is False:
+            continue
         command = f"/crav1-build-walk {slug} {branch}" if slug else f"/crav1-build-walk {branch}"
         out.append(_run_entry(command, "", f"Continue the build walk on {branch}:"))
     return out
@@ -3516,7 +3712,10 @@ def apply_progress_waits(root: Path | None, rows: list[dict]) -> dict:
         row["bucket"] = "waiting"
         row["held"] = True
         row["merge_wait"] = waits[task]
-        row["reason"] = merge_wait_phrase(waits[task])
+        if row.get("claim") and not row.get("own_claim") and row.get("who"):
+            row["reason"] = built_claim_phrase(row["who"], waits[task].get("pr"))
+        else:
+            row["reason"] = merge_wait_phrase(waits[task])
     return waits
 
 
@@ -3818,18 +4017,27 @@ def _run_entry(command: str, reason: str, label: str | None = None) -> str:
 
 
 def _reopened_label(can_start: list, command: str) -> str:
-    """`T1 waits until the reopened /crav1-tighten-plan step finishes:` (1.173.0).
+    """`Finish the reopened /crav1-tighten-plan step:` (1.175.0).
 
-    The real T# list and the step's command, without the slug. Two or more
-    tasks wait; with none it is the work that waits.
+    An action, with the step's command and without the slug. Which tasks
+    wait, and why the step reopened, is the plain sentence above it
+    (_reopened_why).
     """
-    ids = _task_ids_text(can_start)
     step = str(command).split()[0] if str(command).split() else str(command)
+    return f"Finish the reopened {step} step:"
+
+
+def _reopened_why(hit: dict | None, can_start: list) -> str:
+    """One plain sentence: what changed, and which tasks wait (1.175.0)."""
+    reason = str((hit or {}).get("reason") or "").strip().rstrip(".")
+    ids = _task_ids_text(can_start)
     names = [task for task in can_start or [] if task]
-    if not ids:
-        return f"The work waits until the reopened {step} step finishes:"
-    verb = "waits" if len(names) == 1 else "wait"
-    return f"{ids} {verb} until the reopened {step} step finishes:"
+    if not reason:
+        reason = "A file this step covers changed after it was recorded"
+    if ids:
+        verb = "waits" if len(names) == 1 else "wait"
+        return f"{reason}, so {ids} {verb}."
+    return f"{reason}."
 
 
 def _wait_until(lead: str, can_start: list, command: str) -> str:
@@ -3919,8 +4127,9 @@ def not_ready_run(
     if step:
         command, lead = REOPEN_NEXT.get(step, (STEP_COMMAND.get(step, f"/crav1-{step}"), "An earlier step was reopened"))
         command = _command_with_slug(command, slug)
-        reason = because or _wait_until(lead, can_start, command)
-        return [_run_entry(command, reason, _reopened_label(can_start, command))]
+        hit = next((h for h in hits if h.get("bucket") == "reopened" and h.get("step") == step), None)
+        why = _reopened_why(hit, can_start)
+        return [why + "\n" + _run_entry(command, why, _reopened_label(can_start, command))]
     if offer and offer.get("entries"):
         return [str(offer["entries"][0])]
     if waiting_next:
@@ -4369,7 +4578,11 @@ def readiness(args: argparse.Namespace) -> None:
         else:
             nxt = next_for(result, can_start, waiting_next)
     run_status = branch_run_lines(root)
-    resume_entries = resume_walk_entries(root, command_slug(root) if root is not None and root.is_dir() else slug)
+    local_user = getattr(args, "user", None)
+    resume_entries = resume_walk_entries(root, command_slug(root) if root is not None and root.is_dir() else slug, user=local_user)
+    for line in walk_owner_waits(root, local_user):
+        if line not in waiting_bits:
+            waiting_bits.append(line)
     if resume_entries:
         shown_run = resume_entries + [entry for entry in shown_run if entry not in resume_entries]
         if result not in ("ready", "ready-partial") and not catch_up:

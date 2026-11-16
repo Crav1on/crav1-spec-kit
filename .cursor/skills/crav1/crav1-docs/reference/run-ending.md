@@ -42,15 +42,15 @@ Before a ready-check or walk ending, the reply has at most one short lead senten
 
    Since 1.166.0 every branch block has a description line between the bold branch and `<n> open tasks:`. In order: up to three clean sentences from the plan step (each ends with a full stop, has no colon list, no person leading it and no file or path), about 300 characters at most and cut only at a sentence end, never mid-sentence; else the plan note trimmed to its opening clause, the words before the first `:` or ` — `, with a person lead such as `Person A builds PR 73:` dropped, for example `The orders CI/CD branch, cut from develop after billing-ops.`; else the step's heading in plain words; else one sentence from the open task names, a shared prefix once, for example `Orders CI/CD: infra Bicep, cd pipeline, ci lint and tests, and deploy README.`, about 160 characters. The line is left out only when the branch has no plan step and no usable task name, and a person's name never shows. A held question that ends with `:` or only points to a note, such as `The note docs/notes/x.md, in Open questions, question 5, says:`, shows the quoted question that follows: the `>` blockquote under the bullet, else the text in quotes after the colon, else the first sentence ending in `?`.
 
-   Since 1.167.0 what you can fix now with one command leads Run next as a `**Catch up first**` block, before the first branch block and in the same layout: the bold heading, one or two plain sentences of what is behind, then each command alone in its code span under its label line, and the same `---` line before the first branch block. It covers verify.md behind tasks.md, a verify.md row for a T# that is not in tasks.md, and a specs repo ahead of origin. `/crav1-verify-build-against-spec` both checks the behind tasks and drops a row for a T# that tasks.md does not have, so those two share one label and one command. The push is `git push` (the specs repo is never behind here; a copy behind origin stops the check first). The block is left out when nothing is behind, and those items are no longer `Waiting:` lines. For example:
+   Since 1.167.0 what you can fix now with one command leads Run next as a `**Catch up first**` block, before the first branch block and in the same layout: the bold heading, one or two plain sentences of what is behind (since 1.175.0 the push has no sentence; its label says how far ahead), then each command alone in its code span under its label line, and the same `---` line before the first branch block. It covers verify.md behind tasks.md, a verify.md row for a T# that is not in tasks.md, and a specs repo ahead of origin. `/crav1-verify-build-against-spec` both checks the behind tasks and drops a row for a T# that tasks.md does not have, so those two share one label and one command. The push is `git push` (the specs repo is never behind here; a copy behind origin stops the check first). The block is left out when nothing is behind, and those items are no longer `Waiting:` lines. For example:
 
    ```text
    **Catch up first**
-   verify.md is behind for T4 and T7, and it has a row for T44, which is not in tasks.md. The specs repo is 2 commits ahead of origin.
+   verify.md is behind for T4 and T7, and it has a row for T44, which is not in tasks.md.
 
    Check T4 and T7 against the spec and remove the T44 row:
    `/crav1-verify-build-against-spec orders-api`
-   Push the specs repo (2 commits ahead):
+   Push the specs repo, which is 2 commits ahead of origin:
    `git push`
 
    ---

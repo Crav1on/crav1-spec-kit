@@ -671,9 +671,11 @@ def catch_up_block(slug=None, behind=None, orphans=None, ahead=0, failed=None):
     for tid, why in fails:
         sentences.append(f"{tid} failed verify: {why.rstrip('.')}." if why else f"{tid} failed verify.")
     unit = "commit" if ahead == 1 else "commits"
-    if ahead > 0:
-        sentences.append(f"The specs repo is {ahead} {unit} ahead of origin.")
-    lines = ["**Catch up first**", " ".join(sentences), ""]
+    # The push label already says how far ahead the specs repo is, so no
+    # sentence repeats it (1.175.0).
+    lines = ["**Catch up first**", ""]
+    if sentences:
+        lines[1:1] = [" ".join(sentences)]
     verify_cmd = f"{VERIFY_COMMAND} {slug}" if slug else VERIFY_COMMAND
     row_word = "row" if len(orphans) == 1 else "rows"
     if behind and orphans:
@@ -690,7 +692,7 @@ def catch_up_block(slug=None, behind=None, orphans=None, ahead=0, failed=None):
         lines.append(f"Fix {tid}:")
         lines.append(f"`{FIX_COMMAND} {slug} {tid}`" if slug else f"`{FIX_COMMAND} {tid}`")
     if ahead > 0:
-        lines.append(f"Push the specs repo ({ahead} {unit} ahead):")
+        lines.append(f"Push the specs repo, which is {ahead} {unit} ahead of origin:")
         lines.append(f"`{PUSH_COMMAND}`")
     return "\n".join(lines)
 
@@ -975,9 +977,11 @@ def verify_catch_up_block(slug=None, uncommitted=None, ahead=0, plan_notes=None)
     if files:
         sentences.append(f"{_join(files)} {'is' if len(files) == 1 else 'are'} not committed.")
     unit = "commit" if ahead == 1 else "commits"
-    if ahead > 0:
-        sentences.append(f"The specs repo is {ahead} {unit} ahead of origin.")
-    lines = ["**Catch up first**", " ".join(sentences), ""]
+    # The push label already says how far ahead the specs repo is, so no
+    # sentence repeats it (1.175.0).
+    lines = ["**Catch up first**", ""]
+    if sentences:
+        lines[1:1] = [" ".join(sentences)]
     tail = f" {slug}" if slug else ""
     if notes:
         lines.append("Settle the plan note in the plan:" if len(notes) == 1 else "Settle the plan notes in the plan:")
@@ -988,7 +992,7 @@ def verify_catch_up_block(slug=None, uncommitted=None, ahead=0, plan_notes=None)
         lines.append("Then push the specs repo:")
         lines.append(f"`{PUSH_COMMAND}`")
     elif ahead > 0:
-        lines.append(f"Push the specs repo ({ahead} {unit} ahead):")
+        lines.append(f"Push the specs repo, which is {ahead} {unit} ahead of origin:")
         lines.append(f"`{PUSH_COMMAND}`")
     return "\n".join(lines)
 

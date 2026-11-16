@@ -8,6 +8,8 @@
 
 Walk one work branch from build through merge, with one Next while it runs.
 
+1.175.0: the build walk is offered to continue only by its own claim user, the name `git config user.name` gives; `Owner: self` in a progress file is never trusted alone. Someone else's built walk is a Waiting line such as `T9 to T12 are person B's, built, and wait for PR 82 to merge.`
+
 1.174.0: a specs repo that is behind or diverged ends with a label line above the command, `Merge origin into your local branch, since they have diverged (never rebase):` (or `since it is behind`), then `git pull --no-rebase` alone in its code span.
 
 1.172.0: `build_walk.py next --root <spec folder> --branch <branch>` builds the walk state itself: phase, owner and pull request from `build-progress/<branch>.md`, full task names from `tasks.md`, the Uncommitted line from `git status`. `build_walk.py progress init` and `progress record --step <step> --result <result> --yes` write the progress file with `Done` and the normalized stamps; without `--yes` they preview. At `comment` or `wait-merge` the walk prints `lead` and `ending` straight from the script and reads no reference. The one-task build skips `tool-approvals.md` when the walk passes `approvals: already-done`.

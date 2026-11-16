@@ -159,7 +159,7 @@ class Reply(unittest.TestCase):
             we.verify_catch_up_block(unticked=["A5"])
 
     def test_catch_up_push_only_and_empty(self):
-        self.assertIn("Push the specs repo (2 commits ahead):\n`git push`", we.verify_catch_up_block(ahead=2))
+        self.assertIn("Push the specs repo, which is 2 commits ahead of origin:\n`git push`", we.verify_catch_up_block(ahead=2))
         self.assertEqual(we.verify_catch_up_block(), "")
 
     def test_catch_up_leads_with_rule_before_step(self):

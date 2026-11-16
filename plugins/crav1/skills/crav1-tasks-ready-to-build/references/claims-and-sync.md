@@ -9,4 +9,4 @@ Before reading a slice, run `<interpreter> -X utf8 scripts/repo_sync.py status -
 - Ahead: continue, and print the Waiting line to push.
 - In step, or no git repository: continue.
 
-Then also read `docs/specs/<slug>/claims.md` when it exists. A task with an `In progress:` line is held `in progress by <user> since <date>` and is not offered in Run next. A claim older than three days, or the file's `Claim max age:` line, gets a warning and is never cleared on its own. Never read Azure Boards.
+Then also read `docs/specs/<slug>/claims.md` when it exists. A task with an `In progress:` line is held `in progress by <user> since <date>` and is not offered in Run next. When its `build-progress` file shows it built and the branch is not merged, it reads `built by <user>, waits for PR <n> to merge` instead (1.175.0). `Continue the build walk on <branch>:` is offered only when the walk's claim user matches `git config user.name`; someone else's walk is a Waiting line. A claim older than three days, or the file's `Claim max age:` line, gets a warning and is never cleared on its own. Never read Azure Boards.
