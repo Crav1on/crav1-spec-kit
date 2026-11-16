@@ -152,3 +152,31 @@ class TwoRepoRecord(unittest.TestCase):
         self.assertIn("Nothing was written", out["line"])
         self.assertEqual((self.root / "walk-progress.md").read_text(encoding="utf-8"), before)
         self.assertEqual(br.progress_path(self.root, "feat/orders-cicd").read_text(encoding="utf-8"), progress)
+
+
+VERIFY_ON_BRANCH = """# Verify
+
+| T# | Title | Status | Verify |
+| --- | --- | --- | --- |
+| T5 | Orders README | Implemented, verified on branch | pass at 61dc1ce on feat/orders-readme, PR 71 open |
+"""
+
+
+class VerifiedOnBranch(unittest.TestCase):
+    def test_status_is_known_everywhere(self):
+        vr = load(SK / "crav1-verify-build-against-spec/scripts/verify_rows.py", "verify_rows_1176b")
+        self.assertIn("Implemented, verified on branch", vr.STATUSES)
+        tick = load(SK / "crav1-build-tasks/scripts/tick_only.py", "tick_only_1176b")
+        self.assertFalse(tick.already_verified("Implemented, verified on branch"))
+        self.assertTrue(tick.already_verified("Implemented, verified, tick pending"))
+        we = load(SK / "crav1-tasks-ready-to-build/scripts/walk_ending.py", "walk_ending_1176b")
+        self.assertEqual(we.status_key("Implemented, verified on branch"), "on_branch")
+        self.assertEqual(we.status_key("Implemented, verified"), "verified")
+
+    def test_ready_check_says_verified_on_branch(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = two_pr_slice(tmp)
+            (root / "verify.md").write_text(VERIFY_ON_BRANCH, encoding="utf-8")
+            text = ending(root)
+            self.assertIn("T5 Orders README — verified on feat/orders-readme, waits for PR 71 to merge", text)
+            self.assertNotIn("Not implemented", text)

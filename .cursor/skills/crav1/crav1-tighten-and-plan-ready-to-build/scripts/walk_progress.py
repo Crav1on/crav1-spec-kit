@@ -3153,6 +3153,8 @@ def _verify_for(text: str | None, tid: str) -> tuple[str, str | None]:
         if not cells or cells[0] != tid or len(cells) < 3:
             continue
         status = cells[2].lower()
+        if "verified on branch" in status:
+            return "needs-verify", "verified on a branch that is not merged"
         if "unverified" in status or "claimed" in status:
             return "needs-verify", "claimed done, unverified"
         if "failed" in status:
@@ -3867,6 +3869,50 @@ def merge_order_block(rows: list[dict], prs: dict) -> str:
     return "\n".join(lines)
 
 
+ON_BRANCH = "implemented, verified on branch"
+
+
+def verified_on_branch(root: Path | None) -> set[str]:
+    """T#s whose verify.md row says `Implemented, verified on branch` (1.176.0)."""
+    out: set[str] = set()
+    if root is None or not (Path(root) / "verify.md").is_file():
+        return out
+    for line in (Path(root) / "verify.md").read_text(encoding="utf-8").splitlines():
+        cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+        if len(cells) >= 3 and re.fullmatch(r"T\d+", cells[0]) and cells[2].lower().startswith(ON_BRANCH):
+            out.add(cells[0])
+    return out
+
+
+def on_branch_phrase(branch: str, pr, who: str | None = None) -> str:
+    """`verified on feat/x, waits for PR 71 to merge` (1.176.0), with `by <name>` for someone else."""
+    by = f" by {who}" if who else ""
+    wait = f"waits for PR {pr} to merge" if pr else "waits for its pull request to merge"
+    return f"verified on {branch}{by}, {wait}"
+
+
+def apply_verified_on_branch(root: Path | None, rows: list[dict]) -> None:
+    """A task verified on an unmerged branch says so, not Not implemented (1.176.0)."""
+    tasks = verified_on_branch(root)
+    if not tasks:
+        return
+    waits = progress_merge_waits(root)
+    built = walk_built(root)
+    for row in rows:
+        task = row.get("task")
+        if task not in tasks or row.get("bucket") == "done":
+            continue
+        info = waits.get(task) or built.get(task)
+        if not info:
+            continue
+        who = row.get("who") if row.get("claim") and not row.get("own_claim") else None
+        row["bucket"] = "waiting"
+        row["held"] = True
+        row["verified_on_branch"] = True
+        row.setdefault("merge_wait", {"branch": info.get("branch"), "pr": info.get("pr"), "owner": "self" if not who else "other"})
+        row["reason"] = on_branch_phrase(info.get("branch") or "its branch", info.get("pr"), who)
+
+
 def merge_wait_lines(rows: list[dict]) -> list[str]:
     """Plain Waiting lines for tasks that wait on a merge (1.171.0)."""
     by_pr: dict = {}
@@ -3917,6 +3963,7 @@ def ready_branches(root: Path) -> list[dict]:
     rows = build_rows(root)
     apply_claims(root, rows)
     apply_progress_waits(root, rows)
+    apply_verified_on_branch(root, rows)
     apply_loop_holds(root, rows)
     resolve_kept = resolve_is_keep(root)
     resolve_recorded = resolve_ever_recorded(root)
@@ -4638,6 +4685,7 @@ def readiness(args: argparse.Namespace) -> None:
     loop_lines: list[str] = []
     if root is not None and root.is_dir():
         apply_progress_waits(root, rows)
+        apply_verified_on_branch(root, rows)
         loop_lines = apply_loop_holds(root, rows)
     for row in rows:
         if not isinstance(row, dict):

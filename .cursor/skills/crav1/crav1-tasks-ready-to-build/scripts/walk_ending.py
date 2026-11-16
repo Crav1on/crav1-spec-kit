@@ -860,6 +860,7 @@ def not_ready_next(slug: str, counts: dict | None, question_first: bool) -> str 
 
 VERIFY_STATUSES = (
     ("tick_pending", "Implemented, verified, tick pending", "verified, tick pending"),
+    ("on_branch", "Implemented, verified on branch", "verified on branch"),
     ("verified", "Implemented, verified", "verified"),
     ("failed", "Implemented, verify failed", "failed"),
     ("not_implemented", "Not implemented", "not implemented"),

@@ -27,6 +27,9 @@ sys.dont_write_bytecode = True
 STATUSES = (
     "Implemented, verified",
     "Implemented, verified, tick pending",
+    # 1.176.0: evidence passed on a work branch that is not merged yet. The row
+    # stays `[ ]`; it becomes tick pending once the merge is recorded.
+    "Implemented, verified on branch",
     "Implemented, verify failed",
     "Not implemented",
     "Claimed done, unverified",
