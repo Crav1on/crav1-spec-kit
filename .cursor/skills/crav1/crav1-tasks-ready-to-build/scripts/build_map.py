@@ -1680,7 +1680,8 @@ def progress_shas(directory):
 def progress_state(directory):
     """Each branch's walk from build-progress/*.md, as {branch: state} (1.174.0).
 
-    A state is {"built": {task ids}, "pr": number or None, "merged": bool}.
+    A state is {"built": {task ids}, "pr": number or None, "merged": bool,
+    "tasks": {ids on the header's Tasks: line}} (tasks: 1.177.2).
     A task counts as built from a done `Step: build T#` or a `- Built: T#`
     run row. The pull request is the last `PR <n>` the file names.
     """
@@ -1697,10 +1698,13 @@ def progress_state(directory):
         built = set()
         merged = False
         step = ""
+        listed = set()
         for line in text.splitlines():
             stripped = line.strip()
             lower = stripped.lower()
-            if lower.startswith("branch:") and branch is None:
+            if lower.startswith("tasks:") and not step and not listed:
+                listed = {int(n) for n in re.findall(r"\bT(\d+)\b", stripped)}
+            elif lower.startswith("branch:") and branch is None:
                 branch = stripped.split(":", 1)[1].strip()
             elif lower.startswith("- step:"):
                 step = stripped.split(":", 1)[1].strip().lower()
@@ -1713,7 +1717,7 @@ def progress_state(directory):
                     merged = True
         prs = re.findall(r"\b(?:PR|pull request)\s+#?(\d+)", text, re.I)
         key = branch or path.stem.replace("--", "/")
-        found[key] = {"built": built, "pr": int(prs[-1]) if prs else None, "merged": merged}
+        found[key] = {"built": built, "pr": int(prs[-1]) if prs else None, "merged": merged, "tasks": listed}
     return found
 
 
@@ -1787,6 +1791,12 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text
     """Return markdown, a short chat summary, and the one-line pointer."""
     _REMOTE_CACHE.clear()
     tasks = parse_tasks(tasks_text)
+    # 1.177.2: a walk with a merge-pr result (the walk, /crav1-merge-pr, or
+    # the ready check's host check) makes the tasks on its Tasks: line done.
+    merged_ids = {int(n) for walk in (walks or {}).values() if walk.get("merged") for n in walk.get("tasks") or ()}
+    for task in tasks:
+        if task["id"] in merged_ids:
+            task["done"] = True
     titles = work_item_titles(work_item_text)
     name_of = {
         task["id"]: short_name(task.get("rest") or task["title"], titles.get(task["id"]))
