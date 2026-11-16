@@ -59,13 +59,52 @@ def branch_token(value):
     return parts[-1].strip("`.,;:") if parts else ""
 
 
+_NOTE_OPEN = re.compile(r"\s*\((?:verify|spec|after|branch|step|map):", re.I)
+
+
+def _drop_notes(text):
+    """Remove `(verify: ...)`-style notes, nested parentheses included (1.176.0)."""
+    out = []
+    pos = 0
+    while True:
+        found = _NOTE_OPEN.search(text, pos)
+        if not found:
+            out.append(text[pos:])
+            break
+        out.append(text[pos:found.start()])
+        depth, i = 1, found.end()
+        while i < len(text) and depth:
+            if text[i] == "(":
+                depth += 1
+            elif text[i] == ")":
+                depth -= 1
+            i += 1
+        out.append(" ")
+        pos = i
+    return "".join(out)
+
+
+def tidy_title(text):
+    """Collapse spaces and drop the stray space before , ; : . ) and after ( (1.176.0)."""
+    text = re.sub(r"\s+", " ", text or "")
+    text = re.sub(r"\s+([,;:.)])", r"\1", text)
+    text = re.sub(r"\(\s+", "(", text)
+    text = re.sub(r"\(\)", "", text)
+    text = re.sub(r",\s*,", ",", text)
+    return re.sub(r"\s+", " ", text).strip(" ,;.:")
+
+
 def first_words(rest):
-    """First readable words of a task line. Never blank."""
-    text = re.sub(r"\s*\((verify|spec|after|branch|step|map):[^)]*\)", " ", rest or "")
+    """First readable words of a task line. Never blank.
+
+    Code spans keep their text; only the backticks go (1.176.0), so no stray
+    " ," or " )" is left behind.
+    """
+    text = _drop_notes(rest or "")
     text = re.sub(r"\s*\(PR\s+\d+[^)]*\)", " ", text, flags=re.I)
     text = BRANCH_NAME.sub(" ", text)
-    text = re.sub(r"`+", " ", text)
-    text = re.sub(r"\s+", " ", text).strip(" ,;.:")
+    text = re.sub(r"`+", "", text)
+    text = tidy_title(text)
     return text or "work"
 
 

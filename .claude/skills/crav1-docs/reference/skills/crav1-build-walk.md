@@ -8,6 +8,8 @@
 
 Walk one work branch from build through merge, with one Next while it runs.
 
+1.176.0: the walk ending and the whole-branch ending put a plain label above the command, such as `Build T3 Record the decision on feat/orders-api:` above [`/crav1-build-walk`](crav1-build-walk.md) orders-api T3`, never a lowercase line under it. `branch_run.py ending` accepts a plain `stop` value such as `"merge"`.
+
 1.175.0: the build walk is offered to continue only by its own claim user, the name `git config user.name` gives; `Owner: self` in a progress file is never trusted alone. Someone else's built walk is a Waiting line such as `T9 to T12 are person B's, built, and wait for PR 82 to merge.`
 
 1.174.0: a specs repo that is behind or diverged ends with a label line above the command, `Merge origin into your local branch, since they have diverged (never rebase):` (or `since it is behind`), then `git pull --no-rebase` alone in its code span.

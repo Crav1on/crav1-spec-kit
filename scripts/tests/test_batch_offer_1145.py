@@ -172,7 +172,7 @@ class BatchOffer(unittest.TestCase):
                 if pointer.search(line):
                     self.assertRegex(line, ban, f"{rel}: {line}")
         ready = (ROOT / files[1]).read_text(encoding="utf-8")
-        self.assertIn("Print the script's `ending`", ready)
+        self.assertIn("Print the script's `reply`", ready)
         self.assertIn("held line", ready)
         self.assertIn("Run next:", ready)
         self.assertIn("Do not say `above`, `listed above`, or earlier output.", ready)

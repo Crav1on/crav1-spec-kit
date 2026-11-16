@@ -12,6 +12,7 @@
 - a documented kit-script command includes the script's required arguments and does not hardcode python3 alone (1.144.0)
 """
 import ast, glob, os, re, subprocess, sys
+sys.dont_write_bytecode = True
 
 # Calls that load a .py file. Bytecode is written when that file is executed.
 LOADERS = {"spec_from_file_location", "spec_from_loader", "SourceFileLoader", "SourcelessFileLoader", "exec_module"}
@@ -350,7 +351,13 @@ def stray_next_problems(kit):
 # Skills whose every ending is Run next or nothing (1.173.0). No line in
 # their SKILL.md, references, or branches starts with `Next:` or shows a
 # `Next: ...` example in a code span.
-RUN_NEXT_ONLY_SKILLS = ("crav1-finalize-commit",)
+RUN_NEXT_ONLY_SKILLS = (
+    "crav1-finalize-commit",
+    # 1.176.0: the plan steps end with Run next too.
+    "crav1-plan-from-spec",
+    "crav1-tighten-plan",
+    "crav1-review-plan",
+)
 NEXT_EXAMPLE = re.compile(r"`Next:\s*[^`]")
 
 
@@ -377,6 +384,75 @@ def run_next_only_problems(kit):
                     f"{os.path.relpath(path, kit)}:{lineno}: a `Next:` line in a skill that ends with "
                     "Run next or nothing (1.173.0)"
                 )
+    return out
+
+
+# Ending layout (1.176.0). The ending scripts are run on sample states and
+# every printed ending is checked: no line starts with `Next:`, and no
+# lowercase line sits right under a command that is alone in its code span
+# (the label goes above the command).
+LONE_COMMAND = re.compile(r"^`[^`]+`$")
+
+
+def layout_hits(text):
+    """(line number, why) for a Next: line or a lowercase line under a command."""
+    hits = []
+    lines = str(text or "").splitlines()
+    for i, line in enumerate(lines, 1):
+        stripped = line.strip()
+        if stripped.startswith("Next:"):
+            hits.append((i, "a Next: line"))
+        if LONE_COMMAND.match(stripped) and i < len(lines):
+            below = lines[i].strip()
+            if below and below[0].islower():
+                hits.append((i + 1, "a lowercase line under a command"))
+    return hits
+
+
+def _load_script(path, name):
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(name, path)
+    mod = importlib.util.module_from_spec(spec)
+    sys.modules[name] = mod
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def ending_samples(kit):
+    """(where, text) for the endings the walk scripts print on sample states."""
+    sk = os.path.join(kit, ".cursor", "skills", "crav1")
+    out = []
+    we = _load_script(os.path.join(sk, "crav1-tasks-ready-to-build", "scripts", "walk_ending.py"), "kit_lint_walk_ending")
+    out.append(("walk_ending.run_entry", we.run_entry(["T3 Record the decision"], "feat/orders-api", slug="orders-api")))
+    out.append(("walk_ending.branch_entry", we.branch_entry(["T3 Record the decision", "T5 Store the card"], "feat/orders-api", slug="orders-api")))
+    for counts, first in (({}, False), ({"needs_verify": 1}, False), ({"blocked": 2}, True)):
+        out.append(("walk_ending.not_ready_next", we.not_ready_next("orders-api", counts, first) or ""))
+    out.append(("walk_ending.catch_up_block", we.catch_up_block("orders-api", ["T4"], [], 2, uncommitted=["plan.md"])))
+    bw = _load_script(os.path.join(sk, "crav1-build-walk", "scripts", "build_walk.py"), "kit_lint_build_walk")
+    task = [{"id": 3, "title": "Record the decision"}]
+    for phase in ("build", "verify", "commit", "open-pr", "next-task", "done-all"):
+        state = {"slug": "orders-api", "phase": phase, "branch": "feat/orders-api", "tasks": task, "spec_count": 2,
+                 "ready_branches": [], "next_tasks": task, "next_branch": "feat/orders-api"}
+        out.append((f"build_walk.next_for {phase}", bw.next_for(state)["ending"]))
+    br = _load_script(os.path.join(sk, "crav1-build-walk", "scripts", "branch_run.py"), "kit_lint_branch_run")
+    for stop, pr in (("merge", None), ("merge", 82), ({"kind": "question", "line": "T10 waits on an answer"}, 82)):
+        state = {"slug": "orders-api", "branch": "feat/orders-cicd", "pr": pr, "stop": stop, "base": "develop"}
+        out.append(("branch_run.ending", br.ending(state)["ending"]))
+    pc = _load_script(os.path.join(sk, "crav1-plan-from-spec", "scripts", "plan_check.py"), "kit_lint_plan_check")
+    for items, named in (([{"id": "P1", "issue": "x", "tag": "spec", "status": "open"}], True), ([], True), ([], False)):
+        out.append(("plan_check.empty_queue_next", pc.empty_queue_next(items, named, False, "orders-api")))
+    return out
+
+
+def ending_layout_problems(kit):
+    out = []
+    try:
+        samples = ending_samples(kit)
+    except Exception as exc:  # noqa: BLE001 - report, do not crash the lint
+        return [f"ending layout: could not run the ending scripts ({exc})"]
+    for where, text in samples:
+        for lineno, why in layout_hits(text):
+            out.append(f"{where}: line {lineno} is {why}; put the label above the command (1.176.0)")
     return out
 
 
@@ -581,6 +657,7 @@ def main(argv):
     errs.extend(dead_card_problems(kit))
     errs.extend(stray_next_problems(kit))
     errs.extend(run_next_only_problems(kit))
+    errs.extend(ending_layout_problems(kit))
     errs.extend(card_wording_problems(kit))
     errs.extend(invocation_problems(kit))
     for e in errs: print("FAIL  " + e)

@@ -225,7 +225,12 @@ def _readable(text):
     text = MARKER.sub(" ", text or "")
     text = HOST_MARK.sub(" ", text)
     text = NAMED_BRANCH.sub(" ", text)
-    text = re.sub(r"`+", " ", text)
+    # 1.176.0: keep the code text and drop the stray space before , ; : . )
+    text = re.sub(r"`+", "", text)
+    text = re.sub(r"\s+", " ", text)
+    text = re.sub(r"\s+([,;:.)])", r"\1", text)
+    text = re.sub(r"\(\s+", "(", text)
+    text = re.sub(r"\(\)", "", text)
     text = re.sub(r"\s+", " ", text).strip(" ,;.:")
     return text
 
@@ -2337,7 +2342,8 @@ def held_phrase(row):
     # quotes another one keeps its inner quotes.
     match = re.search(r'open question "(.*)"(?=\s+\(|\s+blocks the whole slice|\s*$)', reason)
     if match:
-        question = short_question(match.group(1), quote=row.get("quote"))
+        # Held lines quote the whole question, never cut with "..." (1.176.0).
+        question = short_question(match.group(1), limit=100000, quote=row.get("quote"))
         note = ""
         if "blocks the whole slice (recorded)" in reason.lower():
             note = " Holds the whole slice."

@@ -576,16 +576,20 @@ def ending(state: dict) -> dict:
     branch = state["branch"]
     prefix = f"/crav1-build-walk {slug}" if slug else "/crav1-build-walk"
     stop = state.get("stop") or {"kind": "merge"}
+    if isinstance(stop, str):
+        # A plain "merge" or "question" is the stop kind (1.176.0).
+        stop = {"kind": stop.strip() or "merge"}
     kind = stop.get("kind") or "merge"
     pr = state.get("pr")
     runs = []
     if kind == "merge":
         if not pr or state.get("pr_failed"):
-            runs.append(f"`/crav1-open-pr`\nopen the pull request for {branch}")
+            runs.append(f"Open the pull request for {branch}:\n`/crav1-open-pr`")
         else:
-            runs.append(f"`{prefix} {branch}`\nmerge PR {pr} into {state.get('base') or 'develop'}, after your yes")
+            runs.append(f"Merge PR {pr} into {state.get('base') or 'develop'}, after your yes:\n`{prefix} {branch}`")
     else:
-        runs.append(f"`{prefix} {branch}`\ncontinue {branch} once this is settled: {stop.get('line') or kind}")
+        settled = str(stop.get('line') or kind).rstrip('.')
+        runs.append(f"Continue {branch} once this is settled ({settled}):\n`{prefix} {branch}`")
     em = ending_mod()
     for other in state.get("ready_branches") or []:
         if not isinstance(other, dict):

@@ -2,6 +2,25 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.176.0 (in progress)
+
+Fixes found on two more real walks. A step recorded again after a spec edit stops reading reopened, the plan steps and the build walk end with the label above the command and no `Next:` line, the ready check offers commit before push, asked questions are not offered again, and task titles keep their code text. A minor release because the walk, the ready check and the plan steps read and end differently.
+
+- **A re-recorded step clears its reopen.** Each walk step now compares the spec against its own newest section stamps. Before, every step compared against the stamps of the latest step in order, often the ready check from the day before, so after an outside spec edit `/crav1-tighten-spec` stayed reopened even after it was done and recorded again, resume kept sending you back to it, and the ready check blocked every task on it. Recording the step again now clears it, the later steps still reopen until they are recorded, and the reopen sentence names only the sections that changed since that step was recorded.
+- **Clear really clears.** `walk_progress.py clear --step <id> --yes` now fails with `still-reopened` instead of reporting success when the step still reads reopened after the refresh. With the fix above, a clear after an outside edit leaves the step at keep.
+- **No send-back for a settled spec finding.** The tighten-plan empty queue sent you to `/crav1-tighten-spec` for a spec finding that was already patched. Only an open, skipped or sent spec finding does now.
+- **Linter named when it is.** The plan recap said build is not named when `## Linter` had a partial line such as `No linter or checker in this repo for the shell scripts` beside a line that names a tool, or a recorded choice to go on without one. Those count as named now.
+- **Plan steps end with Run next.** The plan-from-spec recap, the tighten-plan empty queue and review-plan put a plain label on its own line above the command, for example `Review the plan, which is written and not reviewed yet:` above `/crav1-review-plan <slug>`. No `Next:` line.
+- **Asked questions are not offered again.** A question whose text or marks say `Raised with <person>`, `Waiting for <person>`, `Sent to <person>` or `Asked <person>` counts as asked, so the ending no longer offers `Ask the open questions, which haven't been asked yet:` for it. `Waiting for the export to finish` is not a person and does not count.
+- **Commit before push.** When the slice folder has uncommitted files, the Catch up first block says `Commit the walk's changes, <n> files:` above `/crav1-finalize-commit`, then `Then push the specs repo:` above `git push`, on every result. It used to offer only the push.
+- **The same wait is said once.** A task you claimed that waits on a pull request is in the Held list and the Waiting line, and no longer also in a `T5 is yours and waits for PR 71's merge.` sentence.
+- **The reply keeps its closing lines.** The ready-check reference now says to print `reply`, which is `ending` plus `Source:`, `Build map:` and `Zoom the map in your browser:`. Printing `ending` alone dropped them on a rerun.
+- **Whole questions in the Held list.** A held task quotes its whole open question, never cut with `...`.
+- **Task titles keep their code text.** A task name with code spans, such as ``Separate keys on PROD `orders-api`, as T18``, no longer reads `PROD orders-api , as T18`. Notes such as `(verify: ...)` with nested parentheses are removed whole, so no stray ` )` is left.
+- **Build-walk endings.** The build walk, the whole-branch run and the ready check's branch entries put the label above the command, for example `Build T3 Record the decision on feat/orders-api:` above `/crav1-build-walk orders-api T3`, and never put a lowercase line such as `branch feat/orders-api, T3 ...` under it. The whole-branch ending also accepts a plain `stop` value such as `"merge"`. A ready check with no branch entries says `Nothing needed now.` or a Run next entry, never a `Next:` line.
+- **kit-lint.** It now runs the ending scripts on sample states and fails on a `Next:` line or a lowercase line under a command, and it checks the plan skills' files for `Next:` lines.
+- Tests: `scripts/tests/test_review_batch_1176.py`; four older tests now expect the new layout and the settled-finding rule.
+
 ## 1.175.0 (2026-11-16)
 
 Fixes found on a ready check run after a colleague's build walk: Run next no longer offers to continue someone else's walk, built tasks under someone else's claim read built instead of in progress, a reopened step says why, and the Catch up first push entry is said once. A minor release because the ready check, the build map and the catch-up block read differently.

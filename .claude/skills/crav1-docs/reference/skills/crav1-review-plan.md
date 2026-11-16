@@ -8,6 +8,8 @@
 
 Start the crav1-plan-reviewer-agent subagent on plan.md and tasks.md against spec.md.
 
+1.176.0: the review ends with Run next, `Walk the plan findings, which aren't walked yet:` above [`/crav1-tighten-plan`](crav1-tighten-plan.md) <slug>`, no `Next:` line.
+
 Critique `plan.md` / `tasks.md` against the spec; numbered `P#`s.
 
 ## Runs when

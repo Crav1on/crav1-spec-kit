@@ -589,6 +589,13 @@ def _invocation(command: str, tasks: list, slug: str | None, branch: str | None 
     return command
 
 
+def _join_names(labels: list) -> str:
+    items = [str(label) for label in labels if str(label).strip()]
+    if len(items) <= 1:
+        return "".join(items)
+    return ", ".join(items[:-1]) + " and " + items[-1]
+
+
 def _entry(command: str, because: str, tasks: list, branch: str, slug: str | None) -> dict:
     labels = [_task_label(task) for task in tasks] or []
     invoked = _invocation(command, tasks, slug, branch)
@@ -598,8 +605,13 @@ def _entry(command: str, because: str, tasks: list, branch: str, slug: str | Non
     elif labels and branch:
         run = map_mod().run_entry(labels, branch, slug=slug if command == "/crav1-build-walk" else None)
         if command != "/crav1-build-walk":
-            detail = run.split("\n", 1)[1]
-            run = f"`{invoked}`\n{detail}"
+            # Label above the command, never a lowercase line under it (1.176.0).
+            names = _join_names(labels)
+            if command == "/crav1-verify-build-against-spec":
+                label = f"Verify the built tasks, since no work branch remains after {names}:"
+            else:
+                label = f"Continue {names} on {branch}:"
+            run = f"{label}\n`{invoked}`"
     elif labels:
         run = f"`{invoked}`"
     else:

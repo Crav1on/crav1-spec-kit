@@ -380,9 +380,11 @@ class RunNext(unittest.TestCase):
         self.assertNotIn("Next:", ending.replace("Run next:", ""))  # 1.157.0
         commands = [line for line in ending.splitlines() if line.startswith("`/crav1-build-walk")]
         self.assertEqual(commands, ["`/crav1-build-walk orders-api T3`"])
-        detail = ending.splitlines()[ending.splitlines().index(commands[0]) + 1]
-        self.assertTrue(detail.startswith(f"branch {BRANCH}, T3 "))
-        self.assertIn("Apply the CI build policy", detail)
+        # 1.176.0: the label sits above the command, nothing lowercase under it.
+        label = ending.splitlines()[ending.splitlines().index(commands[0]) - 1]
+        self.assertTrue(label.startswith("Build T3 "))
+        self.assertTrue(label.endswith(f" on {BRANCH}:"))
+        self.assertIn("Apply the CI build policy", label)
         self.assertNotIn("because", commands[0])
         alone = bw.next_for(state(phase="verify", slug="orders-api", spec_count=1))
         self.assertIn("`/crav1-build-walk T3`", alone["ending"])

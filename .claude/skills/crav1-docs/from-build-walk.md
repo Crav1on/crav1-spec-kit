@@ -76,8 +76,8 @@ The walk fetches the specs repo before it reads. If that copy is behind origin, 
 ```text
 Run next:
 
+Build T5 Note the policy on feat/orders-note:
 `/crav1-build-walk T5`
-branch feat/orders-note, T5 Note the policy
 ```
 
 When no work branch remains:

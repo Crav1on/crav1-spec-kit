@@ -961,15 +961,20 @@ def _body_hash(text: str) -> str:
     return version_text(normalize_text("spec", body))
 
 
-def section_effect(root: Path, steps: dict) -> dict:
+def section_effect(root: Path, steps: dict, own: dict | None = None) -> dict:
     """What a spec edit invalidates, from the recorded section stamps.
 
     Inactive when no recorded step has `Section stamps` (a walk recorded
     before 1.148.0). Those steps keep the 1.137 whole-body rule.
+    With `own`, the baseline is that one step's own stamps (1.176.0), so a
+    step recorded again after a spec edit compares against its fresh stamps,
+    not against a later step's older ones.
     """
     baseline = None
+    if own is not None and own.get("section_stamps") and own.get("section_stamps") != "none":
+        baseline = own
     # Extras keep the version they saw. The baseline is the latest locked step.
-    for step in list(ORDER) + list(EXTRAS):
+    for step in ([] if baseline is not None else list(ORDER) + list(EXTRAS)):
         if step in EXTRAS and baseline is not None:
             break
         body = steps.get(step) or {}
@@ -1743,7 +1748,10 @@ def hash_drift(root: Path, step: str, body: dict, steps: dict | None = None) -> 
         ):
             changed.append("playbook")
         return changed
-    effect = section_effect(root, steps or {}) if body.get("section_stamps") else None
+    # 1.176.0: each step compares against its own newest stamps. A step that
+    # was recorded again after a spec edit is no longer reopened by a later
+    # step's older stamps.
+    effect = section_effect(root, steps or {}, own=body) if body.get("section_stamps") else None
     for token in COVERS[step]:
         if token == "spec" and effect and effect["active"]:
             if step in effect["reopen_steps"]:
@@ -1985,8 +1993,9 @@ def resume_payload(root: Path, no_playbook: bool) -> dict:
             if drift:
                 status = "reopen"
                 impact = " ".join(IMPACT[token] for token in drift)
-                if effect["reopen_line"] and step in effect["reopen_steps"]:
-                    impact = effect["reopen_line"]
+                own_effect = section_effect(root, data["steps"], own=body) if body.get("section_stamps") else effect
+                if own_effect["reopen_line"] and step in own_effect["reopen_steps"]:
+                    impact = own_effect["reopen_line"]
                 if step == "tasks-ready-to-build":
                     impact = impact + " " + RESTAMP
                 row = {
@@ -2501,6 +2510,14 @@ def clear(args: argparse.Namespace) -> None:
     if not drift:
         fail("not-reopened", f"{args.step} is not reopened")
     refresh_versions(root, args.step, body)
+    still = affected_drift(root, args.step, body, data["steps"])
+    if still:
+        # 1.176.0: never report a clear that did not clear.
+        fail(
+            "still-reopened",
+            f"{args.step} still reads reopened after the refresh ({', '.join(still)}); "
+            f"run {STEP_COMMAND.get(args.step, args.step)} again instead",
+        )
     write_progress(root, data)
     emit({
         "ok": True,
@@ -2636,12 +2653,11 @@ def reopened_hits(root: Path) -> list[dict]:
         drift = affected_drift(root, step, body, data["steps"])
         if drift:
             hit = reopen_hit(step, drift)
-            if titles is None:
-                try:
-                    effect = section_effect(root, data["steps"])
-                    titles = list(effect.get("titles") or []) if effect.get("active") else []
-                except Exception:  # noqa: BLE001 - the reason is words only
-                    titles = []
+            try:
+                effect = section_effect(root, data["steps"], own=body)
+                titles = list(effect.get("titles") or []) if effect.get("active") else []
+            except Exception:  # noqa: BLE001 - the reason is words only
+                titles = []
             hit["reason"] = reopen_reason(step, drift, titles)
             hits.append(hit)
     return hits
@@ -2785,7 +2801,7 @@ def fix_loop_cmd(args: argparse.Namespace) -> None:
     _MAP_CACHE.clear()
     if code == 0 and out.get("wrote"):
         command = " ".join(bit for bit in ("/crav1-tasks-ready-to-build", command_slug(root)) if bit)
-        out["reply"] = out["line"] + "\n\nRun next:\n\n" + f"`{command}`" + "\nreruns the ready check with the fix in place"
+        out["reply"] = out["line"] + "\n\nRun next:\n\n" + "Rerun the ready check with the fix in place:\n" + f"`{command}`"
     else:
         out["reply"] = out.get("line") or "\n".join(bit for bit in (out.get("change"), out.get("message")) if bit)
     if getattr(args, "text", False):
@@ -3743,10 +3759,11 @@ def own_claim_line(rows: list[dict]) -> str | None:
         if not task or row.get("bucket") == "done":
             continue
         info = row.get("merge_wait")
-        if info and (row.get("own_claim") or info.get("owner") == "self" or info.get("owner") == "other"):
-            pr = info.get("pr")
-            parts.append(f"{task} is yours and waits for {'PR ' + str(pr) + chr(39) + 's' if pr else 'its pull request'} merge.")
-        elif row.get("own_claim"):
+        if info:
+            # The Waiting line already names the pull request, so the wait
+            # is said once (1.176.0).
+            continue
+        if row.get("own_claim"):
             parts.append(f"{task} is yours; the walk resumes it.")
     return " ".join(parts) or None
 
@@ -4283,7 +4300,30 @@ def compose_ending(
     )
 
 
-def catch_up_for(slug: str, gap: dict | None, sync: dict | None) -> str:
+def slice_uncommitted(root: Path | None) -> list[str]:
+    """Files in the slice folder that git sees as changed or new (1.176.0)."""
+    if root is None or not Path(root).is_dir():
+        return []
+    try:
+        proc = subprocess.run(
+            ["git", "-C", str(root), "status", "--porcelain", "--", "."],
+            capture_output=True, text=True, check=False, timeout=20,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return []
+    if proc.returncode != 0:
+        return []
+    out = []
+    for line in proc.stdout.splitlines():
+        name = line[3:].strip().strip('"')
+        if " -> " in name:
+            name = name.split(" -> ", 1)[1]
+        if name:
+            out.append(Path(name).name)
+    return out
+
+
+def catch_up_for(slug: str, gap: dict | None, sync: dict | None, root: Path | None = None) -> str:
     """The `**Catch up first**` block for this check, or "" (1.167.0).
 
     verify.md behind (gap tasks), a verify.md row for a T# not in tasks.md
@@ -4301,7 +4341,8 @@ def catch_up_for(slug: str, gap: dict | None, sync: dict | None) -> str:
         except (TypeError, ValueError):
             ahead = 1
     failed = list(gap.get("failed") or [])
-    return ending_mod().catch_up_block(slug or None, behind, orphans, ahead, failed=failed)
+    files = slice_uncommitted(root)
+    return ending_mod().catch_up_block(slug or None, behind, orphans, ahead, failed=failed, uncommitted=files)
 
 
 def next_for(result: str, can_start: list, waiting_next: str | None) -> str | None:
@@ -4539,7 +4580,7 @@ def readiness(args: argparse.Namespace) -> None:
     }
     # What the user can fix now leads Run next as one block (1.167.0); the
     # Waiting lines keep only what waits on people or merges.
-    catch_up = catch_up_for(slug, gap, sync)
+    catch_up = catch_up_for(slug, gap, sync, root)
     waiting_bits = list(loop_lines)
     waiting_bits.extend(merge_wait_lines(rows))
     if resolve_waiting:

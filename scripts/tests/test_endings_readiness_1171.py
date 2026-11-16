@@ -206,7 +206,7 @@ class ReadinessReadsProgress(unittest.TestCase):
     def test_own_claim_line_is_plain(self):
         rows = [{"task": "T5", "own_claim": True, "merge_wait": {"pr": 71, "owner": "self"}, "bucket": "waiting"},
                 {"task": "T7", "own_claim": True, "bucket": "ready"}]
-        self.assertEqual(wp.own_claim_line(rows), "T5 is yours and waits for PR 71's merge. T7 is yours; the walk resumes it.")
+        self.assertEqual(wp.own_claim_line(rows), "T7 is yours; the walk resumes it.")
         self.assertIn("`T5 is yours; the walk resumes it.`", read("crav1-tighten-and-plan-ready-to-build/references/readiness.md"))
 
 
@@ -276,7 +276,7 @@ class NoNextLines(unittest.TestCase):
 
     def test_ready_check_asks_record_before_ending(self):
         text = read("crav1-tighten-and-plan-ready-to-build/references/readiness.md")
-        self.assertIn("Ask the record card first, then print `ending`", text)
+        self.assertIn("Ask the record card first, then print `reply`", text)
 
     def test_fix_finalize_open_pr_have_no_next_line(self):
         for rel in ("crav1-fix-build-gaps/branches/verify-gaps/BRANCH.md",
