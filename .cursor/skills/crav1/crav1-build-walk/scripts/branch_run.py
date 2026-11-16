@@ -649,6 +649,56 @@ def _label(task) -> str:
     return f"T{int(match.group(1))} {match.group(2)}".strip() if match else text
 
 
+_PR_IN_TEXT = re.compile(r"\b(?:PR|pull request)\s+#?(\d+)", re.I)
+
+
+def state_from_progress(root: Path, branch: str, notes: list | None = None) -> dict:
+    """The ending state read from build-progress/<branch>.md itself (1.176.0).
+
+    The pull request, the base, what was built (with full task names from
+    tasks.md), what is left, and the other ready branches. The agent no longer
+    hand-builds a JSON file for the ending.
+    """
+    root = Path(root)
+    path = progress_path(root, branch)
+    text = _read(path)
+    run = parse_run(text) or {"built": [], "next": None}
+    head = text.split("\n- Step:", 1)[0]
+    base = re.search(r"^Cut from:\s*(\S+)", head, re.M)
+    prs = _PR_IN_TEXT.findall(text)
+    plan = branch_plan(root, branch)
+    labels = {row["id"]: row["label"] for row in plan.get("tasks") or []}
+    built = []
+    for row in run.get("built") or []:
+        label = labels.get(row["task"], row["task"])
+        title = label[len(row["task"]):].strip() if label.startswith(row["task"]) else ""
+        built.append({**row, "title": title})
+    built_ids = {row["task"] for row in built}
+    left_open = [tid_ for tid_ in plan.get("open") or [] if tid_ not in built_ids]
+    stop = {"kind": "merge"}
+    first = plan.get("first_stop")
+    if left_open and first:
+        stop = {"kind": first.get("kind") or "question", "line": first.get("line")}
+    try:
+        slug = walk_mod().command_slug(root)
+    except Exception:  # noqa: BLE001 - the slug is words only
+        slug = root.name
+    try:
+        ready = walk_mod().ready_branches(root)
+    except Exception:  # noqa: BLE001 - a bad ready check must not hide the ending
+        ready = []
+    return {
+        "slug": slug,
+        "branch": branch,
+        "pr": int(prs[-1]) if prs else None,
+        "base": base.group(1) if base else "develop",
+        "stop": stop,
+        "built": built,
+        "ready_branches": ready,
+        "notes": list(notes or []),
+    }
+
+
 def ending(state: dict) -> dict:
     """Run next, then what was built, then what is left. One string."""
     slug = state.get("slug")
@@ -687,7 +737,17 @@ def ending(state: dict) -> dict:
     rows = []
     if built:
         header = f"Built on {branch}" + (f" (PR {pr} is open and up to date):" if pr and not state.get("pr_failed") else ":")
-        rows = [f"- {row['task']}{(' ' + row['title']) if row.get('title') else ''}: commit {row['commit'][:7]}, tests {row['tests']}" for row in built]
+        rows = []
+        for row in built:
+            if not isinstance(row, dict):
+                row = {"task": str(row)}
+            bits = []
+            if row.get("commit"):
+                bits.append(f"commit {str(row['commit'])[:7]}")
+            if row.get("tests"):
+                bits.append(f"tests {row['tests']}")
+            tail = (": " + ", ".join(bits)) if bits else ""
+            rows.append(f"- {row.get('task')}{(' ' + row['title']) if row.get('title') else ''}{tail}")
     left = []
     if kind != "merge" and stop.get("line"):
         left.append(f"- Stopped: {stop['line']}")
@@ -698,6 +758,10 @@ def ending(state: dict) -> dict:
     for text in state.get("verify_behind") or []:
         left.append(f"- verify.md is behind: {text}")
     text = em.compose(run=runs, built=rows, built_header=header, left=left, catch_up=state.get("catch_up") or None)
+    notes = [str(note).strip() for note in state.get("notes") or [] if str(note).strip()]
+    if notes:
+        # A sanctioned place for the agent's notes, after what was built (1.176.0).
+        text += "\n\nBefore the merge:\n" + "\n".join(f"- {note}" for note in notes)
     return {"ending": text, "kind": kind, "merges": False}
 
 
@@ -741,7 +805,10 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--code-repo", default=None)
     p.add_argument("--push", action="store_true")
     p = sub.add_parser("ending")
-    p.add_argument("--json", required=True)
+    p.add_argument("--json", default=None)
+    p.add_argument("--root", default=None)
+    p.add_argument("--branch", default=None)
+    p.add_argument("--note", action="append", default=[])
     p = sub.add_parser("status")
     p.add_argument("--root", required=True)
     p.add_argument("--branch", required=True)
@@ -771,8 +838,18 @@ def main(argv: list[str] | None = None) -> int:
             line = set_status(Path(args.root), args.branch, args.state)
             return _emit({"ok": bool(line), "line": line or "walk-progress.md could not be updated"}, 0 if line else 2)
         if args.cmd == "ending":
-            return _emit({"ok": True, **ending(_json(args.json))})
-    except (ValueError, KeyError, OSError, json.JSONDecodeError) as exc:
+            if args.root and args.branch:
+                state = state_from_progress(Path(args.root), args.branch, args.note)
+                if args.json:
+                    state.update({k: v for k, v in _json(args.json).items() if v is not None})
+            elif args.json:
+                state = _json(args.json)
+                if args.note:
+                    state["notes"] = list(state.get("notes") or []) + args.note
+            else:
+                return _emit({"ok": False, "code": "input", "line": "pass --root and --branch"}, 2)
+            return _emit({"ok": True, **ending(state)})
+    except (ValueError, KeyError, OSError, json.JSONDecodeError, AttributeError, TypeError) as exc:
         return _emit({"ok": False, "code": "input", "line": f"input is not usable: {exc}"}, 2)
     return 2
 

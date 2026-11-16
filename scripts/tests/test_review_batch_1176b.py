@@ -180,3 +180,35 @@ class VerifiedOnBranch(unittest.TestCase):
             text = ending(root)
             self.assertIn("T5 Orders README — verified on feat/orders-readme, waits for PR 71 to merge", text)
             self.assertNotIn("Not implemented", text)
+
+
+BRANCH_RUN = SK / "crav1-build-walk/scripts/branch_run.py"
+
+
+def run_cli(*args: str) -> dict:
+    proc = subprocess.run([sys.executable, str(BRANCH_RUN), *args], capture_output=True, text=True, check=False)
+    return json.loads(proc.stdout)
+
+
+class EndingFromProgress(unittest.TestCase):
+    def test_ending_reads_build_progress(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = base.make_slice(tmp, user="person B")
+            out = run_cli("ending", "--root", str(root), "--branch", "feat/orders-cicd",
+                          "--note", "PR 82 needs one approver.")
+            self.assertTrue(out["ok"], out)
+            text = out["ending"]
+            self.assertTrue(text.startswith("Run next:"))
+            self.assertIn("Merge PR 82 into develop, after your yes:\n`/crav1-build-walk", text)
+            self.assertIn("- T9 Orders CI/CD: infra Bicep for dev, test and prod: commit 1f2e3d4, tests green", text)
+            self.assertTrue(text.rstrip().endswith("Before the merge:\n- PR 82 needs one approver."))
+            self.assertNotIn("Next:", text.replace("Run next:", ""))
+
+    def test_plain_stop_and_partial_rows_do_not_crash(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            state = Path(tmp) / "ending.json"
+            state.write_text(json.dumps({"branch": "feat/orders-cicd", "stop": "merge", "pr": 82,
+                                         "built": [{"task": "T9"}, "T10"]}), encoding="utf-8")
+            out = run_cli("ending", "--json", str(state))
+            self.assertTrue(out["ok"], out)
+            self.assertIn("- T9\n- T10", out["ending"])
