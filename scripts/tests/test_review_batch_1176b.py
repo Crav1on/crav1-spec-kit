@@ -217,15 +217,14 @@ class EndingFromProgress(unittest.TestCase):
 PR_COMMON = SK / "crav1-open-pr/scripts/pr_common.py"
 
 
-def long_body() -> str:
-    link = "https://dev.azure.com/contoso/orders/_git/orders-api?path=/a.yml&version=GBfeat&line=3&lineEnd=9&lineStartColumn=1&lineEndColumn=40"
-    bullets = "\n".join(
-        f"- T{n} adds the stage for step {n}. It also explains why the stage runs after the build and before the deploy. [a.yml]({link}) · [b.yml]({link})"
-        for n in range(1, 25)
+def long_body(n: int = 40) -> str:
+    tasks = "\n".join(
+        f"- T{k} Orders CI/CD: deploy stage {k} with approvals. It deploys stage {k} after the stage before it passes, "
+        f"waits for the approver, and runs the smoke checks against the environment before the next stage starts."
+        for k in range(1, n + 1)
     )
-    return ("Adds the orders-api pipeline.\n\nAB#2\n\n## Changes\n\n" + bullets +
-            "\n\n## Testing\n\n" + "- Pipeline 6 run 265 is green on the branch, with every stage.\n" * 20 +
-            "\n## Notes\n\n" + "A long background note about the release plan and the approvals.\n" * 20)
+    return ("Adds the orders-api deploy pipeline. Every stage deploys after the one before it passes.\n\n"
+            "### Tasks\n" + tasks + "\n\n### Verified\nPipeline run 265 is green on feat/orders-cicd, 2026-11-14.\n\nAB#2\n")
 
 
 class AdoBody(unittest.TestCase):
@@ -233,30 +232,35 @@ class AdoBody(unittest.TestCase):
         self.pc = load(PR_COMMON, "pr_common_1176b")
 
     def test_short_body_is_untouched(self):
-        out = self.pc.fit_body("Adds the pipeline.\n\nAB#2\n")
+        out = self.pc.fit_body("Adds the pipeline.\n\n### Tasks\n- T1 Add the pipeline. It builds.\n\nAB#2\n")
         self.assertEqual(out["trimmed"], [])
         self.assertTrue(out["fits"])
 
-    def test_long_body_fits_and_links_the_notes(self):
+    def test_long_body_shortens_task_lines_and_adds_no_link(self):
         text = long_body()
         self.assertGreater(len(text), 4000)
-        out = self.pc.fit_body(text, notes_link="https://dev.azure.com/contoso/orders/_git/specs?path=/docs/specs/orders")
+        out = self.pc.fit_body(text)
         self.assertTrue(out["fits"], out["length"])
-        self.assertLessEqual(len(out["body"]), 4000)
-        self.assertNotIn("lineStartColumn", out["body"])
-        self.assertIn("AB#2", out["body"])
-        self.assertIn("Adds the orders-api pipeline.", out["body"])
-        self.assertEqual(out["trimmed"][0], "columns")
-        if "sections" in out["trimmed"] or "cut" in out["trimmed"]:
-            self.assertIn("Full notes: https://dev.azure.com/contoso/orders/_git/specs", out["body"])
+        body = out["body"]
+        self.assertEqual(out["trimmed"], ["task-names"])
+        self.assertIn("- T7 Orders CI/CD: deploy stage 7 with approvals.\n", body)
+        self.assertIn("Task lines were shortened to fit.\n\n### Verified", body)
+        self.assertNotIn("http", body)
+        self.assertNotIn("Full notes", body)
+        self.assertIn("Pipeline run 265 is green", body)
+        self.assertTrue(body.rstrip().endswith("AB#2"))
 
-    def test_later_sections_give_way_to_the_notes_link(self):
-        out = self.pc.fit_body(long_body(), limit=1500, notes_link="https://example.invalid/notes")
-        self.assertTrue(out["fits"], out)
-        self.assertIn("sections", out["trimmed"])
-        self.assertTrue(out["body"].rstrip().endswith("Full notes: https://example.invalid/notes") or "AB#2" in out["body"])
-        self.assertIn("Full notes: https://example.invalid/notes", out["body"])
-        self.assertNotIn("## Notes", out["body"])
+    def test_very_long_task_names_are_cut_at_a_word(self):
+        out = self.pc.fit_body(long_body(90), limit=4000)
+        self.assertTrue(out["fits"], out["length"])
+        self.assertIn("task-cut", out["trimmed"])
+        self.assertNotIn("...", out["body"])
+        self.assertIn("AB#2", out["body"])
+
+    def test_no_notes_link_option(self):
+        src = PR_COMMON.read_text(encoding="utf-8")
+        self.assertNotIn("--notes-link", src)
+        self.assertNotIn("Full notes", src)
 
     def test_cli_prints_the_body_and_leaves_the_file(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -267,6 +271,19 @@ class AdoBody(unittest.TestCase):
             self.assertEqual(proc.returncode, 0, proc.stderr)
             self.assertLessEqual(len(proc.stdout), 4000)
             self.assertEqual(body.read_text(encoding="utf-8"), long_body())
+
+
+class OpenPrFormatB(unittest.TestCase):
+    def test_draft_is_the_short_fixed_shape_with_no_links(self):
+        text = (SK / "crav1-open-pr/references/draft.md").read_text(encoding="utf-8")
+        self.assertIn("format B", text)
+        self.assertIn("### Tasks", text)
+        self.assertIn("No links at all", text)
+        for gone in ("### Changes", "### Merge order", "head-commit link", "Full notes:"):
+            self.assertNotIn(gone, text)
+        ado = (SK / "crav1-open-pr/references/azure-devops.md").read_text(encoding="utf-8")
+        self.assertNotIn("--notes-link", ado)
+        self.assertIn("Task lines were shortened to fit.", ado)
 
 
 class HelpSharedEnding(unittest.TestCase):
@@ -317,3 +334,93 @@ class SmallDocs(unittest.TestCase):
         self.assertIn("Do not open finalize-commit for that commit", text)
         self.assertIn("ending --root <spec-folder> --branch <branch>", text)
         self.assertIn("--code-repo <code repo>", text)
+
+
+LONG_TASKS = """# Tasks
+
+- [ ] T2: `azuredevops/cd-orders.yml` , from PR 74's `cd-orders-prod.yml` , triggers on the develop branch and deploys every stage with approvals between them and a manual gate before production (branch: feat/orders-cicd) (after: )
+- [ ] T3: Add the test stage (branch: feat/orders-cicd) (after: T2)
+"""
+
+VERIFY_TITLES = """# Verify
+
+| T# | Title | Status | Verify |
+| --- | --- | --- | --- |
+| T2 | Orders CI/CD: deploy pipeline | Not implemented | none |
+| T3 | Orders CI/CD: test stage | Not implemented | none |
+"""
+
+
+class PlanLabels(unittest.TestCase):
+    def test_plan_label_is_the_verify_short_title(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = brt.write_slice(Path(tmp), tasks=LONG_TASKS)
+            (root / "verify.md").write_text(VERIFY_TITLES, encoding="utf-8")
+            plan = br.branch_plan(root, "feat/orders-cicd")
+            labels = {row["id"]: row["label"] for row in plan["tasks"]}
+            self.assertEqual(labels["T2"], "T2 Orders CI/CD: deploy pipeline")
+            full = {row["id"]: row["full"] for row in plan["tasks"]}
+            self.assertIn("azuredevops/cd-orders.yml,", full["T2"])
+            self.assertNotIn(" ,", full["T2"])
+
+    def test_without_verify_the_label_is_never_cut_with_dots(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = brt.write_slice(Path(tmp), tasks=LONG_TASKS)
+            plan = br.branch_plan(root, "feat/orders-cicd")
+            label = plan["tasks"][0]["label"]
+            self.assertFalse(label.endswith("..."), label)
+            self.assertNotIn(" ,", label)
+
+
+class BuildTasksHintInHelp(unittest.TestCase):
+    def test_ready_check_ending_leaves_the_hint_to_help(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = base.make_slice(tmp, user="person B")
+            text = ending(root)
+            self.assertNotIn("/crav1-build-tasks builds one task without the walk.", text)
+        status = (SK / "crav1-help/references/status.md").read_text(encoding="utf-8")
+        self.assertIn("`/crav1-build-tasks <T#>` builds one task without the walk", status)
+
+
+UK = load(SK / "crav1-update-kit/scripts/update_kit.py", "update_kit_1176b")
+ASSETS = ".cursor/skills/crav1/crav1-finalize-commit/branches/message-only/assets"
+
+
+class StyleRuleRewrite(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        b = Path(self.tmp.name)
+        self.root, self.old, self.new = b / "repo", b / "old", b / "new"
+        for tree, text in ((self.old, "style v1\r\n"), (self.new, "style v2 (crav1-finalize-commit/branches/message-only/references/style.md)\n")):
+            path = tree / ASSETS / "draft-commit-style.mdc"
+            path.parent.mkdir(parents=True)
+            path.write_text(text, encoding="utf-8", newline="")
+        (self.root / ".cursor/rules").mkdir(parents=True)
+        (self.root / ".claude/rules").mkdir(parents=True)
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def test_stale_and_unchanged_rules_are_rewritten_and_hand_edits_stay(self):
+        (self.root / ".cursor/rules/draft-commit-style.mdc").write_bytes(b"style v1\r\n")
+        (self.root / ".claude/rules/draft-commit-style.md").write_text(
+            "Read crav1-draft-commit-message/references/style.md\n", encoding="utf-8")
+        (self.root / ".claude/rules/draft-commit-gitlog.md").write_text("my own words\n", encoding="utf-8")
+        out = UK.style_rule_actions(self.root, self.old, self.new)
+        self.assertEqual(sorted(out["update"]), [".claude/rules/draft-commit-style.md", ".cursor/rules/draft-commit-style.mdc"])
+        self.assertEqual(out["payloads"][".cursor/rules/draft-commit-style.mdc"],
+                         b"style v2 (crav1-finalize-commit/branches/message-only/references/style.md)\r\n")
+        self.assertEqual(out["left"], [])
+
+    def test_a_hand_edited_rule_is_left_and_listed(self):
+        (self.root / ".cursor/rules/draft-commit-style.mdc").write_text("style stays\n", encoding="utf-8")
+        out = UK.style_rule_actions(self.root, self.old, self.new)
+        self.assertEqual(out["update"], [])
+        self.assertEqual(out["left"][0]["path"], ".cursor/rules/draft-commit-style.mdc")
+
+
+class TodoLayout(unittest.TestCase):
+    def test_todo_items_use_label_above_command(self):
+        text = (SK / "crav1-help/references/todo.md").read_text(encoding="utf-8")
+        self.assertNotIn("Next: <skill>", text)
+        self.assertIn("Answer the question:\n`/crav1-resolve-open-questions orders-api`", text)

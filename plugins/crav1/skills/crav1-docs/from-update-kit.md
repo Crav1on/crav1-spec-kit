@@ -51,3 +51,5 @@ Next: nothing needed now.
 Reload the window so the new skills load. When files were written and not committed, the run adds one `Uncommitted:` line. See [How a run ends](reference/run-ending.md).
 
 Reference page: [update-kit](reference/skills/crav1-update-kit.md)
+
+Since 1.176.0 `/crav1-update-kit` also fixes a saved commit-style rule that is out of date. When `.cursor/rules/draft-commit-style.mdc` (or the gitlog rule, or the `.claude/rules/` copy) is the old release's copy, or still points at `crav1-draft-commit-message/`, it is rewritten from the current asset in the same yes, so agents stop looking for a skill that is gone. A rule you changed by hand is left and named.

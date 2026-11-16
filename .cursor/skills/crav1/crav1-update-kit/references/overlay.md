@@ -32,7 +32,11 @@ CRLF and LF compare equal (1.132.0). A local file that matches the old release a
 
 ## Left alone
 
-Never write these, even if a release tree contains them: a spec folder (`walk-progress.md`, `build-progress/`, `spec.md`, `plan.md`, `tasks.md`, `verify.md`, `work-item.md`, `build-map.md`), the rest of `docs/system/`, `docs/notes/`, `docs/playbooks/`, `docs/environments/`, `docs/research/`, `docs/sources/`, a product `AGENTS.md`, `kit-maintainer.mdc`, the draft-commit persist rules, and the transfer data policy. Do not run `sync-crav1-plugin.sh` or the other maintainer generators in the consumer project. The release already contains the generated docs and the Claude Code drop-in. A later `git merge` that conflicts on `walk-progress.md` version lines is `/crav1-finalize-commit` `references/pull.md` (1.139.0), not this replace. The same settle covers a `build-progress` file whose conflict is only hash lines (1.142.0).
+Never write these, even if a release tree contains them: a spec folder (`walk-progress.md`, `build-progress/`, `spec.md`, `plan.md`, `tasks.md`, `verify.md`, `work-item.md`, `build-map.md`), the rest of `docs/system/`, `docs/notes/`, `docs/playbooks/`, `docs/environments/`, `docs/research/`, `docs/sources/`, a product `AGENTS.md`, `kit-maintainer.mdc`, the draft-commit persist rules (except the stale case below), and the transfer data policy. Do not run `sync-crav1-plugin.sh` or the other maintainer generators in the consumer project. The release already contains the generated docs and the Claude Code drop-in. A later `git merge` that conflicts on `walk-progress.md` version lines is `/crav1-finalize-commit` `references/pull.md` (1.139.0), not this replace. The same settle covers a `build-progress` file whose conflict is only hash lines (1.142.0).
+
+## Persisted commit style (1.176.0)
+
+A saved commit-style rule (`draft-commit-style` or `draft-commit-gitlog` in the repo's Cursor or Claude Code rules folder) is rewritten from the current message-only asset when it is stale: it is the old release's copy unchanged, or it names `crav1-draft-commit-message/`, a skill that no longer exists. It shows under `update` in the plan, so it is in the same yes. A rule changed by hand is left and listed in `style_rules_left`; say which one and that it still points where it did. A rule under the home folder is not touched.
 
 ## Commit
 

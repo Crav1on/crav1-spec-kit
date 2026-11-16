@@ -228,11 +228,10 @@ class EndingCommandOnce(unittest.TestCase):
         self.assertEqual(len(commands), len(set(commands)))
         self.assertEqual(ending.count("/crav1-build-walk"), len(commands))
         self.assertTrue(any(re.search(r" T43`$", line) for line in commands), commands)
-        self.assertIn("/crav1-build-tasks builds one task without the walk.", ending)
-        self.assertLess(ending.index("Run next:"), ending.index("/crav1-build-tasks builds one task"))
+        self.assertNotIn("/crav1-build-tasks builds one task without the walk.", ending)  # moved to help, 1.176.0
         self.assertNotIn("Next: /crav1-build-walk", ending)
         self.assertNotIn("/crav1-build-walk", payload["next"] or "")
-        self.assertEqual(payload["next_lines"], ["/crav1-build-tasks builds one task without the walk."])
+        self.assertEqual(payload["next_lines"], [])  # the hint moved to help, 1.176.0
         # The alternative must not repeat the command.
         self.assertNotIn("/crav1-build-walk", "\n".join(payload["next_lines"]))
 

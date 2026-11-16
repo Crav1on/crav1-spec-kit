@@ -35,4 +35,12 @@ Match `git config user.name` (or its first word), or the `todo for <name>` name,
 
 ## Each line
 
-`<n>. <slug>: <the item in plain words>. <reason with the age>. Next: <skill>`. The next skill is resolve-open-questions (1, 2, 8), show-or-ask-open-questions (3, 4), pr-status (5; the line is `<n>. PR <n> <repo>: …`), a revisit request (7), build-tasks (9), retire-spec un-park (10), and for 6 the skill the dated item needs. End with `<m> more: todo-top <N>` when cut, and the Source line.
+Each item is three lines (1.176.0): `<n>. <slug>: <the item in plain words>. <reason with the age>.`, then a plain label that says what to do, then the command alone in its code span. No `Next:` line. For example:
+
+```
+1. orders-api: Q3 on retry limits has no answer. Open 12 days.
+Answer the question:
+`/crav1-resolve-open-questions orders-api`
+```
+
+The command is resolve-open-questions (1, 2, 8), show-or-ask-open-questions (3, 4), pr-status (5; the first line is `<n>. PR <n> <repo>: …`), a revisit request (7), build-tasks (9), retire-spec un-park (10), and for 6 the skill the dated item needs. End with `<m> more: todo-top <N>` when cut, and the Source line.

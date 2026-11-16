@@ -228,6 +228,30 @@ def stop_for(task_id: str, line: str, questions: list, holds: dict) -> dict | No
     return None
 
 
+def verify_titles(root: Path) -> dict:
+    """T# -> the short title in verify.md's overview (1.176.0). Empty when there is none."""
+    text = _read(Path(root) / "verify.md")
+    if not text:
+        return {}
+    try:
+        rows = _load("crav1-verify-build-against-spec", "verify_rows.py").overview_rows(text)
+    except (OSError, RuntimeError, AttributeError):
+        return {}
+    return {task: cells[0] for task, cells in rows.items() if cells and cells[0].strip()}
+
+
+def short_label(task_id: str, task: dict, titles: dict) -> str:
+    """The plan's label: verify.md's short title, else the map's name (1.176.0).
+
+    Never the first 80 characters of the task body with an ellipsis. The full
+    name stays in `full` for the ending, which shows it uncut (1.174.0).
+    """
+    title = re.sub(r"\s+", " ", titles.get(task_id) or "").strip()
+    if title:
+        return f"{task_id} {title}"
+    return task.get("label") or task_id
+
+
 def branch_plan(root: Path, branch: str, user: str | None = None) -> dict:
     """Open tasks on the branch in task order, each with the stop that holds it."""
     root = Path(root)
@@ -252,13 +276,15 @@ def branch_plan(root: Path, branch: str, user: str | None = None) -> dict:
     questions = questions_mod().kept_open(spec_text, task_ids=ids)
     holds = approval_mod().holds(spec_text, ids) if spec_text else {}
     claims = claims_mod().parse_claims(_read(root / "claims.md"))["claims"]
+    titles = verify_titles(root)
     rows = []
     for task in sorted(found["tasks"], key=lambda t: (order.get(t["id"], 10**6), t["id"])):
         task_id = f"T{task['id']}"
         line = lines.get(task_id, "")
         row = {
             "id": task_id,
-            "label": task.get("label") or task_id,
+            "label": short_label(task_id, task, titles),
+            "full": task.get("label") or task_id,
             "done": bool(task.get("done")),
             "deps": [f"T{d}" for d in task.get("deps") or []],
             "stamp": task_stamp(line),
@@ -667,7 +693,7 @@ def state_from_progress(root: Path, branch: str, notes: list | None = None) -> d
     base = re.search(r"^Cut from:\s*(\S+)", head, re.M)
     prs = _PR_IN_TEXT.findall(text)
     plan = branch_plan(root, branch)
-    labels = {row["id"]: row["label"] for row in plan.get("tasks") or []}
+    labels = {row["id"]: row.get("full") or row["label"] for row in plan.get("tasks") or []}
     built = []
     for row in run.get("built") or []:
         label = labels.get(row["task"], row["task"])

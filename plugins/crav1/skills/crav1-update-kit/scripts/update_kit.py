@@ -767,6 +767,57 @@ def plugin_advice(info: dict, target: str | None) -> str:
     return " ".join(lines)
 
 
+# Persisted commit-style rules (1.176.0). The kit wrote them once from the
+# message-only assets; an old copy can point at a skill that no longer exists.
+STYLE_RULES = {
+    ".cursor/rules/draft-commit-style.mdc": "draft-commit-style.mdc",
+    ".cursor/rules/draft-commit-gitlog.mdc": "draft-commit-gitlog.mdc",
+    ".claude/rules/draft-commit-style.md": "draft-commit-style.mdc",
+    ".claude/rules/draft-commit-gitlog.md": "draft-commit-gitlog.mdc",
+}
+STYLE_ASSET_DIRS = (
+    ".cursor/skills/crav1/crav1-finalize-commit/branches/message-only/assets",
+    ".claude/skills/crav1-finalize-commit/branches/message-only/assets",
+    "plugins/crav1/skills/crav1-finalize-commit/branches/message-only/assets",
+    ".cursor/skills/crav1/crav1-draft-commit-message/assets",
+)
+STALE_STYLE_PATHS = ("crav1-draft-commit-message/",)
+
+
+def _style_asset(tree: Path, name: str) -> bytes | None:
+    for folder in STYLE_ASSET_DIRS:
+        path = tree / folder / name
+        if path.is_file():
+            return path.read_bytes()
+    return None
+
+
+def style_rule_actions(root: Path, old_root: Path, new_root: Path) -> dict:
+    """Rewrite a persisted style rule from the current asset when it is stale.
+
+    Stale means it is the old release's copy unchanged, or it names a path
+    that no longer exists. A rule edited by hand is left and listed.
+    """
+    out = {"update": [], "left": [], "payloads": {}}
+    for rel, name in STYLE_RULES.items():
+        path = root / rel
+        if not path.is_file():
+            continue
+        local = path.read_bytes()
+        new = _style_asset(new_root, name)
+        if new is None or _normalize_newlines(local) == _normalize_newlines(new):
+            continue
+        old = _style_asset(old_root, name)
+        text = local.decode("utf-8", errors="replace")
+        same_as_old = old is not None and _normalize_newlines(local) == _normalize_newlines(old)
+        if same_as_old or any(stale in text for stale in STALE_STYLE_PATHS):
+            out["update"].append(rel)
+            out["payloads"][rel] = _restyle(new, preferred_newline(root, rel, local))
+        else:
+            out["left"].append({"path": rel, "reason": "edited by hand, so it is left as it is"})
+    return out
+
+
 def build_actions(root: Path, old_root: Path, new_root: Path, hosts: set[str]) -> dict:
     old_files = collect_kit(old_root, hosts)
     new_files = collect_kit(new_root, hosts)
@@ -823,11 +874,16 @@ def build_actions(root: Path, old_root: Path, new_root: Path, hosts: set[str]) -
             template_payloads[path] = None
         elif action["op"] == "leave":
             templates["left"].append({"path": path, "reason": action["reason"]})
+    style = style_rule_actions(root, old_root, new_root)
+    for rel in style["update"]:
+        files["update"].append(rel)
+        payloads[rel] = style["payloads"][rel]
     return {
         "files": files,
         "templates": templates,
         "payloads": payloads,
         "template_payloads": template_payloads,
+        "style_rules_left": style["left"],
     }
 
 
@@ -843,6 +899,7 @@ def plan_view(info: dict, actions: dict, target: str | None) -> dict:
         "writes_kit_files": info.get("writes_kit_files", False),
         "files": files,
         "templates": actions["templates"],
+        "style_rules_left": actions.get("style_rules_left", []),
         "project_untouched": True,
         "advice": None,
     }

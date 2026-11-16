@@ -59,8 +59,6 @@ branch feat/orders-export, T6 export the receipt
 Held:
 - `feat/orders-currency` (wave 1): T7 choose the currency — open question "Which currency for refunds?" Waiting for the partner.
 
-/crav1-build-tasks builds one task without the walk.
-
 Source: docs/specs/<slug>/spec.md, plan.md, tasks.md, verify.md
 Build map: docs/specs/<slug>/build-map.md
 ```

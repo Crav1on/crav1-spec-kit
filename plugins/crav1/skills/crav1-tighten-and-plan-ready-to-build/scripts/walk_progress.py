@@ -4785,8 +4785,10 @@ def readiness(args: argparse.Namespace) -> None:
         if waiting_next and waiting_next.startswith("/crav1-show-or-ask-open-questions"):
             shown_run.append(_run_from_clause(waiting_next))
         alt = "/crav1-build-tasks builds one task without the walk."
-        shown_next = [alt]
-        next_lines = [alt]
+        # The build-tasks hint moved to /crav1-help (1.176.0): the printed
+        # ending no longer repeats it. `next` keeps it for callers.
+        shown_next = []
+        next_lines = []
         nxt = alt
     else:
         shown_run = not_ready_run(

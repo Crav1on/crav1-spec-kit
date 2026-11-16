@@ -296,25 +296,43 @@ def cmd_behind(args) -> int:
 # ---------- the Azure DevOps 4,000-character description (1.176.0) ----------
 
 ADO_LIMIT = 4000
-_COLUMNS = re.compile(r"[&?](?:lineStartColumn|lineEndColumn)=\d+")
-_MD_LINK = re.compile(r"\[[^\]]*\]\([^)]*\)")
+SHORTENED = "Task lines were shortened to fit."
+_TASK_LINE = re.compile(r"^\s*[-*]\s+T\d+\b")
 
 
-def _notes_line(link: str | None) -> str:
-    if link:
-        return f"Full notes: {link}"
-    return "Full notes: the spec folder in the specs repo."
+def _task_lines(lines: list[str]) -> list[int]:
+    """Indexes of the task lines: `- T#` bullets, else the bullets under `### Tasks`."""
+    found = [i for i, line in enumerate(lines) if _TASK_LINE.match(line)]
+    if found:
+        return found
+    inside = False
+    for i, line in enumerate(lines):
+        if line.startswith("#"):
+            inside = line.lstrip("#").strip().lower() == "tasks"
+            continue
+        if inside and line.lstrip().startswith(("- ", "* ")):
+            found.append(i)
+    return found
 
 
-def fit_body(text: str, limit: int = ADO_LIMIT, notes_link: str | None = None) -> dict:
-    """Trim a PR description to `limit` characters, plainest parts first.
+def _first_sentence(line: str) -> str:
+    return re.split(r"(?<=[.!?])\s+(?=[A-Z`])", line, maxsplit=1)[0].rstrip()
 
-    1. Drop `lineStartColumn` and `lineEndColumn` from links.
-    2. Keep one link per bullet.
-    3. Cut each bullet to its first sentence.
-    4. Drop the later `## ` sections and link the full notes instead.
-    5. Cut at a line end, keeping the notes link.
-    The title, the first section and the work-item mention stay.
+
+def _cut_words(line: str, room: int) -> str:
+    if len(line) <= room:
+        return line
+    cut = line[:room]
+    return (cut.rsplit(" ", 1)[0] if " " in cut else cut).rstrip(" ,;:.")
+
+
+def fit_body(text: str, limit: int = ADO_LIMIT) -> dict:
+    """A guard for a PR description over `limit` characters (format B, 1.176.0).
+
+    Only the task lines give way: first to the task name (the first
+    sentence), then cut at a word. A plain `Task lines were shortened to
+    fit.` line follows them. No link and no overflow comment is added; the
+    summary, Verified and the work-item mention stay as written.
     """
     body = str(text or "").replace("\r\n", "\n")
     steps: list[str] = []
@@ -322,56 +340,27 @@ def fit_body(text: str, limit: int = ADO_LIMIT, notes_link: str | None = None) -
     def fits(value: str) -> bool:
         return len(value) <= limit
 
-    if not fits(body):
-        new = _COLUMNS.sub("", body)
-        if new != body:
-            body, _ = new, steps.append("columns")
-    if not fits(body):
-        out = []
-        for line in body.split("\n"):
-            if line.lstrip().startswith(("- ", "* ")):
-                links = _MD_LINK.findall(line)
-                for extra in links[1:]:
-                    line = line.replace(extra, "", 1)
-                line = re.sub(r"\s*[·,]\s*(?=[·,]|$)", "", line).rstrip()
-            out.append(line)
-        new = "\n".join(out)
-        if new != body:
-            body, _ = new, steps.append("one-link")
-    if not fits(body):
-        out = []
-        for line in body.split("\n"):
-            stripped = line.lstrip()
-            if stripped.startswith(("- ", "* ")):
-                first = re.split(r"(?<=[.!?])\s+(?=[A-Z`])", line, maxsplit=1)[0]
-                line = first
-            out.append(line)
-        new = "\n".join(out)
-        if new != body:
-            body, _ = new, steps.append("short-bullets")
-    mention = re.findall(r"\bAB#\d+\b", body)
-    if not fits(body):
-        parts = re.split(r"(?m)^(?=## )", body)
-        head, rest = parts[0], parts[1:]
-        keep = [head] + rest[:1] if rest and not head.strip() else [head]
-        tail = "\n\n" + _notes_line(notes_link)
-        if mention and not any(m in "".join(keep) for m in mention):
-            tail += "\n\n" + mention[0]
-        dropped = len(parts) - len(keep)
-        while dropped and len("".join(keep).rstrip() + tail) <= limit and len(keep) < len(parts):
-            trial = keep + [parts[len(keep)]]
-            if len("".join(trial).rstrip() + tail) > limit:
-                break
-            keep = trial
-        body = "".join(keep).rstrip() + tail
-        steps.append("sections")
-    if not fits(body):
-        tail = "\n\n" + _notes_line(notes_link)
-        room = limit - len(tail)
-        cut = body[:room]
-        cut = cut[: cut.rfind("\n")] if "\n" in cut else cut
-        body = cut.rstrip() + tail
-        steps.append("cut")
+    if fits(body):
+        return {"body": body, "length": len(body), "limit": limit, "fits": True, "trimmed": steps}
+    lines = body.split("\n")
+    tasks = _task_lines(lines)
+    if tasks:
+        for i in tasks:
+            lines[i] = _first_sentence(lines[i])
+        lines.insert(tasks[-1] + 1, SHORTENED)
+        steps.append("task-names")
+        body = "\n".join(lines)
+        if not fits(body):
+            over = len(body) - limit
+            longest = max(len(lines[i]) for i in tasks)
+            room = longest
+            while over > 0 and room > 20:
+                room -= 10
+                over = len(body) - limit - sum(max(0, len(lines[i]) - room) for i in tasks)
+            for i in tasks:
+                lines[i] = _cut_words(lines[i], room)
+            steps.append("task-cut")
+            body = "\n".join(lines)
     return {"body": body, "length": len(body), "limit": limit, "fits": fits(body), "trimmed": steps}
 
 
@@ -382,7 +371,7 @@ def limit_of(out: dict) -> int:
 def cmd_fit(args) -> int:
     path = Path(args.body)
     text = path.read_text(encoding="utf-8-sig")
-    out = fit_body(text, args.limit, args.notes_link)
+    out = fit_body(text, args.limit)
     if args.text:
         if not out["fits"]:
             print(f"Still {out['length']} characters after trimming; the limit is {limit_of(out)}.", file=sys.stderr)
@@ -417,7 +406,6 @@ def main(argv: list[str] | None = None) -> int:
     ft = sub.add_parser("fit")
     ft.add_argument("--body", required=True, help="the PR body file, UTF-8")
     ft.add_argument("--limit", type=int, default=ADO_LIMIT)
-    ft.add_argument("--notes-link", default=None, help="a pinned link to the full notes")
     ft.add_argument("--text", action="store_true", help="print only the trimmed body, to redirect into the file you pass to create")
     ft.add_argument("--show", action="store_true", help="print the trimmed body in the JSON")
     b = sub.add_parser("behind")

@@ -17,6 +17,6 @@ One sentence: they can review when they want. Then Run next (1.171.0), never a `
 
 When `/crav1-build-walk` opened this skill, do not print that Run next. The walk prints its own ending (1.142.0).
 
-This skill does not save a PR note or a PR record: the body is its own summary, and the next `/crav1-pr-status` run reads its Merge order, Questions for reviewers and Not in this PR sections (1.98.0). `/crav1-review-pr` and `/crav1-merge-pr` save the description, with any later edits, as the PR note. Merging stays `/crav1-merge-pr` when they explicitly ask, in a later turn. A review is not that ask. This skill does not merge, and it does not delete the branch. Do not run `/crav1-review-pr` or `/crav1-merge-pr` from this step.
+This skill does not save a PR note or a PR record: the body is its own summary (format B, 1.176.0: summary, one line per task, how it was verified, the work-item mention). `/crav1-review-pr` and `/crav1-merge-pr` save the description, with any later edits, as the PR note. Merging stays `/crav1-merge-pr` when they explicitly ask, in a later turn. A review is not that ask. This skill does not merge, and it does not delete the branch. Do not run `/crav1-review-pr` or `/crav1-merge-pr` from this step.
 
 When you only printed commands, stop after those commands. Do not invent a URL.
