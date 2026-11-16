@@ -201,7 +201,8 @@ class ResumeWalkFirst(unittest.TestCase):
             root = make_slice(tmp)
             (Path(tmp) / "other").mkdir()
             wp.set_branch_run(root, "feat/orders-cicd", "stopped before merge", "2026-11-16T10:00:00+01:00")
-            entries = wp.resume_walk_entries(root, "orders")
+            # 1.175.0: offered only when the claim user is you.
+            entries = wp.resume_walk_entries(root, "orders", user="person A")
             self.assertEqual(entries, ["Continue the build walk on feat/orders-cicd:\n`/crav1-build-walk orders feat/orders-cicd`"])
 
     def test_merge_wait_and_merged_runs_are_not_offered(self):

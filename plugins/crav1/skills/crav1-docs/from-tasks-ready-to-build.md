@@ -151,11 +151,11 @@ Since 1.167.0 what you can fix now with one command is not a Waiting line any mo
 Run next:
 
 **Catch up first**
-verify.md is behind for T2 and T45, and it has a row for T44, which is not in tasks.md. The specs repo is 2 commits ahead of origin.
+verify.md is behind for T2 and T45, and it has a row for T44, which is not in tasks.md.
 
 Check T2 and T45 against the spec and remove the T44 row:
 `/crav1-verify-build-against-spec orders-api`
-Push the specs repo (2 commits ahead):
+Push the specs repo, which is 2 commits ahead of origin:
 `git push`
 
 ---
@@ -175,6 +175,8 @@ No commit, and no other file. The build map is the one file this command writes.
 Since 1.149.0, `/crav1-tasks-ready-to-build` keeps the task rules in its skill file and reads a references file only when that case applies: work branches, a sub-branch, promotion, a work item, a plan risk that blocks the slice, or a next line that is not the ready list.
 
 Since 1.173.0 a done task on the build map keeps its own commit: the merge commit in its branch's `build-progress` file, else its own row in `verify.md`. A `Date:` line or another task's row that names a newer commit never replaces it, and with no own commit the mark already on the map stays. Held and ready lines show full task names, and the open-questions entry is `Ask the open questions, which haven't been asked yet:` above `/crav1-show-or-ask-open-questions <slug>`.
+
+Since 1.175.0 the ready check offers `Continue the build walk on <branch>:` only for your own walk: the walk's claim user in `claims.md` (else the `Run yes:` name in its `build-progress` file) must match `git config user.name`, the same check that makes a claim yours. `Owner: self` in the progress file means whoever ran that walk, so it is never trusted alone. Someone else's walk is a Waiting line instead, `Waiting: T9 to T12 are person B's, built, and wait for PR 82 to merge.`, or `Waiting: T9 to T12 are in progress by person B.` when the pull request is not known. A claimed task that is already built on a branch that is not merged reads `built by <name>, waits for PR <n> to merge` in the Held list, the status and `build-map.md`, not `in progress by <name> since <date>`. A reopened step's entry says why in one plain sentence, which names the changed spec sections or files and the tasks that wait, above an action label, `Finish the reopened /crav1-tighten-spec step:`. A build walk's own files (claims.md, walk-progress.md, build-progress, verify.md and task ticks) never reopen a step. The Catch up first push entry says how far ahead once, in its label `Push the specs repo, which is 2 commits ahead of origin:`, with no sentence repeating it.
 
 Since 1.174.0 a done task's commit is the merge commit from its branch's `merge-pr` step, not the later commit that ticked it. A branch whose tasks are built and whose pull request is open reads `built, waits for PR <n> to merge`, never waiting on its own tasks, and the `Delivers:` and `Tasks:` lines show full names. An unfinished branch walk is the first Run next entry, `Continue the build walk on <branch>:` above `/crav1-build-walk <slug> <branch>`.
 

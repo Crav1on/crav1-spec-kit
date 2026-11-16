@@ -387,8 +387,13 @@ def _claims_mod():
     return mod
 
 
-def apply_claim_holds(res, tasks, claims_text, now=None):
-    """Move claimed tasks out of Ready into Waiting, in progress (1.151.0)."""
+def apply_claim_holds(res, tasks, claims_text, now=None, built=None):
+    """Move claimed tasks out of Ready into Waiting, in progress (1.151.0).
+
+    `built` is {task id: PR number or None} for tasks built on a walk that
+    is not merged. Such a claim reads `built by <name>, waits for PR <n> to
+    merge`, not `in progress by <name> since <date>` (1.175.0).
+    """
     waiting = []
     res["waiting_in_progress"] = waiting
     if not claims_text:
@@ -408,6 +413,10 @@ def apply_claim_holds(res, tasks, claims_text, now=None):
         tid = f"T{task['id']}"
         if tid in by_task:
             held[tid] = by_task[tid]
+            if built and task["id"] in built:
+                pr = built[task["id"]]
+                wait = f"waits for PR {pr} to merge" if pr else "waits for its pull request to merge"
+                held[tid] = {**by_task[tid], "phrase": f"built by {by_task[tid].get('user') or 'someone'}, {wait}"}
     changed = True
     while changed:
         changed = False

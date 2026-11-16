@@ -108,10 +108,11 @@ class CatchUpBlock(unittest.TestCase):
 
     def test_repo_ahead(self):
         block = we.catch_up_block("orders-api", ahead=2)
-        self.assertIn("The specs repo is 2 commits ahead of origin.", block)
-        self.assertIn("Push the specs repo (2 commits ahead):\n`git push`", block)
+        # 1.175.0: the label says it once; no sentence repeats it.
+        self.assertEqual(block.count("ahead of origin"), 1)
+        self.assertIn("Push the specs repo, which is 2 commits ahead of origin:\n`git push`", block)
         one = we.catch_up_block(None, ahead=1)
-        self.assertIn("Push the specs repo (1 commit ahead):", one)
+        self.assertIn("Push the specs repo, which is 1 commit ahead of origin:", one)
 
     def test_each_command_alone_under_its_label(self):
         block = we.catch_up_block("orders-api", behind=["T4"], orphans=["T44"], ahead=2)

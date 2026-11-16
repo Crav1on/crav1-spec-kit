@@ -1803,7 +1803,13 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text
     risk_blocks = any(row["blocks_slice"] for row in risks)
     analysed = task_order.analyse(tasks)
     if claims_text:
-        task_order.apply_claim_holds(analysed, tasks, claims_text)
+        built_open = {}
+        for walk in (walks or {}).values():
+            if walk.get("merged"):
+                continue
+            for task_id in walk.get("built") or ():
+                built_open[int(task_id)] = walk.get("pr")
+        task_order.apply_claim_holds(analysed, tasks, claims_text, built=built_open)
     rows = {row["id"]: row for row in analysed["rows"]}
     claimed_ids = {row["id"] for row in (analysed.get("waiting_in_progress") or [])}
     by_id = {task["id"]: task for task in tasks}

@@ -161,17 +161,18 @@ class MovedLabels(unittest.TestCase):
     def test_reopened_step_label_one_task(self):
         entry = wp.not_ready_run("not-ready", "orders-api", [{"bucket": "reopened", "step": "review-and-tighten-plan"}],
                                  ["T1"], None, {}, None, None, {}, None, False)
-        self.assertEqual(entry, ["T1 waits until the reopened /crav1-tighten-plan step finishes:\n`/crav1-tighten-plan orders-api`"])
+        # 1.175.0: a reason sentence, then an action label above the command.
+        self.assertEqual(entry, ["A file this step covers changed after it was recorded, so T1 waits.\nFinish the reopened /crav1-tighten-plan step:\n`/crav1-tighten-plan orders-api`"])
 
     def test_reopened_step_label_several_tasks(self):
         entry = wp.not_ready_run("not-ready", "orders-api", [{"bucket": "reopened", "step": "tighten-spec"}],
                                  ["T1", "T2", "T5"], None, {}, None, None, {}, None, False)
-        self.assertTrue(entry[0].startswith("T1, T2 and T5 wait until the reopened /crav1-tighten-spec step finishes:\n"))
+        self.assertIn(", so T1, T2 and T5 wait.\nFinish the reopened /crav1-tighten-spec step:\n", entry[0])
 
     def test_reopened_step_label_no_tasks(self):
         entry = wp.not_ready_run("not-ready", "", [{"bucket": "reopened", "step": "plan-from-spec"}],
                                  [], None, {}, None, None, {}, None, False)
-        self.assertEqual(entry, ["The work waits until the reopened /crav1-plan-from-spec step finishes:\n`/crav1-plan-from-spec`"])
+        self.assertEqual(entry, ["A file this step covers changed after it was recorded.\nFinish the reopened /crav1-plan-from-spec step:\n`/crav1-plan-from-spec`"])
 
     def test_verify_push_resolve_and_resume_labels(self):
         verify = wp.not_ready_run("not-ready", "orders-api", [], [], None, {"behind": True}, None, None, {}, None, False)

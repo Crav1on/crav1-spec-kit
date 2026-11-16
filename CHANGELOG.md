@@ -2,6 +2,16 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.175.0 (2026-11-16)
+
+Fixes found on a ready check run after a colleague's build walk: Run next no longer offers to continue someone else's walk, built tasks under someone else's claim read built instead of in progress, a reopened step says why, and the Catch up first push entry is said once. A minor release because the ready check, the build map and the catch-up block read differently.
+
+- **Continue only your own walk.** `Owner: self` in `build-progress/<branch>.md` is written relative to whoever ran the walk, so a colleague's walk read as yours and Run next offered `Continue the build walk on <branch>:`. Now the walk's claim user in `claims.md` (else the `Run yes:` name in its progress file) must match `--user` or `git config user.name`, the same comparison that makes a claim yours. Someone else's walk is a Waiting line: `Waiting: T9 to T12 are person B's, built, and wait for PR 82 to merge.`, or `Waiting: T9 to T12 are in progress by person B.` when the pull request is not known. No continue offer.
+- **Built, not in progress.** A task claimed by someone else that is built on a branch that is not merged (a done `Step: build T#` or a `- Built: T#` row in `build-progress`) reads `built by <name>, waits for PR <n> to merge` in the Held list, the status and `build-map.md`, instead of `in progress by <name> since <date>`. The claim still holds the task until the merge.
+- **A reopened step says why.** The Run next entry for a reopened step now has one plain sentence that names what changed and which tasks wait, such as `The spec's Constraints section changed after /crav1-tighten-spec was last recorded in walk-progress.md, so T9 waits.`, above an action label, `Finish the reopened /crav1-tighten-spec step:`. It was `The work waits until the reopened /crav1-tighten-spec step finishes:` with no reason. The reopen rule is unchanged: only a change to the spec, plan or tasks that a step covers reopens it, and a build walk's own files (claims.md, walk-progress.md, build-progress, verify.md) and task ticks never do. A regression test runs a whole build walk's file changes and checks that no step reopens.
+- **Push said once.** The Catch up first block no longer has the sentence `The specs repo is 2 commits ahead of origin.` above a label that said the same. The label reads `Push the specs repo, which is 2 commits ahead of origin:` above `git push`.
+- Tests: `scripts/tests/test_walk_owner_claims_1175.py`; four older tests now expect the new reopened entry, the push label and the own-walk check.
+
 ## 1.174.0 (2026-11-16)
 
 Fixes found on a second real ready check: a done task keeps its merge commit instead of the later commit that ticked it, Run next offers to continue an unfinished branch walk first, a built branch no longer reads as waiting on its own tasks, the build map shows full names, and the pull ending puts its label above the command. A minor release because the build map and the ready check write and end differently.
