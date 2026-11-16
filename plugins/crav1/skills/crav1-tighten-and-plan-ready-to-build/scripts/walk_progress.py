@@ -3792,12 +3792,12 @@ def pr_common_mod():
     return _PR_COMMON
 
 
-def host_pr_author(root: Path | None, pr) -> str | None:
+def host_pr_author(root: Path | None, pr, record: bool = True) -> str | None:
     """Who opened PR <n>, read-only from its own host, then recorded (1.177.1).
 
     Only when the kit's records or this checkout's remote give the PR's host;
     only that host's CLI is tried, with a short timeout. A found name is
-    written as `PR author:` in the build-progress file (pr_common.py author).
+    written as `PR author:` in the build-progress file (record_pr_author).
     Never fails the ready check. CRAV1_NO_HOST_LOOKUP=1 turns it off.
     """
     import os
@@ -3810,11 +3810,56 @@ def host_pr_author(root: Path | None, pr) -> str | None:
         if info.get("status") != "ok":
             return None
         name = pc.host_author(info, str(base))
-        if name:
-            pc.record_author(Path(root), int(pr), name)
+        if name and record:
+            record_pr_author(Path(root), int(pr), name)
         return name
     except Exception:  # noqa: BLE001 - the lookup must never break the check
         return None
+
+
+_AUTHOR_LINE = re.compile(r"^(?:PR author|Opened by):.*$", re.M | re.I)
+
+
+def record_pr_author(root: Path, number: int, name: str) -> Path | None:
+    """Write `PR author: <name>` into the build-progress file that names PR <n> (1.177.1).
+
+    Replaces an earlier `PR author:` or `Opened by:` line, else adds the line
+    after the header's `Owner:` (or `Branch:`) line. None when no
+    build-progress file names that PR.
+    """
+    folder = Path(root) / "build-progress"
+    name = " ".join(str(name).split())
+    if not name or not folder.is_dir():
+        return None
+    for path in sorted(folder.glob("*.md")):
+        text = path.read_text(encoding="utf-8", errors="replace")
+        if int(number) not in {int(n) for n in _PROGRESS_PR.findall(text)}:
+            continue
+        line = f"PR author: {name}"
+        if _AUTHOR_LINE.search(text):
+            text = _AUTHOR_LINE.sub(line, text, count=1)
+        else:
+            m = re.search(r"^Owner:.*$", text, re.M) or re.search(r"^Branch:.*$", text, re.M)
+            text = text[:m.end()] + "\n" + line + text[m.end():] if m else line + "\n" + text
+        path.write_text(text, encoding="utf-8")
+        return path
+    return None
+
+
+def cmd_pr_author(args) -> None:
+    """`pr-author --root <spec-folder> --pr <n> [--name <who>]` (1.177.1)."""
+    root = Path(args.root)
+    name = args.name or host_pr_author(root, args.pr, record=False)
+    source = "you" if args.name else "host"
+    if not name:
+        print(json.dumps({"status": "not-found", "line": f"The host did not say who opened PR {args.pr}. "
+                          "Ask who opened it, then run this again with --name."}, indent=2))
+        sys.exit(1)
+    path = record_pr_author(root, args.pr, name)
+    print(json.dumps({"status": "recorded" if path else "no-record", "author": name, "source": source,
+                      "file": str(path) if path else None}, indent=2, ensure_ascii=False))
+    if not path:
+        sys.exit(1)
 
 
 def open_prs(root: Path | None, user: str | None = None) -> dict:
@@ -6541,6 +6586,12 @@ def main(argv: list[str] | None = None) -> None:
     rc.add_argument("--root", required=True)
     rc.add_argument("--yes", action="store_true")
     rc.set_defaults(func=restamp_covered)
+
+    pa = sub.add_parser("pr-author", help="Record who opened a pull request in its build-progress file (1.177.1).")
+    pa.add_argument("--root", required=True, help="Spec folder.")
+    pa.add_argument("--pr", required=True, type=int)
+    pa.add_argument("--name", help="Who opened it, as the user said. Omit to ask the PR's own host, read-only.")
+    pa.set_defaults(func=cmd_pr_author)
 
     args = parser.parse_args(argv)
     args.func(args)

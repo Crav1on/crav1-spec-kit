@@ -35,10 +35,6 @@ Subcommands, each printing one JSON object:
           that names `PR <n>` without a URL takes its host from a
           `Code repo:` line or the only docs/system/repos.md row; with no
           host it is `ask`, never the remote.
-  author  --root <spec-folder> --pr <n> [--name <who>]
-          Records `PR author: <who>` in the build-progress file that
-          names PR <n> (1.177.1). Without --name it asks the PR's own host
-          read-only (gh or az, short timeout) and records the answer.
 
 The interpreter is crav1-docs/reference/running-scripts.md. The canonical
 copy lives in skill crav1-open-pr; the other three skills ship a thin copy
@@ -607,9 +603,6 @@ def resolve_ref(ref: str, remote_url: str | None = None, roots: list[Path] | Non
             "line": f"No kit record names PR {number} and this checkout has no single GitHub or Azure DevOps remote. Ask for the pull request URL."}
 
 
-_AUTHOR_LINE = re.compile(r"^(?:PR author|Opened by):.*$", re.M | re.I)
-
-
 def host_author(info: dict, repo: str | None = None, timeout: int = 8) -> str | None:
     """Who opened a pull request, read-only from its own host (1.177.1).
 
@@ -647,53 +640,6 @@ def host_author(info: dict, repo: str | None = None, timeout: int = 8) -> str | 
     else:
         name = data if isinstance(data, str) else None
     return name.strip() if isinstance(name, str) and name.strip() else None
-
-
-def record_author(spec_root: Path, number: int, name: str) -> Path | None:
-    """Write `PR author: <name>` into the build-progress file that names PR <n> (1.177.1).
-
-    Replaces an earlier `PR author:` or `Opened by:` line, else adds the line
-    after the header's `Owner:` (or `Branch:`) line. None when no
-    build-progress file names that PR.
-    """
-    folder = Path(spec_root) / "build-progress"
-    name = " ".join(str(name).split())
-    if not name or not folder.is_dir():
-        return None
-    for path in sorted(folder.glob("*.md")):
-        text = path.read_text(encoding="utf-8", errors="replace")
-        nums = {int(n) for n in BARE_PR.findall(text)}
-        nums |= {parse_ref(u).get("number") for u in PR_URL_ANY.findall(text)}
-        if int(number) not in nums:
-            continue
-        line = f"PR author: {name}"
-        if _AUTHOR_LINE.search(text):
-            text = _AUTHOR_LINE.sub(line, text, count=1)
-        else:
-            m = re.search(r"^Owner:.*$", text, re.M) or re.search(r"^Branch:.*$", text, re.M)
-            text = text[:m.end()] + "\n" + line + text[m.end():] if m else line + "\n" + text
-        path.write_text(text, encoding="utf-8")
-        return path
-    return None
-
-
-def cmd_author(args) -> int:
-    root = Path(args.root)
-    if args.name:
-        path = record_author(root, args.pr, args.name)
-        if not path:
-            return emit({"status": "no-record", "line": f"No build-progress file in {root} names PR {args.pr}."}, 1)
-        return emit({"status": "recorded", "author": args.name, "file": str(path), "source": "you"})
-    base = repo_root_of(root)
-    remote = args.remote_url if args.remote_url is not None else _remote_url(str(base))
-    info = resolve_ref(str(args.pr), remote, [base])
-    name = host_author(info, str(base)) if info.get("status") == "ok" else None
-    if not name:
-        return emit({"status": "not-found", "host": info.get("host"),
-                     "line": f"The host did not say who opened PR {args.pr}. Ask who opened it, then record the answer with --name."}, 1)
-    path = record_author(root, args.pr, name)
-    return emit({"status": "recorded" if path else "no-record", "author": name,
-                 "file": str(path) if path else None, "source": info.get("host")}, 0 if path else 1)
 
 
 def cmd_resolve(args) -> int:
@@ -740,18 +686,13 @@ def main(argv: list[str] | None = None) -> int:
     r.add_argument("--repo")
     r.add_argument("--remote-has-pr", action="store_true",
                    help="this checkout's host already showed a pull request with that number")
-    au = sub.add_parser("author", help="record who opened a pull request in its build-progress file")
-    au.add_argument("--root", required=True, help="the spec folder")
-    au.add_argument("--pr", required=True, type=int)
-    au.add_argument("--name", help="who opened it, as the user said; without it the PR's host is asked read-only")
-    au.add_argument("--remote-url")
     args = parser.parse_args(argv)
     if args.cmd == "parse":
         out = parse_ref(args.ref, args.remote_url)
         return emit(out, 0 if out.get("status") == "ok" else 1)
     if args.cmd == "host":
         return emit(host_of(args.remote_url))
-    return {"find": cmd_find, "checks": cmd_checks, "claim": cmd_claim, "behind": cmd_behind, "fit": cmd_fit, "resolve": cmd_resolve, "author": cmd_author}[args.cmd](args)
+    return {"find": cmd_find, "checks": cmd_checks, "claim": cmd_claim, "behind": cmd_behind, "fit": cmd_fit, "resolve": cmd_resolve}[args.cmd](args)
 
 
 if __name__ == "__main__":

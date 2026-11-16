@@ -109,6 +109,9 @@ class OwnerFromHost(unittest.TestCase):
             self.assertIn("Owner: self\nPR author: person C\n", log)
             self.assertEqual(wp.pr_author(root, 71, log), "person C")
 
+    def test_pr_common_stays_read_only(self):
+        self.assertNotIn("write_text", PC_PATH.read_text(encoding="utf-8"))
+
     def test_fallback_keeps_owner_not_recorded(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = strip_author(rb.two_pr_slice(tmp))
@@ -118,11 +121,11 @@ class OwnerFromHost(unittest.TestCase):
     def test_author_command_records_the_users_answer(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = strip_author(rb.two_pr_slice(tmp))
-            proc = subprocess.run([sys.executable, str(PC_PATH), "author", "--root", str(root), "--pr", "71",
+            proc = subprocess.run([sys.executable, str(t77.WALK), "pr-author", "--root", str(root), "--pr", "71",
                                    "--name", "person D"], capture_output=True, text=True, check=False)
             self.assertEqual(json.loads(proc.stdout)["status"], "recorded")
             self.assertEqual(wp.pr_author(root, 71, (root / "build-progress/feat--orders-readme.md").read_text()), "person D")
-            again = subprocess.run([sys.executable, str(PC_PATH), "author", "--root", str(root), "--pr", "71",
+            again = subprocess.run([sys.executable, str(t77.WALK), "pr-author", "--root", str(root), "--pr", "71",
                                     "--name", "person E"], capture_output=True, text=True, check=False)
             self.assertEqual(json.loads(again.stdout)["status"], "recorded")
             text = (root / "build-progress/feat--orders-readme.md").read_text()
