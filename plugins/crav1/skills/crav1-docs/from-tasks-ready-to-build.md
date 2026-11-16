@@ -174,6 +174,8 @@ No commit, and no other file. The build map is the one file this command writes.
 
 Since 1.149.0, `/crav1-tasks-ready-to-build` keeps the task rules in its skill file and reads a references file only when that case applies: work branches, a sub-branch, promotion, a work item, a plan risk that blocks the slice, or a next line that is not the ready list.
 
+Since 1.173.0 a done task on the build map keeps its own commit: the merge commit in its branch's `build-progress` file, else its own row in `verify.md`. A `Date:` line or another task's row that names a newer commit never replaces it, and with no own commit the mark already on the map stays. Held and ready lines show full task names, and the open-questions entry is `Ask the open questions, which haven't been asked yet:` above `/crav1-show-or-ask-open-questions <slug>`.
+
 ## After
 
 The Next line recommends the build walk, with the T number beside the short name. `/crav1-build-tasks` builds one task without the walk:

@@ -347,6 +347,39 @@ def stray_next_problems(kit):
     return out
 
 
+# Skills whose every ending is Run next or nothing (1.173.0). No line in
+# their SKILL.md, references, or branches starts with `Next:` or shows a
+# `Next: ...` example in a code span.
+RUN_NEXT_ONLY_SKILLS = ("crav1-finalize-commit",)
+NEXT_EXAMPLE = re.compile(r"`Next:\s*[^`]")
+
+
+def run_next_only_hits(text):
+    hits = []
+    for i, line in enumerate(text.splitlines(), 1):
+        if line.strip().startswith("Next:") or NEXT_EXAMPLE.search(line):
+            hits.append(i)
+    return hits
+
+
+def run_next_only_problems(kit):
+    root = os.path.join(kit, ".cursor", "skills", "crav1")
+    out = []
+    for name in RUN_NEXT_ONLY_SKILLS:
+        skill = os.path.join(root, name)
+        if not os.path.isdir(skill):
+            continue
+        for path in sorted(glob.glob(os.path.join(skill, "**", "*.md"), recursive=True)):
+            with open(path, encoding="utf-8") as fh:
+                text = fh.read()
+            for lineno in run_next_only_hits(text):
+                out.append(
+                    f"{os.path.relpath(path, kit)}:{lineno}: a `Next:` line in a skill that ends with "
+                    "Run next or nothing (1.173.0)"
+                )
+    return out
+
+
 # Card wording (1.164.0). A card in a skill file is written as a block:
 #   Card: <short plain question>
 #   - **<label> (Recommended)** (`word`): <what happens>. Why: <reason>
@@ -547,6 +580,7 @@ def main(argv):
     errs.extend(run_ending_problems(kit))
     errs.extend(dead_card_problems(kit))
     errs.extend(stray_next_problems(kit))
+    errs.extend(run_next_only_problems(kit))
     errs.extend(card_wording_problems(kit))
     errs.extend(invocation_problems(kit))
     for e in errs: print("FAIL  " + e)

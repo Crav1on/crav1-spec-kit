@@ -3744,8 +3744,29 @@ def _command_with_slug(command: str, slug: str) -> str:
     return command
 
 
+RUN_LABELS = {
+    "/crav1-show-or-ask-open-questions": "Ask the open questions, which haven't been asked yet:",
+    "/crav1-record-approval": "Record the approval, which is not on record yet:",
+}
+
+
+def _run_label(command: str, reason: str) -> str:
+    """The label line above a Run next command (1.173.0).
+
+    A sentence on its own line, capitalized and ending in a colon, so the
+    command stands alone in its code span under it.
+    """
+    for prefix, label in RUN_LABELS.items():
+        if command.split()[0:1] == [prefix]:
+            return label
+    text = str(reason).strip().rstrip(".:").strip()
+    if not text:
+        return "Run:"
+    return text[0].upper() + text[1:] + ":"
+
+
 def _run_entry(command: str, reason: str) -> str:
-    return f"`{command}`\n{str(reason).strip()}"
+    return f"{_run_label(command, reason)}\n`{command}`"
 
 
 def _wait_until(lead: str, can_start: list, command: str) -> str:

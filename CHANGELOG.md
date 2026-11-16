@@ -2,6 +2,17 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.173.0 (2026-11-16)
+
+Fixes found on a real ready check: the build map no longer swaps a done task's commit for another task's commit, Held names are full, the open-questions entry has its label above the command, and finalize-commit has no `Next:` line on any ending. A minor release because the build map, the ready check and finalize-commit write and end differently.
+
+- **Done commits stay on their own task.** `readiness --write-map` and `build_map.py` took a done task's commit from the first line in `verify.md` that named the task and held any commit, so a `Date:` line such as `second run (T4 and T27 rechecked); T43 added from its build at local abc9d01` gave T4 and T27 the newer, unrelated T43 commit. Now the commit comes only from that task's own evidence: the `Result: done (...)` merge commit in its branch's `build-progress` file, else the task's own row in `verify.md`, preferring a merge commit there. A Date line, a gaps note or another task's row never counts. With no own commit, the mark already on `build-map.md` stays.
+- **Full Held names.** Held and ready lines in the ready check use the full task name, never cut with `...`. Held questions may still be shortened.
+- **Open-questions entry.** The Run next entry reads `Ask the open questions, which haven't been asked yet:` on its own line, then `/crav1-show-or-ask-open-questions <slug>` alone in its code span. Every Run next entry the readiness script builds now puts its label above the command.
+- **Finalize-commit endings.** `commit`, `copy`, `stop` and a failed commit end with Run next or nothing, never a `Next:` line. A suggestion to throw an edit away is a plain sentence with the git command in a code span. Kit-lint fails on a `Next:` line anywhere in the finalize-commit skill.
+- **Kit-rewritten files still ask.** A typed `commit` or `commit-now` still asks, with `stop` recommended, when the only changed files are kit-rewritten files (`build-map.md`, `walk-progress.md`, `build-progress/*`) whose values disagree with `verify.md` or `build-progress`.
+- Tests: `scripts/tests/test_map_hashes_1173.py`.
+
 ## 1.172.0 (2026-11-16)
 
 Walk tooling: the build walk reads its state from the files instead of hand-written JSON, Azure DevOps threads have one safe helper, the walk and review read fewer references, and a verify rerun checks only what moved. A minor release because the build walk, review-pr, open-pr, verify and the one-task build gain scripts and route differently.
