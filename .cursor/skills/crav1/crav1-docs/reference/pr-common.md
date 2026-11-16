@@ -26,6 +26,10 @@ Accept a number (`123`, `pr82`, `PR 82`, `#82`) or a URL.
 - The records name several, or one record and this checkout's host already showed a pull request with that number (`--remote-has-pr`): `status: ask`. List every candidate with its URL and ask which one. Do not pick.
 - Only when the records name none does it fall back to this checkout's single `git remote` (`source: remote`). No record and no GitHub or Azure DevOps remote: ask for the pull request URL.
 
+Since 1.177.1 `--root` may be the specs repo root, `docs/specs`, or one spec folder; the script reads the whole specs repo either way. Pass the specs repo root. A record that names `PR 82` without a URL takes its host from a `Code repo:` line in the build-progress file (a URL or a `repos.md` name), else from the only row of `docs/system/repos.md`. When the host cannot be worked out, the answer is `status: ask` with that record as the candidate, for example `PR 82 is in build-progress for feat/orders-cicd, but its host isn't recorded.` It never falls back to the remote then, and `tool` is empty: ask for the pull request URL and name no CLI to install until the host is known.
+
+**Who opened it (1.177.1).** The ready check asks the pull request's own host, read-only and with a short timeout: `gh pr view <n> --json author` on GitHub, `az repos pr show --id <n>` (`createdBy.displayName`) on Azure DevOps, only the CLI for the host the records name, when no author is recorded. `pr_common.py` stays read-only: the ready check writes a found name as `PR author: <name>` in the build-progress file that names that pull request, and `<interpreter> -X utf8 <skill crav1-tighten-and-plan-ready-to-build>/scripts/walk_progress.py pr-author --root <spec-folder> --pr <n> --name "<who>"` records the user's answer.
+
 Remote: the single `git remote`. If several remotes exist, ask which one. A full URL names its host.
 
 ## Finding the pull request for a branch

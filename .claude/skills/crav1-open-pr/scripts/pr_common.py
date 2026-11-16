@@ -30,7 +30,11 @@ Subcommands, each printing one JSON object:
           and docs/system/repos.md. One record match wins; a record match
           and a different remote, or several records, is `ask`. Only with
           no record does it fall back to this checkout's remote. `tool`
-          is the one CLI the resolved host needs (gh or az).
+          is the one CLI the resolved host needs (gh or az). --root may be
+          the repo root, docs/specs or a spec folder (1.177.1). A record
+          that names `PR <n>` without a URL takes its host from a
+          `Code repo:` line or the only docs/system/repos.md row; with no
+          host it is `ask`, never the remote.
 
 The interpreter is crav1-docs/reference/running-scripts.md. The canonical
 copy lives in skill crav1-open-pr; the other three skills ship a thin copy
@@ -451,10 +455,52 @@ def record_files(root: Path) -> list[tuple[str, Path]]:
     return out
 
 
-def record_candidates(roots: list[Path], number: int) -> list[dict]:
-    """Every pull request numbered `number` that the kit's records name, one per URL."""
+BARE_PR = re.compile(r"\b(?:PR|pull request)\s*#?(\d+)\b", re.I)
+REPO_FIELD = re.compile(r"^(?:Code repo|Repo):\s*`?([^`\s]+)`?\s*$", re.M | re.I)
+
+
+def repo_root_of(path: Path) -> Path:
+    """The specs repo root for a repo root, docs/specs, or a spec folder (1.177.1)."""
+    here = Path(path).resolve()
+    for p in (here, *here.parents):
+        if (p / "docs" / "specs").is_dir() or (p / "docs" / "notes").is_dir() or (p / "docs" / "system" / "repos.md").is_file():
+            return p
+    return here
+
+
+def _record_repo_url(text: str, repos: dict) -> str:
+    """The code repo URL a record points at (1.177.1).
+
+    A `Code repo:` or `Repo:` line (a URL, or a repos.md name), else the one
+    row of docs/system/repos.md when there is exactly one. Empty when the
+    host cannot be worked out.
+    """
+    m = REPO_FIELD.search(text or "")
+    if m:
+        value = m.group(1).strip()
+        if host_of(value)["host"] in ("github", "azure"):
+            return value
+        if value.lower().removesuffix(".git") in repos:
+            return repos[value.lower().removesuffix(".git")]
+    if len(repos) == 1:
+        return next(iter(repos.values()))
+    return ""
+
+
+def _branch_of(text: str, path: Path) -> str:
+    m = re.search(r"^Branch:\s*(\S+)", text or "", re.M)
+    return m.group(1) if m else path.stem.replace("--", "/")
+
+
+def record_candidates(roots: list[Path], number: int, unhosted: list | None = None) -> list[dict]:
+    """Every pull request numbered `number` that the kit's records name, one per URL.
+
+    A record that names `PR <n>` without a URL gets its URL from the record's
+    code repo (_record_repo_url, 1.177.1). When that cannot be worked out the
+    record goes to `unhosted` instead.
+    """
     found: dict = {}
-    for root in roots:
+    for root in [repo_root_of(r) for r in roots]:
         repos = _repos_rows(root)
         for kind, path in record_files(root):
             try:
@@ -473,6 +519,14 @@ def record_candidates(roots: list[Path], number: int) -> list[dict]:
                     built = _pr_url_for(repos[m.group("repo").lower()], number)
                     if built:
                         urls.append(parse_ref(built))
+            elif not urls and any(int(n) == number for n in BARE_PR.findall(text)):
+                built = _pr_url_for(_record_repo_url(text, repos), number)
+                if built:
+                    urls.append(parse_ref(built))
+                elif unhosted is not None:
+                    label = (f"build-progress for {_branch_of(text, path)}" if kind == "build-progress" else rel)
+                    unhosted.append({"number": number, "host": None, "url": None, "tool": None,
+                                     "sources": [rel], "label": f"PR {number} is in {label}"})
             for ref in urls:
                 key = _url_key(ref)
                 row = found.setdefault(key, {"host": ref["host"], "number": number, "url": ref["url"],
@@ -513,8 +567,16 @@ def resolve_ref(ref: str, remote_url: str | None = None, roots: list[Path] | Non
     if not m:
         return {"status": "not-a-pr", "line": f"{text!r} is not a pull request number or URL. A branch name is not a pull request."}
     number = int(m.group("n"))
-    cands = record_candidates(roots or [], number)
+    unhosted: list = []
+    cands = record_candidates(roots or [], number, unhosted)
     remote = host_of(remote_url)
+    if not cands and unhosted:
+        # 1.177.1: a record names the PR but not its host. Ask; never fall
+        # back to this checkout's remote, which may be another host.
+        first = unhosted[0]
+        return {"status": "ask", "number": number, "candidates": unhosted, "tool": None,
+                "line": f"{first['label']}, but its host isn't recorded. Ask for the pull request URL; "
+                        "do not name or install a CLI until the host is known."}
     remote_pr = None
     if remote["host"] in ("github", "azure"):
         remote_pr = _pr_url_for(remote_url or "", number)
@@ -541,8 +603,47 @@ def resolve_ref(ref: str, remote_url: str | None = None, roots: list[Path] | Non
             "line": f"No kit record names PR {number} and this checkout has no single GitHub or Azure DevOps remote. Ask for the pull request URL."}
 
 
+def host_author(info: dict, repo: str | None = None, timeout: int = 8) -> str | None:
+    """Who opened a pull request, read-only from its own host (1.177.1).
+
+    Only the resolved host's CLI is tried: `gh pr view <n> --json author` for
+    GitHub, `az repos pr show --id <n>` (createdBy.displayName) for Azure
+    DevOps. None when the CLI is missing, not signed in, slow, or fails.
+    """
+    host, number = info.get("host"), info.get("number")
+    if not number or host not in TOOL or not shutil.which(TOOL[host]):
+        return None
+    url = info.get("url") or ""
+    if host == "github":
+        cmd = ["gh", "pr", "view", str(number), "--json", "author"]
+        ref = host_of(url.split("/pull/")[0]) if "/pull/" in url else {}
+        if ref.get("owner"):
+            cmd += ["-R", f"{ref['owner']}/{ref['repo']}"]
+    else:
+        cmd = ["az", "repos", "pr", "show", "--id", str(number), "--query", "createdBy.displayName", "-o", "json"]
+        ref = parse_ref(url) if url else {}
+        if ref.get("org"):
+            cmd += ["--organization", f"https://dev.azure.com/{ref['org']}"]
+    try:
+        proc = subprocess.run(cmd, cwd=repo, capture_output=True, text=True, timeout=timeout, check=False)
+    except (OSError, subprocess.SubprocessError):
+        return None
+    if proc.returncode != 0 or not proc.stdout.strip():
+        return None
+    try:
+        data = json.loads(proc.stdout)
+    except ValueError:
+        return None
+    if isinstance(data, dict):
+        author = data.get("author") or {}
+        name = author.get("name") or author.get("login") if isinstance(author, dict) else None
+    else:
+        name = data if isinstance(data, str) else None
+    return name.strip() if isinstance(name, str) and name.strip() else None
+
+
 def cmd_resolve(args) -> int:
-    roots = [Path(r) for r in (args.root or [])] or _default_roots(args.repo)
+    roots = [repo_root_of(Path(r)) for r in (args.root or [])] or _default_roots(args.repo)
     remote = args.remote_url if args.remote_url is not None else _remote_url(args.repo)
     out = resolve_ref(args.ref, remote, roots, args.remote_has_pr)
     out["note"] = "Read-only. Name only the tool for the resolved host; never ask to install or sign in to the other one."
@@ -581,7 +682,7 @@ def main(argv: list[str] | None = None) -> int:
     r = sub.add_parser("resolve")
     r.add_argument("--ref", required=True)
     r.add_argument("--remote-url")
-    r.add_argument("--root", action="append", help="a specs repo or checkout to read records from; repeatable")
+    r.add_argument("--root", action="append", help="the specs repo root (docs/specs or a spec folder also work) to read records from; repeatable")
     r.add_argument("--repo")
     r.add_argument("--remote-has-pr", action="store_true",
                    help="this checkout's host already showed a pull request with that number")

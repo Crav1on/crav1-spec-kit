@@ -29,7 +29,8 @@ The readiness script decides every task and prints the finished reply: the count
 4. **Run it.** Per slice: `<interpreter> -X utf8 scripts/walk_progress.py readiness --root <spec-folder> --write-map --text` (skill `crav1-tighten-and-plan-ready-to-build`). Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. That rewrites `build-map.md` with `scripts/build_map.py` and prints the reply, ending `Build map: docs/specs/<slug>/build-map.md`. Print it, one slice after another when listing every slice. With `full`, run `--full` instead and add the per-task lists and the Order line from its `rows`, as [references/rules.md](references/rules.md) shows, then the same `ending`.
 5. **Build map word.** With `build-map`, run `scripts/build_map.py docs/specs/<slug> --chat` and print only that summary: each wave, then that wave's Overlap lines. `--recommend T#` prints the branch to offer; the first line is the name (1.140.0). Do not hand-edit the map. Read `references/build-map.md` only when the script cannot run. Do not invent the map.
 6. **Loop.** A `Loop:` line is followed by the fix offer. Never tell the user to edit `tasks.md` by hand. On `fix-loop` or `fix-loop <n>`, read [references/loop-fix.md](references/loop-fix.md): run `walk_progress.py fix-loop --root <spec-folder> --pick <n> --text`, ask its card, and on yes run it again with `--yes` (1.161.0).
-7. **Stop.** Do not run either command the reply names.
+7. **Owner.** On `owner not recorded`, read [references/pr-owner.md](references/pr-owner.md).
+8. **Stop.** Do not run either command the reply names.
 
 ## What it reads
 
@@ -57,7 +58,7 @@ Without Python at all, follow [references/rules.md](references/rules.md) and `re
 
 ## What it does not do
 
-- No commit, no Azure Boards read, no checkout. The only network read is the script's fetch. The only writes are `build-map.md` and a confirmed loop fix in `tasks.md`, through the scripts.
+- No commit, no Azure Boards read, no checkout. Network reads: the fetch and a PR-owner lookup. Writes: `build-map.md`, a confirmed `tasks.md` loop fix, `PR author:` lines, through the scripts.
 - No skill run. It names the next step and stops.
 - No new readiness marks, except the `(map:)` or `(after:)` change a confirmed `fix-loop` writes. `Reviewed:`, `(after:)`, `(branch:)`, and `Blocks:` are written by the plan and question skills. This skill only reads them. It does not write `verify.md`, and it does not restamp `walk-progress.md`.
 
