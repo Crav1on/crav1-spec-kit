@@ -8,6 +8,8 @@
 
 Walk one work branch from build through merge, with one Next while it runs.
 
+1.176.0: `branch_run.py record` keeps the specs repo (`--specs-repo`, default the top level of `--root`) and the code repo (`--code-repo`) apart, checks both before writing, commits `verify.md` with the progress file and the work-item mention, and pushes both. `branch_run.py ending --root --branch` reads `build-progress/<branch>.md` itself, takes `--note` lines for `Before the merge:`, and accepts a plain `stop`.
+
 1.176.0: the walk ending and the whole-branch ending put a plain label above the command, such as `Build T3 Record the decision on feat/orders-api:` above [`/crav1-build-walk`](crav1-build-walk.md) orders-api T3`, never a lowercase line under it. `branch_run.py ending` accepts a plain `stop` value such as `"merge"`.
 
 1.175.0: the build walk is offered to continue only by its own claim user, the name `git config user.name` gives; `Owner: self` in a progress file is never trusted alone. Someone else's built walk is a Waiting line such as `T9 to T12 are person B's, built, and wait for PR 82 to merge.`

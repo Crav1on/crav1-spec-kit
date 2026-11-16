@@ -73,7 +73,8 @@ def already_verified(status):
     if not status:
         return False
     low = status.lower()
-    if any(word in low for word in ("not implemented", "failed", "unverified", "claimed")):
+    # Verified on a branch that is not merged is not a tick (1.176.0).
+    if any(word in low for word in ("not implemented", "failed", "unverified", "claimed", "verified on branch")):
         return False
     return "verified" in low
 

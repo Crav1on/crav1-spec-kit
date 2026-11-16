@@ -96,4 +96,4 @@ Run the step it named, for example:
 
 Reference page: [help](reference/skills/crav1-help.md) · Routes: [Workflow routes](reference/workflow.md)
 
-The run ends as [How a run ends](reference/run-ending.md) says: one `Next:` line, `Waiting:` only when a step is blocked, and `Uncommitted:` when files changed and are not committed.
+The run ends as [How a run ends](reference/run-ending.md) says: Run next, never a `Next:` line. Since 1.176.0 `/crav1-help status` takes its Run next from the ready check itself (read only, no build map written), so help and `/crav1-tasks-ready-to-build` recommend the same command. `Waiting:` only when a step is blocked, and `Uncommitted:` when files changed and are not committed.

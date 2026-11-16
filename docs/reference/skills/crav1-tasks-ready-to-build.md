@@ -8,6 +8,8 @@
 
 List the tasks ready to build, for one spec or all, and why the others are blocked. Rewrites each slice build map.
 
+1.176.0: open pull requests are one `Merge these PRs, in this order:` block, one numbered PR per line with its owner (`yours` or the name) and what merging it ticks and lets start, in dependency order. Branch runs reads `built, PR <n> open`. A task verified on an unmerged branch reads `verified on <branch>, waits for PR <n> to merge`.
+
 1.176.0: branch entries read `Build <T# full name> on <branch>:` above the command; a held task quotes its whole question; a question that says `Raised with` or `Waiting for` a person counts as asked; uncommitted slice files add `Commit the walk's changes, <n> files:` above [`/crav1-finalize-commit`](crav1-finalize-commit.md) before the push; task titles keep their code text with no stray ` ,` or ` )`.
 
 1.175.0: a claimed task that is built on a branch that is not merged reads `built by <name>, waits for PR <n> to merge` in the Held list and on `build-map.md`, not `in progress by <name> since <date>`. A reopened step's entry gives the reason in one plain sentence above `Finish the reopened <command> step:`. The Catch up first push entry names how far ahead only in its label.

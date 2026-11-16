@@ -8,6 +8,8 @@
 
 Open a pull request for the current change branch, or push to an existing one and update its description or comment (push with explicit yes).
 
+1.176.0: on Azure DevOps, `pr_common.py fit --body <file> --notes-link <link> --text` keeps the description under 4,000 characters, trimming link columns, extra links, long bullets and later sections first, and links the full notes.
+
 1.172.0: on Windows, pull request threads are listed and posted with `crav1-review-pr/scripts/ado_threads.py`, which reads az JSON from stdout and decodes UTF-8, then cp1252.
 
 1.171.0: the ending is Run next, never a `Next:` line: a Catch up first `git push` when the specs repo is ahead, then `Review PR <n>:` with [`/crav1-review-pr`](crav1-review-pr.md) <repo> <n>`.

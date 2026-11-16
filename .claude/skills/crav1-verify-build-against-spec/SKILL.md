@@ -17,7 +17,7 @@ You prove the **running system** (or current tree) against `spec.md`. You do not
 
 ## Find the spec
 
-The spec folder is the user's @-mention, or the one folder `<interpreter> -X utf8 <skill crav1-tasks-ready-to-build>/scripts/resolve_spec.py "<query>" --root docs/specs` prints, as `crav1-docs/reference/running-scripts.md` says. Exact folder first, then hyphen and space forms (`orders 1.0` matches `orders-1-0`), then one unique playbook basename, spec title, or work-item name in `spec.md`, then one unique ordered token subsequence of those names (`cc 1.0` matches `cc-process-1-0`). Several matches: list them and stop. No match: say so and list the nearest slugs. Do not pick the most recently edited tree. Do not search the rest of the tree. No name: ask which slug.
+The spec folder is the user's @-mention, or the one folder `<interpreter> -X utf8 <skill crav1-tasks-ready-to-build>/scripts/resolve_spec.py "<query>" --root docs/specs` prints, as `crav1-docs/reference/running-scripts.md` says. Several matches: list them and stop. No match: say so and list the nearest slugs. Do not pick the most recently edited tree. Do not search the rest of the tree. No name: ask which slug.
 
 Read only (1.168.0): `spec.md` acceptance (an EARS/BDD export too; spec.md wins), `plan.md`, `tasks.md`, the previous `verify.md`, the reference a step names, then the tests and files `plan.md` names. Do not open `build-map.md`, `claims.md`, `walk-progress.md` or a log unless a step names it.
 
@@ -34,10 +34,11 @@ A task downstream of an **Implemented, verify failed** task (it waits on it, dir
 | **Implemented, verified** | Row is `[x]` **and** its verify evidence ran and passed |
 | **Implemented, verified, tick pending** | Evidence passed, the row is still `[ ]`, and the pull request is recorded merged (`(PR n)` and the word `merged` on the task line, or on the Match `Branch:` line for its `(branch:)` or `(map:)`). Not **Not implemented**. The open checkbox is a Gap |
 | **Implemented, verify failed** | `[x]` or code exists for this `T#`, but verify ran and failed |
-| **Not implemented** | Still `- [ ]`, and it is not tick pending (or no code for this `T#`) |
+| **Implemented, verified on branch** | Evidence passed on an unmerged work branch, row still `[ ]` (1.176.0) |
+| **Not implemented** | Still `- [ ]`, neither of the two above (or no code for this `T#`) |
 | **Claimed done, unverified** | `[x]` but evidence could not be run (no command, no browser). Also a ticked task whose `(branch: X)` is not the checkout: **Claimed done, unverified (on X, not checked out)** |
 
-Read `references/tick-pending.md` ("Tick pending") only when evidence passed, the row is still `[ ]`, and the pull request is recorded merged.
+Read `references/tick-pending.md` only when a row is tick pending or verified on branch.
 
 Read `references/host-setup-task.md` ("Host setup tasks") only when a task is marked `(host setup)` (1.115.0, skill `crav1-host-setup`).
 
@@ -65,7 +66,7 @@ Then:
 1. If any acceptance or task verify is **live** (running Aspire/compose/dev host, published URL, browser against localhost), follow this skill’s [references/live-host.md](references/live-host.md) **before** that evidence. Record refresh/health in **Commands run**.
 2. Before any test command, run the local dependency preflight in this skill's [references/test-dependencies.md](references/test-dependencies.md): detect what the tests need (Azurite, a database container, an emulator), check each is running, and ask start, skip, or stop for one that is not. Then run the documented test/lint commands from `AGENTS.md` or the repo README when they exist. Record the command and outcome. A test skipped for a missing dependency blocks **Implemented, verified** unless the user chose skip; that task is **Claimed done, unverified**, and the missing dependency goes at the top of the report as a blocker.
 3. For UI acceptance, use the browser if available; otherwise mark **untested** and say why.
-4. Map `tasks.md` rows: checked but failing verify → **Implemented, verify failed**; evidence passed, row still `[ ]`, pull request recorded merged → **Implemented, verified, tick pending**; other unchecked → **Not implemented**.
+4. Map `tasks.md` rows: checked but failing verify → **Implemented, verify failed**; evidence passed, row still `[ ]`, pull request recorded merged → **Implemented, verified, tick pending**; passed on an unmerged branch → **Implemented, verified on branch**; other unchecked → **Not implemented**.
 
 ## Write `docs/specs/<slug>/verify.md`
 

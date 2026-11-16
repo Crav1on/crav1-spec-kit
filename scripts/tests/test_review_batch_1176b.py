@@ -212,3 +212,108 @@ class EndingFromProgress(unittest.TestCase):
             out = run_cli("ending", "--json", str(state))
             self.assertTrue(out["ok"], out)
             self.assertIn("- T9\n- T10", out["ending"])
+
+
+PR_COMMON = SK / "crav1-open-pr/scripts/pr_common.py"
+
+
+def long_body() -> str:
+    link = "https://dev.azure.com/contoso/orders/_git/orders-api?path=/a.yml&version=GBfeat&line=3&lineEnd=9&lineStartColumn=1&lineEndColumn=40"
+    bullets = "\n".join(
+        f"- T{n} adds the stage for step {n}. It also explains why the stage runs after the build and before the deploy. [a.yml]({link}) · [b.yml]({link})"
+        for n in range(1, 25)
+    )
+    return ("Adds the orders-api pipeline.\n\nAB#2\n\n## Changes\n\n" + bullets +
+            "\n\n## Testing\n\n" + "- Pipeline 6 run 265 is green on the branch, with every stage.\n" * 20 +
+            "\n## Notes\n\n" + "A long background note about the release plan and the approvals.\n" * 20)
+
+
+class AdoBody(unittest.TestCase):
+    def setUp(self):
+        self.pc = load(PR_COMMON, "pr_common_1176b")
+
+    def test_short_body_is_untouched(self):
+        out = self.pc.fit_body("Adds the pipeline.\n\nAB#2\n")
+        self.assertEqual(out["trimmed"], [])
+        self.assertTrue(out["fits"])
+
+    def test_long_body_fits_and_links_the_notes(self):
+        text = long_body()
+        self.assertGreater(len(text), 4000)
+        out = self.pc.fit_body(text, notes_link="https://dev.azure.com/contoso/orders/_git/specs?path=/docs/specs/orders")
+        self.assertTrue(out["fits"], out["length"])
+        self.assertLessEqual(len(out["body"]), 4000)
+        self.assertNotIn("lineStartColumn", out["body"])
+        self.assertIn("AB#2", out["body"])
+        self.assertIn("Adds the orders-api pipeline.", out["body"])
+        self.assertEqual(out["trimmed"][0], "columns")
+        if "sections" in out["trimmed"] or "cut" in out["trimmed"]:
+            self.assertIn("Full notes: https://dev.azure.com/contoso/orders/_git/specs", out["body"])
+
+    def test_later_sections_give_way_to_the_notes_link(self):
+        out = self.pc.fit_body(long_body(), limit=1500, notes_link="https://example.invalid/notes")
+        self.assertTrue(out["fits"], out)
+        self.assertIn("sections", out["trimmed"])
+        self.assertTrue(out["body"].rstrip().endswith("Full notes: https://example.invalid/notes") or "AB#2" in out["body"])
+        self.assertIn("Full notes: https://example.invalid/notes", out["body"])
+        self.assertNotIn("## Notes", out["body"])
+
+    def test_cli_prints_the_body_and_leaves_the_file(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            body = Path(tmp) / "body.md"
+            body.write_text(long_body(), encoding="utf-8")
+            proc = subprocess.run([sys.executable, "-X", "utf8", str(PR_COMMON), "fit", "--body", str(body), "--text"],
+                                  capture_output=True, text=True, encoding="utf-8", check=False)
+            self.assertEqual(proc.returncode, 0, proc.stderr)
+            self.assertLessEqual(len(proc.stdout), 4000)
+            self.assertEqual(body.read_text(encoding="utf-8"), long_body())
+
+
+class HelpSharedEnding(unittest.TestCase):
+    def test_status_takes_run_next_from_the_ready_check(self):
+        text = (SK / "crav1-help/references/status.md").read_text(encoding="utf-8")
+        self.assertIn("readiness --root <spec-folder> --skip-sync --text", text)
+        self.assertIn("Never write a `Next:` line", text)
+        self.assertNotIn("--write-map`, so", text.replace("without `--write-map`, so", ""))
+
+
+VERIFY_CRLF = (
+    "# Verify\r\n\r\n| | Count | Ids |\r\n| --- | --- | --- |\r\n"
+    "| Implemented, verified | 2 | T3, T1 |\r\n| Not implemented | 1 | T2 |\r\n"
+    "| Implemented, verified on branch | 0 | |\r\n\r\n"
+    "| T# | Title | Status | Verify |\r\n| --- | --- | --- | --- |\r\n"
+    "| T1 | One | Implemented, verified | pass |\r\n| T2 | Two | Not implemented | none |\r\n"
+    "| T3 | Three | Implemented, verified | pass |\r\n"
+)
+
+
+class VerifyRowsKeepTheFile(unittest.TestCase):
+    def test_crlf_stays_and_unchanged_lists_keep_their_order(self):
+        script = SK / "crav1-verify-build-against-spec/scripts/verify_rows.py"
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "verify.md"
+            path.write_bytes(VERIFY_CRLF.encode("utf-8"))
+            proc = subprocess.run([sys.executable, str(script), "set", "--file", str(path), "--task", "T2",
+                                   "--status", "Implemented, verified on branch",
+                                   "--evidence", "pass at 61dc1ce on feat/orders-readme, PR 71 open", "--yes"],
+                                  capture_output=True, text=True, check=False)
+            self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
+            raw = path.read_bytes()
+            self.assertNotIn(b"\n", raw.replace(b"\r\n", b""))
+            text = raw.decode("utf-8")
+            self.assertIn("| Implemented, verified | 2 | T3, T1 |", text)
+            self.assertIn("| Implemented, verified on branch | 1 | T2 |", text)
+            self.assertIn("| Not implemented | 0 |", text)
+
+
+class SmallDocs(unittest.TestCase):
+    def test_build_tasks_implement_has_no_next_line(self):
+        text = (SK / "crav1-build-tasks/branches/implement/BRANCH.md").read_text(encoding="utf-8")
+        self.assertNotIn("Next:", text)
+        self.assertIn("`Verify this turn's tasks:` above `/crav1-verify-build-against-spec`", text)
+
+    def test_branch_run_commit_needs_no_extra_reads(self):
+        text = (SK / "crav1-build-walk/references/branch-run.md").read_text(encoding="utf-8")
+        self.assertIn("Do not open finalize-commit for that commit", text)
+        self.assertIn("ending --root <spec-folder> --branch <branch>", text)
+        self.assertIn("--code-repo <code repo>", text)

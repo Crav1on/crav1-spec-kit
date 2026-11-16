@@ -500,9 +500,67 @@ def after(state: dict) -> dict:
     return {"stop": False, "action": "continue", "task": task, "next": nxt, "line": line, "hint": hint}
 
 
+def _toplevel(path: Path) -> Path | None:
+    proc = _git(path, "rev-parse", "--show-toplevel")
+    if proc.returncode != 0 or not proc.stdout.strip():
+        return None
+    return Path(proc.stdout.strip()).resolve()
+
+
+def _inside(path: Path, repo: Path) -> bool:
+    try:
+        path.resolve().relative_to(repo.resolve())
+        return True
+    except ValueError:
+        return False
+
+
+def work_item_mention(root: Path) -> str | None:
+    """`AB#2` from work-item.md, when the slice has one (1.176.0)."""
+    text = _read(Path(root) / "work-item.md")
+    match = re.search(r"\bAB#\d+\b", text)
+    return match.group(0) if match else None
+
+
+def repos_for(root: Path, repo: Path | None = None, specs_repo: Path | None = None,
+              code_repo: Path | None = None) -> dict:
+    """Keep the specs repo and the code repo apart (1.176.0).
+
+    The specs repo is `--specs-repo`, else the git top level of `--root`. The
+    code repo is `--code-repo`, else a `--repo` that does not hold the specs
+    folder (the older single flag). Checked before anything is written.
+    """
+    root = Path(root)
+    specs = Path(specs_repo).resolve() if specs_repo else None
+    code = Path(code_repo).resolve() if code_repo else None
+    if repo is not None:
+        given = Path(repo).resolve()
+        if _inside(root, given):
+            specs = specs or given
+        else:
+            code = code or given
+    if specs is None:
+        specs = _toplevel(root)
+    if specs is None or not _inside(root, specs):
+        return {"ok": False, "code": "specs-repo",
+                "line": f"The spec folder {root} is not inside the specs repo; pass --specs-repo. Nothing was written."}
+    if code is not None and _toplevel(code) is None:
+        return {"ok": False, "code": "code-repo",
+                "line": f"{code} is not a git repo; pass the code repo with --code-repo. Nothing was written."}
+    return {"ok": True, "specs": specs, "code": code}
+
+
 def record(root: Path, branch: str, task: str, commit: str, tests: str,
-           repo: Path | None = None, push: bool = False) -> dict:
-    """Write one built task to the run section, commit it, and push with no card."""
+           repo: Path | None = None, push: bool = False,
+           specs_repo: Path | None = None, code_repo: Path | None = None) -> dict:
+    """Write one built task to the run section, commit it, and push with no card.
+
+    1.176.0: the specs repo and the code repo are kept apart. Every check runs
+    before anything is written, so a bad path never leaves a half-written
+    run. The specs commit holds the progress file, claims.md,
+    walk-progress.md and verify.md, and ends with the work-item mention.
+    `--push` pushes the work branch in the code repo and the specs repo.
+    """
     root = Path(root)
     run = load_run(root, branch)
     if run is None or not run.get("yes"):
@@ -512,6 +570,10 @@ def record(root: Path, branch: str, task: str, commit: str, tests: str,
         return {"ok": False, "code": "commit", "line": f"not a commit sha: {commit}"}
     if tests not in ("green", "red", "none"):
         return {"ok": False, "code": "tests", "line": "tests is green, red, or none"}
+    commits = repo is not None or specs_repo is not None or code_repo is not None
+    repos = repos_for(root, repo, specs_repo, code_repo) if commits else {"ok": True, "specs": None, "code": None}
+    if not repos["ok"]:
+        return repos
     run["built"] = [row for row in run["built"] if row["task"] != task]
     run["built"].append({"task": task, "commit": commit[:12], "tests": tests})
     built = {row["task"] for row in run["built"]}
@@ -524,19 +586,36 @@ def record(root: Path, branch: str, task: str, commit: str, tests: str,
     status = set_status(root, branch, run_state(run["next"], task))
     out = {"ok": True, "task": task, "next_task": run["next"], "progress": str(path),
            "status_line": status, "committed": False, "pushed": False}
-    if repo is None:
+    if not commits:
         return out
-    rel = str(path.resolve().relative_to(Path(repo).resolve()))
-    paths = [rel]
-    for extra in (root / "claims.md", root / "walk-progress.md"):
-        if extra.is_file():
-            paths.append(str(extra.resolve().relative_to(Path(repo).resolve())))
+    specs = repos["specs"]
+    paths = []
+    for item in (path, root / "claims.md", root / "walk-progress.md", root / "verify.md"):
+        if item.is_file():
+            paths.append(str(item.resolve().relative_to(specs)))
     for item in paths:
-        _git(repo, "add", "--", item)
-    proc = _git(repo, "commit", "-m", f"Record {task} on {branch} in the build progress")
+        _git(specs, "add", "--", item)
+    subject = f"Record {task} on {branch} with its verify evidence"
+    mention = work_item_mention(root)
+    message = subject + (f"\n\n{mention}" if mention else "")
+    proc = _git(specs, "commit", "-m", message)
     out["committed"] = proc.returncode == 0
+    out["specs_repo"] = str(specs)
+    out["code_repo"] = str(repos["code"]) if repos["code"] else None
+    out["files"] = paths
     if push:
-        out.update(push_branch(Path(repo), branch))
+        if repos["code"] is not None:
+            code_push = push_branch(repos["code"], branch)
+            out["code_pushed"] = code_push.get("pushed", False)
+            if not code_push.get("pushed"):
+                out.update(code_push)
+                return out
+        current = _git(specs, "rev-parse", "--abbrev-ref", "HEAD").stdout.strip() or branch
+        specs_push = push_branch(specs, current)
+        out["specs_pushed"] = bool(specs_push.get("pushed"))
+        if not specs_push.get("pushed"):
+            out.update({k: v for k, v in specs_push.items() if k != "pushed"})
+        out["pushed"] = bool(out.get("code_pushed", True)) and out["specs_pushed"]
     return out
 
 
@@ -568,6 +647,56 @@ def _label(task) -> str:
     text = str(task).strip()
     match = re.match(r"^T?(\d+)\b\s*(.*)$", text, re.I)
     return f"T{int(match.group(1))} {match.group(2)}".strip() if match else text
+
+
+_PR_IN_TEXT = re.compile(r"\b(?:PR|pull request)\s+#?(\d+)", re.I)
+
+
+def state_from_progress(root: Path, branch: str, notes: list | None = None) -> dict:
+    """The ending state read from build-progress/<branch>.md itself (1.176.0).
+
+    The pull request, the base, what was built (with full task names from
+    tasks.md), what is left, and the other ready branches. The agent no longer
+    hand-builds a JSON file for the ending.
+    """
+    root = Path(root)
+    path = progress_path(root, branch)
+    text = _read(path)
+    run = parse_run(text) or {"built": [], "next": None}
+    head = text.split("\n- Step:", 1)[0]
+    base = re.search(r"^Cut from:\s*(\S+)", head, re.M)
+    prs = _PR_IN_TEXT.findall(text)
+    plan = branch_plan(root, branch)
+    labels = {row["id"]: row["label"] for row in plan.get("tasks") or []}
+    built = []
+    for row in run.get("built") or []:
+        label = labels.get(row["task"], row["task"])
+        title = label[len(row["task"]):].strip() if label.startswith(row["task"]) else ""
+        built.append({**row, "title": title})
+    built_ids = {row["task"] for row in built}
+    left_open = [tid_ for tid_ in plan.get("open") or [] if tid_ not in built_ids]
+    stop = {"kind": "merge"}
+    first = plan.get("first_stop")
+    if left_open and first:
+        stop = {"kind": first.get("kind") or "question", "line": first.get("line")}
+    try:
+        slug = walk_mod().command_slug(root)
+    except Exception:  # noqa: BLE001 - the slug is words only
+        slug = root.name
+    try:
+        ready = walk_mod().ready_branches(root)
+    except Exception:  # noqa: BLE001 - a bad ready check must not hide the ending
+        ready = []
+    return {
+        "slug": slug,
+        "branch": branch,
+        "pr": int(prs[-1]) if prs else None,
+        "base": base.group(1) if base else "develop",
+        "stop": stop,
+        "built": built,
+        "ready_branches": ready,
+        "notes": list(notes or []),
+    }
 
 
 def ending(state: dict) -> dict:
@@ -608,7 +737,17 @@ def ending(state: dict) -> dict:
     rows = []
     if built:
         header = f"Built on {branch}" + (f" (PR {pr} is open and up to date):" if pr and not state.get("pr_failed") else ":")
-        rows = [f"- {row['task']}{(' ' + row['title']) if row.get('title') else ''}: commit {row['commit'][:7]}, tests {row['tests']}" for row in built]
+        rows = []
+        for row in built:
+            if not isinstance(row, dict):
+                row = {"task": str(row)}
+            bits = []
+            if row.get("commit"):
+                bits.append(f"commit {str(row['commit'])[:7]}")
+            if row.get("tests"):
+                bits.append(f"tests {row['tests']}")
+            tail = (": " + ", ".join(bits)) if bits else ""
+            rows.append(f"- {row.get('task')}{(' ' + row['title']) if row.get('title') else ''}{tail}")
     left = []
     if kind != "merge" and stop.get("line"):
         left.append(f"- Stopped: {stop['line']}")
@@ -619,6 +758,10 @@ def ending(state: dict) -> dict:
     for text in state.get("verify_behind") or []:
         left.append(f"- verify.md is behind: {text}")
     text = em.compose(run=runs, built=rows, built_header=header, left=left, catch_up=state.get("catch_up") or None)
+    notes = [str(note).strip() for note in state.get("notes") or [] if str(note).strip()]
+    if notes:
+        # A sanctioned place for the agent's notes, after what was built (1.176.0).
+        text += "\n\nBefore the merge:\n" + "\n".join(f"- {note}" for note in notes)
     return {"ending": text, "kind": kind, "merges": False}
 
 
@@ -658,9 +801,14 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--commit", required=True)
     p.add_argument("--tests", required=True)
     p.add_argument("--repo", default=None)
+    p.add_argument("--specs-repo", default=None)
+    p.add_argument("--code-repo", default=None)
     p.add_argument("--push", action="store_true")
     p = sub.add_parser("ending")
-    p.add_argument("--json", required=True)
+    p.add_argument("--json", default=None)
+    p.add_argument("--root", default=None)
+    p.add_argument("--branch", default=None)
+    p.add_argument("--note", action="append", default=[])
     p = sub.add_parser("status")
     p.add_argument("--root", required=True)
     p.add_argument("--branch", required=True)
@@ -682,14 +830,26 @@ def main(argv: list[str] | None = None) -> int:
             return _emit({"ok": True, **after(_json(args.json))})
         if args.cmd == "record":
             out = record(Path(args.root), args.branch, args.task, args.commit, args.tests,
-                         Path(args.repo) if args.repo else None, args.push)
+                         Path(args.repo) if args.repo else None, args.push,
+                         Path(args.specs_repo) if args.specs_repo else None,
+                         Path(args.code_repo) if args.code_repo else None)
             return _emit(out, 0 if out["ok"] else 2)
         if args.cmd == "status":
             line = set_status(Path(args.root), args.branch, args.state)
             return _emit({"ok": bool(line), "line": line or "walk-progress.md could not be updated"}, 0 if line else 2)
         if args.cmd == "ending":
-            return _emit({"ok": True, **ending(_json(args.json))})
-    except (ValueError, KeyError, OSError, json.JSONDecodeError) as exc:
+            if args.root and args.branch:
+                state = state_from_progress(Path(args.root), args.branch, args.note)
+                if args.json:
+                    state.update({k: v for k, v in _json(args.json).items() if v is not None})
+            elif args.json:
+                state = _json(args.json)
+                if args.note:
+                    state["notes"] = list(state.get("notes") or []) + args.note
+            else:
+                return _emit({"ok": False, "code": "input", "line": "pass --root and --branch"}, 2)
+            return _emit({"ok": True, **ending(state)})
+    except (ValueError, KeyError, OSError, json.JSONDecodeError, AttributeError, TypeError) as exc:
         return _emit({"ok": False, "code": "input", "line": f"input is not usable: {exc}"}, 2)
     return 2
 

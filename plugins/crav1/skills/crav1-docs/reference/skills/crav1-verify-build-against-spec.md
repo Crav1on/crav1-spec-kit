@@ -8,6 +8,8 @@
 
 Map every v0 acceptance line to tests or UI checks and report pass, fail, or missing.
 
+1.176.0: new status **Implemented, verified on branch** for evidence that passed on an unmerged work branch; a check that can only pass after the merge is pending. It becomes tick pending once the merge is recorded. `verify_rows.py set` keeps CRLF files CRLF and re-sorts a count line only when its ids change.
+
 1.172.0: a rerun verifies again only the rows whose branch or tip moved since the last verify, or every row when spec.md, plan.md or tasks.md changed (`scripts/verify_rows.py scope`), and the reply says which rows were kept (`Kept from the last verify: T1, T3 (branch and tip unchanged).`). `verify_rows.py set --task T# --status <status> --evidence <evidence> --branch <b> --tip <sha> --yes` writes one row, recounts the TL;DR and records the tip under `## Row tips`.
 
 1.171.0: with no hand-written steps, the reply's branch blocks come from the ready check (`walk_ending.ready_branch_blocks`), with descriptions, open tasks and the whole-branch entry; a task that waits on a merge is not offered.

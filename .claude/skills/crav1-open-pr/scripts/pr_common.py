@@ -293,6 +293,107 @@ def cmd_behind(args) -> int:
                  "line": f"{args.head} is {behind} behind and {ahead} ahead of {args.base}." + (" " + advice if advice else "")})
 
 
+# ---------- the Azure DevOps 4,000-character description (1.176.0) ----------
+
+ADO_LIMIT = 4000
+_COLUMNS = re.compile(r"[&?](?:lineStartColumn|lineEndColumn)=\d+")
+_MD_LINK = re.compile(r"\[[^\]]*\]\([^)]*\)")
+
+
+def _notes_line(link: str | None) -> str:
+    if link:
+        return f"Full notes: {link}"
+    return "Full notes: the spec folder in the specs repo."
+
+
+def fit_body(text: str, limit: int = ADO_LIMIT, notes_link: str | None = None) -> dict:
+    """Trim a PR description to `limit` characters, plainest parts first.
+
+    1. Drop `lineStartColumn` and `lineEndColumn` from links.
+    2. Keep one link per bullet.
+    3. Cut each bullet to its first sentence.
+    4. Drop the later `## ` sections and link the full notes instead.
+    5. Cut at a line end, keeping the notes link.
+    The title, the first section and the work-item mention stay.
+    """
+    body = str(text or "").replace("\r\n", "\n")
+    steps: list[str] = []
+
+    def fits(value: str) -> bool:
+        return len(value) <= limit
+
+    if not fits(body):
+        new = _COLUMNS.sub("", body)
+        if new != body:
+            body, _ = new, steps.append("columns")
+    if not fits(body):
+        out = []
+        for line in body.split("\n"):
+            if line.lstrip().startswith(("- ", "* ")):
+                links = _MD_LINK.findall(line)
+                for extra in links[1:]:
+                    line = line.replace(extra, "", 1)
+                line = re.sub(r"\s*[·,]\s*(?=[·,]|$)", "", line).rstrip()
+            out.append(line)
+        new = "\n".join(out)
+        if new != body:
+            body, _ = new, steps.append("one-link")
+    if not fits(body):
+        out = []
+        for line in body.split("\n"):
+            stripped = line.lstrip()
+            if stripped.startswith(("- ", "* ")):
+                first = re.split(r"(?<=[.!?])\s+(?=[A-Z`])", line, maxsplit=1)[0]
+                line = first
+            out.append(line)
+        new = "\n".join(out)
+        if new != body:
+            body, _ = new, steps.append("short-bullets")
+    mention = re.findall(r"\bAB#\d+\b", body)
+    if not fits(body):
+        parts = re.split(r"(?m)^(?=## )", body)
+        head, rest = parts[0], parts[1:]
+        keep = [head] + rest[:1] if rest and not head.strip() else [head]
+        tail = "\n\n" + _notes_line(notes_link)
+        if mention and not any(m in "".join(keep) for m in mention):
+            tail += "\n\n" + mention[0]
+        dropped = len(parts) - len(keep)
+        while dropped and len("".join(keep).rstrip() + tail) <= limit and len(keep) < len(parts):
+            trial = keep + [parts[len(keep)]]
+            if len("".join(trial).rstrip() + tail) > limit:
+                break
+            keep = trial
+        body = "".join(keep).rstrip() + tail
+        steps.append("sections")
+    if not fits(body):
+        tail = "\n\n" + _notes_line(notes_link)
+        room = limit - len(tail)
+        cut = body[:room]
+        cut = cut[: cut.rfind("\n")] if "\n" in cut else cut
+        body = cut.rstrip() + tail
+        steps.append("cut")
+    return {"body": body, "length": len(body), "limit": limit, "fits": fits(body), "trimmed": steps}
+
+
+def limit_of(out: dict) -> int:
+    return int(out["limit"])
+
+
+def cmd_fit(args) -> int:
+    path = Path(args.body)
+    text = path.read_text(encoding="utf-8-sig")
+    out = fit_body(text, args.limit, args.notes_link)
+    if args.text:
+        if not out["fits"]:
+            print(f"Still {out['length']} characters after trimming; the limit is {limit_of(out)}.", file=sys.stderr)
+            return 2
+        sys.stdout.write(out["body"])
+        return 0
+    if not args.show:
+        out.pop("body")
+    return emit({"ok": out["fits"], **out}, 0 if out["fits"] else 2)
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="pr_common.py", description=__doc__.splitlines()[0])
     sub = parser.add_subparsers(dest="cmd", required=True)
@@ -313,6 +414,12 @@ def main(argv: list[str] | None = None) -> int:
     cl = sub.add_parser("claim")
     cl.add_argument("--root", required=True)
     cl.add_argument("--branch", required=True)
+    ft = sub.add_parser("fit")
+    ft.add_argument("--body", required=True, help="the PR body file, UTF-8")
+    ft.add_argument("--limit", type=int, default=ADO_LIMIT)
+    ft.add_argument("--notes-link", default=None, help="a pinned link to the full notes")
+    ft.add_argument("--text", action="store_true", help="print only the trimmed body, to redirect into the file you pass to create")
+    ft.add_argument("--show", action="store_true", help="print the trimmed body in the JSON")
     b = sub.add_parser("behind")
     b.add_argument("--head", required=True)
     b.add_argument("--base", required=True)
@@ -323,7 +430,7 @@ def main(argv: list[str] | None = None) -> int:
         return emit(out, 0 if out.get("status") == "ok" else 1)
     if args.cmd == "host":
         return emit(host_of(args.remote_url))
-    return {"find": cmd_find, "checks": cmd_checks, "claim": cmd_claim, "behind": cmd_behind}[args.cmd](args)
+    return {"find": cmd_find, "checks": cmd_checks, "claim": cmd_claim, "behind": cmd_behind, "fit": cmd_fit}[args.cmd](args)
 
 
 if __name__ == "__main__":

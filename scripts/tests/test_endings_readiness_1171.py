@@ -185,7 +185,7 @@ class ReadinessReadsProgress(unittest.TestCase):
                        [("build", "built"), ("comment", "pushed to PR 71, commented")])
         after = self.readiness()
         self.assertNotIn("T2", after.get("can_start") or [])
-        self.assertIn("Waiting: PR 71 to merge, then T2 is ticked.", after["ending"])
+        self.assertIn("Merge these PRs, in this order:\n1. PR 71 (someone else's, feat/orders-api-host-setup): ticks T2.", after["ending"])  # 1.176.0
         self.assertNotIn("/crav1-build-walk T2`", after["ending"])
 
     def test_progress_mid_build_still_starts(self):

@@ -27,6 +27,9 @@ sys.dont_write_bytecode = True
 STATUSES = (
     "Implemented, verified",
     "Implemented, verified, tick pending",
+    # 1.176.0: evidence passed on a work branch that is not merged yet. The row
+    # stays `[ ]`; it becomes tick pending once the merge is recorded.
+    "Implemented, verified on branch",
     "Implemented, verify failed",
     "Not implemented",
     "Claimed done, unverified",
@@ -99,7 +102,10 @@ def recount(text: str) -> str:
             label = match.group(1)
             ids = [t for t, cells in rows.items() if cells[1] == label]
             ids.sort(key=lambda t: int(t[1:]))
-            line = f"| {label} | {len(ids)} | {', '.join(ids)} |"
+            had = re.findall(r"T\d+", line.rsplit("|", 2)[-2])
+            # 1.176.0: re-sort only when the set changes, so no unrelated diff.
+            if set(had) != set(ids) or len(had) != len(ids):
+                line = f"| {label} | {len(ids)} | {', '.join(ids)} |"
         out.append(line)
     return "\n".join(out) + ("\n" if text.endswith("\n") else "")
 
@@ -212,7 +218,9 @@ def main(argv: list[str] | None = None) -> int:
         new = write_tips(new, tips)
     wrote = False
     if args.yes:
-        path.write_text(new, encoding="utf-8", newline="\n")
+        # Keep the file's own line endings (1.176.0): a CRLF checkout stays CRLF.
+        ending = "\r\n" if b"\r\n" in path.read_bytes() else "\n"
+        path.write_text(new, encoding="utf-8", newline=ending)
         wrote = True
     return _out({"ok": True, "wrote": wrote, "task": task, "status": args.status,
                  "line": f"Wrote the {task} row." if wrote else "Preview only. Add --yes to write the row."})

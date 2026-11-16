@@ -51,6 +51,8 @@ If the list call fails, do not create. Print the Azure DevOps fallback from **Ho
 
 If the list is empty, create one pull request.
 
+**4,000 characters (1.176.0).** Azure DevOps refuses a description longer than 4,000 characters. Before `create` (and before an update), write the body to a UTF-8 file and run `<interpreter> -X utf8 scripts/pr_common.py fit --body <file> --notes-link <pinned link to the spec folder> --text > <fitted file>` and pass `<fitted file>` to `create`. The script itself never writes a file. It trims the plainest parts first: the `lineStartColumn` and `lineEndColumn` parts of links, then all but one link per bullet, then each bullet to its first sentence, then the later `## ` sections, which give way to a `Full notes:` link. The opening, the first section and the work-item mention stay. `ok: false` means it still does not fit; say so and stop. Never count characters by hand.
+
 Non-Windows: pass `--description` as one value (a HEREDOC is fine) so quotes and Markdown survive. Microsoft documents each `--description` value as one new line.
 
 ```text
