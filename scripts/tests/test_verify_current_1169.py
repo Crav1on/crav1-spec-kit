@@ -189,7 +189,7 @@ class EndToEnd(unittest.TestCase):
         text = _readiness(spec=SPEC_NOT_ASKED)["ending"]
         run_next = text.split("Held:")[0]
         self.assertIn("**feat/orders-cicd**", run_next)
-        self.assertIn("`/crav1-show-or-ask-open-questions orders-api`\nthe questions are not asked yet.", run_next)
+        self.assertIn("Ask the open questions, which haven't been asked yet:\n`/crav1-show-or-ask-open-questions orders-api`", run_next)
         self.assertLess(run_next.index("**feat/orders-cicd**"), run_next.index("/crav1-show-or-ask-open-questions"))
 
     def test_only_needs_verify_left_is_not_ready(self):

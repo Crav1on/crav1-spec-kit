@@ -12,4 +12,6 @@ Exact words for bots and scripted runs. There are no `--flags`.
 
 `commit-now`, and `commit` typed in the invocation (1.76.1): draft, show the paste blocks, then commit with no choice question. When `agent-tools/` or build output is in the file set, warn and offer the normal choices instead. On a base branch with implementation code staged (1.99.0), ask the base-branch prompt instead ([base-branch.md](base-branch.md)); `new-branch` answers it.
 
+Kit-rewritten files (1.173.0): when the only changed files are kit-owned files the kit rewrote (`build-map.md`, `walk-progress.md`, `build-progress/*`) and a value in them disagrees with `verify.md` or `build-progress`, such as a done hash, a typed `commit` or `commit-now` still asks. Say which value disagrees and offer the normal choices with `stop` recommended.
+
 When the invocation contains one of these words (for example `/crav1-finalize-commit commit`), take that choice and do not ask. This holds for a person, a bot, or a headless run.

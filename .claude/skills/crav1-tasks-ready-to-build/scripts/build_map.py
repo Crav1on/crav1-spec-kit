@@ -1590,22 +1590,105 @@ def task_pr(rest):
     return None
 
 
+OWN_SHA = re.compile(r"(?<![0-9A-Za-z])((?=[0-9a-f]*\d)[0-9a-f]{7,40})(?![0-9A-Za-z])")
+MERGE_SHA = re.compile(r"merge\w*\D{0,40}?(?<![0-9A-Za-z])((?=[0-9a-f]*\d)[0-9a-f]{7,40})(?![0-9A-Za-z])", re.I)
+ROW_LEAD = re.compile(r"^[\s|>*_`\-]*(?:\[[ xX]\]\s*)?[*_`]*T(\d+)\b")
+
+
+def _pick_sha(text):
+    """The merge commit on a line when one is named, else the first commit."""
+    merged = MERGE_SHA.search(text or "")
+    if merged:
+        return merged.group(1)[:12]
+    found = OWN_SHA.search(text or "")
+    return found.group(1)[:12] if found else None
+
+
 def verify_sha(text, task_id):
-    """A commit sha on the verify row for this task, or None."""
+    """A commit sha on this task's own verify row, or None (1.173.0).
+
+    Only a row whose first cell or first word is this task id counts. A
+    Date line, a gaps note, or another task's row that merely mentions the
+    id never lends its commit to this task.
+    """
     if not text:
         return None
-    tid = f"T{task_id}"
     for line in text.splitlines():
-        if not re.search(rf"\b{re.escape(tid)}\b", line):
+        lead = ROW_LEAD.match(line)
+        if not lead or int(lead.group(1)) != int(task_id):
             continue
-        match = SHA.search(line)
-        if match:
-            return match.group(1)[:12]
+        sha = _pick_sha(line)
+        if sha:
+            return sha
     return None
 
 
-def done_evidence(task, branch_name, prs, verify_text):
-    """PR link, else the recorded branch, else a verify commit, else the row branch."""
+def progress_shas(directory):
+    """Merge commits from build-progress/*.md, as {task id: sha} (1.173.0).
+
+    A file counts for the tasks on its own `Tasks:` line. The commit comes
+    from that file's `Result: done (...)` or `Result: merged (...)` line.
+    """
+    found = {}
+    folder = pathlib.Path(directory) / "build-progress"
+    if not folder.is_dir():
+        return found
+    for path in sorted(folder.glob("*.md")):
+        try:
+            text = path.read_text(encoding="utf-8")
+        except OSError:
+            continue
+        ids = []
+        branch = None
+        sha = None
+        for line in text.splitlines():
+            stripped = line.strip()
+            if stripped.lower().startswith("tasks:"):
+                ids = [int(n) for n in re.findall(r"\bT(\d+)\b", stripped)]
+            elif stripped.lower().startswith("branch:") and branch is None:
+                branch = stripped.split(":", 1)[1].strip()
+            elif re.match(r"result:\s*(done|merged)\b", stripped, re.I):
+                picked = _pick_sha(stripped.split(":", 1)[1])
+                if picked:
+                    sha = picked
+        if not sha:
+            continue
+        for task_id in ids:
+            found.setdefault(task_id, sha)
+        if branch:
+            found.setdefault(branch, sha)
+    return found
+
+
+def map_marks(map_text):
+    """The done marks already on build-map.md, as {task id: evidence} (1.173.0)."""
+    marks = {}
+    for match in re.finditer(r"~~T(\d+)\b[^~\n]*~~ ✓ done \(", map_text or ""):
+        start = match.end()
+        depth = 1
+        index = start
+        while index < len(map_text) and depth:
+            char = map_text[index]
+            if char == "(":
+                depth += 1
+            elif char == ")":
+                depth -= 1
+            elif char == "\n":
+                break
+            index += 1
+        if depth == 0:
+            marks.setdefault(int(match.group(1)), map_text[start:index - 1])
+    return marks
+
+
+def done_evidence(task, branch_name, prs, verify_text, progress=None, existing=None):
+    """PR link, else the recorded branch, else the task's own commit, else the old mark.
+
+    The commit is the merge commit from the branch's build-progress file, else
+    the commit on the task's own verify row (1.173.0). A commit another task
+    or branch names is never used. With no own commit, an existing done mark
+    stays as it was, and only then the row branch is written.
+    """
     direct = task_pr(task.get("rest") or "")
     if direct:
         return direct
@@ -1615,9 +1698,16 @@ def done_evidence(task, branch_name, prs, verify_text):
             return prs[key]
     if recorded:
         return recorded
+    progress = progress or {}
+    sha = progress.get(task["id"]) or progress.get(branch_name)
+    if sha:
+        return sha
     sha = verify_sha(verify_text, task["id"])
     if sha:
         return sha
+    kept = (existing or {}).get(task["id"])
+    if kept:
+        return kept
     return branch_name
 
 
@@ -1630,7 +1720,7 @@ def _explicit(task):
     return None
 
 
-def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text="", resolve_recorded=False, repo=None, claims_text="", code_repo=None):
+def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text="", resolve_recorded=False, repo=None, claims_text="", code_repo=None, progress=None, existing=None):
     """Return markdown, a short chat summary, and the one-line pointer."""
     _REMOTE_CACHE.clear()
     tasks = parse_tasks(tasks_text)
@@ -1855,7 +1945,7 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text
             task["label"] = label
             task["run_label"] = task_label(task["id"], full)
             if task["done"]:
-                evidence = done_evidence(task, name, prs, verify_text)
+                evidence = done_evidence(task, name, prs, verify_text, progress, existing)
                 shorts.append(f"~~{plain}~~ ✓ done ({evidence})")
                 shown.append(f"~~{label}~~ ✓ done ({evidence})")
             else:
@@ -2237,6 +2327,11 @@ def wait_reason(task, row=None):
     return "can't start yet"
 
 
+def _full_label(task):
+    """`T#` plus the full task name, never cut with an ellipsis (1.173.0)."""
+    return task.get("run_label") or task_label(task["id"], task.get("full") or task.get("short"))
+
+
 def report_by_branch(built, rows, slug=None):
     """Group ready and held tasks by the build-map row.
 
@@ -2284,14 +2379,14 @@ def report_by_branch(built, rows, slug=None):
     held_groups = gather(held)
     ready_lines = []
     for group in ready_groups:
-        labels = "; ".join(task.get("label") or task_label(task["id"], task.get("short")) for task, _row in group["items"])
+        labels = "; ".join(_full_label(task) for task, _row in group["items"])
         ready_lines.append(f"- `{group['branch']['name']}` ({_where(group['branch'])}): {labels}")
     held_lines = []
     for group in held_groups:
         # One task per line under its branch heading (1.164.0).
         rows = [f"- `{group['branch']['name']}` ({_where(group['branch'])}):"]
         for task, row in group["items"]:
-            label = task.get("label") or task_label(task["id"], task.get("short"))
+            label = _full_label(task)
             phrase = re.sub(r"([.!?])[.;]+", r"\1", held_phrase(row))
             rows.append(f"  - {label} — {phrase}")
         held_lines.append("\n".join(rows))
@@ -2670,7 +2765,9 @@ def run_dir(directory, chat=False, stdout=False, recommend=None, code_repo=None)
         if not offer:
             return f"No open task {recommend}.", 2
         return format_offer(offer), 0
-    result = build(slug, spec, plan, tasks, work, verify, resolve_recorded=resolve_recorded, repo=repo, claims_text=claims, code_repo=code_repo)
+    progress_hashes = progress_shas(directory)
+    existing = map_marks(_read(directory / "build-map.md") or "")
+    result = build(slug, spec, plan, tasks, work, verify, resolve_recorded=resolve_recorded, repo=repo, claims_text=claims, code_repo=code_repo, progress=progress_hashes, existing=existing)
     if not stdout:
         (directory / "build-map.md").write_text(result["markdown"], encoding="utf-8")
     if stdout and not chat:
@@ -2779,7 +2876,7 @@ def fix_loop(directory, pick=1, yes=False, code_repo=None):
     new_text = apply_fix_text(tasks, chosen)
     with open(tasks_path, "w", encoding="utf-8", newline="") as handle:
         handle.write(new_text)
-    after = build(slug, spec, plan, new_text, work, verify, repo=repo, claims_text=claims, code_repo=code_repo)
+    after = build(slug, spec, plan, new_text, work, verify, repo=repo, claims_text=claims, code_repo=code_repo, progress=progress_shas(directory), existing=map_marks(_read(directory / "build-map.md") or ""))
     (directory / "build-map.md").write_text(after["markdown"], encoding="utf-8")
     lines = [f"Wrote {change}", "Rebuilt build-map.md."]
     if after["loops"]:

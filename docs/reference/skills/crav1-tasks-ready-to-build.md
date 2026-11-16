@@ -8,6 +8,8 @@
 
 List the tasks ready to build, for one spec or all, and why the others are blocked. Rewrites each slice build map.
 
+1.173.0: a done task's mark on the build map takes its commit only from its own evidence: the merge result in its branch's `build-progress` file, else its own row in `verify.md`. A Date line, a gaps note or another task's row never lends its commit. With no own commit the existing mark stays. Held and ready lines show full task names, never cut with `...`.
+
 1.171.0: readiness reads `build-progress/<branch>.md`: a task whose branch's last step is `comment` or `wait-merge` waits for its pull request to merge and is not in `can_start`. Your own claim reads `T5 is yours; the walk resumes it.` or `T5 is yours and waits for PR 71's merge.` Ready branches carry full task names. A branch description is never a planning note such as `cut from develop after ...`, and never a sentence about a done task.
 
 1.170.0: the Catch up first line `T# failed verify: <reason>.` is short. The reason is the Verify cell's opening sentence, plus the sentence that names the cause (`... made the asserts stale.`, `... because ...`) when it fits, about 200 characters, cut only at a sentence end; leading run detail (`fail at PR 7's tip abc1234: pipeline 6 run 251, 110 failed, 173 passed.`) gives way to the next sentence. The full cell stays in `verify.md`. A held question or approval with nobody named says `Nobody is named to answer it yet.` or `Nobody is named to give it yet.`, and the Waiting line says `nobody named for 1`, never `Waiting for not named yet`.
