@@ -64,9 +64,9 @@ class SingleNext(unittest.TestCase):
         "merge-pr",
         "tick",
         "comment",
-        "wait-merge",
         "next-task",
     ]
+    # wait-merge has no current-branch entry when Waiting says why (1.171.0).
 
     def test_each_in_walk_state_has_one_next_and_drops_the_step_skill_line(self):
         for phase in self.phases:
@@ -153,9 +153,11 @@ class OtherOwner(unittest.TestCase):
         self.assertTrue(bw.may_tick("other", pr_merged=True))
         waiting = bw.current_phase({"owner": "other", "built": True, "verified": True, "dirty": False, "pr_merged": False, "commented": True, "pushed": True})
         self.assertEqual(waiting, "wait-merge")
-        line = bw.next_for(state(owner="other", phase=waiting))["next"][0]
-        self.assertIn("wait until", line)
-        self.assertIn("merged", line)
+        # 1.171.0: no Run next entry for the waiting branch; the Waiting line says it.
+        out = bw.next_for(state(owner="other", phase=waiting))
+        self.assertEqual(out["next"], [])
+        self.assertIn("merge", out["ending"])
+        self.assertTrue(out["ending"].startswith("Waiting:"))
 
     def test_one_comment_per_push_and_the_description_stays(self):
         first = bw.push_comment(BRANCH, 51, "T3 Apply the CI build policy.")

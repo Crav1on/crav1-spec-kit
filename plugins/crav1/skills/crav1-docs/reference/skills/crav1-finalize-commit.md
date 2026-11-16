@@ -8,6 +8,8 @@
 
 Draft the commit message, then commit, copy, change, or stop.
 
+1.171.0: every case ends with Run next, never a `Next:` line: `Push the specs repo:` with `git push`, `Push and open the pull request:` with [`/crav1-open-pr`](crav1-open-pr.md), or `Push to PR <n> and comment:` with [`/crav1-open-pr`](crav1-open-pr.md) pr<n>`.
+
 1.149.0: the commit steps are read only after `commit` or `commit-now`. The trailer-hook file is read only when that question is asked, or when a teammate has the hook and the config line is missing. The rules are unchanged.
 
 1.141.0: a merge of `spec.md` keeps every `Approved:` line under `## Approval needed`. The pull path never drops one.

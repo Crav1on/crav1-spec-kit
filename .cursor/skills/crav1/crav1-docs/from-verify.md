@@ -74,4 +74,4 @@ When the matrix is green: [From commit to merge](from-commit.md). When the spec 
 
 Reference pages: [verify-build-against-spec](reference/skills/crav1-verify-build-against-spec.md) · [fix-build-gaps](reference/skills/crav1-fix-build-gaps.md) · [fix-build-gaps](reference/skills/crav1-fix-build-gaps.md)
 
-The run ends as [How a run ends](reference/run-ending.md) says: one `Next:` line, `Waiting:` only when a step is blocked, and `Uncommitted:` when files changed and are not committed.
+The run ends as [How a run ends](reference/run-ending.md) says: Run next, never a `Next:` line. Since 1.171.0 the branch blocks for what can start come from the ready check, the same as the build walk, so a task that waits on a merge is not offered. `Waiting:` only when a step is blocked.

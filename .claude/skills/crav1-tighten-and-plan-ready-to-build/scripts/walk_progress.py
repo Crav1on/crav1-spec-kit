@@ -1553,6 +1553,35 @@ def _one_step(values) -> str:
     return parts[0]
 
 
+def record_unchanged(root: Path, step: str, result: str, playbook: Path | None = None) -> bool:
+    """True when a record would only restamp Done or Verify version (1.171.0).
+
+    The step is already recorded with the same Result, and every other
+    version it stores is the same. Then the record is skipped: no card, no
+    write, and walk-progress.md stays clean.
+    """
+    if root is None or not Path(root).is_dir():
+        return False
+    try:
+        previous = load(Path(root))["steps"].get(step)
+    except Exception:  # noqa: BLE001 - an unreadable file is not unchanged
+        return False
+    if not previous or previous.get("result") != result:
+        return False
+    try:
+        now = current_tokens(Path(root), step, playbook)
+    except Exception:  # noqa: BLE001
+        return False
+    for key, value in now.items():
+        if "verify" in str(key).lower():
+            continue
+        if key in previous and previous.get(key) != value:
+            return False
+        if key not in previous:
+            return False
+    return True
+
+
 def record(args: argparse.Namespace) -> None:
     step = _one_step(args.step)
     if step not in COVERS:
@@ -1577,6 +1606,10 @@ def record(args: argparse.Namespace) -> None:
     root = Path(args.root)
     if not root.is_dir():
         fail("root", f"not a folder: {root}")
+    if step == "tasks-ready-to-build" and record_unchanged(root, step, args.result, Path(args.playbook) if args.playbook else None):
+        # Only Done or Verify version would change (1.171.0): no write.
+        emit({"ok": True, "wrote": None, "step": step, "result": args.result, "unchanged": True, "line": "Record unchanged."})
+        return
     data = load(root)
     previous = data["steps"].get(step)
     result = args.result
@@ -2298,6 +2331,13 @@ def classify(row: dict, resolve_kept: bool = False, resolve_recorded: bool = Fal
         # tasks can still start, so this hit alone does not force not-ready.
         hit = _hit(task, "blocker", "tighten-plan", LOOP_WHY)
         hit["loop"] = True
+        return hit
+    if row.get("merge_wait"):
+        hit = _waiting(row)
+        hit["merge"] = True
+        hit["step"] = None
+        hit["who"] = None
+        hit["why"] = f"{task or 'The task'} is pushed and {merge_wait_phrase(row['merge_wait'])}. It is not offered in Run next."
         return hit
     if row.get("approval") or "approval needed" in text:
         return _waiting(row)
@@ -3368,6 +3408,107 @@ def apply_claims(root: Path | None, rows: list[dict], user: str | None = None, b
     return {"claims": claims, "warnings": warnings, "ids": claims_mod().claimed_ids(claims)}
 
 
+MERGE_WAIT_STEPS = {"comment", "wait-merge"}
+_PROGRESS_STEP = re.compile(r"^- Step:\s*(\S+)", re.M)
+_PROGRESS_PR = re.compile(r"\b(?:PR|pull request)\s+#?(\d+)", re.I)
+
+
+def progress_merge_waits(root: Path | None) -> dict:
+    """Tasks whose walk waits on a merge, from build-progress/<branch>.md (1.171.0).
+
+    A branch whose last recorded step is `comment` or `wait-merge` is pushed
+    and waits for its pull request to merge. Returns {"T5": {"branch", "pr",
+    "owner", "step"}}. Empty when there is no build-progress folder.
+    """
+    out: dict = {}
+    if root is None:
+        return out
+    folder = Path(root) / "build-progress"
+    if not folder.is_dir():
+        return out
+    for path in sorted(folder.glob("*.md")):
+        try:
+            text = path.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError):
+            continue
+        steps = _PROGRESS_STEP.findall(text)
+        if not steps or steps[-1].strip().lower() not in MERGE_WAIT_STEPS:
+            continue
+        head = text.split("\n- Step:", 1)[0]
+        tasks_line = re.search(r"^Tasks:\s*(.*)$", head, re.M)
+        branch_line = re.search(r"^Branch:\s*(\S+)", head, re.M)
+        owner_line = re.search(r"^Owner:\s*(\S+)", head, re.M)
+        ids = re.findall(r"\bT(\d+)\b", tasks_line.group(1)) if tasks_line else []
+        prs = _PROGRESS_PR.findall(text)
+        pr = int(prs[-1]) if prs else None
+        for num in ids:
+            out[f"T{int(num)}"] = {
+                "branch": branch_line.group(1) if branch_line else path.stem.replace("--", "/"),
+                "pr": pr,
+                "owner": owner_line.group(1) if owner_line else "self",
+                "step": steps[-1].strip().lower(),
+            }
+    return out
+
+
+def merge_wait_phrase(info: dict) -> str:
+    pr = info.get("pr")
+    return f"waits for PR {pr} to merge" if pr else "waits for its pull request to merge"
+
+
+def apply_progress_waits(root: Path | None, rows: list[dict]) -> dict:
+    """A task pushed and waiting on a merge is waiting, not can start (1.171.0).
+
+    Your own claim no longer offers it in Run next while its branch's
+    build-progress file says the walk waits on the merge. Done and Needs
+    verify rows keep their state.
+    """
+    waits = progress_merge_waits(root)
+    for row in rows:
+        task = row.get("task")
+        if not task or task not in waits:
+            continue
+        if row.get("bucket") in ("done", "needs-verify"):
+            continue
+        row["bucket"] = "waiting"
+        row["held"] = True
+        row["merge_wait"] = waits[task]
+        row["reason"] = merge_wait_phrase(waits[task])
+    return waits
+
+
+def merge_wait_lines(rows: list[dict]) -> list[str]:
+    """Plain Waiting lines for tasks that wait on a merge (1.171.0)."""
+    by_pr: dict = {}
+    for row in rows:
+        info = row.get("merge_wait")
+        if not info or not row.get("task"):
+            continue
+        by_pr.setdefault(info.get("pr"), []).append(row["task"])
+    lines = []
+    for pr, tasks in by_pr.items():
+        named = f"PR {pr}" if pr else "the pull request"
+        joined = ", ".join(tasks[:-1]) + " and " + tasks[-1] if len(tasks) > 1 else tasks[0]
+        lines.append(f"Waiting: {named} to merge, then {joined} {'are' if len(tasks) > 1 else 'is'} ticked.")
+    return lines
+
+
+def own_claim_line(rows: list[dict]) -> str | None:
+    """Your own claimed tasks, in plain words (1.171.0)."""
+    parts = []
+    for row in rows:
+        task = row.get("task")
+        if not task or row.get("bucket") == "done":
+            continue
+        info = row.get("merge_wait")
+        if info and (row.get("own_claim") or info.get("owner") == "self" or info.get("owner") == "other"):
+            pr = info.get("pr")
+            parts.append(f"{task} is yours and waits for {'PR ' + str(pr) + chr(39) + 's' if pr else 'its pull request'} merge.")
+        elif row.get("own_claim"):
+            parts.append(f"{task} is yours; the walk resumes it.")
+    return " ".join(parts) or None
+
+
 def preflight_sync(root: Path | None, skip: bool = False) -> dict:
     """Fetch the specs repo. Behind or diverged stops before a read or write."""
     if skip or root is None:
@@ -3384,6 +3525,7 @@ def ready_branches(root: Path) -> list[dict]:
         return []
     rows = build_rows(root)
     apply_claims(root, rows)
+    apply_progress_waits(root, rows)
     apply_loop_holds(root, rows)
     resolve_kept = resolve_is_keep(root)
     resolve_recorded = resolve_ever_recorded(root)
@@ -4028,6 +4170,7 @@ def readiness(args: argparse.Namespace) -> None:
         fail("readiness", "pass --root <spec-folder>, or --json <rows file>")
     loop_lines: list[str] = []
     if root is not None and root.is_dir():
+        apply_progress_waits(root, rows)
         loop_lines = apply_loop_holds(root, rows)
     for row in rows:
         if not isinstance(row, dict):
@@ -4055,7 +4198,7 @@ def readiness(args: argparse.Namespace) -> None:
     slug = _slug(root) if root is not None else ""
     because = not_ready_because(result, rows, hits, can_start, slug=slug)
     ready = result == "ready"
-    waiting_line, waiting_next = _waiting_lines(waiting, slug)
+    waiting_line, waiting_next = _waiting_lines([h for h in waiting if not h.get("merge")], slug)
     report = branch_report(root, rows) if root is not None else None
     ready_lines = (report or {}).get("ready_lines") or []
     held_lines = (report or {}).get("held_lines") or []
@@ -4104,6 +4247,7 @@ def readiness(args: argparse.Namespace) -> None:
     # Waiting lines keep only what waits on people or merges.
     catch_up = catch_up_for(slug, gap, sync)
     waiting_bits = list(loop_lines)
+    waiting_bits.extend(merge_wait_lines(rows))
     if resolve_waiting:
         waiting_bits.append(resolve_waiting)
     if result == "not-ready" and not can_start and waiting_line:
@@ -4150,10 +4294,9 @@ def readiness(args: argparse.Namespace) -> None:
         ending = (ending + "\n\n" if ending else "") + sync["message"]
     if warnings:
         ending = (ending + "\n\n" if ending else "") + "\n".join(warnings)
-    own = [row.get("task") for row in rows if row.get("own_claim") and row.get("bucket") != "done" and row.get("task")]
-    if own:
-        pronoun = "it" if len(own) == 1 else "them"
-        ending = (ending + "\n\n" if ending else "") + f"In progress by you: {', '.join(own)}. Your own claim does not hold {pronoun}."
+    own_line = own_claim_line([row for row in rows if row.get("own_claim")])
+    if own_line:
+        ending = (ending + "\n\n" if ending else "") + own_line
     out = {
         "ok": True,
         "ready": ready,
@@ -4193,6 +4336,7 @@ def readiness(args: argparse.Namespace) -> None:
         "reopen_steps": [],
         "changed_questions": [],
         "restamp_only": False,
+        "record_unchanged": bool(root is not None and record_unchanged(root, "tasks-ready-to-build", result)),
         "verify_behind": gap["behind"],
         "verify_stale": gap["tasks"],
         "verify_waiting": gap["waiting"],

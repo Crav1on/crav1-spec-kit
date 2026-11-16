@@ -275,7 +275,10 @@ def _task_label(task: dict) -> str:
     title = (task.get("title") or "").strip()
     title = RUNS_LIVE.sub("", title)
     title = LIVE_YES.sub("", title)
-    title = re.sub(r"\s{2,}", " ", title).strip(" .")
+    title = re.sub(r"\s{2,}", " ", title).strip()
+    # Only a lone trailing full stop goes; an ellipsis stays (1.171.0).
+    if title.endswith(".") and not title.endswith(".."):
+        title = title[:-1].rstrip()
     return f"{_task_token(task.get('id'))} {title}".strip()
 
 
@@ -561,9 +564,18 @@ def _slug_for(state: dict) -> str | None:
     return slug
 
 
-def _invocation(command: str, tasks: list, slug: str | None) -> str:
-    """A command a new session can run. The T#s are on the command, not in because."""
-    ids = ", ".join(_task_token(task["id"]) for task in tasks if task.get("id") is not None)
+def _invocation(command: str, tasks: list, slug: str | None, branch: str | None = None) -> str:
+    """A command a new session can run. The T#s are on the command, not in because.
+
+    Two or more tasks use the branch form, `/crav1-build-walk <slug> <branch>`,
+    never a comma list of T#s (1.171.0). Without a branch only the first T#.
+    """
+    tokens = [_task_token(task["id"]) for task in tasks if task.get("id") is not None]
+    if command == "/crav1-build-walk" and len(tokens) >= 2:
+        if branch:
+            return f"/crav1-build-walk {slug} {branch}" if slug else f"/crav1-build-walk {branch}"
+        tokens = tokens[:1]
+    ids = " ".join(tokens)
     if command == "/crav1-build-walk":
         if slug and ids:
             return f"/crav1-build-walk {slug} {ids}"
@@ -579,8 +591,11 @@ def _invocation(command: str, tasks: list, slug: str | None) -> str:
 
 def _entry(command: str, because: str, tasks: list, branch: str, slug: str | None) -> dict:
     labels = [_task_label(task) for task in tasks] or []
-    invoked = _invocation(command, tasks, slug)
-    if labels and branch:
+    invoked = _invocation(command, tasks, slug, branch)
+    if command == "/crav1-build-walk" and len(labels) >= 2 and branch:
+        # The branch_block layout, one task per line (1.171.0).
+        run = map_mod().branch_block(branch, labels, first=labels[0], slug=slug)
+    elif labels and branch:
         run = map_mod().run_entry(labels, branch, slug=slug if command == "/crav1-build-walk" else None)
         if command != "/crav1-build-walk":
             detail = run.split("\n", 1)[1]
@@ -764,6 +779,63 @@ def _waiting_line(phase: str, state: dict, because: str) -> str:
 # reason is a Waiting line when the caller passed none.
 WAIT_PHASES = {"confirm-owner", "approval", "live-yes", "wait-merge"}
 
+# Phases where the current branch is not a Run next entry when Waiting says
+# why (1.171.0): only someone else's merge moves it on.
+SKIP_CURRENT_PHASES = {"wait-merge"}
+
+
+def lead_for(phase: str, state: dict, uncommitted=None) -> str:
+    """One sentence the walk prints before Run next (1.171.0).
+
+    Built from phase and owner. It never says there is nothing to commit,
+    and when `uncommitted` is set it says files are left to commit, so it
+    agrees with the Uncommitted line.
+    """
+    tokens = []
+    for item in state.get("tasks") or []:
+        try:
+            tokens.append(_task_token(normalize_task(item)["id"]))
+        except InputError:
+            continue
+    if len(tokens) > 1:
+        tasks = ", ".join(tokens[:-1]) + " and " + tokens[-1]
+    else:
+        tasks = tokens[0] if tokens else "The task"
+    branch = state.get("branch") or "this branch"
+    pr = state.get("pr")
+    named = f"PR {pr}" if pr else "the pull request"
+    owner = state.get("owner") or "self"
+    if phase == "wait-merge":
+        text = f"{tasks} is pushed to {named} and waits for its merge"
+    elif phase == "comment":
+        text = f"{tasks} is pushed to {named}, and one comment on it is next"
+    elif phase == "build":
+        text = f"{tasks} is next to build on {branch}"
+    elif phase == "verify":
+        text = f"{tasks} is built on {branch}, and verify is next"
+    elif phase == "commit":
+        text = f"{tasks} is built and verified on {branch}, and the commit is next"
+    elif phase == "open-pr":
+        text = f"{tasks} is committed on {branch}, and the pull request is next"
+    elif phase == "merge-base":
+        text = f"{branch} is behind {state.get('base') or DEFAULT_BASE}, and that merge is next"
+    elif phase == "merge-pr":
+        text = f"{named} is open for {tasks}, and its merge is next"
+    elif phase == "tick":
+        text = f"{tasks} is merged, and the tick is next"
+    elif phase == "next-task":
+        text = f"{tasks} is done on {branch}"
+    elif phase in ("approval", "confirm-owner", "live-yes", "live-dry", "permission-refused"):
+        text = f"{tasks} on {branch} waits before it can go on"
+    else:
+        text = f"The walk is on {branch}" + (" in other-owner mode" if owner == "other" else "")
+    if len(tokens) > 1:
+        text = text.replace(" is ", " are ", 1)
+    if uncommitted:
+        text += "; some files are not committed yet"
+    return text[0].upper() + text[1:] + "."
+
+
 # Phases that other-owner mode must never enter.
 OTHER_FORBIDDEN = {"open-pr", "merge-base", "merge-pr"}
 
@@ -818,7 +890,11 @@ def next_for(state: dict) -> dict:
             use_branch = state.get("next_branch") or ""
             entries.append(_entry(command, because, use_tasks, use_branch, slug))
     else:
-        entries.append(_entry(command, because, tasks, branch, slug))
+        # In wait-merge the Waiting line already says why; running the walk
+        # again would only reprint the wait, so the current branch is not a
+        # Run next entry (1.171.0).
+        if not (phase in SKIP_CURRENT_PHASES and waiting):
+            entries.append(_entry(command, because, tasks, branch, slug))
         for other in _other_ready(state, branch):
             entries.extend(branch_entries(other, slug))
     lines = [entry["next"] for entry in entries]
@@ -827,6 +903,7 @@ def next_for(state: dict) -> dict:
     result = {
         "mode": "walk",
         "phase": phase,
+        "lead": lead_for(phase, state, uncommitted),
         "next": lines,
         "ending": ending,
         "count": len(lines),

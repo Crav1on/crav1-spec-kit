@@ -90,7 +90,8 @@ class PlanSentences(unittest.TestCase):
 
 class OpeningClause(unittest.TestCase):
     def test_plan_notes_keep_the_opening_clause(self):
-        self.assertEqual(we.about_sentence(NOTES), "The orders CI/CD branch, cut from develop after billing-ops.")
+        # 1.171.0: how the branch was cut is a planning note, not a description.
+        self.assertEqual(we.about_sentence(NOTES), "")
 
     def test_person_lead_is_dropped(self):
         out = we.about_sentence(PERSON)
@@ -247,7 +248,7 @@ class EndToEnd(unittest.TestCase):
 
     def test_descriptions(self):
         self.assertIn("**feat/orders-api-readme**\n" + THREE + "\n1 open task:", self.text)
-        self.assertIn("**feat/orders-cicd**\nThe orders CI/CD branch, cut from develop after billing-ops.\n", self.text)
+        self.assertIn("**feat/orders-cicd**\nOrders CI/CD: infra Bicep and cd pipeline.\n", self.text)  # 1.171.0
         self.assertIn("**feat/orders-api-fixes**\nGetReceipts answers 404 for a cursor that matches no stored receipt.\n", self.text)
         self.assertNotIn("Person A", self.text)
 

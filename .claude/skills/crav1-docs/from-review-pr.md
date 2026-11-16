@@ -177,7 +177,7 @@ Each earlier finding gets one line first: **Fixed** (with the short commit SHA),
 
 Since 1.114.1 a re-review fetches the pull request again and reads every file and line link from the head commit as it is now. After a new push or a force-push, a point whose code moved links its new lines, and a point whose code is gone is marked fixed or no longer relevant. Lines are never copied from the earlier review.
 
-On post, the re-review replies in the earlier comment's thread (Azure DevOps) or posts a new review (GitHub). Afterwards it offers to resolve existing threads whose points are fixed, and resolves them only on your yes.
+On post, the re-review starts a new top-level thread (Azure DevOps) or posts a new review (GitHub), so it shows at the top of the pull request (1.171.0). It replies in an earlier thread only to answer a question asked there. Afterwards it offers to resolve existing threads whose points are fixed, and resolves them only on your yes.
 
 ## Specs in another repo (1.65.0)
 
@@ -249,4 +249,4 @@ It diffs from the base with local git only, never fetching. The base comes from 
 
 The checks are those of a pull request review: spec, plan, `verify.md`, the secret rule, `F#` findings and suggestions. The body, the checks, the comment record and posting are skipped, and it says so once. The verdict stays in the chat. Nothing is checked out, committed, pushed or posted. When the base moved on, it suggests merging the base into the branch, never a rebase.
 
-The run ends as [How a run ends](reference/run-ending.md) says: one `Next:` line, `Waiting:` only when a step is blocked, and `Uncommitted:` when files changed and are not committed.
+The run ends as [How a run ends](reference/run-ending.md) says: Run next, never a `Next:` line (1.171.0). While the PR note is uncommitted, Run next is `Commit the PR note:` with `/crav1-finalize-commit`, then `Then push the specs repo:` with `git push`, each command alone in its code span. `Waiting:` only when a step is blocked, and `Uncommitted:` in chat when files changed and are not committed.

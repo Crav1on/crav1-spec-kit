@@ -2,6 +2,23 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.171.0 (2026-11-16)
+
+Fixes found on a real build session: the walk no longer offers a task that only waits on someone else's merge, task names and branch descriptions read cleanly, and the last skills that still printed a `Next:` line end with Run next. A minor release because the ready check, the build walk, the verify reply, fix-build-gaps, finalize-commit, open-pr and review-pr read differently.
+
+- **A task waiting on a merge is not offered.** The ready check reads `build-progress/<branch>.md`. A task whose branch's last step is `comment` or `wait-merge` is waiting (`Waiting: PR 71 to merge, then T5 is ticked.`), not in `can_start`, and tasks after it are held too. In `wait-merge` the build walk's ending has no entry for the current branch: the Waiting line says why, and Run next starts with the branches that can start. Before, `/crav1-build-walk <slug> T5` was offered again in the walk, the verify reply and the ready check, and only reprinted the wait.
+- **Your own claim in plain words.** `In progress by you: T5. Your own claim does not hold it.` is now `T5 is yours; the walk resumes it.`, or `T5 is yours and waits for PR 71's merge.` The readiness reference agrees with the claims reference.
+- **Full task names.** The ready branches in the readiness JSON carry the full task name, and the walk no longer strips the `...` of a shortened one, so a name never ends mid-phrase such as `metadata read from the`.
+- **Branch descriptions.** A plan note about how the branch was made (`The orders CI/CD branch, cut from develop after billing-ops.`) is no longer a description; the step heading or the open task names describe it. The description follows the open tasks, not a sentence about a task that is already done.
+- **One lead sentence.** `build_walk.py next` returns `lead`, one sentence from phase and owner, such as `T5 is pushed to PR 71 and waits for its merge.`, that agrees with the Uncommitted line. The walk prints only that before Run next, never `nothing to commit` above an Uncommitted line.
+- **No comma command.** Two or more tasks on one Run next entry use the branch form, `/crav1-build-walk <slug> <branch>`, with one task per line under it, never `T43, T8`.
+- **Re-reviews are new threads.** On Azure DevOps a re-review posts a new top-level thread, so it shows at the top of the pull request. It replies in an earlier thread only to answer a question asked there.
+- **Run next in review-pr, fix-build-gaps, finalize-commit and open-pr.** No `Next:` line is left in these skills. Review-pr ends with `Commit the PR note:` and `/crav1-finalize-commit`, then `git push`, and shows Uncommitted in chat. Fix-build-gaps is one lead sentence and a Catch up first block (commit, then push to the pull request) before verify. Finalize-commit ends with `git push`, `/crav1-open-pr` or `/crav1-open-pr pr<n>` under a label. Open-pr ends with a `git push` catch-up when the specs repo is ahead, then `/crav1-review-pr <repo> <n>`.
+- **The ready check's last reply is Run next.** The record card comes before the ending, so the final reply starts with Run next. When only the time or the verify version would change, `record_unchanged` is true, the card is skipped and `record` writes nothing (`Record unchanged.`).
+- **Verify reply branch blocks from the ready check.** With no hand-written steps, `walk_ending.py --verify` builds the branch blocks from the ready check (`ready_branch_blocks`): description, open tasks and the whole-branch entry, the same as the build walk.
+- **Other-owner verify status.** After a build on someone else's pull request passes and is pushed, the verify row says `Implemented, verified, tick pending`, not `Not implemented`.
+- Tests: `scripts/tests/test_endings_readiness_1171.py`; four older tests now expect the wait-merge ending and the new claim line.
+
 ## 1.170.0 (2026-11-15)
 
 The ready check's Catch up first line for a failed verify is short, and a hold with nobody named reads in plain words. A minor release because the ready check, the walk and the verify reply read differently; `verify.md` and the JSON are unchanged.
@@ -156,15 +173,5 @@ The rule file loaded into every session is short again, and every build-walk end
 - **Walk endings are Run next only.** `/crav1-build-walk`, for one task or a whole branch, ends with the Run next block first, then what was built, what is left, and Waiting. The script no longer writes a `Next:` line under it. When a step is held (an Approval needed item, a live yes, a pull request still to merge, someone else's branch), the reason is a `Waiting:` line. With no work branch left, Run next is `/crav1-verify-build-against-spec`.
 - **Commit after a paused walk.** When `/crav1-finalize-commit` finds an unfinished build walk on the branch, it now ends with a Run next entry holding the command that resumes it, `/crav1-build-walk <slug> <branch>` for a whole-branch run or `/crav1-build-walk <slug> T#` for one task, instead of a bare `Next: /crav1-build-walk` line.
 - **Tests.** The rule stays at or under 700 words, every rule that moved can still be found word for word, the walk endings have no `Next:` line, held steps say why on a Waiting line, and no skill file shows a `Next: /crav1-build-walk` example.
-
-## 1.156.0 (2026-11-14)
-
-The ready check prints its own ending, the three walks share one ending, and the short reply is the default. A minor release because the readiness output, its default, and a choice word change.
-
-- **The script prints the reply.** `walk_progress.py readiness --root <spec-folder> --write-map --text` prints the whole ready-check reply: the header, the counts row, `Result:`, the ending (Run next first, Held, Branch runs, Loop and Waiting lines, claim warnings), `Source:` and `Build map:`. The assistant shows it as-is and never adds a `Next:` line. When nothing can start, the script also prints the one Next line the reply keeps (resolve the question, verify, or nothing needed now).
-- **A shorter skill.** `/crav1-tasks-ready-to-build` drops from 1,900 to about 960 words. It keeps the step order, the stops and the choice words. The rules it used to restate moved to `references/rules.md`, word for word, for when the script cannot run.
-- **One shared ending.** The ready check, the tighten-and-plan ready check and `/crav1-build-walk` (in-walk and whole-branch endings) build their ending with one script, `scripts/walk_ending.py` in the ready-check skill, which each of the three skills ships. For the same ready branches, all three print the same Run next entries, word for word. The shape is one section in `run-ending.md`, and the tighten-and-plan and build-walk skills point at it instead of describing their own.
-- **Brief by default.** `readiness` prints the short output unless asked for `--full`, which prints the complete JSON. `/crav1-build-tasks` asks for `--full` for its held-task check. In chat, the new word `full` (`/crav1-tasks-ready-to-build full <slug>`) adds the per-task lists and the Order line.
-- **Tests.** The Run next entries match across the three skills for the same state, the ending order is shared, readiness is brief without a flag, the ready-check skill stays between 800 and 1,100 words, and no skill instruction asks for a Next line after the Waiting lines.
 
 The newest 15 releases are above. The full changelog is https://github.com/Crav1on/crav1-spec-kit/blob/main/CHANGELOG.md.
