@@ -116,4 +116,4 @@ After an outside pull request merges, `/crav1-review-pr` names `/crav1-refresh-s
 
 Reference pages: [finalize-commit](reference/skills/crav1-finalize-commit.md) · [finalize-commit](reference/skills/crav1-finalize-commit.md) · [open-pr](reference/skills/crav1-open-pr.md) · [merge-pr](reference/skills/crav1-merge-pr.md)
 
-The run ends as [How a run ends](reference/run-ending.md) says: one `Next:` line, `Waiting:` only when a step is blocked, and `Uncommitted:` when files changed and are not committed.
+The run ends as [How a run ends](reference/run-ending.md) says: Run next, never a `Next:` line (1.171.0). After the commit it is `Push the specs repo:` with `git push`, `Push and open the pull request:` with `/crav1-open-pr`, or `Push to PR <n> and comment:` with `/crav1-open-pr pr<n>`; `/crav1-open-pr` ends with `Review PR <n>:` and `/crav1-review-pr <repo> <n>`, after a `git push` catch-up when the specs repo is ahead; `/crav1-fix-build-gaps` ends with commit and push catch-ups before verify. `Waiting:` only when a step is blocked, and `Uncommitted:` when files changed and are not committed.

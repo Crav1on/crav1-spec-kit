@@ -2,6 +2,23 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.171.0 (2026-11-16)
+
+Fixes found on a real build session: the walk no longer offers a task that only waits on someone else's merge, task names and branch descriptions read cleanly, and the last skills that still printed a `Next:` line end with Run next. A minor release because the ready check, the build walk, the verify reply, fix-build-gaps, finalize-commit, open-pr and review-pr read differently.
+
+- **A task waiting on a merge is not offered.** The ready check reads `build-progress/<branch>.md`. A task whose branch's last step is `comment` or `wait-merge` is waiting (`Waiting: PR 71 to merge, then T5 is ticked.`), not in `can_start`, and tasks after it are held too. In `wait-merge` the build walk's ending has no entry for the current branch: the Waiting line says why, and Run next starts with the branches that can start. Before, `/crav1-build-walk <slug> T5` was offered again in the walk, the verify reply and the ready check, and only reprinted the wait.
+- **Your own claim in plain words.** `In progress by you: T5. Your own claim does not hold it.` is now `T5 is yours; the walk resumes it.`, or `T5 is yours and waits for PR 71's merge.` The readiness reference agrees with the claims reference.
+- **Full task names.** The ready branches in the readiness JSON carry the full task name, and the walk no longer strips the `...` of a shortened one, so a name never ends mid-phrase such as `metadata read from the`.
+- **Branch descriptions.** A plan note about how the branch was made (`The orders CI/CD branch, cut from develop after billing-ops.`) is no longer a description; the step heading or the open task names describe it. The description follows the open tasks, not a sentence about a task that is already done.
+- **One lead sentence.** `build_walk.py next` returns `lead`, one sentence from phase and owner, such as `T5 is pushed to PR 71 and waits for its merge.`, that agrees with the Uncommitted line. The walk prints only that before Run next, never `nothing to commit` above an Uncommitted line.
+- **No comma command.** Two or more tasks on one Run next entry use the branch form, `/crav1-build-walk <slug> <branch>`, with one task per line under it, never `T43, T8`.
+- **Re-reviews are new threads.** On Azure DevOps a re-review posts a new top-level thread, so it shows at the top of the pull request. It replies in an earlier thread only to answer a question asked there.
+- **Run next in review-pr, fix-build-gaps, finalize-commit and open-pr.** No `Next:` line is left in these skills. Review-pr ends with `Commit the PR note:` and `/crav1-finalize-commit`, then `git push`, and shows Uncommitted in chat. Fix-build-gaps is one lead sentence and a Catch up first block (commit, then push to the pull request) before verify. Finalize-commit ends with `git push`, `/crav1-open-pr` or `/crav1-open-pr pr<n>` under a label. Open-pr ends with a `git push` catch-up when the specs repo is ahead, then `/crav1-review-pr <repo> <n>`.
+- **The ready check's last reply is Run next.** The record card comes before the ending, so the final reply starts with Run next. When only the time or the verify version would change, `record_unchanged` is true, the card is skipped and `record` writes nothing (`Record unchanged.`).
+- **Verify reply branch blocks from the ready check.** With no hand-written steps, `walk_ending.py --verify` builds the branch blocks from the ready check (`ready_branch_blocks`): description, open tasks and the whole-branch entry, the same as the build walk.
+- **Other-owner verify status.** After a build on someone else's pull request passes and is pushed, the verify row says `Implemented, verified, tick pending`, not `Not implemented`.
+- Tests: `scripts/tests/test_endings_readiness_1171.py`; four older tests now expect the wait-merge ending and the new claim line.
+
 ## 1.170.0 (2026-11-15)
 
 The ready check's Catch up first line for a failed verify is short, and a hold with nobody named reads in plain words. A minor release because the ready check, the walk and the verify reply read differently; `verify.md` and the JSON are unchanged.

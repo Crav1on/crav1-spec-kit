@@ -36,7 +36,7 @@ If the script returns `claimed`, that task is already in progress by someone els
 
 The ready check holds a claimed task as `in progress by <user> since <date>` and does not offer it in Run next. This walk continues on its own claim.
 
-Your own claim does not hold a task (1.160.0). `walk_progress.py readiness --root <spec-folder>` takes `--user <name>` (default `git config user.name` in the specs repo) and `--branch <branch>` (the branch being walked). A claim by that user, on that branch when `--branch` is given, keeps the task's own state: its gate has `refused` false and `reason` `in progress by you`, and the reply says `In progress by you: T#.` Someone else's claim, or your claim on another branch when `--branch` is given, still holds the task and refuses it.
+Your own claim does not hold a task (1.160.0). `walk_progress.py readiness --root <spec-folder>` takes `--user <name>` (default `git config user.name` in the specs repo) and `--branch <branch>` (the branch being walked). A claim by that user, on that branch when `--branch` is given, keeps the task's own state: its gate has `refused` false and `reason` `in progress by you`, and the reply says `T# is yours; the walk resumes it.` (1.171.0). When that task's `build-progress/<branch>.md` ends at `comment` or `wait-merge`, it is waiting, not offered in Run next, and the reply says `T# is yours and waits for PR <n>'s merge.` Someone else's claim, or your claim on another branch when `--branch` is given, still holds the task and refuses it.
 
 A claim older than the max age (default 3 days, or `Claim max age: N days` in the file) gets a warning. It is not cleared on its own. The warning names `release-claim`.
 

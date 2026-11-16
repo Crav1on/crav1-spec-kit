@@ -8,6 +8,8 @@
 
 Read one named open pull request and report whether it can ship.
 
+1.171.0: an Azure DevOps re-review posts a new top-level thread, not a reply in an earlier thread; it replies in a thread only to answer a question asked there. After the post offer the reply ends with Run next ([`/crav1-finalize-commit`](crav1-finalize-commit.md), then `git push`) while the PR note is uncommitted, and the Uncommitted line shows in chat.
+
 1.164.0: the fetch card for an older copy on disk follows the card wording rule in `docs/reference/question-cards.md`: one sentence names the older copy, then `Fetch the pull request's two branches before the review?`.
 
 1.158.0: the shared pull-request steps are `crav1-docs/reference/pr-common.md` and `scripts/pr_common.py`. Ship or not moved word for word to `references/ship.md`, and the one-line pointers are one list, Which file, when.

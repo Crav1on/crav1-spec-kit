@@ -39,6 +39,8 @@ Each task also updates one line in `docs/specs/orders-capacity/walk-progress.md`
 
 To resume after a stop or in a new session, run the same command. It picks up at the next open task, keeps its own claim, and does not build a task twice. A stop partway keeps the claim unless you say `release-claim`.
 
+When the walk waits for someone else to merge the pull request (1.171.0), Run next no longer offers the same task again: the Waiting line says what it waits for, and Run next starts with the branches you can build now. The ready check reads `build-progress/<branch>.md` too, so a task that is pushed and waits on a merge is not offered anywhere until that merge. One lead sentence comes before Run next, for example `T5 is pushed to PR 71 and waits for its merge.`, and it never says there is nothing to commit when an Uncommitted line follows. Two tasks on one branch are one branch command, `/crav1-build-walk orders-api feat/orders-incoming`, never `T43, T8`. Task names are shown in full. In someone else's pull request, a built and pushed task's verify row says `Implemented, verified, tick pending`.
+
 ## Steps
 
 | Step | You | Agent |

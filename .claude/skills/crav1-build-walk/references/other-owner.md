@@ -18,3 +18,5 @@ After a push, write one pull request comment that says what was pushed. One push
 `edit-description` is the only way to change the description, and only because this run asked. Without that word, leave the description as it is.
 
 Ticks for tasks on this branch wait until that pull request is merged. The row stays `[ ]`. The Waiting line says it in plain words, for example `Waiting for person A to merge PR 71 before T5 is ticked.` Do not tick early.
+
+Verify status in other-owner mode (1.171.0): after the build passes and is pushed, the worker writes the task's `verify.md` row as `Implemented, verified, tick pending` with the evidence it has (the local run, or the pipeline run at that commit), never `Not implemented`. The ready check already reads that status: the tick is the only leftover, and verify is not behind.

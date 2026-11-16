@@ -280,6 +280,32 @@ def branch_block(branch_name, open_labels, first=None, slug=None, about=None, wa
     return _ending_mod().branch_block(branch_name, open_labels, first=first, slug=slug, about=about, waits=waits)
 
 
+def _names_done(text, done_tasks):
+    """True when a step's opening sentence is about a done task (1.171.0).
+
+    It names the done T#, or its opening words match the done task's name.
+    """
+    text = str(text or "")
+    first = re.split(r"(?<=[.!?])\s", text.strip(), maxsplit=1)[0].lower()
+    if not first:
+        return False
+    for task in done_tasks:
+        if re.search(rf"\bT{task['id']}\b", first, re.I):
+            return True
+        for name in (task.get("full"), task.get("short")):
+            words = re.findall(r"\w+", str(name or "").lower())
+            if len(words) < 4:
+                continue
+            probe = " ".join(words[:4])
+            if probe in " ".join(re.findall(r"\w+", first)):
+                return True
+        lead = " ".join(re.findall(r"\w+", first)[:4])
+        full = " ".join(re.findall(r"\w+", str(task.get("full") or task.get("short") or "").lower()))
+        if len(lead.split()) >= 4 and lead in full:
+            return True
+    return False
+
+
 def short_name(rest, work_title=None, trim=True):
     """A task's short name: its work-item title, else the text up to the first cut.
 
@@ -1849,8 +1875,15 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text
         # One plain sentence for Run next (1.164.0): the plan step that owns
         # every task on this branch, even when the task lines name the branch.
         about = ""
-        if mode == "steps" and owner in step_by_n:
-            about = clean_prose(step_by_n[owner]["body"], name_of) or ""
+        # The description follows the open tasks (1.171.0): the plan step that
+        # owns every open task, and not a sentence about a done task.
+        open_members = [task for task in members if not task["done"]] or members
+        open_owners = {task.get("owner") for task in open_members}
+        about_owner = next(iter(open_owners)) if len(open_owners) == 1 else None
+        if mode == "steps" and about_owner in step_by_n:
+            about = clean_prose(step_by_n[about_owner]["body"], name_of) or ""
+            if about and _names_done(about, [task for task in members if task["done"]]):
+                about = ""
         areas = set()
         for task in members:
             areas.update(task.get("areas") or ())
@@ -2298,11 +2331,11 @@ def report_by_branch(built, rows, slug=None):
             "branch": group["branch"]["name"],
             "about": group["branch"].get("about") or "",
             "tasks": [
-                {"id": f"T{task['id']}", "title": task.get("short") or ""}
+                {"id": f"T{task['id']}", "title": task.get("full") or task.get("short") or ""}
                 for task in (firsts or [task for task, _row in group["items"]])
             ],
             "open_tasks": [
-                {"id": f"T{task['id']}", "title": task.get("short") or "", "waits": waits.get(f"T{task['id']}") or ""}
+                {"id": f"T{task['id']}", "title": task.get("full") or task.get("short") or "", "waits": waits.get(f"T{task['id']}") or ""}
                 for task in open_tasks
             ],
         })

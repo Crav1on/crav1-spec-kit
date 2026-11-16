@@ -110,7 +110,7 @@ class OwnClaimTests(unittest.TestCase):
         self.assertTrue(gate["allow"])
         self.assertEqual(gate["reason"], "in progress by you")
         self.assertIn("T2", payload.get("can_start") or [])
-        self.assertIn("In progress by you: T2.", payload.get("ending") or "")
+        self.assertIn("T2 is yours; the walk resumes it.", payload.get("ending") or "")
 
     def test_own_claim_on_the_walked_branch(self):
         _, gate = self.readiness("--user", "person A", "--branch", "feat/orders-api-host-setup")

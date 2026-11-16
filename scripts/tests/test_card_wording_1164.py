@@ -168,7 +168,9 @@ class LiveRunCards(unittest.TestCase):
 
     def test_claim_line_agrees_in_number(self):
         src = (SKILLS / "crav1-tighten-and-plan-ready-to-build/scripts/walk_progress.py").read_text(encoding="utf-8")
-        self.assertIn('pronoun = "it" if len(own) == 1 else "them"', src)
+        # 1.171.0: one plain sentence per own task, no pronoun to agree.
+        self.assertIn('is yours; the walk resumes it.', src)
+        self.assertNotIn("Your own claim does not hold", src)
 
     def test_record_and_playbook_guidance(self):
         steps = (SKILLS / "crav1-tighten-and-plan-ready-to-build/references/steps.md").read_text(encoding="utf-8")

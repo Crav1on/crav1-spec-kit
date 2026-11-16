@@ -121,3 +121,5 @@ The walk fetches the specs repo before it reads. If that copy is behind origin, 
 Reference page: [tighten and plan, ready to build](reference/skills/crav1-tighten-and-plan-ready-to-build.md)
 
 Since 1.164.0 `start` and `resume` name the one reference the next step needs in `read`, and the walk opens only that file. Its cards follow the card wording rule in [Question cards](reference/question-cards.md): a reopened step asks `Skip redoing the plan review?` after one plain sentence, and the record card asks `Save the ready check as done?` without quoting the progress line.
+
+Since 1.171.0 the ready check asks its record card before it prints the ending, so its last reply starts with Run next. When only the time or the verify version would change, it skips the record and says `Record unchanged.`, and `walk-progress.md` stays clean. A task whose build walk is pushed and waits on a merge is waiting, not offered, and your own claim reads `T5 is yours; the walk resumes it.` A branch description is never a note about how the branch was cut, and never a sentence about a task that is already done.

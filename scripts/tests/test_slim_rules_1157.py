@@ -129,7 +129,9 @@ class WalkEndingRunNextOnly(unittest.TestCase):
     def test_no_phase_prints_a_next_line(self):
         for phase in self.phases:
             out = bw.next_for(state(phase=phase))
-            self.assertTrue(out["ending"].startswith("Run next:"), phase)
+            # wait-merge leads with Waiting when no other branch can start (1.171.0).
+            first = "Waiting:" if phase == "wait-merge" else "Run next:"
+            self.assertTrue(out["ending"].startswith(first), phase)
             self.assertTrue(no_next(out["ending"]), (phase, out["ending"]))
 
     def test_next_data_stays_one_per_entry(self):

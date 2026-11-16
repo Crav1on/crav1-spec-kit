@@ -8,6 +8,8 @@
 
 Map every v0 acceptance line to tests or UI checks and report pass, fail, or missing.
 
+1.171.0: with no hand-written steps, the reply's branch blocks come from the ready check (`walk_ending.ready_branch_blocks`), with descriptions, open tasks and the whole-branch entry; a task that waits on a merge is not offered.
+
 1.170.0: a `T6 failed:` change line in the reply keeps the Verify cell's opening sentence and the sentence naming the cause, not the run detail; the ready check's Catch up first line uses the same short reason.
 
 1.169.0: `verify.md` has no `Next:` line any more; the chat reply's Run next names the next step. The ready check still reads an older file that has one, and a Verified or Failed row there is never behind.

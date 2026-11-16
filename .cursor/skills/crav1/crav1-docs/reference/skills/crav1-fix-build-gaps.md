@@ -8,6 +8,8 @@
 
 Fix gaps a build left, one at a time inside the spec; asks verify-report gaps or live-site gaps.
 
+1.171.0: the reply is one lead sentence and the shared ending, never a `Next:` line: a Catch up first block with [`/crav1-finalize-commit`](crav1-finalize-commit.md) and, when the fix is on an unpushed pull request branch, [`/crav1-open-pr`](crav1-open-pr.md) pr<n>`, then the next gap or [`/crav1-verify-build-against-spec`](crav1-verify-build-against-spec.md) <slug>`.
+
 1.99.0: before the first code edit on a base branch, offers Create `fix/<slug>` from the into branch (Recommended), an existing branch, another name or stop; never edits code there; headless stops unless `new-branch`.
 
 1.130.0: a typed branch name is that card's free-text answer, hint `Type a branch name`. There is no option labelled Other name.

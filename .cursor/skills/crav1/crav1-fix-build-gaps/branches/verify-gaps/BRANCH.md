@@ -14,7 +14,7 @@ Read, in order:
 2. `spec.md`, `tasks.md`, `plan.md` — spec wins.
 3. Report shape: this skill’s `assets/fix-log.md`.
 
-If `verify.md` is missing and they did not paste a verify TL;DR, **stop**. Next: `/crav1-verify-build-against-spec`. Do not guess gaps from vibes.
+If `verify.md` is missing and they did not paste a verify TL;DR, **stop**, and end with Run next: the label `Check the build against the spec:` on its own line, then `/crav1-verify-build-against-spec <slug>` alone in its code span. Do not guess gaps from vibes.
 
 ## Pick one gap (no edits yet)
 
@@ -94,16 +94,15 @@ If an older `live-fix.md` exists, you may append a one-line pointer to the new `
 
 ## After (chat)
 
-TL;DR first:
+A short reply (1.171.0), no table:
 
-- Which verify bucket / id you fixed
-- Before → after (the **same** evidence)
-- Tests still pass? (if you ran them)
-- Files changed
-- Remaining **inner-loop** ids (`F2`…) — not unimplemented tasks
-- The queue still has an inner-loop id: `Next: /crav1-fix-build-gaps, because the inner-loop queue is not empty.` Omit Gap to continue the walk.
-- The queue is empty: `Next: /crav1-verify-build-against-spec, because the inner loop is clear.`
-- Add the Uncommitted line when files changed and are not committed. Do not run the next step.
+- One lead sentence: which id you fixed and the before → after on the **same** evidence, for example `T6's four tests pass again at the fix.`
+- Tests still pass? (one line, if you ran them), files changed (one line), remaining **inner-loop** ids (`F2`…), not unimplemented tasks.
+- Then the shared ending (`walk_ending.py --json`, `compose`), with no Next line. Run next, in this order, each label on its own line and each command alone in its code span:
+  1. A `**Catch up first**` block when the fix is not committed or not pushed: `Commit the fix:` with `/crav1-finalize-commit`, then, when the fix is on a pull request branch that is not pushed, `Push the fix to PR <n>:` with `/crav1-open-pr pr<n>` (or `Push the specs repo:` with `git push` when only spec files changed). Verify needs the fix on the pull request first.
+  2. The queue still has an inner-loop id: `Fix the next gap:` with `/crav1-fix-build-gaps <slug> <id>`.
+  3. The queue is empty: `Check the fix against the spec:` with `/crav1-verify-build-against-spec <slug>`.
+- `Uncommitted:` in chat when files changed and are not committed. Do not run the next step.
 
 ## Hard rules
 

@@ -64,9 +64,9 @@ class SingleNext(unittest.TestCase):
         "merge-pr",
         "tick",
         "comment",
-        "wait-merge",
         "next-task",
     ]
+    # wait-merge has no current-branch entry when Waiting says why (1.171.0).
 
     def test_each_in_walk_state_has_one_next_and_drops_the_step_skill_line(self):
         for phase in self.phases:

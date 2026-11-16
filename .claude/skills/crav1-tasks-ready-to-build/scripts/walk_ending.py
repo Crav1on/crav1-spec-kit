@@ -289,10 +289,34 @@ def _cap(text):
     return text[:1].upper() + text[1:] if text else text
 
 
+# How a branch was made is a planning note, not a description (1.171.0):
+# `The orders CI/CD branch, cut from develop after billing-ops.`
+PLANNING_NOTE = re.compile(
+    r"\b(?:cut|branched|branches|branch(?:es)? off|created|made|taken)\s+(?:off\s+|out\s+)?from\b"
+    r"|\bafter\s+[\w./-]+\s+(?:merges|is merged|lands)\b"
+    r"|\bfrom\s+(?:develop|main|master)\s+after\b",
+    re.I,
+)
+ONLY_BRANCH = re.compile(r"^\s*the\s+.{0,60}\bbranch\s*\.?\s*$", re.I)
+
+
+def planning_note(text):
+    """True for a clause about how the branch was made, or one that only
+    names the branch (1.171.0)."""
+    text = str(text or "").strip()
+    if not text:
+        return False
+    if PLANNING_NOTE.search(text):
+        return True
+    return bool(ONLY_BRANCH.match(text))
+
+
 def _clean_sentence(sentence):
     """A plain description: ends with a full stop, no colon list, no person
-    lead, no file or path list."""
+    lead, no file or path list, and not a planning note (1.171.0)."""
     if not sentence.endswith("."):
+        return False
+    if planning_note(sentence):
         return False
     if ":" in sentence:
         return False
@@ -313,10 +337,12 @@ def _drop_dangling(text):
 def opening_clause(text, limit=DESCRIPTION_LIMIT):
     """A plan note trimmed to its opening clause, or "" (1.166.0).
 
-    A step written as notes (`The orders CI/CD branch, cut from develop
-    after billing-ops: merge main ...`) keeps the words before the first
-    `:` or ` — `: `The orders CI/CD branch, cut from develop after
-    billing-ops.` A person lead (`Person A builds PR 73: ...`) is dropped
+    A step written as notes (`Orders CI/CD runs lint, tests and the deploy
+    stages: infra first ...`) keeps the words before the first `:` or
+    ` — `: `Orders CI/CD runs lint, tests and the deploy stages.` A clause
+    about how the branch was made (`The orders CI/CD branch, cut from
+    develop after billing-ops`) is a planning note and gives "" (1.171.0),
+    so the step heading or the task names describe the branch. A person lead (`Person A builds PR 73: ...`) is dropped
     and the clause is taken from what follows. A trailing fragment (a short
     comma part such as `PR 73`, or a path) and a dangling word are dropped.
     The clause needs at least four words and no file or path.
@@ -340,6 +366,8 @@ def opening_clause(text, limit=DESCRIPTION_LIMIT):
         parts.pop()
     head = _drop_dangling(", ".join(parts))
     if len(head.split()) < 4 or _fileish(head) or PERSON_LEAD.match(head):
+        return ""
+    if planning_note(head):
         return ""
     if len(head) + 1 > limit:
         return ""
@@ -1059,6 +1087,61 @@ def _full_text(text):
     return "\n\n".join(keep)
 
 
+def _walk_progress_mod():
+    import importlib.util
+
+    here = Path(__file__).resolve().parent
+    path = here.parent.parent / "crav1-tighten-and-plan-ready-to-build" / "scripts" / "walk_progress.py"
+    if not path.is_file():
+        return None
+    spec = importlib.util.spec_from_file_location("crav1_walk_progress_for_verify", path)
+    mod = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = mod
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def ready_branch_blocks(root, slug=None):
+    """Run next branch blocks from the ready check (1.171.0).
+
+    The same blocks the build walk prints: description, open tasks, the
+    whole-branch entry and the first task. A task that waits on a merge is
+    not here (readiness reads build-progress). Empty when nothing can start
+    or the ready-check script is not installed.
+    """
+    mod = _walk_progress_mod()
+    if mod is None:
+        return []
+    root = Path(root)
+    try:
+        branches = mod.ready_branches(root)
+        cmd_slug = mod.command_slug(root) if slug is None else slug
+    except Exception:  # noqa: BLE001 - a readiness failure leaves the steps empty
+        return []
+    blocks = []
+    for branch in branches or []:
+        tasks = branch.get("tasks") or []
+        if not tasks:
+            continue
+        opens = branch.get("open_tasks") or tasks
+
+        def label(task):
+            return f"{task.get('id')} {task.get('title') or ''}".strip()
+
+        waits = {task.get("id"): task.get("waits") for task in opens if task.get("waits")}
+        block = branch_block(
+            branch.get("branch") or "",
+            [label(task) for task in opens],
+            first=label(tasks[0]),
+            slug=cmd_slug,
+            about=branch.get("about"),
+            waits=waits,
+        )
+        if block:
+            blocks.append(block)
+    return blocks
+
+
 def verify_state(state):
     """The verify_reply() keywords from a state dict (1.168.0).
 
@@ -1066,7 +1149,8 @@ def verify_state(state):
     Uncommitted files come from verify.md, the committed verify.md
     (`git show HEAD:`, or `previous`, a file path), tasks.md and git status.
     The skill adds only what it judged: `steps`, `plan_notes`, `waiting`,
-    `walk`, `full`.
+    `walk`, `full`. With no `steps`, the branch blocks for what can start
+    come from the ready check (1.171.0).
     """
     root = Path(state["root"])
     slug = state.get("slug") or root.name
@@ -1094,11 +1178,16 @@ def verify_state(state):
     if ahead is None:
         out = _git(root, "rev-list", "--count", "@{u}..HEAD")
         ahead = int(out.strip()) if out and out.strip().isdigit() else 0
+    steps = state.get("steps") or []
+    if not steps and not state.get("walk") and root.is_dir():
+        # Build what is left: the branch blocks come from the ready check,
+        # not from hand-written steps (1.171.0).
+        steps = ready_branch_blocks(root, state.get("command_slug"))
     return {
         "slug": slug,
         "counts": verify_counts(text),
         "changes": changes,
-        "steps": state.get("steps") or [],
+        "steps": steps,
         "catch_up": {
             "uncommitted": uncommitted,
             "ahead": ahead,
