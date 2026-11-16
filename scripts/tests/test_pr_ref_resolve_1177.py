@@ -236,7 +236,7 @@ class OwnMergeFirst(unittest.TestCase):
             self.assertIn(entry, text)
             self.assertLess(text.index(entry), text.index("Held:"))
             self.assertLess(text.index("Run next:"), text.index(entry))
-            self.assertIn("Waiting: PR 82 is person B's; it unblocks T13.", text)
+            self.assertNotIn("Waiting: PR", text)  # 1.177.1: the merge list only
 
     def test_resume_stays_below_the_merge_entry(self):
         merge = wp.own_merge_entry([{"pr": 71, "owner": "yours"}, {"pr": 82, "owner": "person B"}])
@@ -258,7 +258,7 @@ class PrOwnerIsWhoOpenedIt(unittest.TestCase):
             text = rb.ending(root)
             self.assertIn("1. PR 71 (person C's, you added T5, feat/orders-readme): ticks T5", text)
             self.assertNotIn("Merge your PR", text)
-            self.assertIn("Waiting: PR 71 is person C's; it unblocks T6.", text)
+            self.assertNotIn("Waiting: PR", text)  # 1.177.1: the merge list only
 
     def test_no_author_recorded_is_not_yours(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -270,7 +270,7 @@ class PrOwnerIsWhoOpenedIt(unittest.TestCase):
             text = rb.ending(root)
             self.assertIn("1. PR 71 (owner not recorded, feat/orders-readme)", text)
             self.assertNotIn("Merge your PR", text)
-            self.assertIn("Waiting: PR 71 (owner not recorded); it unblocks T6.", text)
+            self.assertNotIn("Waiting: PR", text)  # 1.177.1: the merge list only
 
     def test_waiting_groups_one_owner(self):
         order = [{"pr": 71, "owner": "person A", "ticks": ["T5"], "starts": []},

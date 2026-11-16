@@ -3776,6 +3776,47 @@ def pr_author(root: Path | None, pr, text: str = "") -> str | None:
     return match.group(1).strip() if match else None
 
 
+_PR_COMMON = None
+
+
+def pr_common_mod():
+    """skill crav1-open-pr scripts/pr_common.py, loaded once (1.177.1)."""
+    global _PR_COMMON
+    if _PR_COMMON is None:
+        import importlib.util
+        path = Path(__file__).resolve().parents[2] / "crav1-open-pr" / "scripts" / "pr_common.py"
+        spec = importlib.util.spec_from_file_location("pr_common_wp", path)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        _PR_COMMON = mod
+    return _PR_COMMON
+
+
+def host_pr_author(root: Path | None, pr) -> str | None:
+    """Who opened PR <n>, read-only from its own host, then recorded (1.177.1).
+
+    Only when the kit's records or this checkout's remote give the PR's host;
+    only that host's CLI is tried, with a short timeout. A found name is
+    written as `PR author:` in the build-progress file (pr_common.py author).
+    Never fails the ready check. CRAV1_NO_HOST_LOOKUP=1 turns it off.
+    """
+    import os
+    if root is None or not pr or os.environ.get("CRAV1_NO_HOST_LOOKUP"):
+        return None
+    try:
+        pc = pr_common_mod()
+        base = pc.repo_root_of(Path(root))
+        info = pc.resolve_ref(str(pr), pc._remote_url(str(base)) or None, [base])
+        if info.get("status") != "ok":
+            return None
+        name = pc.host_author(info, str(base))
+        if name:
+            pc.record_author(Path(root), int(pr), name)
+        return name
+    except Exception:  # noqa: BLE001 - the lookup must never break the check
+        return None
+
+
 def open_prs(root: Path | None, user: str | None = None) -> dict:
     """Pull requests that wait to merge, from build-progress (1.176.0).
 
@@ -3784,7 +3825,8 @@ def open_prs(root: Path | None, user: str | None = None) -> dict:
     else's walk stopped before the merge). `owner` comes from who opened the
     PR (pr_author, 1.177.0): `yours` when that is the local git user, else
     that name. With no author recorded it is the claimer's name, or
-    `owner not recorded` where it would have said `yours`. `added` lists the
+    `owner not recorded` where it would have said `yours`, after the PR's
+    own host was asked (host_pr_author, 1.177.1). `added` lists the
     tasks you claimed on someone else's PR.
     """
     out: dict = {}
@@ -3816,6 +3858,8 @@ def open_prs(root: Path | None, user: str | None = None) -> dict:
 
     def settle(entry: dict, pr, text: str, claimer: str) -> None:
         author = pr_author(root, pr, text)
+        if not author and claimer == "yours":
+            author = host_pr_author(root, pr)
         if author:
             entry["owner"] = "yours" if is_local(author) else author
             if entry["owner"] != "yours" and claimer == "yours":
@@ -3934,7 +3978,7 @@ def own_merge_entry(order: list[dict]) -> str | None:
     When the merge list holds at least one PR that is yours, the ready check
     leads with `Merge your PRs 71 and 73 first:` above `/crav1-merge-pr 71`,
     the first of yours in list order. Only PRs you opened count; others'
-    PRs get a Waiting line (others_merge_waits). None when no listed PR is
+    PRs stay in the merge list only (1.177.1). None when no listed PR is
     yours.
     """
     mine = [str(item["pr"]) for item in order if item.get("owner") == "yours"]
@@ -3949,8 +3993,37 @@ def own_merge_entry(order: list[dict]) -> str | None:
     return _run_entry(f"/crav1-merge-pr {mine[0]}", "", head + ":")
 
 
+def ask_owners_entry(order: list[dict]) -> str | None:
+    """The Run next entry that asks the PR owners to merge (1.177.1).
+
+    Only when the merge list holds PRs and none is yours. `Ask the PR owners
+    to merge, in this order:` and one line per owner, in list order:
+    `- person B: PR 82`. PRs with no recorded owner share one line. None
+    when a listed PR is yours (own_merge_entry leads) or the list is empty.
+    """
+    if not order or any(item.get("owner") == "yours" for item in order):
+        return None
+    groups: dict = {}
+    for item in order:
+        groups.setdefault(item.get("owner") or "someone else", []).append(f"PR {item['pr']}")
+
+    def _and(items: list[str]) -> str:
+        return items[0] if len(items) == 1 else ", ".join(items[:-1]) + " and " + items[-1]
+
+    lines = ["Ask the PR owners to merge, in this order:"]
+    for owner, prs in groups.items():
+        if owner == "owner not recorded":
+            lines.append(f"- {_and(prs)} ({'owners' if len(prs) > 1 else 'owner'} not recorded)")
+        else:
+            lines.append(f"- {owner}: {_and(prs)}")
+    return "\n".join(lines)
+
+
 def others_merge_waits(order: list[dict]) -> list[str]:
     """Waiting lines for listed PRs you did not open (1.177.0).
+
+    Not printed by the ready check since 1.177.1: the merge list already
+    names these PRs, and ask_owners_entry is the Run next entry for them.
 
     `Waiting: PR 71 and PR 73 are person A's; they unblock T8.` One line per
     owner, in list order. A PR with no recorded author says `owner not
@@ -4880,8 +4953,9 @@ def readiness(args: argparse.Namespace) -> None:
     merge_prs = open_prs(root, getattr(args, "user", None)) if root is not None and root.is_dir() else {}
     merge_block = merge_order_block(rows, merge_prs) if merge_prs else ""
     if merge_block:
+        # 1.177.1: the list is the only place PR waits live; no Waiting
+        # line repeats a listed PR.
         waiting_bits.append(merge_block)
-        waiting_bits.extend(others_merge_waits(merge_order(rows, merge_prs)))
     else:
         waiting_bits.extend(merge_wait_lines(rows))
     if resolve_waiting:
@@ -4936,6 +5010,13 @@ def readiness(args: argparse.Namespace) -> None:
     # 1.177.0: your own PRs in the merge list lead Run next, above the
     # resume entry; with none of yours the order stays as it was.
     own_merge = own_merge_entry(merge_order(rows, merge_prs)) if merge_block else None
+    # 1.177.1: none of the listed PRs is yours: ask their owners to merge,
+    # above the resume entry.
+    nudge = ask_owners_entry(merge_order(rows, merge_prs)) if merge_block and not own_merge else None
+    if nudge and nudge not in shown_run:
+        shown_run = [nudge] + list(shown_run)
+        if result not in ("ready", "ready-partial") and not catch_up:
+            nxt = shown_run[0]
     if own_merge and own_merge not in shown_run:
         shown_run = [own_merge] + list(shown_run)
         if result not in ("ready", "ready-partial") and not catch_up:

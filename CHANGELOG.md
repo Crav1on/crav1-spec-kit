@@ -2,6 +2,15 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.177.1 (2026-11-16)
+
+Fixes to the ready check's pull request lines and to bare-number lookup, found on a live run. The merge list is the only place a pull request waits, a missing PR owner is read from the PR's own host and recorded through the kit, Run next asks the owners to merge when none of the PRs is yours, and a bare number recorded without a URL no longer falls back to the wrong host.
+
+- **No repeated Waiting lines.** `Waiting: PR 82 is person B's; it unblocks T13.` and `Waiting: PR 71 and PR 73 (owners not recorded); they unblock T8.` repeated the numbered `Merge these PRs, in this order:` list above them. The ready check no longer prints them; the open-questions Waiting line stays.
+- **PR owner from the host.** When neither a PR note nor build-progress names who opened a pull request, the ready check asks that pull request's own host, read-only with a short timeout (`gh pr view <n> --json author` on GitHub, `az repos pr show --id <n>` on Azure DevOps, only the CLI for the host the records name), and records the name as `PR author:` in build-progress. The new `pr_common.py author --root <spec-folder> --pr <n> [--name <who>]` does that write. When the host does not say, the merge list still reads `owner not recorded` and `/crav1-tasks-ready-to-build` asks you once who opened it, then records your answer with the same command; you never edit a spec file.
+- **Ask the owners to merge.** When the merge list holds pull requests and none of them is yours, Run next leads with `Ask the PR owners to merge, in this order:` and one line per owner, such as `- person B: PR 82`, above `Resume the walk when the answers arrive:`. Your own pull requests still lead with `Merge your PR 71 first:`.
+- **Bare numbers from the repo root.** `pr_common.py resolve --ref pr82 --root .` from the specs repo root fell back to the checkout's GitHub remote although build-progress said `built, PR 82 open` for a pull request in an Azure DevOps code repo. `--root` may now be the repo root, `docs/specs` or a spec folder. A record that names `PR 82` without a URL takes its host from a `Code repo:` line or the only `docs/system/repos.md` row. With no host it answers `ask`, for example `PR 82 is in build-progress for feat/orders-cicd, but its host isn't recorded`, names no CLI to install, and never falls back to the remote. `/crav1-review-pr` and `/crav1-pr-status` pass the specs repo root as `--root`.
+
 ## 1.177.0 (2026-11-16)
 
 A pull request named by bare number is looked up in the kit's own records before this checkout's remote, the PR skills name only the CLI of the host the pull request is on, and the four PR skills end with Run next instead of a `Next:` line. The ready check leads with merging your own pull requests and keeps Waiting out of the merge list. A minor release because the PR skills resolve and end differently.
