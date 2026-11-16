@@ -1627,7 +1627,9 @@ def progress_shas(directory):
     """Merge commits from build-progress/*.md, as {task id: sha} (1.173.0).
 
     A file counts for the tasks on its own `Tasks:` line. The commit comes
-    from that file's `Result: done (...)` or `Result: merged (...)` line.
+    from the `Result:` line of that file's `Step: merge-pr` (1.174.0). A tick
+    or commit step's hash is only a fallback, kept under ("tick", key), and
+    never replaces a merge hash, wherever it sits in the file.
     """
     found = {}
     folder = pathlib.Path(directory) / "build-progress"
@@ -1640,23 +1642,73 @@ def progress_shas(directory):
             continue
         ids = []
         branch = None
-        sha = None
+        merge_sha = None
+        other_sha = None
+        step = ""
         for line in text.splitlines():
-            stripped = line.strip()
-            if stripped.lower().startswith("tasks:"):
+            stripped = line.strip().lstrip("-").strip()
+            lower = stripped.lower()
+            if lower.startswith("tasks:"):
                 ids = [int(n) for n in re.findall(r"\bT(\d+)\b", stripped)]
-            elif stripped.lower().startswith("branch:") and branch is None:
+            elif lower.startswith("branch:") and branch is None:
                 branch = stripped.split(":", 1)[1].strip()
+            elif lower.startswith("step:"):
+                step = stripped.split(":", 1)[1].strip().lower()
             elif re.match(r"result:\s*(done|merged)\b", stripped, re.I):
                 picked = _pick_sha(stripped.split(":", 1)[1])
-                if picked:
-                    sha = picked
-        if not sha:
+                if not picked:
+                    continue
+                if step.startswith("merge-pr") or step.startswith("merge pr"):
+                    merge_sha = picked
+                elif other_sha is None:
+                    other_sha = picked
+        for sha, wrap in ((merge_sha, lambda key: key), (other_sha, lambda key: ("tick", key))):
+            if not sha:
+                continue
+            for task_id in ids:
+                found.setdefault(wrap(task_id), sha)
+            if branch:
+                found.setdefault(wrap(branch), sha)
+    return found
+
+
+def progress_state(directory):
+    """Each branch's walk from build-progress/*.md, as {branch: state} (1.174.0).
+
+    A state is {"built": {task ids}, "pr": number or None, "merged": bool}.
+    A task counts as built from a done `Step: build T#` or a `- Built: T#`
+    run row. The pull request is the last `PR <n>` the file names.
+    """
+    found = {}
+    folder = pathlib.Path(directory) / "build-progress"
+    if not folder.is_dir():
+        return found
+    for path in sorted(folder.glob("*.md")):
+        try:
+            text = path.read_text(encoding="utf-8")
+        except OSError:
             continue
-        for task_id in ids:
-            found.setdefault(task_id, sha)
-        if branch:
-            found.setdefault(branch, sha)
+        branch = None
+        built = set()
+        merged = False
+        step = ""
+        for line in text.splitlines():
+            stripped = line.strip()
+            lower = stripped.lower()
+            if lower.startswith("branch:") and branch is None:
+                branch = stripped.split(":", 1)[1].strip()
+            elif lower.startswith("- step:"):
+                step = stripped.split(":", 1)[1].strip().lower()
+            elif lower.startswith("- built:"):
+                built.update(int(n) for n in re.findall(r"\bT(\d+)\b", stripped.split(",", 1)[0]))
+            elif re.match(r"result:\s*(done|merged)\b", stripped, re.I):
+                if step.startswith("build "):
+                    built.update(int(n) for n in re.findall(r"\bt(\d+)\b", step))
+                elif step.startswith("merge-pr"):
+                    merged = True
+        prs = re.findall(r"\b(?:PR|pull request)\s+#?(\d+)", text, re.I)
+        key = branch or path.stem.replace("--", "/")
+        found[key] = {"built": built, "pr": int(prs[-1]) if prs else None, "merged": merged}
     return found
 
 
@@ -1687,7 +1739,8 @@ def done_evidence(task, branch_name, prs, verify_text, progress=None, existing=N
     The commit is the merge commit from the branch's build-progress file, else
     the commit on the task's own verify row (1.173.0). A commit another task
     or branch names is never used. With no own commit, an existing done mark
-    stays as it was, and only then the row branch is written.
+    stays as it was. A tick or commit step's hash comes after that (1.174.0),
+    and only then the row branch is written.
     """
     direct = task_pr(task.get("rest") or "")
     if direct:
@@ -1708,6 +1761,11 @@ def done_evidence(task, branch_name, prs, verify_text, progress=None, existing=N
     kept = (existing or {}).get(task["id"])
     if kept:
         return kept
+    # A tick or commit step's hash only when there is no merge result, no
+    # verify row and no earlier mark (1.174.0).
+    sha = progress.get(("tick", task["id"])) or progress.get(("tick", branch_name))
+    if sha:
+        return sha
     return branch_name
 
 
@@ -1720,7 +1778,7 @@ def _explicit(task):
     return None
 
 
-def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text="", resolve_recorded=False, repo=None, claims_text="", code_repo=None, progress=None, existing=None):
+def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text="", resolve_recorded=False, repo=None, claims_text="", code_repo=None, progress=None, existing=None, walks=None):
     """Return markdown, a short chat summary, and the one-line pointer."""
     _REMOTE_CACHE.clear()
     tasks = parse_tasks(tasks_text)
@@ -1939,17 +1997,18 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text
         for task in members:
             plain = name_of.get(task["id"]) or "work"
             full = full_of.get(task["id"]) or plain
-            label = task_label(task["id"], plain)
+            # build-map.md shows full names, never cut with "..." (1.174.0).
+            label = task_label(task["id"], full)
             task["short"] = plain
             task["full"] = full
             task["label"] = label
             task["run_label"] = task_label(task["id"], full)
             if task["done"]:
                 evidence = done_evidence(task, name, prs, verify_text, progress, existing)
-                shorts.append(f"~~{plain}~~ ✓ done ({evidence})")
+                shorts.append(f"~~{full}~~ ✓ done ({evidence})")
                 shown.append(f"~~{label}~~ ✓ done ({evidence})")
             else:
-                shorts.append(plain)
+                shorts.append(full)
                 shown.append(label)
         owners = {task.get("owner") for task in members}
         owner = next(iter(owners)) if len(owners) == 1 else None
@@ -1959,7 +2018,7 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text
             and all(not task_line_choice(task)[0] for task in members)
             and all(resolved[task["id"]] == step_names.get(owner) for task in members)
         ):
-            deliver = clean_prose(step_by_n[owner]["body"], name_of) or "; ".join(shorts)
+            deliver = clean_prose(step_by_n[owner]["body"], full_of) or "; ".join(shorts)
         else:
             deliver = "; ".join(shorts)
         # One plain sentence for Run next (1.164.0): the plan step that owns
@@ -1971,7 +2030,7 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text
         open_owners = {task.get("owner") for task in open_members}
         about_owner = next(iter(open_owners)) if len(open_owners) == 1 else None
         if mode == "steps" and about_owner in step_by_n:
-            about = clean_prose(step_by_n[about_owner]["body"], name_of) or ""
+            about = clean_prose(step_by_n[about_owner]["body"], full_of) or ""
             if about and _names_done(about, [task for task in members if task["done"]]):
                 about = ""
         areas = set()
@@ -2074,6 +2133,21 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text
         if open_ids and all(task_id in claimed_ids for task_id in open_ids) and branch["status"] == "ready":
             branch["status"] = "held"
             branch["held_on"] = [f"T{task_id}" for task_id in open_ids]
+        # A branch never waits on its own tasks (1.174.0). Claimed or walked,
+        # it reads built and waiting for its pull request, or in progress.
+        walk = (walks or {}).get(branch["name"])
+        if open_ids and branch["status"] in ("ready", "held") and (
+            branch["status"] == "held" and set(branch["held_on"]) <= {f"T{task_id}" for task_id in open_ids}
+            or (walk and not walk.get("merged") and walk.get("built"))
+        ):
+            branch["status"] = "held"
+            branch["held_on"] = []
+            built = set((walk or {}).get("built") or ())
+            pr = (walk or {}).get("pr")
+            if built and all(task_id in built for task_id in open_ids):
+                branch["held_text"] = f"built, waits for PR {pr} to merge" if pr else "built, waits for its pull request to merge"
+            else:
+                branch["held_text"] = "in progress"
     held_names = {branch["name"] for branch in branches if branch["status"] in ("waiting on a question", "held")}
     changed = True
     while changed:
@@ -2482,6 +2556,8 @@ def _ready_now(branch):
     if branch.get("loop"):
         return "blocked, in a loop"
     if branch["status"] == "held":
+        if branch.get("held_text"):
+            return branch["held_text"]
         return "held, waits on " + "; ".join(branch.get("held_on") or [])
     return branch["status"]
 
@@ -2767,7 +2843,7 @@ def run_dir(directory, chat=False, stdout=False, recommend=None, code_repo=None)
         return format_offer(offer), 0
     progress_hashes = progress_shas(directory)
     existing = map_marks(_read(directory / "build-map.md") or "")
-    result = build(slug, spec, plan, tasks, work, verify, resolve_recorded=resolve_recorded, repo=repo, claims_text=claims, code_repo=code_repo, progress=progress_hashes, existing=existing)
+    result = build(slug, spec, plan, tasks, work, verify, resolve_recorded=resolve_recorded, repo=repo, claims_text=claims, code_repo=code_repo, progress=progress_hashes, existing=existing, walks=progress_state(directory))
     if not stdout:
         (directory / "build-map.md").write_text(result["markdown"], encoding="utf-8")
     if stdout and not chat:
@@ -2876,7 +2952,7 @@ def fix_loop(directory, pick=1, yes=False, code_repo=None):
     new_text = apply_fix_text(tasks, chosen)
     with open(tasks_path, "w", encoding="utf-8", newline="") as handle:
         handle.write(new_text)
-    after = build(slug, spec, plan, new_text, work, verify, repo=repo, claims_text=claims, code_repo=code_repo, progress=progress_shas(directory), existing=map_marks(_read(directory / "build-map.md") or ""))
+    after = build(slug, spec, plan, new_text, work, verify, repo=repo, claims_text=claims, code_repo=code_repo, progress=progress_shas(directory), existing=map_marks(_read(directory / "build-map.md") or ""), walks=progress_state(directory))
     (directory / "build-map.md").write_text(after["markdown"], encoding="utf-8")
     lines = [f"Wrote {change}", "Rebuilt build-map.md."]
     if after["loops"]:

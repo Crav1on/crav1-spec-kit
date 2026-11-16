@@ -8,6 +8,8 @@
 
 Walk a draft spec through architecture, tighten, questions, and the plan until the ready check is clear.
 
+1.174.0: when `walk-progress.md` lists a branch run that is not merged and its `build-progress` file is not at `comment`, `wait-merge` or `merge-pr`, Run next starts with `Continue the build walk on <branch>:` above [`/crav1-build-walk`](crav1-build-walk.md) <slug> <branch>`. A behind or diverged specs repo ends with `Merge origin into your local branch, since they have diverged (never rebase):` above `git pull --no-rebase`. `--write-map` keeps a done task on its merge commit, not the tick commit.
+
 1.173.0: `readiness --write-map` keeps each done task on its own commit (from its branch's `build-progress` merge result or its own `verify.md` row), never a commit another task names. Held names are full. The open-questions entry is a label line, `Ask the open questions, which haven't been asked yet:`, above [`/crav1-show-or-ask-open-questions`](crav1-show-or-ask-open-questions.md) <slug>`, and every Run next entry puts its label above the command, for example `T1 waits until the reopened [`/crav1-tighten-plan`](crav1-tighten-plan.md) step finishes:` or `T1 and T2 wait until ...`, `Verify the built tasks, since verify.md is behind:`, `Push the specs repo, which is 2 commits ahead of origin:`, `Resolve the open question that blocks the first task:`.
 
 1.171.0: the record card comes before the ending, so the last reply starts with Run next. When only Done or Verify version would change, `record_unchanged` is true and the record is skipped. A task waiting on a merge (from `build-progress/<branch>.md`) is waiting, not offered. Your own claim reads `T5 is yours; the walk resumes it.`

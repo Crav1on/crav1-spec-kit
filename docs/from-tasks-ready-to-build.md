@@ -176,6 +176,8 @@ Since 1.149.0, `/crav1-tasks-ready-to-build` keeps the task rules in its skill f
 
 Since 1.173.0 a done task on the build map keeps its own commit: the merge commit in its branch's `build-progress` file, else its own row in `verify.md`. A `Date:` line or another task's row that names a newer commit never replaces it, and with no own commit the mark already on the map stays. Held and ready lines show full task names, and the open-questions entry is `Ask the open questions, which haven't been asked yet:` above `/crav1-show-or-ask-open-questions <slug>`.
 
+Since 1.174.0 a done task's commit is the merge commit from its branch's `merge-pr` step, not the later commit that ticked it. A branch whose tasks are built and whose pull request is open reads `built, waits for PR <n> to merge`, never waiting on its own tasks, and the `Delivers:` and `Tasks:` lines show full names. An unfinished branch walk is the first Run next entry, `Continue the build walk on <branch>:` above `/crav1-build-walk <slug> <branch>`.
+
 ## After
 
 The Next line recommends the build walk, with the T number beside the short name. `/crav1-build-tasks` builds one task without the walk:

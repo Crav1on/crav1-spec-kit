@@ -8,6 +8,8 @@
 
 List the tasks ready to build, for one spec or all, and why the others are blocked. Rewrites each slice build map.
 
+1.174.0: a done task's commit is its branch's `merge-pr` result in `build-progress`, never a later tick or commit step's hash; that hash is only a last fallback and never replaces a mark. A branch whose open tasks are all claimed or walked reads `built, waits for PR <n> to merge` or `in progress` on `build-map.md`, never `held, waits on` its own tasks. `Delivers:` and `Tasks:` lines use full names. Run next continues an unfinished branch walk first.
+
 1.173.0: a done task's mark on the build map takes its commit only from its own evidence: the merge result in its branch's `build-progress` file, else its own row in `verify.md`. A Date line, a gaps note or another task's row never lends its commit. With no own commit the existing mark stays. Held and ready lines show full task names, never cut with `...`.
 
 1.171.0: readiness reads `build-progress/<branch>.md`: a task whose branch's last step is `comment` or `wait-merge` waits for its pull request to merge and is not in `can_start`. Your own claim reads `T5 is yours; the walk resumes it.` or `T5 is yours and waits for PR 71's merge.` Ready branches carry full task names. A branch description is never a planning note such as `cut from develop after ...`, and never a sentence about a done task.

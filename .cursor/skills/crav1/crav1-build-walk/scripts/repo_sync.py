@@ -123,8 +123,9 @@ def ahead_behind(repo: Path, upstream: str) -> tuple[int, int] | None:
     return int(parts[0]), int(parts[1])
 
 
-def pull_ending(why: str = "the specs repo is behind origin; merge, never rebase") -> str:
-    return "Run next:\n\n`git pull --no-rebase`\n" + why
+def pull_ending(label: str = "Merge origin into your local branch, since it is behind (never rebase):") -> str:
+    """The pull ending, with its label on the line above the command (1.174.0)."""
+    return "Run next:\n\n" + label + "\n`git pull --no-rebase`"
 
 
 def _status_payload(repo: Path, fetched: bool, fetch_error: str | None) -> dict:
@@ -176,7 +177,7 @@ def _status_payload(repo: Path, fetched: bool, fetch_error: str | None) -> dict:
             f"({ahead} ahead, {behind} behind). Merge origin in, never rebase."
         )
         payload["ending"] = pull_ending(
-            f"the specs repo has diverged from {upstream}; merge, never rebase"
+            "Merge origin into your local branch, since they have diverged (never rebase):"
         )
         payload["line"] = payload["message"]
         return payload

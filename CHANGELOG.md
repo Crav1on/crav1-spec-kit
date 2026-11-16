@@ -2,6 +2,17 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.174.0 (2026-11-16)
+
+Fixes found on a second real ready check: a done task keeps its merge commit instead of the later commit that ticked it, Run next offers to continue an unfinished branch walk first, a built branch no longer reads as waiting on its own tasks, the build map shows full names, and the pull ending puts its label above the command. A minor release because the build map and the ready check write and end differently.
+
+- **Merge commit over the tick commit.** 1.173.0 read a branch's `build-progress` file top to bottom and kept the last `Result: done (...)` hash, so a `Step: tick T27` result such as `done (9f8e7d6, verify 5e4d3c2)` replaced the `Step: merge-pr` result `done (PR 80, 1a2b3c4, branch deleted)`. Now the hash comes from the `merge-pr` step. A tick or commit step's hash is used only when there is no merge result, no own `verify.md` row and no mark already on the map, so it never replaces a merge commit.
+- **Continue an unfinished walk first.** When `walk-progress.md` lists a branch run that is not merged, such as `stopped before merge`, and its `build-progress` file is not at `comment`, `wait-merge` or `merge-pr`, Run next starts with `Continue the build walk on <branch>:` above `/crav1-build-walk <slug> <branch>`. A walk that waits on a merge, or someone else's walk, stays a Waiting line (1.171.0).
+- **A branch never waits on its own tasks.** On `build-map.md`, a branch whose open tasks are all claimed or walked used to read `held, waits on T9; T10; T11; T12`. Now it reads `built, waits for PR 82 to merge` when its `build-progress` file shows every open task built and no merge, or `in progress` otherwise. A later branch still reads `held, waits on <branch>`.
+- **Full names in the build map.** The `Delivers:` and `Tasks:` lines on `build-map.md` use full task names, never cut with `...`, like the chat Held list since 1.173.0.
+- **Pull ending layout.** A behind or diverged specs repo ends with `Merge origin into your local branch, since they have diverged (never rebase):` (or `since it is behind`) above `git pull --no-rebase`, not a lowercase reason under the command. The loop-fix entry in the ready check puts its label above the command too.
+- Tests: `scripts/tests/test_merge_hash_walk_1174.py`.
+
 ## 1.173.0 (2026-11-16)
 
 Fixes found on a real ready check: the build map no longer swaps a done task's commit for another task's commit, Held names are full, the open-questions entry has its label above the command, and finalize-commit has no `Next:` line on any ending. A minor release because the build map, the ready check and finalize-commit write and end differently.
