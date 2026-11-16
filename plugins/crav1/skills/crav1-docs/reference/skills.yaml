@@ -1059,6 +1059,7 @@ skills:
   purpose: Build tasks from tasks.md, always in an isolated worker per task; asks which tasks (one, a
     range, or all).
   in_depth:
+  - '1.172.0: when the build walk or the range or all branch passes `approvals: already-done`, the one-task branch does not open `tool-approvals.md`.'
   - '1.160.0: the held check never refuses a task claimed by you. `walk_progress.py readiness` reads you from `--user` or `git config user.name`; your claimed task''s gate has `refused` false and `reason` `in progress by you`. Someone else''s claim still refuses it.'
   - '1.160.0: when `--recommend` prints a `checkout:` line, the task-line branch is only on origin or is the head of an open pull request. The build checks it out (`git checkout <name>` makes the local tracking branch) without the branch card.'
   - '1.142.0: when `/crav1-build-walk` opened this skill, do not print the open-pr Next. The walk prints its one Next.'
@@ -1186,6 +1187,7 @@ skills:
   walkthrough: docs/from-build-walk.md
   purpose: Walk one work branch from build through merge, with one Next while it runs.
   in_depth:
+  - '1.172.0: `build_walk.py next --root <spec folder> --branch <branch>` builds the walk state itself: phase, owner and pull request from `build-progress/<branch>.md`, full task names from `tasks.md`, the Uncommitted line from `git status`. `build_walk.py progress init` and `progress record --step <step> --result <result> --yes` write the progress file with `Done` and the normalized stamps; without `--yes` they preview. At `comment` or `wait-merge` the walk prints `lead` and `ending` straight from the script and reads no reference. The one-task build skips `tool-approvals.md` when the walk passes `approvals: already-done`.'
   - '1.171.0: in wait-merge the current branch is not a Run next entry; the Waiting line says why and Run next starts with the branches that can start. The `next` output has `lead`, one sentence from phase and owner (`T5 is pushed to PR 71 and waits for its merge.`) that agrees with the Uncommitted line; print only that before Run next. Two or more tasks use the branch form `/crav1-build-walk <slug> <branch>`, never a comma list. Task names are the full names. In other-owner mode a built and pushed task''s verify row says `Implemented, verified, tick pending`.'
   - '1.164.0: cards follow the card wording rule in `docs/reference/question-cards.md`: a plain question, each option saying what happens, the recommended one first with why. The other-owner card asks `Should I add my work to their pull request?`. Settle-and-push is one card: one yes commits the walk''s files and pushes the specs repo. Waiting lines name who or what and why, for example `Waiting: person A to merge pull request 71, then the tasks on feat/orders-cicd are ticked.`'
   - '1.160.0: `claims.py` writes `since` in local time with the local offset, to the second, for example `2026-11-14T23:40:00+01:00`; an older UTC line still reads. Your own claim does not hold a task in the ready check: `walk_progress.py readiness --root <spec-folder> --user <name> --branch <branch>` (user defaults to `git config user.name`) gives your claimed task `refused` false and `in progress by you`. Someone else''s claim still refuses it.'
@@ -1228,6 +1230,7 @@ skills:
   walkthrough: docs/from-verify.md
   purpose: Map every v0 acceptance line to tests or UI checks and report pass, fail, or missing.
   in_depth:
+  - '1.172.0: a rerun verifies again only the rows whose branch or tip moved since the last verify, or every row when spec.md, plan.md or tasks.md changed (`scripts/verify_rows.py scope`), and the reply says which rows were kept (`Kept from the last verify: T1, T3 (branch and tip unchanged).`). `verify_rows.py set --task T# --status <status> --evidence <evidence> --branch <b> --tip <sha> --yes` writes one row, recounts the TL;DR and records the tip under `## Row tips`.'
   - '1.171.0: with no hand-written steps, the reply''s branch blocks come from the ready check (`walk_ending.ready_branch_blocks`), with descriptions, open tasks and the whole-branch entry; a task that waits on a merge is not offered.'
   - '1.170.0: a `T6 failed:` change line in the reply keeps the Verify cell''s opening sentence and the sentence naming the cause, not the run detail; the ready check''s Catch up first line uses the same short reason.'
   - '1.169.0: `verify.md` has no `Next:` line any more; the chat reply''s Run next names the next step. The ready check still reads an older file that has one, and a Verified or Failed row there is never behind.'
@@ -1428,6 +1431,7 @@ skills:
   walkthrough: docs/from-commit.md
   purpose: Open a pull request for the current change branch, or push to an existing one and update its description or comment (push with explicit yes).
   in_depth:
+  - '1.172.0: on Windows, pull request threads are listed and posted with `crav1-review-pr/scripts/ado_threads.py`, which reads az JSON from stdout and decodes UTF-8, then cp1252.'
   - '1.171.0: the ending is Run next, never a `Next:` line: a Catch up first `git push` when the specs repo is ahead, then `Review PR <n>:` with `/crav1-review-pr <repo> <n>`.'
   - '1.164.0: the post-or-update card follows the card wording rule in `docs/reference/question-cards.md`, for example `Post this comment on PR 71?` with **Post it (Recommended)**. Typed changes stay on the free-text answer.'
   - '1.158.0: the steps it shares with merge-pr, pr-status and review-pr (which pull request, host order, Windows, finding the pull request for a branch, state and checks, claims, catching up by merging the base in, signing in, run ending) are one page, `crav1-docs/reference/pr-common.md`, with one read-only script, `scripts/pr_common.py` (`parse`, `host`, `find`, `checks`, `claim`, `behind`). The skill ships the script; the other three run it from here. The checks before the draft moved word for word to `references/checks.md`, the GitHub create steps to `references/github.md`.'
@@ -1518,6 +1522,7 @@ skills:
   walkthrough: docs/from-review-pr.md
   purpose: Read one named open pull request and report whether it can ship.
   in_depth:
+  - '1.172.0: `scripts/ado_threads.py list`, `compare --draft <file>` and `post --file <file> --yes` read and post Azure DevOps threads. It reads `az -o json` from stdout as bytes and decodes UTF-8, then UTF-8 with a BOM, then cp1252, so a Windows code page no longer breaks the JSON. A post is always a new top-level thread. `comment-as-posted.md` is read only when the PR note''s draft has no `## Comment as posted` section.'
   - '1.171.0: an Azure DevOps re-review posts a new top-level thread, not a reply in an earlier thread; it replies in a thread only to answer a question asked there. After the post offer the reply ends with Run next (`/crav1-finalize-commit`, then `git push`) while the PR note is uncommitted, and the Uncommitted line shows in chat.'
   - '1.164.0: the fetch card for an older copy on disk follows the card wording rule in `docs/reference/question-cards.md`: one sentence names the older copy, then `Fetch the pull request''s two branches before the review?`.'
   - '1.158.0: the shared pull-request steps are `crav1-docs/reference/pr-common.md` and `scripts/pr_common.py`. Ship or not moved word for word to `references/ship.md`, and the one-line pointers are one list, Which file, when.'

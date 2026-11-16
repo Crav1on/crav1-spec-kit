@@ -23,6 +23,8 @@ That slash command *is* the prompt.
 
 If the message does not name a pull request, the command asks which one and stops. It does not pick the newest.
 
+On Azure DevOps, the review lists, checks and posts threads with `scripts/ado_threads.py` (1.172.0). It reads the az output safely on Windows, so a Swedish or other non-ASCII character in a comment no longer breaks the listing, and a re-review is always posted as a new thread.
+
 ## Steps
 
 | Phase | You | Agent |

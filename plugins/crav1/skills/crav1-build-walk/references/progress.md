@@ -44,6 +44,8 @@ Each step records `Done`, `Result`, and the normalized hashes: `Spec version`, `
 
 `scripts/build_walk.py` settles a merge conflict in this file when every hunk is only those hash lines. It takes the upstream side and may write the merged file's normalized hash. `Done` and `Result` stay. A hunk that also changes those lines is not rewritten. `/crav1-finalize-commit` runs that settle on the pull path. Do not reimplement the hash. Nothing is pushed.
 
+Write the file and each step with the script (1.172.0): `scripts/build_walk.py progress init --root <spec> --branch <branch> --yes` once, then `scripts/build_walk.py progress record --root <spec> --branch <branch> --step <step> --result <result> --yes`. The script writes `Done` and the stamps; never write them by hand. On resume, `next --root <spec> --branch <branch>` reads the step back.
+
 Resume that matches the stored hash stays on the recorded step. It does not ask to clear. Record the next step only after `yes`, one step per call.
 
 ## Commit the progress file (1.150.0)

@@ -6,7 +6,7 @@ The walk opens a step skill by its sibling path, for example `../crav1-build-tas
 
 ## The ending
 
-Print `ending` from `scripts/build_walk.py next --json <file>` (1.150.0). `Run next:` is first. Each command is alone in a code span. The next line names the branch and the short task name. Then `Waiting:` when a step is blocked or waits on a yes, then `Uncommitted:` when files are uncommitted. The ending has no `Next:` line (1.157.0). The JSON `next` list keeps one sentence per Run next entry, as data; do not print it.
+Print `ending` from `scripts/build_walk.py next --root <spec folder> --branch <branch>` (1.172.0; `--json <file>` since 1.150.0). `Run next:` is first. Each command is alone in a code span. The next line names the branch and the short task name. Then `Waiting:` when a step is blocked or waits on a yes, then `Uncommitted:` when files are uncommitted. The ending has no `Next:` line (1.157.0). The JSON `next` list keeps one sentence per Run next entry, as data; do not print it.
 
 The step skill's own suggestion is not printed. That includes `/crav1-open-pr` after a build or a commit, and `/crav1-review-pr` after a pull request opens.
 
@@ -64,4 +64,17 @@ The specs repo is fetched before this walk reads the spec folder, and a claim is
 
 ## Script
 
-`scripts/build_walk.py` in this skill. The interpreter is `crav1-docs/reference/running-scripts.md`. The kit repo wrapper is `scripts/build-walk.py`. Pass state as `--json`. The script does not push, open, merge, or run a live change.
+`scripts/build_walk.py` in this skill. The interpreter is `crav1-docs/reference/running-scripts.md`. The kit repo wrapper is `scripts/build-walk.py`. Pass state with `--root` and `--branch`, or as `--json` (see State from files). The script does not push, open, merge, or run a live change.
+
+## State from files (1.172.0)
+
+`scripts/build_walk.py next --root docs/specs/<slug> --branch <branch>` builds the next JSON itself: `phase` and `owner` from the last step in `build-progress/<branch>.md` (a `done` step moves to the next step in order; `comment` done is `wait-merge`), `pr` from that file, task names from `tasks.md`, `uncommitted` from `git status` of the spec folder, and `root`, so readiness fills the other branches. `--waiting`, `--who` and `--pr` add what the files do not hold. Do not hand-write the JSON or rerun the script only to add `uncommitted`.
+
+The progress file is written by the script, never by hand:
+
+- `build_walk.py progress init --root <spec> --branch <branch> --owner self --tasks T3,T4 --cut-from develop --yes` writes the header.
+- `build_walk.py progress record --root <spec> --branch <branch> --step build --result done --yes` adds one step with `Done`, `Result` and the normalized stamps.
+
+Without `--yes` each prints a preview and writes nothing. Never write the progress file or the next JSON by hand.
+
+When the progress file's last step is `comment` or `wait-merge`, the walk only waits on a merge: print `lead` and `ending` from `next --root --branch` and stop, with no other reference read. The walk passes `approvals: already-done` to the one-task build, which then does not open `tool-approvals.md`.

@@ -8,6 +8,8 @@
 
 Build tasks from tasks.md, always in an isolated worker per task; asks which tasks (one, a range, or all).
 
+1.172.0: when the build walk or the range or all branch passes `approvals: already-done`, the one-task branch does not open `tool-approvals.md`.
+
 1.160.0: the held check never refuses a task claimed by you. `walk_progress.py readiness` reads you from `--user` or `git config user.name`; your claimed task's gate has `refused` false and `reason` `in progress by you`. Someone else's claim still refuses it.
 
 1.160.0: when `--recommend` prints a `checkout:` line, the task-line branch is only on origin or is the head of an open pull request. The build checks it out (`git checkout <name>` makes the local tracking branch) without the branch card.

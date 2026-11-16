@@ -41,6 +41,8 @@ To resume after a stop or in a new session, run the same command. It picks up at
 
 When the walk waits for someone else to merge the pull request (1.171.0), Run next no longer offers the same task again: the Waiting line says what it waits for, and Run next starts with the branches you can build now. The ready check reads `build-progress/<branch>.md` too, so a task that is pushed and waits on a merge is not offered anywhere until that merge. One lead sentence comes before Run next, for example `T5 is pushed to PR 71 and waits for its merge.`, and it never says there is nothing to commit when an Uncommitted line follows. Two tasks on one branch are one branch command, `/crav1-build-walk orders-api feat/orders-incoming`, never `T43, T8`. Task names are shown in full. In someone else's pull request, a built and pushed task's verify row says `Implemented, verified, tick pending`.
 
+The walk reads its own state from the files (1.172.0): `build_walk.py next --root docs/specs/orders-api --branch feat/orders-readme` takes the step and owner from `build-progress/<branch>.md`, the task names from `tasks.md` and the Uncommitted line from `git status`, and `build_walk.py progress record` writes each step with its stamps. When the branch waits on someone else's merge, the walk prints the ending straight from the script without reading its reference files.
+
 ## Steps
 
 | Step | You | Agent |
