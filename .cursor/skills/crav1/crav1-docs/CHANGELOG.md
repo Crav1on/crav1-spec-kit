@@ -2,7 +2,7 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
-## 1.176.0 (in progress)
+## 1.176.0 (2026-11-16)
 
 Fixes found on two more real walks. A step recorded again after a spec edit stops reading reopened, the ready check lists pull requests in merge order, a whole-branch run keeps two repos apart and records verified-on-branch work honestly, the plan steps and the build walk end with the label above the command and no `Next:` line, the ready check offers commit before push, asked questions are not offered again, and task titles keep their code text. A minor release because the walk, the ready check and the plan steps read and end differently.
 
