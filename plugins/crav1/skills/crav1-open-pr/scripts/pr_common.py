@@ -642,6 +642,62 @@ def host_author(info: dict, repo: str | None = None, timeout: int = 8) -> str | 
     return name.strip() if isinstance(name, str) and name.strip() else None
 
 
+def host_state(info: dict, repo: str | None = None, timeout: int = 8) -> dict | None:
+    """Whether a pull request merged, read-only from its own host (1.177.2).
+
+    Only the resolved host's CLI is tried, the same way as host_author:
+    `gh pr view <n> --json state,mergeCommit,mergedAt,closedAt` for GitHub,
+    `az repos pr show --id <n>` (status, lastMergeCommit, closedDate) for
+    Azure DevOps. Returns {"state": "merged" | "closed" | "open", "sha",
+    "date"}; GitHub MERGED and Azure DevOps completed are merged, CLOSED and
+    abandoned are closed. None when the CLI is missing, not signed in, slow,
+    or fails.
+    """
+    host, number = info.get("host"), info.get("number")
+    if not number or host not in TOOL or not shutil.which(TOOL[host]):
+        return None
+    url = info.get("url") or ""
+    if host == "github":
+        cmd = ["gh", "pr", "view", str(number), "--json", "state,mergeCommit,mergedAt,closedAt"]
+        ref = host_of(url.split("/pull/")[0]) if "/pull/" in url else {}
+        if ref.get("owner"):
+            cmd += ["-R", f"{ref['owner']}/{ref['repo']}"]
+    else:
+        cmd = ["az", "repos", "pr", "show", "--id", str(number), "--query",
+               "{status:status,sha:lastMergeCommit.commitId,closed:closedDate}", "-o", "json"]
+        ref = parse_ref(url) if url else {}
+        if ref.get("org"):
+            cmd += ["--organization", f"https://dev.azure.com/{ref['org']}"]
+    try:
+        proc = subprocess.run(cmd, cwd=repo, capture_output=True, text=True, timeout=timeout, check=False)
+    except (OSError, subprocess.SubprocessError):
+        return None
+    if proc.returncode != 0 or not proc.stdout.strip():
+        return None
+    try:
+        data = json.loads(proc.stdout)
+    except ValueError:
+        return None
+    if not isinstance(data, dict):
+        return None
+    if host == "github":
+        raw = str(data.get("state") or "").upper()
+        commit = data.get("mergeCommit") or {}
+        sha = commit.get("oid") if isinstance(commit, dict) else None
+        date = data.get("mergedAt") or data.get("closedAt")
+        state = {"MERGED": "merged", "CLOSED": "closed", "OPEN": "open"}.get(raw)
+    else:
+        raw = str(data.get("status") or "").lower()
+        sha = data.get("sha")
+        date = data.get("closed")
+        state = {"completed": "merged", "abandoned": "closed", "active": "open"}.get(raw)
+    if not state:
+        return None
+    sha = sha if isinstance(sha, str) and re.fullmatch(r"[0-9a-fA-F]{7,40}", sha) else None
+    day = str(date)[:10] if date and re.match(r"\d{4}-\d{2}-\d{2}", str(date)) else None
+    return {"state": state, "sha": sha.lower() if sha else None, "date": day}
+
+
 def cmd_resolve(args) -> int:
     roots = [repo_root_of(Path(r)) for r in (args.root or [])] or _default_roots(args.repo)
     remote = args.remote_url if args.remote_url is not None else _remote_url(args.repo)

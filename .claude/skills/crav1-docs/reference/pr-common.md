@@ -30,6 +30,8 @@ Since 1.177.1 `--root` may be the specs repo root, `docs/specs`, or one spec fol
 
 **Who opened it (1.177.1).** The ready check asks the pull request's own host, read-only and with a short timeout: `gh pr view <n> --json author` on GitHub, `az repos pr show --id <n>` (`createdBy.displayName`) on Azure DevOps, only the CLI for the host the records name, when no author is recorded. `pr_common.py` stays read-only: the ready check writes a found name as `PR author: <name>` in the build-progress file that names that pull request, and `<interpreter> -X utf8 <skill crav1-tighten-and-plan-ready-to-build>/scripts/walk_progress.py pr-author --root <spec-folder> --pr <n> --name "<who>"` records the user's answer.
 
+**Did it merge (1.177.2).** `host_state` asks the same way whether a pull request merged: `gh pr view <n> --json state,mergeCommit,mergedAt,closedAt` on GitHub (`MERGED`, `CLOSED`, `OPEN`), `az repos pr show --id <n>` (`status`, `lastMergeCommit`, `closedDate`) on Azure DevOps (`completed`, `abandoned`, `active`). It returns the state, the merge commit when the host gives it, and the date, or nothing when the CLI is missing, not signed in, slow or fails. The ready check records a merge in build-progress itself; a `Code repo:` line written by `walk_progress.py code-repo --root <spec-folder> --pr <n> --repo <name-or-url>` gives a number-only record its host.
+
 Remote: the single `git remote`. If several remotes exist, ask which one. A full URL names its host.
 
 ## Finding the pull request for a branch

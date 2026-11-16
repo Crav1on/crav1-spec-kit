@@ -3289,9 +3289,12 @@ def build_rows(root: Path, excluded: set[str] | None = None, aliases: list | Non
     spec_text = spec_path.read_text(encoding="utf-8") if spec_path.is_file() else ""
     rests = _task_rests(tasks_path.read_text(encoding="utf-8"))
     merged_branches = _merged_branches(spec_text)
+    # 1.177.2: a build-progress file with a merge-pr result (from the walk,
+    # /crav1-merge-pr, or the host check) makes its tasks done.
+    walk_merged = merged_walk_tasks(root)
     for task in tasks:
         task["ticked"] = task["done"]
-        task["merged"] = _task_merged(rests.get(task["id"], ""), merged_branches)
+        task["merged"] = _task_merged(rests.get(task["id"], ""), merged_branches) or f"T{task['id']}" in walk_merged
         # A merged pull request is built, so later tasks do not wait on it.
         if task["merged"]:
             task["done"] = True
@@ -3858,6 +3861,251 @@ def cmd_pr_author(args) -> None:
     path = record_pr_author(root, args.pr, name)
     print(json.dumps({"status": "recorded" if path else "no-record", "author": name, "source": source,
                       "file": str(path) if path else None}, indent=2, ensure_ascii=False))
+    if not path:
+        sys.exit(1)
+
+
+def _progress_file_for(root: Path, number: int, branch: str | None = None) -> Path | None:
+    """The build-progress file that names PR <n>, the branch's own first (1.177.2)."""
+    folder = Path(root) / "build-progress"
+    if not folder.is_dir():
+        return None
+    files = sorted(folder.glob("*.md"))
+    if branch:
+        own = folder / f"{branch.replace('/', '--')}.md"
+        files = ([own] if own in files else []) + [f for f in files if f != own]
+    for path in files:
+        try:
+            text = path.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        if int(number) in {int(n) for n in _PROGRESS_PR.findall(text)}:
+            return path
+    return None
+
+
+def waiting_prs(root: Path | None, user: str | None = None) -> dict:
+    """{pr: branch} for every PR the ready check waits on to merge (1.177.2).
+
+    The same two sources as open_prs (a walk at `comment` or `wait-merge`,
+    and someone else's built walk with a known PR), without the owner lookup.
+    """
+    out: dict = {}
+    if root is None or not Path(root).is_dir():
+        return out
+    for info in progress_merge_waits(root).values():
+        if info.get("pr"):
+            out.setdefault(int(info["pr"]), info["branch"])
+    built = walk_built(root)
+    for branch, info in _unfinished_walks(root, user).items():
+        tasks = info["owner"]["tasks"]
+        if info.get("pr") and tasks and all(task in built for task in tasks):
+            out.setdefault(int(info["pr"]), branch)
+    return out
+
+
+def host_pr_ref(root: Path | None, pr) -> dict:
+    """Where PR <n> lives, from the kit's records, read-only (1.177.2).
+
+    {"status": "ok", "host", "url", ...} when resolve finds one host;
+    {"status": "unhosted"} when a record names the PR but no `Code repo:`
+    line or single docs/system/repos.md row gives its host; else the
+    resolve status. Never raises.
+    """
+    try:
+        pc = pr_common_mod()
+        base = pc.repo_root_of(Path(root))
+        info = pc.resolve_ref(str(pr), pc._remote_url(str(base)) or None, [base])
+    except Exception:  # noqa: BLE001 - the lookup must never break the check
+        return {"status": "error"}
+    if info.get("status") == "ask" and info.get("candidates") and all(
+            not c.get("host") for c in info["candidates"]):
+        return {"status": "unhosted", "number": int(pr)}
+    return info
+
+
+def host_pr_state(root: Path | None, pr) -> dict | None:
+    """PR <n>'s state on its own host, read-only (1.177.2). None when unread."""
+    import os
+    if root is None or not pr or os.environ.get("CRAV1_NO_HOST_LOOKUP"):
+        return None
+    info = host_pr_ref(root, pr)
+    if info.get("status") != "ok":
+        return {"state": "unhosted"} if info.get("status") == "unhosted" else None
+    try:
+        pc = pr_common_mod()
+        return pc.host_state(info, str(pc.repo_root_of(Path(root))))
+    except Exception:  # noqa: BLE001 - the lookup must never break the check
+        return None
+
+
+def merged_result_line(number: int, sha: str | None, date: str | None) -> str:
+    """`merged (PR 71, merge commit 1a2b3c4d, merged on host 2026-11-14)` (1.177.2)."""
+    bits = [f"PR {int(number)}"]
+    if sha:
+        bits.append(f"merge commit {sha}")
+    bits.append(f"merged on host {date}" if date else "merged on host")
+    return f"merged ({', '.join(bits)})"
+
+
+def record_pr_merged(root: Path, number: int, sha: str | None = None, date: str | None = None,
+                     branch: str | None = None) -> Path | None:
+    """Add a merge-pr result for PR <n> to its build-progress file (1.177.2).
+
+    The same shape as a /crav1-merge-pr or build-walk merge result, so the
+    walk stops waiting, the map's done marks take the merge commit, and the
+    file's tasks count as done. A branch run in walk-progress.md for that
+    branch becomes `merged`. None when no build-progress file names the PR
+    or the file already has a merge-pr result.
+    """
+    from datetime import datetime as _dt
+    path = _progress_file_for(root, number, branch)
+    if path is None:
+        return None
+    text = path.read_text(encoding="utf-8")
+    steps = _PROGRESS_STEP.findall(text)
+    if steps and steps[-1].strip().lower() == "merge-pr":
+        return None
+    when = _dt.now().astimezone().replace(microsecond=0).isoformat()
+    block = (f"- Step: merge-pr\n  Done: {when}\n  Result: {merged_result_line(number, sha, date)}\n")
+    text = text.rstrip("\n") + "\n\n" + block
+    path.write_text(text, encoding="utf-8")
+    head = text.split("\n- Step:", 1)[0]
+    match = re.search(r"^Branch:\s*(\S+)", head, re.M)
+    name = match.group(1) if match else path.stem.replace("--", "/")
+    try:
+        if progress_path(root).is_file():
+            data, _err = _try_parse(progress_path(root).read_text(encoding="utf-8"))
+            if data and name in (data.get("branch_runs") or {}):
+                set_branch_run(Path(root), name, "merged")
+    except (Exception, SystemExit):  # noqa: BLE001 - the progress log is the record
+        pass
+    return path
+
+
+def sync_pr_states(root: Path | None, user: str | None = None) -> dict:
+    """Ask each waiting PR's own host whether it merged, and record it (1.177.2).
+
+    Read-only on the host (pr_common.host_state). A merged or completed PR
+    gets a merge-pr result in its build-progress file (record_pr_merged), so
+    this same ready check counts its tasks as done and drops it from the
+    merge list. A PR closed without merging is listed in `closed`; nothing
+    is recorded. A PR whose code repo is not recorded is in `unhosted`. A
+    host that cannot be read changes nothing.
+    """
+    out: dict = {"merged": [], "closed": [], "unhosted": [], "branches": {}}
+    for pr, branch in sorted(waiting_prs(root, user).items()):
+        out["branches"][pr] = branch
+        state = host_pr_state(root, pr)
+        if not state:
+            continue
+        if state["state"] == "unhosted":
+            out["unhosted"].append(pr)
+        elif state["state"] == "merged":
+            if record_pr_merged(Path(root), pr, state.get("sha"), state.get("date"), branch):
+                out["merged"].append(pr)
+        elif state["state"] == "closed":
+            out["closed"].append(pr)
+    return out
+
+
+def _prs_text(prs: list) -> str:
+    names = [f"PR {pr}" for pr in prs]
+    return names[0] if len(names) == 1 else ", ".join(names[:-1]) + " and " + names[-1]
+
+
+def pr_state_lines(state: dict) -> list[str]:
+    """Waiting lines for closed and unhosted PRs (1.177.2)."""
+    lines = []
+    for pr in state.get("closed") or []:
+        lines.append(f"Waiting: PR {pr} was closed without merging; its tasks are not done.")
+    unhosted = state.get("unhosted") or []
+    if unhosted:
+        many = len(unhosted) > 1
+        lines.append(f"Waiting: {_prs_text(unhosted)}: code repo not recorded, so the host was not asked "
+                     f"whether {'they' if many else 'it'} merged.")
+    return lines
+
+
+def merged_walk_tasks(root: Path | None) -> set[str]:
+    """T#s on the `Tasks:` line of a build-progress file with a merge result (1.177.2)."""
+    out: set[str] = set()
+    folder = Path(root) / "build-progress" if root is not None else None
+    if folder is None or not folder.is_dir():
+        return out
+    try:
+        walks = map_mod().progress_state(root)
+    except Exception:  # noqa: BLE001
+        return out
+    for path in sorted(folder.glob("*.md")):
+        text = path.read_text(encoding="utf-8", errors="replace")
+        head = text.split("\n- Step:", 1)[0]
+        match = re.search(r"^Branch:\s*(\S+)", head, re.M)
+        key = match.group(1) if match else path.stem.replace("--", "/")
+        if not (walks.get(key) or {}).get("merged"):
+            continue
+        line = re.search(r"^Tasks:\s*(.*)$", head, re.M)
+        out |= {f"T{int(n)}" for n in re.findall(r"\bT(\d+)\b", line.group(1))} if line else set()
+    return out
+
+
+def code_repo_choices(root: Path) -> dict:
+    """{name: URL} from docs/system/repos.md, the choices for `code-repo` (1.177.2)."""
+    pc = pr_common_mod()
+    return pc._repos_rows(pc.repo_root_of(Path(root)))
+
+
+_CODE_REPO_LINE = re.compile(r"^(?:Code repo|Repo):.*$", re.M | re.I)
+
+
+def record_code_repo(root: Path, number: int, url: str) -> Path | None:
+    """Write `Code repo: <url>` into the build-progress file that names PR <n> (1.177.2)."""
+    path = _progress_file_for(root, number)
+    if path is None:
+        return None
+    text = path.read_text(encoding="utf-8")
+    line = f"Code repo: {url}"
+    head, sep, rest = text.partition("\n- Step:")
+    if _CODE_REPO_LINE.search(head):
+        head = _CODE_REPO_LINE.sub(line, head, count=1)
+    else:
+        m = (re.search(r"^PR author:.*$", head, re.M | re.I) or re.search(r"^Owner:.*$", head, re.M)
+             or re.search(r"^Branch:.*$", head, re.M))
+        head = head[:m.end()] + "\n" + line + head[m.end():] if m else line + "\n" + head
+    path.write_text(head + sep + rest, encoding="utf-8")
+    return path
+
+
+def cmd_code_repo(args) -> None:
+    """`code-repo --root <spec-folder> --pr <n> [--repo <name-or-url>]` (1.177.2).
+
+    Without --repo it lists the docs/system/repos.md rows to offer. With it,
+    a repos.md name or a GitHub or Azure DevOps repo URL is written as
+    `Code repo: <url>` in that PR's build-progress file; the owner, state
+    and bare-number lookups then use it. Run the ready check again after.
+    """
+    root = Path(args.root)
+    choices = code_repo_choices(root)
+    if not args.repo:
+        print(json.dumps({"status": "choices", "pr": args.pr,
+                          "choices": [{"name": k, "url": v} for k, v in choices.items()],
+                          "line": f"Which repo is PR {args.pr} in?"}, indent=2, ensure_ascii=False))
+        return
+    value = args.repo.strip().strip("`")
+    url = choices.get(value.lower().removesuffix(".git"))
+    if not url and pr_common_mod().host_of(value)["host"] in ("github", "azure"):
+        url = value
+    if not url:
+        print(json.dumps({"status": "unknown-repo", "repo": value,
+                          "choices": [{"name": k, "url": v} for k, v in choices.items()],
+                          "line": f"{value} is not a docs/system/repos.md row or a GitHub or Azure DevOps repo URL."},
+                         indent=2, ensure_ascii=False))
+        sys.exit(1)
+    path = record_code_repo(root, args.pr, url)
+    print(json.dumps({"status": "recorded" if path else "no-record", "pr": args.pr, "url": url,
+                      "file": str(path) if path else None,
+                      "next": "Run the ready check again; it asks the PR's host whether it merged."},
+                     indent=2, ensure_ascii=False))
     if not path:
         sys.exit(1)
 
@@ -4850,6 +5098,8 @@ def reply_for(root: Path | None, out: dict) -> str:
     build_map = None
     if out.get("build_map_wrote"):
         build_map = f"docs/specs/{slug}/build-map.md"
+        if "build_map_changed" in out:
+            build_map += " (updated)" if out["build_map_changed"] else " (unchanged, nothing new since the last write)"
     next_line = None
     # A not-ready ending already starts with Run next (1.163.0). Only keep a
     # trailing Next line when there is still no Run next block, and never
@@ -4875,6 +5125,7 @@ def reply_for(root: Path | None, out: dict) -> str:
 def readiness(args: argparse.Namespace) -> None:
     root = Path(args.root) if args.root else None
     built = False
+    pr_state: dict = {"merged": [], "closed": [], "unhosted": []}
     sync = preflight_sync(root, skip=getattr(args, "skip_sync", False))
     if sync.get("stop"):
         stopped = {
@@ -4908,6 +5159,9 @@ def readiness(args: argparse.Namespace) -> None:
     elif root is not None:
         if not root.is_dir():
             fail("root", f"not a folder: {root}")
+        # 1.177.2: ask each waiting PR's host whether it merged and record
+        # it first, so this run's rows, merge list and Run next use it.
+        pr_state = sync_pr_states(root, getattr(args, "user", None))
         aliases: list[dict] = []
         rows = build_rows(root, excluded=set(args.new_question or []), aliases=aliases)
         claim_info = apply_claims(root, rows, getattr(args, "user", None), getattr(args, "branch", None))
@@ -4996,13 +5250,18 @@ def readiness(args: argparse.Namespace) -> None:
     waiting_bits = list(loop_lines)
     # 1.176.0: one ordered merge list replaces the per-PR Waiting lines.
     merge_prs = open_prs(root, getattr(args, "user", None)) if root is not None and root.is_dir() else {}
+    # 1.177.2: a PR closed without merging leaves the merge list.
+    for pr in pr_state.get("closed") or []:
+        merge_prs.pop(pr, None)
     merge_block = merge_order_block(rows, merge_prs) if merge_prs else ""
     if merge_block:
         # 1.177.1: the list is the only place PR waits live; no Waiting
         # line repeats a listed PR.
         waiting_bits.append(merge_block)
     else:
-        waiting_bits.extend(merge_wait_lines(rows))
+        waiting_bits.extend(line for line in merge_wait_lines(rows)
+                            if not any(f"PR {pr} " in line for pr in pr_state.get("closed") or []))
+    waiting_bits.extend(pr_state_lines(pr_state))
     if resolve_waiting:
         waiting_bits.append(resolve_waiting)
     if result == "not-ready" and not can_start and waiting_line:
@@ -5135,17 +5394,26 @@ def readiness(args: argparse.Namespace) -> None:
         "loop_lines": loop_lines,
         "loop_card": offer["card"],
         "loop_fixes": offer["fixes"],
+        "pr_state": {key: pr_state.get(key) or [] for key in ("merged", "closed", "unhosted")},
+        "code_repo_unknown": [
+            {"pr": pr, "branch": (pr_state.get("branches") or {}).get(pr)} for pr in pr_state.get("unhosted") or []
+        ],
     }
     if built:
         out["rows"] = rows
         out["question_aliases"] = aliases
     if getattr(args, "write_map", False) and root is not None and root.is_dir():
+        map_path = root / "build-map.md"
+        before = map_path.read_text(encoding="utf-8") if map_path.is_file() else None
         text, code = map_mod().run_dir(root)
         if code:
             fail("build-map", text or "could not write build-map.md")
         out["build_map"] = text.strip()
-        map_path = root / "build-map.md"
-        out["build_map_wrote"] = str(map_path) if map_path.is_file() else None
+        after = map_path.read_text(encoding="utf-8") if map_path.is_file() else None
+        out["build_map_wrote"] = str(map_path) if after is not None else None
+        # 1.177.2: say whether the write changed the map, so a no-op is not
+        # mistaken for a failure.
+        out["build_map_changed"] = after is not None and after != before
     if root is not None and root.is_dir():
         loaded = load(root)
         out["done_stamp_warning"] = done_stamp_warning(loaded["steps"], loaded.get("acks"))
@@ -6592,6 +6860,12 @@ def main(argv: list[str] | None = None) -> None:
     pa.add_argument("--pr", required=True, type=int)
     pa.add_argument("--name", help="Who opened it, as the user said. Omit to ask the PR's own host, read-only.")
     pa.set_defaults(func=cmd_pr_author)
+
+    cr = sub.add_parser("code-repo", help="Record which code repo a pull request is in (1.177.2).")
+    cr.add_argument("--root", required=True, help="Spec folder.")
+    cr.add_argument("--pr", required=True, type=int)
+    cr.add_argument("--repo", help="A docs/system/repos.md name or a repo URL. Omit to list the choices.")
+    cr.set_defaults(func=cmd_code_repo)
 
     args = parser.parse_args(argv)
     args.func(args)
