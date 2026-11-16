@@ -357,6 +357,11 @@ RUN_NEXT_ONLY_SKILLS = (
     "crav1-plan-from-spec",
     "crav1-tighten-plan",
     "crav1-review-plan",
+    # 1.177.0: the four PR skills end with Run next too.
+    "crav1-open-pr",
+    "crav1-pr-status",
+    "crav1-review-pr",
+    "crav1-merge-pr",
 )
 NEXT_EXAMPLE = re.compile(r"`Next:\s*[^`]")
 
@@ -384,6 +389,53 @@ def run_next_only_problems(kit):
                     f"{os.path.relpath(path, kit)}:{lineno}: a `Next:` line in a skill that ends with "
                     "Run next or nothing (1.173.0)"
                 )
+    return out
+
+
+# Prose that tells a skill to print a Next: line (1.177.0). Script output is
+# checked by the ending layout below; this catches reference prose such as
+# "ends with one `Next:` line" or "print a Next: line" in a skill that ends
+# with Run next, in the shared PR steps, and in the PR skills' scripts.
+PROSE_NEXT = re.compile(
+    r"(?i)\b(?:one|a|print|prints|printing|write|writes|ends?\s+with|then)\s+`?Next:?`?\s+lines?\b"
+)
+PROSE_NEXT_OK = re.compile(r"(?i)\b(?:never|no|not|nor|without)\b[^.\n]{0,40}$")
+SCRIPT_NEXT = re.compile(r"""["'](?:[^"'\n]*\n)?Next:""")
+PR_SKILLS = ("crav1-open-pr", "crav1-pr-status", "crav1-review-pr", "crav1-merge-pr")
+
+
+def prose_next_hits(text):
+    """Line numbers where prose tells the agent to print a Next: line."""
+    hits = []
+    for i, line in enumerate(str(text or "").splitlines(), 1):
+        for m in PROSE_NEXT.finditer(line):
+            if not PROSE_NEXT_OK.search(line[: m.start()]):
+                hits.append(i)
+                break
+    return hits
+
+
+def prose_next_problems(kit):
+    root = os.path.join(kit, ".cursor", "skills", "crav1")
+    out = []
+    paths = [os.path.join(kit, "docs", "reference", "pr-common.md")]
+    for name in RUN_NEXT_ONLY_SKILLS:
+        paths += sorted(glob.glob(os.path.join(root, name, "**", "*.md"), recursive=True))
+    for path in paths:
+        if not os.path.isfile(path):
+            continue
+        with open(path, encoding="utf-8") as fh:
+            text = fh.read()
+        for lineno in prose_next_hits(text):
+            out.append(f"{os.path.relpath(path, kit)}:{lineno}: tells the skill to print a `Next:` line; "
+                       "this skill ends with Run next, the label above the command (1.177.0)")
+    for name in PR_SKILLS:
+        for path in sorted(glob.glob(os.path.join(root, name, "scripts", "*.py"))):
+            with open(path, encoding="utf-8") as fh:
+                for lineno, line in enumerate(fh, 1):
+                    if SCRIPT_NEXT.search(line):
+                        out.append(f"{os.path.relpath(path, kit)}:{lineno}: prints a `Next:` line; "
+                                   "the PR skills end with Run next (1.177.0)")
     return out
 
 
@@ -657,6 +709,7 @@ def main(argv):
     errs.extend(dead_card_problems(kit))
     errs.extend(stray_next_problems(kit))
     errs.extend(run_next_only_problems(kit))
+    errs.extend(prose_next_problems(kit))
     errs.extend(ending_layout_problems(kit))
     errs.extend(card_wording_problems(kit))
     errs.extend(invocation_problems(kit))

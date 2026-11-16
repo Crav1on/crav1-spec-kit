@@ -10,7 +10,7 @@ The four are one command family and none runs another. `/crav1-open-pr` may name
 
 ## Which pull request
 
-Accept a number (`123`) or a URL.
+Accept a number (`123`, `pr82`, `PR 82`, `#82`) or a URL.
 
 | URL | Id |
 | --- | --- |
@@ -20,7 +20,13 @@ Accept a number (`123`) or a URL.
 
 `<interpreter> -X utf8 scripts/pr_common.py parse --ref <n-or-url> --remote-url <remote-url>` reads it. A branch name is not a pull request. Do not pick the newest pull request for the current branch. When the URL's repository is not this git remote, the script says `mismatch`: stop and name both. Compare without a trailing `.git`, ignore case, and treat `dev.azure.com/<org>` and `<org>.visualstudio.com` as the same. `/crav1-review-pr` and `/crav1-pr-status` also accept `<repo> <n>` and a workspace folder or `repos.md` row, as skill `crav1-review-pr` `references/which-pr.md` says.
 
-Remote: the single `git remote`. If several remotes exist, ask which one. A full URL still names the host. A bare number needs that remote, or a `gh` repo that matches it.
+**A bare number (1.177.0).** Resolve it from the kit's own records before the remote: `<interpreter> -X utf8 scripts/pr_common.py resolve --ref <ref> --root <specs-repo>`. It reads the build-progress files (`docs/specs/<slug>/build-progress/`), the merge list (`build-map.md`, `walk-progress.md`), the PR notes in `docs/notes/` and `docs/system/repos.md`, and is read-only.
+
+- The records name exactly one pull request with that number: use its URL and host (`status: ok`, `source: records`). That holds even when this checkout's remote is on another host, for example a GitHub specs checkout and an Azure DevOps code repo.
+- The records name several, or one record and this checkout's host already showed a pull request with that number (`--remote-has-pr`): `status: ask`. List every candidate with its URL and ask which one. Do not pick.
+- Only when the records name none does it fall back to this checkout's single `git remote` (`source: remote`). No record and no GitHub or Azure DevOps remote: ask for the pull request URL.
+
+Remote: the single `git remote`. If several remotes exist, ask which one. A full URL names its host.
 
 ## Finding the pull request for a branch
 
@@ -28,7 +34,7 @@ Remote: the single `git remote`. If several remotes exist, ask which one. A full
 
 ## Host
 
-Resolve **one** path, in this order: GitHub `gh`, then Azure DevOps `az`, then the skill's no-host step. `<interpreter> -X utf8 scripts/pr_common.py host --remote-url <remote-url>` says `github`, `azure`, or `other`. Use `gh` only when `gh auth status` succeeds and the pull request is on GitHub. Each skill's own Azure DevOps file holds its `az` calls. Never claim a host did something it did not return: a URL for open, the diff and body for a read, a merge commit hash for a merge.
+Resolve **one** path, in this order: GitHub `gh`, then Azure DevOps `az`, then the skill's no-host step. `<interpreter> -X utf8 scripts/pr_common.py host --remote-url <remote-url>` says `github`, `azure`, or `other`. Use `gh` only when `gh auth status` succeeds and the pull request is on GitHub. Each skill's own Azure DevOps file holds its `az` calls. The host is the resolved pull request's host (`resolve` says `tool: gh` or `tool: az`), not this checkout's remote. Never tell the user to install or sign in to `gh` unless the resolved pull request is on GitHub, and never to set up `az` unless it is on Azure DevOps (1.177.0). When the remote is GitHub and the records point to Azure DevOps, take the `az` path. Never claim a host did something it did not return: a URL for open, the diff and body for a read, a merge commit hash for a merge.
 
 On Windows, `git` may not be on `PATH`. Try `git`, then `C:\Program Files\Git\cmd\git.exe`. `az` may be `az.cmd`. Quote any `--query` value that contains parentheses; `cmd.exe` treats an unquoted `(` as syntax. A multi-line pull-request description uses the `@file` steps in `/crav1-open-pr`. `/crav1-merge-pr` does not pass a multi-line body to `az`; a multi-line `--description` on Windows uses those `@file` steps.
 
@@ -52,4 +58,12 @@ Never start a dialog-box or browser Microsoft sign-in (`az login`, `az devops lo
 
 ## Run ending
 
-Each of the four ends as `run-ending.md` says (1.122.0): one `Next:` line, then `Waiting:` lines, then `Uncommitted:` when a note it wrote is not committed. When `/crav1-build-walk` opened the skill, the skill prints no line of its own for what to run next; the walk prints its Run next block (1.142.0, 1.157.0).
+Each of the four ends with Run next (1.177.0), as `run-ending.md` ("Run next for every other skill") says: `Run next:`, then a short reason, then a label on its own line and the command alone in its code span on the next line. Then `Waiting:` lines, then `Uncommitted:` when a note it wrote is not committed. Nothing needed now: `Run next: nothing needed now.` The four never print a `Next:` line. When `/crav1-build-walk` opened the skill, the skill prints no Run next of its own; the walk prints its Run next block (1.142.0, 1.157.0).
+
+```text
+Run next:
+Thread 104 is waiting on you.
+
+Post the drafted reply in thread 104:
+`/crav1-pr-status pr42`
+```

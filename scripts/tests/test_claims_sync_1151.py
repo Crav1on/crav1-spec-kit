@@ -137,7 +137,7 @@ class ClaimsTests(unittest.TestCase):
         self.assertTrue((self.root / "claims.md").is_file())
         text = (self.root / "claims.md").read_text(encoding="utf-8")
         self.assertIn("In progress: feat/orders-api-host-setup, T27, person A, since 2026-11-13T15:50:00+01:00", text)
-        code, listed, _ = run_py(CLAIMS, ["list", "--root", str(self.root)])
+        code, listed, _ = run_py(CLAIMS, ["list", "--root", str(self.root), "--now", "2026-11-13T16:00:00+01:00"])
         self.assertEqual(code, 0)
         self.assertEqual(listed["ids"], ["T27"])
         self.assertEqual(listed["claims"][0]["phrase"], "in progress by person A since 2026-11-13")

@@ -8,6 +8,8 @@
 
 Show where one pull request stands, point by point, and who owes the next step.
 
+1.177.0: a bare number is resolved from the kit's records before this checkout's remote (`pr_common.py resolve`), and only the resolved host's CLI is named. The ending is Run next, the label above the command; nothing needed is `Run next: nothing needed now.`, never a `Next:` line.
+
 1.176.0: reads format B task lines as the tasks the pull request carries. `Order` lines come from the ready check's merge list and `build-progress/`, questions from the spec's open questions; with neither it says so plainly. Older Merge order, Questions for reviewers and Not in this PR sections are still read for existing pull requests, and the kit's state wins when they differ.
 
 1.164.0: each closing offer follows the card wording rule in `docs/reference/question-cards.md`: one background sentence, then a short question such as `Set thread 112 back to active?`, each option saying what happens.

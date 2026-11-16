@@ -3744,13 +3744,48 @@ def apply_progress_waits(root: Path | None, rows: list[dict]) -> dict:
     return waits
 
 
+_PR_AUTHOR = re.compile(r"^(?:PR author|Opened by):\s*(.+?)\s*$", re.M | re.I)
+_NOTE_AUTHOR = re.compile(r"^author:\s*['\"]?(.+?)['\"]?\s*$", re.M | re.I)
+
+
+def pr_author(root: Path | None, pr, text: str = "") -> str | None:
+    """Who opened a pull request, from the kit's own records (1.177.0).
+
+    The PR note's front matter `author:` (`docs/notes/**/<date>-pr-<repo>-<n>.md`
+    in the specs repo), else a `PR author:` or `Opened by:` line in the
+    build-progress text. None when neither records it. A claim or the walk's
+    owner is never the author: someone can add tasks to another's PR.
+    """
+    if root is None or not pr:
+        return None
+    here = Path(root).resolve()
+    for base in [here, *here.parents]:
+        notes = base / "docs" / "notes"
+        if notes.is_dir():
+            for note in sorted(notes.rglob(f"*-pr-*-{int(pr)}.md")):
+                if note.name.endswith("-context.md"):
+                    continue
+                head = note.read_text(encoding="utf-8", errors="replace")
+                if head.startswith("---"):
+                    head = head.split("---", 2)[1] if head.count("---") >= 2 else ""
+                    match = _NOTE_AUTHOR.search(head)
+                    if match and match.group(1).strip():
+                        return match.group(1).strip()
+            break
+    match = _PR_AUTHOR.search(text or "")
+    return match.group(1).strip() if match else None
+
+
 def open_prs(root: Path | None, user: str | None = None) -> dict:
     """Pull requests that wait to merge, from build-progress (1.176.0).
 
     {pr: {"branch", "tasks", "owner"}}. A walk at `comment` or `wait-merge`,
     and a walk whose claimed tasks are all built with a known PR (someone
-    else's walk stopped before the merge). `owner` is `yours` when the claim
-    or `Run yes:` user is the local git user, else that name.
+    else's walk stopped before the merge). `owner` comes from who opened the
+    PR (pr_author, 1.177.0): `yours` when that is the local git user, else
+    that name. With no author recorded it is the claimer's name, or
+    `owner not recorded` where it would have said `yours`. `added` lists the
+    tasks you claimed on someone else's PR.
     """
     out: dict = {}
     if root is None:
@@ -3770,6 +3805,26 @@ def open_prs(root: Path | None, user: str | None = None) -> dict:
             return who
         return "yours" if (fallback or "self").lower() == "self" else "someone else"
 
+    def is_local(who: str | None) -> bool:
+        nonlocal local, looked
+        if not who:
+            return False
+        if not looked:
+            local = user or _git_user(root)
+            looked = True
+        return bool(local) and claims_mod().same_person(who, local)
+
+    def settle(entry: dict, pr, text: str, claimer: str) -> None:
+        author = pr_author(root, pr, text)
+        if author:
+            entry["owner"] = "yours" if is_local(author) else author
+            if entry["owner"] != "yours" and claimer == "yours":
+                entry["added"] = list(entry["tasks"])
+        elif claimer == "yours":
+            entry["owner"] = "owner not recorded"
+        else:
+            entry["owner"] = claimer
+
     for task, info in progress_merge_waits(root).items():
         pr = info.get("pr")
         if not pr:
@@ -3780,7 +3835,7 @@ def open_prs(root: Path | None, user: str | None = None) -> dict:
         if entry["owner"] is None:
             log = Path(root) / "build-progress" / f"{info['branch'].replace('/', '--')}.md"
             text = log.read_text(encoding="utf-8") if log.is_file() else ""
-            entry["owner"] = owner_of(info["branch"], text, info.get("owner"))
+            settle(entry, pr, text, owner_of(info["branch"], text, info.get("owner")))
     built = walk_built(root)
     for branch, info in _unfinished_walks(root, user).items():
         pr = info.get("pr")
@@ -3793,7 +3848,9 @@ def open_prs(root: Path | None, user: str | None = None) -> dict:
                 entry["tasks"].append(task)
         if entry["owner"] is None:
             name = info["owner"]["user"]
-            entry["owner"] = "yours" if info["own"] else (name or "someone else")
+            log = Path(root) / "build-progress" / f"{branch.replace('/', '--')}.md"
+            text = log.read_text(encoding="utf-8") if log.is_file() else ""
+            settle(entry, pr, text, "yours" if info["own"] else (name or "someone else"))
     return out
 
 
@@ -3860,13 +3917,70 @@ def merge_order_block(rows: list[dict], prs: dict) -> str:
     lines = ["Merge these PRs, in this order:"]
     for i, item in enumerate(order, 1):
         owner = item.get("owner") or "someone else"
-        whose = "yours" if owner == "yours" else f"{owner}'s"
+        whose = owner if owner in ("yours", "owner not recorded") else f"{owner}'s"
+        if item.get("added"):
+            whose += f", you added {_ids_span(item['added'])}"
         what = f"ticks {_ids_span(item['ticks'])}"
         if item["starts"]:
             verb = "can" if len(item["starts"]) > 1 else "can"
             what += f", then {_ids_span(item['starts'])} {verb} start"
         lines.append(f"{i}. PR {item['pr']} ({whose}, {item['branch']}): {what}.")
     return "\n".join(lines)
+
+
+def own_merge_entry(order: list[dict]) -> str | None:
+    """The Run next entry that merges your own pull requests first (1.177.0).
+
+    When the merge list holds at least one PR that is yours, the ready check
+    leads with `Merge your PRs 71 and 73 first:` above `/crav1-merge-pr 71`,
+    the first of yours in list order. Only PRs you opened count; others'
+    PRs get a Waiting line (others_merge_waits). None when no listed PR is
+    yours.
+    """
+    mine = [str(item["pr"]) for item in order if item.get("owner") == "yours"]
+    if not mine:
+        return None
+    others = [item for item in order if item.get("owner") != "yours"]
+
+    def _and(items: list[str]) -> str:
+        return items[0] if len(items) == 1 else ", ".join(items[:-1]) + " and " + items[-1]
+
+    head = f"Merge your PR {mine[0]} first" if len(mine) == 1 else f"Merge your PRs {_and(mine)} first"
+    return _run_entry(f"/crav1-merge-pr {mine[0]}", "", head + ":")
+
+
+def others_merge_waits(order: list[dict]) -> list[str]:
+    """Waiting lines for listed PRs you did not open (1.177.0).
+
+    `Waiting: PR 71 and PR 73 are person A's; they unblock T8.` One line per
+    owner, in list order. A PR with no recorded author says `owner not
+    recorded`. Your own PRs are the Run next entry instead.
+    """
+    groups: dict = {}
+    for item in order:
+        owner = item.get("owner") or "someone else"
+        if owner == "yours":
+            continue
+        groups.setdefault(owner, []).append(item)
+    out = []
+    for owner, items in groups.items():
+        names = [f"PR {item['pr']}" for item in items]
+        names = names[0] if len(names) == 1 else ", ".join(names[:-1]) + " and " + names[-1]
+        many = len(items) > 1
+        if owner == "owner not recorded":
+            line = f"Waiting: {names} ({'owners' if many else 'owner'} not recorded)"
+        else:
+            line = f"Waiting: {names} {'are' if many else 'is'} {owner}'s"
+        starts = sorted({t for item in items for t in item.get("starts") or []}, key=_task_num)
+        ticks = sorted({t for item in items for t in item.get("ticks") or []}, key=_task_num)
+        if starts:
+            line += f"; {'they unblock' if many else 'it unblocks'} {_ids_span(starts)}."
+        elif ticks:
+            line += f"; {'they tick' if many else 'it ticks'} {_ids_span(ticks)}."
+        else:
+            line += "."
+        out.append(line)
+    return out
 
 
 ON_BRANCH = "implemented, verified on branch"
@@ -4767,6 +4881,7 @@ def readiness(args: argparse.Namespace) -> None:
     merge_block = merge_order_block(rows, merge_prs) if merge_prs else ""
     if merge_block:
         waiting_bits.append(merge_block)
+        waiting_bits.extend(others_merge_waits(merge_order(rows, merge_prs)))
     else:
         waiting_bits.extend(merge_wait_lines(rows))
     if resolve_waiting:
@@ -4816,6 +4931,13 @@ def readiness(args: argparse.Namespace) -> None:
             waiting_bits.append(line)
     if resume_entries:
         shown_run = resume_entries + [entry for entry in shown_run if entry not in resume_entries]
+        if result not in ("ready", "ready-partial") and not catch_up:
+            nxt = shown_run[0]
+    # 1.177.0: your own PRs in the merge list lead Run next, above the
+    # resume entry; with none of yours the order stays as it was.
+    own_merge = own_merge_entry(merge_order(rows, merge_prs)) if merge_block else None
+    if own_merge and own_merge not in shown_run:
+        shown_run = [own_merge] + list(shown_run)
         if result not in ("ready", "ready-partial") and not catch_up:
             nxt = shown_run[0]
     ending = compose_ending(

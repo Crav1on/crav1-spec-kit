@@ -22,7 +22,7 @@ The steps shared with open-pr, pr-status and review-pr (which pull request, host
 
 ## Which pull request
 
-A number (`123`) or a URL, as [pr-common.md](../crav1-docs/reference/pr-common.md) ("Which pull request") says. A branch name is not a pull request; never pick the newest. A URL whose repository is not this git remote: stop, name both, and do not merge across that mismatch.
+A number (`123`, `pr82`) or a URL, as [pr-common.md](../crav1-docs/reference/pr-common.md) ("Which pull request") says; a bare number goes through `scripts/pr_common.py resolve --ref <n>` (1.177.0). A branch name is not a pull request; never pick the newest. A URL whose repository is not this git remote: stop, name both, and do not merge across that mismatch.
 
 ## Host
 
@@ -115,7 +115,7 @@ This skill never writes, clears, commits or pushes `claims.md`. `/crav1-build-wa
 - Do not claim a no-fast-forward merge unless the parent count was verified as two. A null `lastMergeCommit.parents` is not that count.
 - Do not run this skill from `/crav1-open-pr`, `crav1-build-task-agent`, or `/crav1-review-pr`. A yes on `/crav1-build-walk`'s card that names this pull request is the ask in this turn. The walk opens this file after that yes.
 - Do not run `/crav1-review-pr`. A review is not a merge ask. A required host check that is red still stops this skill.
-- When `/crav1-build-walk` opened this file, do not print a line of your own for what to run next. The walk prints its one line (1.142.0).
+- When `/crav1-build-walk` opened this file, do not print a Run next of your own. The walk prints its ending (1.142.0).
 
 ## Choice words (1.69.0)
 

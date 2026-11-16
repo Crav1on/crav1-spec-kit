@@ -32,7 +32,7 @@ Resolve these before you push or create anything. Prompt when a value is missing
 | Body | Format B in `references/draft.md`: summary, one line per task, how it was verified, work-item mention. No links. |
 | Push | Ask once, **after** the title and body are visible. Options in order: **push and open PR** (first/top), **open PR only** (remote already has the branch), **stop**. |
 
-The steps shared with merge-pr, pr-status and review-pr (host order, finding the pull request for a branch, claims, catching up, signing in) are [pr-common.md](../crav1-docs/reference/pr-common.md) (1.158.0). Read it every run. This file keeps what open-pr drafts and pushes. On Windows, read `references/host.md` ("Windows").
+The steps shared with merge-pr, pr-status and review-pr (host order, finding the pull request for a branch, claims, catching up, signing in) are [pr-common.md](../crav1-docs/reference/pr-common.md) (1.158.0). Read it every run; a bare number goes through `pr_common.py resolve --ref <n>`. This file keeps what open-pr drafts and pushes. On Windows, read `references/host.md` ("Windows").
 
 ## Base branch
 
