@@ -63,9 +63,17 @@ def host(states: dict, url_of=None):
     def ref(_root, pr):
         return {"status": "ok", "host": "azure", "number": int(pr), "url": f"{ADO_REPO}/pullrequest/{pr}"}
 
-    def state(info, _repo=None, timeout=8):
+    def state(info, _repo=None, timeout=None):
         return states.get(info["number"])
     return contextlib.ExitStack(), ref, state
+
+
+def lookup_of(state):
+    """host_lookup (1.179.0) from a host_state stand-in: a missing state is a host that timed out."""
+    def lookup(info, _repo=None, timeout=None):
+        got = state(info, _repo)
+        return {"ok": got, "error": None if got else "timeout", "detail": "" if got else "no answer within 20 s"}
+    return lookup
 
 
 @contextlib.contextmanager
@@ -74,7 +82,7 @@ def fake_host(states: dict):
     env = {k: v for k, v in os.environ.items() if k != "CRAV1_NO_HOST_LOOKUP"}
     with mock.patch.dict(os.environ, env, clear=True), \
             mock.patch.object(wp, "host_pr_ref", side_effect=ref), \
-            mock.patch.object(pc, "host_state", side_effect=state), \
+            mock.patch.object(pc, "host_lookup", side_effect=lookup_of(state)), \
             mock.patch.object(pc, "host_author", return_value=None):
         yield
 
@@ -94,7 +102,8 @@ class HostState(unittest.TestCase):
         out, cmd = self.run_with("github", {"state": "MERGED", "mergeCommit": {"oid": SHA},
                                             "mergedAt": "2026-11-14T10:00:00Z"})
         self.assertEqual(out, {"state": "merged", "sha": SHA, "date": "2026-11-14"})
-        self.assertEqual(cmd[:3], ["gh", "pr", "view"])
+        self.assertEqual(cmd[0], "/usr/bin/gh", "the full CLI path, never the bare name (1.179.0)")
+        self.assertEqual(cmd[1:3], ["pr", "view"])
         self.assertIn("contoso/orders-web", cmd)
         out, _ = self.run_with("github", {"state": "CLOSED", "mergeCommit": None, "closedAt": "2026-11-13T09:00:00Z"})
         self.assertEqual(out["state"], "closed")
@@ -102,7 +111,9 @@ class HostState(unittest.TestCase):
     def test_azure_completed_and_abandoned(self):
         out, cmd = self.run_with("azure", {"status": "completed", "sha": SHA, "closed": "2026-11-14T10:00:00Z"})
         self.assertEqual(out, {"state": "merged", "sha": SHA, "date": "2026-11-14"})
-        self.assertEqual(cmd[:4], ["az", "repos", "pr", "show"])
+        self.assertEqual(cmd[0], "/usr/bin/az", "the full CLI path, never the bare name (1.179.0)")
+        self.assertEqual(cmd[1:4], ["repos", "pr", "show"])
+        self.assertEqual(cmd[cmd.index("--detect") + 1], "false")
         self.assertIn("https://dev.azure.com/contoso", cmd)
         out, _ = self.run_with("azure", {"status": "abandoned", "sha": None, "closed": "2026-11-13T09:00:00Z"})
         self.assertEqual(out["state"], "closed")
@@ -182,7 +193,10 @@ class ClosedAndUnreadable(unittest.TestCase):
             before = readme_log(root)
             with fake_host({}):
                 text = ready(root)
-            self.assertEqual(text, baseline)
+            # 1.179.0: nothing is recorded, and Catch up first says why the
+            # host was not read instead of staying silent.
+            self.assertNotIn("Azure DevOps was not reached", baseline)
+            self.assertIn("Azure DevOps was not reached for PR 71 and PR 82: it did not answer within 20 s.", text)
             self.assertEqual(readme_log(root), before)
             self.assertIn("1. PR 71 (yours, feat/orders-readme)", text)
 
@@ -215,8 +229,9 @@ class CodeRepoUnknown(unittest.TestCase):
             # The owner lookup uses it.
             log = readme_log(root).replace("PR author: person A\n", "")
             (root / "build-progress/feat--orders-readme.md").write_text(log, encoding="utf-8")
+            named = {"ok": {"state": "open", "sha": None, "date": None, "author": "person C"}, "error": None, "detail": ""}
             with mock.patch.dict(os.environ, env, clear=True), \
-                    mock.patch.object(pc, "host_author", return_value="person C") as author:
+                    mock.patch.object(pc, "host_lookup", return_value=named) as author:
                 self.assertEqual(wp.host_pr_author(root, 71), "person C")
             self.assertEqual(author.call_args[0][0]["url"], f"{ADO_REPO}/pullrequest/71")
             # And the state lookup: merged on the host ticks T5 in the same run.

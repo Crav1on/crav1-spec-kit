@@ -3539,6 +3539,38 @@ def apply_built_claims(root: Path | None, rows: list[dict]) -> None:
         row["reason"] = built_claim_phrase(row.get("who") or "", built[task].get("pr"))
 
 
+_PR_HEADER = re.compile(r"^PR:\s*#?(\d+)\s*$", re.M | re.I)
+PR_OPEN_STEPS = ("open-pr",)
+
+
+def _file_pr(text: str) -> int | None:
+    """The pull request a build-progress file is about (1.179.0).
+
+    A header `PR: <n>` line, else the first PR named by the last `open-pr`
+    step, else the last PR named by the last `comment` or `wait-merge` step,
+    else the last PR named anywhere. A step that says `take in develop after
+    PR 71` does not make PR 71 this file's PR when its own PR is named too.
+    """
+    head, _sep, _rest = (text or "").partition("\n- Step:")
+    match = _PR_HEADER.search(head)
+    if match:
+        return int(match.group(1))
+    blocks = re.split(r"(?m)^- Step:", text or "")[1:]
+    steps = [(block.split(None, 1)[0].strip().lower() if block.split() else "", block) for block in blocks]
+    for name, block in reversed(steps):
+        if name in PR_OPEN_STEPS:
+            prs = _PROGRESS_PR.findall(block)
+            if prs:
+                return int(prs[0])
+    for name, block in reversed(steps):
+        if name in MERGE_WAIT_STEPS:
+            prs = _PROGRESS_PR.findall(block)
+            if prs:
+                return int(prs[-1])
+    prs = _PROGRESS_PR.findall(text or "")
+    return int(prs[-1]) if prs else None
+
+
 def progress_merge_waits(root: Path | None) -> dict:
     """Tasks whose walk waits on a merge, from build-progress/<branch>.md (1.171.0).
 
@@ -3565,8 +3597,9 @@ def progress_merge_waits(root: Path | None) -> dict:
         branch_line = re.search(r"^Branch:\s*(\S+)", head, re.M)
         owner_line = re.search(r"^Owner:\s*(\S+)", head, re.M)
         ids = re.findall(r"\bT(\d+)\b", tasks_line.group(1)) if tasks_line else []
-        prs = _PROGRESS_PR.findall(text)
-        pr = int(prs[-1]) if prs else None
+        # 1.179.0: the file's own PR (its header, open-pr step or merge-wait
+        # step), not the last PR mentioned anywhere in it.
+        pr = _file_pr(text)
         for num in ids:
             out[f"T{int(num)}"] = {
                 "branch": branch_line.group(1) if branch_line else path.stem.replace("--", "/"),
@@ -3809,79 +3842,189 @@ def _lookup_key(root, pr) -> tuple:
         return (str(root), str(pr))
 
 
-def host_pr_author(root: Path | None, pr, record: bool = True) -> str | None:
-    """Who opened PR <n>, read-only from its own host, then recorded (1.177.1).
+def host_pr_lookup(root: Path | None, pr) -> dict:
+    """PR <n> on its own host, read-only, once per run (1.179.0).
 
-    Only when the kit's records or this checkout's remote give the PR's host;
-    only that host's CLI is tried, with a short timeout. A found name is
-    written as `PR author:` in the build-progress file (record_pr_author).
-    Never fails the ready check. CRAV1_NO_HOST_LOOKUP=1 turns it off.
+    {"state": host state | {"state": "unhosted"} | None, "error": code |
+    None, "detail": text}. `error` is set only when the PR's host is known
+    and its CLI could not be read (pr_common.host_lookup: cli-missing,
+    cli-not-runnable, timeout, not-signed-in, extension-missing, not-found,
+    bad-output, unknown-status, host-error); `host` then names it. With
+    CRAV1_NO_HOST_LOOKUP set, or no single host for the PR, both are None.
+    Never raises.
     """
     import os
+    empty = {"state": None, "error": None, "detail": ""}
     if root is None or not pr or os.environ.get("CRAV1_NO_HOST_LOOKUP"):
-        return None
+        return dict(empty)
     key = _lookup_key(root, pr)
     if _HOST_SCOPE["on"] and key in _HOST_LOOKUPS:
-        state = _HOST_LOOKUPS[key] or {}
-        name = state.get("author")
-        if name and record:
-            record_pr_author(Path(root), int(pr), name)
-        return name
-    try:
-        pc = pr_common_mod()
-        base = pc.repo_root_of(Path(root))
-        info = pc.resolve_ref(str(pr), pc._remote_url(str(base)) or None, [base])
-        if info.get("status") != "ok":
-            return None
-        name = pc.host_author(info, str(base))
-        if name and record:
-            record_pr_author(Path(root), int(pr), name)
-        return name
-    except Exception:  # noqa: BLE001 - the lookup must never break the check
-        return None
+        return _HOST_LOOKUPS[key]
+    info = host_pr_ref(root, pr)
+    if info.get("status") != "ok":
+        result = dict(empty, state={"state": "unhosted"} if info.get("status") == "unhosted" else None)
+    else:
+        try:
+            pc = pr_common_mod()
+            got = pc.host_lookup(info, str(pc.repo_root_of(Path(root))))
+            result = {"state": got.get("ok"), "error": got.get("error"), "detail": got.get("detail") or "",
+                      "host": info.get("host")}
+        except Exception as exc:  # noqa: BLE001 - the lookup must never break the check
+            result = {"state": None, "error": "cli-not-runnable", "detail": str(exc)[:200], "host": info.get("host")}
+    if _HOST_SCOPE["on"]:
+        _HOST_LOOKUPS[key] = result
+    return result
+
+
+def host_pr_author(root: Path | None, pr, record: bool = True, branch: str | None = None) -> str | None:
+    """Who opened PR <n>, read-only from its own host, then recorded (1.177.1).
+
+    1.179.0: the same single lookup as the merge state (host_pr_lookup).
+    A found name is written as `PR author:` in that PR's build-progress file
+    (record_pr_author). Never fails the ready check. CRAV1_NO_HOST_LOOKUP=1
+    turns it off.
+    """
+    state = host_pr_lookup(root, pr).get("state") or {}
+    name = state.get("author")
+    if name and record:
+        try:
+            record_pr_author(Path(root), int(pr), name, branch)
+        except Exception:  # noqa: BLE001 - recording never breaks the check
+            pass
+    return name
 
 
 _AUTHOR_LINE = re.compile(r"^(?:PR author|Opened by):.*$", re.M | re.I)
 
 
-def record_pr_author(root: Path, number: int, name: str) -> Path | None:
-    """Write `PR author: <name>` into the build-progress file that names PR <n> (1.177.1).
+def _progress_pick(root: Path, number: int, branch: str | None = None) -> tuple[Path | None, str, list]:
+    """The build-progress file for PR <n>: (path, how, candidates) (1.179.0).
 
-    Replaces an earlier `PR author:` or `Opened by:` line, else adds the line
-    after the header's `Owner:` (or `Branch:`) line. None when no
-    build-progress file names that PR.
+    1. The branch's own file (`build-progress/<branch>.md`, or a header
+       `Branch: <branch>`).
+    2. The one file whose own PR is <n> (_file_pr: header `PR:`, its open-pr
+       step, its merge-wait step).
+    3. The one file that names PR <n> anywhere.
+    `how` is `branch`, `pr`, `mention`, `ambiguous` (several files match; path
+    None, candidates listed) or `none`.
     """
     folder = Path(root) / "build-progress"
-    name = " ".join(str(name).split())
-    if not name or not folder.is_dir():
-        return None
-    for path in sorted(folder.glob("*.md")):
-        text = path.read_text(encoding="utf-8", errors="replace")
-        if int(number) not in {int(n) for n in _PROGRESS_PR.findall(text)}:
+    if not folder.is_dir():
+        return None, "none", []
+    files = sorted(folder.glob("*.md"))
+    texts: dict = {}
+    for path in files:
+        try:
+            texts[path] = path.read_text(encoding="utf-8", errors="replace")
+        except OSError:
             continue
-        line = f"PR author: {name}"
-        if _AUTHOR_LINE.search(text):
-            text = _AUTHOR_LINE.sub(line, text, count=1)
+    if branch:
+        own = folder / f"{branch.replace('/', '--')}.md"
+        if own in texts:
+            return own, "branch", [own]
+        for path, text in texts.items():
+            head = text.split("\n- Step:", 1)[0]
+            match = re.search(r"^Branch:\s*(\S+)", head, re.M)
+            if match and match.group(1) == branch:
+                return path, "branch", [path]
+    owners = [path for path, text in texts.items() if _file_pr(text) == int(number)]
+    if len(owners) == 1:
+        return owners[0], "pr", owners
+    if len(owners) > 1:
+        return None, "ambiguous", owners
+    mentions = [path for path, text in texts.items()
+                if int(number) in {int(n) for n in _PROGRESS_PR.findall(text)}]
+    if len(mentions) == 1:
+        return mentions[0], "mention", mentions
+    if len(mentions) > 1:
+        return None, "ambiguous", mentions
+    return None, "none", []
+
+
+def _new_progress_file(root: Path, branch: str) -> Path:
+    """build-progress/<branch>.md with only its header (1.179.0)."""
+    folder = Path(root) / "build-progress"
+    folder.mkdir(parents=True, exist_ok=True)
+    path = folder / f"{branch.replace('/', '--')}.md"
+    if not path.exists():
+        path.write_text(f"# Build progress\n\nBranch: {branch}\n", encoding="utf-8")
+    return path
+
+
+def _set_header_line(path: Path, pattern: re.Pattern, line: str, after: tuple) -> None:
+    """Replace or add one header line, before the first `- Step:` only (1.179.0)."""
+    text = path.read_text(encoding="utf-8")
+    head, sep, rest = text.partition("\n- Step:")
+    if pattern.search(head):
+        head = pattern.sub(line.replace("\\", "\\\\"), head, count=1)
+    else:
+        m = None
+        for label in after:
+            m = re.search(rf"^{label}:.*$", head, re.M | re.I)
+            if m:
+                break
+        if m:
+            head = head[:m.end()] + "\n" + line + head[m.end():]
         else:
-            m = re.search(r"^Owner:.*$", text, re.M) or re.search(r"^Branch:.*$", text, re.M)
-            text = text[:m.end()] + "\n" + line + text[m.end():] if m else line + "\n" + text
-        path.write_text(text, encoding="utf-8")
-        return path
-    return None
+            head = head.rstrip("\n") + "\n" + line + "\n"
+    path.write_text(head + sep + rest, encoding="utf-8")
+
+
+def record_pr_author(root: Path, number: int, name: str, branch: str | None = None) -> Path | None:
+    """Write `PR author: <name>` into PR <n>'s own build-progress file (1.177.1).
+
+    1.179.0: the file is picked by branch, then by the file's own PR
+    (_progress_pick), never the first file that mentions the number; the
+    line goes in the header only. With no file and a known branch, the
+    branch's file is created. None when no file is found or several match.
+    """
+    name = " ".join(str(name).split())
+    if not name:
+        return None
+    path, how, _cands = _progress_pick(Path(root), number, branch)
+    if path is None:
+        if how == "none" and branch:
+            path = _new_progress_file(Path(root), branch)
+        else:
+            return None
+    _set_header_line(path, _AUTHOR_LINE, f"PR author: {name}", ("Owner", "Branch"))
+    return path
 
 
 _NOT_A_NAME = {"self", "yours", "you", "someone else", "owner not recorded", "none", "-", "—", "unknown",
-               "don't know", "dont know"}
-_OWNER_LINE = re.compile(r"^(?:PR author|Opened by|Owner):\s*(.+?)\s*$", re.M | re.I)
+               "don't know", "dont know", "other", "others", "someone", "anyone", "nobody", "n/a", "tbd"}
+# 1.179.0: `Owner: self | other` is the build-walk mode marker, never a name,
+# so only `PR author:` and `Opened by:` lines name people.
+_OWNER_LINE = _PR_AUTHOR
+_GROUP_WORDS = re.compile(r"\b(?:team|teams|group|department|dept|board|committee|organi[sz]ation|org|company"
+                          r"|vendor|supplier|customer|client|ops|support|management|staff|everyone)\b", re.I)
 
 
-def known_people(root: Path | None) -> list[str]:
+def is_group(name: str) -> bool:
+    """A team or an organisation, not a person (1.179.0).
+
+    `the project team`, `the vendor`, `Ops group`, or one all-caps word such
+    as `CONTOSO`. The owner question offers people only.
+    """
+    name = " ".join(str(name or "").split())
+    if not name:
+        return True
+    if name.lower().startswith("the ") or _GROUP_WORDS.search(name):
+        return True
+    words = name.split()
+    return len(words) == 1 and len(name) > 1 and name.isupper()
+
+
+def known_people(root: Path | None, rows: list[dict] | None = None) -> list[str]:
     """Names the kit already knows, the choices for the owner question (1.178.0).
 
     From claims.md (`In progress:` users), PR notes' front matter `author:`,
-    and build-progress `PR author:`, `Opened by:` and `Owner:` lines, in
-    that order, once each (same_person). `self` and other placeholders are
-    skipped. Read-only.
+    build-progress `PR author:` and `Opened by:` lines, then the people
+    open questions wait on (rows' `who` in the blocked or waiting buckets,
+    1.179.0), in that order, once each (same_person). `self`, `other` and
+    other placeholders are skipped, and so are teams and organisations
+    (is_group). `Owner:` is the walk's mode marker, not a name (1.179.0).
+    Read-only.
     """
     if root is None or not Path(root).is_dir():
         return []
@@ -3921,12 +4064,23 @@ def known_people(root: Path | None) -> list[str]:
             head = path.read_text(encoding="utf-8", errors="replace").split("\n- Step:", 1)[0]
             for match in _OWNER_LINE.finditer(head):
                 add(match.group(1))
+    for row in rows or []:
+        if not isinstance(row, dict) or row.get("bucket") not in ("blocked", "waiting"):
+            continue
+        who = row.get("who")
+        for one in (who if isinstance(who, list) else [who]):
+            if one and not is_group(str(one)):
+                add(one)
     return names
 
 
-def owner_choices(root: Path | None) -> list[str]:
-    """The owner question's choices: the known names, then `Don't know` (1.178.0)."""
-    return known_people(root) + ["Don't know"]
+def owner_choices(root: Path | None, rows: list[dict] | None = None) -> list[str]:
+    """The owner question's choices: the known names, then `Don't know` (1.178.0).
+
+    Never a literal `other` (1.179.0): the question's own Other field covers
+    someone not listed.
+    """
+    return [name for name in known_people(root, rows) if name.lower() != "other"] + ["Don't know"]
 
 
 def rerun_command(root: Path) -> str:
@@ -3938,18 +4092,155 @@ RERUN_LINE = ("Run the ready check again now, in this same run, and print its ne
               "Do not end with the earlier reply's steps.")
 
 
+HOST_NAME = {"azure": "Azure DevOps", "github": "GitHub"}
+# 1.179.0: what each host error means, and the command that fixes it (None:
+# nothing to run, only the ready check again).
+HOST_FIX = {
+    "cli-missing": ("{tool} is not installed", None),
+    "cli-not-runnable": ("{tool} could not be started ({detail})", "{tool} --version"),
+    "timeout": ("it did not answer within {seconds} s", None),
+    "not-signed-in": ("not signed in", "{login}"),
+    "extension-missing": ("the azure-devops extension is missing", "az extension add --name azure-devops"),
+    "not-found": ("it has no such pull request ({detail})", None),
+    "bad-output": ("its answer could not be read ({detail})", None),
+    "unknown-status": ("it gave a status the kit does not know ({detail})", None),
+    "host-error": ("it failed ({detail})", None),
+}
+HOST_FIX_LABEL = {
+    "cli-missing": "Install {cli} ({link}), then check it runs:",
+    "cli-not-runnable": "Check that {tool} runs in this shell:",
+    "not-signed-in": "Sign in to {name}:",
+    "extension-missing": "Add the Azure DevOps extension:",
+}
+HOST_CLI = {"azure": ("the Azure CLI", "https://aka.ms/installazurecli", "az login"),
+            "github": ("the GitHub CLI", "https://cli.github.com", "gh auth login")}
+COMMIT_LINE = "Commit this file with the specs so the answer is kept (it is not pushed for you)."
+
+
+def host_reason(host: str | None, error: str, detail: str = "") -> str:
+    """`not signed in`, `az is not installed`, ... for one host error (1.179.0)."""
+    pc = pr_common_mod()
+    tool = pc.TOOL.get(host or "", "the host CLI")
+    text, _cmd = HOST_FIX.get(error, HOST_FIX["host-error"])
+    return text.format(tool=tool, detail=(detail or "no detail").rstrip("."), seconds=pc.host_timeout(host))
+
+
+def host_fix(host: str | None, error: str) -> tuple[str | None, str | None]:
+    """(label, command) that fixes one host error, or (None, None) (1.179.0)."""
+    pc = pr_common_mod()
+    tool = pc.TOOL.get(host or "", "az")
+    cli, link, login = HOST_CLI.get(host or "", HOST_CLI["azure"])
+    _text, cmd = HOST_FIX.get(error, HOST_FIX["host-error"])
+    if error == "cli-missing":
+        cmd = f"{tool} --version"
+    if not cmd:
+        return None, None
+    label = HOST_FIX_LABEL[error].format(cli=cli, link=link, tool=tool, name=HOST_NAME.get(host or "", "the host"))
+    return label, cmd.format(tool=tool, login=login)
+
+
+def host_fix_lines(unread: list[dict], slug: str | None) -> list[str]:
+    """Catch-up lines for PRs whose host could not be read (1.179.0).
+
+    One label per host and error, on its own line, above its command alone
+    in a code span; then one `run the ready check again` entry. Errors with
+    no fix command (timeout, not-found, ...) only say why in that last label.
+    """
+    groups: dict = {}
+    for item in unread or []:
+        groups.setdefault((item.get("host") or "azure", item.get("error") or "host-error"), []).append(item)
+    if not groups:
+        return []
+    lines: list[str] = []
+    plain: list[str] = []
+    for (host, error), items in groups.items():
+        prs = _prs_text([item["pr"] for item in items])
+        why = host_reason(host, error, items[0].get("detail") or "")
+        head = f"{HOST_NAME.get(host, 'The host')} was not reached for {prs}: {why}."
+        label, cmd = host_fix(host, error)
+        if cmd:
+            lines.append(f"{head} {label}")
+            lines.append(f"`{cmd}`")
+        else:
+            plain.append(head)
+    again = "Then run the ready check again:" if lines else "Run the ready check again:"
+    command = f"/crav1-tasks-ready-to-build {slug}" if slug else "/crav1-tasks-ready-to-build"
+    lines.append(" ".join(plain + [again]))
+    lines.append(f"`{command}`")
+    return lines
+
+
+def _commit_name(root: Path, path: Path | None) -> str | None:
+    if path is None:
+        return None
+    try:
+        return Path(path).resolve().relative_to(Path(root).resolve()).as_posix()
+    except ValueError:
+        return Path(path).name
+
+
+def _ambiguous_reply(args, root: Path, cands: list) -> None:
+    print(json.dumps({"status": "ambiguous", "pr": args.pr,
+                      "files": [_commit_name(root, path) for path in cands],
+                      "line": f"More than one build-progress file names PR {args.pr}. Ask which branch PR {args.pr} "
+                              "is on, then run this again with --branch."},
+                     indent=2, ensure_ascii=False))
+    sys.exit(1)
+
+
+def _answer_branch(args, root: Path) -> str | None:
+    """The branch whose build-progress file takes an answer (1.179.0).
+
+    --branch when given. Else, when several files claim the PR, stop with
+    `ambiguous` and ask which branch; else the branch the ready check waits
+    on for that PR (waiting_prs), which may be a file still to create.
+    """
+    if getattr(args, "branch", None):
+        return args.branch
+    _path, how, cands = _progress_pick(root, args.pr)
+    if how == "ambiguous":
+        _ambiguous_reply(args, root, cands)
+    return waiting_prs(root).get(int(args.pr))
+
+
 def cmd_pr_author(args) -> None:
-    """`pr-author --root <spec-folder> --pr <n> [--name <who>]` (1.177.1).
+    """`pr-author --root <spec-folder> --pr <n> [--name <who>] [--branch <b>]` (1.177.1).
 
     1.178.0: without --name and with no host answer, it lists the names the
     kit already knows as `choices` (then `Don't know`). After a recorded
     name, `rerun` is the ready check to run again in the same run.
+    1.179.0: when the host could not be read at all, the status is
+    `host-unread` with the reason and its fix, not a question about the
+    owner. The answer goes into the PR's own build-progress file, picked by
+    branch; `commit` names that file.
     """
     root = Path(args.root)
-    name = args.name or host_pr_author(root, args.pr, record=False)
+    name = args.name
     source = "you" if args.name else "host"
     if not name:
-        print(json.dumps({"status": "not-found", "pr": args.pr, "choices": owner_choices(root),
+        got = host_pr_lookup(root, args.pr)
+        name = (got.get("state") or {}).get("author")
+        if not name and got.get("error"):
+            try:
+                rows = build_rows(root)
+            except (Exception, SystemExit):  # noqa: BLE001 - choices are only a fallback
+                rows = []
+            host = got.get("host")
+            label, cmd = host_fix(host, got["error"])
+            why = host_reason(host, got["error"], got.get("detail") or "")
+            print(json.dumps({"status": "host-unread", "pr": args.pr, "error": got["error"],
+                              "detail": got.get("detail") or "", "fix": {"label": label, "command": cmd} if cmd else None,
+                              "choices": owner_choices(root, rows),
+                              "line": f"{HOST_NAME.get(host, 'The host')} could not be reached ({why}). Fix that and "
+                                      f"run the ready check again, or say who opened PR {args.pr}."},
+                             indent=2, ensure_ascii=False))
+            sys.exit(1)
+    if not name:
+        try:
+            rows = build_rows(root)
+        except (Exception, SystemExit):  # noqa: BLE001 - choices never break the question
+            rows = []
+        print(json.dumps({"status": "not-found", "pr": args.pr, "choices": owner_choices(root, rows),
                           "line": f"The host did not say who opened PR {args.pr}. "
                           "Ask who opened it, offering these choices, then run this again with --name."},
                          indent=2, ensure_ascii=False))
@@ -3958,31 +4249,24 @@ def cmd_pr_author(args) -> None:
         print(json.dumps({"status": "skipped", "pr": args.pr, "rerun": rerun_command(root), "line": RERUN_LINE},
                          indent=2, ensure_ascii=False))
         return
-    path = record_pr_author(root, args.pr, name)
+    branch = _answer_branch(args, root)
+    path = record_pr_author(root, args.pr, name, branch)
+    commit = _commit_name(root, path)
     print(json.dumps({"status": "recorded" if path else "no-record", "author": name, "source": source,
-                      "file": str(path) if path else None, "rerun": rerun_command(root), "line": RERUN_LINE},
+                      "file": str(path) if path else None, "commit": commit, "rerun": rerun_command(root),
+                      "line": f"{COMMIT_LINE} {RERUN_LINE}" if path else RERUN_LINE},
                      indent=2, ensure_ascii=False))
     if not path:
         sys.exit(1)
 
 
 def _progress_file_for(root: Path, number: int, branch: str | None = None) -> Path | None:
-    """The build-progress file that names PR <n>, the branch's own first (1.177.2)."""
-    folder = Path(root) / "build-progress"
-    if not folder.is_dir():
-        return None
-    files = sorted(folder.glob("*.md"))
-    if branch:
-        own = folder / f"{branch.replace('/', '--')}.md"
-        files = ([own] if own in files else []) + [f for f in files if f != own]
-    for path in files:
-        try:
-            text = path.read_text(encoding="utf-8", errors="replace")
-        except OSError:
-            continue
-        if int(number) in {int(n) for n in _PROGRESS_PR.findall(text)}:
-            return path
-    return None
+    """The build-progress file for PR <n> (1.177.2); None when none or several match.
+
+    1.179.0: _progress_pick — the branch's own file, else the one file whose
+    own PR is <n>, else the one file that names it.
+    """
+    return _progress_pick(root, number, branch)[0]
 
 
 def waiting_prs(root: Path | None, user: str | None = None) -> dict:
@@ -4026,25 +4310,11 @@ def host_pr_ref(root: Path | None, pr) -> dict:
 
 
 def host_pr_state(root: Path | None, pr) -> dict | None:
-    """PR <n>'s state on its own host, read-only (1.177.2). None when unread."""
-    import os
-    if root is None or not pr or os.environ.get("CRAV1_NO_HOST_LOOKUP"):
-        return None
-    key = _lookup_key(root, pr)
-    if _HOST_SCOPE["on"] and key in _HOST_LOOKUPS:
-        return _HOST_LOOKUPS[key]
-    info = host_pr_ref(root, pr)
-    if info.get("status") != "ok":
-        state = {"state": "unhosted"} if info.get("status") == "unhosted" else None
-    else:
-        try:
-            pc = pr_common_mod()
-            state = pc.host_state(info, str(pc.repo_root_of(Path(root))))
-        except Exception:  # noqa: BLE001 - the lookup must never break the check
-            state = None
-    if _HOST_SCOPE["on"]:
-        _HOST_LOOKUPS[key] = state
-    return state
+    """PR <n>'s state on its own host, read-only (1.177.2). None when unread.
+
+    1.179.0: host_pr_lookup says why when it is unread.
+    """
+    return host_pr_lookup(root, pr).get("state")
 
 
 def merged_result_line(number: int, sha: str | None, date: str | None) -> str:
@@ -4099,20 +4369,26 @@ def sync_pr_states(root: Path | None, user: str | None = None) -> dict:
     this same ready check counts its tasks as done and drops it from the
     merge list. A PR closed without merging is listed in `closed`; nothing
     is recorded. A PR whose code repo is not recorded is in `unhosted`. A
-    host that cannot be read changes nothing.
+    host that cannot be read changes nothing; 1.179.0 lists it in
+    `host_unread` with the reason ({pr, branch, host, error, detail}).
     """
-    out: dict = {"merged": [], "closed": [], "unhosted": [], "branches": {}}
+    out: dict = {"merged": [], "closed": [], "unhosted": [], "branches": {}, "host_unread": []}
     for pr, branch in sorted(waiting_prs(root, user).items()):
         out["branches"][pr] = branch
-        state = host_pr_state(root, pr)
+        got = host_pr_lookup(root, pr)
+        state = got.get("state")
         if not state:
             out.setdefault("unread", []).append(pr)
+            if got.get("error"):
+                # 1.179.0: the host was known but could not be read; say why.
+                out["host_unread"].append({"pr": pr, "branch": branch, "host": got.get("host"),
+                                           "error": got["error"], "detail": got.get("detail") or ""})
             continue
         if state.get("author"):
             # 1.178.0: the same lookup names who opened it; record it once.
             path = _progress_file_for(Path(root), pr, branch)
             text = path.read_text(encoding="utf-8", errors="replace") if path else ""
-            if not pr_author(root, pr, text) and record_pr_author(Path(root), pr, state["author"]):
+            if not pr_author(root, pr, text) and record_pr_author(Path(root), pr, state["author"], branch):
                 out.setdefault("owners", {})[pr] = state["author"]
         if state["state"] == "unhosted":
             out["unhosted"].append(pr)
@@ -4173,31 +4449,31 @@ def code_repo_choices(root: Path) -> dict:
 _CODE_REPO_LINE = re.compile(r"^(?:Code repo|Repo):.*$", re.M | re.I)
 
 
-def record_code_repo(root: Path, number: int, url: str) -> Path | None:
-    """Write `Code repo: <url>` into the build-progress file that names PR <n> (1.177.2)."""
-    path = _progress_file_for(root, number)
+def record_code_repo(root: Path, number: int, url: str, branch: str | None = None) -> Path | None:
+    """Write `Code repo: <url>` into PR <n>'s own build-progress file (1.177.2).
+
+    1.179.0: the file is picked by branch, as record_pr_author does, and
+    created for a known branch when none exists. None when no file is found
+    or several match.
+    """
+    path, how, _cands = _progress_pick(Path(root), number, branch)
     if path is None:
-        return None
-    text = path.read_text(encoding="utf-8")
-    line = f"Code repo: {url}"
-    head, sep, rest = text.partition("\n- Step:")
-    if _CODE_REPO_LINE.search(head):
-        head = _CODE_REPO_LINE.sub(line, head, count=1)
-    else:
-        m = (re.search(r"^PR author:.*$", head, re.M | re.I) or re.search(r"^Owner:.*$", head, re.M)
-             or re.search(r"^Branch:.*$", head, re.M))
-        head = head[:m.end()] + "\n" + line + head[m.end():] if m else line + "\n" + head
-    path.write_text(head + sep + rest, encoding="utf-8")
+        if how == "none" and branch:
+            path = _new_progress_file(Path(root), branch)
+        else:
+            return None
+    _set_header_line(path, _CODE_REPO_LINE, f"Code repo: {url}", ("PR author", "Owner", "Branch"))
     return path
 
 
 def cmd_code_repo(args) -> None:
-    """`code-repo --root <spec-folder> --pr <n> [--repo <name-or-url>]` (1.177.2).
+    """`code-repo --root <spec-folder> --pr <n> [--repo <name-or-url>] [--branch <b>]` (1.177.2).
 
     Without --repo it lists the docs/system/repos.md rows to offer. With it,
     a repos.md name or a GitHub or Azure DevOps repo URL is written as
     `Code repo: <url>` in that PR's build-progress file; the owner, state
     and bare-number lookups then use it. Run the ready check again after.
+    1.179.0: the file is the PR's own (by branch); `commit` names it.
     """
     root = Path(args.root)
     choices = code_repo_choices(root)
@@ -4216,11 +4492,13 @@ def cmd_code_repo(args) -> None:
                           "line": f"{value} is not a docs/system/repos.md row or a GitHub or Azure DevOps repo URL."},
                          indent=2, ensure_ascii=False))
         sys.exit(1)
-    path = record_code_repo(root, args.pr, url)
+    branch = _answer_branch(args, root)
+    path = record_code_repo(root, args.pr, url, branch)
     print(json.dumps({"status": "recorded" if path else "no-record", "pr": args.pr, "url": url,
-                      "file": str(path) if path else None,
+                      "file": str(path) if path else None, "commit": _commit_name(root, path),
                       "next": "Run the ready check again; it asks the PR's host whether it merged and who opened it.",
-                      "rerun": rerun_command(root), "line": RERUN_LINE},
+                      "rerun": rerun_command(root),
+                      "line": f"{COMMIT_LINE} {RERUN_LINE}" if path else RERUN_LINE},
                      indent=2, ensure_ascii=False))
     if not path:
         sys.exit(1)
@@ -4268,7 +4546,7 @@ def open_prs(root: Path | None, user: str | None = None) -> dict:
     def settle(entry: dict, pr, text: str, claimer: str) -> None:
         author = pr_author(root, pr, text)
         if not author and claimer == "yours":
-            author = host_pr_author(root, pr)
+            author = host_pr_author(root, pr, branch=entry.get("branch"))
         if author:
             entry["owner"] = "yours" if is_local(author) else author
             if entry["owner"] != "yours" and claimer == "yours":
@@ -4362,6 +4640,16 @@ def merge_order(rows: list[dict], prs: dict) -> list[dict]:
     return order
 
 
+def host_unread_owner(host: str | None) -> str:
+    """`owner unknown: Azure DevOps not reached` (1.179.0)."""
+    return f"owner unknown: {HOST_NAME.get(host or '', 'the host')} not reached"
+
+
+def _unnamed(owner: str | None) -> bool:
+    """`owner not recorded` or `owner unknown: ...`: no person to name (1.179.0)."""
+    return bool(owner) and (owner == "owner not recorded" or owner.startswith("owner unknown"))
+
+
 def merge_order_block(rows: list[dict], prs: dict) -> str:
     """`Merge these PRs, in this order:` with one numbered PR per line (1.176.0)."""
     order = merge_order(rows, prs)
@@ -4370,7 +4658,7 @@ def merge_order_block(rows: list[dict], prs: dict) -> str:
     lines = ["Merge these PRs, in this order:"]
     for i, item in enumerate(order, 1):
         owner = item.get("owner") or "someone else"
-        whose = owner if owner in ("yours", "owner not recorded") else f"{owner}'s"
+        whose = owner if owner == "yours" or _unnamed(owner) else f"{owner}'s"
         if item.get("added"):
             whose += f", you added {_ids_span(item['added'])}"
         what = f"ticks {_ids_span(item['ticks'])}"
@@ -4423,6 +4711,8 @@ def ask_owners_entry(order: list[dict]) -> str | None:
     for owner, prs in groups.items():
         if owner == "owner not recorded":
             lines.append(f"- {_and(prs)} ({'owners' if len(prs) > 1 else 'owner'} not recorded)")
+        elif _unnamed(owner):
+            lines.append(f"- {_and(prs)} ({owner})")
         else:
             lines.append(f"- {owner}: {_and(prs)}")
     return "\n".join(lines)
@@ -5098,7 +5388,8 @@ def slice_uncommitted(root: Path | None) -> list[str]:
     return out
 
 
-def catch_up_for(slug: str, gap: dict | None, sync: dict | None, root: Path | None = None) -> str:
+def catch_up_for(slug: str, gap: dict | None, sync: dict | None, root: Path | None = None,
+                 host_unread: list[dict] | None = None) -> str:
     """The `**Catch up first**` block for this check, or "" (1.167.0).
 
     verify.md behind (gap tasks), a verify.md row for a T# not in tasks.md
@@ -5117,7 +5408,15 @@ def catch_up_for(slug: str, gap: dict | None, sync: dict | None, root: Path | No
             ahead = 1
     failed = list(gap.get("failed") or [])
     files = slice_uncommitted(root)
-    return ending_mod().catch_up_block(slug or None, behind, orphans, ahead, failed=failed, uncommitted=files)
+    block = ending_mod().catch_up_block(slug or None, behind, orphans, ahead, failed=failed, uncommitted=files)
+    # 1.179.0: a PR's host that could not be read gets its fix here, label
+    # above command, so the merge list is not guessed from a silent failure.
+    fix = host_fix_lines(host_unread or [], slug)
+    if not fix:
+        return block
+    if not block:
+        return "\n".join(["**Catch up first**", ""] + fix)
+    return block + "\n" + "\n".join(fix)
 
 
 def next_for(result: str, can_start: list, waiting_next: str | None) -> str | None:
@@ -5373,13 +5672,20 @@ def _readiness(args: argparse.Namespace) -> None:
     }
     # What the user can fix now leads Run next as one block (1.167.0); the
     # Waiting lines keep only what waits on people or merges.
-    catch_up = catch_up_for(slug, gap, sync, root)
+    host_unread = list(pr_state.get("host_unread") or [])
+    catch_up = catch_up_for(slug, gap, sync, root, host_unread)
     waiting_bits = list(loop_lines)
     # 1.176.0: one ordered merge list replaces the per-PR Waiting lines.
     merge_prs = open_prs(root, getattr(args, "user", None)) if root is not None and root.is_dir() else {}
     # 1.177.2: a PR closed without merging leaves the merge list.
     for pr in pr_state.get("closed") or []:
         merge_prs.pop(pr, None)
+    # 1.179.0: a PR whose host could not be read is not "owner not recorded";
+    # the host was never asked, so its owner is unknown until the fix.
+    for item in host_unread:
+        entry = merge_prs.get(item["pr"])
+        if entry and entry.get("owner") in ("owner not recorded", "someone else", None):
+            entry["owner"] = host_unread_owner(item.get("host"))
     merge_block = merge_order_block(rows, merge_prs) if merge_prs else ""
     if merge_block:
         # 1.177.1: the list is the only place PR waits live; no Waiting
@@ -5532,10 +5838,17 @@ def _readiness(args: argparse.Namespace) -> None:
             if info.get("owner") == "owner not recorded" and pr not in (pr_state.get("unhosted") or [])
         ],
         "owners_from_host": {str(k): v for k, v in (pr_state.get("owners") or {}).items()},
+        # 1.179.0: PRs whose host was known but could not be read, with why.
+        "host_unread": host_unread,
     }
-    out["ask_first"] = ("code-repo" if out["code_repo_unknown"] else "pr-author" if out["owner_unknown"] else None)
+    unread_prs = {item["pr"] for item in host_unread}
+    out["owner_unknown"] = [item for item in out["owner_unknown"] if item["pr"] not in unread_prs]
+    # 1.179.0: repo, then host, then owner. Who opened a PR is asked only
+    # after its host answered and named no one.
+    out["ask_first"] = ("code-repo" if out["code_repo_unknown"] else "host" if host_unread
+                        else "pr-author" if out["owner_unknown"] else None)
     if out["owner_unknown"]:
-        out["owner_choices"] = owner_choices(root)
+        out["owner_choices"] = owner_choices(root, rows)
     if built:
         out["rows"] = rows
         out["question_aliases"] = aliases
@@ -6996,12 +7309,14 @@ def main(argv: list[str] | None = None) -> None:
     pa.add_argument("--root", required=True, help="Spec folder.")
     pa.add_argument("--pr", required=True, type=int)
     pa.add_argument("--name", help="Who opened it, as the user said. Omit to ask the PR's own host, read-only.")
+    pa.add_argument("--branch", help="The PR's branch, when several build-progress files name it (1.179.0).")
     pa.set_defaults(func=cmd_pr_author)
 
     cr = sub.add_parser("code-repo", help="Record which code repo a pull request is in (1.177.2).")
     cr.add_argument("--root", required=True, help="Spec folder.")
     cr.add_argument("--pr", required=True, type=int)
     cr.add_argument("--repo", help="A docs/system/repos.md name or a repo URL. Omit to list the choices.")
+    cr.add_argument("--branch", help="The PR's branch, when several build-progress files name it (1.179.0).")
     cr.set_defaults(func=cmd_code_repo)
 
     args = parser.parse_args(argv)
