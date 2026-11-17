@@ -2,6 +2,11 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.185.0 (2026-11-17)
+
+- **Nested lists in the build map.** Each branch block in `build-map.md` now lists `- Tasks:` and `- Waits for:` one item per nested sub-bullet instead of joining them with `; `. A done task keeps its strike-through and `✓ done (PR N)` on its own sub-bullet, and an empty list reads `Waits for: none` on one line. Question, Ready now and the Plan step note stay on one line.
+- **Delivers merged into Tasks.** The Delivers bullet is gone; Tasks, with task ids, is the branch's one list. The Mermaid diagram is unchanged, and a map written by an older kit is rewritten once on the next ready check.
+
 ## 1.184.0 (2026-11-17)
 
 - **Older progress files with a second task.** Kits before 1.182.0 recorded a second task's build as a plain `- Step: build` with the task only in the result, such as `Result: done (T47: orders-api af772f5 on feat/orders-cicd, tests only)`, and the same for its verify, commit and comment steps. `task_state.py` now treats a done plain build step whose result starts `done (T<n>:` as that task built and waiting for the merge. The walk names every task on the branch (`T43 and T47 are pushed to PR 73 and wait for its merge`, and the Waiting line names both), adds the task to the header the next time it writes the file, the ready check does not offer it, the merge list says the pull request ticks both, and dependants wait on the merge. A snapshot covers this file shape.

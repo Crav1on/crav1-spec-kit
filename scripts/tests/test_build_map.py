@@ -21,8 +21,16 @@ def ids_outside_tasks(text):
     So do the fix lines under it (1.161.0).
     """
     bad = []
+    in_tasks = False
     for line in text.splitlines():
-        if line.startswith(("- Tasks:", "Loop: ", "Recommended fix (", "Other fix (", "No single change")):
+        # 1.185.0: the Tasks items are nested sub-bullets under `- Tasks:`.
+        if line.startswith("- Tasks:"):
+            in_tasks = True
+            continue
+        if in_tasks and line.startswith("  - "):
+            continue
+        in_tasks = False
+        if line.startswith(("Loop: ", "Recommended fix (", "Other fix (", "No single change")):
             continue
         if TASK_ID.search(line):
             bad.append(line)
@@ -92,9 +100,10 @@ class BuildMap(unittest.TestCase):
         self.assertIn("Persist the decision", record)
         self.assertNotIn("Reject an unknown booking", record)
         self.assertIn("Reject an unknown booking", extra)
-        self.assertIn("- Delivers: Reject an unknown booking", extra)
+        self.assertIn("- Tasks:\n  - T2 Reject an unknown booking\n", extra)
+        self.assertNotIn("Delivers", extra)  # 1.185.0
         receipt = text.split("### feat/cancel-booking-send-receipt", 1)[1]
-        self.assertIn("Waits for: feat/cancel-extra", receipt)
+        self.assertIn("Waits for:\n  - feat/cancel-extra", receipt)
         self.assertEqual(ids_outside_tasks(text), [])
 
     def test_waves_follow_branch_dependencies(self):
@@ -104,7 +113,7 @@ class BuildMap(unittest.TestCase):
         self.assertIn("feat/cancel-booking-record-refund-decision", wave1)
         self.assertNotIn("feat/cancel-booking-send-receipt", wave1)
         self.assertIn("feat/cancel-booking-send-receipt", wave2)
-        self.assertIn("Waits for: feat/cancel-booking-record-refund-decision", wave2)
+        self.assertIn("Waits for:\n  - feat/cancel-booking-record-refund-decision", wave2)
         self.assertIn("Ready now: ready", wave1)
         self.assertIn("Ready now: waits in order", wave2)
         diagram = mermaid(text)
@@ -174,8 +183,8 @@ class BuildMap(unittest.TestCase):
         blocked = cycle["markdown"].split("## Blocked", 1)[1]
         self.assertNotIn("## Wave", cycle["markdown"])
         self.assertIn("Ready now: blocked", blocked)
-        self.assertIn("Waits for: feat/cancel-booking-notify-guest", blocked)
-        self.assertIn("Waits for: feat/cancel-booking-store-decision", blocked)
+        self.assertIn("Waits for:\n  - feat/cancel-booking-notify-guest", blocked)
+        self.assertIn("Waits for:\n  - feat/cancel-booking-store-decision", blocked)
         self.assertEqual(ids_outside_tasks(cycle["markdown"]), [])
 
         missing = bm.build("cancel-booking", SPEC, """# Plan
@@ -188,7 +197,7 @@ class BuildMap(unittest.TestCase):
 - [ ] T1: Store the decision (after: T9)
 """)
         self.assertIn("## Blocked", missing["markdown"])
-        self.assertIn(f"Waits for: {bm.UNKNOWN_DEP}", missing["markdown"])
+        self.assertIn(f"Waits for:\n  - {bm.UNKNOWN_DEP}", missing["markdown"])
         self.assertIn("Ready now: blocked", missing["markdown"])
         self.assertEqual(ids_outside_tasks(missing["markdown"]), [])
         self.assertIn("Wave 1: none", missing["summary"])
@@ -218,8 +227,9 @@ class BuildMap(unittest.TestCase):
         self.assertIn("```mermaid", text)
         self.assertIn("flowchart LR", text)
         self.assertNotIn("## Files", text)
-        for field in ("- Delivers:", "- Tasks:", "- Waits for:", "- Question:", "- Ready now:"):
+        for field in ("- Tasks:", "- Waits for:", "- Question:", "- Ready now:"):
             self.assertIn(field, text)
+        self.assertNotIn("- Delivers:", text)  # 1.185.0: Tasks is the one list
 
     def test_build_map_word_keeps_scope(self):
         parsed = bm.parse_invocation("build-map cc 1.0")
@@ -434,7 +444,7 @@ class BuildMap(unittest.TestCase):
         text = result["markdown"]
         row = text.split("### ", 1)[1]
         self.assertIn("### feat/orders-cicd", text)
-        self.assertIn("- Tasks: T1 Disable pipelines 7\n", row)
+        self.assertIn("- Tasks:\n  - T1 Disable pipelines 7\n", row)
         self.assertNotIn("infra/ado", row.split("- Waits for:", 1)[0].split("- Tasks:", 1)[1])
         self.assertNotIn("(host setup)", row.split("- Tasks:", 1)[1].split("- Waits for:", 1)[0])
         self.assertNotIn("committed later", row.split("- Tasks:", 1)[1].split("- Waits for:", 1)[0])
@@ -455,7 +465,7 @@ class BuildMap(unittest.TestCase):
         plan = "# Plan\n\n## Approach\n\n1. Turn the pipelines off. (T1)\n"
         work = "Work item: 44 — task: T1 Turn off pipelines 7 and 24 (ADO: example/orders)\n"
         text = bm.build("cancel-booking", SPEC, plan, tasks, work)["markdown"]
-        self.assertIn("- Tasks: T1 Turn off pipelines 7 and 24\n", text)
+        self.assertIn("- Tasks:\n  - T1 Turn off pipelines 7 and 24\n", text)
         self.assertNotIn("infra/ado", text.split("- Tasks:", 1)[1].split("- Waits for:", 1)[0])
         long = "Persist " + " ".join(["word"] * 40)
         self.assertLessEqual(len(bm.short_name(long)), 80)
