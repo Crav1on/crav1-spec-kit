@@ -685,12 +685,6 @@ def review(t: Topic, name: str, root: Path) -> list[dict]:
     for env in sorted(set(re.findall(r"\b(dev|test|staging|prod|uat|qa)\b", d["end_state"].casefold()))):
         if known and env not in known:
             found.append({"kind": "conflict", "text": f"the end state uses environment {env}, which docs/environments/ does not show"})
-    hosting = root / "docs" / "system" / "landscape.md"
-    if hosting.is_file():
-        for m in re.finditer(r"^- Not (?:in use|allowed): (.+)$", hosting.read_text(encoding="utf-8"), re.M):
-            term = m.group(1).strip().casefold()
-            if term and term in d["end_state"].casefold():
-                found.append({"kind": "conflict", "text": f"the end state uses {m.group(1).strip()}, which docs/system/landscape.md rules out"})
     return found
 
 

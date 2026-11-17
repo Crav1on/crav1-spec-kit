@@ -431,7 +431,6 @@ class TestGoAhead(Base):
         self.create()
         data = dict(SETTLE, end_state="orders-api owns a retry queue in staging.")
         self.settle(data=data)
-        (self.tmp / "docs/system/landscape.md").write_text("# Landscape\n\n- Not allowed: staging\n")
         before = tree(self.tmp)
         code, out, err = run(self.tmp, "go-ahead", "--topic", TOPIC)
         self.assertEqual(code, 0, err)
