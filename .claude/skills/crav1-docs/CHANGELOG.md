@@ -2,6 +2,16 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.179.0 (2026-11-17)
+
+Fixes from a live ready check on Windows. The ready check now reaches Azure DevOps, says why when it cannot instead of asking who opened a pull request, writes each answer into the right build-progress file, and offers people as owner choices.
+
+- **Azure DevOps on Windows.** The host lookup found `az.cmd` but started the bare name `az`, which Windows cannot start without a shell, and the failure was treated as no answer. It now runs the full path `shutil.which` returned (`az.cmd` or `az.bat`), with stdin closed, UTF-8 output, `--detect false`, extension install prompts turned off, and a 20-second timeout for `az` (8 seconds for `gh`; `CRAV1_HOST_TIMEOUT` overrides both). A completed pull request is read as merged and leaves the merge list in the same run.
+- **A reason instead of nothing.** One lookup (`host_lookup`) returns why a host could not be read: `cli-missing`, `cli-not-runnable`, `timeout`, `not-signed-in`, `extension-missing`, `not-found`, `bad-output`, `unknown-status` or `host-error`, with the first line the CLI printed.
+- **Host before owner.** The `--full` JSON lists these pull requests under `host_unread`, and `ask_first` is `code-repo`, then `host`, then `pr-author`. A pull request whose host was not reached is not in the owner question; its merge-list line says `owner unknown: Azure DevOps not reached`. Catch up first names the reason and the fix, a label on its own line above `az login` or `az extension add --name azure-devops`, then `Run the ready check again:`. `pr-author` returns `status: host-unread` with the reason and the fix.
+- **The right build-progress file.** `pr-author --name` and `code-repo --repo` wrote into the first file that mentioned the pull request number anywhere, so an answer for one pull request could land in another's file. They now pick the branch's own file, then the one file whose own pull request it is, write only in the header, return `ambiguous` (with `--branch` to choose) when several files match, and create the branch's file when none exists. The reply's `commit` names the file to commit. The merge wait takes the file's own pull request, not the last one it mentions.
+- **Owner choices.** `Owner:` is the walk's mode marker (`self` or `other`), so it is no longer read as a name and `other` is never a choice. The people open questions wait on are added; teams and organisations, such as `the project team`, are not.
+
 ## 1.178.0 (2026-11-17)
 
 Fixes from a live ready check and a kit update. The build map shows each branch's state in colour, the update no longer refuses a stale commit-style rule, and the ready check asks for the code repo first, reads the owner and merge state from the host in one lookup, and runs again after each answer.
@@ -171,14 +181,5 @@ What you can fix now leads Run next as a Catch up first block, instead of sittin
 - **Waiting is for waits.** Waiting lines keep only what you cannot act on now, such as a person's answer or a merge.
 - One shared builder, `walk_ending.catch_up_block()`, used by the ready check and the tighten-and-plan ready check (`catch_up` in the readiness JSON), and passed through by `/crav1-build-walk` and the branch run when their state carries `catch_up`.
 - `run-ending.md`, the readiness, rules, verify-behind, next-verify and sync references, the build-walk state table, three walkthroughs and the skill pages show it. Tests: `scripts/tests/test_catch_up_block_1167.py`; two older tests now expect the block.
-
-## 1.166.0 (2026-11-15)
-
-Every Run next branch block has a description again, and a held question that points to a note shows the question itself. A minor release because the ending reads differently in the ready check, the tighten-and-plan ready check and the build walk.
-
-- **A description under every branch.** 1.165.0 left the line out when the plan step's first sentence was not clean, so on a real plan most branches had none. Now the line between the bold branch and `<n> open tasks:` is, in order: up to three clean sentences from the plan step (each ends with a full stop, has no colon list, no person leading it and no file or path), about 300 characters at most and cut only at a sentence end, never mid-sentence; else the plan note trimmed to its opening clause, the words before the first `:` or ` — `, for example `The orders CI/CD branch, cut from develop after billing-ops.`; else the step's heading in plain words; else one sentence from the branch's open task names, a shared prefix once, for example `Orders CI/CD: infra Bicep, cd pipeline, ci lint and tests, and deploy README.`, about 160 characters. The line is left out only when the branch has no plan step and no usable task name.
-- **No person's name.** A plan note that opens with a person, such as `Person A builds PR 73: GetReceipts answers 404 ...`, drops that lead and describes the work after it: `GetReceipts answers 404 for a cursor that matches no stored receipt.` A short trailing fragment such as `PR 73` is dropped too.
-- **The quoted question, not the pointer.** A held question whose text ends with `:` or only points to a note, such as `The note docs/notes/x.md, in Open questions, question 5, says:`, shows the quoted question that follows: the `>` blockquote under the bullet in the spec, else the text in quotes after the colon, else the first sentence ending in `?`. The question's key and stored text do not change, so recorded answers still match. A question that quotes another one keeps its inner quotes on the held line.
-- `run-ending.md`, the build-map fallback reference, the grouping reference, both walkthroughs and the skill page show the new rule. Tests: `scripts/tests/test_branch_description_1166.py`; three older tests now expect the description line.
 
 The newest 15 releases are above. The full changelog is https://github.com/Crav1on/crav1-spec-kit/blob/main/CHANGELOG.md.

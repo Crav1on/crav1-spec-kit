@@ -79,7 +79,7 @@ class OwnerFromHost(unittest.TestCase):
         with mock.patch.object(pc.shutil, "which", return_value="/usr/bin/gh"), \
                 mock.patch.object(pc.subprocess, "run", return_value=gh) as run:
             self.assertEqual(pc.host_author({"host": "github", "number": 82, "url": t77.GH_PR}), "person B")
-            self.assertEqual(run.call_args[0][0][:3], ["gh", "pr", "view"])
+            self.assertEqual(run.call_args[0][0][:3], ["/usr/bin/gh", "pr", "view"])
         az = subprocess.CompletedProcess([], 0, json.dumps("person A"), "")
         with mock.patch.object(pc.shutil, "which", return_value="/usr/bin/az"), \
                 mock.patch.object(pc.subprocess, "run", return_value=az) as run:
@@ -100,7 +100,9 @@ class OwnerFromHost(unittest.TestCase):
             info = {"status": "ok", "host": "azure", "number": 71, "url": t77.ADO_PR.replace("/82", "/71")}
             fake = mock.Mock(return_value=info)
             with mock.patch.object(wp.pr_common_mod(), "resolve_ref", fake), \
-                    mock.patch.object(wp.pr_common_mod(), "host_author", return_value="person C"), \
+                    mock.patch.object(wp.pr_common_mod(), "host_lookup", return_value={
+                        "ok": {"state": "open", "sha": None, "date": None, "author": "person C"},
+                        "error": None, "detail": ""}), \
                     mock.patch.dict(os.environ, {}, clear=False):
                 os.environ.pop("CRAV1_NO_HOST_LOOKUP", None)
                 prs = wp.open_prs(root)

@@ -2,6 +2,16 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.179.0 (2026-11-17)
+
+Fixes from a live ready check on Windows. The ready check now reaches Azure DevOps, says why when it cannot instead of asking who opened a pull request, writes each answer into the right build-progress file, and offers people as owner choices.
+
+- **Azure DevOps on Windows.** The host lookup found `az.cmd` but started the bare name `az`, which Windows cannot start without a shell, and the failure was treated as no answer. It now runs the full path `shutil.which` returned (`az.cmd` or `az.bat`), with stdin closed, UTF-8 output, `--detect false`, extension install prompts turned off, and a 20-second timeout for `az` (8 seconds for `gh`; `CRAV1_HOST_TIMEOUT` overrides both). A completed pull request is read as merged and leaves the merge list in the same run.
+- **A reason instead of nothing.** One lookup (`host_lookup`) returns why a host could not be read: `cli-missing`, `cli-not-runnable`, `timeout`, `not-signed-in`, `extension-missing`, `not-found`, `bad-output`, `unknown-status` or `host-error`, with the first line the CLI printed.
+- **Host before owner.** The `--full` JSON lists these pull requests under `host_unread`, and `ask_first` is `code-repo`, then `host`, then `pr-author`. A pull request whose host was not reached is not in the owner question; its merge-list line says `owner unknown: Azure DevOps not reached`. Catch up first names the reason and the fix, a label on its own line above `az login` or `az extension add --name azure-devops`, then `Run the ready check again:`. `pr-author` returns `status: host-unread` with the reason and the fix.
+- **The right build-progress file.** `pr-author --name` and `code-repo --repo` wrote into the first file that mentioned the pull request number anywhere, so an answer for one pull request could land in another's file. They now pick the branch's own file, then the one file whose own pull request it is, write only in the header, return `ambiguous` (with `--branch` to choose) when several files match, and create the branch's file when none exists. The reply's `commit` names the file to commit. The merge wait takes the file's own pull request, not the last one it mentions.
+- **Owner choices.** `Owner:` is the walk's mode marker (`self` or `other`), so it is no longer read as a name and `other` is never a choice. The people open questions wait on are added; teams and organisations, such as `the project team`, are not.
+
 ## 1.178.0 (2026-11-17)
 
 Fixes from a live ready check and a kit update. The build map shows each branch's state in colour, the update no longer refuses a stale commit-style rule, and the ready check asks for the code repo first, reads the owner and merge state from the host in one lookup, and runs again after each answer.

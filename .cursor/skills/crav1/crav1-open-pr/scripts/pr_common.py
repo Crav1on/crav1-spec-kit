@@ -44,6 +44,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -603,84 +604,148 @@ def resolve_ref(ref: str, remote_url: str | None = None, roots: list[Path] | Non
             "line": f"No kit record names PR {number} and this checkout has no single GitHub or Azure DevOps remote. Ask for the pull request URL."}
 
 
-def host_author(info: dict, repo: str | None = None, timeout: int = 8) -> str | None:
-    """Who opened a pull request, read-only from its own host (1.177.1).
+# 1.179.0: how long a host CLI may take. The first `az` call on Windows loads
+# Python, the azure-devops extension and a token, so it gets 20 s; `gh` 8 s.
+# CRAV1_HOST_TIMEOUT overrides both.
+HOST_TIMEOUT = {"github": 8, "azure": 20}
 
-    Only the resolved host's CLI is tried: `gh pr view <n> --json author` for
-    GitHub, `az repos pr show --id <n>` (createdBy.displayName) for Azure
-    DevOps. None when the CLI is missing, not signed in, slow, or fails.
+# 1.179.0: why a host lookup gave no answer. Each code is one reason the
+# ready check can name, with its fix, instead of a silent "no answer".
+HOST_ERRORS = ("cli-missing", "cli-not-runnable", "timeout", "not-signed-in", "extension-missing",
+               "not-found", "bad-output", "unknown-status", "host-error")
+_EXTENSION_MISSING = re.compile(r"azure-devops|'repos' is misspelled|misspelled or not recognized"
+                                r"|extension\b.*\bnot installed", re.I)
+_NOT_SIGNED_IN = re.compile(r"\baz\s+(?:devops\s+)?login\b|AADSTS|TF400813|\b401\b|unauthori[sz]ed"
+                            r"|not logged in|please run .*login|gh auth login|authentication (?:required|failed)"
+                            r"|credentials? (?:have|has) expired|token .*expired", re.I)
+_NOT_FOUND = re.compile(r"TF401180|does not exist|could not resolve to a pullrequest|no pull requests? found"
+                        r"|\bnot found\b|\b404\b", re.I)
+
+
+def host_timeout(host: str | None) -> int:
+    """Seconds a host lookup may take: CRAV1_HOST_TIMEOUT, else 20 for az, 8 for gh (1.179.0)."""
+    raw = os.environ.get("CRAV1_HOST_TIMEOUT", "").strip()
+    if raw.isdigit() and int(raw) > 0:
+        return int(raw)
+    return HOST_TIMEOUT.get(host or "", 8)
+
+
+def _host_cli(host: str | None) -> str | None:
+    """The full path of the host's CLI, or None (1.179.0).
+
+    On Windows `az` is `az.cmd` (or `az.bat`). shutil.which finds it, but
+    starting the bare name `az` without a shell fails, so the lookup always
+    runs the path which() returned.
     """
-    host, number = info.get("host"), info.get("number")
-    if not number or host not in TOOL or not shutil.which(TOOL[host]):
+    tool = TOOL.get(host or "")
+    if not tool:
         return None
+    names = [tool, f"{tool}.cmd", f"{tool}.bat"] if host == "azure" else [tool, f"{tool}.exe"]
+    for name in names:
+        exe = shutil.which(name)
+        if exe:
+            return exe
+    return None
+
+
+def _host_env(host: str | None) -> dict:
+    env = dict(os.environ)
+    if host == "azure":
+        # Never prompt to install the azure-devops extension and wait for input.
+        env["AZURE_EXTENSION_USE_DYNAMIC_INSTALL"] = "no"
+        env["AZURE_CORE_ONLY_SHOW_ERRORS"] = "true"
+        env["AZURE_CORE_NO_COLOR"] = "true"
+    else:
+        env["GH_PROMPT_DISABLED"] = "1"
+        env["NO_COLOR"] = "1"
+    return env
+
+
+def _first_line(text: str | None) -> str:
+    for line in str(text or "").splitlines():
+        line = line.strip()
+        if line:
+            return line[:200]
+    return ""
+
+
+def classify_host_error(stderr: str | None) -> str:
+    """The error code for a failed host CLI call, from its stderr (1.179.0)."""
+    text = str(stderr or "")
+    if _EXTENSION_MISSING.search(text):
+        return "extension-missing"
+    if _NOT_SIGNED_IN.search(text):
+        return "not-signed-in"
+    if _NOT_FOUND.search(text):
+        return "not-found"
+    return "host-error"
+
+
+def _host_call(host: str, args: list[str], repo: str | None, timeout: int | None) -> tuple[str | None, str | None, str]:
+    """Run the host CLI read-only. (stdout, error code, detail); stdout is None on an error (1.179.0)."""
+    exe = _host_cli(host)
+    if not exe:
+        return None, "cli-missing", f"{TOOL.get(host, host)} not found"
+    limit = timeout or host_timeout(host)
+    try:
+        proc = subprocess.run([exe, *args], cwd=repo, capture_output=True, stdin=subprocess.DEVNULL,
+                              encoding="utf-8", errors="replace", timeout=limit, check=False,
+                              env=_host_env(host))
+    except subprocess.TimeoutExpired:
+        return None, "timeout", f"no answer within {limit} s"
+    except (OSError, subprocess.SubprocessError) as exc:
+        return None, "cli-not-runnable", _first_line(str(exc)) or type(exc).__name__
+    if proc.returncode != 0:
+        return None, classify_host_error(proc.stderr), _first_line(proc.stderr) or f"exit code {proc.returncode}"
+    if not (proc.stdout or "").strip():
+        return None, "bad-output", "empty output"
+    return proc.stdout, None, ""
+
+
+def _host_args(info: dict, fields: str) -> list[str]:
+    host, number = info.get("host"), info.get("number")
     url = info.get("url") or ""
     if host == "github":
-        cmd = ["gh", "pr", "view", str(number), "--json", "author"]
+        args = ["pr", "view", str(number), "--json", fields]
         ref = host_of(url.split("/pull/")[0]) if "/pull/" in url else {}
         if ref.get("owner"):
-            cmd += ["-R", f"{ref['owner']}/{ref['repo']}"]
-    else:
-        cmd = ["az", "repos", "pr", "show", "--id", str(number), "--query", "createdBy.displayName", "-o", "json"]
-        ref = parse_ref(url) if url else {}
-        if ref.get("org"):
-            cmd += ["--organization", f"https://dev.azure.com/{ref['org']}"]
-    try:
-        proc = subprocess.run(cmd, cwd=repo, capture_output=True, text=True, timeout=timeout, check=False)
-    except (OSError, subprocess.SubprocessError):
-        return None
-    if proc.returncode != 0 or not proc.stdout.strip():
-        return None
-    try:
-        data = json.loads(proc.stdout)
-    except ValueError:
-        return None
-    if isinstance(data, dict):
-        author = data.get("author") or {}
-        name = author.get("name") or author.get("login") if isinstance(author, dict) else None
-    else:
-        name = data if isinstance(data, str) else None
-    return name.strip() if isinstance(name, str) and name.strip() else None
+            args += ["-R", f"{ref['owner']}/{ref['repo']}"]
+        return args
+    args = ["repos", "pr", "show", "--id", str(number), "--query", fields, "-o", "json", "--detect", "false"]
+    ref = parse_ref(url) if url else {}
+    if ref.get("org"):
+        args += ["--organization", f"https://dev.azure.com/{ref['org']}"]
+    return args
 
 
-def host_state(info: dict, repo: str | None = None, timeout: int = 8) -> dict | None:
-    """Whether a pull request merged, read-only from its own host (1.177.2).
+def host_lookup(info: dict, repo: str | None = None, timeout: int | None = None) -> dict:
+    """One read-only lookup on the pull request's own host, with a reason (1.179.0).
 
-    Only the resolved host's CLI is tried, the same way as host_author:
-    `gh pr view <n> --json state,mergeCommit,mergedAt,closedAt,author` for
-    GitHub, `az repos pr show --id <n>` (status, lastMergeCommit, closedDate,
-    createdBy) for Azure DevOps. Returns {"state": "merged" | "closed" |
-    "open", "sha", "date"}, plus "author" when the host names who opened it
-    (1.178.0: one lookup gives both the owner and the merge state); GitHub MERGED and Azure DevOps completed are merged, CLOSED and
-    abandoned are closed. None when the CLI is missing, not signed in, slow,
-    or fails.
+    {"ok": state | None, "error": code | None, "detail": first stderr line}.
+    `ok` is what host_state returns: {"state": "merged" | "closed" | "open",
+    "sha", "date"} plus "author" when the host names who opened it. `error`
+    is one of HOST_ERRORS when the host could not be read: cli-missing,
+    cli-not-runnable, timeout, not-signed-in, extension-missing, not-found,
+    bad-output, unknown-status, host-error. Both are None when the PR's host
+    is not GitHub or Azure DevOps. Only the resolved host's CLI is tried, by
+    its full path, with stdin closed, UTF-8 output and no prompts.
     """
     host, number = info.get("host"), info.get("number")
-    if not number or host not in TOOL or not shutil.which(TOOL[host]):
-        return None
-    url = info.get("url") or ""
+    if not number or host not in TOOL:
+        return {"ok": None, "error": None, "detail": ""}
     if host == "github":
-        cmd = ["gh", "pr", "view", str(number), "--json", "state,mergeCommit,mergedAt,closedAt,author"]
-        ref = host_of(url.split("/pull/")[0]) if "/pull/" in url else {}
-        if ref.get("owner"):
-            cmd += ["-R", f"{ref['owner']}/{ref['repo']}"]
+        fields = "state,mergeCommit,mergedAt,closedAt,author"
     else:
-        cmd = ["az", "repos", "pr", "show", "--id", str(number), "--query",
-               "{status:status,sha:lastMergeCommit.commitId,closed:closedDate,author:createdBy.displayName}", "-o", "json"]
-        ref = parse_ref(url) if url else {}
-        if ref.get("org"):
-            cmd += ["--organization", f"https://dev.azure.com/{ref['org']}"]
+        fields = "{status:status,sha:lastMergeCommit.commitId,closed:closedDate,author:createdBy.displayName}"
+    out, error, detail = _host_call(host, _host_args(info, fields), repo, timeout)
+    if error:
+        return {"ok": None, "error": error, "detail": detail}
     try:
-        proc = subprocess.run(cmd, cwd=repo, capture_output=True, text=True, timeout=timeout, check=False)
-    except (OSError, subprocess.SubprocessError):
-        return None
-    if proc.returncode != 0 or not proc.stdout.strip():
-        return None
-    try:
-        data = json.loads(proc.stdout)
+        data = json.loads(out)
     except ValueError:
-        return None
+        return {"ok": None, "error": "bad-output", "detail": _first_line(out)}
     if not isinstance(data, dict):
-        return None
+        return {"ok": None, "error": "bad-output", "detail": _first_line(out)}
     if host == "github":
         raw = str(data.get("state") or "").upper()
         commit = data.get("mergeCommit") or {}
@@ -693,16 +758,58 @@ def host_state(info: dict, repo: str | None = None, timeout: int = 8) -> dict | 
         date = data.get("closed")
         state = {"completed": "merged", "abandoned": "closed", "active": "open"}.get(raw)
     if not state:
-        return None
+        return {"ok": None, "error": "unknown-status", "detail": f"status {raw or 'missing'}"}
     sha = sha if isinstance(sha, str) and re.fullmatch(r"[0-9a-fA-F]{7,40}", sha) else None
     day = str(date)[:10] if date and re.match(r"\d{4}-\d{2}-\d{2}", str(date)) else None
-    out = {"state": state, "sha": sha.lower() if sha else None, "date": day}
+    state_out = {"state": state, "sha": sha.lower() if sha else None, "date": day}
     who = data.get("author")
     if isinstance(who, dict):
         who = who.get("name") or who.get("login")
     if isinstance(who, str) and who.strip():
-        out["author"] = " ".join(who.split())
-    return out
+        state_out["author"] = " ".join(who.split())
+    return {"ok": state_out, "error": None, "detail": ""}
+
+
+def host_state(info: dict, repo: str | None = None, timeout: int | None = None) -> dict | None:
+    """Whether a pull request merged, read-only from its own host (1.177.2).
+
+    The `ok` part of host_lookup (1.179.0): {"state": "merged" | "closed" |
+    "open", "sha", "date"}, plus "author" when the host names who opened it
+    (1.178.0). GitHub MERGED and Azure DevOps completed are merged, CLOSED
+    and abandoned are closed. None when the host could not be read;
+    host_lookup says why.
+    """
+    return host_lookup(info, repo, timeout)["ok"]
+
+
+def host_author(info: dict, repo: str | None = None, timeout: int | None = None) -> str | None:
+    """Who opened a pull request, read-only from its own host (1.177.1).
+
+    `gh pr view <n> --json author` for GitHub, `az repos pr show --id <n>`
+    (createdBy.displayName) for Azure DevOps, run the same way as
+    host_lookup (1.179.0: full CLI path, no prompts). None when the CLI is
+    missing, not signed in, slow, or fails.
+    """
+    host, number = info.get("host"), info.get("number")
+    if not number or host not in TOOL:
+        return None
+    fields = "author" if host == "github" else "createdBy.displayName"
+    out, error, _detail = _host_call(host, _host_args(info, fields), repo, timeout)
+    if error:
+        return None
+    try:
+        data = json.loads(out)
+    except ValueError:
+        return None
+    if isinstance(data, dict):
+        author = data.get("author") or {}
+        if isinstance(author, dict):
+            name = author.get("name") or author.get("login")
+        else:
+            name = author if isinstance(author, str) else None
+    else:
+        name = data if isinstance(data, str) else None
+    return name.strip() if isinstance(name, str) and name.strip() else None
 
 
 def cmd_resolve(args) -> int:

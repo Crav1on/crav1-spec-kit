@@ -222,7 +222,7 @@ class OneHostLookup(unittest.TestCase):
             env = {k: v for k, v in os.environ.items() if k != "CRAV1_NO_HOST_LOOKUP"}
             with mock.patch.dict(os.environ, env, clear=True), \
                     mock.patch.object(wp, "host_pr_ref", side_effect=ref), \
-                    mock.patch.object(pc, "host_state", side_effect=state) as calls, \
+                    mock.patch.object(pc, "host_lookup", side_effect=ps.lookup_of(state)) as calls, \
                     mock.patch.object(pc, "host_author", return_value=None) as author:
                 out = ps.ready_json(root)
             self.assertEqual(author.call_count, 0, "no second lookup for the owner")
@@ -247,7 +247,8 @@ class OneHostLookup(unittest.TestCase):
             log = root / "build-progress/feat--orders-readme.md"
             log.write_text(re.sub(r"(?m)^(PR author|Opened by):.*\n", "", log.read_text(encoding="utf-8")),
                            encoding="utf-8")
-            with ps.fake_host({71: {"state": "open", "sha": None, "date": None}}):
+            with ps.fake_host({71: {"state": "open", "sha": None, "date": None},
+                               82: {"state": "open", "sha": None, "date": None}}):
                 out = ps.ready_json(root)
             self.assertEqual([item["pr"] for item in out["owner_unknown"]], [71])
             self.assertEqual(out["ask_first"], "pr-author")
@@ -257,7 +258,7 @@ class OneHostLookup(unittest.TestCase):
     def test_docs_say_repo_first(self):
         text = (SK / "crav1-tasks-ready-to-build/references/pr-owner.md").read_text(encoding="utf-8")
         self.assertLess(text.index("## Repo first"), text.index("## Owner"))
-        self.assertIn("8-second timeout", text)
+        self.assertIn("20-second timeout", text)
 
 
 class RerunAfterAnswer(unittest.TestCase):

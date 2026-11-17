@@ -199,6 +199,8 @@ Since 1.177.2 the ready check first asks each waiting pull request's own host, r
 
 Since 1.178.0 the skill asks which repo a pull request is in before it asks who opened it. With the repo known, one read-only lookup on that host gives both the owner and whether it merged, and the owner is recorded for you. You are asked who opened a pull request only when the host could not say, and the choices include the names the kit already knows, plus `Don't know`. After each answer the skill runs the ready check again in the same run and shows the new reply. In `build-map.md` each branch box is coloured by its worst task: green done, amber waiting on a pull request or a question, red truly blocked, blue ready or not started, with a legend.
 
+Since 1.179.0 the ready check also reaches Azure DevOps on Windows, where `az` is `az.cmd`. When it cannot read a pull request's host, it does not ask you who opened the pull request. Catch up first says why, for example not signed in, with the command that fixes it under its label, such as `az login`, and then asks you to run the ready check again. When you do answer a repo or owner question, the answer goes into that pull request's own build-progress file, and the reply names the file to commit. The owner question offers the people open questions wait on, never a team or the word other.
+
 Reference page: [tasks-ready-to-build](reference/skills/crav1-tasks-ready-to-build.md) · Routes: [Workflow routes](reference/workflow.md)
 
 The run ends as [How a run ends](reference/run-ending.md) says: one Run next block with one entry per ready branch, `Waiting:` only when a step is blocked, and `Uncommitted:` when files changed and are not committed.

@@ -34,6 +34,8 @@ Since 1.177.1 `--root` may be the specs repo root, `docs/specs`, or one spec fol
 
 **One lookup (1.178.0).** `host_state` also asks for who opened the pull request (`author` on GitHub, `createdBy.displayName` on Azure DevOps) and returns it as `author` when the host names one, so the ready check reads the owner and the merge state in one call. `host_author` is then not called again for that pull request in the same run.
 
+**A reason, not silence (1.179.0).** `host_lookup` makes that one call and returns `{ok, error, detail}`. It runs the CLI by the full path `shutil.which` found (`az.cmd` or `az.bat` on Windows), with stdin closed, UTF-8 output, `--detect false`, `AZURE_EXTENSION_USE_DYNAMIC_INSTALL=no`, and a 20-second timeout for `az` (8 seconds for `gh`, or `CRAV1_HOST_TIMEOUT`). When it cannot read the pull request, `error` is one of `cli-missing`, `cli-not-runnable`, `timeout`, `not-signed-in`, `extension-missing`, `not-found`, `bad-output`, `unknown-status` or `host-error`, and `detail` is the first line of what the CLI said. `host_state` and `host_author` stay as thin wrappers.
+
 Remote: the single `git remote`. If several remotes exist, ask which one. A full URL names its host.
 
 ## Finding the pull request for a branch
