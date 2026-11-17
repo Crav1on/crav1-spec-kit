@@ -56,10 +56,26 @@ SETTLE2 = {
     "why": "fewer teams on call",
     "deciders": "person A",
 }
-CUSTOMER = [
-    "baltic cable", "balticcable", "nrcc", "fn-nrcc", "tc-amp", "bc-operations", "arvid", "cederberg", "oscar",
-    "kristian", "volue", "evangelos", "krokos", "microstep", "lakshmin", "ravindran", "stretch",
-]
+# Names that must never appear, kept only as short sha256 prefixes so the list itself names nobody.
+CUSTOMER_HASHES = {
+    "82bff18f71c3a871",
+    "de322221623ada23",
+    "ada477b446e467c2",
+    "75e547b036211924",
+    "a165b9a3e5d67af2",
+    "cfc6b373af0d4e80",
+    "b05ba665c24619a5",
+    "37466f3bf5da33ae",
+    "f5a1971c2ef02a5a",
+    "57a4911c9baba00a",
+    "006baaa470736bf4",
+    "ebc04857644759fe",
+    "2cf106c714ba26ac",
+    "1411d2b4a05dbbc0",
+    "797fbf1ce497851e",
+    "24febe21f3b2356b",
+    "1219929bd7c1c9f4",
+}
 
 
 def make_fixture(root: Path) -> None:
@@ -568,12 +584,15 @@ class TestKitWiring(unittest.TestCase):
                 self.assertFalse(re.match(r"^\s*Next:", line), f"{p.name}: {line}")
 
     def test_no_customer_names_in_new_files(self):
+        import hashlib
         files = list(SKILL.rglob("*")) + [Path(__file__), ROOT / "docs/from-design-architecture.md"] + list(SNAP.rglob("*"))
         for p in files:
-            if p.is_file() and "__pycache__" not in p.parts:
-                low = p.read_text(encoding="utf-8").lower()
-                hits = [w for w in CUSTOMER if re.search(rf"\b{re.escape(w)}\b", low) and p != Path(__file__)]
-                self.assertEqual(hits, [], str(p))
+            if not p.is_file() or "__pycache__" in p.parts:
+                continue
+            words = re.findall(r"[a-z0-9]+(?:-[a-z0-9]+)*", p.read_text(encoding="utf-8").lower())
+            grams = set(words) | {f"{a} {b}" for a, b in zip(words, words[1:])}
+            hits = [g for g in grams if hashlib.sha256(g.encode()).hexdigest()[:16] in CUSTOMER_HASHES]
+            self.assertEqual(hits, [], str(p))
 
     def test_adr_asset_is_the_template_copy(self):
         self.assertEqual((SKILL / "assets/adr.md").read_bytes(), (ROOT / "docs/specs/_template/adr.md").read_bytes())
