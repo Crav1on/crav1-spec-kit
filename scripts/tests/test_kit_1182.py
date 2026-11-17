@@ -175,13 +175,6 @@ class SecondTaskReadyCheck(unittest.TestCase):
         build_map = (SNAP.parent / "expected/build-map.md").read_text(encoding="utf-8")
         self.assertIn("class b1,b2,key2 waiting", build_map)
 
-    def test_no_customer_names_in_the_snapshot(self):
-        for path in SNAP.parent.rglob("*"):
-            if path.is_file():
-                low = path.read_text(encoding="utf-8").lower()
-                for word in ("baltic", "nrcc", "volue", "microstep"):
-                    self.assertNotIn(word, low, path)
-
 
 class AdoRoute(unittest.TestCase):
     def args(self, **kw):

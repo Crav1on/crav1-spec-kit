@@ -206,3 +206,5 @@ Since 1.180.0 one module decides each task's state, so the ready check, the buil
 Reference page: [tasks-ready-to-build](reference/skills/crav1-tasks-ready-to-build.md) · Routes: [Workflow routes](reference/workflow.md)
 
 The run ends as [How a run ends](reference/run-ending.md) says: one Run next block with one entry per ready branch, `Waiting:` only when a step is blocked, and `Uncommitted:` when files changed and are not committed.
+
+Since 1.182.0 a task already built on a branch that is not merged is never offered as startable, even when your own claim names it, and older progress files whose header lists only the first task still count every task a done build step names. Tasks that wait on it read `held, waits on PR 21 to merge (T47, recorded)`, and the merge list names only the tasks you claimed as `you added`.
