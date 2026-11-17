@@ -301,7 +301,17 @@ Reviewed: 2026-11-11, P# open: 0
         self.assertNotIn("Nothing left to build.", text)
         tasks_lines = [line for line in text.splitlines() if line.startswith("- Tasks:")]
         self.assertTrue(tasks_lines)
-        other = "\n".join(line for line in text.splitlines() if not line.startswith("- Tasks:"))
+        # 1.185.0: the Tasks items are nested sub-bullets under `- Tasks:`.
+        kept, in_tasks = [], False
+        for line in text.splitlines():
+            if line.startswith("- Tasks:"):
+                in_tasks = True
+                continue
+            if in_tasks and line.startswith("  - "):
+                continue
+            in_tasks = False
+            kept.append(line)
+        other = "\n".join(kept)
         self.assertIsNone(re.search(r"\bT\d+\b", other))
         folded = re.search(r"<details>\n<summary>Wave 1 done \(2 tasks\)</summary>\n\n(.*?)\n</details>", text, re.S)
         self.assertIsNotNone(folded)
