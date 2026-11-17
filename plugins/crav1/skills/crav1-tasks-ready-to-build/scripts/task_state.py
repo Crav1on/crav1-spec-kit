@@ -15,16 +15,23 @@ It also owns the owner-name clean-up used when names are written or read:
 a leading word like `Admin` and a trailing `(...)` tag are dropped, and two
 spellings of one person match.
 
+It also owns the box colour on the build map (box_state) and the
+finalize-commit decision for a task recorded merged but not ticked
+(commit_check), so the map, the ready check and finalize-commit agree.
+
 Usage:
   task_state.py state --ticked yes-no --merged yes-no --verify "<status>" [--built yes-no]
   task_state.py clean-name "<name>"
+  task_state.py commit-check --root <spec-folder>
 """
 from __future__ import annotations
 
 import argparse
 import json
+import importlib.util
 import re
 import sys
+from pathlib import Path
 
 sys.dont_write_bytecode = True
 
@@ -118,6 +125,102 @@ def deadlock_text(task: str, dep: str, pr, branch: str | None = None) -> str:
     return f"Merge deadlock: {task}{where} waits on {dep}, which ticks only when PR {pr} merges."
 
 
+# The box colour a task state gives, worst first (1.180.0).
+STATE_COLOUR = {DONE: "done", TICK_PENDING: "done", MERGE_WAIT: "waiting", OPEN: "todo"}
+COLOUR_RANK = ("blocked", "waiting", "todo", "done")
+
+
+def row_state(row: dict) -> str:
+    """A ready-check row's state, by the same rules as task_state()."""
+    bucket = row.get("bucket")
+    if bucket in ("done", "needs-verify"):
+        # Needs verify is ticked (or claimed done) without a verify row.
+        return DONE
+    waits = bool(row.get("merge_wait") or row.get("claim_built") or row.get("verified_on_branch"))
+    return task_state(False, built=waits)["state"]
+
+
+def box_state(branch: dict) -> str:
+    """One of done, waiting, blocked, todo: a build-map box colour.
+
+    Blocked only for a truly blocked branch: in a loop, the Blocked section,
+    a merge deadlock, or a walk whose last result failed or was reopened.
+    Waiting for a question hold, a hold on another branch, or a task built
+    and waiting for its pull request. Done when every task's state is done.
+    Else todo (ready, waits in order, in progress).
+    """
+    status = branch.get("status")
+    if (branch.get("loop") or branch.get("deadlock") or status == "blocked"
+            or branch.get("section") == "blocked" or branch.get("failed")):
+        return "blocked"
+    states = [task.get("state") for task in branch.get("tasks") or [] if task.get("state")]
+    if status == "done" or (states and all(STATE_COLOUR[state] == "done" for state in states)):
+        return "done"
+    if status == "waiting on a question":
+        return "waiting"
+    if status == "held":
+        return "todo" if (branch.get("held_text") or "") == "in progress" else "waiting"
+    open_colours = {STATE_COLOUR[state] for state in states if STATE_COLOUR[state] != "done"}
+    return "waiting" if open_colours == {"waiting"} else "todo"
+
+
+def _build_map():
+    path = Path(__file__).resolve().parent / "build_map.py"
+    spec = importlib.util.spec_from_file_location("build_map_ts", path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+_VERIFY_ROW = re.compile(r"^\|\s*T(\d+)\s*\|[^|]*\|\s*([^|]+?)\s*\|", re.M)
+
+
+def slice_states(root) -> dict:
+    """{"T5": task_state(...)} for every task in a spec folder.
+
+    Ticks from tasks.md, merges and builds from build-progress (the same
+    progress_state the build map reads), verify status from verify.md.
+    """
+    root = Path(root)
+    tasks = (root / "tasks.md").read_text(encoding="utf-8") if (root / "tasks.md").is_file() else ""
+    verify = (root / "verify.md").read_text(encoding="utf-8") if (root / "verify.md").is_file() else ""
+    statuses = {f"T{int(n)}": status for n, status in _VERIFY_ROW.findall(verify)}
+    bm = _build_map()
+    walks = bm.progress_state(root) if (root / "build-progress").is_dir() else {}
+    # The same per-task decision the build map makes (apply_task_states).
+    parsed = bm.parse_tasks(tasks)
+    states = bm.apply_task_states(parsed, walks)
+    out = {}
+    for task, state in states.items():
+        merged = state == TICK_PENDING
+        out[task] = task_state(state == DONE, merged, statuses.get(task), state == MERGE_WAIT)
+    return out
+
+
+def commit_check(root) -> dict:
+    """Finalize-commit's merged-but-not-ticked decision (M3).
+
+    A task recorded merged on the host but `[ ]` in tasks.md is tick
+    pending. It is never a reason to recommend `stop`: name it, recommend
+    `commit`, and put the next step in Run next (verify when verify.md does
+    not pass it yet, else the tick).
+    """
+    states = slice_states(root)
+    pending = [task for task, state in states.items() if state["state"] == TICK_PENDING]
+    slug = Path(root).name
+    if not pending:
+        return {"ok": True, "tick_pending": [], "recommend": None, "stop": False, "run_next": None, "line": None}
+    verify_first = [task for task in pending if states[task].get("verify_first")]
+    joined = ", ".join(pending)
+    line = f"{joined} {'is' if len(pending) == 1 else 'are'} recorded merged but not ticked in tasks.md; that is tick pending, not a reason to stop."
+    if verify_first:
+        run_next = f"Verify {', '.join(verify_first)}, recorded merged on the host:\n`/crav1-verify-build-against-spec {slug}`"
+    else:
+        run_next = (f"Tick {joined} in tasks.md, recorded merged and verified:\n"
+                    f"`verify_rows.py tick --file docs/specs/{slug}/verify.md --task {pending[0]} --merged yes --yes`")
+    return {"ok": True, "tick_pending": pending, "recommend": "commit", "stop": False, "run_next": run_next, "line": line}
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     sub = parser.add_subparsers(dest="cmd", required=True)
@@ -128,7 +231,12 @@ def main(argv: list[str] | None = None) -> int:
     state.add_argument("--verify", default="")
     name = sub.add_parser("clean-name")
     name.add_argument("name")
+    check = sub.add_parser("commit-check")
+    check.add_argument("--root", required=True)
     args = parser.parse_args(argv)
+    if args.cmd == "commit-check":
+        print(json.dumps(commit_check(args.root), indent=2, ensure_ascii=False))
+        return 0
     if args.cmd == "clean-name":
         print(json.dumps({"ok": True, "name": clean_name(args.name)}))
         return 0

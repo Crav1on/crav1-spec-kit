@@ -1,0 +1,26 @@
+Tasks ready to build — orders-api-tick-pending
+
+| Slice | Ready | Waiting | Waits in order | Blocked | Needs verify | Done |
+| --- | --- | --- | --- | --- | --- | --- |
+| orders-api-tick-pending | 0 | 1 | 1 | 0 | 0 | 1 |
+
+Result: not-ready
+
+Run next:
+
+Ask the PR owners to merge, in this order:
+- Person B: PR 12
+
+Held:
+- `feat/orders-cicd` (wave 2):
+  - T2 Add the build pipeline — waits for PR 12 to merge
+
+Merge these PRs, in this order:
+1. PR 12 (Person B's, you added T2, feat/orders-cicd): ticks T2, then T3 can start.
+
+Source: docs/specs/orders-api-tick-pending/spec.md, plan.md, tasks.md, verify.md
+Build map: docs/specs/orders-api-tick-pending/build-map.md (updated)
+Zoom the map in your browser:
+`/crav1-tasks-ready-to-build orders-api-tick-pending open-map`
+
+Recorded: author names cleaned (in build-progress/feat--orders-cicd.md).

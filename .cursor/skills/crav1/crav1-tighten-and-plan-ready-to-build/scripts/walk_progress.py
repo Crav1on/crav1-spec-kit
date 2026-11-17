@@ -3554,7 +3554,7 @@ def apply_built_claims(root: Path | None, rows: list[dict]) -> None:
         task = row.get("task")
         if not task or task not in built or not row.get("claim") or row.get("own_claim"):
             continue
-        if row.get("bucket") == "done":
+        if task_state_mod().row_state(row) == task_state_mod().DONE:
             continue
         row["claim_built"] = built[task]
         # The same merge wait as a verified-on-branch row, so the hold spreads
@@ -3792,7 +3792,7 @@ def apply_progress_waits(root: Path | None, rows: list[dict]) -> dict:
         task = row.get("task")
         if not task or task not in waits:
             continue
-        if row.get("bucket") in ("done", "needs-verify"):
+        if row.get("bucket") == "needs-verify" or task_state_mod().row_state(row) == task_state_mod().DONE:
             continue
         row["bucket"] = "waiting"
         row["held"] = True
@@ -4722,7 +4722,8 @@ def apply_merge_deadlocks(rows: list[dict]) -> list[str]:
             continue
         for dep in row.get("deps") or []:
             info = (by_task.get(dep) or {}).get("merge_wait") or {}
-            if info.get("pr") and info.get("branch") == branch and (by_task.get(dep) or {}).get("bucket") != "done":
+            if (info.get("pr") and info.get("branch") == branch
+                    and task_state_mod().row_state(by_task.get(dep) or {}) == task_state_mod().MERGE_WAIT):
                 text = task_state_mod().deadlock_text(task, dep, info["pr"], branch)
                 row["deadlock"] = text
                 row["bucket"] = "blocked"
@@ -4946,7 +4947,7 @@ def apply_verified_on_branch(root: Path | None, rows: list[dict]) -> None:
     built = walk_built(root)
     for row in rows:
         task = row.get("task")
-        if task not in tasks or row.get("bucket") == "done":
+        if task not in tasks or task_state_mod().row_state(row) == task_state_mod().DONE:
             continue
         info = waits.get(task) or built.get(task)
         if not info:
@@ -5015,6 +5016,9 @@ def ready_branches(root: Path) -> list[dict]:
     resolve_recorded = resolve_ever_recorded(root)
     hits = []
     for row in rows:
+        if isinstance(row, dict) and row.get("task"):
+            # 1.180.0: the shared state, the one the build map colours from.
+            row["state"] = task_state_mod().row_state(row)
         hit = classify(row, resolve_kept=resolve_kept, resolve_recorded=resolve_recorded)
         if hit:
             hits.append(hit)
@@ -5780,6 +5784,9 @@ def _readiness(args: argparse.Namespace) -> None:
     resolve_recorded = resolve_ever_recorded(root) if root is not None else False
     hits = []
     for row in rows:
+        if isinstance(row, dict) and row.get("task"):
+            # 1.180.0: the shared state, the one the build map colours from.
+            row["state"] = task_state_mod().row_state(row)
         hit = classify(row, resolve_kept=resolve_kept, resolve_recorded=resolve_recorded)
         if hit:
             hits.append(hit)

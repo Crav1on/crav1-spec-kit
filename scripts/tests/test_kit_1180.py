@@ -296,5 +296,83 @@ class Invariants(unittest.TestCase):
                 self.assertIn(code, broken)
 
 
+class SharedStateAgrees(unittest.TestCase):
+    """The ready check, the build map and finalize-commit agree (1.180.0)."""
+
+    def check_folder(self, name):
+        import os
+        import re
+        import shutil
+        with tempfile.TemporaryDirectory() as tmp:
+            work = Path(tmp) / name
+            shutil.copytree(ROOT / "scripts/tests/snapshots" / name / "spec", work)
+            env = dict(os.environ, CRAV1_NO_HOST_LOOKUP="1")
+            proc = subprocess.run([sys.executable, str(SK / "crav1-tighten-and-plan-ready-to-build/scripts/walk_progress.py"),
+                                   "readiness", "--root", str(work), "--full", "--write-map", "--skip-sync",
+                                   "--user", "Person C"], capture_output=True, text=True, env=env)
+            self.assertEqual(proc.returncode, 0, proc.stderr)
+            out = json.loads(proc.stdout)
+            ready = {row["task"]: row["state"] for row in out["rows"] if row.get("task")}
+            parsed = bm.parse_tasks((work / "tasks.md").read_text(encoding="utf-8"))
+            mapped = bm.apply_task_states(parsed, bm.progress_state(work))
+            sliced = {task: state["state"] for task, state in ts.slice_states(work).items()}
+            colour = ts.STATE_COLOUR
+            self.assertEqual(set(ready), set(mapped))
+            for task in ready:
+                self.assertEqual(colour[ready[task]], colour[mapped[task]], f"{name} {task}: ready check vs build map")
+                self.assertEqual(sliced[task], mapped[task], f"{name} {task}: finalize-commit vs build map")
+            check = ts.commit_check(work)
+            self.assertEqual(check["tick_pending"], sorted(t for t, st in mapped.items() if st == ts.TICK_PENDING))
+            self.assertFalse(check["stop"])
+            for task in check["tick_pending"]:
+                self.assertEqual(ready[task], ts.DONE, "the ready check counts a tick-pending task done")
+            # Box colours on the written map follow the same task states.
+            text = (work / "build-map.md").read_text(encoding="utf-8")
+            boxes = dict(re.findall(r'^\s*(b\d+)\["([^"]+)"\]', text, re.M))
+            classes = {}
+            for cls_ids, cls in re.findall(r"^\s*class ([\w,]+) (\w+)$", text, re.M):
+                for box in cls_ids.split(","):
+                    classes[box] = cls
+            branch_of = {f"T{t['id']}": t.get("branch") for t in parsed}
+            branches = {}
+            tasks_md = (work / "tasks.md").read_text(encoding="utf-8")
+            for num, branch in re.findall(r"T(\d+)\b.*\(branch: ([^)]+)\)", tasks_md):
+                branches.setdefault(branch, []).append(f"T{int(num)}")
+            for box, branch in boxes.items():
+                ids = branches.get(branch) or []
+                if ids and all(colour[ready[t]] == "done" for t in ids):
+                    self.assertEqual(classes.get(box), "done", f"{name} {branch}")
+                if any(ready[t] == ts.MERGE_WAIT for t in ids):
+                    self.assertIn(classes.get(box), ("waiting", "blocked"), f"{name} {branch}")
+            inv = load("crav1-tasks-ready-to-build/scripts/task_invariants.py", "inv_agree")
+            self.assertEqual(inv.check(work, out), [])
+            return check
+
+    def test_tick_pending_snapshot(self):
+        check = self.check_folder("orders-api-tick-pending")
+        self.assertEqual(check["tick_pending"], ["T1"])
+        self.assertEqual(check["recommend"], "commit")
+        self.assertIn("/crav1-verify-build-against-spec orders-api-tick-pending", check["run_next"])
+
+    def test_merge_wait_snapshot(self):
+        self.check_folder("orders-api-merge-wait")
+
+    def test_deadlock_snapshot(self):
+        self.check_folder("orders-api-deadlock")
+
+    def test_finalize_commit_wrapper_runs_the_shared_module(self):
+        wrapper = SK / "crav1-finalize-commit/scripts/task_state.py"
+        self.assertLess(len(wrapper.read_text(encoding="utf-8").splitlines()), 60, "a thin wrapper, no copied logic")
+        proc = subprocess.run([sys.executable, str(wrapper), "commit-check", "--root",
+                               str(ROOT / "scripts/tests/snapshots/orders-api-tick-pending/spec")],
+                              capture_output=True, text=True)
+        self.assertEqual(json.loads(proc.stdout)["tick_pending"], ["T1"])
+        self.assertIn("scripts/task_state.py commit-check",
+                      (SK / "crav1-finalize-commit/references/choice-words.md").read_text(encoding="utf-8"))
+
+    def test_map_colour_is_box_state(self):
+        self.assertIn("task_state.box_state(branch)", (SK / "crav1-tasks-ready-to-build/scripts/build_map.py").read_text(encoding="utf-8"))
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -24,7 +24,7 @@ Date:
 
 Sorted: verified, then tick pending, then verify failed, then not implemented, then unverified.
 
-<!-- Tick pending (1.136.0): Tick pending: T2. Say yes to tick `[x]` in tasks.md. Verify does not tick without that yes. The open checkbox stays a Gap. -->
+<!-- Tick pending (1.136.0, 1.180.0): the tick is a labelled Run next step, never a line after the ending: `Tick T2 in tasks.md, recorded merged and verified:` above `verify_rows.py tick --file <spec-folder>/verify.md --task T2 --merged yes --yes`. Verify does not tick without a yes. The open checkbox stays a Gap. -->
 
 | T# | Title | Status | Verify |
 | --- | --- | --- | --- |
