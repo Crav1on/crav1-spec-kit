@@ -31,6 +31,7 @@ crav1-bundle-to-specs/assets/glossary.md	docs/system/_template/glossary.md
 crav1-bundle-to-specs/assets/landscape.md	docs/system/_template/landscape.md
 crav1-bundle-to-specs/assets/repos.md	docs/system/_template/repos.md
 crav1-bundle-to-specs/assets/spec.md	docs/specs/_template/spec.md + insert scripts/template-overlays/bundle-spec.insert.md before ## Open questions
+crav1-design-architecture/assets/adr.md	docs/specs/_template/adr.md
 crav1-existing-to-specs/branches/repos-and-bundle/assets/adr.md	docs/system/_template/adr.md
 crav1-existing-to-specs/branches/repos-and-bundle/assets/diagrams.md	docs/system/_template/diagrams.md
 crav1-existing-to-specs/branches/repos-and-bundle/assets/glossary.md	docs/system/_template/glossary.md

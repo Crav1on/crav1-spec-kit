@@ -103,6 +103,12 @@ When the user asks for startup options, these six are the only ways in. That ask
 | [`/crav1-glossary`](skills/crav1-glossary.md) | — | You want the glossary, the meaning of one word, or the open glossary rows filled | `docs/system/glossary.md`, every file under `docs/`, and the web for public terms | Rows in `docs/system/glossary.md`; `.crav1/glossary-list.md` (ignored) in as-file mode | [`/crav1-finalize-commit`](skills/crav1-finalize-commit.md) | `/crav1-glossary` | [The glossary: show it, look up a word, fill the gaps](../from-glossary.md) |
 | [`/crav1-export-spec`](skills/crav1-export-spec.md) | — | Spec exists; want another format | `spec.md` and the format recipes | Requested files under `export/` | — | — | reference only |
 
+### Cross-cutting: Specify
+
+| Command | Starter | Use when | Reads | Writes | You run next | Runs by itself | Walkthrough |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| [`/crav1-design-architecture`](skills/crav1-design-architecture.md) | — | You want to decide how the architecture should change | Architecture spec, system notes, environment docs, research, slice specs, code and config, and the topic's sandbox | `docs/architecture/designs/<topic>/`; at go-ahead `docs/architecture/spec.md`, accepted ADRs, and the affected diagram | [`/crav1-tighten-spec`](skills/crav1-tighten-spec.md); [`/crav1-plan-from-spec`](skills/crav1-plan-from-spec.md); [`/crav1-add-to-spec`](skills/crav1-add-to-spec.md); [`/crav1-show-or-ask-open-questions`](skills/crav1-show-or-ask-open-questions.md) | `/crav1-tighten-spec`, `/crav1-plan-from-spec`, `/crav1-add-to-spec`, `/crav1-show-or-ask-open-questions` | [Design the architecture](../from-design-architecture.md) |
+
 ### Cross-cutting: Azure Boards
 
 | Command | Starter | Use when | Reads | Writes | You run next | Runs by itself | Walkthrough |

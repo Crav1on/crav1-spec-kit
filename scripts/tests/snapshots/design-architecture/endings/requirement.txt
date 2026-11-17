@@ -1,0 +1,5 @@
+Run next:
+A requirement came up during the design.
+
+Add the requirement to the spec:
+`/crav1-add-to-spec fact`

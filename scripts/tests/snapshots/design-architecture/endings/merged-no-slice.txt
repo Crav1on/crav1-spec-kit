@@ -1,0 +1,5 @@
+Run next:
+The orders payment retry design is on main and no slice exists yet.
+
+Plan the work from the architecture spec:
+`/crav1-plan-from-spec`

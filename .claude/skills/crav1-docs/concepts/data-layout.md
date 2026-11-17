@@ -35,6 +35,12 @@ docs/research/
   <topic>.md         # research notes; a spec's ## Research findings links to them
 docs/playbooks/
   <topic>.md         # a filled playbook copied on apply (1.120.0); the first write stays outside the project
+docs/architecture/designs/
+  <topic>/           # a design sandbox, one goal, on its own design branch (1.181.0); no other skill reads it
+    goal.md          # end goal, drivers, constraints, criteria
+    compare.md       # designs in this topic scored against the shared criteria
+    designs/<name>/  # design.md, questions.md, diagrams.md, adr/ drafts, stages.md once staged
+  _compare/          # one-off cross-topic comparisons, only when asked
 docs/data-model/
   <model>/
     index.md         # flow, scope, revision; scope confirmed only after a yes
@@ -93,6 +99,7 @@ docs/specs/
 | `docs/sources/YYYY-MM-DD-<slug>/` | The original of an imported transcript, minutes, chat, screenshot, or diagram, or a mail written as text (`mail.md`, 1.111.0; the original mail stays outside the repo), plus a `README.md` | `/crav1-add-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs` | Anyone checking a quote. See [Data policy](data-policy.md) |
 | `docs/research/<topic>.md` | A short research note with the recommendation, trade-offs, confidence, and a link to the full study | The researcher (no slash command; see [guild routing](../guild-routing.md)). Skills only add or clear a stale mark | add, match-dump, add-to-spec, meeting, refresh-system-notes, explain-existing-system, what-do-we-know-about-this, ado-sync |
 | `docs/playbooks/<topic>.md` | The shared copy of a filled playbook report. The file name comes from the subject, lowercase kebab-case. A `Docs path:` line fixes it. `Applied as:` detects a hand-edit since the last apply. The first write stays outside the project. A draft with no filled answer is not copied | `/crav1-resolve-open-questions` `apply <file>`, also at the end of a playbook walk and in step 1 of `/crav1-tighten-and-plan-ready-to-build` | `/crav1-resolve-open-questions`, `/crav1-what-do-we-know-about-this` `report-playbook-walk`, `/crav1-tighten-and-plan-ready-to-build` |
+| `docs/architecture/designs/<topic>/` | A design sandbox: goal, competing designs, decisions, draft ADRs, open questions, stages, and comparisons (1.181.0). At go-ahead the chosen design is copied under `## Decided, not built yet` in `docs/architecture/spec.md` | `/crav1-design-architecture`, through its `scripts/design_run.py` only | `/crav1-design-architecture` only. Every other skill ignores this folder, also after the design branch is merged |
 | `docs/data-model/<model>/` | Confirmed and proposed data model, questions, both comparison views, pinned sources, `history.md` for revised items (1.121.0), and immutable review snapshots | `/crav1-model-data`; `reviews/` by `/crav1-what-do-we-know-about-this` `report-data-model-full` | `/crav1-model-data`, `/crav1-what-do-we-know-about-this` |
 | `docs/specs/<slug>/spec.md` | What and why, acceptance, open questions | spark, ideas, intake (through `crav1-bundle-slice-agent`), match; then tighten-spec, resolve-open-questions, add-to-spec, match-dump, add-to-spec, and review-security | Every later lane |
 | `docs/specs/<slug>/plan.md`, `tasks.md` | How, constraints, files, linter; ordered testable tasks | `/crav1-plan-from-spec`, `/crav1-tighten-plan`; `[x]` on a task row by implement and build-tasks | Build, verify, review |

@@ -53,6 +53,7 @@ lanes:
   - Start
   - Meetings and open questions
   - Keep the picture current
+  - Specify
   - Azure Boards
   - Testing helpers
   - Commit and pull request
@@ -601,7 +602,7 @@ skills:
     reads: Open questions, assumptions and Conflict lines in `spec.md`, and the playbook file on apply
     writes: The picked question in the spec (with a linked answer's quote and source), a cleared research
       mark when no point stays open, and on apply the playbook copy plus a Playbook line on each spec it changed
-  reads: Reads Open questions, unresolved assumptions and **Conflict:** lines in `spec.md`.
+  reads: Reads Open questions, unresolved assumptions and **Conflict:** lines in `spec.md`, including `docs/architecture/spec.md` since 1.181.0. It never reads `docs/architecture/designs/`.
   writes: 'Writes only the picked question into the spec, a constraint, a non-goal, or an ADR. When that answer settles a stale research point waiting on the question, re-checks the point and clears the mark when no point is open. It does not ask the user. A question with an `Answered:` line shows that answer and offers it first. An answer keeps that quote and source with the decision. When `tasks.md` exists, None on a kept-open question writes `Blocks: none`. The whole slice writes `- Blocks: whole slice`. `apply <file>` also copies a filled playbook to `docs/playbooks/<topic>.md` through `scripts/playbook_store.py` and writes a Playbook line for that path on each spec it changed.'
   leaves_alone: Leaves application code and kept-open questions alone. Does not change `Answer:` or
     `Change:` lines in the playbook file. Does not copy a draft. Does not git-commit.
@@ -648,7 +649,7 @@ skills:
     reads: Open questions on the specs for a person, a spec, or a topic
     writes: A draft in chat; `Asked:` or `Pending:` lines under those questions and under Approval needed
       items after yes or pending; the transfer data policy after a yes
-  reads: Reads `## Open questions`, unresolved assumptions, and their `Asked:`, `Pending:`, and `Answered:`
+  reads: Reads `## Open questions` in slice specs and, since 1.181.0, in `docs/architecture/spec.md` (never `docs/architecture/designs/`), plus unresolved assumptions, and their `Asked:`, `Pending:`, and `Answered:`
     lines, and `## Approval needed` items with no matching `Approved:` line, on every `docs/specs/<slug>/spec.md`,
     skipping `_template`, for the person, spec, or topic the user named.
   writes: Writes a draft in the chat only (mail, meeting agenda, chat message, meeting questions, or a
@@ -2200,6 +2201,56 @@ skills:
   first_prompt: '/crav1-model-data manual-flow
 
     <optional scope, or leave it out>'
+- name: crav1-design-architecture
+  choice_words:
+  - question: Which step
+    words:
+    - word: "resume"
+      means: "Continue an open design topic at its first open decision. An optional topic value may follow."
+    - word: "park"
+      means: "Stop the current topic. It stays resumable."
+    - word: "status"
+      means: "Show open topics, designs, decisions, stages and questions. Writes nothing."
+    - word: "fan-out"
+      means: "Start a competing design under the same goal, as a copy or from a blank start."
+    - word: "stage-it"
+      means: "Suggest a split of the designed end state into stages that the user names and divides."
+    - word: "go-ahead"
+      means: "Review the chosen design, then copy it into the architecture spec after the findings are fixed or accepted."
+    - word: "compare-topics"
+      means: "One-off comparison of designs from different topics, with criteria the user picks."
+    - word: "prepare"
+      means: "Gather facts, draft options with recommendations, and refresh comparisons. Settles nothing."
+    note: "Idea text with no word starts a new topic. A run without the user is always prepare, and with no word and no idea text it stops and names the words. Per-decision reply words: choose-a, choose-b, choose-c, choose-mine, discuss, add-my-idea, ask-me, to-question, to-research, skip-for-now."
+  lane: cross-cutting
+  group: Specify
+  starter: false
+  since: 1.181.0
+  stage: preview
+  prompt_budget: 2
+  prompt_note: 'One framing card for a new or changed goal, then one card per decision, plus at most 3 narrowing questions per decision when ask-me is picked. One decision per round. No cap on how many decisions a session may settle.'
+  walkthrough: docs/from-design-architecture.md
+  purpose: Work out an architecture change with the user, one decision at a time, in a sandbox until go-ahead.
+  in_depth:
+  - '`/crav1-design-architecture` (1.181.0, preview) decides how the landscape should change: systems and services and how they connect, environments, infrastructure and hosting, data flows, integrations, and deployment. It reads what the kit knows, shows two or three real options per decision with a reasoned recommendation first, folds in the user''s own ideas as their own option, and records each settled choice as a draft ADR in a sandbox.'
+  - 'The sandbox is `docs/architecture/designs/<topic>/` on its own design branch: one goal per topic in `goal.md`, one or more designs under `designs/<name>/`, and `compare.md` once a topic fans out. The end state is designed first; staging happens only on `stage-it`, and the user names and divides the stages. A stage may wait on a stakeholder decision. No other skill reads the sandbox, even after it is merged.'
+  - 'The skill''s `scripts/design_run.py` owns the folder format and every move, saves after each one, and refuses writes outside the topic folder before go-ahead. A run without the user may only prepare. At go-ahead the chosen design is reviewed, then copied as one block under `## Decided, not built yet` in `docs/architecture/spec.md` with a "Designed in" link, its draft ADRs are copied as accepted, and still-open questions go into that spec. The ending names pushing the design branch and opening its pull request first; planning comes only after that pull request is merged.'
+  use_when: You want to decide how the architecture should change
+  table:
+    reads: Architecture spec, system notes, environment docs, research, slice specs, code and config, and the topic's sandbox
+    writes: '`docs/architecture/designs/<topic>/`; at go-ahead `docs/architecture/spec.md`, accepted ADRs, and the affected diagram'
+  reads: Reads `docs/architecture/spec.md` and `left-out.md`, `docs/system/` notes and ADRs, environment, infrastructure and hosting docs, research notes with their stale marks, slice specs when the ask touches one, saved data models when it touches data, code and config in the linked repos, and its own sandbox.
+  writes: 'Before go-ahead only `docs/architecture/designs/<topic>/` through `scripts/design_run.py`: `goal.md`, `compare.md`, and per design `design.md`, `questions.md`, `diagrams.md`, `adr/`, and `stages.md` once staged; a one-off file under `_compare/` only when asked. At go-ahead, after the review is fixed or accepted: one block under `## Decided, not built yet` and still-open questions in `docs/architecture/spec.md`, accepted ADR copies in `docs/system/adr/` or `docs/specs/<slug>/adr/`, and the affected diagram.'
+  leaves_alone: Leaves `## Confirmed`, `## Accepted from a guess`, `## How the repos connect`, `left-out.md`, requirements, plans, tasks, verify, research notes, question mark lines, application code, pipelines, and live infrastructure alone. Does not commit, push, merge, tag, or open a pull request.
+  exceptions: A run without the user never settles a decision, stages, or gives go-ahead. A choice that reverses an accepted ADR, a constraint, or a current environment fact needs a separate yes. A requirement is routed to `/crav1-add-to-spec`.
+  called_by: Called by the user. `/crav1-tighten-and-plan-ready-to-build` may offer it.
+  runs_by_itself: Calls no skill. It may name `/crav1-tighten-spec`, `/crav1-plan-from-spec`, `/crav1-add-to-spec`, and `/crav1-show-or-ask-open-questions`.
+  you_run_next:
+  - /crav1-tighten-spec
+  - /crav1-plan-from-spec
+  - /crav1-add-to-spec
+  - /crav1-show-or-ask-open-questions
+  first_prompt: '/crav1-design-architecture orders should retry failed payments without blocking checkout'
 - name: crav1-update-specs-from-changes-and-prs
   choice_words:
   - question: Which flow
@@ -2930,6 +2981,9 @@ routing:
         crav1-model-data:
         - >-
           `/crav1-model-data` may run from any lane when the user asks for a data model. It does not move work into Specify, Plan, or Build. It does not edit spec requirements, generate schema, or start a watcher. It is not a starter option.
+        crav1-design-architecture:
+        - >-
+          `/crav1-design-architecture` may run from any lane when the user wants to decide how the architecture should change. It works in a sandbox under `docs/architecture/designs/` that no other skill reads, and writes outside it only at go-ahead. It does not move work into Specify, Plan, or Build. It is not a starter option.
         crav1-update-specs-from-changes-and-prs:
         - >-
           `/crav1-update-specs-from-changes-and-prs` may run from any lane. It runs `/crav1-add-to-spec` for each item and does not replace it. It does not run `/crav1-review-pr` or `/crav1-pr-status`. It does not commit. It does not move work into Specify, Plan, or Build. It is not a starter option.

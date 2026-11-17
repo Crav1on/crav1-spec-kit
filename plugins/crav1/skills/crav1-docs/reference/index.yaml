@@ -176,6 +176,11 @@ skills:
     starter: false
     page: reference/skills/crav1-model-data.md
     purpose: "Build or revise one data model from the project's specs, with a manual flow or an auto flow."
+  crav1-design-architecture:
+    lane: cross-cutting
+    starter: false
+    page: reference/skills/crav1-design-architecture.md
+    purpose: "Work out an architecture change with the user, one decision at a time, in a sandbox until go-ahead."
   crav1-update-specs-from-changes-and-prs:
     lane: cross-cutting
     starter: false

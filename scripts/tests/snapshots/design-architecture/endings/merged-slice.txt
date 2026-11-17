@@ -1,0 +1,5 @@
+Run next:
+The orders payment retry design is on main. The orders-api spec still needs to be brought in line with the new ADRs.
+
+Bring the orders-api spec in line with the design decisions:
+`/crav1-tighten-spec orders-api`

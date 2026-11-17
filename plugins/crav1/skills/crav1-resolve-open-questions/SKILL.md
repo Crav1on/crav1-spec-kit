@@ -31,6 +31,8 @@ Use the spec the user @-mentions. A branch, a pull request (`pr71`, `#71`), or w
 
 Read `spec.md` (`## Open questions`, `## Assumptions`, `## Constraints`, and `## Research findings` when that heading is there). Note `diagrams.md` and `adr/`.
 
+The architecture spec (1.181.0): `docs/architecture/spec.md` is a spec this skill can pick too, by name or when the user asks about architecture questions. Read its `## Open questions` the same way; `/crav1-design-architecture` copies still-open questions there at go-ahead. Never read `docs/architecture/designs/`; it is a design sandbox.
+
 ## Build the question list (no edits)
 
 Number `Q1`, `Q2`, … in document order, for display only (1.84.0): never write a `Q#` into a file. A `Q#: letter` answer maps to the question shown with that number, and the patch finds that question in `spec.md` by its words, as `crav1-add-to-spec` `references/merge-safe.md` says.

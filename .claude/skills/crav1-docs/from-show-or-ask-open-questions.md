@@ -6,6 +6,8 @@ Use this when the specs hold open questions that only someone else can answer: a
 
 This is not `/crav1-resolve-open-questions`. Resolve walks the questions with you and writes your decisions into the spec. This command drafts the questions for someone else and writes only the asked and pending marks.
 
+Since 1.181.0 it also reads the open questions in `docs/architecture/spec.md`, where `/crav1-design-architecture` copies still-open questions at go-ahead. Their asked and pending marks go under the question in that file. It never reads the design sandbox under `docs/architecture/designs/`.
+
 ## First prompt
 
 ```text

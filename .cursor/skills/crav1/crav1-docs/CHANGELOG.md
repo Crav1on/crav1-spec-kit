@@ -2,6 +2,16 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.181.0 (2026-11-17)
+
+A new preview skill, `/crav1-design-architecture`, works out an architecture change with you: systems, environments, hosting, data flows, integrations and deployment. It compares real options one decision at a time in a sandbox and copies the chosen design into the architecture spec only at go-ahead.
+
+- **New skill.** `/crav1-design-architecture` (cross-cutting, group Specify, preview). Idea text starts a topic; `resume`, `park`, `status`, `fan-out`, `stage-it`, `go-ahead`, `compare-topics` and `prepare` are the choice words, and each decision card uses `choose-a`, `choose-b`, `choose-c`, `choose-mine`, `discuss`, `add-my-idea`, `ask-me`, `to-question`, `to-research` and `skip-for-now`. Every option shows what changes, environments, cost, risks, fit with the drivers and what it reverses, with a reasoned recommendation first. Your own idea is its own option.
+- **Sandbox.** Work lives in `docs/architecture/designs/<topic>/` on a design branch: `goal.md`, one or more designs with draft ADRs, questions, draft diagrams and stages, and `compare.md` once a topic fans out. One-off cross-topic comparisons go under `_compare/` only when asked. No other skill reads the sandbox.
+- **Script.** `design_run.py` owns the folder format and every move, saves after each one (no cap per session), reopens a decision on resume when a source it relied on changed, and refuses writes outside the topic folder before go-ahead. A run without you may only prepare.
+- **Go-ahead.** The chosen design is reviewed for gaps against the goal, conflicts and missing decisions, then copied as one block under `## Decided, not built yet` in `docs/architecture/spec.md` with a "Designed in" link. Its ADRs are copied as accepted and numbered, still-open questions go into that spec, and the ending names pushing the design branch and opening its pull request before any planning.
+- **Open questions in the architecture spec.** `/crav1-show-or-ask-open-questions` and `/crav1-resolve-open-questions` also read `docs/architecture/spec.md`, and `/crav1-existing-to-specs` recheck moves parts of a Decided, not built yet block up to Confirmed once the code or the environment shows them.
+
 ## 1.180.0 (2026-11-17)
 
 Fixes from a live session review. One shared module now decides a task's state, the ready check no longer hides a merge deadlock or a built-and-waiting task, the merge list follows the plan, tighten-plan's ending names the ready check, and owner names are cleaned where they are stored. Snapshot spec folders and an invariant checker guard the ready check's output.
@@ -175,16 +185,5 @@ The ready check no longer says verify is behind right after a fresh verify, and 
 - **Ready branches always show.** Needs verify holds only its own task. With tasks that can start, the result is ready-partial and each ready branch keeps its block after the catch-up block and the `---` line. In 1.168.0 one failed task made the result not-ready and Run next kept only the catch-up block or the questions line. With nothing that can start the result stays not-ready. Questions that are not asked yet stay a `/crav1-show-or-ask-open-questions <slug>` entry after the branch blocks.
 - **No Next line in verify.md.** The verify template and the spec reviewer's copy drop the TL;DR `Next:` line; the chat reply's Run next names the next step (1.168.0). Older files that still have one read as above.
 - `walk_ending.catch_up_block()` takes `failed`; the readiness JSON's verify gap carries `failed`. The readiness, rules, verify-behind and tick-pending references, four walkthroughs, the glossary, data layout, run-ending and the skill pages show it. Tests: `scripts/tests/test_verify_current_1169.py`; the 1.135.0 test for a Next line over a verified row now expects it current.
-
-## 1.168.0 (2026-11-15)
-
-The verify reply gets the shared ending. A minor release because `/crav1-verify-build-against-spec` reads differently in chat; the live checks and `verify.md` are unchanged.
-
-- **Run next, not a Next line.** The next step is the reason once (`T6's four tests fail on stale asserts at the PR's tip.`), then the label on its own line (`Fix T6:`) and the command alone in its code span (`` `/crav1-fix-build-gaps <slug> T6` ``). The six case references (fix, build, plan, tighten, open a pull request, nothing needed) give that shape. Build what is left names `/crav1-build-walk <slug> T#` per ready branch, like the ready check.
-- **Catch up first.** What can be settled now leads Run next in the 1.167.0 layout: a plan note such as `T24 to T26 may belong to another slice` (`/crav1-tighten-plan <slug>`) and an uncommitted `verify.md` (`/crav1-finalize-commit`, then `git push`). That replaces the verify `Uncommitted:` line.
-- **A brief reply.** `Verify — <slug>`, a `Result:` line with the counts, one line per task whose state changed since the last verify (`T6 failed: ...`, `T44 row dropped: not in tasks.md`), Run next, Waiting for what you cannot act on now, and `Report: docs/specs/<slug>/verify.md`. The TL;DR, tables, per-task bullets and branch detail stay in `verify.md`. The word `full` shows the TL;DR and Tasks overview in chat.
-- **Fewer reads.** The skill names what it reads: spec, plan, tasks, the previous `verify.md`, and the reference a step names. It does not open `build-map.md`, `claims.md`, `walk-progress.md` or a log unless a step needs it.
-- One builder: `walk_ending.verify_reply()` with `verify_state()`, `verify_catch_up_block()` and `step_block()`, run as `walk_ending.py --verify <state file>`. The script reads the counts and changed tasks from `verify.md` against the committed copy, and the uncommitted files and ahead count from git; the skill passes only the steps, plan notes and waits. The verify skill ships a `scripts/walk_ending.py` wrapper and a new `references/reply.md`. SKILL.md is 1,413 words (was 1,416).
-- `run-ending.md`, the verify walkthrough and the skill pages show it. Tests: `scripts/tests/test_verify_ending_1168.py`.
 
 The newest 15 releases are above. The full changelog is https://github.com/Crav1on/crav1-spec-kit/blob/main/CHANGELOG.md.

@@ -53,7 +53,7 @@ Prompt budget: 2 for the question walk. On apply, the one confirm includes the p
 
 In short: Open questions, assumptions and Conflict lines in `spec.md`, and the playbook file on apply.
 
-Reads Open questions, unresolved assumptions and **Conflict:** lines in `spec.md`.
+Reads Open questions, unresolved assumptions and **Conflict:** lines in `spec.md`, including `docs/architecture/spec.md` since 1.181.0. It never reads `docs/architecture/designs/`.
 
 ## Writes
 
