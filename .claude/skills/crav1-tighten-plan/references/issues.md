@@ -38,7 +38,7 @@ If **no plan issues** remain, say so and print one Run next entry, its label on 
 
 - An open spec-tagged finding is a spec defect: Run next, "Fix the spec finding, which is a spec defect:" above `` `/crav1-tighten-spec <slug>` ``. A spec finding already patched, dropped or kept is settled and sends nobody back.
 - An open spec-tagged finding is an open question: Run next, "Resolve the spec finding, which is an open question:" above `` `/crav1-resolve-open-questions <slug>` ``.
-- None remain, and the plan names a linter or they chose to go on without one: Run next, "Build the tasks in a new chat, with plan.md, tasks.md and spec.md attached, since the plan issues are done:" above `` `/crav1-build-tasks <slug>` ``.
+- None remain, and the plan names a linter or they chose to go on without one: Run next, "Check what can be built, since the plan issues are done:" above `` `/crav1-tasks-ready-to-build <slug>` `` (1.180.0: never `/crav1-build-tasks`; the ready check knows about reopened steps and held tasks). With uncommitted files, "Commit the <n> changed spec files:" above `` `/crav1-finalize-commit` `` comes first, inside Run next.
 - No linter, and they have not chosen to go on: "Nothing needed now." Do not name build.
 
 When `## Linter` says this repo has no linter or checker for the code the tasks will touch, do not name those Build commands. Stop before Build. The user decides to add the linter or to go on without one. Do not install one. When they already chose to go on without one in this turn, the Build next step applies, and the plan still says none. A plan that already says none is not a `P#` by itself.

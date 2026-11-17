@@ -2348,6 +2348,11 @@ def classify(row: dict, resolve_kept: bool = False, resolve_recorded: bool = Fal
         hit = _hit(task, "blocker", "tighten-plan", LOOP_WHY)
         hit["loop"] = True
         return hit
+    if row.get("deadlock"):
+        # 1.180.0 (M4): a task that waits on its own PR's merge is Blocked.
+        hit = _hit(task, "blocker", "tighten-plan", row["deadlock"] + " Fix the order with /crav1-tighten-plan.")
+        hit["deadlock"] = True
+        return hit
     if row.get("merge_wait"):
         hit = _waiting(row)
         hit["merge"] = True
@@ -2369,6 +2374,9 @@ def classify(row: dict, resolve_kept: bool = False, resolve_recorded: bool = Fal
     # A task that depends on a held task is held too, even with no question
     # of its own (1.132.0). That is waiting, not a jump back.
     if "in progress by" in text:
+        return _waiting(row)
+    # Built by someone, waits for the PR to merge, is waiting (1.180.0, M5).
+    if row.get("claim_built") or task_state_mod().is_waiting_reason(text):
         return _waiting(row)
     if "held, waits on" in text:
         return _waiting(row)
@@ -2606,6 +2614,18 @@ def _and_list(items: list[str]) -> str:
     return ", ".join(items[:-1]) + " and " + items[-1]
 
 
+def reopen_titles(step: str, slugs: list[str], titles: list[str]) -> list[str]:
+    """Only sections that can reopen `step` are named (1.180.0, S1).
+
+    Match and In the code own no steps, so they never reopen tighten-spec
+    and are not named in its reason. With no slugs (Synced at only) the
+    titles stay as they are.
+    """
+    if not slugs:
+        return titles
+    return [section_title(slug) for slug in slugs if step in SECTION_STEPS.get(slug, (step,))]
+
+
 def reopen_reason(step: str, drift: list[str], titles: list[str] | None = None) -> str:
     """Why a step reopened, in one plain sentence (1.175.0).
 
@@ -2663,6 +2683,7 @@ def reopened_hits(root: Path) -> list[dict]:
             try:
                 effect = section_effect(root, data["steps"], own=body)
                 titles = list(effect.get("titles") or []) if effect.get("active") else []
+                titles = reopen_titles(step, effect.get("changed_slugs") or [], titles)
             except Exception:  # noqa: BLE001 - the reason is words only
                 titles = []
             hit["reason"] = reopen_reason(step, drift, titles)
@@ -3536,6 +3557,9 @@ def apply_built_claims(root: Path | None, rows: list[dict]) -> None:
         if row.get("bucket") == "done":
             continue
         row["claim_built"] = built[task]
+        # The same merge wait as a verified-on-branch row, so the hold spreads
+        # the same way whichever file mentioned it (1.180.0, M5).
+        row.setdefault("merge_wait", {"branch": built[task].get("branch"), "pr": built[task].get("pr"), "owner": "other"})
         row["reason"] = built_claim_phrase(row.get("who") or "", built[task].get("pr"))
 
 
@@ -3806,10 +3830,27 @@ def pr_author(root: Path | None, pr, text: str = "") -> str | None:
                     head = head.split("---", 2)[1] if head.count("---") >= 2 else ""
                     match = _NOTE_AUTHOR.search(head)
                     if match and match.group(1).strip():
-                        return match.group(1).strip()
+                        return task_state_mod().clean_name(match.group(1)) or None
             break
     match = _PR_AUTHOR.search(text or "")
-    return match.group(1).strip() if match else None
+    # Stored names are cleaned on read too (1.180.0, S8).
+    return (task_state_mod().clean_name(match.group(1)) or None) if match else None
+
+
+_TASK_STATE = None
+
+
+def task_state_mod():
+    """skill crav1-tasks-ready-to-build scripts/task_state.py, the one owner of a task's state (1.180.0)."""
+    global _TASK_STATE
+    if _TASK_STATE is None:
+        import importlib.util
+        path = Path(__file__).resolve().parents[2] / "crav1-tasks-ready-to-build" / "scripts" / "task_state.py"
+        spec = importlib.util.spec_from_file_location("task_state_wp", path)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        _TASK_STATE = mod
+    return _TASK_STATE
 
 
 _PR_COMMON = None
@@ -3978,7 +4019,8 @@ def record_pr_author(root: Path, number: int, name: str, branch: str | None = No
     line goes in the header only. With no file and a known branch, the
     branch's file is created. None when no file is found or several match.
     """
-    name = " ".join(str(name).split())
+    # Cleaned on write (1.180.0, S8): no `Admin` prefix, no `(...)` tag.
+    name = task_state_mod().clean_name(name)
     if not name:
         return None
     path, how, _cands = _progress_pick(Path(root), number, branch)
@@ -4031,7 +4073,7 @@ def known_people(root: Path | None, rows: list[dict] | None = None) -> list[str]
     names: list[str] = []
 
     def add(value) -> None:
-        name = " ".join(str(value or "").strip().strip("`'\"").split())
+        name = task_state_mod().clean_name(str(value or "").strip().strip("`'\""))
         if not name or name.lower() in _NOT_A_NAME:
             return
         try:
@@ -4372,7 +4414,10 @@ def sync_pr_states(root: Path | None, user: str | None = None) -> dict:
     host that cannot be read changes nothing; 1.179.0 lists it in
     `host_unread` with the reason ({pr, branch, host, error, detail}).
     """
-    out: dict = {"merged": [], "closed": [], "unhosted": [], "branches": {}, "host_unread": []}
+    out: dict = {"merged": [], "closed": [], "unhosted": [], "branches": {}, "host_unread": [], "files": []}
+    # 1.180.0 (S8): stored `PR author:` lines are cleaned once, and every
+    # file the check writes is named in its reply.
+    out["cleaned"] = clean_stored_authors(root)
     for pr, branch in sorted(waiting_prs(root, user).items()):
         out["branches"][pr] = branch
         got = host_pr_lookup(root, pr)
@@ -4388,16 +4433,72 @@ def sync_pr_states(root: Path | None, user: str | None = None) -> dict:
             # 1.178.0: the same lookup names who opened it; record it once.
             path = _progress_file_for(Path(root), pr, branch)
             text = path.read_text(encoding="utf-8", errors="replace") if path else ""
-            if not pr_author(root, pr, text) and record_pr_author(Path(root), pr, state["author"], branch):
-                out.setdefault("owners", {})[pr] = state["author"]
+            wrote = None if pr_author(root, pr, text) else record_pr_author(Path(root), pr, state["author"], branch)
+            if wrote:
+                out.setdefault("owners", {})[pr] = task_state_mod().clean_name(state["author"])
+                out["files"].append(Path(wrote).name)
         if state["state"] == "unhosted":
             out["unhosted"].append(pr)
         elif state["state"] == "merged":
             if record_pr_merged(Path(root), pr, state.get("sha"), state.get("date"), branch):
                 out["merged"].append(pr)
+                merged_file = _progress_file_for(Path(root), pr, branch)
+                if merged_file is not None:
+                    out["files"].append(Path(merged_file).name)
         elif state["state"] == "closed":
             out["closed"].append(pr)
     return out
+
+
+def clean_stored_authors(root: Path | None) -> list[str]:
+    """Rewrite stored `PR author:` / `Opened by:` lines with clean names (1.180.0, S8).
+
+    `PR author: Admin Person A` becomes `PR author: Person A` and
+    `PR author: Person B (Tag)` becomes `PR author: Person B`. Line endings
+    are kept. Returns the names of the files rewritten.
+    """
+    folder = Path(root) / "build-progress" if root is not None else None
+    if folder is None or not folder.is_dir():
+        return []
+    cleaned = []
+    for path in sorted(folder.glob("*.md")):
+        with open(path, encoding="utf-8", errors="replace", newline="") as handle:
+            raw = handle.read()
+
+        def fix(match: re.Match) -> str:
+            label, name, end = match.group(1), match.group(2), match.group(3)
+            return f"{label}{task_state_mod().clean_name(name)}{end}"
+
+        new = re.sub(r"(?mi)^((?:PR author|Opened by):[ \t]*)([^\r\n]*?)([ \t]*\r?)$", fix, raw)
+        if new != raw:
+            with open(path, "w", encoding="utf-8", newline="") as handle:
+                handle.write(new)
+            cleaned.append(path.name)
+    return cleaned
+
+
+def recorded_line(pr_state: dict | None) -> str | None:
+    """`Recorded: PR 71 merged; PR authors for PR 73 and PR 82 (in <files>).` (1.180.0, S8)."""
+    state = pr_state or {}
+    parts = []
+    merged = state.get("merged") or []
+    if merged:
+        parts.append(_prs_text(merged) + " merged")
+    owners = sorted((state.get("owners") or {}).keys())
+    if owners:
+        parts.append(("PR author for " if len(owners) == 1 else "PR authors for ") + _prs_text(owners))
+    if state.get("cleaned"):
+        parts.append("author names cleaned")
+    files = []
+    for name in list(state.get("files") or []) + list(state.get("cleaned") or []):
+        if name not in files:
+            files.append(name)
+    if not parts:
+        return None
+    line = "Recorded: " + "; ".join(parts)
+    if files:
+        line += " (in build-progress/" + ", build-progress/".join(files) + ")"
+    return line + "."
 
 
 def _prs_text(prs: list) -> str:
@@ -4590,6 +4691,47 @@ def _task_num(task: str) -> int:
     return int(match.group(1)) if match else 10**9
 
 
+_TASK_BRANCH_LINE = re.compile(r"^\s*[-*]\s*\[[ xX]\]\s*\**\s*(T\d+)\b.*?\(branch:\s*([^)]*)\)", re.M)
+
+
+def apply_task_branches(root: Path | None, rows: list[dict]) -> None:
+    """Each row's `(branch:)` from tasks.md as `task_branch` (1.180.0)."""
+    path = Path(root) / "tasks.md" if root is not None else None
+    if path is None or not path.is_file():
+        return
+    found = {f"T{int(m.group(1)[1:])}": m.group(2).strip().strip("`")
+             for m in _TASK_BRANCH_LINE.finditer(path.read_text(encoding="utf-8", errors="replace"))}
+    for row in rows:
+        if row.get("task") in found:
+            row.setdefault("task_branch", found[row["task"]])
+
+
+def apply_merge_deadlocks(rows: list[dict]) -> list[str]:
+    """Mark merge deadlocks Blocked (1.180.0, M4).
+
+    Task X is on branch B, whose PR n is open, and depends on task Y, whose
+    only way to done is PR n merging. X can never start, so it is Blocked,
+    not in progress. Returns the plain lines, one per task.
+    """
+    by_task = {row.get("task"): row for row in rows if row.get("task")}
+    lines = []
+    for row in rows:
+        task = row.get("task")
+        branch = row.get("task_branch")
+        if not task or not branch or row.get("bucket") == "done" or row.get("merge_wait"):
+            continue
+        for dep in row.get("deps") or []:
+            info = (by_task.get(dep) or {}).get("merge_wait") or {}
+            if info.get("pr") and info.get("branch") == branch and (by_task.get(dep) or {}).get("bucket") != "done":
+                text = task_state_mod().deadlock_text(task, dep, info["pr"], branch)
+                row["deadlock"] = text
+                row["bucket"] = "blocked"
+                row["reason"] = text
+                lines.append(text)
+                break
+    return lines
+
+
 def merge_order(rows: list[dict], prs: dict) -> list[dict]:
     """The PRs in merge order, each with what merging it unblocks (1.176.0).
 
@@ -4609,18 +4751,32 @@ def merge_order(rows: list[dict], prs: dict) -> list[dict]:
                 continue
             if "open question" in str(row.get("reason") or "") or row.get("claim") and not row.get("own_claim"):
                 continue
+            if row.get("deadlock"):
+                continue
             deps = [dep for dep in row.get("deps") or [] if dep]
             if deps and any(dep in merged for dep in deps) and all(dep in done or dep in merged for dep in deps):
                 out.add(task)
         return out
 
     needs: dict = {pr: set() for pr in prs}
+    open_waits: dict = {pr: [] for pr in prs}
     for pr, info in prs.items():
         for task in info["tasks"]:
             for dep in (by_task.get(task) or {}).get("deps") or []:
                 for other, oinfo in prs.items():
                     if other != pr and dep in oinfo["tasks"]:
                         needs[pr].add(other)
+        # 1.180.0 (M2): an unfinished task on the PR's own branch counts too.
+        # A branch with an open task that waits on another PR's task cannot
+        # merge first, and says why.
+        for task, row in by_task.items():
+            if task in info["tasks"] or task in done or row.get("task_branch") != info.get("branch"):
+                continue
+            for dep in row.get("deps") or []:
+                for other, oinfo in prs.items():
+                    if other != pr and dep in oinfo["tasks"]:
+                        needs[pr].add(other)
+                        open_waits[pr].append((task, dep, other))
     order: list[dict] = []
     merged: set[str] = set()
     left = set(prs)
@@ -4635,7 +4791,8 @@ def merge_order(rows: list[dict], prs: dict) -> list[dict]:
         pick = free[0]
         merged |= set(prs[pick]["tasks"])
         starts = sorted(startable(merged) - before, key=_task_num)
-        order.append({"pr": pick, **prs[pick], "ticks": sorted(prs[pick]["tasks"], key=_task_num), "starts": starts})
+        order.append({"pr": pick, **prs[pick], "ticks": sorted(prs[pick]["tasks"], key=_task_num), "starts": starts,
+                      "open_waits": sorted(open_waits[pick], key=lambda item: _task_num(item[0]))})
         left.discard(pick)
     return order
 
@@ -4665,6 +4822,9 @@ def merge_order_block(rows: list[dict], prs: dict) -> str:
         if item["starts"]:
             verb = "can" if len(item["starts"]) > 1 else "can"
             what += f", then {_ids_span(item['starts'])} {verb} start"
+        if item.get("open_waits"):
+            waits = ", ".join(f"{task} waits on {dep} (PR {other})" for task, dep, other in item["open_waits"])
+            what += f"; not ready to merge: {waits}"
         lines.append(f"{i}. PR {item['pr']} ({whose}, {item['branch']}): {what}.")
     return "\n".join(lines)
 
@@ -4860,6 +5020,10 @@ def ready_branches(root: Path) -> list[dict]:
             hits.append(hit)
             if hit["kind"] == "waiting":
                 row["bucket"] = "waiting"
+            elif str(hit.get("why") or "").startswith("Unrecognized blocker"):
+                # Never invisible (1.180.0, M5): counted as Blocked and printed.
+                row["bucket"] = "blocked"
+                row["unrecognized"] = True
     propagate_held(rows, hits)
     reopened, _replaced = _without_self_reopen(reopened_hits(root))
     hits.extend(reopened)
@@ -4980,6 +5144,13 @@ def propagate_held(rows: list[dict], hits: list[dict]) -> None:
                 text = f"held, waits on {deps[0]} ({tag})"
             else:
                 text = "held, waits on " + ", ".join(deps) + f" ({tag})"
+            # 1.180.0 (S6): every unfinished dependency is named, held ones
+            # first, then the ones not built yet.
+            by_id = {r.get("task"): r for r in rows if r.get("task")}
+            unbuilt = [dep for dep in row.get("deps") or []
+                       if dep and dep not in held and (by_id.get(dep) or {}).get("bucket") not in ("done", None)]
+            if unbuilt:
+                text += " and " + ", ".join(unbuilt) + " (not built)"
             row["bucket"] = "waiting"
             row["reason"] = text
             row["held"] = True
@@ -5595,10 +5766,13 @@ def _readiness(args: argparse.Namespace) -> None:
     else:
         fail("readiness", "pass --root <spec-folder>, or --json <rows file>")
     loop_lines: list[str] = []
+    deadlock_lines: list[str] = []
     if root is not None and root.is_dir():
+        apply_task_branches(root, rows)
         apply_progress_waits(root, rows)
         apply_verified_on_branch(root, rows)
         loop_lines = apply_loop_holds(root, rows)
+        deadlock_lines = apply_merge_deadlocks(rows)
     for row in rows:
         if not isinstance(row, dict):
             fail("readiness", "each row must be an object")
@@ -5611,6 +5785,10 @@ def _readiness(args: argparse.Namespace) -> None:
             hits.append(hit)
             if hit["kind"] == "waiting":
                 row["bucket"] = "waiting"
+            elif str(hit.get("why") or "").startswith("Unrecognized blocker"):
+                # Never invisible (1.180.0, M5): counted as Blocked and printed.
+                row["bucket"] = "blocked"
+                row["unrecognized"] = True
     propagate_held(rows, hits)
     reopened_raw = reopened_hits(root) if root is not None else []
     reopened, replaced = _without_self_reopen(reopened_raw)
@@ -5673,6 +5851,17 @@ def _readiness(args: argparse.Namespace) -> None:
     # What the user can fix now leads Run next as one block (1.167.0); the
     # Waiting lines keep only what waits on people or merges.
     host_unread = list(pr_state.get("host_unread") or [])
+    # 1.180.0 (S3): the map is written before the uncommitted files are
+    # counted, so a changed build-map.md is in the count.
+    map_write = None
+    if getattr(args, "write_map", False) and root is not None and root.is_dir():
+        map_path = root / "build-map.md"
+        map_before = map_path.read_text(encoding="utf-8") if map_path.is_file() else None
+        map_text, map_code = map_mod().run_dir(root)
+        if map_code:
+            fail("build-map", map_text or "could not write build-map.md")
+        map_after = map_path.read_text(encoding="utf-8") if map_path.is_file() else None
+        map_write = (map_path, map_text, map_before, map_after)
     catch_up = catch_up_for(slug, gap, sync, root, host_unread)
     waiting_bits = list(loop_lines)
     # 1.176.0: one ordered merge list replaces the per-PR Waiting lines.
@@ -5758,6 +5947,16 @@ def _readiness(args: argparse.Namespace) -> None:
         shown_run = [own_merge] + list(shown_run)
         if result not in ("ready", "ready-partial") and not catch_up:
             nxt = shown_run[0]
+    if deadlock_lines:
+        # 1.180.0 (M4): a merge deadlock leads Run next with the plan fix, and
+        # each one is printed, never shown as in progress.
+        fix = _run_entry(f"/crav1-tighten-plan {slug}".strip(), "",
+                         "Fix the merge deadlock in the plan, since no merge can untangle it:")
+        if fix not in shown_run:
+            shown_run = [fix] + list(shown_run)
+            if not catch_up:
+                nxt = shown_run[0]
+        waiting_bits = list(deadlock_lines) + [bit for bit in waiting_bits if bit not in deadlock_lines]
     ending = compose_ending(
         result, shown_run, held_lines, waiting_bits, shown_next, because, replaced, run_status,
         catch_up=catch_up,
@@ -5852,14 +6051,9 @@ def _readiness(args: argparse.Namespace) -> None:
     if built:
         out["rows"] = rows
         out["question_aliases"] = aliases
-    if getattr(args, "write_map", False) and root is not None and root.is_dir():
-        map_path = root / "build-map.md"
-        before = map_path.read_text(encoding="utf-8") if map_path.is_file() else None
-        text, code = map_mod().run_dir(root)
-        if code:
-            fail("build-map", text or "could not write build-map.md")
+    if map_write is not None:
+        map_path, text, before, after = map_write
         out["build_map"] = text.strip()
-        after = map_path.read_text(encoding="utf-8") if map_path.is_file() else None
         out["build_map_wrote"] = str(map_path) if after is not None else None
         # 1.177.2: say whether the write changed the map, so a no-op is not
         # mistaken for a failure.
@@ -5874,6 +6068,10 @@ def _readiness(args: argparse.Namespace) -> None:
         out["changed_questions"] = effect["changed_questions"]
         out["restamp_only"] = effect["restamp_only"]
     out["reply"] = reply_for(root, out)
+    recorded = recorded_line(pr_state)
+    if recorded:
+        out["recorded"] = recorded
+        out["reply"] = out["reply"].rstrip("\n") + "\n\n" + recorded
     _emit_readiness(args, out)
 
 

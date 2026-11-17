@@ -8,6 +8,8 @@
 
 Draft the commit message, then commit, copy, change, or stop.
 
+1.180.0: a task recorded merged on the host while `verify.md` says Not implemented is not a reason to recommend `stop`: name it, recommend `commit`, and put the verify step in Run next. The state comes from `task_state.py`.
+
 1.173.0: every ending, `commit`, `copy`, `stop` or a failed commit, is Run next or nothing, never a `Next:` line; a suggestion to throw an edit away is a plain sentence with the git command in a code span. A typed `commit` or `commit-now` still asks, with `stop` recommended, when the only changed files are kit-rewritten files (`build-map.md`, `walk-progress.md`, `build-progress/*`) whose values disagree with `verify.md` or `build-progress`, such as a done hash.
 
 1.171.0: every case ends with Run next, never a `Next:` line: `Push the specs repo:` with `git push`, `Push and open the pull request:` with [`/crav1-open-pr`](crav1-open-pr.md), or `Push to PR <n> and comment:` with [`/crav1-open-pr`](crav1-open-pr.md) pr<n>`.

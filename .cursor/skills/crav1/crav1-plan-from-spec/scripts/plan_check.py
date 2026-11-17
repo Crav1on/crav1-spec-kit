@@ -479,8 +479,15 @@ def _items(path: str) -> list[dict]:
     return sorted(data, key=lambda i: (int(re.sub(r"\D", "", str(i["id"])) or 0), str(i["id"])))
 
 
-def empty_queue_next(items: list[dict], linter_named: bool, went_on: bool, slug: str | None = None) -> str:
-    """Run next once no plan finding is open (1.176.0: open spec findings only)."""
+def empty_queue_next(items: list[dict], linter_named: bool, went_on: bool, slug: str | None = None,
+                     uncommitted: int | None = None) -> str:
+    """Run next once no plan finding is open (1.176.0: open spec findings only).
+
+    1.180.0 (M6): with the plan issues done, the next step is the ready
+    check, never /crav1-build-tasks: it knows about reopened steps, held
+    tasks and the first ready branch. Uncommitted files are committed first,
+    inside Run next.
+    """
     spec = [i for i in items if i["tag"] == "spec" and i.get("status", "open") not in SPEC_DONE]
     tail = f" {slug}" if slug else ""
     if any(str(i.get("kind", "defect")).lower() != "question" for i in spec):
@@ -488,8 +495,12 @@ def empty_queue_next(items: list[dict], linter_named: bool, went_on: bool, slug:
     if spec:
         return run_next("Resolve the spec finding, which is an open question:", f"/crav1-resolve-open-questions{tail}")
     if linter_named or went_on:
-        return (run_next("Build the tasks in a new chat, with plan.md, tasks.md and spec.md attached, since the plan issues are done:",
-                         f"/crav1-build-tasks{tail}"))
+        check = f"/crav1-tasks-ready-to-build{tail}"
+        if uncommitted:
+            noun = "file" if uncommitted == 1 else "files"
+            return (f"Run next:\n\nCommit the {uncommitted} changed spec {noun}:\n`/crav1-finalize-commit`\n"
+                    f"Then check what can be built, since the plan issues are done:\n`{check}`")
+        return run_next("Check what can be built, since the plan issues are done:", check)
     return "Nothing needed now."
 
 
@@ -522,8 +533,9 @@ def queue(items: list[dict], root: Path | None, went_on: bool, uncommitted: int 
         if not remaining:
             out.append("No plan issues remain.")
         out.append("")
-        out.append(empty_queue_next(items, named, went_on, root.name if root is not None else None))
-        if uncommitted:
+        nxt = empty_queue_next(items, named, went_on, root.name if root is not None else None, uncommitted)
+        out.append(nxt)
+        if uncommitted and "/crav1-finalize-commit" not in nxt:
             out.append(f"Uncommitted: {uncommitted} files; commit with /crav1-finalize-commit when ready.")
     return "\n".join(out) + "\n"
 

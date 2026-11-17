@@ -99,6 +99,7 @@ def _load(name):
 
 task_order = _load("task_order")
 question_blocks = _load("question_blocks")
+task_state = _load("task_state")
 
 STEP_LINE = re.compile(r"^(\d+)[.)]\s*(.*)$")
 TASK_ID = re.compile(r"\bT(\d+)\b")
@@ -2175,7 +2176,14 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text
             branch["held_on"] = []
             built = set((walk or {}).get("built") or ())
             pr = (walk or {}).get("pr")
-            if built and all(task_id in built for task_id in open_ids):
+            deadlock = merge_deadlock(branch["tasks"], built, pr) if walk and not walk.get("merged") else None
+            if deadlock:
+                # 1.180.0 (M4): an open task waits on a task that ticks only
+                # when this branch's own PR merges. Blocked, red on the map.
+                branch["status"] = "blocked"
+                branch["deadlock"] = deadlock
+                branch["held_text"] = deadlock
+            elif built and all(task_id in built for task_id in open_ids):
                 branch["held_text"] = f"built, waits for PR {pr} to merge" if pr else "built, waits for its pull request to merge"
             else:
                 branch["held_text"] = "in progress"
@@ -2584,7 +2592,22 @@ def _waits_line(branch, by_name):
     return "; ".join(parts) if parts else "none"
 
 
+def merge_deadlock(tasks, built, pr):
+    """`blocked, merge deadlock: T8 waits on T43, which ticks only when PR 73 merges` or None (1.180.0)."""
+    if not pr or not built:
+        return None
+    for task in tasks or ():
+        if task.get("done") or task["id"] in built:
+            continue
+        for dep in task.get("deps") or ():
+            if dep in built:
+                return "blocked, " + task_state.deadlock_text(f"T{task['id']}", f"T{dep}", pr).rstrip(".").replace("Merge", "merge", 1)
+    return None
+
+
 def _ready_now(branch):
+    if branch.get("deadlock"):
+        return branch["deadlock"]
     if branch.get("loop"):
         return "blocked, in a loop"
     if branch["status"] == "held":

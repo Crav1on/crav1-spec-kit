@@ -192,7 +192,14 @@ def main(argv: list[str] | None = None) -> int:
     st.add_argument("--branch")
     st.add_argument("--tip")
     st.add_argument("--yes", action="store_true")
+    tk = sub.add_parser("tick", help="offer or write the tick for a task recorded merged (1.180.0)")
+    tk.add_argument("--file", required=True)
+    tk.add_argument("--task", required=True)
+    tk.add_argument("--merged", choices=("yes", "no"), default="no")
+    tk.add_argument("--yes", action="store_true")
     args = parser.parse_args(argv)
+    if args.cmd == "tick":
+        return _out(tick(Path(args.file), args.task, args.merged == "yes", args.yes))
     path = Path(args.file)
     try:
         text = path.read_text(encoding="utf-8")
@@ -224,6 +231,46 @@ def main(argv: list[str] | None = None) -> int:
         wrote = True
     return _out({"ok": True, "wrote": wrote, "task": task, "status": args.status,
                  "line": f"Wrote the {task} row." if wrote else "Preview only. Add --yes to write the row."})
+
+
+def task_state_mod():
+    """skill crav1-tasks-ready-to-build scripts/task_state.py, the one owner of a task's state (1.180.0)."""
+    import importlib.util
+    path = Path(__file__).resolve().parents[2] / "crav1-tasks-ready-to-build" / "scripts" / "task_state.py"
+    spec = importlib.util.spec_from_file_location("task_state_vr", path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def tick(verify_path: Path, task: str, merged: bool, yes: bool) -> dict:
+    """The tick offer as a Run next entry, or the tick itself after a yes (1.180.0, M3)."""
+    task = "T" + str(int(re.sub(r"^[Tt]", "", task)))
+    tasks_path = verify_path.parent / "tasks.md"
+    try:
+        raw = tasks_path.read_bytes().decode("utf-8")
+    except OSError as exc:
+        return {"ok": False, "error": "tasks", "line": str(exc)}
+    line_re = re.compile(r"^(\s*[-*]\s*\[)([ xX])(\]\s*\**\s*" + task + r"\b)", re.M)
+    match = line_re.search(raw)
+    if not match:
+        return {"ok": False, "error": "task", "line": f"{task} has no task line in tasks.md."}
+    status = (overview_rows(verify_path.read_text(encoding="utf-8")).get(task) or ["", ""])[1]
+    state = task_state_mod().task_state(match.group(2).lower() == "x", merged, status)
+    slug = verify_path.parent.name
+    if not state["offer_tick"]:
+        return {"ok": True, "offer": False, "state": state["state"], "task": task, "line": f"{task} has no tick to offer."}
+    if state.get("verify_first"):
+        entry = f"Verify {task}, recorded merged on the host, before it is ticked:\n`/crav1-verify-build-against-spec {slug}`"
+        return {"ok": True, "offer": False, "state": state["state"], "task": task, "run_next": entry, "line": entry}
+    command = f"verify_rows.py tick --file docs/specs/{slug}/verify.md --task {task} --merged yes --yes"
+    entry = f"Tick {task} in tasks.md, recorded merged and verified:\n`{command}`"
+    if not yes:
+        return {"ok": True, "offer": True, "state": state["state"], "task": task, "run_next": entry, "line": entry}
+    new = raw[:match.start(2)] + "x" + raw[match.end(2):]
+    with open(tasks_path, "w", encoding="utf-8", newline="") as handle:
+        handle.write(new)
+    return {"ok": True, "offer": False, "wrote": True, "state": "done", "task": task, "line": f"Ticked {task} in tasks.md."}
 
 
 def _out(payload: dict) -> int:

@@ -172,7 +172,7 @@ class N2SettledSpecFinding(unittest.TestCase):
         items = [{"id": "P1", "issue": "x", "tag": "spec", "kind": "defect", "status": "patched"}]
         out = self.pc.empty_queue_next(items, True, False, "orders-api")
         self.assertNotIn("tighten-spec", out)
-        self.assertIn("`/crav1-build-tasks orders-api`", out)
+        self.assertIn("`/crav1-tasks-ready-to-build orders-api`", out)
 
     def test_open_spec_finding_uses_label_above_command(self):
         items = [{"id": "P1", "issue": "x", "tag": "spec", "kind": "defect", "status": "open"}]
@@ -223,7 +223,7 @@ class N5CommitBeforePush(unittest.TestCase):
     def test_uncommitted_files_come_before_the_push(self):
         we = load(WE, "walk_ending_1176_n5")
         text = we.catch_up_block("orders-api", [], [], 3, uncommitted=["spec.md", "plan.md", "tasks.md", "walk-progress.md", "build-map.md"])
-        self.assertIn("Commit the walk's changes, 5 files:\n`/crav1-finalize-commit`\nThen push the specs repo:\n`git push`", text)
+        self.assertIn("Commit the 5 changed spec files:\n`/crav1-finalize-commit`\nThen push the specs repo:\n`git push`", text)
         self.assertLess(text.index("/crav1-finalize-commit"), text.index("git push"))
 
     def test_slice_uncommitted_reads_git(self):

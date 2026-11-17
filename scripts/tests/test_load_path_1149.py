@@ -26,7 +26,7 @@ CASES = (
     ("crav1-verify-build-against-spec", "work-branches.md", "never fetch, never check out"),
     ("crav1-verify-build-against-spec", "sub-branches.md", "left behind"),
     ("crav1-verify-build-against-spec", "promotion.md", "not yet tagged"),
-    ("crav1-verify-build-against-spec", "tick-pending.md", "Say yes to tick"),
+    ("crav1-verify-build-against-spec", "tick-pending.md", "verify_rows.py tick"),
     ("crav1-verify-build-against-spec", "host-setup-task.md", "Verify never runs `apply`"),
     ("crav1-verify-build-against-spec", "next-fix.md", "crav1-fix-build-gaps"),
     ("crav1-verify-build-against-spec", "next-build.md", "crav1-build-tasks"),

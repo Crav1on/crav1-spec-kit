@@ -1,0 +1,33 @@
+Tasks ready to build — orders-api-merge-wait
+
+| Slice | Ready | Waiting | Waits in order | Blocked | Needs verify | Done |
+| --- | --- | --- | --- | --- | --- | --- |
+| orders-api-merge-wait | 0 | 4 | 0 | 0 | 1 | 0 |
+
+Result: not-ready
+
+Run next:
+
+Ask the PR owners to merge, in this order:
+- Person A: PR 11
+- Person B: PR 12
+
+Held:
+- `feat/orders-store` (wave 1):
+  - T2 Store a retried order once — waits for PR 11 to merge
+- `feat/orders-cicd` (wave 2):
+  - T3 Add the build pipeline — waits for PR 12 to merge
+  - T4 Take in develop after PR 11 merges — waits for PR 12 to merge
+- `feat/orders-deploy` (wave 3):
+  - T5 Add the deploy stage — held, waits on T3
+
+Merge these PRs, in this order:
+1. PR 11 (Person A's, you added T1, feat/orders-store): ticks T1 and T2.
+2. PR 12 (Person B's, you added T3, feat/orders-cicd): ticks T3 and T4, then T5 can start.
+
+Source: docs/specs/orders-api-merge-wait/spec.md, plan.md, tasks.md
+Build map: docs/specs/orders-api-merge-wait/build-map.md (updated)
+Zoom the map in your browser:
+`/crav1-tasks-ready-to-build orders-api-merge-wait open-map`
+
+Recorded: author names cleaned (in build-progress/feat--orders-cicd.md, build-progress/feat--orders-store.md).

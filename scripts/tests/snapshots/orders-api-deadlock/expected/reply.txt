@@ -1,0 +1,30 @@
+Tasks ready to build — orders-api-deadlock
+
+| Slice | Ready | Waiting | Waits in order | Blocked | Needs verify | Done |
+| --- | --- | --- | --- | --- | --- | --- |
+| orders-api-deadlock | 0 | 1 | 1 | 1 | 0 | 0 |
+
+Result: not-ready
+
+Run next:
+
+Fix the merge deadlock in the plan, since no merge can untangle it:
+`/crav1-tighten-plan orders-api-deadlock`
+
+---
+
+Ask the PR owners to merge, in this order:
+- Person A: PR 11
+
+Held:
+- `feat/orders-store` (wave 1):
+  - T1 Store a retried order once — waits for PR 11 to merge
+
+Merge deadlock: T2 is on feat/orders-store and waits on T1, which ticks only when PR 11 merges.
+Merge these PRs, in this order:
+1. PR 11 (Person A's, you added T1, feat/orders-store): ticks T1.
+
+Source: docs/specs/orders-api-deadlock/spec.md, plan.md, tasks.md
+Build map: docs/specs/orders-api-deadlock/build-map.md (updated)
+Zoom the map in your browser:
+`/crav1-tasks-ready-to-build orders-api-deadlock open-map`
