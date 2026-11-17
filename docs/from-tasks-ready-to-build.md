@@ -210,3 +210,5 @@ The run ends as [How a run ends](reference/run-ending.md) says: one Run next blo
 Since 1.182.0 a task already built on a branch that is not merged is never offered as startable, even when your own claim names it, and older progress files whose header lists only the first task still count every task a done build step names. Tasks that wait on it read `held, waits on PR 21 to merge (T47, recorded)`, and the merge list names only the tasks you claimed as `you added`.
 
 Since 1.183.0 `build-map.md` no longer starts with the sentences naming `open-map` and `export-map`; the heading is followed by the grouping line, such as `One branch per plan step.`, and then the diagram. `/crav1-tasks-ready-to-build <slug> open-map` and `export-map` work as before.
+
+Since 1.184.0 that also holds for older progress files whose second task's build step is a plain `build` with `done (T47: ...)` in its result: T47 is built and waits for the merge, the merge list says the pull request ticks both, and dependants wait on that merge.

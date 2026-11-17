@@ -2,6 +2,10 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.184.0 (2026-11-17)
+
+- **Older progress files with a second task.** Kits before 1.182.0 recorded a second task's build as a plain `- Step: build` with the task only in the result, such as `Result: done (T47: orders-api af772f5 on feat/orders-cicd, tests only)`, and the same for its verify, commit and comment steps. `task_state.py` now treats a done plain build step whose result starts `done (T<n>:` as that task built and waiting for the merge. The walk names every task on the branch (`T43 and T47 are pushed to PR 73 and wait for its merge`, and the Waiting line names both), adds the task to the header the next time it writes the file, the ready check does not offer it, the merge list says the pull request ticks both, and dependants wait on the merge. A snapshot covers this file shape.
+
 ## 1.183.0 (2026-11-17)
 
 - **A quieter build map.** `build-map.md` no longer shows the two sentences above the diagram that named `open-map` and `export-map`. The map starts with its heading and the grouping line, such as `One branch per plan step.` Both choice words still work and stay listed in the skill.
@@ -165,22 +169,5 @@ Walk tooling: the build walk reads its state from the files instead of hand-writ
 - **Fewer reference reads.** At `comment` or `wait-merge` the walk prints `lead` and `ending` straight from the script and reads no reference. The one-task build skips `tool-approvals.md` when `approvals: already-done` is passed. Review-pr reads `comment-as-posted.md` only when the PR note's draft has no posted section.
 - **Scoped verify.** `crav1-verify-build-against-spec/scripts/verify_rows.py scope` says which rows to verify again: a row whose branch or tip moved, a row with no recorded tip, or every row when spec.md, plan.md or tasks.md changed (a ticked checkbox does not count). The reply prints `kept_line`, such as `Kept from the last verify: T1, T3 (branch and tip unchanged).` `verify_rows.py set --task T# --status <status> --evidence <evidence> --branch <b> --tip <sha> --yes` writes one row, recounts the TL;DR and records the tip under `## Row tips`.
 - Tests: `scripts/tests/test_walk_tooling_1172.py` (mocked az output with cp1252 bytes).
-
-## 1.171.0 (2026-11-16)
-
-Fixes found on a real build session: the walk no longer offers a task that only waits on someone else's merge, task names and branch descriptions read cleanly, and the last skills that still printed a `Next:` line end with Run next. A minor release because the ready check, the build walk, the verify reply, fix-build-gaps, finalize-commit, open-pr and review-pr read differently.
-
-- **A task waiting on a merge is not offered.** The ready check reads `build-progress/<branch>.md`. A task whose branch's last step is `comment` or `wait-merge` is waiting (`Waiting: PR 71 to merge, then T5 is ticked.`), not in `can_start`, and tasks after it are held too. In `wait-merge` the build walk's ending has no entry for the current branch: the Waiting line says why, and Run next starts with the branches that can start. Before, `/crav1-build-walk <slug> T5` was offered again in the walk, the verify reply and the ready check, and only reprinted the wait.
-- **Your own claim in plain words.** `In progress by you: T5. Your own claim does not hold it.` is now `T5 is yours; the walk resumes it.`, or `T5 is yours and waits for PR 71's merge.` The readiness reference agrees with the claims reference.
-- **Full task names.** The ready branches in the readiness JSON carry the full task name, and the walk no longer strips the `...` of a shortened one, so a name never ends mid-phrase such as `metadata read from the`.
-- **Branch descriptions.** A plan note about how the branch was made (`The orders CI/CD branch, cut from develop after billing-ops.`) is no longer a description; the step heading or the open task names describe it. The description follows the open tasks, not a sentence about a task that is already done.
-- **One lead sentence.** `build_walk.py next` returns `lead`, one sentence from phase and owner, such as `T5 is pushed to PR 71 and waits for its merge.`, that agrees with the Uncommitted line. The walk prints only that before Run next, never `nothing to commit` above an Uncommitted line.
-- **No comma command.** Two or more tasks on one Run next entry use the branch form, `/crav1-build-walk <slug> <branch>`, with one task per line under it, never `T43, T8`.
-- **Re-reviews are new threads.** On Azure DevOps a re-review posts a new top-level thread, so it shows at the top of the pull request. It replies in an earlier thread only to answer a question asked there.
-- **Run next in review-pr, fix-build-gaps, finalize-commit and open-pr.** No `Next:` line is left in these skills. Review-pr ends with `Commit the PR note:` and `/crav1-finalize-commit`, then `git push`, and shows Uncommitted in chat. Fix-build-gaps is one lead sentence and a Catch up first block (commit, then push to the pull request) before verify. Finalize-commit ends with `git push`, `/crav1-open-pr` or `/crav1-open-pr pr<n>` under a label. Open-pr ends with a `git push` catch-up when the specs repo is ahead, then `/crav1-review-pr <repo> <n>`.
-- **The ready check's last reply is Run next.** The record card comes before the ending, so the final reply starts with Run next. When only the time or the verify version would change, `record_unchanged` is true, the card is skipped and `record` writes nothing (`Record unchanged.`).
-- **Verify reply branch blocks from the ready check.** With no hand-written steps, `walk_ending.py --verify` builds the branch blocks from the ready check (`ready_branch_blocks`): description, open tasks and the whole-branch entry, the same as the build walk.
-- **Other-owner verify status.** After a build on someone else's pull request passes and is pushed, the verify row says `Implemented, verified, tick pending`, not `Not implemented`.
-- Tests: `scripts/tests/test_endings_readiness_1171.py`; four older tests now expect the wait-merge ending and the new claim line.
 
 The newest 15 releases are above. The full changelog is https://github.com/Crav1on/crav1-spec-kit/blob/main/CHANGELOG.md.

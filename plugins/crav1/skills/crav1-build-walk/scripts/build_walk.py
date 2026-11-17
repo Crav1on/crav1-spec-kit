@@ -781,7 +781,15 @@ def _waiting_line(phase: str, state: dict, because: str) -> str:
     elif phase == "live-yes":
         text = f"your yes to run {tasks} live"
     elif phase == "wait-merge":
-        text = (f"{who} to merge {named}" if who else f"{named} to be merged") + f", then the tasks on {branch} are ticked"
+        ids = []
+        for item in state.get("tasks") or []:
+            try:
+                ids.append(_task_token(normalize_task(item)["id"]))
+            except InputError:
+                continue
+        # 1.184.0: every task on the branch is named once there are two.
+        ticked = (", ".join(ids[:-1]) + " and " + ids[-1] + f" on {branch} are ticked") if len(ids) > 1 else f"the tasks on {branch} are ticked"
+        text = (f"{who} to merge {named}" if who else f"{named} to be merged") + f", then {ticked}"
     else:
         text = because
     return f"Waiting: {text}."
@@ -843,6 +851,8 @@ def lead_for(phase: str, state: dict, uncommitted=None) -> str:
         text = f"The walk is on {branch}" + (" in other-owner mode" if owner == "other" else "")
     if len(tokens) > 1:
         text = text.replace(" is ", " are ", 1)
+        # 1.184.0: `T43 and T47 are pushed to PR 73 and wait for its merge`.
+        text = text.replace(" and waits for its merge", " and wait for its merge", 1)
     if uncommitted:
         text += "; some files are not committed yet"
     return text[0].upper() + text[1:] + "."
@@ -1148,7 +1158,19 @@ def _all_task_ids(text: str, tasks_field: str) -> list[str]:
         for task in build_step_tasks(match.group(1)) or []:
             if task not in ids:
                 ids.append(task)
+    # 1.184.0: a plain `build` step from an older kit names its task only in
+    # the result (`done (T47: ...)`); the shared task_state module reads it.
+    for task in _shared_progress_tasks(text):
+        if task not in ids:
+            ids.append(task)
     return ids
+
+
+def _shared_progress_tasks(text: str) -> list[str]:
+    try:
+        return list(map_mod().task_state.progress_tasks(text or "")["all"])
+    except Exception:  # noqa: BLE001 - the header and build T# steps still count
+        return []
 
 
 def read_progress(text: str) -> dict:
@@ -1338,6 +1360,9 @@ def cmd_progress(args: argparse.Namespace) -> int:
         if named:
             # 1.182.0: a build for a task the header does not list adds it.
             before = add_header_tasks(before, root, named)
+        # 1.184.0: a task an older kit's plain build step names only in its
+        # result is added to the header the next time the file is written.
+        before = add_header_tasks(before, root, _shared_progress_tasks(before))
         text = progress_record(before, root, args.step, args.result)
     wrote = False
     if args.yes:
