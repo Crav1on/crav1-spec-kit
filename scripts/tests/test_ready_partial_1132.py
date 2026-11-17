@@ -319,8 +319,8 @@ Reviewed: 2026-11-11, P# open: 0
         self.assertIn("## Wave 1:", body)
         self.assertIn("### feat/orders-retry", body)
         self.assertIn("### feat/orders-card", body)
-        self.assertIn("~~Persist the decision~~", body)
-        self.assertIn("~~Store the card~~", body)
+        self.assertIn("~~T1 Persist the decision~~", body)  # 1.185.0: from Tasks, Delivers is gone
+        self.assertIn("~~T2 Store the card~~", body)
         self.assertIn(", 2 done", body)
         outside = text.split("</details>", 1)[1]
         self.assertIn("### feat/cancel-booking-send-receipt", outside)
