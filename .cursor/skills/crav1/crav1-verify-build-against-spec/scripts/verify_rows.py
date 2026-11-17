@@ -10,7 +10,9 @@ since the last verify, a row with no recorded tip, or every row when the
 spec stamp (a hash of spec.md, plan.md and tasks.md, checkboxes ignored) changed. The
 rest are kept, and `kept_line` says which. `set` writes one overview row,
 recounts the TL;DR table, and records the row's branch and tip under
-`## Row tips`, so rows are not edited by hand. Nothing is written without
+`## Row tips`, so rows are not edited by hand. One row never moves the
+whole-file spec stamp (1.182.0); `--all-rows` on the last row of a full
+verify does. Nothing is written without
 `--yes`. Output is one JSON object; errors have `ok: false`.
 """
 from __future__ import annotations
@@ -27,8 +29,8 @@ sys.dont_write_bytecode = True
 STATUSES = (
     "Implemented, verified",
     "Implemented, verified, tick pending",
-    # 1.176.0: evidence passed on a work branch that is not merged yet. The row
-    # stays `[ ]`; it becomes tick pending once the merge is recorded.
+    # 1.176.0 wording for the same state, still read; 1.182.0 writes
+    # `Implemented, verified, tick pending` instead and rewrites it once.
     "Implemented, verified on branch",
     "Implemented, verify failed",
     "Not implemented",
@@ -191,6 +193,8 @@ def main(argv: list[str] | None = None) -> int:
     st.add_argument("--evidence", required=True)
     st.add_argument("--branch")
     st.add_argument("--tip")
+    st.add_argument("--all-rows", action="store_true",
+                    help="the last row of a full verify (every row rerun): moves the whole-file spec stamp (1.182.0)")
     st.add_argument("--yes", action="store_true")
     tk = sub.add_parser("tick", help="offer or write the tick for a task recorded merged (1.180.0)")
     tk.add_argument("--file", required=True)
@@ -214,14 +218,22 @@ def main(argv: list[str] | None = None) -> int:
         result = scope(text, current, args.stamp or spec_stamp(path.parent))
         result["ok"] = True
         return _out(result)
+    # 1.182.0: one wording for verified and waiting for the tick. The old
+    # on-branch wording is written as tick pending, and any old row in the
+    # file is rewritten once now that the file is touched.
+    status = task_state_mod().new_status(args.status)
+    text = task_state_mod().rewrite_old_status(text)
     try:
-        new = set_row(text, task, args.status, args.evidence)
+        new = set_row(text, task, status, args.evidence)
     except KeyError:
         return _out({"ok": False, "error": "task", "line": f"{task} has no row in the overview table."})
     if args.branch and args.tip:
         tips = read_tips(new)
         tips["rows"][task] = {"branch": args.branch, "tip": args.tip[:12]}
-        tips["stamp"] = spec_stamp(path.parent)
+        # 1.182.0: one row does not move the whole-file spec stamp. It is
+        # written only when the file has none yet; a full verify moves it.
+        if not tips.get("stamp") or args.all_rows:
+            tips["stamp"] = spec_stamp(path.parent)
         new = write_tips(new, tips)
     wrote = False
     if args.yes:
@@ -229,7 +241,7 @@ def main(argv: list[str] | None = None) -> int:
         ending = "\r\n" if b"\r\n" in path.read_bytes() else "\n"
         path.write_text(new, encoding="utf-8", newline=ending)
         wrote = True
-    return _out({"ok": True, "wrote": wrote, "task": task, "status": args.status,
+    return _out({"ok": True, "wrote": wrote, "task": task, "status": status,
                  "line": f"Wrote the {task} row." if wrote else "Preview only. Add --yes to write the row."})
 
 

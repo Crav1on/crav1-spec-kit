@@ -3503,6 +3503,7 @@ def apply_claims(root: Path | None, rows: list[dict], user: str | None = None, b
     if claims:
         claims_mod().apply_to_rows(rows, claims, user=user or _git_user(root), branch=branch)
         apply_built_claims(root, rows)
+    apply_built_tasks(root, rows)
     warnings = claims_mod().age_warnings(claims, loaded.get("max_age_days") or 3)
     return {"claims": claims, "warnings": warnings, "ids": claims_mod().claimed_ids(claims)}
 
@@ -3563,6 +3564,36 @@ def apply_built_claims(root: Path | None, rows: list[dict]) -> None:
         row["reason"] = built_claim_phrase(row.get("who") or "", built[task].get("pr"))
 
 
+def apply_built_tasks(root: Path | None, rows: list[dict]) -> None:
+    """A task already built on an unmerged branch is never startable (1.182.0).
+
+    A done `Step: build T#` in a build-progress file counts whatever the
+    header lists, so a second task added to a branch is built and waits for
+    that branch's pull request, like the first. Your own claim on it no
+    longer reads `T# is yours; the walk resumes it.`: it is waiting, held,
+    and the Waiting line or merge list names the pull request.
+    """
+    built = walk_built(root)
+    if not built:
+        return
+    for row in rows:
+        task = row.get("task")
+        if not task or task not in built or row.get("merge_wait"):
+            continue
+        if row.get("bucket") == "needs-verify" or task_state_mod().row_state(row) == task_state_mod().DONE:
+            continue
+        info = built[task]
+        row["bucket"] = "waiting"
+        row["held"] = True
+        row["walk_built"] = True
+        row["merge_wait"] = {"branch": info.get("branch"), "pr": info.get("pr"),
+                             "owner": "other" if row.get("claim") and not row.get("own_claim") else "self"}
+        if row.get("claim") and not row.get("own_claim") and row.get("who"):
+            row["reason"] = built_claim_phrase(row["who"], info.get("pr"))
+        else:
+            row["reason"] = merge_wait_phrase(info)
+
+
 _PR_HEADER = re.compile(r"^PR:\s*#?(\d+)\s*$", re.M | re.I)
 PR_OPEN_STEPS = ("open-pr",)
 
@@ -3621,6 +3652,11 @@ def progress_merge_waits(root: Path | None) -> dict:
         branch_line = re.search(r"^Branch:\s*(\S+)", head, re.M)
         owner_line = re.search(r"^Owner:\s*(\S+)", head, re.M)
         ids = re.findall(r"\bT(\d+)\b", tasks_line.group(1)) if tasks_line else []
+        # 1.182.0: a task a build step names waits too, even when an older
+        # header lists only the branch's first task.
+        for task in task_state_mod().progress_tasks(text)["all"]:
+            if task[1:] not in ids and str(int(task[1:])) not in ids:
+                ids.append(task[1:])
         # 1.179.0: the file's own PR (its header, open-pr step or merge-wait
         # step), not the last PR mentioned anywhere in it.
         pr = _file_pr(text)
@@ -3801,6 +3837,7 @@ def apply_progress_waits(root: Path | None, rows: list[dict]) -> dict:
             row["reason"] = built_claim_phrase(row["who"], waits[task].get("pr"))
         else:
             row["reason"] = merge_wait_phrase(waits[task])
+    apply_built_tasks(root, rows)
     return waits
 
 
@@ -4538,6 +4575,8 @@ def merged_walk_tasks(root: Path | None) -> set[str]:
             continue
         line = re.search(r"^Tasks:\s*(.*)$", head, re.M)
         out |= {f"T{int(n)}" for n in re.findall(r"\bT(\d+)\b", line.group(1))} if line else set()
+        # 1.182.0: and every task a build step names.
+        out |= set(task_state_mod().progress_tasks(text)["all"])
     return out
 
 
@@ -4651,7 +4690,10 @@ def open_prs(root: Path | None, user: str | None = None) -> dict:
         if author:
             entry["owner"] = "yours" if is_local(author) else author
             if entry["owner"] != "yours" and claimer == "yours":
+                # 1.182.0: only the tasks you claimed on that branch are the
+                # ones you added; the PR's own tasks are its author's.
                 entry["added"] = list(entry["tasks"])
+                entry["claimed"] = list(walk_owner(root, entry.get("branch") or "", text).get("tasks") or [])
         elif claimer == "yours":
             entry["owner"] = "owner not recorded"
         else:
@@ -4683,6 +4725,11 @@ def open_prs(root: Path | None, user: str | None = None) -> dict:
             log = Path(root) / "build-progress" / f"{branch.replace('/', '--')}.md"
             text = log.read_text(encoding="utf-8") if log.is_file() else ""
             settle(entry, pr, text, "yours" if info["own"] else (name or "someone else"))
+    for entry in out.values():
+        claimed = entry.pop("claimed", None)
+        mine = [task for task in claimed or [] if task in entry["tasks"]]
+        if "added" in entry and mine:
+            entry["added"] = mine
     return out
 
 
@@ -4920,13 +4967,15 @@ ON_BRANCH = "implemented, verified on branch"
 
 
 def verified_on_branch(root: Path | None) -> set[str]:
-    """T#s whose verify.md row says `Implemented, verified on branch` (1.176.0)."""
+    """T#s whose verify.md row says `Implemented, verified, tick pending`, or the old `Implemented, verified on branch` (1.176.0, 1.182.0)."""
     out: set[str] = set()
     if root is None or not (Path(root) / "verify.md").is_file():
         return out
     for line in (Path(root) / "verify.md").read_text(encoding="utf-8").splitlines():
         cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
-        if len(cells) >= 3 and re.fullmatch(r"T\d+", cells[0]) and cells[2].lower().startswith(ON_BRANCH):
+        # 1.182.0: `Implemented, verified, tick pending` is the same state;
+        # it waits here only while its branch's walk is not merged.
+        if len(cells) >= 3 and re.fullmatch(r"T\d+", cells[0]) and task_state_mod().is_waiting_status(cells[2]):
             out.add(cells[0])
     return out
 
@@ -5144,7 +5193,15 @@ def propagate_held(rows: list[dict], hits: list[dict]) -> None:
             if not deps:
                 continue
             tag = "recorded" if row.get("dep_recorded") else "inferred"
-            if len(deps) == 1:
+            by_dep = {r.get("task"): r for r in rows if r.get("task")}
+            merge_prs = {((by_dep.get(dep) or {}).get("merge_wait") or {}).get("pr") for dep in deps}
+            if all((by_dep.get(dep) or {}).get("merge_wait") for dep in deps) and len(merge_prs) == 1:
+                # 1.182.0: a task waiting on a built task waits on that
+                # task's pull request, not on the task.
+                pr = merge_prs.pop()
+                named = f"PR {pr}" if pr else "its pull request"
+                text = f"held, waits on {named} to merge ({', '.join(deps)}, {tag})"
+            elif len(deps) == 1:
                 text = f"held, waits on {deps[0]} ({tag})"
             else:
                 text = "held, waits on " + ", ".join(deps) + f" ({tag})"

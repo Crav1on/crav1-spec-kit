@@ -10,7 +10,6 @@ Date:
 | --- | --- | --- |
 | Implemented, verified | 0 | |
 | Implemented, verified, tick pending | 0 | |
-| Implemented, verified on branch | 0 | |
 | Implemented, verify failed | 0 | |
 | Not implemented | 0 | |
 | Claimed done, unverified | 0 | |

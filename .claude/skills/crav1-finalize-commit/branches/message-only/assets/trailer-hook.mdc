@@ -4,7 +4,7 @@ This file was written by `/crav1-finalize-commit` when you answered **Strip tool
 
 Answer: ANSWER
 
-- `yes`: `.githooks/commit-msg` strips the known tool trailers (Cursor, Claude Code, Anthropic) on every commit. Each person turns it on once with `git config core.hooksPath .githooks`; finalize-commit runs that line for anyone whose config is missing. Human `Co-authored-by` lines stay.
+- `yes`: `.githooks/commit-msg` strips the known tool trailers (Cursor, Claude Code, Anthropic) on every commit. Each person turns it on once with `git config core.hooksPath .githooks`; finalize-commit offers that line on its card (`turn-on-hook` / `skip-hook`) for anyone whose config is missing, and runs it only on `turn-on-hook`. Human `Co-authored-by` lines stay.
 - `no`: finalize-commit does not ask again.
 
 **To get the question again:** delete this file. Claude Code project: `.claude/rules/trailer-hook.md`. Claude Code user: `~/.claude/rules/trailer-hook.md`.

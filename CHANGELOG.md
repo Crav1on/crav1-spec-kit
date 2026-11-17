@@ -2,6 +2,17 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.182.0 (2026-11-17)
+
+Fixes from a live build walk: a second task on someone else's pull request branch is recorded and counted everywhere, Azure DevOps thread posts find their repository, one verify wording for verified-and-waiting, and the walk asks before it fast-forwards a branch or sets a commit hook.
+
+- **A second task on an existing branch.** `build_walk.py progress record` refused `--step 'build T47'` on a progress file whose header listed only T43. It now accepts `build <task>` for any task and adds a task the header does not list to its `Tasks:` line. `task_state.py` counts any done build step naming a task as built and waiting for the merge, whatever the header says, so older files work too. The walk's lead and ending name both tasks, the ready check no longer offers an already-built task or says `T47 is yours; the walk resumes it.`, the merge list says the pull request ticks both, tasks that wait on it read `held, waits on PR 71 to merge (T47, recorded)`, and the build map counts both. A snapshot spec folder covers a second task added to another person's pull request branch.
+- **Thread posts find the repository.** `ado_threads.py` reads the organization, project and repository from the code repo's git remote (`--code-repo`, default the current folder), so `post` no longer returns 404 without `--org`, `--project` and `--repo`. The flags still override.
+- **One wording for verified and waiting.** `Implemented, verified on branch` and `Implemented, verified, tick pending` were the same state. Only `Implemented, verified, tick pending` is written now; `verify_rows.py set` rewrites an old row once when it touches the file, and `task_state.py` and the ready check read both.
+- **One verify row keeps the spec stamp.** Writing one row with `verify_rows.py set` moved the whole-file `Spec stamp:`, so other rows looked verified against a spec they were not checked against. One row now leaves it; `--all-rows` on the last row of a full verify moves it.
+- **Fast-forward is a choice.** Before building, the walk runs `repo_sync.py code-behind --repo <code repo>`. A code branch behind origin gets a card, `fast-forward` or `stop`, and is fast-forwarded only after `fast-forward`. A diverged branch stops with the merge in Run next, never a rebase.
+- **The commit hook is asked, not set.** A teammate whose repo has `.githooks/commit-msg` but no `core.hooksPath` gets `turn-on-hook` / `skip-hook` in finalize-commit's choices prompt instead of a silent `git config core.hooksPath .githooks`, and the `strip-trailers` option names that line on the card.
+
 ## 1.181.0 (2026-11-17)
 
 A new preview skill, `/crav1-design-architecture`, works out an architecture change with you: systems, environments, hosting, data flows, integrations and deployment. It compares real options one decision at a time in a sandbox and copies the chosen design into the architecture spec only at go-ahead.

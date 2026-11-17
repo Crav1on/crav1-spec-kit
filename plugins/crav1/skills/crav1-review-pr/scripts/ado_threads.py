@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
 """List, compare and post Azure DevOps pull-request threads (1.172.0).
 
-    ado_threads.py list    --pr N [--project P] [--repo R] [--org URL]
+    ado_threads.py list    --pr N [--project P] [--repo R] [--org URL] [--code-repo <path>]
     ado_threads.py compare --pr N --draft <file>
     ado_threads.py post    --pr N --file <file> [--yes]
+
+Organization, project and repository come from the code repo's git remote
+(`--code-repo`, default the current folder), the same read the host lookup
+uses (1.182.0), so a post does not 404 for want of them. `--org`,
+`--project` and `--repo` still override each one.
 
 It reads `az ... -o json` from stdout as bytes, never through a shell
 redirect, and decodes UTF-8 first, then UTF-8 with a BOM, then cp1252, so a
@@ -64,6 +69,52 @@ def run_az(args: list[str]) -> bytes:
     if done.returncode != 0:
         raise RuntimeError(decode(done.stderr or b"").strip() or f"az exited {done.returncode}")
     return done.stdout
+
+
+import re
+
+AZURE_REMOTE = re.compile(
+    r"(?:dev\.azure\.com[:/](?:v3/)?(?P<org>[^/]+)|(?P<org2>[^./@]+)\.visualstudio\.com(?::v3)?)"
+    r"/(?P<project>[^/]+)/(?:_git/)?(?P<repo>[^/]+?)(?:\.git)?/?$",
+    re.I,
+)
+
+
+def remote_url(code_repo: str | None) -> str | None:
+    """The code repo's git remote: origin, else its only remote. Tests replace this."""
+    where = code_repo or "."
+
+    def git(*args: str) -> str | None:
+        try:
+            done = subprocess.run(["git", "-C", where, *args], capture_output=True, timeout=15)
+        except (OSError, subprocess.SubprocessError):
+            return None
+        return decode(done.stdout).strip() if done.returncode == 0 else None
+
+    url = git("remote", "get-url", "origin")
+    if url:
+        return url
+    names = (git("remote") or "").split()
+    return git("remote", "get-url", names[0]) if len(names) == 1 else None
+
+
+def remote_route(url: str | None) -> dict:
+    """{"org": URL, "project", "repo"} from an Azure DevOps remote, else {} (1.182.0)."""
+    match = AZURE_REMOTE.search((url or "").strip())
+    if not match:
+        return {}
+    org = match.group("org") or match.group("org2")
+    return {"org": f"https://dev.azure.com/{org}", "project": match.group("project"), "repo": match.group("repo")}
+
+
+def fill_route(args) -> None:
+    """Fill a missing --org, --project or --repo from the git remote; flags win (1.182.0)."""
+    if getattr(args, "from_file", None) or (args.org and args.project and args.repo):
+        return
+    found = remote_route(remote_url(getattr(args, "code_repo", None)))
+    for key in ("org", "project", "repo"):
+        if not getattr(args, key, None) and found.get(key):
+            setattr(args, key, found[key])
 
 
 def _route(args) -> list[str]:
@@ -174,6 +225,7 @@ def _common(p) -> None:
     p.add_argument("--project")
     p.add_argument("--repo")
     p.add_argument("--org")
+    p.add_argument("--code-repo", default=".", help="the code repo whose git remote names org, project and repo")
     p.add_argument("--from-file")
 
 
@@ -190,6 +242,7 @@ def main(argv: list[str] | None = None) -> int:
     for p in (lst, cmp_, pst):
         _common(p)
     args = parser.parse_args(argv)
+    fill_route(args)
     try:
         result = {"list": cmd_list, "compare": cmd_compare, "post": cmd_post}[args.cmd](args)
     except (OSError, RuntimeError, json.JSONDecodeError) as exc:

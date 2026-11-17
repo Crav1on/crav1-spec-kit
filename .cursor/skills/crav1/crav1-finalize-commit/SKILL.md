@@ -59,7 +59,7 @@ Without a questions tool, use numbered lists, one per question, then end with `R
 
 Never call the questions tool (or any blocking choice UI) before step 2.
 
-Trailer hook (1.90.0): when no answer is saved and `.githooks/commit-msg` is missing or not turned on, the same prompt adds `Strip tool trailers on every commit for this repo?` (`strip-trailers` / `keep-trailers`), asked once per repo. Read [references/trailer-hook.md](references/trailer-hook.md) ("When to ask") only then, and when a teammate has the hook but `core.hooksPath` is not `.githooks`. A reply that names neither word (for example only `commit`) leaves it unanswered: install no hook, save no answer, and ask again next run; never apply the Recommended pick on its own. A teammate with the hook but no config gets the config line without a question.
+Trailer hook (1.90.0): when no answer is saved and `.githooks/commit-msg` is missing or not turned on, the same prompt adds `Strip tool trailers on every commit for this repo?` (`strip-trailers` / `keep-trailers`), asked once per repo. Read [references/trailer-hook.md](references/trailer-hook.md) ("When to ask") only then, and when a teammate has the hook but `core.hooksPath` is not `.githooks`. A reply that names neither word (for example only `commit`) leaves it unanswered: install no hook, save no answer, and ask again next run; never apply the Recommended pick on its own. A teammate with the hook but no config is asked `turn-on-hook` / `skip-hook` in that prompt; `core.hooksPath` is never set silently (1.182.0).
 
 | Id | Choice | What it does |
 | --- | --- | --- |

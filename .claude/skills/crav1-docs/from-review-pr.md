@@ -252,3 +252,5 @@ It diffs from the base with local git only, never fetching. The base comes from 
 The checks are those of a pull request review: spec, plan, `verify.md`, the secret rule, `F#` findings and suggestions. The body, the checks, the comment record and posting are skipped, and it says so once. The verdict stays in the chat. Nothing is checked out, committed, pushed or posted. When the base moved on, it suggests merging the base into the branch, never a rebase.
 
 The run ends as [How a run ends](reference/run-ending.md) says: Run next, never a `Next:` line (1.171.0). While the PR note is uncommitted, Run next is `Commit the PR note:` with `/crav1-finalize-commit`, then `Then push the specs repo:` with `git push`, each command alone in its code span. `Waiting:` only when a step is blocked, and `Uncommitted:` in chat when files changed and are not committed.
+
+Since 1.182.0 `ado_threads.py` takes the Azure DevOps organization, project and repository from the code repo's git remote, so posting the review thread no longer fails with 404 when they are not passed. `--org`, `--project` and `--repo` still override.

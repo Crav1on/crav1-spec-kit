@@ -38,6 +38,8 @@ Fetch, pull and check (1.81.0, 1.123.0): after the commit it fetches. When the b
 
 1.139.0: a conflict in `docs/specs/<slug>/walk-progress.md` whose every hunk is only a version line (`Spec version`, `Plan version`, `Tasks version`, `Verify version`, `Spec body`, `Questions version`, `Kept questions`, `Section stamps`, `Question ids`, `Content stamp`, `Key`, or `Playbook:`) is settled by `walk_progress.py resolve-stamps --root <spec-folder> --yes`. The script takes the upstream text. It rewrites a hash to the merged file's normalized hash only when at least one side's recorded hash matches that side's file and every matching side differs from the merge only by progress (line endings, and for spec and tasks a checkbox or a `(PR n)` or `(done)` mark). Otherwise the upstream hash stays, so a real edit still reopens the steps it affects. `Done` and `Result` stay. The file is staged into the merge commit. A hunk that touches `Done`, `Result`, or any other recorded line is not rewritten. The run shows which hunks are stamp-only and offers `settle stamps`. It does not push.
 
+1.182.0: a teammate with `.githooks/commit-msg` but no `core.hooksPath` is asked `turn-on-hook` / `skip-hook` in the same choices prompt; the config is never set silently, and the `strip-trailers` option names the `git config core.hooksPath .githooks` line it runs.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.

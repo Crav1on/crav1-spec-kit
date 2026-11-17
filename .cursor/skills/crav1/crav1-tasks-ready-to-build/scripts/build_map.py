@@ -1668,6 +1668,10 @@ def progress_shas(directory):
                     merge_sha = picked
                 elif other_sha is None:
                     other_sha = picked
+        # 1.182.0: a task a build step names counts too, header or not.
+        for extra in task_state.progress_tasks(text)["all"]:
+            if int(extra[1:]) not in ids:
+                ids.append(int(extra[1:]))
         for sha, wrap in ((merge_sha, lambda key: key), (other_sha, lambda key: ("tick", key))):
             if not sha:
                 continue
@@ -1682,7 +1686,8 @@ def progress_state(directory):
     """Each branch's walk from build-progress/*.md, as {branch: state} (1.174.0).
 
     A state is {"built": {task ids}, "pr": number or None, "merged": bool,
-    "tasks": {ids on the header's Tasks: line}, "failed": bool} (tasks:
+    "tasks": {ids on the header's Tasks: line, plus any task a build step
+    names (1.182.0)}, "failed": bool} (tasks:
     1.177.2). `failed` (1.178.0) is true when a step's last `Result:` is
     failed or reopened (a failed check, a reopened step), so the map's box
     turns red.
@@ -1723,6 +1728,11 @@ def progress_state(directory):
                     built.update(int(n) for n in re.findall(r"\bt(\d+)\b", step))
                 elif step.startswith("merge-pr"):
                     merged = True
+        # 1.182.0: any build step naming a task makes it built (waiting for
+        # the merge) and one of the branch's tasks, whatever the header lists.
+        named = task_state.progress_tasks(text)
+        built.update(int(task[1:]) for task in named["built"])
+        listed.update(int(task[1:]) for task in named["all"])
         prs = re.findall(r"\b(?:PR|pull request)\s+#?(\d+)", text, re.I)
         key = branch or path.stem.replace("--", "/")
         failed = any(value == "failed" for value in last_result.values())

@@ -34,6 +34,8 @@ Reads one named open pull request. When the slug has `plan.md`, spec, plan, `ver
 
 1.98.0: a format A description from [`/crav1-open-pr`](crav1-open-pr.md) is compared with the diff bullet by bullet (each Changes bullet against the lines it links, each change against a bullet), and a choice a bullet's why calls deliberate, or that Not in this PR names as left out, is not raised as a fault unless the repo says otherwise.
 
+1.182.0: `ado_threads.py` reads the organization, project and repository from the code repo's git remote (`--code-repo`, default the current folder), so `post` no longer returns 404 without `--org`, `--project` and `--repo`; those flags still override.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
