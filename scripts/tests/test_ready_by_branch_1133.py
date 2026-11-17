@@ -254,8 +254,8 @@ Reviewed: 2026-11-11, P# open: 0
 """
         work = "Work item: 44 — task: T5 orders-api: require pipeline 6 as build validation (ADO: example/orders)\n"
         text = self.bm.build("orders-api", spec, plan, tasks, work, verify)["markdown"]
-        self.assertIn("- Tasks: ~~T1 Persist the decision~~ ✓ done ([PR 12](https://github.com/contoso/orders-api/pull/12))", text)
-        self.assertIn("- Tasks: T5 orders-api: require pipeline 6 as build validation", text)
+        self.assertIn("- Tasks:\n  - ~~T1 Persist the decision~~ ✓ done ([PR 12](https://github.com/contoso/orders-api/pull/12))", text)
+        self.assertIn("- Tasks:\n  - T5 orders-api: require pipeline 6 as build validation", text)
         delivers = "\n".join(line for line in text.splitlines() if line.startswith("- Delivers:"))
         self.assertNotIn("T1", delivers)
         self.assertNotIn("T5", delivers)

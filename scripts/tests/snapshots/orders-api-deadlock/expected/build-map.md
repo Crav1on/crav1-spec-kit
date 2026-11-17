@@ -41,9 +41,10 @@ An arrow means the later branch waits for the earlier one.
 
 ### feat/orders-cicd
 
-- Delivers: Add the build pipeline
-- Tasks: T3 Add the build pipeline
-- Waits for: feat/orders-store
+- Tasks:
+  - T3 Add the build pipeline
+- Waits for:
+  - feat/orders-store
 - Question: none
 - Ready now: waits in order
 
@@ -51,8 +52,9 @@ An arrow means the later branch waits for the earlier one.
 
 ### feat/orders-store
 
-- Delivers: Store a retried order once; Take in develop, resolve conflicts and merge PR 11
-- Tasks: T1 Store a retried order once; T2 Take in develop, resolve conflicts and merge PR 11
+- Tasks:
+  - T1 Store a retried order once
+  - T2 Take in develop, resolve conflicts and merge PR 11
 - Waits for: none
 - Question: none
 - Ready now: blocked, merge deadlock: T2 waits on T1, which ticks only when PR 11 merges

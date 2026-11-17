@@ -2254,7 +2254,8 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text
             if branch["name"] in step["body"] and step["body"] not in bits:
                 bits.append(step["body"])
         # The plan step is the branch's own description. Without one, the
-        # row's Delivers text is all there is.
+        # branch's task names are all there is (no longer shown as Delivers
+        # in the map since 1.185.0).
         desc[branch["name"]] = " ".join(bits) or branch["deliver"]
     number = 1
     for group in loops:
@@ -2613,12 +2614,25 @@ def _question_line(questions, names=None):
     return "; ".join(parts)
 
 
-def _waits_line(branch, by_name):
+def _waits_items(branch, by_name):
+    """The branches this one waits for, in task order (1.185.0: one per sub-bullet)."""
     ordered = sorted(branch["waits"], key=lambda name: (by_name[name]["tasks"][0]["id"], name))
     parts = list(ordered)
     if branch["unknown"]:
         parts.append(UNKNOWN_DEP)
+    return parts
+
+
+def _waits_line(branch, by_name):
+    parts = _waits_items(branch, by_name)
     return "; ".join(parts) if parts else "none"
+
+
+def _list_bullet(label, items, empty="none"):
+    """`- Label:` with one nested sub-bullet per item, or one line when empty (1.185.0)."""
+    if not items:
+        return [f"- {label}: {empty}"]
+    return [f"- {label}:"] + [f"  - {item}" for item in items]
 
 
 def merge_deadlock(tasks, built, pr):
@@ -2760,13 +2774,12 @@ def waits_label(branch):
 
 
 def _branch_block(branch, by_name, names=None):
-    titles = "; ".join(branch.get("task_names") or []) or "work"
-    lines = [
-        f"### {branch['name']}",
-        "",
-        f"- Delivers: {branch['deliver']}",
-        f"- Tasks: {titles}",
-        f"- {waits_label(branch)}: {_waits_line(branch, by_name)}",
+    # 1.185.0: list bullets nest one item per sub-bullet instead of joining
+    # with "; ", and Delivers is gone: Tasks (with task ids) is the one list.
+    lines = [f"### {branch['name']}", ""]
+    lines += _list_bullet("Tasks", list(branch.get("task_names") or []), empty="work")
+    lines += _list_bullet(waits_label(branch), _waits_items(branch, by_name))
+    lines += [
         f"- Question: {_question_line(branch['questions'], names)}",
         f"- Ready now: {_ready_now(branch)}",
     ]

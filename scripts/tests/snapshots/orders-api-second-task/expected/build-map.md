@@ -41,8 +41,9 @@ An arrow means the later branch waits for the earlier one.
 
 ### feat/orders-cicd
 
-- Delivers: Add the build pipeline; Add the deploy stage
-- Tasks: T43 Add the build pipeline; T47 Add the deploy stage
+- Tasks:
+  - T43 Add the build pipeline
+  - T47 Add the deploy stage
 - Waits for: none
 - Question: none
 - Ready now: built, waits for PR 21 to merge
@@ -51,8 +52,9 @@ An arrow means the later branch waits for the earlier one.
 
 ### feat/orders-smoke
 
-- Delivers: Add smoke tests
-- Tasks: T48 Add smoke tests
-- Waits for: feat/orders-cicd
+- Tasks:
+  - T48 Add smoke tests
+- Waits for:
+  - feat/orders-cicd
 - Question: none
 - Ready now: held, waits on feat/orders-cicd

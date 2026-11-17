@@ -51,8 +51,8 @@ An arrow means the later branch waits for the earlier one.
 
 ### feat/orders-store
 
-- Delivers: ~~Store a retried order once~~ ✓ done (feat/orders-store)
-- Tasks: ~~T1 Store a retried order once~~ ✓ done (feat/orders-store)
+- Tasks:
+  - ~~T1 Store a retried order once~~ ✓ done (feat/orders-store)
 - Waited for: none
 - Question: none
 - Ready now: done
@@ -63,9 +63,10 @@ An arrow means the later branch waits for the earlier one.
 
 ### feat/orders-cicd
 
-- Delivers: Add the build pipeline
-- Tasks: T2 Add the build pipeline
-- Waits for: feat/orders-store
+- Tasks:
+  - T2 Add the build pipeline
+- Waits for:
+  - feat/orders-store
 - Question: none
 - Ready now: built, waits for PR 12 to merge
 
@@ -73,8 +74,9 @@ An arrow means the later branch waits for the earlier one.
 
 ### feat/orders-deploy
 
-- Delivers: Add the deploy stage
-- Tasks: T3 Add the deploy stage
-- Waits for: feat/orders-cicd
+- Tasks:
+  - T3 Add the deploy stage
+- Waits for:
+  - feat/orders-cicd
 - Question: none
 - Ready now: held, waits on feat/orders-cicd

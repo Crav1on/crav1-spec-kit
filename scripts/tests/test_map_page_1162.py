@@ -256,7 +256,7 @@ class MapFile(unittest.TestCase):
         open_ = section(markdown, "feat/orders-dev-switch")
         self.assertIn("- Waited for: none", done)
         self.assertNotIn("- Waits for:", done)
-        self.assertIn("- Waits for: feat/orders-cicd", open_)
+        self.assertIn("- Waits for:\n  - feat/orders-cicd", open_)
         self.assertNotIn("Waited for", open_)
 
     def test_no_page_line_under_the_heading(self):

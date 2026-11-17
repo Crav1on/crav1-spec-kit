@@ -114,6 +114,8 @@ Shows summary counts per slice, then Ready and Held grouped by build-map branch,
 
 1.184.0: `task_state.py` treats a done plain `build` step whose result starts `done (T<n>:` as task T<n> built and waiting for the merge, so the ready check does not offer it, the merge list ticks every task on the branch, and tasks that wait on it wait on the pull request's merge.
 
+1.185.0: each branch block in `build-map.md` nests its lists: `- Tasks:` and `- Waits for:` are label bullets with one sub-bullet per item instead of items joined with `; `, a done task keeps its strike-through and `✓ done (PR N)` on its own sub-bullet, and an empty list is `Waits for: none` on one line. Question, Ready now and the Plan step note stay on one line. The Delivers bullet is gone; Tasks, with task ids, is the one list. The Mermaid diagram is unchanged, and a map written by an older kit is rewritten once on the next ready check.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
