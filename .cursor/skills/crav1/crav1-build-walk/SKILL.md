@@ -27,7 +27,7 @@ The JSON object is documented in [references/common.md](references/common.md). F
 
 ## Route first (1.142.0)
 
-Progress file at `comment` or `wait-merge`: print the script's `lead` and `ending`, then stop. Read no reference (1.172.0).
+`next --task <T#>` decides (1.186.0): `start` starts the task; `cannot-start` asks `card`, prints `ending`. At `wait-merge`: print `lead` and `ending`, stop. Read no reference (1.172.0).
 
 Otherwise read [references/common.md](references/common.md) once. Then open only the file for the point you are at. Do not open the others yet.
 

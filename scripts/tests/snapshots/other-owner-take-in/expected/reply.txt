@@ -1,0 +1,39 @@
+Tasks ready to build — other-owner-take-in
+
+| Slice | Ready | Waiting | Waits in order | Blocked | Needs verify | Done |
+| --- | --- | --- | --- | --- | --- | --- |
+| other-owner-take-in | 1 | 2 | 0 | 0 | 0 | 1 |
+
+Result: ready-partial
+
+Run next:
+
+Ask the PR owners to merge, in this order:
+- Person A: PR 7
+
+---
+
+**feat/orders-fixes**
+A test of the 404, A test of the order id guard, and PR 7 takes in develop.
+3 open tasks:
+- T2 A test of the 404 for an unknown order (held)
+- T3 A test of the order id guard (held)
+- T4 PR 7 takes in develop, conflicts resolved, whole suite green
+
+Run the whole branch:
+`/crav1-build-walk other-owner-take-in feat/orders-fixes`
+Run only T4, the first task that can start:
+`/crav1-build-walk other-owner-take-in T4`
+
+Held:
+- `feat/orders-fixes` (wave 2):
+  - T2 A test of the 404 for an unknown order — verified on feat/orders-fixes, waits for PR 7 to merge
+  - T3 A test of the order id guard — verified on feat/orders-fixes, waits for PR 7 to merge
+
+Merge these PRs, in this order:
+1. PR 7 (Person A's, you added T2 and T3, feat/orders-fixes): ticks T2 and T3.
+
+Source: docs/specs/other-owner-take-in/spec.md, plan.md, tasks.md, verify.md, claims.md
+Build map: docs/specs/other-owner-take-in/build-map.md (updated)
+Zoom the map in your browser:
+`/crav1-tasks-ready-to-build other-owner-take-in open-map`

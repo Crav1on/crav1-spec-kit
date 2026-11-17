@@ -118,6 +118,15 @@ def map_mod():
     return _load("crav1-tasks-ready-to-build", "build_map.py")
 
 
+def state_mod():
+    """The shared task state, with walk_start (1.186.0)."""
+    return _load("crav1-tasks-ready-to-build", "task_state.py")
+
+
+def claims_mod():
+    return _load("crav1-build-walk", "claims.py")
+
+
 def ending_mod():
     """The shared walk ending (1.156.0)."""
     return _load("crav1-tasks-ready-to-build", "walk_ending.py")
@@ -1198,6 +1207,7 @@ def read_progress(text: str) -> dict:
         "owner": (field("Owner") or "self").lower(),
         "slice": field("Slice"),
         "cut_from": field("Cut from"),
+        "author": field("PR author"),
         "task_ids": _all_task_ids(text, tasks_field),
         "steps": steps,
         "pr": int(prs[-1]) if prs else None,
@@ -1287,12 +1297,114 @@ def state_from_files(root: Path, branch: str, waiting: str | None = None, who: s
         state["pr"] = int(pr or info["pr"])
     if waiting:
         state["waiting"] = waiting
+    if not who and state["owner"] == "other" and info.get("author"):
+        # 1.186.0: the Waiting line names who merges.
+        who = state_mod().clean_name(info["author"]) or None
     if who:
         state["who"] = who
+    started = _started_task(info)
+    if started and state["phase"] not in ("wait-merge", "tick", "next-task"):
+        # 1.186.0: after `start T8`, the steps that follow are T8's.
+        state["tasks"] = [{"id": started, "title": (titles.get(started) or {}).get("title") or ""}]
     line = uncommitted_line(root)
     if line:
         state["uncommitted"] = line
     return state
+
+
+def _started_task(info: dict) -> str | None:
+    """The T# of the last `start T#` step, when one is recorded (1.186.0)."""
+    for step in reversed(info.get("steps") or []):
+        match = re.match(r"^start\s+t(\d+)$", step.get("step") or "", re.I)
+        if match:
+            return f"T{int(match.group(1))}"
+    return None
+
+
+def git_user(root: Path) -> str | None:
+    """`git config user.name` in the specs repo, or None."""
+    out = _git(Path(root), "config", "user.name")
+    return out.strip() if out and out.strip() else None
+
+
+def start_state(root: Path, branch: str, start: dict, waiting: str | None = None, who: str | None = None, pr=None) -> dict:
+    """The next JSON for an open task that starts as new work (1.186.0).
+
+    The branch may be waiting for its pull request's merge for tasks already
+    pushed; that wait does not hold a task that is not built yet.
+    """
+    state = state_from_files(root, branch, waiting, who, pr)
+    state["phase"] = "build"
+    state["tasks"] = [{"id": start["task"], "title": start.get("title") or ""}]
+    state["start"] = start
+    return state
+
+
+def start_fields(start: dict, slug: str, branch: str, user: str | None, state: dict) -> dict:
+    """What the walk does before the build: claim, header, the take-in yes (1.186.0)."""
+    task = start["task"]
+    command = (f"build_walk.py progress start-task --root docs/specs/{slug} --branch {branch} "
+               f"--task {task} --user \"{user or '<name>'}\" --yes")
+    out = {
+        "task": task,
+        "branch": branch,
+        "claim_needed": bool(start.get("claim_needed")),
+        "header_needed": bool(start.get("header_needed")),
+        "take_in": start.get("take_in"),
+        "command": command,
+    }
+    base = start.get("take_in")
+    if base and state.get("owner") == "other":
+        pr = state.get("pr")
+        named = f"PR {pr}" if pr else "the pull request"
+        who = state.get("who") or "the owner"
+        out["card"] = {
+            "question": f"{task} takes {base} into {branch}, {who}'s {named}. Take it in now?",
+            "options": [
+                {"word": "take-in", "label": f"Take {base} into the branch (Recommended)",
+                 "text": (f"git fetch, then git merge --no-ff origin/{base} on {branch}; resolve the conflicts, "
+                          f"run the whole suite and the linter, commit, push after your yes, and comment once on {named}. "
+                          f"{who} merges {named}.")},
+                {"word": "stop", "label": "Stop", "text": "Change nothing and end the walk here."},
+            ],
+        }
+    return out
+
+
+def cannot_start(start: dict, slug: str) -> dict:
+    """A named task that cannot start: a card and a Run next (1.186.0)."""
+    task = start["task"]
+    phase = start.get("phase")
+    if phase == "held":
+        deps = start.get("waits_on") or []
+        joined = ", ".join(deps[:-1]) + " and " + deps[-1] if len(deps) > 1 else (deps[0] if deps else "its dependencies")
+        waiting = f"Waiting: {joined} to be done before {task} can start."
+    elif phase == "claimed":
+        waiting = f"Waiting: {start.get('claimed_by') or 'someone else'} to finish {task}. {start['reason']}"
+    else:
+        waiting = f"Waiting: {start['reason']}"
+    ending = ("Run next:\n\nCheck what can start now:\n"
+              f"`/crav1-tasks-ready-to-build {slug}`\n\n{waiting}")
+    return {
+        "mode": "walk",
+        "phase": "cannot-start",
+        "lead": f"{task} cannot start yet. {start['reason']}",
+        "next": [f"Run /crav1-tasks-ready-to-build {slug}, because {task} cannot start yet."],
+        "ending": ending,
+        "count": 1,
+        "suppressed": ["/crav1-open-pr", "/crav1-merge-pr"],
+        "allowed": allowed_actions(start.get("owner")),
+        "command": "/crav1-tasks-ready-to-build",
+        "walk_start": start,
+        "card": {
+            "question": f"{task} cannot start yet: {start['reason']} What now?",
+            "options": [
+                {"word": "check-ready", "label": "Check what can start (Recommended)",
+                 "text": f"Run the ready check for {slug}. Nothing is written."},
+                {"word": "stop", "label": "Stop", "text": "Change nothing and end the walk here."},
+            ],
+        },
+    }
 
 
 def _now_stamp() -> str:
@@ -1335,6 +1447,49 @@ def progress_record(text: str, root: Path, step: str, result: str, when: str | N
     return (text or "").rstrip() + "\n\n" + "\n".join(lines) + "\n"
 
 
+def progress_start_task(root: Path, branch: str, task: str | None, user: str | None, yes: bool) -> int:
+    """Claim an open task and add it to the branch's progress file (1.186.0).
+
+    One call after the start yes: the `In progress:` line in claims.md, the
+    task on the header's Tasks: line, and a `start T#` step. Idempotent: a
+    second call writes nothing new.
+    """
+    if not task:
+        return _bad("task", "start-task needs --task <T#>")
+    user = user or git_user(root)
+    if not user:
+        return _bad("user", "start-task needs --user <name> (git config user.name is not set)")
+    found = state_mod().walk_start(root, task, user)
+    token = found["task"]
+    path = progress_path(root, branch)
+    already = path.is_file() and re.search(rf"^- Step: start {token}\s*$", path.read_text(encoding="utf-8"), re.M)
+    if not found.get("startable") and not already:
+        return _emit({"ok": False, "code": found.get("phase"), "line": found.get("reason"), "walk_start": found}, 2)
+    if found.get("branch") and found["branch"] != branch:
+        return _bad("branch", f"{token} is on {found['branch']}, not {branch}")
+    if not yes:
+        return _emit({"ok": True, "wrote": False, "line": f"Preview only. Add --yes after the user's yes to claim {token} and add it to {path.name}."})
+    claim = claims_mod().add_claim(root, branch, [token], user)
+    if not claim.get("ok"):
+        return _emit({"ok": False, "code": claim.get("code"), "line": claim.get("line"), "claim": claim}, 2)
+    if path.is_file():
+        text = path.read_text(encoding="utf-8")
+        # Tasks an older kit named only in a build step come first, in order.
+        text = add_header_tasks(text, root, _shared_progress_tasks(text))
+        text = add_header_tasks(text, root, [token])
+    else:
+        text = progress_init(root, branch, found.get("owner") or "self", [token])
+    if not already:
+        base = found.get("take_in")
+        result = f"started ({'take-in: ' + base if base else 'new task on this branch'})"
+        text = progress_record(text, root, f"start {token}", result)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8", newline="\n")
+    return _emit({"ok": True, "wrote": True, "path": str(path), "task": token, "take_in": found.get("take_in"),
+                  "claim": claim.get("line") or claim.get("claim"),
+                  "line": f"Claimed {token} and added it to {path.name}."})
+
+
 def cmd_progress(args: argparse.Namespace) -> int:
     root = Path(args.root)
     if not root.is_dir():
@@ -1343,6 +1498,8 @@ def cmd_progress(args: argparse.Namespace) -> int:
         path = progress_path(root, args.branch)
     except ValueError as exc:
         return _bad("branch", str(exc))
+    if args.action == "start-task":
+        return progress_start_task(root, args.branch, args.task, args.user, args.yes)
     if args.action == "init":
         if path.is_file():
             return _emit({"ok": True, "wrote": False, "path": str(path), "line": "The build progress file already exists. Nothing was rewritten."})
@@ -1408,16 +1565,62 @@ def cmd_next(args: argparse.Namespace) -> int:
     try:
         if args.json:
             raw = _read_json(args.json)
-        elif args.root and args.branch:
-            if not Path(args.root).is_dir():
+        elif args.root and (args.branch or getattr(args, "task", None)):
+            root = Path(args.root)
+            if not root.is_dir():
                 return _bad("root", f"no spec folder {args.root}")
-            raw = state_from_files(Path(args.root), args.branch, args.waiting, args.who, args.pr)
+            user = getattr(args, "user", None) or git_user(root)
+            start = None
+            if getattr(args, "task", None):
+                # 1.186.0: a named task decides the start, not the branch's
+                # last step. The ready check asks the same walk_start.
+                found = state_mod().walk_start(root, args.task, user)
+                if not found.get("startable") and found.get("phase") not in ("wait-merge", "done"):
+                    result = cannot_start(found, root.name)
+                    result["ok"] = True
+                    return _emit(result)
+                branch = args.branch or found.get("branch")
+                if not branch:
+                    return _bad("branch", f"{found['task']} names no branch in tasks.md; pass --branch")
+                if found.get("startable"):
+                    start = found
+            else:
+                branch = args.branch
+            raw = state_from_files(root, branch, args.waiting, args.who, args.pr)
+            if start is None and raw.get("phase") == "wait-merge":
+                # 1.186.0: wait-merge only once every task on the branch is
+                # pushed. An open task on it starts as new work.
+                starts = state_mod().walk_starts(root, user)
+                ready = [item for item in starts.values() if item.get("branch") == branch and item.get("startable")]
+                if ready:
+                    start = ready[0]
+            if start is not None:
+                raw = start_state(root, branch, start, args.waiting, args.who, args.pr)
         else:
-            return _bad("input", "next needs --json <file>, or --root <spec folder> and --branch <branch>")
+            return _bad("input", "next needs --json <file>, or --root <spec folder> and --branch <branch> or --task <T#>")
         state = prepare_state(raw)
         if not state.get("phase") and state.get("mode") != "grouping":
             state["phase"] = current_phase(state)
         result = next_for(state)
+        start = raw.get("start") if isinstance(raw, dict) else None
+        if start:
+            slug = Path(args.root).name
+            fields = start_fields(start, slug, raw.get("branch") or "", user, state)
+            result["start"] = fields
+            if fields.get("take_in"):
+                result["allowed"]["take_in_base"] = True
+            if fields.get("card"):
+                result["card"] = fields.pop("card")
+            waits = [t for t in (state_from_files(Path(args.root), raw.get("branch") or "").get("tasks") or [])
+                     if _task_token(normalize_task(t)["id"]) != start["task"]]
+            ids = [_task_token(normalize_task(t)["id"]) for t in waits]
+            what = f"take {fields['take_in']} into {raw.get('branch')}" if fields.get("take_in") else f"build it on {raw.get('branch')}"
+            lead = f"{start['task']} starts as new work: {what}"
+            if ids and raw.get("owner") == "other":
+                pr = raw.get("pr")
+                lead += "; " + (", ".join(ids[:-1]) + " and " + ids[-1] if len(ids) > 1 else ids[0])
+                lead += f" wait for {'PR ' + str(pr) if pr else 'the pull request'}'s merge"
+            result["lead"] = lead + "."
     except InputError as exc:
         return _bad(exc.code, exc.line)
     except (AttributeError, TypeError, ValueError, KeyError) as exc:
@@ -1507,10 +1710,14 @@ def main(argv: list[str] | None = None) -> int:
     nxt.add_argument("--waiting")
     nxt.add_argument("--who")
     nxt.add_argument("--pr")
+    nxt.add_argument("--task", help="A T# to start (1.186.0): an open task starts as new work.")
+    nxt.add_argument("--user", help="The current user; default git config user.name.")
     nxt.set_defaults(func=cmd_next)
 
     prog = sub.add_parser("progress")
-    prog.add_argument("action", choices=["init", "record"])
+    prog.add_argument("action", choices=["init", "record", "start-task"])
+    prog.add_argument("--task")
+    prog.add_argument("--user")
     prog.add_argument("--root", required=True)
     prog.add_argument("--branch", required=True)
     prog.add_argument("--owner", default="self", choices=["self", "other"])

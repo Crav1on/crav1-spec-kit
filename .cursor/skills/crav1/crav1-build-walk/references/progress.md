@@ -60,3 +60,5 @@ Run next:
 `/crav1-build-walk T3`
 branch feat/orders-host-setup-scripts, T3 Apply the CI build policy
 ```
+
+`- Step: start T4` (1.186.0) is written by `build_walk.py progress start-task --root <spec> --branch <branch> --task T4 --user "<name>" --yes`. It starts an open task on a branch whose other tasks wait for their merge: that task is on the header's `Tasks:` line, and the steps after it are that task's.

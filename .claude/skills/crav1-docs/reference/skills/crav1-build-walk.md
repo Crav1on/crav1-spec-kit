@@ -58,6 +58,8 @@ A task that needs code from an unmerged branch is cut from that branch. The prog
 
 1.184.0: a progress file from an older kit that records a second task's build as a plain `- Step: build` with the task only in the result (`Result: done (T47: ...)`) counts that task too: the lead and the Waiting line name every task on the branch (`T43 and T47 are pushed to PR 73 and wait for its merge`), and the next write adds it to the header's Tasks: line.
 
+1.186.0: [`/crav1-build-walk`](crav1-build-walk.md) <slug> <T#>` starts an open, unclaimed task as new work even when the branch's other tasks wait for the merge; wait-merge applies only once every task is pushed. `build_walk.py next --task` returns `start`, and `progress start-task` claims the task, adds it to the header and records `start <T#>`. A task that cannot start gets a card and a Run next from the script. On another person's branch a take-in task (`(take-in: develop)`, or text that says it takes in develop) may merge the base into the branch with its own yes: `git merge --no-ff`, the whole suite and the linter, a push after yes and one comment; the pull request merge stays with its owner, and the ending names who merges.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.

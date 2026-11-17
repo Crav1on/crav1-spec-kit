@@ -77,4 +77,12 @@ The progress file is written by the script, never by hand:
 
 Without `--yes` each prints a preview and writes nothing. Never write the progress file or the next JSON by hand.
 
-When the progress file's last step is `comment` or `wait-merge`, the walk only waits on a merge: print `lead` and `ending` from `next --root --branch` and stop, with no other reference read. The walk passes `approvals: already-done` to the one-task build, which then does not open `tool-approvals.md`.
+When the progress file's last step is `comment` or `wait-merge` and no task on that branch can start, the walk only waits on a merge: print `lead` and `ending` from `next --root --branch` and stop, with no other reference read.
+
+## Starting a task on a waiting branch (1.186.0)
+
+`next --root <spec> --task <T#>` asks `task_state.walk_start`, the same answer the ready check uses before it offers a task. The ready check offers `/crav1-build-walk <slug> <T#>` only when that answer is startable (invariant I8). Wait-merge applies only once every task on the branch is pushed: an open, unclaimed task whose dependencies are done starts as new work, and `next --branch` picks it too. The JSON then has `start` (`task`, `claim_needed`, `header_needed`, `take_in`, and the `command`). After the start yes, run that one command:
+
+- `build_walk.py progress start-task --root <spec> --branch <branch> --task <T#> --user "<name>" --yes` writes the `In progress:` line in `claims.md`, adds the task to the header's `Tasks:` line, and records `- Step: start <T#>`. A second call writes nothing new. The steps that follow are that task's.
+
+A named task that cannot start (`phase: cannot-start`: held by an open dependency, claimed by someone else, or not in `tasks.md`) gets the script's `card` (`check-ready` recommended, or `stop`) and an `ending` with Run next first and the Waiting line. Print those as they are. The walk passes `approvals: already-done` to the one-task build, which then does not open `tool-approvals.md`.

@@ -23,6 +23,11 @@ Usage:
   task_state.py state --ticked yes-no --merged yes-no --verify "<status>" [--built yes-no]
   task_state.py clean-name "<name>"
   task_state.py commit-check --root <spec-folder>
+  task_state.py walk-start --root <spec-folder> --task T8 [--user "<name>"]
+
+walk_start (1.186.0) says whether `/crav1-build-walk <slug> <T#>` can start a
+task now. The ready check offers a task only when it can, and the walk
+starts from the same answer.
 """
 from __future__ import annotations
 
@@ -305,6 +310,158 @@ def commit_check(root) -> dict:
     return {"ok": True, "tick_pending": pending, "recommend": "commit", "stop": False, "run_next": run_next, "line": line}
 
 
+# A task that takes the base into its branch (1.186.0). The mark is
+# `(take-in: develop)`. Without the mark, a task on another person's branch
+# whose text says it takes in a base branch is a take-in task too, so
+# nobody adds the mark by hand.
+TAKE_IN_MARK = re.compile(r"\(take-in:\s*`?([A-Za-z0-9._/-]+?)`?\s*\)", re.I)
+TAKE_IN_TEXT = re.compile(
+    r"\btak(?:e|es|ing)\s+in\s+`?(develop|development|main|master|dev|trunk|release/[A-Za-z0-9._-]+)`?(?![A-Za-z0-9_/-])",
+    re.I,
+)
+_CLAIM = re.compile(
+    r"^\s*In progress:\s*(?P<branch>\S+),\s*(?P<tasks>T?\d+(?:\s*,\s*T?\d+)*),\s*(?P<user>.+?),\s*since\s+(?P<since>\S+)\s*$",
+    re.I | re.M,
+)
+_PR_IN = re.compile(r"\b(?:PR|pull request)\s+#?(\d+)", re.I)
+
+
+def take_in_base(text: str | None, owner: str | None = None) -> str | None:
+    """`develop` for a take-in task, else None (1.186.0).
+
+    The `(take-in: <base>)` mark always counts. Without it, a task whose text
+    says `takes in develop` (or main, master, ...) counts only on a branch
+    another person owns, where the walk would otherwise never merge the base.
+    """
+    text = str(text or "")
+    mark = TAKE_IN_MARK.search(text)
+    if mark:
+        return mark.group(1)
+    if owner == "other":
+        found = TAKE_IN_TEXT.search(text)
+        if found:
+            return found.group(1)
+    return None
+
+
+def branch_file(branch: str) -> str:
+    """feat/orders-note -> feat--orders-note (the build-progress file name)."""
+    return (branch or "").replace("/", "--")
+
+
+def _progress_header(root: Path, branch: str | None) -> dict:
+    """Owner, PR, author and listed tasks from a branch's build-progress file."""
+    if not branch:
+        return {"exists": False, "owner": None, "pr": None, "author": None, "listed": []}
+    path = Path(root) / "build-progress" / f"{branch_file(branch)}.md"
+    if not path.is_file():
+        return {"exists": False, "owner": None, "pr": None, "author": None, "listed": []}
+    text = path.read_text(encoding="utf-8", errors="replace")
+    head = text.split("\n- Step:", 1)[0]
+
+    def field(label):
+        match = re.search(rf"^{label}:\s*(.*)$", head, re.M)
+        return match.group(1).strip() if match else None
+
+    prs = _PR_IN.findall(text)
+    return {
+        "exists": True,
+        "owner": (field("Owner") or "self").lower(),
+        "pr": int(prs[-1]) if prs else None,
+        "author": clean_name(field("PR author")) or None,
+        "listed": progress_tasks(text)["listed"],
+    }
+
+
+def read_claims(root) -> list[dict]:
+    """`In progress:` lines of claims.md as {branch, tasks, user, since}."""
+    path = Path(root) / "claims.md"
+    if not path.is_file():
+        return []
+    out = []
+    for match in _CLAIM.finditer(path.read_text(encoding="utf-8", errors="replace")):
+        tasks = [f"T{int(n)}" for n in re.findall(r"\d+", match.group("tasks"))]
+        out.append({"branch": match.group("branch"), "tasks": tasks,
+                    "user": clean_name(match.group("user")), "since": match.group("since")[:10]})
+    return out
+
+
+def walk_starts(root, user: str | None = None) -> dict:
+    """{"T8": walk_start(...)} for every task in a spec folder, read once (1.186.0)."""
+    root = Path(root)
+    tasks_md = root / "tasks.md"
+    text = tasks_md.read_text(encoding="utf-8") if tasks_md.is_file() else ""
+    parsed = _build_map().parse_tasks(text)
+    states = slice_states(root)
+    claims = read_claims(root)
+    return {f"T{int(task['id'])}": _walk_start(root, task, states, claims, user) for task in parsed}
+
+
+def walk_start(root, task: str, user: str | None = None) -> dict:
+    """Can `/crav1-build-walk <slug> <task>` start this task now? (1.186.0)
+
+    The one answer for the ready check and the walk. `phase` is:
+    - `build`: startable. An open task with every dependency done, not
+      claimed by someone else. A branch whose other tasks wait for their
+      merge does not stop it: wait-merge is only for pushed tasks.
+    - `wait-merge`: built and pushed, its tick waits for the merge.
+    - `done`: ticked, or recorded merged.
+    - `held`: a dependency is not done yet.
+    - `claimed`: someone else's `In progress:` line holds it.
+    - `unknown`: not in tasks.md.
+    """
+    token = f"T{int(re.sub(r'[^0-9]', '', str(task)) or 0)}"
+    starts = walk_starts(root, user)
+    if token not in starts:
+        return {"ok": True, "task": token, "startable": False, "phase": "unknown",
+                "reason": f"{token} is not in tasks.md.", "branch": None, "owner": None, "pr": None,
+                "take_in": None, "claim_needed": False, "header_needed": False}
+    return starts[token]
+
+
+def _walk_start(root: Path, task: dict, states: dict, claims: list[dict], user: str | None) -> dict:
+    token = f"T{int(task['id'])}"
+    branch = task.get("branch") or task.get("map")
+    header = _progress_header(root, branch)
+    owner = header["owner"] or "self"
+    out = {
+        "ok": True,
+        "task": token,
+        "title": task.get("title") or "",
+        "branch": branch,
+        "owner": owner,
+        "pr": header["pr"],
+        "author": header["author"],
+        "take_in": take_in_base(task.get("rest") or task.get("title"), owner),
+        "claim_needed": False,
+        "header_needed": False,
+    }
+    state = (states.get(token) or {}).get("state", OPEN)
+    if state in (DONE, TICK_PENDING):
+        return {**out, "startable": False, "phase": "done", "reason": f"{token} is done."}
+    if state == MERGE_WAIT:
+        named = f"PR {header['pr']}" if header["pr"] else "its pull request"
+        return {**out, "startable": False, "phase": "wait-merge",
+                "reason": f"{token} is pushed to {named} and waits for its merge."}
+    claim = next((item for item in claims if token in item["tasks"]), None)
+    if claim and not (user and same_person(claim["user"], user)):
+        # Someone else's claim, or no user to compare with: held, as the
+        # ready check holds it.
+        return {**out, "startable": False, "phase": "claimed", "claimed_by": claim["user"],
+                "reason": f"{token} is in progress by {claim['user']} since {claim['since']}."}
+    open_deps = []
+    for dep in task.get("deps") or []:
+        dep_state = (states.get(f"T{int(dep)}") or {}).get("state", OPEN)
+        if dep_state not in (DONE, TICK_PENDING):
+            open_deps.append(f"T{int(dep)}")
+    if open_deps:
+        return {**out, "startable": False, "phase": "held", "waits_on": open_deps,
+                "reason": f"{token} waits on {', '.join(open_deps)}."}
+    return {**out, "startable": True, "phase": "build", "reason": f"{token} can start on {branch or 'its branch'}.",
+            "claim_needed": claim is None,
+            "header_needed": bool(header["exists"]) and token not in header["listed"]}
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     sub = parser.add_subparsers(dest="cmd", required=True)
@@ -317,7 +474,14 @@ def main(argv: list[str] | None = None) -> int:
     name.add_argument("name")
     check = sub.add_parser("commit-check")
     check.add_argument("--root", required=True)
+    start = sub.add_parser("walk-start")
+    start.add_argument("--root", required=True)
+    start.add_argument("--task", required=True)
+    start.add_argument("--user", default=None)
     args = parser.parse_args(argv)
+    if args.cmd == "walk-start":
+        print(json.dumps(walk_start(args.root, args.task, args.user), indent=2, ensure_ascii=False))
+        return 0
     if args.cmd == "commit-check":
         print(json.dumps(commit_check(args.root), indent=2, ensure_ascii=False))
         return 0

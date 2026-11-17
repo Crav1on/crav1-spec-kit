@@ -2,6 +2,17 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.186.0 (2026-11-17)
+
+Starting an open task on someone else's pull request branch, found on a live build walk.
+
+- **An open task on a waiting branch starts.** `/crav1-build-walk <slug> <T#>` stopped on `wait-merge` whenever the branch's other tasks were pushed and waiting for the merge, even for a task nobody had built or claimed. The task now decides, not the branch's last step: `build_walk.py next --task <T#>` starts an open, unclaimed task whose dependencies are done as new work, and `next --branch` picks it too. Wait-merge applies only once every task on the branch is pushed. `build_walk.py progress start-task` claims the task in `claims.md`, adds it to the header's `Tasks:` line and records `- Step: start <T#>`, after the start yes.
+- **One answer for the ready check and the walk.** `task_state.walk_start` (and `task_state.py walk-start --root <spec> --task <T#>`) says whether the walk can start a task: `build`, `wait-merge`, `done`, `held`, `claimed` or `unknown`. The ready check offers `/crav1-build-walk <slug> <T#>` only when it can, and invariant I8 checks that every offered task starts in the walk.
+- **A take-in task on another person's branch.** A task whose work is taking the base into the branch, marked `(take-in: develop)` or, on a branch another person owns, saying it takes in develop (the script infers it, so nobody adds the mark by hand), may merge the base into that branch: a yes card, `git merge --no-ff origin/<base>` (never a rebase), resolve, the whole suite and the linter, commit, push after yes, and one pull request comment. The walk's own merge-base step and the pull request merge stay off in other-owner mode.
+- **The ending names who merges.** On another person's branch the Waiting line names the pull request's author, such as `Waiting: person A to merge pull request 7, then T2, T3 and T4 on feat/orders-fixes are ticked.`
+- **A task that cannot start gets a card.** Held by a dependency, claimed by someone else, or not in `tasks.md`: the script returns a card (`check-ready` recommended, or `stop`) and an ending with Run next first, so the walk never offers choices in prose.
+- Snapshot `other-owner-take-in` and `scripts/tests/test_kit_1186.py`.
+
 ## 1.185.0 (2026-11-17)
 
 - **Nested lists in the build map.** Each branch block in `build-map.md` now lists `- Tasks:` and `- Waits for:` one item per nested sub-bullet instead of joining them with `; `. A done task keeps its strike-through and `✓ done (PR N)` on its own sub-bullet, and an empty list reads `Waits for: none` on one line. Question, Ready now and the Plan step note stay on one line.
@@ -152,16 +163,5 @@ Fixes found on a second real ready check: a done task keeps its merge commit ins
 - **Full names in the build map.** The `Delivers:` and `Tasks:` lines on `build-map.md` use full task names, never cut with `...`, like the chat Held list since 1.173.0.
 - **Pull ending layout.** A behind or diverged specs repo ends with `Merge origin into your local branch, since they have diverged (never rebase):` (or `since it is behind`) above `git pull --no-rebase`, not a lowercase reason under the command. The loop-fix entry in the ready check puts its label above the command too.
 - Tests: `scripts/tests/test_merge_hash_walk_1174.py`.
-
-## 1.173.0 (2026-11-16)
-
-Fixes found on a real ready check: the build map no longer swaps a done task's commit for another task's commit, Held names are full, the open-questions entry has its label above the command, and finalize-commit has no `Next:` line on any ending. A minor release because the build map, the ready check and finalize-commit write and end differently.
-
-- **Done commits stay on their own task.** `readiness --write-map` and `build_map.py` took a done task's commit from the first line in `verify.md` that named the task and held any commit, so a `Date:` line such as `second run (T4 and T27 rechecked); T43 added from its build at local abc9d01` gave T4 and T27 the newer, unrelated T43 commit. Now the commit comes only from that task's own evidence: the `Result: done (...)` merge commit in its branch's `build-progress` file, else the task's own row in `verify.md`, preferring a merge commit there. A Date line, a gaps note or another task's row never counts. With no own commit, the mark already on `build-map.md` stays.
-- **Full Held names.** Held and ready lines in the ready check use the full task name, never cut with `...`. Held questions may still be shortened.
-- **Open-questions entry.** The Run next entry reads `Ask the open questions, which haven't been asked yet:` on its own line, then `/crav1-show-or-ask-open-questions <slug>` alone in its code span. Every Run next entry the readiness script builds now puts its label above the command, as a grammatical sentence: a reopened step reads `T1 waits until the reopened /crav1-tighten-plan step finishes:` (`T1 and T2 wait until ...` for several tasks, `The work waits until ...` for none), verify behind reads `Verify the built tasks, since verify.md is behind:`, a push reads `Push the specs repo, which is 2 commits ahead of origin:`, a blocking question reads `Resolve the open question that blocks the first task:`, and a resume reads `Resume the walk when the answers arrive:`.
-- **Finalize-commit endings.** `commit`, `copy`, `stop` and a failed commit end with Run next or nothing, never a `Next:` line. A suggestion to throw an edit away is a plain sentence with the git command in a code span. Kit-lint fails on a `Next:` line anywhere in the finalize-commit skill.
-- **Kit-rewritten files still ask.** A typed `commit` or `commit-now` still asks, with `stop` recommended, when the only changed files are kit-rewritten files (`build-map.md`, `walk-progress.md`, `build-progress/*`) whose values disagree with `verify.md` or `build-progress`.
-- Tests: `scripts/tests/test_map_hashes_1173.py`.
 
 The newest 15 releases are above. The full changelog is https://github.com/Crav1on/crav1-spec-kit/blob/main/CHANGELOG.md.

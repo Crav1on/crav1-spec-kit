@@ -60,7 +60,7 @@ def run_one(folder: Path) -> tuple[dict, list[str]]:
         for path in sorted((work / "build-progress").glob("*.md")) if (work / "build-progress").is_dir() else []:
             got[f"build-progress/{path.name}"] = path.read_text(encoding="utf-8")
         inv = _invariants()
-        broken = inv.check(work, inv.readiness(work, USER))
+        broken = inv.check(work, inv.readiness(work, USER), USER)
     return got, broken
 
 
