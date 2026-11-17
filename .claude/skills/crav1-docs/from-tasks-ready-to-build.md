@@ -135,7 +135,7 @@ To show the map to someone, say `export-map`:
 
 That writes one file, for example `orders-api-build-map-2026-11-15.html`, to your Downloads folder, never into the specs repo. It is about 2.6 MB and opens with a double-click in any browser, offline, with nothing to install. It is a snapshot of the map and holds everything the map shows, so export again after the plan changes and send it only to people who may see the plan.
 
-A done branch says `Waited for:` instead of `Waits for:`, since nothing waits any more. The line under the map's heading names both commands.
+A done branch says `Waited for:` instead of `Waits for:`, since nothing waits any more. Since 1.183.0 the map has no line under its heading naming the two commands.
 
 ## When verify.md is behind (1.136.0)
 
@@ -208,3 +208,5 @@ Reference page: [tasks-ready-to-build](reference/skills/crav1-tasks-ready-to-bui
 The run ends as [How a run ends](reference/run-ending.md) says: one Run next block with one entry per ready branch, `Waiting:` only when a step is blocked, and `Uncommitted:` when files changed and are not committed.
 
 Since 1.182.0 a task already built on a branch that is not merged is never offered as startable, even when your own claim names it, and older progress files whose header lists only the first task still count every task a done build step names. Tasks that wait on it read `held, waits on PR 21 to merge (T47, recorded)`, and the merge list names only the tasks you claimed as `you added`.
+
+Since 1.183.0 `build-map.md` no longer starts with the sentences naming `open-map` and `export-map`; the heading is followed by the grouping line, such as `One branch per plan step.`, and then the diagram. `/crav1-tasks-ready-to-build <slug> open-map` and `export-map` work as before.

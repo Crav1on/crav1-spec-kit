@@ -17,9 +17,9 @@ Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. On Windo
 
 The file is committed with the spec. This command does not commit.
 
-## The page line (1.162.0)
+## The map page (1.162.0, 1.183.0)
 
-Under the `# Build map` heading, one line names the zoomable page: to zoom the diagram, `/crav1-tasks-ready-to-build <slug> open-map`; to share the map as one file, `/crav1-tasks-ready-to-build <slug> export-map`. See [map-page.md](map-page.md).
+`build-map.md` has no line about the page above the diagram (1.183.0). The zoomable page is still `/crav1-tasks-ready-to-build <slug> open-map`, and one file to share is `/crav1-tasks-ready-to-build <slug> export-map`. See [map-page.md](map-page.md).
 
 ## What a row shows
 

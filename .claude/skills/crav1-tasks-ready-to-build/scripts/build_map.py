@@ -2687,7 +2687,9 @@ def overlap_lines(members):
 
 
 def _render(slug, grouping, branches, by_name, risks, has_plan, risk_blocks, names=None, loop_lines=None):
-    lines = ["# Build map", "", page_line(slug), "", grouping, ""]
+    # 1.183.0: no page line above the diagram; open-map and export-map
+    # still work and are listed in the skill's choice words.
+    lines = ["# Build map", "", grouping, ""]
     for line in loop_lines or []:
         lines.append(line)
         lines.append("")
@@ -2747,15 +2749,6 @@ def _render(slug, grouping, branches, by_name, risks, has_plan, risk_blocks, nam
             lines.extend(_branch_block(branch, by_name, names))
     text = "\n".join(lines).rstrip() + "\n"
     return text
-
-
-def page_line(slug):
-    """The pointer to the zoomable page, near the top of the file (1.162.0)."""
-    command = f"/crav1-tasks-ready-to-build {slug}"
-    return (
-        f"To zoom the diagram, run `{command} open-map`. "
-        f"To share the map as one file, run `{command} export-map`."
-    )
 
 
 def waits_label(branch):

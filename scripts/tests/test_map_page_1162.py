@@ -30,8 +30,6 @@ bm = load(BUILD_MAP, "build_map_1162")
 
 MAP = """# Build map
 
-To zoom the diagram, run `/crav1-tasks-ready-to-build orders-api open-map`.
-
 One branch per plan step.
 
 ```mermaid
@@ -261,15 +259,14 @@ class MapFile(unittest.TestCase):
         self.assertIn("- Waits for: feat/orders-cicd", open_)
         self.assertNotIn("Waited for", open_)
 
-    def test_page_line_under_the_heading(self):
+    def test_no_page_line_under_the_heading(self):
+        # 1.183.0: the map no longer names open-map and export-map above the diagram.
         markdown = bm.build("orders-api", SPEC, PLAN, TASKS)["markdown"]
         lines = markdown.splitlines()
         self.assertEqual(lines[0], "# Build map")
-        self.assertEqual(
-            lines[2],
-            "To zoom the diagram, run `/crav1-tasks-ready-to-build orders-api open-map`. "
-            "To share the map as one file, run `/crav1-tasks-ready-to-build orders-api export-map`.",
-        )
+        self.assertEqual(lines[2], "One branch per plan step.")
+        self.assertNotIn("To zoom the diagram", markdown)
+        self.assertNotIn("To share the map as one file", markdown)
 
     def test_choice_words_parse(self):
         parsed = bm.parse_invocation("/crav1-tasks-ready-to-build orders-api export-map")
