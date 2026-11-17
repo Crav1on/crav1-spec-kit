@@ -56,6 +56,8 @@ A task that needs code from an unmerged branch is cut from that branch. The prog
 
 1.182.0: a second task on a branch whose progress file lists only the first is recorded: `build_walk.py progress record --step 'build T47'` accepts `build <task>` for any task and adds it to the header's Tasks: line, so the lead, the ending, the merge list (one PR ticks both) and the build map name both. Before the build step, `repo_sync.py code-behind --repo <code repo>` checks the code branch against origin; behind offers `fast-forward` or `stop` on a card and fast-forwards only after `fast-forward`, never silently.
 
+1.184.0: a progress file from an older kit that records a second task's build as a plain `- Step: build` with the task only in the result (`Result: done (T47: ...)`) counts that task too: the lead and the Waiting line name every task on the branch (`T43 and T47 are pushed to PR 73 and wait for its merge`), and the next write adds it to the header's Tasks: line.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.

@@ -156,6 +156,7 @@ def rewrite_old_status(text: str) -> str:
 
 # A build-progress step that names tasks: `- Step: build T47` (1.182.0).
 _BUILD_STEP = re.compile(r"^-\s*Step:\s*build\b(?P<rest>[^\n]*)$(?P<body>(?:\n[ \t]+.*)*)", re.M | re.I)
+_RESULT_TASK = re.compile(r"^(?:done|merged)\b\s*\(\s*T(\d+)\s*:", re.I)
 _BUILT_ROW = re.compile(r"^-\s*Built:\s*([^,\n]*)", re.M | re.I)
 
 
@@ -163,7 +164,8 @@ def progress_tasks(text: str | None) -> dict:
     """The tasks a build-progress file is about (1.182.0).
 
     {"listed": [T# on the header's Tasks: line], "built": [T# with a done
-    `Step: build T#` or a `- Built: T#` row], "all": listed, then any task a
+    `Step: build T#`, a done plain `Step: build` whose result starts
+    `done (T#:` (older kits, 1.184.0), or a `- Built: T#` row], "all": listed, then any task a
     build step names}. A build step naming a task counts for that task
     whatever the header says, so older files that list only the first task
     still count the second one as built, waiting for the merge.
@@ -178,6 +180,12 @@ def progress_tasks(text: str | None) -> dict:
         ids = [f"T{int(n)}" for n in re.findall(r"\bT(\d+)\b", match.group("rest"), re.I)]
         result = re.search(r"^[ \t]+Result:\s*(.*)$", match.group("body") or "", re.M)
         done = bool(result and re.match(r"(done|merged)\b", result.group(1).strip(), re.I))
+        if not ids and result:
+            # 1.184.0: older kits wrote a plain `- Step: build` with the task
+            # only in the result, `Result: done (T47: <repo> af772f5 on ...)`.
+            lead = _RESULT_TASK.match(result.group(1).strip())
+            if lead:
+                ids = [f"T{int(lead.group(1))}"]
         for task in ids:
             if task not in named:
                 named.append(task)

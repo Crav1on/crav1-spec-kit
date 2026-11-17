@@ -112,6 +112,8 @@ Shows summary counts per slice, then Ready and Held grouped by build-map branch,
 
 1.183.0: `build-map.md` no longer has the two sentences above the diagram that named `open-map` and `export-map`; it starts with the heading and the grouping line, such as `One branch per plan step.` Both choice words still work.
 
+1.184.0: `task_state.py` treats a done plain `build` step whose result starts `done (T<n>:` as task T<n> built and waiting for the merge, so the ready check does not offer it, the merge list ticks every task on the branch, and tasks that wait on it wait on the pull request's merge.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
