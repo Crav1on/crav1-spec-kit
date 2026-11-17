@@ -2,6 +2,10 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.183.0 (2026-11-17)
+
+- **A quieter build map.** `build-map.md` no longer shows the two sentences above the diagram that named `open-map` and `export-map`. The map starts with its heading and the grouping line, such as `One branch per plan step.` Both choice words still work and stay listed in the skill.
+
 ## 1.182.0 (2026-11-17)
 
 Fixes from a live build walk: a second task on someone else's pull request branch is recorded and counted everywhere, Azure DevOps thread posts find their repository, one verify wording for verified-and-waiting, and the walk asks before it fast-forwards a branch or sets a commit hook.
@@ -178,13 +182,5 @@ Fixes found on a real build session: the walk no longer offers a task that only 
 - **Verify reply branch blocks from the ready check.** With no hand-written steps, `walk_ending.py --verify` builds the branch blocks from the ready check (`ready_branch_blocks`): description, open tasks and the whole-branch entry, the same as the build walk.
 - **Other-owner verify status.** After a build on someone else's pull request passes and is pushed, the verify row says `Implemented, verified, tick pending`, not `Not implemented`.
 - Tests: `scripts/tests/test_endings_readiness_1171.py`; four older tests now expect the wait-merge ending and the new claim line.
-
-## 1.170.0 (2026-11-15)
-
-The ready check's Catch up first line for a failed verify is short, and a hold with nobody named reads in plain words. A minor release because the ready check, the walk and the verify reply read differently; `verify.md` and the JSON are unchanged.
-
-- **A short failed-verify reason.** `T6 failed verify: <reason>.` pasted the whole Verify cell from `verify.md`, a long paragraph of test names. The reason is now the cell's opening sentence, plus the sentence that names the cause (`... made the asserts stale.`, `... because ...`) when it fits, about 200 characters, cut only at a sentence end (a single long sentence is cut at a clause end). Leading run detail such as `fail at PR 7's tip abc1234: pipeline 6 run 251 (Run tests, log 19), 110 failed, 173 passed.` gives way to the next sentence, which keeps `at PR 7's tip abc1234`. Example: `T6 failed verify: four of the tests T6's verify rests on fail at PR 7's tip abc1234. 9f8e7d6 made the asserts stale.` The full cell stays in `verify.md` and in the readiness JSON for `/crav1-fix-build-gaps`. The verify reply's `T6 failed:` change line uses the same reason.
-- **Nobody named, in plain words.** A held question with nobody named said `Waiting for not named yet.`; it now says `Nobody is named to answer it yet.` An approval says `Nobody is named to give it yet.`, the Waiting line says `(the partner; nobody named for 1)`, the build map's Question line says `nobody named yet`, and the build walk's approval stop says nobody is named to give the yes. The JSON `who` value is unchanged.
-- `walk_ending.failed_reason()` is new; `catch_up_block()` and `verify_changes()` use it. The readiness, rules, approval-holds, build-map and verify-behind references, two walkthroughs, run-ending and the skill pages show it. Tests: `scripts/tests/test_short_reason_1170.py`; the 1.127.0 Waiting-line and build-map Question-line tests expect the new words.
 
 The newest 15 releases are above. The full changelog is https://github.com/Crav1on/crav1-spec-kit/blob/main/CHANGELOG.md.

@@ -1,7 +1,5 @@
 # Build map
 
-To zoom the diagram, run `/crav1-tasks-ready-to-build orders-api-merge-wait open-map`. To share the map as one file, run `/crav1-tasks-ready-to-build orders-api-merge-wait export-map`.
-
 The plan has no steps, so this map uses one branch per task.
 
 ```mermaid
