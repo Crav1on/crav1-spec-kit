@@ -796,16 +796,26 @@ def style_rule_actions(root: Path, old_root: Path, new_root: Path) -> dict:
     """Rewrite a persisted style rule from the current asset when it is stale.
 
     Stale means it is the old release's copy unchanged, or it names a path
-    that no longer exists. A rule edited by hand is left and listed.
+    that no longer exists. A rule edited by hand is left and listed. A stale
+    rule with no asset in the new release is removed (1.178.0): it is listed
+    under `delete` and the kit removes it in the same yes.
     """
-    out = {"update": [], "left": [], "payloads": {}}
+    out = {"update": [], "left": [], "payloads": {}, "remove": []}
     for rel, name in STYLE_RULES.items():
         path = root / rel
         if not path.is_file():
             continue
         local = path.read_bytes()
         new = _style_asset(new_root, name)
-        if new is None or _normalize_newlines(local) == _normalize_newlines(new):
+        if new is None:
+            text = local.decode("utf-8", errors="replace")
+            old = _style_asset(old_root, name)
+            same_as_old = old is not None and _normalize_newlines(local) == _normalize_newlines(old)
+            if same_as_old or any(stale in text for stale in STALE_STYLE_PATHS):
+                out["remove"].append(rel)
+                out["payloads"][rel] = None
+            continue
+        if _normalize_newlines(local) == _normalize_newlines(new):
             continue
         old = _style_asset(old_root, name)
         text = local.decode("utf-8", errors="replace")
@@ -878,6 +888,9 @@ def build_actions(root: Path, old_root: Path, new_root: Path, hosts: set[str]) -
     for rel in style["update"]:
         files["update"].append(rel)
         payloads[rel] = style["payloads"][rel]
+    for rel in style.get("remove", []):
+        files["delete"].append(rel)
+        payloads[rel] = None
     return {
         "files": files,
         "templates": templates,
@@ -1002,8 +1015,29 @@ def run_migrations(root: Path, installed: str | None, target: str | None, regist
     return {"migrations": results, "installed": installed, "target": target}
 
 
+def is_style_rule(path: str) -> bool:
+    """A persisted commit-style rule the kit wrote (STYLE_RULES, 1.178.0)."""
+    return path in STYLE_RULES
+
+
+def style_rule_kit_owned(root: Path, rel: str) -> bool:
+    """True when a style rule may go in the kit commit (1.178.0).
+
+    It is removed, or it matches a current message-only asset installed on
+    this branch, so it is the kit's own rewrite and not a hand edit.
+    """
+    if not is_style_rule(rel):
+        return False
+    path = root / rel
+    if not path.is_file():
+        return True
+    local = _normalize_newlines(path.read_bytes())
+    asset = _style_asset(root, STYLE_RULES[rel])
+    return asset is not None and local == _normalize_newlines(asset)
+
+
 def _write(root: Path, rel: str, data: bytes | None) -> None:
-    if not is_managed(rel):
+    if not (is_managed(rel) or is_style_rule(rel)):
         refuse(f"Refused: {rel} is a project file.")
     path = _safe(root, rel)
     if data is None:
@@ -1066,13 +1100,13 @@ def commit_kit(root: Path, old: str, new: str, yes: bool) -> dict:
     if not (root / ".git").exists():
         refuse("Refused: a commit needs a git checkout.")
     dirty = dirty_paths(root)
-    stage = [path for path in dirty if is_managed(path)]
+    stage = [path for path in dirty if is_managed(path) or style_rule_kit_owned(root, path)]
     left = [path for path in dirty if path not in stage]
     if not stage:
         refuse("Refused: nothing kit-owned to commit.")
     git(root, "add", "--", *stage)
     cached = _cached_paths(root)
-    unsafe = [path for path in cached if not is_managed(path)]
+    unsafe = [path for path in cached if not (is_managed(path) or style_rule_kit_owned(root, path))]
     if unsafe:
         subprocess.run(["git", "restore", "--staged", "--", *unsafe], cwd=root, check=False)
         refuse("Refused: the commit would include a project file: " + ", ".join(unsafe))

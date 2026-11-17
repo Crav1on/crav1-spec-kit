@@ -646,10 +646,11 @@ def host_state(info: dict, repo: str | None = None, timeout: int = 8) -> dict | 
     """Whether a pull request merged, read-only from its own host (1.177.2).
 
     Only the resolved host's CLI is tried, the same way as host_author:
-    `gh pr view <n> --json state,mergeCommit,mergedAt,closedAt` for GitHub,
-    `az repos pr show --id <n>` (status, lastMergeCommit, closedDate) for
-    Azure DevOps. Returns {"state": "merged" | "closed" | "open", "sha",
-    "date"}; GitHub MERGED and Azure DevOps completed are merged, CLOSED and
+    `gh pr view <n> --json state,mergeCommit,mergedAt,closedAt,author` for
+    GitHub, `az repos pr show --id <n>` (status, lastMergeCommit, closedDate,
+    createdBy) for Azure DevOps. Returns {"state": "merged" | "closed" |
+    "open", "sha", "date"}, plus "author" when the host names who opened it
+    (1.178.0: one lookup gives both the owner and the merge state); GitHub MERGED and Azure DevOps completed are merged, CLOSED and
     abandoned are closed. None when the CLI is missing, not signed in, slow,
     or fails.
     """
@@ -658,13 +659,13 @@ def host_state(info: dict, repo: str | None = None, timeout: int = 8) -> dict | 
         return None
     url = info.get("url") or ""
     if host == "github":
-        cmd = ["gh", "pr", "view", str(number), "--json", "state,mergeCommit,mergedAt,closedAt"]
+        cmd = ["gh", "pr", "view", str(number), "--json", "state,mergeCommit,mergedAt,closedAt,author"]
         ref = host_of(url.split("/pull/")[0]) if "/pull/" in url else {}
         if ref.get("owner"):
             cmd += ["-R", f"{ref['owner']}/{ref['repo']}"]
     else:
         cmd = ["az", "repos", "pr", "show", "--id", str(number), "--query",
-               "{status:status,sha:lastMergeCommit.commitId,closed:closedDate}", "-o", "json"]
+               "{status:status,sha:lastMergeCommit.commitId,closed:closedDate,author:createdBy.displayName}", "-o", "json"]
         ref = parse_ref(url) if url else {}
         if ref.get("org"):
             cmd += ["--organization", f"https://dev.azure.com/{ref['org']}"]
@@ -695,7 +696,13 @@ def host_state(info: dict, repo: str | None = None, timeout: int = 8) -> dict | 
         return None
     sha = sha if isinstance(sha, str) and re.fullmatch(r"[0-9a-fA-F]{7,40}", sha) else None
     day = str(date)[:10] if date and re.match(r"\d{4}-\d{2}-\d{2}", str(date)) else None
-    return {"state": state, "sha": sha.lower() if sha else None, "date": day}
+    out = {"state": state, "sha": sha.lower() if sha else None, "date": day}
+    who = data.get("author")
+    if isinstance(who, dict):
+        who = who.get("name") or who.get("login")
+    if isinstance(who, str) and who.strip():
+        out["author"] = " ".join(who.split())
+    return out
 
 
 def cmd_resolve(args) -> int:

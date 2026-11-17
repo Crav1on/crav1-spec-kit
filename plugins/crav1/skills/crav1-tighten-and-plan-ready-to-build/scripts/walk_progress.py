@@ -3795,6 +3795,20 @@ def pr_common_mod():
     return _PR_COMMON
 
 
+# 1.178.0: one host lookup per PR per run gives both the merge state and who
+# opened it. host_pr_state fills this; host_pr_author reads it instead of
+# asking the host a second time. readiness clears it at the start of a run.
+_HOST_LOOKUPS: dict = {}
+_HOST_SCOPE = {"on": False}
+
+
+def _lookup_key(root, pr) -> tuple:
+    try:
+        return (str(Path(root).resolve()), int(pr))
+    except (TypeError, ValueError):
+        return (str(root), str(pr))
+
+
 def host_pr_author(root: Path | None, pr, record: bool = True) -> str | None:
     """Who opened PR <n>, read-only from its own host, then recorded (1.177.1).
 
@@ -3806,6 +3820,13 @@ def host_pr_author(root: Path | None, pr, record: bool = True) -> str | None:
     import os
     if root is None or not pr or os.environ.get("CRAV1_NO_HOST_LOOKUP"):
         return None
+    key = _lookup_key(root, pr)
+    if _HOST_SCOPE["on"] and key in _HOST_LOOKUPS:
+        state = _HOST_LOOKUPS[key] or {}
+        name = state.get("author")
+        if name and record:
+            record_pr_author(Path(root), int(pr), name)
+        return name
     try:
         pc = pr_common_mod()
         base = pc.repo_root_of(Path(root))
@@ -3849,18 +3870,98 @@ def record_pr_author(root: Path, number: int, name: str) -> Path | None:
     return None
 
 
+_NOT_A_NAME = {"self", "yours", "you", "someone else", "owner not recorded", "none", "-", "—", "unknown",
+               "don't know", "dont know"}
+_OWNER_LINE = re.compile(r"^(?:PR author|Opened by|Owner):\s*(.+?)\s*$", re.M | re.I)
+
+
+def known_people(root: Path | None) -> list[str]:
+    """Names the kit already knows, the choices for the owner question (1.178.0).
+
+    From claims.md (`In progress:` users), PR notes' front matter `author:`,
+    and build-progress `PR author:`, `Opened by:` and `Owner:` lines, in
+    that order, once each (same_person). `self` and other placeholders are
+    skipped. Read-only.
+    """
+    if root is None or not Path(root).is_dir():
+        return []
+    names: list[str] = []
+
+    def add(value) -> None:
+        name = " ".join(str(value or "").strip().strip("`'\"").split())
+        if not name or name.lower() in _NOT_A_NAME:
+            return
+        try:
+            same = claims_mod().same_person
+        except Exception:  # noqa: BLE001
+            same = lambda a, b: (a or "").lower() == (b or "").lower()  # noqa: E731
+        if any(same(name, other) for other in names):
+            return
+        names.append(name)
+
+    try:
+        for claim in claims_mod().load_claims(Path(root)).get("claims") or []:
+            add(claim.get("user"))
+    except (Exception, SystemExit):  # noqa: BLE001 - choices never break the question
+        pass
+    here = Path(root).resolve()
+    for base in [here, *here.parents]:
+        notes = base / "docs" / "notes"
+        if notes.is_dir():
+            for note in sorted(notes.rglob("*-pr-*.md")):
+                head = note.read_text(encoding="utf-8", errors="replace")
+                if head.startswith("---") and head.count("---") >= 2:
+                    match = _NOTE_AUTHOR.search(head.split("---", 2)[1])
+                    if match:
+                        add(match.group(1))
+            break
+    folder = Path(root) / "build-progress"
+    if folder.is_dir():
+        for path in sorted(folder.glob("*.md")):
+            head = path.read_text(encoding="utf-8", errors="replace").split("\n- Step:", 1)[0]
+            for match in _OWNER_LINE.finditer(head):
+                add(match.group(1))
+    return names
+
+
+def owner_choices(root: Path | None) -> list[str]:
+    """The owner question's choices: the known names, then `Don't know` (1.178.0)."""
+    return known_people(root) + ["Don't know"]
+
+
+def rerun_command(root: Path) -> str:
+    """The ready check to run again in this same run after an answer (1.178.0)."""
+    return f"walk_progress.py readiness --root {root} --write-map --text"
+
+
+RERUN_LINE = ("Run the ready check again now, in this same run, and print its new reply. "
+              "Do not end with the earlier reply's steps.")
+
+
 def cmd_pr_author(args) -> None:
-    """`pr-author --root <spec-folder> --pr <n> [--name <who>]` (1.177.1)."""
+    """`pr-author --root <spec-folder> --pr <n> [--name <who>]` (1.177.1).
+
+    1.178.0: without --name and with no host answer, it lists the names the
+    kit already knows as `choices` (then `Don't know`). After a recorded
+    name, `rerun` is the ready check to run again in the same run.
+    """
     root = Path(args.root)
     name = args.name or host_pr_author(root, args.pr, record=False)
     source = "you" if args.name else "host"
     if not name:
-        print(json.dumps({"status": "not-found", "line": f"The host did not say who opened PR {args.pr}. "
-                          "Ask who opened it, then run this again with --name."}, indent=2))
+        print(json.dumps({"status": "not-found", "pr": args.pr, "choices": owner_choices(root),
+                          "line": f"The host did not say who opened PR {args.pr}. "
+                          "Ask who opened it, offering these choices, then run this again with --name."},
+                         indent=2, ensure_ascii=False))
         sys.exit(1)
+    if name.strip().lower() in ("don't know", "dont know"):
+        print(json.dumps({"status": "skipped", "pr": args.pr, "rerun": rerun_command(root), "line": RERUN_LINE},
+                         indent=2, ensure_ascii=False))
+        return
     path = record_pr_author(root, args.pr, name)
     print(json.dumps({"status": "recorded" if path else "no-record", "author": name, "source": source,
-                      "file": str(path) if path else None}, indent=2, ensure_ascii=False))
+                      "file": str(path) if path else None, "rerun": rerun_command(root), "line": RERUN_LINE},
+                     indent=2, ensure_ascii=False))
     if not path:
         sys.exit(1)
 
@@ -3929,14 +4030,21 @@ def host_pr_state(root: Path | None, pr) -> dict | None:
     import os
     if root is None or not pr or os.environ.get("CRAV1_NO_HOST_LOOKUP"):
         return None
+    key = _lookup_key(root, pr)
+    if _HOST_SCOPE["on"] and key in _HOST_LOOKUPS:
+        return _HOST_LOOKUPS[key]
     info = host_pr_ref(root, pr)
     if info.get("status") != "ok":
-        return {"state": "unhosted"} if info.get("status") == "unhosted" else None
-    try:
-        pc = pr_common_mod()
-        return pc.host_state(info, str(pc.repo_root_of(Path(root))))
-    except Exception:  # noqa: BLE001 - the lookup must never break the check
-        return None
+        state = {"state": "unhosted"} if info.get("status") == "unhosted" else None
+    else:
+        try:
+            pc = pr_common_mod()
+            state = pc.host_state(info, str(pc.repo_root_of(Path(root))))
+        except Exception:  # noqa: BLE001 - the lookup must never break the check
+            state = None
+    if _HOST_SCOPE["on"]:
+        _HOST_LOOKUPS[key] = state
+    return state
 
 
 def merged_result_line(number: int, sha: str | None, date: str | None) -> str:
@@ -3998,7 +4106,14 @@ def sync_pr_states(root: Path | None, user: str | None = None) -> dict:
         out["branches"][pr] = branch
         state = host_pr_state(root, pr)
         if not state:
+            out.setdefault("unread", []).append(pr)
             continue
+        if state.get("author"):
+            # 1.178.0: the same lookup names who opened it; record it once.
+            path = _progress_file_for(Path(root), pr, branch)
+            text = path.read_text(encoding="utf-8", errors="replace") if path else ""
+            if not pr_author(root, pr, text) and record_pr_author(Path(root), pr, state["author"]):
+                out.setdefault("owners", {})[pr] = state["author"]
         if state["state"] == "unhosted":
             out["unhosted"].append(pr)
         elif state["state"] == "merged":
@@ -4104,7 +4219,8 @@ def cmd_code_repo(args) -> None:
     path = record_code_repo(root, args.pr, url)
     print(json.dumps({"status": "recorded" if path else "no-record", "pr": args.pr, "url": url,
                       "file": str(path) if path else None,
-                      "next": "Run the ready check again; it asks the PR's host whether it merged."},
+                      "next": "Run the ready check again; it asks the PR's host whether it merged and who opened it.",
+                      "rerun": rerun_command(root), "line": RERUN_LINE},
                      indent=2, ensure_ascii=False))
     if not path:
         sys.exit(1)
@@ -5123,6 +5239,17 @@ def reply_for(root: Path | None, out: dict) -> str:
 
 
 def readiness(args: argparse.Namespace) -> None:
+    """The ready check; host lookups are shared only within this one run (1.178.0)."""
+    _HOST_LOOKUPS.clear()
+    _HOST_SCOPE["on"] = True
+    try:
+        _readiness(args)
+    finally:
+        _HOST_SCOPE["on"] = False
+        _HOST_LOOKUPS.clear()
+
+
+def _readiness(args: argparse.Namespace) -> None:
     root = Path(args.root) if args.root else None
     built = False
     pr_state: dict = {"merged": [], "closed": [], "unhosted": []}
@@ -5398,7 +5525,17 @@ def readiness(args: argparse.Namespace) -> None:
         "code_repo_unknown": [
             {"pr": pr, "branch": (pr_state.get("branches") or {}).get(pr)} for pr in pr_state.get("unhosted") or []
         ],
+        # 1.178.0: the repo question comes first; who opened a PR is asked
+        # only when its repo is known and the host lookup still named no one.
+        "owner_unknown": [
+            {"pr": pr, "branch": info.get("branch")} for pr, info in sorted(merge_prs.items())
+            if info.get("owner") == "owner not recorded" and pr not in (pr_state.get("unhosted") or [])
+        ],
+        "owners_from_host": {str(k): v for k, v in (pr_state.get("owners") or {}).items()},
     }
+    out["ask_first"] = ("code-repo" if out["code_repo_unknown"] else "pr-author" if out["owner_unknown"] else None)
+    if out["owner_unknown"]:
+        out["owner_choices"] = owner_choices(root)
     if built:
         out["rows"] = rows
         out["question_aliases"] = aliases

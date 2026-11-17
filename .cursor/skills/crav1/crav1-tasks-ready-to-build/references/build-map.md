@@ -38,6 +38,8 @@ Wave 1 is the branches that do not wait for another branch. Wave 2 is what opens
 
 The flowchart is `flowchart LR`. Each wave is one subgraph, with `direction TB` inside, so the branches in a wave sit side by side across the page and one above another inside the wave. An arrow means the later branch waits for the earlier one.
 
+Colours (1.178.0): each branch box takes its worst task's state. Green is done (solid edge), amber waits on a pull request or a question (dashed edge), red is truly blocked only, such as a loop, a failed check or a reopened step (thick edge), and blue is the default for ready or not started. The edge out of a box shows that box's state. A `Legend` subgraph names the four colours. Fills are dark with bright text, borders and edges, so the map reads on a dark background.
+
 Under a wave, an `Overlap:` line names a pair of branches in that wave that share a requirement or a path. A requirement is the text of `(spec: …)` on a task, compared with case folded and extra space collapsed. A path is a backtick span in the task line that contains `/` or a file extension, compared exactly as written. The plan's file list is not used. The note does not block, and it does not change Ready now or which wave a branch is in. A branch row still has the six fields above, and still no file list.
 
 ## Grouping

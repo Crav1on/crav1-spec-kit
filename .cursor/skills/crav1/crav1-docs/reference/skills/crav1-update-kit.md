@@ -8,6 +8,8 @@
 
 Update the installed kit on the current branch to a published release.
 
+1.178.0: a stale commit-style rule is written, removed and committed by the kit itself instead of being refused as a project file; a stale rule whose asset is gone from the new release is listed under `delete`. The run ends `Run next: nothing needed now.`, never a `Next:` line.
+
 1.176.0: a persisted commit-style rule that is the old release's copy, or names the missing `crav1-draft-commit-message/` skill, is rewritten from the current message-only asset in the same yes. A rule changed by hand is left and listed in `style_rules_left`.
 
 **[`/crav1-update-kit`](crav1-update-kit.md)** takes an optional `to vX.Y.Z`. With no version, the target is the latest published release tag. `main`, a branch, a commit, and an open pull request are refused in one line. It detects the installed version from `plugin.json` or the `Kit version:` line in `crav1-docs/reference/workflow.md` (the changelog heading when that line is missing).
