@@ -493,6 +493,10 @@ def ending_samples(kit):
     pc = _load_script(os.path.join(sk, "crav1-plan-from-spec", "scripts", "plan_check.py"), "kit_lint_plan_check")
     for items, named in (([{"id": "P1", "issue": "x", "tag": "spec", "status": "open"}], True), ([], True), ([], False)):
         out.append(("plan_check.empty_queue_next", pc.empty_queue_next(items, named, False, "orders-api")))
+    da = _load_script(os.path.join(sk, "crav1-design-architecture", "scripts", "design_run.py"), "kit_lint_design_run")
+    for state in ({"phase": "design", "parked": True, "uncommitted": 4}, {"phase": "go-ahead", "uncommitted": 7},
+                  {"phase": "merged", "slices": ["orders-api"]}, {"phase": "merged", "no_slice": True}):
+        out.append((f"design_run.ending {state['phase']}", da.ending(dict(state, topic="orders-payment-retry"))))
     return out
 
 
@@ -523,6 +527,7 @@ CARD_LINT_SKILLS = (
     "crav1-merge-pr",
     "crav1-pr-status",
     "crav1-review-pr",
+    "crav1-design-architecture",
 )
 # Kit terms that never belong in a card's question or options.
 CARD_JARGON = (

@@ -41,6 +41,7 @@ Not fixed steps. Security and tests stay optional. When one of them finishes ins
 - Research helper, no slash command. Offer it when the spec needs a technology, a service, or a scaling choice nobody has decided. Flag the question. Do not invent a command.
 - Open `../crav1-review-security/SKILL.md` (`/crav1-review-security`), when the spec touches trust, access, or personal data, or the user asks. Architecture review already names it. Still optional here.
 - Open `../crav1-model-data/SKILL.md` (`/crav1-model-data`), when the spec is about stored data and no `Data model:` line names a saved model. It does not edit requirements.
+- Offer `/crav1-design-architecture` (1.181.0) when the spec needs an architecture change nobody has decided: systems, environments, hosting, data flows, integrations or deployment. It works on its own design branch, so the walk names it and does not open it. Planning that depends on the design waits until that design branch is merged.
 - Open `../crav1-show-or-ask-open-questions/SKILL.md` (`/crav1-show-or-ask-open-questions`), when a question is for someone else.
 - Open `../crav1-suggest-tests-for-code/SKILL.md` (`/crav1-suggest-tests-for-code`), when the spec names existing code and the acceptance lines do not already name the checks. A kept suggestion goes through add-to-spec, which that skill opens on yes. This walk does not write the tests.
 

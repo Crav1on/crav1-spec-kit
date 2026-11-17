@@ -39,13 +39,17 @@ Route first, load second. Pick the branch from the choice word or the answer to 
 - **Show** (`show`): follow [branches/show/BRANCH.md](branches/show/BRANCH.md).
 - **Ask** (`ask`): follow [branches/ask/BRANCH.md](branches/ask/BRANCH.md).
 
+## The architecture spec (1.181.0)
+
+Besides slice specs, read the `## Open questions` in `docs/architecture/spec.md` when it exists. `/crav1-design-architecture` copies still-open questions there at go-ahead. Treat them like slice questions; their `Asked:` and `Pending:` lines go under that question in that file. Never read `docs/architecture/designs/`; it is a design sandbox.
+
 ## Parked and retired specs (1.60.0)
 
 Read `references/asked.md` ("Parked and retired specs (1.60.0)") only when a spec is parked or retired.
 
 ## Stop
 
-The only file this command writes is `docs/specs/<slug>/spec.md`, and in that file only the `Asked:` and `Pending:` lines under open questions and under `## Approval needed` items, and the transfer data policy after a yes, as the personal-data check says. It does not write `Approved:`. It does not write `docs/system/`, `plan.md`, `tasks.md`, `verify.md`, or a draft file. It does not send, post, or reply. It does not commit, push, or open a pull request.
+The only files this command writes are `docs/specs/<slug>/spec.md` and `docs/architecture/spec.md`, and in those files only the `Asked:` and `Pending:` lines under open questions and under `## Approval needed` items, and the transfer data policy after a yes, as the personal-data check says. It does not write `Approved:`. It does not write `docs/system/`, `plan.md`, `tasks.md`, `verify.md`, or a draft file. It does not send, post, or reply. It does not commit, push, or open a pull request.
 
 End with:
 

@@ -4,7 +4,7 @@ Prompt budget for one run: one framing card for a new or changed goal, then one 
 
 ## Step 0: Route
 
-`status` reads and stops. `resume` runs `design_run.py resume` and continues at the first open or reopened decision, or at a stage marked `needs another look`. `park` runs `park` and ends. `fan-out`, `stage-it`, `go-ahead`, `compare-topics` and `prepare` go to those steps. A run without the user passes `--headless`; the script then refuses every move except status, resume, lean, compare, compare-topics, review and ending.
+`status` reads and stops. `resume` runs the script move `resume --topic <topic>` and continues at the first open or reopened decision, or at a stage marked `needs another look`. `park` runs `park` and ends. `fan-out`, `stage-it`, `go-ahead`, `compare-topics` and `prepare` go to those steps. A run without the user passes `--headless`; the script then refuses every move except status, resume, lean, compare, compare-topics, review and ending.
 
 ## Step 1: Read what is already known (no writes)
 
@@ -27,7 +27,7 @@ Card: Is this the right goal and starting list of decisions?
 - **Yes (Recommended)** (`yes`): keep the goal and the list as shown and start the first decision. Why: it follows the ask and what the docs show.
 - **Change it**: type what to add, drop, reorder, split or change in the criteria, and the goal is shown again.
 
-After the yes, run `design_run.py create`. It writes `goal.md` and starts one design.
+After the yes, run the script move `create --topic <topic> --input goal.json`. It writes `goal.md` and starts one design.
 
 ## Step 3: Design the end state, one decision at a time
 

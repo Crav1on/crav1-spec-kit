@@ -88,6 +88,16 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 
 **Flow word.** `manual-flow` or `auto-flow` on `/crav1-model-data` (1.118.0). The scope after it is an optional value. Both flows use the same modeling rules. Manual flow confirms the business model before physical design. Auto flow continues after a budget approval and leaves unconfirmed results as proposals.
 
+**Design topic.** One goal under `docs/architecture/designs/<topic>/`, worked by `/crav1-design-architecture` (1.181.0) on its own design branch. *Architecture* in that skill means the whole landscape: systems and services and how they connect, environments, infrastructure and hosting, data flows, integrations, and deployment. No other skill reads a design topic.
+
+**Goal.** A design topic's `goal.md`: the end goal, drivers, constraints, and the criteria its designs are scored on.
+
+**Fan out.** `fan-out` on `/crav1-design-architecture`: start a competing design under the same goal, as a copy or from a blank start. `compare.md` then scores the designs.
+
+**Stage.** One named part of a designed end state, made on `stage-it` after the end state is designed. The user names and divides the stages. A stage may wait on a stakeholder decision.
+
+**Go-ahead.** `go-ahead` on `/crav1-design-architecture`: review the chosen design, then copy it under `## Decided, not built yet` in `docs/architecture/spec.md`, with its ADRs as accepted and its still-open questions. Planning starts only after the design branch's pull request is merged.
+
 **Correction pass.** One cycle in an auto flow: find an issue, revise the proposal, revalidate what that change affects. The default budget is 5 passes, shared by the whole run, plus 20 minutes. The first proposal is a baseline and does not use a pass (1.121.0). A `revise` of a recorded item during an open run stays inside the current pass. The run shows the budget before it starts. A new run does not inherit the old count.
 
 **Route.** An ordered list of commands for one situation, such as a new slice or new information on an existing slice. Each step says when it applies, and some are optional. The routes live in `docs/reference/workflow.yaml` and are shown in [Workflow routes](../reference/workflow.md). `/crav1-help` answers order questions from them.

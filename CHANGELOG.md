@@ -2,6 +2,16 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.181.0 (2026-11-17)
+
+A new preview skill, `/crav1-design-architecture`, works out an architecture change with you: systems, environments, hosting, data flows, integrations and deployment. It compares real options one decision at a time in a sandbox and copies the chosen design into the architecture spec only at go-ahead.
+
+- **New skill.** `/crav1-design-architecture` (cross-cutting, group Specify, preview). Idea text starts a topic; `resume`, `park`, `status`, `fan-out`, `stage-it`, `go-ahead`, `compare-topics` and `prepare` are the choice words, and each decision card uses `choose-a`, `choose-b`, `choose-c`, `choose-mine`, `discuss`, `add-my-idea`, `ask-me`, `to-question`, `to-research` and `skip-for-now`. Every option shows what changes, environments, cost, risks, fit with the drivers and what it reverses, with a reasoned recommendation first. Your own idea is its own option.
+- **Sandbox.** Work lives in `docs/architecture/designs/<topic>/` on a design branch: `goal.md`, one or more designs with draft ADRs, questions, draft diagrams and stages, and `compare.md` once a topic fans out. One-off cross-topic comparisons go under `_compare/` only when asked. No other skill reads the sandbox.
+- **Script.** `design_run.py` owns the folder format and every move, saves after each one (no cap per session), reopens a decision on resume when a source it relied on changed, and refuses writes outside the topic folder before go-ahead. A run without you may only prepare.
+- **Go-ahead.** The chosen design is reviewed for gaps against the goal, conflicts and missing decisions, then copied as one block under `## Decided, not built yet` in `docs/architecture/spec.md` with a "Designed in" link. Its ADRs are copied as accepted and numbered, still-open questions go into that spec, and the ending names pushing the design branch and opening its pull request before any planning.
+- **Open questions in the architecture spec.** `/crav1-show-or-ask-open-questions` and `/crav1-resolve-open-questions` also read `docs/architecture/spec.md`, and `/crav1-existing-to-specs` recheck moves parts of a Decided, not built yet block up to Confirmed once the code or the environment shows them.
+
 ## 1.180.0 (2026-11-17)
 
 Fixes from a live session review. One shared module now decides a task's state, the ready check no longer hides a merge deadlock or a built-and-waiting task, the merge list follows the plan, tighten-plan's ending names the ready check, and owner names are cleaned where they are stored. Snapshot spec folders and an invariant checker guard the ready check's output.

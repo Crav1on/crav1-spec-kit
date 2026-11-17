@@ -1,6 +1,6 @@
 # Script inputs
 
-`python3 scripts/design_run.py [--root <specs repo>] [--headless] <move> ...`. Exit 2 means refused; the reason is on stderr and nothing was written.
+Run `<interpreter> scripts/design_run.py [--root <specs repo>] [--headless] <move> ...`, where the interpreter is `py -3` on Windows and `python3` elsewhere. Exit 2 means refused; the reason is on stderr and nothing was written.
 
 - `create --topic <topic> --input goal.json`: `ask`, `end_goal`, `drivers`, `constraints`, `criteria`, `design`, `design_title`, `decisions` (titles).
 - `status [--topic]`, `resume --topic [--design]`, `park --topic [--design]`, `review --topic [--design]`.

@@ -102,6 +102,7 @@ Started from a ready-to-build report, the walk offers each ready branch as its o
 | Skill | `/crav1-retire-spec` |
 | Skill | `/crav1-what-do-we-know-about-this` |
 | Skill | `/crav1-model-data` |
+| Skill | `/crav1-design-architecture` |
 | Skill | `/crav1-update-specs-from-changes-and-prs` |
 | Skill | `/crav1-tighten-and-plan-ready-to-build` |
 | Skill | `/crav1-refresh-system-notes` |
@@ -148,6 +149,8 @@ Started from a ready-to-build report, the walk offers each ready branch as its o
 `/crav1-what-do-we-know-about-this` may run from any lane when the user asks about one feature, slice, or resource. With no report word it writes nothing in the project. A `report-*` word other than `report-data-model-full` writes one report outside the project. `report-data-model-full` writes under `docs/data-model/<model>/reviews/` and does not edit the saved model. No slice: it names a starter and does not run it. Pasted minutes name `/crav1-add-to-spec` and stop. It does not run another skill and does not move work into Specify, Plan, or Build. It is not a starter option.
 
 `/crav1-model-data` may run from any lane when the user asks for a data model. It does not move work into Specify, Plan, or Build. It does not edit spec requirements, generate schema, or start a watcher. It is not a starter option.
+
+`/crav1-design-architecture` may run from any lane when the user wants to decide how the architecture should change. It works in a sandbox under `docs/architecture/designs/` that no other skill reads, and writes outside it only at go-ahead. It does not move work into Specify, Plan, or Build. It is not a starter option.
 
 `/crav1-update-specs-from-changes-and-prs` may run from any lane. It runs `/crav1-add-to-spec` for each item and does not replace it. It does not run `/crav1-review-pr` or `/crav1-pr-status`. It does not commit. It does not move work into Specify, Plan, or Build. It is not a starter option.
 
@@ -237,6 +240,7 @@ The merged skills take exact choice words instead of `--flags`. A word in the in
 | `/crav1-explain-this-code` | How deep | `what-it-does` · `what-and-why` · `teach-the-language` |
 | `/crav1-retire-spec` | What to do | `retire` · `merge` · `park` · `convert-to-note` |
 | `/crav1-model-data` | Which flow | `manual-flow` · `auto-flow` |
+| `/crav1-design-architecture` | Which step | `resume` · `park` · `status` · `fan-out` · `stage-it` · `go-ahead` · `compare-topics` · `prepare` |
 | `/crav1-update-specs-from-changes-and-prs` | Which flow | `manual-flow` · `auto-flow` |
 | `/crav1-glossary` | Which mode | `as-file` · `research` · `<term>` |
 | `/crav1-ado-sync` | Which sync | `suggest-features` · `push-features` · `push-tasks` · `pull-tasks` · `pull-spec-changes` |
@@ -304,6 +308,7 @@ cross_cutting:
     - crav1-retire-spec
     - crav1-what-do-we-know-about-this
     - crav1-model-data
+    - crav1-design-architecture
     - crav1-update-specs-from-changes-and-prs
     - crav1-tighten-and-plan-ready-to-build
     - crav1-refresh-system-notes

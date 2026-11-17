@@ -4,7 +4,7 @@ If the topic has more than one design, first pick the chosen one, with the `comp
 
 ## 1. Review, automatically
 
-Run `design_run.py review`, then review in the spirit of `/crav1-review-architecture`: gaps against the goal (including environments, hosting, data flows, integrations and deployment), conflicts with what is already built or documented in environment and infrastructure docs, and decisions that are missing. Show the findings.
+Run the script move `review --topic <topic>`, then review in the spirit of `/crav1-review-architecture`: gaps against the goal (including environments, hosting, data flows, integrations and deployment), conflicts with what is already built or documented in environment and infrastructure docs, and decisions that are missing. Show the findings.
 
 Card: What should happen with these findings?
 - **Fix them first (Recommended)** (`fix`): go back to the open points in the design folder; nothing is copied yet. Why: the copy is what other skills read.
