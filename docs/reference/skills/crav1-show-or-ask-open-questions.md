@@ -36,7 +36,7 @@ Prompt budget: 2 (the most prompts in one run, the closing yes included). A prom
 
 In short: Open questions on the specs for a person, a spec, or a topic.
 
-Reads `## Open questions`, unresolved assumptions, and their `Asked:`, `Pending:`, and `Answered:` lines, and `## Approval needed` items with no matching `Approved:` line, on every `docs/specs/<slug>/spec.md`, skipping `_template`, for the person, spec, or topic the user named.
+Reads `## Open questions` in slice specs and, since 1.181.0, in `docs/architecture/spec.md` (never `docs/architecture/designs/`), plus unresolved assumptions, and their `Asked:`, `Pending:`, and `Answered:` lines, and `## Approval needed` items with no matching `Approved:` line, on every `docs/specs/<slug>/spec.md`, skipping `_template`, for the person, spec, or topic the user named.
 
 ## Writes
 

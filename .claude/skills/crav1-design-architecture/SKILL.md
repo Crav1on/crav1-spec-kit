@@ -47,7 +47,7 @@ Then read `references/flow.md` for the steps. Read `references/options.md` when 
 
 ## The script owns the sandbox
 
-`scripts/design_run.py` in this skill owns the folder format and every move: create, resume, park, fan out, record a lean, settle, question, answer, skip, stage, compare, compare-topics, review and go-ahead. On Windows run `py -3`, elsewhere `python3`. Content goes in through `--input <json file>`. Do not hand-edit the design files, and never tell the user to hand-edit a spec file. The script saves after every move, so any session can stop and pick up again. There is no cap on decisions per session.
+`scripts/design_run.py` in this skill owns the folder format and every move: create, resume, park, fan out, record a lean, settle, question, answer, skip, stage, compare, compare-topics, review and go-ahead. On Windows run `py -3`, elsewhere `python3` (`crav1-docs/reference/running-scripts.md`). Content goes in through `--input <json file>`. Do not hand-edit the design files, and never tell the user to hand-edit a spec file. The script saves after every move, so any session can stop and pick up again. There is no cap on decisions per session.
 
 The sandbox is `docs/architecture/designs/<topic>/` on its own design branch (recommended name `design/<topic>`). One goal per topic, in `goal.md`. Each design lives in `designs/<name>/` with `design.md`, `questions.md`, `diagrams.md`, `adr/`, and `stages.md` once staged. `compare.md` scores designs in the topic against the shared criteria. One-off cross-topic comparisons go under `_compare/`. No other skill reads this tree, even after the branch is merged.
 

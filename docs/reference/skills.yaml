@@ -2981,6 +2981,9 @@ routing:
         crav1-model-data:
         - >-
           `/crav1-model-data` may run from any lane when the user asks for a data model. It does not move work into Specify, Plan, or Build. It does not edit spec requirements, generate schema, or start a watcher. It is not a starter option.
+        crav1-design-architecture:
+        - >-
+          `/crav1-design-architecture` may run from any lane when the user wants to decide how the architecture should change. It works in a sandbox under `docs/architecture/designs/` that no other skill reads, and writes outside it only at go-ahead. It does not move work into Specify, Plan, or Build. It is not a starter option.
         crav1-update-specs-from-changes-and-prs:
         - >-
           `/crav1-update-specs-from-changes-and-prs` may run from any lane. It runs `/crav1-add-to-spec` for each item and does not replace it. It does not run `/crav1-review-pr` or `/crav1-pr-status`. It does not commit. It does not move work into Specify, Plan, or Build. It is not a starter option.

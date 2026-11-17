@@ -71,6 +71,7 @@ class CardLint(unittest.TestCase):
                 "crav1-tasks-ready-to-build", "crav1-build-walk",
                 "crav1-tighten-and-plan-ready-to-build", "crav1-open-pr",
                 "crav1-merge-pr", "crav1-pr-status", "crav1-review-pr",
+                "crav1-design-architecture",
             },
         )
         self.assertEqual(LINT.card_wording_problems(str(ROOT)), [])

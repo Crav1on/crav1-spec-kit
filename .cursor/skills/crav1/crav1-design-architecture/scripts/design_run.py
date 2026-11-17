@@ -20,6 +20,19 @@ import re
 import sys
 from pathlib import Path
 
+
+def _utf8_stdout() -> None:
+    reconfigure = getattr(sys.stdout, "reconfigure", None)
+    if not callable(reconfigure):
+        return
+    try:
+        reconfigure(encoding="utf-8")
+    except (AttributeError, OSError, ValueError):
+        return
+
+
+_utf8_stdout()
+
 DESIGNS = Path("docs/architecture/designs")
 ARCH_SPEC = Path("docs/architecture/spec.md")
 DECIDED = "## Decided, not built yet"
@@ -133,7 +146,8 @@ def parse_design(text: str) -> dict:
     for line in sec.get("Decisions", "").splitlines():
         if line.startswith("- "):
             cur = {"title": line[2:].strip(), "State": "open"}
-            decisions.append(cur)
+            if cur["title"] != "none yet":
+                decisions.append(cur)
         elif cur is not None and line.startswith("  - "):
             k, _, v = line[4:].partition(": ")
             cur[k.strip()] = v.strip()
@@ -693,7 +707,7 @@ def _next_adr_number(folder: Path) -> int:
 
 def _confirmed(text: str) -> str:
     m = re.search(r"^## Confirmed\n(.*?)(?=^## |\Z)", text, flags=re.S | re.M)
-    return m.group(1) if m else ""
+    return m.group(1).strip() if m else ""
 
 
 def _marks(text: str) -> list[str]:
