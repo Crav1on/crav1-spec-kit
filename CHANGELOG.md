@@ -2,6 +2,17 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.186.0 (2026-11-17)
+
+Starting an open task on someone else's pull request branch, found on a live build walk.
+
+- **An open task on a waiting branch starts.** `/crav1-build-walk <slug> <T#>` stopped on `wait-merge` whenever the branch's other tasks were pushed and waiting for the merge, even for a task nobody had built or claimed. The task now decides, not the branch's last step: `build_walk.py next --task <T#>` starts an open, unclaimed task whose dependencies are done as new work, and `next --branch` picks it too. Wait-merge applies only once every task on the branch is pushed. `build_walk.py progress start-task` claims the task in `claims.md`, adds it to the header's `Tasks:` line and records `- Step: start <T#>`, after the start yes.
+- **One answer for the ready check and the walk.** `task_state.walk_start` (and `task_state.py walk-start --root <spec> --task <T#>`) says whether the walk can start a task: `build`, `wait-merge`, `done`, `held`, `claimed` or `unknown`. The ready check offers `/crav1-build-walk <slug> <T#>` only when it can, and invariant I8 checks that every offered task starts in the walk.
+- **A take-in task on another person's branch.** A task whose work is taking the base into the branch, marked `(take-in: develop)` or, on a branch another person owns, saying it takes in develop (the script infers it, so nobody adds the mark by hand), may merge the base into that branch: a yes card, `git merge --no-ff origin/<base>` (never a rebase), resolve, the whole suite and the linter, commit, push after yes, and one pull request comment. The walk's own merge-base step and the pull request merge stay off in other-owner mode.
+- **The ending names who merges.** On another person's branch the Waiting line names the pull request's author, such as `Waiting: person A to merge pull request 7, then T2, T3 and T4 on feat/orders-fixes are ticked.`
+- **A task that cannot start gets a card.** Held by a dependency, claimed by someone else, or not in `tasks.md`: the script returns a card (`check-ready` recommended, or `stop`) and an ending with Run next first, so the walk never offers choices in prose.
+- Snapshot `other-owner-take-in` and `scripts/tests/test_kit_1186.py`.
+
 ## 1.185.0 (2026-11-17)
 
 - **Nested lists in the build map.** Each branch block in `build-map.md` now lists `- Tasks:` and `- Waits for:` one item per nested sub-bullet instead of joining them with `; `. A done task keeps its strike-through and `✓ done (PR N)` on its own sub-bullet, and an empty list reads `Waits for: none` on one line. Question, Ready now and the Plan step note stay on one line.

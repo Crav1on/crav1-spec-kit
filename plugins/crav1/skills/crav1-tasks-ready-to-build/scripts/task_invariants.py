@@ -14,6 +14,8 @@ whatever the slice looks like:
       with Run next.
   I7  No stored or printed owner name keeps a leading `Admin` or a
       trailing `(...)` tag.
+  I8  Every task the reply offers as `/crav1-build-walk <slug> <T#>` starts
+      in the walk: task_state.walk_start says startable (1.186.0).
 
 Usage:
   task_invariants.py --root <spec-folder> [--json]
@@ -63,7 +65,16 @@ def readiness(root: Path, user: str | None = None) -> dict:
     return json.loads(proc.stdout)
 
 
-def check(root: Path, out: dict) -> list[str]:
+def _walk_starts(root: Path, user: str | None) -> dict:
+    import importlib.util
+    path = HERE / "task_state.py"
+    spec = importlib.util.spec_from_file_location("task_state_inv", path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod.walk_starts(root, user)
+
+
+def check(root: Path, out: dict, user: str | None = None) -> list[str]:
     broken = []
     rows = [row for row in out.get("rows") or [] if row.get("task")]
     counts = out.get("counts") or {}
@@ -103,6 +114,13 @@ def check(root: Path, out: dict) -> list[str]:
             broken.append(f"I7 build-progress/{path.name} keeps an uncleaned owner name")
     if re.search(r"\bAdmin [A-Z]", reply):
         broken.append("I7 the reply prints an uncleaned owner name")
+    offered = re.findall(rf"`/crav1-build-walk {re.escape(root.name)} (T\d+)`", reply)
+    if offered:
+        starts = _walk_starts(root, user)
+        for task in offered:
+            found = starts.get(task) or {}
+            if not found.get("startable"):
+                broken.append(f"I8 the reply offers {task}, but the walk would not start it: {found.get('reason', 'not in tasks.md')}")
     return broken
 
 
@@ -113,7 +131,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args(argv)
     root = Path(args.root)
-    broken = check(root, readiness(root, args.user))
+    broken = check(root, readiness(root, args.user), args.user)
     if args.json:
         print(json.dumps({"ok": not broken, "broken": broken}, indent=2))
     else:

@@ -4780,6 +4780,29 @@ def apply_merge_deadlocks(rows: list[dict]) -> list[str]:
     return lines
 
 
+def apply_walk_starts(root: Path, rows: list[dict], user: str | None = None) -> None:
+    """Offer a task only when the walk can start it (1.186.0).
+
+    The ready check and `/crav1-build-walk <slug> <T#>` ask the same
+    `task_state.walk_start`. A ready row the walk would not start (pushed and
+    waiting for its merge, done, or claimed by someone else) is held with
+    the walk's reason instead of offered.
+    """
+    try:
+        starts = task_state_mod().walk_starts(root, user)
+    except (OSError, ValueError, KeyError):
+        return
+    for row in rows:
+        task = row.get("task")
+        if not task or task not in starts:
+            continue
+        found = starts[task]
+        row["walk_start"] = found.get("phase")
+        if row.get("bucket") == "ready" and found.get("phase") in ("wait-merge", "done", "claimed"):
+            row["bucket"] = "waiting"
+            row["reason"] = found.get("reason", "").rstrip(".")
+
+
 def merge_order(rows: list[dict], prs: dict) -> list[dict]:
     """The PRs in merge order, each with what merging it unblocks (1.176.0).
 
@@ -5834,6 +5857,7 @@ def _readiness(args: argparse.Namespace) -> None:
         apply_verified_on_branch(root, rows)
         loop_lines = apply_loop_holds(root, rows)
         deadlock_lines = apply_merge_deadlocks(rows)
+        apply_walk_starts(root, rows, getattr(args, "user", None) or _git_user(root))
     for row in rows:
         if not isinstance(row, dict):
             fail("readiness", "each row must be an object")
