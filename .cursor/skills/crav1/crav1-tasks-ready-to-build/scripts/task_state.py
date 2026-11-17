@@ -54,6 +54,12 @@ MERGE_WAIT = "merge-wait"
 OPEN = "open"
 
 PASSED = ("implemented, verified", "implemented, verified, tick pending", "implemented, verified on branch")
+# 1.182.0: `Implemented, verified on branch` and `Implemented, verified, tick
+# pending` are one state. Only TICK_PENDING_STATUS is written; the old
+# wording is still read, and rewritten once when its file is touched.
+TICK_PENDING_STATUS = "Implemented, verified, tick pending"
+OLD_TICK_PENDING_STATUS = "Implemented, verified on branch"
+WAITING_STATUSES = ("implemented, verified on branch", "implemented, verified, tick pending")
 
 # Words a host puts before a display name. Only a leading word is dropped.
 NAME_PREFIXES = ("admin", "administrator", "ext", "external", "guest", "contractor")
@@ -114,9 +120,79 @@ def task_state(ticked: bool, merged: bool = False, verify: str | None = None, bu
         # tick offered in Run next, never a reason to stop a commit (M3).
         return {"state": TICK_PENDING, "counts_done": True, "offer_tick": True, "stop": False,
                 "verify_first": not verify_passed(verify)}
-    if built or merge_wait or str(verify or "").strip().lower() == "implemented, verified on branch":
+    if built or merge_wait or str(verify or "").strip().lower() in WAITING_STATUSES:
         return {"state": MERGE_WAIT, "counts_done": False, "offer_tick": False, "stop": False}
     return {"state": OPEN, "counts_done": False, "offer_tick": False, "stop": False}
+
+
+def is_waiting_status(status: str | None) -> bool:
+    """Either wording of verified and waiting for the tick (1.182.0)."""
+    return str(status or "").strip().lower() in WAITING_STATUSES
+
+
+def new_status(status: str | None) -> str:
+    """The one written wording: the old on-branch wording becomes tick pending (1.182.0)."""
+    text = str(status or "").strip()
+    return TICK_PENDING_STATUS if text.lower() == OLD_TICK_PENDING_STATUS.lower() else text
+
+
+_OLD_STATUS_CELL = re.compile(r"^(\|\s*T\d+\s*\|[^|\n]*\|\s*)Implemented, verified on branch(\s*\|)", re.I | re.M)
+_OLD_COUNT_ROW = re.compile(r"^\|\s*Implemented, verified on branch\s*\|\s*\d+\s*\|[^\n]*\n?", re.I | re.M)
+
+
+def rewrite_old_status(text: str) -> str:
+    """verify.md text with the old on-branch wording gone (1.182.0).
+
+    Each task row's old status becomes the one wording, and the old TL;DR
+    count row is dropped; the caller recounts.
+    """
+    out = _OLD_STATUS_CELL.sub(lambda m: m.group(1) + TICK_PENDING_STATUS + m.group(2), text or "")
+    if re.search(r"^\|\s*Implemented, verified, tick pending\s*\|\s*\d+\s*\|", out, re.I | re.M):
+        return _OLD_COUNT_ROW.sub("", out)
+    # No tick pending count row yet: the old one becomes it.
+    return re.sub(r"^(\|\s*)Implemented, verified on branch(\s*\|\s*\d+\s*\|)",
+                  lambda m: m.group(1) + TICK_PENDING_STATUS + m.group(2), out, flags=re.I | re.M)
+
+
+# A build-progress step that names tasks: `- Step: build T47` (1.182.0).
+_BUILD_STEP = re.compile(r"^-\s*Step:\s*build\b(?P<rest>[^\n]*)$(?P<body>(?:\n[ \t]+.*)*)", re.M | re.I)
+_BUILT_ROW = re.compile(r"^-\s*Built:\s*([^,\n]*)", re.M | re.I)
+
+
+def progress_tasks(text: str | None) -> dict:
+    """The tasks a build-progress file is about (1.182.0).
+
+    {"listed": [T# on the header's Tasks: line], "built": [T# with a done
+    `Step: build T#` or a `- Built: T#` row], "all": listed, then any task a
+    build step names}. A build step naming a task counts for that task
+    whatever the header says, so older files that list only the first task
+    still count the second one as built, waiting for the merge.
+    """
+    text = text or ""
+    head = text.split("\n- Step:", 1)[0]
+    line = re.search(r"^Tasks:\s*(.*)$", head, re.M)
+    listed = [f"T{int(n)}" for n in re.findall(r"\bT(\d+)\b", line.group(1))] if line else []
+    named: list[str] = []
+    built: list[str] = []
+    for match in _BUILD_STEP.finditer(text):
+        ids = [f"T{int(n)}" for n in re.findall(r"\bT(\d+)\b", match.group("rest"), re.I)]
+        result = re.search(r"^[ \t]+Result:\s*(.*)$", match.group("body") or "", re.M)
+        done = bool(result and re.match(r"(done|merged)\b", result.group(1).strip(), re.I))
+        for task in ids:
+            if task not in named:
+                named.append(task)
+            if done and task not in built:
+                built.append(task)
+    for match in _BUILT_ROW.finditer(text):
+        for n in re.findall(r"\bT(\d+)\b", match.group(1)):
+            task = f"T{int(n)}"
+            if task not in built:
+                built.append(task)
+    everything = list(listed)
+    for task in named + built:
+        if task not in everything:
+            everything.append(task)
+    return {"listed": listed, "built": built, "all": everything}
 
 
 def deadlock_text(task: str, dep: str, pr, branch: str | None = None) -> str:

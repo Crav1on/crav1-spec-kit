@@ -54,6 +54,8 @@ A task that needs code from an unmerged branch is cut from that branch. The prog
 
 1.157.0: every walk ending, one task or a whole branch, is the Run next block first, then what was built, what is left, and Waiting. The script no longer writes a `Next:` line under it. A held step (an Approval needed item, a live yes, a pull request still to merge, someone else's branch) says why on a `Waiting:` line instead, and with no work branch left Run next is [`/crav1-verify-build-against-spec`](crav1-verify-build-against-spec.md). The JSON `next` list still has one sentence per Run next entry, and is not printed.
 
+1.182.0: a second task on a branch whose progress file lists only the first is recorded: `build_walk.py progress record --step 'build T47'` accepts `build <task>` for any task and adds it to the header's Tasks: line, so the lead, the ending, the merge list (one PR ticks both) and the build map name both. Before the build step, `repo_sync.py code-behind --repo <code repo>` checks the code branch against origin; behind offers `fast-forward` or `stop` on a card and fast-forwards only after `fast-forward`, never silently.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.

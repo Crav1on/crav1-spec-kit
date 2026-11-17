@@ -882,7 +882,8 @@ def not_ready_next(slug: str, counts: dict | None, question_first: bool) -> str 
 
 VERIFY_STATUSES = (
     ("tick_pending", "Implemented, verified, tick pending", "verified, tick pending"),
-    ("on_branch", "Implemented, verified on branch", "verified on branch"),
+    # 1.182.0: the old on-branch wording is the same state as tick pending.
+    ("tick_pending", "Implemented, verified on branch", "verified, tick pending"),
     ("verified", "Implemented, verified", "verified"),
     ("failed", "Implemented, verify failed", "failed"),
     ("not_implemented", "Not implemented", "not implemented"),

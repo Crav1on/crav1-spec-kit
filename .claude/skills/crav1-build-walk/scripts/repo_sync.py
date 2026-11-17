@@ -12,7 +12,12 @@ is behind, origin is merged in first (never rebased). A conflict stops and
 names the files. After a successful push the ending says the specs repo is
 in step with origin. An unpushed branch is a Waiting line.
 
-Usage: repo_sync.py <fetch|status|settle|merge-upstream|commit|push> [options]
+Before the build step, `code-behind --repo <code repo>` checks whether the
+code branch is behind origin (1.182.0). It never moves the branch itself:
+behind gives a choice card, `fast-forward` or `stop`, and only
+`code-behind --yes` fast-forwards (`git merge --ff-only`), after that yes.
+
+Usage: repo_sync.py <fetch|status|settle|merge-upstream|commit|push|code-behind> [options]
 The interpreter is crav1-docs/reference/running-scripts.md. The kit wrapper
 is scripts/repo-sync.py. This script does not force-push and never rebases.
 """
@@ -480,6 +485,66 @@ def cmd_push(args: argparse.Namespace) -> int:
     return emit(result, 0 if result.get("ok") else 2)
 
 
+def code_behind(repo: Path, do_fetch: bool = True) -> dict:
+    """Is the code branch behind origin before a build? (1.182.0)
+
+    {"state": "in-step" | "behind" | "diverged" | "ahead" | "no-upstream" |
+    "offline" | "no-repo", "behind", "ahead", "card", "ending"}. Behind
+    offers the fast-forward as a choice; the walk never does it silently.
+    """
+    root = find_repo(repo)
+    if root is None:
+        return {"ok": True, "state": "no-repo", "behind": 0, "ahead": 0, "stop": False, "card": None, "ending": None}
+    branch = current_branch(root) or "the branch"
+    upstream = upstream_of(root)
+    if not upstream:
+        return {"ok": True, "state": "no-upstream", "behind": 0, "ahead": 0, "stop": False, "card": None, "ending": None,
+                "line": f"{branch} has no upstream, so it was not compared with origin."}
+    if do_fetch:
+        fetched, error = fetch_repo(root)
+        if not fetched:
+            return {"ok": True, "state": "offline", "behind": 0, "ahead": 0, "stop": False, "card": None, "ending": None,
+                    "line": f"The code repo could not be fetched ({error}); building from the local copy."}
+    counts = ahead_behind(root, upstream) or (0, 0)
+    ahead, behind = counts
+    out = {"ok": True, "branch": branch, "upstream": upstream, "ahead": ahead, "behind": behind,
+           "stop": False, "card": None, "ending": None}
+    commits = f"{behind} commit{'s' if behind != 1 else ''}"
+    if behind and ahead:
+        out.update(state="diverged", stop=True,
+                   line=f"{branch} has diverged from {upstream} ({ahead} ahead, {behind} behind). It is not built until origin is merged in.",
+                   ending=("Run next:\n\nMerge origin into the code branch, which has diverged (never rebase):\n"
+                           f"`git merge {upstream}`"))
+        return out
+    if behind:
+        out.update(state="behind", stop=True,
+                   line=f"{branch} is {commits} behind {upstream}. The build waits for your choice.",
+                   card={"question": f"{branch} is {commits} behind {upstream}. Fast-forward it before the build?",
+                         "words": ["fast-forward", "stop"], "recommended": "fast-forward",
+                         "options": [
+                             {"word": "fast-forward", "label": f"Fast-forward to {upstream} (Recommended)",
+                              "action": "git merge --ff-only, then build"},
+                             {"word": "stop", "label": "Stop", "action": "build nothing; the branch stays as it is"}]},
+                   ending=("Run next:\n\nFast-forward the code branch, which is behind origin:\n"
+                           f"`repo_sync.py code-behind --repo {repo} --yes`"))
+        return out
+    out["state"] = "ahead" if ahead else "in-step"
+    return out
+
+
+def cmd_code_behind(args: argparse.Namespace) -> int:
+    status = code_behind(Path(args.repo), do_fetch=not args.no_fetch)
+    if not args.yes or status.get("state") != "behind":
+        return emit(status)
+    root = find_repo(Path(args.repo))
+    proc = git(root, "merge", "--ff-only", status["upstream"])
+    if proc.returncode != 0:
+        return emit({"ok": False, "code": "not-fast-forward", "state": "behind",
+                     "line": f"{status['branch']} could not be fast-forwarded to {status['upstream']}. Nothing was changed."}, 2)
+    return emit({"ok": True, "state": "in-step", "fast_forwarded": True, "behind": 0, "ahead": 0,
+                 "line": f"Fast-forwarded {status['branch']} to {status['upstream']}."})
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="cmd", required=True)
@@ -520,6 +585,12 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--yes", action="store_true")
     p.add_argument("--headless", action="store_true")
     p.set_defaults(func=cmd_push)
+
+    cb = sub.add_parser("code-behind")
+    cb.add_argument("--repo", required=True)
+    cb.add_argument("--no-fetch", action="store_true")
+    cb.add_argument("--yes", action="store_true")
+    cb.set_defaults(func=cmd_code_behind)
 
     args = parser.parse_args(argv)
     return args.func(args)

@@ -32,13 +32,12 @@ A task downstream of an **Implemented, verify failed** task (it waits on it, dir
 | Status | Meaning |
 | --- | --- |
 | **Implemented, verified** | Row is `[x]` **and** its verify evidence ran and passed |
-| **Implemented, verified, tick pending** | Evidence passed, the row is still `[ ]`, and the pull request is recorded merged (`(PR n)` and the word `merged` on the task line, or on the Match `Branch:` line for its `(branch:)` or `(map:)`). Not **Not implemented**. The open checkbox is a Gap |
+| **Implemented, verified, tick pending** | Evidence passed and the row is still `[ ]`: on an unmerged work branch (it waits for the merge), or with the pull request recorded merged (`(PR n)` and the word `merged` on the task line, or on the Match `Branch:` line for its `(branch:)` or `(map:)`). Not **Not implemented**. The open checkbox is a Gap |
 | **Implemented, verify failed** | `[x]` or code exists for this `T#`, but verify ran and failed |
-| **Implemented, verified on branch** | Evidence passed on an unmerged work branch, row still `[ ]` (1.176.0) |
 | **Not implemented** | Still `- [ ]`, neither of the two above (or no code for this `T#`) |
 | **Claimed done, unverified** | `[x]` but evidence could not be run (no command, no browser). Also a ticked task whose `(branch: X)` is not the checkout: **Claimed done, unverified (on X, not checked out)** |
 
-Read `references/tick-pending.md` only when a row is tick pending or verified on branch.
+Read `references/tick-pending.md` only when a row is tick pending. 1.182.0: the old `Implemented, verified on branch` is the same state; it is read, never written, and rewritten once when the row script next writes the file.
 
 Read `references/host-setup-task.md` ("Host setup tasks") only when a task is marked `(host setup)` (1.115.0, skill `crav1-host-setup`).
 
@@ -66,7 +65,7 @@ Then:
 1. If any acceptance or task verify is **live** (running Aspire/compose/dev host, published URL, browser against localhost), follow this skill’s [references/live-host.md](references/live-host.md) **before** that evidence. Record refresh/health in **Commands run**.
 2. Before any test command, run the local dependency preflight in this skill's [references/test-dependencies.md](references/test-dependencies.md): detect what the tests need (Azurite, a database container, an emulator), check each is running, and ask start, skip, or stop for one that is not. Then run the documented test/lint commands from `AGENTS.md` or the repo README when they exist. Record the command and outcome. A test skipped for a missing dependency blocks **Implemented, verified** unless the user chose skip; that task is **Claimed done, unverified**, and the missing dependency goes at the top of the report as a blocker.
 3. For UI acceptance, use the browser if available; otherwise mark **untested** and say why.
-4. Map `tasks.md` rows: checked but failing verify → **Implemented, verify failed**; evidence passed, row still `[ ]`, pull request recorded merged → **Implemented, verified, tick pending**; passed on an unmerged branch → **Implemented, verified on branch**; other unchecked → **Not implemented**.
+4. Map `tasks.md` rows: checked but failing verify → **Implemented, verify failed**; evidence passed, row still `[ ]`, pull request recorded merged → **Implemented, verified, tick pending**; passed on an unmerged branch → **Implemented, verified, tick pending** too (1.182.0); other unchecked → **Not implemented**.
 
 ## Write `docs/specs/<slug>/verify.md`
 

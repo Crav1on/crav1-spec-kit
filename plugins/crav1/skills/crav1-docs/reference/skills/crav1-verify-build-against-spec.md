@@ -44,6 +44,8 @@ Before the tests, a local dependency preflight checks Azurite, database containe
 
 1.144.0: the spec folder command is `<interpreter> -X utf8 <skill crav1-tasks-ready-to-build>/scripts/resolve_spec.py "<query>" --root docs/specs`. On Windows `<interpreter>` is `python` with `PYTHONUTF8=1`. Elsewhere it is `python3`. The rule is `docs/reference/running-scripts.md`.
 
+1.182.0: `Implemented, verified, tick pending` is the one wording for evidence that passed with the row still `[ ]`, on an unmerged branch or recorded merged. `verify_rows.py set` writes only that wording, rewrites an old `Implemented, verified on branch` row once when it touches the file, and a single row no longer moves the whole-file `Spec stamp:`; `--all-rows` on the last row of a full verify does.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.

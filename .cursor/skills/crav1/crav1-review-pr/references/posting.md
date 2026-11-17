@@ -25,5 +25,6 @@ When a post fails, say what failed and what already posted. Do not retry by anot
 - `ado_threads.py list --pr <n>` prints every thread with its status, file and comments.
 - `ado_threads.py compare --pr <n> --draft <file>` says whether a posted comment matches the draft (line endings and trailing spaces ignored).
 - `ado_threads.py post --pr <n> --file <file> --yes` posts a new top-level thread. Without `--yes` it only previews.
+- Organization, project and repository come from the code repo's git remote (`--code-repo <path>`, default the current folder) since 1.182.0, so a post no longer returns 404 without them. `--org`, `--project` and `--repo` still override.
 
 Add `--project`, `--repo` and `--org` when az has no defaults. It reads az's stdout as bytes and decodes UTF-8, then UTF-8 with a BOM, then cp1252.

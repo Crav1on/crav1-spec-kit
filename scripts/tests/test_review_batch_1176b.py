@@ -171,7 +171,8 @@ class VerifiedOnBranch(unittest.TestCase):
         self.assertFalse(tick.already_verified("Implemented, verified on branch"))
         self.assertTrue(tick.already_verified("Implemented, verified, tick pending"))
         we = load(SK / "crav1-tasks-ready-to-build/scripts/walk_ending.py", "walk_ending_1176b")
-        self.assertEqual(we.status_key("Implemented, verified on branch"), "on_branch")
+        # 1.182.0: the old on-branch wording is the same state as tick pending.
+        self.assertEqual(we.status_key("Implemented, verified on branch"), "tick_pending")
         self.assertEqual(we.status_key("Implemented, verified"), "verified")
 
     def test_ready_check_says_verified_on_branch(self):
@@ -320,7 +321,9 @@ class VerifyRowsKeepTheFile(unittest.TestCase):
             self.assertNotIn(b"\n", raw.replace(b"\r\n", b""))
             text = raw.decode("utf-8")
             self.assertIn("| Implemented, verified | 2 | T3, T1 |", text)
-            self.assertIn("| Implemented, verified on branch | 1 | T2 |", text)
+            # 1.182.0: written as tick pending, the old count row renamed.
+            self.assertIn("| Implemented, verified, tick pending | 1 | T2 |", text)
+            self.assertNotIn("verified on branch", text)
             self.assertIn("| Not implemented | 0 |", text)
 
 

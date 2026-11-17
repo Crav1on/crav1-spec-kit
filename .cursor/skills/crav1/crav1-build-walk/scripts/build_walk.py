@@ -1097,8 +1097,58 @@ def settle_stamps(text: str, hashes: dict | None = None) -> str | None:
 SELF_ORDER = ["build", "verify", "commit", "open-pr", "merge-base", "merge-pr", "tick", "next-task"]
 OTHER_ORDER = ["build", "verify", "commit", "comment", "wait-merge", "tick", "next-task"]
 STEP_NAMES = set(SELF_ORDER) | set(OTHER_ORDER) | {"approval", "live-dry", "live-yes", "confirm-owner", "permission-refused"}
-_STEP_BLOCK = re.compile(r"^- Step:\s*(?P<step>\S+)\s*$(?P<body>(?:\n  .*)*)", re.M)
+_BUILD_TASK_STEP = re.compile(r"^build\s+(T\d+(?:\s*(?:,|and)\s*T\d+)*)$", re.I)
+
+
+def build_step_tasks(step: str | None) -> list[str] | None:
+    """`build T47` -> ["T47"]; None when the step names no task (1.182.0)."""
+    match = _BUILD_TASK_STEP.match(" ".join(str(step or "").split()))
+    if not match:
+        return None
+    return [f"T{int(n)}" for n in re.findall(r"T(\d+)", match.group(1), re.I)]
+
+
+def step_base(step: str | None) -> str:
+    """`build T47` is the build step for T47 (1.182.0)."""
+    return "build" if build_step_tasks(step) is not None else str(step or "").strip().lower()
+
+
+def add_header_tasks(text: str, root: Path, tasks: list[str]) -> str:
+    """Add tasks missing from the header's Tasks: line, in order (1.182.0).
+
+    A second task built on a branch whose progress file lists only the first
+    one is added to the header, so the walk's lead and ending, the merge
+    list and the build map all name both.
+    """
+    head, sep, rest = (text or "").partition("\n- Step:")
+    match = re.search(r"^Tasks:\s*(.*)$", head, re.M)
+    if not match:
+        return text
+    have = [f"T{int(n)}" for n in re.findall(r"\bT(\d+)\b", match.group(1))]
+    missing = [task for task in tasks if task not in have]
+    if not missing:
+        return text
+    titles = task_titles(root)
+    rows = [{"id": tid, "title": (titles.get(tid) or {}).get("title") or ""} for tid in missing]
+    current = match.group(1).strip()
+    added = _task_list(rows)
+    value = added if current.lower() in ("", "none") else f"{current}, {added}"
+    head = head[:match.start(1)] + value + head[match.end(1):]
+    return head + sep + rest
+
+
+_STEP_BLOCK = re.compile(r"^- Step:\s*(?P<step>\S+(?:\s+T\d+(?:\s*(?:,|and)\s*T\d+)*)?)\s*$(?P<body>(?:\n  .*)*)", re.M | re.I)
 _PR_IN = re.compile(r"\b(?:PR|pull request)\s+#?(\d+)", re.I)
+
+
+def _all_task_ids(text: str, tasks_field: str) -> list[str]:
+    """Header tasks, then any task a `build T#` step names (1.182.0)."""
+    ids = [f"T{int(n)}" for n in re.findall(r"\bT(\d+)\b", tasks_field)]
+    for match in re.finditer(r"^- Step:\s*(build\b[^\n]*)$", text or "", re.M | re.I):
+        for task in build_step_tasks(match.group(1)) or []:
+            if task not in ids:
+                ids.append(task)
+    return ids
 
 
 def read_progress(text: str) -> dict:
@@ -1126,7 +1176,7 @@ def read_progress(text: str) -> dict:
         "owner": (field("Owner") or "self").lower(),
         "slice": field("Slice"),
         "cut_from": field("Cut from"),
-        "task_ids": [f"T{int(n)}" for n in re.findall(r"\bT(\d+)\b", tasks_field)],
+        "task_ids": _all_task_ids(text, tasks_field),
         "steps": steps,
         "pr": int(prs[-1]) if prs else None,
     }
@@ -1138,7 +1188,7 @@ def phase_from_progress(info: dict) -> str:
     if not steps:
         return "build"
     last = steps[-1]
-    step = last["step"]
+    step = step_base(last["step"])
     order = OTHER_ORDER if info.get("owner") == "other" else SELF_ORDER
     result = (last.get("result") or "").lower()
     if step == "wait-merge":
@@ -1277,13 +1327,18 @@ def cmd_progress(args: argparse.Namespace) -> int:
         ids = [_task_token(normalize_task(t)["id"]) for t in re.split(r"[,\s]+", args.tasks or "") if t]
         text = progress_init(root, args.branch, args.owner, ids, args.cut_from)
     else:
-        if not args.step or args.step not in STEP_NAMES:
-            return _bad("step", f"--step must be one of: {', '.join(sorted(STEP_NAMES))}")
+        named = build_step_tasks(args.step)
+        if not args.step or (args.step not in STEP_NAMES and named is None):
+            return _bad("step", f"--step must be one of: {', '.join(sorted(STEP_NAMES))}, or build <task> such as build T47")
         if not args.result:
             return _bad("result", "--result is required for record")
         if not path.is_file():
             return _bad("file", "No build progress file yet. Run progress init first.")
-        text = progress_record(path.read_text(encoding="utf-8"), root, args.step, args.result)
+        before = path.read_text(encoding="utf-8")
+        if named:
+            # 1.182.0: a build for a task the header does not list adds it.
+            before = add_header_tasks(before, root, named)
+        text = progress_record(before, root, args.step, args.result)
     wrote = False
     if args.yes:
         path.parent.mkdir(parents=True, exist_ok=True)
