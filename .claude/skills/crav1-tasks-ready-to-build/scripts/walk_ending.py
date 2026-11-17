@@ -695,7 +695,9 @@ def catch_up_block(slug=None, behind=None, orphans=None, ahead=0, failed=None, u
         # 1.176.0: commit the walk's own changes before any push, on every result.
         count = len(files)
         noun = "file" if count == 1 else "files"
-        lines.append(f"Commit the walk's changes, {count} {noun}:")
+        # 1.180.0 (S3): the files are the slice's changed spec files, which
+        # other skills may have written too, not only the walk's.
+        lines.append(f"Commit the {count} changed spec {noun}:")
         lines.append("`/crav1-finalize-commit`")
         lines.append("Then push the specs repo:")
         lines.append(f"`{PUSH_COMMAND}`")

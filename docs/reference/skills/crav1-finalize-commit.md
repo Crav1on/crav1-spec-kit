@@ -8,6 +8,8 @@
 
 Draft the commit message, then commit, copy, change, or stop.
 
+1.180.0: a task recorded merged on the host but not ticked is not a reason to recommend `stop`. `scripts/task_state.py commit-check --root <spec-folder>` (a thin wrapper over the shared crav1-tasks-ready-to-build module) lists it as tick pending, recommends `commit`, and gives the Run next entry: the verify step, or the tick once verify passes it.
+
 1.173.0: every ending, `commit`, `copy`, `stop` or a failed commit, is Run next or nothing, never a `Next:` line; a suggestion to throw an edit away is a plain sentence with the git command in a code span. A typed `commit` or `commit-now` still asks, with `stop` recommended, when the only changed files are kit-rewritten files (`build-map.md`, `walk-progress.md`, `build-progress/*`) whose values disagree with `verify.md` or `build-progress`, such as a done hash.
 
 1.171.0: every case ends with Run next, never a `Next:` line: `Push the specs repo:` with `git push`, `Push and open the pull request:` with [`/crav1-open-pr`](crav1-open-pr.md), or `Push to PR <n> and comment:` with [`/crav1-open-pr`](crav1-open-pr.md) pr<n>`.

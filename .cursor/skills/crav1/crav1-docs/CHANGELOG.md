@@ -2,6 +2,21 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.180.0 (2026-11-17)
+
+Fixes from a live session review. One shared module now decides a task's state, the ready check no longer hides a merge deadlock or a built-and-waiting task, the merge list follows the plan, tighten-plan's ending names the ready check, and owner names are cleaned where they are stored. Snapshot spec folders and an invariant checker guard the ready check's output.
+
+- **One owner for a task's state.** `task_state.py` (in `crav1-tasks-ready-to-build/scripts/`) says whether a task is done, tick pending, waiting for a merge or open. The build map takes each task's state and each box colour from it (`apply_task_states`, `box_state`), the ready check stamps the same state on its rows, verify's tick uses it, and finalize-commit runs `scripts/task_state.py commit-check` (a thin wrapper) for the merged-but-not-ticked decision, so a task recorded merged on the host is no longer done in one place and unticked in another. Tests check all three agree on the snapshot folders.
+- **Claimed rows keep their order.** `claims.py preserve --write` put claimed rows back in the `claims.md` order, moving rows in `tasks.md`. They now keep their file order, and the file keeps its line endings.
+- **The merge list follows the plan.** An unfinished task on a pull request's own branch now counts toward that pull request's order. A pull request whose branch still has an open task waiting on another pull request is listed after it, with `not ready to merge: T46 waits on T8 (PR 73)`.
+- **Tick pending is not a reason to stop.** Finalize-commit names a task recorded merged but not ticked, recommends `commit`, and puts the verify step (or the tick, once verify passes it) in Run next, all from `task_state.py commit-check`. Verify's tick offer is a labelled Run next step (`verify_rows.py tick`), never a line after the ending, and the `verify.md` template comment says so.
+- **Merge deadlocks are Blocked.** A task that waits on a task that ticks only when its own branch's pull request merges is shown as Blocked, red on the map, with `/crav1-tighten-plan` first in Run next, not as in progress.
+- **Built and waiting is waiting.** A task built by someone else and waiting for its pull request now holds its dependants the same way whichever file mentions it, and an unrecognized blocker is counted as Blocked and printed instead of dropped.
+- **Tighten-plan ends with the ready check.** With no plan issue left, Run next names `/crav1-tasks-ready-to-build <slug>`, never `/crav1-build-tasks`, and uncommitted files are committed first inside Run next.
+- **Smaller fixes.** A reopened step's reason names only the sections that can reopen it (not Match or In the code). The map is written before uncommitted files are counted, and the line reads `Commit the <n> changed spec files:`. Held lines name every unfinished dependency, held ones first, then `and T8 (not built)`.
+- **Owner names.** A leading word such as `Admin` and a trailing `(...)` tag are dropped when a name is written and when it is read, two spellings of one person are listed once, stored `PR author:` lines are rewritten once, and the ready check's reply ends with a `Recorded:` line naming the files it wrote.
+- **Snapshots and invariants.** `scripts/snapshot-check.py` runs the ready check on anonymised spec folders under `scripts/tests/snapshots/` and compares the reply, the map and the build-progress files with the expected ones (`--update` rewrites them). `task_invariants.py` checks that counts add up, nothing Blocked is hidden, a ticked task is never ready, the merge list keeps its order, deadlocks name the plan fix, no `Next:` line appears, and no owner name keeps its extras.
+
 ## 1.179.0 (2026-11-17)
 
 Fixes from a live ready check on Windows. The ready check now reaches Azure DevOps, says why when it cannot instead of asking who opened a pull request, writes each answer into the right build-progress file, and offers people as owner choices.
@@ -171,15 +186,5 @@ The verify reply gets the shared ending. A minor release because `/crav1-verify-
 - **Fewer reads.** The skill names what it reads: spec, plan, tasks, the previous `verify.md`, and the reference a step names. It does not open `build-map.md`, `claims.md`, `walk-progress.md` or a log unless a step needs it.
 - One builder: `walk_ending.verify_reply()` with `verify_state()`, `verify_catch_up_block()` and `step_block()`, run as `walk_ending.py --verify <state file>`. The script reads the counts and changed tasks from `verify.md` against the committed copy, and the uncommitted files and ahead count from git; the skill passes only the steps, plan notes and waits. The verify skill ships a `scripts/walk_ending.py` wrapper and a new `references/reply.md`. SKILL.md is 1,413 words (was 1,416).
 - `run-ending.md`, the verify walkthrough and the skill pages show it. Tests: `scripts/tests/test_verify_ending_1168.py`.
-
-## 1.167.0 (2026-11-15)
-
-What you can fix now leads Run next as a Catch up first block, instead of sitting in Waiting lines at the bottom. A minor release because the ending reads differently in the ready check, the tighten-and-plan ready check and the build walk.
-
-- **Catch up first.** verify.md behind tasks.md, a verify.md row for a T# that is not in tasks.md, and a specs repo ahead of origin are one `**Catch up first**` block at the top of Run next, before the branch blocks and in their layout: the bold heading, one or two plain sentences of what is behind (`verify.md is behind for T4 and T7, and it has a row for T44, which is not in tasks.md.`), then each command alone in its code span under its label (`Check T4 and T7 against the spec and remove the T44 row:` with `` `/crav1-verify-build-against-spec <slug>` ``, `Push the specs repo (2 commits ahead):` with `` `git push` ``), and a `---` line before the first branch block. Left out when nothing is behind. A not-ready ending puts the same block first and drops its separate verify or push entry.
-- **One command for the stray row.** `/crav1-verify-build-against-spec` now says it writes one Tasks overview row per T# in `tasks.md` and drops a row for a T# that `tasks.md` does not have, naming it in the reply. The ready check therefore names only that command, and no longer `/crav1-tighten-plan`, which never wrote `verify.md`.
-- **Waiting is for waits.** Waiting lines keep only what you cannot act on now, such as a person's answer or a merge.
-- One shared builder, `walk_ending.catch_up_block()`, used by the ready check and the tighten-and-plan ready check (`catch_up` in the readiness JSON), and passed through by `/crav1-build-walk` and the branch run when their state carries `catch_up`.
-- `run-ending.md`, the readiness, rules, verify-behind, next-verify and sync references, the build-walk state table, three walkthroughs and the skill pages show it. Tests: `scripts/tests/test_catch_up_block_1167.py`; two older tests now expect the block.
 
 The newest 15 releases are above. The full changelog is https://github.com/Crav1on/crav1-spec-kit/blob/main/CHANGELOG.md.

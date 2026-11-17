@@ -194,7 +194,7 @@ class Queue(unittest.TestCase):
         allowed = [
             "Fix the spec finding, which is a spec defect:",
             "Resolve the spec finding, which is an open question:",
-            "Build the tasks in a new chat, with plan.md, tasks.md and spec.md attached, since the plan issues are done:",
+            "Check what can be built, since the plan issues are done:",
             "Nothing needed now.",
         ]
         for label in allowed:
@@ -272,7 +272,7 @@ class SkillText(unittest.TestCase):
             "Compare by meaning first: a reworded line a task already covers is a `fix-trace`, not a new task.",
             "**Spec** tag: the plan is fine or cannot be honest until `spec.md` changes.",
             "Remaining `P#` titles only. Mark the current one. Note plan vs spec.",
-            "Build the tasks in a new chat, with plan.md, tasks.md and spec.md attached, since the plan issues are done:",
+            "Check what can be built, since the plan issues are done:",
             "A plan that already says none is not a `P#` by itself.",
             "This line is the only `plan.md` change this skill makes outside the picked patches.",
             "At most **one** alternate suggestion, then they must pick a patch letter, `ask`, `keep`, or `send-to-spec`.",

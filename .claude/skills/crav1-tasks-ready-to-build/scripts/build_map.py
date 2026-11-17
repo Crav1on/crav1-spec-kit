@@ -99,6 +99,7 @@ def _load(name):
 
 task_order = _load("task_order")
 question_blocks = _load("question_blocks")
+task_state = _load("task_state")
 
 STEP_LINE = re.compile(r"^(\d+)[.)]\s*(.*)$")
 TASK_ID = re.compile(r"\bT(\d+)\b")
@@ -1725,8 +1726,11 @@ def progress_state(directory):
         prs = re.findall(r"\b(?:PR|pull request)\s+#?(\d+)", text, re.I)
         key = branch or path.stem.replace("--", "/")
         failed = any(value == "failed" for value in last_result.values())
+        # 1.180.0: the walk's last step is comment or wait-merge, the same
+        # rule the ready check uses for tasks that wait on the merge.
+        waits = step in ("comment", "wait-merge") and not merged
         found[key] = {"built": built, "pr": int(prs[-1]) if prs else None, "merged": merged, "tasks": listed,
-                      "failed": failed and not merged}
+                      "failed": failed and not merged, "wait_merge": waits}
     return found
 
 
@@ -1796,16 +1800,32 @@ def _explicit(task):
     return None
 
 
+def apply_task_states(tasks, walks):
+    """Each task's state from task_state.py, the decision the ready check and
+    finalize-commit use (1.180.0); done follows from it. Returns {T#: state}.
+
+    1.177.2: a walk with a merge-pr result (the walk, /crav1-merge-pr, or the
+    ready check's host check) makes the tasks on its Tasks: line done.
+    """
+    merged_ids = {int(n) for walk in (walks or {}).values() if walk.get("merged") for n in walk.get("tasks") or ()}
+    built_ids = {int(n) for walk in (walks or {}).values() if not walk.get("merged") for n in walk.get("built") or ()}
+    built_ids |= {int(n) for walk in (walks or {}).values() if walk.get("wait_merge") for n in walk.get("tasks") or ()}
+    out = {}
+    for task in tasks:
+        state = task_state.task_state(task["done"], task["id"] in merged_ids, None, task["id"] in built_ids)
+        task["state"] = state["state"]
+        task["done"] = state["counts_done"]
+        out[f"T{task['id']}"] = state["state"]
+    return out
+
+
 def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text="", resolve_recorded=False, repo=None, claims_text="", code_repo=None, progress=None, existing=None, walks=None):
     """Return markdown, a short chat summary, and the one-line pointer."""
     _REMOTE_CACHE.clear()
     tasks = parse_tasks(tasks_text)
     # 1.177.2: a walk with a merge-pr result (the walk, /crav1-merge-pr, or
     # the ready check's host check) makes the tasks on its Tasks: line done.
-    merged_ids = {int(n) for walk in (walks or {}).values() if walk.get("merged") for n in walk.get("tasks") or ()}
-    for task in tasks:
-        if task["id"] in merged_ids:
-            task["done"] = True
+    apply_task_states(tasks, walks)
     titles = work_item_titles(work_item_text)
     name_of = {
         task["id"]: short_name(task.get("rest") or task["title"], titles.get(task["id"]))
@@ -2175,7 +2195,14 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text
             branch["held_on"] = []
             built = set((walk or {}).get("built") or ())
             pr = (walk or {}).get("pr")
-            if built and all(task_id in built for task_id in open_ids):
+            deadlock = merge_deadlock(branch["tasks"], built, pr) if walk and not walk.get("merged") else None
+            if deadlock:
+                # 1.180.0 (M4): an open task waits on a task that ticks only
+                # when this branch's own PR merges. Blocked, red on the map.
+                branch["status"] = "blocked"
+                branch["deadlock"] = deadlock
+                branch["held_text"] = deadlock
+            elif built and all(task["state"] == task_state.MERGE_WAIT for task in branch["tasks"] if not task["done"]):
                 branch["held_text"] = f"built, waits for PR {pr} to merge" if pr else "built, waits for its pull request to merge"
             else:
                 branch["held_text"] = "in progress"
@@ -2584,7 +2611,22 @@ def _waits_line(branch, by_name):
     return "; ".join(parts) if parts else "none"
 
 
+def merge_deadlock(tasks, built, pr):
+    """`blocked, merge deadlock: T8 waits on T43, which ticks only when PR 73 merges` or None (1.180.0)."""
+    if not pr or not built:
+        return None
+    for task in tasks or ():
+        if task.get("done") or task["id"] in built:
+            continue
+        for dep in task.get("deps") or ():
+            if dep in built:
+                return "blocked, " + task_state.deadlock_text(f"T{task['id']}", f"T{dep}", pr).rstrip(".").replace("Merge", "merge", 1)
+    return None
+
+
 def _ready_now(branch):
+    if branch.get("deadlock"):
+        return branch["deadlock"]
     if branch.get("loop"):
         return "blocked, in a loop"
     if branch["status"] == "held":
@@ -2770,19 +2812,8 @@ def map_state(branch):
     hold on another branch that waits. Done when every task is done. Else
     todo (ready, waits in order, in progress).
     """
-    status = branch.get("status")
-    if branch.get("loop") or status == "blocked" or branch.get("section") == "blocked" or branch.get("failed"):
-        return "blocked"
-    if status == "done":
-        return "done"
-    if status == "waiting on a question":
-        return "waiting"
-    if status == "held":
-        text = branch.get("held_text") or ""
-        if text == "in progress":
-            return "todo"
-        return "waiting"
-    return "todo"
+    # 1.180.0: the colour is task_state.box_state, from each task's state.
+    return task_state.box_state(branch)
 
 
 def _mermaid(branches, by_name):

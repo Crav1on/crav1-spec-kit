@@ -201,6 +201,8 @@ Since 1.178.0 the skill asks which repo a pull request is in before it asks who 
 
 Since 1.179.0 the ready check also reaches Azure DevOps on Windows, where `az` is `az.cmd`. When it cannot read a pull request's host, it does not ask you who opened the pull request. Catch up first says why, for example not signed in, with the command that fixes it under its label, such as `az login`, and then asks you to run the ready check again. When you do answer a repo or owner question, the answer goes into that pull request's own build-progress file, and the reply names the file to commit. The owner question offers the people open questions wait on, never a team or the word other.
 
+Since 1.180.0 one module decides each task's state, so the ready check, the build map, verify and finalize-commit agree. A task that waits on a task that can only tick when its own branch's pull request merges is shown as Blocked, a merge deadlock, with `/crav1-tighten-plan` to fix the order. A pull request whose branch still has an open task waiting on another pull request is listed after that one, with the reason. Names like `Admin Person A` or `Person B (Tag)` are cleaned to `Person A` and `Person B`, stored lines too, and the reply ends with a `Recorded:` line naming the files it wrote.
+
 Reference page: [tasks-ready-to-build](reference/skills/crav1-tasks-ready-to-build.md) · Routes: [Workflow routes](reference/workflow.md)
 
 The run ends as [How a run ends](reference/run-ending.md) says: one Run next block with one entry per ready branch, `Waiting:` only when a step is blocked, and `Uncommitted:` when files changed and are not committed.

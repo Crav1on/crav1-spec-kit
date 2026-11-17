@@ -596,7 +596,9 @@ def preserve_claimed(before: str, after: str, claimed: list[str]) -> dict:
 
     current = _task_map("\n".join(rewritten))
     claimed_positions = [(current[token][0], token) for token in claimed_set if token in current]
-    expected_order = list(claimed_set)
+    # 1.180.0 (M1): claimed rows keep the order they had in the file, not
+    # the order claims.md lists them in.
+    expected_order = sorted(claimed_set, key=lambda token: original[token][0])
     actual_order = [token for _idx, token in sorted(claimed_positions)]
     if actual_order != expected_order:
         positions = sorted(idx for idx, _token in claimed_positions)
@@ -669,7 +671,10 @@ def cmd_list(args: argparse.Namespace) -> int:
 def cmd_preserve(args: argparse.Namespace) -> int:
     before = Path(args.before).read_text(encoding="utf-8")
     after_path = Path(args.after)
-    after = after_path.read_text(encoding="utf-8")
+    with open(after_path, encoding="utf-8", newline="") as handle:
+        raw_after = handle.read()
+    eol = "\r\n" if "\r\n" in raw_after else "\n"
+    after = raw_after.replace("\r\n", "\n")
     if args.tasks:
         try:
             claimed = task_tokens(args.tasks)
@@ -680,7 +685,9 @@ def cmd_preserve(args: argparse.Namespace) -> int:
         claimed = claimed_ids(loaded["claims"])
     result = preserve_claimed(before, after, claimed)
     if args.write and result.get("changed"):
-        after_path.write_text(result["text"], encoding="utf-8")
+        # 1.180.0 (M1): keep the file's own line endings.
+        with open(after_path, "w", encoding="utf-8", newline="") as handle:
+            handle.write(result["text"].replace("\n", eol))
         result["wrote"] = str(after_path)
     return emit(result)
 
