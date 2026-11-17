@@ -45,7 +45,7 @@ A plugin install does not get that commit. The command compares the installed pl
 ## After
 
 ```text
-Next: nothing needed now.
+Run next: nothing needed now.
 ```
 
 Reload the window so the new skills load. When files were written and not committed, the run adds one `Uncommitted:` line. See [How a run ends](reference/run-ending.md).

@@ -44,10 +44,10 @@ The heads-up card is not skipped. A word in the opening message is not the yes. 
 
 End as [run-ending.md](../crav1-docs/reference/run-ending.md) says.
 
-After a commit, when the kit was already current, or when a plugin install needed no file write:
+The ending is Run next (1.178.0), never a `Next:` line. After a commit, when the kit was already current, or when a plugin install needed no file write:
 
 ```text
-Next: nothing needed now.
+Run next: nothing needed now.
 ```
 
 When this run wrote files and they are not committed, add one trailing line:

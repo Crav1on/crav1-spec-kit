@@ -1681,7 +1681,10 @@ def progress_state(directory):
     """Each branch's walk from build-progress/*.md, as {branch: state} (1.174.0).
 
     A state is {"built": {task ids}, "pr": number or None, "merged": bool,
-    "tasks": {ids on the header's Tasks: line}} (tasks: 1.177.2).
+    "tasks": {ids on the header's Tasks: line}, "failed": bool} (tasks:
+    1.177.2). `failed` (1.178.0) is true when a step's last `Result:` is
+    failed or reopened (a failed check, a reopened step), so the map's box
+    turns red.
     A task counts as built from a done `Step: build T#` or a `- Built: T#`
     run row. The pull request is the last `PR <n>` the file names.
     """
@@ -1699,6 +1702,7 @@ def progress_state(directory):
         merged = False
         step = ""
         listed = set()
+        last_result: dict = {}
         for line in text.splitlines():
             stripped = line.strip()
             lower = stripped.lower()
@@ -1710,14 +1714,19 @@ def progress_state(directory):
                 step = stripped.split(":", 1)[1].strip().lower()
             elif lower.startswith("- built:"):
                 built.update(int(n) for n in re.findall(r"\bT(\d+)\b", stripped.split(",", 1)[0]))
+            elif re.match(r"result:\s*(failed|fail|reopened)\b", stripped, re.I):
+                last_result[step] = "failed"
             elif re.match(r"result:\s*(done|merged)\b", stripped, re.I):
+                last_result[step] = "done"
                 if step.startswith("build "):
                     built.update(int(n) for n in re.findall(r"\bt(\d+)\b", step))
                 elif step.startswith("merge-pr"):
                     merged = True
         prs = re.findall(r"\b(?:PR|pull request)\s+#?(\d+)", text, re.I)
         key = branch or path.stem.replace("--", "/")
-        found[key] = {"built": built, "pr": int(prs[-1]) if prs else None, "merged": merged, "tasks": listed}
+        failed = any(value == "failed" for value in last_result.values())
+        found[key] = {"built": built, "pr": int(prs[-1]) if prs else None, "merged": merged, "tasks": listed,
+                      "failed": failed and not merged}
     return found
 
 
@@ -2157,6 +2166,7 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text
         # A branch never waits on its own tasks (1.174.0). Claimed or walked,
         # it reads built and waiting for its pull request, or in progress.
         walk = (walks or {}).get(branch["name"])
+        branch["failed"] = bool(open_ids and walk and walk.get("failed"))
         if open_ids and branch["status"] in ("ready", "held") and (
             branch["status"] == "held" and set(branch["held_on"]) <= {f"T{task_id}" for task_id in open_ids}
             or (walk and not walk.get("merged") and walk.get("built"))
@@ -2725,6 +2735,56 @@ def _mermaid_label(name):
     return name.replace('"', "'").replace("[", "(").replace("]", ")")
 
 
+# Build-map colours (1.178.0). Each box takes its worst task's state: red
+# (truly blocked: a loop, a failed check, a reopened step, no plan), then
+# amber (waits on a pull request or a question), then blue (ready or not
+# started, the default), then green (every task done). The edge out of a
+# box shows that box's state: solid green, dashed amber, thick red, plain
+# blue. Fills are dark and text, borders and edges are bright, so the map
+# reads on a dark background and stays readable on a light one.
+MAP_STATES = ("blocked", "waiting", "todo", "done")
+MAP_CLASSES = {
+    "done": "fill:#14532d,stroke:#4ade80,stroke-width:2px,color:#f0fdf4",
+    "waiting": "fill:#78350f,stroke:#fbbf24,stroke-width:2px,color:#fffbeb",
+    "blocked": "fill:#7f1d1d,stroke:#f87171,stroke-width:3px,color:#fef2f2",
+    "todo": "fill:#1e3a8a,stroke:#60a5fa,stroke-width:2px,color:#eff6ff",
+}
+MAP_EDGE_COLOURS = {"done": "#4ade80", "waiting": "#fbbf24", "blocked": "#f87171", "todo": "#60a5fa"}
+MAP_EDGE_ARROWS = {"done": "-->", "waiting": "-.->", "blocked": "==>", "todo": "-->"}
+MAP_EDGE_WIDTH = {"done": "2px", "waiting": "2px", "blocked": "4px", "todo": "2px"}
+MAP_LEGEND = (
+    ("done", "Done"),
+    ("waiting", "Waits on a PR or question"),
+    ("blocked", "Blocked"),
+    ("todo", "Ready or not started"),
+)
+MAP_GROUP_STYLE = "fill:transparent,stroke:#94a3b8,stroke-width:1px,color:#cbd5e1"
+
+
+def map_state(branch):
+    """One of done, waiting, blocked, todo: the box colour (1.178.0).
+
+    Blocked only for a truly blocked branch: in a loop, the Blocked section,
+    or a walk whose last result failed or was reopened. Waiting for a
+    question hold, a branch built and waiting for its pull request, or a
+    hold on another branch that waits. Done when every task is done. Else
+    todo (ready, waits in order, in progress).
+    """
+    status = branch.get("status")
+    if branch.get("loop") or status == "blocked" or branch.get("section") == "blocked" or branch.get("failed"):
+        return "blocked"
+    if status == "done":
+        return "done"
+    if status == "waiting on a question":
+        return "waiting"
+    if status == "held":
+        text = branch.get("held_text") or ""
+        if text == "in progress":
+            return "todo"
+        return "waiting"
+    return "todo"
+
+
 def _mermaid(branches, by_name):
     if not branches:
         return "flowchart LR\n  none[\"Nothing left to build\"]"
@@ -2737,6 +2797,7 @@ def _mermaid(branches, by_name):
             waves.setdefault(branch["wave"], []).append(branch)
     lines = ["flowchart LR"]
     ids = {}
+    states = {}
     number = 1
 
     def add_group(group_id, title, members):
@@ -2747,8 +2808,12 @@ def _mermaid(branches, by_name):
             node = f"b{number}"
             number += 1
             ids[branch["name"]] = node
+            states[node] = map_state(branch)
             lines.append(f'    {node}["{_mermaid_label(branch["name"])}"]')
         lines.append("  end")
+        groups.append(group_id)
+
+    groups = []
 
     for wave_number in sorted(waves):
         add_group(f"w{wave_number}", f"Wave {wave_number}", waves[wave_number])
@@ -2758,14 +2823,36 @@ def _mermaid(branches, by_name):
         add_group("inloop", "In a loop", looped)
     if others:
         add_group("blocked", "Blocked", others)
+    lines.append('  subgraph legend["Legend"]')
+    lines.append("    direction TB")
+    for index, (state, label) in enumerate(MAP_LEGEND, 1):
+        lines.append(f'    key{index}["{label}"]')
+    lines.append("  end")
+    groups.append("legend")
     seen = set()
+    edges = []
     for branch in branches:
         for dep in branch["waits"]:
             edge = (ids.get(dep), ids.get(branch["name"]))
             if edge in seen or None in edge:
                 continue
             seen.add(edge)
-            lines.append(f"  {edge[0]} --> {edge[1]}")
+            state = states.get(edge[0], "todo")
+            edges.append(state)
+            lines.append(f"  {edge[0]} {MAP_EDGE_ARROWS[state]} {edge[1]}")
+    for state in MAP_STATES:
+        lines.append(f"  classDef {state} {MAP_CLASSES[state]}")
+    for index, (state, _label) in enumerate(MAP_LEGEND, 1):
+        states[f"key{index}"] = state
+    for state in MAP_STATES:
+        nodes = [node for node, value in states.items() if value == state]
+        if nodes:
+            lines.append(f"  class {','.join(nodes)} {state}")
+    for group in groups:
+        lines.append(f"  style {group} {MAP_GROUP_STYLE}")
+    lines.append("  linkStyle default stroke:#60a5fa,stroke-width:2px")
+    for index, state in enumerate(edges):
+        lines.append(f"  linkStyle {index} stroke:{MAP_EDGE_COLOURS[state]},stroke-width:{MAP_EDGE_WIDTH[state]}")
     return "\n".join(lines)
 
 

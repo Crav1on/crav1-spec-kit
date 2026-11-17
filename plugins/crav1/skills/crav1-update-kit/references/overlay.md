@@ -36,7 +36,7 @@ Never write these, even if a release tree contains them: a spec folder (`walk-pr
 
 ## Persisted commit style (1.176.0)
 
-A saved commit-style rule (`draft-commit-style` or `draft-commit-gitlog` in the repo's Cursor or Claude Code rules folder) is rewritten from the current message-only asset when it is stale: it is the old release's copy unchanged, or it names `crav1-draft-commit-message/`, a skill that no longer exists. It shows under `update` in the plan, so it is in the same yes. A rule changed by hand is left and listed in `style_rules_left`; say which one and that it still points where it did. A rule under the home folder is not touched.
+A saved commit-style rule (`draft-commit-style` or `draft-commit-gitlog` in the repo's Cursor or Claude Code rules folder) is rewritten from the current message-only asset when it is stale: it is the old release's copy unchanged, or it names `crav1-draft-commit-message/`, a skill that no longer exists. It shows under `update` in the plan, so it is in the same yes. A stale rule whose asset is gone from the new release is listed under `delete` and the kit removes it in the same yes (1.178.0). The kit writes, removes and commits these rules itself, so a stale rule is never refused as a project file. A rule changed by hand is left and listed in `style_rules_left`; say which one and that it still points where it did. A rule under the home folder is not touched.
 
 ## Commit
 

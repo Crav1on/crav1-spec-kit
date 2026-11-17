@@ -2,6 +2,17 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.178.0 (2026-11-17)
+
+Fixes from a live ready check and a kit update. The build map shows each branch's state in colour, the update no longer refuses a stale commit-style rule, and the ready check asks for the code repo first, reads the owner and merge state from the host in one lookup, and runs again after each answer.
+
+- **Build-map colours.** Each branch box in the `build-map.md` diagram takes its worst task's state: green is done (solid edge), amber waits on a pull request or a question (dashed edge), red is truly blocked only, such as a loop, a failed check or a reopened step (thick edge), and blue is the default for ready or not started. The edge out of a box shows that box's state. A `Legend` subgraph names the four colours. Fills are dark and text, borders and edges are bright, so the map reads on a dark background. A build-progress step whose last `Result:` is `failed` or `reopened` turns its branch red.
+- **Stale commit-style rules are fixed, not refused.** `/crav1-update-kit` planned a rewrite of a stale `draft-commit-style` rule that pointed to the removed `crav1-draft-commit-message` skill, then refused it with `Refused: ... is a project file.` because the writer and the commit only took kit-owned paths. Now the kit writes and commits these rules itself; a rule is committed only when it is removed or matches the current asset, so a hand edit is never swept in. A stale rule whose asset is gone from the new release is listed under `delete` and removed in the same yes.
+- **Update ending is Run next.** `/crav1-update-kit` ends `Run next: nothing needed now.` instead of a `Next:` line.
+- **Repo first, then one host lookup.** When a waiting pull request's code repo is not recorded, the skill asks for the repo first, offering the `docs/system/repos.md` rows. With the repo known, one read-only lookup on that host (`gh` or `az`, 8-second timeout) gives both who opened the pull request and whether it merged, and the owner is recorded as `PR author:` in its build-progress file. The skill asks who opened it only when that lookup names no one. The `--full` JSON adds `ask_first`, `owner_unknown` and `owners_from_host`.
+- **The check runs again after an answer.** After `walk_progress.py code-repo` or `pr-author` records an answer, the skill runs the ready check again in the same run and prints the new reply. Both commands return a `rerun` field naming it.
+- **Owner choices.** The owner question offers the names the kit already knows (people in `claims.md`, PR notes' `author:`, and build-progress `PR author:`, `Opened by:` and `Owner:` lines) besides `Don't know`. `pr-author` lists them under `choices` when the host names no one, and the `--full` JSON has them as `owner_choices`.
+
 ## 1.177.2 (2026-11-16)
 
 Fixes for a specs repo and a code repo on different hosts, found on a live run. The ready check asks each waiting pull request's own host whether it merged and records the merge, a pull request whose code repo is not recorded is named and asked about once, and `--write-map` says whether the map changed.

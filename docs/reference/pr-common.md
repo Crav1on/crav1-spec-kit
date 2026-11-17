@@ -32,6 +32,8 @@ Since 1.177.1 `--root` may be the specs repo root, `docs/specs`, or one spec fol
 
 **Did it merge (1.177.2).** `host_state` asks the same way whether a pull request merged: `gh pr view <n> --json state,mergeCommit,mergedAt,closedAt` on GitHub (`MERGED`, `CLOSED`, `OPEN`), `az repos pr show --id <n>` (`status`, `lastMergeCommit`, `closedDate`) on Azure DevOps (`completed`, `abandoned`, `active`). It returns the state, the merge commit when the host gives it, and the date, or nothing when the CLI is missing, not signed in, slow or fails. The ready check records a merge in build-progress itself; a `Code repo:` line written by `walk_progress.py code-repo --root <spec-folder> --pr <n> --repo <name-or-url>` gives a number-only record its host.
 
+**One lookup (1.178.0).** `host_state` also asks for who opened the pull request (`author` on GitHub, `createdBy.displayName` on Azure DevOps) and returns it as `author` when the host names one, so the ready check reads the owner and the merge state in one call. `host_author` is then not called again for that pull request in the same run.
+
 Remote: the single `git remote`. If several remotes exist, ask which one. A full URL names its host.
 
 ## Finding the pull request for a branch

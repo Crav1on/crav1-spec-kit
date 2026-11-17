@@ -2,6 +2,17 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.178.0 (2026-11-17)
+
+Fixes from a live ready check and a kit update. The build map shows each branch's state in colour, the update no longer refuses a stale commit-style rule, and the ready check asks for the code repo first, reads the owner and merge state from the host in one lookup, and runs again after each answer.
+
+- **Build-map colours.** Each branch box in the `build-map.md` diagram takes its worst task's state: green is done (solid edge), amber waits on a pull request or a question (dashed edge), red is truly blocked only, such as a loop, a failed check or a reopened step (thick edge), and blue is the default for ready or not started. The edge out of a box shows that box's state. A `Legend` subgraph names the four colours. Fills are dark and text, borders and edges are bright, so the map reads on a dark background. A build-progress step whose last `Result:` is `failed` or `reopened` turns its branch red.
+- **Stale commit-style rules are fixed, not refused.** `/crav1-update-kit` planned a rewrite of a stale `draft-commit-style` rule that pointed to the removed `crav1-draft-commit-message` skill, then refused it with `Refused: ... is a project file.` because the writer and the commit only took kit-owned paths. Now the kit writes and commits these rules itself; a rule is committed only when it is removed or matches the current asset, so a hand edit is never swept in. A stale rule whose asset is gone from the new release is listed under `delete` and removed in the same yes.
+- **Update ending is Run next.** `/crav1-update-kit` ends `Run next: nothing needed now.` instead of a `Next:` line.
+- **Repo first, then one host lookup.** When a waiting pull request's code repo is not recorded, the skill asks for the repo first, offering the `docs/system/repos.md` rows. With the repo known, one read-only lookup on that host (`gh` or `az`, 8-second timeout) gives both who opened the pull request and whether it merged, and the owner is recorded as `PR author:` in its build-progress file. The skill asks who opened it only when that lookup names no one. The `--full` JSON adds `ask_first`, `owner_unknown` and `owners_from_host`.
+- **The check runs again after an answer.** After `walk_progress.py code-repo` or `pr-author` records an answer, the skill runs the ready check again in the same run and prints the new reply. Both commands return a `rerun` field naming it.
+- **Owner choices.** The owner question offers the names the kit already knows (people in `claims.md`, PR notes' `author:`, and build-progress `PR author:`, `Opened by:` and `Owner:` lines) besides `Don't know`. `pr-author` lists them under `choices` when the host names no one, and the `--full` JSON has them as `owner_choices`.
+
 ## 1.177.2 (2026-11-16)
 
 Fixes for a specs repo and a code repo on different hosts, found on a live run. The ready check asks each waiting pull request's own host whether it merged and records the merge, a pull request whose code repo is not recorded is named and asked about once, and `--write-map` says whether the map changed.
@@ -169,16 +180,5 @@ Every Run next branch block has a description again, and a held question that po
 - **No person's name.** A plan note that opens with a person, such as `Person A builds PR 73: GetReceipts answers 404 ...`, drops that lead and describes the work after it: `GetReceipts answers 404 for a cursor that matches no stored receipt.` A short trailing fragment such as `PR 73` is dropped too.
 - **The quoted question, not the pointer.** A held question whose text ends with `:` or only points to a note, such as `The note docs/notes/x.md, in Open questions, question 5, says:`, shows the quoted question that follows: the `>` blockquote under the bullet in the spec, else the text in quotes after the colon, else the first sentence ending in `?`. The question's key and stored text do not change, so recorded answers still match. A question that quotes another one keeps its inner quotes on the held line.
 - `run-ending.md`, the build-map fallback reference, the grouping reference, both walkthroughs and the skill page show the new rule. Tests: `scripts/tests/test_branch_description_1166.py`; three older tests now expect the description line.
-
-## 1.165.0 (2026-11-15)
-
-Fixes to the Run next ending from 1.164.0, found when it ran on a real plan. A minor release because the ending reads differently in the ready check, the tighten-and-plan ready check and the build walk.
-
-- **Clear gaps between branches.** A `---` line, with a blank line on each side, now stands between two branch blocks in Run next, so the next branch's name never sits right under the previous command in a Markdown viewer.
-- **The branch sentence is a description, not plan notes.** The line under a branch is the plan step's first sentence only when it is clean: it ends with a full stop, has no colon list and does not open with a person, such as `Person A builds PR 73: ...`. Otherwise it is the step's heading in plain words (a bold lead, or short words before ` — ` or `:`). Otherwise the line is left out. So a person's name no longer leads that line.
-- **Cuts at a clause or a word.** A long branch sentence or held question is cut at a clause end, else at a word, never on a dangling word such as `the` or `that`. There is a bit more room, about 160 characters.
-- **The question, not its heading.** A held question that opens with a short heading, such as `Client certificate.`, shows the question sentence (the one ending in `?`), or else the next real sentence.
-- **The first task matches the list.** A branch's open tasks are listed in the order the walk runs them. A task that cannot start yet says why on its line, for example `- T8 Take in develop (waits on T5)`. When the first listed task cannot start, the task command says `Run only T43, the first task that can start:`.
-- `run-ending.md`, the build-map fallback reference, the grouping reference and both walkthroughs show the new form. Tests: `scripts/tests/test_run_next_fixes_1165.py`.
 
 The newest 15 releases are above. The full changelog is https://github.com/Crav1on/crav1-spec-kit/blob/main/CHANGELOG.md.
