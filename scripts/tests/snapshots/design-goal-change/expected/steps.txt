@@ -141,6 +141,8 @@ Exit: 0
   "dropped": [],
   "preview": false,
   "written": [
+    "docs/architecture/designs/orders-platform/inputs/README.md",
+    "docs/architecture/designs/orders-platform/inputs/goal-change-1.json",
     "docs/architecture/designs/orders-platform/goal.md",
     "docs/architecture/designs/orders-platform/designs/platform-first/design.md",
     "docs/architecture/designs/orders-platform/designs/platform-first/stages.md"
@@ -200,6 +202,7 @@ Exit: 0
   ],
   "preview": false,
   "written": [
+    "docs/architecture/designs/orders-platform/inputs/goal-change-2.json",
     "docs/architecture/designs/orders-platform/goal.md",
     "docs/architecture/designs/orders-platform/designs/platform-first/design.md"
   ]

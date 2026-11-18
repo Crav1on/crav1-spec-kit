@@ -72,7 +72,7 @@ class Base(unittest.TestCase):
         return self.ok("create", "--topic", T, inp=goal)
 
     def titles(self):
-        return [d["title"] for d in dr.Topic(self.tmp, T).design("platform-first")["decisions"]]
+        return [d["title"] for d in dr.ordered(dr.Topic(self.tmp, T).design("platform-first")["decisions"])]
 
 
 class TestStoredOrder(Base):
@@ -115,11 +115,9 @@ class TestEnding(unittest.TestCase):
         self.assertIn("Waiting: person A to decide the layout\n", self.end(waiting="person A to decide the layout"))
 
     def test_uncommitted_types(self):
-        self.assertIn("Uncommitted: files in docs/architecture/designs/orders-platform/.", self.end(uncommitted=True))
         self.assertIn("Uncommitted: 1 file.", self.end(uncommitted=1))
         self.assertIn("Uncommitted: 3 files.", self.end(uncommitted=3))
-        self.assertIn("Uncommitted: 2 files: `a.md`, `b.md`.", self.end(uncommitted=["a.md", "b.md"]))
-        self.assertIn("Uncommitted: the design folder.", self.end(uncommitted="the design folder"))
+        self.assertIn("Uncommitted: 2 files.", self.end(uncommitted=["a.md", "b.md"]))  # 1.190.0: counted
         out = self.end(uncommitted=False, waiting=False)
         self.assertNotIn("True", out)
         self.assertNotIn("Uncommitted", out)
@@ -128,7 +126,7 @@ class TestEnding(unittest.TestCase):
     def test_inputs_md_documents_the_types(self):
         text = (SKILL / "references/inputs.md").read_text(encoding="utf-8")
         self.assertIn("one `Waiting:` line per item", text)
-        self.assertIn("a count, a list of paths, true for the topic folder", text)
+        self.assertIn("a list of paths is counted, and true is counted from git status of the topic folder", text)
 
 
 class TestLeanDrivers(Base):
@@ -138,7 +136,7 @@ class TestLeanDrivers(Base):
         self.ok("lean", "--topic", T, "--decision", "where orders", inp={"drivers": ["Checkout does not wait", "One team runs orders"], "leaning": "x"})
         d = dr.Topic(self.tmp, T).design("platform-first")
         self.assertEqual(d["drivers"], before)
-        self.assertEqual(d["decisions"][0]["Drivers"], "Checkout does not wait; One team runs orders")
+        self.assertEqual(dr.find_decision(d, "where orders")["Drivers"], "Checkout does not wait; One team runs orders")
 
     def test_a_new_driver_is_added_once(self):
         self.create()
@@ -170,11 +168,11 @@ class TestCards(unittest.TestCase):
 
 
 class TestInputsAndNotes(Base):
-    def test_input_outside_the_repo_is_refused(self):
+    def test_input_outside_the_repo_is_accepted_since_1190(self):
+        # 1.190.0: scratch input lives in the session's temp folder, so an outside input is fine.
         outside = Path(tempfile.mkdtemp()) / "goal.json"
         try:
-            err = self.refused("create", "--topic", T, inp=GOAL, inp_path=outside)
-            self.assertIn("never in a temp folder", err)
+            self.ok("create", "--topic", T, inp=GOAL, inp_path=outside)
         finally:
             shutil.rmtree(outside.parent, ignore_errors=True)
 
@@ -193,7 +191,7 @@ class TestInputsAndNotes(Base):
     def test_flow_saves_notes_before_parking(self):
         flow = (SKILL / "references/flow.md").read_text(encoding="utf-8")
         self.assertIn("`park` first saves anything discussed but not yet in a script move with `note`", flow)
-        self.assertIn("inputs/<move>.json", flow)
+        self.assertIn("session's temp folder", flow)  # 1.190.0: scratch input is not in inputs/
 
 
 class TestScopeAndDetail(Base):
@@ -258,8 +256,7 @@ class TestBranches(GitHelpers, Base):
         self.init()
         self.git("branch", f"design/{T}")
         err = self.refused("create", "--topic", T, inp=GOAL)
-        self.assertTrue(err.startswith("Run next:\n"))
-        self.assertIn("Switch to the design branch:\n`git switch design/orders-platform`", err)
+        self.assertIn("switch-branch --topic orders-platform --yes", err)  # 1.190.0: a yes card, not a plain refusal
 
     def test_resume_on_the_wrong_branch_names_the_design_branch(self):
         self.init()
@@ -267,8 +264,8 @@ class TestBranches(GitHelpers, Base):
         self.commit("design")
         self.git("switch", "-q", "main")
         err = self.refused("resume", "--topic", T)
-        self.assertEqual(err.strip(), "Run next:\nThe orders platform topic is on its design branch design/orders-platform, not on main.\n\n"
-                         "Switch to the design branch:\n`git switch design/orders-platform`")
+        self.assertIn("on its design branch design/orders-platform, not on main", err)
+        self.assertIn("switch-branch --topic orders-platform --yes", err)
 
     def test_linked_topic_is_cut_from_the_base_branch(self):
         self.init()

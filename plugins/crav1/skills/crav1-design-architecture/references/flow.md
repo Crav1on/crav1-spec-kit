@@ -8,9 +8,9 @@ Prompt budget for one run: one framing card for a new or changed goal (its scope
 - One question per card. Never put a second question on the same card, least of all one that only matters if the first answer is yes.
 - An empty Other, with no text, is a missing answer: ask that one question again. It is never a yes or a no.
 
-## Saved inputs and notes (1.189.0)
+## Saved inputs, scratch input and notes (1.189.0, 1.190.0)
 
-Write every `--input` file in the topic folder, `docs/architecture/designs/<topic>/inputs/<move>.json`, never in a temp or session scratch folder; the script refuses an input file outside the specs repo. Discussion that is not yet a script move, such as an improvement scan, a vision or target sketch, a scope list or the user's answers, goes into `note --topic <topic> --kind scan|vision|scope|answers|goal|other --title "<title>" --input inputs/note.json`, which appends to `notes.md` in the topic folder.
+`docs/architecture/designs/<topic>/inputs/` holds only the user's own saved goal files, such as a revised goal for `change-goal`. Scratch input, such as the `ending` state and `lean`, `settle`, `stage` and `compare` drafts, goes in the session's temp folder, never in `inputs/`; the script refuses those moves' input from `inputs/`. A topic created before 1.189.0 gets its `inputs/` folder on the first save (a note or a goal change), with no question. Discussion that is not yet a script move, such as an improvement scan, a vision or target sketch, a scope list or the user's answers, goes into `note --topic <topic> --kind scan|vision|scope|answers|goal|other --title "<title>" --input inputs/note.json`, which appends to `notes.md` in the topic folder.
 
 ## Step 0: Route
 
@@ -18,7 +18,19 @@ Write every `--input` file in the topic folder, `docs/architecture/designs/<topi
 
 A different goal for a topic that already exists goes to Step 2a, `change-goal`; do not offer to recreate the topic. Idea text that builds on an existing topic, or `builds-on <base>`, goes to Step 2b. On `resume` of a linked topic, name the decisions the base settled or reopened since the last run (`base_settled_since`, `base_reopened_since`) before the next decision. A run without the user passes `--headless`; the script then refuses every move except status, resume, lean, note, compare, compare-topics, review and ending.
 
-When `resume` refuses because the topic is on its design branch, give its Run next as-is: it names `git switch design/<topic>`.
+Never offer to recreate a topic that already exists; a new or saved goal for it goes through `change-goal`. When `resume` returns `pending_goal_inputs`, a saved goal file in `inputs/` is newer than `goal.md` or not in it yet: offer `change-goal` with that file on a card before the next decision.
+
+Card: Apply the saved goal file to this topic?
+- **Show the change (Recommended)** (`change-goal`): run change-goal without yes on that file and show the old and the new goal side by side. Why: the topic and its decisions stay.
+- **Leave it** (`not-now`): go on with the current goal; the file stays in inputs for later.
+
+Wrong branch (1.190.0): when a move refuses because the topic lives on `design/<topic>` and this is another branch, offer the switch on a card; after the yes run `switch-branch --topic <topic> --yes`, which switches itself and refuses, naming the paths, when the working tree has uncommitted changes. Then run the move again.
+
+Card: Switch to the topic's design branch and go on?
+- **Switch (Recommended)** (`yes`): switch to design/<topic> and run the move again. Why: the topic's files live on that branch.
+- **Stop** (`stop`): stay on this branch; nothing changes.
+
+Kit version (1.190.0): `resume` and `create` return `kit_check` when the stated kit version (workflow.md) and this skill's files differ: warn and offer `/crav1-update-kit`. Never state a kit version you did not read from `kit_check` or workflow.md. When the design branch's kit is behind origin/main's (`kit_behind_main`), `resume` writes nothing and returns `branch_sync`: offer that merge card before the topic is touched.
 
 Design branch update: `resume`, `create` on an existing design branch, `fan-out`, `stage`, `go-ahead` and `change-goal` fetch and check whether `design/<topic>` is behind `origin/main`, and for a linked topic behind `design/<base>`. When it is, the result has `branch_sync` with a card; show it before going on.
 
@@ -81,13 +93,13 @@ A decision touches the change when it is dropped, when it is renamed while settl
 
 ## Step 2b: A topic that builds on another
 
-Frame the goal as in Step 2, and show the base topic's settled decisions as fixed. After the yes, run `create --topic <topic> --builds-on <base> --input inputs/goal.json`. The script cuts `design/<topic>` from `design/<base>` and returns the commands it stands for: `git switch design/<base>`, then `git switch -c design/<topic>`. Base updates come in with `git merge design/<base>`; never rebase.
+Frame the goal as in Step 2, and show the base topic's settled decisions as fixed. The base topic's files must be committed first; `create --builds-on` refuses and names them otherwise. After the yes, run `create --topic <topic> --builds-on <base> --input inputs/goal.json`. The script cuts `design/<topic>` from `design/<base>` and returns the commands it stands for: `git switch design/<base>`, then `git switch -c design/<topic>`. Base updates come in with `git merge design/<base>`; never rebase.
 
 When the user wants a base decision changed, the script refuses the local move. Offer the revisit on a card (`send-revisit` or `keep-it`); after `send-revisit`, run `revisit --topic <topic> --decision "<words>" --reason "<why>"` and give its ending.
 
 ## Step 3: Design the end state, one decision at a time
 
-Index line every turn, titles only, in the stored order (the order added, or the goal's order after `change-goal`), current one marked. Decisions and open questions keep that order; `resume` picks the first reopened one, then the first open big one, then the first open detail one. For the current decision show the decision and what it unblocks, 2 to 5 drivers each citing a source or `(from you, this session)`, 2 or 3 options in the shape in `options.md`, and the recommendation first with *Why*. Then the card in `options.md`. Nothing is settled until the user picks a `choose-*` word. Save options and a lean with `lean`.
+Index line every turn, titles only, in the decision order (`Order: N` on each decision: the order added, or the goal's order after `change-goal`; `design.md` stores decisions by title so parallel adds do not conflict), current one marked. Decisions and open questions keep that order; `resume` picks the first reopened one, then the first open big one, then the first open detail one. For the current decision show the decision and what it unblocks, 2 to 5 drivers each citing a source or `(from you, this session)`, 2 or 3 options in the shape in `options.md`, and the recommendation first with *Why*. Then the card in `options.md`. Nothing is settled until the user picks a `choose-*` word. Save options and a lean with `lean`.
 
 ## Step 4: Back-and-forth
 
@@ -127,5 +139,13 @@ Read `go-ahead.md`.
 ## Step 11: End
 
 Before the ending, anything discussed but not yet in a script move goes into `note`.
+
+When design files are uncommitted, offer the commit before the ending (1.190.0): run `commit --topic <topic>` for the card, and after the yes `commit --topic <topic> --yes`. The ending's `uncommitted` is the count of files left (`true` is counted from git status).
+
+Card: Commit the design files now?
+- **Commit (Recommended)** (`yes`): commit the topic folder on the design branch. Why: a linked topic or another session starts from committed files.
+- **Not now** (`not-now`): leave them uncommitted; the ending says how many.
+
+When the next topic builds on this one, commit first, then end with `builds_on` and `idea` in the ending state; the ending prints `/crav1-design-architecture builds-on <base> <idea>`, which routes to Step 2b.
 
 Recap settled decisions with their draft or accepted ADR paths, open questions, stages, designs still in play, any requirement routed out, and whether go-ahead has happened. Then the ending from the script.

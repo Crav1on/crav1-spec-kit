@@ -12,8 +12,10 @@ Not designed yet.
 
 - Where a failed payment waits before retry
   - State: open
+  - Order: 1
 - Who owns the retry policy
   - State: open
+  - Order: 2
 
 ## Drivers
 

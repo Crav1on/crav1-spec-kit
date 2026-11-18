@@ -10,6 +10,8 @@ icon: compass
 color: purple
 ---
 
+<!-- Skill files: 1.190.0 -->
+
 # Design architecture
 
 The user brings an idea, a need or a pain point. You work out an architecture change with them. You read what the kit already knows, put two or three real options on the table, argue them out one decision at a time, fold in the user's own ideas, and record each settled choice in a sandbox until the user says `go-ahead`.
@@ -51,7 +53,7 @@ Then read `references/flow.md` for the steps. Read `references/options.md` when 
 
 ## The script owns the sandbox
 
-`scripts/design_run.py` in this skill owns the folder format and every move: create (with `--builds-on`), resume, park, fan out, record a lean, settle, question, answer, skip, stage, compare, compare-topics, review, go-ahead, change-goal, revisit, note and small-fix. Input files go in `docs/architecture/designs/<topic>/inputs/`, never in a temp folder. On Windows run `py -3`, elsewhere `python3` (`crav1-docs/reference/running-scripts.md`). Content goes in through `--input <json file>`. Do not hand-edit the design files, and never tell the user to hand-edit a spec file. The script saves after every move, so any session can stop and pick up again. There is no cap on decisions per session.
+`scripts/design_run.py` in this skill owns the folder format and every move: create (with `--builds-on`), resume, park, fan out, record a lean, settle, question, answer, skip, stage, compare, compare-topics, review, go-ahead, change-goal, revisit, note, small-fix, switch-branch and commit. `docs/architecture/designs/<topic>/inputs/` holds only the user's own saved goal files; scratch input goes in the session's temp folder. On Windows run `py -3`, elsewhere `python3` (`crav1-docs/reference/running-scripts.md`). Content goes in through `--input <json file>`. Do not hand-edit the design files, and never tell the user to hand-edit a spec file. The script saves after every move, so any session can stop and pick up again. There is no cap on decisions per session.
 
 The sandbox is `docs/architecture/designs/<topic>/` on its own design branch (recommended name `design/<topic>`). One goal per topic, in `goal.md`. Each design lives in `designs/<name>/` with `design.md`, `questions.md`, `diagrams.md`, `adr/`, and `stages.md` once staged. `compare.md` scores designs in the topic against the shared criteria. One-off cross-topic comparisons go under `_compare/`. No other skill reads this tree, even after the branch is merged.
 
@@ -66,8 +68,14 @@ The sandbox is `docs/architecture/designs/<topic>/` on its own design branch (re
 
 - Decisions and open questions keep the order they were added, or the goal's order after `change-goal`. Big decisions come first; a detail decision is proposed only after the big ones.
 - Cards hold at most 4 options and one question. Typed input goes through the free-text Other answer; an empty Other is asked again.
-- `create` creates or checks the design branch `design/<topic>` (cut from `design/<base>` for a linked topic). Before work starts on a topic, the script checks whether the design branch is behind `origin/main` (or `design/<base>`) and offers `git merge --no-ff` on a yes card, never a rebase. After a committed change to a base topic, linked design branches behind it get one yes card to merge `design/<base>` into each. Creating the branch and those merges, after their yes, are the only git writes the skill makes. A move on another branch, when the topic lives on its design branch, refuses with a Run next naming `git switch design/<topic>`.
+- `create` creates or checks the design branch `design/<topic>` (cut from `design/<base>` for a linked topic). Before work starts on a topic, the script checks whether the design branch is behind `origin/main` (or `design/<base>`) and offers `git merge --no-ff` on a yes card, never a rebase. After a committed change to a base topic, linked design branches behind it get one yes card to merge `design/<base>` into each. Creating the branch, those merges, `switch-branch` and `commit` of the topic folder, each after its yes, are the only git writes the skill makes. A move on another branch, when the topic lives on its design branch, refuses with a Run next naming `git switch design/<topic>`.
 - Step 1 reads the plans, tasks and build maps of slices the ask touches. Planned work is an input, never a new proposal.
+
+## Order, branches, commits and kit version (1.190.0)
+
+- `design.md` stores decisions by title, so parallel adds do not conflict. Each decision has `Order: N`, used for the index line and for resume (ties by title). The goal's decision list comes from those numbers; files from before 1.190.0 get them on read.
+- Never offer to recreate a topic that exists; a new or saved goal goes through `change-goal`. `resume` lists saved goal files in `inputs/` not yet applied.
+- A session that ends with uncommitted design files offers a commit card first. Never state a kit version you did not read; `kit_check` warns when the files differ and offers `/crav1-update-kit`.
 
 ## Hard rules
 

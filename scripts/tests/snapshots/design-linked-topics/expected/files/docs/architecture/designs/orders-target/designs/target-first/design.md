@@ -12,6 +12,7 @@ Not designed yet.
 
 - How the target reads orders
   - State: open
+  - Order: 1
 
 ## Drivers
 

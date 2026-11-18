@@ -10,12 +10,14 @@ Not designed yet.
 
 ## Decisions
 
-- Zone layout
-  - State: settled
-  - Options shown: One zone, Two zones
-  - Draft ADR: designs/platform-first/adr/zone-layout.md
 - Access model
   - State: open
+  - Order: 2
+- Zone layout
+  - State: settled
+  - Order: 1
+  - Options shown: One zone, Two zones
+  - Draft ADR: designs/platform-first/adr/zone-layout.md
 
 ## Drivers
 

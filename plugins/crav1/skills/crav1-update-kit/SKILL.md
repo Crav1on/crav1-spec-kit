@@ -44,7 +44,22 @@ The heads-up card is not skipped. A word in the opening message is not the yes. 
 
 End as [run-ending.md](../crav1-docs/reference/run-ending.md) says.
 
-The ending is Run next (1.178.0), never a `Next:` line. After a commit, when the kit was already current, or when a plugin install needed no file write:
+The ending is Run next (1.178.0), never a `Next:` line. Print it with `update_kit.py ending --root <project> [--uncommitted N]` (1.190.0).
+
+After a successful update that wrote kit files or changed the plugin, the ending tells the user to reload the window, and names the resume command for each open or parked design topic instead of `nothing needed now`:
+
+```text
+Run next:
+The kit files changed; reload the window so the new skills load.
+
+Reload the window from the command palette:
+`Developer: Reload Window`
+
+Go on with the orders platform design topic:
+`/crav1-design-architecture resume orders-platform`
+```
+
+When the kit was already current and nothing is open (`ending --not-updated`):
 
 ```text
 Run next: nothing needed now.

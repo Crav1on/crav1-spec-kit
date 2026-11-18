@@ -11,7 +11,8 @@ Exit: 0
     "docs/architecture/designs/orders-platform/goal.md",
     "docs/architecture/designs/orders-platform/designs/platform-first/design.md",
     "docs/architecture/designs/orders-platform/designs/platform-first/questions.md",
-    "docs/architecture/designs/orders-platform/designs/platform-first/diagrams.md"
+    "docs/architecture/designs/orders-platform/designs/platform-first/diagrams.md",
+    "docs/architecture/designs/orders-platform/inputs/README.md"
   ]
 }
 
@@ -28,7 +29,8 @@ Exit: 0
     "docs/architecture/designs/orders-target/goal.md",
     "docs/architecture/designs/orders-target/designs/target-first/design.md",
     "docs/architecture/designs/orders-target/designs/target-first/questions.md",
-    "docs/architecture/designs/orders-target/designs/target-first/diagrams.md"
+    "docs/architecture/designs/orders-target/designs/target-first/diagrams.md",
+    "docs/architecture/designs/orders-target/inputs/README.md"
   ],
   "builds_on": "orders-platform",
   "branch_from": "design/orders-platform",

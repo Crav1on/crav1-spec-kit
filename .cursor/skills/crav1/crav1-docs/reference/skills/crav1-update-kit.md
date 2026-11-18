@@ -24,6 +24,8 @@ The commit message is `Update CRAV1 kit vA to vB`. The script does not push. A p
 
 1.132.0: the first jump, before the command is installed, has a Windows PowerShell download next to the bash one. In Windows PowerShell 5.1, `curl` is an alias for `Invoke-WebRequest`. On Windows, use `python` or `py`. The three-way compare treats CRLF and LF as the same text. A line-ending-only difference is an update, not a clash. A real edit on the same lines still clashes. The written file keeps the local line endings. `fetch` clones with `core.autocrlf=false`.
 
+1.190.0: `fetch` clones into a short temp folder by default with `core.longpaths=true` and `core.autocrlf=false`, and refuses an incomplete checkout (git status not clean) before any plan. The `ending` move tells the user to reload the window after an update and names [`/crav1-design-architecture`](crav1-design-architecture.md) resume <topic>` for open design topics.
+
 ## Runs when
 
 The installed kit should move to a published release. Called by the user, or by a guild agent. The user's yes in this run is still required before a write, a commit, or a push.

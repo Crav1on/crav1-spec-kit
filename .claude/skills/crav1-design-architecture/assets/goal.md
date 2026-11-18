@@ -19,10 +19,6 @@
 
 - <how designs are scored: services, environments, hosting, data flows, integrations, deployment>
 
-## Decisions
-
-- <written by change-goal: the decision order; a dropped one ends with (dropped: reason)>
-
 ## Fixed from the base topic
 
 - <linked topic only: the base topic's settled decisions>
@@ -30,3 +26,7 @@
 ## Goal changes
 
 - <written by change-goal: date, reason, and what changed>
+
+## Applied inputs
+
+- <written by create and change-goal: inputs/<file>@<hash> for each saved goal file already in this goal>

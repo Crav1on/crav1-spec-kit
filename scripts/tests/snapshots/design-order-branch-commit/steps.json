@@ -1,0 +1,139 @@
+[
+  {
+    "git": [
+      "init",
+      "-q",
+      "-b",
+      "main"
+    ]
+  },
+  {
+    "git": [
+      "add",
+      "-A"
+    ]
+  },
+  {
+    "git": [
+      "commit",
+      "-q",
+      "-m",
+      "start"
+    ]
+  },
+  {
+    "args": [
+      "create",
+      "--topic",
+      "orders-platform"
+    ],
+    "input": {
+      "ask": "split the orders platform",
+      "end_goal": "Orders run as their own platform.",
+      "criteria": [
+        "Checkout stays fast in prod"
+      ],
+      "design": "platform-first",
+      "decisions": [
+        "Zone layout",
+        "Access model"
+      ]
+    }
+  },
+  {
+    "args": [
+      "add-decision",
+      "--topic",
+      "orders-platform",
+      "--title",
+      "Backup policy"
+    ]
+  },
+  {
+    "args": [
+      "ending",
+      "--topic",
+      "orders-platform"
+    ],
+    "input": {
+      "phase": "design",
+      "open": true,
+      "uncommitted": true
+    }
+  },
+  {
+    "args": [
+      "commit",
+      "--topic",
+      "orders-platform"
+    ]
+  },
+  {
+    "args": [
+      "commit",
+      "--topic",
+      "orders-platform",
+      "--yes",
+      "--message",
+      "goal and first design"
+    ]
+  },
+  {
+    "git": [
+      "switch",
+      "-q",
+      "main"
+    ]
+  },
+  {
+    "args": [
+      "resume",
+      "--topic",
+      "orders-platform"
+    ],
+    "code": 2
+  },
+  {
+    "args": [
+      "switch-branch",
+      "--topic",
+      "orders-platform"
+    ]
+  },
+  {
+    "args": [
+      "switch-branch",
+      "--topic",
+      "orders-platform",
+      "--yes"
+    ]
+  },
+  {
+    "args": [
+      "status",
+      "--topic",
+      "orders-platform"
+    ]
+  },
+  {
+    "args": [
+      "ending",
+      "--topic",
+      "orders-platform"
+    ],
+    "input": {
+      "phase": "design",
+      "builds_on": "orders-platform",
+      "idea": "orders target on the new platform"
+    }
+  },
+  {
+    "args": [
+      "route",
+      "--word",
+      "builds-on",
+      "--idea",
+      "orders-platform orders target on the new platform"
+    ]
+  }
+]

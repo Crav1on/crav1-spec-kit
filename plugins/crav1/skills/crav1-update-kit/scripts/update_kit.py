@@ -1115,16 +1115,72 @@ def commit_kit(root: Path, old: str, new: str, yes: bool) -> dict:
     return {"message": message, "committed": cached, "left_uncommitted": left}
 
 
-def fetch_release(tag: str, dest: Path, url: str) -> None:
+def default_dest(tag: str) -> Path:
+    """A short folder in the system temp folder (1.190.0): long clone paths fail on Windows."""
+    import tempfile
+
+    base = Path(tempfile.gettempdir()) / ("ck" + re.sub(r"[^0-9]", "", tag))
+    dest, n = base, 1
+    while dest.exists():
+        n += 1
+        dest = base.with_name(f"{base.name}-{n}")
+    return dest
+
+
+def fetch_release(tag: str, dest: Path | None, url: str) -> Path:
     normalized = normalize_request(tag)
     if normalized is None or not RELEASE_TAG.fullmatch(normalized):
         refuse(refusal_reason(tag.strip()))
+    dest = dest or default_dest(normalized)
     if dest.exists():
         refuse(f"Refused: {dest} already exists.")
-    subprocess.run(
-        ["git", "-c", "core.autocrlf=false", "clone", "--depth", "1", "--branch", normalized, url, str(dest)],
-        check=True,
-    )
+    cmd = ["git", "-c", "core.longpaths=true", "-c", "core.autocrlf=false", "clone", "--depth", "1",
+           "--config", "core.longpaths=true", "--config", "core.autocrlf=false", "--branch", normalized, url, str(dest)]
+    result = subprocess.run(cmd, check=False, capture_output=True, text=True)
+    if result.returncode != 0:
+        detail = (result.stderr or result.stdout or "").strip().splitlines()
+        refuse(f"Refused: the clone of {normalized} failed: {detail[-1] if detail else 'no output'}. "
+               "Try a shorter --dest, such as a folder right under the system temp folder.")
+    verify_checkout(dest)
+    return dest
+
+
+def verify_checkout(dest: Path) -> None:
+    """The clone must be complete before a plan reads it (1.190.0): git status in it is clean."""
+    status = subprocess.run(["git", "-C", str(dest), "status", "--porcelain"], check=False, capture_output=True, text=True)
+    lines = [line for line in status.stdout.splitlines() if line.strip()]
+    if status.returncode != 0 or lines:
+        sample = ", ".join(line[3:] for line in lines[:3])
+        refuse(f"Refused: the checkout in {dest} is incomplete ({len(lines)} files differ{': ' + sample if sample else ''}), "
+               "often a Windows path-length limit. Delete it and fetch again with a shorter --dest; no plan was made.")
+
+
+def open_design_topics(root: Path) -> list[str]:
+    """Design topics that are not done: Status in goal.md is not go-ahead or dropped."""
+    out = []
+    for goal in sorted((root / "docs" / "architecture" / "designs").glob("*/goal.md")):
+        text = goal.read_text(encoding="utf-8")
+        match = re.search(r"^Status: (.+)$", text, re.M)
+        state = (match.group(1).strip().lower() if match else "open")
+        if not state.startswith(("go-ahead", "dropped", "done")):
+            out.append(goal.parent.name)
+    return out
+
+
+def ending_text(root: Path, uncommitted: int = 0, updated: bool = True) -> str:
+    """1.190.0: after an update, reload the window; name the resume command for open design topics."""
+    lines = ["Run next:"]
+    topics = open_design_topics(root)
+    if updated:
+        lines += ["The kit files changed; reload the window so the new skills load.", "",
+                  "Reload the window from the command palette:", "`Developer: Reload Window`"]
+    for topic in topics:
+        lines += ["", f"Go on with the {topic.replace('-', ' ')} design topic:", f"`/crav1-design-architecture resume {topic}`"]
+    if len(lines) == 1:
+        lines = ["Run next: nothing needed now."]
+    if uncommitted:
+        lines += ["", f"Uncommitted: {uncommitted} file{'s' if uncommitted != 1 else ''}; commit with /crav1-finalize-commit when ready."]
+    return "\n".join(lines) + "\n"
 
 
 def _print(payload: dict) -> None:
@@ -1151,7 +1207,7 @@ def main(argv: list[str] | None = None) -> int:
     if argv and argv[0] in {"push", "--push"}:
         refuse("Refused: this script does not push.")
     parser = argparse.ArgumentParser(description="Update a consumer project's CRAV1 kit from a published release.")
-    parser.add_argument("command", choices=["detect", "resolve-target", "plan", "apply", "migrations", "commit", "fetch"])
+    parser.add_argument("command", choices=["detect", "resolve-target", "plan", "apply", "migrations", "commit", "fetch", "ending"])
     parser.add_argument("--root", default=".")
     parser.add_argument("--home")
     parser.add_argument("--to")
@@ -1168,6 +1224,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--dest")
     parser.add_argument("--tag")
     parser.add_argument("--url", default=KIT_REPO)
+    parser.add_argument("--uncommitted", type=int, default=0)
+    parser.add_argument("--not-updated", action="store_true")
     args = parser.parse_args(argv)
     root = Path(args.root).resolve()
     home = Path(args.home).resolve() if args.home else None
@@ -1180,10 +1238,13 @@ def main(argv: list[str] | None = None) -> int:
             _print(resolve_target(normalize_request(args.to), tags))
             return 0
         if args.command == "fetch":
-            if not args.tag or not args.dest:
-                refuse("Refused: fetch needs a published release tag and a destination.")
-            fetch_release(args.tag, Path(args.dest), args.url)
-            _print({"fetched": normalize_request(args.tag), "dest": args.dest})
+            if not args.tag:
+                refuse("Refused: fetch needs a published release tag.")
+            dest = fetch_release(args.tag, Path(args.dest) if args.dest else None, args.url)
+            _print({"fetched": normalize_request(args.tag), "dest": str(dest), "complete": True})
+            return 0
+        if args.command == "ending":
+            sys.stdout.write(ending_text(root, args.uncommitted, not args.not_updated))
             return 0
         info = detect(root, home)
         if args.command == "plan":

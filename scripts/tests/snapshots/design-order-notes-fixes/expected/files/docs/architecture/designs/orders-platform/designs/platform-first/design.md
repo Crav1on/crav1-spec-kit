@@ -10,18 +10,22 @@ Not designed yet.
 
 ## Decisions
 
+- Access model
+  - State: open
+  - Order: 3
+- Backup policy
+  - State: open
+  - Order: 4
+- Resource group names
+  - State: open
+  - Order: 2
+  - Detail: yes
 - Zone layout
   - State: leaning
+  - Order: 1
   - Options shown: One zone, Two zones
   - Leaning: One zone
   - Drivers: Checkout does not wait; One team runs orders
-- Resource group names
-  - State: open
-  - Detail: yes
-- Access model
-  - State: open
-- Backup policy
-  - State: open
 
 ## Drivers
 

@@ -238,7 +238,7 @@ class TestMoves(Base):
         self.create()
         run(self.tmp, "add-decision", "--topic", TOPIC, "--title", "How the user sees a payment in retry")
         d = dr.Topic(self.tmp, TOPIC).design("queue-in-orders-api")
-        titles = [x["title"] for x in d["decisions"]]
+        titles = [x["title"] for x in dr.ordered(d["decisions"])]  # 1.190.0: Order: N on each decision
         self.assertEqual(titles, GOAL["decisions"] + ["How the user sees a payment in retry"])
         code, _, err = run(self.tmp, "skip", "--topic", TOPIC, "--decision", "retry")
         self.assertEqual(code, 2)

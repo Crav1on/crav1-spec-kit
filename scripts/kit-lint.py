@@ -546,6 +546,8 @@ CARD_OPTION = re.compile(r"^\s*(?:\d+\.|[-*])\s+(.*)$")
 CARD_BRACKETS = re.compile(r"[()\[\]{}<>]")
 CARD_WORD = re.compile(r"^\s*\(`[^`\n]+`\)")
 # An option list written inline in prose instead of a Card block.
+# An option that corrects itself mid-sentence (1.190.0): "... no: on ...", "... I mean ...".
+SELF_CORRECTION = re.compile(r"(?i)(?:\bno:\s|\bI mean\b|\bactually\b|\bor rather\b|\bwait,)")
 INLINE_CARD = re.compile(
     r"(?i)(?:\bcard is|\boptions?:?|\boffer)\s+`[^`\n]+`\s*\(Recommended\)\s*(?:,|\bor\b|/)"
     r"|\*\*[^*\n]+\(Recommended\)\*\*\s*/\s*\*\*"
@@ -582,6 +584,8 @@ def card_hits(question, options):
         hits.append("the question has brackets")
     for word in _jargon(question):
         hits.append(f"the question uses the kit term `{word}`")
+    if question.count("?") > 1:
+        hits.append("two questions on one card; ask one question per card (1.190.0)")
     if not options:
         hits.append("the card has no options")
     for index, (label, text) in enumerate(options):
@@ -589,6 +593,8 @@ def card_hits(question, options):
             hits.append(f"option `{label}` does not say what happens")
         for word in _jargon(label + " " + text):
             hits.append(f"option `{label}` uses the kit term `{word}`")
+        if SELF_CORRECTION.search(label + " " + text):
+            hits.append(f"option `{label}` corrects itself mid-sentence; write the option once, as meant (1.190.0)")
         if index and "(Recommended)" in label:
             hits.append(f"option `{label}` is Recommended but not first")
     return hits

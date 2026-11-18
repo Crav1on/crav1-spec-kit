@@ -1,0 +1,1 @@
+{"constraints": [], "criteria": ["Checkout stays fast in prod", "Can be tried in test before prod", "Does not block the target"], "decisions": ["How test gets data", "Where orders live", "Who ships orders", "How the target reads orders"], "renames": {"Who releases orders": "Who ships orders"}}
