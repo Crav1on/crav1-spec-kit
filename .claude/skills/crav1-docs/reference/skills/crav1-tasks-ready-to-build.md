@@ -118,6 +118,8 @@ Shows summary counts per slice, then Ready and Held grouped by build-map branch,
 
 1.186.0: `task_state.walk_start` says whether the walk can start a task now. The ready check offers [`/crav1-build-walk`](crav1-build-walk.md) <slug> <T#>` only when it can (invariant I8), so the ready check and the walk agree.
 
+1.187.0: the open-task list, Run next and `build-map.md` name a task by its text up to the first verify item, through the shared `task_order.task_name`; unbalanced parentheses are dropped and stray spaces such as `( x` and `develop ,` are tidied.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.

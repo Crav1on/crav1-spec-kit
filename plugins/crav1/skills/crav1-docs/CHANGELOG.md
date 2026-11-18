@@ -2,6 +2,11 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.187.0 (2026-11-18)
+
+- **Task names stop at the verify items.** The walk lead, the ending under Run next, the ready check's open-task list and `build-map.md` showed the whole task line, checks included, such as `Build T8 PR 12 takes in develop after PR 10 merges, with the conflicts resolved; integration — ...; system — ... with api-doc.yaml in it) on feat/orders-api:`. One helper, `task_order.task_name`, now cuts at the first verify item (`; integration —`, `; contract —`, `; system —`, `; unit —`, a `(verify: ...)` block, `(regression`), drops unbalanced parentheses and tidies stray spaces such as `( x` and `develop ,`. The line reads `Build T8 PR 12 takes in develop after PR 10 merges, with the conflicts resolved on feat/orders-api:`. `tasks.md` titles, the build map's short and full names and the walk's task labels all use it.
+- Snapshot `orders-api-verify-names` (with a golden walk ending) and `scripts/tests/test_kit_1187.py`.
+
 ## 1.186.0 (2026-11-17)
 
 Starting an open task on someone else's pull request branch, found on a live build walk.
@@ -152,16 +157,5 @@ Fixes found on a ready check run after a colleague's build walk: Run next no lon
 - **A reopened step says why.** The Run next entry for a reopened step now has one plain sentence that names what changed and which tasks wait, such as `The spec's Constraints section changed after /crav1-tighten-spec was last recorded in walk-progress.md, so T9 waits.`, above an action label, `Finish the reopened /crav1-tighten-spec step:`. It was `The work waits until the reopened /crav1-tighten-spec step finishes:` with no reason. The reopen rule is unchanged: only a change to the spec, plan or tasks that a step covers reopens it, and a build walk's own files (claims.md, walk-progress.md, build-progress, verify.md) and task ticks never do. A regression test runs a whole build walk's file changes and checks that no step reopens.
 - **Push said once.** The Catch up first block no longer has the sentence `The specs repo is 2 commits ahead of origin.` above a label that said the same. The label reads `Push the specs repo, which is 2 commits ahead of origin:` above `git push`.
 - Tests: `scripts/tests/test_walk_owner_claims_1175.py`; four older tests now expect the new reopened entry, the push label and the own-walk check.
-
-## 1.174.0 (2026-11-16)
-
-Fixes found on a second real ready check: a done task keeps its merge commit instead of the later commit that ticked it, Run next offers to continue an unfinished branch walk first, a built branch no longer reads as waiting on its own tasks, the build map shows full names, and the pull ending puts its label above the command. A minor release because the build map and the ready check write and end differently.
-
-- **Merge commit over the tick commit.** 1.173.0 read a branch's `build-progress` file top to bottom and kept the last `Result: done (...)` hash, so a `Step: tick T27` result such as `done (9f8e7d6, verify 5e4d3c2)` replaced the `Step: merge-pr` result `done (PR 80, 1a2b3c4, branch deleted)`. Now the hash comes from the `merge-pr` step. A tick or commit step's hash is used only when there is no merge result, no own `verify.md` row and no mark already on the map, so it never replaces a merge commit.
-- **Continue an unfinished walk first.** When `walk-progress.md` lists a branch run that is not merged, such as `stopped before merge`, and its `build-progress` file is not at `comment`, `wait-merge` or `merge-pr`, Run next starts with `Continue the build walk on <branch>:` above `/crav1-build-walk <slug> <branch>`. A walk that waits on a merge, or someone else's walk, stays a Waiting line (1.171.0).
-- **A branch never waits on its own tasks.** On `build-map.md`, a branch whose open tasks are all claimed or walked used to read `held, waits on T9; T10; T11; T12`. Now it reads `built, waits for PR 82 to merge` when its `build-progress` file shows every open task built and no merge, or `in progress` otherwise. A later branch still reads `held, waits on <branch>`.
-- **Full names in the build map.** The `Delivers:` and `Tasks:` lines on `build-map.md` use full task names, never cut with `...`, like the chat Held list since 1.173.0.
-- **Pull ending layout.** A behind or diverged specs repo ends with `Merge origin into your local branch, since they have diverged (never rebase):` (or `since it is behind`) above `git pull --no-rebase`, not a lowercase reason under the command. The loop-fix entry in the ready check puts its label above the command too.
-- Tests: `scripts/tests/test_merge_hash_walk_1174.py`.
 
 The newest 15 releases are above. The full changelog is https://github.com/Crav1on/crav1-spec-kit/blob/main/CHANGELOG.md.

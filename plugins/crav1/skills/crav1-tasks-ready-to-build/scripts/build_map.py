@@ -232,6 +232,7 @@ def _readable(text):
     text = re.sub(r"\s+([,;:.)])", r"\1", text)
     text = re.sub(r"\(\s+", "(", text)
     text = re.sub(r"\(\)", "", text)
+    text = task_order.balance_parens(text)
     text = re.sub(r"\s+", " ", text).strip(" ,;.:")
     return text
 
@@ -315,7 +316,8 @@ def _names_done(text, done_tasks):
 def short_name(rest, work_title=None, trim=True):
     """A task's short name: its work-item title, else the text up to the first cut.
 
-    Cuts are ` (`, `, in `, and the end of the sentence, whichever comes first.
+    Cuts are the first verify item (1.187.0), ` (`, `, in `, and the end of
+    the sentence, whichever comes first.
     Kit marks, branch prefixes, and leftover backticks are dropped. The
     result is never blank. When `trim` is true the name is at most 80
     characters, cut at a word boundary with an ellipsis.
@@ -332,7 +334,9 @@ def short_name(rest, work_title=None, trim=True):
 
     if work_title and _readable(work_title):
         return finish(work_title)
-    text = MARKER.sub(" ", rest or "")
+    # 1.187.0: stop at the first verify item, the same cut as task_order.task_name.
+    text = task_order.cut_verify(rest or "")
+    text = MARKER.sub(" ", text)
     text = HOST_MARK.sub(" ", text)
     text = re.sub(r"\s+", " ", text).strip()
     cuts = []
