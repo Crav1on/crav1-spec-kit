@@ -22,7 +22,7 @@ This is cross-cutting. It is not a lane. It may run from any lane. It does not s
 
 Review and tighten find and fix problems in what is written. Design creates new decisions. This skill never critiques the whole spec; `/crav1-review-architecture` never proposes a new architecture.
 
-## Choice words (1.181.0)
+## Choice words (1.181.0, change-goal and builds-on 1.188.0)
 
 Route first, load second. Exact words, no flags, hyphen-only.
 
@@ -35,6 +35,8 @@ Route first, load second. Exact words, no flags, hyphen-only.
 - **`go-ahead`:** review the chosen design, then copy it after the user fixes or accepts the findings. The one step that writes outside the sandbox.
 - **`compare-topics`:** one-off comparison of designs from different topics, with criteria the user picks. Never runs unless asked.
 - **`prepare`:** gather facts, draft options with recommendations, refresh comparisons. Settles nothing.
+- **`change-goal`:** change an open topic's goal in place: ask, end goal, drivers, constraints, criteria, and the decision list (add, drop, reorder, rename). Offer it whenever the user wants a different goal for a topic that exists; never recreate the topic. A card shows the old and the new goal before anything is written.
+- **`builds-on`:** start a new topic that builds on an existing one: `builds-on orders-platform` followed by the idea text. The base topic's settled decisions become fixed inputs.
 - **Nothing at all:** ask one free-text question: *What do you want to change, add or fix in the architecture?* Offer `resume` too when a topic is open.
 
 A run without the user in the chat, such as a bot or a scheduled job, is always `prepare`, even when another word is given. With no word and no idea text it stops with:
@@ -47,9 +49,16 @@ Then read `references/flow.md` for the steps. Read `references/options.md` when 
 
 ## The script owns the sandbox
 
-`scripts/design_run.py` in this skill owns the folder format and every move: create, resume, park, fan out, record a lean, settle, question, answer, skip, stage, compare, compare-topics, review and go-ahead. On Windows run `py -3`, elsewhere `python3` (`crav1-docs/reference/running-scripts.md`). Content goes in through `--input <json file>`. Do not hand-edit the design files, and never tell the user to hand-edit a spec file. The script saves after every move, so any session can stop and pick up again. There is no cap on decisions per session.
+`scripts/design_run.py` in this skill owns the folder format and every move: create (with `--builds-on`), resume, park, fan out, record a lean, settle, question, answer, skip, stage, compare, compare-topics, review, go-ahead, change-goal and revisit. On Windows run `py -3`, elsewhere `python3` (`crav1-docs/reference/running-scripts.md`). Content goes in through `--input <json file>`. Do not hand-edit the design files, and never tell the user to hand-edit a spec file. The script saves after every move, so any session can stop and pick up again. There is no cap on decisions per session.
 
 The sandbox is `docs/architecture/designs/<topic>/` on its own design branch (recommended name `design/<topic>`). One goal per topic, in `goal.md`. Each design lives in `designs/<name>/` with `design.md`, `questions.md`, `diagrams.md`, `adr/`, and `stages.md` once staged. `compare.md` scores designs in the topic against the shared criteria. One-off cross-topic comparisons go under `_compare/`. No other skill reads this tree, even after the branch is merged.
+
+## Goal changes and linked topics (1.188.0)
+
+- **A goal changes in place.** `change-goal` rewrites `goal.md` and logs each change under `## Goal changes` with the date, the reason and what was added, removed, renamed, dropped or reordered. A dropped decision stays in the design, marked `dropped` with its reason; it is never deleted. A settled or leaning decision the change touches is marked reopened (`needs another look`), and `resume` continues there. Open questions and leans on the other decisions stay.
+- **A linked topic builds on a base topic.** `create --builds-on <base>` records `Builds on: <base>` in `goal.md` and lists the base's settled decisions under `## Fixed from the base topic`. Its design branch is cut from the base's: `git switch design/<base>`, then `git switch -c design/<topic>`. Later base changes come in with `git merge design/<base>` (or `git merge main` once the base pull request is merged), never a rebase. `resume` re-reads the base and names decisions settled or reopened there since the last run.
+- **A base decision changes only in the base topic.** The linked topic may not settle, add or change it; the script refuses and offers a revisit, which marks the decision reopened in the base topic.
+- **Each topic has its own go-ahead and design pull request.** Go-ahead on a linked topic waits until the base topic's design pull request is merged into main. The script checks the architecture spec on main; the refusal is a Run next with a Waiting line naming the base pull request. Pass `--base-merged` only after the user confirms that pull request is merged and main is not fetched here.
 
 ## Hard rules
 

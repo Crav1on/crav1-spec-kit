@@ -2,6 +2,10 @@
 
 If the topic has more than one design, first pick the chosen one, with the `compare.md` scores and a recommendation.
 
+## 0. A linked topic waits for its base
+
+A topic created with `--builds-on` has its own go-ahead and design pull request. Its go-ahead waits until the base topic's design pull request is merged into main. The script looks for the base design under `## Decided, not built yet` or `## Confirmed` in `docs/architecture/spec.md` on `origin/main` or `main`. Until then it refuses and prints a Run next with a Waiting line naming the base pull request; give that text as-is. Pass `--base-merged` only after the user confirms the base pull request is merged and main has not been fetched yet.
+
 ## 1. Review, automatically
 
 Run the script move `review --topic <topic>`, then review in the spirit of `/crav1-review-architecture`: gaps against the goal (including environments, hosting, data flows, integrations and deployment), conflicts with what is already built or documented in environment and infrastructure docs, and decisions that are missing. Show the findings.

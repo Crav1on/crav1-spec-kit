@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""State machine for /crav1-design-architecture (1.181.0).
+"""State machine for /crav1-design-architecture (1.181.0, linked topics and goal changes 1.188.0).
 
 Owns the sandbox format under docs/architecture/designs/<topic>/ and every move:
 create, status, resume, park, fan-out, lean, settle, question, answer, skip,
-stage, compare, compare-topics, review, go-ahead, ending, route.
+stage, compare, compare-topics, review, go-ahead, ending, route,
+change-goal (1.188.0) and revisit (1.188.0).
 
 Before go-ahead every write stays inside the topic folder. A run without the
 user (--headless) may only prepare: lean, compare, compare-topics, status.
@@ -37,10 +38,12 @@ DESIGNS = Path("docs/architecture/designs")
 ARCH_SPEC = Path("docs/architecture/spec.md")
 DECIDED = "## Decided, not built yet"
 OPEN_Q = "## Open questions"
-START_WORDS = ["resume", "park", "status", "fan-out", "stage-it", "go-ahead", "compare-topics", "prepare"]
+START_WORDS = ["resume", "park", "status", "fan-out", "stage-it", "go-ahead", "compare-topics", "prepare", "change-goal", "builds-on"]
 HEADLESS_WORDS = ["resume", "park", "status", "prepare"]
 HEADLESS_ALLOWED = {"status", "resume", "lean", "compare", "compare-topics", "route", "ending", "review"}
-STATES = {"open", "leaning", "settled", "to-question", "to-research", "skipped", "reopened"}
+STATES = {"open", "leaning", "settled", "to-question", "to-research", "skipped", "reopened", "dropped"}
+CONFIRMED = "## Confirmed"
+STOP_WORDS = {"the", "and", "for", "with", "not", "from", "into", "that", "this", "are", "was", "but", "its", "any", "all", "can", "has", "have", "one", "two", "via", "per", "may", "must", "should", "only", "each", "out", "off", "own", "our", "use", "uses", "used"}
 GUARDED_MARKS = ("Asked:", "Pending:", "Answered:", "Approved:", "Blocks:")
 
 
@@ -122,20 +125,44 @@ def bullets(body: str) -> list[str]:
 def parse_goal(text: str) -> dict:
     head, sec, _ = split_sections(text)
     title = head.splitlines()[0][len("# Goal: "):] if head.startswith("# Goal: ") else ""
-    return {"topic": title, "ask": meta(head).get("Ask", "").strip('"'),
+    m = meta(head)
+    decisions, dropped = [], {}
+    for item in bullets(sec.get("Decisions", "")):
+        dm = re.match(r"^(.*) \(dropped: (.*)\)$", item)
+        if dm:
+            dropped[dm.group(1)] = dm.group(2)
+            decisions.append(dm.group(1))
+        else:
+            decisions.append(item)
+    return {"topic": title, "ask": m.get("Ask", "").strip('"'), "builds_on": m.get("Builds on", ""),
             "end_goal": sec.get("End goal", ""), "drivers": bullets(sec.get("Drivers", "")),
-            "constraints": bullets(sec.get("Constraints", "")), "criteria": bullets(sec.get("Criteria", ""))}
+            "constraints": bullets(sec.get("Constraints", "")), "criteria": bullets(sec.get("Criteria", "")),
+            "decisions": decisions, "dropped": dropped, "fixed": bullets(sec.get(FIXED_HEAD, "")),
+            "changes": sec.get("Goal changes", "")}
+
+
+FIXED_HEAD = "Fixed from the base topic"
 
 
 def render_goal(g: dict) -> str:
     def bl(xs):
         return "\n".join(f"- {x}" for x in xs) if xs else "- none yet"
-    return (f"# Goal: {g['topic']}\n\n- Ask: \"{g['ask']}\"\n\n## End goal\n\n{g['end_goal']}\n\n"
-            f"## Drivers\n\n{bl(g['drivers'])}\n\n## Constraints\n\n{bl(g['constraints'])}\n\n"
-            f"## Criteria\n\n{bl(g['criteria'])}\n")
+    link = f"- Builds on: {g['builds_on']}\n" if g.get("builds_on") else ""
+    out = (f"# Goal: {g['topic']}\n\n- Ask: \"{g['ask']}\"\n{link}\n## End goal\n\n{g['end_goal']}\n\n"
+           f"## Drivers\n\n{bl(g['drivers'])}\n\n## Constraints\n\n{bl(g['constraints'])}\n\n"
+           f"## Criteria\n\n{bl(g['criteria'])}\n")
+    if g.get("decisions"):
+        dropped = g.get("dropped", {})
+        out += "\n## Decisions\n\n" + "\n".join(f"- {x} (dropped: {dropped[x]})" if x in dropped else f"- {x}" for x in g["decisions"]) + "\n"
+    if g.get("builds_on"):
+        out += (f"\n## {FIXED_HEAD}\n\nSettled in topic {g['builds_on']}. Fixed inputs here; a change goes to that topic as a revisit.\n\n"
+                + bl(g.get("fixed", [])) + "\n")
+    if g.get("changes"):
+        out += "\n## Goal changes\n\n" + g["changes"].strip("\n") + "\n"
+    return out
 
 
-DEC_KEYS = ["State", "Options shown", "Leaning", "Recommended", "Draft ADR", "Open question in", "Sources", "Reopened", "Reverses"]
+DEC_KEYS = ["State", "Options shown", "Leaning", "Recommended", "Draft ADR", "Open question in", "Sources", "Reopened", "Reverses", "Dropped", "Renamed from"]
 
 
 def parse_design(text: str) -> dict:
@@ -314,7 +341,8 @@ def compare_text(t: Topic, scores: dict | None = None) -> str:
     for n in designs:
         d = t.design(n)
         settled = sum(1 for x in d["decisions"] if x["State"] == "settled")
-        lines.append(f"- {n}: {settled} of {len(d['decisions'])} settled, status {d['status']}")
+        live = [x for x in d["decisions"] if x["State"] != "dropped"]
+        lines.append(f"- {n}: {settled} of {len(live)} settled, status {d['status']}")
     return "\n".join(lines) + "\n"
 
 
@@ -343,15 +371,26 @@ def cmd_create(a, root: Path) -> dict:
     tdir = root / DESIGNS / topic
     if (tdir / "goal.md").exists():
         raise Refused(f"topic {topic} already exists; use resume")
+    base = slugify(a.builds_on) if getattr(a, "builds_on", None) else ""
+    if base:
+        if base == topic:
+            raise Refused("a topic cannot build on itself")
+        Topic(root, base)
     w = Writer(root, topic)
     goal = {"topic": topic, "ask": data.get("ask", ""), "end_goal": data.get("end_goal", ""),
             "drivers": data.get("drivers", []), "constraints": data.get("constraints", []),
-            "criteria": data.get("criteria", [])}
+            "criteria": data.get("criteria", []), "builds_on": base,
+            "fixed": base_fixed(root, base) if base else []}
     w.write(tdir / "goal.md", render_goal(goal))
     name = slugify(a.design or data.get("design", "first-design"))
     _new_design(root, topic, name, data.get("design_title", name.replace("-", " ")), goal["ask"],
                 [{"title": x, "State": "open"} for x in data.get("decisions", [])], goal["drivers"], w)
-    return {"topic": topic, "design": name, "branch": f"design/{topic}", "written": w.written}
+    res = {"topic": topic, "design": name, "branch": f"design/{topic}", "written": w.written}
+    if base:
+        res |= {"builds_on": base, "branch_from": f"design/{base}", "fixed": goal["fixed"],
+                "git": [f"git switch design/{base}", f"git switch -c design/{topic}"],
+                "update_from_base": f"git merge design/{base}"}
+    return res
 
 
 def _new_design(root, topic, name, title, ask, decisions, drivers, w, end_state="", ideas=None):
@@ -385,7 +424,15 @@ def cmd_status(a, root: Path) -> dict:
                         "open": [x["title"] for x in d["decisions"] if x["State"] != "settled"],
                         "questions": [q["text"] for q in t.questions(dn) if not q.get("answer")],
                         "stages": [s["name"] for s in t.stages(dn)]})
-    return {"designs": out}
+    links = {}
+    every = sorted(p.name for p in base.iterdir() if (p / "goal.md").is_file()) if base.is_dir() else []
+    for tn in every:
+        b = Topic(root, tn).goal().get("builds_on")
+        if b:
+            links.setdefault(tn, {"builds_on": "", "built_on_by": []})["builds_on"] = b
+            links.setdefault(b, {"builds_on": "", "built_on_by": []})["built_on_by"].append(tn)
+    links = {k: v for k, v in links.items() if not a.topic or k == a.topic}
+    return {"designs": out, "links": links} if links else {"designs": out}
 
 
 def cmd_resume(a, root: Path) -> dict:
@@ -415,11 +462,23 @@ def cmd_resume(a, root: Path) -> dict:
                 st["state"] = "needs another look"
             if t.stages(name):
                 w.write(t.ddir(name) / "stages.md", render_stages(name, [dict(s, state="needs another look") for s in t.stages(name)]))
-    nxt = next((x["title"] for x in d["decisions"] if x["State"] == "reopened"), None) or \
-        next((x["title"] for x in d["decisions"] if x["State"] in ("open", "leaning")), None)
+    ordered = goal_order(t.goal(), d)
+    nxt = next((x["title"] for x in ordered if x["State"] == "reopened"), None) or \
+        next((x["title"] for x in ordered if x["State"] in ("open", "leaning")), None)
     stage_work = [s["name"] for s in t.stages(name) if s.get("state") != "open" and s.get("state")]
-    return {"topic": t.name, "design": name, "reopened": reopened, "next_decision": nxt,
-            "stages_needing_work": stage_work, "written": w.written}
+    res = {"topic": t.name, "design": name, "reopened": reopened, "next_decision": nxt,
+           "stages_needing_work": stage_work, "written": w.written}
+    g = t.goal()
+    if g.get("builds_on"):
+        base = g["builds_on"]
+        now = base_fixed(root, base) if (root / DESIGNS / base / "goal.md").is_file() else g["fixed"]
+        res["builds_on"] = base
+        res["base_settled_since"] = [x for x in now if x not in g["fixed"]]
+        res["base_reopened_since"] = [x for x in g["fixed"] if x.split(": ", 1)[0] not in {y.split(": ", 1)[0] for y in now}]
+        res["fixed"] = now
+        if now != g["fixed"] and not a.headless:
+            w.write(t.dir / "goal.md", render_goal(dict(g, fixed=now)))
+    return res
 
 
 def cmd_park(a, root: Path) -> dict:
@@ -457,6 +516,7 @@ def cmd_add_decision(a, root: Path) -> dict:
     t = Topic(root, a.topic)
     name = t.current(a.design)
     d = t.design(name)
+    guard_base(t, d, a.title)
     if any(x["title"].casefold() == a.title.casefold() for x in d["decisions"]):
         raise Refused("that decision is already listed")
     d["decisions"].append({"title": a.title, "State": "open"})
@@ -471,9 +531,12 @@ def cmd_lean(a, root: Path) -> dict:
     t = Topic(root, a.topic)
     name = t.current(a.design)
     d = t.design(name)
+    guard_base(t, d, a.decision)
     dec = find_decision(d, a.decision)
     if dec["State"] == "settled":
         raise Refused("that decision is settled; reopen it with a choose word in chat first")
+    if dec["State"] == "dropped":
+        raise Refused("that decision was dropped from the goal; add it back with change-goal first")
     if data.get("options"):
         dec["Options shown"] = ", ".join(o["name"] for o in data["options"])
     if data.get("recommended"):
@@ -524,7 +587,10 @@ def cmd_settle(a, root: Path) -> dict:
     t = Topic(root, a.topic)
     name = t.current(a.design)
     d = t.design(name)
+    guard_base(t, d, a.decision)
     dec = find_decision(d, a.decision)
+    if dec["State"] == "dropped":
+        raise Refused("that decision was dropped from the goal; add it back with change-goal first")
     reverses = data.get("reverses", "")
     if reverses and not a.revisit_yes:
         raise Refused(f"this choice reverses {reverses}; it is a revisit and needs a separate yes (--revisit-yes)")
@@ -678,7 +744,7 @@ def review(t: Topic, name: str, root: Path) -> list[dict]:
         if words and not any(w in text for w in words):
             found.append({"kind": "gap", "text": f"criterion not covered by the end state: {crit}"})
     for dec in d["decisions"]:
-        if dec["State"] in ("open", "leaning", "skipped", "reopened"):
+        if dec["State"] in ("open", "leaning", "skipped", "reopened"):  # dropped is not missing
             found.append({"kind": "missing-decision", "text": f"not settled: {dec['title']}"})
     envs = root / "docs" / "environments"
     known = {p.stem.casefold() for p in envs.glob("*.md")} if envs.is_dir() else set()
@@ -711,6 +777,9 @@ def _marks(text: str) -> list[str]:
 def cmd_go_ahead(a, root: Path) -> dict:
     t = Topic(root, a.topic)
     name = t.current(a.design)
+    base = t.goal().get("builds_on")
+    if base and not (a.base_merged or base_on_main(root, base)):
+        raise Refused(waiting_base_text(root, t.name, base))
     findings = review(t, name, root)
     if findings and not a.accept_findings:
         return {"design": name, "findings": findings, "copied": False, "written": [],
@@ -733,6 +802,8 @@ def cmd_go_ahead(a, root: Path) -> dict:
     spec = spec_p.read_text(encoding="utf-8") if spec_p.is_file() else "# Architecture\n"
     before_confirmed, before_marks = _confirmed(spec), _marks(spec)
     block = [f"### {d['title']} (topic {t.name})", "", f"Designed in: `{designed_in}`"]
+    if base:
+        block.append(f"Builds on: topic {base}")
     if adr_targets:
         block.append("Accepted ADRs: " + ", ".join(f"`{x[1]}`" for x in adr_targets))
     block += ["", d["end_state"]]
@@ -792,6 +863,278 @@ def cmd_go_ahead(a, root: Path) -> dict:
     refresh_compare(t, w)
     return {"design": name, "findings": findings, "copied": True, "adrs": [str(x[1]) for x in adr_targets],
             "slice": slice_slug, "written": w.written}
+
+
+# ---------------------------------------------------------------- goal changes (1.188.0)
+def goal_order(g: dict, d: dict) -> list[dict]:
+    """Decisions in the goal's order when the goal lists one, else as stored."""
+    order = [x.casefold() for x in g.get("decisions", [])]
+    if not order:
+        return d["decisions"]
+    pos = {k: i for i, k in enumerate(order)}
+    return sorted(d["decisions"], key=lambda x: pos.get(x["title"].casefold(), len(pos)))
+
+
+def _words(text: str) -> set[str]:
+    return {w for w in re.findall(r"[a-z0-9][a-z0-9.+#-]*[a-z0-9+#]|[a-z0-9]", text.casefold())
+            if len(w) >= 3 and w not in STOP_WORDS}
+
+
+def _settled_text(t: Topic, design: str, dec: dict) -> str:
+    """Title, lean, recommendation and the draft ADR's decision outcome."""
+    parts = [dec["title"], dec.get("Leaning", ""), dec.get("Recommended", "")]
+    ref = dec.get("Draft ADR", "")
+    if ref:
+        p = t.dir / ref
+        if p.is_file():
+            m = re.search(r"^## Decision outcome\n(.*?)(?=^## |\Z)", p.read_text(encoding="utf-8"), flags=re.S | re.M)
+            if m:
+                parts.append(m.group(1))
+    return " ".join(parts)
+
+
+def plan_goal_change(t: Topic, data: dict, reason: str) -> dict:
+    """Work out the new goal, the change lines and which decisions it touches.
+
+    Touches, in this order: the decision is dropped; it is renamed; the input
+    lists it under `reopen`; or it is settled or leaning and its title, lean,
+    recommendation or draft ADR decision outcome names a word from a removed
+    constraint, criterion or driver that no kept goal line still uses.
+    """
+    old = t.goal()
+    designs = [n for n in t.designs() if t.design(n)["status"] != "rejected"]
+    first = t.design(designs[0]) if designs else {"decisions": []}
+    old_list = old["decisions"] or [x["title"] for x in first["decisions"]]
+    new = dict(old)
+    for k in ("ask", "end_goal", "drivers", "constraints", "criteria"):
+        if k in data:
+            new[k] = data[k]
+    renames = {k: v for k, v in (data.get("renames") or {}).items()}
+    live_old = [x for x in old_list if x not in old["dropped"]]
+    want = list(data.get("decisions") or [renames.get(x, x) for x in live_old])
+    renamed_to = set(renames.values())
+    dropped_now = [x for x in live_old if renames.get(x, x) not in want and x not in renamed_to]
+    reasons = data.get("drop_reasons") or {}
+    dropped = {k: v for k, v in old["dropped"].items() if k not in want}
+    for x in dropped_now:
+        dropped[x] = reasons.get(x, reason)
+    new["decisions"] = want + [x for x in old_list if x in dropped and x not in want]
+    new["dropped"] = dropped
+    changes = []
+    for k, label in (("drivers", "driver"), ("constraints", "constraint"), ("criteria", "criterion")):
+        for x in old[k]:
+            if x not in new[k]:
+                changes.append(f"Removed {label}: {x}")
+        for x in new[k]:
+            if x not in old[k]:
+                changes.append(f"Added {label}: {x}")
+    if new["ask"] != old["ask"]:
+        changes.append("Changed the ask")
+    if new["end_goal"] != old["end_goal"]:
+        changes.append("Changed the end goal")
+    for o, n in renames.items():
+        changes.append(f"Renamed decision: {o} to {n}")
+    for x in want:
+        if x in old["dropped"]:
+            changes.append(f"Added back decision: {x}")
+        elif x not in [renames.get(y, y) for y in live_old]:
+            changes.append(f"Added decision: {x}")
+    for x in dropped_now:
+        changes.append(f"Dropped decision: {x} ({dropped[x]})")
+    kept_old = [renames.get(x, x) for x in live_old if x not in dropped_now]
+    if [x for x in want if x in kept_old] != kept_old:
+        changes.append("Reordered decisions: " + ", ".join(want))
+    removed = [x for k in ("drivers", "constraints", "criteria") for x in old[k] if x not in new[k]]
+    kept_text = " ".join([new["end_goal"]] + new["drivers"] + new["constraints"] + new["criteria"])
+    keywords = sorted(set().union(*[_words(x) for x in removed]) - _words(kept_text)) if removed else []
+    reopen = {x.casefold() for x in data.get("reopen", [])}
+    flagged, per_design = [], {}
+    for dn in designs:
+        d = t.design(dn)
+        hits = []
+        for dec in d["decisions"]:
+            title = dec["title"]
+            if title in dropped_now:
+                continue
+            why = ""
+            if title in renames:
+                why = f"renamed from {title}"
+            elif title.casefold() in reopen:
+                why = "listed to look at again"
+            elif dec["State"] in ("settled", "leaning") and keywords:
+                found = sorted(_words(_settled_text(t, dn, dec)) & set(keywords))
+                if found:
+                    why = "names " + ", ".join(found) + " from a removed goal line"
+            if why and (dec["State"] in ("settled", "leaning") or title.casefold() in reopen):
+                hits.append((title, why))
+                flagged.append({"design": dn, "decision": renames.get(title, title), "why": why})
+        per_design[dn] = hits
+    for f in flagged:
+        changes.append(f"Needs another look: {f['decision']} ({f['why']})")
+    return {"old": dict(old, decisions=old_list), "new": new, "changes": changes, "flagged": flagged, "dropped": dropped_now,
+            "renames": renames, "keywords": keywords, "designs": designs, "per_design": per_design}
+
+
+def _goal_view(g: dict) -> dict:
+    return {k: g.get(k) for k in ("ask", "end_goal", "drivers", "constraints", "criteria")} | {
+        "decisions": [x + (" (dropped)" if x in g.get("dropped", {}) else "") for x in g.get("decisions", [])]}
+
+
+def cmd_change_goal(a, root: Path) -> dict:
+    data = load_input(a.input)
+    if not a.reason or not a.reason.strip():
+        raise Refused("a goal change needs a reason (--reason)")
+    t = Topic(root, a.topic)
+    plan = plan_goal_change(t, data, a.reason.strip())
+    if not plan["changes"]:
+        raise Refused("the new goal is the same as the old one; nothing written")
+    view = {"topic": t.name, "old": _goal_view(plan["old"]), "new": _goal_view(plan["new"]),
+            "changes": plan["changes"], "flagged": plan["flagged"], "dropped": plan["dropped"]}
+    if not a.yes:
+        return view | {"preview": True, "written": [],
+                       "note": "show old and new goal on a card; after the user's yes run change-goal again with --yes"}
+    w = Writer(root, t.name)
+    new = plan["new"]
+    entry = [f"- {today()}: {a.reason.strip()}"] + [f"  - {c}" for c in plan["changes"]]
+    new["changes"] = ("\n".join(entry) + ("\n" + plan["old"]["changes"].strip("\n") if plan["old"]["changes"].strip() else ""))
+    w.write(t.dir / "goal.md", render_goal(new))
+    renames = plan["renames"]
+    for dn in plan["designs"]:
+        d = t.design(dn)
+        hits = dict(plan["per_design"].get(dn, []))
+        for dec in d["decisions"]:
+            title = dec["title"]
+            if title in plan["dropped"]:
+                dec["State"] = "dropped"
+                dec["Dropped"] = f"{today()}: {new['dropped'][title]}"
+                continue
+            if dec["State"] == "dropped" and title in new["decisions"] and title not in new["dropped"]:
+                dec["State"] = "open"
+                dec.pop("Dropped", None)
+            if title in hits:
+                dec["State"] = "reopened"
+                dec["Reopened"] = f"goal changed {today()}: {hits[title]}"
+            if title in renames:
+                dec["Renamed from"] = title
+                dec["title"] = renames[title]
+        have = {y["title"] for y in d["decisions"]}
+        for x in new["decisions"]:
+            if x not in new["dropped"] and x not in have:
+                d["decisions"].append({"title": x, "State": "open"})
+        save_design(t, dn, d, w)
+        if hits and t.stages(dn):
+            w.write(t.ddir(dn) / "stages.md", render_stages(dn, [dict(s, state="needs another look") for s in t.stages(dn)]))
+    refresh_compare(t, w)
+    return view | {"preview": False, "written": w.written}
+
+
+# ---------------------------------------------------------------- linked topics (1.188.0)
+def _chosen_option(t: Topic, dec: dict) -> str:
+    p = t.dir / dec.get("Draft ADR", "")
+    if dec.get("Draft ADR") and p.is_file():
+        m = re.search(r'^Chosen option: "([^"]*)"', p.read_text(encoding="utf-8"), flags=re.M)
+        if m:
+            return m.group(1)
+    return "settled"
+
+
+def base_fixed(root: Path, base: str) -> list[str]:
+    """The base topic's settled decisions, one line each: `<title>: <chosen> (<design>)`."""
+    t = Topic(root, base)
+    names = [n for n in t.designs() if t.design(n)["status"] == "chosen"] or \
+        [n for n in t.designs() if t.design(n)["status"] != "rejected"]
+    out = []
+    for n in names:
+        d = t.design(n)
+        for dec in goal_order(t.goal(), d):
+            if dec["State"] == "settled":
+                out.append(f"{dec['title']}: {_chosen_option(t, dec)} ({n}, {dec.get('Draft ADR', '')})")
+    return out
+
+
+def _base_titles(t: Topic) -> list[str]:
+    return [x.split(": ", 1)[0] for x in t.goal().get("fixed", [])]
+
+
+def guard_base(t: Topic, d: dict, words: str) -> None:
+    """A linked topic may not settle or change a decision settled in its base topic."""
+    base = t.goal().get("builds_on")
+    if not base:
+        return
+    key = words.casefold().strip()
+    if any(x["title"].casefold() == key for x in d["decisions"]):
+        return
+    hits = [x for x in _base_titles(t) if x.casefold() == key] or [x for x in _base_titles(t) if key in x.casefold()]
+    if len(hits) == 1:
+        raise Refused(f"{hits[0]} is settled in the base topic {base}; this topic may not settle or change it. "
+                      f"Offer a revisit to {base}: revisit --topic {t.name} --decision \"{hits[0]}\" --reason \"<why>\"")
+
+
+def cmd_revisit(a, root: Path) -> dict:
+    t = Topic(root, a.topic)
+    base = t.goal().get("builds_on")
+    if not base:
+        raise Refused(f"topic {t.name} does not build on another topic; settle the decision here")
+    if not a.reason or not a.reason.strip():
+        raise Refused("a revisit needs a reason (--reason)")
+    bt = Topic(root, base)
+    w = Writer(root, base)
+    hit = None
+    for dn in bt.designs():
+        d = bt.design(dn)
+        if d["status"] == "rejected":
+            continue
+        try:
+            dec = find_decision(d, a.decision)
+        except Refused:
+            continue
+        dec["State"] = "reopened" if dec["State"] in ("settled", "leaning") else dec["State"]
+        dec["Reopened"] = f"revisit from topic {t.name} {today()}: {a.reason.strip()}"
+        save_design(bt, dn, d, w)
+        hit = {"design": dn, "decision": dec["title"]}
+        break
+    if not hit:
+        raise Refused(f"no single decision in the base topic {base} matches the words: {a.decision}")
+    if bt.stages(hit["design"]):
+        w.write(bt.ddir(hit["design"]) / "stages.md", render_stages(hit["design"], [dict(s, state="needs another look") for s in bt.stages(hit["design"])]))
+    return {"topic": t.name, "base": base, "revisit": hit, "base_branch": f"design/{base}",
+            "ending": revisit_text(t.name, base, hit["decision"]), "written": w.written}
+
+
+def base_on_main(root: Path, base: str) -> bool:
+    """The base topic's design block is in the architecture spec on main (its design PR merged)."""
+    import subprocess
+    for ref in ("origin/main", "main"):
+        try:
+            out = subprocess.run(["git", "show", f"{ref}:{ARCH_SPEC.as_posix()}"], cwd=root, capture_output=True,
+                                 text=True, encoding="utf-8", timeout=10)
+        except Exception:
+            return False
+        if out.returncode == 0:
+            sections = "".join(x.group(1) for x in re.finditer(rf"^(?:{re.escape(DECIDED)}|{re.escape(CONFIRMED)})\n(.*?)(?=^## |\Z)", out.stdout, flags=re.S | re.M))
+            return f"(topic {base})" in sections
+    return False
+
+
+def waiting_base_text(root: Path, topic: str, base: str) -> str:
+    words, bwords = topic.replace("-", " "), base.replace("-", " ")
+    bt = Topic(root, base)
+    chosen = any(bt.design(n)["status"] == "chosen" for n in bt.designs())
+    if chosen:
+        why = f"The {words} design builds on {base}, whose design pull request is not merged into main yet. Go-ahead here waits for that merge."
+        waiting = f"the {base} design pull request (design/{base}) to merge into main."
+        lead, cmd = f"Pick up the {words} designs:", f"/crav1-design-architecture resume {topic}"
+    else:
+        why = f"The {words} design builds on {base}, which has not had go-ahead yet. Go-ahead here waits until the {base} design pull request is merged."
+        waiting = f"go-ahead on {base} and its design pull request (design/{base}) merged into main."
+        lead, cmd = f"Pick up the {bwords} designs:", f"/crav1-design-architecture resume {base}"
+    return "\n".join(["Run next:", why, "", lead, f"`{cmd}`", "", f"Waiting: {waiting}"]) + "\n"
+
+
+def revisit_text(topic: str, base: str, decision: str) -> str:
+    bwords = base.replace("-", " ")
+    return "\n".join(["Run next:", f"{decision} is marked for another look in the base topic {base}. Settle it there, then merge design/{base} into design/{topic}.",
+                      "", f"Pick up the {bwords} designs:", f"`/crav1-design-architecture resume {base}`"]) + "\n"
 
 
 # ---------------------------------------------------------------- endings
@@ -863,6 +1206,16 @@ def main(argv=None) -> int:
     c.add_argument("--topic", required=True)
     c.add_argument("--design")
     c.add_argument("--input")
+    c.add_argument("--builds-on", dest="builds_on")
+    cg = sub.add_parser("change-goal")
+    cg.add_argument("--topic", required=True)
+    cg.add_argument("--input", required=True)
+    cg.add_argument("--reason", required=True)
+    cg.add_argument("--yes", action="store_true")
+    rvs = sub.add_parser("revisit")
+    rvs.add_argument("--topic", required=True)
+    rvs.add_argument("--decision", required=True)
+    rvs.add_argument("--reason", required=True)
     s = sub.add_parser("status")
     s.add_argument("--topic")
     rs = sub.add_parser("resume")
@@ -928,6 +1281,7 @@ def main(argv=None) -> int:
     g.add_argument("--design")
     g.add_argument("--slice")
     g.add_argument("--accept-findings", action="store_true")
+    g.add_argument("--base-merged", action="store_true", help="the base topic's design pull request is merged")
     e = sub.add_parser("ending")
     e.add_argument("--topic", required=True)
     e.add_argument("--input")
@@ -942,7 +1296,8 @@ def main(argv=None) -> int:
               "lean": lambda: cmd_lean(a, root), "settle": lambda: cmd_settle(a, root), "question": lambda: cmd_question(a, root),
               "answer": lambda: cmd_answer(a, root), "skip": lambda: cmd_skip(a, root), "stage": lambda: cmd_stage(a, root),
               "compare": lambda: cmd_compare(a, root), "compare-topics": lambda: cmd_compare_topics(a, root),
-              "go-ahead": lambda: cmd_go_ahead(a, root), "ending": lambda: cmd_ending(a, root)}[a.cmd]
+              "go-ahead": lambda: cmd_go_ahead(a, root), "ending": lambda: cmd_ending(a, root),
+              "change-goal": lambda: cmd_change_goal(a, root), "revisit": lambda: cmd_revisit(a, root)}[a.cmd]
         res = fn()
     except Refused as exc:
         print(str(exc), file=sys.stderr)

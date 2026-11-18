@@ -1,0 +1,131 @@
+[
+  {
+    "args": [
+      "create",
+      "--topic",
+      "orders-target",
+      "--builds-on",
+      "orders-platform"
+    ],
+    "input": {
+      "ask": "design the orders target on top of the platform",
+      "end_goal": "The target reads orders without blocking the platform.",
+      "drivers": [
+        "The platform is settled first. (from you, this session)"
+      ],
+      "constraints": [],
+      "criteria": [
+        "Does not block the platform"
+      ],
+      "design": "target-first",
+      "design_title": "target first",
+      "decisions": [
+        "How the target reads orders"
+      ]
+    }
+  },
+  {
+    "args": [
+      "settle",
+      "--topic",
+      "orders-target",
+      "--decision",
+      "where orders live"
+    ],
+    "input": {
+      "chosen": "Two databases",
+      "options": [
+        {
+          "name": "Two databases"
+        },
+        {
+          "name": "One SQL database for orders"
+        }
+      ],
+      "why": "x",
+      "deciders": "person A"
+    },
+    "code": 2
+  },
+  {
+    "args": [
+      "revisit",
+      "--topic",
+      "orders-target",
+      "--decision",
+      "where orders live",
+      "--reason",
+      "the target needs its own read copy"
+    ]
+  },
+  {
+    "args": [
+      "settle",
+      "--topic",
+      "orders-platform",
+      "--decision",
+      "how test gets data"
+    ],
+    "input": {
+      "chosen": "Made-up data",
+      "options": [
+        {
+          "name": "Made-up data"
+        },
+        {
+          "name": "Copy of prod data",
+          "not_chosen": "prod data stays in prod"
+        }
+      ],
+      "why": "no prod data in test",
+      "deciders": "person A"
+    }
+  },
+  {
+    "args": [
+      "resume",
+      "--topic",
+      "orders-target"
+    ]
+  },
+  {
+    "args": [
+      "status"
+    ]
+  },
+  {
+    "args": [
+      "go-ahead",
+      "--topic",
+      "orders-target",
+      "--accept-findings"
+    ],
+    "code": 2
+  },
+  {
+    "args": [
+      "go-ahead",
+      "--topic",
+      "orders-platform",
+      "--accept-findings"
+    ]
+  },
+  {
+    "args": [
+      "go-ahead",
+      "--topic",
+      "orders-target",
+      "--accept-findings"
+    ],
+    "code": 2
+  },
+  {
+    "args": [
+      "go-ahead",
+      "--topic",
+      "orders-target",
+      "--accept-findings",
+      "--base-merged"
+    ]
+  }
+]

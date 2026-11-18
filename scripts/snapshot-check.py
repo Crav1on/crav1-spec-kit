@@ -12,6 +12,13 @@ Usage:
   scripts/snapshot-check.py            compare, exit 1 on a difference
   scripts/snapshot-check.py --update   rewrite expected/ from this run
   scripts/snapshot-check.py --only <name>
+
+Since 1.188.0 a folder with `design-spec/` and `steps.json` is a design
+snapshot: the check copies `design-spec/` and runs each step of
+`design_run.py` from /crav1-design-architecture in order (`args`, optional
+`input`, expected `code`). `expected/steps.txt` holds every step's output and
+`expected/files/` the topic folders and the architecture spec afterwards.
+Dates are written as YYYY-MM-DD.
 """
 from __future__ import annotations
 
@@ -31,6 +38,7 @@ SNAPSHOTS = ROOT / "scripts" / "tests" / "snapshots"
 SK = ROOT / ".cursor" / "skills" / "crav1"
 WALK = SK / "crav1-tighten-and-plan-ready-to-build" / "scripts" / "walk_progress.py"
 USER = "Person C"
+DESIGN_RUN = SK / "crav1-design-architecture" / "scripts" / "design_run.py"
 
 
 def _invariants():
@@ -64,16 +72,49 @@ def run_one(folder: Path) -> tuple[dict, list[str]]:
     return got, broken
 
 
+def _dated(text: str) -> str:
+    import re
+    return re.sub(r"\d{4}-\d{2}-\d{2}", "YYYY-MM-DD", text)
+
+
+def run_design(folder: Path) -> tuple[dict, list[str]]:
+    """A design snapshot: run the steps, return {relative name: text} and problems."""
+    import json
+    steps = json.loads((folder / "steps.json").read_text(encoding="utf-8"))
+    problems, log = [], []
+    with tempfile.TemporaryDirectory() as tmp:
+        work = Path(tmp) / folder.name
+        shutil.copytree(folder / "design-spec", work)
+        for i, step in enumerate(steps, 1):
+            argv = [sys.executable, str(DESIGN_RUN), "--root", str(work)] + list(step["args"])
+            if step.get("input") is not None:
+                inp = Path(tmp) / f"step{i}.json"
+                inp.write_text(json.dumps(step["input"]), encoding="utf-8")
+                argv += ["--input", str(inp)]
+            proc = subprocess.run(argv, capture_output=True, text=True, encoding="utf-8", timeout=60,
+                                  env=dict(os.environ, PYTHONDONTWRITEBYTECODE="1"))
+            want = step.get("code", 0)
+            if proc.returncode != want:
+                problems.append(f"step {i} ({' '.join(step['args'][:1])}) exited {proc.returncode}, expected {want}")
+            out = (proc.stdout + proc.stderr).replace(str(work), "<root>").replace(tmp, "<tmp>")
+            log.append(f"## Step {i}: design_run.py {' '.join(step['args'])}\n\nExit: {proc.returncode}\n\n{out.rstrip()}\n")
+        got = {"steps.txt": _dated("\n".join(log))}
+        for path in sorted((work / "docs" / "architecture").rglob("*")):
+            if path.is_file():
+                got["files/" + str(path.relative_to(work)).replace(os.sep, "/")] = _dated(path.read_text(encoding="utf-8"))
+    return got, problems
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Compare the ready check with its snapshots")
     parser.add_argument("--update", action="store_true", help="Rewrite expected/ from this run.")
     parser.add_argument("--only", default=None, help="One snapshot folder name.")
     args = parser.parse_args(argv)
     failed = False
-    for folder in sorted(p for p in SNAPSHOTS.iterdir() if (p / "spec").is_dir()):
+    for folder in sorted(p for p in SNAPSHOTS.iterdir() if (p / "spec").is_dir() or (p / "steps.json").is_file()):
         if args.only and folder.name != args.only:
             continue
-        got, broken = run_one(folder)
+        got, broken = run_design(folder) if (folder / "steps.json").is_file() else run_one(folder)
         for line in broken:
             print(f"{folder.name}: {line}")
             failed = True

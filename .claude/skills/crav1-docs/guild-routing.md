@@ -240,7 +240,7 @@ The merged skills take exact choice words instead of `--flags`. A word in the in
 | `/crav1-explain-this-code` | How deep | `what-it-does` · `what-and-why` · `teach-the-language` |
 | `/crav1-retire-spec` | What to do | `retire` · `merge` · `park` · `convert-to-note` |
 | `/crav1-model-data` | Which flow | `manual-flow` · `auto-flow` |
-| `/crav1-design-architecture` | Which step | `resume` · `park` · `status` · `fan-out` · `stage-it` · `go-ahead` · `compare-topics` · `prepare` |
+| `/crav1-design-architecture` | Which step | `resume` · `park` · `status` · `fan-out` · `stage-it` · `go-ahead` · `compare-topics` · `prepare` · `change-goal` · `builds-on` |
 | `/crav1-update-specs-from-changes-and-prs` | Which flow | `manual-flow` · `auto-flow` |
 | `/crav1-glossary` | Which mode | `as-file` · `research` · `<term>` |
 | `/crav1-ado-sync` | Which sync | `suggest-features` · `push-features` · `push-tasks` · `pull-tasks` · `pull-spec-changes` |
