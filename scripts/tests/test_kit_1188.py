@@ -105,7 +105,7 @@ class TestChangeGoal(Base):
         self.assertIn(": SQL is out", g["changes"])
         self.assertIn("Removed constraint: Orders stay in one SQL store.", g["changes"])
         self.assertIn("Added criterion: Does not block the target", g["changes"])
-        self.assertEqual(g["decisions"][:3], ["How test gets data", "Where orders live", "Who releases orders"])
+        self.assertEqual(g["decisions"][:3], ["Where orders live", "Who releases orders", "How test gets data"])
 
     def test_settled_decision_naming_a_removed_constraint_is_flagged(self):
         res = self.ok("change-goal", "--topic", BASE, "--reason", "SQL is out", "--yes", inp=self.NEW)

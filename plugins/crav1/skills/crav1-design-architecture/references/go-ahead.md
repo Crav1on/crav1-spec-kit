@@ -24,6 +24,7 @@ Only after the findings are fixed or accepted, run `go-ahead`, with `--slice <sl
 - copies still-open questions into that spec's `## Open questions`, still naming who has the fact or decides;
 - copies only the chosen design's draft ADRs, marked `accepted` and numbered, into `docs/system/adr/` or `docs/specs/<slug>/adr/`, each with a "Designed in" link;
 - adds the design's draft diagrams to `docs/system/diagrams.md` or the slice's `diagrams.md` as a planned section, dashed parts labelled `planned`;
+- copies the design's small fixes, if any, as a `Small fixes (no design choice)` list in the same block, with no ADR;
 - marks the chosen design `chosen` and the others `rejected`. Rejected designs keep their draft ADRs in the sandbox.
 
 ## 3. Merge the design branch

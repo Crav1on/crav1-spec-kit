@@ -1,0 +1,158 @@
+## Step 1: design_run.py create --topic orders-platform
+
+Exit: 2
+
+create does not know the input key notes_to_replay; known keys: ask, constraints, criteria, decisions, design, design_title, drivers, end_goal, notes. Put anything else under notes, which is saved with note.
+
+## Step 2: design_run.py create --topic orders-platform
+
+Exit: 0
+
+{
+  "topic": "orders-platform",
+  "design": "platform-first",
+  "branch": "design/orders-platform",
+  "branch_state": "not a git repository; the design branch is not checked",
+  "written": [
+    "docs/architecture/designs/orders-platform/goal.md",
+    "docs/architecture/designs/orders-platform/designs/platform-first/design.md",
+    "docs/architecture/designs/orders-platform/designs/platform-first/questions.md",
+    "docs/architecture/designs/orders-platform/designs/platform-first/diagrams.md",
+    "docs/architecture/designs/orders-platform/notes.md"
+  ]
+}
+
+## Step 3: design_run.py add-decision --topic orders-platform --title Backup policy
+
+Exit: 0
+
+{
+  "design": "platform-first",
+  "written": [
+    "docs/architecture/designs/orders-platform/designs/platform-first/design.md"
+  ]
+}
+
+## Step 4: design_run.py question --topic orders-platform --text Who pays for the zone (person B decides)
+
+Exit: 0
+
+{
+  "design": "platform-first",
+  "written": [
+    "docs/architecture/designs/orders-platform/designs/platform-first/questions.md"
+  ]
+}
+
+## Step 5: design_run.py question --topic orders-platform --text Are backups needed in test (person A knows)
+
+Exit: 0
+
+{
+  "design": "platform-first",
+  "written": [
+    "docs/architecture/designs/orders-platform/designs/platform-first/questions.md"
+  ]
+}
+
+## Step 6: design_run.py lean --topic orders-platform --decision zone layout
+
+Exit: 0
+
+{
+  "design": "platform-first",
+  "decision": "Zone layout",
+  "written": [
+    "docs/architecture/designs/orders-platform/designs/platform-first/design.md"
+  ]
+}
+
+## Step 7: design_run.py note --topic orders-platform --kind scan --title improvement scan
+
+Exit: 0
+
+{
+  "topic": "orders-platform",
+  "note": "docs/architecture/designs/orders-platform/notes.md",
+  "written": [
+    "docs/architecture/designs/orders-platform/notes.md"
+  ]
+}
+
+## Step 8: design_run.py small-fix --topic orders-platform --text Rename the test queue to orders-test
+
+Exit: 0
+
+{
+  "design": "platform-first",
+  "small_fixes": [
+    "Rename the test queue to orders-test"
+  ],
+  "written": [
+    "docs/architecture/designs/orders-platform/designs/platform-first/design.md"
+  ]
+}
+
+## Step 9: design_run.py resume --topic orders-platform
+
+Exit: 0
+
+{
+  "topic": "orders-platform",
+  "design": "platform-first",
+  "reopened": [],
+  "next_decision": "Zone layout",
+  "stages_needing_work": [],
+  "written": []
+}
+
+## Step 10: design_run.py ending --topic orders-platform
+
+Exit: 0
+
+Run next:
+The end state is still being designed.
+
+Pick up the orders platform designs:
+`/crav1-design-architecture resume orders-platform`
+
+Waiting: person B to decide who pays for the zone
+Waiting: person A on test backups
+Uncommitted: files in docs/architecture/designs/orders-platform/.
+
+## Step 11: design_run.py go-ahead --topic orders-platform --accept-findings
+
+Exit: 0
+
+{
+  "design": "platform-first",
+  "findings": [
+    {
+      "kind": "gap",
+      "text": "criterion not covered by the end state: Checkout stays fast in prod"
+    },
+    {
+      "kind": "missing-decision",
+      "text": "not settled: Zone layout"
+    },
+    {
+      "kind": "missing-decision",
+      "text": "not settled: Resource group names"
+    },
+    {
+      "kind": "missing-decision",
+      "text": "not settled: Access model"
+    },
+    {
+      "kind": "missing-decision",
+      "text": "not settled: Backup policy"
+    }
+  ],
+  "copied": true,
+  "adrs": [],
+  "slice": null,
+  "written": [
+    "docs/architecture/spec.md",
+    "docs/architecture/designs/orders-platform/designs/platform-first/design.md"
+  ]
+}

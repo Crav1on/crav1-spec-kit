@@ -21,6 +21,7 @@ B  Retry queue owned by orders-api (Recommended)
 - **Risks**: what can go wrong and what the design bets on.
 - **Fits drivers**: one word per driver: yes, partly, no.
 - **Reverses**: any accepted ADR, constraint, approval item or current environment fact it would undo.
+- **Overlaps**: any planned task it overlaps, as `<slug> T#` from that slice's `tasks.md`. Planned work is an input, not a new option.
 
 When 3 or more options are wide, print a short option by driver table in the same reply.
 
@@ -33,15 +34,12 @@ When 3 or more options are wide, print a short option by driver table in the sam
 
 ## The decision card
 
+At most 4 options and one question (1.189.0). Typed input goes through the card's free-text Other answer.
+
 Card: Which option settles this decision?
 - **Option B (Recommended)** (`choose-b`): settle with option B and write its draft ADR in the design folder. Why: it fits the most drivers.
 - **Option A** (`choose-a`): settle with option A and write its draft ADR in the design folder.
-- **Your idea** (`choose-mine`): settle with your own option and write its draft ADR in the design folder.
-- **Keep talking** (`discuss`): talk this decision through; nothing outside the design folder changes.
-- **Add my idea** (`add-my-idea`): add your own option and score it on the same drivers.
-- **Ask me first** (`ask-me`): answer up to three short questions, then see the options again.
-- **Ask a person** (`to-question`): write an open question in the design folder naming who has the fact or decides.
-- **Needs research** (`to-research`): write an open question in the design folder and name the research step.
-- **Skip for now** (`skip-for-now`): move on; this decision stays open in the design.
+- **Option C** (`choose-c`): settle with option C and write its draft ADR; shown only when there is a third option, otherwise **Your idea** (`choose-mine`) once the user has given one.
+- **Not yet** (`discuss`): talk this decision through first; nothing outside the design folder changes.
 
-Show `choose-c` when there is a third option. Order the options so the recommended one is first.
+Other: type your own idea, a point to talk through, `ask-me`, `to-question` with who has the fact, `to-research` with the topic, or `skip-for-now`. Order the options so the recommended one is first. An empty Other is asked again; it is never an answer.

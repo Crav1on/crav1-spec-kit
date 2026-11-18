@@ -1,0 +1,135 @@
+[
+  {
+    "git": [
+      "init",
+      "-q",
+      "-b",
+      "main"
+    ]
+  },
+  {
+    "git": [
+      "add",
+      "-A"
+    ]
+  },
+  {
+    "git": [
+      "commit",
+      "-q",
+      "-m",
+      "start"
+    ]
+  },
+  {
+    "args": [
+      "create",
+      "--topic",
+      "orders-platform"
+    ],
+    "input": {
+      "ask": "split the orders platform",
+      "end_goal": "Orders run as their own platform.",
+      "criteria": [
+        "Checkout stays fast in prod"
+      ],
+      "design": "platform-first",
+      "decisions": [
+        "Zone layout",
+        "Access model"
+      ]
+    }
+  },
+  {
+    "git": [
+      "add",
+      "-A"
+    ]
+  },
+  {
+    "git": [
+      "commit",
+      "-q",
+      "-m",
+      "design"
+    ]
+  },
+  {
+    "git": [
+      "switch",
+      "-q",
+      "main"
+    ]
+  },
+  {
+    "git": [
+      "commit",
+      "-q",
+      "--allow-empty",
+      "-m",
+      "main moves on"
+    ]
+  },
+  {
+    "git": [
+      "update-ref",
+      "refs/remotes/origin/main",
+      "main"
+    ]
+  },
+  {
+    "args": [
+      "resume",
+      "--topic",
+      "orders-platform"
+    ],
+    "code": 2
+  },
+  {
+    "git": [
+      "switch",
+      "-q",
+      "design/orders-platform"
+    ]
+  },
+  {
+    "args": [
+      "resume",
+      "--topic",
+      "orders-platform"
+    ]
+  },
+  {
+    "args": [
+      "--headless",
+      "branch-behind",
+      "--topic",
+      "orders-platform"
+    ]
+  },
+  {
+    "args": [
+      "--headless",
+      "branch-behind",
+      "--topic",
+      "orders-platform",
+      "--yes"
+    ],
+    "code": 2
+  },
+  {
+    "args": [
+      "branch-behind",
+      "--topic",
+      "orders-platform",
+      "--yes"
+    ]
+  },
+  {
+    "args": [
+      "branch-behind",
+      "--topic",
+      "orders-platform"
+    ]
+  }
+]
