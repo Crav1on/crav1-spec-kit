@@ -2,6 +2,16 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.192.0 (2026-11-18)
+
+A new cross-cutting skill, `/crav1-explain-tech`, explains one technology tied to where the specs use it.
+
+- **Short answer, fixed shape.** `/crav1-explain-tech <technology> [in <spec, topic or architecture>]` answers in about 150 to 250 words: what it is, how it works, where it shows up (links to the exact files and sections), why it is used, the main tradeoff and one alternative, then Run next. `deeper` gives 300 to 900 words and adds how it fits with the rest of the spec.
+- **Read from the specs.** `explain_tech.py find` lists every mention in specs, plans, tasks, notes, the architecture spec, ADRs, design topics and system notes (also `private-link`, `PrivateLink`), with links, owners (ADR deciders, `Owner:` lines, `## Approval needed`) and the spec to save to. A technology the specs never mention is said plainly, with no spec link, and Run next names research.
+- **Save only on request.** `save` (the word, or yes on the card) appends a dated `### <technology>` entry with the short explanation and links under `## Technology notes` in the spec's `notes.md` (created when missing). Links that are not in the specs are refused; nothing is written without the yes.
+- **Checked shape.** `check` tests the sections, their order, the word count and every link; kit-lint runs it on the skill's sample answers and checks its Run next layout.
+- Registered in the skills reference, guild routing (a Cross-cutting skill row and a choice-words row: `deeper`, `save`), the walkthrough `docs/from-explain-tech.md`, the glossary, and `scripts/tests/test_kit_1192.py`.
+
 ## 1.191.0 (2026-11-18)
 
 `/crav1-design-architecture` works in repos whose default branch is not main.
@@ -137,13 +147,5 @@ Fixes from a live ready check and a kit update. The build map shows each branch'
 - **Repo first, then one host lookup.** When a waiting pull request's code repo is not recorded, the skill asks for the repo first, offering the `docs/system/repos.md` rows. With the repo known, one read-only lookup on that host (`gh` or `az`, 8-second timeout) gives both who opened the pull request and whether it merged, and the owner is recorded as `PR author:` in its build-progress file. The skill asks who opened it only when that lookup names no one. The `--full` JSON adds `ask_first`, `owner_unknown` and `owners_from_host`.
 - **The check runs again after an answer.** After `walk_progress.py code-repo` or `pr-author` records an answer, the skill runs the ready check again in the same run and prints the new reply. Both commands return a `rerun` field naming it.
 - **Owner choices.** The owner question offers the names the kit already knows (people in `claims.md`, PR notes' `author:`, and build-progress `PR author:`, `Opened by:` and `Owner:` lines) besides `Don't know`. `pr-author` lists them under `choices` when the host names no one, and the `--full` JSON has them as `owner_choices`.
-
-## 1.177.2 (2026-11-16)
-
-Fixes for a specs repo and a code repo on different hosts, found on a live run. The ready check asks each waiting pull request's own host whether it merged and records the merge, a pull request whose code repo is not recorded is named and asked about once, and `--write-map` says whether the map changed.
-
-- **Merge state from the host.** A pull request completed on Azure DevOps still read `waits for PR 71 to merge`, because the ready check only read the kit's records and git in the specs checkout. Now `walk_progress.py readiness` asks each waiting pull request's own host first, read-only with a short timeout and only the CLI for that host (`gh pr view <n> --json state,mergeCommit,mergedAt,closedAt` on GitHub, `az repos pr show --id <n>` on Azure DevOps), through `pr_common.py`, which stays read-only. A merged or completed pull request gets a `Step: merge-pr` result in its build-progress file, such as `Result: merged (PR 71, merge commit 1a2b3c4d5e6f, merged on host 2026-11-14)`, the same shape as a `/crav1-merge-pr` or build-walk merge, and its branch run becomes `merged`. In that same run its tasks count as done, it leaves the merge list, and the tasks that waited on it can start. A build-progress file with a merge-pr result now makes the tasks on its `Tasks:` line done in the ready check and the build map. A pull request closed or abandoned without merging reads `Waiting: PR 71 was closed without merging; its tasks are not done.` and leaves the merge list, with nothing recorded. When the host cannot be read, nothing changes.
-- **Code repo not recorded.** When no `Code repo:` line names where a pull request lives and `docs/system/repos.md` has zero or several rows, the ready check says `Waiting: PR 71 and PR 73: code repo not recorded, so the host was not asked whether they merged.` and lists them under `code_repo_unknown`. `/crav1-tasks-ready-to-build` asks you once which repo they are in, offering the `repos.md` rows, records the answer with the new `walk_progress.py code-repo --root <spec-folder> --pr <n> --repo <name-or-url>` (`Code repo: <url>` in that pull request's build-progress file; without `--repo` it lists the choices), and runs the ready check again so the merge list and Run next show what merged. The owner, merge-state and bare-number lookups all use that line.
-- **Build map says whether it changed.** `readiness --write-map` always rewrote `build-map.md`, but when nothing had changed the file stayed byte-identical and showed no git change, which looked like a failed write. The reply now ends `Build map: docs/specs/<slug>/build-map.md (updated)` or `(unchanged, nothing new since the last write)`.
 
 The newest 15 releases are above. The full changelog is https://github.com/Crav1on/crav1-spec-kit/blob/main/CHANGELOG.md.

@@ -497,6 +497,9 @@ def ending_samples(kit):
     for state in ({"phase": "design", "parked": True, "uncommitted": 4}, {"phase": "go-ahead", "uncommitted": 7},
                   {"phase": "merged", "slices": ["orders-api"]}, {"phase": "merged", "no_slice": True}):
         out.append((f"design_run.ending {state['phase']}", da.ending(dict(state, topic="orders-payment-retry"))))
+    et = _load_script(os.path.join(sk, "crav1-explain-tech", "scripts", "explain_tech.py"), "kit_lint_explain_tech")
+    for kw in ({}, {"deeper": True, "spec": "orders-api"}, {"not_in_spec": True}, {"saved": "docs/specs/orders-api/notes.md"}):
+        out.append((f"explain_tech.ending {sorted(kw)}", et.ending("Service Bus", **kw)))
     return out
 
 
@@ -669,6 +672,22 @@ def design_card_hits(text):
     return hits
 
 
+def explain_tech_problems(kit):
+    """1.192.0: the /crav1-explain-tech sample answers keep the fixed shape and word counts."""
+    skill = os.path.join(kit, ".cursor", "skills", "crav1", "crav1-explain-tech")
+    et = _load_script(os.path.join(skill, "scripts", "explain_tech.py"), "kit_lint_explain_tech_check")
+    out = []
+    for name, deeper in (("sample-short.md", False), ("sample-not-in-spec.md", False), ("sample-deeper.md", True)):
+        path = os.path.join(skill, "assets", name)
+        if not os.path.isfile(path):
+            out.append(f"{os.path.relpath(path, kit)}: missing sample answer")
+            continue
+        with open(path, encoding="utf-8") as fh:
+            res = et.check(fh.read(), deeper)
+        out += [f"{os.path.relpath(path, kit)}: explain-tech answer: {p}" for p in res["problems"]]
+    return out
+
+
 def design_card_problems(kit):
     skill = os.path.join(kit, ".cursor", "skills", "crav1", DESIGN_CARD_SKILL)
     paths = [os.path.join(skill, "SKILL.md")]
@@ -758,6 +777,7 @@ def main(argv):
     errs.extend(ending_layout_problems(kit))
     errs.extend(card_wording_problems(kit))
     errs.extend(design_card_problems(kit))
+    errs.extend(explain_tech_problems(kit))
     errs.extend(invocation_problems(kit))
     for e in errs: print("FAIL  " + e)
     print(f"kit lint: {len(skills)} skills, {len(errs)} problem(s)")

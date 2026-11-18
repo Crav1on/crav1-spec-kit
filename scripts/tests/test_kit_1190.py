@@ -155,7 +155,8 @@ class TestKitCheck(GitHelpers, Base):
     def test_files_agree_in_the_kit(self):
         kc = dr.kit_check(self.tmp)
         self.assertTrue(kc["ok"], kc)
-        self.assertEqual(kc["stated"], dr.SKILL_VERSION)
+        # 1.192.0: a later release states a newer kit than SKILL_VERSION; that is fine, never older.
+        self.assertGreaterEqual(dr._version_key(kc["stated"]), dr._version_key(dr.SKILL_VERSION))
 
     def test_skill_md_marker_matches_script(self):
         self.assertIn(f"Skill files: {dr.SKILL_VERSION}", (SKILL / "SKILL.md").read_text(encoding="utf-8"))
