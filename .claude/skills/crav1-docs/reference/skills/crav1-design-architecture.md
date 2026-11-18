@@ -30,6 +30,8 @@ The skill's `scripts/design_run.py` owns the folder format and every move, saves
 
 1.190.0: scratch input (ending state, lean, settle, stage and compare drafts) goes in the session's temp folder and is refused from `inputs/`, which holds only the user's saved goal files and is created on the first save for older topics. `uncommitted` is a count (`true` is counted from git status), a commit card (`commit --topic <t> --yes`) comes before the ending, `create --builds-on` refuses while the base topic is uncommitted, and the ending prints the routable [`/crav1-design-architecture`](crav1-design-architecture.md) builds-on <base> <idea>`.
 
+1.191.0: the design branch check, the kit-behind check and the go-ahead base check use the repo's default branch (`origin/HEAD`, else `origin/main`, then `origin/master`), skip with a reason when there is none, and name that branch in cards and Run next.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.

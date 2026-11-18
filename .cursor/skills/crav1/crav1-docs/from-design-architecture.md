@@ -84,3 +84,5 @@ Since 1.189.0 decisions keep their order, cards hold at most four options and on
 Reference page: [design architecture](reference/skills/crav1-design-architecture.md)
 
 Since 1.190.0 decisions carry order numbers, the skill offers to switch branches and to commit before it ends, and saved goal files are offered as a goal change.
+
+Since 1.191.0 the branch checks use your repo's default branch (for example master), not always main.

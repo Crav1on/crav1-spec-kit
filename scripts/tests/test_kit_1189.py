@@ -316,7 +316,7 @@ class TestBranchBehind(GitHelpers, Base):
         sync = self.ok("--no-fetch", "resume", "--topic", T)["branch_sync"]
         self.assertEqual(sync["behind"], {"origin/main": 1})
         self.assertEqual(sync["card"]["words"], ["yes", "stop"])
-        self.assertIn("Merge origin/main into the design branch:\n`git merge --no-ff origin/main`", sync["ending"])
+        self.assertIn("Merge main into the design branch:\n`git merge --no-ff origin/main`", sync["ending"])  # 1.191.0: names the default branch
         self.assertNotIn("rebase`", sync["ending"])
         for move in (["stage", "--topic", T], ):
             res = self.ok("--no-fetch", *move, inp={"stages": [{"name": "one", "reason": "test first"}]})

@@ -59,7 +59,8 @@ Exit: 0
         }
       ]
     },
-    "ending": "Run next:\ndesign/orders-platform is behind origin/main (1 commit). Merge it in before going on; never rebase.\n\nMerge origin/main into the design branch:\n`git merge --no-ff origin/main`\n",
+    "ending": "Run next:\ndesign/orders-platform is behind origin/main (1 commit). Merge it in before going on; never rebase.\n\nMerge main into the design branch:\n`git merge --no-ff origin/main`\n",
+    "default_branch": "origin/main",
     "line": "design/orders-platform is behind origin/main (1 commit)."
   }
 }
@@ -94,7 +95,8 @@ Exit: 0
       }
     ]
   },
-  "ending": "Run next:\ndesign/orders-platform is behind origin/main (1 commit). Merge it in before going on; never rebase.\n\nMerge origin/main into the design branch:\n`git merge --no-ff origin/main`\n",
+  "ending": "Run next:\ndesign/orders-platform is behind origin/main (1 commit). Merge it in before going on; never rebase.\n\nMerge main into the design branch:\n`git merge --no-ff origin/main`\n",
+  "default_branch": "origin/main",
   "line": "design/orders-platform is behind origin/main (1 commit)."
 }
 
@@ -129,5 +131,6 @@ Exit: 0
   "branch": "design/orders-platform",
   "behind": {},
   "card": null,
-  "ending": null
+  "ending": null,
+  "default_branch": "origin/main"
 }

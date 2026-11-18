@@ -49,7 +49,7 @@ INPUTS_DIR = "inputs"
 _ROOT: list = []
 _CMD: list = []
 # The kit version this skill's files last changed in. SKILL.md carries the same marker (1.190.0).
-SKILL_VERSION = "1.190.0"
+SKILL_VERSION = "1.191.0"
 SCRATCH_MOVES = {"ending", "lean", "settle", "stage", "compare", "compare-topics"}
 GOAL_KEYS = {"ask", "end_goal", "drivers", "constraints", "criteria", "decisions"}
 STATES = {"open", "leaning", "settled", "to-question", "to-research", "skipped", "reopened", "dropped"}
@@ -504,8 +504,44 @@ def _ref_ok(root: Path, ref: str) -> bool:
     return out is not None and out.returncode == 0
 
 
+_DEFAULT: dict = {}
+
+
+def default_branch(root: Path) -> tuple[str, str]:
+    """The repo's default branch as a remote ref, resolved once per repo (1.191.0).
+
+    origin/HEAD when set; else origin/main, then origin/master when they exist.
+    Returns (ref, "") or ("", reason) when there is none; never raises."""
+    key = str(Path(root).resolve())
+    if key in _DEFAULT:
+        return _DEFAULT[key]
+    found = ("", "")
+    out = _git(root, "symbolic-ref", "--quiet", "refs/remotes/origin/HEAD")
+    if out is not None and out.returncode == 0 and out.stdout.strip().startswith("refs/remotes/"):
+        ref = out.stdout.strip()[len("refs/remotes/"):]
+        if _ref_ok(root, ref):
+            found = (ref, "")
+    if not found[0]:
+        for ref in ("origin/main", "origin/master"):
+            if _ref_ok(root, ref):
+                found = (ref, "")
+                break
+    if not found[0]:
+        found = ("", "no default branch found (origin/HEAD is not set and there is no origin/main or origin/master), "
+                     "so the design branch was not compared with it")
+    if out is not None:  # cache only inside a git repository
+        _DEFAULT[key] = found
+    return found
+
+
+def default_name(root: Path, fallback: str = "main") -> str:
+    """The default branch's short name for text (master, main, develop ...)."""
+    ref, _ = default_branch(root)
+    return ref.split("/", 1)[1] if ref else fallback
+
+
 def branch_behind(root: Path, topic: str, do_fetch: bool = True) -> dict:
-    """Is design/<topic> behind origin/main, or behind design/<base> for a linked topic? (1.189.0)
+    """Is design/<topic> behind the default branch (origin/HEAD, 1.191.0), or behind design/<base> for a linked topic? (1.189.0)
 
     Mirrors the build walk's code-behind: behind offers a merge on a yes card,
     never a silent merge and never a rebase. {"state": "in-step" | "behind" |
@@ -525,9 +561,11 @@ def branch_behind(root: Path, topic: str, do_fetch: bool = True) -> dict:
             out = _git(root, "fetch", "-q", "origin")
             if out is None or out.returncode != 0:
                 line = "origin could not be fetched; compared with the local copies."
+            _DEFAULT.pop(str(Path(root).resolve()), None)
     refs = []
-    if _ref_ok(root, "origin/main"):
-        refs.append("origin/main")
+    dref, skipped = default_branch(root)
+    if dref:
+        refs.append(dref)
     goal_p = root / DESIGNS / topic / "goal.md"
     base = parse_goal(goal_p.read_text(encoding="utf-8")).get("builds_on") if goal_p.is_file() else ""
     if base:
@@ -537,6 +575,10 @@ def branch_behind(root: Path, topic: str, do_fetch: bool = True) -> dict:
                 break
     behind = {r: n for r in refs if (n := _behind(root, r))}
     out = {"state": "behind" if behind else "in-step", "branch": branch, "behind": behind, "card": None, "ending": None}
+    if dref:
+        out["default_branch"] = dref
+    else:
+        out["skipped"] = skipped
     if line:
         out["line"] = line
     if not behind:
@@ -550,7 +592,8 @@ def branch_behind(root: Path, topic: str, do_fetch: bool = True) -> dict:
                                {"word": "stop", "label": "Stop", "action": "merge nothing; the design branch stays as it is"}]}
     lines = ["Run next:", f"{branch} is behind {what}. Merge it in before going on; never rebase.", ""]
     for r in behind:
-        lines += [f"Merge {r} into the design branch:", f"`git merge --no-ff {r}`", ""]
+        name = r.split("/", 1)[1] if r == dref else r
+        lines += [f"Merge {name} into the design branch:", f"`git merge --no-ff {r}`", ""]
     out["ending"] = "\n".join(lines).rstrip("\n") + "\n"
     return out
 
@@ -687,7 +730,7 @@ def _stated_version(text: str) -> str:
 
 def kit_check(root: Path) -> dict:
     """1.190.0: the stated kit version (workflow.md next to the skills) against this skill's files,
-    and the specs repo's kit on this branch against origin/main's. Never guess a version."""
+    and the specs repo's kit on this branch against the default branch's (1.191.0). Never guess a version."""
     here = Path(__file__).resolve().parent.parent
     wf = here.parent / "crav1-docs" / "reference" / "workflow.md"
     stated = _stated_version(wf.read_text(encoding="utf-8")) if wf.is_file() else ""
@@ -707,13 +750,18 @@ def kit_check(root: Path) -> dict:
     if local.is_file():
         repo_kit = _stated_version(local.read_text(encoding="utf-8"))
         out["repo_kit"] = repo_kit or "not found"
-        main = _git(root, "show", f"origin/main:{rel}")
+        dref, skipped = default_branch(root)
+        main = _git(root, "show", f"{dref}:{rel}") if dref else None
+        if dref:
+            out["default_branch"] = dref
+        elif skipped and current_branch(root) is not None:
+            out["skipped"] = skipped
         if main is not None and main.returncode == 0:
             main_kit = _stated_version(main.stdout)
             out["main_kit"] = main_kit or "not found"
             if repo_kit and main_kit and _version_key(repo_kit) < _version_key(main_kit):
                 out["kit_behind_main"] = True
-                problems.append(f"this branch has kit {repo_kit}, origin/main has {main_kit}; merge main in before the topic is touched")
+                problems.append(f"this branch has kit {repo_kit}, {dref} has {main_kit}; merge {dref.split('/', 1)[1]} into the branch before the topic is touched")
     if problems:
         out.update(ok=False, problems=problems, run="/crav1-update-kit")
     return out
@@ -956,7 +1004,7 @@ def cmd_resume(a, root: Path) -> dict:
     if kc.get("kit_behind_main") and not a.skip_kit_check:
         st = branch_behind(root, t.name, do_fetch=not getattr(a, "no_fetch", False))
         return {"topic": t.name, "kit_check": kc, "branch_sync": st, "written": [],
-                "note": "the design branch's kit is behind origin/main: offer the merge card (branch-behind --yes) before the topic is touched"}
+                "note": f"the design branch's kit is behind {kc.get('default_branch', 'the default branch')}: offer the merge card (branch-behind --yes) before the topic is touched"}
     name = t.current(a.design)
     d = t.design(name)
     w = Writer(root, t.name)
@@ -1675,7 +1723,9 @@ def cmd_revisit(a, root: Path) -> dict:
 def base_on_main(root: Path, base: str) -> bool:
     """The base topic's design block is in the architecture spec on main (its design PR merged)."""
     import subprocess
-    for ref in ("origin/main", "main"):
+    dref, _ = default_branch(root)
+    refs = [dref, dref.split("/", 1)[1]] if dref else ["origin/main", "main", "origin/master", "master"]
+    for ref in refs:
         try:
             out = subprocess.run(["git", "show", f"{ref}:{ARCH_SPEC.as_posix()}"], cwd=root, capture_output=True,
                                  text=True, encoding="utf-8", timeout=10)
@@ -1689,15 +1739,16 @@ def base_on_main(root: Path, base: str) -> bool:
 
 def waiting_base_text(root: Path, topic: str, base: str) -> str:
     words, bwords = topic.replace("-", " "), base.replace("-", " ")
+    dn = default_name(root)
     bt = Topic(root, base)
     chosen = any(bt.design(n)["status"] == "chosen" for n in bt.designs())
     if chosen:
-        why = f"The {words} design builds on {base}, whose design pull request is not merged into main yet. Go-ahead here waits for that merge."
-        waiting = f"the {base} design pull request (design/{base}) to merge into main."
+        why = f"The {words} design builds on {base}, whose design pull request is not merged into {dn} yet. Go-ahead here waits for that merge."
+        waiting = f"the {base} design pull request (design/{base}) to merge into {dn}."
         lead, cmd = f"Pick up the {words} designs:", f"/crav1-design-architecture resume {topic}"
     else:
         why = f"The {words} design builds on {base}, which has not had go-ahead yet. Go-ahead here waits until the {base} design pull request is merged."
-        waiting = f"go-ahead on {base} and its design pull request (design/{base}) merged into main."
+        waiting = f"go-ahead on {base} and its design pull request (design/{base}) merged into {dn}."
         lead, cmd = f"Pick up the {bwords} designs:", f"/crav1-design-architecture resume {base}"
     return "\n".join(["Run next:", why, "", lead, f"`{cmd}`", "", f"Waiting: {waiting}"]) + "\n"
 
@@ -1715,19 +1766,20 @@ def ending(state: dict) -> str:
     topic = state["topic"]
     words = topic.replace("-", " ")
     phase = state.get("phase", "design")
+    dn = state.get("default_branch") or "main"
     out = ["Run next:"]
     if phase == "go-ahead":
         out.append(state.get("reason") or "The chosen design has been reviewed, accepted, and copied on the design branch.")
         out.append("Do not plan until this pull request is merged. Merge with no tag.")
         out += ["", f"Push the {words} design branch:", f"`git push -u origin design/{topic}`", "",
-                "Open the pull request for that branch:", f"`gh pr create --base main --head design/{topic}`"]
+                "Open the pull request for that branch:", f"`gh pr create --base {dn} --head design/{topic}`"]
     elif phase == "merged":
         if state.get("slices"):
             s = state["slices"][0]
-            out += [state.get("reason") or f"The {words} design is on main. The {s} spec still needs to be brought in line with the new ADRs.", "",
+            out += [state.get("reason") or f"The {words} design is on {dn}. The {s} spec still needs to be brought in line with the new ADRs.", "",
                     f"Bring the {s} spec in line with the design decisions:", f"`/crav1-tighten-spec {s}`"]
         elif state.get("no_slice"):
-            out += [state.get("reason") or f"The {words} design is on main and no slice exists yet.", "",
+            out += [state.get("reason") or f"The {words} design is on {dn} and no slice exists yet.", "",
                     "Plan the work from the architecture spec:", "`/crav1-plan-from-spec`"]
         elif state.get("routed_requirement"):
             out += ["A requirement came up during the design.", "", "Add the requirement to the spec:", "`/crav1-add-to-spec fact`"]
@@ -1837,6 +1889,7 @@ def cmd_ending(a, root: Path) -> str:
         if current_branch(root) is None:
             raise Refused("uncommitted takes a count of files; there is no git status to count here")
         state["uncommitted"] = len(topic_dirty(root, slugify(a.topic)))
+    state.setdefault("default_branch", default_name(root))
     text = ending(state)
     st = linked_behind(root, slugify(a.topic))
     if st["state"] == "behind":
@@ -1873,7 +1926,7 @@ def main(argv=None) -> int:
     rs = sub.add_parser("resume")
     rs.add_argument("--topic", required=True)
     rs.add_argument("--design")
-    rs.add_argument("--skip-kit-check", action="store_true", help="go on although the branch's kit is behind main")
+    rs.add_argument("--skip-kit-check", action="store_true", help="go on although the branch's kit is behind the default branch")
     pk = sub.add_parser("park")
     pk.add_argument("--topic", required=True)
     pk.add_argument("--design")
@@ -1966,6 +2019,7 @@ def main(argv=None) -> int:
     root = Path(a.root)
     _ROOT[:] = [root]
     _CMD[:] = [a.cmd]
+    _DEFAULT.clear()  # resolve the default branch once per run (1.191.0)
     try:
         if a.headless and a.cmd not in HEADLESS_ALLOWED:
             raise Refused(f"a run without the user may only prepare; {a.cmd} needs the user")

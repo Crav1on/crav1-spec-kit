@@ -10,7 +10,7 @@ icon: compass
 color: purple
 ---
 
-<!-- Skill files: 1.190.0 -->
+<!-- Skill files: 1.191.0 -->
 
 # Design architecture
 
@@ -62,13 +62,13 @@ The sandbox is `docs/architecture/designs/<topic>/` on its own design branch (re
 - **A goal changes in place.** `change-goal` rewrites `goal.md` and logs each change under `## Goal changes` with the date, the reason and what was added, removed, renamed, dropped or reordered. A dropped decision stays in the design, marked `dropped` with its reason; it is never deleted. A settled or leaning decision the change touches is marked reopened (`needs another look`), and `resume` continues there. Open questions and leans on the other decisions stay.
 - **A linked topic builds on a base topic.** `create --builds-on <base>` records `Builds on: <base>` in `goal.md` and lists the base's settled decisions under `## Fixed from the base topic`. Its design branch is cut from the base's: `git switch design/<base>`, then `git switch -c design/<topic>`. Later base changes come in with `git merge design/<base>` (or `git merge main` once the base pull request is merged), never a rebase. `resume` re-reads the base and names decisions settled or reopened there since the last run.
 - **A base decision changes only in the base topic.** The linked topic may not settle, add or change it; the script refuses and offers a revisit, which marks the decision reopened in the base topic.
-- **Each topic has its own go-ahead and design pull request.** Go-ahead on a linked topic waits until the base topic's design pull request is merged into main. The script checks the architecture spec on main; the refusal is a Run next with a Waiting line naming the base pull request. Pass `--base-merged` only after the user confirms that pull request is merged and main is not fetched here.
+- **Each topic has its own go-ahead and design pull request.** Go-ahead on a linked topic waits until the base topic's design pull request is merged into the default branch. The script checks the architecture spec on the default branch; the refusal is a Run next with a Waiting line naming the base pull request. Pass `--base-merged` only after the user confirms that pull request is merged and main is not fetched here.
 
 ## Stored order, cards and branches (1.189.0)
 
 - Decisions and open questions keep the order they were added, or the goal's order after `change-goal`. Big decisions come first; a detail decision is proposed only after the big ones.
 - Cards hold at most 4 options and one question. Typed input goes through the free-text Other answer; an empty Other is asked again.
-- `create` creates or checks the design branch `design/<topic>` (cut from `design/<base>` for a linked topic). Before work starts on a topic, the script checks whether the design branch is behind `origin/main` (or `design/<base>`) and offers `git merge --no-ff` on a yes card, never a rebase. After a committed change to a base topic, linked design branches behind it get one yes card to merge `design/<base>` into each. Creating the branch, those merges, `switch-branch` and `commit` of the topic folder, each after its yes, are the only git writes the skill makes. A move on another branch, when the topic lives on its design branch, refuses with a Run next naming `git switch design/<topic>`.
+- `create` creates or checks the design branch `design/<topic>` (cut from `design/<base>` for a linked topic). Before work starts on a topic, the script checks whether the design branch is behind the repo's default branch (`origin/HEAD`, else `origin/main`, then `origin/master`; 1.191.0) (or `design/<base>`) and offers `git merge --no-ff` on a yes card, never a rebase. After a committed change to a base topic, linked design branches behind it get one yes card to merge `design/<base>` into each. Creating the branch, those merges, `switch-branch` and `commit` of the topic folder, each after its yes, are the only git writes the skill makes. A move on another branch, when the topic lives on its design branch, refuses with a Run next naming `git switch design/<topic>`.
 - Step 1 reads the plans, tasks and build maps of slices the ask touches. Planned work is an input, never a new proposal.
 
 ## Order, branches, commits and kit version (1.190.0)

@@ -30,12 +30,12 @@ Card: Switch to the topic's design branch and go on?
 - **Switch (Recommended)** (`yes`): switch to design/<topic> and run the move again. Why: the topic's files live on that branch.
 - **Stop** (`stop`): stay on this branch; nothing changes.
 
-Kit version (1.190.0): `resume` and `create` return `kit_check` when the stated kit version (workflow.md) and this skill's files differ: warn and offer `/crav1-update-kit`. Never state a kit version you did not read from `kit_check` or workflow.md. When the design branch's kit is behind origin/main's (`kit_behind_main`), `resume` writes nothing and returns `branch_sync`: offer that merge card before the topic is touched.
+Kit version (1.190.0): `resume` and `create` return `kit_check` when the stated kit version (workflow.md) and this skill's files differ: warn and offer `/crav1-update-kit`. Never state a kit version you did not read from `kit_check` or workflow.md. When the design branch's kit is behind the default branch's (`kit_behind_main`, with `default_branch`), `resume` writes nothing and returns `branch_sync`: offer that merge card before the topic is touched.
 
-Design branch update: `resume`, `create` on an existing design branch, `fan-out`, `stage`, `go-ahead` and `change-goal` fetch and check whether `design/<topic>` is behind `origin/main`, and for a linked topic behind `design/<base>`. When it is, the result has `branch_sync` with a card; show it before going on.
+Design branch update: `resume`, `create` on an existing design branch, `fan-out`, `stage`, `go-ahead` and `change-goal` fetch and check whether `design/<topic>` is behind the repo's default branch, and for a linked topic behind `design/<base>`. The default branch (1.191.0) is `origin/HEAD`, else `origin/main`, then `origin/master`; with none the check is skipped and the result says why (`skipped`). Cards and Run next name that branch, for example master. When it is, the result has `branch_sync` with a card; show it before going on.
 
-Card: Merge origin/main into the design branch before going on?
-- **Merge it in (Recommended)** (`yes`): run `branch-behind --topic <topic> --yes`, which merges with `git merge --no-ff`, never a rebase. Why: the design then reads what is on main now.
+Card: Merge the default branch into the design branch before going on?
+- **Merge it in (Recommended)** (`yes`): run `branch-behind --topic <topic> --yes`, which merges with `git merge --no-ff`, never a rebase. Why: the design then reads what is on the default branch now.
 - **Stop** (`stop`): merge nothing; the design branch stays as it is and the step waits.
 
 On a conflict the script merges nothing, names the conflicting files and gives a Run next with the merge command. A run without the user names `yes` and `stop` and never merges.
