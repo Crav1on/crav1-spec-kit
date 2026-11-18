@@ -1,0 +1,176 @@
+[
+  {
+    "args": [
+      "create",
+      "--topic",
+      "orders-platform"
+    ],
+    "input": {
+      "ask": "split the orders platform",
+      "end_goal": "Orders run as their own platform.",
+      "drivers": [
+        "Checkout does not wait (docs/system/landscape.md)",
+        "One team runs orders: fewer people on call"
+      ],
+      "constraints": [],
+      "criteria": [
+        "Checkout stays fast in prod"
+      ],
+      "design": "platform-first",
+      "decisions": [
+        "Zone layout",
+        {
+          "title": "Resource group names",
+          "detail": true
+        },
+        "Access model"
+      ],
+      "notes": [
+        "Scope: alerts per env are in, billing is out"
+      ],
+      "notes_to_replay": [
+        "x"
+      ]
+    },
+    "code": 2
+  },
+  {
+    "args": [
+      "create",
+      "--topic",
+      "orders-platform"
+    ],
+    "input": {
+      "ask": "split the orders platform",
+      "end_goal": "Orders run as their own platform.",
+      "drivers": [
+        "Checkout does not wait (docs/system/landscape.md)",
+        "One team runs orders: fewer people on call"
+      ],
+      "constraints": [],
+      "criteria": [
+        "Checkout stays fast in prod"
+      ],
+      "design": "platform-first",
+      "decisions": [
+        "Zone layout",
+        {
+          "title": "Resource group names",
+          "detail": true
+        },
+        "Access model"
+      ],
+      "notes": [
+        "Scope: alerts per env are in, billing is out"
+      ]
+    }
+  },
+  {
+    "args": [
+      "add-decision",
+      "--topic",
+      "orders-platform",
+      "--title",
+      "Backup policy"
+    ]
+  },
+  {
+    "args": [
+      "question",
+      "--topic",
+      "orders-platform",
+      "--text",
+      "Who pays for the zone (person B decides)"
+    ]
+  },
+  {
+    "args": [
+      "question",
+      "--topic",
+      "orders-platform",
+      "--text",
+      "Are backups needed in test (person A knows)"
+    ]
+  },
+  {
+    "args": [
+      "lean",
+      "--topic",
+      "orders-platform",
+      "--decision",
+      "zone layout"
+    ],
+    "input": {
+      "options": [
+        {
+          "name": "One zone"
+        },
+        {
+          "name": "Two zones"
+        }
+      ],
+      "leaning": "One zone",
+      "drivers": [
+        "Checkout does not wait",
+        "One team runs orders"
+      ]
+    }
+  },
+  {
+    "args": [
+      "note",
+      "--topic",
+      "orders-platform",
+      "--kind",
+      "scan",
+      "--title",
+      "improvement scan"
+    ],
+    "input": {
+      "items": [
+        "shared deploy template: already planned (orders-api T4)",
+        "alerts per env"
+      ]
+    }
+  },
+  {
+    "args": [
+      "small-fix",
+      "--topic",
+      "orders-platform",
+      "--text",
+      "Rename the test queue to orders-test"
+    ]
+  },
+  {
+    "args": [
+      "resume",
+      "--topic",
+      "orders-platform"
+    ]
+  },
+  {
+    "args": [
+      "ending",
+      "--topic",
+      "orders-platform"
+    ],
+    "input": {
+      "phase": "design",
+      "open": true,
+      "waiting": [
+        "person B to decide who pays for the zone",
+        "person A on test backups"
+      ],
+      "uncommitted": true
+    }
+  },
+  {
+    "args": [
+      "go-ahead",
+      "--topic",
+      "orders-platform",
+      "--accept-findings"
+    ]
+  }
+]

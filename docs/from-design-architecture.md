@@ -50,6 +50,15 @@ A run without you, such as a bot, may only `prepare`: gather facts, draft option
 - `builds-on orders-platform` followed by your idea starts a topic that builds on `orders-platform`. Its design branch is cut from `design/orders-platform`, and updates come in by merging that branch, never by a rebase. The base topic's settled decisions are fixed inputs; to change one, the skill sends a revisit to the base topic instead. `resume` names what the base settled since your last run, and `status` shows the link both ways.
 - Each topic has its own go-ahead and design pull request. Go-ahead on the linked topic waits until the base topic's design pull request is merged; until then the ending names the base pull request under `Waiting:`.
 
+## 3b. Order, cards, notes and small fixes (1.189.0)
+
+- Decisions and open questions keep the order they were added, or the goal's order after `change-goal`; `resume` starts at the first open one in that order. Framing has a scope round: what else the change should cover, then big decisions first and detail decisions (marked detail) last.
+- Each card has at most four options and one question. Your own idea, a point to talk through, a question for a person, research or skip go in the card's free-text answer. An empty free-text answer is asked again.
+- Step 1 reads the plans, tasks and build maps of slices the ask touches, so work that is already planned is named as planned and never proposed again.
+- Script input files live in the topic folder under `inputs/`. `note` keeps scans, visions, scope lists and your answers in the topic's `notes.md`, and the skill saves open discussion there before it parks.
+- `small-fix` records a change that needs no design choice; go-ahead copies it with the design, with no ADR.
+- `create` creates or checks the design branch `design/<topic>`. On another branch, a move on that topic tells you which branch to switch to.
+
 ## 4. Go-ahead
 
 `go-ahead` first reviews the chosen design for gaps against the goal, conflicts with what is already built or documented, and missing decisions. Fix the findings or accept them. Then the skill copies the design as one block under `## Decided, not built yet` in `docs/architecture/spec.md`, copies its ADRs as accepted with a "Designed in" link, and copies still-open questions into that spec. Rejected designs stay in the topic folder.
@@ -59,5 +68,7 @@ A run without you, such as a bot, may only `prepare`: gather facts, draft option
 After go-ahead the ending names pushing the design branch first, then opening its pull request. Merge it with no tag. Planning comes only after that pull request is merged: then the ending names `/crav1-tighten-spec <slug>` for an affected slice, or `/crav1-plan-from-spec` when no slice exists yet. This command does not run them. See [How a run ends](reference/run-ending.md).
 
 Since 1.188.0 a topic's goal changes in place with `change-goal`, and `builds-on` starts a linked topic whose go-ahead waits for the base topic's design pull request.
+
+Since 1.189.0 decisions keep their order, cards hold at most four options and one question, and `note` and `small-fix` keep discussion and small changes in the topic folder.
 
 Reference page: [design architecture](reference/skills/crav1-design-architecture.md)

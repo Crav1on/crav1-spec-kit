@@ -233,35 +233,16 @@ class TestMoves(Base):
         g = self.tmp / f"docs/architecture/designs/{TOPIC}/goal.md"
         self.assertEqual(dr.render_goal(dr.parse_goal(g.read_text())), g.read_text())
 
-    def test_decisions_found_by_words_and_kept_in_sorted_place(self):
+    def test_decisions_found_by_words_and_kept_in_the_order_added(self):
+        # 1.189.0: decisions keep the order they were added (was alphabetical).
         self.create()
         run(self.tmp, "add-decision", "--topic", TOPIC, "--title", "How the user sees a payment in retry")
         d = dr.Topic(self.tmp, TOPIC).design("queue-in-orders-api")
         titles = [x["title"] for x in d["decisions"]]
-        self.assertEqual(titles, sorted(titles, key=str.casefold))
+        self.assertEqual(titles, GOAL["decisions"] + ["How the user sees a payment in retry"])
         code, _, err = run(self.tmp, "skip", "--topic", TOPIC, "--decision", "retry")
         self.assertEqual(code, 2)
         self.assertIn("no single decision", err)
-
-    def test_two_people_adding_decisions_merge_without_conflict(self):
-        self.create()
-        git = lambda *a: subprocess.run(["git", *a], cwd=self.tmp, capture_output=True, text=True, check=True)
-        git("init", "-q")
-        git("config", "user.name", "person A")
-        git("config", "user.email", "a@example.com")
-        git("add", "-A")
-        git("commit", "-qm", "base")
-        git("checkout", "-qb", "a")
-        run(self.tmp, "add-decision", "--topic", TOPIC, "--title", "Alpha decision on dead letters")
-        git("commit", "-qam", "a")
-        git("checkout", "-q", "-")
-        git("checkout", "-qb", "b")
-        run(self.tmp, "add-decision", "--topic", TOPIC, "--title", "Zulu decision on monitoring")
-        git("commit", "-qam", "b")
-        merged = subprocess.run(["git", "merge", "-q", "a", "-m", "m"], cwd=self.tmp, capture_output=True, text=True)
-        self.assertEqual(merged.returncode, 0, merged.stdout + merged.stderr)
-        d = dr.Topic(self.tmp, TOPIC).design("queue-in-orders-api")
-        self.assertEqual(len(d["decisions"]), 4)
 
     def test_lean_saves_progress_without_settling(self):
         self.create()

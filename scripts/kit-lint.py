@@ -645,6 +645,40 @@ def card_wording_problems(kit, skills=CARD_LINT_SKILLS):
     return out
 
 
+DESIGN_CARD_SKILL = "crav1-design-architecture"
+TYPE_ONLY = re.compile(r"(?i)^(keep talking|add my idea|change it|type\b.*|other\b.*|something else)$")
+
+
+def design_card_hits(text):
+    """1.189.0: a design card has at most 4 options, one question, and no option that only says to type."""
+    hits = []
+    for lineno, question, options in card_blocks(text):
+        if len(options) > 4:
+            hits.append((lineno, f"{len(options)} options; a card holds at most 4, typed input goes through Other"))
+        if question.count("?") > 1:
+            hits.append((lineno, "more than one question on one card"))
+        for label, desc in options:
+            if TYPE_ONLY.match(label.replace(" (Recommended)", "").strip()) or re.match(r"(?i)^type\b", desc):
+                hits.append((lineno, f"option `{label}` only says to type; typed input goes through the Other field"))
+    return hits
+
+
+def design_card_problems(kit):
+    skill = os.path.join(kit, ".cursor", "skills", "crav1", DESIGN_CARD_SKILL)
+    paths = [os.path.join(skill, "SKILL.md")]
+    for sub in ("references", "assets"):
+        paths += glob.glob(os.path.join(skill, sub, "**", "*.md"), recursive=True)
+    out = []
+    for path in sorted(paths):
+        if not os.path.isfile(path):
+            continue
+        with open(path, encoding="utf-8") as fh:
+            text = fh.read()
+        for lineno, why in design_card_hits(text):
+            out.append(f"{os.path.relpath(path, kit)}:{lineno}: design card: {why} (docs/reference/question-cards.md)")
+    return out
+
+
 def bytecode_problems(kit):
     out = []
     for path in sorted(py_entry_points(kit)):
@@ -717,6 +751,7 @@ def main(argv):
     errs.extend(prose_next_problems(kit))
     errs.extend(ending_layout_problems(kit))
     errs.extend(card_wording_problems(kit))
+    errs.extend(design_card_problems(kit))
     errs.extend(invocation_problems(kit))
     for e in errs: print("FAIL  " + e)
     print(f"kit lint: {len(skills)} skills, {len(errs)} problem(s)")

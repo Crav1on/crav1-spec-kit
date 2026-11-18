@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""State machine for /crav1-design-architecture (1.181.0, linked topics and goal changes 1.188.0).
+"""State machine for /crav1-design-architecture (1.181.0, linked topics and goal changes 1.188.0,
+stored order, notes, small fixes and design branches 1.189.0).
 
 Owns the sandbox format under docs/architecture/designs/<topic>/ and every move:
 create, status, resume, park, fan-out, lean, settle, question, answer, skip,
 stage, compare, compare-topics, review, go-ahead, ending, route,
-change-goal (1.188.0) and revisit (1.188.0).
+change-goal (1.188.0), revisit (1.188.0), note and small-fix (1.189.0).
 
 Before go-ahead every write stays inside the topic folder. A run without the
 user (--headless) may only prepare: lean, compare, compare-topics, status.
@@ -38,9 +39,13 @@ DESIGNS = Path("docs/architecture/designs")
 ARCH_SPEC = Path("docs/architecture/spec.md")
 DECIDED = "## Decided, not built yet"
 OPEN_Q = "## Open questions"
-START_WORDS = ["resume", "park", "status", "fan-out", "stage-it", "go-ahead", "compare-topics", "prepare", "change-goal", "builds-on"]
+START_WORDS = ["resume", "park", "status", "fan-out", "stage-it", "go-ahead", "compare-topics", "prepare", "change-goal", "builds-on", "note", "small-fix"]
 HEADLESS_WORDS = ["resume", "park", "status", "prepare"]
-HEADLESS_ALLOWED = {"status", "resume", "lean", "compare", "compare-topics", "route", "ending", "review"}
+HEADLESS_ALLOWED = {"status", "resume", "lean", "compare", "compare-topics", "route", "ending", "review", "note"}
+CREATE_KEYS = {"ask", "end_goal", "drivers", "constraints", "criteria", "design", "design_title", "decisions", "notes"}
+CHANGE_KEYS = {"ask", "end_goal", "drivers", "constraints", "criteria", "decisions", "renames", "drop_reasons", "reopen", "notes"}
+INPUTS_DIR = "inputs"
+_ROOT: list = []
 STATES = {"open", "leaning", "settled", "to-question", "to-research", "skipped", "reopened", "dropped"}
 CONFIRMED = "## Confirmed"
 STOP_WORDS = {"the", "and", "for", "with", "not", "from", "into", "that", "this", "are", "was", "but", "its", "any", "all", "can", "has", "have", "one", "two", "via", "per", "may", "must", "should", "only", "each", "out", "off", "own", "our", "use", "uses", "used"}
@@ -162,7 +167,7 @@ def render_goal(g: dict) -> str:
     return out
 
 
-DEC_KEYS = ["State", "Options shown", "Leaning", "Recommended", "Draft ADR", "Open question in", "Sources", "Reopened", "Reverses", "Dropped", "Renamed from"]
+DEC_KEYS = ["State", "Options shown", "Leaning", "Recommended", "Draft ADR", "Open question in", "Sources", "Reopened", "Reverses", "Dropped", "Renamed from", "Drivers", "Detail"]
 
 
 def parse_design(text: str) -> dict:
@@ -182,11 +187,11 @@ def parse_design(text: str) -> dict:
             "topic": m.get("Topic", ""), "status": m.get("Status", "open"),
             "ask": m.get("Ask", "").strip('"'), "end_state": sec.get("End state", ""),
             "decisions": decisions, "drivers": bullets(sec.get("Drivers", "")),
-            "ideas": bullets(sec.get("Ideas", ""))}
+            "ideas": bullets(sec.get("Ideas", "")), "small_fixes": bullets(sec.get("Small fixes", ""))}
 
 
 def render_design(d: dict) -> str:
-    decs = sorted(d["decisions"], key=lambda x: x["title"].casefold())
+    decs = list(d["decisions"])  # stored order: as added, or the goal's order (1.189.0)
     lines = [f"# Design: {d['title']}", "", f"- Topic: {d['topic']}", f"- Status: {d['status']}",
              f"- Ask: \"{d['ask']}\"", "", "## End state", "", d["end_state"] or "Not designed yet.", "",
              "## Decisions", ""]
@@ -201,6 +206,9 @@ def render_design(d: dict) -> str:
                 lines.append(f"  - {k}: {dec[k]}")
     lines += ["", "## Drivers", ""] + ([f"- {x}" for x in d["drivers"]] or ["- none yet"])
     lines += ["", "## Ideas", ""] + ([f"- {x}" for x in d["ideas"]] or ["- none yet"])
+    if d.get("small_fixes"):
+        lines += ["", "## Small fixes", "", "Accepted changes that need no design choice. Copied at go-ahead with no ADR.", ""]
+        lines += [f"- {x}" for x in d["small_fixes"]]
     return "\n".join(lines) + "\n"
 
 
@@ -221,7 +229,7 @@ def render_questions(design: str, qs: list[dict]) -> str:
     lines = [f"# Open questions: {design}", "", "Sandbox only. Copied to the architecture spec at go-ahead when still open.", "", "## Open", ""]
     if not qs:
         lines.append("- none yet")
-    for q in sorted(qs, key=lambda x: x["text"].casefold()):
+    for q in qs:  # the order they were asked (1.189.0)
         lines.append(f"- {q['text']}")
         for k in ("decision", "kind", "research", "stage", "answer"):
             if q.get(k):
@@ -259,7 +267,8 @@ class Topic:
         self.root, self.name = root, name
         self.dir = root / DESIGNS / name
         if not (self.dir / "goal.md").is_file():
-            raise Refused(f"no topic {name} under {DESIGNS}")
+            hint = branch_hint(root, name)
+            raise Refused(hint or f"no topic {name} under {DESIGNS}")
 
     def designs(self) -> list[str]:
         d = self.dir / "designs"
@@ -311,7 +320,92 @@ def find_decision(d: dict, title: str) -> dict:
 def load_input(path: str | None) -> dict:
     if not path:
         return {}
-    return json.loads(Path(path).read_text(encoding="utf-8"))
+    p = Path(path)
+    if _ROOT:
+        root = _ROOT[0].resolve()
+        if not (p.resolve() == root or root in p.resolve().parents):
+            raise Refused(f"input files go in the specs repo, in docs/architecture/designs/<topic>/{INPUTS_DIR}/, never in a temp folder: {path}")
+    return json.loads(p.read_text(encoding="utf-8"))
+
+
+def check_keys(data: dict, allowed: set, move: str) -> None:
+    unknown = sorted(k for k in data if k not in allowed)
+    if unknown:
+        raise Refused(f"{move} does not know the input key{'s' if len(unknown) > 1 else ''} {', '.join(unknown)}; "
+                      f"known keys: {', '.join(sorted(allowed))}. Put anything else under notes, which is saved with note.")
+
+
+def _decision_items(items: list) -> list[dict]:
+    """Decision titles as strings, or {"title": ..., "detail": true} for a detail decision (1.189.0)."""
+    out = []
+    for x in items:
+        if isinstance(x, dict):
+            dec = {"title": x["title"], "State": "open"}
+            if x.get("detail"):
+                dec["Detail"] = "yes"
+            out.append(dec)
+        else:
+            out.append({"title": x, "State": "open"})
+    return out
+
+
+def _git(root: Path, *args: str):
+    import subprocess
+    try:
+        return subprocess.run(["git", *args], cwd=root, capture_output=True, text=True, encoding="utf-8", timeout=15)
+    except Exception:
+        return None
+
+
+def current_branch(root: Path) -> str | None:
+    out = _git(root, "rev-parse", "--abbrev-ref", "HEAD")
+    if out is None or out.returncode != 0:
+        return None
+    return out.stdout.strip()
+
+
+def branch_exists(root: Path, branch: str) -> str:
+    """'local', 'origin' or '' for a branch name."""
+    for ref, where in ((f"refs/heads/{branch}", "local"), (f"refs/remotes/origin/{branch}", "origin")):
+        out = _git(root, "rev-parse", "--verify", "--quiet", ref)
+        if out is not None and out.returncode == 0:
+            return where
+    return ""
+
+
+def branch_hint(root: Path, topic: str) -> str:
+    """Run next text when the topic lives on its design branch and this branch is another one."""
+    cur = current_branch(root)
+    branch = f"design/{topic}"
+    if cur is None or cur == branch or not branch_exists(root, branch):
+        return ""
+    words = topic.replace("-", " ")
+    return "\n".join(["Run next:", f"The {words} topic is on its design branch {branch}, not on {cur}.", "",
+                      "Switch to the design branch:", f"`git switch {branch}`"]) + "\n"
+
+
+def ensure_design_branch(root: Path, topic: str, base: str = "") -> dict:
+    """create: be on design/<topic>; create it (from design/<base> for a linked topic) when missing."""
+    branch = f"design/{topic}"
+    cur = current_branch(root)
+    if cur is None:
+        return {"branch": branch, "branch_state": "not a git repository; the design branch is not checked"}
+    if cur == branch:
+        return {"branch": branch, "branch_state": "already on it"}
+    if branch_exists(root, branch):
+        raise Refused("\n".join(["Run next:", f"The design branch {branch} already exists; this is {cur}.", "",
+                                 "Switch to the design branch:", f"`git switch {branch}`"]) + "\n")
+    start = []
+    if base:
+        bb = f"design/{base}"
+        if cur != bb:
+            if not branch_exists(root, bb):
+                raise Refused(f"the base topic's design branch {bb} is not here; fetch it first")
+            start = [bb] if branch_exists(root, bb) == "local" else [f"origin/{bb}"]
+    out = _git(root, "switch", "-c", branch, *start)
+    if out is None or out.returncode != 0:
+        raise Refused(f"could not create {branch}: {(out.stderr if out else '').strip()}")
+    return {"branch": branch, "branch_state": f"created from {start[0] if start else cur}"}
 
 
 # ---------------------------------------------------------------- compare
@@ -367,14 +461,16 @@ def cmd_route(a) -> str:
 
 def cmd_create(a, root: Path) -> dict:
     data = load_input(a.input)
+    check_keys(data, CREATE_KEYS, "create")
     topic = slugify(a.topic)
     tdir = root / DESIGNS / topic
     if (tdir / "goal.md").exists():
         raise Refused(f"topic {topic} already exists; use resume")
     base = slugify(a.builds_on) if getattr(a, "builds_on", None) else ""
+    if base == topic:
+        raise Refused("a topic cannot build on itself")
+    branch = ensure_design_branch(root, topic, base)
     if base:
-        if base == topic:
-            raise Refused("a topic cannot build on itself")
         Topic(root, base)
     w = Writer(root, topic)
     goal = {"topic": topic, "ask": data.get("ask", ""), "end_goal": data.get("end_goal", ""),
@@ -384,8 +480,10 @@ def cmd_create(a, root: Path) -> dict:
     w.write(tdir / "goal.md", render_goal(goal))
     name = slugify(a.design or data.get("design", "first-design"))
     _new_design(root, topic, name, data.get("design_title", name.replace("-", " ")), goal["ask"],
-                [{"title": x, "State": "open"} for x in data.get("decisions", [])], goal["drivers"], w)
-    res = {"topic": topic, "design": name, "branch": f"design/{topic}", "written": w.written}
+                _decision_items(data.get("decisions", [])), goal["drivers"], w)
+    if data.get("notes"):
+        _write_note(root, topic, "notes from the goal input", data["notes"], "other", w)
+    res = {"topic": topic, "design": name, "branch": f"design/{topic}", "branch_state": branch["branch_state"], "written": w.written}
     if base:
         res |= {"builds_on": base, "branch_from": f"design/{base}", "fixed": goal["fixed"],
                 "git": [f"git switch design/{base}", f"git switch -c design/{topic}"],
@@ -463,8 +561,11 @@ def cmd_resume(a, root: Path) -> dict:
             if t.stages(name):
                 w.write(t.ddir(name) / "stages.md", render_stages(name, [dict(s, state="needs another look") for s in t.stages(name)]))
     ordered = goal_order(t.goal(), d)
+    big = [x for x in ordered if not x.get("Detail")]
+    detail = [x for x in ordered if x.get("Detail")]
     nxt = next((x["title"] for x in ordered if x["State"] == "reopened"), None) or \
-        next((x["title"] for x in ordered if x["State"] in ("open", "leaning")), None)
+        next((x["title"] for x in big if x["State"] in ("open", "leaning")), None) or \
+        next((x["title"] for x in detail if x["State"] in ("open", "leaning")), None)
     stage_work = [s["name"] for s in t.stages(name) if s.get("state") != "open" and s.get("state")]
     res = {"topic": t.name, "design": name, "reopened": reopened, "next_decision": nxt,
            "stages_needing_work": stage_work, "written": w.written}
@@ -519,7 +620,7 @@ def cmd_add_decision(a, root: Path) -> dict:
     guard_base(t, d, a.title)
     if any(x["title"].casefold() == a.title.casefold() for x in d["decisions"]):
         raise Refused("that decision is already listed")
-    d["decisions"].append({"title": a.title, "State": "open"})
+    d["decisions"].append({"title": a.title, "State": "open"} | ({"Detail": "yes"} if a.detail else {}))
     w = Writer(root, t.name)
     save_design(t, name, d, w)
     return {"design": name, "written": w.written}
@@ -545,15 +646,35 @@ def cmd_lean(a, root: Path) -> dict:
         dec["Leaning"] = data["leaning"]
     if dec["State"] in ("open", "reopened"):
         dec["State"] = "leaning" if dec.get("Leaning") else dec["State"]
+    named = []
     for drv in data.get("drivers", []):
-        if drv not in d["drivers"]:
+        hit = match_driver(drv, d["drivers"])
+        if hit is None:
             d["drivers"].append(drv)
+        named.append(drv)
+    if named:
+        dec["Drivers"] = "; ".join(named)
     for idea in data.get("ideas", []):
         if idea not in d["ideas"]:
             d["ideas"].append(idea)
     w = Writer(root, t.name)
     save_design(t, name, d, w)
     return {"design": name, "decision": dec["title"], "written": w.written}
+
+
+def _driver_key(text: str) -> str:
+    return re.split(r" \(|: |\. ", text.strip(), maxsplit=1)[0].strip().rstrip(".").casefold()
+
+
+def match_driver(name: str, drivers: list[str]) -> str | None:
+    """A lean names drivers by their short name; match it to a driver already listed (1.189.0)."""
+    key = _driver_key(name)
+    if not key:
+        return None
+    for drv in drivers:
+        if _driver_key(drv) == key or drv.casefold().startswith(name.strip().rstrip(".").casefold()):
+            return drv
+    return None
 
 
 def _adr_text(data: dict, dec_title: str, deciders: str) -> str:
@@ -654,7 +775,12 @@ def cmd_question(a, root: Path) -> dict:
         q["research"] = a.research
     if a.stage:
         q["stage"] = a.stage
-    qs = [x for x in t.questions(name) if x["text"] != a.text] + [q]
+    qs = t.questions(name)
+    pos = next((i for i, x in enumerate(qs) if x["text"] == a.text), None)
+    if pos is None:
+        qs.append(q)
+    else:
+        qs[pos] = q
     w = Writer(root, t.name)
     w.write(t.ddir(name) / "questions.md", render_questions(name, qs))
     save_design(t, name, d, w)
@@ -812,6 +938,8 @@ def cmd_go_ahead(a, root: Path) -> dict:
         block += ["", "Stages:"]
         for i, st in enumerate(stages, 1):
             block.append(f"{i}. {st['name']}: {st.get('reason', '')}" + (f" Waits on: {st['waits_on']}" if st.get("waits_on") else ""))
+    if d.get("small_fixes"):
+        block += ["", "Small fixes (no design choice):"] + [f"- {x}" for x in d["small_fixes"]]
     block_txt = "\n".join(block).rstrip() + "\n"
     head = f"### {d['title']} (topic {t.name})"
     if head in spec:
@@ -982,6 +1110,8 @@ def _goal_view(g: dict) -> dict:
 
 def cmd_change_goal(a, root: Path) -> dict:
     data = load_input(a.input)
+    check_keys(data, CHANGE_KEYS, "change-goal")
+    notes = data.pop("notes", None)
     if not a.reason or not a.reason.strip():
         raise Refused("a goal change needs a reason (--reason)")
     t = Topic(root, a.topic)
@@ -1021,9 +1151,12 @@ def cmd_change_goal(a, root: Path) -> dict:
         for x in new["decisions"]:
             if x not in new["dropped"] and x not in have:
                 d["decisions"].append({"title": x, "State": "open"})
+        d["decisions"] = goal_order(new, d)
         save_design(t, dn, d, w)
         if hits and t.stages(dn):
             w.write(t.ddir(dn) / "stages.md", render_stages(dn, [dict(s, state="needs another look") for s in t.stages(dn)]))
+    if notes:
+        _write_note(root, t.name, f"notes with the goal change: {a.reason.strip()}", notes, "other", w)
     refresh_compare(t, w)
     return view | {"preview": False, "written": w.written}
 
@@ -1178,15 +1311,82 @@ def ending(state: dict) -> str:
                     f"Pick up the {words} designs:", f"`/crav1-design-architecture resume {topic}`"]
         else:
             out = ["Run next: nothing needed now."]
-    tail = []
-    if state.get("waiting"):
-        tail.append(f"Waiting: {state['waiting']}")
-    if state.get("uncommitted"):
-        n = state["uncommitted"]
-        tail.append(f"Uncommitted: {n} file{'s' if n != 1 else ''}.")
+    tail = [f"Waiting: {x}" for x in _as_list(state.get("waiting"))]
+    unc = _uncommitted(state.get("uncommitted"), topic)
+    if unc:
+        tail.append(unc)
     if tail:
         out += [""] + tail
     return "\n".join(out) + "\n"
+
+
+def _as_list(value) -> list[str]:
+    """waiting: a string is one line, a list is one line per item (1.189.0)."""
+    if value is None or value is False or value == "":
+        return []
+    if isinstance(value, (list, tuple)):
+        return [str(x).strip() for x in value if str(x).strip()]
+    if value is True:
+        return []
+    return [str(value).strip()]
+
+
+def _uncommitted(value, topic: str) -> str:
+    """uncommitted: a count, a list of paths, true, or a short text (1.189.0)."""
+    if value is None or value is False or value == 0 or value == "" or value == []:
+        return ""
+    if value is True:
+        return f"Uncommitted: files in docs/architecture/designs/{topic}/."
+    if isinstance(value, int):
+        return f"Uncommitted: {value} file{'s' if value != 1 else ''}."
+    if isinstance(value, (list, tuple)):
+        n = len(value)
+        return f"Uncommitted: {n} file{'s' if n != 1 else ''}: " + ", ".join(f"`{x}`" for x in value) + "."
+    text = str(value).strip().rstrip(".")
+    return f"Uncommitted: {text}."
+
+
+def _note_text(body) -> str:
+    if isinstance(body, (list, tuple)):
+        return "\n".join(f"- {x}" for x in body)
+    if isinstance(body, dict):
+        return "\n".join(f"- {k}: {v}" for k, v in body.items())
+    return str(body).strip()
+
+
+def _write_note(root: Path, topic: str, title: str, body, kind: str, w: Writer) -> str:
+    path = root / DESIGNS / topic / "notes.md"
+    cur = path.read_text(encoding="utf-8") if path.is_file() else (
+        f"# Notes: {topic}\n\nDiscussion kept with the topic: scans, visions, scope lists and answers not yet in a decision.\n")
+    cur = cur.rstrip("\n") + f"\n\n## {today()} {kind}: {title}\n\n{_note_text(body)}\n"
+    w.write(path, cur)
+    return str(path.relative_to(root).as_posix())
+
+
+def cmd_note(a, root: Path) -> dict:
+    t = Topic(root, a.topic)
+    data = load_input(a.input)
+    body = a.text if a.text else data.get("text", data.get("items"))
+    if not body:
+        raise Refused("a note needs text (--text, or text or items in --input)")
+    w = Writer(root, t.name)
+    path = _write_note(root, t.name, a.title, body, a.kind, w)
+    return {"topic": t.name, "note": path, "written": w.written}
+
+
+def cmd_small_fix(a, root: Path) -> dict:
+    t = Topic(root, a.topic)
+    name = t.current(a.design)
+    d = t.design(name)
+    text = a.text.strip()
+    if not text:
+        raise Refused("a small fix needs text")
+    if text in d["small_fixes"]:
+        raise Refused("that small fix is already listed")
+    d["small_fixes"].append(text)
+    w = Writer(root, t.name)
+    save_design(t, name, d, w)
+    return {"design": name, "small_fixes": d["small_fixes"], "written": w.written}
 
 
 def cmd_ending(a, root: Path) -> str:
@@ -1237,6 +1437,17 @@ def main(argv=None) -> int:
     ad.add_argument("--topic", required=True)
     ad.add_argument("--design")
     ad.add_argument("--title", required=True)
+    ad.add_argument("--detail", action="store_true", help="a detail decision: proposed after the big ones")
+    nt = sub.add_parser("note")
+    nt.add_argument("--topic", required=True)
+    nt.add_argument("--title", required=True)
+    nt.add_argument("--kind", choices=["scan", "vision", "scope", "answers", "goal", "other"], default="other")
+    nt.add_argument("--text")
+    nt.add_argument("--input")
+    sf = sub.add_parser("small-fix")
+    sf.add_argument("--topic", required=True)
+    sf.add_argument("--design")
+    sf.add_argument("--text", required=True)
     ln = sub.add_parser("lean")
     ln.add_argument("--topic", required=True)
     ln.add_argument("--design")
@@ -1287,6 +1498,7 @@ def main(argv=None) -> int:
     e.add_argument("--input")
     a = p.parse_args(argv)
     root = Path(a.root)
+    _ROOT[:] = [root]
     try:
         if a.headless and a.cmd not in HEADLESS_ALLOWED:
             raise Refused(f"a run without the user may only prepare; {a.cmd} needs the user")
@@ -1297,7 +1509,8 @@ def main(argv=None) -> int:
               "answer": lambda: cmd_answer(a, root), "skip": lambda: cmd_skip(a, root), "stage": lambda: cmd_stage(a, root),
               "compare": lambda: cmd_compare(a, root), "compare-topics": lambda: cmd_compare_topics(a, root),
               "go-ahead": lambda: cmd_go_ahead(a, root), "ending": lambda: cmd_ending(a, root),
-              "change-goal": lambda: cmd_change_goal(a, root), "revisit": lambda: cmd_revisit(a, root)}[a.cmd]
+              "change-goal": lambda: cmd_change_goal(a, root), "revisit": lambda: cmd_revisit(a, root),
+              "note": lambda: cmd_note(a, root), "small-fix": lambda: cmd_small_fix(a, root)}[a.cmd]
         res = fn()
     except Refused as exc:
         print(str(exc), file=sys.stderr)

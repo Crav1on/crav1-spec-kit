@@ -6,6 +6,7 @@ Exit: 0
   "topic": "orders-target",
   "design": "target-first",
   "branch": "design/orders-target",
+  "branch_state": "not a git repository; the design branch is not checked",
   "written": [
     "docs/architecture/designs/orders-target/goal.md",
     "docs/architecture/designs/orders-target/designs/target-first/design.md",

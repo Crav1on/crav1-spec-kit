@@ -16,9 +16,6 @@ Not designed yet.
   - Leaning: Made-up data
   - Recommended: Made-up data
   - Open question in: questions.md
-- How the target reads orders
-  - State: dropped
-  - Dropped: YYYY-MM-DD: the target topic decides it
 - Where orders live
   - State: reopened
   - Options shown: One SQL database for orders, Event log per service
@@ -30,6 +27,9 @@ Not designed yet.
   - Draft ADR: designs/platform-first/adr/who-releases-orders.md
   - Reopened: goal changed YYYY-MM-DD: renamed from Who releases orders
   - Renamed from: Who releases orders
+- How the target reads orders
+  - State: dropped
+  - Dropped: YYYY-MM-DD: the target topic decides it
 
 ## Drivers
 

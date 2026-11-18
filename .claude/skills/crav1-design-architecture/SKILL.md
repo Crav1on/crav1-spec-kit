@@ -36,6 +36,8 @@ Route first, load second. Exact words, no flags, hyphen-only.
 - **`compare-topics`:** one-off comparison of designs from different topics, with criteria the user picks. Never runs unless asked.
 - **`prepare`:** gather facts, draft options with recommendations, refresh comparisons. Settles nothing.
 - **`change-goal`:** change an open topic's goal in place: ask, end goal, drivers, constraints, criteria, and the decision list (add, drop, reorder, rename). Offer it whenever the user wants a different goal for a topic that exists; never recreate the topic. A card shows the old and the new goal before anything is written.
+- **`note`:** save discussion that is not a decision yet (an improvement scan, a vision, a scope list, answers) into the topic folder. Allowed in prepare.
+- **`small-fix`:** record a change that needs no design choice; it is copied at go-ahead with no ADR.
 - **`builds-on`:** start a new topic that builds on an existing one: `builds-on orders-platform` followed by the idea text. The base topic's settled decisions become fixed inputs.
 - **Nothing at all:** ask one free-text question: *What do you want to change, add or fix in the architecture?* Offer `resume` too when a topic is open.
 
@@ -49,7 +51,7 @@ Then read `references/flow.md` for the steps. Read `references/options.md` when 
 
 ## The script owns the sandbox
 
-`scripts/design_run.py` in this skill owns the folder format and every move: create (with `--builds-on`), resume, park, fan out, record a lean, settle, question, answer, skip, stage, compare, compare-topics, review, go-ahead, change-goal and revisit. On Windows run `py -3`, elsewhere `python3` (`crav1-docs/reference/running-scripts.md`). Content goes in through `--input <json file>`. Do not hand-edit the design files, and never tell the user to hand-edit a spec file. The script saves after every move, so any session can stop and pick up again. There is no cap on decisions per session.
+`scripts/design_run.py` in this skill owns the folder format and every move: create (with `--builds-on`), resume, park, fan out, record a lean, settle, question, answer, skip, stage, compare, compare-topics, review, go-ahead, change-goal, revisit, note and small-fix. Input files go in `docs/architecture/designs/<topic>/inputs/`, never in a temp folder. On Windows run `py -3`, elsewhere `python3` (`crav1-docs/reference/running-scripts.md`). Content goes in through `--input <json file>`. Do not hand-edit the design files, and never tell the user to hand-edit a spec file. The script saves after every move, so any session can stop and pick up again. There is no cap on decisions per session.
 
 The sandbox is `docs/architecture/designs/<topic>/` on its own design branch (recommended name `design/<topic>`). One goal per topic, in `goal.md`. Each design lives in `designs/<name>/` with `design.md`, `questions.md`, `diagrams.md`, `adr/`, and `stages.md` once staged. `compare.md` scores designs in the topic against the shared criteria. One-off cross-topic comparisons go under `_compare/`. No other skill reads this tree, even after the branch is merged.
 
@@ -59,6 +61,13 @@ The sandbox is `docs/architecture/designs/<topic>/` on its own design branch (re
 - **A linked topic builds on a base topic.** `create --builds-on <base>` records `Builds on: <base>` in `goal.md` and lists the base's settled decisions under `## Fixed from the base topic`. Its design branch is cut from the base's: `git switch design/<base>`, then `git switch -c design/<topic>`. Later base changes come in with `git merge design/<base>` (or `git merge main` once the base pull request is merged), never a rebase. `resume` re-reads the base and names decisions settled or reopened there since the last run.
 - **A base decision changes only in the base topic.** The linked topic may not settle, add or change it; the script refuses and offers a revisit, which marks the decision reopened in the base topic.
 - **Each topic has its own go-ahead and design pull request.** Go-ahead on a linked topic waits until the base topic's design pull request is merged into main. The script checks the architecture spec on main; the refusal is a Run next with a Waiting line naming the base pull request. Pass `--base-merged` only after the user confirms that pull request is merged and main is not fetched here.
+
+## Stored order, cards and branches (1.189.0)
+
+- Decisions and open questions keep the order they were added, or the goal's order after `change-goal`. Big decisions come first; a detail decision is proposed only after the big ones.
+- Cards hold at most 4 options and one question. Typed input goes through the free-text Other answer; an empty Other is asked again.
+- `create` creates or checks the design branch `design/<topic>` (cut from `design/<base>` for a linked topic). This is the one git write the skill makes. A move on another branch, when the topic lives on its design branch, refuses with a Run next naming `git switch design/<topic>`.
+- Step 1 reads the plans, tasks and build maps of slices the ask touches. Planned work is an input, never a new proposal.
 
 ## Hard rules
 
@@ -71,7 +80,7 @@ The sandbox is `docs/architecture/designs/<topic>/` on its own design branch (re
 - Design the end state first. Stage only when the user asks. The user names and divides the stages.
 - Before go-ahead, write nothing outside the topic folder. Do not write `Asked:` or `Pending:` lines in any spec.
 - A run without the user never settles a decision, never stages, never gives go-ahead, and never writes a real ADR.
-- Do not commit, push, merge, tag, or open a pull request.
+- Do not commit, push, merge, tag, or open a pull request. The only git write is `create` creating the design branch.
 
 ## End
 

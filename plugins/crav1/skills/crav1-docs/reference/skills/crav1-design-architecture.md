@@ -18,6 +18,10 @@ The skill's `scripts/design_run.py` owns the folder format and every move, saves
 
 1.188.0: linked topics. `create --topic <t> --builds-on <base>` records `Builds on: <base>`, lists the base's settled decisions as fixed inputs, and cuts the design branch from `design/<base>` (updates by `git merge design/<base>`, never a rebase). `resume` names decisions the base settled or reopened since the last run, a local change of a base decision is refused with a `revisit` that reopens it in the base topic, `status` shows links both ways, and `go-ahead` on the linked topic waits until the base design is in the architecture spec on main, with a Waiting line naming the base pull request.
 
+1.189.0: decisions and open questions keep the order they were added (or the goal's order after `change-goal`), and `resume` takes the first reopened, then the first open big decision, then detail decisions (`{"title": ..., "detail": true}`). `ending` prints one `Waiting:` line per list item and reads `uncommitted` as a count, a list of paths, true or text. `lean` matches short driver names to listed drivers. Cards hold at most 4 options and one question, typed input goes through Other, and an empty Other is asked again; kit-lint checks this skill's cards.
+
+1.189.0: input files go in `docs/architecture/designs/<topic>/inputs/` (an input outside the specs repo is refused), `note` appends scans, visions, scope lists and answers to the topic's `notes.md` (allowed in prepare, used before parking), `create` and `change-goal` refuse unknown keys by name and save a `notes` key with note, `create` creates or checks `design/<topic>` (from `design/<base>` for a linked topic), a move on the wrong branch names `git switch design/<topic>`, `small-fix` lists changes with no design choice that go-ahead copies with no ADR, and Step 1 reads plans, tasks and build maps so planned work is not proposed again.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
@@ -34,6 +38,8 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 | Which step | `prepare` | Gather facts, draft options with recommendations, and refresh comparisons. Settles nothing. |
 | Which step | `change-goal` | Change an open topic's goal in place after a card shows old and new, with a dated log; touched settled decisions get another look. |
 | Which step | `builds-on` | Start a topic that builds on an existing one; the base topic's settled decisions are fixed inputs. |
+| Which step | `note` | Save discussion that is not a decision yet (a scan, a vision, a scope list, answers) into the topic's notes.md. |
+| Which step | `small-fix` | Record a change that needs no design choice; it is copied at go-ahead with no ADR. |
 
 Idea text with no word starts a new topic. A run without the user is always prepare, and with no word and no idea text it stops and names the words. Per-decision reply words: choose-a, choose-b, choose-c, choose-mine, discuss, add-my-idea, ask-me, to-question, to-research, skip-for-now.
 

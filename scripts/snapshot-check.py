@@ -16,7 +16,7 @@ Usage:
 Since 1.188.0 a folder with `design-spec/` and `steps.json` is a design
 snapshot: the check copies `design-spec/` and runs each step of
 `design_run.py` from /crav1-design-architecture in order (`args`, optional
-`input`, expected `code`). `expected/steps.txt` holds every step's output and
+`input`, written inside the copied repo, expected `code`). `expected/steps.txt` holds every step's output and
 `expected/files/` the topic folders and the architecture spec afterwards.
 Dates are written as YYYY-MM-DD.
 """
@@ -88,7 +88,8 @@ def run_design(folder: Path) -> tuple[dict, list[str]]:
         for i, step in enumerate(steps, 1):
             argv = [sys.executable, str(DESIGN_RUN), "--root", str(work)] + list(step["args"])
             if step.get("input") is not None:
-                inp = Path(tmp) / f"step{i}.json"
+                inp = work / ".inputs" / f"step{i}.json"
+                inp.parent.mkdir(exist_ok=True)
                 inp.write_text(json.dumps(step["input"]), encoding="utf-8")
                 argv += ["--input", str(inp)]
             proc = subprocess.run(argv, capture_output=True, text=True, encoding="utf-8", timeout=60,
