@@ -4,7 +4,7 @@ If the topic has more than one design, first pick the chosen one, with the `comp
 
 ## 0. A linked topic waits for its base
 
-A topic created with `--builds-on` has its own go-ahead and design pull request. Its go-ahead waits until the base topic's design pull request is merged into main. The script looks for the base design under `## Decided, not built yet` or `## Confirmed` in `docs/architecture/spec.md` on `origin/main` or `main`. Until then it refuses and prints a Run next with a Waiting line naming the base pull request; give that text as-is. Pass `--base-merged` only after the user confirms the base pull request is merged and main has not been fetched yet.
+A topic created with `--builds-on` has its own go-ahead and design pull request. Its go-ahead waits until the base topic's design pull request is merged into the default branch. The script looks for the base design under `## Decided, not built yet` or `## Confirmed` in `docs/architecture/spec.md` on the repo's default branch (`origin/HEAD`, else `origin/main`, then `origin/master`; 1.191.0). Until then it refuses and prints a Run next with a Waiting line naming the base pull request; give that text as-is. Pass `--base-merged` only after the user confirms the base pull request is merged and main has not been fetched yet.
 
 ## 1. Review, automatically
 
