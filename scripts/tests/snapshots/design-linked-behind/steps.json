@@ -1,0 +1,174 @@
+[
+  {
+    "git": [
+      "init",
+      "-q",
+      "-b",
+      "main"
+    ]
+  },
+  {
+    "git": [
+      "add",
+      "-A"
+    ]
+  },
+  {
+    "git": [
+      "commit",
+      "-q",
+      "-m",
+      "start"
+    ]
+  },
+  {
+    "args": [
+      "create",
+      "--topic",
+      "orders-platform"
+    ],
+    "input": {
+      "ask": "split the orders platform",
+      "end_goal": "Orders run as their own platform.",
+      "criteria": [
+        "Checkout stays fast in prod"
+      ],
+      "design": "platform-first",
+      "decisions": [
+        "Zone layout",
+        "Access model"
+      ]
+    }
+  },
+  {
+    "git": [
+      "add",
+      "-A"
+    ]
+  },
+  {
+    "git": [
+      "commit",
+      "-q",
+      "-m",
+      "base"
+    ]
+  },
+  {
+    "args": [
+      "create",
+      "--topic",
+      "orders-target",
+      "--builds-on",
+      "orders-platform"
+    ],
+    "input": {
+      "ask": "target",
+      "criteria": [
+        "Does not block the platform"
+      ],
+      "design": "target-first"
+    }
+  },
+  {
+    "git": [
+      "add",
+      "-A"
+    ]
+  },
+  {
+    "git": [
+      "commit",
+      "-q",
+      "-m",
+      "linked"
+    ]
+  },
+  {
+    "git": [
+      "switch",
+      "-q",
+      "design/orders-platform"
+    ]
+  },
+  {
+    "args": [
+      "settle",
+      "--topic",
+      "orders-platform",
+      "--decision",
+      "zone layout"
+    ],
+    "input": {
+      "chosen": "One zone",
+      "options": [
+        {
+          "name": "One zone"
+        },
+        {
+          "name": "Two zones"
+        }
+      ],
+      "why": "simple",
+      "deciders": "person A"
+    }
+  },
+  {
+    "git": [
+      "add",
+      "-A"
+    ]
+  },
+  {
+    "git": [
+      "commit",
+      "-q",
+      "-m",
+      "settle"
+    ]
+  },
+  {
+    "args": [
+      "ending",
+      "--topic",
+      "orders-platform"
+    ],
+    "input": {
+      "phase": "design",
+      "open": true
+    }
+  },
+  {
+    "args": [
+      "--headless",
+      "linked-behind",
+      "--topic",
+      "orders-platform"
+    ]
+  },
+  {
+    "args": [
+      "--headless",
+      "linked-behind",
+      "--topic",
+      "orders-platform",
+      "--yes"
+    ],
+    "code": 2
+  },
+  {
+    "args": [
+      "linked-behind",
+      "--topic",
+      "orders-platform",
+      "--yes"
+    ]
+  },
+  {
+    "args": [
+      "linked-behind",
+      "--topic",
+      "orders-platform"
+    ]
+  }
+]

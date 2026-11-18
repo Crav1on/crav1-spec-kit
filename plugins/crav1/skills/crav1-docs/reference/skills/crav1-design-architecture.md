@@ -22,6 +22,10 @@ The skill's `scripts/design_run.py` owns the folder format and every move, saves
 
 1.189.0: input files go in `docs/architecture/designs/<topic>/inputs/` (an input outside the specs repo is refused), `note` appends scans, visions, scope lists and answers to the topic's `notes.md` (allowed in prepare, used before parking), `create` and `change-goal` refuse unknown keys by name and save a `notes` key with note, `create` creates or checks `design/<topic>` (from `design/<base>` for a linked topic), a move on the wrong branch names `git switch design/<topic>`, `small-fix` lists changes with no design choice that go-ahead copies with no ADR, and Step 1 reads plans, tasks and build maps so planned work is not proposed again.
 
+1.189.0: design branch update: resume and every move that starts work on a topic fetch and check whether `design/<topic>` is behind `origin/main` (and `design/<base>` for a linked topic), and offer `git merge --no-ff` on a yes card through `branch-behind --topic <t> --yes`; never a rebase, a conflict merges nothing and names the files, and a run without the user never merges.
+
+1.189.0: base to linked update: after a committed change to a base topic, the ending lists linked topics whose `design/<linked>` is behind `design/<base>`, and one yes card runs `linked-behind --topic <base> --yes`: switch, `git merge --no-ff design/<base>`, switch back; a conflict stops on that branch, names the files and leaves the rest; a run without the user merges nothing.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.

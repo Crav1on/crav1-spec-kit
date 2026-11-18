@@ -20,6 +20,22 @@ A different goal for a topic that already exists goes to Step 2a, `change-goal`;
 
 When `resume` refuses because the topic is on its design branch, give its Run next as-is: it names `git switch design/<topic>`.
 
+Design branch update: `resume`, `create` on an existing design branch, `fan-out`, `stage`, `go-ahead` and `change-goal` fetch and check whether `design/<topic>` is behind `origin/main`, and for a linked topic behind `design/<base>`. When it is, the result has `branch_sync` with a card; show it before going on.
+
+Card: Merge origin/main into the design branch before going on?
+- **Merge it in (Recommended)** (`yes`): run `branch-behind --topic <topic> --yes`, which merges with `git merge --no-ff`, never a rebase. Why: the design then reads what is on main now.
+- **Stop** (`stop`): merge nothing; the design branch stays as it is and the step waits.
+
+On a conflict the script merges nothing, names the conflicting files and gives a Run next with the merge command. A run without the user names `yes` and `stop` and never merges.
+
+Base to linked update: after a change to a base topic (settle, a changed lean, `change-goal`, a revisit settled or reopened there, go-ahead) is committed, the ending lists each linked topic whose `design/<linked>` branch is behind `design/<base>` (a `Behind` line), and `settle`, `lean`, `change-goal` and `go-ahead` return `linked_sync` with one card for all of them.
+
+Card: Merge the base design branch into the linked design branches?
+- **Merge it into each (Recommended)** (`yes`): run `linked-behind --topic <base> --yes`, which switches to each linked branch, runs `git merge --no-ff design/<base>`, and switches back to the base branch; never a rebase. Why: the linked topics then read the base decisions as they are now.
+- **Stop** (`stop`): merge nothing; the linked branches stay as they are.
+
+One yes covers every branch listed. A conflict stops on that branch: the script merges nothing there, names the files, leaves the remaining branches untouched and gives a Run next. A run without the user names `yes` and `stop` and merges nothing.
+
 ## Step 1: Read what is already known (no writes)
 
 Read widely and cite paths in the framing:

@@ -1,0 +1,132 @@
+## Step 4: design_run.py create --topic orders-platform
+
+Exit: 0
+
+{
+  "topic": "orders-platform",
+  "design": "platform-first",
+  "branch": "design/orders-platform",
+  "branch_state": "created from main",
+  "written": [
+    "docs/architecture/designs/orders-platform/goal.md",
+    "docs/architecture/designs/orders-platform/designs/platform-first/design.md",
+    "docs/architecture/designs/orders-platform/designs/platform-first/questions.md",
+    "docs/architecture/designs/orders-platform/designs/platform-first/diagrams.md"
+  ]
+}
+
+## Step 7: design_run.py create --topic orders-target --builds-on orders-platform
+
+Exit: 0
+
+{
+  "topic": "orders-target",
+  "design": "target-first",
+  "branch": "design/orders-target",
+  "branch_state": "created from design/orders-platform",
+  "written": [
+    "docs/architecture/designs/orders-target/goal.md",
+    "docs/architecture/designs/orders-target/designs/target-first/design.md",
+    "docs/architecture/designs/orders-target/designs/target-first/questions.md",
+    "docs/architecture/designs/orders-target/designs/target-first/diagrams.md"
+  ],
+  "builds_on": "orders-platform",
+  "branch_from": "design/orders-platform",
+  "fixed": [],
+  "git": [
+    "git switch design/orders-platform",
+    "git switch -c design/orders-target"
+  ],
+  "update_from_base": "git merge design/orders-platform"
+}
+
+## Step 11: design_run.py settle --topic orders-platform --decision zone layout
+
+Exit: 0
+
+{
+  "design": "platform-first",
+  "decision": "Zone layout",
+  "adr": "docs/architecture/designs/orders-platform/designs/platform-first/adr/zone-layout.md",
+  "written": [
+    "docs/architecture/designs/orders-platform/designs/platform-first/adr/zone-layout.md",
+    "docs/architecture/designs/orders-platform/designs/platform-first/design.md"
+  ]
+}
+
+## Step 14: design_run.py ending --topic orders-platform
+
+Exit: 0
+
+Run next:
+The end state is still being designed.
+
+Pick up the orders platform designs:
+`/crav1-design-architecture resume orders-platform`
+
+Behind design/orders-platform: design/orders-target (1 commit).
+
+## Step 15: design_run.py --headless linked-behind --topic orders-platform
+
+Exit: 0
+
+{
+  "state": "behind",
+  "base_branch": "design/orders-platform",
+  "behind": {
+    "design/orders-target": 1
+  },
+  "card": {
+    "question": "Merge design/orders-platform into design/orders-target?",
+    "words": [
+      "yes",
+      "stop"
+    ],
+    "recommended": "yes",
+    "options": [
+      {
+        "word": "yes",
+        "label": "Merge it into each (Recommended)",
+        "action": "switch to each branch, git merge --no-ff design/orders-platform, switch back to design/orders-platform; never a rebase"
+      },
+      {
+        "word": "stop",
+        "label": "Stop",
+        "action": "merge nothing; the linked branches stay as they are"
+      }
+    ]
+  },
+  "ending": "Run next:\ndesign/orders-target (1 commit) is behind design/orders-platform. Merge the base into each; never rebase.\n\nSwitch to design/orders-target:\n`git switch design/orders-target`\n\nMerge design/orders-platform into it:\n`git merge --no-ff design/orders-platform`\n\nSwitch back to design/orders-platform:\n`git switch design/orders-platform`\n",
+  "line": "Linked design branches behind design/orders-platform: design/orders-target (1 commit)."
+}
+
+## Step 16: design_run.py --headless linked-behind --topic orders-platform --yes
+
+Exit: 2
+
+a run without the user does not merge; ask yes or stop on the card
+
+## Step 17: design_run.py linked-behind --topic orders-platform --yes
+
+Exit: 0
+
+{
+  "base_branch": "design/orders-platform",
+  "merged": [
+    "design/orders-target"
+  ],
+  "untouched": [],
+  "conflict": null
+}
+
+## Step 18: design_run.py linked-behind --topic orders-platform
+
+Exit: 0
+
+{
+  "state": "in-step",
+  "base_branch": "design/orders-platform",
+  "behind": {},
+  "card": null,
+  "ending": null
+}

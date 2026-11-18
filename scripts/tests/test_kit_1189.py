@@ -10,6 +10,7 @@ import contextlib
 import importlib.util
 import io
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -233,7 +234,7 @@ class TestInputKeys(Base):
         self.assertIn("kept the old order", (self.tmp / "docs/architecture/designs" / T / "notes.md").read_text(encoding="utf-8"))
 
 
-class TestBranches(Base):
+class GitHelpers:
     def git(self, *args):
         return subprocess.run(["git", *args], cwd=self.tmp, capture_output=True, text=True, check=True).stdout.strip()
 
@@ -245,6 +246,8 @@ class TestBranches(Base):
         self.git("add", "-A")
         self.git("-c", "user.name=person A", "-c", "user.email=a@example.com", "commit", "-q", "-m", msg)
 
+
+class TestBranches(GitHelpers, Base):
     def test_create_makes_the_design_branch(self):
         self.init()
         res = self.create()
@@ -277,6 +280,164 @@ class TestBranches(Base):
         self.assertEqual(self.git("rev-parse", "--abbrev-ref", "HEAD"), "design/orders-target")
 
 
+class TestBranchBehind(GitHelpers, Base):
+    """The design branch is checked against origin/main (and design/<base>) when work starts."""
+
+    def setUp(self):
+        super().setUp()
+        env = {"GIT_AUTHOR_NAME": "person A", "GIT_AUTHOR_EMAIL": "a@example.com",
+               "GIT_COMMITTER_NAME": "person A", "GIT_COMMITTER_EMAIL": "a@example.com"}
+        self._env = {k: os.environ.get(k) for k in env}
+        os.environ.update(env)
+        self.init()
+        self.create()
+        self.commit("design")
+
+    def tearDown(self):
+        for k, v in self._env.items():
+            if v is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = v
+        super().tearDown()
+
+    def main_moves_on(self, path="docs/system/notes.md", text="x\n"):
+        self.git("switch", "-q", "main")
+        f = self.tmp / path
+        f.parent.mkdir(parents=True, exist_ok=True)
+        f.write_text(text, encoding="utf-8")
+        self.commit("main moves on")
+        self.git("update-ref", "refs/remotes/origin/main", "main")
+        self.git("switch", "-q", f"design/{T}")
+
+    def test_in_step_reports_nothing(self):
+        self.git("update-ref", "refs/remotes/origin/main", "main")
+        self.assertNotIn("branch_sync", self.ok("--no-fetch", "resume", "--topic", T))
+
+    def test_resume_offers_a_merge_card_when_behind(self):
+        self.main_moves_on()
+        sync = self.ok("--no-fetch", "resume", "--topic", T)["branch_sync"]
+        self.assertEqual(sync["behind"], {"origin/main": 1})
+        self.assertEqual(sync["card"]["words"], ["yes", "stop"])
+        self.assertIn("Merge origin/main into the design branch:\n`git merge --no-ff origin/main`", sync["ending"])
+        self.assertNotIn("rebase`", sync["ending"])
+        for move in (["stage", "--topic", T], ):
+            res = self.ok("--no-fetch", *move, inp={"stages": [{"name": "one", "reason": "test first"}]})
+            self.assertEqual(res["branch_sync"]["state"], "behind")
+        self.assertEqual(self.ok("--no-fetch", "fan-out", "--topic", T, "--name", "other", "--mode", "blank")["branch_sync"]["state"], "behind")
+        self.assertEqual(self.ok("--no-fetch", "change-goal", "--topic", T, "--reason", "r", inp={"criteria": ["Cheap"]})["branch_sync"]["state"], "behind")
+
+    def test_yes_merges_with_no_ff_and_headless_never_merges(self):
+        self.main_moves_on()
+        head = self.git("rev-parse", "HEAD")
+        self.refused("--headless", "--no-fetch", "branch-behind", "--topic", T, "--yes")
+        self.assertEqual(self.git("rev-parse", "HEAD"), head)
+        res = self.ok("--no-fetch", "branch-behind", "--topic", T, "--yes")
+        self.assertEqual(res["merged"], ["origin/main"])
+        self.assertEqual(len(self.git("rev-list", "--parents", "-n", "1", "HEAD").split()), 3)
+        self.assertEqual(self.ok("--no-fetch", "branch-behind", "--topic", T)["state"], "in-step")
+
+    def test_conflict_stops_and_names_the_files(self):
+        spec = "docs/architecture/spec.md"
+        (self.tmp / spec).write_text("# Architecture\n\ndesign side\n", encoding="utf-8")
+        self.commit("design edit")
+        self.main_moves_on(spec, "# Architecture\n\nmain side\n")
+        head = self.git("rev-parse", "HEAD")
+        err = self.refused("--no-fetch", "branch-behind", "--topic", T, "--yes")
+        self.assertTrue(err.startswith("Run next:\n"))
+        self.assertIn("conflicts in: docs/architecture/spec.md", err)
+        self.assertEqual(self.git("rev-parse", "HEAD"), head)
+        self.assertFalse((self.tmp / ".git/MERGE_HEAD").exists())
+
+    def test_linked_topic_is_checked_against_its_base_branch(self):
+        self.git("update-ref", "refs/remotes/origin/main", "main")
+        self.git("switch", "-q", "main")
+        self.ok("create", "--topic", "orders-target", "--builds-on", T, inp={"ask": "target", "criteria": ["x"]})
+        self.commit("target")
+        self.git("switch", "-q", f"design/{T}")
+        self.ok("small-fix", "--topic", T, "--text", "Tag the queues")
+        self.commit("base moves on")
+        self.git("switch", "-q", "design/orders-target")
+        sync = self.ok("--no-fetch", "branch-behind", "--topic", "orders-target")
+        self.assertEqual(sync["behind"], {f"design/{T}": 1})
+        self.assertIn(f"`git merge --no-ff design/{T}`", sync["ending"])
+
+
+class TestLinkedBehind(GitHelpers, Base):
+    """After a committed change on the base topic, linked design branches behind it get one merge card."""
+
+    def setUp(self):
+        super().setUp()
+        env = {"GIT_AUTHOR_NAME": "person A", "GIT_AUTHOR_EMAIL": "a@example.com",
+               "GIT_COMMITTER_NAME": "person A", "GIT_COMMITTER_EMAIL": "a@example.com"}
+        self._env = {k: os.environ.get(k) for k in env}
+        os.environ.update(env)
+        self.init()
+        self.create()
+        self.commit("base")
+        for name in ("orders-a", "orders-b"):
+            self.git("switch", "-q", f"design/{T}")
+            self.ok("create", "--topic", name, "--builds-on", T, inp={"ask": name, "criteria": ["x"]})
+            self.commit(name)
+        self.git("switch", "-q", f"design/{T}")
+
+    def tearDown(self):
+        for k, v in self._env.items():
+            if v is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = v
+        super().tearDown()
+
+    def settle_and_commit(self):
+        res = self.ok("settle", "--topic", T, "--decision", "where orders", inp={"chosen": "One store", "options": [{"name": "One store"}, {"name": "Two"}], "why": "simple", "deciders": "person A"})
+        self.commit("settle")
+        return res
+
+    def test_ending_lists_linked_branches_behind_after_the_commit(self):
+        self.settle_and_commit()
+        out = self.ok("ending", "--topic", T, inp={"phase": "design", "open": True})
+        self.assertTrue(out.startswith("Run next:\n"))
+        self.assertIn("Behind design/orders-platform: design/orders-a (1 commit), design/orders-b (1 commit).", out)
+        st = self.ok("linked-behind", "--topic", T)
+        self.assertEqual(st["behind"], {"design/orders-a": 1, "design/orders-b": 1})
+        self.assertEqual(st["card"]["words"], ["yes", "stop"])
+        self.assertIn("`git merge --no-ff design/orders-platform`", st["ending"])
+        self.assertIn("linked_sync", self.ok("lean", "--topic", T, "--decision", "alerting", inp={"recommended": "x"}))
+
+    def test_one_yes_merges_into_each_and_switches_back(self):
+        self.settle_and_commit()
+        self.refused("--headless", "linked-behind", "--topic", T, "--yes")
+        res = self.ok("linked-behind", "--topic", T, "--yes")
+        self.assertEqual(res["merged"], ["design/orders-a", "design/orders-b"])
+        self.assertEqual(self.git("rev-parse", "--abbrev-ref", "HEAD"), f"design/{T}")
+        self.assertEqual(len(self.git("rev-list", "--parents", "-n", "1", "design/orders-a").split()), 3)
+        self.assertEqual(self.ok("linked-behind", "--topic", T)["state"], "in-step")
+
+    def test_uncommitted_change_is_refused(self):
+        self.settle_and_commit()
+        self.ok("small-fix", "--topic", T, "--text", "Tag the queues")
+        self.assertIn("commit the base topic's change first", self.refused("linked-behind", "--topic", T, "--yes"))
+
+    def test_conflict_stops_on_that_branch_and_leaves_the_rest(self):
+        spec = "docs/architecture/spec.md"
+        self.git("switch", "-q", "design/orders-a")
+        (self.tmp / spec).write_text("# Architecture\n\nlinked side\n", encoding="utf-8")
+        self.commit("linked edit")
+        self.git("switch", "-q", f"design/{T}")
+        (self.tmp / spec).write_text("# Architecture\n\nbase side\n", encoding="utf-8")
+        self.commit("base edit")
+        before_b = self.git("rev-parse", "design/orders-b")
+        err_res = self.ok("linked-behind", "--topic", T, "--yes")
+        self.assertEqual(err_res["merged"], [])
+        self.assertEqual(err_res["conflict"]["files"], [spec])
+        self.assertEqual(err_res["untouched"], ["design/orders-b"])
+        self.assertTrue(err_res["ending"].startswith("Run next:\n"))
+        self.assertIn("conflicts in: docs/architecture/spec.md", err_res["ending"])
+        self.assertEqual(self.git("rev-parse", "design/orders-b"), before_b)
+        self.assertEqual(self.git("rev-parse", "--abbrev-ref", "HEAD"), f"design/{T}")
+
+
 class TestSmallFixes(Base):
     def test_small_fix_is_listed_and_copied_at_go_ahead(self):
         self.create()
@@ -291,11 +452,12 @@ class TestSmallFixes(Base):
 
 
 class TestSnapshot(unittest.TestCase):
-    def test_design_order_notes_fixes_snapshot(self):
-        proc = subprocess.run([sys.executable, str(ROOT / "scripts/snapshot-check.py"), "--only", "design-order-notes-fixes"],
-                              capture_output=True, text=True, encoding="utf-8", timeout=120)
-        self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
-        self.assertIn("design-order-notes-fixes: matches", proc.stdout)
+    def test_design_snapshots_1189(self):
+        for name in ("design-order-notes-fixes", "design-branch-behind", "design-linked-behind"):
+            proc = subprocess.run([sys.executable, str(ROOT / "scripts/snapshot-check.py"), "--only", name],
+                                  capture_output=True, text=True, encoding="utf-8", timeout=120)
+            self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
+            self.assertIn(f"{name}: matches", proc.stdout)
 
 
 if __name__ == "__main__":

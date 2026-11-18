@@ -16,7 +16,7 @@ Usage:
 Since 1.188.0 a folder with `design-spec/` and `steps.json` is a design
 snapshot: the check copies `design-spec/` and runs each step of
 `design_run.py` from /crav1-design-architecture in order (`args`, optional
-`input`, written inside the copied repo, expected `code`). `expected/steps.txt` holds every step's output and
+`input`, written inside the copied repo, expected `code`); a step with `git` runs that git command in the copy (1.189.0), with person A as author and no fetch. `expected/steps.txt` holds every step's output and
 `expected/files/` the topic folders and the architecture spec afterwards.
 Dates are written as YYYY-MM-DD.
 """
@@ -85,7 +85,14 @@ def run_design(folder: Path) -> tuple[dict, list[str]]:
     with tempfile.TemporaryDirectory() as tmp:
         work = Path(tmp) / folder.name
         shutil.copytree(folder / "design-spec", work)
+        genv = dict(os.environ, GIT_AUTHOR_NAME="person A", GIT_AUTHOR_EMAIL="a@example.com",
+                    GIT_COMMITTER_NAME="person A", GIT_COMMITTER_EMAIL="a@example.com", CRAV1_NO_FETCH="1")
         for i, step in enumerate(steps, 1):
+            if "git" in step:
+                proc = subprocess.run(["git", *step["git"]], cwd=work, capture_output=True, text=True, encoding="utf-8", env=genv, timeout=60)
+                if proc.returncode != 0:
+                    problems.append(f"step {i} git {' '.join(step['git'])} failed: {proc.stderr.strip()}")
+                continue
             argv = [sys.executable, str(DESIGN_RUN), "--root", str(work)] + list(step["args"])
             if step.get("input") is not None:
                 inp = work / ".inputs" / f"step{i}.json"
@@ -93,7 +100,7 @@ def run_design(folder: Path) -> tuple[dict, list[str]]:
                 inp.write_text(json.dumps(step["input"]), encoding="utf-8")
                 argv += ["--input", str(inp)]
             proc = subprocess.run(argv, capture_output=True, text=True, encoding="utf-8", timeout=60,
-                                  env=dict(os.environ, PYTHONDONTWRITEBYTECODE="1"))
+                                  env=dict(genv, PYTHONDONTWRITEBYTECODE="1"))
             want = step.get("code", 0)
             if proc.returncode != want:
                 problems.append(f"step {i} ({' '.join(step['args'][:1])}) exited {proc.returncode}, expected {want}")

@@ -1,0 +1,136 @@
+## Step 4: design_run.py create --topic orders-platform
+
+Exit: 0
+
+{
+  "topic": "orders-platform",
+  "design": "platform-first",
+  "branch": "design/orders-platform",
+  "branch_state": "created from main",
+  "written": [
+    "docs/architecture/designs/orders-platform/goal.md",
+    "docs/architecture/designs/orders-platform/designs/platform-first/design.md",
+    "docs/architecture/designs/orders-platform/designs/platform-first/questions.md",
+    "docs/architecture/designs/orders-platform/designs/platform-first/diagrams.md"
+  ]
+}
+
+## Step 10: design_run.py resume --topic orders-platform
+
+Exit: 2
+
+Run next:
+The orders platform topic is on its design branch design/orders-platform, not on main.
+
+Switch to the design branch:
+`git switch design/orders-platform`
+
+## Step 12: design_run.py resume --topic orders-platform
+
+Exit: 0
+
+{
+  "topic": "orders-platform",
+  "design": "platform-first",
+  "reopened": [],
+  "next_decision": "Zone layout",
+  "stages_needing_work": [],
+  "written": [],
+  "branch_sync": {
+    "state": "behind",
+    "branch": "design/orders-platform",
+    "behind": {
+      "origin/main": 1
+    },
+    "card": {
+      "question": "Merge origin/main into design/orders-platform before going on?",
+      "words": [
+        "yes",
+        "stop"
+      ],
+      "recommended": "yes",
+      "options": [
+        {
+          "word": "yes",
+          "label": "Merge it in (Recommended)",
+          "action": "git merge --no-ff origin/main into design/orders-platform; never a rebase"
+        },
+        {
+          "word": "stop",
+          "label": "Stop",
+          "action": "merge nothing; the design branch stays as it is"
+        }
+      ]
+    },
+    "ending": "Run next:\ndesign/orders-platform is behind origin/main (1 commit). Merge it in before going on; never rebase.\n\nMerge origin/main into the design branch:\n`git merge --no-ff origin/main`\n",
+    "line": "design/orders-platform is behind origin/main (1 commit)."
+  }
+}
+
+## Step 13: design_run.py --headless branch-behind --topic orders-platform
+
+Exit: 0
+
+{
+  "state": "behind",
+  "branch": "design/orders-platform",
+  "behind": {
+    "origin/main": 1
+  },
+  "card": {
+    "question": "Merge origin/main into design/orders-platform before going on?",
+    "words": [
+      "yes",
+      "stop"
+    ],
+    "recommended": "yes",
+    "options": [
+      {
+        "word": "yes",
+        "label": "Merge it in (Recommended)",
+        "action": "git merge --no-ff origin/main into design/orders-platform; never a rebase"
+      },
+      {
+        "word": "stop",
+        "label": "Stop",
+        "action": "merge nothing; the design branch stays as it is"
+      }
+    ]
+  },
+  "ending": "Run next:\ndesign/orders-platform is behind origin/main (1 commit). Merge it in before going on; never rebase.\n\nMerge origin/main into the design branch:\n`git merge --no-ff origin/main`\n",
+  "line": "design/orders-platform is behind origin/main (1 commit)."
+}
+
+## Step 14: design_run.py --headless branch-behind --topic orders-platform --yes
+
+Exit: 2
+
+a run without the user does not merge; ask yes or stop on the card
+
+## Step 15: design_run.py branch-behind --topic orders-platform --yes
+
+Exit: 0
+
+{
+  "state": "in-step",
+  "branch": "design/orders-platform",
+  "merged": [
+    "origin/main"
+  ],
+  "behind": {},
+  "card": null,
+  "ending": null,
+  "line": "Merged origin/main into design/orders-platform."
+}
+
+## Step 16: design_run.py branch-behind --topic orders-platform
+
+Exit: 0
+
+{
+  "state": "in-step",
+  "branch": "design/orders-platform",
+  "behind": {},
+  "card": null,
+  "ending": null
+}

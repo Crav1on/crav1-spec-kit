@@ -58,6 +58,8 @@ A run without you, such as a bot, may only `prepare`: gather facts, draft option
 - Script input files live in the topic folder under `inputs/`. `note` keeps scans, visions, scope lists and your answers in the topic's `notes.md`, and the skill saves open discussion there before it parks.
 - `small-fix` records a change that needs no design choice; go-ahead copies it with the design, with no ADR.
 - `create` creates or checks the design branch `design/<topic>`. On another branch, a move on that topic tells you which branch to switch to.
+- When you resume or start work on a topic, the skill fetches and checks whether the design branch is behind main (or, for a linked topic, its base topic's branch). If it is, a card offers to merge it in with `git merge --no-ff`; it never rebases, and a conflict stops with the file names.
+- After you commit a change to a base topic, the ending lists linked topics whose design branch is now behind the base, and one yes merges the base branch into each of them (`git merge --no-ff`, then back to the base branch). A conflict stops on that branch with the file names and leaves the others alone.
 
 ## 4. Go-ahead
 

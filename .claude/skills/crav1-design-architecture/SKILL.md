@@ -66,7 +66,7 @@ The sandbox is `docs/architecture/designs/<topic>/` on its own design branch (re
 
 - Decisions and open questions keep the order they were added, or the goal's order after `change-goal`. Big decisions come first; a detail decision is proposed only after the big ones.
 - Cards hold at most 4 options and one question. Typed input goes through the free-text Other answer; an empty Other is asked again.
-- `create` creates or checks the design branch `design/<topic>` (cut from `design/<base>` for a linked topic). This is the one git write the skill makes. A move on another branch, when the topic lives on its design branch, refuses with a Run next naming `git switch design/<topic>`.
+- `create` creates or checks the design branch `design/<topic>` (cut from `design/<base>` for a linked topic). Before work starts on a topic, the script checks whether the design branch is behind `origin/main` (or `design/<base>`) and offers `git merge --no-ff` on a yes card, never a rebase. After a committed change to a base topic, linked design branches behind it get one yes card to merge `design/<base>` into each. Creating the branch and those merges, after their yes, are the only git writes the skill makes. A move on another branch, when the topic lives on its design branch, refuses with a Run next naming `git switch design/<topic>`.
 - Step 1 reads the plans, tasks and build maps of slices the ask touches. Planned work is an input, never a new proposal.
 
 ## Hard rules
@@ -80,7 +80,7 @@ The sandbox is `docs/architecture/designs/<topic>/` on its own design branch (re
 - Design the end state first. Stage only when the user asks. The user names and divides the stages.
 - Before go-ahead, write nothing outside the topic folder. Do not write `Asked:` or `Pending:` lines in any spec.
 - A run without the user never settles a decision, never stages, never gives go-ahead, and never writes a real ADR.
-- Do not commit, push, merge, tag, or open a pull request. The only git write is `create` creating the design branch.
+- Do not commit, push, merge, tag, or open a pull request. The only git writes are `create` creating the design branch and the design branch update merges after their yes.
 
 ## End
 

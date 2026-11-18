@@ -5,7 +5,7 @@ stored order, notes, small fixes and design branches 1.189.0).
 Owns the sandbox format under docs/architecture/designs/<topic>/ and every move:
 create, status, resume, park, fan-out, lean, settle, question, answer, skip,
 stage, compare, compare-topics, review, go-ahead, ending, route,
-change-goal (1.188.0), revisit (1.188.0), note and small-fix (1.189.0).
+change-goal (1.188.0), revisit (1.188.0), note, small-fix, branch-behind and linked-behind (1.189.0).
 
 Before go-ahead every write stays inside the topic folder. A run without the
 user (--headless) may only prepare: lean, compare, compare-topics, status.
@@ -41,7 +41,7 @@ DECIDED = "## Decided, not built yet"
 OPEN_Q = "## Open questions"
 START_WORDS = ["resume", "park", "status", "fan-out", "stage-it", "go-ahead", "compare-topics", "prepare", "change-goal", "builds-on", "note", "small-fix"]
 HEADLESS_WORDS = ["resume", "park", "status", "prepare"]
-HEADLESS_ALLOWED = {"status", "resume", "lean", "compare", "compare-topics", "route", "ending", "review", "note"}
+HEADLESS_ALLOWED = {"status", "resume", "lean", "compare", "compare-topics", "route", "ending", "review", "note", "branch-behind", "linked-behind"}
 CREATE_KEYS = {"ask", "end_goal", "drivers", "constraints", "criteria", "design", "design_title", "decisions", "notes"}
 CHANGE_KEYS = {"ask", "end_goal", "drivers", "constraints", "criteria", "decisions", "renames", "drop_reasons", "reopen", "notes"}
 INPUTS_DIR = "inputs"
@@ -384,6 +384,190 @@ def branch_hint(root: Path, topic: str) -> str:
                       "Switch to the design branch:", f"`git switch {branch}`"]) + "\n"
 
 
+def _behind(root: Path, ref: str) -> int | None:
+    out = _git(root, "rev-list", "--count", f"HEAD..{ref}")
+    if out is None or out.returncode != 0:
+        return None
+    return int(out.stdout.strip() or 0)
+
+
+def _ref_ok(root: Path, ref: str) -> bool:
+    out = _git(root, "rev-parse", "--verify", "--quiet", ref)
+    return out is not None and out.returncode == 0
+
+
+def branch_behind(root: Path, topic: str, do_fetch: bool = True) -> dict:
+    """Is design/<topic> behind origin/main, or behind design/<base> for a linked topic? (1.189.0)
+
+    Mirrors the build walk's code-behind: behind offers a merge on a yes card,
+    never a silent merge and never a rebase. {"state": "in-step" | "behind" |
+    "not-on-design-branch" | "no-repo" | "offline", "behind": {ref: n}, "card", "ending"}.
+    """
+    branch = f"design/{topic}"
+    cur = current_branch(root)
+    if cur is None:
+        return {"state": "no-repo", "behind": {}, "card": None, "ending": None}
+    if cur != branch:
+        return {"state": "not-on-design-branch", "branch": cur, "behind": {}, "card": None, "ending": None,
+                "line": f"This is {cur}, not {branch}, so the design branch was not compared."}
+    line = ""
+    if do_fetch and not os.environ.get("CRAV1_NO_FETCH"):
+        remotes = _git(root, "remote")
+        if remotes is not None and "origin" in remotes.stdout.split():
+            out = _git(root, "fetch", "-q", "origin")
+            if out is None or out.returncode != 0:
+                line = "origin could not be fetched; compared with the local copies."
+    refs = []
+    if _ref_ok(root, "origin/main"):
+        refs.append("origin/main")
+    goal_p = root / DESIGNS / topic / "goal.md"
+    base = parse_goal(goal_p.read_text(encoding="utf-8")).get("builds_on") if goal_p.is_file() else ""
+    if base:
+        for ref in (f"design/{base}", f"origin/design/{base}"):
+            if _ref_ok(root, ref):
+                refs.append(ref)
+                break
+    behind = {r: n for r in refs if (n := _behind(root, r))}
+    out = {"state": "behind" if behind else "in-step", "branch": branch, "behind": behind, "card": None, "ending": None}
+    if line:
+        out["line"] = line
+    if not behind:
+        return out
+    what = " and ".join(f"{r} ({n} commit{'s' if n != 1 else ''})" for r, n in behind.items())
+    out["line"] = f"{branch} is behind {what}."
+    out["card"] = {"question": f"Merge {' and '.join(behind)} into {branch} before going on?",
+                   "words": ["yes", "stop"], "recommended": "yes",
+                   "options": [{"word": "yes", "label": "Merge it in (Recommended)",
+                                "action": f"git merge --no-ff {' then '.join(behind)} into {branch}; never a rebase"},
+                               {"word": "stop", "label": "Stop", "action": "merge nothing; the design branch stays as it is"}]}
+    lines = ["Run next:", f"{branch} is behind {what}. Merge it in before going on; never rebase.", ""]
+    for r in behind:
+        lines += [f"Merge {r} into the design branch:", f"`git merge --no-ff {r}`", ""]
+    out["ending"] = "\n".join(lines).rstrip("\n") + "\n"
+    return out
+
+
+def cmd_branch_behind(a, root: Path) -> dict:
+    status = branch_behind(root, slugify(a.topic), do_fetch=not a.no_fetch)
+    if not a.yes or status["state"] != "behind":
+        return status
+    if a.headless:
+        raise Refused("a run without the user does not merge; ask yes or stop on the card")
+    merged = []
+    for ref in status["behind"]:
+        out = _git(root, "merge", "--no-ff", "--no-edit", ref)
+        if out is None or out.returncode != 0:
+            files = _git(root, "diff", "--name-only", "--diff-filter=U")
+            names = [x for x in (files.stdout.split("\n") if files else []) if x.strip()]
+            if not names:
+                msg = ((out.stderr or out.stdout) if out else "git did not run").strip().splitlines()
+                raise Refused(f"could not merge {ref} into {status['branch']}: {msg[0] if msg else 'unknown error'}. Nothing was merged.")
+            _git(root, "merge", "--abort")
+            raise Refused("\n".join(["Run next:", f"Merging {ref} into {status['branch']} conflicts in: {', '.join(names) or 'unknown files'}. "
+                                     "Nothing was merged. Resolve the conflicts in those files, then commit the merge.", "",
+                                     f"Merge {ref} into the design branch and resolve the conflicts:", f"`git merge --no-ff {ref}`"]) + "\n")
+        merged.append(ref)
+    return {"state": "in-step", "branch": status["branch"], "merged": merged, "behind": {}, "card": None, "ending": None,
+            "line": f"Merged {' and '.join(merged)} into {status['branch']}."}
+
+
+def linked_branches(root: Path, base: str) -> list[str]:
+    """Linked topics whose committed goal.md on design/<linked> says Builds on: <base>."""
+    out = _git(root, "for-each-ref", "--format=%(refname:short)", "refs/heads/design/")
+    if out is None or out.returncode != 0:
+        return []
+    found = []
+    for br in out.stdout.split():
+        topic = br[len("design/"):]
+        if topic == base:
+            continue
+        g = _git(root, "show", f"{br}:{(DESIGNS / topic / 'goal.md').as_posix()}")
+        if g is not None and g.returncode == 0 and parse_goal(g.stdout).get("builds_on") == base:
+            found.append(topic)
+    return found
+
+
+def linked_behind(root: Path, base: str) -> dict:
+    """After a committed change to a base topic: which linked design branches are behind design/<base>? (1.189.0)"""
+    bb = f"design/{base}"
+    if current_branch(root) is None or not _ref_ok(root, bb):
+        return {"state": "no-repo" if current_branch(root) is None else "no-base-branch", "behind": {}, "card": None, "ending": None}
+    behind = {}
+    for topic in linked_branches(root, base):
+        out = _git(root, "rev-list", "--count", f"design/{topic}..{bb}")
+        n = int(out.stdout.strip() or 0) if out is not None and out.returncode == 0 else 0
+        if n:
+            behind[f"design/{topic}"] = n
+    res = {"state": "behind" if behind else "in-step", "base_branch": bb, "behind": behind, "card": None, "ending": None}
+    if not behind:
+        return res
+    what = ", ".join(f"{b} ({n} commit{'s' if n != 1 else ''})" for b, n in behind.items())
+    res["line"] = f"Linked design branches behind {bb}: {what}."
+    res["card"] = {"question": f"Merge {bb} into {', '.join(behind)}?", "words": ["yes", "stop"], "recommended": "yes",
+                   "options": [{"word": "yes", "label": "Merge it into each (Recommended)",
+                                "action": f"switch to each branch, git merge --no-ff {bb}, switch back to {bb}; never a rebase"},
+                               {"word": "stop", "label": "Stop", "action": "merge nothing; the linked branches stay as they are"}]}
+    lines = ["Run next:", f"{what} {'is' if len(behind) == 1 else 'are'} behind {bb}. Merge the base into each; never rebase.", ""]
+    for b in behind:
+        lines += [f"Switch to {b}:", f"`git switch {b}`", "", f"Merge {bb} into it:", f"`git merge --no-ff {bb}`", ""]
+    lines += [f"Switch back to {bb}:", f"`git switch {bb}`"]
+    res["ending"] = "\n".join(lines) + "\n"
+    return res
+
+
+def cmd_linked_behind(a, root: Path) -> dict:
+    base = slugify(a.topic)
+    status = linked_behind(root, base)
+    if not a.yes or status["state"] != "behind":
+        return status
+    if a.headless:
+        raise Refused("a run without the user does not merge; ask yes or stop on the card")
+    dirty = _git(root, "status", "--porcelain")
+    if dirty is not None and dirty.stdout.strip():
+        raise Refused("commit the base topic's change first; the working tree has uncommitted files")
+    bb, start = status["base_branch"], current_branch(root)
+    merged, conflict = [], None
+    for b in status["behind"]:
+        sw = _git(root, "switch", "-q", b)
+        if sw is None or sw.returncode != 0:
+            conflict = {"branch": b, "files": [], "error": (sw.stderr if sw else "").strip()}
+            break
+        out = _git(root, "merge", "--no-ff", "--no-edit", bb)
+        if out is None or out.returncode != 0:
+            files = _git(root, "diff", "--name-only", "--diff-filter=U")
+            names = [x for x in (files.stdout.split("\n") if files else []) if x.strip()]
+            _git(root, "merge", "--abort")
+            conflict = {"branch": b, "files": names, "error": "" if names else ((out.stderr or out.stdout) if out else "").strip()}
+            break
+        merged.append(b)
+    _git(root, "switch", "-q", start or bb)
+    left = [b for b in status["behind"] if b not in merged and (not conflict or b != conflict["branch"])]
+    res = {"base_branch": bb, "merged": merged, "untouched": left, "conflict": conflict}
+    if conflict:
+        b = conflict["branch"]
+        why = f"conflicts in: {', '.join(conflict['files'])}" if conflict["files"] else f"failed: {conflict['error'] or 'unknown error'}"
+        res["ending"] = "\n".join(["Run next:", f"Merging {bb} into {b} {why}. Nothing was merged there" +
+                                   (f"; {', '.join(left)} {'was' if len(left) == 1 else 'were'} left untouched." if left else "."), "",
+                                   f"Switch to {b}:", f"`git switch {b}`", "",
+                                   f"Merge {bb} into it and resolve the conflicts:", f"`git merge --no-ff {bb}`"]) + "\n"
+    return res
+
+
+def _with_linked(res: dict, root: Path, topic: str) -> dict:
+    st = linked_behind(root, topic)
+    if st["state"] == "behind":
+        res["linked_sync"] = st
+    return res
+
+
+def _with_sync(res: dict, a, root: Path, topic: str) -> dict:
+    """resume and every move that starts work on a topic report whether the design branch is behind."""
+    st = branch_behind(root, topic, do_fetch=not getattr(a, "no_fetch", False))
+    if st["state"] in ("behind", "not-on-design-branch") or st.get("line"):
+        res["branch_sync"] = st
+    return res
+
+
 def ensure_design_branch(root: Path, topic: str, base: str = "") -> dict:
     """create: be on design/<topic>; create it (from design/<base> for a linked topic) when missing."""
     branch = f"design/{topic}"
@@ -484,6 +668,8 @@ def cmd_create(a, root: Path) -> dict:
     if data.get("notes"):
         _write_note(root, topic, "notes from the goal input", data["notes"], "other", w)
     res = {"topic": topic, "design": name, "branch": f"design/{topic}", "branch_state": branch["branch_state"], "written": w.written}
+    if branch["branch_state"] == "already on it":
+        _with_sync(res, a, root, topic)
     if base:
         res |= {"builds_on": base, "branch_from": f"design/{base}", "fixed": goal["fixed"],
                 "git": [f"git switch design/{base}", f"git switch -c design/{topic}"],
@@ -569,6 +755,7 @@ def cmd_resume(a, root: Path) -> dict:
     stage_work = [s["name"] for s in t.stages(name) if s.get("state") != "open" and s.get("state")]
     res = {"topic": t.name, "design": name, "reopened": reopened, "next_decision": nxt,
            "stages_needing_work": stage_work, "written": w.written}
+    _with_sync(res, a, root, t.name)
     g = t.goal()
     if g.get("builds_on"):
         base = g["builds_on"]
@@ -610,7 +797,7 @@ def cmd_fan_out(a, root: Path) -> dict:
     refresh_compare(t, w)
     if not (t.dir / "compare.md").is_file():
         w.write(t.dir / "compare.md", compare_text(t))
-    return {"topic": t.name, "design": new, "mode": a.mode, "written": w.written}
+    return _with_sync({"topic": t.name, "design": new, "mode": a.mode, "written": w.written}, a, root, t.name)
 
 
 def cmd_add_decision(a, root: Path) -> dict:
@@ -659,7 +846,7 @@ def cmd_lean(a, root: Path) -> dict:
             d["ideas"].append(idea)
     w = Writer(root, t.name)
     save_design(t, name, d, w)
-    return {"design": name, "decision": dec["title"], "written": w.written}
+    return _with_linked({"design": name, "decision": dec["title"], "written": w.written}, root, t.name)
 
 
 def _driver_key(text: str) -> str:
@@ -747,7 +934,7 @@ def cmd_settle(a, root: Path) -> dict:
         cur += f"\n{head}\n\n```mermaid\n{data['diagram'].strip()}\n```\n"
         w.write(dp, cur)
     refresh_compare(t, w, data.get("scores"))
-    return {"design": name, "decision": dec["title"], "adr": str(adr_path.relative_to(root)), "written": w.written}
+    return _with_linked({"design": name, "decision": dec["title"], "adr": str(adr_path.relative_to(root)), "written": w.written}, root, t.name)
 
 
 def _git_user(root: Path) -> str:
@@ -828,7 +1015,7 @@ def cmd_stage(a, root: Path) -> dict:
             raise Refused("every stage needs a name and a reason")
     w = Writer(root, t.name)
     w.write(t.ddir(name) / "stages.md", render_stages(name, [dict(s, state=s.get("state", "open")) for s in stages]))
-    return {"design": name, "stages": [s["name"] for s in stages], "written": w.written}
+    return _with_sync({"design": name, "stages": [s["name"] for s in stages], "written": w.written}, a, root, t.name)
 
 
 def cmd_compare(a, root: Path) -> dict:
@@ -908,8 +1095,8 @@ def cmd_go_ahead(a, root: Path) -> dict:
         raise Refused(waiting_base_text(root, t.name, base))
     findings = review(t, name, root)
     if findings and not a.accept_findings:
-        return {"design": name, "findings": findings, "copied": False, "written": [],
-                "note": "fix the findings in the sandbox or accept them, then run go-ahead again"}
+        return _with_sync({"design": name, "findings": findings, "copied": False, "written": [],
+                           "note": "fix the findings in the sandbox or accept them, then run go-ahead again"}, a, root, t.name)
     d = t.design(name)
     if d["status"] == "chosen":
         raise Refused("this design already had go-ahead; nothing written")
@@ -989,8 +1176,8 @@ def cmd_go_ahead(a, root: Path) -> dict:
                 od["status"] = "rejected"
                 save_design(t, other, od, w)
     refresh_compare(t, w)
-    return {"design": name, "findings": findings, "copied": True, "adrs": [str(x[1]) for x in adr_targets],
-            "slice": slice_slug, "written": w.written}
+    return _with_linked(_with_sync({"design": name, "findings": findings, "copied": True, "adrs": [str(x[1]) for x in adr_targets],
+                                    "slice": slice_slug, "written": w.written}, a, root, t.name), root, t.name)
 
 
 # ---------------------------------------------------------------- goal changes (1.188.0)
@@ -1121,7 +1308,7 @@ def cmd_change_goal(a, root: Path) -> dict:
     view = {"topic": t.name, "old": _goal_view(plan["old"]), "new": _goal_view(plan["new"]),
             "changes": plan["changes"], "flagged": plan["flagged"], "dropped": plan["dropped"]}
     if not a.yes:
-        return view | {"preview": True, "written": [],
+        return _with_sync(view, a, root, t.name) | {"preview": True, "written": [],
                        "note": "show old and new goal on a card; after the user's yes run change-goal again with --yes"}
     w = Writer(root, t.name)
     new = plan["new"]
@@ -1158,7 +1345,7 @@ def cmd_change_goal(a, root: Path) -> dict:
     if notes:
         _write_note(root, t.name, f"notes with the goal change: {a.reason.strip()}", notes, "other", w)
     refresh_compare(t, w)
-    return view | {"preview": False, "written": w.written}
+    return _with_linked(view | {"preview": False, "written": w.written}, root, t.name)
 
 
 # ---------------------------------------------------------------- linked topics (1.188.0)
@@ -1390,7 +1577,11 @@ def cmd_small_fix(a, root: Path) -> dict:
 
 
 def cmd_ending(a, root: Path) -> str:
-    return ending(load_input(a.input) | {"topic": a.topic})
+    text = ending(load_input(a.input) | {"topic": a.topic})
+    st = linked_behind(root, slugify(a.topic))
+    if st["state"] == "behind":
+        text = text.rstrip("\n") + "\n\n" + st["line"].replace("Linked design branches behind", "Behind") + "\n"
+    return text
 
 
 # ---------------------------------------------------------------- cli
@@ -1398,6 +1589,7 @@ def main(argv=None) -> int:
     p = argparse.ArgumentParser(prog="design_run.py")
     p.add_argument("--root", default=".")
     p.add_argument("--headless", action="store_true", help="run without the user: prepare only")
+    p.add_argument("--no-fetch", action="store_true", help="compare the design branch with local copies only")
     sub = p.add_subparsers(dest="cmd", required=True)
     r = sub.add_parser("route")
     r.add_argument("--word", default="")
@@ -1444,6 +1636,12 @@ def main(argv=None) -> int:
     nt.add_argument("--kind", choices=["scan", "vision", "scope", "answers", "goal", "other"], default="other")
     nt.add_argument("--text")
     nt.add_argument("--input")
+    bb = sub.add_parser("branch-behind")
+    bb.add_argument("--topic", required=True)
+    bb.add_argument("--yes", action="store_true", help="merge after the user's yes; never with --headless")
+    lb = sub.add_parser("linked-behind")
+    lb.add_argument("--topic", required=True, help="the base topic")
+    lb.add_argument("--yes", action="store_true", help="merge into every listed branch after one yes; never with --headless")
     sf = sub.add_parser("small-fix")
     sf.add_argument("--topic", required=True)
     sf.add_argument("--design")
@@ -1510,7 +1708,8 @@ def main(argv=None) -> int:
               "compare": lambda: cmd_compare(a, root), "compare-topics": lambda: cmd_compare_topics(a, root),
               "go-ahead": lambda: cmd_go_ahead(a, root), "ending": lambda: cmd_ending(a, root),
               "change-goal": lambda: cmd_change_goal(a, root), "revisit": lambda: cmd_revisit(a, root),
-              "note": lambda: cmd_note(a, root), "small-fix": lambda: cmd_small_fix(a, root)}[a.cmd]
+              "note": lambda: cmd_note(a, root), "small-fix": lambda: cmd_small_fix(a, root),
+              "branch-behind": lambda: cmd_branch_behind(a, root), "linked-behind": lambda: cmd_linked_behind(a, root)}[a.cmd]
         res = fn()
     except Refused as exc:
         print(str(exc), file=sys.stderr)
