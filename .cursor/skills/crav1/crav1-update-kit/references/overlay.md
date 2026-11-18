@@ -2,6 +2,8 @@
 
 Read this only when `writes_kit_files` is true. Fetch the installed tag and the target tag with `fetch`. Both must already have passed `resolve-target`. Do not fetch `main`, a branch, or a pull request.
 
+`fetch` (1.190.0) clones into a short folder in the system temp folder when `--dest` is left out (`ck` plus the version digits), with `core.longpaths=true` and `core.autocrlf=false`, because a long clone path fails on Windows. It then checks that `git status` in the clone is clean. A failed clone or an incomplete checkout is refused with the reason and no plan is made; fetch again with a shorter `--dest`.
+
 Plan with `--old` and `--new` pointing at those trees. Show the heads-up card. On `yes` or `write only`, run `apply --yes`.
 
 ## What is replaced

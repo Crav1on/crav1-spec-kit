@@ -26,6 +26,10 @@ The skill's `scripts/design_run.py` owns the folder format and every move, saves
 
 1.189.0: base to linked update: after a committed change to a base topic, the ending lists linked topics whose `design/<linked>` is behind `design/<base>`, and one yes card runs `linked-behind --topic <base> --yes`: switch, `git merge --no-ff design/<base>`, switch back; a conflict stops on that branch, names the files and leaves the rest; a run without the user merges nothing.
 
+1.190.0: `design.md` stores decisions by title so parallel adds do not conflict, and each decision has `Order: N` for the index and resume (ties by title); the goal's decision list comes from those numbers and older files get them on read. A move on the wrong branch offers a yes card and `switch-branch --topic <t> --yes` switches itself (refused, naming the paths, on a dirty tree). `resume` offers `change-goal` for a saved goal file in `inputs/` not yet applied and never recreates a topic, and returns `kit_check` when the stated kit version and the skill files differ (offering [`/crav1-update-kit`](crav1-update-kit.md)); a branch whose kit is behind origin/main gets the merge card before the topic is touched.
+
+1.190.0: scratch input (ending state, lean, settle, stage and compare drafts) goes in the session's temp folder and is refused from `inputs/`, which holds only the user's saved goal files and is created on the first save for older topics. `uncommitted` is a count (`true` is counted from git status), a commit card (`commit --topic <t> --yes`) comes before the ending, `create --builds-on` refuses while the base topic is uncommitted, and the ending prints the routable [`/crav1-design-architecture`](crav1-design-architecture.md) builds-on <base> <idea>`.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.

@@ -61,6 +61,14 @@ A run without you, such as a bot, may only `prepare`: gather facts, draft option
 - When you resume or start work on a topic, the skill fetches and checks whether the design branch is behind main (or, for a linked topic, its base topic's branch). If it is, a card offers to merge it in with `git merge --no-ff`; it never rebases, and a conflict stops with the file names.
 - After you commit a change to a base topic, the ending lists linked topics whose design branch is now behind the base, and one yes merges the base branch into each of them (`git merge --no-ff`, then back to the base branch). A conflict stops on that branch with the file names and leaves the others alone.
 
+## 3c. Order numbers, branches and commits (1.190.0)
+
+- Decisions are stored by title in `design.md`, so two people adding decisions in parallel do not conflict. Each decision carries an order number, which sets the order you see and where `resume` starts.
+- On the wrong branch, a card offers to switch to the topic's design branch, and the skill switches itself after your yes. It stops and names the files when you have uncommitted changes.
+- A goal file you saved in the topic's `inputs/` folder and that is not in the goal yet is offered as a goal change; the skill never recreates an existing topic.
+- When the kit version in the docs and the skill's own files differ, the skill warns and offers `/crav1-update-kit`; when the design branch has an older kit than main, it offers to merge main in first.
+- Before the session ends with uncommitted design files, a card offers to commit them. To start a topic that builds on this one, the ending names `/crav1-design-architecture builds-on <base> <idea>`.
+
 ## 4. Go-ahead
 
 `go-ahead` first reviews the chosen design for gaps against the goal, conflicts with what is already built or documented, and missing decisions. Fix the findings or accept them. Then the skill copies the design as one block under `## Decided, not built yet` in `docs/architecture/spec.md`, copies its ADRs as accepted with a "Designed in" link, and copies still-open questions into that spec. Rejected designs stay in the topic folder.
@@ -74,3 +82,5 @@ Since 1.188.0 a topic's goal changes in place with `change-goal`, and `builds-on
 Since 1.189.0 decisions keep their order, cards hold at most four options and one question, and `note` and `small-fix` keep discussion and small changes in the topic folder.
 
 Reference page: [design architecture](reference/skills/crav1-design-architecture.md)
+
+Since 1.190.0 decisions carry order numbers, the skill offers to switch branches and to commit before it ends, and saved goal files are offered as a goal change.

@@ -167,9 +167,9 @@ class VersionsAndTargets(unittest.TestCase):
     def test_fetch_clones_with_autocrlf_off(self):
         dest = Path(tempfile.mkdtemp()) / "release"
         with patch("subprocess.run") as run:
-            run.return_value = subprocess.CompletedProcess([], 0)
+            run.return_value = subprocess.CompletedProcess([], 0, stdout="", stderr="")
             kit.fetch_release("v1.131.0", dest, "https://example.invalid/kit.git")
-        cmd = run.call_args.args[0]
+        cmd = run.call_args_list[0].args[0]
         self.assertEqual(cmd[0], "git")
         self.assertIn("-c", cmd)
         self.assertIn("core.autocrlf=false", cmd)

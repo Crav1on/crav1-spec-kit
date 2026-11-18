@@ -12,6 +12,7 @@
 
 - <decision, found by its words>
   - State: open
+  - Order: 1
   - Options shown: <A>, <B>, <your idea>
   - Leaning: <option, short reason>
   - Draft ADR: designs/<name>/adr/<slug>.md

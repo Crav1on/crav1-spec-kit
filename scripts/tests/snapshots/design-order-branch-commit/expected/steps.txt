@@ -1,0 +1,178 @@
+## Step 4: design_run.py create --topic orders-platform
+
+Exit: 0
+
+{
+  "topic": "orders-platform",
+  "design": "platform-first",
+  "branch": "design/orders-platform",
+  "branch_state": "created from main",
+  "written": [
+    "docs/architecture/designs/orders-platform/goal.md",
+    "docs/architecture/designs/orders-platform/designs/platform-first/design.md",
+    "docs/architecture/designs/orders-platform/designs/platform-first/questions.md",
+    "docs/architecture/designs/orders-platform/designs/platform-first/diagrams.md",
+    "docs/architecture/designs/orders-platform/inputs/README.md"
+  ]
+}
+
+## Step 5: design_run.py add-decision --topic orders-platform --title Backup policy
+
+Exit: 0
+
+{
+  "design": "platform-first",
+  "written": [
+    "docs/architecture/designs/orders-platform/designs/platform-first/design.md"
+  ]
+}
+
+## Step 6: design_run.py ending --topic orders-platform
+
+Exit: 0
+
+Run next:
+The end state is still being designed.
+
+Pick up the orders platform designs:
+`/crav1-design-architecture resume orders-platform`
+
+Uncommitted: 5 files.
+
+## Step 7: design_run.py commit --topic orders-platform
+
+Exit: 0
+
+{
+  "topic": "orders-platform",
+  "committed": false,
+  "paths": [
+    "docs/architecture/designs/orders-platform/designs/platform-first/design.md",
+    "docs/architecture/designs/orders-platform/designs/platform-first/diagrams.md",
+    "docs/architecture/designs/orders-platform/designs/platform-first/questions.md",
+    "docs/architecture/designs/orders-platform/goal.md",
+    "docs/architecture/designs/orders-platform/inputs/README.md"
+  ],
+  "message": "Design orders-platform: save design work",
+  "card": {
+    "question": "Commit the 5 design files of orders-platform now?",
+    "words": [
+      "yes",
+      "not-now"
+    ],
+    "recommended": "yes",
+    "options": [
+      {
+        "word": "yes",
+        "label": "Commit (Recommended)",
+        "action": "git commit with the message 'Design orders-platform: save design work'"
+      },
+      {
+        "word": "not-now",
+        "label": "Not now",
+        "action": "leave the files uncommitted; the ending says how many"
+      }
+    ]
+  }
+}
+
+## Step 8: design_run.py commit --topic orders-platform --yes --message goal and first design
+
+Exit: 0
+
+{
+  "topic": "orders-platform",
+  "committed": true,
+  "paths": [
+    "docs/architecture/designs/orders-platform/designs/platform-first/design.md",
+    "docs/architecture/designs/orders-platform/designs/platform-first/diagrams.md",
+    "docs/architecture/designs/orders-platform/designs/platform-first/questions.md",
+    "docs/architecture/designs/orders-platform/goal.md",
+    "docs/architecture/designs/orders-platform/inputs/README.md"
+  ],
+  "message": "Design orders-platform: goal and first design"
+}
+
+## Step 10: design_run.py resume --topic orders-platform
+
+Exit: 2
+
+the orders-platform topic is on its design branch design/orders-platform, not on main. Offer the switch on a yes card; after the yes run switch-branch --topic orders-platform --yes, then run this move again
+
+## Step 11: design_run.py switch-branch --topic orders-platform
+
+Exit: 0
+
+{
+  "branch": "design/orders-platform",
+  "current": "main",
+  "switched": false,
+  "card": {
+    "question": "Switch to design/orders-platform and go on with the orders platform topic?",
+    "words": [
+      "yes",
+      "stop"
+    ],
+    "recommended": "yes",
+    "options": [
+      {
+        "word": "yes",
+        "label": "Switch (Recommended)",
+        "action": "git switch design/orders-platform, then go on"
+      },
+      {
+        "word": "stop",
+        "label": "Stop",
+        "action": "stay on main; nothing changes"
+      }
+    ]
+  }
+}
+
+## Step 12: design_run.py switch-branch --topic orders-platform --yes
+
+Exit: 0
+
+{
+  "branch": "design/orders-platform",
+  "switched": true,
+  "line": "Switched from main to design/orders-platform."
+}
+
+## Step 13: design_run.py status --topic orders-platform
+
+Exit: 0
+
+{
+  "designs": [
+    {
+      "topic": "orders-platform",
+      "design": "platform-first",
+      "status": "open",
+      "settled": [],
+      "open": [
+        "Zone layout",
+        "Access model",
+        "Backup policy"
+      ],
+      "questions": [],
+      "stages": []
+    }
+  ]
+}
+
+## Step 14: design_run.py ending --topic orders-platform
+
+Exit: 0
+
+Run next:
+The next topic builds on orders-platform; commit orders-platform first, then start it.
+
+Start the linked topic on top of orders-platform:
+`/crav1-design-architecture builds-on orders-platform orders target on the new platform`
+
+## Step 15: design_run.py route --word builds-on --idea orders-platform orders target on the new platform
+
+Exit: 0
+
+builds-on

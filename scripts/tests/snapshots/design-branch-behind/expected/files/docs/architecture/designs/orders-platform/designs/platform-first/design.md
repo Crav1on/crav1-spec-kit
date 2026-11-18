@@ -10,10 +10,12 @@ Not designed yet.
 
 ## Decisions
 
-- Zone layout
-  - State: open
 - Access model
   - State: open
+  - Order: 2
+- Zone layout
+  - State: open
+  - Order: 1
 
 ## Drivers
 

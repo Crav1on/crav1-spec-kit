@@ -18,7 +18,8 @@ Exit: 0
     "docs/architecture/designs/orders-platform/designs/platform-first/design.md",
     "docs/architecture/designs/orders-platform/designs/platform-first/questions.md",
     "docs/architecture/designs/orders-platform/designs/platform-first/diagrams.md",
-    "docs/architecture/designs/orders-platform/notes.md"
+    "docs/architecture/designs/orders-platform/notes.md",
+    "docs/architecture/designs/orders-platform/inputs/README.md"
   ]
 }
 
@@ -118,7 +119,7 @@ Pick up the orders platform designs:
 
 Waiting: person B to decide who pays for the zone
 Waiting: person A on test backups
-Uncommitted: files in docs/architecture/designs/orders-platform/.
+Uncommitted: 2 files.
 
 ## Step 11: design_run.py go-ahead --topic orders-platform --accept-findings
 
@@ -133,7 +134,11 @@ Exit: 0
     },
     {
       "kind": "missing-decision",
-      "text": "not settled: Zone layout"
+      "text": "not settled: Access model"
+    },
+    {
+      "kind": "missing-decision",
+      "text": "not settled: Backup policy"
     },
     {
       "kind": "missing-decision",
@@ -141,11 +146,7 @@ Exit: 0
     },
     {
       "kind": "missing-decision",
-      "text": "not settled: Access model"
-    },
-    {
-      "kind": "missing-decision",
-      "text": "not settled: Backup policy"
+      "text": "not settled: Zone layout"
     }
   ],
   "copied": true,
