@@ -94,6 +94,65 @@ def tidy_title(text):
     return re.sub(r"\s+", " ", text).strip(" ,;.:")
 
 
+VERIFY_KINDS = (
+    r"(?:unit|integration|contract|system|e2e|end-to-end|regression|smoke|"
+    r"manual|live|ui|api|performance|load|security|acceptance)"
+)
+# 1.187.0: where the verify text starts. `(verify:`, `(checks:` or `(tests:`,
+# and `; integration —` or `(unit —` style verify items, with an em dash, an
+# en dash, a spaced hyphen or a colon after the kind.
+_VERIFY_START = re.compile(
+    r"\s*(?:\((?:verify|checks?|tests?)\s*:"
+    rf"|[;(]\s*{VERIFY_KINDS}(?:\s+tests?)?\s*(?:[\u2014\u2013:]|\s-\s|--)"
+    r"|\(\s*regression\b)",
+    re.I,
+)
+
+
+def cut_verify(text):
+    """The task text before its first verify item (1.187.0)."""
+    text = text or ""
+    found = _VERIFY_START.search(text)
+    return text[:found.start()] if found else text
+
+
+def balance_parens(text):
+    """Drop a `)` with no `(` and a `(` that is never closed (1.187.0)."""
+    out, opened = [], []
+    for ch in text or "":
+        if ch == "(":
+            opened.append(len(out))
+            out.append(ch)
+        elif ch == ")":
+            if opened:
+                opened.pop()
+                out.append(ch)
+        else:
+            out.append(ch)
+    for index in reversed(opened):
+        del out[index]
+    return "".join(out)
+
+
+def task_name(rest):
+    """A task's name: its text up to the verify items, marks dropped (1.187.0).
+
+    The one helper for every place a task name is shown: the walk lead, the
+    ending under Run next, the ready check and the build map. Stops at the
+    first verify item (`; integration —`, `; contract —`, `; system —`,
+    `; unit —`, `(verify: ...`, `(regression`), drops kit marks, pull
+    request notes, branch names and backticks, closes or drops unbalanced
+    parentheses, and tidies spaces such as `( x` and `develop ,`. Never blank.
+    """
+    text = cut_verify(rest or "")
+    text = _drop_notes(text)
+    text = re.sub(r"\s*\(PR\s+\d+[^)]*\)", " ", text, flags=re.I)
+    text = BRANCH_NAME.sub(" ", text)
+    text = re.sub(r"`+", " ", text)
+    text = tidy_title(balance_parens(text))
+    return text or first_words(rest)
+
+
 def first_words(rest):
     """First readable words of a task line. Never blank.
 
@@ -189,13 +248,7 @@ def parse(text):
         else:
             deps = [prev] if prev is not None else []
             recorded = False
-        title = re.sub(r"\s*\((verify|spec|after|branch|step|map):[^)]*\)", "", rest)
-        title = re.sub(r"\s*\(PR\s+\d+[^)]*\)", "", title, flags=re.I)
-        title = BRANCH_NAME.sub(" ", title)
-        title = re.sub(r"`+", " ", title)
-        title = re.sub(r"\s+", " ", title).strip(" ,;.:")
-        if not title:
-            title = first_words(rest)
+        title = task_name(rest)
         tasks.append({"id": num, "done": m.group(1) != " ", "title": title, "deps": deps, "recorded": recorded})
         prev = num
     return tasks

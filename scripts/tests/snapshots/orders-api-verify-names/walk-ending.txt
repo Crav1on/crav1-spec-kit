@@ -1,0 +1,4 @@
+Run next:
+
+Build T4 PR 7 takes in develop after PR 6 merges, with the conflicts in app.py and tests/test_store.py resolved on feat/orders-fixes:
+`/crav1-build-walk orders-api T4`

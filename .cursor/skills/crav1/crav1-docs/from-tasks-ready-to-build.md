@@ -216,3 +216,5 @@ Since 1.184.0 that also holds for older progress files whose second task's build
 Since 1.185.0 each branch block in `build-map.md` is easier to scan: `- Tasks:` and `- Waits for:` list one item per nested sub-bullet instead of joining them with `; `, a done task keeps its strike-through and `✓ done (PR 12)` on its own sub-bullet, and `Waits for: none` stays on one line. The Delivers bullet is gone, because Tasks already lists every task with its id. Question, Ready now and the Plan step note stay on one line, and the diagram is unchanged. A map written by an older kit is rewritten once, the next time the ready check runs.
 
 Since 1.186.0 the ready check offers `/crav1-build-walk <slug> T#` only when the walk can start that task: both ask the same `task_state.walk_start`.
+
+Since 1.187.0 the ready check and the build map name a task by its text up to the first verify item (`; integration —`, `; contract —`, `; system —`, `; unit —`, or a `(verify: ...)` block), so the checks no longer show in the open-task list or under Run next.

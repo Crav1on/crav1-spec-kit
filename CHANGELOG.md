@@ -2,6 +2,11 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.187.0 (2026-11-18)
+
+- **Task names stop at the verify items.** The walk lead, the ending under Run next, the ready check's open-task list and `build-map.md` showed the whole task line, checks included, such as `Build T8 PR 12 takes in develop after PR 10 merges, with the conflicts resolved; integration — ...; system — ... with api-doc.yaml in it) on feat/orders-api:`. One helper, `task_order.task_name`, now cuts at the first verify item (`; integration —`, `; contract —`, `; system —`, `; unit —`, a `(verify: ...)` block, `(regression`), drops unbalanced parentheses and tidies stray spaces such as `( x` and `develop ,`. The line reads `Build T8 PR 12 takes in develop after PR 10 merges, with the conflicts resolved on feat/orders-api:`. `tasks.md` titles, the build map's short and full names and the walk's task labels all use it.
+- Snapshot `orders-api-verify-names` (with a golden walk ending) and `scripts/tests/test_kit_1187.py`.
+
 ## 1.186.0 (2026-11-17)
 
 Starting an open task on someone else's pull request branch, found on a live build walk.

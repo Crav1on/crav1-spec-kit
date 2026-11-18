@@ -282,6 +282,10 @@ def _task_token(value) -> str:
 
 def _task_label(task: dict) -> str:
     title = (task.get("title") or "").strip()
+    # 1.187.0: a title that still carries its verify items is cut to the name.
+    to = map_mod().task_order
+    if to.cut_verify(title) != title:
+        title = to.task_name(title)
     title = RUNS_LIVE.sub("", title)
     title = LIVE_YES.sub("", title)
     title = re.sub(r"\s{2,}", " ", title).strip()
