@@ -4,7 +4,9 @@ Prompt budget for one run: one framing card for a new or changed goal, then one 
 
 ## Step 0: Route
 
-`status` reads and stops. `resume` runs the script move `resume --topic <topic>` and continues at the first open or reopened decision, or at a stage marked `needs another look`. `park` runs `park` and ends. `fan-out`, `stage-it`, `go-ahead`, `compare-topics` and `prepare` go to those steps. A run without the user passes `--headless`; the script then refuses every move except status, resume, lean, compare, compare-topics, review and ending.
+`status` reads and stops; it shows each topic's links both ways (`builds on` and `built on by`). `resume` runs the script move `resume --topic <topic>` and continues at the first open or reopened decision, or at a stage marked `needs another look`. `park` runs `park` and ends. `fan-out`, `stage-it`, `go-ahead`, `compare-topics` and `prepare` go to those steps.
+
+A different goal for a topic that already exists goes to Step 2a, `change-goal`; do not offer to recreate the topic. Idea text that builds on an existing topic, or `builds-on <base>`, goes to Step 2b. On `resume` of a linked topic, name the decisions the base settled or reopened since the last run (`base_settled_since`, `base_reopened_since`) before the next decision. A run without the user passes `--headless`; the script then refuses every move except status, resume, lean, compare, compare-topics, review and ending.
 
 ## Step 1: Read what is already known (no writes)
 
@@ -28,6 +30,25 @@ Card: Is this the right goal and starting list of decisions?
 - **Change it**: type what to add, drop, reorder, split or change in the criteria, and the goal is shown again.
 
 After the yes, run the script move `create --topic <topic> --input goal.json`. It writes `goal.md` and starts one design.
+
+## Step 2a: Change the goal of an existing topic
+
+Write the new goal as JSON (only the fields that change: `ask`, `end_goal`, `drivers`, `constraints`, `criteria`, `decisions` in the new order, `renames`, `drop_reasons`, `reopen`). Run `change-goal --topic <topic> --input change.json --reason "<why>"` without `--yes`: it writes nothing and returns the old goal, the new goal, the change lines and the decisions it would flag. Show them side by side.
+
+Card: Change the goal as shown?
+- **Yes (Recommended)** (`yes`): rewrite the goal, log the change, and mark the flagged decisions for another look. Why: the history stays and nothing settled is lost.
+- **Change it** (`change-it`): type what to adjust, and the card is shown again.
+- **Keep the old goal** (`keep-goal`): nothing is written.
+
+After the yes, run the same move with `--yes`. Name the flagged decisions, then `resume` continues at the first one.
+
+A decision touches the change when it is dropped, when it is renamed while settled or leaning, when `reopen` lists it, or when it is settled or leaning and its title, lean, recommendation or draft ADR outcome names a word from a removed constraint, criterion or driver that no kept goal line still uses.
+
+## Step 2b: A topic that builds on another
+
+Frame the goal as in Step 2, and show the base topic's settled decisions as fixed. After the yes, run `create --topic <topic> --builds-on <base> --input goal.json`. The script returns the git commands for the branch: `git switch design/<base>`, then `git switch -c design/<topic>`. Base updates come in with `git merge design/<base>`; never rebase.
+
+When the user wants a base decision changed, the script refuses the local move. Offer the revisit on a card (`send-revisit` or `keep-it`); after `send-revisit`, run `revisit --topic <topic> --decision "<words>" --reason "<why>"` and give its ending.
 
 ## Step 3: Design the end state, one decision at a time
 

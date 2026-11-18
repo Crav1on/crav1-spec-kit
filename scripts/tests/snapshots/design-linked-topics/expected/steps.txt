@@ -1,0 +1,217 @@
+## Step 1: design_run.py create --topic orders-target --builds-on orders-platform
+
+Exit: 0
+
+{
+  "topic": "orders-target",
+  "design": "target-first",
+  "branch": "design/orders-target",
+  "written": [
+    "docs/architecture/designs/orders-target/goal.md",
+    "docs/architecture/designs/orders-target/designs/target-first/design.md",
+    "docs/architecture/designs/orders-target/designs/target-first/questions.md",
+    "docs/architecture/designs/orders-target/designs/target-first/diagrams.md"
+  ],
+  "builds_on": "orders-platform",
+  "branch_from": "design/orders-platform",
+  "fixed": [
+    "Where orders live: One SQL database for orders (platform-first, designs/platform-first/adr/where-orders-live.md)",
+    "Who releases orders: A pipeline releases orders (platform-first, designs/platform-first/adr/who-releases-orders.md)"
+  ],
+  "git": [
+    "git switch design/orders-platform",
+    "git switch -c design/orders-target"
+  ],
+  "update_from_base": "git merge design/orders-platform"
+}
+
+## Step 2: design_run.py settle --topic orders-target --decision where orders live
+
+Exit: 2
+
+Where orders live is settled in the base topic orders-platform; this topic may not settle or change it. Offer a revisit to orders-platform: revisit --topic orders-target --decision "Where orders live" --reason "<why>"
+
+## Step 3: design_run.py revisit --topic orders-target --decision where orders live --reason the target needs its own read copy
+
+Exit: 0
+
+{
+  "topic": "orders-target",
+  "base": "orders-platform",
+  "revisit": {
+    "design": "platform-first",
+    "decision": "Where orders live"
+  },
+  "base_branch": "design/orders-platform",
+  "ending": "Run next:\nWhere orders live is marked for another look in the base topic orders-platform. Settle it there, then merge design/orders-platform into design/orders-target.\n\nPick up the orders platform designs:\n`/crav1-design-architecture resume orders-platform`\n",
+  "written": [
+    "docs/architecture/designs/orders-platform/designs/platform-first/design.md"
+  ]
+}
+
+## Step 4: design_run.py settle --topic orders-platform --decision how test gets data
+
+Exit: 0
+
+{
+  "design": "platform-first",
+  "decision": "How test gets data",
+  "adr": "docs/architecture/designs/orders-platform/designs/platform-first/adr/how-test-gets-data.md",
+  "written": [
+    "docs/architecture/designs/orders-platform/designs/platform-first/adr/how-test-gets-data.md",
+    "docs/architecture/designs/orders-platform/designs/platform-first/design.md"
+  ]
+}
+
+## Step 5: design_run.py resume --topic orders-target
+
+Exit: 0
+
+{
+  "topic": "orders-target",
+  "design": "target-first",
+  "reopened": [],
+  "next_decision": "How the target reads orders",
+  "stages_needing_work": [],
+  "written": [
+    "docs/architecture/designs/orders-target/goal.md"
+  ],
+  "builds_on": "orders-platform",
+  "base_settled_since": [
+    "How test gets data: Made-up data (platform-first, designs/platform-first/adr/how-test-gets-data.md)"
+  ],
+  "base_reopened_since": [
+    "Where orders live: One SQL database for orders (platform-first, designs/platform-first/adr/where-orders-live.md)"
+  ],
+  "fixed": [
+    "How test gets data: Made-up data (platform-first, designs/platform-first/adr/how-test-gets-data.md)",
+    "Who releases orders: A pipeline releases orders (platform-first, designs/platform-first/adr/who-releases-orders.md)"
+  ]
+}
+
+## Step 6: design_run.py status
+
+Exit: 0
+
+{
+  "designs": [
+    {
+      "topic": "orders-platform",
+      "design": "platform-first",
+      "status": "open",
+      "settled": [
+        "How test gets data",
+        "Who releases orders"
+      ],
+      "open": [
+        "Where orders live"
+      ],
+      "questions": [],
+      "stages": []
+    },
+    {
+      "topic": "orders-target",
+      "design": "target-first",
+      "status": "open",
+      "settled": [],
+      "open": [
+        "How the target reads orders"
+      ],
+      "questions": [],
+      "stages": []
+    }
+  ],
+  "links": {
+    "orders-target": {
+      "builds_on": "orders-platform",
+      "built_on_by": []
+    },
+    "orders-platform": {
+      "builds_on": "",
+      "built_on_by": [
+        "orders-target"
+      ]
+    }
+  }
+}
+
+## Step 7: design_run.py go-ahead --topic orders-target --accept-findings
+
+Exit: 2
+
+Run next:
+The orders target design builds on orders-platform, which has not had go-ahead yet. Go-ahead here waits until the orders-platform design pull request is merged.
+
+Pick up the orders platform designs:
+`/crav1-design-architecture resume orders-platform`
+
+Waiting: go-ahead on orders-platform and its design pull request (design/orders-platform) merged into main.
+
+## Step 8: design_run.py go-ahead --topic orders-platform --accept-findings
+
+Exit: 0
+
+{
+  "design": "platform-first",
+  "findings": [
+    {
+      "kind": "gap",
+      "text": "criterion not covered by the end state: Checkout stays fast in prod"
+    },
+    {
+      "kind": "missing-decision",
+      "text": "not settled: Where orders live"
+    }
+  ],
+  "copied": true,
+  "adrs": [
+    "docs/system/adr/0001-how-test-gets-data.md",
+    "docs/system/adr/0002-where-orders-live.md",
+    "docs/system/adr/0003-who-releases-orders.md"
+  ],
+  "slice": null,
+  "written": [
+    "docs/system/adr/0001-how-test-gets-data.md",
+    "docs/system/adr/0002-where-orders-live.md",
+    "docs/system/adr/0003-who-releases-orders.md",
+    "docs/architecture/spec.md",
+    "docs/architecture/designs/orders-platform/designs/platform-first/design.md"
+  ]
+}
+
+## Step 9: design_run.py go-ahead --topic orders-target --accept-findings
+
+Exit: 2
+
+Run next:
+The orders target design builds on orders-platform, whose design pull request is not merged into main yet. Go-ahead here waits for that merge.
+
+Pick up the orders target designs:
+`/crav1-design-architecture resume orders-target`
+
+Waiting: the orders-platform design pull request (design/orders-platform) to merge into main.
+
+## Step 10: design_run.py go-ahead --topic orders-target --accept-findings --base-merged
+
+Exit: 0
+
+{
+  "design": "target-first",
+  "findings": [
+    {
+      "kind": "gap",
+      "text": "criterion not covered by the end state: Does not block the platform"
+    },
+    {
+      "kind": "missing-decision",
+      "text": "not settled: How the target reads orders"
+    }
+  ],
+  "copied": true,
+  "adrs": [],
+  "slice": null,
+  "written": [
+    "docs/architecture/spec.md",
+    "docs/architecture/designs/orders-target/designs/target-first/design.md"
+  ]
+}

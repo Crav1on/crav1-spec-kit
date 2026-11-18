@@ -44,6 +44,12 @@ Every move is saved, so you can stop at any point. `park` stops on purpose; `res
 
 A run without you, such as a bot, may only `prepare`: gather facts, draft options and refresh comparisons. It never decides.
 
+## 3a. Change the goal, or build on another topic
+
+- `change-goal` changes an open topic's goal in place: the ask, the end goal, drivers, constraints, criteria, and which decisions are on the list and in what order. A card shows the old and the new goal before anything is written. Each change is logged in `goal.md` with the date and the reason. A dropped decision stays, marked dropped with its reason. A settled decision the change touches, for example one that leaned on a constraint you removed, is marked for another look, and `resume` starts there. You never have to recreate a topic to change its goal.
+- `builds-on orders-platform` followed by your idea starts a topic that builds on `orders-platform`. Its design branch is cut from `design/orders-platform`, and updates come in by merging that branch, never by a rebase. The base topic's settled decisions are fixed inputs; to change one, the skill sends a revisit to the base topic instead. `resume` names what the base settled since your last run, and `status` shows the link both ways.
+- Each topic has its own go-ahead and design pull request. Go-ahead on the linked topic waits until the base topic's design pull request is merged; until then the ending names the base pull request under `Waiting:`.
+
 ## 4. Go-ahead
 
 `go-ahead` first reviews the chosen design for gaps against the goal, conflicts with what is already built or documented, and missing decisions. Fix the findings or accept them. Then the skill copies the design as one block under `## Decided, not built yet` in `docs/architecture/spec.md`, copies its ADRs as accepted with a "Designed in" link, and copies still-open questions into that spec. Rejected designs stay in the topic folder.
@@ -51,5 +57,7 @@ A run without you, such as a bot, may only `prepare`: gather facts, draft option
 ## After
 
 After go-ahead the ending names pushing the design branch first, then opening its pull request. Merge it with no tag. Planning comes only after that pull request is merged: then the ending names `/crav1-tighten-spec <slug>` for an affected slice, or `/crav1-plan-from-spec` when no slice exists yet. This command does not run them. See [How a run ends](reference/run-ending.md).
+
+Since 1.188.0 a topic's goal changes in place with `change-goal`, and `builds-on` starts a linked topic whose go-ahead waits for the base topic's design pull request.
 
 Reference page: [design architecture](reference/skills/crav1-design-architecture.md)

@@ -1,0 +1,221 @@
+## Step 1: design_run.py --headless change-goal --topic orders-platform --reason SQL is out of scope
+
+Exit: 2
+
+a run without the user may only prepare; change-goal needs the user
+
+## Step 2: design_run.py change-goal --topic orders-platform --reason SQL is out of scope
+
+Exit: 0
+
+{
+  "topic": "orders-platform",
+  "old": {
+    "ask": "split the orders platform so the target can grow on it",
+    "end_goal": "Orders run as their own platform that a later target can build on.",
+    "drivers": [
+      "One team runs orders. (from you, this session)"
+    ],
+    "constraints": [
+      "Orders stay in one SQL store. (docs/architecture/spec.md)"
+    ],
+    "criteria": [
+      "Checkout stays fast in prod",
+      "Can be tried in test before prod"
+    ],
+    "decisions": [
+      "How test gets data",
+      "Where orders live",
+      "Who releases orders"
+    ]
+  },
+  "new": {
+    "ask": "split the orders platform so the target can grow on it",
+    "end_goal": "Orders run as their own platform that a later target can build on.",
+    "drivers": [
+      "One team runs orders. (from you, this session)"
+    ],
+    "constraints": [],
+    "criteria": [
+      "Checkout stays fast in prod",
+      "Can be tried in test before prod",
+      "Does not block the target"
+    ],
+    "decisions": [
+      "How test gets data",
+      "Where orders live",
+      "Who ships orders",
+      "How the target reads orders"
+    ]
+  },
+  "changes": [
+    "Removed constraint: Orders stay in one SQL store. (docs/architecture/spec.md)",
+    "Added criterion: Does not block the target",
+    "Renamed decision: Who releases orders to Who ships orders",
+    "Added decision: How the target reads orders",
+    "Needs another look: Where orders live (names sql, store from a removed goal line)",
+    "Needs another look: Who ships orders (renamed from Who releases orders)"
+  ],
+  "flagged": [
+    {
+      "design": "platform-first",
+      "decision": "Where orders live",
+      "why": "names sql, store from a removed goal line"
+    },
+    {
+      "design": "platform-first",
+      "decision": "Who ships orders",
+      "why": "renamed from Who releases orders"
+    }
+  ],
+  "dropped": [],
+  "preview": true,
+  "written": [],
+  "note": "show old and new goal on a card; after the user's yes run change-goal again with --yes"
+}
+
+## Step 3: design_run.py change-goal --topic orders-platform --reason SQL is out of scope --yes
+
+Exit: 0
+
+{
+  "topic": "orders-platform",
+  "old": {
+    "ask": "split the orders platform so the target can grow on it",
+    "end_goal": "Orders run as their own platform that a later target can build on.",
+    "drivers": [
+      "One team runs orders. (from you, this session)"
+    ],
+    "constraints": [
+      "Orders stay in one SQL store. (docs/architecture/spec.md)"
+    ],
+    "criteria": [
+      "Checkout stays fast in prod",
+      "Can be tried in test before prod"
+    ],
+    "decisions": [
+      "How test gets data",
+      "Where orders live",
+      "Who releases orders"
+    ]
+  },
+  "new": {
+    "ask": "split the orders platform so the target can grow on it",
+    "end_goal": "Orders run as their own platform that a later target can build on.",
+    "drivers": [
+      "One team runs orders. (from you, this session)"
+    ],
+    "constraints": [],
+    "criteria": [
+      "Checkout stays fast in prod",
+      "Can be tried in test before prod",
+      "Does not block the target"
+    ],
+    "decisions": [
+      "How test gets data",
+      "Where orders live",
+      "Who ships orders",
+      "How the target reads orders"
+    ]
+  },
+  "changes": [
+    "Removed constraint: Orders stay in one SQL store. (docs/architecture/spec.md)",
+    "Added criterion: Does not block the target",
+    "Renamed decision: Who releases orders to Who ships orders",
+    "Added decision: How the target reads orders",
+    "Needs another look: Where orders live (names sql, store from a removed goal line)",
+    "Needs another look: Who ships orders (renamed from Who releases orders)"
+  ],
+  "flagged": [
+    {
+      "design": "platform-first",
+      "decision": "Where orders live",
+      "why": "names sql, store from a removed goal line"
+    },
+    {
+      "design": "platform-first",
+      "decision": "Who ships orders",
+      "why": "renamed from Who releases orders"
+    }
+  ],
+  "dropped": [],
+  "preview": false,
+  "written": [
+    "docs/architecture/designs/orders-platform/goal.md",
+    "docs/architecture/designs/orders-platform/designs/platform-first/design.md",
+    "docs/architecture/designs/orders-platform/designs/platform-first/stages.md"
+  ]
+}
+
+## Step 4: design_run.py change-goal --topic orders-platform --reason the target owns how it reads orders --yes
+
+Exit: 0
+
+{
+  "topic": "orders-platform",
+  "old": {
+    "ask": "split the orders platform so the target can grow on it",
+    "end_goal": "Orders run as their own platform that a later target can build on.",
+    "drivers": [
+      "One team runs orders. (from you, this session)"
+    ],
+    "constraints": [],
+    "criteria": [
+      "Checkout stays fast in prod",
+      "Can be tried in test before prod",
+      "Does not block the target"
+    ],
+    "decisions": [
+      "How test gets data",
+      "Where orders live",
+      "Who ships orders",
+      "How the target reads orders"
+    ]
+  },
+  "new": {
+    "ask": "split the orders platform so the target can grow on it",
+    "end_goal": "Orders run as their own platform that a later target can build on.",
+    "drivers": [
+      "One team runs orders. (from you, this session)"
+    ],
+    "constraints": [],
+    "criteria": [
+      "Checkout stays fast in prod",
+      "Can be tried in test before prod",
+      "Does not block the target"
+    ],
+    "decisions": [
+      "How test gets data",
+      "Where orders live",
+      "Who ships orders",
+      "How the target reads orders (dropped)"
+    ]
+  },
+  "changes": [
+    "Dropped decision: How the target reads orders (the target topic decides it)"
+  ],
+  "flagged": [],
+  "dropped": [
+    "How the target reads orders"
+  ],
+  "preview": false,
+  "written": [
+    "docs/architecture/designs/orders-platform/goal.md",
+    "docs/architecture/designs/orders-platform/designs/platform-first/design.md"
+  ]
+}
+
+## Step 5: design_run.py resume --topic orders-platform
+
+Exit: 0
+
+{
+  "topic": "orders-platform",
+  "design": "platform-first",
+  "reopened": [],
+  "next_decision": "Where orders live",
+  "stages_needing_work": [
+    "Orders in test"
+  ],
+  "written": []
+}
