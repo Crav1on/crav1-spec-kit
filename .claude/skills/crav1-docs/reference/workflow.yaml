@@ -204,6 +204,7 @@ also_next:
   crav1-design-architecture: [/crav1-tighten-spec, /crav1-plan-from-spec, /crav1-add-to-spec, /crav1-show-or-ask-open-questions]
   crav1-model-data: [/crav1-finalize-commit, "/crav1-what-do-we-know-about-this report-data-model-full <model>", /crav1-add-to-spec]
   crav1-update-specs-from-changes-and-prs: [/crav1-resolve-open-questions, /crav1-update-specs-from-changes-and-prs, /crav1-finalize-commit]
+  crav1-explain-tech: [/crav1-explain-tech, /crav1-show-or-ask-open-questions, /crav1-finalize-commit]
   crav1-tighten-and-plan-ready-to-build: [/crav1-build-walk, /crav1-build-tasks]
   crav1-refresh-system-notes: [/crav1-finalize-commit]
   crav1-map-pipeline-environments: [/crav1-read-environment]
@@ -217,6 +218,7 @@ also_next:
 # Replaces the generated list. Free text is allowed here only.
 override:
   crav1-explain-this-code: []
+  crav1-explain-tech: []
   crav1-retire-spec: []
   crav1-fix-bug: ["The lane it names (Specify, Plan, or Build)"]
   crav1-what-do-we-know-about-this: ["The one skill it names, if any"]

@@ -36,7 +36,7 @@ docs/research/
 docs/playbooks/
   <topic>.md         # a filled playbook copied on apply (1.120.0); the first write stays outside the project
 docs/architecture/designs/
-  <topic>/           # a design sandbox, one goal, on its own design branch (1.181.0); no other skill reads it
+  <topic>/           # a design sandbox, one goal, on its own design branch (1.181.0); no other skill reads it except explain-tech, read-only, as not decided
     goal.md          # end goal, drivers, constraints, criteria
     compare.md       # designs in this topic scored against the shared criteria
     designs/<name>/  # design.md, questions.md, diagrams.md, adr/ drafts, stages.md once staged

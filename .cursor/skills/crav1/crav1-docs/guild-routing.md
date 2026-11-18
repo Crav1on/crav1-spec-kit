@@ -99,6 +99,7 @@ Started from a ready-to-build report, the walk offers each ready branch as its o
 | Skill | `/crav1-tasks-ready-to-build` |
 | Skill | `/crav1-explain-existing-system` |
 | Skill | `/crav1-explain-this-code` |
+| Skill | `/crav1-explain-tech` |
 | Skill | `/crav1-retire-spec` |
 | Skill | `/crav1-what-do-we-know-about-this` |
 | Skill | `/crav1-model-data` |
@@ -144,13 +145,15 @@ Started from a ready-to-build report, the walk offers each ready branch as its o
 
 `/crav1-explain-this-code` may run from any lane, any time. It is not `/crav1-explain-existing-system`. It writes nothing into the repo unless the user picks Save as .md, and then only outside the repo. It does not move work into Specify, Plan, or Build.
 
+`/crav1-explain-tech` may run from any lane, any time. It reads the specs and writes nothing unless the user asks to save, and then only a dated entry in the spec's notes file. It is not `/crav1-explain-this-code` or `/crav1-what-do-we-know-about-this`. It does not move work into Specify, Plan, or Build. It is not a starter option.
+
 `/crav1-retire-spec` may run from any lane, on one spec the user names. Choice words are `retire`, `merge`, `park`, and `convert-to-note`. It runs no other skill. Parked specs are skipped by `/crav1-plan-from-spec`, `/crav1-build-tasks`, `/crav1-build-features`, and the push branches of `/crav1-ado-sync`. It does not move work into Specify, Plan, or Build.
 
 `/crav1-what-do-we-know-about-this` may run from any lane when the user asks about one feature, slice, or resource. With no report word it writes nothing in the project. A `report-*` word other than `report-data-model-full` writes one report outside the project. `report-data-model-full` writes under `docs/data-model/<model>/reviews/` and does not edit the saved model. No slice: it names a starter and does not run it. Pasted minutes name `/crav1-add-to-spec` and stop. It does not run another skill and does not move work into Specify, Plan, or Build. It is not a starter option.
 
 `/crav1-model-data` may run from any lane when the user asks for a data model. It does not move work into Specify, Plan, or Build. It does not edit spec requirements, generate schema, or start a watcher. It is not a starter option.
 
-`/crav1-design-architecture` may run from any lane when the user wants to decide how the architecture should change. It works in a sandbox under `docs/architecture/designs/` that no other skill reads, and writes outside it only at go-ahead. It does not move work into Specify, Plan, or Build. It is not a starter option.
+`/crav1-design-architecture` may run from any lane when the user wants to decide how the architecture should change. It works in a sandbox under `docs/architecture/designs/` that no other skill reads (only `/crav1-explain-tech` lists mentions there, read-only, as not decided), and writes outside it only at go-ahead. It does not move work into Specify, Plan, or Build. It is not a starter option.
 
 `/crav1-update-specs-from-changes-and-prs` may run from any lane. It runs `/crav1-add-to-spec` for each item and does not replace it. It does not run `/crav1-review-pr` or `/crav1-pr-status`. It does not commit. It does not move work into Specify, Plan, or Build. It is not a starter option.
 
@@ -238,6 +241,7 @@ The merged skills take exact choice words instead of `--flags`. A word in the in
 | `/crav1-tasks-ready-to-build` | Open the map as a zoomable page? | `open-map` · `export-map` |
 | `/crav1-tasks-ready-to-build` | Also check the latest pipeline runs? | `pipeline-runs` |
 | `/crav1-explain-this-code` | How deep | `what-it-does` · `what-and-why` · `teach-the-language` |
+| `/crav1-explain-tech` | Depth and save | `deeper` · `save` |
 | `/crav1-retire-spec` | What to do | `retire` · `merge` · `park` · `convert-to-note` |
 | `/crav1-model-data` | Which flow | `manual-flow` · `auto-flow` |
 | `/crav1-design-architecture` | Which step | `resume` · `park` · `status` · `fan-out` · `stage-it` · `go-ahead` · `compare-topics` · `prepare` · `change-goal` · `builds-on` · `note` · `small-fix` |
@@ -305,6 +309,7 @@ cross_cutting:
     - crav1-tasks-ready-to-build
     - crav1-explain-existing-system
     - crav1-explain-this-code
+    - crav1-explain-tech
     - crav1-retire-spec
     - crav1-what-do-we-know-about-this
     - crav1-model-data

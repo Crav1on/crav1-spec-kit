@@ -556,7 +556,8 @@ class TestKitWiring(unittest.TestCase):
                 continue
             for line in p.read_text(encoding="utf-8").splitlines():
                 if "architecture/designs" in line:
-                    self.assertRegex(line, r"(?i)never read|ignore|no other skill", f"{rel}: {line}")
+                    # 1.192.0: explain-tech may list mentions there, read-only, as not decided.
+                    self.assertRegex(line, r"(?i)never read|ignore|no other skill|not decided", f"{rel}: {line}")
 
     def test_endings_in_skill_text_have_no_next_line(self):
         for p in SKILL.rglob("*.md"):

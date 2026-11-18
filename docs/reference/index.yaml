@@ -161,6 +161,11 @@ skills:
     starter: false
     page: reference/skills/crav1-explain-this-code.md
     purpose: "Explain one piece of code (a file, a function, a selection, or a PR diff) from reading it."
+  crav1-explain-tech:
+    lane: cross-cutting
+    starter: false
+    page: reference/skills/crav1-explain-tech.md
+    purpose: "Explain one technology (what it is, how it works, where the specs use it, why, the tradeoff, one alternative)."
   crav1-retire-spec:
     lane: cross-cutting
     starter: false

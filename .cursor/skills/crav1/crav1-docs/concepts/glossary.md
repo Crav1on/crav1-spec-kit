@@ -88,7 +88,7 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 
 **Flow word.** `manual-flow` or `auto-flow` on `/crav1-model-data` (1.118.0). The scope after it is an optional value. Both flows use the same modeling rules. Manual flow confirms the business model before physical design. Auto flow continues after a budget approval and leaves unconfirmed results as proposals.
 
-**Design topic.** One goal under `docs/architecture/designs/<topic>/`, worked by `/crav1-design-architecture` (1.181.0) on its own design branch. *Architecture* in that skill means the whole landscape: systems and services and how they connect, environments, infrastructure and hosting, data flows, integrations, and deployment. No other skill reads a design topic.
+**Design topic.** One goal under `docs/architecture/designs/<topic>/`, worked by `/crav1-design-architecture` (1.181.0) on its own design branch. *Architecture* in that skill means the whole landscape: systems and services and how they connect, environments, infrastructure and hosting, data flows, integrations, and deployment. No other skill reads a design topic, except `/crav1-explain-tech`, which only lists mentions read-only and calls them not decided (1.192.0).
 
 **Goal.** A design topic's `goal.md`: the end goal, drivers, constraints, and the criteria its designs are scored on.
 
@@ -158,6 +158,8 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 **Pointer.** The one-line `Moved:` `spec.md` left at a spec's old path when it is retired, merged, or converted. Nothing is deleted.
 
 **Waiting note.** A note in `docs/notes/YYYY-MM/` with the slug in `waiting_for`: the full input that matched a parked spec. Never absorbed; it stays the shared full source and `Used by` grows as specs use it.
+
+**Technology notes.** A `## Technology notes` section in a spec's `notes.md` (or `docs/architecture/notes.md`) with dated `### <technology> (YYYY-MM-DD)` entries that `/crav1-explain-tech` appends only on `save` (1.192.0): the short explanation and links to where the specs use it.
 
 **Saved explanation.** The optional `explain-this-code-<target>-<date>.md` that `/crav1-explain-this-code` writes when the user says yes to Save as .md: in the Downloads folder by default, or a path the user names, never into the repo by default. Its header names the paths covered and `<branch>@<short sha>`. Not a note: the kit never reads or indexes it.
 

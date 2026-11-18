@@ -2046,6 +2046,51 @@ skills:
   first_prompt: '/crav1-explain-this-code what-it-does
 
     @src/<file>'
+- name: crav1-explain-tech
+  choice_words:
+  - question: Depth and save
+    words:
+    - word: "deeper"
+      means: "a longer answer with how it fits the rest of the spec"
+    - word: "save"
+      means: "append a dated note to the spec's notes file"
+  lane: cross-cutting
+  group: Keep the picture current
+  starter: false
+  since: 1.192.0
+  stage: stable
+  prompt_budget: 3
+  walkthrough: docs/from-explain-tech.md
+  purpose: Explain one technology (what it is, how it works, where the specs use it, why, the tradeoff, one alternative).
+  in_depth:
+  - '**`/crav1-explain-tech`** explains one technology, such as Private Link or Service Bus, tied to where
+    the specs use it. `explain_tech.py find` lists every mention in specs, plans, tasks, notes, the architecture
+    spec, ADRs, design topics and system notes, with links to the exact file and section, plus owners
+    and the spec to save to. The short answer (150 to 250 words) has a fixed shape: what it is, how it
+    works, where it shows up, why it is used, main tradeoff, one alternative, then Run next. `deeper` gives
+    300 to 900 words and adds how it fits with the rest of the spec. A technology the specs never mention
+    is said plainly and explained in general terms, with no spec link and research named in Run next.
+    Missing facts name who has them (ADR deciders, `Owner:` lines, the spec''s `## Approval needed`).
+    `check` tests the shape, the word count and every link; kit-lint runs it on the samples.'
+  - 'Read-only by default. `save` (the word, or yes on the card) appends `### <technology> (YYYY-MM-DD)` with
+    the short explanation and its links under `## Technology notes` in the spec''s `notes.md` (created when
+    missing; `docs/architecture/notes.md` for the architecture spec). A link that is not a file or section
+    in the specs is refused.'
+  use_when: You want one technology explained in the context of your specs
+  table:
+    reads: Specs, plans, tasks, notes, the architecture spec, ADRs, design topics and system notes
+    writes: Nothing (an answer in chat); a Technology notes entry in the spec's notes.md only on save
+  reads: Reads `docs/specs/`, `docs/architecture/spec.md` and its ADRs, `docs/architecture/designs/`, and
+    `docs/system/` to find where the technology appears.
+  writes: Writes the answer in the chat. On `save` or a yes on the save card, appends a dated Technology notes
+    entry to `docs/specs/<slug>/notes.md` or `docs/architecture/notes.md`, creating the file when it is missing.
+  leaves_alone: Leaves specs, plans, tasks, design topics and ADRs alone. Writes nothing without save.
+  exceptions: never invents a spec link; a technology the specs do not mention is said plainly. A save
+    link that is not in the specs is refused.
+  called_by: Called by the user.
+  runs_by_itself: Calls no skill. Runs `scripts/explain_tech.py`.
+  you_run_next: []
+  first_prompt: '/crav1-explain-tech Service Bus'
 - name: crav1-retire-spec
   choice_words:
   - question: What to do
@@ -2255,7 +2300,7 @@ skills:
   purpose: Work out an architecture change with the user, one decision at a time, in a sandbox until go-ahead.
   in_depth:
   - '`/crav1-design-architecture` (1.181.0, preview) decides how the landscape should change: systems and services and how they connect, environments, infrastructure and hosting, data flows, integrations, and deployment. It reads what the kit knows, shows two or three real options per decision with a reasoned recommendation first, folds in the user''s own ideas as their own option, and records each settled choice as a draft ADR in a sandbox.'
-  - 'The sandbox is `docs/architecture/designs/<topic>/` on its own design branch: one goal per topic in `goal.md`, one or more designs under `designs/<name>/`, and `compare.md` once a topic fans out. The end state is designed first; staging happens only on `stage-it`, and the user names and divides the stages. A stage may wait on a stakeholder decision. No other skill reads the sandbox, even after it is merged.'
+  - 'The sandbox is `docs/architecture/designs/<topic>/` on its own design branch: one goal per topic in `goal.md`, one or more designs under `designs/<name>/`, and `compare.md` once a topic fans out. The end state is designed first; staging happens only on `stage-it`, and the user names and divides the stages. A stage may wait on a stakeholder decision. No other skill reads the sandbox, even after it is merged (except `/crav1-explain-tech`, which only lists mentions read-only and calls them not decided, 1.192.0).'
   - 'The skill''s `scripts/design_run.py` owns the folder format and every move, saves after each one, and refuses writes outside the topic folder before go-ahead. A run without the user may only prepare. At go-ahead the chosen design is reviewed, then copied as one block under `## Decided, not built yet` in `docs/architecture/spec.md` with a "Designed in" link, its draft ADRs are copied as accepted, and still-open questions go into that spec. The ending names pushing the design branch and opening its pull request first; planning comes only after that pull request is merged.'
   - '1.188.0: `change-goal` changes an open topic''s goal in place: `design_run.py change-goal --topic <t> --input <json> --reason "<why>"` shows old and new without writing, then with `--yes` rewrites `goal.md` and logs the date, the reason and each change under `## Goal changes`. Decisions can be added, dropped, renamed or reordered; a dropped decision stays, marked `dropped` with its reason. A settled or leaning decision that is renamed, listed under `reopen`, or names a word from a removed constraint, criterion or driver is marked reopened for another look. A run without the user may not change a goal.'
   - '1.188.0: linked topics. `create --topic <t> --builds-on <base>` records `Builds on: <base>`, lists the base''s settled decisions as fixed inputs, and cuts the design branch from `design/<base>` (updates by `git merge design/<base>`, never a rebase). `resume` names decisions the base settled or reopened since the last run, a local change of a base decision is refused with a `revisit` that reopens it in the base topic, `status` shows links both ways, and `go-ahead` on the linked topic waits until the base design is in the architecture spec on main, with a Waiting line naming the base pull request.'
@@ -3006,6 +3051,9 @@ routing:
         crav1-explain-this-code:
         - >-
           `/crav1-explain-this-code` may run from any lane, any time. It is not `/crav1-explain-existing-system`. It writes nothing into the repo unless the user picks Save as .md, and then only outside the repo. It does not move work into Specify, Plan, or Build.
+        crav1-explain-tech:
+        - >-
+          `/crav1-explain-tech` may run from any lane, any time. It reads the specs and writes nothing unless the user asks to save, and then only a dated entry in the spec's notes file. It is not `/crav1-explain-this-code` or `/crav1-what-do-we-know-about-this`. It does not move work into Specify, Plan, or Build. It is not a starter option.
         crav1-retire-spec:
         - >-
           `/crav1-retire-spec` may run from any lane, on one spec the user names. Choice words are `retire`, `merge`, `park`, and `convert-to-note`. It runs no other skill. Parked specs are skipped by `/crav1-plan-from-spec`, `/crav1-build-tasks`, `/crav1-build-features`, and the push branches of `/crav1-ado-sync`. It does not move work into Specify, Plan, or Build.
@@ -3014,7 +3062,7 @@ routing:
           `/crav1-model-data` may run from any lane when the user asks for a data model. It does not move work into Specify, Plan, or Build. It does not edit spec requirements, generate schema, or start a watcher. It is not a starter option.
         crav1-design-architecture:
         - >-
-          `/crav1-design-architecture` may run from any lane when the user wants to decide how the architecture should change. It works in a sandbox under `docs/architecture/designs/` that no other skill reads, and writes outside it only at go-ahead. It does not move work into Specify, Plan, or Build. It is not a starter option.
+          `/crav1-design-architecture` may run from any lane when the user wants to decide how the architecture should change. It works in a sandbox under `docs/architecture/designs/` that no other skill reads (only `/crav1-explain-tech` lists mentions there, read-only, as not decided), and writes outside it only at go-ahead. It does not move work into Specify, Plan, or Build. It is not a starter option.
         crav1-update-specs-from-changes-and-prs:
         - >-
           `/crav1-update-specs-from-changes-and-prs` may run from any lane. It runs `/crav1-add-to-spec` for each item and does not replace it. It does not run `/crav1-review-pr` or `/crav1-pr-status`. It does not commit. It does not move work into Specify, Plan, or Build. It is not a starter option.
