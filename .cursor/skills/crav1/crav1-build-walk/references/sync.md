@@ -2,6 +2,8 @@
 
 Read this at the start of `/crav1-build-walk`, and again when a walk branch finishes or the user stops.
 
+**Merged since sync (1.194.0).** When a walk branch's pull request has merged, before the next branch starts, run `scripts/merged_since_sync.py check --spec <spec.md> --code-repo <code checkout>` in `crav1-add-to-spec` (the one shared check), as `crav1-docs/reference/running-scripts.md` says. It reads refs on disk, compares each branch in the spec's `Synced at:` lines with the base (the default branch, as `design_run.py` finds it, or `--base`) and writes nothing. When `offer` is `take-in`, ask its one yes card with its `question` and two `options`. On yes, Open `../crav1-add-to-spec/SKILL.md` for its `command` and follow the PR or branch step inline with that skill's own confirms, then run its `after_yes` (`merged_since_sync.py stamp ... --yes`) to move `Synced at` to the merge. On `not now`, write nothing. Either way the walk goes on with the next branch. With no card (`not-merged`, `already-synced` or `skipped`), say nothing.
+
 ## Pull before reading
 
 Before reading or writing the spec folder, run `<interpreter> -X utf8 scripts/repo_sync.py status --repo <specs-repo>`, as `crav1-docs/reference/running-scripts.md` says. That fetch is read-only.

@@ -2,6 +2,16 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.194.0 (2026-11-19)
+
+Fixes for spec findings in `/crav1-tighten-and-plan-ready-to-build`, from a live walk.
+
+- **The right owner on the jump-back card.** `walk_progress.py spec-finding` no longer always recommends `/crav1-tighten-spec`. A finding about code the spec has not recorded (unrecorded commits, a merged pull request, `Synced at` or `In the code` drift, new PR comments) recommends `/crav1-add-to-spec` with that pull request or branch; wording, structure, diagrams and constraints stay with tighten-spec, the default when unclear. `--kind code-drift|spec-text` is the hint, `--pr` or `--branch` the target; the recommended label, its text and the opened path name the right command.
+- **Already fixed, no card.** Before the card, spec-finding re-reads `spec.md` and its `Synced at:` lines. A finding the spec already covers (the branch's `Synced at` shows the merge commit or later, `--code-repo` for later; or `--expect` words present) returns `already-fixed` with a one-line note and no card. A typed "already done" (`--choice already-done`) closes the finding only when the spec shows it, and otherwise returns the card with what is still missing.
+- **Add-to-spec before the plan review.** New `walk_progress.py code-drift` reads refs on disk (no fetch): when commits sit after a `Synced at` commit, or a merged pull request is not recorded, the walk asks one add-to-spec yes card before the plan review, and passes the drift to the reviewer as known context, not as a finding to echo.
+- **Merged since sync, one shared check.** New `crav1-add-to-spec` `scripts/merged_since_sync.py check` compares each branch in a spec's `Synced at:` lines with the base (the default branch, found as `design_run.py` does, or `--base`). When a branch merged since the recorded commit it asks ONE yes card: `PR <n> merged at <sha> with <k> commits the spec hasn't recorded. Take them in now?`. Yes runs the add-to-spec PR or branch step inline and `stamp --yes` moves `Synced at` to the merge; nothing is written without the yes, and headless runs only report. Used at the tighten-and-plan walk start, by `/crav1-pr-status`, the specs sweep (auto flow reports only), `/crav1-merge-pr` after a merge and `/crav1-build-walk` when a branch's pull request merged.
+- `scripts/tests/test_kit_1194.py` and the walkthrough `docs/from-tighten-and-plan.md`.
+
 ## 1.193.0 (2026-11-19)
 
 Fixes from a review session on the sweep, commit, review-pr, pr-status and add-to-spec.
@@ -137,15 +147,5 @@ Fixes from a live session review. One shared module now decides a task's state, 
 - **Smaller fixes.** A reopened step's reason names only the sections that can reopen it (not Match or In the code). The map is written before uncommitted files are counted, and the line reads `Commit the <n> changed spec files:`. Held lines name every unfinished dependency, held ones first, then `and T8 (not built)`.
 - **Owner names.** A leading word such as `Admin` and a trailing `(...)` tag are dropped when a name is written and when it is read, two spellings of one person are listed once, stored `PR author:` lines are rewritten once, and the ready check's reply ends with a `Recorded:` line naming the files it wrote.
 - **Snapshots and invariants.** `scripts/snapshot-check.py` runs the ready check on anonymised spec folders under `scripts/tests/snapshots/` and compares the reply, the map and the build-progress files with the expected ones (`--update` rewrites them). `task_invariants.py` checks that counts add up, nothing Blocked is hidden, a ticked task is never ready, the merge list keeps its order, deadlocks name the plan fix, no `Next:` line appears, and no owner name keeps its extras.
-
-## 1.179.0 (2026-11-17)
-
-Fixes from a live ready check on Windows. The ready check now reaches Azure DevOps, says why when it cannot instead of asking who opened a pull request, writes each answer into the right build-progress file, and offers people as owner choices.
-
-- **Azure DevOps on Windows.** The host lookup found `az.cmd` but started the bare name `az`, which Windows cannot start without a shell, and the failure was treated as no answer. It now runs the full path `shutil.which` returned (`az.cmd` or `az.bat`), with stdin closed, UTF-8 output, `--detect false`, extension install prompts turned off, and a 20-second timeout for `az` (8 seconds for `gh`; `CRAV1_HOST_TIMEOUT` overrides both). A completed pull request is read as merged and leaves the merge list in the same run.
-- **A reason instead of nothing.** One lookup (`host_lookup`) returns why a host could not be read: `cli-missing`, `cli-not-runnable`, `timeout`, `not-signed-in`, `extension-missing`, `not-found`, `bad-output`, `unknown-status` or `host-error`, with the first line the CLI printed.
-- **Host before owner.** The `--full` JSON lists these pull requests under `host_unread`, and `ask_first` is `code-repo`, then `host`, then `pr-author`. A pull request whose host was not reached is not in the owner question; its merge-list line says `owner unknown: Azure DevOps not reached`. Catch up first names the reason and the fix, a label on its own line above `az login` or `az extension add --name azure-devops`, then `Run the ready check again:`. `pr-author` returns `status: host-unread` with the reason and the fix.
-- **The right build-progress file.** `pr-author --name` and `code-repo --repo` wrote into the first file that mentioned the pull request number anywhere, so an answer for one pull request could land in another's file. They now pick the branch's own file, then the one file whose own pull request it is, write only in the header, return `ambiguous` (with `--branch` to choose) when several files match, and create the branch's file when none exists. The reply's `commit` names the file to commit. The merge wait takes the file's own pull request, not the last one it mentions.
-- **Owner choices.** `Owner:` is the walk's mode marker (`self` or `other`), so it is no longer read as a name and `other` is never a choice. The people open questions wait on are added; teams and organisations, such as `the project team`, are not.
 
 The newest 15 releases are above. The full changelog is https://github.com/Crav1on/crav1-spec-kit/blob/main/CHANGELOG.md.

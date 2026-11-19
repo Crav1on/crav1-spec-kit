@@ -28,7 +28,9 @@ Usage (JSON on stdout):
   walk_progress.py unlinked --root <spec-folder>
   walk_progress.py ack-stamps --root <spec-folder> --yes
   walk_progress.py spec-finding --root <spec-folder> --id P2 --text "<finding>"
-      [--tag spec|plan] [--choice tighten-spec|open-point] [--yes]
+      [--tag spec|plan] [--choice tighten-spec|add-to-spec|open-point|already-done] [--yes]
+      [--kind code-drift|spec-text] [--pr N] [--branch B] [--expect "<words>"] [--code-repo <path>]
+  walk_progress.py code-drift --root <spec-folder> --code-repo <path> [--branch B] [--pr N --merged <sha>]
   walk_progress.py resolve-stamps --root <spec-folder> --yes
       [--settle-stamps] [--ours-root <folder> --theirs-root <folder>]
   walk_progress.py restamp-covered --root <spec-folder> --yes
@@ -46,6 +48,12 @@ spec-finding offers one jump back for a spec finding, or records an open
 point when that finding already jumped. A close reword of a recorded finding
 is offered as that finding, and --new keeps it separate. The first-seen Key
 stays. Later wordings are Alias. A plan tag writes nothing.
+Since 1.194.0 a code finding (unrecorded commits, a merged PR, Synced at or
+In the code drift, new PR comments) recommends /crav1-add-to-spec; wording,
+structure, diagrams and constraints stay with /crav1-tighten-spec, the
+default when unclear. A finding spec.md already covers is offer
+already-fixed, with a note and no card. code-drift offers add-to-spec
+before the plan review when the spec's record is behind the code.
 
 record, cover, and clear without --yes write nothing and exit 2.
 record takes one step per call and stamps Done itself. --when, when passed,
@@ -217,7 +225,27 @@ CONTINUE_POINT = "review-and-tighten-plan, tasks-ready-to-build"
 JUMP_CHOICE = "run /crav1-tighten-spec on just that finding now (Recommended)"
 POINT_CHOICE = "keep it as an open point and continue"
 FINDING_ID = re.compile(r"^P[1-9][0-9]*$")
-JUMP_RESULTS = {"jumped", "open-point"}
+JUMP_RESULTS = {"jumped", "open-point", "already-fixed"}
+# The owner of a spec finding (1.194.0). A finding about code the spec has not
+# recorded (unrecorded commits, a merged PR, Synced at or In the code drift,
+# new PR comments) is /crav1-add-to-spec's. Wording, structure, diagrams and
+# constraints stay /crav1-tighten-spec's, which is also the default when unclear.
+ADD_TO_SPEC_PATH = "../crav1-add-to-spec/SKILL.md"
+ADD_CHOICE = "run /crav1-add-to-spec on just that finding now (Recommended)"
+FINDING_KINDS = ("code-drift", "spec-text")
+DRIFT_WORDS = re.compile(
+    r"(?i)\b(?:merged?|unrecorded|not recorded|has not recorded|hasn't recorded|not in the spec yet|"
+    r"synced at|in the code|new (?:pr )?(?:comments?|replies|threads?)|new commits?|commits? after|"
+    r"drift|behind the code|sync)\b"
+)
+SPEC_TEXT_WORDS = re.compile(
+    r"(?i)\b(?:wording|reword|structure|heading|section order|diagrams?|edge|constraints?|acceptance|"
+    r"ambiguous|vague|contradicts?|unclear|typo)\b"
+)
+SHA_TOKEN = re.compile(r"\b(?=[0-9a-f]*[0-9])(?=[0-9a-f]*[a-f])[0-9a-f]{7,40}\b")
+MERGE_SHA = re.compile(r"(?i)\bmerged?\b[^.;]*?\b(?:at|as|in)\s+([0-9a-f]{7,40})\b")
+PR_IN_TEXT = re.compile(r"(?i)\bPR\s*#?(\d+)\b")
+SYNCED_LINE = re.compile(r"^Synced at:\s*(?:(?P<repo>\S+)\s+)?(?P<branch>\S+)@(?P<sha>[0-9a-f]{7,40})", re.M)
 
 
 def version_of(path: Path) -> str:
@@ -1304,9 +1332,9 @@ def parse_progress(text: str) -> dict:
         if jump["kind"] == "jump-back":
             if jump["result"] != "jumped":
                 fail("progress-file", f"jump-back {jump['id']} result is not jumped")
-            if jump.get("open") != TIGHTEN_SPEC_PATH:
-                fail("progress-file", f"jump-back {jump['id']} does not name {TIGHTEN_SPEC_PATH}")
-        elif jump["result"] != "open-point":
+            if jump.get("open") not in (TIGHTEN_SPEC_PATH, ADD_TO_SPEC_PATH):
+                fail("progress-file", f"jump-back {jump['id']} does not name {TIGHTEN_SPEC_PATH} or {ADD_TO_SPEC_PATH}")
+        elif jump["result"] not in ("open-point", "already-fixed"):
             fail("progress-file", f"open point {jump['id']} result is not open-point")
     return {"slice": slice_line, "steps": steps, "acks": acks, "jumps": jumps, "branch_runs": branch_runs}
 
@@ -6386,21 +6414,121 @@ def _append_finding(root: Path, data: dict, kind: str, fid: str, text: str, key:
     write_progress(root, data)
 
 
-def _jump_back_offer(fid: str) -> dict:
+def finding_owner(text: str, kind: str | None = None, topic: str = "") -> str:
+    """add-to-spec or tighten-spec (1.194.0). The kind hint wins; then words; unclear is tighten-spec."""
+    if kind == "code-drift":
+        return "add-to-spec"
+    if kind == "spec-text":
+        return "tighten-spec"
+    words = f"{text} {topic.replace('-', ' ')}"
+    if DRIFT_WORDS.search(words) and not SPEC_TEXT_WORDS.search(words):
+        return "add-to-spec"
+    return "tighten-spec"
+
+
+def add_to_spec_command(text: str, pr: str | None = None, branch: str | None = None) -> str:
+    if pr:
+        return f"/crav1-add-to-spec pr{str(pr).lstrip('#').removeprefix('pr')}"
+    if branch:
+        return f"/crav1-add-to-spec {branch}"
+    m = PR_IN_TEXT.search(text or "")
+    return f"/crav1-add-to-spec pr{m.group(1)}" if m else "/crav1-add-to-spec"
+
+
+def _norm_words(text: str) -> str:
+    return re.sub(r"\s+", " ", (text or "").strip().lower())
+
+
+def _is_ancestor(code_repo: str | None, older: str, newer: str) -> bool:
+    if not code_repo:
+        return False
+    try:
+        done = subprocess.run(["git", "-C", code_repo, "merge-base", "--is-ancestor", older, newer],
+                              capture_output=True, timeout=15)
+    except (OSError, subprocess.SubprocessError):
+        return False
+    return done.returncode == 0
+
+
+def already_fixed(root: Path, text: str, owner: str, expect: str | None = None, code_repo: str | None = None) -> dict:
+    """Does spec.md already cover the finding (1.194.0)? Re-reads spec.md and its Synced at lines.
+
+    --expect names the words the fix leaves in the spec. A code finding with a
+    merge commit is covered when a Synced at line shows that commit or a later
+    one (a descendant, with --code-repo). Without a merge commit, every commit
+    the finding names must be in the spec. Otherwise nothing can be checked."""
+    spec_path = root / "spec.md"
+    spec = spec_path.read_text(encoding="utf-8") if spec_path.is_file() else ""
+    if expect:
+        ok = _norm_words(expect) in _norm_words(spec)
+        return {"checked": True, "covered": ok, "missing": [] if ok else [f"spec.md does not say: {expect}"],
+                "note": f"spec.md already says: {expect}" if ok else None}
+    if owner != "add-to-spec":
+        return {"checked": False, "covered": False, "missing": ["nothing to check this against; pass --expect with the words the fix leaves"], "note": None}
+    synced = [m.groupdict() for m in SYNCED_LINE.finditer(spec)]
+    merge = MERGE_SHA.search(text or "")
+    if merge:
+        sha = merge.group(1).lower()
+        for row in synced:
+            have = row["sha"].lower()
+            if have.startswith(sha) or sha.startswith(have) or _is_ancestor(code_repo, sha, have):
+                where = f"{row['branch']}@{row['sha']}"
+                return {"checked": True, "covered": True, "missing": [],
+                        "note": f"Synced at shows {where}, at or after the merge commit {sha}."}
+        shown = ", ".join(f"{r['branch']}@{r['sha']}" for r in synced) or "no Synced at line"
+        return {"checked": True, "covered": False, "note": None,
+                "missing": [f"Synced at shows {shown}, not the merge commit {sha} or later"]}
+    shas = sorted({m.group(0).lower() for m in SHA_TOKEN.finditer(text or "")})
+    if not shas:
+        return {"checked": False, "covered": False, "note": None,
+                "missing": ["the finding names no commit; pass --expect with the words the fix leaves"]}
+    lower = spec.lower()
+    missing = [sha for sha in shas if sha not in lower]
+    if not missing:
+        return {"checked": True, "covered": True, "missing": [], "note": f"spec.md records {', '.join(shas)}."}
+    return {"checked": True, "covered": False, "note": None,
+            "missing": [f"spec.md does not record {', '.join(missing)}"]}
+
+
+def _already_fixed_offer(fid: str, check: dict) -> dict:
+    return {
+        "ok": True,
+        "offer": "already-fixed",
+        "spec": True,
+        "finding": fid,
+        "note": f"{fid} is already fixed in the spec: {check['note']}",
+        "record": "spec-finding with the same --id and --text, --choice already-done --yes",
+        "options": [],
+        "already_jumped": False,
+        "pause": False,
+        "wrote": None,
+    }
+
+
+def _jump_back_offer(fid: str, owner: str = "tighten-spec", command: str = "/crav1-tighten-spec") -> dict:
+    if owner == "add-to-spec":
+        first = {"id": "add-to-spec", "label": ADD_CHOICE, "recommended": True,
+                 "text": f"Open {command} for {fid} only, then the walk goes on with the plan. Why: the spec has not recorded that code yet."}
+        path = ADD_TO_SPEC_PATH
+    else:
+        first = {"id": "tighten-spec", "label": JUMP_CHOICE, "recommended": True,
+                 "text": f"Open /crav1-tighten-spec for {fid} only, then the walk goes on with the plan. Why: the plan is built from the spec."}
+        path = TIGHTEN_SPEC_PATH
     return {
         "ok": True,
         "offer": "jump-back",
         "spec": True,
         "finding": fid,
+        "owner": owner,
+        "command": command,
         "background": f"{fid} is about the spec, not the plan.",
         "question": f"Fix {fid} in the spec now, before the plan goes on?",
         "options": [
-            {"id": "tighten-spec", "label": JUMP_CHOICE, "recommended": True,
-             "text": f"Open /crav1-tighten-spec for {fid} only, then the walk goes on with the plan. Why: the plan is built from the spec."},
+            first,
             {"id": "open-point", "label": POINT_CHOICE, "recommended": False,
              "text": f"Record {fid} as an open point and go on; the spec stays as it is for now."},
         ],
-        "path": TIGHTEN_SPEC_PATH,
+        "path": path,
         "already_jumped": False,
         "pause": False,
         "wrote": None,
@@ -6443,6 +6571,25 @@ def spec_finding(args: argparse.Namespace) -> None:
     data = load(root)
     key = _finding_key(args.text)
     jumps = data.get("jumps") or []
+    if args.kind and args.kind not in FINDING_KINDS:
+        fail("kind", "kind must be code-drift or spec-text")
+    owner = finding_owner(args.text, args.kind, topic)
+    command = add_to_spec_command(args.text, args.pr, args.branch) if owner == "add-to-spec" else "/crav1-tighten-spec"
+    if args.choice == "already-done":
+        check = already_fixed(root, args.text, owner, args.expect, args.code_repo)
+        if not check["covered"]:
+            offer = _jump_back_offer(args.id, owner, command)
+            offer["still_missing"] = check["missing"]
+            offer["message"] = f"The spec does not show {args.id} fixed yet: " + "; ".join(check["missing"]) + "."
+            emit(offer)
+            return
+        if not args.yes:
+            fail("needs-yes", "spec-finding writes the progress file only with --yes, after the card was answered", status=2)
+        _append_finding(root, data, "open-point", args.id, args.text, key, "already-fixed", CONTINUE_POINT, topic=topic)
+        emit({"ok": True, "offer": None, "spec": True, "finding": args.id, "key": key,
+              "recorded": "already-fixed", "note": f"{args.id} is already fixed in the spec: {check['note']}",
+              "pause": False, "continue": _continue_list(CONTINUE_POINT), "wrote": PROGRESS_NAME})
+        return
     force_new = bool(args.new or args.choice == "new")
     if args.choice == "same":
         first, _aliases, _stored_topic, _finding = _family(jumps, key)
@@ -6480,7 +6627,7 @@ def spec_finding(args: argparse.Namespace) -> None:
         if first is None:
             close = _close_findings(jumps, args.text, args.id, topic)
             if close:
-                if args.choice in ("tighten-spec", "open-point"):
+                if args.choice in ("tighten-spec", "add-to-spec", "open-point"):
                     emit(_same_or_new_offer(args.id, close))
                     return
                 emit(_same_or_new_offer(args.id, close))
@@ -6502,7 +6649,7 @@ def spec_finding(args: argparse.Namespace) -> None:
             "open_point": True,
             "pause": False,
             "continue": _continue_list(CONTINUE_POINT),
-            "refused_second_jump": args.choice == "tighten-spec",
+            "refused_second_jump": args.choice in ("tighten-spec", "add-to-spec"),
         }
         if key != first:
             payload["aliased"] = True
@@ -6529,20 +6676,25 @@ def spec_finding(args: argparse.Namespace) -> None:
         emit(payload)
         return
     if args.choice in (None, "new", "same"):
-        emit(_jump_back_offer(args.id))
+        check = already_fixed(root, args.text, owner, args.expect, args.code_repo)
+        if check["covered"]:
+            emit(_already_fixed_offer(args.id, check))
+            return
+        emit(_jump_back_offer(args.id, owner, command))
         return
-    if args.choice not in ("tighten-spec", "open-point"):
-        fail("choice", "choice must be tighten-spec, open-point, same, or new")
+    if args.choice not in ("tighten-spec", "add-to-spec", "open-point"):
+        fail("choice", "choice must be tighten-spec, add-to-spec, open-point, already-done, same, or new")
     if not args.yes:
         fail(
             "needs-yes",
             "spec-finding writes the progress file only with --yes, after the card was answered",
             status=2,
         )
-    if args.choice == "tighten-spec":
+    if args.choice in ("tighten-spec", "add-to-spec"):
+        path = ADD_TO_SPEC_PATH if args.choice == "add-to-spec" else TIGHTEN_SPEC_PATH
         _append_finding(
             root, data, "jump-back", args.id, args.text, key, "jumped",
-            CONTINUE_JUMP, TIGHTEN_SPEC_PATH, topic=topic,
+            CONTINUE_JUMP, path, topic=topic,
         )
         emit({
             "ok": True,
@@ -6551,8 +6703,9 @@ def spec_finding(args: argparse.Namespace) -> None:
             "finding": args.id,
             "key": key,
             "recorded": "jump-back",
-            "choice": "tighten-spec",
-            "path": TIGHTEN_SPEC_PATH,
+            "choice": args.choice,
+            "command": add_to_spec_command(args.text, args.pr, args.branch) if args.choice == "add-to-spec" else "/crav1-tighten-spec",
+            "path": path,
             "scoped_to": args.id,
             "pause": False,
             "continue": _continue_list(CONTINUE_JUMP),
@@ -6574,6 +6727,84 @@ def spec_finding(args: argparse.Namespace) -> None:
         "pause": False,
         "continue": _continue_list(CONTINUE_POINT),
         "wrote": PROGRESS_NAME,
+    })
+
+
+def _git_lines(code_repo: str, *args: str) -> list[str] | None:
+    try:
+        done = subprocess.run(["git", "-C", code_repo, *args], capture_output=True, timeout=20)
+    except (OSError, subprocess.SubprocessError):
+        return None
+    if done.returncode != 0:
+        return None
+    return [line for line in done.stdout.decode("utf-8", "replace").splitlines() if line.strip()]
+
+
+def code_drift(args: argparse.Namespace) -> None:
+    """Is the spec's record behind the code (1.194.0)? Read-only, no fetch.
+
+    For each `Synced at:` line in spec.md, counts the commits on the code
+    repo's `origin/<branch>` (else `<branch>`) after that commit. `--merged
+    <sha>` (a merged PR the walk already saw) is behind unless a Synced at
+    commit is that one or later. Behind: one add-to-spec yes card, asked
+    before the plan review, and a reviewer note so the reviewer does not echo
+    the known drift as a new finding. Writes nothing."""
+    root = Path(args.root)
+    spec_path = root / "spec.md"
+    if not spec_path.is_file():
+        fail("root", f"no spec.md in {root}")
+    spec = spec_path.read_text(encoding="utf-8")
+    synced = [m.groupdict() for m in SYNCED_LINE.finditer(spec)]
+    behind = []
+    for row in synced:
+        if args.branch and row["branch"] != args.branch:
+            continue
+        ref = None
+        for cand in (f"origin/{row['branch']}", row["branch"]):
+            if _git_lines(args.code_repo, "rev-parse", "--verify", "--quiet", cand) is not None:
+                ref = cand
+                break
+        if not ref:
+            continue
+        commits = _git_lines(args.code_repo, "log", "--format=%h %s", f"{row['sha']}..{ref}") or []
+        if commits:
+            behind.append({"branch": row["branch"], "synced": row["sha"], "ref": ref,
+                           "count": len(commits), "commits": commits[:5]})
+    merged = None
+    if args.merged:
+        sha = args.merged.lower()
+        hit = any(r["sha"].lower().startswith(sha) or sha.startswith(r["sha"].lower())
+                  or _is_ancestor(args.code_repo, sha, r["sha"]) for r in synced)
+        if not hit:
+            merged = {"sha": sha, "pr": args.pr}
+    if not behind and not merged:
+        emit({"ok": True, "behind": False, "offer": None, "wrote": None,
+              "message": "The spec's Synced at lines are current with the code; no add-to-spec offer."})
+        return
+    target = args.branch or (behind[0]["branch"] if behind else None)
+    command = add_to_spec_command("", args.pr, target)
+    parts = [f"{b['count']} commit{'s' if b['count'] != 1 else ''} on {b['branch']} after Synced at {b['synced']}" for b in behind]
+    if merged:
+        parts.append(f"PR {args.pr} merged at {merged['sha']}" if args.pr else f"a merge at {merged['sha']}")
+    what = "; ".join(parts)
+    emit({
+        "ok": True,
+        "behind": True,
+        "offer": "add-to-spec",
+        "drift": behind,
+        "merged": merged,
+        "command": command,
+        "path": ADD_TO_SPEC_PATH,
+        "background": f"The spec's record is behind the code: {what}.",
+        "question": "Record those code changes in the spec before the plan review?",
+        "options": [
+            {"id": "add-to-spec", "label": f"run {command} first (Recommended)", "recommended": True,
+             "text": f"Open {command} now, then update the plan for what it changed and start the plan review. Why: the review then reads a current spec."},
+            {"id": "review-now", "label": "review the plan as it is", "recommended": False,
+             "text": "Start the plan review now; the spec stays behind the code and the walk names add-to-spec at the end."},
+        ],
+        "reviewer_note": f"Known and already offered: {what}. Do not report it as a new finding.",
+        "wrote": None,
     })
 
 
@@ -7563,12 +7794,25 @@ def main(argv: list[str] | None = None) -> None:
     f.add_argument("--id", required=True)
     f.add_argument("--text", required=True)
     f.add_argument("--tag", default="spec", help="spec offers a jump back. plan behaves as today.")
-    f.add_argument("--choice", help="tighten-spec, open-point, same, or new")
+    f.add_argument("--choice", help="tighten-spec, add-to-spec, open-point, already-done, same, or new")
+    f.add_argument("--kind", help="code-drift (add-to-spec owns it) or spec-text (tighten-spec owns it); unclear is tighten-spec")
+    f.add_argument("--pr", help="the pull request a code-drift finding is about, e.g. 73")
+    f.add_argument("--branch", help="the branch a code-drift finding is about")
+    f.add_argument("--expect", help="words the fix leaves in spec.md; checks whether it is already fixed")
+    f.add_argument("--code-repo", help="code checkout to tell whether a Synced at commit is after the merge commit (no fetch)")
     f.add_argument("--topic", help="Short stable topic, such as approver. Same P# and topic are one finding.")
     f.add_argument("--new", action="store_true", help="This wording is a new finding.")
     f.add_argument("--match-key", help="First-seen key when more than one recorded finding is close.")
     f.add_argument("--yes", action="store_true")
     f.set_defaults(func=spec_finding)
+
+    cdr = sub.add_parser("code-drift", help="is the spec's record behind the code; one add-to-spec card before the plan review (1.194.0)")
+    cdr.add_argument("--root", required=True)
+    cdr.add_argument("--code-repo", required=True, help="the code checkout; refs on disk, no fetch")
+    cdr.add_argument("--branch", help="only this Synced at branch")
+    cdr.add_argument("--pr", help="the merged pull request, e.g. 73")
+    cdr.add_argument("--merged", help="its merge commit, when the walk already saw it merged")
+    cdr.set_defaults(func=code_drift)
 
     bs = sub.add_parser("branch-status")
     bs.add_argument("--root", required=True)
