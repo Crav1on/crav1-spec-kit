@@ -2,6 +2,8 @@
 
 Read only when there is something to offer, from **Hand-offs** in `SKILL.md`.
 
+**Merged since sync (1.194.0).** Before the closing prompt, for each spec this pull request carries, run `scripts/merged_since_sync.py check --spec <spec.md> --code-repo <code checkout>` in `crav1-add-to-spec` (the one shared check), as `crav1-docs/reference/running-scripts.md` says. It reads refs on disk, compares each branch in the spec's `Synced at:` lines with the base (the default branch, as `design_run.py` finds it, or `--base`) and writes nothing. When `offer` is `take-in`, ask its one yes card with its `question` and two `options`. On yes, Open `../crav1-add-to-spec/SKILL.md` for its `command` and follow the PR or branch step inline with that skill's own confirms, then run its `after_yes` (`merged_since_sync.py stamp ... --yes`) to move `Synced at` to the merge. On `not now`, write nothing. Either way the closing prompt follows. This card counts toward the run's one question only when it is asked. With no card (`not-merged`, `already-synced` or `skipped`), say nothing.
+
 ## The closing prompt
 
 All offers go in **one** prompt at the end of the run, the run's only prompt. Each offer is its own question with its own answer; one answer never covers two threads. The recommended option is first, labelled ` (Recommended)`, at most 4 options.

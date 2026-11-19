@@ -4,6 +4,8 @@ Read this only for `auto-flow`, then [common.md](common.md). Do not open the man
 
 ## Start
 
+**Merged since sync (1.194.0).** For each spec the run touches, run `scripts/merged_since_sync.py check --spec <spec.md> --code-repo <code checkout>` in `crav1-add-to-spec` (the one shared check), as `crav1-docs/reference/running-scripts.md` says. It reads refs on disk, compares each branch in the spec's `Synced at:` lines with the base (the default branch, as `design_run.py` finds it, or `--base`) and writes nothing. This run asks nothing: pass `--headless` and print its `report` line when `status` is `merged`. Nothing is written for it.
+
 No fetch question. No specs-repo question. The specs repo stays out unless the invocation named that row. Naming it reads its pull request comments and never its branches.
 
 State the budget in one line and go on. Default 20 minutes. A number in the invocation replaces it. Above 45, say the run will use 45 and go on. A headless run uses 20 unless a number was given. Do not ask.

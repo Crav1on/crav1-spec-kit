@@ -4,6 +4,8 @@ Read only when the pointer in `SKILL.md` sends you here. Moved word for word fro
 
 ## After it merged
 
+**Merged since sync (1.194.0).** After the merge is confirmed, for each spec that names the merged branch, run `scripts/merged_since_sync.py check --spec <spec.md> --code-repo <code checkout>` in `crav1-add-to-spec` (the one shared check), as `crav1-docs/reference/running-scripts.md` says. It reads refs on disk, compares each branch in the spec's `Synced at:` lines with the base (the default branch, as `design_run.py` finds it, or `--base`) and writes nothing. When `offer` is `take-in`, ask its one yes card with its `question` and two `options`. On yes, Open `../crav1-add-to-spec/SKILL.md` for its `command` and follow the PR or branch step inline with that skill's own confirms, then run its `after_yes` (`merged_since_sync.py stamp ... --yes`) to move `Synced at` to the merge. On `not now`, write nothing. Either way the run ending follows. With no card (`not-merged`, `already-synced` or `skipped`), say nothing.
+
 Report the merge commit hash, the title, and `source` → `target`. Repeat the strategy: merge commit. On Azure DevOps, also say the merge commit has two parents. Reach this section only after that check passes.
 
 When you only printed commands, stop after those commands. Do not invent a hash.
