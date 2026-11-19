@@ -82,7 +82,7 @@ Do not silently rewrite `docs/system/` or other specs. Apply those edits only if
 
 ## Stop
 
-Read `references/stop.md` ("Stop") only when the input cannot be placed or the add must stop.
+Read `references/stop.md` ("Stop") only when the input cannot be placed or the add must stop. Its ending routes to `/crav1-tighten-and-plan-ready-to-build <slug>` when the edit reopened an open walk on that spec (1.195.0), otherwise to `/crav1-tighten-spec <slug>`.
 
 ## Style
 

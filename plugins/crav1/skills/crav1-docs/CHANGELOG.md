@@ -2,6 +2,24 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.195.0 (2026-11-20)
+
+Fixes from two live sessions: meeting imports, the spec walk's code checks, and the tighten cards.
+
+- **Meeting Run next names every changed spec.** The first changed spec gets the command; the rest follow as `Also changed, not tightened: <slugs>.` When an edit reopens a spec's open walk, the command is `/crav1-tighten-and-plan-ready-to-build <slug>` with the reason `The new information reopened the walk.` The fact branch's ending (`references/stop.md`) routes the same way.
+- **Save for later.** Meeting items get a fourth choice, save for later, which writes the slug (or `general` for team-workflow information) to a new note field `later_for`. `waiting_for` stays for parked specs only. `/crav1-help`, `/crav1-tighten-spec`, `/crav1-show-or-ask-open-questions` and `/crav1-retire-spec` list these notes as saved for later; `notes_index.py later --slug <slug>` lists them. New mark `later_for` in `marks.yaml`.
+- **One batch rule for meetings.** One to four items get one question each; more than four always get the batch card. The recap's `Noted` count is gone (every input is noted) and `Saved for later` counts the new choice.
+- **Reason lines in `/crav1-finalize-commit` endings.** Every Run next example in `references/commit.md` starts with its reason, for example `The commit is only local.`
+- **`.docx` meeting imports.** New `crav1-add-to-spec` `scripts/docx_to_md.py`: `convert` keeps paragraphs, headings, list levels and bold and reads the created date from `docProps/core.xml`; `check` compares the words in order. Standard library only, no network. Named in `references/sources-binary.md` and the meeting branch.
+- **The base, per branch.** `merged_since_sync.py check` finds each branch's base from `--base`, then the repo's `Merges into` in `docs/system/repos.md` (`--repos`), then a base `Synced at` line, then `origin/develop`, then the default branch, and reports `base` and `base_from`. Every caller passes `--base <Merges into>`.
+- **Code drift at the walk start.** `/crav1-tighten-and-plan-ready-to-build` runs `walk_progress.py code-drift` right after merged-since-sync at the start; the run before the plan review is a recheck. New `readiness --stale-seen`: when anything stale was seen, every reopen card recommends rerun, never nothing new.
+- **Only unrecorded commits count.** `code-drift` leaves out commits already named in the spec or in a note's `commits:` list, and base merge-ins, and reports `count`, `total`, `already_recorded` and `base_merge_ins`. New `--base`.
+- **Tighten-spec: whether findings and sources.** A finding that asks whether something is so, with no deciding source, recommends ask or keep. A patch that contradicts a source line quotes it and is never the recommendation; ask or keep is always listed, also on the batch card.
+- **One owner for acceptance ticks.** `/crav1-tighten-spec` ticks a spec acceptance box only through the new `tick-from-verify` resolution, which quotes the passing verify row. `/crav1-verify-build-against-spec` only reports the open box.
+- **Tighten-plan batch cap.** `plan_check.py batch` puts at most 8 findings on one card and names the rest for the next card. A finding with `changes_tasks` (adds, removes or reorders tasks) never goes on a yes-to-all card; it gets its own card.
+
+Docs and tests: walkthroughs for meetings, commit and the spec walk; data layout, glossary and marks; `scripts/tests/test_kit_1195.py`.
+
 ## 1.194.0 (2026-11-19)
 
 Fixes for spec findings in `/crav1-tighten-and-plan-ready-to-build`, from a live walk.
@@ -132,20 +150,5 @@ A new preview skill, `/crav1-design-architecture`, works out an architecture cha
 - **Script.** `design_run.py` owns the folder format and every move, saves after each one (no cap per session), reopens a decision on resume when a source it relied on changed, and refuses writes outside the topic folder before go-ahead. A run without you may only prepare.
 - **Go-ahead.** The chosen design is reviewed for gaps against the goal, conflicts and missing decisions, then copied as one block under `## Decided, not built yet` in `docs/architecture/spec.md` with a "Designed in" link. Its ADRs are copied as accepted and numbered, still-open questions go into that spec, and the ending names pushing the design branch and opening its pull request before any planning.
 - **Open questions in the architecture spec.** `/crav1-show-or-ask-open-questions` and `/crav1-resolve-open-questions` also read `docs/architecture/spec.md`, and `/crav1-existing-to-specs` recheck moves parts of a Decided, not built yet block up to Confirmed once the code or the environment shows them.
-
-## 1.180.0 (2026-11-17)
-
-Fixes from a live session review. One shared module now decides a task's state, the ready check no longer hides a merge deadlock or a built-and-waiting task, the merge list follows the plan, tighten-plan's ending names the ready check, and owner names are cleaned where they are stored. Snapshot spec folders and an invariant checker guard the ready check's output.
-
-- **One owner for a task's state.** `task_state.py` (in `crav1-tasks-ready-to-build/scripts/`) says whether a task is done, tick pending, waiting for a merge or open. The build map takes each task's state and each box colour from it (`apply_task_states`, `box_state`), the ready check stamps the same state on its rows, verify's tick uses it, and finalize-commit runs `scripts/task_state.py commit-check` (a thin wrapper) for the merged-but-not-ticked decision, so a task recorded merged on the host is no longer done in one place and unticked in another. Tests check all three agree on the snapshot folders.
-- **Claimed rows keep their order.** `claims.py preserve --write` put claimed rows back in the `claims.md` order, moving rows in `tasks.md`. They now keep their file order, and the file keeps its line endings.
-- **The merge list follows the plan.** An unfinished task on a pull request's own branch now counts toward that pull request's order. A pull request whose branch still has an open task waiting on another pull request is listed after it, with `not ready to merge: T46 waits on T8 (PR 73)`.
-- **Tick pending is not a reason to stop.** Finalize-commit names a task recorded merged but not ticked, recommends `commit`, and puts the verify step (or the tick, once verify passes it) in Run next, all from `task_state.py commit-check`. Verify's tick offer is a labelled Run next step (`verify_rows.py tick`), never a line after the ending, and the `verify.md` template comment says so.
-- **Merge deadlocks are Blocked.** A task that waits on a task that ticks only when its own branch's pull request merges is shown as Blocked, red on the map, with `/crav1-tighten-plan` first in Run next, not as in progress.
-- **Built and waiting is waiting.** A task built by someone else and waiting for its pull request now holds its dependants the same way whichever file mentions it, and an unrecognized blocker is counted as Blocked and printed instead of dropped.
-- **Tighten-plan ends with the ready check.** With no plan issue left, Run next names `/crav1-tasks-ready-to-build <slug>`, never `/crav1-build-tasks`, and uncommitted files are committed first inside Run next.
-- **Smaller fixes.** A reopened step's reason names only the sections that can reopen it (not Match or In the code). The map is written before uncommitted files are counted, and the line reads `Commit the <n> changed spec files:`. Held lines name every unfinished dependency, held ones first, then `and T8 (not built)`.
-- **Owner names.** A leading word such as `Admin` and a trailing `(...)` tag are dropped when a name is written and when it is read, two spellings of one person are listed once, stored `PR author:` lines are rewritten once, and the ready check's reply ends with a `Recorded:` line naming the files it wrote.
-- **Snapshots and invariants.** `scripts/snapshot-check.py` runs the ready check on anonymised spec folders under `scripts/tests/snapshots/` and compares the reply, the map and the build-progress files with the expected ones (`--update` rewrites them). `task_invariants.py` checks that counts add up, nothing Blocked is hidden, a ticked task is never ready, the merge list keeps its order, deadlocks name the plan fix, no `Next:` line appears, and no owner name keeps its extras.
 
 The newest 15 releases are above. The full changelog is https://github.com/Crav1on/crav1-spec-kit/blob/main/CHANGELOG.md.

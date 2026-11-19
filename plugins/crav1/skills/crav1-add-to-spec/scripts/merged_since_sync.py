@@ -4,12 +4,16 @@
 One shared check for the tighten-and-plan walk start, /crav1-pr-status, the
 specs sweep and the kit merge paths (/crav1-build-walk, /crav1-merge-pr).
 
-    merged_since_sync.py check --spec <spec.md> --code-repo <checkout> [--base <ref>] [--pr N] [--headless]
+    merged_since_sync.py check --spec <spec.md> --code-repo <checkout> [--base <ref>] [--repos <repos.md>] [--pr N] [--headless]
     merged_since_sync.py stamp --spec <spec.md> --repo <repo> --branch <branch> --base <name> --merge <sha> --date <YYYY-MM-DD> [--yes]
 
 `check` reads refs on disk only (no fetch) and writes nothing. The base is
-`--base`, else the default branch: origin/HEAD, then origin/main, then
-origin/master (the same order as design_run.py's default_branch). For each
+found per branch (1.195.0): `--base`; else that repo's `Merges into` cell in
+docs/system/repos.md (`--repos`, default next to the spec folder); else the
+spec's own `Synced at:` line on a base branch (develop, main, master) for
+that repo; else origin/develop when it exists; else the default branch:
+origin/HEAD, then origin/main, then origin/master (design_run.py's order).
+Each branch reports the base it was compared with. For each
 work-branch `Synced at:` line whose branch tip is merged into the base, it
 finds the merge commit and the commits after the recorded one. When the
 spec has not recorded them it returns ONE yes card. A headless run only
@@ -94,23 +98,80 @@ def branch_ref(repo: str, branch: str) -> str | None:
     return None
 
 
-def check(spec_text: str, repo: str, base: str | None = None, pr: str | None = None, headless: bool = False) -> dict:
+BASE_NAMES = ("develop", "main", "master")
+
+
+def merges_into(repos_text: str) -> dict:
+    """{repo: branch} from the repos.md table's `Merges into` column."""
+    out, head = {}, None
+    for line in (repos_text or "").splitlines():
+        if not line.strip().startswith("|"):
+            continue
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        if head is None:
+            head = [c.lower() for c in cells]
+            continue
+        if set("".join(cells)) <= set("-: "):
+            continue
+        row = dict(zip(head, cells))
+        name = (row.get("repo") or row.get("name") or "").strip("` ")
+        into = (row.get("merges into") or "").strip("` ")
+        if name and into:
+            out[name] = into
+    return out
+
+
+def resolve(repo: str, name: str) -> str:
+    for cand in (name, f"origin/{name}"):
+        if ref_ok(repo, cand):
+            return cand
+    return ""
+
+
+def base_for(repo: str, row: dict, rows: list[dict], base: str | None, into: dict) -> tuple[str, str, str]:
+    """(ref, source, reason) for one Synced at branch."""
     if base:
-        base_ref = base if ref_ok(repo, base) else (f"origin/{base}" if ref_ok(repo, f"origin/{base}") else "")
-        reason = "" if base_ref else f"base {base} not found in {repo}"
-    else:
-        base_ref, reason = default_branch(repo)
-    if not base_ref:
-        return {"ok": True, "status": "skipped", "reason": reason, "offer": None, "wrote": None}
-    base_name = short(base_ref)
+        ref = resolve(repo, base)
+        return ref, "--base", "" if ref else f"base {base} not found in {repo}"
+    name = row.get("repo") or ""
+    if name and into.get(name):
+        ref = resolve(repo, into[name])
+        if ref:
+            return ref, "repos.md Merges into", ""
+    for other in rows:
+        if other["branch"] in BASE_NAMES and (other.get("repo") or "") == name:
+            ref = resolve(repo, other["branch"])
+            if ref:
+                return ref, "Synced at", ""
+    if ref_ok(repo, "origin/develop"):
+        return "origin/develop", "develop fallback", ""
+    ref, reason = default_branch(repo)
+    return ref, "default branch", reason
+
+
+def check(spec_text: str, repo: str, base: str | None = None, pr: str | None = None, headless: bool = False,
+          repos_text: str = "") -> dict:
     rows = [m.groupdict() for m in SYNCED.finditer(spec_text)]
+    into = merges_into(repos_text)
     found = []
+    reasons = []
+    merged_before = False
     for row in rows:
-        if row["branch"] == base_name or "(dropped)" in (row["rest"] or ""):
+        if "(merged" in (row["rest"] or ""):
+            merged_before = True
+            continue
+        if "(dropped)" in (row["rest"] or ""):
+            continue
+        base_ref, source, reason = base_for(repo, row, rows, base, into)
+        if not base_ref:
+            reasons.append(reason)
+            continue
+        base_name = short(base_ref)
+        if row["branch"] == base_name or row["branch"] in BASE_NAMES:
             continue
         tip = branch_ref(repo, row["branch"])
         if not tip or not is_ancestor(repo, tip, base_ref):
-            found.append({"branch": row["branch"], "status": "not-merged"})
+            found.append({"branch": row["branch"], "status": "not-merged", "base": base_name, "base_from": source})
             continue
         merges = (git(repo, "rev-list", "--merges", "--ancestry-path", "--reverse", f"{tip}..{base_ref}") or "").split()
         merge = merges[0] if merges else (git(repo, "rev-parse", tip) or "")
@@ -122,13 +183,19 @@ def check(spec_text: str, repo: str, base: str | None = None, pr: str | None = N
         number = pr or (next(g for g in m.groups() if g) if m else None)
         status = "already-synced" if synced_after or not commits else "merged"
         found.append({"branch": row["branch"], "repo": row["repo"], "status": status, "merge": merge_short,
-                      "commits": len(commits), "pr": number, "synced": row["sha"]})
+                      "commits": len(commits), "pr": number, "synced": row["sha"], "base": base_name, "base_from": source})
     todo = [f for f in found if f["status"] == "merged"]
-    out = {"ok": True, "base": base_name, "branches": found, "wrote": None, "offer": None}
+    out = {"ok": True, "branches": found, "wrote": None, "offer": None}
+    if not found and reasons:
+        out.update({"status": "skipped", "reason": reasons[0]})
+        return out
     if not todo:
-        out["status"] = "already-synced" if any(f["status"] == "already-synced" for f in found) else "not-merged"
+        synced = merged_before or any(f["status"] == "already-synced" for f in found)
+        out["status"] = "already-synced" if synced else "not-merged"
         return out
     first = todo[0]
+    base_name = first["base"]
+    out["base"] = base_name
     who = f"PR {first['pr']}" if first["pr"] else first["branch"]
     noun = "commit" if first["commits"] == 1 else "commits"
     question = f"{who} merged at {first['merge']} with {first['commits']} {noun} the spec hasn't recorded. Take them in now?"
@@ -175,7 +242,8 @@ def main(argv: list[str] | None = None) -> int:
     c = sub.add_parser("check")
     c.add_argument("--spec", required=True)
     c.add_argument("--code-repo", required=True)
-    c.add_argument("--base")
+    c.add_argument("--base", help="compare every branch with this base; otherwise found per branch")
+    c.add_argument("--repos", help="docs/system/repos.md; default: next to the spec folder")
     c.add_argument("--pr")
     c.add_argument("--headless", action="store_true", help="report only, no card")
     s = sub.add_parser("stamp")
@@ -192,7 +260,9 @@ def main(argv: list[str] | None = None) -> int:
         return emit({"ok": False, "error": "spec", "line": f"no spec file at {spec}"}, 1)
     text = spec.read_text(encoding="utf-8")
     if a.cmd == "check":
-        return emit(check(text, a.code_repo, a.base, a.pr, a.headless))
+        repos = Path(a.repos) if a.repos else spec.resolve().parent.parent.parent / "system" / "repos.md"
+        repos_text = repos.read_text(encoding="utf-8") if repos.is_file() else ""
+        return emit(check(text, a.code_repo, a.base, a.pr, a.headless, repos_text))
     if not SHA_RE.fullmatch(a.merge) or not DATE_RE.fullmatch(a.date):
         return emit({"ok": False, "error": "args", "line": "merge is a hex sha and date is YYYY-MM-DD"}, 1)
     new = stamp_text(text, a.repo, a.branch, a.base, a.merge, a.date)

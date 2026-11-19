@@ -32,7 +32,9 @@ Commands:
 <file> for queue and batch is JSON: a list of objects with id, issue,
 tag (plan or spec), status (open, patched, dropped, skipped, kept), and, for
 spec findings, kind (defect or question). Batch rows also need options and
-recommendation. One row may have "current": true.
+recommendation. One row may have "current": true. A plan row whose fix adds,
+removes or reorders tasks sets "changes_tasks": true; batch leaves it out of
+the card (its own card), and a card holds at most 8 rows (1.195.0).
 
 Usage: <interpreter> -X utf8 scripts/plan_check.py <command> ...
 On Windows the interpreter is python. Elsewhere python3, then py -3.
@@ -540,16 +542,37 @@ def queue(items: list[dict], root: Path | None, went_on: bool, uncommitted: int 
     return "\n".join(out) + "\n"
 
 
+BATCH_CAP = 8
+
+
+def _changes_tasks(item: dict) -> bool:
+    """A finding whose fix adds, removes or reorders tasks (1.195.0)."""
+    return str(item.get("changes_tasks", "")).lower() in ("true", "1", "yes")
+
+
 def batch(items: list[dict], title: str) -> str:
+    """At most 8 rows per card; task add/remove/reorder rows get their own card each (1.195.0)."""
+    open_rows = [i for i in items if i["tag"] == "plan" and i["status"] not in DONE]
+    own = [i["id"] for i in open_rows if _changes_tasks(i)]
+    batchable = [i for i in open_rows if not _changes_tasks(i)]
+    later = [i["id"] for i in batchable[BATCH_CAP:]]
     rows = [{k: i.get(k, "") for k in ("id", "issue", "options", "recommendation")}
-            for i in items if i["tag"] == "plan" and i["status"] not in DONE]
+            for i in batchable[:BATCH_CAP]]
     if not rows:
+        if own:
+            return ("No batch card: each of these adds, removes or reorders tasks, so each gets its own card: "
+                    + ", ".join(own) + ".\n")
         raise PlanCheckError("no open plan P#, so there is no batch card")
     bo = _batch_offer()
     try:
-        return bo.offer(title, rows)
+        text = bo.offer(title, rows)
     except bo.BatchOfferError as exc:
         raise PlanCheckError(str(exc)) from exc
+    if own:
+        text += "Not in this batch, each gets its own card (adds, removes or reorders tasks): " + ", ".join(own) + ".\n"
+    if later:
+        text += f"Not in this batch (at most {BATCH_CAP} per card), in the next card: " + ", ".join(later) + ".\n"
+    return text
 
 
 REVIEWED = re.compile(r"^(Reviewed:\s*[^,\n]+,\s*P#\s*open:\s*)(\d+)\s*$", re.M)

@@ -2591,10 +2591,12 @@ CHANGE_PLAIN = {
 }
 
 
-def reopen_card(step: str, drift: list[str], recommend_rerun: bool) -> dict:
+def reopen_card(step: str, drift: list[str], recommend_rerun: bool, stale_seen: bool = False) -> dict:
     """The clear-or-rerun card for one reopened step, in plain words (1.164.0).
 
     `rerun` jumps back to the step's skill; `nothing new` runs clear --yes.
+    1.195.0: when the walk saw anything stale (code drift, a merge since sync,
+    a stale research mark), rerun is recommended, never `nothing new`.
     """
     name = STEP_PLAIN.get(step, "this step")
     changes = [CHANGE_PLAIN[token] for token in drift if token in CHANGE_PLAIN] or ["a file changed"]
@@ -2609,9 +2611,10 @@ def reopen_card(step: str, drift: list[str], recommend_rerun: bool) -> dict:
         "label": f"Skip redoing {name}",
         "text": f"Keep {name} as done and go straight on, because the change does not affect it.",
     }
-    if recommend_rerun:
+    if recommend_rerun or stale_seen:
         rerun["label"] += " (Recommended)"
-        rerun["text"] += " Why: the change can affect it."
+        rerun["text"] += (" Why: this walk saw something stale, so the step may be out of date."
+                          if stale_seen and not recommend_rerun else " Why: the change can affect it.")
         options = [rerun, skip]
     else:
         skip["label"] += " (Recommended)"
@@ -6115,7 +6118,8 @@ def _readiness(args: argparse.Namespace) -> None:
         "resolve_waiting": resolve_waiting,
         "recommend_jump": bool(jump) and result == "not-ready",
         "reopen_cards": [
-            reopen_card(h["step"], h.get("changed") or [], bool(jump) and result == "not-ready")
+            reopen_card(h["step"], h.get("changed") or [], bool(jump) and result == "not-ready",
+                        bool(getattr(args, "stale_seen", False)))
             for h in hits if h.get("bucket") == "reopened" and h.get("step")
         ],
         "jump_back": jump,
@@ -6740,6 +6744,45 @@ def _git_lines(code_repo: str, *args: str) -> list[str] | None:
     return [line for line in done.stdout.decode("utf-8", "replace").splitlines() if line.strip()]
 
 
+def short_ref(ref: str | None) -> str:
+    return (ref or "").split("/", 1)[1] if (ref or "").startswith("origin/") else (ref or "")
+
+
+NOTE_COMMITS = re.compile(r"^commits:\s*\[(?P<list>[^\]]*)\]", re.M)
+
+
+def _recorded_shas(root: Path, spec: str) -> set[str]:
+    """Commits the specs repo already records (1.195.0): any sha in spec.md, and every note's commits: list."""
+    found = {m.group(0).lower() for m in SHA_TOKEN.finditer(spec)}
+    notes = root.resolve().parent.parent / "notes"
+    if notes.is_dir():
+        for path in notes.rglob("*.md"):
+            try:
+                text = path.read_text(encoding="utf-8")
+            except (OSError, UnicodeDecodeError):
+                continue
+            for m in NOTE_COMMITS.finditer(text):
+                found.update(x.strip().strip("'\"").lower() for x in m.group("list").split(",") if x.strip())
+    return {x for x in found if len(x) >= 7}
+
+
+def _recorded(sha: str, known: set[str]) -> bool:
+    sha = sha.lower()
+    return any(sha.startswith(k) or k.startswith(sha) for k in known)
+
+
+def _drift_base(code_repo: str, row: dict, synced: list[dict], base: str | None) -> str | None:
+    """The branch a work branch merges into: --base, a Synced at base line, origin/develop, origin/main, origin/master."""
+    names = [base] if base else []
+    names += [r["branch"] for r in synced if r["branch"] in ("develop", "main", "master") and r is not row]
+    names += ["develop", "main", "master"]
+    for name in names:
+        for cand in (f"origin/{name}", name):
+            if _git_lines(code_repo, "rev-parse", "--verify", "--quiet", cand) is not None:
+                return cand
+    return None
+
+
 def code_drift(args: argparse.Namespace) -> None:
     """Is the spec's record behind the code (1.194.0)? Read-only, no fetch.
 
@@ -6755,6 +6798,7 @@ def code_drift(args: argparse.Namespace) -> None:
         fail("root", f"no spec.md in {root}")
     spec = spec_path.read_text(encoding="utf-8")
     synced = [m.groupdict() for m in SYNCED_LINE.finditer(spec)]
+    known = _recorded_shas(root, spec)
     behind = []
     for row in synced:
         if args.branch and row["branch"] != args.branch:
@@ -6766,10 +6810,21 @@ def code_drift(args: argparse.Namespace) -> None:
                 break
         if not ref:
             continue
-        commits = _git_lines(args.code_repo, "log", "--format=%h %s", f"{row['sha']}..{ref}") or []
-        if commits:
-            behind.append({"branch": row["branch"], "synced": row["sha"], "ref": ref,
-                           "count": len(commits), "commits": commits[:5]})
+        allc = _git_lines(args.code_repo, "log", "--format=%h %s", f"{row['sha']}..{ref}") or []
+        base_ref = _drift_base(args.code_repo, row, synced, args.base)
+        own = allc
+        if base_ref and base_ref != ref and row["branch"] not in ("develop", "main", "master"):
+            own = _git_lines(args.code_repo, "log", "--format=%h %s", f"{row['sha']}..{ref}", f"^{base_ref}") or []
+            # A merge commit that brings the base in is a base merge-in, not the branch's own work.
+            ins = set(_git_lines(args.code_repo, "log", "--merges", "--format=%h", f"{row['sha']}..{ref}", f"^{base_ref}") or [])
+            ins = {h for h in ins if _git_lines(args.code_repo, "merge-base", "--is-ancestor", f"{h}^2", base_ref) is not None}
+            own = [c for c in own if c.split()[0] not in ins]
+        merged_in = len(allc) - len(own)
+        new = [c for c in own if not _recorded(c.split()[0], known)]
+        if new:
+            behind.append({"branch": row["branch"], "synced": row["sha"], "ref": ref, "base": base_ref,
+                           "count": len(new), "total": len(allc), "already_recorded": len(own) - len(new),
+                           "base_merge_ins": merged_in, "commits": new[:5]})
     merged = None
     if args.merged:
         sha = args.merged.lower()
@@ -6783,7 +6838,9 @@ def code_drift(args: argparse.Namespace) -> None:
         return
     target = args.branch or (behind[0]["branch"] if behind else None)
     command = add_to_spec_command("", args.pr, target)
-    parts = [f"{b['count']} commit{'s' if b['count'] != 1 else ''} on {b['branch']} after Synced at {b['synced']}" for b in behind]
+    parts = [f"{b['count']} commit{'s' if b['count'] != 1 else ''} on {b['branch']} after Synced at {b['synced']} not recorded yet"
+             + (f" ({b['already_recorded'] + b['base_merge_ins']} more already recorded or merged in from {short_ref(b['base'])})"
+                if b['already_recorded'] + b['base_merge_ins'] else "") for b in behind]
     if merged:
         parts.append(f"PR {args.pr} merged at {merged['sha']}" if args.pr else f"a merge at {merged['sha']}")
     what = "; ".join(parts)
@@ -7771,6 +7828,7 @@ def main(argv: list[str] | None = None) -> None:
     d.add_argument("--skip-sync", action="store_true", help="Skip the fetch. Tests and an already-fetched copy.")
     d.add_argument("--user", default=None, help="Claim owner that is you. Default: git config user.name in the specs repo (1.160.0).")
     d.add_argument("--branch", default=None, help="The branch being walked. Your claim counts as yours only on this branch when given (1.160.0).")
+    d.add_argument("--stale-seen", action="store_true", help="This walk saw something stale (code-drift behind, a merge since sync, a stale mark): reopen cards recommend rerun (1.195.0).")
     d.set_defaults(func=readiness)
 
     u = sub.add_parser("unlinked")
@@ -7810,6 +7868,7 @@ def main(argv: list[str] | None = None) -> None:
     cdr.add_argument("--root", required=True)
     cdr.add_argument("--code-repo", required=True, help="the code checkout; refs on disk, no fetch")
     cdr.add_argument("--branch", help="only this Synced at branch")
+    cdr.add_argument("--base", help="the branch work merges into (repos.md Merges into); commits merged in from it are not counted")
     cdr.add_argument("--pr", help="the merged pull request, e.g. 73")
     cdr.add_argument("--merged", help="its merge commit, when the walk already saw it merged")
     cdr.set_defaults(func=code_drift)

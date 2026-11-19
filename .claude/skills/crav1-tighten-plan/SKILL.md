@@ -85,6 +85,8 @@ Do **not** patch. Stay on this `P#`. Follow `references/issues.md` ("When they p
 3. If `export/openspec/design.md` or `tasks.md` exist, update them to **match** (same tasks, no extra scope) when the resolution changed tasks.
 4. Run `reviewed` when the `Reviewed:` line applies (`references/issues.md`, "Reviewed line"). Advance to the next unanswered `P#`. If none remain, print the `queue` output.
 
+Batch cap: 8; task changes get own cards ([issues.md](references/issues.md)).
+
 **Batch (1.145.0).** Follow **Batch of several items** in `crav1-docs/reference/question-cards.md` before this card. Print the findings table in this reply, then ask: the `batch` command prints the table and the `Card:` line together. The card names each item and its recommendation, for example `P4 tasks miss the 400 path: A add a test`. Never write `table above` unless that table is in this reply. Never ask the card without the table. `yes (Recommended)` applies every recommendation. The card's free-text answer carries the hint `Type your changes, e.g. P1 A, P3 keep`. An item that answer does not mention keeps its recommendation. One issue at a time still works. Then patch, and give one recap for the run.
 
 ## Resolution catalog (per plan issue)

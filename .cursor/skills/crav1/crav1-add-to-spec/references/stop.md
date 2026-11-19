@@ -27,5 +27,15 @@ Tighten the spec:
 `/crav1-tighten-spec <slug>`
 ```
 
+- The spec has an open walk the edit reopened (1.195.0): `walk-progress.md` is beside the spec and records a step whose section this edit changed, as `references/section-reopen.md` in `crav1-tighten-and-plan-ready-to-build` says. Then the reason is `The new information reopened the walk.`, the label `Resume the spec walk:`, and the command `/crav1-tighten-and-plan-ready-to-build <slug>`, instead of tighten-spec.
+
+```text
+Run next:
+The new information reopened the walk.
+
+Resume the spec walk:
+`/crav1-tighten-and-plan-ready-to-build orders-api`
+```
+
 - No existing spec changed: `Run next: nothing needed now.`
 - Never write a `Next:` line (1.193.0).

@@ -56,3 +56,7 @@ When `## Linter` says this repo has no linter or checker for the code the tasks 
 ## When they pick `suggest`
 
 Do **not** patch. Stay on this `P#`. Name the letter you would pick and why (2–4 sentences). Re-offer the same patch letters, with the suggested one first and its label ending in ` (Recommended)` (letters do not change). At most **one** alternate suggestion, then they must pick a patch letter, `ask`, `keep`, or `send-to-spec`.
+
+## Batch size
+
+1.195.0. A batch card holds at most 8 findings; with more, the `batch` command prints the first 8 and names the rest for the next card, paced as `crav1-tighten-spec/references/pacing.md` does. A finding whose fix adds, removes or reorders tasks (a new `T#`, a dropped task, a moved dependency) sets `changes_tasks` in the items file and never goes in a yes-to-all card; it gets its own card, one at a time.

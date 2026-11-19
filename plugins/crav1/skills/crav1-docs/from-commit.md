@@ -123,3 +123,5 @@ Since 1.173.0 every finalize-commit ending is Run next or nothing: `commit`, `co
 Since 1.176.0 a pull request description from `/crav1-open-pr`, on GitHub and on Azure DevOps, is a short fixed shape: a 2–3 sentence summary of what the branch delivers, one line per task with its full name and what it does, one or two lines on how it was verified, and the work-item mention. It has no links at all, not to the spec and not to code, and no per-file detail or walk recap; that detail lives in the commit messages. On Azure DevOps `pr_common.py fit --body <file> --text` is only a guard for the 4,000-character limit: when a body is still too long it shortens the task lines and adds the plain line `Task lines were shortened to fit.`
 
 Since 1.182.0 a teammate whose repo already has `.githooks/commit-msg` but whose git config does not point at it is asked in the same choices prompt, `turn-on-hook` or `skip-hook`, before `git config core.hooksPath .githooks` runs. The config is never changed silently.
+
+Since 1.195.0 every Run next example starts with its reason line, for example `The commit is only local.` above `Push the specs repo:` and `git push`.

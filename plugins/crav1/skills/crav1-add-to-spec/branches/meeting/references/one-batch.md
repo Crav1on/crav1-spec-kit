@@ -1,12 +1,18 @@
-# Meeting to specs: **In one batch (1.70.0)**, **Keep**, **Answer**, **Leave**, **Dismiss**
+# Meeting to specs: **In one batch (1.70.0)**, **Keep**, **Save for later**, **Answer**, **Leave**, **Dismiss**
 
 Part of `branches/meeting/BRANCH.md`, read only when that file sends you here. Moved word for word in 1.107.0; the rules are unchanged. Paths in backticks are relative to the skill folder.
 
 ## In one batch (1.70.0)
 
-Ask about every item in one questions call, one question per item; a single `yes` takes the recommended option for every item. Use the questions tool when it is available. The question text names the item and the spec when one fits, then the same `State` line that is on the item. It does not say `Recommendation:`. Each question names that item. Do not replace them with one card that says `table above`. If one card covers every item, follow **Batch of several items** in `crav1-docs/reference/question-cards.md`. Print the findings table in this reply, then ask. The card names each item and its recommendation, for example `P4 tasks miss the 400 path: A add a test`. Never write `table above` unless that table is in this reply. Never ask the card without the table. The options are only these three. The recommended one comes first with ` (Recommended)` at the end of its label; the others keep this order:
+How many cards depends on the count (1.195.0, one rule):
+
+- **One to four items:** one questions call, one question per item. A single `yes` takes the recommended option for every item.
+- **More than four items:** always the batch card, **Batch of several items** in `crav1-docs/reference/question-cards.md` (`scripts/batch_offer.py` in `crav1-tighten-plan` builds it). Never one question per item for more than four.
+
+Use the questions tool when it is available. For one question per item, the question text names the item and the spec when one fits, then the same `State` line that is on the item. It does not say `Recommendation:`. Each question names that item. For the batch card, print the findings table in this reply, then ask. The card names each item and its recommendation, for example `P4 tasks miss the 400 path: A add a test`. Never write `table above` unless that table is in this reply. Never ask the card without the table. The options are only these four. The recommended one comes first with ` (Recommended)` at the end of its label; the others keep this order:
 
 - **Keep**
+- **Save for later** (linked to a spec, or general workflow info)
 - **Leave**
 - **Dismiss**
 
@@ -15,19 +21,25 @@ M1: dev and prod containers. Add this to <slug>?
 State: partly built. Dev container done (task 4 checked); prod not in tasks.md.
 ```
 
-Options: **Keep (Recommended)**, Leave, Dismiss.
+Options: **Keep (Recommended)**, Save for later, Leave, Dismiss.
 
 ```text
 M1: source-to-target mapping of the SQL tables. No spec fits.
 ```
 
-Options: **Leave (Recommended)**, Keep, Dismiss. Left, it stays in the full note.
+Options: **Leave (Recommended)**, Keep, Save for later, Dismiss. Left, it stays in the full note.
 
-When `Fits` is `none`, the question has no `State` line. The options stay Keep, Leave, and Dismiss.
+```text
+M3: the team now reviews pull requests on Fridays. No spec fits.
+```
+
+Options: **Save for later (Recommended)**, Keep, Leave, Dismiss. Team-workflow information that fits no spec is saved as `general`.
+
+When `Fits` is `none`, the question has no `State` line. The options stay Keep, Save for later, Leave, and Dismiss.
 
 Stop until the user answers. Do not write before that reply. Then apply the answered items in order.
 
-A batch (`M1 keep, M2 leave`) applies only the items named in that batch, in order. An item with no mark stays unanswered. Do not treat silence as dismiss. When a keep needs a further question, ask that question and do not apply the rest of the batch in that turn.
+A batch (`M1 keep, M2 later, M3 leave`) applies only the items named in that batch, in order. An item with no mark stays unanswered. Do not treat silence as dismiss. When a keep needs a further question, ask that question and do not apply the rest of the batch in that turn.
 
 ### Keep
 
@@ -56,6 +68,16 @@ When a later keep brings the new-feature count to two or more, the next command 
 An `answer` item is not asked. When this source is not yet imported, follow the imported-sources convention first, exactly as for a kept addition. Then hand it to the fact branch of `/crav1-add-to-spec` for that slug. Follow only the handoff **From an import: answer links and asked marks** in that skill. Pass the question, the quote after any redaction, who answered, the kind, the date, and the source folder. Pass the `Asked in this <kind>` lines for that spec in the same handoff. When a spec has only asked lines and no answer, hand those lines alone. They do not need a source folder. Do not write the spec in this skill. When the answer would change a spec line, name `/crav1-resolve-open-questions` for that slug. Do not run it.
 
 When the imported-sources check asks a question, that question is this turn. Then continue with the next item.
+
+### Save for later
+
+For an item that is not for this spec now, but belongs with a spec later, or general team-workflow information (who reviews when, how the team works). The full note already holds the quote; nothing goes into any spec.
+
+- When a spec fits, ask which spec it is saved for only when more than one fits (options only, one per candidate, at most four). Add that slug to the note's `later_for:` list, for example `later_for: [orders-api]`.
+- When no spec fits, or the item is about how the team works, add `general`: `later_for: [general]`.
+- Never put it in `waiting_for`. `waiting_for` is only for a parked spec (a spec with a `Parked:` line), as `references/notes.md` in `crav1-add-to-spec` says.
+
+The listings show it: `/crav1-help` lists notes saved for later, `/crav1-tighten-spec <slug>` lists the notes saved for later on that spec, and `/crav1-show-or-ask-open-questions` and `/crav1-retire-spec` read `later_for` as linked notes, not as waiting input. Run `notes_index.py later` with `--slug <slug>` (or `--slug general`) in the `crav1-add-to-spec` skill folder to list them; see `crav1-docs/reference/running-scripts.md`.
 
 ### Leave
 

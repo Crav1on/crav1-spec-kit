@@ -7,11 +7,12 @@
 5. Show the new hash, subject, and `git status` short result.
 5a. **Fetch and check (1.81.0, 1.123.0, stamp conflicts 1.139.0, build progress 1.142.0).** Fetch. When behind the upstream, merge with `git pull --no-rebase --no-commit` (no auto-commit, no rebase) and resolve kit-file conflicts by the kit's rules. A `walk-progress.md` conflict that is only version lines is settled in that same merge. A `build-progress` file that is only hash lines is settled the same way. A notes index rebuild goes into that same merge commit. This run makes at most two commits: the drafted commit, and that merge commit. Otherwise check any unpushed merge for lines either side added that the merge dropped. Read [references/pull.md](pull.md) for both. Never push; the Run next in step 7 names the push.
 6. If the message has any line that was **not** in the draft (a `Co-authored-by`, `Signed-off-by`, `Generated with` or other trailer from Cursor, Claude Code or another tool), read [references/added-lines.md](added-lines.md).
-7. After the commit message is settled (including a one-time strip of added lines), end with Run next, never a `Next:` line (1.171.0). Each label is on its own line above its command, and each command is alone in its code span. An unfinished specify walk comes first. An unfinished build-progress file for this branch comes first too. A failed commit has no Run next.
+7. After the commit message is settled (including a one-time strip of added lines), end with Run next, never a `Next:` line (1.171.0). Run next starts with one reason line, then each label on its own line above its command, and each command alone in its code span (reason line 1.195.0). An unfinished specify walk comes first. An unfinished build-progress file for this branch comes first too. A failed commit has no Run next.
 
    On a base branch or in the specs repo (a pull request cannot open from that branch into itself):
 
    Run next:
+   The commit is only local.
 
    Push the specs repo:
    `git push`
@@ -19,6 +20,7 @@
    Unfinished build walk on this branch: a Run next entry, not a `Next:` line (1.157.0). The command resumes that walk: the branch for a `Run: whole branch` file, otherwise the file's first unticked `T#`.
 
    Run next:
+   The build walk on this branch is not finished.
 
    Continue the build walk on feat/orders-cicd:
    `/crav1-build-walk orders-api feat/orders-cicd`
@@ -26,6 +28,7 @@
    On a feature branch with no unfinished walk and no pull request yet:
 
    Run next:
+   The commit is only local and no pull request is open.
 
    Push and open the pull request:
    `/crav1-open-pr`
@@ -33,6 +36,7 @@
    When a pull request is already open:
 
    Run next:
+   PR <n> does not have this commit yet.
 
    Push to PR <n> and comment:
    `/crav1-open-pr pr<n>`

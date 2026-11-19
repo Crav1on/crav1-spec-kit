@@ -14,7 +14,7 @@ While parked:
 
 ## Un-park
 
-1. Find every note in `docs/notes/` (month folders and their generated indexes) with the slug in `waiting_for`, or an old `Waiting for <slug> (parked)` line.
+1. Find every note in `docs/notes/` (month folders and their generated indexes) with the slug in `waiting_for`, or an old `Waiting for <slug> (parked)` line. Notes with the slug in `later_for` (saved for later, 1.195.0) are listed too, as `saved for later`, but stay in `later_for`.
 2. Read each waiting note in full. Suggest what fits the spec now, including points that already went to other specs, when they matter to this one too. Match each point against every active spec as well, and say when another spec is now the better fit.
 3. Show the summary: the `Parked:` line removed, each point to add, and each note that gets `Used by <slug>`.
 4. On yes: remove the `Parked:` line, add the chosen points through the same rules as `/crav1-add-to-spec`, and on each waiting note move the slug from `waiting_for` to `used_by` (an old line becomes `Used by <slug>`). Run the notes index generator; do not hand-edit an index.
