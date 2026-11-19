@@ -1101,6 +1101,21 @@ marks:
     mention: 'waiting_for'
     since: 1.61.0
 
+  - id: note-later-for
+    name: "later_for"
+    group: notes
+    files: ["docs/notes/YYYY-MM/<note>.md (front matter)"]
+    format: "later_for: [<slug or general>]"
+    pattern: '^later_for: \[([a-z0-9-]+(, [a-z0-9-]+)*)?\]$'
+    examples:
+      - "later_for: [orders-api]"
+      - "later_for: [general]"
+    meaning: "Specs (or general team workflow) an item was saved for later on; never a parked spec's waiting list."
+    written_by: [crav1-add-to-spec]
+    read_by: [crav1-help, crav1-tighten-spec, crav1-show-or-ask-open-questions, crav1-retire-spec]
+    mention: 'later_for'
+    since: 1.195.0
+
   - id: note-converted
     name: "Converted from spec"
     group: notes

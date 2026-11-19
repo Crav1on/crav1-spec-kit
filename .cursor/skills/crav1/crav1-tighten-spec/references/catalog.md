@@ -18,7 +18,10 @@ Pick the ones that fit; rewrite names to the actual REQ/ADR.
 | `keep` | Keep as written | Explicitly accept the current text. Say the cost (usually untestable or blurred layers). | No disk change. Use rarely; call out the cost. |
 | `suggest` | Get a suggestion | Recommend one of the patch letters already offered, with a short why. No edits. Re-offer the same menu. | Stay on this `I#` until they pick a real resolution. Always offer this. |
 | `ask` | Ask, don’t patch | Ask at most 3 questions **about this issue**. No file edits. | Next turn retries this `I#` with answers. |
+| `tick-from-verify` | Tick from a verify pass (1.195.0) | Only when `verify.md` has a passing row for this acceptance line on the base branch. Quote that row (task, status, evidence) on the card. Tick only that acceptance box. | `spec.md` that one checkbox. The only way this skill ticks acceptance. |
 | `sync-here` | Sync this artifact | Update the diagram/ADR/export that this issue names so it matches `spec.md`. Does not change product intent. | Only the named files. |
+
+**Whether and sources (1.195.0).** A finding that asks whether something is so, with no source that decides it, is recommended `ask` or `keep`. A patch that contradicts a source line quotes that line and is never the recommended option; `ask` or `keep` is always listed for that item, on one card or in a batch.
 
 Do **not** offer a turn-level `apply-notes` that applies the whole architecture review. Each reviewer bullet is its own `I#`.
 

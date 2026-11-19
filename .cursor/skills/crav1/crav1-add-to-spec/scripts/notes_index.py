@@ -83,6 +83,7 @@ def read_note(path):
         title = m.group(1).strip() if m else path.stem
     used = parse_list(meta.get("used_by", ""))
     waiting = parse_list(meta.get("waiting_for", ""))
+    later = parse_list(meta.get("later_for", ""))
     absorbed = []
     for m in re.finditer(r"^(Used by|Absorbed by|Waiting for) ([\w.-]+)", body, re.M):
         kind, slug = m.group(1), m.group(2)
@@ -103,7 +104,7 @@ def read_note(path):
         "path": path, "title": title, "kind": meta.get("kind", ""),
         "source": meta.get("source", "").strip("'\""), "date": sd or imported,
         "dated": bool(sd), "imported": imported, "used_by": used,
-        "waiting_for": waiting, "absorbed": absorbed,
+        "waiting_for": waiting, "absorbed": absorbed, "later_for": later,
     }
 
 
@@ -508,9 +509,24 @@ def selftest():
     return 0
 
 
+def later(root: Path, slug: str) -> int:
+    """Notes saved for later on a spec (`later_for: [<slug>]`), or `general` workflow info (1.195.0). Read-only."""
+    rows = []
+    notes = root / "docs" / "notes"
+    for n in (read_note(f) for f in (note_files(notes) if notes.is_dir() else [])):
+        if slug in n["later_for"]:
+            rel = n["path"].relative_to(root).as_posix()
+            rows.append(f"- {n['date'] or 'no date'} [{n['title']}]({rel})")
+    print(f"Saved for later on {slug}: {len(rows)}")
+    for row in rows:
+        print(row)
+    return 0
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("command", nargs="?", choices=["build", "migrate", "migrate-dry-run"], default="build")
+    ap.add_argument("command", nargs="?", choices=["build", "migrate", "migrate-dry-run", "later"], default="build")
+    ap.add_argument("--slug", help="later: the spec slug, or general")
     ap.add_argument("--check", action="store_true")
     ap.add_argument("--root", default=".")
     ap.add_argument("--selftest", action="store_true")
@@ -518,6 +534,11 @@ def main():
     if a.selftest:
         return selftest()
     root = Path(a.root).resolve()
+    if a.command == "later":
+        if not a.slug:
+            print("later needs --slug <spec slug or general>")
+            return 2
+        return later(root, a.slug)
     if a.command in ("migrate", "migrate-dry-run"):
         return migrate(root, dry_run=a.command == "migrate-dry-run")
     return build(root, a.check)

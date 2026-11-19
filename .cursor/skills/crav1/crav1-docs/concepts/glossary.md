@@ -159,6 +159,8 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 
 **Waiting note.** A note in `docs/notes/YYYY-MM/` with the slug in `waiting_for`: the full input that matched a parked spec. Never absorbed; it stays the shared full source and `Used by` grows as specs use it.
 
+**Saved for later.** A note with a slug in `later_for`: a meeting item kept for a spec later, or `general` for team-workflow information (1.195.0). Nothing is written into the spec; it is not a waiting note, which is only for a parked spec.
+
 **Technology notes.** A `## Technology notes` section in a spec's `notes.md` (or `docs/architecture/notes.md`) with dated `### <technology> (YYYY-MM-DD)` entries that `/crav1-explain-tech` appends only on `save` (1.192.0): the short explanation and links to where the specs use it.
 
 **Saved explanation.** The optional `explain-this-code-<target>-<date>.md` that `/crav1-explain-this-code` writes when the user says yes to Save as .md: in the Downloads folder by default, or a path the user names, never into the repo by default. Its header names the paths covered and `<branch>@<short sha>`. Not a note: the kit never reads or indexes it.

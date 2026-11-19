@@ -118,6 +118,8 @@ Card: Skip redoing the plan review?
 - **Skip redoing the plan review (Recommended)** (`nothing new`): keep the plan review as done and go straight on to the ready check. Why: only branch tags were added to three tasks; no task text changed.
 - **Redo the plan review** (`rerun`): run the plan review again on the current files, then the walk goes on.
 
+**Stale seen (1.195.0).** When this walk saw anything stale (merged-since-sync offered `take-in`, code-drift was `behind`, or a stale research mark), run `readiness` with `--stale-seen`: every reopen card then recommends `rerun`, never `nothing new`.
+
 The background names the change in plain words, for example `The plan review only reopened because three tasks got a branch tag.` Never put stamps, `Done`, `Result`, step ids, or a command in the card.
 
 `clear --step <id> --yes` refreshes one reopened step after the user says `nothing new`. `Done` and `Result` stay. Other steps stay as they are. That is the path when a reopened step has nothing new. Do not record `nothing-to-do` over it. A `nothing-to-do` record keeps an earlier `done` Result.

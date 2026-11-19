@@ -4,7 +4,7 @@ Read this only for `auto-flow`, then [common.md](common.md). Do not open the man
 
 ## Start
 
-**Merged since sync (1.194.0).** For each spec the run touches, run `scripts/merged_since_sync.py check --spec <spec.md> --code-repo <code checkout>` in `crav1-add-to-spec` (the one shared check), as `crav1-docs/reference/running-scripts.md` says. It reads refs on disk, compares each branch in the spec's `Synced at:` lines with the base (the default branch, as `design_run.py` finds it, or `--base`) and writes nothing. This run asks nothing: pass `--headless` and print its `report` line when `status` is `merged`. Nothing is written for it.
+**Merged since sync (1.194.0).** For each spec the run touches, run `scripts/merged_since_sync.py check --spec <spec.md> --code-repo <code checkout> --base <Merges into>` in `crav1-add-to-spec` (the one shared check), as `crav1-docs/reference/running-scripts.md` says. It reads refs on disk, compares each branch in the spec's `Synced at:` lines with that branch's base, found per branch (1.195.0): `--base`, which callers pass as the repo's `Merges into` branch from `docs/system/repos.md` when it names one (leave `--base` out otherwise), then that `Merges into` column, then the base branch's own `Synced at` line, then `origin/develop`, then the default branch and writes nothing. This run asks nothing: pass `--headless` and print its `report` line when `status` is `merged`. Nothing is written for it.
 
 No fetch question. No specs-repo question. The specs repo stays out unless the invocation named that row. Naming it reads its pull request comments and never its branches.
 

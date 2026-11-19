@@ -74,6 +74,8 @@ Every option: **letter**, **name**, **what changes**, **impact** (who/v0/tests, 
 
 Offer **2–4** mutually exclusive **patch** resolutions, then **`suggest`**. Add `ask` / `keep` only when they fit. `suggest` does not count toward the 2–4.
 
+**Whether, and sources (1.195.0).** When the finding asks *whether* something is so (a reviewer question such as "say whether DEV gets the new hostname") and no spec line, note, or dated source decides it, the recommended option is `ask` (an open question to the named owner) or `keep`, never a patch that makes the decision. When a patch would contradict a source line (a dated meeting line, a note, an ADR), the card quotes that line next to the patch, and that patch is never the recommended option. Such an item always lists `ask` or `keep`, also on the batch card.
+
 4. How to answer: `A` / `B` / … for this issue, or a batch: `I1 A, I3 C, I4 D`. On the batch card that line is the free-text answer, not its own option. Unmentioned issues stay for later.
 
 Stop. Do not edit. Do not preview a full patched spec.
@@ -91,7 +93,7 @@ Read `references/catalog.md` ("When they pick `suggest`") only when the user pic
 3. If acceptance is still mushy on *this* issue and they did not choose `make-testable`, say so — do not silently rewrite.
 4. Advance to the next unanswered issue (same format). If none remain, run the tight-enough checklist.
 
-**Batch (1.145.0).** When there are 8 or fewer issues, one question card for the whole list. Follow **Batch of several items** in `crav1-docs/reference/question-cards.md` before this card. Print the findings table in this reply, then ask. The card names each item and its recommendation, for example `P4 tasks miss the 400 path: A add a test`. Never write `table above` unless that table is in this reply. Never ask the card without the table. `yes (Recommended)` applies every recommendation. The card's free-text answer carries the hint `Type your changes, e.g. I1 B, I3 keep`. An item that answer does not mention keeps its recommendation. One issue at a time still works. Then patch, and give one recap for the run.
+**Batch (1.145.0).** When there are 8 or fewer issues, one question card for the whole list. A whether-item with no deciding source (above) is recommended `ask` or `keep` on the card too. Follow **Batch of several items** in `crav1-docs/reference/question-cards.md` before this card. Print the findings table in this reply, then ask. The card names each item and its recommendation, for example `P4 tasks miss the 400 path: A add a test`. Never write `table above` unless that table is in this reply. Never ask the card without the table. `yes (Recommended)` applies every recommendation. The card's free-text answer carries the hint `Type your changes, e.g. I1 B, I3 keep`. An item that answer does not mention keeps its recommendation. One issue at a time still works. Then patch, and give one recap for the run.
 
 **Open questions (1.123.0).** An issue whose only work is an `Answered:` line, or that only repeats a question already under `## Open questions`, is not walked. One line, no menu: `Left for /crav1-resolve-open-questions: I3, I10.`
 
@@ -116,6 +118,8 @@ Read `references/notes.md` ("A quoted note") only when a fix quotes a note.
 - Do not patch “to be helpful” when they have not chosen a **patch** resolution (`suggest` is not a patch).
 - Do not silently rewrite the spec to match the code. Call the disagreement out.
 - Do not add finish the gap, add a verify test, or leave it. Those choices belong to `/crav1-plan-from-spec`.
+- Never tick a spec acceptance box (`- [ ]` to `- [x]`) except through the `tick-from-verify` resolution, which quotes the passing `verify.md` row (1.195.0). This skill owns that tick; `/crav1-verify-build-against-spec` only reports that the box is still open.
+- Notes saved for later on this spec (a note's `later_for` names the slug, 1.195.0) are listed once at the start as `Saved for later: <note>`; they are input to read, not issues by themselves. Run `notes_index.py later` with `--slug <slug>` in the `crav1-add-to-spec` skill folder (see `crav1-docs/reference/running-scripts.md`).
 
 ## When the spec is tight enough
 

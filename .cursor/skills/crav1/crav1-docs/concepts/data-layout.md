@@ -138,6 +138,7 @@ commits: []   # code change only (1.64.0)
 pr_note:      # code change or review-pr from a pull request (1.65.0)
 used_by: []
 waiting_for: []
+later_for: []   # saved for later on a spec, or general (1.195.0); written only when used
 ---
 # Title
 
@@ -150,7 +151,9 @@ Source date: YYYY-MM-DD. Imported: YYYY-MM-DD.
 
 **Duplicate check.** The same source again (the same mail, meeting date and title, file, or commit) is not written twice: the run says `already imported on <date> as <note>` and offers reuse (for specs that took nothing yet) or skip. The same point from a different source adds the new note as a second source on the existing spec line. A disagreement is written as a `**Conflict:**` line for the user to decide, never an overwrite; `/crav1-resolve-open-questions` settles it (1.111.0). Since 1.64.0 a code change is also matched commit by commit: the note's `commits:` list (or its `source` expanded with git) and `git patch-id` for the same change under another SHA. Commits already imported are left out, and a fully imported change takes the reuse-or-skip path.
 
-**Parked specs.** A parked spec gets nothing written; its slug goes in the note's `waiting_for` until `/crav1-retire-spec` un-parks it.
+**Parked specs.** A parked spec gets nothing written; its slug goes in the note's `waiting_for` until `/crav1-retire-spec` un-parks it. `waiting_for` holds parked slugs only.
+
+**Saved for later (1.195.0).** A meeting item saved for later adds a spec slug, or `general` for team-workflow information, to the note's `later_for`. Nothing is written into the spec. `/crav1-help`, `/crav1-tighten-spec`, `/crav1-show-or-ask-open-questions`, and `/crav1-retire-spec` list these notes as saved for later, never as waiting; `notes_index.py later --slug <slug>` lists them.
 
 **Older notes.** Notes from before 1.61.0 (flat in `docs/notes/`, no front matter, maybe `Absorbed by`) are still read; `Absorbed by` counts as used by. To move them, run `notes_index.py migrate-dry-run` first by hand (prints planned moves, source fills, and link rewrites; writes nothing), then the one-time move, `notes_index.py migrate` (1.62.0). It files notes by source date, fills `source` and `source_folder` from each note's `Source:` lines and list items (1.63.0: `source_folder` is the first `docs/sources/` path, `source` that line; empty when there is none, never guessed; `/crav1-add-to-spec` uses these for its already-imported check), rebases every relative link inside a moved note (folders, any file type, anchors) and rewrites every markdown link to a moved note anywhere in the repo, anchors kept, with correct relative paths and lists each changed file, and rebuilds the indexes. Re-running is safe. Old spec lines keep their source lines; nothing is backfilled. `/crav1-bundle-to-specs`, `/crav1-ideas-to-spec`, `/crav1-spark-to-spec`, `/crav1-tighten-spec`, and `/crav1-existing-to-specs` add their slug to `used_by` when they quote a note; `/crav1-ado-sync`, `/crav1-help`, and `/crav1-show-or-ask-open-questions` read the month folders and the generated indexes.
 
@@ -496,6 +499,7 @@ Every mark and line format the kit writes inside product files, generated from [
 | Posted comment source | `<Read from the PR thread: <url>. \| Pasted in chat. \| Posted from this review on the user's yes: <url>.> Draft compared: <YYYY-MM-DD \| none>. Description reviewed: as of <YYYY-MM-DD> (PR note).[ Verbatim except: <kind> removed.][ Edited on the host.]` | `docs/notes/YYYY-MM/YYYY-MM-DD-pr-<repo>-<n>.md` (first line under Comment as posted; the follow-ups note before 1.97.0) | `/crav1-review-pr` | `/crav1-review-pr` | 1.67.0 |
 | Not in the posted comment | `<bullet> (Not in the posted comment, <YYYY-MM-DD>; still open.)` | `docs/notes/YYYY-MM/review-pr-<n>-follow-ups.md` (end of a bullet, before 1.97.0) | — | `/crav1-review-pr` | 1.67.0 |
 | waiting_for | `waiting_for: [<parked slug>]` | `docs/notes/YYYY-MM/<note>.md` (front matter) | `/crav1-add-to-spec`, `/crav1-retire-spec` | `/crav1-help`, `/crav1-show-or-ask-open-questions`, `/crav1-ado-sync` | 1.61.0 |
+| later_for | `later_for: [<slug or general>]` | `docs/notes/YYYY-MM/<note>.md` (front matter) | `/crav1-add-to-spec` | `/crav1-help`, `/crav1-tighten-spec`, `/crav1-show-or-ask-open-questions`, `/crav1-retire-spec` | 1.195.0 |
 | Converted from spec | `Converted from spec, no research owner` | `docs/notes/YYYY-MM/<note>.md` (body, after the Source line) | `/crav1-retire-spec` | `/crav1-add-to-spec` | 1.60.0 |
 | Absorbed by / Used by (older notes) | `<Absorbed by \| Used by> <slug>` | `docs/notes/<note>.md` (before 1.61.0) | — | `/crav1-add-to-spec` | 1.36.0 |
 | (done in …) | `(done in <short sha>)` | `docs/notes/YYYY-MM/review-pr-<n>-follow-ups.md` (end of a follow-up, before 1.97.0) | — | `/crav1-add-to-spec` | 1.51.0 |

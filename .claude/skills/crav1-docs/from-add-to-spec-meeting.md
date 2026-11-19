@@ -82,4 +82,6 @@ One `Next:` line, the first case that applies, as [How a run ends](reference/run
 
 When a file changed: `Uncommitted: 1 file; commit with /crav1-finalize-commit when ready.` No push. This command does not commit.
 
+Since 1.195.0 each item has four choices: keep, save for later, leave, or dismiss. One to four items get one question each; more than four always get one batch card with the findings table. Save for later puts nothing in a spec: the note gets `later_for: [orders-api]`, or `later_for: [general]` for how the team works, and the help, tighten-spec, open-questions and retire listings show it as saved for later. `waiting_for` stays only for parked specs. The recap counts `Saved for later` instead of `Noted`. Run next names every changed spec: the first gets the command, the rest follow as `Also changed, not tightened: <slugs>.` When an edit reopens a spec's open walk, the command is `/crav1-tighten-and-plan-ready-to-build <slug>` with the reason `The new information reopened the walk.` A `.docx` summary is turned into text with `scripts/docx_to_md.py` (convert, then check word for word), no network.
+
 Reference page: [add-to-spec](reference/skills/crav1-add-to-spec.md)

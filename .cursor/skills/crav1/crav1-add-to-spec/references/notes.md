@@ -7,6 +7,7 @@ Every `/crav1-add-to-spec` input (fact, dump, code change, meeting) becomes **on
 - One input, one note. Do not split it. A meeting, a mail, a dump, a code change: the whole text (after the imported-sources redaction). A fact: the fact plus the passage around it, as the user gave it.
 - The note is the shared full source. It is **never absorbed**. Do not ask an absorb question. Do not write `Absorbed by`. `used_by` grows as specs take points from it.
 - There is no Note choice. Every input is noted, whatever happens to its points. An item that is left or dismissed stays in the full note; nothing extra is written for it.
+- **Save for later (1.195.0).** An item that belongs with a spec later, or general team-workflow information, adds that slug (or `general`) to the note's `later_for:` list, for example `later_for: [orders-api]`. Nothing goes into the spec. `later_for` is not `waiting_for`: `waiting_for` is only ever a parked spec's slug.
 - No "never used" flag. A note nobody has used yet is just a note.
 
 ## Where and named how
@@ -15,7 +16,7 @@ Every `/crav1-add-to-spec` input (fact, dump, code change, meeting) becomes **on
 
 ## Shape
 
-The shape is this skill's `assets/note.md` (same file as `docs/notes/_template/note.md`): front matter `title`, `kind`, `source`, `source_date`, `imported`, `source_folder` (when imported), `commits` (code changes only, 1.64.0), `pr_note` (code-change and review-pr notes that came from a pull request, 1.65.0), `used_by`, `waiting_for`; then the title, a `Source date: … Imported: …` line, and the full input verbatim.
+The shape is this skill's `assets/note.md` (same file as `docs/notes/_template/note.md`): front matter `title`, `kind`, `source`, `source_date`, `imported`, `source_folder` (when imported), `commits` (code changes only, 1.64.0), `pr_note` (code-change and review-pr notes that came from a pull request, 1.65.0), `used_by`, `waiting_for`, and `later_for` when an item was saved for later (1.195.0); then the title, a `Source date: … Imported: …` line, and the full input verbatim.
 
 `source` names the input so it can be recognised again: the mail's subject, sender, and sent date; the meeting date and title; the file path; the commit SHA or range.
 
@@ -53,7 +54,7 @@ Do not edit `docs/notes/index.md` or `docs/notes/YYYY-MM/index.md` by hand. Afte
 
 Each matching spec gets only its own short points, quoted as **Add to that spec.md** in `references/fact.md` says, each followed by `Full source: docs/notes/YYYY-MM/<file>.md`. Then add the slug to the note's `used_by`.
 
-A **parked** spec (a `Parked:` line) gets nothing written. Add its slug to the note's `waiting_for`. Say `saved as a note for <slug> (parked)`. Un-park is `/crav1-retire-spec`; it moves the slug from `waiting_for` to `used_by`.
+A **parked** spec (a `Parked:` line) gets nothing written. Add its slug to the note's `waiting_for`. Only a parked spec goes in `waiting_for`; an active spec that should take an item later goes in `later_for`. Say `saved as a note for <slug> (parked)`. Un-park is `/crav1-retire-spec`; it moves the slug from `waiting_for` to `used_by`.
 
 ## Duplicate check (before writing)
 
