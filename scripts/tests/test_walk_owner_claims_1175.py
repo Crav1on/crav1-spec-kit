@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -17,6 +18,15 @@ ROOT = Path(__file__).resolve().parents[2]
 SK = ROOT / ".cursor/skills/crav1"
 WALK = SK / "crav1-tighten-and-plan-ready-to-build/scripts/walk_progress.py"
 WHEN = "2026-11-13T10:00:00+01:00"
+
+
+def setUpModule():
+    # The claim in these fixtures is from 2026-11-16; pin now so its age never crosses the 3-day mark (1.193.0).
+    os.environ["CRAV1_NOW"] = "2026-11-17T12:00:00+00:00"
+
+
+def tearDownModule():
+    os.environ.pop("CRAV1_NOW", None)
 
 
 def load(path: Path, name: str):

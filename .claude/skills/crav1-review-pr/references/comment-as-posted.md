@@ -52,11 +52,11 @@ Use the signed-in `gh` or `az` session only, read-only. Never log in.
   - The signed-in user: `gh api user -q .login`.
   - Edited means `updated_at` is later than `created_at`, or the body differs from the saved text.
 - **Azure DevOps:**
-  - Threads, as `crav1-add-to-spec` `references/pr-threads.md` says (1.97.0): `az rest --method get --resource 499b84ac-1321-427f-aa17-267ca6975798 --uri "<org-url>/<project>/_apis/git/repositories/<repo>/pullRequests/<n>/threads?api-version=7.1"`.
+  - Threads: `scripts/ado_threads.py list --pr <n>` (the one way, 1.193.0; `crav1-add-to-spec` `references/pr-threads.md`). It gives each comment's `published` and `updated` dates.
   - A candidate is a comment with `commentType` `text` (not `system`) on a thread without `threadContext` (not inline). It is the first comment of a thread (a re-review posts a new thread since 1.171.0), or, on an older pull request, the user's reply in the thread of an earlier posted comment.
-  - Fields: `content`, `author.displayName`, `author.uniqueName`, `publishedDate`, `lastContentUpdatedDate`.
+  - Fields: `content`, `author`, `published`, `updated`.
   - The signed-in user: `az account show --query user.name`, compared with `uniqueName`.
-  - Edited means `lastContentUpdatedDate` is later than `publishedDate`.
+  - Edited means `updated` is later than `published`.
 - **Another host, no `gh` or `az`, or not signed in:** ask the user to paste the comment, with the options **paste it** and **not posted yet**.
 
 ### Picking it

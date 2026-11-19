@@ -22,7 +22,7 @@ A comment that clearly answers an open question is linked under it as `Answered:
 
 ## Read with
 
-Read-only, never log in, as [pr-threads.md](pr-threads.md) says (1.97.0): GitHub `gh pr view <n> --json body,comments`, `gh api repos/<owner>/<repo>/pulls/<n>/comments`, and `reviewThreads` (`isResolved`) through `gh api graphql`. Azure DevOps: `az devops invoke --area git --resource pullRequestThreads` with the project, repo and PR id; thread `status` gives open or resolved, comment type `system` marks system threads.
+Read-only, never log in, as [pr-threads.md](pr-threads.md) says (1.97.0): GitHub `gh pr view <n> --json body,comments`, `gh api repos/<owner>/<repo>/pulls/<n>/comments`, and `reviewThreads` (`isResolved`) through `gh api graphql`. Azure DevOps: `ado_threads.py list --pr <n>` in `crav1-review-pr` (the one way, 1.193.0); thread `status` gives open or resolved, and system comments are left out.
 
 ## Signed out
 
@@ -40,8 +40,18 @@ A runs one sign-in check; still signed out shows the question once more. Never p
 
 End as `crav1-docs/reference/run-ending.md` says. Do not run the next step.
 
-- This run added a Point on one or more pull requests: `Next: /crav1-pr-status` for every pull request this run touched, in that one command, because those Points are not sorted yet.
-- No new Point: `Next: nothing needed now.`
+- This run added a Point on one or more pull requests: Run next names `/crav1-pr-status` for every pull request this run touched, in that one command:
+
+```text
+Run next:
+This run added Points nothing has sorted yet.
+
+Sort the new Points on PR 71 and PR 73:
+`/crav1-pr-status pr71, pr73`
+```
+
+- No new Point: `Run next: nothing needed now.`
+- Never write a `Next:` line (1.193.0).
 - A question that waits on a person is one `Waiting:` line: `/crav1-resolve-open-questions <slug>, after <who> answers <what>.`
 - Do not list `pr<n> candidates` here. pr-status names that when the record has candidates.
 - Add the Uncommitted line when a file changed and is not committed.

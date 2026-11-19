@@ -41,7 +41,7 @@ class RunEndingTest(unittest.TestCase):
 
     def test_add_to_spec_stop_does_not_list_the_later_route(self):
         text = (ROOT / ".cursor/skills/crav1/crav1-add-to-spec/references/stop.md").read_text(encoding="utf-8")
-        self.assertIn("Next: /crav1-tighten-spec <slug>, because the new information is not tightened yet.", text)
+        self.assertIn("The new information is not tightened yet.\n\nTighten the spec:\n`/crav1-tighten-spec <slug>`", text)  # Run next since 1.193.0
         self.assertNotIn("/crav1-help next", text)
         self.assertIn("Do not run `/crav1-finalize-commit`", text)
 

@@ -26,7 +26,7 @@ Commit in one go, with no questions (1.73.0):
 /crav1-finalize-commit commit-now crav1
 ```
 
-`commit-now`, or just `commit` (1.76.1), drafts, shows the Summary and Description, then commits without the choice question. It never pushes. When `agent-tools/` or build output is in the file set, it warns and offers the normal choices instead. `crav1` (CRAV1 style) or `git-log` (match the repo's log) answers the style question for this commit; a saved style rule still works as before.
+`commit-now`, or just `commit` (1.76.1), drafts, shows the Summary and Description, then commits without the choice question. Since 1.193.0 `/crav1-finalize-commit commit-now` may still ask one question: which work item to mention, when `work-item.md` has several Feature lines and none clearly matches the slice. It is one card, at most 4 options plus a typed Other, and the mention is never copied from `git log` or the previous commit. It never pushes. When `agent-tools/` or build output is in the file set, it warns and offers the normal choices instead. `crav1` (CRAV1 style) or `git-log` (match the repo's log) answers the style question for this commit; a saved style rule still works as before.
 
 Pull and check only, with no commit (1.81.0):
 

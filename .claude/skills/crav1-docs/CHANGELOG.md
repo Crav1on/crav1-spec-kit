@@ -2,6 +2,17 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.193.0 (2026-11-19)
+
+Fixes from a review session on the sweep, commit, review-pr, pr-status and add-to-spec.
+
+- **Run next, not Next.** `/crav1-add-to-spec` (stop, PR comments, code-change, dump and meeting endings) and the sweep's `sweep_progress.py ending` end with Run next: `Run next:` first, the reason, the label on its own line and the command alone in its code span. `pr<n> candidates` with none left ends with a Run next naming `/crav1-pr-status pr<n>`. kit-lint fails on any `Next:` line in skill files and any script string that prints one; the skills not moved yet are listed with their counts in `scripts/next-line-baseline.tsv`, which may only shrink.
+- **One candidates rule.** `pr_common.py candidates --note <PR note>` decides spec and decision candidates for both `/crav1-pr-status` and `/crav1-add-to-spec pr<n> candidates`. A newer settled answer on a Point already `in spec <slug>` narrows the tag to `in spec <slug> (question)` (`pr_common.py answered`), so the Point is offered again; taking it writes `in spec <slug> <date>` (`pr_common.py in-spec`).
+- **Nothing in the spec before the yes.** In the sweep's manual flow only the note, the PR note and the Read line are written before the write card. `Synced at` waits for the yes: `sweep_progress.py synced-at` writes nothing without `--yes`, and the notes-only option writes no stamp.
+- **commit-now can ask the mention.** With several Feature lines in `work-item.md` and none clearly matching, `/crav1-finalize-commit commit-now` asks one card from `work_item_pick.py` (at most 4 options plus a typed Other) and never copies a mention from `git log` or the previous commit.
+- **ado_threads.py is the one Azure DevOps way.** New `pr` (description, votes), `iterations`, `changes`, `set-status --yes` (read back from the host) and `since-last` (against the PR note's Read line and saved description, never a temp file); `list` gives thread and comment dates. Output is UTF-8 JSON with accented characters intact. The add-to-spec, pr-status and review-pr docs no longer teach `az rest` or hand-made token calls.
+- `scripts/tests/test_kit_1193.py` (mocked Azure DevOps responses with non-ASCII text); the sweep ending tests use the Run next form. Claim ages read `CRAV1_NOW` when set; snapshot-check and the claim tests pin it, so they no longer fail once a fixture claim is 3 days old.
+
 ## 1.192.0 (2026-11-18)
 
 A new cross-cutting skill, `/crav1-explain-tech`, explains one technology tied to where the specs use it.
@@ -136,16 +147,5 @@ Fixes from a live ready check on Windows. The ready check now reaches Azure DevO
 - **Host before owner.** The `--full` JSON lists these pull requests under `host_unread`, and `ask_first` is `code-repo`, then `host`, then `pr-author`. A pull request whose host was not reached is not in the owner question; its merge-list line says `owner unknown: Azure DevOps not reached`. Catch up first names the reason and the fix, a label on its own line above `az login` or `az extension add --name azure-devops`, then `Run the ready check again:`. `pr-author` returns `status: host-unread` with the reason and the fix.
 - **The right build-progress file.** `pr-author --name` and `code-repo --repo` wrote into the first file that mentioned the pull request number anywhere, so an answer for one pull request could land in another's file. They now pick the branch's own file, then the one file whose own pull request it is, write only in the header, return `ambiguous` (with `--branch` to choose) when several files match, and create the branch's file when none exists. The reply's `commit` names the file to commit. The merge wait takes the file's own pull request, not the last one it mentions.
 - **Owner choices.** `Owner:` is the walk's mode marker (`self` or `other`), so it is no longer read as a name and `other` is never a choice. The people open questions wait on are added; teams and organisations, such as `the project team`, are not.
-
-## 1.178.0 (2026-11-17)
-
-Fixes from a live ready check and a kit update. The build map shows each branch's state in colour, the update no longer refuses a stale commit-style rule, and the ready check asks for the code repo first, reads the owner and merge state from the host in one lookup, and runs again after each answer.
-
-- **Build-map colours.** Each branch box in the `build-map.md` diagram takes its worst task's state: green is done (solid edge), amber waits on a pull request or a question (dashed edge), red is truly blocked only, such as a loop, a failed check or a reopened step (thick edge), and blue is the default for ready or not started. The edge out of a box shows that box's state. A `Legend` subgraph names the four colours. Fills are dark and text, borders and edges are bright, so the map reads on a dark background. A build-progress step whose last `Result:` is `failed` or `reopened` turns its branch red.
-- **Stale commit-style rules are fixed, not refused.** `/crav1-update-kit` planned a rewrite of a stale `draft-commit-style` rule that pointed to the removed `crav1-draft-commit-message` skill, then refused it with `Refused: ... is a project file.` because the writer and the commit only took kit-owned paths. Now the kit writes and commits these rules itself; a rule is committed only when it is removed or matches the current asset, so a hand edit is never swept in. A stale rule whose asset is gone from the new release is listed under `delete` and removed in the same yes.
-- **Update ending is Run next.** `/crav1-update-kit` ends `Run next: nothing needed now.` instead of a `Next:` line.
-- **Repo first, then one host lookup.** When a waiting pull request's code repo is not recorded, the skill asks for the repo first, offering the `docs/system/repos.md` rows. With the repo known, one read-only lookup on that host (`gh` or `az`, 8-second timeout) gives both who opened the pull request and whether it merged, and the owner is recorded as `PR author:` in its build-progress file. The skill asks who opened it only when that lookup names no one. The `--full` JSON adds `ask_first`, `owner_unknown` and `owners_from_host`.
-- **The check runs again after an answer.** After `walk_progress.py code-repo` or `pr-author` records an answer, the skill runs the ready check again in the same run and prints the new reply. Both commands return a `rerun` field naming it.
-- **Owner choices.** The owner question offers the names the kit already knows (people in `claims.md`, PR notes' `author:`, and build-progress `PR author:`, `Opened by:` and `Owner:` lines) besides `Don't know`. `pr-author` lists them under `choices` when the host names no one, and the `--full` JSON has them as `owner_choices`.
 
 The newest 15 releases are above. The full changelog is https://github.com/Crav1on/crav1-spec-kit/blob/main/CHANGELOG.md.

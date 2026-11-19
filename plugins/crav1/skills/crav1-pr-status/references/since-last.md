@@ -8,6 +8,8 @@ Every run writes `- Read: <your name> | <head short sha>, push <n>, newest comme
 
 ## What changed
 
+On Azure DevOps run `ado_threads.py since-last --pr <n> --note <PR note> --who <your name>` (`crav1-review-pr` `scripts/`, 1.193.0). It compares the host with the state recorded in the PR note: your `Read` line, and the newest `## Description as of <date>` section for the description. Never compare with a temp or scratch file saved by an earlier run. On GitHub compare the same way with `gh`.
+
 Compare the host now with your `Read` line and the record:
 
 - New pushes: `Sam pushed 2 commits (push 7, 7b41a0c).`

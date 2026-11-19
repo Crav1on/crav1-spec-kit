@@ -54,7 +54,7 @@ def run_one(folder: Path) -> tuple[dict, list[str]]:
     with tempfile.TemporaryDirectory() as tmp:
         work = Path(tmp) / folder.name
         shutil.copytree(folder / "spec", work)
-        env = dict(os.environ, CRAV1_NO_HOST_LOOKUP="1")
+        env = dict(os.environ, CRAV1_NO_HOST_LOOKUP="1", CRAV1_NOW="2026-11-17T12:00:00+00:00")
         proc = subprocess.run(
             [sys.executable, str(WALK), "readiness", "--root", str(work), "--text", "--write-map",
              "--skip-sync", "--user", USER],

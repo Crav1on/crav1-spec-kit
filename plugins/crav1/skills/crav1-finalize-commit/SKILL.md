@@ -80,6 +80,8 @@ Read [references/change.md](references/change.md). Redraft or edit, show the new
 
 ## When they pick `commit`
 
+**Work-item mention (1.193.0).** `commit-now` may still ask one question: which work item to mention, when `work-item.md` has several Feature lines and none clearly matches the slice. It is one question card from `scripts/work_item_pick.py`, at most 4 options plus a typed Other. Never copy the mention from `git log` or the previous commit.
+
 Read `references/commit.md` ("When they pick commit") only when they pick `commit` or `commit-now`. A pull request already open is named there: `/crav1-open-pr` to push to PR <n> and update its description or comment. Do not run it from this skill.
 
 ## Added lines

@@ -12,17 +12,19 @@ The one place for how the kit reads a pull request's comment threads, pushes and
 
 ## Azure DevOps
 
-`az repos pr` has no thread command. There is no `az repos pr thread list`. Threads, pushes and iterations are read through the REST API, with `az devops invoke` (preferred) or `az rest`. Pass `--org <org-url>` and `--detect false` where the command takes them. Docs: [Pull Request Threads](https://learn.microsoft.com/en-us/rest/api/azure/devops/git/pull-request-threads?view=azure-devops-rest-7.1), [Pull Request Iterations](https://learn.microsoft.com/en-us/rest/api/azure/devops/git/pull-request-iterations?view=azure-devops-rest-7.1), [Iteration Changes](https://learn.microsoft.com/en-us/rest/api/azure/devops/git/pull-request-iteration-changes?view=azure-devops-rest-7.1), [`az repos pr`](https://learn.microsoft.com/en-us/cli/azure/repos/pr).
+`az repos pr` has no thread command. There is no `az repos pr thread list`. Azure DevOps pull requests are read and changed only through `scripts/ado_threads.py` in `crav1-review-pr` (1.193.0). Never use `az rest`, `az devops invoke` by hand, `curl`, or any call with a token you fetched yourself: on Windows a redirect writes the console code page and accented names come back broken. The script decodes UTF-8 first and its JSON keeps accented characters intact. Organization, project and repository come from the code repo's git remote (`--code-repo`); `--org`, `--project` and `--repo` override. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says.
 
 ```text
-# threads, with their comments
-az devops invoke --org <org-url> --area git --resource pullRequestThreads --route-parameters project=<project> repositoryId=<repo> pullRequestId=<n> --api-version 7.1 --http-method GET --output json
-# pushes (iterations), with their commits
-az devops invoke --org <org-url> --area git --resource pullRequestIterations --route-parameters project=<project> repositoryId=<repo> pullRequestId=<n> --query-parameters includeCommits=true --api-version 7.1 --http-method GET --output json
+# threads, with thread and comment dates (published, updated) and status
+ado_threads.py list --pr <n>
+# title, state, description, created date and reviewer votes
+ado_threads.py pr --pr <n>
+# pushes (iterations): id, date, head commit
+ado_threads.py iterations --pr <n>
 # files changed in push <i> compared with push <j>
-az devops invoke --org <org-url> --area git --resource pullRequestIterationChanges --route-parameters project=<project> repositoryId=<repo> pullRequestId=<n> iterationId=<i> --query-parameters '$compareTo=<j>' --api-version 7.1 --http-method GET --output json
-# the same threads through az rest (the resource id is Azure DevOps itself)
-az rest --method get --resource 499b84ac-1321-427f-aa17-267ca6975798 --url "https://dev.azure.com/<org>/<project>/_apis/git/repositories/<repo>/pullRequests/<n>/threads?api-version=7.1"
+ado_threads.py changes --pr <n> --iteration <i> --compare-to <j>
+# what changed since your Read line and the description saved in the PR note
+ado_threads.py since-last --pr <n> --note <PR note> --who <your name>
 ```
 
 What each field gives:
@@ -44,10 +46,10 @@ What each field gives:
 **Change a thread's status** (only after the user's yes for that one thread; never in a batch):
 
 ```text
-az devops invoke --org <org-url> --area git --resource pullRequestThreads --route-parameters project=<project> repositoryId=<repo> pullRequestId=<n> threadId=<id> --api-version 7.1 --http-method PATCH --in-file <file with {"status": "<status>"}>
+ado_threads.py set-status --pr <n> --thread <id> --status <status> --yes
 ```
 
-Write the one-line JSON file in a temp folder, delete it after the call, then read the thread again and report the status the host now shows. The status is one of `fixed`, `wontFix`, `closed`, `byDesign`, `active`, `pending`. No comment is added by this call.
+Without `--yes` it only previews. With it, the script sets the status, reads the thread again and reports the status the host now shows (`ok` is false when it differs). The status is one of `fixed`, `wontFix`, `closed`, `byDesign`, `active`, `pending`. No comment is added by this call.
 
 ## GitHub
 

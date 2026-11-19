@@ -44,7 +44,17 @@ Then the answer summary from the reference file: each answer linked, each possib
 
 Then one ending, as `crav1-docs/reference/run-ending.md` says. The first matching case wins. Do not list resolve or the plan. Do not run the next step. Add the Uncommitted line when a file changed and is not committed. Do not commit the note.
 
-- The fact branch changed an existing spec: `Next: /crav1-tighten-spec <slug>, because the new information is not tightened yet.`
-- A kept new feature was the only handoff: `Next:` is the one starter that item named (spark, ideas, or bundle), because it fits no existing spec.
-- A kept bug was the only handoff: `Next: /crav1-fix-bug, because the item is a bug and no lane has started.`
-- None of those: `Next: nothing needed now.`
+Each ending is Run next first: the reason, then the label on its own line and the command alone in its code span. Never write a `Next:` line (1.193.0).
+
+- The fact branch changed an existing spec: reason `The new information is not tightened yet.`, label `Tighten the spec:`, command `/crav1-tighten-spec <slug>`.
+- A kept new feature was the only handoff: reason `It fits no existing spec.`, label `Start the new feature:`, command the one starter that item named (spark, ideas, or bundle).
+- A kept bug was the only handoff: reason `The item is a bug and no lane has started.`, label `Start the bug fix:`, command `/crav1-fix-bug`.
+- None of those: `Run next: nothing needed now.`
+
+```text
+Run next:
+The new information is not tightened yet.
+
+Tighten the spec:
+`/crav1-tighten-spec orders-api`
+```

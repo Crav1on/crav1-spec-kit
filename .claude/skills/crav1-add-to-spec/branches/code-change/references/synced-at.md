@@ -4,7 +4,7 @@ Part of `branches/code-change/BRANCH.md`, read only when that file sends you her
 
 ## Synced at
 
-Record the code commit this run actually read. This write is not an apply option. It happens with the confirmed writes. Do not stamp before that confirmation.
+Record the code commit this run actually read. This write is not an apply option. It happens with the confirmed writes. Do not stamp before that confirmation. The writes that need no yes are only the note, the PR note and its `Read` line; `Synced at`, the Match `Branch:` line and every other line in `docs/specs/` or `docs/system/repos.md` wait for the yes (1.193.0). A notes-only answer writes none of them. The sweep enforces this with the `synced-at` step of `sweep_progress.py` in `crav1-update-specs-from-changes-and-prs`, which writes nothing without `--yes`.
 
 `Synced at` in `docs/system/repos.md` is one line per repo and branch, `- <repo> <branch>@<short sha>, <date>`, in its `## Synced at` section, for example `- orders-api main@abc1234, 2026-10-07` (1.84.0, `crav1-add-to-spec` `references/merge-safe.md`). The branch is the branch that was read. The short sha is seven characters, the commit the read ended at: that commit, the end of a range, or the tip of a branch diff. The date is the date of that read, `YYYY-MM-DD`.
 
