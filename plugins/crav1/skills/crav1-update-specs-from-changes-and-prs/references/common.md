@@ -51,14 +51,14 @@ When a pull request's threads were read, add or replace one line on its PR note,
 
 The budget starts at `start`. Default 20 minutes. The hard stop is 45, which the script will not exceed. Check `budget` between items. Time running out finishes the current item, then `pause`. A later `start` with the same flow and scope keeps done and collected items, resets the clock, and does not ask again for repos already fetched. A different scope while items are pending stops until the user says to replace that run. Replacing keeps the last open-PR list and drops the unfinished queue. Say that before `--replace`.
 
-`Synced at` is still the branch stamp. This file does not write a second sha. Add-to-spec writes the line when the read earned it. When `resume` has no next item, call `finish`.
+`Synced at` is still the branch stamp. This file does not write a second sha. Add-to-spec's rules say when the read earned the line. In manual flow it is written only after the write card's yes, with `synced-at --yes` (1.193.0); the notes-only option writes no stamp. Auto flow writes notes and `Synced at` with no card, as `references/auto-flow.md` says. When `resume` has no next item, call `finish`.
 
 ## Ending
 
 `ending --files <n>` is the run's ending. `<n>` is how many files this run changed and did not commit, counting the progress file when it changed.
 
-Print the proposal lines first when the list is not empty. Then one `Next` line, then each `Waiting` line, then `Uncommitted` when files changed. A commit is not `Next`. A failed fetch is `Waiting`, not `Next`.
+Print the script's `next` block first, as-is: `Run next:`, the reason, the label on its own line and the command alone in its code span (1.193.0, [run-ending.md](../../crav1-docs/reference/run-ending.md)). Then the proposal lines when the list is not empty, then each `Waiting` line, then `Uncommitted` when files changed. A commit is not the Run next step. A failed fetch is `Waiting`, not Run next. Never write a `Next:` line.
 
-Pending items: `Next` is this command, same flow and scope. A conflict or an open question that was written onto a spec: `Next` is `/crav1-resolve-open-questions` for those slugs. Proposals and nothing pending: `Next` is this command's `manual-flow`. Otherwise `Next` is `nothing needed now`.
+Pending items: Run next is this command, same flow and scope. A conflict or an open question that was written onto a spec: Run next is `/crav1-resolve-open-questions` for those slugs. Proposals and nothing pending: Run next is this command's `manual-flow`. Otherwise it is `Run next: nothing needed now.`
 
 Do not commit. Do not start a watcher.

@@ -50,7 +50,7 @@ Examples:
   - `follow-up`: not for this pull request; it becomes later work. `/crav1-ado-sync` reads it like an open note item.
   - `migrated`: written by the migration from an older note; the next `/crav1-pr-status` run sorts it.
 - **Owner:** who acts next, as the host shows the name, or `-`.
-- **Tags**, `; `-separated, or `-`: `thread <id>`, `host <status>` (the host's thread status: `active`, `fixed`, `wontFix`, `closed`, `byDesign`, `pending`, or GitHub `resolved` / `outdated`), `resolved, code unchanged`, `to spec`, `to decision`, `in spec <slug>`, `asked`, `answered <date>`, `not posted <date>`, `from <skill> <date>`, `from description <date>` (pr-status, from the description's Questions for reviewers or Not in this PR, 1.98.0).
+- **Tags**, `; `-separated, or `-`: `thread <id>`, `host <status>` (the host's thread status: `active`, `fixed`, `wontFix`, `closed`, `byDesign`, `pending`, or GitHub `resolved` / `outdated`), `resolved, code unchanged`, `to spec`, `to decision`, `in spec <slug>` (since 1.193.0 `in spec <slug> <date>`; `in spec <slug> (question)` when only the question is in the spec and a newer answer is not), `asked`, `answered <date>`, `not posted <date>`, `from <skill> <date>`, `from description <date>` (pr-status, from the description's Questions for reviewers or Not in this PR, 1.98.0).
 - **Text:** the point in plain words, with the reason when there is one. Last, so it may hold anything except a line break.
 
 ## Merge-safe rules

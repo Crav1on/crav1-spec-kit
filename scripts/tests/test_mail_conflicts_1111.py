@@ -38,7 +38,7 @@ class Conflicts(unittest.TestCase):
             self.assertIn(want, s)
 
     def test_next_names_skill(self):
-        self.assertIn("Next: /crav1-resolve-open-questions <slug>, because a Conflict line is unsettled.", (ATS / "branches/dump/BRANCH.md").read_text())
+        self.assertIn("A Conflict line is unsettled.\n\nSettle the conflict:\n`/crav1-resolve-open-questions <slug>`", (ATS / "branches/dump/BRANCH.md").read_text())  # Run next since 1.193.0
         self.assertIn("`/crav1-resolve-open-questions <slug>`", (SK / "crav1-finalize-commit/references/pull.md").read_text())
 
 

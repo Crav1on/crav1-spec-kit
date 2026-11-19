@@ -86,9 +86,28 @@ Output only:
 - Impact: nothing else, or the one-line edit list and which option they picked
 - Research: each hit, whether it was marked, the note path and the findings line, or that none was marked. The revisit draft when one was written in the chat, or that none was drafted. The clear summary: what was cleared, narrowed, and routed where, each open question from the updated note and where it went, and when an older mark had no points, or that this run did not check an updated note
 - End as `crav1-docs/reference/run-ending.md` says. Do not run the next step. Do not list the plan. Add the Uncommitted line when a file changed and is not committed.
-- A `Conflict:` line was written: `Next: /crav1-resolve-open-questions <slug>, because a Conflict line is unsettled.`
-- An existing spec changed and no Conflict line was written: `Next: /crav1-tighten-spec <slug>, because the new information is not tightened yet.`
-- Neither: `Next: nothing needed now.`
+- A `Conflict:` line was written: Run next first:
+
+```text
+Run next:
+A Conflict line is unsettled.
+
+Settle the conflict:
+`/crav1-resolve-open-questions <slug>`
+```
+
+- An existing spec changed and no Conflict line was written: Run next first:
+
+```text
+Run next:
+The new information is not tightened yet.
+
+Tighten the spec:
+`/crav1-tighten-spec <slug>`
+```
+
+- Neither: `Run next: nothing needed now.`
+- Never write a `Next:` line (1.193.0).
 
 ## Style
 

@@ -819,6 +819,97 @@ def cmd_resolve(args) -> int:
     out["note"] = "Read-only. Name only the tool for the resolved host; never ask to install or sign in to the other one."
     return emit(out, 0 if out.get("status") in ("ok", "ask") else 1)
 
+# PR record candidates (1.193.0): one rule for /crav1-pr-status and /crav1-add-to-spec pr<n> candidates.
+POINT_RE = re.compile(r"^- Point: (?P<anchor>[^|]*?) \| (?P<status>[^|]*?) \| (?P<owner>[^|]*?) \| (?P<tags>[^|]*?) \| (?P<text>.*)$")
+IN_SPEC_RE = re.compile(r"^in spec (?P<slug>[a-z0-9][a-z0-9-]*)(?: (?P<date>\d{4}-\d{2}-\d{2}))?(?P<q> \(question\))?$")
+DATE_TAG_RE = re.compile(r"^(?:answered|replied) (?P<date>\d{4}-\d{2}-\d{2})$")
+
+
+def parse_point(line: str) -> dict | None:
+    m = POINT_RE.match(line.rstrip("\n"))
+    if not m:
+        return None
+    d = m.groupdict()
+    d["tags"] = [] if d["tags"].strip() == "-" else [t.strip() for t in d["tags"].split(";") if t.strip()]
+    return d
+
+
+def point_line(p: dict) -> str:
+    tags = "; ".join(p["tags"]) if p["tags"] else "-"
+    return f"- Point: {p['anchor']} | {p['status']} | {p['owner']} | {tags} | {p['text']}"
+
+
+def candidate_state(p: dict) -> dict:
+    """Is a Point a spec or decision candidate? A to spec / to decision Point is one unless an
+    `in spec <slug>` tag covers its newest answer: a narrowed tag `(question)`, or an in-spec date
+    older than a later `answered` or `replied` date, makes it a candidate again."""
+    kinds = [t for t in p["tags"] if t in ("to spec", "to decision")]
+    if not kinds:
+        return {"candidate": False, "why": "not tagged to spec or to decision"}
+    ins = [IN_SPEC_RE.match(t) for t in p["tags"] if t.startswith("in spec ")]
+    ins = [m for m in ins if m]
+    if not ins:
+        return {"candidate": True, "why": "not in a spec yet"}
+    latest = max((m.group("date") for m in [DATE_TAG_RE.match(t) for t in p["tags"]] if m), default="")
+    for m in ins:
+        if m.group("q"):
+            return {"candidate": True, "why": f"only the question is in spec {m.group('slug')}; a newer answer is not"}
+        if latest and m.group("date") and latest > m.group("date"):
+            return {"candidate": True, "why": f"answered {latest}, after it went into spec {m.group('slug')} on {m.group('date')}"}
+    return {"candidate": False, "why": "already in spec " + ins[0].group("slug")}
+
+
+def record_candidates_of(text: str) -> list[dict]:
+    """Every Point in a PR note's record, numbered in record order, with its candidate state."""
+    out, n = [], 0
+    for i, line in enumerate(text.splitlines(), 1):
+        p = parse_point(line)
+        if not p:
+            continue
+        n += 1
+        out.append(dict(p, number=n, line=i, **candidate_state(p)))
+    return out
+
+
+def mark_answered(line: str, date: str) -> str:
+    """A newer answer on a Point (1.193.0): add or move `answered <date>`, and narrow an older
+    `in spec <slug>` tag to `in spec <slug> (question)` so the Point is a candidate again."""
+    p = parse_point(line)
+    if not p:
+        raise ValueError("not a Point line")
+    tags = [t for t in p["tags"] if not t.startswith("answered ")] + [f"answered {date}"]
+    new = []
+    for t in tags:
+        m = IN_SPEC_RE.match(t)
+        if m and not m.group("q") and not (m.group("date") and m.group("date") >= date):
+            t = f"in spec {m.group('slug')} (question)"
+        new.append(t)
+    p["tags"] = new
+    return point_line(p)
+
+
+def mark_in_spec(line: str, slug: str, date: str) -> str:
+    """After add-to-spec takes a Point: one `in spec <slug> <date>` tag, replacing a narrowed one."""
+    p = parse_point(line)
+    if not p:
+        raise ValueError("not a Point line")
+    p["tags"] = [t for t in p["tags"] if not (IN_SPEC_RE.match(t) and IN_SPEC_RE.match(t).group("slug") == slug)] + [f"in spec {slug} {date}"]
+    return point_line(p)
+
+
+def _pick(spec: str | None) -> set[int] | None:
+    return {int(x) for x in spec.split(",") if x.strip()} if spec else None
+
+
+def cmd_candidates(args) -> int:
+    text = Path(args.note).read_text(encoding="utf-8")
+    pts = record_candidates_of(text)
+    pick = _pick(args.pick)
+    cands = [p for p in pts if p["candidate"] and (pick is None or p["number"] in pick)]
+    return emit({"note": args.note, "candidates": cands,
+                 "skipped": [{"number": p["number"], "why": p["why"]} for p in pts if not p["candidate"] and any(t in ("to spec", "to decision") for t in p["tags"])],
+                 "none_left": not cands})
+
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="pr_common.py", description=__doc__.splitlines()[0])
@@ -856,13 +947,17 @@ def main(argv: list[str] | None = None) -> int:
     r.add_argument("--repo")
     r.add_argument("--remote-has-pr", action="store_true",
                    help="this checkout's host already showed a pull request with that number")
+    cd = sub.add_parser("candidates", help="spec and decision candidates in a PR note's record (1.193.0)")
+    cd.add_argument("--note", required=True)
+    cd.add_argument("--pick", help="numbers in record order, e.g. 1,3")
     args = parser.parse_args(argv)
     if args.cmd == "parse":
         out = parse_ref(args.ref, args.remote_url)
         return emit(out, 0 if out.get("status") == "ok" else 1)
     if args.cmd == "host":
         return emit(host_of(args.remote_url))
-    return {"find": cmd_find, "checks": cmd_checks, "claim": cmd_claim, "behind": cmd_behind, "fit": cmd_fit, "resolve": cmd_resolve}[args.cmd](args)
+    return {"find": cmd_find, "checks": cmd_checks, "claim": cmd_claim, "behind": cmd_behind, "fit": cmd_fit, "resolve": cmd_resolve,
+            "candidates": cmd_candidates}[args.cmd](args)
 
 
 if __name__ == "__main__":

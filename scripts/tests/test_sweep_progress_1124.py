@@ -399,7 +399,8 @@ class SweepProgress(unittest.TestCase):
         self.assertEqual(payload["error"], "budget")
         self.call("pause", "--yes")
         ending = self.call("ending", "--files", "2")
-        self.assertIn("manual-flow, because 1 item is still pending", ending["next"])
+        self.assertIn("1 item is still pending.", ending["next"])
+        self.assertIn("manual-flow`", ending["next"])
         self.assertNotIn("finalize-commit", ending["next"])
         self.assertIn("2 files", ending["uncommitted"])
 
@@ -456,7 +457,8 @@ class SweepProgress(unittest.TestCase):
             ending["proposals"],
             ["orders-api pr 74 on orders-retry: The retry window moves from 20 s to 30 s."],
         )
-        self.assertIn("manual-flow orders-api, because 1 spec change is still a proposal", ending["next"])
+        self.assertIn("1 spec change is still a proposal.", ending["next"])
+        self.assertIn("manual-flow orders-api`", ending["next"])
         self.assertNotIn("finalize-commit", ending["next"])
 
     def test_a_written_question_points_next_at_resolve(self):
@@ -481,7 +483,7 @@ class SweepProgress(unittest.TestCase):
         ending = self.call("ending", "--files", "0")
         self.assertEqual(
             ending["next"],
-            "Next: /crav1-resolve-open-questions orders-export, orders-retry, because this sweep left a conflict or an open question unsettled.",
+            "Run next:\nThis sweep left a conflict or an open question unsettled.\n\nSettle the open questions:\n`/crav1-resolve-open-questions orders-export, orders-retry`",
         )
         self.assertIsNone(ending["uncommitted"])
 

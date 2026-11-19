@@ -30,7 +30,9 @@ A small group is at most four items. One by one stays available: they can say so
 
 ## Each item
 
-Take the next item from `resume`. Open `../crav1-add-to-spec/SKILL.md` from this skill's folder and follow the note and `Synced at` part for that item's command. The rule is [open-skill-file.md](../../crav1-docs/reference/open-skill-file.md) (1.134.0). Do not start `/crav1-add-to-spec`. That part does not need a yes.
+Take the next item from `resume`. Open `../crav1-add-to-spec/SKILL.md` from this skill's folder and follow the note part for that item's command. The rule is [open-skill-file.md](../../crav1-docs/reference/open-skill-file.md) (1.134.0). Do not start `/crav1-add-to-spec`.
+
+**What needs no yes, and what does (1.193.0).** Before the item's write card only these are written: the note, the PR note (its record and history), and the `Read` line. Nothing in `docs/specs/` and nothing in `docs/system/repos.md` is written before the card. The `Synced at` stamp is a spec write: it goes with the confirmed writes, after the card's yes, never before. Plan it with `<interpreter> scripts/sweep_progress.py synced-at --spec <spec.md> --repo <repo> --branch <branch> --sha <sha> --date <YYYY-MM-DD>`, which writes nothing without `--yes`, and run it again with `--yes` only after the yes. On the card's notes-only option (`No, notes only`) no stamp and no spec line is written, so that option stays true.
 
 If the sort, an `Answered:` line, or a new open question would change a spec, show that change and wait. Yes writes it (`complete --outcome spec`, and `--question` or `--conflict` when that line was written). No leaves the spec alone (`complete --outcome notes` or `synced-at`, no proposal). Do not ask a second time for the same change.
 

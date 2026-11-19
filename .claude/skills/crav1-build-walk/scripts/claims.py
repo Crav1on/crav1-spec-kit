@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import sys
 from datetime import datetime, timedelta, timezone
@@ -124,6 +125,14 @@ def date_of(when: datetime) -> str:
 
 
 def now_utc() -> datetime:
+    """Now, in UTC. CRAV1_NOW (an ISO time) pins it for snapshots and tests, so a claim's age does not drift (1.193.0)."""
+    pinned = os.environ.get("CRAV1_NOW")
+    if pinned:
+        try:
+            when = datetime.fromisoformat(pinned.replace("Z", "+00:00"))
+            return when if when.tzinfo else when.replace(tzinfo=timezone.utc)
+        except ValueError:
+            pass
     return datetime.now(timezone.utc)
 
 

@@ -362,6 +362,9 @@ RUN_NEXT_ONLY_SKILLS = (
     "crav1-pr-status",
     "crav1-review-pr",
     "crav1-merge-pr",
+    # 1.193.0: add-to-spec and the sweep end with Run next too.
+    "crav1-add-to-spec",
+    "crav1-update-specs-from-changes-and-prs",
 )
 NEXT_EXAMPLE = re.compile(r"`Next:\s*[^`]")
 
@@ -436,6 +439,71 @@ def prose_next_problems(kit):
                     if SCRIPT_NEXT.search(line):
                         out.append(f"{os.path.relpath(path, kit)}:{lineno}: prints a `Next:` line; "
                                    "the PR skills end with Run next (1.177.0)")
+    return out
+
+
+# No `Next:` anywhere (1.193.0). Every skill file and every skill script is
+# checked: a line that starts with `Next:`, a `Next: ...` example in a code
+# span, or a script string that prints `Next:`. Files not moved to Run next
+# yet are listed in scripts/next-line-baseline.tsv with their count; a file
+# not listed, or a count above its baseline, fails. A count below the
+# baseline fails too, so the baseline only shrinks.
+NEXT_BASELINE = os.path.join("scripts", "next-line-baseline.tsv")
+# A script line that only detects or strips a `Next:` line prints nothing.
+NEXT_CHECK_OK = re.compile(r"""startswith\(\s*["']Next:|len\(\s*["']Next:|re\.(?:search|match)\(""")
+
+
+def next_line_counts(kit):
+    root = os.path.join(kit, ".cursor", "skills", "crav1")
+    counts = {}
+    if not os.path.isdir(root):
+        return counts
+    for name in sorted(os.listdir(root)):
+        if name == "crav1-docs":
+            continue
+        skill = os.path.join(root, name)
+        for path in sorted(glob.glob(os.path.join(skill, "**", "*"), recursive=True)):
+            if not os.path.isfile(path) or "__pycache__" in path:
+                continue
+            rel = os.path.relpath(path, kit).replace(os.sep, "/")
+            with open(path, encoding="utf-8", errors="replace") as fh:
+                text = fh.read()
+            if path.endswith(".md"):
+                n = len(run_next_only_hits(text))
+            elif path.endswith(".py"):
+                n = sum(1 for line in text.splitlines() if SCRIPT_NEXT.search(line) and not NEXT_CHECK_OK.search(line))
+            else:
+                continue
+            if n:
+                counts[rel] = n
+    return counts
+
+
+def read_next_baseline(kit):
+    path = os.path.join(kit, NEXT_BASELINE)
+    base = {}
+    if os.path.isfile(path):
+        with open(path, encoding="utf-8") as fh:
+            for line in fh:
+                if not line.strip() or line.startswith("#"):
+                    continue
+                rel, _, n = line.rstrip("\n").partition("\t")
+                base[rel] = int(n)
+    return base
+
+
+def next_anywhere_problems(kit):
+    counts = next_line_counts(kit)
+    base = read_next_baseline(kit)
+    out = []
+    for rel, n in sorted(counts.items()):
+        allowed = base.get(rel, 0)
+        if n > allowed:
+            out.append(f"{rel}: {n} `Next:` line(s), baseline {allowed}; end with Run next, the label above the command alone in its code span (1.193.0)")
+    for rel, allowed in sorted(base.items()):
+        n = counts.get(rel, 0)
+        if n < allowed:
+            out.append(f"{NEXT_BASELINE}: {rel} has {n} `Next:` line(s) now, below its baseline {allowed}; lower the baseline (1.193.0)")
     return out
 
 
@@ -774,6 +842,7 @@ def main(argv):
     errs.extend(stray_next_problems(kit))
     errs.extend(run_next_only_problems(kit))
     errs.extend(prose_next_problems(kit))
+    errs.extend(next_anywhere_problems(kit))
     errs.extend(ending_layout_problems(kit))
     errs.extend(card_wording_problems(kit))
     errs.extend(design_card_problems(kit))

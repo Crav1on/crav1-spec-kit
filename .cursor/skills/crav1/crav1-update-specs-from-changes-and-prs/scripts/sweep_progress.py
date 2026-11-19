@@ -549,6 +549,11 @@ def question_slugs(state: dict) -> list[str]:
     return sorted(found)
 
 
+def run_next(reason: str, label: str, cmd: str) -> str:
+    """The Run next block (1.193.0): Run next first, the reason, the label on its own line, the command alone in its code span."""
+    return f"Run next:\n{reason}\n\n{label}\n`{cmd}`"
+
+
 def ending_lines(state: dict, files: int) -> dict:
     pending = [item for item in state["items"] if item["status"] in {"pending", "current"}]
     flow = state["header"]["Flow"]
@@ -557,23 +562,17 @@ def ending_lines(state: dict, files: int) -> dict:
     command = f"/crav1-update-specs-from-changes-and-prs"
     if pending:
         noun = "item is" if len(pending) == 1 else "items are"
-        nxt = (
-            f"Next: {command} {flow}{scope_text}, because {len(pending)} {noun} still pending."
-        )
+        nxt = run_next(f"{len(pending)} {noun} still pending.", "Go on with the sweep:", f"{command} {flow}{scope_text}")
     elif any("conflict" in flag_set(item["flags"]) or "question" in flag_set(item["flags"]) for item in state["items"]):
         slugs = question_slugs(state)
         target = " " + ", ".join(slugs) if slugs else ""
-        nxt = (
-            f"Next: /crav1-resolve-open-questions{target}, because this sweep left a conflict or an open question unsettled."
-        )
+        nxt = run_next("This sweep left a conflict or an open question unsettled.", "Settle the open questions:", f"/crav1-resolve-open-questions{target}")
     elif state["proposals"]:
         noun = "spec change is" if len(state["proposals"]) == 1 else "spec changes are"
         word = "a proposal" if len(state["proposals"]) == 1 else "proposals"
-        nxt = (
-            f"Next: {command} manual-flow{scope_text}, because {len(state['proposals'])} {noun} still {word}."
-        )
+        nxt = run_next(f"{len(state['proposals'])} {noun} still {word}.", "Review the proposals one by one:", f"{command} manual-flow{scope_text}")
     else:
-        nxt = "Next: nothing needed now."
+        nxt = "Run next: nothing needed now."
     waiting = [
         f"Waiting: {wait['repo']}, because {wait['reason']} ({wait['detail']})."
         for wait in sorted(state["waiting"], key=lambda row: (row["repo"].lower(), row["reason"]))
@@ -1057,6 +1056,49 @@ def cmd_read_line(args: argparse.Namespace) -> None:
     emit({"ok": True, "line": line}, 0)
 
 
+def synced_entry_update(text: str, repo: str, branch: str, sha: str, date: str) -> str:
+    """Replace or add `Synced at: <repo> <branch>@<sha>, <date>` in a slice spec.md (after the title, before the first heading)."""
+    entry = f"Synced at: {repo} {branch}@{sha[:7]}, {date}"
+    lines = text.splitlines(keepends=True)
+    prefix = f"Synced at: {repo} {branch}@"
+    for i, line in enumerate(lines):
+        if line.startswith(prefix):
+            tail = " (dropped)" if line.rstrip("\n").endswith("(dropped)") else ""
+            lines[i] = entry + tail + "\n"
+            return "".join(lines)
+    last = None
+    for i, line in enumerate(lines):
+        if line.startswith("## "):
+            break
+        if line.startswith("Synced at: ") or (last is None and line.startswith("# ")):
+            last = i
+    at = 0 if last is None else last + 1
+    lines.insert(at, entry + "\n")
+    return "".join(lines)
+
+
+def cmd_synced_at(args: argparse.Namespace) -> None:
+    """The spec's Synced at stamp (1.193.0). Without --yes it only plans: the stamp is a spec write and waits for the write card's yes."""
+    if not SHA_RE.fullmatch(args.sha):
+        fail("sha", "The sha is hex, at least 7 characters.")
+    if not DATE_RE.fullmatch(args.date):
+        fail("date", "The date is YYYY-MM-DD.")
+    if not NAME_RE.fullmatch(args.repo):
+        fail("repo", "The repo is one name.")
+    spec = args.spec
+    if not spec.is_file():
+        fail("spec", "The spec file does not exist.")
+    before = spec.read_text(encoding="utf-8")
+    after = synced_entry_update(before, args.repo, args.branch, args.sha, args.date)
+    line = f"Synced at: {args.repo} {args.branch}@{args.sha[:7]}, {args.date}"
+    if not args.yes:
+        emit({"ok": True, "written": False, "line": line,
+              "message": "Planned only. The Synced at stamp is a spec write: run this again with --yes after the write card's yes. On notes only, do not stamp."}, 0)
+    if after != before:
+        spec.write_text(after, encoding="utf-8")
+    emit({"ok": True, "written": after != before, "line": line}, 0)
+
+
 def build() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Sweep progress file")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -1155,6 +1197,15 @@ def build() -> argparse.ArgumentParser:
     shared(budget)
     budget.add_argument("--now")
     budget.set_defaults(func=cmd_budget)
+
+    synced = sub.add_parser("synced-at", help="plan, or with --yes write, a slice spec's Synced at stamp")
+    synced.add_argument("--spec", required=True, type=lambda value: __import__("pathlib").Path(value))
+    synced.add_argument("--repo", required=True)
+    synced.add_argument("--branch", required=True)
+    synced.add_argument("--sha", required=True)
+    synced.add_argument("--date", required=True)
+    synced.add_argument("--yes", action="store_true")
+    synced.set_defaults(func=cmd_synced_at)
 
     read = sub.add_parser("read-line")
     read.add_argument("--head", required=True)

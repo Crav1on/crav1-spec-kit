@@ -17,5 +17,15 @@ Output only:
 - Impact: nothing else, or the one-line edit list and which option they picked
 - Research: each hit, whether it was marked, the note path and the findings line, or that none was marked. The revisit draft when one was written in the chat, or that none was drafted. The clear summary: what was cleared, narrowed, and routed where, each open question from the updated note and where it went, and when an older mark had no points, or that this run did not check an updated note
 - End as `crav1-docs/reference/run-ending.md` says. Do not run the next step. Add the Uncommitted line when a file changed and is not committed.
-- An existing spec changed: `Next: /crav1-tighten-spec <slug>, because the new information is not tightened yet.`
-- No existing spec changed: `Next: nothing needed now.`
+- An existing spec changed: Run next first, the reason, then the label on its own line and the command alone in its code span:
+
+```text
+Run next:
+The new information is not tightened yet.
+
+Tighten the spec:
+`/crav1-tighten-spec <slug>`
+```
+
+- No existing spec changed: `Run next: nothing needed now.`
+- Never write a `Next:` line (1.193.0).

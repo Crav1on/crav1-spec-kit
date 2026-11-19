@@ -20,7 +20,11 @@ When a post fails, say what failed and what already posted. Do not retry by anot
 
 ## Azure DevOps threads (1.172.0)
 
-`scripts/ado_threads.py` is the one way to read and post threads. Do not hand-roll `az devops invoke` with a redirect to a file: on Windows that writes the console code page and the JSON fails to load.
+`scripts/ado_threads.py` is the one way to read and post threads, and since 1.193.0 also to read votes, pushes and the description and to set a thread's status. Do not hand-roll `az devops invoke` with a redirect to a file, `az rest`, or a token request: on Windows that writes the console code page and the JSON fails to load. Its output is always UTF-8 JSON with accented characters intact.
+
+- `ado_threads.py pr --pr <n>`: title, state, description, created date and reviewer votes.
+- `ado_threads.py iterations --pr <n>`: pushes with their dates and head commits.
+- `ado_threads.py set-status --pr <n> --thread <id> --status <status> --yes`: one thread, after the user's yes, read back from the host.
 
 - `ado_threads.py list --pr <n>` prints every thread with its status, file and comments.
 - `ado_threads.py compare --pr <n> --draft <file>` says whether a posted comment matches the draft (line endings and trailing spaces ignored).

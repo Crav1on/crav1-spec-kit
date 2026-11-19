@@ -31,11 +31,11 @@ Use the policy list already read. When that evaluation names a build that alread
 
 ```text
 az pipelines runs show --org <org-url> --project <project> --id <build-id> --detect false --output json
-az rest --method get --uri "<org-url>/<project>/_apis/test/runs?buildUri=vstfs:///Build/Build/<build-id>&api-version=7.1"
-az rest --method get --uri "<org-url>/<project>/_apis/test/runs/<run-id>/results?api-version=7.1"
+az devops invoke --org <org-url> --area test --resource runs --route-parameters project=<project> --query-parameters buildUri=vstfs:///Build/Build/<build-id> --api-version 7.1 --http-method GET --output json
+az devops invoke --org <org-url> --area test --resource results --route-parameters project=<project> runId=<run-id> --api-version 7.1 --http-method GET --output json
 ```
 
-Do not print a token, a secret, or a connection string from those payloads.
+Never call `az rest` or a hand-made token request. Do not print a token, a secret, or a connection string from those payloads.
 
 ### What the info note reports
 
