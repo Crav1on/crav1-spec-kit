@@ -8,7 +8,7 @@ One pull request, one PR note, one record. The PR note (`docs/notes/YYYY-MM/YYYY
 
 1. Front matter, title, `Source date: … Imported: …`, then the header lines (`URL:`, `Author:`, `<target> <- <source>`). Older notes may also have `State on <date>: <state>` header lines; they stay as they are and are only read.
 2. `## PR record`, right after the header lines. Written when missing, by the first skill that needs it.
-3. The history: dated sections, each verbatim and never rewritten. Only these headings start a history section: `## Description as of <date>`, `## PR updates as of <date>`, `## Comment as drafted, <date>`, `## Comment as posted, <date> (by <name>)[, edited]`, `## Replies as drafted, <date> (not posted)`, `## Review follow-ups, moved <date>`. A `## ` line inside a description is part of that description.
+3. The history: dated sections, each verbatim and never rewritten. Only these headings start a history section: `## Description as of <date>`, `## PR updates as of <date>`, `## Comment as drafted, <date>`, `## Comment as posted, <date> (by <name>)[, edited]`, `## Replies as drafted, <date> (not posted)`, `## Review follow-ups, moved <date>`. The one change to a history section is that heading's state once a drafted reply is posted (1.199.0): `(thread 195 posted 2026-11-20)`, or `(not posted; thread 195 posted 2026-11-20)` when the section holds other threads; the words stay. A `## ` line inside a description is part of that description.
 
 A new history section goes in **sorted place by date**: before the first history section whose date is later, else at the end. Same date: after the ones already there.
 
@@ -44,6 +44,7 @@ Examples:
   - `done <short sha>`: the change is in the code. Needs the commit.
   - `agreed`: the other side said yes or will do it; no commit shows it yet.
   - `declined`: the other side will not do it; the text says why.
+  - `answered` (1.199.0): a question that was answered and the asker accepted; no code change. It carries an `answered <date>` tag. Reported in plain words, `answered; no code change`. Never `done host`, which is only for a host setting that reads back live.
   - `open`: still being discussed, or not answered yet.
   - `waiting on <name>`: the last message asks that person something or hands them the next step.
   - `needs <name>`: someone outside the thread has to act or answer.

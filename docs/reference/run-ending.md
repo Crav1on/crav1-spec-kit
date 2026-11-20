@@ -123,6 +123,19 @@ Sort the new Points on PR 71, PR 73 and PR 74:
 
 When nothing is needed now: `Run next: nothing needed now.`
 
+**Waiting on someone, then check again (1.199.0).** When the only next step is to check again after someone answers, every PR skill uses one shape: a label naming who, on its own line, above the command alone in its code span. `Run next: nothing needed now.` is only for when there is nothing to check again either. The Waiting line under it names the wait and never carries a command. The signed-in user is `you`, never their name in the third person.
+
+```text
+Run next:
+
+Check PR 84 again after person A answers in thread 198:
+`/crav1-pr-status pr84 since-last`
+
+Waiting: person A, to answer the settings question in thread 198.
+```
+
+A card the run asks comes before the ending, and the ending is printed once, after the answers.
+
 The four PR skills (`/crav1-open-pr`, `/crav1-pr-status`, `/crav1-review-pr`, `/crav1-merge-pr`) and their references and scripts never print a `Next:` line (1.177.0). A skill whose own file still shows the older one-line form names one step on that line and moves to Run next when it is next changed.
 
 ### The older one-line form
@@ -161,8 +174,10 @@ When the ready check says `verify.md` is behind `tasks.md` (1.135.0), that last 
 A commit is not a step. When this run changed files and they are not committed, add one trailing line. Leave it out when nothing changed, or the changes are already committed.
 
 ```text
-Uncommitted: 3 files; commit with /crav1-finalize-commit when ready.
+Uncommitted: 3 files; commit with `/crav1-finalize-commit` when ready.
 ```
+
+The command is in a code span (1.199.0). A PR skill whose only change is its own PR note names the one-yes commit and push: ``Uncommitted: 1 file; commit and push with `/crav1-finalize-commit commit-push`.``
 
 Do not put the commit command in `Next` or `Waiting`.
 

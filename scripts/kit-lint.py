@@ -792,6 +792,36 @@ def invocation_problems(kit):
     return lines
 
 
+def maintainer_tool_problems(kit):
+    """1.199.0: the maintainer-only kit_dry_run tester is never named where users or skills read it.
+
+    Skills, their copies, plugin files, docs/ (skills.yaml included) and the
+    README stay silent about it; CONTRIBUTING.md and the repo's top-level
+    scripts/ are the only places it lives. The CHANGELOG is bundled into
+    crav1-docs, so it describes the tester without its file name.
+    """
+    out = []
+    word = "kit_dry_run"
+    roots = [os.path.join(kit, part) for part in (".cursor", ".claude", "plugins", "docs")]
+    singles = [os.path.join(kit, name) for name in ("README.md", "CHANGELOG.md", "SUPPORT.md")]
+    paths = list(singles)
+    for root in roots:
+        for folder, _dirs, names in os.walk(root):
+            if "__pycache__" in folder:
+                continue
+            paths += [os.path.join(folder, name) for name in names]
+    for path in paths:
+        if not os.path.isfile(path) or path.endswith((".pyc", ".png", ".jpg", ".gif", ".pptx")):
+            continue
+        try:
+            text = open(path, encoding="utf-8").read()
+        except (OSError, UnicodeDecodeError):
+            continue
+        if word in text:
+            out.append(f"{os.path.relpath(path, kit)}: names the maintainer-only kit_dry_run tester; keep it to CONTRIBUTING.md and scripts/")
+    return out
+
+
 def main(argv):
     kit = os.path.abspath(argv[1] if len(argv) > 1 else os.environ.get("KIT_DIR", "."))
     errs = []
@@ -848,6 +878,7 @@ def main(argv):
     errs.extend(design_card_problems(kit))
     errs.extend(explain_tech_problems(kit))
     errs.extend(invocation_problems(kit))
+    errs.extend(maintainer_tool_problems(kit))
     for e in errs: print("FAIL  " + e)
     print(f"kit lint: {len(skills)} skills, {len(errs)} problem(s)")
     return 1 if errs else 0

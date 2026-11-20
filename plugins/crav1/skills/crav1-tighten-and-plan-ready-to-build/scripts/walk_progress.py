@@ -1641,6 +1641,7 @@ def record_quiet(root: Path | None, result: str, hits: list[dict]) -> str | None
         return None
     if not previous or previous == result or previous not in READY_ONLY:
         return None
+    # 1.199.0: your own pushed task waiting for its merge is a merge wait too.
     if any(hit.get("kind") != "waiting" and not hit.get("merge") for hit in hits):
         return None
     return f"Recorded: {result} (was {previous})."
@@ -2386,6 +2387,11 @@ def unlinked(args: argparse.Namespace) -> None:
     emit({"ok": True, "count": len(missing), "questions": missing})
 
 
+_OWN_PUSHED = re.compile(
+    r"\bpushed\b.*\bwaits? (?:for|on) (?:its|the) (?:merge|pull request|pr)\b"
+    r"|\bwaits? (?:for|on) (?:its|the) (?:pull request'?s? |pr'?s? )?merge\b", re.I)
+
+
 def classify(row: dict, resolve_kept: bool = False, resolve_recorded: bool = False) -> dict | None:
     bucket = str(row.get("bucket") or "")
     reason = str(row.get("reason") or "")
@@ -2423,6 +2429,19 @@ def classify(row: dict, resolve_kept: bool = False, resolve_recorded: bool = Fal
         return _hit(task, "assumption", "review-plan", "The ready check assumed a plan review. Run /crav1-review-plan, then /crav1-tighten-plan.")
     if "p# open" in text or "open p#" in text:
         return _hit(task, "assumption", "tighten-plan", "The plan review still has open P# items. Run /crav1-tighten-plan.")
+    if bucket != "done" and (row.get("own_pr_open") or (row.get("own_claim") and _OWN_PUSHED.search(text))):
+        # 1.199.0: your own task, pushed and waiting for its pull request to
+        # merge, is waiting, never an unrecognized blocker.
+        hit = _waiting(row)
+        hit["merge"] = True
+        hit["own"] = True
+        hit["step"] = None
+        hit["who"] = None
+        pr = row.get("own_pr_open")
+        hit["pr"] = pr
+        wait = f"waits for PR {pr}'s merge" if pr else "waits for its pull request to merge"
+        hit["why"] = f"{task or 'The task'} is yours and {wait}. It is not offered in Run next."
+        return hit
     if bucket == "waits-in-order":
         return None
     if bucket in ("ready", "done") and not warning:
@@ -2553,7 +2572,7 @@ def _hit(task, kind: str, command_key: str | None, why: str) -> dict:
             "can_jump_back": False,
             "outside_walk": False,
             "kind": kind,
-            "why": why + " The walk does not invent a step for this.",
+            "why": why.rstrip().rstrip(".") + ". The walk does not invent a step for this.",
         }
     step = "review-and-tighten-plan" if command_key in ("review-plan", "tighten-plan") else command_key
     return {
@@ -3948,7 +3967,94 @@ def apply_progress_waits(root: Path | None, rows: list[dict]) -> dict:
         task = row.get("task")
         if task in opened and row.get("own_claim") and not row.get("merge_wait"):
             row["own_pr_open"] = opened[task]
+    fill_merge_prs(root, rows, opened)
     return waits
+
+
+def fill_merge_prs(root: Path | None, rows: list[dict], opened: dict | None = None) -> None:
+    """Name the pull request on a merge wait when it is known (1.199.0).
+
+    From the branch's open-pr step, the branch run log in walk-progress.md,
+    or another task waiting on the same branch, so the line reads
+    `Waiting: PR 85 to merge, then ...`, not `the pull request`.
+    """
+    opened = opened if opened is not None else progress_open_prs(root)
+    try:
+        built = walk_built(root) or {}
+    except Exception:  # noqa: BLE001
+        built = {}
+    waits = [row for row in rows if isinstance(row.get("merge_wait"), dict)]
+    if not waits:
+        return
+    known = branch_pr_numbers(root) if any(not row["merge_wait"].get("pr") for row in waits) else {"tasks": {}, "branches": {}}
+    for row in waits:
+        if not row["merge_wait"].get("pr"):
+            task = row.get("task")
+            row["merge_wait"]["pr"] = (known["tasks"].get(task) or known["branches"].get(row["merge_wait"].get("branch"))
+                                       or opened.get(task) or (built.get(task) or {}).get("pr"))
+    by_branch = {row["merge_wait"]["branch"]: row["merge_wait"]["pr"] for row in waits
+                 if row["merge_wait"].get("pr") and row["merge_wait"].get("branch")}
+    for row in waits:
+        info = row["merge_wait"]
+        pr = info.get("pr") or by_branch.get(info.get("branch"))
+        if not pr:
+            continue
+        info["pr"] = pr
+        reason = str(row.get("reason") or "")
+        if "waits for its pull request to merge" in reason:
+            row["reason"] = reason.replace("waits for its pull request to merge", f"waits for PR {pr} to merge")
+
+
+_PR_NOTE = re.compile(r"\(PR\s+#?(\d+)\b", re.I)
+
+
+def branch_pr_numbers(root: Path | None) -> dict:
+    """A branch's pull request number from local files, read-only (1.199.0).
+
+    The same places pr-status reads: the spec's Match `Branch:` line
+    `(PR n)`, a task's `(PR n)` note in tasks.md (that task, and its
+    `(branch: X)` branch), and any author's build-progress log for the
+    branch. {"branches": {branch: n}, "tasks": {"T5": n}}. No host call.
+    """
+    out: dict = {"branches": {}, "tasks": {}}
+    if root is None or not Path(root).is_dir():
+        return out
+    mod = map_mod()
+    try:
+        spec = (Path(root) / "spec.md").read_text(encoding="utf-8")
+    except OSError:
+        spec = ""
+    for line in spec.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("- "):
+            stripped = stripped[2:].strip()
+        if not stripped.lower().startswith("branch:"):
+            continue
+        match = _PR_NOTE.search(stripped)
+        token = mod.branch_token(re.sub(r"\([^)]*\)", " ", stripped.split(":", 1)[1]))
+        if match and token:
+            out["branches"].setdefault(token, int(match.group(1)))
+    try:
+        tasks = (Path(root) / "tasks.md").read_text(encoding="utf-8")
+    except OSError:
+        tasks = ""
+    for num, rest in _task_rests(tasks).items():
+        match = _PR_NOTE.search(rest or "")
+        if not match:
+            continue
+        out["tasks"][f"T{num}"] = int(match.group(1))
+        for mark in re.finditer(r"\((?:branch|map):\s*([^)]+)\)", rest, re.I):
+            token = mod.branch_token(mark.group(1))
+            if token:
+                out["branches"].setdefault(token, int(match.group(1)))
+    try:
+        walks = mod.progress_state(root) or {}
+    except Exception:  # noqa: BLE001 - a bad progress file must not hide the rows
+        walks = {}
+    for branch, walk in walks.items():
+        if walk.get("pr") and not walk.get("merged"):
+            out["branches"].setdefault(branch, int(walk["pr"]))
+    return out
 
 
 def progress_open_prs(root: Path | None) -> dict:
@@ -5277,6 +5383,7 @@ def ready_branches(root: Path) -> list[dict]:
     apply_claims(root, rows)
     apply_progress_waits(root, rows)
     apply_verified_on_branch(root, rows)
+    fill_merge_prs(root, rows)
     apply_loop_holds(root, rows)
     apply_release_gates(root, rows)  # 1.198.0: the build-walk ending uses this list
     resolve_kept = resolve_is_keep(root)
@@ -5679,6 +5786,10 @@ def hard_hit_line(result: str, hits: list[dict], can_start: list) -> str | None:
     plain = next((part for part in sentences if not _INSTRUCTION.match(part)), "")
     plain = plain.rstrip(".")
     what = str(hit.get("bucket") or hit.get("kind") or "held").replace("-", " ")
+    # 1.199.0: `T30 is blocked`, never `T30 is blocker`.
+    what = {"blocker": "blocked", "assumption": "held by an assumption"}.get(what, what)
+    if plain.lower().startswith("unrecognized blocker: "):
+        plain = plain[len("unrecognized blocker: "):]
     who = hit.get("task") or "The slice"
     head = f"Not ready: {who} is {what}"
     if plain and plain.lower() not in head.lower():
@@ -5846,6 +5957,7 @@ def compose_ending(
     replaced: str | None,
     branch_runs: list[str] | None = None,
     catch_up: str | None = None,
+    hard_line: str | None = None,
 ) -> str:
     """The reply for a walk ending. Print this text. Do not point at earlier output.
 
@@ -5866,6 +5978,7 @@ def compose_ending(
         alternatives=alternatives,
         notes=[replaced] if replaced else None,
         catch_up=catch_up or None,
+        after_run=hard_line or None,
     )
 
 
@@ -6131,6 +6244,7 @@ def _readiness(args: argparse.Namespace) -> None:
         apply_task_branches(root, rows)
         apply_progress_waits(root, rows)
         apply_verified_on_branch(root, rows)
+        fill_merge_prs(root, rows)  # 1.199.0: someone else's verified branch too
         loop_lines = apply_loop_holds(root, rows)
         deadlock_lines = apply_merge_deadlocks(rows)
         apply_walk_starts(root, rows, getattr(args, "user", None) or _git_user(root))
@@ -6322,9 +6436,11 @@ def _readiness(args: argparse.Namespace) -> None:
             if not catch_up:
                 nxt = shown_run[0]
         waiting_bits = list(deadlock_lines) + [bit for bit in waiting_bits if bit not in deadlock_lines]
+    # 1.199.0: the hard hit comes right after Run next, before Held.
+    hard_line = hard_hit_line(result, hits, can_start)
     ending = compose_ending(
         result, shown_run, held_lines, waiting_bits, shown_next, because, replaced, run_status,
-        catch_up=catch_up,
+        catch_up=catch_up, hard_line=hard_line,
     )
     claim_info = claim_info if "claim_info" in locals() else {"claims": [], "warnings": [], "ids": []}
     warnings = list(claim_info.get("warnings") or [])
@@ -6334,7 +6450,6 @@ def _readiness(args: argparse.Namespace) -> None:
         ending = (ending + "\n\n" if ending else "") + "\n".join(warnings)
     # 1.198.0: a not-ready result with tasks that can start names the hard hit
     # and those tasks, whatever leads Run next (catch-up, resume, merges).
-    hard_line = hard_hit_line(result, hits, can_start)
     if hard_line and hard_line not in (ending or ""):
         ending = (ending + "\n\n" if ending else "") + hard_line
     own_line = own_claim_line([row for row in rows if row.get("own_claim")])
@@ -7061,6 +7176,27 @@ def start_check_mod():
     return _load_script("crav1-add-to-spec", "start_check.py", "start-check")
 
 
+_MERGE_FROM = re.compile(r"Merge (?:pull request #?\d+ from \S+?/|branch ')(?P<b>[^'\s]+)|Merged PR \d+: .*? \((?P<b2>[^)]+)\)", re.I)
+_SPEC_PATH = re.compile(r"`([A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)+/?)`")
+
+
+def _merge_source(commit: str) -> str | None:
+    """The branch a merge commit's subject names, when it names one (1.199.0)."""
+    m = _MERGE_FROM.search(commit)
+    return (m.group("b") or m.group("b2")) if m else None
+
+
+def _slice_paths(spec: str, code_repo) -> list[str]:
+    """Repo paths the spec names in code spans that exist in the code repo (1.199.0)."""
+    out = []
+    for path in _SPEC_PATH.findall(spec or ""):
+        if path.startswith(("docs/", "http")):
+            continue
+        if code_repo and (Path(code_repo) / path).exists():
+            out.append(path)
+    return sorted(set(out))
+
+
 def code_drift(args: argparse.Namespace) -> None:
     """Is the spec's record behind the code (1.194.0)? Read-only, no fetch.
 
@@ -7081,6 +7217,8 @@ def code_drift(args: argparse.Namespace) -> None:
     fetched = sc.fetch(args.code_repo, getattr(args, "no_fetch", False))
     behind = []
     merged_tips = []
+    unlisted: list[dict] = []
+    slice_paths = _slice_paths(spec, args.code_repo)
     for row in synced:
         if args.branch and row["branch"] != args.branch:
             continue
@@ -7101,6 +7239,21 @@ def code_drift(args: argparse.Namespace) -> None:
             ins = {h for h in ins if _git_lines(args.code_repo, "merge-base", "--is-ancestor", f"{h}^2", base_ref) is not None}
             own = [c for c in own if c.split()[0] not in ins]
         merged_in = len(allc) - len(own)
+        # 1.199.0: base commits merged in from branches the spec does not list
+        # that touch this slice's files are drift too, not "merged in".
+        if merged_in and slice_paths:
+            listed = {r["branch"] for r in synced}
+            own_set = {c.split()[0] for c in own}
+            for commit in allc:
+                short = commit.split()[0]
+                if short in own_set or _recorded(short, known):
+                    continue
+                files = _git_lines(args.code_repo, "show", "--name-only", "--format=", short) or []
+                source = _merge_source(commit)
+                if source and source in listed:
+                    continue
+                if any(f.strip() and any(f.strip().startswith(pth) for pth in slice_paths) for f in files):
+                    unlisted.append({"branch": row["branch"], "commit": commit, "from": source or "an unlisted branch"})
         # 1.196.0: a work branch whose tip is already in the base is merged; take it in
         # unless the merge (or a later commit) is already recorded.
         if base_ref and base_ref != ref and row["branch"] not in ("develop", "main", "master"):
@@ -7126,6 +7279,10 @@ def code_drift(args: argparse.Namespace) -> None:
         merged = {"sha": first["sha"], "pr": first["pr"], "branch": first["branch"], "tip_merged": True}
         if not args.pr and first["pr"]:
             args.pr = first["pr"]
+    if unlisted and not behind:
+        first = unlisted[0]["branch"]
+        behind.append({"branch": first, "synced": next(r["sha"] for r in synced if r["branch"] == first), "ref": first,
+                       "base": None, "count": 0, "total": 0, "already_recorded": 0, "base_merge_ins": 0, "commits": []})
     if not behind and not merged:
         emit({"ok": True, "behind": False, "offer": None, "wrote": None, "fetch": fetched,
               "message": "The spec's Synced at lines are current with the code; no add-to-spec offer."})
@@ -7135,6 +7292,11 @@ def code_drift(args: argparse.Namespace) -> None:
     parts = [f"{b['count']} commit{'s' if b['count'] != 1 else ''} on {b['branch']} after Synced at {b['synced']} not recorded yet"
              + (f" ({b['already_recorded'] + b['base_merge_ins']} more already recorded or merged in from {short_ref(b['base'])})"
                 if b['already_recorded'] + b['base_merge_ins'] else "") for b in behind]
+    parts = [part for part, b in zip(parts, behind) if b["count"]]
+    if unlisted:
+        n = len(unlisted)
+        parts.append(f"{n} commit{'s' if n != 1 else ''} merged in from the base touch this slice's files "
+                     f"and come from a branch the spec does not list")
     if merged:
         parts.append(f"PR {args.pr} merged at {merged['sha']}" if args.pr else f"a merge at {merged['sha']}")
     what = "; ".join(parts)
@@ -7145,6 +7307,7 @@ def code_drift(args: argparse.Namespace) -> None:
         "drift": behind,
         "merged": merged,
         "merged_tips": merged_tips,
+        "unlisted": unlisted[:5],
         "fetch": fetched,
         "command": command,
         "path": ADD_TO_SPEC_PATH,

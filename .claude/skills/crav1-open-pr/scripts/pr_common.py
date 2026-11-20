@@ -256,6 +256,27 @@ def summarize_checks(view: dict) -> dict:
             "line": f"{len(passing)} passing, {len(failing)} failing, {len(pending)} pending" + ("" if state == "OPEN" else f"; {state}")}
 
 
+def azure_org(ref: dict, repo: str | None = None) -> str | None:
+    """The Azure DevOps organization URL for `az` (1.199.0).
+
+    From the PR URL or the git remote (`parse_ref` already has it), else the
+    `docs/system/repos.md` route that `ado_threads.py` uses (skill
+    crav1-review-pr). None when neither names one; az then uses its defaults.
+    """
+    if ref.get("org"):
+        return f"https://dev.azure.com/{ref['org']}"
+    try:
+        import importlib.util
+        path = Path(__file__).resolve().parents[2] / "crav1-review-pr" / "scripts" / "ado_threads.py"
+        spec = importlib.util.spec_from_file_location("ado_threads_for_pr_common", path)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        found = mod.repos_md_route(Path(repo or ".").resolve(), ref.get("repo"))
+        return found.get("org")
+    except Exception:  # noqa: BLE001 - no route: az falls back to its defaults
+        return None
+
+
 def cmd_checks(args) -> int:
     if args.from_json:
         return emit(summarize_checks(json.loads(Path(args.from_json).read_text(encoding="utf-8"))))
@@ -268,11 +289,13 @@ def cmd_checks(args) -> int:
         if code != 0:
             return emit({"status": "cli-failed", "host": "github", "line": (err or out).strip()[:300]}, 1)
         return emit(summarize_checks(json.loads(out)))
-    code, out, err = _run(["az", "repos", "pr", "show", "--id", str(ref["number"]), "--detect", "false", "--output", "json"], cwd=args.repo)
+    org = azure_org(ref, args.repo)
+    org_args = ["--organization", org] if org else []
+    code, out, err = _run(["az", "repos", "pr", "show", "--id", str(ref["number"]), "--detect", "false", "--output", "json", *org_args], cwd=args.repo)
     if code != 0:
         return emit({"status": "cli-failed", "host": "azure", "line": (err or out).strip()[:300]}, 1)
     view = json.loads(out)
-    code, pol, _ = _run(["az", "repos", "pr", "policy", "list", "--id", str(ref["number"]), "--detect", "false", "--output", "json"], cwd=args.repo)
+    code, pol, _ = _run(["az", "repos", "pr", "policy", "list", "--id", str(ref["number"]), "--detect", "false", "--output", "json", *org_args], cwd=args.repo)
     view["policies"] = json.loads(pol) if code == 0 and pol.strip() else []
     return emit(summarize_checks(view))
 

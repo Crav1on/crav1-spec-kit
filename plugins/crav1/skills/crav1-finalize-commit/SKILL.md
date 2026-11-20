@@ -3,8 +3,8 @@ name: crav1-finalize-commit
 description: >-
   Use when the user wants a commit message drafted or a commit made. Drafts
   Summary and Description first, then offers commit, copy, change, or stop.
-  Choice words: `message-only`, `commit-now`, `pull`; `crav1` or `git-log`
-  sets the style. Never pushes.
+  Choice words: `message-only`, `commit-now`, `commit-push`, `pull`; `crav1`
+  or `git-log` sets the style. Pushes only on `commit-push`.
 disable-model-invocation: true
 icon: git-branch
 color: green
@@ -97,7 +97,7 @@ The final message is exactly what this skill drafted. Any other line: read [refe
 - Do not install a hook to enforce the work-item line. Do not block the commit when `work-item.md` is missing. The only hook is the trailer hook, after `strip-trailers`.
 - Do not change product files except the persist rules the draft skill already writes, and the trailer hook and its saved answer (`.githooks/commit-msg`, `trailer-hook` rule). Cursor: `.cursor/rules/draft-commit-style.mdc` or `.cursor/rules/draft-commit-gitlog.mdc`. Claude Code project: `.claude/rules/draft-commit-style.md` or `.claude/rules/draft-commit-gitlog.md`. Claude Code user: `~/.claude/rules/draft-commit-style.md` or `~/.claude/rules/draft-commit-gitlog.md`.
 - Never commit implementation code on a base branch ([references/base-branch.md](references/base-branch.md)).
-- Never push and never rebase. Do not open a PR. This run makes at most two commits: the drafted commit, and one merge commit when the branch was behind. Do not commit a notes index rebuild on its own. After a successful commit, the ending follows run-ending.md. Do not invoke the command it names.
+- Never rebase. Push only on `commit-push` (1.199.0): one plain `git push` after the commit and its fetch check, never a force push. Do not open a PR. This run makes at most two commits: the drafted commit, and one merge commit when the branch was behind. Do not commit a notes index rebuild on its own. After a successful commit, the ending follows run-ending.md. Do not invoke the command it names.
 
 ## Run ending (1.122.0)
 

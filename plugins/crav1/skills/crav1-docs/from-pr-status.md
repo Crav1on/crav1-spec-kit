@@ -97,3 +97,7 @@ Reference page: [pr-status](reference/skills/crav1-pr-status.md)
 ## 1.198.0 changes
 
 `/crav1-pr-status` passes `--code-repo` to the threads script's since-last check, and the script finds the Azure DevOps organization in `docs/system/repos.md` when the remote names none. Every `--query` value is quoted for Windows. `/crav1-merge-pr` fetches the specs repo before it reads the PR note, and `/crav1-open-pr` offers Open PR only when the head is already pushed.
+
+## 1.199.0 changes
+
+When your drafted reply and a status change are for the same thread, `/crav1-pr-status` asks one card, `Post your reply in thread 195 and set it to fixed?`, and on yes runs `ado_threads.py reply --pr <n> --thread <id> --file <draft file> --status fixed --yes`, which replies inside the thread, sets it fixed and marks the draft posted in the PR note. Drafted replies carry their thread link, and their words match what the card does. A question that was answered and accepted is `answered` in the record, said as `answered; no code change`. The card comes before the ending, which is printed once; waiting on someone ends with a label and `/crav1-pr-status <pr> since-last` alone in its code span, and you are `you`. The run reads threads with `list --brief`, runs merged-since-sync once and the ready check only when the PR closes a task. `pr_common.py checks --ref <n>` passes the Azure DevOps organization to both `az` calls.

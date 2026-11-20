@@ -14,9 +14,15 @@ The one place for how the kit reads a pull request's comment threads, pushes and
 
 `az repos pr` has no thread command. There is no `az repos pr thread list`. Azure DevOps pull requests are read and changed only through `scripts/ado_threads.py` in `crav1-review-pr` (1.193.0). Never use `az rest`, `az devops invoke` by hand, `curl`, or any call with a token you fetched yourself: on Windows a redirect writes the console code page and accented names come back broken. The script decodes UTF-8 first and its JSON keeps accented characters intact. Organization, project and repository come from the code repo's git remote (`--code-repo`); `--org`, `--project` and `--repo` override. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says.
 
+Read the script's output as it is: `list --brief` for a summary, never ad hoc parsing of the full JSON. A thread's key is always `thread` (1.199.0).
+
 ```text
 # threads, with thread and comment dates (published, updated) and status
 ado_threads.py list --pr <n>
+# one line per thread: thread id, status, file:line, last author, last 200 characters (1.199.0)
+ado_threads.py list --pr <n> --brief
+# reply inside thread <t>, then set it fixed; marks the drafted reply posted in the PR note (1.199.0)
+ado_threads.py reply --pr <n> --thread <t> --file <reply file> --status fixed --note <PR note> --yes
 # title, state, description, created date and reviewer votes
 ado_threads.py pr --pr <n>
 # pushes (iterations): id, date, head commit

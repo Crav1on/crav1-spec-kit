@@ -77,8 +77,8 @@ Its **Hand-offs** section holds the three kinds: spec or decision candidates (na
 
 ## Hard rules
 
-- Never post, reply, vote, approve or resolve on the host, except one thread status the user said yes to for that thread.
-- Replies and messages to other people are drafts. Never send them.
+- Never post, reply, vote, approve or resolve on the host, except, on that one thread's yes, its status and your drafted reply inside it (1.199.0).
+- Replies are drafts until their thread's yes; messages to other people are never sent.
 - No edits to code, `spec.md`, `plan.md`, `tasks.md` or `verify.md`. The only writes are the PR note with its record, and the generated notes indexes.
 - Read-only toward the code repo; the only git write is a fetch of the pull request's two branches, as `/crav1-review-pr` asks first.
 - Never log in. Never print, echo or store a token. Redact secrets and personal data the way `/crav1-review-pr` does ([pr-common.md](../crav1-docs/reference/pr-common.md), "Signing in and secrets").

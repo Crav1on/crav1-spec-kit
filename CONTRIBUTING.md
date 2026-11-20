@@ -56,3 +56,13 @@ Every skill added or changed aims for the leanest load path:
 - Keep `SKILL.md` near 1,500 words (CI fails at 2,000). Move a section out, with a one-line pointer, before it grows. A `BRANCH.md` fails CI over 2,000 words (1.107.0); move a later step into `branches/<name>/references/`.
 - Add a unit test for the routing when a skill gains paths (see `scripts/tests/test_report_routing.py`).
 
+## Dry-run a kit pull request on a real project (maintainers, 1.199.0)
+
+`scripts/kit_dry_run.py` is a maintainer tool, not part of the kit: it is not a skill, not in `skills.yaml` or the user docs, and `update_kit.py` never installs the top-level `scripts/` folder (kit-lint fails if a skill, plugin file or user doc names it). From the project root:
+
+```powershell
+python -X utf8 kit_dry_run.py --pr 277 --spec "orders-api"
+```
+
+`--branch <name>` instead of `--pr`; `--extra "build_map.py --root {folder}"` (repeatable) runs another kit script from the installed copy. It shallow-clones the kit at that pull request into a temp folder, adds a detached temporary `git worktree` of the project at HEAD, runs the kit's own `update_kit.py` (`detect`, `plan`, `apply` against the installed release) into the worktree, then `walk_progress.py start --root <spec> --skip-sync` and `readiness --root <folder> --text`. It prints one block between `===== COPY FROM HERE =====` and `===== COPY TO HERE =====`, saves it in the temp folder and copies it to the clipboard when `clip`, `pbcopy`, `wl-copy` or `xclip` is there. It snapshots the project (branch, HEAD, `git status --porcelain`, `git stash list`, `git worktree list`) before and after and says `Your repo: unchanged` or `Your repo CHANGED:` with the difference. The worktree and both temp folders are always removed. It never commits, pushes or fetches into the project.
+
