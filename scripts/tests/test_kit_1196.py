@@ -328,7 +328,9 @@ class Tickable(unittest.TestCase):
         out = js(WALK, "tickable", "--root", str(self.root))
         acts = {i["row"]: i["action"] for i in out["items"]}
         self.assertEqual(acts, {"A1": "tick", "A2": "tick-recheck"})
-        self.assertEqual({c["row"] for c in out["cards"]}, {"A3", "A4"})
+        # 1.197.0: only failing or no-evidence rows are cards; a branch-only pass waits (test_kit_1197).
+        self.assertEqual({c["row"] for c in out["cards"]}, {"A4"})
+        self.assertEqual(out["waiting"], [3])
         self.assertIsNone(out["wrote"])
         self.assertIn("- [ ] Retries stop", (self.root / "spec.md").read_text(encoding="utf-8"))
 

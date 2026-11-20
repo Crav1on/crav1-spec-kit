@@ -2398,6 +2398,13 @@ def classify(row: dict, resolve_kept: bool = False, resolve_recorded: bool = Fal
         hit["who"] = None
         hit["why"] = f"{task or 'The task'} is pushed and {merge_wait_phrase(row['merge_wait'])}. It is not offered in Run next."
         return hit
+    if row.get("release_gate"):
+        hit = _waiting(row)
+        hit["release"] = True
+        hit["step"] = None
+        hit["who"] = None
+        hit["why"] = f"{task or 'The task'} {row['release_gate']}. It is not offered in Run next."
+        return hit
     if row.get("approval") or "approval needed" in text:
         return _waiting(row)
     if "open question" in text:
@@ -4825,6 +4832,52 @@ def apply_merge_deadlocks(rows: list[dict]) -> list[str]:
     return lines
 
 
+# 1.197.0: a manual prod task waits for its release, never offered as the first task.
+AFTER_RELEASE = re.compile(r"\(after-release:\s*([^)\s]+)\s*\)", re.I)
+MANUAL_PROD_TASK = re.compile(r"\(manual,\s*(?:prod|production|prd)\b", re.I)
+GATE_TASK = re.compile(r"^\s*-\s*\[ \]\s*(T\d+)\b(.*)$")
+
+
+def release_gates(root: Path | None) -> dict[str, str]:
+    """T# to its release gate phrase: an `(after-release: <branch>)` mark, or a `(manual, prod` task
+    that a plan.md `## Risks` line names together with the word release."""
+    if root is None:
+        return {}
+    tasks_path, plan_path = Path(root) / "tasks.md", Path(root) / "plan.md"
+    if not tasks_path.is_file():
+        return {}
+    plan = plan_path.read_text(encoding="utf-8") if plan_path.is_file() else ""
+    risks = plan.split("## Risks", 1)[1] if "## Risks" in plan else ""
+    risks = re.split(r"\n## ", risks, maxsplit=1)[0]
+    gates = {}
+    for line in tasks_path.read_text(encoding="utf-8").splitlines():
+        m = GATE_TASK.match(line)
+        if not m:
+            continue
+        tid, rest = m.group(1), m.group(2)
+        mark = AFTER_RELEASE.search(rest)
+        if mark:
+            gates[tid] = f"waits for the first release to {mark.group(1)} and a prod yes"
+            continue
+        if MANUAL_PROD_TASK.search(rest):
+            for risk in risks.splitlines():
+                if re.search(rf"\b{tid}\b", risk) and re.search(r"(?i)\breleases?\b", risk):
+                    gates[tid] = "waits for the release its Risks line names and a prod yes"
+                    break
+    return gates
+
+
+def apply_release_gates(root: Path | None, rows: list[dict]) -> None:
+    gates = release_gates(root)
+    for row in rows:
+        task = row.get("task")
+        if task in gates and row.get("bucket") in ("ready", "waits-in-order"):
+            row["bucket"] = "waiting"
+            row["held"] = True
+            row["release_gate"] = gates[task]
+            row["reason"] = gates[task]
+
+
 def apply_walk_starts(root: Path, rows: list[dict], user: str | None = None) -> None:
     """Offer a task only when the walk can start it (1.186.0).
 
@@ -5930,6 +5983,7 @@ def _readiness(args: argparse.Namespace) -> None:
         loop_lines = apply_loop_holds(root, rows)
         deadlock_lines = apply_merge_deadlocks(rows)
         apply_walk_starts(root, rows, getattr(args, "user", None) or _git_user(root))
+        apply_release_gates(root, rows)
     for row in rows:
         if not isinstance(row, dict):
             fail("readiness", "each row must be an object")
@@ -7023,14 +7077,25 @@ def tickable_report(root: Path) -> dict:
         m = _TASK_OPEN.match(line)
         if m and m.group(1) == " ":
             open_tasks[f"T{m.group(2)}"] = line
-    found, cards = [], []
+    found, cards, waiting = [], [], []
     for row in rows:
         item = _match_item(row, items)
         if item is None or item["ticked"]:
             continue
         files = sorted({f.split(":")[0] for f in _EVIDENCE_FILE.findall(row["evidence"])})
-        if not _row_passes_on_base(row) or not files:
-            cards.append({"item": item["item"], "text": item["text"], "row": row["id"], "result": row["result"]})
+        passes = _row_passes_on_base(row)
+        # 1.197.0: only a failing row, or a passing row with no evidence, is a question.
+        # An untested or pending row waits on its tasks with no question.
+        if passes and not files:
+            cards.append({"item": item["item"], "text": item["text"], "row": row["id"], "result": row["result"],
+                          "why": "passes with no evidence"})
+            continue
+        if not passes:
+            if re.match(r"(?i)\s*fail", row["result"] or ""):
+                cards.append({"item": item["item"], "text": item["text"], "row": row["id"], "result": row["result"],
+                              "why": "failing"})
+            else:
+                waiting.append(item["item"])
             continue
         touching = [t for t in row["tasks"] if t in open_tasks]
         for tid, line in open_tasks.items():
@@ -7038,7 +7103,7 @@ def tickable_report(root: Path) -> dict:
                 touching.append(tid)
         found.append({"item": item["item"], "text": item["text"], "row": row["id"], "evidence_files": files,
                       "open_tasks_touching": touching, "action": "tick-recheck" if touching else "tick"})
-    return {"items": found, "cards": cards}
+    return {"items": found, "cards": cards, "waiting": waiting}
 
 
 def _add_recheck(tasks: str, tid: str, note: str) -> str:
@@ -7063,8 +7128,8 @@ def tickable(args: argparse.Namespace) -> None:
 
     No card when the evidence is clear: the item is ticked. When a later open
     task touches the evidence files, it is still ticked now and that task's
-    verify note gets `recheck item N (verify A#)`. A failing or unmatched row
-    is listed under `cards`. Writes only with --write."""
+    verify note gets `recheck item N (verify A#)`. Only a failing row, or a passing
+    row with no evidence, is listed under `cards` (1.197.0); untested rows are `waiting`. Writes only with --write."""
     root = Path(args.root)
     report = tickable_report(root)
     wrote = []
@@ -7094,7 +7159,10 @@ def tickable(args: argparse.Namespace) -> None:
         verb = "Ticked" if args.write else "Can tick"
         n = len(parts)
         line = f"{verb} {n} acceptance item{'s' if n != 1 else ''} from verify: " + ", ".join(parts) + "."
-    emit({"ok": True, **report, "line": line, "wrote": wrote or None})
+    wait_n = len(report["waiting"])
+    wait_line = (f"{wait_n} acceptance item{'s wait' if wait_n != 1 else ' waits'} on {'their' if wait_n != 1 else 'its'} tasks."
+                 if wait_n else None)
+    emit({"ok": True, **report, "line": line, "waiting_line": wait_line, "wrote": wrote or None})
 
 
 # Hash lines resolve-stamps may rewrite (1.139.0). Done, Result, findings,

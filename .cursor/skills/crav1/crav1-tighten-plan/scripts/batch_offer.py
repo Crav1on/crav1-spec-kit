@@ -63,14 +63,30 @@ LABELS = {
     "suggest": "get a suggestion",
     "ask": "ask the owner",
 }
-_ID = re.compile(r"(?<![\w-])(" + "|".join(sorted((re.escape(k) for k in LABELS), key=len, reverse=True)) + r")(?![\w-])")
+_LETTER = re.compile(r"^[A-H]\s+(?=\S)")
+_SEP = re.compile(r"([;,]\s*)")
+
+
+def _plain_part(part: str) -> str:
+    """One option: drop a leading A/B letter; map an id only when it is the whole option
+    or the part before its first ':' (1.197.0). Words inside option text never change."""
+    lead = part[: len(part) - len(part.lstrip())]
+    body = _LETTER.sub("", part.strip())
+    head, colon, rest = body.partition(":")
+    if body in LABELS:
+        body = LABELS[body]
+    elif colon and head.strip() in LABELS:
+        body = LABELS[head.strip()] + colon + rest
+    return lead + body
 
 
 def plain(text: str) -> str:
-    """One option or a list of options in plain words: drop A/B letters, map internal ids."""
+    """One option or a list of options in plain words: drop A/B letters, map whole internal ids."""
     text = " ".join(str(text).split())
-    text = re.sub(r"(^|[;,]\s*)[A-H]\s+(?=\S)", r"\1", text)
-    return _ID.sub(lambda m: LABELS[m.group(1)], text)
+    pieces = _SEP.split(text)
+    return "".join(p if i % 2 else _plain_part(p) for i, p in enumerate(pieces))
+
+
 HEADER = "| Id | Issue | Options | Recommendation |"
 RULE = "| --- | --- | --- | --- |"
 
