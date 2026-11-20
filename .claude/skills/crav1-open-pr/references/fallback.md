@@ -21,7 +21,7 @@ az repos pr list --org https://dev.azure.com/<org> --project <project> --reposit
 az repos pr create --org https://dev.azure.com/<org> --project <project> --repository <repo> --source-branch <head> --target-branch <base> --title "<title>" --description "<body>" --detect false
 ```
 
-On Windows, do not put a multi-line `<body>` on that create command. `cmd.exe` keeps only the first line. Write the accepted body to a temp file as UTF-8 without a BOM and pass `--description "@<file>"`, then delete the file. See **Create**. Quote any `--query` value that contains parentheses.
+On Windows, do not put a multi-line `<body>` on that create command. `cmd.exe` keeps only the first line. Write the accepted body to a temp file as UTF-8 without a BOM and pass `--description "@<file>"`, then delete the file. See **Create**. Quote every `--query` value.
 
 When org, project, and repository are known, also print the create-PR page they can open. This is not an opened pull request. URL-encode `<head>` and `<base>` (`/` as `%2F`):
 

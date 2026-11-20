@@ -121,9 +121,36 @@ def fill_route(args) -> None:
     if getattr(args, "from_file", None) or (args.org and args.project and args.repo):
         return
     found = remote_route(remote_url(getattr(args, "code_repo", None)))
+    if not found.get("org") and not getattr(args, "org", None):
+        found = {**repos_md_route(Path.cwd(), getattr(args, "repo", None)), **found}
     for key in ("org", "project", "repo"):
         if not getattr(args, key, None) and found.get(key):
             setattr(args, key, found[key])
+
+
+def repos_md_route(start: Path, repo: str | None = None) -> dict:
+    """1.198.0: the Azure DevOps org (and project, repo) from `docs/system/repos.md` when the remote
+    names none, for example when run from the specs repo. The row naming `repo` wins, else the only
+    Azure DevOps URL. {} when not found or ambiguous."""
+    for folder in (start, *start.parents):
+        path = folder / "docs" / "system" / "repos.md"
+        if not path.is_file():
+            continue
+        routes = []
+        for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
+            for url in re.findall(r"https?://[^\s|)>`]+", line):
+                found = remote_route(url)
+                if found:
+                    routes.append(found)
+        if repo:
+            named = [r for r in routes if r["repo"].lower() == repo.lower()]
+            if named:
+                return named[0]
+        orgs = {r["org"] for r in routes}
+        if len(orgs) == 1:
+            return {"org": routes[0]["org"]} if len(routes) > 1 else routes[0]
+        return {}
+    return {}
 
 
 def _route(args, resource: str = "pullRequestThreads", extra: list[str] | None = None) -> list[str]:

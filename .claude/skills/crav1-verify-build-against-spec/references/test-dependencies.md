@@ -21,6 +21,13 @@ Typical local dependencies:
 
 Check that each one is running. Do not start anything yet. List only what the repo references. Do not guess one the repo does not name.
 
+**Containers first (1.198.0).** For each one that does not answer, run `<interpreter> -X utf8 scripts/dep_check.py containers --service <name>` in `crav1-verify-build-against-spec` (read-only; it lists docker and podman containers, stopped ones too, and a stopped podman machine). Its `state`:
+
+- `running`: the container is up; check its port again.
+- `stopped`: recommend its `start` commands, for example `podman machine start` then `podman start orders-storage`. No install.
+- `no-container`: a runtime exists; recommend the repo's documented start command.
+- `no-runtime`: only now offer to install the dependency or a container runtime.
+
 ## Ask
 
 When one is not running, ask once per dependency. Use the questions tool when it is available:
@@ -30,6 +37,8 @@ When one is not running, ask once per dependency. Use the questions tool when it
 3. **Stop.** Run no tests. Nothing is marked verified.
 
 When the start fails, say why and ask again with skip or stop.
+
+**A worker never waits on a full run (1.198.0).** When a dependency is down and no answer has come yet, the build or verify worker runs only the tests that do not need it (filter by the test project, category or marker), then reports the blocker at the top. It does not run the full suite first to find out.
 
 ## Headless runs (two-pass)
 

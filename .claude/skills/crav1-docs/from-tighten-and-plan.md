@@ -141,3 +141,7 @@ Fewer cards: housekeeping fixes in the plan apply with one summary line, a reope
 The prod lint reads each verify item and its target, so a local Bicep compile of `main.prod.bicepparam`, a unit test with PROD-like settings or a read-only check on prod is not flagged. A manual prod task that drops or changes data needs an owner and a Risks line, and the ready check holds it until its release, for example `T52 waits for the first release to main and a prod yes`, so it is never offered as the first task. Untested acceptance items stay open with no question. Batch cards keep option text as written, and the question is only the short `Card:` line.
 
 Before the plan review, the walk writes a review packet with the changed tasks, their spec sections and the plan's Risks, and `/crav1-review-plan` runs in the foreground on that packet instead of reading the whole spec. A small change gets a quick review.
+
+## 1.198.0 changes
+
+The `/crav1-tighten-and-plan-ready-to-build` ready check names the hard hit when it says not-ready while tasks can start, says `T30 is yours and waits for PR 85's merge.` for your own pushed task, names who the answers come from in `Resume the walk when the answers from person A arrive:`, shows a repeated question once (`same question as T26`), records a result that only reflects waits without a card (`Recorded: not-ready (was ready-partial).`), and labels a lone build-map change `Commit the updated build map:`. The walk start says `Kit update available: <installed> -> <latest>` when a newer release is out.

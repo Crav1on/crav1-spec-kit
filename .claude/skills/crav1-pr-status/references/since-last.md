@@ -8,7 +8,7 @@ Every run writes `- Read: <your name> | <head short sha>, push <n>, newest comme
 
 ## What changed
 
-On Azure DevOps run `ado_threads.py since-last --pr <n> --note <PR note> --who <your name>` (`crav1-review-pr` `scripts/`, 1.193.0). It compares the host with the state recorded in the PR note: your `Read` line, and the newest `## Description as of <date>` section for the description. Never compare with a temp or scratch file saved by an earlier run. On GitHub compare the same way with `gh`.
+On Azure DevOps run `ado_threads.py since-last --pr <n> --note <PR note> --who <your name> --code-repo <code checkout>` (`crav1-review-pr` `scripts/`, 1.193.0). Without a code checkout the script finds the organization in `docs/system/repos.md` (1.198.0); pass `--org <url>` when that file has none. It compares the host with the state recorded in the PR note: your `Read` line, and the newest `## Description as of <date>` section for the description. Never compare with a temp or scratch file saved by an earlier run. On GitHub compare the same way with `gh`.
 
 Compare the host now with your `Read` line and the record:
 

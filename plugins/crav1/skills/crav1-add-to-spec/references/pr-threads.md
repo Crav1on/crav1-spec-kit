@@ -41,7 +41,7 @@ What each field gives:
 
 `$iteration=<i>` (with `$baseIteration=<j>`) on the threads call maps each thread's lines to that push, so a line can be compared with today's code.
 
-**Who is signed in.** `az account show --query user.name --output tsv` gives the sign-in name; compare it, case ignored, with the pull request's `createdBy.uniqueName` and each comment's `author.uniqueName`. With a PAT and no `az login`, use `git config user.email`, then `git config user.name` against `displayName`.
+**Who is signed in.** `az account show --query "user.name" --output tsv` gives the sign-in name; compare it, case ignored, with the pull request's `createdBy.uniqueName` and each comment's `author.uniqueName`. With a PAT and no `az login`, use `git config user.email`, then `git config user.name` against `displayName`.
 
 **Change a thread's status** (only after the user's yes for that one thread; never in a batch):
 

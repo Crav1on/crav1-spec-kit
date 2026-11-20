@@ -77,7 +77,7 @@ az repos pr create --org <org-url> --project <project> --repository <repo> --sou
 
 3. Delete the temp file after the create call returns, whether it succeeded or failed. Do not commit it. Do not leave it in the repo.
 
-Quote any `--query` value that contains parentheses. `cmd.exe` treats an unquoted `(` as syntax.
+Quote every `--query` value (1.198.0). `cmd.exe` treats an unquoted `(` or `{` as syntax.
 
 Do not pass `--open`, `--auto-complete`, `--draft`, `--delete-source-branch`, `--reviewers`, `--optional-reviewers`, `--required-reviewers`, `--work-items`, `--transition-work-items`, `--squash`, `--merge-commit-message`, `--labels`, or `--bypass-policy` unless they asked for that in this chat. Do not set auto-complete, merge, draft, reviewers, work items, or delete-source-branch unless they asked.
 

@@ -4,7 +4,7 @@ Read only when the pointer in `SKILL.md` sends you here.
 
 ## Find the record
 
-Look for the pull request's PR note in the specs repo (found as **After it merged** says: this checkout with `docs/specs/`, else the workspace folder with `docs/specs/`, else a sibling `../*/docs/system/repos.md` with a row for this repo). Search the month `docs/notes/YYYY-MM/index.md` files, then the notes themselves, for `source: PR <n>` with this repo. Read its `## PR record` section, as `crav1-add-to-spec` `references/pr-record.md` says (skill `crav1-add-to-spec`, `references/pr-record.md`). Read-only.
+Fetch the specs repo first (`git -C <specs repo> fetch --quiet`, read-only; 1.198.0), and when its branch is behind origin read the note as `git show origin/<branch>:<note path>`, so a record written from another machine is seen. Offline: read the local copy and say so once. Look for the pull request's PR note in the specs repo (found as **After it merged** says: this checkout with `docs/specs/`, else the workspace folder with `docs/specs/`, else a sibling `../*/docs/system/repos.md` with a row for this repo). Search the month `docs/notes/YYYY-MM/index.md` files, then the notes themselves, for `source: PR <n>` with this repo. Read its `## PR record` section, as `crav1-add-to-spec` `references/pr-record.md` says (skill `crav1-add-to-spec`, `references/pr-record.md`). Read-only.
 
 ## The Ready line
 

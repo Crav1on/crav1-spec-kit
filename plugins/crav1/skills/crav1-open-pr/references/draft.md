@@ -63,9 +63,11 @@ Options, **in this order**:
 | Id | Choice | What it does |
 | --- | --- | --- |
 | `push` | Push and open PR | `git push -u <remote> <head>` (no force), then open one pull request. **Always list this first.** |
-| `open` | Open PR only | Remote already has this head. Do not push. Open one pull request for that remote head. |
+| `open` | Open PR only | Remote already has this head at the local commit. Do not push. Open one pull request for that remote head. Leave this choice out when the head is not pushed or the remote is behind (`git ls-remote --heads <remote> <head>`; 1.198.0): `push` pushes and opens together. |
 | `stop` | Stop | No push. No pull request. They can still copy the draft. |
+
+Opened by `/crav1-build-walk` (1.198.0): the walk's yes already chose `push`. Show base, head, title and body, then push and open with no card here.
 
 Never call the questions tool before the title and body are in the reply. If they named `push` or `open` before any draft existed, ignore it, draft, show the text, then offer the choices.
 
-If they edit the title, body, base, or head: apply only that edit, re-run the checks when base or head changed, show the new draft, **then** the same three choices (`push` still first). Do not push in the edit turn unless they pick `push` or `open` **after** seeing the new draft.
+If they edit the title, body, base, or head: apply only that edit, re-run the checks when base or head changed, show the new draft, **then** the same choices (`push` still first). Do not push in the edit turn unless they pick `push` or `open` **after** seeing the new draft.

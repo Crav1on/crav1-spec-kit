@@ -93,3 +93,7 @@ Since 1.177.1 a bare number is resolved with `--root` set to the specs repo root
 The run ends as [How a run ends](reference/run-ending.md) says. Since 1.177.0 that is Run next, never a `Next:` line: a plain label, then the command alone in its code span, for the first thing nothing blocks. A bare number such as `82` is looked up in the kit's records before this checkout's remote, as [Shared pull-request steps](reference/pr-common.md) says. A step that waits on a person or another pull request is a `Waiting:` line. Candidates stay in the report; `/crav1-pr-status` names `/crav1-add-to-spec` when you take them. Follow-ups stay drafts for `/crav1-ado-sync`. Merge is `/crav1-merge-pr` only after `Ready: yes`.
 
 Reference page: [pr-status](reference/skills/crav1-pr-status.md)
+
+## 1.198.0 changes
+
+`/crav1-pr-status` passes `--code-repo` to the threads script's since-last check, and the script finds the Azure DevOps organization in `docs/system/repos.md` when the remote names none. Every `--query` value is quoted for Windows. `/crav1-merge-pr` fetches the specs repo before it reads the PR note, and `/crav1-open-pr` offers Open PR only when the head is already pushed.

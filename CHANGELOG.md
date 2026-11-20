@@ -2,6 +2,22 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.198.0 (2026-11-20)
+
+Build-walk endings that follow the real step, checked facts, release gates in the build walk, a kit update line, fewer cards, container-aware dependency checks and ready-check ending fixes.
+
+- **Step labels.** Build-walk Run next labels follow the step: `Merge PR 71 for T5:`, `Check PR 71's merge for T5:`, `Tick T5, now that PR 71 is merged:`. Task names are the first sentence, at most 120 characters.
+- **Checked facts.** `next --code-repo` (or the progress header's `Code repo:`) counts commits behind the base before saying so; not behind skips to the merge. A `nothing-to-do` step moves on. The lead says only what was checked.
+- **Record in one call.** `progress record --step build,verify,commit` and `--pr 71`. `next --task` falls back to the branch named in the task line or the map.
+- **Release gate in the build walk.** Release-gated tasks are left out of the build-walk ending, and a manual task with no branch is listed alone, never under a generated branch name.
+- **Kit update line.** `update_kit.py available` and both walks' starts say `Kit update available: <installed> -> <latest>` with `/crav1-update-kit`; read-only, short timeout, silent offline.
+- **Fewer cards.** One yes pushes and opens the pull request; Open PR only appears only when the head is pushed. `Not yet` on the merge card also commits and pushes the walk's specs files.
+- **Dependency containers.** New `dep_check.py containers` finds docker or podman containers, stopped ones and a stopped podman machine, and recommends starting them; install only when nothing exists. A worker runs only the tests that do not need a down dependency, then reports the blocker.
+- **Ready-check ending.** Not-ready with tasks that can start names the hard hit and those tasks. Your own pushed task waits for its PR's merge. `Resume the walk` appears only for held questions and names who answers. A repeated question is shown once and cut near 120 characters. A result that only reflects waits is recorded without a card. A lone build-map change is `Commit the updated build map:`.
+- **Small fixes.** No `Next:` lines in walk prose. pr-status finds the Azure DevOps organization in `repos.md`. merge-pr fetches before the PR-note check. Every Windows `--query` value is quoted. Build-walk cards show plain labels.
+
+Docs and tests: build walk, tighten and plan, verify, update kit and pr-status walkthroughs; `scripts/tests/test_kit_1198.py`.
+
 ## 1.197.0 (2026-11-20)
 
 Fixes from a live spec walk: cleaner batch cards, a prod lint that judges each check, release gates, quieter acceptance checks and a scoped plan review.

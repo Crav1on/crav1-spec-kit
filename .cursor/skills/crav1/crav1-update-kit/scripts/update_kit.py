@@ -1202,12 +1202,73 @@ def _releases_text(path: str | None) -> str:
     return result.stdout
 
 
+LATEST_CACHE_HOURS = 12
+
+
+def _latest_release(timeout: int = 5) -> str | None:
+    """The newest published release version, read-only (1.198.0). None when offline or slow.
+
+    CRAV1_KIT_LATEST overrides it (tests, offline use). One `git ls-remote` per
+    12 hours, cached in the system temp folder.
+    """
+    import os
+    import tempfile
+    import time
+
+    forced = os.environ.get("CRAV1_KIT_LATEST", "").strip()
+    if forced:
+        return forced.lstrip("v") if forced.lower() not in ("none", "off") else None
+    cache = Path(tempfile.gettempdir()) / "crav1-kit-latest.json"
+    try:
+        data = json.loads(cache.read_text(encoding="utf-8"))
+        if time.time() - float(data.get("at", 0)) < LATEST_CACHE_HOURS * 3600 and data.get("latest"):
+            return str(data["latest"])
+    except (OSError, ValueError, TypeError):
+        pass
+    try:
+        result = subprocess.run(["git", "ls-remote", "--tags", "--refs", KIT_REPO], check=False, capture_output=True,
+                                text=True, timeout=timeout, stdin=subprocess.DEVNULL)
+    except (OSError, subprocess.SubprocessError):
+        return None
+    if result.returncode != 0:
+        return None
+    tags = published_tags(result.stdout)
+    if not tags:
+        return None
+    latest = tags[-1].lstrip("v")
+    try:
+        cache.write_text(json.dumps({"at": time.time(), "latest": latest}), encoding="utf-8")
+    except OSError:
+        pass
+    return latest
+
+
+def update_available(root: Path, home: Path | None = None, timeout: int = 5) -> dict | None:
+    """One `Kit update available` line when a newer release is out (1.198.0). Read-only; None when
+    the installed version is unknown, this is the kit repo, offline, or already the latest."""
+    try:
+        info = detect(Path(root), home)
+    except Exception:  # noqa: BLE001 - never stop a walk for this check
+        return None
+    installed = info.get("version")
+    if not installed or info.get("mode") in ("none", "kit-repo"):
+        return None
+    latest = _latest_release(timeout)
+    if not latest or not VERSION_NUM.fullmatch(latest) or not VERSION_NUM.fullmatch(str(installed).lstrip("v")):
+        return None
+    if version_key(latest) <= version_key(str(installed).lstrip("v")):
+        return None
+    return {"installed": str(installed).lstrip("v"), "latest": latest,
+            "line": f"Kit update available: {str(installed).lstrip('v')} -> {latest}",
+            "run": f"Update the kit first ({latest} is out):\n`/crav1-update-kit`"}
+
+
 def main(argv: list[str] | None = None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
     if argv and argv[0] in {"push", "--push"}:
         refuse("Refused: this script does not push.")
     parser = argparse.ArgumentParser(description="Update a consumer project's CRAV1 kit from a published release.")
-    parser.add_argument("command", choices=["detect", "resolve-target", "plan", "apply", "migrations", "commit", "fetch", "ending"])
+    parser.add_argument("command", choices=["detect", "resolve-target", "plan", "apply", "migrations", "commit", "fetch", "ending", "available"])
     parser.add_argument("--root", default=".")
     parser.add_argument("--home")
     parser.add_argument("--to")
@@ -1232,6 +1293,10 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if args.command == "detect":
             _print(detect(root, home))
+            return 0
+        if args.command == "available":
+            found = update_available(root, home)
+            _print({"ok": True, "update": found, "line": found["line"] if found else None})
             return 0
         if args.command == "resolve-target":
             tags = published_tags(_releases_text(args.releases_file))

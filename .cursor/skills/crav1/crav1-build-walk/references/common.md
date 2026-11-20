@@ -6,7 +6,11 @@ The walk opens a step skill by its sibling path, for example `../crav1-build-tas
 
 ## The ending
 
-Print `ending` from `scripts/build_walk.py next --root <spec folder> --branch <branch>` (1.172.0; `--json <file>` since 1.150.0). `Run next:` is first. Each command is alone in a code span. The next line names the branch and the short task name. Then `Waiting:` when a step is blocked or waits on a yes, then `Uncommitted:` when files are uncommitted. The ending has no `Next:` line (1.157.0). The JSON `next` list keeps one sentence per Run next entry, as data; do not print it.
+Print `ending` from `scripts/build_walk.py next --root <spec folder> --branch <branch>` (1.172.0; `--json <file>` since 1.150.0). `Run next:` is first. Each command is alone in a code span. The next line names the branch and the short task name. Then `Waiting:` when a step is blocked or waits on a yes, then `Uncommitted:` when files are uncommitted. The ending has no `Next:` line (1.157.0). The JSON `next` list keeps one sentence per Run next entry, as data; do not print it. Your own prose has no `Next:` line either (1.198.0): what comes next is only the Run next block.
+
+Each Run next label follows the step the branch is on (1.198.0): `Merge PR 71 for T5:`, `Check PR 71's merge for T5:`, `Tick T5, now that PR 71 is merged:`, `Verify T5 Retry on feat/orders-retry:`. Only the build step says `Build`. Task names are short: the first sentence, at most 120 characters, cut at a word.
+
+**Kit update (1.198.0).** When a newer kit release is out, `next` adds `kit_update` (`Kit update available: <installed> -> <latest>`) and one Run next entry, `/crav1-update-kit`. Say that line once at the walk's start. The check is read-only (one `git ls-remote`, 5 second timeout, cached 12 hours) and says nothing when offline, when the installed version is unknown, or in the kit repo itself.
 
 The step skill's own suggestion is not printed. That includes `/crav1-open-pr` after a build or a commit, and `/crav1-review-pr` after a pull request opens.
 
@@ -48,13 +52,17 @@ Card: Commit these 3 files on feat/orders-cicd?
 - **Commit them (Recommended)** (`yes`): commit the files shown, then the walk opens the commit step. Why: the step is done and checked.
 - **Stop here** (`stop`): write nothing and pause the walk at this step.
 
+Show each option by its plain label only (1.198.0). The word in backticks (`yes`, `stop`, `fast-forward`, `dependency-skip`) is the answer's id, never a `yes:` or `stop:` prefix on the label. A script card's `result` is plain text under the card, such as `On yes: fast-forwards your local develop. Nothing is pushed.`
+
 `yes` does that action and then the walk opens the step skill. `stop` does not. There is no Edits option. A missing word is asked again. Do not guess.
 
 The card that merges names the pull request number:
 
 Card: Merge PR 71 into develop?
 - **Merge PR 71 (Recommended)** (`yes`): merge PR 71 now, then the walk opens the merge step. Why: its checks are green and the record says ready.
-- **Not yet** (`stop`): leave PR 71 open and pause the walk.
+- **Not yet** (`stop`): leave PR 71 open, commit and push the walk's specs files, and pause the walk.
+
+`Not yet` covers the specs-repo settle in [sync.md](sync.md) (1.198.0): no second card for that push.
 
 That `yes` is the explicit ask `/crav1-merge-pr` requires. The walk opens `../crav1-merge-pr/SKILL.md` only after it.
 
@@ -68,12 +76,12 @@ The specs repo is fetched before this walk reads the spec folder, and a claim is
 
 ## State from files (1.172.0)
 
-`scripts/build_walk.py next --root docs/specs/<slug> --branch <branch>` builds the next JSON itself: `phase` and `owner` from the last step in `build-progress/<branch>.md` (a `done` step moves to the next step in order; `comment` done is `wait-merge`), `pr` from that file, task names from `tasks.md`, `uncommitted` from `git status` of the spec folder, and `root`, so readiness fills the other branches. `--waiting`, `--who` and `--pr` add what the files do not hold. Do not hand-write the JSON or rerun the script only to add `uncommitted`.
+`scripts/build_walk.py next --root docs/specs/<slug> --branch <branch>` builds the next JSON itself: `phase` and `owner` from the last step in `build-progress/<branch>.md` (a `done` step moves to the next step in order; `comment` done is `wait-merge`), `pr` from that file, task names from `tasks.md`, `uncommitted` from `git status` of the spec folder, and `root`, so readiness fills the other branches. `--waiting`, `--who` and `--pr` add what the files do not hold. `--code-repo <checkout>` (or the progress header's `Code repo:` line) lets it check whether the branch is really behind its base before it says so (1.198.0): not behind skips to the merge, and an unknown count is phrased as a check, not a fact. Do not hand-write the JSON or rerun the script only to add `uncommitted`.
 
 The progress file is written by the script, never by hand:
 
 - `build_walk.py progress init --root <spec> --branch <branch> --owner self --tasks T3,T4 --cut-from develop --yes` writes the header.
-- `build_walk.py progress record --root <spec> --branch <branch> --step build --result done --yes` adds one step with `Done`, `Result` and the normalized stamps.
+- `build_walk.py progress record --root <spec> --branch <branch> --step build --result done --yes` adds one step with `Done`, `Result` and the normalized stamps. `--step build,verify,commit` records several steps with the same result in one call, and `--pr 71` adds `(PR 71)` to an `open-pr` result (1.198.0). A `nothing-to-do` (or `skipped`, `not needed`) result moves the walk on like `done`.
 
 Without `--yes` each prints a preview and writes nothing. Never write the progress file or the next JSON by hand.
 

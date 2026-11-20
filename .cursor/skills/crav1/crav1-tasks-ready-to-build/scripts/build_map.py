@@ -2404,8 +2404,9 @@ def held_phrase(row):
     # quotes another one keeps its inner quotes.
     match = re.search(r'open question "(.*)"(?=\s+\(|\s+blocks the whole slice|\s*$)', reason)
     if match:
-        # Held lines quote the whole question, never cut with "..." (1.176.0).
-        question = short_question(match.group(1), limit=100000, quote=row.get("quote"))
+        # 1.198.0: a long question is cut at a clause end near 120 characters
+        # (1.176.0 quoted it whole).
+        question = short_question(match.group(1), limit=HELD_MAX, quote=row.get("quote"))
         note = ""
         if "blocks the whole slice (recorded)" in reason.lower():
             note = " Holds the whole slice."
@@ -2480,6 +2481,9 @@ def _full_label(task):
     return task.get("run_label") or task_label(task["id"], task.get("full") or task.get("short"))
 
 
+HELD_MAX = 120
+
+
 def report_by_branch(built, rows, slug=None):
     """Group ready and held tasks by the build-map row.
 
@@ -2530,12 +2534,20 @@ def report_by_branch(built, rows, slug=None):
         labels = "; ".join(_full_label(task) for task, _row in group["items"])
         ready_lines.append(f"- `{group['branch']['name']}` ({_where(group['branch'])}): {labels}")
     held_lines = []
+    seen_questions: dict = {}
     for group in held_groups:
         # One task per line under its branch heading (1.164.0).
         rows = [f"- `{group['branch']['name']}` ({_where(group['branch'])}):"]
         for task, row in group["items"]:
             label = _full_label(task)
             phrase = re.sub(r"([.!?])[.;]+", r"\1", held_phrase(row))
+            # 1.198.0: a repeated question is shown once; later tasks point back.
+            key = re.sub(r"\W+", " ", phrase.lower()).strip()
+            if "question" in key and len(phrase) > 60:
+                if key in seen_questions:
+                    phrase = f"same question as {seen_questions[key]}"
+                else:
+                    seen_questions[key] = f"T{_task_num(task.get('id'))}"
             rows.append(f"  - {label} — {phrase}")
         held_lines.append("\n".join(rows))
     next_lines = []

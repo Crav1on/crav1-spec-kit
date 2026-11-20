@@ -7,7 +7,7 @@ Read every run, from **Mode** in `SKILL.md`.
 1. A choice word in this turn (`as-reviewer`, `as-author`) wins. Say `Mode: <mode> (as asked).`
 2. Else compare the signed-in user with the pull request's author, as `crav1-add-to-spec` `references/pr-threads.md` **Who is signed in** says:
    - GitHub: `gh api user -q .login` against `author.login`.
-   - Azure DevOps: `az account show --query user.name` against `createdBy.uniqueName`, case ignored. A PAT run (`AZURE_DEVOPS_EXT_PAT`) has no `user.name`: use git `user.email`, then `user.name` against `createdBy.uniqueName` and `createdBy.displayName`.
+   - Azure DevOps: `az account show --query "user.name"` against `createdBy.uniqueName`, case ignored. A PAT run (`AZURE_DEVOPS_EXT_PAT`) has no `user.name`: use git `user.email`, then `user.name` against `createdBy.uniqueName` and `createdBy.displayName`.
    - Same person: **author**. Otherwise: **reviewer**. Say `Mode: <mode> (you are <name>; the PR is by <author>).`
 3. The name can't be read (signed out, pasted threads): guess without asking. **Reviewer** when a comment in the threads is by the git `user.name`, else **author** when the source branch's commits are by the git `user.email`, else **reviewer**. Say `Mode: <mode> (guessed; say as <other> to switch).`
 

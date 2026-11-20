@@ -53,3 +53,7 @@ Reload the window so the new skills load. When files were written and not commit
 Reference page: [update-kit](reference/skills/crav1-update-kit.md)
 
 Since 1.176.0 `/crav1-update-kit` also fixes a saved commit-style rule that is out of date. When `.cursor/rules/draft-commit-style.mdc` (or the gitlog rule, or the `.claude/rules/` copy) is the old release's copy, or still points at `crav1-draft-commit-message/`, it is rewritten from the current asset in the same yes, so agents stop looking for a skill that is gone. A rule you changed by hand is left and named.
+
+## 1.198.0 changes
+
+`update_kit.py available` prints one `Kit update available: <installed> -> <latest>` line, read-only, with a 5 second timeout and a 12 hour cache, and nothing when offline. `/crav1-build-walk` and `/crav1-tighten-and-plan-ready-to-build` show it at the start with `/crav1-update-kit` in Run next.
