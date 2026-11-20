@@ -60,18 +60,18 @@ Order
 - Merge order: PR 40, then PR 42.
 
 Drafted replies (not posted)
-- Thread 104 (src/orders/audit.py): "Agreed for the pilot. I'll add the restructure as a follow-up so it isn't lost."
+- Thread 104 (src/orders/audit.py, https://dev.azure.com/contoso/Orders/_git/orders-api/pullrequest/71?discussionId=104): "Agreed for the pilot. I'll add the restructure as a follow-up so it isn't lost."
 - To Robin K. (not sent): "Hi Robin, Sam and I need the merge order of feat/orders-queue (PR 40) and PR 42. Plan: PR 40 into develop first. OK with you?"
 
 Run next:
 Thread 104 is waiting on you.
 
-After you post the drafted reply in thread 104, check again:
+Check PR 71 again after Robin K. answers the merge order:
 `/crav1-pr-status pr71 since-last`
 
-Waiting: /crav1-pr-status pr42 since-last, after Robin K. answers the merge order.
-Waiting: /crav1-merge-pr pr42, after PR 40 is merged and Ready is yes.
-Uncommitted: 1 file; commit with /crav1-finalize-commit when ready.
+Waiting: Robin K., to answer the merge order.
+Waiting: PR 40 to merge and Ready to say yes, before PR 42 can merge.
+Uncommitted: 1 file; commit and push with `/crav1-finalize-commit commit-push`.
 
 Ready: no. 2 waiting on you; 1 needs Robin K.; 1 agreed, not done; after PR 40 (not merged).
 PR record: `orders-api: docs/notes/2026-10/2026-10-08-pr-orders-api-71.md`

@@ -136,10 +136,124 @@ class AnsweredPoint(unittest.TestCase):
     """Item 4: an answered status, in plain words."""
 
     def test_set_point_answered(self):
-        mod = load(PRC, "pr_common_t1199c")
+        mod = load(ADO, "ado_threads_t1199c")
         note = "## PR record\n\n- Point: settings.json:4 | waiting on you | you | thread 195; host active | Which setting → this one\n"
         new, line = mod.set_point(note, "195", "answered", None, "2026-11-20")
         self.assertEqual(line, "- Point: settings.json:4 | answered | you | thread 195; host active; answered 2026-11-20 | Which setting → this one")
         self.assertEqual(mod.status_words("answered"), "answered; no code change")
         self.assertIsNone(mod.set_point(note, "999", "answered", None, "2026-11-20")[1])
         self.assertIn("`answered` (1.199.0)", read(SK / "crav1-add-to-spec/references/pr-record.md"))
+
+
+import subprocess
+
+WALK = SK / "crav1-tighten-and-plan-ready-to-build/scripts/walk_progress.py"
+G = ["git", "-c", "user.name=person A", "-c", "user.email=a@example.com"]
+
+
+def git(repo, *args):
+    return subprocess.run([*G, "-C", str(repo), *args], capture_output=True, text=True, check=True).stdout.strip()
+
+
+class RecheckShapeAndYou(unittest.TestCase):
+    """Item 3: one re-check shape, card before the ending, you for the signed-in user."""
+
+    def test_run_ending_shape(self):
+        text = read(ROOT / "docs/reference/run-ending.md")
+        self.assertIn("Check PR 84 again after person A answers in thread 198:\n`/crav1-pr-status pr84 since-last`", text)
+        self.assertIn("never carries a command", text)
+        self.assertIn("the ending is printed once", text)
+
+    def test_pr_status_output(self):
+        out = read(SK / "crav1-pr-status/references/output.md")
+        self.assertIn("A Waiting line never carries a command (1.199.0)", out)
+        self.assertIn("`Waiting: you, to accept the settings answer in thread 195.`", out)
+        self.assertNotIn("Waiting: /crav1-pr-status", out)
+        self.assertIn("Ask it before the run ending (1.199.0)", read(SK / "crav1-pr-status/references/offers.md"))
+
+
+class LighterRuns(unittest.TestCase):
+    """Item 5: one merged-since-sync, brief thread list, open-pr early stop."""
+
+    def test_docs(self):
+        offers = read(SK / "crav1-pr-status/references/offers.md")
+        self.assertIn("Run it once per run and read its short `line`", offers)
+        self.assertIn("runs only when this pull request closes a task", offers)
+        self.assertIn("ado_threads.py list --pr <n> --brief", read(SK / "crav1-add-to-spec/references/pr-threads.md"))
+        existing = read(SK / "crav1-open-pr/references/existing-pr.md")
+        self.assertIn("stop after that one host read", existing)
+        self.assertIn("`/crav1-pr-status pr84`", existing)
+
+
+class CommitPush(unittest.TestCase):
+    """Item 6: commit-push takes one yes; the Uncommitted line has a code span."""
+
+    def test_word_and_rules(self):
+        skill = read(SK / "crav1-finalize-commit/SKILL.md")
+        self.assertIn("`commit-push`", skill)
+        self.assertIn("Push only on `commit-push`", skill)
+        self.assertIn("5b. **Push on `commit-push` (1.199.0).**", read(SK / "crav1-finalize-commit/references/commit.md"))
+        self.assertIn("`commit-push` is `commit-now`, then one plain `git push`", read(SK / "crav1-finalize-commit/references/choice-words.md"))
+        self.assertIn("commit with `/crav1-finalize-commit` when ready.", read(ROOT / "docs/reference/run-ending.md"))
+
+
+class BuildQueue(unittest.TestCase):
+    """Item 7: shared plan-step descriptions, pipeline triggers, unlisted-branch drift."""
+
+    def test_a_shared_step_description_is_not_repeated(self):
+        bm = load(SK / "crav1-tasks-ready-to-build/scripts/build_map.py", "build_map_t1199")
+        plan = "# Plan\n\n## Approach\n\n1. Separate keys. Each store gets its own key. (T1, T2)\n"
+        tasks = ("- [ ] T1: Separate keys for orders (branch: feat/orders-keys)\n"
+                 "- [ ] T2: Separate keys for billing (branch: feat/billing-keys)\n")
+        built = bm.build("orders-api", "# Orders\n", plan, tasks)
+        branches = built.get("branches") or []
+        self.assertEqual(len(branches), 2)
+        # Before 1.199.0 both said "Separate keys. Each store gets its own key."
+        self.assertEqual([b.get("about") for b in branches], ["", ""])
+
+    def test_b_pipeline_trigger(self):
+        mod = load(SK / "crav1-merge-pr/scripts/pipeline_trigger.py", "pipeline_trigger_t1199")
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = Path(tmp)
+            (repo / "azure-pipelines.yml").write_text(
+                "trigger:\n  branches:\n    include:\n      - main\n  paths:\n    include:\n      - src/orders\nsteps:\n  - script: echo\n", encoding="utf-8")
+            self.assertEqual(mod.check(repo, "develop")["triggered"], [])
+            self.assertEqual(len(mod.check(repo, "main", ["src/orders/api.py"])["triggered"]), 1)
+            self.assertEqual(mod.check(repo, "main", ["docs/readme.md"])["triggered"], [])
+            (repo / "azure-pipelines.yml").write_text("trigger: none\nsteps:\n  - script: echo\n", encoding="utf-8")
+            self.assertIsNone(mod.check(repo, "main")["line"])
+            wf = repo / ".github/workflows"
+            wf.mkdir(parents=True)
+            (wf / "deploy.yml").write_text("on:\n  push:\n    branches: [develop]\njobs: {}\n", encoding="utf-8")
+            self.assertIn("deploy.yml", mod.check(repo, "develop")["line"])
+        self.assertIn("never that a deploy starts", read(SK / "crav1-build-walk/references/common.md"))
+
+    def test_c_unlisted_branch_drift(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = Path(tmp) / "code"
+            repo.mkdir()
+            subprocess.run([*G, "init", "-q", "-b", "develop", str(repo)], check=True)
+            (repo / "src/orders").mkdir(parents=True)
+            (repo / "src/orders/api.py").write_text("a = 1\n")
+            git(repo, "add", "-A")
+            git(repo, "commit", "-qm", "start")
+            base = git(repo, "rev-parse", "--short", "HEAD")
+            git(repo, "checkout", "-qb", "feat/orders-x")
+            git(repo, "checkout", "-q", "develop")
+            git(repo, "checkout", "-qb", "feat/other")
+            (repo / "src/orders/api.py").write_text("a = 2\n")
+            git(repo, "commit", "-qam", "other team change")
+            git(repo, "checkout", "-q", "develop")
+            git(repo, "merge", "-q", "--no-ff", "feat/other", "-m", "Merge branch 'feat/other'")
+            git(repo, "checkout", "-q", "feat/orders-x")
+            git(repo, "merge", "-q", "--no-ff", "develop", "-m", "Merge develop into feat/orders-x")
+            spec_dir = Path(tmp) / "docs/specs/orders-api"
+            spec_dir.mkdir(parents=True)
+            (spec_dir / "spec.md").write_text(f"# Orders\n\nSynced at: feat/orders-x@{base}\n\n## In the code\n\n- `src/orders/api.py`\n",
+                                             encoding="utf-8")
+            proc = subprocess.run([sys.executable, str(WALK), "code-drift", "--root", str(spec_dir), "--code-repo", str(repo),
+                                   "--base", "develop", "--no-fetch"], capture_output=True, text=True)
+            out = json.loads(proc.stdout or proc.stderr)
+        self.assertTrue(out.get("behind"), out)
+        self.assertTrue(out.get("unlisted"), out)
+        self.assertIn("come from a branch the spec does not list", out["background"])

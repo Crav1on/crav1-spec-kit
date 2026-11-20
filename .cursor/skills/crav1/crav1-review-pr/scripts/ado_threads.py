@@ -10,6 +10,7 @@
     ado_threads.py set-status  --pr N --thread T --status fixed [--yes]  (read back after)
     ado_threads.py reply       --pr N --thread T --file <file> [--status fixed] [--yes]  (1.199.0)
     ado_threads.py list        --pr N --brief  (one line per thread, 1.199.0)
+    ado_threads.py set-point   --note <PR note> --thread T --status answered [--text T] [--yes]  (1.199.0)
     ado_threads.py since-last  --pr N --note <PR note> --who <name>      (against the recorded state)
 
 This is the one way the kit reads and changes Azure DevOps pull requests:
@@ -302,6 +303,77 @@ def mark_draft_posted(note: str, thread, when: str) -> tuple[str, bool]:
     return note, False
 
 
+POINT_RE = re.compile(r"^- Point: (?P<anchor>[^|]*?) \| (?P<status>[^|]*?) \| (?P<owner>[^|]*?) \| (?P<tags>[^|]*?) \| (?P<text>.*)$")
+
+
+def parse_point(line: str) -> dict | None:
+    """The same Point fields pr_common.py reads (crav1-open-pr), 1.199.0."""
+    m = POINT_RE.match(line.rstrip("\n"))
+    if not m:
+        return None
+    d = m.groupdict()
+    d["tags"] = [] if d["tags"].strip() == "-" else [t.strip() for t in d["tags"].split(";") if t.strip()]
+    return d
+
+
+def point_line(p: dict) -> str:
+    tags = "; ".join(p["tags"]) if p["tags"] else "-"
+    return f"- Point: {p['anchor']} | {p['status']} | {p['owner']} | {tags} | {p['text']}"
+
+
+POINT_STATUSES = ("done", "agreed", "declined", "answered", "open", "waiting on", "needs", "follow-up", "migrated")
+
+
+def status_words(status: str) -> str:
+    """A Point status in plain words for a reply (1.199.0): never `done host` jargon."""
+    text = (status or "").strip()
+    if text == "answered":
+        return "answered; no code change"
+    if text == "done host":
+        return "done: the host setting reads back live"
+    if text.startswith("done "):
+        return f"done in {text[5:]}"
+    return text
+
+
+def set_point(note: str, thread, status: str, text: str | None, when: str) -> tuple[str, str | None]:
+    """Replace the status (and text) of the Point tagged `thread <id>`, in place (1.199.0).
+
+    `answered` also adds `answered <date>`. Returns the new note and the new
+    line, or the note unchanged and None when no Point names that thread.
+    The script writes the record, so a non-ASCII Point line never needs a
+    hand edit.
+    """
+    lines = note.split("\n")
+    for i, line in enumerate(lines):
+        p = parse_point(line)
+        if not p or f"thread {thread}" not in p["tags"]:
+            continue
+        p["status"] = status
+        if status == "answered":
+            p["tags"] = [t for t in p["tags"] if not t.startswith("answered ")] + [f"answered {when}"]
+        if text:
+            p["text"] = " ".join(text.split())
+        lines[i] = point_line(p)
+        return "\n".join(lines), lines[i]
+    return note, None
+
+
+def cmd_set_point(args) -> dict:
+    import datetime
+    if not any(args.status == s or args.status.startswith(s + " ") for s in POINT_STATUSES):
+        return {"ok": False, "error": "status", "line": "The status is one of: " + ", ".join(POINT_STATUSES) + "."}
+    path = Path(args.note)
+    note = path.read_text(encoding="utf-8")
+    new, line = set_point(note, args.thread, args.status, args.text, datetime.date.today().isoformat())
+    if line is None:
+        return {"ok": False, "error": "no-point", "line": f"No Point in the record names thread {args.thread}."}
+    if args.yes:
+        path.write_text(new, encoding="utf-8")
+    return {"ok": True, "written": bool(args.yes), "point": line,
+            "line": f"Thread {args.thread}: {status_words(args.status)}." + ("" if args.yes else " Preview only; add --yes to write.")}
+
+
 def cmd_reply(args) -> dict:
     """Reply inside an existing thread, then optionally set its status (1.199.0)."""
     text = decode(Path(args.file).read_bytes())
@@ -578,6 +650,12 @@ def main(argv: list[str] | None = None) -> int:
     sts.add_argument("--thread", required=True, type=int)
     sts.add_argument("--status", required=True)
     sts.add_argument("--yes", action="store_true")
+    spt = sub.add_parser("set-point", help="set one PR-record Point's status by its thread (1.199.0)")
+    spt.add_argument("--note", required=True)
+    spt.add_argument("--thread", required=True)
+    spt.add_argument("--status", required=True)
+    spt.add_argument("--text")
+    spt.add_argument("--yes", action="store_true")
     rpl = sub.add_parser("reply")
     rpl.add_argument("--thread", required=True, type=int)
     rpl.add_argument("--file", required=True)
@@ -592,6 +670,11 @@ def main(argv: list[str] | None = None) -> int:
     for p in (lst, cmp_, pst, prv, its, chg, sts, snc, rpl):
         _common(p)
     args = parser.parse_args(argv)
+    if args.cmd == "set-point":
+        result = cmd_set_point(args)
+        json.dump(result, sys.stdout, indent=2, ensure_ascii=False)
+        sys.stdout.write("\n")
+        return 0 if result.get("ok") else 2
     fill_route(args)
     try:
         result = {"list": cmd_list, "compare": cmd_compare, "post": cmd_post, "pr": cmd_pr,

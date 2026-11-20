@@ -994,59 +994,6 @@ def mark_in_spec(line: str, slug: str, date: str) -> str:
     return point_line(p)
 
 
-POINT_STATUSES = ("done", "agreed", "declined", "answered", "open", "waiting on", "needs", "follow-up", "migrated")
-
-
-def status_words(status: str) -> str:
-    """A Point status in plain words for a reply (1.199.0): never `done host` jargon."""
-    text = (status or "").strip()
-    if text == "answered":
-        return "answered; no code change"
-    if text == "done host":
-        return "done: the host setting reads back live"
-    if text.startswith("done "):
-        return f"done in {text[5:]}"
-    return text
-
-
-def set_point(note: str, thread, status: str, text: str | None, when: str) -> tuple[str, str | None]:
-    """Replace the status (and text) of the Point tagged `thread <id>`, in place (1.199.0).
-
-    `answered` also adds `answered <date>`. Returns the new note and the new
-    line, or the note unchanged and None when no Point names that thread.
-    The script writes the record, so a non-ASCII Point line never needs a
-    hand edit.
-    """
-    lines = note.split("\n")
-    for i, line in enumerate(lines):
-        p = parse_point(line)
-        if not p or f"thread {thread}" not in p["tags"]:
-            continue
-        p["status"] = status
-        if status == "answered":
-            p["tags"] = [t for t in p["tags"] if not t.startswith("answered ")] + [f"answered {when}"]
-        if text:
-            p["text"] = " ".join(text.split())
-        lines[i] = point_line(p)
-        return "\n".join(lines), lines[i]
-    return note, None
-
-
-def cmd_set_point(args) -> int:
-    import datetime
-    if not any(args.status == s or args.status.startswith(s + " ") for s in POINT_STATUSES):
-        return emit({"status": "bad-status", "line": "The status is one of: " + ", ".join(POINT_STATUSES) + "."}, 1)
-    path = Path(args.note)
-    note = path.read_text(encoding="utf-8")
-    new, line = set_point(note, args.thread, args.status, args.text, datetime.date.today().isoformat())
-    if line is None:
-        return emit({"status": "no-point", "line": f"No Point in the record names thread {args.thread}."}, 1)
-    if args.yes:
-        path.write_text(new, encoding="utf-8")
-    return emit({"status": "ok", "written": bool(args.yes), "point": line,
-                 "line": f"Thread {args.thread}: {status_words(args.status)}." + ("" if args.yes else " Preview only; add --yes to write.")})
-
-
 def _pick(spec: str | None) -> set[int] | None:
     return {int(x) for x in spec.split(",") if x.strip()} if spec else None
 
@@ -1102,12 +1049,6 @@ def main(argv: list[str] | None = None) -> int:
     cd = sub.add_parser("candidates", help="spec and decision candidates in a PR note's record (1.193.0)")
     cd.add_argument("--note", required=True)
     cd.add_argument("--pick", help="numbers in record order, e.g. 1,3")
-    sp = sub.add_parser("set-point", help="set one Point's status by its thread (1.199.0)")
-    sp.add_argument("--note", required=True)
-    sp.add_argument("--thread", required=True)
-    sp.add_argument("--status", required=True)
-    sp.add_argument("--text")
-    sp.add_argument("--yes", action="store_true")
     args = parser.parse_args(argv)
     if args.cmd == "parse":
         out = parse_ref(args.ref, args.remote_url)
@@ -1115,7 +1056,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.cmd == "host":
         return emit(host_of(args.remote_url))
     return {"find": cmd_find, "checks": cmd_checks, "claim": cmd_claim, "behind": cmd_behind, "fit": cmd_fit, "resolve": cmd_resolve,
-            "candidates": cmd_candidates, "set-point": cmd_set_point}[args.cmd](args)
+            "candidates": cmd_candidates}[args.cmd](args)
 
 
 if __name__ == "__main__":

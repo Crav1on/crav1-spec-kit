@@ -2116,6 +2116,17 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text
             ),
         })
 
+    # 1.199.0: two branches that share one plan step would print the same
+    # description; each then describes itself from its own task names.
+    seen_about: dict = {}
+    for branch in branches:
+        if branch["about"]:
+            seen_about.setdefault(branch["about"].strip().lower(), []).append(branch)
+    for same in seen_about.values():
+        if len(same) > 1:
+            for branch in same:
+                branch["about"] = ""
+
     id_branch = {}
     for branch in branches:
         for task_id in branch["task_ids"]:

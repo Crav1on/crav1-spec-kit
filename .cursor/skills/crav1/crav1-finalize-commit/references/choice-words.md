@@ -9,6 +9,7 @@ Exact words for bots and scripted runs. There are no `--flags`.
 - Style: `crav1` / `git-log`.
 - Trailer hook: `strip-trailers` / `keep-trailers`.
 - Pull: `pull` (1.81.0) runs the pull path with no commit first.
+- Commit and push (1.199.0): `commit-push` is `commit-now`, then one plain `git push` once the fetch check says nothing was lost. One yes covers both. A rejected push stops with the pull advice in [pull.md](pull.md); never a force push.
 
 `commit-now`, and `commit` typed in the invocation (1.76.1): draft, show the paste blocks, then commit with no commit-or-message choice question. commit-now may still ask one question: the work-item mention question, when `work-item.md` has several Feature lines and none clearly matches the slice (1.193.0, [work-item-mention.md](../branches/message-only/references/work-item-mention.md)). A headless run with no one to answer ends as `copy`. When `agent-tools/` or build output is in the file set, warn and offer the normal choices instead. On a base branch with implementation code staged (1.99.0), ask the base-branch prompt instead ([base-branch.md](base-branch.md)); `new-branch` answers it.
 
