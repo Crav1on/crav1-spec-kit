@@ -7,7 +7,9 @@ specs sweep and the kit merge paths (/crav1-build-walk, /crav1-merge-pr).
     merged_since_sync.py check --spec <spec.md> --code-repo <checkout> [--base <ref>] [--repos <repos.md>] [--pr N] [--headless]
     merged_since_sync.py stamp --spec <spec.md> --repo <repo> --branch <branch> --base <name> --merge <sha> --date <YYYY-MM-DD> [--yes]
 
-`check` reads refs on disk only (no fetch) and writes nothing. The base is
+`check` fetches origin once (1.196.0, `--no-fetch` to skip; only remote-tracking
+refs in the code checkout change) and writes nothing in the specs repo. Base
+refs prefer `origin/<base>` over the local branch, through start_check.py. The base is
 found per branch (1.195.0): `--base`; else that repo's `Merges into` cell in
 docs/system/repos.md (`--repos`, default next to the spec folder); else the
 spec's own `Synced at:` line on a base branch (develop, main, master) for
@@ -30,6 +32,8 @@ import sys
 from pathlib import Path
 
 sys.dont_write_bytecode = True
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import start_check  # noqa: E402  (shared base and merged-tip rules, 1.196.0)
 
 
 def _utf8_stdout() -> None:
@@ -92,10 +96,7 @@ def short(name: str) -> str:
 
 
 def branch_ref(repo: str, branch: str) -> str | None:
-    for cand in (f"origin/{branch}", branch):
-        if ref_ok(repo, cand):
-            return cand
-    return None
+    return start_check.prefer_ref(repo, branch) or None
 
 
 BASE_NAMES = ("develop", "main", "master")
@@ -122,10 +123,8 @@ def merges_into(repos_text: str) -> dict:
 
 
 def resolve(repo: str, name: str) -> str:
-    for cand in (name, f"origin/{name}"):
-        if ref_ok(repo, cand):
-            return cand
-    return ""
+    """origin/<name> before the local <name> (1.196.0): a stale local base never hides a merge."""
+    return start_check.prefer_ref(repo, name)
 
 
 def base_for(repo: str, row: dict, rows: list[dict], base: str | None, into: dict) -> tuple[str, str, str]:
@@ -170,17 +169,17 @@ def check(spec_text: str, repo: str, base: str | None = None, pr: str | None = N
         if row["branch"] == base_name or row["branch"] in BASE_NAMES:
             continue
         tip = branch_ref(repo, row["branch"])
-        if not tip or not is_ancestor(repo, tip, base_ref):
+        hit = start_check.tip_merged(repo, tip, base_ref) if tip else None
+        if not hit and tip and is_ancestor(repo, tip, base_ref):
+            hit = {"merge": git(repo, "rev-parse", tip) or "", "pr": None}
+        if not hit:
             found.append({"branch": row["branch"], "status": "not-merged", "base": base_name, "base_from": source})
             continue
-        merges = (git(repo, "rev-list", "--merges", "--ancestry-path", "--reverse", f"{tip}..{base_ref}") or "").split()
-        merge = merges[0] if merges else (git(repo, "rev-parse", tip) or "")
+        merge = hit["merge"]
         merge_short = merge[:7]
         synced_after = any(is_ancestor(repo, merge, r["sha"]) for r in rows)
         commits = (git(repo, "rev-list", f"{row['sha']}..{tip}") or "").split()
-        subject = git(repo, "log", "-1", "--format=%s", merge) or ""
-        m = PR_SUBJECT.search(subject)
-        number = pr or (next(g for g in m.groups() if g) if m else None)
+        number = pr or hit.get("pr")
         status = "already-synced" if synced_after or not commits else "merged"
         found.append({"branch": row["branch"], "repo": row["repo"], "status": status, "merge": merge_short,
                       "commits": len(commits), "pr": number, "synced": row["sha"], "base": base_name, "base_from": source})
@@ -246,6 +245,7 @@ def main(argv: list[str] | None = None) -> int:
     c.add_argument("--repos", help="docs/system/repos.md; default: next to the spec folder")
     c.add_argument("--pr")
     c.add_argument("--headless", action="store_true", help="report only, no card")
+    c.add_argument("--no-fetch", action="store_true", help="skip the one quiet fetch of origin (1.196.0)")
     s = sub.add_parser("stamp")
     s.add_argument("--spec", required=True)
     s.add_argument("--repo", required=True)
@@ -262,7 +262,10 @@ def main(argv: list[str] | None = None) -> int:
     if a.cmd == "check":
         repos = Path(a.repos) if a.repos else spec.resolve().parent.parent.parent / "system" / "repos.md"
         repos_text = repos.read_text(encoding="utf-8") if repos.is_file() else ""
-        return emit(check(text, a.code_repo, a.base, a.pr, a.headless, repos_text))
+        fetched = start_check.fetch(a.code_repo, a.no_fetch)
+        out = check(text, a.code_repo, a.base, a.pr, a.headless, repos_text)
+        out["fetch"] = fetched
+        return emit(out)
     if not SHA_RE.fullmatch(a.merge) or not DATE_RE.fullmatch(a.date):
         return emit({"ok": False, "error": "args", "line": "merge is a hex sha and date is YYYY-MM-DD"}, 1)
     new = stamp_text(text, a.repo, a.branch, a.base, a.merge, a.date)

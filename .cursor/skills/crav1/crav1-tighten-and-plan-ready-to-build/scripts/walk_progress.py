@@ -3535,7 +3535,9 @@ def apply_claims(root: Path | None, rows: list[dict], user: str | None = None, b
         claims_mod().apply_to_rows(rows, claims, user=user or _git_user(root), branch=branch)
         apply_built_claims(root, rows)
     apply_built_tasks(root, rows)
-    warnings = claims_mod().age_warnings(claims, loaded.get("max_age_days") or 3)
+    cm = claims_mod()
+    ticked = cm.ticked_ids(root) if hasattr(cm, "ticked_ids") else set()
+    warnings = cm.age_warnings(claims, loaded.get("max_age_days") or 3, ticked)
     return {"claims": claims, "warnings": warnings, "ids": claims_mod().claimed_ids(claims)}
 
 
@@ -6776,11 +6778,17 @@ def _drift_base(code_repo: str, row: dict, synced: list[dict], base: str | None)
     names = [base] if base else []
     names += [r["branch"] for r in synced if r["branch"] in ("develop", "main", "master") and r is not row]
     names += ["develop", "main", "master"]
+    sc = start_check_mod()
     for name in names:
-        for cand in (f"origin/{name}", name):
-            if _git_lines(code_repo, "rev-parse", "--verify", "--quiet", cand) is not None:
-                return cand
+        ref = sc.prefer_ref(code_repo, name)
+        if ref:
+            return ref
     return None
+
+
+def start_check_mod():
+    """The shared start-check helper in crav1-add-to-spec (1.196.0)."""
+    return _load_script("crav1-add-to-spec", "start_check.py", "start-check")
 
 
 def code_drift(args: argparse.Namespace) -> None:
@@ -6799,7 +6807,10 @@ def code_drift(args: argparse.Namespace) -> None:
     spec = spec_path.read_text(encoding="utf-8")
     synced = [m.groupdict() for m in SYNCED_LINE.finditer(spec)]
     known = _recorded_shas(root, spec)
+    sc = start_check_mod()
+    fetched = sc.fetch(args.code_repo, getattr(args, "no_fetch", False))
     behind = []
+    merged_tips = []
     for row in synced:
         if args.branch and row["branch"] != args.branch:
             continue
@@ -6820,6 +6831,14 @@ def code_drift(args: argparse.Namespace) -> None:
             ins = {h for h in ins if _git_lines(args.code_repo, "merge-base", "--is-ancestor", f"{h}^2", base_ref) is not None}
             own = [c for c in own if c.split()[0] not in ins]
         merged_in = len(allc) - len(own)
+        # 1.196.0: a work branch whose tip is already in the base is merged; take it in
+        # unless the merge (or a later commit) is already recorded.
+        if base_ref and base_ref != ref and row["branch"] not in ("develop", "main", "master"):
+            hit = sc.tip_merged(args.code_repo, ref, base_ref)
+            if hit and not _recorded(hit["merge_short"], known) and not any(
+                    _is_ancestor(args.code_repo, hit["merge"], r["sha"]) for r in synced):
+                merged_tips.append({"branch": row["branch"], "sha": hit["merge_short"], "pr": hit["pr"],
+                                    "base": short_ref(base_ref)})
         new = [c for c in own if not _recorded(c.split()[0], known)]
         if new:
             behind.append({"branch": row["branch"], "synced": row["sha"], "ref": ref, "base": base_ref,
@@ -6832,11 +6851,16 @@ def code_drift(args: argparse.Namespace) -> None:
                   or _is_ancestor(args.code_repo, sha, r["sha"]) for r in synced)
         if not hit:
             merged = {"sha": sha, "pr": args.pr}
+    if not merged and merged_tips:
+        first = merged_tips[0]
+        merged = {"sha": first["sha"], "pr": first["pr"], "branch": first["branch"], "tip_merged": True}
+        if not args.pr and first["pr"]:
+            args.pr = first["pr"]
     if not behind and not merged:
-        emit({"ok": True, "behind": False, "offer": None, "wrote": None,
+        emit({"ok": True, "behind": False, "offer": None, "wrote": None, "fetch": fetched,
               "message": "The spec's Synced at lines are current with the code; no add-to-spec offer."})
         return
-    target = args.branch or (behind[0]["branch"] if behind else None)
+    target = args.branch or (behind[0]["branch"] if behind else (merged or {}).get("branch"))
     command = add_to_spec_command("", args.pr, target)
     parts = [f"{b['count']} commit{'s' if b['count'] != 1 else ''} on {b['branch']} after Synced at {b['synced']} not recorded yet"
              + (f" ({b['already_recorded'] + b['base_merge_ins']} more already recorded or merged in from {short_ref(b['base'])})"
@@ -6850,6 +6874,8 @@ def code_drift(args: argparse.Namespace) -> None:
         "offer": "add-to-spec",
         "drift": behind,
         "merged": merged,
+        "merged_tips": merged_tips,
+        "fetch": fetched,
         "command": command,
         "path": ADD_TO_SPEC_PATH,
         "background": f"The spec's record is behind the code: {what}.",
@@ -7866,7 +7892,8 @@ def main(argv: list[str] | None = None) -> None:
 
     cdr = sub.add_parser("code-drift", help="is the spec's record behind the code; one add-to-spec card before the plan review (1.194.0)")
     cdr.add_argument("--root", required=True)
-    cdr.add_argument("--code-repo", required=True, help="the code checkout; refs on disk, no fetch")
+    cdr.add_argument("--code-repo", required=True, help="the code checkout; fetched once, then refs on disk (1.196.0)")
+    cdr.add_argument("--no-fetch", action="store_true", help="skip the one quiet fetch of origin")
     cdr.add_argument("--branch", help="only this Synced at branch")
     cdr.add_argument("--base", help="the branch work merges into (repos.md Merges into); commits merged in from it are not counted")
     cdr.add_argument("--pr", help="the merged pull request, e.g. 73")

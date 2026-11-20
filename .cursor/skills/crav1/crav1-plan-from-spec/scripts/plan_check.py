@@ -26,6 +26,12 @@ Commands:
   batch   --items <file> [--title <text>]
       The findings table and its Card: line for every open plan P#, built
       by batch_offer.py in this same reply. No open plan P#, no card.
+  lint    --root <spec-folder>
+      Rule checks the reviewer should not have to find (1.196.0). Prod
+      verify: a task's (verify: ...) note that names prod must be read-only
+      (health, version, config, existence). Any other prod verify is flagged:
+      verify runs on DEV/TEST, and a prod-write check is its own task marked
+      prod-write with an owner: and a Risks line in plan.md naming its T#.
   reviewed --root <spec-folder> --open <n> [--write]
       Lowers P# open on the Reviewed line, keeping the date. No line, none added.
 
@@ -575,6 +581,42 @@ def batch(items: list[dict], title: str) -> str:
     return text
 
 
+PROD = re.compile(r"\b(?:prod|production|prd)\b", re.I)
+PROD_READ = re.compile(r"\b(?:health|healthcheck|version|config|configuration|exist|exists|existence|read-only|"
+                       r"read only|smoke read|get|list|show|ping)\b", re.I)
+PROD_WRITE = re.compile(r"\b(?:write|writes|create|creates|post|put|delete|insert|update|send|sends|publish|"
+                        r"trigger|run the job|load|import|submit|change|migrate|seed)\b", re.I)
+
+
+def lint_lines(root: Path) -> list[str]:
+    """Prod verify rule (1.196.0). One line per problem, then a closing count line."""
+    tasks = _read(root / "tasks.md")
+    plan = (root / "plan.md").read_text(encoding="utf-8") if (root / "plan.md").is_file() else ""
+    risks = plan.split("## Risks", 1)[1] if "## Risks" in plan else ""
+    out = []
+    for line in tasks.splitlines():
+        m = TASK_LINE.match(line)
+        if not m:
+            continue
+        tid = f"T{m.group(2)}"
+        for note in VERIFY.findall(line):
+            if not PROD.search(note):
+                continue
+            if "prod-write" in note.lower():
+                missing = [w for w, ok in (("an owner:", "owner:" in note.lower()),
+                                           ("a Risks line", re.search(rf"\b{tid}\b", risks) is not None)) if not ok]
+                if missing:
+                    out.append(f"Prod write: {tid} is a prod-write check without " + " and ".join(missing)
+                               + ". It needs an owner, the user's yes and a Risks line.")
+                continue
+            if PROD_WRITE.search(note) or not PROD_READ.search(note):
+                out.append(f"Prod verify: {tid} verifies on prod with more than a read ({' '.join(note.split())}). "
+                           "Recommend: verify on DEV/TEST, keep only a read-only prod check (health, version, config, "
+                           "existence), and make any prod write its own prod-write task with an owner, a yes and a Risks line.")
+    out.append(f"Lint: {len(out)} problem{'s' if len(out) != 1 else ''}.")
+    return out
+
+
 REVIEWED = re.compile(r"^(Reviewed:\s*[^,\n]+,\s*P#\s*open:\s*)(\d+)\s*$", re.M)
 
 
@@ -612,6 +654,8 @@ def main(argv: list[str] | None = None) -> int:
     p = sub.add_parser("batch")
     p.add_argument("--items", required=True)
     p.add_argument("--title", default="Tighten-plan batch")
+    p = sub.add_parser("lint")
+    p.add_argument("--root", required=True)
     p = sub.add_parser("reviewed")
     p.add_argument("--root", required=True)
     p.add_argument("--open", required=True, type=int)
@@ -633,6 +677,8 @@ def main(argv: list[str] | None = None) -> int:
                          args.went_on_without_linter, args.uncommitted)
         elif args.command == "batch":
             text = batch(_items(args.items), args.title)
+        elif args.command == "lint":
+            text = "\n".join(lint_lines(_root(args.root))) + "\n"
         else:
             text = reviewed(_root(args.root), args.open, args.write)
     except PlanCheckError as exc:
