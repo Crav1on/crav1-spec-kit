@@ -146,3 +146,70 @@ class QuietTickable(unittest.TestCase):
         self.assertEqual({c["row"]: c["why"] for c in out["cards"]}, {"A1": "passes with no evidence", "A3": "failing"})
         self.assertEqual(out["waiting"], [2])
         self.assertEqual(out["waiting_line"], "1 acceptance item waits on its tasks.")
+
+
+class SmallFixes(unittest.TestCase):
+    """Item 4: resolved playbook, no Kept line, ADO PR number, housekeeping count and wording."""
+
+    def test_ado_merge_subject_gives_pr(self):
+        mod = load(SK / "crav1-add-to-spec/scripts/start_check.py", "start_check_t1197")
+        for subject, pr in (("Merge pull request 82 from feat/orders-cicd into develop", "82"),
+                            ("Merge pull request #71 from contoso/feat/orders-retry", "71"),
+                            ("Merged PR 90: orders export", "90"), ("Add retry (#12)", "12")):
+            m = mod.PR_SUBJECT.search(subject)
+            self.assertEqual(next(g for g in m.groups() if g), pr, subject)
+
+    def test_preserve_says_nothing_when_unchanged(self):
+        claims = SK / "crav1-build-walk/scripts/claims.py"
+        tmp = Path(tempfile.mkdtemp())
+        text = "# Tasks\n\n- [ ] T2: Record the decision (branch: feat/orders-api-record)\n"
+        (tmp / "b.md").write_text(text, encoding="utf-8")
+        (tmp / "a.md").write_text(text, encoding="utf-8")
+        out = js(claims, "preserve", "--before", str(tmp / "b.md"), "--after", str(tmp / "a.md"), "--tasks", "T2")
+        self.assertFalse(out["changed"])
+        self.assertIsNone(out["line"])
+
+    def test_housekeeping_count_and_wording(self):
+        root = spec_folder("- [ ] T1: Retry (verify: unit)\n", "# Plan\n\nReviewed: 2026-11-20, P# open: 3\n")
+        items = root / "items.json"
+        items.write_text(json.dumps([
+            {"id": "P3", "issue": "stale read line", "tag": "plan", "status": "open", "housekeeping": True,
+             "options": "update it", "recommendation": "update it"},
+            {"id": "P4", "issue": "no 400 test", "tag": "plan", "status": "open", "options": "add-regression; keep",
+             "recommendation": "add-regression", "why": "the spec names a 400 reply"}]), encoding="utf-8")
+        out = py(PLAN, "batch", "--items", str(items)).stdout
+        self.assertTrue(out.startswith("Applying with no card (housekeeping): P3 stale read line."))
+        rev = py(PLAN, "reviewed", "--root", str(root), "--items", str(items)).stdout
+        self.assertIn("P# open 3 would be 1", rev)
+
+    def test_start_uses_resolved_playbook(self):
+        docs = Path(tempfile.mkdtemp()) / "docs"
+        root = docs / "specs" / "orders-api"
+        root.mkdir(parents=True)
+        (docs / "playbooks").mkdir()
+        (docs / "playbooks" / "orders-process-1-0.md").write_text("# Orders process 1.0\n\n1. Ship it.\n", encoding="utf-8")
+        (root / "spec.md").write_text("# Orders API\n\nPlaybook: `docs/playbooks/orders-process-1-0.md`\n\n## Problem\n", encoding="utf-8")
+        proc = subprocess.run([sys.executable, str(WALK), "start", "--root", "orders process 1 0", "--skip-sync"],
+                              capture_output=True, text=True, cwd=docs.parent)
+        out = json.loads(proc.stdout)
+        if out.get("how") and "playbook" in out["how"]:
+            self.assertEqual(out["playbook"], "docs/playbooks/orders-process-1-0.md")
+            self.assertIsNotNone(out["playbook_status"])
+        else:
+            self.fail(proc.stdout + proc.stderr)
+
+
+class RuleDocs(unittest.TestCase):
+    """Item 5: short batch question; proposed, not done."""
+
+    def test_question_cards_short_question(self):
+        page = (ROOT / "docs/reference/question-cards.md").read_text(encoding="utf-8")
+        self.assertIn("The question is short (1.197.0)", page)
+        self.assertIn("Never put the items in the question.", page)
+        self.assertNotIn("The question text still names every item.", page)
+
+    def test_proposed_not_done(self):
+        common = read("crav1-tighten-and-plan-ready-to-build/references/common.md")
+        self.assertIn("**Proposed, not done (1.197.0).**", common)
+        self.assertIn("Never write `I've updated`", common)
+        self.assertIn("do not run `repo_sync.py status` yourself", common)

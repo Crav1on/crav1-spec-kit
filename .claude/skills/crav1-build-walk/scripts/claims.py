@@ -644,12 +644,14 @@ def preserve_claimed(before: str, after: str, claimed: list[str]) -> dict:
     text_out = "\n".join(rewritten)
     if _ends_nl(after) or (not after and _ends_nl(before)):
         text_out = text_out + "\n"
-    kept_line = "Kept claimed tasks: " + ", ".join(claimed_set) + "."
+    changed = text_out != after
+    # 1.197.0: say nothing when the claimed tasks were not touched.
+    kept_line = ("Kept claimed tasks: " + ", ".join(claimed_set) + ".") if changed else None
     return {
         "ok": True,
         "text": text_out,
         "kept": claimed_set,
-        "changed": text_out != after,
+        "changed": changed,
         "line": kept_line,
     }
 

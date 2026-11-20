@@ -71,7 +71,7 @@ Before the review findings are walked, run `lint`. Each `Prod verify:` line beco
 
 ## Housekeeping with no card (1.196.0)
 
-Housekeeping fixes are applied with no card: Trace rows for cited constraints, missing marks, merged-state wording ("until PR 71 merges" after it merged), Risks that name merged pull requests or finished claims, a stale Linter line, and the build-map refresh. Set `"housekeeping": true` on those rows in the items file; `batch` leaves them off the card and prints one line, `Applied with no card (housekeeping): P7 Trace row for the retry constraint; P14 missing mark.` Apply them, then say that line. Cards are only for intent changes: adding, removing or reordering tasks, changing a verify check, a new risk or constraint, and anything that touches prod.
+Housekeeping fixes are applied with no card: Trace rows for cited constraints, missing marks, merged-state wording ("until PR 71 merges" after it merged), Risks that name merged pull requests or finished claims, a stale Linter line, and the build-map refresh. Set `"housekeeping": true` on those rows in the items file; `batch` leaves them off the card and prints one line, `Applying with no card (housekeeping): P7 Trace row for the retry constraint; P14 missing mark.` Say that line, then apply them. For the Reviewed line, run `scripts/plan_check.py reviewed --root <spec-folder> --items <items file> --write`: housekeeping rows never count as open (1.197.0). Cards are only for intent changes: adding, removing or reordering tasks, changing a verify check, a new risk or constraint, and anything that touches prod.
 
 ## Card labels (1.196.0)
 

@@ -2280,18 +2280,36 @@ def start(args: argparse.Namespace) -> None:
             "line": sync.get("line"),
         })
         return
+    # 1.197.0: when the spec was found by its playbook name, use that playbook (no second start run).
+    playbook_arg = args.playbook or (_resolved_playbook(folder, args.root) if "playbook" in str(found.get("how") or "") else None)
     payload = {
         "ok": True,
         "slug": found.get("slug") or folder.name,
         "folder": str(folder),
         "how": found.get("how") or "folder",
         "sync": sync,
-        "resume": resume_payload(folder, no_playbook=not args.playbook),
+        "resume": resume_payload(folder, no_playbook=not playbook_arg),
         "playbook_status": None,
     }
-    if args.playbook:
-        payload["playbook_status"] = playbook_payload(folder, args.playbook)
+    if playbook_arg:
+        payload["playbook"] = playbook_arg
+        payload["playbook_status"] = playbook_payload(folder, playbook_arg)
     emit(payload)
+
+
+def _resolved_playbook(folder: Path, query: str) -> str | None:
+    """The playbook path the spec names whose file name matched the start query."""
+    spec = folder / "spec.md"
+    if not spec.is_file():
+        return None
+    mod = resolve_mod()
+    raws = [m.group(1).strip().strip("`").strip() for m in mod.PLAYBOOK.finditer(spec.read_text(encoding="utf-8"))]
+    raws = [r for r in raws if r]
+    want = mod.norm(Path(str(query)).name)
+    hits = [r for r in raws if mod.norm(Path(r.replace("\\", "/")).stem) == want]
+    if len(hits) == 1:
+        return hits[0]
+    return raws[0] if len(raws) == 1 else None
 
 
 def _load_script(folder: str, filename: str, code: str):

@@ -32,8 +32,9 @@ Commands:
       (health, version, config, existence). Any other prod verify is flagged:
       verify runs on DEV/TEST, and a prod-write check is its own task marked
       prod-write with an owner: and a Risks line in plan.md naming its T#.
-  reviewed --root <spec-folder> --open <n> [--write]
+  reviewed --root <spec-folder> (--open <n> | --items <file>) [--write]
       Lowers P# open on the Reviewed line, keeping the date. No line, none added.
+      With --items, housekeeping rows are not counted (1.197.0).
 
 <file> for queue and batch is JSON: a list of objects with id, issue,
 tag (plan or spec), status (open, patched, dropped, skipped, kept), and, for
@@ -571,7 +572,8 @@ def batch(items: list[dict], title: str) -> str:
     open_rows = [i for i in items if i["tag"] == "plan" and i["status"] not in DONE]
     chores = [i for i in open_rows if _housekeeping(i) and not _changes_tasks(i)]
     open_rows = [i for i in open_rows if i not in chores]
-    chores_line = ("Applied with no card (housekeeping): "
+    # 1.197.0: "Applying", since the line is printed before the edits.
+    chores_line = ("Applying with no card (housekeeping): "
                    + "; ".join(f"{i['id']} {' '.join(str(i.get('issue', '')).split())}" for i in chores) + ".\n") if chores else ""
     own = [i["id"] for i in open_rows if _changes_tasks(i)]
     batchable = [i for i in open_rows if not _changes_tasks(i)]
@@ -688,6 +690,11 @@ def lint_lines(root: Path) -> list[str]:
 REVIEWED = re.compile(r"^(Reviewed:\s*[^,\n]+,\s*P#\s*open:\s*)(\d+)\s*$", re.M)
 
 
+def open_for_review(items: list[dict]) -> int:
+    """Open plan P# for the Reviewed line: housekeeping rows never count (1.197.0)."""
+    return len([i for i in items if i["tag"] == "plan" and i["status"] not in DONE and not _housekeeping(i)])
+
+
 def reviewed(root: Path, open_n: int, write: bool) -> str:
     path = root / "plan.md"
     text = _read(path)
@@ -726,7 +733,8 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--root", required=True)
     p = sub.add_parser("reviewed")
     p.add_argument("--root", required=True)
-    p.add_argument("--open", required=True, type=int)
+    p.add_argument("--open", type=int, help="open plan P#; or pass --items to count them without housekeeping")
+    p.add_argument("--items")
     p.add_argument("--write", action="store_true")
     args = parser.parse_args(argv)
     try:
@@ -748,7 +756,13 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "lint":
             text = "\n".join(lint_lines(_root(args.root))) + "\n"
         else:
-            text = reviewed(_root(args.root), args.open, args.write)
+            if args.items:
+                open_n = open_for_review(_items(args.items))
+            elif args.open is not None:
+                open_n = args.open
+            else:
+                raise PlanCheckError("reviewed needs --open <n> or --items <file>")
+            text = reviewed(_root(args.root), open_n, args.write)
     except PlanCheckError as exc:
         print(str(exc), file=sys.stderr)
         return 2
