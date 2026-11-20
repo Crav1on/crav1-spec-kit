@@ -17,12 +17,12 @@ Run these in order. When a playbook was named, the playbook question is answered
 - Run the plan reviewer in the foreground; the walk cannot go on without it, so no wake-up timer.
 - Quote every free-text argument, `--text "…"` and `--topic "…"`, so PowerShell passes it as one value. When `spec-finding` returns `kind-conflict`, ask its card: merged work that is not marked merged counts as code drift.
 
-**The save rides on the step's last yes (1.196.0).** A step's record is not its own card. The step's last card says it in its result-on-yes line, for example `Yes applies the eight fixes and saves the plan review as done.`, and that yes runs `record --yes` too. Only a step that asked no card at all gets the save card below, and only once: when the next step has a card, fold it into that card's result line instead (`… and saves the architecture review as done.`).
+**The save rides on the step's last yes (1.196.0).** A step's record is not its own card. The step's last card says it in its result-on-yes line, for example `Yes applies the eight fixes and saves the plan review as done.`, and that yes runs `record --yes` too. Only a step that asked no card at all gets the save card below, and only once: when the next step has a card, fold it into that card's result line instead (`… and saves the architecture review as done.`). The ready check never gets a save card (1.197.0): it is a read-only result, so record it with `record --yes` right after printing its reply, with no card. Plan-from-spec housekeeping (Risks wording refreshes, Trace evidence shas, header read lines) is applied with no card and one summary line, as in tighten-plan.
 
 The fallback save card says in plain words what will be recorded. The card does not quote the progress line, `walk-progress.md`, `Done`, `Result`, or step ids:
 
-Card: Save the ready check as done?
-- **Save it (Recommended)** (`yes`): the walk notes the ready check as done with some tasks ready, so a later run does not ask again. Why: the check just ran.
+Card: Save the architecture review as done?
+- **Save it (Recommended)** (`yes`): the walk notes the architecture review as done, so a later run does not ask again. Why: the review just ran with nothing to change.
 - **Not now** (`stop`): save nothing, and the walk asks again next time.
 
  The answers inside the step do not cover that line. Skip this confirm only when the step's own confirm already included this record. An extra's yes is that case. When that confirm shares one card with the step's batch, `yes (Recommended)` covers the recommendations and the progress line. Typed changes are that card's free-text answer. Do not add an `Edits` option. The rule is `crav1-docs/reference/question-cards.md`.

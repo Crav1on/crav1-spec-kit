@@ -213,3 +213,17 @@ class RuleDocs(unittest.TestCase):
         self.assertIn("**Proposed, not done (1.197.0).**", common)
         self.assertIn("Never write `I've updated`", common)
         self.assertIn("do not run `repo_sync.py status` yourself", common)
+
+
+class FewerCards1197(unittest.TestCase):
+    """Item 6: housekeeping with no card in plan-from-spec; no separate ready save card."""
+
+    def test_plan_from_spec_housekeeping(self):
+        text = read("crav1-plan-from-spec/references/write.md")
+        self.assertIn("## Housekeeping with no card (1.197.0)", text)
+        self.assertIn("Applying with no card (housekeeping):", text)
+
+    def test_ready_check_has_no_save_card(self):
+        steps = read("crav1-tighten-and-plan-ready-to-build/references/steps.md")
+        self.assertIn("The ready check never gets a save card (1.197.0)", steps)
+        self.assertNotIn("Card: Save the ready check as done?", steps)
