@@ -372,5 +372,46 @@ class Endings(unittest.TestCase):
         self.assertNotIn("crav1-tighten-spec/references/done.md", (ROOT / "scripts/next-line-baseline.tsv").read_text(encoding="utf-8"))
 
 
+class ShouldFixes1119d(unittest.TestCase):
+    """Item 8: kind conflict, notes in the uncommitted count, walk-step rules."""
+
+    def test_drift_text_as_spec_text_is_asked(self):
+        root = spec_folder("# Orders API\nSynced at: orders-api develop@4ef3776, 2026-11-18\n\n## Problem\n")
+        out = js(WALK, "spec-finding", "--root", str(root), "--id", "P15", "--kind", "spec-text", "--text",
+                 "PR 82 merged into develop at f6aad4d; Synced at still says 4ef3776 and misses two commits")
+        self.assertEqual(out["offer"], "kind-conflict")
+        self.assertEqual(len(out["options"]), 2)
+        self.assertTrue(out["result"].startswith("On yes:"))
+        self.assertIsNone(out["wrote"])
+
+    def test_uncommitted_counts_notes(self):
+        top = Path(tempfile.mkdtemp())
+        subprocess.run(["git", "init", "-q", str(top)], check=True)
+        root = top / "docs" / "specs" / "orders-api"
+        root.mkdir(parents=True)
+        (top / "docs" / "notes" / "2026-11").mkdir(parents=True)
+        (root / "spec.md").write_text("# Orders API\n", encoding="utf-8")
+        git = ["git", "-C", str(top), "-c", "user.name=t", "-c", "user.email=t@example.com"]
+        subprocess.run(git + ["add", "."], check=True)
+        subprocess.run(git + ["commit", "-qm", "slice"], check=True)
+        (root / "spec.md").write_text("# Orders API\nchanged\n", encoding="utf-8")
+        (top / "docs" / "notes" / "2026-11" / "2026-11-20-pr-82.md").write_text("# PR 82\n", encoding="utf-8")
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("walk_progress_t1196c", WALK)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        files = mod.slice_uncommitted(root)
+        self.assertIn("spec.md", files)
+        self.assertIn("2026-11-20-pr-82.md", files)
+
+    def test_walk_step_rules(self):
+        steps = read("crav1-tighten-and-plan-ready-to-build/references/steps.md")
+        self.assertIn("prints no Run next and no `Uncommitted:` line", steps)
+        self.assertIn("foreground", steps)
+        self.assertIn("follow its `continue` list", steps)
+        doc = (ROOT / "docs" / "reference" / "open-skill-file.md").read_text(encoding="utf-8")
+        self.assertIn("prints no Run next and no `Uncommitted:` line", doc)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -30,3 +30,5 @@ That relative path is the installed file in every layout, because the skills are
 Open the sibling path. Do not search the workspace for the skill. Do not fetch it from the web.
 
 The step that runs the skill names the exact path, for example `../crav1-review-architecture/SKILL.md` for the orders-api spec walk. Follow only the section that step names when it names one.
+
+A skill opened this way runs inside the step that opened it: it prints no Run next and no `Uncommitted:` line of its own (1.196.0). The step's own reply ends the run.

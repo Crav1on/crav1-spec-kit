@@ -5665,15 +5665,12 @@ def compose_ending(
     )
 
 
-def slice_uncommitted(root: Path | None) -> list[str]:
-    """Files in the slice folder that git sees as changed or new (1.176.0)."""
-    if root is None or not Path(root).is_dir():
-        return []
+def _porcelain(root: Path, paths: list[str], every_file: bool = False) -> list[str]:
+    cmd = ["git", "-C", str(root), "status", "--porcelain"]
+    if every_file:
+        cmd.append("--untracked-files=all")
     try:
-        proc = subprocess.run(
-            ["git", "-C", str(root), "status", "--porcelain", "--", "."],
-            capture_output=True, text=True, check=False, timeout=20,
-        )
+        proc = subprocess.run(cmd + ["--", *paths], capture_output=True, text=True, check=False, timeout=20)
     except (OSError, subprocess.SubprocessError):
         return []
     if proc.returncode != 0:
@@ -5685,6 +5682,20 @@ def slice_uncommitted(root: Path | None) -> list[str]:
             name = name.split(" -> ", 1)[1]
         if name:
             out.append(Path(name).name)
+    return out
+
+
+def slice_uncommitted(root: Path | None) -> list[str]:
+    """Files in the slice folder that git sees as changed or new (1.176.0), plus kit-written
+    notes and sources under docs/notes and docs/sources (1.196.0, 1119d S9), so the count is
+    every file the commit will take."""
+    if root is None or not Path(root).is_dir():
+        return []
+    out = _porcelain(Path(root), ["."])
+    docs = Path(root).resolve().parent.parent
+    extra = [str(docs / name) for name in ("notes", "sources") if (docs / name).is_dir()]
+    if extra:
+        out += _porcelain(Path(root), extra, every_file=True)
     return out
 
 
@@ -6613,6 +6624,21 @@ def spec_finding(args: argparse.Namespace) -> None:
         fail("kind", "kind must be code-drift or spec-text")
     owner = finding_owner(args.text, args.kind, topic)
     command = add_to_spec_command(args.text, args.pr, args.branch) if owner == "add-to-spec" else "/crav1-tighten-spec"
+    # 1.196.0 (1119d S3): a code-drift text passed as spec-text is asked, not routed silently.
+    if args.kind == "spec-text" and not args.choice and finding_owner(args.text, None, topic) == "add-to-spec":
+        drift_cmd = add_to_spec_command(args.text, args.pr, args.branch)
+        emit({"ok": True, "offer": "kind-conflict", "spec": True, "finding": args.id, "kind_conflict": True,
+              "background": f"{args.id} was passed as spec text, but it reads like code the spec has not recorded (a merge or commits).",
+              "question": f"Is {args.id} about code the spec has not recorded?",
+              "result": f"On yes: it goes to {drift_cmd}; otherwise to /crav1-tighten-spec.",
+              "options": [
+                  {"id": "add-to-spec", "label": "Yes, record the code (Recommended)", "recommended": True,
+                   "text": f"Run the same command with --kind code-drift; {drift_cmd} records it. Why: merged work not marked merged is code drift."},
+                  {"id": "tighten-spec", "label": "No, it is spec wording", "recommended": False,
+                   "text": "Run the same command with --kind spec-text --choice tighten-spec --yes; /crav1-tighten-spec fixes the wording."},
+              ],
+              "pause": False, "wrote": None})
+        return
     if args.choice == "already-done":
         check = already_fixed(root, args.text, owner, args.expect, args.code_repo)
         if not check["covered"]:
@@ -6932,7 +6958,7 @@ _TASK_OPEN = re.compile(r"^\s*-\s*\[( |x|X)\]\s*T(\d+)\b")
 _ITEM_REF = re.compile(r"\bitem\s+(\d+)\b", re.I)
 
 
-def _norm_words(text: str) -> str:
+def _tick_words(text: str) -> str:
     return " ".join(re.sub(r"[^\w\s]", " ", text.lower()).split())
 
 
@@ -6976,11 +7002,11 @@ def _match_item(row: dict, items: list[dict]) -> dict | None:
     if ref:
         n = int(ref.group(1))
         return next((i for i in items if i["item"] == n), None)
-    want = _norm_words(row["acceptance"])
+    want = _tick_words(row["acceptance"])
     if not want:
         return None
-    hits = [i for i in items if _norm_words(i["text"]) == want
-            or (len(want) >= 12 and (_norm_words(i["text"]).startswith(want) or want.startswith(_norm_words(i["text"]))))]
+    hits = [i for i in items if _tick_words(i["text"]) == want
+            or (len(want) >= 12 and (_tick_words(i["text"]).startswith(want) or want.startswith(_tick_words(i["text"]))))]
     return hits[0] if len(hits) == 1 else None
 
 

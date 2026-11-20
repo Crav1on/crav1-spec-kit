@@ -64,7 +64,8 @@ class Owner(unittest.TestCase):
 
     def test_wording_and_unclear_stay_with_tighten_spec(self):
         root = slice_dir(SPEC_OLD)
-        for text, kind in ((WORDING, None), ("the retry limit is stated twice", None), (DRIFT, "spec-text")):
+        # 1.196.0: code-drift text passed as spec-text is a kind-conflict card (test_kit_1196).
+        for text, kind in ((WORDING, None), ("the retry limit is stated twice", None), (WORDING, "spec-text")):
             args = ["spec-finding", "--root", str(root), "--id", "P10", "--text", text]
             if kind:
                 args += ["--kind", kind]
