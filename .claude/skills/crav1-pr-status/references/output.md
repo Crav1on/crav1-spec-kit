@@ -60,18 +60,18 @@ Order
 - Merge order: PR 40, then PR 42.
 
 Drafted replies (not posted)
-- Thread 104 (src/orders/audit.py): "Agreed for the pilot. I'll add the restructure as a follow-up so it isn't lost."
+- Thread 104 (src/orders/audit.py, https://dev.azure.com/contoso/Orders/_git/orders-api/pullrequest/71?discussionId=104): "Agreed for the pilot. I'll add the restructure as a follow-up so it isn't lost."
 - To Robin K. (not sent): "Hi Robin, Sam and I need the merge order of feat/orders-queue (PR 40) and PR 42. Plan: PR 40 into develop first. OK with you?"
 
 Run next:
 Thread 104 is waiting on you.
 
-After you post the drafted reply in thread 104, check again:
+Check PR 71 again after Robin K. answers the merge order:
 `/crav1-pr-status pr71 since-last`
 
-Waiting: /crav1-pr-status pr42 since-last, after Robin K. answers the merge order.
-Waiting: /crav1-merge-pr pr42, after PR 40 is merged and Ready is yes.
-Uncommitted: 1 file; commit with /crav1-finalize-commit when ready.
+Waiting: Robin K., to answer the merge order.
+Waiting: PR 40 to merge and Ready to say yes, before PR 42 can merge.
+Uncommitted: 1 file; commit and push with `/crav1-finalize-commit commit-push`.
 
 Ready: no. 2 waiting on you; 1 needs Robin K.; 1 agreed, not done; after PR 40 (not merged).
 PR record: `orders-api: docs/notes/2026-10/2026-10-08-pr-orders-api-71.md`
@@ -84,16 +84,16 @@ Local files, the `PR record:` line included, are named as a code span with the r
 The last lines before `Ready`, as `crav1-docs/reference/run-ending.md` says. Build the old Now / After / Later groups in your head, from record lines, never from guesses, then print the shape and not the groups.
 
 - **Now** (not printed as a heading): steps nothing blocks, from `waiting on <you>` Points, drafted replies, open candidates and follow-ups. Order them by `docs/reference/workflow.md`, then oldest, then anchor. That file is the source, so no help call is needed.
-- `Run next:` is the first Now item: one short reason, then a label on its own line and the command alone in its code span on the next line. Now empty: `Run next: nothing needed now.`
+- `Run next:` is the first Now item: one short reason, then a label on its own line and the command alone in its code span on the next line. Now empty and the next step is to check again after someone answers (1.199.0): the label `Check PR 84 again after person A answers:` above `` `/crav1-pr-status pr84 since-last` ``, the one shape `crav1-docs/reference/run-ending.md` names. Nothing to check again either: `Run next: nothing needed now.`
 - A Now item that is not first stays in the report section that already lists it (candidates, follow-ups, drafted replies). It is not a second Run next entry and not a `Waiting` line.
-- **After `<name>` answers** and **Later** become `Waiting:` lines. One line per blocked step: the step, and who or what it waits on. When the thread names options, keep them in the Order section. One Waiting line for that person, not one line per option. Nothing made up.
-- `Uncommitted:` when the PR note changed and is not committed. Do not put the commit command in Run next.
+- **After `<name>` answers** and **Later** become `Waiting:` lines. One line per blocked step: the step, and who or what it waits on. When the thread names options, keep them in the Order section. One Waiting line for that person, not one line per option. Nothing made up. A Waiting line never carries a command (1.199.0). The signed-in user is `you`, never their name in the third person: `Waiting: you, to accept the settings answer in thread 195.`
+- `Uncommitted:` when the PR note changed and is not committed, with the command in a code span (1.199.0): `` Uncommitted: 1 file; commit and push with `/crav1-finalize-commit commit-push`. `` Do not put the commit command in Run next.
 
 Commands are named, never run. `since-last` uses the same shape for steps that moved. Nothing new: `Run next: nothing needed now.` Never a `Next:` line (1.177.0).
 
 ## Verdict line
 
-`Verdict: <counts>. <Ready | Not ready> to merge.` Counts in this order, zero counts left out: waiting on you, waiting on others (named when one), needs <name>, open, agreed (with `code checked: <n> done` or `code not checked`), done, declined. Nothing left: `Verdict: all <n> points done or settled. Ready to merge.`
+`Verdict: <counts>. <Ready | Not ready> to merge.` Counts in this order, zero counts left out: waiting on you, waiting on others (named when one), needs <name>, open, agreed (with `code checked: <n> done` or `code not checked`), done, answered, declined. Nothing left: `Verdict: all <n> points done or settled. Ready to merge.`
 
 ## Merge readiness
 
@@ -106,11 +106,11 @@ Commands are named, never run. `since-last` uses the same shape for steps that m
 - the host says draft, conflicts, or a required check or policy is failing (read-only, as `/crav1-merge-pr` reads them);
 - `no-code` was used and an agreed point has no commit check.
 
-`declined` points the asker accepted, `done` points and follow-ups do not block. Otherwise `Ready: yes`. Merged or closed on the host: `Ready: merged` or `State: closed`, and no verdict. `/crav1-merge-pr` reads this line and stops on `no`.
+`declined` points the asker accepted, `answered` and `done` points and follow-ups do not block (1.199.0: say `answered; no code change`, never `done host`, for an answered question). Otherwise `Ready: yes`. Merged or closed on the host: `Ready: merged` or `State: closed`, and no verdict. `/crav1-merge-pr` reads this line and stops on `no`.
 
 ## Drafted replies
 
-First person, friendly, short, in the style of `/crav1-review-pr` **Comment style**. One per thread that waits on you, plus a message for each `needs <name>` you were asked to chase. Never posted, never sent. In the record they go in `## Replies as drafted, <date> (not posted)`, word for word, after the personal-data and secrets check.
+First person, friendly, short, in the style of `/crav1-review-pr` **Comment style**. One per thread that waits on you, plus a message for each `needs <name>` you were asked to chase. Each reply carries its thread link (`…/pullrequest/<n>?discussionId=<id>`; `ado_threads.py reply --pr <n> --thread <id> --file <draft file>` prints it as `link`) so it can be pasted in one click. A reply is posted only through its thread's reply card in [offers.md](offers.md) (1.199.0), and its words match what that card does. Messages to other people are never sent. In the record they go in `## Replies as drafted, <date> (not posted)`, word for word, after the personal-data and secrets check.
 
 ## Errors
 

@@ -64,6 +64,8 @@ Card: Merge PR 71 into develop?
 
 `Not yet` covers the specs-repo settle in [sync.md](sync.md) (1.198.0): no second card for that push.
 
+The card names a deploy or pipeline side effect only when `pipeline_trigger.py check --repo <code checkout> --branch <base> --path <changed file>` in `crav1-merge-pr` finds a pipeline file whose trigger covers the base (and the changed paths, when the file lists paths), and then only as `develop has a trigger in azure-pipelines.yml`, never that a deploy starts (1.199.0). No trigger found: say nothing about a deploy.
+
 That `yes` is the explicit ask `/crav1-merge-pr` requires. The walk opens `../crav1-merge-pr/SKILL.md` only after it.
 
 Never rebase. A branch that is behind is fixed by merging the base into it, after `yes`.

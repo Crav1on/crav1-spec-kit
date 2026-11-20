@@ -4,7 +4,7 @@ Read only when the pointer in `SKILL.md` sends you here: a pull request is alrea
 
 ## Someone else's pull request, nothing new (1.199.0)
 
-When `pr_common.py resolve` names an open pull request that someone else opened, and the local head has no commit the host lacks, stop after that one host read: no checks, no branch compare, no further reads. Say `PR 84 is open and is person A's; open-pr has nothing to do.` Then Run next, the label `See where PR 84 stands:` above `` `/crav1-pr-status pr84` ``. The signed-in user is `you` in every line, never their name in the third person.
+When `pr_common.py resolve --ref <n>` names an open pull request that someone else opened, and the local head has no commit the host lacks, stop after that one host read: no checks, no branch compare, no further reads. Say `PR 84 is open and is person A's; open-pr has nothing to do.` Then Run next, the label `See where PR 84 stands:` above `` `/crav1-pr-status pr84` ``. The signed-in user is `you` in every line, never their name in the third person.
 
 ## Find and read it
 

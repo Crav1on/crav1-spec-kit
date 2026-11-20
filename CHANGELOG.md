@@ -2,6 +2,20 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.199.0 (2026-11-20)
+
+Thread replies from the kit, one re-check shape, an answered status, lighter PR runs, commit and push in one yes, and three build fixes.
+
+- **Organization on checks.** `pr_common.py checks` passes the Azure DevOps organization to both `az` calls, from the PR URL or remote, else `docs/system/repos.md`.
+- **Thread replies.** New `ado_threads.py reply` posts inside an existing thread, can set its status, and marks the drafted reply posted in the PR note. pr-status asks one card, `Post your reply in thread 195 and set it to fixed?`, and the draft's words match what the card does. Drafted replies carry their thread link.
+- **One re-check shape.** Waiting on someone ends with a label and `/crav1-pr-status <pr> since-last` alone in its code span; Waiting lines carry no command. The card comes before the ending, which is printed once. The signed-in user is `you`.
+- **Answered status.** A question that was answered and accepted is `answered` in the PR record, said as `answered; no code change`, never `done host`. New `ado_threads.py set-point` writes a Point by its thread.
+- **Lighter runs.** pr-status runs merged-since-sync once, the ready check only when the PR closes a task, and reads threads with `ado_threads.py list --brief`. open-pr stops after one host read on someone else's up-to-date PR.
+- **Commit and push.** `/crav1-finalize-commit commit-push` commits and pushes on one yes. `Uncommitted:` lines name the command in a code span.
+- **Build fixes.** Branches that share a plan step no longer repeat its description. New `pipeline_trigger.py check` in merge-pr: a merge card names a deploy side effect only when a pipeline trigger covers the base. `code-drift` reports base commits from branches the spec does not list that touch the slice's files.
+
+Docs and tests: pr-status, commit, build walk and tighten-and-plan walkthroughs, run-ending, pr-record and data layout; `scripts/tests/test_kit_1199.py`.
+
 ## 1.198.0 (2026-11-20)
 
 Build-walk endings that follow the real step, checked facts, release gates in the build walk, a kit update line, fewer cards, container-aware dependency checks and ready-check ending fixes.

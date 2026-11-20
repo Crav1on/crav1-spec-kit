@@ -145,3 +145,7 @@ Before the plan review, the walk writes a review packet with the changed tasks, 
 ## 1.198.0 changes
 
 The `/crav1-tighten-and-plan-ready-to-build` ready check names the hard hit when it says not-ready while tasks can start, says `T30 is yours and waits for PR 85's merge.` for your own pushed task, names who the answers come from in `Resume the walk when the answers from person A arrive:`, shows a repeated question once (`same question as T26`), records a result that only reflects waits without a card (`Recorded: not-ready (was ready-partial).`), and labels a lone build-map change `Commit the updated build map:`. The walk start says `Kit update available: <installed> -> <latest>` when a newer release is out.
+
+## 1.199.0 changes
+
+`walk_progress.py code-drift --root <spec folder> --code-repo <checkout>` also reports commits merged in from the base that touch this slice's files and come from a branch the spec does not list, so they are offered for add-to-spec instead of counted as merged in.

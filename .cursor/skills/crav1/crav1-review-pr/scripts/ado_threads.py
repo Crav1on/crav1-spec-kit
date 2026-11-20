@@ -10,7 +10,7 @@
     ado_threads.py set-status  --pr N --thread T --status fixed [--yes]  (read back after)
     ado_threads.py reply       --pr N --thread T --file <file> [--status fixed] [--yes]  (1.199.0)
     ado_threads.py list        --pr N --brief  (one line per thread, 1.199.0)
-    ado_threads.py set-point   --note <PR note> --thread T --status answered [--text T] [--yes]  (1.199.0)
+    ado_threads.py set-point   --pr N --note <PR note> --thread T --status answered [--text T] [--yes]  (1.199.0)
     ado_threads.py since-last  --pr N --note <PR note> --who <name>      (against the recorded state)
 
 This is the one way the kit reads and changes Azure DevOps pull requests:
@@ -656,6 +656,7 @@ def main(argv: list[str] | None = None) -> int:
     spt.add_argument("--status", required=True)
     spt.add_argument("--text")
     spt.add_argument("--yes", action="store_true")
+    spt.add_argument("--pr", type=int, help="the pull request; accepted for symmetry, the note names it")
     rpl = sub.add_parser("reply")
     rpl.add_argument("--thread", required=True, type=int)
     rpl.add_argument("--file", required=True)

@@ -125,3 +125,7 @@ Since 1.176.0 a pull request description from `/crav1-open-pr`, on GitHub and on
 Since 1.182.0 a teammate whose repo already has `.githooks/commit-msg` but whose git config does not point at it is asked in the same choices prompt, `turn-on-hook` or `skip-hook`, before `git config core.hooksPath .githooks` runs. The config is never changed silently.
 
 Since 1.195.0 every Run next example starts with its reason line, for example `The commit is only local.` above `Push the specs repo:` and `git push`.
+
+## 1.199.0 changes
+
+`/crav1-finalize-commit commit-push` commits and then pushes once the fetch check says nothing was lost: one yes for both, never a force push. An `Uncommitted:` line names the command in a code span.

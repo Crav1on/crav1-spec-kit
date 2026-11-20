@@ -7061,6 +7061,27 @@ def start_check_mod():
     return _load_script("crav1-add-to-spec", "start_check.py", "start-check")
 
 
+_MERGE_FROM = re.compile(r"Merge (?:pull request #?\d+ from \S+?/|branch ')(?P<b>[^'\s]+)|Merged PR \d+: .*? \((?P<b2>[^)]+)\)", re.I)
+_SPEC_PATH = re.compile(r"`([A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)+/?)`")
+
+
+def _merge_source(commit: str) -> str | None:
+    """The branch a merge commit's subject names, when it names one (1.199.0)."""
+    m = _MERGE_FROM.search(commit)
+    return (m.group("b") or m.group("b2")) if m else None
+
+
+def _slice_paths(spec: str, code_repo) -> list[str]:
+    """Repo paths the spec names in code spans that exist in the code repo (1.199.0)."""
+    out = []
+    for path in _SPEC_PATH.findall(spec or ""):
+        if path.startswith(("docs/", "http")):
+            continue
+        if code_repo and (Path(code_repo) / path).exists():
+            out.append(path)
+    return sorted(set(out))
+
+
 def code_drift(args: argparse.Namespace) -> None:
     """Is the spec's record behind the code (1.194.0)? Read-only, no fetch.
 
@@ -7081,6 +7102,8 @@ def code_drift(args: argparse.Namespace) -> None:
     fetched = sc.fetch(args.code_repo, getattr(args, "no_fetch", False))
     behind = []
     merged_tips = []
+    unlisted: list[dict] = []
+    slice_paths = _slice_paths(spec, args.code_repo)
     for row in synced:
         if args.branch and row["branch"] != args.branch:
             continue
@@ -7101,6 +7124,21 @@ def code_drift(args: argparse.Namespace) -> None:
             ins = {h for h in ins if _git_lines(args.code_repo, "merge-base", "--is-ancestor", f"{h}^2", base_ref) is not None}
             own = [c for c in own if c.split()[0] not in ins]
         merged_in = len(allc) - len(own)
+        # 1.199.0: base commits merged in from branches the spec does not list
+        # that touch this slice's files are drift too, not "merged in".
+        if merged_in and slice_paths:
+            listed = {r["branch"] for r in synced}
+            own_set = {c.split()[0] for c in own}
+            for commit in allc:
+                short = commit.split()[0]
+                if short in own_set or _recorded(short, known):
+                    continue
+                files = _git_lines(args.code_repo, "show", "--name-only", "--format=", short) or []
+                source = _merge_source(commit)
+                if source and source in listed:
+                    continue
+                if any(f.strip() and any(f.strip().startswith(pth) for pth in slice_paths) for f in files):
+                    unlisted.append({"branch": row["branch"], "commit": commit, "from": source or "an unlisted branch"})
         # 1.196.0: a work branch whose tip is already in the base is merged; take it in
         # unless the merge (or a later commit) is already recorded.
         if base_ref and base_ref != ref and row["branch"] not in ("develop", "main", "master"):
@@ -7126,6 +7164,10 @@ def code_drift(args: argparse.Namespace) -> None:
         merged = {"sha": first["sha"], "pr": first["pr"], "branch": first["branch"], "tip_merged": True}
         if not args.pr and first["pr"]:
             args.pr = first["pr"]
+    if unlisted and not behind:
+        first = unlisted[0]["branch"]
+        behind.append({"branch": first, "synced": next(r["sha"] for r in synced if r["branch"] == first), "ref": first,
+                       "base": None, "count": 0, "total": 0, "already_recorded": 0, "base_merge_ins": 0, "commits": []})
     if not behind and not merged:
         emit({"ok": True, "behind": False, "offer": None, "wrote": None, "fetch": fetched,
               "message": "The spec's Synced at lines are current with the code; no add-to-spec offer."})
@@ -7135,6 +7177,11 @@ def code_drift(args: argparse.Namespace) -> None:
     parts = [f"{b['count']} commit{'s' if b['count'] != 1 else ''} on {b['branch']} after Synced at {b['synced']} not recorded yet"
              + (f" ({b['already_recorded'] + b['base_merge_ins']} more already recorded or merged in from {short_ref(b['base'])})"
                 if b['already_recorded'] + b['base_merge_ins'] else "") for b in behind]
+    parts = [part for part, b in zip(parts, behind) if b["count"]]
+    if unlisted:
+        n = len(unlisted)
+        parts.append(f"{n} commit{'s' if n != 1 else ''} merged in from the base touch this slice's files "
+                     f"and come from a branch the spec does not list")
     if merged:
         parts.append(f"PR {args.pr} merged at {merged['sha']}" if args.pr else f"a merge at {merged['sha']}")
     what = "; ".join(parts)
@@ -7145,6 +7192,7 @@ def code_drift(args: argparse.Namespace) -> None:
         "drift": behind,
         "merged": merged,
         "merged_tips": merged_tips,
+        "unlisted": unlisted[:5],
         "fetch": fetched,
         "command": command,
         "path": ADD_TO_SPEC_PATH,

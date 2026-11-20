@@ -110,7 +110,7 @@ Commands are named, never run. `since-last` uses the same shape for steps that m
 
 ## Drafted replies
 
-First person, friendly, short, in the style of `/crav1-review-pr` **Comment style**. One per thread that waits on you, plus a message for each `needs <name>` you were asked to chase. Each reply carries its thread link (`…/pullrequest/<n>?discussionId=<id>`; `ado_threads.py reply` prints it as `link`) so it can be pasted in one click. A reply is posted only through its thread's reply card in [offers.md](offers.md) (1.199.0), and its words match what that card does. Messages to other people are never sent. In the record they go in `## Replies as drafted, <date> (not posted)`, word for word, after the personal-data and secrets check.
+First person, friendly, short, in the style of `/crav1-review-pr` **Comment style**. One per thread that waits on you, plus a message for each `needs <name>` you were asked to chase. Each reply carries its thread link (`…/pullrequest/<n>?discussionId=<id>`; `ado_threads.py reply --pr <n> --thread <id> --file <draft file>` prints it as `link`) so it can be pasted in one click. A reply is posted only through its thread's reply card in [offers.md](offers.md) (1.199.0), and its words match what that card does. Messages to other people are never sent. In the record they go in `## Replies as drafted, <date> (not posted)`, word for word, after the personal-data and secrets check.
 
 ## Errors
 

@@ -16,7 +16,7 @@ Merge **one** named pull request with a **merge commit**, then stop. Never squas
 
 Command: `/crav1-merge-pr`.
 
-Run it only when **this turn** explicitly asks to merge a pull request named by number or URL. `/crav1-open-pr`, a build-tasks loop, `/crav1-review-pr`, or an earlier turn is not that ask. No pull request named: ask which one, and do not merge in that turn.
+Run it only when **this turn** explicitly asks to merge a specific pull request, named by number or URL. `/crav1-open-pr`, a build-tasks loop, `/crav1-review-pr`, or an earlier turn naming a URL is not that ask. If this turn does not name a pull request, ask which one. That turn is the question only. No merge.
 
 The steps shared with open-pr, pr-status and review-pr (which pull request, host order, Windows, state, claims, catching up, signing in) are [pr-common.md](../crav1-docs/reference/pr-common.md) (1.158.0). Read it every run. The merge rules here win over that page.
 
@@ -62,7 +62,7 @@ Source: <source> → Target: <target>
 Strategy: merge commit (GitHub --merge; Azure Repos noFastForward via --squash false). Not squash. Not rebase.
 ```
 
-Name a deploy side effect only when `scripts/pipeline_trigger.py check --repo <code checkout> --branch <target>` finds a trigger (1.199.0). Then merge. If a blocker stopped you, show those three lines and the blocker, and do not merge.
+Name a deploy side effect only if `scripts/pipeline_trigger.py check --repo <checkout> --branch <target>` finds one. Then merge. If a blocker stopped you, show those three lines and the blocker, and do not merge.
 
 ## Merge
 
