@@ -19,7 +19,7 @@ Use the folder the user @-mentions. Otherwise the most recently edited tree unde
 
 Need `spec.md`, `plan.md`, and `tasks.md`. If plan/tasks are missing, stop (`/crav1-plan-from-spec`). Do not invent a plan in this command.
 
-Pass the subagent these paths (read-only): `spec.md`, `plan.md`, `tasks.md`, plus `diagrams.md` / `adr/` if present. Also point it at this skill’s `assets/` (drop-in also `.claude/agent-assets/crav1-plan-reviewer-agent/`; plugin also `agent-assets/crav1-plan-reviewer-agent/`) for **expected plan/tasks shape**, not as the files under review.
+Pass the subagent these paths (read-only): `spec.md`, `plan.md`, `tasks.md`, plus `diagrams.md` / `adr/` if present. Also point it at this skill’s `assets/` (drop-in also `.claude/agent-assets/crav1-plan-reviewer-agent/`; plugin also `agent-assets/crav1-plan-reviewer-agent/`) for **expected plan/tasks shape**, not as the files under review. Run the subagent in the foreground. When a review packet exists (the spec walk writes one before the review), pass its path too; the subagent never reads `spec.md` whole (1.197.0).
 
 ## What to tell the subagent
 

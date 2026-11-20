@@ -227,3 +227,48 @@ class FewerCards1197(unittest.TestCase):
         steps = read("crav1-tighten-and-plan-ready-to-build/references/steps.md")
         self.assertIn("The ready check never gets a save card (1.197.0)", steps)
         self.assertNotIn("Card: Save the ready check as done?", steps)
+
+
+class ReviewPacket(unittest.TestCase):
+    """Item 7: a scoped reviewer input; quick mode for small deltas."""
+
+    def setUp(self):
+        self.root = spec_folder(
+            "- [x] T1: Retry (verify: unit) (spec: retry limit)\n"
+            "- [ ] T2: Export by day (verify: unit — one file per day) (spec: daily export)\n",
+            "# Plan\n\n## Risks\n\n- T2 waits on the export owner.\n\n## Linter\n\nruff\n")
+        filler = "\n".join(f"Filler line {i} about something else." for i in range(400))
+        (self.root / "spec.md").write_text(
+            "# Orders API\n\n## Retry\n\nThe retry limit is three tries.\n\n## Export\n\nThe daily export writes one file per day.\n\n"
+            "## Other\n\n" + filler + "\n", encoding="utf-8")
+        subprocess.run(["git", "init", "-q", str(self.root)], check=True)
+        g = ["git", "-C", str(self.root), "-c", "user.name=person A", "-c", "user.email=a@example.com"]
+        subprocess.run(g + ["add", "-A"], check=True)
+        subprocess.run(g + ["commit", "-qm", "base"], check=True)
+        with (self.root / "tasks.md").open("a", encoding="utf-8") as fh:
+            fh.write("- [ ] T3: Export by region (verify: unit — one file per region) (spec: daily export)\n")
+
+    def test_packet_holds_changed_task_and_its_section_only(self):
+        out_path = self.root.parent / "packet.md"
+        out = js(WALK, "review-packet", "--root", str(self.root), "--out", str(out_path))
+        self.assertEqual(out["tasks"], ["T3"])
+        self.assertEqual(out["how"], "changed")
+        self.assertTrue(out["quick"])
+        self.assertEqual(out["line"], "Review packet: 1 task, 1 spec section, quick review.")
+        text = out_path.read_text(encoding="utf-8")
+        self.assertIn("The daily export writes one file per day.", text)
+        self.assertIn("T2 waits on the export owner.", text)
+        self.assertNotIn("Filler line 300", text)
+        self.assertNotIn("The retry limit is three tries.", text)
+
+    def test_named_tasks(self):
+        out = js(WALK, "review-packet", "--root", str(self.root), "--tasks", "T1,T2", "--out", str(self.root.parent / "p2.md"))
+        self.assertEqual(out["tasks"], ["T1", "T2"])
+        self.assertFalse(out["quick"])
+
+    def test_reviewer_rules(self):
+        agent = (ROOT / ".cursor/agents/crav1-plan-reviewer-agent.md").read_text(encoding="utf-8")
+        self.assertIn("Never read `spec.md` whole", agent)
+        steps = read("crav1-tighten-and-plan-ready-to-build/references/steps.md")
+        self.assertIn("walk_progress.py review-packet", steps)
+        self.assertIn("foreground", steps)

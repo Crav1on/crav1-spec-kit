@@ -7082,6 +7082,120 @@ def _match_item(row: dict, items: list[dict]) -> dict | None:
     return hits[0] if len(hits) == 1 else None
 
 
+# --- review-packet (1.197.0): a scoped input for the plan reviewer, never the whole spec.
+_PACKET_TASK = re.compile(r"^\s*-\s*\[( |x|X)\]\s*(T\d+)\b.*$")
+_SPEC_REF = re.compile(r"\(spec:\s*([^)]+)\)", re.I)
+QUICK_MAX_TASKS = 3
+QUICK_MAX_LINES = 40
+SECTION_MAX_LINES = 60
+
+
+def _git_out(root: Path, *args: str) -> str | None:
+    try:
+        proc = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True, timeout=20, check=False)
+    except (OSError, subprocess.SubprocessError):
+        return None
+    return proc.stdout if proc.returncode == 0 else None
+
+
+def _changed_lines(root: Path, since: str | None) -> tuple[list[str], int]:
+    """Added lines in tasks.md and plan.md since a ref (or uncommitted), and how many lines changed."""
+    args = ["diff", "--unified=0"] + ([since] if since else ["HEAD"]) + ["--", "tasks.md", "plan.md"]
+    out = _git_out(root, *args)
+    if out is None:
+        return [], -1
+    added = [line[1:] for line in out.splitlines() if line.startswith("+") and not line.startswith("+++")]
+    removed = [line for line in out.splitlines() if line.startswith("-") and not line.startswith("---")]
+    return added, len(added) + len(removed)
+
+
+def _packet_section(text: str, heading: str) -> str:
+    m = re.search(rf"(?m)^##+\s+{re.escape(heading)}\s*$", text)
+    if not m:
+        return ""
+    rest = text[m.start():]
+    nxt = re.search(r"(?m)^##\s+", rest[3:])
+    return rest[: nxt.start() + 3].rstrip() if nxt else rest.rstrip()
+
+
+def _spec_range(spec_lines: list[str], ref: str) -> tuple[int, int] | None:
+    """Line range (1-based, inclusive) of the spec section that holds the ref words."""
+    want = _tick_words(ref)
+    if not want:
+        return None
+    for idx, line in enumerate(spec_lines):
+        if want in _tick_words(line):
+            start = idx
+            while start > 0 and not spec_lines[start].startswith("#"):
+                start -= 1
+            end = idx + 1
+            while end < len(spec_lines) and not spec_lines[end].startswith("#") and end - start < SECTION_MAX_LINES:
+                end += 1
+            return start + 1, end
+    return None
+
+
+def review_packet(root: Path, since: str | None = None, tasks_arg: str | None = None) -> dict:
+    spec_path, plan_path, tasks_path = root / "spec.md", root / "plan.md", root / "tasks.md"
+    if not tasks_path.is_file():
+        fail("root", f"no tasks.md in {root}")
+    spec = spec_path.read_text(encoding="utf-8") if spec_path.is_file() else ""
+    plan = plan_path.read_text(encoding="utf-8") if plan_path.is_file() else ""
+    task_lines = {}
+    for line in tasks_path.read_text(encoding="utf-8").splitlines():
+        m = _PACKET_TASK.match(line)
+        if m:
+            task_lines[m.group(2)] = (m.group(1) == " ", line)
+    if tasks_arg:
+        wanted = [t.strip() for t in tasks_arg.split(",") if t.strip()]
+        how, changed_n = "named", -1
+    else:
+        added, changed_n = _changed_lines(root, since)
+        wanted = [m.group(2) for m in (_PACKET_TASK.match(a) for a in added) if m]
+        how = "changed"
+        if not wanted:
+            wanted = [t for t, (is_open, _l) in task_lines.items() if is_open]
+            how = "open"
+    wanted = [t for t in dict.fromkeys(wanted) if t in task_lines]
+    spec_lines = spec.splitlines()
+    ranges = []
+    for tid in wanted:
+        for ref in _SPEC_REF.findall(task_lines[tid][1]):
+            for part in re.split(r"[;,]", ref):
+                rng = _spec_range(spec_lines, part)
+                if rng and rng not in ranges:
+                    ranges.append(rng)
+    ranges.sort()
+    parts = ["# Plan review packet", "", f"Tasks ({how}): " + (", ".join(wanted) or "none"), ""]
+    parts += ["## Tasks", ""] + [task_lines[t][1] for t in wanted] + [""]
+    for heading in ("Risks", "Linter"):
+        sec = _packet_section(plan, heading)
+        if sec:
+            parts += [f"## plan.md {heading}", "", sec.split("\n", 1)[1].strip() if "\n" in sec else "", ""]
+    parts += ["## spec.md sections (line ranges)", ""]
+    for start, end in ranges:
+        parts += [f"### spec.md lines {start}-{end}", ""] + spec_lines[start - 1:end] + [""]
+    quick = bool(wanted) and len(wanted) <= QUICK_MAX_TASKS and 0 <= changed_n <= QUICK_MAX_LINES
+    return {"tasks": wanted, "how": how, "spec_ranges": [f"{a}-{b}" for a, b in ranges],
+            "spec_bytes": len(spec.encode("utf-8")), "changed_lines": changed_n, "quick": quick,
+            "text": "\n".join(parts).rstrip() + "\n"}
+
+
+def review_packet_cmd(args: argparse.Namespace) -> None:
+    """Write the plan reviewer's input packet (1.197.0). The reviewer reads it, never spec.md whole."""
+    root = Path(args.root)
+    packet = review_packet(root, args.since, args.tasks)
+    import tempfile
+    # Outside the repo, so it is never committed or counted as uncommitted.
+    out = Path(args.out) if args.out else Path(tempfile.gettempdir()) / f"crav1-review-packet-{root.resolve().name}.md"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(packet.pop("text"), encoding="utf-8")
+    mode = "quick" if packet["quick"] else "full"
+    line = (f"Review packet: {len(packet['tasks'])} task{'s' if len(packet['tasks']) != 1 else ''}, "
+            f"{len(packet['spec_ranges'])} spec section{'s' if len(packet['spec_ranges']) != 1 else ''}, {mode} review.")
+    emit({"ok": True, **packet, "mode": mode, "path": str(out), "line": line})
+
+
 def tickable_report(root: Path) -> dict:
     spec_path, verify_path, tasks_path = root / "spec.md", root / "verify.md", root / "tasks.md"
     if not spec_path.is_file():
@@ -8193,6 +8307,12 @@ def main(argv: list[str] | None = None) -> None:
     cdr.add_argument("--merged", help="its merge commit, when the walk already saw it merged")
     cdr.set_defaults(func=code_drift)
 
+    rp = sub.add_parser("review-packet", help="scoped plan-reviewer input: changed tasks, their spec sections, Risks (1.197.0)")
+    rp.add_argument("--root", required=True)
+    rp.add_argument("--since", help="git ref; tasks added since it are the changed tasks")
+    rp.add_argument("--tasks", help="T# list instead, such as T3,T7")
+    rp.add_argument("--out", help="packet path; default a file in the system temp folder")
+    rp.set_defaults(func=review_packet_cmd)
     tk = sub.add_parser("tickable", help="acceptance items a passing verify row proves; tick with no card (1.196.0)")
     tk.add_argument("--root", required=True)
     tk.add_argument("--write", action="store_true", help="tick them, and add recheck notes to touching open tasks")
