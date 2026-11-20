@@ -17,7 +17,7 @@ Thread replies from the kit, one re-check shape, an answered status, lighter PR 
 - **Ready-check waits.** Your own task that is pushed and waits for its pull request is `waiting`, never an unrecognized blocker: the result stays ready-partial, the other tasks go to Run next, and only waits changed means a quiet record. A real `Not ready: T12 is blocked (…)` line comes right after Run next, before Held, and a merge wait names its PR, `Waiting: PR 85 to merge, then …`.
 - **PR number on someone else's branch.** A task verified on another person's branch names the branch's PR in the Waiting and held lines, from the Match `Branch:` line `(PR n)`, a task's `(PR n)` note, or any author's build-progress log; with none the wording stays.
 
-Docs and tests: pr-status, commit, build walk and tighten-and-plan walkthroughs, readiness, run-ending, pr-record and data layout; `scripts/tests/test_kit_1199.py`.
+Docs and tests: pr-status, commit, build walk and tighten-and-plan walkthroughs, readiness, run-ending, pr-record and data layout; `scripts/tests/test_kit_1199.py`. Maintainers get a dry-run tester for a kit pull request on a real project (CONTRIBUTING.md); it is not part of the kit, update never installs it, kit-lint keeps it out of skills and user docs, and it reports whether your repo is unchanged.
 
 ## 1.198.0 (2026-11-20)
 
