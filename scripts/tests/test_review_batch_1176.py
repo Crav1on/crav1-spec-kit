@@ -262,9 +262,11 @@ class N8WholeQuestion(unittest.TestCase):
                     "what are the subject and thumbprint, and who renews it before it runs out next year?")
         row = {"reason": f'open question "{question}" (recorded)', "who": "Person A", "quote": None}
         text = bm.held_phrase(row)
-        self.assertIn(question, text)
-        self.assertNotIn("…", text)
-        self.assertNotIn("...", text)
+        # 1.198.0: a long question is cut at a clause end near 120 characters.
+        quoted = text.split('"')[1]
+        self.assertLessEqual(len(quoted), 125)
+        self.assertTrue(question.startswith(quoted.rstrip("…").rstrip()), quoted)
+        self.assertIn("Waiting for Person A.", text)
 
 
 class TaskTitles(unittest.TestCase):

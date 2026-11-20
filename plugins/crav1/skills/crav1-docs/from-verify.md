@@ -81,3 +81,7 @@ The run ends as [How a run ends](reference/run-ending.md) says: Run next, never 
 Since 1.176.0 a task whose checks passed on a work branch that is not merged yet is **Implemented, verified on branch**, with the branch, the commit and the pull request in the evidence, not **Not implemented**. A check that can only pass after the merge is pending. The ready check says `verified on feat/orders-readme, waits for PR 71 to merge`, and the row becomes **Implemented, verified, tick pending** once the merge is recorded. `/crav1-verify-build-against-spec` writes it.
 
 Since 1.182.0 there is one wording for evidence that passed while the row is still `[ ]`: `Implemented, verified, tick pending`, whether the branch is still waiting for its merge or the merge is recorded. The older `Implemented, verified on branch` is still read and is rewritten once when the row script next writes the file. Writing one row no longer moves the whole-file `Spec stamp:`, so rows that were not checked again still rerun after a spec change; the last row of a full verify passes `--all-rows` to move it.
+
+## 1.198.0 changes
+
+When a test dependency is down, `/crav1-verify-build-against-spec` runs `scripts/dep_check.py containers --service <name>` first: a stopped docker or podman container, or a stopped podman machine, gets its start commands (`podman machine start`, `podman start <name>`), and an install is offered only when no runtime or container exists. The worker runs only the tests that do not need the dependency, then reports the blocker.

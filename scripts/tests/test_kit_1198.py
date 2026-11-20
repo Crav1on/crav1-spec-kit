@@ -203,7 +203,7 @@ class DependencyContainers(unittest.TestCase):
         self.mod = load(SK / "crav1-verify-build-against-spec/scripts/dep_check.py", "dep_check_t1198")
 
     def test_no_runtime_offers_install(self):
-        out = self.mod.check(["azurite"], which=lambda tool: None, run=lambda cmd: (1, ""))
+        out = self.mod.check(["orders-storage"], which=lambda tool: None, run=lambda cmd: (1, ""))
         self.assertEqual(out["state"], "no-runtime")
         self.assertTrue(out["install"])
 
@@ -214,7 +214,7 @@ class DependencyContainers(unittest.TestCase):
             if cmd[:3] == ["podman", "machine", "list"]:
                 return 0, "podman-machine-default\tfalse\n"
             return 1, ""
-        out = self.mod.check(["azurite"], which=lambda tool: "/usr/bin/podman" if tool == "podman" else None, run=run)
+        out = self.mod.check(["orders-storage"], which=lambda tool: "/usr/bin/podman" if tool == "podman" else None, run=run)
         self.assertEqual(out["state"], "stopped")
         self.assertEqual(out["start"][0], "podman machine start")
         self.assertFalse(out["install"])
@@ -222,16 +222,16 @@ class DependencyContainers(unittest.TestCase):
     def test_stopped_container_recommends_start(self):
         def run(cmd):
             if cmd[:2] == ["docker", "ps"]:
-                return 0, "orders-storage\tmcr.microsoft.com/azure-storage/azurite\texited\n"
+                return 0, "orders-storage\tcontoso/storage-emulator\texited\n"
             return 1, ""
-        out = self.mod.check(["azurite"], which=lambda tool: "/usr/bin/docker" if tool == "docker" else None, run=run)
+        out = self.mod.check(["orders-storage"], which=lambda tool: "/usr/bin/docker" if tool == "docker" else None, run=run)
         self.assertEqual(out["state"], "stopped")
         self.assertEqual(out["start"], ["docker start orders-storage"])
         self.assertIn("No install needed", out["line"])
 
     def test_running_container(self):
-        run = lambda cmd: (0, "azurite\tazurite:latest\trunning\n") if cmd[1] == "ps" else (1, "")
-        out = self.mod.check(["azurite"], which=lambda tool: "/x" if tool == "podman" else None, run=run)
+        run = lambda cmd: (0, "orders-storage\tcontoso/storage-emulator:latest\trunning\n") if cmd[1] == "ps" else (1, "")
+        out = self.mod.check(["orders-storage"], which=lambda tool: "/x" if tool == "podman" else None, run=run)
         self.assertEqual(out["state"], "running")
 
     def test_doc_runs_only_dependency_free_tests(self):
@@ -355,3 +355,31 @@ class ReadyCheckEnding(unittest.TestCase):
         self.assertNotIn("changed spec file", block)
         block = we.catch_up_block("orders-api", uncommitted=["docs/specs/orders-api/build-map.md", "docs/specs/orders-api/tasks.md"])
         self.assertIn("Commit the 2 changed spec files:", block)
+
+
+class PlainCardLabels(unittest.TestCase):
+    """Item 7: plain labels on build-walk cards."""
+
+    def test_rule(self):
+        text = read(SK / "crav1-build-walk/references/common.md")
+        self.assertIn("never a `yes:` or `stop:` prefix on the label", text)
+        self.assertIn("On yes:", text)
+
+
+class NextTaskFallback(unittest.TestCase):
+    """Item 6: next --task falls back to the recommended branch."""
+
+    def test_recommended_branch_for_exists(self):
+        bw = load(BW, "build_walk_t1198n")
+        self.assertTrue(callable(bw.recommended_branch_for))
+        with tempfile.TemporaryDirectory() as tmp:
+            self.assertIsNone(bw.recommended_branch_for(Path(tmp), "T4"))
+        import importlib
+        tbm = load(ROOT / "scripts/tests/test_build_map.py", "test_build_map_t1198")
+        with tempfile.TemporaryDirectory() as tmp:
+            folder = Path(tmp) / "cancel-booking"
+            folder.mkdir()
+            (folder / "tasks.md").write_text(tbm.TASKS, encoding="utf-8")
+            (folder / "plan.md").write_text(tbm.PLAN, encoding="utf-8")
+            (folder / "spec.md").write_text(tbm.SPEC, encoding="utf-8")
+            self.assertEqual(bw.recommended_branch_for(folder, "T3"), "feat/cancel-booking-send-receipt")

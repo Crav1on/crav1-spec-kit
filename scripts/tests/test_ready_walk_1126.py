@@ -214,7 +214,8 @@ class Waiting(unittest.TestCase):
         self.assertIn("held, waits on T1", by_task["T2"]["reason"])
         self.assertIn("held, waits on T2", by_task["T3"]["reason"])
         self.assertIn("/crav1-tighten-and-plan-ready-to-build the-slice", payload["waiting_next"])
-        self.assertIn("answers arrive", payload["waiting_next"])
+        # 1.198.0: names who answers.
+        self.assertIn("answers from the partner arrive", payload["waiting_next"])
 
     def test_not_yet_asked_names_show_or_ask(self):
         payload = self._ready(self.PENDING, recorded=True)

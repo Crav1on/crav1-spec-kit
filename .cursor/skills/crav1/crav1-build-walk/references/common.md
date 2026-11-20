@@ -52,6 +52,8 @@ Card: Commit these 3 files on feat/orders-cicd?
 - **Commit them (Recommended)** (`yes`): commit the files shown, then the walk opens the commit step. Why: the step is done and checked.
 - **Stop here** (`stop`): write nothing and pause the walk at this step.
 
+Show each option by its plain label only (1.198.0). The word in backticks (`yes`, `stop`, `fast-forward`, `dependency-skip`) is the answer's id, never a `yes:` or `stop:` prefix on the label. A script card's `result` is plain text under the card, such as `On yes: fast-forwards your local develop. Nothing is pushed.`
+
 `yes` does that action and then the walk opens the step skill. `stop` does not. There is no Edits option. A missing word is asked again. Do not guess.
 
 The card that merges names the pull request number:

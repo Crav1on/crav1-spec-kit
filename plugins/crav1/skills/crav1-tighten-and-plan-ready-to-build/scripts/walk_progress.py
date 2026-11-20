@@ -1625,6 +1625,27 @@ def record_unchanged(root: Path, step: str, result: str, playbook: Path | None =
     return True
 
 
+def record_quiet(root: Path | None, result: str, hits: list[dict]) -> str | None:
+    """1.198.0: `Recorded: not-ready (was ready-partial).` when the new result only reflects waits.
+
+    The step is recorded with another result, and every hit is a wait on
+    someone else or on a merge (no blocker, no reopened step, no jump back).
+    Then the walk records without a card and says this one line. None
+    otherwise, so the record card is asked as before.
+    """
+    if root is None or not Path(root).is_dir():
+        return None
+    try:
+        previous = (load(Path(root))["steps"].get("tasks-ready-to-build") or {}).get("result")
+    except Exception:  # noqa: BLE001
+        return None
+    if not previous or previous == result or previous not in READY_ONLY:
+        return None
+    if any(hit.get("kind") != "waiting" and not hit.get("merge") for hit in hits):
+        return None
+    return f"Recorded: {result} (was {previous})."
+
+
 def record(args: argparse.Namespace) -> None:
     step = _one_step(args.step)
     if step not in COVERS:
@@ -2291,10 +2312,24 @@ def start(args: argparse.Namespace) -> None:
         "resume": resume_payload(folder, no_playbook=not playbook_arg),
         "playbook_status": None,
     }
+    kit = _kit_update(folder)
+    if kit:
+        payload["kit_update"] = kit["line"]
+        payload["kit_update_run"] = kit["run"]
     if playbook_arg:
         payload["playbook"] = playbook_arg
         payload["playbook_status"] = playbook_payload(folder, playbook_arg)
     emit(payload)
+
+
+def _kit_update(folder: Path) -> dict | None:
+    """1.198.0: `Kit update available: <installed> -> <latest>`, read-only, silent when offline."""
+    try:
+        top = _git_out(folder, "rev-parse", "--show-toplevel")
+        mod = _load_script("crav1-update-kit", "update_kit.py", "walk_update_kit")
+        return mod.update_available(Path(top.strip()) if top else folder)
+    except Exception:  # noqa: BLE001 - never stop the walk for this line
+        return None
 
 
 def _resolved_playbook(folder: Path, query: str) -> str | None:
@@ -3908,7 +3943,44 @@ def apply_progress_waits(root: Path | None, rows: list[dict]) -> dict:
         else:
             row["reason"] = merge_wait_phrase(waits[task])
     apply_built_tasks(root, rows)
+    opened = progress_open_prs(root)
+    for row in rows:
+        task = row.get("task")
+        if task in opened and row.get("own_claim") and not row.get("merge_wait"):
+            row["own_pr_open"] = opened[task]
     return waits
+
+
+def progress_open_prs(root: Path | None) -> dict:
+    """Tasks on a branch whose pull request is open and not merged (1.198.0): {"T30": 85}.
+
+    From build-progress/<branch>.md: a done `open-pr` step naming a PR, and no
+    done `merge-pr` step. Your own claim there waits for that merge; the walk
+    does not resume it.
+    """
+    out: dict = {}
+    if root is None or not (Path(root) / "build-progress").is_dir():
+        return out
+    for path in sorted((Path(root) / "build-progress").glob("*.md")):
+        try:
+            text = path.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError):
+            continue
+        blocks = re.split(r"(?m)^- Step:", text)[1:]
+        done = [block.split(None, 1)[0].lower() for block in blocks
+                if block.split() and re.search(r"Result:\s*(done|merged)\b", block, re.I)]
+        if "open-pr" not in done or "merge-pr" in done:
+            continue
+        pr = _file_pr(text)
+        if not pr:
+            continue
+        head = text.split("\n- Step:", 1)[0]
+        tasks_line = re.search(r"^Tasks:\s*(.*)$", head, re.M)
+        ids = {f"T{int(n)}" for n in re.findall(r"\bT(\d+)\b", tasks_line.group(1))} if tasks_line else set()
+        ids |= set(task_state_mod().progress_tasks(text)["all"])
+        for task in ids:
+            out[task] = pr
+    return out
 
 
 _PR_AUTHOR = re.compile(r"^(?:PR author|Opened by):\s*(.+?)\s*$", re.M | re.I)
@@ -5172,11 +5244,17 @@ def own_claim_line(rows: list[dict]) -> str | None:
         if not task or row.get("bucket") == "done":
             continue
         info = row.get("merge_wait")
-        if info:
-            # The Waiting line already names the pull request, so the wait
-            # is said once (1.176.0).
+        if not row.get("own_claim"):
             continue
-        if row.get("own_claim"):
+        # 1.198.0: your own pushed task waits for its merge; the walk does not
+        # resume it. Said only when the pull request is known.
+        if info:
+            # The Waiting line or merge list already names the wait (1.176.0).
+            continue
+        pr = row.get("own_pr_open")
+        if pr:
+            parts.append(f"{task} is yours and waits for PR {pr}'s merge.")
+        else:
             parts.append(f"{task} is yours; the walk resumes it.")
     return " ".join(parts) or None
 
@@ -5200,6 +5278,7 @@ def ready_branches(root: Path) -> list[dict]:
     apply_progress_waits(root, rows)
     apply_verified_on_branch(root, rows)
     apply_loop_holds(root, rows)
+    apply_release_gates(root, rows)  # 1.198.0: the build-walk ending uses this list
     resolve_kept = resolve_is_keep(root)
     resolve_recorded = resolve_ever_recorded(root)
     hits = []
@@ -5293,12 +5372,32 @@ def _waiting_lines(waiting: list[dict], slug: str) -> tuple[str | None, str | No
             f"/crav1-record-approval {slug}, "
             "because that yes is not on record yet."
         )
-    else:
+    elif questions:
+        # 1.198.0: only when held questions exist, naming who answers them.
+        from_whom = _answer_from(questions)
         nxt = (
             f"/crav1-tighten-and-plan-ready-to-build {slug}, "
-            "because the walk resumes when the answers arrive."
+            f"because the walk resumes when the answers{from_whom} arrive."
         )
+    else:
+        nxt = None
     return line, nxt
+
+
+def _answer_from(questions: list[dict]) -> str:
+    """` from person A and the project team` (1.198.0): short names, at most three."""
+    names: list[str] = []
+    for hit in questions:
+        who = str(hit.get("who") or "").strip()
+        who = re.sub(r"\s*\(.*?\)\s*", " ", who).strip(" ,.;")
+        if not who or who == NOT_NAMED or who.lower() in (n.lower() for n in names):
+            continue
+        names.append(who)
+    if not names:
+        return ""
+    if len(names) > 3:
+        names = names[:3] + ["others"]
+    return " from " + (names[0] if len(names) == 1 else ", ".join(names[:-1]) + " and " + names[-1])
 
 
 def propagate_held(rows: list[dict], hits: list[dict]) -> None:
@@ -5508,7 +5607,11 @@ def _run_from_clause(text: str) -> str:
     if ", because " in text:
         command, reason = text.split(", because ", 1)
         reason = reason.strip()
-        return _run_entry(command.strip().strip("`"), reason, REASON_LABELS.get(reason))
+        label = REASON_LABELS.get(reason)
+        resume = re.fullmatch(r"the walk resumes when the answers( from .+)? arrive\.", reason)
+        if resume and not label:
+            label = f"Resume the walk when the answers{resume.group(1) or ''} arrive:"
+        return _run_entry(command.strip().strip("`"), reason, label)
     if text.startswith("`") and "\n" in text:
         return text
     return text
@@ -5553,6 +5656,36 @@ def not_ready_because(result: str, rows: list[dict], hits: list[dict], can_start
     if ids:
         return f"{ids} cannot start yet."
     return "not ready"
+
+
+_INSTRUCTION = re.compile(r"^(Do not|Never|Jump back|The walk does not|/crav1-)", re.I)
+
+
+def hard_hit_line(result: str, hits: list[dict], can_start: list) -> str | None:
+    """1.198.0: the hard hit that forced not-ready while tasks can start, in plain words.
+
+    `Not ready: T12 is blocked (the queue name is not decided). T3, T4 and T5
+    can start once that is cleared.` None when nothing can start, or when a
+    reopened step already leads Run next with its own reason.
+    """
+    if result != "not-ready" or not can_start:
+        return None
+    hard = [hit for hit in hits if hit.get("kind") != "waiting" and not hit.get("loop")
+            and hit.get("bucket") != "needs-verify"]
+    if not hard or any(hit.get("bucket") == "reopened" for hit in hard):
+        return None
+    hit = hard[0]
+    sentences = [part.strip() for part in re.split(r"(?<=[.!?])\s+", str(hit.get("why") or "")) if part.strip()]
+    plain = next((part for part in sentences if not _INSTRUCTION.match(part)), "")
+    plain = plain.rstrip(".")
+    what = str(hit.get("bucket") or hit.get("kind") or "held").replace("-", " ")
+    who = hit.get("task") or "The slice"
+    head = f"Not ready: {who} is {what}"
+    if plain and plain.lower() not in head.lower():
+        head += f" ({plain[:1].lower()}{plain[1:]})"
+    ids = _task_ids_text(can_start)
+    verb = "can" if ids else ""
+    return f"{head}. {ids} {verb} start once that is cleared.".replace("  ", " ") if ids else head + "."
 
 
 def not_ready_run(
@@ -6199,6 +6332,11 @@ def _readiness(args: argparse.Namespace) -> None:
         ending = (ending + "\n\n" if ending else "") + sync["message"]
     if warnings:
         ending = (ending + "\n\n" if ending else "") + "\n".join(warnings)
+    # 1.198.0: a not-ready result with tasks that can start names the hard hit
+    # and those tasks, whatever leads Run next (catch-up, resume, merges).
+    hard_line = hard_hit_line(result, hits, can_start)
+    if hard_line and hard_line not in (ending or ""):
+        ending = (ending + "\n\n" if ending else "") + hard_line
     own_line = own_claim_line([row for row in rows if row.get("own_claim")])
     if own_line:
         ending = (ending + "\n\n" if ending else "") + own_line
@@ -6209,6 +6347,7 @@ def _readiness(args: argparse.Namespace) -> None:
         "can_start": can_start,
         "held": held,
         "because": because,
+        "hard_hit": hard_line,
         "line": line,
         "ready_lines": ready_lines,
         "held_lines": held_lines,
@@ -6246,6 +6385,7 @@ def _readiness(args: argparse.Namespace) -> None:
         "changed_questions": [],
         "restamp_only": False,
         "record_unchanged": bool(root is not None and record_unchanged(root, "tasks-ready-to-build", result)),
+        "record_quiet": record_quiet(root, result, hits),
         "verify_behind": gap["behind"],
         "verify_stale": gap["tasks"],
         "verify_waiting": gap["waiting"],

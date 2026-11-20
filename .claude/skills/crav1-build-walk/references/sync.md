@@ -25,7 +25,7 @@ Card: Commit the walk's files and push the specs repo?
 - **Commit and push (Recommended)** (`yes`): commit the walk's files with the persisted commit style, the draft-commit rule already in the repo, then push the specs repo, for example 2 commits ahead. Why: others then see the progress.
 - **Leave them** (`stop`): commit and push nothing, and the ending shows a Waiting line.
 
-One yes covers the commit and the push (1.164.0). Do not ask a second card for the push. `stop` does not push. A headless run stops and names `yes` and `stop`.
+One yes covers the commit and the push (1.164.0). When the walk pauses on the merge card's `Not yet`, that answer already covers this commit and push (1.198.0): do it without this card. Do not ask a second card for the push. `stop` does not push. A headless run stops and names `yes` and `stop`.
 
 If the branch is behind origin, fetch and merge origin in first. Never rebase. On a conflict, stop and name the files. Nothing is pushed.
 

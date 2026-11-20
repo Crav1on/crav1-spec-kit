@@ -109,3 +109,7 @@ A claim stays only while its tasks are open. `/crav1-merge-pr` and the start of 
 ## Local base update (1.197.0)
 
 When the code repo's local base branch is behind origin, the walk asks `Your local develop in orders-api is 2 commits behind origin/develop. Update it locally before the build?` **Update local develop** fast-forwards your local branch (`git merge --ff-only`) and pushes nothing, then cuts the work branch from it and builds the task. **Stop** builds nothing.
+
+## 1.198.0 changes
+
+`/crav1-build-walk` labels each Run next entry by the step the branch is on, such as `Merge PR 71 for T5:` or `Check PR 71's merge for T5:`, with short task names. It checks whether the branch is really behind its base before it says so, moves on after a `nothing-to-do` step, and leaves release-gated tasks out of its ending; a manual task with no branch is listed on its own. `progress record --step build,verify --pr 71` records several steps and the PR in one call. One yes opens the pull request, and `Not yet` on the merge card also commits and pushes the walk's specs files. When a newer kit release is out it says `Kit update available: 1.197.0 -> 1.198.0` once, with `/crav1-update-kit` in Run next.

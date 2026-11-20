@@ -118,6 +118,17 @@ def map_mod():
     return _load("crav1-tasks-ready-to-build", "build_map.py")
 
 
+def kit_update_for(root) -> dict | None:
+    """1.198.0: one read-only `Kit update available` check for the specs repo; None when silent."""
+    try:
+        repo = Path(str(root)).resolve()
+        top = _git(repo, "rev-parse", "--show-toplevel")
+        mod = _load("crav1-update-kit", "update_kit.py")
+        return mod.update_available(Path(top.strip()) if top else repo)
+    except Exception:  # noqa: BLE001 - never stop the walk for this line
+        return None
+
+
 def state_mod():
     """The shared task state, with walk_start (1.186.0)."""
     return _load("crav1-tasks-ready-to-build", "task_state.py")
@@ -292,7 +303,24 @@ def _task_label(task: dict) -> str:
     # Only a lone trailing full stop goes; an ellipsis stays (1.171.0).
     if title.endswith(".") and not title.endswith(".."):
         title = title[:-1].rstrip()
+    title = short_title(title)
     return f"{_task_token(task.get('id'))} {title}".strip()
+
+
+TITLE_MAX = 120
+
+
+def short_title(title: str) -> str:
+    """A task title for labels (1.198.0): its first sentence, at most about 80 characters,
+    cut at a word with an ellipsis. Never a 500-character task text."""
+    title = " ".join(str(title or "").split())
+    if len(title) <= TITLE_MAX:
+        return title
+    first = re.split(r"(?<=[a-z0-9)\]])\.\s+(?=[A-Z(])", title, maxsplit=1)[0]
+    if len(first) <= TITLE_MAX:
+        return first.rstrip(".")
+    cut = first[:TITLE_MAX].rsplit(" ", 1)[0].rstrip(",;:-— ")
+    return cut + "…"
 
 
 def normalize_task(item) -> dict:
@@ -609,10 +637,35 @@ def _join_names(labels: list) -> str:
     return ", ".join(items[:-1]) + " and " + items[-1]
 
 
-def _entry(command: str, because: str, tasks: list, branch: str, slug: str | None) -> dict:
+def phase_label(phase: str | None, labels: list, branch: str, state: dict | None = None) -> str | None:
+    """The Run next label for the step the task is on (1.198.0). None for build: run_entry says Build."""
+    state = state or {}
+    names = _join_names(labels)
+    ids = _join_names([str(label).split(" ", 1)[0] for label in labels]) or "the task"
+    pr = state.get("pr")
+    named = f"PR {pr}" if pr else "the pull request"
+    base = state.get("base") or DEFAULT_BASE
+    table = {
+        "verify": f"Verify {names} on {branch}:",
+        "commit": f"Commit {names} on {branch}:",
+        "open-pr": f"Open the pull request for {names} on {branch}:",
+        "merge-base": f"Merge {base} into {branch} for {ids}:",
+        "merge-pr": f"Merge {named} for {ids}:",
+        "comment": f"Comment on {named} for {ids}:",
+        "wait-merge": f"Check {named}'s merge for {ids}:",
+        "tick": f"Tick {ids}, now that {named} is merged:",
+    }
+    return table.get(phase or "")
+
+
+def _entry(command: str, because: str, tasks: list, branch: str, slug: str | None,
+           phase: str | None = None, state: dict | None = None) -> dict:
     labels = [_task_label(task) for task in tasks] or []
     invoked = _invocation(command, tasks, slug, branch)
-    if command == "/crav1-build-walk" and len(labels) >= 2 and branch:
+    step_label = phase_label(phase, labels, branch, state) if command == "/crav1-build-walk" and labels and branch else None
+    if step_label:
+        run = f"{step_label}\n`{invoked}`"
+    elif command == "/crav1-build-walk" and len(labels) >= 2 and branch:
         # The branch_block layout, one task per line (1.171.0).
         run = map_mod().branch_block(branch, labels, first=labels[0], slug=slug)
     elif labels and branch:
@@ -656,16 +709,72 @@ def _other_ready(state: dict, current: str | None) -> list:
         if path.is_dir():
             branches = walk_mod().ready_branches(path)
     out = []
-    for branch in branches or []:
+    for branch in gate_and_split(branches or [], state.get("root")):
         if not isinstance(branch, dict):
             continue
         name = branch.get("branch")
+        if branch.get("manual"):
+            out.append(branch)
+            continue
         if not name or name == current:
             continue
         tasks = branch.get("tasks") or []
         if tasks:
             out.append(branch)
     return out
+
+
+def _task_meta(root) -> dict:
+    path = Path(str(root)) / "tasks.md" if root else None
+    if path is None or not path.is_file():
+        return {}
+    out = {}
+    for task in map_mod().parse_tasks(path.read_text(encoding="utf-8")):
+        rest = str(task.get("rest") or task.get("title") or "")
+        out[f"T{int(task['id'])}"] = {"manual": bool(re.search(r"\(manual\b", rest, re.I)), "branch": task.get("branch")}
+    return out
+
+
+def gate_and_split(branches: list, root) -> list:
+    """1.198.0: the ready check's release gate applies here too, and a manual task with no
+    `(branch:)` is its own entry, not under a generated branch name."""
+    if not root or not Path(str(root)).is_dir():
+        return list(branches)
+    try:
+        gates = walk_mod().release_gates(Path(str(root)))
+    except Exception:  # noqa: BLE001 - an older walk script has no gates
+        gates = {}
+    meta = _task_meta(root)
+    out, manual = [], []
+
+    def token(task):
+        try:
+            return _task_token(normalize_task(task)["id"])
+        except InputError:
+            return ""
+
+    for branch in branches:
+        if not isinstance(branch, dict):
+            continue
+        kept = dict(branch)
+        for key in ("tasks", "open_tasks"):
+            if kept.get(key) is None:
+                continue
+            items = []
+            for task in kept.get(key) or []:
+                tid = token(task)
+                if tid in gates:
+                    continue
+                info = meta.get(tid) or {}
+                if info.get("manual") and not info.get("branch"):
+                    if key == "tasks" and all(token(m["tasks"][0]) != tid for m in manual):
+                        manual.append({"branch": "", "manual": True, "tasks": [task]})
+                    continue
+                items.append(task)
+            kept[key] = items
+        if kept.get("tasks"):
+            out.append(kept)
+    return out + manual
 
 
 def branch_entries(branch: dict, slug: str | None = None) -> list[dict]:
@@ -676,6 +785,13 @@ def branch_entries(branch: dict, slug: str | None = None) -> list[dict]:
     """
     tasks = branch.get("tasks") or []
     name = branch.get("branch") or ""
+    if branch.get("manual") and tasks:
+        # 1.198.0: an unbranched manual task is listed on its own.
+        label = _task_label(normalize_task(tasks[0]))
+        tid = _task_token(normalize_task(tasks[0])["id"])
+        command = f"/crav1-build-walk {slug} {tid}" if slug else f"/crav1-build-walk {tid}"
+        return [{"command": command, "run": f"Run the manual task {label} (no branch):\n`{command}`",
+                 "next": _one(command, f"{tid} is a manual task with no branch")}]
     opens = branch.get("open_tasks")
     if opens is None:
         opens = tasks
@@ -851,7 +967,12 @@ def lead_for(phase: str, state: dict, uncommitted=None) -> str:
     elif phase == "open-pr":
         text = f"{tasks} is committed on {branch}, and the pull request is next"
     elif phase == "merge-base":
-        text = f"{branch} is behind {state.get('base') or DEFAULT_BASE}, and that merge is next"
+        base_name = state.get("base") or DEFAULT_BASE
+        if state.get("behind_count"):
+            text = f"{branch} is {state['behind_count']} commit{'s' if state['behind_count'] != 1 else ''} behind {base_name}, and that merge is next"
+        else:
+            # 1.198.0: only checked facts. Unknown behind state is not stated as behind.
+            text = f"{named} is open for {tasks}; the walk checks whether {branch} needs {base_name} merged in first"
     elif phase == "merge-pr":
         text = f"{named} is open for {tasks}, and its merge is next"
     elif phase == "tick":
@@ -868,6 +989,9 @@ def lead_for(phase: str, state: dict, uncommitted=None) -> str:
         text = text.replace(" and waits for its merge", " and wait for its merge", 1)
     if uncommitted:
         text += "; some files are not committed yet"
+    if branch and text.startswith(branch):
+        # 1.198.0: never capitalize a branch name.
+        return text + "."
     return text[0].upper() + text[1:] + "."
 
 
@@ -918,6 +1042,7 @@ def next_for(state: dict) -> dict:
             path = Path(str(state["root"]))
             if path.is_dir():
                 ready = walk_mod().ready_branches(path)
+        ready = gate_and_split(ready, state.get("root"))
         if ready:
             entries.extend(grouping_lines(ready, slug))
         else:
@@ -929,9 +1054,12 @@ def next_for(state: dict) -> dict:
         # again would only reprint the wait, so the current branch is not a
         # Run next entry (1.171.0).
         if not (phase in SKIP_CURRENT_PHASES and waiting):
-            entries.append(_entry(command, because, tasks, branch, slug))
+            entries.append(_entry(command, because, tasks, branch, slug, phase=phase, state=state))
         for other in _other_ready(state, branch):
             entries.extend(branch_entries(other, slug))
+    kit = state.get("kit_update")
+    if kit and kit.get("run"):
+        entries.append({"command": "/crav1-update-kit", "run": kit["run"], "next": _one("/crav1-update-kit", kit["line"])})
     lines = [entry["next"] for entry in entries]
     ending = _compose_ending(entries, waiting, uncommitted, state.get("catch_up"))
     outcome = state.get("_permission") if phase == "permission-refused" else None
@@ -946,6 +1074,8 @@ def next_for(state: dict) -> dict:
         "allowed": allowed_actions(owner, state.get("description_asked")),
         "command": entries[0]["command"] if entries else command,
     }
+    if kit:
+        result["kit_update"] = kit["line"]
     if outcome:
         result["waiting"] = outcome["waiting"]
         result["offer"] = outcome["offer"]
@@ -1212,10 +1342,15 @@ def read_progress(text: str) -> dict:
         "slice": field("Slice"),
         "cut_from": field("Cut from"),
         "author": field("PR author"),
+        "code_repo": field("Code repo"),
         "task_ids": _all_task_ids(text, tasks_field),
         "steps": steps,
         "pr": int(prs[-1]) if prs else None,
     }
+
+
+# 1.198.0: a step with nothing to do is finished too.
+DONE_RESULTS = ("done", "merged", "nothing-to-do", "nothing to do", "skipped", "not needed")
 
 
 def phase_from_progress(info: dict) -> str:
@@ -1229,7 +1364,7 @@ def phase_from_progress(info: dict) -> str:
     result = (last.get("result") or "").lower()
     if step == "wait-merge":
         return "tick" if result.startswith("merged") else "wait-merge"
-    if not result.startswith("done") and not result.startswith("merged"):
+    if not result.startswith(DONE_RESULTS):
         return step if step in STEP_NAMES else "build"
     if step in order:
         i = order.index(step)
@@ -1278,7 +1413,24 @@ def uncommitted_line(root: Path) -> str | None:
     return f"Uncommitted: {files} ({', '.join(names[:5])}{', …' if count > 5 else ''})."
 
 
-def state_from_files(root: Path, branch: str, waiting: str | None = None, who: str | None = None, pr=None) -> dict:
+def behind_count(code_repo, branch: str, base: str) -> int | None:
+    """Commits on origin/<base> that <branch> lacks, in the code repo (1.198.0). None when unknown."""
+    if not code_repo or not branch:
+        return None
+    repo = Path(str(code_repo))
+    if not repo.is_dir():
+        return None
+    head = branch if _git(repo, "rev-parse", "--verify", "-q", branch) else f"origin/{branch}"
+    for ref in (f"origin/{base}", base):
+        if _git(repo, "rev-parse", "--verify", "-q", ref):
+            out = _git(repo, "rev-list", "--count", f"{head}..{ref}")
+            if out is not None and out.strip().isdigit():
+                return int(out.strip())
+    return None
+
+
+def state_from_files(root: Path, branch: str, waiting: str | None = None, who: str | None = None, pr=None,
+                     code_repo=None) -> dict:
     """The next JSON, derived from build-progress, tasks.md and git status."""
     root = Path(root)
     path = progress_path(root, branch)
@@ -1299,6 +1451,13 @@ def state_from_files(root: Path, branch: str, waiting: str | None = None, who: s
         state["base"] = info["cut_from"]
     if pr or info.get("pr"):
         state["pr"] = int(pr or info["pr"])
+    if state["phase"] == "merge-base":
+        behind = behind_count(code_repo or info.get("code_repo"), branch, state.get("base") or DEFAULT_BASE)
+        if behind == 0:
+            # 1.198.0: a real check; not behind skips the merge-in.
+            state["phase"] = "merge-pr"
+        elif behind:
+            state["behind_count"] = behind
     if waiting:
         state["waiting"] = waiting
     if not who and state["owner"] == "other" and info.get("author"):
@@ -1510,26 +1669,42 @@ def cmd_progress(args: argparse.Namespace) -> int:
         ids = [_task_token(normalize_task(t)["id"]) for t in re.split(r"[,\s]+", args.tasks or "") if t]
         text = progress_init(root, args.branch, args.owner, ids, args.cut_from)
     else:
-        named = build_step_tasks(args.step)
-        if not args.step or (args.step not in STEP_NAMES and named is None):
-            return _bad("step", f"--step must be one of: {', '.join(sorted(STEP_NAMES))}, or build <task> such as build T47")
+        # 1.198.0: several steps in one call, `--step build,verify,commit`, each with the same result.
+        steps = [part.strip() for part in (args.step or "").split(",") if part.strip()]
+        for one in steps or [""]:
+            if not one or (one not in STEP_NAMES and build_step_tasks(one) is None):
+                return _bad("step", f"--step must be one of: {', '.join(sorted(STEP_NAMES))}, or build <task> such as build T47")
         if not args.result:
             return _bad("result", "--result is required for record")
         if not path.is_file():
             return _bad("file", "No build progress file yet. Run progress init first.")
+        result_text = args.result
+        if getattr(args, "pr", None):
+            # 1.198.0: `--pr 85` records the pull request so `next` reads it.
+            number = str(args.pr).lstrip("#")
+            if not re.search(rf"\bPR\s*#?{re.escape(number)}\b", result_text, re.I):
+                result_text = f"{result_text} (PR {number})"
         before = path.read_text(encoding="utf-8")
-        if named:
-            # 1.182.0: a build for a task the header does not list adds it.
-            before = add_header_tasks(before, root, named)
-        # 1.184.0: a task an older kit's plain build step names only in its
-        # result is added to the header the next time the file is written.
-        before = add_header_tasks(before, root, _shared_progress_tasks(before))
-        text = progress_record(before, root, args.step, args.result)
+        for one in steps:
+            named = build_step_tasks(one)
+            if named:
+                # 1.182.0: a build for a task the header does not list adds it.
+                before = add_header_tasks(before, root, named)
+            # 1.184.0: a task an older kit's plain build step names only in its
+            # result is added to the header the next time the file is written.
+            before = add_header_tasks(before, root, _shared_progress_tasks(before))
+            before = progress_record(before, root, one, result_text)
+        text = before
     wrote = False
     if args.yes:
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(text, encoding="utf-8", newline="\n")
         wrote = True
+    if wrote and args.action == "record":
+        # 1.198.0: after a write, only the line; the file is not echoed.
+        steps = ", ".join(part.strip() for part in args.step.split(",") if part.strip())
+        return _emit({"ok": True, "wrote": True, "path": str(path),
+                      "line": f"Recorded {steps} in the build progress file."})
     return _emit({"ok": True, "wrote": wrote, "path": str(path), "text": text,
                   "line": "Wrote the build progress file." if wrote else "Preview only. Add --yes after the user's yes to write it."})
 
@@ -1565,6 +1740,19 @@ def _bad(code: str, line: str, status: int = 2) -> int:
     return _emit({"ok": False, "code": code, "line": line}, status)
 
 
+def recommended_branch_for(root: Path, task) -> str | None:
+    """The branch build_map --recommend names from the task line or the map (1.198.0), so a
+    task whose branch is written in its sentence starts as printed."""
+    try:
+        text, code = map_mod().run_dir(str(root), recommend=str(task))
+    except Exception:  # noqa: BLE001 - no recommendation, the caller asks for --branch
+        return None
+    lines = [line.strip() for line in (text or "").splitlines() if line.strip()]
+    if code != 0 or len(lines) < 2 or lines[1] not in ("source: task line", "source: build map"):
+        return None
+    return lines[0]
+
+
 def cmd_next(args: argparse.Namespace) -> int:
     try:
         if args.json:
@@ -1583,14 +1771,14 @@ def cmd_next(args: argparse.Namespace) -> int:
                     result = cannot_start(found, root.name)
                     result["ok"] = True
                     return _emit(result)
-                branch = args.branch or found.get("branch")
+                branch = args.branch or found.get("branch") or recommended_branch_for(root, found.get("task") or args.task)
                 if not branch:
                     return _bad("branch", f"{found['task']} names no branch in tasks.md; pass --branch")
                 if found.get("startable"):
                     start = found
             else:
                 branch = args.branch
-            raw = state_from_files(root, branch, args.waiting, args.who, args.pr)
+            raw = state_from_files(root, branch, args.waiting, args.who, args.pr, getattr(args, "code_repo", None))
             if start is None and raw.get("phase") == "wait-merge":
                 # 1.186.0: wait-merge only once every task on the branch is
                 # pushed. An open task on it starts as new work.
@@ -1603,6 +1791,8 @@ def cmd_next(args: argparse.Namespace) -> int:
         else:
             return _bad("input", "next needs --json <file>, or --root <spec folder> and --branch <branch> or --task <T#>")
         state = prepare_state(raw)
+        if args.root and "kit_update" not in state:
+            state["kit_update"] = kit_update_for(args.root)
         if not state.get("phase") and state.get("mode") != "grouping":
             state["phase"] = current_phase(state)
         result = next_for(state)
@@ -1715,6 +1905,7 @@ def main(argv: list[str] | None = None) -> int:
     nxt.add_argument("--who")
     nxt.add_argument("--pr")
     nxt.add_argument("--task", help="A T# to start (1.186.0): an open task starts as new work.")
+    nxt.add_argument("--code-repo", help="The code checkout, for a real behind check before merge-base (1.198.0).")
     nxt.add_argument("--user", help="The current user; default git config user.name.")
     nxt.set_defaults(func=cmd_next)
 
@@ -1729,6 +1920,7 @@ def main(argv: list[str] | None = None) -> int:
     prog.add_argument("--cut-from", default=DEFAULT_BASE)
     prog.add_argument("--step")
     prog.add_argument("--result")
+    prog.add_argument("--pr", help="The pull request number for an open-pr record (1.198.0).")
     prog.add_argument("--yes", action="store_true")
     prog.set_defaults(func=cmd_progress)
 

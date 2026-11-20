@@ -25,6 +25,16 @@ import sys
 TIMEOUT = 8
 
 
+def _utf8_stdout() -> None:
+    reconfigure = getattr(sys.stdout, "reconfigure", None)
+    if not callable(reconfigure):
+        return
+    try:
+        reconfigure(encoding="utf-8")
+    except (AttributeError, OSError, ValueError):
+        return
+
+
 def _run(cmd: list[str]) -> tuple[int, str]:
     try:
         done = subprocess.run(cmd, capture_output=True, text=True, timeout=TIMEOUT, stdin=subprocess.DEVNULL, check=False)
@@ -105,6 +115,7 @@ def check(services: list[str], which=shutil.which, run=_run) -> dict:
 
 
 def main(argv: list[str] | None = None) -> int:
+    _utf8_stdout()
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     sub = parser.add_subparsers(dest="command", required=True)
     cont = sub.add_parser("containers")

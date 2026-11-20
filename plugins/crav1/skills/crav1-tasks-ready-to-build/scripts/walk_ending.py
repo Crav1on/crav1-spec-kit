@@ -697,7 +697,12 @@ def catch_up_block(slug=None, behind=None, orphans=None, ahead=0, failed=None, u
         noun = "file" if count == 1 else "files"
         # 1.180.0 (S3): the files are the slice's changed spec files, which
         # other skills may have written too, not only the walk's.
-        lines.append(f"Commit the {count} changed spec {noun}:")
+        if all(Path(f).name == "build-map.md" for f in files):
+            # 1.198.0: the map this check just rewrote is the only change; say
+            # what it is instead of "1 changed spec file".
+            lines.append("Commit the updated build map:")
+        else:
+            lines.append(f"Commit the {count} changed spec {noun}:")
         lines.append("`/crav1-finalize-commit`")
         lines.append("Then push the specs repo:")
         lines.append(f"`{PUSH_COMMAND}`")

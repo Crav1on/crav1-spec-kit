@@ -24,7 +24,7 @@ Check that each one is running. Do not start anything yet. List only what the re
 **Containers first (1.198.0).** For each one that does not answer, run `<interpreter> -X utf8 scripts/dep_check.py containers --service <name>` in `crav1-verify-build-against-spec` (read-only; it lists docker and podman containers, stopped ones too, and a stopped podman machine). Its `state`:
 
 - `running`: the container is up; check its port again.
-- `stopped`: recommend its `start` commands, for example `podman machine start` then `podman start azurite`. No install.
+- `stopped`: recommend its `start` commands, for example `podman machine start` then `podman start orders-storage`. No install.
 - `no-container`: a runtime exists; recommend the repo's documented start command.
 - `no-runtime`: only now offer to install the dependency or a container runtime.
 

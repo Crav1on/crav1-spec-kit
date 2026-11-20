@@ -5248,12 +5248,12 @@ def own_claim_line(rows: list[dict]) -> str | None:
             continue
         # 1.198.0: your own pushed task waits for its merge; the walk does not
         # resume it. Said only when the pull request is known.
-        pr = (info or {}).get("pr") or row.get("own_pr_open")
+        if info:
+            # The Waiting line or merge list already names the wait (1.176.0).
+            continue
+        pr = row.get("own_pr_open")
         if pr:
             parts.append(f"{task} is yours and waits for PR {pr}'s merge.")
-        elif info:
-            # The Waiting line already names the wait (1.176.0).
-            continue
         else:
             parts.append(f"{task} is yours; the walk resumes it.")
     return " ".join(parts) or None
