@@ -2,6 +2,22 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.197.0 (2026-11-20)
+
+Fixes from a live spec walk: cleaner batch cards, a prod lint that judges each check, release gates, quieter acceptance checks and a scoped plan review.
+
+- **Whole labels only.** The batch label map replaces an option only when the whole option, or the part before its `:`, is an internal id. Words such as keep or ask inside option text stay as written.
+- **Prod lint per item.** `plan_check.py lint` reads each verify item and its target: file names such as `main.prod.bicepparam`, PROD-like settings, unit and contract items, local compiles and read-only checks are not flagged. A `(manual, prod` task whose own text drops, deletes or changes data needs `owner:` and a Risks line.
+- **Release gate.** A task marked `(after-release: main)`, or a manual prod task that a Risks line ties to a release, is Waiting in the ready check and is never offered as the first task. New mark in the data layout.
+- **Quiet tickable.** `walk_progress.py tickable` asks only about a failing row or a passing row with no evidence. Untested and pending rows stay open with no question; one `waiting_line` counts them.
+- **Small fixes.** `start` uses the playbook it found by name (no second run). The claims "Kept claimed tasks" line is gone when nothing changed. `start_check.py` reads the PR number from Azure DevOps `Merge pull request 82 from` subjects. Housekeeping says `Applying with no card` and `plan_check.py reviewed --items` leaves housekeeping out of the open count.
+- **Card rules.** A batch question is only the short `Card:` line; the items live in the bullets and the `On yes:` line. Before a yes the walk says what it would change, never that it already did.
+- **Fewer cards.** Plan-from-spec applies housekeeping refreshes with one summary line, and the ready check is recorded with no save card.
+- **Scoped plan review.** New `walk_progress.py review-packet` writes the reviewer's input outside the repo: the changed tasks, their spec sections by line range, and the plan's Risks and Linter, with a quick mode for small changes. The reviewer runs in the foreground and never reads `spec.md` whole.
+- **Bare PR numbers from a specs-only checkout.** When no record names the number and this checkout holds no code, `pr_common.py resolve` checks the code repos in `repos.md` read-only and uses the single match, otherwise asks with those repos listed. It never suggests installing a CLI before the host is known. `/crav1-review-pr` ends with a Run next block when the host is still unknown.
+
+Docs and tests: the spec walk walkthrough, question cards, pr-common and marks; `scripts/tests/test_kit_1197.py`.
+
 ## 1.196.0 (2026-11-20)
 
 Start checks that trust origin, claims that clear themselves, and fewer, plainer walk cards.
@@ -144,16 +160,5 @@ Starting an open task on someone else's pull request branch, found on a live bui
 ## 1.183.0 (2026-11-17)
 
 - **A quieter build map.** `build-map.md` no longer shows the two sentences above the diagram that named `open-map` and `export-map`. The map starts with its heading and the grouping line, such as `One branch per plan step.` Both choice words still work and stay listed in the skill.
-
-## 1.182.0 (2026-11-17)
-
-Fixes from a live build walk: a second task on someone else's pull request branch is recorded and counted everywhere, Azure DevOps thread posts find their repository, one verify wording for verified-and-waiting, and the walk asks before it fast-forwards a branch or sets a commit hook.
-
-- **A second task on an existing branch.** `build_walk.py progress record` refused `--step 'build T47'` on a progress file whose header listed only T43. It now accepts `build <task>` for any task and adds a task the header does not list to its `Tasks:` line. `task_state.py` counts any done build step naming a task as built and waiting for the merge, whatever the header says, so older files work too. The walk's lead and ending name both tasks, the ready check no longer offers an already-built task or says `T47 is yours; the walk resumes it.`, the merge list says the pull request ticks both, tasks that wait on it read `held, waits on PR 71 to merge (T47, recorded)`, and the build map counts both. A snapshot spec folder covers a second task added to another person's pull request branch.
-- **Thread posts find the repository.** `ado_threads.py` reads the organization, project and repository from the code repo's git remote (`--code-repo`, default the current folder), so `post` no longer returns 404 without `--org`, `--project` and `--repo`. The flags still override.
-- **One wording for verified and waiting.** `Implemented, verified on branch` and `Implemented, verified, tick pending` were the same state. Only `Implemented, verified, tick pending` is written now; `verify_rows.py set` rewrites an old row once when it touches the file, and `task_state.py` and the ready check read both.
-- **One verify row keeps the spec stamp.** Writing one row with `verify_rows.py set` moved the whole-file `Spec stamp:`, so other rows looked verified against a spec they were not checked against. One row now leaves it; `--all-rows` on the last row of a full verify moves it.
-- **Fast-forward is a choice.** Before building, the walk runs `repo_sync.py code-behind --repo <code repo>`. A code branch behind origin gets a card, `fast-forward` or `stop`, and is fast-forwarded only after `fast-forward`. A diverged branch stops with the merge in Run next, never a rebase.
-- **The commit hook is asked, not set.** A teammate whose repo has `.githooks/commit-msg` but no `core.hooksPath` gets `turn-on-hook` / `skip-hook` in finalize-commit's choices prompt instead of a silent `git config core.hooksPath .githooks`, and the `strip-trailers` option names that line on the card.
 
 The newest 15 releases are above. The full changelog is https://github.com/Crav1on/crav1-spec-kit/blob/main/CHANGELOG.md.
