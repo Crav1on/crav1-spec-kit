@@ -14,7 +14,9 @@ Thread replies from the kit, one re-check shape, an answered status, lighter PR 
 - **Commit and push.** `/crav1-finalize-commit commit-push` commits and pushes on one yes. `Uncommitted:` lines name the command in a code span.
 - **Build fixes.** Branches that share a plan step no longer repeat its description. New `pipeline_trigger.py check` in merge-pr: a merge card names a deploy side effect only when a pipeline trigger covers the base. `code-drift` reports base commits from branches the spec does not list that touch the slice's files.
 
-Docs and tests: pr-status, commit, build walk and tighten-and-plan walkthroughs, run-ending, pr-record and data layout; `scripts/tests/test_kit_1199.py`.
+- **Ready-check waits.** Your own task that is pushed and waits for its pull request is `waiting`, never an unrecognized blocker: the result stays ready-partial, the other tasks go to Run next, and only waits changed means a quiet record. A real `Not ready: T12 is blocked (…)` line comes right after Run next, before Held, and a merge wait names its PR, `Waiting: PR 85 to merge, then …`.
+
+Docs and tests: pr-status, commit, build walk and tighten-and-plan walkthroughs, readiness, run-ending, pr-record and data layout; `scripts/tests/test_kit_1199.py`.
 
 ## 1.198.0 (2026-11-20)
 

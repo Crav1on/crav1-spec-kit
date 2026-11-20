@@ -772,8 +772,12 @@ def compose(
     notes=None,
     uncommitted=None,
     catch_up=None,
+    after_run=None,
 ) -> str:
     """The one ending, in the shared order. Empty parts are left out.
+
+    `after_run` is one line printed right after Run next, before Held
+    (1.199.0: the `Not ready: ...` hard hit).
 
     `catch_up` is a catch_up_block() text, or a dict of its keywords
     (`slug`, `behind`, `orphans`, `ahead`); it leads Run next (1.167.0).
@@ -786,6 +790,8 @@ def compose(
     block = run_block(run, catch_up)
     if block:
         parts.append(block)
+    if after_run:
+        parts.append(str(after_run))
     if held:
         parts.append("Held:\n" + "\n".join(str(line) for line in held))
     if branch_runs:

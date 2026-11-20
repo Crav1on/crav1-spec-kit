@@ -257,3 +257,70 @@ class BuildQueue(unittest.TestCase):
         self.assertTrue(out.get("behind"), out)
         self.assertTrue(out.get("unlisted"), out)
         self.assertIn("come from a branch the spec does not list", out["background"])
+
+
+WE = SK / "crav1-tasks-ready-to-build/scripts/walk_ending.py"
+
+
+class ReadyCheckWaits(unittest.TestCase):
+    """Item 8: your own pushed task waits, quiet record, ending order and PR number."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.wp = load(WALK, "walk_progress_t1199r")
+
+    def test_a_own_pushed_task_is_waiting(self):
+        row = {"task": "T30", "bucket": "blocked", "own_claim": True,
+               "reason": "T30 is pushed to its pull request and waits for its merge"}
+        hit = self.wp.classify(row)
+        self.assertEqual(hit["kind"], "waiting")
+        self.assertTrue(hit["merge"])
+        hit = self.wp.classify({"task": "T30", "bucket": "ready", "own_claim": True, "own_pr_open": 85, "warning": "x"})
+        self.assertEqual(hit["kind"], "waiting")
+        self.assertIn("T30 is yours and waits for PR 85's merge.", hit["why"])
+
+    def test_a_readiness_is_ready_partial(self):
+        root = Path(tempfile.mkdtemp()) / "docs" / "specs" / "orders-api"
+        root.mkdir(parents=True)
+        (root / "spec.md").write_text("# Orders API\n\n## Problem\n\nx\n", encoding="utf-8")
+        (root / "plan.md").write_text("# Plan\n\nReviewed: 2026-11-19, P# open: 0\n", encoding="utf-8")
+        (root / "tasks.md").write_text(
+            "# Tasks\n\n- [ ] T13 Add the export endpoint (branch: feat/orders-export)\n"
+            "- [ ] T30 Retry failed orders (branch: feat/orders-retry)\n", encoding="utf-8")
+        (root / "claims.md").write_text(
+            "# Claims\n\nIn progress: feat/orders-retry, T30, person A, since 2026-11-19T09:00:00+01:00\n", encoding="utf-8")
+        (root / "build-progress").mkdir()
+        (root / "build-progress/feat--orders-retry.md").write_text(
+            "# Build progress\n\nBranch: feat/orders-retry\nOwner: self\nTasks: T30\n\n"
+            "- Step: open-pr\n  Done: 2026-11-20\n  Result: done (PR 85)\n", encoding="utf-8")
+        proc = subprocess.run([sys.executable, str(WALK), "readiness", "--root", str(root), "--user", "person A", "--skip-sync"],
+                              capture_output=True, text=True)
+        out = json.loads(proc.stdout)
+        self.assertEqual(out["result"], "ready-partial", out.get("ending"))
+        self.assertEqual((out["counts"]["ready"], out["counts"]["waiting"]), (1, 1))
+        self.assertIn("`/crav1-build-walk T13`", out["ending"])
+        self.assertNotIn("`/crav1-build-walk T30`", out["ending"])
+        self.assertIn("T30 is yours and waits for PR 85's merge.", out["ending"])
+        self.assertNotIn("nrecognized", out["ending"])
+
+    def test_b_record_quiet_covers_it(self):
+        wp = load(WALK, "walk_progress_t1199q")
+        wp.load = lambda root: {"steps": {"tasks-ready-to-build": {"result": "not-ready"}}}
+        hit = wp.classify({"task": "T30", "bucket": "blocked", "own_claim": True, "own_pr_open": 85})
+        with tempfile.TemporaryDirectory() as tmp:
+            self.assertEqual(wp.record_quiet(Path(tmp), "ready-partial", [hit]), "Recorded: ready-partial (was not-ready).")
+        self.assertIn("1.199.0", read(SK / "crav1-tighten-and-plan-ready-to-build/references/readiness.md"))
+
+    def test_c_grammar_order_and_pr(self):
+        hit = self.wp.classify({"task": "T12", "bucket": "blocked", "reason": "the queue name is not decided"})
+        line = self.wp.hard_hit_line("not-ready", [hit], ["T3", "T4"])
+        self.assertEqual(line, "Not ready: T12 is blocked (the queue name is not decided). T3 and T4 can start once that is cleared.")
+        we = load(WE, "walk_ending_t1199")
+        text = we.compose(run=["Build T3:\n`/crav1-build-walk orders-api T3`"], held=["T9 waits for T12"], after_run=line)
+        self.assertLess(text.index("Not ready:"), text.index("Held:"))
+        self.assertLess(text.index("Build T3:"), text.index("Not ready:"))
+        rows = [{"task": t, "merge_wait": {"branch": "feat/orders-keys", "pr": None}, "reason": "waits for its pull request to merge"}
+                for t in ("T28", "T37", "T39")]
+        self.wp.fill_merge_prs(None, rows, {"T28": 85})
+        self.assertEqual(self.wp.merge_wait_lines(rows), ["Waiting: PR 85 to merge, then T28, T37 and T39 are ticked."])
+        self.assertEqual(rows[1]["reason"], "waits for PR 85 to merge")

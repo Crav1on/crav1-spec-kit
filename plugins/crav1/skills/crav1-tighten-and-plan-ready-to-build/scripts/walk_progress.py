@@ -1641,6 +1641,7 @@ def record_quiet(root: Path | None, result: str, hits: list[dict]) -> str | None
         return None
     if not previous or previous == result or previous not in READY_ONLY:
         return None
+    # 1.199.0: your own pushed task waiting for its merge is a merge wait too.
     if any(hit.get("kind") != "waiting" and not hit.get("merge") for hit in hits):
         return None
     return f"Recorded: {result} (was {previous})."
@@ -2386,6 +2387,11 @@ def unlinked(args: argparse.Namespace) -> None:
     emit({"ok": True, "count": len(missing), "questions": missing})
 
 
+_OWN_PUSHED = re.compile(
+    r"\bpushed\b.*\bwaits? (?:for|on) (?:its|the) (?:merge|pull request|pr)\b"
+    r"|\bwaits? (?:for|on) (?:its|the) (?:pull request'?s? |pr'?s? )?merge\b", re.I)
+
+
 def classify(row: dict, resolve_kept: bool = False, resolve_recorded: bool = False) -> dict | None:
     bucket = str(row.get("bucket") or "")
     reason = str(row.get("reason") or "")
@@ -2423,6 +2429,19 @@ def classify(row: dict, resolve_kept: bool = False, resolve_recorded: bool = Fal
         return _hit(task, "assumption", "review-plan", "The ready check assumed a plan review. Run /crav1-review-plan, then /crav1-tighten-plan.")
     if "p# open" in text or "open p#" in text:
         return _hit(task, "assumption", "tighten-plan", "The plan review still has open P# items. Run /crav1-tighten-plan.")
+    if bucket != "done" and (row.get("own_pr_open") or (row.get("own_claim") and _OWN_PUSHED.search(text))):
+        # 1.199.0: your own task, pushed and waiting for its pull request to
+        # merge, is waiting, never an unrecognized blocker.
+        hit = _waiting(row)
+        hit["merge"] = True
+        hit["own"] = True
+        hit["step"] = None
+        hit["who"] = None
+        pr = row.get("own_pr_open")
+        hit["pr"] = pr
+        wait = f"waits for PR {pr}'s merge" if pr else "waits for its pull request to merge"
+        hit["why"] = f"{task or 'The task'} is yours and {wait}. It is not offered in Run next."
+        return hit
     if bucket == "waits-in-order":
         return None
     if bucket in ("ready", "done") and not warning:
@@ -2553,7 +2572,7 @@ def _hit(task, kind: str, command_key: str | None, why: str) -> dict:
             "can_jump_back": False,
             "outside_walk": False,
             "kind": kind,
-            "why": why + " The walk does not invent a step for this.",
+            "why": why.rstrip().rstrip(".") + ". The walk does not invent a step for this.",
         }
     step = "review-and-tighten-plan" if command_key in ("review-plan", "tighten-plan") else command_key
     return {
@@ -3948,7 +3967,38 @@ def apply_progress_waits(root: Path | None, rows: list[dict]) -> dict:
         task = row.get("task")
         if task in opened and row.get("own_claim") and not row.get("merge_wait"):
             row["own_pr_open"] = opened[task]
+    fill_merge_prs(root, rows, opened)
     return waits
+
+
+def fill_merge_prs(root: Path | None, rows: list[dict], opened: dict | None = None) -> None:
+    """Name the pull request on a merge wait when it is known (1.199.0).
+
+    From the branch's open-pr step, the branch run log in walk-progress.md,
+    or another task waiting on the same branch, so the line reads
+    `Waiting: PR 85 to merge, then ...`, not `the pull request`.
+    """
+    opened = opened if opened is not None else progress_open_prs(root)
+    try:
+        built = walk_built(root) or {}
+    except Exception:  # noqa: BLE001
+        built = {}
+    waits = [row for row in rows if isinstance(row.get("merge_wait"), dict)]
+    for row in waits:
+        if not row["merge_wait"].get("pr"):
+            task = row.get("task")
+            row["merge_wait"]["pr"] = opened.get(task) or (built.get(task) or {}).get("pr")
+    by_branch = {row["merge_wait"]["branch"]: row["merge_wait"]["pr"] for row in waits
+                 if row["merge_wait"].get("pr") and row["merge_wait"].get("branch")}
+    for row in waits:
+        info = row["merge_wait"]
+        pr = info.get("pr") or by_branch.get(info.get("branch"))
+        if not pr:
+            continue
+        info["pr"] = pr
+        reason = str(row.get("reason") or "")
+        if "waits for its pull request to merge" in reason:
+            row["reason"] = reason.replace("waits for its pull request to merge", f"waits for PR {pr} to merge")
 
 
 def progress_open_prs(root: Path | None) -> dict:
@@ -5679,6 +5729,10 @@ def hard_hit_line(result: str, hits: list[dict], can_start: list) -> str | None:
     plain = next((part for part in sentences if not _INSTRUCTION.match(part)), "")
     plain = plain.rstrip(".")
     what = str(hit.get("bucket") or hit.get("kind") or "held").replace("-", " ")
+    # 1.199.0: `T30 is blocked`, never `T30 is blocker`.
+    what = {"blocker": "blocked", "assumption": "held by an assumption"}.get(what, what)
+    if plain.lower().startswith("unrecognized blocker: "):
+        plain = plain[len("unrecognized blocker: "):]
     who = hit.get("task") or "The slice"
     head = f"Not ready: {who} is {what}"
     if plain and plain.lower() not in head.lower():
@@ -5846,6 +5900,7 @@ def compose_ending(
     replaced: str | None,
     branch_runs: list[str] | None = None,
     catch_up: str | None = None,
+    hard_line: str | None = None,
 ) -> str:
     """The reply for a walk ending. Print this text. Do not point at earlier output.
 
@@ -5866,6 +5921,7 @@ def compose_ending(
         alternatives=alternatives,
         notes=[replaced] if replaced else None,
         catch_up=catch_up or None,
+        after_run=hard_line or None,
     )
 
 
@@ -6322,9 +6378,11 @@ def _readiness(args: argparse.Namespace) -> None:
             if not catch_up:
                 nxt = shown_run[0]
         waiting_bits = list(deadlock_lines) + [bit for bit in waiting_bits if bit not in deadlock_lines]
+    # 1.199.0: the hard hit comes right after Run next, before Held.
+    hard_line = hard_hit_line(result, hits, can_start)
     ending = compose_ending(
         result, shown_run, held_lines, waiting_bits, shown_next, because, replaced, run_status,
-        catch_up=catch_up,
+        catch_up=catch_up, hard_line=hard_line,
     )
     claim_info = claim_info if "claim_info" in locals() else {"claims": [], "warnings": [], "ids": []}
     warnings = list(claim_info.get("warnings") or [])
@@ -6334,7 +6392,6 @@ def _readiness(args: argparse.Namespace) -> None:
         ending = (ending + "\n\n" if ending else "") + "\n".join(warnings)
     # 1.198.0: a not-ready result with tasks that can start names the hard hit
     # and those tasks, whatever leads Run next (catch-up, resume, merges).
-    hard_line = hard_hit_line(result, hits, can_start)
     if hard_line and hard_line not in (ending or ""):
         ending = (ending + "\n\n" if ending else "") + hard_line
     own_line = own_claim_line([row for row in rows if row.get("own_claim")])
