@@ -224,11 +224,12 @@ class MergeStaysTheSame(unittest.TestCase):
 
     def test_claims_are_never_touched(self):
         b = self.body()
-        self.assertIn("This skill never writes, clears, commits or pushes `claims.md`.", b)
-        self.assertIn("The only file this skill writes is the PR note with its PR record", b)
-        self.assertNotIn("claims.py", b)
-        for ref in (SK / "crav1-merge-pr/references").glob("*.md"):
-            self.assertNotIn("claims.py", ref.read_text(encoding="utf-8"), ref.name)
+        # 1.196.0: merge-pr prunes finished claims (claims.py prune) and never touches unfinished ones.
+        self.assertIn("An unfinished claim is never touched.", b)
+        self.assertIn("the claims prune in the specs repo", b)
+        ref = (SK / "crav1-merge-pr/references/after-merge.md").read_text(encoding="utf-8")
+        self.assertIn("scripts/claims.py prune", ref)
+        self.assertIn("does not commit or push `claims.md`", ref)
 
     def test_walk_ending(self):
         b = self.body()

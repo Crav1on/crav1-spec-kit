@@ -37,3 +37,5 @@ Do not delete the remote branch or the local branch unless the user asked in thi
 Tracker-neutral. Do not change work-item links.
 
 Do not read or write `work-item.md`. Do not pass `--work-items` or `--transition-work-items`. Do not call `az repos pr work-item`. Do not set `transitionWorkItems`. Do not edit the pull request title or description.
+
+**Claims prune (1.196.0).** After a confirmed merge, for each spec that names the merged branch, run `scripts/claims.py prune --root <spec-folder> --code-repo <code checkout> --base <Merges into>` in `crav1-build-walk`, as `crav1-docs/reference/running-scripts.md` says. It fetches origin first and clears only finished claims (every task ticked, or the branch merged into `origin/<base>`), with one line such as `Cleared 1 finished claim: T5 (PR 71).` Say that line as it is; say nothing when it clears none. It never touches an unfinished claim, yours or anyone's. This skill does not commit or push `claims.md`; the change rides on the next specs commit.

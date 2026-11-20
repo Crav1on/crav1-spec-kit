@@ -97,7 +97,7 @@ Read `references/azure-devops.md` ("Azure DevOps (Merge)") only when the remote 
 
 ## Claims (1.158.0)
 
-After the merge went through (1.196.0), run `scripts/claims.py prune --root <spec-folder> --code-repo <code checkout> --base <Merges into>` in `crav1-build-walk` for each spec that names the merged branch, as `crav1-docs/reference/running-scripts.md` says. It has no card: it clears only finished claims (every task ticked, or the branch merged into `origin/<base>`) and prints one line, for example `Cleared 1 finished claim: T5 (PR 71).` Say that line as it is; say nothing when it prints none. It never touches an unfinished claim, yours or anyone's. This skill does not commit or push `claims.md`; the change rides on the next specs commit.
+After a confirmed merge (1.196.0), clear finished claims with no card, as [after-merge.md](references/after-merge.md) says under **Claims prune**. An unfinished claim is never touched.
 
 ## Hard rules
 
@@ -107,7 +107,7 @@ After the merge went through (1.196.0), run `scripts/claims.py prune --root <spe
 - No `--admin`, no `--bypass-policy`, no `bypassPolicy`.
 - No second strategy attempt after a refusal or a failed `az repos pr update`.
 - No `git commit`, no stash, no new branch, no force-push.
-- The only file this skill writes is the PR note with its PR record (and the generated notes indexes) in the specs repo, after a confirmed merge. Never committed.
+- The only files this skill writes are the PR note with its PR record (and the generated notes indexes) and the claims prune in the specs repo, after a confirmed merge. Never committed.
 - No branch delete unless the user asked in this turn.
 - No dialog-box or browser Microsoft sign-in (`az login`, `az devops login`, device code, or a web login). No token printed, echoed, or created; an `AZURE_DEVOPS_EXT_PAT` the user already set is the PAT route in **Auth notes**.
 - Do not run `az rest` to complete, update, or bypass a pull request. The parent-count fallback in **Merge** may GET one commit when git cannot see it.

@@ -186,7 +186,7 @@ class ClaimsPrune(unittest.TestCase):
         self.assertIn("T9 has been", joined)
 
     def test_docs_run_prune_and_merge_pr_clears(self):
-        self.assertIn("claims.py prune", read("crav1-merge-pr/SKILL.md"))
+        self.assertIn("claims.py prune", read("crav1-merge-pr/references/after-merge.md"))
         self.assertNotIn("This skill never writes, clears", read("crav1-merge-pr/SKILL.md"))
         self.assertIn("claims.py prune", read("crav1-tighten-and-plan-ready-to-build/references/steps.md"))
         self.assertIn("Never write a line saying claims or claimed tasks were kept", read("crav1-tighten-and-plan-ready-to-build/references/steps.md"))
