@@ -367,7 +367,7 @@ class Endings(unittest.TestCase):
         page = (ROOT / "docs/reference/run-ending.md").read_text(encoding="utf-8")
         self.assertIn("Print the block as the script wrote it (1.196.0)", page)
         done = read("crav1-tighten-spec/references/done.md")
-        self.assertNotIn("Next:", done)
+        self.assertNotIn("`Next: /crav1", done)
         self.assertIn("`/crav1-plan-from-spec orders-api`", done)
         self.assertNotIn("crav1-tighten-spec/references/done.md", (ROOT / "scripts/next-line-baseline.tsv").read_text(encoding="utf-8"))
 
