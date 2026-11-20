@@ -272,3 +272,44 @@ class ReviewPacket(unittest.TestCase):
         steps = read("crav1-tighten-and-plan-ready-to-build/references/steps.md")
         self.assertIn("walk_progress.py review-packet", steps)
         self.assertIn("foreground", steps)
+
+
+class BareNumberResolve(unittest.TestCase):
+    """Item 8: a specs-only checkout asks for the code repo, after a read-only host check."""
+
+    def setUp(self):
+        self.mod = load(SK / "crav1-open-pr/scripts/pr_common.py", "pr_common_t1197")
+        self.root = Path(tempfile.mkdtemp())
+        (self.root / "docs" / "system").mkdir(parents=True)
+        (self.root / "docs" / "specs").mkdir()
+        (self.root / "docs" / "system" / "repos.md").write_text(
+            "# Repos\n\n| Repo | Purpose | Status | URL | Merges into | Work items go to |\n| --- | --- | --- | --- | --- | --- |\n"
+            "| contoso-specs | specs | active | https://github.com/contoso/contoso-specs | main | |\n"
+            "| orders-api | code | active | https://dev.azure.com/contoso/orders/_git/orders-api | develop | |\n"
+            "| billing-api | code | active | https://dev.azure.com/contoso/orders/_git/billing-api | develop | |\n",
+            encoding="utf-8")
+        self.remote = "https://github.com/contoso/contoso-specs.git"
+
+    def test_ask_lists_code_repos_without_cli_hint(self):
+        out = self.mod.resolve_ref("84", self.remote, [self.root])
+        self.assertEqual(out["status"], "ask")
+        self.assertEqual([c["repo"] for c in out["candidates"]], ["orders-api", "billing-api"])
+        self.assertIn("Do not name or install a CLI", out["line"])
+        self.assertNotIn("contoso-specs/pull/84", json.dumps(out))
+
+    def test_single_host_match_is_picked(self):
+        probe = lambda info: info.get("repo") == "billing-api"
+        out = self.mod.resolve_ref("84", self.remote, [self.root], probe=probe)
+        self.assertEqual(out["status"], "ok")
+        self.assertEqual(out["source"], "host-check")
+        self.assertEqual(out["url"], "https://dev.azure.com/contoso/orders/_git/billing-api/pullrequest/84")
+        self.assertEqual(out["tool"], "az")
+
+    def test_code_checkout_still_uses_its_remote(self):
+        out = self.mod.resolve_ref("84", "https://dev.azure.com/contoso/orders/_git/orders-api", [self.root])
+        self.assertEqual(out["status"], "ok")
+        self.assertEqual(out["source"], "remote")
+
+    def test_review_pr_no_host_ending(self):
+        text = read("crav1-review-pr/references/which-pr.md")
+        self.assertIn("Run next:\n\nReview the pull request by its URL:\n`/crav1-review-pr <pull request URL>`", text)
