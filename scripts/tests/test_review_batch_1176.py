@@ -291,7 +291,9 @@ class LabelAboveCommand(unittest.TestCase):
                      "tasks": [{"id": 3, "title": "Record the decision"}], "spec_count": 2, "ready_branches": [],
                      "next_tasks": [{"id": 3, "title": "Record the decision"}], "next_branch": "feat/orders-api"}
             ending = bw.next_for(state)["ending"]
-            self.assertIn("Build T3 Record the decision on feat/orders-api:\n`/crav1-build-walk orders-api T3`", ending, phase)
+            # 1.198.0: the label follows the step the branch is on.
+            verb = {"verify": "Verify", "commit": "Commit"}.get(phase, "Build")
+            self.assertIn(f"{verb} T3 Record the decision on feat/orders-api:\n`/crav1-build-walk orders-api T3`", ending, phase)
             self.assertNotIn("\nbranch feat/", ending)
 
     def test_branch_run_endings(self):

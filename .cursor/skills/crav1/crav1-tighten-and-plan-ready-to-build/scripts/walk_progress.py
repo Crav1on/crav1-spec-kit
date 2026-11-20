@@ -2291,10 +2291,24 @@ def start(args: argparse.Namespace) -> None:
         "resume": resume_payload(folder, no_playbook=not playbook_arg),
         "playbook_status": None,
     }
+    kit = _kit_update(folder)
+    if kit:
+        payload["kit_update"] = kit["line"]
+        payload["kit_update_run"] = kit["run"]
     if playbook_arg:
         payload["playbook"] = playbook_arg
         payload["playbook_status"] = playbook_payload(folder, playbook_arg)
     emit(payload)
+
+
+def _kit_update(folder: Path) -> dict | None:
+    """1.198.0: `Kit update available: <installed> -> <latest>`, read-only, silent when offline."""
+    try:
+        top = _git_out(folder, "rev-parse", "--show-toplevel")
+        mod = _load_script("crav1-update-kit", "update_kit.py", "walk_update_kit")
+        return mod.update_available(Path(top.strip()) if top else folder)
+    except Exception:  # noqa: BLE001 - never stop the walk for this line
+        return None
 
 
 def _resolved_playbook(folder: Path, query: str) -> str | None:
@@ -5200,6 +5214,7 @@ def ready_branches(root: Path) -> list[dict]:
     apply_progress_waits(root, rows)
     apply_verified_on_branch(root, rows)
     apply_loop_holds(root, rows)
+    apply_release_gates(root, rows)  # 1.198.0: the build-walk ending uses this list
     resolve_kept = resolve_is_keep(root)
     resolve_recorded = resolve_ever_recorded(root)
     hits = []

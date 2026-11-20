@@ -382,7 +382,7 @@ class RunNext(unittest.TestCase):
         self.assertEqual(commands, ["`/crav1-build-walk orders-api T3`"])
         # 1.176.0: the label sits above the command, nothing lowercase under it.
         label = ending.splitlines()[ending.splitlines().index(commands[0]) - 1]
-        self.assertTrue(label.startswith("Build T3 "))
+        self.assertTrue(label.startswith("Verify T3 "))  # 1.198.0: the label follows the phase
         self.assertTrue(label.endswith(f" on {BRANCH}:"))
         self.assertIn("Apply the CI build policy", label)
         self.assertNotIn("because", commands[0])
