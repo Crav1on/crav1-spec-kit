@@ -40,7 +40,9 @@ tag (plan or spec), status (open, patched, dropped, skipped, kept), and, for
 spec findings, kind (defect or question). Batch rows also need options and
 recommendation. One row may have "current": true. A plan row whose fix adds,
 removes or reorders tasks sets "changes_tasks": true; batch leaves it out of
-the card (its own card), and a card holds at most 8 rows (1.195.0).
+the card (its own card), and a card holds at most 8 rows (1.195.0). A row with
+"housekeeping": true (or trace, mark, merged-state, stale-risk, linter,
+build-map) is applied with no card and listed on one line (1.196.0).
 
 Usage: <interpreter> -X utf8 scripts/plan_check.py <command> ...
 On Windows the interpreter is python. Elsewhere python3, then py -3.
@@ -549,6 +551,14 @@ def queue(items: list[dict], root: Path | None, went_on: bool, uncommitted: int 
 
 
 BATCH_CAP = 8
+HOUSEKEEPING = ("trace", "mark", "merged-state", "stale-risk", "linter", "build-map")
+
+
+def _housekeeping(item: dict) -> bool:
+    """Housekeeping fixes auto-apply with no card (1.196.0): Trace rows, marks, merged-state
+    wording, stale Risks, the Linter line, the build-map refresh."""
+    value = str(item.get("housekeeping", "")).lower()
+    return value in ("true", "1", "yes") or value in HOUSEKEEPING
 
 
 def _changes_tasks(item: dict) -> bool:
@@ -559,14 +569,20 @@ def _changes_tasks(item: dict) -> bool:
 def batch(items: list[dict], title: str) -> str:
     """At most 8 rows per card; task add/remove/reorder rows get their own card each (1.195.0)."""
     open_rows = [i for i in items if i["tag"] == "plan" and i["status"] not in DONE]
+    chores = [i for i in open_rows if _housekeeping(i) and not _changes_tasks(i)]
+    open_rows = [i for i in open_rows if i not in chores]
+    chores_line = ("Applied with no card (housekeeping): "
+                   + "; ".join(f"{i['id']} {' '.join(str(i.get('issue', '')).split())}" for i in chores) + ".\n") if chores else ""
     own = [i["id"] for i in open_rows if _changes_tasks(i)]
     batchable = [i for i in open_rows if not _changes_tasks(i)]
     later = [i["id"] for i in batchable[BATCH_CAP:]]
     rows = [{k: i.get(k, "") for k in ("id", "issue", "options", "recommendation")}
             for i in batchable[:BATCH_CAP]]
     if not rows:
+        if chores and not own:
+            return chores_line
         if own:
-            return ("No batch card: each of these adds, removes or reorders tasks, so each gets its own card: "
+            return chores_line + ("No batch card: each of these adds, removes or reorders tasks, so each gets its own card: "
                     + ", ".join(own) + ".\n")
         raise PlanCheckError("no open plan P#, so there is no batch card")
     bo = _batch_offer()
@@ -574,6 +590,7 @@ def batch(items: list[dict], title: str) -> str:
         text = bo.offer(title, rows)
     except bo.BatchOfferError as exc:
         raise PlanCheckError(str(exc)) from exc
+    text = chores_line + text if chores_line else text
     if own:
         text += "Not in this batch, each gets its own card (adds, removes or reorders tasks): " + ", ".join(own) + ".\n"
     if later:

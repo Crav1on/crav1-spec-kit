@@ -8,7 +8,9 @@
 
 Run these in order. When a playbook was named, the playbook question is answered before any later step, including a read-only check. Each one is the existing skill, not a copy of it. Open its file from this skill's folder, as [open-skill-file.md](../../crav1-docs/reference/open-skill-file.md) says (1.134.0). A step with nothing to do says so in one line, records `Result: nothing-to-do` with the versions it covers, and moves on. Record that one step right then. One `record` call per step. Do not record several steps in one command. Do not pass `--when`. The script stamps Done. `record` refuses more than one step.
 
-After a step, say in plain words what will be recorded and get a yes before `record --yes`. The card does not quote the progress line, `walk-progress.md`, `Done`, `Result`, or step ids:
+**The save rides on the step's last yes (1.196.0).** A step's record is not its own card. The step's last card says it in its result-on-yes line, for example `Yes applies the eight fixes and saves the plan review as done.`, and that yes runs `record --yes` too. Only a step that asked no card at all gets the save card below, and only once: when the next step has a card, fold it into that card's result line instead (`… and saves the architecture review as done.`).
+
+The fallback save card says in plain words what will be recorded. The card does not quote the progress line, `walk-progress.md`, `Done`, `Result`, or step ids:
 
 Card: Save the ready check as done?
 - **Save it (Recommended)** (`yes`): the walk notes the ready check as done with some tasks ready, so a later run does not ask again. Why: the check just ran.

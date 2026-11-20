@@ -5777,7 +5777,23 @@ def brief_payload(out: dict) -> dict:
         brief["build_map_wrote"] = out["build_map_wrote"]
     if out.get("line") and out.get("stop"):
         brief["line"] = out["line"]
+    if out.get("reopen_cards"):
+        brief["reopen_cards"] = out["reopen_cards"]
+    if out.get("auto_clear"):
+        brief["auto_clear"] = out["auto_clear"]
+        brief["auto_clear_line"] = auto_clear_line(out["auto_clear"])
     return brief
+
+
+def auto_clear_line(steps: list[str]) -> str:
+    """One line for reopened steps cleared with no card (1.196.0)."""
+    names = [STEP_PLAIN.get(step, "this step") for step in steps]
+    said = names[0] if len(names) == 1 else ", ".join(names[:-1]) + " and " + names[-1]
+    verb = "stays" if len(names) == 1 else "stay"
+    return (f"{said[:1].upper()}{said[1:]} reopened only because of a fact this walk just recorded, "
+            f"and a finding already covers it; it {verb} done with no card." if len(names) == 1 else
+            f"{said[:1].upper()}{said[1:]} reopened only because of a fact this walk just recorded, "
+            f"and a finding already covers it; they {verb} done with no card.")
 
 
 READ_FILES = ("spec.md", "plan.md", "tasks.md", "verify.md", "claims.md")
@@ -6123,7 +6139,10 @@ def _readiness(args: argparse.Namespace) -> None:
             reopen_card(h["step"], h.get("changed") or [], bool(jump) and result == "not-ready",
                         bool(getattr(args, "stale_seen", False)))
             for h in hits if h.get("bucket") == "reopened" and h.get("step")
+            and h["step"] not in set(getattr(args, "covered", None) or [])
         ],
+        "auto_clear": [h["step"] for h in hits if h.get("bucket") == "reopened" and h.get("step")
+                       and h["step"] in set(getattr(args, "covered", None) or [])],
         "jump_back": jump,
         "reopened": reopened,
         "reopen_line": None,
@@ -7854,6 +7873,7 @@ def main(argv: list[str] | None = None) -> None:
     d.add_argument("--skip-sync", action="store_true", help="Skip the fetch. Tests and an already-fetched copy.")
     d.add_argument("--user", default=None, help="Claim owner that is you. Default: git config user.name in the specs repo (1.160.0).")
     d.add_argument("--branch", default=None, help="The branch being walked. Your claim counts as yours only on this branch when given (1.160.0).")
+    d.add_argument("--covered", action="append", default=[], help="A reopened step whose only change is a fact this walk just recorded and a finding covers: no card, clear it (1.196.0).")
     d.add_argument("--stale-seen", action="store_true", help="This walk saw something stale (code-drift behind, a merge since sync, a stale mark): reopen cards recommend rerun (1.195.0).")
     d.set_defaults(func=readiness)
 

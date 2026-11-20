@@ -225,5 +225,46 @@ class ProdVerify(unittest.TestCase):
         self.assertIn("## Prod verify (1.196.0)", read("crav1-tighten-plan/references/issues.md"))
 
 
+class FewerCards(unittest.TestCase):
+    """Item 4: housekeeping auto-applies, covered reopens clear, the save rides on the last yes."""
+
+    def items(self, rows):
+        path = Path(tempfile.mkdtemp()) / "items.json"
+        path.write_text(json.dumps(rows), encoding="utf-8")
+        return str(path)
+
+    def row(self, i, **extra):
+        r = {"id": f"P{i}", "issue": f"issue {i}", "tag": "plan", "status": "open", "options": "fix; keep", "recommendation": "fix"}
+        r.update(extra)
+        return r
+
+    def test_housekeeping_has_no_card(self):
+        out = py(PLAN, "batch", "--items", self.items([self.row(1), self.row(7, issue="Trace row for the retry constraint", housekeeping=True),
+                                                      self.row(14, issue="missing mark", housekeeping="mark")])).stdout
+        self.assertIn("Applied with no card (housekeeping): P7 Trace row for the retry constraint; P14 missing mark.", out)
+        card = [l for l in out.splitlines() if l.startswith("Card:")][0]
+        self.assertNotIn("P7", card)
+        self.assertIn("P1", card)
+
+    def test_only_housekeeping_prints_only_the_line(self):
+        out = py(PLAN, "batch", "--items", self.items([self.row(7, housekeeping=True)])).stdout
+        self.assertNotIn("Card:", out)
+        self.assertTrue(out.startswith("Applied with no card"))
+
+    def test_auto_clear_line(self):
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("walk_progress_t1196", WALK)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        line = mod.auto_clear_line(["review-and-tighten-plan"])
+        self.assertIn("reopened only because of a fact this walk just recorded", line)
+        self.assertIn("with no card", line)
+
+    def test_docs(self):
+        self.assertIn("--covered <step>", read("crav1-tighten-and-plan-ready-to-build/references/progress.md"))
+        self.assertIn("The save rides on the step's last yes", read("crav1-tighten-and-plan-ready-to-build/references/steps.md"))
+        self.assertIn("## Housekeeping with no card (1.196.0)", read("crav1-tighten-plan/references/issues.md"))
+
+
 if __name__ == "__main__":
     unittest.main()
