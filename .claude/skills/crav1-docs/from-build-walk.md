@@ -105,3 +105,7 @@ Since 1.187.0 a task is named by its text up to the first verify item. A task li
 ## Finished claims (1.196.0)
 
 A claim stays only while its tasks are open. `/crav1-merge-pr` and the start of `/crav1-tighten-and-plan-ready-to-build` clear claims whose tasks are all ticked or whose branch is merged into `origin/develop`, with one line such as `Cleared 2 finished claims: T5 (ticked), T8 (PR 71).` An unfinished claim is never cleared, and a finished claim gets no age warning. Both fetch origin first, so a stale local `develop` does not hide a merge.
+
+## Local base update (1.197.0)
+
+When the code repo's local base branch is behind origin, the walk asks `Your local develop in orders-api is 2 commits behind origin/develop. Update it locally before the build?` **Update local develop** fast-forwards your local branch (`git merge --ff-only`) and pushes nothing, then cuts the work branch from it and builds the task. **Stop** builds nothing.

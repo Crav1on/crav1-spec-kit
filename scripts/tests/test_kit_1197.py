@@ -313,3 +313,37 @@ class BareNumberResolve(unittest.TestCase):
     def test_review_pr_no_host_ending(self):
         text = read("crav1-review-pr/references/which-pr.md")
         self.assertIn("Run next:\n\nReview the pull request by its URL:\n`/crav1-review-pr <pull request URL>`", text)
+
+
+class LocalFastForwardCard(unittest.TestCase):
+    """Item 9: the fast-forward card says it is local and nothing is pushed."""
+
+    def test_card_wording(self):
+        tmp = Path(tempfile.mkdtemp())
+        origin, work = tmp / "origin.git", tmp / "orders-api"
+        g = ["git", "-c", "user.name=person A", "-c", "user.email=a@example.com"]
+        subprocess.run(["git", "init", "-q", "--bare", "-b", "develop", str(origin)], check=True)
+        subprocess.run(["git", "clone", "-q", str(origin), str(work)], check=True, capture_output=True)
+        subprocess.run(g + ["-C", str(work), "checkout", "-q", "-b", "develop"], check=True)
+        (work / "a.txt").write_text("a\n", encoding="utf-8")
+        subprocess.run(g + ["-C", str(work), "add", "-A"], check=True)
+        subprocess.run(g + ["-C", str(work), "commit", "-qm", "a"], check=True)
+        subprocess.run(g + ["-C", str(work), "push", "-q", "-u", "origin", "develop"], check=True, capture_output=True)
+        other = tmp / "other"
+        subprocess.run(["git", "clone", "-q", "-b", "develop", str(origin), str(other)], check=True, capture_output=True)
+        for name in ("b", "c"):
+            (other / f"{name}.txt").write_text(name, encoding="utf-8")
+            subprocess.run(g + ["-C", str(other), "add", "-A"], check=True)
+            subprocess.run(g + ["-C", str(other), "commit", "-qm", name], check=True)
+        subprocess.run(g + ["-C", str(other), "push", "-q"], check=True, capture_output=True)
+        out = js(SK / "crav1-build-walk/scripts/repo_sync.py", "code-behind", "--repo", str(work),
+                 "--branch", "feat/orders-export", "--task", "T4")
+        card = out["card"]
+        self.assertEqual(card["question"],
+                         "Your local develop in orders-api is 2 commits behind origin/develop. Update it locally before the build?")
+        first = card["options"][0]
+        self.assertEqual(first["label"], "Update local develop (Recommended)")
+        self.assertEqual(first["result"], "Fast-forwards your local develop to origin/develop (git merge --ff-only). "
+                                          "Nothing is pushed. Then cuts feat/orders-export from it and builds T4.")
+        self.assertEqual(card["options"][1]["label"], "Stop")
+        self.assertLessEqual(len(card["options"]), 4)
