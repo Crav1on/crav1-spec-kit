@@ -135,3 +135,9 @@ Since 1.195.0 the walk checks the code at the start: the shared merged-since-syn
 The walk fetches origin once at the start and compares against `origin/develop`, so a branch tip that is already merged shows as merged, not as drift. In the same start it clears finished claims and ticks acceptance items whose verify row passes with evidence, in one line such as `Ticked 2 acceptance items from verify: item 1 (A1), item 2 (A2, recheck on T3).` When an open task touches the evidence, the item is ticked and that task's verify note gets a recheck line.
 
 Fewer cards: housekeeping fixes in the plan apply with one summary line, a reopen that only came from a fact the walk just recorded gets no card, and the save rides on the step's last yes. Batch cards show one bullet per item above a short question and an `On yes:` line, in plain words with no letters or internal names. Verify runs on DEV or TEST; a check on prod is read-only, and a check that writes to prod is its own task with an owner, your yes and a Risks line.
+
+## Release gates, quieter cards and a scoped review (1.197.0)
+
+The prod lint reads each verify item and its target, so a local Bicep compile of `main.prod.bicepparam`, a unit test with PROD-like settings or a read-only check on prod is not flagged. A manual prod task that drops or changes data needs an owner and a Risks line, and the ready check holds it until its release, for example `T52 waits for the first release to main and a prod yes`, so it is never offered as the first task. Untested acceptance items stay open with no question. Batch cards keep option text as written, and the question is only the short `Card:` line.
+
+Before the plan review, the walk writes a review packet with the changed tasks, their spec sections and the plan's Risks, and `/crav1-review-plan` runs in the foreground on that packet instead of reading the whole spec. A small change gets a quick review.

@@ -76,3 +76,7 @@ Use the template in this skill’s `assets/plan.md`. Fill:
 - **Left as committed** — only when the user left a piece; see `references/write.md` ("Left as committed").
 
 Stay inside v0. File-level, not class-by-class essays. No new product behavior. A piece marked already there is named in the trace as `already there` and has no rebuild task. A left piece has no task.
+
+## Housekeeping with no card (1.197.0)
+
+On a rerun, refresh edits are housekeeping and get no card: Risks wording that still says a merged pull request is open, Trace evidence shas, the plan header's code-read lines, a stale Linter line and the build-map refresh. Apply them and say one line, such as `Applying with no card (housekeeping): Risks wording for PR 82; Trace evidence sha for the retry constraint.` Cards are only for intent changes: adding, removing or reordering tasks, changing a verify check, a new risk or constraint, and anything that touches prod. The same rule is in `crav1-tighten-plan` `references/issues.md`.

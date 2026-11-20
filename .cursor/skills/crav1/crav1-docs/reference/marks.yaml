@@ -576,6 +576,20 @@ marks:
     mention: '\(after:'
     since: 1.54.0
 
+  - id: task-after-release
+    name: "(after-release: …)"
+    group: plan
+    files: ["docs/specs/<slug>/tasks.md (on a manual prod task line)"]
+    format: "(after-release: <branch>)"
+    pattern: '^\(after-release: \S+\)$'
+    examples:
+      - "(after-release: main)"
+    meaning: "A manual prod task that runs only after the first release to that branch and a prod yes. The ready check holds it as Waiting and never offers it as the first task."
+    written_by: [crav1-plan-from-spec]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    mention: 'after-release'
+    since: 1.197.0
+
   - id: task-branch
     name: "(branch: …)"
     group: plan

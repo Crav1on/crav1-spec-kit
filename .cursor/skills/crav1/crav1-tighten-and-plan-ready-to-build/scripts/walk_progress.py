@@ -2280,18 +2280,36 @@ def start(args: argparse.Namespace) -> None:
             "line": sync.get("line"),
         })
         return
+    # 1.197.0: when the spec was found by its playbook name, use that playbook (no second start run).
+    playbook_arg = args.playbook or (_resolved_playbook(folder, args.root) if "playbook" in str(found.get("how") or "") else None)
     payload = {
         "ok": True,
         "slug": found.get("slug") or folder.name,
         "folder": str(folder),
         "how": found.get("how") or "folder",
         "sync": sync,
-        "resume": resume_payload(folder, no_playbook=not args.playbook),
+        "resume": resume_payload(folder, no_playbook=not playbook_arg),
         "playbook_status": None,
     }
-    if args.playbook:
-        payload["playbook_status"] = playbook_payload(folder, args.playbook)
+    if playbook_arg:
+        payload["playbook"] = playbook_arg
+        payload["playbook_status"] = playbook_payload(folder, playbook_arg)
     emit(payload)
+
+
+def _resolved_playbook(folder: Path, query: str) -> str | None:
+    """The playbook path the spec names whose file name matched the start query."""
+    spec = folder / "spec.md"
+    if not spec.is_file():
+        return None
+    mod = resolve_mod()
+    raws = [m.group(1).strip().strip("`").strip() for m in mod.PLAYBOOK.finditer(spec.read_text(encoding="utf-8"))]
+    raws = [r for r in raws if r]
+    want = mod.norm(Path(str(query)).name)
+    hits = [r for r in raws if mod.norm(Path(r.replace("\\", "/")).stem) == want]
+    if len(hits) == 1:
+        return hits[0]
+    return raws[0] if len(raws) == 1 else None
 
 
 def _load_script(folder: str, filename: str, code: str):
@@ -2397,6 +2415,13 @@ def classify(row: dict, resolve_kept: bool = False, resolve_recorded: bool = Fal
         hit["step"] = None
         hit["who"] = None
         hit["why"] = f"{task or 'The task'} is pushed and {merge_wait_phrase(row['merge_wait'])}. It is not offered in Run next."
+        return hit
+    if row.get("release_gate"):
+        hit = _waiting(row)
+        hit["release"] = True
+        hit["step"] = None
+        hit["who"] = None
+        hit["why"] = f"{task or 'The task'} {row['release_gate']}. It is not offered in Run next."
         return hit
     if row.get("approval") or "approval needed" in text:
         return _waiting(row)
@@ -4825,6 +4850,52 @@ def apply_merge_deadlocks(rows: list[dict]) -> list[str]:
     return lines
 
 
+# 1.197.0: a manual prod task waits for its release, never offered as the first task.
+AFTER_RELEASE = re.compile(r"\(after-release:\s*([^)\s]+)\s*\)", re.I)
+MANUAL_PROD_TASK = re.compile(r"\(manual,\s*(?:prod|production|prd)\b", re.I)
+GATE_TASK = re.compile(r"^\s*-\s*\[ \]\s*(T\d+)\b(.*)$")
+
+
+def release_gates(root: Path | None) -> dict[str, str]:
+    """T# to its release gate phrase: an `(after-release: <branch>)` mark, or a `(manual, prod` task
+    that a plan.md `## Risks` line names together with the word release."""
+    if root is None:
+        return {}
+    tasks_path, plan_path = Path(root) / "tasks.md", Path(root) / "plan.md"
+    if not tasks_path.is_file():
+        return {}
+    plan = plan_path.read_text(encoding="utf-8") if plan_path.is_file() else ""
+    risks = plan.split("## Risks", 1)[1] if "## Risks" in plan else ""
+    risks = re.split(r"\n## ", risks, maxsplit=1)[0]
+    gates = {}
+    for line in tasks_path.read_text(encoding="utf-8").splitlines():
+        m = GATE_TASK.match(line)
+        if not m:
+            continue
+        tid, rest = m.group(1), m.group(2)
+        mark = AFTER_RELEASE.search(rest)
+        if mark:
+            gates[tid] = f"waits for the first release to {mark.group(1)} and a prod yes"
+            continue
+        if MANUAL_PROD_TASK.search(rest):
+            for risk in risks.splitlines():
+                if re.search(rf"\b{tid}\b", risk) and re.search(r"(?i)\breleases?\b", risk):
+                    gates[tid] = "waits for the release its Risks line names and a prod yes"
+                    break
+    return gates
+
+
+def apply_release_gates(root: Path | None, rows: list[dict]) -> None:
+    gates = release_gates(root)
+    for row in rows:
+        task = row.get("task")
+        if task in gates and row.get("bucket") in ("ready", "waits-in-order"):
+            row["bucket"] = "waiting"
+            row["held"] = True
+            row["release_gate"] = gates[task]
+            row["reason"] = gates[task]
+
+
 def apply_walk_starts(root: Path, rows: list[dict], user: str | None = None) -> None:
     """Offer a task only when the walk can start it (1.186.0).
 
@@ -5930,6 +6001,7 @@ def _readiness(args: argparse.Namespace) -> None:
         loop_lines = apply_loop_holds(root, rows)
         deadlock_lines = apply_merge_deadlocks(rows)
         apply_walk_starts(root, rows, getattr(args, "user", None) or _git_user(root))
+        apply_release_gates(root, rows)
     for row in rows:
         if not isinstance(row, dict):
             fail("readiness", "each row must be an object")
@@ -7010,6 +7082,120 @@ def _match_item(row: dict, items: list[dict]) -> dict | None:
     return hits[0] if len(hits) == 1 else None
 
 
+# --- review-packet (1.197.0): a scoped input for the plan reviewer, never the whole spec.
+_PACKET_TASK = re.compile(r"^\s*-\s*\[( |x|X)\]\s*(T\d+)\b.*$")
+_SPEC_REF = re.compile(r"\(spec:\s*([^)]+)\)", re.I)
+QUICK_MAX_TASKS = 3
+QUICK_MAX_LINES = 40
+SECTION_MAX_LINES = 60
+
+
+def _git_out(root: Path, *args: str) -> str | None:
+    try:
+        proc = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True, timeout=20, check=False)
+    except (OSError, subprocess.SubprocessError):
+        return None
+    return proc.stdout if proc.returncode == 0 else None
+
+
+def _changed_lines(root: Path, since: str | None) -> tuple[list[str], int]:
+    """Added lines in tasks.md and plan.md since a ref (or uncommitted), and how many lines changed."""
+    args = ["diff", "--unified=0"] + ([since] if since else ["HEAD"]) + ["--", "tasks.md", "plan.md"]
+    out = _git_out(root, *args)
+    if out is None:
+        return [], -1
+    added = [line[1:] for line in out.splitlines() if line.startswith("+") and not line.startswith("+++")]
+    removed = [line for line in out.splitlines() if line.startswith("-") and not line.startswith("---")]
+    return added, len(added) + len(removed)
+
+
+def _packet_section(text: str, heading: str) -> str:
+    m = re.search(rf"(?m)^##+\s+{re.escape(heading)}\s*$", text)
+    if not m:
+        return ""
+    rest = text[m.start():]
+    nxt = re.search(r"(?m)^##\s+", rest[3:])
+    return rest[: nxt.start() + 3].rstrip() if nxt else rest.rstrip()
+
+
+def _spec_range(spec_lines: list[str], ref: str) -> tuple[int, int] | None:
+    """Line range (1-based, inclusive) of the spec section that holds the ref words."""
+    want = _tick_words(ref)
+    if not want:
+        return None
+    for idx, line in enumerate(spec_lines):
+        if want in _tick_words(line):
+            start = idx
+            while start > 0 and not spec_lines[start].startswith("#"):
+                start -= 1
+            end = idx + 1
+            while end < len(spec_lines) and not spec_lines[end].startswith("#") and end - start < SECTION_MAX_LINES:
+                end += 1
+            return start + 1, end
+    return None
+
+
+def review_packet(root: Path, since: str | None = None, tasks_arg: str | None = None) -> dict:
+    spec_path, plan_path, tasks_path = root / "spec.md", root / "plan.md", root / "tasks.md"
+    if not tasks_path.is_file():
+        fail("root", f"no tasks.md in {root}")
+    spec = spec_path.read_text(encoding="utf-8") if spec_path.is_file() else ""
+    plan = plan_path.read_text(encoding="utf-8") if plan_path.is_file() else ""
+    task_lines = {}
+    for line in tasks_path.read_text(encoding="utf-8").splitlines():
+        m = _PACKET_TASK.match(line)
+        if m:
+            task_lines[m.group(2)] = (m.group(1) == " ", line)
+    if tasks_arg:
+        wanted = [t.strip() for t in tasks_arg.split(",") if t.strip()]
+        how, changed_n = "named", -1
+    else:
+        added, changed_n = _changed_lines(root, since)
+        wanted = [m.group(2) for m in (_PACKET_TASK.match(a) for a in added) if m]
+        how = "changed"
+        if not wanted:
+            wanted = [t for t, (is_open, _l) in task_lines.items() if is_open]
+            how = "open"
+    wanted = [t for t in dict.fromkeys(wanted) if t in task_lines]
+    spec_lines = spec.splitlines()
+    ranges = []
+    for tid in wanted:
+        for ref in _SPEC_REF.findall(task_lines[tid][1]):
+            for part in re.split(r"[;,]", ref):
+                rng = _spec_range(spec_lines, part)
+                if rng and rng not in ranges:
+                    ranges.append(rng)
+    ranges.sort()
+    parts = ["# Plan review packet", "", f"Tasks ({how}): " + (", ".join(wanted) or "none"), ""]
+    parts += ["## Tasks", ""] + [task_lines[t][1] for t in wanted] + [""]
+    for heading in ("Risks", "Linter"):
+        sec = _packet_section(plan, heading)
+        if sec:
+            parts += [f"## plan.md {heading}", "", sec.split("\n", 1)[1].strip() if "\n" in sec else "", ""]
+    parts += ["## spec.md sections (line ranges)", ""]
+    for start, end in ranges:
+        parts += [f"### spec.md lines {start}-{end}", ""] + spec_lines[start - 1:end] + [""]
+    quick = bool(wanted) and len(wanted) <= QUICK_MAX_TASKS and 0 <= changed_n <= QUICK_MAX_LINES
+    return {"tasks": wanted, "how": how, "spec_ranges": [f"{a}-{b}" for a, b in ranges],
+            "spec_bytes": len(spec.encode("utf-8")), "changed_lines": changed_n, "quick": quick,
+            "text": "\n".join(parts).rstrip() + "\n"}
+
+
+def review_packet_cmd(args: argparse.Namespace) -> None:
+    """Write the plan reviewer's input packet (1.197.0). The reviewer reads it, never spec.md whole."""
+    root = Path(args.root)
+    packet = review_packet(root, args.since, args.tasks)
+    import tempfile
+    # Outside the repo, so it is never committed or counted as uncommitted.
+    out = Path(args.out) if args.out else Path(tempfile.gettempdir()) / f"crav1-review-packet-{root.resolve().name}.md"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(packet.pop("text"), encoding="utf-8")
+    mode = "quick" if packet["quick"] else "full"
+    line = (f"Review packet: {len(packet['tasks'])} task{'s' if len(packet['tasks']) != 1 else ''}, "
+            f"{len(packet['spec_ranges'])} spec section{'s' if len(packet['spec_ranges']) != 1 else ''}, {mode} review.")
+    emit({"ok": True, **packet, "mode": mode, "path": str(out), "line": line})
+
+
 def tickable_report(root: Path) -> dict:
     spec_path, verify_path, tasks_path = root / "spec.md", root / "verify.md", root / "tasks.md"
     if not spec_path.is_file():
@@ -7023,14 +7209,25 @@ def tickable_report(root: Path) -> dict:
         m = _TASK_OPEN.match(line)
         if m and m.group(1) == " ":
             open_tasks[f"T{m.group(2)}"] = line
-    found, cards = [], []
+    found, cards, waiting = [], [], []
     for row in rows:
         item = _match_item(row, items)
         if item is None or item["ticked"]:
             continue
         files = sorted({f.split(":")[0] for f in _EVIDENCE_FILE.findall(row["evidence"])})
-        if not _row_passes_on_base(row) or not files:
-            cards.append({"item": item["item"], "text": item["text"], "row": row["id"], "result": row["result"]})
+        passes = _row_passes_on_base(row)
+        # 1.197.0: only a failing row, or a passing row with no evidence, is a question.
+        # An untested or pending row waits on its tasks with no question.
+        if passes and not files:
+            cards.append({"item": item["item"], "text": item["text"], "row": row["id"], "result": row["result"],
+                          "why": "passes with no evidence"})
+            continue
+        if not passes:
+            if re.match(r"(?i)\s*fail", row["result"] or ""):
+                cards.append({"item": item["item"], "text": item["text"], "row": row["id"], "result": row["result"],
+                              "why": "failing"})
+            else:
+                waiting.append(item["item"])
             continue
         touching = [t for t in row["tasks"] if t in open_tasks]
         for tid, line in open_tasks.items():
@@ -7038,7 +7235,7 @@ def tickable_report(root: Path) -> dict:
                 touching.append(tid)
         found.append({"item": item["item"], "text": item["text"], "row": row["id"], "evidence_files": files,
                       "open_tasks_touching": touching, "action": "tick-recheck" if touching else "tick"})
-    return {"items": found, "cards": cards}
+    return {"items": found, "cards": cards, "waiting": waiting}
 
 
 def _add_recheck(tasks: str, tid: str, note: str) -> str:
@@ -7063,8 +7260,8 @@ def tickable(args: argparse.Namespace) -> None:
 
     No card when the evidence is clear: the item is ticked. When a later open
     task touches the evidence files, it is still ticked now and that task's
-    verify note gets `recheck item N (verify A#)`. A failing or unmatched row
-    is listed under `cards`. Writes only with --write."""
+    verify note gets `recheck item N (verify A#)`. Only a failing row, or a passing
+    row with no evidence, is listed under `cards` (1.197.0); untested rows are `waiting`. Writes only with --write."""
     root = Path(args.root)
     report = tickable_report(root)
     wrote = []
@@ -7094,7 +7291,10 @@ def tickable(args: argparse.Namespace) -> None:
         verb = "Ticked" if args.write else "Can tick"
         n = len(parts)
         line = f"{verb} {n} acceptance item{'s' if n != 1 else ''} from verify: " + ", ".join(parts) + "."
-    emit({"ok": True, **report, "line": line, "wrote": wrote or None})
+    wait_n = len(report["waiting"])
+    wait_line = (f"{wait_n} acceptance item{'s wait' if wait_n != 1 else ' waits'} on {'their' if wait_n != 1 else 'its'} tasks."
+                 if wait_n else None)
+    emit({"ok": True, **report, "line": line, "waiting_line": wait_line, "wrote": wrote or None})
 
 
 # Hash lines resolve-stamps may rewrite (1.139.0). Done, Result, findings,
@@ -8107,6 +8307,12 @@ def main(argv: list[str] | None = None) -> None:
     cdr.add_argument("--merged", help="its merge commit, when the walk already saw it merged")
     cdr.set_defaults(func=code_drift)
 
+    rp = sub.add_parser("review-packet", help="scoped plan-reviewer input: changed tasks, their spec sections, Risks (1.197.0)")
+    rp.add_argument("--root", required=True)
+    rp.add_argument("--since", help="git ref; tasks added since it are the changed tasks")
+    rp.add_argument("--tasks", help="T# list instead, such as T3,T7")
+    rp.add_argument("--out", help="packet path; default a file in the system temp folder")
+    rp.set_defaults(func=review_packet_cmd)
     tk = sub.add_parser("tickable", help="acceptance items a passing verify row proves; tick with no card (1.196.0)")
     tk.add_argument("--root", required=True)
     tk.add_argument("--write", action="store_true", help="tick them, and add recheck notes to touching open tasks")

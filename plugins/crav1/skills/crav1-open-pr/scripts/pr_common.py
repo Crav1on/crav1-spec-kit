@@ -545,13 +545,55 @@ def _default_roots(repo: str | None) -> list[Path]:
     return [here]
 
 
+NO_CODE = re.compile(r"(?i)\bno code\b|\bspecs?\b(?: repo| only)?$|^specs?\b|\bdocs? only\b|^docs?\b|\bdocumentation\b")
+
+
+def _repos_table(root: Path) -> list[dict]:
+    """Every repos.md row with a URL: name, purpose and URL (1.197.0)."""
+    path = root / "docs" / "system" / "repos.md"
+    rows: list[dict] = []
+    if not path.is_file():
+        return rows
+    for raw in path.read_text(encoding="utf-8", errors="replace").splitlines():
+        cells = [c.strip().strip("`") for c in raw.strip().strip("|").split("|")]
+        if len(cells) < 4 or not cells[0] or cells[0].lower() in ("repo", "---") or set(cells[0]) <= {"-", ":"}:
+            continue
+        url = next((c for c in cells if c.lower().startswith(("http://", "https://", "git@"))), "")
+        if url:
+            rows.append({"name": cells[0], "purpose": cells[1] if len(cells) > 1 else "", "url": url})
+    return rows
+
+
+def _code_rows_elsewhere(roots: list[Path], remote_url: str | None) -> list[dict] | None:
+    """The code repos to ask about when this checkout holds no code (1.197.0).
+
+    None when this checkout may hold the pull request: no repos.md, or this
+    remote's row has code. A list (maybe empty) when this remote's row says
+    it has no code (purpose such as `specs`, `no code`), or the remote is
+    not a listed repo while other rows are.
+    """
+    remote = host_of(remote_url)
+    for root in roots:
+        rows = _repos_table(root)
+        if not rows:
+            continue
+        own = [r for r in rows if remote.get("host") and same_repo(host_of(r["url"]), remote)]
+        if own and not any(NO_CODE.search(r["purpose"].strip()) for r in own):
+            return None
+        others = [r for r in rows if r not in own and not NO_CODE.search(r["purpose"].strip())
+                  and host_of(r["url"]).get("host") in TOOL]
+        return others
+    return None
+
+
 def resolve_ref(ref: str, remote_url: str | None = None, roots: list[Path] | None = None,
-                remote_has_pr: bool = False) -> dict:
+                remote_has_pr: bool = False, probe=None) -> dict:
     """Which pull request `ref` means: the kit's records first, the remote last (1.177.0).
 
     The remote is a candidate beside a record only when `remote_has_pr` says
     this checkout's host already showed a pull request with that number.
-    The script never asks a host itself.
+    When this checkout holds no code (1.197.0), `probe` checks each code repo
+    in repos.md read-only; with no probe the script never asks a host.
     """
     text = (ref or "").strip()
     if GITHUB_PR.match(text) or AZURE_PR.match(text):
@@ -596,6 +638,33 @@ def resolve_ref(ref: str, remote_url: str | None = None, roots: list[Path] | Non
         return {"status": "ask", "number": number, "candidates": cands,
                 "line": f"The kit's records name {len(cands)} pull requests numbered {number}: "
                         + "; ".join(c["url"] for c in cands) + ". Ask which one."}
+    elsewhere = _code_rows_elsewhere(roots or [], remote_url) if not remote_has_pr else None
+    if elsewhere:
+        # 1.197.0: this checkout holds no code. Check each code repo read-only; one match is it.
+        cands = []
+        for row in elsewhere:
+            url = _pr_url_for(row["url"], number)
+            info = parse_ref(url) if url else {}
+            cands.append({"host": info.get("host"), "number": number, "url": url, "repo": row["name"],
+                          "tool": TOOL.get(info.get("host")), "sources": ["docs/system/repos.md"],
+                          "label": f"PR {number} in {row['name']}"})
+        found = []
+        if probe is not None:
+            for cand in cands:
+                try:
+                    hit = probe(parse_ref(cand["url"]))
+                except Exception:  # a host that cannot be read is no match
+                    hit = None
+                if hit:
+                    found.append(cand)
+        if len(found) == 1:
+            c = found[0]
+            return {"status": "ok", "source": "host-check", **c,
+                    "line": f"PR {number} is {c['url']}, the one code repo whose host has it; use {c['tool']}."}
+        names = ", ".join(c["repo"] for c in cands)
+        return {"status": "ask", "number": number, "candidates": cands, "tool": None,
+                "line": f"No kit record names PR {number}, and this checkout holds no code. Ask which repo it is in: {names}. "
+                        "Do not name or install a CLI until the host is known."}
     if remote_pr:
         return {"status": "ok", "source": "remote", "host": remote["host"], "number": number, "url": remote_pr,
                 "repo": remote.get("repo"), "tool": TOOL.get(remote["host"]), "candidates": [],
@@ -815,7 +884,12 @@ def host_author(info: dict, repo: str | None = None, timeout: int | None = None)
 def cmd_resolve(args) -> int:
     roots = [repo_root_of(Path(r)) for r in (args.root or [])] or _default_roots(args.repo)
     remote = args.remote_url if args.remote_url is not None else _remote_url(args.repo)
-    out = resolve_ref(args.ref, remote, roots, args.remote_has_pr)
+    probe = None
+    if not getattr(args, "no_host_check", False):
+        def probe(info: dict) -> bool:
+            # Read-only, short timeout; any error (no CLI, not signed in) is no match.
+            return bool(host_lookup(info, args.repo, host_timeout(info.get("host")))["ok"])
+    out = resolve_ref(args.ref, remote, roots, args.remote_has_pr, probe)
     out["note"] = "Read-only. Name only the tool for the resolved host; never ask to install or sign in to the other one."
     return emit(out, 0 if out.get("status") in ("ok", "ask") else 1)
 
@@ -947,6 +1021,8 @@ def main(argv: list[str] | None = None) -> int:
     r.add_argument("--repo")
     r.add_argument("--remote-has-pr", action="store_true",
                    help="this checkout's host already showed a pull request with that number")
+    r.add_argument("--no-host-check", action="store_true",
+                   help="do not check the code repos' hosts when this checkout holds no code (1.197.0)")
     cd = sub.add_parser("candidates", help="spec and decision candidates in a PR note's record (1.193.0)")
     cd.add_argument("--note", required=True)
     cd.add_argument("--pick", help="numbers in record order, e.g. 1,3")

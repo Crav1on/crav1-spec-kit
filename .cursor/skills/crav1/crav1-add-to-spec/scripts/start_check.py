@@ -38,7 +38,8 @@ def _utf8_stdout() -> None:
 
 _utf8_stdout()
 
-PR_SUBJECT = re.compile(r"(?:Merge pull request #(\d+)|Merged PR (\d+):|\(#(\d+)\)\s*$)")
+# GitHub `Merge pull request #12 from`, Azure DevOps `Merged PR 12:` and `Merge pull request 12 from` (1.197.0), squash `(#12)`.
+PR_SUBJECT = re.compile(r"(?:Merge pull request #?(\d+)\b|Merged PR (\d+):|\(#(\d+)\)\s*$)")
 _FETCHED: set[str] = set()
 
 

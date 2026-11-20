@@ -2,6 +2,23 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.197.0 (2026-11-20)
+
+Fixes from a live spec walk: cleaner batch cards, a prod lint that judges each check, release gates, quieter acceptance checks and a scoped plan review.
+
+- **Whole labels only.** The batch label map replaces an option only when the whole option, or the part before its `:`, is an internal id. Words such as keep or ask inside option text stay as written.
+- **Prod lint per item.** `plan_check.py lint` reads each verify item and its target: file names such as `main.prod.bicepparam`, PROD-like settings, unit and contract items, local compiles and read-only checks are not flagged. A `(manual, prod` task whose own text drops, deletes or changes data needs `owner:` and a Risks line.
+- **Release gate.** A task marked `(after-release: main)`, or a manual prod task that a Risks line ties to a release, is Waiting in the ready check and is never offered as the first task. New mark in the data layout.
+- **Quiet tickable.** `walk_progress.py tickable` asks only about a failing row or a passing row with no evidence. Untested and pending rows stay open with no question; one `waiting_line` counts them.
+- **Small fixes.** `start` uses the playbook it found by name (no second run). The claims "Kept claimed tasks" line is gone when nothing changed. `start_check.py` reads the PR number from Azure DevOps `Merge pull request 82 from` subjects. Housekeeping says `Applying with no card` and `plan_check.py reviewed --items` leaves housekeeping out of the open count.
+- **Card rules.** A batch question is only the short `Card:` line; the items live in the bullets and the `On yes:` line. Before a yes the walk says what it would change, never that it already did.
+- **Fewer cards.** Plan-from-spec applies housekeeping refreshes with one summary line, and the ready check is recorded with no save card.
+- **Scoped plan review.** New `walk_progress.py review-packet` writes the reviewer's input outside the repo: the changed tasks, their spec sections by line range, and the plan's Risks and Linter, with a quick mode for small changes. The reviewer runs in the foreground and never reads `spec.md` whole.
+- **Local fast-forward card.** The build walk's card for a code base branch behind origin now reads `Your local develop in orders-api is 2 commits behind origin/develop. Update it locally before the build?`, with **Update local develop** and a result line that says nothing is pushed, then the work branch and task it builds. New `code-behind --branch --task`.
+- **Bare PR numbers from a specs-only checkout.** When no record names the number and this checkout holds no code, `pr_common.py resolve` checks the code repos in `repos.md` read-only and uses the single match, otherwise asks with those repos listed. It never suggests installing a CLI before the host is known. `/crav1-review-pr` ends with a Run next block when the host is still unknown.
+
+Docs and tests: the spec walk walkthrough, question cards, pr-common and marks; `scripts/tests/test_kit_1197.py`.
+
 ## 1.196.0 (2026-11-20)
 
 Start checks that trust origin, claims that clear themselves, and fewer, plainer walk cards.

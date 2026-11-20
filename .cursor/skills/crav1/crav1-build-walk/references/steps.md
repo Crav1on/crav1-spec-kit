@@ -4,7 +4,7 @@ Read this when a branch is chosen and the other route files do not apply. Open e
 
 Own mode, in order. A step with nothing to do says so, records `nothing-to-do`, and moves on.
 
-1. Build the tasks on this branch. First check the code branch against origin (1.182.0): `<interpreter> -X utf8 scripts/repo_sync.py code-behind --repo <code repo>`. Behind: show its `card` (`fast-forward` or `stop`) and fast-forward only on `fast-forward`, with `--yes`; never fast-forward or pull silently. Diverged: stop and print its `ending`. In step, ahead, no upstream or offline: go on. Then open `../crav1-build-tasks/SKILL.md`. One worker per `T#`. A `(Runs live)` task follows the live file first; do not open that file from here when `SKILL.md` already sent you there.
+1. Build the tasks on this branch. First check the code branch against origin (1.182.0): `<interpreter> -X utf8 scripts/repo_sync.py code-behind --repo <code repo> --branch <work branch> --task <T#>`. Behind: show its `card` (`fast-forward` or `stop`), which says the update is local and nothing is pushed (1.197.0), with each option's `result` line, and fast-forward only on `fast-forward`, with `--yes`; never fast-forward or pull silently. Diverged: stop and print its `ending`. In step, ahead, no upstream or offline: go on. Then open `../crav1-build-tasks/SKILL.md`. One worker per `T#`. A `(Runs live)` task follows the live file first; do not open that file from here when `SKILL.md` already sent you there.
 2. Verify. Open `../crav1-verify-build-against-spec/SKILL.md`.
 3. Commit. Show the commit card, then on `yes` open `../crav1-finalize-commit/SKILL.md`.
 4. Open the pull request. On `yes`, open `../crav1-open-pr/SKILL.md`. Push only inside that skill, after its own yes.

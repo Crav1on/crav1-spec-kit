@@ -24,7 +24,14 @@ Otherwise stop and name what you looked at: `PR repository <url> is not this rem
 
 Remote: the single `git remote`. If several remotes exist, ask which one. A full URL names its host.
 
-A bare number is resolved from the kit's records first (1.177.0): `<interpreter> -X utf8 scripts/pr_common.py resolve --ref <ref> --root <specs-repo>`, as `crav1-docs/reference/pr-common.md` ("A bare number") says. One record match is the pull request, on its own host, even when this checkout's remote is another host. `ask` lists every candidate and asks which one. Only with no record does the number mean this checkout's remote. `--root` is the specs repo root (1.177.1); a record that names the number without its host is `ask` with that record as the candidate, never the remote. Use the `tool` it names: never tell the user to install or sign in to `gh` for an Azure DevOps pull request, or to set up `az` for a GitHub one.
+A bare number is resolved from the kit's records first (1.177.0): `<interpreter> -X utf8 scripts/pr_common.py resolve --ref <ref> --root <specs-repo>`, as `crav1-docs/reference/pr-common.md` ("A bare number") says. One record match is the pull request, on its own host, even when this checkout's remote is another host. `ask` lists every candidate and asks which one. Only with no record does the number mean this checkout's remote. `--root` is the specs repo root (1.177.1); a record that names the number without its host is `ask` with that record as the candidate, never the remote. Use the `tool` it names: never tell the user to install or sign in to `gh` for an Azure DevOps pull request, or to set up `az` for a GitHub one. When this checkout holds no code, the script checks the code repos in `repos.md` read-only first and asks only when none or several have that number (1.197.0).
+
+**No host yet (1.197.0).** When the run ends because the pull request or its host is not known (`ask` with no answer, or `needs-remote`), end with the Run next layout, never a CLI install hint:
+
+Run next:
+
+Review the pull request by its URL:
+`/crav1-review-pr <pull request URL>`
 
 ## Other skills
 

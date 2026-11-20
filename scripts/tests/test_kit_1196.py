@@ -241,7 +241,7 @@ class FewerCards(unittest.TestCase):
     def test_housekeeping_has_no_card(self):
         out = py(PLAN, "batch", "--items", self.items([self.row(1), self.row(7, issue="Trace row for the retry constraint", housekeeping=True),
                                                       self.row(14, issue="missing mark", housekeeping="mark")])).stdout
-        self.assertIn("Applied with no card (housekeeping): P7 Trace row for the retry constraint; P14 missing mark.", out)
+        self.assertIn("Applying with no card (housekeeping): P7 Trace row for the retry constraint; P14 missing mark.", out)
         card = [l for l in out.splitlines() if l.startswith("On yes:")][0]
         self.assertNotIn("P7", card)
         self.assertIn("P1", card)
@@ -249,7 +249,7 @@ class FewerCards(unittest.TestCase):
     def test_only_housekeeping_prints_only_the_line(self):
         out = py(PLAN, "batch", "--items", self.items([self.row(7, housekeeping=True)])).stdout
         self.assertNotIn("Card:", out)
-        self.assertTrue(out.startswith("Applied with no card"))
+        self.assertTrue(out.startswith("Applying with no card"))
 
     def test_auto_clear_line(self):
         import importlib.util
@@ -328,7 +328,9 @@ class Tickable(unittest.TestCase):
         out = js(WALK, "tickable", "--root", str(self.root))
         acts = {i["row"]: i["action"] for i in out["items"]}
         self.assertEqual(acts, {"A1": "tick", "A2": "tick-recheck"})
-        self.assertEqual({c["row"] for c in out["cards"]}, {"A3", "A4"})
+        # 1.197.0: only failing or no-evidence rows are cards; a branch-only pass waits (test_kit_1197).
+        self.assertEqual({c["row"] for c in out["cards"]}, {"A4"})
+        self.assertEqual(out["waiting"], [3])
         self.assertIsNone(out["wrote"])
         self.assertIn("- [ ] Retries stop", (self.root / "spec.md").read_text(encoding="utf-8"))
 

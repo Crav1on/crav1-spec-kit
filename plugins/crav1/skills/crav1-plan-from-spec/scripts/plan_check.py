@@ -32,8 +32,9 @@ Commands:
       (health, version, config, existence). Any other prod verify is flagged:
       verify runs on DEV/TEST, and a prod-write check is its own task marked
       prod-write with an owner: and a Risks line in plan.md naming its T#.
-  reviewed --root <spec-folder> --open <n> [--write]
+  reviewed --root <spec-folder> (--open <n> | --items <file>) [--write]
       Lowers P# open on the Reviewed line, keeping the date. No line, none added.
+      With --items, housekeeping rows are not counted (1.197.0).
 
 <file> for queue and batch is JSON: a list of objects with id, issue,
 tag (plan or spec), status (open, patched, dropped, skipped, kept), and, for
@@ -571,7 +572,8 @@ def batch(items: list[dict], title: str) -> str:
     open_rows = [i for i in items if i["tag"] == "plan" and i["status"] not in DONE]
     chores = [i for i in open_rows if _housekeeping(i) and not _changes_tasks(i)]
     open_rows = [i for i in open_rows if i not in chores]
-    chores_line = ("Applied with no card (housekeeping): "
+    # 1.197.0: "Applying", since the line is printed before the edits.
+    chores_line = ("Applying with no card (housekeeping): "
                    + "; ".join(f"{i['id']} {' '.join(str(i.get('issue', '')).split())}" for i in chores) + ".\n") if chores else ""
     own = [i["id"] for i in open_rows if _changes_tasks(i)]
     batchable = [i for i in open_rows if not _changes_tasks(i)]
@@ -601,40 +603,96 @@ def batch(items: list[dict], title: str) -> str:
 PROD = re.compile(r"\b(?:prod|production|prd)\b", re.I)
 PROD_READ = re.compile(r"\b(?:health|healthcheck|version|config|configuration|exist|exists|existence|read-only|"
                        r"read only|smoke read|get|list|show|ping)\b", re.I)
-PROD_WRITE = re.compile(r"\b(?:write|writes|create|creates|post|put|delete|insert|update|send|sends|publish|"
-                        r"trigger|run the job|load|import|submit|change|migrate|seed)\b", re.I)
+PROD_WRITE = re.compile(r"\b(?:write|writes|create|creates|post|put|delete|deletes|insert|update|send|sends|publish|"
+                        r"trigger|run the job|load|import|submit|change|migrate|seed|drop|drops|alter|truncate|purge)\b", re.I)
+# 1.197.0: judge each verify item and its target, not a "prod" substring.
+LINT_TASK = re.compile(r"^\s*-\s*\[( |x|X)\]\s*T(\d+)\b\s*:?\s*(.*)$")
+FILE_NAME = re.compile(r"\S+\.(?:bicepparam|bicep|json|ya?ml|tf|tfvars|env|ps1|sh|py|sql|md)\b", re.I)
+PROD_LIKE = re.compile(r"\b(?:prod|production|prd)-(?:like|style|shaped|sized)\b", re.I)
+PROD_TARGET = re.compile(
+    r"\b(?:on|in|against|to|into)\s+(?:the\s+)?(?:prod|production|prd)\b"
+    r"|\b(?:prod|production|prd)\s+(?:stage|environment|env|slot|subscription|resource group|database|db|tables?)\b"
+    r"|\b[\w-]+-(?:prod|prd)\b", re.I)
+DEV_TARGET = re.compile(r"\b(?:dev|test|tst|qa|staging|local|locally)\b|\b[\w-]+-(?:dev|test)\b", re.I)
+EXEMPT_ITEM = re.compile(r"^\s*(?:unit|contract|integration)\b|\b(?:compiles?|build-params|bicep build|lint|"
+                         r"what-if|dry-run|unit tests?)\b", re.I)
+MANUAL_PROD = re.compile(r"\(manual,\s*(?:prod|production|prd)\b", re.I)
+
+
+def _clean(text: str) -> str:
+    return PROD_LIKE.sub(" ", FILE_NAME.sub(" ", text))
+
+
+def _env_is_prod(note: str) -> bool:
+    """The note's mode/environment part, before the first ';': a comma part that is or starts with prod."""
+    head = note.split(";", 1)[0]
+    return any(re.match(r"(?:prod|production|prd)\b", part.strip(), re.I) for part in head.split(","))
+
+
+def prod_write_items(note: str) -> list[str]:
+    """The verify items that write to prod: target prod (named or the note's environment), not
+    exempt (unit, contract, local compile), and with a write verb."""
+    note = _clean(note)
+    env_prod = _env_is_prod(note)
+    hits = []
+    for item in note.split(";"):
+        text = item.strip()
+        if not text or EXEMPT_ITEM.search(text):
+            continue
+        targets_prod = bool(PROD_TARGET.search(text)) or (env_prod and not DEV_TARGET.search(text))
+        if targets_prod and PROD_WRITE.search(text):
+            hits.append(" ".join(text.split()))
+    return hits
+
+
+def _risk_names(risks: str, tid: str) -> bool:
+    return re.search(rf"\b{tid}\b", risks) is not None
 
 
 def lint_lines(root: Path) -> list[str]:
-    """Prod verify rule (1.196.0). One line per problem, then a closing count line."""
+    """Prod verify rule (1.196.0, per item and target since 1.197.0). One line per problem, then a count."""
     tasks = _read(root / "tasks.md")
     plan = (root / "plan.md").read_text(encoding="utf-8") if (root / "plan.md").is_file() else ""
     risks = plan.split("## Risks", 1)[1] if "## Risks" in plan else ""
+    risks = re.split(r"\n## ", risks, maxsplit=1)[0]
     out = []
     for line in tasks.splitlines():
-        m = TASK_LINE.match(line)
+        m = LINT_TASK.match(line)
         if not m:
             continue
         tid = f"T{m.group(2)}"
+        owner = "owner:" in line.lower()
         for note in VERIFY.findall(line):
-            if not PROD.search(note):
-                continue
             if "prod-write" in note.lower():
                 missing = [w for w, ok in (("an owner:", "owner:" in note.lower()),
-                                           ("a Risks line", re.search(rf"\b{tid}\b", risks) is not None)) if not ok]
+                                           ("a Risks line", _risk_names(risks, tid))) if not ok]
                 if missing:
                     out.append(f"Prod write: {tid} is a prod-write check without " + " and ".join(missing)
                                + ". It needs an owner, the user's yes and a Risks line.")
                 continue
-            if PROD_WRITE.search(note) or not PROD_READ.search(note):
-                out.append(f"Prod verify: {tid} verifies on prod with more than a read ({' '.join(note.split())}). "
+            items = prod_write_items(note)
+            if items:
+                out.append(f"Prod verify: {tid} verifies on prod with more than a read ({'; '.join(items)}). "
                            "Recommend: verify on DEV/TEST, keep only a read-only prod check (health, version, config, "
                            "existence), and make any prod write its own prod-write task with an owner, a yes and a Risks line.")
+        # 1.197.0: a manual prod task's own text is a prod write when it drops, deletes or changes data.
+        if MANUAL_PROD.search(line):
+            body = VERIFY.sub(" ", _clean(line))
+            if PROD_WRITE.search(re.sub(r"\(manual,[^)]*\)", " ", body)):
+                missing = [w for w, ok in (("an owner:", owner), ("a Risks line", _risk_names(risks, tid))) if not ok]
+                if missing:
+                    out.append(f"Prod write: {tid} is a manual prod task that writes to prod without "
+                               + " and ".join(missing) + ". It needs an owner, the user's yes and a Risks line.")
     out.append(f"Lint: {len(out)} problem{'s' if len(out) != 1 else ''}.")
     return out
 
 
 REVIEWED = re.compile(r"^(Reviewed:\s*[^,\n]+,\s*P#\s*open:\s*)(\d+)\s*$", re.M)
+
+
+def open_for_review(items: list[dict]) -> int:
+    """Open plan P# for the Reviewed line: housekeeping rows never count (1.197.0)."""
+    return len([i for i in items if i["tag"] == "plan" and i["status"] not in DONE and not _housekeeping(i)])
 
 
 def reviewed(root: Path, open_n: int, write: bool) -> str:
@@ -675,7 +733,8 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--root", required=True)
     p = sub.add_parser("reviewed")
     p.add_argument("--root", required=True)
-    p.add_argument("--open", required=True, type=int)
+    p.add_argument("--open", type=int, help="open plan P#; or pass --items to count them without housekeeping")
+    p.add_argument("--items")
     p.add_argument("--write", action="store_true")
     args = parser.parse_args(argv)
     try:
@@ -697,7 +756,13 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "lint":
             text = "\n".join(lint_lines(_root(args.root))) + "\n"
         else:
-            text = reviewed(_root(args.root), args.open, args.write)
+            if args.items:
+                open_n = open_for_review(_items(args.items))
+            elif args.open is not None:
+                open_n = args.open
+            else:
+                raise PlanCheckError("reviewed needs --open <n> or --items <file>")
+            text = reviewed(_root(args.root), open_n, args.write)
     except PlanCheckError as exc:
         print(str(exc), file=sys.stderr)
         return 2

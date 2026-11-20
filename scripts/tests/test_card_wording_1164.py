@@ -175,7 +175,9 @@ class LiveRunCards(unittest.TestCase):
 
     def test_record_and_playbook_guidance(self):
         steps = (SKILLS / "crav1-tighten-and-plan-ready-to-build/references/steps.md").read_text(encoding="utf-8")
-        self.assertIn("Card: Save the ready check as done?", steps)
+        # 1.197.0: the ready check is recorded with no card; the fallback example is another step.
+        self.assertIn("Card: Save the architecture review as done?", steps)
+        self.assertNotIn("Card: Save the ready check as done?", steps)
         progress = (SKILLS / "crav1-tighten-and-plan-ready-to-build/references/progress.md").read_text(encoding="utf-8")
         self.assertIn("Card: Skip redoing the plan review?", progress)
         playbook = (SKILLS / "crav1-tighten-and-plan-ready-to-build/references/playbook.md").read_text(encoding="utf-8")

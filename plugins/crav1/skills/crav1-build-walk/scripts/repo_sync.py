@@ -485,7 +485,7 @@ def cmd_push(args: argparse.Namespace) -> int:
     return emit(result, 0 if result.get("ok") else 2)
 
 
-def code_behind(repo: Path, do_fetch: bool = True) -> dict:
+def code_behind(repo: Path, do_fetch: bool = True, work_branch: str | None = None, task: str | None = None) -> dict:
     """Is the code branch behind origin before a build? (1.182.0)
 
     {"state": "in-step" | "behind" | "diverged" | "ahead" | "no-upstream" |
@@ -519,12 +519,16 @@ def code_behind(repo: Path, do_fetch: bool = True) -> dict:
     if behind:
         out.update(state="behind", stop=True,
                    line=f"{branch} is {commits} behind {upstream}. The build waits for your choice.",
-                   card={"question": f"{branch} is {commits} behind {upstream}. Fast-forward it before the build?",
+                   # 1.197.0: say it is local and nothing is pushed.
+                   card={"question": f"Your local {branch} in {root.name} is {commits} behind {upstream}. Update it locally before the build?",
                          "words": ["fast-forward", "stop"], "recommended": "fast-forward",
                          "options": [
-                             {"word": "fast-forward", "label": f"Fast-forward to {upstream} (Recommended)",
-                              "action": "git merge --ff-only, then build"},
-                             {"word": "stop", "label": "Stop", "action": "build nothing; the branch stays as it is"}]},
+                             {"word": "fast-forward", "label": f"Update local {branch} (Recommended)",
+                              "action": "git merge --ff-only, then build",
+                              "result": (f"Fast-forwards your local {branch} to {upstream} (git merge --ff-only). Nothing is pushed. "
+                                         f"Then cuts {work_branch or 'the work branch'} from it and builds {task or 'the task'}.")},
+                             {"word": "stop", "label": "Stop", "action": "build nothing; the branch stays as it is",
+                              "result": "Builds nothing; your local branch stays as it is."}]},
                    ending=("Run next:\n\nFast-forward the code branch, which is behind origin:\n"
                            f"`repo_sync.py code-behind --repo {repo} --yes`"))
         return out
@@ -533,7 +537,8 @@ def code_behind(repo: Path, do_fetch: bool = True) -> dict:
 
 
 def cmd_code_behind(args: argparse.Namespace) -> int:
-    status = code_behind(Path(args.repo), do_fetch=not args.no_fetch)
+    status = code_behind(Path(args.repo), do_fetch=not args.no_fetch,
+                         work_branch=getattr(args, "branch", None), task=getattr(args, "task", None))
     if not args.yes or status.get("state") != "behind":
         return emit(status)
     root = find_repo(Path(args.repo))
@@ -542,7 +547,7 @@ def cmd_code_behind(args: argparse.Namespace) -> int:
         return emit({"ok": False, "code": "not-fast-forward", "state": "behind",
                      "line": f"{status['branch']} could not be fast-forwarded to {status['upstream']}. Nothing was changed."}, 2)
     return emit({"ok": True, "state": "in-step", "fast_forwarded": True, "behind": 0, "ahead": 0,
-                 "line": f"Fast-forwarded {status['branch']} to {status['upstream']}."})
+                 "line": f"Fast-forwarded your local {status['branch']} to {status['upstream']}. Nothing was pushed."})
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -590,6 +595,8 @@ def main(argv: list[str] | None = None) -> int:
     cb.add_argument("--repo", required=True)
     cb.add_argument("--no-fetch", action="store_true")
     cb.add_argument("--yes", action="store_true")
+    cb.add_argument("--branch", help="the work branch the build cuts from it, for the card's result line")
+    cb.add_argument("--task", help="the T# the build starts with, for the card's result line")
     cb.set_defaults(func=cmd_code_behind)
 
     args = parser.parse_args(argv)

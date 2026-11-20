@@ -21,3 +21,7 @@ Spec, plan, and tasks remain the source of truth. The progress file does not. A 
 Do not run `/crav1-build-tasks`, `/crav1-build-features`, `/crav1-verify-build-against-spec`, or `/crav1-fix-build-gaps`. This walk never writes `verify.md`. Do not create a git commit. The playbook copy under `docs/playbooks/` is a file write inside apply, not a git commit.
 
 **Fewer reads (1.164.0).** `start` and `resume` return `read`, the one reference the next step needs: `references/playbook.md`, `references/steps.md`, or `references/readiness.md`. Open only that file. Do not open `progress.md`, `playbook.md`, or `steps.md` when `read` does not name them; `progress.md` is only for a stop or a clear.
+
+**Proposed, not done (1.197.0).** Before a card, describe each change as proposed: `would update the plan's Risks and Trace lines`. Never write `I've updated`, `I changed` or `updated` for an edit that waits on the card's yes. Say what was done only after the yes, once the edit is written.
+
+**One start call (1.197.0).** `start` already syncs the specs repo and, when the spec was found by its playbook name, reads that playbook's status (`playbook`, `playbook_status`). Do not run `start` again with `--playbook`, and do not run `repo_sync.py status` yourself.
