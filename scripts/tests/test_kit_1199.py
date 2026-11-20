@@ -6,6 +6,7 @@ Generic fixtures only (orders-api, contoso, person A).
 from __future__ import annotations
 
 import importlib.util
+import os
 import json
 import sys
 import tempfile
@@ -324,3 +325,53 @@ class ReadyCheckWaits(unittest.TestCase):
         self.wp.fill_merge_prs(None, rows, {"T28": 85})
         self.assertEqual(self.wp.merge_wait_lines(rows), ["Waiting: PR 85 to merge, then T28, T37 and T39 are ticked."])
         self.assertEqual(rows[1]["reason"], "waits for PR 85 to merge")
+
+
+class OtherBranchPrNumber(unittest.TestCase):
+    """Item 8 follow-up: someone else's verified branch names its PR when a local file knows it."""
+
+    def folder(self, spec_branch="- Branch: feat/orders-keys\n", task_note="", progress_pr=""):
+        root = Path(tempfile.mkdtemp()) / "docs" / "specs" / "orders-api"
+        root.mkdir(parents=True)
+        (root / "spec.md").write_text("# Orders API\n\n## Problem\n\nx\n\n## Match\n\n" + spec_branch, encoding="utf-8")
+        (root / "plan.md").write_text("# Plan\n\nReviewed: 2026-11-19, P# open: 0\n", encoding="utf-8")
+        (root / "tasks.md").write_text(
+            "# Tasks\n\n- [ ] T13 Add the export endpoint (branch: feat/orders-export)\n"
+            f"- [ ] T28 Separate keys for orders (branch: feat/orders-keys){task_note}\n"
+            "- [ ] T37 Separate keys for billing (branch: feat/orders-keys)\n"
+            "- [ ] T39 Separate keys for audit (branch: feat/orders-keys)\n", encoding="utf-8")
+        (root / "claims.md").write_text(
+            "# Claims\n\nIn progress: feat/orders-keys, T28, person B, since 2026-11-19T09:00:00+01:00\n"
+            "In progress: feat/orders-keys, T37, person B, since 2026-11-19T09:00:00+01:00\n"
+            "In progress: feat/orders-keys, T39, person B, since 2026-11-19T09:00:00+01:00\n", encoding="utf-8")
+        (root / "verify.md").write_text(
+            "# Verify\n\n| Task | Name | Status |\n| --- | --- | --- |\n"
+            + "".join(f"| {t} | keys | Implemented, verified, tick pending |\n" for t in ("T28", "T37", "T39")), encoding="utf-8")
+        (root / "build-progress").mkdir()
+        (root / "build-progress/feat--orders-keys.md").write_text(
+            "# Build progress\n\nBranch: feat/orders-keys\nOwner: person B\nTasks: T28, T37, T39\n\n"
+            "- Step: build T28, T37, T39\n  Done: 2026-11-19\n  Result: done\n" + progress_pr, encoding="utf-8")
+        return root
+
+    def ending(self, root):
+        env = dict(os.environ, CRAV1_NO_HOST_LOOKUP="1")
+        proc = subprocess.run([sys.executable, str(WALK), "readiness", "--root", str(root), "--user", "person A", "--skip-sync"],
+                              capture_output=True, text=True, env=env)
+        return json.loads(proc.stdout)["ending"]
+
+    def test_match_branch_line(self):
+        text = self.ending(self.folder(spec_branch="- Branch: feat/orders-keys (PR 91)\n"))
+        self.assertIn("Waiting: PR 91 to merge, then T28, T37 and T39 are ticked.", text)
+        self.assertIn("verified on feat/orders-keys by person B, waits for PR 91 to merge", text)
+
+    def test_task_note(self):
+        text = self.ending(self.folder(task_note=" (PR 91)"))
+        self.assertIn("Waiting: PR 91 to merge, then T28, T37 and T39 are ticked.", text)
+
+    def test_any_authors_progress_log(self):
+        text = self.ending(self.folder(progress_pr="- Step: open-pr\n  Done: 2026-11-19\n  Result: done (PR 91)\n"))
+        self.assertIn("PR 91 to merge", text)
+
+    def test_unknown_keeps_wording(self):
+        text = self.ending(self.folder())
+        self.assertIn("Waiting: the pull request to merge, then T28, T37 and T39 are ticked.", text)

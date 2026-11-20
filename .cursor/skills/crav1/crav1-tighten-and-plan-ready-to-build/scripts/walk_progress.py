@@ -3984,10 +3984,14 @@ def fill_merge_prs(root: Path | None, rows: list[dict], opened: dict | None = No
     except Exception:  # noqa: BLE001
         built = {}
     waits = [row for row in rows if isinstance(row.get("merge_wait"), dict)]
+    if not waits:
+        return
+    known = branch_pr_numbers(root) if any(not row["merge_wait"].get("pr") for row in waits) else {"tasks": {}, "branches": {}}
     for row in waits:
         if not row["merge_wait"].get("pr"):
             task = row.get("task")
-            row["merge_wait"]["pr"] = opened.get(task) or (built.get(task) or {}).get("pr")
+            row["merge_wait"]["pr"] = (known["tasks"].get(task) or known["branches"].get(row["merge_wait"].get("branch"))
+                                       or opened.get(task) or (built.get(task) or {}).get("pr"))
     by_branch = {row["merge_wait"]["branch"]: row["merge_wait"]["pr"] for row in waits
                  if row["merge_wait"].get("pr") and row["merge_wait"].get("branch")}
     for row in waits:
@@ -3999,6 +4003,58 @@ def fill_merge_prs(root: Path | None, rows: list[dict], opened: dict | None = No
         reason = str(row.get("reason") or "")
         if "waits for its pull request to merge" in reason:
             row["reason"] = reason.replace("waits for its pull request to merge", f"waits for PR {pr} to merge")
+
+
+_PR_NOTE = re.compile(r"\(PR\s+#?(\d+)\b", re.I)
+
+
+def branch_pr_numbers(root: Path | None) -> dict:
+    """A branch's pull request number from local files, read-only (1.199.0).
+
+    The same places pr-status reads: the spec's Match `Branch:` line
+    `(PR n)`, a task's `(PR n)` note in tasks.md (that task, and its
+    `(branch: X)` branch), and any author's build-progress log for the
+    branch. {"branches": {branch: n}, "tasks": {"T5": n}}. No host call.
+    """
+    out: dict = {"branches": {}, "tasks": {}}
+    if root is None or not Path(root).is_dir():
+        return out
+    mod = map_mod()
+    try:
+        spec = (Path(root) / "spec.md").read_text(encoding="utf-8")
+    except OSError:
+        spec = ""
+    for line in spec.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("- "):
+            stripped = stripped[2:].strip()
+        if not stripped.lower().startswith("branch:"):
+            continue
+        match = _PR_NOTE.search(stripped)
+        token = mod.branch_token(re.sub(r"\([^)]*\)", " ", stripped.split(":", 1)[1]))
+        if match and token:
+            out["branches"].setdefault(token, int(match.group(1)))
+    try:
+        tasks = (Path(root) / "tasks.md").read_text(encoding="utf-8")
+    except OSError:
+        tasks = ""
+    for num, rest in _task_rests(tasks).items():
+        match = _PR_NOTE.search(rest or "")
+        if not match:
+            continue
+        out["tasks"][f"T{num}"] = int(match.group(1))
+        for mark in re.finditer(r"\((?:branch|map):\s*([^)]+)\)", rest, re.I):
+            token = mod.branch_token(mark.group(1))
+            if token:
+                out["branches"].setdefault(token, int(match.group(1)))
+    try:
+        walks = mod.progress_state(root) or {}
+    except Exception:  # noqa: BLE001 - a bad progress file must not hide the rows
+        walks = {}
+    for branch, walk in walks.items():
+        if walk.get("pr") and not walk.get("merged"):
+            out["branches"].setdefault(branch, int(walk["pr"]))
+    return out
 
 
 def progress_open_prs(root: Path | None) -> dict:
@@ -5327,6 +5383,7 @@ def ready_branches(root: Path) -> list[dict]:
     apply_claims(root, rows)
     apply_progress_waits(root, rows)
     apply_verified_on_branch(root, rows)
+    fill_merge_prs(root, rows)
     apply_loop_holds(root, rows)
     apply_release_gates(root, rows)  # 1.198.0: the build-walk ending uses this list
     resolve_kept = resolve_is_keep(root)
@@ -6187,6 +6244,7 @@ def _readiness(args: argparse.Namespace) -> None:
         apply_task_branches(root, rows)
         apply_progress_waits(root, rows)
         apply_verified_on_branch(root, rows)
+        fill_merge_prs(root, rows)  # 1.199.0: someone else's verified branch too
         loop_lines = apply_loop_holds(root, rows)
         deadlock_lines = apply_merge_deadlocks(rows)
         apply_walk_starts(root, rows, getattr(args, "user", None) or _git_user(root))
