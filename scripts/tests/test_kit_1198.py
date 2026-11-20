@@ -275,3 +275,83 @@ class SmallFixes(unittest.TestCase):
         self.assertIn("Quote every `--query` value", read(ROOT / "docs/reference/pr-common.md"))
         self.assertIn("Your own prose has no `Next:` line", read(SK / "crav1-build-walk/references/common.md"))
         self.assertIn("--code-repo <code checkout>", read(SK / "crav1-pr-status/references/since-last.md"))
+
+
+WP = SK / "crav1-tighten-and-plan-ready-to-build/scripts/walk_progress.py"
+BM = SK / "crav1-tasks-ready-to-build/scripts/build_map.py"
+WE = SK / "crav1-tasks-ready-to-build/scripts/walk_ending.py"
+
+
+class ReadyCheckEnding(unittest.TestCase):
+    """Item 8: ready-check ending fixes."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.wp = load(WP, "walk_progress_t1198")
+
+    def test_a_hard_hit_is_named_with_the_ready_tasks(self):
+        hits = [{"task": "T12", "bucket": "blocked", "kind": "blocked",
+                 "why": "The queue name is not decided. The walk does not invent a step for this."},
+                {"task": "T20", "bucket": "waiting", "kind": "waiting", "why": "x"}]
+        line = self.wp.hard_hit_line("not-ready", hits, ["T3", "T4", "T5", "T6"])
+        self.assertEqual(line, "Not ready: T12 is blocked (the queue name is not decided). "
+                               "T3, T4, T5 and T6 can start once that is cleared.")
+        self.assertIsNone(self.wp.hard_hit_line("not-ready", hits, []))
+        self.assertIsNone(self.wp.hard_hit_line("ready-partial", hits, ["T3"]))
+
+    def test_b_own_pushed_task_waits_for_its_merge(self):
+        rows = [{"task": "T30", "own_claim": True, "own_pr_open": 85, "bucket": "ready"}]
+        self.assertEqual(self.wp.own_claim_line(rows), "T30 is yours and waits for PR 85's merge.")
+        with tempfile.TemporaryDirectory() as tmp:
+            folder = Path(tmp) / "build-progress"
+            folder.mkdir()
+            (folder / "feat--orders-retry.md").write_text(
+                "# Build progress\n\nBranch: feat/orders-retry\nOwner: self\nTasks: T30\n\n"
+                "- Step: build T30\n  Done: 2026-11-20\n  Result: done\n"
+                "- Step: open-pr\n  Done: 2026-11-20\n  Result: done (PR 85)\n", encoding="utf-8")
+            self.assertEqual(self.wp.progress_open_prs(Path(tmp)), {"T30": 85})
+            (folder / "feat--orders-retry.md").write_text(
+                (folder / "feat--orders-retry.md").read_text() + "- Step: merge-pr\n  Done: 2026-11-21\n  Result: done\n")
+            self.assertEqual(self.wp.progress_open_prs(Path(tmp)), {})
+
+    def test_c_resume_names_who_and_needs_questions(self):
+        questions = [{"task": "T26", "reason": 'open question "Which queue?"', "who": "person A", "asked": True},
+                     {"task": "T33", "reason": 'open question "Which region?"', "who": "the project team (owners)", "asked": True}]
+        _line, nxt = self.wp._waiting_lines(questions, "orders-api")
+        entry = self.wp._run_from_clause(nxt)
+        self.assertTrue(entry.startswith("Resume the walk when the answers from person A and the project team arrive:"), entry)
+        approvals = [{"task": "T5", "reason": "approval needed \"go live\"", "approval": True, "asked": True}]
+        _line, nxt = self.wp._waiting_lines(approvals, "orders-api")
+        self.assertNotIn("answers", nxt or "")
+
+    def test_d_record_without_card_when_only_waits(self):
+        wp = load(WP, "walk_progress_t1198d")
+        wp.load = lambda root: {"steps": {"tasks-ready-to-build": {"result": "ready-partial"}}}
+        with tempfile.TemporaryDirectory() as tmp:
+            waits = [{"kind": "waiting", "task": "T26"}, {"kind": "blocker", "merge": True, "task": "T30"}]
+            self.assertEqual(wp.record_quiet(Path(tmp), "not-ready", waits), "Recorded: not-ready (was ready-partial).")
+            self.assertIsNone(wp.record_quiet(Path(tmp), "not-ready", waits + [{"kind": "blocked", "task": "T12"}]))
+            self.assertIsNone(wp.record_quiet(Path(tmp), "ready-partial", waits))
+
+    def test_e_repeated_question_once_and_cut(self):
+        bm = load(BM, "build_map_t1198")
+        question = ("Which storage account holds the retry queue for orders-api, given that the shared one is "
+                    "being retired next quarter, and who approves the move to the new one?")
+        built = {"branches": [{"name": "feat/orders-retry", "section": "wave", "wave": 1,
+                               "tasks": [{"id": 26, "title": "Retry queue"}, {"id": 33, "title": "Retry alerts"}]}]}
+        rows = [{"task": "T26", "bucket": "waiting", "held": True, "who": "person A", "reason": f'open question "{question}"'},
+                {"task": "T33", "bucket": "waiting", "held": True, "who": "person A", "reason": f'open question "{question}"'}]
+        report = bm.report_by_branch(built, rows)
+        text = "\n".join(report["held_lines"])
+        self.assertEqual(text.count("Which storage account"), 1, text)
+        self.assertIn("same question as T26", text)
+        first = next(line for line in text.splitlines() if "T26" in line)
+        self.assertLess(len(first.split('"')[1]), 125)
+
+    def test_f_build_map_only_change_label(self):
+        we = load(WE, "walk_ending_t1198")
+        block = we.catch_up_block("orders-api", uncommitted=["docs/specs/orders-api/build-map.md"])
+        self.assertIn("Commit the updated build map:", block)
+        self.assertNotIn("changed spec file", block)
+        block = we.catch_up_block("orders-api", uncommitted=["docs/specs/orders-api/build-map.md", "docs/specs/orders-api/tasks.md"])
+        self.assertIn("Commit the 2 changed spec files:", block)

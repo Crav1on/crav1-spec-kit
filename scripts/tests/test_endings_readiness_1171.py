@@ -206,7 +206,8 @@ class ReadinessReadsProgress(unittest.TestCase):
     def test_own_claim_line_is_plain(self):
         rows = [{"task": "T5", "own_claim": True, "merge_wait": {"pr": 71, "owner": "self"}, "bucket": "waiting"},
                 {"task": "T7", "own_claim": True, "bucket": "ready"}]
-        self.assertEqual(wp.own_claim_line(rows), "T7 is yours; the walk resumes it.")
+        # 1.198.0: your own pushed task names its merge wait.
+        self.assertEqual(wp.own_claim_line(rows), "T5 is yours and waits for PR 71's merge. T7 is yours; the walk resumes it.")
         self.assertIn("`T5 is yours; the walk resumes it.`", read("crav1-tighten-and-plan-ready-to-build/references/readiness.md"))
 
 
