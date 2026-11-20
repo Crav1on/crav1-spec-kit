@@ -70,3 +70,7 @@ Before the review findings are walked, run `lint`. Each `Prod verify:` line beco
 ## Housekeeping with no card (1.196.0)
 
 Housekeeping fixes are applied with no card: Trace rows for cited constraints, missing marks, merged-state wording ("until PR 71 merges" after it merged), Risks that name merged pull requests or finished claims, a stale Linter line, and the build-map refresh. Set `"housekeeping": true` on those rows in the items file; `batch` leaves them off the card and prints one line, `Applied with no card (housekeeping): P7 Trace row for the retry constraint; P14 missing mark.` Apply them, then say that line. Cards are only for intent changes: adding, removing or reordering tasks, changing a verify check, a new risk or constraint, and anything that touches prod.
+
+## Card labels (1.196.0)
+
+Cards follow **Walk card rules** in `crav1-docs/reference/question-cards.md`: plain option names (the `batch` command maps catalog ids such as `park-risk` or `add-regression` to words), one background bullet per item above a batch card, a short question and an `On yes:` line. A single card names the task in its own words and quotes the evidence in a bullet above it. `suggest` is offered only for a wording finding. Typed answers may still use the ids.

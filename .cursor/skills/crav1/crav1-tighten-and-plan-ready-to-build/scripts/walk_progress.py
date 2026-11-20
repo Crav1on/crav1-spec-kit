@@ -222,8 +222,8 @@ JUMP = {
 TIGHTEN_SPEC_PATH = "../crav1-tighten-spec/SKILL.md"
 CONTINUE_JUMP = "plan-from-spec, review-and-tighten-plan, tasks-ready-to-build"
 CONTINUE_POINT = "review-and-tighten-plan, tasks-ready-to-build"
-JUMP_CHOICE = "run /crav1-tighten-spec on just that finding now (Recommended)"
-POINT_CHOICE = "keep it as an open point and continue"
+JUMP_CHOICE = "Fix it in the spec first (Recommended)"
+POINT_CHOICE = "Keep it as an open point and go on"
 FINDING_ID = re.compile(r"^P[1-9][0-9]*$")
 JUMP_RESULTS = {"jumped", "open-point", "already-fixed"}
 # The owner of a spec finding (1.194.0). A finding about code the spec has not
@@ -231,7 +231,17 @@ JUMP_RESULTS = {"jumped", "open-point", "already-fixed"}
 # new PR comments) is /crav1-add-to-spec's. Wording, structure, diagrams and
 # constraints stay /crav1-tighten-spec's, which is also the default when unclear.
 ADD_TO_SPEC_PATH = "../crav1-add-to-spec/SKILL.md"
-ADD_CHOICE = "run /crav1-add-to-spec on just that finding now (Recommended)"
+ADD_CHOICE = "Record the code in the spec first (Recommended)"
+# Plain labels for walk cards (1.196.0): no letters, no internal ids. Plan and spec
+# resolution ids map through LABELS in crav1-tighten-plan/scripts/batch_offer.py.
+PLAIN_LABELS = {
+    "tighten-spec": JUMP_CHOICE,
+    "add-to-spec": ADD_CHOICE,
+    "open-point": POINT_CHOICE,
+    "review-now": "Review the plan as it is",
+    "rerun": "Redo the step",
+    "nothing new": "Skip redoing the step",
+}
 FINDING_KINDS = ("code-drift", "spec-text")
 DRIFT_WORDS = re.compile(
     r"(?i)\b(?:merged?|unrecorded|not recorded|has not recorded|hasn't recorded|not in the spec yet|"
@@ -2625,6 +2635,8 @@ def reopen_card(step: str, drift: list[str], recommend_rerun: bool, stale_seen: 
         "background": f"{name[:1].upper()}{name[1:]} reopened because {said}.",
         "question": f"Skip redoing {name}?",
         "options": options,
+        "result": (f"On yes: {name} runs again on the current files." if options[0]["id"] == "rerun"
+                   else f"On yes: {name} stays done and the walk goes on."),
     }
 
 
@@ -6548,6 +6560,7 @@ def _jump_back_offer(fid: str, owner: str = "tighten-spec", command: str = "/cra
         "command": command,
         "background": f"{fid} is about the spec, not the plan.",
         "question": f"Fix {fid} in the spec now, before the plan goes on?",
+        "result": f"On yes: {command} runs for {fid} only, then the walk goes on with the plan.",
         "options": [
             first,
             {"id": "open-point", "label": POINT_CHOICE, "recommended": False,
@@ -6899,10 +6912,11 @@ def code_drift(args: argparse.Namespace) -> None:
         "path": ADD_TO_SPEC_PATH,
         "background": f"The spec's record is behind the code: {what}.",
         "question": "Record those code changes in the spec before the plan review?",
+        "result": f"On yes: {command} records them, then the plan is updated and reviewed.",
         "options": [
-            {"id": "add-to-spec", "label": f"run {command} first (Recommended)", "recommended": True,
+            {"id": "add-to-spec", "label": "Record the code changes first (Recommended)", "recommended": True,
              "text": f"Open {command} now, then update the plan for what it changed and start the plan review. Why: the review then reads a current spec."},
-            {"id": "review-now", "label": "review the plan as it is", "recommended": False,
+            {"id": "review-now", "label": PLAIN_LABELS["review-now"], "recommended": False,
              "text": "Start the plan review now; the spec stays behind the code and the walk names add-to-spec at the end."},
         ],
         "reviewer_note": f"Known and already offered: {what}. Do not report it as a new finding.",

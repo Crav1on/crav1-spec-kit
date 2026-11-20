@@ -56,7 +56,7 @@ class Owner(unittest.TestCase):
         self.assertEqual(out["command"], "/crav1-add-to-spec pr73")
         first = out["options"][0]
         self.assertEqual(first["id"], "add-to-spec")
-        self.assertIn("/crav1-add-to-spec", first["label"])
+        self.assertEqual(first["label"], "Record the code in the spec first (Recommended)")
         self.assertIn("/crav1-add-to-spec pr73", first["text"])
         self.assertNotIn("tighten-spec", first["label"] + first["text"])
         self.assertEqual(out["path"], "../crav1-add-to-spec/SKILL.md")
@@ -71,7 +71,7 @@ class Owner(unittest.TestCase):
             code, out = run(args)
             self.assertEqual(out["owner"], "tighten-spec", text)
             self.assertEqual(out["options"][0]["id"], "tighten-spec")
-            self.assertIn("/crav1-tighten-spec", out["options"][0]["label"])
+            self.assertEqual(out["options"][0]["label"], "Fix it in the spec first (Recommended)")
 
     def test_kind_hint_routes_a_plain_finding(self):
         root = slice_dir(SPEC_OLD)

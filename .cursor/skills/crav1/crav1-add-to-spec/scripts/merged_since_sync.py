@@ -199,7 +199,8 @@ def check(spec_text: str, repo: str, base: str | None = None, pr: str | None = N
     noun = "commit" if first["commits"] == 1 else "commits"
     question = f"{who} merged at {first['merge']} with {first['commits']} {noun} the spec hasn't recorded. Take them in now?"
     command = f"/crav1-add-to-spec pr{first['pr']}" if first["pr"] else f"/crav1-add-to-spec {first['branch']}"
-    out.update({"status": "merged", "merged": first, "question": question, "command": command})
+    out.update({"status": "merged", "merged": first, "question": question, "command": command,
+                "result": f"On yes: {command} takes the commits in and Synced at moves to {first['merge']}."})
     if headless:
         out["report"] = question.replace(" Take them in now?", "") + f" Run {command} to take them in."
         return out

@@ -91,12 +91,14 @@ class BatchOffer(unittest.TestCase):
         table, card = text.split("\n\n", 1)
         self.assertLess(text.index("| P4 |"), text.index("Card:"))
         self.assertIn("| Id | Issue | Options | Recommendation |", table)
-        self.assertIn("| P4 | tasks miss the 400 path | A add a test; B keep | A add a test |", table)
-        self.assertIn("| P11 | the empty list is already covered | A add a test; keep | keep |", table)
+        # 1.196.0: plain labels, bullets above the card, a short question and a result-on-yes line.
+        self.assertIn("| P4 | tasks miss the 400 path | add a test; keep as written | add a test |", table)
+        self.assertIn("| P11 | the empty list is already covered | add a test; keep as written | keep as written |", table)
+        self.assertIn("- P4 tasks miss the 400 path. Yes: add a test.", card)
         self.assertIn(
-            "Card: Tighten-plan batch. Yes applies every recommendation: "
-            "P4 tasks miss the 400 path: A add a test; "
-            "P11 the empty list is already covered: keep.",
+            "Card: Tighten-plan batch: apply all 2 recommendations?\nOn yes: "
+            "P4 tasks miss the 400 path: add a test; "
+            "P11 the empty list is already covered: keep as written.",
             card,
         )
         self.assertNotIn("table above", text.lower())
@@ -105,7 +107,7 @@ class BatchOffer(unittest.TestCase):
     def test_card_text_reads_only_the_table_that_was_passed(self):
         table = offer.render_table(ROWS[:1])
         card = offer.card_text("Tighten-plan batch", table)
-        self.assertIn("P4 tasks miss the 400 path: A add a test", card)
+        self.assertIn("P4 tasks miss the 400 path: add a test", card)
         self.assertNotIn("P11", card)
 
     def test_cli_without_items_prints_no_card(self):
@@ -129,7 +131,7 @@ class BatchOffer(unittest.TestCase):
             )
         self.assertEqual(proc.returncode, 0, proc.stderr)
         self.assertTrue(proc.stdout.startswith("| Id | Issue | Options | Recommendation |"))
-        self.assertIn("P4 tasks miss the 400 path: A add a test", proc.stdout)
+        self.assertIn("P4 tasks miss the 400 path: add a test", proc.stdout)
         self.assertLess(proc.stdout.index("| P4 |"), proc.stdout.index("Card:"))
 
     def test_cli_empty_list_exits_without_a_card(self):
@@ -180,14 +182,14 @@ class BatchOffer(unittest.TestCase):
 
     def test_the_shared_rule_names_the_command_and_the_example(self):
         page = (ROOT / "docs/reference/question-cards.md").read_text(encoding="utf-8")
-        self.assertIn("P4 tasks miss the 400 path: A add a test", page)
+        self.assertIn("P4 tasks miss the 400 path: add a test", page)
         self.assertIn(
             '<interpreter> -X utf8 <skill crav1-tighten-plan>/scripts/batch_offer.py --title "Tighten-plan batch" --items <file>',
             page,
         )
         self.assertIn("immediately before the card", page)
         skill = (ROOT / ".cursor/skills/crav1/crav1-tighten-plan/SKILL.md").read_text(encoding="utf-8")
-        self.assertIn("P4 tasks miss the 400 path: A add a test", skill)
+        self.assertIn("P4 tasks miss the 400 path: add a test", skill)
 
 
 if __name__ == "__main__":

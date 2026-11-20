@@ -64,9 +64,9 @@ For **only** the current plan `P#`:
 
 1. **Finding** — one or two sentences. Quote the plan/task line.
 2. **Why it matters** — verify-ability, extra scope, or silent spec decision.
-3. **Options** — 2–4 mutually exclusive **plan** resolutions, then **`suggest`**. Always keep `suggest`. Add `ask` / `keep` / `send-to-spec` when they fit.
+3. **Options** — 2–4 mutually exclusive **plan** resolutions, then `suggest` for wording findings only. Add `ask` / `keep` / `send-to-spec` when they fit.
 
-Every option: **letter**, **name**, **what changes**, **impact** (which `T#`s / files). Never add a product feature as a “fix.”
+Every option: plain **name**, **what changes**, **impact** (which `T#`s / files). Never add a product feature as a “fix.”
 
 4. How to answer: `A` / `B` / … or a batch: `P1 A, P3 C`. On the batch card that line is the free-text answer, not its own option. Unmentioned issues stay for later. A batch card follows **Batch (1.145.0)** below. Do not ask it from this menu.
 
@@ -87,7 +87,7 @@ Do **not** patch. Stay on this `P#`. Follow `references/issues.md` ("When they p
 
 Batch cap: 8; task changes get own cards; lint and prod verify: [issues.md](references/issues.md).
 
-**Batch (1.145.0).** Follow **Batch of several items** in `crav1-docs/reference/question-cards.md` before this card. Print the findings table in this reply, then ask: the `batch` command prints the table and the `Card:` line together. The card names each item and its recommendation, for example `P4 tasks miss the 400 path: A add a test`. Never write `table above` unless that table is in this reply. Never ask the card without the table. `yes (Recommended)` applies every recommendation. The card's free-text answer carries the hint `Type your changes, e.g. P1 A, P3 keep`. An item that answer does not mention keeps its recommendation. One issue at a time still works. Then patch, and give one recap for the run.
+**Batch (1.145.0).** Follow **Batch of several items** in `crav1-docs/reference/question-cards.md` before this card. Print the findings table in this reply, then ask: the `batch` command prints the table and the `Card:` line together. The card names each item and its recommendation, for example `P4 tasks miss the 400 path: add a test`. Never write `table above` unless that table is in this reply. Never ask the card without the table. `yes (Recommended)` applies every recommendation. The card's free-text answer carries the hint `Type your changes, e.g. P1 A, P3 keep`. An item that answer does not mention keeps its recommendation. One issue at a time still works. Then patch, and give one recap for the run.
 
 ## Resolution catalog (per plan issue)
 

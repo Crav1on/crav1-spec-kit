@@ -242,7 +242,7 @@ class FewerCards(unittest.TestCase):
         out = py(PLAN, "batch", "--items", self.items([self.row(1), self.row(7, issue="Trace row for the retry constraint", housekeeping=True),
                                                       self.row(14, issue="missing mark", housekeeping="mark")])).stdout
         self.assertIn("Applied with no card (housekeeping): P7 Trace row for the retry constraint; P14 missing mark.", out)
-        card = [l for l in out.splitlines() if l.startswith("Card:")][0]
+        card = [l for l in out.splitlines() if l.startswith("On yes:")][0]
         self.assertNotIn("P7", card)
         self.assertIn("P1", card)
 
@@ -264,6 +264,45 @@ class FewerCards(unittest.TestCase):
         self.assertIn("--covered <step>", read("crav1-tighten-and-plan-ready-to-build/references/progress.md"))
         self.assertIn("The save rides on the step's last yes", read("crav1-tighten-and-plan-ready-to-build/references/steps.md"))
         self.assertIn("## Housekeeping with no card (1.196.0)", read("crav1-tighten-plan/references/issues.md"))
+
+
+class CardRules(unittest.TestCase):
+    """Item 5: plain labels, bullets above batch cards, a short question and a result-on-yes line."""
+
+    def test_batch_offer_maps_letters_and_ids(self):
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("batch_offer_t1196", SK / "crav1-tighten-plan/scripts/batch_offer.py")
+        bo = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(bo)
+        self.assertEqual(bo.plain("A tick-from-verify; B keep"), "tick it from the passing verify row; keep as written")
+        self.assertEqual(bo.plain("A park-risk, B add-regression"), "note it as a risk, add a regression test")
+        text = bo.offer("Tighten-plan batch", [{"id": "P1", "issue": "no 400 test", "options": "A add-regression; keep",
+                                                "recommendation": "A add-regression", "why": "the spec names a 400 reply"}])
+        self.assertIn("- P1 no 400 test. Why: the spec names a 400 reply. Yes: add a regression test.", text)
+        self.assertIn("Card: Tighten-plan batch: apply the recommendation?\nOn yes: P1 no 400 test: add a regression test.", text)
+        for bad in ("tick-from-verify", "park-risk", "add-regression", "| A ", " A add"):
+            self.assertNotIn(bad, text)
+
+    def test_walk_cards_have_plain_labels_and_results(self):
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("walk_progress_t1196b", WALK)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        card = mod.reopen_card("review-and-tighten-plan", ["tasks"], True)
+        self.assertTrue(card["result"].startswith("On yes:"))
+        jump = mod._jump_back_offer("P9", "add-to-spec", "/crav1-add-to-spec pr73")
+        self.assertEqual(jump["options"][0]["label"], "Record the code in the spec first (Recommended)")
+        self.assertTrue(jump["result"].startswith("On yes: /crav1-add-to-spec pr73"))
+        for label in mod.PLAIN_LABELS.values():
+            self.assertNotIn("/crav1-", label)
+
+    def test_question_cards_rules(self):
+        page = (ROOT / "docs/reference/question-cards.md").read_text(encoding="utf-8")
+        self.assertIn("## Walk card rules (1.196.0)", page)
+        self.assertIn("On yes:", page)
+        self.assertIn("`suggest` only for wording findings", page)
+        self.assertIn("the meeting batch's fixed choice set", page)
+        self.assertIn("Offer **`suggest`** only for a wording finding", read("crav1-tighten-spec/SKILL.md"))
 
 
 if __name__ == "__main__":

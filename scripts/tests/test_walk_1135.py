@@ -23,8 +23,8 @@ FINDING = (
     "the plan requires a named person's yes to stop a prod function app, "
     "but the spec names no approver"
 )
-RECOMMENDED = "run /crav1-tighten-spec on just that finding now (Recommended)"
-OTHER = "keep it as an open point and continue"
+RECOMMENDED = "Fix it in the spec first (Recommended)"
+OTHER = "Keep it as an open point and go on"
 WAITING = (
     "Waiting: /crav1-verify-build-against-spec orders-api - "
     "verify.md is behind tasks.md (T2, T45)"
