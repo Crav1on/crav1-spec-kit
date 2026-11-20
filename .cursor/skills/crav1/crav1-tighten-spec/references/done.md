@@ -15,6 +15,24 @@ All remaining issues resolved **and**:
 
 Then stop the issue walk.
 
-If **Open questions** (or unresolved assumptions) remain: `Next: /crav1-resolve-open-questions, because open questions are still listed.` Not Plan Mode. That skill walks each question with keep-open vs answer.
+End with Run next first, the reason, then the label on its own line and the command alone in its code span (1.196.0). Never a `Next:` line.
 
-If the open-question list is empty: `Next: /crav1-plan-from-spec, because the spec is tight enough to plan.` A new chat in Plan Mode (`Shift+Tab`) with `spec.md` attached is the same step. Do not name the spec reviewer in the ending.
+If **Open questions** (or unresolved assumptions) remain. Not Plan Mode. That skill walks each question with keep-open vs answer:
+
+```text
+Run next:
+Open questions are still listed.
+
+Resolve the open questions:
+`/crav1-resolve-open-questions orders-api`
+```
+
+If the open-question list is empty. A new chat in Plan Mode (`Shift+Tab`) with `spec.md` attached is the same step. Do not name the spec reviewer in the ending:
+
+```text
+Run next:
+The spec is tight enough to plan.
+
+Plan from the spec:
+`/crav1-plan-from-spec orders-api`
+```

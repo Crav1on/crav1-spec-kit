@@ -97,7 +97,7 @@ Read `references/azure-devops.md` ("Azure DevOps (Merge)") only when the remote 
 
 ## Claims (1.158.0)
 
-This skill never writes, clears, commits or pushes `claims.md`. `/crav1-build-walk` clears its own claim after the merge; a standalone merge leaves `claims.md` as it is.
+After the merge went through (1.196.0), run `scripts/claims.py prune --root <spec-folder> --code-repo <code checkout> --base <Merges into>` in `crav1-build-walk` for each spec that names the merged branch, as `crav1-docs/reference/running-scripts.md` says. It has no card: it clears only finished claims (every task ticked, or the branch merged into `origin/<base>`) and prints one line, for example `Cleared 1 finished claim: T5 (PR 71).` Say that line as it is; say nothing when it prints none. It never touches an unfinished claim, yours or anyone's. This skill does not commit or push `claims.md`; the change rides on the next specs commit.
 
 ## Hard rules
 

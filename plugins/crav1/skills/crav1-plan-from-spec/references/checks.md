@@ -75,3 +75,7 @@ Smoke after deploy, chaos, and fuzzing for its own sake stay out. A **property**
 ## Branch loops (1.161.0)
 
 `plan_check.py order` lists branches that wait for each other as a `Branch loop:` line, with the fixes the ready check offers in plain words, the recommended one first. Never ask the user to edit `tasks.md` by hand. Show the recommended fix, and on the user's yes run `<interpreter> -X utf8 <skill crav1-tighten-and-plan-ready-to-build>/scripts/walk_progress.py fix-loop --root <spec-folder> --pick <n> --yes`. It writes the `(map:)` marks or drops the one wait in `tasks.md` and rebuilds `build-map.md`. Then run `order` again.
+
+## Prod verify (1.196.0)
+
+Verify checks run on DEV or TEST. On prod a verify note may only read: health, version, config, or that a resource exists. A check that writes to prod (posts a message, runs a job, loads data) is its own task, marked `prod-write` in its verify note, with `owner: <person>`, the user's yes before it runs, and a line under `## Risks` in plan.md naming its T#. Run `scripts/plan_check.py lint --root <spec-folder>` (see `crav1-docs/reference/running-scripts.md`); it flags any other prod verify and a prod-write task missing its owner or Risks line.

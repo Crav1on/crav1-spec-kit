@@ -118,6 +118,8 @@ Card: Skip redoing the plan review?
 - **Skip redoing the plan review (Recommended)** (`nothing new`): keep the plan review as done and go straight on to the ready check. Why: only branch tags were added to three tasks; no task text changed.
 - **Redo the plan review** (`rerun`): run the plan review again on the current files, then the walk goes on.
 
+**No card when a finding covers it (1.196.0).** When a step reopened only because of a fact this walk just recorded (for example the PR merge line add-to-spec wrote) and a finding already covers its effect, there is no reopen card. Run `readiness` with `--covered <step>`: that step is left out of `reopen_cards` and listed in `auto_clear` with one `auto_clear_line`. Run `clear --step <step> --yes` and say that line.
+
 **Stale seen (1.195.0).** When this walk saw anything stale (merged-since-sync offered `take-in`, code-drift was `behind`, or a stale research mark), run `readiness` with `--stale-seen`: every reopen card then recommends `rerun`, never `nothing new`.
 
 The background names the change in plain words, for example `The plan review only reopened because three tasks got a branch tag.` Never put stamps, `Done`, `Result`, step ids, or a command in the card.

@@ -349,5 +349,28 @@ class Tickable(unittest.TestCase):
         self.assertIn("**Tickable at the start (1.196.0).**", read("crav1-tighten-and-plan-ready-to-build/references/steps.md"))
 
 
+class Endings(unittest.TestCase):
+    """Item 7: the Catch up first layout and no Next: lines in tighten-spec."""
+
+    def test_catch_up_layout_from_the_script(self):
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("walk_ending_t1196", SK / "crav1-tasks-ready-to-build/scripts/walk_ending.py")
+        we = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(we)
+        block = we.catch_up_block("orders-api", uncommitted=["a.md", "b.md"])
+        lines = block.splitlines()
+        self.assertEqual(lines[0], "**Catch up first**")
+        i = lines.index("Commit the 2 changed spec files:")
+        self.assertEqual(lines[i + 1], "`/crav1-finalize-commit`")
+
+    def test_docs(self):
+        page = (ROOT / "docs/reference/run-ending.md").read_text(encoding="utf-8")
+        self.assertIn("Print the block as the script wrote it (1.196.0)", page)
+        done = read("crav1-tighten-spec/references/done.md")
+        self.assertNotIn("Next:", done)
+        self.assertIn("`/crav1-plan-from-spec orders-api`", done)
+        self.assertNotIn("crav1-tighten-spec/references/done.md", (ROOT / "scripts/next-line-baseline.tsv").read_text(encoding="utf-8"))
+
+
 if __name__ == "__main__":
     unittest.main()

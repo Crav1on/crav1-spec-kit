@@ -63,6 +63,19 @@ Before a ready-check or walk ending, the reply has at most one short lead senten
    Only the orphan row gives `Remove the T44 row (it is in verify.md but not in tasks.md):`, and only the behind tasks give `Check T4 and T7 against the spec:`. A not-ready ending puts the same block first, before its one next step.
 2. `Held:` lines, then `Branch runs:` status lines.
 3. For a branch run: `Built on <branch>:` (one line per task, with its commit and tests), then `Left:`.
+   Print the block as the script wrote it (1.196.0). Never retype it: the heading stays bold, `**Catch up first**`, each label is on its own line ending in a colon, and each command is alone in its code span on the next line. Wrong: `Catch up first` in plain text, or a bare `/crav1-finalize-commit` with no code span. Right:
+
+   ```text
+   Run next:
+
+   **Catch up first**
+
+   Commit the 5 changed spec files:
+   `/crav1-finalize-commit`
+   Then push the specs repo:
+   `git push`
+   ```
+
 4. `Loop:` and other `Waiting:` lines. Since 1.167.0 Waiting keeps only what you cannot act on now, such as a person's answer or a merge; verify-behind, orphan verify rows and an unpushed specs repo are the Catch up first block.
 5. The not-ready reason (only when it is not already the Run next line), at most the one-line `/crav1-build-tasks` alternative, notes, and `Uncommitted:`.
 6. A not-ready ready check starts its ending with `Run next:`, naming the first real next step (1.163.0): `/crav1-tighten-plan <slug>` when the plan was reopened for review, `/crav1-verify-build-against-spec <slug>` when verify.md is behind, or `git push` when the specs repo is ahead. Since 1.167.0 the verify and push steps come as the Catch up first block, not as a separate entry. Since 1.169.0 a task whose verify failed is `Fix T#:` with `/crav1-fix-build-gaps <slug> T#` in that block, and Needs verify alone never hides a ready branch (since 1.170.0 its `T# failed verify: <reason>.` line is one short sentence or two, never the whole Verify cell): with tasks that can start the result is ready-partial and their branch blocks follow the block. A build-walk ending, one task or a whole branch, never has a `Next:` line (1.157.0). It is only the Run next block first, then Built, Left, and Waiting. A wait that used to be the reason on a Next line is a `Waiting:` line.

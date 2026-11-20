@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 
 sys.dont_write_bytecode = True
@@ -33,6 +34,43 @@ def _utf8_stdout() -> None:
 _utf8_stdout()
 
 COLUMNS = ("id", "issue", "options", "recommendation")
+
+# Plain labels (1.196.0): no option letters and no internal resolution ids on a card.
+LABELS = {
+    "tick-from-verify": "tick it from the passing verify row",
+    "park-risk": "note it as a risk",
+    "add-regression": "add a regression test",
+    "add-verify": "add a verify check",
+    "add-cases": "add the missing cases",
+    "add-integration": "add an integration check",
+    "add-missing-path": "add the missing path",
+    "cover-security": "cover the security case",
+    "drop-scope": "drop it from scope",
+    "fix-trace": "add the Trace row",
+    "fix-loop": "break the dependency loop",
+    "retarget-files": "point the task at the right files",
+    "name-linter": "name the linter",
+    "send-to-spec": "fix it in the spec",
+    "split-task": "split the task",
+    "make-testable": "make it a yes/no check",
+    "cut-from-v0": "cut it from v0",
+    "to-constraint": "make it a constraint",
+    "to-adr": "record it as a decision",
+    "to-open-question": "leave it as an open question",
+    "mark-dropped": "mark the branch dropped",
+    "sync-here": "update the diagram or decision to match",
+    "keep": "keep as written",
+    "suggest": "get a suggestion",
+    "ask": "ask the owner",
+}
+_ID = re.compile(r"(?<![\w-])(" + "|".join(sorted((re.escape(k) for k in LABELS), key=len, reverse=True)) + r")(?![\w-])")
+
+
+def plain(text: str) -> str:
+    """One option or a list of options in plain words: drop A/B letters, map internal ids."""
+    text = " ".join(str(text).split())
+    text = re.sub(r"(^|[;,]\s*)[A-H]\s+(?=\S)", r"\1", text)
+    return _ID.sub(lambda m: LABELS[m.group(1)], text)
 HEADER = "| Id | Issue | Options | Recommendation |"
 RULE = "| --- | --- | --- | --- |"
 
@@ -61,7 +99,8 @@ def render_table(items: list) -> str:
         for key in COLUMNS:
             if key not in item:
                 raise BatchOfferError(f"missing {key}")
-            cells.append(_cell(item[key], key))
+            value = plain(item[key]) if key in ("options", "recommendation") else item[key]
+            cells.append(_cell(value, key))
         if cells[0] in seen:
             raise BatchOfferError(f"duplicate id {cells[0]}")
         seen.add(cells[0])
@@ -98,14 +137,30 @@ def card_text(title: str, table: str) -> str:
     if not rows:
         raise BatchOfferError("card text needs the findings table rows")
     parts = [f"{row['id']} {row['issue']}: {row['recommendation']}" for row in rows]
-    return f"{name}. Yes applies every recommendation: " + "; ".join(parts) + "."
+    n = len(rows)
+    what = "the recommendation" if n == 1 else f"all {n} recommendations"
+    return f"{name}: apply {what}?\nOn yes: " + "; ".join(parts) + "."
+
+
+def bullets(items: list) -> str:
+    """One background bullet per item, right above the card: what, why, what yes does (1.196.0)."""
+    lines = []
+    for item in items:
+        why = " ".join(str(item.get("why", "")).split())
+        yes = plain(item.get("recommendation", ""))
+        line = f"- {item['id']} {' '.join(str(item['issue']).split())}."
+        if why:
+            line += f" Why: {why.rstrip('.')}."
+        line += f" Yes: {yes}."
+        lines.append(line)
+    return "\n".join(lines)
 
 
 def offer(title: str, items: list) -> str:
-    """Table first, then the card line. The card is not returned without rows."""
+    """Table, the bullets, then the short card and its result-on-yes line. No card without rows."""
     table = render_table(items)
     card = card_text(title, table)
-    return table + "\n\nCard: " + card + "\n"
+    return table + "\n\n" + bullets(items) + "\n\nCard: " + card + "\n"
 
 
 def _load_items(path: str) -> list:
