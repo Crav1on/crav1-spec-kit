@@ -1,6 +1,6 @@
 # Tick pending
 
-**Spec acceptance boxes (1.195.0).** This skill never ticks an acceptance box in `spec.md`. When a check passed on the base branch and the box is still `- [ ]`, say so in the report; `/crav1-tighten-spec` ticks it through its `tick-from-verify` resolution, which quotes the passing row. That is the only owner.
+**Spec acceptance boxes (1.195.0).** This skill never ticks an acceptance box in `spec.md`. When a check passed on the base branch and the box is still `- [ ]`, say so in the report; `/crav1-tighten-spec` ticks it through its `tick-from-verify` resolution, which quotes the passing row. That is the only owner. Since 1.196.0 clear cases are ticked with no card by the walk's tickable check at the walk start, under that same rule.
 
 **Tick pending (1.136.0).** That status is not Not implemented. The reply's Run next skips every task the ready check already counts as done (ticked, or recorded merged) and names the first task that can start. `verify.md` has no `Next:` line (1.169.0). The open checkbox stays a Gap. After a passed check the tick offer sits inside Run next as a labelled step (1.180.0), never after the ending: `Tick T2 in tasks.md, recorded merged and verified:` above `verify_rows.py tick --file <spec-folder>/verify.md --task T2 --merged yes`, and a yes card. Tick that one row only after that yes. Do not re-implement. The state comes from `task_state.py`, the same owner the ready check and finalize-commit use. The tick entry comes before the entry for tasks that can start.
 

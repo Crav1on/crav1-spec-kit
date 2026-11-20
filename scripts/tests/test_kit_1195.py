@@ -321,7 +321,7 @@ class TightenRules(unittest.TestCase):
 
     def test_batch_caps_at_eight_and_keeps_task_changes_out(self):
         out = py(PLAN, "batch", "--items", self.items(12, {"P5"})).stdout
-        card = [l for l in out.splitlines() if l.startswith("Card:")][0]
+        card = [l for l in out.splitlines() if l.startswith("On yes:")][0]
         self.assertNotIn("P5 ", card)
         self.assertIn("P9 ", card)
         self.assertNotIn("P10 ", card)

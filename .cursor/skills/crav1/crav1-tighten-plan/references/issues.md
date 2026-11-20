@@ -60,3 +60,17 @@ Do **not** patch. Stay on this `P#`. Name the letter you would pick and why (2â€
 ## Batch size
 
 1.195.0. A batch card holds at most 8 findings; with more, the `batch` command prints the first 8 and names the rest for the next card, paced as `crav1-tighten-spec/references/pacing.md` does. A finding whose fix adds, removes or reorders tasks (a new `T#`, a dropped task, a moved dependency) sets `changes_tasks` in the items file and never goes in a yes-to-all card; it gets its own card, one at a time.
+
+## Prod verify (1.196.0)
+
+Verify checks run on DEV or TEST. On prod a verify note may only read: health, version, config, or that a resource exists. A check that writes to prod (posts a message, runs a job, loads data) is its own task, marked `prod-write` in its verify note, with `owner: <person>`, the user's yes before it runs, and a line under `## Risks` in plan.md naming its T#. Run `scripts/plan_check.py lint --root <spec-folder>` (see `crav1-docs/reference/running-scripts.md`); it flags any other prod verify and a prod-write task missing its owner or Risks line.
+
+Before the review findings are walked, run `lint`. Each `Prod verify:` line becomes a finding whose recommended fix moves the check to DEV/TEST and keeps only a read-only prod check; moving a prod write into its own task changes tasks, so it gets its own card.
+
+## Housekeeping with no card (1.196.0)
+
+Housekeeping fixes are applied with no card: Trace rows for cited constraints, missing marks, merged-state wording ("until PR 71 merges" after it merged), Risks that name merged pull requests or finished claims, a stale Linter line, and the build-map refresh. Set `"housekeeping": true` on those rows in the items file; `batch` leaves them off the card and prints one line, `Applied with no card (housekeeping): P7 Trace row for the retry constraint; P14 missing mark.` Apply them, then say that line. Cards are only for intent changes: adding, removing or reordering tasks, changing a verify check, a new risk or constraint, and anything that touches prod.
+
+## Card labels (1.196.0)
+
+Cards follow **Walk card rules** in `crav1-docs/reference/question-cards.md`: plain option names (the `batch` command maps catalog ids such as `park-risk` or `add-regression` to words), one background bullet per item above a batch card, a short question and an `On yes:` line. A single card names the task in its own words and quotes the evidence in a bullet above it. `suggest` is offered only for a wording finding. Typed answers may still use the ids.

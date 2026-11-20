@@ -22,13 +22,13 @@ When the questions tool is not available, the same reply still works: the recomm
 
 A batch card applies one yes to each of several items: plan findings (`P#`), spec issues (`I#`), open questions and conflict lines (`Q#`, `C#`), meeting items (`M#`), dump or code-change sort lines, a map of slices, test suggestions, flagged source lines, or images in a mail.
 
-Print a findings table in that same reply, immediately before the card. The card is never asked without it. Columns, in order: Id, Issue, Options, Recommendation. One row per item. The issue is one line. Options are the letters or words for that item. Recommendation is the choice `yes` will apply, such as `A add a test` or `keep`.
+Print a findings table in that same reply, immediately before the card. The card is never asked without it. Columns, in order: Id, Issue, Options, Recommendation. One row per item. The issue is one line. Options are plain words for that item, never letters or internal names (1.196.0). Recommendation is the choice `yes` will apply, such as `add a test` or `keep as written`.
 
-The card text is self-contained. It names every item as `<id> <one-line issue>: <recommendation>`, for example `P4 tasks miss the 400 path: A add a test`. It still makes sense if the table scrolled away. The question text is the `Card:` line from the command below. `yes (Recommended)` applies every recommendation on that line. A skill whose options are already **Accept all recommendations (Recommended)** and **Go through them one by one** keeps those labels. The question text still names every item. Typed changes stay on the card's free-text answer.
+The card text is self-contained. It names every item as `<id> <one-line issue>: <recommendation>`, for example `P4 tasks miss the 400 path: add a test`. It still makes sense if the table scrolled away. The question text is the `Card:` line from the command below, and the `On yes:` line under it is the card's result-on-yes. `yes (Recommended)` applies every recommendation on that line. A skill whose options are already **Accept all recommendations (Recommended)** and **Go through them one by one** keeps those labels. The question text still names every item. Typed changes stay on the card's free-text answer.
 
 Never write `table above`, `the table recommends`, or `as in the table` unless that table is in this reply. Do not use those phrases on the card. The card does not point at the table. It repeats each item. Never ask the card without the table.
 
-Build the table and the card with one command. Print its stdout in the reply. The table is the first part. The card question is the `Card:` line, word for word. If the command fails, or it prints no table, do not ask the card.
+Build the table and the card with one command. Print its stdout in the reply. The table is the first part, then one background bullet per item (what, why, what yes does), then the card. The card question is the `Card:` line, word for word. If the command fails, or it prints no table, do not ask the card.
 
 `<interpreter> -X utf8 <skill crav1-tighten-plan>/scripts/batch_offer.py --title "Tighten-plan batch" --items <file>`
 
@@ -62,3 +62,16 @@ Card: Should I add my work to their pull request?
 A script that prints a card uses the same shape: a `Card:` line, then numbered options, each with what happens.
 
 `scripts/kit-lint.py` reads only `Card:` lines and the option lines right under them, so prose is not checked. It flags a question with brackets, an option that does not say what happens, a Recommended option that is not first, a kit term from its short list, options listed inline instead of in a `Card:` block, a question with two question marks, and an option that corrects itself mid-sentence (1.190.0). Since 1.164.0 it checks the build walk, the two ready checks, and the four pull-request skills. Whether an option really says what happens still needs a person to read it.
+
+## Walk card rules (1.196.0)
+
+These hold for the cards inside the spec walk: tighten-spec, tighten-plan, tighten-and-plan, the ready check and its reopen cards, and the pull-request sort and add-to-spec cards the walk asks.
+
+1. **Batch cards: bullets above, short question, result on yes.** One background bullet per item above the card, `- P4 tasks miss the 400 path. Why: the spec names a 400 reply. Yes: add a test.` The question is short, `Tighten-plan batch: apply all 8 recommendations?`, and one `On yes:` line says what the yes does.
+2. **Single cards name the item in its own words.** For example `Tick 'unit tests for the retry' (item 5, acceptance)?` The evidence and the quoted spec line go in a bullet above the card, not in the question.
+3. **Plain labels.** No `A`/`B`/`C` letters and no internal names such as `tick-from-verify`, `park-risk` or `add-regression` on a card. The scripts map them: `LABELS` in `batch_offer.py`, `plan_check.py` through it, and `PLAIN_LABELS` in `walk_progress.py`.
+4. **`suggest` only for wording findings.** A finding about behaviour, tasks, checks or prod never offers a suggestion option.
+5. **Every card has a result-on-yes line** in the same place, right under the question: `On yes: …`.
+6. **Still at most 4 options and one question per card.**
+
+Left as they are, by design: the playbook card that is always asked, the open-pr card with the draft inside the question, pr-status's single closing prompt, and the meeting batch's fixed choice set.

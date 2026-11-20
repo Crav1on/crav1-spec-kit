@@ -18,7 +18,14 @@ Normalized content stamps ignore In progress: and Claim max age: lines.
 Tighten-and-plan, plan-from-spec, and tighten-plan run preserve so a claimed
 task line is not renumbered, reordered, rewritten, or removed.
 
-Usage: claims.py <add|clear|list|preserve|stamp-strip> [options]
+prune (1.196.0) clears finished claims with no card: every task on the line
+is ticked in tasks.md, or the branch tip is merged into origin/<base> (the
+shared start_check.py rule in crav1-add-to-spec). It prints one summary line,
+`Cleared 2 finished claims: T5 (PR 71), T8 (ticked).` Unfinished claims,
+yours or anyone's, are never touched; an unfinished claim keeps its age
+warning, a finished one never gets one.
+
+Usage: claims.py <add|clear|list|preserve|prune|stamp-strip> [options]
 The interpreter is crav1-docs/reference/running-scripts.md. The kit wrapper
 is scripts/claims.py. This script does not push.
 """
@@ -277,10 +284,30 @@ def claimed_ids(claims: list[dict]) -> list[str]:
     return out
 
 
-def age_warnings(claims: list[dict], max_age: int = DEFAULT_AGE_DAYS) -> list[str]:
+def ticked_ids(root: Path) -> set[str]:
+    """T# tokens ticked `[x]` in the spec folder's tasks.md (1.196.0)."""
+    path = Path(root) / "tasks.md"
+    if not path.is_file():
+        return set()
+    out = set()
+    for line in path.read_text(encoding="utf-8").splitlines():
+        m = TASK_LINE.match(line)
+        if m and "[x]" in m.group(1).lower():
+            out.add(f"T{int(m.group(2))}")
+    return out
+
+
+def finished_by_tick(claim: dict, ticked: set[str]) -> bool:
+    return bool(claim.get("tasks")) and all(t in ticked for t in claim["tasks"])
+
+
+def age_warnings(claims: list[dict], max_age: int = DEFAULT_AGE_DAYS, ticked: set[str] | None = None) -> list[str]:
+    """Warnings for stale unfinished claims. A finished claim (all tasks ticked) never warns (1.196.0)."""
     warnings = []
     for claim in claims:
         if not claim.get("stale"):
+            continue
+        if ticked and finished_by_tick(claim, ticked):
             continue
         days = int(claim["age_days"]) if "age_days" in claim else max_age
         tasks = ", ".join(claim["tasks"])
@@ -665,7 +692,7 @@ def cmd_clear(args: argparse.Namespace) -> int:
 def cmd_list(args: argparse.Namespace) -> int:
     now = parse_when(args.now) if args.now else now_utc()
     loaded = load_claims(Path(args.root), now=now, age_days=args.age_days)
-    warnings = age_warnings(loaded["claims"], loaded["max_age_days"])
+    warnings = age_warnings(loaded["claims"], loaded["max_age_days"], ticked_ids(Path(args.root)))
     return emit({
         "ok": True,
         "path": loaded["path"],
@@ -699,6 +726,57 @@ def cmd_preserve(args: argparse.Namespace) -> int:
             handle.write(result["text"].replace("\n", eol))
         result["wrote"] = str(after_path)
     return emit(result)
+
+
+def _start_check():
+    import importlib.util
+    path = Path(__file__).resolve().parents[2] / "crav1-add-to-spec" / "scripts" / "start_check.py"
+    spec = importlib.util.spec_from_file_location("start_check_claims", path)
+    if spec is None or spec.loader is None:
+        return None
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def prune(root: Path, code_repo: str | None = None, base: str = "develop", no_fetch: bool = False,
+          dry_run: bool = False) -> dict:
+    """Clear finished claims, no card (1.196.0). Unfinished claims are never touched."""
+    loaded = load_claims(root)
+    ticked = ticked_ids(root)
+    sc = _start_check() if code_repo else None
+    fetched = sc.fetch(code_repo, no_fetch) if sc else "skipped"
+    base_ref = sc.prefer_ref(code_repo, base) if sc else ""
+    keep, cleared = [], []
+    for claim in loaded["raw"]:
+        why = None
+        if finished_by_tick(claim, ticked):
+            why = "ticked"
+        elif sc and base_ref:
+            tip = sc.prefer_ref(code_repo, claim["branch"])
+            hit = sc.tip_merged(code_repo, tip, base_ref) if tip else None
+            if not hit and tip and sc.is_ancestor(code_repo, tip, base_ref):
+                hit = {"pr": None}
+            if hit:
+                why = f"PR {hit['pr']}" if hit.get("pr") else f"merged into {base}"
+        if why:
+            cleared.append({"branch": claim["branch"], "tasks": claim["tasks"], "user": claim["user"], "why": why})
+        else:
+            keep.append(claim)
+    line = None
+    if cleared:
+        parts = [f"{', '.join(c['tasks'])} ({c['why']})" for c in cleared]
+        noun = "claim" if len(cleared) == 1 else "claims"
+        line = f"Cleared {len(cleared)} finished {noun}: " + ", ".join(parts) + "."
+    wrote = None
+    if cleared and not dry_run:
+        wrote = str(write_claims(root, keep, age_days=loaded.get("file_age_days"), notes=loaded["notes"]))
+    return {"ok": True, "cleared": cleared, "kept": len(keep), "line": line, "wrote": wrote, "fetch": fetched,
+            "base": base_ref or None}
+
+
+def cmd_prune(args: argparse.Namespace) -> int:
+    return emit(prune(Path(args.root), args.code_repo, args.base, args.no_fetch, args.dry_run))
 
 
 def cmd_stamp_strip(args: argparse.Namespace) -> int:
@@ -751,6 +829,14 @@ def main(argv: list[str] | None = None) -> int:
     pres.add_argument("--tasks", default=None)
     pres.add_argument("--write", action="store_true")
     pres.set_defaults(func=cmd_preserve)
+
+    prune_p = sub.add_parser("prune", help="clear finished claims (all ticked, or branch merged), no card (1.196.0)")
+    prune_p.add_argument("--root", required=True)
+    prune_p.add_argument("--code-repo", default=None, help="the code checkout; without it only ticked claims clear")
+    prune_p.add_argument("--base", default="develop", help="the branch work merges into; origin/<base> first")
+    prune_p.add_argument("--no-fetch", action="store_true")
+    prune_p.add_argument("--dry-run", action="store_true", help="report only, write nothing")
+    prune_p.set_defaults(func=cmd_prune)
 
     strip_p = sub.add_parser("stamp-strip")
     strip_p.add_argument("--path", default=None)

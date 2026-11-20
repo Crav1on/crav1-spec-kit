@@ -26,6 +26,12 @@ Commands:
   batch   --items <file> [--title <text>]
       The findings table and its Card: line for every open plan P#, built
       by batch_offer.py in this same reply. No open plan P#, no card.
+  lint    --root <spec-folder>
+      Rule checks the reviewer should not have to find (1.196.0). Prod
+      verify: a task's (verify: ...) note that names prod must be read-only
+      (health, version, config, existence). Any other prod verify is flagged:
+      verify runs on DEV/TEST, and a prod-write check is its own task marked
+      prod-write with an owner: and a Risks line in plan.md naming its T#.
   reviewed --root <spec-folder> --open <n> [--write]
       Lowers P# open on the Reviewed line, keeping the date. No line, none added.
 
@@ -34,7 +40,9 @@ tag (plan or spec), status (open, patched, dropped, skipped, kept), and, for
 spec findings, kind (defect or question). Batch rows also need options and
 recommendation. One row may have "current": true. A plan row whose fix adds,
 removes or reorders tasks sets "changes_tasks": true; batch leaves it out of
-the card (its own card), and a card holds at most 8 rows (1.195.0).
+the card (its own card), and a card holds at most 8 rows (1.195.0). A row with
+"housekeeping": true (or trace, mark, merged-state, stale-risk, linter,
+build-map) is applied with no card and listed on one line (1.196.0).
 
 Usage: <interpreter> -X utf8 scripts/plan_check.py <command> ...
 On Windows the interpreter is python. Elsewhere python3, then py -3.
@@ -543,6 +551,14 @@ def queue(items: list[dict], root: Path | None, went_on: bool, uncommitted: int 
 
 
 BATCH_CAP = 8
+HOUSEKEEPING = ("trace", "mark", "merged-state", "stale-risk", "linter", "build-map")
+
+
+def _housekeeping(item: dict) -> bool:
+    """Housekeeping fixes auto-apply with no card (1.196.0): Trace rows, marks, merged-state
+    wording, stale Risks, the Linter line, the build-map refresh."""
+    value = str(item.get("housekeeping", "")).lower()
+    return value in ("true", "1", "yes") or value in HOUSEKEEPING
 
 
 def _changes_tasks(item: dict) -> bool:
@@ -553,14 +569,20 @@ def _changes_tasks(item: dict) -> bool:
 def batch(items: list[dict], title: str) -> str:
     """At most 8 rows per card; task add/remove/reorder rows get their own card each (1.195.0)."""
     open_rows = [i for i in items if i["tag"] == "plan" and i["status"] not in DONE]
+    chores = [i for i in open_rows if _housekeeping(i) and not _changes_tasks(i)]
+    open_rows = [i for i in open_rows if i not in chores]
+    chores_line = ("Applied with no card (housekeeping): "
+                   + "; ".join(f"{i['id']} {' '.join(str(i.get('issue', '')).split())}" for i in chores) + ".\n") if chores else ""
     own = [i["id"] for i in open_rows if _changes_tasks(i)]
     batchable = [i for i in open_rows if not _changes_tasks(i)]
     later = [i["id"] for i in batchable[BATCH_CAP:]]
     rows = [{k: i.get(k, "") for k in ("id", "issue", "options", "recommendation")}
             for i in batchable[:BATCH_CAP]]
     if not rows:
+        if chores and not own:
+            return chores_line
         if own:
-            return ("No batch card: each of these adds, removes or reorders tasks, so each gets its own card: "
+            return chores_line + ("No batch card: each of these adds, removes or reorders tasks, so each gets its own card: "
                     + ", ".join(own) + ".\n")
         raise PlanCheckError("no open plan P#, so there is no batch card")
     bo = _batch_offer()
@@ -568,11 +590,48 @@ def batch(items: list[dict], title: str) -> str:
         text = bo.offer(title, rows)
     except bo.BatchOfferError as exc:
         raise PlanCheckError(str(exc)) from exc
+    text = chores_line + text if chores_line else text
     if own:
         text += "Not in this batch, each gets its own card (adds, removes or reorders tasks): " + ", ".join(own) + ".\n"
     if later:
         text += f"Not in this batch (at most {BATCH_CAP} per card), in the next card: " + ", ".join(later) + ".\n"
     return text
+
+
+PROD = re.compile(r"\b(?:prod|production|prd)\b", re.I)
+PROD_READ = re.compile(r"\b(?:health|healthcheck|version|config|configuration|exist|exists|existence|read-only|"
+                       r"read only|smoke read|get|list|show|ping)\b", re.I)
+PROD_WRITE = re.compile(r"\b(?:write|writes|create|creates|post|put|delete|insert|update|send|sends|publish|"
+                        r"trigger|run the job|load|import|submit|change|migrate|seed)\b", re.I)
+
+
+def lint_lines(root: Path) -> list[str]:
+    """Prod verify rule (1.196.0). One line per problem, then a closing count line."""
+    tasks = _read(root / "tasks.md")
+    plan = (root / "plan.md").read_text(encoding="utf-8") if (root / "plan.md").is_file() else ""
+    risks = plan.split("## Risks", 1)[1] if "## Risks" in plan else ""
+    out = []
+    for line in tasks.splitlines():
+        m = TASK_LINE.match(line)
+        if not m:
+            continue
+        tid = f"T{m.group(2)}"
+        for note in VERIFY.findall(line):
+            if not PROD.search(note):
+                continue
+            if "prod-write" in note.lower():
+                missing = [w for w, ok in (("an owner:", "owner:" in note.lower()),
+                                           ("a Risks line", re.search(rf"\b{tid}\b", risks) is not None)) if not ok]
+                if missing:
+                    out.append(f"Prod write: {tid} is a prod-write check without " + " and ".join(missing)
+                               + ". It needs an owner, the user's yes and a Risks line.")
+                continue
+            if PROD_WRITE.search(note) or not PROD_READ.search(note):
+                out.append(f"Prod verify: {tid} verifies on prod with more than a read ({' '.join(note.split())}). "
+                           "Recommend: verify on DEV/TEST, keep only a read-only prod check (health, version, config, "
+                           "existence), and make any prod write its own prod-write task with an owner, a yes and a Risks line.")
+    out.append(f"Lint: {len(out)} problem{'s' if len(out) != 1 else ''}.")
+    return out
 
 
 REVIEWED = re.compile(r"^(Reviewed:\s*[^,\n]+,\s*P#\s*open:\s*)(\d+)\s*$", re.M)
@@ -612,6 +671,8 @@ def main(argv: list[str] | None = None) -> int:
     p = sub.add_parser("batch")
     p.add_argument("--items", required=True)
     p.add_argument("--title", default="Tighten-plan batch")
+    p = sub.add_parser("lint")
+    p.add_argument("--root", required=True)
     p = sub.add_parser("reviewed")
     p.add_argument("--root", required=True)
     p.add_argument("--open", required=True, type=int)
@@ -633,6 +694,8 @@ def main(argv: list[str] | None = None) -> int:
                          args.went_on_without_linter, args.uncommitted)
         elif args.command == "batch":
             text = batch(_items(args.items), args.title)
+        elif args.command == "lint":
+            text = "\n".join(lint_lines(_root(args.root))) + "\n"
         else:
             text = reviewed(_root(args.root), args.open, args.write)
     except PlanCheckError as exc:

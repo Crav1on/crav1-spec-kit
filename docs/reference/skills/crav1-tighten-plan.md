@@ -18,7 +18,7 @@ One plan issue at a time; patches plan/tasks only (spec findings go to tighten-s
 
 1.130.0: the batch is one card. `yes (Recommended)` applies every recommendation. Typed changes go on that card's free-text answer, for example `P1 A, P3 keep`. An item not mentioned keeps its recommendation. There is no Edits option.
 
-1.145.0: the batch card is asked only after a findings table in that same reply (Id, Issue, Options, Recommendation). The card names each item, for example `P4 tasks miss the 400 path: A add a test`. It does not say `table above`. The command is `<interpreter> -X utf8 <skill crav1-tighten-plan>/scripts/batch_offer.py --title "Tighten-plan batch" --items <file>`. It prints no card without rows.
+1.145.0: the batch card is asked only after a findings table in that same reply (Id, Issue, Options, Recommendation). The card names each item, for example `P4 tasks miss the 400 path: add a test`. It does not say `table above`. The command is `<interpreter> -X utf8 <skill crav1-tighten-plan>/scripts/batch_offer.py --title "Tighten-plan batch" --items <file>`. It prints no card without rows.
 
 1.151.0: a task listed in `claims.md` as `In progress:` is left unchanged: no renumber, reorder, rewrite, or removal. After writing `tasks.md`, the step preserves those lines and says once which claimed tasks were kept.
 

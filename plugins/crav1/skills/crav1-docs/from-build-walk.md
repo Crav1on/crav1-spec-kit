@@ -101,3 +101,7 @@ Since 1.184.0 a progress file written by an older kit, where a second task's bui
 Since 1.186.0 `/crav1-build-walk <slug> T4` starts an open task on a branch whose other tasks already wait for the pull request's merge. The walk claims T4, adds it to the progress file and builds it. On another person's branch, a task that takes in develop merges develop into that branch with its own yes, runs the whole suite and the linter, pushes after yes and comments once; the owner still merges the pull request, and the ending names them.
 
 Since 1.187.0 a task is named by its text up to the first verify item. A task line such as `PR 12 takes in develop after PR 10 merges, with the conflicts resolved; integration — ...; system — ...` shows as `Build T8 PR 12 takes in develop after PR 10 merges, with the conflicts resolved on feat/orders-api:` under Run next and in the lead, not the whole line with its checks.
+
+## Finished claims (1.196.0)
+
+A claim stays only while its tasks are open. `/crav1-merge-pr` and the start of `/crav1-tighten-and-plan-ready-to-build` clear claims whose tasks are all ticked or whose branch is merged into `origin/develop`, with one line such as `Cleared 2 finished claims: T5 (ticked), T8 (PR 71).` An unfinished claim is never cleared, and a finished claim gets no age warning. Both fetch origin first, so a stale local `develop` does not hide a merge.

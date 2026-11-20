@@ -222,8 +222,8 @@ JUMP = {
 TIGHTEN_SPEC_PATH = "../crav1-tighten-spec/SKILL.md"
 CONTINUE_JUMP = "plan-from-spec, review-and-tighten-plan, tasks-ready-to-build"
 CONTINUE_POINT = "review-and-tighten-plan, tasks-ready-to-build"
-JUMP_CHOICE = "run /crav1-tighten-spec on just that finding now (Recommended)"
-POINT_CHOICE = "keep it as an open point and continue"
+JUMP_CHOICE = "Fix it in the spec first (Recommended)"
+POINT_CHOICE = "Keep it as an open point and go on"
 FINDING_ID = re.compile(r"^P[1-9][0-9]*$")
 JUMP_RESULTS = {"jumped", "open-point", "already-fixed"}
 # The owner of a spec finding (1.194.0). A finding about code the spec has not
@@ -231,7 +231,17 @@ JUMP_RESULTS = {"jumped", "open-point", "already-fixed"}
 # new PR comments) is /crav1-add-to-spec's. Wording, structure, diagrams and
 # constraints stay /crav1-tighten-spec's, which is also the default when unclear.
 ADD_TO_SPEC_PATH = "../crav1-add-to-spec/SKILL.md"
-ADD_CHOICE = "run /crav1-add-to-spec on just that finding now (Recommended)"
+ADD_CHOICE = "Record the code in the spec first (Recommended)"
+# Plain labels for walk cards (1.196.0): no letters, no internal ids. Plan and spec
+# resolution ids map through LABELS in crav1-tighten-plan/scripts/batch_offer.py.
+PLAIN_LABELS = {
+    "tighten-spec": JUMP_CHOICE,
+    "add-to-spec": ADD_CHOICE,
+    "open-point": POINT_CHOICE,
+    "review-now": "Review the plan as it is",
+    "rerun": "Redo the step",
+    "nothing new": "Skip redoing the step",
+}
 FINDING_KINDS = ("code-drift", "spec-text")
 DRIFT_WORDS = re.compile(
     r"(?i)\b(?:merged?|unrecorded|not recorded|has not recorded|hasn't recorded|not in the spec yet|"
@@ -2625,6 +2635,8 @@ def reopen_card(step: str, drift: list[str], recommend_rerun: bool, stale_seen: 
         "background": f"{name[:1].upper()}{name[1:]} reopened because {said}.",
         "question": f"Skip redoing {name}?",
         "options": options,
+        "result": (f"On yes: {name} runs again on the current files." if options[0]["id"] == "rerun"
+                   else f"On yes: {name} stays done and the walk goes on."),
     }
 
 
@@ -3535,7 +3547,9 @@ def apply_claims(root: Path | None, rows: list[dict], user: str | None = None, b
         claims_mod().apply_to_rows(rows, claims, user=user or _git_user(root), branch=branch)
         apply_built_claims(root, rows)
     apply_built_tasks(root, rows)
-    warnings = claims_mod().age_warnings(claims, loaded.get("max_age_days") or 3)
+    cm = claims_mod()
+    ticked = cm.ticked_ids(root) if hasattr(cm, "ticked_ids") else set()
+    warnings = cm.age_warnings(claims, loaded.get("max_age_days") or 3, ticked)
     return {"claims": claims, "warnings": warnings, "ids": claims_mod().claimed_ids(claims)}
 
 
@@ -5651,15 +5665,12 @@ def compose_ending(
     )
 
 
-def slice_uncommitted(root: Path | None) -> list[str]:
-    """Files in the slice folder that git sees as changed or new (1.176.0)."""
-    if root is None or not Path(root).is_dir():
-        return []
+def _porcelain(root: Path, paths: list[str], every_file: bool = False) -> list[str]:
+    cmd = ["git", "-C", str(root), "status", "--porcelain"]
+    if every_file:
+        cmd.append("--untracked-files=all")
     try:
-        proc = subprocess.run(
-            ["git", "-C", str(root), "status", "--porcelain", "--", "."],
-            capture_output=True, text=True, check=False, timeout=20,
-        )
+        proc = subprocess.run(cmd + ["--", *paths], capture_output=True, text=True, check=False, timeout=20)
     except (OSError, subprocess.SubprocessError):
         return []
     if proc.returncode != 0:
@@ -5671,6 +5682,20 @@ def slice_uncommitted(root: Path | None) -> list[str]:
             name = name.split(" -> ", 1)[1]
         if name:
             out.append(Path(name).name)
+    return out
+
+
+def slice_uncommitted(root: Path | None) -> list[str]:
+    """Files in the slice folder that git sees as changed or new (1.176.0), plus kit-written
+    notes and sources under docs/notes and docs/sources (1.196.0, 1119d S9), so the count is
+    every file the commit will take."""
+    if root is None or not Path(root).is_dir():
+        return []
+    out = _porcelain(Path(root), ["."])
+    docs = Path(root).resolve().parent.parent
+    extra = [str(docs / name) for name in ("notes", "sources") if (docs / name).is_dir()]
+    if extra:
+        out += _porcelain(Path(root), extra, every_file=True)
     return out
 
 
@@ -5775,7 +5800,23 @@ def brief_payload(out: dict) -> dict:
         brief["build_map_wrote"] = out["build_map_wrote"]
     if out.get("line") and out.get("stop"):
         brief["line"] = out["line"]
+    if out.get("reopen_cards"):
+        brief["reopen_cards"] = out["reopen_cards"]
+    if out.get("auto_clear"):
+        brief["auto_clear"] = out["auto_clear"]
+        brief["auto_clear_line"] = auto_clear_line(out["auto_clear"])
     return brief
+
+
+def auto_clear_line(steps: list[str]) -> str:
+    """One line for reopened steps cleared with no card (1.196.0)."""
+    names = [STEP_PLAIN.get(step, "this step") for step in steps]
+    said = names[0] if len(names) == 1 else ", ".join(names[:-1]) + " and " + names[-1]
+    verb = "stays" if len(names) == 1 else "stay"
+    return (f"{said[:1].upper()}{said[1:]} reopened only because of a fact this walk just recorded, "
+            f"and a finding already covers it; it {verb} done with no card." if len(names) == 1 else
+            f"{said[:1].upper()}{said[1:]} reopened only because of a fact this walk just recorded, "
+            f"and a finding already covers it; they {verb} done with no card.")
 
 
 READ_FILES = ("spec.md", "plan.md", "tasks.md", "verify.md", "claims.md")
@@ -6121,7 +6162,10 @@ def _readiness(args: argparse.Namespace) -> None:
             reopen_card(h["step"], h.get("changed") or [], bool(jump) and result == "not-ready",
                         bool(getattr(args, "stale_seen", False)))
             for h in hits if h.get("bucket") == "reopened" and h.get("step")
+            and h["step"] not in set(getattr(args, "covered", None) or [])
         ],
+        "auto_clear": [h["step"] for h in hits if h.get("bucket") == "reopened" and h.get("step")
+                       and h["step"] in set(getattr(args, "covered", None) or [])],
         "jump_back": jump,
         "reopened": reopened,
         "reopen_line": None,
@@ -6527,6 +6571,7 @@ def _jump_back_offer(fid: str, owner: str = "tighten-spec", command: str = "/cra
         "command": command,
         "background": f"{fid} is about the spec, not the plan.",
         "question": f"Fix {fid} in the spec now, before the plan goes on?",
+        "result": f"On yes: {command} runs for {fid} only, then the walk goes on with the plan.",
         "options": [
             first,
             {"id": "open-point", "label": POINT_CHOICE, "recommended": False,
@@ -6579,6 +6624,21 @@ def spec_finding(args: argparse.Namespace) -> None:
         fail("kind", "kind must be code-drift or spec-text")
     owner = finding_owner(args.text, args.kind, topic)
     command = add_to_spec_command(args.text, args.pr, args.branch) if owner == "add-to-spec" else "/crav1-tighten-spec"
+    # 1.196.0 (1119d S3): a code-drift text passed as spec-text is asked, not routed silently.
+    if args.kind == "spec-text" and not args.choice and finding_owner(args.text, None, topic) == "add-to-spec":
+        drift_cmd = add_to_spec_command(args.text, args.pr, args.branch)
+        emit({"ok": True, "offer": "kind-conflict", "spec": True, "finding": args.id, "kind_conflict": True,
+              "background": f"{args.id} was passed as spec text, but it reads like code the spec has not recorded (a merge or commits).",
+              "question": f"Is {args.id} about code the spec has not recorded?",
+              "result": f"On yes: it goes to {drift_cmd}; otherwise to /crav1-tighten-spec.",
+              "options": [
+                  {"id": "add-to-spec", "label": "Yes, record the code (Recommended)", "recommended": True,
+                   "text": f"Run the same command with --kind code-drift; {drift_cmd} records it. Why: merged work not marked merged is code drift."},
+                  {"id": "tighten-spec", "label": "No, it is spec wording", "recommended": False,
+                   "text": "Run the same command with --kind spec-text --choice tighten-spec --yes; /crav1-tighten-spec fixes the wording."},
+              ],
+              "pause": False, "wrote": None})
+        return
     if args.choice == "already-done":
         check = already_fixed(root, args.text, owner, args.expect, args.code_repo)
         if not check["covered"]:
@@ -6776,11 +6836,17 @@ def _drift_base(code_repo: str, row: dict, synced: list[dict], base: str | None)
     names = [base] if base else []
     names += [r["branch"] for r in synced if r["branch"] in ("develop", "main", "master") and r is not row]
     names += ["develop", "main", "master"]
+    sc = start_check_mod()
     for name in names:
-        for cand in (f"origin/{name}", name):
-            if _git_lines(code_repo, "rev-parse", "--verify", "--quiet", cand) is not None:
-                return cand
+        ref = sc.prefer_ref(code_repo, name)
+        if ref:
+            return ref
     return None
+
+
+def start_check_mod():
+    """The shared start-check helper in crav1-add-to-spec (1.196.0)."""
+    return _load_script("crav1-add-to-spec", "start_check.py", "start-check")
 
 
 def code_drift(args: argparse.Namespace) -> None:
@@ -6799,7 +6865,10 @@ def code_drift(args: argparse.Namespace) -> None:
     spec = spec_path.read_text(encoding="utf-8")
     synced = [m.groupdict() for m in SYNCED_LINE.finditer(spec)]
     known = _recorded_shas(root, spec)
+    sc = start_check_mod()
+    fetched = sc.fetch(args.code_repo, getattr(args, "no_fetch", False))
     behind = []
+    merged_tips = []
     for row in synced:
         if args.branch and row["branch"] != args.branch:
             continue
@@ -6820,6 +6889,14 @@ def code_drift(args: argparse.Namespace) -> None:
             ins = {h for h in ins if _git_lines(args.code_repo, "merge-base", "--is-ancestor", f"{h}^2", base_ref) is not None}
             own = [c for c in own if c.split()[0] not in ins]
         merged_in = len(allc) - len(own)
+        # 1.196.0: a work branch whose tip is already in the base is merged; take it in
+        # unless the merge (or a later commit) is already recorded.
+        if base_ref and base_ref != ref and row["branch"] not in ("develop", "main", "master"):
+            hit = sc.tip_merged(args.code_repo, ref, base_ref)
+            if hit and not _recorded(hit["merge_short"], known) and not any(
+                    _is_ancestor(args.code_repo, hit["merge"], r["sha"]) for r in synced):
+                merged_tips.append({"branch": row["branch"], "sha": hit["merge_short"], "pr": hit["pr"],
+                                    "base": short_ref(base_ref)})
         new = [c for c in own if not _recorded(c.split()[0], known)]
         if new:
             behind.append({"branch": row["branch"], "synced": row["sha"], "ref": ref, "base": base_ref,
@@ -6832,11 +6909,16 @@ def code_drift(args: argparse.Namespace) -> None:
                   or _is_ancestor(args.code_repo, sha, r["sha"]) for r in synced)
         if not hit:
             merged = {"sha": sha, "pr": args.pr}
+    if not merged and merged_tips:
+        first = merged_tips[0]
+        merged = {"sha": first["sha"], "pr": first["pr"], "branch": first["branch"], "tip_merged": True}
+        if not args.pr and first["pr"]:
+            args.pr = first["pr"]
     if not behind and not merged:
-        emit({"ok": True, "behind": False, "offer": None, "wrote": None,
+        emit({"ok": True, "behind": False, "offer": None, "wrote": None, "fetch": fetched,
               "message": "The spec's Synced at lines are current with the code; no add-to-spec offer."})
         return
-    target = args.branch or (behind[0]["branch"] if behind else None)
+    target = args.branch or (behind[0]["branch"] if behind else (merged or {}).get("branch"))
     command = add_to_spec_command("", args.pr, target)
     parts = [f"{b['count']} commit{'s' if b['count'] != 1 else ''} on {b['branch']} after Synced at {b['synced']} not recorded yet"
              + (f" ({b['already_recorded'] + b['base_merge_ins']} more already recorded or merged in from {short_ref(b['base'])})"
@@ -6850,19 +6932,169 @@ def code_drift(args: argparse.Namespace) -> None:
         "offer": "add-to-spec",
         "drift": behind,
         "merged": merged,
+        "merged_tips": merged_tips,
+        "fetch": fetched,
         "command": command,
         "path": ADD_TO_SPEC_PATH,
         "background": f"The spec's record is behind the code: {what}.",
         "question": "Record those code changes in the spec before the plan review?",
+        "result": f"On yes: {command} records them, then the plan is updated and reviewed.",
         "options": [
-            {"id": "add-to-spec", "label": f"run {command} first (Recommended)", "recommended": True,
+            {"id": "add-to-spec", "label": "Record the code changes first (Recommended)", "recommended": True,
              "text": f"Open {command} now, then update the plan for what it changed and start the plan review. Why: the review then reads a current spec."},
-            {"id": "review-now", "label": "review the plan as it is", "recommended": False,
+            {"id": "review-now", "label": PLAIN_LABELS["review-now"], "recommended": False,
              "text": "Start the plan review now; the spec stays behind the code and the walk names add-to-spec at the end."},
         ],
         "reviewer_note": f"Known and already offered: {what}. Do not report it as a new finding.",
         "wrote": None,
     })
+
+
+# --- tickable (1.196.0) -----------------------------------------------------
+_ACC_HEAD = re.compile(r"^##\s+Acceptance criteria\s*$", re.M | re.I)
+_VERIFY_ACC_HEAD = re.compile(r"^##\s+Acceptance\b.*details\s*$", re.M | re.I)
+_EVIDENCE_FILE = re.compile(r"[\w./-]+\.[A-Za-z0-9]{1,6}(?::\d+)?")
+_TASK_OPEN = re.compile(r"^\s*-\s*\[( |x|X)\]\s*T(\d+)\b")
+_ITEM_REF = re.compile(r"\bitem\s+(\d+)\b", re.I)
+
+
+def _tick_words(text: str) -> str:
+    return " ".join(re.sub(r"[^\w\s]", " ", text.lower()).split())
+
+
+def _section(text: str, head: re.Pattern) -> str:
+    m = head.search(text)
+    if not m:
+        return ""
+    rest = text[m.end():]
+    nxt = re.search(r"^##\s", rest, re.M)
+    return rest[: nxt.start()] if nxt else rest
+
+
+def _acceptance_lines(spec: str) -> list[dict]:
+    out = []
+    for line in _section(spec, _ACC_HEAD).splitlines():
+        m = re.match(r"^\s*-\s*\[( |x|X)\]\s*(.*)$", line)
+        if m and m.group(2).strip():
+            out.append({"item": len(out) + 1, "text": m.group(2).strip(), "ticked": m.group(1).lower() == "x",
+                        "line": line})
+    return out
+
+
+def _verify_acc_rows(verify: str) -> list[dict]:
+    rows = []
+    for line in _section(verify, _VERIFY_ACC_HEAD).splitlines():
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        if len(cells) < 5 or not re.fullmatch(r"A\d+", cells[0]):
+            continue
+        rows.append({"id": cells[0], "acceptance": cells[1], "evidence": cells[2], "result": cells[3],
+                     "tasks": re.findall(r"T\d+", cells[4])})
+    return rows
+
+
+def _row_passes_on_base(row: dict) -> bool:
+    result = row["result"].lower()
+    return result.startswith("pass") and "fail" not in result and "on branch" not in result and "feat/" not in result
+
+
+def _match_item(row: dict, items: list[dict]) -> dict | None:
+    ref = _ITEM_REF.search(row["acceptance"])
+    if ref:
+        n = int(ref.group(1))
+        return next((i for i in items if i["item"] == n), None)
+    want = _tick_words(row["acceptance"])
+    if not want:
+        return None
+    hits = [i for i in items if _tick_words(i["text"]) == want
+            or (len(want) >= 12 and (_tick_words(i["text"]).startswith(want) or want.startswith(_tick_words(i["text"]))))]
+    return hits[0] if len(hits) == 1 else None
+
+
+def tickable_report(root: Path) -> dict:
+    spec_path, verify_path, tasks_path = root / "spec.md", root / "verify.md", root / "tasks.md"
+    if not spec_path.is_file():
+        fail("root", f"no spec.md in {root}")
+    spec = spec_path.read_text(encoding="utf-8")
+    items = _acceptance_lines(spec)
+    rows = _verify_acc_rows(verify_path.read_text(encoding="utf-8")) if verify_path.is_file() else []
+    tasks = tasks_path.read_text(encoding="utf-8") if tasks_path.is_file() else ""
+    open_tasks = {}
+    for line in tasks.splitlines():
+        m = _TASK_OPEN.match(line)
+        if m and m.group(1) == " ":
+            open_tasks[f"T{m.group(2)}"] = line
+    found, cards = [], []
+    for row in rows:
+        item = _match_item(row, items)
+        if item is None or item["ticked"]:
+            continue
+        files = sorted({f.split(":")[0] for f in _EVIDENCE_FILE.findall(row["evidence"])})
+        if not _row_passes_on_base(row) or not files:
+            cards.append({"item": item["item"], "text": item["text"], "row": row["id"], "result": row["result"]})
+            continue
+        touching = [t for t in row["tasks"] if t in open_tasks]
+        for tid, line in open_tasks.items():
+            if tid not in touching and any(Path(f).name in line for f in files):
+                touching.append(tid)
+        found.append({"item": item["item"], "text": item["text"], "row": row["id"], "evidence_files": files,
+                      "open_tasks_touching": touching, "action": "tick-recheck" if touching else "tick"})
+    return {"items": found, "cards": cards}
+
+
+def _add_recheck(tasks: str, tid: str, note: str) -> str:
+    out = []
+    for line in tasks.splitlines(keepends=True):
+        m = _TASK_OPEN.match(line)
+        if m and f"T{m.group(2)}" == tid and note not in line:
+            body = line.rstrip("\r\n")
+            ending = line[len(body):]
+            vm = re.search(r"\(verify:\s*([^)]*)\)", body)
+            if vm:
+                body = body[: vm.end() - 1] + f"; {note}" + body[vm.end() - 1:]
+            else:
+                body = body + f" (verify: {note})"
+            line = body + ending
+        out.append(line)
+    return "".join(out)
+
+
+def tickable(args: argparse.Namespace) -> None:
+    """Acceptance items a passing verify row on the base already proves (1.196.0). Owned by tighten-spec.
+
+    No card when the evidence is clear: the item is ticked. When a later open
+    task touches the evidence files, it is still ticked now and that task's
+    verify note gets `recheck item N (verify A#)`. A failing or unmatched row
+    is listed under `cards`. Writes only with --write."""
+    root = Path(args.root)
+    report = tickable_report(root)
+    wrote = []
+    if args.write and report["items"]:
+        spec_path = root / "spec.md"
+        spec = spec_path.read_text(encoding="utf-8")
+        items = {i["item"]: i for i in _acceptance_lines(spec)}
+        for hit in report["items"]:
+            line = items[hit["item"]]["line"]
+            spec = spec.replace(line, line.replace("[ ]", "[x]", 1), 1)
+        spec_path.write_text(spec, encoding="utf-8")
+        wrote.append("spec.md")
+        tasks_path = root / "tasks.md"
+        if tasks_path.is_file() and any(h["open_tasks_touching"] for h in report["items"]):
+            tasks = tasks_path.read_text(encoding="utf-8")
+            for hit in report["items"]:
+                for tid in hit["open_tasks_touching"]:
+                    tasks = _add_recheck(tasks, tid, f"recheck item {hit['item']} (verify {hit['row']})")
+            tasks_path.write_text(tasks, encoding="utf-8")
+            wrote.append("tasks.md")
+    line = None
+    if report["items"]:
+        parts = []
+        for h in report["items"]:
+            extra = f", recheck on {', '.join(h['open_tasks_touching'])}" if h["open_tasks_touching"] else ""
+            parts.append(f"item {h['item']} ({h['row']}{extra})")
+        verb = "Ticked" if args.write else "Can tick"
+        n = len(parts)
+        line = f"{verb} {n} acceptance item{'s' if n != 1 else ''} from verify: " + ", ".join(parts) + "."
+    emit({"ok": True, **report, "line": line, "wrote": wrote or None})
 
 
 # Hash lines resolve-stamps may rewrite (1.139.0). Done, Result, findings,
@@ -7828,6 +8060,7 @@ def main(argv: list[str] | None = None) -> None:
     d.add_argument("--skip-sync", action="store_true", help="Skip the fetch. Tests and an already-fetched copy.")
     d.add_argument("--user", default=None, help="Claim owner that is you. Default: git config user.name in the specs repo (1.160.0).")
     d.add_argument("--branch", default=None, help="The branch being walked. Your claim counts as yours only on this branch when given (1.160.0).")
+    d.add_argument("--covered", action="append", default=[], help="A reopened step whose only change is a fact this walk just recorded and a finding covers: no card, clear it (1.196.0).")
     d.add_argument("--stale-seen", action="store_true", help="This walk saw something stale (code-drift behind, a merge since sync, a stale mark): reopen cards recommend rerun (1.195.0).")
     d.set_defaults(func=readiness)
 
@@ -7866,12 +8099,18 @@ def main(argv: list[str] | None = None) -> None:
 
     cdr = sub.add_parser("code-drift", help="is the spec's record behind the code; one add-to-spec card before the plan review (1.194.0)")
     cdr.add_argument("--root", required=True)
-    cdr.add_argument("--code-repo", required=True, help="the code checkout; refs on disk, no fetch")
+    cdr.add_argument("--code-repo", required=True, help="the code checkout; fetched once, then refs on disk (1.196.0)")
+    cdr.add_argument("--no-fetch", action="store_true", help="skip the one quiet fetch of origin")
     cdr.add_argument("--branch", help="only this Synced at branch")
     cdr.add_argument("--base", help="the branch work merges into (repos.md Merges into); commits merged in from it are not counted")
     cdr.add_argument("--pr", help="the merged pull request, e.g. 73")
     cdr.add_argument("--merged", help="its merge commit, when the walk already saw it merged")
     cdr.set_defaults(func=code_drift)
+
+    tk = sub.add_parser("tickable", help="acceptance items a passing verify row proves; tick with no card (1.196.0)")
+    tk.add_argument("--root", required=True)
+    tk.add_argument("--write", action="store_true", help="tick them, and add recheck notes to touching open tasks")
+    tk.set_defaults(func=tickable)
 
     bs = sub.add_parser("branch-status")
     bs.add_argument("--root", required=True)
