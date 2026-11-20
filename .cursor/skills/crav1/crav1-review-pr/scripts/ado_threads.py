@@ -8,6 +8,8 @@
     ado_threads.py iterations  --pr N        (pushes: id, date, head commit)
     ado_threads.py changes     --pr N --iteration I [--compare-to J]   (files a push changed)
     ado_threads.py set-status  --pr N --thread T --status fixed [--yes]  (read back after)
+    ado_threads.py reply       --pr N --thread T --file <file> [--status fixed] [--yes]  (1.199.0)
+    ado_threads.py list        --pr N --brief  (one line per thread, 1.199.0)
     ado_threads.py since-last  --pr N --note <PR note> --who <name>      (against the recorded state)
 
 This is the one way the kit reads and changes Azure DevOps pull requests:
@@ -201,10 +203,12 @@ def summarize(threads: list[dict]) -> list[dict]:
         if not comments:
             continue
         status = thread.get("status")
+        context = thread.get("threadContext") or {}
         out.append({
             "thread": thread.get("id"),
             "status": STATUS.get(status, status) if isinstance(status, int) else (status or ""),
-            "file": ((thread.get("threadContext") or {}).get("filePath")) or None,
+            "file": context.get("filePath") or None,
+            "line": ((context.get("rightFileStart") or context.get("leftFileStart") or {}).get("line")) or None,
             "published": thread.get("publishedDate"),
             "updated": thread.get("lastUpdatedDate"),
             "comments": comments,
@@ -227,9 +231,120 @@ def post_body(text: str) -> dict:
     return {"comments": [{"parentCommentId": 0, "content": text, "commentType": 1}], "status": 1}
 
 
+def brief_lines(threads: list[dict], limit: int = 200) -> list[str]:
+    """`thread 195 | active | src/app.py:12 | person A | <last 200 characters>` (1.199.0).
+
+    The key is always `thread`, so no summary prints `thread None`.
+    """
+    rows = []
+    for thread in threads:
+        last = thread["comments"][-1] if thread.get("comments") else {}
+        where = thread.get("file") or "(no file)"
+        if thread.get("line"):
+            where += f":{thread['line']}"
+        text = " ".join(str(last.get("content") or "").split())
+        if len(text) > limit:
+            text = "…" + text[-limit:]
+        rows.append(f"thread {thread.get('thread')} | {thread.get('status') or 'unknown'} | {where} | "
+                    f"{last.get('author') or 'unknown'} | {text}")
+    return rows
+
+
 def cmd_list(args) -> dict:
     threads = summarize(load_threads(args))
+    if getattr(args, "brief", False):
+        return {"ok": True, "pr": args.pr, "count": len(threads), "brief": brief_lines(threads),
+                "line": f"{len(threads)} threads on PR {args.pr}."}
     return {"ok": True, "pr": args.pr, "count": len(threads), "threads": threads}
+
+
+def thread_link(args, thread) -> str | None:
+    """The thread's web link, `...pullrequest/<n>?discussionId=<t>` (1.199.0)."""
+    if not (args.org and args.project and args.repo):
+        return None
+    return f"{args.org.rstrip('/')}/{args.project}/_git/{args.repo}/pullrequest/{args.pr}?discussionId={thread}"
+
+
+def reply_body(text: str, parent: int) -> dict:
+    return {"parentCommentId": parent, "content": text, "commentType": 1}
+
+
+DRAFT_HEAD = re.compile(r"^## Replies as drafted, (?P<date>[^(]+?) \((?P<state>[^)]*)\)\s*$")
+
+
+def mark_draft_posted(note: str, thread, when: str) -> tuple[str, bool]:
+    """Mark the newest `## Replies as drafted` section that names this thread as posted (1.199.0).
+
+    `(not posted)` becomes `(thread 195 posted 2026-11-20)`; a section that
+    holds other threads too keeps `not posted` for them:
+    `(not posted; thread 195 posted 2026-11-20)`. Only the heading changes;
+    the drafted words stay as they were.
+    """
+    lines = note.split("\n")
+    heads = [i for i, line in enumerate(lines) if DRAFT_HEAD.match(line)]
+    for index in reversed(heads):
+        end = next((j for j in range(index + 1, len(lines)) if lines[j].startswith("## ")), len(lines))
+        body = "\n".join(lines[index + 1:end])
+        if not re.search(rf"\bthread {re.escape(str(thread))}\b", body, re.I):
+            continue
+        match = DRAFT_HEAD.match(lines[index])
+        state = match.group("state")
+        mark = f"thread {thread} posted {when}"
+        if mark in state:
+            return note, False
+        others = len(set(re.findall(r"\bthread (\d+)\b", body, re.I)) - {str(thread)}) > 0
+        if state == "not posted":
+            state = f"not posted; {mark}" if others else mark
+        else:
+            state = f"{state}; {mark}"
+        lines[index] = f"## Replies as drafted, {match.group('date')} ({state})"
+        return "\n".join(lines), True
+    return note, False
+
+
+def cmd_reply(args) -> dict:
+    """Reply inside an existing thread, then optionally set its status (1.199.0)."""
+    text = decode(Path(args.file).read_bytes())
+    if args.status and args.status not in STATUS_CODES:
+        return {"ok": False, "error": "status", "line": "The status is one of " + ", ".join(sorted(STATUS_CODES)) + "."}
+    route = _route(args, "pullRequestThreads", [f"threadId={args.thread}"])
+    thread = _json(Path(args.from_file).read_bytes()) if args.from_file else _json(run_az(route))
+    comments = [c for c in thread.get("comments") or [] if not c.get("isDeleted") and c.get("commentType") != "system"]
+    parent = comments[-1].get("id") if comments else 1
+    body = reply_body(text, parent or 1)
+    link = thread_link(args, args.thread)
+    then = f" and set it to {args.status}" if args.status else ""
+    if not args.yes:
+        return {"ok": True, "posted": False, "thread": args.thread, "body": body, "status": args.status, "link": link,
+                "line": f"Preview only. Add --yes after the user's yes to post the reply in thread {args.thread}{then}."}
+    fd, tmp = tempfile.mkstemp(suffix=".json")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as handle:
+            json.dump(body, handle, ensure_ascii=False)
+        posted = _json(run_az(_route(args, "pullRequestThreadComments", [f"threadId={args.thread}"])
+                              + ["--http-method", "POST", "--in-file", tmp]))
+    finally:
+        try:
+            os.unlink(tmp)
+        except OSError:
+            pass
+    out = {"ok": True, "posted": True, "thread": args.thread, "comment": posted.get("id"), "link": link,
+           "line": f"Posted your reply in thread {args.thread} on PR {args.pr}."}
+    if args.status:
+        args.yes = True
+        status = cmd_set_status(args)
+        out["status"] = status.get("status")
+        out["ok"] = bool(status.get("ok"))
+        out["line"] = f"Posted your reply in thread {args.thread} and it now shows {status.get('status')} on the host."
+    if getattr(args, "note", None):
+        import datetime
+        note_path = Path(args.note)
+        text = note_path.read_text(encoding="utf-8")
+        new, changed = mark_draft_posted(text, args.thread, datetime.date.today().isoformat())
+        if changed:
+            note_path.write_text(new, encoding="utf-8")
+        out["note_marked"] = changed
+    return out
 
 
 def cmd_compare(args) -> dict:
@@ -463,17 +578,24 @@ def main(argv: list[str] | None = None) -> int:
     sts.add_argument("--thread", required=True, type=int)
     sts.add_argument("--status", required=True)
     sts.add_argument("--yes", action="store_true")
+    rpl = sub.add_parser("reply")
+    rpl.add_argument("--thread", required=True, type=int)
+    rpl.add_argument("--file", required=True)
+    rpl.add_argument("--status", help="also set the thread status after the reply, for example fixed")
+    rpl.add_argument("--yes", action="store_true")
+    rpl.add_argument("--note", help="the PR note whose drafted reply is marked posted after the post")
+    lst.add_argument("--brief", action="store_true", help="one line per thread")
     snc = sub.add_parser("since-last")
     snc.add_argument("--note", required=True, help="the PR note; its Read line and saved description are the recorded state")
     snc.add_argument("--who", required=True, help="the name on your Read line")
     snc.add_argument("--from-dir", help="saved threads.json, iterations.json and pr.json instead of az")
-    for p in (lst, cmp_, pst, prv, its, chg, sts, snc):
+    for p in (lst, cmp_, pst, prv, its, chg, sts, snc, rpl):
         _common(p)
     args = parser.parse_args(argv)
     fill_route(args)
     try:
         result = {"list": cmd_list, "compare": cmd_compare, "post": cmd_post, "pr": cmd_pr,
-                  "iterations": cmd_iterations, "changes": cmd_changes, "set-status": cmd_set_status,
+                  "iterations": cmd_iterations, "changes": cmd_changes, "set-status": cmd_set_status, "reply": cmd_reply,
                   "since-last": cmd_since_last}[args.cmd](args)
     except (OSError, RuntimeError, json.JSONDecodeError) as exc:
         result = {"ok": False, "error": args.cmd, "line": str(exc)}

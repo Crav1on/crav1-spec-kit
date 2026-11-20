@@ -19,6 +19,8 @@ One thread can hold several points; split them. Each point gets exactly one of t
 
 A point that belongs to later work keeps its status and is also offered as a follow-up. Never guess `done`: no commit, no `done`. When the text does not settle a status, use `open` and say why.
 
+**Answered questions (1.199.0).** A point that asked a question, got an answer and the asker accepted it is `answered`, set with `pr_common.py set-point --note <PR note> --thread <id> --status answered --yes` (skill `crav1-open-pr`), which writes the Point line in place. Say it as `answered; no code change`. It does not block the merge.
+
 **Host settings (1.115.0).** A point that asks for a host setting (a branch policy, required build, reviewers, an approval) is `done host` (the `done` status with `host` in place of the sha) when that repo's host-setup script `check` part, or the same read, shows the setting live in this run; no commit is needed. Read-only: never run `apply`. Not set yet, or not signed in: keep the status and name `/crav1-host-setup`.
 
 **Resolved while the code is unchanged.** A thread the host shows as resolved (Azure DevOps `fixed`, `closed`, `wontFix`, `byDesign`; GitHub resolved) whose point is not `done`, `declined` or settled in the thread, with no push after the request touching its anchor, is flagged `resolved, code unchanged`. The opposite, `done` in the code while the thread is still active, is flagged `done, thread still active`. Both are offered as a status change.
