@@ -305,5 +305,49 @@ class CardRules(unittest.TestCase):
         self.assertIn("Offer **`suggest`** only for a wording finding", read("crav1-tighten-spec/SKILL.md"))
 
 
+class Tickable(unittest.TestCase):
+    """Item 6: tick clear acceptance items with no card; soon-stale items get a recheck note."""
+
+    def setUp(self):
+        self.root = spec_folder("# Orders API\n\n## Acceptance criteria\n\n"
+                                "- [ ] Retries stop after three tries\n"
+                                "- [ ] The export writes one file per day\n"
+                                "- [ ] Unit tests for the retry\n"
+                                "- [ ] Failure case: a bad row is skipped\n\n## Open questions\n")
+        (self.root / "verify.md").write_text(
+            "# Verify\n\n## Acceptance — details\n\n| Id | Acceptance | Evidence | Result | Task |\n| --- | --- | --- | --- | --- |\n"
+            "| A1 | Retries stop after three tries | src/retry.py:40, tests/test_retry.py:12 | pass on develop | T1 |\n"
+            "| A2 | The export writes one file per day | src/export.py:9 | pass on develop | T2 |\n"
+            "| A3 | item 3 | tests/test_retry.py:30 | pass on feat/orders-retry | T1 |\n"
+            "| A4 | Failure case: a bad row is skipped | src/export.py:20 | fail | T2 |\n", encoding="utf-8")
+        (self.root / "tasks.md").write_text(
+            "# Tasks\n\n- [x] T1: Retry (verify: unit)\n- [x] T2: Export (verify: unit)\n"
+            "- [ ] T3: Export by region, touches src/export.py (verify: unit — one file per region)\n", encoding="utf-8")
+
+    def test_report_without_write(self):
+        out = js(WALK, "tickable", "--root", str(self.root))
+        acts = {i["row"]: i["action"] for i in out["items"]}
+        self.assertEqual(acts, {"A1": "tick", "A2": "tick-recheck"})
+        self.assertEqual({c["row"] for c in out["cards"]}, {"A3", "A4"})
+        self.assertIsNone(out["wrote"])
+        self.assertIn("- [ ] Retries stop", (self.root / "spec.md").read_text(encoding="utf-8"))
+
+    def test_write_ticks_and_adds_recheck(self):
+        out = js(WALK, "tickable", "--root", str(self.root), "--write")
+        self.assertEqual(out["line"], "Ticked 2 acceptance items from verify: item 1 (A1), item 2 (A2, recheck on T3).")
+        spec = (self.root / "spec.md").read_text(encoding="utf-8")
+        self.assertIn("- [x] Retries stop after three tries", spec)
+        self.assertIn("- [x] The export writes one file per day", spec)
+        self.assertIn("- [ ] Unit tests for the retry", spec)
+        tasks = (self.root / "tasks.md").read_text(encoding="utf-8")
+        self.assertIn("(verify: unit — one file per region; recheck item 2 (verify A2))", tasks)
+        again = js(WALK, "tickable", "--root", str(self.root), "--write")
+        self.assertEqual(again["items"], [])
+
+    def test_docs(self):
+        self.assertIn("tickable --root <spec-folder> --write", read("crav1-tighten-spec/SKILL.md"))
+        self.assertIn("**Tickable at the start (1.196.0).**", read("crav1-tighten-and-plan-ready-to-build/references/steps.md"))
+
+
 if __name__ == "__main__":
     unittest.main()

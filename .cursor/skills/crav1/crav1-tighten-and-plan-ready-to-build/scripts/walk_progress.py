@@ -6924,6 +6924,153 @@ def code_drift(args: argparse.Namespace) -> None:
     })
 
 
+# --- tickable (1.196.0) -----------------------------------------------------
+_ACC_HEAD = re.compile(r"^##\s+Acceptance criteria\s*$", re.M | re.I)
+_VERIFY_ACC_HEAD = re.compile(r"^##\s+Acceptance\b.*details\s*$", re.M | re.I)
+_EVIDENCE_FILE = re.compile(r"[\w./-]+\.[A-Za-z0-9]{1,6}(?::\d+)?")
+_TASK_OPEN = re.compile(r"^\s*-\s*\[( |x|X)\]\s*T(\d+)\b")
+_ITEM_REF = re.compile(r"\bitem\s+(\d+)\b", re.I)
+
+
+def _norm_words(text: str) -> str:
+    return " ".join(re.sub(r"[^\w\s]", " ", text.lower()).split())
+
+
+def _section(text: str, head: re.Pattern) -> str:
+    m = head.search(text)
+    if not m:
+        return ""
+    rest = text[m.end():]
+    nxt = re.search(r"^##\s", rest, re.M)
+    return rest[: nxt.start()] if nxt else rest
+
+
+def _acceptance_lines(spec: str) -> list[dict]:
+    out = []
+    for line in _section(spec, _ACC_HEAD).splitlines():
+        m = re.match(r"^\s*-\s*\[( |x|X)\]\s*(.*)$", line)
+        if m and m.group(2).strip():
+            out.append({"item": len(out) + 1, "text": m.group(2).strip(), "ticked": m.group(1).lower() == "x",
+                        "line": line})
+    return out
+
+
+def _verify_acc_rows(verify: str) -> list[dict]:
+    rows = []
+    for line in _section(verify, _VERIFY_ACC_HEAD).splitlines():
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        if len(cells) < 5 or not re.fullmatch(r"A\d+", cells[0]):
+            continue
+        rows.append({"id": cells[0], "acceptance": cells[1], "evidence": cells[2], "result": cells[3],
+                     "tasks": re.findall(r"T\d+", cells[4])})
+    return rows
+
+
+def _row_passes_on_base(row: dict) -> bool:
+    result = row["result"].lower()
+    return result.startswith("pass") and "fail" not in result and "on branch" not in result and "feat/" not in result
+
+
+def _match_item(row: dict, items: list[dict]) -> dict | None:
+    ref = _ITEM_REF.search(row["acceptance"])
+    if ref:
+        n = int(ref.group(1))
+        return next((i for i in items if i["item"] == n), None)
+    want = _norm_words(row["acceptance"])
+    if not want:
+        return None
+    hits = [i for i in items if _norm_words(i["text"]) == want
+            or (len(want) >= 12 and (_norm_words(i["text"]).startswith(want) or want.startswith(_norm_words(i["text"]))))]
+    return hits[0] if len(hits) == 1 else None
+
+
+def tickable_report(root: Path) -> dict:
+    spec_path, verify_path, tasks_path = root / "spec.md", root / "verify.md", root / "tasks.md"
+    if not spec_path.is_file():
+        fail("root", f"no spec.md in {root}")
+    spec = spec_path.read_text(encoding="utf-8")
+    items = _acceptance_lines(spec)
+    rows = _verify_acc_rows(verify_path.read_text(encoding="utf-8")) if verify_path.is_file() else []
+    tasks = tasks_path.read_text(encoding="utf-8") if tasks_path.is_file() else ""
+    open_tasks = {}
+    for line in tasks.splitlines():
+        m = _TASK_OPEN.match(line)
+        if m and m.group(1) == " ":
+            open_tasks[f"T{m.group(2)}"] = line
+    found, cards = [], []
+    for row in rows:
+        item = _match_item(row, items)
+        if item is None or item["ticked"]:
+            continue
+        files = sorted({f.split(":")[0] for f in _EVIDENCE_FILE.findall(row["evidence"])})
+        if not _row_passes_on_base(row) or not files:
+            cards.append({"item": item["item"], "text": item["text"], "row": row["id"], "result": row["result"]})
+            continue
+        touching = [t for t in row["tasks"] if t in open_tasks]
+        for tid, line in open_tasks.items():
+            if tid not in touching and any(Path(f).name in line for f in files):
+                touching.append(tid)
+        found.append({"item": item["item"], "text": item["text"], "row": row["id"], "evidence_files": files,
+                      "open_tasks_touching": touching, "action": "tick-recheck" if touching else "tick"})
+    return {"items": found, "cards": cards}
+
+
+def _add_recheck(tasks: str, tid: str, note: str) -> str:
+    out = []
+    for line in tasks.splitlines(keepends=True):
+        m = _TASK_OPEN.match(line)
+        if m and f"T{m.group(2)}" == tid and note not in line:
+            body = line.rstrip("\r\n")
+            ending = line[len(body):]
+            vm = re.search(r"\(verify:\s*([^)]*)\)", body)
+            if vm:
+                body = body[: vm.end() - 1] + f"; {note}" + body[vm.end() - 1:]
+            else:
+                body = body + f" (verify: {note})"
+            line = body + ending
+        out.append(line)
+    return "".join(out)
+
+
+def tickable(args: argparse.Namespace) -> None:
+    """Acceptance items a passing verify row on the base already proves (1.196.0). Owned by tighten-spec.
+
+    No card when the evidence is clear: the item is ticked. When a later open
+    task touches the evidence files, it is still ticked now and that task's
+    verify note gets `recheck item N (verify A#)`. A failing or unmatched row
+    is listed under `cards`. Writes only with --write."""
+    root = Path(args.root)
+    report = tickable_report(root)
+    wrote = []
+    if args.write and report["items"]:
+        spec_path = root / "spec.md"
+        spec = spec_path.read_text(encoding="utf-8")
+        items = {i["item"]: i for i in _acceptance_lines(spec)}
+        for hit in report["items"]:
+            line = items[hit["item"]]["line"]
+            spec = spec.replace(line, line.replace("[ ]", "[x]", 1), 1)
+        spec_path.write_text(spec, encoding="utf-8")
+        wrote.append("spec.md")
+        tasks_path = root / "tasks.md"
+        if tasks_path.is_file() and any(h["open_tasks_touching"] for h in report["items"]):
+            tasks = tasks_path.read_text(encoding="utf-8")
+            for hit in report["items"]:
+                for tid in hit["open_tasks_touching"]:
+                    tasks = _add_recheck(tasks, tid, f"recheck item {hit['item']} (verify {hit['row']})")
+            tasks_path.write_text(tasks, encoding="utf-8")
+            wrote.append("tasks.md")
+    line = None
+    if report["items"]:
+        parts = []
+        for h in report["items"]:
+            extra = f", recheck on {', '.join(h['open_tasks_touching'])}" if h["open_tasks_touching"] else ""
+            parts.append(f"item {h['item']} ({h['row']}{extra})")
+        verb = "Ticked" if args.write else "Can tick"
+        n = len(parts)
+        line = f"{verb} {n} acceptance item{'s' if n != 1 else ''} from verify: " + ", ".join(parts) + "."
+    emit({"ok": True, **report, "line": line, "wrote": wrote or None})
+
+
 # Hash lines resolve-stamps may rewrite (1.139.0). Done, Result, findings,
 # notes, and Acknowledged stamp are recorded facts and are not in this set.
 _STAMP_KEYS = frozenset({
@@ -7933,6 +8080,11 @@ def main(argv: list[str] | None = None) -> None:
     cdr.add_argument("--pr", help="the merged pull request, e.g. 73")
     cdr.add_argument("--merged", help="its merge commit, when the walk already saw it merged")
     cdr.set_defaults(func=code_drift)
+
+    tk = sub.add_parser("tickable", help="acceptance items a passing verify row proves; tick with no card (1.196.0)")
+    tk.add_argument("--root", required=True)
+    tk.add_argument("--write", action="store_true", help="tick them, and add recheck notes to touching open tasks")
+    tk.set_defaults(func=tickable)
 
     bs = sub.add_parser("branch-status")
     bs.add_argument("--root", required=True)
