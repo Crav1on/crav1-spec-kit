@@ -580,7 +580,7 @@ def ending_lines(state: dict, files: int) -> dict:
     uncommitted = None
     if files:
         noun = "file" if files == 1 else "files"
-        uncommitted = f"Uncommitted: {files} {noun}; commit with /crav1-finalize-commit when ready."
+        uncommitted = f"Uncommitted: {files} {noun}; commit with `/crav1-finalize-commit` when ready."
     proposals = []
     for proposal in sorted(state["proposals"], key=lambda row: row["key"].lower()):
         where = "" if proposal["slug"] == "-" else f" on {proposal['slug']}"

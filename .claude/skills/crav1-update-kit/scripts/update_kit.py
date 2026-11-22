@@ -1175,11 +1175,11 @@ def ending_text(root: Path, uncommitted: int = 0, updated: bool = True) -> str:
         lines += ["The kit files changed; reload the window so the new skills load.", "",
                   "Reload the window from the command palette:", "`Developer: Reload Window`"]
     for topic in topics:
-        lines += ["", f"Go on with the {topic.replace('-', ' ')} design topic:", f"`/crav1-design-architecture resume {topic}`"]
+        lines += ["", f"Go on with the {topic.replace('-', ' ')} design topic:", f"`/crav1-design-architecture {topic}`"]
     if len(lines) == 1:
         lines = ["Run next: nothing needed now."]
     if uncommitted:
-        lines += ["", f"Uncommitted: {uncommitted} file{'s' if uncommitted != 1 else ''}; commit with /crav1-finalize-commit when ready."]
+        lines += ["", f"Uncommitted: {uncommitted} file{'s' if uncommitted != 1 else ''}; commit with `/crav1-finalize-commit` when ready."]
     return "\n".join(lines) + "\n"
 
 

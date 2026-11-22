@@ -14,6 +14,8 @@ Exit: 0
     "docs/architecture/designs/orders-target/designs/target-first/diagrams.md",
     "docs/architecture/designs/orders-target/inputs/README.md"
   ],
+  "status_line": "Design session open: orders-target. Park: `/crav1-design-architecture orders-target park`",
+  "session": "open",
   "builds_on": "orders-platform",
   "branch_from": "design/orders-platform",
   "fixed": [
@@ -45,7 +47,7 @@ Exit: 0
     "decision": "Where orders live"
   },
   "base_branch": "design/orders-platform",
-  "ending": "Run next:\nWhere orders live is marked for another look in the base topic orders-platform. Settle it there, then merge design/orders-platform into design/orders-target.\n\nPick up the orders platform designs:\n`/crav1-design-architecture resume orders-platform`\n",
+  "ending": "Run next:\nWhere orders live is marked for another look in the base topic orders-platform. Settle it there, then merge design/orders-platform into design/orders-target.\n\nOpen the orders platform session:\n`/crav1-design-architecture orders-platform`\n",
   "written": [
     "docs/architecture/designs/orders-platform/designs/platform-first/design.md"
   ]
@@ -65,7 +67,7 @@ Exit: 0
   ]
 }
 
-## Step 5: design_run.py resume --topic orders-target
+## Step 5: design_run.py resume --json --topic orders-target
 
 Exit: 0
 
@@ -141,13 +143,13 @@ Exit: 0
 
 Exit: 2
 
+Waiting: go-ahead on orders-platform and its design pull request (design/orders-platform) merged into main.
+
 Run next:
 The orders target design builds on orders-platform, which has not had go-ahead yet. Go-ahead here waits until the orders-platform design pull request is merged.
 
-Pick up the orders platform designs:
-`/crav1-design-architecture resume orders-platform`
-
-Waiting: go-ahead on orders-platform and its design pull request (design/orders-platform) merged into main.
+Open the orders platform session:
+`/crav1-design-architecture orders-platform`
 
 ## Step 8: design_run.py go-ahead --topic orders-platform --accept-findings
 
@@ -185,13 +187,13 @@ Exit: 0
 
 Exit: 2
 
+Waiting: the orders-platform design pull request (design/orders-platform) to merge into main.
+
 Run next:
 The orders target design builds on orders-platform, whose design pull request is not merged into main yet. Go-ahead here waits for that merge.
 
-Pick up the orders target designs:
-`/crav1-design-architecture resume orders-target`
-
-Waiting: the orders-platform design pull request (design/orders-platform) to merge into main.
+Open the orders target session:
+`/crav1-design-architecture orders-target`
 
 ## Step 10: design_run.py go-ahead --topic orders-target --accept-findings --base-merged
 

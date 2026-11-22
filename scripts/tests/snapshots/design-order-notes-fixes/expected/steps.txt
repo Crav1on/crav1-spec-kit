@@ -20,7 +20,9 @@ Exit: 0
     "docs/architecture/designs/orders-platform/designs/platform-first/diagrams.md",
     "docs/architecture/designs/orders-platform/notes.md",
     "docs/architecture/designs/orders-platform/inputs/README.md"
-  ]
+  ],
+  "status_line": "Design session open: orders-platform. Park: `/crav1-design-architecture orders-platform park`",
+  "session": "open"
 }
 
 ## Step 3: design_run.py add-decision --topic orders-platform --title Backup policy
@@ -94,7 +96,7 @@ Exit: 0
   ]
 }
 
-## Step 9: design_run.py resume --topic orders-platform
+## Step 9: design_run.py resume --json --topic orders-platform
 
 Exit: 0
 
@@ -111,15 +113,17 @@ Exit: 0
 
 Exit: 0
 
+Waiting: person B to decide who pays for the zone
+Waiting: person A on test backups
+
+Design session open: orders-platform. Park: `/crav1-design-architecture orders-platform park`
 Run next:
 The end state is still being designed.
 
-Pick up the orders platform designs:
-`/crav1-design-architecture resume orders-platform`
+Open the orders platform session:
+`/crav1-design-architecture orders-platform`
 
-Waiting: person B to decide who pays for the zone
-Waiting: person A on test backups
-Uncommitted: 2 files.
+Uncommitted: 2 files; commit with `/crav1-finalize-commit` when ready.
 
 ## Step 11: design_run.py go-ahead --topic orders-platform --accept-findings
 

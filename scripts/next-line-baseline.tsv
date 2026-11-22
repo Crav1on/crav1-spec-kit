@@ -1,37 +1,4 @@
 # Files not moved to Run next yet, with their count of `Next:` lines (1.193.0).
 # kit-lint fails on a file not listed, a higher count, or a lower one (lower the count here).
 # The list only shrinks; never add a file.
-.cursor/skills/crav1/crav1-ado-sync/branches/pull-spec-changes/BRANCH.md	1
-.cursor/skills/crav1/crav1-ado-sync/branches/pull-tasks/BRANCH.md	1
-.cursor/skills/crav1/crav1-ado-sync/branches/push-features/BRANCH.md	2
-.cursor/skills/crav1/crav1-ado-sync/branches/push-tasks/BRANCH.md	1
-.cursor/skills/crav1/crav1-build-features/SKILL.md	1
-.cursor/skills/crav1/crav1-build-tasks/branches/one-task/BRANCH.md	1
-.cursor/skills/crav1/crav1-build-tasks/branches/several-tasks/BRANCH.md	1
-.cursor/skills/crav1/crav1-build-tasks/references/approval-needed.md	2
-.cursor/skills/crav1/crav1-build-tasks/scripts/permission_block.py	2
-.cursor/skills/crav1/crav1-build-walk/scripts/build_walk.py	1
-.cursor/skills/crav1/crav1-create-feature-branch/SKILL.md	1
-.cursor/skills/crav1/crav1-existing-to-specs/branches/recheck/BRANCH.md	4
-.cursor/skills/crav1/crav1-existing-to-specs/branches/repos-and-bundle/BRANCH.md	2
-.cursor/skills/crav1/crav1-existing-to-specs/branches/repos-only/BRANCH.md	1
-.cursor/skills/crav1/crav1-explain-existing-system/SKILL.md	2
-.cursor/skills/crav1/crav1-fix-bug/SKILL.md	5
-.cursor/skills/crav1/crav1-glossary/SKILL.md	1
-.cursor/skills/crav1/crav1-host-setup/SKILL.md	1
-.cursor/skills/crav1/crav1-map-pipeline-environments/SKILL.md	1
-.cursor/skills/crav1/crav1-model-data/SKILL.md	2
-.cursor/skills/crav1/crav1-read-environment/references/after.md	1
-.cursor/skills/crav1/crav1-record-approval/SKILL.md	1
-.cursor/skills/crav1/crav1-refresh-system-notes/SKILL.md	1
-.cursor/skills/crav1/crav1-resolve-open-questions/references/list-done.md	4
-.cursor/skills/crav1/crav1-resolve-open-questions/references/one-question.md	1
-.cursor/skills/crav1/crav1-review-architecture/SKILL.md	1
-.cursor/skills/crav1/crav1-review-security/SKILL.md	1
-.cursor/skills/crav1/crav1-run-exploratory-test/SKILL.md	1
-.cursor/skills/crav1/crav1-show-or-ask-open-questions/SKILL.md	1
-.cursor/skills/crav1/crav1-show-or-ask-open-questions/branches/show/BRANCH.md	3
-.cursor/skills/crav1/crav1-suggest-tests-for-code/SKILL.md	2
-.cursor/skills/crav1/crav1-tasks-ready-to-build/scripts/task_order.py	1
-.cursor/skills/crav1/crav1-tighten-and-plan-ready-to-build/scripts/walk_progress.py	2
-.cursor/skills/crav1/crav1-what-do-we-know-about-this/references/answer.md	2
+# 1.200.0: every counted line is gone, so the baseline is empty.

@@ -91,4 +91,4 @@ Read [references/walk-restamp.md](references/walk-restamp.md) only when the spec
 
 ## Run ending (1.122.0)
 
-End as [run-ending.md](../crav1-docs/reference/run-ending.md) says.
+End as [run-ending.md](../crav1-docs/reference/run-ending.md) says. `scripts/ending.py` prints that ending from the shared helper. Before a write, the same script's stay card applies when a `design/<topic>` branch is checked out or owns the change: recommend staying, and never switch to the default branch.

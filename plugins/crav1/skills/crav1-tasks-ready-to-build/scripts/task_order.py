@@ -596,7 +596,7 @@ def render(res, full=False):
         out.append("Needs tick")
         out += [f"- T{r['id']}: {shown(r['title'])}" for r in needs]
     out.append("Order: " + " → ".join(f"T{n}" for n in res["order"]))
-    out.append(f"Next: T{res['next']}" if res["next"] else "Next: none ready")
+    out.append(f"Ready task: T{res['next']}" if res["next"] else "Ready task: none ready")
     for k, v in res["depends_on_failed"].items():
         out.append(f"{k}: {v}")
     return "\n".join(out)

@@ -63,6 +63,6 @@ A new line says it was seen in that environment. A shared line keeps `shared wit
 
 ## After
 
-`Next: nothing needed now.` When a file changed: `Uncommitted: 1 file; commit with /crav1-finalize-commit when ready.` See [How a run ends](reference/run-ending.md). No push. This command does not commit for you. It does not start Specify, Plan, or Build.
+`Run next: nothing needed now.` When a file changed: `Uncommitted: 1 file; commit with /crav1-finalize-commit when ready.` See [How a run ends](reference/run-ending.md). No push. This command does not commit for you. It does not start Specify, Plan, or Build.
 
 Reference page: [read-environment](reference/skills/crav1-read-environment.md)

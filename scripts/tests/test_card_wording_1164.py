@@ -64,16 +64,13 @@ class CardLint(unittest.TestCase):
         text = "Card: How should I fix it?\n1. Move T14 (Recommended) (`fix-loop`): Build T14 on feat/x instead.\n2. Leave it (`stop`): Change nothing at all.\n"
         self.assertEqual(self.hits(text), [])
 
-    def test_scope_is_the_reworded_skills(self):
-        self.assertEqual(
-            set(LINT.CARD_LINT_SKILLS),
-            {
-                "crav1-tasks-ready-to-build", "crav1-build-walk",
-                "crav1-tighten-and-plan-ready-to-build", "crav1-open-pr",
-                "crav1-merge-pr", "crav1-pr-status", "crav1-review-pr",
-                "crav1-design-architecture",
-            },
-        )
+    def test_scope_is_every_skill(self):
+        names = {
+            path.name for path in SKILLS.iterdir()
+            if path.is_dir() and path.name.startswith("crav1-") and path.name != "crav1-docs"
+        }
+        self.assertEqual(set(LINT.CARD_LINT_SKILLS), names)
+        self.assertGreater(len(names), 8)
         self.assertEqual(LINT.card_wording_problems(str(ROOT)), [])
 
     def test_reworded_files_have_card_blocks(self):

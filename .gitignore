@@ -1,3 +1,5 @@
 __pycache__/
 *.pyc
 scripts/mermaid/node_modules/
+
+.kit-build-1200.md

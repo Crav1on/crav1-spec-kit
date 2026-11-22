@@ -18,7 +18,7 @@ Read the input. Extract what matters:
 
 A source-to-target mapping, a list that may feed several features, and debt being identified are items. They are worth keeping even when no spec covers them.
 
-Each item is a quote. Use their words. Do not replace a quote with a paraphrase. When the input shows a speaker, include the speaker. When it shows a time, include the time. Do not invent a speaker, a time, or a date.
+Each item is a quote. Use their words. Do not replace a quote with a paraphrase. When the input shows a speaker, include the speaker. When it shows a time, include the time. Do not invent a speaker, a time, or a date. A point in an AI meeting summary is not that person's unless the note marks it as theirs; say the date note says it (1.200.0).
 
 Drop small talk and status chatter. A greeting, scheduling, thanks, a status round, and "we will take that offline" with no decision are not items. A dropped line is not numbered and is not counted as extracted. Dismiss stays for that noise when a numbered item is only noise.
 

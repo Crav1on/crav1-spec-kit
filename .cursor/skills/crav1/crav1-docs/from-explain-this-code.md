@@ -45,4 +45,4 @@ The file opens with a header naming the paths it covers and the commit it was ba
 
 Reference page: [explain this code](reference/skills/crav1-explain-this-code.md)
 
-The run ends as [How a run ends](reference/run-ending.md) says: one `Next:` line, `Waiting:` only when a step is blocked, and `Uncommitted:` when files changed and are not committed.
+The run ends as [How a run ends](reference/run-ending.md) says: Run next, never a `Next:` line (1.200.0), `Waiting:` only when a step is blocked, and `Uncommitted:` when files changed and are not committed.

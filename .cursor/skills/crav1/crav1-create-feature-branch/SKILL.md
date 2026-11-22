@@ -91,7 +91,7 @@ Offer:
 
 When `/crav1-plan-from-spec` has written `plan.md` / `tasks.md` on `spec/<slug>` (or they chose specify-only earlier):
 
-- On `spec/<slug>`: `Next: /crav1-open-pr, because this specify-only branch is not on the default branch yet.` Add the Uncommitted line when spec files are not committed. Do not start build on that branch. Do not list the feat branch; it waits until this pull request has merged.
+- On `spec/<slug>`: the Run next reason "this specify-only branch is not on the default branch yet" and the command alone in its code span `/crav1-open-pr` Add the Uncommitted line when spec files are not committed. Do not start build on that branch. Do not list the feat branch; it waits until this pull request has merged.
 - On `feat/<slug>`: skip this list. Implement on the same branch when they ask. Do not start it here.
 
 If they planned on `feat/<slug>` (one-branch default), skip spec-first. Implement on the same branch.

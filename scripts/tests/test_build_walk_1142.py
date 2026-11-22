@@ -75,8 +75,9 @@ class SingleNext(unittest.TestCase):
                 self.assertEqual(result["count"], 1, result)
                 self.assertEqual(len(result["next"]), 1)
                 line = result["next"][0]
-                self.assertEqual(line.count("Next:"), 1)
-                commands = [part for part in line.split() if part.startswith("/crav1-")]
+                self.assertNotIn("Next:", line)
+                self.assertEqual(line.count("Run next:"), 1)
+                commands = [part.strip("`") for part in line.split() if part.strip("`").startswith("/crav1-")]
                 self.assertEqual(len(commands), 1, line)
                 for banned in result["suppressed"]:
                     self.assertNotIn(banned, line)
@@ -111,7 +112,8 @@ class SingleNext(unittest.TestCase):
         self.assertIn("T5 Note the policy", result["next"][1])
         self.assertIn(NOTE, result["next"][1])
         for line in result["next"]:
-            self.assertEqual(line.count("Next:"), 1)
+            self.assertNotIn("Next:", line)
+            self.assertEqual(line.count("Run next:"), 1)
             self.assertIn("/crav1-build-walk", line)
 
 
@@ -343,7 +345,8 @@ class ApprovalHold(unittest.TestCase):
         line = bw.next_for(state(phase="approval", approval_asked=False, tasks=[task(4, "Apply the CI build policy")]))["next"][0]
         self.assertIn("/crav1-show-or-ask-open-questions", line)
         self.assertNotIn("/crav1-build-tasks", line)
-        self.assertEqual(line.count("Next:"), 1)
+        self.assertNotIn("Next:", line)
+        self.assertEqual(line.count("Run next:"), 1)
 
     def test_an_approved_line_does_not_replace_the_live_yes(self):
         gate = bw.live_gate(self.line, approval_holding=False, dry_ran=True, user_yes=False, approved=True)

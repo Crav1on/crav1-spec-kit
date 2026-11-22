@@ -114,7 +114,7 @@ class TestChangeGoal(Base):
         self.assertEqual(d["Where orders live"]["State"], "reopened")
         self.assertIn("goal changed", d["Where orders live"]["Reopened"])
         self.assertEqual(d["Who releases orders"]["State"], "settled")
-        self.assertEqual(self.ok("resume", "--topic", BASE)["next_decision"], "Where orders live")
+        self.assertEqual(self.ok("resume", "--json", "--topic", BASE)["next_decision"], "Where orders live")
 
     def test_reopen_list_and_rename_flag_settled_decisions(self):
         res = self.ok("change-goal", "--topic", BASE, "--reason", "names", "--yes",
@@ -143,7 +143,7 @@ class TestChangeGoal(Base):
         g = dr.Topic(self.tmp, BASE).goal()
         self.assertIn("Reordered decisions", g["changes"])
         self.assertIn("Added decision: How billing reads orders", g["changes"])
-        self.assertEqual(self.ok("resume", "--topic", BASE)["next_decision"], "How billing reads orders")
+        self.assertEqual(self.ok("resume", "--json", "--topic", BASE)["next_decision"], "How billing reads orders")
 
     def test_open_questions_and_leans_on_surviving_decisions_are_kept(self):
         self.ok("lean", "--topic", BASE, "--decision", "how test", inp={"options": [{"name": "Made-up data"}], "leaning": "Made-up data"})
@@ -178,10 +178,10 @@ class TestLinkedTopics(Base):
     def test_resume_shows_decisions_settled_in_the_base_since_last_run(self):
         self.link()
         self.ok("settle", "--topic", BASE, "--decision", "how test", inp=DATA)
-        res = self.ok("resume", "--topic", LINKED)
+        res = self.ok("resume", "--json", "--topic", LINKED)
         self.assertEqual(len(res["base_settled_since"]), 1)
         self.assertTrue(res["base_settled_since"][0].startswith("How test gets data: Made-up data"))
-        self.assertEqual(self.ok("resume", "--topic", LINKED)["base_settled_since"], [])
+        self.assertEqual(self.ok("resume", "--json", "--topic", LINKED)["base_settled_since"], [])
 
     def test_local_change_of_a_base_decision_is_refused_with_a_revisit(self):
         self.link()
@@ -195,9 +195,10 @@ class TestLinkedTopics(Base):
         self.assertEqual(d["Where orders live"]["State"], "reopened")
         self.assertIn("revisit from topic orders-target", d["Where orders live"]["Reopened"])
         self.assertTrue(res["ending"].startswith("Run next:\n"))
-        self.assertIn("`/crav1-design-architecture resume orders-platform`", res["ending"])
+        self.assertIn("`/crav1-design-architecture orders-platform`", res["ending"])
+        self.assertNotIn("resume orders-platform", res["ending"])
         self.assertNotIn("Next:", res["ending"].replace("Run next:", ""))
-        self.assertEqual(self.ok("resume", "--topic", LINKED)["base_reopened_since"][0].split(": ")[0], "Where orders live")
+        self.assertEqual(self.ok("resume", "--json", "--topic", LINKED)["base_reopened_since"][0].split(": ")[0], "Where orders live")
 
     def test_revisit_needs_a_linked_topic(self):
         self.refused("revisit", "--topic", BASE, "--decision", "where", "--reason", "x")
@@ -214,14 +215,16 @@ class TestLinkedTopics(Base):
     def test_go_ahead_waits_for_the_base_design_pr_to_merge(self):
         self.link()
         err = self.refused("go-ahead", "--topic", LINKED, "--accept-findings")
-        self.assertTrue(err.startswith("Run next:\n"))
+        self.assertTrue(err.startswith("Waiting:"))
+        self.assertLess(err.index("Waiting:"), err.index("Run next:"))
         self.assertIn("Waiting: go-ahead on orders-platform", err)
         self.ok("go-ahead", "--topic", BASE, "--accept-findings")
         self._git("init", "-q", "-b", "main")
         self._git("-c", "user.name=person A", "-c", "user.email=a@example.com", "commit", "-q", "--allow-empty", "-m", "start")
         err = self.refused("go-ahead", "--topic", LINKED, "--accept-findings")
         self.assertIn("Waiting: the orders-platform design pull request (design/orders-platform) to merge into main.", err)
-        self.assertIn("`/crav1-design-architecture resume orders-target`", err)
+        self.assertIn("`/crav1-design-architecture orders-target`", err)
+        self.assertNotIn("resume orders-target", err)
         self._git("add", "-A")
         self._git("-c", "user.name=person A", "-c", "user.email=a@example.com", "commit", "-q", "-m", "merge design")
         res = self.ok("go-ahead", "--topic", LINKED, "--accept-findings")

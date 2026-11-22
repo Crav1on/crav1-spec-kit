@@ -55,7 +55,11 @@ After Unclear, a fourth section, **Branches**, proposes `docs/environments/promo
 The run ends as [How a run ends](reference/run-ending.md) says. This command does not run the next step.
 
 ```text
-Next: /crav1-read-environment, because the pipeline read is not a host read.
+Run next:
+The pipeline read is not a host read.
+
+Read the host:
+`/crav1-read-environment`
 Uncommitted: 1 file; commit with /crav1-finalize-commit when ready.
 ```
 

@@ -120,7 +120,7 @@ Read only the file for the STATUS you got. Do not read the others.
 
 TL;DR: slugs `done` (with `n branches not merged` when that applies) / `blocked` + why / `skipped` / not started; which `feat/<slug>` tips you left on; commits workers reported.
 
-Remind: **no push, no PR** from this skill. `Next: /crav1-open-pr, because the work is not on a pull request yet.` One pull request per `feat/<slug>`. Do not run it here. When the head's Match `Branch:` line ends in `(PR <n>)` or a pull request is known to be open for it, name it instead: `/crav1-open-pr` to push to PR <n> and update its description or comment.
+Remind: **no push, no PR** from this skill. the Run next reason "the work is not on a pull request yet" and the command alone in its code span `/crav1-open-pr` One pull request per `feat/<slug>`. Do not run it here. When the head's Match `Branch:` line ends in `(PR <n>)` or a pull request is known to be open for it, name it instead: `/crav1-open-pr` to push to PR <n> and update its description or comment.
 
 Then [tool-approvals.md](../crav1-build-tasks/branches/one-task/references/tool-approvals.md) → Undo once. Do not undo per slug or per `T#`.
 

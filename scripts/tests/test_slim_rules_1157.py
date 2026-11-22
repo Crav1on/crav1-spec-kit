@@ -140,7 +140,9 @@ class WalkEndingRunNextOnly(unittest.TestCase):
         commands = [line for line in out["ending"].splitlines() if line.startswith("`")]
         self.assertEqual(len(out["next"]), len(commands))
         for line, command in zip(out["next"], commands):
-            self.assertTrue(line.startswith("Next: " + command.strip("`") + ","), (line, command))
+            self.assertTrue(line.startswith("Run next:\n"), (line, command))
+            self.assertIn(command.strip("`"), line)
+            self.assertNotIn("Next:", line)
 
     def test_grouping_prints_run_next_only(self):
         out = bw.next_for({"mode": "grouping", "branches": [

@@ -50,6 +50,6 @@ No test code. No application code. No `plan.md`. No `tasks.md`. No new folder.
 
 ## After
 
-When a kept suggestion is not in the spec yet: `Next: /crav1-add-to-spec, because that suggestion is not in the spec yet.` Plan is not listed here. When a file changed: `Uncommitted: 1 file; commit with /crav1-finalize-commit when ready.` See [How a run ends](reference/run-ending.md). This command does not run the next step. No push.
+When a kept suggestion is not in the spec yet, Run next names `/crav1-add-to-spec` because that suggestion is not in the spec yet (1.200.0). Plan is not listed here. When a file changed: `Uncommitted: 1 file; commit with /crav1-finalize-commit when ready.` See [How a run ends](reference/run-ending.md). This command does not run the next step. No push.
 
 Reference page: [suggest-tests-for-code](reference/skills/crav1-suggest-tests-for-code.md)

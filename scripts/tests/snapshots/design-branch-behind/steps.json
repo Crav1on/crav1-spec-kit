@@ -80,6 +80,7 @@
   {
     "args": [
       "resume",
+      "--json",
       "--topic",
       "orders-platform"
     ],
@@ -95,6 +96,7 @@
   {
     "args": [
       "resume",
+      "--json",
       "--topic",
       "orders-platform"
     ]

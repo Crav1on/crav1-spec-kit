@@ -36,7 +36,11 @@ A plan task marked `(host setup)` follows the same rules inside [Build tasks](fr
 ## After
 
 ```text
-Next: /crav1-open-pr, because the script is on a work branch and not on a pull request yet.
+Run next:
+The script is on a work branch and not on a pull request yet.
+
+Open the pull request:
+`/crav1-open-pr`
 ```
 
 A thread that asked for the setting is named in that reason. `/crav1-pr-status` comes after the pull request exists. See [How a run ends](reference/run-ending.md).

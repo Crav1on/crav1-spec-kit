@@ -6,6 +6,14 @@ Read only when the pointer in `SKILL.md` sends you here: a pull request is alrea
 
 When `pr_common.py resolve --ref <n>` names an open pull request that someone else opened, and the local head has no commit the host lacks, stop after that one host read: no checks, no branch compare, no further reads. Say `PR 84 is open and is person A's; open-pr has nothing to do.` Then Run next, the label `See where PR 84 stands:` above `` `/crav1-pr-status pr84` ``. The signed-in user is `you` in every line, never their name in the third person.
 
+## A review comment already on the pull request (1.200.0)
+
+When the open pull request already has a review comment and the user has a drafted reply, offer one card before posting. Use the same reply card as pr-status. Preview first. Post only after the yes. One thread, one card.
+
+Card: Post your reply in thread 195 and set it to resolved?
+- **Post and set resolved (Recommended)**: post the drafted reply, then resolve that thread.
+- **Leave it**: post nothing and leave the draft where it is.
+
 ## Find and read it
 
 After the push (or open only) succeeded, read the open pull request for head → base on the host picked in **Host**:

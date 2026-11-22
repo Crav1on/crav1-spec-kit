@@ -208,7 +208,7 @@ class Waiting(unittest.TestCase):
         self.assertFalse(row["can_jump_back"])
         self.assertEqual(
             payload["waiting_line"],
-            "Waiting: 1 tasks wait on open questions (the partner).",
+            'Waiting: 1 tasks wait on open questions (the partner): T1 waits on "Which currency for refunds?" from the partner.',
         )
         by_task = {item["task"]: item for item in payload["waiting"]}
         self.assertIn("held, waits on T1", by_task["T2"]["reason"])

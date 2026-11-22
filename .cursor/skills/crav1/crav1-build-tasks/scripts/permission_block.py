@@ -102,7 +102,7 @@ def classify(
             else "the live run needs your yes"
         )
         waiting = "Waiting: your yes to run the live command is not on record."
-        nxt = f"Next: {step}, because {why}."
+        nxt = f"Run next:\n{why}\n\nGo on:\n`{step}`"
         out = {
             "kind": "yes-missing",
             "yes_on_record": False,
@@ -126,7 +126,7 @@ def classify(
             f"Run it yourself: {shown}",
             "Or allow that one command and rerun.",
         ]
-        nxt = f"Next: {step}, because {why}."
+        nxt = f"Run next:\n{why}\n\nGo on:\n`{step}`"
         out = {
             "kind": "permission-refused",
             "yes_on_record": True,

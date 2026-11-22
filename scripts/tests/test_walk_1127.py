@@ -126,7 +126,7 @@ class WaitingWho(unittest.TestCase):
         self.assertFalse(by_task["T3"]["asked"])
         self.assertEqual(
             payload["waiting_line"],
-            "Waiting: 3 tasks wait on open questions (the partner, a colleague; nobody named for 1).",
+            'Waiting: 3 tasks wait on open questions (the partner, a colleague; nobody named for 1): T1 waits on "Waiting for the partner to confirm the currency?" from the partner; T2 waits on "Which export format?" and nobody is named to answer it; T3 waits on "Who signs the vendor file?" from a colleague.',
         )
         rows = {row["task"]: row["bucket"] for row in payload["rows"]}
         self.assertEqual(rows["T1"], "waiting")
@@ -138,7 +138,7 @@ class WaitingWho(unittest.TestCase):
         self.assertEqual(payload["waiting"][0]["who"], "not named yet")
         self.assertEqual(
             payload["waiting_line"],
-            "Waiting: 1 tasks wait on open questions (nobody named for 1).",
+            'Waiting: 1 tasks wait on open questions (nobody named for 1): T1 waits on "Which export format?" and nobody is named to answer it.',
         )
         self.assertEqual(len(payload["waiting"]), 3)
         self.assertEqual(payload["result"], "not-ready")

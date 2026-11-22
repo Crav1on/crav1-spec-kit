@@ -101,6 +101,6 @@ The final message is exactly what this skill drafted. Any other line: read [refe
 
 ## Run ending (1.122.0)
 
-End as [run-ending.md](../crav1-docs/reference/run-ending.md) says.
+End as [run-ending.md](../crav1-docs/reference/run-ending.md) says. `scripts/ending.py` prints it and its stay card.
 
 Every ending of this skill is Run next or nothing, never a `Next:` line (1.173.0). That covers `commit`, `copy`, `stop`, and a failed commit. Each label is on its own line above its command, and each command is alone in its code span. When nothing applies, there is no Run next. A suggestion to throw away an edit stays a plain sentence with the git command in a code span, for example: To throw the edit away, run `git checkout -- docs/specs/orders-api/build-map.md`.

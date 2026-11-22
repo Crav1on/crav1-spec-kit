@@ -21,7 +21,11 @@ This is cross-cutting. It may run from any lane. It does not move work into Spec
 
 Route first, load second. The word after the command is the flow. A repo name from `docs/system/repos.md` may follow. A whole number of minutes may follow. Do not ask the user to type brackets.
 
-- **No flow word:** ask one question. Options: `manual-flow` (Recommended), `auto-flow`. A headless or bot run with no word stops and names those two words. It does not guess.
+- **No flow word:** ask this card. A headless or bot run with no word stops and names those two words. It does not guess.
+
+Card: Which flow should this run use?
+- **Manual flow (Recommended)**: ask before each write and read the manual-flow reference.
+- **Auto flow**: fetch without asking and read the auto-flow reference.
 - **`manual-flow`:** read [references/manual-flow.md](references/manual-flow.md), then [references/common.md](references/common.md). Do not open `references/auto-flow.md`.
 - **`auto-flow`:** read [references/auto-flow.md](references/auto-flow.md), then [references/common.md](references/common.md). Do not open `references/manual-flow.md`.
 

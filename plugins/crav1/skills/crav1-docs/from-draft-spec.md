@@ -66,4 +66,4 @@ Then plan: [From a spec to a plan](from-spec-to-plan.md).
 
 Reference pages: [review-architecture](reference/skills/crav1-review-architecture.md) · [tighten-spec](reference/skills/crav1-tighten-spec.md) · [resolve-open-questions](reference/skills/crav1-resolve-open-questions.md) · [create-feature-branch](reference/skills/crav1-create-feature-branch.md)
 
-The run ends as [How a run ends](reference/run-ending.md) says: one `Next:` line, `Waiting:` only when a step is blocked, and `Uncommitted:` when files changed and are not committed.
+The run ends as [How a run ends](reference/run-ending.md) says: Run next, never a `Next:` line (1.200.0), `Waiting:` only when a step is blocked, and `Uncommitted:` when files changed and are not committed.

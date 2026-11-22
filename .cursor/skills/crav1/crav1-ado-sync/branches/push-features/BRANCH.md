@@ -123,8 +123,8 @@ Say what was created and what was updated. One line each: the id, the home, the 
 
 When a create wrote a file, name that file. Say that without that file a later run offers Create again and would make a duplicate. Add the Uncommitted line. Do not run a commit.
 
-- That spec has tasks: `Next: /crav1-ado-sync push-tasks, because the Feature exists and its tasks are not on the board yet.`
-- Otherwise: `Next: nothing needed now.`
+- That spec has tasks: the Run next reason "the Feature exists and its tasks are not on the board yet" and the command alone in its code span `/crav1-ado-sync push-tasks`
+- Otherwise: `Run next: nothing needed now.`
 - Do not name the pull-spec-changes branch in the ending. Do not run the next step.
 
 Do not plan. Do not implement. Do not commit.

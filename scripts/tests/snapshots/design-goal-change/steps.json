@@ -103,6 +103,7 @@
   {
     "args": [
       "resume",
+      "--json",
       "--topic",
       "orders-platform"
     ]

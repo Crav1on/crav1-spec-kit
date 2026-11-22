@@ -452,7 +452,7 @@ def recap(root: Path, branch: str, facts: dict, uncommitted: int | None) -> str:
             out.append("Build is not named until you add a linter or choose to go on without one.")
     if uncommitted:
         out.append("")
-        out.append(f"Uncommitted: {uncommitted} files; commit with /crav1-finalize-commit when ready.")
+        out.append(f"Uncommitted: {uncommitted} files; commit with `/crav1-finalize-commit` when ready.")
     return "\n".join(out) + "\n"
 
 
@@ -547,7 +547,7 @@ def queue(items: list[dict], root: Path | None, went_on: bool, uncommitted: int 
         nxt = empty_queue_next(items, named, went_on, root.name if root is not None else None, uncommitted)
         out.append(nxt)
         if uncommitted and "/crav1-finalize-commit" not in nxt:
-            out.append(f"Uncommitted: {uncommitted} files; commit with /crav1-finalize-commit when ready.")
+            out.append(f"Uncommitted: {uncommitted} files; commit with `/crav1-finalize-commit` when ready.")
     return "\n".join(out) + "\n"
 
 

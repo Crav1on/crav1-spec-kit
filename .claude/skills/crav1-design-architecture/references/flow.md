@@ -14,9 +14,9 @@ Prompt budget for one run: one framing card for a new or changed goal (its scope
 
 ## Step 0: Route
 
-`status` reads and stops; it shows each topic's links both ways (`builds on` and `built on by`). `resume` runs the script move `resume --topic <topic>` and continues at the first open or reopened decision, or at a stage marked `needs another look`. `park` first saves anything discussed but not yet in a script move with `note`, then runs `park` and ends. `fan-out`, `stage-it`, `go-ahead`, `compare-topics` and `prepare` go to those steps.
+The standard start is the status screen in `references/session.md`. `resume` is the same screen. `status` reads and stops; it shows each topic's links both ways (`builds on` and `built on by`). `next` continues at the first open or reopened decision. `park` first saves anything discussed but not yet in a script move with `note`, then runs `park` and prints `Session parked` with `/crav1-design-architecture <topic>`. `fan-out`, `stage-it`, `go-ahead`, `compare-topics` and `prepare` go to those steps.
 
-A different goal for a topic that already exists goes to Step 2a, `change-goal`; do not offer to recreate the topic. Idea text that builds on an existing topic, or `builds-on <base>`, goes to Step 2b. On `resume` of a linked topic, name the decisions the base settled or reopened since the last run (`base_settled_since`, `base_reopened_since`) before the next decision. A run without the user passes `--headless`; the script then refuses every move except status, resume, lean, note, compare, compare-topics, review and ending.
+A different goal for a topic that already exists goes to Step 2a, `change-goal`; do not offer to recreate the topic. Idea text that builds on an existing topic, or `builds-on <base>`, goes to Step 2b. On `next` for a linked topic, read `resume --json` and name the decisions the base settled or reopened since the last run (`base_settled_since`, `base_reopened_since`) before the card. The status screen itself does not print those fields. A run without the user passes `--headless`; the script then refuses every move except status, resume, lean, note, compare, compare-topics, review and ending.
 
 Never offer to recreate a topic that already exists; a new or saved goal for it goes through `change-goal`. When `resume` returns `pending_goal_inputs`, a saved goal file in `inputs/` is newer than `goal.md` or not in it yet: offer `change-goal` with that file on a card before the next decision.
 
@@ -112,7 +112,7 @@ Index line every turn, titles only, in the decision order (`Order: N` on each de
 
 On `choose-*`, run `settle`. It writes a draft ADR from the ADR template in `designs/<name>/adr/` (status `draft`, every option shown under Considered options, the user's idea among them), marks the decision settled in `design.md`, updates the end state, adds the draft diagram (planned parts dashed and labelled `planned`), and refreshes `compare.md` when the topic has more than one design. A stage the change affects is marked `needs another look`. A revisit needs `--revisit-yes` after a separate yes. Recap: **Added / Changed / Still open**.
 
-Optional batch: when 3 or more decisions remain and each has a clear recommendation, offer the kit's batch card from `question-cards.md`. `D#` is display only. A run without the user never uses it.
+One by one only. `settle-preview` shows the open decisions and a card whose recommended option is `one-by-one`. A yes on that card settles nothing. There is no settle batch. When the user asked for one at a time, or a listed decision has an open question that names a person, the preview refuses. An Other that is not a listed option is asked again and is not written. Nothing is settled until `settle` runs on a `choose-*` word.
 
 ## Step 6: Unsettled points
 

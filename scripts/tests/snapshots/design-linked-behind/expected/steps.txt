@@ -13,7 +13,9 @@ Exit: 0
     "docs/architecture/designs/orders-platform/designs/platform-first/questions.md",
     "docs/architecture/designs/orders-platform/designs/platform-first/diagrams.md",
     "docs/architecture/designs/orders-platform/inputs/README.md"
-  ]
+  ],
+  "status_line": "Design session open: orders-platform. Park: `/crav1-design-architecture orders-platform park`",
+  "session": "open"
 }
 
 ## Step 7: design_run.py create --topic orders-target --builds-on orders-platform
@@ -32,6 +34,8 @@ Exit: 0
     "docs/architecture/designs/orders-target/designs/target-first/diagrams.md",
     "docs/architecture/designs/orders-target/inputs/README.md"
   ],
+  "status_line": "Design session open: orders-target. Park: `/crav1-design-architecture orders-target park`",
+  "session": "open",
   "builds_on": "orders-platform",
   "branch_from": "design/orders-platform",
   "fixed": [],
@@ -60,11 +64,12 @@ Exit: 0
 
 Exit: 0
 
+Design session open: orders-platform. Park: `/crav1-design-architecture orders-platform park`
 Run next:
 The end state is still being designed.
 
-Pick up the orders platform designs:
-`/crav1-design-architecture resume orders-platform`
+Open the orders platform session:
+`/crav1-design-architecture orders-platform`
 
 Behind design/orders-platform: design/orders-target (1 commit).
 

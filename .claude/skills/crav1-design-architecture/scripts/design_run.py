@@ -22,6 +22,8 @@ import re
 import sys
 from pathlib import Path
 
+sys.dont_write_bytecode = True
+
 
 def _utf8_stdout() -> None:
     reconfigure = getattr(sys.stdout, "reconfigure", None)
@@ -39,17 +41,17 @@ DESIGNS = Path("docs/architecture/designs")
 ARCH_SPEC = Path("docs/architecture/spec.md")
 DECIDED = "## Decided, not built yet"
 OPEN_Q = "## Open questions"
-START_WORDS = ["resume", "park", "status", "fan-out", "stage-it", "go-ahead", "compare-topics", "prepare", "change-goal", "builds-on", "note", "small-fix"]
+START_WORDS = ["resume", "park", "status", "fan-out", "stage-it", "go-ahead", "compare-topics", "prepare", "change-goal", "builds-on", "note", "small-fix", "screen", "next", "questions", "proposal", "stages", "end", "close"]
 TOPIC_WORDS = {"resume", "change-goal", "note", "small-fix", "park", "status", "go-ahead", "fan-out", "stage-it"}
 HEADLESS_WORDS = ["resume", "park", "status", "prepare"]
-HEADLESS_ALLOWED = {"status", "resume", "lean", "compare", "compare-topics", "route", "ending", "review", "note", "branch-behind", "linked-behind"}
+HEADLESS_ALLOWED = {"status", "resume", "screen", "lean", "compare", "compare-topics", "route", "ending", "review", "note", "branch-behind", "linked-behind"}
 CREATE_KEYS = {"ask", "end_goal", "drivers", "constraints", "criteria", "design", "design_title", "decisions", "notes"}
 CHANGE_KEYS = {"ask", "end_goal", "drivers", "constraints", "criteria", "decisions", "renames", "drop_reasons", "reopen", "notes"}
 INPUTS_DIR = "inputs"
 _ROOT: list = []
 _CMD: list = []
 # The kit version this skill's files last changed in. SKILL.md carries the same marker (1.190.0).
-SKILL_VERSION = "1.191.0"
+SKILL_VERSION = "1.200.0"
 SCRATCH_MOVES = {"ending", "lean", "settle", "stage", "compare", "compare-topics"}
 GOAL_KEYS = {"ask", "end_goal", "drivers", "constraints", "criteria", "decisions"}
 STATES = {"open", "leaning", "settled", "to-question", "to-research", "skipped", "reopened", "dropped"}
@@ -386,8 +388,11 @@ def find_decision(d: dict, title: str) -> dict:
 
 
 def load_input(path: str | None) -> dict:
+    """JSON from a file, or from stdin when the path is `-` (1.200.0). Never a shell heredoc."""
     if not path:
         return {}
+    if path == "-":
+        return json.loads(sys.stdin.read())
     p = Path(path)
     if _CMD and _CMD[0] in SCRATCH_MOVES and _in_inputs(p):
         raise Refused(f"{_CMD[0]} input is scratch: write it in the session's temp folder, not in {INPUTS_DIR}/, "
@@ -823,8 +828,22 @@ def cmd_commit(a, root: Path) -> dict:
             "words": ["yes", "not-now"], "recommended": "yes",
             "options": [{"word": "yes", "label": "Commit (Recommended)", "action": f"git commit with the message '{msg}'"},
                         {"word": "not-now", "label": "Not now", "action": "leave the files uncommitted; the ending says how many"}]}
-    if not a.yes:
-        return {"topic": topic, "committed": False, "paths": paths, "message": msg, "card": card}
+    words = str(getattr(a, "words", "") or "")
+    skill_text = (Path(__file__).resolve().parents[1] / "SKILL.md").read_text(encoding="utf-8")
+    try:
+        import importlib.util
+        path = Path(__file__).resolve().parents[2] / "crav1-tasks-ready-to-build" / "scripts" / "run_ending.py"
+        spec = importlib.util.spec_from_file_location("run_ending_commit", path)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        allowed = mod.commit_yes(bool(a.yes), words, skill_text)
+    except Exception:
+        allowed = bool(a.yes) and words.strip().lower() != "stop and commit"
+    if not allowed:
+        out = {"topic": topic, "committed": False, "paths": paths, "message": msg, "card": card}
+        if words.strip().lower() == "stop and commit":
+            out["line"] = "Stop and commit is not a yes here. Show the commit card."
+        return out
     if a.headless:
         raise Refused("a run without the user does not commit; ask yes or not-now on the card")
     add = _git(root, "add", "--", (DESIGNS / topic).as_posix())
@@ -906,6 +925,8 @@ def cmd_route(a) -> str:
         if len(parts) < 2:
             raise Refused("builds-on needs the base topic and the idea text: builds-on <base> <idea text>")
         return "builds-on"
+    if word in ("resume", "screen"):
+        return "screen"
     if word in START_WORDS:
         return word
     if word:
@@ -942,7 +963,9 @@ def cmd_create(a, root: Path) -> dict:
                 _decision_items(data.get("decisions", [])), goal["drivers"], w)
     if data.get("notes"):
         _write_note(root, topic, "notes from the goal input", data["notes"], "other", w)
-    res = {"topic": topic, "design": name, "branch": f"design/{topic}", "branch_state": branch["branch_state"], "written": w.written}
+    save_session(root, topic, status="open", mode="session", step="frame")
+    res = {"topic": topic, "design": name, "branch": f"design/{topic}", "branch_state": branch["branch_state"], "written": w.written,
+           "status_line": status_line(topic, "open", ""), "session": "open"}
     ensure_inputs(root, topic, w)
     if branch["branch_state"] == "already on it":
         _with_sync(res, a, root, topic)
@@ -998,7 +1021,14 @@ def cmd_status(a, root: Path) -> dict:
     return {"designs": out, "links": links} if links else {"designs": out}
 
 
-def cmd_resume(a, root: Path) -> dict:
+def cmd_resume(a, root: Path):
+    """resume is an alias of the status screen (1.200.0). --json keeps the old payload for callers that read fields."""
+    if not getattr(a, "as_json", False):
+        return screen_text(root, slugify(a.topic))
+    return _resume_json(a, root)
+
+
+def _resume_json(a, root: Path) -> dict:
     t = Topic(root, a.topic)
     kc = kit_check(root)
     if kc.get("kit_behind_main") and not a.skip_kit_check:
@@ -1060,6 +1090,411 @@ def cmd_resume(a, root: Path) -> dict:
     return res
 
 
+def _now() -> str:
+    """A date, not a clock time, so a saved session stays comparable (1.200.0)."""
+    return today()
+
+
+def session_path(root: Path, topic: str) -> Path:
+    return root / DESIGNS / topic / "session.json"
+
+
+def load_session(root: Path, topic: str) -> dict:
+    """session.json is the source of truth. A missing file reads as open (1.200.0)."""
+    path = session_path(root, topic)
+    data = {"status": "open", "mode": "session", "topic": topic, "branch": f"design/{topic}",
+            "decision": "", "step": "", "updated": ""}
+    if path.is_file():
+        try:
+            saved = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            saved = {}
+        if isinstance(saved, dict):
+            data.update({k: saved.get(k, data.get(k, "")) for k in ("status", "mode", "decision", "step", "updated")})
+    if data.get("status") not in ("open", "parked", "ended"):
+        data["status"] = "open"
+    if data.get("mode") not in ("session", "guided"):
+        data["mode"] = "session"
+    return data
+
+
+def save_session(root: Path, topic: str, **fields) -> dict:
+    data = load_session(root, topic)
+    data.update(fields)
+    data["topic"] = topic
+    data["branch"] = f"design/{topic}"
+    data["updated"] = _now()
+    w = Writer(root, topic)
+    w.write(session_path(root, topic), json.dumps(data, indent=2) + "\n")
+    data["written"] = w.written
+    return data
+
+
+def plain_command(topic: str, word: str = "") -> str:
+    """The one invocation shape (1.200.0): `/crav1-design-architecture <topic>` and an optional word."""
+    if not topic:
+        return "/crav1-design-architecture"
+    if word:
+        return f"/crav1-design-architecture {topic} {word}"
+    return f"/crav1-design-architecture {topic}"
+
+
+def status_line(topic: str, status: str = "open", step: str = "") -> str:
+    park = f"`{plain_command(topic, 'park')}`"
+    back = f"`{plain_command(topic)}`"
+    if status == "parked":
+        return f"Design session parked: {topic}. Open: {back}"
+    if status == "ended":
+        return f"Design session ended: {topic}. Open: {back}"
+    extra = f" Step: {step}." if step else ""
+    return f"Design session open: {topic}.{extra} Park: {park}"
+
+
+def _topics(root: Path) -> list[str]:
+    base = root / DESIGNS
+    if not base.is_dir():
+        return []
+    return sorted(p.name for p in base.iterdir() if (p / "goal.md").is_file() and not p.name.startswith("_"))
+
+
+def _next_open(root: Path, topic: str) -> str:
+    try:
+        t = Topic(root, topic)
+        name = t.current(None)
+        d = t.design(name)
+    except Refused:
+        return ""
+    ordered_decs = goal_order(t.goal(), d)
+    big = [x for x in ordered_decs if not x.get("Detail")]
+    detail = [x for x in ordered_decs if x.get("Detail")]
+    return (next((x["title"] for x in ordered_decs if x["State"] == "reopened"), None)
+            or next((x["title"] for x in big if x["State"] in ("open", "leaning", "to-question", "to-research")), None)
+            or next((x["title"] for x in detail if x["State"] in ("open", "leaning", "to-question", "to-research")), None)
+            or "")
+
+
+def _open_questions(root: Path, topic: str) -> list[dict]:
+    try:
+        t = Topic(root, topic)
+        name = t.current(None)
+    except Refused:
+        return []
+    return [q for q in t.questions(name) if not q.get("answer")]
+
+
+def _uncommitted_count(root: Path, topic: str) -> int:
+    try:
+        return len(topic_dirty(root, topic))
+    except Exception:
+        return 0
+
+
+def _proposal_pages(root: Path, topic: str) -> list[str]:
+    folder = root / DESIGNS / topic
+    names = ["proposal.html", "proposal.md", "briefing.html", "briefing.md"]
+    return [str((folder / name).relative_to(root).as_posix()) for name in names if (folder / name).is_file()]
+
+
+def screen_facts(root: Path, topic: str) -> dict:
+    """Read session.json and the topic files. Writes nothing (1.200.0)."""
+    topic = slugify(topic) if topic else ""
+    facts = {"topic": topic, "topics": _topics(root), "where": "none", "status": "", "next_decision": "",
+             "questions": [], "uncommitted": 0, "proposals": [], "needs": "", "commands": [], "waits": []}
+    if not topic:
+        facts["needs"] = "Start a topic, or open one that already exists." if facts["topics"] else "Start a topic."
+        facts["commands"] = [("Start a topic", "/crav1-design-architecture <idea text>")]
+        facts["commands"] += [(f"Open {name.replace('-', ' ')}", plain_command(name)) for name in facts["topics"]]
+        return facts
+    if not (root / DESIGNS / topic / "goal.md").is_file():
+        facts["where"] = "missing"
+        facts["needs"] = f"{topic} is not a topic yet."
+        facts["commands"] = [("Start this topic", f"/crav1-design-architecture <idea text>")]
+        facts["commands"] += [(f"Open {name.replace('-', ' ')}", plain_command(name)) for name in facts["topics"]]
+        return facts
+    sess = load_session(root, topic)
+    try:
+        design_status = Topic(root, topic).design(Topic(root, topic).current(None))["status"]
+    except Refused:
+        design_status = "open"
+    status = sess.get("status") or "open"
+    if design_status == "parked" and status == "open" and not session_path(root, topic).is_file():
+        status = "parked"
+    facts["status"] = status
+    facts["where"] = "parked" if status == "parked" else ("ended" if status == "ended" else "open")
+    facts["next_decision"] = _next_open(root, topic)
+    facts["questions"] = _open_questions(root, topic)
+    facts["uncommitted"] = _uncommitted_count(root, topic)
+    facts["proposals"] = _proposal_pages(root, topic)
+    facts["step"] = sess.get("decision") or facts["next_decision"]
+    for q in facts["questions"]:
+        who = ""
+        found = re.search(r"\(([^)]+)\)\s*$", q.get("text") or "")
+        if found:
+            who = found.group(1).strip()
+        facts["waits"].append({"text": q.get("text") or "", "who": who})
+    commands = []
+    if facts["next_decision"]:
+        facts["needs"] = f"{facts['next_decision']} is still open."
+        commands.append(("Next decision", plain_command(topic, "next")))
+    else:
+        facts["needs"] = "Every decision is settled."
+        commands.append(("Write stages", plain_command(topic, "stages")))
+        commands.append(("Edit the proposal", plain_command(topic, "proposal")))
+        commands.append(("Review go-ahead", plain_command(topic, "go-ahead")))
+    if facts["questions"]:
+        commands.append(("Show open questions", plain_command(topic, "questions")))
+    if facts["next_decision"]:
+        commands.append(("Edit the proposal", plain_command(topic, "proposal")))
+        commands.append(("Write stages", plain_command(topic, "stages")))
+    commands.append(("Park", plain_command(topic, "park")))
+    # At most the useful set, next decision or the settled set first.
+    facts["commands"] = commands
+    return facts
+
+
+def _blocks(commands: list[tuple[str, str]]) -> str:
+    parts = ["Run next:", ""]
+    for label, command in commands:
+        parts += [f"{label}:", f"`{command}`", ""]
+    return "\n".join(parts).rstrip() + "\n"
+
+
+def screen_text(root: Path, topic: str) -> str:
+    """The one start (1.200.0). Fresh and resume both print this. Writes nothing."""
+    facts = screen_facts(root, topic)
+    if facts["where"] in ("none", "missing"):
+        listed = ", ".join(facts["topics"]) if facts["topics"] else "none"
+        where = "no topic yet" if facts["where"] == "none" else f"{topic} is not a topic yet"
+        lines = [f"Where: {where}.", f"Topics: {listed}.", "", f"Needs doing: {facts['needs']}", "", _blocks(facts["commands"])]
+        return "\n".join(lines)
+    topic = facts["topic"]
+    step = facts["step"] if facts["where"] == "open" else ""
+    lines = [status_line(topic, facts["status"], step), ""]
+    if facts["where"] == "parked":
+        where = f"{topic} is parked."
+    elif facts["where"] == "ended":
+        where = f"{topic} is ended."
+    elif facts["next_decision"]:
+        where = f"topic open. Next decision: {facts['next_decision']}."
+    else:
+        where = "topic open. Every decision is settled."
+    lines.append(f"Where: {where}")
+    if facts["waits"]:
+        for item in facts["waits"]:
+            who = f" from {item['who']}" if item["who"] else ""
+            lines.append(f"Waiting: {item['text']}{who}.")
+    else:
+        lines.append("Waiting: nothing.")
+    n = facts["uncommitted"]
+    if n:
+        lines.append(uncommitted_count_line(n))
+    else:
+        lines.append("Uncommitted: none.")
+    if facts["proposals"]:
+        lines.append("Proposal: " + ", ".join(facts["proposals"]) + ".")
+    else:
+        lines.append("Proposal: none.")
+    lines += ["", f"Needs doing: {facts['needs']}", "", _blocks(facts["commands"])]
+    return "\n".join(lines)
+
+
+def uncommitted_count_line(n: int) -> str:
+    noun = "file" if n == 1 else "files"
+    return f"Uncommitted: {n} {noun}; commit with `/crav1-finalize-commit` when ready."
+
+
+def cmd_screen(a, root: Path) -> str:
+    return screen_text(root, getattr(a, "topic", "") or "")
+
+
+def cmd_next(a, root: Path) -> dict:
+    """Enter the next decision. The only way the guided card flow starts (1.200.0)."""
+    topic = slugify(a.topic)
+    if not (root / DESIGNS / topic / "goal.md").is_file():
+        raise Refused(f"{topic} is not a topic yet; the status screen offers how to start one")
+    title = _next_open(root, topic)
+    if not title:
+        return {"topic": topic, "next_decision": "", "status_line": status_line(topic, "open", ""),
+                "note": "Every decision is settled. The status screen offers stages, the proposal and go-ahead."}
+    t = Topic(root, topic)
+    name = t.current(None)
+    d = t.design(name)
+    if d.get("status") == "parked":
+        d["status"] = "open"
+        w = Writer(root, topic)
+        save_design(t, name, d, w)
+    save_session(root, topic, status="open", mode="guided", decision=title, step="next")
+    return {"topic": topic, "design": name, "next_decision": title, "mode": "guided",
+            "status_line": status_line(topic, "open", title),
+            "note": "Show the decision card for this decision. Nothing is settled until a choose word."}
+
+
+def cmd_questions(a, root: Path) -> str:
+    topic = slugify(a.topic)
+    qs = _open_questions(root, topic)
+    save_session(root, topic, status="open", mode="session", step="questions")
+    lines = [status_line(topic, "open", ""), ""]
+    if not qs:
+        lines.append("No open questions.")
+    else:
+        lines.append("Open questions:")
+        for q in qs:
+            lines.append(f"- {q.get('text')}")
+    lines += ["", "Run next:", "", "Back to the session:", f"`{plain_command(topic)}`"]
+    return "\n".join(lines) + "\n"
+
+
+def _shared_section(root: Path, topic: str) -> str:
+    """One source for the proposal and the briefing (1.200.0)."""
+    path = root / DESIGNS / topic / "shared.md"
+    if path.is_file():
+        return path.read_text(encoding="utf-8").strip() + "\n"
+    try:
+        t = Topic(root, topic)
+        d = t.design(t.current(None))
+    except Refused:
+        return "## Shared decisions\n\n- none yet\n"
+    lines = ["## Shared decisions", ""]
+    settled = [x for x in ordered(d["decisions"]) if x.get("State") == "settled"]
+    open_ones = [x for x in ordered(d["decisions"]) if x.get("State") not in ("settled", "dropped")]
+    if not settled and not open_ones:
+        lines.append("- none yet")
+    for dec in settled:
+        lines.append(f"- decided: {dec['title']}")
+    for dec in open_ones:
+        lines.append(f"- proposed: {dec['title']}")
+    return "\n".join(lines) + "\n"
+
+
+def _svg_from_mermaid(text: str) -> str:
+    """A self-contained SVG. No remote font and no private path (1.200.0)."""
+    labels = []
+    for line in str(text or "").splitlines():
+        line = line.strip()
+        if not line or line.startswith("%%") or line.lower().startswith("flowchart") or line.lower().startswith("graph"):
+            continue
+        labels.append(re.sub(r"[\[\]{}()]", " ", line)[:80])
+    if not labels:
+        labels = ["diagram"]
+    rows = []
+    for i, label in enumerate(labels[:12]):
+        y = 20 + i * 36
+        safe = (label.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;"))
+        rows.append(f'<rect x="10" y="{y}" width="460" height="28" class="box"/><text x="20" y="{y + 18}">{safe}</text>')
+    height = 28 + len(rows) * 36
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" width="480" height="{height}" role="img">'
+            f'<style>.box{{fill:#f4f4f4;stroke:#444}}.decided{{fill:#e7f5ee}}.proposed{{fill:#f6f6f6}}</style>'
+            + "".join(rows) + "</svg>")
+
+
+def _proposal_markdown(root: Path, topic: str, briefing: bool = False) -> str:
+    title = "Briefing" if briefing else "Proposal"
+    shared = _shared_section(root, topic)
+    stages = ""
+    try:
+        t = Topic(root, topic)
+        name = t.current(None)
+        parsed = t.stages(name)
+    except Refused:
+        parsed = []
+    if parsed:
+        lines = ["## Stages", ""]
+        for i, st in enumerate(parsed, 1):
+            lines.append(f"{i}. {st.get('name')} — {st.get('reason', '')}")
+        stages = "\n".join(lines) + "\n"
+    return f"# {title}: {topic}\n\n{shared}\n{stages}"
+
+
+def _proposal_html(markdown: str) -> str:
+    parts = ['<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Proposal</title>',
+             "<style>body{font-family:Georgia,serif;margin:2rem;color:#222} .decided{border-left:4px solid #146c43;padding-left:.6rem} .proposed{border-left:4px solid #6c757d;background:#f6f6f6;padding-left:.6rem} pre{white-space:pre-wrap}</style>",
+             "</head><body>"]
+    for line in markdown.splitlines():
+        if line.startswith("# "):
+            parts.append(f"<h1>{line[2:]}</h1>")
+        elif line.startswith("## "):
+            parts.append(f"<h2>{line[3:]}</h2>")
+        elif line.startswith("- decided:"):
+            parts.append(f'<p class="decided">{line[2:]}</p>')
+        elif line.startswith("- proposed:"):
+            parts.append(f'<p class="proposed">{line[2:]}</p>')
+        elif line[:2].rstrip(".").isdigit() or (line[:1].isdigit() and ". " in line[:4]):
+            parts.append(f"<p>{line}</p>")
+        elif line.startswith("```mermaid"):
+            parts.append("<!-- diagram -->")
+        elif line.strip() == "```":
+            continue
+        elif line.strip():
+            parts.append(f"<p>{line}</p>")
+    parts.append("</body></html>\n")
+    return "\n".join(parts)
+
+
+def publish_proposal(root: Path, topic: str, briefing: bool = False) -> dict:
+    topic = slugify(topic)
+    w = Writer(root, topic)
+    md = _proposal_markdown(root, topic, briefing=False)
+    html = _proposal_html(md)
+    folder = root / DESIGNS / topic
+    w.write(folder / "proposal.md", md if md.endswith("\n") else md + "\n")
+    w.write(folder / "proposal.html", html)
+    if briefing:
+        bmd = _proposal_markdown(root, topic, briefing=True)
+        w.write(folder / "briefing.md", bmd if bmd.endswith("\n") else bmd + "\n")
+        w.write(folder / "briefing.html", _proposal_html(bmd))
+    save_session(root, topic, status="open", mode="session", step="proposal")
+    return {"topic": topic, "written": w.written, "current": True}
+
+
+def proposal_current(root: Path, topic: str) -> bool:
+    folder = root / DESIGNS / topic
+    md = folder / "proposal.md"
+    if not md.is_file():
+        return False
+    return md.read_text(encoding="utf-8") == (_proposal_markdown(root, topic) if _proposal_markdown(root, topic).endswith("\n") else _proposal_markdown(root, topic) + "\n")
+
+
+def cmd_proposal(a, root: Path) -> dict:
+    topic = slugify(a.topic)
+    if not (root / DESIGNS / topic / "goal.md").is_file():
+        raise Refused(f"{topic} is not a topic yet")
+    if getattr(a, "check", False) and not a.yes:
+        return {"topic": topic, "current": proposal_current(root, topic)}
+    if not a.yes and not getattr(a, "check", False):
+        return {"topic": topic, "preview": True, "current": proposal_current(root, topic),
+                "note": "Add --yes to write proposal.md and proposal.html from the shared decisions."}
+    if getattr(a, "check", False):
+        fresh = publish_proposal(root, topic, briefing=getattr(a, "briefing", False))
+        return {"topic": topic, "current": True, "written": fresh["written"]}
+    return publish_proposal(root, topic, briefing=getattr(a, "briefing", False))
+
+
+def cmd_stages_list(a, root: Path) -> str:
+    topic = slugify(a.topic)
+    try:
+        t = Topic(root, topic)
+        parsed = t.stages(t.current(None))
+    except Refused:
+        parsed = []
+    save_session(root, topic, status="open", mode="session", step="stages")
+    lines = [status_line(topic, "open", ""), ""]
+    if not parsed:
+        lines.append("No stages yet. The user names and divides them.")
+    else:
+        for i, st in enumerate(parsed, 1):
+            lines.append(f"{i}. {st.get('name')} — {st.get('reason', '')}")
+    lines += ["", "Run next:", "", "Back to the session:", f"`{plain_command(topic)}`"]
+    return "\n".join(lines) + "\n"
+
+
+def cmd_end(a, root: Path) -> str:
+    topic = slugify(a.topic)
+    if not (root / DESIGNS / topic / "goal.md").is_file():
+        raise Refused(f"{topic} is not a topic yet")
+    save_session(root, topic, status="ended", mode="session", step="end")
+    return "\n".join(["Session ended", "", f"`{plain_command(topic)}`", ""]) 
+
+
 def cmd_park(a, root: Path) -> dict:
     t = Topic(root, a.topic)
     name = t.current(a.design)
@@ -1067,7 +1502,9 @@ def cmd_park(a, root: Path) -> dict:
     d["status"] = "parked"
     w = Writer(root, t.name)
     save_design(t, name, d, w)
-    return {"topic": t.name, "design": name, "status": "parked", "written": w.written}
+    save_session(root, t.name, status="parked", mode="session", step="park")
+    text = "\n".join(["Session parked", "", f"`{plain_command(t.name)}`", ""])
+    return {"topic": t.name, "design": name, "status": "parked", "written": w.written, "screen": text}
 
 
 def cmd_fan_out(a, root: Path) -> dict:
@@ -1156,6 +1593,18 @@ def match_driver(name: str, drivers: list[str]) -> str | None:
     return None
 
 
+def match_option(chosen: str, options: list) -> str:
+    """A unique short prefix ('Your idea', 'A') selects the option. Exit 2 lists the names (1.200.0)."""
+    names = [str(o.get("name") if isinstance(o, dict) else o) for o in options]
+    text = chosen.strip()
+    if text in names:
+        return text
+    hits = [name for name in names if name.casefold().startswith(text.casefold())] if text else []
+    if len(hits) == 1:
+        return hits[0]
+    raise Refused("chosen option does not match one option. Accepted: " + ", ".join(names))
+
+
 def _adr_text(data: dict, dec_title: str, deciders: str) -> str:
     tpl = asset("adr.md")
     chosen = data["chosen"]
@@ -1182,6 +1631,42 @@ def _adr_text(data: dict, dec_title: str, deciders: str) -> str:
     return body
 
 
+def cmd_settle_preview(a, root: Path) -> dict:
+    """A lean preview. The recommended option is one by one, and a yes settles nothing (1.200.0)."""
+    t = Topic(root, a.topic)
+    name = t.current(getattr(a, "design", None))
+    d = t.design(name)
+    if getattr(a, "one_at_a_time", False):
+        raise Refused("one at a time was asked; there is no settle batch")
+    open_ones = [dec for dec in ordered(d["decisions"]) if dec.get("State") not in ("settled", "dropped")]
+    named = []
+    for q in t.questions(name):
+        text = str(q.get("text") or "")
+        if q.get("answer"):
+            continue
+        if re.search(r"\((?!nobody\b|not named)[^)]+\)\s*$", text, re.I):
+            named.append(text)
+    if named:
+        raise Refused("a listed decision waits on " + ", ".join(named) + "; settle one by one")
+    return {
+        "topic": t.name,
+        "settled": False,
+        "preview": True,
+        "decisions": [dec["title"] for dec in open_ones],
+        "card": {
+            "question": "Settle the open decisions one by one?",
+            "recommended": "one-by-one",
+            "words": ["one-by-one", "stop"],
+            "options": [
+                {"word": "one-by-one", "label": "One by one (Recommended)",
+                 "action": "show the next decision card; this yes settles nothing"},
+                {"word": "stop", "label": "Stop", "action": "settle nothing"},
+            ],
+        },
+        "note": "Nothing is settled until a choose-* word is picked on one decision.",
+    }
+
+
 def cmd_settle(a, root: Path) -> dict:
     data = load_input(a.input)
     t = Topic(root, a.topic)
@@ -1191,9 +1676,12 @@ def cmd_settle(a, root: Path) -> dict:
     dec = find_decision(d, a.decision)
     if dec["State"] == "dropped":
         raise Refused("that decision was dropped from the goal; add it back with change-goal first")
+    if dec["State"] == "reopened" and not a.revisit_yes:
+        raise Refused("this decision was reopened; settle needs --revisit-yes, even when the choice stays the same")
     reverses = data.get("reverses", "")
     if reverses and not a.revisit_yes:
         raise Refused(f"this choice reverses {reverses}; it is a revisit and needs a separate yes (--revisit-yes)")
+    data["chosen"] = match_option(str(data.get("chosen") or ""), data.get("options") or [])
     w = Writer(root, t.name)
     deciders = data.get("deciders") or _git_user(root)
     slug = slugify(data.get("adr_slug") or data.get("adr_title") or dec["title"])
@@ -1745,76 +2233,122 @@ def waiting_base_text(root: Path, topic: str, base: str) -> str:
     if chosen:
         why = f"The {words} design builds on {base}, whose design pull request is not merged into {dn} yet. Go-ahead here waits for that merge."
         waiting = f"the {base} design pull request (design/{base}) to merge into {dn}."
-        lead, cmd = f"Pick up the {words} designs:", f"/crav1-design-architecture resume {topic}"
+        lead, cmd = f"Open the {words} session:", plain_command(topic)
     else:
         why = f"The {words} design builds on {base}, which has not had go-ahead yet. Go-ahead here waits until the {base} design pull request is merged."
         waiting = f"go-ahead on {base} and its design pull request (design/{base}) merged into {dn}."
-        lead, cmd = f"Pick up the {bwords} designs:", f"/crav1-design-architecture resume {base}"
-    return "\n".join(["Run next:", why, "", lead, f"`{cmd}`", "", f"Waiting: {waiting}"]) + "\n"
+        lead, cmd = f"Open the {bwords} session:", plain_command(base)
+    return "\n".join([f"Waiting: {waiting}", "", "Run next:", why, "", lead, f"`{cmd}`"]) + "\n"
 
 
 def revisit_text(topic: str, base: str, decision: str) -> str:
     bwords = base.replace("-", " ")
     return "\n".join(["Run next:", f"{decision} is marked for another look in the base topic {base}. Settle it there, then merge design/{base} into design/{topic}.",
-                      "", f"Pick up the {bwords} designs:", f"`/crav1-design-architecture resume {base}`"]) + "\n"
+                      "", f"Open the {bwords} session:", f"`{plain_command(base)}`"]) + "\n"
 
 
 # ---------------------------------------------------------------- endings
+def _requirement_command(value) -> tuple[str, str]:
+    """(reason, command) for a routed requirement. Never the bare word fact (1.200.0)."""
+    if isinstance(value, dict):
+        slug = str(value.get("slice") or value.get("slug") or "").strip()
+        text = " ".join(str(value.get("text") or "").split())
+        if not slug or not text or text == "fact":
+            raise Refused("a routed requirement needs a slice and the requirement text")
+        return "A requirement came up during the design.", f"/crav1-add-to-spec {slug} {text}"
+    text = " ".join(str(value or "").split())
+    if not text or text in ("1", "true", "True", "fact"):
+        raise Refused("a routed requirement needs a slice and the requirement text")
+    return "A requirement came up during the design.", f"/crav1-add-to-spec {text}"
+
+
 def ending(state: dict) -> str:
     """state: phase (design|go-ahead|merged), topic, slices, routed_requirement,
-    research_topic, question_open, parked, waiting, uncommitted, reason"""
+    research_topic, question_open, parked, waiting, uncommitted, reason.
+
+    A design that is still open stays open: this prints a checkpoint and the
+    status line. It does not end the session (1.200.0).
+    """
     topic = state["topic"]
     words = topic.replace("-", " ")
     phase = state.get("phase", "design")
     dn = state.get("default_branch") or "main"
-    out = ["Run next:"]
+    waiting = [f"Waiting: {x}" for x in _as_list(state.get("waiting"))]
+    lead = state.get("checkpoint") or state.get("reason") or ""
+    head: list[str] = []
+    if lead and phase == "design" and not state.get("parked"):
+        head.append(lead if lead.lower().startswith("checkpoint") else f"Checkpoint: {lead}")
+    if waiting and phase == "design":
+        head += ([""] if head else []) + waiting
+    if phase == "design" and state.get("open") and not state.get("parked") and not state.get("routed_requirement"):
+        step = state.get("step") or ""
+        head += ([""] if head else []) + [status_line(topic, "open", step)]
+
+    def block(reason: str, entries: list[tuple[str, str]]) -> list[str]:
+        out = ["Run next:", reason, ""]
+        for label, command in entries:
+            out += [label, f"`{command}`", ""]
+        return out
+
     if phase == "go-ahead":
-        out.append(state.get("reason") or "The chosen design has been reviewed, accepted, and copied on the design branch.")
-        out.append("Do not plan until this pull request is merged. Merge with no tag.")
-        out += ["", f"Push the {words} design branch:", f"`git push -u origin design/{topic}`", "",
-                "Open the pull request for that branch:", f"`gh pr create --base {dn} --head design/{topic}`"]
+        reason = state.get("reason") or "The chosen design has been reviewed, accepted, and copied on the design branch. Do not plan until this pull request is merged. Merge with no tag."
+        body = block(reason, [(f"Push the {words} design branch:", f"git push -u origin design/{topic}"),
+                              ("Open the pull request for that branch:", f"gh pr create --base {dn} --head design/{topic}")])
     elif phase == "merged":
         if state.get("slices"):
             s = state["slices"][0]
-            out += [state.get("reason") or f"The {words} design is on {dn}. The {s} spec still needs to be brought in line with the new ADRs.", "",
-                    f"Bring the {s} spec in line with the design decisions:", f"`/crav1-tighten-spec {s}`"]
+            reason = state.get("reason") or f"The {words} design is on {dn}. The {s} spec still needs to be brought in line with the new ADRs."
+            body = block(reason, [(f"Bring the {s} spec in line with the design decisions:", f"/crav1-tighten-spec {s}")])
         elif state.get("no_slice"):
-            out += [state.get("reason") or f"The {words} design is on {dn} and no slice exists yet.", "",
-                    "Plan the work from the architecture spec:", "`/crav1-plan-from-spec`"]
+            reason = state.get("reason") or f"The {words} design is on {dn} and no slice exists yet."
+            body = block(reason, [("Plan the work from the architecture spec:", "/crav1-plan-from-spec")])
         elif state.get("routed_requirement"):
-            out += ["A requirement came up during the design.", "", "Add the requirement to the spec:", "`/crav1-add-to-spec fact`"]
+            reason, command = _requirement_command(state["routed_requirement"])
+            body = block(reason, [("Add the requirement to the spec:", command)])
         elif state.get("research_topic"):
-            out += ["A research point now sits in the architecture spec.", "", "Ask for the research:",
-                    f"`/crav1-show-or-ask-open-questions ask research {state['research_topic']}`"]
+            body = block("A research point now sits in the architecture spec.",
+                         [("Ask for the research:", f"/crav1-show-or-ask-open-questions ask research {state['research_topic']}")])
         elif state.get("question_open"):
-            out += ["An open question now sits in the architecture spec.", "", "Ask who has the answer:", "`/crav1-show-or-ask-open-questions ask`"]
+            body = block("An open question now sits in the architecture spec.",
+                         [("Ask who has the answer:", "/crav1-show-or-ask-open-questions ask")])
         else:
-            out = ["Run next: nothing needed now."]
+            body = ["Run next: nothing needed now."]
     else:
         if state.get("routed_requirement"):
-            out += ["A requirement came up during the design.", "", "Add the requirement to the spec:", "`/crav1-add-to-spec fact`"]
+            _why, command = _requirement_command(state["routed_requirement"])
+            reason = f"A requirement came up on design/{topic}. Add it from this branch."
+            body = block(reason, [("Add the requirement to the spec:", command),
+                                  (f"Open the {words} session:", plain_command(topic))])
         elif state.get("research_topic"):
-            out += ["A research point is open in the design.", "", "Ask for the research:",
-                    f"`/crav1-show-or-ask-open-questions ask research {state['research_topic']}`"]
+            body = block("A research point is open in the design.",
+                         [("Ask for the research:", f"/crav1-show-or-ask-open-questions ask research {state['research_topic']}"),
+                          (f"Open the {words} session:", plain_command(topic))])
         elif state.get("builds_on"):
             base = state["builds_on"]
             idea = (state.get("idea") or "").strip()
             if not idea:
                 raise Refused("a builds-on ending needs the idea text for the linked topic")
-            out += [state.get("reason") or f"The next topic builds on {base}; commit {base} first, then start it.", "",
-                    f"Start the linked topic on top of {base}:", f"`/crav1-design-architecture builds-on {base} {idea}`"]
-        elif state.get("parked") or state.get("open"):
-            out += [state.get("reason") or ("The topic is parked." if state.get("parked") else "The end state is still being designed."), "",
-                    f"Pick up the {words} designs:", f"`/crav1-design-architecture resume {topic}`"]
+            reason = state.get("reason") or f"The next topic builds on {base}; commit {base} first, then start it."
+            body = block(reason, [(f"Start the linked topic on top of {base}:", f"/crav1-design-architecture builds-on {base} {idea}")])
+        elif state.get("parked"):
+            body = ["Session parked.", ""] + block(state.get("reason") or "The topic is parked.", [("Open the session:", plain_command(topic))])
+        elif state.get("open"):
+            reason = state.get("reason") or "The end state is still being designed."
+            body = block(reason, [(f"Open the {words} session:", plain_command(topic))])
         else:
-            out = ["Run next: nothing needed now."]
-    tail = [f"Waiting: {x}" for x in _as_list(state.get("waiting"))]
+            body = ["Run next: nothing needed now."]
+    if phase != "design":
+        if waiting:
+            head = waiting + [""]
+        else:
+            head = []
     unc = _uncommitted(state.get("uncommitted"), topic)
-    if unc:
-        tail.append(unc)
-    if tail:
-        out += [""] + tail
-    return "\n".join(out) + "\n"
+    tail = [unc] if unc else []
+    parts = [ln for ln in head + body + tail if ln is not None]
+    # Drop the trailing blank the block leaves, then one newline.
+    while parts and parts[-1] == "":
+        parts.pop()
+    return "\n".join(parts) + "\n"
 
 
 def _as_list(value) -> list[str]:
@@ -1836,7 +2370,7 @@ def _uncommitted(value, topic: str) -> str:
         raise Refused("uncommitted takes a count of files (or a list of paths); true is counted from git status by the ending move")
     if isinstance(value, (list, tuple)):
         value = len(value)
-    return f"Uncommitted: {value} file{'s' if value != 1 else ''}."
+    return uncommitted_count_line(int(value))
 
 
 def _note_text(body) -> str:
@@ -1891,6 +2425,18 @@ def cmd_ending(a, root: Path) -> str:
         state["uncommitted"] = len(topic_dirty(root, slugify(a.topic)))
     state.setdefault("default_branch", default_name(root))
     text = ending(state)
+    problems = []
+    try:
+        import importlib.util
+        path = Path(__file__).resolve().parents[2] / "crav1-tasks-ready-to-build" / "scripts" / "run_ending.py"
+        spec = importlib.util.spec_from_file_location("run_ending_design", path)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        problems = mod.check_ending(text)
+    except Exception:
+        problems = []
+    if problems:
+        raise Refused("ending failed its own check: " + "; ".join(problems))
     st = linked_behind(root, slugify(a.topic))
     if st["state"] == "behind":
         text = text.rstrip("\n") + "\n\n" + st["line"].replace("Linked design branches behind", "Behind") + "\n"
@@ -1926,7 +2472,25 @@ def main(argv=None) -> int:
     rs = sub.add_parser("resume")
     rs.add_argument("--topic", required=True)
     rs.add_argument("--design")
+    rs.add_argument("--json", dest="as_json", action="store_true", help="print the field payload; the default is the status screen")
     rs.add_argument("--skip-kit-check", action="store_true", help="go on although the branch's kit is behind the default branch")
+    scn = sub.add_parser("screen")
+    scn.add_argument("--topic", default="")
+    nx = sub.add_parser("next")
+    nx.add_argument("--topic", required=True)
+    qs = sub.add_parser("questions")
+    qs.add_argument("--topic", required=True)
+    en = sub.add_parser("end")
+    en.add_argument("--topic", required=True)
+    cl = sub.add_parser("close")
+    cl.add_argument("--topic", required=True)
+    prp = sub.add_parser("proposal")
+    prp.add_argument("--topic", required=True)
+    prp.add_argument("--yes", action="store_true")
+    prp.add_argument("--check", action="store_true")
+    prp.add_argument("--briefing", action="store_true")
+    stg = sub.add_parser("stages-list")
+    stg.add_argument("--topic", required=True)
     pk = sub.add_parser("park")
     pk.add_argument("--topic", required=True)
     pk.add_argument("--design")
@@ -1963,6 +2527,7 @@ def main(argv=None) -> int:
     co.add_argument("--topic", required=True)
     co.add_argument("--message")
     co.add_argument("--yes", action="store_true")
+    co.add_argument("--words", default="", help="the user's words; 'stop and commit' is a yes only when the skill says so")
     sf = sub.add_parser("small-fix")
     sf.add_argument("--topic", required=True)
     sf.add_argument("--design")
@@ -1972,6 +2537,11 @@ def main(argv=None) -> int:
     ln.add_argument("--design")
     ln.add_argument("--decision", required=True)
     ln.add_argument("--input")
+    sp = sub.add_parser("settle-preview")
+    sp.add_argument("--topic", required=True)
+    sp.add_argument("--design")
+    sp.add_argument("--one-at-a-time", action="store_true")
+    sp.add_argument("--yes", action="store_true", help="accepted and still settles nothing")
     se = sub.add_parser("settle")
     se.add_argument("--topic", required=True)
     se.add_argument("--design")
@@ -2024,7 +2594,12 @@ def main(argv=None) -> int:
         if a.headless and a.cmd not in HEADLESS_ALLOWED:
             raise Refused(f"a run without the user may only prepare; {a.cmd} needs the user")
         fn = {"route": lambda: cmd_route(a), "create": lambda: cmd_create(a, root), "status": lambda: cmd_status(a, root),
-              "resume": lambda: cmd_resume(a, root), "park": lambda: cmd_park(a, root), "review": lambda: cmd_review(a, root),
+              "resume": lambda: cmd_resume(a, root), "screen": lambda: cmd_screen(a, root), "next": lambda: cmd_next(a, root),
+              "questions": lambda: cmd_questions(a, root), "proposal": lambda: cmd_proposal(a, root),
+              "stages-list": lambda: cmd_stages_list(a, root),
+              "end": lambda: cmd_end(a, root), "close": lambda: cmd_end(a, root),
+              "park": lambda: cmd_park(a, root), "settle-preview": lambda: cmd_settle_preview(a, root),
+              "review": lambda: cmd_review(a, root),
               "fan-out": lambda: cmd_fan_out(a, root), "add-decision": lambda: cmd_add_decision(a, root),
               "lean": lambda: cmd_lean(a, root), "settle": lambda: cmd_settle(a, root), "question": lambda: cmd_question(a, root),
               "answer": lambda: cmd_answer(a, root), "skip": lambda: cmd_skip(a, root), "stage": lambda: cmd_stage(a, root),

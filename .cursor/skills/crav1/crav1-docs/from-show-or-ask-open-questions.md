@@ -51,6 +51,6 @@ Not written: the question text, any other spec line, `docs/system/`, plan, tasks
 
 ## After
 
-`Next: nothing needed now.` The draft is this run's work. When answers have not come back: `Waiting: /crav1-add-to-spec, after the answers come back.` Bring the mail, minutes, transcript, or chat then; a larger dump uses the same command. Those write an `Answered:` line. Resolve is not listed here. When a mark was written: `Uncommitted: 1 file; commit with /crav1-finalize-commit when ready.` See [How a run ends](reference/run-ending.md). The marks are explained in [Data layout](concepts/data-layout.md#open-question-marks).
+`Run next: nothing needed now.` The draft is this run's work. When answers have not come back: `Waiting: /crav1-add-to-spec, after the answers come back.` Bring the mail, minutes, transcript, or chat then; a larger dump uses the same command. Those write an `Answered:` line. Resolve is not listed here. When a mark was written: `Uncommitted: 1 file; commit with /crav1-finalize-commit when ready.` See [How a run ends](reference/run-ending.md). The marks are explained in [Data layout](concepts/data-layout.md#open-question-marks).
 
 Reference page: [show-or-ask-open-questions](reference/skills/crav1-show-or-ask-open-questions.md)

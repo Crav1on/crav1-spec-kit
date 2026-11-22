@@ -810,6 +810,44 @@ def _host_args(info: dict, fields: str) -> list[str]:
     return args
 
 
+def pr_number_for_branch(branch: str, repo: str | None = None, timeout: int | None = None) -> int | None:
+    """The open pull request for a branch, read-only, when exactly one matches (1.200.0).
+
+    Local files are tried first by the caller. This asks the host only when
+    `CRAV1_NO_HOST_LOOKUP` is unset. A miss, a timeout, or more than one open
+    pull request returns None. Nothing is written.
+    """
+    if os.environ.get("CRAV1_NO_HOST_LOOKUP"):
+        return None
+    name = str(branch or "").strip()
+    if not name:
+        return None
+    out, error, _detail = _host_call(
+        "github", ["pr", "list", "--head", name, "--state", "open", "--json", "number", "--limit", "5"], repo, timeout)
+    if not error and out:
+        try:
+            data = json.loads(out)
+        except ValueError:
+            data = None
+        if isinstance(data, list):
+            numbers = [item.get("number") for item in data if isinstance(item, dict) and item.get("number")]
+            return int(numbers[0]) if len(numbers) == 1 else None
+    out, error, _detail = _host_call(
+        "azure", ["repos", "pr", "list", "--source-branch", name, "--status", "active", "-o", "json"], repo, timeout)
+    if error or not out:
+        return None
+    try:
+        data = json.loads(out)
+    except ValueError:
+        return None
+    rows = data if isinstance(data, list) else (data.get("value") if isinstance(data, dict) else None)
+    if not isinstance(rows, list):
+        return None
+    numbers = [item.get("pullRequestId") or item.get("codeReviewId") for item in rows if isinstance(item, dict)]
+    numbers = [n for n in numbers if n]
+    return int(numbers[0]) if len(numbers) == 1 else None
+
+
 def host_lookup(info: dict, repo: str | None = None, timeout: int | None = None) -> dict:
     """One read-only lookup on the pull request's own host, with a reason (1.179.0).
 

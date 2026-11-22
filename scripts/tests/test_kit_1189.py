@@ -81,11 +81,11 @@ class TestStoredOrder(Base):
         self.assertEqual(self.titles(), ["Where orders live", "Resource group names", "Alerting owner", "Data in test"])
         self.ok("add-decision", "--topic", T, "--title", "Backup policy")
         self.assertEqual(self.titles()[-1], "Backup policy")
-        self.assertEqual(self.ok("resume", "--topic", T)["next_decision"], "Where orders live")
+        self.assertEqual(self.ok("resume", "--json", "--topic", T)["next_decision"], "Where orders live")
 
     def test_z_before_a_stays(self):
         self.create(dict(GOAL, decisions=["Zone layout", "Access model"]))
-        self.assertEqual(self.ok("resume", "--topic", T)["next_decision"], "Zone layout")
+        self.assertEqual(self.ok("resume", "--json", "--topic", T)["next_decision"], "Zone layout")
 
     def test_questions_keep_the_order_asked(self):
         self.create()
@@ -115,13 +115,14 @@ class TestEnding(unittest.TestCase):
         self.assertIn("Waiting: person A to decide the layout\n", self.end(waiting="person A to decide the layout"))
 
     def test_uncommitted_types(self):
-        self.assertIn("Uncommitted: 1 file.", self.end(uncommitted=1))
-        self.assertIn("Uncommitted: 3 files.", self.end(uncommitted=3))
-        self.assertIn("Uncommitted: 2 files.", self.end(uncommitted=["a.md", "b.md"]))  # 1.190.0: counted
+        self.assertIn("Uncommitted: 1 file; commit with `/crav1-finalize-commit` when ready.", self.end(uncommitted=1))
+        self.assertIn("Uncommitted: 3 files; commit with `/crav1-finalize-commit` when ready.", self.end(uncommitted=3))
+        self.assertIn("Uncommitted: 2 files; commit with `/crav1-finalize-commit` when ready.", self.end(uncommitted=["a.md", "b.md"]))
         out = self.end(uncommitted=False, waiting=False)
         self.assertNotIn("True", out)
         self.assertNotIn("Uncommitted", out)
-        self.assertTrue(out.startswith("Run next:\n"))
+        self.assertIn("Run next:", out)
+        self.assertIn("Design session open: orders-platform.", out)
 
     def test_inputs_md_documents_the_types(self):
         text = (SKILL / "references/inputs.md").read_text(encoding="utf-8")
@@ -197,9 +198,9 @@ class TestInputsAndNotes(Base):
 class TestScopeAndDetail(Base):
     def test_detail_decision_comes_after_the_big_ones(self):
         self.create(dict(GOAL, decisions=[{"title": "Resource group names", "detail": True}, "Where orders live"]))
-        self.assertEqual(self.ok("resume", "--topic", T)["next_decision"], "Where orders live")
+        self.assertEqual(self.ok("resume", "--json", "--topic", T)["next_decision"], "Where orders live")
         self.ok("skip", "--topic", T, "--decision", "where orders")
-        self.assertEqual(self.ok("resume", "--topic", T)["next_decision"], "Resource group names")
+        self.assertEqual(self.ok("resume", "--json", "--topic", T)["next_decision"], "Resource group names")
 
     def test_flow_has_a_scope_round_in_framing(self):
         flow = (SKILL / "references/flow.md").read_text(encoding="utf-8")
@@ -263,7 +264,7 @@ class TestBranches(GitHelpers, Base):
         self.create()
         self.commit("design")
         self.git("switch", "-q", "main")
-        err = self.refused("resume", "--topic", T)
+        err = self.refused("resume", "--json", "--topic", T)
         self.assertIn("on its design branch design/orders-platform, not on main", err)
         self.assertIn("switch-branch --topic orders-platform --yes", err)
 
@@ -309,11 +310,11 @@ class TestBranchBehind(GitHelpers, Base):
 
     def test_in_step_reports_nothing(self):
         self.git("update-ref", "refs/remotes/origin/main", "main")
-        self.assertNotIn("branch_sync", self.ok("--no-fetch", "resume", "--topic", T))
+        self.assertNotIn("branch_sync", self.ok("--no-fetch", "resume", "--json", "--topic", T))
 
     def test_resume_offers_a_merge_card_when_behind(self):
         self.main_moves_on()
-        sync = self.ok("--no-fetch", "resume", "--topic", T)["branch_sync"]
+        sync = self.ok("--no-fetch", "resume", "--json", "--topic", T)["branch_sync"]
         self.assertEqual(sync["behind"], {"origin/main": 1})
         self.assertEqual(sync["card"]["words"], ["yes", "stop"])
         self.assertIn("Merge main into the design branch:\n`git merge --no-ff origin/main`", sync["ending"])  # 1.191.0: names the default branch
@@ -394,7 +395,7 @@ class TestLinkedBehind(GitHelpers, Base):
     def test_ending_lists_linked_branches_behind_after_the_commit(self):
         self.settle_and_commit()
         out = self.ok("ending", "--topic", T, inp={"phase": "design", "open": True})
-        self.assertTrue(out.startswith("Run next:\n"))
+        self.assertIn("Run next:", out)
         self.assertIn("Behind design/orders-platform: design/orders-a (1 commit), design/orders-b (1 commit).", out)
         st = self.ok("linked-behind", "--topic", T)
         self.assertEqual(st["behind"], {"design/orders-a": 1, "design/orders-b": 1})

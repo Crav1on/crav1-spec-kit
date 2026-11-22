@@ -26,7 +26,7 @@ Instruct it to follow its own prompt and to finish with numbered **Issues for `/
 
 ## After it returns
 
-Show the subagent’s review to the user. Then one line: `Next: /crav1-tighten-spec, because the review's issues are not walked yet.` Do not start tightening in this turn unless they already asked. Do not name a security review in the ending. Architecture review stays a critique of design hunches. It does not ask whether the thing is secure.
+Show the subagent’s review to the user. Then one line: the Run next reason "the review's issues are not walked yet" and the command alone in its code span `/crav1-tighten-spec` Do not start tightening in this turn unless they already asked. Do not name a security review in the ending. Architecture review stays a critique of design hunches. It does not ask whether the thing is secure.
 
 ## Run ending (1.122.0)
 

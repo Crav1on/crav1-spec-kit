@@ -40,6 +40,6 @@ The item, the constraint, and any `Asked:` or `Pending:` line stay. Nothing is s
 
 ## After
 
-`Next: /crav1-build-tasks T4, because that approval is on record and the task can start.` When a mark was written: `Uncommitted: 1 file; commit with /crav1-finalize-commit when ready.`
+Run next, with the reason "that approval is on record and the task can start" and the command `/crav1-build-tasks T4` alone in its code span (1.200.0). When a mark was written: `Uncommitted: 1 file; commit with /crav1-finalize-commit when ready.`
 
 Reference page: [record-approval](reference/skills/crav1-record-approval.md)

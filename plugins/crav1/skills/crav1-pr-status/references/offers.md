@@ -34,7 +34,7 @@ Order of questions:
 
    The draft's words match the recommended option: `I've marked this thread fixed.` only on that path, never `I'll resolve this thread`. On **Post only**, drop that sentence before posting.
 
-   - GitHub: **Resolve thread** / **Unresolve thread** in the same way.
+   - GitHub uses the same card. **Post and set resolved** posts the drafted reply and resolves the thread.
    Recommend **Leave it** for any change that undoes someone else's resolve.
 2. **Follow-ups**, one question. Background: `These 2 points are follow-ups; marking them creates no work item.`
 
@@ -47,7 +47,7 @@ Signed out, headless, or a bot run: list the same questions as text under `Offer
 ## On a yes
 
 - **Thread status:** set only that thread's status, as `crav1-add-to-spec` `references/pr-threads.md` **Change a thread's status** (Azure DevOps) or **Resolve a thread** (GitHub) says, then read the thread again and show its new status. A failure is shown and not retried. Update the Point's `host <status>` tag.
-- **Reply (1.199.0):** `ado_threads.py reply --pr <n> --thread <id> --file <draft file> --status fixed --note <PR note> --yes` from skill `crav1-review-pr` (leave `--status fixed` out on **Post only**). It replies inside the thread, sets the status, reads it back and marks the draft's heading in the PR note `thread <id> posted <date>`. GitHub: `gh api repos/<o>/<r>/pulls/<n>/comments/<id>/replies -f body=@<file>`, then resolve as above.
+- **Reply (1.199.0, GitHub 1.200.0):** `ado_threads.py reply --pr <n> --thread <id> --file <draft file> --status fixed --note <PR note> --yes` from skill `crav1-review-pr` (leave `--status fixed` out on **Post only**). It replies inside the thread, sets the status, reads it back and marks the draft's heading in the PR note `thread <id> posted <date>`. GitHub: `gh_threads.py reply --repo <owner>/<name> --pr <n> --thread <id> --file <draft file> --note <PR note> --resolve --yes` (leave `--resolve` out on **Post only**). Preview first; `--yes` only after the card's yes.
 - **Follow-ups:** set each chosen Point to `follow-up`, keep its text, and print the draft item (title, description with the pull request link and the anchor) for `/crav1-ado-sync`. Do not run `/crav1-ado-sync`; name it. It reads `follow-up` Points as open items.
 
 A no changes nothing and is not asked again in the same run.
