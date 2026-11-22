@@ -15,15 +15,17 @@ This is cross-cutting. It may run from any lane. It does not move work into Spec
 | Answer questions already written in a spec | `/crav1-resolve-open-questions` |
 | Decide how the landscape should change | `/crav1-design-architecture` |
 
-## 1. Start with an idea
+## 1. Start
 
-Type the idea after the command:
+`/crav1-design-architecture` with or without a topic, and with or without the word `resume`, opens the same status screen. It says where you are, what is waiting, and the commands you can type, each label above one command. `resume` does not change that screen.
+
+With no topic yet the screen offers to start one. With decisions still open, **Next decision** is first. When every decision is settled it offers stages, the proposal and go-ahead.
+
+Type an idea when you start a topic:
 
 `/crav1-design-architecture orders should retry failed payments without blocking checkout`
 
-The skill reads the architecture spec, system notes, environment docs, research and code, then shows one framing card: the proposed goal with its drivers, constraints and criteria, what is already fixed, and the decisions that look necessary. Say yes, or type what to change. After the yes it starts a topic, for example `orders-payment-retry`, with one design.
-
-Work it on its own branch, for example `design/orders-payment-retry`.
+After you say yes it starts a topic, for example `orders-payment-retry`, with one design, on a branch such as `design/orders-payment-retry`. The session stays open until you park or end it.
 
 ## 2. One decision at a time
 
@@ -34,7 +36,7 @@ Each decision shows two or three real options, the recommended one first with it
 - `to-question` or `to-research` writes an open question in the design folder, naming who has the fact or who decides.
 - `skip-for-now` moves on.
 
-Every move is saved, so you can stop at any point. `park` stops on purpose; `resume orders-payment-retry` picks up at the first open decision in a later chat.
+Every move is saved. `park` prints `Session parked` and `/crav1-design-architecture orders-payment-retry`. Typing that command again opens the same status screen. `next` is the guided card.
 
 ## 3. Fan out and stage, when you want
 

@@ -1,6 +1,7 @@
+Waiting: person A's decision on whether prod may use the new queue.
+
 Run next:
-The chosen design has been reviewed, accepted, and copied on the design branch.
-Do not plan until this pull request is merged. Merge with no tag.
+The chosen design has been reviewed, accepted, and copied on the design branch. Do not plan until this pull request is merged. Merge with no tag.
 
 Push the orders payment retry design branch:
 `git push -u origin design/orders-payment-retry`
@@ -8,5 +9,4 @@ Push the orders payment retry design branch:
 Open the pull request for that branch:
 `gh pr create --base main --head design/orders-payment-retry`
 
-Waiting: person A's decision on whether prod may use the new queue.
-Uncommitted: 7 files.
+Uncommitted: 7 files; commit with `/crav1-finalize-commit` when ready.

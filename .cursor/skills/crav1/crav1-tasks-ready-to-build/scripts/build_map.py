@@ -2425,7 +2425,12 @@ def held_phrase(row):
             note = " Inferred from the text."
         wait = f"Waiting for {who}." if who else NOBODY_ANSWERS
         return f'open question "{question}" {wait}{note}'
-    return core or "held"
+    phrase = core or "held"
+    info = row.get("merge_wait") if isinstance(row.get("merge_wait"), dict) else {}
+    pr = info.get("pr") or row.get("pr")
+    if pr and "pull request" in phrase and f"PR {pr}" not in phrase:
+        phrase = phrase.replace("its pull request", f"PR {pr}", 1).replace("the pull request", f"PR {pr}", 1)
+    return phrase
 
 
 def short_question(text, limit=160, quote=None):

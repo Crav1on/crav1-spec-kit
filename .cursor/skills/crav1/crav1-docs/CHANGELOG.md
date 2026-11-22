@@ -2,6 +2,17 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.200.0 (2026-11-22)
+
+One design-session start, shared ending checks, and a shorter dry run.
+
+- **Design session.** `/crav1-design-architecture` with or without a topic, and with or without `resume`, opens the same status screen from the topic files. `resume` changes nothing. Park and end print `Session parked` or `Session ended` and `/crav1-design-architecture <topic>`. The session stays open across decisions, endings and commits. `next` is the guided card. A proposal and a briefing share one decisions section. Stage numbers start at 1. A routed requirement names the slice and the text.
+- **Endings.** A shared check refuses a `Next:` line, a Waiting line that carries a command, and an Uncommitted line that names the commit command outside a code span. Question waits name the question and who it waits on when that text is known. A held line that waits on a pull request names the PR number. When local files have no number, a read-only host lookup may supply the one open pull request for that branch.
+- **GitHub replies.** `gh_threads.py reply` previews a reply in a review thread and, after a yes, posts it and can resolve the thread. open-pr offers the same one-thread card.
+- **Dry run.** The maintainer dry run summarises update detect and plan to a count and the changed files, and hides the spurious no-upstream line.
+
+Docs and tests: design walkthrough, glossary, data layout, and `scripts/tests/test_kit_1200.py`.
+
 ## 1.199.0 (2026-11-20)
 
 Thread replies from the kit, one re-check shape, an answered status, lighter PR runs, commit and push in one yes, and three build fixes.
@@ -181,10 +192,5 @@ Starting an open task on someone else's pull request branch, found on a live bui
 - **The ending names who merges.** On another person's branch the Waiting line names the pull request's author, such as `Waiting: person A to merge pull request 7, then T2, T3 and T4 on feat/orders-fixes are ticked.`
 - **A task that cannot start gets a card.** Held by a dependency, claimed by someone else, or not in `tasks.md`: the script returns a card (`check-ready` recommended, or `stop`) and an ending with Run next first, so the walk never offers choices in prose.
 - Snapshot `other-owner-take-in` and `scripts/tests/test_kit_1186.py`.
-
-## 1.185.0 (2026-11-17)
-
-- **Nested lists in the build map.** Each branch block in `build-map.md` now lists `- Tasks:` and `- Waits for:` one item per nested sub-bullet instead of joining them with `; `. A done task keeps its strike-through and `✓ done (PR N)` on its own sub-bullet, and an empty list reads `Waits for: none` on one line. Question, Ready now and the Plan step note stay on one line.
-- **Delivers merged into Tasks.** The Delivers bullet is gone; Tasks, with task ids, is the branch's one list. The Mermaid diagram is unchanged, and a map written by an older kit is rewritten once on the next ready check.
 
 The newest 15 releases are above. The full changelog is https://github.com/Crav1on/crav1-spec-kit/blob/main/CHANGELOG.md.

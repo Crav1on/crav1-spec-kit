@@ -13,7 +13,9 @@ Exit: 0
     "docs/architecture/designs/orders-platform/designs/platform-first/questions.md",
     "docs/architecture/designs/orders-platform/designs/platform-first/diagrams.md",
     "docs/architecture/designs/orders-platform/inputs/README.md"
-  ]
+  ],
+  "status_line": "Design session open: orders-platform. Park: `/crav1-design-architecture orders-platform park`",
+  "session": "open"
 }
 
 ## Step 5: design_run.py add-decision --topic orders-platform --title Backup policy
@@ -31,13 +33,14 @@ Exit: 0
 
 Exit: 0
 
+Design session open: orders-platform. Park: `/crav1-design-architecture orders-platform park`
 Run next:
 The end state is still being designed.
 
-Pick up the orders platform designs:
-`/crav1-design-architecture resume orders-platform`
+Open the orders platform session:
+`/crav1-design-architecture orders-platform`
 
-Uncommitted: 5 files.
+Uncommitted: 6 files; commit with `/crav1-finalize-commit` when ready.
 
 ## Step 7: design_run.py commit --topic orders-platform
 
@@ -51,11 +54,12 @@ Exit: 0
     "docs/architecture/designs/orders-platform/designs/platform-first/diagrams.md",
     "docs/architecture/designs/orders-platform/designs/platform-first/questions.md",
     "docs/architecture/designs/orders-platform/goal.md",
-    "docs/architecture/designs/orders-platform/inputs/README.md"
+    "docs/architecture/designs/orders-platform/inputs/README.md",
+    "docs/architecture/designs/orders-platform/session.json"
   ],
   "message": "Design orders-platform: save design work",
   "card": {
-    "question": "Commit the 5 design files of orders-platform now?",
+    "question": "Commit the 6 design files of orders-platform now?",
     "words": [
       "yes",
       "not-now"
@@ -88,12 +92,13 @@ Exit: 0
     "docs/architecture/designs/orders-platform/designs/platform-first/diagrams.md",
     "docs/architecture/designs/orders-platform/designs/platform-first/questions.md",
     "docs/architecture/designs/orders-platform/goal.md",
-    "docs/architecture/designs/orders-platform/inputs/README.md"
+    "docs/architecture/designs/orders-platform/inputs/README.md",
+    "docs/architecture/designs/orders-platform/session.json"
   ],
   "message": "Design orders-platform: goal and first design"
 }
 
-## Step 10: design_run.py resume --topic orders-platform
+## Step 10: design_run.py resume --json --topic orders-platform
 
 Exit: 2
 

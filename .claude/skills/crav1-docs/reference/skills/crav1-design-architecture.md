@@ -32,14 +32,18 @@ The skill's `scripts/design_run.py` owns the folder format and every move, saves
 
 1.191.0: the design branch check, the kit-behind check and the go-ahead base check use the repo's default branch (`origin/HEAD`, else `origin/main`, then `origin/master`), skip with a reason when there is none, and name that branch in cards and Run next.
 
+1.200.0: one session start. The design command with or without a topic, and with or without resume, prints the same status screen from session.json and the topic files. resume is an alias and changes nothing. Park and end print Session parked or Session ended and the plain command for that topic. An open session stays open across decisions, endings and commits. next is the guided card. A proposal page and a briefing share one decisions section, stage numbers start at 1, and a routed requirement names the slice and the text.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
 
 | Question | Word | Means |
 | --- | --- | --- |
-| Which step | `resume` | Continue an open design topic at its first open decision. An optional topic value may follow. |
-| Which step | `park` | Stop the current topic. It stays resumable. |
+| Which step | `resume` | Alias of the status screen. Same text as starting fresh, for the same files. Does not change the session. |
+| Which step | `next` | Open the guided card for the next decision. Cards appear only from this word. |
+| Which step | `park` | Park the session. Prints Session parked and the plain command to open it again. |
+| Which step | `end` | End the session. Prints Session ended and the plain command to open it again. |
 | Which step | `status` | Show open topics, designs, decisions, stages and questions. Writes nothing. |
 | Which step | `fan-out` | Start a competing design under the same goal, as a copy or from a blank start. |
 | Which step | `stage-it` | Suggest a split of the designed end state into stages that the user names and divides. |
@@ -51,7 +55,7 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 | Which step | `note` | Save discussion that is not a decision yet (a scan, a vision, a scope list, answers) into the topic's notes.md. |
 | Which step | `small-fix` | Record a change that needs no design choice; it is copied at go-ahead with no ADR. |
 
-Idea text with no word starts a new topic. A run without the user is always prepare, and with no word and no idea text it stops and names the words. Per-decision reply words: choose-a, choose-b, choose-c, choose-mine, discuss, add-my-idea, ask-me, to-question, to-research, skip-for-now.
+With or without a topic, and with or without resume, the start is the status screen. next opens the guided card. A run without the user is always prepare. Per-decision reply words: choose-a, choose-b, choose-c, choose-mine, discuss, add-my-idea, ask-me, to-question, to-research, skip-for-now.
 
 ## Runs when
 

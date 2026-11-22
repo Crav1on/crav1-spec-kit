@@ -1,8 +1,10 @@
+Waiting: person A's answer on peak order volume, before the retry limits can be decided.
+Session parked.
+
 Run next:
 Two of three decisions are settled; the topic is parked.
 
-Pick up the orders payment retry designs:
-`/crav1-design-architecture resume orders-payment-retry`
+Open the session:
+`/crav1-design-architecture orders-payment-retry`
 
-Waiting: person A's answer on peak order volume, before the retry limits can be decided.
-Uncommitted: 4 files.
+Uncommitted: 4 files; commit with `/crav1-finalize-commit` when ready.

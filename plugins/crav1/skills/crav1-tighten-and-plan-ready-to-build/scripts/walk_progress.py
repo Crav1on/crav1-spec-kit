@@ -3978,6 +3978,7 @@ def fill_merge_prs(root: Path | None, rows: list[dict], opened: dict | None = No
     or another task waiting on the same branch, so the line reads
     `Waiting: PR 85 to merge, then ...`, not `the pull request`.
     """
+    import os
     opened = opened if opened is not None else progress_open_prs(root)
     try:
         built = walk_built(root) or {}
@@ -3997,6 +3998,16 @@ def fill_merge_prs(root: Path | None, rows: list[dict], opened: dict | None = No
     for row in waits:
         info = row["merge_wait"]
         pr = info.get("pr") or by_branch.get(info.get("branch"))
+        if not pr and info.get("branch") and not os.environ.get("CRAV1_NO_HOST_LOOKUP"):
+            try:
+                import importlib.util
+                path = Path(__file__).resolve().parents[2] / "crav1-open-pr" / "scripts" / "pr_common.py"
+                spec = importlib.util.spec_from_file_location("pr_common_host_1200", path)
+                mod = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(mod)
+                pr = mod.pr_number_for_branch(str(info.get("branch")), str(root) if root else None)
+            except Exception:
+                pr = None
         if not pr:
             continue
         info["pr"] = pr
@@ -5434,7 +5445,25 @@ def _wait_phrase(waiting: list[dict], noun: str) -> str:
         tail = f" (nobody named for {unnamed})"
     else:
         tail = ""
-    return f"Waiting: {count} tasks wait on {noun}{tail}."
+    line = f"Waiting: {count} tasks wait on {noun}{tail}."
+    if noun != "open questions":
+        return line
+    bits = []
+    for hit in waiting:
+        reason = str(hit.get("reason") or "")
+        match = re.search(r'open question "(.*?)"', reason)
+        question = str(hit.get("question") or (match.group(1) if match else "")).strip()
+        if not question:
+            continue
+        task = hit.get("task") or "a task"
+        who = hit.get("who")
+        if not who or who == NOT_NAMED:
+            bits.append(f'{task} waits on "{question}" and nobody is named to answer it')
+        else:
+            bits.append(f'{task} waits on "{question}" from {who}')
+    if not bits:
+        return line
+    return line[:-1] + ": " + "; ".join(bits) + "."
 
 
 def _direct_question_or_approval(hit: dict) -> bool:

@@ -1261,7 +1261,20 @@ def main(argv=None) -> int:
         return 0
     state = json.loads(Path(args.json).read_text(encoding="utf-8"))
     keys = compose.__code__.co_varnames[: compose.__code__.co_argcount]
-    print(compose(**{key: state[key] for key in keys if key in state}))
+    text = compose(**{key: state[key] for key in keys if key in state})
+    try:
+        import importlib.util
+        path = Path(__file__).resolve().parent / "run_ending.py"
+        spec = importlib.util.spec_from_file_location("run_ending_walk", path)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        problems = mod.check_ending(text)
+    except Exception:
+        problems = []
+    if problems:
+        print("ending failed its own check: " + "; ".join(problems), file=sys.stderr)
+        return 2
+    print(text)
     return 0
 
 

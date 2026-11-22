@@ -208,7 +208,7 @@ Exit: 0
   ]
 }
 
-## Step 5: design_run.py resume --topic orders-platform
+## Step 5: design_run.py resume --json --topic orders-platform
 
 Exit: 0
 

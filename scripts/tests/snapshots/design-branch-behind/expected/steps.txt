@@ -13,16 +13,18 @@ Exit: 0
     "docs/architecture/designs/orders-platform/designs/platform-first/questions.md",
     "docs/architecture/designs/orders-platform/designs/platform-first/diagrams.md",
     "docs/architecture/designs/orders-platform/inputs/README.md"
-  ]
+  ],
+  "status_line": "Design session open: orders-platform. Park: `/crav1-design-architecture orders-platform park`",
+  "session": "open"
 }
 
-## Step 10: design_run.py resume --topic orders-platform
+## Step 10: design_run.py resume --json --topic orders-platform
 
 Exit: 2
 
 the orders-platform topic is on its design branch design/orders-platform, not on main. Offer the switch on a yes card; after the yes run switch-branch --topic orders-platform --yes, then run this move again
 
-## Step 12: design_run.py resume --topic orders-platform
+## Step 12: design_run.py resume --json --topic orders-platform
 
 Exit: 0
 

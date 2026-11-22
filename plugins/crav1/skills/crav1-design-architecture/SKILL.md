@@ -10,7 +10,7 @@ icon: compass
 color: purple
 ---
 
-<!-- Skill files: 1.191.0 -->
+<!-- Skill files: 1.200.0 -->
 
 # Design architecture
 
@@ -28,9 +28,10 @@ Review and tighten find and fix problems in what is written. Design creates new 
 
 Route first, load second. Exact words, no flags, hyphen-only.
 
-- **Idea text, no word:** start a new topic from the text, or add to the topic already open in this chat. There is no `new` word.
-- **`resume`:** continue an open topic. An optional topic value may follow: `resume orders-payment-retry`. One open topic: no question. Several: one card listing them.
-- **`park`:** stop the current topic; it stays resumable.
+- **Nothing, a topic, or `resume`:** one entry, the status screen. `/crav1-design-architecture`, `/crav1-design-architecture <topic>`, and the same words with `resume` before or after the topic all print that screen from the current files. `resume` changes nothing. There is no `new` word.
+- **`next`:** the guided card for the next open decision. Cards appear only from this word, or from a command on the screen that leads into a decision.
+- **`park`:** park the session. It prints `Session parked` and `/crav1-design-architecture <topic>`.
+- **`end` or `close`:** end the session. It prints `Session ended` and the same plain command.
 - **`status`:** read-only. Show open topics, designs, settled and open decisions, stages and questions. Writes nothing.
 - **`fan-out`:** start a competing design under the same goal, as a copy of the current design or from a blank start. The user picks copy or blank.
 - **`stage-it`:** suggest a split of the designed end state into stages; the user names and divides them. Optional.
@@ -41,7 +42,7 @@ Route first, load second. Exact words, no flags, hyphen-only.
 - **`note`:** save discussion that is not a decision yet (an improvement scan, a vision, a scope list, answers) into the topic folder. Allowed in prepare.
 - **`small-fix`:** record a change that needs no design choice; it is copied at go-ahead with no ADR.
 - **`builds-on`:** start a new topic that builds on an existing one: `builds-on orders-platform` followed by the idea text. The base topic's settled decisions become fixed inputs.
-- **Nothing at all:** ask one free-text question: *What do you want to change, add or fix in the architecture?* Offer `resume` too when a topic is open.
+- **`proposal` and `stages`:** write or list the proposal and the stages. Stage numbers start at 1 everywhere.
 
 A run without the user in the chat, such as a bot or a scheduled job, is always `prepare`, even when another word is given. With no word and no idea text it stops with:
 
@@ -49,7 +50,7 @@ A run without the user in the chat, such as a bot or a scheduled job, is always 
 Missing choice. Use one of: <idea text>, resume, park, status, prepare.
 ```
 
-Then read `references/flow.md` for the steps. Read `references/options.md` when you show a decision. Read `references/go-ahead.md` only on `go-ahead`. Read `references/inputs.md` only when you call the script.
+Then read `references/session.md` for the status screen, park and end. Read `references/flow.md` for the steps. Read `references/options.md` when you show a decision. Read `references/go-ahead.md` only on `go-ahead`. Read `references/inputs.md` only when you call the script.
 
 ## The script owns the sandbox
 
@@ -92,8 +93,10 @@ The sandbox is `docs/architecture/designs/<topic>/` on its own design branch (re
 
 ## End
 
-End as `crav1-docs/reference/run-ending.md` says: `Run next:` first, a short reason, then each label on its own line above a command alone in its code span. The script prints it: `design_run.py ending --topic <topic> --input <state.json>`. Give that text as-is. Add the Uncommitted line when files changed.
+The script prints the ending: `design_run.py ending --topic <topic> --input <state.json>`. Give that text as-is. Shape follows `crav1-docs/reference/run-ending.md`. A design that is still open stays open: the ending is a checkpoint plus the status line, then `Run next` with `/crav1-design-architecture <topic>`. It does not print `Session ended`. Only `park` and `end` change `session.json`.
 
+- A routed requirement names the slice and the requirement text: `/crav1-add-to-spec <slice> <text>`. Never the bare word `fact`.
 - After go-ahead, until the design pull request is merged: push the design branch first, then open its pull request. Name no planning step.
 - After that pull request is merged: `/crav1-tighten-spec <slug>` for an affected slice, or `/crav1-plan-from-spec` when no slice exists yet.
-- During design: `/crav1-design-architecture resume <topic>` when parked or still designing.
+- Uncommitted files use the shared line: Uncommitted, the count, then the commit command in one code span.
+- Stop and commit is a yes for the commit card only when this skill has said so. Otherwise show the commit card.

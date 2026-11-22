@@ -109,13 +109,50 @@ def find_script(name: str, worktree: Path, kit: Path) -> Path | None:
     return None
 
 
+def _quiet(text: str) -> str:
+    """Drop the spurious no-upstream line. It is not a dry-run failure (1.200.0)."""
+    return "\n".join(ln for ln in str(text or "").splitlines() if "no upstream" not in ln.lower())
+
+
+def _summarise(cmd: str, code: int, out: str) -> str:
+    """Detect and plan as a count plus the changed files. Apply keeps its exit line (1.200.0)."""
+    text = _quiet(out)
+    if cmd == "detect":
+        try:
+            info = json.loads(text)
+            return f"$ update_kit.py detect (exit {code})\nmode: {info.get('mode')}; version: {info.get('version')}"
+        except ValueError:
+            return f"$ update_kit.py detect (exit {code})\n{text}"
+    if cmd == "plan":
+        files: list[str] = []
+        try:
+            data = json.loads(text)
+        except ValueError:
+            data = None
+        if isinstance(data, dict):
+            for value in data.values():
+                if isinstance(value, list):
+                    files.extend(str(item) for item in value if isinstance(item, str) and ("/" in item or item.endswith(".md")))
+                elif isinstance(value, dict):
+                    files.extend(str(key) for key in value if "/" in str(key) or str(key).endswith(".md"))
+        if not files:
+            files = [ln.strip() for ln in text.splitlines() if "/" in ln and not ln.strip().startswith("{")]
+        shown = "\n".join(files[:40])
+        extra = f"\n{shown}" if shown else ""
+        return f"$ update_kit.py plan (exit {code})\n{len(files)} files{extra}"
+    kept = text
+    if "dry-run-marker.md" in out and "dry-run-marker.md" not in kept:
+        kept = (kept + "\ndry-run-marker.md").strip()
+    return f"$ update_kit.py {cmd} (exit {code})\n{kept}".rstrip()
+
+
 def update_into(worktree: Path, kit: Path, tmp: Path, source: str | None) -> list[str]:
     """The PR kit's own update, the way /crav1-update-kit installs: detect, old release tree, plan, apply."""
     script = kit / UPDATE
     py = [sys.executable, "-X", "utf8", str(script)]
     lines = []
     code, out = run(py + ["detect", "--root", str(worktree)])
-    lines.append(f"$ update_kit.py detect (exit {code})\n{out}")
+    lines.append(_summarise("detect", code, out))
     try:
         info = json.loads(out)
     except ValueError:
@@ -131,7 +168,7 @@ def update_into(worktree: Path, kit: Path, tmp: Path, source: str | None) -> lis
     for cmd in (["plan", "--old", str(old), "--new", str(kit), "--to-version", target],
                 ["apply", "--old", str(old), "--new", str(kit), "--yes"]):
         code, out = run(py + cmd + ["--root", str(worktree)])
-        lines.append(f"$ update_kit.py {cmd[0]} (exit {code})\n{out}")
+        lines.append(_summarise(cmd[0], code, out))
         if code != 0:
             break
     return lines
@@ -144,7 +181,7 @@ def checks(worktree: Path, kit: Path, spec: str, extras: list[str]) -> list[str]
     py = [sys.executable, "-X", "utf8"]
     lines = [f"Scripts from: {walk.relative_to(worktree) if worktree in walk.parents else 'the kit clone'}"]
     code, out = run(py + [str(walk), "start", "--root", spec, "--skip-sync"], cwd=worktree)
-    lines.append(f"$ walk_progress.py start --root \"{spec}\" --skip-sync (exit {code})\n{out}")
+    lines.append(f"$ walk_progress.py start --root \"{spec}\" --skip-sync (exit {code})\n{_quiet(out)}")
     folder = None
     try:
         folder = json.loads(out).get("folder")
@@ -153,7 +190,7 @@ def checks(worktree: Path, kit: Path, spec: str, extras: list[str]) -> list[str]
     if folder:
         code, out = run(py + [str(walk), "readiness", "--root", folder, "--text"], cwd=worktree)
         rel = os.path.relpath(folder, worktree)
-        lines.append(f"$ walk_progress.py readiness --root {rel} --text (exit {code})\n{out}")
+        lines.append(f"$ walk_progress.py readiness --root {rel} --text (exit {code})\n{_quiet(out)}")
     else:
         lines.append("readiness skipped: start did not name a spec folder.")
     for extra in extras:
@@ -163,7 +200,7 @@ def checks(worktree: Path, kit: Path, spec: str, extras: list[str]) -> list[str]
             lines.append(f"$ {extra}\nnot run: {parts[0] if parts else 'nothing'} was not found.")
             continue
         code, out = run(py + [str(script)] + parts[1:], cwd=worktree)
-        lines.append(f"$ {extra} (exit {code})\n{out}")
+        lines.append(f"$ {extra} (exit {code})\n{_quiet(out)}")
     return lines
 
 

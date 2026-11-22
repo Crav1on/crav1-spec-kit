@@ -3,3 +3,6 @@ A research point is open in the design.
 
 Ask for the research:
 `/crav1-show-or-ask-open-questions ask research retry-backoff`
+
+Open the orders payment retry session:
+`/crav1-design-architecture orders-payment-retry`

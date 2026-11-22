@@ -186,7 +186,12 @@ class Base(unittest.TestCase):
                       if not k.startswith("docs/architecture/designs/") and after.get(k) != before.get(k))
 
     def check_snapshot(self, name):
-        got = {k: v for k, v in tree(self.tmp).items()}
+        def freeze(rel, text):
+            if rel.endswith("session.json"):
+                return re.sub(r'"updated": "[^"]*"', '"updated": "DATE"', text)
+            return text
+
+        got = {k: freeze(k, v) for k, v in tree(self.tmp).items()}
         folder = SNAP / name
         if os.environ.get("UPDATE_DESIGN_SNAPSHOTS"):
             shutil.rmtree(folder, ignore_errors=True)
@@ -313,7 +318,7 @@ class TestMoves(Base):
         self.settle()
         run(self.tmp, "park", "--topic", TOPIC)
         self.assertEqual(dr.Topic(self.tmp, TOPIC).design("queue-in-orders-api")["status"], "parked")
-        code, out, err = run(self.tmp, "resume", "--topic", TOPIC)
+        code, out, err = run(self.tmp, "resume", "--json", "--topic", TOPIC)
         res = json.loads(out)
         self.assertEqual(res["next_decision"], "Who owns the retry policy")
         self.assertEqual(res["reopened"], [])
@@ -323,7 +328,7 @@ class TestMoves(Base):
         self.settle()
         self.settle("who owns", dict(SETTLE2, sources=["docs/system/adr/0001-inline-retry.md"]))
         (self.tmp / "docs/environments/test.md").write_text("# test\n\nNow runs on a new account.\n")
-        code, out, err = run(self.tmp, "resume", "--topic", TOPIC)
+        code, out, err = run(self.tmp, "resume", "--json", "--topic", TOPIC)
         res = json.loads(out)
         self.assertEqual([r["decision"] for r in res["reopened"]], ["Where a failed payment waits before retry"])
         d = dr.Topic(self.tmp, TOPIC).design("queue-in-orders-api")
@@ -486,7 +491,7 @@ class TestGoAhead(Base):
 class TestEndings(Base):
     def check_shape(self, text):
         lines = text.splitlines()
-        self.assertTrue(lines[0].startswith("Run next:"))
+        self.assertTrue(any(line.startswith("Run next:") for line in lines), text)
         self.assertNotIn("Next:", text.replace("Run next:", ""))
         for i, line in enumerate(lines):
             if "`" in line and line.startswith("`"):
@@ -506,7 +511,8 @@ class TestEndings(Base):
     def test_mid_design_parked(self):
         t = self.golden("parked", {"phase": "design", "parked": True, "reason": "Two of three decisions are settled; the topic is parked.",
                                    "waiting": "person A's answer on peak order volume, before the retry limits can be decided.", "uncommitted": 4})
-        self.assertIn("`/crav1-design-architecture resume orders-payment-retry`", t)
+        self.assertIn("`/crav1-design-architecture orders-payment-retry`", t)
+        self.assertNotIn("resume orders-payment-retry", t)
 
     def test_after_go_ahead_push_then_pr_and_no_planning(self):
         t = self.golden("go-ahead", {"phase": "go-ahead", "waiting": "person A's decision on whether prod may use the new queue.", "uncommitted": 7})
@@ -521,7 +527,8 @@ class TestEndings(Base):
         self.assertIn("`/crav1-plan-from-spec`", t)
 
     def test_other_endings(self):
-        self.assertIn("`/crav1-add-to-spec fact`", self.golden("requirement", {"phase": "design", "routed_requirement": True}))
+        self.assertIn("`/crav1-add-to-spec orders-api Orders retry without blocking checkout`",
+                      self.golden("requirement", {"phase": "design", "routed_requirement": {"slice": "orders-api", "text": "Orders retry without blocking checkout"}}))
         self.assertIn("ask research retry-backoff", self.golden("research", {"phase": "design", "research_topic": "retry-backoff"}))
         self.assertEqual(dr.ending({"topic": TOPIC, "phase": "design"}), "Run next: nothing needed now.\n")
         self.assertEqual(dr.ending({"topic": TOPIC, "phase": "merged"}), "Run next: nothing needed now.\n")

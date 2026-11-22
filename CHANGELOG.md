@@ -2,6 +2,17 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.200.0 (2026-11-22)
+
+One design-session start, shared ending checks, and a shorter dry run.
+
+- **Design session.** `/crav1-design-architecture` with or without a topic, and with or without `resume`, opens the same status screen from the topic files. `resume` changes nothing. Park and end print `Session parked` or `Session ended` and `/crav1-design-architecture <topic>`. The session stays open across decisions, endings and commits. `next` is the guided card. A proposal and a briefing share one decisions section. Stage numbers start at 1. A routed requirement names the slice and the text.
+- **Endings.** A shared check refuses a `Next:` line, a Waiting line that carries a command, and an Uncommitted line that names the commit command outside a code span. Question waits name the question and who it waits on when that text is known. A held line that waits on a pull request names the PR number. When local files have no number, a read-only host lookup may supply the one open pull request for that branch.
+- **GitHub replies.** `gh_threads.py reply` previews a reply in a review thread and, after a yes, posts it and can resolve the thread. open-pr offers the same one-thread card.
+- **Dry run.** The maintainer dry run summarises update detect and plan to a count and the changed files, and hides the spurious no-upstream line.
+
+Docs and tests: design walkthrough, glossary, data layout, and `scripts/tests/test_kit_1200.py`.
+
 ## 1.199.0 (2026-11-20)
 
 Thread replies from the kit, one re-check shape, an answered status, lighter PR runs, commit and push in one yes, and three build fixes.

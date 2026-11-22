@@ -88,6 +88,8 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 
 **Flow word.** `manual-flow` or `auto-flow` on `/crav1-model-data` (1.118.0). The scope after it is an optional value. Both flows use the same modeling rules. Manual flow confirms the business model before physical design. Auto flow continues after a budget approval and leaves unconfirmed results as proposals.
 
+**Design session.** The open working chat for one design topic (1.200.0). Starting fresh and typing `resume` open the same status screen. The session stays open until `park` or `end`. `session.json` in the topic folder records open, parked or ended. Come back with `/crav1-design-architecture <topic>`.
+
 **Design topic.** One goal under `docs/architecture/designs/<topic>/`, worked by `/crav1-design-architecture` (1.181.0) on its own design branch. *Architecture* in that skill means the whole landscape: systems and services and how they connect, environments, infrastructure and hosting, data flows, integrations, and deployment. No other skill reads a design topic, except `/crav1-explain-tech`, which only lists mentions read-only and calls them not decided (1.192.0).
 
 **Goal.** A design topic's `goal.md`: the end goal, drivers, constraints, and the criteria its designs are scored on.

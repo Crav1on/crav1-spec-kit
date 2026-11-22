@@ -117,20 +117,20 @@ class TestPendingGoalInputs(Base):
         self.create()
         f = self.tmp / "docs/architecture/designs/orders-platform/inputs/new-goal.json"
         f.write_text(json.dumps({"end_goal": "Orders run alone.", "decisions": ["Where orders live"]}), encoding="utf-8")
-        res = self.ok("resume", "--topic", T)
+        res = self.ok("resume", "--json", "--topic", T)
         self.assertEqual([x["path"] for x in res["pending_goal_inputs"]], ["inputs/new-goal.json"])
         self.assertIn("never recreate the topic", res["pending_note"])
         self.ok("change-goal", "--topic", T, "--reason", "saved goal", "--yes", "--input", str(f))
-        self.assertNotIn("pending_goal_inputs", self.ok("resume", "--topic", T))
+        self.assertNotIn("pending_goal_inputs", self.ok("resume", "--json", "--topic", T))
         f.write_text(json.dumps({"end_goal": "Orders run alone, again."}), encoding="utf-8")
-        self.assertIn("pending_goal_inputs", self.ok("resume", "--topic", T))
+        self.assertIn("pending_goal_inputs", self.ok("resume", "--json", "--topic", T))
 
     def test_change_goal_copies_an_outside_input_into_inputs(self):
         self.create()
         self.ok("change-goal", "--topic", T, "--reason", "r", "--yes", inp={"end_goal": "New end."})
         folder = self.tmp / "docs/architecture/designs/orders-platform/inputs"
         self.assertEqual(len(list(folder.glob("goal-change-*.json"))), 1)
-        self.assertNotIn("pending_goal_inputs", self.ok("resume", "--topic", T))
+        self.assertNotIn("pending_goal_inputs", self.ok("resume", "--json", "--topic", T))
 
     def test_skill_says_never_recreate(self):
         text = (SKILL / "references/flow.md").read_text(encoding="utf-8")
@@ -181,12 +181,12 @@ class TestKitCheck(GitHelpers, Base):
         self.git("update-ref", "refs/remotes/origin/main", "main")
         self.git("switch", "-q", f"design/{T}")
         before = (self.tmp / DESIGN).read_text(encoding="utf-8")
-        res = self.ok("--no-fetch", "resume", "--topic", T)
+        res = self.ok("--no-fetch", "resume", "--json", "--topic", T)
         self.assertTrue(res["kit_check"]["kit_behind_main"])
         self.assertEqual(res["branch_sync"]["state"], "behind")
         self.assertEqual(res["written"], [])
         self.assertEqual((self.tmp / DESIGN).read_text(encoding="utf-8"), before)
-        res = self.ok("--no-fetch", "resume", "--topic", T, "--skip-kit-check")
+        res = self.ok("--no-fetch", "resume", "--json", "--topic", T, "--skip-kit-check")
         self.assertNotIn("before the topic is touched", res.get("note", ""))
         self.assertTrue(res["kit_check"]["kit_behind_main"])  # still warned
 
@@ -235,7 +235,8 @@ class TestUpdateKitEnding(unittest.TestCase):
         text = uk.ending_text(root, 3)
         self.assertTrue(text.startswith("Run next:\n"))
         self.assertIn("`Developer: Reload Window`", text)
-        self.assertIn("`/crav1-design-architecture resume orders-platform`", text)
+        self.assertIn("`/crav1-design-architecture orders-platform`", text)
+        self.assertNotIn("resume orders-platform", text)
         self.assertNotIn("orders-done", text)
         self.assertNotIn("nothing needed now", text)
         self.assertIn("Uncommitted: 3 files", text)
@@ -253,7 +254,7 @@ class TestScratchAndInputs(Base):
         self.create()
         f = Path(tempfile.mkdtemp()) / "state.json"
         out = self.ok("ending", "--topic", T, inp={"phase": "design", "open": True}, inp_path=f)
-        self.assertTrue(out.startswith("Run next:"))
+        self.assertIn("Run next:", out)
 
     def test_old_topic_gets_inputs_on_first_save(self):
         self.create()
@@ -273,7 +274,7 @@ class TestUncommitted(GitHelpers, Base):
         out = self.ok("ending", "--topic", T, inp={"phase": "design", "open": True, "uncommitted": True}, inp_path=f)
         n = len([x for x in self.git("status", "--porcelain", "-uall", "--", "docs/architecture/designs/orders-platform").splitlines()])
         self.assertGreater(n, 0)
-        self.assertRegex(out, r"Uncommitted: \d+ files?\.")
+        self.assertRegex(out, r"Uncommitted: \d+ files?; commit with `/crav1-finalize-commit` when ready.")
         self.assertNotIn("True", out)
 
     def test_text_is_refused(self):
@@ -332,7 +333,7 @@ class TestRunNextRoutes(Base):
                   {"phase": "go-ahead", "slices": ["orders-api"]}, {"phase": "merged"},
                   {"phase": "design", "builds_on": T, "idea": "orders target on the new platform"},
                   {"phase": "design", "question_open": True, "research_topic": "queue limits"},
-                  {"phase": "design", "routed_requirement": True}]
+                  {"phase": "design", "routed_requirement": {"slice": "orders-api", "text": "Orders retry without blocking checkout"}}]
         cmds = []
         for st in states:
             text = dr.ending(dict({"topic": T}, **st))

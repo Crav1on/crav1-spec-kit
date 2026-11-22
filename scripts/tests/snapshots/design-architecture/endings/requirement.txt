@@ -2,4 +2,7 @@ Run next:
 A requirement came up during the design.
 
 Add the requirement to the spec:
-`/crav1-add-to-spec fact`
+`/crav1-add-to-spec orders-api Orders retry without blocking checkout`
+
+Open the orders payment retry session:
+`/crav1-design-architecture orders-payment-retry`

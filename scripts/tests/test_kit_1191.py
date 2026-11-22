@@ -80,7 +80,7 @@ class TestDefaultBranch(Repo):
         self.assertEqual(st["state"], "in-step")
         self.assertIn("no default branch found", st["skipped"])
         self.assertIsNone(st["card"])
-        self.ok("resume", "--topic", T)
+        self.ok("resume", "--json", "--topic", T)
 
     def test_not_a_repo_never_crashes(self):
         self.assertEqual(dr.default_branch(self.tmp)[0], "")
@@ -101,7 +101,7 @@ class TestKitBehindMaster(Repo):
         self.git("update-ref", "refs/remotes/origin/master", "master")
         self.git("symbolic-ref", "refs/remotes/origin/HEAD", "refs/remotes/origin/master")
         self.git("switch", "-q", f"design/{T}")
-        res = self.ok("resume", "--topic", T)
+        res = self.ok("resume", "--json", "--topic", T)
         self.assertTrue(res["kit_check"]["kit_behind_main"])
         self.assertEqual(res["kit_check"]["default_branch"], "origin/master")
         self.assertIn("merge master into the branch", " ".join(res["kit_check"]["problems"]))
