@@ -6,6 +6,7 @@ from the project root:
 
     python -X utf8 kit_dry_run.py --pr 277 --spec "orders-api"
     python -X utf8 kit_dry_run.py --branch feat/kit-1199 --spec "orders-api"
+    python -X utf8 kit_dry_run.py --pr 277 --spec "orders-api" --add codex
 
 It shallow-clones the kit at that pull request or branch into a temp folder,
 adds a detached temporary git worktree of this project at HEAD, runs the
@@ -22,6 +23,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import shlex
 import shutil
 import stat
@@ -114,8 +116,48 @@ def _quiet(text: str) -> str:
     return "\n".join(ln for ln in str(text or "").splitlines() if "no upstream" not in ln.lower())
 
 
+_PLAN_KINDS = ("update", "add", "merge", "delete", "clash", "unchanged", "left_extra")
+_PLAN_SAMPLES = ("update", "add", "merge", "delete", "clash")
+
+
+def _plan_summary(code: int, text: str) -> str:
+    """Counts by kind, then at most 10 changed paths (1.201.0). Unchanged stays a count."""
+    try:
+        data = json.loads(text)
+    except ValueError:
+        data = None
+    files = data.get("files") if isinstance(data, dict) else None
+    if not isinstance(files, dict):
+        head = "\n".join(text.splitlines()[:12])
+        return f"$ update_kit.py plan (exit {code})\n{head}".rstrip()
+    counts = []
+    samples: list[str] = []
+    changed = 0
+    for kind in _PLAN_KINDS:
+        items = files.get(kind) or []
+        if not isinstance(items, list):
+            items = []
+        counts.append(f"{kind} {len(items)}")
+        if kind not in _PLAN_SAMPLES:
+            continue
+        for item in items:
+            path = item.get("path") if isinstance(item, dict) else item
+            if not isinstance(path, str):
+                continue
+            changed += 1
+            if len(samples) < 10:
+                samples.append(path)
+    body = ", ".join(counts)
+    if samples:
+        body += "\n" + "\n".join(samples)
+    extra = changed - len(samples)
+    if extra > 0:
+        body += f"\n… and {extra} more"
+    return f"$ update_kit.py plan (exit {code})\n{body}"
+
+
 def _summarise(cmd: str, code: int, out: str) -> str:
-    """Detect and plan as a count plus the changed files. Apply keeps its exit line (1.200.0)."""
+    """Detect is mode and version. Plan is counts by kind. Apply keeps its exit line (1.200.0, 1.201.0)."""
     text = _quiet(out)
     if cmd == "detect":
         try:
@@ -124,22 +166,7 @@ def _summarise(cmd: str, code: int, out: str) -> str:
         except ValueError:
             return f"$ update_kit.py detect (exit {code})\n{text}"
     if cmd == "plan":
-        files: list[str] = []
-        try:
-            data = json.loads(text)
-        except ValueError:
-            data = None
-        if isinstance(data, dict):
-            for value in data.values():
-                if isinstance(value, list):
-                    files.extend(str(item) for item in value if isinstance(item, str) and ("/" in item or item.endswith(".md")))
-                elif isinstance(value, dict):
-                    files.extend(str(key) for key in value if "/" in str(key) or str(key).endswith(".md"))
-        if not files:
-            files = [ln.strip() for ln in text.splitlines() if "/" in ln and not ln.strip().startswith("{")]
-        shown = "\n".join(files[:40])
-        extra = f"\n{shown}" if shown else ""
-        return f"$ update_kit.py plan (exit {code})\n{len(files)} files{extra}"
+        return _plan_summary(code, text)
     kept = text
     if "dry-run-marker.md" in out and "dry-run-marker.md" not in kept:
         kept = (kept + "\ndry-run-marker.md").strip()
@@ -171,6 +198,97 @@ def update_into(worktree: Path, kit: Path, tmp: Path, source: str | None) -> lis
         lines.append(_summarise(cmd[0], code, out))
         if code != 0:
             break
+    return lines
+
+
+def _vendor_row(kit: Path, name: str) -> dict:
+    for rel in (
+        "plugins/crav1/skills/crav1-update-kit/vendors.json",
+        ".cursor/skills/crav1/crav1-update-kit/vendors.json",
+    ):
+        path = kit / rel
+        if path.is_file():
+            try:
+                data = json.loads(path.read_text(encoding="utf-8"))
+            except (OSError, ValueError):
+                return {}
+            row = (data.get("vendors") or {}).get(name)
+            return row if isinstance(row, dict) else {}
+    return {}
+
+
+def _skill_total(kit: Path) -> int:
+    for rel in ("docs/reference/skills.yaml", ".cursor/skills/crav1/crav1-docs/reference/skills.yaml"):
+        path = kit / rel
+        if path.is_file():
+            return len(re.findall(r"(?m)^- name: (crav1-[a-z0-9-]+)\s*$", path.read_text(encoding="utf-8")))
+    return 0
+
+
+def _command_only(worktree: Path, row: dict, name: str) -> int:
+    folder = worktree / str(row.get("skills") or "")
+    if not folder.is_dir():
+        return 0
+    if name == "codex":
+        return sum(1 for path in folder.glob("*/agents/openai.yaml") if path.is_file())
+    count = 0
+    for skill in folder.glob("*/SKILL.md"):
+        try:
+            text = skill.read_text(encoding="utf-8")
+        except (OSError, UnicodeError):
+            continue
+        head = text.split("---", 2)[1] if text.startswith("---") else ""
+        if "disable-model-invocation: true" in head:
+            count += 1
+    return count
+
+
+def add_vendors(worktree: Path, kit: Path, names: list[str]) -> list[str]:
+    """plan --add and apply --add in the temp worktree, then vendors. The real repo is not this folder."""
+    script = kit / UPDATE
+    py = [sys.executable, "-X", "utf8", str(script)]
+    lines: list[str] = []
+    total = _skill_total(kit)
+    for name in names:
+        row = _vendor_row(kit, name)
+        code, out = run(py + ["plan", "--add", name, "--root", str(worktree)])
+        try:
+            plan = json.loads(out)
+        except ValueError:
+            plan = {}
+        item = {}
+        if isinstance(plan, dict):
+            vendors = plan.get("vendors") or []
+            if vendors and isinstance(vendors[0], dict):
+                item = vendors[0]
+        if code == 0:
+            code, applied = run(py + ["apply", "--add", name, "--yes", "--root", str(worktree)])
+            if code != 0:
+                out = applied
+        folder = item.get("folder") or row.get("skills") or "(unknown)"
+        extras = item.get("extras") if isinstance(item.get("extras"), list) else row.get("extras") or []
+        extra_text = ", ".join(str(part) for part in extras) if extras else "none"
+        present = 0
+        if row.get("skills"):
+            base = worktree / str(row["skills"])
+            if base.is_dir():
+                present = sum(1 for child in base.iterdir() if child.is_dir() and (child / "SKILL.md").is_file())
+        untouched = item.get("project_untouched")
+        lines += [
+            f"--- Vendor {name} ---",
+            f"folder: {folder}",
+            f"skills: {present}/{total}",
+            f"command-only: {_command_only(worktree, row, name)}",
+            f"extras: {extra_text}",
+            f"added: {len(item.get('added') or [])}, merged: {len(item.get('merged') or [])}, clash: {len(item.get('clash') or [])}",
+            f"project_untouched: {str(untouched).lower() if untouched is not None else 'unknown'}",
+        ]
+        if item.get("note"):
+            lines.append(str(item["note"]))
+        if code != 0:
+            lines.append(f"$ update_kit.py plan --add {name} (exit {code})\n{_quiet(out)}")
+    code, out = run(py + ["vendors", "--root", str(worktree)])
+    lines.append(f"$ update_kit.py vendors (exit {code})\n{_quiet(out)}")
     return lines
 
 
@@ -264,6 +382,7 @@ def main(argv: list[str] | None = None) -> int:
     which.add_argument("--branch", help="kit branch name")
     parser.add_argument("--spec", required=True, help="spec folder, slug or title, as /crav1-tighten-and-plan-ready-to-build takes it")
     parser.add_argument("--extra", action="append", default=[], help='another kit script and its args, e.g. "build_map.py --root {folder}"; repeatable')
+    parser.add_argument("--add", action="append", default=[], help="after the update, plan and apply this vendor in the temp worktree; repeatable")
     parser.add_argument("--repo", default=".", help="the project root (default: current folder)")
     parser.add_argument("--kit-source", help=argparse.SUPPRESS)  # tests: a local kit repo instead of GitHub
     args = parser.parse_args(argv)
@@ -296,8 +415,10 @@ def main(argv: list[str] | None = None) -> int:
                 block.append(f"git worktree add failed:\n{out}")
             else:
                 added = True
-                block += ["--- Update ---", *update_into(worktree, kit, tmp_kit, args.kit_source), "",
-                          "--- Checks ---", *checks(worktree, kit, args.spec, args.extra)]
+                block += ["--- Update ---", *update_into(worktree, kit, tmp_kit, args.kit_source)]
+                if args.add:
+                    block += ["", "--- Add ---", *add_vendors(worktree, kit, args.add)]
+                block += ["", "--- Checks ---", *checks(worktree, kit, args.spec, args.extra)]
     finally:
         if added:
             code, out = run(["git", "-C", str(repo), "worktree", "remove", "--force", str(worktree)])

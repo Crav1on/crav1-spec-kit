@@ -711,7 +711,24 @@ def reviewed(root: Path, open_n: int, write: bool) -> str:
     return f"Reviewed line: P# open {old} {verb} {open_n}, date kept.\n"
 
 
+def _bind_vendor(argv):
+    """1.201.0: --vendor codex prints $crav1- commands. The default stays /."""
+    source = sys.argv[1:] if argv is None else argv
+    if "--vendor" not in source and not any(str(item).startswith("--vendor=") for item in source):
+        return argv
+    path = Path(__file__).resolve().parents[2] / "crav1-update-kit" / "scripts" / "vendor_prefix.py"
+    if not path.is_file():
+        print("Refused: --vendor needs the vendor table.", file=sys.stderr)
+        raise SystemExit(2)
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("crav1_vendor_prefix", path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod.install_from_argv(argv)
+
+
 def main(argv: list[str] | None = None) -> int:
+    argv = _bind_vendor(argv)
     parser = argparse.ArgumentParser(description="Computed plan checks (1.159.0).")
     sub = parser.add_subparsers(dest="command", required=True)
     p = sub.add_parser("order")

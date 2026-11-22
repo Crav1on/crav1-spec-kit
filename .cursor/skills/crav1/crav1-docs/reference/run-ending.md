@@ -4,6 +4,8 @@ Every skill ends a run in this shape (1.122.0). The skill still chooses which st
 
 A skill names the next step. It does not run it, unless that skill already runs the step today. The tighten-and-plan walk runs the steps inside the walk. Every other skill only names the step.
 
+A script that prints Run next accepts `--vendor` (1.201.0). With no flag, and for cursor, claude, and copilot, the command prefix stays `/`. `--vendor codex` prints `$crav1-` in place of `/crav1-`. A path such as `.cursor/skills/crav1/crav1-help` is left as written.
+
 ## The shared walk ending (1.156.0)
 
 The ready check (`/crav1-tasks-ready-to-build`), the tighten-and-plan ready check, and `/crav1-build-walk` build their ending with one shared script, skill `crav1-tasks-ready-to-build` `scripts/walk_ending.py --json <state>` (each of the three skills ships a copy of that `walk_ending` script). The skill gives that text once as its answer, as-is. It never pastes the raw tool output and then repeats the reply, never adds more than one short lead sentence before it, never adds, drops, or rewrites a line, and never adds a `Next:` line of its own. For the same ready branches, the three print the same Run next entries. The order is:

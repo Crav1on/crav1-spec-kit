@@ -149,13 +149,13 @@ def check_ending(text: str) -> list[str]:
         stripped = line.strip()
         if _NEXT.match(stripped):
             problems.append(f"line {i + 1} starts with Next:")
-        if stripped.startswith("Waiting:") and "`/" in stripped:
+        if stripped.startswith("Waiting:") and ("`/" in stripped or "`$" in stripped):
             problems.append(f"line {i + 1} is a Waiting line that carries a command")
-        if stripped.startswith("Uncommitted:") and "finalize-commit" in stripped and "`/" not in stripped:
+        if stripped.startswith("Uncommitted:") and "finalize-commit" in stripped and "`/" not in stripped and "`$" not in stripped:
             problems.append(f"line {i + 1} names the commit command outside a code span")
         if _LABEL.match(stripped) and i + 1 < len(lines):
             nxt = lines[i + 1].strip()
-            if nxt.startswith("/") or nxt.startswith("git ") or nxt.startswith("gh "):
+            if nxt.startswith(("/", "$", "git ", "gh ")):
                 problems.append(f"line {i + 2} is a command outside a code span")
             elif nxt.startswith("`") and not _CMD.match(nxt):
                 problems.append(f"line {i + 2} puts more than the command in the code span")

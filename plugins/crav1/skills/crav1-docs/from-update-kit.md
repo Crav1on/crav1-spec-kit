@@ -57,3 +57,11 @@ Since 1.176.0 `/crav1-update-kit` also fixes a saved commit-style rule that is o
 ## 1.198.0 changes
 
 `update_kit.py available` prints one `Kit update available: <installed> -> <latest>` line, read-only, with a 5 second timeout and a 12 hour cache, and nothing when offline. `/crav1-build-walk` and `/crav1-tighten-and-plan-ready-to-build` show it at the start with `/crav1-update-kit` in Run next.
+
+## 1.201.0 changes
+
+`vendors.json` in the update-kit skill lists each host: the folders the kit owns, the frontmatter a skill needs, the command prefix, and extra files. Cursor and Claude Code rows reproduce the 1.200 allow-list, so a plan and an apply on an existing install match 1.200. Codex and Copilot are listed and are not installed.
+
+`update_kit.py detect` adds `vendors`, the hosts whose marker file is present. `update_kit.py vendors --root .` lists each vendor's folder and skill count and writes nothing.
+
+A script that prints Run next takes `--vendor`. The default stays `/`. `--vendor codex` prints `$crav1-`.

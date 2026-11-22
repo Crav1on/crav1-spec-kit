@@ -87,7 +87,7 @@ Sources are listed at the end of this section. "Verified" means it was read in o
   - Migrations come from `migrations.json`.
   - `overlay.md` says: "Do not create the other host's tree." Today there is **no way to add a host**.
 - **Size.** Each host tree is about 9.3 MB and 674 files, mostly the bundled `crav1-docs`.
-- **Dry-run tester.** `scripts/kit_dry_run.py` clones the PR kit, makes a temp worktree, runs `detect`, `plan` and `apply` from the installed tag to the PR, runs readiness checks, and snapshots branch, HEAD, status, stash and worktrees before and after.
+- **Dry-run tester.** The maintainer dry-run tester clones the PR kit, makes a temp worktree, runs `detect`, `plan` and `apply` from the installed tag to the PR, runs readiness checks, and snapshots branch, HEAD, status, stash and worktrees before and after.
 
 ---
 
@@ -260,7 +260,7 @@ v1.200.0 is already scoped (fixtures, the shared "waiting" judgement, tester tid
 Thomas runs the tester on his real spec for every PR, as today:
 
 ```
-python -X utf8 kit_dry_run.py --pr N --spec "cc 1.0"
+python -X utf8 <the maintainer dry-run tester> --pr N --spec "orders-api"
 ```
 
 **Additions (v1.201.0):**

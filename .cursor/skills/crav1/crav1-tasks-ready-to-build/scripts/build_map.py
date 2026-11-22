@@ -3160,8 +3160,25 @@ def fix_loop(directory, pick=1, yes=False, code_repo=None):
     }, 0
 
 
+def _bind_vendor(argv):
+    """1.201.0: --vendor codex prints $crav1- commands. The default stays /."""
+    source = sys.argv[1:] if argv is None else argv
+    if "--vendor" not in source and not any(str(item).startswith("--vendor=") for item in source):
+        return argv
+    path = pathlib.Path(__file__).resolve().parents[2] / "crav1-update-kit" / "scripts" / "vendor_prefix.py"
+    if not path.is_file():
+        print("Refused: --vendor needs the vendor table.", file=sys.stderr)
+        raise SystemExit(2)
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("crav1_vendor_prefix", path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod.install_from_argv(argv)
+
+
 def main(argv):
     _utf8_stdout()
+    argv = _bind_vendor(argv)
     if not argv or argv[0] in ("-h", "--help"):
         sys.stdout.write(__doc__ or "")
         if not (__doc__ or "").endswith("\n"):
