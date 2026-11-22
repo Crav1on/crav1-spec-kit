@@ -56,7 +56,7 @@ That line is the sweep's watermark. It is not yours. `/crav1-pr-status` `since-l
 
 ## After
 
-Proposals, when there are any, are printed first. Then one `Next` line.
+Proposals, when there are any, are printed first. Then Run next, never a `Next:` line (1.200.0).
 
 When items are still pending, `Next` is this same command, because the queue is not finished. When a conflict or an open question was written onto a spec, `Next` is `/crav1-resolve-open-questions` for those slugs. When the only leftover is proposals, `Next` is `/crav1-update-specs-from-changes-and-prs manual-flow`, because those spec changes are not written yet. Otherwise `Next` is `nothing needed now`.
 

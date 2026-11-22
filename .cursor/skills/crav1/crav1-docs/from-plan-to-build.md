@@ -117,7 +117,7 @@ Prove the slice against the spec: [Verify and fix](from-verify.md). Then [From c
 
 Reference pages: [build-tasks](reference/skills/crav1-build-tasks.md) · [build-tasks](reference/skills/crav1-build-tasks.md) · [build-tasks](reference/skills/crav1-build-tasks.md) · [build-features](reference/skills/crav1-build-features.md) · [subagents](reference/skills.md#subagents)
 
-The run ends as [How a run ends](reference/run-ending.md) says: one `Next:` line, `Waiting:` when a step is blocked or waits on a person's yes, and `Uncommitted:` when files changed and are not committed.
+The run ends as [How a run ends](reference/run-ending.md) says: Run next, never a `Next:` line (1.200.0), `Waiting:` when a step is blocked or waits on a person's yes, and `Uncommitted:` when files changed and are not committed.
 
 
 ## Claimed tasks (1.151.0)
