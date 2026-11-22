@@ -61,6 +61,6 @@ The picture is the short description, the diagram, and how the parts connect. Th
 
 ## After
 
-`Next: nothing needed now.` When a file changed: `Uncommitted: 1 file; commit with /crav1-finalize-commit when ready.` See [How a run ends](reference/run-ending.md). No push. This command does not commit for you. The lanes can extend `docs/architecture/spec.md` in a later turn. This command does not start that turn.
+`Run next: nothing needed now.` When a file changed: `Uncommitted: 1 file; commit with /crav1-finalize-commit when ready.` See [How a run ends](reference/run-ending.md). No push. This command does not commit for you. The lanes can extend `docs/architecture/spec.md` in a later turn. This command does not start that turn.
 
 Reference page: [existing-to-specs](reference/skills/crav1-existing-to-specs.md)

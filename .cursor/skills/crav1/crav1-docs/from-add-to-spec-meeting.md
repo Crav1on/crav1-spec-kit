@@ -72,7 +72,7 @@ A left item is not written. A dismissed item is not written. The state line is n
 
 ## After
 
-One `Next:` line, the first case that applies, as [How a run ends](reference/run-ending.md) says. This command does not run it. Ask `/crav1-help next` for the full order.
+Run next, never a `Next:` line, for the first case that applies, as [How a run ends](reference/run-ending.md) says. This command does not run it. Ask `/crav1-help next` for the full order.
 
 - An existing spec changed: `/crav1-tighten-spec`, because the new information is not tightened yet. Resolve and `/crav1-plan-from-spec` are not listed. See [New information on an existing slice](reference/workflow.md#new-info).
 - The only handoff is one new feature of one or two sentences: `/crav1-spark-to-spec`.

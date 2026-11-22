@@ -63,4 +63,4 @@ A Feature with no spec yet: run the starter it suggested, for example [`/crav1-s
 
 Reference page: [ado-sync](reference/skills/crav1-ado-sync.md)
 
-The run ends as [How a run ends](reference/run-ending.md) says: one `Next:` line, `Waiting:` only when a step is blocked, and `Uncommitted:` when files changed and are not committed.
+The run ends as [How a run ends](reference/run-ending.md) says: Run next, never a `Next:` line (1.200.0), `Waiting:` only when a step is blocked, and `Uncommitted:` when files changed and are not committed.

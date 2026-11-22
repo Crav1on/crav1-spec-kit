@@ -77,6 +77,6 @@ For each gap you pick: add it to the nearest spec (handed to `/crav1-add-to-spec
 
 ## After Index
 
-When specs were written: `Next: /crav1-tighten-spec <first slug>, because those specs are not tightened yet.` When a file changed: `Uncommitted: 1 file; commit with /crav1-finalize-commit when ready.` See [How a run ends](reference/run-ending.md). No push. This command does not commit for you. A slice that is not in the code is not planned by this command.
+When specs were written, Run next names `/crav1-tighten-spec <first slug>` because those specs are not tightened yet (1.200.0). When a file changed: `Uncommitted: 1 file; commit with /crav1-finalize-commit when ready.` See [How a run ends](reference/run-ending.md). No push. This command does not commit for you. A slice that is not in the code is not planned by this command.
 
 Reference page: [existing-to-specs](reference/skills/crav1-existing-to-specs.md)
