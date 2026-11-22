@@ -360,7 +360,9 @@ class CodeBehind(unittest.TestCase):
 class HooksPathIsAsked(unittest.TestCase):
     def test_trailer_hook_asks_before_setting_hooks_path(self):
         text = (SK / "crav1-finalize-commit/references/trailer-hook.md").read_text(encoding="utf-8")
-        self.assertIn("`turn-on-hook` (recommended) / `skip-hook`", text)
+        self.assertIn("Card: Turn on this repo's commit hook?", text)
+        self.assertIn("`turn-on-hook`", text)
+        self.assertIn("`skip-hook`", text)
         self.assertIn("never set it silently", text)
         self.assertNotIn("(a teammate's first run) and say so in one line. Do not ask.", text)
         skill = (SK / "crav1-finalize-commit/SKILL.md").read_text(encoding="utf-8")

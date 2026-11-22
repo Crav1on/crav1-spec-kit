@@ -27,7 +27,11 @@ Other skills do not run this one. It may name `/crav1-add-to-spec`, `/crav1-what
 
 Route first, load second. The word after the command is the flow. A scope may follow it. The scope is an optional value. Do not ask the user to type the characters `[scope]`.
 
-- **No flow word:** ask one question. Options: `manual-flow` (Recommended), `auto-flow`. A headless or bot run with no word stops and names those two words. It does not guess.
+- **No flow word:** ask this card. A headless or bot run with no word stops and names those two words. It does not guess.
+
+Card: Which flow should this run use?
+- **Manual flow (Recommended)**: ask before each write and read the manual-flow reference.
+- **Auto flow**: write the recorded steps and read the auto-flow reference.
 - **`manual-flow`:** read `references/manual-flow.md`, then `references/common.md`. Do not open `references/auto-flow.md`.
 - **`auto-flow`:** read `references/auto-flow.md`, then `references/common.md`. Do not open `references/manual-flow.md`.
 
@@ -49,8 +53,8 @@ Do not edit a spec's requirements. Do not generate or apply schema or migration 
 
 End as `crav1-docs/reference/run-ending.md` says. Do not run the next step. Add the Uncommitted line when a model file changed.
 
-- The user asked for the review in this run: `Next: /crav1-what-do-we-know-about-this report-data-model-full <model>, because they asked for the review.`
-- Otherwise: `Next: nothing needed now.`
+- The user asked for the review in this run: the Run next reason "they asked for the review" and the command alone in its code span `/crav1-what-do-we-know-about-this report-data-model-full <model>`
+- Otherwise: `Run next: nothing needed now.`
 - Do not name add-to-spec in the ending.
 
 ## Hard rules

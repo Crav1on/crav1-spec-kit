@@ -56,7 +56,9 @@ class Distinguish(unittest.TestCase):
             f"Run it yourself: {COMMAND}",
             "Or allow that one command and rerun.",
         ])
-        self.assertTrue(outcome["next"].startswith("Next: /crav1-build-walk,"))
+        self.assertTrue(outcome["next"].startswith("Run next:"))
+        self.assertIn("`/crav1-build-walk`", outcome["next"])
+        self.assertNotIn("Next:", outcome["next"])
         self.assertIn("can rerun after the command has run", outcome["next"])
         self.assertEqual(outcome["next"].count("/crav1-"), 1)
         self.assertFalse(pb.suggests_workaround(pb._fixed(outcome["waiting"], outcome["offer"], outcome["next"])))
@@ -89,7 +91,9 @@ class Distinguish(unittest.TestCase):
         self.assertEqual(payload["kind"], "permission-refused")
         self.assertEqual(payload["lines"][0], payload["waiting"])
         self.assertIn(COMMAND, payload["lines"][1])
-        self.assertTrue(payload["lines"][-1].startswith("Next: /crav1-build-tasks T3,"))
+        self.assertTrue(payload["lines"][-1].startswith("Run next:"))
+        self.assertIn("/crav1-build-tasks T3", payload["lines"][-1])
+        self.assertNotIn("Next:", payload["lines"][-1])
 
 
 class WalkLive(unittest.TestCase):
@@ -146,8 +150,9 @@ class WalkLive(unittest.TestCase):
         })
         line = result["next"][0]
         self.assertEqual(result["count"], 1)
-        self.assertEqual(line.count("Next:"), 1)
-        self.assertEqual(len([part for part in line.split() if part.startswith("/crav1-")]), 1)
+        self.assertNotIn("Next:", line)
+        self.assertEqual(line.count("Run next:"), 1)
+        self.assertEqual(len([part.strip("`") for part in line.split() if part.strip("`").startswith("/crav1-")]), 1)
         self.assertIn("/crav1-build-walk", line)
         self.assertIn("can rerun after the command has run", line)
         self.assertNotIn("needs your yes", line)

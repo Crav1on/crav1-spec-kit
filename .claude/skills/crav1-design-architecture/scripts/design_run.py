@@ -828,8 +828,22 @@ def cmd_commit(a, root: Path) -> dict:
             "words": ["yes", "not-now"], "recommended": "yes",
             "options": [{"word": "yes", "label": "Commit (Recommended)", "action": f"git commit with the message '{msg}'"},
                         {"word": "not-now", "label": "Not now", "action": "leave the files uncommitted; the ending says how many"}]}
-    if not a.yes:
-        return {"topic": topic, "committed": False, "paths": paths, "message": msg, "card": card}
+    words = str(getattr(a, "words", "") or "")
+    skill_text = (Path(__file__).resolve().parents[1] / "SKILL.md").read_text(encoding="utf-8")
+    try:
+        import importlib.util
+        path = Path(__file__).resolve().parents[2] / "crav1-tasks-ready-to-build" / "scripts" / "run_ending.py"
+        spec = importlib.util.spec_from_file_location("run_ending_commit", path)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        allowed = mod.commit_yes(bool(a.yes), words, skill_text)
+    except Exception:
+        allowed = bool(a.yes) and words.strip().lower() != "stop and commit"
+    if not allowed:
+        out = {"topic": topic, "committed": False, "paths": paths, "message": msg, "card": card}
+        if words.strip().lower() == "stop and commit":
+            out["line"] = "Stop and commit is not a yes here. Show the commit card."
+        return out
     if a.headless:
         raise Refused("a run without the user does not commit; ask yes or not-now on the card")
     add = _git(root, "add", "--", (DESIGNS / topic).as_posix())
@@ -1617,6 +1631,42 @@ def _adr_text(data: dict, dec_title: str, deciders: str) -> str:
     return body
 
 
+def cmd_settle_preview(a, root: Path) -> dict:
+    """A lean preview. The recommended option is one by one, and a yes settles nothing (1.200.0)."""
+    t = Topic(root, a.topic)
+    name = t.current(getattr(a, "design", None))
+    d = t.design(name)
+    if getattr(a, "one_at_a_time", False):
+        raise Refused("one at a time was asked; there is no settle batch")
+    open_ones = [dec for dec in ordered(d["decisions"]) if dec.get("State") not in ("settled", "dropped")]
+    named = []
+    for q in t.questions(name):
+        text = str(q.get("text") or "")
+        if q.get("answer"):
+            continue
+        if re.search(r"\((?!nobody\b|not named)[^)]+\)\s*$", text, re.I):
+            named.append(text)
+    if named:
+        raise Refused("a listed decision waits on " + ", ".join(named) + "; settle one by one")
+    return {
+        "topic": t.name,
+        "settled": False,
+        "preview": True,
+        "decisions": [dec["title"] for dec in open_ones],
+        "card": {
+            "question": "Settle the open decisions one by one?",
+            "recommended": "one-by-one",
+            "words": ["one-by-one", "stop"],
+            "options": [
+                {"word": "one-by-one", "label": "One by one (Recommended)",
+                 "action": "show the next decision card; this yes settles nothing"},
+                {"word": "stop", "label": "Stop", "action": "settle nothing"},
+            ],
+        },
+        "note": "Nothing is settled until a choose-* word is picked on one decision.",
+    }
+
+
 def cmd_settle(a, root: Path) -> dict:
     data = load_input(a.input)
     t = Topic(root, a.topic)
@@ -2230,7 +2280,7 @@ def ending(state: dict) -> str:
         head.append(lead if lead.lower().startswith("checkpoint") else f"Checkpoint: {lead}")
     if waiting and phase == "design":
         head += ([""] if head else []) + waiting
-    if phase == "design" and state.get("open") and not state.get("parked"):
+    if phase == "design" and state.get("open") and not state.get("parked") and not state.get("routed_requirement"):
         step = state.get("step") or ""
         head += ([""] if head else []) + [status_line(topic, "open", step)]
 
@@ -2265,7 +2315,8 @@ def ending(state: dict) -> str:
             body = ["Run next: nothing needed now."]
     else:
         if state.get("routed_requirement"):
-            reason, command = _requirement_command(state["routed_requirement"])
+            _why, command = _requirement_command(state["routed_requirement"])
+            reason = f"A requirement came up on design/{topic}. Add it from this branch."
             body = block(reason, [("Add the requirement to the spec:", command),
                                   (f"Open the {words} session:", plain_command(topic))])
         elif state.get("research_topic"):
@@ -2476,6 +2527,7 @@ def main(argv=None) -> int:
     co.add_argument("--topic", required=True)
     co.add_argument("--message")
     co.add_argument("--yes", action="store_true")
+    co.add_argument("--words", default="", help="the user's words; 'stop and commit' is a yes only when the skill says so")
     sf = sub.add_parser("small-fix")
     sf.add_argument("--topic", required=True)
     sf.add_argument("--design")
@@ -2485,6 +2537,11 @@ def main(argv=None) -> int:
     ln.add_argument("--design")
     ln.add_argument("--decision", required=True)
     ln.add_argument("--input")
+    sp = sub.add_parser("settle-preview")
+    sp.add_argument("--topic", required=True)
+    sp.add_argument("--design")
+    sp.add_argument("--one-at-a-time", action="store_true")
+    sp.add_argument("--yes", action="store_true", help="accepted and still settles nothing")
     se = sub.add_parser("settle")
     se.add_argument("--topic", required=True)
     se.add_argument("--design")
@@ -2541,7 +2598,8 @@ def main(argv=None) -> int:
               "questions": lambda: cmd_questions(a, root), "proposal": lambda: cmd_proposal(a, root),
               "stages-list": lambda: cmd_stages_list(a, root),
               "end": lambda: cmd_end(a, root), "close": lambda: cmd_end(a, root),
-              "park": lambda: cmd_park(a, root), "review": lambda: cmd_review(a, root),
+              "park": lambda: cmd_park(a, root), "settle-preview": lambda: cmd_settle_preview(a, root),
+              "review": lambda: cmd_review(a, root),
               "fan-out": lambda: cmd_fan_out(a, root), "add-decision": lambda: cmd_add_decision(a, root),
               "lean": lambda: cmd_lean(a, root), "settle": lambda: cmd_settle(a, root), "question": lambda: cmd_question(a, root),
               "answer": lambda: cmd_answer(a, root), "skip": lambda: cmd_skip(a, root), "stage": lambda: cmd_stage(a, root),

@@ -21,10 +21,10 @@ A line that is a guess ends with `(inference, not in the docs)`. A fact the file
 
 Case 3 names the next command in **Source**. It does not run it.
 
-A gap matching an open question (1.78.0, one line since 1.122.0). Do not write one Next line per question. It does not run the command and asks nothing. Add the spec, as in `orders static IP`, only when those words would match more than one spec.
+A gap matching an open question (1.78.0, one line since 1.122.0). Do not write one Run next per question. It does not run the command and asks nothing. Add the spec, as in `orders static IP`, only when those words would match more than one spec.
 
-- One match: `Next: /crav1-show-or-ask-open-questions ask research <its words>, because the answer leaves that question open.`
-- Several matches: `Next: /crav1-show-or-ask-open-questions, because <n> open questions match this answer.`
+- One match: the Run next reason "the answer leaves that question open" and the command alone in its code span `/crav1-show-or-ask-open-questions ask research <its words>`
+- Several matches: the Run next reason "<n> open questions match this answer" and the command alone in its code span `/crav1-show-or-ask-open-questions`
 - Nothing matches: no line for a question.
 
 When the user picked Skip, **Source** includes one line: the live checks did not run, and why.

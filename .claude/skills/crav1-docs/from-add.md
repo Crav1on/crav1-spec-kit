@@ -58,9 +58,16 @@ No `plan.md`. No `tasks.md`. No application code. A missing `docs/system/` is no
 When this changed an existing spec, the run ends as [How a run ends](reference/run-ending.md) says:
 
 ```text
-Next: /crav1-tighten-spec <slug>, because the new information is not tightened yet.
-Uncommitted: 1 file; commit with /crav1-finalize-commit when ready.
+Run next:
+The new information is not tightened yet.
+
+Tighten the spec:
+`/crav1-tighten-spec orders-api`
+
+Uncommitted: 1 file; commit with `/crav1-finalize-commit` when ready.
 ```
+
+`scripts/ending.py` prints that block from the shared helper (1.200.0). When a `design/<topic>` branch is checked out or owns the change, the same helper shows a stay card first. The recommended option stays on that branch.
 
 Resolve and the plan are not listed here. `/crav1-tighten-spec` names them when they apply, as the [New information on an existing slice](reference/workflow.md#new-info) route says. This command does not run the next step. `/crav1-help next` gives the full order.
 

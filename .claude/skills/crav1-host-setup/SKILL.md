@@ -78,7 +78,7 @@ Exact words for bots and scripted runs: `yes` / `manual` / `stop` for the confir
 - The script path and the manual steps
 - Applied or not, and each `check` line
 - The commit, or why there is none
-- `Next: /crav1-open-pr, because the script is on a work branch and not on a pull request yet.` When a thread asked for the setting, say that in the reason. Do not also name pr-status. Add the Uncommitted line when the script is not committed. Do not run the next step.
+- the Run next reason "the script is on a work branch and not on a pull request yet" and the command alone in its code span `/crav1-open-pr` When a thread asked for the setting, say that in the reason. Do not also name pr-status. Add the Uncommitted line when the script is not committed. Do not run the next step.
 
 ## Hard rules
 

@@ -9,7 +9,9 @@ from __future__ import annotations
 
 import argparse
 import re
+import subprocess
 import sys
+from pathlib import Path
 
 
 def _utf8_stdout() -> None:
@@ -172,6 +174,101 @@ def check_ending(text: str) -> list[str]:
             if not labels:
                 problems.append("Run next has no label above a command")
     return problems
+
+
+def compose(reason: str, entries: list[tuple[str, str]] | None = None, *,
+            waiting: list[str] | None = None, uncommitted: int | None = None, push: bool = False) -> str:
+    """Run next first, then Waiting, then Uncommitted. Raises EndingError when the text breaks the rules (1.200.0)."""
+    entries = entries or []
+    lines: list[str] = []
+    if not entries and reason.strip() in ("", "nothing needed now."):
+        lines.append("Run next: nothing needed now.")
+    else:
+        lines += ["Run next:", reason.strip(), ""]
+        for label, command in entries:
+            shown = label if str(label).rstrip().endswith(":") else f"{label}:"
+            lines += [shown, f"`{command}`", ""]
+    if waiting:
+        if lines and lines[-1] != "":
+            lines.append("")
+        for item in waiting:
+            text = str(item).strip()
+            lines.append(text if text.startswith("Waiting:") else f"Waiting: {text}")
+    if uncommitted:
+        lines += ["", uncommitted_line(int(uncommitted), push=push)]
+    while lines and lines[-1] == "":
+        lines.pop()
+    return guard("\n".join(lines) + "\n")
+
+
+def _git(root: Path, *args: str) -> str | None:
+    try:
+        proc = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True,
+                              encoding="utf-8", timeout=15)
+    except (OSError, subprocess.SubprocessError):
+        return None
+    return proc.stdout.strip() if proc.returncode == 0 else None
+
+
+def design_branch_card(root) -> dict | None:
+    """A stay card when a design branch is checked out or owns this change (1.200.0).
+
+    The recommended option stays on that branch. The card never offers a switch
+    to the default branch.
+    """
+    root = Path(root)
+    cur = _git(root, "rev-parse", "--abbrev-ref", "HEAD")
+    if not cur or cur == "HEAD":
+        return None
+    listed = _git(root, "for-each-ref", "--format=%(refname:short)", "refs/heads/design") or ""
+    design_branches = [line for line in listed.splitlines() if line.startswith("design/")]
+    # Other skills never read docs/architecture/designs; this only sees which branch owns uncommitted files.
+    designs = "docs/architecture/" + "designs"
+    status = _git(root, "status", "--porcelain", "-uall", "--", designs) or ""
+    owned: list[str] = []
+    for line in status.splitlines():
+        path = line[3:].strip().strip('"')
+        parts = path.split("/")
+        if len(parts) >= 4 and parts[0] == "docs" and parts[2] == "designs" and parts[3] not in owned:
+            owned.append(parts[3])
+    branch = cur if cur.startswith("design/") else ""
+    if not branch and owned:
+        candidate = f"design/{owned[0]}"
+        if candidate in design_branches or not design_branches:
+            branch = candidate
+    if not branch:
+        return None
+    on_it = cur == branch
+    question = f"Stay on {branch}?" if on_it else f"This change belongs on {branch}. Stay with that branch?"
+    stay_action = "keep writing on this design branch" if on_it else f"git switch {branch} and write there"
+    return {
+        "branch": branch,
+        "on_branch": on_it,
+        "stay": True,
+        "switch_to_default": False,
+        "card": {
+            "question": question,
+            "recommended": "stay",
+            "words": ["stay", "stop"],
+            "options": [
+                {"word": "stay", "label": "Stay (Recommended)", "action": stay_action},
+                {"word": "stop", "label": "Stop", "action": "write nothing"},
+            ],
+        },
+    }
+
+
+def commit_yes(yes: bool, words: str, skill_text: str) -> bool:
+    """`stop and commit` is a yes only when the skill text says so (1.200.0)."""
+    if yes and str(words or "").strip().lower() != "stop and commit":
+        return True
+    phrase = str(words or "").strip().lower() == "stop and commit"
+    explicit = "Stop and commit is a yes" in str(skill_text or "")
+    if phrase and explicit:
+        return True
+    if phrase:
+        return False
+    return bool(yes)
 
 
 def guard(text: str) -> str:

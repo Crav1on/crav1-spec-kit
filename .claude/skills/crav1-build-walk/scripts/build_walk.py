@@ -574,7 +574,7 @@ def live_gate(line: str, approval_holding: bool = False, approval_asked: bool = 
 
 
 def _one(command: str, because: str) -> str:
-    return f"Next: {command}, because {because}."
+    return f"Run next:\n{because}\n\nGo on:\n`{command}`"
 
 
 def _task_list(tasks: list) -> str:
@@ -858,7 +858,12 @@ def _because(phase: str, state: dict) -> tuple[str, str]:
             True, True, state.get("command") or "", "/crav1-build-walk", tasks,
         )
         state["_permission"] = outcome
-        why = outcome["next"].split(", because ", 1)[1].rstrip(".")
+        text = outcome["next"]
+        if ", because " in text:
+            why = text.split(", because ", 1)[1].rstrip(".")
+        else:
+            why = next((line for line in text.splitlines()
+                        if line and not line.startswith(("Run next", "Go on", "`"))), text)
         return ("/crav1-build-walk", why)
     if phase == "build":
         return ("/crav1-build-walk", f"the next step on {branch} is to build {tasks or 'the tasks'}")

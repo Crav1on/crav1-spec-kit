@@ -112,8 +112,11 @@ class SettleAndRequirement(unittest.TestCase):
             dr.ending({"topic": "orders-platform", "phase": "design", "routed_requirement": True})
         text = dr.ending({"topic": "orders-platform", "phase": "design",
                           "routed_requirement": {"slice": "orders-api", "text": "Orders retry without blocking checkout"}})
+        self.assertTrue(text.startswith("Run next:\n"))
+        self.assertIn("design/orders-platform", text)
         self.assertIn("`/crav1-add-to-spec orders-api Orders retry without blocking checkout`", text)
         self.assertNotIn("fact", text)
+        self.assertNotIn("Next:", text)
 
     def test_stdin_keeps_an_apostrophe(self):
         import sys
@@ -208,6 +211,98 @@ class GitHubReply(unittest.TestCase):
         self.assertTrue(out["posted"])
         self.assertEqual(called[0][0], "api")
         self.assertIn("Ship the retry in orders-api.", called[0][-1])
+
+
+class SharedEnding(unittest.TestCase):
+    def test_compose_puts_run_next_first(self):
+        text = re_mod.compose(
+            "The new information is not tightened yet.",
+            [("Tighten the spec:", "/crav1-tighten-spec orders-api")],
+            uncommitted=1)
+        self.assertTrue(text.startswith("Run next:\n"))
+        self.assertIn("`/crav1-tighten-spec orders-api`", text)
+        self.assertIn("commit with `/crav1-finalize-commit`", text)
+        self.assertNotIn("Next:", text)
+
+    def test_stop_and_commit_needs_the_skill_sentence(self):
+        said = "Stop and commit is a yes for the commit card only when this skill has said so."
+        self.assertTrue(re_mod.commit_yes(False, "stop and commit", said))
+        self.assertFalse(re_mod.commit_yes(True, "stop and commit", "show the commit card"))
+        self.assertTrue(re_mod.commit_yes(True, "yes", "show the commit card"))
+        self.assertFalse(re_mod.commit_yes(False, "please commit", said))
+
+    def test_design_branch_card_stays_and_never_names_the_default(self):
+        import subprocess
+        root = Path(tempfile.mkdtemp())
+        subprocess.run(["git", "init", "-b", "design/orders-platform"], cwd=root, check=True, capture_output=True)
+        (root / "README").write_text("orders\n", encoding="utf-8")
+        subprocess.run(["git", "add", "README"], cwd=root, check=True, capture_output=True)
+        subprocess.run(["git", "-c", "user.email=person-a@contoso.test", "-c", "user.name=person A",
+                        "commit", "-m", "start"], cwd=root, check=True, capture_output=True)
+        card = re_mod.design_branch_card(root)
+        self.assertEqual(card["branch"], "design/orders-platform")
+        self.assertFalse(card["switch_to_default"])
+        self.assertEqual(card["card"]["recommended"], "stay")
+        blob = json.dumps(card)
+        self.assertNotIn("main", blob)
+        self.assertNotIn("master", blob)
+        other = Path(tempfile.mkdtemp())
+        subprocess.run(["git", "init", "-b", "main"], cwd=other, check=True, capture_output=True)
+        (other / "README").write_text("orders\n", encoding="utf-8")
+        subprocess.run(["git", "add", "README"], cwd=other, check=True, capture_output=True)
+        subprocess.run(["git", "-c", "user.email=person-a@contoso.test", "-c", "user.name=person A",
+                        "commit", "-m", "start"], cwd=other, check=True, capture_output=True)
+        subprocess.run(["git", "checkout", "-b", "design/orders-platform"], cwd=other, check=True, capture_output=True)
+        subprocess.run(["git", "checkout", "main"], cwd=other, check=True, capture_output=True)
+        folder = other / "docs/architecture/designs/orders-platform"
+        folder.mkdir(parents=True)
+        (folder / "notes.md").write_text("draft\n", encoding="utf-8")
+        owned = re_mod.design_branch_card(other)
+        self.assertEqual(owned["branch"], "design/orders-platform")
+        self.assertFalse(owned["on_branch"])
+        self.assertNotIn("main", json.dumps(owned["card"]))
+
+    def test_add_to_spec_and_finalize_use_the_helper(self):
+        add = load("add_ending_1200", ROOT / ".cursor/skills/crav1/crav1-add-to-spec/scripts/ending.py")
+        fin = load("fin_ending_1200", ROOT / ".cursor/skills/crav1/crav1-finalize-commit/scripts/ending.py")
+        added = add.build({"slug": "orders-api", "changed": True, "uncommitted": 2})
+        self.assertTrue(added["ending"].startswith("Run next:\n"))
+        self.assertIn("`/crav1-tighten-spec orders-api`", added["ending"])
+        self.assertFalse(added["switch_to_default"])
+        failed = fin.build({"failed": True})
+        self.assertEqual(failed["ending"], "")
+        pushed = fin.build({"feature": True})
+        self.assertTrue(pushed["ending"].startswith("Run next:\n"))
+        self.assertIn("`/crav1-open-pr`", pushed["ending"])
+        self.assertFalse(pushed["switch_to_default"])
+
+
+class SettlePreview(unittest.TestCase):
+    def test_yes_settles_nothing_and_a_named_person_refuses_a_batch(self):
+        root = fresh()
+        args = type("A", (), {"topic": "orders-platform", "design": None, "one_at_a_time": False, "yes": True})()
+        out = dr.cmd_settle_preview(args, root)
+        self.assertFalse(out["settled"])
+        self.assertEqual(out["card"]["recommended"], "one-by-one")
+        self.assertNotIn("I've settled", json.dumps(out))
+        self.assertNotIn("batch", json.dumps(out["card"]))
+        still = dr.Topic(root, "orders-platform").design("platform-first")
+        self.assertTrue(all(item["State"] != "settled" for item in still["decisions"]))
+        args.one_at_a_time = True
+        with self.assertRaises(dr.Refused):
+            dr.cmd_settle_preview(args, root)
+        args.one_at_a_time = False
+        dr.cmd_question(type("A", (), {
+            "topic": "orders-platform", "design": None, "kind": "question", "research": None, "stage": None,
+            "decision": "Where orders live", "text": "Which queue? (person A decides)",
+        })(), root)
+        with self.assertRaises(dr.Refused) as caught:
+            dr.cmd_settle_preview(args, root)
+        self.assertIn("person A", str(caught.exception))
+
+    def test_other_that_is_not_an_option_is_not_written(self):
+        with self.assertRaises(dr.Refused):
+            dr.match_option("I have settled this already", [{"name": "One store"}, {"name": "Two stores"}])
 
 
 if __name__ == "__main__":

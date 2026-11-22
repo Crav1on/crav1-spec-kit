@@ -9,7 +9,11 @@ Before the choices prompt, check in this order:
 1. A saved answer exists. Claude Code project: `.claude/rules/trailer-hook.md`. Claude Code user: `~/.claude/rules/trailer-hook.md` (same project/user rule as the style rule in the message-only branch).
    - `Answer: no`: do not ask. Done.
    - `Answer: yes`: go to step 2 without asking.
-2. `.githooks/commit-msg` exists in the repo and `git config core.hooksPath` is not `.githooks` (a teammate's first run): never set it silently (1.182.0). Add one question to the same choices prompt, `Turn on this repo's commit hook with git config core.hooksPath .githooks?`, options `turn-on-hook` (recommended) / `skip-hook`. Run the line only on `turn-on-hook`. `skip-hook`, or a reply that names neither word, changes no config, and the next run asks again. When `core.hooksPath` points at another folder, do not offer to change it: say so in one line.
+2. `.githooks/commit-msg` exists in the repo and `git config core.hooksPath` is not `.githooks` (a teammate's first run): never set it silently (1.182.0). Add this card to the same choices prompt. Run the line only on `turn-on-hook`. `skip-hook`, or a reply that names neither word, changes no config, and the next run asks again. When `core.hooksPath` points at another folder, do not offer to change it: say so in one line.
+
+Card: Turn on this repo's commit hook?
+- **Turn the hook on (Recommended)** (`turn-on-hook`): set git config core.hooksPath to .githooks, then the hook strips trailers.
+- **Skip the hook** (`skip-hook`): leave core.hooksPath as it is and ask again next run.
 3. `.githooks/commit-msg` exists and `core.hooksPath` is `.githooks`: nothing to do.
 4. No saved answer and the hook is missing or not turned on: add one question to the same choices prompt.
 
@@ -17,7 +21,11 @@ Never a separate prompt and never before the paste blocks. A headless or bot run
 
 ## The question
 
-`Strip tool trailers on every commit for this repo?` Options: `strip-trailers` (recommended) / `keep-trailers`. Both are choice words; typed in the invocation they answer it without asking. The `strip-trailers` option names the config change it makes, `git config core.hooksPath .githooks`, on the card itself (1.182.0), so the yes covers it.
+Both are choice words; typed in the invocation they answer it without asking. The `strip-trailers` option names the config change it makes, `git config core.hooksPath .githooks`, on the card itself (1.182.0), so the yes covers it.
+
+Card: Strip tool trailers on every commit for this repo?
+- **Strip trailers (Recommended)** (`strip-trailers`): install the hook and set git config core.hooksPath to .githooks.
+- **Keep trailers** (`keep-trailers`): write the saved answer no and install nothing.
 
 ## On `strip-trailers`
 

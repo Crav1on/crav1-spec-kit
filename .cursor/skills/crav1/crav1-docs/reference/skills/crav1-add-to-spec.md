@@ -8,6 +8,8 @@
 
 Bring new information into existing specs; asks what you have: a fact, a dump, a code change, or a meeting.
 
+1.200.0: `scripts/ending.py` prints the ending from the shared run-ending helper, Run next first. Before a write, the same helper's stay card applies when a `design/<topic>` branch is checked out or owns the change: the recommended option stays on that branch, and the card never offers a switch to the default branch.
+
 **[`/crav1-add-to-spec`](crav1-add-to-spec.md)** opens with one question: what you have, a fact, a dump (a mail or a chat goes here), a code change, or a meeting (minutes or a transcript). It skips the question when the message shows which. It replaces match-dump-to-specs, code-into-specs, and meeting-to-specs; their rules are kept as branches, and a kept quote from any of them goes through the fact rules.
 
 1.134.0: `references/pr-record.md`, `references/merge-safe.md`, and `references/handoffs-picture.md` name other skills and do not run them. They do not open those files. A command-only refusal is not a reason to stop. The rule is `docs/reference/open-skill-file.md`.

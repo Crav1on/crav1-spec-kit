@@ -47,7 +47,7 @@ The personal-data and secrets check runs on the quote before the write. Follow s
 
 You do not edit `plan.md`, `tasks.md`, `verify.md`, or `docs/system/`. You do not send, post, or reply. You do not commit, push, or open a pull request.
 
-End with the line, who it is for, and which tasks it unblocks. `Next: /crav1-build-tasks <T#>, because that approval is on record and the task can start.` When the task is a live `apply`, say the build still needs the user's own yes in that run, and the task stays unticked until then. Leave the Uncommitted line when the spec changed.
+End with the line, who it is for, and which tasks it unblocks. the Run next reason "that approval is on record and the task can start" and the command alone in its code span `/crav1-build-tasks <T#>` When the task is a live `apply`, say the build still needs the user's own yes in that run, and the task stays unticked until then. Leave the Uncommitted line when the spec changed.
 
 ## Run ending (1.122.0)
 

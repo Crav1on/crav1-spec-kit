@@ -1,5 +1,5 @@
 Run next:
-A requirement came up during the design.
+A requirement came up on design/orders-payment-retry. Add it from this branch.
 
 Add the requirement to the spec:
 `/crav1-add-to-spec orders-api Orders retry without blocking checkout`

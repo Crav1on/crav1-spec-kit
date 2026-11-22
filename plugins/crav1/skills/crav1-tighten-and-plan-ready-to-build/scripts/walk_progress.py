@@ -6324,12 +6324,15 @@ def _readiness(args: argparse.Namespace) -> None:
     )
     resolve_waiting = None
     resolve_next = (
-        f"Next: /crav1-resolve-open-questions {slug}, "
-        "because that step needs a rerun or clear."
+        "Run next:\nthat step needs a rerun or clear.\n\n"
+        f"Settle the open questions:\n`/crav1-resolve-open-questions {slug}`"
     )
     if later and result != "not-ready":
         names = ", ".join(hit["step"] for hit in reopened)
-        nxt = f"Next: rerun or clear {names}."
+        nxt = (
+            f"Run next:\nrerun or clear {names}.\n\n"
+            "Rerun or clear those steps:\n`/crav1-tighten-and-plan-ready-to-build`"
+        )
         next_lines = []
     elif result in ("ready", "ready-partial") and next_lines:
         if resolve_open and result == "ready-partial":

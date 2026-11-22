@@ -93,8 +93,8 @@ Do not write a file. Do not invent a second document. Do not teach how to build 
 
 Output only the answer, the spec quote when the picture has nothing on the question, the feature-index list when a slice is missing from the picture, and each stale research mark this run found.
 
-- A slice is missing from the picture: `Next: /crav1-refresh-system-notes, because that slice is missing from the picture.`
-- Otherwise: `Next: nothing needed now.`
+- A slice is missing from the picture: the Run next reason "that slice is missing from the picture" and the command alone in its code span `/crav1-refresh-system-notes`
+- Otherwise: `Run next: nothing needed now.`
 - Do not run the next step.
 
 ## Style

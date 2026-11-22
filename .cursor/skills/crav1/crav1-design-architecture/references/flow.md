@@ -112,7 +112,7 @@ Index line every turn, titles only, in the decision order (`Order: N` on each de
 
 On `choose-*`, run `settle`. It writes a draft ADR from the ADR template in `designs/<name>/adr/` (status `draft`, every option shown under Considered options, the user's idea among them), marks the decision settled in `design.md`, updates the end state, adds the draft diagram (planned parts dashed and labelled `planned`), and refreshes `compare.md` when the topic has more than one design. A stage the change affects is marked `needs another look`. A revisit needs `--revisit-yes` after a separate yes. Recap: **Added / Changed / Still open**.
 
-Optional batch: when 3 or more decisions remain and each has a clear recommendation, offer the kit's batch card from `question-cards.md`. `D#` is display only. A run without the user never uses it.
+One by one only. `settle-preview` shows the open decisions and a card whose recommended option is `one-by-one`. A yes on that card settles nothing. There is no settle batch. When the user asked for one at a time, or a listed decision has an open question that names a person, the preview refuses. An Other that is not a listed option is asked again and is not written. Nothing is settled until `settle` runs on a `choose-*` word.
 
 ## Step 6: Unsettled points
 

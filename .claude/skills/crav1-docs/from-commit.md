@@ -129,3 +129,7 @@ Since 1.195.0 every Run next example starts with its reason line, for example `T
 ## 1.199.0 changes
 
 `/crav1-finalize-commit commit-push` commits and then pushes once the fetch check says nothing was lost: one yes for both, never a force push. An `Uncommitted:` line names the command in a code span.
+
+## 1.200.0 changes
+
+`scripts/ending.py` prints the ending from the shared helper, Run next first. A failed commit has no Run next. When a `design/<topic>` branch is checked out or owns the change, the helper shows a stay card and never offers the default branch.

@@ -61,7 +61,7 @@ Card: Should I add my work to their pull request?
 
 A script that prints a card uses the same shape: a `Card:` line, then numbered options, each with what happens.
 
-`scripts/kit-lint.py` reads only `Card:` lines and the option lines right under them, so prose is not checked. It flags a question with brackets, an option that does not say what happens, a Recommended option that is not first, a kit term from its short list, options listed inline instead of in a `Card:` block, a question with two question marks, and an option that corrects itself mid-sentence (1.190.0). Since 1.164.0 it checks the build walk, the two ready checks, and the four pull-request skills. Whether an option really says what happens still needs a person to read it.
+`scripts/kit-lint.py` reads only `Card:` lines and the option lines right under them, so prose is not checked. It flags a question with brackets, an option that does not say what happens, a Recommended option that is not first, a kit term from its short list, options listed inline instead of in a `Card:` block, a question with two question marks, and an option that corrects itself mid-sentence (1.190.0). Since 1.200.0 it checks every skill. Whether an option really says what happens still needs a person to read it.
 
 ## Walk card rules (1.196.0)
 

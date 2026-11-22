@@ -105,8 +105,8 @@ Output only:
 - Counts: done, partial, not in the code
 - Where the uncovered-code note is, or that the map had none
 - End as `crav1-docs/reference/run-ending.md` says. Do not run the next step. A slice that is not in the code is not planned here. Add the Uncommitted line when a file changed and is not committed.
-- Specs were written: `Next: /crav1-tighten-spec <first slug>, because those specs are not tightened yet.`
-- Nothing was written: `Next: nothing needed now.`
+- Specs were written: the Run next reason "those specs are not tightened yet" and the command alone in its code span `/crav1-tighten-spec <first slug>`
+- Nothing was written: `Run next: nothing needed now.`
 
 If they chose `spec/<dump>`, say that branch is specify-only: no implement there.
 

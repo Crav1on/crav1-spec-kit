@@ -588,18 +588,19 @@ def ending_layout_problems(kit):
 #   - **<label> (Recommended)** (`word`): <what happens>. Why: <reason>
 #   - **<label>** (`word`): <what happens>
 # Only `Card:` lines and the option lines right under them are read, so prose
-# is never checked. The check runs on the skills in CARD_LINT_SKILLS (a
-# ratchet: 1.165.0 adds the rest). The rule is docs/reference/question-cards.md.
-CARD_LINT_SKILLS = (
-    "crav1-tasks-ready-to-build",
-    "crav1-build-walk",
-    "crav1-tighten-and-plan-ready-to-build",
-    "crav1-open-pr",
-    "crav1-merge-pr",
-    "crav1-pr-status",
-    "crav1-review-pr",
-    "crav1-design-architecture",
-)
+# is never checked. Since 1.200.0 the check runs on every skill. The rule is
+# docs/reference/question-cards.md.
+def _card_lint_skills():
+    root = os.path.join(os.path.dirname(__file__), "..", ".cursor", "skills", "crav1")
+    if not os.path.isdir(root):
+        return ()
+    return tuple(sorted(
+        name for name in os.listdir(root)
+        if name.startswith("crav1-") and name != "crav1-docs" and os.path.isdir(os.path.join(root, name))
+    ))
+
+
+CARD_LINT_SKILLS = _card_lint_skills()
 # Kit terms that never belong in a card's question or options.
 CARD_JARGON = (
     "needs_yes",

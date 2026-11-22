@@ -92,7 +92,7 @@ Do not edit code. Do not edit `spec.md`, `plan.md`, `tasks.md`, or `verify.md`. 
 
 Do not run `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, `/crav1-tighten-spec`, `/crav1-plan-from-spec`, `/crav1-build-tasks`, `/crav1-fix-build-gaps`, `/crav1-verify-build-against-spec`, `/crav1-open-pr`, `/crav1-refresh-system-notes`, or `/crav1-finalize-commit`.
 
-This skill does not run another kit skill. Do not open those skill files. A refused start because a skill is command-only is expected. Continue to the Next line. The rule is [open-skill-file.md](../crav1-docs/reference/open-skill-file.md) (1.134.0).
+This skill does not run another kit skill. Do not open those skill files. A refused start because a skill is command-only is expected. Continue to the Run next. The rule is [open-skill-file.md](../crav1-docs/reference/open-skill-file.md) (1.134.0).
 
 ## Hard rules
 
@@ -103,13 +103,13 @@ This skill does not run another kit skill. Do not open those skill files. A refu
 - Not a stretch of verify. It is not a skill that runs because a repo is new. It is not started automatically.
 - When the bug changes how the parts connect, ask the picture question once. Do not run `/crav1-refresh-system-notes`.
 
-One `Next` line for the lane this run picked. Do not list the other lanes. Do not run it.
+One Run next for the lane this run picked. Do not list the other lanes. Do not run it.
 
-- Spec miss: `Next: /crav1-tighten-spec, because the bug is a spec miss.`
-- Plan miss: `Next: /crav1-plan-from-spec, because the bug is a plan miss.`
-- Code miss: `Next: /crav1-build-tasks, because the bug is a code miss.`
-- Host setting: `Next: /crav1-host-setup, because the bug is a host setting.`
-- Not a real bug: `Next: nothing needed now.`
+- Spec miss: the Run next reason "the bug is a spec miss" and the command alone in its code span `/crav1-tighten-spec`
+- Plan miss: the Run next reason "the bug is a plan miss" and the command alone in its code span `/crav1-plan-from-spec`
+- Code miss: the Run next reason "the bug is a code miss" and the command alone in its code span `/crav1-build-tasks`
+- Host setting: the Run next reason "the bug is a host setting" and the command alone in its code span `/crav1-host-setup`
+- Not a real bug: `Run next: nothing needed now.`
 
 ## Run ending (1.122.0)
 

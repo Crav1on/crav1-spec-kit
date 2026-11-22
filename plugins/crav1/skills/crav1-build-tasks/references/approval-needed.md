@@ -24,8 +24,8 @@ End with `Waiting: <who>'s yes to <what>.` The task stays unticked.
 
 When the item has no `Asked:` line:
 
-`Next: /crav1-show-or-ask-open-questions <slug>, because that approval is not asked yet.`
+the Run next reason "that approval is not asked yet" and the command alone in its code span `/crav1-show-or-ask-open-questions <slug>`
 
 When the item already has `Asked:`:
 
-`Next: /crav1-record-approval <slug>, because that yes is not on record yet.`
+the Run next reason "that yes is not on record yet" and the command alone in its code span `/crav1-record-approval <slug>`

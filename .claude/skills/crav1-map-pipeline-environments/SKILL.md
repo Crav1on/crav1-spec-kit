@@ -111,7 +111,7 @@ Output only:
 - Org, project, and the pipelines read (name and kind), or that the read stopped before a pipeline list
 - Counts: one environment, shared, unclear
 - Whether `docs/environments/marks.md` changed, and whether `docs/environments/promotion.md` changed
-- `Next: /crav1-read-environment, because the pipeline read is not a host read.` Do not run it. Add the Uncommitted line when a file changed and is not committed.
+- the Run next reason "the pipeline read is not a host read" and the command alone in its code span `/crav1-read-environment` Do not run it. Add the Uncommitted line when a file changed and is not committed.
 
 ## Hard rules
 

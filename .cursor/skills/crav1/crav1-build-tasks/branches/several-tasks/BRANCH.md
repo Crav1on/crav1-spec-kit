@@ -67,7 +67,7 @@ You may summarize each worker briefly on the board. Do not redo their implement/
 
 TL;DR: finished `T#`s, blocked `T#` + why, not started, commits the workers reported.
 
-`Next: /crav1-open-pr, because the work is not on a pull request yet.` When the head's Match `Branch:` line ends in `(PR <n>)` or a pull request is known to be open for it, name it instead: `/crav1-open-pr` to push to PR <n> and update its description or comment. Do not run it from this skill.
+the Run next reason "the work is not on a pull request yet" and the command alone in its code span `/crav1-open-pr` When the head's Match `Branch:` line ends in `(PR <n>)` or a pull request is known to be open for it, name it instead: `/crav1-open-pr` to push to PR <n> and update its description or comment. Do not run it from this skill.
 
 When `/crav1-build-walk` opened this skill, do not print that line. The walk prints its one line (1.142.0).
 

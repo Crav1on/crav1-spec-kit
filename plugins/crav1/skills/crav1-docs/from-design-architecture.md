@@ -31,7 +31,7 @@ After you say yes it starts a topic, for example `orders-payment-retry`, with on
 
 Each decision shows two or three real options, the recommended one first with its reason. Each option says what changes, how environments differ, cost, risks, how it fits the drivers, and what it would reverse. Reply with one word:
 
-- `choose-a`, `choose-b`, `choose-c`, or `choose-mine` settles the decision and writes a draft ADR in the design folder.
+- `choose-a`, `choose-b`, `choose-c`, or `choose-mine` settles the decision and writes a draft ADR in the design folder. `settle-preview` lists what is still open and recommends one by one; a yes there settles nothing, and there is no settle batch (1.200.0).
 - `discuss` keeps talking; `ask-me` asks up to three short questions first; `add-my-idea` adds your own option, scored the same way.
 - `to-question` or `to-research` writes an open question in the design folder, naming who has the fact or who decides.
 - `skip-for-now` moves on.
@@ -88,3 +88,5 @@ Reference page: [design architecture](reference/skills/crav1-design-architecture
 Since 1.190.0 decisions carry order numbers, the skill offers to switch branches and to commit before it ends, and saved goal files are offered as a goal change.
 
 Since 1.191.0 the branch checks use your repo's default branch (for example master), not always main.
+
+Since 1.200.0 a requirement that comes up on the design branch ends with Run next first and a full `/crav1-add-to-spec <slice> <text>` command. `stop and commit` commits only because this skill says that phrase is a yes.

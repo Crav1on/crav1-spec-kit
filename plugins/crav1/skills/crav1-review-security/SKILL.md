@@ -122,7 +122,7 @@ Output only:
 - Target (system, `docs/specs/<slug>/`, or the change and the spec it wrote)
 - Kept findings, or that nothing was kept
 - File written, or that nothing was written
-- `Next: nothing needed now.` Add the Uncommitted line when a file changed and is not committed. Do not run a commit.
+- `Run next: nothing needed now.` Add the Uncommitted line when a file changed and is not committed. Do not run a commit.
 
 ## Style
 

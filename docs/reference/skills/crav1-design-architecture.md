@@ -32,7 +32,7 @@ The skill's `scripts/design_run.py` owns the folder format and every move, saves
 
 1.191.0: the design branch check, the kit-behind check and the go-ahead base check use the repo's default branch (`origin/HEAD`, else `origin/main`, then `origin/master`), skip with a reason when there is none, and name that branch in cards and Run next.
 
-1.200.0: one session start. The design command with or without a topic, and with or without resume, prints the same status screen from session.json and the topic files. resume is an alias and changes nothing. Park and end print Session parked or Session ended and the plain command for that topic. An open session stays open across decisions, endings and commits. next is the guided card. A proposal page and a briefing share one decisions section, stage numbers start at 1, and a routed requirement names the slice and the text.
+1.200.0: one session start. The design command with or without a topic, and with or without resume, prints the same status screen from session.json and the topic files. resume is an alias and changes nothing. Park and end print Session parked or Session ended and the plain command for that topic. An open session stays open across decisions, endings and commits. next is the guided card. A proposal page and a briefing share one decisions section, stage numbers start at 1, and a routed requirement names the slice and the text. The design ending for that requirement starts with Run next and a full add-to-spec command for the design branch. `settle-preview` recommends one by one and settles nothing; there is no settle batch. `stop and commit` is a commit yes only when this skill says so.
 
 ## Choice words
 

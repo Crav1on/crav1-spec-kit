@@ -57,7 +57,7 @@ End with:
 - how many questions, from which specs (paths, for the user only)
 - how many were skipped, and why
 - which marks were written, or that none were
-- `Next: nothing needed now.` The draft is the work of this run.
+- `Run next: nothing needed now.` The draft is the work of this run.
 - `Waiting: /crav1-add-to-spec, after the answers come back.` Leave that line out when nothing was drafted.
 - Add the Uncommitted line when a mark was written. Do not run the next step.
 
