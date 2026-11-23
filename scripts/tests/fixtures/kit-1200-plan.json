@@ -1,0 +1,58 @@
+{
+  "advice": null,
+  "branch": "main",
+  "files": {
+    "add": [
+      ".cursor/skills/crav1/crav1-help/extra.md"
+    ],
+    "clash": [
+      {
+        "hunks": [
+          {
+            "kit": "claude new\n",
+            "local": "claude local\n"
+          }
+        ],
+        "path": ".claude/CLAUDE.md"
+      }
+    ],
+    "delete": [
+      ".cursor/rules/crav1.mdc"
+    ],
+    "left_extra": [],
+    "merge": [],
+    "unchanged": [
+      ".claude/agent-assets/README.md",
+      ".claude/agent-assets/crav1-spec-reviewer-agent/prompt.md",
+      ".claude/agents/crav1-spec-reviewer-agent.md",
+      ".cursor/agent-assets/README.md",
+      ".cursor/agent-assets/crav1-spec-reviewer-agent/prompt.md",
+      ".cursor/agents/crav1-spec-reviewer-agent.md"
+    ],
+    "update": [
+      ".claude/skills/crav1-docs/reference/workflow.md",
+      ".claude/skills/crav1-help/SKILL.md",
+      ".cursor/skills/crav1/crav1-docs/reference/workflow.md",
+      ".cursor/skills/crav1/crav1-help/SKILL.md"
+    ]
+  },
+  "heads_up": {
+    "branch": "main",
+    "text": "You are on main. Only this branch gets the new kit. Other branches stay on the old kit until you merge this branch into them. Say merge develop into the branch. Never rebase. If this branch should not get the new kit, merge first or switch branch, then run the command again.",
+    "uncommitted_kit": [],
+    "uncommitted_project": []
+  },
+  "installed": "1.200.0",
+  "migration_ids": [],
+  "mode": "drop-in",
+  "project_untouched": true,
+  "style_rules_left": [],
+  "target": "1.201.0",
+  "templates": {
+    "delete": [],
+    "left": [],
+    "update": []
+  },
+  "version_from": "workflow.md",
+  "writes_kit_files": true
+}

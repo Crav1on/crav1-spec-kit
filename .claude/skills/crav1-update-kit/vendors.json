@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "vendors": {
+    "cursor": {
+      "prefix": "/",
+      "install": true,
+      "skills": ".cursor/skills/crav1",
+      "tree": ".cursor",
+      "marker": ".cursor/skills/crav1/crav1-docs/reference/workflow.md",
+      "frontmatter": ["name", "description", "disable-model-invocation", "icon", "color"],
+      "extras": [".cursor/agents/crav1-*.md", ".cursor/agent-assets/", ".cursor/rules/crav1.mdc"],
+      "owns": [
+        {"tree": ".cursor/skills/crav1"},
+        {"glob": ".cursor/agents/crav1-*.md", "depth": 1},
+        {"assets": ".cursor/agent-assets", "prefix": "crav1-", "readme": "README.md"},
+        {"file": ".cursor/rules/crav1.mdc"}
+      ]
+    },
+    "claude": {
+      "prefix": "/",
+      "install": true,
+      "skills": ".claude/skills",
+      "tree": ".claude",
+      "marker": ".claude/skills/crav1-docs/reference/workflow.md",
+      "frontmatter": ["name", "description", "license", "disable-model-invocation"],
+      "extras": [".claude/agents/crav1-*.md", ".claude/agent-assets/", ".claude/CLAUDE.md"],
+      "owns": [
+        {"skills": ".claude/skills", "names": "crav1"},
+        {"glob": ".claude/agents/crav1-*.md", "depth": 1},
+        {"assets": ".claude/agent-assets", "prefix": "crav1-", "readme": "README.md"},
+        {"file": ".claude/CLAUDE.md"}
+      ]
+    },
+    "codex": {
+      "prefix": "$",
+      "install": false,
+      "skills": ".agents/skills",
+      "tree": "vendors/codex",
+      "marker": ".agents/skills/crav1-docs/reference/workflow.md",
+      "frontmatter": ["name", "description", "license", "disable-model-invocation"],
+      "extras": ["<skill>/agents/openai.yaml"],
+      "owns": [
+        {"skills": ".agents/skills", "names": "crav1"}
+      ]
+    },
+    "copilot": {
+      "prefix": "/",
+      "install": false,
+      "skills": ".github/skills",
+      "tree": "vendors/copilot",
+      "marker": ".github/skills/crav1-docs/reference/workflow.md",
+      "frontmatter": ["name", "description", "license", "disable-model-invocation"],
+      "extras": [".github/instructions/crav1.instructions.md"],
+      "owns": [
+        {"skills": ".github/skills", "names": "crav1"},
+        {"file": ".github/instructions/crav1.instructions.md"}
+      ]
+    }
+  }
+}

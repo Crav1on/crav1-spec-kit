@@ -13,7 +13,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 DRY = ROOT / "scripts/kit_dry_run.py"
-UPDATE = ROOT / "plugins/crav1/skills/crav1-update-kit/scripts/update_kit.py"
+UPDATE = ROOT / ".cursor/skills/crav1/crav1-update-kit/scripts/update_kit.py"
 SKILLS = ROOT / ".cursor/skills/crav1"
 G = ["git", "-c", "user.name=person A", "-c", "user.email=a@example.com", "-c", "init.defaultBranch=main"]
 
@@ -41,6 +41,8 @@ def kit_fixture(base: Path) -> Path:
     shutil.copy(ROOT / "plugins/crav1/.cursor-plugin/plugin.json", kit / "plugins/crav1/.cursor-plugin/plugin.json")
     (kit / "plugins/crav1/skills/crav1-update-kit/scripts").mkdir(parents=True)
     shutil.copy(UPDATE, kit / "plugins/crav1/skills/crav1-update-kit/scripts/update_kit.py")
+    shutil.copy(ROOT / ".cursor/skills/crav1/crav1-update-kit/vendors.json",
+                kit / "plugins/crav1/skills/crav1-update-kit/vendors.json")
     (kit / "scripts").mkdir()
     shutil.copy(DRY, kit / "scripts/kit_dry_run.py")
     restamp(kit, "1.0.0")
@@ -98,7 +100,8 @@ class DryRun(unittest.TestCase):
         temp_before = set(os.listdir(tempfile.gettempdir()))
         env = dict(os.environ, CRAV1_DRY_RUN_NO_CLIPBOARD="1")
         proc = subprocess.run([sys.executable, str(DRY), "--branch", "feat/kit-test", "--spec", "orders-api",
-                               "--kit-source", str(self.kit), "--extra", "build_map.py --root {folder}"],
+                               "--kit-source", str(self.kit), "--extra", "build_map.py --root {folder}",
+                               "--add", "codex"],
                               cwd=self.proj, capture_output=True, text=True, env=env, timeout=600)
         out = proc.stdout
         self.assertEqual(proc.returncode, 0, out + proc.stderr)
@@ -108,6 +111,11 @@ class DryRun(unittest.TestCase):
         self.assertIn("Kit: 1.0.1 at", out)
         self.assertIn("$ update_kit.py apply (exit 0)", out)
         self.assertIn("dry-run-marker.md", out)
+        self.assertIn("unchanged ", out)
+        self.assertIn("--- Vendor codex ---", out)
+        self.assertIn("project_untouched: true", out)
+        self.assertIn("is not installed by this release", out)
+        self.assertIn("$ update_kit.py vendors (exit 0)", out)
         self.assertIn("walk_progress.py readiness --root", out)
         self.assertIn("$ build_map.py --root", out)
         self.assertIn("Cleanup: worktree and temp folders removed", out)

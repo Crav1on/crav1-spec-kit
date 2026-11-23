@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import difflib
+import fnmatch
 import json
 import re
 import subprocess
@@ -236,10 +237,7 @@ def detect(root: Path, home: Path | None = None) -> dict:
                 "path": str(plugin),
             }
         )
-    for kind, rel in (
-        ("cursor-drop-in", CURSOR_DROPIN_MARKER),
-        ("claude-drop-in", CLAUDE_DROPIN_MARKER),
-    ):
+    for kind, rel in _dropin_markers():
         marker = root / rel
         if not marker.is_file():
             continue
@@ -292,7 +290,123 @@ def detect(root: Path, home: Path | None = None) -> dict:
         "dirty": dirty,
         "heads_up": heads_up(branch, dirty),
         "writes_kit_files": mode == "drop-in",
+        "vendors": present_vendors(root),
     }
+
+
+def _dropin_markers() -> list[tuple[str, str]]:
+    """Cursor and Claude drop-in markers. The table's values match the 1.200 constants."""
+    cursor = _row("cursor")
+    claude = _row("claude")
+    cursor_marker = str(cursor["marker"]) if cursor and cursor.get("marker") else CURSOR_DROPIN_MARKER
+    claude_marker = str(claude["marker"]) if claude and claude.get("marker") else CLAUDE_DROPIN_MARKER
+    return [("cursor-drop-in", cursor_marker), ("claude-drop-in", claude_marker)]
+
+
+def present_vendors(root: Path) -> list[str]:
+    """Vendor names whose marker file is in this tree. Read-only."""
+    table = vendor_table()
+    rows = table.get("vendors") if isinstance(table, dict) else None
+    if not isinstance(rows, dict):
+        found = []
+        if (root / CURSOR_DROPIN_MARKER).is_file():
+            found.append("cursor")
+        if (root / CLAUDE_DROPIN_MARKER).is_file():
+            found.append("claude")
+        return sorted(found)
+    found = []
+    for name, row in rows.items():
+        marker = row.get("marker") if isinstance(row, dict) else None
+        if marker and (root / str(marker)).is_file():
+            found.append(name)
+    return sorted(found)
+
+
+def _skill_count(root: Path, folder: str) -> int:
+    base = root / folder
+    if not base.is_dir():
+        return 0
+    return sum(1 for child in base.iterdir() if child.is_dir() and (child / "SKILL.md").is_file())
+
+
+def vendor_report(root: Path) -> dict:
+    """Each vendor's folder and skill count. Writes nothing."""
+    table = vendor_table()
+    rows = table.get("vendors") if isinstance(table, dict) else None
+    if not isinstance(rows, dict):
+        refuse("Refused: the vendor table is not in this install.")
+    listed = []
+    for name in sorted(rows):
+        row = rows[name]
+        if not isinstance(row, dict):
+            continue
+        folder = str(row.get("skills") or "")
+        listed.append({"name": name, "folder": folder, "skills": _skill_count(root, folder)})
+    return {"vendors": listed}
+
+
+def command_prefix(vendor: str | None) -> str:
+    """`/` unless the vendor's row says otherwise. Empty stays `/`."""
+    if not vendor:
+        return "/"
+    row = _row(vendor)
+    if row is not None:
+        prefix = row.get("prefix")
+        return str(prefix) if prefix else "/"
+    if vendor_table() is None and vendor in _FALLBACK_PREFIX:
+        return _FALLBACK_PREFIX[vendor]
+    refuse(f"Refused: {vendor} is not a vendor.")
+    return "/"
+
+
+def with_vendor(text: str, vendor: str | None) -> str:
+    """Rewrite `/crav1-` commands. A `/` prefix returns the same text."""
+    prefix = command_prefix(vendor)
+    if prefix == "/":
+        return text
+    return COMMAND_PREFIX.sub(prefix + "crav1-", text)
+
+
+def _vendor_names(names: list[str]) -> list[dict]:
+    table = vendor_table()
+    rows = table.get("vendors") if isinstance(table, dict) else None
+    if not isinstance(rows, dict):
+        refuse("Refused: the vendor table is not in this install.")
+    listed = []
+    for name in names:
+        row = rows.get(name)
+        if not isinstance(row, dict):
+            refuse(f"Refused: {name} is not a vendor.")
+        if row.get("install"):
+            note = f"{name} is updated by the normal plan. This release does not add it as a separate install."
+        else:
+            note = f"{name} is in the vendor table and is not installed by this release."
+        listed.append(
+            {
+                "vendor": name,
+                "folder": row.get("skills"),
+                "install": bool(row.get("install")),
+                "added": [],
+                "merged": [],
+                "clash": [],
+                "extras": list(row.get("extras") or []),
+                "project_untouched": True,
+                "note": note,
+            }
+        )
+    return listed
+
+
+def add_report(names: list[str]) -> dict:
+    """A plan for `--add`. This release writes nothing for any vendor."""
+    return {"vendors": _vendor_names(names), "project_untouched": True, "writes_kit_files": False}
+
+
+def add_apply(names: list[str], yes: bool) -> dict:
+    if not yes:
+        refuse("Refused: writing kit files needs a yes in this run.")
+    report = add_report(names)
+    return {"vendors": report["vendors"], "touched": [], "kept": [], "project_untouched": True}
 
 
 def current_branch(root: Path) -> str | None:
@@ -328,7 +442,39 @@ def is_template(path: str) -> bool:
     return path.startswith(TEMPLATE_ROOTS)
 
 
-def is_cursor_kit(path: str) -> bool:
+COMMAND_PREFIX = re.compile(r"(?<![A-Za-z0-9_./-])/crav1-")
+_VENDOR_CACHE: dict | None = None
+_VENDOR_LOADED = False
+_HOST_ORDER = ("cursor", "claude", "codex", "copilot")
+_FALLBACK_PREFIX = {"cursor": "/", "claude": "/", "codex": "$", "copilot": "/"}
+
+
+def _vendors_file() -> Path | None:
+    here = Path(__file__).resolve().parent
+    for candidate in (here.parent / "vendors.json", here / "vendors.json"):
+        if candidate.is_file():
+            return candidate
+    return None
+
+
+def vendor_table() -> dict | None:
+    """The vendor table next to this skill, or None for the single-file release asset."""
+    global _VENDOR_CACHE, _VENDOR_LOADED
+    if not _VENDOR_LOADED:
+        path = _vendors_file()
+        if path is None:
+            _VENDOR_CACHE = None
+        else:
+            try:
+                data = json.loads(path.read_text(encoding="utf-8"))
+            except (OSError, UnicodeError, json.JSONDecodeError):
+                data = None
+            _VENDOR_CACHE = data if isinstance(data, dict) else None
+        _VENDOR_LOADED = True
+    return _VENDOR_CACHE
+
+
+def _legacy_is_cursor_kit(path: str) -> bool:
     if path.startswith(".cursor/skills/crav1/"):
         return True
     if path.startswith(".cursor/agents/crav1-") and path.endswith(".md") and path.count("/") == 2:
@@ -338,7 +484,7 @@ def is_cursor_kit(path: str) -> bool:
     return path == ".cursor/rules/crav1.mdc"
 
 
-def is_claude_kit(path: str) -> bool:
+def _legacy_is_claude_kit(path: str) -> bool:
     if path.startswith(".claude/skills/"):
         top = path[len(".claude/skills/") :].split("/", 1)[0]
         if top == "crav1-docs" or top.startswith("crav1-"):
@@ -350,8 +496,80 @@ def is_claude_kit(path: str) -> bool:
     return path == ".claude/CLAUDE.md"
 
 
+def _match_owns(path: str, owns: list) -> bool:
+    """One allow-list row. The shapes match the 1.200 Cursor and Claude checks."""
+    for rule in owns:
+        if not isinstance(rule, dict):
+            continue
+        if "tree" in rule:
+            root = str(rule["tree"]).rstrip("/")
+            if path.startswith(root + "/"):
+                return True
+        elif "glob" in rule:
+            pattern = str(rule["glob"])
+            if "/" not in pattern:
+                continue
+            directory, name = pattern.rsplit("/", 1)
+            prefix = directory + "/"
+            if not path.startswith(prefix):
+                continue
+            rest = path[len(prefix) :]
+            if "/" in rest:
+                continue
+            if fnmatch.fnmatch(rest, name):
+                return True
+        elif "assets" in rule:
+            base = str(rule["assets"]).rstrip("/")
+            readme = str(rule.get("readme") or "README.md")
+            token = str(rule.get("prefix") or "crav1-")
+            if path == f"{base}/{readme}" or path.startswith(f"{base}/{token}"):
+                return True
+        elif "skills" in rule:
+            base = str(rule["skills"]).rstrip("/")
+            if not path.startswith(base + "/"):
+                continue
+            token = str(rule.get("names") or "crav1")
+            top = path[len(base) + 1 :].split("/", 1)[0]
+            if top == f"{token}-docs" or top.startswith(f"{token}-"):
+                return True
+        elif "file" in rule and path == rule["file"]:
+            return True
+    return False
+
+
+def _row(name: str) -> dict | None:
+    table = vendor_table()
+    if not table:
+        return None
+    rows = table.get("vendors")
+    if not isinstance(rows, dict):
+        return None
+    row = rows.get(name)
+    return row if isinstance(row, dict) else None
+
+
+def is_cursor_kit(path: str) -> bool:
+    row = _row("cursor")
+    if row is None:
+        return _legacy_is_cursor_kit(path)
+    return _match_owns(path, row.get("owns") or [])
+
+
+def is_claude_kit(path: str) -> bool:
+    row = _row("claude")
+    if row is None:
+        return _legacy_is_claude_kit(path)
+    return _match_owns(path, row.get("owns") or [])
+
+
 def is_kit_path(path: str) -> bool:
-    return is_cursor_kit(path) or is_claude_kit(path)
+    table = vendor_table()
+    if not table or not isinstance(table.get("vendors"), dict):
+        return _legacy_is_cursor_kit(path) or _legacy_is_claude_kit(path)
+    for row in table["vendors"].values():
+        if isinstance(row, dict) and row.get("install") and _match_owns(path, row.get("owns") or []):
+            return True
+    return False
 
 
 def is_managed(path: str) -> bool:
@@ -416,7 +634,7 @@ def _read_assets(folder: Path, prefix: str, out: dict[str, bytes]) -> None:
             _read_tree(child, f"{prefix}/{child.name}", out)
 
 
-def collect_kit(root: Path, hosts: set[str]) -> dict[str, bytes]:
+def _legacy_collect_kit(root: Path, hosts: set[str]) -> dict[str, bytes]:
     out: dict[str, bytes] = {}
     if "cursor" in hosts:
         _read_tree(root / ".cursor/skills/crav1", ".cursor/skills/crav1", out)
@@ -436,6 +654,66 @@ def collect_kit(root: Path, hosts: set[str]) -> dict[str, bytes]:
         claude = root / ".claude/CLAUDE.md"
         if claude.is_file() and not claude.is_symlink():
             out[".claude/CLAUDE.md"] = claude.read_bytes()
+    return out
+
+
+def _collect_owns(root: Path, owns: list, out: dict[str, bytes]) -> None:
+    for rule in owns:
+        if not isinstance(rule, dict):
+            continue
+        if "tree" in rule:
+            rel = str(rule["tree"]).rstrip("/")
+            _read_tree(root / rel, rel, out)
+        elif "glob" in rule:
+            pattern = str(rule["glob"])
+            if "/" not in pattern:
+                continue
+            directory, name = pattern.rsplit("/", 1)
+            _read_named(root / directory, directory, name, out)
+        elif "assets" in rule:
+            base = str(rule["assets"]).rstrip("/")
+            readme_name = str(rule.get("readme") or "README.md")
+            token = str(rule.get("prefix") or "crav1-")
+            folder = root / base
+            if not folder.is_dir():
+                continue
+            readme = folder / readme_name
+            if readme.is_file() and not readme.is_symlink():
+                out[f"{base}/{readme_name}"] = readme.read_bytes()
+            for child in folder.iterdir():
+                if child.is_dir() and child.name.startswith(token) and not child.is_symlink():
+                    _read_tree(child, f"{base}/{child.name}", out)
+        elif "skills" in rule:
+            base = str(rule["skills"]).rstrip("/")
+            token = str(rule.get("names") or "crav1")
+            folder = root / base
+            if not folder.is_dir():
+                continue
+            for child in folder.iterdir():
+                if child.is_dir() and not child.is_symlink() and (
+                    child.name == f"{token}-docs" or child.name.startswith(f"{token}-")
+                ):
+                    _read_tree(child, f"{base}/{child.name}", out)
+        elif "file" in rule:
+            rel = str(rule["file"])
+            path = root / rel
+            if path.is_file() and not path.is_symlink():
+                out[rel] = path.read_bytes()
+
+
+def collect_kit(root: Path, hosts: set[str]) -> dict[str, bytes]:
+    table = vendor_table()
+    rows = table.get("vendors") if isinstance(table, dict) else None
+    if not isinstance(rows, dict):
+        return _legacy_collect_kit(root, hosts)
+    out: dict[str, bytes] = {}
+    for name in _HOST_ORDER:
+        if name not in hosts:
+            continue
+        row = rows.get(name)
+        if not isinstance(row, dict) or not row.get("install"):
+            continue
+        _collect_owns(root, row.get("owns") or [], out)
     return out
 
 
@@ -1268,7 +1546,10 @@ def main(argv: list[str] | None = None) -> int:
     if argv and argv[0] in {"push", "--push"}:
         refuse("Refused: this script does not push.")
     parser = argparse.ArgumentParser(description="Update a consumer project's CRAV1 kit from a published release.")
-    parser.add_argument("command", choices=["detect", "resolve-target", "plan", "apply", "migrations", "commit", "fetch", "ending", "available"])
+    parser.add_argument(
+        "command",
+        choices=["detect", "resolve-target", "plan", "apply", "migrations", "commit", "fetch", "ending", "available", "vendors"],
+    )
     parser.add_argument("--root", default=".")
     parser.add_argument("--home")
     parser.add_argument("--to")
@@ -1287,6 +1568,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--url", default=KIT_REPO)
     parser.add_argument("--uncommitted", type=int, default=0)
     parser.add_argument("--not-updated", action="store_true")
+    parser.add_argument("--vendor", default=None, help="cursor, claude, codex, or copilot. The default prefix stays /.")
+    parser.add_argument("--add", action="append", default=[], help="vendor to describe. This release does not install it.")
     args = parser.parse_args(argv)
     root = Path(args.root).resolve()
     home = Path(args.home).resolve() if args.home else None
@@ -1296,6 +1579,9 @@ def main(argv: list[str] | None = None) -> int:
             return 0
         if args.command == "available":
             found = update_available(root, home)
+            if found:
+                found = dict(found)
+                found["run"] = with_vendor(found["run"], args.vendor)
             _print({"ok": True, "update": found, "line": found["line"] if found else None})
             return 0
         if args.command == "resolve-target":
@@ -1308,8 +1594,17 @@ def main(argv: list[str] | None = None) -> int:
             dest = fetch_release(args.tag, Path(args.dest) if args.dest else None, args.url)
             _print({"fetched": normalize_request(args.tag), "dest": str(dest), "complete": True})
             return 0
+        if args.command == "vendors":
+            _print(vendor_report(root))
+            return 0
+        if args.command in {"plan", "apply"} and args.add:
+            if args.command == "apply":
+                _print(add_apply(args.add, args.yes))
+            else:
+                _print(add_report(args.add))
+            return 0
         if args.command == "ending":
-            sys.stdout.write(ending_text(root, args.uncommitted, not args.not_updated))
+            sys.stdout.write(with_vendor(ending_text(root, args.uncommitted, not args.not_updated), args.vendor))
             return 0
         info = detect(root, home)
         if args.command == "plan":

@@ -2,6 +2,18 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.201.0 (2026-11-22)
+
+A vendor table, with no change to a Cursor and Claude Code update.
+
+- **Vendor table.** `vendors.json` in the update-kit skill lists, for each host, the folders the kit owns, the frontmatter a skill needs, the command prefix, and extra files. The Cursor and Claude Code rows reproduce the 1.200 allow-list. Codex and Copilot are listed and are not installed or generated.
+- **Same plan.** `collect_kit` and the kit-path checks read that table. A plan and an apply on an existing Cursor and Claude Code repo match 1.200 byte for byte.
+- **Report.** `update_kit.py detect` adds `vendors`. `update_kit.py vendors --root .` lists each vendor's folder and skill count and writes nothing.
+- **Prefix.** A script that prints Run next takes `--vendor`. The default stays `/`. `--vendor codex` prints `$crav1-`.
+- **Dry run.** The maintainer dry run takes `--add <vendor>` (repeatable). It plans and applies that vendor inside the temp worktree after the normal update, then lists each vendor's folder and skill count. The update plan step prints counts by kind and at most 10 sample paths.
+
+Docs and tests: update-kit walkthrough, glossary, data layout, run-ending, and `scripts/tests/test_kit_1201.py`.
+
 ## 1.200.0 (2026-11-22)
 
 One design-session start, shared ending checks, and a shorter dry run.

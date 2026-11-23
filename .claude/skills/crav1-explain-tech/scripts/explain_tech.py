@@ -21,6 +21,8 @@ import re
 import sys
 from pathlib import Path
 
+sys.dont_write_bytecode = True
+
 
 def _utf8_stdout() -> None:
     reconfigure = getattr(sys.stdout, "reconfigure", None)
@@ -314,7 +316,24 @@ def ending(tech: str, deeper: bool = False, not_in_spec: bool = False, spec: str
     return "\n".join(out) + "\n"
 
 
+def _bind_vendor(argv):
+    """1.201.0: --vendor codex prints $crav1- commands. The default stays /."""
+    source = sys.argv[1:] if argv is None else argv
+    if "--vendor" not in source and not any(str(item).startswith("--vendor=") for item in source):
+        return argv
+    path = Path(__file__).resolve().parents[2] / "crav1-update-kit" / "scripts" / "vendor_prefix.py"
+    if not path.is_file():
+        print("Refused: --vendor needs the vendor table.", file=sys.stderr)
+        raise SystemExit(2)
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("crav1_vendor_prefix", path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod.install_from_argv(argv)
+
+
 def main(argv: list[str] | None = None) -> int:
+    argv = _bind_vendor(argv)
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--root", default=".")
     sub = ap.add_subparsers(dest="cmd", required=True)

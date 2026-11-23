@@ -2,6 +2,18 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.201.0 (2026-11-22)
+
+A vendor table, with no change to a Cursor and Claude Code update.
+
+- **Vendor table.** `vendors.json` in the update-kit skill lists, for each host, the folders the kit owns, the frontmatter a skill needs, the command prefix, and extra files. The Cursor and Claude Code rows reproduce the 1.200 allow-list. Codex and Copilot are listed and are not installed or generated.
+- **Same plan.** `collect_kit` and the kit-path checks read that table. A plan and an apply on an existing Cursor and Claude Code repo match 1.200 byte for byte.
+- **Report.** `update_kit.py detect` adds `vendors`. `update_kit.py vendors --root .` lists each vendor's folder and skill count and writes nothing.
+- **Prefix.** A script that prints Run next takes `--vendor`. The default stays `/`. `--vendor codex` prints `$crav1-`.
+- **Dry run.** The maintainer dry run takes `--add <vendor>` (repeatable). It plans and applies that vendor inside the temp worktree after the normal update, then lists each vendor's folder and skill count. The update plan step prints counts by kind and at most 10 sample paths.
+
+Docs and tests: update-kit walkthrough, glossary, data layout, run-ending, and `scripts/tests/test_kit_1201.py`.
+
 ## 1.200.0 (2026-11-22)
 
 One design-session start, shared ending checks, and a shorter dry run.
@@ -181,16 +193,5 @@ Changing a design topic's goal and building one topic on another, for `/crav1-de
 
 - **Task names stop at the verify items.** The walk lead, the ending under Run next, the ready check's open-task list and `build-map.md` showed the whole task line, checks included, such as `Build T8 PR 12 takes in develop after PR 10 merges, with the conflicts resolved; integration — ...; system — ... with api-doc.yaml in it) on feat/orders-api:`. One helper, `task_order.task_name`, now cuts at the first verify item (`; integration —`, `; contract —`, `; system —`, `; unit —`, a `(verify: ...)` block, `(regression`), drops unbalanced parentheses and tidies stray spaces such as `( x` and `develop ,`. The line reads `Build T8 PR 12 takes in develop after PR 10 merges, with the conflicts resolved on feat/orders-api:`. `tasks.md` titles, the build map's short and full names and the walk's task labels all use it.
 - Snapshot `orders-api-verify-names` (with a golden walk ending) and `scripts/tests/test_kit_1187.py`.
-
-## 1.186.0 (2026-11-17)
-
-Starting an open task on someone else's pull request branch, found on a live build walk.
-
-- **An open task on a waiting branch starts.** `/crav1-build-walk <slug> <T#>` stopped on `wait-merge` whenever the branch's other tasks were pushed and waiting for the merge, even for a task nobody had built or claimed. The task now decides, not the branch's last step: `build_walk.py next --task <T#>` starts an open, unclaimed task whose dependencies are done as new work, and `next --branch` picks it too. Wait-merge applies only once every task on the branch is pushed. `build_walk.py progress start-task` claims the task in `claims.md`, adds it to the header's `Tasks:` line and records `- Step: start <T#>`, after the start yes.
-- **One answer for the ready check and the walk.** `task_state.walk_start` (and `task_state.py walk-start --root <spec> --task <T#>`) says whether the walk can start a task: `build`, `wait-merge`, `done`, `held`, `claimed` or `unknown`. The ready check offers `/crav1-build-walk <slug> <T#>` only when it can, and invariant I8 checks that every offered task starts in the walk.
-- **A take-in task on another person's branch.** A task whose work is taking the base into the branch, marked `(take-in: develop)` or, on a branch another person owns, saying it takes in develop (the script infers it, so nobody adds the mark by hand), may merge the base into that branch: a yes card, `git merge --no-ff origin/<base>` (never a rebase), resolve, the whole suite and the linter, commit, push after yes, and one pull request comment. The walk's own merge-base step and the pull request merge stay off in other-owner mode.
-- **The ending names who merges.** On another person's branch the Waiting line names the pull request's author, such as `Waiting: person A to merge pull request 7, then T2, T3 and T4 on feat/orders-fixes are ticked.`
-- **A task that cannot start gets a card.** Held by a dependency, claimed by someone else, or not in `tasks.md`: the script returns a card (`check-ready` recommended, or `stop`) and an ending with Run next first, so the walk never offers choices in prose.
-- Snapshot `other-owner-take-in` and `scripts/tests/test_kit_1186.py`.
 
 The newest 15 releases are above. The full changelog is https://github.com/Crav1on/crav1-spec-kit/blob/main/CHANGELOG.md.

@@ -220,6 +220,10 @@ def rewrite_tree_files(root: Path) -> None:
     for path in root.rglob("*"):
         if not path.is_file() or not is_text(path):
             continue
+        # The vendor table names every host's folders. Rewriting it would turn
+        # the Cursor row into Claude paths (1.201.0).
+        if path.name == "vendors.json":
+            continue
         text = path.read_text(encoding="utf-8")
         if path.name in FRONTMATTER_RULE_ASSETS:
             updated = transform_commit_style_asset(text)

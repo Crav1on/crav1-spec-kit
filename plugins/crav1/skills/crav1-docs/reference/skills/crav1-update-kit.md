@@ -8,6 +8,8 @@
 
 Update the installed kit on the current branch to a published release.
 
+1.201.0: `vendors.json` lists each host: the folders the kit owns, the frontmatter a skill needs, the command prefix, and extra files. Cursor and Claude Code reproduce the 1.200 allow-list. Codex and Copilot are rows and are not installed. `detect` reports `vendors`. `vendors --root .` lists each folder and skill count and writes nothing. `--vendor codex` prints `$crav1-` on a Run next script; the default prefix stays `/`.
+
 1.178.0: a stale commit-style rule is written, removed and committed by the kit itself instead of being refused as a project file; a stale rule whose asset is gone from the new release is listed under `delete`. The run ends `Run next: nothing needed now.`, never a `Next:` line.
 
 1.176.0: a persisted commit-style rule that is the old release's copy, or names the missing `crav1-draft-commit-message/` skill, is rewritten from the current message-only asset in the same yes. A rule changed by hand is left and listed in `style_rules_left`.
@@ -38,7 +40,7 @@ Prompt budget: 2 (the most prompts in one run, the closing yes included). A prom
 
 In short: The installed version, the published release tags, and the kit files on this branch.
 
-Reads `plugin.json` or the `Kit version:` line, the published `vX.Y.Z` tags, the old release, the new release, and the working tree. It does not read a branch or an open pull request as a target.
+Reads `plugin.json` or the `Kit version:` line, the published `vX.Y.Z` tags, the old release, the new release, `vendors.json`, and the working tree. It does not read a branch or an open pull request as a target.
 
 ## Writes
 
@@ -48,7 +50,7 @@ Writes kit-owned files on the current branch after a yes, replaces a copied temp
 
 ## Does not
 
-Leaves specs, `walk-progress.md`, `build-progress/`, plans, tasks, notes, playbooks, the build map, persist rules (except a stale commit-style rule, 1.176.0), the transfer data policy, and `kit-maintainer.mdc` alone. Does not switch branches, rebase, or push. A plugin install gets no kit commit.
+Leaves specs, `walk-progress.md`, `build-progress/`, plans, tasks, notes, playbooks, the build map, persist rules (except a stale commit-style rule, 1.176.0), the transfer data policy, and `kit-maintainer.mdc` alone. A hand-made `.agents/` or `.github/skills/` tree is a project file. Does not switch branches, rebase, or push. A plugin install gets no kit commit. This release does not install Codex or Copilot.
 
 Limits and exceptions: a target that is not a published release tag stops in one line. A clash is not overwritten. An edited template is listed and left. The kit source checkout is refused. An agent's yes does not write, commit, or push.
 
