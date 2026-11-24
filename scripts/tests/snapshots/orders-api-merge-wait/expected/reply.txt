@@ -17,7 +17,7 @@ Held:
   - T2 Store a retried order once — waits for PR 11 to merge
 - `feat/orders-cicd` (wave 2):
   - T3 Add the build pipeline — waits for PR 12 to merge
-  - T4 Take in develop after PR 11 merges — waits for PR 12 to merge
+  - T4 Take in develop after PR 11 merges — waits for PR 11 to merge
 - `feat/orders-deploy` (wave 3):
   - T5 Add the deploy stage — held, waits on PR 12 to merge (T3, recorded)
 

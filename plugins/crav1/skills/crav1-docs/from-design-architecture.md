@@ -21,6 +21,8 @@ This is cross-cutting. It may run from any lane. It does not move work into Spec
 
 With no topic yet the screen offers to start one. With decisions still open, **Next decision** is first. When every decision is settled it offers stages, the proposal and go-ahead.
 
+Since 1.201.1 the screen starts with Run next and one reason. A topic that lives only on `design/<topic>` while this checkout is another branch offers the switch card. When every open decision is waiting on named people, Run next names `/crav1-show-or-ask-open-questions` and the proposal. A parked screen has no Park command. An ended screen's one command is `reopen`. Each question records `Asked: <date>`, and a waiting line names each person once. Dated pages under `docs/architecture/proposals/<date>/` count as the proposal. A JSON resume leaves Status as it is, including parked. A source that changed still marks that one decision reopened. Run the design script from the repo root, the folder that holds `docs/`.
+
 Type an idea when you start a topic:
 
 `/crav1-design-architecture orders should retry failed payments without blocking checkout`

@@ -2,6 +2,18 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.201.1 (2026-11-24)
+
+Fixes for the design screen and the ready check. The rules were already the ones below; the scripts now follow them.
+
+- **Design screen.** Run next comes first, with one reason line. A topic that exists only on `design/<topic>` offers the switch card. `resume --json` leaves the files unchanged, including a parked Status. Dated proposal pages under `docs/architecture/proposals/` count. Waiting lines name each person once, with the date recorded on the question, and stay near 120 characters. When every open decision is waiting on named people, Run next names the open-questions command and the proposal. A parked screen has no Park command. An ended screen's one command is `reopen`. Run `scripts/design_run.py` from the repo root.
+- **Script output.** Do not pipe a script's output, in bash or in PowerShell. A pipe such as `| head` can cut an ending off at a lone `{`.
+- **Task names.** A `from <base>` clause and parenthesised marks such as `(manual, secret, …)` are not the task name. The name is the outcome after that clause.
+- **Claims.** `claims.py add` leaves `claims.md` unchanged until `--yes`. A second start on the same claim keeps the original since time.
+- **Ready check.** A `--text` read that does not pass `--write-map` does not add a `PR author` line. A merged pull request is still recorded, as in 1.177.2. A free-text mention such as `(PR 12)` or `(PR 7 merged into develop)` does not mark a task done; only a tick or the kit mark `(PR n, merged)` or `(PR n) merged` does. A task with `(after: T#)` stays held while T#'s pull request is open, and the held line says `waits for PR <n> to merge`. A task that says `(after: PR 87)`, or whose text says `after PR 87 merges`, stays held the same way until the host says PR 87 is merged. The ready check, the build map and the walk ending all say `waits for PR 87 to merge`. When the code repo is not recorded, the check uses the same one-time repo question as 1.177.2. `/crav1-plan-from-spec` and `/crav1-tighten-plan` write `(after: PR N)` for that prose: `plan_check.py order` names the line, and `plan_check.py after-pr --yes` writes the mark. A pull request the host says is merged is cleared with `/crav1-build-walk <slug> T#`. A blocked line names only the tasks that wait on that block. Claude Code sends one question per question-tool call.
+
+Docs and tests: design, build-walk and ready-check walkthroughs, data layout, question cards, install, running scripts, and `scripts/tests/test_kit_12011.py`.
+
 ## 1.201.0 (2026-11-22)
 
 A vendor table, with no change to a Cursor and Claude Code update.

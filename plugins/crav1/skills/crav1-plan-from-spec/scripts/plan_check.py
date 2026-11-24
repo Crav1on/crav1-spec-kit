@@ -8,7 +8,10 @@ Next line.
 
 Commands:
   order   --root <spec-folder>
-      Waves from the (after: ...) graph, the same sort the ready check uses
+      Waves from the (after: ...) graph, the same sort the ready check uses.
+      A line that says `after PR N merges` and has no `(after: PR N)` is listed.
+  after-pr --root <spec-folder> [--yes]
+      The same list. With --yes, writes `(after: PR N)` on those lines.
       (skill crav1-tasks-ready-to-build, scripts/task_order.py). Lists a
       loop, an after: that names no task, and a task line with no verify
       kind or no (spec: ...) mark. Branches that wait for each other are a
@@ -256,7 +259,49 @@ def order_lines(root: Path) -> list[str]:
     inferred = [t["id"] for t in tasks if not t["recorded"] and t["deps"]]
     if inferred:
         lines.append("- Inferred from file order (no after: mark): " + ", ".join(f"T{i}" for i in inferred))
+    lines.extend(after_pr_lines(text))
     return lines
+
+
+def after_pr_lines(text: str) -> list[str]:
+    """Task lines that say `after PR N merges` and do not carry `(after: PR N)` (1.201.1)."""
+    to = _task_order()
+    found: list[str] = []
+    for line in text.splitlines():
+        match = TASK_LINE.match(line)
+        if not match:
+            continue
+        missing = to.missing_after_pr_marks(match.group(3))
+        if not missing:
+            continue
+        names = " and ".join(f"PR {number}" for number in missing)
+        marks = " ".join(f"(after: PR {number})" for number in missing)
+        found.append(f"- T{match.group(2)}: the line says after {names} merges. Add {marks}.")
+    return found
+
+
+def apply_after_pr(root: Path, yes: bool) -> str:
+    """Recommend `(after: PR N)` for prose waits. Write the mark only with yes (1.201.1)."""
+    path = root / "tasks.md"
+    text = _read(path)
+    if not text.strip():
+        raise PlanCheckError(f"tasks.md not found: {path}")
+    report = after_pr_lines(text)
+    if not report:
+        return "No task line says after PR N merges without the mark.\n"
+    if not yes:
+        return "\n".join(report) + "\nNothing written.\n"
+    to = _task_order()
+    out: list[str] = []
+    for line in text.splitlines(keepends=True):
+        match = TASK_LINE.match(line)
+        if not match:
+            out.append(line)
+            continue
+        missing = to.missing_after_pr_marks(match.group(3))
+        out.append(to.add_after_pr_mark(line, missing) if missing else line)
+    path.write_text("".join(out), encoding="utf-8")
+    return "\n".join(report) + "\nWrote the mark on tasks.md.\n"
 
 
 # ---------- recap (plan-from-spec After writing) ----------
@@ -733,6 +778,9 @@ def main(argv: list[str] | None = None) -> int:
     sub = parser.add_subparsers(dest="command", required=True)
     p = sub.add_parser("order")
     p.add_argument("--root", required=True)
+    p = sub.add_parser("after-pr")
+    p.add_argument("--root", required=True)
+    p.add_argument("--yes", action="store_true")
     p = sub.add_parser("recap")
     p.add_argument("--root", required=True)
     p.add_argument("--branch", required=True)
@@ -757,6 +805,8 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if args.command == "order":
             text = "\n".join(order_lines(_root(args.root))) + "\n"
+        elif args.command == "after-pr":
+            text = apply_after_pr(_root(args.root), args.yes)
         elif args.command == "recap":
             facts = {}
             if args.facts:
