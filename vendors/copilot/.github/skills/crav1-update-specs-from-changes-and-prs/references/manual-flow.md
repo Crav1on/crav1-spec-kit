@@ -1,0 +1,45 @@
+# Manual flow (1.124.0)
+
+Read this only for `manual-flow`, then [common.md](common.md). Do not open the auto-flow file.
+
+## Start
+
+Call `scope` first. It does not write. One line lists the repos it returned, by name.
+
+One prompt, two questions when a specs-repo row exists and this run did not name it:
+
+- Fetch: `Fetch` (Recommended), `Use what is already on disk`, `Stop`.
+- Specs repo: `Leave the specs repo out` (Recommended), `Read its pull request comments this time`. The question text says this run never reads that repo's branches.
+
+No specs-repo row: ask only the fetch question. The repo was named and it is the specs repo: do not ask; say its pull request comments are in and its branches are out.
+
+A word in the invocation answers its question. `fetch` takes Fetch. `no-fetch` takes what is already on disk. `specs-comments` takes the comments. A headless or bot run with neither `fetch` nor `no-fetch` stops and names those two words. It does not fetch.
+
+State the budget in that same prompt's reply, after they answer. Default 20 minutes. A number in the invocation is the budget. Above 45, the script uses 45. Do not ask for a number.
+
+Then `start` with `--yes`. `fetch` is a result of `ok` after a read-only `git fetch`. `no-fetch` is `local`. Do not push or delete.
+
+## Inventory
+
+Build the inventory in [common.md](common.md). Then one question, unless the invocation said `all` or the run is headless (headless `fetch` or `no-fetch` takes every item and writes no spec line):
+
+- Eight or fewer items: `All, one by one` (Recommended), `I'll name which to drop`, `Stop`.
+- More than eight: `All, one by one` (Recommended), `All, in small groups`, `I'll name which to drop`, `Stop`.
+
+A small group is at most four items. One by one stays available: they can say so later and the pace changes. `drop` records each named item. Stop calls `pause` and ends.
+
+## Each item
+
+Take the next item from `resume`. Open `../crav1-add-to-spec/SKILL.md` from this skill's folder and follow the note part for that item's command. The rule is [open-skill-file.md](../../crav1-docs/reference/open-skill-file.md) (1.134.0). Do not start `/crav1-add-to-spec`.
+
+**Merged since sync (1.194.0).** For each item's spec, before its write card, run `scripts/merged_since_sync.py check --spec <spec.md> --code-repo <code checkout> --base <Merges into>` in `crav1-add-to-spec` (the one shared check), as `crav1-docs/reference/running-scripts.md` says. It fetches origin once first (1.196.0; `--no-fetch` skips it), prefers `origin/<branch>` over a stale local branch, catches a tip that is already merged, and compares each branch in the spec's `Synced at:` lines with that branch's base, found per branch (1.195.0): `--base`, which callers pass as the repo's `Merges into` branch from `docs/system/repos.md` when it names one (leave `--base` out otherwise), then that `Merges into` column, then the base branch's own `Synced at` line, then `origin/develop`, then the default branch and writes nothing. When `offer` is `take-in`, ask its one yes card with its `question` and two `options`. On yes, Open `../crav1-add-to-spec/SKILL.md` for its `command` and follow the PR or branch step inline with that skill's own confirms, then run its `after_yes` (`merged_since_sync.py stamp ... --yes`) to move `Synced at` to the merge. On `not now`, write nothing. Either way the item goes on. With no card (`not-merged`, `already-synced` or `skipped`), say nothing.
+
+**What needs no yes, and what does (1.193.0).** Before the item's write card only these are written: the note, the PR note (its record and history), and the `Read` line. Nothing in `docs/specs/` and nothing in `docs/system/repos.md` is written before the card. The `Synced at` stamp is a spec write: it goes with the confirmed writes, after the card's yes, never before. Plan it with `<interpreter> scripts/sweep_progress.py synced-at --spec <spec.md> --repo <repo> --branch <branch> --sha <sha> --date <YYYY-MM-DD> --vendor copilot`, which writes nothing without `--yes` (`<interpreter>` as `crav1-docs/reference/running-scripts.md` says), and run it again with `--yes` only after the yes. On the card's notes-only option (`No, notes only`) no stamp and no spec line is written, so that option stays true.
+
+If the sort, an `Answered:` line, or a new open question would change a spec, show that change and wait. Yes writes it (`complete --outcome spec`, and `--question` or `--conflict` when that line was written). No leaves the spec alone (`complete --outcome notes` or `synced-at`, no proposal). Do not ask a second time for the same change.
+
+A headless run does not write the spec line. `complete --outcome proposal` with the text, and do not pass `--question` or `--conflict` for a line that was not written.
+
+Nothing to show: complete with `notes`, `synced-at`, or `notes+synced-at` and continue.
+
+Between items, `budget`. When it says stop, finish the item already begun, `pause`, and end. Do not begin another.

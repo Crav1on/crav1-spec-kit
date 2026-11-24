@@ -1,6 +1,6 @@
 # Step 7, ready to build
 
-Before this check reads or writes, fetch the specs repo (1.151.0). Behind or diverged: stop, and Run next is `git pull --no-rebase`. A task with someone else's `In progress:` line in `claims.md` is held `in progress by <user> since <date>` and is not offered in Run next. Your own claim does not hold it (1.160.0): the ending says `T5 is yours; the walk resumes it.` A task whose branch's `build-progress/<branch>.md` ends at step `comment` or `wait-merge` is pushed and waits on a merge (1.171.0): it is `waiting`, not in `can_start`, not offered in Run next, and the ending says `Waiting: PR 71 to merge, then T5 is ticked.` and, when it is yours, `T5 is yours and waits for PR 71's merge.` When your task is on a branch whose pull request is open and not merged, at any other step, the ending says `T30 is yours and waits for PR 85's merge.`, never `the walk resumes it` (1.198.0). Tasks that wait on it are held too.
+Before this check reads or writes, fetch the specs repo (1.151.0). Behind or diverged: stop, and Run next is `git pull --no-rebase`. A task with someone else's `In progress:` line in `claims.md` is held `in progress by <user> since <date>` and is not offered in Run next. Your own claim does not hold it (1.160.0): the ending says `T5 is yours; the walk resumes it.` A task whose branch's `build-progress/<branch>.md` ends at step `comment` or `wait-merge` is pushed and waits on a merge (1.171.0): it is `waiting`, not in `can_start`, not offered in Run next, and the ending says `Waiting: PR 71 to merge, then T5 is ticked.` and, when it is yours, `T5 is yours and waits for PR 71's merge.` When your task is on a branch whose pull request is open and not merged, at any other step, the held line says `T30 is yours and waits for PR 85's merge.` (1.198.0, 1.202.0). The ending does not print that sentence again under the Held section. Tasks that wait on it are held too.
 
 Read this only at the ready check.
 
@@ -12,7 +12,7 @@ Run `<interpreter> -X utf8 scripts/walk_progress.py readiness --root <spec-folde
 
 When `question_aliases` is not empty, print one line per entry: `Same question: "<text>" kept as "<matched>". Say this is new to split it.` If they say this is new, run the check again with `--new-question <key>` from that entry. A `Blocks:` line still holds its tasks.
 
-Row buckets: `waits-in-order` is a task that only waits on an earlier real task. `waiting` is a task held by an open question. `blocked` is a true blocker only (a cycle, an `(after:)` that names no task, a missing plan or tasks file, a plan risk, or a question that is still a jump back).
+Row buckets: `waits-in-order` is a task that only waits on an earlier real task. `waiting` is a task held by an open question. `blocked` is a true blocker only (a cycle, an `(after:)` that names no task, a missing plan or tasks file, a plan risk, or a question that is still a jump back). Since 1.202.0 the Held section lists every held task, including a `waits-in-order` task whose `(after:)` names a task that is not built yet. The reason is on that line.
 
 Ready means the first task can start, the rest wait in order, and nothing else blocks. A reason `waits on T#` for a real task is not a hit. A cycle, or an `(after:)` that names no task, is a blocker.
 

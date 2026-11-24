@@ -35,7 +35,7 @@ Cursor plugin layout (install-from-repo / local plugin):
 - Agent templates: `plugins/crav1/agent-assets/crav1-<name>/`
 - Rules: `plugins/crav1/rules/` (includes `crav1.mdc`; do not put this maintainer file in the plugin)
 
-After editing drop-in files, run `scripts/sync-crav1-plugin.sh` so the plugin tree and `.claude/` match. Do not hand-edit mirrored files only under `plugins/crav1/` or `.claude/` — they will be overwritten. Plugin-only files: `plugins/crav1/.cursor-plugin/plugin.json`, `plugins/crav1/README.md`. The `version` in `plugin.json` follows the release tag: a release pull request sets it to the same number as its new `## X.Y.Z` heading in `CHANGELOG.md`. There is no Claude Code plugin marketplace in this kit.
+After editing drop-in files, run `scripts/sync-crav1-plugin.sh` so the plugin tree, `.claude/`, and `vendors/codex/` plus `vendors/copilot/` match. Do not hand-edit mirrored files only under `plugins/crav1/`, `.claude/`, or `vendors/` — they will be overwritten. Plugin-only files: `plugins/crav1/.cursor-plugin/plugin.json`, `plugins/crav1/README.md`. The `version` in `plugin.json` follows the release tag: a release pull request sets it to the same number as its new `## X.Y.Z` heading in `CHANGELOG.md`. There is no Claude Code plugin marketplace in this kit.
 
 ## Claude Code drop-in (generated `.claude/`)
 

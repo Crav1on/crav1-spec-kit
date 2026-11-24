@@ -78,6 +78,8 @@ Source: docs/specs/cancel-booking/spec.md, plan.md, tasks.md, verify.md
 Build map: docs/specs/cancel-booking/build-map.md
 ```
 
+Since 1.202.0 Held also lists a task whose only wait is an `(after:)` on a task that is not built yet, and the reason is on that line rather than a footer.
+
 Say `full` (`/crav1-tasks-ready-to-build full cancel-booking`) for the long form. It adds the per-task lists after the result line:
 
 ```text

@@ -1,0 +1,27 @@
+# Shared rules
+
+Guided only. There is no automatic mode. Every write is explained and confirmed before it happens, using the confirm the skill that owns the write already uses. Do not add a second confirm for the same write. Do not write on a headless or bot run. Stop and say the walk needs a person.
+
+At the start of a run, one command: `<interpreter> -X utf8 scripts/walk_progress.py start --root <folder-or-slug> --vendor copilot`. Add `--playbook <file>` when a playbook was named. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. Do not run `python3` alone. `<folder-or-slug>` is the spec folder, or a slug, title, or playbook name. Exact folder first, then hyphen and space forms (`orders 1.0` matches `orders-1-0`), then one unique playbook basename, spec title, or work-item name in `spec.md`. Several matches: list them and stop. No match: say so and list the nearest slugs. Do not pick the most recently edited tree. No name: ask which slug once. Use `resume` and `playbook_status` from that JSON. Do not also run `resolve_spec.py`, `resume`, and `playbook-status` at the start.
+
+Two routes, one walk. With a playbook, step 1 is that file. Without a playbook, step 1 is skipped. Steps 2 through 7 are the same, and the ready check is the same.
+
+Run each locked skill by opening the file that step names, from this skill's folder, and following it. Read [open-skill-file.md](../crav1-docs/reference/open-skill-file.md) once before the first locked skill (1.134.0). Do not copy that skill's rules into this walk. Do not replace it.
+
+This walk's own prompts are the playbook choice, asked even when that file is already applied, one batch of optional extras once after open questions when any extra applies, one batch for kept-open questions that still have no `Blocks:` line after the plan, one jump-back card per spec finding during plan review (a finding already jumped does not ask again), one same-or-new card when a reword is close to a recorded finding, one jump-back question when the check is not clear, and the yes before `walk-progress.md` is written. That yes shows the progress line, unless the step's own confirm already included this record. An extra's yes is that case. Questions inside a step belong to that step's skill.
+
+The progress script is `scripts/walk_progress.py --vendor copilot` in this skill. Use it for versions, resume, playbook status, and the ready check. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. The ready check is `<interpreter> -X utf8 scripts/walk_progress.py readiness --root <spec-folder> --write-map --vendor copilot`. Print the script's lines. Do not open the tasks-ready skill. Do not hand-build rows. Do not keep a second copy of those rules in chat. Pass `--yes` only after you have shown the line and the user has confirmed that record. After a step is recorded, run `resume` again. That later `resume` is not the start command.
+
+When a playbook was named, ask that question before any later step, including a read-only check. Resume may report status. It does not start the next step.
+
+After a step finishes, record that one step, then run `resume`. One `record` call per step, right then. Do not put several records in one command. Do not pass `--when`. `record` refuses more than one step. Recording updates earlier steps, so this step's write does not reopen them. When an optional extra this walk offered and ran finishes, record that extra in the same way. The yes that ran the extra is the yes for that record. Do not ask the user to run `cover`. A write in an earlier step can still reopen a later one. A change from outside the walk reopens only the steps that change affects. Since 1.148.0 say `reopen_line` once and redo only the steps it names. When resolve-open-questions is one of them, ask only `changed_questions`. A checkbox tick, a trailing `(PR n)` or `(done)` note on that task line, or `(PR n)` on a Match `Branch:` line does not. Do not ask to clear those. Explain a real reopen in the script's words before redoing only those steps.
+
+Spec, plan, and tasks remain the source of truth. The progress file does not. A jump back reruns the skill that owns the step, even for a small patch. This walk does not edit `spec.md`, `plan.md`, or `tasks.md` on that jump, and it does not write the `Reviewed:` line.
+
+Do not run `/crav1-build-tasks`, `/crav1-build-features`, `/crav1-verify-build-against-spec`, or `/crav1-fix-build-gaps`. This walk never writes `verify.md`. Do not create a git commit. The playbook copy under `docs/playbooks/` is a file write inside apply, not a git commit.
+
+**Fewer reads (1.164.0).** `start` and `resume` return `read`, the one reference the next step needs: `references/playbook.md`, `references/steps.md`, or `references/readiness.md`. Open only that file. Do not open `progress.md`, `playbook.md`, or `steps.md` when `read` does not name them; `progress.md` is only for a stop or a clear.
+
+**Proposed, not done (1.197.0).** Before a card, describe each change as proposed: `would update the plan's Risks and Trace lines`. Never write `I've updated`, `I changed` or `updated` for an edit that waits on the card's yes. Say what was done only after the yes, once the edit is written.
+
+**One start call (1.197.0).** `start` already syncs the specs repo and, when the spec was found by its playbook name, reads that playbook's status (`playbook`, `playbook_status`). Do not run `start` again with `--playbook`, and do not run `repo_sync.py status --vendor copilot` yourself.

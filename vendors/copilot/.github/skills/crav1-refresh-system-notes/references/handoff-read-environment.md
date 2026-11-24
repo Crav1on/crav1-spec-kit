@@ -1,0 +1,3 @@
+# From /crav1-read-environment
+
+When `/crav1-read-environment` hands a confirmed system section, run only this section, then stop. That section is the source. Add only what is new to the picture, following [picture.md](picture.md). Each new sentence, node, edge, or connection line says `Seen in <host> <environment>.` When the line says `shared with prod`, `prod only`, or shape and connections only, keep that label. It does not say the code shows it. A connection is added only when that section says the environment shows it. Do not rewrite a line that is already there. Do not run the alone-read of the specs. Do not open an interview. Do not start Specify, Plan, or Build. If `docs/system/` is missing, write nothing.

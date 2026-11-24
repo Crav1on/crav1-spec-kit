@@ -75,7 +75,7 @@ Do not push unless the user, in this run, already said to push. Do not add a pus
 
 ## Vendors (1.201.0)
 
-`vendors.json` next to this skill lists each host: the folders the kit owns, the frontmatter a skill needs, the command prefix, and extra files. `detect` reports `vendors`. `update_kit.py vendors --root .` lists each vendor's folder and skill count and writes nothing. Cursor and Claude Code are installed. Codex and Copilot are rows and are not installed by this release. `--vendor codex` on a script that prints Run next prints `$crav1-`. With no `--vendor`, the prefix stays `/`.
+`vendors.json` next to this skill lists each host: the folders the kit owns, the frontmatter a skill needs, the command prefix, and extra files. `detect` reports `vendors`. `update_kit.py vendors --root .` lists each vendor's folder and skill count and writes nothing. Cursor and Claude Code are installed. Codex and Copilot are rows and are not installed by this release. `--vendor codex` on a script that prints Run next uses the Codex command prefix. With no `--vendor`, the prefix stays `/`.
 
 ## Hard rules
 

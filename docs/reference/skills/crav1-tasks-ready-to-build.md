@@ -8,6 +8,8 @@
 
 List the tasks ready to build, for one spec or all, and why the others are blocked. Rewrites each slice build map.
 
+1.202.0: Held lists every held task, including one whose only wait is an `(after:)` on a task that is not built yet. The reason is on that line.
+
 1.176.0: the readiness ending leaves out [`/crav1-build-tasks`](crav1-build-tasks.md) builds one task without the walk.`; [`/crav1-help`](crav1-help.md) status` names it.
 
 1.177.0: when the merge list holds a pull request you opened, Run next leads with it, for example `Merge your PRs 71 and 73 first:` above [`/crav1-merge-pr`](crav1-merge-pr.md) 71`, above the entry that resumes the walk; with none of yours nothing is added. A PR's owner is who opened it (the PR note's `author:`, else `PR author:` in build-progress), not the claimer: `PR 71 (person A's, you added T5)`, or `owner not recorded`; others' PRs get `Waiting: PR 71 and PR 73 are person A's; they unblock T8.` A blank line separates the numbered list from the Waiting line under it.

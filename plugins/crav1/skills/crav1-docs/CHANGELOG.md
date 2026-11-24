@@ -2,6 +2,16 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.202.0 (2026-11-24)
+
+Generated Codex and Copilot trees, plus three ready-check and plan-count fixes. Nothing here is installed.
+
+- **Vendor trees.** `scripts/sync-crav1-vendors.py` writes `vendors/codex/` (`.agents/skills/`) and `vendors/copilot/` (`.github/skills/` plus `.github/instructions/crav1.instructions.md`). Each generated skill opens with the kit-rules line. Codex commands are `$crav1-` and its Run next script calls pass `--vendor codex`. Copilot keeps `/crav1-` and passes `--vendor copilot`. Command-only Codex skills get `agents/openai.yaml`. The project's `AGENTS.md` is not written. CI fails when a committed tree drifts, and kit-lint checks the per-vendor rules. Update still installs only Cursor and Claude Code.
+- **Held list.** A task whose only wait is an `(after:)` on a task that is not built yet is listed under Held, with the reason on that line. An own pull-request wait is on the held line too. The same sentence is not printed again underneath.
+- **Open count.** `plan_check.py open-count --review <file>` prints `open: <n>` from the reviewer's `P#` lines. The walk uses that value. `reviewed --items` recomputes the Reviewed line from the items file.
+
+Docs and tests: tighten-and-plan and spec-to-plan walkthroughs, glossary, data layout, and `scripts/tests/test_kit_1202.py`.
+
 ## 1.201.0 (2026-11-22)
 
 A vendor table, with no change to a Cursor and Claude Code update.
@@ -188,10 +198,5 @@ Changing a design topic's goal and building one topic on another, for `/crav1-de
 - **`change-goal` changes a topic's goal in place.** `design_run.py change-goal --topic <t> --input <json> --reason "<why>"` returns the old and the new goal, the change lines and the decisions it would flag, and writes nothing; the agent shows them on a card. With `--yes` it rewrites `goal.md` (ask, end goal, drivers, constraints, criteria and a `## Decisions` order) and logs the date, the reason and each change under `## Goal changes`. Decisions can be added, dropped, renamed or reordered. A dropped decision stays in the design, marked `dropped` with its reason, and review no longer lists it as missing. A settled or leaning decision that is renamed, listed under `reopen`, or whose title, lean, recommendation or draft ADR outcome names a word from a removed constraint, criterion or driver is marked reopened, and `resume` continues there in the goal's order. Open questions and leans on the other decisions stay. A run without the user is refused. Step 0 routes a new goal for an existing topic here instead of recreating the topic.
 - **Linked topics.** `create --topic <t> --builds-on <base>` records `Builds on: <base>` and lists the base topic's settled decisions under `## Fixed from the base topic`. The design branch is cut from `design/<base>` (`git switch design/<base>`, `git switch -c design/<t>`), and base updates come in with `git merge design/<base>`, never a rebase. `resume` re-reads the base and names the decisions it settled or reopened since the last run. Settling or adding a base decision in the linked topic is refused; the new `revisit --topic <t> --decision "<words>" --reason "<why>"` marks it reopened in the base topic and ends with Run next on the base. `status` shows links both ways. `go-ahead` on a linked topic waits until the base design is under `## Decided, not built yet` or `## Confirmed` in `docs/architecture/spec.md` on main (or `--base-merged` after the user confirms); the refusal is a Run next with a Waiting line naming the base topic's design pull request. The copied block says `Builds on: topic <base>`.
 - `scripts/snapshot-check.py` runs design snapshots (`design-spec/` plus `steps.json`): `design-goal-change` and `design-linked-topics`, and `scripts/tests/test_kit_1188.py`.
-
-## 1.187.0 (2026-11-18)
-
-- **Task names stop at the verify items.** The walk lead, the ending under Run next, the ready check's open-task list and `build-map.md` showed the whole task line, checks included, such as `Build T8 PR 12 takes in develop after PR 10 merges, with the conflicts resolved; integration — ...; system — ... with api-doc.yaml in it) on feat/orders-api:`. One helper, `task_order.task_name`, now cuts at the first verify item (`; integration —`, `; contract —`, `; system —`, `; unit —`, a `(verify: ...)` block, `(regression`), drops unbalanced parentheses and tidies stray spaces such as `( x` and `develop ,`. The line reads `Build T8 PR 12 takes in develop after PR 10 merges, with the conflicts resolved on feat/orders-api:`. `tasks.md` titles, the build map's short and full names and the walk's task labels all use it.
-- Snapshot `orders-api-verify-names` (with a golden walk ending) and `scripts/tests/test_kit_1187.py`.
 
 The newest 15 releases are above. The full changelog is https://github.com/Crav1on/crav1-spec-kit/blob/main/CHANGELOG.md.

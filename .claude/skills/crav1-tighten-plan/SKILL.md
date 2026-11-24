@@ -25,7 +25,7 @@ The index, counts, dependency order, batch card, empty-queue `Next` line and Rev
 - `<interpreter> -X utf8 scripts/plan_check.py order --root <spec-folder>`: the waves and any ordering or task-line problem.
 - `<interpreter> -X utf8 scripts/plan_check.py queue --items <file> --root <spec-folder>`: the index and counts; with no plan `P#` open, the one empty-queue `Next` line. Flags: `--went-on-without-linter` (chosen this turn), `--uncommitted <n>`.
 - `<interpreter> -X utf8 scripts/plan_check.py batch --items <file>`: the findings table and its `Card:` line.
-- `<interpreter> -X utf8 scripts/plan_check.py reviewed --root <spec-folder> --open <n> --write`.
+- `<interpreter> -X utf8 scripts/plan_check.py reviewed --root <spec-folder> --items <file> --write`.
 
 Its `<file>` fields are in `references/issues.md` ("Items file"). Choosing those values is your judgement; the script does the rest. When Python cannot run, follow `references/issues.md` by hand with the same wording.
 

@@ -2426,8 +2426,14 @@ def held_phrase(row):
         wait = f"Waiting for {who}." if who else NOBODY_ANSWERS
         return f'open question "{question}" {wait}{note}'
     phrase = core or "held"
+    # 1.202.0: an own pull-request wait used to print `— held`, with the
+    # reason only in a footer. The reason is this line.
+    own_pr = row.get("own_pr_open")
+    if phrase == "held" and own_pr:
+        task = row.get("task") or "The task"
+        phrase = f"{task} is yours and waits for PR {own_pr}'s merge."
     info = row.get("merge_wait") if isinstance(row.get("merge_wait"), dict) else {}
-    pr = info.get("pr") or row.get("pr")
+    pr = info.get("pr") or row.get("pr") or own_pr
     if pr and "pull request" in phrase and f"PR {pr}" not in phrase:
         phrase = phrase.replace("its pull request", f"PR {pr}", 1).replace("the pull request", f"PR {pr}", 1)
     return phrase
@@ -2519,13 +2525,21 @@ def report_by_branch(built, rows, slug=None):
             rows_by_num.setdefault(num, row)
     ready = []
     held = []
+    loose = []
     for row in rows or []:
         num = _task_num(row.get("task"))
-        if num is None or num not in by_num:
+        if num is None:
+            continue
+        # 1.202.0: a task held only by an (after:) wait on a task that is not
+        # built yet is waits-in-order. It belongs in Held with the others.
+        is_held = row.get("bucket") in ("waiting", "waits-in-order") or row.get("held")
+        if num not in by_num:
+            if is_held:
+                loose.append(row)
             continue
         if row.get("bucket") == "ready":
             ready.append((num, row))
-        elif row.get("bucket") == "waiting" or row.get("held"):
+        elif is_held:
             held.append((num, row))
 
     def gather(pairs):
@@ -2566,6 +2580,13 @@ def report_by_branch(built, rows, slug=None):
                     seen_questions[key] = f"T{_task_num(task.get('id'))}"
             rows.append(f"  - {label} — {phrase}")
         held_lines.append("\n".join(rows))
+    if loose:
+        # A held task the map did not place still appears, with its reason.
+        extra = ["- (no branch):"]
+        for row in sorted(loose, key=lambda item: _task_num(item.get("task")) or 0):
+            phrase = re.sub(r"([.!?])[.;]+", r"\1", held_phrase(row))
+            extra.append(f"  - {row.get('task')} — {phrase}")
+        held_lines.append("\n".join(extra))
     next_lines = []
     run_lines = []
     ready_branches = []

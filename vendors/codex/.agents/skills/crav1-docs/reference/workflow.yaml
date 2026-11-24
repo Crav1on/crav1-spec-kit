@@ -1,0 +1,229 @@
+# The one written source for the order of kit commands.
+#
+# scripts/gen-workflow.py reads this file and writes:
+#   - docs/reference/workflow.md            (the routes, one section per route)
+#   - the order block in .cursor/rules/crav1.mdc (between the crav1-order markers)
+#   - every `you_run_next` value in docs/reference/skills.yaml
+# Then run scripts/gen-skill-docs.py and scripts/sync-crav1-plugin.sh.
+# `scripts/gen-workflow.py --check` fails CI when any of those drift.
+#
+# Route step fields:
+#   skills     one or more skills; more than one means "one of these"
+#   when       when the step applies, in plain words
+#   optional   true when the step can be skipped; the step before it then
+#              names both this step and the next required one
+#   loop_to    after this step, go back to that skill (no other next step)
+#   then       per skill in the step: its own next steps, instead of the route's
+#   as_next    how the step is written when another skill names it as next
+#
+# A skill's `you_run_next` is: every next step the routes give it (in route
+# order), then its `also_next` entries. `override` replaces both.
+
+routes:
+  - id: new-slice
+    title: New slice
+    when: You are starting a new feature from one or two sentences, a pile of ideas, or several files.
+    steps:
+      - skills: [crav1-spark-to-spec, crav1-ideas-to-spec, crav1-bundle-to-specs]
+        when: One or two sentences (spark), a pile of ideas and technical hunches (ideas), or mixed files or several v0 features (intake, then each slice follows this route).
+      - skills: [crav1-create-feature-branch]
+        optional: true
+        when: Before the first commit for the slice, on `feat/<slug>` (or `spec/<slug>` for specify only).
+      - skills: [crav1-review-architecture]
+        optional: true
+        when: When the spec touches structure, data, or integrations.
+      - skills: [crav1-tighten-spec]
+        when: Always, before questions and the plan.
+      - skills: [crav1-resolve-open-questions]
+        when: When `## Open questions` still has items.
+      - skills: [crav1-ado-sync]
+        optional: true
+        when: When the team tracks Features in Azure Boards.
+      - skills: [crav1-plan-from-spec]
+        when: The spec is tight and its questions are answered or kept open on purpose.
+      - skills: [crav1-review-plan]
+        when: Right after the plan is written.
+      - skills: [crav1-tighten-plan]
+        when: After the plan review.
+      - skills: [crav1-ado-sync]
+        optional: true
+        when: When the Feature is in Azure Boards and the tasks should be too.
+      - skills: [crav1-tasks-ready-to-build]
+        optional: true
+        when: Any time, to see which tasks are ready, which are blocked and why. Read-only.
+      - skills: [crav1-build-walk]
+        optional: true
+        when: "One work branch at a time: build, verify, commit, open the pull request, merge the base into the branch, merge the pull request, tick, then the next task. One Next while it runs. It does not replace build-tasks."
+        then:
+          crav1-build-walk: [crav1-verify-build-against-spec]
+      - skills: [crav1-build-tasks, crav1-build-features]
+        when: "One task, a range, or all (build-tasks), or whole features (build-features). Each task runs in its own worker that implements, commits, and verifies it, so they go straight to the pull request."
+        then:
+          crav1-build-tasks: [crav1-open-pr]
+          crav1-build-features: [crav1-open-pr]
+      - skills: [crav1-verify-build-against-spec]
+        when: Against the spec and the plan, for the whole slice when you want one report.
+      - skills: [crav1-fix-build-gaps]
+        optional: true
+        loop_to: crav1-verify-build-against-spec
+        when: When `verify.md` has a failure, or to fix it against the running host (fix-build-gaps asks which). Do not edit `spec.md` in this loop.
+      - skills: [crav1-finalize-commit]
+        when: When the slice verifies (it drafts first, then offers commit, copy, change, or stop).
+      - skills: [crav1-open-pr]
+        when: To push and open the pull request.
+      - skills: [crav1-review-pr]
+        when: Before the merge.
+      - skills: [crav1-merge-pr]
+        when: When the review says ship and the host checks are green.
+
+  - id: new-info
+    title: New information on an existing slice
+    when: Minutes, a mail, a chat, or a new fact changes a spec that already exists, built or not.
+    steps:
+      - skills: [crav1-add-to-spec]
+        when: Minutes, a transcript, a mail, a chat, a dump, a code change, or one new fact (add-to-spec asks which).
+      - skills: [crav1-tighten-spec]
+        when: Always, on each spec that changed. New text needs the same tightening as the first draft.
+      - skills: [crav1-resolve-open-questions]
+        when: When the change added or answered open questions. Use `$crav1-show-or-ask-open-questions` for the ones someone else must answer.
+      - skills: [crav1-plan-from-spec]
+        when: When the slice has `plan.md` or `tasks.md`, so the plan and the tasks follow the new spec.
+      - skills: [crav1-ado-sync]
+        optional: true
+        when: When the Feature or its tasks are in Azure Boards (push Features only when the Feature itself changed; push-tasks for the tasks).
+      - skills: [crav1-tasks-ready-to-build]
+        optional: true
+        when: Any time, to see which tasks are ready after the change, which are blocked and why. Read-only.
+      - skills: [crav1-build-tasks]
+        when: To build the tasks that are not built yet. Each task is verified inside its worker.
+        then:
+          crav1-build-tasks: [crav1-open-pr]
+      - skills: [crav1-verify-build-against-spec]
+        when: For the whole slice when you want one report.
+      - skills: [crav1-finalize-commit]
+        when: When the slice verifies.
+
+  - id: bug
+    title: Bug
+    when: Someone names a real bug.
+    steps:
+      - skills: [crav1-fix-bug]
+        when: The bug is named. It says which lane the fix belongs to.
+      - skills: [crav1-tighten-spec, crav1-plan-from-spec, crav1-build-tasks]
+        when: The lane fix-bug named. Spec miss is Specify (tighten-spec), plan miss is Plan (plan-from-spec), code miss is Build (build-tasks). Tighten-spec and plan-from-spec then follow the New slice route from that step.
+        then:
+          crav1-tighten-spec: []
+          crav1-plan-from-spec: []
+      - skills: [crav1-verify-build-against-spec]
+        when: After the fix is built.
+      - skills: [crav1-fix-build-gaps]
+        optional: true
+        loop_to: crav1-verify-build-against-spec
+        when: When `verify.md` has a failure.
+      - skills: [crav1-finalize-commit]
+        when: When it verifies.
+      - skills: [crav1-open-pr]
+        when: To push and open the pull request.
+
+  - id: before-pr
+    title: Before a pull request
+    when: Your branch is ready and you want it reviewed and fixed before you open a pull request.
+    steps:
+      - skills: [crav1-review-pr]
+        as_next: $crav1-review-pr branch
+        when: "With the choice word `branch`: reviews the branch against its base, no pull request needed. Each finding names its lane."
+      - skills: [crav1-tighten-spec, crav1-plan-from-spec, crav1-build-tasks]
+        optional: true
+        when: When the review has findings, the lane each one names. Spec miss is Specify (tighten-spec), plan miss is Plan (plan-from-spec), code miss is Build (build-tasks).
+        then:
+          crav1-tighten-spec: []
+          crav1-plan-from-spec: []
+      - skills: [crav1-finalize-commit]
+        when: When the fixes are made.
+      - skills: [crav1-open-pr]
+        when: To push and open the pull request.
+      - skills: [crav1-pr-status]
+        optional: true
+        when: When the pull request has comments and replies, to see what is done, what is left and what you owe (1.97.0).
+
+  - id: outside-pr
+    title: Outside pull request
+    when: A pull request was built outside the kit (its slug has no `plan.md` or `tasks.md`).
+    steps:
+      - skills: [crav1-review-pr]
+        when: The pull request is open.
+      - skills: [crav1-pr-status]
+        optional: true
+        when: When the review comments got replies or new pushes, to see where each point stands and whether it is ready to merge (1.97.0).
+      - skills: [crav1-merge-pr]
+        when: When the review says ship.
+      - skills: [crav1-refresh-system-notes]
+        as_next: $crav1-refresh-system-notes after an outside pull request merges
+        when: After the merge, to bring its changes into the spec and `docs/system/`.
+      - skills: [crav1-finalize-commit]
+        when: When refresh-system-notes changed a file.
+
+  - id: ado-sync
+    title: Azure Boards sync
+    when: Specs and Azure Boards (ADO) should match.
+    steps:
+      - skills: [crav1-ado-sync]
+        when: "It asks which: suggest Features, push Features, push-tasks (when the slice has `tasks.md`), pull task states, or pull-spec-changes from Features."
+      - skills: [crav1-finalize-commit]
+        when: When the sync changed a file.
+  - id: repo-gaps
+    title: Repos vs specs
+    when: Specs already exist and you want to know what code no spec covers, or which spec claims the code no longer shows.
+    steps:
+      - skills: [crav1-existing-to-specs]
+        when: "`$crav1-existing-to-specs recheck` (1.108.0): reports code with no spec and stale spec claims, and refreshes `## Code with no slice` in `docs/system/landscape.md`. It writes nothing into any spec."
+        as_next: $crav1-existing-to-specs recheck
+      - skills: [crav1-add-to-spec]
+        optional: true
+        when: For a gap you want in an existing spec, after a yes.
+      - skills: [crav1-tighten-spec]
+        optional: true
+        when: For a stale claim you want fixed in the spec.
+      - skills: [crav1-finalize-commit]
+        when: When the note changed.
+
+# Extra next steps after the route steps (side steps such as a commit).
+also_next:
+  crav1-bundle-to-specs: [$crav1-finalize-commit]
+  crav1-existing-to-specs: [$crav1-finalize-commit]
+  crav1-read-environment: [$crav1-finalize-commit]
+  crav1-create-feature-branch: [$crav1-finalize-commit]
+  crav1-show-or-ask-open-questions: [$crav1-add-to-spec, $crav1-record-approval, $crav1-finalize-commit]
+  crav1-record-approval: [$crav1-build-tasks, $crav1-finalize-commit]
+  crav1-add-to-spec: [$crav1-finalize-commit]
+  crav1-review-pr: [$crav1-refresh-system-notes after an outside pull request merges, $crav1-finalize-commit]
+  crav1-merge-pr: [$crav1-finalize-commit]
+  crav1-pr-status: [$crav1-add-to-spec, $crav1-ado-sync, $crav1-review-pr]
+  crav1-explain-existing-system: [$crav1-what-do-we-know-about-this]
+  crav1-glossary: [$crav1-finalize-commit]
+  crav1-design-architecture: [$crav1-tighten-spec, $crav1-plan-from-spec, $crav1-add-to-spec, $crav1-show-or-ask-open-questions]
+  crav1-model-data: [$crav1-finalize-commit, "$crav1-what-do-we-know-about-this report-data-model-full <model>", $crav1-add-to-spec]
+  crav1-update-specs-from-changes-and-prs: [$crav1-resolve-open-questions, $crav1-update-specs-from-changes-and-prs, $crav1-finalize-commit]
+  crav1-explain-tech: [$crav1-explain-tech, $crav1-show-or-ask-open-questions, $crav1-finalize-commit]
+  crav1-tighten-and-plan-ready-to-build: [$crav1-build-walk, $crav1-build-tasks]
+  crav1-refresh-system-notes: [$crav1-finalize-commit]
+  crav1-map-pipeline-environments: [$crav1-read-environment]
+  crav1-host-setup: [$crav1-open-pr, $crav1-pr-status]
+  crav1-review-security: [$crav1-finalize-commit]
+  crav1-run-exploratory-test: [$crav1-finalize-commit]
+  crav1-suggest-tests-for-code: [$crav1-plan-from-spec]
+  # The override below is the real next step. This entry lets a walkthrough After section name the command.
+  crav1-update-kit: []
+
+# Replaces the generated list. Free text is allowed here only.
+override:
+  crav1-explain-this-code: []
+  crav1-explain-tech: []
+  crav1-retire-spec: []
+  crav1-fix-bug: ["The lane it names (Specify, Plan, or Build)"]
+  crav1-what-do-we-know-about-this: ["The one skill it names, if any"]
+  crav1-export-spec: []
+  crav1-help: [The skill or route step it names]
+  crav1-update-kit: ["nothing needed now"]
+  crav1-tasks-ready-to-build: [$crav1-build-walk, $crav1-build-tasks]
+  crav1-build-walk: [$crav1-build-walk, $crav1-verify-build-against-spec]

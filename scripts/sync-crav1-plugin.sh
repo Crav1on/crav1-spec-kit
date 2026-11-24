@@ -43,3 +43,6 @@ echo "Synced docs/ → .cursor/skills/crav1/crav1-docs/, and .cursor/ → plugin
 
 # Claude Code drop-in is generated. A stale .claude/ fails CI via --check.
 "$ROOT/scripts/sync-crav1-claude.sh"
+
+# Codex and Copilot trees are generated. A stale vendors/ tree fails CI via --check.
+python3 "$ROOT/scripts/sync-crav1-vendors.py" --root "$ROOT"

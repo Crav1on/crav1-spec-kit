@@ -1,0 +1,272 @@
+# Installing and using CRAV1 Spec Kit (crav1)
+
+Read this **before** you put **CRAV1 Spec Kit** in a project. It covers what you get, which host and scope to pick, and where files go. It is not the full playbook. The thin path after you pick an install is [first-run.md](first-run.md).
+
+The method (specs, `plan.md`, `tasks.md`, verify) is [The method](concepts/method.md). Every walkthrough is listed in the [docs index](README.md). This file is the host detail those pages leave out.
+
+Kit home: [https://github.com/Crav1on/crav1-spec-kit](https://github.com/Crav1on/crav1-spec-kit). License: [MIT](../LICENSE).
+
+- After a **Cursor plugin** install, open the plugin README (in Cursor: the `crav1` plugin, or [plugins/crav1/README.md](../plugins/crav1/README.md) in this repo). Plugin id: `crav1`. There is no public Cursor Marketplace listing. Install that plugin from this GitHub repo (team marketplace import or a local plugin), or copy the `.cursor/` drop-in below.
+- **Claude Code** has no plugin and no marketplace. The slash commands are the same. Copy the generated `.claude/` drop-in below into a repository you own, or into `~/.claude` for a client project. Cloning this kit does not install it into another product.
+
+## What this kit is
+
+**CRAV1 Spec Kit** (`crav1`) is a skill and agent library for spec-driven development. Slash commands are prefixed `crav1-` so they group under `/crav1`.
+
+It does **not** create an app for you. It writes and walks specs, plans, tasks, and verify/fix loops **in the repo you already have** (or that you ask the agent to scaffold).
+
+This kit repository is the source. Your product repository is where work happens. Cursor drop-in plus `plugins/crav1/` is the source of the playbooks. `.claude/` is generated from that source (`scripts/sync-crav1-plugin.sh`). Do not keep a second hand-written copy of the skills.
+
+## License
+
+[MIT](../LICENSE). The copyright notice is in that file.
+
+## What gets installed
+
+| Piece | Role |
+| --- | --- |
+| Skills (`/crav1-…`) | Playbooks for every lane: the six starter options, Specify, Plan, Build, Verify and fix, Commit and pull request, and the cross-cutting helpers. What each command reads, writes, and leaves alone is in the [skills reference](reference/skills.md), one page per command. `/crav1-map-pipeline-environments`, `/crav1-ado-sync` use the `az` command-line tool with the `azure-devops` extension where their pages say so; the skills do not install it or log in |
+| Agents | `crav1-spec-reviewer-agent`, `crav1-review-architecture-agent`, `crav1-plan-reviewer-agent` (read-only critics); `crav1-build-task-agent` and `crav1-bundle-slice-agent` (writers) |
+| Project instruction | Cursor: rule `crav1.mdc`. Claude Code: `.claude/CLAUDE.md` (the same always-on text, not the README) |
+| Templates | Inside each skill’s `assets/` (and agent-assets). Optional human copies: `docs/specs/_template/`, `docs/system/_template/` |
+
+Every install bundles this repo's `docs/` in a `crav1-docs/` folder next to the skills, so `/crav1-help` answers for the installed version: `skills/crav1-docs/` in the Cursor plugin, `.cursor/skills/crav1/crav1-docs/` in the Cursor drop-in, and `.claude/skills/crav1-docs/` in the Claude Code drop-in (`~/.claude/skills/crav1-docs/` in user scope). `/crav1-help` reads that folder directly and never searches for it. It is not a skill. Copy it with the skills. The bundled `CHANGELOG.md` is the newest 15 releases from the repo-root file, plus one line to the full changelog on GitHub. `/crav1-help` reads that copy for `whats-new`. Not installed by the Cursor plugin: this repo’s README and `AGENTS.md`. The starter folders `docs/specs/_template/` and `docs/system/_template/` are in the bundled docs but are not copied into your repo. Copy them yourself if you want them in git.
+
+Skill files name a file in another skill host-neutral (1.107.0): skill `crav1-add-to-spec`, `references/branches.md`, not a `.cursor/` or plugin path. So `/crav1-plan-from-spec`, `/crav1-tighten-spec`, `/crav1-build-features` and `/crav1-what-do-we-know-about-this` find the `/crav1-add-to-spec` files, and `/crav1-review-plan` and `/crav1-tighten-plan` find the `/crav1-plan-from-spec` files, in the same folder layout on every host. Only files that name a host path (rules, agents, a command line) differ between the `.cursor/` and `.claude/` copies.
+
+## Project drop-in or user scope
+
+**Project drop-in** — commit `.cursor/` or `.claude/` in a repository you own. Clones and teammates get the same kit.
+
+**User scope** — the kit follows you and is not committed into the repo. Cursor: user-scoped plugin (below). Claude Code: `~/.claude/`.
+
+**Client project** — install into the user Claude config (`~/.claude`), not committed into the client repo, unless that project asked for the kit in git. The same idea on Cursor is a user-scoped plugin, not a commit of `.cursor/` into the client repo, unless they asked.
+
+## Host plan UI is not `plan.md`
+
+Cursor Plan Mode and Claude Code plan mode are each host’s plan UI. Neither one is `docs/specs/<slug>/plan.md`. `/crav1-plan-from-spec` writes `plan.md` and `tasks.md` itself. Use the UI only when you want a plan that stays in the chat and not in those files.
+
+## Slash commands
+
+After install, type `/crav1` to list the kit. Each skill folder’s `name:` is `crav1-<short-name>`, and the command is `/crav1-<short-name>`.
+
+- **Cursor** project skills live under `.cursor/skills/crav1/`. If `/crav1` is missing, `Developer: Reload Window`.
+- **Claude Code** project skills live under `.claude/skills/<name>/SKILL.md`. User skills live under `~/.claude/skills/<name>/SKILL.md`. If a skills or agents directory was created after the session started, restart Claude Code so it picks the new directory up. Checked against [Claude Code skills](https://code.claude.com/docs/en/skills) and [subagents](https://code.claude.com/docs/en/sub-agents).
+
+## Cursor
+
+### Prerequisites
+
+- [Cursor](https://cursor.com/) with Agent chat (slash skills).
+- A **product git repo** (or this kit repo, which already has the drop-in `.cursor/` tree).
+- Optional: Teams or Enterprise, if you want a **team marketplace** (import this repo, then Install). Free/Pro can still **copy files** or load a **local plugin**.
+- Optional, for `/crav1-map-pipeline-environments` on the machine where the command runs (Cursor or Claude Code): [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli) and the `azure-devops` extension (`az extension add --name azure-devops`). The skill does not install them and does not log in. Login is `az login` and `az devops configure --defaults`.
+- Optional, for the SQL look-inside in `/crav1-read-environment` on the machine where the command runs (Cursor or Claude Code): [`sqlcmd`](https://learn.microsoft.com/sql/tools/sqlcmd/sqlcmd-utility). The skill does not install it and does not log in. PostgreSQL and MySQL use a client already on the machine. The skill does not install that client either. The host CLI (`az`, `aws`, or `gcloud`) is still required for the resource list.
+
+**Import from Repo** for this kit uses [https://github.com/Crav1on/crav1-spec-kit](https://github.com/Crav1on/crav1-spec-kit).
+
+### A. Drop-in copy (files in the product repo)
+
+Works on any plan. Skills travel with clones, PRs, and Cloud Agents that use **project** files. Updates are a later copy (or git subtree).
+
+From a clone of this kit:
+
+1. Copy into the **product** repo:
+   - `.cursor/skills/crav1/` (includes `crav1-docs/`, the kit docs `/crav1-help` reads)
+   - `.cursor/agents/crav1-*.md`
+   - `.cursor/agent-assets/crav1-*`
+   - `.cursor/rules/crav1.mdc`
+2. Optionally copy `docs/specs/_template/`, `docs/system/_template/`, and add a line to the product `AGENTS.md` pointing at `docs/specs/` and `docs/system/`.
+3. Commit those files in the product repo when you own it.
+4. Reload Cursor if `/crav1` does not show up (`Developer: Reload Window`).
+
+Do **not** copy `.cursor/rules/kit-maintainer.mdc` unless you are forking the kit itself. That rule is for maintainers of this repository (no `crav1-` prefix on purpose, so a `crav1*` dump skips it).
+
+Do not copy a transfer data policy at install. The imported-sources check writes `.cursor/rules/crav1-transfer-data-policy.mdc` into the product repo after a yes. On Claude Code the same check writes `.claude/rules/crav1-transfer-data-policy.md`. Delete that file to get the questions again.
+
+Cursor rules: [Rules](https://cursor.com/docs/rules). Cursor skills: [Skills](https://cursor.com/docs/skills).
+
+### B. Cursor plugin (install from this repo)
+
+The plugin lives at [`plugins/crav1/`](../plugins/crav1/) with manifest [`plugin.json`](../plugins/crav1/.cursor-plugin/plugin.json). Plugin id: `crav1`. The catalog is [`.cursor-plugin/marketplace.json`](../.cursor-plugin/marketplace.json). That catalog is **Cursor-only**. There is no public Cursor Marketplace listing.
+
+**Team marketplace (Teams / Enterprise)**
+
+1. Cursor Dashboard → **Plugins & MCPs** → **Team Marketplaces** → **Add Marketplace** → **Import from Repo**, and use [https://github.com/Crav1on/crav1-spec-kit](https://github.com/Crav1on/crav1-spec-kit).
+2. Confirm plugin `crav1`. Set access and Default Off / Default On / Required. Save. Enable Auto Refresh on GitHub if you want pushes to re-index.
+3. In the IDE: **Customize** → find **crav1** → **Install** → project or user scope.
+
+**No public listing**
+
+There is no public Cursor Marketplace listing for plugin `crav1`. Install it from this GitHub repo: team marketplace import (above) or a local plugin (below). A drop-in copy of `.cursor/` is the other Cursor path (section A).
+
+**CLI**
+
+`cursor-agent plugin marketplace add <repository-url>` adds this repo as a Cursor marketplace. It does not publish a public listing. Installing a plugin is still interactive (Customize or `/plugin`). There is no reliable non-interactive `plugin install` for CI yet.
+
+**Scope**
+
+- **Project** — this workspace. Prefer this so Cloud Agents and teammates see the same kit.
+- **User** — follows you across repos; does not put files in git. Use this on a client project unless that project asked for the kit in git.
+
+### C. Local plugin (kit development)
+
+1. Copy or symlink **inside** `~/.cursor/plugins/local/` only (Cursor ignores symlinks that point outside that folder):
+
+   ```bash
+   mkdir -p ~/.cursor/plugins/local
+   cp -a plugins/crav1 ~/.cursor/plugins/local/crav1
+   ```
+
+2. Reload the window. Confirm **crav1** in **Customize**.
+3. Teams/Enterprise admins may disable local plugin imports.
+
+After you change the kit, re-copy or re-run the sync script, then reload.
+
+Cursor plugin format: [Plugins](https://cursor.com/docs/plugins) · [Plugins reference](https://cursor.com/docs/reference/plugins).
+
+## Claude Code
+
+Claude Code has no plugin and no marketplace. The same slash commands as on Cursor live in the generated `.claude/` tree. Copy that tree into a repository you own, or into `~/.claude` for a client project. Cloning this kit does not install it into another product.
+
+Checked against current Claude Code docs (not a guessed layout):
+
+| What | Project (repo you own) | User (`~/.claude/`) | Doc |
+| --- | --- | --- | --- |
+| Skills | `.claude/skills/<name>/SKILL.md` | `~/.claude/skills/<name>/SKILL.md` | [Skills](https://code.claude.com/docs/en/skills) |
+| Subagents | `.claude/agents/*.md` | `~/.claude/agents/*.md` | [Subagents](https://code.claude.com/docs/en/sub-agents) |
+| Project instruction | `.claude/CLAUDE.md` | `~/.claude/CLAUDE.md` | [Memory](https://code.claude.com/docs/en/memory) |
+| Commit-style persist rule | `.claude/rules/*.md` | `~/.claude/rules/*.md` | [Memory](https://code.claude.com/docs/en/memory) |
+| Transfer data policy | `.claude/rules/crav1-transfer-data-policy.md` | Not written under `~/.claude/`. It stays in the repo. | [Memory](https://code.claude.com/docs/en/memory) |
+
+Docs also allow a project instruction at `./CLAUDE.md`. This kit uses `.claude/CLAUDE.md` so the drop-in is one directory and does not replace a product’s root `CLAUDE.md`. Both paths are loaded ([directory overview](https://code.claude.com/docs/en/claude-directory)).
+
+`.claude/agent-assets/` is **not** a directory Claude Code loads by itself. The subagent prompts tell the model to read those template files. They are not under `.claude/agents/` because Claude Code scans that tree recursively and would treat extra markdown as subagents.
+
+### Project drop-in
+
+From a clone of this kit, copy into a repository you own and commit it when that project asked for the kit in git:
+
+- `.claude/skills/`
+- `.claude/agents/`
+- `.claude/agent-assets/`
+- `.claude/CLAUDE.md`
+
+Do not copy `.cursor/rules/kit-maintainer.mdc`.
+
+### User scope (client project)
+
+Copy into the user config. Do not commit these files into the client repo unless that project asked for the kit in git.
+
+```bash
+mkdir -p ~/.claude
+cp -a .claude/skills ~/.claude/skills
+cp -a .claude/agents ~/.claude/agents
+cp -a .claude/agent-assets ~/.claude/agent-assets
+```
+
+Append `.claude/CLAUDE.md` to `~/.claude/CLAUDE.md` if you want the kit instruction in every project. Do not overwrite an existing `~/.claude/CLAUDE.md`.
+
+Playbooks name project paths (`.claude/skills/…`). If that file is not in the repo, read the same path under `~/.claude/`. The generated `CLAUDE.md` says this.
+
+Onward commit style on a client repo writes `~/.claude/rules/draft-commit-style.md` or `draft-commit-gitlog.md` (user rules, loaded for every project). A repo that committed the kit writes `.claude/rules/` instead, same idea as Cursor’s `.cursor/rules/draft-commit-*.mdc`.
+
+The imported-sources check can write a transfer data policy into the repo after a yes. Cursor: `.cursor/rules/crav1-transfer-data-policy.mdc`. Claude Code project: `.claude/rules/crav1-transfer-data-policy.md`. It is once per repo. It is not a user rule. Delete that file to get the questions again. The template is in the add-to-spec skill assets.
+
+### Agents
+
+The Cursor `model: inherit` line is left out of the Claude Code copy, because Claude Code’s default is already the parent model ([subagents](https://code.claude.com/docs/en/sub-agents)). The three reviewers (`crav1-spec-reviewer-agent`, `crav1-review-architecture-agent`, `crav1-plan-reviewer-agent`) set `tools: Read, Grep, Glob` instead of Cursor `readonly: true`. The two writers omit `tools`, so they can edit.
+
+### Tried on Claude Code
+
+On Claude Code 2.1.286, in a private throwaway git repo, the generated `.claude/` drop-in ran `/crav1-spark-to-spec`, `/crav1-plan-from-spec`, one implement task, and `/crav1-verify-build-against-spec`. The trial feature was a root `hello.txt` of exactly the five bytes `68 65 6c 6c 6f`. Verify passed. Nothing from that repo was pushed. Two frictions: a PowerShell byte-dump that uses a script block was blocked by Claude Code’s permission check, and the same bytes were checked another way; the create-feature-branch skill wants a clean tree, and the branch was created with the kit files still untracked.
+
+## After install
+
+New to the loop? [First 15 minutes](first-run.md): open the product repo → `/crav1` → one starter option. A spark continues tighten → plan → one task.
+
+When you ask for startup options, these six are the only ways in. That ask names the list. It does not run a skill. It does not move work into a lane. Each starter still follows the rules it already has. Every other skill is a later skill.
+
+| Starter | When |
+| --- | --- |
+| `/crav1-spark-to-spec` | One or two sentences |
+| `/crav1-ideas-to-spec` | A pile of ideas and technical hunches |
+| `/crav1-bundle-to-specs` | Mixed files, or more than one v0 feature |
+| `/crav1-existing-to-specs` | Existing repos plus a dump to match |
+| `/crav1-existing-to-specs` | You name the repos. It runs only then |
+| `/crav1-read-environment` | You name the host. It runs only then |
+| `/crav1-fix-bug` | You name a real bug that already exists. It runs only then |
+
+1. Open a chat in the **product** repo. On Cursor that is Agent chat. On Claude Code, open a session in that repo.
+2. Type `/crav1` and pick one starter from the table. Brownfield spark, ideas, intake, and match expect a branch prompt (`feat/<slug>` or `spec/<slug>`). `/crav1-existing-to-specs` still runs only when you name the repos, and it does not start Specify, Plan, or Build. `/crav1-read-environment` still runs only when you name the host. Naming production, prod, or live stops. It reads every non-prod environment in one pass. A prod-only resource is shape and connections only, after one yes. SQL metadata and storage structure are optional after that, and only when you say yes. Look-inside never opens production. It does not start Specify, Plan, or Build. `/crav1-fix-bug` still runs only when you name a real bug. It is not a skill that runs because a repo is new, and it is not started automatically.
+3. Follow the command loop. Do not start in the host plan UI or by picking a stack. `/crav1-plan-from-spec` writes `plan.md` and `tasks.md`. Later skills, once specs already exist, include `/crav1-add-to-spec`, `/crav1-suggest-tests-for-code` for tests on one repo or one area of code that already exists, `/crav1-add-to-spec` for minutes, a transcript, an email, or a chat matched to those specs, `/crav1-show-or-ask-open-questions` to draft the open questions for a person, a spec, or a topic as a mail, an agenda, a chat message, or meeting questions, `/crav1-what-do-we-know-about-this` for one feature, slice, resource, or not-yet-feature, `/crav1-map-pipeline-environments` when the user names Azure DevOps, the org, and the project, `/crav1-ado-sync` for a Feature list from the landscape and the specs, `/crav1-ado-sync` to send picked candidates to Azure Boards, and `/crav1-ado-sync` to read those Features back onto the specs. Those are not starter options.
+
+`/crav1-build-tasks`, standalone `/crav1-build-tasks`, and `/crav1-build-features` **pause once** before the first worker, wait for `continue` / `click`, then remind you how to restore the previous gate when the run ends. On Cursor that gate is Approvals & Execution. On Claude Code it is the permission prompt (`/permissions`); the skill does not set a permission mode. Workers launched by those orchestrators do not pause again. The skill cannot change host settings for you.
+
+If this window is the **kit repo**, drop-in skills are already under `.cursor/` and `.claude/` — no extra install.
+
+## Keeping the kit updated
+
+In a consumer project that already has the command, run `/crav1-update-kit`. Optional `to vX.Y.Z`. With no version, the target is the latest published release tag. It will not take `main`, a branch, a commit, or an open pull request. It commits on the current branch only after a yes, and it does not push unless you say yes to that push in that run. Other branches stay on the old kit until you merge this branch into them. Say merge develop into the branch. Do not rebase.
+
+A Cursor plugin install, including one that auto-updates from a team marketplace, is not a commit in the product repo. The command compares the installed version with the latest release, tells you how to refresh or recopy, and still offers any project-file migration steps.
+
+**First jump, when the command is not installed yet.** Each GitHub release attaches `crav1-update-kit.py` (the same script the command runs). From 1.131.0 on, the release is created with that file attached, and `.github/workflows/kit-update-asset.yml` attaches it if the release was published without it. From the product repo:
+
+```bash
+curl -fsSL -o crav1-update-kit.py https://github.com/Crav1on/crav1-spec-kit/releases/latest/download/crav1-update-kit.py
+PYTHONUTF8=1 python3 -X utf8 crav1-update-kit.py detect
+```
+
+On Windows PowerShell 5.1, `curl` is an alias for `Invoke-WebRequest`, so the curl flags fail. On Windows, `python3` is often missing. Use `python` or `py`.
+
+```powershell
+Invoke-WebRequest -Uri https://github.com/Crav1on/crav1-spec-kit/releases/latest/download/crav1-update-kit.py -OutFile crav1-update-kit.py
+$env:PYTHONUTF8 = "1"
+python -X utf8 crav1-update-kit.py detect
+```
+
+Resolve a published tag, then plan and apply only after a yes. The script does not push. After that jump the command is on the branch, and the downloaded file can be deleted. A release older than 1.131.0 has no asset; copy the drop-in by hand from that tag, then use the command for the next jump.
+
+The manual copy still works when you want to do it yourself:
+
+| You installed with | Update by |
+| --- | --- |
+| Cursor drop-in copy | Copy the same `.cursor/` folders again from a newer kit; commit in the product repo |
+| Claude Code drop-in | Copy the same `.claude/` tree again (project) or into `~/.claude/` (user) |
+| Cursor team marketplace | Auto Refresh or Dashboard **Refresh**, then update/reinstall the plugin if Cursor asks |
+| Cursor local plugin | `scripts/sync-crav1-plugin.sh` in the kit, copy `plugins/crav1` to `~/.cursor/plugins/local/crav1`, reload |
+
+**Updating to 1.84.0 or later from an older kit:** run `/crav1-add-to-spec migrate-formats` once in each product repo that has specs. It rewrites every `spec.md` and `docs/system/repos.md` to the merge-safe formats (one `Synced at` line per repo and branch, plain-bullet open questions, and since 1.86.0 one Match `Branch:` line per branch; a repo already on 1.84.0 runs it again). It keeps every line, checks nothing was lost before it writes, and changes nothing on a second run. The same script runs without an agent. `<interpreter>` is `python` with `PYTHONUTF8=1` on Windows and `python3` elsewhere, as [Running a kit script](reference/running-scripts.md) says. Pass `-X utf8`. Cursor drop-in: `<interpreter> -X utf8 .cursor/skills/crav1/crav1-add-to-spec/scripts/merge_safe_migrate.py --dry-run`, then the same command without `--dry-run` (Claude Code: `.claude/skills/crav1-add-to-spec/scripts/`). Commit the result yourself.
+
+**Updating to 1.97.0 or later:** run `/crav1-add-to-spec migrate-formats` again in each specs repo that has PR notes or review-pr follow-ups notes. It gives every PR note its shared `## PR record` and moves each `review-pr-[<repo>-]<n>-follow-ups.md` into its PR note (one `Point` per bullet, text verbatim; the comment history by date; then the old file is deleted and links to it rewritten). The dry run prints a unified diff of every change and writes nothing; it writes only on your yes. It stops and leaves a note alone when anything would be lost (`LOST`, exit 2), and a second run changes nothing. Without an agent, from the specs repo root:
+
+```text
+<interpreter> -X utf8 .cursor/skills/crav1/crav1-add-to-spec/scripts/merge_safe_migrate.py --dry-run
+<interpreter> -X utf8 .cursor/skills/crav1/crav1-add-to-spec/scripts/merge_safe_migrate.py
+<interpreter> -X utf8 .cursor/skills/crav1/crav1-add-to-spec/scripts/merge_safe_migrate.py --check
+```
+
+Commit the result yourself.
+
+Kit maintainers: edit `.cursor/` first, run `scripts/sync-crav1-plugin.sh` (plugin mirror and `.claude/`). `scripts/sync-crav1-claude.sh --check` fails if `.claude/` is stale. Keep this file and `plugins/crav1/README.md` accurate. Rule: `.cursor/rules/kit-maintainer.mdc`.
+
+## Using the kit without “installing”
+
+Clone this repository and work in it. Commands work here because `.cursor/skills/crav1/` and `.claude/skills/` are already present. That is not an install into another product. Copy the host drop-in, or on Cursor install plugin `crav1`, when a product repo should get the same commands.
+
+## Clone
+
+```bash
+git clone https://github.com/Crav1on/crav1-spec-kit.git
+```
+
+The kit is at [https://github.com/Crav1on/crav1-spec-kit](https://github.com/Crav1on/crav1-spec-kit). Cloning this repository does not install the kit into another product. To use the commands there, copy the drop-in for that host (Cursor `.cursor/` or Claude Code `.claude/`) or, on Cursor, install plugin `crav1` from this repo (team marketplace import or a local plugin). See the sections above.
+
+## What to read next
+
+| Situation | Doc |
+| --- | --- |
+| Just installed; want install through one task | [first-run.md](first-run.md) |
+| Cursor plugin just installed, want the command order | [plugins/crav1/README.md](../plugins/crav1/README.md) |
+| Every other page: walkthroughs, reference, and concepts, by type and by reader | [Docs index](README.md) |

@@ -8,6 +8,8 @@
 
 Walk plan.md/tasks.md issues one by one (including [`/crav1-review-plan`](crav1-review-plan.md) P#s).
 
+1.202.0: `reviewed --items <file>` writes the open count the script computes. A hand-counted `--open` is not the path.
+
 1.180.0: with no plan issue left, Run next names [`/crav1-tasks-ready-to-build`](crav1-tasks-ready-to-build.md) <slug>`, never [`/crav1-build-tasks`](crav1-build-tasks.md); uncommitted files come first inside Run next as `Commit the <n> changed spec files:` above [`/crav1-finalize-commit`](crav1-finalize-commit.md).
 
 1.176.0: the empty queue ends with a Run next entry, its label above the command, no `Next:` line. A spec finding already patched, dropped or kept no longer sends you back to [`/crav1-tighten-spec`](crav1-tighten-spec.md).

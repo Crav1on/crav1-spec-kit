@@ -1,0 +1,22 @@
+# crav1-review-pr: re review
+
+Read only when the pointer in `SKILL.md` sends you here. Moved word for word from `SKILL.md` in 1.71.0; the rules are unchanged.
+
+## Re-review
+
+When the pull request already has an earlier review, this run is a re-review. Read the PR note's `## PR record` first (1.97.0; `crav1-add-to-spec` `references/pr-record.md`): its Points are the earlier findings, follow-ups and questions, with their statuses. Then read the earlier findings from the pull request's own review comments and threads, including the bullets of an earlier one-comment review (each link gives the path and lines) (read as `crav1-add-to-spec` `references/pr-threads.md` says, 1.97.0; skill `crav1-add-to-spec`, `references/pr-threads.md`. GitHub `gh api repos/<owner>/<repo>/pulls/<n>/comments` and `gh pr view <n> --json reviews,comments`; Azure DevOps `scripts/ado_threads.py list --pr <n>`, the one way (1.193.0). `az repos pr` has no thread command). Comments from anyone count, including ones this skill posted. When the PR note has a `## Comment as posted` section (1.67.0), the earlier points are the points of the newest one, after the record step. When the host has no earlier review comments, nothing was posted: the comment is a first-review comment with no `### Since last time`, and the chat goes through the newest `## Comment as drafted` section's points under `compared with the draft; nothing posted was found`. When there is no draft either, do a first review.
+
+**Lines from the current head (1.114.1).** Before any status, fetch the pull request's two branches again (the same fetch-only rule as a first review) and take the head commit the host reports now. Read every file and compute every line number from that commit, never from the PR record, the kit record, an earlier draft or the comment as posted: those keep the old lines. For each earlier point, find its code at the new head (the same line text, else the same function or block) and link the lines it is on now. When the code moved, link the new lines. When it cannot be found, the point is fixed or no longer relevant, not linked to its old lines. Name the head commit the links were read at in the chat.
+
+Go through each earlier finding, one line each, before the new findings:
+
+- **Fixed:** the code changed and the problem is gone. Name the commit that fixed it (short SHA); its Point becomes `done <short sha>`.
+- **Partly fixed:** some of it changed. Say what is left.
+- **Still open:** the problem is still there.
+- **No longer relevant:** the code was removed or rewritten so the finding no longer applies.
+
+A thread marked resolved whose problem is still there is flagged `resolved but still open`. Do not guess a status: when the diff does not settle it, say so.
+
+Status lines and thread replies follow [Comment style](../SKILL.md#comment-style): first person, friendly, varied, for example "Thanks, this looks sorted now in `abc1234`" or "I think there is still a little bit left here: …". A still-open finding is said softly, with the same information.
+
+In the comment, earlier points go under `### Since last time` and new points under the normal sections (`references/comment-layout.md` **Re-review**). `### Since last time` lists only points the reviewers saw. A new finding that matches a Point tagged `not posted` is shown in the chat with its mark and kept out of the comment unless the user says to include it (1.67.0). The ship-or-not rule counts still-open, partly-fixed, and new first-section findings.

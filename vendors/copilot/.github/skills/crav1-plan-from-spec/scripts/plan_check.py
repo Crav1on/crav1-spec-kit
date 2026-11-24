@@ -1,0 +1,811 @@
+#!/usr/bin/env python3
+"""Computed plan checks for /crav1-plan-from-spec and /crav1-tighten-plan (kit 1.159.0).
+
+The ordering, counts, finding queue, batch card and ending that both skills
+used to work out in prose are computed here. The skill prints the stdout
+as-is. It never adds, drops or rewrites a line, and never writes a second
+Next line.
+
+Commands:
+  order   --root <spec-folder>
+      Waves from the (after: ...) graph, the same sort the ready check uses
+      (skill crav1-tasks-ready-to-build, scripts/task_order.py). Lists a
+      loop, an after: that names no task, and a task line with no verify
+      kind or no (spec: ...) mark. Branches that wait for each other are a
+      Branch loop line with the fixes the ready check offers (1.161.0).
+  recap   --root <spec-folder> --branch <name> [--facts <file>] [--uncommitted <n>]
+      The plan-from-spec "After writing" output, in its fixed order, ending
+      with its one Next line. <file> is JSON with what only the agent can
+      know: built_pieces (list of {piece, choice}), branch_read,
+      security_unmapped (list), stale_checked (true once the research
+      section was read).
+  queue   --items <file> [--root <spec-folder>] [--went-on-without-linter] [--uncommitted <n>]
+      The tighten-plan index (remaining P# titles, current marked, plan or
+      spec), the finding counts, and, when no plan P# is open, the one
+      empty-queue Next line.
+  batch   --items <file> [--title <text>]
+      The findings table and its Card: line for every open plan P#, built
+      by batch_offer.py in this same reply. No open plan P#, no card.
+  lint    --root <spec-folder>
+      Rule checks the reviewer should not have to find (1.196.0). Prod
+      verify: a task's (verify: ...) note that names prod must be read-only
+      (health, version, config, existence). Any other prod verify is flagged:
+      verify runs on DEV/TEST, and a prod-write check is its own task marked
+      prod-write with an owner: and a Risks line in plan.md naming its T#.
+  open-count --review <file>
+      Prints `open: <n>`, the number of distinct P# lines in the reviewer's
+      reply (1.202.0). The walk writes that number. It does not count.
+  reviewed --root <spec-folder> (--open <n> | --items <file>) [--write]
+      Lowers P# open on the Reviewed line, keeping the date. No line, none added.
+      With --items, housekeeping rows are not counted (1.197.0). Prefer --items.
+
+<file> for queue and batch is JSON: a list of objects with id, issue,
+tag (plan or spec), status (open, patched, dropped, skipped, kept), and, for
+spec findings, kind (defect or question). Batch rows also need options and
+recommendation. One row may have "current": true. A plan row whose fix adds,
+removes or reorders tasks sets "changes_tasks": true; batch leaves it out of
+the card (its own card), and a card holds at most 8 rows (1.195.0). A row with
+"housekeeping": true (or trace, mark, merged-state, stale-risk, linter,
+build-map) is applied with no card and listed on one line (1.196.0).
+
+Usage: <interpreter> -X utf8 scripts/plan_check.py <command> ...
+On Windows the interpreter is python. Elsewhere python3, then py -3.
+Standard library only. Exit 0 on success, 2 on a missing file or bad input.
+"""
+from __future__ import annotations
+
+import argparse
+import importlib.util
+import json
+import re
+import sys
+from pathlib import Path
+
+sys.dont_write_bytecode = True
+
+
+def _utf8_stdout() -> None:
+    reconfigure = getattr(sys.stdout, "reconfigure", None)
+    if not callable(reconfigure):
+        return
+    try:
+        reconfigure(encoding="utf-8")
+    except (AttributeError, OSError, ValueError):
+        return
+
+
+_utf8_stdout()
+
+
+class PlanCheckError(Exception):
+    """Input that cannot be checked. One line on stderr, exit 2."""
+
+
+def _sibling(skill: str, name: str) -> Path:
+    here = Path(__file__).resolve().parent
+    # <skills>/<this-skill>/scripts -> <skills>/<skill>/scripts/<name>
+    for base in (here.parent.parent, here.parent.parent.parent):
+        candidate = base / skill / "scripts" / name
+        if candidate.is_file():
+            return candidate
+    raise PlanCheckError(f"{name} was not found in {skill}/scripts")
+
+
+def _load(skill: str, name: str, alias: str):
+    path = _sibling(skill, name)
+    spec = importlib.util.spec_from_file_location(alias, path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def _task_order():
+    return _load("crav1-tasks-ready-to-build", "task_order.py", "plan_check_task_order")
+
+
+def _build_map():
+    return _load("crav1-tasks-ready-to-build", "build_map.py", "plan_check_build_map")
+
+
+def branch_loop_lines(root: Path, tasks_text: str) -> list[str]:
+    """Branches that wait for each other, with the fix the ready check offers (1.161.0).
+
+    The same judgement as the build map: a loop between branches, not only
+    between tasks. Each fix is one candidate plan issue, applied on the
+    batch yes with walk_progress.py fix-loop.
+    """
+    try:
+        bm = _build_map()
+        built = bm.build(root.name, _read(root / "spec.md"), _read(root / "plan.md") if (root / "plan.md").is_file() else None,
+                         tasks_text, repo=None)
+    except PlanCheckError:
+        return []
+    lines: list[str] = []
+    for row in built.get("loops") or []:
+        lines.append("- Branch loop: " + row["line"][len("Loop: "):])
+        fixes = row.get("fixes") or []
+        if not fixes:
+            lines.append("  - No single change breaks it. Ask which wait should go.")
+        for index, fix in enumerate(fixes):
+            head = "Recommended fix" if index == 0 else "Other fix"
+            lines.append(
+                f"  - {head} {fix['number']} (fix-loop): {fix['detail']} Why: {fix['why']} "
+                f"Apply on the batch yes: walk_progress.py fix-loop --root {root.as_posix()} --pick {fix['number']} --yes"
+            )
+    return lines
+
+
+def _batch_offer():
+    return _load("crav1-tighten-plan", "batch_offer.py", "plan_check_batch_offer")
+
+
+def _read(path: Path) -> str:
+    try:
+        return path.read_text(encoding="utf-8")
+    except FileNotFoundError:
+        return ""
+    except OSError as exc:
+        raise PlanCheckError(f"cannot read {path}: {exc.strerror or exc}") from exc
+
+
+def _root(value: str) -> Path:
+    root = Path(value)
+    if not root.is_dir():
+        raise PlanCheckError(f"spec folder not found: {root}")
+    return root
+
+
+def section(text: str, heading: str) -> str:
+    """Body of `## <heading>` (case-insensitive prefix match), up to the next `## `."""
+    out: list[str] = []
+    inside = False
+    for line in text.splitlines():
+        if line.startswith("## "):
+            if inside:
+                break
+            inside = line[3:].strip().lower().startswith(heading.lower())
+            continue
+        if inside:
+            out.append(line)
+    return "\n".join(out).strip()
+
+
+def has_section(text: str, heading: str) -> bool:
+    return any(line.startswith("## ") and line[3:].strip().lower().startswith(heading.lower())
+               for line in text.splitlines())
+
+
+# ---------- order ----------
+
+KINDS = ("unit", "system", "browser", "integration", "contract", "load", "speed",
+         "accessibility", "golden", "property", "manual")
+TASK_LINE = re.compile(r"^\s*-\s*\[( |x|X)\]\s*T(\d+)\s*:\s*(.*)$")
+VERIFY = re.compile(r"\(verify:\s*([^)]*)\)", re.I)
+
+
+def waves(tasks: list[dict]) -> tuple[list[list[int]], set[int]]:
+    """Waves over every task, done or not. Wave 1 waits on nothing. Loop members are left out."""
+    ids = {t["id"] for t in tasks}
+    deps = {t["id"]: [d for d in t["deps"] if d in ids] for t in tasks}
+    wave: dict[int, int] = {}
+    remaining = set(ids)
+    level = 0
+    while remaining:
+        layer = sorted(i for i in remaining if all(d in wave for d in deps[i]))
+        if not layer:
+            break
+        for i in layer:
+            wave[i] = level
+        remaining -= set(layer)
+        level += 1
+    out: list[list[int]] = []
+    for i, w in sorted(wave.items(), key=lambda kv: (kv[1], kv[0])):
+        while len(out) <= w:
+            out.append([])
+        out[w].append(i)
+    return out, remaining
+
+
+def line_problems(text: str) -> list[str]:
+    problems: list[str] = []
+    for line in text.splitlines():
+        m = TASK_LINE.match(line)
+        if not m:
+            continue
+        tid, rest = f"T{m.group(2)}", m.group(3)
+        setup = "(host setup)" in rest.lower() or "manual" in rest.lower()
+        verify = VERIFY.search(rest)
+        if not verify:
+            if not setup:
+                problems.append(f"{tid} has no verify note")
+        else:
+            head = re.split(r"\s+[—–-]\s+|:", verify.group(1).strip(), maxsplit=1)[0].strip().lower()
+            words = re.findall(r"[a-z]+", head)
+            if not setup and not any(w in KINDS for w in words):
+                problems.append(f"{tid} verify note names no kind")
+        if not re.search(r"\(spec:\s*[^)]+\)", rest, re.I):
+            problems.append(f"{tid} has no (spec: ...) mark")
+    return problems
+
+
+def order_lines(root: Path) -> list[str]:
+    text = _read(root / "tasks.md")
+    if not text.strip():
+        raise PlanCheckError(f"tasks.md not found: {root / 'tasks.md'}")
+    to = _task_order()
+    tasks = to.parse(text)
+    ids = {t["id"] for t in tasks}
+    layers, looped = waves(tasks)
+    lines = ["Order (dependency waves; a task in one wave can start together with the others in it):"]
+    for n, layer in enumerate(layers, start=1):
+        lines.append(f"- Wave {n}: " + ", ".join(f"T{i}" for i in layer))
+    cycles = to._cycles(ids, {t["id"]: t["deps"] for t in tasks}) if tasks else {}
+    seen: set[tuple[int, ...]] = set()
+    for tid in sorted(cycles):
+        path = tuple(cycles[tid])
+        key = tuple(sorted(set(path)))
+        if key in seen:
+            continue
+        seen.add(key)
+        lines.append("- Loop: " + " → ".join(f"T{x}" for x in path) + ". Fix one (after: ...) mark.")
+    lines.extend(branch_loop_lines(root, text))
+    leftover = sorted(looped - set(cycles))
+    if leftover:
+        lines.append("- Waits on a loop: " + ", ".join(f"T{i}" for i in leftover))
+    for t in tasks:
+        missing = [d for d in t["deps"] if d not in ids]
+        if missing and t["recorded"]:
+            lines.append(f"- T{t['id']}: after: " + ", ".join(f"T{x}" for x in missing) + " names no task")
+    inferred = [t["id"] for t in tasks if not t["recorded"] and t["deps"]]
+    if inferred:
+        lines.append("- Inferred from file order (no after: mark): " + ", ".join(f"T{i}" for i in inferred))
+    return lines
+
+
+# ---------- recap (plan-from-spec After writing) ----------
+
+def _norm(text: str) -> str:
+    text = re.sub(r"[`*_]", "", text.lower())
+    text = re.sub(r"^\s*-\s*(\[[ xX]\]\s*)?", "", text)
+    return re.sub(r"[^a-z0-9]+", " ", text).strip()
+
+
+def acceptance_lines(spec: str) -> list[str]:
+    out = []
+    for line in section(spec, "Acceptance").splitlines():
+        if re.match(r"^\s*-\s", line):
+            body = re.sub(r"^\s*-\s*(\[[ xX]\]\s*)?", "", line).strip()
+            if body:
+                out.append(body)
+    return out
+
+
+def trace_rows(plan: str) -> list[tuple[str, str]]:
+    body = section(plan, "Trace") or section(plan, "Requirements trace")
+    rows = []
+    for line in body.splitlines():
+        line = line.strip()
+        if not line.startswith("|"):
+            continue
+        cells = [c.strip() for c in line.strip("|").split("|")]
+        if len(cells) < 2 or set(cells[0]) <= set("-: ") or cells[0].lower().startswith("acceptance"):
+            continue
+        rows.append((cells[0], cells[1]))
+    return rows
+
+
+def _ids(text: str) -> set[str]:
+    return set(re.findall(r"\b(?:REQ|AC|A)-?\d+\b", text, re.I))
+
+
+# The match is by wording only, so a reworded line can be listed when a task
+# does cover it. The note tells the agent to compare by meaning first.
+ACCEPTANCE_HEAD = "Check these acceptance lines, no task matched their wording: "
+ACCEPTANCE_NOTE = (" (compare each by meaning with the trace table and tasks first. A line a task covers needs"
+                   " only its trace row or (spec: ...) mark. A line nothing covers is missing: the plan is not done"
+                   " until it has a task, already there, or left as committed)")
+
+
+def untraced(spec: str, plan: str, tasks_text: str) -> list[str]:
+    rows = trace_rows(plan)
+    marks = [m.group(1) for m in re.finditer(r"\(spec:\s*([^)]+)\)", tasks_text, re.I)]
+    covered: list[str] = []
+    for key, tasks in rows:
+        cell = tasks.lower()
+        if re.search(r"\bT\d+\b", tasks, re.I) or "already there" in cell or "left as committed" in cell or "covered by" in cell:
+            covered.append(key)
+    covered += marks
+    keys = [_norm(k) for k in covered if _norm(k)]
+    idsets = [_ids(k) for k in covered]
+    missing = []
+    for line in acceptance_lines(spec):
+        n = _norm(line)
+        if not n:
+            continue
+        if any(k in n or n in k for k in keys):
+            continue
+        if any(_ids(line) & ids for ids in idsets if ids):
+            continue
+        head = " ".join(n.split()[:4])
+        if any(head and head in k for k in keys):
+            continue
+        missing.append(line)
+    return missing
+
+
+def trace_problems(plan: str, tasks_text: str) -> list[str]:
+    known = {f"T{m.group(2)}" for m in map(TASK_LINE.match, tasks_text.splitlines()) if m}
+    out = []
+    for key, tasks in trace_rows(plan):
+        for tid in re.findall(r"\bT\d+\b", tasks):
+            if tid not in known:
+                out.append(f"Trace row {key!r} names {tid}, which is not in tasks.md")
+    return out
+
+
+def open_questions(spec: str) -> list[str]:
+    """Each kept-open question with its Blocks line, one line each."""
+    out: list[str] = []
+    current = None
+    blocks = None
+    for line in section(spec, "Open questions").splitlines():
+        top = re.match(r"^-\s+(.*\S)", line)
+        sub = re.match(r"^\s+-\s+Blocks:\s*(.*\S)", line)
+        if top:
+            if current:
+                out.append(current + (f" Blocks: {blocks}" if blocks else " No Blocks line."))
+            current, blocks = top.group(1), None
+        elif sub and current:
+            blocks = sub.group(1)
+    if current:
+        out.append(current + (f" Blocks: {blocks}" if blocks else " No Blocks line."))
+    return [q for q in out if not q.lower().startswith(("none", "resolved"))]
+
+
+def approval_items(spec: str) -> list[str]:
+    out: list[str] = []
+    item = None
+    extra: list[str] = []
+    for line in section(spec, "Approval needed").splitlines():
+        top = re.match(r"^-\s+(.*\S)", line)
+        sub = re.match(r"^\s+-\s+(Person|Holds|Approved):\s*(.*\S)", line)
+        if top:
+            if item:
+                out.append(item + (" (" + "; ".join(extra) + ")" if extra else ""))
+            item, extra = top.group(1), []
+        elif sub and item:
+            extra.append(f"{sub.group(1)}: {sub.group(2)}")
+    if item:
+        out.append(item + (" (" + "; ".join(extra) + ")" if extra else ""))
+    return out
+
+
+def stale_lines(spec: str) -> list[str]:
+    return [l.strip("- ").strip() for l in section(spec, "Research findings").splitlines() if "stale since" in l.lower()]
+
+
+NO_LINTER = re.compile(r"\b(no|none|not have|has no|lacks|without)\b[^.]*\b(linter|checker|lint)\b|^\W*none\W*$", re.I)
+# 1.176.0: a "No linter ... for <subset>" line is partial. When another line
+# names a tool, or going on without one is recorded, the linter is named.
+WENT_ON = re.compile(r"\bgo(?:es|ing)? on without (?:one|a linter|it)\b|\bwent on without\b", re.I)
+
+
+def linter_line(plan: str) -> tuple[str, bool]:
+    """(text, named). named is False when the section is missing, empty, or says there is none."""
+    body = section(plan, "Linter")
+    lines = [l.strip("- ").strip() for l in body.splitlines() if l.strip("- ").strip()]
+    text = " ".join(lines)
+    if not text:
+        return ("", False)
+    if WENT_ON.search(text):
+        return (text, True)
+    if any(not NO_LINTER.search(line) for line in lines):
+        return (text, True)
+    return (text, False)
+
+
+def run_next(label: str, command: str) -> str:
+    """Run next with the label on its own line above the command (1.176.0)."""
+    return f"Run next:\n\n{label}\n`{command}`"
+
+
+def recap(root: Path, branch: str, facts: dict, uncommitted: int | None) -> str:
+    spec, plan, tasks_text = (_read(root / n) for n in ("spec.md", "plan.md", "tasks.md"))
+    if not plan.strip() or not tasks_text.strip():
+        raise PlanCheckError("plan.md and tasks.md must be written before the recap")
+    slug = root.name
+    rel = f"docs/specs/{slug}"
+    written = [f"{rel}/plan.md", f"{rel}/tasks.md"]
+    for name in ("design.md", "tasks.md"):
+        if (root / "export/openspec" / name).is_file():
+            written.append(f"{rel}/export/openspec/{name}")
+    task_ids = [m.group(2) for m in map(TASK_LINE.match, tasks_text.splitlines()) if m]
+    out = ["Written: " + ", ".join(written)]
+    missing = untraced(spec, plan, tasks_text)
+    out.append(f"Tasks: {len(task_ids)}. {ACCEPTANCE_HEAD}" + ("none" if not missing else "; ".join(missing) + ACCEPTANCE_NOTE))
+    out += order_lines(root)
+    for piece in facts.get("built_pieces") or []:
+        out.append(f"Built piece: {piece.get('piece')}: {piece.get('choice')}")
+    if facts.get("branch_read"):
+        out.append(f"Branch read: {facts['branch_read']}")
+    problems = line_problems(tasks_text) + trace_problems(plan, tasks_text)
+    out.append("Verify notes with no kind, and other task-line gaps: " + ("none" if not problems else "; ".join(problems)))
+    security = facts.get("security_unmapped") or []
+    out.append("Kept security checks with no task: " + ("none" if not security else "; ".join(security)))
+    questions = open_questions(spec)
+    out.append("Kept-open questions parked as risks:" + (" none" if not questions else ""))
+    out += [f"- {q}" for q in questions]
+    items = approval_items(spec)
+    if items:
+        out.append("Approval needed:")
+        out += [f"- {i}" for i in items]
+    stale = stale_lines(spec)
+    out.append("Stale research under Risks: " + ("none was marked stale" if not stale else "; ".join(stale)))
+    out.append("These notes name the checks. /crav1-verify-build-against-spec is the gate that says they passed.")
+    text, named = linter_line(plan)
+    out.append("Linter: " + (text if text else "not stated yet"))
+    out.append("")
+    if branch.strip() == f"spec/{slug}":
+        out.append(run_next("Open the pull request, since this specify-only branch is not on the default branch yet:",
+                            f"/crav1-open-pr {slug}"))
+    else:
+        out.append(run_next("Review the plan, which is written and not reviewed yet:", f"/crav1-review-plan {slug}"))
+        if not named:
+            out.append("")
+            out.append("Build is not named until you add a linter or choose to go on without one.")
+    if uncommitted:
+        out.append("")
+        out.append(f"Uncommitted: {uncommitted} files; commit with `/crav1-finalize-commit` when ready.")
+    return "\n".join(out) + "\n"
+
+
+# ---------- queue (tighten-plan) ----------
+
+DONE = {"patched", "dropped", "kept", "skipped", "done", "sent"}
+# A spec finding skipped or sent in the plan walk still waits on the spec;
+# one patched, dropped or kept is settled and sends nobody back (1.176.0).
+SPEC_DONE = {"patched", "dropped", "kept", "done"}
+
+
+def _items(path: str) -> list[dict]:
+    try:
+        data = json.loads(Path(path).read_text(encoding="utf-8"))
+    except OSError as exc:
+        raise PlanCheckError(f"cannot read items file: {exc.strerror or exc}") from exc
+    except json.JSONDecodeError as exc:
+        raise PlanCheckError(f"items file is not JSON: {exc.msg}") from exc
+    if isinstance(data, dict):
+        data = data.get("items")
+    if not isinstance(data, list):
+        raise PlanCheckError("items file must be a JSON list of findings")
+    seen = set()
+    for item in data:
+        if not isinstance(item, dict) or not item.get("id") or not item.get("issue"):
+            raise PlanCheckError("each finding needs id and issue")
+        if item["id"] in seen:
+            raise PlanCheckError(f"duplicate id {item['id']}")
+        seen.add(item["id"])
+        tag = str(item.get("tag", "plan")).lower()
+        if tag not in ("plan", "spec"):
+            raise PlanCheckError(f"{item['id']}: tag is plan or spec")
+        item["tag"] = tag
+        item["status"] = str(item.get("status", "open")).lower()
+    return sorted(data, key=lambda i: (int(re.sub(r"\D", "", str(i["id"])) or 0), str(i["id"])))
+
+
+def empty_queue_next(items: list[dict], linter_named: bool, went_on: bool, slug: str | None = None,
+                     uncommitted: int | None = None) -> str:
+    """Run next once no plan finding is open (1.176.0: open spec findings only).
+
+    1.180.0 (M6): with the plan issues done, the next step is the ready
+    check, never /crav1-build-tasks: it knows about reopened steps, held
+    tasks and the first ready branch. Uncommitted files are committed first,
+    inside Run next.
+    """
+    spec = [i for i in items if i["tag"] == "spec" and i.get("status", "open") not in SPEC_DONE]
+    tail = f" {slug}" if slug else ""
+    if any(str(i.get("kind", "defect")).lower() != "question" for i in spec):
+        return run_next("Fix the spec finding, which is a spec defect:", f"/crav1-tighten-spec{tail}")
+    if spec:
+        return run_next("Resolve the spec finding, which is an open question:", f"/crav1-resolve-open-questions{tail}")
+    if linter_named or went_on:
+        check = f"/crav1-tasks-ready-to-build{tail}"
+        if uncommitted:
+            noun = "file" if uncommitted == 1 else "files"
+            return (f"Run next:\n\nCommit the {uncommitted} changed spec {noun}:\n`/crav1-finalize-commit`\n"
+                    f"Then check what can be built, since the plan issues are done:\n`{check}`")
+        return run_next("Check what can be built, since the plan issues are done:", check)
+    return "Nothing needed now."
+
+
+def queue(items: list[dict], root: Path | None, went_on: bool, uncommitted: int | None) -> str:
+    open_plan = [i for i in items if i["tag"] == "plan" and i["status"] not in DONE]
+    open_spec = [i for i in items if i["tag"] == "spec" and i["status"] not in DONE]
+    current = next((i["id"] for i in open_plan if i.get("current")), open_plan[0]["id"] if open_plan else None)
+    out: list[str] = []
+    plan_n = sum(1 for i in items if i["tag"] == "plan")
+    counts = {s: sum(1 for i in items if i["status"] == s) for s in ("patched", "dropped", "kept", "skipped")}
+    tail = ", ".join(f"{n} {s}" for s, n in counts.items() if n)
+    out.append(f"Findings: {len(items)} ({plan_n} plan, {len(items) - plan_n} spec). "
+               f"Open: {len(open_plan)} plan, {len(open_spec)} spec" + (f". Done: {tail}." if tail else "."))
+    remaining = open_plan + open_spec
+    if remaining:
+        out.append("Remaining:")
+        for i in remaining:
+            mark = " ← current" if i["id"] == current else ""
+            if i["tag"] == "plan":
+                note = "plan"
+            elif str(i.get("kind", "defect")).lower() == "question":
+                note = "spec, skipped for plan: /crav1-resolve-open-questions"
+            else:
+                note = "spec, skipped for plan: /crav1-tighten-spec"
+            out.append(f"- {i['id']} {' '.join(str(i['issue']).split())} ({note}){mark}")
+    if not open_plan:
+        named = False
+        if root is not None:
+            named = linter_line(_read(root / "plan.md"))[1]
+        if not remaining:
+            out.append("No plan issues remain.")
+        out.append("")
+        nxt = empty_queue_next(items, named, went_on, root.name if root is not None else None, uncommitted)
+        out.append(nxt)
+        if uncommitted and "/crav1-finalize-commit" not in nxt:
+            out.append(f"Uncommitted: {uncommitted} files; commit with `/crav1-finalize-commit` when ready.")
+    return "\n".join(out) + "\n"
+
+
+BATCH_CAP = 8
+HOUSEKEEPING = ("trace", "mark", "merged-state", "stale-risk", "linter", "build-map")
+
+
+def _housekeeping(item: dict) -> bool:
+    """Housekeeping fixes auto-apply with no card (1.196.0): Trace rows, marks, merged-state
+    wording, stale Risks, the Linter line, the build-map refresh."""
+    value = str(item.get("housekeeping", "")).lower()
+    return value in ("true", "1", "yes") or value in HOUSEKEEPING
+
+
+def _changes_tasks(item: dict) -> bool:
+    """A finding whose fix adds, removes or reorders tasks (1.195.0)."""
+    return str(item.get("changes_tasks", "")).lower() in ("true", "1", "yes")
+
+
+def batch(items: list[dict], title: str) -> str:
+    """At most 8 rows per card; task add/remove/reorder rows get their own card each (1.195.0)."""
+    open_rows = [i for i in items if i["tag"] == "plan" and i["status"] not in DONE]
+    chores = [i for i in open_rows if _housekeeping(i) and not _changes_tasks(i)]
+    open_rows = [i for i in open_rows if i not in chores]
+    # 1.197.0: "Applying", since the line is printed before the edits.
+    chores_line = ("Applying with no card (housekeeping): "
+                   + "; ".join(f"{i['id']} {' '.join(str(i.get('issue', '')).split())}" for i in chores) + ".\n") if chores else ""
+    own = [i["id"] for i in open_rows if _changes_tasks(i)]
+    batchable = [i for i in open_rows if not _changes_tasks(i)]
+    later = [i["id"] for i in batchable[BATCH_CAP:]]
+    rows = [{k: i.get(k, "") for k in ("id", "issue", "options", "recommendation")}
+            for i in batchable[:BATCH_CAP]]
+    if not rows:
+        if chores and not own:
+            return chores_line
+        if own:
+            return chores_line + ("No batch card: each of these adds, removes or reorders tasks, so each gets its own card: "
+                    + ", ".join(own) + ".\n")
+        raise PlanCheckError("no open plan P#, so there is no batch card")
+    bo = _batch_offer()
+    try:
+        text = bo.offer(title, rows)
+    except bo.BatchOfferError as exc:
+        raise PlanCheckError(str(exc)) from exc
+    text = chores_line + text if chores_line else text
+    if own:
+        text += "Not in this batch, each gets its own card (adds, removes or reorders tasks): " + ", ".join(own) + ".\n"
+    if later:
+        text += f"Not in this batch (at most {BATCH_CAP} per card), in the next card: " + ", ".join(later) + ".\n"
+    return text
+
+
+PROD = re.compile(r"\b(?:prod|production|prd)\b", re.I)
+PROD_READ = re.compile(r"\b(?:health|healthcheck|version|config|configuration|exist|exists|existence|read-only|"
+                       r"read only|smoke read|get|list|show|ping)\b", re.I)
+PROD_WRITE = re.compile(r"\b(?:write|writes|create|creates|post|put|delete|deletes|insert|update|send|sends|publish|"
+                        r"trigger|run the job|load|import|submit|change|migrate|seed|drop|drops|alter|truncate|purge)\b", re.I)
+# 1.197.0: judge each verify item and its target, not a "prod" substring.
+LINT_TASK = re.compile(r"^\s*-\s*\[( |x|X)\]\s*T(\d+)\b\s*:?\s*(.*)$")
+FILE_NAME = re.compile(r"\S+\.(?:bicepparam|bicep|json|ya?ml|tf|tfvars|env|ps1|sh|py|sql|md)\b", re.I)
+PROD_LIKE = re.compile(r"\b(?:prod|production|prd)-(?:like|style|shaped|sized)\b", re.I)
+PROD_TARGET = re.compile(
+    r"\b(?:on|in|against|to|into)\s+(?:the\s+)?(?:prod|production|prd)\b"
+    r"|\b(?:prod|production|prd)\s+(?:stage|environment|env|slot|subscription|resource group|database|db|tables?)\b"
+    r"|\b[\w-]+-(?:prod|prd)\b", re.I)
+DEV_TARGET = re.compile(r"\b(?:dev|test|tst|qa|staging|local|locally)\b|\b[\w-]+-(?:dev|test)\b", re.I)
+EXEMPT_ITEM = re.compile(r"^\s*(?:unit|contract|integration)\b|\b(?:compiles?|build-params|bicep build|lint|"
+                         r"what-if|dry-run|unit tests?)\b", re.I)
+MANUAL_PROD = re.compile(r"\(manual,\s*(?:prod|production|prd)\b", re.I)
+
+
+def _clean(text: str) -> str:
+    return PROD_LIKE.sub(" ", FILE_NAME.sub(" ", text))
+
+
+def _env_is_prod(note: str) -> bool:
+    """The note's mode/environment part, before the first ';': a comma part that is or starts with prod."""
+    head = note.split(";", 1)[0]
+    return any(re.match(r"(?:prod|production|prd)\b", part.strip(), re.I) for part in head.split(","))
+
+
+def prod_write_items(note: str) -> list[str]:
+    """The verify items that write to prod: target prod (named or the note's environment), not
+    exempt (unit, contract, local compile), and with a write verb."""
+    note = _clean(note)
+    env_prod = _env_is_prod(note)
+    hits = []
+    for item in note.split(";"):
+        text = item.strip()
+        if not text or EXEMPT_ITEM.search(text):
+            continue
+        targets_prod = bool(PROD_TARGET.search(text)) or (env_prod and not DEV_TARGET.search(text))
+        if targets_prod and PROD_WRITE.search(text):
+            hits.append(" ".join(text.split()))
+    return hits
+
+
+def _risk_names(risks: str, tid: str) -> bool:
+    return re.search(rf"\b{tid}\b", risks) is not None
+
+
+def lint_lines(root: Path) -> list[str]:
+    """Prod verify rule (1.196.0, per item and target since 1.197.0). One line per problem, then a count."""
+    tasks = _read(root / "tasks.md")
+    plan = (root / "plan.md").read_text(encoding="utf-8") if (root / "plan.md").is_file() else ""
+    risks = plan.split("## Risks", 1)[1] if "## Risks" in plan else ""
+    risks = re.split(r"\n## ", risks, maxsplit=1)[0]
+    out = []
+    for line in tasks.splitlines():
+        m = LINT_TASK.match(line)
+        if not m:
+            continue
+        tid = f"T{m.group(2)}"
+        owner = "owner:" in line.lower()
+        for note in VERIFY.findall(line):
+            if "prod-write" in note.lower():
+                missing = [w for w, ok in (("an owner:", "owner:" in note.lower()),
+                                           ("a Risks line", _risk_names(risks, tid))) if not ok]
+                if missing:
+                    out.append(f"Prod write: {tid} is a prod-write check without " + " and ".join(missing)
+                               + ". It needs an owner, the user's yes and a Risks line.")
+                continue
+            items = prod_write_items(note)
+            if items:
+                out.append(f"Prod verify: {tid} verifies on prod with more than a read ({'; '.join(items)}). "
+                           "Recommend: verify on DEV/TEST, keep only a read-only prod check (health, version, config, "
+                           "existence), and make any prod write its own prod-write task with an owner, a yes and a Risks line.")
+        # 1.197.0: a manual prod task's own text is a prod write when it drops, deletes or changes data.
+        if MANUAL_PROD.search(line):
+            body = VERIFY.sub(" ", _clean(line))
+            if PROD_WRITE.search(re.sub(r"\(manual,[^)]*\)", " ", body)):
+                missing = [w for w, ok in (("an owner:", owner), ("a Risks line", _risk_names(risks, tid))) if not ok]
+                if missing:
+                    out.append(f"Prod write: {tid} is a manual prod task that writes to prod without "
+                               + " and ".join(missing) + ". It needs an owner, the user's yes and a Risks line.")
+    out.append(f"Lint: {len(out)} problem{'s' if len(out) != 1 else ''}.")
+    return out
+
+
+REVIEWED = re.compile(r"^(Reviewed:\s*[^,\n]+,\s*P#\s*open:\s*)(\d+)\s*$", re.M)
+P_FINDING = re.compile(r"(?m)^[ \t]*(?:[-*][ \t]+)?`?(P\d+)\b")
+
+
+def open_findings(text: str) -> int:
+    """How many distinct P# findings a review lists (1.202.0).
+
+    The walk uses this number for `P# open`. It does not count the lines itself.
+    """
+    return len(set(P_FINDING.findall(text or "")))
+
+
+def open_for_review(items: list[dict]) -> int:
+    """Open plan P# for the Reviewed line: housekeeping rows never count (1.197.0)."""
+    return len([i for i in items if i["tag"] == "plan" and i["status"] not in DONE and not _housekeeping(i)])
+
+
+def reviewed(root: Path, open_n: int, write: bool) -> str:
+    path = root / "plan.md"
+    text = _read(path)
+    m = REVIEWED.search(text)
+    if not m:
+        return "Reviewed line: none in plan.md, none added.\n"
+    old = int(m.group(2))
+    if open_n < 0:
+        raise PlanCheckError("--open is 0 or more")
+    new_text = text[: m.start(2)] + str(open_n) + text[m.end(2):]
+    if write and new_text != text:
+        path.write_text(new_text, encoding="utf-8")
+    verb = "now" if write else "would be"
+    return f"Reviewed line: P# open {old} {verb} {open_n}, date kept.\n"
+
+
+def _bind_vendor(argv):
+    """1.201.0: --vendor codex prints $crav1- commands. The default stays /."""
+    source = sys.argv[1:] if argv is None else argv
+    if "--vendor" not in source and not any(str(item).startswith("--vendor=") for item in source):
+        return argv
+    path = Path(__file__).resolve().parents[2] / "crav1-update-kit" / "scripts" / "vendor_prefix.py"
+    if not path.is_file():
+        print("Refused: --vendor needs the vendor table.", file=sys.stderr)
+        raise SystemExit(2)
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("crav1_vendor_prefix", path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod.install_from_argv(argv)
+
+
+def main(argv: list[str] | None = None) -> int:
+    argv = _bind_vendor(argv)
+    parser = argparse.ArgumentParser(description="Computed plan checks (1.159.0).")
+    sub = parser.add_subparsers(dest="command", required=True)
+    p = sub.add_parser("order")
+    p.add_argument("--root", required=True)
+    p = sub.add_parser("recap")
+    p.add_argument("--root", required=True)
+    p.add_argument("--branch", required=True)
+    p.add_argument("--facts")
+    p.add_argument("--uncommitted", type=int)
+    p = sub.add_parser("queue")
+    p.add_argument("--items", required=True)
+    p.add_argument("--root")
+    p.add_argument("--went-on-without-linter", action="store_true")
+    p.add_argument("--uncommitted", type=int)
+    p = sub.add_parser("batch")
+    p.add_argument("--items", required=True)
+    p.add_argument("--title", default="Tighten-plan batch")
+    p = sub.add_parser("lint")
+    p.add_argument("--root", required=True)
+    p = sub.add_parser("open-count")
+    p.add_argument("--review", required=True, help="the reviewer's reply; prints open: <n>")
+    p = sub.add_parser("reviewed")
+    p.add_argument("--root", required=True)
+    p.add_argument("--open", type=int, help="open plan P#; prefer --items so the script counts")
+    p.add_argument("--items")
+    p.add_argument("--write", action="store_true")
+    args = parser.parse_args(argv)
+    try:
+        if args.command == "order":
+            text = "\n".join(order_lines(_root(args.root))) + "\n"
+        elif args.command == "recap":
+            facts = {}
+            if args.facts:
+                try:
+                    facts = json.loads(Path(args.facts).read_text(encoding="utf-8"))
+                except (OSError, json.JSONDecodeError) as exc:
+                    raise PlanCheckError(f"facts file: {exc}") from exc
+            text = recap(_root(args.root), args.branch, facts, args.uncommitted)
+        elif args.command == "queue":
+            text = queue(_items(args.items), _root(args.root) if args.root else None,
+                         args.went_on_without_linter, args.uncommitted)
+        elif args.command == "batch":
+            text = batch(_items(args.items), args.title)
+        elif args.command == "lint":
+            text = "\n".join(lint_lines(_root(args.root))) + "\n"
+        elif args.command == "open-count":
+            try:
+                review = Path(args.review).read_text(encoding="utf-8")
+            except OSError as exc:
+                raise PlanCheckError(f"cannot read review: {exc.strerror or exc}") from exc
+            text = f"open: {open_findings(review)}\n"
+        else:
+            if args.items:
+                open_n = open_for_review(_items(args.items))
+            elif args.open is not None:
+                open_n = args.open
+            else:
+                raise PlanCheckError("reviewed needs --open <n> or --items <file>")
+            text = reviewed(_root(args.root), open_n, args.write)
+    except PlanCheckError as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+    sys.stdout.write(text)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

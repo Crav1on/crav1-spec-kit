@@ -27,7 +27,7 @@ Instruct it to follow its own prompt and the check rules in `crav1-plan-from-spe
 
 ## Record the review
 
-After the subagent returns, write one line in `plan.md`, right under the `# Plan:` title: `Reviewed: <today's date>, P# open: <n>`, where `<n>` is the number of plan and spec `P#`s it listed (0 when it found none). Replace an earlier `Reviewed:` line, and the template's comment about it, instead of adding a second line. Change nothing else in `plan.md` or `tasks.md`. Say in the recap that the line was written. `/crav1-tasks-ready-to-build` reads it. This skill does not commit.
+After the subagent returns, save its reply to a file and run `<interpreter> -X utf8 ../crav1-plan-from-spec/scripts/plan_check.py open-count --review <file>`. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. `<n>` is that command's `open` value (0 when the reply lists no `P#`). Use that value. Do not count the `P#` lines yourself. Write one line in `plan.md`, right under the `# Plan:` title: `Reviewed: <today's date>, P# open: <n>`. Replace an earlier `Reviewed:` line, and the template's comment about it, instead of adding a second line. Change nothing else in `plan.md` or `tasks.md`. Say in the recap that the line was written and quote the script's `open` value. `/crav1-tasks-ready-to-build` reads it. This skill does not commit.
 
 ## After it returns
 
