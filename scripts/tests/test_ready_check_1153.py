@@ -237,7 +237,7 @@ class EndingCommandOnce(unittest.TestCase):
 
 
 class BriefOutput(unittest.TestCase):
-    def test_brief_is_under_8kb_for_a_45_task_slice(self):
+    def test_brief_stays_a_summary_for_a_45_task_slice(self):
         lines = ["# Tasks\n", "\n", "Branches: `feat/orders-api-host-setup` (T1).\n", "\n"]
         for i in range(1, 46):
             after = " (after: )" if i == 1 else f" (after: T{i - 1})"
@@ -261,7 +261,10 @@ class BriefOutput(unittest.TestCase):
             full = run_walk(["readiness", "--full", "--root", str(root), "--skip-sync"])
         self.assertEqual(brief.returncode, 0, brief.stderr + brief.stdout)
         self.assertEqual(full.returncode, 0, full.stderr + full.stdout)
-        self.assertLess(len(brief.stdout.encode("utf-8")), 8000)
+        # 1.202.0 lists every held task, including an (after:) wait, so the
+        # brief grows with those lines and still leaves the row dump out.
+        self.assertLess(len(brief.stdout.encode("utf-8")), 32000)
+        self.assertIn("T45", brief.stdout)
         payload = json.loads(brief.stdout)
         self.assertEqual(set(payload) >= {"ok", "result", "counts", "ending", "claim_warnings"}, True)
         self.assertNotIn("rows", payload)

@@ -1,0 +1,56 @@
+# Ask open questions
+
+Kit not in this project yet? [Install first](install.md) (Cursor and Claude Code; the slash commands match, the files do not). After a Cursor plugin install, the short command loop is [plugins/crav1/README.md](../plugins/crav1/README.md). Claude Code has no plugin.
+
+Use this when the specs hold open questions that only someone else can answer: a partner, a customer, or a colleague. The command gathers those questions for one person, one spec, or one topic, and drafts them for you to send or ask. It also drafts an Approval needed item that has no `Approved:` line, as a mail, a chat message, a meeting agenda, or a PR comment. It records whether you asked. Nothing is sent by the kit. It does not write `Approved:`.
+
+This is not `$crav1-resolve-open-questions`. Resolve walks the questions with you and writes your decisions into the spec. This command drafts the questions for someone else and writes only the asked and pending marks.
+
+Since 1.181.0 it also reads the open questions in `docs/architecture/spec.md`, where `$crav1-design-architecture` copies still-open questions at go-ahead. Their asked and pending marks go under the question in that file. It never reads the design sandbox under `docs/architecture/designs/`.
+
+## First prompt
+
+```text
+$crav1-show-or-ask-open-questions
+
+The open questions for <a person, one-spec, or a topic>, as a mail.
+```
+
+Name a person (`Alex`, or a group), a spec (`@docs/specs/<slug>/`), or a topic (`static IP`). A question routed via a person ("Finance via Dana") belongs to that person: `$crav1-show-or-ask-open-questions` lists it for Dana. A branch, or a pull request (`pr71`, `#71`, `pr orders-api 71`), also works (1.75.0): the pull request is found from its PR note or the local git log first, and online only after you pick to. You can also name the kind of draft and the language.
+
+Words that match one question, or `orders Q3`, pick just that question (1.77.0); the overview prints each `Q#`. A `Q#` is a display number in document order and is never written; marks go under the question found by its words (1.84.0). `$crav1-show-or-ask-open-questions ask research static IP Alex` drafts a self-contained research request (the question, why it matters, what is known, sources, who decides) for any tool or person, and marks it `Pending since <date> for Alex (research)` without asking: no confirm, no yes/no and no Asked? question (1.90.3). With no name it is marked for your `git config user.name`, and `$crav1-help todo` lists it under **Yours first**. The research note that comes back goes through `$crav1-add-to-spec`.
+
+## Steps
+
+| Step | You | Agent |
+| --- | --- | --- |
+| Who or what | Name a person, a spec, or a topic | With none of them, stops and asks, with options only |
+| Pending first | For each earlier draft: mark as sent, keep pending, or drop the mark | Shows drafts still marked `Pending:` before anything new. Mark as sent writes `Asked:` with the date you give, or today |
+| Gather | Glance at the list | Reads `## Open questions` and unresolved assumptions on every spec. Lists every question that fits, numbered, with its spec path. Skips questions already answered, and questions already asked of this person unless you ask again, and says how many and why. Nothing is dropped to keep the list short |
+| Kind | Pick mail, meeting agenda, chat message, or meeting questions | Asks only when you did not name one. Meeting questions lists every selected question to ask out loud |
+| Draft | Copy it | Numbered, grouped by topic in plain words, with enough context for someone who has not read the spec. No spec name, path, file, or question id. English unless you named a language. The personal-data and secrets check runs on the draft. Ends with `Nothing was sent.` |
+| Asked? | Yes, no, or pending | Yes writes `Asked:` under each question. Pending writes `Pending:`, shown first next run. No writes nothing |
+
+## Parked and retired specs
+
+Specs in `docs/specs/retired/` are skipped. A parked spec is still listed, marked `(parked)`, and its questions can still be asked. A note waiting for a parked spec is shown as `waiting for parked <slug>`, not counted as open work ([retire spec](from-retire-spec.md)).
+
+## What gets written
+
+Only lines under the drafted questions in `docs/specs/<slug>/spec.md`:
+
+```text
+- <question>
+  - Pending: drafted <date> for <who>, <channel>. Not marked as sent yet. Question <n> of that draft.
+  - Asked: <date>, <channel> to <who>. Question <n>. Date from <the user's yes | email <date> | meeting <date> | chat <date>>.
+```
+
+The transfer data policy, after a yes, when the personal-data check asks for it. See [Data policy](concepts/data-policy.md).
+
+Not written: the question text, any other spec line, `docs/system/`, plan, tasks, or code. Not sent. Not committed.
+
+## After
+
+`Run next: nothing needed now.` The draft is this run's work. When answers have not come back: `Waiting: $crav1-add-to-spec, after the answers come back.` Bring the mail, minutes, transcript, or chat then; a larger dump uses the same command. Those write an `Answered:` line. Resolve is not listed here. When a mark was written: `Uncommitted: 1 file; commit with $crav1-finalize-commit when ready.` See [How a run ends](reference/run-ending.md). The marks are explained in [Data layout](concepts/data-layout.md#open-question-marks).
+
+Reference page: [show-or-ask-open-questions](reference/skills/crav1-show-or-ask-open-questions.md)

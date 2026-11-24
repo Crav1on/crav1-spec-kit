@@ -1,0 +1,19 @@
+{
+  "id": "order-line-grain",
+  "stage": "business-model",
+  "status": "proposed",
+  "evidence": "requirement",
+  "requirement": "supported",
+  "fit": "meets",
+  "outcome": "viable-on-evidence",
+  "scope": "area:orders",
+  "axis": "modeling",
+  "sources": "docs/specs/orders/spec.md, docs/specs/billing/spec.md",
+  "depends": "none",
+  "conditional": false,
+  "implementable": false,
+  "grain": "one order line",
+  "measure": "ordered amount",
+  "short_source": "docs/specs/orders/spec.md",
+  "body": "An order line is one row at the stated grain. Billing is a second source."
+}

@@ -1,0 +1,1 @@
+diagram --home docs/data-model/orders --id platform-structure --kind er --caption "Order and line" --mermaid references/inputs/diagram.mmd

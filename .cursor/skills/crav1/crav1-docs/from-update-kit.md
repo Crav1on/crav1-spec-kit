@@ -65,3 +65,7 @@ Since 1.176.0 `/crav1-update-kit` also fixes a saved commit-style rule that is o
 `update_kit.py detect` adds `vendors`, the hosts whose marker file is present. `update_kit.py vendors --root .` lists each vendor's folder and skill count and writes nothing.
 
 A script that prints Run next takes `--vendor`. The default stays `/`. `--vendor codex` prints `$crav1-`.
+
+## 1.202.0 changes
+
+`/crav1-update-kit` still installs only Cursor and Claude Code. The kit repo now also commits generated Codex and Copilot copies under `vendors/codex/` and `vendors/copilot/`. Update does not copy those trees into a product repo.

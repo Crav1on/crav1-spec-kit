@@ -8,6 +8,8 @@
 
 Walk a draft spec through architecture, tighten, questions, and the plan until the ready check is clear.
 
+1.202.0: the Reviewed line uses `plan_check.py open-count --review <file>` (`open: <n>`). Held includes a task that only waits, via `(after:)`, on a task that is not built yet, and the reason is on that held line.
+
 1.176.0: each step compares the spec against its own newest section stamps, so a step recorded again after a spec edit stops reading reopened and the ready check no longer blocks on it. `clear --yes` fails with `still-reopened` instead of reporting success when nothing cleared. The ready check reply is `reply`, which keeps the Source, Build map and Zoom the map lines.
 
 1.175.0: `readiness` offers `Continue the build walk on <branch>:` only when the walk's claim user (else its `Run yes:` name) matches `--user` or `git config user.name`; someone else's walk is a Waiting line, `T9 to T12 are person B's, built, and wait for PR 82 to merge.` or `T9 to T12 are in progress by person B.` Built claimed tasks read `built by <name>, waits for PR <n> to merge`. A reopened step reads one reason sentence, then `Finish the reopened [`/crav1-tighten-spec`](crav1-tighten-spec.md) step:` above the command. A walk's own files never reopen a step.

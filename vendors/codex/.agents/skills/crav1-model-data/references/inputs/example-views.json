@@ -1,0 +1,6 @@
+{
+  "area_obligations": ["orders keeps dispatch rows 7 years"],
+  "platform_obligations": ["orders keeps dispatch rows 7 years", "shared clock for every area"],
+  "default_view": null,
+  "promoted_to_platform_rule": false
+}

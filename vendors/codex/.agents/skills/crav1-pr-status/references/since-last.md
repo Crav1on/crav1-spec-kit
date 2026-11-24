@@ -1,0 +1,23 @@
+# crav1-pr-status: since last
+
+Read only on `since-last`, from **Since last** in `SKILL.md`.
+
+## Your Read line
+
+Every run writes `- Read: <your name> | <head short sha>, push <n>, newest comment <YYYY-MM-DDTHH:MMZ> | <date>` in the record, replacing your own earlier line. `<n>` is the Azure DevOps iteration id, or the GitHub commit count on the source branch. The newest comment is the latest `publishedDate` or `lastUpdatedDate` (GitHub `created_at` or `updated_at`) of a non-system comment.
+
+## What changed
+
+On Azure DevOps run `ado_threads.py since-last --pr <n> --note <PR note> --who <your name> --code-repo <code checkout>` (`crav1-review-pr` `scripts/`, 1.193.0). Without a code checkout the script finds the organization in `docs/system/repos.md` (1.198.0); pass `--org <url>` when that file has none. It compares the host with the state recorded in the PR note: your `Read` line, and the newest `## Description as of <date>` section for the description. Never compare with a temp or scratch file saved by an earlier run. On GitHub compare the same way with `gh`.
+
+Compare the host now with your `Read` line and the record:
+
+- New pushes: `Sam pushed 2 commits (push 7, 7b41a0c).`
+- New or edited comments since the newest comment time, by thread.
+- New threads, as new points.
+- Each Point whose status or flags changed: `4. src/orders/handler.py:238-244: agreed -> done 3c9d2e1.`
+- `Order` and `Ready` changes, and a host state change.
+
+Print the heading, then `Since your last run on <date> (<sha>, push <n>):`, then those lines, then the verdict line, the run ending from `references/output.md`, and the `Ready` line, and the offers. Nothing changed: `Nothing new since your last run on <date>.`, `Run next: nothing needed now.`, and the verdict line.
+
+The record is still written in full, so the next run compares with this one. Someone else's `Read` line is never used or changed. A `Read: sweep` line is the sweep watermark, not a person. `since-last` does not use it and does not change it.

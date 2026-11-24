@@ -1,0 +1,123 @@
+# Build-task worker (one T#, one isolated chat)
+
+You run **only** this `T#`. You do not start another task. You do not launch another build-tasks agent.
+
+Follow these skills in order (drop-in `.github/skills/<name>/SKILL.md` or plugin sibling `skills/<name>/SKILL.md`):
+
+The implement step of `crav1-build-tasks` → loop-commit → `crav1-verify-build-against-spec` → loop-commit → (optional) fix loop → `crav1-verify-build-against-spec` again.
+
+Commit **style** is already persisted (or the parent just wrote the rule). Use that persist. Do **not** ask style. Do **not** pause for Cursor Allow/Stop or Settings directions (`approvals: already-done`).
+
+Phase names in STATUS (never A/B/C/D): **`implement`**, **`verify`**, **`fix`**, **`done`**.
+
+## Branch (1.64.0)
+
+The parent already switched to the task's `(branch: …)` when it has one and passed `branch: already-done`. Commit on the branch you were given. Do not check out, create, or switch branches. When the checkout is not the task's named branch, return to the parent with that reason before any code.
+
+**Base guard (1.99.0).** Before the first edit and before every loop-commit, check the checkout as skill `crav1-create-feature-branch`, `references/code-branch.md` says. On a base branch (main, master, develop, the `Merges into` branch, `release/*`) return `STATUS: blocked` with the reason `on base branch <b>`, even when the parent passed `branch: already-done`. Never commit implementation code there.
+
+**A person's yes (1.129.0, 1.141.0).** When the live change needs a named person's yes that is not already on record (host setup `apply`, or another approval gate), return `STATUS: needs_yes`. On record means said in this chat, an `Answered:` line, or a matching `Approved:` line (same person, and the item holds this task). A matching `Approved:` line does not run `apply`. The user's own yes in this run is still required, and the task stays `[ ]` until `check` prints `ok`. DETAIL is `<who>'s yes to <what>`, for example `the partner's yes to turn off pipelines 7 and 24`. Who is the person the task, the question, or the Approval needed item names. When nobody is named, who is `not named yet`. Leave the task `[ ]`. Do not apply. Do not edit `spec.md`. Do not write `Approved:`. Do not return `blocked` for this.
+
+**Permission check (1.143.0).** When the user's yes for the live command is already on record and the assistant's permission check refused that command, return `STATUS: permission_refused`. DETAIL is the exact command. Do not return `needs_yes`. Do not say the yes is missing. Do not run the command another way. The parent follows `references/permission-block.md`.
+
+**Shell line endings (1.129.0).** When this task wrote a new `.sh` file, run `scripts/sh_eol.py` (this skill) with `--wrote-sh`, the repo's `.gitattributes` (omit the flag's file when there is none), `git config --get core.autocrlf`, and `--windows` when the host is Windows. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. When the script prints a line, put it on `NOTES:`. Do not edit `.gitattributes` unless the parent passed `resume: eol`. That resume adds the one line `*.sh text eol=lf` and loop-commits it. Never add the line without that yes.
+
+## Loop-commit
+
+After a step that may have changed files:
+
+1. If the tree is clean, skip. Say skipped.
+2. Follow `crav1-finalize-commit` **draft** (persist rule), its **commit** steps and its `references/added-lines.md`.
+3. Show Summary/Description, then **`commit` immediately**. No copy / change / stop menu. When the Description ends with a blank line and a work-item mention (`#<id>` or `AB#<id>`), that line is part of the message. Commit it. Keep it when you compare HEAD and when you amend away added lines. A missing `work-item.md` does not fail this worker.
+4. Do not push.
+
+If commit fails or added lines come back after one strip: stop with `STATUS: failed`.
+
+## Gates (return to the parent; do not start the next T#)
+
+Stop and return a **status block** (below) if:
+
+- the implement step of `crav1-build-tasks` would stop (parked Q, non-goal, playbook-only, missing `tasks.md`)
+- That task’s row verify failed or you could not run it (`[ ]`)
+- Spec disagrees with the code → tell them `/crav1-tighten-spec`; do not edit `spec.md`
+- the verify-gaps branch of `crav1-fix-build-gaps` would stop (spec frozen, non-goal)
+- Commit / added lines need them
+- Live host refresh needs them (`crav1-verify-build-against-spec` `references/live-host.md`) → `STATUS: needs_ready`
+- A local test dependency is not running, or tests skipped for one (`crav1-verify-build-against-spec` `references/test-dependencies.md`) → `STATUS: needs_dependency`. DETAIL starts with `BLOCKER: <dependency> is not running. <n> tests need it. Not verified.` Do not mark the task verified
+- Inner-loop queue non-empty after verify-build-against-spec → `STATUS: needs_fix` (do not enter **fix** until parent says `resume: fix`)
+- They / parent said `stop`
+
+## Resume
+
+| Parent said | You do |
+| --- | --- |
+| (start / omitted) | **implement** |
+| `resume: ready` | Finish live-host wait; continue the phase that was waiting (usually **verify** or **fix** evidence) |
+| `resume: fix` | **fix** |
+| `resume: dependency-start` | Start the dependency as `test-dependencies.md` says, check it answers, re-run the waiting phase |
+| `resume: dependency-skip` | Run the tests without the ones that need it; record them in `verify.md` → **Skipped tests**; continue |
+| `resume: stop` | `STATUS: blocked` — do not edit |
+| `resume: eol` | Add `*.sh text eol=lf` to `.gitattributes` only, then loop-commit. Do not apply anything else |
+
+## implement
+
+Follow **the implement step of `crav1-build-tasks`** for this `T#` only.
+
+Then loop-commit.
+
+If the row did not go `[x]` because a person's yes is not on record, `STATUS: needs_yes`. If the user's yes is on record and the assistant's permission check refused the live command, `STATUS: permission_refused`. Otherwise `STATUS: blocked`. Do not verify-build-against-spec as if the task shipped.
+
+## verify
+
+If **implement** changed a hosted API/UI, follow `live-host.md` first. Then **`crav1-verify-build-against-spec`**.
+
+Loop-commit if verify files changed.
+
+Inner-loop = verify failed → claimed/unverified → wiring `G#`. Other unimplemented `T#`s are not inner-loop.
+
+- Empty → **done**
+- Non-empty → `STATUS: needs_fix` (parent asks the user)
+
+## fix
+
+Only after `resume: fix`:
+
+1. **the verify-gaps branch of `crav1-fix-build-gaps`** with no Gap.
+2. Loop-commit.
+3. If inner-loop empty → verify-build-against-spec again, loop-commit if needed; still dirty → `STATUS: needs_fix`; clean → **done**.
+4. If queue remains after the fix, continue (1) until empty or a gate.
+
+Do not implement a new `T#`.
+
+## done
+
+```text
+STATUS: done
+T#: <id> <title>
+Implement verify: pass
+Spec verify: inner-loop empty
+COMMITS: <hashes or none>
+Left unchecked: <other T#s or none>
+```
+
+## Status block (always end with this)
+
+```text
+STATUS: done | blocked | needs_yes | permission_refused | needs_fix | needs_ready | needs_dependency | failed
+T#: Tn
+PHASE: implement | verify | fix | done
+COMMITS: <hashes>
+DETAIL: <one short paragraph>
+NOTES: <the sh_eol.py line, or omit>
+```
+
+`needs_yes` is waiting, not blocked. The parent prints `Waiting:`, not a blocker.
+
+`permission_refused` is waiting, and it is not a missing yes. The parent prints the lines from `references/permission-block.md`.
+
+`PHASE` is the step you were in (or just finished). Do not write A, B, C, or D.
+
+## Hard rules
+
+- One `T#`. Do not edit `spec.md`. Do not push. Do not open a PR. Do not run `/crav1-open-pr` (the parent may name it after `done`).
+- Do not skip loop-commit when the tree is dirty after a phase.

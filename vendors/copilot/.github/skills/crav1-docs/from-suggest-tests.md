@@ -1,0 +1,55 @@
+# From code that already exists, suggest tests
+
+Kit not in this project yet? [Install first](install.md) (Cursor and Claude Code; the slash commands match, the files do not). After a Cursor plugin install, the short command loop is [plugins/crav1/README.md](../plugins/crav1/README.md). Claude Code has no plugin.
+
+Use this when the user points at **code that already exists**, one repo or one area, and wants tests suggested for what that code can actually break.
+
+This is cross-cutting. It is not its own lane. It may run from any lane. It does not move work into Specify, Plan, or Build. It does not start those lanes.
+
+It is a later skill. It is not a starter option. When the user asks for startup options, that ask names only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs`, `/crav1-read-environment`, and `/crav1-fix-bug`. It does not run this command. The six starter options stay unchanged.
+
+A function gets a few checks. A page gets a browser check. A boundary gets an integration check. The command does not dump every test type. Every suggestion stays listed. Nothing is dropped to keep the list short. The user answers them in one batch: keep, leave, or dismiss (a single yes takes the recommendations). Dismiss means it is not offered again. A kept suggestion goes onto the existing spec through `/crav1-add-to-spec`. Since 1.134.0 that handoff opens the add-to-spec file and does not start the command. The rule is [Opening another kit skill](reference/open-skill-file.md). Plan turns it into a task. This command does not write the tests, change the code, or start Specify, Plan, or Build.
+
+## First prompt
+
+New chat. Point at one repo or one area. Name the spec when one folder is the target.
+
+```text
+/crav1-suggest-tests-for-code
+@<one repo or one area>
+@docs/specs/<slug>/
+
+Suggest tests for what this code can break. Do not write the tests. Do not change the code.
+```
+
+That slash command *is* the prompt.
+
+If the message points at the whole system, the command stops. If it points at no code, it stops. It does not pick an area.
+
+## Steps
+
+| Phase | You | Agent |
+| --- | --- | --- |
+| Code | Pointed at one repo or one area | Stops when the pointer is the whole system, several repos, or no code. Does not scan the repo to pick an area |
+| Spec | Named one existing spec, or pick from the spec folders | Stops when no spec exists. Does not create a slug. Does not create a folder |
+| List | Read every suggestion | A function gets a few unit checks. A page gets a browser check. A boundary gets an integration check. Every suggestion stays listed |
+| In one batch (1.70.0) | Keep, leave, or dismiss | Every suggestion in one batch; a single yes takes each recommendation. Each question names the suggestion. Since 1.145.0, one card for every suggestion prints a findings table immediately before the card. The card names each item and its recommendation. It does not say `table above` unless that table is in the reply. The card is not asked without the table. Keep goes onto that spec through `/crav1-add-to-spec`. Leave is offered again. Dismiss is not offered again |
+| Stop | Glance | Does not write the tests, change the code, or start Specify, Plan, or Build |
+
+No existing spec: the command stops and points at the starter that fits. It does not run that starter.
+
+## What gets written
+
+A kept suggestion is an acceptance line on the existing `spec.md`, written by `/crav1-add-to-spec`.
+
+A dismissed suggestion is one line under `## Dismissed test suggestions` on that same spec, so the next run does not offer it. It is not acceptance. Plan does not turn it into a task.
+
+A left suggestion is not written. The next run offers it again when that code can still break that way.
+
+No test code. No application code. No `plan.md`. No `tasks.md`. No new folder.
+
+## After
+
+When a kept suggestion is not in the spec yet, Run next names `/crav1-add-to-spec` because that suggestion is not in the spec yet (1.200.0). Plan is not listed here. When a file changed: `Uncommitted: 1 file; commit with /crav1-finalize-commit when ready.` See [How a run ends](reference/run-ending.md). This command does not run the next step. No push.
+
+Reference page: [suggest-tests-for-code](reference/skills/crav1-suggest-tests-for-code.md)

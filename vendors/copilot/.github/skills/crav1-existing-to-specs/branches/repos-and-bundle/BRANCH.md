@@ -1,0 +1,119 @@
+# Match to specs
+
+You are the **parent**. Match existing repos to a dump. Do not implement. Do not plan. Do not commit.
+
+This command is a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs`, `/crav1-read-environment`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane. Every other skill is a later skill.
+
+This is not a mode of `/crav1-bundle-to-specs`, `/crav1-spark-to-spec`, or `/crav1-ideas-to-spec`. It is not a system-to-architecture pass. Named repos and no dump, when the job is one architecture spec the lanes can extend, is the repos-only branch of `/crav1-existing-to-specs`. Do not do that job here. Do not send this job to those commands, and do not absorb theirs.
+
+Slice protocol: [references/slice.md](references/slice.md). Landscape diagrams: [references/diagrams.md](references/diagrams.md).
+
+## Inputs
+
+Everything after `/crav1-existing-to-specs`, and every `@`, is input.
+
+| Kind | Role |
+| --- | --- |
+| **Repos** | Evidence of what exists. One or more repos that already make up the system |
+| **Dump** | Notes, tickets, old docs, diagrams, screenshots. What to match. Not a brief for a new product |
+
+A one-liner with no repos and no dump: tell them `/crav1-spark-to-spec`. A pile of ideas for a product that is not built yet: `/crav1-ideas-to-spec` or `/crav1-bundle-to-specs`. Do not match a greenfield brief against empty code and call the slices done.
+
+## Where the specs go (first response, no map, no files)
+
+Before any map and before any file, ask where the spec files go. Use the questions tool when it is available. Options only. Do not ask them to type a path.
+
+Repos already in front of you are the repos they `@`-mentioned. Include the current checkout when it is one of those repos, or when they `@`-mentioned no repo and this checkout is the system. Do not offer a repo that is only named inside the dump. Do not offer this kit repo unless they `@`-mentioned it as one of the system repos.
+
+1. One option per repo already in front of you, labeled with that repo’s name.
+2. Last option: **A new clean repo**.
+
+Stop. Do not read the dump for slices yet. Do not write files.
+
+**Existing repo.** That repo is the only spec tree. Other repos stay evidence. They are listed in `repos.md` and are not given their own `docs/specs/` trees.
+
+**A new clean repo.** Create it only after they pick this option, and only when you are about to write (after the map is confirmed). `git init` a new directory. No remote. No application code. Name it with a short kebab from the system in the dump, or `system` if the dump has no name. Put it next to the other repos when those paths share a parent directory. Otherwise create it in the current workspace. Tell them the path you used. Specs and `docs/system/` go there. The evidence repos are still not spec trees.
+
+## Read and map (no files yet)
+
+Read the repos and the dump. Then propose a map. Do not write files.
+
+For each slice:
+
+- Slug (`docs/specs/<slug>/`) and a short title
+- Which repo the slice belongs to (behavior lives there, or would live there)
+- First match: **done**, **partial**, or **not in the code**
+- Evidence: paths, or none
+- Facts you read from the code, and facts that are only in the dump
+
+**Done:** the dump’s claim for this slice is in that repo. Cite paths.
+
+**Partial:** part of the claim is in the code and part is not. Cite the paths that exist. The missing part is the dump’s words.
+
+**Not in the code:** the dump describes it and the repos do not contain it. This slice is not started. Still list it. Do not drop it because it has no code.
+
+On the side, list code no slice covers: repo, path, one line about what it is. Major areas you actually read, not every file. That list is not a guessed spec.
+
+Put every fact you will treat as accepted on the map. A fact you leave off stays inferred.
+
+End the map with one question card, as `crav1-docs/reference/question-cards.md` says, as the last thing in the message. Follow **Batch of several items** in that file before this card. Print the findings table in this reply, then ask. The card names each item and its recommendation, for example `P4 tasks miss the 400 path: add a test`. Never write `table above` unless that table is in this reply. Never ask the card without the table.
+
+- `yes (Recommended)`: write it as shown.
+- The card's free-text answer. Hint: `Type your changes, e.g. drop slice 3` or `move 5 to the orders repo`. An item that answer does not mention keeps what was shown.
+
+Nothing gets committed either way. Do not add an `Edits` option.
+
+Stop. They confirm or edit the map. Do not write files. That confirmation is the only product stop before writing. Do not open a mushy interview, an architecture interview, or an export-format question. If they edit the map, the edit is the confirmation. Do not ask again. Use their slugs, repos, and match statuses. A fact they struck, or that you never put on the map, stays labeled inferred if it appears later. Confirming the map confirms the facts they left on it.
+
+## Branch (one for the dump)
+
+If they picked a new clean repo, create it now, before the branch prompt. No commit yet. A repo with no commits skips the prompt.
+
+Follow `/crav1-create-feature-branch` (skill `crav1-create-feature-branch`, `SKILL.md`) in the **destination** repo. One branch for the whole dump. Not one branch per slice.
+
+Slug for that prompt: a short landscape kebab, or `system` if unnamed. Specify options: `feat/<that>` first, then `spec/<that>`, stay. A typed branch name is that card's free-text answer, hint `Type a branch name`. Do not write `docs/system/` or specs until that choice is done or skipped. A new clean repo with no commits skips the prompt (create-feature-branch skip). Do not push. Do not open a pull request.
+
+## Landscape
+
+Read this skill's `branches/repos-and-bundle/references/landscape.md` now, before you go on.
+
+## Imported sources
+
+When a dump file is a mail, a transcript, minutes, a chat, a screenshot, a diagram, or another original that will be quoted into a spec, follow the imported-sources convention before the slice specs are written (skill `crav1-add-to-spec`, `references/sources.md`). Its personal-data and secrets check is in that file; flagged items, the transfer data policy, and the one question are in `references/sources-flagged.md`, and a mail's images in `references/sources-mail.md` and `references/sources-binary.md`, all in `crav1-add-to-spec`. Write each source folder once. Pass each folder path with the slice that quotes it. The slice write adds the `Source:` and `Trace:` lines and does not import the file again. Do not commit. A file that is not an imported source does not get a folder.
+
+## Slice specs
+
+One `docs/specs/<slug>/` per confirmed slice, including `not in the code`.
+
+One slice: write it in this chat. More than one: write them in this chat, or one worker per slug. Workers may run in parallel. There is no match-slice subagent. Do not launch `crav1-bundle-slice-agent`. Do not reuse that prompt. A worker’s only instructions are [references/slice.md](references/slice.md), and the handoff must include the match status and the trace. A worker that is not given those does not write. Not-started (`not in the code`) stays the thin shape in that file. Workers do not edit `docs/system/`.
+
+Do not thicken a not-started spec in this command. A later pass may add information before planning. This command does not.
+
+## Index
+
+After the specs exist, add one feature-index row per slice on `docs/system/landscape.md`: slug, `docs/specs/<slug>/`, the repo the slice belongs to, and the match status in Notes (`done`, `partial`, or `not in the code`). Do not rewrite other rows. Do not add a second row for a slug that already has one.
+
+**Picture.** After the index, follow [picture.md](../../../crav1-refresh-system-notes/references/picture.md) (skill `crav1-refresh-system-notes`, `references/picture.md`). Add what this pass added to the short description, the diagram, and how the parts connect. Do not rewrite a sentence, a diagram node, a diagram edge, or a connection line that is already there. Do not run `/crav1-refresh-system-notes` as a second turn. When this pass seeded `docs/system/`, the seed fill of those three is the picture for what the repos and the confirmed match already stated; the picture update still adds anything the new specs state that those three do not yet say. Do not rewrite existing glossary rows.
+
+## Stop
+
+Do not plan. Do not implement. Do not commit. Do not run `/crav1-finalize-commit` or `/crav1-plan-from-spec`. Do not read `work-item-offer.md`. Do not write `work-item.md`.
+
+Output only:
+
+- Paths written (`docs/system/`, each `docs/specs/<slug>/spec.md`, any source folder `docs/sources/YYYY-MM-DD-<slug>/`, the transfer data policy when this pass wrote it, plus any picture lines added)
+- Counts: done, partial, not in the code
+- Where the uncovered-code note is, or that the map had none
+- End as `crav1-docs/reference/run-ending.md` says. Do not run the next step. A slice that is not in the code is not planned here. Add the Uncommitted line when a file changed and is not committed.
+- Specs were written: the Run next reason "those specs are not tightened yet" and the command alone in its code span `/crav1-tighten-spec <first slug>`
+- Nothing was written: `Run next: nothing needed now.`
+
+If they chose `spec/<dump>`, say that branch is specify-only: no implement there.
+
+## A quoted note
+
+When this run quotes a note from `docs/notes/` (month folders `docs/notes/YYYY-MM/` since 1.61.0; older flat notes are still read), add `<slug>` to that note's `used_by` front matter (an old note without front matter gets a `Used by <slug>` line under `## Used by`), and link the note from the spec line as `Full source: <note path>`. Then run the notes index generator as `crav1-add-to-spec` `references/notes.md` says; do not hand-edit an index. Many specs can be listed. A note is not owned by one spec and is never absorbed: do not write `Absorbed by`. Do not commit. The same write is in `/crav1-add-to-spec`.
+
+## Style
+
+Be concise. Quote the dump and cite paths. Prefer a smaller map to a guessed spec.

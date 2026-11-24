@@ -1,0 +1,1909 @@
+# The single source for every mark and line format the kit writes in a product repo.
+# scripts/gen-marks.py generates the marks tables in docs/concepts/data-layout.md from this file,
+# and `--check` (CI) fails when:
+#   - the generated tables differ from this file,
+#   - an example does not match its `pattern`,
+#   - a skill or agent in written_by or read_by does not mention the mark (its `mention`
+#     regex, default: the literal text of `format` before the first `<`) in its folder's
+#     .md files (SKILL.md, branches, references, assets) or its agent file.
+#
+# Fields:
+#   id          unique, kebab-case
+#   name        short label for the tables
+#   group       which generated table it belongs to (see GROUPS in scripts/gen-marks.py)
+#   files       where the line lives in a product repo
+#   format      the line, with <placeholders>; [ ... ] is optional
+#   pattern     a Python regex every example must match in full
+#   examples    real-looking lines with made-up names
+#   meaning     one line, plain English
+#   written_by  skills (crav1-*) or agents that write it
+#   read_by     skills or agents that read it to decide something
+#   since       the kit version that introduced it
+#   mention     optional regex; see above
+#   readiness   true when /crav1-tasks-ready-to-build reads it (Readiness marks table)
+
+marks:
+  # ---------- spec.md: header lines ----------
+  - id: parked
+    name: "Parked"
+    group: spec
+    files: ["docs/specs/<slug>/spec.md (first line)"]
+    format: "Parked: <YYYY-MM-DD>, <reason>"
+    pattern: '^Parked: \d{4}-\d{2}-\d{2}, .+$'
+    examples:
+      - "Parked: 2026-10-16, waiting for the partner to confirm the export format."
+    meaning: "The spec is on hold. Plan, build, and push skip it; help lists it as parked."
+    written_by: [crav1-retire-spec]
+    read_by: [crav1-add-to-spec, crav1-ado-sync, crav1-build-features, crav1-build-tasks, crav1-help, crav1-plan-from-spec, crav1-show-or-ask-open-questions]
+    since: 1.60.0
+
+  - id: moved
+    name: "Moved pointer"
+    group: spec
+    files: ["docs/specs/<slug>/spec.md (the old path, whole file)"]
+    format: "Moved: <retired | merged | converted> <YYYY-MM-DD>, see <new path>. Reason: <reason>"
+    pattern: '^Moved: (retired|merged|converted) \d{4}-\d{2}-\d{2}, see \S+\. Reason: .+$'
+    examples:
+      - "Moved: retired 2026-10-16, see docs/specs/retired/orders-export/. Reason: replaced by the reporting API."
+      - "Moved: merged 2026-10-16, see docs/specs/orders-retry/. Reason: same feature."
+    meaning: "The spec was retired, merged, or converted to a note; skills skip the pointer."
+    written_by: [crav1-retire-spec]
+    read_by: [crav1-add-to-spec, crav1-ado-sync, crav1-build-features, crav1-build-tasks, crav1-help, crav1-plan-from-spec, crav1-show-or-ask-open-questions]
+    since: 1.60.0
+
+  - id: retired
+    name: "Retired"
+    group: spec
+    files: ["docs/specs/retired/<slug>/spec.md (first line)"]
+    format: "Retired: <YYYY-MM-DD>, <reason>"
+    pattern: '^Retired: \d{4}-\d{2}-\d{2}, .+$'
+    examples:
+      - "Retired: 2026-10-16, replaced by the reporting API."
+    meaning: "Why and when a spec under docs/specs/retired/ was retired."
+    written_by: [crav1-retire-spec]
+    read_by: []
+    since: 1.60.0
+
+  - id: merged
+    name: "Merged"
+    group: spec
+    files: ["docs/specs/retired/<slug>/spec.md (first line)"]
+    format: "Merged: <YYYY-MM-DD> into <target slug>, <reason>"
+    pattern: '^Merged: \d{4}-\d{2}-\d{2} into \S+, .+$'
+    examples:
+      - "Merged: 2026-10-16 into orders-retry, same feature."
+    meaning: "The spec was merged into another spec."
+    written_by: [crav1-retire-spec]
+    read_by: []
+    since: 1.60.0
+
+  - id: synced-at-slice
+    name: "Synced at (slice line)"
+    group: spec
+    files: ["docs/specs/<slug>/spec.md (after the title, before the first heading)"]
+    format: "Synced at: <repo> <branch>@<short sha>, <date>[ (dropped)]"
+    pattern: '^Synced at: \S+ \S+@[0-9a-f]{7}, \d{4}-\d{2}-\d{2}( \(dropped\))?$'
+    examples:
+      - "Synced at: orders-api develop@00344be, 2026-10-15"
+      - "Synced at: orders-api feat/orders-retry@155b5c4, 2026-10-19"
+    meaning: "The code commit a one-slice read last read. Since 1.84.0 one line per repo and branch, sorted by repo, then branch; a new read replaces only its own line. Older `; `-joined lines are split by `/crav1-add-to-spec migrate-formats`."
+    written_by: [crav1-add-to-spec, crav1-bundle-to-specs, crav1-bundle-slice-agent, crav1-spark-to-spec, crav1-ideas-to-spec, crav1-refresh-system-notes]
+    read_by: [crav1-plan-from-spec, crav1-tighten-spec, crav1-help, crav1-verify-build-against-spec, crav1-tasks-ready-to-build, crav1-open-pr, crav1-merge-pr, crav1-review-pr, crav1-update-specs-from-changes-and-prs]
+    mention: 'Synced at'
+    since: 1.29.0
+
+  - id: match-status
+    name: "Match status"
+    group: spec
+    files: ["docs/specs/<slug>/spec.md (under ## Match)"]
+    format: "- Status: <done | partial | not in the code>"
+    pattern: '^- Status: (done|partial|not in the code)$'
+    examples:
+      - "- Status: partial"
+    meaning: "How much of the slice the code already has."
+    written_by: [crav1-existing-to-specs, crav1-add-to-spec]
+    read_by: [crav1-plan-from-spec, crav1-tighten-spec, crav1-explain-existing-system]
+    mention: '(?i)status'
+    since: 1.0.0
+
+  - id: match-branch
+    name: "Branch"
+    group: spec
+    files: ["docs/specs/<slug>/spec.md (under ## Match, or after the title)"]
+    format: "[- ]Branch: [<repo> ]<branch>[ (into <branch>)| (spec branch)][ (PR <n>)]"
+    pattern: '^(- )?Branch: (\S+ )?\S+( \(into \S+\)| \(spec branch\))?( \(PR \d+\))?$'
+    examples:
+      - "- Branch: develop"
+      - "- Branch: feat/orders-retry"
+      - "- Branch: orders-api feature/orders-export (into feat/orders-retry)"
+      - "- Branch: orders-api feat/orders-capacity (spec branch)"
+      - "- Branch: orders-api feat/orders-capacity-t3 (into feat/orders-capacity) (PR 12)"
+    meaning: "The branches that hold the slice's code, written after a yes. Since 1.86.0 one line per branch, a new one in sorted place (repo, then branch); never `; `-joined, and the migration splits old lists. Since 1.64.0 a yes adds to the list. Since 1.67.1 an add-to-spec code-change read of a work branch adds that branch. Since 1.68.0 an entry may end in (into …) or (spec branch), written after a yes (see those marks)."
+    written_by: [crav1-tighten-spec, crav1-add-to-spec]
+    read_by: [crav1-tighten-spec, crav1-plan-from-spec, crav1-open-pr, crav1-help, crav1-verify-build-against-spec, crav1-tasks-ready-to-build, crav1-merge-pr, crav1-review-pr]
+    mention: 'Branch:'
+    since: 1.32.0
+
+  - id: spec-branch
+    name: "(spec branch)"
+    group: spec
+    files: ["docs/specs/<slug>/spec.md (end of a Match Branch: line)"]
+    format: "[<repo> ]<branch> (spec branch)"
+    pattern: '^(\S+ )?\S+ \(spec branch\)$'
+    examples:
+      - "feat/orders-capacity (spec branch)"
+      - "orders-api feat/orders-capacity (spec branch)"
+    meaning: "The spec's long-lived branch that its task sub-branches merge into (setup 4). Written after a yes on the into question, on the parent's line when it has no marker. Done means the top-level branches, not the sub-branches, reached the base."
+    written_by: [crav1-add-to-spec, crav1-tighten-spec, crav1-open-pr]
+    read_by: [crav1-create-feature-branch, crav1-plan-from-spec, crav1-help]
+    mention: '\(spec branch\)'
+    since: 1.68.0
+
+  - id: into-written
+    name: "(into …)"
+    group: spec
+    files: ["docs/specs/<slug>/spec.md (end of a Match Branch: line)"]
+    format: "[<repo> ]<branch> (into <branch>)"
+    pattern: '^(\S+ )?\S+ \(into \S+\)$'
+    examples:
+      - "feat/orders-capacity-t3 (into feat/orders-capacity)"
+    meaning: "The branch merges into the named branch, not the base: its fork point and its PR base. Read since 1.64.0; offered with a yes/no question and written since 1.68.0. A headless run writes nothing and treats the branch as stacked. Sub-branches count toward the Sub-branches: line only."
+    written_by: [crav1-add-to-spec, crav1-tighten-spec, crav1-open-pr, crav1-create-feature-branch, crav1-build-tasks]
+    read_by: [crav1-open-pr, crav1-help, crav1-verify-build-against-spec, crav1-tasks-ready-to-build, crav1-merge-pr]
+    mention: '\(into'
+    since: 1.68.0
+
+  - id: dropped
+    name: "(dropped)"
+    group: spec
+    files: ["docs/specs/<slug>/spec.md (end of a Synced at line)"]
+    format: "<branch>@<short sha>, <date> (dropped)"
+    pattern: '^\S+@[0-9a-f]{7}, \d{4}-\d{2}-\d{2} \(dropped\)$'
+    examples:
+      - "feat/orders-old@abc1234, 2026-10-01 (dropped)"
+    meaning: "A branch that is gone and was never merged, given up after a yes. It stays a record of what was read and no longer counts toward done."
+    written_by: [crav1-tighten-spec]
+    read_by: [crav1-help, crav1-verify-build-against-spec, crav1-tasks-ready-to-build, crav1-plan-from-spec]
+    mention: '\(dropped\)'
+    since: 1.64.0
+
+  # ---------- spec.md: lines in the body ----------
+  - id: label-new
+    name: "New"
+    group: spec
+    files: ["docs/specs/<slug>/spec.md"]
+    format: '**New:** "<quote>"'
+    pattern: '^\*\*New:\*\* .+$'
+    examples:
+      - '**New:** From the code, `retry.py`: "max_attempts = 3"'
+    meaning: "A fact this pass added."
+    written_by: [crav1-add-to-spec]
+    read_by: []
+    mention: '\*\*New:\*\*'
+    since: 1.0.0
+
+  - id: label-inferred
+    name: "Inferred"
+    group: spec
+    files: ["docs/specs/<slug>/spec.md"]
+    format: "**Inferred:** <connection the source does not state>"
+    pattern: '^\*\*Inferred:\*\* .+$'
+    examples:
+      - "**Inferred:** the retry also covers the nightly export. Not an accepted fact."
+    meaning: "A connection the kit drew. Not an accepted fact."
+    written_by: [crav1-add-to-spec]
+    read_by: []
+    mention: '\*\*Inferred:\*\*'
+    since: 1.0.0
+
+  - id: full-source
+    name: "Full source"
+    group: spec
+    files: ["docs/specs/<slug>/spec.md (after a point)"]
+    format: "Full source: docs/notes/YYYY-MM/<file>.md[; <second note>]"
+    pattern: '^Full source: docs/notes/(\d{4}-\d{2}|undated)/\S+\.md(; docs/notes/(\d{4}-\d{2}|undated)/\S+\.md)*$'
+    examples:
+      - "Full source: docs/notes/2026-10/2026-10-07-retry-call.md"
+      - "Full source: docs/notes/2026-10/2026-10-07-retry-call.md; docs/notes/2026-10/2026-10-09-retry-mail.md"
+    meaning: "The note that holds the full input a point came from."
+    written_by: [crav1-add-to-spec, crav1-bundle-to-specs, crav1-ideas-to-spec, crav1-spark-to-spec, crav1-tighten-spec, crav1-existing-to-specs]
+    read_by: [crav1-add-to-spec]
+    mention: 'Full source'
+    since: 1.60.0
+
+  - id: conflict
+    name: "Conflict"
+    group: spec
+    files: ["docs/specs/<slug>/spec.md (under the point it disagrees with)"]
+    format: '**Conflict:** "<new words>" (Full source: <note>) vs the line above'
+    pattern: '^\*\*Conflict:\*\* ".+" \(Full source: \S+\) vs the line above$'
+    examples:
+      - '**Conflict:** "Retries stop after 5 attempts" (Full source: docs/notes/2026-10/2026-10-09-retry-mail.md) vs the line above'
+    meaning: "A new source disagrees with a point, or two sides of a merge do (1.81.0); the user decides with /crav1-resolve-open-questions (1.111.0)."
+    written_by: [crav1-add-to-spec, crav1-finalize-commit]
+    read_by: [crav1-resolve-open-questions]
+    since: 1.61.0
+
+  - id: source-line
+    name: "Source"
+    group: spec
+    files: ["docs/specs/<slug>/spec.md (after a quote)"]
+    format: "Source: docs/sources/YYYY-MM-DD-<slug>/"
+    pattern: '^Source: \[?`?docs/sources/(\d{4}-\d{2}-\d{2}|undated)-[a-z0-9-]+/`?\]?.*$'
+    examples:
+      - "Source: docs/sources/2026-10-07-retry-call/"
+    meaning: "The imported original a quote comes from."
+    written_by: [crav1-add-to-spec]
+    read_by: []
+    mention: 'Source: docs/sources'
+    since: 1.37.0
+
+  - id: trace
+    name: "Trace"
+    group: spec
+    files: ["docs/specs/<slug>/spec.md (under ## Trace)"]
+    format: "[- ]Trace: <source> — <what this pass marked new, already there, and inferred>"
+    pattern: '^(- )?Trace: .+ [—-] .+$'
+    examples:
+      - "- Trace: docs/sources/2026-10-07-retry-call/ — This pass marked new: the 3-attempt limit. Already there: the backoff. Inferred: none written."
+    meaning: "One line per pass on what it added."
+    written_by: [crav1-add-to-spec, crav1-bundle-to-specs, crav1-existing-to-specs]
+    read_by: []
+    mention: 'Trace'
+    since: 1.30.0
+
+  - id: seen-in
+    name: "Seen in"
+    group: spec
+    files: ["docs/specs/<slug>/spec.md", "docs/architecture/spec.md", "docs/system/*.md"]
+    format: "Seen in <host> <environment>."
+    pattern: '^.*Seen in \S+ [a-z-]+\..*$'
+    examples:
+      - "Seen in Azure dev. orders-api-dev reads its database through a Key Vault reference."
+    meaning: "A fact read from a live environment, with where it was seen."
+    written_by: [crav1-add-to-spec, crav1-existing-to-specs, crav1-refresh-system-notes]
+    read_by: [crav1-read-environment]
+    since: 1.13.0
+
+  # ---------- spec.md: open question marks ----------
+  - id: oq-pending
+    name: "Pending"
+    group: open-questions
+    files: ["docs/specs/<slug>/spec.md (indented under an open question)"]
+    format: "  - Pending: drafted <date> for <who>, <channel>. Not marked as sent yet. Question <n> of that draft."
+    pattern: '^  - Pending: drafted \d{4}-\d{2}-\d{2} for .+, .+\. Not marked as sent yet\. Question \d+ of that draft\.$'
+    examples:
+      - "  - Pending: drafted 2026-10-12 for Dana, email. Not marked as sent yet. Question 2 of that draft."
+    meaning: "A drafted question that is not marked as sent yet."
+    written_by: [crav1-show-or-ask-open-questions]
+    read_by: [crav1-resolve-open-questions, crav1-show-or-ask-open-questions]
+    mention: 'Pending'
+    since: 1.40.0
+
+  - id: oq-asked
+    name: "Asked"
+    group: open-questions
+    files: ["docs/specs/<slug>/spec.md (indented under an open question)"]
+    format: "  - Asked: <date>, <channel> to <who>. Question <n>. Date from <the user's yes | email <date> | meeting <date> | chat <date>>."
+    pattern: '^  - Asked: \d{4}-\d{2}-\d{2}, .+ to .+\. Question \d+\. Date from .+\.$'
+    examples:
+      - "  - Asked: 2026-10-12, email to Dana. Question 2. Date from the user's yes."
+    meaning: "The question went out, when, and to whom."
+    written_by: [crav1-show-or-ask-open-questions]
+    read_by: [crav1-resolve-open-questions, crav1-show-or-ask-open-questions]
+    mention: 'Asked'
+    since: 1.40.0
+
+  - id: oq-answered
+    name: "Answered"
+    group: open-questions
+    files: ["docs/specs/<slug>/spec.md (indented under an open question)"]
+    format: '  - Answered: <date>, <who>, <kind>: "<quote>" Source: docs/sources/YYYY-MM-DD-<slug>/'
+    pattern: '^  - Answered: \d{4}-\d{2}-\d{2}, .+, .+: ".+" Source: docs/sources/\S+/$'
+    examples:
+      - '  - Answered: 2026-10-14, Dana, email: "Three attempts is right." Source: docs/sources/2026-10-14-dana-retry-answer/'
+    meaning: "A kept quote that answers the question."
+    written_by: [crav1-add-to-spec]
+    read_by: [crav1-resolve-open-questions, crav1-show-or-ask-open-questions]
+    mention: 'Answered'
+    since: 1.40.0
+
+  - id: oq-blocks
+    name: "Blocks"
+    group: open-questions
+    files: ["docs/specs/<slug>/spec.md (indented under a kept-open question)"]
+    format: "  - Blocks: T<n>[, T<n>]"
+    pattern: '^  - Blocks: T\d+(, T\d+)*$'
+    examples:
+      - "  - Blocks: T2, T4"
+    meaning: "The question blocks only those tasks. This line wins over a plan Risk that says do not implement until resolved."
+    written_by: [crav1-resolve-open-questions, crav1-plan-from-spec]
+    read_by: [crav1-tasks-ready-to-build]
+    readiness: true
+    mention: 'Blocks'
+    since: 1.54.0
+
+  - id: oq-blocks-none
+    name: "Blocks none"
+    group: open-questions
+    files: ["docs/specs/<slug>/spec.md (indented under a kept-open question)"]
+    format: "  - Blocks: none [(<reason>)]"
+    pattern: '^  - Blocks: none( \([^)]+\))?$'
+    examples:
+      - "  - Blocks: none"
+      - "  - Blocks: none (later phase)"
+    meaning: "The question blocks no current task. A short reason in parentheses is optional. Since 1.137.0 a missing Blocks line holds T# ids named in the question text, and holds the whole slice only when no task is named and resolve-open-questions has never been recorded."
+    written_by: [crav1-resolve-open-questions, crav1-plan-from-spec, crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tasks-ready-to-build]
+    readiness: true
+    mention: 'Blocks: none'
+    since: 1.125.0
+
+  - id: oq-blocks-whole
+    name: "Blocks whole slice"
+    group: open-questions
+    files: ["docs/specs/<slug>/spec.md (indented under a kept-open question)"]
+    format: "  - Blocks: whole slice"
+    pattern: '^  - Blocks: ([Tt]he )?[Ww]hole [Ss]lice$'
+    examples:
+      - "  - Blocks: whole slice"
+      - "  - Blocks: the whole slice"
+      - "  - Blocks: Whole Slice"
+    meaning: "The question holds every unfinished task. The ready check says Holds the whole slice. This stays after resolve-open-questions is recorded and through an open-questions edit. A missing Blocks line does not mean this."
+    written_by: [crav1-resolve-open-questions]
+    read_by: [crav1-tasks-ready-to-build]
+    readiness: true
+    mention: 'Blocks: whole slice'
+    since: 1.137.0
+
+  # ---------- spec.md: approval needed ----------
+  - id: approval-person
+    name: "Person"
+    group: approval
+    files: ["docs/specs/<slug>/spec.md (indented under an Approval needed item)"]
+    format: "  - Person: <who>"
+    pattern: '^  - Person: .+$'
+    examples:
+      - "  - Person: the partner"
+    meaning: "The person whose yes the item waits on."
+    written_by: [crav1-plan-from-spec, crav1-build-tasks]
+    read_by: [crav1-tasks-ready-to-build, crav1-record-approval, crav1-show-or-ask-open-questions]
+    readiness: true
+    mention: 'Person:'
+    since: 1.141.0
+
+  - id: approval-holds
+    name: "Holds"
+    group: approval
+    files: ["docs/specs/<slug>/spec.md (indented under an Approval needed item)"]
+    format: "  - Holds: T<n>[, T<n>]"
+    pattern: '^  - Holds: T\d+(, T\d+)*$'
+    examples:
+      - "  - Holds: T4"
+      - "  - Holds: T2, T4"
+    meaning: "The tasks that wait until a matching Approved line is recorded. Other tasks can still start."
+    written_by: [crav1-plan-from-spec, crav1-build-tasks]
+    read_by: [crav1-tasks-ready-to-build, crav1-build-tasks, crav1-record-approval]
+    readiness: true
+    mention: 'Holds:'
+    since: 1.141.0
+
+  - id: approval-approved
+    name: "Approved (person's yes)"
+    group: approval
+    files: ["docs/specs/<slug>/spec.md (indented under an Approval needed item)"]
+    format: '  - Approved: <person>, <source date>, <source>, "<quote>" (accepted by <recorder> <date>)'
+    pattern: '^  - Approved: .+, \d{4}-\d{2}-\d{2}, .+, ".+" \(accepted by .+ \d{4}-\d{2}-\d{2}\)$'
+    examples:
+      - '  - Approved: the partner, 2026-10-02, https://github.com/example/widgets/pull/12#discussion_r9, "Yes, apply the policy." (accepted by Alex 2026-11-12)'
+    meaning: "A lasting record of a named person's yes. The source date is the quote's date. The last date is when it was accepted. Resolve and every other skill leave the line in place. This is not the data-model stage line."
+    written_by: [crav1-record-approval]
+    read_by: [crav1-tasks-ready-to-build, crav1-build-tasks, crav1-resolve-open-questions, crav1-show-or-ask-open-questions]
+    readiness: true
+    mention: 'Approved:'
+    since: 1.141.0
+
+  # ---------- research stale marks ----------
+  - id: stale-note
+    name: "Stale (note)"
+    group: research
+    files: ["docs/research/<topic>.md (below the title and owner line)"]
+    format: "> Stale since <date>: <one line on what changed>. Source: docs/sources/YYYY-MM-DD-<slug>/"
+    pattern: '^> Stale since \d{4}-\d{2}-\d{2}: .+\. Source: docs/sources/\S+/$'
+    examples:
+      - "> Stale since 2026-10-14: the vendor now offers a fixed IP. Source: docs/sources/2026-10-14-vendor-mail/"
+    meaning: "A kept quote contradicts the research note; written after a yes."
+    written_by: [crav1-add-to-spec]
+    read_by: [crav1-what-do-we-know-about-this, crav1-ado-sync, crav1-plan-from-spec]
+    mention: 'Stale since'
+    since: 1.37.0
+
+  - id: stale-finding
+    name: "Stale (spec finding)"
+    group: research
+    files: ["docs/specs/<slug>/spec.md (under ## Research findings)"]
+    format: "Stale since <date>: <one line>. See <note path>."
+    pattern: '^Stale since \d{4}-\d{2}-\d{2}: .+\. See \S+\.$'
+    examples:
+      - "Stale since 2026-10-14: the vendor now offers a fixed IP. See docs/research/vendor-network.md."
+    meaning: "The spec relies on a research note marked stale."
+    written_by: [crav1-add-to-spec]
+    read_by: [crav1-what-do-we-know-about-this, crav1-plan-from-spec]
+    mention: 'Stale since'
+    since: 1.37.0
+
+  - id: stale-narrowed
+    name: "Stale, narrowed"
+    group: research
+    files: ["docs/research/<topic>.md", "docs/specs/<slug>/spec.md (under ## Research findings)"]
+    format: "[> ]Stale since <date>, N of M points open: <points>.[ See <note path>.]"
+    pattern: '^(> )?Stale since \d{4}-\d{2}-\d{2}, \d+ of \d+ points open: .+\.( See \S+\.)?$'
+    examples:
+      - "> Stale since 2026-10-14, 1 of 2 points open: allowlist."
+    meaning: "Some points of a stale mark are still open after an update."
+    written_by: [crav1-add-to-spec, crav1-refresh-system-notes]
+    read_by: [crav1-what-do-we-know-about-this]
+    mention: 'Stale since|narrowed'
+    since: 1.38.0
+
+  - id: stale-point
+    name: "Point"
+    group: research
+    files: ["docs/specs/<slug>/spec.md (under a Stale since line)"]
+    format: "Point: <short label>. <the research line or the question, quoted>."
+    pattern: '^Point: [^.]+\. .+[.!?]"?$'
+    examples:
+      - 'Point: fixed IP. "The vendor cannot offer a fixed address."'
+    meaning: "One hit of a stale mark, checked again when the note is updated."
+    written_by: [crav1-add-to-spec]
+    read_by: [crav1-refresh-system-notes]
+    mention: 'Point:|points'
+    since: 1.38.0
+
+  - id: stale-cleared
+    name: "Cleared"
+    group: research
+    files: ["docs/specs/<slug>/spec.md (under ## Research findings)"]
+    format: "Cleared <date>: updated note <path or commit>."
+    pattern: '^Cleared \d{4}-\d{2}-\d{2}: updated note \S+\.$'
+    examples:
+      - "Cleared 2026-10-20: updated note docs/research/vendor-network.md."
+    meaning: "Every point of the stale mark is resolved."
+    written_by: [crav1-add-to-spec, crav1-refresh-system-notes]
+    read_by: []
+    mention: '(?i)clear'
+    since: 1.37.0
+
+  - id: stale-resolved
+    name: "Resolved"
+    group: research
+    files: ["docs/specs/<slug>/spec.md (under a narrowed Stale since line)"]
+    format: "Resolved <date>: <point>. Updated note <path or commit>. <how>."
+    pattern: '^Resolved \d{4}-\d{2}-\d{2}: .+\. Updated note \S+\. .+\.$'
+    examples:
+      - "Resolved 2026-10-20: fixed IP. Updated note docs/research/vendor-network.md. The vendor confirmed a fixed address."
+    meaning: "One point of a still-open mark is resolved."
+    written_by: [crav1-add-to-spec]
+    read_by: []
+    mention: 'Resolved'
+    since: 1.38.0
+
+  - id: stale-waiting
+    name: "Waiting point"
+    group: research
+    files: ["docs/specs/<slug>/spec.md (under a narrowed Stale since line)"]
+    format: "<point>: <waiting for the note's owner. Follow-up <N> of this mark. | open question on <slug>, waiting for <who>.>"
+    pattern: "^.+: (waiting for the note's owner\\. Follow-up \\d+ of this mark\\.|open question on \\S+, waiting for .+\\.)$"
+    examples:
+      - "allowlist: waiting for the note's owner. Follow-up 1 of this mark."
+      - "allowlist: open question on orders-retry, waiting for the network team."
+    meaning: "Where an open point of a stale mark waits."
+    written_by: [crav1-add-to-spec]
+    read_by: []
+    mention: 'waiting for'
+    since: 1.38.0
+
+  # ---------- plan.md and tasks.md ----------
+  - id: reviewed
+    name: "Reviewed"
+    group: plan
+    files: ["docs/specs/<slug>/plan.md (under the # Plan title)"]
+    format: "Reviewed: <date>, P# open: <n>"
+    pattern: '^Reviewed: \d{4}-\d{2}-\d{2}, P# open: \d+$'
+    examples:
+      - "Reviewed: 2026-10-14, P# open: 0"
+    meaning: "The plan was reviewed, and how many reviewer findings are still open."
+    written_by: [crav1-review-plan, crav1-tighten-plan]
+    read_by: [crav1-tasks-ready-to-build, crav1-help]
+    readiness: true
+    since: 1.54.0
+
+  - id: task-line
+    name: "Task line"
+    group: plan
+    files: ["docs/specs/<slug>/tasks.md"]
+    format: "- [ ] T<n>: <what> (verify: <kind> — <named check>) (spec: <REQ or acceptance>)"
+    pattern: '^- \[[ x]\] T\d+: .+ \(verify: .+\) \(spec: .+\)( \(after: (?:T\d+|PR \d+)(?:, (?:T\d+|PR \d+))*\))?$'
+    examples:
+      - "- [ ] T1: POST /retry rejects a missing order id (verify: unit — empty id is rejected) (spec: invalid input)"
+      - "- [x] T2: Retry stops after 3 attempts (verify: unit — the 4th call is not made) (spec: retry limit) (after: T1)"
+      - "- [ ] T58: docs/x from develop (verify: unit — the file is present) (spec: docs) (after: PR 87)"
+    meaning: "One ordered, testable task. `[x]` is set by the build worker."
+    written_by: [crav1-plan-from-spec, crav1-tighten-plan, crav1-build-tasks]
+    read_by: [crav1-build-tasks, crav1-review-plan, crav1-tasks-ready-to-build, crav1-verify-build-against-spec]
+    mention: 'T#|T1|tasks\.md'
+    since: 1.0.0
+
+  - id: task-verify
+    name: "(verify: …)"
+    group: plan
+    files: ["docs/specs/<slug>/tasks.md (on a task line)"]
+    format: "(verify: <kind> — <named check>[; <kind> — <named check>])"
+    pattern: '^\(verify: .+ [—-] .+\)$'
+    examples:
+      - "(verify: unit — empty id is rejected; unit — malformed id is rejected)"
+    meaning: "The kind of check and the named checks that prove the task."
+    written_by: [crav1-plan-from-spec, crav1-tighten-plan]
+    read_by: [crav1-build-tasks, crav1-review-plan]
+    mention: '\(verify:'
+    since: 1.0.0
+
+  - id: task-spec
+    name: "(spec: …)"
+    group: plan
+    files: ["docs/specs/<slug>/tasks.md (on a task line)"]
+    format: "(spec: <REQ or acceptance>)"
+    pattern: '^\(spec: .+\)$'
+    examples:
+      - "(spec: invalid input)"
+    meaning: "The acceptance line or requirement the task covers."
+    written_by: [crav1-plan-from-spec, crav1-tighten-plan]
+    read_by: [crav1-review-plan, crav1-ado-sync]
+    mention: '\(spec:'
+    since: 1.0.0
+
+  - id: task-after
+    name: "(after: …)"
+    group: plan
+    files: ["docs/specs/<slug>/tasks.md (end of a task line)"]
+    format: "(after: T<n>[, T<n>][, PR <n>])"
+    pattern: '^\(after: (?:T\d+|PR \d+)(?:, (?:T\d+|PR \d+))*\)$'
+    examples:
+      - "(after: T1, T3)"
+      - "(after: PR 87)"
+      - "(after: T1, PR 87)"
+    meaning: "The task needs those tasks done first, or waits until that pull request is merged."
+    written_by: [crav1-plan-from-spec, crav1-tighten-plan]
+    read_by: [crav1-tasks-ready-to-build, crav1-help]
+    readiness: true
+    mention: '\(after:'
+    since: 1.54.0
+
+  - id: task-after-release
+    name: "(after-release: …)"
+    group: plan
+    files: ["docs/specs/<slug>/tasks.md (on a manual prod task line)"]
+    format: "(after-release: <branch>)"
+    pattern: '^\(after-release: \S+\)$'
+    examples:
+      - "(after-release: main)"
+    meaning: "A manual prod task that runs only after the first release to that branch and a prod yes. The ready check holds it as Waiting and never offers it as the first task."
+    written_by: [crav1-plan-from-spec]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    mention: 'after-release'
+    since: 1.197.0
+
+  - id: task-branch
+    name: "(branch: …)"
+    group: plan
+    files: ["docs/specs/<slug>/tasks.md (end of a task line, after (after: …))"]
+    format: "(branch: [<repo> ]<branch>)"
+    pattern: '^\(branch: (\S+ )?\S+\)$'
+    examples:
+      - "(branch: feat/orders-retry)"
+      - "(branch: orders-api feat/orders-retry)"
+    meaning: "The branch the task is built on when no (map:) is set. The build map uses it as the row name in that case. The repo is named when the spec spans repos. Since 1.140.0 a feat/ name or committed later on the task line also wins over the plan step. The plan step is used only when the task line names no branch."
+    written_by: [crav1-plan-from-spec]
+    read_by: [crav1-build-tasks, crav1-build-features, crav1-create-feature-branch, crav1-tasks-ready-to-build, crav1-verify-build-against-spec, crav1-help, crav1-review-pr]
+    mention: '\(branch:'
+    since: 1.64.0
+
+  - id: task-step
+    name: "(step: …)"
+    group: plan
+    files: ["docs/specs/<slug>/tasks.md (end of a task line)"]
+    format: "(step: <n>)"
+    pattern: '^\(step: \d+\)$'
+    examples:
+      - "(step: 1)"
+    meaning: "The task belongs to this numbered Approach step on the build map. When absent, a task id written in the step is the link. This mark wins when both are present."
+    written_by: [crav1-plan-from-spec]
+    read_by: [crav1-tasks-ready-to-build]
+    readiness: true
+    mention: '\(step:'
+    since: 1.128.0
+
+  - id: task-map
+    name: "(map: …)"
+    group: plan
+    files: ["docs/specs/<slug>/tasks.md (end of a task line)"]
+    format: "(map: [<repo> ]<branch>)"
+    pattern: '^\(map: (\S+ )?\S+\)$'
+    examples:
+      - "(map: feat/cancel-refund)"
+    meaning: "The task is built on this branch instead of its plan step's branch. Tasks that name the same branch share it. When absent, a branch named on the task line is the row, else the plan step (1.140.0). Since 1.129.0 the build prompt writes this mark, and does not commit it, when the picked branch is not the offered branch. Since 1.161.0 a confirmed `fix-loop` (ready check) or `fix-loop` plan issue (tighten-plan) writes or replaces it, uncommitted, to break a loop between branches, keeping a repo word."
+    written_by: [crav1-plan-from-spec, crav1-create-feature-branch, crav1-tasks-ready-to-build, crav1-tighten-plan]
+    read_by: [crav1-tasks-ready-to-build, crav1-build-tasks, crav1-create-feature-branch, crav1-build-features]
+    readiness: true
+    mention: '\(map:'
+    since: 1.128.0
+
+  # ---------- docs/system/repos.md ----------
+  - id: synced-at-repo
+    name: "Synced at (repo line)"
+    group: system
+    files: ["docs/system/repos.md (## Synced at section, after the table)"]
+    format: "- <repo> <branch>@<short sha>, <date>"
+    pattern: '^- \S+ \S+@[0-9a-f]{7}, \d{4}-\d{2}-\d{2}$'
+    examples:
+      - "- orders-api develop@def5678, 2026-10-06"
+      - "- orders-api main@abc1234, 2026-10-07"
+    meaning: "The commit a whole-repo read last read. Since 1.84.0 one line per repo and branch, sorted by repo, then branch; the table has no Synced at column."
+    written_by: [crav1-add-to-spec, crav1-bundle-to-specs, crav1-ideas-to-spec, crav1-refresh-system-notes, crav1-existing-to-specs]
+    read_by: [crav1-refresh-system-notes, crav1-update-specs-from-changes-and-prs]
+    mention: 'Synced at'
+    since: 1.29.0
+
+  - id: merges-into
+    name: "Merges into"
+    group: system
+    files: ["docs/system/repos.md (Merges into column)"]
+    format: "<branch>"
+    pattern: '^\S+$'
+    examples:
+      - "develop"
+    meaning: "The branch the repo's work merges into. Empty means the default branch. Fork point, done and the open-pr base use it."
+    written_by: [crav1-add-to-spec]
+    read_by: [crav1-open-pr, crav1-add-to-spec, crav1-review-pr]
+    mention: 'Merges into'
+    since: 1.64.0
+
+  - id: work-items-go-to
+    name: "Work items go to"
+    group: system
+    files: ["docs/system/repos.md (Work items go to column)"]
+    format: "ADO: <org>/<project>"
+    pattern: '^ADO: [^/\s]+/.+$'
+    examples:
+      - "ADO: contoso/orders"
+    meaning: "The work item home of that repo. `Jira:` is reserved and read as no home."
+    written_by: [crav1-ado-sync]
+    read_by: [crav1-ado-sync, crav1-finalize-commit, crav1-open-pr, crav1-what-do-we-know-about-this]
+    mention: 'Work items go to'
+    since: 1.50.0
+
+  - id: sweep-item
+    name: "Sweep item"
+    group: system
+    files: ["docs/system/sweep-progress.md (## Items)"]
+    format: "- <id> | <pending | current | done | collected | dropped | skipped> | <branch | pr> | <repo> | <ref> | <command> | <outcome> | <flags> | <slug or reason>"
+    pattern: '^- [A-Za-z0-9][A-Za-z0-9._/-]* \| (pending|current|done|collected|dropped|skipped) \| (branch|pr) \| [A-Za-z0-9][A-Za-z0-9._-]* \| \S+ \| /crav1-add-to-spec (code-change \S+ \S+|pr \S+ \d+ all) \| (-|notes|synced-at|notes\+synced-at|proposal|spec) \| (-|[A-Za-z0-9:./_-]+(?:;[A-Za-z0-9:./_-]+)*) \| (-|[a-z0-9-]+(?:,[a-z0-9-]+)*|reason: [^|]+)$'
+    examples:
+      - "- orders-api/pr/71 | collected | pr | orders-api | 71 | /crav1-add-to-spec pr orders-api 71 all | proposal | draft;head:feat/orders-retry | orders-retry"
+      - "- orders-api/branch/feat/orders-retry | dropped | branch | orders-api | feat/orders-retry | /crav1-add-to-spec code-change orders-api feat/orders-retry | - | - | reason: covered by pr 71"
+    meaning: "One branch or pull request in the current sweep, and whether it is still to do. The script writes the line. A hand edit is not a resume point."
+    written_by: [crav1-update-specs-from-changes-and-prs]
+    read_by: [crav1-update-specs-from-changes-and-prs]
+    since: 1.124.0
+
+  - id: sweep-proposal
+    name: "Sweep proposal"
+    group: system
+    files: ["docs/system/sweep-progress.md (## Proposals)"]
+    format: "- <repo> <pr <n> | branch <ref>> | <slug | -> | <text>"
+    pattern: '^- [A-Za-z0-9][A-Za-z0-9._-]* (pr \d+|branch \S+) \| (-|[a-z0-9-]+(?:,[a-z0-9-]+)*) \| [^|]+$'
+    examples:
+      - "- orders-api pr 74 | orders-retry | The retry window moves from 20 s to 30 s."
+    meaning: "A spec change auto flow did not write. The next manual flow can apply it."
+    written_by: [crav1-update-specs-from-changes-and-prs]
+    read_by: [crav1-update-specs-from-changes-and-prs]
+    since: 1.124.0
+
+  - id: sweep-waiting
+    name: "Sweep waiting"
+    group: system
+    files: ["docs/system/sweep-progress.md (## Waiting)"]
+    format: "- <repo> | <fetch failed | no checkout | signed out | rate limit> | <detail>"
+    pattern: '^- [A-Za-z0-9][A-Za-z0-9._-]* \| (fetch failed|no checkout|signed out|rate limit) \| [^|]+$'
+    examples:
+      - "- orders-web | fetch failed | login expired"
+      - "- orders-api | rate limit | host rate limit on pr 71"
+    meaning: "A repo or pull request this sweep skipped. The run lists it under Waiting and continues."
+    written_by: [crav1-update-specs-from-changes-and-prs]
+    read_by: [crav1-update-specs-from-changes-and-prs]
+    since: 1.124.0
+
+  - id: landscape-reference
+    name: "Reference-only line"
+    group: system
+    files: ["docs/system/landscape.md (under ## How the parts connect)"]
+    format: "<title>: reference only, see docs/notes/<YYYY-MM>/<YYYY-MM-DD>-<slug>.md"
+    pattern: '^.+: reference only, see docs/notes/\d{4}-\d{2}/\d{4}-\d{2}-\d{2}-[a-z0-9-]+\.md$'
+    examples:
+      - "Orders export: reference only, see docs/notes/2026-09/2026-09-02-orders-export.md"
+    meaning: "A spec converted to a note stays visible in the picture."
+    written_by: [crav1-retire-spec]
+    read_by: []
+    mention: 'reference only'
+    since: 1.60.0
+
+  # ---------- docs/environments/marks.md ----------
+  - id: environment-mark
+    name: "Environment mark"
+    group: environments
+    files: ["docs/environments/marks.md"]
+    format: "<resource-id-or-name> | <group> | <environment> | <source>"
+    pattern: '^\S+ \| \S+ \| (dev|development|test|testing|stage|staging|uat|qa|pre-prod|preprod|prod|production|live) \| (pipeline .+, stage .+|marked by the user|marked by the user, suggested by group)$'
+    examples:
+      - "orders-api | rg-orders | dev | pipeline orders-ci, stage Dev"
+      - "orders-db | rg-orders | test | marked by the user, suggested by group"
+    meaning: "One confirmed environment per resource. Full rules in environments-marks.md."
+    written_by: [crav1-read-environment, crav1-map-pipeline-environments]
+    read_by: [crav1-read-environment, crav1-what-do-we-know-about-this]
+    mention: 'marks\.md'
+    since: 1.18.0
+
+  - id: promotion-line
+    name: "Promotion line"
+    group: environments
+    files: ["docs/environments/promotion.md"]
+    format: "<repo> | <branch, pattern or tag <pattern>> | <environment>[ (after <environment>)] | <source>"
+    pattern: '^\S+ \| (tag )?\S+ \| ((dev|development|test|stage|uat|qa|pre-prod|prod)|\S+ \(after \S+\)) \| (pipeline .+, stage .+|marked by the user)$'
+    examples:
+      - "orders-api | develop | test | pipeline orders-cd, stage DeployTest"
+      - "orders-api | release/* | prod | marked by the user"
+      - "orders-api | tag v* | prod | marked by the user"
+      - "orders-api | hotfix | sandbox (after dev) | marked by the user"
+    meaning: "Which branch, branch pattern or tag pattern deploys to which environment. Read for the Promotion: report line (branch reach, not deployment proof); never changes done. An unknown environment word needs (after …), else the line is Unclear. Full rules in environments-promotion.md."
+    written_by: [crav1-map-pipeline-environments]
+    read_by: [crav1-help, crav1-verify-build-against-spec, crav1-tasks-ready-to-build, crav1-merge-pr]
+    mention: 'promotion\.md'
+    since: 1.69.0
+
+  - id: azure-boards-task-type
+    name: "Azure Boards task type"
+    group: environments
+    files: ["docs/environments/marks.md"]
+    format: "Azure Boards task type[ (<project>)]: <type>"
+    pattern: '^Azure Boards task type( \(\S+\))?: .+$'
+    examples:
+      - "Azure Boards task type (orders): User Story"
+    meaning: "The work item type a task becomes in that project."
+    written_by: [crav1-ado-sync]
+    read_by: [crav1-ado-sync]
+    mention: 'Azure Boards task type'
+    since: 1.45.0
+
+  - id: azure-boards-done-state
+    name: "Azure Boards task done state"
+    group: environments
+    files: ["docs/environments/marks.md"]
+    format: "Azure Boards task done state[ (<project>)]: <state>"
+    pattern: '^Azure Boards task done state( \(\S+\))?: .+$'
+    examples:
+      - "Azure Boards task done state (orders): Closed"
+    meaning: "The done state of that type in that project."
+    written_by: [crav1-ado-sync]
+    read_by: [crav1-ado-sync]
+    mention: 'Azure Boards task done state'
+    since: 1.48.0
+
+  # ---------- work-item.md ----------
+  - id: work-item-line
+    name: "Work item"
+    group: work-items
+    files: ["docs/specs/<slug>/work-item.md"]
+    format: "Work item: <id>[ — <milestone or slice>] (ADO: <org>/<project>)"
+    pattern: '^Work item: \d+( — .+)? \(ADO: [^/\s]+/\S+\)$'
+    examples:
+      - "Work item: 52 (ADO: contoso/orders)"
+      - "Work item: 81 — October billing (ADO: contoso/orders)"
+    meaning: "A Feature id and its home. An older line without the tag uses marks.md."
+    written_by: [crav1-ado-sync]
+    read_by: [crav1-finalize-commit, crav1-ado-sync]
+    mention: 'Work item'
+    since: 1.0.0
+
+  - id: work-item-task-line
+    name: "Work item task"
+    group: work-items
+    files: ["docs/specs/<slug>/work-item.md"]
+    format: "Work item: <id> — task: T<n> <title> (ADO: <org>/<project>)"
+    pattern: '^Work item: \d+ — task: T\d+ .+ \(ADO: [^/\s]+/\S+\)$'
+    examples:
+      - "Work item: 1234 — task: T1 Reject a missing order id (ADO: contoso/orders)"
+    meaning: "A child work item for one task."
+    written_by: [crav1-ado-sync]
+    read_by: [crav1-finalize-commit, crav1-ado-sync]
+    mention: 'task: T'
+    since: 1.45.0
+
+  # ---------- notes and sources ----------
+  - id: note-used-by
+    name: "used_by"
+    group: notes
+    files: ["docs/notes/YYYY-MM/<note>.md (front matter)"]
+    format: "used_by: [<slug>, <slug>]"
+    pattern: '^used_by: \[([a-z0-9-]+(, [a-z0-9-]+)*)?\]$'
+    examples:
+      - "used_by: [orders-retry, billing]"
+    meaning: "The specs that took points from the note."
+    written_by: [crav1-add-to-spec, crav1-bundle-to-specs, crav1-ideas-to-spec, crav1-spark-to-spec, crav1-tighten-spec, crav1-existing-to-specs, crav1-retire-spec]
+    read_by: [crav1-ado-sync]
+    mention: 'used_by'
+    since: 1.61.0
+
+  - id: note-commits
+    name: "commits"
+    group: notes
+    files: ["docs/notes/YYYY-MM/<note>.md (front matter, code change notes only)"]
+    format: "commits: [<short sha>[, <short sha>]]"
+    pattern: '^commits: \[([0-9a-f]{7}(, [0-9a-f]{7})*)?\]$'
+    examples:
+      - "commits: [155b5c4, 2c0e1a9]"
+    meaning: "The commits a code-change note imported, oldest first, without merge commits. The overlap check matches on it."
+    written_by: [crav1-add-to-spec]
+    read_by: [crav1-add-to-spec, crav1-tighten-spec]
+    mention: 'commits:'
+    since: 1.64.0
+
+  - id: note-commit-line
+    name: "Commit line (code change note)"
+    group: notes
+    files: ["docs/notes/YYYY-MM/<note>.md (body of a code change note, one per imported commit)"]
+    format: "<short sha> <author date> <subject>"
+    pattern: '^[0-9a-f]{7} \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2} .+$'
+    examples:
+      - "155b5c4 2026-10-01T08:00:12+02:00 Retry an order call on timeout"
+    meaning: "The imported commit with its author date and subject. When the commit is no longer on disk after a force push, the same author date and subject count as the same change."
+    written_by: [crav1-add-to-spec]
+    read_by: [crav1-add-to-spec]
+    mention: 'author date'
+    since: 1.64.1
+
+  - id: note-kind
+    name: "kind"
+    group: notes
+    files: ["docs/notes/YYYY-MM/<note>.md (front matter)", "docs/notes/_template/note.md"]
+    format: "kind: <fact | dump | code change | meeting | email | chat | review-pr | pull request | converted spec>"
+    pattern: '^kind: (fact|dump|code change|meeting|email|chat|review-pr|pull request|converted spec)$'
+    examples:
+      - "kind: code change"
+      - "kind: pull request"
+    meaning: "What the note holds. `pull request` (1.65.0) is the PR note: one per pull request, with its title and description."
+    written_by: [crav1-add-to-spec, crav1-review-pr, crav1-merge-pr, crav1-retire-spec]
+    read_by: [crav1-add-to-spec, crav1-review-pr]
+    mention: 'kind: '
+    since: 1.65.0
+
+  - id: note-pr-source
+    name: "PR note source"
+    group: notes
+    files: ["docs/notes/YYYY-MM/YYYY-MM-DD-pr-<repo>-<n>.md (front matter)"]
+    format: "source: PR <n> <repo URL path>"
+    pattern: '^source: PR \d+ \S+/\S+$'
+    examples:
+      - "source: PR 71 dev.azure.com/contoso/orders/orders-api"
+      - "source: PR 12 github.com/orders-org/orders-specs"
+    meaning: "The PR note's key: host, repo and pull request number. One note per pull request; a later read reuses it."
+    written_by: [crav1-add-to-spec, crav1-review-pr, crav1-merge-pr]
+    read_by: [crav1-add-to-spec, crav1-review-pr, crav1-merge-pr]
+    mention: 'source: PR '
+    since: 1.65.0
+
+  - id: note-pr-link
+    name: "pr_note"
+    group: notes
+    files: ["docs/notes/YYYY-MM/<note>.md (front matter of a code change or review-pr note from a pull request)"]
+    format: "pr_note: docs/notes/YYYY-MM/<file>.md"
+    pattern: '^pr_note: docs/notes/\d{4}-\d{2}/[a-z0-9.-]+\.md$'
+    examples:
+      - "pr_note: docs/notes/2026-10/2026-10-02-pr-orders-api-71.md"
+    meaning: "Links a code-change note (or a review follow-ups note from before 1.97.0) to the PR note of the pull request it came from."
+    written_by: [crav1-add-to-spec]
+    read_by: [crav1-add-to-spec]
+    mention: 'pr_note:'
+    since: 1.65.0
+
+  # ---------- PR note: the shared PR record (1.97.0) ----------
+  - id: pr-record
+    name: "PR record"
+    group: notes
+    files: ["docs/notes/YYYY-MM/YYYY-MM-DD-pr-<repo>-<n>.md (body, after the header lines)"]
+    format: "## PR record"
+    pattern: '^## PR record$'
+    examples:
+      - "## PR record"
+    meaning: "The one shared record of a pull request: one sorted line per item, read and written by pr-status, review-pr, add-to-spec and merge-pr. Format in crav1-add-to-spec references/pr-record.md."
+    written_by: [crav1-pr-status, crav1-review-pr, crav1-add-to-spec, crav1-merge-pr]
+    read_by: [crav1-pr-status, crav1-review-pr, crav1-add-to-spec, crav1-merge-pr, crav1-help, crav1-ado-sync]
+    mention: '## PR record'
+    since: 1.97.0
+
+  - id: pr-record-order
+    name: "Order (PR record)"
+    group: notes
+    files: ["docs/notes/YYYY-MM/YYYY-MM-DD-pr-<repo>-<n>.md (PR record)"]
+    format: "- Order: <after | before> PR <n> <repo> (<branch>) | <why> | <YYYY-MM-DD>"
+    pattern: '^- Order: (after|before) PR \d+ \S+ \(\S+\) \| .+ \| \d{4}-\d{2}-\d{2}$'
+    examples:
+      - "- Order: after PR 40 orders-api (feat/orders-queue) | merge order asked in thread 106, reply 2026-10-20 | 2026-10-27"
+    meaning: "A pull request this one depends on, or that depends on it, and why. The merge order comes from these lines."
+    written_by: [crav1-pr-status]
+    read_by: [crav1-pr-status, crav1-add-to-spec]
+    mention: 'Order:'
+    since: 1.97.0
+
+  - id: pr-record-point
+    name: "Point (PR record)"
+    group: notes
+    files: ["docs/notes/YYYY-MM/YYYY-MM-DD-pr-<repo>-<n>.md (PR record)"]
+    format: "- Point: <anchor> | <status> | <owner> | <tags or -> | <text>"
+    pattern: '^- Point: \S.* \| (done [0-9a-f]{7,}|done host|agreed|declined|open|waiting on .+|needs .+|follow-up|migrated) \| .+ \| .+ \| .+$'
+    examples:
+      - "- Point: tests/test_retry_store.py:45 | done 3c9d2e1 | Sam Lee | thread 98; host fixed | Fixture could clean live tables"
+      - "- Point: general | waiting on Sam Lee | Sam Lee | asked; from review-pr 2026-10-19 | Is the cut-off local time?"
+      - "- Point: general | done host | Sam Lee | thread 101; required build on develop read back 2026-11-05 | Add a required build"
+    meaning: "One point of the pull request with its status: done <sha>, done host (a host setting read back live, 1.115.0), agreed, declined, open, waiting on <name>, needs <name>, follow-up or migrated. Never deleted; a change replaces the line where it is."
+    written_by: [crav1-pr-status, crav1-review-pr, crav1-add-to-spec]
+    read_by: [crav1-pr-status, crav1-review-pr, crav1-add-to-spec, crav1-merge-pr, crav1-help, crav1-ado-sync]
+    mention: '\bPoints?\b'
+    since: 1.97.0
+
+  - id: pr-record-read
+    name: "Read (PR record)"
+    group: notes
+    files: ["docs/notes/YYYY-MM/YYYY-MM-DD-pr-<repo>-<n>.md (PR record)"]
+    format: "- Read: <name> | <short sha>, push <n>, newest comment <timestamp> | <YYYY-MM-DD>"
+    pattern: '^- Read: .+ \| [0-9a-f]{7,}, push \d+, newest comment \S+ \| \d{4}-\d{2}-\d{2}$'
+    examples:
+      - "- Read: Alex Doe | 7b41a0c, push 6, newest comment 2026-10-26T15:03Z | 2026-10-27"
+    meaning: "What one person's last pr-status run saw. since last compares with it; each person has their own line. A Read: sweep line is the sweep watermark, not a person."
+    written_by: [crav1-pr-status]
+    read_by: [crav1-pr-status, crav1-update-specs-from-changes-and-prs]
+    mention: 'Read:'
+    since: 1.97.0
+
+  - id: read-sweep
+    name: "Read sweep"
+    group: notes
+    files: ["docs/notes/YYYY-MM/YYYY-MM-DD-pr-<repo>-<n>.md (PR record)"]
+    format: "- Read: sweep | <short sha>, push <n>, newest comment <timestamp> | <YYYY-MM-DD>"
+    pattern: '^- Read: sweep \| [0-9a-f]{7,}, push \d+, newest comment \S+ \| \d{4}-\d{2}-\d{2}$'
+    examples:
+      - "- Read: sweep | 7b41a0c, push 6, newest comment 2026-10-26T15:03Z | 2026-10-27"
+      - "- Read: sweep | 7b41a0c, push 6, newest comment none | 2026-10-27"
+    meaning: "What the last sweep read on this pull request. It is not a person's Read line. since last does not use it."
+    written_by: [crav1-update-specs-from-changes-and-prs]
+    read_by: [crav1-update-specs-from-changes-and-prs, crav1-pr-status]
+    mention: 'Read: sweep'
+    since: 1.124.0
+
+  - id: pr-record-ready
+    name: "Ready (PR record)"
+    group: notes
+    files: ["docs/notes/YYYY-MM/YYYY-MM-DD-pr-<repo>-<n>.md (PR record)"]
+    format: "- Ready: <yes | no | merged> | <why> | <YYYY-MM-DD> by <skill>"
+    pattern: '^- Ready: (yes|no|merged) \| .+ \| \d{4}-\d{2}-\d{2} by [a-z-]+$'
+    examples:
+      - "- Ready: no | 1 needs Robin K.; after PR 40 (not merged) | 2026-10-27 by pr-status"
+    meaning: "Whether the pull request is ready to merge as far as its points go. merge-pr stops on no unless the turn says anyway."
+    written_by: [crav1-pr-status, crav1-merge-pr]
+    read_by: [crav1-merge-pr, crav1-pr-status]
+    mention: 'Ready:'
+    since: 1.97.0
+
+  - id: pr-record-state
+    name: "State (PR record)"
+    group: notes
+    files: ["docs/notes/YYYY-MM/YYYY-MM-DD-pr-<repo>-<n>.md (PR record, last line)"]
+    format: "- State: <active | draft | merged | abandoned | closed> | <YYYY-MM-DD>"
+    pattern: '^- State: (active|draft|merged|abandoned|closed) \| \d{4}-\d{2}-\d{2}$'
+    examples:
+      - "- State: active | 2026-10-27"
+      - "- State: merged | 2026-10-28"
+    meaning: "The pull request's state on the host as last read. One line; it replaces the older State on mentions."
+    written_by: [crav1-pr-status, crav1-review-pr, crav1-add-to-spec, crav1-merge-pr]
+    read_by: [crav1-pr-status, crav1-add-to-spec, crav1-merge-pr]
+    mention: 'State:'
+    since: 1.97.0
+
+  - id: pr-description-as-of
+    name: "Description version (PR note)"
+    group: notes
+    files: ["docs/notes/YYYY-MM/YYYY-MM-DD-pr-<repo>-<n>.md (body)"]
+    format: "## Description as of <YYYY-MM-DD>"
+    pattern: '^## Description as of \d{4}-\d{2}-\d{2}$'
+    examples:
+      - "## Description as of 2026-10-19"
+    meaning: "One version of the pull request description. A changed description is appended as a new section; earlier ones are never removed."
+    written_by: [crav1-add-to-spec, crav1-review-pr, crav1-merge-pr]
+    read_by: [crav1-add-to-spec, crav1-review-pr, crav1-merge-pr]
+    mention: 'Description as of'
+    since: 1.65.0
+
+  - id: asked-on-the-pr
+    name: "Asked on the PR"
+    group: notes
+    files: ["docs/notes/YYYY-MM/review-pr-<n>-follow-ups.md (a bullet, before 1.97.0)"]
+    format: "- Asked on the PR: <question>"
+    pattern: '^- Asked on the PR: .+$'
+    examples:
+      - "- Asked on the PR: Should the retry log stay in the SQL table? (answered on the PR 2026-10-20)"
+    meaning: "Before 1.97.0: a question asked in the review comment, kept in the follow-ups note. Read only; migrate formats turns it into a Point tagged asked, and from 1.97.0 a question is a waiting on Point in the PR record."
+    written_by: []
+    read_by: [crav1-add-to-spec]
+    mention: 'Asked on the PR:'
+    since: 1.66.0
+
+  - id: comment-as-drafted
+    name: "Comment as drafted"
+    group: notes
+    files: ["docs/notes/YYYY-MM/YYYY-MM-DD-pr-<repo>-<n>.md (history, after the PR record; the follow-ups note before 1.97.0)"]
+    format: "## Comment as drafted, <YYYY-MM-DD>"
+    pattern: '^## Comment as drafted, \d{4}-\d{2}-\d{2}$'
+    examples:
+      - "## Comment as drafted, 2026-10-19"
+    meaning: "The paste-ready comment of one review, word for word in a code fence. Later runs compare the posted comment with it."
+    written_by: [crav1-review-pr]
+    read_by: [crav1-review-pr]
+    mention: 'Comment as drafted'
+    since: 1.67.0
+
+  - id: comment-as-posted
+    name: "Comment as posted"
+    group: notes
+    files: ["docs/notes/YYYY-MM/YYYY-MM-DD-pr-<repo>-<n>.md (history, after the PR record; the follow-ups note before 1.97.0)"]
+    format: "## Comment as posted, <YYYY-MM-DD> (by <name>)[, edited]"
+    pattern: '^## Comment as posted, \d{4}-\d{2}-\d{2} \(by [^()\n]+\)(, edited)?$'
+    examples:
+      - "## Comment as posted, 2026-10-19 (by Alex Doe)"
+      - "## Comment as posted, 2026-10-21 (by Alex Doe), edited"
+    meaning: "The comment as the reviewers see it, word for word in a code fence. An edit on the host adds a new section; earlier ones are never removed."
+    written_by: [crav1-review-pr]
+    read_by: [crav1-review-pr]
+    mention: 'Comment as posted'
+    since: 1.67.0
+
+  - id: comment-posted-source
+    name: "Posted comment source"
+    group: notes
+    files: ["docs/notes/YYYY-MM/YYYY-MM-DD-pr-<repo>-<n>.md (first line under Comment as posted; the follow-ups note before 1.97.0)"]
+    format: "<Read from the PR thread: <url>. | Pasted in chat. | Posted from this review on the user's yes: <url>.> Draft compared: <YYYY-MM-DD | none>. Description reviewed: as of <YYYY-MM-DD> (PR note).[ Verbatim except: <kind> removed.][ Edited on the host.]"
+    pattern: '^(Read from the PR thread: https://\S+\.|Pasted in chat\.|Posted from this review on the user''s yes: https://\S+\.) Draft compared: (\d{4}-\d{2}-\d{2}|none)\. Description reviewed: as of \d{4}-\d{2}-\d{2} \(PR note\)\.( Verbatim except: .+ removed\.)?( Edited on the host\.)?$'
+    examples:
+      - "Read from the PR thread: https://github.com/contoso/orders-api/pull/42#issuecomment-1001. Draft compared: 2026-10-19. Description reviewed: as of 2026-10-18 (PR note)."
+      - "Pasted in chat. Draft compared: 2026-10-19. Description reviewed: as of 2026-10-18 (PR note). Verbatim except: API key removed."
+    meaning: "Where the posted text came from, which draft it was compared with, and which description version the review read."
+    written_by: [crav1-review-pr]
+    read_by: [crav1-review-pr]
+    mention: 'Read from the PR thread'
+    since: 1.67.0
+
+  - id: not-in-posted-comment
+    name: "Not in the posted comment"
+    group: notes
+    files: ["docs/notes/YYYY-MM/review-pr-<n>-follow-ups.md (end of a bullet, before 1.97.0)"]
+    format: "<bullet> (Not in the posted comment, <YYYY-MM-DD>; still open.)"
+    pattern: '^- .+ \(Not in the posted comment, \d{4}-\d{2}-\d{2}; still open\.\)( \((done in [0-9a-f]{7,}|posted \d{4}-\d{2}-\d{2})\))?$'
+    examples:
+      - "- `src/orders/retry_store.py`, line 9: an idempotency test for the row key. (Not in the posted comment, 2026-10-19; still open.)"
+    meaning: "Before 1.97.0: a drafted point the user left out of the posted comment. Read only; from 1.97.0 it is the not posted tag on the Point, and migrate formats converts it."
+    written_by: []
+    read_by: [crav1-review-pr]
+    mention: 'Not in the posted comment'
+    since: 1.67.0
+
+  - id: note-waiting-for
+    name: "waiting_for"
+    group: notes
+    files: ["docs/notes/YYYY-MM/<note>.md (front matter)"]
+    format: "waiting_for: [<parked slug>]"
+    pattern: '^waiting_for: \[([a-z0-9-]+(, [a-z0-9-]+)*)?\]$'
+    examples:
+      - "waiting_for: [orders-export]"
+    meaning: "Parked specs the note waits for."
+    written_by: [crav1-add-to-spec, crav1-retire-spec]
+    read_by: [crav1-help, crav1-show-or-ask-open-questions, crav1-ado-sync]
+    mention: 'waiting_for'
+    since: 1.61.0
+
+  - id: note-later-for
+    name: "later_for"
+    group: notes
+    files: ["docs/notes/YYYY-MM/<note>.md (front matter)"]
+    format: "later_for: [<slug or general>]"
+    pattern: '^later_for: \[([a-z0-9-]+(, [a-z0-9-]+)*)?\]$'
+    examples:
+      - "later_for: [orders-api]"
+      - "later_for: [general]"
+    meaning: "Specs (or general team workflow) an item was saved for later on; never a parked spec's waiting list."
+    written_by: [crav1-add-to-spec]
+    read_by: [crav1-help, crav1-tighten-spec, crav1-show-or-ask-open-questions, crav1-retire-spec]
+    mention: 'later_for'
+    since: 1.195.0
+
+  - id: note-converted
+    name: "Converted from spec"
+    group: notes
+    files: ["docs/notes/YYYY-MM/<note>.md (body, after the Source line)"]
+    format: "Converted from spec, no research owner"
+    pattern: '^Converted from spec, no research owner$'
+    examples:
+      - "Converted from spec, no research owner"
+    meaning: "A note made from a spec. Stale marks on it get no revisit request."
+    written_by: [crav1-retire-spec]
+    read_by: [crav1-add-to-spec]
+    since: 1.60.0
+
+  - id: note-legacy-used
+    name: "Absorbed by / Used by (older notes)"
+    group: notes
+    files: ["docs/notes/<note>.md (before 1.61.0)"]
+    format: "<Absorbed by | Used by> <slug>"
+    pattern: '^(Absorbed by|Used by) [a-z0-9-]+$'
+    examples:
+      - "Absorbed by orders-retry"
+    meaning: "Read only. Absorbed by counts as used by. No skill adds new ones."
+    written_by: []
+    read_by: [crav1-add-to-spec]
+    mention: 'Absorbed by'
+    since: 1.36.0
+
+  - id: follow-up-done
+    name: "(done in …)"
+    group: notes
+    files: ["docs/notes/YYYY-MM/review-pr-<n>-follow-ups.md (end of a follow-up, before 1.97.0)"]
+    format: "(done in <short sha>)"
+    pattern: '^\(done in [0-9a-f]{7}\)$'
+    examples:
+      - "(done in abc1234)"
+    meaning: "Before 1.97.0: a review follow-up that a later commit addressed. Read only; migrate formats turns it into a done <sha> Point."
+    written_by: []
+    read_by: [crav1-add-to-spec]
+    mention: 'done in'
+    since: 1.51.0
+
+  - id: source-superseded
+    name: "Superseded by"
+    group: notes
+    files: ["docs/sources/YYYY-MM-DD-<slug>/README.md"]
+    format: "Superseded by: docs/sources/<newer>/"
+    pattern: '^Superseded by: docs/sources/\S+/$'
+    examples:
+      - "Superseded by: docs/sources/2026-10-14-orders-spec-v2/"
+    meaning: "A newer version of this source was imported; specs read only the newest."
+    written_by: [crav1-add-to-spec]
+    read_by: [crav1-add-to-spec]
+    mention: 'Superseded by'
+    since: 1.43.0
+
+  - id: data-model-link
+    name: "Data model"
+    group: data-model
+    files: ["docs/specs/<slug>/spec.md (after the title)"]
+    format: "Data model: docs/data-model/<model>/"
+    pattern: '^Data model: docs/data-model/[a-z0-9-]+/$'
+    examples:
+      - "Data model: docs/data-model/orders/"
+    meaning: "The spec points at its saved data model. Written only after a yes. It is not a requirement edit."
+    written_by: [crav1-model-data]
+    read_by: [crav1-model-data, crav1-what-do-we-know-about-this]
+    since: 1.118.0
+
+  - id: data-model-approved
+    name: "Approved stage"
+    group: data-model
+    files: ["docs/data-model/<model>/confirmed.md"]
+    format: "Approved: <business-model | physical-design> r<n>, <YYYY-MM-DD>"
+    pattern: '^Approved: (business-model|physical-design) r[1-9][0-9]*, \d{4}-\d{2}-\d{2}$'
+    examples:
+      - "Approved: business-model r2, 2026-11-08"
+      - "Approved: physical-design r3, 2026-11-08"
+    meaning: "That stage and revision were explicitly approved. Another stage, or a later revision, stays unapproved."
+    written_by: [crav1-model-data]
+    read_by: [crav1-model-data, crav1-what-do-we-know-about-this]
+    since: 1.118.0
+
+  - id: walk-name
+    name: "Walk"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md (near the title)"]
+    format: "Walk: tighten-and-plan-ready-to-build"
+    pattern: '^Walk: tighten-and-plan-ready-to-build$'
+    examples:
+      - "Walk: tighten-and-plan-ready-to-build"
+    meaning: "Which walk this progress file tracks. The file is position only."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    since: 1.119.0
+
+  - id: walk-slice
+    name: "Slice"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md (near the title)"]
+    format: "Slice: docs/specs/<slug>/"
+    pattern: '^Slice: docs/specs/[a-z0-9-]+/$'
+    examples:
+      - "Slice: docs/specs/orders-retry/"
+    meaning: "The spec folder this progress file sits beside."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    since: 1.119.0
+
+  - id: walk-step
+    name: "Step"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md"]
+    format: "- Step: <playbook | review-architecture | tighten-spec | resolve-open-questions | plan-from-spec | review-and-tighten-plan | tasks-ready-to-build>"
+    pattern: '^- Step: (playbook|review-architecture|tighten-spec|resolve-open-questions|plan-from-spec|review-and-tighten-plan|tasks-ready-to-build)$'
+    examples:
+      - "- Step: review-architecture"
+      - "- Step: tasks-ready-to-build"
+    meaning: "One locked step of the walk. A playbook step is intake only."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    mention: '(?m)^- Step: '
+    since: 1.119.0
+
+  - id: walk-extra
+    name: "Extra"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md"]
+    format: "- Extra: <review-security | research | model-data | show-or-ask-open-questions | suggest-tests-for-code>"
+    pattern: '^- Extra: (review-security|research|model-data|show-or-ask-open-questions|suggest-tests-for-code)$'
+    examples:
+      - "- Extra: review-security"
+      - "- Extra: model-data"
+    meaning: "An optional extra this walk ran. Recorded when it finishes. Not a locked step. Its write does not reopen earlier steps."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    mention: '(?m)^- Extra: '
+    since: 1.123.0
+
+  - id: walk-done
+    name: "Done"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md (under a step)"]
+    format: "  Done: <YYYY-MM-DDTHH:MM:SS+HH:MM>"
+    pattern: '^  Done: \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}$'
+    examples:
+      - "  Done: 2026-11-09T10:19:09+01:00"
+    meaning: "When that step was recorded. Since 1.123.0 the progress script stamps this full timestamp itself."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    mention: '(?m)^  Done: '
+    since: 1.119.0
+
+  - id: walk-result
+    name: "Result"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md (under a step)"]
+    format: "  Result: <done | nothing-to-do | skipped | applied | reapplied | ready | ready-partial | not-ready | jumped | open-point>"
+    pattern: '^  Result: (done|nothing-to-do|skipped|applied|reapplied|ready|ready-partial|not-ready|jumped|open-point)$'
+    examples:
+      - "  Result: done"
+      - "  Result: ready"
+      - "  Result: ready-partial"
+      - "  Result: not-ready"
+      - "  Result: jumped"
+      - "  Result: open-point"
+    meaning: "How the step ended. The ready check records ready, ready-partial, or not-ready. ready-partial means some tasks can start and some are held. It is covered, and it is not a not-ready mark. An older done on that step still reads. nothing-to-do still counts as covered for those versions. jumped is only on a jump-back record. open-point is only on an open-point record. A locked step does not use those two."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    mention: '(?m)^  Result: '
+    since: 1.119.0
+
+  - id: walk-ack-stamp
+    name: "Acknowledged stamp"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md (before the steps)"]
+    format: "Acknowledged stamp: <YYYY-MM-DDTHH:MM:SS+HH:MM> (<step>, <step>)"
+    pattern: '^Acknowledged stamp: \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2} \([a-z0-9-]+(?:, [a-z0-9-]+)+\)$'
+    examples:
+      - "Acknowledged stamp: 2026-11-10T12:00:00+00:00 (tighten-spec, resolve-open-questions)"
+    meaning: "Those steps share a Done time. The warning stays quiet for this stamp. A later shared stamp warns again."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    since: 1.127.0
+
+  - id: walk-spec-version
+    name: "Spec version"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md (under a step that covers the spec)"]
+    format: "  Spec version: <12 hex | missing>"
+    pattern: '^  Spec version: ([0-9a-f]{12}|missing)$'
+    examples:
+      - "  Spec version: a1b2c3d4e5f6"
+      - "  Spec version: missing"
+    meaning: "The whole spec file that step covered. Since 1.123.0 a later step inside the walk updates this and the earlier step stays done. Since 1.137.0 Spec body and Questions version say whether the change was only the open questions. Since 1.138.0, with Content stamp normalized, (PR n) on a Match Branch line does not change this hash. A change from outside the walk reopens the step only when a spec change affects it."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    since: 1.119.0
+
+  - id: walk-spec-body
+    name: "Spec body"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md (under a step that covers the spec)"]
+    format: "  Spec body: <12 hex | missing>"
+    pattern: '^  Spec body: ([0-9a-f]{12}|missing)$'
+    examples:
+      - "  Spec body: a1b2c3d4e5f6"
+      - "  Spec body: missing"
+    meaning: "The spec with the Open questions section removed. An edit confined to that section does not change this hash, so tighten-spec, plan-from-spec, review-and-tighten-plan, and tasks-ready-to-build stay covered."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    since: 1.137.0
+
+  - id: walk-questions-version
+    name: "Questions version"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md (under a step that covers the spec)"]
+    format: "  Questions version: <12 hex | missing>"
+    pattern: '^  Questions version: ([0-9a-f]{12}|missing)$'
+    examples:
+      - "  Questions version: a1b2c3d4e5f6"
+      - "  Questions version: missing"
+    meaning: "The Open questions section. Since 1.148.0 a change here reopens resolve-open-questions only when a question's words or its stable id changed. An already-answered question does not. It does not by itself reopen the later plan steps."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    since: 1.137.0
+
+  - id: walk-kept-questions
+    name: "Kept questions"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md (under resolve-open-questions)"]
+    format: "  Kept questions: <12 hex> [<12 hex> ...] | none"
+    pattern: '^  Kept questions: (none|[0-9a-f]{12}(?: [0-9a-f]{12})*)$'
+    examples:
+      - "  Kept questions: a1b2c3d4e5f6"
+      - "  Kept questions: none"
+    meaning: "Question texts that were already waiting when resolve-open-questions was recorded. Those questions stay Waiting when the spec drifts."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    since: 1.137.0
+
+  - id: walk-section-stamps
+    name: "Section stamps"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md (under a step that covers the spec)"]
+    format: "  Section stamps: <slug>@<12 hex> [<slug>@<12 hex> ...] | none"
+    pattern: '^  Section stamps: (none|[a-z0-9-]+@[0-9a-f]{12}(?: [a-z0-9-]+@[0-9a-f]{12})*)$'
+    examples:
+      - "  Section stamps: preamble@a1b2c3d4e5f6 goals@b2c3d4e5f6a1"
+      - "  Section stamps: none"
+    meaning: "One hash per spec section, in document order. preamble is the text before the first heading. Since 1.148.0 a change reopens from the first step that owns that section. Match and In the code do not reopen a step. Approval needed is not in this line."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    since: 1.148.0
+
+  - id: walk-question-ids
+    name: "Question ids"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md (under resolve-open-questions)"]
+    format: "  Question ids: <id>@<12 hex>[=a] [<id>@<12 hex>[=a] ...] | none"
+    pattern: '^  Question ids: (none|[A-Za-z0-9._-]+@[0-9a-f]{12}(?:=a)?(?: [A-Za-z0-9._-]+@[0-9a-f]{12}(?:=a)?)*)$'
+    examples:
+      - "  Question ids: q-lane@a1b2c3d4e5f6 a1b2c3d4e5f6@a1b2c3d4e5f6=a"
+      - "  Question ids: none"
+    meaning: "Each question's stable id, or the hash of its words when it has none, and the hash of its words. =a means the question already has an Answered line. A settled question is not asked again unless that id or those words changed."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    since: 1.148.0
+
+  - id: walk-content-stamp
+    name: "Content stamp"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md (under a step)"]
+    format: "  Content stamp: normalized"
+    pattern: '^  Content stamp: normalized$'
+    examples:
+      - "  Content stamp: normalized"
+    meaning: "The versions on this step hash normalized text. Line endings do not count. A task checkbox, a (PR n) or (done) note on that task line, and (PR n) or a trailing merged word on a Match Branch line do not count. An older step has no such line. A progress-only edit still matches. The next record writes this line."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    since: 1.138.0
+
+  - id: walk-plan-version
+    name: "Plan version"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md (under a step that covers the plan)"]
+    format: "  Plan version: <12 hex | missing>"
+    pattern: '^  Plan version: ([0-9a-f]{12}|missing)$'
+    examples:
+      - "  Plan version: a1b2c3d4e5f6"
+      - "  Plan version: missing"
+    meaning: "The plan contents that step covered. A playbook step does not record this."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    since: 1.119.0
+
+  - id: walk-tasks-version
+    name: "Tasks version"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md (under a step that covers the tasks)"]
+    format: "  Tasks version: <12 hex | missing>"
+    pattern: '^  Tasks version: ([0-9a-f]{12}|missing)$'
+    examples:
+      - "  Tasks version: a1b2c3d4e5f6"
+      - "  Tasks version: missing"
+    meaning: "The tasks contents that step covered. Since 1.138.0, with Content stamp normalized, a checkbox tick and a PR or done note on the task line do not change this hash."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    since: 1.119.0
+
+  - id: walk-verify-version
+    name: "Verify version"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md (under the ready check)"]
+    format: "  Verify version: <12 hex | missing>"
+    pattern: '^  Verify version: ([0-9a-f]{12}|missing)$'
+    examples:
+      - "  Verify version: a1b2c3d4e5f6"
+      - "  Verify version: missing"
+    meaning: "The verify.md contents the ready check covered. Only that check records it."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    since: 1.119.0
+
+  - id: walk-playbook
+    name: "Playbook"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md (under the playbook step)"]
+    format: "  Playbook: <path>@<12 hex>"
+    pattern: '^  Playbook: \S+@[0-9a-f]{12}$'
+    examples:
+      - "  Playbook: docs/playbooks/orders-retry.md@a1b2c3d4e5f6"
+    meaning: "The committed playbook under docs/playbooks/ and the contents this walk applied or skipped. Since 1.120.0 the path is that docs path, not a file outside the repo, so resume works on any machine. Intake only."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    since: 1.119.0
+
+  - id: walk-jump-back
+    name: "Jump-back"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md (after the locked steps)"]
+    format: "- Jump-back: <P#>"
+    pattern: '^- Jump-back: P[1-9][0-9]*$'
+    examples:
+      - "- Jump-back: P2"
+    meaning: "One jump back to tighten-spec for a spec finding during plan review. The same finding is not jumped again."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    mention: '(?m)^- Jump-back: '
+    since: 1.135.0
+
+  - id: walk-open-point
+    name: "Open point"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md (after the locked steps)"]
+    format: "- Open point: <P#>"
+    pattern: '^- Open point: P[1-9][0-9]*$'
+    examples:
+      - "- Open point: P2"
+    meaning: "A spec finding the walk will not jump back for again. The walk continues."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    mention: '(?m)^- Open point: '
+    since: 1.135.0
+
+  - id: walk-finding
+    name: "Finding"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md (under a jump-back or open point)"]
+    format: "  Finding: <one line>"
+    pattern: '^  Finding: .+$'
+    examples:
+      - "  Finding: the plan requires a named person's yes to stop a prod function app"
+    meaning: "The spec finding that jump back was for, on one line."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    mention: '(?m)^  Finding: '
+    since: 1.135.0
+
+  - id: walk-jump-open
+    name: "Jump open"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md (under a jump-back)"]
+    format: "  Open: ../crav1-tighten-spec/SKILL.md"
+    pattern: '^  Open: \.\./crav1-tighten-spec/SKILL\.md$'
+    examples:
+      - "  Open: ../crav1-tighten-spec/SKILL.md"
+    meaning: "The sibling file the walk opens for that one finding. An open point does not have this line."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    since: 1.135.0
+
+  - id: walk-continue
+    name: "Continue"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md (under a jump-back or open point)"]
+    format: "  Continue: <step>[, <step>]"
+    pattern: '^  Continue: [a-z0-9-]+(?:, [a-z0-9-]+)*$'
+    examples:
+      - "  Continue: plan-from-spec, review-and-tighten-plan, tasks-ready-to-build"
+      - "  Continue: review-and-tighten-plan, tasks-ready-to-build"
+    meaning: "The walk steps that run after this record. A jump back continues through the plan and the ready check. An open point continues the plan review and the ready check."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    mention: '(?m)^  Continue: '
+    since: 1.135.0
+
+  - id: walk-finding-key
+    name: "Finding key"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md (under a jump-back or open point)"]
+    format: "  Key: <12 hex>"
+    pattern: '^  Key: [0-9a-f]{12}$'
+    examples:
+      - "  Key: 6a034c36ad9e"
+    meaning: "The first-seen words, hashed. Later wordings that are the same finding are Alias lines. Exact words still match an old file that has only this line (1.146.0)."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    mention: '(?m)^  Key: '
+    since: 1.135.0
+
+  - id: walk-finding-topic
+    name: "Finding topic"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md (under a jump-back or open point)"]
+    format: "  Topic: <short topic>"
+    pattern: '^  Topic: [a-z0-9]+(?:[ -][a-z0-9]+)*$'
+    examples:
+      - "  Topic: approver"
+    meaning: "Optional short name for a finding. The same P# and the same topic are one finding. A different topic is not that finding (1.146.0)."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    mention: '(?m)^  Topic: '
+    since: 1.146.0
+
+  - id: walk-finding-alias
+    name: "Finding alias"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md (under a jump-back or open point)"]
+    format: "  Alias: <12 hex> [<12 hex> ...]"
+    pattern: '^  Alias: [0-9a-f]{12}(?: [0-9a-f]{12})*$'
+    examples:
+      - "  Alias: b7c8d9e0f1a2"
+    meaning: "Hashes of later wordings of the same finding. The Key line stays the first-seen wording. This is new does not add an alias (1.146.0)."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    mention: '(?m)^  Alias: '
+    since: 1.146.0
+
+  - id: walk-question-key
+    name: "Question key"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md (under resolve-open-questions)"]
+    format: "  Question: <12 hex> <12 hex> <text>"
+    pattern: '^  Question: [0-9a-f]{12} [0-9a-f]{12} \S.*$'
+    examples:
+      - "  Question: a1b2c3d4e5f6 a1b2c3d4e5f6 Which currency for refunds?"
+    meaning: "The exact key, the stable key, and the question text recorded with resolve-open-questions. The stable key ignores a refreshed commit list. A close reword of one stored question stays that question. Two close questions are not merged. An old file with no Question line still matches Kept questions (1.146.0)."
+    written_by: [crav1-tighten-and-plan-ready-to-build]
+    read_by: [crav1-tighten-and-plan-ready-to-build]
+    mention: '(?m)^  Question: '
+    since: 1.146.0
+
+  - id: spec-playbook
+    name: "Playbook link"
+    group: spec
+    files: ["docs/specs/<slug>/spec.md (after the title)"]
+    format: "Playbook: docs/playbooks/<topic>.md"
+    pattern: '^Playbook: docs/playbooks/[a-z0-9]+(?:-[a-z0-9]+)*\.md$'
+    examples:
+      - "Playbook: docs/playbooks/orders-retry.md"
+    meaning: "The committed playbook an apply wrote answers from. One line, replaced when a later apply touches this spec."
+    written_by: [crav1-resolve-open-questions]
+    read_by: [crav1-resolve-open-questions, crav1-what-do-we-know-about-this, crav1-tighten-and-plan-ready-to-build]
+    since: 1.120.0
+
+  - id: playbook-docs-path
+    name: "Docs path"
+    group: playbook
+    files: ["docs/playbooks/<topic>.md (after the Report line)"]
+    format: "Docs path: docs/playbooks/<topic>.md"
+    pattern: '^Docs path: docs/playbooks/[a-z0-9]+(?:-[a-z0-9]+)*\.md$'
+    examples:
+      - "Docs path: docs/playbooks/cc-process-1-0.md"
+    meaning: "The fixed repo path of this playbook. Later applies reuse it. The same playbook is this line, or else the one committed file whose title subject matches."
+    written_by: [crav1-resolve-open-questions]
+    read_by: [crav1-resolve-open-questions, crav1-what-do-we-know-about-this, crav1-tighten-and-plan-ready-to-build]
+    since: 1.120.0
+
+  - id: playbook-applied-as
+    name: "Applied as"
+    group: playbook
+    files: ["docs/playbooks/<topic>.md (after Docs path)"]
+    format: "Applied as: <12 hex>"
+    pattern: '^Applied as: [0-9a-f]{12}$'
+    examples:
+      - "Applied as: a1b2c3d4e5f6"
+    meaning: "Hash of the committed playbook at the last apply, ignoring this line. A mismatch means the file was edited in the repo, so the next apply shows the diff and asks first."
+    written_by: [crav1-resolve-open-questions]
+    read_by: [crav1-resolve-open-questions, crav1-tighten-and-plan-ready-to-build]
+    since: 1.120.0
+
+  - id: build-walk-name
+    name: "Build walk"
+    group: walk
+    files: ["docs/specs/<slug>/build-progress/<branch>.md (near the title)"]
+    format: "Walk: build-walk"
+    pattern: '^Walk: build-walk$'
+    examples:
+      - "Walk: build-walk"
+    meaning: "This file is one work branch of /crav1-build-walk. It is not walk-progress.md."
+    written_by: [crav1-build-walk]
+    read_by: [crav1-build-walk]
+    since: 1.142.0
+
+  - id: build-branch
+    name: "Build branch"
+    group: walk
+    files: ["docs/specs/<slug>/build-progress/<branch>.md (near the title)"]
+    format: "Branch: <branch>"
+    pattern: '^Branch: \S+$'
+    examples:
+      - "Branch: feat/orders-host-setup-scripts"
+    meaning: "The work branch this progress file records. The file name writes each slash as --."
+    written_by: [crav1-build-walk]
+    read_by: [crav1-build-walk]
+    since: 1.142.0
+
+  - id: build-owner
+    name: "Build owner"
+    group: walk
+    files: ["docs/specs/<slug>/build-progress/<branch>.md (near the title)"]
+    format: "Owner: <self | other>"
+    pattern: '^Owner: (self|other)$'
+    examples:
+      - "Owner: self"
+      - "Owner: other"
+    meaning: "self is this user's branch. other is another developer's branch, and only after switch."
+    written_by: [crav1-build-walk]
+    read_by: [crav1-build-walk]
+    since: 1.142.0
+
+  - id: build-tasks-line
+    name: "Build tasks"
+    group: walk
+    files: ["docs/specs/<slug>/build-progress/<branch>.md (near the title)"]
+    format: "Tasks: <T# name>[; <T# name>]"
+    pattern: '^Tasks: (none|T\d+ .+(?:; T\d+ .+)*)$'
+    examples:
+      - "Tasks: T3 Apply the CI build policy"
+      - "Tasks: none"
+    meaning: "The tasks on this work branch, T number beside the short name."
+    written_by: [crav1-build-walk]
+    read_by: [crav1-build-walk]
+    since: 1.142.0
+
+  - id: build-cut-from
+    name: "Cut from"
+    group: walk
+    files: ["docs/specs/<slug>/build-progress/<branch>.md (near the title)"]
+    format: "Cut from: <branch>"
+    pattern: '^Cut from: \S+$'
+    examples:
+      - "Cut from: develop"
+      - "Cut from: feat/orders-host-setup-scripts"
+    meaning: "The branch this work branch was cut from. An unmerged dependency branch, not the base, when the task needs that code."
+    written_by: [crav1-build-walk]
+    read_by: [crav1-build-walk]
+    since: 1.142.0
+
+  - id: build-merge-list-none
+    name: "Merge list none"
+    group: walk
+    files: ["docs/specs/<slug>/build-progress/<branch>.md (near the title)"]
+    format: "Merge list: none"
+    pattern: '^Merge list: none$'
+    examples:
+      - "Merge list: none"
+    meaning: "This branch was not cut from another unmerged work branch."
+    written_by: [crav1-build-walk]
+    read_by: [crav1-build-walk]
+    since: 1.142.0
+
+  - id: build-merge
+    name: "Merge order"
+    group: walk
+    files: ["docs/specs/<slug>/build-progress/<branch>.md (under Merge list)"]
+    format: "Merge: <branch> into <branch>"
+    pattern: '^Merge: \S+ into \S+$'
+    examples:
+      - "Merge: feat/orders-note into feat/orders-host-setup-scripts"
+    meaning: "This branch merges back into the branch it was cut from. Child lines come before the parent."
+    written_by: [crav1-build-walk]
+    read_by: [crav1-build-walk]
+    since: 1.142.0
+
+  - id: build-step
+    name: "Build step"
+    group: walk
+    files: ["docs/specs/<slug>/build-progress/<branch>.md"]
+    format: "- Step: <build | verify | commit | open-pr | merge-base | merge-pr | tick | comment>"
+    pattern: '^- Step: (build|verify|commit|open-pr|merge-base|merge-pr|tick|comment)$'
+    examples:
+      - "- Step: build"
+    meaning: "A finished step on this work branch. One record per step."
+    written_by: [crav1-build-walk]
+    read_by: [crav1-build-walk]
+    since: 1.142.0
+
+  - id: build-content-stamp
+    name: "Build content stamp"
+    group: walk
+    files: ["docs/specs/<slug>/build-progress/<branch>.md (under a step)"]
+    format: "  Content stamp: normalized"
+    pattern: '^  Content stamp: normalized$'
+    examples:
+      - "  Content stamp: normalized"
+    meaning: "The hashes on this step ignore line endings, a checkbox, a (PR n) or (done) note, and a (live yes) note."
+    written_by: [crav1-build-walk]
+    read_by: [crav1-build-walk]
+    mention: 'Content stamp'
+    since: 1.142.0
+
+  - id: build-run
+    name: "Whole-branch run"
+    group: walk
+    files: ["docs/specs/<slug>/build-progress/<branch>.md (under ## Run)"]
+    format: "Run: whole branch"
+    pattern: '^Run: whole branch$'
+    examples:
+      - "Run: whole branch"
+    meaning: "This branch is built in one run that stops only for a real stop and always before the merge."
+    written_by: [crav1-build-walk]
+    read_by: [crav1-build-walk]
+    since: 1.155.0
+
+  - id: build-run-yes
+    name: "Run yes"
+    group: walk
+    files: ["docs/specs/<slug>/build-progress/<branch>.md (under ## Run)"]
+    format: "Run yes: <user>, <ISO time>"
+    pattern: '^Run yes: .+, \d{4}-\d{2}-\d{2}T\S+$'
+    examples:
+      - "Run yes: person A, 2026-11-14T09:00:00+01:00"
+    meaning: "The start yes that covers each commit and push in the run. Without it nothing is pushed."
+    written_by: [crav1-build-walk]
+    read_by: [crav1-build-walk]
+    since: 1.155.0
+
+  - id: build-task-stamps
+    name: "Task stamps"
+    group: walk
+    files: ["docs/specs/<slug>/build-progress/<branch>.md (under ## Run)"]
+    format: "Task stamps: <T#> <hash>[, <T#> <hash>]"
+    pattern: '^Task stamps: T\d+ [0-9a-f]{12}(?:, T\d+ [0-9a-f]{12})*$'
+    examples:
+      - "Task stamps: T2 7888ebce45d1, T3 228042a732a4"
+    meaning: "Each run task's line at the start, ignoring the checkbox and progress notes. A change by someone else stops the run."
+    written_by: [crav1-build-walk]
+    read_by: [crav1-build-walk]
+    since: 1.155.0
+
+  - id: build-next-task
+    name: "Next task"
+    group: walk
+    files: ["docs/specs/<slug>/build-progress/<branch>.md (under ## Run)"]
+    format: "Next task: <T# | none>"
+    pattern: '^Next task: (T\d+|none)$'
+    examples:
+      - "Next task: T3"
+      - "Next task: none"
+    meaning: "Where rerunning the same command picks up. none means every task is built and the run stops before the merge."
+    written_by: [crav1-build-walk]
+    read_by: [crav1-build-walk]
+    since: 1.155.0
+
+  - id: build-built
+    name: "Built"
+    group: walk
+    files: ["docs/specs/<slug>/build-progress/<branch>.md (under ## Run)"]
+    format: "- Built: <T#>, commit <sha>, tests <green | red | none>"
+    pattern: '^- Built: T\d+, commit [0-9a-f]{7,40}, tests (green|red|none)$'
+    examples:
+      - "- Built: T2, commit a1b2c3d4e5f6, tests green"
+    meaning: "A task the run built, committed, and pushed. It is never built again on resume."
+    written_by: [crav1-build-walk]
+    read_by: [crav1-build-walk]
+    since: 1.155.0
+
+  - id: build-fresh-hint
+    name: "Fresh session hint"
+    group: walk
+    files: ["docs/specs/<slug>/build-progress/<branch>.md (under ## Run)"]
+    format: "Fresh session hint: every <N> tasks"
+    pattern: '^Fresh session hint: every \d+ tasks$'
+    examples:
+      - "Fresh session hint: every 5 tasks"
+    meaning: "How often the progress line suggests a fresh session. The default is 3 when the line is absent. It is never a stop."
+    written_by: [crav1-build-walk]
+    read_by: [crav1-build-walk]
+    since: 1.155.0
+
+  - id: branch-run-status
+    name: "Branch run status"
+    group: walk
+    files: ["docs/specs/<slug>/walk-progress.md (under ## Branch runs)"]
+    format: "- Branch run: <branch>: <state> (<ISO time>). Log: build-progress/<file>.md"
+    pattern: '^- Branch run: \S+: .+ \(\d{4}-\d{2}-\d{2}T\S+\)\. Log: build-progress/\S+\.md$'
+    examples:
+      - "- Branch run: feat/orders-cicd: running, T9 done, next T10 (2026-11-14T09:40:00+01:00). Log: build-progress/feat--orders-cicd.md"
+      - "- Branch run: feat/orders-cicd: stopped before merge (2026-11-14T11:00:00+01:00). Log: build-progress/feat--orders-cicd.md"
+      - "- Branch run: feat/orders-cicd: merged (2026-11-14T12:00:00+01:00). Log: build-progress/feat--orders-cicd.md"
+    meaning: "One status line per whole-branch run, so walk-progress.md stays the one file every skill reads. The detailed log is the linked build-progress file. A conflict that is only these lines keeps each branch's newest line."
+    written_by: [crav1-build-walk]
+    read_by: [crav1-build-walk, crav1-tasks-ready-to-build, crav1-tighten-and-plan-ready-to-build]
+    mention: 'Branch run'
+    since: 1.155.0
+
+  - id: in-progress-claim
+    name: "In progress claim"
+    group: walk
+    files: ["docs/specs/<slug>/claims.md"]
+    format: "In progress: <branch>, <T#>, <user>, since <ISO time>"
+    pattern: '^In progress: \S+, T\d+(?:, T\d+)*, .+, since \S.+$'
+    examples:
+      - "In progress: feat/orders-api-host-setup, T27, person A, since 2026-11-13T15:50:00+01:00"
+      - "In progress: feat/orders-api-host-setup, T3, T27, person A, since 2026-11-13T15:50:00+01:00"
+      - "In progress: feat/orders-cicd, T2, T3, T5, person A, since 2026-11-14T09:00:00+01:00"
+    meaning: "A build walk is in progress on that branch and those tasks. A whole-branch run (1.155.0) names every open task on the branch on one line. The ready check holds them and does not offer them in Run next. The claim is never cleared on its own."
+    written_by: [crav1-build-walk]
+    read_by: [crav1-build-walk, crav1-tasks-ready-to-build, crav1-tighten-and-plan-ready-to-build, crav1-plan-from-spec, crav1-tighten-plan]
+    mention: 'In progress:'
+    readiness: true
+    since: 1.151.0
+
+  - id: claim-max-age
+    name: "Claim max age"
+    group: walk
+    files: ["docs/specs/<slug>/claims.md"]
+    format: "Claim max age: <N> days"
+    pattern: '^Claim max age: \d+ days$'
+    examples:
+      - "Claim max age: 3 days"
+    meaning: "How old a claim may be before the ready check warns. The default is 3 days when this line is absent. The claim is never cleared on its own."
+    written_by: [crav1-build-walk]
+    read_by: [crav1-build-walk, crav1-tasks-ready-to-build, crav1-tighten-and-plan-ready-to-build]
+    mention: 'Claim max age:'
+    since: 1.151.0
+
+  - id: runs-live
+    name: "Runs live"
+    group: plan
+    files: ["docs/specs/<slug>/tasks.md (on a task line)"]
+    format: "(Runs live)"
+    pattern: '^\(Runs live\)$'
+    examples:
+      - "(Runs live)"
+    meaning: "This task's build runs a live change, such as a CI policy or a host setting. The walk writes the script, runs check, then asks for the user's yes."
+    written_by: [crav1-build-walk]
+    read_by: [crav1-build-walk]
+    since: 1.142.0
+
+  - id: live-yes
+    name: "Live yes"
+    group: plan
+    files: ["docs/specs/<slug>/tasks.md (on a Runs live task line)"]
+    format: "(live yes: <name>, <YYYY-MM-DD>)"
+    pattern: '^\(live yes: [^,]+, \d{4}-\d{2}-\d{2}\)$'
+    examples:
+      - "(live yes: person A, 2026-11-12)"
+    meaning: "The user's own yes to run the live change, with name and date. An Approved line does not replace it. The checkbox stays open until the later tick."
+    written_by: [crav1-build-walk]
+    read_by: [crav1-build-walk]
+    since: 1.142.0
+

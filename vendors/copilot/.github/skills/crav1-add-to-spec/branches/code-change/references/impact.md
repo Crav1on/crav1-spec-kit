@@ -1,0 +1,29 @@
+# Code into specs: **Impact (before any other edit)**
+
+Part of `branches/code-change/BRANCH.md`, read only when that file sends you here. Moved word for word in 1.107.0; the rules are unchanged. Paths in backticks are relative to the skill folder.
+
+## Impact (before any other edit)
+
+The new quotes are already in the matching specs. Read `docs/system/` when it exists (`landscape.md`, `repos.md`, `diagrams.md`, `glossary.md`, `adr/`) and every other `docs/specs/<slug>/spec.md` (skip `_template`). Other means a spec that did not just receive a new quote, plus any heading on a spec you did edit that the confirmed sort did not already cover. Check whether what the change does contradicts or extends the landscape, a repo row, a diagram, an ADR, or another spec.
+
+Also compare each kept quote with research. Follow this skill's `references/research-stale.md`. Read `docs/research/*.md` and `## Research findings` on the specs this quote touches, and the notes those findings link to. List a clear contradiction and an answered open question. An unclear case is not a hit. Ask before any new mark. Write the stale block and the findings line only after the user says yes. Then offer the revisit draft. The kit drafts only. It does not send it. It does not contact the note's owner. This question is not an apply option. When it is open, ask it before the landscape question. Do not ask both in the same turn. Do not commit. A kept quote that answers a point already waiting is re-checked there too. That re-check does not ask. Any kit skill that writes a file under `docs/research/` follows the clear section of that same skill, `references/research-stale-clear.md`. That check does not ask the user. An older mark with no point lines is not one point. The note's own open questions are routed when the answer lies outside the note's owner, including when the mark clears.
+
+Section names for that read, not a file to paste over what exists: this skill’s `assets/system/` (same files as `docs/system/_template/`, including `glossary.md`; this skill's `branches/code-change/assets/system/`).
+
+Do not edit anything outside the confirmed belongs writes in this step, except the `Synced at` stamp above, the glossary gap, the picture update below, a research mark that `crav1-add-to-spec` `references/research-stale.md` already allowed after a yes, or a clear, a narrowed mark, a resolved line, or an open question that the same file says to write. The clear does not wait for a yes. Do not seed `docs/system/` when it is missing. Say it is missing and that this command does not create it. Do not invent a landscape from the diff alone. When that folder is missing, do nothing about a glossary and do nothing about the picture. The research check still runs. The research mark is not a landscape edit.
+
+**Glossary.** When `docs/system/` is missing, do nothing about a glossary. When it exists and `glossary.md` is missing, write only that file from `assets/system/glossary.md`. When `glossary.md` already exists, append only words or abbreviations the change uses that are not already rows. Do not rewrite, reorder, or edit existing rows. A new row goes in sorted place by term, not at the end (1.84.0, `crav1-add-to-spec` `references/merge-safe.md`). Do not change a Meaning cell that already has text. Source is the landed change. Do not invent terms, expansions, or definitions. Do not write TBD or to be decided. A row is only a word or abbreviation that change already uses. When that same change already says the expansion or meaning, put that text in Meaning. When the change never says what it means, set Meaning to `to be researched`. Skip ordinary English. A code identifier is not a row unless the change already treats that word as a term. Write the file even when it has no rows. This write is not an apply option, and it does not rewrite any other landscape file except the `Synced at` stamp above and the picture update below. Do not list a rewrite of existing rows.
+
+**Picture.** When `docs/system/` is missing, do nothing about the picture. When it exists, follow [picture.md](../../../../crav1-refresh-system-notes/references/picture.md) (skill `crav1-refresh-system-notes`, `references/picture.md`). Source is the confirmed new quotes, not a sentence marked inferred. Add what those quotes added to the short description, the diagram, and how the parts connect. Do not rewrite a sentence, a diagram node, a diagram edge, or a connection line that is already there. Do not run `/crav1-refresh-system-notes` as a second turn. This write is not an apply option. Do not invent a part from the diff. Do not rewrite existing glossary rows.
+
+Do not edit `plan.md` or `tasks.md` when they exist, and do not list them as proposed edits. One line in the report when they exist: they were left alone. Adding what the change does does not start planning.
+
+Report:
+
+- If nothing else is affected, say so. Do not ask. `docs/system/` and the specs outside those writes stay as they are.
+- If something else is affected, stop and ask. Options only. Use the questions tool when it is available.
+  1. **Apply the listed edits**
+  2. **Leave the other files alone**
+- List each proposed edit in one line: the file, and what would change. One line per file change. No surrounding rewrite.
+
+Do not silently rewrite `docs/system/` or specs the sort did not already write. The glossary write above is one exception: a missing file, or new rows appended to an existing file. The picture update is the other: new lines on the short description, the diagram, and how the parts connect. The `Synced at` stamp above is the third: the repo line on a whole-repo read, or the slice line on a one-slice read. Apply the other edits only if they pick apply, and only the lines you listed. If they pick leave, do not edit those files. Do not rewrite existing glossary rows or existing picture lines either way. Do not list the picture lines again as an apply option.

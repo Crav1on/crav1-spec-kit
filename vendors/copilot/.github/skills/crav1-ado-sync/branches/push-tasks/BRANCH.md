@@ -1,0 +1,118 @@
+# Tasks to Azure Boards
+
+You turn the tasks of one spec into Azure Boards work items, each a child of that spec's Feature. The spec stays the source. A create or an update runs only after the user says yes, because it goes out in the user’s name.
+
+Command: `/crav1-ado-sync`.
+
+This is cross-cutting. It is not a lane. It may run from any lane. It does not move work into Specify, Plan, or Build. It does not start those lanes.
+
+This command is a later skill. It is not a starter option. When the user asks for startup options, name only `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs`, `/crav1-read-environment`, and `/crav1-fix-bug`. That ask names the list. It does not run this command and does not move work into a lane. The seven starter options stay unchanged.
+
+Spark, specify, plan, and verify do not run it. It is not started automatically. The push-features branch of `/crav1-ado-sync` may name it and does not run it.
+
+CLI checks and the `az` calls: the same file the push-features branch of `/crav1-ado-sync` uses, [azure-boards.md](../../../crav1-ado-sync/branches/push-features/references/azure-boards.md) (this skill's `branches/push-features/references/azure-boards.md`), plus [references/child-items.md](references/child-items.md) for the child type and the parent link. Do not show those commands in the chat.
+
+## Check first
+
+1. Take the Azure DevOps org and project as `azure-boards.md` says. `docs/environments/marks.md` first, then Azure DevOps URLs in `docs/system/repos.md`.
+2. Check that `az` works, including the default install paths, the same way the push-features branch of `/crav1-ado-sync` does.
+
+On a failure, state the issue, suggest a fix such as `az login`, and offer Retry or Skip. Skip stops this command. Say the Azure Boards calls did not run, and why. Do not install. Do not log in. Do not run `az login`. Do not guess the org or the project.
+
+## Work item homes
+
+Each task goes to the home of its repo, as [work-item-homes.md](../../../crav1-ado-sync/branches/push-features/references/work-item-homes.md) (this skill's `branches/push-features/references/work-item-homes.md`) says: read the `Work items go to` cell in `docs/system/repos.md`, and ask for an empty one, once per repo. A task with no clear repo is asked once, suggesting the spec's main repo. A task whose repos are in different homes is asked: split it (through `/crav1-add-to-spec`) or pick one repo's home.
+
+Its parent is the spec's Feature **in that same home** (the Feature line whose `(ADO: …)` tag matches). When the spec has no Feature in that home, say so and name the push-features branch of `/crav1-ado-sync`. Do not send that task. Do not parent it to a Feature in another home.
+
+## Which spec
+
+The user picks one spec. List the specs whose `docs/specs/<slug>/work-item.md` records a Feature id (a `Work item: <id> — <label>` line that is not a task line). Skip `_template`. Use the questions tool when it is available and the list fits. Stop until they pick.
+
+A spec with no Feature id is not offered. When the user names one, say it has no Feature in Azure Boards yet and name the push-features branch of `/crav1-ado-sync`. Do not run it. When the spec records several Feature ids, ask which Feature these tasks belong to. Do not guess.
+
+## Which tasks
+
+Read that spec's `tasks.md`. List every task, numbered as the file numbers them (`T1`, `T2`, …), one line each: the number, the task's own short wording, and `Update #<id>` when `work-item.md` already records it. Every task stays listed. Do not drop one to keep the list short. A spec with no `tasks.md`, or with no tasks, says so and stops. Name `/crav1-plan-from-spec`. Do not run it.
+
+The user picks one or more. On the card, **All** and **None** are real options. None previews nothing. Do not tell them to type all or none. Use the questions tool when the tasks plus those two options fit in four. A further task is named in the question. Otherwise the numbered table is the choice, and **All** and **None** stay real choices beside the numbers. Stop until they pick. Do not preview a task they did not pick.
+
+## Child type
+
+Read this skill's `branches/push-tasks/references/child-type.md` now, before you go on.
+
+## Preview
+
+For each pick, show the Azure Boards form in plain words. The label is **Create** when no id is recorded for that task, or **Update #<id>** when `work-item.md` records one. The layout follows the Feature layout from the suggest-features branch of `/crav1-ado-sync`.
+
+| Form field | What to show |
+| --- | --- |
+| Home | `ADO: <org>/<project>`, the task's home |
+| Type | The saved child type for that home |
+| Parent | The Feature id |
+| Title | A fuller title that says what the work is: the area, then the task, for example `Orders API: enable retries on dev` |
+| State | New when the `tasks.md` box is open. The saved done state (Closed or Done) when the box is ticked. See **State** below |
+| Iteration | blank. The user’s team sets it |
+| Priority | blank. The user’s team sets it |
+| Tags | The slice name, then the code repos this task touches |
+| Assigned To | The task owner when the spec, the task, or the plan states one. Otherwise blank |
+| Description | Fuller context that stands alone: what the task does, why, who is involved, decisions with short quotes, names, and dates, and related items. Then **Open blockers/questions** as bullets with who and when where the docs say, or `none recorded` |
+| Acceptance Criteria | The task's verify line in plain words. When the type has no Acceptance Criteria field, this row is not on the form and the line goes at the end of the Description |
+
+Tags come from `docs/system/repos.md`: the code repos the task or the plan names for it, else the slice's repos. Never tag the repo that holds the specs.
+
+Use only what the docs state. Do not invent an owner, a quote, a date, a decision, or a check. When the task has no verify line, Acceptance Criteria is blank and the preview says so.
+
+### Example
+
+Generic, for the shape only:
+
+- **Title:** `Orders API: enable retries on dev`
+- **Tags:** `orders-api; orders-infra`
+- **Assigned To:** `<task owner>`
+- **Description:** Retries only run on test and prod today. In orders-api the code limits them to those two environments, and the dev settings in orders-infra have no configuration for them. This task enables them on dev so v0 runs on both dev and test. Decision: "v0 stays dev and test" (<name>, <date>). Related: the dev and test queues are set up and tested (<name>, <date>, ticket <number>). Open blockers/questions: none recorded.
+- **Acceptance Criteria:** A unit test shows a failed order call is retried when the environment is dev.
+
+### Strip before the preview
+
+Remove file paths, line numbers, spec references such as `(spec: v0; Open questions 1)`, `docs/sources/` paths, and kit and skill names from every field. Code repo names stay in the text, for example "In email-service the code limits it…". Never mention the repo that holds the specs, and do not link to it. The preview is what will be sent, so it must already be stripped. A commit mention `AB#` in a code repo stays as it is and is not copied in.
+
+### Update
+
+An **Update** shows only the fields that differ from what `az boards work-item show` returns. Do not reset Iteration, Priority, or Assigned To when the docs do not state that field. State changes only as **State** says. Tags add what is missing and remove nothing. Do not change the parent link when it already points at the Feature. When it points elsewhere, say so and ask. Do not guess.
+
+### State
+
+Read this skill's `branches/push-tasks/references/state.md` now, before you go on.
+
+### Edits
+
+Edits never happen in the preview. When the user wants different words, an owner, or a different check, that change goes into the spec or `tasks.md` first through `/crav1-add-to-spec`. Then rebuild the preview. Do not patch the form in the chat and send that patch.
+
+## Send
+
+Ask after the previews. Use the questions tool when it is available.
+
+1. **Create** or **Update #<id>** for this one
+2. **All reviewed**
+3. **Skip this one**
+
+Stop until they pick. Create or update only on a yes, as [references/child-items.md](references/child-items.md) says, with the parent link to the Feature. Do not show the command. A skip sends nothing for that task. A state change the user did not say yes to is not sent, even when the other fields are.
+
+## Record
+
+After a create, append one line to `docs/specs/<slug>/work-item.md`. This is a required final step of the run.
+
+```text
+Work item: <id> — task: T<n> <short title> (ADO: <org>/<project>)
+```
+
+The line ends with its home. Add the tag to older lines in that file that have none, without asking. A re-run reads these lines and offers **Update #<id>** for that task. An update keeps the line. Never write an id into `tasks.md`. When the line is already there, leave it. If the write fails, say so and print the exact line to add.
+
+## Report
+
+Say what was created, what was updated, and what was skipped. One line each: the id, the title, `T<n>`, and the State it was created with or moved to. Name any conflict that was left as it is.
+
+When the run wrote `work-item.md` or `docs/environments/marks.md`, name each file. Say that without `work-item.md` a later run offers Create again and would make a duplicate. `Run next: nothing needed now.` Add the Uncommitted line. Do not name the pull-tasks branch in the ending. Do not run a commit.
+
+Do not plan. Do not implement. Do not commit.

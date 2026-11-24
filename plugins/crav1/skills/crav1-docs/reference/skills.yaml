@@ -987,6 +987,7 @@ skills:
   walkthrough: docs/from-spec-to-plan.md
   purpose: Start the crav1-plan-reviewer-agent subagent on plan.md and tasks.md against spec.md.
   in_depth:
+  - '1.202.0: `P# open` is the `open` value from `plan_check.py open-count --review <file>`. The parent uses that number and does not count the `P#` lines.'
   - '1.176.0: the review ends with Run next, `Walk the plan findings, which aren''t walked yet:` above `/crav1-tighten-plan <slug>`, no `Next:` line.'
   - Critique `plan.md` / `tasks.md` against the spec; numbered `P#`s.
   use_when: Plan exists; want a critique
@@ -1015,6 +1016,7 @@ skills:
   walkthrough: docs/from-spec-to-plan.md
   purpose: Walk plan.md/tasks.md issues one by one (including /crav1-review-plan P#s).
   in_depth:
+  - '1.202.0: `reviewed --items <file>` writes the open count the script computes. A hand-counted `--open` is not the path.'
   - '1.180.0: with no plan issue left, Run next names `/crav1-tasks-ready-to-build <slug>`, never `/crav1-build-tasks`; uncommitted files come first inside Run next as `Commit the <n> changed spec files:` above `/crav1-finalize-commit`.'
   - '1.176.0: the empty queue ends with a Run next entry, its label above the command, no `Next:` line. A spec finding already patched, dropped or kept no longer sends you back to `/crav1-tighten-spec`.'
   - '1.159.0: the index (remaining `P#` titles, the current one marked, plan or spec), the finding counts, the dependency waves and ordering problems, the batch card with its findings table, the one empty-queue `Next` line and the `Reviewed:` line come from `scripts/plan_check.py` (`order`, `queue`, `batch`, `reviewed`), a thin copy of the script that ships with `/crav1-plan-from-spec`. The skill prints its output as-is. The typical plan shapes, the empty-queue rules, the Reviewed line, the items file and the suggest step moved word for word to `references/issues.md`.'
@@ -1860,6 +1862,7 @@ skills:
   walkthrough: docs/from-tasks-ready-to-build.md
   purpose: 'List the tasks ready to build, for one spec or all, and why the others are blocked. Rewrites each slice build map.'
   in_depth:
+  - '1.202.0: Held lists every held task, including one whose only wait is an `(after:)` on a task that is not built yet. The reason is on that line.'
   - '1.176.0: the readiness ending leaves out `/crav1-build-tasks builds one task without the walk.`; `/crav1-help status` names it.'
   - '1.177.0: when the merge list holds a pull request you opened, Run next leads with it, for example `Merge your PRs 71 and 73 first:` above `/crav1-merge-pr 71`, above the entry that resumes the walk; with none of yours nothing is added. A PR''s owner is who opened it (the PR note''s `author:`, else `PR author:` in build-progress), not the claimer: `PR 71 (person A''s, you added T5)`, or `owner not recorded`; others'' PRs get `Waiting: PR 71 and PR 73 are person A''s; they unblock T8.` A blank line separates the numbered list from the Waiting line under it.'
   - '1.177.1: no Waiting line repeats a pull request the merge list names. When none of the listed pull requests is yours, Run next leads with `Ask the PR owners to merge, in this order:` and one line per owner, such as `- person B: PR 82`, above the entry that resumes the walk. A PR with no recorded author is read from its own host (`gh` or `az`, read-only, short timeout) and recorded as `PR author:` in build-progress by `walk_progress.py pr-author`; when the host does not say, the skill asks once who opened it and records the answer the same way.'
@@ -2396,6 +2399,7 @@ skills:
   walkthrough: docs/from-tighten-and-plan.md
   purpose: Walk a draft spec through architecture, tighten, questions, and the plan until the ready check is clear.
   in_depth:
+  - '1.202.0: the Reviewed line uses `plan_check.py open-count --review <file>` (`open: <n>`). Held includes a task that only waits, via `(after:)`, on a task that is not built yet, and the reason is on that held line.'
   - '1.176.0: each step compares the spec against its own newest section stamps, so a step recorded again after a spec edit stops reading reopened and the ready check no longer blocks on it. `clear --yes` fails with `still-reopened` instead of reporting success when nothing cleared. The ready check reply is `reply`, which keeps the Source, Build map and Zoom the map lines.'
   - '1.175.0: `readiness` offers `Continue the build walk on <branch>:` only when the walk''s claim user (else its `Run yes:` name) matches `--user` or `git config user.name`; someone else''s walk is a Waiting line, `T9 to T12 are person B''s, built, and wait for PR 82 to merge.` or `T9 to T12 are in progress by person B.` Built claimed tasks read `built by <name>, waits for PR <n> to merge`. A reopened step reads one reason sentence, then `Finish the reopened /crav1-tighten-spec step:` above the command. A walk''s own files never reopen a step.'
   - '1.174.0: when `walk-progress.md` lists a branch run that is not merged and its `build-progress` file is not at `comment`, `wait-merge` or `merge-pr`, Run next starts with `Continue the build walk on <branch>:` above `/crav1-build-walk <slug> <branch>`. A behind or diverged specs repo ends with `Merge origin into your local branch, since they have diverged (never rebase):` above `git pull --no-rebase`. `--write-map` keeps a done task on its merge commit, not the tick commit.'

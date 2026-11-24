@@ -35,9 +35,12 @@ Commands:
       (health, version, config, existence). Any other prod verify is flagged:
       verify runs on DEV/TEST, and a prod-write check is its own task marked
       prod-write with an owner: and a Risks line in plan.md naming its T#.
+  open-count --review <file>
+      Prints `open: <n>`, the number of distinct P# lines in the reviewer's
+      reply (1.202.0). The walk writes that number. It does not count.
   reviewed --root <spec-folder> (--open <n> | --items <file>) [--write]
       Lowers P# open on the Reviewed line, keeping the date. No line, none added.
-      With --items, housekeeping rows are not counted (1.197.0).
+      With --items, housekeeping rows are not counted (1.197.0). Prefer --items.
 
 <file> for queue and batch is JSON: a list of objects with id, issue,
 tag (plan or spec), status (open, patched, dropped, skipped, kept), and, for
@@ -733,6 +736,15 @@ def lint_lines(root: Path) -> list[str]:
 
 
 REVIEWED = re.compile(r"^(Reviewed:\s*[^,\n]+,\s*P#\s*open:\s*)(\d+)\s*$", re.M)
+P_FINDING = re.compile(r"(?m)^[ \t]*(?:[-*][ \t]+)?`?(P\d+)\b")
+
+
+def open_findings(text: str) -> int:
+    """How many distinct P# findings a review lists (1.202.0).
+
+    The walk uses this number for `P# open`. It does not count the lines itself.
+    """
+    return len(set(P_FINDING.findall(text or "")))
 
 
 def open_for_review(items: list[dict]) -> int:
@@ -796,9 +808,11 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--title", default="Tighten-plan batch")
     p = sub.add_parser("lint")
     p.add_argument("--root", required=True)
+    p = sub.add_parser("open-count")
+    p.add_argument("--review", required=True, help="the reviewer's reply; prints open: <n>")
     p = sub.add_parser("reviewed")
     p.add_argument("--root", required=True)
-    p.add_argument("--open", type=int, help="open plan P#; or pass --items to count them without housekeeping")
+    p.add_argument("--open", type=int, help="open plan P#; prefer --items so the script counts")
     p.add_argument("--items")
     p.add_argument("--write", action="store_true")
     args = parser.parse_args(argv)
@@ -822,6 +836,12 @@ def main(argv: list[str] | None = None) -> int:
             text = batch(_items(args.items), args.title)
         elif args.command == "lint":
             text = "\n".join(lint_lines(_root(args.root))) + "\n"
+        elif args.command == "open-count":
+            try:
+                review = Path(args.review).read_text(encoding="utf-8")
+            except OSError as exc:
+                raise PlanCheckError(f"cannot read review: {exc.strerror or exc}") from exc
+            text = f"open: {open_findings(review)}\n"
         else:
             if args.items:
                 open_n = open_for_review(_items(args.items))

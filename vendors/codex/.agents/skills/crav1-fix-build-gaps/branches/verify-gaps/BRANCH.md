@@ -1,0 +1,112 @@
+# Fix from verify
+
+You run this **after `$crav1-verify-build-against-spec`**. Walk the **inner-loop queue** one item at a time: failed evidence, then unverified/could-not-run, then leftover `G#` wiring gaps. Omit `Gap` to take the next. Unimplemented tasks are **not** this skill (the implement step of `$crav1-build-tasks`).
+
+Do not change `spec.md`. Do not invent product behavior to get a green matrix.
+
+## Find the work
+
+Spec folder: user @-mention, else most recently edited `docs/specs/` tree excluding `_template/`.
+
+Read, in order:
+
+1. `verify.md` (required if it exists). Chat TL;DR from the last `$crav1-verify-build-against-spec` in this thread counts as the same source.
+2. `spec.md`, `tasks.md`, `plan.md` — spec wins.
+3. Report shape: this skill’s `assets/fix-log.md`.
+
+If `verify.md` is missing and they did not paste a verify TL;DR, **stop**, and end with Run next: the label `Check the build against the spec:` on its own line, then `$crav1-verify-build-against-spec <slug>` alone in its code span. Do not guess gaps from vibes.
+
+## Pick one gap (no edits yet)
+
+This skill is the **inner-loop queue**: something is *supposed* to already work (or already be checked off) but verify could not prove it. It is not a backlog burn-down.
+
+**In the queue** (walk in this order; skip empty buckets):
+
+1. **Implemented, verify failed** — evidence ran and contradicted (`T#` then `A#` as listed in `verify.md`)
+2. **Claimed done, unverified** — `[x]` but evidence could not run (no host, port, browser, SQL)
+3. **`G#` in verify.md Gaps** — only if it is the same kind of problem (fail, untested, live/wiring) **and** it is not a duplicate of a `T#`/`A#` already in (1) or (2)
+
+**Not in this queue** (do not auto-pick; say so and point elsewhere):
+
+| Verify says | Use instead |
+| --- | --- |
+| **Not implemented** | `$crav1-build-tasks T#` |
+| **Acceptance with no task** | `$crav1-plan-from-spec` or `$crav1-tighten-spec` — this skill does not grow the spec |
+
+If they named `T#` / `A#` / `G#`:
+
+- Inner-loop (failed, unverified, or a wiring `G#`) → that is the current item
+- Not implemented / no-task → **stop**, send them to the table above. Do not implement a new `T#` here just because they typed the id
+
+If they **omitted Gap**: take the **first remaining** item in the queue above. List the rest as `F2`, `F3`, … so the next the verify-gaps branch of `$crav1-fix-build-gaps` with no Gap continues the walk.
+
+Build the queue fresh from `verify.md` each turn (minus what `fix-log.md` already marked fixed **and** whose evidence you re-ran green). Deduplicate: one live SQL proxy failure that explains three unverified rows is still **one** current item — after the fix, re-run **each** of those rows’ evidence.
+
+**Stop** (no fix) if:
+
+- Closing the gap needs behavior **not** in the spec
+- It would implement a **non-goal** or reopen a rejected ADR
+- Playbook-only workspace and they did not ask to change an app here
+- The inner-loop queue is **empty** (only unimplemented / no-task left, or everything verified) — tell them the implement step of `$crav1-build-tasks` or `$crav1-verify-build-against-spec` / ship
+
+Confirm the before-state: re-run that row’s evidence once. Quote the failure. Do not skip.
+
+## Branch (1.99.0)
+
+Before the first code edit, check the checkout as skill `crav1-create-feature-branch`, `references/code-branch.md` says. On a work branch, go ahead. On a base branch (main, master, develop, the `Merges into` branch, `release/*`) never edit code there: ask once, **Create `fix/<slug>` from `<into>` (Recommended)**, **Use an existing branch**, **Stop**. A typed branch name is that card's free-text answer, hint `Type a branch name`. Do not offer an option labelled `Other name`. On another branch, the same with **Stay on `<current>`** as a real option. Headless: stop with the reference's one line unless the invocation has `new-branch`. Inside the build worker the branch is already checked; skip this.
+
+## Fix (in spec)
+
+Smallest change that makes **this** verify row pass:
+
+- Product code only if this row is **verify failed** (already implemented, evidence red) — not to start an unimplemented `T#`
+- Tests or UI checks that **cover existing** acceptance (new test OK; new acceptance not OK)
+- Inner-loop wiring when evidence could not run or failed for connectivity: publish/ports, Aspire/SQL proxy, env, compose waits, operator health probes — not a new public API unless the spec already has it
+
+Do **not**:
+
+- Edit `spec.md`, exports, or acceptance text
+- Delete or weaken the failing check to go green
+- Refactor unrelated files
+- Add endpoints, fields, or actors the spec does not require
+
+## Verify the fix (required, same turn)
+
+If this gap’s evidence is **live**, follow skill `crav1-verify-build-against-spec`, `references/live-host.md` **before** re-running it (especially after you changed API/service code).
+
+1. Before any test command, run the local dependency preflight in skill `crav1-verify-build-against-spec`, `references/test-dependencies.md`. A test skipped for a missing dependency does not close the gap unless the user chose skip. Then re-run **the same evidence** for this gap (test name, UI path, or live HTTP/DB command from verify.md / the user). Fail → pass, or report still failing.
+2. If you changed app or config, re-run the repo test command. Must still pass.
+3. Extra probes (SQL ready, etc.) are optional **add-ons**. They do not replace the verify row.
+
+Passing tests alone is not enough when the gap was live/untested. The **row’s evidence** is enough when the gap was a failing test.
+
+Update `tasks.md` `[x]` only if that task’s stated verify now passes.
+
+## Write `docs/specs/<slug>/fix-log.md`
+
+Follow this skill’s `assets/fix-log.md` (TL;DR first). **Append** a dated entry if the file exists.
+
+Optionally patch **only this row** in `verify.md` if that file exists (status/evidence). Do not restage the whole matrix — tell them to run `$crav1-verify-build-against-spec` for a fresh full report.
+
+Do not rewrite `spec.md`.
+
+If an older `live-fix.md` exists, you may append a one-line pointer to the new `fix-log.md` entry. Prefer `fix-log.md` going forward.
+
+## After (chat)
+
+A short reply (1.171.0), no table:
+
+- One lead sentence: which id you fixed and the before → after on the **same** evidence, for example `T6's four tests pass again at the fix.`
+- Tests still pass? (one line, if you ran them), files changed (one line), remaining **inner-loop** ids (`F2`…), not unimplemented tasks.
+- Then the shared ending (`walk_ending.py --json --vendor codex`, `compose`), with no Next line. Run next, in this order, each label on its own line and each command alone in its code span:
+  1. A `**Catch up first**` block when the fix is not committed or not pushed: `Commit the fix:` with `$crav1-finalize-commit`, then, when the fix is on a pull request branch that is not pushed, `Push the fix to PR <n>:` with `$crav1-open-pr pr<n>` (or `Push the specs repo:` with `git push` when only spec files changed). Verify needs the fix on the pull request first.
+  2. The queue still has an inner-loop id: `Fix the next gap:` with `$crav1-fix-build-gaps <slug> <id>`.
+  3. The queue is empty: `Check the fix against the spec:` with `$crav1-verify-build-against-spec <slug>`.
+- `Uncommitted:` in chat when files changed and are not committed. Do not run the next step.
+
+## Hard rules
+
+- **Spec is frozen.** Disagreement with the spec → stop, do not patch the spec.
+- One inner-loop item per turn unless they named a shared cause and listed the ids. Omit Gap = next in queue.
+- Do not mark success without re-running that gap’s evidence.
+- Do not run `$crav1-fix-bug`. This queue is the inner loop. A verify failure on work that is already shipping, or a defect from outside, is that command. Do not start it here.

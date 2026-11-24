@@ -45,9 +45,9 @@ When `## Linter` says this repo has no linter or checker for the code the tasks 
 
 ## Reviewed line
 
-`plan.md` may have `Reviewed: <date>, P# open: <n>` under its title, written by `/crav1-review-plan`. After each patched `P#`, and when a `P#` is dropped as not an issue, lower `<n>` to the number of reviewer `P#`s still open. Keep the date. A `P#` the user leaves open stays counted. When there is no `Reviewed:` line, do not add one: only `/crav1-review-plan` records a review. This line is the only `plan.md` change this skill makes outside the picked patches.
+`plan.md` may have `Reviewed: <date>, P# open: <n>` under its title, written by `/crav1-review-plan`. After each patched `P#`, and when a `P#` is dropped as not an issue, the script lowers `<n>` to the open plan `P#`s still in the items file. Keep the date. A `P#` the user leaves open stays in that file, so it stays counted. When there is no `Reviewed:` line, do not add one: only `/crav1-review-plan` records a review. This line is the only `plan.md` change this skill makes outside the picked patches.
 
-`plan_check.py reviewed --root <spec-folder> --open <n> --write` makes that change and prints one line. It never adds a line.
+`plan_check.py reviewed --root <spec-folder> --items <file> --write` makes that change and prints one line. The `open` count is the script's. Do not pass a number you counted. It does not add a line. The reviewer's first count, before any items file exists, is `plan_check.py open-count --review <file>`, and that `open` value is what `/crav1-review-plan` writes.
 
 ## Items file
 

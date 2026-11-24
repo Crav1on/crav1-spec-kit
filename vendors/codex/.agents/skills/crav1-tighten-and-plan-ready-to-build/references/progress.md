@@ -1,0 +1,150 @@
+# Progress file
+
+Read this when `walk-progress.md` is already beside the spec, and again when you record a step. The file is `docs/specs/<slug>/walk-progress.md`. It records completed steps, when, and the version of each file that step covered. It is not the source of truth.
+
+The script `scripts/walk_progress.py --vendor codex` in this skill reads and writes it. Do not hand-edit it. `record` writes only with `--yes`. Show the progress line and get a yes before `record --yes`. The command is `<interpreter> -X utf8 scripts/walk_progress.py record --root <spec-folder> --step <id> --result <result> --yes --vendor codex`. The answers inside tighten, open questions, or the plan do not cover that line. Skip this confirm only when the step's own confirm already included this record. An extra's yes is that case, and it stays one confirm.
+
+A version is the first 12 hex characters of a SHA-256. A missing file is `missing`. Since 1.138.0 the hash is of the normalized text, and the step has `Content stamp: normalized`. Progress marks and line endings are not part of that text. The rule is under Progress marks. The playbook version is the same kind of hash, of the committed file when one exists. Since 1.137.0 a step that covers the spec also records `Spec body:` (the spec with `## Open questions` removed) and `Questions version:` (that section). An edit confined to that section reopens resolve-open-questions and does not reopen tighten-spec, plan-from-spec, review-and-tighten-plan, or tasks-ready-to-build. Since 1.141.0 `## Approval needed` is in neither stamp, so editing it reopens no step. That step also records `Kept questions:` for the questions already waiting. A spec change does not reopen the playbook step. The playbook is intake only. After apply, the `Playbook:` line is `docs/playbooks/<topic>.md@<12 hex>`, not the outside path, so resume works on any machine. The script stores that docs path when the file has a `Docs path: docs/playbooks/<topic>.md` line or the same subject as a file under `docs/playbooks/`. Specs apply touched use `Playbook: docs/playbooks/<topic>.md`.
+
+Shape of the file:
+
+```text
+Walk: tighten-and-plan-ready-to-build
+Slice: docs/specs/orders-retry/
+
+- Step: playbook
+  Done: 2026-11-09T10:19:09+01:00
+  Result: applied
+  Playbook: docs/playbooks/orders-retry.md@a1b2c3d4e5f6
+
+- Step: plan-from-spec
+  Done: 2026-11-09T10:19:09+01:00
+  Result: done
+  Spec version: a1b2c3d4e5f6
+  Plan version: b2c3d4e5f6a1
+  Tasks version: c3d4e5f6a1b2
+
+- Step: tasks-ready-to-build
+  Done: 2026-11-09T10:19:09+01:00
+  Result: ready
+  Spec version: a1b2c3d4e5f6
+  Plan version: b2c3d4e5f6a1
+  Tasks version: c3d4e5f6a1b2
+  Verify version: missing
+```
+
+A playbook step records `Playbook:` only. It does not record spec, plan, or tasks versions. Other result words are `skipped` and `reapplied`. The ready check records `Result: ready` when the readiness output says ready, `Result: ready-partial` when some tasks can start and some are held, and `Result: not-ready` when nothing can start or another walk blocker remains. Do not record `Result: done` for that step. An older `Result: done` on that step still reads as recorded. Resume treats `ready`, `ready-partial`, `not-ready`, and an older `done` as recorded. `ready-partial` covers this step. It is not a `not-ready` mark. The ready check is the only step that records `Verify version:`. An extra records spec, plan, and tasks versions:
+
+```text
+- Extra: review-security
+  Done: 2026-11-09T10:19:09+01:00
+  Result: done
+  Spec version: a1b2c3d4e5f6
+  Plan version: b2c3d4e5f6a1
+  Tasks version: c3d4e5f6a1b2
+```
+
+A spec finding during plan review is not a locked step. `spec-finding --choice tighten-spec --yes` records one jump back. The same finding coming back is an open point. Since 1.146.0 the same finding is the first-seen `Key:`, or an `Alias:` of a later wording. A close reword is offered as that finding, and `this is new` keeps it separate. An old file with only `Key:` still matches those words. `Continue:` is the walk after that record. `Result: jumped` and `Result: open-point` are only on those records, not on a locked step.
+
+```text
+- Jump-back: P2
+  Done: 2026-11-11T20:30:00+00:00
+  Finding: the plan requires a named person's yes to stop a prod function app
+  Result: jumped
+  Open: ../crav1-tighten-spec/SKILL.md
+  Continue: plan-from-spec, review-and-tighten-plan, tasks-ready-to-build
+  Key: 6a034c36ad9e
+  Topic: approver
+  Alias: b7c8d9e0f1a2
+
+- Open point: P2
+  Done: 2026-11-11T20:30:00+00:00
+  Finding: the plan requires a named person's yes to stop a prod function app
+  Result: open-point
+  Continue: review-and-tighten-plan, tasks-ready-to-build
+  Key: 6a034c36ad9e
+```
+
+A resolve step also records each kept question. The first hash is the exact words. The second ignores a refreshed commit list. An old file with no `Question:` line still matches `Kept questions:`.
+
+```text
+  Question: a1b2c3d4e5f6 a1b2c3d4e5f6 Which currency for refunds?
+```
+
+The script stamps `Done` itself, as `YYYY-MM-DDTHH:MM:SS+HH:MM`. Do not pass `--when`. A date alone is rejected. Record one step per call, right when that step finishes. Do not record several steps in one command. `resume` and `readiness` return `done_stamp_warning` when two or more steps share a Done stamp that has not been acknowledged. Say that warning. Those steps were recorded together. The times are not evidence each one finished then.
+
+A shared stamp from before the one-step rule can be acknowledged once. Show the line, get a yes, then run `walk_progress.py ack-stamps --root <spec-folder> --yes --vendor codex`. It writes one line, before the steps:
+
+```text
+Acknowledged stamp: 2026-11-10T12:00:00+00:00 (tighten-spec, resolve-open-questions)
+```
+
+After that line, the warning stays quiet for those records. A new shared stamp warns again. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says.
+
+Recording a step updates the versions on earlier steps. Their `Done` and `Result` stay. A later step's write does not reopen them. That includes a plan step that edits the plan.
+
+An optional extra this walk offered and ran is recorded when it finishes, before `resume`. The user does not run `cover` for that. The line is `- Extra: review-security` (or `research`, `model-data`, `show-or-ask-open-questions`, `suggest-tests-for-code`), with `Done`, `Result`, and the spec, plan, and tasks versions. The yes that ran the extra is enough. That record leaves earlier steps done. An extra is not a locked step. Resume does not stop on it, and a later outside change does not reopen it.
+
+`cover --yes` is optional. It counts the current spec, plan, tasks, and verify as part of the walk and does not add an `- Extra:` line. Use it when a write happened outside this walk and you want that write counted here. It does not touch the playbook line.
+
+A change from outside the walk is one nobody recorded or covered. A hand edit, or `$crav1-add-to-spec` between sessions, is outside. Resume then reopens only the steps that change affects.
+
+- Since 1.148.0 a recorded step has `Section stamps`. Resume compares each section and reopens from the first step that owns a changed section, not every later step. Say `reopen_line` once. The map is [section-reopen.md](section-reopen.md). A requirement section reopens tighten-spec and the plan steps. It does not reopen resolve-open-questions when `changed_questions` is empty. Ask only those ids. Do not re-ask a question whose id is unchanged. `## Match`, `## In the code`, a `Synced at:` line, and an already-answered question set `restamp_only` and reopen nothing. `## Approval needed` still reopens nothing. An unknown heading reopens tighten-spec and the plan steps. When the architecture review is the only spec step so far, a requirement change reopens it. An older step with no `Section stamps` line still uses the 1.137 rule: a spec change outside `## Open questions` reopens tighten-spec, resolve-open-questions, and the plan steps.
+- A plan or tasks change reopens the plan review and the ready check. It does not reopen plan-from-spec. A spec change outside the open questions does, because the plan was written from the spec.
+- A `verify.md` change does not reopen the ready check (1.136.0). A playbook file change reopens only the playbook step.
+- A progress-only edit does not reopen any step (1.138.0). Do not ask to clear. Resume stays `keep`.
+
+## Progress marks (1.138.0)
+
+The stamp compares content. It does not compare progress, and it does not compare CRLF with LF.
+
+Ignored on `tasks.md`: the `[ ]` / `[x]` checkbox, a `(PR n)` or `(PR n, merged)` note on that task line, a trailing `(done)`, and a trailing `merged` on that line. The task title, `(branch:)`, `(map:)`, `(after:)`, and `(spec:)` still count.
+
+Ignored on `spec.md` branch lines (`Branch:` under Match, with or without the leading `-`): `(PR n)` and a trailing `merged`. The branch name, `(into …)`, and `(spec branch)` still change the Match section. Since 1.148.0 a Match-only change, including a renamed branch or a new branch line, does not reopen a step. `restamp_only` is true. A `Synced at:` line does not reopen a step.
+
+`plan.md`, `verify.md`, the playbook, and `## Open questions` ignore line endings only.
+
+A new record writes `Content stamp: normalized` on that step. Resume does not rewrite the file. The next `record` updates earlier steps to that stamp. `Done` and `Result` stay.
+
+An older step has no `Content stamp` line. Its stored hash is the raw bytes from that kit. An unchanged file still matches. A progress-only edit matches too: the script compares the raw bytes, then the other line ending, then one hash-undo over checkbox and `(PR n)` variants (the full set when that is at most 16384, otherwise one line at a time, which covers one tick and any number of added `(PR n)` marks on a short branch list), then `HEAD` once when that blob is the stored stamp and the normalized text matches. It does not walk history. Two or more checkbox edits on a task list longer than 14 lines, when those bytes are not `HEAD`, still look like a content change. The next record writes the new stamp. Do not reopen every old file just because the hash moved.
+
+At the start of a run, `start` returns `resume` before anything is recorded. That resume may report status. When a playbook was named, it does not start a later step, and the playbook question is answered first, including before a read-only check. Redo `continue_from` only after that choice. Do not record a later step to clear an earlier reopen.
+
+On resume, run `resume`. With no playbook on this command, add `--no-playbook` so a playbook step that was never started stays skipped. The script returns `keep`, `reopen`, or `not-started`, and `continue_from`. A recorded extra is `keep` and does not change `continue_from`. Explain each reopen with its `impact` before redoing it. Leave `keep` steps as they are. After a step or an extra is recorded, run `resume` again.
+
+Ask the clear-or-rerun question with the readiness output's `reopen_cards` entry for that step: its `background` sentence first, then its `question`, then its `options` in that order, each with its `text`. For example:
+
+Card: Skip redoing the plan review?
+- **Skip redoing the plan review (Recommended)** (`nothing new`): keep the plan review as done and go straight on to the ready check. Why: only branch tags were added to three tasks; no task text changed.
+- **Redo the plan review** (`rerun`): run the plan review again on the current files, then the walk goes on.
+
+**No card when a finding covers it (1.196.0).** When a step reopened only because of a fact this walk just recorded (for example the PR merge line add-to-spec wrote) and a finding already covers its effect, there is no reopen card. Run `readiness` with `--covered <step>`: that step is left out of `reopen_cards` and listed in `auto_clear` with one `auto_clear_line`. Run `clear --step <step> --yes` and say that line.
+
+**Stale seen (1.195.0).** When this walk saw anything stale (merged-since-sync offered `take-in`, code-drift was `behind`, or a stale research mark), run `readiness` with `--stale-seen`: every reopen card then recommends `rerun`, never `nothing new`.
+
+The background names the change in plain words, for example `The plan review only reopened because three tasks got a branch tag.` Never put stamps, `Done`, `Result`, step ids, or a command in the card.
+
+`clear --step <id> --yes` refreshes one reopened step after the user says `nothing new`. `Done` and `Result` stay. Other steps stay as they are. That is the path when a reopened step has nothing new. Do not record `nothing-to-do` over it. A `nothing-to-do` record keeps an earlier `done` Result.
+
+`playbook-status` answers whether this walk already applied that file. It does not read the spec. The apply compare in step 1 does that.
+
+## Stop
+
+When the user stops partway, including after a record, end with one paused-at line and the shared ending. No other next-step prose.
+
+```text
+Paused at resolve-open-questions.
+
+Run next:
+
+`$crav1-tighten-and-plan-ready-to-build docs/playbooks/orders-retry.md`
+continues from plan-from-spec
+
+Uncommitted: 2 files; commit with $crav1-finalize-commit when ready.
+```
+
+`Paused at` is the step just recorded, or the step they stopped in. The Run next entry is this command alone in a code span, then `continues from` and `continue_from` from `resume` (1.154.0). Do not write a `Next:` line. Include the playbook path when `resume` returns one. Add `Waiting:` only when that next step is blocked. Leave `Uncommitted:` out when nothing is uncommitted.
+
+`walk-progress.md` may also have a `## Branch runs` section: one `- Branch run: <branch>: <state> (<time>). Log: build-progress/<file>.md` line per whole-branch run of `$crav1-build-walk` (1.155.0). This walk does not write those lines. `record`, `cover`, and `clear` keep them. `resume` returns them as `branch_runs`. A file with only those lines has no step, so it is not a paused walk. `resolve-stamps` settles a conflict that is only those lines, or only hash lines, keeping each branch's newest line.
+
+When the ready check has run, print its `ending` in this reply as well (1.150.0). That text includes each held line, one branch per line, with the T# , the short name, and who it waits on. On ready and ready-partial, `Run next:` is first, before any Waiting line, and it is the only Run next block. Never add a `Next:` line after the Waiting lines (1.153.0). Do not say `above`, `listed above`, or earlier output.

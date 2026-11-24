@@ -2,6 +2,16 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.202.0 (2026-11-24)
+
+Generated Codex and Copilot trees, plus three ready-check and plan-count fixes. Nothing here is installed.
+
+- **Vendor trees.** `scripts/sync-crav1-vendors.py` writes `vendors/codex/` (`.agents/skills/`) and `vendors/copilot/` (`.github/skills/` plus `.github/instructions/crav1.instructions.md`). Each generated skill opens with the kit-rules line. Codex commands are `$crav1-` and its Run next script calls pass `--vendor codex`. Copilot keeps `/crav1-` and passes `--vendor copilot`. Command-only Codex skills get `agents/openai.yaml`. The project's `AGENTS.md` is not written. CI fails when a committed tree drifts, and kit-lint checks the per-vendor rules. Update still installs only Cursor and Claude Code.
+- **Held list.** A task whose only wait is an `(after:)` on a task that is not built yet is listed under Held, with the reason on that line. An own pull-request wait is on the held line too. The same sentence is not printed again underneath.
+- **Open count.** `plan_check.py open-count --review <file>` prints `open: <n>` from the reviewer's `P#` lines. The walk uses that value. `reviewed --items` recomputes the Reviewed line from the items file.
+
+Docs and tests: tighten-and-plan and spec-to-plan walkthroughs, glossary, data layout, and `scripts/tests/test_kit_1202.py`.
+
 ## 1.201.1 (2026-11-24)
 
 Fixes for the design screen and the ready check. The rules were already the ones below; the scripts now follow them.

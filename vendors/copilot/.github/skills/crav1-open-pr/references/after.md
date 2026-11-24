@@ -1,0 +1,22 @@
+# crav1-open-pr: after
+
+Read only when the pointer in `SKILL.md` sends you here. Moved word for word from `SKILL.md` in 1.71.0; the rules are unchanged.
+
+## After it exists
+
+When the host returned a pull request URL, print that URL and `base` ← `head`.
+
+**PR number (1.75.0).** With that URL, add ` (PR <n>)` to the head's own Match `Branch:` line (replace an older `(PR …)`; on an old `; `-joined line, to the head's entry). When the head is `feat/<slug>` or `spec/<slug>` and is not listed, add `- Branch: <head> (PR <n>)` under `## Match` in sorted place (repo, then branch, 1.86.0), creating that heading at the end when missing. No spec: write nothing. Do not commit; say the file changed.
+
+One sentence: they can review when they want. Then Run next (1.171.0), never a `Next:` line, each label on its own line and each command alone in its code span:
+
+1. A `**Catch up first**` block when the specs repo is ahead of origin (for example a fix-log or PR-note commit that is not pushed): `Push the specs repo (<n> commits ahead):` with `git push`. Say it as this step, not as prose in the reply.
+2. `Review PR <n>:` with `/crav1-review-pr <repo> <n>`. From the specs repo, a pull request in another repo names the repo and the number (1.65.0).
+
+`Uncommitted:` in chat when this run changed a file (the Match line). Do not run the next step.
+
+When `/crav1-build-walk` opened this skill, do not print that Run next. The walk prints its own ending (1.142.0).
+
+This skill does not save a PR note or a PR record: the body is its own summary (format B, 1.176.0: summary, one line per task, how it was verified, the work-item mention). `/crav1-review-pr` and `/crav1-merge-pr` save the description, with any later edits, as the PR note. Merging stays `/crav1-merge-pr` when they explicitly ask, in a later turn. A review is not that ask. This skill does not merge, and it does not delete the branch. Do not run `/crav1-review-pr` or `/crav1-merge-pr` from this step.
+
+When you only printed commands, stop after those commands. Do not invent a URL.

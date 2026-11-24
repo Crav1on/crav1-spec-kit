@@ -793,6 +793,19 @@ def invocation_problems(kit):
     return lines
 
 
+def vendor_problems(kit):
+    """1.202.0: Codex and Copilot trees match the per-vendor rules."""
+    path = os.path.join(kit, "scripts", "sync-crav1-vendors.py")
+    if not os.path.isfile(path):
+        return ["scripts/sync-crav1-vendors.py is missing"]
+    proc = subprocess.run([sys.executable, path, "--lint", "--root", kit], capture_output=True, text=True)
+    lines = [line[6:] for line in (proc.stdout or "").splitlines() if line.startswith("FAIL  ")]
+    if proc.returncode and not lines:
+        detail = (proc.stderr or proc.stdout or "vendor lint failed").strip()
+        lines.append(detail)
+    return lines
+
+
 def maintainer_tool_problems(kit):
     """1.199.0: the maintainer-only kit_dry_run tester is never named where users or skills read it.
 
@@ -880,6 +893,7 @@ def main(argv):
     errs.extend(explain_tech_problems(kit))
     errs.extend(invocation_problems(kit))
     errs.extend(maintainer_tool_problems(kit))
+    errs.extend(vendor_problems(kit))
     for e in errs: print("FAIL  " + e)
     print(f"kit lint: {len(skills)} skills, {len(errs)} problem(s)")
     return 1 if errs else 0

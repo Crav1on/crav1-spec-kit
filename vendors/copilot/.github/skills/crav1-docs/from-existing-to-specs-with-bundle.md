@@ -1,0 +1,82 @@
+# From existing repos and a dump to specs
+
+Kit not in this project yet? [Install first](install.md) (Cursor and Claude Code; the slash commands match, the files do not). After a Cursor plugin install, the short command loop is [plugins/crav1/README.md](../plugins/crav1/README.md). Claude Code has no plugin.
+
+Use this when **one or more repos already make up a system**, and you have a **dump** (notes, tickets, old docs, diagrams, screenshots) to match against that code. This command is a starter option. The six are in [first-run.md](first-run.md). Asking for startup options names that list and does not run this command.
+
+The repos are evidence of what exists. The dump is what to match. It is not a brief for a new product. You still do **not** start by coding.
+
+This command is not [intake](from-bundle-to-specs.md), [a spark](from-nothing.md), or [a pile of ideas](from-ideas.md). It does not replace those commands. A new system, with code only as background, stays `/crav1-bundle-to-specs`. One or two sentences stay `/crav1-spark-to-spec`. One unstructured pile for one feature stays `/crav1-ideas-to-spec`. Named repos and no dump, when the job is one architecture spec of what the code shows, is [from the repos](from-existing-to-specs-repos-only.md) (`/crav1-existing-to-specs`). This command still needs the dump.
+
+## First prompt
+
+New chat. Strong reasoning model. Not the host plan UI yet.
+
+`@` the repos and the dump. No required structure in the dump.
+
+```text
+/crav1-existing-to-specs
+@repo-a/
+@repo-b/
+@notes/old-spec.md
+@tickets/
+
+The repos are what exists. The dump is what to match.
+Do not write code. Ask where the specs go, then map, and stop.
+```
+
+That slash command *is* the prompt.
+
+## Steps
+
+| Phase | You | Agent |
+| --- | --- | --- |
+| Where specs go | Pick one repo already in front of the command, or a new clean repo | Options only. Does not ask for a typed path. No files yet |
+| Map | Confirm or edit slices, which repo each belongs to, and done / partial / not in the code | Reads the repos and the dump. Lists code no slice covers, on the side. Stops |
+| Branch | Pick `feat/…` or `spec/…` (or stay) | `/crav1-create-feature-branch`, one branch for the dump (no push, no PR) |
+| Landscape | — | `docs/system/` from the repos and the confirmed match, including `glossary.md`. An existing landscape is not rewritten; only gaps the match needs, including a missing glossary, new glossary rows, and the picture update. Existing glossary rows are not rewritten. A meaning the source does not state is `to be researched`. The picture update adds what is new to the short description, the diagram, and how the parts connect |
+| Slice specs | Wait | One `docs/specs/<slug>/` per confirmed slice, including not in the code |
+| Index | — | One landscape row per slice, with match status |
+| Stop | Glance, then `/crav1-finalize-commit` if this dump should be in git | Does not plan, implement, or commit |
+
+
+The map confirmation is the only product stop before writing. The card is `yes (Recommended)` to write it as shown, or typed changes on that card's free-text answer (1.130.0). Since 1.145.0 the reply prints a findings table immediately before the card. The card names each slice and its recommendation. It does not say `table above` unless that table is in the reply. The card is not asked without the table. Confirming the map accepts the facts left on it. Facts that were not confirmed stay labeled inferred.
+
+A new clean repo is created only if that option was picked. Other repos are listed in `repos.md`. They do not get their own spec trees.
+
+## What gets written
+
+```text
+docs/system/
+  landscape.md
+  repos.md
+  diagrams.md
+  glossary.md
+  adr/
+docs/specs/<slug>/
+  spec.md
+```
+
+Human starter copies for the landscape are `docs/system/_template/` (same files as this skill’s `assets/` for landscape, repos, diagrams, glossary, and ADRs). The slice file starts from the skill’s `assets/spec.md`.
+
+A mail, a transcript, a chat, a screenshot, or another original that a quote comes from is written under `docs/sources/YYYY-MM-DD-<slug>/`. The spec `Source:` and `Trace:` lines link to that folder. This command does not commit.
+
+**Done** and **partial** specs record the match status, what the dump says, the repo paths that support the slice, what was read from the code versus what was only in the dump, and open questions. Normal spec sections appear only where the dump or the code supports them. The command does not invent acceptance criteria to make a slice look buildable.
+
+**Not in the code** stays thin: what the dump says, that the code does not have it, open questions, and an empty trace. More information can be added later, until planning. This command does not add it.
+
+Code that no slice covers is a note on the landscape, not a guessed spec. ADRs are written only where there was a real choice.
+
+## Later: recheck the specs against the repos (1.108.0)
+
+Once specs exist and the code has moved on, run `/crav1-existing-to-specs recheck` (or `repos-vs-specs`). Name a repo, or leave it out to use every repo in `docs/system/repos.md`. Add a path to narrow it, or `since` for only code changed after that repo's `Synced at`.
+
+It reports, per repo, the code no spec covers (with the nearest spec) and the stale claims: paths a spec cites under `## In the code` that are gone. It refreshes `## Code with no slice` in `docs/system/landscape.md`: lines still true stay, covered lines come off, new gaps are added, and `## Dismissed` lines are never offered again. It writes nothing into any spec and never adds an open question.
+
+For each gap you pick: add it to the nearest spec (handed to `/crav1-add-to-spec` after a yes), start a new spec (it names `/crav1-spark-to-spec` or `/crav1-ideas-to-spec` and does not run it), ignore it (dismissed), or leave it. A stale claim points at `/crav1-tighten-spec`.
+
+## After Index
+
+When specs were written, Run next names `/crav1-tighten-spec <first slug>` because those specs are not tightened yet (1.200.0). When a file changed: `Uncommitted: 1 file; commit with /crav1-finalize-commit when ready.` See [How a run ends](reference/run-ending.md). No push. This command does not commit for you. A slice that is not in the code is not planned by this command.
+
+Reference page: [existing-to-specs](reference/skills/crav1-existing-to-specs.md)

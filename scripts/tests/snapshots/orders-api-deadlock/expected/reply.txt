@@ -17,6 +17,8 @@ Ask the PR owners to merge, in this order:
 - Person A: PR 11
 
 Held:
+- `feat/orders-cicd` (wave 2):
+  - T3 Add the build pipeline — waits on T2
 - `feat/orders-store` (wave 1):
   - T1 Store a retried order once — waits for PR 11 to merge
 

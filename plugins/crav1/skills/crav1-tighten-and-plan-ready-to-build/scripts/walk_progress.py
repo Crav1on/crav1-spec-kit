@@ -5565,6 +5565,14 @@ def ready_branches(root: Path) -> list[dict]:
             hits.append(hit)
             if hit["kind"] == "waiting":
                 row["bucket"] = "waiting"
+                # 1.202.0: the held line carries an own pull-request wait.
+                # An empty reason used to print `— held` and leave the
+                # sentence to a footer.
+                if hit.get("own") and hit.get("pr"):
+                    sentence = f"{row.get('task')} is yours and waits for PR {hit['pr']}'s merge."
+                    current = str(row.get("reason") or "")
+                    if "PR " not in current and "pull request" not in current.lower():
+                        row["reason"] = sentence
             elif str(hit.get("why") or "").startswith("Unrecognized blocker"):
                 # Never invisible (1.180.0, M5): counted as Blocked and printed.
                 row["bucket"] = "blocked"
@@ -6482,6 +6490,14 @@ def _readiness(args: argparse.Namespace) -> None:
             hits.append(hit)
             if hit["kind"] == "waiting":
                 row["bucket"] = "waiting"
+                # 1.202.0: the held line carries an own pull-request wait.
+                # An empty reason used to print `— held` and leave the
+                # sentence to a footer.
+                if hit.get("own") and hit.get("pr"):
+                    sentence = f"{row.get('task')} is yours and waits for PR {hit['pr']}'s merge."
+                    current = str(row.get("reason") or "")
+                    if "PR " not in current and "pull request" not in current.lower():
+                        row["reason"] = sentence
             elif str(hit.get("why") or "").startswith("Unrecognized blocker"):
                 # Never invisible (1.180.0, M5): counted as Blocked and printed.
                 row["bucket"] = "blocked"
@@ -6691,6 +6707,11 @@ def _readiness(args: argparse.Namespace) -> None:
     if hard_line and hard_line not in (ending or ""):
         ending = (ending + "\n\n" if ending else "") + hard_line
     own_line = own_claim_line([row for row in rows if row.get("own_claim")])
+    if own_line:
+        # 1.202.0: drop a sentence the Held lines already show.
+        shown = "\n".join(held_lines)
+        kept = [part for part in re.split(r"(?<=\.)\s+", own_line) if part and part not in shown]
+        own_line = " ".join(kept) or None
     if own_line:
         ending = (ending + "\n\n" if ending else "") + own_line
     out = {
