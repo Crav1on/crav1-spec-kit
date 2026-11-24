@@ -30,6 +30,8 @@ flow:
 - `plan_check.py order` also lists branches that wait for each other as a `Branch loop:` line with the fixes the ready check offers, in the same plain words.
 - Each is a candidate `P#` with the new `fix-loop` option.
 - The batch yes applies it with `walk_progress.py fix-loop --root <spec-folder> --pick <n> --yes`, which writes the `(map:)` marks or drops the one wait in `tasks.md` and rebuilds `build-map.md`.
+- a task line that says `after PR 87 merges` and has no `(after: PR 87)` is a candidate `P#`.
+- On yes, `plan_check.py after-pr --root <spec-folder> --yes` writes the mark.
 called_by: Called by the user.
 runs by itself: Calls no skill.
 you run next: /crav1-ado-sync; /crav1-tasks-ready-to-build; /crav1-build-walk; /crav1-build-tasks; /crav1-build-features

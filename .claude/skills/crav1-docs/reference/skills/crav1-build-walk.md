@@ -84,6 +84,10 @@ flow:
 - On another person's branch a take-in task (`(take-in: develop)`, or text that says it takes in develop) may merge the base into the branch with its own yes: `git merge --no-ff`, the whole suite and the linter, a push after yes and one comment; the pull request merge stays with its owner, and the ending names who merges.
 - the task name in the lead, the ending under Run next and the yes card stops at the first verify item (`; integration —`, `; contract —`, `; system —`, `; unit —`, `(verify: ...`), so a task line with its checks shows only its name, such as `Build T8 PR 12 takes in develop after PR 10 merges, with the conflicts resolved on feat/orders-api:`.
 - The one helper is `task_order.task_name`.
+- the same helper drops a leading `` `fix/x` from `develop` `` clause and parenthesised marks such as `(manual, secret, …)`, so the label and the Tasks line are the outcome.
+- `claims.py add` prints the line and leaves `claims.md` unchanged until `--yes`.
+- `progress start-task` does not pass a new since, so the time stays.
+- A task that says `(after: PR 87)` or `after PR 87 merges` stays held until the host says PR 87 is merged, and the walk ending says `waits for PR 87 to merge`.
 
 ## Choice words
 - question: Do this step

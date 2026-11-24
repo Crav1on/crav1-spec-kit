@@ -50,6 +50,10 @@ When the spec's work sits on several branches (its `Synced at` lines, its Match 
 
 A constraint such as `The partner gives a yes before the CI build policy script is applied.` becomes an item under `## Approval needed`, with `Person:` and `Holds:` for the tasks that do that work. `$crav1-plan-from-spec` writes the item. It does not write `Approved:`.
 
+## A wait on another pull request (1.201.1)
+
+A task that should start only after another pull request merges, and that pull request has no task of its own, carries `(after: PR 87)`. When the task text says `after PR 87 merges` and the mark is missing, `plan_check.py order --vendor codex` names the line. On yes, `plan_check.py after-pr --root <spec-folder> --yes --vendor codex` writes the mark.
+
 ## Host setup tasks (1.115.0)
 
 A requirement that is a host setting with no file in the repo (a branch policy, required build, reviewers, an approval, a variable group) becomes its own task marked `(host setup)`, verified by reading the live setting back.

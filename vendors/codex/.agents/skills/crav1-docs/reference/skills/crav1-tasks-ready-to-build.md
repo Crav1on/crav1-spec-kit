@@ -213,6 +213,14 @@ flow:
 - `task_state.walk_start` says whether the walk can start a task now.
 - The ready check offers `$crav1-build-walk <slug> <T#>` only when it can (invariant I8), so the ready check and the walk agree.
 - the open-task list, Run next and `build-map.md` name a task by its text up to the first verify item, through the shared `task_order.task_name`; unbalanced parentheses are dropped and stray spaces such as `( x` and `develop ,` are tidied.
+- a free-text `(PR 12)` or `(PR 7 merged into develop)` does not mark a task done.
+- Only a tick or the kit mark `(PR n, merged)` or `(PR n) merged` does.
+- A task with `(after: T#)` stays held while that task's pull request is open, on the ready check and on the build map, and the held line says `waits for PR <n> to merge`.
+- A task that says `(after: PR 87)`, or whose text says `after PR 87 merges`, stays held until the host says PR 87 is merged.
+- The ready check, the build map and the walk ending all say `waits for PR 87 to merge`.
+- When the code repo is not recorded, the check uses the same one-time repo question as 1.177.2.
+- A pull request the host says is merged is cleared with `$crav1-build-walk <slug> T#`.
+- A `--text` read that does not pass `--write-map` does not add a `PR author` line.
 
 ## Choice words
 - question: Show the build map?

@@ -35,6 +35,9 @@ flow:
 - After writing `tasks.md`, the step preserves those lines and says once which claimed tasks were kept.
 - `plan_check.py order` also lists branches that wait for each other as a `Branch loop:` line with the recommended fix in plain words.
 - Before the recap, apply it on the user's yes with `walk_progress.py fix-loop --root <spec-folder> --pick <n> --yes`.
+- a task that waits for another pull request ends its line with `(after: PR 87)`.
+- When the text says `after PR 87 merges` and the mark is missing, `plan_check.py order` names the line.
+- On yes, `plan_check.py after-pr --root <spec-folder> --yes` writes the mark.
 called_by: Called by the user.
 runs by itself: Calls no skill.
 you run next: /crav1-review-plan; /crav1-ado-sync; /crav1-tasks-ready-to-build; /crav1-build-tasks

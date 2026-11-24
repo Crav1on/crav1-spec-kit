@@ -399,7 +399,14 @@ def tasks_sentence(names, limit=TASK_SUMMARY_LIMIT):
     ` for ` ...). The line stays under `limit`, whole items only; items
     left out are counted (`and 2 more`).
     """
-    items = [TASK_PREFIX.sub("", _plain(name)).strip() for name in names or []]
+    def _outcome(name):
+        item = TASK_PREFIX.sub("", _plain(name)).strip()
+        # 1.201.1: a branch-and-base clause (`from develop, ...: outcome`) is not the name.
+        if ":" in item and re.search(r"\bfrom\s+\S+", item.split(":", 1)[0], re.I):
+            item = item.split(":", 1)[1].strip()
+        return item
+
+    items = [_outcome(name) for name in names or []]
     items = [item for item in items if item and not PERSON_LEAD.match(item)]
     if not items:
         return ""

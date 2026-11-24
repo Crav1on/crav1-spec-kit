@@ -115,7 +115,7 @@ subagents: none
 - $crav1-explain-tech | Depth and save | `deeper` `save`
 - $crav1-retire-spec | What to do | `retire` `merge` `park` `convert-to-note`
 - $crav1-model-data | Which flow | `manual-flow` `auto-flow`
-- $crav1-design-architecture | Which step | `resume` `next` `park` `end` `status` `fan-out` `stage-it` `go-ahead` `compare-topics` `prepare` `change-goal` `builds-on` `note` `small-fix`
+- $crav1-design-architecture | Which step | `resume` `next` `park` `end` `reopen` `status` `fan-out` `stage-it` `go-ahead` `compare-topics` `prepare` `change-goal` `builds-on` `note` `small-fix`
 - $crav1-update-specs-from-changes-and-prs | Which flow | `manual-flow` `auto-flow`
 - $crav1-glossary | Which mode | `as-file` `research` `<term>`
 - $crav1-ado-sync | Which sync | `suggest-features` `push-features` `push-tasks` `pull-tasks` `pull-spec-changes`

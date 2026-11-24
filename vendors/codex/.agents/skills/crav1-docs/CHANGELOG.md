@@ -24,6 +24,18 @@ Generated Codex and Copilot trees, plus three ready-check and plan-count fixes. 
 
 Docs and tests: tighten-and-plan and spec-to-plan walkthroughs, glossary, data layout, and `scripts/tests/test_kit_1202.py`.
 
+## 1.201.1 (2026-11-24)
+
+Fixes for the design screen and the ready check. The rules were already the ones below; the scripts now follow them.
+
+- **Design screen.** Run next comes first, with one reason line. A topic that exists only on `design/<topic>` offers the switch card. `resume --json` leaves the files unchanged, including a parked Status. Dated proposal pages under `docs/architecture/proposals/` count. Waiting lines name each person once, with the date recorded on the question, and stay near 120 characters. When every open decision is waiting on named people, Run next names the open-questions command and the proposal. A parked screen has no Park command. An ended screen's one command is `reopen`. Run `scripts/design_run.py --vendor codex` from the repo root.
+- **Script output.** Do not pipe a script's output, in bash or in PowerShell. A pipe such as `| head` can cut an ending off at a lone `{`.
+- **Task names.** A `from <base>` clause and parenthesised marks such as `(manual, secret, …)` are not the task name. The name is the outcome after that clause.
+- **Claims.** `claims.py add` leaves `claims.md` unchanged until `--yes`. A second start on the same claim keeps the original since time.
+- **Ready check.** A `--text` read that does not pass `--write-map` does not add a `PR author` line. A merged pull request is still recorded, as in 1.177.2. A free-text mention such as `(PR 12)` or `(PR 7 merged into develop)` does not mark a task done; only a tick or the kit mark `(PR n, merged)` or `(PR n) merged` does. A task with `(after: T#)` stays held while T#'s pull request is open, and the held line says `waits for PR <n> to merge`. A task that says `(after: PR 87)`, or whose text says `after PR 87 merges`, stays held the same way until the host says PR 87 is merged. The ready check, the build map and the walk ending all say `waits for PR 87 to merge`. When the code repo is not recorded, the check uses the same one-time repo question as 1.177.2. `$crav1-plan-from-spec` and `$crav1-tighten-plan` write `(after: PR N)` for that prose: `plan_check.py order --vendor codex` names the line, and `plan_check.py after-pr --yes --vendor codex` writes the mark. A pull request the host says is merged is cleared with `$crav1-build-walk <slug> T#`. A blocked line names only the tasks that wait on that block. Claude Code sends one question per question-tool call.
+
+Docs and tests: design, build-walk and ready-check walkthroughs, data layout, question cards, install, running scripts, and `scripts/tests/test_kit_12011.py`.
+
 ## 1.201.0 (2026-11-22)
 
 A vendor table, with no change to a Cursor and Claude Code update.
@@ -184,23 +196,5 @@ Fixes for `$crav1-design-architecture` and `$crav1-update-kit` from a live desig
 - **Commit before the ending.** The new `commit --topic <t> --yes` commits the topic folder after the user's yes; the flow offers it before the ending, and `create --builds-on` refuses while the base topic has uncommitted files.
 - **Linked topic route.** `$crav1-design-architecture builds-on <base> <idea>` routes to a linked create, and the ending prints that command; a test checks that every Run next command the script prints routes.
 - Design snapshot `design-order-branch-commit` and `scripts/tests/test_kit_1190.py`.
-
-## 1.189.0 (2026-11-18)
-
-Fixes for `$crav1-design-architecture` from a review of a long live design session.
-
-- **Stored order.** Decisions and open questions keep the order they were added, or the goal's order after `change-goal`, instead of being sorted by title. `resume` takes the first reopened decision, then the first open big decision, then detail decisions.
-- **Endings with lists and true or false.** `ending` prints one `Waiting:` line per item when `waiting` is a list and reads `uncommitted` as a count, a list of paths, `true` (the topic folder) or text, so no raw `['a']` or `True` reaches the user. inputs.md documents each value type.
-- **Lean drivers.** `lean` matches short driver names to the drivers already listed instead of appending duplicates, and keeps the names on the decision as `Drivers:`.
-- **Cards.** At most 4 options and one question per card. Typed input (your idea, a point to discuss, `ask-me`, `to-question`, `to-research`, `skip-for-now`) goes through the free-text Other; no option only says to type. An empty Other is asked again. A `discuss` with no text gets likely talking points, not an open question. kit-lint now checks this skill's cards for option count, type-only options and two questions.
-- **Inputs and notes in the topic folder.** Script input files go in `docs/architecture/designs/<topic>/inputs/`; an input outside the specs repo is refused. The new `note` move (allowed in prepare) appends scans, visions, scope lists and answers to the topic's `notes.md`, and the flow saves open discussion with it before parking.
-- **Scope round.** Framing asks what else the change should cover and orders decisions big shape first, detail last; a detail decision (`"detail": true`) is proposed only after the big ones.
-- **Planned work.** Step 1 reads `plan.md`, `tasks.md` and `build-map.md` of slices the ask touches; planned work is an input, and options name it under `Overlaps`.
-- **Unknown input keys.** `create` and `change-goal` refuse unknown keys and name them; a documented `notes` key is saved with `note`.
-- **Design branches.** `create` creates `design/<topic>` (from `design/<base>` for a linked topic) or refuses with `git switch` when it exists elsewhere. A move on a topic that lives on its design branch, run from another branch, refuses with a Run next naming `git switch design/<topic>`.
-- **Design branch update.** `resume`, `create` on an existing design branch, `fan-out`, `stage`, `go-ahead` and `change-goal` fetch and check whether `design/<topic>` is behind `origin/main`, and a linked topic also behind `design/<base>`, the same way the build walk's `code-behind` checks a code branch. When behind, the result carries a yes or stop card; the new `branch-behind --topic <t> --yes` merges with `git merge --no-ff`, never a rebase. A conflict merges nothing and names the files, and a run without the user never merges. `--no-fetch` compares with local copies.
-- **Base to linked update.** After a committed change to a base topic (settle, lean, `change-goal`, a revisit settled or reopened, go-ahead), the ending lists each linked topic whose `design/<linked>` branch is behind `design/<base>`, and those moves return one yes or stop card for all of them. `linked-behind --topic <base> --yes` switches to each, merges `design/<base>` with `git merge --no-ff`, and switches back; never a rebase. A conflict stops on that branch, names the files and leaves the rest untouched; a run without the user merges nothing.
-- **Small fixes.** `small-fix` lists a change with no design choice under `## Small fixes` in `design.md`; go-ahead copies the list with the design, with no ADR.
-- Design snapshots `design-order-notes-fixes`, `design-branch-behind` and `design-linked-behind` (snapshot-check steps may now run `git`), and `scripts/tests/test_kit_1189.py`.
 
 The newest 15 releases are above. The full changelog is https://github.com/Crav1on/crav1-spec-kit/blob/main/CHANGELOG.md.

@@ -39,6 +39,11 @@ flow:
 - A proposal page and a briefing share one decisions section, stage numbers start at 1, and a routed requirement names the slice and the text.
 - `settle-preview` recommends one by one and settles nothing; there is no settle batch.
 - `stop and commit` is a commit yes only when this skill says so.
+- A topic whose goal is only on `design/<topic>` offers the switch card.
+- `resume --json` leaves Status as it is, including parked; a source that changed still marks that decision reopened.
+- Dated pages under `docs/architecture/proposals/` count as the proposal.
+- Waiting lines name each person once, with the date on the question, near 120 characters.
+- An ended screen's one command is `reopen`.
 
 ## Choice words
 - question: Which step
@@ -46,6 +51,7 @@ flow:
   - `next`: Open the guided card for the next decision. Cards appear only from this word.
   - `park`: Park the session. Prints Session parked and the plain command to open it again.
   - `end`: End the session. Prints Session ended and the plain command to open it again.
+  - `reopen`: Open an ended session again and print the status screen.
   - `status`: Show open topics, designs, decisions, stages and questions. Writes nothing.
   - `fan-out`: Start a competing design under the same goal, as a copy or from a blank start.
   - `stage-it`: Suggest a split of the designed end state into stages that the user names and divides.

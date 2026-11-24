@@ -26,7 +26,7 @@ Skip nitpicks. Merge duplicates. Prefer fewer sharp issues.
 
 ## Ordering findings (1.159.0)
 
-`plan_check.py order --root <spec-folder> --vendor codex` prints the dependency waves, any loop, any `after:` that names no task, which tasks are only inferred from file order, and each task line with no verify kind or no `(spec: …)` mark. A `Branch loop:` line names branches that wait for each other, with the fixes the ready check offers (1.161.0). It is a `P#` with the `fix-loop` option and its recommended fix, applied on the batch yes like a `fix-trace`. Never ask the user to edit `tasks.md` by hand. Each printed problem is a candidate `P#`. Only the agent decides whether it is a real issue.
+`plan_check.py order --root <spec-folder> --vendor codex` prints the dependency waves, any loop, any `after:` that names no task, which tasks are only inferred from file order, and each task line with no verify kind or no `(spec: …)` mark. A `Branch loop:` line names branches that wait for each other, with the fixes the ready check offers (1.161.0). It is a `P#` with the `fix-loop` option and its recommended fix, applied on the batch yes like a `fix-trace`. A line that says `after PR 87 merges` and has no `(after: PR 87)` is a candidate `P#` (1.201.1). On yes, `<interpreter> -X utf8 scripts/plan_check.py after-pr --root <spec-folder> --yes --vendor codex` writes that mark on the line. Never ask the user to edit `tasks.md` by hand. Each printed problem is a candidate `P#`. Only the agent decides whether it is a real issue.
 
 ## Index
 

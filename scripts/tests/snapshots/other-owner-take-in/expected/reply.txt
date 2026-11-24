@@ -16,8 +16,8 @@ Ask the PR owners to merge, in this order:
 **feat/orders-fixes**
 A test of the 404, A test of the order id guard, and PR 7 takes in develop.
 3 open tasks:
-- T2 A test of the 404 for an unknown order (held)
-- T3 A test of the order id guard (held)
+- T2 A test of the 404 for an unknown order (waits for PR 7 to merge)
+- T3 A test of the order id guard (waits for PR 7 to merge)
 - T4 PR 7 takes in develop, conflicts resolved, whole suite green
 
 Run the whole branch:

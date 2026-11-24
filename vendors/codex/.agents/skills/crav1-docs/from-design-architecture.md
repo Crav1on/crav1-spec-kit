@@ -17,6 +17,8 @@ The command is [`$crav1-design-architecture`](reference/skills/crav1-design-arch
 
 `$crav1-design-architecture` with or without a topic, and with or without the word `resume`, opens the same status screen. `resume` does not change that screen.
 
+A topic that lives only on `design/<topic>` while this checkout is another branch offers the switch card. When every open decision is waiting on named people, Run next names `$crav1-show-or-ask-open-questions` and the proposal. An ended screen's one command is `reopen`. Each question records `Asked: <date>`, and a waiting line names each person once. Dated pages under `docs/architecture/proposals/<date>/` count as the proposal. Run the design script from the repo root, the folder that holds `docs/`.
+
 `$crav1-design-architecture orders should retry failed payments without blocking checkout`
 
 After you say yes it starts a topic, for example `orders-payment-retry`, with one design, on a branch such as `design/orders-payment-retry`.

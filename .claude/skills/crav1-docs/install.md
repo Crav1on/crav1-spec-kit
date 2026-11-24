@@ -120,6 +120,8 @@ Cursor plugin format: [Plugins](https://cursor.com/docs/plugins) · [Plugins ref
 
 The same slash commands as on Cursor live in the generated `.claude/` tree. Copy that tree into a repository you own, or into `~/.claude` for a client project.
 
+See [question cards](reference/question-cards.md).
+
 | What | Project (repo you own) | User (`~/.claude/`) | Doc |
 | --- | --- | --- | --- |
 | Skills | `.claude/skills/<name>/SKILL.md` | `~/.claude/skills/<name>/SKILL.md` | [Skills](https://code.claude.com/docs/en/skills) |
