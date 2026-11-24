@@ -26,7 +26,7 @@ Specify: spark, ideas, bundle, or existing-to-specs; later information through `
 
 ## Editing the kit
 
-- When adding or updating a crav1 skill or agent, edit `.cursor/skills/crav1/crav1-<name>/` (agents: `.cursor/agents/crav1-<name>.md`, templates: that skill's `assets/` and `.cursor/agent-assets/crav1-<name>/`), then run `scripts/sync-crav1-plugin.sh` so `plugins/crav1/` and the generated `.claude/` tree match. `scripts/sync-crav1-claude.sh --check` fails if `.claude/` is stale. See `.cursor/rules/kit-maintainer.mdc`.
+- When adding or updating a crav1 skill or agent, edit `.cursor/skills/crav1/crav1-<name>/` (agents: `.cursor/agents/crav1-<name>.md`, templates: that skill's `assets/` and `.cursor/agent-assets/crav1-<name>/`), then run `scripts/sync-crav1-plugin.sh` so `plugins/crav1/`, the generated `.claude/` tree, the compact `crav1-docs/` bundle, and repo-root `llms.txt` match. `scripts/sync-crav1-claude.sh --check` fails if `.claude/` is stale. See `.cursor/rules/kit-maintainer.mdc`.
 - Load paths: a skill routes first and loads only the chosen branch or reference. `SKILL.md` stays near 1,500 words (CI limit 2,000); the description is trigger text only, at most 60 words (`scripts/check-kit-docs.py`).
 - A behavior change updates `docs/reference/skills.yaml`, then `scripts/gen-skill-docs.py` regenerates the pages and `docs/reference/index.yaml`.
 - Keep the README a short landing page: intro, the six starter options, the lanes, and links. The method is [docs/concepts/method.md](docs/concepts/method.md). Every page is listed in [docs/README.md](docs/README.md); add a new page there. Host file locations belong in [docs/install.md](docs/install.md).

@@ -113,6 +113,7 @@ Install:
 - [Environment marks](environments-marks.md). The line format of `docs/environments/marks.md`.
 - [Promotion lines](environments-promotion.md). The line format of `docs/environments/promotion.md` and the `Promotion:` status line (1.69.0).
 - [Changelog](../CHANGELOG.md). Full history in this repo. An install bundles the newest 15 releases in `crav1-docs/CHANGELOG.md`.
+- [llms.txt](../llms.txt). Repo-root index of these human pages for tools outside the kit. Generated with the compact `crav1-docs/` edition an install reads.
 
 ### Explanation
 

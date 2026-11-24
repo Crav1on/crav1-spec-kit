@@ -248,9 +248,10 @@ v1.200.0 is already scoped (fixtures, the shared "waiting" judgement, tester tid
 |---|---|---|---|
 | **v1.201.0** | Vendor table (`vendors.json`); `collect_kit` / `is_kit_path` read it (no behaviour change). `detect` reports `vendors`. A read-only `update_kit.py vendors --root .` lists each vendor's folder and skill count. `--vendor` on the Run next scripts, default unchanged. Dry-run tester gets `--add` | Only the extra `detect` fields and the read-only `vendors` command | None needed |
 | **v1.202.0** | `scripts/sync-crav1-vendors.py`, committed `vendors/codex/` and `vendors/copilot/` trees, CI `--check` and the per-vendor lint rules. No install path yet | No | Optional: Thomas copies a tree into a scratch repo |
-| **v1.203.0** | `.crav1/kit.json`, `/crav1-update-kit add <vendor>` and `remove <vendor>`, the Codex row live. Docs: install.md Codex section, update-kit page, CHANGELOG | **Yes: Codex** | Thomas: Codex smoke on a scratch repo, then the dry run with `--add codex` |
-| **v1.204.0** | The Copilot row live: `.github/skills/` and the instructions file. Docs for Copilot | **Yes: Copilot** | Thomas: VS Code agent mode and Copilot CLI smoke |
-| **v1.205.0** | Bootstrap install for repos with no kit (`install --vendors …`), plus an install.md "pick your tool" page | Yes | Thomas: a fresh scratch repo per vendor |
+| **v1.203.0** | Compact `crav1-docs` for installed skills, and `llms.txt` at the kit repo root. Human pages stay in `docs/`. No install path for Codex | No | None |
+| **v1.204.0** | `.crav1/kit.json`, `/crav1-update-kit add <vendor>` and `remove <vendor>`, the Codex row live. Docs: install.md Codex section, update-kit page, CHANGELOG | **Yes: Codex** | Thomas: Codex smoke on a scratch repo, then the dry run with `--add codex` |
+| **v1.205.0** | The Copilot row live: `.github/skills/` and the instructions file. Docs for Copilot | **Yes: Copilot** | Thomas: VS Code agent mode and Copilot CLI smoke |
+| **v1.206.0** | Bootstrap install for repos with no kit (`install --vendors …`), plus an install.md "pick your tool" page | Yes | Thomas: a fresh scratch repo per vendor |
 | **later** | Generated custom agents (`.github/agents/crav1-*.agent.md`, `.codex/agents/crav1-*.toml`); more vendors as table rows | Yes | Per vendor |
 
 ---
@@ -281,9 +282,9 @@ python -X utf8 <the maintainer dry-run tester> --pr N --spec "orders-api"
 **What to check per phase:**
 - **v1.201.0:** the dry run without `--add` matches 1.200 output exactly, which proves the refactor has no effect.
 - **v1.202.0:** dry run unchanged (no install path yet); CI shows both generated trees in sync.
-- **v1.203.0:** `--add codex` shows the Codex row above, `$crav1-` in its Run next lines, and nothing written outside `.agents/` and `.crav1/`.
-- **v1.204.0:** `--add codex --add copilot` writes both folders, each with its own counts; nothing outside `.agents/`, `.github/skills/`, `.github/instructions/crav1.instructions.md` and `.crav1/`.
-- **v1.205.0:** a bootstrap run against an empty scratch folder (not the real repo).
+- **v1.204.0:** `--add codex` shows the Codex row above, `$crav1-` in its Run next lines, and nothing written outside `.agents/` and `.crav1/`.
+- **v1.205.0:** `--add codex --add copilot` writes both folders, each with its own counts; nothing outside `.agents/`, `.github/skills/`, `.github/instructions/crav1.instructions.md` and `.crav1/`.
+- **v1.206.0:** a bootstrap run against an empty scratch folder (not the real repo).
 
 ---
 

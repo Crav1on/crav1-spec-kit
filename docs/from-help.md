@@ -77,7 +77,7 @@ The skill names its docs folder for each host and reads it directly (1.96.1). It
 - Claude Code: `.claude/skills/crav1-docs/`, or `~/.claude/skills/crav1-docs/` in user scope.
 - When only the skill folders were copied and `crav1-docs/` is missing, the command answers from the skill files only and says so.
 
-Each release bundles its own docs and a `CHANGELOG.md` of the newest 15 releases, so `whats-new` fits the version you have. The kit repo root file is the full history. The answer starts with the answer, not with a line about which docs it used; the `Source:` line at the end says where it came from.
+Each release bundles a compact edition of its docs and a `CHANGELOG.md` of the newest 15 releases, so `whats-new` fits the version you have. The compact pages are short labelled notes generated from the same sources as these human pages. Nine rule files are copied unchanged. Each other compact page ends with a `human:` link to the matching page on the installed tag. In this kit repo the command reads `docs/`, these human pages. The kit repo root changelog is the full history. The answer starts with the answer, not with a line about which docs it used; the `Source:` line at the end says where it came from.
 
 It never fetches an answer from GitHub. When the machine is online, it reads the kit's tag names once and adds one line when a newer version is tagged.
 

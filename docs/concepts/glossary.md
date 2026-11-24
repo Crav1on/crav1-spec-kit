@@ -36,6 +36,8 @@ Words the kit uses in its skills and docs. Abbreviations are written in full fir
 
 **Choice word.** An exact word that answers a merged skill's opening question, such as `push-tasks` for `/crav1-ado-sync`. A word in the invocation skips the question. A headless or bot run with no word stops and names the valid words. Listed under `choice_words` in `skills.yaml`. Not a `--flag`.
 
+**Compact edition.** The `crav1-docs/` folder an install ships next to the skills (1.203.0). Short labelled pages generated from the same sources as the human docs, for `/crav1-help` and the other skills. Nine rule files are copied unchanged. Each other page ends with a `human:` link to the matching page on the installed tag. The human pages stay in the kit repo's `docs/`. `llms.txt` at the kit repo root indexes those human pages for tools outside the kit.
+
 **Later skill.** Any skill that is not a starter option. Most run once specs already exist.
 
 **Lane.** One of the groupings of skills: Starters, Specify, Plan, Build, and Cross-cutting. Inside each lane, skills sit in groups by phase. The [skills reference](../reference/skills.md) is organized this way, and [guild routing](../guild-routing.md) maps each skill to a lane.
