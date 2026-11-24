@@ -129,6 +129,8 @@ Cursor plugin format: [Plugins](https://cursor.com/docs/plugins) · [Plugins ref
 
 Claude Code has no plugin and no marketplace. The same slash commands as on Cursor live in the generated `.claude/` tree. Copy that tree into a repository you own, or into `~/.claude` for a client project. Cloning this kit does not install it into another product.
 
+Claude Code's question tool accepts several questions in one call. The kit's cards are one question each, so each call sends one question (1.201.1). See [question cards](reference/question-cards.md).
+
 Checked against current Claude Code docs (not a guessed layout):
 
 | What | Project (repo you own) | User (`~/.claude/`) | Doc |

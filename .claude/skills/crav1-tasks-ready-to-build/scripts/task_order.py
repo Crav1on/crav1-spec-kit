@@ -7,8 +7,9 @@ Dependency order is a topological sort in waves (a task's wave is one more than 
 lowest task number first inside a wave.
 Ready: unticked, every dependency ticked, no missing dependency, not in a cycle. Next: the ready task that
 unblocks the most unticked tasks (all tasks downstream of it), lowest number on a tie.
-A recorded-merged task counts as done (1.136.0), the same rule as walk_progress: `(PR n)` and the word
-merged on the task line, or on the Match Branch line for its `(branch:)` or `(map:)` branch. It is not
+A recorded-merged task counts as done (1.136.0), the same rule as walk_progress: the kit mark
+`(PR n, merged)` or `(PR n) merged` on the task line, or on the Match Branch line for its `(branch:)` or
+`(map:)` branch. A bare `(PR n)`, or prose such as `(PR n merged into develop)`, is not a done mark. It is not
 Ready and not Next. It is listed under Needs tick while the checkbox is still open. A sibling spec.md
 is read when this file is given a tasks.md path. An unapproved `## Approval needed`
 item moves the tasks it holds out of Ready and into Waiting on approval (1.141.0).
@@ -50,6 +51,18 @@ AFTER = re.compile(r"\(after:\s*([^)]*)\)")
 BRANCH_MARK = re.compile(r"\((?:branch|map):\s*([^)]+)\)", re.I)
 BRANCH_NAME = re.compile(
     r"\b((?:feature|feat|hotfix|bugfix|fix|spec|chore|bug)/[A-Za-z0-9][A-Za-z0-9._/-]*)"
+)
+# A leading `` `fix/x` from `develop`, ...: outcome `` clause. The name is the outcome (1.201.1).
+_BRANCH_FROM = re.compile(
+    r"^\s*`?(?:feature|feat|hotfix|bugfix|fix|spec|chore|bug)/[A-Za-z0-9][A-Za-z0-9._/-]*`?"
+    r"\s+from\s+`?[A-Za-z0-9][A-Za-z0-9._/-]*`?",
+    re.I,
+)
+# A suffix mark such as `(manual, secret, TEST, after person A's heads-up)`.
+# A leading gate mark such as `(manual, prod, owner: person A)` stays (1.201.1).
+_MARK_PAREN = re.compile(
+    r"\((?:[^()]*)\b(?:secret|after person|TEST)\b[^()]*\)",
+    re.I,
 )
 
 
@@ -134,6 +147,34 @@ def balance_parens(text):
     return "".join(out)
 
 
+def strip_branch_clause(text):
+    """The outcome after a leading branch-and-base clause (1.201.1).
+
+    `` `fix/x` from `develop`, with a pull request into develop that person A
+    approves (it changes a pipeline): Apply the CI build policy `` keeps
+    `Apply the CI build policy`. A name that does not start that way stays.
+    """
+    text = text or ""
+    if not _BRANCH_FROM.match(text):
+        return text
+    _head, sep, tail = text.partition(":")
+    return tail.strip() if sep and tail.strip() else text
+
+
+def drop_mark_parens(text):
+    """Drop parenthesised kit marks, including a compound mark (1.201.1).
+
+    `(manual, secret, TEST, after person A's heads-up)` goes. A parenthesis
+    that does not name a kit mark stays.
+    """
+    previous = None
+    text = text or ""
+    while text != previous:
+        previous = text
+        text = _MARK_PAREN.sub(" ", text)
+    return text
+
+
 def task_name(rest):
     """A task's name: its text up to the verify items, marks dropped (1.187.0).
 
@@ -144,7 +185,9 @@ def task_name(rest):
     request notes, branch names and backticks, closes or drops unbalanced
     parentheses, and tidies spaces such as `( x` and `develop ,`. Never blank.
     """
-    text = cut_verify(rest or "")
+    text = strip_branch_clause(rest or "")
+    text = drop_mark_parens(text)
+    text = cut_verify(text)
     text = _drop_notes(text)
     text = re.sub(r"\s*\(PR\s+\d+[^)]*\)", " ", text, flags=re.I)
     text = BRANCH_NAME.sub(" ", text)
@@ -181,15 +224,18 @@ def short_title(title, limit=60):
     return cut + "..." if cut != text else cut
 
 
-_PR_MERGED = re.compile(r"\(PR\s+\d+\s*(?:,\s*merged|merged|\)\s*merged)\b", re.I)
+# The kit's own done mark only (1.201.1). `(PR 78, merged)` and `(PR 78) merged`.
+# Not a bare `(PR 12)`, and not prose such as `(PR 7 merged into develop)`.
+_PR_MERGED = re.compile(r"\(PR\s+\d+\s*,\s*merged\b|\(PR\s+\d+\)\s*merged\b", re.I)
 
 
 def pr_merged(text):
     """A pull request recorded on this line is merged. Local text only.
 
-    The word `merged` must sit on the PR mark, as in `(PR 78, merged)` or
-    `(PR 78) merged`. A future line such as `(PR 12) to be merged into
-    develop` is not a recorded merge.
+    The word `merged` must sit on the kit's PR mark, as in `(PR 78, merged)`
+    or `(PR 78) merged`. A bare `(PR 12)`, prose such as `(PR 7 merged into
+    develop)`, and a future line such as `(PR 12) to be merged into develop`
+    are not a recorded merge.
     """
     return bool(_PR_MERGED.search(text or ""))
 

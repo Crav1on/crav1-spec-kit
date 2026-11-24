@@ -335,7 +335,11 @@ def short_name(rest, work_title=None, trim=True):
     if work_title and _readable(work_title):
         return finish(work_title)
     # 1.187.0: stop at the first verify item, the same cut as task_order.task_name.
-    text = task_order.cut_verify(rest or "")
+    # 1.201.1: the name is the outcome after a branch-and-base clause, and
+    # parenthesised kit marks are gone before the first ` (` cut.
+    text = task_order.strip_branch_clause(rest or "")
+    text = task_order.drop_mark_parens(text)
+    text = task_order.cut_verify(text)
     text = MARKER.sub(" ", text)
     text = HOST_MARK.sub(" ", text)
     text = re.sub(r"\s+", " ", text).strip()
@@ -520,10 +524,10 @@ def task_line_choice(task, paragraph_branch=None, avoid=None):
     return chosen, stated_base(rest, chosen)
 
 
-# A recorded merge ties `merged` to the PR mark itself, as in `(PR 78, merged)`
-# or `(PR 78) merged`. A future line such as `(PR 12) ... to be merged into
-# develop` is not a recorded merge.
-_PR_MERGED = re.compile(r"\(PR\s+\d+\s*(?:,\s*merged|merged|\)\s*merged)\b", re.I)
+# A recorded merge is the kit mark only: `(PR 78, merged)` or `(PR 78) merged`
+# (1.201.1). A bare `(PR 12)`, prose `(PR 7 merged into develop)`, and a
+# future line such as `(PR 12) ... to be merged into develop` are not.
+_PR_MERGED = re.compile(r"\(PR\s+\d+\s*,\s*merged\b|\(PR\s+\d+\)\s*merged\b", re.I)
 
 
 def _pr_merged_line(line):
@@ -533,6 +537,60 @@ def _pr_merged_line(line):
 def task_records_merge(task):
     """This task's own line records its pull request as merged."""
     return _pr_merged_line(task.get("rest") or "")
+
+
+def dependency_open_prs(tasks, walks=None, host_merged=None):
+    """Tasks held because a done dependency's pull request is still open (1.201.1).
+
+    A ticked dependency, or one whose line is not the kit merge mark, still
+    holds its `(after:)` tasks while that pull request is open. The number
+    comes from the dependency's own `(PR n)` or from its build-progress file.
+    A kit mark `(PR n, merged)` or `(PR n) merged`, a merged build-progress
+    file, or a PR number in `host_merged` (the 1.177.2 host check) does not
+    hold. Returns {task id: pr number}.
+    """
+    host = set()
+    for number in host_merged or ():
+        try:
+            host.add(int(number))
+        except (TypeError, ValueError):
+            continue
+    open_of = {}
+    for task in tasks or []:
+        rest = task.get("rest") or ""
+        if _pr_merged_line(rest) or not task.get("done"):
+            continue
+        pr = None
+        numbers = task_pr_numbers(rest)
+        if numbers:
+            pr = numbers[-1]
+        for walk in (walks or {}).values():
+            ids = set()
+            for key in ("tasks", "built"):
+                for item in walk.get(key) or ():
+                    try:
+                        ids.add(int(item))
+                    except (TypeError, ValueError):
+                        continue
+            if task["id"] not in ids or not walk.get("pr"):
+                continue
+            if walk.get("merged"):
+                pr = None
+            elif pr is None:
+                pr = int(walk["pr"])
+        if pr in host:
+            pr = None
+        if pr:
+            open_of[task["id"]] = pr
+    holds = {}
+    for task in tasks or []:
+        if task.get("done"):
+            continue
+        for dep in task.get("deps") or []:
+            if dep in open_of:
+                holds[task["id"]] = open_of[dep]
+                break
+    return holds
 
 
 def merged_branch_names(*texts):
@@ -1833,7 +1891,7 @@ def apply_task_states(tasks, walks):
     return out
 
 
-def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text="", resolve_recorded=False, repo=None, claims_text="", code_repo=None, progress=None, existing=None, walks=None):
+def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text="", resolve_recorded=False, repo=None, claims_text="", code_repo=None, progress=None, existing=None, walks=None, host_merged=None):
     """Return markdown, a short chat summary, and the one-line pointer."""
     _REMOTE_CACHE.clear()
     tasks = parse_tasks(tasks_text)
@@ -1881,6 +1939,10 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text
             dep for dep in task.get("deps") or []
             if dep in by_id and not by_id[dep]["done"]
         ]
+    pr_holds = dependency_open_prs(tasks, walks, host_merged)
+    for task in tasks:
+        if task["id"] in pr_holds:
+            task["pr_hold"] = pr_holds[task["id"]]
     mentioned = {}
     for step in steps:
         for task_id in step["ids"]:
@@ -2204,6 +2266,14 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text
         if branch["waits"] and all(by_name[name]["status"] == "done" for name in branch["waits"]):
             branch["status"] = "ready"
     for branch in branches:
+        # 1.201.1: a ticked dependency whose pull request is still open holds
+        # the tasks that come after it. The map and the ready check agree.
+        held_prs = [task["pr_hold"] for task in branch["tasks"] if task.get("pr_hold") and not task.get("done")]
+        if held_prs and branch["status"] == "ready":
+            branch["status"] = "held"
+            branch["held_text"] = f"waits for PR {held_prs[0]} to merge"
+            branch["held_on"] = [f"T{task['id']}" for task in branch["tasks"] if task.get("pr_hold")]
+    for branch in branches:
         open_ids = [task["id"] for task in branch["tasks"] if not task["done"]]
         if open_ids and all(task_id in claimed_ids for task_id in open_ids) and branch["status"] == "ready":
             branch["status"] = "held"
@@ -2231,6 +2301,9 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text
                 branch["held_text"] = f"built, waits for PR {pr} to merge" if pr else "built, waits for its pull request to merge"
             else:
                 branch["held_text"] = "in progress"
+            held_prs = [task["pr_hold"] for task in branch["tasks"] if task.get("pr_hold") and not task["done"]]
+            if held_prs and branch.get("held_text") == "in progress":
+                branch["held_text"] = f"waits for PR {held_prs[0]} to merge"
     held_names = {branch["name"] for branch in branches if branch["status"] in ("waiting on a question", "held")}
     changed = True
     while changed:
@@ -2428,6 +2501,8 @@ def held_phrase(row):
     phrase = core or "held"
     info = row.get("merge_wait") if isinstance(row.get("merge_wait"), dict) else {}
     pr = info.get("pr") or row.get("pr")
+    if pr and phrase.lower() in ("held", "— held", "- held"):
+        return f"waits for PR {pr} to merge"
     if pr and "pull request" in phrase and f"PR {pr}" not in phrase:
         phrase = phrase.replace("its pull request", f"PR {pr}", 1).replace("the pull request", f"PR {pr}", 1)
     return phrase
@@ -2484,10 +2559,17 @@ def wait_reason(task, row=None):
     `waits on T5` for open tasks it comes after, `held` for an open
     question or approval, else `can't start yet`.
     """
+    pr_hold = task.get("pr_hold")
+    if pr_hold:
+        return f"waits for PR {pr_hold} to merge"
     deps = task.get("waits_on") or []
     if deps:
         return "waits on " + ", ".join(f"T{dep}" for dep in deps)
     if row and (row.get("held") or row.get("bucket") == "waiting"):
+        info = row.get("merge_wait") if isinstance(row.get("merge_wait"), dict) else {}
+        pr = info.get("pr") or row.get("pr")
+        if pr:
+            return f"waits for PR {pr} to merge"
         return "held"
     return "can't start yet"
 

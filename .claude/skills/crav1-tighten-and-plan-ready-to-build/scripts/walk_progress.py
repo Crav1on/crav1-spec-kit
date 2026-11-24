@@ -2503,6 +2503,24 @@ def classify(row: dict, resolve_kept: bool = False, resolve_recorded: bool = Fal
         return _hit(task, "blocker", "tighten-plan", "A task dependency is blocked. Fix the (after:) marks with /crav1-tighten-plan.")
     if re.search(r"waits on\s+t\d+", text):
         return None
+    # 1.201.1: pushed and waiting for its merge is waiting, not an unrecognized
+    # blocker. A host-merged pull request is cleared before this, as ready.
+    if re.search(r"\bpushed to\b.*\bwaits for its merge\b", text) or re.search(r"\bwaits for (?:its|the) merge\b", text):
+        if row.get("clear_walk") or row.get("host_merged"):
+            return None
+        hit = _waiting(row)
+        hit["merge"] = True
+        hit["step"] = None
+        hit["who"] = None
+        pr = row.get("pr")
+        if not pr and isinstance(row.get("merge_wait"), dict):
+            pr = row["merge_wait"].get("pr")
+        hit["why"] = (
+            f"{task or 'The task'} waits for PR {pr} to merge. It is not offered in Run next."
+            if pr else
+            f"{task or 'The task'} waits for its pull request to merge. It is not offered in Run next."
+        )
+        return hit
     return _hit(task, "blocker", None, f"Unrecognized blocker: {reason or bucket}")
 
 
@@ -2858,7 +2876,7 @@ def ending_mod():
 _MAP_CACHE: dict = {}
 
 
-def map_built(root: Path) -> dict | None:
+def map_built(root: Path, host_merged=None) -> dict | None:
     """The same build the map writes, shared by the ready check (1.154.0).
 
     The rows, the held lines, and build-map.md all read this one judgement,
@@ -2880,11 +2898,13 @@ def map_built(root: Path) -> dict | None:
     work = work_path.read_text(encoding="utf-8") if work_path.is_file() else ""
     verify = verify_path.read_text(encoding="utf-8") if verify_path.is_file() else ""
     recorded = resolve_ever_recorded(root)
-    key = (str(root.resolve()), tasks, spec, plan, work, verify, recorded)
+    merged_key = tuple(sorted(int(n) for n in (host_merged or [])))
+    key = (str(root.resolve()), tasks, spec, plan, work, verify, recorded, merged_key)
     cached = _MAP_CACHE.get(key)
     if cached is not None:
         return cached
     mod = map_mod()
+    walks = mod.progress_state(root) if (root / "build-progress").is_dir() else None
     built = mod.build(
         root.name,
         spec,
@@ -2894,19 +2914,21 @@ def map_built(root: Path) -> dict | None:
         verify,
         resolve_recorded=recorded,
         repo=mod.find_repo(root),
+        walks=walks,
+        host_merged=host_merged,
     )
     _MAP_CACHE.clear()
     _MAP_CACHE[key] = built
     return built
 
 
-def branch_report(root: Path, rows: list[dict]) -> dict | None:
+def branch_report(root: Path, rows: list[dict], host_merged=None) -> dict | None:
     """Ready and held tasks grouped by the build-map row (1.133.0).
 
     The branch is the one `build_map.py --recommend` prints. Missing files
     leave the report empty so the caller keeps the older line.
     """
-    built = map_built(root)
+    built = map_built(root, host_merged=host_merged)
     if built is None:
         return None
     return map_mod().report_by_branch(built, rows, slug=command_slug(root))
@@ -3009,8 +3031,12 @@ def reviewed_warning(plan_text: str) -> str | None:
 
 
 def _pr_merged(text: str) -> bool:
-    """A pull request recorded on this line is merged. Local text only."""
-    return bool(re.search(r"\(PR\s+\d+", text or "", re.I) and re.search(r"\bmerged\b", text or "", re.I))
+    """A pull request recorded on this line is merged. Local text only.
+
+    The kit mark only: `(PR n, merged)` or `(PR n) merged` (1.201.1). A bare
+    `(PR n)`, or prose such as `(PR n merged into develop)`, is not done.
+    """
+    return map_mod()._pr_merged_line(text)
 
 
 def _merged_branches(spec_text: str) -> set[str]:
@@ -4699,7 +4725,7 @@ def record_pr_merged(root: Path, number: int, sha: str | None = None, date: str 
     return path
 
 
-def sync_pr_states(root: Path | None, user: str | None = None) -> dict:
+def sync_pr_states(root: Path | None, user: str | None = None, record: bool = True, record_author: bool = True) -> dict:
     """Ask each waiting PR's own host whether it merged, and record it (1.177.2).
 
     Read-only on the host (pr_common.host_state). A merged or completed PR
@@ -4712,8 +4738,10 @@ def sync_pr_states(root: Path | None, user: str | None = None) -> dict:
     """
     out: dict = {"merged": [], "closed": [], "unhosted": [], "branches": {}, "host_unread": [], "files": []}
     # 1.180.0 (S8): stored `PR author:` lines are cleaned once, and every
-    # file the check writes is named in its reply.
-    out["cleaned"] = clean_stored_authors(root)
+    # file the check writes is named in its reply. A read-only run (1.201.1,
+    # readiness --skip-sync) still asks the host and keeps the answer in
+    # memory, and writes nothing.
+    out["cleaned"] = clean_stored_authors(root) if record else []
     for pr, branch in sorted(waiting_prs(root, user).items()):
         out["branches"][pr] = branch
         got = host_pr_lookup(root, pr)
@@ -4725,7 +4753,7 @@ def sync_pr_states(root: Path | None, user: str | None = None) -> dict:
                 out["host_unread"].append({"pr": pr, "branch": branch, "host": got.get("host"),
                                            "error": got["error"], "detail": got.get("detail") or ""})
             continue
-        if state.get("author"):
+        if state.get("author") and record and record_author:
             # 1.178.0: the same lookup names who opened it; record it once.
             path = _progress_file_for(Path(root), pr, branch)
             text = path.read_text(encoding="utf-8", errors="replace") if path else ""
@@ -4736,11 +4764,13 @@ def sync_pr_states(root: Path | None, user: str | None = None) -> dict:
         if state["state"] == "unhosted":
             out["unhosted"].append(pr)
         elif state["state"] == "merged":
-            if record_pr_merged(Path(root), pr, state.get("sha"), state.get("date"), branch):
+            wrote_merge = record_pr_merged(Path(root), pr, state.get("sha"), state.get("date"), branch) if record else True
+            if wrote_merge:
                 out["merged"].append(pr)
-                merged_file = _progress_file_for(Path(root), pr, branch)
-                if merged_file is not None:
-                    out["files"].append(Path(merged_file).name)
+                if record:
+                    merged_file = _progress_file_for(Path(root), pr, branch)
+                    if merged_file is not None:
+                        out["files"].append(Path(merged_file).name)
         elif state["state"] == "closed":
             out["closed"].append(pr)
     return out
@@ -5085,6 +5115,59 @@ def apply_release_gates(root: Path | None, rows: list[dict]) -> None:
             row["reason"] = gates[task]
 
 
+def _host_merged(root: Path | None, pr) -> bool:
+    """True when the 1.177.2 host check says this pull request is merged (1.201.1)."""
+    import os
+    if not pr or root is None or os.environ.get("CRAV1_NO_HOST_LOOKUP"):
+        return False
+    try:
+        state = (host_pr_lookup(root, pr).get("state") or {})
+    except Exception:  # noqa: BLE001 - a host miss leaves the local reading
+        return False
+    return state.get("state") == "merged"
+
+
+def _dep_pr_numbers(root: Path | None) -> list[int]:
+    """PR numbers on ticked tasks that are not the kit's merge mark."""
+    if root is None or not (Path(root) / "tasks.md").is_file():
+        return []
+    mod = map_mod()
+    numbers = []
+    for task in mod.parse_tasks((Path(root) / "tasks.md").read_text(encoding="utf-8")):
+        if not task.get("done") or mod._pr_merged_line(task.get("rest") or ""):
+            continue
+        for number in mod.task_pr_numbers(task.get("rest") or ""):
+            if number not in numbers:
+                numbers.append(number)
+    return numbers
+
+
+def apply_open_pr_holds(root: Path | None, rows: list[dict], host_merged=None) -> None:
+    """Hold `(after: T#)` until T#'s open pull request is merged (1.201.1).
+
+    A ticked dependency still holds the next task while its `(PR n)` or its
+    build-progress pull request is open. The held reason is `waits for PR n
+    to merge`. A kit merge mark or a merged host state does not hold.
+    """
+    if root is None or not (Path(root) / "tasks.md").is_file():
+        return
+    mod = map_mod()
+    tasks = mod.parse_tasks((Path(root) / "tasks.md").read_text(encoding="utf-8"))
+    walks = mod.progress_state(root) if (Path(root) / "build-progress").is_dir() else {}
+    holds = mod.dependency_open_prs(tasks, walks, host_merged)
+    for row in rows:
+        match = re.fullmatch(r"T(\d+)", str(row.get("task") or ""))
+        if not match:
+            continue
+        pr = holds.get(int(match.group(1)))
+        if not pr or row.get("bucket") in ("done", "needs-verify"):
+            continue
+        row["bucket"] = "waiting"
+        row["held"] = True
+        row["pr"] = pr
+        row["reason"] = f"waits for PR {pr} to merge"
+
+
 def apply_walk_starts(root: Path, rows: list[dict], user: str | None = None) -> None:
     """Offer a task only when the walk can start it (1.186.0).
 
@@ -5103,7 +5186,26 @@ def apply_walk_starts(root: Path, rows: list[dict], user: str | None = None) -> 
             continue
         found = starts[task]
         row["walk_start"] = found.get("phase")
-        if row.get("bucket") == "ready" and found.get("phase") in ("wait-merge", "done", "claimed"):
+        if found.get("phase") == "wait-merge":
+            pr = found.get("pr")
+            if _host_merged(root, pr):
+                # The pull request is merged. The walk's next command clears it (1.201.1).
+                row["bucket"] = "ready"
+                row["held"] = False
+                row["clear_walk"] = True
+                row["host_merged"] = True
+                row["pr"] = pr
+                row["reason"] = f"PR {pr} is merged."
+                continue
+            if row.get("bucket") == "ready":
+                row["bucket"] = "waiting"
+                row["held"] = True
+                row["pr"] = pr
+                row["reason"] = found.get("reason", "").rstrip(".")
+                if pr and not isinstance(row.get("merge_wait"), dict):
+                    row["merge_wait"] = {"pr": pr, "branch": found.get("branch"), "owner": "self"}
+            continue
+        if row.get("bucket") == "ready" and found.get("phase") in ("done", "claimed"):
             row["bucket"] = "waiting"
             row["reason"] = found.get("reason", "").rstrip(".")
 
@@ -5797,7 +5899,25 @@ def not_ready_because(result: str, rows: list[dict], hits: list[dict], can_start
 _INSTRUCTION = re.compile(r"^(Do not|Never|Jump back|The walk does not|/crav1-)", re.I)
 
 
-def hard_hit_line(result: str, hits: list[dict], can_start: list) -> str | None:
+def _downstream(rows: list[dict] | None, task: str) -> set[str]:
+    """Tasks that depend on `task`, directly or further along (1.201.1)."""
+    if not rows or not task:
+        return set()
+    found: set[str] = set()
+    frontier = {task}
+    changed = True
+    while changed:
+        changed = False
+        for row in rows:
+            deps = row.get("deps") or []
+            if any(dep in frontier for dep in deps) and row.get("task") not in frontier:
+                frontier.add(row.get("task"))
+                found.add(row.get("task"))
+                changed = True
+    return found
+
+
+def hard_hit_line(result: str, hits: list[dict], can_start: list, rows: list[dict] | None = None) -> str | None:
     """1.198.0: the hard hit that forced not-ready while tasks can start, in plain words.
 
     `Not ready: T12 is blocked (the queue name is not decided). T3, T4 and T5
@@ -5823,7 +5943,11 @@ def hard_hit_line(result: str, hits: list[dict], can_start: list) -> str | None:
     head = f"Not ready: {who} is {what}"
     if plain and plain.lower() not in head.lower():
         head += f" ({plain[:1].lower()}{plain[1:]})"
-    ids = _task_ids_text(can_start)
+    named = list(can_start)
+    if rows is not None and hit.get("task"):
+        related = _downstream(rows, hit["task"])
+        named = [task for task in can_start if task in related]
+    ids = _task_ids_text(named)
     verb = "can" if ids else ""
     return f"{head}. {ids} {verb} start once that is cleared.".replace("  ", " ") if ids else head + "."
 
@@ -6260,7 +6384,16 @@ def _readiness(args: argparse.Namespace) -> None:
             fail("root", f"not a folder: {root}")
         # 1.177.2: ask each waiting PR's host whether it merged and record
         # it first, so this run's rows, merge list and Run next use it.
-        pr_state = sync_pr_states(root, getattr(args, "user", None))
+        # --text without --write-map is a read: the host is asked, and a new
+        # PR author line is not written (1.201.1). A merge is still recorded,
+        # as in 1.177.2, so the same run drops a merged pull request.
+        text_read = bool(getattr(args, "text", False)) and not bool(getattr(args, "write_map", False))
+        pr_state = sync_pr_states(
+            root, getattr(args, "user", None), record=True, record_author=not text_read
+        )
+        for number in _dep_pr_numbers(root):
+            if number not in pr_state["merged"] and _host_merged(root, number):
+                pr_state["merged"].append(number)
         aliases: list[dict] = []
         rows = build_rows(root, excluded=set(args.new_question or []), aliases=aliases)
         claim_info = apply_claims(root, rows, getattr(args, "user", None), getattr(args, "branch", None))
@@ -6276,6 +6409,7 @@ def _readiness(args: argparse.Namespace) -> None:
         fill_merge_prs(root, rows)  # 1.199.0: someone else's verified branch too
         loop_lines = apply_loop_holds(root, rows)
         deadlock_lines = apply_merge_deadlocks(rows)
+        apply_open_pr_holds(root, rows, pr_state.get("merged"))
         apply_walk_starts(root, rows, getattr(args, "user", None) or _git_user(root))
         apply_release_gates(root, rows)
     for row in rows:
@@ -6312,7 +6446,7 @@ def _readiness(args: argparse.Namespace) -> None:
     because = not_ready_because(result, rows, hits, can_start, slug=slug)
     ready = result == "ready"
     waiting_line, waiting_next = _waiting_lines([h for h in waiting if not h.get("merge")], slug)
-    report = branch_report(root, rows) if root is not None else None
+    report = branch_report(root, rows, host_merged=pr_state.get("merged")) if root is not None else None
     ready_lines = (report or {}).get("ready_lines") or []
     held_lines = (report or {}).get("held_lines") or []
     next_lines = (report or {}).get("next_lines") or []
@@ -6469,7 +6603,24 @@ def _readiness(args: argparse.Namespace) -> None:
                 nxt = shown_run[0]
         waiting_bits = list(deadlock_lines) + [bit for bit in waiting_bits if bit not in deadlock_lines]
     # 1.199.0: the hard hit comes right after Run next, before Held.
-    hard_line = hard_hit_line(result, hits, can_start)
+    clears = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("clear_walk") or not row.get("task"):
+            continue
+        task = row["task"]
+        pr = row.get("pr")
+        reason = f"PR {pr} is merged. The walk clears {task}." if pr else f"The pull request is merged. The walk clears {task}."
+        command = f"/crav1-build-walk {slug} {task}".strip()
+        entry = _run_entry(command, reason, f"Clear {task}:")
+        if command not in "\n".join(shown_run):
+            clears.append(entry)
+    if clears:
+        shown_run = clears + [entry for entry in shown_run if "Resume the walk when the answers arrive" not in entry]
+        nxt = shown_run[0]
+        first = next((row for row in rows if isinstance(row, dict) and row.get("clear_walk")), None)
+        if first and first.get("pr"):
+            because = f"PR {first['pr']} is merged. The walk clears {first['task']}."
+    hard_line = hard_hit_line(result, hits, can_start, rows)
     ending = compose_ending(
         result, shown_run, held_lines, waiting_bits, shown_next, because, replaced, run_status,
         catch_up=catch_up, hard_line=hard_line,

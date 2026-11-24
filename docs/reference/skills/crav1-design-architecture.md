@@ -34,6 +34,8 @@ The skill's `scripts/design_run.py` owns the folder format and every move, saves
 
 1.200.0: one session start. The design command with or without a topic, and with or without resume, prints the same status screen from session.json and the topic files. resume is an alias and changes nothing. Park and end print Session parked or Session ended and the plain command for that topic. An open session stays open across decisions, endings and commits. next is the guided card. A proposal page and a briefing share one decisions section, stage numbers start at 1, and a routed requirement names the slice and the text. The design ending for that requirement starts with Run next and a full add-to-spec command for the design branch. `settle-preview` recommends one by one and settles nothing; there is no settle batch. `stop and commit` is a commit yes only when this skill says so.
 
+1.201.1: Run next comes first, with one reason line. A topic whose goal is only on `design/<topic>` offers the switch card. `resume --json` leaves Status as it is, including parked; a source that changed still marks that decision reopened. Dated pages under `docs/architecture/proposals/` count as the proposal. Waiting lines name each person once, with the date on the question, near 120 characters. When every open decision is to-question or to-research, Run next names the open-questions command and the proposal. A parked screen has no Park command. An ended screen's one command is `reopen`. Run the script from the repo root.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
@@ -44,6 +46,7 @@ Exact words for bots and scripted runs (no `--flags`). A word in the invocation 
 | Which step | `next` | Open the guided card for the next decision. Cards appear only from this word. |
 | Which step | `park` | Park the session. Prints Session parked and the plain command to open it again. |
 | Which step | `end` | End the session. Prints Session ended and the plain command to open it again. |
+| Which step | `reopen` | Open an ended session again and print the status screen. |
 | Which step | `status` | Show open topics, designs, decisions, stages and questions. Writes nothing. |
 | Which step | `fan-out` | Start a competing design under the same goal, as a copy or from a blank start. |
 | Which step | `stage-it` | Suggest a split of the designed end state into stages that the user names and divides. |

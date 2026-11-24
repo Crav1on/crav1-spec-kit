@@ -294,8 +294,14 @@ def _task_token(value) -> str:
 def _task_label(task: dict) -> str:
     title = (task.get("title") or "").strip()
     # 1.187.0: a title that still carries its verify items is cut to the name.
+    # 1.201.1: always take the name, so a branch-and-base clause and
+    # parenthesised marks are not the label.
     to = map_mod().task_order
-    if to.cut_verify(title) != title:
+    if title and (
+        to.strip_branch_clause(title) != title
+        or to.drop_mark_parens(title) != title
+        or to.cut_verify(title) != title
+    ):
         title = to.task_name(title)
     title = RUNS_LIVE.sub("", title)
     title = LIVE_YES.sub("", title)
@@ -311,16 +317,24 @@ TITLE_MAX = 120
 
 
 def short_title(title: str) -> str:
-    """A task title for labels (1.198.0): its first sentence, at most about 80 characters,
+    """A task title for labels (1.198.0): its first sentence, at most about 120 characters,
     cut at a word with an ellipsis. Never a 500-character task text."""
-    title = " ".join(str(title or "").split())
+    to = map_mod().task_order
+    title = to.drop_mark_parens(to.strip_branch_clause(" ".join(str(title or "").split())))
+    title = " ".join(title.split())
     if len(title) <= TITLE_MAX:
         return title
     first = re.split(r"(?<=[a-z0-9)\]])\.\s+(?=[A-Z(])", title, maxsplit=1)[0]
     if len(first) <= TITLE_MAX:
         return first.rstrip(".")
-    cut = first[:TITLE_MAX].rsplit(" ", 1)[0].rstrip(",;:-— ")
-    return cut + "…"
+    # Prefer a clause boundary inside the limit over a mid-sentence cut (1.201.1).
+    window = first[:TITLE_MAX]
+    for mark in ("; ", ", "):
+        at = window.rfind(mark)
+        if at >= 40:
+            return window[:at].rstrip(",;:-— ")
+    cut = window.rsplit(" ", 1)[0].rstrip(",;:-— ")
+    return (cut or window.rstrip()) + "…"
 
 
 def normalize_task(item) -> dict:

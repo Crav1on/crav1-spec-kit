@@ -327,8 +327,15 @@ def add_claim(
     since: datetime | None = None,
     age_days: int | None = None,
     now: datetime | None = None,
+    write: bool = True,
 ) -> dict:
-    """Add or refresh a claim. Another user's claim on the same task is refused."""
+    """Add or refresh a claim. Another user's claim on the same task is refused.
+
+    `write` false leaves claims.md unchanged (the claim card, before yes).
+    A second claim for the same user and branch keeps the original since
+    time unless `since` is passed (1.201.1).
+    """
+    explicit_since = since is not None
     now = now or now_utc()
     when = since or now
     tokens = task_tokens(tasks)
@@ -343,6 +350,7 @@ def add_claim(
     loaded = load_claims(root, now=now, age_days=age_days)
     kept: list[dict] = []
     conflicts = []
+    preserved_since = None
     for claim in loaded["claims"]:
         overlap = [task for task in tokens if task in claim["tasks"]]
         if not overlap:
@@ -352,6 +360,8 @@ def add_claim(
             conflicts.append({"tasks": overlap, "claim": claim})
             kept.append(claim)
             continue
+        if not explicit_since and preserved_since is None:
+            preserved_since = claim.get("since")
         remain = [task for task in claim["tasks"] if task not in tokens]
         if remain:
             kept.append({**claim, "tasks": remain})
@@ -365,11 +375,13 @@ def add_claim(
             "conflicts": conflicts,
             "claims": loaded["claims"],
         }
+    if preserved_since and not explicit_since:
+        when = parse_when(preserved_since)
     added = {
         "branch": branch,
         "tasks": tokens,
         "user": user,
-        "since": format_when(when),
+        "since": preserved_since if preserved_since and not explicit_since else format_when(when),
         "when": when,
         "since_date": date_of(when),
         "age_days": 0.0,
@@ -397,15 +409,28 @@ def add_claim(
         out.append(added)
     max_age = age_days if age_days is not None else loaded["max_age_days"]
     file_age = max_age if max_age != DEFAULT_AGE_DAYS else loaded["file_age_days"]
-    path = write_claims(root, out, age_days=file_age, notes=loaded["notes"])
-    parsed = load_claims(root, now=now, age_days=age_days)
+    path = claims_path(root)
+    rendered = render_claims(out, age_days=file_age, notes=loaded["notes"])
+    current = path.read_text(encoding="utf-8") if path.is_file() else ""
+    wrote = False
+    if write and current != rendered:
+        path = write_claims(root, out, age_days=file_age, notes=loaded["notes"])
+        wrote = True
+    if path.is_file() and write:
+        parsed = load_claims(root, now=now, age_days=age_days)
+        claims_out = parsed["claims"]
+        warnings = age_warnings(parsed["claims"], parsed["max_age_days"])
+    else:
+        claims_out = [{k: v for k, v in claim.items() if k != "when"} for claim in out]
+        warnings = []
     return {
         "ok": True,
         "action": "add",
+        "written": wrote,
         "path": str(path),
         "added": {k: v for k, v in added.items() if k != "when"},
-        "claims": parsed["claims"],
-        "warnings": age_warnings(parsed["claims"], parsed["max_age_days"]),
+        "claims": claims_out,
+        "warnings": warnings,
         "commit_message": f"Claim {', '.join(tokens)} on {branch}",
         "card": {
             "words": ["yes", "stop"],
@@ -667,7 +692,10 @@ def cmd_add(args: argparse.Namespace) -> int:
             args.user,
             since=parse_when(args.since) if args.since else None,
             age_days=args.age_days,
+            write=bool(getattr(args, "yes", False)),
         )
+        if result.get("ok") and not getattr(args, "yes", False):
+            result["line"] = "Nothing written. Say yes to record the claim."
     except ValueError as exc:
         return fail("tasks", str(exc))
     return emit(result, 0 if result.get("ok") else 2)

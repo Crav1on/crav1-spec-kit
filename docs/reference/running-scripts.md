@@ -23,7 +23,7 @@ PYTHONUTF8=1 python3 -X utf8 <skill folder>/scripts/<script>.py
 py -3 -X utf8 <skill folder>/scripts/<script>.py
 ```
 
-In PowerShell, do not redirect a script's output with `>` and do not pipe its JSON into another program. Read the output directly. PowerShell adds a byte order mark (BOM) to redirected text, and the JSON then fails to parse (1.164.0).
+Do not redirect a script's output with `>` and do not pipe it into another program. Read the output directly. That includes bash `| head`, `| tail` and `| grep`, and PowerShell `Select-Object` (1.201.1). A session that piped an ending through `head` cut it off at a lone `{`. In PowerShell, do not redirect a script's output with `>` either: a redirect adds a byte order mark (BOM), and the JSON then fails to parse (1.164.0).
 
 In a skill instruction, `<interpreter>` means that choice. The command still includes every argument the script requires.
 

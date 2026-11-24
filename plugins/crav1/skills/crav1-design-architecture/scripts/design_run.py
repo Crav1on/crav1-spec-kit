@@ -41,7 +41,7 @@ DESIGNS = Path("docs/architecture/designs")
 ARCH_SPEC = Path("docs/architecture/spec.md")
 DECIDED = "## Decided, not built yet"
 OPEN_Q = "## Open questions"
-START_WORDS = ["resume", "park", "status", "fan-out", "stage-it", "go-ahead", "compare-topics", "prepare", "change-goal", "builds-on", "note", "small-fix", "screen", "next", "questions", "proposal", "stages", "end", "close"]
+START_WORDS = ["resume", "park", "status", "fan-out", "stage-it", "go-ahead", "compare-topics", "prepare", "change-goal", "builds-on", "note", "small-fix", "screen", "next", "questions", "proposal", "stages", "end", "close", "reopen"]
 TOPIC_WORDS = {"resume", "change-goal", "note", "small-fix", "park", "status", "go-ahead", "fan-out", "stage-it"}
 HEADLESS_WORDS = ["resume", "park", "status", "prepare"]
 HEADLESS_ALLOWED = {"status", "resume", "screen", "lean", "compare", "compare-topics", "route", "ending", "review", "note", "branch-behind", "linked-behind"}
@@ -51,7 +51,7 @@ INPUTS_DIR = "inputs"
 _ROOT: list = []
 _CMD: list = []
 # The kit version this skill's files last changed in. SKILL.md carries the same marker (1.190.0).
-SKILL_VERSION = "1.200.0"
+SKILL_VERSION = "1.201.1"
 SCRATCH_MOVES = {"ending", "lean", "settle", "stage", "compare", "compare-topics"}
 GOAL_KEYS = {"ask", "end_goal", "drivers", "constraints", "criteria", "decisions"}
 STATES = {"open", "leaning", "settled", "to-question", "to-research", "skipped", "reopened", "dropped"}
@@ -276,7 +276,7 @@ def render_questions(design: str, qs: list[dict]) -> str:
         lines.append("- none yet")
     for q in qs:  # the order they were asked (1.189.0)
         lines.append(f"- {q['text']}")
-        for k in ("decision", "kind", "research", "stage", "answer"):
+        for k in ("decision", "kind", "research", "stage", "answer", "asked"):
             if q.get(k):
                 lines.append(f"  - {k.capitalize()}: {q[k]}")
     return "\n".join(lines) + "\n"
@@ -1038,6 +1038,9 @@ def _resume_json(a, root: Path) -> dict:
     name = t.current(a.design)
     d = t.design(name)
     w = Writer(root, t.name)
+    # Status, including parked, stays as it is on disk (1.201.1). A source
+    # that changed still marks that decision reopened, which is the resume
+    # record, not a status change.
     reopened = []
     for dec in d["decisions"]:
         if dec["State"] != "settled" or not dec.get("Sources"):
@@ -1051,22 +1054,23 @@ def _resume_json(a, root: Path) -> dict:
             dec["State"] = "reopened"
             dec["Reopened"] = f"{', '.join(changed)} changed since the last save"
             reopened.append({"decision": dec["title"], "changed": changed})
-    if d["status"] == "parked":
-        d["status"] = "open"
-    if not a.headless:
+    if reopened and not a.headless:
         save_design(t, name, d, w)
-        if reopened:
-            for st in t.stages(name):
-                st["state"] = "needs another look"
-            if t.stages(name):
-                w.write(t.ddir(name) / "stages.md", render_stages(name, [dict(s, state="needs another look") for s in t.stages(name)]))
+        for st in t.stages(name):
+            st["state"] = "needs another look"
+        if t.stages(name):
+            w.write(t.ddir(name) / "stages.md", render_stages(name, [dict(s, state="needs another look") for s in t.stages(name)]))
     ordered = goal_order(t.goal(), d)
     big = [x for x in ordered if not x.get("Detail")]
     detail = [x for x in ordered if x.get("Detail")]
-    nxt = next((x["title"] for x in ordered if x["State"] == "reopened"), None) or \
+    nxt = (reopened[0]["decision"] if reopened else None) or \
+        next((x["title"] for x in ordered if x["State"] == "reopened"), None) or \
         next((x["title"] for x in big if x["State"] in ("open", "leaning")), None) or \
         next((x["title"] for x in detail if x["State"] in ("open", "leaning")), None)
-    stage_work = [s["name"] for s in t.stages(name) if s.get("state") != "open" and s.get("state")]
+    stages = t.stages(name)
+    stage_work = [s["name"] for s in stages if s.get("state") != "open" and s.get("state")]
+    if reopened:
+        stage_work = [s["name"] for s in stages]
     res = {"topic": t.name, "design": name, "reopened": reopened, "next_decision": nxt,
            "stages_needing_work": stage_work, "written": w.written}
     _with_sync(res, a, root, t.name)
@@ -1087,6 +1091,7 @@ def _resume_json(a, root: Path) -> dict:
         res["fixed"] = now
         if now != g["fixed"] and not a.headless:
             w.write(t.dir / "goal.md", render_goal(dict(g, fixed=now)))
+            res["written"] = w.written
     return res
 
 
@@ -1145,7 +1150,7 @@ def status_line(topic: str, status: str = "open", step: str = "") -> str:
     if status == "parked":
         return f"Design session parked: {topic}. Open: {back}"
     if status == "ended":
-        return f"Design session ended: {topic}. Open: {back}"
+        return f"Design session ended: {topic}. Reopen: `{plain_command(topic, 'reopen')}`"
     extra = f" Step: {step}." if step else ""
     return f"Design session open: {topic}.{extra} Park: {park}"
 
@@ -1189,26 +1194,157 @@ def _uncommitted_count(root: Path, topic: str) -> int:
         return 0
 
 
+_OWNER_VERB = re.compile(r"^(.+?)\s+(?:decides|decide|has|knows|owns|answers|answer)\b", re.I)
+_WAIT_MAX = 120
+
+
+def design_branch_ref(root: Path, topic: str) -> str:
+    """A design/<topic> ref whose tree holds this topic's goal.md, when we are not on it (1.201.1)."""
+    branch = f"design/{topic}"
+    if current_branch(root) == branch:
+        return ""
+    where = branch_exists(root, branch)
+    if where == "local":
+        refs = [branch]
+    elif where == "remote":
+        refs = [f"origin/{branch}"]
+    else:
+        refs = [branch, f"origin/{branch}"]
+    path = f"{DESIGNS.as_posix()}/{topic}/goal.md"
+    for ref in refs:
+        out = _git(root, "cat-file", "-e", f"{ref}:{path}")
+        if out is not None and out.returncode == 0:
+            return ref
+    return ""
+
+
+def _owner_name(raw: str) -> str:
+    raw = re.split(r"\s*;\s*", (raw or "").strip(), maxsplit=1)[0].strip()
+    found = _OWNER_VERB.match(raw)
+    return (found.group(1) if found else raw).strip()
+
+
+def _question_view(item: dict) -> dict:
+    text = (item.get("text") or "").strip()
+    found = re.search(r"\s*\(([^)]*)\)\s*$", text)
+    who_raw = found.group(1).strip() if found else ""
+    body = text[: found.start()].strip() if found else text
+    return {"body": body.rstrip("."), "who": _owner_name(who_raw), "asked": (item.get("asked") or "").strip()}
+
+
+def _fit_line(prefix: str, bodies: list[str]) -> str:
+    bodies = [b for b in bodies if b] or ["an open question"]
+    text = f"{prefix}{'; '.join(bodies)}."
+    if len(text) <= _WAIT_MAX:
+        return text
+    room = _WAIT_MAX - len(prefix)
+    kept: list[str] = []
+    used = 0
+    for body in bodies:
+        extra = len(body) if not kept else 2 + len(body)
+        if used + extra > room:
+            break
+        kept.append(body)
+        used += extra
+    more = len(bodies) - len(kept)
+    if not kept:
+        text = f"{prefix}{bodies[0][: max(1, room - 1)].rstrip()}…"
+    else:
+        text = f"{prefix}{'; '.join(kept)}"
+        if more:
+            note = f" (+{more} more)"
+            if len(text) + len(note) <= _WAIT_MAX:
+                text += note
+    if len(text) > _WAIT_MAX:
+        text = text[: _WAIT_MAX - 1].rstrip() + "…"
+    if not text.endswith((".", "…")):
+        text += "."
+    return text
+
+
+def _waiting_lines(questions: list[dict]) -> list[str]:
+    """One line per person and recorded date. The name appears once (1.201.1)."""
+    groups: dict[tuple, list] = {}
+    order: list[tuple] = []
+    for item in (_question_view(q) for q in questions):
+        key = (item["who"] or "someone not named", item["asked"])
+        if key not in groups:
+            groups[key] = []
+            order.append(key)
+        groups[key].append(item["body"])
+    lines = []
+    for who, date in order:
+        prefix = f"Waiting: {who}" + (f", asked {date}" if date else "") + ": "
+        lines.append(_fit_line(prefix, groups[(who, date)]))
+    return lines
+
+
+def _live_decisions(root: Path, topic: str) -> list[dict]:
+    try:
+        t = Topic(root, topic)
+        d = t.design(t.current(None))
+    except Refused:
+        return []
+    return [x for x in d.get("decisions") or [] if x.get("State") not in ("settled", "dropped")]
+
+
 def _proposal_pages(root: Path, topic: str) -> list[str]:
     folder = root / DESIGNS / topic
     names = ["proposal.html", "proposal.md", "briefing.html", "briefing.md"]
-    return [str((folder / name).relative_to(root).as_posix()) for name in names if (folder / name).is_file()]
+    pages = [str((folder / name).relative_to(root).as_posix()) for name in names if (folder / name).is_file()]
+    dated = root / "docs" / "architecture" / "proposals"
+    if not dated.is_dir():
+        return pages
+    slug = topic.lower()
+    spaced = slug.replace("-", " ")
+    for path in sorted(dated.rglob("*")):
+        if not path.is_file() or path.suffix.lower() not in (".html", ".md"):
+            continue
+        rel = path.relative_to(root).as_posix()
+        blob = rel.lower()
+        if slug in blob:
+            pages.append(rel)
+            continue
+        try:
+            head = path.read_text(encoding="utf-8", errors="ignore")[:8192].lower()
+        except OSError:
+            continue
+        if slug in head or (spaced and spaced in head):
+            pages.append(rel)
+    return pages
 
 
 def screen_facts(root: Path, topic: str) -> dict:
-    """Read session.json and the topic files. Writes nothing (1.200.0)."""
+    """Read session.json and the topic files. Writes nothing (1.200.0, 1.201.1)."""
     topic = slugify(topic) if topic else ""
     facts = {"topic": topic, "topics": _topics(root), "where": "none", "status": "", "next_decision": "",
-             "questions": [], "uncommitted": 0, "proposals": [], "needs": "", "commands": [], "waits": []}
+             "questions": [], "uncommitted": 0, "proposals": [], "needs": "", "commands": [], "waits": [],
+             "reason": "", "card": ""}
     if not topic:
         facts["needs"] = "Start a topic, or open one that already exists." if facts["topics"] else "Start a topic."
+        facts["reason"] = "No topic was named."
         facts["commands"] = [("Start a topic", "/crav1-design-architecture <idea text>")]
         facts["commands"] += [(f"Open {name.replace('-', ' ')}", plain_command(name)) for name in facts["topics"]]
         return facts
     if not (root / DESIGNS / topic / "goal.md").is_file():
+        ref = design_branch_ref(root, topic)
+        if ref:
+            cur = current_branch(root) or "this branch"
+            facts["where"] = "other-branch"
+            facts["branch"] = f"design/{topic}"
+            facts["needs"] = f"{topic} is on its design branch."
+            facts["reason"] = f"The {topic.replace('-', ' ')} topic is on design/{topic}, not on {cur}."
+            facts["commands"] = [("Switch to the design branch", plain_command(topic))]
+            facts["card"] = "\n".join([
+                f"Switch to design/{topic} and go on with the {topic.replace('-', ' ')} topic?",
+                "- **Switch (Recommended)** (`yes`): git switch, then go on.",
+                f"- **Stop** (`stop`): stay on {cur}; nothing changes.",
+            ])
+            return facts
         facts["where"] = "missing"
         facts["needs"] = f"{topic} is not a topic yet."
-        facts["commands"] = [("Start this topic", f"/crav1-design-architecture <idea text>")]
+        facts["reason"] = f"{topic} is not a topic yet."
+        facts["commands"] = [("Start this topic", "/crav1-design-architecture <idea text>")]
         facts["commands"] += [(f"Open {name.replace('-', ' ')}", plain_command(name)) for name in facts["topics"]]
         return facts
     sess = load_session(root, topic)
@@ -1226,34 +1362,54 @@ def screen_facts(root: Path, topic: str) -> dict:
     facts["uncommitted"] = _uncommitted_count(root, topic)
     facts["proposals"] = _proposal_pages(root, topic)
     facts["step"] = sess.get("decision") or facts["next_decision"]
-    for q in facts["questions"]:
-        who = ""
-        found = re.search(r"\(([^)]+)\)\s*$", q.get("text") or "")
-        if found:
-            who = found.group(1).strip()
-        facts["waits"].append({"text": q.get("text") or "", "who": who})
+    facts["waits"] = _waiting_lines(facts["questions"])
+    live = _live_decisions(root, topic)
+    waiting_on_people = bool(live) and all(x.get("State") in ("to-question", "to-research") for x in live)
+    facts["waiting_on_people"] = waiting_on_people
     commands = []
-    if facts["next_decision"]:
+    if status == "ended":
+        facts["needs"] = "The session is ended."
+        facts["reason"] = "The session is ended. Reopen it to work on it again."
+        commands = [("Reopen the topic", plain_command(topic, "reopen"))]
+    elif waiting_on_people:
+        facts["needs"] = "The open decisions are waiting on named people."
+        parked = " The session is parked." if status == "parked" else ""
+        facts["reason"] = "The open decisions are waiting on named people." + parked
+        commands = [
+            ("Ask the open questions", "/crav1-show-or-ask-open-questions"),
+            ("Edit the proposal", plain_command(topic, "proposal")),
+        ]
+        if status == "open":
+            commands.append(("Park", plain_command(topic, "park")))
+    elif facts["next_decision"]:
         facts["needs"] = f"{facts['next_decision']} is still open."
+        if status == "parked":
+            facts["reason"] = f"The session is parked. The next open decision is {facts['next_decision']}."
+        else:
+            facts["reason"] = f"The next open decision is {facts['next_decision']}."
         commands.append(("Next decision", plain_command(topic, "next")))
+        if facts["questions"]:
+            commands.append(("Show open questions", plain_command(topic, "questions")))
+        commands.append(("Edit the proposal", plain_command(topic, "proposal")))
+        commands.append(("Write stages", plain_command(topic, "stages")))
+        if status == "open":
+            commands.append(("Park", plain_command(topic, "park")))
     else:
         facts["needs"] = "Every decision is settled."
+        facts["reason"] = "The session is parked." if status == "parked" else "Every decision is settled."
         commands.append(("Write stages", plain_command(topic, "stages")))
         commands.append(("Edit the proposal", plain_command(topic, "proposal")))
         commands.append(("Review go-ahead", plain_command(topic, "go-ahead")))
-    if facts["questions"]:
-        commands.append(("Show open questions", plain_command(topic, "questions")))
-    if facts["next_decision"]:
-        commands.append(("Edit the proposal", plain_command(topic, "proposal")))
-        commands.append(("Write stages", plain_command(topic, "stages")))
-    commands.append(("Park", plain_command(topic, "park")))
-    # At most the useful set, next decision or the settled set first.
+        if facts["questions"]:
+            commands.append(("Show open questions", plain_command(topic, "questions")))
+        if status == "open":
+            commands.append(("Park", plain_command(topic, "park")))
     facts["commands"] = commands
     return facts
 
 
-def _blocks(commands: list[tuple[str, str]]) -> str:
-    parts = ["Run next:", ""]
+def _blocks(commands: list[tuple[str, str]], reason: str = "") -> str:
+    parts = ["Run next:", reason or "The session is open.", ""]
     for label, command in commands:
         parts += [f"{label}:", f"`{command}`", ""]
     return "\n".join(parts).rstrip() + "\n"
@@ -1262,40 +1418,41 @@ def _blocks(commands: list[tuple[str, str]]) -> str:
 def screen_text(root: Path, topic: str) -> str:
     """The one start (1.200.0). Fresh and resume both print this. Writes nothing."""
     facts = screen_facts(root, topic)
+    blocks = _blocks(facts["commands"], facts.get("reason") or "")
     if facts["where"] in ("none", "missing"):
         listed = ", ".join(facts["topics"]) if facts["topics"] else "none"
-        where = "no topic yet" if facts["where"] == "none" else f"{topic} is not a topic yet"
-        lines = [f"Where: {where}.", f"Topics: {listed}.", "", f"Needs doing: {facts['needs']}", "", _blocks(facts["commands"])]
-        return "\n".join(lines)
+        where = "no topic yet" if facts["where"] == "none" else f"{facts['topic']} is not a topic yet"
+        lines = [blocks.rstrip(), "", f"Where: {where}.", f"Topics: {listed}.", "", f"Needs doing: {facts['needs']}"]
+        return "\n".join(lines) + "\n"
+    if facts["where"] == "other-branch":
+        lines = [blocks.rstrip(), "", (facts.get("card") or "").rstrip(), "", f"Needs doing: {facts['needs']}"]
+        return "\n".join(lines) + "\n"
     topic = facts["topic"]
     step = facts["step"] if facts["where"] == "open" else ""
-    lines = [status_line(topic, facts["status"], step), ""]
+    lines = [blocks.rstrip(), "", status_line(topic, facts["status"], step), ""]
     if facts["where"] == "parked":
         where = f"{topic} is parked."
     elif facts["where"] == "ended":
         where = f"{topic} is ended."
+    elif facts.get("waiting_on_people"):
+        where = "topic open. The open decisions are waiting on named people."
     elif facts["next_decision"]:
         where = f"topic open. Next decision: {facts['next_decision']}."
     else:
         where = "topic open. Every decision is settled."
     lines.append(f"Where: {where}")
     if facts["waits"]:
-        for item in facts["waits"]:
-            who = f" from {item['who']}" if item["who"] else ""
-            lines.append(f"Waiting: {item['text']}{who}.")
+        lines.extend(facts["waits"])
     else:
         lines.append("Waiting: nothing.")
     n = facts["uncommitted"]
-    if n:
-        lines.append(uncommitted_count_line(n))
-    else:
-        lines.append("Uncommitted: none.")
+    lines.append(uncommitted_count_line(n) if n else "Uncommitted: none.")
     if facts["proposals"]:
         lines.append("Proposal: " + ", ".join(facts["proposals"]) + ".")
     else:
         lines.append("Proposal: none.")
-    lines += ["", f"Needs doing: {facts['needs']}", "", _blocks(facts["commands"])]
-    return "\n".join(lines)
+    lines += ["", f"Needs doing: {facts['needs']}"]
+    return "\n".join(lines) + "\n"
 
 
 def uncommitted_count_line(n: int) -> str:
@@ -1311,6 +1468,8 @@ def cmd_next(a, root: Path) -> dict:
     """Enter the next decision. The only way the guided card flow starts (1.200.0)."""
     topic = slugify(a.topic)
     if not (root / DESIGNS / topic / "goal.md").is_file():
+        if design_branch_ref(root, topic):
+            raise Refused(switch_card(root, topic, current_branch(root) or "this branch"))
         raise Refused(f"{topic} is not a topic yet; the status screen offers how to start one")
     title = _next_open(root, topic)
     if not title:
@@ -1340,7 +1499,7 @@ def cmd_questions(a, root: Path) -> str:
         lines.append("Open questions:")
         for q in qs:
             lines.append(f"- {q.get('text')}")
-    lines += ["", "Run next:", "", "Back to the session:", f"`{plain_command(topic)}`"]
+    lines += ["", "Run next:", "These are the open questions.", "", "Back to the session:", f"`{plain_command(topic)}`"]
     return "\n".join(lines) + "\n"
 
 
@@ -1483,7 +1642,7 @@ def cmd_stages_list(a, root: Path) -> str:
     else:
         for i, st in enumerate(parsed, 1):
             lines.append(f"{i}. {st.get('name')} — {st.get('reason', '')}")
-    lines += ["", "Run next:", "", "Back to the session:", f"`{plain_command(topic)}`"]
+    lines += ["", "Run next:", "These are the stages.", "", "Back to the session:", f"`{plain_command(topic)}`"]
     return "\n".join(lines) + "\n"
 
 
@@ -1493,6 +1652,23 @@ def cmd_end(a, root: Path) -> str:
         raise Refused(f"{topic} is not a topic yet")
     save_session(root, topic, status="ended", mode="session", step="end")
     return "\n".join(["Session ended", "", f"`{plain_command(topic)}`", ""]) 
+
+
+def cmd_reopen(a, root: Path) -> str:
+    """Open an ended session again and print the status screen (1.201.1)."""
+    topic = slugify(a.topic)
+    if not (root / DESIGNS / topic / "goal.md").is_file():
+        if design_branch_ref(root, topic):
+            raise Refused(switch_card(root, topic, current_branch(root) or "this branch"))
+        raise Refused(f"{topic} is not a topic yet")
+    t = Topic(root, topic)
+    name = t.current(None)
+    d = t.design(name)
+    if d.get("status") in ("parked", "ended"):
+        d["status"] = "open"
+        save_design(t, name, d, Writer(root, topic))
+    save_session(root, topic, status="open", mode="session", step="reopen")
+    return screen_text(root, topic)
 
 
 def cmd_park(a, root: Path) -> dict:
@@ -1745,8 +1921,10 @@ def cmd_question(a, root: Path) -> dict:
     qs = t.questions(name)
     pos = next((i for i, x in enumerate(qs) if x["text"] == a.text), None)
     if pos is None:
+        q["asked"] = today()
         qs.append(q)
     else:
+        q["asked"] = qs[pos].get("asked") or today()
         qs[pos] = q
     w = Writer(root, t.name)
     w.write(t.ddir(name) / "questions.md", render_questions(name, qs))
@@ -2510,6 +2688,8 @@ def main(argv=None) -> int:
     stg.add_argument("--topic", required=True)
     pk = sub.add_parser("park")
     pk.add_argument("--topic", required=True)
+    ro = sub.add_parser("reopen")
+    ro.add_argument("--topic", required=True)
     pk.add_argument("--design")
     rv = sub.add_parser("review")
     rv.add_argument("--topic", required=True)
@@ -2615,7 +2795,8 @@ def main(argv=None) -> int:
               "questions": lambda: cmd_questions(a, root), "proposal": lambda: cmd_proposal(a, root),
               "stages-list": lambda: cmd_stages_list(a, root),
               "end": lambda: cmd_end(a, root), "close": lambda: cmd_end(a, root),
-              "park": lambda: cmd_park(a, root), "settle-preview": lambda: cmd_settle_preview(a, root),
+              "park": lambda: cmd_park(a, root), "reopen": lambda: cmd_reopen(a, root),
+              "settle-preview": lambda: cmd_settle_preview(a, root),
               "review": lambda: cmd_review(a, root),
               "fan-out": lambda: cmd_fan_out(a, root), "add-decision": lambda: cmd_add_decision(a, root),
               "lean": lambda: cmd_lean(a, root), "settle": lambda: cmd_settle(a, root), "question": lambda: cmd_question(a, root),

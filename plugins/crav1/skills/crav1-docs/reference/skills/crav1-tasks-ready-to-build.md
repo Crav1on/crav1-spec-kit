@@ -120,6 +120,8 @@ Shows summary counts per slice, then Ready and Held grouped by build-map branch,
 
 1.187.0: the open-task list, Run next and `build-map.md` name a task by its text up to the first verify item, through the shared `task_order.task_name`; unbalanced parentheses are dropped and stray spaces such as `( x` and `develop ,` are tidied.
 
+1.201.1: a free-text `(PR 12)` or `(PR 7 merged into develop)` does not mark a task done. Only a tick or the kit mark `(PR n, merged)` or `(PR n) merged` does. A task with `(after: T#)` stays held while that task's pull request is open, on the ready check and on the build map, and the held line says `waits for PR <n> to merge`. A pull request the host says is merged is cleared with [`/crav1-build-walk`](crav1-build-walk.md) <slug> T#`. A `--text` read that does not pass `--write-map` does not add a `PR author` line. A blocked line names only tasks that wait on that block.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
