@@ -1557,7 +1557,14 @@ def cannot_start(start: dict, slug: str) -> dict:
     """A named task that cannot start: a card and a Run next (1.186.0)."""
     task = start["task"]
     phase = start.get("phase")
-    if phase == "held":
+    reason = (start.get("reason") or "").rstrip(".")
+    lead = f"{task} cannot start yet. {start['reason']}"
+    if phase == "held" and re.search(r"\bwaits for PR \d+ to merge\b", reason, re.I):
+        title = " ".join(str(start.get("title") or "").split())
+        named = f"{task} {title}".strip() if title else task
+        waiting = f"{named} — {reason}"
+        lead = f"{task} {reason}."
+    elif phase == "held":
         deps = start.get("waits_on") or []
         joined = ", ".join(deps[:-1]) + " and " + deps[-1] if len(deps) > 1 else (deps[0] if deps else "its dependencies")
         waiting = f"Waiting: {joined} to be done before {task} can start."
@@ -1570,7 +1577,7 @@ def cannot_start(start: dict, slug: str) -> dict:
     return {
         "mode": "walk",
         "phase": "cannot-start",
-        "lead": f"{task} cannot start yet. {start['reason']}",
+        "lead": lead,
         "next": [f"Run /crav1-tasks-ready-to-build {slug}, because {task} cannot start yet."],
         "ending": ending,
         "count": 1,

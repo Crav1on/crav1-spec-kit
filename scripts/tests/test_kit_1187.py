@@ -98,7 +98,8 @@ class WalkEnding(unittest.TestCase):
             out = json.loads(proc.stdout)
         golden = (SNAP / "walk-ending.txt").read_text(encoding="utf-8").rstrip("\n")
         self.assertEqual(out["ending"], golden)
-        self.assertIn("resolved on feat/orders-fixes:", out["ending"])
+        self.assertIn("PR 7 takes in develop after PR 6 merges", out["ending"])
+        self.assertIn("waits for PR 6 to merge", out["ending"])
         for leak in ("integration —", "contract —", "system —", "api-doc.yaml"):
             self.assertNotIn(leak, out["ending"])
             self.assertNotIn(leak, out["lead"])
@@ -106,7 +107,7 @@ class WalkEnding(unittest.TestCase):
     def test_ready_check_snapshot_shows_the_short_name(self):
         reply = (SNAP / "expected/reply.txt").read_text(encoding="utf-8")
         self.assertIn("- T4 PR 7 takes in develop after PR 6 merges, with the conflicts in app.py and "
-                      "tests/test_store.py resolved\n", reply)
+                      "tests/test_store.py resolved — waits for PR 6 to merge\n", reply)
         self.assertNotIn("integration —", reply)
         self.assertNotIn("regression", reply)
 

@@ -5142,12 +5142,64 @@ def _dep_pr_numbers(root: Path | None) -> list[int]:
     return numbers
 
 
+def _note_after_prs(root: Path | None, pr_state: dict) -> None:
+    """Ask the host about a task's `(after: PR N)` and keep the answer (1.201.1).
+
+    The same read-only lookup as 1.177.2. A merged answer stays in memory
+    even when no build-progress file names the pull request, so the task can
+    start in this run. An unhosted answer uses the same code-repo line.
+    This writes no file.
+    """
+    import os
+    if root is None or os.environ.get("CRAV1_NO_HOST_LOOKUP"):
+        return
+    if not (Path(root) / "tasks.md").is_file():
+        return
+    tasks = map_mod().parse_tasks((Path(root) / "tasks.md").read_text(encoding="utf-8"))
+    numbers: list[int] = []
+    for task in tasks:
+        if task.get("done"):
+            continue
+        for number in task.get("after_prs") or ():
+            if number not in numbers:
+                numbers.append(int(number))
+    merged = pr_state.setdefault("merged", [])
+    closed = pr_state.setdefault("closed", [])
+    unhosted = pr_state.setdefault("unhosted", [])
+    branches = pr_state.setdefault("branches", {})
+    unread = pr_state.setdefault("host_unread", [])
+    for number in numbers:
+        if number in merged or number in closed or number in unhosted:
+            continue
+        got = host_pr_lookup(root, number)
+        state = got.get("state") or {}
+        kind = state.get("state")
+        if kind == "merged":
+            merged.append(number)
+        elif kind == "closed":
+            closed.append(number)
+        elif kind == "unhosted":
+            unhosted.append(number)
+            branches.setdefault(number, None)
+        elif got.get("error"):
+            unread.append({
+                "pr": number,
+                "branch": None,
+                "host": got.get("host"),
+                "error": got["error"],
+                "detail": got.get("detail") or "",
+            })
+
+
 def apply_open_pr_holds(root: Path | None, rows: list[dict], host_merged=None) -> None:
-    """Hold `(after: T#)` until T#'s open pull request is merged (1.201.1).
+    """Hold a task until the pull request it waits on is merged (1.201.1).
 
     A ticked dependency still holds the next task while its `(PR n)` or its
-    build-progress pull request is open. The held reason is `waits for PR n
-    to merge`. A kit merge mark or a merged host state does not hold.
+    build-progress pull request is open. A task whose own line says
+    `(after: PR n)` or `after PR n merges` is held the same way, until the
+    1.177.2 host check says that pull request merged. The held reason is
+    `waits for PR n to merge`. A kit merge mark or a merged host state does
+    not hold. A bare `(PR n)` is not this wait.
     """
     if root is None or not (Path(root) / "tasks.md").is_file():
         return
@@ -5155,6 +5207,8 @@ def apply_open_pr_holds(root: Path | None, rows: list[dict], host_merged=None) -
     tasks = mod.parse_tasks((Path(root) / "tasks.md").read_text(encoding="utf-8"))
     walks = mod.progress_state(root) if (Path(root) / "build-progress").is_dir() else {}
     holds = mod.dependency_open_prs(tasks, walks, host_merged)
+    for task_id, pr in mod.after_pr_holds(tasks, host_merged).items():
+        holds.setdefault(task_id, pr)
     for row in rows:
         match = re.fullmatch(r"T(\d+)", str(row.get("task") or ""))
         if not match:
@@ -6394,6 +6448,7 @@ def _readiness(args: argparse.Namespace) -> None:
         for number in _dep_pr_numbers(root):
             if number not in pr_state["merged"] and _host_merged(root, number):
                 pr_state["merged"].append(number)
+        _note_after_prs(root, pr_state)
         aliases: list[dict] = []
         rows = build_rows(root, excluded=set(args.new_question or []), aliases=aliases)
         claim_info = apply_claims(root, rows, getattr(args, "user", None), getattr(args, "branch", None))

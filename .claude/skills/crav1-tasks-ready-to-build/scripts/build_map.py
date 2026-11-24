@@ -593,6 +593,38 @@ def dependency_open_prs(tasks, walks=None, host_merged=None):
     return holds
 
 
+def after_pr_holds(tasks, host_merged=None):
+    """Tasks held because they wait on another pull request (1.201.1).
+
+    `(after: PR 87)` and the prose `after PR 87 merges` both hold the task
+    until that number is in `host_merged` (the 1.177.2 host check says it
+    merged). A bare `(PR 87)` is not this wait. Returns {task id: pr number}.
+    """
+    host = set()
+    for number in host_merged or ():
+        try:
+            host.add(int(number))
+        except (TypeError, ValueError):
+            continue
+    holds = {}
+    for task in tasks or []:
+        if task.get("done"):
+            continue
+        numbers = task.get("after_prs")
+        if numbers is None:
+            numbers = task_order.after_pr_numbers(task.get("rest") or "")
+        for pr in numbers:
+            try:
+                value = int(pr)
+            except (TypeError, ValueError):
+                continue
+            if value in host:
+                continue
+            holds[task["id"]] = value
+            break
+    return holds
+
+
 def merged_branch_names(*texts):
     """Branch names a line records as merged. Local text only. No network."""
     found = []
@@ -1940,6 +1972,8 @@ def build(slug, spec_text, plan_text, tasks_text, work_item_text="", verify_text
             if dep in by_id and not by_id[dep]["done"]
         ]
     pr_holds = dependency_open_prs(tasks, walks, host_merged)
+    for task_id, pr in after_pr_holds(tasks, host_merged).items():
+        pr_holds.setdefault(task_id, pr)
     for task in tasks:
         if task["id"] in pr_holds:
             task["pr_hold"] = pr_holds[task["id"]]

@@ -27,6 +27,7 @@ to = load("task_order_12011", SK / "crav1-tasks-ready-to-build/scripts/task_orde
 bm = load("build_map_12011", SK / "crav1-tasks-ready-to-build/scripts/build_map.py")
 we = load("walk_ending_12011", SK / "crav1-tasks-ready-to-build/scripts/walk_ending.py")
 bw = load("build_walk_12011", SK / "crav1-build-walk/scripts/build_walk.py")
+ts = load("task_state_12011", SK / "crav1-tasks-ready-to-build/scripts/task_state.py")
 claims = load("claims_12011", SK / "crav1-build-walk/scripts/claims.py")
 wp = load("walk_progress_12011", SK / "crav1-tighten-and-plan-ready-to-build/scripts/walk_progress.py")
 
@@ -376,6 +377,129 @@ class ReadyCheck(unittest.TestCase):
         })
         self.assertEqual(hit["kind"], "waiting")
         self.assertIn("PR 12", hit["why"])
+
+    def test_after_pr_mark_holds_until_the_host_says_merged(self):
+        prose = (
+            "- [ ] T58: docs/x from develop after PR 87 merges "
+            "(branch: feat/orders-api) (verify: unit — the file is present) (spec: docs)\n"
+        )
+        marked = prose.replace(
+            "after PR 87 merges ",
+            "after PR 87 merges (after: PR 87) ",
+        )
+        for tasks in (prose, marked):
+            self.assertEqual(to.after_pr_numbers(tasks), [87])
+            self.assertFalse(to.pr_merged(tasks))
+            root = spec_folder(tasks)
+            rows = wp.build_rows(root)
+            wp.apply_open_pr_holds(root, rows, host_merged=None)
+            self.assertEqual(rows[0]["task"], "T58")
+            self.assertEqual(rows[0]["bucket"], "waiting")
+            self.assertEqual(rows[0]["reason"], "waits for PR 87 to merge")
+            built = bm.build("orders-api", SPEC, PLAN, tasks, walks={}, host_merged=None)
+            self.assertTrue(any(
+                branch.get("held_text") == "waits for PR 87 to merge"
+                for branch in built["branches"]
+            ))
+            report = bm.report_by_branch(built, rows, slug="orders-api")
+            self.assertIn("waits for PR 87 to merge", report["line"])
+            self.assertNotIn("Ready now", report["line"] or "")
+            again = wp.build_rows(root)
+            wp.apply_open_pr_holds(root, again, host_merged=[87])
+            self.assertEqual(again[0]["bucket"], "ready")
+            self.assertNotEqual(again[0].get("reason"), "waits for PR 87 to merge")
+            clear = bm.build("orders-api", SPEC, PLAN, tasks, walks={}, host_merged=[87])
+            self.assertFalse(any(
+                (branch.get("held_text") or "") == "waits for PR 87 to merge"
+                for branch in clear["branches"]
+            ))
+            start = ts.walk_start(root, "T58", "person A")
+            self.assertFalse(start["startable"])
+            self.assertEqual(start["reason"], "waits for PR 87 to merge.")
+            blocked = bw.cannot_start(start, "orders-api")
+            self.assertIn("waits for PR 87 to merge", blocked["ending"])
+            self.assertIn("docs/x from develop after PR 87 merges", blocked["ending"])
+        os.environ.pop("CRAV1_NO_HOST_LOOKUP", None)
+
+        class _Host:
+            @staticmethod
+            def _host_merged(root, pr):
+                return int(pr) == 87
+
+        ts._WALK_PROGRESS = _Host()
+        try:
+            opened = spec_folder(prose)
+            start = ts.walk_start(opened, "T58", "person A")
+            self.assertTrue(start["startable"])
+        finally:
+            ts._WALK_PROGRESS = None
+            os.environ["CRAV1_NO_HOST_LOOKUP"] = "1"
+
+    def test_bare_pr_mention_is_not_an_after_wait(self):
+        rest = "docs/x (PR 87)"
+        self.assertEqual(to.after_pr_numbers(rest), [])
+        self.assertEqual(to.missing_after_pr_marks(rest), [])
+        self.assertFalse(to.pr_merged(rest))
+        root = spec_folder(
+            "- [ ] T58: docs/x (PR 87) (branch: feat/orders-api) "
+            "(verify: unit — the file is present) (spec: docs)\n"
+        )
+        rows = wp.build_rows(root)
+        wp.apply_open_pr_holds(root, rows, host_merged=None)
+        self.assertNotEqual(rows[0].get("reason"), "waits for PR 87 to merge")
+        self.assertNotEqual(rows[0]["bucket"], "done")
+
+    def test_unhosted_after_pr_uses_the_repo_question_and_stays_held(self):
+        root = spec_folder(
+            "- [ ] T58: docs/x from develop after PR 87 merges "
+            "(branch: feat/orders-api) (verify: unit — the file is present) (spec: docs)\n"
+        )
+        original = wp.host_pr_lookup
+        os.environ.pop("CRAV1_NO_HOST_LOOKUP", None)
+        wp.host_pr_lookup = lambda *args, **kwargs: {"state": {"state": "unhosted"}}
+        try:
+            state = {"merged": [], "closed": [], "unhosted": [], "branches": {}}
+            wp._note_after_prs(root, state)
+            self.assertIn(87, state["unhosted"])
+            self.assertIn("code repo not recorded", "\n".join(wp.pr_state_lines(state)))
+            self.assertFalse((root / "build-progress").exists())
+            rows = wp.build_rows(root)
+            wp.apply_open_pr_holds(root, rows, state["merged"])
+            self.assertEqual(rows[0]["reason"], "waits for PR 87 to merge")
+            wp.host_pr_lookup = lambda *args, **kwargs: {"state": {"state": "merged"}}
+            state = {"merged": [], "closed": [], "unhosted": [], "branches": {}}
+            wp._note_after_prs(root, state)
+            self.assertEqual(state["merged"], [87])
+            self.assertFalse((root / "build-progress").exists())
+            ready = wp.build_rows(root)
+            wp.apply_open_pr_holds(root, ready, state["merged"])
+            self.assertEqual(ready[0]["bucket"], "ready")
+        finally:
+            wp.host_pr_lookup = original
+            os.environ["CRAV1_NO_HOST_LOOKUP"] = "1"
+
+    def test_plan_check_writes_the_after_pr_mark_on_yes(self):
+        pc = load("plan_check_12011", SK / "crav1-plan-from-spec/scripts/plan_check.py")
+        root = spec_folder(
+            "- [ ] T58: docs/x from develop after PR 87 merges "
+            "(verify: unit — the file is present) (spec: docs)\n"
+            "- [ ] T59: notes from develop after PR 88 merges (after: T58) "
+            "(verify: unit — the note is present) (spec: notes)\n"
+        )
+        preview = pc.apply_after_pr(root, False)
+        self.assertIn("T58: the line says after PR 87 merges. Add (after: PR 87).", preview)
+        self.assertIn("Nothing written.", preview)
+        self.assertNotIn("(after: PR 87)", (root / "tasks.md").read_text(encoding="utf-8"))
+        written = pc.apply_after_pr(root, True)
+        text = (root / "tasks.md").read_text(encoding="utf-8")
+        self.assertIn("Wrote the mark on tasks.md.", written)
+        self.assertIn("(after: PR 87)", text)
+        self.assertIn("(after: T58, PR 88)", text)
+        self.assertIn("without the mark", pc.apply_after_pr(root, True))
+        self.assertTrue(any("after PR 87 merges" in line for line in pc.order_lines(spec_folder(
+            "- [ ] T58: docs/x from develop after PR 87 merges "
+            "(verify: unit — the file is present) (spec: docs)\n"
+        ))))
 
 
 if __name__ == "__main__":

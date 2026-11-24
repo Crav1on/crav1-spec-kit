@@ -48,6 +48,9 @@ _utf8_stdout()
 
 TASK = re.compile(r"^\s*- \[( |x|X)\] T(\d+)\b[:.]?\s*(.*)$")
 AFTER = re.compile(r"\(after:\s*([^)]*)\)")
+# A wait on another pull request, with or without a task of its own (1.201.1).
+_AFTER_PR = re.compile(r"\bPR\s*(\d+)\b", re.I)
+_AFTER_PR_PROSE = re.compile(r"\bafter\s+PR\s+(\d+)\s+merges\b", re.I)
 BRANCH_MARK = re.compile(r"\((?:branch|map):\s*([^)]+)\)", re.I)
 BRANCH_NAME = re.compile(
     r"\b((?:feature|feat|hotfix|bugfix|fix|spec|chore|bug)/[A-Za-z0-9][A-Za-z0-9._/-]*)"
@@ -240,6 +243,66 @@ def pr_merged(text):
     return bool(_PR_MERGED.search(text or ""))
 
 
+def after_pr_numbers(rest):
+    """Pull-request numbers a task waits on (1.201.1).
+
+    The mark `(after: PR 87)` and the prose `after PR 87 merges` both count.
+    A bare `(PR 87)` does not: that note is not a wait, and only the kit
+    merge mark makes a task done.
+    """
+    text = rest or ""
+    found, seen = [], set()
+    mark = AFTER.search(text)
+    if mark:
+        for raw in _AFTER_PR.findall(mark.group(1)):
+            number = int(raw)
+            if number not in seen:
+                seen.add(number)
+                found.append(number)
+    for raw in _AFTER_PR_PROSE.findall(text):
+        number = int(raw)
+        if number not in seen:
+            seen.add(number)
+            found.append(number)
+    return found
+
+
+def missing_after_pr_marks(rest):
+    """Prose `after PR N merges` whose `(after:)` mark does not name that PR."""
+    text = rest or ""
+    marked = set()
+    mark = AFTER.search(text)
+    if mark:
+        marked = {int(raw) for raw in _AFTER_PR.findall(mark.group(1))}
+    return [int(raw) for raw in _AFTER_PR_PROSE.findall(text) if int(raw) not in marked]
+
+
+def add_after_pr_mark(line, numbers):
+    """Put `(after: PR N)` on a task line, or add `PR N` inside an existing mark."""
+    extra = []
+    for number in numbers or ():
+        try:
+            value = int(number)
+        except (TypeError, ValueError):
+            continue
+        if value not in extra:
+            extra.append(value)
+    if not extra:
+        return line
+    found = AFTER.search(line)
+    if found:
+        body = found.group(1).strip().rstrip(",").strip()
+        add = [f"PR {number}" for number in extra if not re.search(rf"\bPR\s*{number}\b", body, re.I)]
+        if not add:
+            return line
+        new_body = ", ".join(part for part in [body, *add] if part)
+        return line[: found.start()] + f"(after: {new_body})" + line[found.end() :]
+    insert = f" (after: {', '.join(f'PR {number}' for number in extra)})"
+    if line.endswith("\n"):
+        return line[:-1] + insert + "\n"
+    return line + insert
+
+
 def merged_branch_names(spec_text):
     """Match Branch lines whose pull request is recorded merged."""
     names = set()
@@ -295,7 +358,14 @@ def parse(text):
             deps = [prev] if prev is not None else []
             recorded = False
         title = task_name(rest)
-        tasks.append({"id": num, "done": m.group(1) != " ", "title": title, "deps": deps, "recorded": recorded})
+        tasks.append({
+            "id": num,
+            "done": m.group(1) != " ",
+            "title": title,
+            "deps": deps,
+            "recorded": recorded,
+            "after_prs": after_pr_numbers(rest),
+        })
         prev = num
     return tasks
 
