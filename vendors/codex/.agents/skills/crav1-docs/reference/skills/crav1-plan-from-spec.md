@@ -32,6 +32,8 @@ File-level `plan.md` and `tasks.md`; each verify note names the checks before co
 
 1.161.0: `plan_check.py order --vendor codex` also lists branches that wait for each other as a `Branch loop:` line with the recommended fix in plain words. Before the recap, apply it on the user's yes with `walk_progress.py fix-loop --root <spec-folder> --pick <n> --yes --vendor codex`.
 
+1.201.1: a task that waits for another pull request ends its line with `(after: PR 87)`. When the text says `after PR 87 merges` and the mark is missing, `plan_check.py order --vendor codex` names the line. On yes, `plan_check.py after-pr --root <spec-folder> --yes --vendor codex` writes the mark.
+
 ## Runs when
 
 Spec is accepted. Called by the user.

@@ -26,6 +26,8 @@ One plan issue at a time; patches plan/tasks only (spec findings go to tighten-s
 
 1.161.0: `plan_check.py order --vendor codex` also lists branches that wait for each other as a `Branch loop:` line with the fixes the ready check offers, in the same plain words. Each is a candidate `P#` with the new `fix-loop` option. The batch yes applies it with `walk_progress.py fix-loop --root <spec-folder> --pick <n> --yes --vendor codex`, which writes the `(map:)` marks or drops the one wait in `tasks.md` and rebuilds `build-map.md`.
 
+1.201.1: a task line that says `after PR 87 merges` and has no `(after: PR 87)` is a candidate `P#`. On yes, `plan_check.py after-pr --root <spec-folder> --yes --vendor codex` writes the mark.
+
 ## Runs when
 
 Plan findings, or mushy tasks. Called by the user.

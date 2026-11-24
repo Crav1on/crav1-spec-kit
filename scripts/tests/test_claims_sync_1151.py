@@ -125,7 +125,7 @@ class ClaimsTests(unittest.TestCase):
 
     def test_add_list_and_clear(self):
         code, payload, err = run_py(CLAIMS, [
-            "add", "--root", str(self.root),
+            "add", "--yes", "--root", str(self.root),
             "--branch", "feat/orders-api-host-setup",
             "--tasks", "T27",
             "--user", "person A",
@@ -154,7 +154,7 @@ class ClaimsTests(unittest.TestCase):
     def test_age_warning_never_autoclears(self):
         since = "2026-11-09T10:00:00+01:00"
         run_py(CLAIMS, [
-            "add", "--root", str(self.root),
+            "add", "--yes", "--root", str(self.root),
             "--branch", "feat/orders-api-host-setup",
             "--tasks", "T27",
             "--user", "person A",
@@ -173,7 +173,7 @@ class ClaimsTests(unittest.TestCase):
 
     def test_age_days_configurable(self):
         run_py(CLAIMS, [
-            "add", "--root", str(self.root),
+            "add", "--yes", "--root", str(self.root),
             "--branch", "feat/orders-api-host-setup",
             "--tasks", "T2",
             "--user", "person A",
@@ -191,14 +191,14 @@ class ClaimsTests(unittest.TestCase):
 
     def test_other_user_conflict(self):
         run_py(CLAIMS, [
-            "add", "--root", str(self.root),
+            "add", "--yes", "--root", str(self.root),
             "--branch", "feat/orders-api-host-setup",
             "--tasks", "T2",
             "--user", "person A",
             "--since", "2026-11-13T15:50:00+01:00",
         ])
         code, payload, _ = run_py(CLAIMS, [
-            "add", "--root", str(self.root),
+            "add", "--yes", "--root", str(self.root),
             "--branch", "feat/orders-api-host-setup",
             "--tasks", "T2",
             "--user", "person B",
@@ -209,14 +209,14 @@ class ClaimsTests(unittest.TestCase):
 
     def test_same_user_refreshes(self):
         run_py(CLAIMS, [
-            "add", "--root", str(self.root),
+            "add", "--yes", "--root", str(self.root),
             "--branch", "feat/orders-api-host-setup",
             "--tasks", "T2",
             "--user", "person A",
             "--since", "2026-11-13T10:00:00+01:00",
         ])
         code, payload, _ = run_py(CLAIMS, [
-            "add", "--root", str(self.root),
+            "add", "--yes", "--root", str(self.root),
             "--branch", "feat/orders-api-host-setup",
             "--tasks", "T2",
             "--user", "person A",
@@ -299,7 +299,7 @@ class ReadinessClaimTests(unittest.TestCase):
 
     def test_claimed_task_is_held_and_not_in_run_next(self):
         run_py(CLAIMS, [
-            "add", "--root", str(self.root),
+            "add", "--yes", "--root", str(self.root),
             "--branch", "feat/orders-api-host-setup",
             "--tasks", "T2",
             "--user", "person A",
@@ -333,7 +333,7 @@ class TaskOrderClaimTests(unittest.TestCase):
         tmp = Path(tempfile.mkdtemp())
         root = write_slice(tmp)
         run_py(CLAIMS, [
-            "add", "--root", str(root),
+            "add", "--yes", "--root", str(root),
             "--branch", "feat/orders-api-host-setup",
             "--tasks", "T2",
             "--user", "person A",

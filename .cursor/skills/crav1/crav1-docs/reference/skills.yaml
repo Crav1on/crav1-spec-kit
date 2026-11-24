@@ -949,6 +949,7 @@ skills:
   - '1.128.0: optional `(step: 1)` links a task to a numbered Approach step, and optional `(map: feat/cancel-refund)` puts that task on another branch. Leave both off. The default build map is one branch per step.'
   - '1.151.0: a task listed in `claims.md` as `In progress:` is left unchanged: no renumber, reorder, rewrite, or removal. After writing `tasks.md`, the step preserves those lines and says once which claimed tasks were kept.'
   - '1.161.0: `plan_check.py order` also lists branches that wait for each other as a `Branch loop:` line with the recommended fix in plain words. Before the recap, apply it on the user''s yes with `walk_progress.py fix-loop --root <spec-folder> --pick <n> --yes`.'
+  - '1.201.1: a task that waits for another pull request ends its line with `(after: PR 87)`. When the text says `after PR 87 merges` and the mark is missing, `plan_check.py order` names the line. On yes, `plan_check.py after-pr --root <spec-folder> --yes` writes the mark.'
   use_when: Spec is accepted
   table:
     reads: Spec, diagrams, ADRs; the named repo and branch when the slice is partial
@@ -1024,6 +1025,7 @@ skills:
   - '1.145.0: the batch card is asked only after a findings table in that same reply (Id, Issue, Options, Recommendation). The card names each item, for example `P4 tasks miss the 400 path: add a test`. It does not say `table above`. The command is `<interpreter> -X utf8 <skill crav1-tighten-plan>/scripts/batch_offer.py --title "Tighten-plan batch" --items <file>`. It prints no card without rows.'
   - '1.151.0: a task listed in `claims.md` as `In progress:` is left unchanged: no renumber, reorder, rewrite, or removal. After writing `tasks.md`, the step preserves those lines and says once which claimed tasks were kept.'
   - '1.161.0: `plan_check.py order` also lists branches that wait for each other as a `Branch loop:` line with the fixes the ready check offers, in the same plain words. Each is a candidate `P#` with the new `fix-loop` option. The batch yes applies it with `walk_progress.py fix-loop --root <spec-folder> --pick <n> --yes`, which writes the `(map:)` marks or drops the one wait in `tasks.md` and rebuilds `build-map.md`.'
+  - '1.201.1: a task line that says `after PR 87 merges` and has no `(after: PR 87)` is a candidate `P#`. On yes, `plan_check.py after-pr --root <spec-folder> --yes` writes the mark.'
   use_when: Plan findings, or mushy tasks
   table:
     reads: Plan, tasks, spec, and those findings
@@ -1223,6 +1225,7 @@ skills:
   - '1.184.0: a progress file from an older kit that records a second task''s build as a plain `- Step: build` with the task only in the result (`Result: done (T47: ...)`) counts that task too: the lead and the Waiting line name every task on the branch (`T43 and T47 are pushed to PR 73 and wait for its merge`), and the next write adds it to the header''s Tasks: line.'
   - '1.186.0: `/crav1-build-walk <slug> <T#>` starts an open, unclaimed task as new work even when the branch''s other tasks wait for the merge; wait-merge applies only once every task is pushed. `build_walk.py next --task` returns `start`, and `progress start-task` claims the task, adds it to the header and records `start <T#>`. A task that cannot start gets a card and a Run next from the script. On another person''s branch a take-in task (`(take-in: develop)`, or text that says it takes in develop) may merge the base into the branch with its own yes: `git merge --no-ff`, the whole suite and the linter, a push after yes and one comment; the pull request merge stays with its owner, and the ending names who merges.'
   - '1.187.0: the task name in the lead, the ending under Run next and the yes card stops at the first verify item (`; integration —`, `; contract —`, `; system —`, `; unit —`, `(verify: ...`), so a task line with its checks shows only its name, such as `Build T8 PR 12 takes in develop after PR 10 merges, with the conflicts resolved on feat/orders-api:`. The one helper is `task_order.task_name`.'
+  - '1.201.1: the same helper drops a leading `` `fix/x` from `develop` `` clause and parenthesised marks such as `(manual, secret, …)`, so the label and the Tasks line are the outcome. `claims.py add` prints the line and leaves `claims.md` unchanged until `--yes`. A second start on the same claim keeps the original since time. `progress start-task` does not pass a new since, so the time stays. A task that says `(after: PR 87)` or `after PR 87 merges` stays held until the host says PR 87 is merged, and the walk ending says `waits for PR 87 to merge`.'
   use_when: A ready slice should be built one work branch at a time, through the pull request and the merge
   table:
     reads: The spec folder, the build map, the pull request author, and commit authors
@@ -1916,6 +1919,7 @@ skills:
   - '1.185.0: each branch block in `build-map.md` nests its lists: `- Tasks:` and `- Waits for:` are label bullets with one sub-bullet per item instead of items joined with `; `, a done task keeps its strike-through and `✓ done (PR N)` on its own sub-bullet, and an empty list is `Waits for: none` on one line. Question, Ready now and the Plan step note stay on one line. The Delivers bullet is gone; Tasks, with task ids, is the one list. The Mermaid diagram is unchanged, and a map written by an older kit is rewritten once on the next ready check.'
   - '1.186.0: `task_state.walk_start` says whether the walk can start a task now. The ready check offers `/crav1-build-walk <slug> <T#>` only when it can (invariant I8), so the ready check and the walk agree.'
   - '1.187.0: the open-task list, Run next and `build-map.md` name a task by its text up to the first verify item, through the shared `task_order.task_name`; unbalanced parentheses are dropped and stray spaces such as `( x` and `develop ,` are tidied.'
+  - '1.201.1: a free-text `(PR 12)` or `(PR 7 merged into develop)` does not mark a task done. Only a tick or the kit mark `(PR n, merged)` or `(PR n) merged` does. A task with `(after: T#)` stays held while that task''s pull request is open, on the ready check and on the build map, and the held line says `waits for PR <n> to merge`. A task that says `(after: PR 87)`, or whose text says `after PR 87 merges`, stays held until the host says PR 87 is merged. The ready check, the build map and the walk ending all say `waits for PR 87 to merge`. When the code repo is not recorded, the check uses the same one-time repo question as 1.177.2. A pull request the host says is merged is cleared with `/crav1-build-walk <slug> T#`. A `--text` read that does not pass `--write-map` does not add a `PR author` line. A blocked line names only tasks that wait on that block.'
   choice_words:
   - question: Show the build map?
     words:
@@ -2279,6 +2283,8 @@ skills:
       means: "Park the session. Prints Session parked and the plain command to open it again."
     - word: "end"
       means: "End the session. Prints Session ended and the plain command to open it again."
+    - word: "reopen"
+      means: "Open an ended session again and print the status screen."
     - word: "status"
       means: "Show open topics, designs, decisions, stages and questions. Writes nothing."
     - word: "fan-out"
@@ -2323,6 +2329,7 @@ skills:
   - '1.190.0: scratch input (ending state, lean, settle, stage and compare drafts) goes in the session''s temp folder and is refused from `inputs/`, which holds only the user''s saved goal files and is created on the first save for older topics. `uncommitted` is a count (`true` is counted from git status), a commit card (`commit --topic <t> --yes`) comes before the ending, `create --builds-on` refuses while the base topic is uncommitted, and the ending prints the routable `/crav1-design-architecture builds-on <base> <idea>`.'
   - '1.191.0: the design branch check, the kit-behind check and the go-ahead base check use the repo''s default branch (`origin/HEAD`, else `origin/main`, then `origin/master`), skip with a reason when there is none, and name that branch in cards and Run next.'
   - '1.200.0: one session start. The design command with or without a topic, and with or without resume, prints the same status screen from session.json and the topic files. resume is an alias and changes nothing. Park and end print Session parked or Session ended and the plain command for that topic. An open session stays open across decisions, endings and commits. next is the guided card. A proposal page and a briefing share one decisions section, stage numbers start at 1, and a routed requirement names the slice and the text. The design ending for that requirement starts with Run next and a full add-to-spec command for the design branch. `settle-preview` recommends one by one and settles nothing; there is no settle batch. `stop and commit` is a commit yes only when this skill says so.'
+  - '1.201.1: Run next comes first, with one reason line. A topic whose goal is only on `design/<topic>` offers the switch card. `resume --json` leaves Status as it is, including parked; a source that changed still marks that decision reopened. Dated pages under `docs/architecture/proposals/` count as the proposal. Waiting lines name each person once, with the date on the question, near 120 characters. When every open decision is to-question or to-research, Run next names the open-questions command and the proposal. A parked screen has no Park command. An ended screen''s one command is `reopen`. Run the script from the repo root.'
   use_when: You want to decide how the architecture should change
   table:
     reads: Architecture spec, system notes, environment docs, research, slice specs, code and config, and the topic's sandbox

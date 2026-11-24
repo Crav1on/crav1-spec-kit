@@ -523,10 +523,11 @@ marks:
     group: plan
     files: ["docs/specs/<slug>/tasks.md"]
     format: "- [ ] T<n>: <what> (verify: <kind> — <named check>) (spec: <REQ or acceptance>)"
-    pattern: '^- \[[ x]\] T\d+: .+ \(verify: .+\) \(spec: .+\)( \(after: T\d+(, T\d+)*\))?$'
+    pattern: '^- \[[ x]\] T\d+: .+ \(verify: .+\) \(spec: .+\)( \(after: (?:T\d+|PR \d+)(?:, (?:T\d+|PR \d+))*\))?$'
     examples:
       - "- [ ] T1: POST /retry rejects a missing order id (verify: unit — empty id is rejected) (spec: invalid input)"
       - "- [x] T2: Retry stops after 3 attempts (verify: unit — the 4th call is not made) (spec: retry limit) (after: T1)"
+      - "- [ ] T58: docs/x from develop (verify: unit — the file is present) (spec: docs) (after: PR 87)"
     meaning: "One ordered, testable task. `[x]` is set by the build worker."
     written_by: [crav1-plan-from-spec, crav1-tighten-plan, crav1-build-tasks]
     read_by: [crav1-build-tasks, crav1-review-plan, crav1-tasks-ready-to-build, crav1-verify-build-against-spec]
@@ -565,12 +566,14 @@ marks:
     name: "(after: …)"
     group: plan
     files: ["docs/specs/<slug>/tasks.md (end of a task line)"]
-    format: "(after: T<n>[, T<n>])"
-    pattern: '^\(after: T\d+(, T\d+)*\)$'
+    format: "(after: T<n>[, T<n>][, PR <n>])"
+    pattern: '^\(after: (?:T\d+|PR \d+)(?:, (?:T\d+|PR \d+))*\)$'
     examples:
       - "(after: T1, T3)"
-    meaning: "The task needs those tasks done first."
-    written_by: [crav1-plan-from-spec]
+      - "(after: PR 87)"
+      - "(after: T1, PR 87)"
+    meaning: "The task needs those tasks done first, or waits until that pull request is merged."
+    written_by: [crav1-plan-from-spec, crav1-tighten-plan]
     read_by: [crav1-tasks-ready-to-build, crav1-help]
     readiness: true
     mention: '\(after:'

@@ -89,6 +89,19 @@ class HeldList(unittest.TestCase):
         self.assertEqual(out["ending"].count(sentence), 1, out["ending"])
 
 
+    def test_held_phrase_own_pr_keeps_the_inline_reason(self):
+        # 1.202.0 merged with 1.201.1: a task waiting on its own PR.
+        row = {"reason": "", "task": "T30", "own_pr_open": 85}
+        self.assertEqual(self.bm.held_phrase(row), "T30 is yours and waits for PR 85's merge.")
+        row = {"reason": "", "task": "T30", "own_pr_open": 85, "merge_wait": {"pr": 85}}
+        self.assertEqual(self.bm.held_phrase(row), "T30 is yours and waits for PR 85's merge.")
+
+    def test_held_phrase_other_pr_wait_says_waits_to_merge(self):
+        # 1.201.1 wording for a wait that is not the task's own PR.
+        self.assertEqual(self.bm.held_phrase({"reason": "", "merge_wait": {"pr": 87}}), "waits for PR 87 to merge")
+        self.assertEqual(self.bm.held_phrase({"reason": "held", "pr": 12}), "waits for PR 12 to merge")
+
+
 class OpenCount(unittest.TestCase):
     def test_the_script_counts_distinct_findings(self):
         mod = load(PLAN, "plan_check_t1202")

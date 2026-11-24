@@ -182,6 +182,8 @@ Since 1.175.0 the ready check offers `Continue the build walk on <branch>:` only
 
 Since 1.174.0 a done task's commit is the merge commit from its branch's `merge-pr` step, not the later commit that ticked it. A branch whose tasks are built and whose pull request is open reads `built, waits for PR <n> to merge`, never waiting on its own tasks, and the `Delivers:` and `Tasks:` lines show full names. An unfinished branch walk is the first Run next entry, `Continue the build walk on <branch>:` above `$crav1-build-walk <slug> <branch>`.
 
+Since 1.201.1 a free-text mention such as `(PR 12)` or `(PR 7 merged into develop)` does not mark a task done. Only a tick, or the kit mark `(PR n, merged)` or `(PR n) merged`, does. A task with `(after: T#)` stays held while T#'s pull request is still open, on this check and on the build map, and the held line says `waits for PR <n> to merge`. A task that says `(after: PR 87)`, or whose text says `after PR 87 merges`, stays held until the host says PR 87 is merged. The held line, the build map and the walk ending all say `waits for PR 87 to merge`. When the code repo is not recorded, the check uses the same one-time repo question as 1.177.2. When the host says that pull request is merged, Run next leads with `$crav1-build-walk <slug> T#`. A blocked line names only the tasks that wait on that block. A `--text` read that does not pass `--write-map` does not add a `PR author` line. A merged pull request is still recorded, as in 1.177.2.
+
 ## After
 
 The Next line recommends the build walk, with the T number beside the short name. `$crav1-build-tasks` builds one task without the walk:

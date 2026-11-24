@@ -12,6 +12,18 @@ Generated Codex and Copilot trees, plus three ready-check and plan-count fixes. 
 
 Docs and tests: tighten-and-plan and spec-to-plan walkthroughs, glossary, data layout, and `scripts/tests/test_kit_1202.py`.
 
+## 1.201.1 (2026-11-24)
+
+Fixes for the design screen and the ready check. The rules were already the ones below; the scripts now follow them.
+
+- **Design screen.** Run next comes first, with one reason line. A topic that exists only on `design/<topic>` offers the switch card. `resume --json` leaves the files unchanged, including a parked Status. Dated proposal pages under `docs/architecture/proposals/` count. Waiting lines name each person once, with the date recorded on the question, and stay near 120 characters. When every open decision is waiting on named people, Run next names the open-questions command and the proposal. A parked screen has no Park command. An ended screen's one command is `reopen`. Run `scripts/design_run.py` from the repo root.
+- **Script output.** Do not pipe a script's output, in bash or in PowerShell. A pipe such as `| head` can cut an ending off at a lone `{`.
+- **Task names.** A `from <base>` clause and parenthesised marks such as `(manual, secret, …)` are not the task name. The name is the outcome after that clause.
+- **Claims.** `claims.py add` leaves `claims.md` unchanged until `--yes`. A second start on the same claim keeps the original since time.
+- **Ready check.** A `--text` read that does not pass `--write-map` does not add a `PR author` line. A merged pull request is still recorded, as in 1.177.2. A free-text mention such as `(PR 12)` or `(PR 7 merged into develop)` does not mark a task done; only a tick or the kit mark `(PR n, merged)` or `(PR n) merged` does. A task with `(after: T#)` stays held while T#'s pull request is open, and the held line says `waits for PR <n> to merge`. A task that says `(after: PR 87)`, or whose text says `after PR 87 merges`, stays held the same way until the host says PR 87 is merged. The ready check, the build map and the walk ending all say `waits for PR 87 to merge`. When the code repo is not recorded, the check uses the same one-time repo question as 1.177.2. `/crav1-plan-from-spec` and `/crav1-tighten-plan` write `(after: PR N)` for that prose: `plan_check.py order` names the line, and `plan_check.py after-pr --yes` writes the mark. A pull request the host says is merged is cleared with `/crav1-build-walk <slug> T#`. A blocked line names only the tasks that wait on that block. Claude Code sends one question per question-tool call.
+
+Docs and tests: design, build-walk and ready-check walkthroughs, data layout, question cards, install, running scripts, and `scripts/tests/test_kit_12011.py`.
+
 ## 1.201.0 (2026-11-22)
 
 A vendor table, with no change to a Cursor and Claude Code update.
@@ -190,13 +202,5 @@ Fixes for `/crav1-design-architecture` from a review of a long live design sessi
 - **Base to linked update.** After a committed change to a base topic (settle, lean, `change-goal`, a revisit settled or reopened, go-ahead), the ending lists each linked topic whose `design/<linked>` branch is behind `design/<base>`, and those moves return one yes or stop card for all of them. `linked-behind --topic <base> --yes` switches to each, merges `design/<base>` with `git merge --no-ff`, and switches back; never a rebase. A conflict stops on that branch, names the files and leaves the rest untouched; a run without the user merges nothing.
 - **Small fixes.** `small-fix` lists a change with no design choice under `## Small fixes` in `design.md`; go-ahead copies the list with the design, with no ADR.
 - Design snapshots `design-order-notes-fixes`, `design-branch-behind` and `design-linked-behind` (snapshot-check steps may now run `git`), and `scripts/tests/test_kit_1189.py`.
-
-## 1.188.0 (2026-11-18)
-
-Changing a design topic's goal and building one topic on another, for `/crav1-design-architecture`.
-
-- **`change-goal` changes a topic's goal in place.** `design_run.py change-goal --topic <t> --input <json> --reason "<why>"` returns the old and the new goal, the change lines and the decisions it would flag, and writes nothing; the agent shows them on a card. With `--yes` it rewrites `goal.md` (ask, end goal, drivers, constraints, criteria and a `## Decisions` order) and logs the date, the reason and each change under `## Goal changes`. Decisions can be added, dropped, renamed or reordered. A dropped decision stays in the design, marked `dropped` with its reason, and review no longer lists it as missing. A settled or leaning decision that is renamed, listed under `reopen`, or whose title, lean, recommendation or draft ADR outcome names a word from a removed constraint, criterion or driver is marked reopened, and `resume` continues there in the goal's order. Open questions and leans on the other decisions stay. A run without the user is refused. Step 0 routes a new goal for an existing topic here instead of recreating the topic.
-- **Linked topics.** `create --topic <t> --builds-on <base>` records `Builds on: <base>` and lists the base topic's settled decisions under `## Fixed from the base topic`. The design branch is cut from `design/<base>` (`git switch design/<base>`, `git switch -c design/<t>`), and base updates come in with `git merge design/<base>`, never a rebase. `resume` re-reads the base and names the decisions it settled or reopened since the last run. Settling or adding a base decision in the linked topic is refused; the new `revisit --topic <t> --decision "<words>" --reason "<why>"` marks it reopened in the base topic and ends with Run next on the base. `status` shows links both ways. `go-ahead` on a linked topic waits until the base design is under `## Decided, not built yet` or `## Confirmed` in `docs/architecture/spec.md` on main (or `--base-merged` after the user confirms); the refusal is a Run next with a Waiting line naming the base topic's design pull request. The copied block says `Builds on: topic <base>`.
-- `scripts/snapshot-check.py` runs design snapshots (`design-spec/` plus `steps.json`): `design-goal-change` and `design-linked-topics`, and `scripts/tests/test_kit_1188.py`.
 
 The newest 15 releases are above. The full changelog is https://github.com/Crav1on/crav1-spec-kit/blob/main/CHANGELOG.md.

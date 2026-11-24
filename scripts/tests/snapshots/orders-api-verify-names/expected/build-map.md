@@ -25,8 +25,8 @@ flowchart LR
   classDef todo fill:#1e3a8a,stroke:#60a5fa,stroke-width:2px,color:#eff6ff
   classDef done fill:#14532d,stroke:#4ade80,stroke-width:2px,color:#f0fdf4
   class key3 blocked
-  class key2 waiting
-  class b2,key4 todo
+  class b2,key2 waiting
+  class key4 todo
   class b1,key1 done
   style w1 fill:transparent,stroke:#94a3b8,stroke-width:1px,color:#cbd5e1
   style w2 fill:transparent,stroke:#94a3b8,stroke-width:1px,color:#cbd5e1
@@ -63,4 +63,4 @@ An arrow means the later branch waits for the earlier one.
 - Waits for:
   - feat/orders-table
 - Question: none
-- Ready now: in progress
+- Ready now: waits for PR 6 to merge

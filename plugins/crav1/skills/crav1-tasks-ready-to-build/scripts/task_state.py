@@ -397,6 +397,45 @@ def walk_starts(root, user: str | None = None) -> dict:
     return {f"T{int(task['id'])}": _walk_start(root, task, states, claims, user) for task in parsed}
 
 
+def _open_after_pr(root, task: dict):
+    """The first pull request this task waits on that the host has not merged (1.201.1)."""
+    import os
+    numbers = []
+    for number in task.get("after_prs") or ():
+        try:
+            value = int(number)
+        except (TypeError, ValueError):
+            continue
+        if value not in numbers:
+            numbers.append(value)
+    if not numbers:
+        return None
+    if os.environ.get("CRAV1_NO_HOST_LOOKUP"):
+        return numbers[0]
+    try:
+        merged = _walk_progress()._host_merged
+    except Exception:  # noqa: BLE001 - a host miss leaves the task held
+        return numbers[0]
+    for number in numbers:
+        if not merged(root, number):
+            return number
+    return None
+
+
+_WALK_PROGRESS = None
+
+
+def _walk_progress():
+    global _WALK_PROGRESS
+    if _WALK_PROGRESS is None:
+        path = Path(__file__).resolve().parents[1].parent / "crav1-tighten-and-plan-ready-to-build/scripts/walk_progress.py"
+        spec = importlib.util.spec_from_file_location("task_state_walk_progress", path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        _WALK_PROGRESS = module
+    return _WALK_PROGRESS
+
+
 def walk_start(root, task: str, user: str | None = None) -> dict:
     """Can `/crav1-build-walk <slug> <task>` start this task now? (1.186.0)
 
@@ -457,6 +496,12 @@ def _walk_start(root: Path, task: dict, states: dict, claims: list[dict], user: 
     if open_deps:
         return {**out, "startable": False, "phase": "held", "waits_on": open_deps,
                 "reason": f"{token} waits on {', '.join(open_deps)}."}
+    # 1.201.1: `(after: PR N)` or `after PR N merges` holds the walk until the
+    # host says that pull request merged. The same phrase as the ready check.
+    held_pr = _open_after_pr(root, task)
+    if held_pr:
+        return {**out, "startable": False, "phase": "held", "pr": held_pr,
+                "reason": f"waits for PR {held_pr} to merge."}
     return {**out, "startable": True, "phase": "build", "reason": f"{token} can start on {branch or 'its branch'}.",
             "claim_needed": claim is None,
             "header_needed": bool(header["exists"]) and token not in header["listed"]}

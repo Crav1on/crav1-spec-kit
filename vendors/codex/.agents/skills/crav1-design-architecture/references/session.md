@@ -11,6 +11,10 @@ A status line, where the user is, what is waiting and on whom, uncommitted files
 - Every decision settled: write stages, edit the proposal, review go-ahead, then park.
 - Parked or ended: the same screen from the files. The come-back command is `$crav1-design-architecture <topic>`, never a `resume` word.
 
+## Screen shape (1.201.1)
+
+`Run next` comes first, with one reason line, then the status. A topic whose `goal.md` is on `design/<topic>` while this checkout is another branch gets the switch card. `resume --json` leaves Status as it is, including parked. A source that changed still marks that one decision reopened. Waiting lines name each person once, with the date recorded on the question, and stay near 120 characters. When every open decision is `to-question` or `to-research`, Run next names the open-questions command and the proposal. A parked screen has no Park command. An ended screen has one command, `reopen`. Proposal pages include dated files under `docs/architecture/proposals/` whose path or opening text names the topic.
+
 ## While it is open
 
 The session stays open until the user parks or ends it. A decision, an ending or a commit does not close it. Free-form requests (edit the proposal, explain, compare, draft) stay inside the session: one question per card, nothing settled without a `choose-*` word, files only in the topic folder. Say the status line on every turn.

@@ -6,3 +6,4 @@ Sandbox only. Copied to the architecture spec at go-ahead when still open.
 
 - May prod use the new queue (person A decides)
   - Kind: question
+  - Asked: YYYY-MM-DD

@@ -17,10 +17,10 @@ Ask the PR owners to merge, in this order:
 - Person A: PR 11
 
 Held:
-- `feat/orders-store` (wave 1):
-  - T1 Store a retried order once — waits for PR 11 to merge
 - `feat/orders-cicd` (wave 2):
   - T3 Add the build pipeline — waits on T2
+- `feat/orders-store` (wave 1):
+  - T1 Store a retried order once — waits for PR 11 to merge
 
 Merge deadlock: T2 is on feat/orders-store and waits on T1, which ticks only when PR 11 merges.
 Merge these PRs, in this order:

@@ -114,6 +114,10 @@ When the code repo's local base branch is behind origin, the walk asks `Your loc
 
 `$crav1-build-walk` labels each Run next entry by the step the branch is on, such as `Merge PR 71 for T5:` or `Check PR 71's merge for T5:`, with short task names. It checks whether the branch is really behind its base before it says so, moves on after a `nothing-to-do` step, and leaves release-gated tasks out of its ending; a manual task with no branch is listed on its own. `progress record --step build,verify --pr 71` records several steps and the PR in one call. One yes opens the pull request, and `Not yet` on the merge card also commits and pushes the walk's specs files. When a newer kit release is out it says `Kit update available: 1.197.0 -> 1.198.0` once, with `$crav1-update-kit` in Run next.
 
+## 1.201.1 changes
+
+A task name is the outcome after a `` `fix/x` from `develop` `` clause. Parenthesised marks such as `(manual, secret, TEST, after person A's heads-up)` are dropped, so the label and the progress file's Tasks line stay the outcome. `claims.py add` prints the claim and leaves `claims.md` unchanged until the same command is run with `--yes`. A second start on the same claim keeps the original since time. A `--text` readiness read that does not pass `--write-map` does not add a `PR author` line. Claude Code sends one question per question-tool call. A task that waits on another pull request, `(after: PR 87)` or `after PR 87 merges`, stays held until the host says that pull request is merged. The walk ending says `waits for PR 87 to merge`, the same line as the ready check and the build map.
+
 ## 1.199.0 changes
 
 Two branches that share one plan step no longer print the same description; each describes itself from its task names. The merge card names a deploy or pipeline side effect only when `pipeline_trigger.py check --repo <code checkout> --branch <base>` in `crav1-merge-pr` finds a pipeline file whose trigger covers the base, and then only as a trigger, never that a deploy starts. `$crav1-open-pr` stops after one host read when the pull request is someone else's and up to date.

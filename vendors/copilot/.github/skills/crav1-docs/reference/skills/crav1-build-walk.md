@@ -62,6 +62,8 @@ A task that needs code from an unmerged branch is cut from that branch. The prog
 
 1.187.0: the task name in the lead, the ending under Run next and the yes card stops at the first verify item (`; integration —`, `; contract —`, `; system —`, `; unit —`, `(verify: ...`), so a task line with its checks shows only its name, such as `Build T8 PR 12 takes in develop after PR 10 merges, with the conflicts resolved on feat/orders-api:`. The one helper is `task_order.task_name`.
 
+1.201.1: the same helper drops a leading `` `fix/x` from `develop` `` clause and parenthesised marks such as `(manual, secret, …)`, so the label and the Tasks line are the outcome. `claims.py add` prints the line and leaves `claims.md` unchanged until `--yes`. A second start on the same claim keeps the original since time. `progress start-task` does not pass a new since, so the time stays. A task that says `(after: PR 87)` or `after PR 87 merges` stays held until the host says PR 87 is merged, and the walk ending says `waits for PR 87 to merge`.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.

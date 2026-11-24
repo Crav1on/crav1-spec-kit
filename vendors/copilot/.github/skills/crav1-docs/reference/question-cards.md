@@ -46,7 +46,7 @@ Every card the kit asks follows these seven rules.
 4. **Background goes before the card**, in one short sentence, never inside the question. For example `PR 71 on feat/orders-cicd is person A's.`, then the card.
 5. **Fewer cards.** Questions in a row that you would always answer together are one card, for example commit and push the walk's files. Never ask again for a yes that is already on record.
 6. **Plain Waiting lines.** A Waiting line names who or what, and why: `Waiting for person A to approve T7`, not `needs_yes T7`.
-7. **One question, written once (1.190.0).** A card asks one question; a second question gets its own card. An option is written as meant: never one that corrects itself mid-sentence (`... no: on ...`, `... I mean ...`, `... actually ...`, `... or rather ...`). Rewrite it before the card is shown.
+7. **One question, written once (1.190.0).** A card asks one question; a second question gets its own card. Claude Code's question tool accepts several questions in one call; send one question per call, matching this rule (1.201.1). An option is written as meant: never one that corrects itself mid-sentence (`... no: on ...`, `... I mean ...`, `... actually ...`, `... or rather ...`). Rewrite it before the card is shown.
 
 The rules above still hold: no `Edits` option, typed changes go in the free-text answer, a missing word is asked again, and the merge card names the pull request.
 

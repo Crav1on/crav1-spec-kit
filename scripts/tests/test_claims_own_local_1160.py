@@ -75,7 +75,7 @@ class LocalTimeTests(unittest.TestCase):
 
     def test_add_writes_local_time_without_microseconds(self):
         code, payload, err = run_env(CLAIMS, [
-            "add", "--root", str(self.root), "--branch", "feat/orders-api-host-setup",
+            "add", "--yes", "--root", str(self.root), "--branch", "feat/orders-api-host-setup",
             "--tasks", "T2", "--user", "person A",
         ], tz="Europe/Stockholm")
         self.assertEqual(code, 0, err)
@@ -90,7 +90,7 @@ class OwnClaimTests(unittest.TestCase):
         self.tmp = Path(tempfile.mkdtemp())
         self.root = base.write_slice(self.tmp)
         code, _, err = base.run_py(CLAIMS, [
-            "add", "--root", str(self.root), "--branch", "feat/orders-api-host-setup",
+            "add", "--yes", "--root", str(self.root), "--branch", "feat/orders-api-host-setup",
             "--tasks", "T2", "--user", "person A", "--since", "2026-11-13T15:50:00+01:00",
         ])
         self.assertEqual(code, 0, err)
