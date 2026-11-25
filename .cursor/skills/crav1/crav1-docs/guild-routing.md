@@ -194,4 +194,4 @@ cross_cutting:
   subagents: []
 ```
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.203.0/docs/guild-routing.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.204.0/docs/guild-routing.md

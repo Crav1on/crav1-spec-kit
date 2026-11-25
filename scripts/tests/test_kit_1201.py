@@ -133,7 +133,7 @@ class Table(unittest.TestCase):
         self.assertEqual(data["vendors"]["codex"]["prefix"], "$")
         self.assertTrue(data["vendors"]["cursor"]["install"])
         self.assertTrue(data["vendors"]["claude"]["install"])
-        self.assertFalse(data["vendors"]["codex"]["install"])
+        self.assertTrue(data["vendors"]["codex"]["install"])
         self.assertFalse(data["vendors"]["copilot"]["install"])
         self.assertEqual(data["vendors"]["cursor"]["marker"], kit.CURSOR_DROPIN_MARKER)
         self.assertEqual(data["vendors"]["claude"]["marker"], kit.CLAUDE_DROPIN_MARKER)
@@ -159,7 +159,11 @@ class Table(unittest.TestCase):
             hosts = {"cursor", "claude"}
             for tree in (old, new, proj):
                 self.assertEqual(kit.collect_kit(tree, hosts), kit._legacy_collect_kit(tree, hosts))
-            self.assertEqual(kit.collect_kit(proj, {"codex", "copilot"}), {})
+            self.assertEqual(kit.collect_kit(proj, {"copilot"}), {})
+            self.assertEqual(
+                set(kit.collect_kit(proj, {"codex"})),
+                {".agents/skills/crav1-help/SKILL.md"},
+            )
         finally:
             shutil.rmtree(base, ignore_errors=True)
 
@@ -173,14 +177,28 @@ class GoldenPlanApply(unittest.TestCase):
             plan = run_kit(["plan", *common, "--to-version", "1.201.0"])
             plan_vendor = run_kit(["plan", *common, "--to-version", "1.201.0", "--vendor", "codex"])
             self.assertEqual(plan.returncode, 0, plan.stderr)
-            self.assertEqual(plan.stdout, (GOLDEN / "kit-1200-plan.json").read_text(encoding="utf-8"))
             self.assertEqual(plan_vendor.stdout, plan.stdout)
+            got = json.loads(plan.stdout)
+            want = json.loads((GOLDEN / "kit-1200-plan.json").read_text(encoding="utf-8"))
+            self.assertEqual(got.pop("vendors_from"), "inferred")
+            self.assertIn(".crav1/kit.json", got["files"]["add"])
+            got["files"]["add"].remove(".crav1/kit.json")
+            self.assertEqual(got, want)
+            self.assertFalse(any(path.startswith(".agents/") for paths in got["files"].values() for path in (
+                [item["path"] for item in paths] if paths and isinstance(paths[0], dict) else paths
+            )))
             spec = (proj / "docs/specs/orders-api/spec.md").read_bytes()
             readme = (proj / "README.md").read_bytes()
             handmade = (proj / ".agents/skills/crav1-help/SKILL.md").read_bytes()
             apply = run_kit(["apply", *common, "--yes", "--keep", ".claude/CLAUDE.md"])
             self.assertEqual(apply.returncode, 0, apply.stderr)
-            self.assertEqual(apply.stdout, (GOLDEN / "kit-1200-apply.json").read_text(encoding="utf-8"))
+            applied = json.loads(apply.stdout)
+            want_apply = json.loads((GOLDEN / "kit-1200-apply.json").read_text(encoding="utf-8"))
+            self.assertIn(".crav1/kit.json", applied["touched"])
+            applied["touched"].remove(".crav1/kit.json")
+            self.assertEqual(applied, want_apply)
+            listed = json.loads((proj / ".crav1/kit.json").read_text(encoding="utf-8"))
+            self.assertEqual(listed["vendors"], ["claude", "cursor"])
             self.assertEqual((proj / "docs/specs/orders-api/spec.md").read_bytes(), spec)
             self.assertEqual((proj / "README.md").read_bytes(), readme)
             self.assertEqual((proj / ".agents/skills/crav1-help/SKILL.md").read_bytes(), handmade)
@@ -220,33 +238,37 @@ class VendorsCommand(unittest.TestCase):
             self.assertEqual(detect.returncode, 0, detect.stderr)
             info = json.loads(detect.stdout)
             self.assertEqual(info["vendors"], ["claude", "cursor"])
+            self.assertEqual(info["vendors_from"], "inferred")
             self.assertEqual(info["mode"], "drop-in")
         finally:
             shutil.rmtree(base, ignore_errors=True)
 
-    def test_add_writes_nothing(self):
+    def test_copilot_add_writes_nothing(self):
         base = Path(tempfile.mkdtemp())
         try:
             root = base / "proj"
             write(root / "README.md", "project\n")
             write(root / ".agents/skills/crav1-help/SKILL.md", "hand made\n")
-            plan = run_kit(["plan", "--add", "codex", "--root", str(root)])
+            before = (root / ".agents/skills/crav1-help/SKILL.md").read_bytes()
+            plan = run_kit(["plan", "--add", "copilot", "--root", str(root)])
             self.assertEqual(plan.returncode, 0, plan.stderr)
             body = json.loads(plan.stdout)
             self.assertTrue(body["project_untouched"])
             self.assertEqual(body["vendors"][0]["added"], [])
             self.assertIn("not installed by this release", body["vendors"][0]["note"])
-            self.assertEqual((root / ".agents/skills/crav1-help/SKILL.md").read_text(encoding="utf-8"), "hand made\n")
-            refused = run_kit(["apply", "--add", "codex", "--root", str(root)])
+            self.assertEqual(body["kit_json_op"], "unchanged")
+            refused = run_kit(["apply", "--add", "copilot", "--root", str(root)])
             self.assertEqual(refused.returncode, 2)
             self.assertIn("yes", refused.stderr)
-            applied = run_kit(["apply", "--add", "codex", "--add", "copilot", "--yes", "--root", str(root)])
+            applied = run_kit(["apply", "--add", "copilot", "--yes", "--root", str(root)])
             self.assertEqual(applied.returncode, 0, applied.stderr)
             done = json.loads(applied.stdout)
             self.assertEqual(done["touched"], [])
             self.assertTrue(done["project_untouched"])
             self.assertEqual((root / "README.md").read_text(encoding="utf-8"), "project\n")
+            self.assertEqual((root / ".agents/skills/crav1-help/SKILL.md").read_bytes(), before)
             self.assertFalse((root / ".github").exists())
+            self.assertFalse((root / ".crav1/kit.json").exists())
             unknown = run_kit(["plan", "--add", "nope", "--root", str(root)])
             self.assertEqual(unknown.returncode, 2)
             self.assertIn("not a vendor", unknown.stderr)

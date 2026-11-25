@@ -68,4 +68,4 @@ runs by itself: Calls no skill. It may name `/crav1-tighten-spec`, `/crav1-plan-
 you run next: /crav1-tighten-spec; /crav1-plan-from-spec; /crav1-add-to-spec; /crav1-show-or-ask-open-questions
 first: `/crav1-design-architecture orders should retry failed payments without blocking checkout`
 walkthrough: from-design-architecture.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.203.0/docs/reference/skills/crav1-design-architecture.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.204.0/docs/reference/skills/crav1-design-architecture.md

@@ -78,4 +78,4 @@ One to four items get one question each; more than four always get one batch car
 
 Reference page: [add-to-spec](reference/skills/crav1-add-to-spec.md)
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.203.0/docs/from-add-to-spec-meeting.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.204.0/docs/from-add-to-spec-meeting.md

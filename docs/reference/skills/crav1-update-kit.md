@@ -8,6 +8,8 @@
 
 Update the installed kit on the current branch to a published release.
 
+1.204.0: Codex is installed. `.crav1/kit.json` lists the vendors. A missing file is inferred from marker files and written in the same yes. `add codex` copies `vendors/codex/` into `.agents/skills/` and does not upgrade the other vendors. `remove codex` deletes kit-owned files that still match the release; a local edit is a clash (`keep` or `take`); other files stay. `detect` adds `vendors_from`. The project `AGENTS.md` is never written. Copilot is not installed by this release.
+
 1.201.0: `vendors.json` lists each host: the folders the kit owns, the frontmatter a skill needs, the command prefix, and extra files. Cursor and Claude Code reproduce the 1.200 allow-list. Codex and Copilot are rows and are not installed. `detect` reports `vendors`. `vendors --root .` lists each folder and skill count and writes nothing. `--vendor codex` prints `$crav1-` on a Run next script; the default prefix stays `/`.
 
 1.178.0: a stale commit-style rule is written, removed and committed by the kit itself instead of being refused as a project file; a stale rule whose asset is gone from the new release is listed under `delete`. The run ends `Run next: nothing needed now.`, never a `Next:` line.
@@ -40,17 +42,17 @@ Prompt budget: 2 (the most prompts in one run, the closing yes included). A prom
 
 In short: The installed version, the published release tags, and the kit files on this branch.
 
-Reads `plugin.json` or the `Kit version:` line, the published `vX.Y.Z` tags, the old release, the new release, `vendors.json`, and the working tree. It does not read a branch or an open pull request as a target.
+Reads `plugin.json` or the `Kit version:` line, the published `vX.Y.Z` tags, the old release, the new release, `vendors.json`, `.crav1/kit.json` when it exists, and the working tree. It does not read a branch or an open pull request as a target.
 
 ## Writes
 
-In short: Kit-owned files on this branch, a copied template that still matches the old release apart from line endings, an optional migration after a separate yes, and one local commit.
+In short: Kit-owned files on this branch, `.crav1/kit.json`, the Codex tree when Codex is selected, a copied template that still matches the old release apart from line endings, an optional migration after a separate yes, and one local commit.
 
-Writes kit-owned files on the current branch after a yes, replaces a copied template that still matches the old release apart from line endings, and commits `Update CRAV1 kit vA to vB` when the user chose the commit. A migration listed for the jump is dry-run and written only on its own yes, and is left unstaged.
+Writes kit-owned files on the current branch after a yes, including the Codex tree under `.agents/skills/` when Codex is selected, writes `.crav1/kit.json`, replaces a copied template that still matches the old release apart from line endings, and commits `Update CRAV1 kit vA to vB` when the user chose the commit. `add codex` commits `Add CRAV1 kit vendor codex vX.Y.Z`. `remove codex` commits `Remove CRAV1 kit vendor codex vX.Y.Z`. A migration listed for the jump is dry-run and written only on its own yes, and is left unstaged.
 
 ## Does not
 
-Leaves specs, `walk-progress.md`, `build-progress/`, plans, tasks, notes, playbooks, the build map, persist rules (except a stale commit-style rule, 1.176.0), the transfer data policy, and `kit-maintainer.mdc` alone. A hand-made `.agents/` or `.github/skills/` tree is a project file. Does not switch branches, rebase, or push. A plugin install gets no kit commit. This release does not install Codex or Copilot.
+Leaves specs, `walk-progress.md`, `build-progress/`, plans, tasks, notes, playbooks, the build map, persist rules (except a stale commit-style rule, 1.176.0), the transfer data policy, `kit-maintainer.mdc`, and the project's `AGENTS.md` alone. A skill folder that does not start with `crav1-` stays a project file. Copilot is not installed by this release. Does not switch branches, rebase, or push. A plugin install gets no kit commit.
 
 Limits and exceptions: a target that is not a published release tag stops in one line. A clash is not overwritten. An edited template is listed and left. The kit source checkout is refused. An agent's yes does not write, commit, or push.
 

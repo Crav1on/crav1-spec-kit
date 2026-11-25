@@ -215,4 +215,4 @@ the ready check offers `/crav1-build-walk <slug> T#` only when the walk can star
 
 the ready check and the build map name a task by its text up to the first verify item (`; integration —`, `; contract —`, `; system —`, `; unit —`, or a `(verify: ...)` block), so the checks no longer show in the open-task list or under Run next.
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.203.0/docs/from-tasks-ready-to-build.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.204.0/docs/from-tasks-ready-to-build.md

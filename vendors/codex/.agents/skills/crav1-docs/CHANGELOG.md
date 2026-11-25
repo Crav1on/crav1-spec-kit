@@ -2,6 +2,17 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.204.0 (2026-11-25)
+
+Codex installs into a consumer project. Copilot stays generated and is not installed.
+
+- **Codex.** `$crav1-update-kit add codex` copies `vendors/codex/` into `.agents/skills/`, including `agents/openai.yaml` on each command-only skill. Commands in that copy are `$crav1-`. Each skill's first line reads `../crav1-docs/reference/kit-rules.md`. The project's `AGENTS.md` is not written.
+- **Vendor list.** `.crav1/kit.json` holds `schema` 1 and the vendor names. The installer writes it. `add` and `remove` change it. A missing file is inferred from the marker files, and the same yes writes it. `detect` reports `vendors_from` as `kit.json` or `inferred`. An unknown name is refused.
+- **Remove.** `$crav1-update-kit remove codex` deletes kit-owned files that still match the installed release. A local edit is a clash, with the same `keep` or `take` as any other tree. A file the release does not contain stays. Other vendors' folders stay.
+- **Plan.** Counts come first, then at most 10 sample paths, and every clash. A second apply that finds the same files changes nothing. A normal update of Cursor and Claude Code does not write Codex when Codex is not listed.
+
+Docs and tests: install, update-kit walkthrough, glossary, data layout, and `scripts/tests/test_kit_1204.py`.
+
 ## 1.203.0 (2026-11-24)
 
 The installed docs bundle is a compact edition for the kit's skills. The human pages stay in `docs/`.
@@ -179,22 +190,5 @@ A new cross-cutting skill, `$crav1-explain-tech`, explains one technology tied t
 
 - **Default branch, not origin/main.** The design branch check, the kit-behind check and the go-ahead base check resolve the repo's default branch once per run: `origin/HEAD`, else `origin/main`, then `origin/master`. With none, the check is skipped with a reason (`skipped`) and never fails. The merge card, its Run next (`Merge master into the design branch:`), the kit warning and the go-ahead ending (`gh pr create --base <branch>`) name that branch; never a rebase.
 - `scripts/tests/test_kit_1191.py` (master default, origin/HEAD unset fallback, no default branch); the `design-branch-behind` snapshot now shows `default_branch`.
-
-## 1.190.0 (2026-11-18)
-
-Fixes for `$crav1-design-architecture` and `$crav1-update-kit` from a live design session.
-
-- **Decision order on each decision.** `design.md` stores decisions by title, so parallel adds do not conflict, and each decision carries `Order: N` for the index line and resume (ties by title). The goal's decision list is built from those numbers and no longer stored in `goal.md`. `create`, `add-decision` and `change-goal` write the numbers; older files get them on read from their list position (or the old goal list).
-- **Wrong branch.** A move on another branch, when the topic lives on `design/<topic>`, offers a yes card; the new `switch-branch --topic <t> --yes` switches itself and refuses, naming the paths, when the working tree is dirty.
-- **Saved goal files.** `resume` lists goal files in the topic's `inputs/` that `goal.md` does not record under `## Applied inputs` and offers `change-goal` on a card. The skill never offers to recreate an existing topic.
-- **Card wording.** kit-lint flags a card with two questions and an option that corrects itself mid-sentence (`no:`, `I mean`, `actually`, `or rather`); the rule is in the question cards reference.
-- **Kit version check.** `resume` and `create` return `kit_check` when the stated kit version and the skill's files differ and offer `$crav1-update-kit`; the session never states a version it did not read. When the design branch's kit is behind origin/main's, `resume` writes nothing and offers the merge card first.
-- **Update kit fetch.** `fetch` clones into a short temp folder by default, with `core.longpaths=true` and `core.autocrlf=false`, and refuses an incomplete checkout (git status not clean) before any plan.
-- **Update kit ending.** The new `ending` move tells the user to reload the window after an update and names `$crav1-design-architecture resume <topic>` for open design topics.
-- **Scratch input.** Ending state and lean, settle, stage and compare drafts go in the session's temp folder; those moves refuse input from `inputs/`, which holds only the user's saved goal files. Topics from before 1.189.0 get `inputs/` on the first save.
-- **Uncommitted as a count.** The ending prints `Uncommitted: N files.`; `true` is counted from git status of the topic folder and text is refused.
-- **Commit before the ending.** The new `commit --topic <t> --yes` commits the topic folder after the user's yes; the flow offers it before the ending, and `create --builds-on` refuses while the base topic has uncommitted files.
-- **Linked topic route.** `$crav1-design-architecture builds-on <base> <idea>` routes to a linked create, and the ending prints that command; a test checks that every Run next command the script prints routes.
-- Design snapshot `design-order-branch-commit` and `scripts/tests/test_kit_1190.py`.
 
 The newest 15 releases are above. The full changelog is https://github.com/Crav1on/crav1-spec-kit/blob/main/CHANGELOG.md.

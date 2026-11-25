@@ -2,6 +2,17 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.204.0 (2026-11-25)
+
+Codex installs into a consumer project. Copilot stays generated and is not installed.
+
+- **Codex.** `/crav1-update-kit add codex` copies `vendors/codex/` into `.agents/skills/`, including `agents/openai.yaml` on each command-only skill. Commands in that copy are `$crav1-`. Each skill's first line reads `../crav1-docs/reference/kit-rules.md`. The project's `AGENTS.md` is not written.
+- **Vendor list.** `.crav1/kit.json` holds `schema` 1 and the vendor names. The installer writes it. `add` and `remove` change it. A missing file is inferred from the marker files, and the same yes writes it. `detect` reports `vendors_from` as `kit.json` or `inferred`. An unknown name is refused.
+- **Remove.** `/crav1-update-kit remove codex` deletes kit-owned files that still match the installed release. A local edit is a clash, with the same `keep` or `take` as any other tree. A file the release does not contain stays. Other vendors' folders stay.
+- **Plan.** Counts come first, then at most 10 sample paths, and every clash. A second apply that finds the same files changes nothing. A normal update of Cursor and Claude Code does not write Codex when Codex is not listed.
+
+Docs and tests: install, update-kit walkthrough, glossary, data layout, and `scripts/tests/test_kit_1204.py`.
+
 ## 1.203.0 (2026-11-24)
 
 The installed docs bundle is a compact edition for the kit's skills. The human pages stay in `docs/`.

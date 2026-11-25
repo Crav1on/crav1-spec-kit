@@ -8,7 +8,7 @@ description: >-
 license: MIT
 metadata:
   crav1-vendor: codex
-  crav1-version: 1.203.0
+  crav1-version: 1.204.0
 ---
 
 Read `../crav1-docs/reference/kit-rules.md` first.

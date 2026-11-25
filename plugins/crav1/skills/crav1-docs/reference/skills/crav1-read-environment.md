@@ -31,4 +31,4 @@ runs by itself: Opens `/crav1-refresh-system-notes`, `/crav1-existing-to-specs`,
 you run next: /crav1-finalize-commit
 first: `/crav1-read-environment Azure. List every non-prod environment. A prod-only resource is shape and connections only, after one yes. Do not guess the host.`
 walkthrough: from-read-environment.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.203.0/docs/reference/skills/crav1-read-environment.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.204.0/docs/reference/skills/crav1-read-environment.md

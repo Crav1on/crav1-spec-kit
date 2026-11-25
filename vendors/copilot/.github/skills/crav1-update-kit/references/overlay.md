@@ -8,7 +8,7 @@ Plan with `--old` and `--new` pointing at those trees. Show the heads-up card. O
 
 ## What is replaced
 
-Kit-owned paths only, for a host whose drop-in is already in the project. Do not create the other host's tree. The script's allow-list is the source of truth:
+Kit-owned paths only, for each vendor in `.crav1/kit.json`. When that file is missing, the vendors are the ones whose marker files are present, and the same yes writes the file. A normal update does not create a vendor that is not selected. `add` and `remove` are [vendors.md](vendors.md). The script's allow-list is the source of truth:
 
 - the `crav1` skill tree, including bundled `crav1-docs`
 - agent files whose names start with `crav1-`

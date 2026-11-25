@@ -70,4 +70,4 @@ runs by itself: Inside each worker: Calls `/crav1-create-feature-branch` before 
 you run next: /crav1-open-pr; /crav1-verify-build-against-spec; /crav1-finalize-commit
 first: `/crav1-build-tasks @docs/specs/<slug>/`
 walkthrough: from-plan-to-build.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.203.0/docs/reference/skills/crav1-build-tasks.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.204.0/docs/reference/skills/crav1-build-tasks.md

@@ -283,6 +283,9 @@ def add_vendors(worktree: Path, kit: Path, names: list[str]) -> list[str]:
             f"added: {len(item.get('added') or [])}, merged: {len(item.get('merged') or [])}, clash: {len(item.get('clash') or [])}",
             f"project_untouched: {str(untouched).lower() if untouched is not None else 'unknown'}",
         ]
+        if isinstance(plan, dict) and plan.get("kit_json_op") and plan.get("kit_json_op") != "unchanged":
+            after = plan.get("vendors_after") if isinstance(plan.get("vendors_after"), list) else []
+            lines.append("kit.json: " + plan["kit_json_op"] + (" -> " + ", ".join(after) if after else ""))
         if item.get("note"):
             lines.append(str(item["note"]))
         if code != 0:

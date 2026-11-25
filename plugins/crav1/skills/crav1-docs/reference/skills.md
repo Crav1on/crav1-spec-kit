@@ -92,4 +92,4 @@ Starters: /crav1-spark-to-spec, /crav1-ideas-to-spec, /crav1-bundle-to-specs, /c
 - crav1-build-task-agent | build | One `T#` from implement to commit, in isolation. | reads: One `T#` (`spec.md`, `plan.md`, `tasks.md`). | writes: That task's code, `tasks.md`, `verify.md`, `fix-log.md` when a fix runs, and the commits | leaves alone: `spec.md`, other `T#`s, push, and the pull request.
 - crav1-bundle-slice-agent | specify | One v0 feature slug after the intake map. | reads: `docs/system/` and what the parent passes for that slug. | writes: `docs/specs/<slug>/` only | leaves alone: `docs/system/`, `work-item.md`, code, and every other slug.
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.203.0/docs/reference/skills.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.204.0/docs/reference/skills.md
