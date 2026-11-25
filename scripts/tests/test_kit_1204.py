@@ -72,6 +72,8 @@ def project(base: Path) -> Path:
 
 def git_init(root: Path) -> None:
     subprocess.run([*G, "init", "-q", str(root)], check=True)
+    subprocess.run(["git", "config", "user.email", "a@example.com"], cwd=root, check=True)
+    subprocess.run(["git", "config", "user.name", "person A"], cwd=root, check=True)
     subprocess.run([*G, "-C", str(root), "add", "-A"], check=True)
     subprocess.run([*G, "-C", str(root), "commit", "-qm", "start"], check=True)
 
