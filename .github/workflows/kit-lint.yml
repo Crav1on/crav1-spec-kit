@@ -14,6 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install PyYAML
+        run: python3 -m pip install --quiet pyyaml
       - name: Skill links, front matter, skills.yaml, skill copies
         run: python3 scripts/kit-lint.py .
       - name: Unit tests (task-order sort, report routing)

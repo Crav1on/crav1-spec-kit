@@ -9,16 +9,11 @@ python3 "$ROOT/scripts/gen-template-copies.py"
 
 mkdir -p "$PLUGIN/skills" "$PLUGIN/agents" "$PLUGIN/rules" "$PLUGIN/agent-assets"
 
-# docs: every install carries this release's docs next to the skills, so
-# /crav1-help answers locally for that exact version. Cursor drop-in:
-# .cursor/skills/crav1/crav1-docs/; the plugin mirror and the Claude Code
-# drop-in (.claude/skills/crav1-docs/) copy it from there. CI fails on drift.
-rm -rf "$ROOT/.cursor/skills/crav1/crav1-docs"
-mkdir -p "$ROOT/.cursor/skills/crav1/crav1-docs"
-cp -a "$ROOT/docs/." "$ROOT/.cursor/skills/crav1/crav1-docs/"
-# Bundled CHANGELOG is the newest 15 releases so /crav1-help can answer
-# "whats new" locally. The repo-root file stays the full history.
-python3 "$ROOT/scripts/slice-changelog.py" --write "$ROOT/.cursor/skills/crav1/crav1-docs/CHANGELOG.md"
+# docs: the compact edition an install reads. Human pages stay in docs/.
+# Cursor drop-in: .cursor/skills/crav1/crav1-docs/. The plugin mirror and the
+# Claude Code drop-in copy that tree. Also writes repo-root llms.txt.
+# CI fails when a copy or llms.txt drifts.
+python3 "$ROOT/scripts/gen-compact-docs.py"
 rm -rf "$PLUGIN/docs"
 
 # skills: replace tree
@@ -39,7 +34,7 @@ rm -rf "$PLUGIN/agent-assets"
 mkdir -p "$PLUGIN/agent-assets"
 cp -a "$ROOT/.cursor/agent-assets/." "$PLUGIN/agent-assets/"
 
-echo "Synced docs/ → .cursor/skills/crav1/crav1-docs/, and .cursor/ → plugins/crav1/ (skills incl. crav1-docs, agents, crav1.mdc, agent-assets)"
+echo "Wrote compact crav1-docs/ and llms.txt, and synced .cursor/ → plugins/crav1/ (skills incl. crav1-docs, agents, crav1.mdc, agent-assets)"
 
 # Claude Code drop-in is generated. A stale .claude/ fails CI via --check.
 "$ROOT/scripts/sync-crav1-claude.sh"

@@ -64,7 +64,7 @@ Broken skill or install: open a [GitHub Issue](https://github.com/Crav1on/crav1-
 
 ## Further reading
 
-- [Kit repository](https://github.com/Crav1on/crav1-spec-kit) · [Docs index](docs/README.md) · [First 15 minutes](docs/first-run.md) · [Installing and using the kit](docs/install.md) · [Skills reference](docs/reference/skills.md) · [The method](docs/concepts/method.md) · [Guild routing](docs/guild-routing.md) · [Environment marks](docs/environments-marks.md) · [Cursor plugin quick start](plugins/crav1/README.md) · [Changelog](CHANGELOG.md) · [Contributing](CONTRIBUTING.md) · [Support](SUPPORT.md) · [MIT License](LICENSE)
+- [Kit repository](https://github.com/Crav1on/crav1-spec-kit) · [Docs index](docs/README.md) · [First 15 minutes](docs/first-run.md) · [Installing and using the kit](docs/install.md) · [Skills reference](docs/reference/skills.md) · [The method](docs/concepts/method.md) · [Guild routing](docs/guild-routing.md) · [Environment marks](docs/environments-marks.md) · [llms.txt](llms.txt) · [Cursor plugin quick start](plugins/crav1/README.md) · [Changelog](CHANGELOG.md) · [Contributing](CONTRIBUTING.md) · [Support](SUPPORT.md) · [MIT License](LICENSE)
 - [GitHub Spec Kit](https://github.com/github/spec-kit/) · [GitHub Blog on spec-driven development (SDD)](https://github.blog/ai-and-ml/generative-ai/spec-driven-development-with-ai-get-started-with-a-new-open-source-toolkit/)
 - [OpenSpec](https://github.com/Fission-AI/OpenSpec)
 - [MADR (Markdown Architectural Decision Records)](https://adr.github.io/madr/)

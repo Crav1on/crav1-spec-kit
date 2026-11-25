@@ -2,6 +2,18 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.203.0 (2026-11-24)
+
+The installed docs bundle is a compact edition for the kit's skills. The human pages stay in `docs/`.
+
+- **Compact `crav1-docs`.** `scripts/gen-compact-docs.py` writes the bundle from the same sources as the human pages: `skills.yaml` for each skill page, the skills list, and guild routing; `marks.yaml` for the mark lines; the human Markdown for walkthroughs and concepts. Version-led history stamps (`1.123.0:`) are dropped. Commands, choices, writes, thresholds, and card steps stay. Each compact page ends with a `human:` link to the matching page at the installed tag.
+- **Unchanged rule files.** These nine are copied byte for byte: `running-scripts.md`, `run-ending.md`, `question-cards.md`, `open-skill-file.md`, `pr-common.md`, `workflow.md`, `standing-rules.md`, `workflow.yaml`, and `index.yaml`.
+- **Left out of the bundle.** `skills.yaml` and `marks.yaml` (generator sources), and `proposals/`, `specs/`, `system/`, and `notes/` (no skill reads them from the bundle). Paths a skill cites stay.
+- **`llms.txt`.** A repo-root index of the human `docs/` pages for tools outside the kit, generated with the bundle. It is not inside `crav1-docs`.
+- **Plan shift.** The Codex install step in `docs/proposals/multi-vendor.md` moves from 1.203.0 to 1.204.0. Copilot moves to 1.205.0 and the bootstrap install to 1.206.0.
+
+Docs and tests: install, help walkthrough, glossary, data layout, and `scripts/tests/test_compact_docs_1203.py`.
+
 ## 1.202.0 (2026-11-24)
 
 Generated Codex and Copilot trees, plus three ready-check and plan-count fixes. Nothing here is installed.

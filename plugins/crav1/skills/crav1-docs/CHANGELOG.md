@@ -2,6 +2,18 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.203.0 (2026-11-24)
+
+The installed docs bundle is a compact edition for the kit's skills. The human pages stay in `docs/`.
+
+- **Compact `crav1-docs`.** `scripts/gen-compact-docs.py` writes the bundle from the same sources as the human pages: `skills.yaml` for each skill page, the skills list, and guild routing; `marks.yaml` for the mark lines; the human Markdown for walkthroughs and concepts. Version-led history stamps (`1.123.0:`) are dropped. Commands, choices, writes, thresholds, and card steps stay. Each compact page ends with a `human:` link to the matching page at the installed tag.
+- **Unchanged rule files.** These nine are copied byte for byte: `running-scripts.md`, `run-ending.md`, `question-cards.md`, `open-skill-file.md`, `pr-common.md`, `workflow.md`, `standing-rules.md`, `workflow.yaml`, and `index.yaml`.
+- **Left out of the bundle.** `skills.yaml` and `marks.yaml` (generator sources), and `proposals/`, `specs/`, `system/`, and `notes/` (no skill reads them from the bundle). Paths a skill cites stay.
+- **`llms.txt`.** A repo-root index of the human `docs/` pages for tools outside the kit, generated with the bundle. It is not inside `crav1-docs`.
+- **Plan shift.** The Codex install step in `docs/proposals/multi-vendor.md` moves from 1.203.0 to 1.204.0. Copilot moves to 1.205.0 and the bootstrap install to 1.206.0.
+
+Docs and tests: install, help walkthrough, glossary, data layout, and `scripts/tests/test_compact_docs_1203.py`.
+
 ## 1.202.0 (2026-11-24)
 
 Generated Codex and Copilot trees, plus three ready-check and plan-count fixes. Nothing here is installed.
@@ -184,23 +196,5 @@ Fixes for `/crav1-design-architecture` and `/crav1-update-kit` from a live desig
 - **Commit before the ending.** The new `commit --topic <t> --yes` commits the topic folder after the user's yes; the flow offers it before the ending, and `create --builds-on` refuses while the base topic has uncommitted files.
 - **Linked topic route.** `/crav1-design-architecture builds-on <base> <idea>` routes to a linked create, and the ending prints that command; a test checks that every Run next command the script prints routes.
 - Design snapshot `design-order-branch-commit` and `scripts/tests/test_kit_1190.py`.
-
-## 1.189.0 (2026-11-18)
-
-Fixes for `/crav1-design-architecture` from a review of a long live design session.
-
-- **Stored order.** Decisions and open questions keep the order they were added, or the goal's order after `change-goal`, instead of being sorted by title. `resume` takes the first reopened decision, then the first open big decision, then detail decisions.
-- **Endings with lists and true or false.** `ending` prints one `Waiting:` line per item when `waiting` is a list and reads `uncommitted` as a count, a list of paths, `true` (the topic folder) or text, so no raw `['a']` or `True` reaches the user. inputs.md documents each value type.
-- **Lean drivers.** `lean` matches short driver names to the drivers already listed instead of appending duplicates, and keeps the names on the decision as `Drivers:`.
-- **Cards.** At most 4 options and one question per card. Typed input (your idea, a point to discuss, `ask-me`, `to-question`, `to-research`, `skip-for-now`) goes through the free-text Other; no option only says to type. An empty Other is asked again. A `discuss` with no text gets likely talking points, not an open question. kit-lint now checks this skill's cards for option count, type-only options and two questions.
-- **Inputs and notes in the topic folder.** Script input files go in `docs/architecture/designs/<topic>/inputs/`; an input outside the specs repo is refused. The new `note` move (allowed in prepare) appends scans, visions, scope lists and answers to the topic's `notes.md`, and the flow saves open discussion with it before parking.
-- **Scope round.** Framing asks what else the change should cover and orders decisions big shape first, detail last; a detail decision (`"detail": true`) is proposed only after the big ones.
-- **Planned work.** Step 1 reads `plan.md`, `tasks.md` and `build-map.md` of slices the ask touches; planned work is an input, and options name it under `Overlaps`.
-- **Unknown input keys.** `create` and `change-goal` refuse unknown keys and name them; a documented `notes` key is saved with `note`.
-- **Design branches.** `create` creates `design/<topic>` (from `design/<base>` for a linked topic) or refuses with `git switch` when it exists elsewhere. A move on a topic that lives on its design branch, run from another branch, refuses with a Run next naming `git switch design/<topic>`.
-- **Design branch update.** `resume`, `create` on an existing design branch, `fan-out`, `stage`, `go-ahead` and `change-goal` fetch and check whether `design/<topic>` is behind `origin/main`, and a linked topic also behind `design/<base>`, the same way the build walk's `code-behind` checks a code branch. When behind, the result carries a yes or stop card; the new `branch-behind --topic <t> --yes` merges with `git merge --no-ff`, never a rebase. A conflict merges nothing and names the files, and a run without the user never merges. `--no-fetch` compares with local copies.
-- **Base to linked update.** After a committed change to a base topic (settle, lean, `change-goal`, a revisit settled or reopened, go-ahead), the ending lists each linked topic whose `design/<linked>` branch is behind `design/<base>`, and those moves return one yes or stop card for all of them. `linked-behind --topic <base> --yes` switches to each, merges `design/<base>` with `git merge --no-ff`, and switches back; never a rebase. A conflict stops on that branch, names the files and leaves the rest untouched; a run without the user merges nothing.
-- **Small fixes.** `small-fix` lists a change with no design choice under `## Small fixes` in `design.md`; go-ahead copies the list with the design, with no ADR.
-- Design snapshots `design-order-notes-fixes`, `design-branch-behind` and `design-linked-behind` (snapshot-check steps may now run `git`), and `scripts/tests/test_kit_1189.py`.
 
 The newest 15 releases are above. The full changelog is https://github.com/Crav1on/crav1-spec-kit/blob/main/CHANGELOG.md.

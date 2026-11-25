@@ -252,7 +252,7 @@ def generate(cursor: Path, dest: Path) -> None:
     for skill_dir in sorted(p for p in skills_src.iterdir() if p.is_dir() and p.name != DOCS_DIR):
         shutil.copytree(skill_dir, dest / "skills" / skill_dir.name)
     rewrite_tree_files(dest / "skills")
-    # The bundled kit docs are copied verbatim (no path rewrite), so they match docs/.
+    # The compact docs bundle is copied as generated (no path rewrite).
     if (skills_src / DOCS_DIR).is_dir():
         shutil.copytree(skills_src / DOCS_DIR, dest / "skills" / DOCS_DIR)
 
