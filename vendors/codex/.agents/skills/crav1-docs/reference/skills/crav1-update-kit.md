@@ -5,11 +5,16 @@
 lane: cross-cutting | group: Start | starter: no | stage: stable | since: 1.131.0 | prompts: 2
 purpose: Update the installed kit on the current branch to a published release.
 use_when: The installed kit should move to a published release
-reads: Reads `plugin.json` or the `Kit version:` line, the published `vX.Y.Z` tags, the old release, the new release, `vendors.json`, and the working tree. It does not read a branch or an open pull request as a target.
-writes: Writes kit-owned files on the current branch after a yes, replaces a copied template that still matches the old release apart from line endings, and commits `Update CRAV1 kit vA to vB` when the user chose the commit. A migration listed for the jump is dry-run and written only on its own yes, and is left unstaged.
-leaves alone: Leaves specs, `walk-progress.md`, `build-progress/`, plans, tasks, notes, playbooks, the build map, persist rules (except a stale commit-style rule, 1.176.0), the transfer data policy, and `kit-maintainer.mdc` alone. A hand-made `.agents/` or `.github/skills/` tree is a project file. Does not switch branches, rebase, or push. A plugin install gets no kit commit. This release does not install Codex or Copilot.
+reads: Reads `plugin.json` or the `Kit version:` line, the published `vX.Y.Z` tags, the old release, the new release, `vendors.json`, `.crav1/kit.json` when it exists, and the working tree. It does not read a branch or an open pull request as a target.
+writes: Writes kit-owned files on the current branch after a yes, including the Codex tree under `.agents/skills/` when Codex is selected, writes `.crav1/kit.json`, replaces a copied template that still matches the old release apart from line endings, and commits `Update CRAV1 kit vA to vB` when the user chose the commit. `add codex` commits `Add CRAV1 kit vendor codex vX.Y.Z`. `remove codex` commits `Remove CRAV1 kit vendor codex vX.Y.Z`. A migration listed for the jump is dry-run and written only on its own yes, and is left unstaged.
+leaves alone: Leaves specs, `walk-progress.md`, `build-progress/`, plans, tasks, notes, playbooks, the build map, persist rules (except a stale commit-style rule, 1.176.0), the transfer data policy, `kit-maintainer.mdc`, and the project's `AGENTS.md` alone. A skill folder that does not start with `crav1-` stays a project file. Copilot is not installed by this release. Does not switch branches, rebase, or push. A plugin install gets no kit commit.
 limits: a target that is not a published release tag stops in one line. A clash is not overwritten. An edited template is listed and left. The kit source checkout is refused. An agent's yes does not write, commit, or push.
 flow:
+- `.crav1/kit.json` lists the vendors.
+- `add codex` copies `vendors/codex/` into `.agents/skills/` and does not upgrade the other vendors.
+- `remove codex` deletes kit-owned files that still match the release; a local edit is a clash (`keep` or `take`); other files stay.
+- `detect` adds `vendors_from`.
+- The project `AGENTS.md` is never written.
 - `vendors.json` lists each host: the folders the kit owns, the frontmatter a skill needs, the command prefix, and extra files.
 - Cursor and Claude Code reproduce the 1.200 allow-list.
 - `detect` reports `vendors`.
@@ -36,4 +41,4 @@ runs by itself: Calls no skill. Runs `scripts/update_kit.py --vendor codex`.
 you run next: nothing needed now
 first: `$crav1-update-kit Update the kit in this consumer project.`
 walkthrough: from-update-kit.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.203.0/docs/reference/skills/crav1-update-kit.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.204.0/docs/reference/skills/crav1-update-kit.md

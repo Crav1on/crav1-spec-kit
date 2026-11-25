@@ -33,7 +33,7 @@
     },
     "codex": {
       "prefix": "$",
-      "install": false,
+      "install": true,
       "skills": ".agents/skills",
       "tree": "vendors/codex",
       "marker": ".agents/skills/crav1-docs/reference/workflow.md",

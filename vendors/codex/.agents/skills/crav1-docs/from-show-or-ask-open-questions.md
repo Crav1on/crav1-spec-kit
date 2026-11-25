@@ -55,4 +55,4 @@ Not written: the question text, any other spec line, `docs/system/`, plan, tasks
 
 Reference page: [show-or-ask-open-questions](reference/skills/crav1-show-or-ask-open-questions.md)
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.203.0/docs/from-show-or-ask-open-questions.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.204.0/docs/from-show-or-ask-open-questions.md

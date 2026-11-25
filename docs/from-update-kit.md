@@ -69,3 +69,7 @@ A script that prints Run next takes `--vendor`. The default stays `/`. `--vendor
 ## 1.202.0 changes
 
 `/crav1-update-kit` still installs only Cursor and Claude Code. The kit repo now also commits generated Codex and Copilot copies under `vendors/codex/` and `vendors/copilot/`. Update does not copy those trees into a product repo.
+
+## 1.204.0 changes
+
+Codex installs. `/crav1-update-kit add codex` copies `vendors/codex/` into `.agents/skills/` from the installed release, so the other vendors stay as they are. `/crav1-update-kit remove codex` deletes kit-owned files that still match that release. A local edit is a clash: `keep` or `take`. The vendor list is `.crav1/kit.json`. When the file is missing, the next update infers the vendors from the marker files and writes the file in the same yes. `detect` reports `vendors_from` as `kit.json` or `inferred`. The project's `AGENTS.md` is not written. Copilot is still not installed. Restart Codex after an add so the new skills load. Commands in that copy are `$crav1-`.

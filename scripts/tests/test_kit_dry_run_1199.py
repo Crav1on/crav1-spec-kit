@@ -54,6 +54,15 @@ def kit_fixture(base: Path) -> Path:
     restamp(kit, "1.0.1")
     note = kit / ".cursor/skills/crav1/crav1-docs/reference/dry-run-marker.md"
     note.write_text("# Marker\n\nAdded on the test branch.\n", encoding="utf-8")
+    skill = kit / "vendors/codex/.agents/skills/crav1-help"
+    skill.mkdir(parents=True)
+    (skill / "SKILL.md").write_text(
+        "Read ../crav1-docs/reference/kit-rules.md first.\n\n`$crav1-help`\n", encoding="utf-8")
+    (skill / "agents").mkdir()
+    (skill / "agents/openai.yaml").write_text("policy:\n  allow_implicit_invocation: false\n", encoding="utf-8")
+    docs = kit / "vendors/codex/.agents/skills/crav1-docs/reference"
+    docs.mkdir(parents=True)
+    (docs / "workflow.md").write_text("Kit version: 1.0.0\n", encoding="utf-8")
     git(kit, "add", "-A")
     git(kit, "commit", "-qm", "v1.0.1")
     git(kit, "checkout", "-q", "main")
@@ -114,7 +123,10 @@ class DryRun(unittest.TestCase):
         self.assertIn("unchanged ", out)
         self.assertIn("--- Vendor codex ---", out)
         self.assertIn("project_untouched: true", out)
-        self.assertIn("is not installed by this release", out)
+        self.assertIn("folder: .agents/skills", out)
+        self.assertIn("skills: 1/", out)
+        self.assertIn("kit.json:", out)
+        self.assertNotIn("is not installed by this release", out)
         self.assertIn("$ update_kit.py vendors (exit 0)", out)
         self.assertIn("walk_progress.py readiness --root", out)
         self.assertIn("$ build_map.py --root", out)

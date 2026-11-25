@@ -55,4 +55,4 @@ Reference page: [explain](reference/skills/crav1-explain-existing-system.md)
 
 The run ends as [How a run ends](reference/run-ending.md) says: Run next, never a `Next:` line, `Waiting:` only when a step is blocked, and `Uncommitted:` when files changed and are not committed.
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.203.0/docs/from-explain-existing-system.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.204.0/docs/from-explain-existing-system.md

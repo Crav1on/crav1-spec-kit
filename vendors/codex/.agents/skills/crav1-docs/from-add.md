@@ -68,4 +68,4 @@ A dump or a code change confirms the sort on one card: `yes (Recommended)`, or t
 
 Reference page: [add-to-spec](reference/skills/crav1-add-to-spec.md)
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.203.0/docs/from-add.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.204.0/docs/from-add.md

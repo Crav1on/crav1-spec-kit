@@ -15,8 +15,10 @@ import difflib
 import fnmatch
 import json
 import re
+import shutil
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 
@@ -48,6 +50,8 @@ CURSOR_DROPIN_MARKER = ".cursor/skills/crav1/crav1-docs/reference/workflow.md"
 CLAUDE_DROPIN_MARKER = ".claude/skills/crav1-docs/reference/workflow.md"
 CLAUDE_USER_MARKER = ".claude/skills/crav1-docs/reference/workflow.md"
 TEMPLATE_ROOTS = ("docs/specs/_template/", "docs/system/_template/")
+KIT_JSON = ".crav1/kit.json"
+KIT_SCHEMA = 1
 
 
 class Refuse(SystemExit):
@@ -281,6 +285,7 @@ def detect(root: Path, home: Path | None = None) -> dict:
         primary = installs[0]
     branch = current_branch(root)
     dirty = dirty_paths(root)
+    selected, source = read_selection(root)
     return {
         "mode": mode,
         "installs": installs,
@@ -288,9 +293,10 @@ def detect(root: Path, home: Path | None = None) -> dict:
         "version_from": None if primary is None else primary.get("version_from"),
         "branch": branch,
         "dirty": dirty,
-        "heads_up": heads_up(branch, dirty),
+        "heads_up": heads_up(branch, dirty, selection_hosts(root)),
         "writes_kit_files": mode == "drop-in",
-        "vendors": present_vendors(root),
+        "vendors": present_vendors(root) if source == "inferred" else selected,
+        "vendors_from": source,
     }
 
 
@@ -367,46 +373,251 @@ def with_vendor(text: str, vendor: str | None) -> str:
     return COMMAND_PREFIX.sub(prefix + "crav1-", text)
 
 
-def _vendor_names(names: list[str]) -> list[dict]:
-    table = vendor_table()
-    rows = table.get("vendors") if isinstance(table, dict) else None
-    if not isinstance(rows, dict):
+def _require_vendor(name: str) -> dict:
+    rows = _vendor_rows()
+    if not rows:
         refuse("Refused: the vendor table is not in this install.")
+    row = rows.get(name)
+    if not isinstance(row, dict):
+        refuse(f"Refused: {name} is not a vendor.")
+    return row
+
+
+def _checkout_root() -> Path | None:
+    """The kit checkout that holds this script, when it also has the Codex tree."""
+    here = Path(__file__).resolve()
+    for parent in here.parents:
+        if not (parent / "vendors" / "codex").is_dir():
+            continue
+        if (parent / "plugins/crav1/.cursor-plugin/plugin.json").is_file():
+            return parent
+        if (parent / ".cursor/skills/crav1/crav1-update-kit/vendors.json").is_file():
+            return parent
+    return None
+
+
+def _resolve_tree(explicit: str | None) -> Path:
+    """A release checkout. `--new` or `--old` wins. Otherwise the checkout that holds this script."""
+    if explicit:
+        path = Path(explicit)
+        if not path.is_dir():
+            refuse(f"Refused: {explicit} is not a release tree.")
+        return path.resolve()
+    found = _checkout_root()
+    if found is None:
+        refuse("Refused: add needs the release tree (--new).")
+    return found
+
+
+def _tree_version(tree: Path) -> str:
+    plugin = tree / "plugins/crav1/.cursor-plugin/plugin.json"
+    version = version_in_plugin(plugin) if plugin.is_file() else None
+    if version:
+        return version
+    for rel in (
+        ".cursor/skills/crav1/crav1-docs/reference/workflow.md",
+        "vendors/codex/.agents/skills/crav1-docs/reference/workflow.md",
+    ):
+        path = tree / rel
+        if path.is_file():
+            found = version_in_workflow(path)
+            if found:
+                return found
+    return ""
+
+
+def _source_has_vendor(tree: Path, row: dict) -> bool:
+    marker = str(row.get("marker") or "")
+    if not marker:
+        return False
+    return (_release_base(tree, row) / marker).is_file()
+
+
+def _vendor_view(name: str, row: dict, actions: dict, note: str | None = None) -> dict:
+    """Counts first, then the paths. Clash rows match the normal plan (`path` and `hunks`)."""
+    files = actions["files"]
+    samples: list[str] = []
+    for key in ("add", "update", "merge", "delete"):
+        for path in files[key]:
+            if len(samples) < 10:
+                samples.append(path)
+    for item in files["clash"]:
+        if len(samples) >= 10:
+            break
+        if isinstance(item, dict) and isinstance(item.get("path"), str):
+            samples.append(item["path"])
+    view = {
+        "vendor": name,
+        "folder": row.get("skills"),
+        "install": bool(row.get("install")),
+        "added": files["add"],
+        "merged": files["merge"],
+        "updated": files["update"],
+        "delete": files["delete"],
+        "clash": files["clash"],
+        "unchanged": len(files["unchanged"]),
+        "left_extra": files["left_extra"],
+        "extras": list(row.get("extras") or []),
+        "samples": samples,
+        "counts": {
+            "add": len(files["add"]),
+            "update": len(files["update"]),
+            "merge": len(files["merge"]),
+            "delete": len(files["delete"]),
+            "clash": len(files["clash"]),
+            "unchanged": len(files["unchanged"]),
+        },
+        "project_untouched": True,
+    }
+    if note:
+        view["note"] = note
+    return view
+
+
+def _not_installed_view(name: str, row: dict) -> dict:
+    return {
+        "vendor": name,
+        "folder": row.get("skills"),
+        "install": False,
+        "added": [],
+        "merged": [],
+        "updated": [],
+        "delete": [],
+        "clash": [],
+        "unchanged": 0,
+        "left_extra": [],
+        "extras": list(row.get("extras") or []),
+        "samples": [],
+        "counts": {"add": 0, "update": 0, "merge": 0, "delete": 0, "clash": 0, "unchanged": 0},
+        "project_untouched": True,
+        "note": f"{name} is in the vendor table and is not installed by this release.",
+    }
+
+
+def _vendor_actions(root: Path, name: str, row: dict, *, adding: bool, tree: Path, selected: list[str]) -> dict:
+    if not _source_has_vendor(tree, row):
+        refuse(f"Refused: the {name} tree is not in this release.")
+    empty = Path(tempfile.mkdtemp(prefix="crv"))
+    try:
+        if adding:
+            return build_actions(root, empty, tree, {name}, with_templates=False, with_style=False)
+        if name not in selected and not (root / str(row.get("marker") or "\0")).is_file():
+            refuse(f"Refused: {name} is not installed here.")
+        return build_actions(root, tree, empty, {name}, with_templates=False, with_style=False)
+    finally:
+        shutil.rmtree(empty, ignore_errors=True)
+
+
+def vendor_change(root: Path, names: list[str], *, adding: bool, tree: Path) -> dict:
+    """Plan for add or remove. The old side of an add is empty. Remove's new side is empty."""
+    if not names:
+        refuse("Refused: name the vendor to add or remove.")
+    selected, _source = read_selection(root)
     listed = []
+    changed: list[str] = []
     for name in names:
-        row = rows.get(name)
-        if not isinstance(row, dict):
-            refuse(f"Refused: {name} is not a vendor.")
-        if row.get("install"):
-            note = f"{name} is updated by the normal plan. This release does not add it as a separate install."
-        else:
-            note = f"{name} is in the vendor table and is not installed by this release."
-        listed.append(
-            {
-                "vendor": name,
-                "folder": row.get("skills"),
-                "install": bool(row.get("install")),
-                "added": [],
-                "merged": [],
-                "clash": [],
-                "extras": list(row.get("extras") or []),
-                "project_untouched": True,
-                "note": note,
-            }
-        )
-    return listed
+        row = _require_vendor(name)
+        if not row.get("install"):
+            listed.append(_not_installed_view(name, row))
+            continue
+        actions = _vendor_actions(root, name, row, adding=adding, tree=tree, selected=selected)
+        listed.append(_vendor_view(name, row, actions))
+        changed.append(name)
+    if changed and adding:
+        after = sorted(set(selected) | set(changed))
+    elif changed:
+        after = sorted(set(selected) - set(changed))
+    else:
+        after = list(selected)
+    kit_op = "unchanged"
+    if changed:
+        desired = kit_json_bytes(after)
+        current_path = root / KIT_JSON
+        current = current_path.read_bytes() if current_path.is_file() else None
+        if current is None:
+            kit_op = "add"
+        elif _normalize_newlines(current) != _normalize_newlines(desired):
+            kit_op = "update"
+    writes = kit_op != "unchanged" or any(
+        item.get("added") or item.get("updated") or item.get("merged") or item.get("delete") or item.get("clash")
+        for item in listed
+    )
+    return {
+        "vendors": listed,
+        "project_untouched": True,
+        "writes_kit_files": writes,
+        "kit_json": KIT_JSON,
+        "kit_json_op": kit_op,
+        "vendors_after": after,
+        "version": _tree_version(tree),
+    }
 
 
-def add_report(names: list[str]) -> dict:
-    """A plan for `--add`. This release writes nothing for any vendor."""
-    return {"vendors": _vendor_names(names), "project_untouched": True, "writes_kit_files": False}
-
-
-def add_apply(names: list[str], yes: bool) -> dict:
+def apply_vendor_change(
+    root: Path,
+    names: list[str],
+    *,
+    adding: bool,
+    tree: Path,
+    yes: bool,
+    keep: set[str],
+    take: set[str],
+) -> dict:
     if not yes:
         refuse("Refused: writing kit files needs a yes in this run.")
-    report = add_report(names)
-    return {"vendors": report["vendors"], "touched": [], "kept": [], "project_untouched": True}
+    if keep & take:
+        refuse("Refused: a clash cannot be both kept and taken.")
+    selected, _source = read_selection(root)
+    clash_paths: set[str] = set()
+    payloads: dict[str, bytes | None | dict] = {}
+    skip: set[str] = set()
+    changed: list[str] = []
+    for name in names:
+        row = _require_vendor(name)
+        if not row.get("install"):
+            continue
+        actions = _vendor_actions(root, name, row, adding=adding, tree=tree, selected=selected)
+        changed.append(name)
+        clash_paths |= {item["path"] for item in actions["files"]["clash"]}
+        payloads.update(actions["payloads"])
+        skip.update(actions["files"]["unchanged"])
+        skip.update(actions["files"]["left_extra"])
+    missing = clash_paths - keep - take
+    if missing:
+        listed = ", ".join(sorted(missing))
+        refuse(f"Refused: a clash needs keep or take before writing: {listed}")
+    unknown = (keep | take) - clash_paths
+    if unknown:
+        listed = ", ".join(sorted(unknown))
+        refuse(f"Refused: {listed} is not a clash.")
+    touched: list[str] = []
+    for path, data in payloads.items():
+        if path in clash_paths or path in skip or isinstance(data, dict):
+            continue
+        _write(root, path, data)
+        touched.append(path)
+    for path in sorted(keep | take):
+        choice = payloads[path]
+        if not isinstance(choice, dict):
+            refuse(f"Refused: {path} is not a clash.")
+        picked = choice["keep"] if path in keep else choice["take"]
+        _write(root, path, picked)
+        touched.append(path)
+    after = sorted(set(selected) | set(changed)) if adding else sorted(set(selected) - set(changed))
+    if changed:
+        desired = kit_json_bytes(after)
+        current_path = root / KIT_JSON
+        current = current_path.read_bytes() if current_path.is_file() else None
+        if current is None or _normalize_newlines(current) != _normalize_newlines(desired):
+            _write(root, KIT_JSON, desired)
+            touched.append(KIT_JSON)
+    return {
+        "vendors": changed,
+        "touched": sorted(set(touched)),
+        "kept": sorted(keep & clash_paths),
+        "project_untouched": True,
+        "vendors_after": after if changed else list(selected),
+    }
 
 
 def current_branch(root: Path) -> str | None:
@@ -421,21 +632,41 @@ def current_branch(root: Path) -> str | None:
     return name
 
 
+def _status_paths(text: str, prefix: str | None = None) -> list[str]:
+    paths = []
+    for line in text.splitlines():
+        if len(line) < 4:
+            continue
+        if prefix is not None and not line.startswith(prefix):
+            continue
+        path = line[3:].strip().strip('"')
+        if " -> " in path:
+            path = path.split(" -> ", 1)[1].strip().strip('"')
+        paths.append(path)
+    return paths
+
+
 def dirty_paths(root: Path) -> list[str]:
     if not (root / ".git").exists():
         return []
-    result = git(root, "status", "--porcelain", check=False)
+    # -uall lists files inside a new folder. A plain status collapses `.crav1/` to one line.
+    result = git(root, "status", "--porcelain", "-uall", check=False)
     if result.returncode != 0:
         return []
-    paths = []
-    for line in result.stdout.splitlines():
-        if len(line) < 4:
-            continue
-        path = line[3:].strip()
-        if " -> " in path:
-            path = path.split(" -> ", 1)[1].strip()
-        paths.append(path)
-    return paths
+    return _status_paths(result.stdout)
+
+
+def _ignored_owned(root: Path, hosts: set[str] | None) -> list[str]:
+    """Kit files a gitignore hides. `.crav1/.gitignore` of `*` hides kit.json."""
+    specs = [".crav1", ".cursor", ".claude", ".agents", ".github"]
+    result = git(root, "status", "--porcelain", "-uall", "--ignored", "--", *specs, check=False)
+    if result.returncode != 0:
+        return []
+    found = []
+    for path in _status_paths(result.stdout, "!!"):
+        if is_managed(path, hosts) or style_rule_kit_owned(root, path):
+            found.append(path)
+    return found
 
 
 def is_template(path: str) -> bool:
@@ -562,7 +793,27 @@ def is_claude_kit(path: str) -> bool:
     return _match_owns(path, row.get("owns") or [])
 
 
-def is_kit_path(path: str) -> bool:
+def is_kit_path(path: str, hosts: set[str] | None = None) -> bool:
+    """True when path is owned by one of hosts.
+
+    With no hosts, only Cursor and Claude match. That keeps a hand-made Codex
+    tree a project file until Codex is selected. Pass the hosts for this run
+    when Codex is part of it.
+    """
+    table = vendor_table()
+    if not table or not isinstance(table.get("vendors"), dict):
+        return _legacy_is_cursor_kit(path) or _legacy_is_claude_kit(path)
+    rows = table["vendors"]
+    names = ("cursor", "claude") if hosts is None else tuple(hosts)
+    for name in names:
+        row = rows.get(name)
+        if isinstance(row, dict) and row.get("install") and _match_owns(path, row.get("owns") or []):
+            return True
+    return False
+
+
+def owned_by_install(path: str) -> bool:
+    """Any vendor this release installs. Copilot stays out until its row is live."""
     table = vendor_table()
     if not table or not isinstance(table.get("vendors"), dict):
         return _legacy_is_cursor_kit(path) or _legacy_is_claude_kit(path)
@@ -572,13 +823,16 @@ def is_kit_path(path: str) -> bool:
     return False
 
 
-def is_managed(path: str) -> bool:
-    return is_kit_path(path) or is_template(path)
+def is_managed(path: str, hosts: set[str] | None = None) -> bool:
+    return path == KIT_JSON or is_kit_path(path, hosts) or is_template(path)
 
 
-def heads_up(branch: str | None, dirty: list[str]) -> dict:
-    kit = [path for path in dirty if is_kit_path(path)]
-    project = [path for path in dirty if not is_kit_path(path)]
+def heads_up(branch: str | None, dirty: list[str], hosts: set[str] | None = None) -> dict:
+    def kit_file(path: str) -> bool:
+        return path == KIT_JSON or is_kit_path(path, hosts)
+
+    kit = [path for path in dirty if kit_file(path)]
+    project = [path for path in dirty if not kit_file(path)]
     shown = branch or "(detached or not a git checkout)"
     return {
         "branch": branch,
@@ -701,7 +955,114 @@ def _collect_owns(root: Path, owns: list, out: dict[str, bytes]) -> None:
                 out[rel] = path.read_bytes()
 
 
-def collect_kit(root: Path, hosts: set[str]) -> dict[str, bytes]:
+def _release_base(root: Path, row: dict) -> Path:
+    """Where a release checkout keeps this vendor.
+
+    Cursor and Claude live at the checkout root. Codex lives under ``vendors/codex``.
+    """
+    tree = str(row.get("tree") or "").strip("/")
+    if not tree:
+        return root
+    for rule in row.get("owns") or []:
+        if not isinstance(rule, dict):
+            continue
+        for key in ("tree", "skills", "file", "assets", "glob"):
+            value = rule.get(key)
+            if isinstance(value, str) and (value == tree or value.startswith(tree + "/")):
+                return root
+    nested = root / tree
+    if nested.is_dir():
+        return nested
+    return root
+
+
+def _vendor_rows() -> dict:
+    table = vendor_table()
+    rows = table.get("vendors") if isinstance(table, dict) else None
+    return rows if isinstance(rows, dict) else {}
+
+
+def kit_json_bytes(names: list[str]) -> bytes:
+    body = {"schema": KIT_SCHEMA, "vendors": sorted(set(names))}
+    return (json.dumps(body, indent=2) + "\n").encode("utf-8")
+
+
+def parse_kit_json(data: bytes) -> list[str]:
+    try:
+        body = json.loads(data.decode("utf-8"))
+    except (UnicodeError, json.JSONDecodeError):
+        refuse("Refused: .crav1/kit.json is not JSON.")
+    if not isinstance(body, dict) or body.get("schema") != KIT_SCHEMA:
+        refuse("Refused: .crav1/kit.json schema is not 1.")
+    names = body.get("vendors")
+    if not isinstance(names, list) or any(not isinstance(name, str) for name in names):
+        refuse("Refused: .crav1/kit.json vendors must be a list of names.")
+    rows = _vendor_rows()
+    if not rows:
+        refuse("Refused: the vendor table is not in this install.")
+    for name in names:
+        if name not in rows:
+            refuse(f"Refused: {name} is not a vendor.")
+    return sorted(set(names))
+
+
+def inferred_vendors(root: Path) -> list[str]:
+    """Installable vendors whose marker file is present. Copilot is not inferred."""
+    found = []
+    for name, row in _vendor_rows().items():
+        if not isinstance(row, dict) or not row.get("install"):
+            continue
+        marker = row.get("marker")
+        if marker and (root / str(marker)).is_file():
+            found.append(name)
+    return sorted(found)
+
+
+def read_selection(root: Path) -> tuple[list[str], str]:
+    path = root / KIT_JSON
+    if path.is_file():
+        return parse_kit_json(path.read_bytes()), "kit.json"
+    if not _vendor_rows():
+        return present_vendors(root), "inferred"
+    return inferred_vendors(root), "inferred"
+
+
+def selection_hosts(root: Path) -> set[str] | None:
+    """Installable vendors for this project. None means the legacy allow-list."""
+    if not _vendor_rows():
+        return None
+    names, _source = read_selection(root)
+    rows = _vendor_rows()
+    return {name for name in names if isinstance(rows.get(name), dict) and rows[name].get("install")}
+
+
+def ensure_kit_json(root: Path, actions: dict, names: list[str]) -> None:
+    """Offer ``.crav1/kit.json`` in this plan. A missing file is an add."""
+    if not _vendor_rows():
+        return
+    desired = kit_json_bytes(names)
+    path = root / KIT_JSON
+    current = path.read_bytes() if path.is_file() else None
+    if current is not None and _normalize_newlines(current) == _normalize_newlines(desired):
+        return
+    bucket = "add" if current is None else "update"
+    actions["files"][bucket].append(KIT_JSON)
+    actions["payloads"][KIT_JSON] = desired
+
+
+def hosts_for_update(root: Path, info: dict) -> set[str]:
+    """Vendors a normal update writes. The file wins when it exists."""
+    if not _vendor_rows():
+        return hosts_from_detect(info)
+    selected, source = read_selection(root)
+    rows = _vendor_rows()
+    installable = {name for name in selected if isinstance(rows.get(name), dict) and rows[name].get("install")}
+    if source == "kit.json":
+        return installable
+    return hosts_from_detect(info) | installable
+
+
+def collect_kit(root: Path, hosts: set[str], *, release: bool = False) -> dict[str, bytes]:
     table = vendor_table()
     rows = table.get("vendors") if isinstance(table, dict) else None
     if not isinstance(rows, dict):
@@ -713,7 +1074,8 @@ def collect_kit(root: Path, hosts: set[str]) -> dict[str, bytes]:
         row = rows.get(name)
         if not isinstance(row, dict) or not row.get("install"):
             continue
-        _collect_owns(root, row.get("owns") or [], out)
+        base = _release_base(root, row) if release else root
+        _collect_owns(base, row.get("owns") or [], out)
     return out
 
 
@@ -969,6 +1331,14 @@ def classify_file(old: bytes | None, local: bytes | None, new: bytes | None, sty
             "keep_data": styled(local_n),
             "take_data": None,
         }
+    # No old release to merge against: a different local file is a clash, same shape as any other.
+    if old is None and local is not None and local_n != new_n:
+        return {
+            "op": "clash",
+            "hunks": [{"local": _preview(local_n), "kit": _preview(new_n)}],
+            "keep_data": styled(local_n),
+            "take_data": styled(new_n),
+        }
     if local is None:
         return {
             "op": "clash",
@@ -1106,10 +1476,18 @@ def style_rule_actions(root: Path, old_root: Path, new_root: Path) -> dict:
     return out
 
 
-def build_actions(root: Path, old_root: Path, new_root: Path, hosts: set[str]) -> dict:
-    old_files = collect_kit(old_root, hosts)
-    new_files = collect_kit(new_root, hosts)
-    local_files = collect_kit(root, hosts)
+def build_actions(
+    root: Path,
+    old_root: Path,
+    new_root: Path,
+    hosts: set[str],
+    *,
+    with_templates: bool = True,
+    with_style: bool = True,
+) -> dict:
+    old_files = collect_kit(old_root, hosts, release=True)
+    new_files = collect_kit(new_root, hosts, release=True)
+    local_files = collect_kit(root, hosts, release=False)
     paths = sorted(set(old_files) | set(new_files) | set(local_files))
     files = {
         "update": [],
@@ -1122,7 +1500,7 @@ def build_actions(root: Path, old_root: Path, new_root: Path, hosts: set[str]) -
     }
     payloads: dict[str, bytes | None] = {}
     for path in paths:
-        if not is_kit_path(path):
+        if not is_kit_path(path, hosts):
             continue
         style = preferred_newline(root, path, local_files.get(path))
         action = classify_file(old_files.get(path), local_files.get(path), new_files.get(path), style)
@@ -1146,27 +1524,28 @@ def build_actions(root: Path, old_root: Path, new_root: Path, hosts: set[str]) -
             files["unchanged"].append(path)
         else:
             files["unchanged"].append(path)
-    old_templates = collect_templates(old_root)
-    new_templates = collect_templates(new_root)
-    local_templates = collect_templates(root)
     templates = {"update": [], "delete": [], "left": []}
     template_payloads: dict[str, bytes | None] = {}
-    for path in sorted(set(local_templates) | set(old_templates) | set(new_templates)):
-        style = preferred_newline(root, path, local_templates.get(path))
-        action = classify_template(old_templates.get(path), local_templates.get(path), new_templates.get(path), style)
-        if action["op"] == "write":
-            templates["update"].append(path)
-            template_payloads[path] = action["data"]
-        elif action["op"] == "delete":
-            templates["delete"].append(path)
-            template_payloads[path] = None
-        elif action["op"] == "leave":
-            templates["left"].append({"path": path, "reason": action["reason"]})
-    style = style_rule_actions(root, old_root, new_root)
-    for rel in style["update"]:
+    if with_templates:
+        old_templates = collect_templates(old_root)
+        new_templates = collect_templates(new_root)
+        local_templates = collect_templates(root)
+        for path in sorted(set(local_templates) | set(old_templates) | set(new_templates)):
+            style = preferred_newline(root, path, local_templates.get(path))
+            action = classify_template(old_templates.get(path), local_templates.get(path), new_templates.get(path), style)
+            if action["op"] == "write":
+                templates["update"].append(path)
+                template_payloads[path] = action["data"]
+            elif action["op"] == "delete":
+                templates["delete"].append(path)
+                template_payloads[path] = None
+            elif action["op"] == "leave":
+                templates["left"].append({"path": path, "reason": action["reason"]})
+    style_rules = style_rule_actions(root, old_root, new_root) if with_style else {"update": [], "left": [], "payloads": {}, "remove": []}
+    for rel in style_rules["update"]:
         files["update"].append(rel)
-        payloads[rel] = style["payloads"][rel]
-    for rel in style.get("remove", []):
+        payloads[rel] = style_rules["payloads"][rel]
+    for rel in style_rules.get("remove", []):
         files["delete"].append(rel)
         payloads[rel] = None
     return {
@@ -1174,7 +1553,7 @@ def build_actions(root: Path, old_root: Path, new_root: Path, hosts: set[str]) -
         "templates": templates,
         "payloads": payloads,
         "template_payloads": template_payloads,
-        "style_rules_left": style["left"],
+        "style_rules_left": style_rules["left"],
     }
 
 
@@ -1315,7 +1694,7 @@ def style_rule_kit_owned(root: Path, rel: str) -> bool:
 
 
 def _write(root: Path, rel: str, data: bytes | None) -> None:
-    if not (is_managed(rel) or is_style_rule(rel)):
+    if not (rel == KIT_JSON or is_template(rel) or is_style_rule(rel) or owned_by_install(rel)):
         refuse(f"Refused: {rel} is a project file.")
     path = _safe(root, rel)
     if data is None:
@@ -1331,12 +1710,23 @@ def _write(root: Path, rel: str, data: bytes | None) -> None:
     path.write_bytes(data)
 
 
-def apply_overlay(root: Path, old_root: Path, new_root: Path, hosts: set[str], yes: bool, keep: set[str], take: set[str]) -> dict:
+def apply_overlay(
+    root: Path,
+    old_root: Path,
+    new_root: Path,
+    hosts: set[str],
+    yes: bool,
+    keep: set[str],
+    take: set[str],
+    kit_names: list[str] | None = None,
+) -> dict:
     if not yes:
         refuse("Refused: writing kit files needs a yes in this run.")
     if keep & take:
         refuse("Refused: a clash cannot be both kept and taken.")
     actions = build_actions(root, old_root, new_root, hosts)
+    if kit_names is not None:
+        ensure_kit_json(root, actions, kit_names)
     clash_paths = {item["path"] for item in actions["files"]["clash"]}
     missing = clash_paths - keep - take
     if missing:
@@ -1372,23 +1762,55 @@ def _cached_paths(root: Path) -> list[str]:
     return [part for part in result.stdout.split("\0") if part]
 
 
-def commit_kit(root: Path, old: str, new: str, yes: bool) -> dict:
+def _ignored(root: Path, paths: list[str]) -> set[str]:
+    if not paths:
+        return set()
+    result = git(root, "check-ignore", "--", *paths, check=False)
+    return {line.strip().replace("\\", "/") for line in result.stdout.splitlines() if line.strip()}
+
+
+def commit_kit(
+    root: Path,
+    old: str,
+    new: str,
+    yes: bool,
+    *,
+    vendors: list[str] | None = None,
+    removing: bool = False,
+) -> dict:
     if not yes:
         refuse("Refused: a commit needs a yes in this run.")
     if not (root / ".git").exists():
         refuse("Refused: a commit needs a git checkout.")
     dirty = dirty_paths(root)
-    stage = [path for path in dirty if is_managed(path) or style_rule_kit_owned(root, path)]
+    base = selection_hosts(root)
+    hosts = set(base or ()) | set(vendors) if vendors else base
+    for path in _ignored_owned(root, hosts):
+        if path not in dirty:
+            dirty.append(path)
+    stage = [path for path in dirty if is_managed(path, hosts) or style_rule_kit_owned(root, path)]
     left = [path for path in dirty if path not in stage]
     if not stage:
         refuse("Refused: nothing kit-owned to commit.")
-    git(root, "add", "--", *stage)
+    ignored = _ignored(root, stage)
+    normal = [path for path in stage if path not in ignored]
+    forced = [path for path in stage if path in ignored]
+    if normal:
+        git(root, "add", "--", *normal)
+    if forced:
+        git(root, "add", "-f", "--", *forced)
     cached = _cached_paths(root)
-    unsafe = [path for path in cached if not (is_managed(path) or style_rule_kit_owned(root, path))]
+    safe = [path for path in cached if is_managed(path, hosts) or style_rule_kit_owned(root, path)]
+    unsafe = [path for path in cached if path not in safe]
     if unsafe:
         subprocess.run(["git", "restore", "--staged", "--", *unsafe], cwd=root, check=False)
         refuse("Refused: the commit would include a project file: " + ", ".join(unsafe))
-    message = commit_message(old, new)
+    if vendors:
+        verb = "Remove" if removing else "Add"
+        shown = " and ".join(vendors)
+        message = f"{verb} CRAV1 kit vendor {shown} {tagify(new)}"
+    else:
+        message = commit_message(old, new)
     git(root, "commit", "-m", message)
     return {"message": message, "committed": cached, "left_uncommitted": left}
 
@@ -1569,7 +1991,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--uncommitted", type=int, default=0)
     parser.add_argument("--not-updated", action="store_true")
     parser.add_argument("--vendor", default=None, help="cursor, claude, codex, or copilot. The default prefix stays /.")
-    parser.add_argument("--add", action="append", default=[], help="vendor to describe. This release does not install it.")
+    parser.add_argument("--add", action="append", default=[], help="vendor to install, such as codex. Uses the release tree and does not upgrade other vendors.")
+    parser.add_argument("--remove", action="append", default=[], help="vendor to remove. Deletes only kit-owned files that match the release.")
     args = parser.parse_args(argv)
     root = Path(args.root).resolve()
     home = Path(args.home).resolve() if args.home else None
@@ -1597,11 +2020,24 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "vendors":
             _print(vendor_report(root))
             return 0
-        if args.command in {"plan", "apply"} and args.add:
+        if args.command in {"plan", "apply"} and (args.add or args.remove):
+            if args.add and args.remove:
+                refuse("Refused: add and remove are separate runs.")
+            if (root / ".cursor/rules/kit-maintainer.mdc").is_file() and (
+                root / "plugins/crav1/.cursor-plugin/plugin.json"
+            ).is_file():
+                refuse("Refused: this checkout is the kit source. Run the update in a consumer project.")
+            adding = bool(args.add)
+            tree = _resolve_tree((args.new or args.old) if adding else (args.old or args.new))
+            names = args.add if adding else args.remove
             if args.command == "apply":
-                _print(add_apply(args.add, args.yes))
+                _print(
+                    apply_vendor_change(
+                        root, names, adding=adding, tree=tree, yes=args.yes, keep=set(args.keep), take=set(args.take)
+                    )
+                )
             else:
-                _print(add_report(args.add))
+                _print(vendor_change(root, names, adding=adding, tree=tree))
             return 0
         if args.command == "ending":
             sys.stdout.write(with_vendor(ending_text(root, args.uncommitted, not args.not_updated), args.vendor))
@@ -1631,9 +2067,12 @@ def main(argv: list[str] | None = None) -> int:
                 return 0
             if not args.old or not args.new:
                 refuse("Refused: a drop-in plan needs the old release tree and the new release tree.")
-            hosts = hosts_from_detect(info)
+            hosts = hosts_for_update(root, info)
             actions = build_actions(root, Path(args.old), Path(args.new), hosts)
+            names, source = read_selection(root)
+            ensure_kit_json(root, actions, sorted(hosts) if source == "inferred" else names)
             view = plan_view(info, actions, None if target is None else str(target))
+            view["vendors_from"] = source
             registry = migration_registry(Path(args.new), Path(args.migrations) if args.migrations else None)
             if registry and registry.is_file() and info.get("version") and target:
                 view["migration_ids"] = [
@@ -1649,7 +2088,8 @@ def main(argv: list[str] | None = None) -> int:
                 refuse("Refused: a plugin install is not updated by a kit commit.")
             if not args.old or not args.new:
                 refuse("Refused: apply needs the old release tree and the new release tree.")
-            hosts = hosts_from_detect(info)
+            hosts = hosts_for_update(root, info)
+            names, source = read_selection(root)
             _print(
                 apply_overlay(
                     root,
@@ -1659,6 +2099,7 @@ def main(argv: list[str] | None = None) -> int:
                     args.yes,
                     set(args.keep),
                     set(args.take),
+                    sorted(hosts) if source == "inferred" else names,
                 )
             )
             return 0
@@ -1669,9 +2110,21 @@ def main(argv: list[str] | None = None) -> int:
             _print(run_migrations(root, installed, target, registry, args.apply, args.yes))
             return 0
         if args.command == "commit":
-            if not args.from_version or not args.to_version:
+            vendor_names = args.add or args.remove
+            if args.add and args.remove:
+                refuse("Refused: add and remove are separate runs.")
+            if not args.to_version or (not args.from_version and not vendor_names):
                 refuse("Refused: a commit needs the installed version and the target version.")
-            _print(commit_kit(root, args.from_version, args.to_version, args.yes))
+            _print(
+                commit_kit(
+                    root,
+                    args.from_version or args.to_version,
+                    args.to_version,
+                    args.yes,
+                    vendors=vendor_names or None,
+                    removing=bool(args.remove),
+                )
+            )
             return 0
     except Refuse:
         return 2

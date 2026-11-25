@@ -37,4 +37,4 @@ runs by itself: Calls no skill.
 you run next: $crav1-ado-sync; $crav1-tasks-ready-to-build; $crav1-build-walk; $crav1-build-tasks; $crav1-build-features
 first: `$crav1-tighten-plan @docs/specs/<slug>/`
 walkthrough: from-spec-to-plan.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.203.0/docs/reference/skills/crav1-tighten-plan.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.204.0/docs/reference/skills/crav1-tighten-plan.md

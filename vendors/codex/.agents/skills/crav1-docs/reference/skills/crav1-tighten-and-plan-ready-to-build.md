@@ -152,4 +152,4 @@ runs by itself: Opens each locked skill's file from this skill's folder and foll
 you run next: $crav1-build-walk; $crav1-build-tasks
 first: `$crav1-tighten-and-plan-ready-to-build @docs/specs/<slug>/ <optional playbook file, or leave it out>`
 walkthrough: from-tighten-and-plan.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.203.0/docs/reference/skills/crav1-tighten-and-plan-ready-to-build.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.204.0/docs/reference/skills/crav1-tighten-and-plan-ready-to-build.md

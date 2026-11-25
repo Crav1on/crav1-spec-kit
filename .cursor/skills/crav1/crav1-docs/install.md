@@ -170,6 +170,12 @@ The Cursor `model: inherit` line is left out of the Claude Code copy, because Cl
 
 On Claude Code 2.1.286, in a private throwaway git repo, the generated `.claude/` drop-in ran `/crav1-spark-to-spec`, `/crav1-plan-from-spec`, one implement task, and `/crav1-verify-build-against-spec`. The trial feature was a root `hello.txt` of exactly the five bytes `68 65 6c 6c 6f`. Two frictions: a PowerShell byte-dump that uses a script block was blocked by Claude Code’s permission check, and the same bytes were checked another way; the create-feature-branch skill wants a clean tree, and the branch was created with the kit files still untracked.
 
+## Codex
+
+Codex reads project skills from `.agents/skills/`. The kit's copy is generated as `vendors/codex/` in this repo. Each command-only skill has `agents/openai.yaml`. Commands are `$crav1-…`. The first line of each skill reads `../crav1-docs/reference/kit-rules.md`. The project's `AGENTS.md` is not written.
+
+In a project that already has the kit, run `/crav1-update-kit add codex`. The vendor list is `.crav1/kit.json`. `/crav1-update-kit remove codex` deletes only the kit's Codex files.
+
 ## After install
 
 [First 15 minutes](first-run.md): open the product repo → `/crav1` → one starter option.
@@ -254,4 +260,4 @@ The kit is at [https://github.com/Crav1on/crav1-spec-kit](https://github.com/Cra
 | Cursor plugin just installed, want the command order | [plugins/crav1/README.md](../plugins/crav1/README.md) |
 | Every other page: walkthroughs, reference, and concepts, by type and by reader | [Docs index](README.md) |
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.203.0/docs/install.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.204.0/docs/install.md

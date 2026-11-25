@@ -88,4 +88,4 @@ The run ends as [How a run ends](reference/run-ending.md) says: Run next, never 
 
 each `$crav1-help todo` item is the item on one line, a plain label on the next, and the command alone in its code span below it, for example `Answer the question:` above `$crav1-resolve-open-questions orders-api`. `$crav1-help status` is now where the one-line `$crav1-build-tasks <T#>` hint lives; the ready check no longer prints it.
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.203.0/docs/from-help.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.204.0/docs/from-help.md

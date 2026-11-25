@@ -43,4 +43,4 @@ Open the pull request:
 
 Reference page: [host-setup](reference/skills/crav1-host-setup.md)
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.203.0/docs/from-host-setup.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.204.0/docs/from-host-setup.md

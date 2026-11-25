@@ -102,4 +102,4 @@ Reference page: [pr-status](reference/skills/crav1-pr-status.md)
 
 When your drafted reply and a status change are for the same thread, `$crav1-pr-status` asks one card, `Post your reply in thread 195 and set it to fixed?`, and on yes runs `ado_threads.py reply --pr <n> --thread <id> --file <draft file> --status fixed --yes`, which replies inside the thread, sets it fixed and marks the draft posted in the PR note. A question that was answered and accepted is `answered` in the record, said as `answered; no code change`. The card comes before the ending, which is printed once; waiting on someone ends with a label and `$crav1-pr-status <pr> since-last` alone in its code span, and you are `you`. The run reads threads with `list --brief`, runs merged-since-sync once and the ready check only when the PR closes a task. `pr_common.py checks --ref <n>` passes the Azure DevOps organization to both `az` calls.
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.203.0/docs/from-pr-status.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.204.0/docs/from-pr-status.md

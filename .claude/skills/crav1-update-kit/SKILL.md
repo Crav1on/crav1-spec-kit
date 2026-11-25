@@ -2,8 +2,8 @@
 name: crav1-update-kit
 description: >-
   Use when the user asks to update the installed CRAV1 kit to a published
-  release. Optional to vX.Y.Z. Default is the latest release tag. Never a
-  branch or an open pull request.
+  release, or to add or remove one vendor such as Codex. Optional to vX.Y.Z.
+  Default is the latest release tag. Never a branch or an open pull request.
 icon: refresh-cw
 color: blue
 ---
@@ -23,6 +23,7 @@ The script is `scripts/update_kit.py` in this skill's folder. The interpreter is
 3. Drop-in (`writes_kit_files` true): read [references/overlay.md](references/overlay.md) and follow it.
 4. Plugin or user scope (`mode` is `plugin`): read [references/plugin.md](references/plugin.md) and follow it. Do not read the overlay page.
 5. When the plan lists a migration id, read [references/migrations.md](references/migrations.md) after the kit files are replaced. When the list is empty, skip that page.
+6. When the user says `add <vendor>` or `remove <vendor>`, read [references/vendors.md](references/vendors.md) and follow it. A plain update does not read that page.
 
 ## Cards
 
@@ -73,9 +74,9 @@ Uncommitted: <n> files; commit with /crav1-finalize-commit when ready.
 
 Do not push unless the user, in this run, already said to push. Do not add a push question when they did not. Do not run the next step.
 
-## Vendors (1.201.0)
+## Vendors (1.204.0)
 
-`vendors.json` next to this skill lists each host: the folders the kit owns, the frontmatter a skill needs, the command prefix, and extra files. `detect` reports `vendors`. `update_kit.py vendors --root .` lists each vendor's folder and skill count and writes nothing. Cursor and Claude Code are installed. Codex and Copilot are rows and are not installed by this release. `--vendor codex` on a script that prints Run next uses the Codex command prefix. With no `--vendor`, the prefix stays `/`.
+`vendors.json` next to this skill lists each host. `detect` reports `vendors` and `vendors_from` (`kit.json` or `inferred`). Cursor, Claude Code, and Codex are installed. Copilot is a row and is not installed by this release. The project's vendor list is `.crav1/kit.json`. `add` and `remove` are [references/vendors.md](references/vendors.md). `--vendor codex` on a script that prints Run next uses the Codex command prefix. With no `--vendor`, the prefix stays `/`.
 
 ## Hard rules
 

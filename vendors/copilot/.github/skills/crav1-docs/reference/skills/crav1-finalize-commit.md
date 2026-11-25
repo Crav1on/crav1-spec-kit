@@ -69,4 +69,4 @@ runs by itself: Only write the message: Calls no skill. Commit: Calls `/crav1-fi
 you run next: /crav1-open-pr
 first: `/crav1-finalize-commit`
 walkthrough: from-commit.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.203.0/docs/reference/skills/crav1-finalize-commit.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.204.0/docs/reference/skills/crav1-finalize-commit.md
