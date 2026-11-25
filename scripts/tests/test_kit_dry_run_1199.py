@@ -116,6 +116,15 @@ class DryRun(unittest.TestCase):
         self.assertEqual(proc.returncode, 0, out + proc.stderr)
         self.assertIn("===== COPY FROM HERE =====", out)
         self.assertIn("===== COPY TO HERE =====", out)
+        self.assertNotIn("cloning kit", out)
+        self.assertNotIn("done (", out)
+        for label in (
+            "cloning kit", "making temp worktree", "update detect", "update plan", "update apply",
+            "add vendor codex", "walk_progress start", "readiness", "cleanup",
+        ):
+            self.assertIn(label, proc.stderr)
+        self.assertRegex(proc.stderr, r"done \(\d+ s\)")
+        self.assertLess(proc.stderr.index("cloning kit"), proc.stderr.index("done ("))
         self.assertLess(out.index("COPY FROM HERE"), out.index("COPY TO HERE"))
         self.assertIn("Kit: 1.0.1 at", out)
         self.assertIn("$ update_kit.py apply (exit 0)", out)
@@ -138,6 +147,11 @@ class DryRun(unittest.TestCase):
         self.assertFalse((self.proj / ".cursor/skills/crav1/crav1-docs/reference/dry-run-marker.md").exists())
         saved = Path(out.splitlines()[-1].split("Saved to ", 1)[1].split("; ", 1)[0])
         self.assertTrue(saved.is_file())
+        saved_text = saved.read_text(encoding="utf-8")
+        block = out.split("Saved to ", 1)[0].rstrip("\n")
+        self.assertEqual(saved_text, block + "\n")
+        self.assertNotIn("cloning kit", saved_text)
+        self.assertNotIn("done (", saved_text)
         saved.unlink()
         leftovers = {name for name in set(os.listdir(tempfile.gettempdir())) - temp_before
                      if name.startswith(("crk", "crw"))}

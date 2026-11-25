@@ -92,4 +92,4 @@ Uncommitted: 1 file; commit with $crav1-finalize-commit when ready.
 
 Reference page: [add-to-spec](reference/skills/crav1-add-to-spec.md)
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.204.0/docs/from-add-to-spec-code-change.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.205.0/docs/from-add-to-spec-code-change.md

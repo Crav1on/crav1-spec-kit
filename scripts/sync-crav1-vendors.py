@@ -27,6 +27,7 @@ import tempfile
 from pathlib import Path
 
 DOCS_DIR = "crav1-docs"
+V1_NAME = re.compile(r"crav1-[a-z]")  # crav1-2- is kit 2.0 (1.205.0)
 NAME_RULE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 # Same lookbehind as vendor_prefix.py: a path such as crav1/crav1-help stays.
 COMMAND = re.compile(r"(?<![A-Za-z0-9_./-])/crav1-")
@@ -248,6 +249,36 @@ def kit_rules_body(cursor: Path, vendor: str, skills_rel: str) -> str:
     return body.strip() + "\n"
 
 
+def v1_skill_dirs(skills_src: Path) -> list[Path]:
+    """Skill folders this 1.x generator copies. crav1-2- stays out (1.205.0)."""
+    if not skills_src.is_dir():
+        return []
+    return sorted(
+        p for p in skills_src.iterdir()
+        if p.is_dir() and p.name != DOCS_DIR and V1_NAME.match(p.name)
+    )
+
+
+def v1_agent_files(folder: Path) -> list[Path]:
+    """Agent files named crav1-[a-z]*.md. crav1-2-*.md is kit 2.0."""
+    if not folder.is_dir():
+        return []
+    return sorted(p for p in folder.glob("crav1-[a-z]*.md") if p.is_file())
+
+
+def copy_v1_tree(src: Path, dest: Path) -> None:
+    """Copy a tree, leaving out a crav1-2- directory at any level."""
+    dest.mkdir(parents=True, exist_ok=True)
+    for child in sorted(src.iterdir()):
+        if child.name.startswith("crav1-2-") or child.name == "__pycache__":
+            continue
+        target = dest / child.name
+        if child.is_dir():
+            copy_v1_tree(child, target)
+        elif child.is_file() and not child.name.endswith(".pyc"):
+            shutil.copy2(child, target)
+
+
 def generate_one(root: Path, vendor: str, row: dict, version: str) -> Path:
     skills_rel = str(row["skills"]).rstrip("/")
     tree = root / str(row["tree"])
@@ -260,7 +291,7 @@ def generate_one(root: Path, vendor: str, row: dict, version: str) -> Path:
     dest_skills = tree / skills_rel
     dest_skills.mkdir(parents=True)
     ignore = shutil.ignore_patterns("__pycache__", "*.pyc")
-    for skill_dir in sorted(p for p in skills_src.iterdir() if p.is_dir() and p.name != DOCS_DIR):
+    for skill_dir in v1_skill_dirs(skills_src):
         shutil.copytree(skill_dir, dest_skills / skill_dir.name, ignore=ignore)
     docs_src = skills_src / DOCS_DIR
     if docs_src.is_dir():
@@ -269,11 +300,11 @@ def generate_one(root: Path, vendor: str, row: dict, version: str) -> Path:
     if agents_src.is_dir():
         agent_dest = dest_skills / DOCS_DIR / "agents"
         agent_dest.mkdir(parents=True, exist_ok=True)
-        for agent in sorted(agents_src.glob("crav1-*.md")):
+        for agent in v1_agent_files(agents_src):
             shutil.copy2(agent, agent_dest / agent.name)
     assets_src = cursor / "agent-assets"
     if assets_src.is_dir():
-        shutil.copytree(assets_src, dest_skills / DOCS_DIR / "agent-assets", ignore=ignore, dirs_exist_ok=True)
+        copy_v1_tree(assets_src, dest_skills / DOCS_DIR / "agent-assets")
 
     # Frontmatter and the first line need the kit version. Transform skills
     # here, then the rest of the tree (docs included) for paths and prefix.

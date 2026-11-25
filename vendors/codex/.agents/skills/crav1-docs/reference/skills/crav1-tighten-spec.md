@@ -30,4 +30,4 @@ runs by itself: Calls no skill.
 you run next: $crav1-resolve-open-questions; $crav1-finalize-commit
 first: `$crav1-tighten-spec @docs/specs/<slug>/spec.md`
 walkthrough: from-draft-spec.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.204.0/docs/reference/skills/crav1-tighten-spec.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.205.0/docs/reference/skills/crav1-tighten-spec.md

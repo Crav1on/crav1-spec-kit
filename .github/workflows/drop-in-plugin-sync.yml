@@ -26,11 +26,11 @@ jobs:
             fail=1
           fi
 
-          echo "== agents: crav1-*.md =="
+          echo "== agents: crav1-[a-z]*.md =="
           agent_drop="$(mktemp -d)"
           agent_plug="$(mktemp -d)"
-          find .cursor/agents -maxdepth 1 -type f -name 'crav1-*.md' -exec cp -a {} "$agent_drop/" \;
-          find plugins/crav1/agents -maxdepth 1 -type f -name 'crav1-*.md' -exec cp -a {} "$agent_plug/" \;
+          find .cursor/agents -maxdepth 1 -type f -name 'crav1-[a-z]*.md' -exec cp -a {} "$agent_drop/" \;
+          find plugins/crav1/agents -maxdepth 1 -type f -name 'crav1-[a-z]*.md' -exec cp -a {} "$agent_plug/" \;
           if ! diff -ru "$agent_drop" "$agent_plug"; then
             fail=1
           fi

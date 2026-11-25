@@ -60,4 +60,4 @@ A repo that was skipped is a `Waiting` line. When files changed: `Uncommitted: 2
 
 Reference page: [update specs from changes and pull requests](reference/skills/crav1-update-specs-from-changes-and-prs.md)
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.204.0/docs/from-update-specs-from-changes-and-prs.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.205.0/docs/from-update-specs-from-changes-and-prs.md

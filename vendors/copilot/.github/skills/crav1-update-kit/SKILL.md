@@ -3,11 +3,11 @@ name: crav1-update-kit
 description: >-
   Use when the user asks to update the installed CRAV1 kit to a published
   release, or to add or remove one vendor such as Codex. Optional to vX.Y.Z.
-  Default is the latest release tag. Never a branch or an open pull request.
+  Default is the latest 1.x release tag. Never a branch or an open pull request.
 license: MIT
 metadata:
   crav1-vendor: copilot
-  crav1-version: 1.204.0
+  crav1-version: 1.205.0
 ---
 
 Read `../crav1-docs/reference/kit-rules.md` first.
@@ -16,7 +16,7 @@ Read `../crav1-docs/reference/kit-rules.md` first.
 
 # Update the kit
 
-Bring the installed CRAV1 kit on the current branch up to a published release. Command: `/crav1-update-kit`. Optional `to vX.Y.Z`. With no version, the target is the latest published release tag.
+Bring the installed CRAV1 kit on the current branch up to a published release. Command: `/crav1-update-kit`. Optional `to vX.Y.Z`. With no version, the target is the latest published 1.x release tag. A 2.0 tag is not offered.
 
 This is cross-cutting. It is not a starter option. It does not move work into a lane. It does not switch branches. A paused walk stays on this branch.
 
@@ -90,4 +90,5 @@ Do not push unless the user, in this run, already said to push. Do not add a pus
 - Never switch branches, and never rebase. Other branches stay on the old kit until this branch is merged into them.
 - Never target `main`, a branch, a commit, or an open pull request.
 - Never edit a spec, `walk-progress.md`, a `build-progress` file, a plan, a task list, a note, a playbook, or a build map as part of the file replace.
+- Never write, stage, or delete a kit 2.0 path: a skill or agent named `crav1-2-`, a `.crav1-2/` folder, or `sot/`. The commit stages only files the release ships.
 - One commit, message `Update CRAV1 kit vA to vB`. The script does not push.

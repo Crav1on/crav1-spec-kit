@@ -32,6 +32,7 @@ from pathlib import Path
 
 READONLY_TOOLS = "tools: Read, Grep, Glob"
 DOCS_DIR = "crav1-docs"  # bundled kit docs, not a skill
+V1_NAME = re.compile(r"crav1-[a-z]")  # crav1-2- is kit 2.0 (1.205.0)
 
 # Longer prefixes first. Do not rewrite "~/.cursor/" (finalize-commit cites
 # ~/.cursor/cli-config.json, which is a Cursor setting, not a Claude path).
@@ -235,6 +236,36 @@ def rewrite_tree_files(root: Path) -> None:
             path.write_text(updated, encoding="utf-8")
 
 
+def v1_skill_dirs(skills_src: Path) -> list[Path]:
+    """Skill folders this 1.x generator copies. crav1-2- stays out (1.205.0)."""
+    if not skills_src.is_dir():
+        return []
+    return sorted(
+        p for p in skills_src.iterdir()
+        if p.is_dir() and p.name != DOCS_DIR and V1_NAME.match(p.name)
+    )
+
+
+def v1_agent_files(folder: Path) -> list[Path]:
+    """Agent files named crav1-[a-z]*.md. crav1-2-*.md is kit 2.0."""
+    if not folder.is_dir():
+        return []
+    return sorted(p for p in folder.glob("crav1-[a-z]*.md") if p.is_file())
+
+
+def copy_v1_tree(src: Path, dest: Path) -> None:
+    """Copy a tree, leaving out a crav1-2- directory at any level."""
+    dest.mkdir(parents=True, exist_ok=True)
+    for child in sorted(src.iterdir()):
+        if child.name.startswith("crav1-2-") or child.name == "__pycache__":
+            continue
+        target = dest / child.name
+        if child.is_dir():
+            copy_v1_tree(child, target)
+        elif child.is_file():
+            shutil.copy2(child, target)
+
+
 def generate(cursor: Path, dest: Path) -> None:
     skills_src = cursor / "skills" / "crav1"
     agents_src = cursor / "agents"
@@ -249,21 +280,21 @@ def generate(cursor: Path, dest: Path) -> None:
     (dest / "skills").mkdir(parents=True)
     (dest / "agents").mkdir(parents=True)
 
-    for skill_dir in sorted(p for p in skills_src.iterdir() if p.is_dir() and p.name != DOCS_DIR):
+    for skill_dir in v1_skill_dirs(skills_src):
         shutil.copytree(skill_dir, dest / "skills" / skill_dir.name)
     rewrite_tree_files(dest / "skills")
     # The compact docs bundle is copied as generated (no path rewrite).
     if (skills_src / DOCS_DIR).is_dir():
         shutil.copytree(skills_src / DOCS_DIR, dest / "skills" / DOCS_DIR)
 
-    agent_files = sorted(agents_src.glob("crav1-*.md"))
+    agent_files = v1_agent_files(agents_src)
     if not agent_files:
         raise SystemExit(f"no crav1 agents under {agents_src}")
     for agent in agent_files:
         text = transform_agent(agent.read_text(encoding="utf-8"))
         (dest / "agents" / agent.name).write_text(text, encoding="utf-8")
 
-    shutil.copytree(assets_src, dest / "agent-assets")
+    copy_v1_tree(assets_src, dest / "agent-assets")
     rewrite_tree_files(dest / "agent-assets")
 
     instruction = transform_project_instruction(rule_src.read_text(encoding="utf-8"))
@@ -283,7 +314,7 @@ def validate(dest: Path) -> None:
     if "docs/specs/" not in instruction:
         raise SystemExit(".claude/CLAUDE.md lost the kit instruction")
 
-    for agent in sorted((dest / "agents").glob("crav1-*.md")):
+    for agent in v1_agent_files(dest / "agents"):
         fm, _body = split_frontmatter(agent.read_text(encoding="utf-8"))
         if fm is None:
             raise SystemExit(f"{agent.name} lost frontmatter")

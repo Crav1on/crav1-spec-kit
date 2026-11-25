@@ -191,7 +191,8 @@ class CodexRoundTrip(unittest.TestCase):
         bad.write_text(json.dumps({"schema": 1, "vendors": ["codex", "cursor"]}, indent=2) + "\n", encoding="utf-8")
         write(root / "README.md", "edited during the walk\n")
         committed = run_kit([
-            "commit", "--yes", "--add", "codex", "--to-version", "1.204.0", "--root", str(root),
+            "commit", "--yes", "--add", "codex", "--to-version", "1.204.0",
+            "--new", str(tree), "--root", str(root),
         ])
         self.assertEqual(committed.returncode, 0, committed.stderr)
         payload = json.loads(committed.stdout)
@@ -216,7 +217,10 @@ class CodexRoundTrip(unittest.TestCase):
         write(root / ".crav1/glossary-list.md", "not committed\n")
         applied = run_kit(["apply", "--add", "codex", "--new", str(tree), "--yes", "--root", str(root)])
         self.assertEqual(applied.returncode, 0, applied.stderr)
-        committed = run_kit(["commit", "--yes", "--add", "codex", "--to-version", "1.204.0", "--root", str(root)])
+        committed = run_kit([
+            "commit", "--yes", "--add", "codex", "--to-version", "1.204.0",
+            "--new", str(tree), "--root", str(root),
+        ])
         self.assertEqual(committed.returncode, 0, committed.stderr)
         names = subprocess.run(
             ["git", "show", "--name-only", "--format=", "HEAD"], cwd=root, check=True, capture_output=True, text=True,
@@ -232,12 +236,16 @@ class CodexRoundTrip(unittest.TestCase):
         git_init(root)
         applied = run_kit(["apply", "--add", "codex", "--new", str(tree), "--yes", "--root", str(root)])
         self.assertEqual(applied.returncode, 0, applied.stderr)
-        run_kit(["commit", "--yes", "--add", "codex", "--to-version", "1.204.0", "--root", str(root)])
+        run_kit([
+            "commit", "--yes", "--add", "codex", "--to-version", "1.204.0",
+            "--new", str(tree), "--root", str(root),
+        ])
         write(root / "README.md", "edited during the walk\n")
         removed = run_kit(["apply", "--remove", "codex", "--old", str(tree), "--yes", "--root", str(root)])
         self.assertEqual(removed.returncode, 0, removed.stderr)
         committed = run_kit([
-            "commit", "--yes", "--remove", "codex", "--to-version", "1.204.0", "--root", str(root),
+            "commit", "--yes", "--remove", "codex", "--to-version", "1.204.0",
+            "--old", str(tree), "--root", str(root),
         ])
         self.assertEqual(committed.returncode, 0, committed.stderr)
         payload = json.loads(committed.stdout)

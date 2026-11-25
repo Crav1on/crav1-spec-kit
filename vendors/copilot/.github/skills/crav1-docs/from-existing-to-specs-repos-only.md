@@ -57,4 +57,4 @@ This command does not run `/crav1-refresh-system-notes`.
 
 Reference page: [existing-to-specs](reference/skills/crav1-existing-to-specs.md)
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.204.0/docs/from-existing-to-specs-repos-only.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.205.0/docs/from-existing-to-specs-repos-only.md

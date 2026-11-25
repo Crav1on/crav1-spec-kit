@@ -37,6 +37,9 @@ _utf8_stdout()
 KIT_REPO = "https://github.com/Crav1on/crav1-spec-kit.git"
 RELEASE_TAG = re.compile(r"^v(\d+)\.(\d+)\.(\d+)$")
 VERSION_NUM = re.compile(r"^v?(\d+)\.(\d+)\.(\d+)$")
+# Kit 2.0 names its skills and agents crav1-2- and writes .crav1-2/ and sot/.
+# This 1.x script never writes, stages, or deletes those paths.
+V2_NAME = re.compile(r"^crav1-2-")
 KIT_VERSION_LINE = re.compile(r"^Kit version:\s*v?(\d+\.\d+\.\d+)\s*$", re.M)
 CHANGELOG_HEAD = re.compile(r"^##\s+v?(\d+\.\d+\.\d+)\b", re.M)
 SHA = re.compile(r"^[0-9a-f]{7,40}$", re.I)
@@ -63,6 +66,35 @@ class Refuse(SystemExit):
 def refuse(message: str) -> None:
     print(message, file=sys.stderr)
     raise Refuse(message)
+
+
+def _is_v1_version(value: str) -> bool:
+    """True for a 1.x release number. 2.0 tags are ignored by this kit."""
+    match = VERSION_NUM.fullmatch(value.strip().lstrip("v"))
+    return bool(match) and match.group(1) == "1"
+
+
+def is_v2_path(path: str) -> bool:
+    """A kit 2.0 path: a crav1-2- skill or agent name, .crav1-2/, or sot/.
+
+    The crav1-2- name can sit at any skill or agent folder level, such as
+    .cursor/agents/crav1-2-review.md or .agents/skills/crav1-2-help/SKILL.md.
+    """
+    rel = path.replace("\\", "/").strip()
+    while rel.startswith("./"):
+        rel = rel[2:]
+    rel = rel.lstrip("/")
+    if rel == "sot" or rel.startswith("sot/"):
+        return True
+    if rel == ".crav1-2" or rel.startswith(".crav1-2/"):
+        return True
+    for part in rel.split("/"):
+        if part == ".crav1-2" or part.startswith(".crav1-2/"):
+            return True
+        stem = part[:-3] if part.endswith(".md") else part
+        if V2_NAME.match(part) or V2_NAME.match(stem):
+            return True
+    return False
 
 
 def version_key(value: str) -> tuple[int, int, int]:
@@ -113,7 +145,11 @@ def published_tags(text: str) -> list[str]:
             line = line[len("refs/tags/") :]
         if line.endswith("^{}"):
             line = line[:-3]
-        if RELEASE_TAG.fullmatch(line):
+        match = RELEASE_TAG.fullmatch(line)
+        # 1.205.0: a 1.x install is never offered a 2.0 tag, including v2.x
+        # and a prerelease such as v2.0.0-alpha.N (that one already fails the
+        # vX.Y.Z shape). Only v1.Y.Z stays in the list.
+        if match and match.group(1) == "1":
             found.append(line)
     return sorted(set(found), key=version_key)
 
@@ -147,6 +183,10 @@ def refusal_reason(request: str) -> str:
 
 
 def resolve_target(request: str | None, tags: list[str]) -> dict:
+    if request is not None:
+        match = RELEASE_TAG.fullmatch(request)
+        if match and match.group(1) != "1":
+            refuse(f"Refused: {request} is not a 1.x release.")
     if not tags:
         refuse("Refused: no published vX.Y.Z release tag was found.")
     if request is None:
@@ -796,10 +836,14 @@ def is_claude_kit(path: str) -> bool:
 def is_kit_path(path: str, hosts: set[str] | None = None) -> bool:
     """True when path is owned by one of hosts.
 
+    A kit 2.0 path is never owned here, even when a crav1- name pattern would match it.
+
     With no hosts, only Cursor and Claude match. That keeps a hand-made Codex
     tree a project file until Codex is selected. Pass the hosts for this run
     when Codex is part of it.
     """
+    if is_v2_path(path):
+        return False
     table = vendor_table()
     if not table or not isinstance(table.get("vendors"), dict):
         return _legacy_is_cursor_kit(path) or _legacy_is_claude_kit(path)
@@ -814,6 +858,8 @@ def is_kit_path(path: str, hosts: set[str] | None = None) -> bool:
 
 def owned_by_install(path: str) -> bool:
     """Any vendor this release installs. Copilot stays out until its row is live."""
+    if is_v2_path(path):
+        return False
     table = vendor_table()
     if not table or not isinstance(table.get("vendors"), dict):
         return _legacy_is_cursor_kit(path) or _legacy_is_claude_kit(path)
@@ -866,6 +912,8 @@ def _read_tree(folder: Path, prefix: str, out: dict[str, bytes]) -> None:
         if ".git" in path.parts or "__pycache__" in path.parts:
             continue
         rel = f"{prefix}/{path.relative_to(folder).as_posix()}"
+        if is_v2_path(rel):
+            continue
         out[rel] = path.read_bytes()
 
 
@@ -874,7 +922,10 @@ def _read_named(folder: Path, prefix: str, pattern: str, out: dict[str, bytes]) 
         return
     for path in folder.glob(pattern):
         if path.is_file() and not path.is_symlink():
-            out[f"{prefix}/{path.name}"] = path.read_bytes()
+            rel = f"{prefix}/{path.name}"
+            if is_v2_path(rel):
+                continue
+            out[rel] = path.read_bytes()
 
 
 def _read_assets(folder: Path, prefix: str, out: dict[str, bytes]) -> None:
@@ -884,7 +935,7 @@ def _read_assets(folder: Path, prefix: str, out: dict[str, bytes]) -> None:
     if readme.is_file() and not readme.is_symlink():
         out[f"{prefix}/README.md"] = readme.read_bytes()
     for child in folder.iterdir():
-        if child.is_dir() and child.name.startswith("crav1-") and not child.is_symlink():
+        if child.is_dir() and child.name.startswith("crav1-") and not child.name.startswith("crav1-2-") and not child.is_symlink():
             _read_tree(child, f"{prefix}/{child.name}", out)
 
 
@@ -901,7 +952,9 @@ def _legacy_collect_kit(root: Path, hosts: set[str]) -> dict[str, bytes]:
         skills = root / ".claude/skills"
         if skills.is_dir():
             for child in skills.iterdir():
-                if child.is_dir() and (child.name == "crav1-docs" or child.name.startswith("crav1-")):
+                if child.is_dir() and not child.name.startswith("crav1-2-") and (
+                    child.name == "crav1-docs" or child.name.startswith("crav1-")
+                ):
                     _read_tree(child, f".claude/skills/{child.name}", out)
         _read_named(root / ".claude/agents", ".claude/agents", "crav1-*.md", out)
         _read_assets(root / ".claude/agent-assets", ".claude/agent-assets", out)
@@ -935,7 +988,12 @@ def _collect_owns(root: Path, owns: list, out: dict[str, bytes]) -> None:
             if readme.is_file() and not readme.is_symlink():
                 out[f"{base}/{readme_name}"] = readme.read_bytes()
             for child in folder.iterdir():
-                if child.is_dir() and child.name.startswith(token) and not child.is_symlink():
+                if (
+                    child.is_dir()
+                    and child.name.startswith(token)
+                    and not child.name.startswith("crav1-2-")
+                    and not child.is_symlink()
+                ):
                     _read_tree(child, f"{base}/{child.name}", out)
         elif "skills" in rule:
             base = str(rule["skills"]).rstrip("/")
@@ -944,7 +1002,7 @@ def _collect_owns(root: Path, owns: list, out: dict[str, bytes]) -> None:
             if not folder.is_dir():
                 continue
             for child in folder.iterdir():
-                if child.is_dir() and not child.is_symlink() and (
+                if child.is_dir() and not child.is_symlink() and not child.name.startswith("crav1-2-") and (
                     child.name == f"{token}-docs" or child.name.startswith(f"{token}-")
                 ):
                     _read_tree(child, f"{base}/{child.name}", out)
@@ -1500,7 +1558,7 @@ def build_actions(
     }
     payloads: dict[str, bytes | None] = {}
     for path in paths:
-        if not is_kit_path(path, hosts):
+        if is_v2_path(path) or not is_kit_path(path, hosts):
             continue
         style = preferred_newline(root, path, local_files.get(path))
         action = classify_file(old_files.get(path), local_files.get(path), new_files.get(path), style)
@@ -1531,6 +1589,8 @@ def build_actions(
         new_templates = collect_templates(new_root)
         local_templates = collect_templates(root)
         for path in sorted(set(local_templates) | set(old_templates) | set(new_templates)):
+            if is_v2_path(path):
+                continue
             style = preferred_newline(root, path, local_templates.get(path))
             action = classify_template(old_templates.get(path), local_templates.get(path), new_templates.get(path), style)
             if action["op"] == "write":
@@ -1694,6 +1754,8 @@ def style_rule_kit_owned(root: Path, rel: str) -> bool:
 
 
 def _write(root: Path, rel: str, data: bytes | None) -> None:
+    if is_v2_path(rel):
+        refuse(f"Refused: {rel} belongs to kit 2.0.")
     if not (rel == KIT_JSON or is_template(rel) or is_style_rule(rel) or owned_by_install(rel)):
         refuse(f"Refused: {rel} is a project file.")
     path = _safe(root, rel)
@@ -1769,6 +1831,33 @@ def _ignored(root: Path, paths: list[str]) -> set[str]:
     return {line.strip().replace("\\", "/") for line in result.stdout.splitlines() if line.strip()}
 
 
+def release_file_list(trees: list[Path], hosts: set[str] | None) -> set[str]:
+    """Paths the release trees actually ship, plus kit.json.
+
+    The commit stages this list. A name pattern is not the list: a crav1-2-
+    file matches crav1-* and must not be staged. Templates and a commit-style
+    rule are included when that release still contains them.
+    """
+    listed: set[str] = {KIT_JSON}
+    host_set = set(hosts) if hosts else {"cursor", "claude"}
+    for tree in trees:
+        listed.update(collect_kit(tree, host_set, release=True))
+        listed.update(collect_templates(tree))
+        for rel, name in STYLE_RULES.items():
+            if _style_asset(tree, name) is not None:
+                listed.add(rel)
+    return {path for path in listed if not is_v2_path(path)}
+
+
+def _stageable(root: Path, path: str, listed: set[str]) -> bool:
+    """True when path is on the release list. Kit 2.0 paths are never stageable."""
+    if is_v2_path(path):
+        return False
+    if path in listed:
+        return True
+    return style_rule_kit_owned(root, path)
+
+
 def commit_kit(
     root: Path,
     old: str,
@@ -1777,18 +1866,29 @@ def commit_kit(
     *,
     vendors: list[str] | None = None,
     removing: bool = False,
+    old_root: Path | None = None,
+    new_root: Path | None = None,
 ) -> dict:
     if not yes:
         refuse("Refused: a commit needs a yes in this run.")
     if not (root / ".git").exists():
         refuse("Refused: a commit needs a git checkout.")
+    trees = [tree for tree in (old_root, new_root) if tree is not None]
+    if not trees:
+        refuse("Refused: a commit needs the release tree.")
     dirty = dirty_paths(root)
     base = selection_hosts(root)
     hosts = set(base or ()) | set(vendors) if vendors else base
     for path in _ignored_owned(root, hosts):
+        if is_v2_path(path):
+            continue
         if path not in dirty:
             dirty.append(path)
-    stage = [path for path in dirty if is_managed(path, hosts) or style_rule_kit_owned(root, path)]
+    listed = release_file_list(trees, hosts)
+    already = [path for path in _cached_paths(root) if is_v2_path(path)]
+    if already:
+        refuse("Refused: " + ", ".join(already) + " belongs to kit 2.0.")
+    stage = [path for path in dirty if _stageable(root, path, listed)]
     left = [path for path in dirty if path not in stage]
     if not stage:
         refuse("Refused: nothing kit-owned to commit.")
@@ -1800,7 +1900,10 @@ def commit_kit(
     if forced:
         git(root, "add", "-f", "--", *forced)
     cached = _cached_paths(root)
-    safe = [path for path in cached if is_managed(path, hosts) or style_rule_kit_owned(root, path)]
+    v2_cached = [path for path in cached if is_v2_path(path)]
+    if v2_cached:
+        refuse("Refused: " + ", ".join(v2_cached) + " belongs to kit 2.0.")
+    safe = [path for path in cached if _stageable(root, path, listed)]
     unsafe = [path for path in cached if path not in safe]
     if unsafe:
         subprocess.run(["git", "restore", "--staged", "--", *unsafe], cwd=root, check=False)
@@ -1831,6 +1934,8 @@ def fetch_release(tag: str, dest: Path | None, url: str) -> Path:
     normalized = normalize_request(tag)
     if normalized is None or not RELEASE_TAG.fullmatch(normalized):
         refuse(refusal_reason(tag.strip()))
+    if not normalized.startswith("v1."):
+        refuse(f"Refused: {normalized} is not a 1.x release.")
     dest = dest or default_dest(normalized)
     if dest.exists():
         refuse(f"Refused: {dest} already exists.")
@@ -1917,12 +2022,16 @@ def _latest_release(timeout: int = 5) -> str | None:
 
     forced = os.environ.get("CRAV1_KIT_LATEST", "").strip()
     if forced:
-        return forced.lstrip("v") if forced.lower() not in ("none", "off") else None
+        if forced.lower() in ("none", "off"):
+            return None
+        version = forced.lstrip("v")
+        return version if _is_v1_version(version) else None
     cache = Path(tempfile.gettempdir()) / "crav1-kit-latest.json"
     try:
         data = json.loads(cache.read_text(encoding="utf-8"))
-        if time.time() - float(data.get("at", 0)) < LATEST_CACHE_HOURS * 3600 and data.get("latest"):
-            return str(data["latest"])
+        cached = str(data.get("latest") or "")
+        if time.time() - float(data.get("at", 0)) < LATEST_CACHE_HOURS * 3600 and _is_v1_version(cached):
+            return cached
     except (OSError, ValueError, TypeError):
         pass
     try:
@@ -1954,7 +2063,7 @@ def update_available(root: Path, home: Path | None = None, timeout: int = 5) -> 
     if not installed or info.get("mode") in ("none", "kit-repo"):
         return None
     latest = _latest_release(timeout)
-    if not latest or not VERSION_NUM.fullmatch(latest) or not VERSION_NUM.fullmatch(str(installed).lstrip("v")):
+    if not latest or not _is_v1_version(latest) or not _is_v1_version(str(installed)):
         return None
     if version_key(latest) <= version_key(str(installed).lstrip("v")):
         return None
@@ -2123,6 +2232,8 @@ def main(argv: list[str] | None = None) -> int:
                     args.yes,
                     vendors=vendor_names or None,
                     removing=bool(args.remove),
+                    old_root=Path(args.old) if args.old else None,
+                    new_root=Path(args.new) if args.new else None,
                 )
             )
             return 0

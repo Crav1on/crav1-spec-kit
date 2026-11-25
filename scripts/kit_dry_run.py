@@ -30,6 +30,7 @@ import stat
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 from pathlib import Path
 
@@ -52,6 +53,39 @@ TO = "===== COPY TO HERE ====="
 UPDATE = "plugins/crav1/skills/crav1-update-kit/scripts/update_kit.py"
 WALK = "crav1-tighten-and-plan-ready-to-build/scripts/walk_progress.py"
 GIT = ["git", "-c", "core.longpaths=true", "-c", "core.autocrlf=false"]
+# Plain text on stderr. No ANSI: Windows PowerShell 5.1 does not need it.
+STEP_DOT_SECONDS = 3.0
+
+
+class Step:
+    """One progress line on stderr. A dot every few seconds while the step runs."""
+
+    def __init__(self, label: str, interval: float = STEP_DOT_SECONDS):
+        self.label = label
+        self.interval = interval
+        self._stop = threading.Event()
+        self._thread: threading.Thread | None = None
+
+    def __enter__(self) -> "Step":
+        sys.stderr.write(self.label)
+        sys.stderr.flush()
+
+        def beat() -> None:
+            while not self._stop.wait(self.interval):
+                sys.stderr.write(".")
+                sys.stderr.flush()
+
+        self._thread = threading.Thread(target=beat, daemon=True)
+        self._thread.start()
+        return self
+
+    def __exit__(self, *exc: object) -> bool:
+        self._stop.set()
+        if self._thread is not None:
+            self._thread.join()
+        sys.stderr.write("\n")
+        sys.stderr.flush()
+        return False
 
 
 def run(cmd: list[str], cwd: Path | None = None, timeout: int = 600) -> tuple[int, str]:
@@ -178,7 +212,8 @@ def update_into(worktree: Path, kit: Path, tmp: Path, source: str | None) -> lis
     script = kit / UPDATE
     py = [sys.executable, "-X", "utf8", str(script)]
     lines = []
-    code, out = run(py + ["detect", "--root", str(worktree)])
+    with Step("update detect"):
+        code, out = run(py + ["detect", "--root", str(worktree)])
     lines.append(_summarise("detect", code, out))
     try:
         info = json.loads(out)
@@ -192,12 +227,15 @@ def update_into(worktree: Path, kit: Path, tmp: Path, source: str | None) -> lis
     if not ok:
         return lines + [f"Update skipped: the installed release v{installed} could not be fetched: {err.splitlines()[-1] if err else ''}"]
     target = kit_version(kit)
-    for cmd in (["plan", "--old", str(old), "--new", str(kit), "--to-version", target],
-                ["apply", "--old", str(old), "--new", str(kit), "--yes"]):
-        code, out = run(py + cmd + ["--root", str(worktree)])
-        lines.append(_summarise(cmd[0], code, out))
-        if code != 0:
-            break
+    plan_cmd = ["plan", "--old", str(old), "--new", str(kit), "--to-version", target]
+    with Step("update plan"):
+        code, out = run(py + plan_cmd + ["--root", str(worktree)])
+    lines.append(_summarise("plan", code, out))
+    if code == 0:
+        apply_cmd = ["apply", "--old", str(old), "--new", str(kit), "--yes"]
+        with Step("update apply"):
+            code, out = run(py + apply_cmd + ["--root", str(worktree)])
+        lines.append(_summarise("apply", code, out))
     return lines
 
 
@@ -251,20 +289,21 @@ def add_vendors(worktree: Path, kit: Path, names: list[str]) -> list[str]:
     total = _skill_total(kit)
     for name in names:
         row = _vendor_row(kit, name)
-        code, out = run(py + ["plan", "--add", name, "--root", str(worktree)])
-        try:
-            plan = json.loads(out)
-        except ValueError:
-            plan = {}
-        item = {}
-        if isinstance(plan, dict):
-            vendors = plan.get("vendors") or []
-            if vendors and isinstance(vendors[0], dict):
-                item = vendors[0]
-        if code == 0:
-            code, applied = run(py + ["apply", "--add", name, "--yes", "--root", str(worktree)])
-            if code != 0:
-                out = applied
+        with Step(f"add vendor {name}"):
+            code, out = run(py + ["plan", "--add", name, "--root", str(worktree)])
+            try:
+                plan = json.loads(out)
+            except ValueError:
+                plan = {}
+            item = {}
+            if isinstance(plan, dict):
+                vendors = plan.get("vendors") or []
+                if vendors and isinstance(vendors[0], dict):
+                    item = vendors[0]
+            if code == 0:
+                code, applied = run(py + ["apply", "--add", name, "--yes", "--root", str(worktree)])
+                if code != 0:
+                    out = applied
         folder = item.get("folder") or row.get("skills") or "(unknown)"
         extras = item.get("extras") if isinstance(item.get("extras"), list) else row.get("extras") or []
         extra_text = ", ".join(str(part) for part in extras) if extras else "none"
@@ -301,7 +340,8 @@ def checks(worktree: Path, kit: Path, spec: str, extras: list[str]) -> list[str]
         return ["walk_progress.py was not found in the worktree or the kit clone."]
     py = [sys.executable, "-X", "utf8"]
     lines = [f"Scripts from: {walk.relative_to(worktree) if worktree in walk.parents else 'the kit clone'}"]
-    code, out = run(py + [str(walk), "start", "--root", spec, "--skip-sync"], cwd=worktree)
+    with Step("walk_progress start"):
+        code, out = run(py + [str(walk), "start", "--root", spec, "--skip-sync"], cwd=worktree)
     lines.append(f"$ walk_progress.py start --root \"{spec}\" --skip-sync (exit {code})\n{_quiet(out)}")
     folder = None
     try:
@@ -309,7 +349,8 @@ def checks(worktree: Path, kit: Path, spec: str, extras: list[str]) -> list[str]
     except ValueError:
         pass
     if folder:
-        code, out = run(py + [str(walk), "readiness", "--root", folder, "--text"], cwd=worktree)
+        with Step("readiness"):
+            code, out = run(py + [str(walk), "readiness", "--root", folder, "--text"], cwd=worktree)
         rel = os.path.relpath(folder, worktree)
         lines.append(f"$ walk_progress.py readiness --root {rel} --text (exit {code})\n{_quiet(out)}")
     else:
@@ -403,8 +444,10 @@ def main(argv: list[str] | None = None) -> int:
     before = snapshot(repo)
     added = False
     block: list[str] = []
+    started = time.monotonic()
     try:
-        ok, err = clone_kit(tmp_kit / "k", args.kit_source, args.pr, args.branch)
+        with Step("cloning kit"):
+            ok, err = clone_kit(tmp_kit / "k", args.kit_source, args.pr, args.branch)
         kit = tmp_kit / "k"
         which_ref = f"PR {args.pr}" if args.pr else f"branch {args.branch}"
         if not ok:
@@ -413,7 +456,8 @@ def main(argv: list[str] | None = None) -> int:
             _c, sha = run(["git", "-C", str(kit), "rev-parse", "--short", "HEAD"])
             _c, head = run(["git", "-C", str(repo), "rev-parse", "--short", "HEAD"])
             block = [f"Kit: {kit_version(kit)} at {sha} ({which_ref})", f"Project HEAD: {head}", f"Spec: {args.spec}", ""]
-            code, out = run(GIT + ["-C", str(repo), "worktree", "add", "--detach", "--quiet", str(worktree), "HEAD"])
+            with Step("making temp worktree"):
+                code, out = run(GIT + ["-C", str(repo), "worktree", "add", "--detach", "--quiet", str(worktree), "HEAD"])
             if code != 0:
                 block.append(f"git worktree add failed:\n{out}")
             else:
@@ -423,17 +467,18 @@ def main(argv: list[str] | None = None) -> int:
                     block += ["", "--- Add ---", *add_vendors(worktree, kit, args.add)]
                 block += ["", "--- Checks ---", *checks(worktree, kit, args.spec, args.extra)]
     finally:
-        if added:
-            code, out = run(["git", "-C", str(repo), "worktree", "remove", "--force", str(worktree)])
+        with Step("cleanup"):
+            if added:
+                code, out = run(["git", "-C", str(repo), "worktree", "remove", "--force", str(worktree)])
+                if code != 0:
+                    cleanup.append(f"git worktree remove failed: {out}")
+            code, out = run(["git", "-C", str(repo), "worktree", "prune"])
             if code != 0:
-                cleanup.append(f"git worktree remove failed: {out}")
-        code, out = run(["git", "-C", str(repo), "worktree", "prune"])
-        if code != 0:
-            cleanup.append(f"git worktree prune failed: {out}")
-        for folder in (tmp_wt, tmp_kit):
-            problem = remove_tree(folder)
-            if problem:
-                cleanup.append(problem)
+                cleanup.append(f"git worktree prune failed: {out}")
+            for folder in (tmp_wt, tmp_kit):
+                problem = remove_tree(folder)
+                if problem:
+                    cleanup.append(problem)
     changed = compare(before, snapshot(repo))
     repo_line = "Your repo: unchanged" if not changed else "!!!!! Your repo CHANGED: !!!!!\n" + "\n".join(changed)
     text = "\n".join([FROM, *block, "", "Cleanup: " + ("; ".join(cleanup) if cleanup else "worktree and temp folders removed"),
@@ -447,6 +492,9 @@ def main(argv: list[str] | None = None) -> int:
         print("Cleanup failed: " + "; ".join(cleanup))
     if changed:
         print("Your repo CHANGED during the dry run; see the block above.")
+    elapsed = round(time.monotonic() - started)
+    sys.stderr.write(f"done ({elapsed} s)\n")
+    sys.stderr.flush()
     return 1 if cleanup or changed else 0
 
 

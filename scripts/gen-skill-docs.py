@@ -38,6 +38,7 @@ GENERATED = (
 )
 LANE_KEYS = {"specify": "specify", "plan": "plan", "build": "build", "cross-cutting": "cross_cutting"}
 CMD = re.compile(r"/crav1-[a-z0-9-]+")
+V1_NAME = re.compile(r"crav1-[a-z]")  # crav1-2- is kit 2.0 (1.205.0)
 AGENT = re.compile(r"crav1-[a-z0-9-]+-agent")
 
 
@@ -66,6 +67,13 @@ def calls_cell(text: str) -> str:
     return ", ".join(f"`{t}`" for t in found) if found else "—"
 
 
+def v1_agent_stems(folder: Path) -> list[str]:
+    """Agent stems named crav1-[a-z]*.md. A crav1-2- agent is kit 2.0 (1.205.0)."""
+    if not folder.is_dir():
+        return []
+    return sorted(p.stem for p in folder.glob("crav1-[a-z]*.md") if p.is_file())
+
+
 def load() -> dict:
     return yaml.safe_load(DATA.read_text(encoding="utf-8"))
 
@@ -77,14 +85,17 @@ def validate(data: dict) -> list[str]:
     lanes = {lane["id"]: lane for lane in data["lanes"]}
     if len(names) != len(set(names)):
         errors.append("skills.yaml lists a skill twice")
-    folders = sorted(p.name for p in SKILLS_DIR.iterdir() if (p / "SKILL.md").is_file())
+    folders = sorted(
+        p.name for p in SKILLS_DIR.iterdir()
+        if (p / "SKILL.md").is_file() and V1_NAME.match(p.name)
+    )
     for f in folders:
         if f not in names:
             errors.append(f"skill folder {f} is not in docs/reference/skills.yaml")
     for n in names:
         if n not in folders:
             errors.append(f"skills.yaml lists {n}, but .cursor/skills/crav1/{n}/SKILL.md is missing")
-    agents = sorted(p.stem for p in AGENTS_DIR.glob("crav1-*.md"))
+    agents = v1_agent_stems(AGENTS_DIR)
     sub_names = [s["name"] for s in data["subagents"]]
     for a in agents:
         if a not in sub_names:

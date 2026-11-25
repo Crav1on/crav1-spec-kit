@@ -17,6 +17,8 @@ Kit-owned paths only, for each vendor in `.crav1/kit.json`. When that file is mi
 
 A file the new release removed is deleted when the local copy still matches the old release. A file the project added inside a kit folder, and that neither release contains, is left in place and listed.
 
+The commit stages files the release trees ship (1.205.0). A name pattern is not the list. Pass `--old` and `--new` on `commit`, the same trees as the plan. A skill or agent whose name starts with `crav1-2-`, a `.crav1-2/` folder, and `sot/` are refused. They are not written, staged, or deleted.
+
 ## Three-way merge
 
 Compare the old release, the local file, and the new release.
@@ -42,4 +44,4 @@ A saved commit-style rule (`draft-commit-style` or `draft-commit-gitlog` in the 
 
 ## Commit
 
-On `yes`, after apply and after the migration card when there is one, run `commit --yes --from-version <installed> --to-version <target>`. The message is `Update CRAV1 kit vA to vB`. The commit stages kit-owned paths and updated templates only. Project files stay unstaged, including a spec a migration just rewrote. On `write only`, do not commit.
+On `yes`, after apply and after the migration card when there is one, run `commit --yes --from-version <installed> --to-version <target> --old <old-release> --new <new-release>`. The message is `Update CRAV1 kit vA to vB`. The commit stages files those release trees ship, including an updated template that still matched the old release. Project files stay unstaged, including a spec a migration just rewrote, a `crav1-2-` skill or agent, `.crav1-2/`, and `sot/`. On `write only`, do not commit.

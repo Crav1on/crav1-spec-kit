@@ -19,4 +19,4 @@ runs by itself: Calls no skill.
 you run next: /crav1-tighten-plan
 first: `/crav1-review-plan @docs/specs/<slug>/`
 walkthrough: from-spec-to-plan.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.204.0/docs/reference/skills/crav1-review-plan.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.205.0/docs/reference/skills/crav1-review-plan.md
