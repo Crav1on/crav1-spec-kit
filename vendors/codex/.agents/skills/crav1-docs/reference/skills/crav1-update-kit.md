@@ -7,9 +7,14 @@ purpose: Update the installed kit on the current branch to a published release.
 use_when: The installed kit should move to a published release
 reads: Reads `plugin.json` or the `Kit version:` line, the published `vX.Y.Z` tags, the old release, the new release, `vendors.json`, `.crav1/kit.json` when it exists, and the working tree. It does not read a branch or an open pull request as a target.
 writes: Writes kit-owned files on the current branch after a yes, including the Codex tree under `.agents/skills/` when Codex is selected, writes `.crav1/kit.json`, replaces a copied template that still matches the old release apart from line endings, and commits `Update CRAV1 kit vA to vB` when the user chose the commit. `add codex` commits `Add CRAV1 kit vendor codex vX.Y.Z`. `remove codex` commits `Remove CRAV1 kit vendor codex vX.Y.Z`. A migration listed for the jump is dry-run and written only on its own yes, and is left unstaged.
-leaves alone: Leaves specs, `walk-progress.md`, `build-progress/`, plans, tasks, notes, playbooks, the build map, persist rules (except a stale commit-style rule, 1.176.0), the transfer data policy, `kit-maintainer.mdc`, and the project's `AGENTS.md` alone. A skill folder that does not start with `crav1-` stays a project file. Copilot is not installed by this release. Does not switch branches, rebase, or push. A plugin install gets no kit commit.
+leaves alone: Leaves specs, `walk-progress.md`, `build-progress/`, plans, tasks, notes, playbooks, the build map, persist rules (except a stale commit-style rule, 1.176.0), the transfer data policy, `kit-maintainer.mdc`, and the project's `AGENTS.md` alone. A skill folder that does not start with `crav1-` stays a project file. A `crav1-2-` skill or agent, `.crav1-2/`, and `sot/` stay. Copilot is not installed by this release. Does not switch branches, rebase, or push. A plugin install gets no kit commit.
 limits: a target that is not a published release tag stops in one line. A clash is not overwritten. An edited template is listed and left. The kit source checkout is refused. An agent's yes does not write, commit, or push.
 flow:
+- Pass `--old` and `--new` (or `--new` on add, `--old` on remove).
+- A `crav1-` name pattern is not the list.
+- A skill or agent named `crav1-2-`, a `.crav1-2/` folder, and `sot/` are not written, staged, or deleted.
+- With no version, the target is the latest published 1.x tag.
+- `v2.0.0` and `v2.0.0-alpha.1` are not offered.
 - `.crav1/kit.json` lists the vendors.
 - `add codex` copies `vendors/codex/` into `.agents/skills/` and does not upgrade the other vendors.
 - `remove codex` deletes kit-owned files that still match the release; a local edit is a clash (`keep` or `take`); other files stay.
@@ -25,6 +30,8 @@ flow:
 - a persisted commit-style rule that is the old release's copy, or names the missing `crav1-draft-commit-message/` skill, is rewritten from the current message-only asset in the same yes.
 - A rule changed by hand is left and listed in `style_rules_left`.
 - **`$crav1-update-kit`** takes an optional `to vX.Y.Z`.
+- With no version, the target is the latest published 1.x release tag.
+- A 2.0 tag is not offered.
 - `main`, a branch, a commit, and an open pull request are refused in one line.
 - It detects the installed version from `plugin.json` or the `Kit version:` line in `crav1-docs/reference/workflow.md` (the changelog heading when that line is missing).
 - Before any write it shows which branch that is, that only this branch gets the new kit, and that other branches stay on the old kit until this branch is merged into them (merge develop into the branch; never rebase).
@@ -41,4 +48,4 @@ runs by itself: Calls no skill. Runs `scripts/update_kit.py --vendor codex`.
 you run next: nothing needed now
 first: `$crav1-update-kit Update the kit in this consumer project.`
 walkthrough: from-update-kit.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.204.0/docs/reference/skills/crav1-update-kit.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.205.0/docs/reference/skills/crav1-update-kit.md

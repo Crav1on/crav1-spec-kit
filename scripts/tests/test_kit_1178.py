@@ -168,7 +168,7 @@ class StyleRules(unittest.TestCase):
         # The new asset is now installed on this branch, so the rewrite is the kit's own.
         self.assertEqual((self.root / rb.ASSETS / "draft-commit-style.mdc").read_text(), "style v2\n")
         (self.root / "app.txt").write_text("project edit\n", encoding="utf-8")
-        done = UK.commit_kit(self.root, "1.177.2", "1.178.0", True)
+        done = UK.commit_kit(self.root, "1.177.2", "1.178.0", True, old_root=self.old, new_root=self.new)
         self.assertIn(".cursor/rules/draft-commit-style.mdc", done["committed"])
         self.assertIn(".claude/rules/draft-commit-style.md", done["committed"])
         self.assertIn("app.txt", done["left_uncommitted"])
@@ -185,7 +185,7 @@ class StyleRules(unittest.TestCase):
         UK.apply_overlay(self.root, self.old, self.new, {"cursor", "claude"}, True, set(), set())
         self.assertFalse((self.root / ".cursor/rules/draft-commit-style.mdc").exists())
         self.assertTrue(UK.style_rule_kit_owned(self.root, ".cursor/rules/draft-commit-style.mdc"))
-        done = UK.commit_kit(self.root, "1.177.2", "1.178.0", True)
+        done = UK.commit_kit(self.root, "1.177.2", "1.178.0", True, old_root=self.old, new_root=self.new)
         self.assertIn(".cursor/rules/draft-commit-style.mdc", done["committed"])
 
 

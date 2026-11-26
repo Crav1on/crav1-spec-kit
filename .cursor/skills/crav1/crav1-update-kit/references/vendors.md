@@ -33,7 +33,7 @@ update_kit.py apply --add codex --new <release-tree> --yes --root .
 It writes that vendor's files and `.crav1/kit.json` only. Then, when they chose the commit:
 
 ```text
-update_kit.py commit --yes --add codex --to-version <version> --root .
+update_kit.py commit --yes --add codex --to-version <version> --new <release-tree> --root .
 ```
 
 The message is `Add CRAV1 kit vendor codex vX.Y.Z`. One commit. It does not push.
@@ -42,12 +42,12 @@ A second apply that finds the same files changes nothing.
 
 ## Remove
 
-`remove codex` deletes kit-owned files that still match the installed release. A local edit is a clash (`keep` leaves it, `take` deletes it). A file the release does not contain stays. Other vendors' folders stay.
+`remove codex` deletes kit-owned files that still match the installed release. A local edit is a clash (`keep` leaves it, `take` deletes it). A file the release does not contain stays. A `crav1-2-` skill or agent, `.crav1-2/`, and `sot/` stay. Other vendors' folders stay.
 
 ```text
 update_kit.py plan --remove codex --old <release-tree> --root .
 update_kit.py apply --remove codex --old <release-tree> --yes --root .
-update_kit.py commit --yes --remove codex --to-version <version> --root .
+update_kit.py commit --yes --remove codex --to-version <version> --old <release-tree> --root .
 ```
 
 The message is `Remove CRAV1 kit vendor codex vX.Y.Z`.

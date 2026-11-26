@@ -113,4 +113,4 @@ A task name is the outcome after a `` `fix/x` from `develop` `` clause. Parenthe
 
 The merge card names a deploy or pipeline side effect only when `pipeline_trigger.py check --repo <code checkout> --branch <base>` in `crav1-merge-pr` finds a pipeline file whose trigger covers the base, and then only as a trigger, never that a deploy starts. `$crav1-open-pr` stops after one host read when the pull request is someone else's and up to date.
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.204.0/docs/from-build-walk.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.205.0/docs/from-build-walk.md

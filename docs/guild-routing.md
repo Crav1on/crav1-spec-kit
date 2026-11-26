@@ -137,7 +137,7 @@ Started from a ready-to-build report, the walk offers each ready branch as its o
 
 `/crav1-help` may run from any lane. It answers what to run next, in what order, and what a skill does, from the kit's own docs, never GitHub. It writes nothing and runs no skill. It does not move work into Specify, Plan, or Build. It is not a starter option. Agents call it before they suggest more than one next step.
 
-`/crav1-update-kit` may run from any lane when the user asks to update the installed kit. Optional `to vX.Y.Z`. The default is the latest published release tag. It refuses `main`, a branch, a commit, and an open pull request. It does not switch branches and never rebases. A yes from an agent does not write. It does not move work into Specify, Plan, or Build. It is not a starter option.
+`/crav1-update-kit` may run from any lane when the user asks to update the installed kit. Optional `to vX.Y.Z`. The default is the latest published 1.x release tag. A 2.0 tag is not offered. It refuses `main`, a branch, a commit, and an open pull request. It does not switch branches and never rebases. A yes from an agent does not write. It does not move work into Specify, Plan, or Build. It is not a starter option.
 
 `/crav1-tasks-ready-to-build` may run from any lane, any time, when you type it. It is command-only. It names `/crav1-build-tasks` and does not run it. It does not move work into Build. It is not a starter option.
 

@@ -41,4 +41,4 @@ No `spec.md` edit. No `plan.md` edit. No `tasks.md` edit. No `verify.md` edit.
 
 Reference page: [run-exploratory-test](reference/skills/crav1-run-exploratory-test.md)
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.204.0/docs/from-run-exploratory-test.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.205.0/docs/from-run-exploratory-test.md

@@ -72,4 +72,4 @@ When specs were written, Run next names `$crav1-tighten-spec <first slug>` becau
 
 Reference page: [existing-to-specs](reference/skills/crav1-existing-to-specs.md)
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.204.0/docs/from-existing-to-specs-with-bundle.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.205.0/docs/from-existing-to-specs-with-bundle.md

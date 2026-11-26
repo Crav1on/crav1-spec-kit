@@ -67,7 +67,7 @@ class CardLint(unittest.TestCase):
     def test_scope_is_every_skill(self):
         names = {
             path.name for path in SKILLS.iterdir()
-            if path.is_dir() and path.name.startswith("crav1-") and path.name != "crav1-docs"
+            if path.is_dir() and LINT.is_v1_skill_name(path.name)
         }
         self.assertEqual(set(LINT.CARD_LINT_SKILLS), names)
         self.assertGreater(len(names), 8)

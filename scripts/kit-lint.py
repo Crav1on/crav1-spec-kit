@@ -590,14 +590,23 @@ def ending_layout_problems(kit):
 # Only `Card:` lines and the option lines right under them are read, so prose
 # is never checked. Since 1.200.0 the check runs on every skill. The rule is
 # docs/reference/question-cards.md.
-def _card_lint_skills():
-    root = os.path.join(os.path.dirname(__file__), "..", ".cursor", "skills", "crav1")
+def is_v1_skill_name(name):
+    """1.x skill folders. crav1-2- is kit 2.0 and is not linted here (1.205.0)."""
+    return bool(re.match(r"crav1-[a-z]", name)) and name != "crav1-docs"
+
+
+def skill_names(root):
     if not os.path.isdir(root):
         return ()
     return tuple(sorted(
         name for name in os.listdir(root)
-        if name.startswith("crav1-") and name != "crav1-docs" and os.path.isdir(os.path.join(root, name))
+        if is_v1_skill_name(name) and os.path.isdir(os.path.join(root, name))
     ))
+
+
+def _card_lint_skills():
+    root = os.path.join(os.path.dirname(__file__), "..", ".cursor", "skills", "crav1")
+    return skill_names(root)
 
 
 CARD_LINT_SKILLS = _card_lint_skills()

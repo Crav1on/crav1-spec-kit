@@ -194,4 +194,4 @@ The old names were removed in 1.58.0 and no longer run. Use the new name, with t
 | `$crav1-exploratory-test` | [`$crav1-run-exploratory-test`](reference/skills/crav1-run-exploratory-test.md) | — |
 | `$crav1-feature-branch` | [`$crav1-create-feature-branch`](reference/skills/crav1-create-feature-branch.md) | — |
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.204.0/docs/README.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.205.0/docs/README.md

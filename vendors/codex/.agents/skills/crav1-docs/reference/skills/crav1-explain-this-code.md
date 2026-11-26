@@ -27,4 +27,4 @@ runs by itself: Calls no skill.
 you run next: nothing in particular
 first: `$crav1-explain-this-code what-it-does @src/<file>`
 walkthrough: from-explain-this-code.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.204.0/docs/reference/skills/crav1-explain-this-code.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.205.0/docs/reference/skills/crav1-explain-this-code.md

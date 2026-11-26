@@ -8,6 +8,8 @@
 
 Update the installed kit on the current branch to a published release.
 
+1.205.0: the commit stages files the release trees ship. Pass `--old` and `--new` (or `--new` on add, `--old` on remove). A `crav1-` name pattern is not the list. A skill or agent named `crav1-2-`, a `.crav1-2/` folder, and `sot/` are not written, staged, or deleted. With no version, the target is the latest published 1.x tag. `v2.0.0` and `v2.0.0-alpha.1` are not offered.
+
 1.204.0: Codex is installed. `.crav1/kit.json` lists the vendors. A missing file is inferred from marker files and written in the same yes. `add codex` copies `vendors/codex/` into `.agents/skills/` and does not upgrade the other vendors. `remove codex` deletes kit-owned files that still match the release; a local edit is a clash (`keep` or `take`); other files stay. `detect` adds `vendors_from`. The project `AGENTS.md` is never written. Copilot is not installed by this release.
 
 1.201.0: `vendors.json` lists each host: the folders the kit owns, the frontmatter a skill needs, the command prefix, and extra files. Cursor and Claude Code reproduce the 1.200 allow-list. Codex and Copilot are rows and are not installed. `detect` reports `vendors`. `vendors --root .` lists each folder and skill count and writes nothing. `--vendor codex` prints `$crav1-` on a Run next script; the default prefix stays `/`.
@@ -16,7 +18,7 @@ Update the installed kit on the current branch to a published release.
 
 1.176.0: a persisted commit-style rule that is the old release's copy, or names the missing `crav1-draft-commit-message/` skill, is rewritten from the current message-only asset in the same yes. A rule changed by hand is left and listed in `style_rules_left`.
 
-**[`/crav1-update-kit`](crav1-update-kit.md)** takes an optional `to vX.Y.Z`. With no version, the target is the latest published release tag. `main`, a branch, a commit, and an open pull request are refused in one line. It detects the installed version from `plugin.json` or the `Kit version:` line in `crav1-docs/reference/workflow.md` (the changelog heading when that line is missing).
+**[`/crav1-update-kit`](crav1-update-kit.md)** takes an optional `to vX.Y.Z`. With no version, the target is the latest published 1.x release tag. A 2.0 tag is not offered. `main`, a branch, a commit, and an open pull request are refused in one line. It detects the installed version from `plugin.json` or the `Kit version:` line in `crav1-docs/reference/workflow.md` (the changelog heading when that line is missing).
 
 It commits on the current branch and does not switch. Before any write it shows which branch that is, that only this branch gets the new kit, and that other branches stay on the old kit until this branch is merged into them (merge develop into the branch; never rebase). It suggests merging first or switching branch when this branch should not move, and it warns about uncommitted changes. A yes from an agent or an earlier chat does not count.
 
@@ -52,7 +54,7 @@ Writes kit-owned files on the current branch after a yes, including the Codex tr
 
 ## Does not
 
-Leaves specs, `walk-progress.md`, `build-progress/`, plans, tasks, notes, playbooks, the build map, persist rules (except a stale commit-style rule, 1.176.0), the transfer data policy, `kit-maintainer.mdc`, and the project's `AGENTS.md` alone. A skill folder that does not start with `crav1-` stays a project file. Copilot is not installed by this release. Does not switch branches, rebase, or push. A plugin install gets no kit commit.
+Leaves specs, `walk-progress.md`, `build-progress/`, plans, tasks, notes, playbooks, the build map, persist rules (except a stale commit-style rule, 1.176.0), the transfer data policy, `kit-maintainer.mdc`, and the project's `AGENTS.md` alone. A skill folder that does not start with `crav1-` stays a project file. A `crav1-2-` skill or agent, `.crav1-2/`, and `sot/` stay (1.205.0). Copilot is not installed by this release. Does not switch branches, rebase, or push. A plugin install gets no kit commit.
 
 Limits and exceptions: a target that is not a published release tag stops in one line. A clash is not overwritten. An edited template is listed and left. The kit source checkout is refused. An agent's yes does not write, commit, or push.
 

@@ -15,7 +15,7 @@ $env:PYTHONUTF8 = "1"
 python -X utf8 crav1-update-kit.py detect
 ```
 
-`/crav1-update-kit` takes an optional `to vX.Y.Z`.
+`/crav1-update-kit` takes an optional `to vX.Y.Z`. With no version, the target is the latest published 1.x release tag. A 2.0 tag is not offered.
 
 ## First prompt
 
@@ -70,4 +70,8 @@ A script that prints Run next takes `--vendor`. The default stays `/`. `--vendor
 
 `/crav1-update-kit add codex` copies `vendors/codex/` into `.agents/skills/` from the installed release, so the other vendors stay as they are. `/crav1-update-kit remove codex` deletes kit-owned files that still match that release. A local edit is a clash: `keep` or `take`. The vendor list is `.crav1/kit.json`. `detect` reports `vendors_from` as `kit.json` or `inferred`. The project's `AGENTS.md` is not written. Commands in that copy are `$crav1-`.
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.204.0/docs/from-update-kit.md
+## 1.205.0 changes
+
+A `crav1-` name pattern is not the list. A skill or agent named `crav1-2-`, a `.crav1-2/` folder, and `sot/` are left alone: the update does not write, stage, or delete them. With no version, the target is the newest published 1.x tag. A `v2` tag, including `v2.0.0-alpha.1`, is not offered.
+
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.205.0/docs/from-update-kit.md

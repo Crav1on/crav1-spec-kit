@@ -31,4 +31,4 @@ runs by itself: Calls no skill.
 you run next: /crav1-review-architecture; /crav1-tighten-spec; /crav1-finalize-commit
 first: `/crav1-create-feature-branch <slug>`
 walkthrough: from-draft-spec.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.204.0/docs/reference/skills/crav1-create-feature-branch.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.205.0/docs/reference/skills/crav1-create-feature-branch.md

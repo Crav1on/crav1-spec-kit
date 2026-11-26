@@ -43,4 +43,4 @@ When you asked for the review, Run next names `/crav1-what-do-we-know-about-this
 
 Reference page: [model data](reference/skills/crav1-model-data.md)
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.204.0/docs/from-model-data.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.205.0/docs/from-model-data.md

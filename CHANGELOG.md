@@ -2,6 +2,18 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.205.0 (2026-11-25)
+
+Kit 1.x leaves a side-by-side kit 2.0 alone, and a 1.x update is never offered a 2.0 tag.
+
+- **Update commit.** The kit commit stages the files the release ships. A `crav1-` name pattern is not the list, so a `crav1-2-` skill is not swept into `Update CRAV1 kit`. The command takes the release trees (`--old` and `--new`, or `--new` on add and `--old` on remove).
+- **Left alone.** A skill or agent named `crav1-2-`, a `.crav1-2/` folder, and `sot/` are not written, staged, or deleted. `remove` already deletes only files in the release list. That list still leaves those paths in place for Cursor, Claude Code, Codex, and Copilot.
+- **Lint and sync.** Kit-lint and the generators that used to match `crav1-*` now match `crav1-[a-z]`, so a `crav1-2-` name is not treated as a 1.x skill or agent.
+- **Tags.** The latest tag is the newest published 1.x release. `v2.0.0` and `v2.0.0-alpha.1` are ignored.
+- **Dry run.** The maintainer dry run prints a progress line on the console as each step starts, and a dot every few seconds when a step runs long. The copy block is unchanged.
+
+Docs and tests: update-kit walkthrough, glossary, data layout, and `scripts/tests/test_kit_1205.py`.
+
 ## 1.204.0 (2026-11-25)
 
 Codex installs into a consumer project. Copilot stays generated and is not installed.
