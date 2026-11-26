@@ -122,4 +122,4 @@ every Run next example starts with its reason line, for example `The commit is o
 
 `scripts/ending.py --vendor codex` prints the ending from the shared helper, Run next first. When a `design/<topic>` branch is checked out or owns the change, the helper shows a stay card and never offers the default branch.
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.205.0/docs/from-commit.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.206.0/docs/from-commit.md

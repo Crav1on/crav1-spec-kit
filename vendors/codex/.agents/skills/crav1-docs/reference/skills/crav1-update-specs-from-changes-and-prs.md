@@ -37,4 +37,4 @@ runs by itself: Opens `$crav1-add-to-spec` for each inventory item and follows t
 you run next: $crav1-resolve-open-questions; $crav1-update-specs-from-changes-and-prs; $crav1-finalize-commit
 first: `$crav1-update-specs-from-changes-and-prs manual-flow <optional repo, or leave it out>`
 walkthrough: from-update-specs-from-changes-and-prs.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.205.0/docs/reference/skills/crav1-update-specs-from-changes-and-prs.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.206.0/docs/reference/skills/crav1-update-specs-from-changes-and-prs.md

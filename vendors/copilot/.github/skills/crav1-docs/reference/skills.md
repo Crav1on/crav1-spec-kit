@@ -41,7 +41,7 @@ Starters: /crav1-spark-to-spec, /crav1-ideas-to-spec, /crav1-bundle-to-specs, /c
 - /crav1-read-environment | starter | The user names the host
 - /crav1-fix-bug | starter | The user names a real bug
 - /crav1-help | You want to know what to run next, in what order, or what a skill does
-- /crav1-update-kit | The installed kit should move to a published release
+- /crav1-update-kit | The installed kit should move to a published release, or an early-access flag should be listed or changed
 - /crav1-tasks-ready-to-build | You want to know which tasks can be built now, and why the others cannot, or you want the build map
 
 ### Meetings and open questions
@@ -92,4 +92,4 @@ Starters: /crav1-spark-to-spec, /crav1-ideas-to-spec, /crav1-bundle-to-specs, /c
 - crav1-build-task-agent | build | One `T#` from implement to commit, in isolation. | reads: One `T#` (`spec.md`, `plan.md`, `tasks.md`). | writes: That task's code, `tasks.md`, `verify.md`, `fix-log.md` when a fix runs, and the commits | leaves alone: `spec.md`, other `T#`s, push, and the pull request.
 - crav1-bundle-slice-agent | specify | One v0 feature slug after the intake map. | reads: `docs/system/` and what the parent passes for that slug. | writes: `docs/specs/<slug>/` only | leaves alone: `docs/system/`, `work-item.md`, code, and every other slug.
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.205.0/docs/reference/skills.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.206.0/docs/reference/skills.md

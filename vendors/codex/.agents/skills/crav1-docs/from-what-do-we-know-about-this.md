@@ -96,4 +96,4 @@ Production follows `$crav1-read-environment`: shape and connections only, after 
 
 Reference page: [what-do-we-know-about-this](reference/skills/crav1-what-do-we-know-about-this.md)
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.205.0/docs/from-what-do-we-know-about-this.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.206.0/docs/from-what-do-we-know-about-this.md

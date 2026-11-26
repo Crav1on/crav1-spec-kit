@@ -2,6 +2,18 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.206.0 (2026-11-27)
+
+Early-access flags for one repo, kept out of git. With no flag file, an update matches 1.205.0.
+
+- **Flag file.** `.crav1/flags.local.json`, for example `{"kit2": true}`. `.crav1/.gitignore` lists `flags.local.json`. The project's `.gitignore` is not changed. An unknown flag in the file is kept and reported. A file that cannot be read is one plain line, and the update continues with no flags.
+- **Words.** `flags-list`, `flags-on <flag> [<flag> ...]`, and `flags-off <flag> [<flag> ...]`. `flags-on kit2` turns kit 2.0 on for this repo. A name that is not known is refused in one line that names the known flags. Known names in the same command are still applied.
+- **kit2.** When the flag is on, the update also installs kit 2.0, or updates it, at user level from the release it is applying, through `v2/install.py`. When the flag is off and `~/.crav1-2/installed.json` exists, the update offers `uninstall-kit2`, which removes only the listed files, or `keep-kit2`. The result is one line. The update, add, and unchanged counts stay the same. With no flag file, nothing about kit 2.0 is printed.
+- **Registry.** Known flags live in the update-kit flags module. Each entry has a one-line description and a status of `experimental` or `beta`. `kit2` is the first entry (`experimental`).
+- **Dry run.** The maintainer dry run prints `Flags: none` or `Flags:` plus the flags that are on, and dry-runs the kit 2.0 step. With no flag file, the copy block is unchanged.
+
+Docs and tests: update-kit walkthrough, glossary, data layout, and `scripts/tests/test_kit_1206.py`.
+
 ## 1.205.0 (2026-11-25)
 
 Kit 1.x leaves a side-by-side kit 2.0 alone, and a 1.x update is never offered a 2.0 tag.

@@ -36,4 +36,4 @@ Reference page: [ado-sync](reference/skills/crav1-ado-sync.md)
 
 The run ends as [How a run ends](reference/run-ending.md) says: Run next, never a `Next:` line, `Waiting:` only when a step is blocked, and `Uncommitted:` when files changed and are not committed.
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.205.0/docs/from-ado-sync-suggest-features.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.206.0/docs/from-ado-sync-suggest-features.md

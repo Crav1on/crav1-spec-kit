@@ -21,6 +21,7 @@ the temp folder (git's own worktree bookkeeping is removed again).
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import os
 import re
@@ -33,6 +34,8 @@ import tempfile
 import threading
 import time
 from pathlib import Path
+
+sys.dont_write_bytecode = True  # before any sibling import; no __pycache__ in the project (1.121.1)
 
 
 def _utf8_stdout() -> None:
@@ -88,8 +91,10 @@ class Step:
         return False
 
 
-def run(cmd: list[str], cwd: Path | None = None, timeout: int = 600) -> tuple[int, str]:
+def run(cmd: list[str], cwd: Path | None = None, timeout: int = 600, env_extra: dict | None = None) -> tuple[int, str]:
     env = dict(os.environ, PYTHONUTF8="1", PYTHONIOENCODING="utf-8", GIT_TERMINAL_PROMPT="0")
+    if env_extra:
+        env.update(env_extra)
     try:
         proc = subprocess.run(cmd, cwd=str(cwd) if cwd else None, capture_output=True, text=True,
                               encoding="utf-8", errors="replace", timeout=timeout, env=env)
@@ -204,16 +209,57 @@ def _summarise(cmd: str, code: int, out: str) -> str:
     kept = text
     if "dry-run-marker.md" in out and "dry-run-marker.md" not in kept:
         kept = (kept + "\ndry-run-marker.md").strip()
-    return f"$ update_kit.py {cmd} (exit {code})\n{kept}".rstrip()
+    body = f"$ update_kit.py {cmd} (exit {code})\n{kept}".rstrip()
+    if cmd == "apply":
+        line = _kit2_line(kept)
+        if line:
+            body += "\n" + line
+    return body
+
+
+def _kit2_line(text: str) -> str | None:
+    try:
+        data = json.loads(text)
+    except ValueError:
+        return None
+    if not isinstance(data, dict):
+        return None
+    line = data.get("kit2_line")
+    return line if isinstance(line, str) and line else None
+
+
+def _flags_api(kit: Path):
+    for rel in (
+        "plugins/crav1/skills/crav1-update-kit/scripts/flags.py",
+        ".cursor/skills/crav1/crav1-update-kit/scripts/flags.py",
+    ):
+        path = kit / rel
+        if path.is_file():
+            spec = importlib.util.spec_from_file_location("crav1_dry_flags", path)
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            return module
+    return None
+
+
+def flags_banner(repo: Path, kit: Path) -> str | None:
+    """None when the project has no flag file, so the copy block stays as it is today."""
+    if not (repo / ".crav1" / "flags.local.json").exists():
+        return None
+    module = _flags_api(kit)
+    if module is None:
+        return "Flags: none"
+    return module.banner(repo)
 
 
 def update_into(worktree: Path, kit: Path, tmp: Path, source: str | None) -> list[str]:
     """The PR kit's own update, the way /crav1-update-kit installs: detect, old release tree, plan, apply."""
     script = kit / UPDATE
     py = [sys.executable, "-X", "utf8", str(script)]
+    dry = {"CRAV1_KIT2_DRY_RUN": "1"}
     lines = []
     with Step("update detect"):
-        code, out = run(py + ["detect", "--root", str(worktree)])
+        code, out = run(py + ["detect", "--root", str(worktree)], env_extra=dry)
     lines.append(_summarise("detect", code, out))
     try:
         info = json.loads(out)
@@ -229,12 +275,12 @@ def update_into(worktree: Path, kit: Path, tmp: Path, source: str | None) -> lis
     target = kit_version(kit)
     plan_cmd = ["plan", "--old", str(old), "--new", str(kit), "--to-version", target]
     with Step("update plan"):
-        code, out = run(py + plan_cmd + ["--root", str(worktree)])
+        code, out = run(py + plan_cmd + ["--root", str(worktree)], env_extra=dry)
     lines.append(_summarise("plan", code, out))
     if code == 0:
         apply_cmd = ["apply", "--old", str(old), "--new", str(kit), "--yes"]
         with Step("update apply"):
-            code, out = run(py + apply_cmd + ["--root", str(worktree)])
+            code, out = run(py + apply_cmd + ["--root", str(worktree)], env_extra=dry)
         lines.append(_summarise("apply", code, out))
     return lines
 
@@ -455,13 +501,20 @@ def main(argv: list[str] | None = None) -> int:
         else:
             _c, sha = run(["git", "-C", str(kit), "rev-parse", "--short", "HEAD"])
             _c, head = run(["git", "-C", str(repo), "rev-parse", "--short", "HEAD"])
-            block = [f"Kit: {kit_version(kit)} at {sha} ({which_ref})", f"Project HEAD: {head}", f"Spec: {args.spec}", ""]
+            block = [f"Kit: {kit_version(kit)} at {sha} ({which_ref})", f"Project HEAD: {head}", f"Spec: {args.spec}"]
+            banner = flags_banner(repo, kit)
+            if banner:
+                block.append(banner)
+            block.append("")
             with Step("making temp worktree"):
                 code, out = run(GIT + ["-C", str(repo), "worktree", "add", "--detach", "--quiet", str(worktree), "HEAD"])
             if code != 0:
                 block.append(f"git worktree add failed:\n{out}")
             else:
                 added = True
+                module = _flags_api(kit)
+                if module is not None:
+                    module.seed_worktree(repo, worktree)
                 block += ["--- Update ---", *update_into(worktree, kit, tmp_kit, args.kit_source)]
                 if args.add:
                     block += ["", "--- Add ---", *add_vendors(worktree, kit, args.add)]

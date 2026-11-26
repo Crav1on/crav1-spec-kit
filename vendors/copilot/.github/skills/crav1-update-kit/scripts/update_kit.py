@@ -21,6 +21,8 @@ import sys
 import tempfile
 from pathlib import Path
 
+sys.dont_write_bytecode = True  # before any sibling import; no __pycache__ in the project (1.121.1)
+
 
 def _utf8_stdout() -> None:
     reconfigure = getattr(sys.stdout, "reconfigure", None)
@@ -2052,6 +2054,48 @@ def _latest_release(timeout: int = 5) -> str | None:
     return latest
 
 
+_FLAGS_MOD = None
+
+
+def _flags():
+    """The flags module beside this script, or None when this copy does not have it."""
+    global _FLAGS_MOD
+    if _FLAGS_MOD is False:
+        return None
+    if _FLAGS_MOD is not None:
+        return _FLAGS_MOD
+    path = Path(__file__).resolve().parent / "flags.py"
+    if not path.is_file():
+        _FLAGS_MOD = False
+        return None
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location("crav1_flags", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    _FLAGS_MOD = module
+    return module
+
+
+def flags_module():
+    return _flags()
+
+
+def _attach_early(payload: dict, root: Path, new_root: Path, home: Path | None, dry: bool) -> dict:
+    """Add the kit 2.0 line when a flag file is present. No flag file leaves payload unchanged."""
+    module = _flags()
+    if module is None:
+        return payload
+    note, extra = module.early_access(root, new_root, home if home is not None else Path.home(), dry)
+    if note:
+        print(note, file=sys.stderr)
+    if not extra:
+        return payload
+    merged = dict(payload)
+    merged.update(extra)
+    return merged
+
+
 def update_available(root: Path, home: Path | None = None, timeout: int = 5) -> dict | None:
     """One `Kit update available` line when a newer release is out (1.198.0). Read-only; None when
     the installed version is unknown, this is the kit repo, offline, or already the latest."""
@@ -2076,10 +2120,15 @@ def main(argv: list[str] | None = None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
     if argv and argv[0] in {"push", "--push"}:
         refuse("Refused: this script does not push.")
+    if argv and argv[0] in {"flags-list", "flags-on", "flags-off", "uninstall-kit2"}:
+        module = _flags()
+        if module is None:
+            refuse("Refused: this copy has no flags module.")
+        return module.main(argv)
     parser = argparse.ArgumentParser(description="Update a consumer project's CRAV1 kit from a published release.")
     parser.add_argument(
         "command",
-        choices=["detect", "resolve-target", "plan", "apply", "migrations", "commit", "fetch", "ending", "available", "vendors"],
+        choices=["detect", "resolve-target", "plan", "apply", "migrations", "commit", "fetch", "ending", "available", "vendors", "flags-list", "flags-on", "flags-off", "uninstall-kit2"],
     )
     parser.add_argument("--root", default=".")
     parser.add_argument("--home")
@@ -2190,7 +2239,7 @@ def main(argv: list[str] | None = None) -> int:
                 ]
             else:
                 view["migration_ids"] = []
-            _print(view)
+            _print(_attach_early(view, root, Path(args.new), home, True))
             return 0
         if args.command == "apply":
             if info["mode"] != "drop-in":
@@ -2199,18 +2248,20 @@ def main(argv: list[str] | None = None) -> int:
                 refuse("Refused: apply needs the old release tree and the new release tree.")
             hosts = hosts_for_update(root, info)
             names, source = read_selection(root)
-            _print(
-                apply_overlay(
-                    root,
-                    Path(args.old),
-                    Path(args.new),
-                    hosts,
-                    args.yes,
-                    set(args.keep),
-                    set(args.take),
-                    sorted(hosts) if source == "inferred" else names,
-                )
+            import os
+
+            applied = apply_overlay(
+                root,
+                Path(args.old),
+                Path(args.new),
+                hosts,
+                args.yes,
+                set(args.keep),
+                set(args.take),
+                sorted(hosts) if source == "inferred" else names,
             )
+            dry = os.environ.get("CRAV1_KIT2_DRY_RUN") == "1"
+            _print(_attach_early(applied, root, Path(args.new), home, dry))
             return 0
         if args.command == "migrations":
             registry = migration_registry(root, Path(args.migrations) if args.migrations else None)

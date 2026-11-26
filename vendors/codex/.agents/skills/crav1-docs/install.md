@@ -174,7 +174,7 @@ On Claude Code 2.1.286, in a private throwaway git repo, the generated `.claude/
 
 Codex reads project skills from `.agents/skills/`. The kit's copy is generated as `vendors/codex/` in this repo. Each command-only skill has `agents/openai.yaml`. Commands are `$crav1-…`. The first line of each skill reads `../crav1-docs/reference/kit-rules.md`. The project's `AGENTS.md` is not written.
 
-In a project that already has the kit, run `$crav1-update-kit add codex`. The vendor list is `.crav1/kit.json`. `$crav1-update-kit remove codex` deletes only the kit's Codex files.
+In a project that already has the kit, run `$crav1-update-kit add codex`. The vendor list is `.crav1/kit.json`. `$crav1-update-kit remove codex` deletes only the kit's Codex files. `$crav1-update-kit` also takes `flags-list`, `flags-on <flag>`, and `flags-off <flag>`. `flags-on kit2` turns on kit 2.0 for this repo.
 
 ## After install
 
@@ -260,4 +260,4 @@ The kit is at [https://github.com/Crav1on/crav1-spec-kit](https://github.com/Cra
 | Cursor plugin just installed, want the command order | [plugins/crav1/README.md](../plugins/crav1/README.md) |
 | Every other page: walkthroughs, reference, and concepts, by type and by reader | [Docs index](README.md) |
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.205.0/docs/install.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.206.0/docs/install.md

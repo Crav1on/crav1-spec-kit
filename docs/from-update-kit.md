@@ -74,6 +74,16 @@ A script that prints Run next takes `--vendor`. The default stays `/`. `--vendor
 
 Codex installs. `/crav1-update-kit add codex` copies `vendors/codex/` into `.agents/skills/` from the installed release, so the other vendors stay as they are. `/crav1-update-kit remove codex` deletes kit-owned files that still match that release. A local edit is a clash: `keep` or `take`. The vendor list is `.crav1/kit.json`. When the file is missing, the next update infers the vendors from the marker files and writes the file in the same yes. `detect` reports `vendors_from` as `kit.json` or `inferred`. The project's `AGENTS.md` is not written. Copilot is still not installed. Restart Codex after an add so the new skills load. Commands in that copy are `$crav1-`.
 
+## Early-access flags
+
+`/crav1-update-kit` also takes `flags-list`, `flags-on <flag>`, and `flags-off <flag>`. One command may name several flags. `flags-on kit2` turns on kit 2.0 for this repo. The kit writes `.crav1/flags.local.json` and lists `flags.local.json` in `.crav1/.gitignore`. The project's `.gitignore` is not changed.
+
+A name the registry does not know is refused in one line that names the known flags. Known names in that command are still applied. The next update installs kit 2.0 at user level from that same release when `kit2` is on. When `kit2` is off and kit 2.0 is installed, the update offers `uninstall-kit2` or `keep-kit2`. With no flag file, the update does not mention kit 2.0.
+
+## 1.206.0 changes
+
+Early-access flags, per repo, kept out of git. The words are `flags-list`, `flags-on <flag>`, and `flags-off <flag>`. `kit2` installs kit 2.0 at user level from the release the update is applying. The result is one line, and the file counts stay the same. With no flag file, plan and apply match 1.205.0.
+
 ## 1.205.0 changes
 
 The kit commit stages the files the release ships. A `crav1-` name pattern is not the list. A skill or agent named `crav1-2-`, a `.crav1-2/` folder, and `sot/` are left alone: the update does not write, stage, or delete them. With no version, the target is the newest published 1.x tag. A `v2` tag, including `v2.0.0-alpha.1`, is not offered.

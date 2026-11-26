@@ -240,4 +240,4 @@ runs by itself: Calls no skill.
 you run next: $crav1-build-walk; $crav1-build-tasks
 first: `$crav1-tasks-ready-to-build @docs/specs/<slug>/`
 walkthrough: from-tasks-ready-to-build.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.205.0/docs/reference/skills/crav1-tasks-ready-to-build.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.206.0/docs/reference/skills/crav1-tasks-ready-to-build.md
