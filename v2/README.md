@@ -4,7 +4,7 @@ This folder is the kit 2.0 skeleton on `main`, next to 1.x. Nothing here is rele
 
 The engine is Python 3.10 or newer, standard library only. It appends `.crav1-2/events.jsonl`, folds that log into state, and rebuilds `sot/index.md`, `sot/facts.md`, `sot/decisions.md`, and `sot/assumptions.md`. A note page (`sot/<YYYY-MM-DD-slug>/note.md`) is rendered with passage anchors when the log carries the passage text. The engine does not commit.
 
-`/crav1-2-link-to-spec` is not in this build.
+Phase 1 is complete in this alpha: add-to-sot, show-sot, and link-to-spec. Nothing here is released.
 
 ## /crav1-2-add-to-sot
 
@@ -20,6 +20,16 @@ Where a session file exists, each quote is checked and a miss is marked unverifi
 
 An answer is matched to an open question by the question's words and recorded as `answer.matched`. The question stays open. A second run with the same session id adds only new passages (`note.extended`). A parked run resumes from `.crav1-2/sessions/<id>.json`.
 
+## /crav1-2-link-to-spec
+
+Link notes that have not been read against one 1.x spec. Words: none (every unread note), `note-<id>` (one note, for example `note-2026-11-25-outbound-channel`), `dry-run`, `resume`, and `park`.
+
+The gap-finder agent returns JSON. The engine checks it, builds the cards, and ranks them. Each affected item is `covered`, `silent`, `conflicting`, or `vague`, with cited passages, impact and uncertainty from 1 to 3, what it holds, and proposed text. A high-impact gap is its own card. Low-impact gaps that do not say MUST share one assumption card (`accept-all`, `change-some`, `skip`). MUST is never written as an assumption. Questions that `answer.matched` already recorded share one card: "These N open questions have answers in the SoT", with `close-all`, `pick-some`, or `skip`. Closing a question writes one decision and an `Answered:` line on that 1.x question.
+
+Each card has 2 to 4 hyphen-only options. Each option names its impact and its undo, and `skip` is always available. A recommendation is present only when a fact is cited. Otherwise the card names the missing fact and who could give it.
+
+Write-back adds only `crav1-2:item` lines, each with one origin tag (`[src:]`, `[dec:]`, or `[asm:]`) and a pointer. No 1.x line is edited. `dry-run` prints the cards and the proposed items and writes nothing. `park` and `resume` use the session file, including from a fresh chat. The ending starts with `Run next:` and has at most one `Also recorded:` line.
+
 ## /crav1-2-show-sot
 
 Read-only. Words: `none` (or no word) for the index, `facts`, `decisions`, `assumptions`, and `about-<topic>`. It writes nothing. A broken pointer is reported in the reply, not written into the view.
@@ -29,16 +39,31 @@ Read-only. Words: `none` (or no word) for the index, `facts`, `decisions`, `assu
 Use a scratch home and a scratch project. `--home` is a test hook, not a product option. The words are `install`, `uninstall`, `status`, and `dry-run`.
 
 ```bash
-mkdir -p /tmp/crav1-2-home /tmp/scratch-repo
+mkdir -p /tmp/crav1-2-home /tmp/scratch-repo/docs/specs/partner-b-feed
 python v2/install.py --home /tmp/crav1-2-home install
 PYTHONPATH=v2 python -m crav1_2 init repo /tmp/scratch-repo
-PYTHONPATH=v2 python -m crav1_2 add-to-sot fact dry-run repo /tmp/scratch-repo <<'JSON'
-{"title":"One fact","date":"2026-11-26","extractor":{"passages":[{"kind":"fact","who":"person A","quote":"The feed stays on the current channel."}]}}
+cat > /tmp/scratch-repo/docs/specs/partner-b-feed/spec.md <<'MD'
+# Partner B feed
+
+## Constraints
+- The feed to partner B runs over the existing secure channel.
+
+## Open questions
+- Who gets the certificate-expiry alert, and how early?
+  - Blocks: none
+MD
+PYTHONPATH=v2 python -m crav1_2 add-to-sot fact repo /tmp/scratch-repo <<'JSON'
+{"title":"Outbound channel","slug":"outbound-channel","date":"2026-11-25","extractor":{"passages":[{"kind":"fact","who":"person A","quote":"Agreed long term, likely before go-live, not in this slice."}]}}
+JSON
+PYTHONPATH=v2 python -m crav1_2 link-to-spec partner-b-feed dry-run repo /tmp/scratch-repo <<'JSON'
+{"finder":{"items":[{"status":"silent","note":"2026-11-25-outbound-channel","passages":["p-001"],"impact":2,"uncertainty":1,"holds":[],"section":"Constraints","text":"The outbound messaging channel is agreed long term and is not built in this slice.","who":"person A"}]}}
 JSON
 PYTHONPATH=v2 python -m crav1_2 show-sot repo /tmp/scratch-repo
 python v2/install.py --home /tmp/crav1-2-home status
 python v2/install.py --home /tmp/crav1-2-home uninstall
 ```
+
+`dry-run` prints the card and the proposed item and writes nothing. Drop `dry-run` to open the card, then send the card word (`add-pointer`, `skip`, and the rest) with `{}` on stdin. `add-to-sot this-session` records answers without closing questions. `link-to-spec` then offers `close-all`, `pick-some`, or `skip`.
 
 `append` reads one JSON object, or one object per line, from stdin. `rebuild-views` rewrites the generated pages. `lint` checks ids, pointers, a single origin kind, and MUST on an assumption item. `check-lines before after` reports whether a shared spec's 1.x lines changed.
 

@@ -481,7 +481,7 @@ class OneX(unittest.TestCase):
         import re
 
         pattern = re.compile(r"crav1-[a-z]")
-        for name in ("crav1-2-add-to-sot", "crav1-2-show-sot", "crav1-2-source-extractor-agent"):
+        for name in ("crav1-2-add-to-sot", "crav1-2-show-sot", "crav1-2-link-to-spec", "crav1-2-source-extractor-agent", "crav1-2-gap-finder-agent"):
             self.assertIsNone(pattern.match(name), name)
         self.assertIsNotNone(pattern.match("crav1-help"))
         lint = (REPO / "scripts" / "kit-lint.py").read_text(encoding="utf-8")

@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from crav1_2.cards import card_problems
 from crav1_2.fold import fold_events
 from crav1_2.schema import DEC_ID, FACT_ID, ITEM_ID, must_on_assumption, origin_problem
 
@@ -54,6 +55,9 @@ def lint_events(events: list[dict], repo: Path | None = None) -> list[dict]:
         if kind == "note.extended":
             if data["note"] not in notes:
                 add("unresolved-id", f"{data['note']} is not a note.", data["note"])
+        elif kind == "note.read":
+            if data["note"] not in notes:
+                add("unresolved-id", f"{data['note']} is not a note.", data["note"])
         elif kind == "answer.matched":
             folded = state["notes"].get(data["note"])
             ids = {item["id"] for item in (folded or {}).get("passage_list") or []}
@@ -73,6 +77,8 @@ def lint_events(events: list[dict], repo: Path | None = None) -> list[dict]:
             for fact in data.get("facts") or []:
                 if fact not in facts:
                     add("unresolved-id", f"{fact} is not a cited fact.", data["card"])
+            for problem in card_problems(data):
+                add("card-shape", problem, data["card"])
         elif kind == "decision.recorded":
             if data["card"] not in cards:
                 add("unresolved-id", f"{data['card']} is not a card.", data["decision"])

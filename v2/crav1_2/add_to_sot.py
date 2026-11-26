@@ -885,6 +885,8 @@ def _load_parked(repo: Path, run_pick: str | None) -> dict | None:
             continue
         if not isinstance(data, dict) or data.get("status") != "parked" or not isinstance(data.get("payload"), dict):
             continue
+        if data["payload"].get("flow") == "link-to-spec":
+            continue
         if run_pick and data.get("id") != run_pick:
             continue
         rows.append(data)

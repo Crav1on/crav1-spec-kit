@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.0.0-alpha.3 (unreleased)
+
+`/crav1-2-link-to-spec` and `crav1-2-gap-finder-agent`. Phase 1 is complete. Not released. No tag.
+
+- link-to-spec reads SoT notes that have not been read against one 1.x spec. Words: none, `note-<id>`, `dry-run`, `resume`, and `park`.
+- The gap-finder agent returns JSON. The engine checks it. Each affected item is covered, silent, conflicting, or vague, with cited passages, impact and uncertainty (1-3), what it holds, and proposed text.
+- The engine builds the cards and ranks them. A card has 2 to 4 hyphen-only options, each with an impact and an undo, plus skip. A recommendation needs a cited fact. Otherwise the card names the missing fact and who could give it.
+- Low-impact gaps that do not say MUST share one card: `accept-all`, `change-some`, or `skip`. MUST is never written on an `asm:` item.
+- Questions recorded by `answer.matched` share one card: "These N open questions have answers in the SoT", with `close-all`, `pick-some`, or `skip`. Each closed question gets one decision and an `Answered:` line.
+- Write-back adds only `crav1-2:item` lines. No 1.x line changes. `dry-run` writes nothing. `park` and `resume` use the session file, including from a fresh chat.
+- A read is recorded as `note.read`, so a later run does not ask the same note again. Installs the skill and the agent for Cursor and Claude Code. Codex stays skipped.
+
 ## 2.0.0-alpha.2 (unreleased)
 
 `/crav1-2-add-to-sot` and `/crav1-2-show-sot`. Not released. No tag.
