@@ -6,12 +6,14 @@ import json
 import sys
 from pathlib import Path
 
+from crav1_2.add_to_sot import add_to_sot, parse_invocation
 from crav1_2.errors import EngineError
 from crav1_2.events import load_jsonl
 from crav1_2.lines import one_x_lines_unchanged, owned_mark_lines
 from crav1_2.lint import lint_repo
 from crav1_2.repo import append_events, init_repo, rebuild_views, record_session, show_state
 from crav1_2.schema import validate_event
+from crav1_2.show_sot import show_sot
 
 WORDS = (
     "init",
@@ -23,6 +25,8 @@ WORDS = (
     "session-open",
     "session-park",
     "session-end",
+    "add-to-sot",
+    "show-sot",
 )
 
 
@@ -78,6 +82,13 @@ def _main(argv: list[str]) -> int:
         findings = lint_repo(repo)
         _emit({"ok": not findings, "findings": findings})
         return 1 if findings else 0
+    if command == "add-to-sot":
+        parse_invocation(args)
+        _emit(add_to_sot(repo, args, _object_stdin("add-to-sot")))
+        return 0
+    if command == "show-sot":
+        _emit(show_sot(repo, args))
+        return 0
     status = {"session-open": "open", "session-park": "parked", "session-end": "ended"}[command]
     if len(args) != 1:
         raise EngineError(f"Refused: {command} takes a session id.")
@@ -95,6 +106,21 @@ def _check_lines(args: list[str]) -> int:
     ok = unchanged and not marks
     _emit({"ok": ok, "unchanged": unchanged, "marks": marks})
     return 0 if ok else 1
+
+
+def _object_stdin(command: str) -> dict:
+    if sys.stdin.isatty():
+        raise EngineError(f"Refused: {command} reads JSON from stdin.")
+    text = sys.stdin.read()
+    if not text.strip():
+        raise EngineError(f"Refused: {command} reads JSON from stdin.")
+    try:
+        raw = json.loads(text)
+    except json.JSONDecodeError as exc:
+        raise EngineError(f"Refused: not a JSON object ({exc.msg}).") from exc
+    if not isinstance(raw, dict):
+        raise EngineError(f"Refused: {command} reads one JSON object.")
+    return raw
 
 
 def _stdin_events() -> list[dict]:
@@ -135,6 +161,7 @@ def _usage() -> None:
     print(
         "crav1-2 engine (alpha). Words: " + ", ".join(WORDS) + ".\n"
         "The project is the working directory. Add `repo <path>` at the end to point elsewhere.\n"
-        "append reads one JSON object, or one object per line, from stdin.",
+        "append reads one JSON object, or one object per line, from stdin.\n"
+        "add-to-sot reads one JSON object from stdin. show-sot writes nothing.",
         file=sys.stderr,
     )

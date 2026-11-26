@@ -2,7 +2,10 @@
 
 Required fields are the phase-1 design. ``note.added`` also accepts optional
 ``title``, ``added_by``, ``passage_list``, and ``know`` so a note page can be
-rebuilt from the log. Unknown fields are refused.
+rebuilt from the log, plus ``vendor``, ``captured_from``, ``session_id``,
+``quotes``, and ``redactions`` for this-session. ``note.extended`` appends
+passages to a note. ``answer.matched`` records an open-question match and does
+not close the question. Unknown fields are refused.
 """
 
 from __future__ import annotations
@@ -15,6 +18,11 @@ from crav1_2.ulid import is_ulid
 from crav1_2.version import SCHEMA
 
 KINDS = ("mail", "chat", "meeting", "session", "document", "fact")
+LABELS = ("finding", "answer", "decision", "open", "todo")
+VENDORS = ("cursor", "claude", "codex")
+CAPTURED = ("live-context", "file")
+QUOTE_STATE = ("checked", "unchecked")
+REDACTION_KINDS = ("access-key", "private-key", "secret", "token")
 WEAK = ("verbal", "unmerged", "ai-summary", "inferred")
 GAP_KINDS = ("silent", "conflicting", "vague")
 ORIGINS = ("src", "dec", "asm")
@@ -40,13 +48,16 @@ TOP_KEYS = ("v", "id", "at", "by", "run", "type", "data")
 NOTE_KEYS = (
     "note", "kinds", "date", "files", "from_sources", "passages",
     "title", "added_by", "passage_list", "know",
+    "vendor", "captured_from", "session_id", "quotes", "redactions",
 )
-PASSAGE_KEYS = ("id", "kind", "who", "when", "quote", "path", "lines")
+PASSAGE_KEYS = ("id", "kind", "who", "when", "quote", "path", "lines", "label", "verified", "weak", "answers")
 KNOW_KEYS = ("heading", "body", "cites", "inferred")
 OPTION_KEYS = ("word", "impact", "undo")
 
 DATA_KEYS = {
     "note.added": NOTE_KEYS,
+    "note.extended": ("note", "passages", "passage_list", "files", "know"),
+    "answer.matched": ("note", "passage", "spec", "question"),
     "fact.cited": ("fact", "note", "passage", "quote", "weak"),
     "gap.found": ("gap", "spec", "kind", "facts", "impact", "uncertainty", "holds"),
     "card.asked": ("card", "gap", "question", "options", "recommended", "missing_fact", "facts"),
@@ -170,6 +181,10 @@ def _validate_data(kind: str, data: dict, fail) -> dict:
         fail(f"unknown data field {sorted(extra)[0]}.")
     if kind == "note.added":
         return _note(data, fail)
+    if kind == "note.extended":
+        return _extended(data, fail)
+    if kind == "answer.matched":
+        return _answer_matched(data, fail)
     if kind == "fact.cited":
         return _fact(data, fail)
     if kind == "gap.found":
@@ -308,7 +323,66 @@ def _note(data: dict, fail) -> dict:
             fail("passages count does not match passage_list.")
     if "know" in data:
         cleaned["know"] = _know(data["know"], cleaned.get("passage_list"), fail)
+    if "vendor" in data:
+        vendor = _text(data, "vendor", fail)
+        if vendor not in VENDORS:
+            fail("vendor must be cursor, claude, or codex.")
+        cleaned["vendor"] = vendor
+    if "captured_from" in data:
+        captured = _text(data, "captured_from", fail)
+        if captured not in CAPTURED:
+            fail("captured_from must be live-context or file.")
+        cleaned["captured_from"] = captured
+    if "session_id" in data:
+        cleaned["session_id"] = _text(data, "session_id", fail)
+    if "quotes" in data:
+        quotes = _text(data, "quotes", fail)
+        if quotes not in QUOTE_STATE:
+            fail("quotes must be checked or unchecked.")
+        cleaned["quotes"] = quotes
+    if "redactions" in data:
+        redactions = data["redactions"]
+        if (
+            not isinstance(redactions, list)
+            or any(item not in REDACTION_KINDS for item in redactions)
+            or len(set(redactions)) != len(redactions)
+        ):
+            fail("redactions must be access-key, private-key, secret, or token.")
+        cleaned["redactions"] = list(redactions)
     return _order(cleaned, NOTE_KEYS)
+
+
+def _extended(data: dict, fail) -> dict:
+    note = _text(data, "note", fail)
+    if not NOTE_ID.fullmatch(note):
+        fail("note must be a YYYY-MM-DD-slug id.")
+    passages = _passages(data.get("passage_list"), fail) if "passage_list" in data else None
+    if passages is None:
+        fail("missing data field passage_list.")
+    count = _require(data, "passages", fail)
+    if type(count) is not int or count != len(passages):
+        fail("passages count does not match passage_list.")
+    cleaned: dict = {"note": note, "passages": count, "passage_list": passages}
+    if "files" in data:
+        files = data["files"]
+        if not isinstance(files, list) or any(not isinstance(name, str) or not FILE_NAME.fullmatch(name) for name in files):
+            fail("files must be a list of file names.")
+        cleaned["files"] = list(files)
+    if "know" in data:
+        cleaned["know"] = _know(data["know"], None, fail)
+    return _order(cleaned, DATA_KEYS["note.extended"])
+
+
+def _answer_matched(data: dict, fail) -> dict:
+    return _order(
+        {
+            "note": _ident(data, "note", NOTE_ID, fail),
+            "passage": _ident(data, "passage", PASSAGE_ID, fail),
+            "spec": _ident(data, "spec", SPEC_SLUG, fail),
+            "question": _text(data, "question", fail),
+        },
+        DATA_KEYS["answer.matched"],
+    )
 
 
 def _passages(value: object, fail) -> list[dict]:
@@ -354,6 +428,23 @@ def _passages(value: object, fail) -> list[dict]:
             if not isinstance(item["when"], str) or not WHEN.fullmatch(item["when"]):
                 fail("a passage time must be HH:MM.")
             cleaned["when"] = item["when"]
+        if "label" in item:
+            if item["label"] not in LABELS:
+                fail("a passage label must be finding, answer, decision, open, or todo.")
+            cleaned["label"] = item["label"]
+        if "verified" in item:
+            if type(item["verified"]) is not bool:
+                fail("verified must be true or false.")
+            cleaned["verified"] = item["verified"]
+        if "weak" in item:
+            if item["weak"] is not None and item["weak"] not in WEAK:
+                fail("weak must be verbal, unmerged, ai-summary, inferred, or null.")
+            cleaned["weak"] = item["weak"]
+        if "answers" in item:
+            answers = item["answers"]
+            if not isinstance(answers, str) or answers.strip() == "" or "\n" in answers or "\r" in answers:
+                fail("answers must be a single line.")
+            cleaned["answers"] = answers
         out.append(_order(cleaned, PASSAGE_KEYS))
     return out
 

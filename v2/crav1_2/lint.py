@@ -51,8 +51,18 @@ def lint_events(events: list[dict], repo: Path | None = None) -> list[dict]:
     for event in events:
         data = event["data"]
         kind = event["type"]
-        if kind == "fact.cited":
-            _pointer(add, notes, data, repo)
+        if kind == "note.extended":
+            if data["note"] not in notes:
+                add("unresolved-id", f"{data['note']} is not a note.", data["note"])
+        elif kind == "answer.matched":
+            folded = state["notes"].get(data["note"])
+            ids = {item["id"] for item in (folded or {}).get("passage_list") or []}
+            if data["note"] not in notes:
+                add("unresolved-id", f"{data['note']} is not a note.", data["passage"])
+            elif data["passage"] not in ids:
+                add("unresolved-id", f"{data['passage']} is not in the note.", data["passage"])
+        elif kind == "fact.cited":
+            _pointer(add, state["notes"], data, repo)
         elif kind == "gap.found":
             for fact in data["facts"]:
                 if fact not in facts:
@@ -114,6 +124,15 @@ def lint_events(events: list[dict], repo: Path | None = None) -> list[dict]:
             for card in data["left"]:
                 if card not in cards:
                     add("unresolved-id", f"{card} is not a card.", event["run"])
+    for note_id, note in state["notes"].items():
+        ids = [item["id"] for item in note.get("passage_list") or []]
+        if len(ids) != len(set(ids)):
+            add("unresolved-id", f"{note_id} repeats a passage id.", note_id)
+        known = set(ids)
+        for block in note.get("know") or []:
+            for cite in block.get("cites") or []:
+                if cite not in known:
+                    add("broken-pointer", f"{cite} is not in {note_id}.", note_id)
     return findings
 
 

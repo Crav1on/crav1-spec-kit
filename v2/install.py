@@ -16,7 +16,7 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-ENGINE = "2.0.0-alpha.1"
+ENGINE = "2.0.0-alpha.2"
 MIN_1X = (1, 205, 0)
 CODEX_NOTE = (
     "skipped: 1.x Codex install writes project .agents/skills/ and has no user-level skills path"
@@ -54,12 +54,19 @@ def payloads(root: Path) -> list[tuple[str, bytes]]:
     files.append((".crav1-2/install.py", (root / "install.py").read_bytes()))
     plugin = (root / "cursor-plugin" / "plugin.json").read_bytes()
     files.append((".cursor/plugins/local/crav1-2/.cursor-plugin/plugin.json", plugin))
-    skill = root / "skills" / "crav1-2-help"
-    for path in sorted(p for p in skill.rglob("*") if p.is_file()):
-        rel = path.relative_to(skill).as_posix()
-        data = path.read_bytes()
-        files.append((f".cursor/plugins/local/crav1-2/skills/crav1-2-help/{rel}", data))
-        files.append((f".claude/skills/crav1-2-help/{rel}", data))
+    skills_root = root / "skills"
+    for skill in sorted(path for path in skills_root.iterdir() if path.is_dir() and path.name.startswith("crav1-2-")):
+        for path in sorted(item for item in skill.rglob("*") if item.is_file()):
+            rel = path.relative_to(skill).as_posix()
+            data = path.read_bytes()
+            files.append((f".cursor/plugins/local/crav1-2/skills/{skill.name}/{rel}", data))
+            files.append((f".claude/skills/{skill.name}/{rel}", data))
+    agents = root / "agents"
+    if agents.is_dir():
+        for path in sorted(agents.glob("crav1-2-*.md")):
+            data = path.read_bytes()
+            files.append((f".cursor/plugins/local/crav1-2/agents/{path.name}", data))
+            files.append((f".claude/agents/{path.name}", data))
     return files
 
 
