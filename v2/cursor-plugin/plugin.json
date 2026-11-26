@@ -1,7 +1,7 @@
 {
   "name": "crav1-2",
-  "version": "2.0.0-alpha.1",
-  "description": "CRAV1 kit 2.0 alpha. Engine, events, and views. Not a release. add-to-sot, show-sot, and link-to-spec are not in this build.",
+  "version": "2.0.0-alpha.2",
+  "description": "CRAV1 kit 2.0 alpha. add-to-sot (including this-session) and show-sot. link-to-spec is not in this build. Not a release.",
   "author": {
     "name": "Crav1"
   },

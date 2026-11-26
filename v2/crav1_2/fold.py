@@ -27,6 +27,7 @@ def empty_state() -> dict:
         "assumptions": {},
         "items": {},
         "runs": {},
+        "answers": [],
         "dropped_duplicate_ids": [],
         "disambiguated": [],
     }
@@ -106,10 +107,48 @@ def _apply(state: dict, event: dict) -> None:
             "passages": data["passages"],
             "at": event["at"],
         }
-        for key in ("title", "added_by", "passage_list", "know"):
+        for key in (
+            "title", "added_by", "passage_list", "know",
+            "vendor", "captured_from", "session_id", "quotes", "redactions",
+        ):
             if key in data:
                 rec[key] = copy.deepcopy(data[key])
         state["notes"][data["note"]] = rec
+        return
+    if kind == "note.extended":
+        rec = state["notes"].get(data["note"])
+        if rec is None:
+            rec = {
+                "note": data["note"],
+                "kinds": ["session"],
+                "date": data["note"][:10],
+                "files": [],
+                "from_sources": None,
+                "passages": 0,
+                "passage_list": [],
+                "missing": True,
+                "at": event["at"],
+            }
+            state["notes"][data["note"]] = rec
+        rec.setdefault("passage_list", [])
+        rec["passage_list"].extend(copy.deepcopy(data["passage_list"]))
+        rec["passages"] = len(rec["passage_list"])
+        for name in data.get("files") or []:
+            if name not in rec.setdefault("files", []):
+                rec["files"].append(name)
+        if data.get("know"):
+            rec.setdefault("know", [])
+            rec["know"].extend(copy.deepcopy(data["know"]))
+        return
+    if kind == "answer.matched":
+        state["answers"].append({
+            "note": data["note"],
+            "passage": data["passage"],
+            "spec": data["spec"],
+            "question": data["question"],
+            "at": event["at"],
+            "run": event["run"],
+        })
         return
     if kind == "fact.cited":
         state["facts"][data["fact"]] = {

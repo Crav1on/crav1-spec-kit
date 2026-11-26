@@ -9,7 +9,7 @@ from crav1_2.paths import guarded_write
 from crav1_2.schema import RUN_ID, now_iso, parse_at
 
 
-def write_session(repo, session_id: str, status: str, step: str = "", left: list | None = None, at: str | None = None) -> dict:
+def write_session(repo, session_id: str, status: str, step: str = "", left: list | None = None, at: str | None = None, payload: dict | None = None) -> dict:
     if status not in {"open", "parked", "ended"}:
         raise EngineError("Refused: a session is open, parked, or ended.")
     if not isinstance(session_id, str) or not RUN_ID.fullmatch(session_id):
@@ -20,6 +20,10 @@ def write_session(repo, session_id: str, status: str, step: str = "", left: list
     stamp = at or now_iso()
     parse_at(stamp)
     body = {"id": session_id, "status": status, "step": step, "left": cards, "at": stamp}
-    payload = (json.dumps(body, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
-    guarded_write(repo, f".crav1-2/sessions/{session_id}.json", payload)
+    if payload is not None:
+        if not isinstance(payload, dict):
+            raise EngineError("Refused: a session payload must be an object.")
+        body["payload"] = payload
+    encoded = (json.dumps(body, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
+    guarded_write(repo, f".crav1-2/sessions/{session_id}.json", encoded)
     return body
