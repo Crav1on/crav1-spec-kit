@@ -69,6 +69,9 @@ def workflow_stamp() -> list[str]:
     for path in sorted(ROOT.glob("**/reference/workflow.md")):
         if ".git" in path.parts:
             continue
+        # Kit 2.0 lives under v2/ on main. That tree is not a 1.x workflow copy.
+        if path.relative_to(ROOT).parts[0] == "v2":
+            continue
         m = re.search(r"^Kit version: (\S+)$", path.read_text(encoding="utf-8"), re.M)
         got = m.group(1) if m else None
         if got != want:
